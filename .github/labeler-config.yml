@@ -1,0 +1,6 @@
+contracts:
+  - '**/*.sol'
+  - 'packages/contracts/**/*'
+  - -
+subgraph:
+  - 'packages/subgraph/**/*'

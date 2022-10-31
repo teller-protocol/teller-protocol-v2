@@ -1,0 +1,9 @@
+{
+  "network": "mainnet",
+  "address_teller_v2": "0x00182FdB0B880eE24D428e3Cc39383717677C37e",
+  "block_teller_v2": "15094705",
+  "address_market_registry": "0x5e30357d5136Bc4BfaDBA1ab341D0da09Fe7a9F1",
+  "block_market_registry": "15094705",
+  "address_lender_commitment": "0x17A8e82351661DFD568FEE6D7c38695b67e1e924",
+  "block_lender_commitment": "15222115"
+}

@@ -1,0 +1,43 @@
+{
+  "name": "Untitled GraphQL Schema",
+  "schemaPath": "schema.graphql",
+  "extensions": {
+    "endpoints": {
+      "Polygon Mainnet": {
+        "url": "https://api.thegraph.com/subgraphs/name/teller-protocol/tellerv2-polygon",
+        "headers": {
+          "user-agent": "JS GraphQL"
+        },
+        "introspect": false
+      },
+      "Polygon Mainnet Test": {
+        "url": "https://api.thegraph.com/subgraphs/name/teller-protocol/tellerv2-polygon-test",
+        "headers": {
+          "user-agent": "JS GraphQL"
+        },
+        "introspect": false
+      },
+      "Ethereum Mainnet": {
+        "url": "https://api.thegraph.com/subgraphs/name/teller-protocol/tellerv2-mainnet",
+        "headers": {
+          "user-agent": "JS GraphQL"
+        },
+        "introspect": false
+      },
+      "Ethereum Mainnet Test": {
+        "url": "https://api.thegraph.com/subgraphs/name/teller-protocol/tellerv2-mainnet-test",
+        "headers": {
+          "user-agent": "JS GraphQL"
+        },
+        "introspect": false
+      },
+      "Local GraphQL Endpoint": {
+        "url": "http://localhost:8080/graphql",
+        "headers": {
+          "user-agent": "JS GraphQL"
+        },
+        "introspect": false
+      }
+    }
+  }
+}

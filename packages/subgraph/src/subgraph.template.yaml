@@ -1,0 +1,110 @@
+specVersion: 0.0.2
+schema:
+  file: ./src/schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: TellerV2
+    network: {{network}}
+    source:
+      address: '{{address_teller_v2}}'
+      abi: TellerV2
+      startBlock: {{block_teller_v2}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Bid
+      abis:
+        - name: TellerV2
+          file: ./abis/{{network}}_TellerV2.json
+      eventHandlers:
+        - event: SubmittedBid(indexed uint256,indexed address,address,indexed bytes32)
+          handler: handleSubmittedBid
+        - event: AcceptedBid(indexed uint256,indexed address)
+          handler: handleAcceptedBid
+        - event: CancelledBid(indexed uint256)
+          handler: handleCancelledBid
+        - event: LoanRepayment(indexed uint256)
+          handler: handleLoanRepayment
+        - event: LoanRepaid(indexed uint256)
+          handler: handleLoanRepaid
+        - event: FeePaid(indexed uint256,indexed string,indexed uint256)
+          handler: handleFeePaid
+        - event: Upgraded(indexed address)
+          handler: handleTellerV2Upgraded
+      file: ./src/mapping.ts
+  - kind: ethereum/contract
+    name: MarketRegistry
+    network: {{network}}
+    source:
+      address: '{{address_market_registry}}'
+      abi: MarketRegistry
+      startBlock: {{block_market_registry}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - MarketPlace
+      abis:
+        - name: MarketRegistry
+          file: ./abis/{{network}}_MarketRegistry.json
+      eventHandlers:
+        - event: MarketCreated(indexed address,uint256)
+          handler: handleMarketCreated
+        - event: SetMarketURI(uint256,string)
+          handler: handleSetMarketURI
+        - event: SetMarketOwner(uint256,address)
+          handler: handleSetMarketOwner
+        - event: SetMarketFeeRecipient(uint256,address)
+          handler: handleSetMarketFeeRecipient
+        - event: SetPaymentCycleDuration(uint256,uint32)
+          handler: handleSetPaymentCycleDuration
+        - event: SetPaymentDefaultDuration(uint256,uint32)
+          handler: handleSetPaymentDefaultDuration
+        - event: SetBidExpirationTime(uint256,uint32)
+          handler: handleSetBidExpirationTime
+        - event: SetMarketFee(uint256,uint16)
+          handler: handleSetMarketFee
+        - event: SetMarketLenderAttestation(uint256,bool)
+          handler: handleSetLenderAttestationRequired
+        - event: SetMarketBorrowerAttestation(uint256,bool)
+          handler: handleSetBorrowerAttestationRequired
+        - event: LenderAttestation(uint256,address)
+          handler: handleLenderAttestation
+        - event: BorrowerAttestation(uint256,address)
+          handler: handleBorrowerAttestation
+        - event: LenderExitMarket(uint256,address)
+          handler: handleLenderExitMarket
+        - event: BorrowerExitMarket(uint256,address)
+          handler: handleBorrowerExitMarket
+        - event: MarketClosed(uint256)
+          handler: handleMarketClosed
+        - event: Upgraded(indexed address)
+          handler: handleMarketRegistryUpgraded
+      file: ./src/mapping.ts
+  - kind: ethereum/contract
+    name: LenderCommitmentForwarder
+    network: {{network}}
+    source:
+      address: '{{address_lender_commitment}}'
+      abi: LenderCommitmentForwarder
+      startBlock: {{block_lender_commitment}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Commitment
+      abis:
+        - name: LenderCommitmentForwarder
+          file: ./abis/{{network}}_LenderCommitmentForwarder.json
+      eventHandlers:
+        - event: UpdatedCommitment(indexed address,indexed uint256,indexed address,uint256)
+          handler: handleUpdatedCommitment
+        - event: DeletedCommitment(indexed address,indexed uint256,indexed address)
+          handler: handleDeletedCommitment
+        - event: ExercisedCommitment(indexed address,indexed uint256,indexed address,uint256,uint256)
+          handler: handleExercisedCommitment
+      file: ./src/mapping.ts

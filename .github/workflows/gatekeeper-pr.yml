@@ -1,0 +1,40 @@
+name: PR GateKeeper
+
+on: pull_request
+
+jobs:
+  gatekeeper:
+    runs-on: ubuntu-latest
+    outputs:
+      is-dependabot: ${{ steps.is-dependabot.outputs.check }}
+      contract-changes: ${{ steps.check-contract-changes.outputs.any_changed }}
+    steps:
+      - id: is-dependabot
+        run: echo "::set-output name=check::${{ github.event.pull_request.user.login == 'dependabot[bot]' }}"
+
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - id: check-contract-changes
+        uses: tj-actions/changed-files@v18.6
+        with:
+          since_last_remote_commit: true
+          files: |
+            **/*.sol
+            packages/hardhat-ts/test/**/*
+
+  contract-jobs:
+    needs: gatekeeper
+    if: needs.gatekeeper.outputs.contract-changes == 'true'
+    uses: teller-protocol/scaffold-pr-setup/.github/workflows/test-contracts.yml@main
+    secrets:
+      DEFAULT_NETWORK: ${{ secrets.DEFAULT_NETWORK }}
+      MNEMONIC: ${{ secrets.MNEMONIC }}
+      MAINNET_RPC_URL: ${{ secrets.MAINNET_RPC_URL }}
+      GOERLI_RPC_URL: ${{ secrets.GOERLI_RPC_URL }}
+      POLYGON_RPC_URL: ${{ secrets.POLYGON_RPC_URL }}
+      MUMBAI_RPC_URL: ${{ secrets.MUMBAI_RPC_URL }}
+      ETHERSCAN_API_KEY: ${{ secrets.ETHERSCAN_API_KEY }}
+      CMC_KEY: ${{ secrets.CMC_KEY }}
+      DISABLE_LOGS: ${{ secrets.DISABLE_LOGS }}

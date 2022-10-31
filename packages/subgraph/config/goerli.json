@@ -1,0 +1,9 @@
+{
+  "network": "goerli",
+  "address_teller_v2": "0x1D0eBC060f2897dAc14E482De600cea7896c0A3E",
+  "block_teller_v2": "6896250",
+  "address_market_registry": "0x1815F01083AFD110373e952b6488f33b048F096b",
+  "block_market_registry": "6896250",
+  "address_lender_commitment": "0xC2418B857F9147AF5eB4517B23e9a966b368328f",
+  "block_lender_commitment": "7664450"
+}

@@ -120,7 +120,7 @@ const getLatestDeploymentBlock = (networkName: string): number | undefined => {
 }
 
 const networkConfig = (config: NetworkUserConfig): NetworkUserConfig => ({
-  live: true,
+  live: false,
   ...config,
   accounts,
   gas: 'auto',
@@ -228,7 +228,6 @@ export default <HardhatUserConfig>{
   networks: {
     hardhat: networkConfig({
       chainId: 31337,
-      live: false,
       allowUnlimitedContractSize: true,
       saveDeployments: !isTesting,
       forking:
@@ -242,11 +241,11 @@ export default <HardhatUserConfig>{
     }),
     localhost: networkConfig({
       url: 'http://localhost:8545',
-      live: false,
     }),
     mainnet: networkConfig({
       url: networkUrls.mainnet,
       chainId: 1,
+      live: true,
       gasPrice: mainnetGwei * 1000000000,
 
       verify: {
@@ -258,6 +257,7 @@ export default <HardhatUserConfig>{
     goerli: networkConfig({
       url: networkUrls.goerli,
       chainId: 5,
+      live: true,
 
       verify: {
         etherscan: {
@@ -273,6 +273,7 @@ export default <HardhatUserConfig>{
     polygon: networkConfig({
       url: networkUrls.polygon,
       chainId: 137,
+      live: true,
       gasPrice: ethers.utils.parseUnits('200', 'gwei').toNumber(),
 
       verify: {
@@ -285,6 +286,7 @@ export default <HardhatUserConfig>{
       url: networkUrls.mumbai,
       gasPrice: 2100000000, // @lazycoder - deserves another Sherlock badge
       chainId: 80001,
+      live: true,
 
       verify: {
         etherscan: {
@@ -298,7 +300,6 @@ export default <HardhatUserConfig>{
       companionNetworks: {
         l1: 'localArbitrumL1',
       },
-      live: false,
     }),
     localArbitrumL1: networkConfig({
       url: 'http://localhost:7545',
@@ -306,7 +307,6 @@ export default <HardhatUserConfig>{
       companionNetworks: {
         l2: 'localArbitrum',
       },
-      live: false,
     }),
     optimism: networkConfig({
       url: networkUrls.optimism,
@@ -319,7 +319,6 @@ export default <HardhatUserConfig>{
       companionNetworks: {
         l1: 'localOptimismL1',
       },
-      live: false,
     }),
     localOptimismL1: networkConfig({
       url: 'http://localhost:9545',
@@ -327,13 +326,11 @@ export default <HardhatUserConfig>{
       companionNetworks: {
         l2: 'localOptimism',
       },
-      live: false,
     }),
     localAvalanche: networkConfig({
       url: 'http://localhost:9650/ext/bc/C/rpc',
       gasPrice: 225000000000,
       chainId: 43112,
-      live: false,
     }),
     fujiAvalanche: networkConfig({
       url: networkUrls.fujiAvalanche,

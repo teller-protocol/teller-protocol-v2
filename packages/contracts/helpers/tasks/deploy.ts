@@ -13,7 +13,7 @@ subtask(TASK_DEPLOY_RUN_DEPLOY, async (args, hre, runSuper) => {
   await hre.run('export:deployments')
 
   // Only continue on a live network
-  if (!hre.network.live) return
+  if (!hre.network.config.live) return
 
   // Verify contracts
   await hre.run('verify')

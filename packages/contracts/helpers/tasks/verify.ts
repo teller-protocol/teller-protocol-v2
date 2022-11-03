@@ -8,7 +8,7 @@ export const verifyContracts = async (
   const { network } = hre
 
   // Only continue on a live network
-  if (!network.live)
+  if (!network.config.live)
     throw new Error('Must be on a live network to submit to Tenderly')
 
   // Verify contracts on Etherscan

@@ -9,18 +9,8 @@ task(
   'export:deployments',
   'Export contract deployments for react-app and subgraph packages'
 ).setAction(async (args, hre) => {
-  await publishReactApp(hre)
   await publishSubgraph(hre)
 })
-
-const publishReactApp = async (
-  hre: HardhatRuntimeEnvironment
-): Promise<void> => {
-  await hre.run('export', {
-    exportAll: '../vite-app-ts/src/generated/contracts/hardhat_contracts.json',
-  })
-  console.log('✅  Published contracts to the react-app package.')
-}
 
 const publishSubgraph = async (
   hre: HardhatRuntimeEnvironment

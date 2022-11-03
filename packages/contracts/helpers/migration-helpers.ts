@@ -1,6 +1,7 @@
 import { DeployFunction } from 'hardhat-deploy/dist/types'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
 import moment from 'moment'
+import path from 'path'
 
 import { getNetworkName } from '~~/config'
 
@@ -10,6 +11,7 @@ export const migrate = (
   id: string,
   deployFn: MigrationFunction
 ): DeployFunction => {
+  id = path.basename(id)
   const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
     const { log } = hre
 

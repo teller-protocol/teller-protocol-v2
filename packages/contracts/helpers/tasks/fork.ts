@@ -28,10 +28,10 @@ export const forkNetwork: ActionType<NetworkArgs> = async (
     throw new Error(`Must use "${HARDHAT_NETWORK_NAME}" network for forking`)
   }
 
-  const chain = process.env.FORKING_NETWORK
+  const chain = process.env.HARDHAT_DEPLOY_FORK
   if (!chain) {
     throw new Error(
-      `Forking network must be set in the ENV parameter FORKING_NETWORK`
+      `Forking network must be set in the ENV parameter HARDHAT_DEPLOY_FORK`
     )
   }
 
@@ -105,7 +105,7 @@ subtask('fork:fund-deployer').setAction(async (args, hre) => {
   if (
     ethers.utils.getAddress(mainAccount) !== ethers.utils.getAddress(deployer)
   ) {
-    const chain = process.env.FORKING_NETWORK
+    const chain = process.env.HARDHAT_DEPLOY_FORK
     if (chain === 'mainnet' || chain === 'goerli') {
       await getFunds({
         to: deployer,

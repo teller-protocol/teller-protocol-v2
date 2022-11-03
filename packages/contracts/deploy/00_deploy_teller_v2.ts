@@ -1,7 +1,6 @@
-import { BigNumber } from 'ethers'
 import { DeployFunction } from 'hardhat-deploy/dist/types'
 import { HARDHAT_NETWORK_NAME } from 'hardhat/plugins'
-import { deploy, DeployedContract } from 'helpers/deploy-helpers'
+import { deploy } from 'helpers/deploy-helpers'
 import { isInitialized } from 'helpers/oz-contract-helpers'
 import { TellerV2 } from 'types/typechain'
 
@@ -12,7 +11,7 @@ const deployFn: DeployFunction = async (hre) => {
 
   const marketRegistry = await hre.contracts.get('MarketRegistry')
 
-  const tokens = getTokens(hre.network)
+  const tokens = await getTokens(hre)
   const lendingTokens = [tokens.all.DAI, tokens.all.USDC, tokens.all.WETH]
   if ('USDCT' in tokens.all) {
     lendingTokens.push(tokens.all.USDCT)

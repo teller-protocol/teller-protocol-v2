@@ -199,7 +199,7 @@ extendEnvironment((hre) => {
       if (ethers.utils.isAddress(nameOrAddress)) {
         address = nameOrAddress
       } else {
-        const tokens = getTokens(network)
+        const tokens = await getTokens(hre)
         address = tokens.all[nameOrAddress.toUpperCase()]
         if (!address) throw new Error(`Token ${nameOrAddress} not found`)
       }

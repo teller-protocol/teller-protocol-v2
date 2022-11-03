@@ -52,13 +52,13 @@ const same = async (
   values: SubmittedBidValues
   txPromise: Promise<ContractTransaction>
 }> => {
-  const { contracts, getNamedSigner, network, ethers, toBN } = hre
+  const { contracts, getNamedSigner, ethers, toBN } = hre
 
   const tellerV2 =
     options?.tellerV2 ?? (await contracts.get<TellerV2>('TellerV2'))
   const borrower = options?.borrower ?? (await getNamedSigner('borrower'))
   const lendingToken = await contracts.get<ERC20>('ERC20', {
-    at: options?.lendingToken ?? getTokens(network).all.DAI,
+    at: options?.lendingToken ?? (await getTokens(hre)).all.DAI,
   })
 
   // Get values or defaults

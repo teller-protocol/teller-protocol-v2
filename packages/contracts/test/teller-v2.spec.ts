@@ -124,7 +124,7 @@ describe('TellerV2', () => {
           marketRegistry.address,
           reputationManager.address,
           AddressZero,
-          [getTokens(hre.network).all.DAI]
+          [(await getTokens(hre)).all.DAI]
         )
         .should.be.revertedWith(
           'Initializable: contract is already initialized'
@@ -239,7 +239,6 @@ describe('TellerV2', () => {
       const { rando: dummyAddress } = await getNamedAccounts()
       await tellerV2.connect(deployer).pauseProtocol()
       const { txPromise } = await trySubmitBid({
-        lendingToken: dummyAddress,
         amountBN: 10000,
       })
 
@@ -253,7 +252,6 @@ describe('TellerV2', () => {
       await marketRegistry.connect(marketOwner).closeMarket(1)
 
       const { txPromise } = await trySubmitBid({
-        lendingToken: dummyAddress,
         amountBN: 10000,
         marketplaceId: 1,
       })

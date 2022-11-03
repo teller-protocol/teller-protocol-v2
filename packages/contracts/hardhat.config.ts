@@ -42,7 +42,7 @@ const {
   COMPILING,
   CMC_KEY,
   DEFAULT_NETWORK,
-  FORKING_NETWORK,
+  HARDHAT_DEPLOY_FORK,
   SAVE_GAS_REPORT,
   SKIP_SIZER,
   TESTING,
@@ -215,6 +215,7 @@ export default <HardhatUserConfig>{
     lender2: 3,
     dao: 4,
     marketowner: 5,
+    funder: 10,
     rando: 14,
   },
 
@@ -228,15 +229,16 @@ export default <HardhatUserConfig>{
   networks: {
     hardhat: networkConfig({
       chainId: 31337,
+      live: true,
       allowUnlimitedContractSize: true,
       saveDeployments: !isTesting,
       forking:
-        FORKING_NETWORK == null
+        HARDHAT_DEPLOY_FORK == null
           ? undefined
           : {
               enabled: true,
-              url: networkUrls[FORKING_NETWORK],
-              // blockNumber: getLatestDeploymentBlock(FORKING_NETWORK),
+              url: networkUrls[HARDHAT_DEPLOY_FORK],
+              // blockNumber: getLatestDeploymentBlock(HARDHAT_DEPLOY_FORK),
             },
     }),
     localhost: networkConfig({
@@ -250,7 +252,7 @@ export default <HardhatUserConfig>{
 
       verify: {
         etherscan: {
-          apiKey: process.env.ETHERSCAN_API_KEY,
+          apiKey: process.env.ETHERSCAN_VERIFY_API_KEY,
         },
       },
     }),
@@ -261,7 +263,7 @@ export default <HardhatUserConfig>{
 
       verify: {
         etherscan: {
-          apiKey: process.env.ETHERSCAN_API_KEY,
+          apiKey: process.env.ETHERSCAN_VERIFY_API_KEY,
         },
       },
     }),
@@ -278,7 +280,7 @@ export default <HardhatUserConfig>{
 
       verify: {
         etherscan: {
-          apiKey: process.env.POLYGONSCAN_API_KEY,
+          apiKey: process.env.POLYGONSCAN_VERIFY_API_KEY,
         },
       },
     }),
@@ -290,7 +292,7 @@ export default <HardhatUserConfig>{
 
       verify: {
         etherscan: {
-          apiKey: process.env.POLYGONSCAN_API_KEY,
+          apiKey: process.env.POLYGONSCAN_VERIFY_API_KEY,
         },
       },
     }),

@@ -9,6 +9,7 @@ subtask(TASK_DEPLOY_RUN_DEPLOY, async (args, hre, runSuper) => {
 
   await runSuper(args)
 
+
   // Export contract data
   await hre.run('export:deployments')
 

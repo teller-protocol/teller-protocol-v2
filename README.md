@@ -28,8 +28,8 @@ Borrowers (and developers building DApps for users) can submit bids by calling:
 * @param _APY The proposed interest rate for the loan bid.
 * @param _paymentCycle The recurrent length of time before which a payment is due.
 * @param _metadataURI The URI for additional borrower loan information as part of loan bid.
-  */
-  function submitBid(
+*/
+function submitBid(
   address _lendingToken,
   uint256 _marketplaceId,
   uint256 _principal,
@@ -38,7 +38,7 @@ Borrowers (and developers building DApps for users) can submit bids by calling:
   uint32 _paymentCycle,
   bytes32 _metadataURI,
   address _receiver
-  );
+);
 ``` 
 The _metadataURI submitted by a borrower along with the proposed loan terms (_APY, _principal, _lendingToken, etc), needs to correspond with the metadata required by the market. Depending on the market, this could be in the form of a verified credit report from the relative credit bureau, identity, or other relevant data.
 
@@ -47,8 +47,8 @@ Lenders (and developers building DApps for users) can accept bids by calling:
 /**
 * @notice Function for a lender to accept a proposed loan bid.
 * @param _bidId The id of the loan bid to accept.
-  */
-  function lenderAcceptBid(uint256 _bidId);
+*/
+function lenderAcceptBid(uint256 _bidId);
 ```
 
 **MarketRegistry**

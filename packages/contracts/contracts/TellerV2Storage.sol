@@ -4,6 +4,7 @@ pragma solidity >=0.8.0 <0.9.0;
 import { IMarketRegistry } from "./interfaces/IMarketRegistry.sol";
 import { V2Calculations } from "./TellerV2.sol";
 import "./interfaces/IReputationManager.sol";
+import "./interfaces/ILenderManager.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
@@ -124,6 +125,9 @@ abstract contract TellerV2Storage_G0 {
     // Mapping of metadataURIs by bidIds.
     // Bid Id => metadataURI string
     mapping(uint256 => string) public uris;
+
+    // Address of the lender manager contract
+    ILenderManager public lenderManager;
 }
 
 abstract contract TellerV2Storage_G1 is TellerV2Storage_G0 {

@@ -26,6 +26,15 @@ const deployFn: DeployFunction = async (hre) => {
     hre,
   })
 
+  const lenderManager = await deploy({
+    contract: 'LenderManager',
+    args: [],
+    proxy: {
+      proxyContract: 'OpenZeppelinTransparentProxy',
+    },
+    hre,
+  })
+
   const trustedForwarder = await deploy({
     contract: 'MetaForwarder',
     skipIfAlreadyDeployed: true,
@@ -65,10 +74,16 @@ const deployFn: DeployFunction = async (hre) => {
     hre,
   })
 
-  // execute the initialize method of reputation manager
+  // Execute the initialize method of reputation manager
   const reputationIsInitialized = await isInitialized(reputationManager.address)
   if (!reputationIsInitialized) {
     await reputationManager.initialize(tellerV2Contract.address)
+  }
+
+  // Execute the initialize method of lender manager
+  const lenderManagerIsInitialized = await isInitialized(lenderManager.address)
+  if (!lenderManagerIsInitialized) {
+    await lenderManager.initialize(tellerV2Contract.address)
   }
 
   const tellerV2IsInitialized = await isInitialized(tellerV2Contract.address)
@@ -78,7 +93,8 @@ const deployFn: DeployFunction = async (hre) => {
       marketRegistry.address,
       reputationManager.address,
       lenderCommitmentForwarder.address,
-      lendingTokens
+      lendingTokens,
+      lenderManager.address
     )
   } else if (tellerV2Contract.deployResult.newlyDeployed) {
     await tellerV2Contract.onUpgrade()

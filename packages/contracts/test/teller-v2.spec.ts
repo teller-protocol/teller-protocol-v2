@@ -7,6 +7,7 @@ import { getFunds } from 'helpers/get-funds'
 import { isInitialized } from 'helpers/oz-contract-helpers'
 import moment from 'moment'
 import {
+  LenderManager,
   MarketRegistry,
   ReputationManager,
   TellerV2,
@@ -63,10 +64,15 @@ const setup = deployments.createFixture<SetupReturn, SetupOptions>(
       'ReputationManager'
     )
 
+    const lenderManager = await hre.contracts.get<LenderManager>(
+      'LenderManager'
+    )
+
     return {
       tellerV2,
       marketRegistry,
       reputationManager,
+      lenderManager,
     }
   }
 )
@@ -78,6 +84,7 @@ describe('TellerV2', () => {
   let borrower: Signer
   let lender: Signer
   let marketOwner: Signer
+  let lenderManager: LenderManager
 
   beforeEach(async () => {
     const result = await setup()
@@ -87,6 +94,7 @@ describe('TellerV2', () => {
     borrower = await getNamedSigner('borrower')
     lender = await getNamedSigner('lender')
     marketOwner = await getNamedSigner('marketowner')
+    lenderManager = result.lenderManager
 
     const marketOwnerAddress = await marketOwner.getAddress()
     const uri = 'http://'
@@ -124,7 +132,8 @@ describe('TellerV2', () => {
           marketRegistry.address,
           reputationManager.address,
           AddressZero,
-          [(await getTokens(hre)).all.DAI]
+          [(await getTokens(hre)).all.DAI],
+          lenderManager.address
         )
         .should.be.revertedWith(
           'Initializable: contract is already initialized'

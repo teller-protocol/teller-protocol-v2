@@ -13,6 +13,7 @@ import "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol";
 // Interfaces
 import "./interfaces/IMarketRegistry.sol";
 import "./interfaces/IReputationManager.sol";
+import "./interfaces/ILenderManager.sol";
 import "./interfaces/ITellerV2.sol";
 
 // Libraries
@@ -159,14 +160,19 @@ contract TellerV2 is
     /**
      * @notice Initializes the proxy.
      * @param _protocolFee The fee collected by the protocol for loan processing.
+     * @param _marketRegistry The address of the market registry contract for the protocol.
+     * @param _reputationManager The address of the reputation manager contract.
+     * @param _lenderCommitmentForwarder The address of the lender commitment forwarder contract.
      * @param _lendingTokens The list of tokens allowed as lending assets on the protocol.
+     * @param _lenderManager The address of the lender manager contract for loans on the protocol.
      */
     function initialize(
         uint16 _protocolFee,
         address _marketRegistry,
         address _reputationManager,
         address _lenderCommitmentForwarder,
-        address[] calldata _lendingTokens
+        address[] calldata _lendingTokens,
+        address _lenderManager
     ) external initializer {
         __ProtocolFee_init(_protocolFee);
 
@@ -175,6 +181,7 @@ contract TellerV2 is
         lenderCommitmentForwarder = _lenderCommitmentForwarder;
         marketRegistry = IMarketRegistry(_marketRegistry);
         reputationManager = IReputationManager(_reputationManager);
+        lenderManager = ILenderManager(_lenderManager);
 
         require(_lendingTokens.length > 0, "No lending tokens specified");
         for (uint256 i = 0; i < _lendingTokens.length; i++) {

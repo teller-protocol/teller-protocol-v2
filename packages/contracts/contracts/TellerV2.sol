@@ -399,6 +399,7 @@ contract TellerV2 is
         Bid storage bid = bids[_bidId];
 
         address sender = _msgSenderForMarket(bid.marketplaceId);
+        lenderManager.setNewLender(_bidId, sender);
         (bool isVerified, ) = marketRegistry.isVerifiedLender(
             bid.marketplaceId,
             sender

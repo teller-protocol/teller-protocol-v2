@@ -6,19 +6,17 @@ import "./interfaces/ILenderManager.sol";
 import "./interfaces/ITellerV2.sol";
 import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 
-contract LenderManager is ILenderManager, Initializable {
+import "hardhat/console.sol";
 
+contract LenderManager is ILenderManager, Initializable {
     /** Storage Variables */
     ITellerV2 public tellerV2;
 
     // Mapping of loans to current active lenders
     mapping(uint256 => address) internal _loanActiveLender;
 
-    /** Events */
-    event NewLenderSet(
-        address indexed newLender,
-        uint256 bidId
-    );
+    /** Events & Modifiers */
+    event NewLenderSet(address indexed newLender, uint256 bidId);
 
     /**
      * @notice Initializes the proxy.
@@ -32,10 +30,12 @@ contract LenderManager is ILenderManager, Initializable {
      * @param _bidId The id for the loan to set.
      * @param _newLender The address of the new active lender.
      */
-    function setNewLender(uint256 _bidId, address _newLender)
-        public
-        override
-    {
+    function setNewLender(uint256 _bidId, address _newLender) public override {
+        require(
+            getActiveLoanLender(_bidId) == msg.sender ||
+                getActiveLoanLender(_bidId) == address(0),
+            "Not loan owner"
+        );
         _loanActiveLender[_bidId] = _newLender;
         emit NewLenderSet(_newLender, _bidId);
     }
@@ -55,5 +55,4 @@ contract LenderManager is ILenderManager, Initializable {
             lender_ = tellerV2.getLoanLender(_bidId);
         }
     }
-
 }

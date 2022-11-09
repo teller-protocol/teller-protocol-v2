@@ -14,6 +14,12 @@ contract LenderManager is ILenderManager, Initializable {
     // Mapping of loans to current active lenders
     mapping(uint256 => address) internal _loanActiveLender;
 
+    /** Events */
+    event NewLenderSet(
+        address indexed newLender,
+        uint256 bidId
+    );
+
     /**
      * @notice Initializes the proxy.
      */
@@ -31,6 +37,7 @@ contract LenderManager is ILenderManager, Initializable {
         override
     {
         _loanActiveLender[_bidId] = _newLender;
+        emit NewLenderSet(_newLender, _bidId);
     }
 
     /**

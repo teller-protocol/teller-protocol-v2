@@ -50,9 +50,8 @@ contract LenderManager is ILenderManager, Initializable {
         override
         returns (address lender_)
     {
-        if (_loanActiveLender[_bidId] != address(0)) {
-            lender_ = _loanActiveLender[_bidId];
-        } else {
+        lender_ = _loanActiveLender[_bidId];
+        if (_loanActiveLender[_bidId] == address(0)) {
             lender_ = tellerV2.getLoanLender(_bidId);
         }
     }

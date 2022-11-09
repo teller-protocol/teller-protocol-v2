@@ -6,8 +6,6 @@ import "./interfaces/ILenderManager.sol";
 import "./interfaces/ITellerV2.sol";
 import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 
-import "hardhat/console.sol";
-
 contract LenderManager is ILenderManager, Initializable {
     /** Storage Variables */
     ITellerV2 public tellerV2;
@@ -15,7 +13,7 @@ contract LenderManager is ILenderManager, Initializable {
     // Mapping of loans to current active lenders
     mapping(uint256 => address) internal _loanActiveLender;
 
-    /** Events & Modifiers */
+    /** Events **/
     event NewLenderSet(address indexed newLender, uint256 bidId);
 
     /**

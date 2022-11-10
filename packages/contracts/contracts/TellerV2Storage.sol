@@ -62,7 +62,7 @@ abstract contract TellerV2Storage_G0 {
     struct Bid {
         address borrower;
         address receiver;
-        address lender;
+        address lender; // DEPRECATED
         uint256 marketplaceId;
         bytes32 _metadataURI; // DEPRECATED
         LoanDetails loanDetails;

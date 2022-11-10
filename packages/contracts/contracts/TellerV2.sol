@@ -399,6 +399,7 @@ contract TellerV2 is
         Bid storage bid = bids[_bidId];
 
         address sender = _msgSenderForMarket(bid.marketplaceId);
+        // Declare the bid acceptor as the lender of the bid
         lenderManager.setNewLender(_bidId, sender);
         (bool isVerified, ) = marketRegistry.isVerifiedLender(
             bid.marketplaceId,
@@ -420,9 +421,6 @@ contract TellerV2 is
         // Mark borrower's request as accepted
         bid.state = BidState.ACCEPTED;
 
-        // Declare the bid acceptor as the lender of the bid
-        bid.lender = sender;
-
         // Transfer funds to borrower from the lender
         amountToProtocol = bid.loanDetails.principal.percent(protocolFee());
         amountToMarketplace = bid.loanDetails.principal.percent(
@@ -434,28 +432,28 @@ contract TellerV2 is
             amountToMarketplace;
         //transfer fee to protocol
         bid.loanDetails.lendingToken.safeTransferFrom(
-            bid.lender,
+            sender,
             owner(),
             amountToProtocol
         );
 
         //transfer fee to marketplace
         bid.loanDetails.lendingToken.safeTransferFrom(
-            bid.lender,
+            sender,
             marketRegistry.getMarketFeeRecipient(bid.marketplaceId),
             amountToMarketplace
         );
 
         //transfer funds to borrower
         bid.loanDetails.lendingToken.safeTransferFrom(
-            bid.lender,
+            sender,
             bid.receiver,
             amountToBorrower
         );
 
         // Record volume filled by lenders
         lenderVolumeFilled[address(bid.loanDetails.lendingToken)][
-            bid.lender
+            sender
         ] += bid.loanDetails.principal;
         totalVolumeFilled[address(bid.loanDetails.lendingToken)] += bid
             .loanDetails
@@ -465,7 +463,7 @@ contract TellerV2 is
         _borrowerBidsActive[bid.borrower].add(_bidId);
 
         // Emit AcceptedBid
-        emit AcceptedBid(_bidId, bid.lender);
+        emit AcceptedBid(_bidId, sender);
 
         emit FeePaid(_bidId, "protocol", amountToProtocol);
         emit FeePaid(_bidId, "marketplace", amountToMarketplace);
@@ -611,7 +609,7 @@ contract TellerV2 is
         // Send payment to the lender
         bid.loanDetails.lendingToken.safeTransferFrom(
             _msgSenderForMarket(bid.marketplaceId),
-            bid.lender,
+            lenderManager.getActiveLoanLender(_bidId),
             paymentAmount
         );
 

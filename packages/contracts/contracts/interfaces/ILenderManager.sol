@@ -2,10 +2,6 @@
 pragma solidity >=0.8.0 <0.9.0;
 
 interface ILenderManager {
-    /**
-     * @notice Initializes the proxy.
-     */
-    function initialize(address protocolAddress) external;
 
     /**
      * @notice Sets the new active lender for a loan.

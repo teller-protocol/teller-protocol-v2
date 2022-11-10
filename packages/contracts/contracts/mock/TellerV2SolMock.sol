@@ -100,11 +100,11 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
     {
         Bid storage bid = bids[_bidId];
 
-        bid.lender = msg.sender;
+        bid._lender = msg.sender;
 
         //send tokens to caller
         IERC20(bid.loanDetails.lendingToken).transferFrom(
-            bid.lender,
+            bid._lender,
             bid.receiver,
             bid.loanDetails.principal
         );
@@ -152,7 +152,7 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
         view
         returns (address lender_)
     {
-        lender_ = bids[_bidId].lender;
+        lender_ = bids[_bidId]._lender;
     }
 
     function getLoanLendingToken(uint256 _bidId)

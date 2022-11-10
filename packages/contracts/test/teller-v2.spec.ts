@@ -442,6 +442,7 @@ describe('TellerV2', () => {
       await tellerV2.mockBid(
         buildBid({
           borrower: await borrower.getAddress(),
+          _lender: NULL_ADDRESS,
           receiver: await borrower.getAddress(),
           loanDetails: {
             lendingToken: token.address,
@@ -795,7 +796,7 @@ export const buildBid = (values: PartialNested<BidParams>): BidParams =>
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   <BidParams>{
     borrower: NULL_ADDRESS,
-    lender: NULL_ADDRESS,
+    _lender: NULL_ADDRESS,
     receiver: NULL_ADDRESS,
     _metadataURI: ethers.utils.id(''),
     marketplaceId: 1,

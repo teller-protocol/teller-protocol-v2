@@ -861,7 +861,7 @@ contract TellerV2 is
         view
         returns (address lender_)
     {
-        lender_ = bids[_bidId].lender;
+        lender_ = bids[_bidId]._lender;
     }
 
     function getLoanLendingToken(uint256 _bidId)

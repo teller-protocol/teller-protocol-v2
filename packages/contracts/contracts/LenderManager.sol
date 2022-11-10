@@ -4,11 +4,11 @@ pragma solidity >=0.8.0 <0.9.0;
 // Interfaces
 import "./interfaces/ILenderManager.sol";
 import "./interfaces/ITellerV2.sol";
-import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 contract LenderManager is ILenderManager, Initializable {
     /** Storage Variables */
-    ITellerV2 public tellerV2;
+    ITellerV2 public immutable tellerV2;
 
     // Mapping of loans to current active lenders
     mapping(uint256 => address) internal _loanActiveLender;
@@ -16,11 +16,8 @@ contract LenderManager is ILenderManager, Initializable {
     /** Events **/
     event NewLenderSet(address indexed newLender, uint256 bidId);
 
-    /**
-     * @notice Initializes the proxy.
-     */
-    function initialize(address _tellerV2) external initializer {
-        tellerV2 = ITellerV2(_tellerV2);
+    constructor(address _protocolAddress) {
+        tellerV2 = ITellerV2(_protocolAddress);
     }
 
     /**
@@ -28,14 +25,33 @@ contract LenderManager is ILenderManager, Initializable {
      * @param _bidId The id for the loan to set.
      * @param _newLender The address of the new active lender.
      */
-    function setNewLender(uint256 _bidId, address _newLender) public override {
+    function setNewLender(uint256 _bidId, address _newLender)
+        public
+        override
+    {
+        address currentLender = _getActiveLender(_bidId);
         require(
-            getActiveLoanLender(_bidId) == msg.sender ||
-                getActiveLoanLender(_bidId) == address(0),
+            currentLender == msg.sender ||
+            currentLender == address(0),
             "Not loan owner"
         );
-        _loanActiveLender[_bidId] = _newLender;
-        emit NewLenderSet(_newLender, _bidId);
+        if (currentLender != _newLender) {
+            _loanActiveLender[_bidId] = _newLender;
+            emit NewLenderSet(_newLender, _bidId);
+        }
+    }
+
+    /**
+     * @notice Returns the address of the lender that owns a given loan/bid.
+     * @param _bidId The id of the bid to return the lender for
+     * @return The address of the lender.
+     */
+    function getActiveLoanLender(uint256 _bidId)
+        public
+        override
+        returns (address)
+    {
+        return _getActiveLender(_bidId);
     }
 
     /**
@@ -43,9 +59,8 @@ contract LenderManager is ILenderManager, Initializable {
      * @param _bidId The id of the bid to return the lender for
      * @return lender_ The address of the lender.
      */
-    function getActiveLoanLender(uint256 _bidId)
-        public
-        override
+    function _getActiveLender(uint256 _bidId)
+        internal
         returns (address lender_)
     {
         lender_ = _loanActiveLender[_bidId];

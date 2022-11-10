@@ -26,15 +26,6 @@ const deployFn: DeployFunction = async (hre) => {
     hre,
   })
 
-  const lenderManager = await deploy({
-    contract: 'LenderManager',
-    args: [],
-    proxy: {
-      proxyContract: 'OpenZeppelinTransparentProxy',
-    },
-    hre,
-  })
-
   const trustedForwarder = await deploy({
     contract: 'MetaForwarder',
     skipIfAlreadyDeployed: true,
@@ -61,6 +52,16 @@ const deployFn: DeployFunction = async (hre) => {
     hre,
   })
 
+  const lenderManager = await deploy({
+    contract: 'LenderManager',
+    args: [tellerV2Contract.address],
+    proxy: {
+      proxyContract: 'OpenZeppelinTransparentProxy',
+    },
+    skipIfAlreadyDeployed: true,
+    hre,
+  })
+
   /*  
      Need to initialize the LenderCommitmentForwarder after TellerV2 has been deployed because it is a MarketForwarder
   */
@@ -78,12 +79,6 @@ const deployFn: DeployFunction = async (hre) => {
   const reputationIsInitialized = await isInitialized(reputationManager.address)
   if (!reputationIsInitialized) {
     await reputationManager.initialize(tellerV2Contract.address)
-  }
-
-  // Execute the initialize method of lender manager
-  const lenderManagerIsInitialized = await isInitialized(lenderManager.address)
-  if (!lenderManagerIsInitialized) {
-    await lenderManager.initialize(tellerV2Contract.address)
   }
 
   const tellerV2IsInitialized = await isInitialized(tellerV2Contract.address)

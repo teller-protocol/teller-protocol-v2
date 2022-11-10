@@ -47,7 +47,7 @@ contract LenderManager is ILenderManager, Initializable {
      * @return The address of the lender.
      */
     function getActiveLoanLender(uint256 _bidId)
-        public
+        external
         override
         returns (address)
     {
@@ -64,7 +64,7 @@ contract LenderManager is ILenderManager, Initializable {
         returns (address lender_)
     {
         lender_ = _loanActiveLender[_bidId];
-        if (_loanActiveLender[_bidId] == address(0)) {
+        if (lender_ == address(0)) {
             lender_ = tellerV2.getLoanLender(_bidId);
         }
     }

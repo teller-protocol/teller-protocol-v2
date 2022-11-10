@@ -47,6 +47,7 @@ interface SetupReturn {
   marketRegistry: MarketRegistry
   tellerV2: TellerV2Mock
   reputationManager: ReputationManager
+  lenderManager: LenderManager
 }
 
 const setup = deployments.createFixture<SetupReturn, SetupOptions>(
@@ -368,7 +369,9 @@ describe('TellerV2', () => {
         .emit(tellerV2, 'AcceptedBid')
         .withArgs(bidId, lender.address)
 
-      const stakeholder = await tellerV2.getLoanLender(bidId)
+      const stakeholder = await lenderManager.callStatic.getActiveLoanLender(
+        bidId
+      )
       stakeholder.should.be.eql(lender.address)
     })
 
@@ -439,7 +442,6 @@ describe('TellerV2', () => {
       await tellerV2.mockBid(
         buildBid({
           borrower: await borrower.getAddress(),
-          lender: await lender.getAddress(),
           receiver: await borrower.getAddress(),
           loanDetails: {
             lendingToken: token.address,

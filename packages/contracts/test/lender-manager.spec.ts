@@ -45,7 +45,7 @@ const setup = deployments.createFixture<SetupReturn, SetupOptions>(
   }
 )
 
-describe.only('LenderManager', () => {
+describe('LenderManager', () => {
   let lenderManager: LenderManager
   let lender: Signer
   let borrower: Signer
@@ -92,7 +92,7 @@ describe.only('LenderManager', () => {
         bidId
       )
 
-      expect(bidData.lender).to.eql(activeLender)
+      expect(await lender.getAddress()).to.eql(activeLender)
     })
   })
 })

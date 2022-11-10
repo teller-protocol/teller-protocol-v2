@@ -125,9 +125,6 @@ abstract contract TellerV2Storage_G0 {
     // Mapping of metadataURIs by bidIds.
     // Bid Id => metadataURI string
     mapping(uint256 => string) public uris;
-
-    // Address of the lender manager contract
-    ILenderManager public lenderManager;
 }
 
 abstract contract TellerV2Storage_G1 is TellerV2Storage_G0 {
@@ -142,4 +139,9 @@ abstract contract TellerV2Storage_G2 is TellerV2Storage_G1 {
     address public lenderCommitmentForwarder;
 }
 
-abstract contract TellerV2Storage is TellerV2Storage_G2 {}
+abstract contract TellerV2Storage_G3 is TellerV2Storage_G2 {
+    // Address of the lender manager contract
+    ILenderManager public lenderManager;
+}
+
+abstract contract TellerV2Storage is TellerV2Storage_G3 {}

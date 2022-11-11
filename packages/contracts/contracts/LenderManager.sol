@@ -39,6 +39,11 @@ contract LenderManager is ILenderManager, Initializable {
             currentLender == address(0),
             "Not loan owner"
         );
+        (bool isVerified, ) = marketRegistry.isVerifiedLender(_marketId, _newLender);
+        require(
+            isVerified,
+            "New lender not verified"
+        );
         if (currentLender != _newLender) {
             _loanActiveLender[_bidId] = _newLender;
             emit NewLenderSet(_newLender, _bidId);

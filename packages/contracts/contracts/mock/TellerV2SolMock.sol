@@ -14,6 +14,10 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
         marketRegistry = IMarketRegistry(_marketRegistry);
     }
 
+    function getMarketRegistry() external view returns (IMarketRegistry) {
+        return marketRegistry;
+    }
+
     function submitBid(
         address _lendingToken,
         uint256 _marketId,

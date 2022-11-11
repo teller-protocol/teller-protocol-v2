@@ -400,7 +400,7 @@ contract TellerV2 is
 
         address sender = _msgSenderForMarket(bid.marketplaceId);
         // Declare the bid acceptor as the lender of the bid
-        lenderManager.setNewLender(_bidId, sender);
+        lenderManager.setNewLender(_bidId, sender, bid.marketplaceId);
         (bool isVerified, ) = marketRegistry.isVerifiedLender(
             bid.marketplaceId,
             sender

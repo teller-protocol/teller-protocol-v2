@@ -4,11 +4,13 @@ pragma solidity >=0.8.0 <0.9.0;
 // Interfaces
 import "./interfaces/ILenderManager.sol";
 import "./interfaces/ITellerV2.sol";
+import "./interfaces/IMarketRegistry.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 contract LenderManager is ILenderManager, Initializable {
     /** Storage Variables */
     ITellerV2 public immutable tellerV2;
+    IMarketRegistry public immutable marketRegistry;
 
     // Mapping of loans to current active lenders
     mapping(uint256 => address) internal _loanActiveLender;
@@ -16,16 +18,18 @@ contract LenderManager is ILenderManager, Initializable {
     /** Events **/
     event NewLenderSet(address indexed newLender, uint256 bidId);
 
-    constructor(address _protocolAddress) {
+    constructor(address _protocolAddress, address _marketRegistry) {
         tellerV2 = ITellerV2(_protocolAddress);
+        marketRegistry = IMarketRegistry(_marketRegistry);
     }
 
     /**
      * @notice Sets the new active lender for a loan.
      * @param _bidId The id for the loan to set.
      * @param _newLender The address of the new active lender.
+     * @param _marketId The Id of the corresponding market.
      */
-    function setNewLender(uint256 _bidId, address _newLender)
+    function setNewLender(uint256 _bidId, address _newLender, uint256 _marketId)
         public
         override
     {

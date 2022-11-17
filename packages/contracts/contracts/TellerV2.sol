@@ -233,14 +233,6 @@ contract TellerV2 is
     }
 
     /**
-     * @notice Lets the DAO/owner of the protocol to set a new lender manager contract.
-     * @param _lenderManager The new contract address.
-     */
-    function setLenderManager(address _lenderManager) public onlyOwner {
-        lenderManager = ILenderManager(_lenderManager);
-    }
-
-    /**
      * @notice Function for a borrower to create a bid for a loan.
      * @param _lendingToken The lending token asset requested to be borrowed.
      * @param _marketplaceId The unique id of the marketplace for the bid.
@@ -852,6 +844,7 @@ contract TellerV2 is
     }
 
     /**
+     * @notice NOTE: This function may be removed at some point in the future. Please refer to the Lender Manager Contract for the updated address.
      * @notice Returns the lender address for a given bid.
      * @param _bidId The id of the bid/loan to get the lender for.
      * @return lender_ The address of the lender associated with the bid.

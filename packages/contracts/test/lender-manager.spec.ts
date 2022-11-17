@@ -79,7 +79,7 @@ describe('LenderManager', () => {
         paymentDefaultDuration,
         loanExpirationTime,
         0,
-        true,
+        false,
         false,
         '0',
         'uri://'

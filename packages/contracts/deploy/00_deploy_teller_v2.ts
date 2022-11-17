@@ -54,7 +54,11 @@ const deployFn: DeployFunction = async (hre) => {
 
   const lenderManager = await deploy({
     contract: 'LenderManager',
-    args: [tellerV2Contract.address, marketRegistry.address],
+    args: [
+      tellerV2Contract.address,
+      marketRegistry.address,
+      trustedForwarder.address,
+    ],
     proxy: {
       proxyContract: 'OpenZeppelinTransparentProxy',
     },

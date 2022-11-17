@@ -6,8 +6,9 @@ import "./interfaces/ILenderManager.sol";
 import "./interfaces/ITellerV2.sol";
 import "./interfaces/IMarketRegistry.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/metatx/ERC2771ContextUpgradeable.sol";
 
-contract LenderManager is ILenderManager, Initializable {
+contract LenderManager is ILenderManager, Initializable, ERC2771ContextUpgradeable {
     /** Storage Variables */
     ITellerV2 public immutable tellerV2;
     IMarketRegistry public immutable marketRegistry;
@@ -18,7 +19,9 @@ contract LenderManager is ILenderManager, Initializable {
     /** Events **/
     event NewLenderSet(address indexed newLender, uint256 bidId);
 
-    constructor(address _protocolAddress, address _marketRegistry) {
+    constructor(address _protocolAddress, address _marketRegistry, address _trustedForwarder)
+        ERC2771ContextUpgradeable(_trustedForwarder)
+    {
         tellerV2 = ITellerV2(_protocolAddress);
         marketRegistry = IMarketRegistry(_marketRegistry);
     }
@@ -35,7 +38,7 @@ contract LenderManager is ILenderManager, Initializable {
     {
         address currentLender = _getActiveLender(_bidId);
         require(
-            currentLender == msg.sender ||
+            currentLender == _msgSender() ||
             currentLender == address(0),
             "Not loan owner"
         );

@@ -12,6 +12,8 @@ contract LenderManager is ILenderManager, Initializable, ERC2771ContextUpgradeab
     /** Storage Variables */
     ITellerV2 public immutable tellerV2;
     IMarketRegistry public immutable marketRegistry;
+    string public constant CONTRACT_VERSION = "1";
+    string public upgradedToVersion;
 
     // Mapping of loans to current active lenders
     mapping(uint256 => address) internal _loanActiveLender;
@@ -24,6 +26,23 @@ contract LenderManager is ILenderManager, Initializable, ERC2771ContextUpgradeab
     {
         tellerV2 = ITellerV2(_protocolAddress);
         marketRegistry = IMarketRegistry(_marketRegistry);
+    }
+
+    /**
+     * @notice The initializer sets the initial list of active loan lenders for TellerV2.
+     * @param _initialActiveBidIds Array containing the list of bidIds.
+     * @param _initialActiveLenderArray Array of the associated active lender addresses.
+     */
+
+    function initialize(
+        uint256[] calldata _initialActiveBidIds,
+        address[] calldata _initialActiveLenderArray
+    ) external initializer {
+        require(_initialActiveBidIds.length == _initialActiveLenderArray.length, "Array lengths mismatch");
+        upgradedToVersion = CONTRACT_VERSION;
+        for (uint i=0; i<_initialActiveBidIds.length; i++) {
+            _loanActiveLender[_initialActiveBidIds[i]] = _initialActiveLenderArray[i];
+        }
     }
 
     /**

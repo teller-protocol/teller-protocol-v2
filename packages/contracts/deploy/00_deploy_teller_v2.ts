@@ -2,10 +2,10 @@ import { DeployFunction } from 'hardhat-deploy/dist/types'
 import { HARDHAT_NETWORK_NAME } from 'hardhat/plugins'
 import { deploy } from 'helpers/deploy-helpers'
 import { isInitialized } from 'helpers/oz-contract-helpers'
+import { getActiveLoans } from 'helpers/tasks/active-loans'
 import { TellerV2 } from 'types/typechain'
 
 import { getTokens } from '~~/config'
-import {getActiveLoans} from "helpers/tasks/active-loans";
 
 const deployFn: DeployFunction = async (hre) => {
   const protocolFee = 5 // 0.05%

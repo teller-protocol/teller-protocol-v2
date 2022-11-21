@@ -1,11 +1,17 @@
+import { BigNumber } from 'ethers'
 import { task } from 'hardhat/config'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
 import { TellerV2 } from 'types/typechain'
 
+export interface activeLoansReturn {
+  activeLoans: BigNumber[]
+  activeLoanLenders: string[]
+}
+
 export const getActiveLoans = async (
   args: null,
   hre: HardhatRuntimeEnvironment
-): Promise<void> => {
+): Promise<activeLoansReturn> => {
   const tellerV2 = await hre.contracts.get<TellerV2>('TellerV2')
 
   // Get events for current active loans on Teller V2
@@ -27,10 +33,10 @@ export const getActiveLoans = async (
     }
   }
 
-  console.log({
-    activeLoans: activeLoans.length,
-    activeLoanLenders: activeLoanLenders.length,
-  })
+  return {
+    activeLoans: activeLoans,
+    activeLoanLenders: activeLoanLenders,
+  }
 }
 
 task(

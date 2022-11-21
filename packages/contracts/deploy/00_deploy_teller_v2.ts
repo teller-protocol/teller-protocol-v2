@@ -5,6 +5,7 @@ import { isInitialized } from 'helpers/oz-contract-helpers'
 import { TellerV2 } from 'types/typechain'
 
 import { getTokens } from '~~/config'
+import {getActiveLoans} from "helpers/tasks/active-loans";
 
 const deployFn: DeployFunction = async (hre) => {
   const protocolFee = 5 // 0.05%
@@ -52,6 +53,8 @@ const deployFn: DeployFunction = async (hre) => {
     hre,
   })
 
+  const activeLoansAndLenders = await getActiveLoans(null, hre)
+
   const lenderManager = await deploy({
     contract: 'LenderManager',
     args: [
@@ -61,6 +64,15 @@ const deployFn: DeployFunction = async (hre) => {
     ],
     proxy: {
       proxyContract: 'OpenZeppelinTransparentProxy',
+      execute: {
+        init: {
+          methodName: 'initialize',
+          args: [
+            activeLoansAndLenders.activeLoans,
+            activeLoansAndLenders.activeLoanLenders,
+          ],
+        },
+      },
     },
     skipIfAlreadyDeployed: true,
     hre,

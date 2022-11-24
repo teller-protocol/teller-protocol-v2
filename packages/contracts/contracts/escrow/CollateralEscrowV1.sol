@@ -5,10 +5,10 @@ pragma solidity >=0.8.0 <0.9.0;
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 // Interfaces
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import {
-    SafeERC20
-} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+    SafeERC20Upgradeable
+} from "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol";
@@ -110,12 +110,13 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
     ) internal {
         // Deposit ERC20
         if (_collateralType == CollateralType.ERC20) {
-            SafeERC20.safeTransferFrom(
-                IERC20(_collateralAddress),
+            SafeERC20Upgradeable.safeTransferFrom(
+                IERC20Upgradeable(_collateralAddress),
                 msg.sender,
                 address(this),
                 _amount
             );
+            return;
         }
         // Deposit ERC721
         if (_collateralType == CollateralType.ERC721) {
@@ -125,6 +126,7 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
                     address(this),
                     _tokenId
                 );
+            return;
         }
         // Deposit ERC1155
         if (_collateralType == CollateralType.ERC721) {
@@ -138,6 +140,7 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
                     _amount,
                     data
                 );
+            return;
         }
     }
 
@@ -149,12 +152,13 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
     ) internal {
         // Withdraw ERC20
         if (_collateral._collateralType == CollateralType.ERC20) {
-            SafeERC20.safeTransferFrom(
-                IERC20(_collateralAddress),
+            SafeERC20Upgradeable.safeTransferFrom(
+                IERC20Upgradeable(_collateralAddress),
                 address(this),
                 _recipient,
                 _collateral._amount
             );
+            return;
         }
         // Withdraw ERC721
         if (_collateral._collateralType == CollateralType.ERC721) {
@@ -164,6 +168,7 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
                 _recipient,
                 _collateral._tokenId
             );
+            return;
         }
         // Withdraw ERC1155
         if (_collateral._collateralType == CollateralType.ERC721) {
@@ -177,10 +182,11 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
                 _amount,
                 data
             );
+            return;
         }
     }
 
-    //On NFT Received handlers
+    // On NFT Received handlers
 
     function onERC721Received(
         address,

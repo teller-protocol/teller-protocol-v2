@@ -14,15 +14,23 @@ contract CollateralEscrowFactory is OwnableUpgradeable {
     /* Events */
     event CollateralEscrowDeployed(uint256 _bidId, address collateralEscrow);
 
-    constructor(address _collateralEscrowBeacon) {
+    /**
+     * @notice Initializes the escrow factory.
+     * @param _collateralEscrowBeacon The address of the escrow implementation.
+     */
+    function initialize(address _collateralEscrowBeacon) external {
         _collateralEscrowBeacon = _collateralEscrowBeacon;
+        __Ownable_init();
     }
 
     /**
      * @notice Deploys a new collateral escrow.
      * @param _bidId The associated bidId of the collateral escrow.
      */
-    function deployCollateralEscrow(uint256 _bidId) external returns(address) {
+    function deployCollateralEscrow(uint256 _bidId)
+        external
+        returns(address)
+    {
         BeaconProxy proxy_ = new BeaconProxy(
             _collateralEscrowBeacon,
             abi.encodeWithSelector(CollateralEscrowV1.initialize.selector, _bidId)
@@ -37,7 +45,11 @@ contract CollateralEscrowFactory is OwnableUpgradeable {
      * @notice _bidId The bidId to return the escrow for.
      * @return The address of the escrow.
      */
-    function getEscrow(uint256 _bidId) external view returns(address) {
+    function getEscrow(uint256 _bidId)
+        external
+        view
+        returns(address)
+    {
         return _escrows[_bidId];
     }
 }

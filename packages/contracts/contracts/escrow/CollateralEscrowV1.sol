@@ -18,17 +18,27 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
 
     uint256 public bidId;
     /* Mappings */
-    mapping(address => Collateral) public _balances; // bidId -> collateral
+    mapping(address => Collateral) public _balances; // collateral address -> collateral
 
     /* Events */
     event CollateralDeposited(address _collateralAddress, uint256 _amount);
     event CollateralWithdrawn(address _collateralAddress, uint256 _amount, address _recipient);
 
     /**
-     * @notice Initializes an escrow
+     * @notice Initializes the implementation.
+     */
+    constructor() {
+        initialize(0);
+    }
+
+    /**
+     * @notice Initializes an escrow.
      * @notice The id of the associated bid.
      */
-    function initialize(uint256 _bidId) external {
+    function initialize(uint256 _bidId)
+        public
+        initializer
+    {
         require(owner() == address(0), "Escrow already initialized");
         __Ownable_init();
         bidId = _bidId;

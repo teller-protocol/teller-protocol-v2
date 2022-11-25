@@ -2,11 +2,11 @@
 pragma solidity >=0.8.0 <0.9.0;
 
 // Contracts
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
+import "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
 import "./CollateralEscrowV1.sol";
 
-contract CollateralEscrowFactory is OwnableUpgradeable {
+contract CollateralEscrowFactory is UpgradeableBeacon {
 
     address private _collateralEscrowBeacon;
     mapping(uint256 => address) public _escrows; // bidIds -> collateralEscrow
@@ -16,11 +16,14 @@ contract CollateralEscrowFactory is OwnableUpgradeable {
 
     /**
      * @notice Initializes the escrow factory.
+     * @param _factoryBeacon The address of the factory implementaion.
      * @param _collateralEscrowBeacon The address of the escrow implementation.
      */
-    function initialize(address _collateralEscrowBeacon) external {
+    constructor(
+        address _factoryBeacon,
+        address _collateralEscrowBeacon
+    ) UpgradeableBeacon(_factoryBeacon) {
         _collateralEscrowBeacon = _collateralEscrowBeacon;
-        __Ownable_init();
     }
 
     /**

@@ -160,13 +160,15 @@ contract TellerV2 is
      * @notice Initializes the proxy.
      * @param _protocolFee The fee collected by the protocol for loan processing.
      * @param _lendingTokens The list of tokens allowed as lending assets on the protocol.
+     * @param _collateralEscrowFactoryBeacon The address of the factory deploying escrows for bid collateral.
      */
     function initialize(
         uint16 _protocolFee,
         address _marketRegistry,
         address _reputationManager,
         address _lenderCommitmentForwarder,
-        address[] calldata _lendingTokens
+        address[] calldata _lendingTokens,
+        address _collateralEscrowFactoryBeacon
     ) external initializer {
         __ProtocolFee_init(_protocolFee);
 
@@ -175,6 +177,7 @@ contract TellerV2 is
         lenderCommitmentForwarder = _lenderCommitmentForwarder;
         marketRegistry = IMarketRegistry(_marketRegistry);
         reputationManager = IReputationManager(_reputationManager);
+        collateralEscrowFactoryBeacon = ICollateralEscrowFactory(_collateralEscrowFactoryBeacon);
 
         require(_lendingTokens.length > 0, "No lending tokens specified");
         for (uint256 i = 0; i < _lendingTokens.length; i++) {

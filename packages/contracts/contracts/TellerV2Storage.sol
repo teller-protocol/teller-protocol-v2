@@ -6,6 +6,7 @@ import { V2Calculations } from "./TellerV2.sol";
 import "./interfaces/IReputationManager.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "./interfaces/escrow/ICollateralEscrowFactory.sol";
 
 abstract contract TellerV2Storage_G0 {
     enum BidState {
@@ -138,4 +139,9 @@ abstract contract TellerV2Storage_G2 is TellerV2Storage_G1 {
     address public lenderCommitmentForwarder;
 }
 
-abstract contract TellerV2Storage is TellerV2Storage_G2 {}
+abstract contract TellerV2Storage_G3 is TellerV2Storage_G2 {
+    ICollateralEscrowFactory public collateralEscrowFactoryBeacon;
+    mapping(uint256 => bool) _isBidCollateralBacked;
+}
+
+abstract contract TellerV2Storage is TellerV2Storage_G3 {}

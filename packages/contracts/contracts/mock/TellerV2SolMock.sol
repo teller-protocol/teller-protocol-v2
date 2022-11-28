@@ -47,7 +47,7 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
         address _receiver,
         address _collateralAddress,
         ICollateralEscrowFactory.Collateral calldata _collateralInfo
-    ) public returns (uint256 bidId_);
+    ) public returns (uint256 bidId_) {}
 
     function repayLoanMinimum(uint256 _bidId) external {}
 

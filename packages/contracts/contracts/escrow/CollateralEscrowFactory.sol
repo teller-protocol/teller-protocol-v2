@@ -6,17 +6,27 @@ import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
 import "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
 import "./CollateralEscrowV1.sol";
 
-contract CollateralEscrowFactory is UpgradeableBeacon {
+// Interfaces
+import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol";
+import "../interfaces/escrow/ICollateralEscrowFactory.sol";
+
+contract CollateralEscrowFactory is UpgradeableBeacon, ICollateralEscrowFactory {
 
     address private _collateralEscrowBeacon;
     mapping(uint256 => address) public _escrows; // bidIds -> collateralEscrow
+    // biIds -> validated collateral info
+    mapping(uint256 => Collateral) _bidCollaterals;
 
     /* Events */
-    event CollateralEscrowDeployed(uint256 _bidId, address collateralEscrow);
+    event CollateralEscrowDeployed(uint256 _bidId, address _collateralEscrow);
+    event CollateralValidated(uint256 _bidId, address _collateralAddress, uint256 _amount);
 
     /**
      * @notice Initializes the escrow factory.
-     * @param _factoryBeacon The address of the factory implementaion.
+     * @param _factoryBeacon The address of the factory implementation.
      * @param _collateralEscrowBeacon The address of the escrow implementation.
      */
     constructor(
@@ -24,6 +34,29 @@ contract CollateralEscrowFactory is UpgradeableBeacon {
         address _collateralEscrowBeacon
     ) UpgradeableBeacon(_factoryBeacon) {
         _collateralEscrowBeacon = _collateralEscrowBeacon;
+    }
+
+    /**
+     * @notice Checks the validity of a borrower's collateral balance.
+     * @param _bidId The id of the associated bid.
+     * @param _borrowerAddress The address of the borrower
+     * @param _collateralAddress The contract address of the asset being put up as collateral.
+     * @param _collateralInfo Additional information about the collateral asset.
+     * @return validation_ Boolean indicating if the collateral balance was validated.
+     */
+    function validateCollateral(
+        uint256 _bidId,
+        address _borrowerAddress,
+        address _collateralAddress,
+        Collateral calldata _collateralInfo
+    ) external
+      returns (bool validation_)
+    {
+        validation_ = _checkBalance(_borrowerAddress, _collateralAddress, _collateralInfo);
+        if (validation_) {
+            _bidCollaterals[_bidId] = _collateralInfo;
+            emit CollateralValidated(_bidId, _collateralAddress, _collateralInfo._amount);
+        }
     }
 
     /**
@@ -54,5 +87,31 @@ contract CollateralEscrowFactory is UpgradeableBeacon {
         returns(address)
     {
         return _escrows[_bidId];
+    }
+
+    function _checkBalance(
+        address _borrowerAddress,
+        address _collateralAddress,
+        Collateral calldata _collateralInfo
+    ) internal
+      returns(bool)
+    {
+        CollateralType collateralType = _collateralInfo._collateralType;
+        if (collateralType == CollateralType.ERC20) {
+            return _collateralInfo._amount >=
+                        IERC20Upgradeable(_collateralAddress)
+                            .balanceOf(_borrowerAddress);
+        }
+        if (collateralType == CollateralType.ERC721) {
+            return _borrowerAddress ==
+                        IERC721Upgradeable(_collateralAddress)
+                            .ownerOf(_collateralInfo._tokenId);
+        }
+        if (collateralType == CollateralType.ERC1155) {
+            return _collateralInfo._amount >=
+                        IERC1155Upgradeable(_collateralAddress)
+                            .balanceOf(_borrowerAddress, _collateralInfo._tokenId);
+        }
+        return false;
     }
 }

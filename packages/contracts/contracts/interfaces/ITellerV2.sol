@@ -25,6 +25,30 @@ interface ITellerV2 {
     ) external returns (uint256 bidId_);
 
     /**
+     * @notice Function for a borrower to create a bid for a loan with Collateral.
+     * @param _lendingToken The lending token asset requested to be borrowed.
+     * @param _marketplaceId The unique id of the marketplace for the bid.
+     * @param _principal The principal amount of the loan bid.
+     * @param _duration The recurrent length of time before which a payment is due.
+     * @param _APR The proposed interest rate for the loan bid.
+     * @param _metadataURI The URI for additional borrower loan information as part of loan bid.
+     * @param _receiver The address where the loan amount will be sent to.
+     * @param _collateralAddress The contract address of the asset being put up as collateral.
+     * @param _collateralInfo Additional information about the collateral asset.
+     */
+    function submitBid(
+        address _lendingToken,
+        uint256 _marketplaceId,
+        uint256 _principal,
+        uint32 _duration,
+        uint16 _APR,
+        string calldata _metadataURI,
+        address _receiver,
+        address _collateralAddress,
+        ICollateralEscrowFactory.Collateral calldata _collateralInfo
+    ) external returns (uint256 bidId_);
+
+    /**
      * @notice Function for a lender to accept a proposed loan bid.
      * @param _bidId The id of the loan bid to accept.
      */

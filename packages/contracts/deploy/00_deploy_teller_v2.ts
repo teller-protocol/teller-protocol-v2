@@ -1,3 +1,4 @@
+import { upgrades } from 'hardhat'
 import { DeployFunction } from 'hardhat-deploy/dist/types'
 import { HARDHAT_NETWORK_NAME } from 'hardhat/plugins'
 import { deploy } from 'helpers/deploy-helpers'
@@ -41,6 +42,23 @@ const deployFn: DeployFunction = async (hre) => {
     hre,
   })
 
+  const collateralEscrowV1 = await hre.ethers.getContractFactory(
+    'CollateralEscrowV1'
+  )
+  // Deploy escrow beacon implementation
+  const collateralEscrowBeacon = await upgrades.deployBeacon(collateralEscrowV1)
+  await collateralEscrowBeacon.deployed()
+
+  // Deploy escrow factory
+  const collateralEscrowFactory = await deploy({
+    contract: 'CollateralEscrowFactory',
+    args: [collateralEscrowBeacon.address],
+    proxy: {
+      proxyContract: 'OpenZeppelinTransparentProxy',
+    },
+    hre,
+  })
+
   const tellerV2Contract = await deploy({
     contract: 'TellerV2',
     args: [trustedForwarder.address],
@@ -78,7 +96,8 @@ const deployFn: DeployFunction = async (hre) => {
       marketRegistry.address,
       reputationManager.address,
       lenderCommitmentForwarder.address,
-      lendingTokens
+      lendingTokens,
+      collateralEscrowFactory.address
     )
   } else if (tellerV2Contract.deployResult.newlyDeployed) {
     await tellerV2Contract.onUpgrade()

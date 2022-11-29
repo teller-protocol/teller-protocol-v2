@@ -124,7 +124,8 @@ describe('TellerV2', () => {
           marketRegistry.address,
           reputationManager.address,
           AddressZero,
-          [(await getTokens(hre)).all.DAI]
+          [(await getTokens(hre)).all.DAI],
+          AddressZero
         )
         .should.be.revertedWith(
           'Initializable: contract is already initialized'

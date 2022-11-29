@@ -3,7 +3,7 @@ pragma solidity >=0.8.0 <0.9.0;
 
 // Contracts
 import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
-import "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "./CollateralEscrowV1.sol";
 
 // Interfaces
@@ -13,7 +13,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155Upgradeable.so
 import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol";
 import "../interfaces/escrow/ICollateralEscrowFactory.sol";
 
-contract CollateralEscrowFactory is UpgradeableBeacon, ICollateralEscrowFactory {
+contract CollateralEscrowFactory is OwnableUpgradeable, ICollateralEscrowFactory {
 
     address private _collateralEscrowBeacon;
     mapping(uint256 => address) public _escrows; // bidIds -> collateralEscrow
@@ -26,13 +26,11 @@ contract CollateralEscrowFactory is UpgradeableBeacon, ICollateralEscrowFactory 
 
     /**
      * @notice Initializes the escrow factory.
-     * @param _factoryBeacon The address of the factory implementation.
      * @param _collateralEscrowBeacon The address of the escrow implementation.
      */
     constructor(
-        address _factoryBeacon,
         address _collateralEscrowBeacon
-    ) UpgradeableBeacon(_factoryBeacon) {
+    ) {
         _collateralEscrowBeacon = _collateralEscrowBeacon;
     }
 

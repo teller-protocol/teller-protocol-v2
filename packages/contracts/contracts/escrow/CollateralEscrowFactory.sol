@@ -96,7 +96,7 @@ contract CollateralEscrowFactory is OwnableUpgradeable, ICollateralEscrowFactory
     {
         CollateralType collateralType = _collateralInfo._collateralType;
         if (collateralType == CollateralType.ERC20) {
-            return _collateralInfo._amount >=
+            return _collateralInfo._amount <=
                         IERC20Upgradeable(_collateralAddress)
                             .balanceOf(_borrowerAddress);
         }
@@ -106,7 +106,7 @@ contract CollateralEscrowFactory is OwnableUpgradeable, ICollateralEscrowFactory
                             .ownerOf(_collateralInfo._tokenId);
         }
         if (collateralType == CollateralType.ERC1155) {
-            return _collateralInfo._amount >=
+            return _collateralInfo._amount <=
                         IERC1155Upgradeable(_collateralAddress)
                             .balanceOf(_borrowerAddress, _collateralInfo._tokenId);
         }

@@ -25,6 +25,13 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
     event CollateralWithdrawn(address _collateralAddress, uint256 _amount, address _recipient);
 
     /**
+     * @notice Initializes the implementation.
+     */
+    constructor() {
+        initialize(0);
+    }
+
+    /**
      * @notice Initializes an escrow.
      * @notice The id of the associated bid.
      */

@@ -15,7 +15,7 @@ import "../interfaces/escrow/ICollateralEscrowFactory.sol";
 
 contract CollateralEscrowFactory is OwnableUpgradeable, ICollateralEscrowFactory {
 
-    address private _collateralEscrowBeacon;
+    address private collateralEscrowBeacon;
     mapping(uint256 => address) public _escrows; // bidIds -> collateralEscrow
     // biIds -> validated collateral info
     mapping(uint256 => Collateral) _bidCollaterals;
@@ -31,7 +31,7 @@ contract CollateralEscrowFactory is OwnableUpgradeable, ICollateralEscrowFactory
     constructor(
         address _collateralEscrowBeacon
     ) {
-        _collateralEscrowBeacon = _collateralEscrowBeacon;
+        collateralEscrowBeacon = _collateralEscrowBeacon;
     }
 
     /**
@@ -66,7 +66,7 @@ contract CollateralEscrowFactory is OwnableUpgradeable, ICollateralEscrowFactory
         returns(address)
     {
         BeaconProxy proxy_ = new BeaconProxy(
-            _collateralEscrowBeacon,
+            collateralEscrowBeacon,
             abi.encodeWithSelector(CollateralEscrowV1.initialize.selector, _bidId)
         );
         _escrows[_bidId] = address(proxy_);

@@ -18,7 +18,7 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
 
     uint256 public bidId;
     /* Mappings */
-    mapping(address => Collateral) public _balances; // collateral address -> collateral
+    mapping(address => Collateral) public collateralBalances; // collateral address -> collateral
 
     /* Events */
     event CollateralDeposited(address _collateralAddress, uint256 _amount);
@@ -59,7 +59,10 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
     {
         require(_amount > 0, "Deposit amount cannot be zero");
         _depositCollateral(CollateralType.ERC20, _collateralAddress, _amount, 0);
-        _balances[_collateralAddress] = Collateral(CollateralType.ERC20, _amount, 0);
+        Collateral storage collateral = collateralBalances[_collateralAddress];
+        collateral._collateralType = CollateralType.ERC20;
+        collateral._amount = _amount;
+        collateral._tokenId = 0;
         emit CollateralDeposited(_collateralAddress, _amount);
     }
 
@@ -81,7 +84,10 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
     {
         require(_amount > 0, "Deposit amount cannot be zero");
         _depositCollateral(_collateralType, _collateralAddress, _amount, _tokenId);
-        _balances[_collateralAddress] = Collateral(_collateralType, _amount, _tokenId);
+        Collateral storage collateral = collateralBalances[_collateralAddress];
+        collateral._collateralType = _collateralType;
+        collateral._amount = _amount;
+        collateral._tokenId = _tokenId;
         emit CollateralDeposited(_collateralAddress, _amount);
     }
 
@@ -96,7 +102,7 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
         onlyOwner
     {
         require(_amount > 0, "Withdraw amount cannot be zero");
-        Collateral memory collateral = _balances[_collateralAddress];
+        Collateral memory collateral = collateralBalances[_collateralAddress];
         _withdrawCollateral(collateral, _collateralAddress, _amount, _recipient);
         emit CollateralWithdrawn(_collateralAddress, _amount, _recipient);
     }

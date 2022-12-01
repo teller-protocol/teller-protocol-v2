@@ -14,11 +14,15 @@ import "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol";
 import "./interfaces/IMarketRegistry.sol";
 import "./interfaces/IReputationManager.sol";
 import "./interfaces/ITellerV2.sol";
+import "./interfaces/escrow/ICollateralEscrowV1.sol";
 
 // Libraries
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155Upgradeable.sol";
 import "./libraries/NumbersLib.sol";
 
 /* Errors */
@@ -450,6 +454,59 @@ contract TellerV2 is
 
         // Declare the bid acceptor as the lender of the bid
         bid.lender = sender;
+
+        // Withdraw collateral if applicable
+        if (_isBidCollateralBacked[_bidId]) {
+            // Get collateral info
+            ICollateralEscrowFactory.Collateral memory collateralInfo =
+                collateralEscrowFactoryBeacon.getCollateralInfo(_bidId);
+            // Deploy collateral escrow
+            ICollateralEscrowV1 collateralEscrow = ICollateralEscrowV1(collateralEscrowFactoryBeacon.deployCollateralEscrow(_bidId));
+            // Pull collateral from borrower & deposit into escrow
+            if (collateralInfo._collateralType == ICollateralEscrowFactory.CollateralType.ERC20) {
+                IERC20Upgradeable(collateralInfo._collateralAddress)
+                    .transferFrom(
+                        bid.receiver,
+                        address(this),
+                        collateralInfo._amount
+                    );
+                collateralEscrow.depositToken(
+                    collateralInfo._collateralAddress,
+                    collateralInfo._amount
+                );
+            }
+            if (collateralInfo._collateralType == ICollateralEscrowFactory.CollateralType.ERC721) {
+                IERC721Upgradeable(collateralInfo._collateralAddress)
+                    .safeTransferFrom(
+                        bid.receiver,
+                        address(this),
+                        collateralInfo._tokenId
+                    );
+                collateralEscrow.depositAsset(
+                    ICollateralEscrowV1.CollateralType.ERC721,
+                    collateralInfo._collateralAddress,
+                    collateralInfo._amount,
+                    collateralInfo._tokenId
+                );
+            }
+            if (collateralInfo._collateralType == ICollateralEscrowFactory.CollateralType.ERC1155) {
+                bytes memory data;
+                IERC1155Upgradeable(collateralInfo._collateralAddress)
+                    .safeTransferFrom(
+                        bid.receiver,
+                        address(this),
+                        collateralInfo._tokenId,
+                        collateralInfo._amount,
+                        data
+                    );
+                collateralEscrow.depositAsset(
+                    ICollateralEscrowV1.CollateralType.ERC721,
+                    collateralInfo._collateralAddress,
+                    collateralInfo._amount,
+                    collateralInfo._tokenId
+                );
+            }
+        }
 
         // Transfer funds to borrower from the lender
         amountToProtocol = bid.loanDetails.principal.percent(protocolFee());

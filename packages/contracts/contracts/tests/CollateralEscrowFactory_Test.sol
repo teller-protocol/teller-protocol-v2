@@ -51,7 +51,7 @@ contract CollateralEscrowFactory_Test is Testable {
     function validateCollateral_test() public {
         ICollateralEscrowFactory.Collateral memory collateralInfo;
         collateralInfo._collateralType = ICollateralEscrowFactory.CollateralType.ERC20;
-        collateralInfo._amount = 1e18;
+        collateralInfo._amount = 1000;
         collateralInfo._tokenId = 0;
         uint256 balance = wethMock.balanceOf(address(borrower));
         bool validation = collateralFactory.validateCollateral(

@@ -18,7 +18,7 @@ contract CollateralEscrowFactory is OwnableUpgradeable, ICollateralEscrowFactory
     address private collateralEscrowBeacon;
     mapping(uint256 => address) public _escrows; // bidIds -> collateralEscrow
     // biIds -> validated collateral info
-    mapping(uint256 => Collateral) _bidCollaterals;
+    mapping(uint256 => Collateral) public _bidCollaterals;
 
     /* Events */
     event CollateralEscrowDeployed(uint256 _bidId, address _collateralEscrow);
@@ -85,6 +85,19 @@ contract CollateralEscrowFactory is OwnableUpgradeable, ICollateralEscrowFactory
         returns(address)
     {
         return _escrows[_bidId];
+    }
+
+    /**
+     * @notice Gets the collateral info for a given bid id.
+     * @param _bidId The bidId to return the collateral info for.
+     * @return The stored collateral info.
+     */
+    function getCollateralInfo(uint256 _bidId)
+        external
+        view
+        returns(Collateral memory)
+    {
+        return _bidCollaterals[_bidId];
     }
 
     function _checkBalance(

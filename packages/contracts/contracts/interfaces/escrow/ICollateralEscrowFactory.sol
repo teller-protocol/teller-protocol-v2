@@ -12,6 +12,7 @@ interface ICollateralEscrowFactory {
         CollateralType _collateralType;
         uint256 _amount;
         uint256 _tokenId;
+        address _collateralAddress;
     }
 
     /**
@@ -48,4 +49,14 @@ interface ICollateralEscrowFactory {
         external
         view
         returns(address);
+
+    /**
+     * @notice Gets the collateral info for a given bid id.
+     * @param _bidId The bidId to return the collateral info for.
+     * @return The stored collateral info.
+     */
+    function getCollateralInfo(uint256 _bidId)
+        external
+        view
+        returns(Collateral memory);
 }

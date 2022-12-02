@@ -393,11 +393,6 @@ contract TellerV2 is
         address sender = _msgSenderForMarket(bid.marketplaceId);
         // Declare the bid acceptor as the lender of the bid
         lenderManager.setNewLender(_bidId, sender, bid.marketplaceId);
-        (bool isVerified, ) = marketRegistry.isVerifiedLender(
-            bid.marketplaceId,
-            sender
-        );
-        require(isVerified, "Not verified lender");
 
         require(
             !marketRegistry.isMarketClosed(bid.marketplaceId),

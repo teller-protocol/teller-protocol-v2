@@ -33,7 +33,6 @@ contract LenderManager is ILenderManager, Initializable, ERC2771ContextUpgradeab
      * @param _initialActiveBidIds Array containing the list of bidIds.
      * @param _initialActiveLenderArray Array of the associated active lender addresses.
      */
-
     function initialize(
         uint256[] calldata _initialActiveBidIds,
         address[] calldata _initialActiveLenderArray
@@ -56,11 +55,17 @@ contract LenderManager is ILenderManager, Initializable, ERC2771ContextUpgradeab
         override
     {
         address currentLender = _getActiveLender(_bidId);
-        require(
-            currentLender == _msgSender() ||
-            currentLender == address(0),
-            "Not loan owner"
-        );
+        if (currentLender == address(0)) {
+            require(
+                _msgSender() == address(tellerV2),
+                "Caller not authorized"
+            );
+        } else {
+            require(
+                currentLender == _msgSender(),
+                "Not loan owner"
+            );
+        }
         (bool isVerified, ) = marketRegistry.isVerifiedLender(_marketId, _newLender);
         require(
             isVerified,
@@ -79,6 +84,7 @@ contract LenderManager is ILenderManager, Initializable, ERC2771ContextUpgradeab
      */
     function getActiveLoanLender(uint256 _bidId)
         external
+        view
         override
         returns (address)
     {
@@ -92,6 +98,7 @@ contract LenderManager is ILenderManager, Initializable, ERC2771ContextUpgradeab
      */
     function _getActiveLender(uint256 _bidId)
         internal
+        view
         returns (address lender_)
     {
         lender_ = _loanActiveLender[_bidId];

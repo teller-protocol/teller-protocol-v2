@@ -9,7 +9,7 @@ interface ILenderManager {
      * @param _newLender The address of the new active lender.
      * @param _marketId The Id of the corresponding market.
      */
-    function setNewLender(uint256 _bidId, address _newLender, uint256 _marketId) external;
+    function setNewLender(uint256 _bidId, address _newLender, uint256 _marketId) external view;
 
     /**
      * @notice Returns the address of the lender that owns a given loan/bid.

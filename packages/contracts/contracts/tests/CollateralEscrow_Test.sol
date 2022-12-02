@@ -17,6 +17,7 @@ contract CollateralEscrow_Test is Testable {
     BeaconProxy private proxy_;
     User private borrower;
     WethMock wethMock;
+    uint256 amount = 1000;
 
     function setup_beforeAll() public {
         // Deploy implementation
@@ -33,7 +34,29 @@ contract CollateralEscrow_Test is Testable {
     }
 
     function depositAsset_test() public {
-        uint256 amount = 1000;
+        _depositAsset();
+    }
+
+    function withdrawAsset_test() public {
+        _depositAsset();
+
+        borrower.withdraw(
+            address(wethMock),
+            amount,
+            address(borrower)
+        );
+
+        uint256 storedBalance = borrower.getBalance(address(wethMock));
+
+        Test.eq(
+            storedBalance,
+            0,
+            'Escrow withdraw unsuccessful'
+        );
+    }
+
+    function _depositAsset() internal {
+
 
         borrower.approveWeth(amount);
 

@@ -439,9 +439,9 @@ contract TellerV2 is
         );
 
         // Record volume filled by lenders
-        lenderVolumeFilled[address(bid.loanDetails.lendingToken)][
-            sender
-        ] += bid.loanDetails.principal;
+        lenderVolumeFilled[address(bid.loanDetails.lendingToken)][sender] += bid
+            .loanDetails
+            .principal;
         totalVolumeFilled[address(bid.loanDetails.lendingToken)] += bid
             .loanDetails
             .principal;

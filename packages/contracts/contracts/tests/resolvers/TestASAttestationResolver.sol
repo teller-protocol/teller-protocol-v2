@@ -18,10 +18,10 @@ contract TestASAttestationResolver is TellerASResolver {
     }
 
     function resolve(
-        address, /* recipient */
-        bytes calldata, /* schema */
+        address /* recipient */,
+        bytes calldata /* schema */,
         bytes calldata data,
-        uint256, /* expirationTime */
+        uint256 /* expirationTime */,
         address /* msgSender */
     ) external payable virtual override returns (bool) {
         return _eas.isAttestationValid(_toBytes32(data, 0));

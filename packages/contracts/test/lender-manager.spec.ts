@@ -3,7 +3,7 @@ import { solidity } from 'ethereum-waffle'
 import { Signer } from 'ethers'
 import hre, { deployments } from 'hardhat'
 import moment from 'moment'
-import { LenderManager, MarketRegistry, TellerV2} from 'types/typechain'
+import { LenderManager, MarketRegistry, TellerV2 } from 'types/typechain'
 
 import { acceptedBid } from './helpers/fixtures/acceptedBid'
 

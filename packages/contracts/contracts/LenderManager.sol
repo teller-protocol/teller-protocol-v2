@@ -8,7 +8,11 @@ import "./interfaces/IMarketRegistry.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/metatx/ERC2771ContextUpgradeable.sol";
 
-contract LenderManager is ILenderManager, Initializable, ERC2771ContextUpgradeable {
+contract LenderManager is
+    ILenderManager,
+    Initializable,
+    ERC2771ContextUpgradeable
+{
     /** Storage Variables */
     ITellerV2 public immutable tellerV2;
     IMarketRegistry public immutable marketRegistry;
@@ -21,9 +25,11 @@ contract LenderManager is ILenderManager, Initializable, ERC2771ContextUpgradeab
     /** Events **/
     event NewLenderSet(address indexed newLender, uint256 bidId);
 
-    constructor(address _protocolAddress, address _marketRegistry, address _trustedForwarder)
-        ERC2771ContextUpgradeable(_trustedForwarder)
-    {
+    constructor(
+        address _protocolAddress,
+        address _marketRegistry,
+        address _trustedForwarder
+    ) ERC2771ContextUpgradeable(_trustedForwarder) {
         tellerV2 = ITellerV2(_protocolAddress);
         marketRegistry = IMarketRegistry(_marketRegistry);
     }
@@ -37,10 +43,15 @@ contract LenderManager is ILenderManager, Initializable, ERC2771ContextUpgradeab
         uint256[] calldata _initialActiveBidIds,
         address[] calldata _initialActiveLenderArray
     ) external initializer {
-        require(_initialActiveBidIds.length == _initialActiveLenderArray.length, "Array lengths mismatch");
+        require(
+            _initialActiveBidIds.length == _initialActiveLenderArray.length,
+            "Array lengths mismatch"
+        );
         upgradedToVersion = CONTRACT_VERSION;
-        for (uint i=0; i<_initialActiveBidIds.length; i++) {
-            _loanActiveLender[_initialActiveBidIds[i]] = _initialActiveLenderArray[i];
+        for (uint i = 0; i < _initialActiveBidIds.length; i++) {
+            _loanActiveLender[
+                _initialActiveBidIds[i]
+            ] = _initialActiveLenderArray[i];
         }
     }
 
@@ -56,21 +67,15 @@ contract LenderManager is ILenderManager, Initializable, ERC2771ContextUpgradeab
     {
         address currentLender = _getActiveLender(_bidId);
         if (currentLender == address(0)) {
-            require(
-                _msgSender() == address(tellerV2),
-                "Caller not authorized"
-            );
+            require(_msgSender() == address(tellerV2), "Caller not authorized");
         } else {
-            require(
-                currentLender == _msgSender(),
-                "Not loan owner"
-            );
+            require(currentLender == _msgSender(), "Not loan owner");
         }
-        (bool isVerified, ) = marketRegistry.isVerifiedLender(_marketId, _newLender);
-        require(
-            isVerified,
-            "New lender not verified"
+        (bool isVerified, ) = marketRegistry.isVerifiedLender(
+            _marketId,
+            _newLender
         );
+        require(isVerified, "New lender not verified");
         if (currentLender != _newLender) {
             _loanActiveLender[_bidId] = _newLender;
             emit NewLenderSet(_newLender, _bidId);

@@ -103,6 +103,7 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
     {
         require(_amount > 0, "Withdraw amount cannot be zero");
         Collateral storage collateral = collateralBalances[_collateralAddress];
+        require(collateral._amount > 0, "No collateral balance for asset");
         _withdrawCollateral(collateral, _collateralAddress, _amount, _recipient);
         collateral._amount -= _amount;
         emit CollateralWithdrawn(_collateralAddress, _amount, _recipient);

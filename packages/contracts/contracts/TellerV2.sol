@@ -659,6 +659,19 @@ contract TellerV2 is
 
         bid.state = BidState.LIQUIDATED;
 
+        // If loan is backed by collateral, withdraw and send to lender
+        if (_isBidCollateralBacked[_bidId]) {
+            // Get collateral info
+            ICollateralEscrowFactory.Collateral memory collateralInfo =
+                collateralEscrowFactoryBeacon.getCollateralInfo(_bidId);
+            // Withdraw collateral from escrow and send it to bid lender
+            ICollateralEscrowV1(collateralEscrowFactoryBeacon.getEscrow(_bidId)).withdraw(
+                collateralInfo._collateralAddress,
+                collateralInfo._amount,
+                bid.lender
+            );
+        }
+
         emit LoanLiquidated(_bidId, _msgSenderForMarket(bid.marketplaceId));
     }
 
@@ -688,6 +701,19 @@ contract TellerV2 is
 
             // Remove borrower's active bid
             _borrowerBidsActive[bid.borrower].remove(_bidId);
+
+            // If loan is backed by collateral, withdraw and send to borrower
+            if (_isBidCollateralBacked[_bidId]) {
+                // Get collateral info
+                ICollateralEscrowFactory.Collateral memory collateralInfo =
+                    collateralEscrowFactoryBeacon.getCollateralInfo(_bidId);
+                // Withdraw collateral from escrow and send it to bid recipient
+                ICollateralEscrowV1(collateralEscrowFactoryBeacon.getEscrow(_bidId)).withdraw(
+                    collateralInfo._collateralAddress,
+                    collateralInfo._amount,
+                    bid.receiver
+                );
+            }
 
             emit LoanRepaid(_bidId);
         } else {

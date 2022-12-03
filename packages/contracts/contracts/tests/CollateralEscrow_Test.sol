@@ -53,6 +53,22 @@ contract CollateralEscrow_Test is Testable {
             0,
             'Escrow withdraw unsuccessful'
         );
+
+        try borrower.withdraw(
+            address(wethMock),
+            amount,
+            address(borrower)
+        ) {
+            Test.fail("No collateral balance for asset");
+        } catch Error(string memory reason) {
+            Test.eq(
+                reason,
+                "No collateral balance for asset",
+                "Should not be able to withdraw already withdrawn assets"
+            );
+        } catch {
+            Test.fail('Unknown error');
+        }
     }
 
     function _depositAsset() internal {

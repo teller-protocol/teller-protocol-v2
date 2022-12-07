@@ -6,7 +6,7 @@ contract_name=$3
 contract_method=$4
 
 migration_id="$(date +%s)__$description"
-template_file="$(dirname "$0")/templates/$action.ts"
+template_file="$(dirname "$0")/templates/$action.mustache"
 migration_dirname="$(dirname "$0")/../../deploy/migrations"
 migration_file_name="$migration_id.ts"
 migration_file="$migration_dirname/$migration_file_name"

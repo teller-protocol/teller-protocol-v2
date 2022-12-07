@@ -1,17 +1,18 @@
+import path from 'path'
+
 import { DeployFunction } from 'hardhat-deploy/dist/types'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
 import moment from 'moment'
-import path from 'path'
 
 import { getNetworkName } from '~~/config'
 
 type MigrationFunction = (hre: HardhatRuntimeEnvironment) => Promise<void>
 
 export const migrate = (
-  id: string,
+  filename: string,
   deployFn: MigrationFunction
 ): DeployFunction => {
-  id = path.basename(id)
+  const id = path.basename(filename)
   const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
     const { log } = hre
 

@@ -63,7 +63,6 @@
     "./build", 
     "./contracts",
     "./coverage",
-    "./docs",
-    "./scripts/contract-migration/templates"
+    "./docs"
   ]
 }

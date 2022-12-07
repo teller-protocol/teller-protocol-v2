@@ -22,8 +22,11 @@ export const getFunds = async (args: SwapArgs): Promise<void> => {
     ? await args.to.getAddress()
     : args.to
 
-  const token = await contracts.get<ERC20PresetMinterPauser>('ERC20PresetMinterPauser', {
-    at: tokenAddresses[args.tokenSym],
-  })
+  const token = await contracts.get<ERC20PresetMinterPauser>(
+    'ERC20PresetMinterPauser',
+    {
+      at: tokenAddresses[args.tokenSym],
+    }
+  )
   await token.connect(funder).mint(toAddress, args.amount)
 }

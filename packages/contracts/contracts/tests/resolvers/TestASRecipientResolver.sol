@@ -15,9 +15,9 @@ contract TestASRecipientResolver is TellerASResolver {
 
     function resolve(
         address recipient,
-        bytes calldata, /* schema */
-        bytes calldata, /* data */
-        uint256, /* expirationTime */
+        bytes calldata /* schema */,
+        bytes calldata /* data */,
+        uint256 /* expirationTime */,
         address /* msgSender */
     ) external payable virtual override returns (bool) {
         return recipient == _targetRecipient;

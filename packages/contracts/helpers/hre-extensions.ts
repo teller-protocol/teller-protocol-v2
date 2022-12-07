@@ -203,7 +203,7 @@ extendEnvironment((hre) => {
         address = tokens.all[nameOrAddress.toUpperCase()]
         if (!address) throw new Error(`Token ${nameOrAddress} not found`)
       }
-      return await ethers.getContractAt('ERC20', address) as ERC20
+      return await ethers.getContractAt('ERC20', address)
     },
   }
 

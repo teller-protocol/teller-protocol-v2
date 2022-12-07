@@ -59,7 +59,7 @@ const deployHardhatTokens = async (
   const { deploy } = deployments
   const { funder } = await getNamedAccounts()
 
-  const deployToken = async (name: string, symbol: string) => {
+  const deployToken = async (name: string, symbol: string): Promise<string> => {
     const { address } = await deploy('ERC20PresetMinterPauser', {
       from: funder,
       args: [name, symbol],

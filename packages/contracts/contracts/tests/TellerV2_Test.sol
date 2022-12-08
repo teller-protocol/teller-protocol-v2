@@ -23,7 +23,6 @@ import "../escrow/CollateralEscrowV1.sol";
 import "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
 import "../LenderCommitmentForwarder.sol";
 import "./resolvers/TestERC20Token.sol";
-import "../escrow/CollateralEscrowFactory.sol";
 
 import "@mangrovedao/hardhat-test-solidity/test.sol";
 

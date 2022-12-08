@@ -49,13 +49,8 @@ const deployFn: DeployFunction = async (hre) => {
   const collateralEscrowBeacon = await upgrades.deployBeacon(collateralEscrowV1)
   await collateralEscrowBeacon.deployed()
 
-  // Deploy escrow factory
-  const collateralEscrowFactory = await deploy({
-    contract: 'CollateralEscrowFactory',
-    args: [collateralEscrowBeacon.address],
-    proxy: {
-      proxyContract: 'OpenZeppelinTransparentProxy',
-    },
+  const escrowLib = await deploy({
+    contract: 'EscrowLib',
     hre,
   })
 
@@ -68,6 +63,9 @@ const deployFn: DeployFunction = async (hre) => {
     },
     skipIfAlreadyDeployed: true,
     hre,
+    libraries: {
+      EscrowLib: escrowLib.address,
+    },
   })
 
   /*  
@@ -97,7 +95,7 @@ const deployFn: DeployFunction = async (hre) => {
       reputationManager.address,
       lenderCommitmentForwarder.address,
       lendingTokens,
-      collateralEscrowFactory.address
+      collateralEscrowBeacon.address
     )
   } else if (tellerV2Contract.deployResult.newlyDeployed) {
     await tellerV2Contract.onUpgrade()

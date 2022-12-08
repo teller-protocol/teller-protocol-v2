@@ -24,6 +24,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155Upgradeable.sol";
 import "./libraries/NumbersLib.sol";
+import "./libraries/EscrowLib.sol";
 
 /* Errors */
 /**
@@ -164,7 +165,7 @@ contract TellerV2 is
      * @notice Initializes the proxy.
      * @param _protocolFee The fee collected by the protocol for loan processing.
      * @param _lendingTokens The list of tokens allowed as lending assets on the protocol.
-     * @param _collateralEscrowFactoryBeacon The address of the factory deploying escrows for bid collateral.
+     * @param _collateralEscrowBeaconAddress The address of the escrow beacon contracts.
      */
     function initialize(
         uint16 _protocolFee,
@@ -172,7 +173,7 @@ contract TellerV2 is
         address _reputationManager,
         address _lenderCommitmentForwarder,
         address[] calldata _lendingTokens,
-        address _collateralEscrowFactoryBeacon
+        address _collateralEscrowBeaconAddress
     ) external initializer {
         __ProtocolFee_init(_protocolFee);
 
@@ -181,7 +182,7 @@ contract TellerV2 is
         lenderCommitmentForwarder = _lenderCommitmentForwarder;
         marketRegistry = IMarketRegistry(_marketRegistry);
         reputationManager = IReputationManager(_reputationManager);
-        collateralEscrowFactoryBeacon = ICollateralEscrowFactory(_collateralEscrowFactoryBeacon);
+        collateralEscrowBeacon = _collateralEscrowBeaconAddress;
 
         require(_lendingTokens.length > 0, "No lending tokens specified");
         for (uint256 i = 0; i < _lendingTokens.length; i++) {

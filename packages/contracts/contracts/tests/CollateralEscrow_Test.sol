@@ -145,7 +145,7 @@ contract User {
     }
 
     function getBalance(address _collateralAddress) public returns(uint256 amount_) {
-        (, amount_,) = escrow.collateralBalances(_collateralAddress);
+        (, amount_, ,) = escrow.collateralBalances(_collateralAddress);
     }
 
     receive() external payable {}

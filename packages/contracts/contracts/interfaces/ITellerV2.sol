@@ -45,7 +45,7 @@ interface ITellerV2 {
         string calldata _metadataURI,
         address _receiver,
         address _collateralAddress,
-        ICollateralEscrowFactory.Collateral calldata _collateralInfo
+        ICollateralEscrowV1.Collateral calldata _collateralInfo
     ) external returns (uint256 bidId_);
 
     /**

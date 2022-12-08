@@ -275,11 +275,21 @@ contract TellerV2 is
         string calldata _metadataURI,
         address _receiver,
         address _collateralAddress,
-        ICollateralEscrowFactory.Collateral calldata _collateralInfo
+        ICollateralEscrowV1.Collateral calldata _collateralInfo
     ) public override whenNotPaused returns (uint256 bidId_) {
         bidId_ = _submitBid(_lendingToken, _marketplaceId, _principal, _duration, _APR, _metadataURI, _receiver);
-        bool validation = collateralEscrowFactoryBeacon.validateCollateral(bidId_, _msgSenderForMarket(_marketplaceId), _collateralAddress, _collateralInfo);
+
+        bool validation = EscrowLib
+            .validateCollateral(
+                bidId_,
+                bids[bidId_].borrower,
+                _collateralAddress,
+                _collateralInfo
+            );
+
         require(validation == true, 'Collateral balance could not be validated');
+        _bidCollaterals[bidId_] = _collateralInfo;
+        _isBidCollateralBacked[bidId_] = validation;
     }
 
     function _submitBid(
@@ -458,24 +468,28 @@ contract TellerV2 is
         // Withdraw collateral if applicable
         if (_isBidCollateralBacked[_bidId]) {
             // Get collateral info
-            ICollateralEscrowFactory.Collateral memory collateralInfo =
-                collateralEscrowFactoryBeacon.getCollateralInfo(_bidId);
+            ICollateralEscrowV1.Collateral memory collateralInfo =
+                _bidCollaterals[_bidId];
             // Deploy collateral escrow
-            ICollateralEscrowV1 collateralEscrow = ICollateralEscrowV1(collateralEscrowFactoryBeacon.deployCollateralEscrow(_bidId));
+            address escrow = EscrowLib.deployCollateralEscrow(_bidId, collateralEscrowBeacon);
+            _escrows[_bidId] = escrow;
+            ICollateralEscrowV1 collateralEscrow = ICollateralEscrowV1(escrow);
             // Pull collateral from borrower & deposit into escrow
-            if (collateralInfo._collateralType == ICollateralEscrowFactory.CollateralType.ERC20) {
+            if (collateralInfo._collateralType == ICollateralEscrowV1.CollateralType.ERC20) {
                 IERC20Upgradeable(collateralInfo._collateralAddress)
                     .transferFrom(
                         bid.receiver,
                         address(this),
                         collateralInfo._amount
                     );
+                IERC20Upgradeable(collateralInfo._collateralAddress)
+                    .approve(escrow, collateralInfo._amount);
                 collateralEscrow.depositToken(
                     collateralInfo._collateralAddress,
                     collateralInfo._amount
                 );
             }
-            if (collateralInfo._collateralType == ICollateralEscrowFactory.CollateralType.ERC721) {
+            if (collateralInfo._collateralType == ICollateralEscrowV1.CollateralType.ERC721) {
                 IERC721Upgradeable(collateralInfo._collateralAddress)
                     .safeTransferFrom(
                         bid.receiver,
@@ -489,7 +503,7 @@ contract TellerV2 is
                     collateralInfo._tokenId
                 );
             }
-            if (collateralInfo._collateralType == ICollateralEscrowFactory.CollateralType.ERC1155) {
+            if (collateralInfo._collateralType == ICollateralEscrowV1.CollateralType.ERC1155) {
                 bytes memory data;
                 IERC1155Upgradeable(collateralInfo._collateralAddress)
                     .safeTransferFrom(
@@ -662,10 +676,10 @@ contract TellerV2 is
         // If loan is backed by collateral, withdraw and send to lender
         if (_isBidCollateralBacked[_bidId]) {
             // Get collateral info
-            ICollateralEscrowFactory.Collateral memory collateralInfo =
-                collateralEscrowFactoryBeacon.getCollateralInfo(_bidId);
+            ICollateralEscrowV1.Collateral memory collateralInfo =
+                _bidCollaterals[_bidId];
             // Withdraw collateral from escrow and send it to bid lender
-            ICollateralEscrowV1(collateralEscrowFactoryBeacon.getEscrow(_bidId)).withdraw(
+            ICollateralEscrowV1(_escrows[_bidId]).withdraw(
                 collateralInfo._collateralAddress,
                 collateralInfo._amount,
                 bid.lender
@@ -705,10 +719,10 @@ contract TellerV2 is
             // If loan is backed by collateral, withdraw and send to borrower
             if (_isBidCollateralBacked[_bidId]) {
                 // Get collateral info
-                ICollateralEscrowFactory.Collateral memory collateralInfo =
-                    collateralEscrowFactoryBeacon.getCollateralInfo(_bidId);
+                ICollateralEscrowV1.Collateral memory collateralInfo =
+                    _bidCollaterals[_bidId];
                 // Withdraw collateral from escrow and send it to bid recipient
-                ICollateralEscrowV1(collateralEscrowFactoryBeacon.getEscrow(_bidId)).withdraw(
+                ICollateralEscrowV1(_escrows[_bidId]).withdraw(
                     collateralInfo._collateralAddress,
                     collateralInfo._amount,
                     bid.receiver

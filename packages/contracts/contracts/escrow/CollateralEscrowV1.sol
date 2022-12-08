@@ -37,6 +37,10 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
         bidId = _bidId;
     }
 
+    function getBid() external view returns(uint256) {
+        return bidId;
+    }
+
     /**
      * @notice Deposits a collateral ERC20 token into the escrow.
      * @param _collateralAddress The address of the collateral token.

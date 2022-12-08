@@ -13,6 +13,7 @@ interface ICollateralEscrowV1 {
         CollateralType _collateralType;
         uint256 _amount;
         uint256 _tokenId;
+        address _collateralAddress;
     }
 
     /**
@@ -43,4 +44,8 @@ interface ICollateralEscrowV1 {
      */
     function withdraw(address _collateralAddress, uint256 _amount, address _recipient) external;
 
+    function getBid() external view returns(uint256);
+
+    function initialize(uint256 _bidId)
+    external;
 }

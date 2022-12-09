@@ -1,9 +1,15 @@
 import { Address, BigInt } from '@graphprotocol/graph-ts'
 
 import { Bid, Borrower, Commitment, TokenVolume } from '../../generated/schema'
-import { TellerV2, TellerV2__bidsResult } from '../../generated/TellerV2/TellerV2'
+import {
+  TellerV2,
+  TellerV2__bidsResult,
+  TellerV2__bidsResultLoanDetailsStruct,
+  TellerV2__bidsResultTermsStruct
+} from '../../generated/TellerV2/TellerV2'
 
 import {
+  getBid,
   loadBorrowerByMarketId,
   loadBorrowerTokenVolume,
   loadLenderByMarketId,
@@ -12,6 +18,7 @@ import {
   loadProtocolTokenVolume,
   loadTokenVolumeByMarketId
 } from './loaders'
+import {TellerV0Storage} from "../../generated/TellerV2/TellerV0Storage";
 
 export function updateTokenVolumeOnPayment(
   lastPayment: BigInt,
@@ -43,7 +50,7 @@ export function updateBid(
   bidState: string
 ): void {
   const tellerV2Instance = TellerV2.bind(eventAddress);
-  const storedBid = tellerV2Instance.bids(bid.bidId);
+  const storedBid = getBid(eventAddress, bid.bidId);
 
   bid.totalRepaidPrincipal = storedBid.value5.totalRepaid.principal;
   bid.totalRepaidInterest = storedBid.value5.totalRepaid.interest;

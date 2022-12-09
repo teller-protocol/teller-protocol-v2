@@ -1,4 +1,4 @@
-import { Address, BigInt } from '@graphprotocol/graph-ts'
+import {Address, BigInt, ethereum} from '@graphprotocol/graph-ts'
 
 import {
   DeletedCommitment,
@@ -34,10 +34,15 @@ import {
   LoanRepaid,
   LoanRepayment,
   SubmittedBid,
-  TellerV2
+  TellerV2,
+  TellerV2__bidsResult,
+  TellerV2__bidsResultLoanDetailsStruct,
+  TellerV2__bidsResultLoanDetailsTotalRepaidStruct, TellerV2__bidsResultTermsStruct,
 } from '../generated/TellerV2/TellerV2'
+import {TellerV0Storage, TellerV0Storage__bidsResult} from '../generated/TellerV2/TellerV0Storage'
 
 import {
+  getBid,
   loadBidById,
   loadBorrowerByMarketId,
   loadBorrowerTokenVolume,
@@ -52,7 +57,8 @@ import { updateBid, updateTokenVolumeOnAccept } from './helpers/updaters'
 
 export function handleSubmittedBid(event: SubmittedBid): void {
   const tellerV2Instance = TellerV2.bind(event.address);
-  const storedBid = tellerV2Instance.bids(event.params.bidId);
+  const storedBid = getBid(event.address, event.params.bidId);
+
   const market = loadMarketById(storedBid.value3.toString());
 
   // Creates User + Borrower entity if it doesn't exist
@@ -112,6 +118,8 @@ export function handleSubmittedBid(event: SubmittedBid): void {
     bid.expiresAt = event.block.timestamp.plus(
       tellerV2Instance.bidExpirationTime(event.params.bidId)
     );
+  } else {
+    bid.expiresAt = BigInt.zero()
   }
 
   bid.save();
@@ -126,7 +134,8 @@ export function handleSubmittedBids(events: SubmittedBid[]): void {
 
 export function handleAcceptedBid(event: AcceptedBid): void {
   const tellerV2Instance = TellerV2.bind(event.address);
-  const storedBid = tellerV2Instance.bids(event.params.bidId);
+  const storedBid = getBid(event.address, event.params.bidId);
+
   const marketPlace = loadMarketById(storedBid.value3.toString());
 
   const lender: Lender = loadLenderByMarketId(
@@ -634,7 +643,7 @@ export function handleTellerV2Upgraded(event: Upgraded): void {
   ) {
     const tellerV2Instance = TellerV2.bind(event.address);
     for (let i = 62; i < 66; i++) {
-      const storedBid = tellerV2Instance.bids(BigInt.fromI32(i));
+      const storedBid = getBid(event.address, BigInt.fromI32(i));
       const bid = loadBidById(i.toString());
       if (bid.bidId) {
         bid.paymentCycleAmount = storedBid.value6.paymentCycleAmount;

@@ -1,23 +1,23 @@
 // SPDX-Licence-Identifier: MIT
 pragma solidity >=0.8.0 <0.9.0;
 
+// Contracts
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/metatx/ERC2771ContextUpgradeable.sol";
+
 // Interfaces
 import "./interfaces/ILenderManager.sol";
 import "./interfaces/ITellerV2.sol";
 import "./interfaces/IMarketRegistry.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "@openzeppelin/contracts-upgradeable/metatx/ERC2771ContextUpgradeable.sol";
 
 contract LenderManager is
-    ILenderManager,
     Initializable,
-    ERC2771ContextUpgradeable
+    OwnableUpgradeable,
+    ERC2771ContextUpgradeable,
+    ILenderManager
 {
-    /** Storage Variables */
-    ITellerV2 public immutable tellerV2;
     IMarketRegistry public immutable marketRegistry;
-    string public constant CONTRACT_VERSION = "1";
-    string public upgradedToVersion;
 
     // Mapping of loans to current active lenders
     mapping(uint256 => address) internal _loanActiveLender;
@@ -25,34 +25,19 @@ contract LenderManager is
     /** Events **/
     event NewLenderSet(address indexed newLender, uint256 bidId);
 
-    constructor(
-        address _protocolAddress,
-        address _marketRegistry,
-        address _trustedForwarder
-    ) ERC2771ContextUpgradeable(_trustedForwarder) {
-        tellerV2 = ITellerV2(_protocolAddress);
+    constructor(address _trustedForwarder, address _marketRegistry)
+        ERC2771ContextUpgradeable(_trustedForwarder)
+    {
+        _disableInitializers();
         marketRegistry = IMarketRegistry(_marketRegistry);
     }
 
-    /**
-     * @notice The initializer sets the initial list of active loan lenders for TellerV2.
-     * @param _initialActiveBidIds Array containing the list of bidIds.
-     * @param _initialActiveLenderArray Array of the associated active lender addresses.
-     */
-    function initialize(
-        uint256[] calldata _initialActiveBidIds,
-        address[] calldata _initialActiveLenderArray
-    ) external initializer {
-        require(
-            _initialActiveBidIds.length == _initialActiveLenderArray.length,
-            "Array lengths mismatch"
-        );
-        upgradedToVersion = CONTRACT_VERSION;
-        for (uint i = 0; i < _initialActiveBidIds.length; i++) {
-            _loanActiveLender[
-                _initialActiveBidIds[i]
-            ] = _initialActiveLenderArray[i];
-        }
+    function initialize() external initializer {
+        __LenderManager_init();
+    }
+
+    function __LenderManager_init() internal onlyInitializing {
+        __Ownable_init();
     }
 
     /**
@@ -67,7 +52,7 @@ contract LenderManager is
     {
         address currentLender = _getActiveLender(_bidId);
         if (currentLender == address(0)) {
-            require(_msgSender() == address(tellerV2), "Caller not authorized");
+            _checkOwner();
         } else {
             require(currentLender == _msgSender(), "Not loan owner");
         }
@@ -108,7 +93,29 @@ contract LenderManager is
     {
         lender_ = _loanActiveLender[_bidId];
         if (lender_ == address(0)) {
-            lender_ = tellerV2.getLoanLender(_bidId);
+            lender_ = ITellerV2(owner()).getLoanLender(_bidId);
         }
+    }
+
+    /** OpenZeppelin Override Functions **/
+
+    function _msgSender()
+        internal
+        view
+        virtual
+        override(ERC2771ContextUpgradeable, ContextUpgradeable)
+        returns (address sender)
+    {
+        sender = ERC2771ContextUpgradeable._msgSender();
+    }
+
+    function _msgData()
+        internal
+        view
+        virtual
+        override(ERC2771ContextUpgradeable, ContextUpgradeable)
+        returns (bytes calldata)
+    {
+        return ERC2771ContextUpgradeable._msgData();
     }
 }

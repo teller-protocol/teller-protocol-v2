@@ -149,7 +149,7 @@ contract TellerV2 is
 
     /** Constant Variables **/
 
-    uint256 public constant CURRENT_CODE_VERSION = 7;
+    uint8 public constant CURRENT_CODE_VERSION = 7;
 
     /** Constructor **/
 
@@ -181,7 +181,7 @@ contract TellerV2 is
         lenderCommitmentForwarder = _lenderCommitmentForwarder;
         marketRegistry = IMarketRegistry(_marketRegistry);
         reputationManager = IReputationManager(_reputationManager);
-        lenderManager = ILenderManager(_lenderManager);
+        _setLenderManager(_lenderManager);
 
         require(_lendingTokens.length > 0, "No lending tokens specified");
         for (uint256 i = 0; i < _lendingTokens.length; i++) {
@@ -193,12 +193,27 @@ contract TellerV2 is
         }
     }
 
-    function onUpgrade() external {
+    function setLenderManager(address _lenderManager)
+        public
+        reinitializer(CURRENT_CODE_VERSION)
+        onlyOwner
+    {
+        _setLenderManager(_lenderManager);
+    }
+
+    function _setLenderManager(address _lenderManager)
+        internal
+        onlyInitializing
+    {
         require(
-            version != CURRENT_CODE_VERSION,
-            "Contract already upgraded to latest version!"
+            address(lenderManager) == address(0),
+            "LenderManager already set"
         );
-        version = CURRENT_CODE_VERSION;
+        require(
+            _lenderManager.isContract(),
+            "LenderManager must be a contract"
+        );
+        lenderManager = ILenderManager(_lenderManager);
     }
 
     /**
@@ -222,14 +237,6 @@ contract TellerV2 is
             uint256 convertedURI = uint256(bids[_bidId]._metadataURI);
             metadataURI_ = StringsUpgradeable.toHexString(convertedURI, 32);
         }
-    }
-
-    /**
-     * @notice Lets the DAO/owner of the protocol to set a new reputation manager contract.
-     * @param _reputationManager The new contract address.
-     */
-    function setReputationManager(address _reputationManager) public onlyOwner {
-        reputationManager = IReputationManager(_reputationManager);
     }
 
     /**

@@ -2,7 +2,6 @@ import { DeployFunction } from 'hardhat-deploy/dist/types'
 import { HARDHAT_NETWORK_NAME } from 'hardhat/plugins'
 import { deploy } from 'helpers/deploy-helpers'
 import { isInitialized } from 'helpers/oz-contract-helpers'
-import { getActiveLoans } from 'helpers/tasks/active-loans'
 import { TellerV2 } from 'types/typechain'
 
 import { getTokens } from '~~/config'
@@ -18,30 +17,7 @@ const deployFn: DeployFunction = async (hre) => {
     lendingTokens.push(tokens.all.USDCT)
   }
 
-  const reputationManager = await deploy({
-    contract: 'ReputationManager',
-    args: [],
-    proxy: {
-      proxyContract: 'OpenZeppelinTransparentProxy',
-    },
-    hre,
-  })
-
-  const trustedForwarder = await deploy({
-    contract: 'MetaForwarder',
-    skipIfAlreadyDeployed: true,
-    proxy: {
-      proxyContract: 'OpenZeppelinTransparentProxy',
-      execute: {
-        init: {
-          methodName: 'initialize',
-          args: [],
-        },
-      },
-    },
-    hre,
-  })
-
+  const trustedForwarder = await hre.contracts.get('MetaForwarder')
   const tellerV2Contract = await deploy({
     contract: 'TellerV2',
     args: [trustedForwarder.address],
@@ -49,32 +25,7 @@ const deployFn: DeployFunction = async (hre) => {
     proxy: {
       proxyContract: 'OpenZeppelinTransparentProxy',
     },
-    skipIfAlreadyDeployed: true,
-    hre,
-  })
-
-  const activeLoansAndLenders = await getActiveLoans(null, hre)
-
-  const lenderManager = await deploy({
-    contract: 'LenderManager',
-    args: [
-      tellerV2Contract.address,
-      marketRegistry.address,
-      trustedForwarder.address,
-    ],
-    proxy: {
-      proxyContract: 'OpenZeppelinTransparentProxy',
-      execute: {
-        init: {
-          methodName: 'initialize',
-          args: [
-            activeLoansAndLenders.activeLoans,
-            activeLoansAndLenders.activeLoanLenders,
-          ],
-        },
-      },
-    },
-    skipIfAlreadyDeployed: true,
+    skipIfAlreadyDeployed: false,
     hre,
   })
 
@@ -91,6 +42,7 @@ const deployFn: DeployFunction = async (hre) => {
     hre,
   })
 
+  const reputationManager = await hre.contracts.get('ReputationManager')
   // Execute the initialize method of reputation manager
   const reputationIsInitialized = await isInitialized(reputationManager.address)
   if (!reputationIsInitialized) {
@@ -99,6 +51,7 @@ const deployFn: DeployFunction = async (hre) => {
 
   const tellerV2IsInitialized = await isInitialized(tellerV2Contract.address)
   if (!tellerV2IsInitialized) {
+    const lenderManager = await hre.contracts.get('LenderManager')
     await tellerV2Contract.initialize(
       protocolFee,
       marketRegistry.address,
@@ -107,12 +60,15 @@ const deployFn: DeployFunction = async (hre) => {
       lendingTokens,
       lenderManager.address
     )
-  } else if (tellerV2Contract.deployResult.newlyDeployed) {
-    await tellerV2Contract.onUpgrade()
   }
 }
 
 // tags and deployment
 deployFn.tags = ['teller-v2']
-deployFn.dependencies = ['market-registry']
+deployFn.dependencies = [
+  'meta-forwarder',
+  'reputation-manager',
+  'market-registry',
+  'lender-manager',
+]
 export default deployFn

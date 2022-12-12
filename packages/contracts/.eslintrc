@@ -71,6 +71,7 @@
     "@typescript-eslint/strict-boolean-expressions": "off",
     "@typescript-eslint/unbound-method": 0,
     "@typescript-eslint/no-non-null-assertion": "off",
+    "@typescript-eslint/no-invalid-void-type": "off",
     "no-param-reassign": "error",
     "no-duplicate-imports": "warn",
     //"dynamic-import-chunkname": "warn",

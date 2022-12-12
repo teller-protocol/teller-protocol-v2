@@ -28,4 +28,5 @@ const deployFn: DeployFunction = async (hre) => {
 // tags and deployment
 deployFn.tags = ['autopay']
 deployFn.dependencies = ['teller-v2']
+deployFn.skip = async (hre) => true
 export default deployFn

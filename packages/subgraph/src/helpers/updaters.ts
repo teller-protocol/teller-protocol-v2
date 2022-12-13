@@ -70,8 +70,10 @@ export function updateBid(
     );
     const tokenVolume = loadTokenVolumeByMarketId(storedBid.value5.lendingToken, storedBid.value3.toHexString());
     const totalRepaidInterest = tokenVolume.totalRepaidInterest;
-    tokenVolume.totalRepaidInterest = totalRepaidInterest.plus(_lastInterestPayment);
-    tokenVolume.save();
+    if(totalRepaidInterest) {
+      tokenVolume.totalRepaidInterest = totalRepaidInterest.plus(_lastInterestPayment);
+      tokenVolume.save();
+    }
   }
 
   if (bidState === "Repayment") {

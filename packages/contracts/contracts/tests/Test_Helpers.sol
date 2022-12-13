@@ -85,7 +85,6 @@ contract User {
         uint16 _APR,
         string calldata _metadataURI,
         address _receiver,
-        address _collateralAddress,
         ICollateralEscrowV1.Collateral calldata _collateralInfo
     ) public returns (uint256) {
         return ITellerV2(tellerV2).submitBid(
@@ -96,9 +95,12 @@ contract User {
             _APR,
             _metadataURI,
             _receiver,
-            _collateralAddress,
             _collateralInfo
         );
+    }
+
+    function repayLoanFull(uint256 _bidId) public {
+        return ITellerV2(tellerV2).repayLoanFull(_bidId);
     }
 
     receive() external payable {}

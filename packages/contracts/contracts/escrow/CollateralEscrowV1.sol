@@ -125,6 +125,7 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
         }
         // Deposit ERC721
         if (_collateralType == CollateralType.ERC721) {
+            require(_amount == 1, 'Incorrect deposit amount');
             IERC721Upgradeable(_collateralAddress)
                 .safeTransferFrom(
                     msg.sender,
@@ -134,7 +135,7 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
             return;
         }
         // Deposit ERC1155
-        if (_collateralType == CollateralType.ERC721) {
+        if (_collateralType == CollateralType.ERC1155) {
             bytes memory data;
 
             IERC1155Upgradeable(_collateralAddress)
@@ -167,6 +168,7 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
         }
         // Withdraw ERC721
         if (_collateral._collateralType == CollateralType.ERC721) {
+            require(_amount == 1, 'Incorrect withdrawal amount');
             IERC721Upgradeable(_collateralAddress)
             .safeTransferFrom(
                 address(this),
@@ -176,7 +178,7 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
             return;
         }
         // Withdraw ERC1155
-        if (_collateral._collateralType == CollateralType.ERC721) {
+        if (_collateral._collateralType == CollateralType.ERC1155) {
             bytes memory data;
 
             IERC1155Upgradeable(_collateralAddress)

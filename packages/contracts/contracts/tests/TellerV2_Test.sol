@@ -37,6 +37,7 @@ contract TellerV2_Test is Testable {
     TestERC20Token daiMock;
 
     uint256 marketId1;
+    uint256 collateralAmount = 10;
 
     function setup_beforeAll() public {
         // Deploy test tokens
@@ -83,6 +84,7 @@ contract TellerV2_Test is Testable {
         lender.depositToWeth(balance*10);
 
         daiMock.transfer(address(lender), balance*10);
+        daiMock.transfer(address(borrower), balance);
         // Approve lender's dai
         lender.addAllowance(
             address(daiMock),
@@ -106,7 +108,7 @@ contract TellerV2_Test is Testable {
 
     function submitCollateralBid() public returns(uint256 bidId_) {
         ICollateralEscrowV1.Collateral memory collateralInfo;
-        collateralInfo._amount = 10;
+        collateralInfo._amount = collateralAmount;
         collateralInfo._tokenId = 0;
         collateralInfo._collateralType = ICollateralEscrowV1.CollateralType.ERC20;
         collateralInfo._collateralAddress = address(wethMock);
@@ -129,7 +131,6 @@ contract TellerV2_Test is Testable {
             500,
             "metadataUri://",
             address(borrower),
-            address(wethMock),
             collateralInfo
         );
     }
@@ -147,7 +148,7 @@ contract TellerV2_Test is Testable {
 
         // Get newly created escrow
         address escrowAddress = tellerV2._escrows(bidId);
-        ICollateralEscrowV1 escrow = ICollateralEscrowV1(escrowAddress);
+        CollateralEscrowV1 escrow = CollateralEscrowV1(escrowAddress);
 
         uint256 storedBidId = escrow.getBid();
 
@@ -156,6 +157,14 @@ contract TellerV2_Test is Testable {
             bidId,
             storedBidId,
             'Collateral escrow was not created'
+        );
+
+        uint256 escrowBalance = wethMock.balanceOf(escrowAddress);
+
+        Test.eq(
+            collateralAmount,
+            escrowBalance,
+            'Collateral was not stored'
         );
     }
 }

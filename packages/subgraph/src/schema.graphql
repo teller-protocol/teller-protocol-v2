@@ -63,6 +63,7 @@ type Bid @entity {
   totalRepaidInterest: BigInt!
   _lastTotalRepaidAmount: BigInt!
   _lastTotalRepaidInterestAmount: BigInt!
+  paymentDefaultDuration: BigInt!
 }
 
 type User @entity {

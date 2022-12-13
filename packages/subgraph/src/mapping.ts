@@ -239,6 +239,8 @@ export function handleAcceptedBid(event: AcceptedBid): void {
   const borrowerVolume = loadBorrowerTokenVolume(lendingTokenAddress, borrower);
   updateTokenVolumeOnAccept(borrowerVolume, storedBid);
 
+  bid.paymentDefaultDuration = marketPlace.paymentDefaultDuration;
+
   bid.save();
   marketPlace.save();
   lender.save();

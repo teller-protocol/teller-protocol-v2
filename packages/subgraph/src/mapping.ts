@@ -122,6 +122,15 @@ export function handleSubmittedBid(event: SubmittedBid): void {
     bid.expiresAt = BigInt.zero()
   }
 
+  const marketPlace = loadMarketById(storedBid.value3.toString());
+
+  const paymentDefaultDuration = marketPlace.paymentDefaultDuration;
+  if(paymentDefaultDuration) {
+    bid.paymentDefaultDuration = paymentDefaultDuration;
+  } else {
+    bid.paymentDefaultDuration = BigInt.zero();
+  }
+
   bid.save();
   market.save();
 }
@@ -238,11 +247,6 @@ export function handleAcceptedBid(event: AcceptedBid): void {
   // Update the borrower's token volume
   const borrowerVolume = loadBorrowerTokenVolume(lendingTokenAddress, borrower);
   updateTokenVolumeOnAccept(borrowerVolume, storedBid);
-
-  const paymentDefaultDuration = marketPlace.paymentDefaultDuration;
-  if(paymentDefaultDuration) {
-    bid.paymentDefaultDuration = paymentDefaultDuration;
-  }
 
   bid.save();
   marketPlace.save();

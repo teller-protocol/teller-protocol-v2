@@ -33,7 +33,6 @@ interface ITellerV2 {
      * @param _APR The proposed interest rate for the loan bid.
      * @param _metadataURI The URI for additional borrower loan information as part of loan bid.
      * @param _receiver The address where the loan amount will be sent to.
-     * @param _collateralAddress The contract address of the asset being put up as collateral.
      * @param _collateralInfo Additional information about the collateral asset.
      */
     function submitBid(
@@ -44,7 +43,6 @@ interface ITellerV2 {
         uint16 _APR,
         string calldata _metadataURI,
         address _receiver,
-        address _collateralAddress,
         ICollateralEscrowV1.Collateral calldata _collateralInfo
     ) external returns (uint256 bidId_);
 

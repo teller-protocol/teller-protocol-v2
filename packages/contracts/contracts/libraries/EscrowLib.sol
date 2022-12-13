@@ -20,22 +20,19 @@ library EscrowLib {
      * @notice Checks the validity of a borrower's collateral balance.
      * @param _bidId The id of the associated bid.
      * @param _borrowerAddress The address of the borrower
-     * @param _collateralAddress The contract address of the asset being put up as collateral.
      * @param _collateralInfo Additional information about the collateral asset.
      * @return validation_ Boolean indicating if the collateral balance was validated.
      */
     function validateCollateral(
         uint256 _bidId,
         address _borrowerAddress,
-        address _collateralAddress,
         ICollateralEscrowV1.Collateral calldata _collateralInfo
     ) external
     returns (bool validation_)
     {
-        validation_ = _checkBalance(_borrowerAddress, _collateralAddress, _collateralInfo);
+        validation_ = _checkBalance(_borrowerAddress, _collateralInfo);
         if (validation_) {
-//            _bidCollaterals[_bidId] = _collateralInfo;
-            emit CollateralValidated(_bidId, _collateralAddress, _collateralInfo._amount);
+            emit CollateralValidated(_bidId, _collateralInfo._collateralAddress, _collateralInfo._amount);
         }
     }
 
@@ -58,7 +55,6 @@ library EscrowLib {
 
     function _checkBalance(
         address _borrowerAddress,
-        address _collateralAddress,
         ICollateralEscrowV1.Collateral calldata _collateralInfo
     ) internal
     returns(bool)
@@ -66,17 +62,17 @@ library EscrowLib {
         ICollateralEscrowV1.CollateralType collateralType = _collateralInfo._collateralType;
         if (collateralType == ICollateralEscrowV1.CollateralType.ERC20) {
             return _collateralInfo._amount <=
-                IERC20Upgradeable(_collateralAddress)
+                IERC20Upgradeable(_collateralInfo._collateralAddress)
                     .balanceOf(_borrowerAddress);
         }
         if (collateralType == ICollateralEscrowV1.CollateralType.ERC721) {
             return _borrowerAddress ==
-                IERC721Upgradeable(_collateralAddress)
+                IERC721Upgradeable(_collateralInfo._collateralAddress)
                     .ownerOf(_collateralInfo._tokenId);
         }
         if (collateralType == ICollateralEscrowV1.CollateralType.ERC1155) {
             return _collateralInfo._amount <=
-                IERC1155Upgradeable(_collateralAddress)
+                IERC1155Upgradeable(_collateralInfo._collateralAddress)
                     .balanceOf(_borrowerAddress, _collateralInfo._tokenId);
         }
         return false;

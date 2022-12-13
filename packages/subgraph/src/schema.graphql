@@ -140,6 +140,7 @@ type TokenVolume @entity {
   activeLoans: BigInt!
   closedLoans: BigInt!
   commissionEarned: BigInt!
+  totalRepaidInterest: BigInt!
 }
 
 type MarketVolume @entity {

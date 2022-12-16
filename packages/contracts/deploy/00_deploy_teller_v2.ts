@@ -49,11 +49,6 @@ const deployFn: DeployFunction = async (hre) => {
   const collateralEscrowBeacon = await upgrades.deployBeacon(collateralEscrowV1)
   await collateralEscrowBeacon.deployed()
 
-  const escrowLib = await deploy({
-    contract: 'EscrowLib',
-    hre,
-  })
-
   const tellerV2Contract = await deploy({
     contract: 'TellerV2',
     args: [trustedForwarder.address],
@@ -63,10 +58,24 @@ const deployFn: DeployFunction = async (hre) => {
     },
     skipIfAlreadyDeployed: true,
     hre,
-    libraries: {
-      EscrowLib: escrowLib.address,
-    },
   })
+
+  // Deploy & initialize collateral manager
+  const collateralManager = await deploy({
+    contract: 'CollateralManager',
+    args: [],
+    proxy: {
+      proxyContract: 'OpenZeppelinTransparentProxy',
+    },
+    hre,
+  })
+  const collateralIsInitialized = await isInitialized(collateralManager.address)
+  if (!collateralIsInitialized) {
+    await collateralManager.initialize(
+      collateralEscrowBeacon.address,
+      tellerV2Contract.address
+    )
+  }
 
   /*  
      Need to initialize the LenderCommitmentForwarder after TellerV2 has been deployed because it is a MarketForwarder
@@ -95,7 +104,7 @@ const deployFn: DeployFunction = async (hre) => {
       reputationManager.address,
       lenderCommitmentForwarder.address,
       lendingTokens,
-      collateralEscrowBeacon.address
+      collateralManager.address
     )
   } else if (tellerV2Contract.deployResult.newlyDeployed) {
     await tellerV2Contract.onUpgrade()

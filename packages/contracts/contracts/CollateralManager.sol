@@ -20,7 +20,6 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     mapping(uint256 => ICollateralEscrowV1.Collateral) public _bidCollaterals;
     // Boolean indicating if a bid is backed by collateral
     mapping(uint256 => bool) _isBidCollateralBacked;
-    TellerV2 public tellerV2;
 
     /* Events */
     event CollateralEscrowDeployed(uint256 _bidId, address _collateralEscrow);
@@ -31,13 +30,14 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
      * @param _collateralEscrowBeacon The address of the escrow implementation.
      */
     function initialize(
-        address _collateralEscrowBeacon,
-        address _tellerV2
+        address _collateralEscrowBeacon
     ) external initializer {
         collateralEscrowBeacon = _collateralEscrowBeacon;
-        tellerV2 = TellerV2(_tellerV2);
+        __CollateralManager_init();
+    }
+
+    function __CollateralManager_init() internal onlyInitializing {
         __Ownable_init();
-        transferOwnership(_tellerV2);
     }
 
     /**
@@ -179,16 +179,16 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
      */
     function withdraw(uint256 _bidId) external {
         if (_isBidCollateralBacked[_bidId]) {
-            BidState bidState = tellerV2.getBidState(_bidId);
+            BidState bidState = TellerV2(owner()).getBidState(_bidId);
             require(
                 bidState >= BidState.PAID,
                 'Loan has not been repaid or liquidated'
             );
             address receiver;
             if(bidState == BidState.LIQUIDATED) {
-                receiver = tellerV2.getLoanLender(_bidId);
+                receiver = TellerV2(owner()).getLoanLender(_bidId);
             } else {
-                receiver = tellerV2.getLoanBorrower(_bidId);
+                receiver = TellerV2(owner()).getLoanBorrower(_bidId);
             }
             // Get collateral info
             ICollateralEscrowV1.Collateral memory collateralInfo = _bidCollaterals[_bidId];

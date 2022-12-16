@@ -42,13 +42,6 @@ const deployFn: DeployFunction = async (hre) => {
     hre,
   })
 
-  const collateralEscrowV1 = await hre.ethers.getContractFactory(
-    'CollateralEscrowV1'
-  )
-  // Deploy escrow beacon implementation
-  const collateralEscrowBeacon = await upgrades.deployBeacon(collateralEscrowV1)
-  await collateralEscrowBeacon.deployed()
-
   const tellerV2Contract = await deploy({
     contract: 'TellerV2',
     args: [trustedForwarder.address],
@@ -96,8 +89,11 @@ const deployFn: DeployFunction = async (hre) => {
     await reputationManager.initialize(tellerV2Contract.address)
   }
 
+
+
   const tellerV2IsInitialized = await isInitialized(tellerV2Contract.address)
   if (!tellerV2IsInitialized) {
+    const collateralManager = await hre.contracts.get('CollateralManager')
     await tellerV2Contract.initialize(
       protocolFee,
       marketRegistry.address,
@@ -113,5 +109,5 @@ const deployFn: DeployFunction = async (hre) => {
 
 // tags and deployment
 deployFn.tags = ['teller-v2']
-deployFn.dependencies = ['market-registry']
+deployFn.dependencies = ['market-registry', 'collateral-manager']
 export default deployFn

@@ -57,9 +57,9 @@ contract TellerV2_Test is Testable {
         // Deploy Collateral manager
         collateralManager = new CollateralManager();
         collateralManager.initialize(
-            address(escrowBeacon),
-            address(tellerV2)
+            address(escrowBeacon)
         );
+        collateralManager.transferOwnership(address(tellerV2));
         // Deploy LenderCommitmentForwarder
         LenderCommitmentForwarder lenderCommitmentForwarder = new LenderCommitmentForwarder(
             address(tellerV2),
@@ -115,11 +115,14 @@ contract TellerV2_Test is Testable {
     }
 
     function submitCollateralBid() public returns(uint256 bidId_) {
-        ICollateralEscrowV1.Collateral memory collateralInfo;
-        collateralInfo._amount = collateralAmount;
-        collateralInfo._tokenId = 0;
-        collateralInfo._collateralType = ICollateralEscrowV1.CollateralType.ERC20;
-        collateralInfo._collateralAddress = address(wethMock);
+        ICollateralEscrowV1.Collateral memory info;
+        info._amount = collateralAmount;
+        info._tokenId = 0;
+        info._collateralType = ICollateralEscrowV1.CollateralType.ERC20;
+        info._collateralAddress = address(wethMock);
+
+        ICollateralEscrowV1.Collateral[] memory collateralInfo = new ICollateralEscrowV1.Collateral[](1);
+        collateralInfo[0] = info;
 
         uint256 bal = wethMock.balanceOf(address(borrower));
 
@@ -128,7 +131,7 @@ contract TellerV2_Test is Testable {
         borrower.addAllowance(
             address(wethMock),
             address(collateralManager),
-            collateralInfo._amount
+            info._amount
         );
 
         bidId_ = borrower.submitCollateralBid(

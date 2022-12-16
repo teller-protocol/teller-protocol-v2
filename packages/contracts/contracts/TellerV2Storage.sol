@@ -142,11 +142,7 @@ abstract contract TellerV2Storage_G2 is TellerV2Storage_G1 {
 }
 
 abstract contract TellerV2Storage_G3 is TellerV2Storage_G2 {
-    address public collateralEscrowBeacon;
-    mapping(uint256 => address) public _escrows; // bidIds -> collateralEscrow
-    // biIds -> validated collateral info
-    mapping(uint256 => ICollateralEscrowV1.Collateral) public _bidCollaterals;
-    mapping(uint256 => bool) _isBidCollateralBacked;
+    ICollateralManager public collateralManager;
 }
 
 abstract contract TellerV2Storage is TellerV2Storage_G3 {}

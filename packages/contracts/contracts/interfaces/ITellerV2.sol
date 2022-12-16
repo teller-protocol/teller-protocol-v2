@@ -97,7 +97,7 @@ interface ITellerV2 {
     function getBidState(uint256 _bidId)
         external
         view
-        returns (TellerV2Storage.BidState);
+        returns (BidState);
 
     function getBorrowerActiveLoanIds(address _borrower)
         external

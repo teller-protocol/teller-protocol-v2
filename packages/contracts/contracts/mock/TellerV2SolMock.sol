@@ -127,7 +127,7 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
     function getBidState(uint256 _bidId)
         public
         view
-        returns (TellerV2Storage.BidState)
+        returns (BidState)
     {
         return bids[_bidId].state;
     }

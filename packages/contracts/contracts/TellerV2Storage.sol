@@ -7,16 +7,18 @@ import "./interfaces/IReputationManager.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "./interfaces/escrow/ICollateralEscrowV1.sol";
+import "./interfaces/ICollateralManager.sol";
+
+enum BidState {
+    NONEXISTENT,
+    PENDING,
+    CANCELLED,
+    ACCEPTED,
+    PAID,
+    LIQUIDATED
+}
 
 abstract contract TellerV2Storage_G0 {
-    enum BidState {
-        NONEXISTENT,
-        PENDING,
-        CANCELLED,
-        ACCEPTED,
-        PAID,
-        LIQUIDATED
-    }
 
     /**
      * @notice Represents a total amount for a payment.

@@ -43,7 +43,7 @@ interface ITellerV2 {
         uint16 _APR,
         string calldata _metadataURI,
         address _receiver,
-        ICollateralEscrowV1.Collateral calldata _collateralInfo
+        ICollateralEscrowV1.Collateral[] calldata _collateralInfo
     ) external returns (uint256 bidId_);
 
     /**

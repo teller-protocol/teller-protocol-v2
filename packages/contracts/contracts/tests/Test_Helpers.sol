@@ -85,7 +85,7 @@ contract User {
         uint16 _APR,
         string calldata _metadataURI,
         address _receiver,
-        ICollateralEscrowV1.Collateral calldata _collateralInfo
+        ICollateralEscrowV1.Collateral[] calldata _collateralInfo
     ) public returns (uint256) {
         return ITellerV2(tellerV2).submitBid(
             _lendingToken,

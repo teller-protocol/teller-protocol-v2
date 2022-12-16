@@ -207,8 +207,12 @@ contract TellerV2 is
         onlyInitializing
     {
         require(
-            address(_collateralManager) == address(0),
-            "Collateral Manager must be a contract"
+            address(collateralManager) == address(0),
+            "Collateral Manager already set"
+        );
+        require(
+            _collateralManager.isContract(),
+            'Collateral Manager must be a contract'
         );
         collateralManager = ICollateralManager(_collateralManager);
     }
@@ -285,14 +289,13 @@ contract TellerV2 is
         uint16 _APR,
         string calldata _metadataURI,
         address _receiver,
-        ICollateralEscrowV1.Collateral calldata _collateralInfo
+        ICollateralEscrowV1.Collateral[] calldata _collateralInfo
     ) public override whenNotPaused returns (uint256 bidId_) {
         bidId_ = _submitBid(_lendingToken, _marketplaceId, _principal, _duration, _APR, _metadataURI, _receiver);
 
         bool validation = collateralManager
-            .validateCollateral(
+            .commitCollateral(
                 bidId_,
-                bids[bidId_].borrower,
                 _collateralInfo
             );
 

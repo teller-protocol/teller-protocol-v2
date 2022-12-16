@@ -72,8 +72,6 @@ const deployFn: DeployFunction = async (hre) => {
     await reputationManager.initialize(tellerV2Contract.address)
   }
 
-
-
   const tellerV2IsInitialized = await isInitialized(tellerV2Contract.address)
   if (!tellerV2IsInitialized) {
     const collateralManager = await hre.contracts.get('CollateralManager')

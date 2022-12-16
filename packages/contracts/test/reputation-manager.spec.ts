@@ -6,7 +6,7 @@ import hre from 'hardhat'
 import { deploy } from 'helpers/deploy-helpers'
 import { getFunds } from 'helpers/get-funds'
 import moment from 'moment'
-import { MarketRegistry, ReputationManager, TellerV2 } from 'types/typechain'
+import {CollateralManager, MarketRegistry, ReputationManager, TellerV2} from 'types/typechain'
 
 import {
   acceptBid,
@@ -65,6 +65,9 @@ const setup = deployments.createFixture<SetupReturn, SetupOptions>(
     )
 
     const tellerV2 = await hre.contracts.get<TellerV2>('TellerV2')
+
+    const collateralManager = await hre.contracts.get<CollateralManager>('CollateralManager')
+    await collateralManager.transferOwnership(tellerV2.address)
 
     return {
       reputationManager,

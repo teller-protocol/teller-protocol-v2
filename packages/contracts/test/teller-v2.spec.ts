@@ -7,6 +7,7 @@ import { getFunds } from 'helpers/get-funds'
 import { isInitialized } from 'helpers/oz-contract-helpers'
 import moment from 'moment'
 import {
+  CollateralManager,
   MarketRegistry,
   ReputationManager,
   TellerV2,
@@ -62,6 +63,9 @@ const setup = deployments.createFixture<SetupReturn, SetupOptions>(
     const reputationManager = await hre.contracts.get<ReputationManager>(
       'ReputationManager'
     )
+
+    const collateralManager = await hre.contracts.get<CollateralManager>('CollateralManager')
+    await collateralManager.transferOwnership(tellerV2.address)
 
     return {
       tellerV2,

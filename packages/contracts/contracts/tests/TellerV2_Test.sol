@@ -25,6 +25,7 @@ import "../LenderCommitmentForwarder.sol";
 import "./resolvers/TestERC20Token.sol";
 
 import "@mangrovedao/hardhat-test-solidity/test.sol";
+import "../CollateralManager.sol";
 
 contract TellerV2_Test is Testable {
     User private marketOwner;
@@ -35,6 +36,7 @@ contract TellerV2_Test is Testable {
 
     WethMock wethMock;
     TestERC20Token daiMock;
+    CollateralManager collateralManager;
 
     uint256 marketId1;
     uint256 collateralAmount = 10;
@@ -47,11 +49,17 @@ contract TellerV2_Test is Testable {
         // Deploy MarketRegistry & ReputationManager
         IMarketRegistry marketRegistry = IMarketRegistry(new MarketRegistry());
         IReputationManager reputationManager = IReputationManager(new ReputationManager());
-        // Deploy Escrow factory
+        // Deploy Escrow beacon
         CollateralEscrowV1 escrowImplementation = new CollateralEscrowV1();
         UpgradeableBeacon escrowBeacon = new UpgradeableBeacon(address(escrowImplementation));
 
         tellerV2 = new TellerV2(address(0));
+        // Deploy Collateral manager
+        collateralManager = new CollateralManager();
+        collateralManager.initialize(
+            address(escrowBeacon),
+            address(tellerV2)
+        );
         // Deploy LenderCommitmentForwarder
         LenderCommitmentForwarder lenderCommitmentForwarder = new LenderCommitmentForwarder(
             address(tellerV2),
@@ -69,7 +77,7 @@ contract TellerV2_Test is Testable {
             address(reputationManager),
             address(lenderCommitmentForwarder),
             lendingTokens,
-            address(escrowBeacon)
+            address(collateralManager)
         );
 
         // Instantiate users & balances
@@ -85,7 +93,7 @@ contract TellerV2_Test is Testable {
 
         daiMock.transfer(address(lender), balance*10);
         daiMock.transfer(address(borrower), balance);
-        // Approve lender's dai
+        // Approve Teller V2 for the lender's dai
         lender.addAllowance(
             address(daiMock),
             address(tellerV2),
@@ -116,10 +124,10 @@ contract TellerV2_Test is Testable {
         uint256 bal = wethMock.balanceOf(address(borrower));
 
         // Increase allowance
-        // Approve borrower's weth
+        // Approve the collateral manager for the borrower's weth
         borrower.addAllowance(
             address(wethMock),
-            address(tellerV2),
+            address(collateralManager),
             collateralInfo._amount
         );
 
@@ -147,7 +155,7 @@ contract TellerV2_Test is Testable {
         acceptBid(bidId);
 
         // Get newly created escrow
-        address escrowAddress = tellerV2._escrows(bidId);
+        address escrowAddress = collateralManager._escrows(bidId);
         CollateralEscrowV1 escrow = CollateralEscrowV1(escrowAddress);
 
         uint256 storedBidId = escrow.getBid();

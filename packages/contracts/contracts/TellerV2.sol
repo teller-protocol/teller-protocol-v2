@@ -153,7 +153,7 @@ contract TellerV2 is
 
     /** Constant Variables **/
 
-    uint256 public constant CURRENT_CODE_VERSION = 7;
+    uint8 public constant CURRENT_CODE_VERSION = 7;
 
     /** Constructor **/
 
@@ -182,7 +182,7 @@ contract TellerV2 is
         lenderCommitmentForwarder = _lenderCommitmentForwarder;
         marketRegistry = IMarketRegistry(_marketRegistry);
         reputationManager = IReputationManager(_reputationManager);
-        collateralManager = ICollateralManager(_collateralManagerAddress);
+        _setCollateralManager(_collateralManagerAddress);
 
         require(_lendingTokens.length > 0, "No lending tokens specified");
         for (uint256 i = 0; i < _lendingTokens.length; i++) {
@@ -194,12 +194,23 @@ contract TellerV2 is
         }
     }
 
-    function onUpgrade() external {
+    function setCollateralManager(address _collateralManager)
+        public
+        reinitializer(CURRENT_CODE_VERSION)
+        onlyOwner
+    {
+        _setCollateralManager(_collateralManager);
+    }
+
+    function _setCollateralManager(address _collateralManager)
+        internal
+        onlyInitializing
+    {
         require(
-            version != CURRENT_CODE_VERSION,
-            "Contract already upgraded to latest version!"
+            address(_collateralManager) == address(0),
+            "Collateral Manager must be a contract"
         );
-        version = CURRENT_CODE_VERSION;
+        collateralManager = ICollateralManager(_collateralManager);
     }
 
     /**

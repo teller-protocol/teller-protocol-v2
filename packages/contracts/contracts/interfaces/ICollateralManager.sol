@@ -4,30 +4,15 @@ pragma solidity >=0.8.0 <0.9.0;
 import "./escrow/ICollateralEscrowV1.sol";
 
 interface ICollateralManager {
-    enum CollateralType {
-        ERC20,
-        ERC721,
-        ERC1155
-    }
-
-    struct Collateral {
-        ICollateralEscrowV1.CollateralType _collateralType;
-        uint256 _amount;
-        uint256 _tokenId;
-        address _collateralAddress;
-    }
-
     /**
      * @notice Checks the validity of a borrower's collateral balance.
      * @param _bidId The id of the associated bid.
-     * @param _borrowerAddress The address of the borrower
      * @param _collateralInfo Additional information about the collateral asset.
      * @return validation_ Boolean indicating if the collateral balance was validated.
      */
-    function validateCollateral(
+    function commitCollateral(
         uint256 _bidId,
-        address _borrowerAddress,
-        ICollateralEscrowV1.Collateral calldata _collateralInfo
+        ICollateralEscrowV1.Collateral[] calldata _collateralInfo
     )
     external
     returns(bool validation_);
@@ -57,19 +42,22 @@ interface ICollateralManager {
     function getCollateralInfo(uint256 _bidId)
     external
     view
-    returns(ICollateralEscrowV1.Collateral memory);
+    returns(ICollateralEscrowV1.Collateral[] memory);
 
     /**
      * @notice Deposits validated collateral into the created escrow for a bid.
      * @param _bidId The id of the bid to deposit collateral for.
      */
     function deposit(
-        uint256 _bidId
-    ) external payable;
+        uint256 _bidId,
+        ICollateralEscrowV1.Collateral[] calldata _collateral
+    ) external;
 
     /**
      * @notice Withdraws deposited collateral from the created escrow of a bid.
      * @param _bidId The id of the bid to withdraw collateral for.
      */
     function withdraw(uint256 _bidId) external;
+
+    function revalidateCollateral(uint256 _bidId) external returns(bool);
 }

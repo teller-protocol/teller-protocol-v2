@@ -61,7 +61,6 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
         Collateral storage collateral = collateralBalances[_collateralAddress];
         collateral._collateralType = CollateralType.ERC20;
         collateral._amount = _amount;
-        collateral._tokenId = 0;
         emit CollateralDeposited(_collateralAddress, _amount);
     }
 

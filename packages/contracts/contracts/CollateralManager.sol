@@ -275,6 +275,11 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
                     address(this),
                     collateralInfo._tokenId
                 );
+            IERC721Upgradeable(collateralInfo._collateralAddress)
+                .approve(
+                    escrowAddress,
+                    collateralInfo._tokenId
+                );
             collateralEscrow.depositAsset(
                 ICollateralEscrowV1.CollateralType.ERC721,
                 collateralInfo._collateralAddress,
@@ -294,6 +299,11 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
                     collateralInfo._tokenId,
                     collateralInfo._amount,
                     data
+                );
+            IERC1155Upgradeable(collateralInfo._collateralAddress)
+                .setApprovalForAll(
+                    escrowAddress,
+                    true
                 );
             collateralEscrow.depositAsset(
                 ICollateralEscrowV1.CollateralType.ERC1155,

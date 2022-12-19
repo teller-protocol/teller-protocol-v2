@@ -38,6 +38,12 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         uint256 _amount
     );
 
+    /* Modifiers */
+    modifier onlyTellerV2() {
+        require(_msgSender() == address(tellerV2), 'Sender not authorized');
+        _;
+    }
+
     /**
      * @notice Initializes the collateral manager.
      * @param _collateralEscrowBeacon The address of the escrow implementation.
@@ -111,7 +117,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
      * @notice Deploys a new collateral escrow and deposits collateral.
      * @param _bidId The associated bidId of the collateral escrow.
      */
-    function deployAndDeposit(uint256 _bidId) external {
+    function deployAndDeposit(uint256 _bidId) external onlyTellerV2 {
         if (_isBidCollateralBacked[_bidId]) {
             require(_msgSender() == address(tellerV2), 'Sender not authorized');
             (address proxyAddress, ) = _deployEscrow(_bidId);

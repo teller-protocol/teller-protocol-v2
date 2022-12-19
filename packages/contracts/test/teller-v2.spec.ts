@@ -64,9 +64,6 @@ const setup = deployments.createFixture<SetupReturn, SetupOptions>(
       'ReputationManager'
     )
 
-    const collateralManager = await hre.contracts.get<CollateralManager>('CollateralManager')
-    await collateralManager.transferOwnership(tellerV2.address)
-
     return {
       tellerV2,
       marketRegistry,

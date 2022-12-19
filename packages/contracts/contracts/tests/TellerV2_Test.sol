@@ -57,9 +57,10 @@ contract TellerV2_Test is Testable {
         // Deploy Collateral manager
         collateralManager = new CollateralManager();
         collateralManager.initialize(
-            address(escrowBeacon)
+            address(escrowBeacon),
+            address(tellerV2)
         );
-        collateralManager.transferOwnership(address(tellerV2));
+
         // Deploy LenderCommitmentForwarder
         LenderCommitmentForwarder lenderCommitmentForwarder = new LenderCommitmentForwarder(
             address(tellerV2),

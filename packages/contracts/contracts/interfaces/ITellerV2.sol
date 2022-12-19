@@ -94,10 +94,7 @@ interface ITellerV2 {
      */
     function isPaymentLate(uint256 _bidId) external view returns (bool);
 
-    function getBidState(uint256 _bidId)
-        external
-        view
-        returns (BidState);
+    function getBidState(uint256 _bidId) external view returns (BidState);
 
     function getBorrowerActiveLoanIds(address _borrower)
         external

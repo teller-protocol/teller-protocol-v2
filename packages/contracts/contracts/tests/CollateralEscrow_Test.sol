@@ -23,7 +23,9 @@ contract CollateralEscrow_Test is Testable {
         // Deploy implementation
         CollateralEscrowV1 escrowImplementation = new CollateralEscrowV1();
         // Deploy beacon contract with implementation
-        UpgradeableBeacon escrowBeacon = new UpgradeableBeacon(address(escrowImplementation));
+        UpgradeableBeacon escrowBeacon = new UpgradeableBeacon(
+            address(escrowImplementation)
+        );
         // Deploy escrow
         wethMock = new WethMock();
         borrower = new User(escrowBeacon, address(wethMock));
@@ -40,25 +42,13 @@ contract CollateralEscrow_Test is Testable {
     function withdrawAsset_test() public {
         _depositAsset();
 
-        borrower.withdraw(
-            address(wethMock),
-            amount,
-            address(borrower)
-        );
+        borrower.withdraw(address(wethMock), amount, address(borrower));
 
         uint256 storedBalance = borrower.getBalance(address(wethMock));
 
-        Test.eq(
-            storedBalance,
-            0,
-            'Escrow withdraw unsuccessful'
-        );
+        Test.eq(storedBalance, 0, "Escrow withdraw unsuccessful");
 
-        try borrower.withdraw(
-            address(wethMock),
-            amount,
-            address(borrower)
-        ) {
+        try borrower.withdraw(address(wethMock), amount, address(borrower)) {
             Test.fail("No collateral balance for asset");
         } catch Error(string memory reason) {
             Test.eq(
@@ -67,13 +57,11 @@ contract CollateralEscrow_Test is Testable {
                 "Should not be able to withdraw already withdrawn assets"
             );
         } catch {
-            Test.fail('Unknown error');
+            Test.fail("Unknown error");
         }
     }
 
     function _depositAsset() internal {
-
-
         borrower.approveWeth(amount);
 
         borrower.deposit(
@@ -85,11 +73,7 @@ contract CollateralEscrow_Test is Testable {
 
         uint256 storedBalance = borrower.getBalance(address(wethMock));
 
-        Test.eq(
-            storedBalance,
-            amount,
-            'Escrow deposit unsuccessful'
-        );
+        Test.eq(storedBalance, amount, "Escrow deposit unsuccessful");
     }
 }
 
@@ -97,10 +81,7 @@ contract User {
     CollateralEscrowV1 public escrow;
     address public immutable wethMock;
 
-    constructor(
-        UpgradeableBeacon escrowBeacon,
-        address _wethMock
-    ) {
+    constructor(UpgradeableBeacon escrowBeacon, address _wethMock) {
         // Deploy escrow
         BeaconProxy proxy_ = new BeaconProxy(
             address(escrowBeacon),
@@ -129,11 +110,7 @@ contract User {
         uint256 _amount,
         address _recipient
     ) public {
-        escrow.withdraw(
-            _collateralAddress,
-            _amount,
-            _recipient
-        );
+        escrow.withdraw(_collateralAddress, _amount, _recipient);
     }
 
     function depositToWeth(uint256 amount) public {
@@ -144,8 +121,11 @@ contract User {
         ERC20(wethMock).approve(address(escrow), amount);
     }
 
-    function getBalance(address _collateralAddress) public returns(uint256 amount_) {
-        (, amount_, ,) = escrow.collateralBalances(_collateralAddress);
+    function getBalance(address _collateralAddress)
+        public
+        returns (uint256 amount_)
+    {
+        (, amount_, , ) = escrow.collateralBalances(_collateralAddress);
     }
 
     receive() external payable {}

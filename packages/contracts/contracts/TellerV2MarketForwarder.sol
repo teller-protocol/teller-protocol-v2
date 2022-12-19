@@ -79,7 +79,9 @@ abstract contract TellerV2MarketForwarder is Initializable, ContextUpgradeable {
         bytes memory responseData;
 
         bytes4 submitBidSelector = bytes4(
-            keccak256("ITellerV2.submitBid(address,uint256,uint256,uint32,uint16,string,address)")
+            keccak256(
+                "ITellerV2.submitBid(address,uint256,uint256,uint32,uint16,string,address)"
+            )
         );
 
         responseData = _forwardCall(

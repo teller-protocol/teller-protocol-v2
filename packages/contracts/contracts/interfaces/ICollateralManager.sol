@@ -13,26 +13,20 @@ interface ICollateralManager {
     function commitCollateral(
         uint256 _bidId,
         ICollateralEscrowV1.Collateral[] calldata _collateralInfo
-    )
-    external
-    returns(bool validation_);
+    ) external returns (bool validation_);
 
     /**
      * @notice Deploys a new collateral escrow.
      * @param _bidId The associated bidId of the collateral escrow.
      */
-    function deployAndDeposit(uint256 _bidId)
-    external;
+    function deployAndDeposit(uint256 _bidId) external;
 
     /**
      * @notice Gets the address of a deployed escrow.
      * @notice _bidId The bidId to return the escrow for.
      * @return The address of the escrow.
      */
-    function getEscrow(uint256 _bidId)
-    external
-    view
-    returns(address);
+    function getEscrow(uint256 _bidId) external view returns (address);
 
     /**
      * @notice Gets the collateral info for a given bid id.
@@ -40,9 +34,9 @@ interface ICollateralManager {
      * @return The stored collateral info.
      */
     function getCollateralInfo(uint256 _bidId)
-    external
-    view
-    returns(ICollateralEscrowV1.Collateral[] memory);
+        external
+        view
+        returns (ICollateralEscrowV1.Collateral[] memory);
 
     /**
      * @notice Deposits validated collateral into the created escrow for a bid.
@@ -59,5 +53,5 @@ interface ICollateralManager {
      */
     function withdraw(uint256 _bidId) external;
 
-    function revalidateCollateral(uint256 _bidId) external returns(bool);
+    function revalidateCollateral(uint256 _bidId) external returns (bool);
 }

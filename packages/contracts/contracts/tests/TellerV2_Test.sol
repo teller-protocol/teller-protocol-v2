@@ -44,28 +44,29 @@ contract TellerV2_Test is Testable {
     function setup_beforeAll() public {
         // Deploy test tokens
         wethMock = new WethMock();
-        daiMock = new TestERC20Token('Dai', 'DAI', 10000000);
+        daiMock = new TestERC20Token("Dai", "DAI", 10000000);
 
         // Deploy MarketRegistry & ReputationManager
         IMarketRegistry marketRegistry = IMarketRegistry(new MarketRegistry());
-        IReputationManager reputationManager = IReputationManager(new ReputationManager());
+        IReputationManager reputationManager = IReputationManager(
+            new ReputationManager()
+        );
         // Deploy Escrow beacon
         CollateralEscrowV1 escrowImplementation = new CollateralEscrowV1();
-        UpgradeableBeacon escrowBeacon = new UpgradeableBeacon(address(escrowImplementation));
+        UpgradeableBeacon escrowBeacon = new UpgradeableBeacon(
+            address(escrowImplementation)
+        );
 
         tellerV2 = new TellerV2(address(0));
         // Deploy Collateral manager
         collateralManager = new CollateralManager();
-        collateralManager.initialize(
-            address(escrowBeacon),
-            address(tellerV2)
-        );
+        collateralManager.initialize(address(escrowBeacon), address(tellerV2));
 
         // Deploy LenderCommitmentForwarder
         LenderCommitmentForwarder lenderCommitmentForwarder = new LenderCommitmentForwarder(
-            address(tellerV2),
-            address(marketRegistry)
-        );
+                address(tellerV2),
+                address(marketRegistry)
+            );
 
         address[] memory lendingTokens = new address[](2);
         lendingTokens[0] = address(wethMock);
@@ -88,18 +89,14 @@ contract TellerV2_Test is Testable {
 
         uint256 balance = 50000;
         payable(address(borrower)).transfer(balance);
-        payable(address(lender)).transfer(balance*10);
+        payable(address(lender)).transfer(balance * 10);
         borrower.depositToWeth(balance);
-        lender.depositToWeth(balance*10);
+        lender.depositToWeth(balance * 10);
 
-        daiMock.transfer(address(lender), balance*10);
+        daiMock.transfer(address(lender), balance * 10);
         daiMock.transfer(address(borrower), balance);
         // Approve Teller V2 for the lender's dai
-        lender.addAllowance(
-            address(daiMock),
-            address(tellerV2),
-            balance*10
-        );
+        lender.addAllowance(address(daiMock), address(tellerV2), balance * 10);
 
         // Create a market
         marketId1 = marketOwner.createMarket(
@@ -115,14 +112,15 @@ contract TellerV2_Test is Testable {
         );
     }
 
-    function submitCollateralBid() public returns(uint256 bidId_) {
+    function submitCollateralBid() public returns (uint256 bidId_) {
         ICollateralEscrowV1.Collateral memory info;
         info._amount = collateralAmount;
         info._tokenId = 0;
         info._collateralType = ICollateralEscrowV1.CollateralType.ERC20;
         info._collateralAddress = address(wethMock);
 
-        ICollateralEscrowV1.Collateral[] memory collateralInfo = new ICollateralEscrowV1.Collateral[](1);
+        ICollateralEscrowV1.Collateral[]
+            memory collateralInfo = new ICollateralEscrowV1.Collateral[](1);
         collateralInfo[0] = info;
 
         uint256 bal = wethMock.balanceOf(address(borrower));
@@ -149,9 +147,7 @@ contract TellerV2_Test is Testable {
 
     function acceptBid(uint256 _bidId) public {
         // Accept bid
-        lender.acceptBid(
-            _bidId
-        );
+        lender.acceptBid(_bidId);
     }
 
     function collateralEscrow_test() public {
@@ -165,18 +161,10 @@ contract TellerV2_Test is Testable {
         uint256 storedBidId = escrow.getBid();
 
         // Test that the created escrow has the same bidId and collateral stored
-        Test.eq(
-            bidId,
-            storedBidId,
-            'Collateral escrow was not created'
-        );
+        Test.eq(bidId, storedBidId, "Collateral escrow was not created");
 
         uint256 escrowBalance = wethMock.balanceOf(escrowAddress);
 
-        Test.eq(
-            collateralAmount,
-            escrowBalance,
-            'Collateral was not stored'
-        );
+        Test.eq(collateralAmount, escrowBalance, "Collateral was not stored");
     }
 }

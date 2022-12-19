@@ -38,18 +38,19 @@ contract User {
         bool _requireBorrowerAttestation,
         V2Calculations.PaymentType _paymentType,
         string calldata _uri
-    ) public returns(uint256) {
-        return IMarketRegistry(marketRegistry).createMarket(
-            address(this),
-            _paymentCycleDuration,
-            _paymentDefaultDuration,
-            _bidExpirationTime,
-            _feePercent,
-            _requireLenderAttestation,
-            _requireBorrowerAttestation,
-            _paymentType,
-            _uri
-        );
+    ) public returns (uint256) {
+        return
+            IMarketRegistry(marketRegistry).createMarket(
+                address(this),
+                _paymentCycleDuration,
+                _paymentDefaultDuration,
+                _bidExpirationTime,
+                _feePercent,
+                _requireLenderAttestation,
+                _requireBorrowerAttestation,
+                _paymentType,
+                _uri
+            );
     }
 
     function acceptBid(uint256 _bidId) public {
@@ -66,15 +67,15 @@ contract User {
         address _receiver
     ) public returns (uint256) {
         return
-        ITellerV2(tellerV2).submitBid(
-            _lendingToken,
-            _marketplaceId,
-            _principal,
-            _duration,
-            _APR,
-            _metadataURI,
-            _receiver
-        );
+            ITellerV2(tellerV2).submitBid(
+                _lendingToken,
+                _marketplaceId,
+                _principal,
+                _duration,
+                _APR,
+                _metadataURI,
+                _receiver
+            );
     }
 
     function submitCollateralBid(
@@ -87,16 +88,17 @@ contract User {
         address _receiver,
         ICollateralEscrowV1.Collateral[] calldata _collateralInfo
     ) public returns (uint256) {
-        return ITellerV2(tellerV2).submitBid(
-            _lendingToken,
-            _marketplaceId,
-            _principal,
-            _duration,
-            _APR,
-            _metadataURI,
-            _receiver,
-            _collateralInfo
-        );
+        return
+            ITellerV2(tellerV2).submitBid(
+                _lendingToken,
+                _marketplaceId,
+                _principal,
+                _duration,
+                _APR,
+                _metadataURI,
+                _receiver,
+                _collateralInfo
+            );
     }
 
     function repayLoanFull(uint256 _bidId) public {

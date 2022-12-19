@@ -211,7 +211,7 @@ contract TellerV2 is
         );
         require(
             _collateralManager.isContract(),
-            'Collateral Manager must be a contract'
+            "Collateral Manager must be a contract"
         );
         collateralManager = ICollateralManager(_collateralManager);
     }
@@ -266,7 +266,15 @@ contract TellerV2 is
         string calldata _metadataURI,
         address _receiver
     ) public override whenNotPaused returns (uint256 bidId_) {
-        bidId_ = _submitBid(_lendingToken, _marketplaceId, _principal, _duration, _APR, _metadataURI, _receiver);
+        bidId_ = _submitBid(
+            _lendingToken,
+            _marketplaceId,
+            _principal,
+            _duration,
+            _APR,
+            _metadataURI,
+            _receiver
+        );
     }
 
     /**
@@ -290,15 +298,25 @@ contract TellerV2 is
         address _receiver,
         ICollateralEscrowV1.Collateral[] calldata _collateralInfo
     ) public override whenNotPaused returns (uint256 bidId_) {
-        bidId_ = _submitBid(_lendingToken, _marketplaceId, _principal, _duration, _APR, _metadataURI, _receiver);
+        bidId_ = _submitBid(
+            _lendingToken,
+            _marketplaceId,
+            _principal,
+            _duration,
+            _APR,
+            _metadataURI,
+            _receiver
+        );
 
-        bool validation = collateralManager
-            .commitCollateral(
-                bidId_,
-                _collateralInfo
-            );
+        bool validation = collateralManager.commitCollateral(
+            bidId_,
+            _collateralInfo
+        );
 
-        require(validation == true, 'Collateral balance could not be validated');
+        require(
+            validation == true,
+            "Collateral balance could not be validated"
+        );
     }
 
     function _submitBid(
@@ -309,8 +327,7 @@ contract TellerV2 is
         uint16 _APR,
         string calldata _metadataURI,
         address _receiver
-    ) internal returns (uint256 bidId_)
-    {
+    ) internal returns (uint256 bidId_) {
         address sender = _msgSenderForMarket(_marketplaceId);
         (bool isVerified, ) = marketRegistry.isVerifiedBorrower(
             _marketplaceId,
@@ -355,13 +372,13 @@ contract TellerV2 is
         bid.paymentType = marketRegistry.getPaymentType(_marketplaceId);
 
         bid.terms.paymentCycleAmount = V2Calculations
-        .calculatePaymentCycleAmount(
-            bid.paymentType,
-            _principal,
-            _duration,
-            bid.terms.paymentCycle,
-            _APR
-        );
+            .calculatePaymentCycleAmount(
+                bid.paymentType,
+                _principal,
+                _duration,
+                bid.terms.paymentCycle,
+                _APR
+            );
 
         uris[bidId] = _metadataURI;
         bid.state = BidState.PENDING;

@@ -15,29 +15,29 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradea
 import "../interfaces/escrow/ICollateralEscrowV1.sol";
 
 contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
-
     uint256 public bidId;
     /* Mappings */
     mapping(address => Collateral) public collateralBalances; // collateral address -> collateral
 
     /* Events */
     event CollateralDeposited(address _collateralAddress, uint256 _amount);
-    event CollateralWithdrawn(address _collateralAddress, uint256 _amount, address _recipient);
+    event CollateralWithdrawn(
+        address _collateralAddress,
+        uint256 _amount,
+        address _recipient
+    );
 
     /**
      * @notice Initializes an escrow.
      * @notice The id of the associated bid.
      */
-    function initialize(uint256 _bidId)
-        public
-        initializer
-    {
+    function initialize(uint256 _bidId) public initializer {
         require(owner() == address(0), "Escrow already initialized");
         __Ownable_init();
         bidId = _bidId;
     }
 
-    function getBid() external view returns(uint256) {
+    function getBid() external view returns (uint256) {
         return bidId;
     }
 
@@ -46,16 +46,18 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
      * @param _collateralAddress The address of the collateral token.
      * @param _amount The amount to deposit.
      */
-    function depositToken(
-        address _collateralAddress,
-        uint256 _amount
-    )
+    function depositToken(address _collateralAddress, uint256 _amount)
         external
         payable
         onlyOwner
     {
         require(_amount > 0, "Deposit amount cannot be zero");
-        _depositCollateral(CollateralType.ERC20, _collateralAddress, _amount, 0);
+        _depositCollateral(
+            CollateralType.ERC20,
+            _collateralAddress,
+            _amount,
+            0
+        );
         Collateral storage collateral = collateralBalances[_collateralAddress];
         collateral._collateralType = CollateralType.ERC20;
         collateral._amount = _amount;
@@ -74,13 +76,14 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
         address _collateralAddress,
         uint256 _amount,
         uint256 _tokenId
-    )
-        external
-        payable
-        onlyOwner
-    {
+    ) external payable onlyOwner {
         require(_amount > 0, "Deposit amount cannot be zero");
-        _depositCollateral(_collateralType, _collateralAddress, _amount, _tokenId);
+        _depositCollateral(
+            _collateralType,
+            _collateralAddress,
+            _amount,
+            _tokenId
+        );
         Collateral storage collateral = collateralBalances[_collateralAddress];
         collateral._collateralType = _collateralType;
         collateral._amount = _amount;
@@ -94,18 +97,23 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
      * @param _amount The amount to withdraw.
      * @param _recipient The address to send the assets to.
      */
-    function withdraw(address _collateralAddress, uint256 _amount, address _recipient)
-        external
-        onlyOwner
-    {
+    function withdraw(
+        address _collateralAddress,
+        uint256 _amount,
+        address _recipient
+    ) external onlyOwner {
         require(_amount > 0, "Withdraw amount cannot be zero");
         Collateral storage collateral = collateralBalances[_collateralAddress];
         require(collateral._amount > 0, "No collateral balance for asset");
-        _withdrawCollateral(collateral, _collateralAddress, _amount, _recipient);
+        _withdrawCollateral(
+            collateral,
+            _collateralAddress,
+            _amount,
+            _recipient
+        );
         collateral._amount -= _amount;
         emit CollateralWithdrawn(_collateralAddress, _amount, _recipient);
     }
-
 
     function _depositCollateral(
         CollateralType _collateralType,
@@ -125,27 +133,25 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
         }
         // Deposit ERC721
         if (_collateralType == CollateralType.ERC721) {
-            require(_amount == 1, 'Incorrect deposit amount');
-            IERC721Upgradeable(_collateralAddress)
-                .safeTransferFrom(
-                    msg.sender,
-                    address(this),
-                    _tokenId
-                );
+            require(_amount == 1, "Incorrect deposit amount");
+            IERC721Upgradeable(_collateralAddress).safeTransferFrom(
+                msg.sender,
+                address(this),
+                _tokenId
+            );
             return;
         }
         // Deposit ERC1155
         if (_collateralType == CollateralType.ERC1155) {
             bytes memory data;
 
-            IERC1155Upgradeable(_collateralAddress)
-                .safeTransferFrom(
-                    msg.sender,
-                    address(this),
-                    _tokenId,
-                    _amount,
-                    data
-                );
+            IERC1155Upgradeable(_collateralAddress).safeTransferFrom(
+                msg.sender,
+                address(this),
+                _tokenId,
+                _amount,
+                data
+            );
             return;
         }
     }
@@ -168,9 +174,8 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
         }
         // Withdraw ERC721
         if (_collateral._collateralType == CollateralType.ERC721) {
-            require(_amount == 1, 'Incorrect withdrawal amount');
-            IERC721Upgradeable(_collateralAddress)
-            .safeTransferFrom(
+            require(_amount == 1, "Incorrect withdrawal amount");
+            IERC721Upgradeable(_collateralAddress).safeTransferFrom(
                 address(this),
                 _recipient,
                 _collateral._tokenId
@@ -181,8 +186,7 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
         if (_collateral._collateralType == CollateralType.ERC1155) {
             bytes memory data;
 
-            IERC1155Upgradeable(_collateralAddress)
-            .safeTransferFrom(
+            IERC1155Upgradeable(_collateralAddress).safeTransferFrom(
                 address(this),
                 _recipient,
                 _collateral._tokenId,
@@ -195,16 +199,15 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
 
     // On NFT Received handlers
 
-    function onERC721Received(
-        address,
-        address,
-        uint256,
-        bytes calldata
-    ) external pure returns (bytes4) {
+    function onERC721Received(address, address, uint256, bytes calldata)
+        external
+        pure
+        returns (bytes4)
+    {
         return
-        bytes4(
-            keccak256("onERC721Received(address,address,uint256,bytes)")
-        );
+            bytes4(
+                keccak256("onERC721Received(address,address,uint256,bytes)")
+            );
     }
 
     function onERC1155Received(
@@ -215,11 +218,11 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
         bytes calldata
     ) external returns (bytes4) {
         return
-        bytes4(
-            keccak256(
-                "onERC1155Received(address,address,uint256,uint256,bytes)"
-            )
-        );
+            bytes4(
+                keccak256(
+                    "onERC1155Received(address,address,uint256,uint256,bytes)"
+                )
+            );
     }
 
     function onERC1155BatchReceived(
@@ -234,11 +237,10 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
             "Only allowed one asset batch transfer per transaction."
         );
         return
-        bytes4(
-            keccak256(
-                "onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)"
-            )
-        );
+            bytes4(
+                keccak256(
+                    "onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)"
+                )
+            );
     }
-
 }

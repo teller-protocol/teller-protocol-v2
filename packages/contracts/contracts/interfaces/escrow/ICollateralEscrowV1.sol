@@ -2,7 +2,6 @@
 pragma solidity >=0.8.0 <0.9.0;
 
 interface ICollateralEscrowV1 {
-
     enum CollateralType {
         ERC20,
         ERC721,
@@ -21,7 +20,9 @@ interface ICollateralEscrowV1 {
      * @param _collateralAddress The address of the collateral token.
      * @param _amount The amount to deposit.
      */
-    function depositToken(address _collateralAddress, uint256 _amount) external payable;
+    function depositToken(address _collateralAddress, uint256 _amount)
+        external
+        payable;
 
     /**
      * @notice Deposits a collateral asset into the escrow.
@@ -42,10 +43,13 @@ interface ICollateralEscrowV1 {
      * @param _amount The amount to withdraw.
      * @param _recipient The address to send the assets to.
      */
-    function withdraw(address _collateralAddress, uint256 _amount, address _recipient) external;
+    function withdraw(
+        address _collateralAddress,
+        uint256 _amount,
+        address _recipient
+    ) external;
 
-    function getBid() external view returns(uint256);
+    function getBid() external view returns (uint256);
 
-    function initialize(uint256 _bidId)
-    external;
+    function initialize(uint256 _bidId) external;
 }

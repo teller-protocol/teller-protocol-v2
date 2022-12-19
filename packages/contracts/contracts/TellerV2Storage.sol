@@ -19,7 +19,6 @@ enum BidState {
 }
 
 abstract contract TellerV2Storage_G0 {
-
     /**
      * @notice Represents a total amount for a payment.
      * @param principal Amount that counts towards the principal.

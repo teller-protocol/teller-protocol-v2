@@ -13,7 +13,9 @@ const deployFn: DeployFunction = migrate(
     if ((await collateralManager.owner()) !== tellerV2.address)
       await collateralManager.transferOwnership(tellerV2.address)
 
-    if ((await tellerV2.collateralManager()) === hre.ethers.constants.AddressZero)
+    if (
+      (await tellerV2.collateralManager()) === hre.ethers.constants.AddressZero
+    )
       await tellerV2.setCollateralManager(collateralManager.address)
 
     if (await tellerV2.paused()) await tellerV2.unpauseProtocol()

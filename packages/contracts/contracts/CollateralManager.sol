@@ -15,8 +15,10 @@ import "@openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155Upgradeable.so
 import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol";
 import "./TellerV2.sol";
 
+
 contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
+    TellerV2 public tellerV2;
 
     address private collateralEscrowBeacon;
     mapping(uint256 => address) public _escrows; // bidIds -> collateralEscrow
@@ -31,21 +33,42 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
 
     /* Events */
     event CollateralEscrowDeployed(uint256 _bidId, address _collateralEscrow);
-    event CollateralValidated(uint256 _bidId, address _collateralAddress, uint256 _amount);
+    event CollateralCommitted(uint256 _bidId, address _collateralAddress, uint256 _amount);
 
     /**
      * @notice Initializes the collateral manager.
      * @param _collateralEscrowBeacon The address of the escrow implementation.
+     * @param _tellerV2 The address of the protocol.
      */
     function initialize(
-        address _collateralEscrowBeacon
+        address _collateralEscrowBeacon,
+        address _tellerV2
     ) external initializer {
         collateralEscrowBeacon = _collateralEscrowBeacon;
-        __CollateralManager_init();
+        tellerV2 = TellerV2(_tellerV2);
     }
 
-    function __CollateralManager_init() internal onlyInitializing {
-        __Ownable_init();
+    /**
+     * @notice Checks the validity of a borrower's multiple collateral balances and commits it to a bid.
+     * @param _bidId The id of the associated bid.
+     * @param _collateralInfo Additional information about the collateral assets.
+     * @return validation_ Boolean indicating if the collateral balances were validated.
+     */
+    function commitCollateral(
+        uint256 _bidId,
+        ICollateralEscrowV1.Collateral[] calldata _collateralInfo
+    ) public
+    returns (bool validation_)
+    {
+        address borrower = tellerV2.getLoanBorrower(_bidId);
+        (validation_, ) = checkBalances(borrower, _collateralInfo);
+        if (validation_) {
+            for (uint256 i; i < _collateralInfo.length; i++) {
+                ICollateralEscrowV1.Collateral memory info = _collateralInfo[i];
+                _commitCollateral(_bidId, info);
+            }
+            _isBidCollateralBacked[_bidId] = true;
+        }
     }
 
     /**
@@ -56,27 +79,19 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
      */
     function commitCollateral(
         uint256 _bidId,
-        ICollateralEscrowV1.Collateral[] calldata _collateralInfo
-    ) public onlyOwner
-    returns (bool validation_)
-    {
-        address borrower = TellerV2(owner()).getLoanBorrower(_bidId);
-        (validation_, ) = checkBalances(borrower, _collateralInfo);
+        ICollateralEscrowV1.Collateral calldata _collateralInfo
+    ) public returns (bool validation_) {
+        address borrower = tellerV2.getLoanBorrower(_bidId);
+        validation_ = _checkBalance(borrower, _collateralInfo);
         if (validation_) {
-            CollateralInfo storage collateral = _bidCollaterals[_bidId];
-            for (uint256 i; i < _collateralInfo.length; i++) {
-                ICollateralEscrowV1.Collateral memory info = _collateralInfo[i];
-                collateral.collateralAddresses.add(info._collateralAddress);
-                collateral.collateralInfo[info._collateralAddress] = info;
-                emit CollateralValidated(_bidId, info._collateralAddress, info._amount);
-            }
+            _commitCollateral(_bidId, _collateralInfo);
             _isBidCollateralBacked[_bidId] = true;
         }
     }
 
     function revalidateCollateral(uint256 _bidId) external returns(bool validation_) {
         ICollateralEscrowV1.Collateral[] memory collateralInfos = getCollateralInfo(_bidId);
-        address borrower = TellerV2(owner()).getLoanBorrower(_bidId);
+        address borrower = tellerV2.getLoanBorrower(_bidId);
         (validation_, ) = _checkBalances(borrower, collateralInfos, true);
     }
 
@@ -87,32 +102,12 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         return _checkBalances(_borrowerAddress, _collateralInfo, false);
     }
 
-    function _checkBalances(
-        address _borrowerAddress,
-        ICollateralEscrowV1.Collateral[] memory _collateralInfo,
-        bool _shortCircut
-    ) internal returns (bool validated_, bool[] memory checks_) {
-        checks_ = new bool[](_collateralInfo.length);
-        validated_ = true;
-        for (uint256 i; i < _collateralInfo.length; i++) {
-            bool isValidated = _checkBalance(_borrowerAddress, _collateralInfo[i]);
-            checks_[i] = isValidated;
-            if (!isValidated) {
-                validated_ = false;
-                if (_shortCircut) {
-                    return (validated_, checks_);
-                }
-            }
-        }
-    }
-
     /**
      * @notice Deploys a new collateral escrow and deposits collateral.
      * @param _bidId The associated bidId of the collateral escrow.
      */
     function deployAndDeposit(uint256 _bidId)
         external
-        onlyOwner
     {
         if (_isBidCollateralBacked[_bidId]) {
             (address proxyAddress, ) = _deployEscrow(_bidId);
@@ -128,21 +123,6 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
             }
 
             emit CollateralEscrowDeployed(_bidId, proxyAddress);
-        }
-    }
-
-    function _deployEscrow(uint256 _bidId) internal returns(address proxyAddress_, address borrower_) {
-        proxyAddress_ = _escrows[_bidId];
-        // Get bid info
-        borrower_ = TellerV2(owner()).getLoanBorrower(_bidId);
-        if (proxyAddress_ == address(0)) {
-            require(borrower_ != address(0), 'Bid does not exist');
-
-            BeaconProxy proxy = new BeaconProxy(
-                collateralEscrowBeacon,
-                abi.encodeWithSelector(CollateralEscrowV1.initialize.selector, _bidId)
-            );
-            proxyAddress_ = address(proxy);
         }
     }
 
@@ -182,6 +162,53 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         ICollateralEscrowV1.Collateral[] calldata _collateral
     ) external {
         commitCollateral(_bidId, _collateral);
+    }
+
+    /**
+     * @notice Withdraws deposited collateral from the created escrow of a bid.
+     * @param _bidId The id of the bid to withdraw collateral for.
+     */
+    function withdraw(uint256 _bidId) external {
+        if (_isBidCollateralBacked[_bidId]) {
+            BidState bidState = tellerV2.getBidState(_bidId);
+            require(
+                bidState >= BidState.PAID,
+                'Loan has not been repaid or liquidated'
+            );
+            address receiver;
+            if(bidState == BidState.LIQUIDATED) {
+                receiver = tellerV2.getLoanLender(_bidId);
+            } else {
+                receiver = tellerV2.getLoanBorrower(_bidId);
+            }
+            for (uint256 i; i < _bidCollaterals[_bidId].collateralAddresses.length(); i++) {
+                // Get collateral info
+                ICollateralEscrowV1.Collateral storage collateralInfo = _bidCollaterals[_bidId].collateralInfo[
+                _bidCollaterals[_bidId].collateralAddresses.at(i)
+                ];
+                // Withdraw collateral from escrow and send it to bid lender
+                ICollateralEscrowV1(_escrows[_bidId]).withdraw(
+                    collateralInfo._collateralAddress,
+                    collateralInfo._amount,
+                    receiver
+                );
+            }
+        }
+    }
+
+    function _deployEscrow(uint256 _bidId) internal returns(address proxyAddress_, address borrower_) {
+        proxyAddress_ = _escrows[_bidId];
+        // Get bid info
+        borrower_ = tellerV2.getLoanBorrower(_bidId);
+        if (proxyAddress_ == address(0)) {
+            require(borrower_ != address(0), 'Bid does not exist');
+
+            BeaconProxy proxy = new BeaconProxy(
+                collateralEscrowBeacon,
+                abi.encodeWithSelector(ICollateralEscrowV1.initialize.selector, _bidId)
+            );
+            proxyAddress_ = address(proxy);
+        }
     }
 
     function _deposit(
@@ -243,33 +270,35 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     }
 
     /**
-     * @notice Withdraws deposited collateral from the created escrow of a bid.
-     * @param _bidId The id of the bid to withdraw collateral for.
+     * @notice Checks the validity of a borrower's collateral balance and commits it to a bid.
+     * @param _bidId The id of the associated bid.
+     * @param _collateralInfo Additional information about the collateral asset.
      */
-    function withdraw(uint256 _bidId) external {
-        if (_isBidCollateralBacked[_bidId]) {
-            BidState bidState = TellerV2(owner()).getBidState(_bidId);
-            require(
-                bidState >= BidState.PAID,
-                'Loan has not been repaid or liquidated'
-            );
-            address receiver;
-            if(bidState == BidState.LIQUIDATED) {
-                receiver = TellerV2(owner()).getLoanLender(_bidId);
-            } else {
-                receiver = TellerV2(owner()).getLoanBorrower(_bidId);
-            }
-            for (uint256 i; i < _bidCollaterals[_bidId].collateralAddresses.length(); i++) {
-                // Get collateral info
-                ICollateralEscrowV1.Collateral storage collateralInfo = _bidCollaterals[_bidId].collateralInfo[
-                        _bidCollaterals[_bidId].collateralAddresses.at(i)
-                    ];
-                // Withdraw collateral from escrow and send it to bid lender
-                ICollateralEscrowV1(_escrows[_bidId]).withdraw(
-                    collateralInfo._collateralAddress,
-                    collateralInfo._amount,
-                    receiver
-                );
+    function _commitCollateral(
+        uint256 _bidId,
+        ICollateralEscrowV1.Collateral memory _collateralInfo
+    ) internal {
+        CollateralInfo storage collateral = _bidCollaterals[_bidId];
+        collateral.collateralAddresses.add(_collateralInfo._collateralAddress);
+        collateral.collateralInfo[_collateralInfo._collateralAddress] = _collateralInfo;
+        emit CollateralCommitted(_bidId, _collateralInfo._collateralAddress, _collateralInfo._amount);
+    }
+
+    function _checkBalances(
+        address _borrowerAddress,
+        ICollateralEscrowV1.Collateral[] memory _collateralInfo,
+        bool _shortCircut
+    ) internal returns (bool validated_, bool[] memory checks_) {
+        checks_ = new bool[](_collateralInfo.length);
+        validated_ = true;
+        for (uint256 i; i < _collateralInfo.length; i++) {
+            bool isValidated = _checkBalance(_borrowerAddress, _collateralInfo[i]);
+            checks_[i] = isValidated;
+            if (!isValidated) {
+                validated_ = false;
+                if (_shortCircut) {
+                    return (validated_, checks_);
+                }
             }
         }
     }

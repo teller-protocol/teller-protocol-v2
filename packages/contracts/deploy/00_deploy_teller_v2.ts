@@ -72,6 +72,31 @@ const deployFn: DeployFunction = async (hre) => {
     await reputationManager.initialize(tellerV2Contract.address)
   }
 
+  const collateralEscrowV1 = await hre.ethers.getContractFactory(
+    'CollateralEscrowV1'
+  )
+  // Deploy escrow beacon implementation
+  const collateralEscrowBeacon = await upgrades.deployBeacon(collateralEscrowV1)
+  await collateralEscrowBeacon.deployed()
+
+  const collateralManager = await deploy({
+    contract: 'CollateralManager',
+    args: [],
+    proxy: {
+      proxyContract: 'OpenZeppelinTransparentProxy',
+    },
+    hre,
+  })
+  const collateralManagerIsInitialized = await isInitialized(
+    collateralManager.address
+  )
+  if (!collateralManagerIsInitialized) {
+    await collateralManager.initialize(
+      collateralEscrowBeacon.address,
+      tellerV2Contract.address
+    )
+  }
+
   const tellerV2IsInitialized = await isInitialized(tellerV2Contract.address)
   if (!tellerV2IsInitialized) {
     const collateralManager = await hre.contracts.get('CollateralManager')

@@ -113,6 +113,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
      */
     function deployAndDeposit(uint256 _bidId) external {
         if (_isBidCollateralBacked[_bidId]) {
+            require(_msgSender() == address(tellerV2), 'Sender not authorized');
             (address proxyAddress, ) = _deployEscrow(_bidId);
             _escrows[_bidId] = proxyAddress;
 

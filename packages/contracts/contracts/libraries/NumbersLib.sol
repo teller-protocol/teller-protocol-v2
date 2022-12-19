@@ -41,11 +41,11 @@ library NumbersLib {
      * @param percentage The percentage value to calculate with.
      * @param decimals The number of decimals the percentage value is in.
      */
-    function percent(
-        uint256 self,
-        uint256 percentage,
-        uint256 decimals
-    ) internal pure returns (uint256) {
+    function percent(uint256 self, uint256 percentage, uint256 decimals)
+        internal
+        pure
+        returns (uint256)
+    {
         return (self * percentage) / percentFactor(decimals);
     }
 
@@ -80,11 +80,11 @@ library NumbersLib {
      * @param decimals The number of decimals the percentage value is returned in.
      * @return Ratio percentage value.
      */
-    function ratioOf(
-        uint256 num1,
-        uint256 num2,
-        uint256 decimals
-    ) internal pure returns (uint256) {
+    function ratioOf(uint256 num1, uint256 num2, uint256 decimals)
+        internal
+        pure
+        returns (uint256)
+    {
         if (num2 == 0) return 0;
         return (num1 * percentFactor(decimals)) / num2;
     }

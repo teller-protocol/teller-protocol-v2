@@ -445,7 +445,7 @@ contract MarketRegistry is
         address recipient,
         bytes calldata schema,
         bytes calldata data,
-        uint256, /* expirationTime */
+        uint256 /* expirationTime */,
         address attestor
     ) external payable override returns (bool) {
         bytes32 attestationSchemaId = keccak256(

@@ -211,11 +211,8 @@ contract User {
     address public immutable wethMock;
     address public immutable tellerV2Autopay;
 
-    constructor(
-        address _tellerV2Autopay,
-        address _tellerV2,
-        address _wethMock
-    ) {
+    constructor(address _tellerV2Autopay, address _tellerV2, address _wethMock)
+    {
         tellerV2Autopay = _tellerV2Autopay;
         tellerV2 = _tellerV2;
         wethMock = _wethMock;

@@ -8,10 +8,10 @@ import "../../EAS/TellerASResolver.sol";
  */
 contract TestASDataResolver is TellerASResolver {
     function resolve(
-        address, /* recipient */
-        bytes calldata, /* schema */
+        address /* recipient */,
+        bytes calldata /* schema */,
         bytes calldata data,
-        uint256, /* expirationTime */
+        uint256 /* expirationTime */,
         address /* msgSender */
     ) external payable virtual override returns (bool) {
         // Verifies that the data is either 0 or 1.

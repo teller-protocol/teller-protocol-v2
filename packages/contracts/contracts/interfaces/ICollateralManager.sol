@@ -16,6 +16,22 @@ interface ICollateralManager {
     ) external returns (bool validation_);
 
     /**
+     * @notice Checks the validity of a borrower's collateral balance and commits it to a bid.
+     * @param _bidId The id of the associated bid.
+     * @param _collateralInfo Additional information about the collateral asset.
+     * @return validation_ Boolean indicating if the collateral balance was validated.
+     */
+    function commitCollateral(
+        uint256 _bidId,
+        Collateral calldata _collateralInfo
+    ) external returns (bool validation_);
+
+    function checkBalances(
+        address _borrowerAddress,
+        Collateral[] calldata _collateralInfo
+    ) external returns (bool validated_, bool[] memory checks_);
+
+    /**
      * @notice Deploys a new collateral escrow.
      * @param _bidId The associated bidId of the collateral escrow.
      */
@@ -37,15 +53,6 @@ interface ICollateralManager {
         external
         view
         returns (Collateral[] memory);
-
-    /**
-     * @notice Deposits validated collateral into the created escrow for a bid.
-     * @param _bidId The id of the bid to deposit collateral for.
-     */
-    function deposit(
-        uint256 _bidId,
-        Collateral[] calldata _collateral
-    ) external;
 
     /**
      * @notice Withdraws deposited collateral from the created escrow of a bid.

@@ -6,6 +6,7 @@ import "../TellerV2.sol";
 import "../interfaces/ITellerV2.sol";
 import "../TellerV2Context.sol";
 import { Collateral } from "../interfaces/escrow/ICollateralEscrowV1.sol";
+import { LoanDetails, Payment, BidState } from "../TellerV2Storage.sol";
 
 /*
 This is only used for sol test so its named specifically to avoid being used for the typescript tests.
@@ -132,7 +133,7 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
     function getLoanDetails(uint256 _bidId)
         public
         view
-        returns (TellerV2Storage.LoanDetails memory)
+        returns (LoanDetails memory)
     {
         return bids[_bidId].loanDetails;
     }

@@ -174,13 +174,6 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         }
     }
 
-    function deposit(
-        uint256 _bidId,
-        Collateral[] calldata _collateral
-    ) external {
-        commitCollateral(_bidId, _collateral);
-    }
-
     /**
      * @notice Withdraws deposited collateral from the created escrow of a bid.
      * @param _bidId The id of the bid to withdraw collateral for.

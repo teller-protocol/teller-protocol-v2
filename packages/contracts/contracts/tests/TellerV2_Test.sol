@@ -7,8 +7,6 @@ import { TellerV2 } from "../TellerV2.sol";
 import { MarketRegistry } from "../MarketRegistry.sol";
 import { ReputationManager } from "../ReputationManager.sol";
 
-import "../TellerV2Storage.sol";
-
 import "../interfaces/IMarketRegistry.sol";
 import "../interfaces/IReputationManager.sol";
 
@@ -28,6 +26,7 @@ import "@mangrovedao/hardhat-test-solidity/test.sol";
 import "../CollateralManager.sol";
 import { Collateral } from "../interfaces/escrow/ICollateralEscrowV1.sol";
 import { PaymentType } from "../libraries/V2Calculations.sol";
+import { BidState, Payment } from "../TellerV2Storage.sol";
 
 contract TellerV2_Test is Testable {
     User private marketOwner;
@@ -48,18 +47,22 @@ contract TellerV2_Test is Testable {
         wethMock = new WethMock();
         daiMock = new TestERC20Token("Dai", "DAI", 10000000);
 
-        // Deploy MarketRegistry & ReputationManager
-        IMarketRegistry marketRegistry = IMarketRegistry(new MarketRegistry());
-        IReputationManager reputationManager = IReputationManager(
-            new ReputationManager()
-        );
         // Deploy Escrow beacon
         CollateralEscrowV1 escrowImplementation = new CollateralEscrowV1();
         UpgradeableBeacon escrowBeacon = new UpgradeableBeacon(
             address(escrowImplementation)
         );
 
+        // Deploy protocol
         tellerV2 = new TellerV2(address(0));
+
+        // Deploy MarketRegistry & ReputationManager
+        IMarketRegistry marketRegistry = IMarketRegistry(new MarketRegistry());
+        IReputationManager reputationManager = IReputationManager(
+            new ReputationManager()
+        );
+        reputationManager.initialize(address(tellerV2));
+
         // Deploy Collateral manager
         collateralManager = new CollateralManager();
         collateralManager.initialize(address(escrowBeacon), address(tellerV2));
@@ -153,7 +156,9 @@ contract TellerV2_Test is Testable {
     }
 
     function collateralEscrow_test() public {
+        // Submit bid as borrower
         uint256 bidId = submitCollateralBid();
+        // Accept bid as lender
         acceptBid(bidId);
 
         // Get newly created escrow
@@ -168,5 +173,27 @@ contract TellerV2_Test is Testable {
         uint256 escrowBalance = wethMock.balanceOf(escrowAddress);
 
         Test.eq(collateralAmount, escrowBalance, "Collateral was not stored");
+
+        // Repay loan
+        uint256 borrowerBalanceBefore = wethMock.balanceOf(address(borrower));
+        Payment memory amountOwed = tellerV2.calculateAmountOwed(bidId);
+        borrower.addAllowance(
+            address(daiMock),
+            address(tellerV2),
+            amountOwed.principal + amountOwed.interest
+        );
+        borrower.repayLoanFull(bidId);
+
+        // Check escrow balance
+        uint256 escrowBalanceAfter = wethMock.balanceOf(escrowAddress);
+        Test.eq(0, escrowBalanceAfter, "Collateral was not withdrawn from escrow on repayment");
+
+        // Check borrower balance for collateral
+        uint256 borrowerBalanceAfter = wethMock.balanceOf(address(borrower));
+        Test.eq(
+            collateralAmount,
+            borrowerBalanceAfter - borrowerBalanceBefore,
+            "Collateral was not sent to borrower after repayment"
+        );
     }
 }

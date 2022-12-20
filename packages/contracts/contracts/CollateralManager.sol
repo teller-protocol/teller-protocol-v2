@@ -24,7 +24,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
 
     address private collateralEscrowBeacon;
     mapping(uint256 => address) public _escrows; // bidIds -> collateralEscrow
-    // biIds -> validated collateral info
+    // bidIds -> validated collateral info
     mapping(uint256 => CollateralInfo) internal _bidCollaterals;
     struct CollateralInfo {
         EnumerableSetUpgradeable.AddressSet collateralAddresses;
@@ -38,7 +38,8 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     event CollateralCommitted(
         uint256 _bidId,
         address _collateralAddress,
-        uint256 _amount
+        uint256 _amount,
+        uint256 _tokenId
     );
 
     /* Modifiers */
@@ -333,7 +334,8 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         emit CollateralCommitted(
             _bidId,
             _collateralInfo._collateralAddress,
-            _collateralInfo._amount
+            _collateralInfo._amount,
+            _collateralInfo._tokenId
         );
     }
 

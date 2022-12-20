@@ -18,6 +18,7 @@ import "../mock/WethMock.sol";
 import "../interfaces/IWETH.sol";
 
 import { User } from "./Test_Helpers.sol";
+import { PaymentType } from "../libraries/V2Calculations.sol";
 
 contract MarketRegistry_Test is Testable, TellerV2 {
     User private marketOwner;
@@ -47,7 +48,7 @@ contract MarketRegistry_Test is Testable, TellerV2 {
             500,
             false,
             false,
-            V2Calculations.PaymentType.EMI,
+            PaymentType.EMI,
             "uri://"
         );
     }

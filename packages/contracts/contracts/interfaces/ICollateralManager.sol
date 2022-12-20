@@ -60,5 +60,10 @@ interface ICollateralManager {
      */
     function withdraw(uint256 _bidId) external;
 
+    /**
+     * @notice Re-checks the validity of a borrower's collateral balance committed to a bid.
+     * @param _bidId The id of the associated bid.
+     * @return validation_ Boolean indicating if the collateral balance was validated.
+     */
     function revalidateCollateral(uint256 _bidId) external returns (bool);
 }

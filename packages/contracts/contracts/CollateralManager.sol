@@ -19,10 +19,10 @@ import "./interfaces/ITellerV2.sol";
 
 
 contract CollateralManager is OwnableUpgradeable, ICollateralManager {
+    /* Storage */
     using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
     ITellerV2 public tellerV2;
-
-    address private collateralEscrowBeacon;
+    address private collateralEscrowBeacon; // The address of the escrow contract beacon
     mapping(uint256 => address) public _escrows; // bidIds -> collateralEscrow
     // bidIds -> validated collateral info
     mapping(uint256 => CollateralInfo) internal _bidCollaterals;
@@ -47,6 +47,8 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         require(_msgSender() == address(tellerV2), 'Sender not authorized');
         _;
     }
+
+    /* External Functions */
 
     /**
      * @notice Initializes the collateral manager.
@@ -100,6 +102,11 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         }
     }
 
+    /**
+     * @notice Re-checks the validity of a borrower's collateral balance committed to a bid.
+     * @param _bidId The id of the associated bid.
+     * @return validation_ Boolean indicating if the collateral balance was validated.
+     */
     function revalidateCollateral(uint256 _bidId)
         external
         returns (bool validation_)
@@ -110,6 +117,11 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         (validation_, ) = _checkBalances(borrower, collateralInfos, true);
     }
 
+    /**
+     * @notice Checks the validity of a borrower's multiple collateral balances.
+     * @param _borrowerAddress The address of the borrower holding the collateral.
+     * @param _collateralInfo Additional information about the collateral assets.
+     */
     function checkBalances(
         address _borrowerAddress,
         Collateral[] calldata _collateralInfo
@@ -212,6 +224,12 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         }
     }
 
+    /* Internal Functions */
+
+    /**
+     * @notice Deploys a new collateral escrow.
+     * @param _bidId The associated bidId of the collateral escrow.
+     */
     function _deployEscrow(uint256 _bidId)
         internal
         returns (address proxyAddress_, address borrower_)
@@ -332,6 +350,11 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         );
     }
 
+    /**
+     * @notice Checks the validity of a borrower's multiple collateral balances.
+     * @param _borrowerAddress The address of the borrower holding the collateral.
+     * @param _collateralInfo Additional information about the collateral assets.
+     */
     function _checkBalances(
         address _borrowerAddress,
         Collateral[] memory _collateralInfo,
@@ -354,6 +377,12 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         }
     }
 
+    /**
+     * @notice Checks the validity of a borrower's single collateral balance.
+     * @param _borrowerAddress The address of the borrower holding the collateral.
+     * @param _collateralInfo Additional information about the collateral asset.
+     * @return validation_ Boolean indicating if the collateral balances were validated.
+     */
     function _checkBalance(
         address _borrowerAddress,
         Collateral memory _collateralInfo

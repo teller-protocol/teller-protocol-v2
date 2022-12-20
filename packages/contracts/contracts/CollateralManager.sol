@@ -13,11 +13,15 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol";
-import "./TellerV2.sol";
+import "./interfaces/ICollateralManager.sol";
+//import "./TellerV2.sol";
+import { Collateral, CollateralType, ICollateralEscrowV1 } from "./interfaces/escrow/ICollateralEscrowV1.sol";
+import "./interfaces/ITellerV2.sol";
+
 
 contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
-    TellerV2 public tellerV2;
+    ITellerV2 public tellerV2;
 
     address private collateralEscrowBeacon;
     mapping(uint256 => address) public _escrows; // bidIds -> collateralEscrow
@@ -25,7 +29,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     mapping(uint256 => CollateralInfo) internal _bidCollaterals;
     struct CollateralInfo {
         EnumerableSetUpgradeable.AddressSet collateralAddresses;
-        mapping(address => ICollateralEscrowV1.Collateral) collateralInfo;
+        mapping(address => Collateral) collateralInfo;
     }
     // Boolean indicating if a bid is backed by collateral
     mapping(uint256 => bool) _isBidCollateralBacked;
@@ -54,7 +58,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         initializer
     {
         collateralEscrowBeacon = _collateralEscrowBeacon;
-        tellerV2 = TellerV2(_tellerV2);
+        tellerV2 = ITellerV2(_tellerV2);
     }
 
     /**
@@ -65,13 +69,13 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
      */
     function commitCollateral(
         uint256 _bidId,
-        ICollateralEscrowV1.Collateral[] calldata _collateralInfo
+        Collateral[] calldata _collateralInfo
     ) public returns (bool validation_) {
         address borrower = tellerV2.getLoanBorrower(_bidId);
         (validation_, ) = checkBalances(borrower, _collateralInfo);
         if (validation_) {
             for (uint256 i; i < _collateralInfo.length; i++) {
-                ICollateralEscrowV1.Collateral memory info = _collateralInfo[i];
+                Collateral memory info = _collateralInfo[i];
                 _commitCollateral(_bidId, info);
             }
             _isBidCollateralBacked[_bidId] = true;
@@ -86,7 +90,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
      */
     function commitCollateral(
         uint256 _bidId,
-        ICollateralEscrowV1.Collateral calldata _collateralInfo
+        Collateral calldata _collateralInfo
     ) public returns (bool validation_) {
         address borrower = tellerV2.getLoanBorrower(_bidId);
         validation_ = _checkBalance(borrower, _collateralInfo);
@@ -100,7 +104,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         external
         returns (bool validation_)
     {
-        ICollateralEscrowV1.Collateral[]
+        Collateral[]
             memory collateralInfos = getCollateralInfo(_bidId);
         address borrower = tellerV2.getLoanBorrower(_bidId);
         (validation_, ) = _checkBalances(borrower, collateralInfos, true);
@@ -108,7 +112,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
 
     function checkBalances(
         address _borrowerAddress,
-        ICollateralEscrowV1.Collateral[] calldata _collateralInfo
+        Collateral[] calldata _collateralInfo
     ) public returns (bool validated_, bool[] memory checks_) {
         return _checkBalances(_borrowerAddress, _collateralInfo, false);
     }
@@ -157,13 +161,13 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     function getCollateralInfo(uint256 _bidId)
         public
         view
-        returns (ICollateralEscrowV1.Collateral[] memory infos_)
+        returns (Collateral[] memory infos_)
     {
         CollateralInfo storage collateral = _bidCollaterals[_bidId];
         address[] memory collateralAddresses = collateral
             .collateralAddresses
             .values();
-        infos_ = new ICollateralEscrowV1.Collateral[](
+        infos_ = new Collateral[](
             collateralAddresses.length
         );
         for (uint256 i; i < collateralAddresses.length; i++) {
@@ -173,7 +177,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
 
     function deposit(
         uint256 _bidId,
-        ICollateralEscrowV1.Collateral[] calldata _collateral
+        Collateral[] calldata _collateral
     ) external {
         commitCollateral(_bidId, _collateral);
     }
@@ -201,7 +205,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
                 i++
             ) {
                 // Get collateral info
-                ICollateralEscrowV1.Collateral
+                Collateral
                     storage collateralInfo = _bidCollaterals[_bidId]
                         .collateralInfo[
                             _bidCollaterals[_bidId].collateralAddresses.at(i)
@@ -239,7 +243,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
 
     function _deposit(
         uint256 _bidId,
-        ICollateralEscrowV1.Collateral memory collateralInfo
+        Collateral memory collateralInfo
     ) public payable {
         require(collateralInfo._amount > 0, "Collateral not validated");
         (address escrowAddress, address borrower) = _deployEscrow(_bidId);
@@ -249,7 +253,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         // Pull collateral from borrower & deposit into escrow
         if (
             collateralInfo._collateralType ==
-            ICollateralEscrowV1.CollateralType.ERC20
+            CollateralType.ERC20
         ) {
             IERC20Upgradeable(collateralInfo._collateralAddress).transferFrom(
                 borrower,
@@ -267,7 +271,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         }
         if (
             collateralInfo._collateralType ==
-            ICollateralEscrowV1.CollateralType.ERC721
+            CollateralType.ERC721
         ) {
             IERC721Upgradeable(collateralInfo._collateralAddress)
                 .safeTransferFrom(
@@ -281,7 +285,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
                     collateralInfo._tokenId
                 );
             collateralEscrow.depositAsset(
-                ICollateralEscrowV1.CollateralType.ERC721,
+                CollateralType.ERC721,
                 collateralInfo._collateralAddress,
                 collateralInfo._amount,
                 collateralInfo._tokenId
@@ -289,7 +293,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         }
         if (
             collateralInfo._collateralType ==
-            ICollateralEscrowV1.CollateralType.ERC1155
+            CollateralType.ERC1155
         ) {
             bytes memory data;
             IERC1155Upgradeable(collateralInfo._collateralAddress)
@@ -306,7 +310,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
                     true
                 );
             collateralEscrow.depositAsset(
-                ICollateralEscrowV1.CollateralType.ERC1155,
+                CollateralType.ERC1155,
                 collateralInfo._collateralAddress,
                 collateralInfo._amount,
                 collateralInfo._tokenId
@@ -321,7 +325,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
      */
     function _commitCollateral(
         uint256 _bidId,
-        ICollateralEscrowV1.Collateral memory _collateralInfo
+        Collateral memory _collateralInfo
     ) internal {
         CollateralInfo storage collateral = _bidCollaterals[_bidId];
         collateral.collateralAddresses.add(_collateralInfo._collateralAddress);
@@ -337,7 +341,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
 
     function _checkBalances(
         address _borrowerAddress,
-        ICollateralEscrowV1.Collateral[] memory _collateralInfo,
+        Collateral[] memory _collateralInfo,
         bool _shortCircut
     ) internal returns (bool validated_, bool[] memory checks_) {
         checks_ = new bool[](_collateralInfo.length);
@@ -359,25 +363,25 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
 
     function _checkBalance(
         address _borrowerAddress,
-        ICollateralEscrowV1.Collateral memory _collateralInfo
+        Collateral memory _collateralInfo
     ) internal returns (bool) {
-        ICollateralEscrowV1.CollateralType collateralType = _collateralInfo
+        CollateralType collateralType = _collateralInfo
             ._collateralType;
-        if (collateralType == ICollateralEscrowV1.CollateralType.ERC20) {
+        if (collateralType == CollateralType.ERC20) {
             return
                 _collateralInfo._amount <=
                 IERC20Upgradeable(_collateralInfo._collateralAddress).balanceOf(
                     _borrowerAddress
                 );
         }
-        if (collateralType == ICollateralEscrowV1.CollateralType.ERC721) {
+        if (collateralType == CollateralType.ERC721) {
             return
                 _borrowerAddress ==
                 IERC721Upgradeable(_collateralInfo._collateralAddress).ownerOf(
                     _collateralInfo._tokenId
                 );
         }
-        if (collateralType == ICollateralEscrowV1.CollateralType.ERC1155) {
+        if (collateralType == CollateralType.ERC1155) {
             return
                 _collateralInfo._amount <=
                 IERC1155Upgradeable(_collateralInfo._collateralAddress)

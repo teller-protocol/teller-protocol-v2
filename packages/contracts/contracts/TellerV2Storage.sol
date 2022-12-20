@@ -6,7 +6,6 @@ import { V2Calculations } from "./TellerV2.sol";
 import "./interfaces/IReputationManager.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "./interfaces/escrow/ICollateralEscrowV1.sol";
 import "./interfaces/ICollateralManager.sol";
 
 enum BidState {
@@ -18,16 +17,17 @@ enum BidState {
     LIQUIDATED
 }
 
+/**
+ * @notice Represents a total amount for a payment.
+ * @param principal Amount that counts towards the principal.
+ * @param interest  Amount that counts toward interest.
+ */
+struct Payment {
+    uint256 principal;
+    uint256 interest;
+}
+
 abstract contract TellerV2Storage_G0 {
-    /**
-     * @notice Represents a total amount for a payment.
-     * @param principal Amount that counts towards the principal.
-     * @param interest  Amount that counts toward interest.
-     */
-    struct Payment {
-        uint256 principal;
-        uint256 interest;
-    }
 
     /**
      * @notice Details about the loan.

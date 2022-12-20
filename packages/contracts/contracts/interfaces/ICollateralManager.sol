@@ -1,7 +1,7 @@
 // SPDX-Licence-Identifier: MIT
 pragma solidity >=0.8.0 <0.9.0;
 
-import "./escrow/ICollateralEscrowV1.sol";
+import { Collateral } from "./escrow/ICollateralEscrowV1.sol";
 
 interface ICollateralManager {
     /**
@@ -12,7 +12,7 @@ interface ICollateralManager {
      */
     function commitCollateral(
         uint256 _bidId,
-        ICollateralEscrowV1.Collateral[] calldata _collateralInfo
+        Collateral[] calldata _collateralInfo
     ) external returns (bool validation_);
 
     /**
@@ -36,7 +36,7 @@ interface ICollateralManager {
     function getCollateralInfo(uint256 _bidId)
         external
         view
-        returns (ICollateralEscrowV1.Collateral[] memory);
+        returns (Collateral[] memory);
 
     /**
      * @notice Deposits validated collateral into the created escrow for a bid.
@@ -44,7 +44,7 @@ interface ICollateralManager {
      */
     function deposit(
         uint256 _bidId,
-        ICollateralEscrowV1.Collateral[] calldata _collateral
+        Collateral[] calldata _collateral
     ) external;
 
     /**

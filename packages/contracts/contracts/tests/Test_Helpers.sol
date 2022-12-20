@@ -5,7 +5,8 @@ import { TellerV2 } from "../TellerV2.sol";
 import "../mock/WethMock.sol";
 import "../interfaces/IMarketRegistry.sol";
 import "../interfaces/ITellerV2.sol";
-import "../interfaces/escrow/ICollateralEscrowV1.sol";
+import { Collateral } from "../interfaces/escrow/ICollateralEscrowV1.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract User {
     TellerV2 public immutable tellerV2;
@@ -86,7 +87,7 @@ contract User {
         uint16 _APR,
         string calldata _metadataURI,
         address _receiver,
-        ICollateralEscrowV1.Collateral[] calldata _collateralInfo
+        Collateral[] calldata _collateralInfo
     ) public returns (uint256) {
         return
             ITellerV2(tellerV2).submitBid(

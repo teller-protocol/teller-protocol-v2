@@ -5,6 +5,7 @@ pragma solidity >=0.8.0 <0.9.0;
 import "../TellerV2.sol";
 import "../interfaces/ITellerV2.sol";
 import "../TellerV2Context.sol";
+import { Collateral } from "../interfaces/escrow/ICollateralEscrowV1.sol";
 
 /*
 This is only used for sol test so its named specifically to avoid being used for the typescript tests.
@@ -45,7 +46,7 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
         uint16 _APR,
         string calldata _metadataURI,
         address _receiver,
-        ICollateralEscrowV1.Collateral[] calldata _collateralInfo
+        Collateral[] calldata _collateralInfo
     ) public returns (uint256 bidId_) {}
 
     function repayLoanMinimum(uint256 _bidId) external {}

@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "../TellerV2Storage.sol";
+import { Payment, BidState } from "../TellerV2Storage.sol";
+import { Collateral } from "./escrow/ICollateralEscrowV1.sol";
 
 interface ITellerV2 {
     /**
@@ -43,7 +44,7 @@ interface ITellerV2 {
         uint16 _APR,
         string calldata _metadataURI,
         address _receiver,
-        ICollateralEscrowV1.Collateral[] calldata _collateralInfo
+        Collateral[] calldata _collateralInfo
     ) external returns (uint256 bidId_);
 
     /**
@@ -61,7 +62,7 @@ interface ITellerV2 {
     function calculateAmountDue(uint256 _bidId)
         external
         view
-        returns (TellerV2Storage.Payment memory due);
+        returns (Payment memory due);
 
     /**
      * @notice Function for users to make the minimum amount due for an active loan.

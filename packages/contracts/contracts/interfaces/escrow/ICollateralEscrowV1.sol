@@ -1,19 +1,20 @@
 // SPDX-Licence-Identifier: MIT
 pragma solidity >=0.8.0 <0.9.0;
 
-interface ICollateralEscrowV1 {
-    enum CollateralType {
-        ERC20,
-        ERC721,
-        ERC1155
-    }
+enum CollateralType {
+    ERC20,
+    ERC721,
+    ERC1155
+}
 
-    struct Collateral {
-        CollateralType _collateralType;
-        uint256 _amount;
-        uint256 _tokenId;
-        address _collateralAddress;
-    }
+struct Collateral {
+    CollateralType _collateralType;
+    uint256 _amount;
+    uint256 _tokenId;
+    address _collateralAddress;
+}
+
+interface ICollateralEscrowV1 {
 
     /**
      * @notice Deposits a collateral ERC20 token into the escrow.

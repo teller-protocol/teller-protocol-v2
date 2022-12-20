@@ -14,7 +14,7 @@ import "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol";
 import "./interfaces/IMarketRegistry.sol";
 import "./interfaces/IReputationManager.sol";
 import "./interfaces/ITellerV2.sol";
-import "./interfaces/escrow/ICollateralEscrowV1.sol";
+import { Collateral } from "./interfaces/escrow/ICollateralEscrowV1.sol";
 
 // Libraries
 import "@openzeppelin/contracts/utils/Address.sol";
@@ -296,7 +296,7 @@ contract TellerV2 is
         uint16 _APR,
         string calldata _metadataURI,
         address _receiver,
-        ICollateralEscrowV1.Collateral[] calldata _collateralInfo
+        Collateral[] calldata _collateralInfo
     ) public override whenNotPaused returns (uint256 bidId_) {
         bidId_ = _submitBid(
             _lendingToken,

@@ -6,12 +6,12 @@ import "@mangrovedao/hardhat-test-solidity/test.sol";
 
 import { CollateralEscrowV1 } from "../escrow/CollateralEscrowV1.sol";
 import "../mock/WethMock.sol";
-import "../interfaces/escrow/ICollateralEscrowV1.sol";
 import "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
 import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "../interfaces/IWETH.sol";
+import { CollateralType, CollateralEscrowV1 } from "../escrow/CollateralEscrowV1.sol";
 
 contract CollateralEscrow_Test is Testable {
     BeaconProxy private proxy_;
@@ -65,7 +65,7 @@ contract CollateralEscrow_Test is Testable {
         borrower.approveWeth(amount);
 
         borrower.deposit(
-            ICollateralEscrowV1.CollateralType.ERC20,
+            CollateralType.ERC20,
             address(wethMock),
             amount,
             0
@@ -92,7 +92,7 @@ contract User {
     }
 
     function deposit(
-        CollateralEscrowV1.CollateralType _collateralType,
+        CollateralType _collateralType,
         address _collateralAddress,
         uint256 _amount,
         uint256 _tokenId

@@ -26,6 +26,7 @@ import "./resolvers/TestERC20Token.sol";
 
 import "@mangrovedao/hardhat-test-solidity/test.sol";
 import "../CollateralManager.sol";
+import { Collateral } from "../interfaces/escrow/ICollateralEscrowV1.sol";
 
 contract TellerV2_Test is Testable {
     User private marketOwner;
@@ -113,14 +114,14 @@ contract TellerV2_Test is Testable {
     }
 
     function submitCollateralBid() public returns (uint256 bidId_) {
-        ICollateralEscrowV1.Collateral memory info;
+        Collateral memory info;
         info._amount = collateralAmount;
         info._tokenId = 0;
-        info._collateralType = ICollateralEscrowV1.CollateralType.ERC20;
+        info._collateralType = CollateralType.ERC20;
         info._collateralAddress = address(wethMock);
 
-        ICollateralEscrowV1.Collateral[]
-            memory collateralInfo = new ICollateralEscrowV1.Collateral[](1);
+        Collateral[]
+            memory collateralInfo = new Collateral[](1);
         collateralInfo[0] = info;
 
         uint256 bal = wethMock.balanceOf(address(borrower));

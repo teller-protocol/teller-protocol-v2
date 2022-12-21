@@ -41,6 +41,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         uint256 _amount,
         uint256 _tokenId
     );
+    event CollateralClaimed(uint256 _bidId);
 
     /* Modifiers */
     modifier onlyTellerV2() {
@@ -203,25 +204,22 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
             } else {
                 receiver = tellerV2.getLoanBorrower(_bidId);
             }
-            for (
-                uint256 i;
-                i < _bidCollaterals[_bidId].collateralAddresses.length();
-                i++
-            ) {
-                // Get collateral info
-                Collateral
-                    storage collateralInfo = _bidCollaterals[_bidId]
-                        .collateralInfo[
-                            _bidCollaterals[_bidId].collateralAddresses.at(i)
-                        ];
-                // Withdraw collateral from escrow and send it to bid lender
-                ICollateralEscrowV1(_escrows[_bidId]).withdraw(
-                    collateralInfo._collateralAddress,
-                    collateralInfo._amount,
-                    receiver
-                );
-            }
+            _withdraw(_bidId, receiver);
         }
+    }
+
+    /**
+     * @notice Allows collateral to be claimed for a defaulted loan.
+     * @param _bidId The id of the bid to claim the collateral for.
+     */
+    function claimCollateral(uint256 _bidId)
+        external
+    {
+        require(_isBidCollateralBacked[_bidId], 'Loan is not collateral backed');
+        require(tellerV2.isLoanDefaulted(_bidId), 'Loan is not eligible to claim');
+        address bidLender = tellerV2.getLoanLender(_bidId);
+        _withdraw(_bidId, bidLender);
+        emit CollateralClaimed(_bidId);
     }
 
     /* Internal Functions */
@@ -324,6 +322,32 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
                 collateralInfo._collateralAddress,
                 collateralInfo._amount,
                 collateralInfo._tokenId
+            );
+        }
+    }
+
+    /**
+     * @notice Withdraws collateral to a given receiver's address.
+     * @param _bidId The id of the bid to withdraw collateral for.
+     * @param _receiver The address to withdraw the collateral to.
+     */
+    function _withdraw(uint256 _bidId, address _receiver) internal {
+        for (
+            uint256 i;
+            i < _bidCollaterals[_bidId].collateralAddresses.length();
+            i++
+        ) {
+            // Get collateral info
+            Collateral
+            storage collateralInfo = _bidCollaterals[_bidId]
+            .collateralInfo[
+            _bidCollaterals[_bidId].collateralAddresses.at(i)
+            ];
+            // Withdraw collateral from escrow and send it to bid lender
+            ICollateralEscrowV1(_escrows[_bidId]).withdraw(
+                collateralInfo._collateralAddress,
+                collateralInfo._amount,
+                _receiver
             );
         }
     }

@@ -66,4 +66,10 @@ interface ICollateralManager {
      * @return validation_ Boolean indicating if the collateral balance was validated.
      */
     function revalidateCollateral(uint256 _bidId) external returns (bool);
+
+    /**
+     * @notice Allows collateral to be claimed for a defaulted loan.
+     * @param _bidId The id of the bid to claim the collateral for.
+     */
+    function claimCollateral(uint256 _bidId) external;
 }

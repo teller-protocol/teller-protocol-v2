@@ -195,7 +195,8 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         if (_isBidCollateralBacked[_bidId]) {
             BidState bidState = tellerV2.getBidState(_bidId);
             require(
-                bidState >= BidState.PAID,
+                bidState == BidState.PAID ||
+                bidState == BidState.LIQUIDATED,
                 "Loan has not been repaid or liquidated"
             );
             address receiver;

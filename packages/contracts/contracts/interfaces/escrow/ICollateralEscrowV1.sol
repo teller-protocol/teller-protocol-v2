@@ -22,8 +22,7 @@ interface ICollateralEscrowV1 {
      * @param _amount The amount to deposit.
      */
     function depositToken(address _collateralAddress, uint256 _amount)
-        external
-        payable;
+        external;
 
     /**
      * @notice Deposits a collateral asset into the escrow.

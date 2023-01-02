@@ -32,7 +32,6 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
      * @notice The id of the associated bid.
      */
     function initialize(uint256 _bidId) public initializer {
-        require(owner() == address(0), "Escrow already initialized");
         __Ownable_init();
         bidId = _bidId;
     }
@@ -48,7 +47,6 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
      */
     function depositToken(address _collateralAddress, uint256 _amount)
         external
-        payable
         onlyOwner
     {
         require(_amount > 0, "Deposit amount cannot be zero");
@@ -103,7 +101,7 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
     ) external onlyOwner {
         require(_amount > 0, "Withdraw amount cannot be zero");
         Collateral storage collateral = collateralBalances[_collateralAddress];
-        require(collateral._amount > 0, "No collateral balance for asset");
+        require(collateral._amount >= _amount, "No collateral balance for asset");
         _withdrawCollateral(
             collateral,
             _collateralAddress,
@@ -124,34 +122,31 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
         if (_collateralType == CollateralType.ERC20) {
             SafeERC20Upgradeable.safeTransferFrom(
                 IERC20Upgradeable(_collateralAddress),
-                msg.sender,
+                _msgSender(),
                 address(this),
                 _amount
             );
-            return;
         }
         // Deposit ERC721
-        if (_collateralType == CollateralType.ERC721) {
+        else if (_collateralType == CollateralType.ERC721) {
             require(_amount == 1, "Incorrect deposit amount");
             IERC721Upgradeable(_collateralAddress).safeTransferFrom(
-                msg.sender,
+                _msgSender(),
                 address(this),
                 _tokenId
             );
-            return;
         }
         // Deposit ERC1155
-        if (_collateralType == CollateralType.ERC1155) {
+        else if (_collateralType == CollateralType.ERC1155) {
             bytes memory data;
 
             IERC1155Upgradeable(_collateralAddress).safeTransferFrom(
-                msg.sender,
+                _msgSender(),
                 address(this),
                 _tokenId,
                 _amount,
                 data
             );
-            return;
         }
     }
 
@@ -163,26 +158,23 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
     ) internal {
         // Withdraw ERC20
         if (_collateral._collateralType == CollateralType.ERC20) {
-            SafeERC20Upgradeable.safeTransferFrom(
-                IERC20Upgradeable(_collateralAddress),
-                address(this),
-                _recipient,
-                _collateral._amount
-            );
-            return;
+            IERC20Upgradeable(_collateralAddress)
+                .transfer(
+                    _recipient,
+                    _collateral._amount
+                );
         }
         // Withdraw ERC721
-        if (_collateral._collateralType == CollateralType.ERC721) {
+        else if (_collateral._collateralType == CollateralType.ERC721) {
             require(_amount == 1, "Incorrect withdrawal amount");
             IERC721Upgradeable(_collateralAddress).safeTransferFrom(
                 address(this),
                 _recipient,
                 _collateral._tokenId
             );
-            return;
         }
         // Withdraw ERC1155
-        if (_collateral._collateralType == CollateralType.ERC1155) {
+        else if (_collateral._collateralType == CollateralType.ERC1155) {
             bytes memory data;
 
             IERC1155Upgradeable(_collateralAddress).safeTransferFrom(
@@ -192,7 +184,6 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
                 _amount,
                 data
             );
-            return;
         }
     }
 

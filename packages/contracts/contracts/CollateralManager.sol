@@ -30,8 +30,6 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         EnumerableSetUpgradeable.AddressSet collateralAddresses;
         mapping(address => Collateral) collateralInfo;
     }
-    // Boolean indicating if a bid is backed by collateral
-    mapping(uint256 => bool) _isBidCollateralBacked;
 
     /* Events */
     event CollateralEscrowDeployed(uint256 _bidId, address _collateralEscrow);
@@ -62,6 +60,16 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     {
         collateralEscrowBeacon = _collateralEscrowBeacon;
         tellerV2 = ITellerV2(_tellerV2);
+        __Ownable_init_unchained();
+    }
+
+    /**
+     * @notice Checks to see if a bid is backed by collateral.
+     * @param _bidId The id of the bid to check.
+     */
+
+    function isBidCollateralBacked(uint256 _bidId) public returns (bool) {
+        return _bidCollaterals[_bidId].collateralAddresses.length() > 0;
     }
 
     /**
@@ -81,7 +89,6 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
                 Collateral memory info = _collateralInfo[i];
                 _commitCollateral(_bidId, info);
             }
-            _isBidCollateralBacked[_bidId] = true;
         }
     }
 
@@ -99,7 +106,6 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         validation_ = _checkBalance(borrower, _collateralInfo);
         if (validation_) {
             _commitCollateral(_bidId, _collateralInfo);
-            _isBidCollateralBacked[_bidId] = true;
         }
     }
 
@@ -135,7 +141,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
      * @param _bidId The associated bidId of the collateral escrow.
      */
     function deployAndDeposit(uint256 _bidId) external onlyTellerV2 {
-        if (_isBidCollateralBacked[_bidId]) {
+        if (isBidCollateralBacked(_bidId)) {
             (address proxyAddress, ) = _deployEscrow(_bidId);
             _escrows[_bidId] = proxyAddress;
 
@@ -192,7 +198,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
      * @param _bidId The id of the bid to withdraw collateral for.
      */
     function withdraw(uint256 _bidId) external {
-        if (_isBidCollateralBacked[_bidId]) {
+        if (isBidCollateralBacked(_bidId)) {
             BidState bidState = tellerV2.getBidState(_bidId);
             require(
                 bidState == BidState.PAID,
@@ -212,7 +218,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         uint256 _bidId,
         address _liquidatorAddress
     ) external onlyTellerV2 {
-        if (_isBidCollateralBacked[_bidId]) {
+        if (isBidCollateralBacked(_bidId)) {
             BidState bidState = tellerV2.getBidState(_bidId);
             require(
                 bidState == BidState.LIQUIDATED,
@@ -229,7 +235,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     function claimCollateral(uint256 _bidId)
         external
     {
-        require(_isBidCollateralBacked[_bidId], 'Loan is not collateral backed');
+        require(isBidCollateralBacked(_bidId), 'Loan is not collateral backed');
         require(tellerV2.isLoanDefaulted(_bidId), 'Loan is not eligible to claim');
         address bidLender = tellerV2.getLoanLender(_bidId);
         _withdraw(_bidId, bidLender);
@@ -291,7 +297,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
                 collateralInfo._amount
             );
         }
-        if (
+        else if (
             collateralInfo._collateralType ==
             CollateralType.ERC721
         ) {
@@ -313,7 +319,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
                 collateralInfo._tokenId
             );
         }
-        if (
+        else if (
             collateralInfo._collateralType ==
             CollateralType.ERC1155
         ) {

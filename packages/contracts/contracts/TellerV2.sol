@@ -645,10 +645,11 @@ contract TellerV2 is
 
         bid.state = BidState.LIQUIDATED;
 
-        // If loan is backed by collateral, withdraw and send to lender
-        collateralManager.withdraw(_bidId);
+        // If loan is backed by collateral, withdraw and send to the liquidator
+        address liquidator = _msgSenderForMarket(bid.marketplaceId);
+        collateralManager.liquidateCollateral(_bidId, liquidator);
 
-        emit LoanLiquidated(_bidId, _msgSenderForMarket(bid.marketplaceId));
+        emit LoanLiquidated(_bidId, liquidator);
     }
 
     /**

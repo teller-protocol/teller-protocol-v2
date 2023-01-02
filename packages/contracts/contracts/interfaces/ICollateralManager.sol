@@ -72,4 +72,15 @@ interface ICollateralManager {
      * @param _bidId The id of the bid to claim the collateral for.
      */
     function claimCollateral(uint256 _bidId) external;
+
+    /**
+     * @notice Sends the deposited collateral to a liquidator of a bid.
+     * @notice Can only be called by the protocol.
+     * @param _bidId The id of the liquidated bid.
+     * @param _liquidatorAddress The address of the liquidator to send the collateral to.
+     */
+    function liquidateCollateral(
+        uint256 _bidId,
+        address _liquidatorAddress
+    ) external;
 }

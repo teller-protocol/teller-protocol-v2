@@ -188,24 +188,37 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     }
 
     /**
-     * @notice Withdraws deposited collateral from the created escrow of a bid.
+     * @notice Withdraws deposited collateral from the created escrow of a bid that has been successfully repaid.
      * @param _bidId The id of the bid to withdraw collateral for.
      */
     function withdraw(uint256 _bidId) external {
         if (_isBidCollateralBacked[_bidId]) {
             BidState bidState = tellerV2.getBidState(_bidId);
             require(
-                bidState == BidState.PAID ||
-                bidState == BidState.LIQUIDATED,
-                "Loan has not been repaid or liquidated"
+                bidState == BidState.PAID,
+                "Loan has not been repaid"
             );
-            address receiver;
-            if (bidState == BidState.LIQUIDATED) {
-                receiver = tellerV2.getLoanLender(_bidId);
-            } else {
-                receiver = tellerV2.getLoanBorrower(_bidId);
-            }
-            _withdraw(_bidId, receiver);
+            _withdraw(_bidId, tellerV2.getLoanBorrower(_bidId));
+        }
+    }
+
+    /**
+     * @notice Sends the deposited collateral to a liquidator of a bid.
+     * @notice Can only be called by the protocol.
+     * @param _bidId The id of the liquidated bid.
+     * @param _liquidatorAddress The address of the liquidator to send the collateral to.
+     */
+    function liquidateCollateral(
+        uint256 _bidId,
+        address _liquidatorAddress
+    ) external onlyTellerV2 {
+        if (_isBidCollateralBacked[_bidId]) {
+            BidState bidState = tellerV2.getBidState(_bidId);
+            require(
+                bidState == BidState.LIQUIDATED,
+                "Loan has not been liquidated"
+            );
+            _withdraw(_bidId, _liquidatorAddress);
         }
     }
 

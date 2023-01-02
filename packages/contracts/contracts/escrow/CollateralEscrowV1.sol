@@ -167,7 +167,7 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
         // Withdraw ERC721
         else if (_collateral._collateralType == CollateralType.ERC721) {
             require(_amount == 1, "Incorrect withdrawal amount");
-            IERC721Upgradeable(_collateralAddress).safeTransferFrom(
+            IERC721Upgradeable(_collateralAddress).transferFrom(
                 address(this),
                 _recipient,
                 _collateral._tokenId

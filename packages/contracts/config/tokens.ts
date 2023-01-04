@@ -30,9 +30,55 @@ const polygonTokens: NetworkTokens = {
   },
 }
 
+const mainnetTokens: NetworkTokens = {
+  compound: {
+    CDAI: '0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643',
+    CUSDC: '0x39aa39c021dfbae8fac545936693ac917d5e7563',
+    CETH: '0x4ddc2d193948926d02f9b1fe9e1daa0718270ed5',
+    CUSDT: '0xf650c3d88d12db855b8bf7d11be6c55a4e07dcc9',
+    CWBTC: '0xccf4429db6322d5c611ee964527d42e5d685dd6a', // cWBTC2
+    CLINK: '0xface851a4921ce59e912d19329929ce6da6eb0c7',
+  },
+  aave: {
+    ADAI: '0x028171bCA77440897B824Ca71D1c56caC55b68A3', // aDAI
+    AUSDC: '0xBcca60bB61934080951369a648Fb03DF4F96263C', // aUSDC
+    AUSDT: '0x3Ed3B47Dd13EC9a98b44e6204A523E766B225811', // aUSDT
+    AWETH: '0x030bA81f1c18d280636F32af80b9AAd02Cf0854e', // aWETH
+    AWBTC: '0x9ff58f4fFB29fA2266Ab25e75e2A8b3503311656', // aWBTC
+    ALINK: '0x5c2ed810328349100A66B82b78a1791B101C9D61', // aLINK
+  },
+  poolTogether: {
+    PTDAI: '0x334cbb5858417aee161b53ee0d5349ccf54514cf',
+    PTDAIS: '0x0A2E7f69fe9588fa7fBa5F5864236883Cd4AaC6d',
+    PTUSDC: '0xD81b1A8B1AD00Baa2D6609E0BAE28A38713872f7',
+  },
+  yearn: {
+    YDAI: '0x19D3364A399d251E894aC732651be8B0E4e85001', // v2 - DAI yVault
+    YUSDT: '0x7Da96a3891Add058AdA2E826306D812C638D87a7',
+  },
+  erc20: {
+    // Compound
+    COMP: '0xc00e94cb662c3520282e6f5717214004a7f26888',
+    // Aave
+    AAVE: '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9',
+    // Pool Together
+    // Yearn
+    // ERC20
+    WETH: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+    DAI: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
+    USDC: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+    USDT: '0xdac17f958d2ee523a2206206994597c13d831ec7',
+    LINK: '0x514910771AF9Ca656af840dff83E8264EcF986CA',
+    WBTC: '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
+    SNX: '0xc011a73ee8576fb46f5e1c5751ca3b9fe0af2a6f',
+    MKR: '0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2',
+    YFI: '0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e',
+  },
+}
+
 export const tokens: Record<string, NetworkTokens> = {
   goerli: {
-    //https://github.com/compound-finance/compound-config/blob/master/networks/goerli.json
+    // https://github.com/compound-finance/compound-config/blob/master/networks/goerli.json
     compound: {
       CDAI: '0x822397d9a55d0fefd20F5c4bCaB33C5F65bd28Eb',
       CUSDC: '0xCEC4a43eBB02f9B80916F1c718338169d6d5C1F0',
@@ -74,49 +120,6 @@ export const tokens: Record<string, NetworkTokens> = {
       WBTC: '0x0d787a4a1548f673ed375445535a6c7A1EE56180',
     },
   },
-  mainnet: {
-    compound: {
-      CDAI: '0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643',
-      CUSDC: '0x39aa39c021dfbae8fac545936693ac917d5e7563',
-      CETH: '0x4ddc2d193948926d02f9b1fe9e1daa0718270ed5',
-      CUSDT: '0xf650c3d88d12db855b8bf7d11be6c55a4e07dcc9',
-      CWBTC: '0xccf4429db6322d5c611ee964527d42e5d685dd6a', // cWBTC2
-      CLINK: '0xface851a4921ce59e912d19329929ce6da6eb0c7',
-    },
-    aave: {
-      ADAI: '0x028171bCA77440897B824Ca71D1c56caC55b68A3', // aDAI
-      AUSDC: '0xBcca60bB61934080951369a648Fb03DF4F96263C', // aUSDC
-      AUSDT: '0x3Ed3B47Dd13EC9a98b44e6204A523E766B225811', // aUSDT
-      AWETH: '0x030bA81f1c18d280636F32af80b9AAd02Cf0854e', // aWETH
-      AWBTC: '0x9ff58f4fFB29fA2266Ab25e75e2A8b3503311656', // aWBTC
-      ALINK: '0x5c2ed810328349100A66B82b78a1791B101C9D61', // aLINK
-    },
-    poolTogether: {
-      PTDAI: '0x334cbb5858417aee161b53ee0d5349ccf54514cf',
-      PTDAIS: '0x0A2E7f69fe9588fa7fBa5F5864236883Cd4AaC6d',
-      PTUSDC: '0xD81b1A8B1AD00Baa2D6609E0BAE28A38713872f7',
-    },
-    yearn: {
-      YDAI: '0x19D3364A399d251E894aC732651be8B0E4e85001', // v2 - DAI yVault
-      YUSDT: '0x7Da96a3891Add058AdA2E826306D812C638D87a7',
-    },
-    erc20: {
-      // Compound
-      COMP: '0xc00e94cb662c3520282e6f5717214004a7f26888',
-      // Aave
-      AAVE: '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9',
-      // Pool Together
-      // Yearn
-      // ERC20
-      WETH: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
-      DAI: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
-      USDC: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
-      USDT: '0xdac17f958d2ee523a2206206994597c13d831ec7',
-      LINK: '0x514910771AF9Ca656af840dff83E8264EcF986CA',
-      WBTC: '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
-      SNX: '0xc011a73ee8576fb46f5e1c5751ca3b9fe0af2a6f',
-      MKR: '0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2',
-      YFI: '0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e',
-    },
-  },
+  mainnet: mainnetTokens,
+  tenderly: mainnetTokens,
 }

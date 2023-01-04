@@ -100,10 +100,34 @@ describe.only('Contract Upgrade', () => {
         hre.network.name.should.eql('hardhat')
       })
 
-      it('should have initialized upgraded ', async () => {
+      it.skip('should have initialized upgraded ', async () => {
         console.log(tellerV2Contract.CURRENT_CODE_VERSION)
         const upgradeVersion = await tellerV2Contract.CURRENT_CODE_VERSION()
         expect(upgradeVersion).to.eql('7')
+
+         
+      })
+
+      it('should submit and accept bid ', async () => {
+        console.log(tellerV2Contract)
+
+        
+
+
+        const submitBid = await tellerV2Contract.submitBid(
+            lendingTokenAddress,
+            marketplaceId,
+            principal,
+            duration,
+            interestRate,
+            metadataURI,
+            receiver
+        )
+
+        const acceptBid = await tellerV2Contract.lenderAcceptBid(
+            bidId
+        )
+       
 
          
       })

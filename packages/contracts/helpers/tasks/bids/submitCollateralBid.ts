@@ -39,6 +39,7 @@ export const submitCollateralBid = async (
     ]
   )
 
+  // Approve collateral manager to be able to pull in committed collateral
   await weth.approve(collateralManager.address, toBN(1, 16))
 
   log(`Submitted collateral bid for ${borrowerAddress}`, { indent: 4 })

@@ -11,7 +11,6 @@ export const acceptCollateralBid = async (
   hre: HardhatRuntimeEnvironment
 ): Promise<void> => {
   const { contracts, log, tokens, toBN } = hre
-
   const { bidId } = args
 
   // Load contracts

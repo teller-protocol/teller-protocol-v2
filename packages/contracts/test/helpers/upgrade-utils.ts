@@ -5,6 +5,7 @@ import { DeployFunction } from 'hardhat-deploy/dist/types'
  
 import { deploy } from 'helpers/deploy-helpers'
 import { isInitialized } from 'helpers/oz-contract-helpers'
+import { impersonate } from './impersonate'
 import {
   upgradeProxyAdminWithImplementation,
   upgradeProxyWithImplementation,
@@ -37,10 +38,12 @@ const contractConfig: any = {
 const config = FORKING_NETWORK ? contractConfig[FORKING_NETWORK] : {}
 
 export const upgradeTellerV2Proxy: DeployFunction = async (hre) => {
-  await hre.evm.impersonate(config.deployerAddress)
-  const signer = ethers.provider.getSigner(config.deployerAddress)
+ // await hre.evm.impersonate(config.deployerAddress)
+ 
+ await impersonate( config.deployerAddress, ethers.provider)
+ 
+ const signer = ethers.provider.getSigner(config.deployerAddress)
 
-  
   const protocolFee = 5 // 0.05%
 
   const tokens = await getTokens(hre)

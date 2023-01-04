@@ -117,10 +117,15 @@ export const upgradeTellerV2Proxy: DeployFunction = async (hre) => {
             collateralManager.address   
           ],
         },
-        onUpgrade: {
+        onUpgrade: undefined 
+        
+        //call onUpgrade method ?
+        /*
+        {
           methodName: 'onUpgrade',
           args: [],
-        },
+        }
+        */
       },
     },
   })

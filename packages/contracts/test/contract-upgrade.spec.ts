@@ -18,7 +18,12 @@ import { DeployFunction } from 'hardhat-deploy/dist/types'
 import { deploy } from 'helpers/deploy-helpers'
 import { upgradeTellerV2Proxy } from './helpers/upgrade-utils'
  
+/*
 
+FORKING_NETWORK=mainnet yarn contracts test 
+
+
+*/
  
 const TellerV2Interface =
   require('../generated/artifacts/contracts/TellerV2.sol/TellerV2.json').abi
@@ -96,6 +101,7 @@ describe.only('Contract Upgrade', () => {
       })
 
       it('should have initialized upgraded ', async () => {
+        console.log(tellerV2Contract.CURRENT_CODE_VERSION)
         const upgradeVersion = await tellerV2Contract.CURRENT_CODE_VERSION()
         expect(upgradeVersion).to.eql('7')
 

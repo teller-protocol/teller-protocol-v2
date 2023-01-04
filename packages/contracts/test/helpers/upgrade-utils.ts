@@ -37,9 +37,11 @@ const contractConfig: any = {
 
 const config = FORKING_NETWORK ? contractConfig[FORKING_NETWORK] : {}
 
+
 export const upgradeTellerV2Proxy: DeployFunction = async (hre) => {
  // await hre.evm.impersonate(config.deployerAddress)
  
+ console.log({FORKING_NETWORK})
  await impersonate( config.deployerAddress, ethers.provider)
  
  const signer = ethers.provider.getSigner(config.deployerAddress)
@@ -72,6 +74,7 @@ export const upgradeTellerV2Proxy: DeployFunction = async (hre) => {
     const collateralEscrowV1 = await hre.ethers.getContractFactory(
       'CollateralEscrowV1'
     )
+
     // Deploy escrow beacon implementation
     const collateralEscrowBeacon = await upgrades.deployBeacon(collateralEscrowV1)
     await collateralEscrowBeacon.deployed()
@@ -84,6 +87,7 @@ export const upgradeTellerV2Proxy: DeployFunction = async (hre) => {
       },
       hre,
     })
+
     const collateralManagerIsInitialized = await isInitialized(
       collateralManager.address
     )
@@ -132,4 +136,6 @@ export const upgradeTellerV2Proxy: DeployFunction = async (hre) => {
       },
     },
   })
+
+  return upgrade
 }

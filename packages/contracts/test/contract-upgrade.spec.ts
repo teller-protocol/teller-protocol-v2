@@ -73,7 +73,7 @@ describe.only('Contract Upgrade', () => {
 
   before(async () => {
     if (forkingNetworkIsValid) {
-      signer = await getNamedSigner('deployer')
+      signer = ethers.provider.getSigner(config.deployerAddress)//await getNamedSigner('deployer')
       borrower = await getNamedSigner('borrower')
 
      // await hre.evm.impersonate(config.marketOwnerAddress)
@@ -86,7 +86,9 @@ describe.only('Contract Upgrade', () => {
         signer
       )
 
-      await upgradeTellerV2Proxy(hre)
+      let upgrade = await upgradeTellerV2Proxy(hre)
+
+      console.log({upgrade})
 
      /* const upgradeVersion = await tellerV2Contract.CURRENT_CODE_VERSION()
 
@@ -112,7 +114,21 @@ describe.only('Contract Upgrade', () => {
          
       })
 
+      it('should have bytecode for the contract', async () => {
+
+        let deployedContractBytecode = await ethers.provider.getCode(config.tellerV2Address)
+        console.log({deployedContractBytecode})
+
+        expect(deployedContractBytecode).to.not.eql('0x')
+      })
+
       it('should submit and accept bid ', async () => {
+
+
+     
+
+        const tellerContract = new Contract(config.tellerV2Address, TellerV2Interface, ethers.provider)
+
         const borrowerAddress = await borrower.getAddress()
 
         const submittedBid = await tellerV2Contract
@@ -137,12 +153,15 @@ describe.only('Contract Upgrade', () => {
             ]
           )
 
-        const bidId = await tellerV2Contract.bidId()
+        console.log({tellerContract})
+        console.log('test 1')
+        const bidId = await tellerContract.bidId.call()
 
+        console.log('test 2')
         const acceptBid = await tellerV2Contract
-          .connect(signer)
-          .lenderAcceptBid(bidId)
-      })
+            .connect(signer)
+            .lenderAcceptBid(bidId)
+        })
 
       /* it.skip('should migrate ERC721 NFT  ', async () => {
         const { tokenAddress, tokenId, tokenType, tokenAmount } = {

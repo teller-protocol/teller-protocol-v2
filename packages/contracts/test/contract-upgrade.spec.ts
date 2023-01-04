@@ -13,7 +13,7 @@ deploy the implementation for new BNPL and use proxy to update
 import chai, { expect } from 'chai'
 import chaiAsPromised from 'chai-as-promised' 
 import { BigNumber, Contract, ContractFactory, Signer, Wallet } from 'ethers'
-import hre, { ethers, getNamedSigner, network } from 'hardhat'
+import hre, {ethers, getNamedSigner, network, toBN} from 'hardhat'
 import { DeployFunction } from 'hardhat-deploy/dist/types'
 import { deploy } from 'helpers/deploy-helpers'
 import { upgradeTellerV2Proxy } from './helpers/upgrade-utils'
@@ -47,6 +47,7 @@ const contractConfig: any = {
     tellerV2Address: '0x00182FdB0B880eE24D428e3Cc39383717677C37e',
     marketRegistry: '0x5e30357d5136bc4bfadba1ab341d0da09fe7a9f1',
     wethAddress: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+    usdcAddress: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
   },
  
   goerli: {   
@@ -55,6 +56,7 @@ const contractConfig: any = {
     tellerV2Address: '0x1D0eBC060f2897dAc14E482De600cea7896c0A3E',
     marketRegistry: '0x1815f01083afd110373e952b6488f33b048f096b',
     wethAddress: '0xffc94fb06b924e6dba5f0325bbed941807a018cd',
+    usdcAddress: '0xD87Ba7A50B2E7E660f678A895E4B72E7CB4CCd9C',
   },
 }
 
@@ -62,6 +64,7 @@ const config = FORKING_NETWORK ? contractConfig[FORKING_NETWORK] : {}
 
 describe.only('Contract Upgrade', () => {
   let signer: Signer
+  let borrower: Signer
 
  // let marketOwner: Signer
 
@@ -71,6 +74,7 @@ describe.only('Contract Upgrade', () => {
   before(async () => {
     if (forkingNetworkIsValid) {
       signer = await getNamedSigner('deployer')
+      borrower = await getNamedSigner('borrower')
 
      // await hre.evm.impersonate(config.marketOwnerAddress)
      // marketOwner = ethers.provider.getSigner(config.marketOwnerAddress)
@@ -109,30 +113,38 @@ describe.only('Contract Upgrade', () => {
       })
 
       it('should submit and accept bid ', async () => {
-        console.log(tellerV2Contract)
+        const borrowerAddress = await borrower.getAddress()
 
-        
+        const submittedBid = await tellerV2Contract
+          .connect(borrower)
+          [
+            'submitBid(address,uint256,uint256,uint32,uint16,string,address,(uint8,uint256,uint256,address)[])'
+          ](
+            config.wethAddress, //lendingTokenAddress,
+            1, //marketplaceId,
+            toBN(1, 16), // 0.01 principal,
+            '31557600', //duration,
+            '5000', //interestRate,
+            '', //metadataURI,
+            borrowerAddress, //receiver
+            [
+              {
+                _collateralType: 0, // ERC20
+                _amount: toBN(100, 6), // 0.01
+                _tokenId: 0,
+                _collateralAddress: config.usdcAddress, // USDC
+              },
+            ]
+          )
 
+        const bidId = await tellerV2Contract.bidId()
 
-        const submitBid = await tellerV2Contract.submitBid(
-            lendingTokenAddress,
-            marketplaceId,
-            principal,
-            duration,
-            interestRate,
-            metadataURI,
-            receiver
-        )
-
-        const acceptBid = await tellerV2Contract.lenderAcceptBid(
-            bidId
-        )
-       
-
-         
+        const acceptBid = await tellerV2Contract
+          .connect(signer)
+          .lenderAcceptBid(bidId)
       })
 
-     /* it.skip('should migrate ERC721 NFT  ', async () => {
+      /* it.skip('should migrate ERC721 NFT  ', async () => {
         const { tokenAddress, tokenId, tokenType, tokenAmount } = {
           tokenAddress: '0x305305c40d3de1c32f4c3d356abc72bcc6dcf9dc',
           tokenId: '12',

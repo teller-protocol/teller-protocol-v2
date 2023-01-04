@@ -19,8 +19,7 @@ import { deploy } from 'helpers/deploy-helpers'
 import { upgradeTellerV2Proxy } from './helpers/upgrade-utils'
  
 
-
-const ERC721Interface = require('../contracts/abi/ERC721.json')
+ 
 const TellerV2Interface =
   require('../generated/artifacts/contracts/TellerV2.sol/TellerV2.json').abi
 
@@ -56,7 +55,7 @@ const contractConfig: any = {
 
 const config = FORKING_NETWORK ? contractConfig[FORKING_NETWORK] : {}
 
-describe('Contract Upgrade', () => {
+describe.only('Contract Upgrade', () => {
   let signer: Signer
 
  // let marketOwner: Signer

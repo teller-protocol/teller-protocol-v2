@@ -6,8 +6,8 @@ import hre, { ethers, getNamedSigner } from 'hardhat'
 import { DeployFunction } from 'hardhat-deploy/dist/types'
 import { deploy } from 'helpers/deploy-helpers'
 
-const OpenZeppelinTransparentProxy = require('../contracts/abi/OpenZeppelinTransparentProxy.abi.json')
-const OpenZeppelinTransparentProxyAdmin = require('../contracts/abi/OpenZeppelinTransparentProxyAdmin.abi.json')
+const OpenZeppelinTransparentProxy = require('../../abi/OpenZeppelinTransparentProxy.abi.json')
+const OpenZeppelinTransparentProxyAdmin = require('../../abi/OpenZeppelinTransparentProxyAdmin.abi.json')
 
 export interface ProxyUpgradeInputs {
   contract: string

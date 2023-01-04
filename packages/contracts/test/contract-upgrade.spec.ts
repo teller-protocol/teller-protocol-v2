@@ -5,7 +5,8 @@ Deploy escrow buyers
 deploy the implementation for new BNPL and use proxy to update 
 
 
- FORKING_NETWORK=goerli yarn contracts test  --only-ts
+HARDHAT_DEPLOY_FORK=mainnet yarn contracts test 
+
 
 
 */
@@ -20,8 +21,6 @@ import { upgradeTellerV2Proxy } from './helpers/upgrade-utils'
  
 /*
 
-FORKING_NETWORK=mainnet yarn contracts test 
-
 
 */
  
@@ -35,10 +34,10 @@ const LATEST_CODE_VERSION = '7'
 
 const validForkingNetworkNames = ['mainnet', 'goerli']
 
-const FORKING_NETWORK = process.env.FORKING_NETWORK
+const HARDHAT_DEPLOY_FORK = process.env.HARDHAT_DEPLOY_FORK
 
 const forkingNetworkIsValid =
-  FORKING_NETWORK && validForkingNetworkNames.includes(FORKING_NETWORK)
+HARDHAT_DEPLOY_FORK && validForkingNetworkNames.includes(HARDHAT_DEPLOY_FORK)
 
 const contractConfig: any = {
   mainnet: {
@@ -60,7 +59,7 @@ const contractConfig: any = {
   },
 }
 
-const config = FORKING_NETWORK ? contractConfig[FORKING_NETWORK] : {}
+const config = HARDHAT_DEPLOY_FORK ? contractConfig[HARDHAT_DEPLOY_FORK] : {}
 
 describe.only('Contract Upgrade', () => {
   let signer: Signer
@@ -72,6 +71,12 @@ describe.only('Contract Upgrade', () => {
  
 
   before(async () => {
+
+
+    let deployedContractBytecodeBefore = await ethers.provider.getCode(config.tellerV2Address)
+
+    console.log({deployedContractBytecodeBefore})
+
     if (forkingNetworkIsValid) {
       signer = ethers.provider.getSigner(config.deployerAddress)//await getNamedSigner('deployer')
       borrower = await getNamedSigner('borrower')

@@ -139,7 +139,7 @@
     },
     "fcb4d153d06c55643b3a387b46762ba1b5b60e0fc9bb709eb0bb8b2a01db61c4": {
       "address": "0x8b0b2A4c1f4d0f9B60C0815A31B3830E0C9E06a2",
-      "txHash": "0x06b7c4f3ef54053833e763fa575bdb6f0acced39f4672cce8cb3039a3da795ba",
+      "txHash": "0x47bb76a1272e7d53243fccb14b17167df17982e2b350d6f1677a7ea70162010d",
       "layout": {
         "solcVersion": "0.8.9",
         "storage": [
@@ -196,7 +196,7 @@
             "label": "collateralBalances",
             "offset": 0,
             "slot": "102",
-            "type": "t_mapping(t_address,t_struct(Collateral)18466_storage)",
+            "type": "t_mapping(t_address,t_struct(Collateral)18126_storage)",
             "contract": "CollateralEscrowV1",
             "src": "contracts/escrow/CollateralEscrowV1.sol:20"
           }
@@ -218,7 +218,7 @@
             "label": "bool",
             "numberOfBytes": "1"
           },
-          "t_enum(CollateralType)18456": {
+          "t_enum(CollateralType)18116": {
             "label": "enum CollateralType",
             "members": [
               "ERC20",
@@ -227,16 +227,16 @@
             ],
             "numberOfBytes": "1"
           },
-          "t_mapping(t_address,t_struct(Collateral)18466_storage)": {
+          "t_mapping(t_address,t_struct(Collateral)18126_storage)": {
             "label": "mapping(address => struct Collateral)",
             "numberOfBytes": "32"
           },
-          "t_struct(Collateral)18466_storage": {
+          "t_struct(Collateral)18126_storage": {
             "label": "struct Collateral",
             "members": [
               {
                 "label": "_collateralType",
-                "type": "t_enum(CollateralType)18456",
+                "type": "t_enum(CollateralType)18116",
                 "offset": 0,
                 "slot": "0"
               },

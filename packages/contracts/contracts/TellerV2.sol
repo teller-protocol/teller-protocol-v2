@@ -190,6 +190,8 @@ contract TellerV2 is
         }
     }
 
+    function onUpgrade() public {}
+
     function setCollateralManager(address _collateralManager)
         public
         reinitializer(CURRENT_CODE_VERSION)

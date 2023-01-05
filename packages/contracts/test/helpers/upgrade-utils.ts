@@ -71,9 +71,7 @@ export const upgradeTellerV2Proxy: DeployFunction = async (hre) => {
   }, config.deployerAddress)*/
 
   let trustedForwarderAddress = "0x1E05c45A674b332e2c7C56e8D945aACF3C825c41"
-    
-  console.log('deployed meta forwarder')
- 
+     
   
     const collateralEscrowV1 = await hre.ethers.getContractFactory(
       'CollateralEscrowV1'
@@ -128,15 +126,10 @@ export const upgradeTellerV2Proxy: DeployFunction = async (hre) => {
             collateralManager.address   
           ],
         },
-        onUpgrade: undefined 
-        
-        //call onUpgrade method ?
-        /*
-        {
+        onUpgrade: {
           methodName: 'onUpgrade',
           args: [],
         }
-        */
       },
     },
   })

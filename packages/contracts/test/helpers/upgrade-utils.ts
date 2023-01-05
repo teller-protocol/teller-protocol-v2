@@ -54,6 +54,7 @@ export const upgradeTellerV2Proxy: DeployFunction = async (hre) => {
     lendingTokens.push(tokens.all.USDCT)
   }
 
+/*
   const trustedForwarder = await deploy({
     contract: 'MetaForwarder',
     skipIfAlreadyDeployed: false, 
@@ -67,8 +68,11 @@ export const upgradeTellerV2Proxy: DeployFunction = async (hre) => {
       },
     },
     hre,
-  }, config.deployerAddress)
+  }, config.deployerAddress)*/
+
+  let trustedForwarderAddress = "0x1E05c45A674b332e2c7C56e8D945aACF3C825c41"
     
+  console.log('deployed meta forwarder')
  
   
     const collateralEscrowV1 = await hre.ethers.getContractFactory(
@@ -86,7 +90,7 @@ export const upgradeTellerV2Proxy: DeployFunction = async (hre) => {
         proxyContract: 'OpenZeppelinTransparentProxy',
       },
       hre,
-    })
+    }, config.deployerAddress)
 
     const collateralManagerIsInitialized = await isInitialized(
       collateralManager.address
@@ -108,7 +112,7 @@ export const upgradeTellerV2Proxy: DeployFunction = async (hre) => {
     proxyAdminAddress: config.proxyAdminAddress,
     signer,
     args: [    
-      trustedForwarder.address, 
+      trustedForwarderAddress, 
     ],
     proxy: {
       proxyContract: 'OpenZeppelinTransparentProxy',

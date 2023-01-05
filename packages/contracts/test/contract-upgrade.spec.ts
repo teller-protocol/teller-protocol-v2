@@ -49,7 +49,7 @@ const contractConfig: any = {
     usdcAddress: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
   },
  
-  goerli: {   
+  goerli: {
     deployerAddress: '0x04cd8462cffe5eddfb923fce634e13bfbdc83886',
     proxyAdminAddress: '0xD27FD721635de713dA155260F4Ca69b717B76Ef9',
     tellerV2Address: '0x1D0eBC060f2897dAc14E482De600cea7896c0A3E',

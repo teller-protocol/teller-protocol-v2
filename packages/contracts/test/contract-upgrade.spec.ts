@@ -5,7 +5,7 @@ Deploy escrow buyers
 deploy the implementation for new BNPL and use proxy to update 
 
 
-HARDHAT_DEPLOY_FORK=mainnet yarn contracts test 
+HARDHAT_DEPLOY_FORK=mainnet yarn contracts test --only-ts
 
 
 
@@ -75,7 +75,7 @@ describe.only('Contract Upgrade', () => {
 
     let deployedContractBytecodeBefore = await ethers.provider.getCode(config.tellerV2Address)
 
-    console.log({deployedContractBytecodeBefore})
+    
 
     if (forkingNetworkIsValid) {
       signer = ethers.provider.getSigner(config.deployerAddress)//await getNamedSigner('deployer')
@@ -122,7 +122,7 @@ describe.only('Contract Upgrade', () => {
       it('should have bytecode for the contract', async () => {
 
         let deployedContractBytecode = await ethers.provider.getCode(config.tellerV2Address)
-        console.log({deployedContractBytecode})
+      
 
         expect(deployedContractBytecode).to.not.eql('0x')
       })

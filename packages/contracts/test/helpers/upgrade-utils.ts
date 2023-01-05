@@ -15,7 +15,7 @@ const FORKING_NETWORK = process.env.FORKING_NETWORK
  
 const contractConfig: any = {
   mainnet: {
-    deployerAddress: '0xafe87013dc96ede1e116a288d80fcaa0effe5fe5',
+    deployerAddress: '0xAFe87013dc96edE1E116a288D80FcaA0eFFE5fe5',
     proxyAdminAddress: '0xcCfFa4e4cBE27D92f926E7B2e396a772Ddf0F2B2',
     tellerV2Address: '0x00182FdB0B880eE24D428e3Cc39383717677C37e',
     marketRegistryAddress: '0x5e30357d5136bc4bfadba1ab341d0da09fe7a9f1',
@@ -41,7 +41,7 @@ const config = FORKING_NETWORK ? contractConfig[FORKING_NETWORK] : {}
 export const upgradeTellerV2Proxy: DeployFunction = async (hre) => {
  // await hre.evm.impersonate(config.deployerAddress)
  
- console.log({FORKING_NETWORK})
+ 
  await impersonate( config.deployerAddress, ethers.provider)
  
  const signer = ethers.provider.getSigner(config.deployerAddress)

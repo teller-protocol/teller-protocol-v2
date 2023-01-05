@@ -24,7 +24,8 @@ export type DeployedContract<C extends Contract> = C & {
 }
 
 export const deploy = async <C extends Contract>(
-  args: DeployArgs
+  args: DeployArgs,
+  deployerArg?: string
 ): Promise<DeployedContract<C>> => {
   const { hre, skipIfAlreadyDeployed = true, indent = 1 } = args
   const {
@@ -33,6 +34,11 @@ export const deploy = async <C extends Contract>(
   } = hre
 
   const { deployer } = await getNamedAccounts()
+  const deployerAddress = deployerArg ? deployerArg : deployer
+
+
+  console.log({deployerArg})
+  console.log({deployerAddress})
 
   // If marked as mock, prepend "Mock" to the contract name
   const contractName = `${args.contract}${args.mock ? 'Mock' : ''}`
@@ -46,7 +52,7 @@ export const deploy = async <C extends Contract>(
     result = await deploy(contractDeployName, {
       ...args,
       contract: contractName,
-      from: deployer,
+      from: deployerAddress,
     })
     contractAddress = result.address
   } else {

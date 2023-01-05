@@ -11,7 +11,7 @@ import {
   upgradeProxyWithImplementation,
 } from './proxy-upgrade-utils'
 
-const FORKING_NETWORK = process.env.FORKING_NETWORK
+const HARDHAT_DEPLOY_FORK = process.env.HARDHAT_DEPLOY_FORK
  
 const contractConfig: any = {
   mainnet: {
@@ -35,7 +35,7 @@ const contractConfig: any = {
   },
 }
 
-const config = FORKING_NETWORK ? contractConfig[FORKING_NETWORK] : {}
+const config = HARDHAT_DEPLOY_FORK ? contractConfig[HARDHAT_DEPLOY_FORK] : {}
 
 
 export const upgradeTellerV2Proxy: DeployFunction = async (hre) => {
@@ -56,7 +56,7 @@ export const upgradeTellerV2Proxy: DeployFunction = async (hre) => {
 
   const trustedForwarder = await deploy({
     contract: 'MetaForwarder',
-    skipIfAlreadyDeployed: false,
+    skipIfAlreadyDeployed: false, 
     proxy: {
       proxyContract: 'OpenZeppelinTransparentProxy',
       execute: {
@@ -67,7 +67,7 @@ export const upgradeTellerV2Proxy: DeployFunction = async (hre) => {
       },
     },
     hre,
-  })
+  }, config.deployerAddress)
     
  
   

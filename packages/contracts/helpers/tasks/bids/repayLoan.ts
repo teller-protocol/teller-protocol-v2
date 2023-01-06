@@ -21,7 +21,7 @@ export const repayLoan = async (
   const amountDue = await tellerV2['calculateAmountOwed(uint256)'](bidId)
   log(`${amountDue}`)
   // Approve funds to be repaid
-  await usdc.approve(tellerV2.address, toBN(101, 6))
+  await usdc.approve(tellerV2.address, toBN(110, 6))
 
   // Repay loan
   await tellerV2.repayLoanFull(bidId)

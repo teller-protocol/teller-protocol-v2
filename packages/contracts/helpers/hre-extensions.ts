@@ -149,7 +149,7 @@ interface ContractsGetConfig {
  *  directly
  */
 const updateTenderlyConfig = (hre: HardhatRuntimeEnvironment): void => {
-  hre.config.tenderly.project = 'V2'
+  hre.config.tenderly.project = 'v2'
 }
 
 extendEnvironment((hre) => {

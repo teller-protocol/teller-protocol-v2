@@ -2,48 +2,90 @@ import { task } from 'hardhat/config'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
 import { CollateralManager, TellerV2 } from 'types/typechain'
 
+interface SubmitCollateralBidArgs {
+  marketPlaceId: number
+  lendingTokenName: string
+  amountToBorrow: number
+  durationInSeconds: number
+  apr: number
+  metadataURI: string
+  collateralTokenName: string
+  collateralAmount: number
+}
+
 export const submitCollateralBid = async (
-  _args: any,
+  args: SubmitCollateralBidArgs,
   hre: HardhatRuntimeEnvironment
 ): Promise<void> => {
   const { contracts, toBN, log, tokens } = hre
-
-  const borrowerAddress = '0x5295b246F00F077c35735ACf9bBA35A6A6C13c62'
+  const {
+    marketPlaceId,
+    lendingTokenName,
+    amountToBorrow,
+    durationInSeconds,
+    apr,
+    metadataURI,
+    collateralTokenName,
+    collateralAmount,
+  } = args
 
   // Load contracts
-  const weth = await tokens.get('WETH')
-  const usdc = await tokens.get('USDC')
+  const collateralToken = await tokens.get(collateralTokenName)
+  const lendingToken = await tokens.get(lendingTokenName)
   const tellerV2 = await contracts.get<TellerV2>('TellerV2')
   const collateralManager = await contracts.get<CollateralManager>(
     'CollateralManager'
+  )
+
+  const borrowerAddress = await hre.ethers.provider.getSigner().getAddress()
+  const collateralAmountBN = toBN(
+    collateralAmount,
+    await collateralToken.decimals()
   )
 
   // Submit bid
   const bidId = await tellerV2[
     'submitBid(address,uint256,uint256,uint32,uint16,string,address,(uint8,uint256,uint256,address)[])'
   ](
-    usdc.address, // USDC
-    1,
-    '100000000',
-    '31557600',
-    '5000',
-    '',
+    lendingToken.address, // Lending token
+    marketPlaceId, // Marketplace Id
+    toBN(amountToBorrow, await lendingToken.decimals()), // Principal
+    durationInSeconds.toString(), // Duration
+    apr.toString(), // APR
+    metadataURI, // MetadataURI
     borrowerAddress, // Receiver
     [
       {
         _collateralType: 0, // ERC20
-        _amount: toBN(1, 16), // 0.01
+        _amount: collateralAmountBN,
         _tokenId: 0,
-        _collateralAddress: weth.address, // WETH
+        _collateralAddress: collateralToken.address,
       },
     ]
   )
 
   // Approve collateral manager to be able to pull in committed collateral
-  await weth.approve(collateralManager.address, toBN(1, 16))
+  await collateralToken.approve(collateralManager.address, collateralAmountBN)
 
   log(`Submitted collateral bid for ${borrowerAddress}`, { indent: 4 })
 }
 
 task('submit-collateral-bid', 'submits a collateral backed bid')
-    .setAction(submitCollateralBid)
+  .addParam('marketPlaceId', 'The id of the marketplace to submit the bid to')
+  .addParam('lendingTokenName', 'The name of the ERC20 token to borrow')
+  .addParam('amountToBorrow', 'The amount to borrow')
+  .addParam('durationInSeconds', 'The length of time to take out the loan for')
+  .addParam('apr', 'The proposed apr for the loan')
+  .addParam(
+    'metadataURI',
+    'The URI of the associated metadata required for the loan'
+  )
+  .addParam(
+    'collateralTokenName',
+    'The name of the ERC20 token to use as collateral'
+  )
+  .addParam(
+    'collateralAmount',
+    'The amount of the collateral token to use as collateral for the loan'
+  )
+  .setAction(submitCollateralBid)

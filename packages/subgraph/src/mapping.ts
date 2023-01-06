@@ -1,4 +1,4 @@
-import {Address, BigInt, ethereum} from '@graphprotocol/graph-ts'
+import {Address, BigInt } from '@graphprotocol/graph-ts'
 
 import {
   DeletedCommitment,
@@ -35,11 +35,7 @@ import {
   LoanRepayment,
   SubmittedBid,
   TellerV2,
-  TellerV2__bidsResult,
-  TellerV2__bidsResultLoanDetailsStruct,
-  TellerV2__bidsResultLoanDetailsTotalRepaidStruct, TellerV2__bidsResultTermsStruct,
 } from '../generated/TellerV2/TellerV2'
-import {TellerV0Storage, TellerV0Storage__bidsResult} from '../generated/TellerV2/TellerV0Storage'
 
 import {
   getBid,

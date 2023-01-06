@@ -18,7 +18,6 @@ import {
   loadProtocolTokenVolume,
   loadTokenVolumeByMarketId
 } from './loaders'
-import {TellerV0Storage} from "../../generated/TellerV2/TellerV0Storage";
 
 export function updateTokenVolumeOnPayment(
   lastPayment: BigInt,

@@ -82,6 +82,7 @@ const deployFn: DeployFunction = async (hre) => {
   const collateralManager = await deploy({
     contract: 'CollateralManager',
     args: [],
+    skipIfAlreadyDeployed: false,
     proxy: {
       proxyContract: 'OpenZeppelinTransparentProxy',
     },

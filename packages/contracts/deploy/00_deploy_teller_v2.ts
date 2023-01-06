@@ -49,7 +49,7 @@ const deployFn: DeployFunction = async (hre) => {
     proxy: {
       proxyContract: 'OpenZeppelinTransparentProxy',
     },
-    skipIfAlreadyDeployed: true,
+    skipIfAlreadyDeployed: false,
     hre,
   })
 
@@ -82,6 +82,7 @@ const deployFn: DeployFunction = async (hre) => {
   const collateralManager = await deploy({
     contract: 'CollateralManager',
     args: [],
+    skipIfAlreadyDeployed: false,
     proxy: {
       proxyContract: 'OpenZeppelinTransparentProxy',
     },
@@ -113,5 +114,5 @@ const deployFn: DeployFunction = async (hre) => {
 
 // tags and deployment
 deployFn.tags = ['teller-v2']
-deployFn.dependencies = ['market-registry', 'collateral-manager']
+deployFn.dependencies = ['market-registry']
 export default deployFn

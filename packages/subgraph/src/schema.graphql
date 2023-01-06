@@ -63,6 +63,7 @@ type Bid @entity {
   totalRepaidInterest: BigInt!
   _lastTotalRepaidAmount: BigInt!
   _lastTotalRepaidInterestAmount: BigInt!
+  paymentDefaultDuration: BigInt!
 }
 
 type User @entity {
@@ -140,6 +141,7 @@ type TokenVolume @entity {
   activeLoans: BigInt!
   closedLoans: BigInt!
   commissionEarned: BigInt!
+  totalRepaidInterest: BigInt!
 }
 
 type MarketVolume @entity {

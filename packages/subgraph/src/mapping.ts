@@ -122,6 +122,15 @@ export function handleSubmittedBid(event: SubmittedBid): void {
     bid.expiresAt = BigInt.zero()
   }
 
+  const marketPlace = loadMarketById(storedBid.value3.toString());
+
+  const paymentDefaultDuration = marketPlace.paymentDefaultDuration;
+  if(paymentDefaultDuration) {
+    bid.paymentDefaultDuration = paymentDefaultDuration;
+  } else {
+    bid.paymentDefaultDuration = BigInt.zero();
+  }
+
   bid.save();
   market.save();
 }

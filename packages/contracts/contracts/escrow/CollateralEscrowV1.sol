@@ -130,7 +130,7 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
         // Deposit ERC721
         else if (_collateralType == CollateralType.ERC721) {
             require(_amount == 1, "Incorrect deposit amount");
-            IERC721Upgradeable(_collateralAddress).safeTransferFrom(
+            IERC721Upgradeable(_collateralAddress).transferFrom(
                 _msgSender(),
                 address(this),
                 _tokenId

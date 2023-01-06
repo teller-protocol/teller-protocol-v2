@@ -1,5 +1,5 @@
-// SPDX-Licence-Identifier: MIT
 pragma solidity >=0.8.0 <0.9.0;
+// SPDX-License-Identifier: MIT
 
 // Contracts
 import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
@@ -302,7 +302,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
             CollateralType.ERC721
         ) {
             IERC721Upgradeable(collateralInfo._collateralAddress)
-                .safeTransferFrom(
+                .transferFrom(
                     borrower,
                     address(this),
                     collateralInfo._tokenId
@@ -454,5 +454,52 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
                     .balanceOf(_borrowerAddress, _collateralInfo._tokenId);
         }
         return false;
+    }
+
+    // On NFT Received handlers
+
+    function onERC721Received(address, address, uint256, bytes calldata)
+    external
+    pure
+    returns (bytes4)
+    {
+        return
+        bytes4(
+            keccak256("onERC721Received(address,address,uint256,bytes)")
+        );
+    }
+
+    function onERC1155Received(
+        address,
+        address,
+        uint256 id,
+        uint256 value,
+        bytes calldata
+    ) external returns (bytes4) {
+        return
+        bytes4(
+            keccak256(
+                "onERC1155Received(address,address,uint256,uint256,bytes)"
+            )
+        );
+    }
+
+    function onERC1155BatchReceived(
+        address,
+        address,
+        uint256[] calldata _ids,
+        uint256[] calldata _values,
+        bytes calldata
+    ) external returns (bytes4) {
+        require(
+            _ids.length == 1,
+            "Only allowed one asset batch transfer per transaction."
+        );
+        return
+        bytes4(
+            keccak256(
+                "onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)"
+            )
+        );
     }
 }

@@ -1,6 +1,6 @@
-import { Address, BigInt } from '@graphprotocol/graph-ts'
+import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts'
 
-import { Bid, Borrower, Commitment, TokenVolume } from '../../generated/schema'
+import {Bid, Borrower, Commitment, Payment, TokenVolume} from '../../generated/schema'
 import {
   TellerV2,
   TellerV2__bidsResult,
@@ -45,11 +45,11 @@ export function updateTokenVolumeOnPayment(
 
 export function updateBid(
   bid: Bid,
-  eventAddress: Address,
+  event: ethereum.Event,
   bidState: string
 ): void {
-  const tellerV2Instance = TellerV2.bind(eventAddress);
-  const storedBid = getBid(eventAddress, bid.bidId);
+  const tellerV2Instance = TellerV2.bind(event.address);
+  const storedBid = getBid(event.address, bid.bidId);
 
   bid.totalRepaidPrincipal = storedBid.value5.totalRepaid.principal;
   bid.totalRepaidInterest = storedBid.value5.totalRepaid.interest;
@@ -90,6 +90,12 @@ export function updateBid(
       _lastInterestPayment,
       bidState
     );
+
+    const payment = new Payment(event.transaction.hash.toHex());
+    payment.bid = bid.id;
+    payment.principal = _lastPayment;
+    payment.interest = _lastInterestPayment;
+    payment.save();
   }
 
   bid.save();

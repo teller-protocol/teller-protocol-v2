@@ -1,3 +1,4 @@
+import { upgrades } from 'hardhat'
 import { DeployFunction } from 'hardhat-deploy/dist/types'
 import { HARDHAT_NETWORK_NAME } from 'hardhat/plugins'
 import { deploy } from 'helpers/deploy-helpers'
@@ -71,21 +72,46 @@ const deployFn: DeployFunction = async (hre) => {
     await reputationManager.initialize(tellerV2Contract.address)
   }
 
+  const collateralEscrowV1 = await hre.ethers.getContractFactory(
+    'CollateralEscrowV1'
+  )
+  // Deploy escrow beacon implementation
+  const collateralEscrowBeacon = await upgrades.deployBeacon(collateralEscrowV1)
+  await collateralEscrowBeacon.deployed()
+
+  const collateralManager = await deploy({
+    contract: 'CollateralManager',
+    args: [],
+    proxy: {
+      proxyContract: 'OpenZeppelinTransparentProxy',
+    },
+    hre,
+  })
+  const collateralManagerIsInitialized = await isInitialized(
+    collateralManager.address
+  )
+  if (!collateralManagerIsInitialized) {
+    await collateralManager.initialize(
+      collateralEscrowBeacon.address,
+      tellerV2Contract.address
+    )
+  }
+
   const tellerV2IsInitialized = await isInitialized(tellerV2Contract.address)
   if (!tellerV2IsInitialized) {
+    const collateralManager = await hre.contracts.get('CollateralManager')
     await tellerV2Contract.initialize(
       protocolFee,
       marketRegistry.address,
       reputationManager.address,
       lenderCommitmentForwarder.address,
-      lendingTokens
+      lendingTokens,
+      collateralManager.address
     )
-  } else if (tellerV2Contract.deployResult.newlyDeployed) {
-    await tellerV2Contract.onUpgrade()
   }
 }
 
 // tags and deployment
 deployFn.tags = ['teller-v2']
-deployFn.dependencies = ['market-registry']
+deployFn.dependencies = ['market-registry', 'collateral-manager']
 export default deployFn

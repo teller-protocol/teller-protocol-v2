@@ -8,6 +8,7 @@ import 'hardhat-gas-reporter'
 import '@nomiclabs/hardhat-ethers'
 import '@typechain/hardhat'
 import 'solidity-coverage'
+import '@openzeppelin/hardhat-upgrades'
 
 import fs from 'fs'
 import path from 'path'

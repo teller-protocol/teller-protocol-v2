@@ -6,7 +6,12 @@ import hre from 'hardhat'
 import { deploy } from 'helpers/deploy-helpers'
 import { getFunds } from 'helpers/get-funds'
 import moment from 'moment'
-import { MarketRegistry, ReputationManager, TellerV2 } from 'types/typechain'
+import {
+  CollateralManager,
+  MarketRegistry,
+  ReputationManager,
+  TellerV2,
+} from 'types/typechain'
 
 import {
   acceptBid,

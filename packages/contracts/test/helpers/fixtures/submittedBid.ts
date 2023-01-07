@@ -88,7 +88,7 @@ const same = async (
   // Execute the transaction
   const txPromise = tellerV2
     .connect(borrower)
-    .submitBid(
+    ['submitBid(address,uint256,uint256,uint32,uint16,string,address)'](
       lendingToken.address,
       marketplaceId,
       amount,

@@ -16,8 +16,8 @@ import "./interfaces/IMarketRegistry.sol";
 import {
     EnumerableSet
 } from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+import { PaymentType } from "./libraries/V2Calculations.sol";
 
-import { V2Calculations } from "./TellerV2.sol";
 
 contract MarketRegistry is
     IMarketRegistry,
@@ -47,7 +47,7 @@ contract MarketRegistry is
         EnumerableSet.AddressSet verifiedBorrowersForMarket;
         mapping(address => bytes32) borrowerAttestationIds;
         address feeRecipient;
-        V2Calculations.PaymentType paymentType;
+        PaymentType paymentType;
     }
 
     bytes32 public lenderAttestationSchemaId;
@@ -98,7 +98,7 @@ contract MarketRegistry is
     event SetMarketBorrowerAttestation(uint256 marketId, bool required);
     event SetMarketPaymentType(
         uint256 marketId,
-        V2Calculations.PaymentType paymentType
+        PaymentType paymentType
     );
 
     /* External Functions */
@@ -147,7 +147,7 @@ contract MarketRegistry is
         uint16 _feePercent,
         bool _requireLenderAttestation,
         bool _requireBorrowerAttestation,
-        V2Calculations.PaymentType _paymentType,
+        PaymentType _paymentType,
         string calldata _uri
     ) external returns (uint256 marketId_) {
         marketId_ = _createMarket(
@@ -193,7 +193,7 @@ contract MarketRegistry is
             _feePercent,
             _requireLenderAttestation,
             _requireBorrowerAttestation,
-            V2Calculations.PaymentType.EMI,
+            PaymentType.EMI,
             _uri
         );
     }
@@ -218,7 +218,7 @@ contract MarketRegistry is
         uint16 _feePercent,
         bool _requireLenderAttestation,
         bool _requireBorrowerAttestation,
-        V2Calculations.PaymentType _paymentType,
+        PaymentType _paymentType,
         string calldata _uri
     ) internal returns (uint256 marketId_) {
         require(_initialOwner != address(0), "Invalid owner address");
@@ -618,7 +618,7 @@ contract MarketRegistry is
      */
     function setMarketPaymentType(
         uint256 _marketId,
-        V2Calculations.PaymentType _newPaymentType
+        PaymentType _newPaymentType
     ) public ownsMarket(_marketId) {
         if (_newPaymentType != markets[_marketId].paymentType) {
             markets[_marketId].paymentType = _newPaymentType;
@@ -793,7 +793,7 @@ contract MarketRegistry is
         public
         view
         override
-        returns (V2Calculations.PaymentType)
+        returns (PaymentType)
     {
         return markets[_marketId].paymentType;
     }

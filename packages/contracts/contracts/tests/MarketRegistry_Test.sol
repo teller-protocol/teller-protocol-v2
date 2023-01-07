@@ -17,6 +17,9 @@ import "../EAS/TellerAS.sol";
 import "../mock/WethMock.sol";
 import "../interfaces/IWETH.sol";
 
+import { User } from "./Test_Helpers.sol";
+import { PaymentType } from "../libraries/V2Calculations.sol";
+
 contract MarketRegistry_Test is Testable, TellerV2 {
     User private marketOwner;
     User private borrower;
@@ -45,46 +48,8 @@ contract MarketRegistry_Test is Testable, TellerV2 {
             500,
             false,
             false,
-            V2Calculations.PaymentType.EMI,
+            PaymentType.EMI,
             "uri://"
-        );
-    }
-}
-
-contract User {
-    TellerV2 public immutable tellerV2;
-    WethMock public immutable wethMock;
-
-    constructor(TellerV2 _tellerV2, WethMock _wethMock) {
-        tellerV2 = _tellerV2;
-        wethMock = _wethMock;
-    }
-
-    function depositToWeth(uint256 amount) public {
-        wethMock.deposit{ value: amount }();
-    }
-
-    function createMarket(
-        address marketRegistry,
-        uint32 _paymentCycleDuration,
-        uint32 _paymentDefaultDuration,
-        uint32 _bidExpirationTime,
-        uint16 _feePercent,
-        bool _requireLenderAttestation,
-        bool _requireBorrowerAttestation,
-        V2Calculations.PaymentType _paymentType,
-        string calldata _uri
-    ) public {
-        IMarketRegistry(marketRegistry).createMarket(
-            address(this),
-            _paymentCycleDuration,
-            _paymentDefaultDuration,
-            _bidExpirationTime,
-            _feePercent,
-            _requireLenderAttestation,
-            _requireBorrowerAttestation,
-            _paymentType,
-            _uri
         );
     }
 }

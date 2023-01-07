@@ -24,7 +24,7 @@ import "../interfaces/IWETH.sol";
 import "../interfaces/ITellerV2Autopay.sol";
 
 import "@mangrovedao/hardhat-test-solidity/test.sol";
-import "hardhat/console.sol";
+import { PaymentType } from "../libraries/V2Calculations.sol";
 
 contract TellerV2Autopay_Test is Testable, TellerV2Autopay {
     User private marketOwner;
@@ -75,7 +75,7 @@ contract TellerV2Autopay_Test is Testable, TellerV2Autopay {
             500,
             false,
             false,
-            V2Calculations.PaymentType.EMI,
+            PaymentType.EMI,
             "uri://"
         );
 
@@ -230,7 +230,7 @@ contract User {
         uint16 _feePercent,
         bool _requireLenderAttestation,
         bool _requireBorrowerAttestation,
-        V2Calculations.PaymentType _paymentType,
+        PaymentType _paymentType,
         string calldata _uri
     ) public {
         IMarketRegistry(marketRegistry).createMarket(

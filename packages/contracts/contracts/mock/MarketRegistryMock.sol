@@ -3,6 +3,7 @@ pragma solidity ^0.8.0;
 // SPDX-License-Identifier: MIT
 
 import "../interfaces/IMarketRegistry.sol";
+import { PaymentType } from "../libraries/V2Calculations.sol";
 
 contract MarketRegistryMock is IMarketRegistry {
     address marketOwner;
@@ -68,7 +69,7 @@ contract MarketRegistryMock is IMarketRegistry {
     function getPaymentType(uint256 _marketId)
         public
         view
-        returns (V2Calculations.PaymentType)
+        returns (PaymentType)
     {}
 
     function createMarket(
@@ -79,7 +80,7 @@ contract MarketRegistryMock is IMarketRegistry {
         uint16 _feePercent,
         bool _requireLenderAttestation,
         bool _requireBorrowerAttestation,
-        V2Calculations.PaymentType _paymentType,
+        PaymentType _paymentType,
         string calldata _uri
     ) public returns (uint256) {}
 

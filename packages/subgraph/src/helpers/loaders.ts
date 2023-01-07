@@ -1,6 +1,16 @@
 import { Address, BigInt, Value } from '@graphprotocol/graph-ts'
 
-import { Bid, Borrower, Commitment, Lender, MarketPlace, MarketVolume, TokenVolume, User } from '../../generated/schema'
+import {
+  Bid,
+  Borrower,
+  Collateral,
+  Commitment,
+  Lender,
+  MarketPlace,
+  MarketVolume,
+  TokenVolume,
+  User
+} from '../../generated/schema'
 
 import { initTokenVolume } from './intializers'
 
@@ -247,4 +257,23 @@ export function loadCommitmentByMarketId(
     commitment.save();
   }
   return commitment;
+}
+
+/**
+ * @param {string} bidId - ID of the bid linked to committed collateral
+ */
+export function loadCollateral(
+    bidId: string
+): Collateral {
+  let collateral = Collateral.load(bidId);
+  if (!collateral) {
+    collateral = new Collateral(bidId);
+    collateral.amount = BigInt.zero();
+    collateral.tokenId = BigInt.zero();
+    collateral.collateralAddress = Address.zero();
+    collateral.status = '';
+    collateral.receiver = Address.zero();
+    collateral.save()
+  }
+  return collateral;
 }

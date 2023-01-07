@@ -63,6 +63,19 @@ type Bid @entity {
   totalRepaidInterest: BigInt!
   _lastTotalRepaidAmount: BigInt!
   _lastTotalRepaidInterestAmount: BigInt!
+  collateralEscrow: Bytes
+  collateral: [Collateral!] @derivedFrom(field: "bid")
+}
+
+type Collateral @entity {
+  id: ID!
+#  type: String!
+  amount: BigInt!
+  tokenId: BigInt!
+  collateralAddress: Bytes!
+  bid: Bid!
+  status: String
+  receiver: Bytes
 }
 
 type User @entity {

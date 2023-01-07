@@ -32,7 +32,10 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     }
 
     /* Events */
-    event CollateralEscrowDeployed(uint256 _bidId, address _collateralEscrow);
+    event CollateralEscrowDeployed(
+        uint256 _bidId,
+        address _collateralEscrow
+    );
     event CollateralCommitted(
         uint256 _bidId,
         address _collateralAddress,
@@ -40,6 +43,19 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         uint256 _tokenId
     );
     event CollateralClaimed(uint256 _bidId);
+    event CollateralDeposited(
+        uint256 _bidId,
+        address _collateralAddress,
+        uint256 _amount,
+        uint256 _tokenId
+    );
+    event CollateralWithdrawn(
+        uint256 _bidId,
+        address _collateralAddress,
+        uint256 _amount,
+        uint256 _tokenId,
+        address _recipient
+    );
 
     /* Modifiers */
     modifier onlyTellerV2() {
@@ -344,6 +360,12 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
                 collateralInfo._tokenId
             );
         }
+        emit CollateralDeposited(
+            _bidId,
+            collateralInfo._collateralAddress,
+            collateralInfo._amount,
+            collateralInfo._tokenId
+        );
     }
 
     /**
@@ -367,6 +389,13 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
             ICollateralEscrowV1(_escrows[_bidId]).withdraw(
                 collateralInfo._collateralAddress,
                 collateralInfo._amount,
+                _receiver
+            );
+            emit CollateralWithdrawn(
+                _bidId,
+                collateralInfo._collateralAddress,
+                collateralInfo._amount,
+                collateralInfo._tokenId,
                 _receiver
             );
         }

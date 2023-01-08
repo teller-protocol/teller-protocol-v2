@@ -13,6 +13,13 @@ import {
 } from '../../generated/schema'
 
 import { initTokenVolume } from './intializers'
+import {
+  TellerV2,
+  TellerV2__bidsResult,
+  TellerV2__bidsResultLoanDetailsStruct,
+  TellerV2__bidsResultTermsStruct
+} from "../../generated/TellerV2/TellerV2";
+import {TellerV0Storage} from "../../generated/TellerV2/TellerV0Storage";
 
 export function loadBidById(id: string): Bid {
   const bid: Bid | null = Bid.load(id);
@@ -259,6 +266,29 @@ export function loadCommitmentByMarketId(
   return commitment;
 }
 
+export function getBid(eventAddress: Address, bidId: BigInt): TellerV2__bidsResult {
+  const tellerV2Instance = TellerV2.bind(eventAddress);
+  const tellerV0Storage = TellerV0Storage.bind(eventAddress);
+
+  let storedBid: TellerV2__bidsResult;
+  if (tellerV2Instance.try_bids(bidId).reverted) {
+    const storedV0Bid = tellerV0Storage.bids(bidId);
+    storedBid = new TellerV2__bidsResult(
+        storedV0Bid.value0,
+        storedV0Bid.value1,
+        storedV0Bid.value2,
+        storedV0Bid.value3,
+        storedV0Bid.value4,
+        changetype<TellerV2__bidsResultLoanDetailsStruct>(storedV0Bid.value5),
+        changetype<TellerV2__bidsResultTermsStruct>(storedV0Bid.value6),
+        storedV0Bid.value7,
+        0
+    )
+  } else {
+    storedBid = tellerV2Instance.bids(bidId);
+  }
+  return storedBid
+}
 /**
  * @param {string} bidId - ID of the bid linked to committed collateral
  */

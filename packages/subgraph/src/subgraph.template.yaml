@@ -18,6 +18,8 @@ dataSources:
       abis:
         - name: TellerV2
           file: ./abis/{{network}}_TellerV2.json
+        - name: TellerV0Storage
+          file: ../../packages/contracts/generated/artifacts/contracts/TellerV0Storage.sol/TellerV0Storage.json
       eventHandlers:
         - event: SubmittedBid(indexed uint256,indexed address,address,indexed bytes32)
           handler: handleSubmittedBid

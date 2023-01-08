@@ -63,6 +63,7 @@ type Bid @entity {
   totalRepaidInterest: BigInt!
   _lastTotalRepaidAmount: BigInt!
   _lastTotalRepaidInterestAmount: BigInt!
+  paymentDefaultDuration: BigInt!
   collateralEscrow: Bytes
   collateral: [Collateral!] @derivedFrom(field: "bid")
 }
@@ -153,6 +154,7 @@ type TokenVolume @entity {
   activeLoans: BigInt!
   closedLoans: BigInt!
   commissionEarned: BigInt!
+  totalRepaidInterest: BigInt!
 }
 
 type MarketVolume @entity {

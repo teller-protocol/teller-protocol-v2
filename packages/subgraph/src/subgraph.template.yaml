@@ -130,9 +130,7 @@ dataSources:
         - event: CollateralEscrowDeployed(uint256,address)
           handler: handleCollateralEscrowDeployed
         - event: CollateralCommitted(uint256,address,uint256,uint256)
-          handler: CollateralCommitted
-        - event: CollateralClaimed(uint256)
-          handler: handleCollateralClaimed
+          handler: handleCollateralCommitted
         - event: CollateralDeposited(uint256,address,uint256,uint256)
           handler: handleCollateralDeposited
         - event:  CollateralWithdrawn(uint256,address,uint256,uint256,address)

@@ -70,7 +70,6 @@ type Bid @entity {
 
 type Collateral @entity {
   id: ID!
-#  type: String!
   amount: BigInt!
   tokenId: BigInt!
   collateralAddress: Bytes!

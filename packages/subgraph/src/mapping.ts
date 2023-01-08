@@ -779,10 +779,9 @@ export function handleCollateralCommitted(
   const bid: Bid = loadBidById(event.params._bidId.toString());
   // Load collateral by bidId and collateral address
   const collateral = loadCollateral(
-      event.params._bidId.toString().concat(
-          event.params._collateralAddress.toHexString()
-      )
-  );
+      event.params._bidId.toString(),
+      event.params._collateralAddress
+    );
   collateral.amount = event.params._amount;
   collateral.tokenId = event.params._tokenId;
   collateral.collateralAddress = event.params._collateralAddress;
@@ -805,10 +804,9 @@ export function handleCollateralDeposited(
 ): void {
   const bid: Bid = loadBidById(event.params._bidId.toString());
   const collateral = loadCollateral(
-      event.params._bidId.toString().concat(
-          event.params._collateralAddress.toHexString()
-      )
-  );
+      event.params._bidId.toString(),
+      event.params._collateralAddress
+    );
   collateral.amount = event.params._amount;
   collateral.tokenId = event.params._tokenId;
   collateral.collateralAddress = event.params._collateralAddress;
@@ -830,10 +828,9 @@ export function handleCollateralWithdrawn(
 ): void {
   const bid: Bid = loadBidById(event.params._bidId.toString());
   const collateral = loadCollateral(
-      event.params._bidId.toString().concat(
-          event.params._collateralAddress.toHexString()
-      )
-  );
+      event.params._bidId.toString(),
+      event.params._collateralAddress
+    );
   collateral.amount = event.params._amount;
   collateral.tokenId = event.params._tokenId;
   collateral.collateralAddress = event.params._collateralAddress;

@@ -291,18 +291,23 @@ export function getBid(eventAddress: Address, bidId: BigInt): TellerV2__bidsResu
 }
 /**
  * @param {string} bidId - ID of the bid linked to committed collateral
+ * @param {Address} collateralAddress - Address of the collateral contract
  */
 export function loadCollateral(
-    bidId: string
+    bidId: string,
+    collateralAddress: Address
 ): Collateral {
-  let collateral = Collateral.load(bidId);
+  const idString = bidId.concat(collateralAddress.toHexString());
+  const bid = loadBidById(bidId);
+  let collateral = Collateral.load(idString);
   if (!collateral) {
-    collateral = new Collateral(bidId);
+    collateral = new Collateral(idString);
     collateral.amount = BigInt.zero();
     collateral.tokenId = BigInt.zero();
     collateral.collateralAddress = Address.zero();
     collateral.status = '';
     collateral.receiver = Address.zero();
+    collateral.bid = bid.id;
     collateral.save()
   }
   return collateral;

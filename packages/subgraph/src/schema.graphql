@@ -59,11 +59,19 @@ type Bid @entity {
   commitment: Commitment
   commitmentId: String
 
+  payments: [Payment!]! @derivedFrom(field: "bid")
   totalRepaidPrincipal: BigInt!
   totalRepaidInterest: BigInt!
   _lastTotalRepaidAmount: BigInt!
   _lastTotalRepaidInterestAmount: BigInt!
   paymentDefaultDuration: BigInt!
+}
+
+type Payment @entity {
+  id: ID!
+  bid: Bid!
+  principal: BigInt!
+  interest: BigInt!
 }
 
 type User @entity {

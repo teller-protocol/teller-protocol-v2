@@ -17,30 +17,7 @@ const deployFn: DeployFunction = async (hre) => {
     lendingTokens.push(tokens.all.USDCT)
   }
 
-  const reputationManager = await deploy({
-    contract: 'ReputationManager',
-    args: [],
-    proxy: {
-      proxyContract: 'OpenZeppelinTransparentProxy',
-    },
-    hre,
-  })
-
-  const trustedForwarder = await deploy({
-    contract: 'MetaForwarder',
-    skipIfAlreadyDeployed: true,
-    proxy: {
-      proxyContract: 'OpenZeppelinTransparentProxy',
-      execute: {
-        init: {
-          methodName: 'initialize',
-          args: [],
-        },
-      },
-    },
-    hre,
-  })
-
+  const trustedForwarder = await hre.contracts.get('MetaForwarder')
   const tellerV2Contract = await deploy({
     contract: 'TellerV2',
     args: [trustedForwarder.address],
@@ -48,7 +25,7 @@ const deployFn: DeployFunction = async (hre) => {
     proxy: {
       proxyContract: 'OpenZeppelinTransparentProxy',
     },
-    skipIfAlreadyDeployed: true,
+    skipIfAlreadyDeployed: false,
     hre,
   })
 
@@ -65,7 +42,8 @@ const deployFn: DeployFunction = async (hre) => {
     hre,
   })
 
-  // execute the initialize method of reputation manager
+  const reputationManager = await hre.contracts.get('ReputationManager')
+  // Execute the initialize method of reputation manager
   const reputationIsInitialized = await isInitialized(reputationManager.address)
   if (!reputationIsInitialized) {
     await reputationManager.initialize(tellerV2Contract.address)
@@ -73,19 +51,24 @@ const deployFn: DeployFunction = async (hre) => {
 
   const tellerV2IsInitialized = await isInitialized(tellerV2Contract.address)
   if (!tellerV2IsInitialized) {
+    const lenderManager = await hre.contracts.get('LenderManager')
     await tellerV2Contract.initialize(
       protocolFee,
       marketRegistry.address,
       reputationManager.address,
       lenderCommitmentForwarder.address,
-      lendingTokens
+      lendingTokens,
+      lenderManager.address
     )
-  } else if (tellerV2Contract.deployResult.newlyDeployed) {
-    await tellerV2Contract.onUpgrade()
   }
 }
 
 // tags and deployment
 deployFn.tags = ['teller-v2']
-deployFn.dependencies = ['market-registry']
+deployFn.dependencies = [
+  'meta-forwarder',
+  'reputation-manager',
+  'market-registry',
+  'lender-manager',
+]
 export default deployFn

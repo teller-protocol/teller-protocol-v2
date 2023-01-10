@@ -4,6 +4,7 @@ pragma solidity >=0.8.0 <0.9.0;
 import { IMarketRegistry } from "./interfaces/IMarketRegistry.sol";
 import { V2Calculations } from "./TellerV2.sol";
 import "./interfaces/IReputationManager.sol";
+import "./interfaces/ILenderManager.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
@@ -61,7 +62,7 @@ abstract contract TellerV2Storage_G0 {
     struct Bid {
         address borrower;
         address receiver;
-        address lender;
+        address _lender; // DEPRECATED
         uint256 marketplaceId;
         bytes32 _metadataURI; // DEPRECATED
         LoanDetails loanDetails;
@@ -138,4 +139,9 @@ abstract contract TellerV2Storage_G2 is TellerV2Storage_G1 {
     address public lenderCommitmentForwarder;
 }
 
-abstract contract TellerV2Storage is TellerV2Storage_G2 {}
+abstract contract TellerV2Storage_G3 is TellerV2Storage_G2 {
+    // Address of the lender manager contract
+    ILenderManager public lenderManager;
+}
+
+abstract contract TellerV2Storage is TellerV2Storage_G3 {}

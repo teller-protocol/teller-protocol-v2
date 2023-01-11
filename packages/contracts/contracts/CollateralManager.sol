@@ -38,6 +38,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     );
     event CollateralCommitted(
         uint256 _bidId,
+        CollateralType _type,
         address _collateralAddress,
         uint256 _amount,
         uint256 _tokenId
@@ -45,12 +46,14 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     event CollateralClaimed(uint256 _bidId);
     event CollateralDeposited(
         uint256 _bidId,
+        CollateralType _type,
         address _collateralAddress,
         uint256 _amount,
         uint256 _tokenId
     );
     event CollateralWithdrawn(
         uint256 _bidId,
+        CollateralType _type,
         address _collateralAddress,
         uint256 _amount,
         uint256 _tokenId,
@@ -362,6 +365,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         }
         emit CollateralDeposited(
             _bidId,
+            collateralInfo._collateralType,
             collateralInfo._collateralAddress,
             collateralInfo._amount,
             collateralInfo._tokenId
@@ -393,6 +397,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
             );
             emit CollateralWithdrawn(
                 _bidId,
+                collateralInfo._collateralType,
                 collateralInfo._collateralAddress,
                 collateralInfo._amount,
                 collateralInfo._tokenId,
@@ -417,6 +422,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         ] = _collateralInfo;
         emit CollateralCommitted(
             _bidId,
+            _collateralInfo._collateralType,
             _collateralInfo._collateralAddress,
             _collateralInfo._amount,
             _collateralInfo._tokenId

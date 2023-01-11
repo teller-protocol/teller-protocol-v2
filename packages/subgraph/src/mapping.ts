@@ -789,7 +789,6 @@ export function handleCollateralCommitted(
   collateral.tokenId = event.params._tokenId;
   collateral.type = getTypeString(event.params._type);
   collateral.collateralAddress = event.params._collateralAddress;
-  collateral.name = getTokenName(event.params._type, event.params._collateralAddress);
   collateral.bid = bid.id;
   collateral.status = 'Committed'
   collateral.receiver = bid.borrowerAddress;
@@ -822,7 +821,6 @@ export function handleCollateralDeposited(
   collateral.tokenId = event.params._tokenId;
   collateral.type = getTypeString(event.params._type);
   collateral.collateralAddress = event.params._collateralAddress;
-  collateral.name = getTokenName(event.params._type, event.params._collateralAddress);
   collateral.bid = bid.id;
   collateral.status = 'Deposited'
   collateral.save();
@@ -848,7 +846,6 @@ export function handleCollateralWithdrawn(
   collateral.tokenId = event.params._tokenId;
   collateral.type = getTypeString(event.params._type);
   collateral.collateralAddress = event.params._collateralAddress;
-  collateral.name = getTokenName(event.params._type, event.params._collateralAddress);
   collateral.receiver = event.params._recipient;
   if (event.params._recipient != bid.borrowerAddress) {
     collateral.status = 'Claimed'
@@ -877,16 +874,4 @@ function getTypeString(tokenType: i32): string {
     type =  'ERC1155'
   }
   return type;
-}
-
-function getTokenName(tokenType: i32, tokenAddress: Address): string {
-  let name = ''
-  if (tokenType == i32(0)) {
-    name = IERC20.bind(tokenAddress)._name;
-  } else if (tokenType == i32(1)) {
-    name = IERC721Upgradeable.bind(tokenAddress)._name;
-  } else if (tokenType == i32(2)) {
-    name = IERC1155Upgradeable.bind(tokenAddress)._name;
-  }
-  return name;
 }

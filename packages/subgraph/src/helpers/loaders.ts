@@ -309,7 +309,6 @@ export function loadCollateral(
     collateral.status = '';
     collateral.receiver = Address.zero();
     collateral.bid = bid.id;
-    collateral.name = '';
     collateral.save()
   }
   return collateral;

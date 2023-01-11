@@ -77,7 +77,6 @@ type Collateral @entity {
   bid: Bid!
   status: String
   receiver: Bytes
-  name: String
 }
 
 type User @entity {

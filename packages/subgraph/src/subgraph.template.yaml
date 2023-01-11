@@ -126,13 +126,19 @@ dataSources:
       abis:
         - name: CollateralManager
           file: ./abis/{{network}}_CollateralManager.json
+        - name: IERC20
+          file: ../../packages/contracts/generated/artifacts/@openzeppelin/contracts/token/ERC20/IERC20.sol/IERC20.json
+        - name: IERC721Upgradeable
+          file: ../../packages/contracts/generated/artifacts/@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol/IERC721Upgradeable.json
+        - name: IERC1155Upgradeable
+          file: ../../packages/contracts/generated/artifacts/@openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155Upgradeable.sol/IERC1155Upgradeable.json
       eventHandlers:
         - event: CollateralEscrowDeployed(uint256,address)
           handler: handleCollateralEscrowDeployed
-        - event: CollateralCommitted(uint256,address,uint256,uint256)
+        - event: CollateralCommitted(uint256,uint8,address,uint256,uint256)
           handler: handleCollateralCommitted
-        - event: CollateralDeposited(uint256,address,uint256,uint256)
+        - event: CollateralDeposited(uint256,uint8,address,uint256,uint256)
           handler: handleCollateralDeposited
-        - event:  CollateralWithdrawn(uint256,address,uint256,uint256,address)
+        - event:  CollateralWithdrawn(uint256,uint8,address,uint256,uint256,address)
           handler: handleCollateralWithdrawn
       file: ./src/mapping.ts

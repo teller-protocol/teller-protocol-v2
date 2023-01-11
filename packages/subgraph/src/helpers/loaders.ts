@@ -305,9 +305,11 @@ export function loadCollateral(
     collateral.amount = BigInt.zero();
     collateral.tokenId = BigInt.zero();
     collateral.collateralAddress = Address.zero();
+    collateral.type = '';
     collateral.status = '';
     collateral.receiver = Address.zero();
     collateral.bid = bid.id;
+    collateral.name = '';
     collateral.save()
   }
   return collateral;

@@ -1,4 +1,4 @@
-import {Address, BigInt } from '@graphprotocol/graph-ts'
+import {Address, BigInt} from '@graphprotocol/graph-ts'
 
 import {
   DeletedCommitment,
@@ -58,6 +58,9 @@ import {
   loadTokenVolumeByMarketId
 } from './helpers/loaders'
 import { updateBid, updateTokenVolumeOnAccept } from './helpers/updaters'
+import {IERC20} from "../generated/CollateralManager/IERC20";
+import {IERC721Upgradeable} from "../generated/CollateralManager/IERC721Upgradeable";
+import {IERC1155Upgradeable} from "../generated/CollateralManager/IERC1155Upgradeable";
 
 export function handleSubmittedBid(event: SubmittedBid): void {
   const tellerV2Instance = TellerV2.bind(event.address);
@@ -784,11 +787,19 @@ export function handleCollateralCommitted(
     );
   collateral.amount = event.params._amount;
   collateral.tokenId = event.params._tokenId;
+  collateral.type = getTypeString(event.params._type);
   collateral.collateralAddress = event.params._collateralAddress;
+  collateral.name = getTokenName(event.params._type, event.params._collateralAddress);
   collateral.bid = bid.id;
   collateral.status = 'Committed'
   collateral.receiver = bid.borrowerAddress;
   collateral.save();
+  let collateralCommitted = bid.collateral;
+  if (collateralCommitted) {
+    collateralCommitted.push(collateral.id);
+    bid.collateral = collateralCommitted;
+    bid.save();
+  }
 }
 
 export function handleCollateralCommitteds(
@@ -809,7 +820,9 @@ export function handleCollateralDeposited(
     );
   collateral.amount = event.params._amount;
   collateral.tokenId = event.params._tokenId;
+  collateral.type = getTypeString(event.params._type);
   collateral.collateralAddress = event.params._collateralAddress;
+  collateral.name = getTokenName(event.params._type, event.params._collateralAddress);
   collateral.bid = bid.id;
   collateral.status = 'Deposited'
   collateral.save();
@@ -833,7 +846,9 @@ export function handleCollateralWithdrawn(
     );
   collateral.amount = event.params._amount;
   collateral.tokenId = event.params._tokenId;
+  collateral.type = getTypeString(event.params._type);
   collateral.collateralAddress = event.params._collateralAddress;
+  collateral.name = getTokenName(event.params._type, event.params._collateralAddress);
   collateral.receiver = event.params._recipient;
   if (event.params._recipient != bid.borrowerAddress) {
     collateral.status = 'Claimed'
@@ -850,4 +865,28 @@ export function handleCollateralWithdrawns(
   events.forEach(event => {
     handleCollateralWithdrawn(event);
   })
+}
+
+function getTypeString(tokenType: i32): string {
+  let type = ''
+  if (tokenType == i32(0)) {
+    type = 'ERC20'
+  } else if (tokenType == i32(1)) {
+    type = 'ERC721'
+  } else if (tokenType == i32(2)) {
+    type =  'ERC1155'
+  }
+  return type;
+}
+
+function getTokenName(tokenType: i32, tokenAddress: Address): string {
+  let name = ''
+  if (tokenType == i32(0)) {
+    name = IERC20.bind(tokenAddress)._name;
+  } else if (tokenType == i32(1)) {
+    name = IERC721Upgradeable.bind(tokenAddress)._name;
+  } else if (tokenType == i32(2)) {
+    name = IERC1155Upgradeable.bind(tokenAddress)._name;
+  }
+  return name;
 }

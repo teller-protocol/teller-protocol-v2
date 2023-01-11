@@ -1,4 +1,4 @@
-import { Address, BigInt } from '@graphprotocol/graph-ts'
+import {Address, BigInt} from '@graphprotocol/graph-ts'
 
 import {
   DeletedCommitment,
@@ -25,7 +25,7 @@ import {
   SetPaymentDefaultDuration,
   Upgraded
 } from '../generated/MarketRegistry/MarketRegistry'
-import { Bid, Borrower, BorrowerBid, Lender, LenderBid, MarketPlace, TokenVolume } from '../generated/schema'
+import {Bid, Borrower, BorrowerBid, Collateral, Lender, LenderBid, MarketPlace, TokenVolume} from '../generated/schema'
 import {
   AcceptedBid,
   CancelledBid,
@@ -34,13 +34,22 @@ import {
   LoanRepaid,
   LoanRepayment,
   SubmittedBid,
-  TellerV2
+  TellerV2,
 } from '../generated/TellerV2/TellerV2'
 
 import {
+  CollateralEscrowDeployed,
+  CollateralCommitted,
+  CollateralDeposited,
+  CollateralWithdrawn
+} from '../generated/CollateralManager/CollateralManager'
+
+import {
+  getBid,
   loadBidById,
   loadBorrowerByMarketId,
   loadBorrowerTokenVolume,
+  loadCollateral,
   loadCommitmentByMarketId,
   loadLenderByMarketId,
   loadLenderTokenVolume,
@@ -49,10 +58,14 @@ import {
   loadTokenVolumeByMarketId
 } from './helpers/loaders'
 import { updateBid, updateTokenVolumeOnAccept } from './helpers/updaters'
+import {IERC20} from "../generated/CollateralManager/IERC20";
+import {IERC721Upgradeable} from "../generated/CollateralManager/IERC721Upgradeable";
+import {IERC1155Upgradeable} from "../generated/CollateralManager/IERC1155Upgradeable";
 
 export function handleSubmittedBid(event: SubmittedBid): void {
   const tellerV2Instance = TellerV2.bind(event.address);
-  const storedBid = tellerV2Instance.bids(event.params.bidId);
+  const storedBid = getBid(event.address, event.params.bidId);
+
   const market = loadMarketById(storedBid.value3.toString());
 
   // Creates User + Borrower entity if it doesn't exist
@@ -112,6 +125,17 @@ export function handleSubmittedBid(event: SubmittedBid): void {
     bid.expiresAt = event.block.timestamp.plus(
       tellerV2Instance.bidExpirationTime(event.params.bidId)
     );
+  } else {
+    bid.expiresAt = BigInt.zero()
+  }
+
+  const marketPlace = loadMarketById(storedBid.value3.toString());
+
+  const paymentDefaultDuration = marketPlace.paymentDefaultDuration;
+  if(paymentDefaultDuration) {
+    bid.paymentDefaultDuration = paymentDefaultDuration;
+  } else {
+    bid.paymentDefaultDuration = BigInt.zero();
   }
 
   bid.save();
@@ -126,7 +150,8 @@ export function handleSubmittedBids(events: SubmittedBid[]): void {
 
 export function handleAcceptedBid(event: AcceptedBid): void {
   const tellerV2Instance = TellerV2.bind(event.address);
-  const storedBid = tellerV2Instance.bids(event.params.bidId);
+  const storedBid = getBid(event.address, event.params.bidId);
+
   const marketPlace = loadMarketById(storedBid.value3.toString());
 
   const lender: Lender = loadLenderByMarketId(
@@ -634,7 +659,7 @@ export function handleTellerV2Upgraded(event: Upgraded): void {
   ) {
     const tellerV2Instance = TellerV2.bind(event.address);
     for (let i = 62; i < 66; i++) {
-      const storedBid = tellerV2Instance.bids(BigInt.fromI32(i));
+      const storedBid = getBid(event.address, BigInt.fromI32(i));
       const bid = loadBidById(i.toString());
       if (bid.bidId) {
         bid.paymentCycleAmount = storedBid.value6.paymentCycleAmount;
@@ -733,4 +758,120 @@ export function handleExercisedCommitments(
   events.forEach(event => {
     handleExercisedCommitment(event);
   });
+}
+
+export function handleCollateralEscrowDeployed(
+  event: CollateralEscrowDeployed
+): void {
+  const bid: Bid = loadBidById(event.params._bidId.toString());
+  bid.collateralEscrow = event.params._collateralEscrow;
+  bid.save();
+}
+
+export function handleCollateralEscrowDeployeds(
+  events: CollateralEscrowDeployed[]
+): void {
+  events.forEach(event => {
+    handleCollateralEscrowDeployed(event);
+  })
+}
+
+export function handleCollateralCommitted(
+    event: CollateralCommitted
+): void {
+  const bid: Bid = loadBidById(event.params._bidId.toString());
+  // Load collateral by bidId and collateral address
+  const collateral = loadCollateral(
+      event.params._bidId.toString(),
+      event.params._collateralAddress
+    );
+  collateral.amount = event.params._amount;
+  collateral.tokenId = event.params._tokenId;
+  collateral.type = getTypeString(event.params._type);
+  collateral.collateralAddress = event.params._collateralAddress;
+  collateral.bid = bid.id;
+  collateral.status = 'Committed'
+  collateral.receiver = bid.borrowerAddress;
+  collateral.save();
+  let collateralCommitted = bid.collateral;
+  if (collateralCommitted) {
+    collateralCommitted.push(collateral.id);
+    bid.collateral = collateralCommitted;
+    bid.save();
+  }
+}
+
+export function handleCollateralCommitteds(
+    events: CollateralCommitted[]
+): void {
+  events.forEach(event => {
+    handleCollateralCommitted(event);
+  })
+}
+
+export function handleCollateralDeposited(
+    event: CollateralDeposited
+): void {
+  const bid: Bid = loadBidById(event.params._bidId.toString());
+  const collateral = loadCollateral(
+      event.params._bidId.toString(),
+      event.params._collateralAddress
+    );
+  collateral.amount = event.params._amount;
+  collateral.tokenId = event.params._tokenId;
+  collateral.type = getTypeString(event.params._type);
+  collateral.collateralAddress = event.params._collateralAddress;
+  collateral.bid = bid.id;
+  collateral.status = 'Deposited'
+  collateral.save();
+}
+
+export function handleCollateralDepositeds(
+    events: CollateralDeposited[]
+): void {
+  events.forEach(event => {
+    handleCollateralDeposited(event);
+  })
+}
+
+export function handleCollateralWithdrawn(
+    event: CollateralWithdrawn
+): void {
+  const bid: Bid = loadBidById(event.params._bidId.toString());
+  const collateral = loadCollateral(
+      event.params._bidId.toString(),
+      event.params._collateralAddress
+    );
+  collateral.amount = event.params._amount;
+  collateral.tokenId = event.params._tokenId;
+  collateral.type = getTypeString(event.params._type);
+  collateral.collateralAddress = event.params._collateralAddress;
+  collateral.receiver = event.params._recipient;
+  if (event.params._recipient != bid.borrowerAddress) {
+    collateral.status = 'Claimed'
+  } else {
+    collateral.status = 'Withdrawn'
+  }
+  collateral.bid = bid.id;
+  collateral.save();
+}
+
+export function handleCollateralWithdrawns(
+    events: CollateralWithdrawn[]
+): void {
+  events.forEach(event => {
+    handleCollateralWithdrawn(event);
+  })
+}
+
+function getTypeString(tokenType: i32): string {
+  let type = ''
+  if (tokenType == i32(0)) {
+    type = 'ERC20'
+  } else if (tokenType == i32(1)) {
+    type = 'ERC721'
+  } else if (tokenType == i32(2)) {
+    type =  'ERC1155'
+  }
+  return type;
 }

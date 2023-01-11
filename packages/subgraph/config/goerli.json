@@ -5,5 +5,7 @@
   "address_market_registry": "0x1815F01083AFD110373e952b6488f33b048F096b",
   "block_market_registry": "6896250",
   "address_lender_commitment": "0xC2418B857F9147AF5eB4517B23e9a966b368328f",
-  "block_lender_commitment": "7664450"
+  "block_lender_commitment": "7664450",
+  "address_collateral_manager": "0xB12B265F9D59B4aa571000ffc865a9a72A1451fb",
+  "block_collateral_manager": "8252657"
 }

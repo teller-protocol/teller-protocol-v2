@@ -16,4 +16,5 @@ export function initTokenVolume(token: TokenVolume, tokenAddress: Address): void
   token.closedLoans = BigInt.zero();
   token.commissionEarned = BigInt.zero();
   token.outstandingCapital = BigInt.zero();
+  token.totalRepaidInterest = BigInt.zero();
 }

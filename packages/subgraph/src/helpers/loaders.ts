@@ -299,7 +299,6 @@ export function loadCollateral(
     collateralAddress: Address
 ): Collateral {
   const idString = bidId.concat(collateralAddress.toHexString());
-  const bid = loadBidById(bidId);
   let collateral = Collateral.load(idString);
   if (!collateral) {
     collateral = new Collateral(idString);
@@ -309,7 +308,7 @@ export function loadCollateral(
     collateral.type = '';
     collateral.status = '';
     collateral.receiver = Address.zero();
-    collateral.bid = bid.id;
+    collateral.bid = bidId;
     collateral.save()
   }
   return collateral;

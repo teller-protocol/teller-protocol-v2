@@ -289,6 +289,7 @@ export function getBid(eventAddress: Address, bidId: BigInt): TellerV2__bidsResu
   }
   return storedBid
 }
+
 /**
  * @param {string} bidId - ID of the bid linked to committed collateral
  * @param {Address} collateralAddress - Address of the collateral contract

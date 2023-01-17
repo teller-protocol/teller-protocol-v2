@@ -1,4 +1,4 @@
-import {Address, BigInt} from '@graphprotocol/graph-ts'
+import { Address, BigInt } from '@graphprotocol/graph-ts'
 
 import {
   DeletedCommitment,
@@ -294,7 +294,7 @@ export function handleLoanRepayment(event: LoanRepayment): void {
   const bid: Bid = loadBidById(event.params.bidId.toString());
   bid.updatedAt = event.block.timestamp;
   bid.transactionHash = event.transaction.hash.toHex();
-  updateBid(bid, event.address, "Repayment");
+  updateBid(bid, event, "Repayment");
 }
 
 export function handleLoanRepayments(events: LoanRepayment[]): void {
@@ -309,7 +309,7 @@ export function handleLoanRepaid(event: LoanRepaid): void {
   bid.updatedAt = event.block.timestamp;
   bid.transactionHash = event.transaction.hash.toHex();
 
-  updateBid(bid, event.address, "Repaid");
+  updateBid(bid, event, "Repaid");
 }
 
 export function handleLoanRepaids(events: LoanRepaid[]): void {
@@ -324,7 +324,7 @@ export function handleLoanLiquidated(event: LoanLiquidated): void {
   bid.updatedAt = event.block.timestamp;
   bid.transactionHash = event.transaction.hash.toHex();
 
-  updateBid(bid, event.address, "Liquidated");
+  updateBid(bid, event, "Liquidated");
 }
 
 export function handleLoanLiquidateds(events: LoanLiquidated[]): void {

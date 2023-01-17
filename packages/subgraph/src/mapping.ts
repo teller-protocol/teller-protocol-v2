@@ -1,4 +1,4 @@
-import { Address, BigInt } from '@graphprotocol/graph-ts'
+import {Address, BigInt } from '@graphprotocol/graph-ts'
 
 import {
   DeletedCommitment,
@@ -34,10 +34,11 @@ import {
   LoanRepaid,
   LoanRepayment,
   SubmittedBid,
-  TellerV2
+  TellerV2,
 } from '../generated/TellerV2/TellerV2'
 
 import {
+  getBid,
   loadBidById,
   loadBorrowerByMarketId,
   loadBorrowerTokenVolume,
@@ -52,7 +53,8 @@ import { updateBid, updateTokenVolumeOnAccept } from './helpers/updaters'
 
 export function handleSubmittedBid(event: SubmittedBid): void {
   const tellerV2Instance = TellerV2.bind(event.address);
-  const storedBid = tellerV2Instance.bids(event.params.bidId);
+  const storedBid = getBid(event.address, event.params.bidId);
+
   const market = loadMarketById(storedBid.value3.toString());
 
   // Creates User + Borrower entity if it doesn't exist
@@ -112,6 +114,17 @@ export function handleSubmittedBid(event: SubmittedBid): void {
     bid.expiresAt = event.block.timestamp.plus(
       tellerV2Instance.bidExpirationTime(event.params.bidId)
     );
+  } else {
+    bid.expiresAt = BigInt.zero()
+  }
+
+  const marketPlace = loadMarketById(storedBid.value3.toString());
+
+  const paymentDefaultDuration = marketPlace.paymentDefaultDuration;
+  if(paymentDefaultDuration) {
+    bid.paymentDefaultDuration = paymentDefaultDuration;
+  } else {
+    bid.paymentDefaultDuration = BigInt.zero();
   }
 
   bid.save();
@@ -126,7 +139,8 @@ export function handleSubmittedBids(events: SubmittedBid[]): void {
 
 export function handleAcceptedBid(event: AcceptedBid): void {
   const tellerV2Instance = TellerV2.bind(event.address);
-  const storedBid = tellerV2Instance.bids(event.params.bidId);
+  const storedBid = getBid(event.address, event.params.bidId);
+
   const marketPlace = loadMarketById(storedBid.value3.toString());
 
   const lender: Lender = loadLenderByMarketId(
@@ -269,7 +283,7 @@ export function handleLoanRepayment(event: LoanRepayment): void {
   const bid: Bid = loadBidById(event.params.bidId.toString());
   bid.updatedAt = event.block.timestamp;
   bid.transactionHash = event.transaction.hash.toHex();
-  updateBid(bid, event.address, "Repayment");
+  updateBid(bid, event, "Repayment");
 }
 
 export function handleLoanRepayments(events: LoanRepayment[]): void {
@@ -284,7 +298,7 @@ export function handleLoanRepaid(event: LoanRepaid): void {
   bid.updatedAt = event.block.timestamp;
   bid.transactionHash = event.transaction.hash.toHex();
 
-  updateBid(bid, event.address, "Repaid");
+  updateBid(bid, event, "Repaid");
 }
 
 export function handleLoanRepaids(events: LoanRepaid[]): void {
@@ -299,7 +313,7 @@ export function handleLoanLiquidated(event: LoanLiquidated): void {
   bid.updatedAt = event.block.timestamp;
   bid.transactionHash = event.transaction.hash.toHex();
 
-  updateBid(bid, event.address, "Liquidated");
+  updateBid(bid, event, "Liquidated");
 }
 
 export function handleLoanLiquidateds(events: LoanLiquidated[]): void {
@@ -634,7 +648,7 @@ export function handleTellerV2Upgraded(event: Upgraded): void {
   ) {
     const tellerV2Instance = TellerV2.bind(event.address);
     for (let i = 62; i < 66; i++) {
-      const storedBid = tellerV2Instance.bids(BigInt.fromI32(i));
+      const storedBid = getBid(event.address, BigInt.fromI32(i));
       const bid = loadBidById(i.toString());
       if (bid.bidId) {
         bid.paymentCycleAmount = storedBid.value6.paymentCycleAmount;

@@ -1,9 +1,15 @@
-import { Address, BigInt } from '@graphprotocol/graph-ts'
+import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts'
 
-import { Bid, Borrower, Commitment, TokenVolume } from '../../generated/schema'
-import { TellerV2, TellerV2__bidsResult } from '../../generated/TellerV2/TellerV2'
+import {Bid, Borrower, Commitment, Payment, TokenVolume} from '../../generated/schema'
+import {
+  TellerV2,
+  TellerV2__bidsResult,
+  TellerV2__bidsResultLoanDetailsStruct,
+  TellerV2__bidsResultTermsStruct
+} from '../../generated/TellerV2/TellerV2'
 
 import {
+  getBid,
   loadBorrowerByMarketId,
   loadBorrowerTokenVolume,
   loadLenderByMarketId,
@@ -39,11 +45,11 @@ export function updateTokenVolumeOnPayment(
 
 export function updateBid(
   bid: Bid,
-  eventAddress: Address,
+  event: ethereum.Event,
   bidState: string
 ): void {
-  const tellerV2Instance = TellerV2.bind(eventAddress);
-  const storedBid = tellerV2Instance.bids(bid.bidId);
+  const tellerV2Instance = TellerV2.bind(event.address);
+  const storedBid = getBid(event.address, bid.bidId);
 
   bid.totalRepaidPrincipal = storedBid.value5.totalRepaid.principal;
   bid.totalRepaidInterest = storedBid.value5.totalRepaid.interest;
@@ -61,6 +67,12 @@ export function updateBid(
     bid._lastTotalRepaidInterestAmount = _lastInterestPayment.plus(
       bid._lastTotalRepaidInterestAmount
     );
+    const tokenVolume = loadTokenVolumeByMarketId(storedBid.value5.lendingToken, storedBid.value3.toHexString());
+    const totalRepaidInterest = tokenVolume.totalRepaidInterest;
+    if(totalRepaidInterest) {
+      tokenVolume.totalRepaidInterest = totalRepaidInterest.plus(_lastInterestPayment);
+      tokenVolume.save();
+    }
   }
 
   if (bidState === "Repayment") {
@@ -78,6 +90,12 @@ export function updateBid(
       _lastInterestPayment,
       bidState
     );
+
+    const payment = new Payment(event.transaction.hash.toHex());
+    payment.bid = bid.id;
+    payment.principal = _lastPayment;
+    payment.interest = _lastInterestPayment;
+    payment.save();
   }
 
   bid.save();

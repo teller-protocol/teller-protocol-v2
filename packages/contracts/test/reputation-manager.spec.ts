@@ -99,7 +99,7 @@ describe('ReputationManager', () => {
     await marketRegistry
       .connect(marketOwner)
       [
-        'createMarket(address,uint32,uint32,uint32,uint16,bool,bool,uint8,string)'
+        'createMarket(address,uint32,uint32,uint32,uint16,bool,bool,uint8,string,uint8)'
       ](
         marketOwnerAddress,
         paymentCycleDuration,
@@ -109,7 +109,8 @@ describe('ReputationManager', () => {
         false,
         false,
         '0',
-        'uri://'
+        'uri://',
+        0
       )
       .should.emit(marketRegistry, 'MarketCreated')
       .withArgs(marketOwnerAddress, 1)

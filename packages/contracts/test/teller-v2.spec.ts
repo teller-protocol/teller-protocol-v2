@@ -32,7 +32,7 @@ import { BidState, NULL_ADDRESS } from '~~/constants'
 chai.should()
 chai.use(chaiAsPromised)
 
-const paymentCycleDuration = moment.duration(30, 'days').asSeconds()
+const paymentCycleValue = moment.duration(30, 'days').asSeconds()
 const loanDefaultDuration = moment.duration(180, 'days').asSeconds()
 const loanExpirationDuration = moment.duration(1, 'days').asSeconds()
 
@@ -94,17 +94,18 @@ describe('TellerV2', () => {
     await marketRegistry
       .connect(marketOwner)
       [
-        'createMarket(address,uint32,uint32,uint32,uint16,bool,bool,uint8,string)'
+        'createMarket(address,uint32,uint32,uint32,uint16,bool,bool,uint8,string,uint8)'
       ](
         marketOwnerAddress,
-        paymentCycleDuration,
+        paymentCycleValue,
         loanDefaultDuration,
         loanExpirationDuration,
         0,
         false,
         false,
         '0',
-        uri
+        uri,
+        0
       )
       .should.emit(marketRegistry, 'MarketCreated')
       .withArgs(marketOwnerAddress, 1)
@@ -217,7 +218,7 @@ describe('TellerV2', () => {
       const sample = async (paymentCycle: moment.Duration): Promise<void> => {
         await marketRegistry
           .connect(marketOwner)
-          .setPaymentCycleDuration(marketplaceId, paymentCycle.asSeconds())
+          .setPaymentCycleValue(marketplaceId, paymentCycle.asSeconds())
 
         const { tellerV2, bidId } = await submitBid({ marketplaceId })
 
@@ -1006,17 +1007,18 @@ describe('TellerV2', () => {
     await marketRegistry
       .connect(marketOwner)
       [
-        'createMarket(address,uint32,uint32,uint32,uint16,bool,bool,uint8,string)'
+        'createMarket(address,uint32,uint32,uint32,uint16,bool,bool,uint8,string,uint8)'
       ](
         marketOwnerAddress,
-        paymentCycleDuration,
+        paymentCycleValue,
         loanDefaultDuration,
         loanExpirationDuration,
         0,
         false,
         false,
         '0',
-        uri
+        uri,
+        0
       )
       .should.emit(marketRegistry, 'MarketCreated')
       .withArgs(marketOwnerAddress, 1)

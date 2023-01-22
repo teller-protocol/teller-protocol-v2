@@ -242,7 +242,8 @@ contract User {
             _requireLenderAttestation,
             _requireBorrowerAttestation,
             _paymentType,
-            _uri
+            _uri,
+            IMarketRegistry.PaymentCycleType.Custom
         );
     }
 

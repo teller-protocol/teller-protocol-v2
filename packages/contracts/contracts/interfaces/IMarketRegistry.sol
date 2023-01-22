@@ -43,6 +43,8 @@ interface IMarketRegistry {
 
     function getMarketplaceFee(uint256 _marketId) external returns (uint16);
 
+    function getMarketplacePaymentCycleType(uint256 _marketId) external returns (PaymentCycleType);
+
     function getPaymentType(uint256 _marketId)
         external
         view
@@ -50,19 +52,20 @@ interface IMarketRegistry {
 
     function createMarket(
         address _initialOwner,
-        uint32 _paymentCycleDuration,
+        uint32 _paymentCycleValue,
         uint32 _paymentDefaultDuration,
         uint32 _bidExpirationTime,
         uint16 _feePercent,
         bool _requireLenderAttestation,
         bool _requireBorrowerAttestation,
         V2Calculations.PaymentType _paymentType,
-        string calldata _uri
+        string calldata _uri,
+        PaymentCycleType _paymentCycleType
     ) external returns (uint256 marketId_);
 
     function createMarket(
         address _initialOwner,
-        uint32 _paymentCycleDuration,
+        uint32 _paymentCycleValue,
         uint32 _paymentDefaultDuration,
         uint32 _bidExpirationTime,
         uint16 _feePercent,

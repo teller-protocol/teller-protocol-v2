@@ -64,6 +64,8 @@ contract MarketRegistry is
 
     TellerAS public tellerAS;
 
+    mapping(uint256 => PaymentCycleType) public paymentCycleType;
+
     /* Modifiers */
 
     modifier ownsMarket(uint256 _marketId) {
@@ -100,6 +102,7 @@ contract MarketRegistry is
         uint256 marketId,
         V2Calculations.PaymentType paymentType
     );
+    event SetMarketPaymentCycleType(uint256 marketId, PaymentCycleType paymentCycleType);
 
     /* External Functions */
 

@@ -20,6 +20,7 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./libraries/NumbersLib.sol";
+import "./libraries/DateTimeLib.sol";
 
 /* Errors */
 /**
@@ -414,6 +415,11 @@ contract TellerV2 is
 
         // Declare the bid acceptor as the lender of the bid
         bid.lender = sender;
+
+        // Set payment cycle value to current day if market setting is based on monthly payments
+        if (bidPaymentCycleType[_bidId] == IMarketRegistry.PaymentCycleType.Monthly) {
+            bid.terms.paymentCycle = uint32(BokkyPooBahsDateTimeLibrary.getDay(block.timestamp));
+        }
 
         // Transfer funds to borrower from the lender
         amountToProtocol = bid.loanDetails.principal.percent(protocolFee());

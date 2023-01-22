@@ -121,6 +121,11 @@ contract PaymentCycle_Test is Testable {
         // Check payment cycle type
         IMarketRegistry.PaymentCycleType paymentCycleType = tellerV2.bidPaymentCycleType(bidId_);
         require(paymentCycleType == IMarketRegistry.PaymentCycleType.Monthly, 'Payment cycle type not set');
+
+        // Check next payment date
+        uint32 nextMonth = uint32(BokkyPooBahsDateTimeLibrary.addMonths(currentDay, 1));
+        uint32 nextDueDate = tellerV2.calculateNextDueDate(bidId_);
+        require(nextDueDate == nextMonth, 'Incorrect due date set');
     }
 
 

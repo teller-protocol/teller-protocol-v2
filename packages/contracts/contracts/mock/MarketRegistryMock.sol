@@ -39,7 +39,7 @@ contract MarketRegistryMock is IMarketRegistry {
         return "url://";
     }
 
-    function getPaymentCycleDuration(uint256 _marketId)
+    function getPaymentCycleValue(uint256 _marketId)
         public
         returns (uint32)
     {

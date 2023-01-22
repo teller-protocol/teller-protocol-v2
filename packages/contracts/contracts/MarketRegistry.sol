@@ -40,7 +40,7 @@ contract MarketRegistry is
         bool lenderAttestationRequired;
         EnumerableSet.AddressSet verifiedLendersForMarket;
         mapping(address => bytes32) lenderAttestationIds;
-        uint32 paymentCycleDuration; //unix time
+        uint32 paymentCycleValue; //unix time
         uint32 paymentDefaultDuration; //unix time
         uint32 bidExpirationTime; //unix time
         bool borrowerAttestationRequired;
@@ -81,7 +81,7 @@ contract MarketRegistry is
 
     event MarketCreated(address indexed owner, uint256 marketId);
     event SetMarketURI(uint256 marketId, string uri);
-    event SetPaymentCycleDuration(uint256 marketId, uint32 duration);
+    event SetPaymentCycleValue(uint256 marketId, uint32 duration);
     event SetPaymentDefaultDuration(uint256 marketId, uint32 duration);
     event SetBidExpirationTime(uint256 marketId, uint32 duration);
     event SetMarketFee(uint256 marketId, uint16 feePct);
@@ -491,7 +491,7 @@ contract MarketRegistry is
      */
     function updateMarketSettings(
         uint256 _marketId,
-        uint32 _paymentCycleDuration,
+        uint32 _paymentCycleValue,
         uint32 _paymentDefaultDuration,
         uint32 _bidExpirationTime,
         uint16 _feePercent,
@@ -671,7 +671,7 @@ contract MarketRegistry is
         view
         returns (
             address owner,
-            uint32 paymentCycleDuration,
+            uint32 paymentCycleValue,
             uint32 paymentDefaultDuration,
             uint32 loanExpirationTime,
             string memory metadataURI,
@@ -681,7 +681,7 @@ contract MarketRegistry is
     {
         return (
             markets[_marketId].owner,
-            markets[_marketId].paymentCycleDuration,
+            markets[_marketId].paymentCycleValue,
             markets[_marketId].paymentDefaultDuration,
             markets[_marketId].bidExpirationTime,
             markets[_marketId].metadataURI,
@@ -761,13 +761,13 @@ contract MarketRegistry is
      * @param _marketId The ID of a market.
      * @return Duration of a loan until it is delinquent.
      */
-    function getPaymentCycleDuration(uint256 _marketId)
+    function getPaymentCycleValue(uint256 _marketId)
         public
         view
         override
         returns (uint32)
     {
-        return markets[_marketId].paymentCycleDuration;
+        return markets[_marketId].paymentCycleValue;
     }
 
     /**

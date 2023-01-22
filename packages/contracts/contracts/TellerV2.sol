@@ -272,7 +272,7 @@ contract TellerV2 is
         bid.loanDetails.loanDuration = _duration;
         bid.loanDetails.timestamp = uint32(block.timestamp);
 
-        bid.terms.paymentCycle = marketRegistry.getPaymentCycleDuration(
+        bid.terms.paymentCycle = marketRegistry.getPaymentCycleValue(
             _marketplaceId
         );
         bid.terms.APR = _APR;

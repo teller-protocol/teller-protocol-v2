@@ -138,4 +138,9 @@ abstract contract TellerV2Storage_G2 is TellerV2Storage_G1 {
     address public lenderCommitmentForwarder;
 }
 
-abstract contract TellerV2Storage is TellerV2Storage_G2 {}
+abstract contract TellerV2Storage_G3 is TellerV2Storage_G2 {
+    // BidId to payment cycle type (custom or monthly)
+    mapping(uint256 => IMarketRegistry.PaymentCycleType) public bidPaymentCycleType;
+}
+
+abstract contract TellerV2Storage is TellerV2Storage_G3 {}

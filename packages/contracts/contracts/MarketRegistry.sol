@@ -672,6 +672,17 @@ contract MarketRegistry is
         }
     }
 
+    function setMarketPaymentCycleType(uint256 _marketId, PaymentCycleType _paymentCycleType)
+        public
+        ownsMarket(_marketId)
+    {
+        if (_paymentCycleType != paymentCycleType[_marketId]) {
+            paymentCycleType[_marketId] = _paymentCycleType;
+
+            emit SetMarketPaymentCycleType(_marketId, _paymentCycleType);
+        }
+    }
+
     /**
      * @notice Gets the data associated with a market.
      * @param _marketId The ID of a market.
@@ -829,6 +840,20 @@ contract MarketRegistry is
         returns (uint16 fee)
     {
         return markets[_marketId].marketplaceFeePercent;
+    }
+
+    /**
+     * @notice Gets the payment cycle type (Seconds, Monthly) for a given market.
+     * @param _marketId The ID of a market.
+     * @return paymentCycleType The payment cycle type
+     */
+    function getMarketplacePaymentCycleType(uint256 _marketId)
+        public
+        view
+        override
+        returns (PaymentCycleType)
+    {
+        return paymentCycleType[_marketId];
     }
 
     /**

@@ -5,6 +5,12 @@ import { V2Calculations } from "../TellerV2.sol";
 import "../EAS/TellerAS.sol";
 
 interface IMarketRegistry {
+
+    enum PaymentCycleType {
+        Custom,
+        Monthly
+    }
+
     function initialize(TellerAS tellerAs) external;
 
     function isVerifiedLender(uint256 _marketId, address _lender)

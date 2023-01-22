@@ -36,7 +36,10 @@ contract MarketRegistry_Test is Testable, TellerV2 {
         lenderCommitmentForwarder = address(0);
         marketRegistry = IMarketRegistry(new MarketRegistry());
         reputationManager = IReputationManager(new ReputationManager());
+    }
 
+    function createMarket_test() public {
+        // Standard seconds payment cycle
         marketOwner.createMarket(
             address(marketRegistry),
             8000,
@@ -46,8 +49,38 @@ contract MarketRegistry_Test is Testable, TellerV2 {
             false,
             false,
             V2Calculations.PaymentType.EMI,
-            "uri://"
+            "uri://",
+            IMarketRegistry.PaymentCycleType.Custom
         );
+        IMarketRegistry.PaymentCycleType paymentCycle = marketRegistry.getMarketplacePaymentCycleType(1);
+
+        require(
+            paymentCycle ==
+            IMarketRegistry.PaymentCycleType.Custom,
+            'Market payment cycle type incorrectly created'
+        );
+
+        // Monthly payment cycle
+        marketOwner.createMarket(
+            address(marketRegistry),
+            8000,
+            7000,
+            5000,
+            500,
+            false,
+            false,
+            V2Calculations.PaymentType.EMI,
+            "uri://",
+            IMarketRegistry.PaymentCycleType.Monthly
+        );
+        paymentCycle = marketRegistry.getMarketplacePaymentCycleType(2);
+
+        require(
+            paymentCycle ==
+            IMarketRegistry.PaymentCycleType.Monthly,
+            'Market payment cycle type incorrectly created'
+        );
+
     }
 }
 
@@ -73,7 +106,8 @@ contract User {
         bool _requireLenderAttestation,
         bool _requireBorrowerAttestation,
         V2Calculations.PaymentType _paymentType,
-        string calldata _uri
+        string calldata _uri,
+        IMarketRegistry.PaymentCycleType _paymentCycleType
     ) public {
         IMarketRegistry(marketRegistry).createMarket(
             address(this),
@@ -84,7 +118,8 @@ contract User {
             _requireLenderAttestation,
             _requireBorrowerAttestation,
             _paymentType,
-            _uri
+            _uri,
+            _paymentCycleType
         );
     }
 }

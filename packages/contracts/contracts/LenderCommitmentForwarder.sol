@@ -231,9 +231,6 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         createLoanArgs.interestRate = _interestRate;
 
 
-       
-        bidId = _submitBid(createLoanArgs, borrower);
-
 
         uint256 collateralAmount = 0; //compute this with ratio 
 
@@ -246,9 +243,9 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             _collateralAddress:  commitment.collateralTokenAddress
         });
 
-         //use the collateral manager to commit collateral
-        _commitCollateral(bidId, collateralInfo, borrower );
+        bidId = _submitBidWithCollateral(createLoanArgs, collateralInfo, borrower);(createLoanArgs, borrower);
 
+ 
 
         _acceptBid(bidId, _lender);
 
@@ -269,7 +266,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
      * @param _bidId The bid id for the loan
      * @param _collateralInfo The collateral to be committed to the loan.
      */
-    function _commitCollateral(
+  /*  function _commitCollateral(
         uint256 _bidId,
         Collateral memory _collateralInfo,
         address _borrower 
@@ -289,5 +286,5 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
        
 
         return abi.decode(responseData, (bool));
-    }
+    }*/
 }

@@ -80,7 +80,8 @@ abstract contract TellerV2MarketForwarder is Initializable, ContextUpgradeable {
 
         responseData = _forwardCall(
             abi.encodeWithSelector(
-                ITellerV2.submitBid.selector,
+                //ITellerV2.submitBid.selector,
+                bytes4(keccak256("submitBid(address,uint256,uint256,uint32,uint16,string,address)")),
                 _createLoanArgs.lendingToken,
                 _createLoanArgs.marketId,
                 _createLoanArgs.principal,
@@ -94,6 +95,38 @@ abstract contract TellerV2MarketForwarder is Initializable, ContextUpgradeable {
 
         return abi.decode(responseData, (uint256));
     }
+
+  /**
+     * @notice Creates a new loan using the TellerV2 lending protocol.
+     * @param _createLoanArgs Details describing the loan agreement.]
+     * @param _borrower The borrower address for the new loan.
+     */
+    function _submitBidWithCollateral(
+        CreateLoanArgs memory _createLoanArgs,
+        Collateral[] calldata _collateralInfo,
+        address _borrower
+    ) internal virtual returns (uint256 bidId) {
+        bytes memory responseData;
+
+        responseData = _forwardCall(
+            abi.encodeWithSelector(
+                //ITellerV2.submitBid.selector,
+                bytes4(keccak256("submitBid(address,uint256,uint256,uint32,uint16,string,address,Collateral[])")),
+                _createLoanArgs.lendingToken,
+                _createLoanArgs.marketId,
+                _createLoanArgs.principal,
+                _createLoanArgs.duration,
+                _createLoanArgs.interestRate,
+                _createLoanArgs.metadataURI,
+                _createLoanArgs.recipient,
+                _collateralInfo
+            ),
+            _borrower
+        );
+
+        return abi.decode(responseData, (uint256));
+    }
+
 
     /**
      * @notice Accepts a new loan using the TellerV2 lending protocol.

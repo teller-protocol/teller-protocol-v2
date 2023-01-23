@@ -5,10 +5,15 @@ import "./TellerV2MarketForwarder.sol";
 
 import "./interfaces/ICollateralManager.sol";
 
-import { Collateral } from "./escrow/ICollateralEscrowV1.sol";
+
+import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
+
+import { Collateral, CollateralType } from "./interfaces/escrow/ICollateralEscrowV1.sol";
 
 
 contract LenderCommitmentForwarder is TellerV2MarketForwarder {
+
+    using AddressUpgradeable for address;
 
     //should we move this into TellerV2MarketForwarder? 
     address public immutable _collateralManager;
@@ -121,7 +126,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
 
         Commitment storage commitment = lenderMarketCommitments[lender][
             _marketId
-        ][_tokenAddress];
+        ][_principalTokenAddress];
         commitment.maxPrincipal = _maxPrincipal;
         commitment.collateralTokenAddress = _collateralTokenAddress;
         commitment.minCollateralPerMaxPrincipal = _minCollateralPerMaxPrincipal;
@@ -129,35 +134,35 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         commitment.maxDuration = _maxLoanDuration;
         commitment.minInterestRate = _minInterestRate;
 
-        emit UpdatedCommitment(lender, _marketId, _tokenAddress, _maxPrincipal);
+        emit UpdatedCommitment(lender, _marketId, _principalTokenAddress, _maxPrincipal);
     }
 
     /**
      * @notice Removes the commitment of a lender to a market.
      * @param _marketId The Id of the market the commitment removal applies to.
-     * @param _tokenAddress The address of the asset for which the commitment is being removed.
+     * @param _principalTokenAddress The address of the asset for which the commitment is being removed.
      */
-    function deleteCommitment(uint256 _marketId, address _tokenAddress) public {
-        _deleteCommitment(_msgSender(), _marketId, _tokenAddress);
+    function deleteCommitment(uint256 _marketId, address _principalTokenAddress) public {
+        _deleteCommitment(_msgSender(), _marketId, _principalTokenAddress);
     }
 
     /**
      * @notice Removes the commitment of a lender to a market.
      * @param _lender The address of the lender of the commitment.
      * @param _marketId The Id of the market the commitment removal applies to.
-     * @param _tokenAddress The address of the asset for which the commitment is being removed.
+     * @param _principalTokenAddress The address of the asset for which the commitment is being removed.
      */
     function _deleteCommitment(
         address _lender,
         uint256 _marketId,
-        address _tokenAddress
+        address _principalTokenAddress
     ) internal {
         if (
-            lenderMarketCommitments[_lender][_marketId][_tokenAddress]
+            lenderMarketCommitments[_lender][_marketId][_principalTokenAddress]
                 .maxPrincipal > 0
         ) {
-            delete lenderMarketCommitments[_lender][_marketId][_tokenAddress];
-            emit DeletedCommitment(_lender, _marketId, _tokenAddress);
+            delete lenderMarketCommitments[_lender][_marketId][_principalTokenAddress];
+            emit DeletedCommitment(_lender, _marketId, _principalTokenAddress);
         }
     }
 
@@ -165,16 +170,16 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
      * @notice Reduces the commitment amount for a lender to a market.
      * @param _lender The address of the lender of the commitment.
      * @param _marketId The Id of the market the commitment removal applies to.
-     * @param _tokenAddress The address of the asset for which the commitment is being removed.
+     * @param _principalTokenAddress The address of the asset for which the commitment is being removed.
      * @param _tokenAmountDelta The amount of change in the maxPrincipal.
      */
     function _decrementCommitment(
         address _lender,
         uint256 _marketId,
-        address _tokenAddress,
+        address _principalTokenAddress,
         uint256 _tokenAmountDelta
     ) internal {
-        lenderMarketCommitments[_lender][_marketId][_tokenAddress]
+        lenderMarketCommitments[_lender][_marketId][_principalTokenAddress]
             .maxPrincipal -= _tokenAmountDelta;
     }
 
@@ -182,7 +187,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
      * @notice Accept the commitment to submitBid and acceptBid using the funds
      * @param _marketId The Id of the market the commitment removal applies to.
      * @param _lender The address of the lender of the commitment.
-     * @param _tokenAddress The address of the asset for which the commitment is being removed.
+     * @param _principalTokenAddress The address of the asset for which the commitment is being removed.
      * @param _principal The amount of currency to borrow for the loan.
      * @param _loanDuration The loan duration for the TellerV2 loan.
      * @param _interestRate The interest rate for the TellerV2 loan.
@@ -190,7 +195,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
     function acceptCommitment(
         uint256 _marketId,
         address _lender,
-        address _tokenAddress,
+        address _principalTokenAddress,
         uint256 _principal,
         uint32 _loanDuration,
         uint16 _interestRate
@@ -199,7 +204,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
 
         Commitment storage commitment = lenderMarketCommitments[_lender][
             _marketId
-        ][_tokenAddress];
+        ][_principalTokenAddress];
 
         require(
             _principal <= commitment.maxPrincipal,
@@ -220,7 +225,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
 
         CreateLoanArgs memory createLoanArgs;
         createLoanArgs.marketId = _marketId;
-        createLoanArgs.lendingToken = _tokenAddress;
+        createLoanArgs.lendingToken = _principalTokenAddress;
         createLoanArgs.principal = _principal;
         createLoanArgs.duration = _loanDuration;
         createLoanArgs.interestRate = _interestRate;
@@ -229,18 +234,30 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
        
         bidId = _submitBid(createLoanArgs, borrower);
 
+
+        uint256 collateralAmount = 0; //compute this with ratio 
+
+        Collateral memory collateralInfo;
+
+        collateralInfo = Collateral({
+            _collateralType: CollateralType.ERC20,
+            _tokenId: 0,
+            _amount:  collateralAmount,
+            _collateralAddress:  commitment.collateralTokenAddress
+        });
+
          //use the collateral manager to commit collateral
         _commitCollateral(bidId, collateralInfo, borrower );
 
 
         _acceptBid(bidId, _lender);
 
-        _decrementCommitment(_lender, _marketId, _tokenAddress, _principal);
+        _decrementCommitment(_lender, _marketId, _principalTokenAddress, _principal);
 
         emit ExercisedCommitment(
             _lender,
             _marketId,
-            _tokenAddress,
+            _principalTokenAddress,
             _principal,
             bidId
         );
@@ -254,7 +271,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
      */
     function _commitCollateral(
         uint256 _bidId,
-        Collateral[] calldata _collateralInfo,
+        Collateral memory _collateralInfo,
         address _borrower 
     ) internal virtual returns (bool validation_) {
         bytes memory responseData;
@@ -262,7 +279,8 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         responseData =  address(_collateralManager).functionCall(
                // abi.encodePacked(
                      abi.encodeWithSelector(
-                        ICollateralManager.commitCollateral.selector,
+                        //ICollateralManager.commitCollateral.selector,
+                        bytes4(keccak256("commitCollateral(uint256,Collateral)")),
                         _bidId,
                         _collateralInfo
                     )

@@ -141,4 +141,6 @@ dataSources:
           handler: handleCollateralDeposited
         - event:  CollateralWithdrawn(uint256,uint8,address,uint256,uint256,address)
           handler: handleCollateralWithdrawn
+        - event: CollateralClaimed(uint256)
+          handler: handleCollateralClaimed
       file: ./src/mapping.ts

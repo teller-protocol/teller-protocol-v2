@@ -41,7 +41,7 @@ import {
   CollateralEscrowDeployed,
   CollateralCommitted,
   CollateralDeposited,
-  CollateralWithdrawn
+  CollateralWithdrawn, CollateralClaimed,
 } from '../generated/CollateralManager/CollateralManager'
 
 import {
@@ -57,7 +57,7 @@ import {
   loadProtocolTokenVolume,
   loadTokenVolumeByMarketId
 } from './helpers/loaders'
-import { updateBid, updateTokenVolumeOnAccept } from './helpers/updaters'
+import { updateBid, updateCollateral, updateTokenVolumeOnAccept } from './helpers/updaters'
 import {IERC20} from "../generated/CollateralManager/IERC20";
 import {IERC721Upgradeable} from "../generated/CollateralManager/IERC721Upgradeable";
 import {IERC1155Upgradeable} from "../generated/CollateralManager/IERC1155Upgradeable";
@@ -779,26 +779,14 @@ export function handleCollateralEscrowDeployeds(
 export function handleCollateralCommitted(
     event: CollateralCommitted
 ): void {
-  const bid: Bid = loadBidById(event.params._bidId.toString());
   // Load collateral by bidId and collateral address
   const collateral = loadCollateral(
       event.params._bidId.toString(),
       event.params._collateralAddress
     );
-  collateral.amount = event.params._amount;
-  collateral.tokenId = event.params._tokenId;
-  collateral.type = getTypeString(event.params._type);
-  collateral.collateralAddress = event.params._collateralAddress;
-  collateral.bid = bid.id;
+  updateCollateral(collateral, event);
   collateral.status = 'Committed'
-  collateral.receiver = bid.borrowerAddress;
   collateral.save();
-  let collateralCommitted = bid.collateral;
-  if (collateralCommitted) {
-    collateralCommitted.push(collateral.id);
-    bid.collateral = collateralCommitted;
-    bid.save();
-  }
 }
 
 export function handleCollateralCommitteds(
@@ -812,16 +800,11 @@ export function handleCollateralCommitteds(
 export function handleCollateralDeposited(
     event: CollateralDeposited
 ): void {
-  const bid: Bid = loadBidById(event.params._bidId.toString());
   const collateral = loadCollateral(
       event.params._bidId.toString(),
       event.params._collateralAddress
     );
-  collateral.amount = event.params._amount;
-  collateral.tokenId = event.params._tokenId;
-  collateral.type = getTypeString(event.params._type);
-  collateral.collateralAddress = event.params._collateralAddress;
-  collateral.bid = bid.id;
+  updateCollateral(collateral, event);
   collateral.status = 'Deposited'
   collateral.save();
 }
@@ -837,22 +820,13 @@ export function handleCollateralDepositeds(
 export function handleCollateralWithdrawn(
     event: CollateralWithdrawn
 ): void {
-  const bid: Bid = loadBidById(event.params._bidId.toString());
   const collateral = loadCollateral(
       event.params._bidId.toString(),
       event.params._collateralAddress
     );
-  collateral.amount = event.params._amount;
-  collateral.tokenId = event.params._tokenId;
-  collateral.type = getTypeString(event.params._type);
-  collateral.collateralAddress = event.params._collateralAddress;
+  updateCollateral(collateral, event);
   collateral.receiver = event.params._recipient;
-  if (event.params._recipient != bid.borrowerAddress) {
-    collateral.status = 'Claimed'
-  } else {
-    collateral.status = 'Withdrawn'
-  }
-  collateral.bid = bid.id;
+  collateral.status = 'Withdrawn'
   collateral.save();
 }
 
@@ -864,14 +838,18 @@ export function handleCollateralWithdrawns(
   })
 }
 
-function getTypeString(tokenType: i32): string {
-  let type = ''
-  if (tokenType == i32(0)) {
-    type = 'ERC20'
-  } else if (tokenType == i32(1)) {
-    type = 'ERC721'
-  } else if (tokenType == i32(2)) {
-    type =  'ERC1155'
-  }
-  return type;
+/**
+ * Sets the bid status to `Liquidated` when the collateral is claimed from a defaulted loan.
+ * @param event
+ */
+export function handleCollateralClaimed(event: CollateralClaimed): void {
+  const bid = loadBidById(event.params._bidId.toString());
+  bid.status = "Liquidated";
+  bid.save();
+}
+
+export function handleCollateralClaimeds(events: CollateralClaimed[]): void {
+  events.forEach(event => {
+    handleCollateralClaimed(event);
+  });
 }

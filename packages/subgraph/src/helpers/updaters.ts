@@ -1,6 +1,7 @@
 import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts'
+import { CollateralCommitted, CollateralDeposited } from '../../generated/CollateralManager/CollateralManager'
 
-import { Bid, Borrower, Commitment, Payment, TokenVolume } from '../../generated/schema'
+import { Bid, Borrower, Collateral, Commitment, Payment, TokenVolume } from '../../generated/schema'
 import {
   TellerV2,
   TellerV2__bidsResult,
@@ -251,4 +252,26 @@ export function updateOutstandingCapital(
   lender.save();
   market.save();
   borrower.save();
+}
+
+export function updateCollateral(
+  collateral: Collateral,
+  event: ethereum.Event
+): void {
+  const evt = changetype<CollateralCommitted>(event);
+  collateral.amount = evt.params._amount;
+  collateral.tokenId = evt.params._tokenId;
+  collateral.type = getTypeString(evt.params._type);
+  collateral.collateralAddress = evt.params._collateralAddress;
+}
+function getTypeString(tokenType: i32): string {
+  let type = "";
+  if (tokenType == i32(0)) {
+    type = "ERC20";
+  } else if (tokenType == i32(1)) {
+    type = "ERC721";
+  } else if (tokenType == i32(2)) {
+    type = "ERC1155";
+  }
+  return type;
 }

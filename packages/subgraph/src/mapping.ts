@@ -1,4 +1,4 @@
-import {Address, BigInt } from '@graphprotocol/graph-ts'
+import { Address, BigInt } from '@graphprotocol/graph-ts'
 
 import {
   DeletedCommitment,
@@ -25,7 +25,7 @@ import {
   SetPaymentDefaultDuration,
   Upgraded
 } from '../generated/MarketRegistry/MarketRegistry'
-import { Bid, Borrower, BorrowerBid, Lender, LenderBid, MarketPlace, TokenVolume } from '../generated/schema'
+import {Bid, Borrower, BorrowerBid, Collateral, Lender, LenderBid, MarketPlace, TokenVolume} from '../generated/schema'
 import {
   AcceptedBid,
   CancelledBid,
@@ -38,10 +38,18 @@ import {
 } from '../generated/TellerV2/TellerV2'
 
 import {
+  CollateralEscrowDeployed,
+  CollateralCommitted,
+  CollateralDeposited,
+  CollateralWithdrawn, CollateralClaimed,
+} from '../generated/CollateralManager/CollateralManager'
+
+import {
   getBid,
   loadBidById,
   loadBorrowerByMarketId,
   loadBorrowerTokenVolume,
+  loadCollateral,
   loadCommitmentByMarketId,
   loadLenderByMarketId,
   loadLenderTokenVolume,
@@ -49,7 +57,10 @@ import {
   loadProtocolTokenVolume,
   loadTokenVolumeByMarketId
 } from './helpers/loaders'
-import { updateBid, updateTokenVolumeOnAccept } from './helpers/updaters'
+import { updateBid, updateCollateral, updateTokenVolumeOnAccept } from './helpers/updaters'
+import {IERC20} from "../generated/CollateralManager/IERC20";
+import {IERC721Upgradeable} from "../generated/CollateralManager/IERC721Upgradeable";
+import {IERC1155Upgradeable} from "../generated/CollateralManager/IERC1155Upgradeable";
 
 export function handleSubmittedBid(event: SubmittedBid): void {
   const tellerV2Instance = TellerV2.bind(event.address);
@@ -746,5 +757,99 @@ export function handleExercisedCommitments(
 ): void {
   events.forEach(event => {
     handleExercisedCommitment(event);
+  });
+}
+
+export function handleCollateralEscrowDeployed(
+  event: CollateralEscrowDeployed
+): void {
+  const bid: Bid = loadBidById(event.params._bidId.toString());
+  bid.collateralEscrow = event.params._collateralEscrow;
+  bid.save();
+}
+
+export function handleCollateralEscrowDeployeds(
+  events: CollateralEscrowDeployed[]
+): void {
+  events.forEach(event => {
+    handleCollateralEscrowDeployed(event);
+  })
+}
+
+export function handleCollateralCommitted(
+    event: CollateralCommitted
+): void {
+  // Load collateral by bidId and collateral address
+  const collateral = loadCollateral(
+      event.params._bidId.toString(),
+      event.params._collateralAddress
+    );
+  updateCollateral(collateral, event);
+  collateral.status = 'Committed'
+  collateral.save();
+}
+
+export function handleCollateralCommitteds(
+    events: CollateralCommitted[]
+): void {
+  events.forEach(event => {
+    handleCollateralCommitted(event);
+  })
+}
+
+export function handleCollateralDeposited(
+    event: CollateralDeposited
+): void {
+  const collateral = loadCollateral(
+      event.params._bidId.toString(),
+      event.params._collateralAddress
+    );
+  updateCollateral(collateral, event);
+  collateral.status = 'Deposited'
+  collateral.save();
+}
+
+export function handleCollateralDepositeds(
+    events: CollateralDeposited[]
+): void {
+  events.forEach(event => {
+    handleCollateralDeposited(event);
+  })
+}
+
+export function handleCollateralWithdrawn(
+    event: CollateralWithdrawn
+): void {
+  const collateral = loadCollateral(
+      event.params._bidId.toString(),
+      event.params._collateralAddress
+    );
+  updateCollateral(collateral, event);
+  collateral.receiver = event.params._recipient;
+  collateral.status = 'Withdrawn'
+  collateral.save();
+}
+
+export function handleCollateralWithdrawns(
+    events: CollateralWithdrawn[]
+): void {
+  events.forEach(event => {
+    handleCollateralWithdrawn(event);
+  })
+}
+
+/**
+ * Sets the bid status to `Liquidated` when the collateral is claimed from a defaulted loan.
+ * @param event
+ */
+export function handleCollateralClaimed(event: CollateralClaimed): void {
+  const bid = loadBidById(event.params._bidId.toString());
+  bid.status = "Liquidated";
+  bid.save();
+}
+
+export function handleCollateralClaimeds(events: CollateralClaimed[]): void {
+  events.forEach(event => {
+    handleCollateralClaimed(event);
   });
 }

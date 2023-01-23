@@ -8,6 +8,7 @@ import 'hardhat-gas-reporter'
 import '@nomiclabs/hardhat-ethers'
 import '@typechain/hardhat'
 import 'solidity-coverage'
+import '@openzeppelin/hardhat-upgrades'
 
 import fs from 'fs'
 import path from 'path'
@@ -19,14 +20,14 @@ import {
 import { HardhatEthersHelpers } from '@nomiclabs/hardhat-ethers/types'
 import chalk from 'chalk'
 import { config } from 'dotenv'
-import { ethers } from 'ethers'
-import { Signer, utils } from 'ethers'
+import { ethers, Signer, utils } from 'ethers'
 import { HardhatUserConfig, task } from 'hardhat/config'
 import {
   HardhatNetworkHDAccountsUserConfig,
   NetworkUserConfig,
 } from 'hardhat/types'
 import rrequire from 'helpers/rrequire'
+import { projectBase } from 'helpers/tenderly'
 import semver from 'semver'
 
 const NODE_VERSION = 'v16'
@@ -98,6 +99,7 @@ const networkUrls: { [network: string]: string } = {
   mainnetAvalanche: process.env.MAINNET_AVALANCHE_RPC_URL ?? '',
   testnetHarmony: process.env.TESTNET_HARMONY_RPC_URL ?? '',
   mainnetHarmony: process.env.MAINNET_HARMONY_RPC_URL ?? '',
+  tenderly: process.env.TENDERLY_RPC_URL ?? '',
 }
 
 const getLatestDeploymentBlock = (networkName: string): number | undefined => {
@@ -148,6 +150,7 @@ export default <HardhatUserConfig>{
   tenderly: {
     username: 'teller',
     project: '{see `updateTenderlyConfig` function in utils/hre-extensions.ts}',
+    forkNetwork: networkUrls.tenderly,
   },
 
   paths: {
@@ -353,6 +356,9 @@ export default <HardhatUserConfig>{
       url: networkUrls.mainnetHarmony,
       gasPrice: 1000000000,
       chainId: 1666600000,
+    }),
+    tenderly: networkConfig({
+      url: networkUrls.tenderly,
     }),
   },
 

@@ -1,4 +1,4 @@
-import { Address, BigInt, Value } from '@graphprotocol/graph-ts'
+import { Address, BigInt, Value } from "@graphprotocol/graph-ts";
 
 import {
   Bid,
@@ -10,21 +10,21 @@ import {
   MarketVolume,
   TokenVolume,
   User
-} from '../../generated/schema'
-
-import { initTokenVolume } from './intializers'
+} from "../../generated/schema";
+import { TellerV0Storage } from "../../generated/TellerV2/TellerV0Storage";
 import {
   TellerV2,
   TellerV2__bidsResult,
   TellerV2__bidsResultLoanDetailsStruct,
   TellerV2__bidsResultTermsStruct
 } from "../../generated/TellerV2/TellerV2";
-import {TellerV0Storage} from "../../generated/TellerV2/TellerV0Storage";
+
+import { initTokenVolume } from "./intializers";
 
 export function loadBidById(id: string): Bid {
   const bid: Bid | null = Bid.load(id);
 
-  if (!bid) throw "unable to load bid";
+  if (!bid) throw new Error("unable to load bid");
 
   return bid;
 }
@@ -126,7 +126,10 @@ export function loadBorrowerByMarketId(
  * @param prefixes An array of prefixes to use to find the token volume.
  * @param tokenAddress The address of the token.
  */
-function loadTokenVolume(prefixes: string[], tokenAddress: Address): TokenVolume {
+function loadTokenVolume(
+  prefixes: string[],
+  tokenAddress: Address
+): TokenVolume {
   return loadTokenVolumeWithValues(prefixes, tokenAddress);
 }
 
@@ -145,7 +148,7 @@ function loadTokenVolumeWithValues(
   values: Value[] = []
 ): TokenVolume {
   prefixes.push(tokenAddress.toHexString());
-  const id = prefixes.join('-');
+  const id = prefixes.join("-");
   let token = TokenVolume.load(id);
 
   if (!token) {
@@ -162,7 +165,7 @@ function loadTokenVolumeWithValues(
 }
 
 export function loadProtocolTokenVolume(tokenAddress: Address): TokenVolume {
-  return loadTokenVolume(['protocol'], tokenAddress);
+  return loadTokenVolume(["protocol"], tokenAddress);
 }
 
 /**
@@ -175,13 +178,13 @@ export function loadTokenVolumeByMarketId(
   marketId: string
 ): TokenVolume {
   const tokenVolume = loadTokenVolumeWithValues(
-    [ 'market', marketId ],
+    ["market", marketId],
     lendingTokenAddress,
-    [ 'marketplace' ],
-    [ Value.fromString(marketId) ]
+    ["marketplace"],
+    [Value.fromString(marketId)]
   );
 
-  let marketVolumeId = `${marketId}-${tokenVolume.id}`;
+  const marketVolumeId = `${marketId}-${tokenVolume.id}`;
   let marketVolume = MarketVolume.load(marketVolumeId);
   if (!marketVolume) {
     marketVolume = new MarketVolume(marketVolumeId);
@@ -203,10 +206,10 @@ export function loadLenderTokenVolume(
   lender: Lender
 ): TokenVolume {
   return loadTokenVolumeWithValues(
-    [ 'lender', lender.id, lender.marketplace ],
+    ["lender", lender.id, lender.marketplace],
     lendingTokenAddress,
-    [ 'marketplace', 'lender' ],
-    [ Value.fromString(lender.marketplace), Value.fromString(lender.id) ]
+    ["marketplace", "lender"],
+    [Value.fromString(lender.marketplace), Value.fromString(lender.id)]
   );
 }
 
@@ -220,10 +223,10 @@ export function loadBorrowerTokenVolume(
   borrower: Borrower
 ): TokenVolume {
   return loadTokenVolumeWithValues(
-    [ 'borrower', borrower.id, borrower.marketplace ],
+    ["borrower", borrower.id, borrower.marketplace],
     lendingTokenAddress,
-    [ 'marketplace', 'borrower' ],
-    [ Value.fromString(borrower.marketplace), Value.fromString(borrower.id) ]
+    ["marketplace", "borrower"],
+    [Value.fromString(borrower.marketplace), Value.fromString(borrower.id)]
   );
 }
 
@@ -246,8 +249,8 @@ export function loadCommitmentByMarketId(
   if (!commitment) {
     commitment = new Commitment(idString);
 
-    const stats = new TokenVolume(`commitment-stats-${commitment.id}`)
-    initTokenVolume(stats, lendingTokenAddress)
+    const stats = new TokenVolume(`commitment-stats-${commitment.id}`);
+    initTokenVolume(stats, lendingTokenAddress);
     stats.save();
 
     const lender = loadLenderByMarketId(lenderAddress, marketId);
@@ -260,13 +263,16 @@ export function loadCommitmentByMarketId(
     commitment.lenderAddress = lender.lenderAddress;
     commitment.marketplace = marketId;
     commitment.marketplaceId = BigInt.fromString(marketId);
-    commitment.stats = stats.id
+    commitment.stats = stats.id;
     commitment.save();
   }
   return commitment;
 }
 
-export function getBid(eventAddress: Address, bidId: BigInt): TellerV2__bidsResult {
+export function getBid(
+  eventAddress: Address,
+  bidId: BigInt
+): TellerV2__bidsResult {
   const tellerV2Instance = TellerV2.bind(eventAddress);
   const tellerV0Storage = TellerV0Storage.bind(eventAddress);
 
@@ -274,20 +280,20 @@ export function getBid(eventAddress: Address, bidId: BigInt): TellerV2__bidsResu
   if (tellerV2Instance.try_bids(bidId).reverted) {
     const storedV0Bid = tellerV0Storage.bids(bidId);
     storedBid = new TellerV2__bidsResult(
-        storedV0Bid.value0,
-        storedV0Bid.value1,
-        storedV0Bid.value2,
-        storedV0Bid.value3,
-        storedV0Bid.value4,
-        changetype<TellerV2__bidsResultLoanDetailsStruct>(storedV0Bid.value5),
-        changetype<TellerV2__bidsResultTermsStruct>(storedV0Bid.value6),
-        storedV0Bid.value7,
-        0
-    )
+      storedV0Bid.value0,
+      storedV0Bid.value1,
+      storedV0Bid.value2,
+      storedV0Bid.value3,
+      storedV0Bid.value4,
+      changetype<TellerV2__bidsResultLoanDetailsStruct>(storedV0Bid.value5),
+      changetype<TellerV2__bidsResultTermsStruct>(storedV0Bid.value6),
+      storedV0Bid.value7,
+      0
+    );
   } else {
     storedBid = tellerV2Instance.bids(bidId);
   }
-  return storedBid
+  return storedBid;
 }
 
 /**
@@ -295,8 +301,8 @@ export function getBid(eventAddress: Address, bidId: BigInt): TellerV2__bidsResu
  * @param {Address} collateralAddress - Address of the collateral contract
  */
 export function loadCollateral(
-    bidId: string,
-    collateralAddress: Address
+  bidId: string,
+  collateralAddress: Address
 ): Collateral {
   const idString = bidId.concat(collateralAddress.toHexString());
   let collateral = Collateral.load(idString);
@@ -305,11 +311,11 @@ export function loadCollateral(
     collateral.amount = BigInt.zero();
     collateral.tokenId = BigInt.zero();
     collateral.collateralAddress = Address.zero();
-    collateral.type = '';
-    collateral.status = '';
+    collateral.type = "";
+    collateral.status = "";
     collateral.receiver = Address.zero();
     collateral.bid = bidId;
-    collateral.save()
+    collateral.save();
   }
   return collateral;
 }

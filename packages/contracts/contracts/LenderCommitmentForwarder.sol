@@ -5,6 +5,9 @@ import "./TellerV2MarketForwarder.sol";
 
 import "./interfaces/ICollateralManager.sol";
 
+import { Collateral } from "./escrow/ICollateralEscrowV1.sol";
+
+
 contract LenderCommitmentForwarder is TellerV2MarketForwarder {
 
     //should we move this into TellerV2MarketForwarder? 
@@ -222,9 +225,13 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         createLoanArgs.duration = _loanDuration;
         createLoanArgs.interestRate = _interestRate;
 
-        _commitCollateral(  );
 
+       
         bidId = _submitBid(createLoanArgs, borrower);
+
+         //use the collateral manager to commit collateral
+        _commitCollateral(bidId, collateralInfo, borrower );
+
 
         _acceptBid(bidId, _lender);
 
@@ -237,5 +244,32 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             _principal,
             bidId
         );
+    }
+
+
+    /**
+     * @notice Commits collateral to a bid using the TellerV2 CollateralManager protocol.
+     * @param _bidId The bid id for the loan
+     * @param _collateralInfo The collateral to be committed to the loan.
+     */
+    function _commitCollateral(
+        uint256 _bidId,
+        Collateral[] calldata _collateralInfo,
+        address _borrower 
+    ) internal virtual returns (bool validation_) {
+        bytes memory responseData;
+
+        responseData =  address(_collateralManager).functionCall(
+               // abi.encodePacked(
+                     abi.encodeWithSelector(
+                        ICollateralManager.commitCollateral.selector,
+                        _bidId,
+                        _collateralInfo
+                    )
+               //  , _borrower)
+            ); 
+       
+
+        return abi.decode(responseData, (bool));
     }
 }

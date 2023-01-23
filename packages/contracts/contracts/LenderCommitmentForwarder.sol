@@ -3,7 +3,15 @@ pragma solidity >=0.8.0 <0.9.0;
 
 import "./TellerV2MarketForwarder.sol";
 
+import "./interfaces/ICollateralManager.sol";
+
 contract LenderCommitmentForwarder is TellerV2MarketForwarder {
+
+    //should we move this into TellerV2MarketForwarder? 
+    address public immutable _collateralManager;
+
+
+
     /**
      * @notice Details about a lender's capital commitment.
      * @param amount Amount of tokens being committed by the lender.
@@ -16,6 +24,8 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint32 expiration;
         uint32 maxDuration;
         uint16 minInterestRate;
+        address collateralTokenAddress;
+        uint256 minCollateralPerMaxPrincipal;
     }
 
     modifier onlyMarketOwner(uint256 marketId) {
@@ -69,25 +79,36 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint256 bidId
     );
 
+    
     /** External Functions **/
 
-    constructor(address _protocolAddress, address _marketRegistry)
+    constructor(address _protocolAddress, address _marketRegistry, address _collateralManagerAddress)
         TellerV2MarketForwarder(_protocolAddress, _marketRegistry)
-    {}
+    {
+        _collateralManager = _collateralManagerAddress;
+    }
 
     /**
      * @notice Updates the commitment of a lender to a market.
-     * @param _tokenAddress The address of the asset being committed.
-     * @param _marketId The Id of the market the commitment applies to.
+      * @param _marketId The Id of the market the commitment applies to.
+     * @param _principalTokenAddress The address of the asset being committed.
      * @param _maxPrincipal Amount of tokens being committed by the lender.
+
+      * @param _collateralTokenAddress The address of the collateral asset required for the loan.
+       * @param _minCollateralPerMaxPrincipal Ratio of collateral amount required per max principal.
+
      * @param _maxLoanDuration Length of time, in seconds that the lender's capital can be lent out for.
      * @param _minInterestRate Minimum Annual percentage to be applied for loans using the lender's capital.
      * @param _expiration Expiration time in seconds, when the commitment expires.
      */
     function updateCommitment(
         uint256 _marketId,
-        address _tokenAddress,
+        address _principalTokenAddress,
         uint256 _maxPrincipal,
+
+        address _collateralTokenAddress,
+        uint256 _minCollateralPerMaxPrincipal,
+
         uint32 _maxLoanDuration,
         uint16 _minInterestRate,
         uint32 _expiration
@@ -99,6 +120,8 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             _marketId
         ][_tokenAddress];
         commitment.maxPrincipal = _maxPrincipal;
+        commitment.collateralTokenAddress = _collateralTokenAddress;
+        commitment.minCollateralPerMaxPrincipal = _minCollateralPerMaxPrincipal;
         commitment.expiration = _expiration;
         commitment.maxDuration = _maxLoanDuration;
         commitment.minInterestRate = _minInterestRate;
@@ -198,6 +221,8 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         createLoanArgs.principal = _principal;
         createLoanArgs.duration = _loanDuration;
         createLoanArgs.interestRate = _interestRate;
+
+        _commitCollateral(  );
 
         bidId = _submitBid(createLoanArgs, borrower);
 

@@ -1,7 +1,7 @@
 pragma solidity >=0.8.0 <0.9.0;
 // SPDX-License-Identifier: MIT
 
-import "./TellerV2.sol";
+import "./interfaces/ITellerV2.sol";
 
 import "./interfaces/IMarketRegistry.sol";
 
@@ -36,8 +36,8 @@ abstract contract TellerV2MarketForwarder is Initializable, ContextUpgradeable {
         _marketRegistry = _marketRegistryAddress;
     }
 
-    function getTellerV2() public view returns (TellerV2) {
-        return TellerV2(_tellerV2);
+    function getTellerV2() public view returns (address) {
+        return _tellerV2;
     }
 
     function getMarketRegistry() public view returns (address) {
@@ -78,15 +78,9 @@ abstract contract TellerV2MarketForwarder is Initializable, ContextUpgradeable {
     ) internal virtual returns (uint256 bidId) {
         bytes memory responseData;
 
-        bytes4 submitBidSelector = bytes4(
-            keccak256(
-                "ITellerV2.submitBid(address,uint256,uint256,uint32,uint16,string,address)"
-            )
-        );
-
         responseData = _forwardCall(
             abi.encodeWithSelector(
-                submitBidSelector,
+                ITellerV2.submitBid.selector,
                 _createLoanArgs.lendingToken,
                 _createLoanArgs.marketId,
                 _createLoanArgs.principal,

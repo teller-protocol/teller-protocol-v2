@@ -329,9 +329,7 @@ describe('MarketRegistry', () => {
         .should.emit(marketRegistry, 'SetPaymentCycleValue')
         .withArgs(1, 60 * 60 * 60)
 
-      expect(await marketRegistry.getPaymentCycleValue(1)).to.eql(
-        60 * 60 * 60
-      )
+      expect(await marketRegistry.getPaymentCycleValue(1)).to.eql(60 * 60 * 60)
     })
 
     it('should not be able to update unowned market metadata uri', async () => {

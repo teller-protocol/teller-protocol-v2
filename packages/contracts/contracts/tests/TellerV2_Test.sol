@@ -113,7 +113,8 @@ contract TellerV2_Test is Testable {
             false,
             false,
             PaymentType.EMI,
-            "uri://"
+            "uri://",
+            IMarketRegistry.PaymentCycleType.Custom
         );
     }
 

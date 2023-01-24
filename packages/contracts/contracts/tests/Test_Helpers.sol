@@ -39,7 +39,8 @@ contract User {
         bool _requireLenderAttestation,
         bool _requireBorrowerAttestation,
         PaymentType _paymentType,
-        string calldata _uri
+        string calldata _uri,
+        IMarketRegistry.PaymentCycleType _paymentCycleType
     ) public returns (uint256) {
         return
             IMarketRegistry(marketRegistry).createMarket(
@@ -51,7 +52,8 @@ contract User {
                 _requireLenderAttestation,
                 _requireBorrowerAttestation,
                 _paymentType,
-                _uri
+                _uri,
+                _paymentCycleType
             );
     }
 

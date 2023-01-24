@@ -82,7 +82,7 @@ contract MarketRegistryMock is IMarketRegistry {
         uint16 _feePercent,
         bool _requireLenderAttestation,
         bool _requireBorrowerAttestation,
-        V2Calculations.PaymentType _paymentType,
+        PaymentType _paymentType,
         string calldata _uri,
         PaymentCycleType _paymentCycleType
     ) public returns (uint256) {}

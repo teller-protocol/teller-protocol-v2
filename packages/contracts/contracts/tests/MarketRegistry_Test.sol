@@ -17,7 +17,6 @@ import "../EAS/TellerAS.sol";
 import "../mock/WethMock.sol";
 import "../interfaces/IWETH.sol";
 
-import { User } from "./Test_Helpers.sol";
 import { PaymentType } from "../libraries/V2Calculations.sol";
 
 contract MarketRegistry_Test is Testable, TellerV2 {
@@ -51,7 +50,7 @@ contract MarketRegistry_Test is Testable, TellerV2 {
             500,
             false,
             false,
-            V2Calculations.PaymentType.EMI,
+            PaymentType.EMI,
             "uri://",
             IMarketRegistry.PaymentCycleType.Custom
         );
@@ -72,7 +71,7 @@ contract MarketRegistry_Test is Testable, TellerV2 {
             500,
             false,
             false,
-            V2Calculations.PaymentType.EMI,
+            PaymentType.EMI,
             "uri://",
             IMarketRegistry.PaymentCycleType.Monthly
         );
@@ -108,7 +107,7 @@ contract User {
         uint16 _feePercent,
         bool _requireLenderAttestation,
         bool _requireBorrowerAttestation,
-        V2Calculations.PaymentType _paymentType,
+        PaymentType _paymentType,
         string calldata _uri,
         IMarketRegistry.PaymentCycleType _paymentCycleType
     ) public {

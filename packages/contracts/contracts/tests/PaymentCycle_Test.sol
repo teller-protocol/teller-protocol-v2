@@ -23,6 +23,7 @@ import "@mangrovedao/hardhat-test-solidity/test.sol";
 
 import "../libraries/DateTimeLib.sol";
 import "../TellerV2Storage.sol";
+import { PaymentType } from "../libraries/V2Calculations.sol";
 
 contract PaymentCycle_Test is Testable {
     User private marketOwner;
@@ -66,7 +67,8 @@ contract PaymentCycle_Test is Testable {
             address(marketRegistry),
             address(reputationManager),
             address(lenderCommitmentForwarder),
-            lendingTokens
+            lendingTokens,
+            address(0) // collateral manager
         );
 
         // Instantiate users & balances
@@ -94,7 +96,7 @@ contract PaymentCycle_Test is Testable {
             500,
             false,
             false,
-            V2Calculations.PaymentType.EMI,
+            PaymentType.EMI,
             "uri://",
             IMarketRegistry.PaymentCycleType.Monthly
         );
@@ -160,7 +162,7 @@ contract User {
         uint16 _feePercent,
         bool _requireLenderAttestation,
         bool _requireBorrowerAttestation,
-        V2Calculations.PaymentType _paymentType,
+        PaymentType _paymentType,
         string calldata _uri,
         IMarketRegistry.PaymentCycleType _paymentCycleType
     ) public returns (uint256) {

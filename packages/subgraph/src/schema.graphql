@@ -85,6 +85,8 @@ type Payment @entity {
   bid: Bid!
   principal: BigInt!
   interest: BigInt!
+  paymentDate: BigInt
+  outstandingCapital: BigInt!
 }
 
 type User @entity {

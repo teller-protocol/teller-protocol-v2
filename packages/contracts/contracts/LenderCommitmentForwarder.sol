@@ -231,7 +231,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             "Commitment has expired"
         );
 
-        require( _collateralAmount * (commitment.maxPrincipalPerCollateralAmount) >= _principalAmount, "Insufficient collateral" );
+        require( commitment.maxPrincipalPerCollateralAmount == 0 || _collateralAmount * (commitment.maxPrincipalPerCollateralAmount) >= _principalAmount, "Insufficient collateral" );
 
         CreateLoanArgs memory createLoanArgs;
         createLoanArgs.marketId = _marketId;

@@ -73,8 +73,6 @@ interface ICollateralManager {
      * @param _bidId The id of the liquidated bid.
      * @param _liquidatorAddress The address of the liquidator to send the collateral to.
      */
-    function liquidateCollateral(
-        uint256 _bidId,
-        address _liquidatorAddress
-    ) external;
+    function liquidateCollateral(uint256 _bidId, address _liquidatorAddress)
+        external;
 }

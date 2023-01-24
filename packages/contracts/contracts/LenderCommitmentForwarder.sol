@@ -5,15 +5,12 @@ import "./TellerV2MarketForwarder.sol";
 
 import "./interfaces/ICollateralManager.sol";
 
- 
-import { Collateral, CollateralType } from "./interfaces/escrow/ICollateralEscrowV1.sol";
+import {
+    Collateral,
+    CollateralType
+} from "./interfaces/escrow/ICollateralEscrowV1.sol";
 
- 
 contract LenderCommitmentForwarder is TellerV2MarketForwarder {
-
- 
-    
-
     /**
      * @notice Details about a lender's capital commitment.
      * @param amount Amount of tokens being committed by the lender.
@@ -22,19 +19,14 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
      * @param minAPR Minimum Annual percentage to be applied for loans using the lender's capital.
      */
     struct Commitment {
-        uint256 maxPrincipal;  //1m usdc  1000000000000  //max amt lender will lend out 
+        uint256 maxPrincipal; //1m usdc  1000000000000  //max amt lender will lend out
         uint32 expiration;
         uint32 maxDuration;
         uint16 minInterestRate;
-
-        address collateralTokenAddress;  //0x0000000
-        uint256 maxPrincipalPerCollateralAmount; //zero means infinite. works better for NFT 
-        CollateralType collateralTokenType; //erc721, erc1155 or erc20 
+        address collateralTokenAddress; //0x0000000
+        uint256 maxPrincipalPerCollateralAmount; //zero means infinite. works better for NFT
+        CollateralType collateralTokenType; //erc721, erc1155 or erc20
     }
-
-     
-
-
 
     modifier onlyMarketOwner(uint256 marketId) {
         require(_msgSender() == getTellerV2MarketOwner(marketId));
@@ -87,14 +79,11 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint256 bidId
     );
 
-    
     /** External Functions **/
 
     constructor(address _protocolAddress, address _marketRegistry)
         TellerV2MarketForwarder(_protocolAddress, _marketRegistry)
-    {
-       
-    }
+    {}
 
     /**
      * @notice Updates the commitment of a lender to a market.
@@ -114,11 +103,9 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint256 _marketId,
         address _principalTokenAddress,
         uint256 _maxPrincipal,
-
         address _collateralTokenAddress,
         uint256 _maxPrincipalPerCollateralAmount,
         CollateralType _collateralTokenType,
-
         uint32 _maxLoanDuration,
         uint16 _minInterestRate,
         uint32 _expiration
@@ -131,13 +118,19 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         ][_principalTokenAddress];
         commitment.maxPrincipal = _maxPrincipal;
         commitment.collateralTokenAddress = _collateralTokenAddress;
-        commitment.maxPrincipalPerCollateralAmount = _maxPrincipalPerCollateralAmount;
+        commitment
+            .maxPrincipalPerCollateralAmount = _maxPrincipalPerCollateralAmount;
         commitment.expiration = _expiration;
         commitment.maxDuration = _maxLoanDuration;
         commitment.minInterestRate = _minInterestRate;
         commitment.collateralTokenType = _collateralTokenType;
 
-        emit UpdatedCommitment(lender, _marketId, _principalTokenAddress, _maxPrincipal);
+        emit UpdatedCommitment(
+            lender,
+            _marketId,
+            _principalTokenAddress,
+            _maxPrincipal
+        );
     }
 
     /**
@@ -145,7 +138,9 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
      * @param _marketId The Id of the market the commitment removal applies to.
      * @param _principalTokenAddress The address of the asset for which the commitment is being removed.
      */
-    function deleteCommitment(uint256 _marketId, address _principalTokenAddress) public {
+    function deleteCommitment(uint256 _marketId, address _principalTokenAddress)
+        public
+    {
         _deleteCommitment(_msgSender(), _marketId, _principalTokenAddress);
     }
 
@@ -164,7 +159,9 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             lenderMarketCommitments[_lender][_marketId][_principalTokenAddress]
                 .maxPrincipal > 0
         ) {
-            delete lenderMarketCommitments[_lender][_marketId][_principalTokenAddress];
+            delete lenderMarketCommitments[_lender][_marketId][
+                _principalTokenAddress
+            ];
             emit DeletedCommitment(_lender, _marketId, _principalTokenAddress);
         }
     }
@@ -200,13 +197,10 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         address _lender,
         address _principalTokenAddress,
         uint256 _principalAmount,
-
         uint256 _collateralAmount,
         uint256 _collateralTokenId,
-
         uint32 _loanDuration,
         uint16 _interestRate
-
     ) external onlyMarketOwner(_marketId) returns (uint256 bidId) {
         address borrower = _msgSender();
 
@@ -231,7 +225,13 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             "Commitment has expired"
         );
 
-        require( commitment.maxPrincipalPerCollateralAmount == 0 || _collateralAmount * (commitment.maxPrincipalPerCollateralAmount) >= _principalAmount, "Insufficient collateral" );
+        require(
+            commitment.maxPrincipalPerCollateralAmount == 0 ||
+                _collateralAmount *
+                    (commitment.maxPrincipalPerCollateralAmount) >=
+                _principalAmount,
+            "Insufficient collateral"
+        );
 
         CreateLoanArgs memory createLoanArgs;
         createLoanArgs.marketId = _marketId;
@@ -240,22 +240,29 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         createLoanArgs.duration = _loanDuration;
         createLoanArgs.interestRate = _interestRate;
 
-
         Collateral[] memory collateralInfo = new Collateral[](1);
 
         collateralInfo[0] = Collateral({
             _collateralType: commitment.collateralTokenType,
             _tokenId: _collateralTokenId,
-            _amount:  _collateralAmount,
-            _collateralAddress:  commitment.collateralTokenAddress
+            _amount: _collateralAmount,
+            _collateralAddress: commitment.collateralTokenAddress
         });
 
-      
-        bidId = _submitBidWithCollateral(createLoanArgs, collateralInfo, borrower);//(createLoanArgs, borrower);
+        bidId = _submitBidWithCollateral(
+            createLoanArgs,
+            collateralInfo,
+            borrower
+        ); //(createLoanArgs, borrower);
 
         _acceptBid(bidId, _lender);
 
-        _decrementCommitment(_lender, _marketId, _principalTokenAddress, _principalAmount);
+        _decrementCommitment(
+            _lender,
+            _marketId,
+            _principalTokenAddress,
+            _principalAmount
+        );
 
         emit ExercisedCommitment(
             _lender,
@@ -266,14 +273,12 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         );
     }
 
-  
-
     /**
      * @notice Commits collateral to a bid using the TellerV2 CollateralManager protocol.
      * @param _bidId The bid id for the loan
      * @param _collateralInfo The collateral to be committed to the loan.
      */
-  /*  function _commitCollateral(
+    /*  function _commitCollateral(
         uint256 _bidId,
         Collateral memory _collateralInfo,
         address _borrower 

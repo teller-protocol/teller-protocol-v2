@@ -14,9 +14,12 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol"
 import "@openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol";
 import "./interfaces/ICollateralManager.sol";
-import { Collateral, CollateralType, ICollateralEscrowV1 } from "./interfaces/escrow/ICollateralEscrowV1.sol";
+import {
+    Collateral,
+    CollateralType,
+    ICollateralEscrowV1
+} from "./interfaces/escrow/ICollateralEscrowV1.sol";
 import "./interfaces/ITellerV2.sol";
-
 
 contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     /* Storage */
@@ -32,10 +35,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     }
 
     /* Events */
-    event CollateralEscrowDeployed(
-        uint256 _bidId,
-        address _collateralEscrow
-    );
+    event CollateralEscrowDeployed(uint256 _bidId, address _collateralEscrow);
     event CollateralCommitted(
         uint256 _bidId,
         CollateralType _type,
@@ -62,7 +62,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
 
     /* Modifiers */
     modifier onlyTellerV2() {
-        require(_msgSender() == address(tellerV2), 'Sender not authorized');
+        require(_msgSender() == address(tellerV2), "Sender not authorized");
         _;
     }
 
@@ -137,8 +137,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         external
         returns (bool validation_)
     {
-        Collateral[]
-            memory collateralInfos = getCollateralInfo(_bidId);
+        Collateral[] memory collateralInfos = getCollateralInfo(_bidId);
         address borrower = tellerV2.getLoanBorrower(_bidId);
         (validation_, ) = _checkBalances(borrower, collateralInfos, true);
     }
@@ -204,9 +203,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         address[] memory collateralAddresses = collateral
             .collateralAddresses
             .values();
-        infos_ = new Collateral[](
-            collateralAddresses.length
-        );
+        infos_ = new Collateral[](collateralAddresses.length);
         for (uint256 i; i < collateralAddresses.length; i++) {
             infos_[i] = collateral.collateralInfo[collateralAddresses[i]];
         }
@@ -234,10 +231,10 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
      * @param _bidId The id of the liquidated bid.
      * @param _liquidatorAddress The address of the liquidator to send the collateral to.
      */
-    function liquidateCollateral(
-        uint256 _bidId,
-        address _liquidatorAddress
-    ) external onlyTellerV2 {
+    function liquidateCollateral(uint256 _bidId, address _liquidatorAddress)
+        external
+        onlyTellerV2
+    {
         if (isBidCollateralBacked(_bidId)) {
             BidState bidState = tellerV2.getBidState(_bidId);
             require(
@@ -275,20 +272,17 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         }
     }
 
-    function _deposit(
-        uint256 _bidId,
-        Collateral memory collateralInfo
-    ) public payable {
+    function _deposit(uint256 _bidId, Collateral memory collateralInfo)
+        public
+        payable
+    {
         require(collateralInfo._amount > 0, "Collateral not validated");
         (address escrowAddress, address borrower) = _deployEscrow(_bidId);
         ICollateralEscrowV1 collateralEscrow = ICollateralEscrowV1(
             escrowAddress
         );
         // Pull collateral from borrower & deposit into escrow
-        if (
-            collateralInfo._collateralType ==
-            CollateralType.ERC20
-        ) {
+        if (collateralInfo._collateralType == CollateralType.ERC20) {
             IERC20Upgradeable(collateralInfo._collateralAddress).transferFrom(
                 borrower,
                 address(this),
@@ -302,33 +296,23 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
                 collateralInfo._collateralAddress,
                 collateralInfo._amount
             );
-        }
-        else if (
-            collateralInfo._collateralType ==
-            CollateralType.ERC721
-        ) {
-            IERC721Upgradeable(collateralInfo._collateralAddress)
-                .transferFrom(
-                    borrower,
-                    address(this),
-                    collateralInfo._tokenId
-                );
-            IERC721Upgradeable(collateralInfo._collateralAddress)
-                .approve(
-                    escrowAddress,
-                    collateralInfo._tokenId
-                );
+        } else if (collateralInfo._collateralType == CollateralType.ERC721) {
+            IERC721Upgradeable(collateralInfo._collateralAddress).transferFrom(
+                borrower,
+                address(this),
+                collateralInfo._tokenId
+            );
+            IERC721Upgradeable(collateralInfo._collateralAddress).approve(
+                escrowAddress,
+                collateralInfo._tokenId
+            );
             collateralEscrow.depositAsset(
                 CollateralType.ERC721,
                 collateralInfo._collateralAddress,
                 collateralInfo._amount,
                 collateralInfo._tokenId
             );
-        }
-        else if (
-            collateralInfo._collateralType ==
-            CollateralType.ERC1155
-        ) {
+        } else if (collateralInfo._collateralType == CollateralType.ERC1155) {
             bytes memory data;
             IERC1155Upgradeable(collateralInfo._collateralAddress)
                 .safeTransferFrom(
@@ -339,10 +323,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
                     data
                 );
             IERC1155Upgradeable(collateralInfo._collateralAddress)
-                .setApprovalForAll(
-                    escrowAddress,
-                    true
-                );
+                .setApprovalForAll(escrowAddress, true);
             collateralEscrow.depositAsset(
                 CollateralType.ERC1155,
                 collateralInfo._collateralAddress,
@@ -371,11 +352,10 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
             i++
         ) {
             // Get collateral info
-            Collateral
-            storage collateralInfo = _bidCollaterals[_bidId]
-            .collateralInfo[
-            _bidCollaterals[_bidId].collateralAddresses.at(i)
-            ];
+            Collateral storage collateralInfo = _bidCollaterals[_bidId]
+                .collateralInfo[
+                    _bidCollaterals[_bidId].collateralAddresses.at(i)
+                ];
             // Withdraw collateral from escrow and send it to bid lender
             ICollateralEscrowV1(_escrows[_bidId]).withdraw(
                 collateralInfo._collateralAddress,
@@ -453,8 +433,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         address _borrowerAddress,
         Collateral memory _collateralInfo
     ) internal returns (bool) {
-        CollateralType collateralType = _collateralInfo
-            ._collateralType;
+        CollateralType collateralType = _collateralInfo._collateralType;
         if (collateralType == CollateralType.ERC20) {
             return
                 _collateralInfo._amount <=
@@ -481,14 +460,14 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     // On NFT Received handlers
 
     function onERC721Received(address, address, uint256, bytes calldata)
-    external
-    pure
-    returns (bytes4)
+        external
+        pure
+        returns (bytes4)
     {
         return
-        bytes4(
-            keccak256("onERC721Received(address,address,uint256,bytes)")
-        );
+            bytes4(
+                keccak256("onERC721Received(address,address,uint256,bytes)")
+            );
     }
 
     function onERC1155Received(
@@ -499,11 +478,11 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         bytes calldata
     ) external returns (bytes4) {
         return
-        bytes4(
-            keccak256(
-                "onERC1155Received(address,address,uint256,uint256,bytes)"
-            )
-        );
+            bytes4(
+                keccak256(
+                    "onERC1155Received(address,address,uint256,uint256,bytes)"
+                )
+            );
     }
 
     function onERC1155BatchReceived(
@@ -518,10 +497,10 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
             "Only allowed one asset batch transfer per transaction."
         );
         return
-        bytes4(
-            keccak256(
-                "onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)"
-            )
-        );
+            bytes4(
+                keccak256(
+                    "onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)"
+                )
+            );
     }
 }

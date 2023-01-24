@@ -796,11 +796,13 @@ export function handleExercisedCommitments(
 }
 
 export function handleSetMarketPaymentType(event: SetMarketPaymentType): void {
-  const marketPlace: MarketPlace = loadMarketById(event.params.marketId.toString());
+  const marketPlace: MarketPlace = loadMarketById(
+    event.params.marketId.toString()
+  );
   if (event.params.paymentType == i32(0)) {
-    marketPlace.paymentType = 'EMI';
+    marketPlace.paymentType = "EMI";
   } else if (event.params.paymentType == i32(1)) {
-    marketPlace.paymentType = 'Bullet';
+    marketPlace.paymentType = "Bullet";
   }
 
   marketPlace.save();
@@ -811,7 +813,9 @@ export function handleSetMarketPaymentTypes(
 ): void {
   events.forEach(event => {
     handleSetMarketPaymentType(event);
-  })
+  });
+}
+
 export function handleCollateralEscrowDeployed(
   event: CollateralEscrowDeployed
 ): void {

@@ -144,8 +144,7 @@ contract TellerV2Autopay is OwnableUpgradeable, ITellerV2Autopay {
         virtual
         returns (uint256 _amount)
     {
-        Payment memory estimatedPayment = tellerV2
-            .calculateAmountDue(_bidId);
+        Payment memory estimatedPayment = tellerV2.calculateAmountDue(_bidId);
 
         _amount = estimatedPayment.principal + estimatedPayment.interest;
     }

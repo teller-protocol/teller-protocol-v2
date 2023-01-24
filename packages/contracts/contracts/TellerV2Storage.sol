@@ -83,7 +83,6 @@ struct Terms {
 }
 
 abstract contract TellerV2Storage_G0 {
-
     /** Storage Variables */
 
     // Current number of bids.

@@ -11,7 +11,10 @@ import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "../interfaces/IWETH.sol";
-import { CollateralType, CollateralEscrowV1 } from "../escrow/CollateralEscrowV1.sol";
+import {
+    CollateralType,
+    CollateralEscrowV1
+} from "../escrow/CollateralEscrowV1.sol";
 
 contract CollateralEscrow_Test is Testable {
     BeaconProxy private proxy_;
@@ -64,12 +67,7 @@ contract CollateralEscrow_Test is Testable {
     function _depositAsset() internal {
         borrower.approveWeth(amount);
 
-        borrower.deposit(
-            CollateralType.ERC20,
-            address(wethMock),
-            amount,
-            0
-        );
+        borrower.deposit(CollateralType.ERC20, address(wethMock), amount, 0);
 
         uint256 storedBalance = borrower.getBalance(address(wethMock));
 

@@ -37,6 +37,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
 
     bool acceptBidWasCalled;
     bool submitBidWasCalled;
+    bool submitBidWithCollateralWasCalled;
 
     constructor()
         LenderCommitmentForwarder(
@@ -199,11 +200,20 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         return 1;
     }
 
+    function _submitBidWithCollateral(CreateLoanArgs memory, Collateral[] memory, address)
+        internal
+        override
+        returns (uint256 bidId)
+    {
+        submitBidWithCollateralWasCalled = true;
+        return 1;
+    }
+
     function _acceptBid(uint256, address) internal override returns (bool) {
         acceptBidWasCalled = true;
 
         Test.eq(
-            submitBidWasCalled,
+            submitBidWithCollateralWasCalled,
             true,
             "Submit bid must be called before accept bid"
         );

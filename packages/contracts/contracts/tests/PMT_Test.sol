@@ -36,6 +36,14 @@ contract PMT_Test is Testable, TellerV2 {
         pmt_runner(833333333);
     }
 
+    function _04_pmt_test() public {
+        __bid.loanDetails.principal = 100000e6; // 100x USDC
+        __bid.loanDetails.loanDuration = 45 days; // 45 days
+        __bid.terms.paymentCycle = 30 days; // 1 month
+        __bid.terms.APR = 600; // 6.0%
+        pmt_runner(50370166243);
+    }
+
     function pmt_runner(uint256 _expected) private {
         uint256 pmt = NumbersLib.pmt(
             __bid.loanDetails.principal,

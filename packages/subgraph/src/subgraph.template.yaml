@@ -85,6 +85,8 @@ dataSources:
           handler: handleMarketClosed
         - event: Upgraded(indexed address)
           handler: handleMarketRegistryUpgraded
+        - event: SetMarketPaymentType(uint256,uint8)
+          handler: handleSetMarketPaymentType
       file: ./src/mapping.ts
   - kind: ethereum/contract
     name: LenderCommitmentForwarder

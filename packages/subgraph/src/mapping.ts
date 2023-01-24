@@ -20,6 +20,7 @@ import {
   SetMarketFeeRecipient,
   SetMarketLenderAttestation,
   SetMarketOwner,
+  SetMarketPaymentType,
   SetMarketURI,
   SetPaymentCycleDuration,
   SetPaymentDefaultDuration,
@@ -747,4 +748,23 @@ export function handleExercisedCommitments(
   events.forEach(event => {
     handleExercisedCommitment(event);
   });
+}
+
+export function handleSetMarketPaymentType(event: SetMarketPaymentType): void {
+  const marketPlace: MarketPlace = loadMarketById(event.params.marketId.toString());
+  if (event.params.paymentType == i32(0)) {
+    marketPlace.paymentType = 'EMI';
+  } else if (event.params.paymentType == i32(1)) {
+    marketPlace.paymentType = 'Bullet';
+  }
+
+  marketPlace.save();
+}
+
+export function handleSetMarketPaymentTypes(
+  events: SetMarketPaymentType[]
+): void {
+  events.forEach(event => {
+    handleSetMarketPaymentType(event);
+  })
 }

@@ -5,15 +5,15 @@ import "./TellerV2MarketForwarder.sol";
 
 import "./interfaces/ICollateralManager.sol";
 
-
-import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
-
+ 
 import { Collateral, CollateralType } from "./interfaces/escrow/ICollateralEscrowV1.sol";
+
+import "./libraries/NumbersLib.sol";
 
 
 contract LenderCommitmentForwarder is TellerV2MarketForwarder {
 
-    using AddressUpgradeable for address;
+    using NumbersLib for uint256; 
 
     //should we move this into TellerV2MarketForwarder? 
     address public immutable _collateralManager;
@@ -28,13 +28,25 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
      * @param minAPR Minimum Annual percentage to be applied for loans using the lender's capital.
      */
     struct Commitment {
-        uint256 maxPrincipal;
+        uint256 maxPrincipal;  //1m usdc  1000000000000  //max amt lender will lend out 
         uint32 expiration;
         uint32 maxDuration;
         uint16 minInterestRate;
-        address collateralTokenAddress;
-        uint256 minCollateralPerMaxPrincipal;
+
+        address collateralTokenAddress;  //0x0000000
+        uint256 maxPrincipalPerCollateralAmount; //zero means infinite. works better for NFT 
+        CollateralType collateralTokenType; //erc721, erc1155 or erc20 
     }
+
+    // compound normalizes to 8 decimal places 
+    //take a look at our numbers lib  WADray
+
+    //could check to see if ratio will be  grt 1 , then handle it as an edge case w other logic 
+
+
+ 
+
+
 
     modifier onlyMarketOwner(uint256 marketId) {
         require(_msgSender() == getTellerV2MarketOwner(marketId));
@@ -98,12 +110,13 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
 
     /**
      * @notice Updates the commitment of a lender to a market.
-      * @param _marketId The Id of the market the commitment applies to.
+     * @param _marketId The Id of the market the commitment applies to.
      * @param _principalTokenAddress The address of the asset being committed.
      * @param _maxPrincipal Amount of tokens being committed by the lender.
 
-      * @param _collateralTokenAddress The address of the collateral asset required for the loan.
-       * @param _minCollateralPerMaxPrincipal Ratio of collateral amount required per max principal.
+     * @param _collateralTokenAddress The address of the collateral asset required for the loan.
+     * @param _maxPrincipalPerCollateralAmount Ratio of collateral amount required per max principal.
+     * @param _collateralTokenType The token type of the collateral 
 
      * @param _maxLoanDuration Length of time, in seconds that the lender's capital can be lent out for.
      * @param _minInterestRate Minimum Annual percentage to be applied for loans using the lender's capital.
@@ -115,7 +128,8 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint256 _maxPrincipal,
 
         address _collateralTokenAddress,
-        uint256 _minCollateralPerMaxPrincipal,
+        uint256 _maxPrincipalPerCollateralAmount,
+        CollateralType _collateralTokenType,
 
         uint32 _maxLoanDuration,
         uint16 _minInterestRate,
@@ -129,10 +143,11 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         ][_principalTokenAddress];
         commitment.maxPrincipal = _maxPrincipal;
         commitment.collateralTokenAddress = _collateralTokenAddress;
-        commitment.minCollateralPerMaxPrincipal = _minCollateralPerMaxPrincipal;
+        commitment.maxPrincipalPerCollateralAmount = _maxPrincipalPerCollateralAmount;
         commitment.expiration = _expiration;
         commitment.maxDuration = _maxLoanDuration;
         commitment.minInterestRate = _minInterestRate;
+        commitment.collateralTokenType = _collateralTokenType;
 
         emit UpdatedCommitment(lender, _marketId, _principalTokenAddress, _maxPrincipal);
     }
@@ -198,7 +213,10 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         address _principalTokenAddress,
         uint256 _principal,
         uint32 _loanDuration,
-        uint16 _interestRate
+        uint16 _interestRate,
+
+        uint256 _collateralAmount,
+        uint256 _collateralTokenId
     ) external onlyMarketOwner(_marketId) returns (uint256 bidId) {
         address borrower = _msgSender();
 
@@ -223,6 +241,8 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             "Commitment has expired"
         );
 
+        require( _collateralAmount * (commitment.maxPrincipalPerCollateralAmount) >= _principal, "Insufficient collateral" );
+
         CreateLoanArgs memory createLoanArgs;
         createLoanArgs.marketId = _marketId;
         createLoanArgs.lendingToken = _principalTokenAddress;
@@ -231,21 +251,20 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         createLoanArgs.interestRate = _interestRate;
 
 
+        Collateral[] memory collateralInfo;
 
-        uint256 collateralAmount = 0; //compute this with ratio 
-
-        Collateral memory collateralInfo;
-
-        collateralInfo = Collateral({
-            _collateralType: CollateralType.ERC20,
-            _tokenId: 0,
-            _amount:  collateralAmount,
+        collateralInfo[0] = Collateral({
+            _collateralType: commitment.collateralTokenType,
+            _tokenId: _collateralTokenId,
+            _amount:  _collateralAmount,
             _collateralAddress:  commitment.collateralTokenAddress
         });
 
-        bidId = _submitBidWithCollateral(createLoanArgs, collateralInfo, borrower);(createLoanArgs, borrower);
+        // _submitCollateral() ; 
 
- 
+      //  bidId = _submitBidWithCommitment( createLoanArgs, collateralInfo, borrower );
+
+        bidId = _submitBidWithCollateral(createLoanArgs, collateralInfo, borrower);//(createLoanArgs, borrower);
 
         _acceptBid(bidId, _lender);
 
@@ -260,6 +279,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         );
     }
 
+  
 
     /**
      * @notice Commits collateral to a bid using the TellerV2 CollateralManager protocol.

@@ -104,7 +104,7 @@ abstract contract TellerV2MarketForwarder is Initializable, ContextUpgradeable {
      */
     function _submitBidWithCollateral(
         CreateLoanArgs memory _createLoanArgs,
-        Collateral[] calldata _collateralInfo,
+        Collateral[] memory _collateralInfo,
         address _borrower
     ) internal virtual returns (uint256 bidId) {
         bytes memory responseData;

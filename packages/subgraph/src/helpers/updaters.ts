@@ -94,6 +94,8 @@ export function updateBid(
   }
 
   if (bidState !== "Liquidated") {
+    // The outstanding capital and payment entities are not updated on liquidation events
+    // because the Liquidation event is fired after the Repayment event
     updateOutstandingCapital(
       bid,
       storedBid,
@@ -101,15 +103,15 @@ export function updateBid(
       _lastInterestPayment,
       bidState
     );
-  }
 
-  const payment = new Payment(event.transaction.hash.toHex());
-  payment.bid = bid.id;
-  payment.principal = _lastPayment;
-  payment.interest = _lastInterestPayment;
-  payment.paymentDate = storedBid.value5.lastRepaidTimestamp;
-  payment.outstandingCapital = bid.principal.minus(bid.totalRepaidPrincipal);
-  payment.save();
+    const payment = new Payment(event.transaction.hash.toHex());
+    payment.bid = bid.id;
+    payment.principal = _lastPayment;
+    payment.interest = _lastInterestPayment;
+    payment.paymentDate = event.block.timestamp;
+    payment.outstandingCapital = bid.principal.minus(bid.totalRepaidPrincipal);
+    payment.save();
+  }
 
   bid.save();
 }

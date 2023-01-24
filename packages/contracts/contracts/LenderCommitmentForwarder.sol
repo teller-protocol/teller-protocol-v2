@@ -241,7 +241,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         createLoanArgs.interestRate = _interestRate;
 
 
-        Collateral[] memory collateralInfo;
+        Collateral[] memory collateralInfo = new Collateral[](1);
 
         collateralInfo[0] = Collateral({
             _collateralType: commitment.collateralTokenType,

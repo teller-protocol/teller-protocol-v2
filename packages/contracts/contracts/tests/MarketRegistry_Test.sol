@@ -17,6 +17,9 @@ import "../EAS/TellerAS.sol";
 import "../mock/WethMock.sol";
 import "../interfaces/IWETH.sol";
 
+import { User } from "./Test_Helpers.sol";
+import { PaymentType } from "../libraries/V2Calculations.sol";
+
 contract MarketRegistry_Test is Testable, TellerV2 {
     User private marketOwner;
     User private borrower;

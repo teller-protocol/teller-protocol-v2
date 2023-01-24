@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import { V2Calculations } from "../TellerV2.sol";
 import "../EAS/TellerAS.sol";
+import { PaymentType } from "../libraries/V2Calculations.sol";
 
 interface IMarketRegistry {
 
@@ -48,7 +48,7 @@ interface IMarketRegistry {
     function getPaymentType(uint256 _marketId)
         external
         view
-        returns (V2Calculations.PaymentType);
+        returns (PaymentType);
 
     function createMarket(
         address _initialOwner,

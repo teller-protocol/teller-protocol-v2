@@ -7,6 +7,7 @@ import { getFunds } from 'helpers/get-funds'
 import { isInitialized } from 'helpers/oz-contract-helpers'
 import moment from 'moment'
 import {
+  CollateralManager,
   MarketRegistry,
   ReputationManager,
   TellerV2,
@@ -125,7 +126,8 @@ describe('TellerV2', () => {
           marketRegistry.address,
           reputationManager.address,
           AddressZero,
-          [(await getTokens(hre)).all.DAI]
+          [(await getTokens(hre)).all.DAI],
+          AddressZero
         )
         .should.be.revertedWith(
           'Initializable: contract is already initialized'

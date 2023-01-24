@@ -1,12 +1,18 @@
-import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts'
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 
-import {Bid, Borrower, Commitment, Payment, TokenVolume} from '../../generated/schema'
+import { CollateralCommitted } from "../../generated/CollateralManager/CollateralManager";
+import {
+  Bid,
+  Borrower,
+  Collateral,
+  Commitment,
+  Payment,
+  TokenVolume
+} from "../../generated/schema";
 import {
   TellerV2,
-  TellerV2__bidsResult,
-  TellerV2__bidsResultLoanDetailsStruct,
-  TellerV2__bidsResultTermsStruct
-} from '../../generated/TellerV2/TellerV2'
+  TellerV2__bidsResult
+} from "../../generated/TellerV2/TellerV2";
 
 import {
   getBid,
@@ -17,7 +23,7 @@ import {
   loadMarketById,
   loadProtocolTokenVolume,
   loadTokenVolumeByMarketId
-} from './loaders'
+} from "./loaders";
 
 export function updateTokenVolumeOnPayment(
   lastPayment: BigInt,
@@ -67,10 +73,15 @@ export function updateBid(
     bid._lastTotalRepaidInterestAmount = _lastInterestPayment.plus(
       bid._lastTotalRepaidInterestAmount
     );
-    const tokenVolume = loadTokenVolumeByMarketId(storedBid.value5.lendingToken, storedBid.value3.toHexString());
+    const tokenVolume = loadTokenVolumeByMarketId(
+      storedBid.value5.lendingToken,
+      storedBid.value3.toHexString()
+    );
     const totalRepaidInterest = tokenVolume.totalRepaidInterest;
-    if(totalRepaidInterest) {
-      tokenVolume.totalRepaidInterest = totalRepaidInterest.plus(_lastInterestPayment);
+    if (totalRepaidInterest) {
+      tokenVolume.totalRepaidInterest = totalRepaidInterest.plus(
+        _lastInterestPayment
+      );
       tokenVolume.save();
     }
   }
@@ -169,7 +180,10 @@ export function updateOutstandingCapital(
 ): void {
   const market = loadMarketById(storedBid.value3.toString());
   const lender = loadLenderByMarketId(storedBid.value2, market.id);
-  const borrower: Borrower = loadBorrowerByMarketId(storedBid.value0, market.id);
+  const borrower: Borrower = loadBorrowerByMarketId(
+    storedBid.value0,
+    market.id
+  );
 
   if (bidState == "Repaid") {
     const activeLoanCount = lender.activeLoans;
@@ -202,7 +216,10 @@ export function updateOutstandingCapital(
   }
 
   // Update market's token volume
-  const tokenVolume = loadTokenVolumeByMarketId(storedBid.value5.lendingToken, market.id);
+  const tokenVolume = loadTokenVolumeByMarketId(
+    storedBid.value5.lendingToken,
+    market.id
+  );
   updateTokenVolumeOnPayment(_lastPayment, bidState, tokenVolume);
   tokenVolume.save();
 
@@ -225,11 +242,11 @@ export function updateOutstandingCapital(
   }
   lenderVolume.save();
 
-  const commitmentId = bid.commitment
+  const commitmentId = bid.commitment;
   if (commitmentId) {
-    const commitment = Commitment.load(commitmentId)
+    const commitment = Commitment.load(commitmentId);
     if (commitment) {
-      const commitmentStats = TokenVolume.load(commitment.stats)
+      const commitmentStats = TokenVolume.load(commitment.stats);
       updateTokenVolumeOnPayment(_lastPayment, bidState, commitmentStats!);
       if (commitmentStats && commitmentStats.commissionEarned) {
         commitmentStats.commissionEarned = commitmentStats.commissionEarned.plus(
@@ -251,4 +268,26 @@ export function updateOutstandingCapital(
   lender.save();
   market.save();
   borrower.save();
+}
+
+export function updateCollateral(
+  collateral: Collateral,
+  event: ethereum.Event
+): void {
+  const evt = changetype<CollateralCommitted>(event);
+  collateral.amount = evt.params._amount;
+  collateral.tokenId = evt.params._tokenId;
+  collateral.type = getTypeString(evt.params._type);
+  collateral.collateralAddress = evt.params._collateralAddress;
+}
+function getTypeString(tokenType: i32): string {
+  let type = "";
+  if (tokenType == i32(0)) {
+    type = "ERC20";
+  } else if (tokenType == i32(1)) {
+    type = "ERC721";
+  } else if (tokenType == i32(2)) {
+    type = "ERC1155";
+  }
+  return type;
 }

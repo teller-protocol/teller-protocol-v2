@@ -1,7 +1,7 @@
 {
   "name": "@teller-protocol/v2-subgraph",
   "license": "UNLICENSED",
-  "version": "0.1.8",
+  "version": "0.2.0",
   "scripts": {
     "build": "./scripts/build.sh",
     "deploy": "./scripts/deploy.sh",

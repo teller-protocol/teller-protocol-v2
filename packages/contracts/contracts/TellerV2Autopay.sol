@@ -11,6 +11,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import { Payment } from "./TellerV2Storage.sol";
 
 /**
  * @dev Helper contract to autopay loans
@@ -143,7 +144,7 @@ contract TellerV2Autopay is OwnableUpgradeable, ITellerV2Autopay {
         virtual
         returns (uint256 _amount)
     {
-        TellerV2Storage.Payment memory estimatedPayment = tellerV2
+        Payment memory estimatedPayment = tellerV2
             .calculateAmountDue(_bidId);
 
         _amount = estimatedPayment.principal + estimatedPayment.interest;

@@ -103,7 +103,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
      * @param _maxPrincipal Amount of tokens being committed by the lender.
 
      * @param _collateralTokenAddress The address of the collateral asset required for the loan.
-     * @param _maxPrincipalPerCollateralAmount Ratio of collateral amount required per max principal.
+     * @param _maxPrincipalPerCollateralAmount Amount of loan principal allowed per each collateral amount expressed in raw value regardles of token decimals.
      * @param _collateralTokenType The token type of the collateral 
 
      * @param _maxLoanDuration Length of time, in seconds that the lender's capital can be lent out for.

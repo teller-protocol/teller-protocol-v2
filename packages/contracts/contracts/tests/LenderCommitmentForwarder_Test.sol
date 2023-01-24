@@ -9,6 +9,8 @@ import "../TellerV2Context.sol";
 import { Testable } from "./Testable.sol";
 import { LenderCommitmentForwarder } from "../LenderCommitmentForwarder.sol";
 
+import { Collateral, CollateralType } from "../interfaces/escrow/ICollateralEscrowV1.sol";
+
 contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
     LenderCommitmentTester private tester;
     MockMarketRegistry mockMarketRegistry;
@@ -20,6 +22,15 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
     address tokenAddress;
     uint256 marketId;
     uint256 maxAmount;
+
+
+
+
+    address collateralTokenAddress;
+    uint256 maxPrincipalPerCollateralAmount;
+    CollateralType collateralTokenType ;
+
+
     uint32 maxLoanDuration;
     uint16 minInterestRate;
     uint32 expiration;
@@ -52,6 +63,13 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         minInterestRate = 3000;
         expiration = uint32(block.timestamp) + uint32(64000);
 
+
+
+        collateralTokenAddress = address(0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174);
+        maxPrincipalPerCollateralAmount = 10000;
+        collateralTokenType = CollateralType.ERC20;
+
+
         marketOwner.setTrustedMarketForwarder(marketId, address(this));
         lender.approveMarketForwarder(marketId, address(this));
 
@@ -64,6 +82,11 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             marketId,
             tokenAddress,
             maxAmount,
+
+            collateralTokenAddress,
+            maxPrincipalPerCollateralAmount,
+            collateralTokenType,
+
             maxLoanDuration,
             minInterestRate,
             expiration
@@ -93,9 +116,16 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             marketId,
             tokenAddress,
             maxAmount,
+
+
+            collateralTokenAddress,
+            maxPrincipalPerCollateralAmount,
+            collateralTokenType,
+
+
             maxLoanDuration,
-              expiration,
-            minInterestRate,
+            expiration,
+            minInterestRate
           
         );
     }
@@ -115,7 +145,12 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             marketId,
             address(lender),
             tokenAddress,
+
+    
             maxAmount - 100,
+            maxAmount, //collateralAmount
+            0, //collateralTokenId
+
             maxLoanDuration,
             minInterestRate
         );
@@ -136,7 +171,14 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             marketId,
             address(lender),
             tokenAddress,
+
             100,
+
+
+            100, //collateralAmount
+             0, //collateralTokenId
+
+
             maxLoanDuration,
             minInterestRate
         );
@@ -205,13 +247,18 @@ contract User {
 
         uint32 loanDuration,
         uint32 expiration,
-        uint16 interestRate,
-              
+        uint16 interestRate
+
     ) public {
         commitmentForwarder.updateCommitment(
             marketId,
             tokenAddress,
             principal,
+
+            _collateralTokenAddress,
+            _maxPrincipalPerCollateralAmount,
+            _collateralTokenType,
+
             loanDuration,
             interestRate,
             expiration
@@ -224,7 +271,7 @@ contract User {
         address tokenAddress,
         uint256 principal,
 
-         uint256 collateralAmount,
+        uint256 collateralAmount,
         uint256 collateralTokenId,
 
         uint32 loanDuration,
@@ -236,6 +283,11 @@ contract User {
                 lender,
                 tokenAddress,
                 principal,
+
+
+                collateralAmount,
+                collateralTokenId,
+
                 loanDuration,
                 interestRate
             );

@@ -15,14 +15,12 @@ struct Collateral {
 }
 
 interface ICollateralEscrowV1 {
-
     /**
      * @notice Deposits a collateral ERC20 token into the escrow.
      * @param _collateralAddress The address of the collateral token.
      * @param _amount The amount to deposit.
      */
-    function depositToken(address _collateralAddress, uint256 _amount)
-        external;
+    function depositToken(address _collateralAddress, uint256 _amount) external;
 
     /**
      * @notice Deposits a collateral asset into the escrow.

@@ -20,14 +20,14 @@ library V2Calculations {
      * @param _bid The loan bid struct to get the timestamp for.
      */
     function lastRepaidTimestamp(Bid storage _bid)
-    internal
-    view
-    returns (uint32)
+        internal
+        view
+        returns (uint32)
     {
         return
-        _bid.loanDetails.lastRepaidTimestamp == 0
-        ? _bid.loanDetails.acceptedTimestamp
-        : _bid.loanDetails.lastRepaidTimestamp;
+            _bid.loanDetails.lastRepaidTimestamp == 0
+                ? _bid.loanDetails.acceptedTimestamp
+                : _bid.loanDetails.lastRepaidTimestamp;
     }
 
     /**
@@ -36,28 +36,28 @@ library V2Calculations {
      * @param _timestamp The timestamp at which to get the owed amount at.
      */
     function calculateAmountOwed(Bid storage _bid, uint256 _timestamp)
-    internal
-    view
-    returns (
-        uint256 owedPrincipal_,
-        uint256 duePrincipal_,
-        uint256 interest_
-    )
+        internal
+        view
+        returns (
+            uint256 owedPrincipal_,
+            uint256 duePrincipal_,
+            uint256 interest_
+        )
     {
         // Total principal left to pay
         return
-        calculateAmountOwed(
-            _bid.loanDetails.principal,
-            _bid.loanDetails.totalRepaid.principal,
-            _bid.terms.APR,
-            _bid.terms.paymentCycleAmount,
-            _bid.terms.paymentCycle,
-            lastRepaidTimestamp(_bid),
-            _timestamp,
-            _bid.loanDetails.acceptedTimestamp,
-            _bid.loanDetails.loanDuration,
-            _bid.paymentType
-        );
+            calculateAmountOwed(
+                _bid.loanDetails.principal,
+                _bid.loanDetails.totalRepaid.principal,
+                _bid.terms.APR,
+                _bid.terms.paymentCycleAmount,
+                _bid.terms.paymentCycle,
+                lastRepaidTimestamp(_bid),
+                _timestamp,
+                _bid.loanDetails.acceptedTimestamp,
+                _bid.loanDetails.loanDuration,
+                _bid.paymentType
+            );
     }
 
     function calculateAmountOwed(
@@ -72,13 +72,13 @@ library V2Calculations {
         uint256 _loanDuration,
         PaymentType _paymentType
     )
-    internal
-    pure
-    returns (
-        uint256 owedPrincipal_,
-        uint256 duePrincipal_,
-        uint256 interest_
-    )
+        internal
+        pure
+        returns (
+            uint256 owedPrincipal_,
+            uint256 duePrincipal_,
+            uint256 interest_
+        )
     {
         owedPrincipal_ = principal - totalRepaidPrincipal;
 
@@ -88,9 +88,9 @@ library V2Calculations {
 
         // Cast to int265 to avoid underflow errors (negative means loan duration has passed)
         int256 durationLeftOnLoan = int256(_loanDuration) -
-        (int256(_timestamp) - int256(_startTimestamp));
+            (int256(_timestamp) - int256(_startTimestamp));
         bool isLastPaymentCycle = durationLeftOnLoan < int256(_paymentCycle) || // Check if current payment cycle is within or beyond the last one
-        owedPrincipal_ + interest_ <= _paymentCycleAmount; // Check if what is left to pay is less than the payment cycle amount
+            owedPrincipal_ + interest_ <= _paymentCycleAmount; // Check if what is left to pay is less than the payment cycle amount
 
         if (_paymentType == PaymentType.Bullet) {
             if (isLastPaymentCycle) {
@@ -101,8 +101,8 @@ library V2Calculations {
             // Max payable amount in a cycle
             // NOTE: the last cycle could have less than the calculated payment amount
             uint256 maxCycleOwed = isLastPaymentCycle
-            ? owedPrincipal_ + interest_
-            : _paymentCycleAmount;
+                ? owedPrincipal_ + interest_
+                : _paymentCycleAmount;
 
             // Calculate accrued amount due since last repayment
             uint256 owedAmount = (maxCycleOwed * owedTime) / _paymentCycle;
@@ -127,10 +127,10 @@ library V2Calculations {
     ) internal returns (uint256) {
         if (_type == PaymentType.Bullet) {
             return
-            _principal.percent(_apr).percent(
-                uint256(_paymentCycle).ratioOf(365 days, 10),
-                10
-            );
+                _principal.percent(_apr).percent(
+                    uint256(_paymentCycle).ratioOf(365 days, 10),
+                    10
+                );
         }
         // Default to PaymentType.EMI
         return NumbersLib.pmt(_principal, _duration, _paymentCycle, _apr);

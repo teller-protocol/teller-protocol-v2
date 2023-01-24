@@ -124,8 +124,7 @@ contract TellerV2_Test is Testable {
         info._collateralType = CollateralType.ERC20;
         info._collateralAddress = address(wethMock);
 
-        Collateral[]
-            memory collateralInfo = new Collateral[](1);
+        Collateral[] memory collateralInfo = new Collateral[](1);
         collateralInfo[0] = info;
 
         uint256 bal = wethMock.balanceOf(address(borrower));
@@ -186,7 +185,11 @@ contract TellerV2_Test is Testable {
 
         // Check escrow balance
         uint256 escrowBalanceAfter = wethMock.balanceOf(escrowAddress);
-        Test.eq(0, escrowBalanceAfter, "Collateral was not withdrawn from escrow on repayment");
+        Test.eq(
+            0,
+            escrowBalanceAfter,
+            "Collateral was not withdrawn from escrow on repayment"
+        );
 
         // Check borrower balance for collateral
         uint256 borrowerBalanceAfter = wethMock.balanceOf(address(borrower));

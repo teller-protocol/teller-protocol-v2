@@ -101,7 +101,10 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
     ) external onlyOwner {
         require(_amount > 0, "Withdraw amount cannot be zero");
         Collateral storage collateral = collateralBalances[_collateralAddress];
-        require(collateral._amount >= _amount, "No collateral balance for asset");
+        require(
+            collateral._amount >= _amount,
+            "No collateral balance for asset"
+        );
         _withdrawCollateral(
             collateral,
             _collateralAddress,
@@ -158,11 +161,10 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
     ) internal {
         // Withdraw ERC20
         if (_collateral._collateralType == CollateralType.ERC20) {
-            IERC20Upgradeable(_collateralAddress)
-                .transfer(
-                    _recipient,
-                    _collateral._amount
-                );
+            IERC20Upgradeable(_collateralAddress).transfer(
+                _recipient,
+                _collateral._amount
+            );
         }
         // Withdraw ERC721
         else if (_collateral._collateralType == CollateralType.ERC721) {

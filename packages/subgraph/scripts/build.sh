@@ -5,10 +5,7 @@ network=$1
 
 # Ensure a network name was given
 if [ -z "$network" ]; then
-  echo
-  echo 'No network was specified!'
-  echo
-  exit 1
+  read -r -p 'Network name: ' network
 fi
 
 # Ensure the network name is valid
@@ -26,7 +23,7 @@ declare -A network_map
 network_map[polygon]=matic
 
 # Normalize network name as defined by The Graph
-graph_network=$1
+graph_network=$network
 if [ -n "${network_map[$network]}" ]; then
   graph_network=${network_map[$network]}
 fi

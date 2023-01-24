@@ -196,7 +196,7 @@ describe('MarketRegistry', () => {
       await marketRegistry
         .connect(marketOwner)
         [
-          'createMarket(address,uint32,uint32,uint32,uint16,bool,bool,uint8,string,uint8)'
+          'createMarket(address,uint32,uint32,uint32,uint16,bool,bool,uint8,uint8,string)'
         ](
           marketOwnerAddress,
           paymentCycleValue,
@@ -206,8 +206,8 @@ describe('MarketRegistry', () => {
           false,
           false,
           '0',
-          uri,
-          0
+          0,
+          uri
         )
         .should.emit(marketRegistry, 'MarketCreated')
         .withArgs(marketOwnerAddress, 1)
@@ -217,7 +217,7 @@ describe('MarketRegistry', () => {
       await marketRegistry
         .connect(marketOwner)
         [
-          'createMarket(address,uint32,uint32,uint32,uint16,bool,bool,uint8,string,uint8)'
+          'createMarket(address,uint32,uint32,uint32,uint16,bool,bool,uint8,uint8,string)'
         ](
           ethers.constants.AddressZero,
           paymentCycleValue,
@@ -227,8 +227,8 @@ describe('MarketRegistry', () => {
           true,
           true,
           '0',
-          uri,
-          0
+          0,
+          uri
         )
         .should.be.revertedWith('Invalid owner address')
     })
@@ -237,7 +237,7 @@ describe('MarketRegistry', () => {
       await marketRegistry
         .connect(marketOwner)
         [
-          'createMarket(address,uint32,uint32,uint32,uint16,bool,bool,uint8,string,uint8)'
+          'createMarket(address,uint32,uint32,uint32,uint16,bool,bool,uint8,uint8,string)'
         ](
           marketOwnerAddress,
           paymentCycleValue,
@@ -247,8 +247,8 @@ describe('MarketRegistry', () => {
           true,
           true,
           '0',
-          uriTwo,
-          0
+          0,
+          uriTwo
         )
         .should.emit(marketRegistry, 'MarketCreated')
         .withArgs(marketOwnerAddress, 2)
@@ -258,7 +258,7 @@ describe('MarketRegistry', () => {
       await marketRegistry
         .connect(marketOwner)
         [
-          'createMarket(address,uint32,uint32,uint32,uint16,bool,bool,uint8,string,uint8)'
+          'createMarket(address,uint32,uint32,uint32,uint16,bool,bool,uint8,uint8,string)'
         ](
           marketOwnerAddress,
           paymentCycleValue,
@@ -268,8 +268,8 @@ describe('MarketRegistry', () => {
           true,
           true,
           '0',
-          uriThree,
-          0
+          0,
+          uriThree
         )
         .should.emit(marketRegistry, 'MarketCreated')
         .withArgs(marketOwnerAddress, 3)
@@ -279,7 +279,7 @@ describe('MarketRegistry', () => {
       await marketRegistry
         .connect(marketOwner)
         [
-          'createMarket(address,uint32,uint32,uint32,uint16,bool,bool,uint8,string,uint8)'
+          'createMarket(address,uint32,uint32,uint32,uint16,bool,bool,uint8,uint8,string)'
         ](
           marketOwnerAddress,
           paymentCycleValue,
@@ -289,8 +289,8 @@ describe('MarketRegistry', () => {
           true,
           true,
           '0',
-          uri,
-          0
+          0,
+          uri
         )
         .should.emit(marketRegistry, 'MarketCreated')
         .withArgs(marketOwnerAddress, 4)

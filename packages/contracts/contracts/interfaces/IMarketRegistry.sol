@@ -7,7 +7,7 @@ import "../EAS/TellerAS.sol";
 interface IMarketRegistry {
 
     enum PaymentCycleType {
-        Custom,
+        Seconds,
         Monthly
     }
 
@@ -59,8 +59,8 @@ interface IMarketRegistry {
         bool _requireLenderAttestation,
         bool _requireBorrowerAttestation,
         V2Calculations.PaymentType _paymentType,
-        string calldata _uri,
-        PaymentCycleType _paymentCycleType
+        PaymentCycleType _paymentCycleType,
+        string calldata _uri
     ) external returns (uint256 marketId_);
 
     function createMarket(

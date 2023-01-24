@@ -18,7 +18,6 @@ import {
 } from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import { PaymentType } from "./libraries/V2Calculations.sol";
 
-
 contract MarketRegistry is
     IMarketRegistry,
     Initializable,
@@ -96,10 +95,7 @@ contract MarketRegistry is
     event SetMarketFeeRecipient(uint256 marketId, address newRecipient);
     event SetMarketLenderAttestation(uint256 marketId, bool required);
     event SetMarketBorrowerAttestation(uint256 marketId, bool required);
-    event SetMarketPaymentType(
-        uint256 marketId,
-        PaymentType paymentType
-    );
+    event SetMarketPaymentType(uint256 marketId, PaymentType paymentType);
 
     /* External Functions */
 

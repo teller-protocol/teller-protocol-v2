@@ -39,6 +39,7 @@ export function loadMarketById(id: string): MarketPlace {
     marketPlace.durationAverage = BigInt.zero();
     marketPlace._durationTotal = BigInt.zero();
     marketPlace.totalNumberOfLenders = BigInt.zero();
+    marketPlace.paymentType = '';
   }
   marketPlace.save();
   return marketPlace;

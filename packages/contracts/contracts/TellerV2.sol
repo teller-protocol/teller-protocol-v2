@@ -14,12 +14,13 @@ import "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol";
 import "./interfaces/IMarketRegistry.sol";
 import "./interfaces/IReputationManager.sol";
 import "./interfaces/ITellerV2.sol";
+import { Collateral } from "./interfaces/escrow/ICollateralEscrowV1.sol";
 
 // Libraries
 import "@openzeppelin/contracts/utils/Address.sol";
-import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./libraries/NumbersLib.sol";
+import { V2Calculations } from "./libraries/V2Calculations.sol";
 
 /* Errors */
 /**
@@ -148,7 +149,7 @@ contract TellerV2 is
 
     /** Constant Variables **/
 
-    uint256 public constant CURRENT_CODE_VERSION = 7;
+    uint8 public constant CURRENT_CODE_VERSION = 7;
 
     /** Constructor **/
 
@@ -160,13 +161,15 @@ contract TellerV2 is
      * @notice Initializes the proxy.
      * @param _protocolFee The fee collected by the protocol for loan processing.
      * @param _lendingTokens The list of tokens allowed as lending assets on the protocol.
+     * @param _collateralManagerAddress The address of the collateral manager contracts.
      */
     function initialize(
         uint16 _protocolFee,
         address _marketRegistry,
         address _reputationManager,
         address _lenderCommitmentForwarder,
-        address[] calldata _lendingTokens
+        address[] calldata _lendingTokens,
+        address _collateralManagerAddress
     ) external initializer {
         __ProtocolFee_init(_protocolFee);
 
@@ -175,6 +178,7 @@ contract TellerV2 is
         lenderCommitmentForwarder = _lenderCommitmentForwarder;
         marketRegistry = IMarketRegistry(_marketRegistry);
         reputationManager = IReputationManager(_reputationManager);
+        _setCollateralManager(_collateralManagerAddress);
 
         require(_lendingTokens.length > 0, "No lending tokens specified");
         for (uint256 i = 0; i < _lendingTokens.length; i++) {
@@ -186,12 +190,27 @@ contract TellerV2 is
         }
     }
 
-    function onUpgrade() external {
+    function setCollateralManager(address _collateralManager)
+        public
+        reinitializer(CURRENT_CODE_VERSION)
+        onlyOwner
+    {
+        _setCollateralManager(_collateralManager);
+    }
+
+    function _setCollateralManager(address _collateralManager)
+        internal
+        onlyInitializing
+    {
         require(
-            version != CURRENT_CODE_VERSION,
-            "Contract already upgraded to latest version!"
+            address(collateralManager) == address(0),
+            "Collateral Manager already set"
         );
-        version = CURRENT_CODE_VERSION;
+        require(
+            _collateralManager.isContract(),
+            "Collateral Manager must be a contract"
+        );
+        collateralManager = ICollateralManager(_collateralManager);
     }
 
     /**
@@ -226,7 +245,7 @@ contract TellerV2 is
     }
 
     /**
-     * @notice Function for a borrower to create a bid for a loan.
+     * @notice Function for a borrower to create a bid for a loan without Collateral.
      * @param _lendingToken The lending token asset requested to be borrowed.
      * @param _marketplaceId The unique id of the marketplace for the bid.
      * @param _principal The principal amount of the loan bid.
@@ -244,6 +263,68 @@ contract TellerV2 is
         string calldata _metadataURI,
         address _receiver
     ) public override whenNotPaused returns (uint256 bidId_) {
+        bidId_ = _submitBid(
+            _lendingToken,
+            _marketplaceId,
+            _principal,
+            _duration,
+            _APR,
+            _metadataURI,
+            _receiver
+        );
+    }
+
+    /**
+     * @notice Function for a borrower to create a bid for a loan with Collateral.
+     * @param _lendingToken The lending token asset requested to be borrowed.
+     * @param _marketplaceId The unique id of the marketplace for the bid.
+     * @param _principal The principal amount of the loan bid.
+     * @param _duration The recurrent length of time before which a payment is due.
+     * @param _APR The proposed interest rate for the loan bid.
+     * @param _metadataURI The URI for additional borrower loan information as part of loan bid.
+     * @param _receiver The address where the loan amount will be sent to.
+     * @param _collateralInfo Additional information about the collateral asset.
+     */
+    function submitBid(
+        address _lendingToken,
+        uint256 _marketplaceId,
+        uint256 _principal,
+        uint32 _duration,
+        uint16 _APR,
+        string calldata _metadataURI,
+        address _receiver,
+        Collateral[] calldata _collateralInfo
+    ) public override whenNotPaused returns (uint256 bidId_) {
+        bidId_ = _submitBid(
+            _lendingToken,
+            _marketplaceId,
+            _principal,
+            _duration,
+            _APR,
+            _metadataURI,
+            _receiver
+        );
+
+        bool validation = collateralManager.commitCollateral(
+            bidId_,
+            _collateralInfo
+        );
+
+        require(
+            validation == true,
+            "Collateral balance could not be validated"
+        );
+    }
+
+    function _submitBid(
+        address _lendingToken,
+        uint256 _marketplaceId,
+        uint256 _principal,
+        uint32 _duration,
+        uint16 _APR,
+        string calldata _metadataURI,
+        address _receiver
+    ) internal returns (uint256 bidId_) {
         address sender = _msgSenderForMarket(_marketplaceId);
         (bool isVerified, ) = marketRegistry.isVerifiedBorrower(
             _marketplaceId,
@@ -407,6 +488,9 @@ contract TellerV2 is
         // Declare the bid acceptor as the lender of the bid
         bid.lender = sender;
 
+        // Tell the collateral manager to deploy the escrow and pull funds from the borrower if applicable
+        collateralManager.deployAndDeposit(_bidId);
+
         // Transfer funds to borrower from the lender
         amountToProtocol = bid.loanDetails.principal.percent(protocolFee());
         amountToMarketplace = bid.loanDetails.principal.percent(
@@ -558,7 +642,11 @@ contract TellerV2 is
 
         bid.state = BidState.LIQUIDATED;
 
-        emit LoanLiquidated(_bidId, _msgSenderForMarket(bid.marketplaceId));
+        // If loan is backed by collateral, withdraw and send to the liquidator
+        address liquidator = _msgSenderForMarket(bid.marketplaceId);
+        collateralManager.liquidateCollateral(_bidId, liquidator);
+
+        emit LoanLiquidated(_bidId, liquidator);
     }
 
     /**
@@ -587,6 +675,9 @@ contract TellerV2 is
 
             // Remove borrower's active bid
             _borrowerBidsActive[bid.borrower].remove(_bidId);
+
+            // If loan is backed by collateral, withdraw and send to borrower
+            collateralManager.withdraw(_bidId);
 
             emit LoanRepaid(_bidId);
         } else {
@@ -878,135 +969,5 @@ contract TellerV2 is
         returns (bytes calldata)
     {
         return ERC2771ContextUpgradeable._msgData();
-    }
-}
-
-library V2Calculations {
-    using NumbersLib for uint256;
-
-    enum PaymentType {
-        EMI,
-        Bullet
-    }
-
-    /**
-     * @notice Returns the timestamp of the last payment made for a loan.
-     * @param _bid The loan bid struct to get the timestamp for.
-     */
-    function lastRepaidTimestamp(TellerV2.Bid storage _bid)
-        internal
-        view
-        returns (uint32)
-    {
-        return
-            _bid.loanDetails.lastRepaidTimestamp == 0
-                ? _bid.loanDetails.acceptedTimestamp
-                : _bid.loanDetails.lastRepaidTimestamp;
-    }
-
-    /**
-     * @notice Calculates the amount owed for a loan.
-     * @param _bid The loan bid struct to get the owed amount for.
-     * @param _timestamp The timestamp at which to get the owed amount at.
-     */
-    function calculateAmountOwed(TellerV2.Bid storage _bid, uint256 _timestamp)
-        internal
-        view
-        returns (
-            uint256 owedPrincipal_,
-            uint256 duePrincipal_,
-            uint256 interest_
-        )
-    {
-        // Total principal left to pay
-        return
-            calculateAmountOwed(
-                _bid.loanDetails.principal,
-                _bid.loanDetails.totalRepaid.principal,
-                _bid.terms.APR,
-                _bid.terms.paymentCycleAmount,
-                _bid.terms.paymentCycle,
-                lastRepaidTimestamp(_bid),
-                _timestamp,
-                _bid.loanDetails.acceptedTimestamp,
-                _bid.loanDetails.loanDuration,
-                _bid.paymentType
-            );
-    }
-
-    function calculateAmountOwed(
-        uint256 principal,
-        uint256 totalRepaidPrincipal,
-        uint16 _interestRate,
-        uint256 _paymentCycleAmount,
-        uint256 _paymentCycle,
-        uint256 _lastRepaidTimestamp,
-        uint256 _timestamp,
-        uint256 _startTimestamp,
-        uint256 _loanDuration,
-        PaymentType _paymentType
-    )
-        internal
-        pure
-        returns (
-            uint256 owedPrincipal_,
-            uint256 duePrincipal_,
-            uint256 interest_
-        )
-    {
-        owedPrincipal_ = principal - totalRepaidPrincipal;
-
-        uint256 interestOwedInAYear = owedPrincipal_.percent(_interestRate);
-        uint256 owedTime = _timestamp - uint256(_lastRepaidTimestamp);
-        interest_ = (interestOwedInAYear * owedTime) / 365 days;
-
-        // Cast to int265 to avoid underflow errors (negative means loan duration has passed)
-        int256 durationLeftOnLoan = int256(_loanDuration) -
-            (int256(_timestamp) - int256(_startTimestamp));
-        bool isLastPaymentCycle = durationLeftOnLoan < int256(_paymentCycle) || // Check if current payment cycle is within or beyond the last one
-            owedPrincipal_ + interest_ <= _paymentCycleAmount; // Check if what is left to pay is less than the payment cycle amount
-
-        if (_paymentType == PaymentType.Bullet) {
-            if (isLastPaymentCycle) {
-                duePrincipal_ = owedPrincipal_;
-            }
-        } else {
-            // Default to PaymentType.EMI
-            // Max payable amount in a cycle
-            // NOTE: the last cycle could have less than the calculated payment amount
-            uint256 maxCycleOwed = isLastPaymentCycle
-                ? owedPrincipal_ + interest_
-                : _paymentCycleAmount;
-
-            // Calculate accrued amount due since last repayment
-            uint256 owedAmount = (maxCycleOwed * owedTime) / _paymentCycle;
-            duePrincipal_ = Math.min(owedAmount - interest_, owedPrincipal_);
-        }
-    }
-
-    /**
-     * @notice Calculates the amount owed for a loan for the next payment cycle.
-     * @param _type The payment type of the loan.
-     * @param _principal The starting amount that is owed on the loan.
-     * @param _duration The length of the loan.
-     * @param _paymentCycle The length of the loan's payment cycle.
-     * @param _apr The annual percentage rate of the loan.
-     */
-    function calculatePaymentCycleAmount(
-        PaymentType _type,
-        uint256 _principal,
-        uint32 _duration,
-        uint32 _paymentCycle,
-        uint16 _apr
-    ) internal returns (uint256) {
-        if (_type == PaymentType.Bullet) {
-            return
-                _principal.percent(_apr).percent(
-                    uint256(_paymentCycle).ratioOf(365 days, 10),
-                    10
-                );
-        }
-        // Default to PaymentType.EMI
-        return NumbersLib.pmt(_principal, _duration, _paymentCycle, _apr);
     }
 }

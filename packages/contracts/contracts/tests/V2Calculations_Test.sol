@@ -10,12 +10,14 @@ import "hardhat/console.sol";
 
 import "./Testable.sol";
 import "../TellerV2.sol";
+import { Bid } from "../TellerV2Storage.sol";
+import { PaymentType } from "../libraries/V2Calculations.sol";
 
 contract V2Calculations_Test is Testable {
     using Arrays for uint256[];
     using EnumerableSet for EnumerableSet.UintSet;
 
-    TellerV2.Bid __bid;
+    Bid __bid;
     EnumerableSet.UintSet cyclesToSkip;
     uint256[] cyclesWithExtraPayments;
     uint256[] cyclesWithExtraPaymentsAmounts;
@@ -39,7 +41,7 @@ contract V2Calculations_Test is Testable {
         cyclesWithExtraPayments = [3, 4];
         cyclesWithExtraPaymentsAmounts = [25000e6, 25000e6];
 
-        calculateAmountOwed_runner(18, V2Calculations.PaymentType.EMI);
+        calculateAmountOwed_runner(18, PaymentType.EMI);
     }
 
     // EMI loan
@@ -48,7 +50,7 @@ contract V2Calculations_Test is Testable {
         cyclesToSkip.add(4);
         cyclesToSkip.add(5);
 
-        calculateAmountOwed_runner(36, V2Calculations.PaymentType.EMI);
+        calculateAmountOwed_runner(36, PaymentType.EMI);
     }
 
     // EMI loan
@@ -56,13 +58,13 @@ contract V2Calculations_Test is Testable {
         cyclesWithExtraPayments = [3, 7];
         cyclesWithExtraPaymentsAmounts = [35000e6, 20000e6];
 
-        calculateAmountOwed_runner(16, V2Calculations.PaymentType.EMI);
+        calculateAmountOwed_runner(16, PaymentType.EMI);
     }
 
     // Bullet loan
     function _04_calculateAmountOwed_test() public {
         cyclesToSkip.add(6);
-        calculateAmountOwed_runner(36, V2Calculations.PaymentType.Bullet);
+        calculateAmountOwed_runner(36, PaymentType.Bullet);
     }
 
     // Bullet loan
@@ -70,12 +72,12 @@ contract V2Calculations_Test is Testable {
         cyclesToSkip.add(12);
         cyclesWithExtraPayments = [1, 8];
         cyclesWithExtraPaymentsAmounts = [15000e6, 10000e6];
-        calculateAmountOwed_runner(36, V2Calculations.PaymentType.Bullet);
+        calculateAmountOwed_runner(36, PaymentType.Bullet);
     }
 
     function calculateAmountOwed_runner(
         uint256 expectedTotalCycles,
-        V2Calculations.PaymentType _paymentType
+        PaymentType _paymentType
     ) private {
         // Calculate payment cycle amount
         uint256 paymentCycleAmount = V2Calculations.calculatePaymentCycleAmount(
@@ -178,7 +180,7 @@ contract V2Calculations_Test is Testable {
                 1663189241, //timestamp
                 1646159355, // accepted timestamp
                 __bid.loanDetails.loanDuration, // duration
-                V2Calculations.PaymentType.EMI // market payment type
+                PaymentType.EMI // market payment type
             );
 
         console.log("calc amt owed test ");
@@ -203,7 +205,7 @@ contract V2Calculations_Test is Testable {
         uint16 _apr = 3000;
         uint256 _paymentCycleAmount = V2Calculations
             .calculatePaymentCycleAmount(
-                V2Calculations.PaymentType.Bullet,
+                PaymentType.Bullet,
                 _principal,
                 365 days,
                 365 days / 12,
@@ -226,7 +228,7 @@ contract V2Calculations_Test is Testable {
                 _timestamp,
                 _acceptedTimestamp,
                 365 days, // loan duration
-                V2Calculations.PaymentType.Bullet
+                PaymentType.Bullet
             );
 
         Test.eq(
@@ -251,7 +253,7 @@ contract V2Calculations_Test is Testable {
                 _timestamp,
                 _acceptedTimestamp,
                 365 days, // loan duration
-                V2Calculations.PaymentType.Bullet
+                PaymentType.Bullet
             );
 
         Test.eq(
@@ -280,7 +282,7 @@ contract V2Calculations_Test is Testable {
                 _timestamp,
                 _acceptedTimestamp,
                 365 days, // loan duration
-                V2Calculations.PaymentType.Bullet
+                PaymentType.Bullet
             );
 
         Test.eq(
@@ -313,7 +315,7 @@ contract V2Calculations_Test is Testable {
                 _timestamp,
                 _acceptedTimestamp,
                 365 days, // loan duration
-                V2Calculations.PaymentType.Bullet
+                PaymentType.Bullet
             );
 
         Test.eq(

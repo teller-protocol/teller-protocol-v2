@@ -5,6 +5,8 @@ pragma solidity >=0.8.0 <0.9.0;
 import "../TellerV2.sol";
 import "../interfaces/ITellerV2.sol";
 import "../TellerV2Context.sol";
+import { Collateral } from "../interfaces/escrow/ICollateralEscrowV1.sol";
+import { LoanDetails, Payment, BidState } from "../TellerV2Storage.sol";
 
 /*
 This is only used for sol test so its named specifically to avoid being used for the typescript tests.
@@ -36,6 +38,17 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
 
         bidId++;
     }
+
+    function submitBid(
+        address _lendingToken,
+        uint256 _marketplaceId,
+        uint256 _principal,
+        uint32 _duration,
+        uint16 _APR,
+        string calldata _metadataURI,
+        address _receiver,
+        Collateral[] calldata _collateralInfo
+    ) public returns (uint256 bidId_) {}
 
     function repayLoanMinimum(uint256 _bidId) external {}
 
@@ -113,18 +126,14 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
         return (0, bid.loanDetails.principal, 0);
     }
 
-    function getBidState(uint256 _bidId)
-        public
-        view
-        returns (TellerV2Storage.BidState)
-    {
+    function getBidState(uint256 _bidId) public view returns (BidState) {
         return bids[_bidId].state;
     }
 
     function getLoanDetails(uint256 _bidId)
         public
         view
-        returns (TellerV2Storage.LoanDetails memory)
+        returns (LoanDetails memory)
     {
         return bids[_bidId].loanDetails;
     }

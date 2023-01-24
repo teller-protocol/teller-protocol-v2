@@ -8,17 +8,11 @@ import "./interfaces/ICollateralManager.sol";
  
 import { Collateral, CollateralType } from "./interfaces/escrow/ICollateralEscrowV1.sol";
 
-import "./libraries/NumbersLib.sol";
-
-
+ 
 contract LenderCommitmentForwarder is TellerV2MarketForwarder {
 
-    using NumbersLib for uint256; 
-
-    //should we move this into TellerV2MarketForwarder? 
-    address public immutable _collateralManager;
-
-
+ 
+    
 
     /**
      * @notice Details about a lender's capital commitment.
@@ -38,13 +32,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         CollateralType collateralTokenType; //erc721, erc1155 or erc20 
     }
 
-    // compound normalizes to 8 decimal places 
-    //take a look at our numbers lib  WADray
-
-    //could check to see if ratio will be  grt 1 , then handle it as an edge case w other logic 
-
-
- 
+     
 
 
 
@@ -102,10 +90,10 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
     
     /** External Functions **/
 
-    constructor(address _protocolAddress, address _marketRegistry, address _collateralManagerAddress)
+    constructor(address _protocolAddress, address _marketRegistry)
         TellerV2MarketForwarder(_protocolAddress, _marketRegistry)
     {
-        _collateralManager = _collateralManagerAddress;
+       
     }
 
     /**
@@ -203,7 +191,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
      * @param _marketId The Id of the market the commitment removal applies to.
      * @param _lender The address of the lender of the commitment.
      * @param _principalTokenAddress The address of the asset for which the commitment is being removed.
-     * @param _principal The amount of currency to borrow for the loan.
+     * @param _principalAmount The amount of currency to borrow for the loan.
      * @param _loanDuration The loan duration for the TellerV2 loan.
      * @param _interestRate The interest rate for the TellerV2 loan.
      */
@@ -211,12 +199,14 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint256 _marketId,
         address _lender,
         address _principalTokenAddress,
-        uint256 _principal,
-        uint32 _loanDuration,
-        uint16 _interestRate,
+        uint256 _principalAmount,
 
         uint256 _collateralAmount,
-        uint256 _collateralTokenId
+        uint256 _collateralTokenId,
+
+        uint32 _loanDuration,
+        uint16 _interestRate
+
     ) external onlyMarketOwner(_marketId) returns (uint256 bidId) {
         address borrower = _msgSender();
 
@@ -225,7 +215,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         ][_principalTokenAddress];
 
         require(
-            _principal <= commitment.maxPrincipal,
+            _principalAmount <= commitment.maxPrincipal,
             "Commitment principal insufficient"
         );
         require(
@@ -241,12 +231,12 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             "Commitment has expired"
         );
 
-        require( _collateralAmount * (commitment.maxPrincipalPerCollateralAmount) >= _principal, "Insufficient collateral" );
+        require( _collateralAmount * (commitment.maxPrincipalPerCollateralAmount) >= _principalAmount, "Insufficient collateral" );
 
         CreateLoanArgs memory createLoanArgs;
         createLoanArgs.marketId = _marketId;
         createLoanArgs.lendingToken = _principalTokenAddress;
-        createLoanArgs.principal = _principal;
+        createLoanArgs.principal = _principalAmount;
         createLoanArgs.duration = _loanDuration;
         createLoanArgs.interestRate = _interestRate;
 
@@ -260,21 +250,18 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             _collateralAddress:  commitment.collateralTokenAddress
         });
 
-        // _submitCollateral() ; 
-
-      //  bidId = _submitBidWithCommitment( createLoanArgs, collateralInfo, borrower );
-
+      
         bidId = _submitBidWithCollateral(createLoanArgs, collateralInfo, borrower);//(createLoanArgs, borrower);
 
         _acceptBid(bidId, _lender);
 
-        _decrementCommitment(_lender, _marketId, _principalTokenAddress, _principal);
+        _decrementCommitment(_lender, _marketId, _principalTokenAddress, _principalAmount);
 
         emit ExercisedCommitment(
             _lender,
             _marketId,
             _principalTokenAddress,
-            _principal,
+            _principalAmount,
             bidId
         );
     }

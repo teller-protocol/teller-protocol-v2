@@ -94,8 +94,9 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             tokenAddress,
             maxAmount,
             maxLoanDuration,
+              expiration,
             minInterestRate,
-            expiration
+          
         );
     }
 
@@ -197,9 +198,15 @@ contract User {
         uint256 marketId,
         address tokenAddress,
         uint256 principal,
+
+        address _collateralTokenAddress,
+        uint256 _maxPrincipalPerCollateralAmount,
+        CollateralType _collateralTokenType,
+
         uint32 loanDuration,
+        uint32 expiration,
         uint16 interestRate,
-        uint32 expiration
+              
     ) public {
         commitmentForwarder.updateCommitment(
             marketId,
@@ -216,6 +223,10 @@ contract User {
         address lender,
         address tokenAddress,
         uint256 principal,
+
+         uint256 collateralAmount,
+        uint256 collateralTokenId,
+
         uint32 loanDuration,
         uint16 interestRate
     ) public returns (uint256) {

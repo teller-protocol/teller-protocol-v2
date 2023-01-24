@@ -1,8 +1,11 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 
-import { TokenVolume } from '../../generated/schema'
+import { TokenVolume } from "../../generated/schema";
 
-export function initTokenVolume(token: TokenVolume, tokenAddress: Address): void {
+export function initTokenVolume(
+  token: TokenVolume,
+  tokenAddress: Address
+): void {
   token.lendingTokenAddress = tokenAddress;
   token.totalLoaned = BigInt.zero();
   token.aprAverage = BigInt.zero();

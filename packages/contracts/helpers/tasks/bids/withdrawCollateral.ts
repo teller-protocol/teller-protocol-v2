@@ -6,7 +6,7 @@ interface ClaimCollateralArgs {
   bidId: number
 }
 
-export const claimCollateral = async (
+export const withdrawCollateral = async (
   args: ClaimCollateralArgs,
   hre: HardhatRuntimeEnvironment
 ): Promise<void> => {
@@ -19,11 +19,11 @@ export const claimCollateral = async (
   )
 
   // Claim collateral
-  await collateralManager.claimCollateral(bidId)
+  await collateralManager.withdraw(bidId)
 
   log(`Collateral claimed for defaulted loan id ${bidId}`)
 }
 
-task('claim-collateral', 'claims collateral for a defaulted loan')
+task('withdraw-collateral', 'withdraws collateral for a defaulted loan')
   .addParam('bidId', 'The id of the bid to claim collateral for')
-  .setAction(claimCollateral)
+  .setAction(withdrawCollateral)

@@ -1,11 +1,18 @@
-import {Address, BigInt } from '@graphprotocol/graph-ts'
+import { Address, BigInt } from "@graphprotocol/graph-ts";
 
+import {
+  CollateralEscrowDeployed,
+  CollateralCommitted,
+  CollateralDeposited,
+  CollateralWithdrawn,
+  CollateralClaimed
+} from "../generated/CollateralManager/CollateralManager";
 import {
   DeletedCommitment,
   ExercisedCommitment,
   LenderCommitmentForwarder,
   UpdatedCommitment
-} from '../generated/LenderCommitmentForwarder/LenderCommitmentForwarder'
+} from "../generated/LenderCommitmentForwarder/LenderCommitmentForwarder";
 import {
   BorrowerAttestation,
   BorrowerExitMarket,
@@ -24,8 +31,16 @@ import {
   SetPaymentCycleDuration,
   SetPaymentDefaultDuration,
   Upgraded
-} from '../generated/MarketRegistry/MarketRegistry'
-import { Bid, Borrower, BorrowerBid, Lender, LenderBid, MarketPlace, TokenVolume } from '../generated/schema'
+} from "../generated/MarketRegistry/MarketRegistry";
+import {
+  Bid,
+  Borrower,
+  BorrowerBid,
+  Lender,
+  LenderBid,
+  MarketPlace,
+  TokenVolume
+} from "../generated/schema";
 import {
   AcceptedBid,
   CancelledBid,
@@ -34,22 +49,27 @@ import {
   LoanRepaid,
   LoanRepayment,
   SubmittedBid,
-  TellerV2,
-} from '../generated/TellerV2/TellerV2'
+  TellerV2
+} from "../generated/TellerV2/TellerV2";
 
 import {
   getBid,
   loadBidById,
   loadBorrowerByMarketId,
   loadBorrowerTokenVolume,
+  loadCollateral,
   loadCommitmentByMarketId,
   loadLenderByMarketId,
   loadLenderTokenVolume,
   loadMarketById,
   loadProtocolTokenVolume,
   loadTokenVolumeByMarketId
-} from './helpers/loaders'
-import { updateBid, updateTokenVolumeOnAccept } from './helpers/updaters'
+} from "./helpers/loaders";
+import {
+  updateBid,
+  updateCollateral,
+  updateTokenVolumeOnAccept
+} from "./helpers/updaters";
 
 export function handleSubmittedBid(event: SubmittedBid): void {
   const tellerV2Instance = TellerV2.bind(event.address);
@@ -103,7 +123,7 @@ export function handleSubmittedBid(event: SubmittedBid): void {
   bid.marketplace = market.id;
   bid.marketplaceId = BigInt.fromString(market.id);
 
-  loadBorrowerTokenVolume(lendingTokenAddress, borrower)
+  loadBorrowerTokenVolume(lendingTokenAddress, borrower);
 
   const requests = market.openRequests;
   if (requests) {
@@ -115,13 +135,13 @@ export function handleSubmittedBid(event: SubmittedBid): void {
       tellerV2Instance.bidExpirationTime(event.params.bidId)
     );
   } else {
-    bid.expiresAt = BigInt.zero()
+    bid.expiresAt = BigInt.zero();
   }
 
   const marketPlace = loadMarketById(storedBid.value3.toString());
 
   const paymentDefaultDuration = marketPlace.paymentDefaultDuration;
-  if(paymentDefaultDuration) {
+  if (paymentDefaultDuration) {
     bid.paymentDefaultDuration = paymentDefaultDuration;
   } else {
     bid.paymentDefaultDuration = BigInt.zero();
@@ -226,7 +246,10 @@ export function handleAcceptedBid(event: AcceptedBid): void {
   const lendingTokenAddress = storedBid.value5.lendingToken;
 
   // Update the market's token volume
-  const tokenVolume = loadTokenVolumeByMarketId(lendingTokenAddress, marketPlace.id);
+  const tokenVolume = loadTokenVolumeByMarketId(
+    lendingTokenAddress,
+    marketPlace.id
+  );
   updateTokenVolumeOnAccept(tokenVolume, storedBid);
 
   // Update the protocol's overall token volume
@@ -234,10 +257,7 @@ export function handleAcceptedBid(event: AcceptedBid): void {
   updateTokenVolumeOnAccept(protocolVolume, storedBid);
 
   // Update the lender's token volume
-  const lenderVolume = loadLenderTokenVolume(
-    lendingTokenAddress,
-    lender
-  );
+  const lenderVolume = loadLenderTokenVolume(lendingTokenAddress, lender);
   updateTokenVolumeOnAccept(lenderVolume, storedBid);
 
   // Update the borrower's token volume
@@ -323,7 +343,9 @@ export function handleLoanLiquidateds(events: LoanLiquidated[]): void {
 }
 
 export function handleMarketCreated(event: MarketCreated): void {
-  const marketPlace: MarketPlace = loadMarketById(event.params.marketId.toString());
+  const marketPlace: MarketPlace = loadMarketById(
+    event.params.marketId.toString()
+  );
   marketPlace.owner = event.params.owner;
   // market owner is the default fee recipient
   marketPlace.feeRecipient = event.params.owner;
@@ -362,7 +384,9 @@ export function handleMarketsCreated(events: MarketCreated[]): void {
 }
 
 export function handleMarketClosed(event: MarketClosed): void {
-  const marketPlace: MarketPlace = loadMarketById(event.params.marketId.toString());
+  const marketPlace: MarketPlace = loadMarketById(
+    event.params.marketId.toString()
+  );
   marketPlace.isMarketOpen = false;
   marketPlace.save();
 }
@@ -373,16 +397,21 @@ export function handleMarketsClosed(events: MarketClosed[]): void {
   });
 }
 
-export function handleSetMarketOwner(event: SetMarketOwner) : void {
-  const marketPlace: MarketPlace = loadMarketById(event.params.marketId.toString());
+export function handleSetMarketOwner(event: SetMarketOwner): void {
+  const marketPlace: MarketPlace = loadMarketById(
+    event.params.marketId.toString()
+  );
   marketPlace.owner = event.params.newOwner;
 
   marketPlace.save();
 }
 
-
-export function handleSetMarketFeeRecipient(event: SetMarketFeeRecipient) : void {
-  const marketPlace: MarketPlace = loadMarketById(event.params.marketId.toString());
+export function handleSetMarketFeeRecipient(
+  event: SetMarketFeeRecipient
+): void {
+  const marketPlace: MarketPlace = loadMarketById(
+    event.params.marketId.toString()
+  );
   marketPlace.feeRecipient = event.params.newRecipient;
 
   marketPlace.save();
@@ -404,7 +433,9 @@ export function handleSetMarketURIs(events: SetMarketURI[]): void {
 export function handleSetPaymentCycleDuration(
   event: SetPaymentCycleDuration
 ): void {
-  const marketPlace: MarketPlace = loadMarketById(event.params.marketId.toString());
+  const marketPlace: MarketPlace = loadMarketById(
+    event.params.marketId.toString()
+  );
   marketPlace.paymentCycleDuration = event.params.duration;
 
   marketPlace.save();
@@ -421,7 +452,9 @@ export function handleSetPaymentCycleDurations(
 export function handleSetPaymentDefaultDuration(
   event: SetPaymentDefaultDuration
 ): void {
-  const marketPlace: MarketPlace = loadMarketById(event.params.marketId.toString());
+  const marketPlace: MarketPlace = loadMarketById(
+    event.params.marketId.toString()
+  );
   marketPlace.paymentDefaultDuration = event.params.duration;
 
   marketPlace.save();
@@ -436,7 +469,9 @@ export function handleSetPaymentDefaultDurations(
 }
 
 export function handleSetBidExpirationTime(event: SetBidExpirationTime): void {
-  const marketPlace: MarketPlace = loadMarketById(event.params.marketId.toString());
+  const marketPlace: MarketPlace = loadMarketById(
+    event.params.marketId.toString()
+  );
   marketPlace.bidExpirationTime = event.params.duration;
 
   marketPlace.save();
@@ -451,7 +486,9 @@ export function handleSetBidExpirationTimes(
 }
 
 export function handleSetMarketFee(event: SetMarketFee): void {
-  const marketPlace: MarketPlace = loadMarketById(event.params.marketId.toString());
+  const marketPlace: MarketPlace = loadMarketById(
+    event.params.marketId.toString()
+  );
 
   marketPlace.marketplaceFeePercent = BigInt.fromI32(event.params.feePct);
 
@@ -467,7 +504,9 @@ export function handleSetMarketFees(events: SetMarketFee[]): void {
 export function handleSetLenderAttestationRequired(
   event: SetMarketLenderAttestation
 ): void {
-  const marketPlace: MarketPlace = loadMarketById(event.params.marketId.toString());
+  const marketPlace: MarketPlace = loadMarketById(
+    event.params.marketId.toString()
+  );
   marketPlace.lenderAttestationRequired = event.params.required;
 
   marketPlace.save();
@@ -476,7 +515,9 @@ export function handleSetLenderAttestationRequired(
 export function handleSetBorrowerAttestationRequired(
   event: SetMarketBorrowerAttestation
 ): void {
-  const marketPlace: MarketPlace = loadMarketById(event.params.marketId.toString());
+  const marketPlace: MarketPlace = loadMarketById(
+    event.params.marketId.toString()
+  );
   marketPlace.borrowerAttestationRequired = event.params.required;
 
   marketPlace.save();
@@ -491,7 +532,10 @@ export function handleFeePaid(event: FeePaid): void {
     event.params.feeType.toHexString() ==
     "0xcef6e888ca344077e889d6d961447b180a6f2c1f8a3a4b954e2385449143c6c8" // bytes value of "marketplace"
   ) {
-    const tokenVolume = loadTokenVolumeByMarketId(lendingTokenAddress, bid.marketplaceId.toString());
+    const tokenVolume = loadTokenVolumeByMarketId(
+      lendingTokenAddress,
+      bid.marketplaceId.toString()
+    );
     const marketCommissionEarned = tokenVolume.commissionEarned;
     tokenVolume.commissionEarned = marketCommissionEarned.plus(
       event.params.amount
@@ -567,7 +611,7 @@ export function handleLenderExitMarket(event: LenderExitMarket): void {
 
 export function handleLenderExitMarkets(events: LenderExitMarket[]): void {
   events.forEach(event => {
-    handleLenderExitMarket(event)
+    handleLenderExitMarket(event);
   });
 }
 
@@ -584,7 +628,7 @@ export function handleBorrowerExitMarket(event: BorrowerExitMarket): void {
 
 export function handleBorrowerExitMarkets(events: BorrowerExitMarket[]): void {
   events.forEach(event => {
-    handleBorrowerExitMarket(event)
+    handleBorrowerExitMarket(event);
   });
 }
 
@@ -628,10 +672,12 @@ export function handleMarketRegistryUpgraded(event: Upgraded): void {
   ) {
     const marketCount = marketPlaceInstance.marketCount();
     for (let i = 1; i <= marketCount.toI32(); i++) {
-      const marketId = BigInt.fromI32(i)
+      const marketId = BigInt.fromI32(i);
       const market = loadMarketById(marketId.toString());
       if (market) {
-        const requirements = marketPlaceInstance.getMarketAttestationRequirements(marketId)
+        const requirements = marketPlaceInstance.getMarketAttestationRequirements(
+          marketId
+        );
         market.lenderAttestationRequired = requirements.value0;
         market.borrowerAttestationRequired = requirements.value1;
         market.save();
@@ -646,7 +692,6 @@ export function handleTellerV2Upgraded(event: Upgraded): void {
       Address.fromString("0xf39674f4d3878a732cb4c70b377c013affb89c1f")
     )
   ) {
-    const tellerV2Instance = TellerV2.bind(event.address);
     for (let i = 62; i < 66; i++) {
       const storedBid = getBid(event.address, BigInt.fromI32(i));
       const bid = loadBidById(i.toString());
@@ -725,19 +770,19 @@ export function handleExercisedCommitment(event: ExercisedCommitment): void {
   bid.save();
   commitment.save();
 
-  const stats = TokenVolume.load(commitment.stats)
+  const stats = TokenVolume.load(commitment.stats);
   if (stats) {
-    stats.activeLoans = stats.activeLoans.plus(BigInt.fromI32(1))
+    stats.activeLoans = stats.activeLoans.plus(BigInt.fromI32(1));
 
-    stats.totalLoaned = stats.totalLoaned.plus(bid.principal)
-    stats.outstandingCapital = stats.outstandingCapital.plus(bid.principal)
+    stats.totalLoaned = stats.totalLoaned.plus(bid.principal);
+    stats.outstandingCapital = stats.outstandingCapital.plus(bid.principal);
 
-    const totalLoans = stats.activeLoans.plus(stats.closedLoans)
-    stats._aprTotal = stats._aprTotal.plus(bid.apr)
-    stats.aprAverage = stats._aprTotal.div(totalLoans)
-    stats.loanAverage = stats.totalLoaned.div(totalLoans)
-    stats.durationAverage = stats._durationTotal.div(totalLoans)
-    stats.save()
+    const totalLoans = stats.activeLoans.plus(stats.closedLoans);
+    stats._aprTotal = stats._aprTotal.plus(bid.apr);
+    stats.aprAverage = stats._aprTotal.div(totalLoans);
+    stats.loanAverage = stats.totalLoaned.div(totalLoans);
+    stats.durationAverage = stats._durationTotal.div(totalLoans);
+    stats.save();
   }
 }
 
@@ -746,5 +791,93 @@ export function handleExercisedCommitments(
 ): void {
   events.forEach(event => {
     handleExercisedCommitment(event);
+  });
+}
+
+export function handleCollateralEscrowDeployed(
+  event: CollateralEscrowDeployed
+): void {
+  const bid: Bid = loadBidById(event.params._bidId.toString());
+  bid.collateralEscrow = event.params._collateralEscrow;
+  bid.save();
+}
+
+export function handleCollateralEscrowDeployeds(
+  events: CollateralEscrowDeployed[]
+): void {
+  events.forEach(event => {
+    handleCollateralEscrowDeployed(event);
+  });
+}
+
+export function handleCollateralCommitted(event: CollateralCommitted): void {
+  // Load collateral by bidId and collateral address
+  const collateral = loadCollateral(
+    event.params._bidId.toString(),
+    event.params._collateralAddress
+  );
+  updateCollateral(collateral, event);
+  collateral.status = "Committed";
+  collateral.save();
+}
+
+export function handleCollateralCommitteds(
+  events: CollateralCommitted[]
+): void {
+  events.forEach(event => {
+    handleCollateralCommitted(event);
+  });
+}
+
+export function handleCollateralDeposited(event: CollateralDeposited): void {
+  const collateral = loadCollateral(
+    event.params._bidId.toString(),
+    event.params._collateralAddress
+  );
+  updateCollateral(collateral, event);
+  collateral.status = "Deposited";
+  collateral.save();
+}
+
+export function handleCollateralDepositeds(
+  events: CollateralDeposited[]
+): void {
+  events.forEach(event => {
+    handleCollateralDeposited(event);
+  });
+}
+
+export function handleCollateralWithdrawn(event: CollateralWithdrawn): void {
+  const collateral = loadCollateral(
+    event.params._bidId.toString(),
+    event.params._collateralAddress
+  );
+  updateCollateral(collateral, event);
+  collateral.receiver = event.params._recipient;
+  collateral.status = "Withdrawn";
+  collateral.save();
+}
+
+export function handleCollateralWithdrawns(
+  events: CollateralWithdrawn[]
+): void {
+  events.forEach(event => {
+    handleCollateralWithdrawn(event);
+  });
+}
+
+/**
+ * Sets the bid status to `Liquidated` when the collateral is claimed from a defaulted loan.
+ * @param event
+ */
+export function handleCollateralClaimed(event: CollateralClaimed): void {
+  const bid = loadBidById(event.params._bidId.toString());
+  bid.status = "Liquidated";
+  bid.save();
+}
+
+export function handleCollateralClaimeds(events: CollateralClaimed[]): void {
+  events.forEach(event => {
+    handleCollateralClaimed(event);
   });
 }

@@ -32,14 +32,33 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     }
 
     /* Events */
-    event CollateralEscrowDeployed(uint256 _bidId, address _collateralEscrow);
+    event CollateralEscrowDeployed(
+        uint256 _bidId,
+        address _collateralEscrow
+    );
     event CollateralCommitted(
         uint256 _bidId,
+        CollateralType _type,
         address _collateralAddress,
         uint256 _amount,
         uint256 _tokenId
     );
     event CollateralClaimed(uint256 _bidId);
+    event CollateralDeposited(
+        uint256 _bidId,
+        CollateralType _type,
+        address _collateralAddress,
+        uint256 _amount,
+        uint256 _tokenId
+    );
+    event CollateralWithdrawn(
+        uint256 _bidId,
+        CollateralType _type,
+        address _collateralAddress,
+        uint256 _amount,
+        uint256 _tokenId,
+        address _recipient
+    );
 
     /* Modifiers */
     modifier onlyTellerV2() {
@@ -198,13 +217,14 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
      * @param _bidId The id of the bid to withdraw collateral for.
      */
     function withdraw(uint256 _bidId) external {
-        if (isBidCollateralBacked(_bidId)) {
-            BidState bidState = tellerV2.getBidState(_bidId);
-            require(
-                bidState == BidState.PAID,
-                "Loan has not been repaid"
-            );
+        BidState bidState = tellerV2.getBidState(_bidId);
+        if (bidState == BidState.PAID) {
             _withdraw(_bidId, tellerV2.getLoanBorrower(_bidId));
+        } else if (tellerV2.isLoanDefaulted(_bidId)) {
+            _withdraw(_bidId, tellerV2.getLoanLender(_bidId));
+            emit CollateralClaimed(_bidId);
+        } else {
+            revert("collateral cannot be withdrawn");
         }
     }
 
@@ -226,20 +246,6 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
             );
             _withdraw(_bidId, _liquidatorAddress);
         }
-    }
-
-    /**
-     * @notice Allows collateral to be claimed for a defaulted loan.
-     * @param _bidId The id of the bid to claim the collateral for.
-     */
-    function claimCollateral(uint256 _bidId)
-        external
-    {
-        require(isBidCollateralBacked(_bidId), 'Loan is not collateral backed');
-        require(tellerV2.isLoanDefaulted(_bidId), 'Loan is not eligible to claim');
-        address bidLender = tellerV2.getLoanLender(_bidId);
-        _withdraw(_bidId, bidLender);
-        emit CollateralClaimed(_bidId);
     }
 
     /* Internal Functions */
@@ -344,6 +350,13 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
                 collateralInfo._tokenId
             );
         }
+        emit CollateralDeposited(
+            _bidId,
+            collateralInfo._collateralType,
+            collateralInfo._collateralAddress,
+            collateralInfo._amount,
+            collateralInfo._tokenId
+        );
     }
 
     /**
@@ -369,6 +382,14 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
                 collateralInfo._amount,
                 _receiver
             );
+            emit CollateralWithdrawn(
+                _bidId,
+                collateralInfo._collateralType,
+                collateralInfo._collateralAddress,
+                collateralInfo._amount,
+                collateralInfo._tokenId,
+                _receiver
+            );
         }
     }
 
@@ -388,6 +409,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         ] = _collateralInfo;
         emit CollateralCommitted(
             _bidId,
+            _collateralInfo._collateralType,
             _collateralInfo._collateralAddress,
             _collateralInfo._amount,
             _collateralInfo._tokenId

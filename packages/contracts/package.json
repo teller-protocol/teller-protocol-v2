@@ -1,6 +1,6 @@
 {
   "name": "@teller-protocol/v2-contracts",
-  "version": "1.6.0",
+  "version": "2.1.0",
   "license": "MIT",
   "scripts": {
     "test": "DISABLE_LOGS=true TS_NODE_TRANSPILE_ONLY=1 TESTING=1 yarn hh test",

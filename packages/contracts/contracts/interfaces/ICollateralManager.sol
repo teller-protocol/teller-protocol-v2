@@ -68,12 +68,6 @@ interface ICollateralManager {
     function revalidateCollateral(uint256 _bidId) external returns (bool);
 
     /**
-     * @notice Allows collateral to be claimed for a defaulted loan.
-     * @param _bidId The id of the bid to claim the collateral for.
-     */
-    function claimCollateral(uint256 _bidId) external;
-
-    /**
      * @notice Sends the deposited collateral to a liquidator of a bid.
      * @notice Can only be called by the protocol.
      * @param _bidId The id of the liquidated bid.

@@ -19,12 +19,12 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
      * @param minAPR Minimum Annual percentage to be applied for loans using the lender's capital.
      */
     struct Commitment {
-        uint256 maxPrincipal; //1m usdc  1000000000000  //max amt lender will lend out
+        uint256 maxPrincipal;  
         uint32 expiration;
         uint32 maxDuration;
         uint16 minInterestRate;
-        address collateralTokenAddress; //0x0000000
-        uint256 maxPrincipalPerCollateralAmount; //zero means infinite. works better for NFT
+        address collateralTokenAddress;  
+        uint256 maxPrincipalPerCollateralAmount; //zero means infinite 
         CollateralType collateralTokenType; //erc721, erc1155 or erc20
     }
 
@@ -273,30 +273,5 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         );
     }
 
-    /**
-     * @notice Commits collateral to a bid using the TellerV2 CollateralManager protocol.
-     * @param _bidId The bid id for the loan
-     * @param _collateralInfo The collateral to be committed to the loan.
-     */
-    /*  function _commitCollateral(
-        uint256 _bidId,
-        Collateral memory _collateralInfo,
-        address _borrower 
-    ) internal virtual returns (bool validation_) {
-        bytes memory responseData;
-
-        responseData =  address(_collateralManager).functionCall(
-               // abi.encodePacked(
-                     abi.encodeWithSelector(
-                        //ICollateralManager.commitCollateral.selector,
-                        bytes4(keccak256("commitCollateral(uint256,Collateral)")),
-                        _bidId,
-                        _collateralInfo
-                    )
-               //  , _borrower)
-            ); 
-       
-
-        return abi.decode(responseData, (bool));
-    }*/
+    
 }

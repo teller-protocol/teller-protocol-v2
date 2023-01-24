@@ -104,7 +104,12 @@ library NumbersLib {
         uint32 cycleDuration,
         uint16 apr
     ) internal pure returns (uint256) {
-        uint256 n = loanDuration / cycleDuration;
+        require(
+            loanDuration >= cycleDuration,
+            "PMT: cycle duration < loan duration"
+        );
+        uint256 remainder = loanDuration % cycleDuration;
+        uint256 n = (loanDuration / cycleDuration) + (remainder > 0 ? 1 : 0);
         if (apr == 0) return (principal / n);
 
         uint256 one = WadRayMath.wad();

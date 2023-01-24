@@ -28,16 +28,13 @@ import {
 export function updateTokenVolumeOnPayment(
   lastPayment: BigInt,
   bidState: string,
-  tokenVolume: TokenVolume,
-  payment: Payment
+  tokenVolume: TokenVolume
 ): void {
   const outstandingTokenCapital = tokenVolume.outstandingCapital;
   if (outstandingTokenCapital) {
     tokenVolume.outstandingCapital = outstandingTokenCapital.minus(lastPayment);
-    payment.outstandingCapital = outstandingTokenCapital.minus(lastPayment);
     if (outstandingTokenCapital.minus(lastPayment).lt(BigInt.zero())) {
       tokenVolume.outstandingCapital = BigInt.zero();
-      payment.outstandingCapital = BigInt.zero();
     }
   }
   if (bidState == "Repaid") {
@@ -96,24 +93,23 @@ export function updateBid(
     bid.status = bidState;
   }
 
-  const payment = new Payment(event.transaction.hash.toHex());
-  payment.bid = bid.id;
-  payment.principal = _lastPayment;
-  payment.interest = _lastInterestPayment;
-  payment.paymentDate = storedBid.value5.lastRepaidTimestamp;
-  payment.outstandingCapital = BigInt.zero();
-  payment.save();
-
   if (bidState !== "Liquidated") {
     updateOutstandingCapital(
       bid,
       storedBid,
       _lastPayment,
       _lastInterestPayment,
-      bidState,
-      payment
+      bidState
     );
   }
+
+  const payment = new Payment(event.transaction.hash.toHex());
+  payment.bid = bid.id;
+  payment.principal = _lastPayment;
+  payment.interest = _lastInterestPayment;
+  payment.paymentDate = storedBid.value5.lastRepaidTimestamp;
+  payment.outstandingCapital = bid.principal.minus(bid.totalRepaidPrincipal);
+  payment.save();
 
   bid.save();
 }

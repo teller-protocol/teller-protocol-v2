@@ -182,8 +182,7 @@ export function updateOutstandingCapital(
   storedBid: TellerV2__bidsResult,
   _lastPayment: BigInt,
   _lastInterestPayment: BigInt,
-  bidState: string,
-  payment: Payment
+  bidState: string
 ): void {
   const market = loadMarketById(storedBid.value3.toString());
   const lender = loadLenderByMarketId(storedBid.value2, market.id);
@@ -227,12 +226,12 @@ export function updateOutstandingCapital(
     storedBid.value5.lendingToken,
     market.id
   );
-  updateTokenVolumeOnPayment(_lastPayment, bidState, tokenVolume, payment);
+  updateTokenVolumeOnPayment(_lastPayment, bidState, tokenVolume);
   tokenVolume.save();
 
   // Update protocol's overall token volume
   const protocolVolume = loadProtocolTokenVolume(storedBid.value5.lendingToken);
-  updateTokenVolumeOnPayment(_lastPayment, bidState, protocolVolume, payment);
+  updateTokenVolumeOnPayment(_lastPayment, bidState, protocolVolume);
   protocolVolume.save();
 
   // Update lender's token volume
@@ -240,7 +239,7 @@ export function updateOutstandingCapital(
     storedBid.value5.lendingToken,
     lender
   );
-  updateTokenVolumeOnPayment(_lastPayment, bidState, lenderVolume, payment);
+  updateTokenVolumeOnPayment(_lastPayment, bidState, lenderVolume);
   const earnedLenderInterest = lenderVolume.commissionEarned;
   if (earnedLenderInterest) {
     lenderVolume.commissionEarned = earnedLenderInterest.plus(
@@ -254,7 +253,7 @@ export function updateOutstandingCapital(
     const commitment = Commitment.load(commitmentId);
     if (commitment) {
       const commitmentStats = TokenVolume.load(commitment.stats);
-      updateTokenVolumeOnPayment(_lastPayment, bidState, commitmentStats!, payment);
+      updateTokenVolumeOnPayment(_lastPayment, bidState, commitmentStats!);
       if (commitmentStats && commitmentStats.commissionEarned) {
         commitmentStats.commissionEarned = commitmentStats.commissionEarned.plus(
           _lastInterestPayment
@@ -269,7 +268,7 @@ export function updateOutstandingCapital(
     storedBid.value5.lendingToken,
     borrower
   );
-  updateTokenVolumeOnPayment(_lastPayment, bidState, borrowerVolume, payment);
+  updateTokenVolumeOnPayment(_lastPayment, bidState, borrowerVolume);
   borrowerVolume.save();
 
   lender.save();

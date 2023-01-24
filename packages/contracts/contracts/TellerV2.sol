@@ -355,11 +355,13 @@ contract TellerV2 is
         bid.loanDetails.timestamp = uint32(block.timestamp);
 
         // Set payment cycle type based on market setting (custom or monthly)
-        bidPaymentCycleType[bidId] = marketRegistry.getMarketplacePaymentCycleType(
-            _marketplaceId
-        );
+        bidPaymentCycleType[bidId] = marketRegistry
+            .getMarketplacePaymentCycleType(_marketplaceId);
 
-        if (bidPaymentCycleType[bidId] == IMarketRegistry.PaymentCycleType.Custom) {
+        if (
+            bidPaymentCycleType[bidId] ==
+            IMarketRegistry.PaymentCycleType.Custom
+        ) {
             bid.terms.paymentCycle = marketRegistry.getPaymentCycleValue(
                 _marketplaceId
             );
@@ -498,8 +500,13 @@ contract TellerV2 is
         bid.lender = sender;
 
         // Set payment cycle value to current day if market setting is based on monthly payments
-        if (bidPaymentCycleType[_bidId] == IMarketRegistry.PaymentCycleType.Monthly) {
-            bid.terms.paymentCycle = uint32(BokkyPooBahsDateTimeLibrary.getDay(block.timestamp));
+        if (
+            bidPaymentCycleType[_bidId] ==
+            IMarketRegistry.PaymentCycleType.Monthly
+        ) {
+            bid.terms.paymentCycle = uint32(
+                BokkyPooBahsDateTimeLibrary.getDay(block.timestamp)
+            );
         }
 
         // Tell the collateral manager to deploy the escrow and pull funds from the borrower if applicable
@@ -814,8 +821,16 @@ contract TellerV2 is
         if (delta > 0) {
             uint32 repaymentCycle = 1 + (delta / bid.terms.paymentCycle);
             // Calculate due date if payment cycle is set to monthly
-            if (bidPaymentCycleType[_bidId] == IMarketRegistry.PaymentCycleType.Monthly) {
-                dueDate_ = uint32(BokkyPooBahsDateTimeLibrary.addMonths(bid.loanDetails.acceptedTimestamp, repaymentCycle));
+            if (
+                bidPaymentCycleType[_bidId] ==
+                IMarketRegistry.PaymentCycleType.Monthly
+            ) {
+                dueDate_ = uint32(
+                    BokkyPooBahsDateTimeLibrary.addMonths(
+                        bid.loanDetails.acceptedTimestamp,
+                        repaymentCycle
+                    )
+                );
             } else {
                 dueDate_ += (repaymentCycle * bid.terms.paymentCycle);
             }

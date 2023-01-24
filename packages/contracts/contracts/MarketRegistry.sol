@@ -98,7 +98,10 @@ contract MarketRegistry is
     event SetMarketLenderAttestation(uint256 marketId, bool required);
     event SetMarketBorrowerAttestation(uint256 marketId, bool required);
     event SetMarketPaymentType(uint256 marketId, PaymentType paymentType);
-    event SetMarketPaymentCycleType(uint256 marketId, PaymentCycleType paymentCycleType);
+    event SetMarketPaymentCycleType(
+        uint256 marketId,
+        PaymentCycleType paymentCycleType
+    );
 
     /* External Functions */
 
@@ -668,10 +671,10 @@ contract MarketRegistry is
         }
     }
 
-    function setMarketPaymentCycleType(uint256 _marketId, PaymentCycleType _paymentCycleType)
-        public
-        ownsMarket(_marketId)
-    {
+    function setMarketPaymentCycleType(
+        uint256 _marketId,
+        PaymentCycleType _paymentCycleType
+    ) public ownsMarket(_marketId) {
         if (_paymentCycleType != paymentCycleType[_marketId]) {
             paymentCycleType[_marketId] = _paymentCycleType;
 

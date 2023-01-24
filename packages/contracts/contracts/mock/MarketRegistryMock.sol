@@ -40,10 +40,7 @@ contract MarketRegistryMock is IMarketRegistry {
         return "url://";
     }
 
-    function getPaymentCycleValue(uint256 _marketId)
-        public
-        returns (uint32)
-    {
+    function getPaymentCycleValue(uint256 _marketId) public returns (uint32) {
         return 1000;
     }
 
@@ -72,7 +69,11 @@ contract MarketRegistryMock is IMarketRegistry {
         returns (PaymentType)
     {}
 
-    function getMarketplacePaymentCycleType(uint256 _marketId) public view returns (PaymentCycleType) {}
+    function getMarketplacePaymentCycleType(uint256 _marketId)
+        public
+        view
+        returns (PaymentCycleType)
+    {}
 
     function createMarket(
         address _initialOwner,

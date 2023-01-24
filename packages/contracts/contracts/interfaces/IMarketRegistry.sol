@@ -5,7 +5,6 @@ import "../EAS/TellerAS.sol";
 import { PaymentType } from "../libraries/V2Calculations.sol";
 
 interface IMarketRegistry {
-
     enum PaymentCycleType {
         Custom,
         Monthly
@@ -31,9 +30,7 @@ interface IMarketRegistry {
 
     function getMarketURI(uint256 _marketId) external returns (string memory);
 
-    function getPaymentCycleValue(uint256 _marketId)
-        external
-        returns (uint32);
+    function getPaymentCycleValue(uint256 _marketId) external returns (uint32);
 
     function getPaymentDefaultDuration(uint256 _marketId)
         external
@@ -43,7 +40,9 @@ interface IMarketRegistry {
 
     function getMarketplaceFee(uint256 _marketId) external returns (uint16);
 
-    function getMarketplacePaymentCycleType(uint256 _marketId) external returns (PaymentCycleType);
+    function getMarketplacePaymentCycleType(uint256 _marketId)
+        external
+        returns (PaymentCycleType);
 
     function getPaymentType(uint256 _marketId)
         external

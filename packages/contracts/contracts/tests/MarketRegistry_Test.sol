@@ -54,12 +54,12 @@ contract MarketRegistry_Test is Testable, TellerV2 {
             "uri://",
             IMarketRegistry.PaymentCycleType.Custom
         );
-        IMarketRegistry.PaymentCycleType paymentCycle = marketRegistry.getMarketplacePaymentCycleType(1);
+        IMarketRegistry.PaymentCycleType paymentCycle = marketRegistry
+            .getMarketplacePaymentCycleType(1);
 
         require(
-            paymentCycle ==
-            IMarketRegistry.PaymentCycleType.Custom,
-            'Market payment cycle type incorrectly created'
+            paymentCycle == IMarketRegistry.PaymentCycleType.Custom,
+            "Market payment cycle type incorrectly created"
         );
 
         // Monthly payment cycle
@@ -78,11 +78,9 @@ contract MarketRegistry_Test is Testable, TellerV2 {
         paymentCycle = marketRegistry.getMarketplacePaymentCycleType(2);
 
         require(
-            paymentCycle ==
-            IMarketRegistry.PaymentCycleType.Monthly,
-            'Market payment cycle type incorrectly created'
+            paymentCycle == IMarketRegistry.PaymentCycleType.Monthly,
+            "Market payment cycle type incorrectly created"
         );
-
     }
 }
 

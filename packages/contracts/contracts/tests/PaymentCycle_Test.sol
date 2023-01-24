@@ -53,9 +53,9 @@ contract PaymentCycle_Test is Testable {
 
         // Deploy LenderCommitmentForwarder
         LenderCommitmentForwarder lenderCommitmentForwarder = new LenderCommitmentForwarder(
-            address(tellerV2),
-            address(marketRegistry)
-        );
+                address(tellerV2),
+                address(marketRegistry)
+            );
 
         address[] memory lendingTokens = new address[](2);
         lendingTokens[0] = address(wethMock);
@@ -104,7 +104,9 @@ contract PaymentCycle_Test is Testable {
 
     function paymentCycleType_Test() public {
         // Get current day
-        uint32 currentDay = uint32(BokkyPooBahsDateTimeLibrary.getDay(block.timestamp));
+        uint32 currentDay = uint32(
+            BokkyPooBahsDateTimeLibrary.getDay(block.timestamp)
+        );
 
         // Submit bid as borrower
         uint256 bidId_ = borrower.submitBid(
@@ -121,16 +123,20 @@ contract PaymentCycle_Test is Testable {
         lender.acceptBid(bidId_);
 
         // Check payment cycle type
-        IMarketRegistry.PaymentCycleType paymentCycleType = tellerV2.bidPaymentCycleType(bidId_);
-        require(paymentCycleType == IMarketRegistry.PaymentCycleType.Monthly, 'Payment cycle type not set');
+        IMarketRegistry.PaymentCycleType paymentCycleType = tellerV2
+            .bidPaymentCycleType(bidId_);
+        require(
+            paymentCycleType == IMarketRegistry.PaymentCycleType.Monthly,
+            "Payment cycle type not set"
+        );
 
         // Check next payment date
-        uint32 nextMonth = uint32(BokkyPooBahsDateTimeLibrary.addMonths(currentDay, 1));
+        uint32 nextMonth = uint32(
+            BokkyPooBahsDateTimeLibrary.addMonths(currentDay, 1)
+        );
         uint32 nextDueDate = tellerV2.calculateNextDueDate(bidId_);
-        require(nextDueDate == nextMonth, 'Incorrect due date set');
+        require(nextDueDate == nextMonth, "Incorrect due date set");
     }
-
-
 }
 
 contract User {
@@ -167,18 +173,18 @@ contract User {
         IMarketRegistry.PaymentCycleType _paymentCycleType
     ) public returns (uint256) {
         return
-        IMarketRegistry(marketRegistry).createMarket(
-            address(this),
-            _paymentCycleDuration,
-            _paymentDefaultDuration,
-            _bidExpirationTime,
-            _feePercent,
-            _requireLenderAttestation,
-            _requireBorrowerAttestation,
-            _paymentType,
-            _uri,
-            _paymentCycleType
-        );
+            IMarketRegistry(marketRegistry).createMarket(
+                address(this),
+                _paymentCycleDuration,
+                _paymentDefaultDuration,
+                _bidExpirationTime,
+                _feePercent,
+                _requireLenderAttestation,
+                _requireBorrowerAttestation,
+                _paymentType,
+                _uri,
+                _paymentCycleType
+            );
     }
 
     function acceptBid(uint256 _bidId) public {
@@ -195,14 +201,14 @@ contract User {
         address _receiver
     ) public returns (uint256) {
         return
-        ITellerV2(tellerV2).submitBid(
-            _lendingToken,
-            _marketplaceId,
-            _principal,
-            _duration,
-            _APR,
-            _metadataURI,
-            _receiver
-        );
+            ITellerV2(tellerV2).submitBid(
+                _lendingToken,
+                _marketplaceId,
+                _principal,
+                _duration,
+                _APR,
+                _metadataURI,
+                _receiver
+            );
     }
 }

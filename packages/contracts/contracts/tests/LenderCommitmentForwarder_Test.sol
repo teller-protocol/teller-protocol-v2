@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import "hardhat/console.sol";
+
 import "@mangrovedao/hardhat-test-solidity/test.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
@@ -77,7 +79,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
     }
 
     function updateCommitment_before() public {
-        super.updateCommitment(
+        uint256 commitmentId = lender._createCommitment(
             marketId,
             tokenAddress,
             maxAmount,
@@ -88,15 +90,33 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             minInterestRate,
             expiration
         );
+
+        console.log(commitmentId);
     }
 
     function updateCommitment_test() public {
-        Commitment memory existingCommitment = lenderMarketCommitments[
-            address(this)
-        ][marketId][tokenAddress];
 
-        //make sure the commitment exists
-        //        Test.eq(existingCommitment.amount, maxAmount, "Commitment not recorded!" );
+        uint256 commitmentId = 0;
+
+        Commitment memory existingCommitment = lenderMarketCommitments[commitmentId];
+
+        Test.eq(address(lender), existingCommitment.lender,"Not the owner of created commitment");
+
+        lender._updateCommitment(
+            commitmentId,
+            marketId,
+            tokenAddress,
+            maxAmount,
+            collateralTokenAddress,
+            maxPrincipalPerCollateralAmount,
+            collateralTokenType,
+            maxLoanDuration,
+            minInterestRate,
+            expiration
+            );
+
+
+
     }
 
     function deleteCommitment_test() public {
@@ -109,7 +129,8 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
     }
 
     function acceptCommitment_before() public {
-        lender._updateCommitment(
+        
+         lender._createCommitment(
             marketId,
             tokenAddress,
             maxAmount,
@@ -117,15 +138,16 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             maxPrincipalPerCollateralAmount,
             collateralTokenType,
             maxLoanDuration,
-            expiration,
-            minInterestRate
+            minInterestRate,
+            expiration
         );
     }
 
     function acceptCommitment_test() public {
-        Commitment storage commitment = lenderMarketCommitments[
-            address(lender)
-        ][marketId][tokenAddress];
+
+        uint256 commitmentId = 0;
+
+        Commitment storage commitment = lenderMarketCommitments[commitmentId];
 
         Test.eq(
             acceptBidWasCalled,
@@ -134,9 +156,10 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         );
 
         uint256 bidId = marketOwner._acceptCommitment(
+            commitmentId,
             marketId,
-            address(lender),
-            tokenAddress,
+            
+           
             maxAmount - 100,
             maxAmount, //collateralAmount
             0, //collateralTokenId
@@ -157,9 +180,9 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         );
 
         bidId = marketOwner._acceptCommitment(
+            commitmentId,
             marketId,
-            address(lender),
-            tokenAddress,
+            
             100,
             100, //collateralAmount
             0, //collateralTokenId
@@ -229,7 +252,7 @@ contract User {
         context.approveMarketForwarder(_marketId, _forwarder);
     }
 
-    function _updateCommitment(
+    function _createCommitment(
         uint256 marketId,
         address tokenAddress,
         uint256 principal,
@@ -237,10 +260,37 @@ contract User {
         uint256 _maxPrincipalPerCollateralAmount,
         CollateralType _collateralTokenType,
         uint32 loanDuration,
-        uint32 expiration,
-        uint16 interestRate
+        uint16 interestRate,
+        uint32 expiration
+    ) public returns (uint256) {
+        return commitmentForwarder.createCommitment(
+            marketId,
+            tokenAddress,
+            principal,
+            _collateralTokenAddress,
+            _maxPrincipalPerCollateralAmount,
+            _collateralTokenType,
+            loanDuration,
+            interestRate,
+            expiration
+        );
+    }
+
+    function _updateCommitment(
+        uint256 commitmentId,
+        uint256 marketId,
+        address tokenAddress,
+        uint256 principal,
+        address _collateralTokenAddress,
+        uint256 _maxPrincipalPerCollateralAmount,
+        CollateralType _collateralTokenType,
+        uint32 loanDuration,
+     
+        uint16 interestRate,
+           uint32 expiration
     ) public {
         commitmentForwarder.updateCommitment(
+            commitmentId,
             marketId,
             tokenAddress,
             principal,
@@ -254,9 +304,10 @@ contract User {
     }
 
     function _acceptCommitment(
+        uint256  commitmentId,
         uint256 marketId,
-        address lender,
-        address tokenAddress,
+        
+         
         uint256 principal,
         uint256 collateralAmount,
         uint256 collateralTokenId,
@@ -265,9 +316,8 @@ contract User {
     ) public returns (uint256) {
         return
             commitmentForwarder.acceptCommitment(
-                marketId,
-                lender,
-                tokenAddress,
+                commitmentId,
+                marketId,         
                 principal,
                 collateralAmount,
                 collateralTokenId,

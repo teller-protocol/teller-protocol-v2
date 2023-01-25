@@ -19,12 +19,12 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
      * @param minAPR Minimum Annual percentage to be applied for loans using the lender's capital.
      */
     struct Commitment {
-        uint256 maxPrincipal;  
+        uint256 maxPrincipal;
         uint32 expiration;
         uint32 maxDuration;
         uint16 minInterestRate;
-        address collateralTokenAddress;  
-        uint256 maxPrincipalPerCollateralAmount; //zero means infinite 
+        address collateralTokenAddress;
+        uint256 maxPrincipalPerCollateralAmount; //zero means infinite
         CollateralType collateralTokenType; //erc721, erc1155 or erc20
         address lender;
         uint256 marketId;
@@ -43,9 +43,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
     // CommitmentId => commitment
     mapping(uint256 => Commitment) public lenderMarketCommitments;
 
-
     uint256 commitmentCount;
-
 
     /**
      * @notice This event is emitted when a lender's commitment is created.
@@ -81,9 +79,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
      * @notice This event is emitted when a lender's commitment has been deleted.
      * @param commitmentId The id of the commitment that was deleted.
      */
-    event DeletedCommitment(
-        uint256 indexed commitmentId        
-    );
+    event DeletedCommitment(uint256 indexed commitmentId);
 
     /**
      * @notice This event is emitted when a lender's commitment is exercised for a loan.
@@ -108,7 +104,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         TellerV2MarketForwarder(_protocolAddress, _marketRegistry)
     {}
 
-     function createCommitment(       
+    function createCommitment(
         uint256 _marketId,
         address _principalTokenAddress,
         uint256 _maxPrincipal,
@@ -118,23 +114,20 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint32 _maxLoanDuration,
         uint16 _minInterestRate,
         uint32 _expiration
-    ) public returns (uint256 commitmentId){
-        
-        commitmentId= commitmentCount++;
-        
-        lenderMarketCommitments[commitmentId] = Commitment({
+    ) public returns (uint256 commitmentId) {
+        commitmentId = commitmentCount++;
 
-            maxPrincipal:_maxPrincipal,
-            expiration:_expiration,
-            maxDuration:_maxLoanDuration,
-            minInterestRate:_minInterestRate,
-            collateralTokenAddress:_collateralTokenAddress,  
-            maxPrincipalPerCollateralAmount:_maxPrincipalPerCollateralAmount,
-            collateralTokenType: _collateralTokenType,  
+        lenderMarketCommitments[commitmentId] = Commitment({
+            maxPrincipal: _maxPrincipal,
+            expiration: _expiration,
+            maxDuration: _maxLoanDuration,
+            minInterestRate: _minInterestRate,
+            collateralTokenAddress: _collateralTokenAddress,
+            maxPrincipalPerCollateralAmount: _maxPrincipalPerCollateralAmount,
+            collateralTokenType: _collateralTokenType,
             lender: _msgSender(),
             marketId: _marketId,
             principalTokenAddress: _principalTokenAddress
-
         });
 
         emit CreatedCommitment(
@@ -173,12 +166,14 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint16 _minInterestRate,
         uint32 _expiration
     ) public {
-        
         require(_expiration > uint32(block.timestamp));
 
         Commitment storage commitment = lenderMarketCommitments[_commitmentId];
 
-        require(_msgSender() == commitment.lender, "Unauthorized to update commitment");
+        require(
+            _msgSender() == commitment.lender,
+            "Unauthorized to update commitment"
+        );
 
         commitment.marketId = _marketId;
         commitment.principalTokenAddress = _principalTokenAddress;
@@ -205,11 +200,12 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
      * @param _commitmentId The id of the commitment to delete.
    
      */
-    function deleteCommitment(uint256 _commitmentId)
-        public
-    { 
-        require(lenderMarketCommitments[_commitmentId].lender == _msgSender(), "Unauthorized to delete commitment");
-    
+    function deleteCommitment(uint256 _commitmentId) public {
+        require(
+            lenderMarketCommitments[_commitmentId].lender == _msgSender(),
+            "Unauthorized to delete commitment"
+        );
+
         _deleteCommitment(_commitmentId);
     }
 
@@ -218,15 +214,14 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
    * @param _commitmentId The id of the commitment to delete.
    
      */
-    function _deleteCommitment(
-         uint256 _commitmentId
-    ) internal {
+    function _deleteCommitment(uint256 _commitmentId) internal {
+        require(
+            lenderMarketCommitments[_commitmentId].maxPrincipal > 0,
+            "Commitment with zero max principal cannot be deleted."
+        );
 
-        require(lenderMarketCommitments[_commitmentId].maxPrincipal > 0, "Commitment with zero max principal cannot be deleted.");
-       
         delete lenderMarketCommitments[_commitmentId];
-        emit DeletedCommitment( _commitmentId);
-        
+        emit DeletedCommitment(_commitmentId);
     }
 
     /**
@@ -236,7 +231,6 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
      */
     function _decrementCommitment(
         uint256 _commitmentId,
-     
         uint256 _tokenAmountDelta
     ) internal {
         lenderMarketCommitments[_commitmentId]
@@ -259,7 +253,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
      */
     function acceptCommitment(
         uint256 _commitmentId,
-        uint256 _marketId,    
+        uint256 _marketId,
         uint256 _principalAmount,
         uint256 _collateralAmount,
         uint256 _collateralTokenId,
@@ -271,7 +265,8 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         Commitment storage commitment = lenderMarketCommitments[_commitmentId];
 
         require(
-            _marketId == commitment.marketId, "Invalid marketId for commitment"
+            _marketId == commitment.marketId,
+            "Invalid marketId for commitment"
         );
 
         require(
@@ -297,11 +292,11 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
                     (commitment.maxPrincipalPerCollateralAmount) >=
                 _principalAmount,
             "Insufficient collateral"
-        ); 
+        );
 
-        bidId = _submitBidFromCommitment(  
-            borrower, 
-            _marketId,   
+        bidId = _submitBidFromCommitment(
+            borrower,
+            _marketId,
             commitment.principalTokenAddress,
             _principalAmount,
             commitment.collateralTokenAddress,
@@ -314,10 +309,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
 
         _acceptBid(bidId, commitment.lender);
 
-        _decrementCommitment(
-            _commitmentId,
-            _principalAmount
-        );
+        _decrementCommitment(_commitmentId, _principalAmount);
 
         emit ExercisedCommitment(
             _commitmentId,
@@ -329,7 +321,6 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         );
     }
 
-
     function _submitBidFromCommitment(
         address _borrower,
         uint256 _marketId,
@@ -340,13 +331,11 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint256 _collateralTokenId,
         CollateralType _collateralTokenType,
         uint32 _loanDuration,
-        uint16 _interestRate 
-
-    ) internal returns(uint256 bidId) {
-
+        uint16 _interestRate
+    ) internal returns (uint256 bidId) {
         CreateLoanArgs memory createLoanArgs;
         createLoanArgs.marketId = _marketId;
-        createLoanArgs.lendingToken =_principalTokenAddress;
+        createLoanArgs.lendingToken = _principalTokenAddress;
         createLoanArgs.principal = _principalAmount;
         createLoanArgs.duration = _loanDuration;
         createLoanArgs.interestRate = _interestRate;
@@ -364,9 +353,6 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             createLoanArgs,
             collateralInfo,
             _borrower
-        );  
-
-
+        );
     }
-    
 }

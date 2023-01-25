@@ -90,17 +90,21 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             minInterestRate,
             expiration
         );
-
-        console.log(commitmentId);
+ 
     }
 
     function updateCommitment_test() public {
-
         uint256 commitmentId = 0;
 
-        Commitment memory existingCommitment = lenderMarketCommitments[commitmentId];
+        Commitment memory existingCommitment = lenderMarketCommitments[
+            commitmentId
+        ];
 
-        Test.eq(address(lender), existingCommitment.lender,"Not the owner of created commitment");
+        Test.eq(
+            address(lender),
+            existingCommitment.lender,
+            "Not the owner of created commitment"
+        );
 
         lender._updateCommitment(
             commitmentId,
@@ -113,10 +117,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             maxLoanDuration,
             minInterestRate,
             expiration
-            );
-
-
-
+        );
     }
 
     function deleteCommitment_test() public {
@@ -129,8 +130,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
     }
 
     function acceptCommitment_before() public {
-        
-         lender._createCommitment(
+        lender._createCommitment(
             marketId,
             tokenAddress,
             maxAmount,
@@ -144,7 +144,6 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
     }
 
     function acceptCommitment_test() public {
-
         uint256 commitmentId = 0;
 
         Commitment storage commitment = lenderMarketCommitments[commitmentId];
@@ -158,8 +157,6 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         uint256 bidId = marketOwner._acceptCommitment(
             commitmentId,
             marketId,
-            
-           
             maxAmount - 100,
             maxAmount, //collateralAmount
             0, //collateralTokenId
@@ -182,7 +179,6 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         bidId = marketOwner._acceptCommitment(
             commitmentId,
             marketId,
-            
             100,
             100, //collateralAmount
             0, //collateralTokenId
@@ -263,17 +259,18 @@ contract User {
         uint16 interestRate,
         uint32 expiration
     ) public returns (uint256) {
-        return commitmentForwarder.createCommitment(
-            marketId,
-            tokenAddress,
-            principal,
-            _collateralTokenAddress,
-            _maxPrincipalPerCollateralAmount,
-            _collateralTokenType,
-            loanDuration,
-            interestRate,
-            expiration
-        );
+        return
+            commitmentForwarder.createCommitment(
+                marketId,
+                tokenAddress,
+                principal,
+                _collateralTokenAddress,
+                _maxPrincipalPerCollateralAmount,
+                _collateralTokenType,
+                loanDuration,
+                interestRate,
+                expiration
+            );
     }
 
     function _updateCommitment(
@@ -285,9 +282,8 @@ contract User {
         uint256 _maxPrincipalPerCollateralAmount,
         CollateralType _collateralTokenType,
         uint32 loanDuration,
-     
         uint16 interestRate,
-           uint32 expiration
+        uint32 expiration
     ) public {
         commitmentForwarder.updateCommitment(
             commitmentId,
@@ -304,10 +300,8 @@ contract User {
     }
 
     function _acceptCommitment(
-        uint256  commitmentId,
+        uint256 commitmentId,
         uint256 marketId,
-        
-         
         uint256 principal,
         uint256 collateralAmount,
         uint256 collateralTokenId,
@@ -317,7 +311,7 @@ contract User {
         return
             commitmentForwarder.acceptCommitment(
                 commitmentId,
-                marketId,         
+                marketId,
                 principal,
                 collateralAmount,
                 collateralTokenId,

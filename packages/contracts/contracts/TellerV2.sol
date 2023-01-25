@@ -815,25 +815,25 @@ contract TellerV2 is
         // Start with the original due date being 1 payment cycle since bid was accepted
         dueDate_ = bid.loanDetails.acceptedTimestamp + bid.terms.paymentCycle;
 
+        // Calculate due date if payment cycle is set to monthly
+        if (
+            bidPaymentCycleType[_bidId] ==
+            IMarketRegistry.PaymentCycleType.Monthly
+        ) {
+            dueDate_ = uint32(
+                BokkyPooBahsDateTimeLibrary.addMonths(
+                    bid.loanDetails.acceptedTimestamp,
+                    1
+                )
+            );
+        }
+
         // Calculate the cycle number the last repayment was made
         uint32 delta = lastRepaidTimestamp(_bidId) -
             bid.loanDetails.acceptedTimestamp;
         if (delta > 0) {
             uint32 repaymentCycle = 1 + (delta / bid.terms.paymentCycle);
-            // Calculate due date if payment cycle is set to monthly
-            if (
-                bidPaymentCycleType[_bidId] ==
-                IMarketRegistry.PaymentCycleType.Monthly
-            ) {
-                dueDate_ = uint32(
-                    BokkyPooBahsDateTimeLibrary.addMonths(
-                        bid.loanDetails.acceptedTimestamp,
-                        repaymentCycle
-                    )
-                );
-            } else {
-                dueDate_ += (repaymentCycle * bid.terms.paymentCycle);
-            }
+            dueDate_ += (repaymentCycle * bid.terms.paymentCycle);
         }
 
         //if we are in the last payment cycle, the next due date is the end of loan duration

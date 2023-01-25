@@ -1,4 +1,7 @@
 #!/bin/bash
 
 path=$(dirname "$0")
-$path/build.sh "$@" && $path/deploy.sh "$@"
+
+read -r -p 'Network name: ' network
+
+"$path"/build.sh "$network" && "$path"/deploy.sh "$network"

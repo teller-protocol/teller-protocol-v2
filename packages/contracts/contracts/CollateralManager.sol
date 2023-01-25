@@ -83,6 +83,14 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     }
 
     /**
+     * @notice Sets the address of the Beacon contract used for the collateral escrow contracts.
+     * @param _collateralEscrowBeacon The address of the Beacon contract.
+     */
+    function setCollateralEscrowBeacon(address _collateralEscrowBeacon) external reinitializer(2) {
+        collateralEscrowBeacon = _collateralEscrowBeacon;
+    }
+
+    /**
      * @notice Checks to see if a bid is backed by collateral.
      * @param _bidId The id of the bid to check.
      */

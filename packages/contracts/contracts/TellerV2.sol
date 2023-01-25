@@ -365,6 +365,11 @@ contract TellerV2 is
             bid.terms.paymentCycle = marketRegistry.getPaymentCycleValue(
                 _marketplaceId
             );
+        } else if (
+            bidPaymentCycleType[bidId] ==
+            IMarketRegistry.PaymentCycleType.Monthly
+        ) {
+            bid.terms.paymentCycle = 30 days;
         }
 
         bid.terms.APR = _APR;

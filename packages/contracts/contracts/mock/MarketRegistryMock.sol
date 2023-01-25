@@ -83,9 +83,9 @@ contract MarketRegistryMock is IMarketRegistry {
         uint16 _feePercent,
         bool _requireLenderAttestation,
         bool _requireBorrowerAttestation,
-        PaymentType _paymentType,
-        string calldata _uri,
-        PaymentCycleType _paymentCycleType
+        V2Calculations.PaymentType _paymentType,
+        PaymentCycleType _paymentCycleType,
+        string calldata _uri
     ) public returns (uint256) {}
 
     function createMarket(

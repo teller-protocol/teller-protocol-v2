@@ -50,16 +50,17 @@ contract MarketRegistry_Test is Testable, TellerV2 {
             500,
             false,
             false,
-            PaymentType.EMI,
-            "uri://",
-            IMarketRegistry.PaymentCycleType.Custom
+            V2Calculations.PaymentType.EMI,
+            IMarketRegistry.PaymentCycleType.Seconds,
+            "uri://"
         );
         IMarketRegistry.PaymentCycleType paymentCycle = marketRegistry
             .getMarketplacePaymentCycleType(1);
 
         require(
-            paymentCycle == IMarketRegistry.PaymentCycleType.Custom,
-            "Market payment cycle type incorrectly created"
+            paymentCycle ==
+            IMarketRegistry.PaymentCycleType.Seconds,
+            'Market payment cycle type incorrectly created'
         );
 
         // Monthly payment cycle
@@ -71,9 +72,9 @@ contract MarketRegistry_Test is Testable, TellerV2 {
             500,
             false,
             false,
-            PaymentType.EMI,
-            "uri://",
-            IMarketRegistry.PaymentCycleType.Monthly
+            V2Calculations.PaymentType.EMI,
+            IMarketRegistry.PaymentCycleType.Monthly,
+            "uri://"
         );
         paymentCycle = marketRegistry.getMarketplacePaymentCycleType(2);
 
@@ -105,9 +106,9 @@ contract User {
         uint16 _feePercent,
         bool _requireLenderAttestation,
         bool _requireBorrowerAttestation,
-        PaymentType _paymentType,
-        string calldata _uri,
-        IMarketRegistry.PaymentCycleType _paymentCycleType
+        V2Calculations.PaymentType _paymentType,
+        IMarketRegistry.PaymentCycleType _paymentCycleType,
+        string calldata _uri
     ) public {
         IMarketRegistry(marketRegistry).createMarket(
             address(this),
@@ -118,8 +119,8 @@ contract User {
             _requireLenderAttestation,
             _requireBorrowerAttestation,
             _paymentType,
-            _uri,
-            _paymentCycleType
+            _paymentCycleType,
+            _uri
         );
     }
 }

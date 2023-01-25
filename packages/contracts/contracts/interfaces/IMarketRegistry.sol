@@ -6,7 +6,7 @@ import { PaymentType } from "../libraries/V2Calculations.sol";
 
 interface IMarketRegistry {
     enum PaymentCycleType {
-        Custom,
+        Seconds,
         Monthly
     }
 
@@ -57,9 +57,9 @@ interface IMarketRegistry {
         uint16 _feePercent,
         bool _requireLenderAttestation,
         bool _requireBorrowerAttestation,
-        PaymentType _paymentType,
-        string calldata _uri,
-        PaymentCycleType _paymentCycleType
+        V2Calculations.PaymentType _paymentType,
+        PaymentCycleType _paymentCycleType,
+        string calldata _uri
     ) external returns (uint256 marketId_);
 
     function createMarket(

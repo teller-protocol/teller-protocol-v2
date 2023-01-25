@@ -39,7 +39,7 @@ contract MarketRegistry is
         bool lenderAttestationRequired;
         EnumerableSet.AddressSet verifiedLendersForMarket;
         mapping(address => bytes32) lenderAttestationIds;
-        uint32 paymentCycleValue; //unix time
+        uint32 paymentCycleValue; // unix time (seconds) OR day of the month (1-31) - depending on the `paymentCycleType`
         uint32 paymentDefaultDuration; //unix time
         uint32 bidExpirationTime; //unix time
         bool borrowerAttestationRequired;
@@ -82,6 +82,7 @@ contract MarketRegistry is
 
     event MarketCreated(address indexed owner, uint256 marketId);
     event SetMarketURI(uint256 marketId, string uri);
+    event SetPaymentCycleDuration(uint256 marketId, uint32 duration);
     event SetPaymentCycleValue(uint256 marketId, uint32 duration);
     event SetPaymentDefaultDuration(uint256 marketId, uint32 duration);
     event SetBidExpirationTime(uint256 marketId, uint32 duration);
@@ -150,9 +151,9 @@ contract MarketRegistry is
         uint16 _feePercent,
         bool _requireLenderAttestation,
         bool _requireBorrowerAttestation,
-        PaymentType _paymentType,
-        string calldata _uri,
-        PaymentCycleType _paymentCycleType
+        V2Calculations.PaymentType _paymentType,
+        PaymentCycleType _paymentCycleType,
+        string calldata _uri
     ) external returns (uint256 marketId_) {
         marketId_ = _createMarket(
             _initialOwner,
@@ -163,8 +164,8 @@ contract MarketRegistry is
             _requireLenderAttestation,
             _requireBorrowerAttestation,
             _paymentType,
-            _uri,
-            _paymentCycleType
+            _paymentCycleType,
+            _uri
         );
     }
 
@@ -198,9 +199,9 @@ contract MarketRegistry is
             _feePercent,
             _requireLenderAttestation,
             _requireBorrowerAttestation,
-            PaymentType.EMI,
-            _uri,
-            PaymentCycleType.Custom
+            V2Calculations.PaymentType.EMI,
+            PaymentCycleType.Seconds,
+            _uri
         );
     }
 
@@ -225,9 +226,9 @@ contract MarketRegistry is
         uint16 _feePercent,
         bool _requireLenderAttestation,
         bool _requireBorrowerAttestation,
-        PaymentType _paymentType,
-        string calldata _uri,
-        PaymentCycleType _paymentCycleType
+        V2Calculations.PaymentType _paymentType,
+        PaymentCycleType _paymentCycleType,
+        string calldata _uri
     ) internal returns (uint256 marketId_) {
         require(_initialOwner != address(0), "Invalid owner address");
         // Increment market ID counter
@@ -560,16 +561,16 @@ contract MarketRegistry is
      * @notice Sets the duration of new loans for this market before they turn delinquent.
      * @notice Changing this value does not change the terms of existing loans for this market.
      * @param _marketId The ID of a market.
-     * @param _duration Delinquency duration for new loans
+     * @param _value Delinquency duration for new loans
      */
-    function setPaymentCycleValue(uint256 _marketId, uint32 _duration)
+    function setPaymentCycleValue(uint256 _marketId, uint32 _value)
         public
         ownsMarket(_marketId)
     {
-        if (_duration != markets[_marketId].paymentCycleValue) {
-            markets[_marketId].paymentCycleValue = _duration;
+        if (_value != markets[_marketId].paymentCycleValue) {
+            markets[_marketId].paymentCycleValue = _value;
 
-            emit SetPaymentCycleValue(_marketId, _duration);
+            emit SetPaymentCycleValue(_marketId, _value);
         }
     }
 

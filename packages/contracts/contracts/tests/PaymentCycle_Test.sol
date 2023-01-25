@@ -116,7 +116,6 @@ contract PaymentCycle_Test is Testable {
         );
 
         uint256 cycleValue = marketRegistry.getPaymentCycleValue(marketId);
-        console.log('Payment cycle', cycleValue);
     }
 
     function paymentCycleType_test() public {

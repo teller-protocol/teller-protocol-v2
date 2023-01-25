@@ -504,16 +504,6 @@ contract TellerV2 is
         // Declare the bid acceptor as the lender of the bid
         bid.lender = sender;
 
-        // Set payment cycle value to current day if market setting is based on monthly payments
-        if (
-            bidPaymentCycleType[_bidId] ==
-            IMarketRegistry.PaymentCycleType.Monthly
-        ) {
-            bid.terms.paymentCycle = uint32(
-                BokkyPooBahsDateTimeLibrary.getDay(block.timestamp)
-            );
-        }
-
         // Tell the collateral manager to deploy the escrow and pull funds from the borrower if applicable
         collateralManager.deployAndDeposit(_bidId);
 

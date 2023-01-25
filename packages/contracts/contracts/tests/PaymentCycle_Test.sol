@@ -24,6 +24,10 @@ import "@mangrovedao/hardhat-test-solidity/test.sol";
 import "../libraries/DateTimeLib.sol";
 import "../TellerV2Storage.sol";
 import { PaymentType } from "../libraries/V2Calculations.sol";
+import "../CollateralManager.sol";
+import "../escrow/CollateralEscrowV1.sol";
+
+import { User } from "./Test_Helpers.sol";
 
 contract PaymentCycle_Test is Testable {
     User private marketOwner;
@@ -41,6 +45,12 @@ contract PaymentCycle_Test is Testable {
         wethMock = new WethMock();
         daiMock = new TestERC20Token("Dai", "DAI", 10000000);
 
+        // Deploy Escrow beacon
+        CollateralEscrowV1 escrowImplementation = new CollateralEscrowV1();
+        UpgradeableBeacon escrowBeacon = new UpgradeableBeacon(
+            address(escrowImplementation)
+        );
+
         // Deploy protocol
         tellerV2 = new TellerV2(address(0));
 
@@ -50,6 +60,10 @@ contract PaymentCycle_Test is Testable {
             new ReputationManager()
         );
         reputationManager.initialize(address(tellerV2));
+
+        // Deploy Collateral manager
+        CollateralManager collateralManager = new CollateralManager();
+        collateralManager.initialize(address(escrowBeacon), address(tellerV2));
 
         // Deploy LenderCommitmentForwarder
         LenderCommitmentForwarder lenderCommitmentForwarder = new LenderCommitmentForwarder(
@@ -68,7 +82,7 @@ contract PaymentCycle_Test is Testable {
             address(reputationManager),
             address(lenderCommitmentForwarder),
             lendingTokens,
-            address(0) // collateral manager
+            address(collateralManager)
         );
 
         // Instantiate users & balances
@@ -90,7 +104,7 @@ contract PaymentCycle_Test is Testable {
         // Create a market with a monthly payment cycle type
         marketId = marketOwner.createMarket(
             address(marketRegistry),
-            8000,
+            2592000, // 30 days
             7000,
             5000,
             500,
@@ -100,20 +114,18 @@ contract PaymentCycle_Test is Testable {
             IMarketRegistry.PaymentCycleType.Monthly,
             "uri://"
         );
+
+        uint256 cycleValue = marketRegistry.getPaymentCycleValue(marketId);
+        console.log('Payment cycle', cycleValue);
     }
 
-    function paymentCycleType_Test() public {
-        // Get current day
-        uint32 currentDay = uint32(
-            BokkyPooBahsDateTimeLibrary.getDay(block.timestamp)
-        );
-
+    function paymentCycleType_test() public {
         // Submit bid as borrower
         uint256 bidId_ = borrower.submitBid(
             address(daiMock),
             marketId,
             100,
-            10000,
+            25920000, // 10 months
             500,
             "metadataUri://",
             address(borrower)
@@ -121,6 +133,9 @@ contract PaymentCycle_Test is Testable {
 
         // Accept bid as lender
         lender.acceptBid(bidId_);
+
+        // Get accepted time
+        uint256 acceptedTime = tellerV2.lastRepaidTimestamp(bidId_);
 
         // Check payment cycle type
         IMarketRegistry.PaymentCycleType paymentCycleType = tellerV2
@@ -132,83 +147,9 @@ contract PaymentCycle_Test is Testable {
 
         // Check next payment date
         uint32 nextMonth = uint32(
-            BokkyPooBahsDateTimeLibrary.addMonths(currentDay, 1)
+            BokkyPooBahsDateTimeLibrary.addMonths(acceptedTime, 1)
         );
         uint32 nextDueDate = tellerV2.calculateNextDueDate(bidId_);
         require(nextDueDate == nextMonth, "Incorrect due date set");
-    }
-}
-
-contract User {
-    TellerV2 public immutable tellerV2;
-    WethMock public immutable wethMock;
-
-    constructor(TellerV2 _tellerV2, WethMock _wethMock) {
-        tellerV2 = _tellerV2;
-        wethMock = _wethMock;
-    }
-
-    function depositToWeth(uint256 amount) public {
-        wethMock.deposit{ value: amount }();
-    }
-
-    function addAllowance(
-        address _assetContractAddress,
-        address _spender,
-        uint256 _amount
-    ) public {
-        IERC20(_assetContractAddress).approve(_spender, _amount);
-    }
-
-    function createMarket(
-        address marketRegistry,
-        uint32 _paymentCycleDuration,
-        uint32 _paymentDefaultDuration,
-        uint32 _bidExpirationTime,
-        uint16 _feePercent,
-        bool _requireLenderAttestation,
-        bool _requireBorrowerAttestation,
-        PaymentType _paymentType,
-        IMarketRegistry.PaymentCycleType _paymentCycleType,
-        string calldata _uri
-    ) public returns (uint256) {
-        return
-            IMarketRegistry(marketRegistry).createMarket(
-                address(this),
-                _paymentCycleDuration,
-                _paymentDefaultDuration,
-                _bidExpirationTime,
-                _feePercent,
-                _requireLenderAttestation,
-                _requireBorrowerAttestation,
-                _paymentType,
-                _paymentCycleType,
-                _uri
-            );
-    }
-
-    function acceptBid(uint256 _bidId) public {
-        ITellerV2(tellerV2).lenderAcceptBid(_bidId);
-    }
-
-    function submitBid(
-        address _lendingToken,
-        uint256 _marketplaceId,
-        uint256 _principal,
-        uint32 _duration,
-        uint16 _APR,
-        string calldata _metadataURI,
-        address _receiver
-    ) public returns (uint256) {
-        return
-            ITellerV2(tellerV2).submitBid(
-                _lendingToken,
-                _marketplaceId,
-                _principal,
-                _duration,
-                _APR,
-                _metadataURI,
-                _receiver
-            );
     }
 }

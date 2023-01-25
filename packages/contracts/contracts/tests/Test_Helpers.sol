@@ -39,6 +39,7 @@ contract User {
         bool _requireLenderAttestation,
         bool _requireBorrowerAttestation,
         PaymentType _paymentType,
+        IMarketRegistry.PaymentCycleType _paymentCycleType,
         string calldata _uri
     ) public returns (uint256) {
         return
@@ -51,6 +52,7 @@ contract User {
                 _requireLenderAttestation,
                 _requireBorrowerAttestation,
                 _paymentType,
+                _paymentCycleType,
                 _uri
             );
     }

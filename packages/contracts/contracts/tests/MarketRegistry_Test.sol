@@ -17,7 +17,6 @@ import "../EAS/TellerAS.sol";
 import "../mock/WethMock.sol";
 import "../interfaces/IWETH.sol";
 
-import { User } from "./Test_Helpers.sol";
 import { PaymentType } from "../libraries/V2Calculations.sol";
 
 contract MarketRegistry_Test is Testable, TellerV2 {
@@ -39,7 +38,10 @@ contract MarketRegistry_Test is Testable, TellerV2 {
         lenderCommitmentForwarder = address(0);
         marketRegistry = IMarketRegistry(new MarketRegistry());
         reputationManager = IReputationManager(new ReputationManager());
+    }
 
+    function createMarket_test() public {
+        // Standard seconds payment cycle
         marketOwner.createMarket(
             address(marketRegistry),
             8000,
@@ -49,7 +51,76 @@ contract MarketRegistry_Test is Testable, TellerV2 {
             false,
             false,
             PaymentType.EMI,
+            IMarketRegistry.PaymentCycleType.Seconds,
             "uri://"
+        );
+        IMarketRegistry.PaymentCycleType paymentCycle = marketRegistry
+            .getMarketplacePaymentCycleType(1);
+
+        require(
+            paymentCycle ==
+            IMarketRegistry.PaymentCycleType.Seconds,
+            'Market payment cycle type incorrectly created'
+        );
+
+        // Monthly payment cycle
+        marketOwner.createMarket(
+            address(marketRegistry),
+            8000,
+            7000,
+            5000,
+            500,
+            false,
+            false,
+            PaymentType.EMI,
+            IMarketRegistry.PaymentCycleType.Monthly,
+            "uri://"
+        );
+        paymentCycle = marketRegistry.getMarketplacePaymentCycleType(2);
+
+        require(
+            paymentCycle == IMarketRegistry.PaymentCycleType.Monthly,
+            "Market payment cycle type incorrectly created"
+        );
+    }
+}
+
+contract User {
+    TellerV2 public immutable tellerV2;
+    WethMock public immutable wethMock;
+
+    constructor(TellerV2 _tellerV2, WethMock _wethMock) {
+        tellerV2 = _tellerV2;
+        wethMock = _wethMock;
+    }
+
+    function depositToWeth(uint256 amount) public {
+        wethMock.deposit{ value: amount }();
+    }
+
+    function createMarket(
+        address marketRegistry,
+        uint32 _paymentCycleDuration,
+        uint32 _paymentDefaultDuration,
+        uint32 _bidExpirationTime,
+        uint16 _feePercent,
+        bool _requireLenderAttestation,
+        bool _requireBorrowerAttestation,
+        PaymentType _paymentType,
+        IMarketRegistry.PaymentCycleType _paymentCycleType,
+        string calldata _uri
+    ) public {
+        IMarketRegistry(marketRegistry).createMarket(
+            address(this),
+            _paymentCycleDuration,
+            _paymentDefaultDuration,
+            _bidExpirationTime,
+            _feePercent,
+            _requireLenderAttestation,
+            _requireBorrowerAttestation,
+            _paymentType,
+            _paymentCycleType,
+            _uri
         );
     }
 }

@@ -1,9 +1,9 @@
-// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
+// SPDX-License-Identifier: MIT
 
 import { Testable } from "./Testable.sol";
 
-import { TellerV2 } from "../TellerV2.sol";
+import { TellerV2, V2Calculations } from "../TellerV2.sol";
 import { MarketRegistry } from "../MarketRegistry.sol";
 import { ReputationManager } from "../ReputationManager.sol";
 
@@ -14,33 +14,31 @@ import "../EAS/TellerAS.sol";
 
 import "../mock/WethMock.sol";
 import "../interfaces/IWETH.sol";
+import "./resolvers/TestERC20Token.sol";
+
+import "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
+import "../LenderCommitmentForwarder.sol";
+
+import "@mangrovedao/hardhat-test-solidity/test.sol";
+
+import "../libraries/DateTimeLib.sol";
+import "../TellerV2Storage.sol";
+import { PaymentType } from "../libraries/V2Calculations.sol";
+import "../CollateralManager.sol";
+import "../escrow/CollateralEscrowV1.sol";
 
 import { User } from "./Test_Helpers.sol";
 
-import "../escrow/CollateralEscrowV1.sol";
-import "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
-import "../LenderCommitmentForwarder.sol";
-import "./resolvers/TestERC20Token.sol";
-
-import "@mangrovedao/hardhat-test-solidity/test.sol";
-import "../CollateralManager.sol";
-import { Collateral } from "../interfaces/escrow/ICollateralEscrowV1.sol";
-import { PaymentType } from "../libraries/V2Calculations.sol";
-import { BidState, Payment } from "../TellerV2Storage.sol";
-
-contract TellerV2_Test is Testable {
+contract PaymentCycle_Test is Testable {
     User private marketOwner;
     User private borrower;
     User private lender;
 
     TellerV2 tellerV2;
+    uint256 marketId;
 
     WethMock wethMock;
     TestERC20Token daiMock;
-    CollateralManager collateralManager;
-
-    uint256 marketId1;
-    uint256 collateralAmount = 10;
 
     function setup_beforeAll() public {
         // Deploy test tokens
@@ -64,7 +62,7 @@ contract TellerV2_Test is Testable {
         reputationManager.initialize(address(tellerV2));
 
         // Deploy Collateral manager
-        collateralManager = new CollateralManager();
+        CollateralManager collateralManager = new CollateralManager();
         collateralManager.initialize(address(escrowBeacon), address(tellerV2));
 
         // Deploy LenderCommitmentForwarder
@@ -103,101 +101,54 @@ contract TellerV2_Test is Testable {
         // Approve Teller V2 for the lender's dai
         lender.addAllowance(address(daiMock), address(tellerV2), balance * 10);
 
-        // Create a market
-        marketId1 = marketOwner.createMarket(
+        // Create a market with a monthly payment cycle type
+        marketId = marketOwner.createMarket(
             address(marketRegistry),
-            8000,
+            2592000, // 30 days
             7000,
             5000,
             500,
             false,
             false,
             PaymentType.EMI,
-            IMarketRegistry.PaymentCycleType.Seconds,
+            IMarketRegistry.PaymentCycleType.Monthly,
             "uri://"
         );
+
+        uint256 cycleValue = marketRegistry.getPaymentCycleValue(marketId);
     }
 
-    function submitCollateralBid() public returns (uint256 bidId_) {
-        Collateral memory info;
-        info._amount = collateralAmount;
-        info._tokenId = 0;
-        info._collateralType = CollateralType.ERC20;
-        info._collateralAddress = address(wethMock);
-
-        Collateral[] memory collateralInfo = new Collateral[](1);
-        collateralInfo[0] = info;
-
-        uint256 bal = wethMock.balanceOf(address(borrower));
-
-        // Increase allowance
-        // Approve the collateral manager for the borrower's weth
-        borrower.addAllowance(
-            address(wethMock),
-            address(collateralManager),
-            info._amount
-        );
-
-        bidId_ = borrower.submitCollateralBid(
+    function paymentCycleType_test() public {
+        // Submit bid as borrower
+        uint256 bidId_ = borrower.submitBid(
             address(daiMock),
-            marketId1,
+            marketId,
             100,
-            10000,
+            25920000, // 10 months
             500,
             "metadataUri://",
-            address(borrower),
-            collateralInfo
+            address(borrower)
         );
-    }
 
-    function acceptBid(uint256 _bidId) public {
-        // Accept bid
-        lender.acceptBid(_bidId);
-    }
-
-    function collateralEscrow_test() public {
-        // Submit bid as borrower
-        uint256 bidId = submitCollateralBid();
         // Accept bid as lender
-        acceptBid(bidId);
+        lender.acceptBid(bidId_);
 
-        // Get newly created escrow
-        address escrowAddress = collateralManager._escrows(bidId);
-        CollateralEscrowV1 escrow = CollateralEscrowV1(escrowAddress);
+        // Get accepted time
+        uint256 acceptedTime = tellerV2.lastRepaidTimestamp(bidId_);
 
-        uint256 storedBidId = escrow.getBid();
-
-        // Test that the created escrow has the same bidId and collateral stored
-        Test.eq(bidId, storedBidId, "Collateral escrow was not created");
-
-        uint256 escrowBalance = wethMock.balanceOf(escrowAddress);
-
-        Test.eq(collateralAmount, escrowBalance, "Collateral was not stored");
-
-        // Repay loan
-        uint256 borrowerBalanceBefore = wethMock.balanceOf(address(borrower));
-        Payment memory amountOwed = tellerV2.calculateAmountOwed(bidId);
-        borrower.addAllowance(
-            address(daiMock),
-            address(tellerV2),
-            amountOwed.principal + amountOwed.interest
-        );
-        borrower.repayLoanFull(bidId);
-
-        // Check escrow balance
-        uint256 escrowBalanceAfter = wethMock.balanceOf(escrowAddress);
-        Test.eq(
-            0,
-            escrowBalanceAfter,
-            "Collateral was not withdrawn from escrow on repayment"
+        // Check payment cycle type
+        IMarketRegistry.PaymentCycleType paymentCycleType = tellerV2
+            .bidPaymentCycleType(bidId_);
+        require(
+            paymentCycleType == IMarketRegistry.PaymentCycleType.Monthly,
+            "Payment cycle type not set"
         );
 
-        // Check borrower balance for collateral
-        uint256 borrowerBalanceAfter = wethMock.balanceOf(address(borrower));
-        Test.eq(
-            collateralAmount,
-            borrowerBalanceAfter - borrowerBalanceBefore,
-            "Collateral was not sent to borrower after repayment"
+        // Check next payment date
+        uint32 nextMonth = uint32(
+            BokkyPooBahsDateTimeLibrary.addMonths(acceptedTime, 1)
         );
+        uint32 nextDueDate = tellerV2.calculateNextDueDate(bidId_);
+        require(nextDueDate == nextMonth, "Incorrect due date set");
     }
 }

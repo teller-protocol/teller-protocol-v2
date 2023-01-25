@@ -20,6 +20,7 @@ import { Collateral } from "./interfaces/escrow/ICollateralEscrowV1.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./libraries/NumbersLib.sol";
+import "./libraries/DateTimeLib.sol";
 import { V2Calculations } from "./libraries/V2Calculations.sol";
 
 /* Errors */
@@ -353,9 +354,24 @@ contract TellerV2 is
         bid.loanDetails.loanDuration = _duration;
         bid.loanDetails.timestamp = uint32(block.timestamp);
 
-        bid.terms.paymentCycle = marketRegistry.getPaymentCycleDuration(
-            _marketplaceId
-        );
+        // Set payment cycle type based on market setting (custom or monthly)
+        bidPaymentCycleType[bidId] = marketRegistry
+            .getMarketplacePaymentCycleType(_marketplaceId);
+
+        if (
+            bidPaymentCycleType[bidId] ==
+            IMarketRegistry.PaymentCycleType.Seconds
+        ) {
+            bid.terms.paymentCycle = marketRegistry.getPaymentCycleValue(
+                _marketplaceId
+            );
+        } else if (
+            bidPaymentCycleType[bidId] ==
+            IMarketRegistry.PaymentCycleType.Monthly
+        ) {
+            bid.terms.paymentCycle = 30 days;
+        }
+
         bid.terms.APR = _APR;
 
         bidDefaultDuration[bidId] = marketRegistry.getPaymentDefaultDuration(
@@ -793,6 +809,19 @@ contract TellerV2 is
 
         // Start with the original due date being 1 payment cycle since bid was accepted
         dueDate_ = bid.loanDetails.acceptedTimestamp + bid.terms.paymentCycle;
+
+        // Calculate due date if payment cycle is set to monthly
+        if (
+            bidPaymentCycleType[_bidId] ==
+            IMarketRegistry.PaymentCycleType.Monthly
+        ) {
+            dueDate_ = uint32(
+                BokkyPooBahsDateTimeLibrary.addMonths(
+                    bid.loanDetails.acceptedTimestamp,
+                    1
+                )
+            );
+        }
 
         // Calculate the cycle number the last repayment was made
         uint32 delta = lastRepaidTimestamp(_bidId) -

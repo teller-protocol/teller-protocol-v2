@@ -143,4 +143,10 @@ abstract contract TellerV2Storage_G3 is TellerV2Storage_G2 {
     ICollateralManager public collateralManager;
 }
 
-abstract contract TellerV2Storage is TellerV2Storage_G3 {}
+abstract contract TellerV2Storage_G4 is TellerV2Storage_G3 {
+    // BidId to payment cycle type (custom or monthly)
+    mapping(uint256 => IMarketRegistry.PaymentCycleType)
+        public bidPaymentCycleType;
+}
+
+abstract contract TellerV2Storage is TellerV2Storage_G4 {}

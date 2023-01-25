@@ -16,7 +16,7 @@ const { ethers, toBN, deployments } = hre
 chai.should()
 chai.use(solidity)
 
-const paymentCycleDuration = moment.duration(30, 'days').asSeconds()
+const paymentCycleValue = moment.duration(30, 'days').asSeconds()
 const loanDefaultDuration = moment.duration(180, 'days').asSeconds()
 const loanExpirationDuration = moment.duration(1, 'days').asSeconds()
 const feePercent = 0
@@ -196,16 +196,17 @@ describe('MarketRegistry', () => {
       await marketRegistry
         .connect(marketOwner)
         [
-          'createMarket(address,uint32,uint32,uint32,uint16,bool,bool,uint8,string)'
+          'createMarket(address,uint32,uint32,uint32,uint16,bool,bool,uint8,uint8,string)'
         ](
           marketOwnerAddress,
-          paymentCycleDuration,
+          paymentCycleValue,
           loanDefaultDuration,
           loanExpirationDuration,
           feePercent,
           false,
           false,
           '0',
+          0,
           uri
         )
         .should.emit(marketRegistry, 'MarketCreated')
@@ -216,16 +217,17 @@ describe('MarketRegistry', () => {
       await marketRegistry
         .connect(marketOwner)
         [
-          'createMarket(address,uint32,uint32,uint32,uint16,bool,bool,uint8,string)'
+          'createMarket(address,uint32,uint32,uint32,uint16,bool,bool,uint8,uint8,string)'
         ](
           ethers.constants.AddressZero,
-          paymentCycleDuration,
+          paymentCycleValue,
           loanDefaultDuration,
           loanExpirationDuration,
           0,
           true,
           true,
           '0',
+          0,
           uri
         )
         .should.be.revertedWith('Invalid owner address')
@@ -235,16 +237,17 @@ describe('MarketRegistry', () => {
       await marketRegistry
         .connect(marketOwner)
         [
-          'createMarket(address,uint32,uint32,uint32,uint16,bool,bool,uint8,string)'
+          'createMarket(address,uint32,uint32,uint32,uint16,bool,bool,uint8,uint8,string)'
         ](
           marketOwnerAddress,
-          paymentCycleDuration,
+          paymentCycleValue,
           loanDefaultDuration,
           loanExpirationDuration,
           0,
           true,
           true,
           '0',
+          0,
           uriTwo
         )
         .should.emit(marketRegistry, 'MarketCreated')
@@ -255,16 +258,17 @@ describe('MarketRegistry', () => {
       await marketRegistry
         .connect(marketOwner)
         [
-          'createMarket(address,uint32,uint32,uint32,uint16,bool,bool,uint8,string)'
+          'createMarket(address,uint32,uint32,uint32,uint16,bool,bool,uint8,uint8,string)'
         ](
           marketOwnerAddress,
-          paymentCycleDuration,
+          paymentCycleValue,
           loanDefaultDuration,
           loanExpirationDuration,
           0,
           true,
           true,
           '0',
+          0,
           uriThree
         )
         .should.emit(marketRegistry, 'MarketCreated')
@@ -275,16 +279,17 @@ describe('MarketRegistry', () => {
       await marketRegistry
         .connect(marketOwner)
         [
-          'createMarket(address,uint32,uint32,uint32,uint16,bool,bool,uint8,string)'
+          'createMarket(address,uint32,uint32,uint32,uint16,bool,bool,uint8,uint8,string)'
         ](
           marketOwnerAddress,
-          paymentCycleDuration,
+          paymentCycleValue,
           loanDefaultDuration,
           loanExpirationDuration,
           feePercent,
           true,
           true,
           '0',
+          0,
           uri
         )
         .should.emit(marketRegistry, 'MarketCreated')
@@ -316,23 +321,21 @@ describe('MarketRegistry', () => {
     })
   })
 
-  describe('setMarketPaymentCycleDuration', () => {
+  describe('setMarketPaymentCycleValue', () => {
     it('should be able to update market payment cycle duration', async () => {
       const setDuration = await marketRegistry
         .connect(marketOwner)
-        .setPaymentCycleDuration(1, 60 * 60 * 60)
-        .should.emit(marketRegistry, 'SetPaymentCycleDuration')
+        .setPaymentCycleValue(1, 60 * 60 * 60)
+        .should.emit(marketRegistry, 'SetPaymentCycleValue')
         .withArgs(1, 60 * 60 * 60)
 
-      expect(await marketRegistry.getPaymentCycleDuration(1)).to.eql(
-        60 * 60 * 60
-      )
+      expect(await marketRegistry.getPaymentCycleValue(1)).to.eql(60 * 60 * 60)
     })
 
     it('should not be able to update unowned market metadata uri', async () => {
       const setURI = await marketRegistry
         .connect(marketOwner)
-        .setPaymentCycleDuration(9, 60 * 60 * 60)
+        .setPaymentCycleValue(9, 60 * 60 * 60)
         .should.be.revertedWith('Not the owner')
     })
   })
@@ -1000,7 +1003,7 @@ describe('MarketRegistry', () => {
       const fetchedData = await marketRegistry.getMarketData(marketplaceId)
 
       expect(fetchedData.owner).to.eql(marketOwnerAddress)
-      expect(fetchedData.paymentCycleDuration).to.eql(paymentCycleDuration)
+      expect(fetchedData.paymentCycleValue).to.eql(paymentCycleValue)
       expect(fetchedData.paymentDefaultDuration).to.eql(loanDefaultDuration)
       expect(fetchedData.loanExpirationTime).to.eql(loanExpirationDuration)
       expect(fetchedData.metadataURI).to.eql(uriTwo)
@@ -1061,7 +1064,7 @@ describe('MarketRegistry', () => {
         .connect(alternateOwner)
         .updateMarketSettings(
           marketId,
-          paymentCycleDuration.toString(),
+          paymentCycleValue.toString(),
           0,
           0,
           0,
@@ -1077,7 +1080,7 @@ describe('MarketRegistry', () => {
         .connect(marketOwner)
         .updateMarketSettings(
           marketId,
-          paymentCycleDuration.toString(),
+          paymentCycleValue.toString(),
           0,
           0,
           0,
@@ -1089,7 +1092,7 @@ describe('MarketRegistry', () => {
       const fetchedData = await marketRegistry.getMarketData(marketId)
 
       expect(fetchedData.owner).to.eql(marketOwnerAddress)
-      expect(fetchedData.paymentCycleDuration).to.eql(paymentCycleDuration)
+      expect(fetchedData.paymentCycleValue).to.eql(paymentCycleValue)
       expect(fetchedData.paymentDefaultDuration).to.eql(0)
       expect(fetchedData.metadataURI).to.eql(urifour)
     })

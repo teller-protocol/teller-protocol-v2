@@ -242,6 +242,7 @@ contract User {
             _requireLenderAttestation,
             _requireBorrowerAttestation,
             _paymentType,
+            IMarketRegistry.PaymentCycleType.Seconds,
             _uri
         );
     }

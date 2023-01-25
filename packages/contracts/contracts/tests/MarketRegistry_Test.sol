@@ -50,7 +50,7 @@ contract MarketRegistry_Test is Testable, TellerV2 {
             500,
             false,
             false,
-            V2Calculations.PaymentType.EMI,
+            PaymentType.EMI,
             IMarketRegistry.PaymentCycleType.Seconds,
             "uri://"
         );
@@ -72,7 +72,7 @@ contract MarketRegistry_Test is Testable, TellerV2 {
             500,
             false,
             false,
-            V2Calculations.PaymentType.EMI,
+            PaymentType.EMI,
             IMarketRegistry.PaymentCycleType.Monthly,
             "uri://"
         );
@@ -106,7 +106,7 @@ contract User {
         uint16 _feePercent,
         bool _requireLenderAttestation,
         bool _requireBorrowerAttestation,
-        V2Calculations.PaymentType _paymentType,
+        PaymentType _paymentType,
         IMarketRegistry.PaymentCycleType _paymentCycleType,
         string calldata _uri
     ) public {

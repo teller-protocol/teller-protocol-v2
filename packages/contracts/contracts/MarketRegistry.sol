@@ -151,7 +151,7 @@ contract MarketRegistry is
         uint16 _feePercent,
         bool _requireLenderAttestation,
         bool _requireBorrowerAttestation,
-        V2Calculations.PaymentType _paymentType,
+        PaymentType _paymentType,
         PaymentCycleType _paymentCycleType,
         string calldata _uri
     ) external returns (uint256 marketId_) {
@@ -199,7 +199,7 @@ contract MarketRegistry is
             _feePercent,
             _requireLenderAttestation,
             _requireBorrowerAttestation,
-            V2Calculations.PaymentType.EMI,
+            PaymentType.EMI,
             PaymentCycleType.Seconds,
             _uri
         );
@@ -226,7 +226,7 @@ contract MarketRegistry is
         uint16 _feePercent,
         bool _requireLenderAttestation,
         bool _requireBorrowerAttestation,
-        V2Calculations.PaymentType _paymentType,
+        PaymentType _paymentType,
         PaymentCycleType _paymentCycleType,
         string calldata _uri
     ) internal returns (uint256 marketId_) {

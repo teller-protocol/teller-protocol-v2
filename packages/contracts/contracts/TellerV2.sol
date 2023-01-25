@@ -360,7 +360,7 @@ contract TellerV2 is
 
         if (
             bidPaymentCycleType[bidId] ==
-            IMarketRegistry.PaymentCycleType.Custom
+            IMarketRegistry.PaymentCycleType.Seconds
         ) {
             bid.terms.paymentCycle = marketRegistry.getPaymentCycleValue(
                 _marketplaceId

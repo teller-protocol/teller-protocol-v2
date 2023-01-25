@@ -57,7 +57,7 @@ interface IMarketRegistry {
         uint16 _feePercent,
         bool _requireLenderAttestation,
         bool _requireBorrowerAttestation,
-        V2Calculations.PaymentType _paymentType,
+        PaymentType _paymentType,
         PaymentCycleType _paymentCycleType,
         string calldata _uri
     ) external returns (uint256 marketId_);

@@ -36,12 +36,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         address principalTokenAddress;
         address borrower;
     }
-
-    modifier onlyMarketOwner(uint256 marketId) {
-        require(_msgSender() == getTellerV2MarketOwner(marketId));
-        _;
-    }
-
+ 
     // Mapping of lender address => market ID => lending token => commitment
     mapping(address => mapping(uint256 => mapping(address => Commitment)))
         public __lenderMarketCommitments_deprecated;

@@ -18,10 +18,17 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
 
     /**
      * @notice Details about a lender's capital commitment.
-     * @param amount Amount of tokens being committed by the lender.
+     * @param maxPrincipal Amount of tokens being committed by the lender. Max amount that can be loaned.
      * @param expiration Expiration time in seconds, when the commitment expires.
      * @param maxDuration Length of time, in seconds that the lender's capital can be lent out for.
-     * @param minAPR Minimum Annual percentage to be applied for loans using the lender's capital.
+     * @param minInterestRate Minimum Annual percentage to be applied for loans using the lender's capital.
+     * @param collateralTokenAddress The address for the token contract that must be used to provide collateral for loans for this commitment.
+     * @param maxPrincipalPerCollateralAmount The amount of principal that can be used for a loan per each unit of collateral, expanded by 10^8. Use zero for no collateral required.
+     * @param collateralTokenType The type of asset of the collateralTokenAddres (ERC20, ERC721, or ERC1155).
+     * @param lender The address of the lender for this commitment.
+     * @param marketId The market id for this commitment.
+     * @param principalTokenAddress The address for the token contract that will be used to provide principal for loans of this commitment.
+     * @param borrower The address of the borrower that is allowed to accept this commitment.  Zero address is wildcard for any address. 
      */
     struct Commitment {
         uint256 maxPrincipal;
@@ -105,6 +112,21 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         TellerV2MarketForwarder(_protocolAddress, _marketRegistry)
     {}
 
+  /**
+     * @notice Created a loan commitment from a lender to a market.
+     * @param _marketId The marketId in which the commitment is valid
+     * @param _principalTokenAddress The address of the asset being committed.
+     * @param _maxPrincipal Amount of tokens being committed by the lender.
+
+     * @param _collateralTokenAddress The address of the collateral asset required for the loan.
+     * @param _maxPrincipalPerCollateralAmount Amount of loan principal allowed per each collateral amount expressed in raw value regardles of token decimals.
+     * @param _collateralTokenType The token type of the collateral 
+
+     * @param _maxLoanDuration Length of time, in seconds that the lender's capital can be lent out for.
+     * @param _minInterestRate Minimum Annual percentage to be applied for loans using the lender's capital.
+     * @param _expiration Expiration time in seconds, when the commitment expires.
+     * @param _borrower The address of the borrower who is allowed to accept this commitment.  Use the zero address to wildcard for any borrower.
+     */
     function createCommitment(
         uint256 _marketId,
         address _principalTokenAddress,
@@ -156,6 +178,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
      * @param _maxLoanDuration Length of time, in seconds that the lender's capital can be lent out for.
      * @param _minInterestRate Minimum Annual percentage to be applied for loans using the lender's capital.
      * @param _expiration Expiration time in seconds, when the commitment expires.
+     * @param _borrower The address of the borrower who is allowed to accept this commitment.  Use the zero address to wildcard for any borrower.
      */
     function updateCommitment(
         uint256 _commitmentId,

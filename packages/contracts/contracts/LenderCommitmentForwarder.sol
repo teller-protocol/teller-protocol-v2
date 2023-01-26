@@ -11,6 +11,11 @@ import {
 } from "./interfaces/escrow/ICollateralEscrowV1.sol";
 
 contract LenderCommitmentForwarder is TellerV2MarketForwarder {
+
+
+    uint256 public immutable PRINCIPAL_PER_COLLATERAL_EXPANSION_FACTOR = 100000000;
+
+
     /**
      * @notice Details about a lender's capital commitment.
      * @param amount Amount of tokens being committed by the lender.
@@ -24,7 +29,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint32 maxDuration;
         uint16 minInterestRate;
         address collateralTokenAddress;
-        uint256 maxPrincipalPerCollateralAmount; //zero means infinite
+        uint256 maxPrincipalPerCollateralAmount; //zero means infinite . This is expressed using 8 decimals [PRINCIPAL_PER_COLLATERAL_EXPANSION_FACTOR] so 1 wei is 10^8 and  1 usdc is 10^14 
         CollateralType collateralTokenType; //erc721, erc1155 or erc20
         address lender;
         uint256 marketId;
@@ -290,7 +295,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             commitment.maxPrincipalPerCollateralAmount == 0 ||
                 _collateralAmount *
                     (commitment.maxPrincipalPerCollateralAmount) >=
-                _principalAmount,
+                _principalAmount * PRINCIPAL_PER_COLLATERAL_EXPANSION_FACTOR,
             "Insufficient collateral"
         );
 

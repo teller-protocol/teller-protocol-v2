@@ -68,7 +68,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         collateralTokenAddress = address(
             0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174
         );
-        maxPrincipalPerCollateralAmount = 10000;
+        maxPrincipalPerCollateralAmount = 10000 * PRINCIPAL_PER_COLLATERAL_EXPANSION_FACTOR;
         collateralTokenType = CollateralType.ERC20;
 
         marketOwner.setTrustedMarketForwarder(marketId, address(this));

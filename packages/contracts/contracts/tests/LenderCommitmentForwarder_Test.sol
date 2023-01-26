@@ -88,7 +88,8 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             collateralTokenType,
             maxLoanDuration,
             minInterestRate,
-            expiration
+            expiration,
+            address(0)
         );
  
     }
@@ -116,7 +117,8 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             collateralTokenType,
             maxLoanDuration,
             minInterestRate,
-            expiration
+            expiration,
+            address(0)
         );
     }
 
@@ -139,7 +141,8 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             collateralTokenType,
             maxLoanDuration,
             minInterestRate,
-            expiration
+            expiration,
+            address(0)
         );
     }
 
@@ -257,7 +260,8 @@ contract User {
         CollateralType _collateralTokenType,
         uint32 loanDuration,
         uint16 interestRate,
-        uint32 expiration
+        uint32 expiration,
+        address borrower
     ) public returns (uint256) {
         return
             commitmentForwarder.createCommitment(
@@ -269,7 +273,8 @@ contract User {
                 _collateralTokenType,
                 loanDuration,
                 interestRate,
-                expiration
+                expiration,
+                borrower
             );
     }
 
@@ -283,7 +288,8 @@ contract User {
         CollateralType _collateralTokenType,
         uint32 loanDuration,
         uint16 interestRate,
-        uint32 expiration
+        uint32 expiration,
+        address borrower
     ) public {
         commitmentForwarder.updateCommitment(
             commitmentId,
@@ -295,7 +301,8 @@ contract User {
             _collateralTokenType,
             loanDuration,
             interestRate,
-            expiration
+            expiration,
+            borrower
         );
     }
 

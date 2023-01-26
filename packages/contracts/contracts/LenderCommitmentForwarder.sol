@@ -34,6 +34,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         address lender;
         uint256 marketId;
         address principalTokenAddress;
+        address borrower;
     }
 
     modifier onlyMarketOwner(uint256 marketId) {
@@ -118,7 +119,8 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         CollateralType _collateralTokenType,
         uint32 _maxLoanDuration,
         uint16 _minInterestRate,
-        uint32 _expiration
+        uint32 _expiration,
+        address _borrower
     ) public returns (uint256 commitmentId) {
         commitmentId = commitmentCount++;
 
@@ -132,7 +134,8 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             collateralTokenType: _collateralTokenType,
             lender: _msgSender(),
             marketId: _marketId,
-            principalTokenAddress: _principalTokenAddress
+            principalTokenAddress: _principalTokenAddress,
+            borrower: _borrower
         });
 
         emit CreatedCommitment(
@@ -169,7 +172,8 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         CollateralType _collateralTokenType,
         uint32 _maxLoanDuration,
         uint16 _minInterestRate,
-        uint32 _expiration
+        uint32 _expiration,
+        address _borrower
     ) public {
         require(_expiration > uint32(block.timestamp));
 
@@ -190,6 +194,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         commitment.maxDuration = _maxLoanDuration;
         commitment.minInterestRate = _minInterestRate;
         commitment.collateralTokenType = _collateralTokenType;
+        commitment.borrower = _borrower;
 
         emit UpdatedCommitment(
             _commitmentId,
@@ -264,10 +269,14 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint256 _collateralTokenId,
         uint32 _loanDuration,
         uint16 _interestRate
-    ) external onlyMarketOwner(_marketId) returns (uint256 bidId) {
+    ) external returns (uint256 bidId) {
         address borrower = _msgSender();
 
         Commitment storage commitment = lenderMarketCommitments[_commitmentId];
+
+        require(
+            commitment.borrower == address(0) || borrower == commitment.borrower, "Unauthorized borrower for this commitment"
+        );
 
         require(
             _marketId == commitment.marketId,

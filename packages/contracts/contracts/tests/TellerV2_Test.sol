@@ -27,6 +27,8 @@ import "../CollateralManager.sol";
 import { Collateral } from "../interfaces/escrow/ICollateralEscrowV1.sol";
 import { PaymentType } from "../libraries/V2Calculations.sol";
 import { BidState, Payment } from "../TellerV2Storage.sol";
+import "../MetaForwarder.sol";
+import { LenderManager } from "../LenderManager.sol";
 
 contract TellerV2_Test is Testable {
     User private marketOwner;
@@ -67,6 +69,16 @@ contract TellerV2_Test is Testable {
         collateralManager = new CollateralManager();
         collateralManager.initialize(address(escrowBeacon), address(tellerV2));
 
+        // Deploy Lender manager
+        MetaForwarder metaforwarder = new MetaForwarder();
+        metaforwarder.initialize();
+        LenderManager lenderManager = new LenderManager(
+            address(metaforwarder),
+            address(marketRegistry)
+        );
+        lenderManager.initialize();
+        lenderManager.transferOwnership(address(tellerV2));
+
         // Deploy LenderCommitmentForwarder
         LenderCommitmentForwarder lenderCommitmentForwarder = new LenderCommitmentForwarder(
                 address(tellerV2),
@@ -84,7 +96,8 @@ contract TellerV2_Test is Testable {
             address(reputationManager),
             address(lenderCommitmentForwarder),
             lendingTokens,
-            address(collateralManager)
+            address(collateralManager),
+            address(lenderManager)
         );
 
         // Instantiate users & balances

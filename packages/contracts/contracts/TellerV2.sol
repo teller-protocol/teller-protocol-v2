@@ -824,11 +824,20 @@ contract TellerV2 is
         }
 
         // Calculate the cycle number the last repayment was made
-        uint32 delta = lastRepaidTimestamp(_bidId) -
+        uint32 lastRepaidTimestamp = lastRepaidTimestamp(_bidId);
+        uint32 delta = lastRepaidTimestamp -
             bid.loanDetails.acceptedTimestamp;
         if (delta > 0) {
             uint32 repaymentCycle = 1 + (delta / bid.terms.paymentCycle);
             dueDate_ += (repaymentCycle * bid.terms.paymentCycle);
+            if (
+                BokkyPooBahsDateTimeLibrary.isLeapYear(bid.loanDetails.acceptedTimestamp)
+            ) {
+                (uint year, uint month, uint day) = BokkyPooBahsDateTimeLibrary.timestampToDate(lastRepaidTimestamp);
+                if (month == 2 && day == 29) {
+                    dueDate_ = uint32(BokkyPooBahsDateTimeLibrary.subDays(dueDate_, 1));
+                }
+            }
         }
 
         //if we are in the last payment cycle, the next due date is the end of loan duration

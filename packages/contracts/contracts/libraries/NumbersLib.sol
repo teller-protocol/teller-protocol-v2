@@ -103,7 +103,8 @@ library NumbersLib {
         uint256 principal,
         uint32 loanDuration,
         uint32 cycleDuration,
-        uint16 apr
+        uint16 apr,
+        uint256 daysInYear
     ) internal pure returns (uint256) {
         require(
             loanDuration >= cycleDuration,
@@ -123,7 +124,7 @@ library NumbersLib {
 
         uint256 one = WadRayMath.wad();
         uint256 r = WadRayMath.pctToWad(apr).wadMul(cycleDuration).wadDiv(
-            365 days
+            daysInYear
         );
         uint256 exp = (one + r).wadPow(n);
         uint256 numerator = principal.wadMul(r).wadMul(exp);

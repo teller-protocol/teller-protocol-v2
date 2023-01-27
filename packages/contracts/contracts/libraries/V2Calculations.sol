@@ -118,6 +118,7 @@ library V2Calculations {
     /**
      * @notice Calculates the amount owed for a loan for the next payment cycle.
      * @param _type The payment type of the loan.
+     * @param _cycleType The cycle type set for the loan. (Seconds or Monthly)
      * @param _principal The starting amount that is owed on the loan.
      * @param _duration The length of the loan.
      * @param _paymentCycle The length of the loan's payment cycle.
@@ -125,19 +126,21 @@ library V2Calculations {
      */
     function calculatePaymentCycleAmount(
         PaymentType _type,
+        PaymentCycleType _cycleType,
         uint256 _principal,
         uint32 _duration,
         uint32 _paymentCycle,
         uint16 _apr
     ) internal returns (uint256) {
+        uint256 daysInYear = _cycleType == PaymentCycleType.Monthly ? 360 days : 365 days;
         if (_type == PaymentType.Bullet) {
             return
                 _principal.percent(_apr).percent(
-                    uint256(_paymentCycle).ratioOf(365 days, 10),
+                    uint256(_paymentCycle).ratioOf(daysInYear, 10),
                     10
                 );
         }
         // Default to PaymentType.EMI
-        return NumbersLib.pmt(_principal, _duration, _paymentCycle, _apr);
+        return NumbersLib.pmt(_principal, _duration, _paymentCycle, _apr, daysInYear);
     }
 }

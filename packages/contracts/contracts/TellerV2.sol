@@ -387,6 +387,7 @@ contract TellerV2 is
         bid.terms.paymentCycleAmount = V2Calculations
             .calculatePaymentCycleAmount(
                 bid.paymentType,
+                bidPaymentCycleType[bidId],
                 _principal,
                 _duration,
                 bid.terms.paymentCycle,

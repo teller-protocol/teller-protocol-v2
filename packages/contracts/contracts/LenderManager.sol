@@ -28,7 +28,6 @@ ILenderManager
     constructor(address _trustedForwarder, address _marketRegistry)
     ERC2771ContextUpgradeable(_trustedForwarder)
     {
-        _disableInitializers();
         marketRegistry = IMarketRegistry(_marketRegistry);
     }
 

@@ -41,7 +41,7 @@ contract V2Calculations_Test is Testable {
         cyclesWithExtraPayments = [3, 4];
         cyclesWithExtraPaymentsAmounts = [25000e6, 25000e6];
 
-        calculateAmountOwed_runner(18, PaymentType.EMI);
+        calculateAmountOwed_runner(18, PaymentType.EMI, PaymentCycleType.Seconds);
     }
 
     // EMI loan
@@ -50,7 +50,7 @@ contract V2Calculations_Test is Testable {
         cyclesToSkip.add(4);
         cyclesToSkip.add(5);
 
-        calculateAmountOwed_runner(36, PaymentType.EMI);
+        calculateAmountOwed_runner(36, PaymentType.EMI, PaymentCycleType.Seconds);
     }
 
     // EMI loan
@@ -58,13 +58,13 @@ contract V2Calculations_Test is Testable {
         cyclesWithExtraPayments = [3, 7];
         cyclesWithExtraPaymentsAmounts = [35000e6, 20000e6];
 
-        calculateAmountOwed_runner(16, PaymentType.EMI);
+        calculateAmountOwed_runner(16, PaymentType.EMI, PaymentCycleType.Seconds);
     }
 
     // Bullet loan
     function _04_calculateAmountOwed_test() public {
         cyclesToSkip.add(6);
-        calculateAmountOwed_runner(36, PaymentType.Bullet);
+        calculateAmountOwed_runner(36, PaymentType.Bullet, PaymentCycleType.Seconds);
     }
 
     // Bullet loan
@@ -72,16 +72,18 @@ contract V2Calculations_Test is Testable {
         cyclesToSkip.add(12);
         cyclesWithExtraPayments = [1, 8];
         cyclesWithExtraPaymentsAmounts = [15000e6, 10000e6];
-        calculateAmountOwed_runner(36, PaymentType.Bullet);
+        calculateAmountOwed_runner(36, PaymentType.Bullet, PaymentCycleType.Seconds);
     }
 
     function calculateAmountOwed_runner(
         uint256 expectedTotalCycles,
-        PaymentType _paymentType
+        PaymentType _paymentType,
+        PaymentCycleType _paymentCycleType
     ) private {
         // Calculate payment cycle amount
         uint256 paymentCycleAmount = V2Calculations.calculatePaymentCycleAmount(
             _paymentType,
+            _paymentCycleType,
             __bid.loanDetails.principal,
             __bid.loanDetails.loanDuration,
             __bid.terms.paymentCycle,
@@ -206,6 +208,7 @@ contract V2Calculations_Test is Testable {
         uint256 _paymentCycleAmount = V2Calculations
             .calculatePaymentCycleAmount(
                 PaymentType.Bullet,
+                PaymentCycleType.Seconds,
                 _principal,
                 365 days,
                 365 days / 12,

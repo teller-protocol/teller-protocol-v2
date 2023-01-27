@@ -88,6 +88,7 @@ type Payment @entity {
   interest: BigInt!
   paymentDate: BigInt
   outstandingCapital: BigInt!
+  status: String
 }
 
 type User @entity {

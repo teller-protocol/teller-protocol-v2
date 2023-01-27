@@ -110,6 +110,11 @@ export function updateBid(
     payment.interest = _lastInterestPayment;
     payment.paymentDate = event.block.timestamp;
     payment.outstandingCapital = bid.principal.minus(bid.totalRepaidPrincipal);
+    if (bid.lastRepaidTimestamp.plus(bid.paymentCycle) > event.block.timestamp) {
+      payment.status = 'Late'
+    } else {
+      payment.status = 'On Time'
+    }
     payment.save();
   }
 

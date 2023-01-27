@@ -17,7 +17,7 @@ import "../EAS/TellerAS.sol";
 import "../mock/WethMock.sol";
 import "../interfaces/IWETH.sol";
 
-import { PaymentType } from "../libraries/V2Calculations.sol";
+import { PaymentType, PaymentCycleType } from "../libraries/V2Calculations.sol";
 
 contract MarketRegistry_Test is Testable, TellerV2 {
     User private marketOwner;
@@ -51,15 +51,15 @@ contract MarketRegistry_Test is Testable, TellerV2 {
             false,
             false,
             PaymentType.EMI,
-            IMarketRegistry.PaymentCycleType.Seconds,
+            PaymentCycleType.Seconds,
             "uri://"
         );
-        IMarketRegistry.PaymentCycleType paymentCycle = marketRegistry
+        PaymentCycleType paymentCycle = marketRegistry
             .getMarketplacePaymentCycleType(1);
 
         require(
             paymentCycle ==
-            IMarketRegistry.PaymentCycleType.Seconds,
+            PaymentCycleType.Seconds,
             'Market payment cycle type incorrectly created'
         );
 
@@ -73,13 +73,13 @@ contract MarketRegistry_Test is Testable, TellerV2 {
             false,
             false,
             PaymentType.EMI,
-            IMarketRegistry.PaymentCycleType.Monthly,
+            PaymentCycleType.Monthly,
             "uri://"
         );
         paymentCycle = marketRegistry.getMarketplacePaymentCycleType(2);
 
         require(
-            paymentCycle == IMarketRegistry.PaymentCycleType.Monthly,
+            paymentCycle == PaymentCycleType.Monthly,
             "Market payment cycle type incorrectly created"
         );
     }
@@ -107,7 +107,7 @@ contract User {
         bool _requireLenderAttestation,
         bool _requireBorrowerAttestation,
         PaymentType _paymentType,
-        IMarketRegistry.PaymentCycleType _paymentCycleType,
+        PaymentCycleType _paymentCycleType,
         string calldata _uri
     ) public {
         IMarketRegistry(marketRegistry).createMarket(

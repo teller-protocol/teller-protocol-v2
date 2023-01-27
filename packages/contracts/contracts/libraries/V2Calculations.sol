@@ -12,6 +12,11 @@ enum PaymentType {
     Bullet
 }
 
+enum PaymentCycleType {
+    Seconds,
+    Monthly
+}
+
 library V2Calculations {
     using NumbersLib for uint256;
 

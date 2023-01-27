@@ -7,7 +7,7 @@ import "../interfaces/IMarketRegistry.sol";
 import "../interfaces/ITellerV2.sol";
 import { Collateral } from "../interfaces/escrow/ICollateralEscrowV1.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import { PaymentType } from "../libraries/V2Calculations.sol";
+import { PaymentType, PaymentCycleType } from "../libraries/V2Calculations.sol";
 
 contract User {
     TellerV2 public immutable tellerV2;
@@ -39,7 +39,7 @@ contract User {
         bool _requireLenderAttestation,
         bool _requireBorrowerAttestation,
         PaymentType _paymentType,
-        IMarketRegistry.PaymentCycleType _paymentCycleType,
+        PaymentCycleType _paymentCycleType,
         string calldata _uri
     ) public returns (uint256) {
         return

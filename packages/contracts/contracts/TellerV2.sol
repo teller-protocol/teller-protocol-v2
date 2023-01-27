@@ -21,7 +21,7 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./libraries/NumbersLib.sol";
 import "./libraries/DateTimeLib.sol";
-import { V2Calculations } from "./libraries/V2Calculations.sol";
+import { V2Calculations, PaymentCycleType } from "./libraries/V2Calculations.sol";
 
 /* Errors */
 /**
@@ -360,14 +360,14 @@ contract TellerV2 is
 
         if (
             bidPaymentCycleType[bidId] ==
-            IMarketRegistry.PaymentCycleType.Seconds
+            PaymentCycleType.Seconds
         ) {
             bid.terms.paymentCycle = marketRegistry.getPaymentCycleValue(
                 _marketplaceId
             );
         } else if (
             bidPaymentCycleType[bidId] ==
-            IMarketRegistry.PaymentCycleType.Monthly
+            PaymentCycleType.Monthly
         ) {
             bid.terms.paymentCycle = 30 days;
         }
@@ -813,7 +813,7 @@ contract TellerV2 is
         // Calculate due date if payment cycle is set to monthly
         if (
             bidPaymentCycleType[_bidId] ==
-            IMarketRegistry.PaymentCycleType.Monthly
+            PaymentCycleType.Monthly
         ) {
             dueDate_ = uint32(
                 BokkyPooBahsDateTimeLibrary.addMonths(

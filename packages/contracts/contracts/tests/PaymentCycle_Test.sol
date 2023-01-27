@@ -23,7 +23,7 @@ import "@mangrovedao/hardhat-test-solidity/test.sol";
 
 import "../libraries/DateTimeLib.sol";
 import "../TellerV2Storage.sol";
-import { PaymentType } from "../libraries/V2Calculations.sol";
+import { PaymentType, PaymentCycleType } from "../libraries/V2Calculations.sol";
 import "../CollateralManager.sol";
 import "../escrow/CollateralEscrowV1.sol";
 
@@ -111,7 +111,7 @@ contract PaymentCycle_Test is Testable {
             false,
             false,
             PaymentType.EMI,
-            IMarketRegistry.PaymentCycleType.Monthly,
+            PaymentCycleType.Monthly,
             "uri://"
         );
 
@@ -137,10 +137,10 @@ contract PaymentCycle_Test is Testable {
         uint256 acceptedTime = tellerV2.lastRepaidTimestamp(bidId_);
 
         // Check payment cycle type
-        IMarketRegistry.PaymentCycleType paymentCycleType = tellerV2
+        PaymentCycleType paymentCycleType = tellerV2
             .bidPaymentCycleType(bidId_);
         require(
-            paymentCycleType == IMarketRegistry.PaymentCycleType.Monthly,
+            paymentCycleType == PaymentCycleType.Monthly,
             "Payment cycle type not set"
         );
 

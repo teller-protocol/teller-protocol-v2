@@ -14,11 +14,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol"
 import "@openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol";
 import "./interfaces/ICollateralManager.sol";
-import {
-    Collateral,
-    CollateralType,
-    ICollateralEscrowV1
-} from "./interfaces/escrow/ICollateralEscrowV1.sol";
+import { Collateral, CollateralType, ICollateralEscrowV1 } from "./interfaces/escrow/ICollateralEscrowV1.sol";
 import "./interfaces/ITellerV2.sol";
 
 contract CollateralManager is OwnableUpgradeable, ICollateralManager {
@@ -80,6 +76,17 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         collateralEscrowBeacon = _collateralEscrowBeacon;
         tellerV2 = ITellerV2(_tellerV2);
         __Ownable_init_unchained();
+    }
+
+    /**
+     * @notice Sets the address of the Beacon contract used for the collateral escrow contracts.
+     * @param _collateralEscrowBeacon The address of the Beacon contract.
+     */
+    function setCollateralEscrowBeacon(address _collateralEscrowBeacon)
+        external
+        reinitializer(2)
+    {
+        collateralEscrowBeacon = _collateralEscrowBeacon;
     }
 
     /**

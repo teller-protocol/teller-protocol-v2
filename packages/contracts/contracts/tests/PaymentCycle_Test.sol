@@ -137,8 +137,9 @@ contract PaymentCycle_Test is Testable {
         uint256 acceptedTime = tellerV2.lastRepaidTimestamp(bidId_);
 
         // Check payment cycle type
-        PaymentCycleType paymentCycleType = tellerV2
-            .bidPaymentCycleType(bidId_);
+        PaymentCycleType paymentCycleType = tellerV2.bidPaymentCycleType(
+            bidId_
+        );
         require(
             paymentCycleType == PaymentCycleType.Monthly,
             "Payment cycle type not set"

@@ -358,17 +358,11 @@ contract TellerV2 is
         bidPaymentCycleType[bidId] = marketRegistry
             .getMarketplacePaymentCycleType(_marketplaceId);
 
-        if (
-            bidPaymentCycleType[bidId] ==
-            PaymentCycleType.Seconds
-        ) {
+        if (bidPaymentCycleType[bidId] == PaymentCycleType.Seconds) {
             bid.terms.paymentCycle = marketRegistry.getPaymentCycleValue(
                 _marketplaceId
             );
-        } else if (
-            bidPaymentCycleType[bidId] ==
-            PaymentCycleType.Monthly
-        ) {
+        } else if (bidPaymentCycleType[bidId] == PaymentCycleType.Monthly) {
             bid.terms.paymentCycle = 30 days;
         }
 
@@ -812,10 +806,7 @@ contract TellerV2 is
         dueDate_ = bid.loanDetails.acceptedTimestamp + bid.terms.paymentCycle;
 
         // Calculate due date if payment cycle is set to monthly
-        if (
-            bidPaymentCycleType[_bidId] ==
-            PaymentCycleType.Monthly
-        ) {
+        if (bidPaymentCycleType[_bidId] == PaymentCycleType.Monthly) {
             dueDate_ = uint32(
                 BokkyPooBahsDateTimeLibrary.addMonths(
                     bid.loanDetails.acceptedTimestamp,
@@ -826,22 +817,18 @@ contract TellerV2 is
 
         // Calculate the cycle number the last repayment was made
         uint32 lastRepaidTimestamp = lastRepaidTimestamp(_bidId);
-        uint32 delta = lastRepaidTimestamp -
-            bid.loanDetails.acceptedTimestamp;
+        uint32 delta = lastRepaidTimestamp - bid.loanDetails.acceptedTimestamp;
         if (delta > 0) {
             uint32 repaymentCycle = 1 + (delta / bid.terms.paymentCycle);
-            if (
-                bidPaymentCycleType[_bidId] ==
-                PaymentCycleType.Monthly
-            ) {
-                dueDate_ = uint32(BokkyPooBahsDateTimeLibrary.addMonths(
-                    dueDate_,
-                    repaymentCycle
+            if (bidPaymentCycleType[_bidId] == PaymentCycleType.Monthly) {
+                dueDate_ = uint32(
+                    BokkyPooBahsDateTimeLibrary.addMonths(
+                        dueDate_,
+                        repaymentCycle
                     )
                 );
             } else if (
-                bidPaymentCycleType[_bidId] ==
-                PaymentCycleType.Seconds
+                bidPaymentCycleType[_bidId] == PaymentCycleType.Seconds
             ) {
                 dueDate_ += (repaymentCycle * bid.terms.paymentCycle);
             }

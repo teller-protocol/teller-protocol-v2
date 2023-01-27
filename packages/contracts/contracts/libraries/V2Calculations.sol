@@ -132,7 +132,9 @@ library V2Calculations {
         uint32 _paymentCycle,
         uint16 _apr
     ) internal returns (uint256) {
-        uint256 daysInYear = _cycleType == PaymentCycleType.Monthly ? 360 days : 365 days;
+        uint256 daysInYear = _cycleType == PaymentCycleType.Monthly
+            ? 360 days
+            : 365 days;
         if (_type == PaymentType.Bullet) {
             return
                 _principal.percent(_apr).percent(
@@ -141,6 +143,13 @@ library V2Calculations {
                 );
         }
         // Default to PaymentType.EMI
-        return NumbersLib.pmt(_principal, _duration, _paymentCycle, _apr, daysInYear);
+        return
+            NumbersLib.pmt(
+                _principal,
+                _duration,
+                _paymentCycle,
+                _apr,
+                daysInYear
+            );
     }
 }

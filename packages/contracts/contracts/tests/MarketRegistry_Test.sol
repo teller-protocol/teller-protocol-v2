@@ -58,9 +58,8 @@ contract MarketRegistry_Test is Testable, TellerV2 {
             .getMarketplacePaymentCycleType(1);
 
         require(
-            paymentCycle ==
-            PaymentCycleType.Seconds,
-            'Market payment cycle type incorrectly created'
+            paymentCycle == PaymentCycleType.Seconds,
+            "Market payment cycle type incorrectly created"
         );
 
         // Monthly payment cycle

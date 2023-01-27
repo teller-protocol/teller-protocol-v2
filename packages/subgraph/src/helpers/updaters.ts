@@ -42,7 +42,7 @@ export function updateTokenVolumeOnPayment(
   const totalRepaidInterest = tokenVolume.totalRepaidInterest;
   if (totalRepaidInterest) {
     tokenVolume.totalRepaidInterest = totalRepaidInterest.plus(
-        lastInterestPayment
+      lastInterestPayment
     );
     tokenVolume.save();
   }
@@ -80,7 +80,7 @@ export function updateBid(
     bid._lastTotalRepaidInterestAmount
   );
   bid._lastTotalRepaidInterestAmount = _lastInterestPayment.plus(
-      bid._lastTotalRepaidInterestAmount
+    bid._lastTotalRepaidInterestAmount
   );
 
   if (bidState === "Repayment") {
@@ -228,12 +228,22 @@ export function updateOutstandingCapital(
     storedBid.value5.lendingToken,
     market.id
   );
-  updateTokenVolumeOnPayment(_lastPayment, _lastInterestPayment, bidState, tokenVolume);
+  updateTokenVolumeOnPayment(
+    _lastPayment,
+    _lastInterestPayment,
+    bidState,
+    tokenVolume
+  );
   tokenVolume.save();
 
   // Update protocol's overall token volume
   const protocolVolume = loadProtocolTokenVolume(storedBid.value5.lendingToken);
-  updateTokenVolumeOnPayment(_lastPayment, _lastInterestPayment, bidState, protocolVolume);
+  updateTokenVolumeOnPayment(
+    _lastPayment,
+    _lastInterestPayment,
+    bidState,
+    protocolVolume
+  );
   protocolVolume.save();
 
   // Update lender's token volume
@@ -241,7 +251,12 @@ export function updateOutstandingCapital(
     storedBid.value5.lendingToken,
     lender
   );
-  updateTokenVolumeOnPayment(_lastPayment, _lastInterestPayment, bidState, lenderVolume);
+  updateTokenVolumeOnPayment(
+    _lastPayment,
+    _lastInterestPayment,
+    bidState,
+    lenderVolume
+  );
   const earnedLenderInterest = lenderVolume.commissionEarned;
   if (earnedLenderInterest) {
     lenderVolume.commissionEarned = earnedLenderInterest.plus(
@@ -255,7 +270,12 @@ export function updateOutstandingCapital(
     const commitment = Commitment.load(commitmentId);
     if (commitment) {
       const commitmentStats = TokenVolume.load(commitment.stats);
-      updateTokenVolumeOnPayment(_lastPayment, _lastInterestPayment, bidState, commitmentStats!);
+      updateTokenVolumeOnPayment(
+        _lastPayment,
+        _lastInterestPayment,
+        bidState,
+        commitmentStats!
+      );
       if (commitmentStats && commitmentStats.commissionEarned) {
         commitmentStats.commissionEarned = commitmentStats.commissionEarned.plus(
           _lastInterestPayment
@@ -270,7 +290,12 @@ export function updateOutstandingCapital(
     storedBid.value5.lendingToken,
     borrower
   );
-  updateTokenVolumeOnPayment(_lastPayment, _lastInterestPayment, bidState, borrowerVolume);
+  updateTokenVolumeOnPayment(
+    _lastPayment,
+    _lastInterestPayment,
+    bidState,
+    borrowerVolume
+  );
   borrowerVolume.save();
 
   lender.save();

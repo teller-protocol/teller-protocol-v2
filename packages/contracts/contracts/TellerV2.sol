@@ -160,8 +160,12 @@ contract TellerV2 is
     /**
      * @notice Initializes the proxy.
      * @param _protocolFee The fee collected by the protocol for loan processing.
+     * @param _marketRegistry The address of the market registry contract for the protocol.
+     * @param _reputationManager The address of the reputation manager contract.
+     * @param _lenderCommitmentForwarder The address of the lender commitment forwarder contract.
      * @param _lendingTokens The list of tokens allowed as lending assets on the protocol.
      * @param _collateralManagerAddress The address of the collateral manager contracts.
+     * @param _lenderManager The address of the lender manager contract for loans on the protocol.
      */
     function initialize(
         uint16 _protocolFee,
@@ -169,7 +173,8 @@ contract TellerV2 is
         address _reputationManager,
         address _lenderCommitmentForwarder,
         address[] calldata _lendingTokens,
-        address _collateralManagerAddress
+        address _collateralManagerAddress,
+        address _lenderManager
     ) external initializer {
         __ProtocolFee_init(_protocolFee);
 
@@ -179,6 +184,7 @@ contract TellerV2 is
         marketRegistry = IMarketRegistry(_marketRegistry);
         reputationManager = IReputationManager(_reputationManager);
         _setCollateralManager(_collateralManagerAddress);
+        _setLenderManager(_lenderManager);
 
         require(_lendingTokens.length > 0, "No lending tokens specified");
         for (uint256 i = 0; i < _lendingTokens.length; i++) {
@@ -211,6 +217,29 @@ contract TellerV2 is
             "Collateral Manager must be a contract"
         );
         collateralManager = ICollateralManager(_collateralManager);
+    }
+
+    function setLenderManager(address _lenderManager)
+        public
+        reinitializer(CURRENT_CODE_VERSION)
+        onlyOwner
+    {
+        _setLenderManager(_lenderManager);
+    }
+
+    function _setLenderManager(address _lenderManager)
+        internal
+        onlyInitializing
+    {
+        require(
+            address(lenderManager) == address(0),
+            "LenderManager already set"
+        );
+        require(
+            _lenderManager.isContract(),
+            "LenderManager must be a contract"
+        );
+        lenderManager = ILenderManager(_lenderManager);
     }
 
     /**
@@ -465,11 +494,8 @@ contract TellerV2 is
         Bid storage bid = bids[_bidId];
 
         address sender = _msgSenderForMarket(bid.marketplaceId);
-        (bool isVerified, ) = marketRegistry.isVerifiedLender(
-            bid.marketplaceId,
-            sender
-        );
-        require(isVerified, "Not verified lender");
+        // Declare the bid acceptor as the lender of the bid
+        lenderManager.setNewLender(_bidId, sender, bid.marketplaceId);
 
         require(
             !marketRegistry.isMarketClosed(bid.marketplaceId),
@@ -485,9 +511,6 @@ contract TellerV2 is
         // Mark borrower's request as accepted
         bid.state = BidState.ACCEPTED;
 
-        // Declare the bid acceptor as the lender of the bid
-        bid.lender = sender;
-
         // Tell the collateral manager to deploy the escrow and pull funds from the borrower if applicable
         collateralManager.deployAndDeposit(_bidId);
 
@@ -502,28 +525,28 @@ contract TellerV2 is
             amountToMarketplace;
         //transfer fee to protocol
         bid.loanDetails.lendingToken.safeTransferFrom(
-            bid.lender,
+            sender,
             owner(),
             amountToProtocol
         );
 
         //transfer fee to marketplace
         bid.loanDetails.lendingToken.safeTransferFrom(
-            bid.lender,
+            sender,
             marketRegistry.getMarketFeeRecipient(bid.marketplaceId),
             amountToMarketplace
         );
 
         //transfer funds to borrower
         bid.loanDetails.lendingToken.safeTransferFrom(
-            bid.lender,
+            sender,
             bid.receiver,
             amountToBorrower
         );
 
         // Record volume filled by lenders
         lenderVolumeFilled[address(bid.loanDetails.lendingToken)][
-            bid.lender
+            sender
         ] += bid.loanDetails.principal;
         totalVolumeFilled[address(bid.loanDetails.lendingToken)] += bid
             .loanDetails
@@ -533,7 +556,7 @@ contract TellerV2 is
         _borrowerBidsActive[bid.borrower].add(_bidId);
 
         // Emit AcceptedBid
-        emit AcceptedBid(_bidId, bid.lender);
+        emit AcceptedBid(_bidId, sender);
 
         emit FeePaid(_bidId, "protocol", amountToProtocol);
         emit FeePaid(_bidId, "marketplace", amountToMarketplace);
@@ -686,7 +709,7 @@ contract TellerV2 is
         // Send payment to the lender
         bid.loanDetails.lendingToken.safeTransferFrom(
             _msgSenderForMarket(bid.marketplaceId),
-            bid.lender,
+            lenderManager.getActiveLoanLender(_bidId),
             paymentAmount
         );
 
@@ -929,6 +952,7 @@ contract TellerV2 is
     }
 
     /**
+    * @notice NOTE: This function may be removed at some point in the future. Please refer to the Lender Manager Contract for the updated address.
      * @notice Returns the lender address for a given bid.
      * @param _bidId The id of the bid/loan to get the lender for.
      * @return lender_ The address of the lender associated with the bid.
@@ -938,7 +962,7 @@ contract TellerV2 is
         view
         returns (address lender_)
     {
-        lender_ = bids[_bidId].lender;
+        lender_ = bids[_bidId]._lender;
     }
 
     function getLoanLendingToken(uint256 _bidId)

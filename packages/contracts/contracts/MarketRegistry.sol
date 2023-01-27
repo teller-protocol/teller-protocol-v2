@@ -13,9 +13,7 @@ import "@openzeppelin/contracts/utils/Context.sol";
 import "./interfaces/IMarketRegistry.sol";
 
 // Libraries
-import {
-    EnumerableSet
-} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+import { EnumerableSet } from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import { PaymentType } from "./libraries/V2Calculations.sol";
 
 contract MarketRegistry is

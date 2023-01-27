@@ -804,40 +804,38 @@ contract TellerV2 is
         view
         returns (uint32 dueDate_)
     {
+        
         Bid storage bid = bids[_bidId];
         if (bids[_bidId].state != BidState.ACCEPTED) return dueDate_;
 
-        // Start with the original due date being 1 payment cycle since bid was accepted
-        dueDate_ = bid.loanDetails.acceptedTimestamp + bid.terms.paymentCycle;
 
         // Calculate due date if payment cycle is set to monthly
         if (
             bidPaymentCycleType[_bidId] ==
             IMarketRegistry.PaymentCycleType.Monthly
         ) {
+            uint32 lastRepaidTimestamp = lastRepaidTimestamp(_bidId);
+
             dueDate_ = uint32(
                 BokkyPooBahsDateTimeLibrary.addMonths(
-                    bid.loanDetails.acceptedTimestamp,
+                    lastRepaidTimestamp,
                     1
                 )
             );
-        }
+        }else if(
+            bidPaymentCycleType[_bidId] ==
+            IMarketRegistry.PaymentCycleType.Seconds ){ 
+
+
+        // Start with the original due date being 1 payment cycle since bid was accepted
+        dueDate_ = bid.loanDetails.acceptedTimestamp + bid.terms.paymentCycle;
 
         // Calculate the cycle number the last repayment was made
-        uint32 lastRepaidTimestamp = lastRepaidTimestamp(_bidId);
-        uint32 delta = lastRepaidTimestamp -
+        uint32 delta = lastRepaidTimestamp(_bidId) -
             bid.loanDetails.acceptedTimestamp;
         if (delta > 0) {
             uint32 repaymentCycle = 1 + (delta / bid.terms.paymentCycle);
             dueDate_ += (repaymentCycle * bid.terms.paymentCycle);
-            if (
-                BokkyPooBahsDateTimeLibrary.isLeapYear(bid.loanDetails.acceptedTimestamp)
-            ) {
-                (uint year, uint month, uint day) = BokkyPooBahsDateTimeLibrary.timestampToDate(lastRepaidTimestamp);
-                if (month == 2 && day == 29) {
-                    dueDate_ = uint32(BokkyPooBahsDateTimeLibrary.subDays(dueDate_, 1));
-                }
-            }
         }
 
         //if we are in the last payment cycle, the next due date is the end of loan duration
@@ -849,6 +847,12 @@ contract TellerV2 is
                 bid.loanDetails.acceptedTimestamp +
                 bid.loanDetails.loanDuration;
         }
+
+        
+        }
+
+           
+
     }
 
     /**

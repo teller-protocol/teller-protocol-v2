@@ -61,13 +61,13 @@ library V2Calculations {
     }
 
     function calculateAmountOwed(
-        Bid storage _bid,
+        Bid memory _bid,
         uint256 _lastRepaidTimestamp,
         uint256 _timestamp,
         PaymentCycleType _paymentCycleType
     )
         internal
-        view
+        pure
         returns (
             uint256 owedPrincipal_,
             uint256 duePrincipal_,

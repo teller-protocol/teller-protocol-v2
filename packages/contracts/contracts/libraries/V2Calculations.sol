@@ -39,8 +39,9 @@ library V2Calculations {
      * @notice Calculates the amount owed for a loan.
      * @param _bid The loan bid struct to get the owed amount for.
      * @param _timestamp The timestamp at which to get the owed amount at.
+     * @param _paymentCycleType The payment cycle type of the loan (Seconds or Monthly).
      */
-    function calculateAmountOwed(Bid storage _bid, uint256 _timestamp)
+    function calculateAmountOwed(Bid storage _bid, uint256 _timestamp, PaymentCycleType _paymentCycleType)
         internal
         view
         returns (
@@ -52,52 +53,44 @@ library V2Calculations {
         // Total principal left to pay
         return
             calculateAmountOwed(
-                _bid.loanDetails.principal,
-                _bid.loanDetails.totalRepaid.principal,
-                _bid.terms.APR,
-                _bid.terms.paymentCycleAmount,
-                _bid.terms.paymentCycle,
+                _bid,
                 lastRepaidTimestamp(_bid),
                 _timestamp,
-                _bid.loanDetails.acceptedTimestamp,
-                _bid.loanDetails.loanDuration,
-                _bid.paymentType
+                _paymentCycleType
             );
     }
 
     function calculateAmountOwed(
-        uint256 principal,
-        uint256 totalRepaidPrincipal,
-        uint16 _interestRate,
-        uint256 _paymentCycleAmount,
-        uint256 _paymentCycle,
+        Bid storage _bid,
         uint256 _lastRepaidTimestamp,
         uint256 _timestamp,
-        uint256 _startTimestamp,
-        uint256 _loanDuration,
-        PaymentType _paymentType
+        PaymentCycleType _paymentCycleType
     )
         internal
-        pure
+        view
         returns (
             uint256 owedPrincipal_,
             uint256 duePrincipal_,
             uint256 interest_
         )
     {
-        owedPrincipal_ = principal - totalRepaidPrincipal;
+        owedPrincipal_ = _bid.loanDetails.principal - _bid.loanDetails.totalRepaid.principal;
 
-        uint256 interestOwedInAYear = owedPrincipal_.percent(_interestRate);
+        uint256 daysInYear = _paymentCycleType == PaymentCycleType.Monthly
+            ? 360 days
+            : 365 days;
+
+        uint256 interestOwedInAYear = owedPrincipal_.percent(_bid.terms.APR);
         uint256 owedTime = _timestamp - uint256(_lastRepaidTimestamp);
-        interest_ = (interestOwedInAYear * owedTime) / 365 days;
+        interest_ = (interestOwedInAYear * owedTime) / daysInYear;
 
         // Cast to int265 to avoid underflow errors (negative means loan duration has passed)
-        int256 durationLeftOnLoan = int256(_loanDuration) -
-            (int256(_timestamp) - int256(_startTimestamp));
-        bool isLastPaymentCycle = durationLeftOnLoan < int256(_paymentCycle) || // Check if current payment cycle is within or beyond the last one
-            owedPrincipal_ + interest_ <= _paymentCycleAmount; // Check if what is left to pay is less than the payment cycle amount
+        int256 durationLeftOnLoan = int256(uint256(_bid.loanDetails.loanDuration)) -
+            (int256(_timestamp) - int256(uint256(_bid.loanDetails.acceptedTimestamp)));
+        bool isLastPaymentCycle = durationLeftOnLoan < int256(uint256(_bid.terms.paymentCycle)) || // Check if current payment cycle is within or beyond the last one
+            owedPrincipal_ + interest_ <= _bid.terms.paymentCycleAmount; // Check if what is left to pay is less than the payment cycle amount
 
-        if (_paymentType == PaymentType.Bullet) {
+        if (_bid.paymentType == PaymentType.Bullet) {
             if (isLastPaymentCycle) {
                 duePrincipal_ = owedPrincipal_;
             }
@@ -107,10 +100,10 @@ library V2Calculations {
             // NOTE: the last cycle could have less than the calculated payment amount
             uint256 maxCycleOwed = isLastPaymentCycle
                 ? owedPrincipal_ + interest_
-                : _paymentCycleAmount;
+                : _bid.terms.paymentCycleAmount;
 
             // Calculate accrued amount due since last repayment
-            uint256 owedAmount = (maxCycleOwed * owedTime) / _paymentCycle;
+            uint256 owedAmount = (maxCycleOwed * owedTime) / _bid.terms.paymentCycle;
             duePrincipal_ = Math.min(owedAmount - interest_, owedPrincipal_);
         }
     }

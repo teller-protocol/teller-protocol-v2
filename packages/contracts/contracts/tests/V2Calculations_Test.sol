@@ -133,7 +133,7 @@ contract V2Calculations_Test is Testable {
             uint256 duePrincipal;
             uint256 interest;
             (owedPrincipal, duePrincipal, interest) = V2Calculations
-                .calculateAmountOwed(__bid, nowTimestamp);
+                .calculateAmountOwed(__bid, nowTimestamp, _paymentCycleType);
 
             // Check if we should skip this cycle for payments
             if (cyclesToSkip.length() > 0) {
@@ -190,19 +190,20 @@ contract V2Calculations_Test is Testable {
         uint256 principal = 24486571879936808846;
         uint256 repaidPrincipal = 23410087846643631232;
         uint16 interestRate = 3000;
+        __bid.loanDetails.principal = principal;
+        __bid.terms.APR = interestRate;
+        __bid.loanDetails.totalRepaid.principal = repaidPrincipal;
+        __bid.terms.paymentCycleAmount = 8567977538702439153;
+        __bid.terms.paymentCycle = 2592000;
+        __bid.loanDetails.acceptedTimestamp = 1646159355;
+        __bid.paymentType = PaymentType.EMI;
 
         (uint256 _owedPrincipal, uint256 _duePrincipal, uint256 _interest) = V2Calculations
             .calculateAmountOwed(
-                principal, //owed principal
-                repaidPrincipal,
-                interestRate,
-                8567977538702439153, //payment cycle amount
-                2592000, ///payment Cycle
+                __bid,
                 1658159355, // last repaid timestamp
                 1663189241, //timestamp
-                1646159355, // accepted timestamp
-                __bid.loanDetails.loanDuration, // duration
-                PaymentType.EMI // market payment type
+                PaymentCycleType.Seconds
             );
 
         console.log("calc amt owed test ");
@@ -225,6 +226,15 @@ contract V2Calculations_Test is Testable {
         uint256 _principal = 100000e6;
         uint256 _repaidPrincipal = 0;
         uint16 _apr = 3000;
+        uint256 _acceptedTimestamp = 1646159355;
+        uint256 _lastRepaidTimestamp = _acceptedTimestamp;
+        __bid.loanDetails.principal = _principal;
+        __bid.terms.APR = _apr;
+        __bid.loanDetails.totalRepaid.principal = _repaidPrincipal;
+        __bid.terms.paymentCycleAmount = 8567977538702439153;
+        __bid.terms.paymentCycle = 2592000;
+        __bid.loanDetails.acceptedTimestamp = uint32(_acceptedTimestamp);
+        __bid.paymentType = PaymentType.Bullet;
         uint256 _paymentCycleAmount = V2Calculations
             .calculatePaymentCycleAmount(
                 PaymentType.Bullet,
@@ -234,24 +244,17 @@ contract V2Calculations_Test is Testable {
                 365 days / 12,
                 _apr
             );
-        uint256 _acceptedTimestamp = 1646159355;
-        uint256 _lastRepaidTimestamp = _acceptedTimestamp;
+        __bid.terms.paymentCycleAmount = _paymentCycleAmount;
 
         // Within the first payment cycle
         uint256 _timestamp = _acceptedTimestamp + ((365 days / 12) / 2);
 
         (uint256 _owedPrincipal, uint256 _duePrincipal, uint256 _interest) = V2Calculations
             .calculateAmountOwed(
-                _principal,
-                _repaidPrincipal,
-                _apr,
-                _paymentCycleAmount,
-                365 days / 12, // paymentCycle
+                __bid,
                 _lastRepaidTimestamp,
                 _timestamp,
-                _acceptedTimestamp,
-                365 days, // loan duration
-                PaymentType.Bullet
+                PaymentCycleType.Seconds
             );
 
         Test.eq(
@@ -265,18 +268,15 @@ contract V2Calculations_Test is Testable {
         // Within random payment cycle
         _timestamp = _acceptedTimestamp + ((365 days / 12) * 3);
 
+        __bid.terms.paymentCycle = 365 days / 12;
+        __bid.loanDetails.loanDuration = 365 days;
+
         (_owedPrincipal, _duePrincipal, _interest) = V2Calculations
             .calculateAmountOwed(
-                _principal,
-                _repaidPrincipal,
-                _apr,
-                _paymentCycleAmount,
-                365 days / 12, // paymentCycle
+                __bid,
                 _lastRepaidTimestamp,
                 _timestamp,
-                _acceptedTimestamp,
-                365 days, // loan duration
-                PaymentType.Bullet
+                PaymentCycleType.Seconds
             );
 
         Test.eq(
@@ -296,16 +296,10 @@ contract V2Calculations_Test is Testable {
 
         (_owedPrincipal, _duePrincipal, _interest) = V2Calculations
             .calculateAmountOwed(
-                _principal,
-                _repaidPrincipal,
-                _apr,
-                _paymentCycleAmount,
-                365 days / 12, // paymentCycle
+                __bid,
                 _lastRepaidTimestamp,
                 _timestamp,
-                _acceptedTimestamp,
-                365 days, // loan duration
-                PaymentType.Bullet
+                PaymentCycleType.Seconds
             );
 
         Test.eq(
@@ -329,16 +323,10 @@ contract V2Calculations_Test is Testable {
 
         (_owedPrincipal, _duePrincipal, _interest) = V2Calculations
             .calculateAmountOwed(
-                _principal,
-                _repaidPrincipal,
-                _apr,
-                _paymentCycleAmount,
-                365 days / 12, // paymentCycle
+                __bid,
                 _lastRepaidTimestamp,
                 _timestamp,
-                _acceptedTimestamp,
-                365 days, // loan duration
-                PaymentType.Bullet
+                PaymentCycleType.Seconds
             );
 
         Test.eq(

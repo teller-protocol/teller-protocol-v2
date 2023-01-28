@@ -562,7 +562,7 @@ contract TellerV2 is
             uint256 owedPrincipal,
             uint256 duePrincipal,
             uint256 interest
-        ) = V2Calculations.calculateAmountOwed(bids[_bidId], block.timestamp);
+        ) = V2Calculations.calculateAmountOwed(bids[_bidId], block.timestamp, bidPaymentCycleType[_bidId]);
         _repayLoan(
             _bidId,
             Payment({ principal: duePrincipal, interest: interest }),
@@ -579,7 +579,7 @@ contract TellerV2 is
         acceptedLoan(_bidId, "repayLoan")
     {
         (uint256 owedPrincipal, , uint256 interest) = V2Calculations
-            .calculateAmountOwed(bids[_bidId], block.timestamp);
+            .calculateAmountOwed(bids[_bidId], block.timestamp, bidPaymentCycleType[_bidId]);
         _repayLoan(
             _bidId,
             Payment({ principal: owedPrincipal, interest: interest }),
@@ -601,7 +601,7 @@ contract TellerV2 is
             uint256 owedPrincipal,
             uint256 duePrincipal,
             uint256 interest
-        ) = V2Calculations.calculateAmountOwed(bids[_bidId], block.timestamp);
+        ) = V2Calculations.calculateAmountOwed(bids[_bidId], block.timestamp, bidPaymentCycleType[_bidId]);
         uint256 minimumOwed = duePrincipal + interest;
 
         // If amount is less than minimumOwed, we revert
@@ -644,7 +644,7 @@ contract TellerV2 is
         Bid storage bid = bids[_bidId];
 
         (uint256 owedPrincipal, , uint256 interest) = V2Calculations
-            .calculateAmountOwed(bid, block.timestamp);
+            .calculateAmountOwed(bid, block.timestamp, bidPaymentCycleType[_bidId]);
         _repayLoan(
             _bidId,
             Payment({ principal: owedPrincipal, interest: interest }),
@@ -724,7 +724,7 @@ contract TellerV2 is
         if (bids[_bidId].state != BidState.ACCEPTED) return owed;
 
         (uint256 owedPrincipal, , uint256 interest) = V2Calculations
-            .calculateAmountOwed(bids[_bidId], block.timestamp);
+            .calculateAmountOwed(bids[_bidId], block.timestamp, bidPaymentCycleType[_bidId]);
         owed.principal = owedPrincipal;
         owed.interest = interest;
     }
@@ -746,7 +746,7 @@ contract TellerV2 is
         ) return owed;
 
         (uint256 owedPrincipal, , uint256 interest) = V2Calculations
-            .calculateAmountOwed(bid, _timestamp);
+            .calculateAmountOwed(bid, _timestamp, bidPaymentCycleType[_bidId]);
         owed.principal = owedPrincipal;
         owed.interest = interest;
     }
@@ -763,7 +763,7 @@ contract TellerV2 is
         if (bids[_bidId].state != BidState.ACCEPTED) return due;
 
         (, uint256 duePrincipal, uint256 interest) = V2Calculations
-            .calculateAmountOwed(bids[_bidId], block.timestamp);
+            .calculateAmountOwed(bids[_bidId], block.timestamp, bidPaymentCycleType[_bidId]);
         due.principal = duePrincipal;
         due.interest = interest;
     }
@@ -785,7 +785,7 @@ contract TellerV2 is
         ) return due;
 
         (, uint256 duePrincipal, uint256 interest) = V2Calculations
-            .calculateAmountOwed(bid, _timestamp);
+            .calculateAmountOwed(bid, _timestamp, bidPaymentCycleType[_bidId]);
         due.principal = duePrincipal;
         due.interest = interest;
     }

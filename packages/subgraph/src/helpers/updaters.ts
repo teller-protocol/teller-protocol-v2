@@ -27,6 +27,7 @@ import {
 
 export function updateTokenVolumeOnPayment(
   lastPayment: BigInt,
+  lastInterestPayment: BigInt,
   bidState: string,
   tokenVolume: TokenVolume
 ): void {
@@ -37,6 +38,15 @@ export function updateTokenVolumeOnPayment(
       tokenVolume.outstandingCapital = BigInt.zero();
     }
   }
+
+  const totalRepaidInterest = tokenVolume.totalRepaidInterest;
+  if (totalRepaidInterest) {
+    tokenVolume.totalRepaidInterest = totalRepaidInterest.plus(
+      lastInterestPayment
+    );
+    tokenVolume.save();
+  }
+
   if (bidState == "Repaid") {
     const activeTokenLoanCount = tokenVolume.activeLoans;
     if (activeTokenLoanCount) {
@@ -69,22 +79,9 @@ export function updateBid(
   const _lastInterestPayment = storedBid.value5.totalRepaid.interest.minus(
     bid._lastTotalRepaidInterestAmount
   );
-  if (_lastInterestPayment) {
-    bid._lastTotalRepaidInterestAmount = _lastInterestPayment.plus(
-      bid._lastTotalRepaidInterestAmount
-    );
-    const tokenVolume = loadTokenVolumeByMarketId(
-      storedBid.value5.lendingToken,
-      storedBid.value3.toHexString()
-    );
-    const totalRepaidInterest = tokenVolume.totalRepaidInterest;
-    if (totalRepaidInterest) {
-      tokenVolume.totalRepaidInterest = totalRepaidInterest.plus(
-        _lastInterestPayment
-      );
-      tokenVolume.save();
-    }
-  }
+  bid._lastTotalRepaidInterestAmount = _lastInterestPayment.plus(
+    bid._lastTotalRepaidInterestAmount
+  );
 
   if (bidState === "Repayment") {
     bid.nextDueDate = tellerV2Instance.calculateNextDueDate(bid.bidId);
@@ -231,12 +228,22 @@ export function updateOutstandingCapital(
     storedBid.value5.lendingToken,
     market.id
   );
-  updateTokenVolumeOnPayment(_lastPayment, bidState, tokenVolume);
+  updateTokenVolumeOnPayment(
+    _lastPayment,
+    _lastInterestPayment,
+    bidState,
+    tokenVolume
+  );
   tokenVolume.save();
 
   // Update protocol's overall token volume
   const protocolVolume = loadProtocolTokenVolume(storedBid.value5.lendingToken);
-  updateTokenVolumeOnPayment(_lastPayment, bidState, protocolVolume);
+  updateTokenVolumeOnPayment(
+    _lastPayment,
+    _lastInterestPayment,
+    bidState,
+    protocolVolume
+  );
   protocolVolume.save();
 
   // Update lender's token volume
@@ -244,7 +251,12 @@ export function updateOutstandingCapital(
     storedBid.value5.lendingToken,
     lender
   );
-  updateTokenVolumeOnPayment(_lastPayment, bidState, lenderVolume);
+  updateTokenVolumeOnPayment(
+    _lastPayment,
+    _lastInterestPayment,
+    bidState,
+    lenderVolume
+  );
   const earnedLenderInterest = lenderVolume.commissionEarned;
   if (earnedLenderInterest) {
     lenderVolume.commissionEarned = earnedLenderInterest.plus(
@@ -258,7 +270,12 @@ export function updateOutstandingCapital(
     const commitment = Commitment.load(commitmentId);
     if (commitment) {
       const commitmentStats = TokenVolume.load(commitment.stats);
-      updateTokenVolumeOnPayment(_lastPayment, bidState, commitmentStats!);
+      updateTokenVolumeOnPayment(
+        _lastPayment,
+        _lastInterestPayment,
+        bidState,
+        commitmentStats!
+      );
       if (commitmentStats && commitmentStats.commissionEarned) {
         commitmentStats.commissionEarned = commitmentStats.commissionEarned.plus(
           _lastInterestPayment
@@ -273,7 +290,12 @@ export function updateOutstandingCapital(
     storedBid.value5.lendingToken,
     borrower
   );
-  updateTokenVolumeOnPayment(_lastPayment, bidState, borrowerVolume);
+  updateTokenVolumeOnPayment(
+    _lastPayment,
+    _lastInterestPayment,
+    bidState,
+    borrowerVolume
+  );
   borrowerVolume.save();
 
   lender.save();

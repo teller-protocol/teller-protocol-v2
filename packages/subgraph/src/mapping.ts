@@ -916,3 +916,29 @@ export function handleCollateralClaimeds(events: CollateralClaimed[]): void {
     handleCollateralClaimed(event);
   });
 }
+
+/**
+ * Sets a new lender when a bid is accepted or the ownership of a loan is transferred.
+ * @param event NewLenderSet
+ */
+export function handleNewLenderSet(event: NewLenderSet): void {
+  const bid = loadBidById(event.params._bidId.toString());
+  bid.lenderAddress = event.params.lender
+
+  const lender: Lender = loadLenderByMarketId(
+      event.params.lender,
+      bid.marketplaceId.toString(),
+      event.block.timestamp
+  );
+  const lenderBid = new LenderBid(lender.id.concat(bid.id));
+  lenderBid.bid = bid.id;
+  lenderBid.lender = lender.id;
+  lenderBid.save();
+  bid.save();
+}
+
+export function handleNewLenderSets(events: NewLenderSet[]): void {
+  events.forEach(event => {
+    handleNewLenderSet(event);
+  })
+}

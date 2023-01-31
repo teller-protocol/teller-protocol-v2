@@ -7,5 +7,7 @@
   "address_lender_commitment": "0x1727ADd0680412e839c500ccE4a2A20e3d96fF5C",
   "block_lender_commitment": "31180303",
   "address_collateral_manager": "0x76888a882a4fF57455B5e74B791DD19DF3ba51Bb",
-  "block_collateral_manager": "38446245"
+  "block_collateral_manager": "38446245",
+  "address_lender_manager": "",
+  "block_lender_manager": ""
 }

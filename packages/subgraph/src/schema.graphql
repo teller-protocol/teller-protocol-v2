@@ -34,6 +34,7 @@ type Bid @entity {
   expiresAt: BigInt!
   updatedAt: BigInt
   transactionHash: String!
+  fundedTx: FundedTx! @derivedFrom(field: "bid")
 
   borrowerAddress: Bytes!
   borrower: BorrowerBid! @derivedFrom(field: "bid")
@@ -79,6 +80,12 @@ type Collateral @entity {
   bid: Bid!
   status: String
   receiver: Bytes
+}
+
+type FundedTx @entity {
+  id: ID!
+  bid: Bid!
+  timestamp: BigInt!
 }
 
 type Payment @entity {

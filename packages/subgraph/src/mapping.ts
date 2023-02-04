@@ -37,6 +37,7 @@ import {
   Bid,
   Borrower,
   BorrowerBid,
+  FundedTx,
   Lender,
   LenderBid,
   MarketPlace,
@@ -175,6 +176,11 @@ export function handleAcceptedBid(event: AcceptedBid): void {
   lenderBid.bid = bid.id;
   lenderBid.lender = lender.id;
   lenderBid.save();
+
+  const fundedTx = new FundedTx(event.transaction.hash.toHex());
+  fundedTx.bid = bid.id;
+  fundedTx.timestamp = event.block.timestamp;
+  fundedTx.save();
 
   bid.updatedAt = event.block.timestamp;
   bid.transactionHash = event.transaction.hash.toHex();

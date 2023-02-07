@@ -34,7 +34,7 @@ type Bid @entity {
   expiresAt: BigInt!
   updatedAt: BigInt
   transactionHash: String!
-  fundedTx: FundedTx! @derivedFrom(field: "bid")
+  fundedTx: FundedTx @derivedFrom(field: "bid")
 
   borrowerAddress: Bytes!
   borrower: BorrowerBid! @derivedFrom(field: "bid")
@@ -42,7 +42,7 @@ type Bid @entity {
   receiverAddress: Bytes!
 
   lenderAddress: Bytes
-  lender: LenderBid! @derivedFrom(field: "bid")
+  lender: LenderBid @derivedFrom(field: "bid")
 
   marketplaceId: BigInt!
   metadataURI: String!

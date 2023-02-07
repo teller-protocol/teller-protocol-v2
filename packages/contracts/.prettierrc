@@ -3,7 +3,6 @@
     {
       "files": "*.sol",
       "options": {
-        "compiler": "0.8.6",
         "explicitTypes": "always",
 
         "printWidth": 80,

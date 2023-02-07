@@ -11,10 +11,7 @@ import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "../interfaces/IWETH.sol";
-import {
-    CollateralType,
-    CollateralEscrowV1
-} from "../escrow/CollateralEscrowV1.sol";
+import { CollateralType, CollateralEscrowV1 } from "../escrow/CollateralEscrowV1.sol";
 
 contract CollateralEscrow_Test is Testable {
     BeaconProxy private proxy_;

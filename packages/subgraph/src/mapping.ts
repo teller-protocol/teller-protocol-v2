@@ -27,6 +27,7 @@ import {
   SetMarketFeeRecipient,
   SetMarketLenderAttestation,
   SetMarketOwner,
+  SetMarketPaymentType,
   SetMarketURI,
   SetPaymentCycleDuration,
   SetPaymentDefaultDuration,
@@ -36,6 +37,7 @@ import {
   Bid,
   Borrower,
   BorrowerBid,
+  FundedTx,
   Lender,
   LenderBid,
   MarketPlace,
@@ -174,6 +176,11 @@ export function handleAcceptedBid(event: AcceptedBid): void {
   lenderBid.bid = bid.id;
   lenderBid.lender = lender.id;
   lenderBid.save();
+
+  const fundedTx = new FundedTx(event.transaction.hash.toHex());
+  fundedTx.bid = bid.id;
+  fundedTx.timestamp = event.block.timestamp;
+  fundedTx.save();
 
   bid.updatedAt = event.block.timestamp;
   bid.transactionHash = event.transaction.hash.toHex();
@@ -791,6 +798,27 @@ export function handleExercisedCommitments(
 ): void {
   events.forEach(event => {
     handleExercisedCommitment(event);
+  });
+}
+
+export function handleSetMarketPaymentType(event: SetMarketPaymentType): void {
+  const marketPlace: MarketPlace = loadMarketById(
+    event.params.marketId.toString()
+  );
+  if (event.params.paymentType == i32(0)) {
+    marketPlace.paymentType = "EMI";
+  } else if (event.params.paymentType == i32(1)) {
+    marketPlace.paymentType = "Bullet";
+  }
+
+  marketPlace.save();
+}
+
+export function handleSetMarketPaymentTypes(
+  events: SetMarketPaymentType[]
+): void {
+  events.forEach(event => {
+    handleSetMarketPaymentType(event);
   });
 }
 

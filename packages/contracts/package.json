@@ -1,6 +1,6 @@
 {
   "name": "@teller-protocol/v2-contracts",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "license": "MIT",
   "scripts": {
     "test": "DISABLE_LOGS=true TS_NODE_TRANSPILE_ONLY=1 TESTING=1 yarn hh test",
@@ -8,8 +8,8 @@
     "shell": "yarn solidity-shell",
     "chain": "yarn hh node --no-deploy",
     "compile": "COMPILING=true yarn hh compile",
+    "build": "yarn clean && yarn compile --force && yarn tsc",
     "verify": "yarn hh verify --network polygon",
-    "build": "yarn compile --force && yarn tsc",
     "migrate:new": "scripts/contract-migration/create-new.sh write",
     "migrate:new:upgrade": "scripts/contract-migration/create-new.sh upgrade",
     "migrate": "yarn hh deploy --tags migration",
@@ -30,11 +30,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/teller-protocol/v2-pilot",
-    "directory": "packages/hardhat-ts"
+    "url": "https://github.com/teller-protocol/teller-protocol-v2.git",
+    "directory": "packages/contracts"
   },
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com",
+    "registry": "https://registry.npmjs.org/",
     "access": "public"
   },
   "files": [
@@ -58,8 +58,8 @@
     "@openzeppelin/contracts-upgradeable": "^4.5.2",
     "@openzeppelin/hardhat-upgrades": "^1.21.0",
     "@tenderly/hardhat-tenderly": "1.1.6",
-    "@typechain/ethers-v5": "^7.0.1",
-    "@typechain/hardhat": "^2.0.2",
+    "@typechain/ethers-v5": "^10.2.0",
+    "@typechain/hardhat": "^6.1.5",
     "@types/chai": "^4.2.22",
     "@types/chai-as-promised": "^7.1.5",
     "@types/ethereumjs-abi": "^0.6.3",
@@ -108,7 +108,7 @@
     "solidity-shell": "^0.0.11",
     "ts-node": "^10.3.0",
     "tsconfig-paths": "^3.11.0",
-    "typechain": "^5.1.1",
+    "typechain": "^8.1.1",
     "typescript": "^4.3.4"
   },
   "installConfig": {

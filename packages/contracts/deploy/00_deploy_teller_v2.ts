@@ -49,7 +49,7 @@ const deployFn: DeployFunction = async (hre) => {
     proxy: {
       proxyContract: 'OpenZeppelinTransparentProxy',
     },
-    skipIfAlreadyDeployed: true,
+    skipIfAlreadyDeployed: false,
     hre,
   })
 

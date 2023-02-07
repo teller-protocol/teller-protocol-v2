@@ -68,7 +68,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         collateralTokenAddress = address(
             0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174
         );
-        maxPrincipalPerCollateralAmount = 10000 * PRINCIPAL_PER_COLLATERAL_EXPANSION_FACTOR;
+        maxPrincipalPerCollateralAmount = 1 * PRINCIPAL_PER_COLLATERAL_EXPANSION_FACTOR;
         collateralTokenType = CollateralType.ERC20;
 
         marketOwner.setTrustedMarketForwarder(marketId, address(this));
@@ -160,7 +160,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         uint256 bidId = marketOwner._acceptCommitment(
             commitmentId,
             marketId,
-            maxAmount - 100,
+            maxAmount - 100, //principal 
             maxAmount, //collateralAmount
             0, //collateralTokenId
             maxLoanDuration,
@@ -190,6 +190,33 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         );
 
         Test.eq(commitment.maxPrincipal == 0, true, "commitment not accepted");
+    }
+
+
+    function getRequiredCollateral_test() public {
+
+        //For each 1 ETH collateral, can withdraw loan of 2000 USDC
+        Test.eq(
+            super.getRequiredCollateral(2 * 10**9,5 * 10**8 * PRINCIPAL_PER_COLLATERAL_EXPANSION_FACTOR),
+            10**18, //requires 1 ETH 
+            "Unexpected result for getRequiredCollateral"
+        );
+
+       
+        //For each 2000 usdc collateral, can withdraw loan of 1 eth
+        Test.eq(
+            super.getRequiredCollateral(10**18,2 * 10**7),
+            2 * 10**9, //requires 2000 USDC 
+            "Unexpected result for getRequiredCollateral"
+        );
+
+       //For each 2000 usdc collateral, can withdraw loan of 1 eth -- smallest possible loan is 10**10 wei principal 
+         Test.eq(
+            super.getRequiredCollateral(10**10,2 * 10**7),
+            2 * 10**1,  
+            "Unexpected result for getRequiredCollateral"
+        );
+
     }
 
     /*

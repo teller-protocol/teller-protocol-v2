@@ -13,7 +13,7 @@ import {
 contract LenderCommitmentForwarder is TellerV2MarketForwarder {
 
 
-    uint256 public immutable PRINCIPAL_PER_COLLATERAL_EXPANSION_FACTOR = 100000000;
+    uint256 public constant PRINCIPAL_PER_COLLATERAL_EXPANSION_FACTOR = 10**16;
 
 
     /**
@@ -36,7 +36,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint32 maxDuration;
         uint16 minInterestRate;
         address collateralTokenAddress;
-        uint256 maxPrincipalPerCollateralAmount; //zero means infinite . This is expressed using 8 decimals [PRINCIPAL_PER_COLLATERAL_EXPANSION_FACTOR] so 1 wei is 10^8 and  1 usdc is 10^14 
+        uint256 maxPrincipalPerCollateralAmount; //zero means infinite . This is expressed using 16 decimals [PRINCIPAL_PER_COLLATERAL_EXPANSION_FACTOR] so 1 wei is 10^16 and 1 usdc is 10^22 
         CollateralType collateralTokenType; //erc721, erc1155 or erc20
         address lender;
         uint256 marketId;
@@ -319,10 +319,9 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         );
 
         require(
-            commitment.maxPrincipalPerCollateralAmount == 0 ||
-                _collateralAmount *
-                    (commitment.maxPrincipalPerCollateralAmount) >=
-                _principalAmount * PRINCIPAL_PER_COLLATERAL_EXPANSION_FACTOR,
+            commitment.maxPrincipalPerCollateralAmount == 0 || 
+                _collateralAmount >= getRequiredCollateral(_principalAmount, commitment.maxPrincipalPerCollateralAmount),
+
             "Insufficient collateral"
         );
 
@@ -351,6 +350,10 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             _principalAmount,
             bidId
         );
+    }
+
+    function getRequiredCollateral(uint256 _principalAmount, uint256 _maxPrincipalPerCollateralAmount) public view returns (uint256 _collateralAmountRaw) {
+        _collateralAmountRaw= (_principalAmount * _maxPrincipalPerCollateralAmount) /  PRINCIPAL_PER_COLLATERAL_EXPANSION_FACTOR  ;
     }
 
     function _submitBidFromCommitment(

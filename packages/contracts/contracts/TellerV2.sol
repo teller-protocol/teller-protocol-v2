@@ -495,7 +495,7 @@ contract TellerV2 is
 
         address sender = _msgSenderForMarket(bid.marketplaceId);
         // Declare the bid acceptor as the lender of the bid
-        lenderManager.setNewLender(_bidId, sender, bid.marketplaceId);
+        lenderManager.registerLoan(_bidId, sender, bid.marketplaceId);
 
         require(
             !marketRegistry.isMarketClosed(bid.marketplaceId),
@@ -978,6 +978,14 @@ contract TellerV2 is
         returns (address token_)
     {
         token_ = address(bids[_bidId].loanDetails.lendingToken);
+    }
+
+     function getLoanMarketId(uint256 _bidId)
+        external
+        view
+        returns (uint256 _marketId)
+    {
+        _marketId = bids[_bidId].marketplaceId;
     }
 
     /** OpenZeppelin Override Functions **/

@@ -6,7 +6,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/metatx/ERC2771ContextUpgradeable.sol";
 
-import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
+import "./LenderManager/ERC721UpgradeableMod.sol";
 
 // Interfaces
 import "./interfaces/ILenderManager.sol";
@@ -17,17 +17,17 @@ contract LenderManager is
 Initializable,
 OwnableUpgradeable,
 ERC2771ContextUpgradeable,
-ERC721Upgradeable,
+ERC721UpgradeableMod,
 ILenderManager
 {
     IMarketRegistry public immutable marketRegistry;
 
     // Mapping of loans to current active lenders - using erc721 now 
    // mapping(uint256 => address) internal _loanActiveLender;
-
+ 
 
     /** Events **/
-    event NewLenderSet(address indexed newLender, uint256 bidId);
+    event NewLoanRegistered(address indexed newLender, uint256 bidId);
 
     constructor(address _trustedForwarder, address _marketRegistry)
     ERC2771ContextUpgradeable(_trustedForwarder)
@@ -45,19 +45,20 @@ ILenderManager
         __ERC721_init("TellerLoan", "TLN");
     }
 
+
     /**
-     * @notice Sets the new active lender for a loan.
+     * @notice Registers a new active lender for a loan, minting the nft
      * @param _bidId The id for the loan to set.
      * @param _newLender The address of the new active lender.
      * @param _marketId The Id of the corresponding market.
      */
-    function setNewLender(uint256 _bidId, address _newLender, uint256 _marketId)
+    function registerLoan(uint256 _bidId, address _newLender, uint256 _marketId )
     public
     override
     {
         address currentLender = _getActiveLender(_bidId);
         if (currentLender == address(0)) {
-            _checkOwner();
+            _checkOwner(); //why is this necessary 
         } else {
             require(currentLender == _msgSender(), "Not loan owner");
         }
@@ -69,11 +70,12 @@ ILenderManager
         if (currentLender != _newLender) {
 
             _safeMint(_newLender,_bidId);
-
-        //    _loanActiveLender[_bidId] = _newLender;
-            emit NewLenderSet(_newLender, _bidId);
+ 
+            emit NewLoanRegistered(_newLender, _bidId);
         }
     }
+
+    
 
     /**
      * @notice Returns the address of the lender that owns a given loan/bid.
@@ -107,6 +109,72 @@ ILenderManager
         }
        
     }
+
+    function _getLoanMarketId(uint256 _bidId)
+    internal
+    view
+    returns (uint256)
+    { 
+        return ITellerV2(owner()).getLoanMarketId(_bidId); 
+    }
+
+
+
+    function _hasMarketApproval(address guy, uint256 _bidId) 
+    internal
+    view 
+    returns (bool)
+    {
+        //address currentLender = _getActiveLender(_bidId);
+        //require(currentLender == _msgSender(), "Not loan owner");
+
+        uint256 marketId = _getLoanMarketId(_bidId);
+
+        (bool isVerified, ) = marketRegistry.isVerifiedLender(
+            marketId,
+            guy
+        );
+
+        return isVerified;
+    }
+
+
+    /**  ERC721 Functions **/
+
+     /**
+     * @dev See {IERC721-transferFrom}.
+     */
+    function transferFrom(address from, address to, uint256 tokenId) public virtual override {
+
+        require(_hasMarketApproval(to,tokenId), "Not approved by market");
+
+        //solhint-disable-next-line max-line-length
+        require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721: caller is not token owner or approved");
+
+        _transfer(from, to, tokenId);
+    }
+
+    /**
+     * @dev See {IERC721-safeTransferFrom}.
+     */
+    function safeTransferFrom(address from, address to, uint256 tokenId) public virtual override {
+        safeTransferFrom(from, to, tokenId, "");
+    }
+
+    /**
+     * @dev See {IERC721-safeTransferFrom}.
+     */
+    function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory data) public virtual override {
+        require(_hasMarketApproval(to,tokenId), "Not approved by market");
+
+        require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721: caller is not token owner or approved");
+        _safeTransfer(from, to, tokenId, data);
+    }
+
+    function _baseURI() internal view override returns (string memory) {
+        return "";
+    }
+
 
     /** OpenZeppelin Override Functions **/
 

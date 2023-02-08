@@ -32,9 +32,10 @@ contract ActivatableLenderManager is LenderManager {
             "Array lengths mismatch"
         );
         for (uint i = 0; i < _initialActiveBidIds.length; i++) {
-            _loanActiveLender[
-            _initialActiveBidIds[i]
-            ] = _initialActiveLenderArray[i];
+
+            _safeMint(_initialActiveLenderArray[i],_initialActiveBidIds[i]);
+
+            
         }
     }
 }

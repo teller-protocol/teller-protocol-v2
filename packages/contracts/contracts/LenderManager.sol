@@ -6,6 +6,8 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/metatx/ERC2771ContextUpgradeable.sol";
 
+import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
+
 // Interfaces
 import "./interfaces/ILenderManager.sol";
 import "./interfaces/ITellerV2.sol";
@@ -15,12 +17,14 @@ contract LenderManager is
 Initializable,
 OwnableUpgradeable,
 ERC2771ContextUpgradeable,
+ERC721Upgradeable,
 ILenderManager
 {
     IMarketRegistry public immutable marketRegistry;
 
-    // Mapping of loans to current active lenders
-    mapping(uint256 => address) internal _loanActiveLender;
+    // Mapping of loans to current active lenders - using erc721 now 
+   // mapping(uint256 => address) internal _loanActiveLender;
+
 
     /** Events **/
     event NewLenderSet(address indexed newLender, uint256 bidId);
@@ -33,10 +37,12 @@ ILenderManager
 
     function initialize() external initializer {
         __LenderManager_init();
+        
     }
 
     function __LenderManager_init() internal onlyInitializing {
         __Ownable_init();
+        __ERC721_init("TellerLoan", "TLN");
     }
 
     /**
@@ -61,7 +67,10 @@ ILenderManager
         );
         require(isVerified, "New lender not verified");
         if (currentLender != _newLender) {
-            _loanActiveLender[_bidId] = _newLender;
+
+            _safeMint(_newLender,_bidId);
+
+        //    _loanActiveLender[_bidId] = _newLender;
             emit NewLenderSet(_newLender, _bidId);
         }
     }
@@ -90,10 +99,13 @@ ILenderManager
     view
     returns (address lender_)
     {
-        lender_ = _loanActiveLender[_bidId];
-        if (lender_ == address(0)) {
-            lender_ = ITellerV2(owner()).getLoanLender(_bidId);
+        if(_exists(_bidId)){
+            return ownerOf(_bidId);
+        }else{
+            //CAUTION: If a loan NFT is burned, this branch of code will be executed
+            return ITellerV2(owner()).getLoanLender(_bidId);
         }
+       
     }
 
     /** OpenZeppelin Override Functions **/

@@ -495,7 +495,7 @@ contract TellerV2 is
 
         address sender = _msgSenderForMarket(bid.marketplaceId);
         // Declare the bid acceptor as the lender of the bid
-        lenderManager.registerLoan(_bidId, sender, bid.marketplaceId);
+        lenderManager.registerLoan(_bidId, sender);
 
         require(
             !marketRegistry.isMarketClosed(bid.marketplaceId),

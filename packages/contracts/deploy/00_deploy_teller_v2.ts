@@ -1,9 +1,8 @@
-import { upgrades } from 'hardhat'
 import { DeployFunction } from 'hardhat-deploy/dist/types'
 import { HARDHAT_NETWORK_NAME } from 'hardhat/plugins'
 import { deploy } from 'helpers/deploy-helpers'
 import { isInitialized } from 'helpers/oz-contract-helpers'
-import { TellerV2 } from 'types/typechain'
+import { CollateralManager, UpgradeableBeacon } from 'types/typechain'
 
 import { getTokens } from '~~/config'
 
@@ -58,15 +57,23 @@ const deployFn: DeployFunction = async (hre) => {
     hre,
   })
 
-  const collateralEscrowBeacon = await deploy({
+  const collateralEscrowBeacon = await deploy<UpgradeableBeacon>({
     contract: 'UpgradeableBeacon',
     name: 'CollateralEscrowBeacon',
     args: [collateralEscrowBeaconImpl.address],
     skipIfAlreadyDeployed: true,
     hre,
   })
+  if (collateralEscrowBeaconImpl.deployResult.newlyDeployed) {
+    hre.log(
+      `Upgrading CollateralEscrow beacon to ${collateralEscrowBeaconImpl.address}... `,
+      { indent: 2, star: true, nl: false }
+    )
+    await collateralEscrowBeacon.upgradeTo(collateralEscrowBeaconImpl.address)
+    hre.log(`done`)
+  }
 
-  const collateralManager = await deploy({
+  const collateralManager = await deploy<CollateralManager>({
     contract: 'CollateralManager',
     args: [],
     skipIfAlreadyDeployed: false,

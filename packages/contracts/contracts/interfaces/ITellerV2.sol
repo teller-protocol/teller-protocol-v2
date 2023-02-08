@@ -127,7 +127,7 @@ interface ITellerV2 {
         view
         returns (address token_);
 
-    function getLoanLMarketId(uint256 _bidId)
+    function getLoanMarketId(uint256 _bidId)
         external
         view
         returns (uint256);

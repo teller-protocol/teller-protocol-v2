@@ -168,6 +168,14 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
         lender_ = bids[_bidId]._lender;
     }
 
+    function getLoanMarketId(uint256 _bidId)
+        external
+        view
+        returns (uint256 _marketId)
+    {
+        _marketId = bids[_bidId].marketplaceId;
+    }
+
     function getLoanLendingToken(uint256 _bidId)
         external
         view

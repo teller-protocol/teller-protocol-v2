@@ -55,6 +55,7 @@ import {
 } from "../generated/TellerV2/TellerV2";
 
 import {
+  createCommitmentByMarketId,
   getBid,
   loadBidById,
   loadBorrowerByMarketId,
@@ -711,10 +712,11 @@ export function handleTellerV2Upgraded(event: Upgraded): void {
 }
 
 export function handleUpdatedCommitment(event: UpdatedCommitment): void {
-  const commitment = loadCommitmentByMarketId(
+  const commitment = createCommitmentByMarketId(
     event.params.lender,
     event.params.marketId.toString(),
-    event.params.lendingToken
+    event.params.lendingToken,
+    event.block.timestamp
   );
   commitment.committedAmount = event.params.tokenAmount;
   const lenderCommitmentForwarderInstance = LenderCommitmentForwarder.bind(
@@ -743,6 +745,7 @@ export function handleDeletedCommitment(event: DeletedCommitment): void {
     event.params.marketId.toString(),
     event.params.lendingToken
   );
+  if (!commitment) return;
   commitment.committedAmount = BigInt.zero();
   commitment.expirationTimestamp = BigInt.zero();
   commitment.maxDuration = BigInt.zero();
@@ -762,6 +765,7 @@ export function handleExercisedCommitment(event: ExercisedCommitment): void {
     event.params.marketId.toString(),
     event.params.lendingToken
   );
+  if (!commitment) return;
   const committedAmount = commitment.committedAmount;
   // Updated stored committed amount
   if (committedAmount) {

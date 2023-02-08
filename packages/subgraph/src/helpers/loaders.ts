@@ -235,39 +235,74 @@ export function loadBorrowerTokenVolume(
  * @param {Address} lenderAddress - Address of the lender
  * @param {string} marketId - Market id
  * @param {Address} lendingTokenAddress - Address of the token being lent
+ * @returns {string} The ID to use for the Commitment entity
+ */
+export function createCommitmentId(
+  lenderAddress: Address,
+  marketId: string,
+  lendingTokenAddress: Address
+): string {
+  return marketId
+    .concat(lendingTokenAddress.toHexString())
+    .concat(lenderAddress.toHexString());
+}
+
+/**
+ * @param {Address} lenderAddress - Address of the lender
+ * @param {string} marketId - Market id
+ * @param {Address} lendingTokenAddress - Address of the token being lent
+ * @param {BigInt} timestamp - Timestamp of the event
+ * @returns {Commitment} The Commitment entity for the lender
+ */
+export function createCommitmentByMarketId(
+  lenderAddress: Address,
+  marketId: string,
+  lendingTokenAddress: Address,
+  timestamp: BigInt
+): Commitment {
+  const idString = createCommitmentId(
+    lenderAddress,
+    marketId,
+    lendingTokenAddress
+  );
+  const commitment = new Commitment(idString);
+  commitment.createdAt = timestamp;
+
+  const stats = new TokenVolume(`commitment-stats-${commitment.id}`);
+  initTokenVolume(stats, lendingTokenAddress);
+  stats.save();
+
+  const lender = loadLenderByMarketId(lenderAddress, marketId);
+
+  commitment.committedAmount = BigInt.zero();
+  commitment.expirationTimestamp = BigInt.zero();
+  commitment.maxDuration = BigInt.zero();
+  commitment.minAPY = BigInt.zero();
+  commitment.lender = lender.id;
+  commitment.lenderAddress = lender.lenderAddress;
+  commitment.marketplace = marketId;
+  commitment.marketplaceId = BigInt.fromString(marketId);
+  commitment.stats = stats.id;
+  commitment.save();
+  return commitment;
+}
+/**
+ * @param {Address} lenderAddress - Address of the lender
+ * @param {string} marketId - Market id
+ * @param {Address} lendingTokenAddress - Address of the token being lent
  * @returns {Commitment} The Commitment entity for the lender
  */
 export function loadCommitmentByMarketId(
   lenderAddress: Address,
   marketId: string,
   lendingTokenAddress: Address
-): Commitment {
-  const idString = marketId
-    .concat(lendingTokenAddress.toHexString())
-    .concat(lenderAddress.toHexString());
-  let commitment = Commitment.load(idString);
-
-  if (!commitment) {
-    commitment = new Commitment(idString);
-
-    const stats = new TokenVolume(`commitment-stats-${commitment.id}`);
-    initTokenVolume(stats, lendingTokenAddress);
-    stats.save();
-
-    const lender = loadLenderByMarketId(lenderAddress, marketId);
-
-    commitment.committedAmount = BigInt.zero();
-    commitment.expirationTimestamp = BigInt.zero();
-    commitment.maxDuration = BigInt.zero();
-    commitment.minAPY = BigInt.zero();
-    commitment.lender = lender.id;
-    commitment.lenderAddress = lender.lenderAddress;
-    commitment.marketplace = marketId;
-    commitment.marketplaceId = BigInt.fromString(marketId);
-    commitment.stats = stats.id;
-    commitment.save();
-  }
-  return commitment;
+): Commitment | null {
+  const idString = createCommitmentId(
+    lenderAddress,
+    marketId,
+    lendingTokenAddress
+  );
+  return Commitment.load(idString);
 }
 
 export function getBid(

@@ -55,23 +55,13 @@ ILenderManager
     public
     override
     {
-        address currentLender = _getActiveLender(_bidId);
-        if (currentLender == address(0)) {
-            _checkOwner(); //why is this necessary 
-        } else {
-            require(currentLender == _msgSender(), "Not loan owner");
-        }
-       
-
-        require(_hasMarketApproval(_newLender,_bidId), "Not approved by market");
-
-
-        if (currentLender != _newLender) {
-
-            _safeMint(_newLender,_bidId);
+        _checkOwner(); // only allow TellerV2 to register loans 
+      
+        require(_hasMarketVerification(_newLender,_bidId), "Not approved by market");
  
-            emit NewLoanRegistered(_newLender, _bidId);
-        }
+        _safeMint(_newLender,_bidId);
+
+        emit NewLoanRegistered(_newLender, _bidId);
     }
 
     
@@ -109,6 +99,10 @@ ILenderManager
        
     }
 
+    /**
+     * @notice Returns the address of the lender that owns a given loan/bid.
+     * @param _bidId The id of the bid of which to return the market id
+     */
     function _getLoanMarketId(uint256 _bidId)
     internal
     view
@@ -118,20 +112,22 @@ ILenderManager
     }
 
 
-
-    function _hasMarketApproval(address guy, uint256 _bidId) 
+    /**
+     * @notice Returns the verification status of a lender for a market.
+     * @param _lender The address of the lender which should be verified by the market
+     * @param _bidId The id of the bid of which to return the market id
+     */
+    function _hasMarketVerification(address _lender, uint256 _bidId) 
     internal
     view 
     returns (bool)
     {
-        //address currentLender = _getActiveLender(_bidId);
-        //require(currentLender == _msgSender(), "Not loan owner");
-
-        uint256 marketId = _getLoanMarketId(_bidId);
+        
+        uint256 _marketId = _getLoanMarketId(_bidId);
 
         (bool isVerified, ) = marketRegistry.isVerifiedLender(
-            marketId,
-            guy
+            _marketId,
+            _lender
         );
 
         return isVerified;
@@ -145,7 +141,7 @@ ILenderManager
      */
     function transferFrom(address from, address to, uint256 tokenId) public virtual override {
 
-        require(_hasMarketApproval(to,tokenId), "Not approved by market");
+        require(_hasMarketVerification(to,tokenId), "Not approved by market");
 
         //solhint-disable-next-line max-line-length
         require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721: caller is not token owner or approved");
@@ -164,7 +160,7 @@ ILenderManager
      * @dev See {IERC721-safeTransferFrom}.
      */
     function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory data) public virtual override {
-        require(_hasMarketApproval(to,tokenId), "Not approved by market");
+        require(_hasMarketVerification(to,tokenId), "Not approved by market");
 
         require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721: caller is not token owner or approved");
         _safeTransfer(from, to, tokenId, data);

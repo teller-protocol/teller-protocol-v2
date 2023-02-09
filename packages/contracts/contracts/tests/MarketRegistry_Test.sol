@@ -54,8 +54,8 @@ contract MarketRegistry_Test is Testable, TellerV2 {
             PaymentCycleType.Seconds,
             "uri://"
         );
-        PaymentCycleType paymentCycle = marketRegistry
-            .getMarketplacePaymentCycleType(1);
+        ( ,PaymentCycleType paymentCycle) = marketRegistry
+            .getPaymentCycleValue(1);
 
         require(
             paymentCycle == PaymentCycleType.Seconds,
@@ -75,7 +75,7 @@ contract MarketRegistry_Test is Testable, TellerV2 {
             PaymentCycleType.Monthly,
             "uri://"
         );
-        paymentCycle = marketRegistry.getMarketplacePaymentCycleType(2);
+        (, paymentCycle) = marketRegistry.getPaymentCycleValue(2);
 
         require(
             paymentCycle == PaymentCycleType.Monthly,

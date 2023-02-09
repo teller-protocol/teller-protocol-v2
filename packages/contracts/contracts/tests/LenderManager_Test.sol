@@ -25,6 +25,8 @@ contract LenderManager_Test is Testable, LenderManager {
 
     LenderCommitmentTester mockTellerV2;
     MarketRegistryMock mockMarketRegistry;
+
+    bool mockedHasMarketVerification;
  
     constructor()
         LenderManager(
@@ -42,12 +44,16 @@ contract LenderManager_Test is Testable, LenderManager {
 
         mockMarketRegistry = new MarketRegistryMock(address(marketOwner));
 
-       
+        delete mockedHasMarketVerification;
     } 
     
  
 
     function registerLoan_test() public {
+
+
+        mockedHasMarketVerification = true;
+
         uint256 bidId = 2;
 
         super.registerLoan(bidId,address(lender)); 
@@ -57,21 +63,46 @@ contract LenderManager_Test is Testable, LenderManager {
 
 
 
-   function transferFrom_before() public {
-
-        uint256 bidId = 2;
-
-        super._mint(address(lender),bidId);
-
-   }
+ 
 
    function transferFrom_test() public {
 
+        mockedHasMarketVerification = true;
+
         uint256 bidId = 2;
+
+         super._mint(address(lender),bidId);
         
         lender.transferLoan(bidId,address(borrower));
         
         Test.eq(super.ownerOf(bidId), address(borrower), "Loan nft was not transferred");
+    }   
+
+
+    function transferFromToInvalidRecipient_test() public {
+
+
+        mockedHasMarketVerification = true;
+
+        uint256 bidId = 2;
+        super._mint(address(lender),bidId);
+
+        mockedHasMarketVerification = false;
+
+        bool transferFailed;
+
+        //I want to expect this to fail !!  
+        try  lender.transferLoan(bidId,address(address(borrower)))  {
+           
+        }catch{
+            transferFailed = true;
+        }
+        
+
+        Test.eq(transferFailed, true, "Loan transfer should have failed");
+
+        
+        Test.eq(super.ownerOf(bidId), address(lender), "Loan nft is no longer owned by lender");
     }   
 
  
@@ -80,9 +111,8 @@ contract LenderManager_Test is Testable, LenderManager {
      internal override view
      returns (bool){
 
-        //hasMarketVerificationWasCalled = true;
-
-        return true;
+        
+        return mockedHasMarketVerification;
     }
 
     //should be able to test the negative case-- use foundry

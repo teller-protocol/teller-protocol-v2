@@ -487,6 +487,8 @@ contract MarketRegistry is
      * @notice Updates multiple market settings for a given market.
      * @param _marketId The ID of a market.
      * @param _paymentCycleValue Delinquency duration for new loans
+     * @param _newPaymentType The payment type for the market.
+     * @param _paymentCycleType The payment cycle type for loans in the market - Seconds or Monthly
      * @param _paymentDefaultDuration Default duration for new loans
      * @param _bidExpirationTime Duration of time before a bid is considered out of date
      * @param _metadataURI A URI that points to a market's metadata.
@@ -497,6 +499,8 @@ contract MarketRegistry is
     function updateMarketSettings(
         uint256 _marketId,
         uint32 _paymentCycleValue,
+        PaymentType _newPaymentType,
+        PaymentCycleType _paymentCycleType,
         uint32 _paymentDefaultDuration,
         uint32 _bidExpirationTime,
         uint16 _feePercent,
@@ -511,6 +515,8 @@ contract MarketRegistry is
         setMarketFeePercent(_marketId, _feePercent);
         setLenderAttestationRequired(_marketId, _lenderAttestationRequired);
         setBorrowerAttestationRequired(_marketId, _borrowerAttestationRequired);
+        setMarketPaymentType(_marketId, _newPaymentType);
+        setMarketPaymentCycleType(_marketId, _paymentCycleType);
     }
 
     /**

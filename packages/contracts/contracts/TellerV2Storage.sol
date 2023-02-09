@@ -42,7 +42,7 @@ struct Payment {
 struct Bid {
     address borrower;
     address receiver;
-     address lender; // if this is the LenderManager address, we use that .owner() as source of truth
+    address lender; // if this is the LenderManager address, we use that .owner() as source of truth
     uint256 marketplaceId;
     bytes32 _metadataURI; // DEPRECATED
     LoanDetails loanDetails;

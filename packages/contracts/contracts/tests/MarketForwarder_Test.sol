@@ -13,9 +13,7 @@ import { TellerV2MarketForwarder } from "../TellerV2MarketForwarder.sol";
 
 import { User } from "./Test_Helpers.sol";
 
-
 import "../mock/MarketRegistryMock.sol";
-
 
 contract MarketForwarder_Test is Testable, TellerV2MarketForwarder {
     MarketForwarderTester private tellerV2Mock;
@@ -127,17 +125,13 @@ contract MarketForwarder_Test is Testable, TellerV2MarketForwarder {
     }
 }
 
-
-//This should use the user helper !! 
+//This should use the user helper !!
 contract MarketForwarderUser is User {
-   
-   constructor(address _tellerV2) User(_tellerV2) {}
- 
+    constructor(address _tellerV2) User(_tellerV2) {}
 }
 
-
-//Move to a helper 
-//this is a tellerV2 mock 
+//Move to a helper
+//this is a tellerV2 mock
 contract MarketForwarderTester is TellerV2Context {
     constructor() TellerV2Context(address(0)) {}
 
@@ -163,4 +157,3 @@ contract MarketForwarderTester is TellerV2Context {
         return _msgDataForMarket(_marketId);
     }
 }
- 

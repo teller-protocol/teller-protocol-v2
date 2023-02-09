@@ -26,19 +26,30 @@ interface IMarketRegistry {
         view
         returns (address);
 
-    function getMarketURI(uint256 _marketId) external view returns (string memory);
+    function getMarketURI(uint256 _marketId)
+        external
+        view
+        returns (string memory);
 
     function getPaymentCycleDuration(uint256 _marketId)
-        external view
+        external
+        view
         returns (uint32);
 
     function getPaymentDefaultDuration(uint256 _marketId)
-        external view
+        external
+        view
         returns (uint32);
 
-    function getBidExpirationTime(uint256 _marketId) external view returns (uint32);
+    function getBidExpirationTime(uint256 _marketId)
+        external
+        view
+        returns (uint32);
 
-    function getMarketplaceFee(uint256 _marketId) external view returns (uint16);
+    function getMarketplaceFee(uint256 _marketId)
+        external
+        view
+        returns (uint16);
 
     function getPaymentType(uint256 _marketId)
         external

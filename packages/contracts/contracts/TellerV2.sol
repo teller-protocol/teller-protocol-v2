@@ -497,7 +497,6 @@ contract TellerV2 is
         Bid storage bid = bids[_bidId];
 
         address sender = _msgSenderForMarket(bid.marketplaceId);
-     
 
         require(
             !marketRegistry.isMarketClosed(bid.marketplaceId),
@@ -550,9 +549,9 @@ contract TellerV2 is
         );
 
         // Record volume filled by lenders
-        lenderVolumeFilled[address(bid.loanDetails.lendingToken)][
-            sender
-        ] += bid.loanDetails.principal;
+        lenderVolumeFilled[address(bid.loanDetails.lendingToken)][sender] += bid
+            .loanDetails
+            .principal;
         totalVolumeFilled[address(bid.loanDetails.lendingToken)] += bid
             .loanDetails
             .principal;
@@ -567,22 +566,20 @@ contract TellerV2 is
         emit FeePaid(_bidId, "marketplace", amountToMarketplace);
     }
 
-    function claimLoanNFT( uint256 _bidId )
-        external 
+    function claimLoanNFT(uint256 _bidId)
+        external
         acceptedLoan(_bidId, "claimLoanNFT")
         whenNotPaused
-        {
-
+    {
         // Retrieve bid
         Bid storage bid = bids[_bidId];
 
-        address sender = _msgSenderForMarket(bid.marketplaceId); 
+        address sender = _msgSenderForMarket(bid.marketplaceId);
 
         // mint an NFT with the lender manager
         lenderManager.registerLoan(_bidId, sender);
 
         bid.lender = address(lenderManager);
- 
     }
 
     /**
@@ -985,7 +982,7 @@ contract TellerV2 is
     }
 
     /**
-    * @notice NOTE: This function may be removed at some point in the future. Please refer to the Lender Manager Contract for the updated address.
+     * @notice NOTE: This function may be removed at some point in the future. Please refer to the Lender Manager Contract for the updated address.
      * @notice Returns the lender address for a given bid.
      * @param _bidId The id of the bid/loan to get the lender for.
      * @return lender_ The address of the lender associated with the bid.
@@ -994,14 +991,12 @@ contract TellerV2 is
         public
         view
         returns (address lender_)
-    { 
-
+    {
         lender_ = bids[_bidId].lender;
 
-        if(lender_ == address(lenderManager)){
+        if (lender_ == address(lenderManager)) {
             return IERC721Upgradeable(address(lenderManager)).ownerOf(_bidId);
         }
-
     }
 
     function getLoanLendingToken(uint256 _bidId)
@@ -1012,7 +1007,7 @@ contract TellerV2 is
         token_ = address(bids[_bidId].loanDetails.lendingToken);
     }
 
-     function getLoanMarketId(uint256 _bidId)
+    function getLoanMarketId(uint256 _bidId)
         external
         view
         returns (uint256 _marketId)

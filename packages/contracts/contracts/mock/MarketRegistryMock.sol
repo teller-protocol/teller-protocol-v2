@@ -15,7 +15,8 @@ contract MarketRegistryMock is IMarketRegistry {
     function initialize(TellerAS _tellerAS) external {}
 
     function isVerifiedLender(uint256 _marketId, address _lenderAddress)
-        public view
+        public
+        view
         returns (bool isVerified_, bytes32 uuid_)
     {
         isVerified_ = true;
@@ -26,7 +27,8 @@ contract MarketRegistryMock is IMarketRegistry {
     }
 
     function isVerifiedBorrower(uint256 _marketId, address _borrower)
-        public view
+        public
+        view
         returns (bool isVerified_, bytes32 uuid_)
     {
         isVerified_ = true;
@@ -36,29 +38,43 @@ contract MarketRegistryMock is IMarketRegistry {
         return address(marketOwner);
     }
 
-    function getMarketFeeRecipient(uint256 _marketId) public view returns (address) {
+    function getMarketFeeRecipient(uint256 _marketId)
+        public
+        view
+        returns (address)
+    {
         return address(marketOwner);
     }
 
-    function getMarketURI(uint256 _marketId) public view returns (string memory) {
+    function getMarketURI(uint256 _marketId)
+        public
+        view
+        returns (string memory)
+    {
         return "url://";
     }
 
     function getPaymentCycleDuration(uint256 _marketId)
-        public view
+        public
+        view
         returns (uint32)
     {
         return 1000;
     }
 
     function getPaymentDefaultDuration(uint256 _marketId)
-        public view
+        public
+        view
         returns (uint32)
     {
         return 1000;
     }
 
-    function getBidExpirationTime(uint256 _marketId) public view returns (uint32) {
+    function getBidExpirationTime(uint256 _marketId)
+        public
+        view
+        returns (uint32)
+    {
         return 1000;
     }
 

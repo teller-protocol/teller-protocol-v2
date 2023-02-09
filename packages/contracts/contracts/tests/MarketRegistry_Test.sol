@@ -20,14 +20,11 @@ import "../interfaces/IWETH.sol";
 import { User } from "./Test_Helpers.sol";
 import { PaymentType } from "../libraries/V2Calculations.sol";
 
-
-
 /*
 
 This should have more unit tests that operate on MarketRegistry.sol 
 
 */
-
 
 contract MarketRegistry_Test is Testable, TellerV2 {
     User private marketOwner;

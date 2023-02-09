@@ -7,7 +7,8 @@ import { getFunds } from 'helpers/get-funds'
 import { isInitialized } from 'helpers/oz-contract-helpers'
 import moment from 'moment'
 import {
-  CollateralManager, LenderManager,
+  CollateralManager,
+  LenderManager,
   MarketRegistry,
   ReputationManager,
   TellerV2,
@@ -73,7 +74,7 @@ const setup = deployments.createFixture<SetupReturn, SetupOptions>(
       tellerV2,
       marketRegistry,
       reputationManager,
-      lenderManager
+      lenderManager,
     }
   }
 )
@@ -880,7 +881,7 @@ describe('TellerV2', () => {
             paymentCycleAmount: 3226719,
             APR: 1000,
           },
-          state: BidState.ACCEPTED
+          state: BidState.ACCEPTED,
         },
         nowIncrease: moment.duration(365, 'd'),
       },

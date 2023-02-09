@@ -12,13 +12,10 @@ import { PaymentType } from "../libraries/V2Calculations.sol";
 
 contract User {
     address public immutable tellerV2;
-     
 
-    constructor(address _tellerV2/*, WethMock _wethMock*/) {
+    constructor(address _tellerV2 /*, WethMock _wethMock*/) {
         tellerV2 = _tellerV2;
-         
     }
- 
 
     function addAllowance(
         address _assetContractAddress,
@@ -108,13 +105,19 @@ contract User {
     function setTrustedMarketForwarder(uint256 _marketId, address _forwarder)
         external
     {
-        ITellerV2Context(tellerV2).setTrustedMarketForwarder(_marketId, _forwarder);
+        ITellerV2Context(tellerV2).setTrustedMarketForwarder(
+            _marketId,
+            _forwarder
+        );
     }
 
     function approveMarketForwarder(uint256 _marketId, address _forwarder)
         external
     {
-        ITellerV2Context(tellerV2).approveMarketForwarder(_marketId, _forwarder);
+        ITellerV2Context(tellerV2).approveMarketForwarder(
+            _marketId,
+            _forwarder
+        );
     }
 
     receive() external payable {}

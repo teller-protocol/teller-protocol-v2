@@ -10,7 +10,6 @@ import { LenderCommitmentForwarder } from "../LenderCommitmentForwarder.sol";
 
 import { User } from "./Test_Helpers.sol";
 
-
 import "../mock/MarketRegistryMock.sol";
 
 contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
@@ -174,14 +173,12 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
 }
 
 contract LenderCommitmentUser is User {
-  
     LenderCommitmentForwarder public immutable commitmentForwarder;
 
     constructor(
         address _tellerV2,
         LenderCommitmentForwarder _commitmentForwarder
     ) User(_tellerV2) {
-        
         commitmentForwarder = _commitmentForwarder;
     }
 
@@ -235,8 +232,6 @@ contract LenderCommitmentUser is User {
             );
     }
 }
-
-
 
 //Move to a helper file !
 contract TellerV2Mock is TellerV2Context {

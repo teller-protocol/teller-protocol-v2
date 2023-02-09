@@ -803,8 +803,8 @@ contract TellerV2 is
         Bid storage bid = bids[_bidId];
         if (bids[_bidId].state != BidState.ACCEPTED) return dueDate_;
 
-        // Start with the original due date being 1 payment cycle since bid was accepted
-        dueDate_ = bid.loanDetails.acceptedTimestamp + bid.terms.paymentCycle;
+        uint32 lastRepaidTimestamp = lastRepaidTimestamp(_bidId);
+        uint32 delta;
 
         // Calculate due date if payment cycle is set to monthly
         if (bidPaymentCycleType[_bidId] == PaymentCycleType.Monthly) {
@@ -814,11 +814,18 @@ contract TellerV2 is
                     1
                 )
             );
+            // Calculate the cycle number the last repayment was made
+            delta = uint32(BokkyPooBahsDateTimeLibrary.diffMonths(
+                    bid.loanDetails.acceptedTimestamp,
+                    lastRepaidTimestamp
+                ));
+        } else if (bidPaymentCycleType[_bidId] == PaymentCycleType.Seconds) {
+            // Start with the original due date being 1 payment cycle since bid was accepted
+            dueDate_ = bid.loanDetails.acceptedTimestamp + bid.terms.paymentCycle;
+            // Calculate the cycle number the last repayment was made
+            delta = lastRepaidTimestamp - bid.loanDetails.acceptedTimestamp;
         }
 
-        // Calculate the cycle number the last repayment was made
-        uint32 lastRepaidTimestamp = lastRepaidTimestamp(_bidId);
-        uint32 delta = lastRepaidTimestamp - bid.loanDetails.acceptedTimestamp;
         if (delta > 0) {
             uint32 repaymentCycle = 1 + (delta / bid.terms.paymentCycle);
             if (bidPaymentCycleType[_bidId] == PaymentCycleType.Monthly) {

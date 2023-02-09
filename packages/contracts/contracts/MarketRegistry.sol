@@ -45,6 +45,7 @@ contract MarketRegistry is
         mapping(address => bytes32) borrowerAttestationIds;
         address feeRecipient;
         PaymentType paymentType;
+        PaymentCycleType paymentCycleType;
     }
 
     bytes32 public lenderAttestationSchemaId;
@@ -60,8 +61,6 @@ contract MarketRegistry is
     mapping(uint256 => bool) private marketIsClosed;
 
     TellerAS public tellerAS;
-
-    mapping(uint256 => PaymentCycleType) public paymentCycleType;
 
     /* Modifiers */
 

@@ -119,6 +119,7 @@ ILenderManager
      */
     function _hasMarketVerification(address _lender, uint256 _bidId) 
     internal
+    virtual
     view 
     returns (bool)
     {
@@ -170,26 +171,5 @@ ILenderManager
         return "";
     }
 
-
-    /** OpenZeppelin Override Functions **/
-/*
-    function _msgSender()
-    internal
-    view
-    virtual
-    override(ERC2771ContextUpgradeable, ContextUpgradeable)
-    returns (address sender)
-    {
-        sender = ERC2771ContextUpgradeable._msgSender();
-    }
-
-    function _msgData()
-    internal
-    view
-    virtual
-    override(ERC2771ContextUpgradeable, ContextUpgradeable)
-    returns (bytes calldata)
-    {
-        return ERC2771ContextUpgradeable._msgData();
-    }*/
+ 
 }

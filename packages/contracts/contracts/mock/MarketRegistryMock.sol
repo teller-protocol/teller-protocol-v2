@@ -40,8 +40,8 @@ contract MarketRegistryMock is IMarketRegistry {
         return "url://";
     }
 
-    function getPaymentCycleValue(uint256 _marketId) public returns (uint32) {
-        return 1000;
+    function getPaymentCycleValue(uint256 _marketId) public returns (uint32, PaymentCycleType) {
+        return (1000, PaymentCycleType.Seconds);
     }
 
     function getPaymentDefaultDuration(uint256 _marketId)
@@ -67,12 +67,6 @@ contract MarketRegistryMock is IMarketRegistry {
         public
         view
         returns (PaymentType)
-    {}
-
-    function getMarketplacePaymentCycleType(uint256 _marketId)
-        public
-        view
-        returns (PaymentCycleType)
     {}
 
     function createMarket(

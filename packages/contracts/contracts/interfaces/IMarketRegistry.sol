@@ -25,7 +25,7 @@ interface IMarketRegistry {
 
     function getMarketURI(uint256 _marketId) external returns (string memory);
 
-    function getPaymentCycleValue(uint256 _marketId) external returns (uint32);
+    function getPaymentCycleValue(uint256 _marketId) external returns (uint32, PaymentCycleType);
 
     function getPaymentDefaultDuration(uint256 _marketId)
         external
@@ -34,10 +34,6 @@ interface IMarketRegistry {
     function getBidExpirationTime(uint256 _marketId) external returns (uint32);
 
     function getMarketplaceFee(uint256 _marketId) external returns (uint16);
-
-    function getMarketplacePaymentCycleType(uint256 _marketId)
-        external
-        returns (PaymentCycleType);
 
     function getPaymentType(uint256 _marketId)
         external

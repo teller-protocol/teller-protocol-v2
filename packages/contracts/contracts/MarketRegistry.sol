@@ -80,7 +80,7 @@ contract MarketRegistry is
     event MarketCreated(address indexed owner, uint256 marketId);
     event SetMarketURI(uint256 marketId, string uri);
     event SetPaymentCycleDuration(uint256 marketId, uint32 duration);
-    event SetPaymentCycleValue(uint256 marketId, uint32 duration);
+
     event SetPaymentDefaultDuration(uint256 marketId, uint32 duration);
     event SetBidExpirationTime(uint256 marketId, uint32 duration);
     event SetMarketFee(uint256 marketId, uint16 feePct);
@@ -96,10 +96,8 @@ contract MarketRegistry is
     event SetMarketLenderAttestation(uint256 marketId, bool required);
     event SetMarketBorrowerAttestation(uint256 marketId, bool required);
     event SetMarketPaymentType(uint256 marketId, PaymentType paymentType);
-    event SetMarketPaymentCycleType(
-        uint256 marketId,
-        PaymentCycleType paymentCycleType
-    );
+
+    event SetPaymentCycle(uint256 marketId, PaymentCycleType paymentCycleType, uint32 value);
 
     /* External Functions */
 
@@ -567,7 +565,7 @@ contract MarketRegistry is
         if (_value != markets[_marketId].paymentCycleValue) {
             markets[_marketId].paymentCycleValue = _value;
 
-            emit SetPaymentCycleValue(_marketId, _value);
+            emit SetPaymentCycle(_marketId, markets[_marketId].paymentCycleType, _value);
         }
     }
 
@@ -673,10 +671,10 @@ contract MarketRegistry is
         uint256 _marketId,
         PaymentCycleType _paymentCycleType
     ) public ownsMarket(_marketId) {
-        if (_paymentCycleType != paymentCycleType[_marketId]) {
-            paymentCycleType[_marketId] = _paymentCycleType;
+        if (_paymentCycleType != markets[_marketId].paymentCycleType) {
+            markets[_marketId].paymentCycleType = _paymentCycleType;
 
-            emit SetMarketPaymentCycleType(_marketId, _paymentCycleType);
+            emit SetPaymentCycle(_marketId, _paymentCycleType, markets[_marketId].paymentCycleValue);
         }
     }
 
@@ -778,14 +776,15 @@ contract MarketRegistry is
      * @notice Gets the loan delinquent duration of a market.
      * @param _marketId The ID of a market.
      * @return Duration of a loan until it is delinquent.
+     * @return The type of payment cycle for loans in the market.
      */
     function getPaymentCycleValue(uint256 _marketId)
         public
         view
         override
-        returns (uint32)
+        returns (uint32, PaymentCycleType)
     {
-        return markets[_marketId].paymentCycleValue;
+        return (markets[_marketId].paymentCycleValue, markets[_marketId].paymentCycleType);
     }
 
     /**
@@ -837,20 +836,6 @@ contract MarketRegistry is
         returns (uint16 fee)
     {
         return markets[_marketId].marketplaceFeePercent;
-    }
-
-    /**
-     * @notice Gets the payment cycle type (Seconds, Monthly) for a given market.
-     * @param _marketId The ID of a market.
-     * @return paymentCycleType The payment cycle type
-     */
-    function getMarketplacePaymentCycleType(uint256 _marketId)
-        public
-        view
-        override
-        returns (PaymentCycleType)
-    {
-        return paymentCycleType[_marketId];
     }
 
     /**

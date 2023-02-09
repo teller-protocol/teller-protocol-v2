@@ -282,10 +282,10 @@ abstract contract ERC721UpgradeableMod is Initializable, ContextUpgradeable, ERC
     function _burn(uint256 tokenId) internal virtual {
         address owner = ERC721UpgradeableMod.ownerOf(tokenId);
 
-        _beforeTokenTransfer(owner, address(0), tokenId, 1);
+        //_beforeTokenTransfer(owner, address(0), tokenId, 1);
 
         // Update ownership in case tokenId was transferred by `_beforeTokenTransfer` hook
-        owner = ERC721UpgradeableMod.ownerOf(tokenId);
+        //owner = ERC721UpgradeableMod.ownerOf(tokenId);
 
         // Clear approvals
         delete _tokenApprovals[tokenId];
@@ -317,10 +317,10 @@ abstract contract ERC721UpgradeableMod is Initializable, ContextUpgradeable, ERC
         require(ERC721UpgradeableMod.ownerOf(tokenId) == from, "ERC721: transfer from incorrect owner");
         require(to != address(0), "ERC721: transfer to the zero address");
 
-        _beforeTokenTransfer(from, to, tokenId, 1);
+        //_beforeTokenTransfer(from, to, tokenId, 1);
 
         // Check that tokenId was not transferred by `_beforeTokenTransfer` hook
-        require(ERC721UpgradeableMod.ownerOf(tokenId) == from, "ERC721: transfer from incorrect owner");
+        //require(ERC721UpgradeableMod.ownerOf(tokenId) == from, "ERC721: transfer from incorrect owner");
 
         // Clear approvals from the previous owner
         delete _tokenApprovals[tokenId];
@@ -417,10 +417,10 @@ abstract contract ERC721UpgradeableMod is Initializable, ContextUpgradeable, ERC
      *
      * To learn more about hooks, head to xref:ROOT:extending-contracts.adoc#using-hooks[Using Hooks].
      */
-    function _beforeTokenTransfer(
+   /* function _beforeTokenTransfer(
         address from,
         address to,
-        uint256 /* firstTokenId */,
+        uint256  ,//firstTokenId
         uint256 batchSize
     ) internal virtual {
         if (batchSize > 1) {
@@ -431,7 +431,7 @@ abstract contract ERC721UpgradeableMod is Initializable, ContextUpgradeable, ERC
                 _balances[to] += batchSize;
             }
         }
-    }
+    }*/
 
     /**
      * @dev Hook that is called after any token transfer. This includes minting and burning. If {ERC721Consecutive} is

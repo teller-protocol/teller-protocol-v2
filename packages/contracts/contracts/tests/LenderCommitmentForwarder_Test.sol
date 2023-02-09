@@ -32,7 +32,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         )
     {}
 
-    function setup_beforeAll() public {
+    function setUp() public {
         tester = LenderCommitmentTester(address(getTellerV2()));
         mockMarketRegistry = MockMarketRegistry(address(getMarketRegistry()));
 
@@ -68,7 +68,9 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         );
     }
 
-    function updateCommitment_test() public {
+    function test_updateCommitment() public {
+        updateCommitment_before();
+        
         Commitment memory existingCommitment = lenderMarketCommitments[
             address(this)
         ][marketId][tokenAddress];
@@ -77,7 +79,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         //        assertEq(existingCommitment.amount, maxAmount, "Commitment not recorded!" );
     }
 
-    function deleteCommitment_test() public {
+    function test_deleteCommitment() public {
         //make sure the commitment exists
         //assertEq( ,  ,"" );
         //        super.deleteCommitment(tokenAddress, marketId);
@@ -97,7 +99,9 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         );
     }
 
-    function acceptCommitment_test() public {
+    function test_acceptCommitment() public {
+        acceptCommitment_before();
+
         Commitment storage commitment = lenderMarketCommitments[
             address(lender)
         ][marketId][tokenAddress];

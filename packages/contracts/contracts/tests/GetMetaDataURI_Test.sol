@@ -8,7 +8,7 @@ import "../TellerV2.sol";
 contract GetMetaDataURI_Test is Testable, TellerV2 {
     constructor() TellerV2(address(0)) {}
 
-    function setup_beforeAll() public {
+    function setUp() public {
         // Old depreciated _metadataURI on bid struct
         bids[0]
             ._metadataURI = 0x0000000000000000000000000000000086004f3f419f88be1cab574b4bd01b6d;
@@ -16,7 +16,7 @@ contract GetMetaDataURI_Test is Testable, TellerV2 {
         uris[59] = "ipfs://QmMyDataHash";
     }
 
-    function getMetaDataURI_test() public {
+    function test_getMetaDataURI() public {
         string memory oldURI = getMetadataURI(0);
         assertEq(
             oldURI,

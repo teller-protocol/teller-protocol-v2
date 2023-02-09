@@ -19,7 +19,7 @@ contract CollateralEscrow_Test is Testable {
     WethMock wethMock;
     uint256 amount = 1000;
 
-    function setup_beforeAll() public {
+    function setUp() public {
         // Deploy implementation
         CollateralEscrowV1 escrowImplementation = new CollateralEscrowV1();
         // Deploy beacon contract with implementation
@@ -35,11 +35,11 @@ contract CollateralEscrow_Test is Testable {
         borrower.depositToWeth(borrowerBalance);
     }
 
-    function depositAsset_test() public {
+    function test_depositAsset() public {
         _depositAsset();
     }
 
-    function withdrawAsset_test() public {
+    function test_withdrawAsset() public {
         _depositAsset();
 
         borrower.withdraw(address(wethMock), amount, address(borrower));

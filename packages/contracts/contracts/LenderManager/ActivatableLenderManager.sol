@@ -33,7 +33,7 @@ contract ActivatableLenderManager is LenderManager {
         );
         for (uint i = 0; i < _initialActiveBidIds.length; i++) {
 
-            _safeMint(_initialActiveLenderArray[i],_initialActiveBidIds[i]);
+            _mint(_initialActiveLenderArray[i],_initialActiveBidIds[i]);
 
             
         }

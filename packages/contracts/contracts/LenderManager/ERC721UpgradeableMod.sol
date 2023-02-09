@@ -246,12 +246,12 @@ abstract contract ERC721UpgradeableMod is Initializable, ContextUpgradeable, ERC
      */
     function _mint(address to, uint256 tokenId) internal virtual {
         require(to != address(0), "ERC721: mint to the zero address");
-        require(!_exists(tokenId), "ERC721: token already minted");
+       // require(!_exists(tokenId), "ERC721: token already minted");
 
-        _beforeTokenTransfer(address(0), to, tokenId, 1);
+       // _beforeTokenTransfer(address(0), to, tokenId, 1);
 
         // Check that tokenId was not minted by `_beforeTokenTransfer` hook
-        require(!_exists(tokenId), "ERC721: token already minted");
+       // require(!_exists(tokenId), "ERC721: token already minted");
 
         unchecked {
             // Will not overflow unless all 2**256 token ids are minted to the same owner.
@@ -265,7 +265,7 @@ abstract contract ERC721UpgradeableMod is Initializable, ContextUpgradeable, ERC
 
         emit Transfer(address(0), to, tokenId);
 
-        _afterTokenTransfer(address(0), to, tokenId, 1);
+        //_afterTokenTransfer(address(0), to, tokenId, 1);
     }
 
     /**

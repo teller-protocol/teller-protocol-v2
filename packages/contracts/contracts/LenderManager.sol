@@ -59,7 +59,7 @@ ILenderManager
       
         require(_hasMarketVerification(_newLender,_bidId), "Not approved by market");
  
-        _safeMint(_newLender,_bidId);
+        _mint(_newLender,_bidId);
 
         emit NewLoanRegistered(_newLender, _bidId);
     }

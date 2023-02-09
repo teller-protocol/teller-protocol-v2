@@ -16,7 +16,7 @@ import "./interfaces/IMarketRegistry.sol";
 contract LenderManager is
 Initializable,
 OwnableUpgradeable,
-ERC2771ContextUpgradeable,
+//ERC2771ContextUpgradeable,
 ERC721UpgradeableMod,
 ILenderManager
 {
@@ -29,8 +29,8 @@ ILenderManager
     /** Events **/
     event NewLoanRegistered(address indexed newLender, uint256 bidId);
 
-    constructor(address _trustedForwarder, address _marketRegistry)
-    ERC2771ContextUpgradeable(_trustedForwarder)
+    constructor( address _marketRegistry)
+    //ERC2771ContextUpgradeable(_trustedForwarder)
     {
         marketRegistry = IMarketRegistry(_marketRegistry);
     }
@@ -172,7 +172,7 @@ ILenderManager
 
 
     /** OpenZeppelin Override Functions **/
-
+/*
     function _msgSender()
     internal
     view
@@ -191,5 +191,5 @@ ILenderManager
     returns (bytes calldata)
     {
         return ERC2771ContextUpgradeable._msgData();
-    }
+    }*/
 }

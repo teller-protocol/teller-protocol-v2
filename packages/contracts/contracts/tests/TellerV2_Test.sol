@@ -72,8 +72,7 @@ contract TellerV2_Test is Testable {
         // Deploy Lender manager
         MetaForwarder metaforwarder = new MetaForwarder();
         metaforwarder.initialize();
-        LenderManager lenderManager = new LenderManager(
-            address(metaforwarder),
+        LenderManager lenderManager = new LenderManager( 
             address(marketRegistry)
         );
         lenderManager.initialize();

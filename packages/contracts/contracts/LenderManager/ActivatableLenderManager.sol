@@ -4,8 +4,8 @@ pragma solidity >=0.8.0 <0.9.0;
 import "../LenderManager.sol";
 
 contract ActivatableLenderManager is LenderManager {
-    constructor(address _trustedForwarder, address _marketRegistry)
-    LenderManager(_trustedForwarder, _marketRegistry)
+    constructor(  address _marketRegistry)
+    LenderManager( _marketRegistry)
     {}
 
     function initializeActiveLoans(

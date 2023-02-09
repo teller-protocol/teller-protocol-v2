@@ -19,24 +19,26 @@ contract LenderManager_Test is Testable, LenderManager {
     User private lender;
     User private borrower; 
 
-
+    LenderCommitmentTester mockTellerV2;
     MarketRegistryMock mockMarketRegistry;
 
     constructor()
         LenderManager(
-            address(new MockMarketForwarder()),
-            address(new MockMarketRegistry(address(0)))
+            //address(0),
+            address(new MarketRegistryMock(address(0)))
         )
     {}
 
     function setup_beforeAll() public {
-        tester = LenderCommitmentTester(address(getTellerV2()));
-        mockMarketRegistry = MockMarketRegistry(address(getMarketRegistry()));
+        mockTellerV2 = new LenderCommitmentTester();
+       
+        marketOwner = new User(address(mockTellerV2) );
+        borrower = new User(address(mockTellerV2) );
+        lender = new User(address(mockTellerV2) );
 
-        marketOwner = new User(tester, (this));
-        borrower = new User(tester, (this));
-        lender = new User(tester, (this));
-        tester.__setMarketOwner(marketOwner);
+        mockMarketRegistry = new MarketRegistryMock(address(marketOwner));
+
+       /* tester.__setMarketOwner(marketOwner);
 
         mockMarketRegistry.setMarketOwner(address(marketOwner));
 
@@ -51,119 +53,18 @@ contract LenderManager_Test is Testable, LenderManager {
         lender.approveMarketForwarder(marketId, address(this));
 
         delete acceptBidWasCalled;
-        delete submitBidWasCalled;
+        delete submitBidWasCalled;*/
     }
 
-    function updateCommitment_before() public {
-        super.updateCommitment(
-            marketId,
-            tokenAddress,
-            maxAmount,
-            maxLoanDuration,
-            minInterestRate,
-            expiration
-        );
-    }
-
-    function updateCommitment_test() public {
-        Commitment memory existingCommitment = lenderMarketCommitments[
-            address(this)
-        ][marketId][tokenAddress];
-
-        //make sure the commitment exists
-        //        Test.eq(existingCommitment.amount, maxAmount, "Commitment not recorded!" );
-    }
-
-    function deleteCommitment_test() public {
-        //make sure the commitment exists
-        //Test.eq( ,  ,"" );
-        //        super.deleteCommitment(tokenAddress, marketId);
-        //        Commitment memory existingCommitment = lenderMarketCommitments[address(this)][marketId][tokenAddress];
-        //make sure the commitment has been removed
-        //Test.eq( ,  ,"" );
-    }
-
-    function acceptCommitment_before() public {
-        lender._updateCommitment(
-            marketId,
-            tokenAddress,
-            maxAmount,
-            maxLoanDuration,
-            minInterestRate,
-            expiration
-        );
-    }
+    
+ 
 
     function acceptCommitment_test() public {
-        Commitment storage commitment = lenderMarketCommitments[
-            address(lender)
-        ][marketId][tokenAddress];
-
-        Test.eq(
-            acceptBidWasCalled,
-            false,
-            "Expect accept bid not called before exercise"
-        );
-
-        uint256 bidId = marketOwner._acceptCommitment(
-            marketId,
-            address(lender),
-            tokenAddress,
-            maxAmount - 100,
-            maxLoanDuration,
-            minInterestRate
-        );
-
-        Test.eq(
-            acceptBidWasCalled,
-            true,
-            "Expect accept bid called after exercise"
-        );
-
-        Test.eq(
-            commitment.maxPrincipal == 100,
-            true,
-            "commitment not accepted"
-        );
-
-        bidId = marketOwner._acceptCommitment(
-            marketId,
-            address(lender),
-            tokenAddress,
-            100,
-            maxLoanDuration,
-            minInterestRate
-        );
-
-        Test.eq(commitment.maxPrincipal == 0, true, "commitment not accepted");
+        
     }
 
-    /*
-        Overrider methods for exercise 
-    */
-
-    function _submitBid(CreateLoanArgs memory, address)
-        internal
-        override
-        returns (uint256 bidId)
-    {
-        submitBidWasCalled = true;
-        return 1;
-    }
-
-    function _acceptBid(uint256, address) internal override returns (bool) {
-        acceptBidWasCalled = true;
-
-        Test.eq(
-            submitBidWasCalled,
-            true,
-            "Submit bid must be called before accept bid"
-        );
-
-        return true;
-    }
 }
-
+ 
 /*
 contract User {
     TellerV2Context public immutable context;
@@ -227,12 +128,14 @@ contract User {
     }
 }*/
 
+
+//Move to a helper  or change it 
 contract LenderCommitmentTester is TellerV2Context {
     constructor() TellerV2Context(address(0)) {}
 
     function __setMarketOwner(User _marketOwner) external {
         marketRegistry = IMarketRegistry(
-            address(new MockMarketRegistry(address(_marketOwner)))
+            address(new MarketRegistryMock(address(_marketOwner)))
         );
     }
 

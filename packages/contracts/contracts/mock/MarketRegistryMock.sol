@@ -8,6 +8,10 @@ import { PaymentType } from "../libraries/V2Calculations.sol";
 contract MarketRegistryMock is IMarketRegistry {
     address marketOwner;
 
+    constructor(address _marketOwner) {
+        marketOwner = _marketOwner;
+    }
+
     function initialize(TellerAS _tellerAS) external {}
 
     function isVerifiedLender(uint256 _marketId, address _lenderAddress)

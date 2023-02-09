@@ -31,9 +31,9 @@ import "../MetaForwarder.sol";
 import { LenderManager } from "../LenderManager.sol";
 
 contract TellerV2_Test is Testable {
-    User private marketOwner;
-    User private borrower;
-    User private lender;
+    TellerV2User private marketOwner;
+    TellerV2User private borrower;
+    TellerV2User private lender;
 
     TellerV2 tellerV2;
 
@@ -101,9 +101,9 @@ contract TellerV2_Test is Testable {
         );
 
         // Instantiate users & balances
-        marketOwner = new User(tellerV2, wethMock);
-        borrower = new User(tellerV2, wethMock);
-        lender = new User(tellerV2, wethMock);
+        marketOwner = new TellerV2User(tellerV2, wethMock);
+        borrower = new TellerV2User(tellerV2, wethMock);
+        lender = new TellerV2User(tellerV2, wethMock);
 
         uint256 balance = 50000;
         payable(address(borrower)).transfer(balance);
@@ -212,4 +212,21 @@ contract TellerV2_Test is Testable {
             "Collateral was not sent to borrower after repayment"
         );
     }
+}
+
+
+contract TellerV2User is User {
+
+    WethMock public immutable wethMock;
+
+    constructor(TellerV2 _tellerV2, WethMock _wethMock) User(_tellerV2){
+
+        wethMock = _wethMock;
+    }
+
+    function depositToWeth(uint256 amount) public {
+        wethMock.deposit{ value: amount }();
+    }
+
+
 }

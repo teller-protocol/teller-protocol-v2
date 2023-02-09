@@ -37,7 +37,7 @@ contract TellerV2Autopay_Test is Testable, TellerV2Autopay {
     address marketRegistry;
 
     constructor() TellerV2Autopay(address(new TellerV2SolMock())) {
-        marketRegistry = address(new MarketRegistryMock());
+        marketRegistry = address(new MarketRegistryMock(address(0)));
         TellerV2SolMock(address(tellerV2)).setMarketRegistry(marketRegistry);
     }
 

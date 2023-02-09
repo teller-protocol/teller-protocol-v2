@@ -30,11 +30,11 @@ contract MarketRegistry_Test is Testable, TellerV2 {
     constructor() TellerV2(address(address(0))) {}
 
     function setup_beforeAll() public {
-        wethMock = new WethMock();
+        //wethMock = new WethMock();
 
-        marketOwner = new User(this, wethMock);
-        borrower = new User(this, wethMock);
-        lender = new User(this, wethMock);
+        marketOwner = new User(this);
+        borrower = new User(this);
+        lender = new User(this);
 
         lenderCommitmentForwarder = address(0);
         marketRegistry = IMarketRegistry(new MarketRegistry());

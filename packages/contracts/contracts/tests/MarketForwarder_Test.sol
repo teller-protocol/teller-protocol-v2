@@ -11,10 +11,13 @@ import { TellerV2Context } from "../TellerV2Context.sol";
 import { IMarketRegistry } from "../interfaces/IMarketRegistry.sol";
 import { TellerV2MarketForwarder } from "../TellerV2MarketForwarder.sol";
 
+import "../mock/MarketRegistryMock.sol";
+
+
 contract MarketForwarder_Test is Testable, TellerV2MarketForwarder {
     MarketForwarderTester private tester;
 
-    MockMarketRegistry mockMarketRegistry;
+    MarketRegistryMock mockMarketRegistry;
 
     uint256 private marketId;
     User private marketOwner;
@@ -24,12 +27,12 @@ contract MarketForwarder_Test is Testable, TellerV2MarketForwarder {
     constructor()
         TellerV2MarketForwarder(
             address(new MarketForwarderTester()),
-            address(new MockMarketRegistry(address(0)))
+            address(new MarketRegistryMock(address(0)))
         )
     {}
 
     function setup_beforeAll() public {
-        mockMarketRegistry = MockMarketRegistry(address(getMarketRegistry()));
+        mockMarketRegistry = MarketRegistryMock(address(getMarketRegistry()));
         tester = MarketForwarderTester(address(getTellerV2()));
 
         marketOwner = new User(tester);
@@ -141,12 +144,15 @@ contract User {
     }
 }
 
+
+//Move to a helper 
+//this is a tellerV2 mock 
 contract MarketForwarderTester is TellerV2Context {
     constructor() TellerV2Context(address(0)) {}
 
     function __setMarketOwner(User _marketOwner) external {
         marketRegistry = IMarketRegistry(
-            address(new MockMarketRegistry(address(_marketOwner)))
+            address(new MarketRegistryMock(address(_marketOwner)))
         );
     }
 
@@ -166,19 +172,4 @@ contract MarketForwarderTester is TellerV2Context {
         return _msgDataForMarket(_marketId);
     }
 }
-
-contract MockMarketRegistry {
-    address private marketOwner;
-
-    constructor(address _marketOwner) {
-        marketOwner = _marketOwner;
-    }
-
-    function setMarketOwner(address _marketOwner) public {
-        marketOwner = _marketOwner;
-    }
-
-    function getMarketOwner(uint256) external view returns (address) {
-        return address(marketOwner);
-    }
-}
+ 

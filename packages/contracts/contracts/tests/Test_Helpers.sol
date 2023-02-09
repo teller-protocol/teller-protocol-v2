@@ -11,16 +11,16 @@ import { PaymentType } from "../libraries/V2Calculations.sol";
 
 contract User {
     TellerV2 public immutable tellerV2;
-    WethMock public immutable wethMock;
+    //WethMock public immutable wethMock;
 
-    constructor(TellerV2 _tellerV2, WethMock _wethMock) {
+    constructor(TellerV2 _tellerV2/*, WethMock _wethMock*/) {
         tellerV2 = _tellerV2;
-        wethMock = _wethMock;
+        //wethMock = _wethMock;
     }
 
-    function depositToWeth(uint256 amount) public {
+    /*function depositToWeth(uint256 amount) public {
         wethMock.deposit{ value: amount }();
-    }
+    }*/
 
     function addAllowance(
         address _assetContractAddress,

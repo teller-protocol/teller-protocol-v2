@@ -12,7 +12,7 @@ contract PMT_Test is Testable, TellerV2 {
 
     constructor() TellerV2(address(0)) {}
 
-    function _01_pmt_test() public {
+    function test_01_pmt() public {
         __bid.loanDetails.principal = 10000e6; // 10k USDC
         __bid.loanDetails.loanDuration = 365 days * 3; // 3 years
         __bid.terms.paymentCycle = 365 days / 12; // 1 month
@@ -20,7 +20,7 @@ contract PMT_Test is Testable, TellerV2 {
         pmt_runner(290812096);
     }
 
-    function _02_pmt_test() public {
+    function test_02_pmt() public {
         __bid.loanDetails.principal = 100000e6; // 100x USDC
         __bid.loanDetails.loanDuration = 365 days * 10; // 10 years
         __bid.terms.paymentCycle = 365 days / 12; // 1 month
@@ -28,7 +28,7 @@ contract PMT_Test is Testable, TellerV2 {
         pmt_runner(1213275944);
     }
 
-    function _03_pmt_test() public {
+    function test_03_pmt() public {
         __bid.loanDetails.principal = 100000e6; // 100x USDC
         __bid.loanDetails.loanDuration = 365 days * 10; // 10 years
         __bid.terms.paymentCycle = 365 days / 12; // 1 month
@@ -36,7 +36,7 @@ contract PMT_Test is Testable, TellerV2 {
         pmt_runner(833333334);
     }
 
-    function _04_pmt_test() public {
+    function test_04_pmt() public {
         __bid.loanDetails.principal = 100000e6; // 100x USDC
         __bid.loanDetails.loanDuration = 45 days; // 45 days
         __bid.terms.paymentCycle = 30 days; // 1 month

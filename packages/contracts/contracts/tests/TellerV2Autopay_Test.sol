@@ -102,12 +102,12 @@ contract TellerV2Autopay_Test is Testable, TellerV2Autopay {
         );
     }
 
-    function setAutopayFee_test() public {
+    function test_setAutopayFee() public {
         _setAutopayFee(4);
         assertEq(4, getAutopayFee(), "Auto pay fee not set");
     }
 
-    function setAutopayFeeOnlyOwner_test() public {
+    function test_setAutopayFeeOnlyOwner() public {
         User user = new User(
             address(this),
             address(tellerV2),

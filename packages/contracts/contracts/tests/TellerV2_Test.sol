@@ -41,7 +41,7 @@ contract TellerV2_Test is Testable {
     uint256 marketId1;
     uint256 collateralAmount = 10;
 
-    function setup_beforeAll() public {
+    function setUp() public {
         // Deploy test tokens
         wethMock = new WethMock();
         daiMock = new TestERC20Token("Dai", "DAI", 10000000);
@@ -153,7 +153,7 @@ contract TellerV2_Test is Testable {
         lender.acceptBid(_bidId);
     }
 
-    function collateralEscrow_test() public {
+    function test_collateralEscrow() public {
         // Submit bid as borrower
         uint256 bidId = submitCollateralBid();
         // Accept bid as lender

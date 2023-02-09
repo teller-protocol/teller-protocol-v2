@@ -28,7 +28,7 @@ contract MarketForwarder_Test is Testable, TellerV2MarketForwarder {
         )
     {}
 
-    function setup_beforeAll() public {
+    function setUp() public {
         mockMarketRegistry = MockMarketRegistry(address(getMarketRegistry()));
         tester = MarketForwarderTester(address(getTellerV2()));
 
@@ -47,7 +47,9 @@ contract MarketForwarder_Test is Testable, TellerV2MarketForwarder {
         marketOwner.setTrustedMarketForwarder(marketId, address(this));
     }
 
-    function setTrustedMarketForwarder_test() public {
+    function test_setTrustedMarketForwarder() public {
+        setTrustedMarketForwarder_before();
+
         assertEq(
             tester.isTrustedMarketForwarder(marketId, address(this)),
             true,
@@ -62,7 +64,9 @@ contract MarketForwarder_Test is Testable, TellerV2MarketForwarder {
         user2.approveMarketForwarder(marketId, address(this));
     }
 
-    function approveMarketForwarder_test() public {
+    function test_approveMarketForwarder() public {
+        approveMarketForwarder_before();
+
         assertEq(
             tester.hasApprovedMarketForwarder(
                 marketId,
@@ -87,7 +91,9 @@ contract MarketForwarder_Test is Testable, TellerV2MarketForwarder {
         approveMarketForwarder_before();
     }
 
-    function forwardUserCall_test() public {
+    function test_forwardUserCall() public {
+        forwardUserCall_before();
+
         address expectedSender = address(user1);
         address sender = abi.decode(
             _forwardCall(

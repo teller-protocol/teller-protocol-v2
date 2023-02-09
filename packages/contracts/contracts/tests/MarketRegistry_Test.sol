@@ -29,7 +29,7 @@ contract MarketRegistry_Test is Testable, TellerV2 {
 
     constructor() TellerV2(address(address(0))) {}
 
-    function setup_beforeAll() public {
+    function setUp() public {
         wethMock = new WethMock();
 
         marketOwner = new User(this, wethMock);

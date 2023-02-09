@@ -355,14 +355,11 @@ contract TellerV2 is
         bid.loanDetails.timestamp = uint32(block.timestamp);
 
         // Set payment cycle type based on market setting (custom or monthly)
-        bidPaymentCycleType[bidId] = marketRegistry
-            .getMarketplacePaymentCycleType(_marketplaceId);
+        (bid.terms.paymentCycle, bidPaymentCycleType[bidId]) = marketRegistry.getPaymentCycleValue(
+            _marketplaceId
+        );
 
-        if (bidPaymentCycleType[bidId] == PaymentCycleType.Seconds) {
-            bid.terms.paymentCycle = marketRegistry.getPaymentCycleValue(
-                _marketplaceId
-            );
-        } else if (bidPaymentCycleType[bidId] == PaymentCycleType.Monthly) {
+        if (bidPaymentCycleType[bidId] == PaymentCycleType.Monthly) {
             bid.terms.paymentCycle = 30 days;
         }
 

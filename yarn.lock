@@ -1014,20 +1014,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mangrovedao/hardhat-test-solidity@npm:^0.0.16":
-  version: 0.0.16
-  resolution: "@mangrovedao/hardhat-test-solidity@npm:0.0.16"
-  dependencies:
-    chai: ^4.2.0
-    debug: ^4.3.2
-    mocha: ^7.1.2
-  peerDependencies:
-    hardhat: ^2.0.0
-    hardhat-deploy: ">=0.8.9"
-  checksum: 3cec5b3fb4fc4b1dcf46e6480c309d448b5ba8ded46de2ad94c49a362ff41e866a6f76d6f4f02f31bbce31dbe993ea6b5940046a667c1260d989f75e8e762520
-  languageName: node
-  linkType: hard
-
 "@metamask/eth-sig-util@npm:^4.0.0":
   version: 4.0.1
   resolution: "@metamask/eth-sig-util@npm:4.0.1"
@@ -1261,6 +1247,17 @@ __metadata:
     mcl-wasm: ^0.7.1
     rustbn.js: ~0.2.0
   checksum: 3c0e10b377579d74bfdcfd056d5545b605f767982e41038d036c8219a50fe3564c7f146fdd04385d64f48f94b9d95c378d7a37955c5100c46c568a29f54ea737
+  languageName: node
+  linkType: hard
+
+"@nomicfoundation/hardhat-foundry@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "@nomicfoundation/hardhat-foundry@npm:1.0.0"
+  dependencies:
+    chalk: ^2.4.2
+  peerDependencies:
+    hardhat: ^2.12.6
+  checksum: 9c3d3746a37d6d6a7246af6f9b945129f3f6fadb2aad528632f75c3c7a1768e0faf75ddf7577072aebea98a2ab287a1a6422af741eed4c666bd6e70c9d81f712
   languageName: node
   linkType: hard
 
@@ -1700,7 +1697,7 @@ __metadata:
     "@ethereum-attestation-service/sdk": ^0.11.2
     "@ethereumjs/vm": ^5.5.3
     "@ethersproject/providers": ^5.6.7
-    "@mangrovedao/hardhat-test-solidity": ^0.0.16
+    "@nomicfoundation/hardhat-foundry": ^1.0.0
     "@nomiclabs/hardhat-ethers": ^2.2.1
     "@nomiclabs/hardhat-waffle": ^2.0.0
     "@openzeppelin/contracts": ^4.5.0
@@ -4586,7 +4583,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chai@npm:^4.2.0, chai@npm:^4.3.4":
+"chai@npm:^4.3.4":
   version: 4.3.6
   resolution: "chai@npm:4.3.6"
   dependencies:
@@ -8514,7 +8511,7 @@ __metadata:
     yargs-parser: ^16.1.0
   bin:
     gluegun: bin/gluegun
-  checksum: 7a45a5a606a1e651c891467a693552b5237f8e90410f9c9daad4621ff0693d1c92b69aa35fc30eccf7c3b92ee724f15fc297e054086cfb312717ef01f48d2290
+  checksum: 872685026db07ad1687056a78388f17c6a9bcd22bbf9d99d1e2b21e2d196c6e99a128bcff48063b3f0cf692a4365142fae9dd06cf8c532bc557a45f8ac853308
   languageName: node
   linkType: hard
 
@@ -11954,7 +11951,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mocha@npm:^7.1.1, mocha@npm:^7.1.2":
+"mocha@npm:^7.1.1":
   version: 7.2.0
   resolution: "mocha@npm:7.2.0"
   dependencies:

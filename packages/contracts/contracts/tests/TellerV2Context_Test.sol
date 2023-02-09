@@ -28,7 +28,7 @@ contract TellerV2Context_Test is Testable, TellerV2Context {
             address(new MockMarketRegistry(marketOwner))
         );
 
-        Test.eq(
+        assertEq(
             marketRegistry.getMarketOwner(5),
             address(marketOwner),
             "should have set marketOwner"
@@ -36,17 +36,17 @@ contract TellerV2Context_Test is Testable, TellerV2Context {
     }
 
     function isTrustedMarketForwarder_test() public returns (bool) {
-        Test.eq(
+        assertEq(
             super.isTrustedMarketForwarder(89, lenderCommitmentForwarder),
             true,
             "lenderCommitmentForwarder should be a trusted forwarder for all markets"
         );
-        //Test.eq(super.isTrustedMarketForwarder(1,  address(0)) , false, "by default address(0) should not be a trusted forwarder");
+        //assertEq(super.isTrustedMarketForwarder(1,  address(0)) , false, "by default address(0) should not be a trusted forwarder");
 
         address stubbedMarketForwarder = address(
             0xB11ca87E32075817C82Cc471994943a4290f4a14
         );
-        Test.eq(
+        assertEq(
             super.isTrustedMarketForwarder(7, stubbedMarketForwarder),
             false,
             "by default an address should not be a trusted forwarder"
@@ -54,7 +54,7 @@ contract TellerV2Context_Test is Testable, TellerV2Context {
 
         marketOwner.setTrustedMarketForwarder(7, stubbedMarketForwarder);
 
-        Test.eq(
+        assertEq(
             super.isTrustedMarketForwarder(7, stubbedMarketForwarder),
             true,
             " address should  be a trusted forwarder after setting "

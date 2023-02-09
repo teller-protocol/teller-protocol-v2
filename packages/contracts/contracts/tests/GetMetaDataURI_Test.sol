@@ -18,13 +18,13 @@ contract GetMetaDataURI_Test is Testable, TellerV2 {
 
     function getMetaDataURI_test() public {
         string memory oldURI = getMetadataURI(0);
-        Test.eq(
+        assertEq(
             oldURI,
             "0x0000000000000000000000000000000086004f3f419f88be1cab574b4bd01b6d",
             "Expected URI does not match stored depreciated value in the Bid struct"
         );
         string memory newURI = getMetadataURI(59);
-        Test.eq(
+        assertEq(
             newURI,
             "ipfs://QmMyDataHash",
             "Expected URI does not match new value in uri mapping"

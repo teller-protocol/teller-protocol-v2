@@ -46,18 +46,18 @@ contract CollateralEscrow_Test is Testable {
 
         uint256 storedBalance = borrower.getBalance(address(wethMock));
 
-        Test.eq(storedBalance, 0, "Escrow withdraw unsuccessful");
+        assertEq(storedBalance, 0,"Stored balance was not withdrawn");
 
         try borrower.withdraw(address(wethMock), amount, address(borrower)) {
-            Test.fail("No collateral balance for asset");
+            fail("No collateral balance for asset");
         } catch Error(string memory reason) {
-            Test.eq(
+            assertEq(
                 reason,
                 "No collateral balance for asset",
                 "Should not be able to withdraw already withdrawn assets"
             );
         } catch {
-            Test.fail("Unknown error");
+            fail("Unknown error");
         }
     }
 
@@ -68,7 +68,7 @@ contract CollateralEscrow_Test is Testable {
 
         uint256 storedBalance = borrower.getBalance(address(wethMock));
 
-        Test.eq(storedBalance, amount, "Escrow deposit unsuccessful");
+        assertEq(storedBalance, amount, "Escrow deposit unsuccessful");
     }
 }
 

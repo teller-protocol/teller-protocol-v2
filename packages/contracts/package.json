@@ -7,7 +7,7 @@
     "coverage": "DISABLE_LOGS=true TS_NODE_TRANSPILE_ONLY=1 TESTING=1 yarn hh coverage",
     "shell": "yarn solidity-shell",
     "chain": "yarn hh node --no-deploy",
-    "compile": "COMPILING=true yarn hh compile",
+    "compile": "COMPILING=true forge build",
     "build": "yarn clean && yarn compile --force && yarn tsc",
     "verify": "yarn hh verify --network polygon",
     "migrate:new": "scripts/contract-migration/create-new.sh write",

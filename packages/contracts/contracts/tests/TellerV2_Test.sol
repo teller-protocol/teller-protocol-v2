@@ -166,11 +166,11 @@ contract TellerV2_Test is Testable {
         uint256 storedBidId = escrow.getBid();
 
         // Test that the created escrow has the same bidId and collateral stored
-        Test.eq(bidId, storedBidId, "Collateral escrow was not created");
+        assertEq(bidId, storedBidId, "Collateral escrow was not created");
 
         uint256 escrowBalance = wethMock.balanceOf(escrowAddress);
 
-        Test.eq(collateralAmount, escrowBalance, "Collateral was not stored");
+        assertEq(collateralAmount, escrowBalance, "Collateral was not stored");
 
         // Repay loan
         uint256 borrowerBalanceBefore = wethMock.balanceOf(address(borrower));
@@ -184,7 +184,7 @@ contract TellerV2_Test is Testable {
 
         // Check escrow balance
         uint256 escrowBalanceAfter = wethMock.balanceOf(escrowAddress);
-        Test.eq(
+        assertEq(
             0,
             escrowBalanceAfter,
             "Collateral was not withdrawn from escrow on repayment"
@@ -192,7 +192,7 @@ contract TellerV2_Test is Testable {
 
         // Check borrower balance for collateral
         uint256 borrowerBalanceAfter = wethMock.balanceOf(address(borrower));
-        Test.eq(
+        assertEq(
             collateralAmount,
             borrowerBalanceAfter - borrowerBalanceBefore,
             "Collateral was not sent to borrower after repayment"

@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@openzeppelin/contracts/utils/Arrays.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 
-import "hardhat/console.sol";
+ 
 
 import "./Testable.sol";
 import "../TellerV2.sol";
@@ -151,12 +151,12 @@ contract V2Calculations_Test is Testable {
             // Set last repaid time
             __bid.loanDetails.lastRepaidTimestamp = uint32(nowTimestamp);
         }
-        Test.eq(
+        assertEq(
             cycleIndex,
             expectedTotalCycles,
             "Expected number of cycles incorrect"
         );
-        Test.eq(
+        assertEq(
             cycleIndex <= cycleCount + 1,
             true,
             "Payment cycle exceeded agreed terms"
@@ -186,12 +186,12 @@ contract V2Calculations_Test is Testable {
         console.log(_owedPrincipal);
         console.log(_duePrincipal);
 
-        Test.eq(
+        assertEq(
             _owedPrincipal,
             1076484033293177614,
             "Expected number of cycles incorrect"
         );
-        Test.eq(
+        assertEq(
             _duePrincipal,
             1076484033293177614,
             "Expected number of cycles incorrect"
@@ -230,13 +230,13 @@ contract V2Calculations_Test is Testable {
                 PaymentType.Bullet
             );
 
-        Test.eq(
+        assertEq(
             _owedPrincipal,
             _principal,
             "First cycle bullet owed principal incorrect"
         );
-        Test.eq(_duePrincipal, 0, "First cycle bullet due principal incorrect");
-        Test.eq(_interest, 1250000000, "First cycle bullet interest incorrect");
+        assertEq(_duePrincipal, 0, "First cycle bullet due principal incorrect");
+        assertEq(_interest, 1250000000, "First cycle bullet interest incorrect");
 
         // Within random payment cycle
         _timestamp = _acceptedTimestamp + ((365 days / 12) * 3);
@@ -255,13 +255,13 @@ contract V2Calculations_Test is Testable {
                 PaymentType.Bullet
             );
 
-        Test.eq(
+        assertEq(
             _owedPrincipal,
             _principal,
             "Second cycle bullet Owed principal incorrect"
         );
-        Test.eq(_duePrincipal, 0, "Second cycle bullet principal incorrect");
-        Test.eq(
+        assertEq(_duePrincipal, 0, "Second cycle bullet principal incorrect");
+        assertEq(
             _interest,
             7500000000,
             "Second cycle bullet interest incorrect"
@@ -284,17 +284,17 @@ contract V2Calculations_Test is Testable {
                 PaymentType.Bullet
             );
 
-        Test.eq(
+        assertEq(
             _owedPrincipal,
             _principal,
             "Final cycle bullet Owed principal incorrect"
         );
-        Test.eq(
+        assertEq(
             _duePrincipal,
             _principal,
             "Final cycle bullet principal incorrect"
         );
-        Test.eq(
+        assertEq(
             _interest,
             29589041095,
             "Final cycle bullet interest incorrect"
@@ -317,17 +317,17 @@ contract V2Calculations_Test is Testable {
                 PaymentType.Bullet
             );
 
-        Test.eq(
+        assertEq(
             _owedPrincipal,
             _principal,
             "Final cycle bullet Owed principal incorrect"
         );
-        Test.eq(
+        assertEq(
             _duePrincipal,
             _principal,
             "Final cycle bullet principal incorrect"
         );
-        Test.eq(
+        assertEq(
             _interest,
             ((_principal * _apr) / 10000) * 2,
             "Final cycle bullet interest incorrect"

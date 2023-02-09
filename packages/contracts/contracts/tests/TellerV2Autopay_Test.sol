@@ -95,7 +95,7 @@ contract TellerV2Autopay_Test is Testable, TellerV2Autopay {
 
         borrower.enableAutoPay(bidId, true);
 
-        Test.eq(
+        assertEq(
             loanAutoPayEnabled[bidId],
             true,
             "Autopay not enabled after setAutoPayEnabled"
@@ -104,7 +104,7 @@ contract TellerV2Autopay_Test is Testable, TellerV2Autopay {
 
     function setAutopayFee_test() public {
         _setAutopayFee(4);
-        Test.eq(4, getAutopayFee(), "Auto pay fee not set");
+        assertEq(4, getAutopayFee(), "Auto pay fee not set");
     }
 
     function setAutopayFeeOnlyOwner_test() public {
@@ -114,15 +114,15 @@ contract TellerV2Autopay_Test is Testable, TellerV2Autopay {
             address(wethMock)
         );
         try user.setAutopayFee(4) {
-            Test.fail("Auto pay fee set by non owner");
+            fail("Auto pay fee set by non owner");
         } catch Error(string memory reason) {
-            Test.eq(
+            assertEq(
                 reason,
                 "Ownable: caller is not the owner",
                 "Should not be able to set autopay fee"
             );
         } catch {
-            Test.fail("Unknown error");
+            fail("Unknown error");
         }
     }
 
@@ -185,7 +185,7 @@ contract TellerV2Autopay_Test is Testable, TellerV2Autopay {
 
         uint256 lenderBalanceDelta = lenderBalanceAfter - lenderBalanceBefore;
 
-        Test.eq(
+        assertEq(
             lenderBalanceDelta,
             2,
             "lender did not receive the auto pay charge"
@@ -194,7 +194,7 @@ contract TellerV2Autopay_Test is Testable, TellerV2Autopay {
         uint256 borrowerBalanceDelta = borrowerBalanceBefore -
             borrowerBalanceAfter;
 
-        Test.eq(borrowerBalanceDelta, 4002, "borrower did not autopay");
+        assertEq(borrowerBalanceDelta, 4002, "borrower did not autopay");
     }
 
     function getEstimatedMinimumPayment(uint256 _bidId)

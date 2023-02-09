@@ -51,6 +51,6 @@ contract PMT_Test is Testable, TellerV2 {
             __bid.terms.paymentCycle,
             __bid.terms.APR
         );
-        Test.eq(pmt, _expected, "Loan payment for cycle incorrect");
+        assertEq(pmt, _expected, "Loan payment for cycle incorrect");
     }
 }

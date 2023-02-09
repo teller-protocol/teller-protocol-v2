@@ -48,7 +48,7 @@ contract MarketForwarder_Test is Testable, TellerV2MarketForwarder {
     }
 
     function setTrustedMarketForwarder_test() public {
-        Test.eq(
+        assertEq(
             tester.isTrustedMarketForwarder(marketId, address(this)),
             true,
             "Trusted forwarder was not set"
@@ -63,7 +63,7 @@ contract MarketForwarder_Test is Testable, TellerV2MarketForwarder {
     }
 
     function approveMarketForwarder_test() public {
-        Test.eq(
+        assertEq(
             tester.hasApprovedMarketForwarder(
                 marketId,
                 address(this),
@@ -72,7 +72,7 @@ contract MarketForwarder_Test is Testable, TellerV2MarketForwarder {
             true,
             "Borrower did not set market forwarder approval"
         );
-        Test.eq(
+        assertEq(
             tester.hasApprovedMarketForwarder(
                 marketId,
                 address(this),
@@ -99,7 +99,7 @@ contract MarketForwarder_Test is Testable, TellerV2MarketForwarder {
             ),
             (address)
         );
-        Test.eq(
+        assertEq(
             sender,
             expectedSender,
             "Sender address for market does not match expected"
@@ -113,7 +113,7 @@ contract MarketForwarder_Test is Testable, TellerV2MarketForwarder {
             _forwardCall(expectedData, expectedSender),
             (bytes)
         );
-        Test.eq0(
+        assertEq0(
             data,
             expectedData,
             "Function calldata for market does not match expected"

@@ -74,16 +74,16 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         ][marketId][tokenAddress];
 
         //make sure the commitment exists
-        //        Test.eq(existingCommitment.amount, maxAmount, "Commitment not recorded!" );
+        //        assertEq(existingCommitment.amount, maxAmount, "Commitment not recorded!" );
     }
 
     function deleteCommitment_test() public {
         //make sure the commitment exists
-        //Test.eq( ,  ,"" );
+        //assertEq( ,  ,"" );
         //        super.deleteCommitment(tokenAddress, marketId);
         //        Commitment memory existingCommitment = lenderMarketCommitments[address(this)][marketId][tokenAddress];
         //make sure the commitment has been removed
-        //Test.eq( ,  ,"" );
+        //assertEq( ,  ,"" );
     }
 
     function acceptCommitment_before() public {
@@ -102,7 +102,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             address(lender)
         ][marketId][tokenAddress];
 
-        Test.eq(
+        assertEq(
             acceptBidWasCalled,
             false,
             "Expect accept bid not called before exercise"
@@ -117,13 +117,13 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             minInterestRate
         );
 
-        Test.eq(
+        assertEq(
             acceptBidWasCalled,
             true,
             "Expect accept bid called after exercise"
         );
 
-        Test.eq(
+        assertEq(
             commitment.maxPrincipal == 100,
             true,
             "commitment not accepted"
@@ -138,7 +138,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             minInterestRate
         );
 
-        Test.eq(commitment.maxPrincipal == 0, true, "commitment not accepted");
+        assertEq(commitment.maxPrincipal == 0, true, "commitment not accepted");
     }
 
     /*
@@ -157,7 +157,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
     function _acceptBid(uint256, address) internal override returns (bool) {
         acceptBidWasCalled = true;
 
-        Test.eq(
+        assertEq(
             submitBidWasCalled,
             true,
             "Submit bid must be called before accept bid"

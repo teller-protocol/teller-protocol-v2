@@ -1,0 +1,733 @@
+{
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "validAfter",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [],
+      "name": "NotPayable",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "isPayable",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes",
+          "name": "",
+          "type": "bytes"
+        },
+        {
+          "internalType": "bytes",
+          "name": "",
+          "type": "bytes"
+        },
+        {
+          "internalType": "uint256",
+          "name": "expirationTime",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "resolve",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "stateMutability": "payable",
+      "type": "receive"
+    }
+  ],
+  "bytecode": {
+    "object": "0x60a060405234801561001057600080fd5b5060405161025238038061025283398101604081905261002f91610037565b608052610050565b60006020828403121561004957600080fd5b5051919050565b6080516101e861006a6000396000606101526101e86000f3fe60806040526004361061002d5760003560e01c8063947a75b414610050578063ce46e0461461009f57600080fd5b3661004b57604051631574f9f360e01b815260040160405180910390fd5b600080fd5b61008b61005e366004610118565b507f0000000000000000000000000000000000000000000000000000000000000000111595945050505050565b604051901515815260200160405180910390f35b3480156100ab57600080fd5b50600061008b565b80356001600160a01b03811681146100ca57600080fd5b919050565b60008083601f8401126100e157600080fd5b50813567ffffffffffffffff8111156100f957600080fd5b60208301915083602082850101111561011157600080fd5b9250929050565b600080600080600080600060a0888a03121561013357600080fd5b61013c886100b3565b9650602088013567ffffffffffffffff8082111561015957600080fd5b6101658b838c016100cf565b909850965060408a013591508082111561017e57600080fd5b5061018b8a828b016100cf565b909550935050606088013591506101a4608089016100b3565b90509295989194975092955056fea26469706673582212204abdada5214bcd7d63bae01184eb6006e22e91927ef5859b0fbd85934d05262064736f6c63430008110033",
+    "sourceMap": "222:484:57:-:0;;;330:73;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::i;:::-;372:24;;222:484;;14:184:135;84:6;137:2;125:9;116:7;112:23;108:32;105:52;;;153:1;150;143:12;105:52;-1:-1:-1;176:16:135;;14:184;-1:-1:-1;14:184:135:o;:::-;222:484:57;;;;;;;;;;;;",
+    "linkReferences": {}
+  },
+  "deployedBytecode": {
+    "object": "0x60806040526004361061002d5760003560e01c8063947a75b414610050578063ce46e0461461009f57600080fd5b3661004b57604051631574f9f360e01b815260040160405180910390fd5b600080fd5b61008b61005e366004610118565b507f0000000000000000000000000000000000000000000000000000000000000000111595945050505050565b604051901515815260200160405180910390f35b3480156100ab57600080fd5b50600061008b565b80356001600160a01b03811681146100ca57600080fd5b919050565b60008083601f8401126100e157600080fd5b50813567ffffffffffffffff8111156100f957600080fd5b60208301915083602082850101111561011157600080fd5b9250929050565b600080600080600080600060a0888a03121561013357600080fd5b61013c886100b3565b9650602088013567ffffffffffffffff8082111561015957600080fd5b6101658b838c016100cf565b909850965060408a013591508082111561017e57600080fd5b5061018b8a828b016100cf565b909550935050606088013591506101a4608089016100b3565b90509295989194975092955056fea26469706673582212204abdada5214bcd7d63bae01184eb6006e22e91927ef5859b0fbd85934d05262064736f6c63430008110033",
+    "sourceMap": "222:484:57:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;414:12:4;;-1:-1:-1;;;414:12:4;;;;;;;;;;;222:484:57;;;;409:295;;;;;;:::i;:::-;-1:-1:-1;686:11:57;-1:-1:-1;668:29:57;;409:295;-1:-1:-1;;;;;409:295:57;;;;1649:14:135;;1642:22;1624:41;;1612:2;1597:18;409:295:57;;;;;;;230:94:4;;;;;;;;;;-1:-1:-1;289:4:4;230:94;;14:173:135;82:20;;-1:-1:-1;;;;;131:31:135;;121:42;;111:70;;177:1;174;167:12;111:70;14:173;;;:::o;192:347::-;243:8;253:6;307:3;300:4;292:6;288:17;284:27;274:55;;325:1;322;315:12;274:55;-1:-1:-1;348:20:135;;391:18;380:30;;377:50;;;423:1;420;413:12;377:50;460:4;452:6;448:17;436:29;;512:3;505:4;496:6;488;484:19;480:30;477:39;474:59;;;529:1;526;519:12;474:59;192:347;;;;;:::o;544:935::-;661:6;669;677;685;693;701;709;762:3;750:9;741:7;737:23;733:33;730:53;;;779:1;776;769:12;730:53;802:29;821:9;802:29;:::i;:::-;792:39;;882:2;871:9;867:18;854:32;905:18;946:2;938:6;935:14;932:34;;;962:1;959;952:12;932:34;1001:58;1051:7;1042:6;1031:9;1027:22;1001:58;:::i;:::-;1078:8;;-1:-1:-1;975:84:135;-1:-1:-1;1166:2:135;1151:18;;1138:32;;-1:-1:-1;1182:16:135;;;1179:36;;;1211:1;1208;1201:12;1179:36;;1250:60;1302:7;1291:8;1280:9;1276:24;1250:60;:::i;:::-;1329:8;;-1:-1:-1;1224:86:135;-1:-1:-1;;1411:2:135;1396:18;;1383:32;;-1:-1:-1;1434:39:135;1468:3;1453:19;;1434:39;:::i;:::-;1424:49;;544:935;;;;;;;;;;:::o",
+    "linkReferences": {},
+    "immutableReferences": {
+      "16446": [
+        {
+          "start": 97,
+          "length": 32
+        }
+      ]
+    }
+  },
+  "methodIdentifiers": {
+    "isPayable()": "ce46e046",
+    "resolve(address,bytes,bytes,uint256,address)": "947a75b4"
+  },
+  "rawMetadata": "{\"compiler\":{\"version\":\"0.8.17+commit.8df45f5f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"validAfter\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[],\"name\":\"NotPayable\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"isPayable\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"expirationTime\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"resolve\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"stateMutability\":\"payable\",\"type\":\"receive\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"isPayable()\":{\"details\":\"Returns whether the resolver supports ETH transfers\"}},\"title\":\"A sample AS resolver that checks whether the expiration time is later than a specific timestamp.\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/tests/resolvers/TestASExpirationTimeResolver.sol\":\"TestASExpirationTimeResolver\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[\":@ensdomains/=node_modules/@ensdomains/\",\":@openzeppelin/=node_modules/@openzeppelin/\",\":ds-test/=lib/forge-std/lib/ds-test/src/\",\":eth-gas-reporter/=node_modules/eth-gas-reporter/\",\":forge-std/=lib/forge-std/src/\",\":hardhat-deploy/=node_modules/hardhat-deploy/\",\":hardhat/=node_modules/hardhat/\"]},\"sources\":{\"contracts/EAS/TellerASResolver.sol\":{\"keccak256\":\"0x8002d1725fd711dacd001e06d98fe2afc4814d2939d06df70c5b3ffcf5ec7f15\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://bf5541bff874031b5b5bd99c16c9b9a02470bf71f2ccbe3de67cb226cfab78ed\",\"dweb:/ipfs/QmNSd856Quf5zhKFYUh2RjeD29fcAkSQNX9SREictuwuUA\"]},\"contracts/interfaces/IASResolver.sol\":{\"keccak256\":\"0xfce671ea099d9f997a69c3447eb4a9c9693d37c5b97e43ada376e614e1c7cb61\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://6673f2ba98aafbeb4bdbfbc2392b164a7ae4e82b8b8a5f5b9b484fbdf4653cc1\",\"dweb:/ipfs/QmVSkwZpHzgpTyzcydE8SptJiGRvK89KahhxBuwNZNm8d2\"]},\"contracts/tests/resolvers/TestASExpirationTimeResolver.sol\":{\"keccak256\":\"0x908de54df73a457fba1ffb324e9c58b991f6a9db8b32548b0ed97ae67fe3d987\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://132852907da6ab0e5f72c88d2365f5310a0d5e824c945f113d3e3657e0468caa\",\"dweb:/ipfs/QmSUtQ5sCxiqGNHpFmSJwE8HspfMtsiDeCL3RVf1wZFXSr\"]}},\"version\":1}",
+  "metadata": {
+    "compiler": {
+      "version": "0.8.17+commit.8df45f5f"
+    },
+    "language": "Solidity",
+    "output": {
+      "abi": [
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "validAfter",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "constructor"
+        },
+        {
+          "inputs": [],
+          "type": "error",
+          "name": "NotPayable"
+        },
+        {
+          "inputs": [],
+          "stateMutability": "pure",
+          "type": "function",
+          "name": "isPayable",
+          "outputs": [
+            {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
+            }
+          ]
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            },
+            {
+              "internalType": "bytes",
+              "name": "",
+              "type": "bytes"
+            },
+            {
+              "internalType": "bytes",
+              "name": "",
+              "type": "bytes"
+            },
+            {
+              "internalType": "uint256",
+              "name": "expirationTime",
+              "type": "uint256"
+            },
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "payable",
+          "type": "function",
+          "name": "resolve",
+          "outputs": [
+            {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
+            }
+          ]
+        },
+        {
+          "inputs": [],
+          "stateMutability": "payable",
+          "type": "receive"
+        }
+      ],
+      "devdoc": {
+        "kind": "dev",
+        "methods": {
+          "isPayable()": {
+            "details": "Returns whether the resolver supports ETH transfers"
+          }
+        },
+        "version": 1
+      },
+      "userdoc": {
+        "kind": "user",
+        "methods": {},
+        "version": 1
+      }
+    },
+    "settings": {
+      "remappings": [
+        ":@ensdomains/=node_modules/@ensdomains/",
+        ":@openzeppelin/=node_modules/@openzeppelin/",
+        ":ds-test/=lib/forge-std/lib/ds-test/src/",
+        ":eth-gas-reporter/=node_modules/eth-gas-reporter/",
+        ":forge-std/=lib/forge-std/src/",
+        ":hardhat-deploy/=node_modules/hardhat-deploy/",
+        ":hardhat/=node_modules/hardhat/"
+      ],
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "metadata": {
+        "bytecodeHash": "ipfs"
+      },
+      "compilationTarget": {
+        "contracts/tests/resolvers/TestASExpirationTimeResolver.sol": "TestASExpirationTimeResolver"
+      },
+      "libraries": {}
+    },
+    "sources": {
+      "contracts/EAS/TellerASResolver.sol": {
+        "keccak256": "0x8002d1725fd711dacd001e06d98fe2afc4814d2939d06df70c5b3ffcf5ec7f15",
+        "urls": [
+          "bzz-raw://bf5541bff874031b5b5bd99c16c9b9a02470bf71f2ccbe3de67cb226cfab78ed",
+          "dweb:/ipfs/QmNSd856Quf5zhKFYUh2RjeD29fcAkSQNX9SREictuwuUA"
+        ],
+        "license": "MIT"
+      },
+      "contracts/interfaces/IASResolver.sol": {
+        "keccak256": "0xfce671ea099d9f997a69c3447eb4a9c9693d37c5b97e43ada376e614e1c7cb61",
+        "urls": [
+          "bzz-raw://6673f2ba98aafbeb4bdbfbc2392b164a7ae4e82b8b8a5f5b9b484fbdf4653cc1",
+          "dweb:/ipfs/QmVSkwZpHzgpTyzcydE8SptJiGRvK89KahhxBuwNZNm8d2"
+        ],
+        "license": "MIT"
+      },
+      "contracts/tests/resolvers/TestASExpirationTimeResolver.sol": {
+        "keccak256": "0x908de54df73a457fba1ffb324e9c58b991f6a9db8b32548b0ed97ae67fe3d987",
+        "urls": [
+          "bzz-raw://132852907da6ab0e5f72c88d2365f5310a0d5e824c945f113d3e3657e0468caa",
+          "dweb:/ipfs/QmSUtQ5sCxiqGNHpFmSJwE8HspfMtsiDeCL3RVf1wZFXSr"
+        ],
+        "license": "MIT"
+      }
+    },
+    "version": 1
+  },
+  "ast": {
+    "absolutePath": "contracts/tests/resolvers/TestASExpirationTimeResolver.sol",
+    "id": 16479,
+    "exportedSymbols": {
+      "IASResolver": [
+        9018
+      ],
+      "TellerASResolver": [
+        2397
+      ],
+      "TestASExpirationTimeResolver": [
+        16478
+      ]
+    },
+    "nodeType": "SourceUnit",
+    "src": "0:707:57",
+    "nodes": [
+      {
+        "id": 16440,
+        "nodeType": "PragmaDirective",
+        "src": "0:31:57",
+        "nodes": [],
+        "literals": [
+          "solidity",
+          ">=",
+          "0.8",
+          ".0",
+          "<",
+          "0.9",
+          ".0"
+        ]
+      },
+      {
+        "id": 16441,
+        "nodeType": "ImportDirective",
+        "src": "65:40:57",
+        "nodes": [],
+        "absolutePath": "contracts/EAS/TellerASResolver.sol",
+        "file": "../../EAS/TellerASResolver.sol",
+        "nameLocation": "-1:-1:-1",
+        "scope": 16479,
+        "sourceUnit": 2398,
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "id": 16478,
+        "nodeType": "ContractDefinition",
+        "src": "222:484:57",
+        "nodes": [
+          {
+            "id": 16446,
+            "nodeType": "VariableDeclaration",
+            "src": "286:37:57",
+            "nodes": [],
+            "constant": false,
+            "mutability": "immutable",
+            "name": "_validAfter",
+            "nameLocation": "312:11:57",
+            "scope": 16478,
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 16445,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "286:7:57",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "visibility": "private"
+          },
+          {
+            "id": 16456,
+            "nodeType": "FunctionDefinition",
+            "src": "330:73:57",
+            "nodes": [],
+            "body": {
+              "id": 16455,
+              "nodeType": "Block",
+              "src": "362:41:57",
+              "nodes": [],
+              "statements": [
+                {
+                  "expression": {
+                    "id": 16453,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "id": 16451,
+                      "name": "_validAfter",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 16446,
+                      "src": "372:11:57",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "id": 16452,
+                      "name": "validAfter",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 16448,
+                      "src": "386:10:57",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "src": "372:24:57",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "id": 16454,
+                  "nodeType": "ExpressionStatement",
+                  "src": "372:24:57"
+                }
+              ]
+            },
+            "implemented": true,
+            "kind": "constructor",
+            "modifiers": [],
+            "name": "",
+            "nameLocation": "-1:-1:-1",
+            "parameters": {
+              "id": 16449,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 16448,
+                  "mutability": "mutable",
+                  "name": "validAfter",
+                  "nameLocation": "350:10:57",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 16456,
+                  "src": "342:18:57",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 16447,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "342:7:57",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "341:20:57"
+            },
+            "returnParameters": {
+              "id": 16450,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "362:0:57"
+            },
+            "scope": 16478,
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "public"
+          },
+          {
+            "id": 16477,
+            "nodeType": "FunctionDefinition",
+            "src": "409:295:57",
+            "nodes": [],
+            "body": {
+              "id": 16476,
+              "nodeType": "Block",
+              "src": "651:53:57",
+              "nodes": [],
+              "statements": [
+                {
+                  "expression": {
+                    "commonType": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    },
+                    "id": 16474,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftExpression": {
+                      "id": 16472,
+                      "name": "expirationTime",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 16464,
+                      "src": "668:14:57",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "nodeType": "BinaryOperation",
+                    "operator": ">=",
+                    "rightExpression": {
+                      "id": 16473,
+                      "name": "_validAfter",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 16446,
+                      "src": "686:11:57",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "src": "668:29:57",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "functionReturnParameters": 16471,
+                  "id": 16475,
+                  "nodeType": "Return",
+                  "src": "661:36:57"
+                }
+              ]
+            },
+            "baseFunctions": [
+              9017
+            ],
+            "functionSelector": "947a75b4",
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "resolve",
+            "nameLocation": "418:7:57",
+            "overrides": {
+              "id": 16468,
+              "nodeType": "OverrideSpecifier",
+              "overrides": [],
+              "src": "627:8:57"
+            },
+            "parameters": {
+              "id": 16467,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 16458,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 16477,
+                  "src": "435:7:57",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 16457,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "435:7:57",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 16460,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 16477,
+                  "src": "468:14:57",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_calldata_ptr",
+                    "typeString": "bytes"
+                  },
+                  "typeName": {
+                    "id": 16459,
+                    "name": "bytes",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "468:5:57",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_storage_ptr",
+                      "typeString": "bytes"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 16462,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 16477,
+                  "src": "505:14:57",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_calldata_ptr",
+                    "typeString": "bytes"
+                  },
+                  "typeName": {
+                    "id": 16461,
+                    "name": "bytes",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "505:5:57",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_storage_ptr",
+                      "typeString": "bytes"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 16464,
+                  "mutability": "mutable",
+                  "name": "expirationTime",
+                  "nameLocation": "548:14:57",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 16477,
+                  "src": "540:22:57",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 16463,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "540:7:57",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 16466,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 16477,
+                  "src": "572:7:57",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 16465,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "572:7:57",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "425:176:57"
+            },
+            "returnParameters": {
+              "id": 16471,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 16470,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 16477,
+                  "src": "645:4:57",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 16469,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "645:4:57",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "644:6:57"
+            },
+            "scope": 16478,
+            "stateMutability": "payable",
+            "virtual": true,
+            "visibility": "external"
+          }
+        ],
+        "abstract": false,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 16443,
+              "name": "TellerASResolver",
+              "nameLocations": [
+                "263:16:57"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 2397,
+              "src": "263:16:57"
+            },
+            "id": 16444,
+            "nodeType": "InheritanceSpecifier",
+            "src": "263:16:57"
+          }
+        ],
+        "canonicalName": "TestASExpirationTimeResolver",
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": {
+          "id": 16442,
+          "nodeType": "StructuredDocumentation",
+          "src": "107:114:57",
+          "text": " @title A sample AS resolver that checks whether the expiration time is later than a specific timestamp."
+        },
+        "fullyImplemented": true,
+        "linearizedBaseContracts": [
+          16478,
+          2397,
+          9018
+        ],
+        "name": "TestASExpirationTimeResolver",
+        "nameLocation": "231:28:57",
+        "scope": 16479,
+        "usedErrors": [
+          2375
+        ]
+      }
+    ],
+    "license": "MIT"
+  },
+  "id": 57
+}

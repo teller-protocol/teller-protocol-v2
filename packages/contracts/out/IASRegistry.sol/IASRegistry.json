@@ -1,0 +1,1003 @@
+{
+  "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "uuid",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "index",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes",
+          "name": "schema",
+          "type": "bytes"
+        },
+        {
+          "indexed": false,
+          "internalType": "contract IASResolver",
+          "name": "resolver",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "attester",
+          "type": "address"
+        }
+      ],
+      "name": "Registered",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "uuid",
+          "type": "bytes32"
+        }
+      ],
+      "name": "getAS",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "bytes32",
+              "name": "uuid",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "contract IASResolver",
+              "name": "resolver",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "index",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bytes",
+              "name": "schema",
+              "type": "bytes"
+            }
+          ],
+          "internalType": "struct IASRegistry.ASRecord",
+          "name": "",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getASCount",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes",
+          "name": "schema",
+          "type": "bytes"
+        },
+        {
+          "internalType": "contract IASResolver",
+          "name": "resolver",
+          "type": "address"
+        }
+      ],
+      "name": "register",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": {
+    "object": "0x",
+    "sourceMap": "",
+    "linkReferences": {}
+  },
+  "deployedBytecode": {
+    "object": "0x",
+    "sourceMap": "",
+    "linkReferences": {}
+  },
+  "methodIdentifiers": {
+    "getAS(bytes32)": "72487d52",
+    "getASCount()": "d9625064",
+    "register(bytes,address)": "a99e7e29"
+  },
+  "rawMetadata": "{\"compiler\":{\"version\":\"0.8.17+commit.8df45f5f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"uuid\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"schema\",\"type\":\"bytes\"},{\"indexed\":false,\"internalType\":\"contract IASResolver\",\"name\":\"resolver\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"attester\",\"type\":\"address\"}],\"name\":\"Registered\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"uuid\",\"type\":\"bytes32\"}],\"name\":\"getAS\",\"outputs\":[{\"components\":[{\"internalType\":\"bytes32\",\"name\":\"uuid\",\"type\":\"bytes32\"},{\"internalType\":\"contract IASResolver\",\"name\":\"resolver\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"schema\",\"type\":\"bytes\"}],\"internalType\":\"struct IASRegistry.ASRecord\",\"name\":\"\",\"type\":\"tuple\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getASCount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"schema\",\"type\":\"bytes\"},{\"internalType\":\"contract IASResolver\",\"name\":\"resolver\",\"type\":\"address\"}],\"name\":\"register\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"events\":{\"Registered(bytes32,uint256,bytes,address,address)\":{\"details\":\"Triggered when a new AS has been registered\",\"params\":{\"attester\":\"The address of the account used to register the AS.\",\"index\":\"The AS index.\",\"resolver\":\"An optional AS schema resolver.\",\"schema\":\"The AS schema.\",\"uuid\":\"The AS UUID.\"}}},\"kind\":\"dev\",\"methods\":{\"getAS(bytes32)\":{\"details\":\"Returns an existing AS by UUID\",\"params\":{\"uuid\":\"The UUID of the AS to retrieve.\"},\"returns\":{\"_0\":\"The AS data members.\"}},\"getASCount()\":{\"details\":\"Returns the global counter for the total number of attestations\",\"returns\":{\"_0\":\"The global counter for the total number of attestations.\"}},\"register(bytes,address)\":{\"details\":\"Submits and reserve a new AS\",\"params\":{\"resolver\":\"An optional AS schema resolver.\",\"schema\":\"The AS data schema.\"},\"returns\":{\"_0\":\"The UUID of the new AS.\"}}},\"title\":\"The global AS registry interface.\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/interfaces/IASRegistry.sol\":\"IASRegistry\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[\":@ensdomains/=node_modules/@ensdomains/\",\":@openzeppelin/=node_modules/@openzeppelin/\",\":ds-test/=lib/forge-std/lib/ds-test/src/\",\":eth-gas-reporter/=node_modules/eth-gas-reporter/\",\":forge-std/=lib/forge-std/src/\",\":hardhat-deploy/=node_modules/hardhat-deploy/\",\":hardhat/=node_modules/hardhat/\"]},\"sources\":{\"contracts/interfaces/IASRegistry.sol\":{\"keccak256\":\"0x74752921f592df45c8717d7084627e823b1dbc93bad7187cd3023c9690df7e60\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://14ed67b4973bd1b2797604cfd652387bbe230682f3f5a41e922879a0f4d5b668\",\"dweb:/ipfs/QmTJ5fvKX7deAQ8YpoPmwyVR379BdfbKSzaHSLoje7h5Tx\"]},\"contracts/interfaces/IASResolver.sol\":{\"keccak256\":\"0xfce671ea099d9f997a69c3447eb4a9c9693d37c5b97e43ada376e614e1c7cb61\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://6673f2ba98aafbeb4bdbfbc2392b164a7ae4e82b8b8a5f5b9b484fbdf4653cc1\",\"dweb:/ipfs/QmVSkwZpHzgpTyzcydE8SptJiGRvK89KahhxBuwNZNm8d2\"]}},\"version\":1}",
+  "metadata": {
+    "compiler": {
+      "version": "0.8.17+commit.8df45f5f"
+    },
+    "language": "Solidity",
+    "output": {
+      "abi": [
+        {
+          "inputs": [
+            {
+              "internalType": "bytes32",
+              "name": "uuid",
+              "type": "bytes32",
+              "indexed": true
+            },
+            {
+              "internalType": "uint256",
+              "name": "index",
+              "type": "uint256",
+              "indexed": true
+            },
+            {
+              "internalType": "bytes",
+              "name": "schema",
+              "type": "bytes",
+              "indexed": false
+            },
+            {
+              "internalType": "contract IASResolver",
+              "name": "resolver",
+              "type": "address",
+              "indexed": false
+            },
+            {
+              "internalType": "address",
+              "name": "attester",
+              "type": "address",
+              "indexed": false
+            }
+          ],
+          "type": "event",
+          "name": "Registered",
+          "anonymous": false
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "bytes32",
+              "name": "uuid",
+              "type": "bytes32"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function",
+          "name": "getAS",
+          "outputs": [
+            {
+              "internalType": "struct IASRegistry.ASRecord",
+              "name": "",
+              "type": "tuple",
+              "components": [
+                {
+                  "internalType": "bytes32",
+                  "name": "uuid",
+                  "type": "bytes32"
+                },
+                {
+                  "internalType": "contract IASResolver",
+                  "name": "resolver",
+                  "type": "address"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "index",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "schema",
+                  "type": "bytes"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "inputs": [],
+          "stateMutability": "view",
+          "type": "function",
+          "name": "getASCount",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ]
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "bytes",
+              "name": "schema",
+              "type": "bytes"
+            },
+            {
+              "internalType": "contract IASResolver",
+              "name": "resolver",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function",
+          "name": "register",
+          "outputs": [
+            {
+              "internalType": "bytes32",
+              "name": "",
+              "type": "bytes32"
+            }
+          ]
+        }
+      ],
+      "devdoc": {
+        "kind": "dev",
+        "methods": {
+          "getAS(bytes32)": {
+            "details": "Returns an existing AS by UUID",
+            "params": {
+              "uuid": "The UUID of the AS to retrieve."
+            },
+            "returns": {
+              "_0": "The AS data members."
+            }
+          },
+          "getASCount()": {
+            "details": "Returns the global counter for the total number of attestations",
+            "returns": {
+              "_0": "The global counter for the total number of attestations."
+            }
+          },
+          "register(bytes,address)": {
+            "details": "Submits and reserve a new AS",
+            "params": {
+              "resolver": "An optional AS schema resolver.",
+              "schema": "The AS data schema."
+            },
+            "returns": {
+              "_0": "The UUID of the new AS."
+            }
+          }
+        },
+        "version": 1
+      },
+      "userdoc": {
+        "kind": "user",
+        "methods": {},
+        "version": 1
+      }
+    },
+    "settings": {
+      "remappings": [
+        ":@ensdomains/=node_modules/@ensdomains/",
+        ":@openzeppelin/=node_modules/@openzeppelin/",
+        ":ds-test/=lib/forge-std/lib/ds-test/src/",
+        ":eth-gas-reporter/=node_modules/eth-gas-reporter/",
+        ":forge-std/=lib/forge-std/src/",
+        ":hardhat-deploy/=node_modules/hardhat-deploy/",
+        ":hardhat/=node_modules/hardhat/"
+      ],
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "metadata": {
+        "bytecodeHash": "ipfs"
+      },
+      "compilationTarget": {
+        "contracts/interfaces/IASRegistry.sol": "IASRegistry"
+      },
+      "libraries": {}
+    },
+    "sources": {
+      "contracts/interfaces/IASRegistry.sol": {
+        "keccak256": "0x74752921f592df45c8717d7084627e823b1dbc93bad7187cd3023c9690df7e60",
+        "urls": [
+          "bzz-raw://14ed67b4973bd1b2797604cfd652387bbe230682f3f5a41e922879a0f4d5b668",
+          "dweb:/ipfs/QmTJ5fvKX7deAQ8YpoPmwyVR379BdfbKSzaHSLoje7h5Tx"
+        ],
+        "license": "MIT"
+      },
+      "contracts/interfaces/IASResolver.sol": {
+        "keccak256": "0xfce671ea099d9f997a69c3447eb4a9c9693d37c5b97e43ada376e614e1c7cb61",
+        "urls": [
+          "bzz-raw://6673f2ba98aafbeb4bdbfbc2392b164a7ae4e82b8b8a5f5b9b484fbdf4653cc1",
+          "dweb:/ipfs/QmVSkwZpHzgpTyzcydE8SptJiGRvK89KahhxBuwNZNm8d2"
+        ],
+        "license": "MIT"
+      }
+    },
+    "version": 1
+  },
+  "ast": {
+    "absolutePath": "contracts/interfaces/IASRegistry.sol",
+    "id": 8993,
+    "exportedSymbols": {
+      "IASRegistry": [
+        8992
+      ],
+      "IASResolver": [
+        9018
+      ]
+    },
+    "nodeType": "SourceUnit",
+    "src": "0:1882:24",
+    "nodes": [
+      {
+        "id": 8939,
+        "nodeType": "PragmaDirective",
+        "src": "0:31:24",
+        "nodes": [],
+        "literals": [
+          "solidity",
+          ">=",
+          "0.8",
+          ".0",
+          "<",
+          "0.9",
+          ".0"
+        ]
+      },
+      {
+        "id": 8940,
+        "nodeType": "ImportDirective",
+        "src": "65:27:24",
+        "nodes": [],
+        "absolutePath": "contracts/interfaces/IASResolver.sol",
+        "file": "./IASResolver.sol",
+        "nameLocation": "-1:-1:-1",
+        "scope": 8993,
+        "sourceUnit": 9019,
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "id": 8992,
+        "nodeType": "ContractDefinition",
+        "src": "146:1735:24",
+        "nodes": [
+          {
+            "id": 8951,
+            "nodeType": "StructDefinition",
+            "src": "276:340:24",
+            "nodes": [],
+            "canonicalName": "IASRegistry.ASRecord",
+            "members": [
+              {
+                "constant": false,
+                "id": 8943,
+                "mutability": "mutable",
+                "name": "uuid",
+                "nameLocation": "352:4:24",
+                "nodeType": "VariableDeclaration",
+                "scope": 8951,
+                "src": "344:12:24",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bytes32",
+                  "typeString": "bytes32"
+                },
+                "typeName": {
+                  "id": 8942,
+                  "name": "bytes32",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "344:7:24",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 8946,
+                "mutability": "mutable",
+                "name": "resolver",
+                "nameLocation": "415:8:24",
+                "nodeType": "VariableDeclaration",
+                "scope": 8951,
+                "src": "403:20:24",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_contract$_IASResolver_$9018",
+                  "typeString": "contract IASResolver"
+                },
+                "typeName": {
+                  "id": 8945,
+                  "nodeType": "UserDefinedTypeName",
+                  "pathNode": {
+                    "id": 8944,
+                    "name": "IASResolver",
+                    "nameLocations": [
+                      "403:11:24"
+                    ],
+                    "nodeType": "IdentifierPath",
+                    "referencedDeclaration": 9018,
+                    "src": "403:11:24"
+                  },
+                  "referencedDeclaration": 9018,
+                  "src": "403:11:24",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IASResolver_$9018",
+                    "typeString": "contract IASResolver"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 8948,
+                "mutability": "mutable",
+                "name": "index",
+                "nameLocation": "524:5:24",
+                "nodeType": "VariableDeclaration",
+                "scope": 8951,
+                "src": "516:13:24",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 8947,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "516:7:24",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 8950,
+                "mutability": "mutable",
+                "name": "schema",
+                "nameLocation": "603:6:24",
+                "nodeType": "VariableDeclaration",
+                "scope": 8951,
+                "src": "597:12:24",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bytes_storage_ptr",
+                  "typeString": "bytes"
+                },
+                "typeName": {
+                  "id": 8949,
+                  "name": "bytes",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "597:5:24",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_storage_ptr",
+                    "typeString": "bytes"
+                  }
+                },
+                "visibility": "internal"
+              }
+            ],
+            "name": "ASRecord",
+            "nameLocation": "283:8:24",
+            "scope": 8992,
+            "visibility": "public"
+          },
+          {
+            "id": 8965,
+            "nodeType": "EventDefinition",
+            "src": "933:162:24",
+            "nodes": [],
+            "anonymous": false,
+            "documentation": {
+              "id": 8952,
+              "nodeType": "StructuredDocumentation",
+              "src": "622:306:24",
+              "text": " @dev Triggered when a new AS has been registered\n @param uuid The AS UUID.\n @param index The AS index.\n @param schema The AS schema.\n @param resolver An optional AS schema resolver.\n @param attester The address of the account used to register the AS."
+            },
+            "eventSelector": "51a1a037ef8a642f8b5528429785b5a54e6ee54fb2d2db4b4a44480b5302d55b",
+            "name": "Registered",
+            "nameLocation": "939:10:24",
+            "parameters": {
+              "id": 8964,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 8954,
+                  "indexed": true,
+                  "mutability": "mutable",
+                  "name": "uuid",
+                  "nameLocation": "975:4:24",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8965,
+                  "src": "959:20:24",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 8953,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "959:7:24",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 8956,
+                  "indexed": true,
+                  "mutability": "mutable",
+                  "name": "index",
+                  "nameLocation": "1005:5:24",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8965,
+                  "src": "989:21:24",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 8955,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "989:7:24",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 8958,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "schema",
+                  "nameLocation": "1026:6:24",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8965,
+                  "src": "1020:12:24",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_memory_ptr",
+                    "typeString": "bytes"
+                  },
+                  "typeName": {
+                    "id": 8957,
+                    "name": "bytes",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1020:5:24",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_storage_ptr",
+                      "typeString": "bytes"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 8961,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "resolver",
+                  "nameLocation": "1054:8:24",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8965,
+                  "src": "1042:20:24",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IASResolver_$9018",
+                    "typeString": "contract IASResolver"
+                  },
+                  "typeName": {
+                    "id": 8960,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 8959,
+                      "name": "IASResolver",
+                      "nameLocations": [
+                        "1042:11:24"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 9018,
+                      "src": "1042:11:24"
+                    },
+                    "referencedDeclaration": 9018,
+                    "src": "1042:11:24",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IASResolver_$9018",
+                      "typeString": "contract IASResolver"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 8963,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "attester",
+                  "nameLocation": "1080:8:24",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8965,
+                  "src": "1072:16:24",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 8962,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1072:7:24",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "949:145:24"
+            }
+          },
+          {
+            "id": 8976,
+            "nodeType": "FunctionDefinition",
+            "src": "1307:106:24",
+            "nodes": [],
+            "documentation": {
+              "id": 8966,
+              "nodeType": "StructuredDocumentation",
+              "src": "1101:201:24",
+              "text": " @dev Submits and reserve a new AS\n @param schema The AS data schema.\n @param resolver An optional AS schema resolver.\n @return The UUID of the new AS."
+            },
+            "functionSelector": "a99e7e29",
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "register",
+            "nameLocation": "1316:8:24",
+            "parameters": {
+              "id": 8972,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 8968,
+                  "mutability": "mutable",
+                  "name": "schema",
+                  "nameLocation": "1340:6:24",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8976,
+                  "src": "1325:21:24",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_calldata_ptr",
+                    "typeString": "bytes"
+                  },
+                  "typeName": {
+                    "id": 8967,
+                    "name": "bytes",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1325:5:24",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_storage_ptr",
+                      "typeString": "bytes"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 8971,
+                  "mutability": "mutable",
+                  "name": "resolver",
+                  "nameLocation": "1360:8:24",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8976,
+                  "src": "1348:20:24",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IASResolver_$9018",
+                    "typeString": "contract IASResolver"
+                  },
+                  "typeName": {
+                    "id": 8970,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 8969,
+                      "name": "IASResolver",
+                      "nameLocations": [
+                        "1348:11:24"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 9018,
+                      "src": "1348:11:24"
+                    },
+                    "referencedDeclaration": 9018,
+                    "src": "1348:11:24",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IASResolver_$9018",
+                      "typeString": "contract IASResolver"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1324:45:24"
+            },
+            "returnParameters": {
+              "id": 8975,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 8974,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8976,
+                  "src": "1404:7:24",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 8973,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1404:7:24",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1403:9:24"
+            },
+            "scope": 8992,
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "id": 8985,
+            "nodeType": "FunctionDefinition",
+            "src": "1579:69:24",
+            "nodes": [],
+            "documentation": {
+              "id": 8977,
+              "nodeType": "StructuredDocumentation",
+              "src": "1419:155:24",
+              "text": " @dev Returns an existing AS by UUID\n @param uuid The UUID of the AS to retrieve.\n @return The AS data members."
+            },
+            "functionSelector": "72487d52",
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getAS",
+            "nameLocation": "1588:5:24",
+            "parameters": {
+              "id": 8980,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 8979,
+                  "mutability": "mutable",
+                  "name": "uuid",
+                  "nameLocation": "1602:4:24",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8985,
+                  "src": "1594:12:24",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 8978,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1594:7:24",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1593:14:24"
+            },
+            "returnParameters": {
+              "id": 8984,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 8983,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8985,
+                  "src": "1631:15:24",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_ASRecord_$8951_memory_ptr",
+                    "typeString": "struct IASRegistry.ASRecord"
+                  },
+                  "typeName": {
+                    "id": 8982,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 8981,
+                      "name": "ASRecord",
+                      "nameLocations": [
+                        "1631:8:24"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 8951,
+                      "src": "1631:8:24"
+                    },
+                    "referencedDeclaration": 8951,
+                    "src": "1631:8:24",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_ASRecord_$8951_storage_ptr",
+                      "typeString": "struct IASRegistry.ASRecord"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1630:17:24"
+            },
+            "scope": 8992,
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "id": 8991,
+            "nodeType": "FunctionDefinition",
+            "src": "1825:54:24",
+            "nodes": [],
+            "documentation": {
+              "id": 8986,
+              "nodeType": "StructuredDocumentation",
+              "src": "1654:166:24",
+              "text": " @dev Returns the global counter for the total number of attestations\n @return The global counter for the total number of attestations."
+            },
+            "functionSelector": "d9625064",
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getASCount",
+            "nameLocation": "1834:10:24",
+            "parameters": {
+              "id": 8987,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1844:2:24"
+            },
+            "returnParameters": {
+              "id": 8990,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 8989,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8991,
+                  "src": "1870:7:24",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 8988,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1870:7:24",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1869:9:24"
+            },
+            "scope": 8992,
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "IASRegistry",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": {
+          "id": 8941,
+          "nodeType": "StructuredDocumentation",
+          "src": "94:51:24",
+          "text": " @title The global AS registry interface."
+        },
+        "fullyImplemented": false,
+        "linearizedBaseContracts": [
+          8992
+        ],
+        "name": "IASRegistry",
+        "nameLocation": "156:11:24",
+        "scope": 8993,
+        "usedErrors": []
+      }
+    ],
+    "license": "MIT"
+  },
+  "id": 24
+}

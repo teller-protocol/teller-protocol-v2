@@ -6,8 +6,8 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/metatx/ERC2771ContextUpgradeable.sol";
 
-import "./LenderManager/ERC721UpgradeableMod.sol";
-
+import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
+ 
 // Interfaces
 import "./interfaces/ILenderManager.sol";
 import "./interfaces/ITellerV2.sol";
@@ -17,7 +17,7 @@ contract LenderManager is
 Initializable,
 OwnableUpgradeable,
 //ERC2771ContextUpgradeable,
-ERC721UpgradeableMod,
+ERC721Upgradeable,
 ILenderManager
 {
     IMarketRegistry public immutable marketRegistry;
@@ -54,11 +54,8 @@ ILenderManager
     function registerLoan(uint256 _bidId, address _newLender )
     public
     override
-    {
-        _checkOwner(); // only allow TellerV2 to register loans 
-      
-        require(_hasMarketVerification(_newLender,_bidId), "Not approved by market");
- 
+    onlyOwner
+    { 
         _mint(_newLender,_bidId);
 
         emit NewLoanRegistered(_newLender, _bidId);
@@ -137,35 +134,18 @@ ILenderManager
 
     /**  ERC721 Functions **/
 
-     /**
-     * @dev See {IERC721-transferFrom}.
-     */
-    function transferFrom(address from, address to, uint256 tokenId) public virtual override {
+
+    function _beforeTokenTransfer(
+        address,
+        address to,
+        uint256 tokenId,
+        uint256 
+    ) internal override {
 
         require(_hasMarketVerification(to,tokenId), "Not approved by market");
 
-        //solhint-disable-next-line max-line-length
-        require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721: caller is not token owner or approved");
-
-        _transfer(from, to, tokenId);
-    }
-
-    /**
-     * @dev See {IERC721-safeTransferFrom}.
-     */
-    function safeTransferFrom(address from, address to, uint256 tokenId) public virtual override {
-        safeTransferFrom(from, to, tokenId, "");
-    }
-
-    /**
-     * @dev See {IERC721-safeTransferFrom}.
-     */
-    function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory data) public virtual override {
-        require(_hasMarketVerification(to,tokenId), "Not approved by market");
-
-        require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721: caller is not token owner or approved");
-        _safeTransfer(from, to, tokenId, data);
-    }
+    } 
+  
 
     function _baseURI() internal view override returns (string memory) {
         return "";

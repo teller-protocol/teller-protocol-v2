@@ -1,0 +1,550 @@
+{
+  "abi": [
+    {
+      "inputs": [],
+      "name": "NotPayable",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "isPayable",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "recipient",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes",
+          "name": "schema",
+          "type": "bytes"
+        },
+        {
+          "internalType": "bytes",
+          "name": "data",
+          "type": "bytes"
+        },
+        {
+          "internalType": "uint256",
+          "name": "expirationTime",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "msgSender",
+          "type": "address"
+        }
+      ],
+      "name": "resolve",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "stateMutability": "payable",
+      "type": "receive"
+    }
+  ],
+  "bytecode": {
+    "object": "0x",
+    "sourceMap": "",
+    "linkReferences": {}
+  },
+  "deployedBytecode": {
+    "object": "0x",
+    "sourceMap": "",
+    "linkReferences": {}
+  },
+  "methodIdentifiers": {
+    "isPayable()": "ce46e046",
+    "resolve(address,bytes,bytes,uint256,address)": "947a75b4"
+  },
+  "rawMetadata": "{\"compiler\":{\"version\":\"0.8.17+commit.8df45f5f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"NotPayable\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"isPayable\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"recipient\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"schema\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"expirationTime\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"msgSender\",\"type\":\"address\"}],\"name\":\"resolve\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"stateMutability\":\"payable\",\"type\":\"receive\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"isPayable()\":{\"details\":\"Returns whether the resolver supports ETH transfers\"},\"resolve(address,bytes,bytes,uint256,address)\":{\"details\":\"Resolves an attestation and verifier whether its data conforms to the spec.\",\"params\":{\"data\":\"The actual attestation data.\",\"expirationTime\":\"The expiration time of the attestation.\",\"msgSender\":\"The sender of the original attestation message.\",\"recipient\":\"The recipient of the attestation.\",\"schema\":\"The AS data schema.\"},\"returns\":{\"_0\":\"Whether the data is valid according to the scheme.\"}}},\"title\":\"A base resolver contract\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/EAS/TellerASResolver.sol\":\"TellerASResolver\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[\":@ensdomains/=node_modules/@ensdomains/\",\":@openzeppelin/=node_modules/@openzeppelin/\",\":ds-test/=lib/forge-std/lib/ds-test/src/\",\":eth-gas-reporter/=node_modules/eth-gas-reporter/\",\":forge-std/=lib/forge-std/src/\",\":hardhat-deploy/=node_modules/hardhat-deploy/\",\":hardhat/=node_modules/hardhat/\"]},\"sources\":{\"contracts/EAS/TellerASResolver.sol\":{\"keccak256\":\"0x8002d1725fd711dacd001e06d98fe2afc4814d2939d06df70c5b3ffcf5ec7f15\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://bf5541bff874031b5b5bd99c16c9b9a02470bf71f2ccbe3de67cb226cfab78ed\",\"dweb:/ipfs/QmNSd856Quf5zhKFYUh2RjeD29fcAkSQNX9SREictuwuUA\"]},\"contracts/interfaces/IASResolver.sol\":{\"keccak256\":\"0xfce671ea099d9f997a69c3447eb4a9c9693d37c5b97e43ada376e614e1c7cb61\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://6673f2ba98aafbeb4bdbfbc2392b164a7ae4e82b8b8a5f5b9b484fbdf4653cc1\",\"dweb:/ipfs/QmVSkwZpHzgpTyzcydE8SptJiGRvK89KahhxBuwNZNm8d2\"]}},\"version\":1}",
+  "metadata": {
+    "compiler": {
+      "version": "0.8.17+commit.8df45f5f"
+    },
+    "language": "Solidity",
+    "output": {
+      "abi": [
+        {
+          "inputs": [],
+          "type": "error",
+          "name": "NotPayable"
+        },
+        {
+          "inputs": [],
+          "stateMutability": "pure",
+          "type": "function",
+          "name": "isPayable",
+          "outputs": [
+            {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
+            }
+          ]
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "recipient",
+              "type": "address"
+            },
+            {
+              "internalType": "bytes",
+              "name": "schema",
+              "type": "bytes"
+            },
+            {
+              "internalType": "bytes",
+              "name": "data",
+              "type": "bytes"
+            },
+            {
+              "internalType": "uint256",
+              "name": "expirationTime",
+              "type": "uint256"
+            },
+            {
+              "internalType": "address",
+              "name": "msgSender",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "payable",
+          "type": "function",
+          "name": "resolve",
+          "outputs": [
+            {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
+            }
+          ]
+        },
+        {
+          "inputs": [],
+          "stateMutability": "payable",
+          "type": "receive"
+        }
+      ],
+      "devdoc": {
+        "kind": "dev",
+        "methods": {
+          "isPayable()": {
+            "details": "Returns whether the resolver supports ETH transfers"
+          },
+          "resolve(address,bytes,bytes,uint256,address)": {
+            "details": "Resolves an attestation and verifier whether its data conforms to the spec.",
+            "params": {
+              "data": "The actual attestation data.",
+              "expirationTime": "The expiration time of the attestation.",
+              "msgSender": "The sender of the original attestation message.",
+              "recipient": "The recipient of the attestation.",
+              "schema": "The AS data schema."
+            },
+            "returns": {
+              "_0": "Whether the data is valid according to the scheme."
+            }
+          }
+        },
+        "version": 1
+      },
+      "userdoc": {
+        "kind": "user",
+        "methods": {},
+        "version": 1
+      }
+    },
+    "settings": {
+      "remappings": [
+        ":@ensdomains/=node_modules/@ensdomains/",
+        ":@openzeppelin/=node_modules/@openzeppelin/",
+        ":ds-test/=lib/forge-std/lib/ds-test/src/",
+        ":eth-gas-reporter/=node_modules/eth-gas-reporter/",
+        ":forge-std/=lib/forge-std/src/",
+        ":hardhat-deploy/=node_modules/hardhat-deploy/",
+        ":hardhat/=node_modules/hardhat/"
+      ],
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "metadata": {
+        "bytecodeHash": "ipfs"
+      },
+      "compilationTarget": {
+        "contracts/EAS/TellerASResolver.sol": "TellerASResolver"
+      },
+      "libraries": {}
+    },
+    "sources": {
+      "contracts/EAS/TellerASResolver.sol": {
+        "keccak256": "0x8002d1725fd711dacd001e06d98fe2afc4814d2939d06df70c5b3ffcf5ec7f15",
+        "urls": [
+          "bzz-raw://bf5541bff874031b5b5bd99c16c9b9a02470bf71f2ccbe3de67cb226cfab78ed",
+          "dweb:/ipfs/QmNSd856Quf5zhKFYUh2RjeD29fcAkSQNX9SREictuwuUA"
+        ],
+        "license": "MIT"
+      },
+      "contracts/interfaces/IASResolver.sol": {
+        "keccak256": "0xfce671ea099d9f997a69c3447eb4a9c9693d37c5b97e43ada376e614e1c7cb61",
+        "urls": [
+          "bzz-raw://6673f2ba98aafbeb4bdbfbc2392b164a7ae4e82b8b8a5f5b9b484fbdf4653cc1",
+          "dweb:/ipfs/QmVSkwZpHzgpTyzcydE8SptJiGRvK89KahhxBuwNZNm8d2"
+        ],
+        "license": "MIT"
+      }
+    },
+    "version": 1
+  },
+  "ast": {
+    "absolutePath": "contracts/EAS/TellerASResolver.sol",
+    "id": 2398,
+    "exportedSymbols": {
+      "IASResolver": [
+        9018
+      ],
+      "TellerASResolver": [
+        2397
+      ]
+    },
+    "nodeType": "SourceUnit",
+    "src": "0:446:4",
+    "nodes": [
+      {
+        "id": 2369,
+        "nodeType": "PragmaDirective",
+        "src": "0:31:4",
+        "nodes": [],
+        "literals": [
+          "solidity",
+          ">=",
+          "0.8",
+          ".0",
+          "<",
+          "0.9",
+          ".0"
+        ]
+      },
+      {
+        "id": 2370,
+        "nodeType": "ImportDirective",
+        "src": "65:39:4",
+        "nodes": [],
+        "absolutePath": "contracts/interfaces/IASResolver.sol",
+        "file": "../interfaces/IASResolver.sol",
+        "nameLocation": "-1:-1:-1",
+        "scope": 2398,
+        "sourceUnit": 9019,
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "id": 2397,
+        "nodeType": "ContractDefinition",
+        "src": "149:296:4",
+        "nodes": [
+          {
+            "id": 2375,
+            "nodeType": "ErrorDefinition",
+            "src": "205:19:4",
+            "nodes": [],
+            "errorSelector": "1574f9f3",
+            "name": "NotPayable",
+            "nameLocation": "211:10:4",
+            "parameters": {
+              "id": 2374,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "221:2:4"
+            }
+          },
+          {
+            "id": 2384,
+            "nodeType": "FunctionDefinition",
+            "src": "230:94:4",
+            "nodes": [],
+            "body": {
+              "id": 2383,
+              "nodeType": "Block",
+              "src": "295:29:4",
+              "nodes": [],
+              "statements": [
+                {
+                  "expression": {
+                    "hexValue": "66616c7365",
+                    "id": 2381,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": true,
+                    "kind": "bool",
+                    "lValueRequested": false,
+                    "nodeType": "Literal",
+                    "src": "312:5:4",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    },
+                    "value": "false"
+                  },
+                  "functionReturnParameters": 2380,
+                  "id": 2382,
+                  "nodeType": "Return",
+                  "src": "305:12:4"
+                }
+              ]
+            },
+            "baseFunctions": [
+              9001
+            ],
+            "functionSelector": "ce46e046",
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "isPayable",
+            "nameLocation": "239:9:4",
+            "overrides": {
+              "id": 2377,
+              "nodeType": "OverrideSpecifier",
+              "overrides": [],
+              "src": "271:8:4"
+            },
+            "parameters": {
+              "id": 2376,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "248:2:4"
+            },
+            "returnParameters": {
+              "id": 2380,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2379,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2384,
+                  "src": "289:4:4",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 2378,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "289:4:4",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "288:6:4"
+            },
+            "scope": 2397,
+            "stateMutability": "pure",
+            "virtual": true,
+            "visibility": "public"
+          },
+          {
+            "id": 2396,
+            "nodeType": "FunctionDefinition",
+            "src": "330:113:4",
+            "nodes": [],
+            "body": {
+              "id": 2395,
+              "nodeType": "Block",
+              "src": "365:78:4",
+              "nodes": [],
+              "statements": [
+                {
+                  "condition": {
+                    "id": 2389,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "nodeType": "UnaryOperation",
+                    "operator": "!",
+                    "prefix": true,
+                    "src": "379:12:4",
+                    "subExpression": {
+                      "arguments": [],
+                      "expression": {
+                        "argumentTypes": [],
+                        "id": 2387,
+                        "name": "isPayable",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 2384,
+                        "src": "380:9:4",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_function_internal_pure$__$returns$_t_bool_$",
+                          "typeString": "function () pure returns (bool)"
+                        }
+                      },
+                      "id": 2388,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "kind": "functionCall",
+                      "lValueRequested": false,
+                      "nameLocations": [],
+                      "names": [],
+                      "nodeType": "FunctionCall",
+                      "src": "380:11:4",
+                      "tryCall": false,
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bool",
+                        "typeString": "bool"
+                      }
+                    },
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "id": 2394,
+                  "nodeType": "IfStatement",
+                  "src": "375:62:4",
+                  "trueBody": {
+                    "id": 2393,
+                    "nodeType": "Block",
+                    "src": "393:44:4",
+                    "statements": [
+                      {
+                        "errorCall": {
+                          "arguments": [],
+                          "expression": {
+                            "argumentTypes": [],
+                            "id": 2390,
+                            "name": "NotPayable",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 2375,
+                            "src": "414:10:4",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_function_error_pure$__$returns$__$",
+                              "typeString": "function () pure"
+                            }
+                          },
+                          "id": 2391,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "kind": "functionCall",
+                          "lValueRequested": false,
+                          "nameLocations": [],
+                          "names": [],
+                          "nodeType": "FunctionCall",
+                          "src": "414:12:4",
+                          "tryCall": false,
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_tuple$__$",
+                            "typeString": "tuple()"
+                          }
+                        },
+                        "id": 2392,
+                        "nodeType": "RevertStatement",
+                        "src": "407:19:4"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "implemented": true,
+            "kind": "receive",
+            "modifiers": [],
+            "name": "",
+            "nameLocation": "-1:-1:-1",
+            "parameters": {
+              "id": 2385,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "337:2:4"
+            },
+            "returnParameters": {
+              "id": 2386,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "365:0:4"
+            },
+            "scope": 2397,
+            "stateMutability": "payable",
+            "virtual": true,
+            "visibility": "external"
+          }
+        ],
+        "abstract": true,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 2372,
+              "name": "IASResolver",
+              "nameLocations": [
+                "187:11:4"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 9018,
+              "src": "187:11:4"
+            },
+            "id": 2373,
+            "nodeType": "InheritanceSpecifier",
+            "src": "187:11:4"
+          }
+        ],
+        "canonicalName": "TellerASResolver",
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": {
+          "id": 2371,
+          "nodeType": "StructuredDocumentation",
+          "src": "106:42:4",
+          "text": " @title A base resolver contract"
+        },
+        "fullyImplemented": false,
+        "linearizedBaseContracts": [
+          2397,
+          9018
+        ],
+        "name": "TellerASResolver",
+        "nameLocation": "167:16:4",
+        "scope": 2398,
+        "usedErrors": [
+          2375
+        ]
+      }
+    ],
+    "license": "MIT"
+  },
+  "id": 4
+}

@@ -10,15 +10,6 @@ interface ILenderManager {
     function registerLoan(uint256 _bidId, address _newLender)
     external;
 
-    /**
-     * @notice Returns the address of the lender that owns a given loan/bid.
-     * @param _bidId The id of the bid to return the lender for
-     * @return lender_ The address of the lender.
-     */
-    function getActiveLoanLender(uint256 _bidId)
-    external
-    view
-    returns (address);
-
+  
  
 }

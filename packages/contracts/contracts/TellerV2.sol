@@ -19,6 +19,9 @@ import { Collateral } from "./interfaces/escrow/ICollateralEscrowV1.sol";
 // Libraries
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+
+import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol";
+
 import "./libraries/NumbersLib.sol";
 import { V2Calculations } from "./libraries/V2Calculations.sol";
 
@@ -494,8 +497,7 @@ contract TellerV2 is
         Bid storage bid = bids[_bidId];
 
         address sender = _msgSenderForMarket(bid.marketplaceId);
-        // Declare the bid acceptor as the lender of the bid
-        lenderManager.registerLoan(_bidId, sender);
+     
 
         require(
             !marketRegistry.isMarketClosed(bid.marketplaceId),
@@ -510,6 +512,9 @@ contract TellerV2 is
 
         // Mark borrower's request as accepted
         bid.state = BidState.ACCEPTED;
+
+        // Declare the bid acceptor as the lender of the bid
+        bid.lender = sender;
 
         // Tell the collateral manager to deploy the escrow and pull funds from the borrower if applicable
         collateralManager.deployAndDeposit(_bidId);
@@ -560,6 +565,24 @@ contract TellerV2 is
 
         emit FeePaid(_bidId, "protocol", amountToProtocol);
         emit FeePaid(_bidId, "marketplace", amountToMarketplace);
+    }
+
+    function claimLoanNFT( uint256 _bidId )
+        external 
+        acceptedLoan(_bidId, "claimLoanNFT")
+        whenNotPaused
+        {
+
+        // Retrieve bid
+        Bid storage bid = bids[_bidId];
+
+        address sender = _msgSenderForMarket(bid.marketplaceId); 
+
+        // mint an NFT with the lender manager
+        lenderManager.registerLoan(_bidId, sender);
+
+        bid.lender = address(lenderManager);
+ 
     }
 
     /**
@@ -713,10 +736,13 @@ contract TellerV2 is
         } else {
             emit LoanRepayment(_bidId);
         }
+
+        address lender = getLoanLender(_bidId);
+
         // Send payment to the lender
         bid.loanDetails.lendingToken.safeTransferFrom(
             _msgSenderForMarket(bid.marketplaceId),
-            lenderManager.getActiveLoanLender(_bidId),
+            lender,
             paymentAmount
         );
 
@@ -951,7 +977,7 @@ contract TellerV2 is
      * @return borrower_ The address of the borrower associated with the bid.
      */
     function getLoanBorrower(uint256 _bidId)
-        external
+        public
         view
         returns (address borrower_)
     {
@@ -965,11 +991,17 @@ contract TellerV2 is
      * @return lender_ The address of the lender associated with the bid.
      */
     function getLoanLender(uint256 _bidId)
-        external
+        public
         view
         returns (address lender_)
-    {
-        lender_ = bids[_bidId]._lender;
+    { 
+
+        lender_ = bids[_bidId].lender;
+
+        if(lender_ == address(lenderManager)){
+            return IERC721Upgradeable(address(lenderManager)).ownerOf(_bidId);
+        }
+
     }
 
     function getLoanLendingToken(uint256 _bidId)

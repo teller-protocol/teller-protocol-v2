@@ -53,9 +53,14 @@ ILenderManager
     }
 
     
+ 
 
+    /*
+    if possible, mint an NFT if the current lender wants to mint an nFT 
 
+    */
 
+ 
     /**
      * @notice Returns the address of the lender that owns a given loan/bid.
      * @param _bidId The id of the bid of which to return the market id

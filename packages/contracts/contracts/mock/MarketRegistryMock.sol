@@ -40,7 +40,7 @@ contract MarketRegistryMock is IMarketRegistry {
         return "url://";
     }
 
-    function getPaymentCycleDuration(uint256 _marketId) public returns (uint32, PaymentCycleType) {
+    function getPaymentCycle(uint256 _marketId) public returns (uint32, PaymentCycleType) {
         return (1000, PaymentCycleType.Seconds);
     }
 

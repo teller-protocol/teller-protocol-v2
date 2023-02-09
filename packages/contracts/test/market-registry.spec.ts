@@ -329,7 +329,7 @@ describe('MarketRegistry', () => {
         .should.emit(marketRegistry, 'SetPaymentCycle')
         .withArgs(1, 0, 60 * 60 * 60)
 
-      expect(await marketRegistry.getPaymentCycleDuration(1)).to.eql([
+      expect(await marketRegistry.getPaymentCycle(1)).to.eql([
         60 * 60 * 60,
         0,
       ])

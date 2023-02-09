@@ -781,7 +781,7 @@ contract MarketRegistry is
      * @return Duration of a loan until it is delinquent.
      * @return The type of payment cycle for loans in the market.
      */
-    function getPaymentCycleDuration(uint256 _marketId)
+    function getPaymentCycle(uint256 _marketId)
         public
         view
         override

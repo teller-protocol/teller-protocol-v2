@@ -42,9 +42,9 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         tellerV2Mock = TellerV2Mock(address(getTellerV2()));
         mockMarketRegistry = MarketRegistryMock(address(getMarketRegistry()));
 
-        marketOwner = new LenderCommitmentUser(tellerV2Mock, (this));
-        borrower = new LenderCommitmentUser(tellerV2Mock, (this));
-        lender = new LenderCommitmentUser(tellerV2Mock, (this));
+        marketOwner = new LenderCommitmentUser(address(tellerV2Mock), (this));
+        borrower = new LenderCommitmentUser(address(tellerV2Mock), (this));
+        lender = new LenderCommitmentUser(address(tellerV2Mock), (this));
         tellerV2Mock.__setMarketOwner(marketOwner);
 
         mockMarketRegistry.setMarketOwner(address(marketOwner));
@@ -174,17 +174,18 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
 }
 
 contract LenderCommitmentUser is User {
-    //TellerV2 public immutable tellerV2;
+  
     LenderCommitmentForwarder public immutable commitmentForwarder;
 
     constructor(
-        TellerV2 _tellerV2,
+        address _tellerV2,
         LenderCommitmentForwarder _commitmentForwarder
     ) User(_tellerV2) {
-        tellerV2 = _tellerV2;
+        
         commitmentForwarder = _commitmentForwarder;
     }
 
+    /*
     function setTrustedMarketForwarder(uint256 _marketId, address _forwarder)
         external
     {
@@ -195,7 +196,7 @@ contract LenderCommitmentUser is User {
         external
     {
         tellerV2.approveMarketForwarder(_marketId, _forwarder);
-    }
+    }*/
 
     function _updateCommitment(
         uint256 marketId,

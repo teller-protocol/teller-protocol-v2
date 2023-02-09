@@ -20,6 +20,15 @@ import "../interfaces/IWETH.sol";
 import { User } from "./Test_Helpers.sol";
 import { PaymentType } from "../libraries/V2Calculations.sol";
 
+
+
+/*
+
+This should have more unit tests that operate on MarketRegistry.sol 
+
+*/
+
+
 contract MarketRegistry_Test is Testable, TellerV2 {
     User private marketOwner;
     User private borrower;
@@ -32,9 +41,9 @@ contract MarketRegistry_Test is Testable, TellerV2 {
     function setup_beforeAll() public {
         //wethMock = new WethMock();
 
-        marketOwner = new User(this);
-        borrower = new User(this);
-        lender = new User(this);
+        marketOwner = new User(address(this));
+        borrower = new User(address(this));
+        lender = new User(address(this));
 
         lenderCommitmentForwarder = address(0);
         marketRegistry = IMarketRegistry(new MarketRegistry());

@@ -321,11 +321,11 @@ describe('MarketRegistry', () => {
     })
   })
 
-  describe('setMarketPaymentCycleDuration', () => {
+  describe('setPaymentCycle', () => {
     it('should be able to update market payment cycle duration', async () => {
       const setDuration = await marketRegistry
         .connect(marketOwner)
-        .setPaymentCycleDuration(1, 60 * 60 * 60)
+        .setPaymentCycle(1, 0, 60 * 60 * 60)
         .should.emit(marketRegistry, 'SetPaymentCycle')
         .withArgs(1, 0, 60 * 60 * 60)
 
@@ -338,7 +338,7 @@ describe('MarketRegistry', () => {
     it('should not be able to update unowned market metadata uri', async () => {
       const setURI = await marketRegistry
         .connect(marketOwner)
-        .setPaymentCycleDuration(9, 60 * 60 * 60)
+        .setPaymentCycle(9, 0, 60 * 60 * 60)
         .should.be.revertedWith('Not the owner')
     })
   })

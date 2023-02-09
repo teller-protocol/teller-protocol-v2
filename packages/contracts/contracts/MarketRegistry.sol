@@ -79,7 +79,6 @@ contract MarketRegistry is
 
     event MarketCreated(address indexed owner, uint256 marketId);
     event SetMarketURI(uint256 marketId, string uri);
-    event SetPaymentCycleDuration(uint256 marketId, uint32 duration);
 
     event SetPaymentDefaultDuration(uint256 marketId, uint32 duration);
     event SetBidExpirationTime(uint256 marketId, uint32 duration);
@@ -233,12 +232,12 @@ contract MarketRegistry is
         markets[marketId_].owner = _initialOwner;
 
         setMarketURI(marketId_, _uri);
-        setPaymentCycleDuration(marketId_, _paymentCycleDuration);
+
         setPaymentDefaultDuration(marketId_, _paymentDefaultDuration);
         setMarketFeePercent(marketId_, _feePercent);
         setBidExpirationTime(marketId_, _bidExpirationTime);
         setMarketPaymentType(marketId_, _paymentType);
-        setMarketPaymentCycleType(marketId_, _paymentCycleType);
+        setPaymentCycle(marketId_, _paymentCycleType, _paymentCycleDuration);
 
         // Check if market requires lender attestation to join
         if (_requireLenderAttestation) {
@@ -509,14 +508,14 @@ contract MarketRegistry is
         string calldata _metadataURI
     ) public ownsMarket(_marketId) {
         setMarketURI(_marketId, _metadataURI);
-        setPaymentCycleDuration(_marketId, _paymentCycleDuration);
+
         setPaymentDefaultDuration(_marketId, _paymentDefaultDuration);
         setBidExpirationTime(_marketId, _bidExpirationTime);
         setMarketFeePercent(_marketId, _feePercent);
         setLenderAttestationRequired(_marketId, _lenderAttestationRequired);
         setBorrowerAttestationRequired(_marketId, _borrowerAttestationRequired);
         setMarketPaymentType(_marketId, _newPaymentType);
-        setMarketPaymentCycleType(_marketId, _paymentCycleType);
+        setPaymentCycle(_marketId, _paymentCycleType, _paymentCycleDuration);
     }
 
     /**
@@ -562,16 +561,25 @@ contract MarketRegistry is
      * @notice Sets the duration of new loans for this market before they turn delinquent.
      * @notice Changing this value does not change the terms of existing loans for this market.
      * @param _marketId The ID of a market.
-     * @param _value Delinquency duration for new loans
+     * @param _paymentCycleType Cycle type (seconds or monthly)
+     * @param _duration Delinquency duration for new loans
      */
-    function setPaymentCycleDuration(uint256 _marketId, uint32 _value)
+    function setPaymentCycle(uint256 _marketId, PaymentCycleType _paymentCycleType, uint32 _duration)
         public
         ownsMarket(_marketId)
     {
-        if (_value != markets[_marketId].paymentCycleDuration) {
-            markets[_marketId].paymentCycleDuration = _value;
+        require(
+            (_paymentCycleType == PaymentCycleType.Seconds) ||
+            (_paymentCycleType == PaymentCycleType.Monthly && _duration == 0),
+            "Monthly payment cycle value must be 0"
+        );
+        Marketplace storage market = markets[_marketId];
+        uint32 duration = _paymentCycleType == PaymentCycleType.Seconds ? _duration : 30 days;
+        if (_paymentCycleType != market.paymentCycleType || duration != market.paymentCycleDuration) {
+            markets[_marketId].paymentCycleType = _paymentCycleType;
+            markets[_marketId].paymentCycleDuration = duration;
 
-            emit SetPaymentCycle(_marketId, markets[_marketId].paymentCycleType, _value);
+            emit SetPaymentCycle(_marketId, _paymentCycleType, duration);
         }
     }
 
@@ -670,17 +678,6 @@ contract MarketRegistry is
         if (_required != markets[_marketId].borrowerAttestationRequired) {
             markets[_marketId].borrowerAttestationRequired = _required;
             emit SetMarketBorrowerAttestation(_marketId, _required);
-        }
-    }
-
-    function setMarketPaymentCycleType(
-        uint256 _marketId,
-        PaymentCycleType _paymentCycleType
-    ) public ownsMarket(_marketId) {
-        if (_paymentCycleType != markets[_marketId].paymentCycleType) {
-            markets[_marketId].paymentCycleType = _paymentCycleType;
-
-            emit SetPaymentCycle(_marketId, _paymentCycleType, markets[_marketId].paymentCycleDuration);
         }
     }
 

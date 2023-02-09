@@ -220,7 +220,7 @@ describe('TellerV2', () => {
       const sample = async (paymentCycle: moment.Duration): Promise<void> => {
         await marketRegistry
           .connect(marketOwner)
-          .setPaymentCycleDuration(marketplaceId, paymentCycle.asSeconds())
+          .setPaymentCycle(marketplaceId, 0, paymentCycle.asSeconds())
 
         const { tellerV2, bidId } = await submitBid({ marketplaceId })
 
@@ -392,7 +392,7 @@ describe('TellerV2', () => {
 
       // pause the protocol
       const deployer = await getNamedSigner('deployer')
-      ///await tellerV2.connect(deployer).pauseProtocol()
+      // /await tellerV2.connect(deployer).pauseProtocol()
 
       // get lender
       const lender = await getNamedSigner('lender')

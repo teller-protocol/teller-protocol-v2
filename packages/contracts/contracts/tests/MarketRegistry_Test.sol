@@ -65,7 +65,7 @@ contract MarketRegistry_Test is Testable, TellerV2 {
         // Monthly payment cycle
         marketOwner.createMarket(
             address(marketRegistry),
-            8000,
+            0,
             7000,
             5000,
             500,

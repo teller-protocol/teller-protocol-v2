@@ -104,7 +104,7 @@ contract PaymentCycle_Test is Testable {
         // Create a market with a monthly payment cycle type
         marketId = marketOwner.createMarket(
             address(marketRegistry),
-            2592000, // 30 days
+            0,
             7000,
             5000,
             500,

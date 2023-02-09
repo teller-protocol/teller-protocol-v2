@@ -16,7 +16,7 @@ const { ethers, toBN, deployments } = hre
 chai.should()
 chai.use(solidity)
 
-const paymentCycleValue = moment.duration(30, 'days').asSeconds()
+const paymentCycleDuration = moment.duration(30, 'days').asSeconds()
 const loanDefaultDuration = moment.duration(180, 'days').asSeconds()
 const loanExpirationDuration = moment.duration(1, 'days').asSeconds()
 const feePercent = 0
@@ -199,7 +199,7 @@ describe('MarketRegistry', () => {
           'createMarket(address,uint32,uint32,uint32,uint16,bool,bool,uint8,uint8,string)'
         ](
           marketOwnerAddress,
-          paymentCycleValue,
+          paymentCycleDuration,
           loanDefaultDuration,
           loanExpirationDuration,
           feePercent,
@@ -220,7 +220,7 @@ describe('MarketRegistry', () => {
           'createMarket(address,uint32,uint32,uint32,uint16,bool,bool,uint8,uint8,string)'
         ](
           ethers.constants.AddressZero,
-          paymentCycleValue,
+          paymentCycleDuration,
           loanDefaultDuration,
           loanExpirationDuration,
           0,
@@ -240,7 +240,7 @@ describe('MarketRegistry', () => {
           'createMarket(address,uint32,uint32,uint32,uint16,bool,bool,uint8,uint8,string)'
         ](
           marketOwnerAddress,
-          paymentCycleValue,
+          paymentCycleDuration,
           loanDefaultDuration,
           loanExpirationDuration,
           0,
@@ -261,7 +261,7 @@ describe('MarketRegistry', () => {
           'createMarket(address,uint32,uint32,uint32,uint16,bool,bool,uint8,uint8,string)'
         ](
           marketOwnerAddress,
-          paymentCycleValue,
+          paymentCycleDuration,
           loanDefaultDuration,
           loanExpirationDuration,
           0,
@@ -282,7 +282,7 @@ describe('MarketRegistry', () => {
           'createMarket(address,uint32,uint32,uint32,uint16,bool,bool,uint8,uint8,string)'
         ](
           marketOwnerAddress,
-          paymentCycleValue,
+          paymentCycleDuration,
           loanDefaultDuration,
           loanExpirationDuration,
           feePercent,
@@ -321,15 +321,15 @@ describe('MarketRegistry', () => {
     })
   })
 
-  describe('setMarketPaymentCycleValue', () => {
+  describe('setMarketPaymentCycleDuration', () => {
     it('should be able to update market payment cycle duration', async () => {
       const setDuration = await marketRegistry
         .connect(marketOwner)
-        .setPaymentCycleValue(1, 60 * 60 * 60)
+        .setPaymentCycleDuration(1, 60 * 60 * 60)
         .should.emit(marketRegistry, 'SetPaymentCycle')
         .withArgs(1, 0, 60 * 60 * 60)
 
-      expect(await marketRegistry.getPaymentCycleValue(1)).to.eql([
+      expect(await marketRegistry.getPaymentCycleDuration(1)).to.eql([
         60 * 60 * 60,
         0,
       ])
@@ -338,7 +338,7 @@ describe('MarketRegistry', () => {
     it('should not be able to update unowned market metadata uri', async () => {
       const setURI = await marketRegistry
         .connect(marketOwner)
-        .setPaymentCycleValue(9, 60 * 60 * 60)
+        .setPaymentCycleDuration(9, 60 * 60 * 60)
         .should.be.revertedWith('Not the owner')
     })
   })
@@ -1006,7 +1006,7 @@ describe('MarketRegistry', () => {
       const fetchedData = await marketRegistry.getMarketData(marketplaceId)
 
       expect(fetchedData.owner).to.eql(marketOwnerAddress)
-      expect(fetchedData.paymentCycleValue).to.eql(paymentCycleValue)
+      expect(fetchedData.paymentCycleDuration).to.eql(paymentCycleDuration)
       expect(fetchedData.paymentDefaultDuration).to.eql(loanDefaultDuration)
       expect(fetchedData.loanExpirationTime).to.eql(loanExpirationDuration)
       expect(fetchedData.metadataURI).to.eql(uriTwo)
@@ -1067,7 +1067,7 @@ describe('MarketRegistry', () => {
         .connect(alternateOwner)
         .updateMarketSettings(
           marketId,
-          paymentCycleValue.toString(),
+          paymentCycleDuration.toString(),
           0,
           0,
           0,
@@ -1085,7 +1085,7 @@ describe('MarketRegistry', () => {
         .connect(marketOwner)
         .updateMarketSettings(
           marketId,
-          paymentCycleValue.toString(),
+          paymentCycleDuration.toString(),
           0,
           0,
           0,
@@ -1099,7 +1099,7 @@ describe('MarketRegistry', () => {
       const fetchedData = await marketRegistry.getMarketData(marketId)
 
       expect(fetchedData.owner).to.eql(marketOwnerAddress)
-      expect(fetchedData.paymentCycleValue).to.eql(paymentCycleValue)
+      expect(fetchedData.paymentCycleDuration).to.eql(paymentCycleDuration)
       expect(fetchedData.paymentDefaultDuration).to.eql(0)
       expect(fetchedData.metadataURI).to.eql(urifour)
     })

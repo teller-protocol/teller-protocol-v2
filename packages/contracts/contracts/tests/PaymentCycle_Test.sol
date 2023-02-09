@@ -115,7 +115,7 @@ contract PaymentCycle_Test is Testable {
             "uri://"
         );
 
-        (uint256 cycleValue, ) = marketRegistry.getPaymentCycleValue(marketId);
+        (uint256 cycleValue, ) = marketRegistry.getPaymentCycleDuration(marketId);
     }
 
     function paymentCycleType_test() public {

@@ -33,7 +33,7 @@ import { BidState, NULL_ADDRESS } from '~~/constants'
 chai.should()
 chai.use(chaiAsPromised)
 
-const paymentCycleValue = moment.duration(30, 'days').asSeconds()
+const paymentCycleDuration = moment.duration(30, 'days').asSeconds()
 const loanDefaultDuration = moment.duration(180, 'days').asSeconds()
 const loanExpirationDuration = moment.duration(1, 'days').asSeconds()
 
@@ -98,7 +98,7 @@ describe('TellerV2', () => {
         'createMarket(address,uint32,uint32,uint32,uint16,bool,bool,uint8,uint8,string)'
       ](
         marketOwnerAddress,
-        paymentCycleValue,
+        paymentCycleDuration,
         loanDefaultDuration,
         loanExpirationDuration,
         0,
@@ -220,7 +220,7 @@ describe('TellerV2', () => {
       const sample = async (paymentCycle: moment.Duration): Promise<void> => {
         await marketRegistry
           .connect(marketOwner)
-          .setPaymentCycleValue(marketplaceId, paymentCycle.asSeconds())
+          .setPaymentCycleDuration(marketplaceId, paymentCycle.asSeconds())
 
         const { tellerV2, bidId } = await submitBid({ marketplaceId })
 
@@ -1012,7 +1012,7 @@ describe('TellerV2', () => {
         'createMarket(address,uint32,uint32,uint32,uint16,bool,bool,uint8,uint8,string)'
       ](
         marketOwnerAddress,
-        paymentCycleValue,
+        paymentCycleDuration,
         loanDefaultDuration,
         loanExpirationDuration,
         0,

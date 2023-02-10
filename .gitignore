@@ -3,6 +3,10 @@
 
 packages/contracts/generated
 packages/contracts/out
+packages/contracts/broadcast
+packages/contracts/cache
+packages/contracts/cache_forge
+packages/contracts/cache_hardhat
 packages/contracts/deployments/hardhat
 packages/contracts/deployments/tenderly
 packages/contracts/deployments/localhost

@@ -10,7 +10,6 @@ import '@typechain/hardhat'
 import 'solidity-coverage'
 import '@openzeppelin/hardhat-upgrades'
 
-import "@nomicfoundation/hardhat-foundry";
 
 import fs from 'fs'
 import path from 'path'
@@ -157,7 +156,8 @@ export default <HardhatUserConfig>{
 
   paths: {
     cache: './generated/cache',
-    artifacts: './generated/artifacts'  
+    artifacts: './generated/artifacts',
+    sources: './contracts'
   },
 
   typechain: {

@@ -19,6 +19,9 @@ import "./deploy.teller_v2.sol";
 import "./deploy.tlr_token.sol";
 import "./deploy.autopay.sol";
  
+import "./utils/deploy-utils.sol";
+
+
 
 /// @dev See the Solidity Scripting tutorial: https://book.getfoundry.sh/tutorials/solidity-scripting
 contract DeployBase is Script {
@@ -39,7 +42,7 @@ contract DeployBase is Script {
 
 
     function _deployProtocol() internal {
-
+        DeployUtils deployUtils = new DeployUtils();
         DeployTellerAS deployTellerAS = new DeployTellerAS();
         DeployMarketRegistry deployMarketRegistry = new DeployMarketRegistry();
         DeployTellerV2 deployTellerV2 = new DeployTellerV2();

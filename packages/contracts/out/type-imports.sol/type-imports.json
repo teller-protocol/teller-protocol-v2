@@ -1,0 +1,112 @@
+{
+  "abi": [],
+  "bytecode": {
+    "object": "0x",
+    "linkReferences": {}
+  },
+  "deployedBytecode": {
+    "object": "0x",
+    "linkReferences": {}
+  },
+  "ast": {
+    "absolutePath": "contracts/type-imports.sol",
+    "id": 9105,
+    "exportedSymbols": {
+      "AccessControl": [
+        10423
+      ],
+      "AccessControlEnumerable": [
+        10548
+      ],
+      "Context": [
+        13445
+      ],
+      "ERC165": [
+        14311
+      ],
+      "ERC20": [
+        11682
+      ],
+      "ERC20Burnable": [
+        11804
+      ],
+      "ERC20Pausable": [
+        11841
+      ],
+      "ERC20PresetMinterPauser": [
+        12847
+      ],
+      "EnumerableSet": [
+        17589
+      ],
+      "IAccessControl": [
+        10621
+      ],
+      "IAccessControlEnumerable": [
+        10646
+      ],
+      "IERC165": [
+        14323
+      ],
+      "IERC20": [
+        11760
+      ],
+      "IERC20Metadata": [
+        12503
+      ],
+      "Pausable": [
+        11096
+      ],
+      "Strings": [
+        13745
+      ]
+    },
+    "nodeType": "SourceUnit",
+    "src": "0:202:34",
+    "nodes": [
+      {
+        "id": 9102,
+        "nodeType": "PragmaDirective",
+        "src": "0:31:34",
+        "nodes": [],
+        "literals": [
+          "solidity",
+          ">=",
+          "0.8",
+          ".0",
+          "<",
+          "0.9",
+          ".0"
+        ]
+      },
+      {
+        "id": 9103,
+        "nodeType": "ImportDirective",
+        "src": "64:55:34",
+        "nodes": [],
+        "absolutePath": "node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol",
+        "file": "@openzeppelin/contracts/token/ERC20/ERC20.sol",
+        "nameLocation": "-1:-1:-1",
+        "scope": 9105,
+        "sourceUnit": 11683,
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "id": 9104,
+        "nodeType": "ImportDirective",
+        "src": "120:81:34",
+        "nodes": [],
+        "absolutePath": "node_modules/@openzeppelin/contracts/token/ERC20/presets/ERC20PresetMinterPauser.sol",
+        "file": "@openzeppelin/contracts/token/ERC20/presets/ERC20PresetMinterPauser.sol",
+        "nameLocation": "-1:-1:-1",
+        "scope": 9105,
+        "sourceUnit": 12848,
+        "symbolAliases": [],
+        "unitAlias": ""
+      }
+    ],
+    "license": "MIT"
+  },
+  "id": 34
+}

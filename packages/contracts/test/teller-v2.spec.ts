@@ -371,7 +371,7 @@ describe('TellerV2', () => {
         .emit(tellerV2, 'AcceptedBid')
         .withArgs(bidId, lender.address)
 
-      const stakeholder = await lenderManager.getActiveLoanLender(bidId)
+      const stakeholder = await lenderManager.ownerOf(bidId)
       stakeholder.should.be.eql(lender.address)
     })
 

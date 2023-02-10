@@ -28,7 +28,7 @@ contract LenderManager_Test is Testable, LenderManager {
     constructor()
         LenderManager(
             //address(0),
-            address(new MarketRegistryMock(address(0)))
+           new MarketRegistryMock(address(0))
         )
     {}
 

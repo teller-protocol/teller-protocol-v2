@@ -73,7 +73,7 @@ contract TellerV2_Test is Testable {
         MetaForwarder metaforwarder = new MetaForwarder();
         metaforwarder.initialize();
         LenderManager lenderManager = new LenderManager(
-            address(marketRegistry)
+            marketRegistry
         );
         lenderManager.initialize();
         lenderManager.transferOwnership(address(tellerV2));

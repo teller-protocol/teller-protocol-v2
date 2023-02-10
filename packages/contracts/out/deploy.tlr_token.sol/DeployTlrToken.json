@@ -1,0 +1,452 @@
+{
+  "abi": [
+    {
+      "inputs": [],
+      "name": "IS_SCRIPT",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "run",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": {
+    "object": "0x6080604052600c805460ff19166001179055348015601c57600080fd5b50609c8061002b6000396000f3fe6080604052348015600f57600080fd5b506004361060325760003560e01c8063c0406226146037578063f8ccbf4714604b575b600080fd5b604051600081526020015b60405180910390f35b600c5460579060ff1681565b6040519015158152602001604256fea2646970667358221220b907f02d7d2459293cbdab5da1d1f967d3ad5ca991bde0d8a2cf81dce39582e664736f6c63430008110033",
+    "sourceMap": "84:151:34:-:0;;;780:28:37;;;-1:-1:-1;;780:28:37;804:4;780:28;;;84:151:34;;;;;;;;;;;;;;;;",
+    "linkReferences": {}
+  },
+  "deployedBytecode": {
+    "object": "0x6080604052348015600f57600080fd5b506004361060325760003560e01c8063c0406226146037578063f8ccbf4714604b575b600080fd5b604051600081526020015b60405180910390f35b600c5460579060ff1681565b6040519015158152602001604256fea2646970667358221220b907f02d7d2459293cbdab5da1d1f967d3ad5ca991bde0d8a2cf81dce39582e664736f6c63430008110033",
+    "sourceMap": "84:151:34:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;133:100;;;165:7;160:51:85;;148:2;133:18;:100:34;;;;;;;;780:28:37;;;;;;;;;;;;387:14:85;;380:22;362:41;;350:2;335:18;780:28:37;222:187:85",
+    "linkReferences": {}
+  },
+  "methodIdentifiers": {
+    "IS_SCRIPT()": "f8ccbf47",
+    "run()": "c0406226"
+  },
+  "rawMetadata": "{\"compiler\":{\"version\":\"0.8.17+commit.8df45f5f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"IS_SCRIPT\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"run\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"deploy/deploy.tlr_token.sol\":\"DeployTlrToken\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[\":@ensdomains/=node_modules/@ensdomains/\",\":@openzeppelin/=node_modules/@openzeppelin/\",\":ds-test/=lib/forge-std/lib/ds-test/src/\",\":eth-gas-reporter/=node_modules/eth-gas-reporter/\",\":forge-std/=lib/forge-std/src/\",\":hardhat-deploy/=node_modules/hardhat-deploy/\",\":hardhat/=node_modules/hardhat/\"]},\"sources\":{\"deploy/deploy.tlr_token.sol\":{\"keccak256\":\"0x8d9b7bce37035cbe8bd6911b2ba5c9d8096854fa3f6f05c828f425e51ef8d841\",\"urls\":[\"bzz-raw://920010847213d31c6c5607424d46a2215e1f8b39123f5fa7c0e1d08fa1e95556\",\"dweb:/ipfs/QmUN3rUHXQDrMu1kB2hcBRfUitYYNjeSAwZn5xqXXLVAyD\"]},\"lib/forge-std/src/Base.sol\":{\"keccak256\":\"0x97add914ea3a0e60e0ebb1164de3a82d416fc53b82fa7ebf3c47af7bc6ea7786\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://6779f1c2c618178aae7758390d523adf1f6e34f33d4c6cd453d54e556fc42541\",\"dweb:/ipfs/QmURQgUjyWV5r6py99S39JsC5v2oLgqVxrVAJR9cDU1JdD\"]},\"lib/forge-std/src/Script.sol\":{\"keccak256\":\"0x0b64f10b3c317955dd5e62a387245b71e8c2344712491f054fdd3a01734f613d\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://702dcc3084a432ed62f8f28616e65d14eee73ce1cecf3d42c2e9ab1701608711\",\"dweb:/ipfs/QmSMmH9z11g5a6x7eUwPudGR5cZGrzNmXvxG8h7W8LfhLc\"]},\"lib/forge-std/src/StdChains.sol\":{\"keccak256\":\"0x6ccc58970e68556ec01b380dde6c6c6d687a70cfcac570b0211bbdb760658b1d\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://83023da47c91529537dc54fd2a3f08c4cddc005f0cfdb34d11f3ac2560ac6c95\",\"dweb:/ipfs/Qmd3XNqQeayxZFMdkwk3prJeZa8HbQ3oKmRmMVnMEkMUfi\"]},\"lib/forge-std/src/StdCheats.sol\":{\"keccak256\":\"0x445bd3b2666800930840ef4323860840d8f915a3a7b62e310a83409d960205fb\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://c613a7da0e655a82d352e5d81bb9c04f5192bfb0d5eb91a9490053fa41ba6ee9\",\"dweb:/ipfs/Qmf7MuAnNLLTx1EL9GD3esGAhWYFUZdmHYno75En4gqgcM\"]},\"lib/forge-std/src/StdJson.sol\":{\"keccak256\":\"0x21d0639e11e35f774b7bf53d4d40c6a37039c623ac4408808017d2b503475baa\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://8b00e95716d5871fb5c62425ec6bf7a6d56ccd537932769802c3cf84ca398baa\",\"dweb:/ipfs/QmdoqhGvnMz2jpyP6ubHZQbUseoBUxFJY8dr3TMheN8Afr\"]},\"lib/forge-std/src/StdMath.sol\":{\"keccak256\":\"0x1b90157ba192ffe5084250e917c768227464413cc77af5f30948be0b09be3689\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://72f10ef9bdd612ad9eba52f7f25d56e757c05e7d9b9a249b4fa78f9572d7406f\",\"dweb:/ipfs/QmXgBEwX6XyshJs56VvMUj1n3cpdBM2kshUXyRY86mNDNj\"]},\"lib/forge-std/src/StdStorage.sol\":{\"keccak256\":\"0x6025b7305bae5471156ff105335ed07a180133c742900bdaa575f09d4871e222\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://dcbf391fcd94b4cbba2dbf07d56bc5e72e1aea2fb460b997517630ab9f23805d\",\"dweb:/ipfs/QmUYB8rLY2McGY64URS5gJYRGiAiEaRbcFmNWkE4r4wise\"]},\"lib/forge-std/src/StdUtils.sol\":{\"keccak256\":\"0x1209e8aa1f14ce35b60caf9a090ff9fbd075729430d5bce1b957d7297bfd79eb\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://83ee1ee181af46a88a77afa211671b43249c6878bfac414b90b10b5baa252de5\",\"dweb:/ipfs/QmVGf1biN9G3ia3yeZw6YThA8vhxvvMnC8nwf7BK186AEE\"]},\"lib/forge-std/src/Vm.sol\":{\"keccak256\":\"0xc2123bf89f66dbcaa581e47d515e9dc6a431430b752d91b59f370047a366a4f2\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://d7c3e32ffcc19bfb3949b906d0eb10e37d8614b9eec83dea08d3a773d74dc757\",\"dweb:/ipfs/QmU8qwH6yVo3QRC2jETcpA71yVhfqPFKra7KQmon6ZDeUG\"]},\"lib/forge-std/src/console.sol\":{\"keccak256\":\"0x429e3e540eb5449d39f1cd6da1804ca6144b8128ef51a8f5551a0fec827b171a\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://357f12fb3f94478683d19b652cd7be849e93f02667ff6ed5647164563eb2f936\",\"dweb:/ipfs/QmY1rdBFA8F6SZEc4YTiLT3NwFecNqkHsdT2zto4H2iYPy\"]},\"lib/forge-std/src/console2.sol\":{\"keccak256\":\"0x3b7758144a57106788d63b621e67bb8f918766561ed5b4653d120affdf3162d7\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://a7eec85e190dfbcd9e87532c8a0fc08d84aff23fb8a13e9a9df0210338476fef\",\"dweb:/ipfs/QmcHdUCXDQqKr9eNa7uXosPhLcqyzy7e2WrZL8aSjxpTnK\"]},\"lib/forge-std/src/interfaces/IMulticall3.sol\":{\"keccak256\":\"0xe1baf47d5e74eb365482e76883ab8fe091e2eb88df6c4a31b30b869e390d481b\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://4624d9c97341cf7ee783cb045412960d5a64bf2047a2d6eaf4059d11a3789fba\",\"dweb:/ipfs/QmQFL3n8VEBGFmZcJV6vE6TtjPwoLyiJQxJGw4sfMEY7mD\"]}},\"version\":1}",
+  "metadata": {
+    "compiler": {
+      "version": "0.8.17+commit.8df45f5f"
+    },
+    "language": "Solidity",
+    "output": {
+      "abi": [
+        {
+          "inputs": [],
+          "stateMutability": "view",
+          "type": "function",
+          "name": "IS_SCRIPT",
+          "outputs": [
+            {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
+            }
+          ]
+        },
+        {
+          "inputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function",
+          "name": "run",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ]
+        }
+      ],
+      "devdoc": {
+        "kind": "dev",
+        "methods": {},
+        "version": 1
+      },
+      "userdoc": {
+        "kind": "user",
+        "methods": {},
+        "version": 1
+      }
+    },
+    "settings": {
+      "remappings": [
+        ":@ensdomains/=node_modules/@ensdomains/",
+        ":@openzeppelin/=node_modules/@openzeppelin/",
+        ":ds-test/=lib/forge-std/lib/ds-test/src/",
+        ":eth-gas-reporter/=node_modules/eth-gas-reporter/",
+        ":forge-std/=lib/forge-std/src/",
+        ":hardhat-deploy/=node_modules/hardhat-deploy/",
+        ":hardhat/=node_modules/hardhat/"
+      ],
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "metadata": {
+        "bytecodeHash": "ipfs"
+      },
+      "compilationTarget": {
+        "deploy/deploy.tlr_token.sol": "DeployTlrToken"
+      },
+      "libraries": {}
+    },
+    "sources": {
+      "deploy/deploy.tlr_token.sol": {
+        "keccak256": "0x8d9b7bce37035cbe8bd6911b2ba5c9d8096854fa3f6f05c828f425e51ef8d841",
+        "urls": [
+          "bzz-raw://920010847213d31c6c5607424d46a2215e1f8b39123f5fa7c0e1d08fa1e95556",
+          "dweb:/ipfs/QmUN3rUHXQDrMu1kB2hcBRfUitYYNjeSAwZn5xqXXLVAyD"
+        ],
+        "license": null
+      },
+      "lib/forge-std/src/Base.sol": {
+        "keccak256": "0x97add914ea3a0e60e0ebb1164de3a82d416fc53b82fa7ebf3c47af7bc6ea7786",
+        "urls": [
+          "bzz-raw://6779f1c2c618178aae7758390d523adf1f6e34f33d4c6cd453d54e556fc42541",
+          "dweb:/ipfs/QmURQgUjyWV5r6py99S39JsC5v2oLgqVxrVAJR9cDU1JdD"
+        ],
+        "license": "MIT"
+      },
+      "lib/forge-std/src/Script.sol": {
+        "keccak256": "0x0b64f10b3c317955dd5e62a387245b71e8c2344712491f054fdd3a01734f613d",
+        "urls": [
+          "bzz-raw://702dcc3084a432ed62f8f28616e65d14eee73ce1cecf3d42c2e9ab1701608711",
+          "dweb:/ipfs/QmSMmH9z11g5a6x7eUwPudGR5cZGrzNmXvxG8h7W8LfhLc"
+        ],
+        "license": "MIT"
+      },
+      "lib/forge-std/src/StdChains.sol": {
+        "keccak256": "0x6ccc58970e68556ec01b380dde6c6c6d687a70cfcac570b0211bbdb760658b1d",
+        "urls": [
+          "bzz-raw://83023da47c91529537dc54fd2a3f08c4cddc005f0cfdb34d11f3ac2560ac6c95",
+          "dweb:/ipfs/Qmd3XNqQeayxZFMdkwk3prJeZa8HbQ3oKmRmMVnMEkMUfi"
+        ],
+        "license": "MIT"
+      },
+      "lib/forge-std/src/StdCheats.sol": {
+        "keccak256": "0x445bd3b2666800930840ef4323860840d8f915a3a7b62e310a83409d960205fb",
+        "urls": [
+          "bzz-raw://c613a7da0e655a82d352e5d81bb9c04f5192bfb0d5eb91a9490053fa41ba6ee9",
+          "dweb:/ipfs/Qmf7MuAnNLLTx1EL9GD3esGAhWYFUZdmHYno75En4gqgcM"
+        ],
+        "license": "MIT"
+      },
+      "lib/forge-std/src/StdJson.sol": {
+        "keccak256": "0x21d0639e11e35f774b7bf53d4d40c6a37039c623ac4408808017d2b503475baa",
+        "urls": [
+          "bzz-raw://8b00e95716d5871fb5c62425ec6bf7a6d56ccd537932769802c3cf84ca398baa",
+          "dweb:/ipfs/QmdoqhGvnMz2jpyP6ubHZQbUseoBUxFJY8dr3TMheN8Afr"
+        ],
+        "license": "MIT"
+      },
+      "lib/forge-std/src/StdMath.sol": {
+        "keccak256": "0x1b90157ba192ffe5084250e917c768227464413cc77af5f30948be0b09be3689",
+        "urls": [
+          "bzz-raw://72f10ef9bdd612ad9eba52f7f25d56e757c05e7d9b9a249b4fa78f9572d7406f",
+          "dweb:/ipfs/QmXgBEwX6XyshJs56VvMUj1n3cpdBM2kshUXyRY86mNDNj"
+        ],
+        "license": "MIT"
+      },
+      "lib/forge-std/src/StdStorage.sol": {
+        "keccak256": "0x6025b7305bae5471156ff105335ed07a180133c742900bdaa575f09d4871e222",
+        "urls": [
+          "bzz-raw://dcbf391fcd94b4cbba2dbf07d56bc5e72e1aea2fb460b997517630ab9f23805d",
+          "dweb:/ipfs/QmUYB8rLY2McGY64URS5gJYRGiAiEaRbcFmNWkE4r4wise"
+        ],
+        "license": "MIT"
+      },
+      "lib/forge-std/src/StdUtils.sol": {
+        "keccak256": "0x1209e8aa1f14ce35b60caf9a090ff9fbd075729430d5bce1b957d7297bfd79eb",
+        "urls": [
+          "bzz-raw://83ee1ee181af46a88a77afa211671b43249c6878bfac414b90b10b5baa252de5",
+          "dweb:/ipfs/QmVGf1biN9G3ia3yeZw6YThA8vhxvvMnC8nwf7BK186AEE"
+        ],
+        "license": "MIT"
+      },
+      "lib/forge-std/src/Vm.sol": {
+        "keccak256": "0xc2123bf89f66dbcaa581e47d515e9dc6a431430b752d91b59f370047a366a4f2",
+        "urls": [
+          "bzz-raw://d7c3e32ffcc19bfb3949b906d0eb10e37d8614b9eec83dea08d3a773d74dc757",
+          "dweb:/ipfs/QmU8qwH6yVo3QRC2jETcpA71yVhfqPFKra7KQmon6ZDeUG"
+        ],
+        "license": "MIT"
+      },
+      "lib/forge-std/src/console.sol": {
+        "keccak256": "0x429e3e540eb5449d39f1cd6da1804ca6144b8128ef51a8f5551a0fec827b171a",
+        "urls": [
+          "bzz-raw://357f12fb3f94478683d19b652cd7be849e93f02667ff6ed5647164563eb2f936",
+          "dweb:/ipfs/QmY1rdBFA8F6SZEc4YTiLT3NwFecNqkHsdT2zto4H2iYPy"
+        ],
+        "license": "MIT"
+      },
+      "lib/forge-std/src/console2.sol": {
+        "keccak256": "0x3b7758144a57106788d63b621e67bb8f918766561ed5b4653d120affdf3162d7",
+        "urls": [
+          "bzz-raw://a7eec85e190dfbcd9e87532c8a0fc08d84aff23fb8a13e9a9df0210338476fef",
+          "dweb:/ipfs/QmcHdUCXDQqKr9eNa7uXosPhLcqyzy7e2WrZL8aSjxpTnK"
+        ],
+        "license": "MIT"
+      },
+      "lib/forge-std/src/interfaces/IMulticall3.sol": {
+        "keccak256": "0xe1baf47d5e74eb365482e76883ab8fe091e2eb88df6c4a31b30b869e390d481b",
+        "urls": [
+          "bzz-raw://4624d9c97341cf7ee783cb045412960d5a64bf2047a2d6eaf4059d11a3789fba",
+          "dweb:/ipfs/QmQFL3n8VEBGFmZcJV6vE6TtjPwoLyiJQxJGw4sfMEY7mD"
+        ],
+        "license": "MIT"
+      }
+    },
+    "version": 1
+  },
+  "ast": {
+    "absolutePath": "deploy/deploy.tlr_token.sol",
+    "id": 10528,
+    "exportedSymbols": {
+      "DeployTlrToken": [
+        10527
+      ],
+      "Script": [
+        10660
+      ]
+    },
+    "nodeType": "SourceUnit",
+    "src": "0:235:34",
+    "nodes": [
+      {
+        "id": 10511,
+        "nodeType": "PragmaDirective",
+        "src": "0:31:34",
+        "nodes": [],
+        "literals": [
+          "solidity",
+          ">=",
+          "0.8",
+          ".0",
+          "<",
+          "0.9",
+          ".0"
+        ]
+      },
+      {
+        "id": 10513,
+        "nodeType": "ImportDirective",
+        "src": "35:46:34",
+        "nodes": [],
+        "absolutePath": "lib/forge-std/src/Script.sol",
+        "file": "forge-std/Script.sol",
+        "nameLocation": "-1:-1:-1",
+        "scope": 10528,
+        "sourceUnit": 10661,
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 10512,
+              "name": "Script",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 10660,
+              "src": "44:6:34",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "id": 10527,
+        "nodeType": "ContractDefinition",
+        "src": "84:151:34",
+        "nodes": [
+          {
+            "id": 10526,
+            "nodeType": "FunctionDefinition",
+            "src": "133:100:34",
+            "nodes": [],
+            "body": {
+              "id": 10525,
+              "nodeType": "Block",
+              "src": "173:60:34",
+              "nodes": [],
+              "statements": [
+                {
+                  "expression": {
+                    "arguments": [
+                      {
+                        "hexValue": "30",
+                        "id": 10522,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "kind": "number",
+                        "lValueRequested": false,
+                        "nodeType": "Literal",
+                        "src": "224:1:34",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_rational_0_by_1",
+                          "typeString": "int_const 0"
+                        },
+                        "value": "0"
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_rational_0_by_1",
+                          "typeString": "int_const 0"
+                        }
+                      ],
+                      "id": 10521,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": true,
+                      "lValueRequested": false,
+                      "nodeType": "ElementaryTypeNameExpression",
+                      "src": "216:7:34",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_type$_t_address_$",
+                        "typeString": "type(address)"
+                      },
+                      "typeName": {
+                        "id": 10520,
+                        "name": "address",
+                        "nodeType": "ElementaryTypeName",
+                        "src": "216:7:34",
+                        "typeDescriptions": {}
+                      }
+                    },
+                    "id": 10523,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": true,
+                    "kind": "typeConversion",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "216:10:34",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "functionReturnParameters": 10519,
+                  "id": 10524,
+                  "nodeType": "Return",
+                  "src": "209:17:34"
+                }
+              ]
+            },
+            "functionSelector": "c0406226",
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "run",
+            "nameLocation": "142:3:34",
+            "parameters": {
+              "id": 10516,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "145:3:34"
+            },
+            "returnParameters": {
+              "id": 10519,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 10518,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10526,
+                  "src": "165:7:34",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 10517,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "165:7:34",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "164:9:34"
+            },
+            "scope": 10527,
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "public"
+          }
+        ],
+        "abstract": false,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 10514,
+              "name": "Script",
+              "nameLocations": [
+                "111:6:34"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 10660,
+              "src": "111:6:34"
+            },
+            "id": 10515,
+            "nodeType": "InheritanceSpecifier",
+            "src": "111:6:34"
+          }
+        ],
+        "canonicalName": "DeployTlrToken",
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "fullyImplemented": true,
+        "linearizedBaseContracts": [
+          10527,
+          10660,
+          10623,
+          10608,
+          16315,
+          12896,
+          11324
+        ],
+        "name": "DeployTlrToken",
+        "nameLocation": "93:14:34",
+        "scope": 10528,
+        "usedErrors": []
+      }
+    ]
+  },
+  "id": 34
+}

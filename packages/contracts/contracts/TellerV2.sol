@@ -20,7 +20,7 @@ import { Collateral } from "./interfaces/escrow/ICollateralEscrowV1.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
-import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol";
+
 
 import "./libraries/NumbersLib.sol";
 import { V2Calculations } from "./libraries/V2Calculations.sol";
@@ -995,7 +995,7 @@ contract TellerV2 is
         lender_ = bids[_bidId].lender;
 
         if (lender_ == address(lenderManager)) {
-            return IERC721Upgradeable(address(lenderManager)).ownerOf(_bidId);
+            return lenderManager.ownerOf(_bidId);
         }
     }
 

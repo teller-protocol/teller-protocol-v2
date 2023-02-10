@@ -1,0 +1,1002 @@
+{
+  "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint8",
+          "name": "version",
+          "type": "uint8"
+        }
+      ],
+      "name": "Initialized",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "previousOwner",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnershipTransferred",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint16",
+          "name": "newFee",
+          "type": "uint16"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint16",
+          "name": "oldFee",
+          "type": "uint16"
+        }
+      ],
+      "name": "ProtocolFeeSet",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint16",
+          "name": "_initFee",
+          "type": "uint16"
+        }
+      ],
+      "name": "initialize",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "protocolFee",
+      "outputs": [
+        {
+          "internalType": "uint16",
+          "name": "",
+          "type": "uint16"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "renounceOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint16",
+          "name": "newFee",
+          "type": "uint16"
+        }
+      ],
+      "name": "setProtocolFee",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "setProtocolFeeCalled",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "transferOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": {
+    "object": "0x608060405234801561001057600080fd5b5061059c806100206000396000f3fe608060405234801561001057600080fd5b506004361061007d5760003560e01c80638da5cb5b1161005b5780638da5cb5b146100c7578063b0e21e8a146100e2578063e4467f35146100f8578063f2fde38b1461010b57600080fd5b80631375094614610082578063609c6c4e14610097578063715018a6146100bf575b600080fd5b6100956100903660046104c7565b61011e565b005b6065546100aa9062010000900460ff1681565b60405190151581526020015b60405180910390f35b610095610237565b6033546040516001600160a01b0390911681526020016100b6565b60655460405161ffff90911681526020016100b6565b6100956101063660046104c7565b61024b565b6100956101193660046104f2565b610275565b600054610100900460ff161580801561013e5750600054600160ff909116105b806101585750303b158015610158575060005460ff166001145b6101c05760405162461bcd60e51b815260206004820152602e60248201527f496e697469616c697a61626c653a20636f6e747261637420697320616c72656160448201526d191e481a5b9a5d1a585b1a5e995960921b60648201526084015b60405180910390fd5b6000805460ff1916600117905580156101e3576000805461ff0019166101001790555b6101ec826102ee565b8015610233576000805461ff0019169055604051600181527f7f26b83ff96e1f2b6a682f133852f6798a09c465da95921460cefb3847402498906020015b60405180910390a15b5050565b61023f610326565b6102496000610380565b565b610253610326565b6065805462ff00001916620100001790556001548061023357610233826103d2565b61027d610326565b6001600160a01b0381166102e25760405162461bcd60e51b815260206004820152602660248201527f4f776e61626c653a206e6577206f776e657220697320746865207a65726f206160448201526564647265737360d01b60648201526084016101b7565b6102eb81610380565b50565b600054610100900460ff166103155760405162461bcd60e51b81526004016101b79061051b565b61031d610438565b6102eb81610467565b6033546001600160a01b031633146102495760405162461bcd60e51b815260206004820181905260248201527f4f776e61626c653a2063616c6c6572206973206e6f7420746865206f776e657260448201526064016101b7565b603380546001600160a01b038381166001600160a01b0319831681179093556040519116919082907f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e090600090a35050565b6103da610326565b60655461ffff8281169116146102eb576065805461ffff83811661ffff198316811790935560408051938452911660208301819052917f4810ece076cee6c6042808956f3f65dad1bc72b75181341d7bed810d39deda0f910161022a565b600054610100900460ff1661045f5760405162461bcd60e51b81526004016101b79061051b565b610249610497565b600054610100900460ff1661048e5760405162461bcd60e51b81526004016101b79061051b565b6102eb8161024b565b600054610100900460ff166104be5760405162461bcd60e51b81526004016101b79061051b565b61024933610380565b6000602082840312156104d957600080fd5b813561ffff811681146104eb57600080fd5b9392505050565b60006020828403121561050457600080fd5b81356001600160a01b03811681146104eb57600080fd5b6020808252602b908201527f496e697469616c697a61626c653a20636f6e7472616374206973206e6f74206960408201526a6e697469616c697a696e6760a81b60608201526080019056fea26469706673582212201b9cda336e729f7ecfe60f31dc66fdb48ede10a73e0b323d63c7628c016adbd464736f6c63430008110033",
+    "sourceMap": "94:558:6:-:0;;;;;;;;;;;;;;;;;;;",
+    "linkReferences": {}
+  },
+  "deployedBytecode": {
+    "object": "0x608060405234801561001057600080fd5b506004361061007d5760003560e01c80638da5cb5b1161005b5780638da5cb5b146100c7578063b0e21e8a146100e2578063e4467f35146100f8578063f2fde38b1461010b57600080fd5b80631375094614610082578063609c6c4e14610097578063715018a6146100bf575b600080fd5b6100956100903660046104c7565b61011e565b005b6065546100aa9062010000900460ff1681565b60405190151581526020015b60405180910390f35b610095610237565b6033546040516001600160a01b0390911681526020016100b6565b60655460405161ffff90911681526020016100b6565b6100956101063660046104c7565b61024b565b6100956101193660046104f2565b610275565b600054610100900460ff161580801561013e5750600054600160ff909116105b806101585750303b158015610158575060005460ff166001145b6101c05760405162461bcd60e51b815260206004820152602e60248201527f496e697469616c697a61626c653a20636f6e747261637420697320616c72656160448201526d191e481a5b9a5d1a585b1a5e995960921b60648201526084015b60405180910390fd5b6000805460ff1916600117905580156101e3576000805461ff0019166101001790555b6101ec826102ee565b8015610233576000805461ff0019169055604051600181527f7f26b83ff96e1f2b6a682f133852f6798a09c465da95921460cefb3847402498906020015b60405180910390a15b5050565b61023f610326565b6102496000610380565b565b610253610326565b6065805462ff00001916620100001790556001548061023357610233826103d2565b61027d610326565b6001600160a01b0381166102e25760405162461bcd60e51b815260206004820152602660248201527f4f776e61626c653a206e6577206f776e657220697320746865207a65726f206160448201526564647265737360d01b60648201526084016101b7565b6102eb81610380565b50565b600054610100900460ff166103155760405162461bcd60e51b81526004016101b79061051b565b61031d610438565b6102eb81610467565b6033546001600160a01b031633146102495760405162461bcd60e51b815260206004820181905260248201527f4f776e61626c653a2063616c6c6572206973206e6f7420746865206f776e657260448201526064016101b7565b603380546001600160a01b038381166001600160a01b0319831681179093556040519116919082907f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e090600090a35050565b6103da610326565b60655461ffff8281169116146102eb576065805461ffff83811661ffff198316811790935560408051938452911660208301819052917f4810ece076cee6c6042808956f3f65dad1bc72b75181341d7bed810d39deda0f910161022a565b600054610100900460ff1661045f5760405162461bcd60e51b81526004016101b79061051b565b610249610497565b600054610100900460ff1661048e5760405162461bcd60e51b81526004016101b79061051b565b6102eb8161024b565b600054610100900460ff166104be5760405162461bcd60e51b81526004016101b79061051b565b61024933610380565b6000602082840312156104d957600080fd5b813561ffff811681146104eb57600080fd5b9392505050565b60006020828403121561050457600080fd5b81356001600160a01b03811681146104eb57600080fd5b6020808252602b908201527f496e697469616c697a61626c653a20636f6e7472616374206973206e6f74206960408201526a6e697469616c697a696e6760a81b60608201526080019056fea26469706673582212201b9cda336e729f7ecfe60f31dc66fdb48ede10a73e0b323d63c7628c016adbd464736f6c63430008110033",
+    "sourceMap": "94:558:6:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;179:103;;;;;;:::i;:::-;;:::i;:::-;;140:32;;;;;;;;;;;;;;;456:14:72;;449:22;431:41;;419:2;404:18;140:32:6;;;;;;;;2071:101:35;;;:::i;1441:85::-;1513:6;;1441:85;;-1:-1:-1;;;;;1513:6:35;;;629:51:72;;617:2;602:18;1441:85:35;483:203:72;1023:96:5;1100:12;;1023:96;;1100:12;;;;835:38:72;;823:2;808:18;1023:96:5;691:188:72;288:362:6;;;;;;:::i;:::-;;:::i;2321:198:35:-;;;;;;:::i;:::-;;:::i;179:103:6:-;3111:19:36;3134:13;;;;;;3133:14;;3179:34;;;;-1:-1:-1;3197:12:36;;3212:1;3197:12;;;;:16;3179:34;3178:108;;;-1:-1:-1;3258:4:36;1476:19:39;:23;;;3219:66:36;;-1:-1:-1;3268:12:36;;;;;:17;3219:66;3157:201;;;;-1:-1:-1;;;3157:201:36;;1377:2:72;3157:201:36;;;1359:21:72;1416:2;1396:18;;;1389:30;1455:34;1435:18;;;1428:62;-1:-1:-1;;;1506:18:72;;;1499:44;1560:19;;3157:201:36;;;;;;;;;3368:12;:16;;-1:-1:-1;;3368:16:36;3383:1;3368:16;;;3394:65;;;;3428:13;:20;;-1:-1:-1;;3428:20:36;;;;;3394:65;247:28:6::1;266:8;247:18;:28::i;:::-;3483:14:36::0;3479:99;;;3529:5;3513:21;;-1:-1:-1;;3513:21:36;;;3553:14;;-1:-1:-1;1742:36:72;;3553:14:36;;1730:2:72;1715:18;3553:14:36;;;;;;;;3479:99;3101:483;179:103:6;:::o;2071:101:35:-;1334:13;:11;:13::i;:::-;2135:30:::1;2162:1;2135:18;:30::i;:::-;2071:101::o:0;288:362:6:-;1334:13:35;:11;:13::i;:::-;363:20:6::1;:27:::0;;-1:-1:-1;;363:27:6::1;::::0;::::1;::::0;;386:4:::1;473:8:::0;;569:75:::1;;605:28;626:6;605:20;:28::i;2321:198:35:-:0;1334:13;:11;:13::i;:::-;-1:-1:-1;;;;;2409:22:35;::::1;2401:73;;;::::0;-1:-1:-1;;;2401:73:35;;1991:2:72;2401:73:35::1;::::0;::::1;1973:21:72::0;2030:2;2010:18;;;2003:30;2069:34;2049:18;;;2042:62;-1:-1:-1;;;2120:18:72;;;2113:36;2166:19;;2401:73:35::1;1789:402:72::0;2401:73:35::1;2484:28;2503:8;2484:18;:28::i;:::-;2321:198:::0;:::o;656:150:5:-;4910:13:36;;;;;;;4902:69;;;;-1:-1:-1;;;4902:69:36;;;;;;;:::i;:::-;736:16:5::1;:14;:16::i;:::-;762:37;791:7;762:28;:37::i;1599:130:35:-:0;1513:6;;-1:-1:-1;;;;;1513:6:35;929:10:40;1662:23:35;1654:68;;;;-1:-1:-1;;;1654:68:35;;2810:2:72;1654:68:35;;;2792:21:72;;;2829:18;;;2822:30;2888:34;2868:18;;;2861:62;2940:18;;1654:68:35;2608:356:72;2673:187:35;2765:6;;;-1:-1:-1;;;;;2781:17:35;;;-1:-1:-1;;;;;;2781:17:35;;;;;;;2813:40;;2765:6;;;2781:17;2765:6;;2813:40;;2746:16;;2813:40;2736:124;2673:187;:::o;1271:269:5:-;1334:13:35;:11;:13::i;:::-;1398:12:5::1;::::0;::::1;1388:22:::0;;::::1;1398:12:::0;::::1;1384:35:::0;1412:7:::1;1384:35;1445:12;::::0;;::::1;1467:21:::0;;::::1;-1:-1:-1::0;;1467:21:5;::::1;::::0;::::1;::::0;;;1503:30:::1;::::0;;3164:34:72;;;1445:12:5;::::1;3229:2:72::0;3214:18;;3207:43;;;1445:12:5;1503:30:::1;::::0;3112:18:72;1503:30:5::1;2969:287:72::0;1003:95:35;4910:13:36;;;;;;;4902:69;;;;-1:-1:-1;;;4902:69:36;;;;;;;:::i;:::-;1065:26:35::1;:24;:26::i;812:140:5:-:0;4910:13:36;;;;;;;4902:69;;;;-1:-1:-1;;;4902:69:36;;;;;;;:::i;:::-;922:23:5::1;937:7;922:14;:23::i;1104:111:35:-:0;4910:13:36;;;;;;;4902:69;;;;-1:-1:-1;;;4902:69:36;;;;;;;:::i;:::-;1176:32:35::1;929:10:40::0;1176:18:35::1;:32::i;14:272:72:-:0;72:6;125:2;113:9;104:7;100:23;96:32;93:52;;;141:1;138;131:12;93:52;180:9;167:23;230:6;223:5;219:18;212:5;209:29;199:57;;252:1;249;242:12;199:57;275:5;14:272;-1:-1:-1;;;14:272:72:o;884:286::-;943:6;996:2;984:9;975:7;971:23;967:32;964:52;;;1012:1;1009;1002:12;964:52;1038:23;;-1:-1:-1;;;;;1090:31:72;;1080:42;;1070:70;;1136:1;1133;1126:12;2196:407;2398:2;2380:21;;;2437:2;2417:18;;;2410:30;2476:34;2471:2;2456:18;;2449:62;-1:-1:-1;;;2542:2:72;2527:18;;2520:41;2593:3;2578:19;;2196:407::o",
+    "linkReferences": {}
+  },
+  "methodIdentifiers": {
+    "initialize(uint16)": "13750946",
+    "owner()": "8da5cb5b",
+    "protocolFee()": "b0e21e8a",
+    "renounceOwnership()": "715018a6",
+    "setProtocolFee(uint16)": "e4467f35",
+    "setProtocolFeeCalled()": "609c6c4e",
+    "transferOwnership(address)": "f2fde38b"
+  },
+  "rawMetadata": "{\"compiler\":{\"version\":\"0.8.17+commit.8df45f5f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint8\",\"name\":\"version\",\"type\":\"uint8\"}],\"name\":\"Initialized\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint16\",\"name\":\"newFee\",\"type\":\"uint16\"},{\"indexed\":false,\"internalType\":\"uint16\",\"name\":\"oldFee\",\"type\":\"uint16\"}],\"name\":\"ProtocolFeeSet\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"uint16\",\"name\":\"_initFee\",\"type\":\"uint16\"}],\"name\":\"initialize\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"protocolFee\",\"outputs\":[{\"internalType\":\"uint16\",\"name\":\"\",\"type\":\"uint16\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint16\",\"name\":\"newFee\",\"type\":\"uint16\"}],\"name\":\"setProtocolFee\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"setProtocolFeeCalled\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"owner()\":{\"details\":\"Returns the address of the current owner.\"},\"renounceOwnership()\":{\"details\":\"Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner.\"},\"setProtocolFee(uint16)\":{\"params\":{\"newFee\":\"The new protocol fee to be set.\"}},\"transferOwnership(address)\":{\"details\":\"Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner.\"}},\"version\":1},\"userdoc\":{\"events\":{\"ProtocolFeeSet(uint16,uint16)\":{\"notice\":\"This event is emitted when the protocol fee has been updated.\"}},\"kind\":\"user\",\"methods\":{\"protocolFee()\":{\"notice\":\"Returns the current protocol fee.\"},\"setProtocolFee(uint16)\":{\"notice\":\"Lets the DAO/owner of the protocol to set a new protocol fee.\"}},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/ProtocolFeeMock.sol\":\"ProtocolFeeMock\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[\":@ensdomains/=node_modules/@ensdomains/\",\":@openzeppelin/=node_modules/@openzeppelin/\",\":ds-test/=lib/forge-std/lib/ds-test/src/\",\":eth-gas-reporter/=node_modules/eth-gas-reporter/\",\":forge-std/=lib/forge-std/src/\",\":hardhat-deploy/=node_modules/hardhat-deploy/\",\":hardhat/=node_modules/hardhat/\"]},\"sources\":{\"contracts/ProtocolFee.sol\":{\"keccak256\":\"0x8a4fbca87131233a11efc1c5006a9b9d5ea45b82078c85726ce9e07ef13e2893\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://158488abd8c3e29e1d4f83173120a3d808a38f330067d94852df767ef00b4acf\",\"dweb:/ipfs/QmRc4iCqThiNT2uptvpHZPV5WCbgD5X86Ty1AfSyim2B2V\"]},\"contracts/ProtocolFeeMock.sol\":{\"keccak256\":\"0x701372377f8241c2983671206381f6fde5619fff190f9646cf5540c983ace926\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://eb446938b5b99e1acd4103917618237331168032860f2aad7e886243fa44239c\",\"dweb:/ipfs/QmVYrQwqNbRkckb7F4RKjJ7GYDUMELqrVuiNp6YRShxJ3T\"]},\"node_modules/@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol\":{\"keccak256\":\"0x247c62047745915c0af6b955470a72d1696ebad4352d7d3011aef1a2463cd888\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://d7fc8396619de513c96b6e00301b88dd790e83542aab918425633a5f7297a15a\",\"dweb:/ipfs/QmXbP4kiZyp7guuS7xe8KaybnwkRPGrBc2Kbi3vhcTfpxb\"]},\"node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol\":{\"keccak256\":\"0x0203dcadc5737d9ef2c211d6fa15d18ebc3b30dfa51903b64870b01a062b0b4e\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://6eb2fd1e9894dbe778f4b8131adecebe570689e63cf892f4e21257bfe1252497\",\"dweb:/ipfs/QmXgUGNfZvrn6N2miv3nooSs7Jm34A41qz94fu2GtDFcx8\"]},\"node_modules/@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol\":{\"keccak256\":\"0x611aa3f23e59cfdd1863c536776407b3e33d695152a266fa7cfb34440a29a8a3\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://9b4b2110b7f2b3eb32951bc08046fa90feccffa594e1176cb91cdfb0e94726b4\",\"dweb:/ipfs/QmSxLwYjicf9zWFuieRc8WQwE4FisA1Um5jp1iSa731TGt\"]},\"node_modules/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol\":{\"keccak256\":\"0x963ea7f0b48b032eef72fe3a7582edf78408d6f834115b9feadd673a4d5bd149\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://d6520943ea55fdf5f0bafb39ed909f64de17051bc954ff3e88c9e5621412c79c\",\"dweb:/ipfs/QmWZ4rAKTQbNG2HxGs46AcTXShsVytKeLs7CUCdCSv5N7a\"]}},\"version\":1}",
+  "metadata": {
+    "compiler": {
+      "version": "0.8.17+commit.8df45f5f"
+    },
+    "language": "Solidity",
+    "output": {
+      "abi": [
+        {
+          "inputs": [
+            {
+              "internalType": "uint8",
+              "name": "version",
+              "type": "uint8",
+              "indexed": false
+            }
+          ],
+          "type": "event",
+          "name": "Initialized",
+          "anonymous": false
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "previousOwner",
+              "type": "address",
+              "indexed": true
+            },
+            {
+              "internalType": "address",
+              "name": "newOwner",
+              "type": "address",
+              "indexed": true
+            }
+          ],
+          "type": "event",
+          "name": "OwnershipTransferred",
+          "anonymous": false
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint16",
+              "name": "newFee",
+              "type": "uint16",
+              "indexed": false
+            },
+            {
+              "internalType": "uint16",
+              "name": "oldFee",
+              "type": "uint16",
+              "indexed": false
+            }
+          ],
+          "type": "event",
+          "name": "ProtocolFeeSet",
+          "anonymous": false
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint16",
+              "name": "_initFee",
+              "type": "uint16"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function",
+          "name": "initialize"
+        },
+        {
+          "inputs": [],
+          "stateMutability": "view",
+          "type": "function",
+          "name": "owner",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ]
+        },
+        {
+          "inputs": [],
+          "stateMutability": "view",
+          "type": "function",
+          "name": "protocolFee",
+          "outputs": [
+            {
+              "internalType": "uint16",
+              "name": "",
+              "type": "uint16"
+            }
+          ]
+        },
+        {
+          "inputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function",
+          "name": "renounceOwnership"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint16",
+              "name": "newFee",
+              "type": "uint16"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function",
+          "name": "setProtocolFee"
+        },
+        {
+          "inputs": [],
+          "stateMutability": "view",
+          "type": "function",
+          "name": "setProtocolFeeCalled",
+          "outputs": [
+            {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
+            }
+          ]
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "newOwner",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function",
+          "name": "transferOwnership"
+        }
+      ],
+      "devdoc": {
+        "kind": "dev",
+        "methods": {
+          "owner()": {
+            "details": "Returns the address of the current owner."
+          },
+          "renounceOwnership()": {
+            "details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner."
+          },
+          "setProtocolFee(uint16)": {
+            "params": {
+              "newFee": "The new protocol fee to be set."
+            }
+          },
+          "transferOwnership(address)": {
+            "details": "Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner."
+          }
+        },
+        "version": 1
+      },
+      "userdoc": {
+        "kind": "user",
+        "methods": {
+          "protocolFee()": {
+            "notice": "Returns the current protocol fee."
+          },
+          "setProtocolFee(uint16)": {
+            "notice": "Lets the DAO/owner of the protocol to set a new protocol fee."
+          }
+        },
+        "version": 1
+      }
+    },
+    "settings": {
+      "remappings": [
+        ":@ensdomains/=node_modules/@ensdomains/",
+        ":@openzeppelin/=node_modules/@openzeppelin/",
+        ":ds-test/=lib/forge-std/lib/ds-test/src/",
+        ":eth-gas-reporter/=node_modules/eth-gas-reporter/",
+        ":forge-std/=lib/forge-std/src/",
+        ":hardhat-deploy/=node_modules/hardhat-deploy/",
+        ":hardhat/=node_modules/hardhat/"
+      ],
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "metadata": {
+        "bytecodeHash": "ipfs"
+      },
+      "compilationTarget": {
+        "contracts/ProtocolFeeMock.sol": "ProtocolFeeMock"
+      },
+      "libraries": {}
+    },
+    "sources": {
+      "contracts/ProtocolFee.sol": {
+        "keccak256": "0x8a4fbca87131233a11efc1c5006a9b9d5ea45b82078c85726ce9e07ef13e2893",
+        "urls": [
+          "bzz-raw://158488abd8c3e29e1d4f83173120a3d808a38f330067d94852df767ef00b4acf",
+          "dweb:/ipfs/QmRc4iCqThiNT2uptvpHZPV5WCbgD5X86Ty1AfSyim2B2V"
+        ],
+        "license": "MIT"
+      },
+      "contracts/ProtocolFeeMock.sol": {
+        "keccak256": "0x701372377f8241c2983671206381f6fde5619fff190f9646cf5540c983ace926",
+        "urls": [
+          "bzz-raw://eb446938b5b99e1acd4103917618237331168032860f2aad7e886243fa44239c",
+          "dweb:/ipfs/QmVYrQwqNbRkckb7F4RKjJ7GYDUMELqrVuiNp6YRShxJ3T"
+        ],
+        "license": "MIT"
+      },
+      "node_modules/@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol": {
+        "keccak256": "0x247c62047745915c0af6b955470a72d1696ebad4352d7d3011aef1a2463cd888",
+        "urls": [
+          "bzz-raw://d7fc8396619de513c96b6e00301b88dd790e83542aab918425633a5f7297a15a",
+          "dweb:/ipfs/QmXbP4kiZyp7guuS7xe8KaybnwkRPGrBc2Kbi3vhcTfpxb"
+        ],
+        "license": "MIT"
+      },
+      "node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol": {
+        "keccak256": "0x0203dcadc5737d9ef2c211d6fa15d18ebc3b30dfa51903b64870b01a062b0b4e",
+        "urls": [
+          "bzz-raw://6eb2fd1e9894dbe778f4b8131adecebe570689e63cf892f4e21257bfe1252497",
+          "dweb:/ipfs/QmXgUGNfZvrn6N2miv3nooSs7Jm34A41qz94fu2GtDFcx8"
+        ],
+        "license": "MIT"
+      },
+      "node_modules/@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol": {
+        "keccak256": "0x611aa3f23e59cfdd1863c536776407b3e33d695152a266fa7cfb34440a29a8a3",
+        "urls": [
+          "bzz-raw://9b4b2110b7f2b3eb32951bc08046fa90feccffa594e1176cb91cdfb0e94726b4",
+          "dweb:/ipfs/QmSxLwYjicf9zWFuieRc8WQwE4FisA1Um5jp1iSa731TGt"
+        ],
+        "license": "MIT"
+      },
+      "node_modules/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol": {
+        "keccak256": "0x963ea7f0b48b032eef72fe3a7582edf78408d6f834115b9feadd673a4d5bd149",
+        "urls": [
+          "bzz-raw://d6520943ea55fdf5f0bafb39ed909f64de17051bc954ff3e88c9e5621412c79c",
+          "dweb:/ipfs/QmWZ4rAKTQbNG2HxGs46AcTXShsVytKeLs7CUCdCSv5N7a"
+        ],
+        "license": "MIT"
+      }
+    },
+    "version": 1
+  },
+  "ast": {
+    "absolutePath": "contracts/ProtocolFeeMock.sol",
+    "id": 3098,
+    "exportedSymbols": {
+      "AddressUpgradeable": [
+        9835
+      ],
+      "ContextUpgradeable": [
+        9877
+      ],
+      "Initializable": [
+        9387
+      ],
+      "OwnableUpgradeable": [
+        9236
+      ],
+      "ProtocolFee": [
+        3050
+      ],
+      "ProtocolFeeMock": [
+        3097
+      ]
+    },
+    "nodeType": "SourceUnit",
+    "src": "0:653:6",
+    "nodes": [
+      {
+        "id": 3052,
+        "nodeType": "PragmaDirective",
+        "src": "0:31:6",
+        "nodes": [],
+        "literals": [
+          "solidity",
+          ">=",
+          "0.8",
+          ".0",
+          "<",
+          "0.9",
+          ".0"
+        ]
+      },
+      {
+        "id": 3053,
+        "nodeType": "ImportDirective",
+        "src": "65:27:6",
+        "nodes": [],
+        "absolutePath": "contracts/ProtocolFee.sol",
+        "file": "./ProtocolFee.sol",
+        "nameLocation": "-1:-1:-1",
+        "scope": 3098,
+        "sourceUnit": 3051,
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "id": 3097,
+        "nodeType": "ContractDefinition",
+        "src": "94:558:6",
+        "nodes": [
+          {
+            "id": 3057,
+            "nodeType": "VariableDeclaration",
+            "src": "140:32:6",
+            "nodes": [],
+            "constant": false,
+            "functionSelector": "609c6c4e",
+            "mutability": "mutable",
+            "name": "setProtocolFeeCalled",
+            "nameLocation": "152:20:6",
+            "scope": 3097,
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_bool",
+              "typeString": "bool"
+            },
+            "typeName": {
+              "id": 3056,
+              "name": "bool",
+              "nodeType": "ElementaryTypeName",
+              "src": "140:4:6",
+              "typeDescriptions": {
+                "typeIdentifier": "t_bool",
+                "typeString": "bool"
+              }
+            },
+            "visibility": "public"
+          },
+          {
+            "id": 3069,
+            "nodeType": "FunctionDefinition",
+            "src": "179:103:6",
+            "nodes": [],
+            "body": {
+              "id": 3068,
+              "nodeType": "Block",
+              "src": "237:45:6",
+              "nodes": [],
+              "statements": [
+                {
+                  "expression": {
+                    "arguments": [
+                      {
+                        "id": 3065,
+                        "name": "_initFee",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 3059,
+                        "src": "266:8:6",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint16",
+                          "typeString": "uint16"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_uint16",
+                          "typeString": "uint16"
+                        }
+                      ],
+                      "id": 3064,
+                      "name": "__ProtocolFee_init",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 3001,
+                      "src": "247:18:6",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_internal_nonpayable$_t_uint16_$returns$__$",
+                        "typeString": "function (uint16)"
+                      }
+                    },
+                    "id": 3066,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "247:28:6",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 3067,
+                  "nodeType": "ExpressionStatement",
+                  "src": "247:28:6"
+                }
+              ]
+            },
+            "functionSelector": "13750946",
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [
+              {
+                "id": 3062,
+                "kind": "modifierInvocation",
+                "modifierName": {
+                  "id": 3061,
+                  "name": "initializer",
+                  "nameLocations": [
+                    "225:11:6"
+                  ],
+                  "nodeType": "IdentifierPath",
+                  "referencedDeclaration": 9307,
+                  "src": "225:11:6"
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "225:11:6"
+              }
+            ],
+            "name": "initialize",
+            "nameLocation": "188:10:6",
+            "parameters": {
+              "id": 3060,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3059,
+                  "mutability": "mutable",
+                  "name": "_initFee",
+                  "nameLocation": "206:8:6",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3069,
+                  "src": "199:15:6",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint16",
+                    "typeString": "uint16"
+                  },
+                  "typeName": {
+                    "id": 3058,
+                    "name": "uint16",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "199:6:6",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint16",
+                      "typeString": "uint16"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "198:17:6"
+            },
+            "returnParameters": {
+              "id": 3063,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "237:0:6"
+            },
+            "scope": 3097,
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "id": 3096,
+            "nodeType": "FunctionDefinition",
+            "src": "288:362:6",
+            "nodes": [],
+            "body": {
+              "id": 3095,
+              "nodeType": "Block",
+              "src": "353:297:6",
+              "nodes": [],
+              "statements": [
+                {
+                  "expression": {
+                    "id": 3079,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "id": 3077,
+                      "name": "setProtocolFeeCalled",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 3057,
+                      "src": "363:20:6",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bool",
+                        "typeString": "bool"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "hexValue": "74727565",
+                      "id": 3078,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": true,
+                      "kind": "bool",
+                      "lValueRequested": false,
+                      "nodeType": "Literal",
+                      "src": "386:4:6",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bool",
+                        "typeString": "bool"
+                      },
+                      "value": "true"
+                    },
+                    "src": "363:27:6",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "id": 3080,
+                  "nodeType": "ExpressionStatement",
+                  "src": "363:27:6"
+                },
+                {
+                  "assignments": [
+                    3082
+                  ],
+                  "declarations": [
+                    {
+                      "constant": false,
+                      "id": 3082,
+                      "mutability": "mutable",
+                      "name": "_isInitializing",
+                      "nameLocation": "406:15:6",
+                      "nodeType": "VariableDeclaration",
+                      "scope": 3095,
+                      "src": "401:20:6",
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bool",
+                        "typeString": "bool"
+                      },
+                      "typeName": {
+                        "id": 3081,
+                        "name": "bool",
+                        "nodeType": "ElementaryTypeName",
+                        "src": "401:4:6",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      },
+                      "visibility": "internal"
+                    }
+                  ],
+                  "id": 3083,
+                  "nodeType": "VariableDeclarationStatement",
+                  "src": "401:20:6"
+                },
+                {
+                  "AST": {
+                    "nodeType": "YulBlock",
+                    "src": "440:51:6",
+                    "statements": [
+                      {
+                        "nodeType": "YulAssignment",
+                        "src": "454:27:6",
+                        "value": {
+                          "arguments": [
+                            {
+                              "kind": "number",
+                              "nodeType": "YulLiteral",
+                              "src": "479:1:6",
+                              "type": "",
+                              "value": "1"
+                            }
+                          ],
+                          "functionName": {
+                            "name": "sload",
+                            "nodeType": "YulIdentifier",
+                            "src": "473:5:6"
+                          },
+                          "nodeType": "YulFunctionCall",
+                          "src": "473:8:6"
+                        },
+                        "variableNames": [
+                          {
+                            "name": "_isInitializing",
+                            "nodeType": "YulIdentifier",
+                            "src": "454:15:6"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "evmVersion": "london",
+                  "externalReferences": [
+                    {
+                      "declaration": 3082,
+                      "isOffset": false,
+                      "isSlot": false,
+                      "src": "454:15:6",
+                      "valueSize": 1
+                    }
+                  ],
+                  "id": 3084,
+                  "nodeType": "InlineAssembly",
+                  "src": "431:60:6"
+                },
+                {
+                  "condition": {
+                    "id": 3086,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "nodeType": "UnaryOperation",
+                    "operator": "!",
+                    "prefix": true,
+                    "src": "573:16:6",
+                    "subExpression": {
+                      "id": 3085,
+                      "name": "_isInitializing",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 3082,
+                      "src": "574:15:6",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bool",
+                        "typeString": "bool"
+                      }
+                    },
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "id": 3094,
+                  "nodeType": "IfStatement",
+                  "src": "569:75:6",
+                  "trueBody": {
+                    "id": 3093,
+                    "nodeType": "Block",
+                    "src": "591:53:6",
+                    "statements": [
+                      {
+                        "expression": {
+                          "arguments": [
+                            {
+                              "id": 3090,
+                              "name": "newFee",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 3071,
+                              "src": "626:6:6",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_uint16",
+                                "typeString": "uint16"
+                              }
+                            }
+                          ],
+                          "expression": {
+                            "argumentTypes": [
+                              {
+                                "typeIdentifier": "t_uint16",
+                                "typeString": "uint16"
+                              }
+                            ],
+                            "expression": {
+                              "id": 3087,
+                              "name": "super",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": -25,
+                              "src": "605:5:6",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_type$_t_super$_ProtocolFeeMock_$3097_$",
+                                "typeString": "type(contract super ProtocolFeeMock)"
+                              }
+                            },
+                            "id": 3089,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": false,
+                            "lValueRequested": false,
+                            "memberLocation": "611:14:6",
+                            "memberName": "setProtocolFee",
+                            "nodeType": "MemberAccess",
+                            "referencedDeclaration": 3049,
+                            "src": "605:20:6",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_function_internal_nonpayable$_t_uint16_$returns$__$",
+                              "typeString": "function (uint16)"
+                            }
+                          },
+                          "id": 3091,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "kind": "functionCall",
+                          "lValueRequested": false,
+                          "nameLocations": [],
+                          "names": [],
+                          "nodeType": "FunctionCall",
+                          "src": "605:28:6",
+                          "tryCall": false,
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_tuple$__$",
+                            "typeString": "tuple()"
+                          }
+                        },
+                        "id": 3092,
+                        "nodeType": "ExpressionStatement",
+                        "src": "605:28:6"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "baseFunctions": [
+              3049
+            ],
+            "functionSelector": "e4467f35",
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [
+              {
+                "id": 3075,
+                "kind": "modifierInvocation",
+                "modifierName": {
+                  "id": 3074,
+                  "name": "onlyOwner",
+                  "nameLocations": [
+                    "343:9:6"
+                  ],
+                  "nodeType": "IdentifierPath",
+                  "referencedDeclaration": 9150,
+                  "src": "343:9:6"
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "343:9:6"
+              }
+            ],
+            "name": "setProtocolFee",
+            "nameLocation": "297:14:6",
+            "overrides": {
+              "id": 3073,
+              "nodeType": "OverrideSpecifier",
+              "overrides": [],
+              "src": "334:8:6"
+            },
+            "parameters": {
+              "id": 3072,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3071,
+                  "mutability": "mutable",
+                  "name": "newFee",
+                  "nameLocation": "319:6:6",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3096,
+                  "src": "312:13:6",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint16",
+                    "typeString": "uint16"
+                  },
+                  "typeName": {
+                    "id": 3070,
+                    "name": "uint16",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "312:6:6",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint16",
+                      "typeString": "uint16"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "311:15:6"
+            },
+            "returnParameters": {
+              "id": 3076,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "353:0:6"
+            },
+            "scope": 3097,
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "public"
+          }
+        ],
+        "abstract": false,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 3054,
+              "name": "ProtocolFee",
+              "nameLocations": [
+                "122:11:6"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 3050,
+              "src": "122:11:6"
+            },
+            "id": 3055,
+            "nodeType": "InheritanceSpecifier",
+            "src": "122:11:6"
+          }
+        ],
+        "canonicalName": "ProtocolFeeMock",
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "fullyImplemented": true,
+        "linearizedBaseContracts": [
+          3097,
+          3050,
+          9236,
+          9877,
+          9387
+        ],
+        "name": "ProtocolFeeMock",
+        "nameLocation": "103:15:6",
+        "scope": 3098,
+        "usedErrors": []
+      }
+    ],
+    "license": "MIT"
+  },
+  "id": 6
+}

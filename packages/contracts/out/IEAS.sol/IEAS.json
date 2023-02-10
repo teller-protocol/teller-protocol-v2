@@ -1,0 +1,4493 @@
+{
+  "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "recipient",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "attester",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes32",
+          "name": "uuid",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "schema",
+          "type": "bytes32"
+        }
+      ],
+      "name": "Attested",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "recipient",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "attester",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes32",
+          "name": "uuid",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "schema",
+          "type": "bytes32"
+        }
+      ],
+      "name": "Revoked",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "recipient",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "schema",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "uint256",
+          "name": "expirationTime",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "refUUID",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "bytes",
+          "name": "data",
+          "type": "bytes"
+        }
+      ],
+      "name": "attest",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "recipient",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "schema",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "uint256",
+          "name": "expirationTime",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "refUUID",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "bytes",
+          "name": "data",
+          "type": "bytes"
+        },
+        {
+          "internalType": "address",
+          "name": "attester",
+          "type": "address"
+        },
+        {
+          "internalType": "uint8",
+          "name": "v",
+          "type": "uint8"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "r",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "s",
+          "type": "bytes32"
+        }
+      ],
+      "name": "attestByDelegation",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getASRegistry",
+      "outputs": [
+        {
+          "internalType": "contract IASRegistry",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "uuid",
+          "type": "bytes32"
+        }
+      ],
+      "name": "getAttestation",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "bytes32",
+              "name": "uuid",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "schema",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "address",
+              "name": "recipient",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "attester",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "time",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "expirationTime",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "revocationTime",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "refUUID",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "bytes",
+              "name": "data",
+              "type": "bytes"
+            }
+          ],
+          "internalType": "struct IEAS.Attestation",
+          "name": "",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getAttestationsCount",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getEIP712Verifier",
+      "outputs": [
+        {
+          "internalType": "contract IEASEIP712Verifier",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "recipient",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "schema",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "uint256",
+          "name": "start",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "length",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "reverseOrder",
+          "type": "bool"
+        }
+      ],
+      "name": "getReceivedAttestationUUIDs",
+      "outputs": [
+        {
+          "internalType": "bytes32[]",
+          "name": "",
+          "type": "bytes32[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "recipient",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "schema",
+          "type": "bytes32"
+        }
+      ],
+      "name": "getReceivedAttestationUUIDsCount",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "uuid",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "uint256",
+          "name": "start",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "length",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "reverseOrder",
+          "type": "bool"
+        }
+      ],
+      "name": "getRelatedAttestationUUIDs",
+      "outputs": [
+        {
+          "internalType": "bytes32[]",
+          "name": "",
+          "type": "bytes32[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "uuid",
+          "type": "bytes32"
+        }
+      ],
+      "name": "getRelatedAttestationUUIDsCount",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "schema",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "uint256",
+          "name": "start",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "length",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "reverseOrder",
+          "type": "bool"
+        }
+      ],
+      "name": "getSchemaAttestationUUIDs",
+      "outputs": [
+        {
+          "internalType": "bytes32[]",
+          "name": "",
+          "type": "bytes32[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "schema",
+          "type": "bytes32"
+        }
+      ],
+      "name": "getSchemaAttestationUUIDsCount",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "attester",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "schema",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "uint256",
+          "name": "start",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "length",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "reverseOrder",
+          "type": "bool"
+        }
+      ],
+      "name": "getSentAttestationUUIDs",
+      "outputs": [
+        {
+          "internalType": "bytes32[]",
+          "name": "",
+          "type": "bytes32[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "recipient",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "schema",
+          "type": "bytes32"
+        }
+      ],
+      "name": "getSentAttestationUUIDsCount",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "uuid",
+          "type": "bytes32"
+        }
+      ],
+      "name": "isAttestationActive",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "uuid",
+          "type": "bytes32"
+        }
+      ],
+      "name": "isAttestationValid",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "uuid",
+          "type": "bytes32"
+        }
+      ],
+      "name": "revoke",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "uuid",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "address",
+          "name": "attester",
+          "type": "address"
+        },
+        {
+          "internalType": "uint8",
+          "name": "v",
+          "type": "uint8"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "r",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "s",
+          "type": "bytes32"
+        }
+      ],
+      "name": "revokeByDelegation",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": {
+    "object": "0x",
+    "sourceMap": "",
+    "linkReferences": {}
+  },
+  "deployedBytecode": {
+    "object": "0x",
+    "sourceMap": "",
+    "linkReferences": {}
+  },
+  "methodIdentifiers": {
+    "attest(address,bytes32,uint256,bytes32,bytes)": "09a954cd",
+    "attestByDelegation(address,bytes32,uint256,bytes32,bytes,address,uint8,bytes32,bytes32)": "930ed013",
+    "getASRegistry()": "81fa6cd3",
+    "getAttestation(bytes32)": "a3112a64",
+    "getAttestationsCount()": "f96e5013",
+    "getEIP712Verifier()": "15cd31a1",
+    "getReceivedAttestationUUIDs(address,bytes32,uint256,uint256,bool)": "10515298",
+    "getReceivedAttestationUUIDsCount(address,bytes32)": "d8c5ebd4",
+    "getRelatedAttestationUUIDs(bytes32,uint256,uint256,bool)": "7f04f284",
+    "getRelatedAttestationUUIDsCount(bytes32)": "0560f90f",
+    "getSchemaAttestationUUIDs(bytes32,uint256,uint256,bool)": "63583538",
+    "getSchemaAttestationUUIDsCount(bytes32)": "62196643",
+    "getSentAttestationUUIDs(address,bytes32,uint256,uint256,bool)": "1bc9a07a",
+    "getSentAttestationUUIDsCount(address,bytes32)": "c042d88f",
+    "isAttestationActive(bytes32)": "c334947c",
+    "isAttestationValid(bytes32)": "e30bb563",
+    "revoke(bytes32)": "b75c7dc6",
+    "revokeByDelegation(bytes32,address,uint8,bytes32,bytes32)": "d87647b2"
+  },
+  "rawMetadata": "{\"compiler\":{\"version\":\"0.8.17+commit.8df45f5f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"recipient\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"attester\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"uuid\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"schema\",\"type\":\"bytes32\"}],\"name\":\"Attested\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"recipient\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"attester\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"uuid\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"schema\",\"type\":\"bytes32\"}],\"name\":\"Revoked\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"recipient\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"schema\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"expirationTime\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"refUUID\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"}],\"name\":\"attest\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"recipient\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"schema\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"expirationTime\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"refUUID\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"},{\"internalType\":\"address\",\"name\":\"attester\",\"type\":\"address\"},{\"internalType\":\"uint8\",\"name\":\"v\",\"type\":\"uint8\"},{\"internalType\":\"bytes32\",\"name\":\"r\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"s\",\"type\":\"bytes32\"}],\"name\":\"attestByDelegation\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getASRegistry\",\"outputs\":[{\"internalType\":\"contract IASRegistry\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"uuid\",\"type\":\"bytes32\"}],\"name\":\"getAttestation\",\"outputs\":[{\"components\":[{\"internalType\":\"bytes32\",\"name\":\"uuid\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"schema\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"recipient\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"attester\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"time\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"expirationTime\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"revocationTime\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"refUUID\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"}],\"internalType\":\"struct IEAS.Attestation\",\"name\":\"\",\"type\":\"tuple\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getAttestationsCount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getEIP712Verifier\",\"outputs\":[{\"internalType\":\"contract IEASEIP712Verifier\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"recipient\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"schema\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"start\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"length\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"reverseOrder\",\"type\":\"bool\"}],\"name\":\"getReceivedAttestationUUIDs\",\"outputs\":[{\"internalType\":\"bytes32[]\",\"name\":\"\",\"type\":\"bytes32[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"recipient\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"schema\",\"type\":\"bytes32\"}],\"name\":\"getReceivedAttestationUUIDsCount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"uuid\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"start\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"length\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"reverseOrder\",\"type\":\"bool\"}],\"name\":\"getRelatedAttestationUUIDs\",\"outputs\":[{\"internalType\":\"bytes32[]\",\"name\":\"\",\"type\":\"bytes32[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"uuid\",\"type\":\"bytes32\"}],\"name\":\"getRelatedAttestationUUIDsCount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"schema\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"start\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"length\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"reverseOrder\",\"type\":\"bool\"}],\"name\":\"getSchemaAttestationUUIDs\",\"outputs\":[{\"internalType\":\"bytes32[]\",\"name\":\"\",\"type\":\"bytes32[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"schema\",\"type\":\"bytes32\"}],\"name\":\"getSchemaAttestationUUIDsCount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"attester\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"schema\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"start\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"length\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"reverseOrder\",\"type\":\"bool\"}],\"name\":\"getSentAttestationUUIDs\",\"outputs\":[{\"internalType\":\"bytes32[]\",\"name\":\"\",\"type\":\"bytes32[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"recipient\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"schema\",\"type\":\"bytes32\"}],\"name\":\"getSentAttestationUUIDsCount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"uuid\",\"type\":\"bytes32\"}],\"name\":\"isAttestationActive\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"uuid\",\"type\":\"bytes32\"}],\"name\":\"isAttestationValid\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"uuid\",\"type\":\"bytes32\"}],\"name\":\"revoke\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"uuid\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"attester\",\"type\":\"address\"},{\"internalType\":\"uint8\",\"name\":\"v\",\"type\":\"uint8\"},{\"internalType\":\"bytes32\",\"name\":\"r\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"s\",\"type\":\"bytes32\"}],\"name\":\"revokeByDelegation\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"events\":{\"Attested(address,address,bytes32,bytes32)\":{\"details\":\"Triggered when an attestation has been made.\",\"params\":{\"attester\":\"The attesting account.\",\"recipient\":\"The recipient of the attestation.\",\"schema\":\"The UUID of the AS.\",\"uuid\":\"The UUID the revoked attestation.\"}},\"Revoked(address,address,bytes32,bytes32)\":{\"details\":\"Triggered when an attestation has been revoked.\",\"params\":{\"attester\":\"The attesting account.\",\"recipient\":\"The recipient of the attestation.\",\"schema\":\"The UUID of the AS.\",\"uuid\":\"The UUID the revoked attestation.\"}}},\"kind\":\"dev\",\"methods\":{\"attest(address,bytes32,uint256,bytes32,bytes)\":{\"details\":\"Attests to a specific AS.\",\"params\":{\"data\":\"Additional custom data.\",\"expirationTime\":\"The expiration time of the attestation.\",\"recipient\":\"The recipient of the attestation.\",\"refUUID\":\"An optional related attestation's UUID.\",\"schema\":\"The UUID of the AS.\"},\"returns\":{\"_0\":\"The UUID of the new attestation.\"}},\"attestByDelegation(address,bytes32,uint256,bytes32,bytes,address,uint8,bytes32,bytes32)\":{\"details\":\"Attests to a specific AS using a provided EIP712 signature.\",\"params\":{\"attester\":\"The attesting account.\",\"data\":\"Additional custom data.\",\"expirationTime\":\"The expiration time of the attestation.\",\"r\":\"The x-coordinate of the nonce R.\",\"recipient\":\"The recipient of the attestation.\",\"refUUID\":\"An optional related attestation's UUID.\",\"s\":\"The signature data.\",\"schema\":\"The UUID of the AS.\",\"v\":\"The recovery ID.\"},\"returns\":{\"_0\":\"The UUID of the new attestation.\"}},\"getASRegistry()\":{\"details\":\"Returns the address of the AS global registry.\",\"returns\":{\"_0\":\"The address of the AS global registry.\"}},\"getAttestation(bytes32)\":{\"details\":\"Returns an existing attestation by UUID.\",\"params\":{\"uuid\":\"The UUID of the attestation to retrieve.\"},\"returns\":{\"_0\":\"The attestation data members.\"}},\"getAttestationsCount()\":{\"details\":\"Returns the global counter for the total number of attestations.\",\"returns\":{\"_0\":\"The global counter for the total number of attestations.\"}},\"getEIP712Verifier()\":{\"details\":\"Returns the address of the EIP712 verifier used to verify signed attestations.\",\"returns\":{\"_0\":\"The address of the EIP712 verifier used to verify signed attestations.\"}},\"getReceivedAttestationUUIDs(address,bytes32,uint256,uint256,bool)\":{\"details\":\"Returns all received attestation UUIDs.\",\"params\":{\"length\":\"The number of total members to retrieve.\",\"recipient\":\"The recipient of the attestation.\",\"reverseOrder\":\"Whether the offset starts from the end and the data is returned in reverse.\",\"schema\":\"The UUID of the AS.\",\"start\":\"The offset to start from.\"},\"returns\":{\"_0\":\"An array of attestation UUIDs.\"}},\"getReceivedAttestationUUIDsCount(address,bytes32)\":{\"details\":\"Returns the number of received attestation UUIDs.\",\"params\":{\"recipient\":\"The recipient of the attestation.\",\"schema\":\"The UUID of the AS.\"},\"returns\":{\"_0\":\"The number of attestations.\"}},\"getRelatedAttestationUUIDs(bytes32,uint256,uint256,bool)\":{\"details\":\"Returns all attestations related to a specific attestation.\",\"params\":{\"length\":\"The number of total members to retrieve.\",\"reverseOrder\":\"Whether the offset starts from the end and the data is returned in reverse.\",\"start\":\"The offset to start from.\",\"uuid\":\"The UUID of the attestation to retrieve.\"},\"returns\":{\"_0\":\"An array of attestation UUIDs.\"}},\"getRelatedAttestationUUIDsCount(bytes32)\":{\"details\":\"Returns the number of related attestation UUIDs.\",\"params\":{\"uuid\":\"The UUID of the attestation to retrieve.\"},\"returns\":{\"_0\":\"The number of related attestations.\"}},\"getSchemaAttestationUUIDs(bytes32,uint256,uint256,bool)\":{\"details\":\"Returns all per-schema attestation UUIDs.\",\"params\":{\"length\":\"The number of total members to retrieve.\",\"reverseOrder\":\"Whether the offset starts from the end and the data is returned in reverse.\",\"schema\":\"The UUID of the AS.\",\"start\":\"The offset to start from.\"},\"returns\":{\"_0\":\"An array of attestation UUIDs.\"}},\"getSchemaAttestationUUIDsCount(bytes32)\":{\"details\":\"Returns the number of per-schema  attestation UUIDs.\",\"params\":{\"schema\":\"The UUID of the AS.\"},\"returns\":{\"_0\":\"The number of attestations.\"}},\"getSentAttestationUUIDs(address,bytes32,uint256,uint256,bool)\":{\"details\":\"Returns all sent attestation UUIDs.\",\"params\":{\"attester\":\"The attesting account.\",\"length\":\"The number of total members to retrieve.\",\"reverseOrder\":\"Whether the offset starts from the end and the data is returned in reverse.\",\"schema\":\"The UUID of the AS.\",\"start\":\"The offset to start from.\"},\"returns\":{\"_0\":\"An array of attestation UUIDs.\"}},\"getSentAttestationUUIDsCount(address,bytes32)\":{\"details\":\"Returns the number of sent attestation UUIDs.\",\"params\":{\"recipient\":\"The recipient of the attestation.\",\"schema\":\"The UUID of the AS.\"},\"returns\":{\"_0\":\"The number of attestations.\"}},\"isAttestationActive(bytes32)\":{\"details\":\"Checks whether an attestation is active.\",\"params\":{\"uuid\":\"The UUID of the attestation to retrieve.\"},\"returns\":{\"_0\":\"Whether an attestation is active.\"}},\"isAttestationValid(bytes32)\":{\"details\":\"Checks whether an attestation exists.\",\"params\":{\"uuid\":\"The UUID of the attestation to retrieve.\"},\"returns\":{\"_0\":\"Whether an attestation exists.\"}},\"revoke(bytes32)\":{\"details\":\"Revokes an existing attestation to a specific AS.\",\"params\":{\"uuid\":\"The UUID of the attestation to revoke.\"}},\"revokeByDelegation(bytes32,address,uint8,bytes32,bytes32)\":{\"details\":\"Attests to a specific AS using a provided EIP712 signature.\",\"params\":{\"attester\":\"The attesting account.\",\"r\":\"The x-coordinate of the nonce R.\",\"s\":\"The signature data.\",\"uuid\":\"The UUID of the attestation to revoke.\",\"v\":\"The recovery ID.\"}}},\"title\":\"EAS - Ethereum Attestation Service interface\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/interfaces/IEAS.sol\":\"IEAS\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[\":@ensdomains/=node_modules/@ensdomains/\",\":@openzeppelin/=node_modules/@openzeppelin/\",\":ds-test/=lib/forge-std/lib/ds-test/src/\",\":eth-gas-reporter/=node_modules/eth-gas-reporter/\",\":forge-std/=lib/forge-std/src/\",\":hardhat-deploy/=node_modules/hardhat-deploy/\",\":hardhat/=node_modules/hardhat/\"]},\"sources\":{\"contracts/interfaces/IASRegistry.sol\":{\"keccak256\":\"0x74752921f592df45c8717d7084627e823b1dbc93bad7187cd3023c9690df7e60\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://14ed67b4973bd1b2797604cfd652387bbe230682f3f5a41e922879a0f4d5b668\",\"dweb:/ipfs/QmTJ5fvKX7deAQ8YpoPmwyVR379BdfbKSzaHSLoje7h5Tx\"]},\"contracts/interfaces/IASResolver.sol\":{\"keccak256\":\"0xfce671ea099d9f997a69c3447eb4a9c9693d37c5b97e43ada376e614e1c7cb61\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://6673f2ba98aafbeb4bdbfbc2392b164a7ae4e82b8b8a5f5b9b484fbdf4653cc1\",\"dweb:/ipfs/QmVSkwZpHzgpTyzcydE8SptJiGRvK89KahhxBuwNZNm8d2\"]},\"contracts/interfaces/IEAS.sol\":{\"keccak256\":\"0x5db90829269f806ed14a6c638f38d4aac1fa0f85829b34a2fcddd5200261c148\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://7e82edf58a6332d6966f860d847329cb7d7b51f8c30942ba55e31bf26c39f8b5\",\"dweb:/ipfs/QmZYqmByHpugi3YD6ngTfD2ViW2GFYywfzq3BJjifADpWc\"]},\"contracts/interfaces/IEASEIP712Verifier.sol\":{\"keccak256\":\"0xeca3ac3bacec52af15b2c86c5bf1a1be315aade51fa86f95da2b426b28486b1e\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://5e3d65dfbe36cc3718f5472061d283bf53ce920b929ed1a3cbab7c7129b7fe9d\",\"dweb:/ipfs/QmPDqoVWC95KkxoWeq4sreQYA2ELsMPhowi7eunU8c6qjW\"]}},\"version\":1}",
+  "metadata": {
+    "compiler": {
+      "version": "0.8.17+commit.8df45f5f"
+    },
+    "language": "Solidity",
+    "output": {
+      "abi": [
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "recipient",
+              "type": "address",
+              "indexed": true
+            },
+            {
+              "internalType": "address",
+              "name": "attester",
+              "type": "address",
+              "indexed": true
+            },
+            {
+              "internalType": "bytes32",
+              "name": "uuid",
+              "type": "bytes32",
+              "indexed": false
+            },
+            {
+              "internalType": "bytes32",
+              "name": "schema",
+              "type": "bytes32",
+              "indexed": true
+            }
+          ],
+          "type": "event",
+          "name": "Attested",
+          "anonymous": false
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "recipient",
+              "type": "address",
+              "indexed": true
+            },
+            {
+              "internalType": "address",
+              "name": "attester",
+              "type": "address",
+              "indexed": true
+            },
+            {
+              "internalType": "bytes32",
+              "name": "uuid",
+              "type": "bytes32",
+              "indexed": false
+            },
+            {
+              "internalType": "bytes32",
+              "name": "schema",
+              "type": "bytes32",
+              "indexed": true
+            }
+          ],
+          "type": "event",
+          "name": "Revoked",
+          "anonymous": false
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "recipient",
+              "type": "address"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "schema",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "uint256",
+              "name": "expirationTime",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "refUUID",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "bytes",
+              "name": "data",
+              "type": "bytes"
+            }
+          ],
+          "stateMutability": "payable",
+          "type": "function",
+          "name": "attest",
+          "outputs": [
+            {
+              "internalType": "bytes32",
+              "name": "",
+              "type": "bytes32"
+            }
+          ]
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "recipient",
+              "type": "address"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "schema",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "uint256",
+              "name": "expirationTime",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "refUUID",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "bytes",
+              "name": "data",
+              "type": "bytes"
+            },
+            {
+              "internalType": "address",
+              "name": "attester",
+              "type": "address"
+            },
+            {
+              "internalType": "uint8",
+              "name": "v",
+              "type": "uint8"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "r",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "s",
+              "type": "bytes32"
+            }
+          ],
+          "stateMutability": "payable",
+          "type": "function",
+          "name": "attestByDelegation",
+          "outputs": [
+            {
+              "internalType": "bytes32",
+              "name": "",
+              "type": "bytes32"
+            }
+          ]
+        },
+        {
+          "inputs": [],
+          "stateMutability": "view",
+          "type": "function",
+          "name": "getASRegistry",
+          "outputs": [
+            {
+              "internalType": "contract IASRegistry",
+              "name": "",
+              "type": "address"
+            }
+          ]
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "bytes32",
+              "name": "uuid",
+              "type": "bytes32"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function",
+          "name": "getAttestation",
+          "outputs": [
+            {
+              "internalType": "struct IEAS.Attestation",
+              "name": "",
+              "type": "tuple",
+              "components": [
+                {
+                  "internalType": "bytes32",
+                  "name": "uuid",
+                  "type": "bytes32"
+                },
+                {
+                  "internalType": "bytes32",
+                  "name": "schema",
+                  "type": "bytes32"
+                },
+                {
+                  "internalType": "address",
+                  "name": "recipient",
+                  "type": "address"
+                },
+                {
+                  "internalType": "address",
+                  "name": "attester",
+                  "type": "address"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "time",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "expirationTime",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "revocationTime",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "bytes32",
+                  "name": "refUUID",
+                  "type": "bytes32"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "data",
+                  "type": "bytes"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "inputs": [],
+          "stateMutability": "view",
+          "type": "function",
+          "name": "getAttestationsCount",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ]
+        },
+        {
+          "inputs": [],
+          "stateMutability": "view",
+          "type": "function",
+          "name": "getEIP712Verifier",
+          "outputs": [
+            {
+              "internalType": "contract IEASEIP712Verifier",
+              "name": "",
+              "type": "address"
+            }
+          ]
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "recipient",
+              "type": "address"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "schema",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "uint256",
+              "name": "start",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "length",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bool",
+              "name": "reverseOrder",
+              "type": "bool"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function",
+          "name": "getReceivedAttestationUUIDs",
+          "outputs": [
+            {
+              "internalType": "bytes32[]",
+              "name": "",
+              "type": "bytes32[]"
+            }
+          ]
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "recipient",
+              "type": "address"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "schema",
+              "type": "bytes32"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function",
+          "name": "getReceivedAttestationUUIDsCount",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ]
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "bytes32",
+              "name": "uuid",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "uint256",
+              "name": "start",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "length",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bool",
+              "name": "reverseOrder",
+              "type": "bool"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function",
+          "name": "getRelatedAttestationUUIDs",
+          "outputs": [
+            {
+              "internalType": "bytes32[]",
+              "name": "",
+              "type": "bytes32[]"
+            }
+          ]
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "bytes32",
+              "name": "uuid",
+              "type": "bytes32"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function",
+          "name": "getRelatedAttestationUUIDsCount",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ]
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "bytes32",
+              "name": "schema",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "uint256",
+              "name": "start",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "length",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bool",
+              "name": "reverseOrder",
+              "type": "bool"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function",
+          "name": "getSchemaAttestationUUIDs",
+          "outputs": [
+            {
+              "internalType": "bytes32[]",
+              "name": "",
+              "type": "bytes32[]"
+            }
+          ]
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "bytes32",
+              "name": "schema",
+              "type": "bytes32"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function",
+          "name": "getSchemaAttestationUUIDsCount",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ]
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "attester",
+              "type": "address"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "schema",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "uint256",
+              "name": "start",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "length",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bool",
+              "name": "reverseOrder",
+              "type": "bool"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function",
+          "name": "getSentAttestationUUIDs",
+          "outputs": [
+            {
+              "internalType": "bytes32[]",
+              "name": "",
+              "type": "bytes32[]"
+            }
+          ]
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "recipient",
+              "type": "address"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "schema",
+              "type": "bytes32"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function",
+          "name": "getSentAttestationUUIDsCount",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ]
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "bytes32",
+              "name": "uuid",
+              "type": "bytes32"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function",
+          "name": "isAttestationActive",
+          "outputs": [
+            {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
+            }
+          ]
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "bytes32",
+              "name": "uuid",
+              "type": "bytes32"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function",
+          "name": "isAttestationValid",
+          "outputs": [
+            {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
+            }
+          ]
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "bytes32",
+              "name": "uuid",
+              "type": "bytes32"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function",
+          "name": "revoke"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "bytes32",
+              "name": "uuid",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "address",
+              "name": "attester",
+              "type": "address"
+            },
+            {
+              "internalType": "uint8",
+              "name": "v",
+              "type": "uint8"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "r",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "s",
+              "type": "bytes32"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function",
+          "name": "revokeByDelegation"
+        }
+      ],
+      "devdoc": {
+        "kind": "dev",
+        "methods": {
+          "attest(address,bytes32,uint256,bytes32,bytes)": {
+            "details": "Attests to a specific AS.",
+            "params": {
+              "data": "Additional custom data.",
+              "expirationTime": "The expiration time of the attestation.",
+              "recipient": "The recipient of the attestation.",
+              "refUUID": "An optional related attestation's UUID.",
+              "schema": "The UUID of the AS."
+            },
+            "returns": {
+              "_0": "The UUID of the new attestation."
+            }
+          },
+          "attestByDelegation(address,bytes32,uint256,bytes32,bytes,address,uint8,bytes32,bytes32)": {
+            "details": "Attests to a specific AS using a provided EIP712 signature.",
+            "params": {
+              "attester": "The attesting account.",
+              "data": "Additional custom data.",
+              "expirationTime": "The expiration time of the attestation.",
+              "r": "The x-coordinate of the nonce R.",
+              "recipient": "The recipient of the attestation.",
+              "refUUID": "An optional related attestation's UUID.",
+              "s": "The signature data.",
+              "schema": "The UUID of the AS.",
+              "v": "The recovery ID."
+            },
+            "returns": {
+              "_0": "The UUID of the new attestation."
+            }
+          },
+          "getASRegistry()": {
+            "details": "Returns the address of the AS global registry.",
+            "returns": {
+              "_0": "The address of the AS global registry."
+            }
+          },
+          "getAttestation(bytes32)": {
+            "details": "Returns an existing attestation by UUID.",
+            "params": {
+              "uuid": "The UUID of the attestation to retrieve."
+            },
+            "returns": {
+              "_0": "The attestation data members."
+            }
+          },
+          "getAttestationsCount()": {
+            "details": "Returns the global counter for the total number of attestations.",
+            "returns": {
+              "_0": "The global counter for the total number of attestations."
+            }
+          },
+          "getEIP712Verifier()": {
+            "details": "Returns the address of the EIP712 verifier used to verify signed attestations.",
+            "returns": {
+              "_0": "The address of the EIP712 verifier used to verify signed attestations."
+            }
+          },
+          "getReceivedAttestationUUIDs(address,bytes32,uint256,uint256,bool)": {
+            "details": "Returns all received attestation UUIDs.",
+            "params": {
+              "length": "The number of total members to retrieve.",
+              "recipient": "The recipient of the attestation.",
+              "reverseOrder": "Whether the offset starts from the end and the data is returned in reverse.",
+              "schema": "The UUID of the AS.",
+              "start": "The offset to start from."
+            },
+            "returns": {
+              "_0": "An array of attestation UUIDs."
+            }
+          },
+          "getReceivedAttestationUUIDsCount(address,bytes32)": {
+            "details": "Returns the number of received attestation UUIDs.",
+            "params": {
+              "recipient": "The recipient of the attestation.",
+              "schema": "The UUID of the AS."
+            },
+            "returns": {
+              "_0": "The number of attestations."
+            }
+          },
+          "getRelatedAttestationUUIDs(bytes32,uint256,uint256,bool)": {
+            "details": "Returns all attestations related to a specific attestation.",
+            "params": {
+              "length": "The number of total members to retrieve.",
+              "reverseOrder": "Whether the offset starts from the end and the data is returned in reverse.",
+              "start": "The offset to start from.",
+              "uuid": "The UUID of the attestation to retrieve."
+            },
+            "returns": {
+              "_0": "An array of attestation UUIDs."
+            }
+          },
+          "getRelatedAttestationUUIDsCount(bytes32)": {
+            "details": "Returns the number of related attestation UUIDs.",
+            "params": {
+              "uuid": "The UUID of the attestation to retrieve."
+            },
+            "returns": {
+              "_0": "The number of related attestations."
+            }
+          },
+          "getSchemaAttestationUUIDs(bytes32,uint256,uint256,bool)": {
+            "details": "Returns all per-schema attestation UUIDs.",
+            "params": {
+              "length": "The number of total members to retrieve.",
+              "reverseOrder": "Whether the offset starts from the end and the data is returned in reverse.",
+              "schema": "The UUID of the AS.",
+              "start": "The offset to start from."
+            },
+            "returns": {
+              "_0": "An array of attestation UUIDs."
+            }
+          },
+          "getSchemaAttestationUUIDsCount(bytes32)": {
+            "details": "Returns the number of per-schema  attestation UUIDs.",
+            "params": {
+              "schema": "The UUID of the AS."
+            },
+            "returns": {
+              "_0": "The number of attestations."
+            }
+          },
+          "getSentAttestationUUIDs(address,bytes32,uint256,uint256,bool)": {
+            "details": "Returns all sent attestation UUIDs.",
+            "params": {
+              "attester": "The attesting account.",
+              "length": "The number of total members to retrieve.",
+              "reverseOrder": "Whether the offset starts from the end and the data is returned in reverse.",
+              "schema": "The UUID of the AS.",
+              "start": "The offset to start from."
+            },
+            "returns": {
+              "_0": "An array of attestation UUIDs."
+            }
+          },
+          "getSentAttestationUUIDsCount(address,bytes32)": {
+            "details": "Returns the number of sent attestation UUIDs.",
+            "params": {
+              "recipient": "The recipient of the attestation.",
+              "schema": "The UUID of the AS."
+            },
+            "returns": {
+              "_0": "The number of attestations."
+            }
+          },
+          "isAttestationActive(bytes32)": {
+            "details": "Checks whether an attestation is active.",
+            "params": {
+              "uuid": "The UUID of the attestation to retrieve."
+            },
+            "returns": {
+              "_0": "Whether an attestation is active."
+            }
+          },
+          "isAttestationValid(bytes32)": {
+            "details": "Checks whether an attestation exists.",
+            "params": {
+              "uuid": "The UUID of the attestation to retrieve."
+            },
+            "returns": {
+              "_0": "Whether an attestation exists."
+            }
+          },
+          "revoke(bytes32)": {
+            "details": "Revokes an existing attestation to a specific AS.",
+            "params": {
+              "uuid": "The UUID of the attestation to revoke."
+            }
+          },
+          "revokeByDelegation(bytes32,address,uint8,bytes32,bytes32)": {
+            "details": "Attests to a specific AS using a provided EIP712 signature.",
+            "params": {
+              "attester": "The attesting account.",
+              "r": "The x-coordinate of the nonce R.",
+              "s": "The signature data.",
+              "uuid": "The UUID of the attestation to revoke.",
+              "v": "The recovery ID."
+            }
+          }
+        },
+        "version": 1
+      },
+      "userdoc": {
+        "kind": "user",
+        "methods": {},
+        "version": 1
+      }
+    },
+    "settings": {
+      "remappings": [
+        ":@ensdomains/=node_modules/@ensdomains/",
+        ":@openzeppelin/=node_modules/@openzeppelin/",
+        ":ds-test/=lib/forge-std/lib/ds-test/src/",
+        ":eth-gas-reporter/=node_modules/eth-gas-reporter/",
+        ":forge-std/=lib/forge-std/src/",
+        ":hardhat-deploy/=node_modules/hardhat-deploy/",
+        ":hardhat/=node_modules/hardhat/"
+      ],
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "metadata": {
+        "bytecodeHash": "ipfs"
+      },
+      "compilationTarget": {
+        "contracts/interfaces/IEAS.sol": "IEAS"
+      },
+      "libraries": {}
+    },
+    "sources": {
+      "contracts/interfaces/IASRegistry.sol": {
+        "keccak256": "0x74752921f592df45c8717d7084627e823b1dbc93bad7187cd3023c9690df7e60",
+        "urls": [
+          "bzz-raw://14ed67b4973bd1b2797604cfd652387bbe230682f3f5a41e922879a0f4d5b668",
+          "dweb:/ipfs/QmTJ5fvKX7deAQ8YpoPmwyVR379BdfbKSzaHSLoje7h5Tx"
+        ],
+        "license": "MIT"
+      },
+      "contracts/interfaces/IASResolver.sol": {
+        "keccak256": "0xfce671ea099d9f997a69c3447eb4a9c9693d37c5b97e43ada376e614e1c7cb61",
+        "urls": [
+          "bzz-raw://6673f2ba98aafbeb4bdbfbc2392b164a7ae4e82b8b8a5f5b9b484fbdf4653cc1",
+          "dweb:/ipfs/QmVSkwZpHzgpTyzcydE8SptJiGRvK89KahhxBuwNZNm8d2"
+        ],
+        "license": "MIT"
+      },
+      "contracts/interfaces/IEAS.sol": {
+        "keccak256": "0x5db90829269f806ed14a6c638f38d4aac1fa0f85829b34a2fcddd5200261c148",
+        "urls": [
+          "bzz-raw://7e82edf58a6332d6966f860d847329cb7d7b51f8c30942ba55e31bf26c39f8b5",
+          "dweb:/ipfs/QmZYqmByHpugi3YD6ngTfD2ViW2GFYywfzq3BJjifADpWc"
+        ],
+        "license": "MIT"
+      },
+      "contracts/interfaces/IEASEIP712Verifier.sol": {
+        "keccak256": "0xeca3ac3bacec52af15b2c86c5bf1a1be315aade51fa86f95da2b426b28486b1e",
+        "urls": [
+          "bzz-raw://5e3d65dfbe36cc3718f5472061d283bf53ce920b929ed1a3cbab7c7129b7fe9d",
+          "dweb:/ipfs/QmPDqoVWC95KkxoWeq4sreQYA2ELsMPhowi7eunU8c6qjW"
+        ],
+        "license": "MIT"
+      }
+    },
+    "version": 1
+  },
+  "ast": {
+    "absolutePath": "contracts/interfaces/IEAS.sol",
+    "id": 8622,
+    "exportedSymbols": {
+      "IASRegistry": [
+        8255
+      ],
+      "IASResolver": [
+        8281
+      ],
+      "IEAS": [
+        8621
+      ],
+      "IEASEIP712Verifier": [
+        8669
+      ]
+    },
+    "nodeType": "SourceUnit",
+    "src": "0:9376:18",
+    "nodes": [
+      {
+        "id": 8371,
+        "nodeType": "PragmaDirective",
+        "src": "0:31:18",
+        "nodes": [],
+        "literals": [
+          "solidity",
+          ">=",
+          "0.8",
+          ".0",
+          "<",
+          "0.9",
+          ".0"
+        ]
+      },
+      {
+        "id": 8372,
+        "nodeType": "ImportDirective",
+        "src": "65:27:18",
+        "nodes": [],
+        "absolutePath": "contracts/interfaces/IASRegistry.sol",
+        "file": "./IASRegistry.sol",
+        "nameLocation": "-1:-1:-1",
+        "scope": 8622,
+        "sourceUnit": 8256,
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "id": 8373,
+        "nodeType": "ImportDirective",
+        "src": "93:34:18",
+        "nodes": [],
+        "absolutePath": "contracts/interfaces/IEASEIP712Verifier.sol",
+        "file": "./IEASEIP712Verifier.sol",
+        "nameLocation": "-1:-1:-1",
+        "scope": 8622,
+        "sourceUnit": 8670,
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "id": 8621,
+        "nodeType": "ContractDefinition",
+        "src": "192:9183:18",
+        "nodes": [
+          {
+            "id": 8393,
+            "nodeType": "StructDefinition",
+            "src": "285:738:18",
+            "nodes": [],
+            "canonicalName": "IEAS.Attestation",
+            "members": [
+              {
+                "constant": false,
+                "id": 8376,
+                "mutability": "mutable",
+                "name": "uuid",
+                "nameLocation": "373:4:18",
+                "nodeType": "VariableDeclaration",
+                "scope": 8393,
+                "src": "365:12:18",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bytes32",
+                  "typeString": "bytes32"
+                },
+                "typeName": {
+                  "id": 8375,
+                  "name": "bytes32",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "365:7:18",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 8378,
+                "mutability": "mutable",
+                "name": "schema",
+                "nameLocation": "437:6:18",
+                "nodeType": "VariableDeclaration",
+                "scope": 8393,
+                "src": "429:14:18",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bytes32",
+                  "typeString": "bytes32"
+                },
+                "typeName": {
+                  "id": 8377,
+                  "name": "bytes32",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "429:7:18",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 8380,
+                "mutability": "mutable",
+                "name": "recipient",
+                "nameLocation": "506:9:18",
+                "nodeType": "VariableDeclaration",
+                "scope": 8393,
+                "src": "498:17:18",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address",
+                  "typeString": "address"
+                },
+                "typeName": {
+                  "id": 8379,
+                  "name": "address",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "498:7:18",
+                  "stateMutability": "nonpayable",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 8382,
+                "mutability": "mutable",
+                "name": "attester",
+                "nameLocation": "584:8:18",
+                "nodeType": "VariableDeclaration",
+                "scope": 8393,
+                "src": "576:16:18",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address",
+                  "typeString": "address"
+                },
+                "typeName": {
+                  "id": 8381,
+                  "name": "address",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "576:7:18",
+                  "stateMutability": "nonpayable",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 8384,
+                "mutability": "mutable",
+                "name": "time",
+                "nameLocation": "681:4:18",
+                "nodeType": "VariableDeclaration",
+                "scope": 8393,
+                "src": "673:12:18",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 8383,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "673:7:18",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 8386,
+                "mutability": "mutable",
+                "name": "expirationTime",
+                "nameLocation": "770:14:18",
+                "nodeType": "VariableDeclaration",
+                "scope": 8393,
+                "src": "762:22:18",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 8385,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "762:7:18",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 8388,
+                "mutability": "mutable",
+                "name": "revocationTime",
+                "nameLocation": "873:14:18",
+                "nodeType": "VariableDeclaration",
+                "scope": 8393,
+                "src": "865:22:18",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 8387,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "865:7:18",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 8390,
+                "mutability": "mutable",
+                "name": "refUUID",
+                "nameLocation": "953:7:18",
+                "nodeType": "VariableDeclaration",
+                "scope": 8393,
+                "src": "945:15:18",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bytes32",
+                  "typeString": "bytes32"
+                },
+                "typeName": {
+                  "id": 8389,
+                  "name": "bytes32",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "945:7:18",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 8392,
+                "mutability": "mutable",
+                "name": "data",
+                "nameLocation": "1012:4:18",
+                "nodeType": "VariableDeclaration",
+                "scope": 8393,
+                "src": "1006:10:18",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bytes_storage_ptr",
+                  "typeString": "bytes"
+                },
+                "typeName": {
+                  "id": 8391,
+                  "name": "bytes",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1006:5:18",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_storage_ptr",
+                    "typeString": "bytes"
+                  }
+                },
+                "visibility": "internal"
+              }
+            ],
+            "name": "Attestation",
+            "nameLocation": "292:11:18",
+            "scope": 8621,
+            "visibility": "public"
+          },
+          {
+            "id": 8404,
+            "nodeType": "EventDefinition",
+            "src": "1307:144:18",
+            "nodes": [],
+            "anonymous": false,
+            "documentation": {
+              "id": 8394,
+              "nodeType": "StructuredDocumentation",
+              "src": "1029:273:18",
+              "text": " @dev Triggered when an attestation has been made.\n @param recipient The recipient of the attestation.\n @param attester The attesting account.\n @param uuid The UUID the revoked attestation.\n @param schema The UUID of the AS."
+            },
+            "eventSelector": "8bf46bf4cfd674fa735a3d63ec1c9ad4153f033c290341f3a588b75685141b35",
+            "name": "Attested",
+            "nameLocation": "1313:8:18",
+            "parameters": {
+              "id": 8403,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 8396,
+                  "indexed": true,
+                  "mutability": "mutable",
+                  "name": "recipient",
+                  "nameLocation": "1347:9:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8404,
+                  "src": "1331:25:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 8395,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1331:7:18",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 8398,
+                  "indexed": true,
+                  "mutability": "mutable",
+                  "name": "attester",
+                  "nameLocation": "1382:8:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8404,
+                  "src": "1366:24:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 8397,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1366:7:18",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 8400,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "uuid",
+                  "nameLocation": "1408:4:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8404,
+                  "src": "1400:12:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 8399,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1400:7:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 8402,
+                  "indexed": true,
+                  "mutability": "mutable",
+                  "name": "schema",
+                  "nameLocation": "1438:6:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8404,
+                  "src": "1422:22:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 8401,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1422:7:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1321:129:18"
+            }
+          },
+          {
+            "id": 8415,
+            "nodeType": "EventDefinition",
+            "src": "1738:143:18",
+            "nodes": [],
+            "anonymous": false,
+            "documentation": {
+              "id": 8405,
+              "nodeType": "StructuredDocumentation",
+              "src": "1457:276:18",
+              "text": " @dev Triggered when an attestation has been revoked.\n @param recipient The recipient of the attestation.\n @param attester The attesting account.\n @param schema The UUID of the AS.\n @param uuid The UUID the revoked attestation."
+            },
+            "eventSelector": "f930a6e2523c9cc298691873087a740550b8fc85a0680830414c148ed927f615",
+            "name": "Revoked",
+            "nameLocation": "1744:7:18",
+            "parameters": {
+              "id": 8414,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 8407,
+                  "indexed": true,
+                  "mutability": "mutable",
+                  "name": "recipient",
+                  "nameLocation": "1777:9:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8415,
+                  "src": "1761:25:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 8406,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1761:7:18",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 8409,
+                  "indexed": true,
+                  "mutability": "mutable",
+                  "name": "attester",
+                  "nameLocation": "1812:8:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8415,
+                  "src": "1796:24:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 8408,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1796:7:18",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 8411,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "uuid",
+                  "nameLocation": "1838:4:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8415,
+                  "src": "1830:12:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 8410,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1830:7:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 8413,
+                  "indexed": true,
+                  "mutability": "mutable",
+                  "name": "schema",
+                  "nameLocation": "1868:6:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8415,
+                  "src": "1852:22:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 8412,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1852:7:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1751:129:18"
+            }
+          },
+          {
+            "id": 8422,
+            "nodeType": "FunctionDefinition",
+            "src": "2023:61:18",
+            "nodes": [],
+            "documentation": {
+              "id": 8416,
+              "nodeType": "StructuredDocumentation",
+              "src": "1887:131:18",
+              "text": " @dev Returns the address of the AS global registry.\n @return The address of the AS global registry."
+            },
+            "functionSelector": "81fa6cd3",
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getASRegistry",
+            "nameLocation": "2032:13:18",
+            "parameters": {
+              "id": 8417,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2045:2:18"
+            },
+            "returnParameters": {
+              "id": 8421,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 8420,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8422,
+                  "src": "2071:11:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IASRegistry_$8255",
+                    "typeString": "contract IASRegistry"
+                  },
+                  "typeName": {
+                    "id": 8419,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 8418,
+                      "name": "IASRegistry",
+                      "nameLocations": [
+                        "2071:11:18"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 8255,
+                      "src": "2071:11:18"
+                    },
+                    "referencedDeclaration": 8255,
+                    "src": "2071:11:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IASRegistry_$8255",
+                      "typeString": "contract IASRegistry"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2070:13:18"
+            },
+            "scope": 8621,
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "id": 8429,
+            "nodeType": "FunctionDefinition",
+            "src": "2290:72:18",
+            "nodes": [],
+            "documentation": {
+              "id": 8423,
+              "nodeType": "StructuredDocumentation",
+              "src": "2090:195:18",
+              "text": " @dev Returns the address of the EIP712 verifier used to verify signed attestations.\n @return The address of the EIP712 verifier used to verify signed attestations."
+            },
+            "functionSelector": "15cd31a1",
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getEIP712Verifier",
+            "nameLocation": "2299:17:18",
+            "parameters": {
+              "id": 8424,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2316:2:18"
+            },
+            "returnParameters": {
+              "id": 8428,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 8427,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8429,
+                  "src": "2342:18:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IEASEIP712Verifier_$8669",
+                    "typeString": "contract IEASEIP712Verifier"
+                  },
+                  "typeName": {
+                    "id": 8426,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 8425,
+                      "name": "IEASEIP712Verifier",
+                      "nameLocations": [
+                        "2342:18:18"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 8669,
+                      "src": "2342:18:18"
+                    },
+                    "referencedDeclaration": 8669,
+                    "src": "2342:18:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IEASEIP712Verifier_$8669",
+                      "typeString": "contract IEASEIP712Verifier"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2341:20:18"
+            },
+            "scope": 8621,
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "id": 8435,
+            "nodeType": "FunctionDefinition",
+            "src": "2540:64:18",
+            "nodes": [],
+            "documentation": {
+              "id": 8430,
+              "nodeType": "StructuredDocumentation",
+              "src": "2368:167:18",
+              "text": " @dev Returns the global counter for the total number of attestations.\n @return The global counter for the total number of attestations."
+            },
+            "functionSelector": "f96e5013",
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getAttestationsCount",
+            "nameLocation": "2549:20:18",
+            "parameters": {
+              "id": 8431,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2569:2:18"
+            },
+            "returnParameters": {
+              "id": 8434,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 8433,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8435,
+                  "src": "2595:7:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 8432,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2595:7:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2594:9:18"
+            },
+            "scope": 8621,
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "id": 8451,
+            "nodeType": "FunctionDefinition",
+            "src": "2999:194:18",
+            "nodes": [],
+            "documentation": {
+              "id": 8436,
+              "nodeType": "StructuredDocumentation",
+              "src": "2610:384:18",
+              "text": " @dev Attests to a specific AS.\n @param recipient The recipient of the attestation.\n @param schema The UUID of the AS.\n @param expirationTime The expiration time of the attestation.\n @param refUUID An optional related attestation's UUID.\n @param data Additional custom data.\n @return The UUID of the new attestation."
+            },
+            "functionSelector": "09a954cd",
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "attest",
+            "nameLocation": "3008:6:18",
+            "parameters": {
+              "id": 8447,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 8438,
+                  "mutability": "mutable",
+                  "name": "recipient",
+                  "nameLocation": "3032:9:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8451,
+                  "src": "3024:17:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 8437,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3024:7:18",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 8440,
+                  "mutability": "mutable",
+                  "name": "schema",
+                  "nameLocation": "3059:6:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8451,
+                  "src": "3051:14:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 8439,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3051:7:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 8442,
+                  "mutability": "mutable",
+                  "name": "expirationTime",
+                  "nameLocation": "3083:14:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8451,
+                  "src": "3075:22:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 8441,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3075:7:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 8444,
+                  "mutability": "mutable",
+                  "name": "refUUID",
+                  "nameLocation": "3115:7:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8451,
+                  "src": "3107:15:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 8443,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3107:7:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 8446,
+                  "mutability": "mutable",
+                  "name": "data",
+                  "nameLocation": "3147:4:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8451,
+                  "src": "3132:19:18",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_calldata_ptr",
+                    "typeString": "bytes"
+                  },
+                  "typeName": {
+                    "id": 8445,
+                    "name": "bytes",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3132:5:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_storage_ptr",
+                      "typeString": "bytes"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "3014:143:18"
+            },
+            "returnParameters": {
+              "id": 8450,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 8449,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8451,
+                  "src": "3184:7:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 8448,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3184:7:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "3183:9:18"
+            },
+            "scope": 8621,
+            "stateMutability": "payable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "id": 8475,
+            "nodeType": "FunctionDefinition",
+            "src": "3786:287:18",
+            "nodes": [],
+            "documentation": {
+              "id": 8452,
+              "nodeType": "StructuredDocumentation",
+              "src": "3199:582:18",
+              "text": " @dev Attests to a specific AS using a provided EIP712 signature.\n @param recipient The recipient of the attestation.\n @param schema The UUID of the AS.\n @param expirationTime The expiration time of the attestation.\n @param refUUID An optional related attestation's UUID.\n @param data Additional custom data.\n @param attester The attesting account.\n @param v The recovery ID.\n @param r The x-coordinate of the nonce R.\n @param s The signature data.\n @return The UUID of the new attestation."
+            },
+            "functionSelector": "930ed013",
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "attestByDelegation",
+            "nameLocation": "3795:18:18",
+            "parameters": {
+              "id": 8471,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 8454,
+                  "mutability": "mutable",
+                  "name": "recipient",
+                  "nameLocation": "3831:9:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8475,
+                  "src": "3823:17:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 8453,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3823:7:18",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 8456,
+                  "mutability": "mutable",
+                  "name": "schema",
+                  "nameLocation": "3858:6:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8475,
+                  "src": "3850:14:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 8455,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3850:7:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 8458,
+                  "mutability": "mutable",
+                  "name": "expirationTime",
+                  "nameLocation": "3882:14:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8475,
+                  "src": "3874:22:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 8457,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3874:7:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 8460,
+                  "mutability": "mutable",
+                  "name": "refUUID",
+                  "nameLocation": "3914:7:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8475,
+                  "src": "3906:15:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 8459,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3906:7:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 8462,
+                  "mutability": "mutable",
+                  "name": "data",
+                  "nameLocation": "3946:4:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8475,
+                  "src": "3931:19:18",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_calldata_ptr",
+                    "typeString": "bytes"
+                  },
+                  "typeName": {
+                    "id": 8461,
+                    "name": "bytes",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3931:5:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_storage_ptr",
+                      "typeString": "bytes"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 8464,
+                  "mutability": "mutable",
+                  "name": "attester",
+                  "nameLocation": "3968:8:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8475,
+                  "src": "3960:16:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 8463,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3960:7:18",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 8466,
+                  "mutability": "mutable",
+                  "name": "v",
+                  "nameLocation": "3992:1:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8475,
+                  "src": "3986:7:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint8",
+                    "typeString": "uint8"
+                  },
+                  "typeName": {
+                    "id": 8465,
+                    "name": "uint8",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3986:5:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint8",
+                      "typeString": "uint8"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 8468,
+                  "mutability": "mutable",
+                  "name": "r",
+                  "nameLocation": "4011:1:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8475,
+                  "src": "4003:9:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 8467,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "4003:7:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 8470,
+                  "mutability": "mutable",
+                  "name": "s",
+                  "nameLocation": "4030:1:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8475,
+                  "src": "4022:9:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 8469,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "4022:7:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "3813:224:18"
+            },
+            "returnParameters": {
+              "id": 8474,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 8473,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8475,
+                  "src": "4064:7:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 8472,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "4064:7:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "4063:9:18"
+            },
+            "scope": 8621,
+            "stateMutability": "payable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "id": 8481,
+            "nodeType": "FunctionDefinition",
+            "src": "4222:39:18",
+            "nodes": [],
+            "documentation": {
+              "id": 8476,
+              "nodeType": "StructuredDocumentation",
+              "src": "4079:138:18",
+              "text": " @dev Revokes an existing attestation to a specific AS.\n @param uuid The UUID of the attestation to revoke."
+            },
+            "functionSelector": "b75c7dc6",
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "revoke",
+            "nameLocation": "4231:6:18",
+            "parameters": {
+              "id": 8479,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 8478,
+                  "mutability": "mutable",
+                  "name": "uuid",
+                  "nameLocation": "4246:4:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8481,
+                  "src": "4238:12:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 8477,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "4238:7:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "4237:14:18"
+            },
+            "returnParameters": {
+              "id": 8480,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "4260:0:18"
+            },
+            "scope": 8621,
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "id": 8495,
+            "nodeType": "FunctionDefinition",
+            "src": "4584:146:18",
+            "nodes": [],
+            "documentation": {
+              "id": 8482,
+              "nodeType": "StructuredDocumentation",
+              "src": "4267:312:18",
+              "text": " @dev Attests to a specific AS using a provided EIP712 signature.\n @param uuid The UUID of the attestation to revoke.\n @param attester The attesting account.\n @param v The recovery ID.\n @param r The x-coordinate of the nonce R.\n @param s The signature data."
+            },
+            "functionSelector": "d87647b2",
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "revokeByDelegation",
+            "nameLocation": "4593:18:18",
+            "parameters": {
+              "id": 8493,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 8484,
+                  "mutability": "mutable",
+                  "name": "uuid",
+                  "nameLocation": "4629:4:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8495,
+                  "src": "4621:12:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 8483,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "4621:7:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 8486,
+                  "mutability": "mutable",
+                  "name": "attester",
+                  "nameLocation": "4651:8:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8495,
+                  "src": "4643:16:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 8485,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "4643:7:18",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 8488,
+                  "mutability": "mutable",
+                  "name": "v",
+                  "nameLocation": "4675:1:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8495,
+                  "src": "4669:7:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint8",
+                    "typeString": "uint8"
+                  },
+                  "typeName": {
+                    "id": 8487,
+                    "name": "uint8",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "4669:5:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint8",
+                      "typeString": "uint8"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 8490,
+                  "mutability": "mutable",
+                  "name": "r",
+                  "nameLocation": "4694:1:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8495,
+                  "src": "4686:9:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 8489,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "4686:7:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 8492,
+                  "mutability": "mutable",
+                  "name": "s",
+                  "nameLocation": "4713:1:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8495,
+                  "src": "4705:9:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 8491,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "4705:7:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "4611:109:18"
+            },
+            "returnParameters": {
+              "id": 8494,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "4729:0:18"
+            },
+            "scope": 8621,
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "id": 8504,
+            "nodeType": "FunctionDefinition",
+            "src": "4924:105:18",
+            "nodes": [],
+            "documentation": {
+              "id": 8496,
+              "nodeType": "StructuredDocumentation",
+              "src": "4736:183:18",
+              "text": " @dev Returns an existing attestation by UUID.\n @param uuid The UUID of the attestation to retrieve.\n @return The attestation data members."
+            },
+            "functionSelector": "a3112a64",
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getAttestation",
+            "nameLocation": "4933:14:18",
+            "parameters": {
+              "id": 8499,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 8498,
+                  "mutability": "mutable",
+                  "name": "uuid",
+                  "nameLocation": "4956:4:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8504,
+                  "src": "4948:12:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 8497,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "4948:7:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "4947:14:18"
+            },
+            "returnParameters": {
+              "id": 8503,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 8502,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8504,
+                  "src": "5009:18:18",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_Attestation_$8393_memory_ptr",
+                    "typeString": "struct IEAS.Attestation"
+                  },
+                  "typeName": {
+                    "id": 8501,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 8500,
+                      "name": "Attestation",
+                      "nameLocations": [
+                        "5009:11:18"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 8393,
+                      "src": "5009:11:18"
+                    },
+                    "referencedDeclaration": 8393,
+                    "src": "5009:11:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_Attestation_$8393_storage_ptr",
+                      "typeString": "struct IEAS.Attestation"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "5008:20:18"
+            },
+            "scope": 8621,
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "id": 8512,
+            "nodeType": "FunctionDefinition",
+            "src": "5221:71:18",
+            "nodes": [],
+            "documentation": {
+              "id": 8505,
+              "nodeType": "StructuredDocumentation",
+              "src": "5035:181:18",
+              "text": " @dev Checks whether an attestation exists.\n @param uuid The UUID of the attestation to retrieve.\n @return Whether an attestation exists."
+            },
+            "functionSelector": "e30bb563",
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "isAttestationValid",
+            "nameLocation": "5230:18:18",
+            "parameters": {
+              "id": 8508,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 8507,
+                  "mutability": "mutable",
+                  "name": "uuid",
+                  "nameLocation": "5257:4:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8512,
+                  "src": "5249:12:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 8506,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "5249:7:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "5248:14:18"
+            },
+            "returnParameters": {
+              "id": 8511,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 8510,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8512,
+                  "src": "5286:4:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 8509,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "5286:4:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "5285:6:18"
+            },
+            "scope": 8621,
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "id": 8520,
+            "nodeType": "FunctionDefinition",
+            "src": "5490:72:18",
+            "nodes": [],
+            "documentation": {
+              "id": 8513,
+              "nodeType": "StructuredDocumentation",
+              "src": "5298:187:18",
+              "text": " @dev Checks whether an attestation is active.\n @param uuid The UUID of the attestation to retrieve.\n @return Whether an attestation is active."
+            },
+            "functionSelector": "c334947c",
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "isAttestationActive",
+            "nameLocation": "5499:19:18",
+            "parameters": {
+              "id": 8516,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 8515,
+                  "mutability": "mutable",
+                  "name": "uuid",
+                  "nameLocation": "5527:4:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8520,
+                  "src": "5519:12:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 8514,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "5519:7:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "5518:14:18"
+            },
+            "returnParameters": {
+              "id": 8519,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 8518,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8520,
+                  "src": "5556:4:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 8517,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "5556:4:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "5555:6:18"
+            },
+            "scope": 8621,
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "id": 8537,
+            "nodeType": "FunctionDefinition",
+            "src": "6006:209:18",
+            "nodes": [],
+            "documentation": {
+              "id": 8521,
+              "nodeType": "StructuredDocumentation",
+              "src": "5568:433:18",
+              "text": " @dev Returns all received attestation UUIDs.\n @param recipient The recipient of the attestation.\n @param schema The UUID of the AS.\n @param start The offset to start from.\n @param length The number of total members to retrieve.\n @param reverseOrder Whether the offset starts from the end and the data is returned in reverse.\n @return An array of attestation UUIDs."
+            },
+            "functionSelector": "10515298",
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getReceivedAttestationUUIDs",
+            "nameLocation": "6015:27:18",
+            "parameters": {
+              "id": 8532,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 8523,
+                  "mutability": "mutable",
+                  "name": "recipient",
+                  "nameLocation": "6060:9:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8537,
+                  "src": "6052:17:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 8522,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "6052:7:18",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 8525,
+                  "mutability": "mutable",
+                  "name": "schema",
+                  "nameLocation": "6087:6:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8537,
+                  "src": "6079:14:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 8524,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "6079:7:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 8527,
+                  "mutability": "mutable",
+                  "name": "start",
+                  "nameLocation": "6111:5:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8537,
+                  "src": "6103:13:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 8526,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "6103:7:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 8529,
+                  "mutability": "mutable",
+                  "name": "length",
+                  "nameLocation": "6134:6:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8537,
+                  "src": "6126:14:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 8528,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "6126:7:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 8531,
+                  "mutability": "mutable",
+                  "name": "reverseOrder",
+                  "nameLocation": "6155:12:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8537,
+                  "src": "6150:17:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 8530,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "6150:4:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "6042:131:18"
+            },
+            "returnParameters": {
+              "id": 8536,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 8535,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8537,
+                  "src": "6197:16:18",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_bytes32_$dyn_memory_ptr",
+                    "typeString": "bytes32[]"
+                  },
+                  "typeName": {
+                    "baseType": {
+                      "id": 8533,
+                      "name": "bytes32",
+                      "nodeType": "ElementaryTypeName",
+                      "src": "6197:7:18",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "id": 8534,
+                    "nodeType": "ArrayTypeName",
+                    "src": "6197:9:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_bytes32_$dyn_storage_ptr",
+                      "typeString": "bytes32[]"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "6196:18:18"
+            },
+            "scope": 8621,
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "id": 8547,
+            "nodeType": "FunctionDefinition",
+            "src": "6455:133:18",
+            "nodes": [],
+            "documentation": {
+              "id": 8538,
+              "nodeType": "StructuredDocumentation",
+              "src": "6221:229:18",
+              "text": " @dev Returns the number of received attestation UUIDs.\n @param recipient The recipient of the attestation.\n @param schema The UUID of the AS.\n @return The number of attestations."
+            },
+            "functionSelector": "d8c5ebd4",
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getReceivedAttestationUUIDsCount",
+            "nameLocation": "6464:32:18",
+            "parameters": {
+              "id": 8543,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 8540,
+                  "mutability": "mutable",
+                  "name": "recipient",
+                  "nameLocation": "6505:9:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8547,
+                  "src": "6497:17:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 8539,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "6497:7:18",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 8542,
+                  "mutability": "mutable",
+                  "name": "schema",
+                  "nameLocation": "6524:6:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8547,
+                  "src": "6516:14:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 8541,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "6516:7:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "6496:35:18"
+            },
+            "returnParameters": {
+              "id": 8546,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 8545,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8547,
+                  "src": "6579:7:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 8544,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "6579:7:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "6578:9:18"
+            },
+            "scope": 8621,
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "id": 8564,
+            "nodeType": "FunctionDefinition",
+            "src": "7016:204:18",
+            "nodes": [],
+            "documentation": {
+              "id": 8548,
+              "nodeType": "StructuredDocumentation",
+              "src": "6594:417:18",
+              "text": " @dev Returns all sent attestation UUIDs.\n @param attester The attesting account.\n @param schema The UUID of the AS.\n @param start The offset to start from.\n @param length The number of total members to retrieve.\n @param reverseOrder Whether the offset starts from the end and the data is returned in reverse.\n @return An array of attestation UUIDs."
+            },
+            "functionSelector": "1bc9a07a",
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getSentAttestationUUIDs",
+            "nameLocation": "7025:23:18",
+            "parameters": {
+              "id": 8559,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 8550,
+                  "mutability": "mutable",
+                  "name": "attester",
+                  "nameLocation": "7066:8:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8564,
+                  "src": "7058:16:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 8549,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "7058:7:18",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 8552,
+                  "mutability": "mutable",
+                  "name": "schema",
+                  "nameLocation": "7092:6:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8564,
+                  "src": "7084:14:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 8551,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "7084:7:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 8554,
+                  "mutability": "mutable",
+                  "name": "start",
+                  "nameLocation": "7116:5:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8564,
+                  "src": "7108:13:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 8553,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "7108:7:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 8556,
+                  "mutability": "mutable",
+                  "name": "length",
+                  "nameLocation": "7139:6:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8564,
+                  "src": "7131:14:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 8555,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "7131:7:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 8558,
+                  "mutability": "mutable",
+                  "name": "reverseOrder",
+                  "nameLocation": "7160:12:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8564,
+                  "src": "7155:17:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 8557,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "7155:4:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "7048:130:18"
+            },
+            "returnParameters": {
+              "id": 8563,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 8562,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8564,
+                  "src": "7202:16:18",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_bytes32_$dyn_memory_ptr",
+                    "typeString": "bytes32[]"
+                  },
+                  "typeName": {
+                    "baseType": {
+                      "id": 8560,
+                      "name": "bytes32",
+                      "nodeType": "ElementaryTypeName",
+                      "src": "7202:7:18",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "id": 8561,
+                    "nodeType": "ArrayTypeName",
+                    "src": "7202:9:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_bytes32_$dyn_storage_ptr",
+                      "typeString": "bytes32[]"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "7201:18:18"
+            },
+            "scope": 8621,
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "id": 8574,
+            "nodeType": "FunctionDefinition",
+            "src": "7456:129:18",
+            "nodes": [],
+            "documentation": {
+              "id": 8565,
+              "nodeType": "StructuredDocumentation",
+              "src": "7226:225:18",
+              "text": " @dev Returns the number of sent attestation UUIDs.\n @param recipient The recipient of the attestation.\n @param schema The UUID of the AS.\n @return The number of attestations."
+            },
+            "functionSelector": "c042d88f",
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getSentAttestationUUIDsCount",
+            "nameLocation": "7465:28:18",
+            "parameters": {
+              "id": 8570,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 8567,
+                  "mutability": "mutable",
+                  "name": "recipient",
+                  "nameLocation": "7502:9:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8574,
+                  "src": "7494:17:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 8566,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "7494:7:18",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 8569,
+                  "mutability": "mutable",
+                  "name": "schema",
+                  "nameLocation": "7521:6:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8574,
+                  "src": "7513:14:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 8568,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "7513:7:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "7493:35:18"
+            },
+            "returnParameters": {
+              "id": 8573,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 8572,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8574,
+                  "src": "7576:7:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 8571,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "7576:7:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "7575:9:18"
+            },
+            "scope": 8621,
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "id": 8589,
+            "nodeType": "FunctionDefinition",
+            "src": "8010:179:18",
+            "nodes": [],
+            "documentation": {
+              "id": 8575,
+              "nodeType": "StructuredDocumentation",
+              "src": "7591:414:18",
+              "text": " @dev Returns all attestations related to a specific attestation.\n @param uuid The UUID of the attestation to retrieve.\n @param start The offset to start from.\n @param length The number of total members to retrieve.\n @param reverseOrder Whether the offset starts from the end and the data is returned in reverse.\n @return An array of attestation UUIDs."
+            },
+            "functionSelector": "7f04f284",
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getRelatedAttestationUUIDs",
+            "nameLocation": "8019:26:18",
+            "parameters": {
+              "id": 8584,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 8577,
+                  "mutability": "mutable",
+                  "name": "uuid",
+                  "nameLocation": "8063:4:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8589,
+                  "src": "8055:12:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 8576,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "8055:7:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 8579,
+                  "mutability": "mutable",
+                  "name": "start",
+                  "nameLocation": "8085:5:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8589,
+                  "src": "8077:13:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 8578,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "8077:7:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 8581,
+                  "mutability": "mutable",
+                  "name": "length",
+                  "nameLocation": "8108:6:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8589,
+                  "src": "8100:14:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 8580,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "8100:7:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 8583,
+                  "mutability": "mutable",
+                  "name": "reverseOrder",
+                  "nameLocation": "8129:12:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8589,
+                  "src": "8124:17:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 8582,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "8124:4:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "8045:102:18"
+            },
+            "returnParameters": {
+              "id": 8588,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 8587,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8589,
+                  "src": "8171:16:18",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_bytes32_$dyn_memory_ptr",
+                    "typeString": "bytes32[]"
+                  },
+                  "typeName": {
+                    "baseType": {
+                      "id": 8585,
+                      "name": "bytes32",
+                      "nodeType": "ElementaryTypeName",
+                      "src": "8171:7:18",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "id": 8586,
+                    "nodeType": "ArrayTypeName",
+                    "src": "8171:9:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_bytes32_$dyn_storage_ptr",
+                      "typeString": "bytes32[]"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "8170:18:18"
+            },
+            "scope": 8621,
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "id": 8597,
+            "nodeType": "FunctionDefinition",
+            "src": "8397:111:18",
+            "nodes": [],
+            "documentation": {
+              "id": 8590,
+              "nodeType": "StructuredDocumentation",
+              "src": "8195:197:18",
+              "text": " @dev Returns the number of related attestation UUIDs.\n @param uuid The UUID of the attestation to retrieve.\n @return The number of related attestations."
+            },
+            "functionSelector": "0560f90f",
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getRelatedAttestationUUIDsCount",
+            "nameLocation": "8406:31:18",
+            "parameters": {
+              "id": 8593,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 8592,
+                  "mutability": "mutable",
+                  "name": "uuid",
+                  "nameLocation": "8446:4:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8597,
+                  "src": "8438:12:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 8591,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "8438:7:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "8437:14:18"
+            },
+            "returnParameters": {
+              "id": 8596,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 8595,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8597,
+                  "src": "8499:7:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 8594,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "8499:7:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "8498:9:18"
+            },
+            "scope": 8621,
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "id": 8612,
+            "nodeType": "FunctionDefinition",
+            "src": "8896:180:18",
+            "nodes": [],
+            "documentation": {
+              "id": 8598,
+              "nodeType": "StructuredDocumentation",
+              "src": "8514:377:18",
+              "text": " @dev Returns all per-schema attestation UUIDs.\n @param schema The UUID of the AS.\n @param start The offset to start from.\n @param length The number of total members to retrieve.\n @param reverseOrder Whether the offset starts from the end and the data is returned in reverse.\n @return An array of attestation UUIDs."
+            },
+            "functionSelector": "63583538",
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getSchemaAttestationUUIDs",
+            "nameLocation": "8905:25:18",
+            "parameters": {
+              "id": 8607,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 8600,
+                  "mutability": "mutable",
+                  "name": "schema",
+                  "nameLocation": "8948:6:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8612,
+                  "src": "8940:14:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 8599,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "8940:7:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 8602,
+                  "mutability": "mutable",
+                  "name": "start",
+                  "nameLocation": "8972:5:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8612,
+                  "src": "8964:13:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 8601,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "8964:7:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 8604,
+                  "mutability": "mutable",
+                  "name": "length",
+                  "nameLocation": "8995:6:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8612,
+                  "src": "8987:14:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 8603,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "8987:7:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 8606,
+                  "mutability": "mutable",
+                  "name": "reverseOrder",
+                  "nameLocation": "9016:12:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8612,
+                  "src": "9011:17:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 8605,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "9011:4:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "8930:104:18"
+            },
+            "returnParameters": {
+              "id": 8611,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 8610,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8612,
+                  "src": "9058:16:18",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_bytes32_$dyn_memory_ptr",
+                    "typeString": "bytes32[]"
+                  },
+                  "typeName": {
+                    "baseType": {
+                      "id": 8608,
+                      "name": "bytes32",
+                      "nodeType": "ElementaryTypeName",
+                      "src": "9058:7:18",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "id": 8609,
+                    "nodeType": "ArrayTypeName",
+                    "src": "9058:9:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_bytes32_$dyn_storage_ptr",
+                      "typeString": "bytes32[]"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "9057:18:18"
+            },
+            "scope": 8621,
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "id": 8620,
+            "nodeType": "FunctionDefinition",
+            "src": "9261:112:18",
+            "nodes": [],
+            "documentation": {
+              "id": 8613,
+              "nodeType": "StructuredDocumentation",
+              "src": "9082:174:18",
+              "text": " @dev Returns the number of per-schema  attestation UUIDs.\n @param schema The UUID of the AS.\n @return The number of attestations."
+            },
+            "functionSelector": "62196643",
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getSchemaAttestationUUIDsCount",
+            "nameLocation": "9270:30:18",
+            "parameters": {
+              "id": 8616,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 8615,
+                  "mutability": "mutable",
+                  "name": "schema",
+                  "nameLocation": "9309:6:18",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8620,
+                  "src": "9301:14:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 8614,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "9301:7:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "9300:16:18"
+            },
+            "returnParameters": {
+              "id": 8619,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 8618,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8620,
+                  "src": "9364:7:18",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 8617,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "9364:7:18",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "9363:9:18"
+            },
+            "scope": 8621,
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "IEAS",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": {
+          "id": 8374,
+          "nodeType": "StructuredDocumentation",
+          "src": "129:62:18",
+          "text": " @title EAS - Ethereum Attestation Service interface"
+        },
+        "fullyImplemented": false,
+        "linearizedBaseContracts": [
+          8621
+        ],
+        "name": "IEAS",
+        "nameLocation": "202:4:18",
+        "scope": 8622,
+        "usedErrors": []
+      }
+    ],
+    "license": "MIT"
+  },
+  "id": 18
+}

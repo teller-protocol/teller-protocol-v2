@@ -1,0 +1,2034 @@
+{
+  "abi": [
+    {
+      "inputs": [],
+      "name": "AlreadyExists",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "uuid",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "index",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes",
+          "name": "schema",
+          "type": "bytes"
+        },
+        {
+          "indexed": false,
+          "internalType": "contract IASResolver",
+          "name": "resolver",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "attester",
+          "type": "address"
+        }
+      ],
+      "name": "Registered",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "VERSION",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "uuid",
+          "type": "bytes32"
+        }
+      ],
+      "name": "getAS",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "bytes32",
+              "name": "uuid",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "contract IASResolver",
+              "name": "resolver",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "index",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bytes",
+              "name": "schema",
+              "type": "bytes"
+            }
+          ],
+          "internalType": "struct IASRegistry.ASRecord",
+          "name": "",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getASCount",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes",
+          "name": "schema",
+          "type": "bytes"
+        },
+        {
+          "internalType": "contract IASResolver",
+          "name": "resolver",
+          "type": "address"
+        }
+      ],
+      "name": "register",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": {
+    "object": "0x608060405234801561001057600080fd5b50610707806100206000396000f3fe608060405234801561001057600080fd5b506004361061004c5760003560e01c806372487d5214610051578063a99e7e291461007a578063d96250641461009b578063ffa1ad74146100a3575b600080fd5b61006461005f366004610372565b6100d2565b60405161007191906103db565b60405180910390f35b61008d610088366004610424565b6101d3565b604051908152602001610071565b60015461008d565b6100c5604051806040016040528060038152602001620605c760eb1b81525081565b60405161007191906104b3565b60408051608081018252600080825260208201819052918101919091526060808201526000828152602081815260409182902082516080810184528154815260018201546001600160a01b03169281019290925260028101549282019290925260038201805491929160608401919061014a906104cd565b80601f0160208091040260200160405190810160405280929190818152602001828054610176906104cd565b80156101c35780601f10610198576101008083540402835291602001916101c3565b820191906000526020600020905b8154815290600101906020018083116101a657829003601f168201915b5050505050815250509050919050565b6000806001600081546101e590610507565b9190508190559050600060405180608001604052806000801b8152602001856001600160a01b0316815260200183815260200187878080601f01602080910402602001604051908101604052809392919081815260200183838082843760009201829052509390945250929350915061025f905082610338565b6000818152602081905260409020549091501561028f5760405163119b4fd360e11b815260040160405180910390fd5b8082526000818152602081815260409182902084518155908401516001820180546001600160a01b0319166001600160a01b03909216919091179055908301516002820155606083015183919060038201906102eb9082610593565b5090505082817f51a1a037ef8a642f8b5528429785b5a54e6ee54fb2d2db4b4a44480b5302d55b898989336040516103269493929190610653565b60405180910390a39695505050505050565b60008160600151826020015160405160200161035592919061069a565b604051602081830303815290604052805190602001209050919050565b60006020828403121561038457600080fd5b5035919050565b60005b838110156103a657818101518382015260200161038e565b50506000910152565b600081518084526103c781602086016020860161038b565b601f01601f19169290920160200192915050565b602081528151602082015260018060a01b036020830151166040820152604082015160608201526000606083015160808084015261041c60a08401826103af565b949350505050565b60008060006040848603121561043957600080fd5b833567ffffffffffffffff8082111561045157600080fd5b818601915086601f83011261046557600080fd5b81358181111561047457600080fd5b87602082850101111561048657600080fd5b602092830195509350508401356001600160a01b03811681146104a857600080fd5b809150509250925092565b6020815260006104c660208301846103af565b9392505050565b600181811c908216806104e157607f821691505b60208210810361050157634e487b7160e01b600052602260045260246000fd5b50919050565b60006001820161052757634e487b7160e01b600052601160045260246000fd5b5060010190565b634e487b7160e01b600052604160045260246000fd5b601f82111561058e57600081815260208120601f850160051c8101602086101561056b5750805b601f850160051c820191505b8181101561058a57828155600101610577565b5050505b505050565b815167ffffffffffffffff8111156105ad576105ad61052e565b6105c1816105bb84546104cd565b84610544565b602080601f8311600181146105f657600084156105de5750858301515b600019600386901b1c1916600185901b17855561058a565b600085815260208120601f198616915b8281101561062557888601518255948401946001909101908401610606565b50858210156106435787850151600019600388901b60f8161c191681555b5050505050600190811b01905550565b6060815283606082015283856080830137600060808583018101919091526001600160a01b039384166020830152919092166040830152601f909201601f19160101919050565b600083516106ac81846020880161038b565b60609390931b6bffffffffffffffffffffffff1916919092019081526014019291505056fea264697066735822122017a92a5a0e7c61eb27105be08a64b57dcc817c24d6fa55d6e78a4f3db06a6b1164736f6c63430008110033",
+    "sourceMap": "211:1678:3:-:0;;;;;;;;;;;;;;;;;;;",
+    "linkReferences": {}
+  },
+  "deployedBytecode": {
+    "object": "0x608060405234801561001057600080fd5b506004361061004c5760003560e01c806372487d5214610051578063a99e7e291461007a578063d96250641461009b578063ffa1ad74146100a3575b600080fd5b61006461005f366004610372565b6100d2565b60405161007191906103db565b60405180910390f35b61008d610088366004610424565b6101d3565b604051908152602001610071565b60015461008d565b6100c5604051806040016040528060038152602001620605c760eb1b81525081565b60405161007191906104b3565b60408051608081018252600080825260208201819052918101919091526060808201526000828152602081815260409182902082516080810184528154815260018201546001600160a01b03169281019290925260028101549282019290925260038201805491929160608401919061014a906104cd565b80601f0160208091040260200160405190810160405280929190818152602001828054610176906104cd565b80156101c35780601f10610198576101008083540402835291602001916101c3565b820191906000526020600020905b8154815290600101906020018083116101a657829003601f168201915b5050505050815250509050919050565b6000806001600081546101e590610507565b9190508190559050600060405180608001604052806000801b8152602001856001600160a01b0316815260200183815260200187878080601f01602080910402602001604051908101604052809392919081815260200183838082843760009201829052509390945250929350915061025f905082610338565b6000818152602081905260409020549091501561028f5760405163119b4fd360e11b815260040160405180910390fd5b8082526000818152602081815260409182902084518155908401516001820180546001600160a01b0319166001600160a01b03909216919091179055908301516002820155606083015183919060038201906102eb9082610593565b5090505082817f51a1a037ef8a642f8b5528429785b5a54e6ee54fb2d2db4b4a44480b5302d55b898989336040516103269493929190610653565b60405180910390a39695505050505050565b60008160600151826020015160405160200161035592919061069a565b604051602081830303815290604052805190602001209050919050565b60006020828403121561038457600080fd5b5035919050565b60005b838110156103a657818101518382015260200161038e565b50506000910152565b600081518084526103c781602086016020860161038b565b601f01601f19169290920160200192915050565b602081528151602082015260018060a01b036020830151166040820152604082015160608201526000606083015160808084015261041c60a08401826103af565b949350505050565b60008060006040848603121561043957600080fd5b833567ffffffffffffffff8082111561045157600080fd5b818601915086601f83011261046557600080fd5b81358181111561047457600080fd5b87602082850101111561048657600080fd5b602092830195509350508401356001600160a01b03811681146104a857600080fd5b809150509250925092565b6020815260006104c660208301846103af565b9392505050565b600181811c908216806104e157607f821691505b60208210810361050157634e487b7160e01b600052602260045260246000fd5b50919050565b60006001820161052757634e487b7160e01b600052601160045260246000fd5b5060010190565b634e487b7160e01b600052604160045260246000fd5b601f82111561058e57600081815260208120601f850160051c8101602086101561056b5750805b601f850160051c820191505b8181101561058a57828155600101610577565b5050505b505050565b815167ffffffffffffffff8111156105ad576105ad61052e565b6105c1816105bb84546104cd565b84610544565b602080601f8311600181146105f657600084156105de5750858301515b600019600386901b1c1916600185901b17855561058a565b600085815260208120601f198616915b8281101561062557888601518255948401946001909101908401610606565b50858210156106435787850151600019600388901b60f8161c191681555b5050505050600190811b01905550565b6060815283606082015283856080830137600060808583018101919091526001600160a01b039384166020830152919092166040830152601f909201601f19160101919050565b600083516106ac81846020880161038b565b60609390931b6bffffffffffffffffffffffff1916919092019081526014019291505056fea264697066735822122017a92a5a0e7c61eb27105be08a64b57dcc817c24d6fa55d6e78a4f3db06a6b1164736f6c63430008110033",
+    "sourceMap": "211:1678:3:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1281:153;;;;;;:::i;:::-;;:::i;:::-;;;;;;;:::i;:::-;;;;;;;;586:642;;;;;;:::i;:::-;;:::i;:::-;;;2222:25:135;;;2210:2;2195:18;586:642:3;2076:177:135;1487:95:3;1567:8;;1487:95;;286:38;;;;;;;;;;;;;;;-1:-1:-1;;;286:38:3;;;;;;;;;;;;:::i;1281:153::-;-1:-1:-1;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1412:9:3;:15;;;;;;;;;;;;1405:22;;;;;;;;;;;;;;;-1:-1:-1;;;;;1405:22:3;;;;;;;;;;;;;;;;;;;;;;;;;;1412:15;1405:22;;;;;;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1281:153;;;:::o;586:642::-;700:7;723:13;741:8;;739:10;;;;;:::i;:::-;;;;;;;723:26;;760:24;787:136;;;;;;;;147:1:22;816:10:3;;787:136;;;;904:8;-1:-1:-1;;;;;787:136:3;;;;;847:5;787:136;;;;874:6;;787:136;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;787:136:3;;;;-1:-1:-1;760:163:3;;-1:-1:-1;787:136:3;-1:-1:-1;949:18:3;;-1:-1:-1;760:163:3;949:8;:18::i;:::-;147:1:22;981:15:3;;;;;;;;;;:20;934:33;;-1:-1:-1;981:34:3;977:87;;1038:15;;-1:-1:-1;;;1038:15:3;;;;;;;;;;;977:87;1074:20;;;:13;1104:15;;;;;;;;;;;;:26;;;;;;;;;;;;;-1:-1:-1;;;;;;1104:26:3;-1:-1:-1;;;;;1104:26:3;;;;;;;;;;;;;;;;;;;;;1074:20;;1104:15;:26;;;;;;;;:::i;:::-;;;;;1163:5;1157:4;1146:53;1170:6;;1178:8;1188:10;1146:53;;;;;;;;;:::i;:::-;;;;;;;;1217:4;586:642;-1:-1:-1;;;;;;586:642:3:o;1725:162::-;1791:7;1844:8;:15;;;1861:8;:17;;;1827:52;;;;;;;;;:::i;:::-;;;;;;;;;;;;;1817:63;;;;;;1810:70;;1725:162;;;:::o;14:180:135:-;73:6;126:2;114:9;105:7;101:23;97:32;94:52;;;142:1;139;132:12;94:52;-1:-1:-1;165:23:135;;14:180;-1:-1:-1;14:180:135:o;199:250::-;284:1;294:113;308:6;305:1;302:13;294:113;;;384:11;;;378:18;365:11;;;358:39;330:2;323:10;294:113;;;-1:-1:-1;;441:1:135;423:16;;416:27;199:250::o;454:270::-;495:3;533:5;527:12;560:6;555:3;548:19;576:76;645:6;638:4;633:3;629:14;622:4;615:5;611:16;576:76;:::i;:::-;706:2;685:15;-1:-1:-1;;681:29:135;672:39;;;;713:4;668:50;;454:270;-1:-1:-1;;454:270:135:o;729:546::-;910:2;899:9;892:21;955:6;949:13;944:2;933:9;929:18;922:41;1044:1;1040;1035:3;1031:11;1027:19;1021:2;1013:6;1009:15;1003:22;999:48;994:2;983:9;979:18;972:76;1102:2;1094:6;1090:15;1084:22;1079:2;1068:9;1064:18;1057:50;873:4;1154:2;1146:6;1142:15;1136:22;1196:4;1189;1178:9;1174:20;1167:34;1218:51;1264:3;1253:9;1249:19;1235:12;1218:51;:::i;:::-;1210:59;729:546;-1:-1:-1;;;;729:546:135:o;1280:791::-;1379:6;1387;1395;1448:2;1436:9;1427:7;1423:23;1419:32;1416:52;;;1464:1;1461;1454:12;1416:52;1504:9;1491:23;1533:18;1574:2;1566:6;1563:14;1560:34;;;1590:1;1587;1580:12;1560:34;1628:6;1617:9;1613:22;1603:32;;1673:7;1666:4;1662:2;1658:13;1654:27;1644:55;;1695:1;1692;1685:12;1644:55;1735:2;1722:16;1761:2;1753:6;1750:14;1747:34;;;1777:1;1774;1767:12;1747:34;1824:7;1817:4;1808:6;1804:2;1800:15;1796:26;1793:39;1790:59;;;1845:1;1842;1835:12;1790:59;1876:4;1868:13;;;;-1:-1:-1;1900:6:135;-1:-1:-1;;1941:20:135;;1928:34;-1:-1:-1;;;;;1991:31:135;;1981:42;;1971:70;;2037:1;2034;2027:12;1971:70;2060:5;2050:15;;;1280:791;;;;;:::o;2440:219::-;2589:2;2578:9;2571:21;2552:4;2609:44;2649:2;2638:9;2634:18;2626:6;2609:44;:::i;:::-;2601:52;2440:219;-1:-1:-1;;;2440:219:135:o;2664:380::-;2743:1;2739:12;;;;2786;;;2807:61;;2861:4;2853:6;2849:17;2839:27;;2807:61;2914:2;2906:6;2903:14;2883:18;2880:38;2877:161;;2960:10;2955:3;2951:20;2948:1;2941:31;2995:4;2992:1;2985:15;3023:4;3020:1;3013:15;2877:161;;2664:380;;;:::o;3049:232::-;3088:3;3109:17;;;3106:140;;3168:10;3163:3;3159:20;3156:1;3149:31;3203:4;3200:1;3193:15;3231:4;3228:1;3221:15;3106:140;-1:-1:-1;3273:1:135;3262:13;;3049:232::o;3286:127::-;3347:10;3342:3;3338:20;3335:1;3328:31;3378:4;3375:1;3368:15;3402:4;3399:1;3392:15;3543:544;3644:2;3639:3;3636:11;3633:448;;;3680:1;3705:5;3701:2;3694:17;3750:4;3746:2;3736:19;3820:2;3808:10;3804:19;3801:1;3797:27;3791:4;3787:38;3856:4;3844:10;3841:20;3838:47;;;-1:-1:-1;3879:4:135;3838:47;3934:2;3929:3;3925:12;3922:1;3918:20;3912:4;3908:31;3898:41;;3989:82;4007:2;4000:5;3997:13;3989:82;;;4052:17;;;4033:1;4022:13;3989:82;;;3993:3;;;3633:448;3543:544;;;:::o;4263:1348::-;4387:3;4381:10;4414:18;4406:6;4403:30;4400:56;;;4436:18;;:::i;:::-;4465:96;4554:6;4514:38;4546:4;4540:11;4514:38;:::i;:::-;4508:4;4465:96;:::i;:::-;4616:4;;4680:2;4669:14;;4697:1;4692:662;;;;5398:1;5415:6;5412:89;;;-1:-1:-1;5467:19:135;;;5461:26;5412:89;-1:-1:-1;;4220:1:135;4216:11;;;4212:24;4208:29;4198:40;4244:1;4240:11;;;4195:57;5514:81;;4662:943;;4692:662;3490:1;3483:14;;;3527:4;3514:18;;-1:-1:-1;;4728:20:135;;;4845:236;4859:7;4856:1;4853:14;4845:236;;;4948:19;;;4942:26;4927:42;;5040:27;;;;5008:1;4996:14;;;;4875:19;;4845:236;;;4849:3;5109:6;5100:7;5097:19;5094:201;;;5170:19;;;5164:26;-1:-1:-1;;5253:1:135;5249:14;;;5265:3;5245:24;5241:37;5237:42;5222:58;5207:74;;5094:201;-1:-1:-1;;;;;5341:1:135;5325:14;;;5321:22;5308:36;;-1:-1:-1;4263:1348:135:o;5616:611::-;5849:2;5838:9;5831:21;5888:6;5883:2;5872:9;5868:18;5861:34;5946:6;5938;5932:3;5921:9;5917:19;5904:49;6003:1;5997:3;5973:22;;;5969:32;;5962:43;;;;-1:-1:-1;;;;;6153:15:135;;;6146:4;6131:20;;6124:45;6205:15;;;;6200:2;6185:18;;6178:43;6066:2;6045:15;;;-1:-1:-1;;6041:29:135;6026:45;6022:55;;;-1:-1:-1;5616:611:135:o;6232:448::-;6409:3;6447:6;6441:13;6463:66;6522:6;6517:3;6510:4;6502:6;6498:17;6463:66;:::i;:::-;6598:2;6594:15;;;;-1:-1:-1;;6590:53:135;6551:16;;;;6576:68;;;6671:2;6660:14;;6232:448;-1:-1:-1;;6232:448:135:o",
+    "linkReferences": {}
+  },
+  "methodIdentifiers": {
+    "VERSION()": "ffa1ad74",
+    "getAS(bytes32)": "72487d52",
+    "getASCount()": "d9625064",
+    "register(bytes,address)": "a99e7e29"
+  },
+  "rawMetadata": "{\"compiler\":{\"version\":\"0.8.17+commit.8df45f5f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"AlreadyExists\",\"type\":\"error\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"uuid\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"schema\",\"type\":\"bytes\"},{\"indexed\":false,\"internalType\":\"contract IASResolver\",\"name\":\"resolver\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"attester\",\"type\":\"address\"}],\"name\":\"Registered\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"VERSION\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"uuid\",\"type\":\"bytes32\"}],\"name\":\"getAS\",\"outputs\":[{\"components\":[{\"internalType\":\"bytes32\",\"name\":\"uuid\",\"type\":\"bytes32\"},{\"internalType\":\"contract IASResolver\",\"name\":\"resolver\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"schema\",\"type\":\"bytes\"}],\"internalType\":\"struct IASRegistry.ASRecord\",\"name\":\"\",\"type\":\"tuple\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getASCount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"schema\",\"type\":\"bytes\"},{\"internalType\":\"contract IASResolver\",\"name\":\"resolver\",\"type\":\"address\"}],\"name\":\"register\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"getAS(bytes32)\":{\"details\":\"Returns an existing AS by UUID\",\"params\":{\"uuid\":\"The UUID of the AS to retrieve.\"},\"returns\":{\"_0\":\"The AS data members.\"}},\"getASCount()\":{\"details\":\"Returns the global counter for the total number of attestations\",\"returns\":{\"_0\":\"The global counter for the total number of attestations.\"}},\"register(bytes,address)\":{\"details\":\"Submits and reserve a new AS\",\"params\":{\"resolver\":\"An optional AS schema resolver.\",\"schema\":\"The AS data schema.\"},\"returns\":{\"_0\":\"The UUID of the new AS.\"}}},\"title\":\"The global AS registry.\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/EAS/TellerASRegistry.sol\":\"TellerASRegistry\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[\":@ensdomains/=node_modules/@ensdomains/\",\":@openzeppelin/=node_modules/@openzeppelin/\",\":ds-test/=lib/forge-std/lib/ds-test/src/\",\":eth-gas-reporter/=node_modules/eth-gas-reporter/\",\":forge-std/=lib/forge-std/src/\",\":hardhat-deploy/=node_modules/hardhat-deploy/\",\":hardhat/=node_modules/hardhat/\"]},\"sources\":{\"contracts/EAS/TellerASRegistry.sol\":{\"keccak256\":\"0x1d5782c3bb5ea52db95c8ce6d7ff6d20382bae8ca574614cfbaa45c05f93f13c\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://9188da7a2469f3fbef8b3e66c3edbf0a27d250aa47de67aa916d28b8a6a3285e\",\"dweb:/ipfs/QmQPs8snYWFL1YxXQ6kyHsq4tEug6Ld5T7s8LY152arHoX\"]},\"contracts/Types.sol\":{\"keccak256\":\"0x2e4bcf4a965f840193af8729251386c1826cd050411ba4a9e85984a2551fd2ff\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://cbab8d73d76e1aa1eaead6a911d5a35f7edb18f9c67484c08bfaa96d4e3e1d68\",\"dweb:/ipfs/QmVxRujQoBdZEote43JdaAgXkYzfqFdBbiu7rPYU3rXf2N\"]},\"contracts/interfaces/IASRegistry.sol\":{\"keccak256\":\"0x74752921f592df45c8717d7084627e823b1dbc93bad7187cd3023c9690df7e60\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://14ed67b4973bd1b2797604cfd652387bbe230682f3f5a41e922879a0f4d5b668\",\"dweb:/ipfs/QmTJ5fvKX7deAQ8YpoPmwyVR379BdfbKSzaHSLoje7h5Tx\"]},\"contracts/interfaces/IASResolver.sol\":{\"keccak256\":\"0xfce671ea099d9f997a69c3447eb4a9c9693d37c5b97e43ada376e614e1c7cb61\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://6673f2ba98aafbeb4bdbfbc2392b164a7ae4e82b8b8a5f5b9b484fbdf4653cc1\",\"dweb:/ipfs/QmVSkwZpHzgpTyzcydE8SptJiGRvK89KahhxBuwNZNm8d2\"]}},\"version\":1}",
+  "metadata": {
+    "compiler": {
+      "version": "0.8.17+commit.8df45f5f"
+    },
+    "language": "Solidity",
+    "output": {
+      "abi": [
+        {
+          "inputs": [],
+          "type": "error",
+          "name": "AlreadyExists"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "bytes32",
+              "name": "uuid",
+              "type": "bytes32",
+              "indexed": true
+            },
+            {
+              "internalType": "uint256",
+              "name": "index",
+              "type": "uint256",
+              "indexed": true
+            },
+            {
+              "internalType": "bytes",
+              "name": "schema",
+              "type": "bytes",
+              "indexed": false
+            },
+            {
+              "internalType": "contract IASResolver",
+              "name": "resolver",
+              "type": "address",
+              "indexed": false
+            },
+            {
+              "internalType": "address",
+              "name": "attester",
+              "type": "address",
+              "indexed": false
+            }
+          ],
+          "type": "event",
+          "name": "Registered",
+          "anonymous": false
+        },
+        {
+          "inputs": [],
+          "stateMutability": "view",
+          "type": "function",
+          "name": "VERSION",
+          "outputs": [
+            {
+              "internalType": "string",
+              "name": "",
+              "type": "string"
+            }
+          ]
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "bytes32",
+              "name": "uuid",
+              "type": "bytes32"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function",
+          "name": "getAS",
+          "outputs": [
+            {
+              "internalType": "struct IASRegistry.ASRecord",
+              "name": "",
+              "type": "tuple",
+              "components": [
+                {
+                  "internalType": "bytes32",
+                  "name": "uuid",
+                  "type": "bytes32"
+                },
+                {
+                  "internalType": "contract IASResolver",
+                  "name": "resolver",
+                  "type": "address"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "index",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "schema",
+                  "type": "bytes"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "inputs": [],
+          "stateMutability": "view",
+          "type": "function",
+          "name": "getASCount",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ]
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "bytes",
+              "name": "schema",
+              "type": "bytes"
+            },
+            {
+              "internalType": "contract IASResolver",
+              "name": "resolver",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function",
+          "name": "register",
+          "outputs": [
+            {
+              "internalType": "bytes32",
+              "name": "",
+              "type": "bytes32"
+            }
+          ]
+        }
+      ],
+      "devdoc": {
+        "kind": "dev",
+        "methods": {
+          "getAS(bytes32)": {
+            "details": "Returns an existing AS by UUID",
+            "params": {
+              "uuid": "The UUID of the AS to retrieve."
+            },
+            "returns": {
+              "_0": "The AS data members."
+            }
+          },
+          "getASCount()": {
+            "details": "Returns the global counter for the total number of attestations",
+            "returns": {
+              "_0": "The global counter for the total number of attestations."
+            }
+          },
+          "register(bytes,address)": {
+            "details": "Submits and reserve a new AS",
+            "params": {
+              "resolver": "An optional AS schema resolver.",
+              "schema": "The AS data schema."
+            },
+            "returns": {
+              "_0": "The UUID of the new AS."
+            }
+          }
+        },
+        "version": 1
+      },
+      "userdoc": {
+        "kind": "user",
+        "methods": {},
+        "version": 1
+      }
+    },
+    "settings": {
+      "remappings": [
+        ":@ensdomains/=node_modules/@ensdomains/",
+        ":@openzeppelin/=node_modules/@openzeppelin/",
+        ":ds-test/=lib/forge-std/lib/ds-test/src/",
+        ":eth-gas-reporter/=node_modules/eth-gas-reporter/",
+        ":forge-std/=lib/forge-std/src/",
+        ":hardhat-deploy/=node_modules/hardhat-deploy/",
+        ":hardhat/=node_modules/hardhat/"
+      ],
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "metadata": {
+        "bytecodeHash": "ipfs"
+      },
+      "compilationTarget": {
+        "contracts/EAS/TellerASRegistry.sol": "TellerASRegistry"
+      },
+      "libraries": {}
+    },
+    "sources": {
+      "contracts/EAS/TellerASRegistry.sol": {
+        "keccak256": "0x1d5782c3bb5ea52db95c8ce6d7ff6d20382bae8ca574614cfbaa45c05f93f13c",
+        "urls": [
+          "bzz-raw://9188da7a2469f3fbef8b3e66c3edbf0a27d250aa47de67aa916d28b8a6a3285e",
+          "dweb:/ipfs/QmQPs8snYWFL1YxXQ6kyHsq4tEug6Ld5T7s8LY152arHoX"
+        ],
+        "license": "MIT"
+      },
+      "contracts/Types.sol": {
+        "keccak256": "0x2e4bcf4a965f840193af8729251386c1826cd050411ba4a9e85984a2551fd2ff",
+        "urls": [
+          "bzz-raw://cbab8d73d76e1aa1eaead6a911d5a35f7edb18f9c67484c08bfaa96d4e3e1d68",
+          "dweb:/ipfs/QmVxRujQoBdZEote43JdaAgXkYzfqFdBbiu7rPYU3rXf2N"
+        ],
+        "license": "MIT"
+      },
+      "contracts/interfaces/IASRegistry.sol": {
+        "keccak256": "0x74752921f592df45c8717d7084627e823b1dbc93bad7187cd3023c9690df7e60",
+        "urls": [
+          "bzz-raw://14ed67b4973bd1b2797604cfd652387bbe230682f3f5a41e922879a0f4d5b668",
+          "dweb:/ipfs/QmTJ5fvKX7deAQ8YpoPmwyVR379BdfbKSzaHSLoje7h5Tx"
+        ],
+        "license": "MIT"
+      },
+      "contracts/interfaces/IASResolver.sol": {
+        "keccak256": "0xfce671ea099d9f997a69c3447eb4a9c9693d37c5b97e43ada376e614e1c7cb61",
+        "urls": [
+          "bzz-raw://6673f2ba98aafbeb4bdbfbc2392b164a7ae4e82b8b8a5f5b9b484fbdf4653cc1",
+          "dweb:/ipfs/QmVSkwZpHzgpTyzcydE8SptJiGRvK89KahhxBuwNZNm8d2"
+        ],
+        "license": "MIT"
+      }
+    },
+    "version": 1
+  },
+  "ast": {
+    "absolutePath": "contracts/EAS/TellerASRegistry.sol",
+    "id": 2368,
+    "exportedSymbols": {
+      "EMPTY_UUID": [
+        8470
+      ],
+      "IASRegistry": [
+        8992
+      ],
+      "IASResolver": [
+        9018
+      ],
+      "TellerASRegistry": [
+        2367
+      ]
+    },
+    "nodeType": "SourceUnit",
+    "src": "0:1890:3",
+    "nodes": [
+      {
+        "id": 2235,
+        "nodeType": "PragmaDirective",
+        "src": "0:31:3",
+        "nodes": [],
+        "literals": [
+          "solidity",
+          ">=",
+          "0.8",
+          ".0",
+          "<",
+          "0.9",
+          ".0"
+        ]
+      },
+      {
+        "id": 2236,
+        "nodeType": "ImportDirective",
+        "src": "65:22:3",
+        "nodes": [],
+        "absolutePath": "contracts/Types.sol",
+        "file": "../Types.sol",
+        "nameLocation": "-1:-1:-1",
+        "scope": 2368,
+        "sourceUnit": 8471,
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "id": 2237,
+        "nodeType": "ImportDirective",
+        "src": "88:39:3",
+        "nodes": [],
+        "absolutePath": "contracts/interfaces/IASRegistry.sol",
+        "file": "../interfaces/IASRegistry.sol",
+        "nameLocation": "-1:-1:-1",
+        "scope": 2368,
+        "sourceUnit": 8993,
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "id": 2238,
+        "nodeType": "ImportDirective",
+        "src": "128:39:3",
+        "nodes": [],
+        "absolutePath": "contracts/interfaces/IASResolver.sol",
+        "file": "../interfaces/IASResolver.sol",
+        "nameLocation": "-1:-1:-1",
+        "scope": 2368,
+        "sourceUnit": 9019,
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "id": 2367,
+        "nodeType": "ContractDefinition",
+        "src": "211:1678:3",
+        "nodes": [
+          {
+            "id": 2243,
+            "nodeType": "ErrorDefinition",
+            "src": "258:22:3",
+            "nodes": [],
+            "errorSelector": "23369fa6",
+            "name": "AlreadyExists",
+            "nameLocation": "264:13:3",
+            "parameters": {
+              "id": 2242,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "277:2:3"
+            }
+          },
+          {
+            "id": 2246,
+            "nodeType": "VariableDeclaration",
+            "src": "286:38:3",
+            "nodes": [],
+            "constant": true,
+            "functionSelector": "ffa1ad74",
+            "mutability": "constant",
+            "name": "VERSION",
+            "nameLocation": "309:7:3",
+            "scope": 2367,
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_string_memory_ptr",
+              "typeString": "string"
+            },
+            "typeName": {
+              "id": 2244,
+              "name": "string",
+              "nodeType": "ElementaryTypeName",
+              "src": "286:6:3",
+              "typeDescriptions": {
+                "typeIdentifier": "t_string_storage_ptr",
+                "typeString": "string"
+              }
+            },
+            "value": {
+              "hexValue": "302e38",
+              "id": 2245,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "string",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "319:5:3",
+              "typeDescriptions": {
+                "typeIdentifier": "t_stringliteral_15e7a716d821b9602c70f6d0f574efbb8147fb465215d43354c7b3e69d03ed92",
+                "typeString": "literal_string \"0.8\""
+              },
+              "value": "0.8"
+            },
+            "visibility": "public"
+          },
+          {
+            "id": 2251,
+            "nodeType": "VariableDeclaration",
+            "src": "391:46:3",
+            "nodes": [],
+            "constant": false,
+            "mutability": "mutable",
+            "name": "_registry",
+            "nameLocation": "428:9:3",
+            "scope": 2367,
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_mapping$_t_bytes32_$_t_struct$_ASRecord_$8951_storage_$",
+              "typeString": "mapping(bytes32 => struct IASRegistry.ASRecord)"
+            },
+            "typeName": {
+              "id": 2250,
+              "keyType": {
+                "id": 2247,
+                "name": "bytes32",
+                "nodeType": "ElementaryTypeName",
+                "src": "399:7:3",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bytes32",
+                  "typeString": "bytes32"
+                }
+              },
+              "nodeType": "Mapping",
+              "src": "391:28:3",
+              "typeDescriptions": {
+                "typeIdentifier": "t_mapping$_t_bytes32_$_t_struct$_ASRecord_$8951_storage_$",
+                "typeString": "mapping(bytes32 => struct IASRegistry.ASRecord)"
+              },
+              "valueType": {
+                "id": 2249,
+                "nodeType": "UserDefinedTypeName",
+                "pathNode": {
+                  "id": 2248,
+                  "name": "ASRecord",
+                  "nameLocations": [
+                    "410:8:3"
+                  ],
+                  "nodeType": "IdentifierPath",
+                  "referencedDeclaration": 8951,
+                  "src": "410:8:3"
+                },
+                "referencedDeclaration": 8951,
+                "src": "410:8:3",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_struct$_ASRecord_$8951_storage_ptr",
+                  "typeString": "struct IASRegistry.ASRecord"
+                }
+              }
+            },
+            "visibility": "private"
+          },
+          {
+            "id": 2253,
+            "nodeType": "VariableDeclaration",
+            "src": "508:24:3",
+            "nodes": [],
+            "constant": false,
+            "mutability": "mutable",
+            "name": "_asCount",
+            "nameLocation": "524:8:3",
+            "scope": 2367,
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 2252,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "508:7:3",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "visibility": "private"
+          },
+          {
+            "id": 2321,
+            "nodeType": "FunctionDefinition",
+            "src": "586:642:3",
+            "nodes": [],
+            "body": {
+              "id": 2320,
+              "nodeType": "Block",
+              "src": "713:515:3",
+              "nodes": [],
+              "statements": [
+                {
+                  "assignments": [
+                    2266
+                  ],
+                  "declarations": [
+                    {
+                      "constant": false,
+                      "id": 2266,
+                      "mutability": "mutable",
+                      "name": "index",
+                      "nameLocation": "731:5:3",
+                      "nodeType": "VariableDeclaration",
+                      "scope": 2320,
+                      "src": "723:13:3",
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      },
+                      "typeName": {
+                        "id": 2265,
+                        "name": "uint256",
+                        "nodeType": "ElementaryTypeName",
+                        "src": "723:7:3",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      "visibility": "internal"
+                    }
+                  ],
+                  "id": 2269,
+                  "initialValue": {
+                    "id": 2268,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "nodeType": "UnaryOperation",
+                    "operator": "++",
+                    "prefix": true,
+                    "src": "739:10:3",
+                    "subExpression": {
+                      "id": 2267,
+                      "name": "_asCount",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 2253,
+                      "src": "741:8:3",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "nodeType": "VariableDeclarationStatement",
+                  "src": "723:26:3"
+                },
+                {
+                  "assignments": [
+                    2272
+                  ],
+                  "declarations": [
+                    {
+                      "constant": false,
+                      "id": 2272,
+                      "mutability": "mutable",
+                      "name": "asRecord",
+                      "nameLocation": "776:8:3",
+                      "nodeType": "VariableDeclaration",
+                      "scope": 2320,
+                      "src": "760:24:3",
+                      "stateVariable": false,
+                      "storageLocation": "memory",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_struct$_ASRecord_$8951_memory_ptr",
+                        "typeString": "struct IASRegistry.ASRecord"
+                      },
+                      "typeName": {
+                        "id": 2271,
+                        "nodeType": "UserDefinedTypeName",
+                        "pathNode": {
+                          "id": 2270,
+                          "name": "ASRecord",
+                          "nameLocations": [
+                            "760:8:3"
+                          ],
+                          "nodeType": "IdentifierPath",
+                          "referencedDeclaration": 8951,
+                          "src": "760:8:3"
+                        },
+                        "referencedDeclaration": 8951,
+                        "src": "760:8:3",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_ASRecord_$8951_storage_ptr",
+                          "typeString": "struct IASRegistry.ASRecord"
+                        }
+                      },
+                      "visibility": "internal"
+                    }
+                  ],
+                  "id": 2279,
+                  "initialValue": {
+                    "arguments": [
+                      {
+                        "id": 2274,
+                        "name": "EMPTY_UUID",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 8470,
+                        "src": "816:10:3",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bytes32",
+                          "typeString": "bytes32"
+                        }
+                      },
+                      {
+                        "id": 2275,
+                        "name": "index",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 2266,
+                        "src": "847:5:3",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      {
+                        "id": 2276,
+                        "name": "schema",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 2256,
+                        "src": "874:6:3",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bytes_calldata_ptr",
+                          "typeString": "bytes calldata"
+                        }
+                      },
+                      {
+                        "id": 2277,
+                        "name": "resolver",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 2259,
+                        "src": "904:8:3",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_IASResolver_$9018",
+                          "typeString": "contract IASResolver"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_bytes32",
+                          "typeString": "bytes32"
+                        },
+                        {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        },
+                        {
+                          "typeIdentifier": "t_bytes_calldata_ptr",
+                          "typeString": "bytes calldata"
+                        },
+                        {
+                          "typeIdentifier": "t_contract$_IASResolver_$9018",
+                          "typeString": "contract IASResolver"
+                        }
+                      ],
+                      "id": 2273,
+                      "name": "ASRecord",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 8951,
+                      "src": "787:8:3",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_type$_t_struct$_ASRecord_$8951_storage_ptr_$",
+                        "typeString": "type(struct IASRegistry.ASRecord storage pointer)"
+                      }
+                    },
+                    "id": 2278,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "structConstructorCall",
+                    "lValueRequested": false,
+                    "nameLocations": [
+                      "810:4:3",
+                      "840:5:3",
+                      "866:6:3",
+                      "894:8:3"
+                    ],
+                    "names": [
+                      "uuid",
+                      "index",
+                      "schema",
+                      "resolver"
+                    ],
+                    "nodeType": "FunctionCall",
+                    "src": "787:136:3",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_ASRecord_$8951_memory_ptr",
+                      "typeString": "struct IASRegistry.ASRecord memory"
+                    }
+                  },
+                  "nodeType": "VariableDeclarationStatement",
+                  "src": "760:163:3"
+                },
+                {
+                  "assignments": [
+                    2281
+                  ],
+                  "declarations": [
+                    {
+                      "constant": false,
+                      "id": 2281,
+                      "mutability": "mutable",
+                      "name": "uuid",
+                      "nameLocation": "942:4:3",
+                      "nodeType": "VariableDeclaration",
+                      "scope": 2320,
+                      "src": "934:12:3",
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      },
+                      "typeName": {
+                        "id": 2280,
+                        "name": "bytes32",
+                        "nodeType": "ElementaryTypeName",
+                        "src": "934:7:3",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bytes32",
+                          "typeString": "bytes32"
+                        }
+                      },
+                      "visibility": "internal"
+                    }
+                  ],
+                  "id": 2285,
+                  "initialValue": {
+                    "arguments": [
+                      {
+                        "id": 2283,
+                        "name": "asRecord",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 2272,
+                        "src": "958:8:3",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_ASRecord_$8951_memory_ptr",
+                          "typeString": "struct IASRegistry.ASRecord memory"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_struct$_ASRecord_$8951_memory_ptr",
+                          "typeString": "struct IASRegistry.ASRecord memory"
+                        }
+                      ],
+                      "id": 2282,
+                      "name": "_getUUID",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 2366,
+                      "src": "949:8:3",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_internal_pure$_t_struct$_ASRecord_$8951_memory_ptr_$returns$_t_bytes32_$",
+                        "typeString": "function (struct IASRegistry.ASRecord memory) pure returns (bytes32)"
+                      }
+                    },
+                    "id": 2284,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "949:18:3",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "nodeType": "VariableDeclarationStatement",
+                  "src": "934:33:3"
+                },
+                {
+                  "condition": {
+                    "commonType": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    },
+                    "id": 2291,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftExpression": {
+                      "expression": {
+                        "baseExpression": {
+                          "id": 2286,
+                          "name": "_registry",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 2251,
+                          "src": "981:9:3",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_mapping$_t_bytes32_$_t_struct$_ASRecord_$8951_storage_$",
+                            "typeString": "mapping(bytes32 => struct IASRegistry.ASRecord storage ref)"
+                          }
+                        },
+                        "id": 2288,
+                        "indexExpression": {
+                          "id": 2287,
+                          "name": "uuid",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 2281,
+                          "src": "991:4:3",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_bytes32",
+                            "typeString": "bytes32"
+                          }
+                        },
+                        "isConstant": false,
+                        "isLValue": true,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "nodeType": "IndexAccess",
+                        "src": "981:15:3",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_ASRecord_$8951_storage",
+                          "typeString": "struct IASRegistry.ASRecord storage ref"
+                        }
+                      },
+                      "id": 2289,
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberLocation": "997:4:3",
+                      "memberName": "uuid",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 8943,
+                      "src": "981:20:3",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "nodeType": "BinaryOperation",
+                    "operator": "!=",
+                    "rightExpression": {
+                      "id": 2290,
+                      "name": "EMPTY_UUID",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 8470,
+                      "src": "1005:10:3",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "src": "981:34:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "id": 2296,
+                  "nodeType": "IfStatement",
+                  "src": "977:87:3",
+                  "trueBody": {
+                    "id": 2295,
+                    "nodeType": "Block",
+                    "src": "1017:47:3",
+                    "statements": [
+                      {
+                        "errorCall": {
+                          "arguments": [],
+                          "expression": {
+                            "argumentTypes": [],
+                            "id": 2292,
+                            "name": "AlreadyExists",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 2243,
+                            "src": "1038:13:3",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_function_error_pure$__$returns$__$",
+                              "typeString": "function () pure"
+                            }
+                          },
+                          "id": 2293,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "kind": "functionCall",
+                          "lValueRequested": false,
+                          "nameLocations": [],
+                          "names": [],
+                          "nodeType": "FunctionCall",
+                          "src": "1038:15:3",
+                          "tryCall": false,
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_tuple$__$",
+                            "typeString": "tuple()"
+                          }
+                        },
+                        "id": 2294,
+                        "nodeType": "RevertStatement",
+                        "src": "1031:22:3"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "expression": {
+                    "id": 2301,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "expression": {
+                        "id": 2297,
+                        "name": "asRecord",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 2272,
+                        "src": "1074:8:3",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_ASRecord_$8951_memory_ptr",
+                          "typeString": "struct IASRegistry.ASRecord memory"
+                        }
+                      },
+                      "id": 2299,
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": true,
+                      "memberLocation": "1083:4:3",
+                      "memberName": "uuid",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 8943,
+                      "src": "1074:13:3",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "id": 2300,
+                      "name": "uuid",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 2281,
+                      "src": "1090:4:3",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "src": "1074:20:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "id": 2302,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1074:20:3"
+                },
+                {
+                  "expression": {
+                    "id": 2307,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "baseExpression": {
+                        "id": 2303,
+                        "name": "_registry",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 2251,
+                        "src": "1104:9:3",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_mapping$_t_bytes32_$_t_struct$_ASRecord_$8951_storage_$",
+                          "typeString": "mapping(bytes32 => struct IASRegistry.ASRecord storage ref)"
+                        }
+                      },
+                      "id": 2305,
+                      "indexExpression": {
+                        "id": 2304,
+                        "name": "uuid",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 2281,
+                        "src": "1114:4:3",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bytes32",
+                          "typeString": "bytes32"
+                        }
+                      },
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": true,
+                      "nodeType": "IndexAccess",
+                      "src": "1104:15:3",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_struct$_ASRecord_$8951_storage",
+                        "typeString": "struct IASRegistry.ASRecord storage ref"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "id": 2306,
+                      "name": "asRecord",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 2272,
+                      "src": "1122:8:3",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_struct$_ASRecord_$8951_memory_ptr",
+                        "typeString": "struct IASRegistry.ASRecord memory"
+                      }
+                    },
+                    "src": "1104:26:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_ASRecord_$8951_storage",
+                      "typeString": "struct IASRegistry.ASRecord storage ref"
+                    }
+                  },
+                  "id": 2308,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1104:26:3"
+                },
+                {
+                  "eventCall": {
+                    "arguments": [
+                      {
+                        "id": 2310,
+                        "name": "uuid",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 2281,
+                        "src": "1157:4:3",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bytes32",
+                          "typeString": "bytes32"
+                        }
+                      },
+                      {
+                        "id": 2311,
+                        "name": "index",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 2266,
+                        "src": "1163:5:3",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      {
+                        "id": 2312,
+                        "name": "schema",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 2256,
+                        "src": "1170:6:3",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bytes_calldata_ptr",
+                          "typeString": "bytes calldata"
+                        }
+                      },
+                      {
+                        "id": 2313,
+                        "name": "resolver",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 2259,
+                        "src": "1178:8:3",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_IASResolver_$9018",
+                          "typeString": "contract IASResolver"
+                        }
+                      },
+                      {
+                        "expression": {
+                          "id": 2314,
+                          "name": "msg",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": -15,
+                          "src": "1188:3:3",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_magic_message",
+                            "typeString": "msg"
+                          }
+                        },
+                        "id": 2315,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberLocation": "1192:6:3",
+                        "memberName": "sender",
+                        "nodeType": "MemberAccess",
+                        "src": "1188:10:3",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_bytes32",
+                          "typeString": "bytes32"
+                        },
+                        {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        },
+                        {
+                          "typeIdentifier": "t_bytes_calldata_ptr",
+                          "typeString": "bytes calldata"
+                        },
+                        {
+                          "typeIdentifier": "t_contract$_IASResolver_$9018",
+                          "typeString": "contract IASResolver"
+                        },
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      ],
+                      "id": 2309,
+                      "name": "Registered",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 8965,
+                      "src": "1146:10:3",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_event_nonpayable$_t_bytes32_$_t_uint256_$_t_bytes_memory_ptr_$_t_contract$_IASResolver_$9018_$_t_address_$returns$__$",
+                        "typeString": "function (bytes32,uint256,bytes memory,contract IASResolver,address)"
+                      }
+                    },
+                    "id": 2316,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1146:53:3",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 2317,
+                  "nodeType": "EmitStatement",
+                  "src": "1141:58:3"
+                },
+                {
+                  "expression": {
+                    "id": 2318,
+                    "name": "uuid",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 2281,
+                    "src": "1217:4:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "functionReturnParameters": 2264,
+                  "id": 2319,
+                  "nodeType": "Return",
+                  "src": "1210:11:3"
+                }
+              ]
+            },
+            "baseFunctions": [
+              8976
+            ],
+            "documentation": {
+              "id": 2254,
+              "nodeType": "StructuredDocumentation",
+              "src": "539:42:3",
+              "text": " @inheritdoc IASRegistry"
+            },
+            "functionSelector": "a99e7e29",
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "register",
+            "nameLocation": "595:8:3",
+            "overrides": {
+              "id": 2261,
+              "nodeType": "OverrideSpecifier",
+              "overrides": [],
+              "src": "674:8:3"
+            },
+            "parameters": {
+              "id": 2260,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2256,
+                  "mutability": "mutable",
+                  "name": "schema",
+                  "nameLocation": "619:6:3",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2321,
+                  "src": "604:21:3",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_calldata_ptr",
+                    "typeString": "bytes"
+                  },
+                  "typeName": {
+                    "id": 2255,
+                    "name": "bytes",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "604:5:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_storage_ptr",
+                      "typeString": "bytes"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 2259,
+                  "mutability": "mutable",
+                  "name": "resolver",
+                  "nameLocation": "639:8:3",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2321,
+                  "src": "627:20:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IASResolver_$9018",
+                    "typeString": "contract IASResolver"
+                  },
+                  "typeName": {
+                    "id": 2258,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 2257,
+                      "name": "IASResolver",
+                      "nameLocations": [
+                        "627:11:3"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 9018,
+                      "src": "627:11:3"
+                    },
+                    "referencedDeclaration": 9018,
+                    "src": "627:11:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IASResolver_$9018",
+                      "typeString": "contract IASResolver"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "603:45:3"
+            },
+            "returnParameters": {
+              "id": 2264,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2263,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2321,
+                  "src": "700:7:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 2262,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "700:7:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "699:9:3"
+            },
+            "scope": 2367,
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "id": 2336,
+            "nodeType": "FunctionDefinition",
+            "src": "1281:153:3",
+            "nodes": [],
+            "body": {
+              "id": 2335,
+              "nodeType": "Block",
+              "src": "1395:39:3",
+              "nodes": [],
+              "statements": [
+                {
+                  "expression": {
+                    "baseExpression": {
+                      "id": 2331,
+                      "name": "_registry",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 2251,
+                      "src": "1412:9:3",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_mapping$_t_bytes32_$_t_struct$_ASRecord_$8951_storage_$",
+                        "typeString": "mapping(bytes32 => struct IASRegistry.ASRecord storage ref)"
+                      }
+                    },
+                    "id": 2333,
+                    "indexExpression": {
+                      "id": 2332,
+                      "name": "uuid",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 2324,
+                      "src": "1422:4:3",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "isConstant": false,
+                    "isLValue": true,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "nodeType": "IndexAccess",
+                    "src": "1412:15:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_ASRecord_$8951_storage",
+                      "typeString": "struct IASRegistry.ASRecord storage ref"
+                    }
+                  },
+                  "functionReturnParameters": 2330,
+                  "id": 2334,
+                  "nodeType": "Return",
+                  "src": "1405:22:3"
+                }
+              ]
+            },
+            "baseFunctions": [
+              8985
+            ],
+            "documentation": {
+              "id": 2322,
+              "nodeType": "StructuredDocumentation",
+              "src": "1234:42:3",
+              "text": " @inheritdoc IASRegistry"
+            },
+            "functionSelector": "72487d52",
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getAS",
+            "nameLocation": "1290:5:3",
+            "overrides": {
+              "id": 2326,
+              "nodeType": "OverrideSpecifier",
+              "overrides": [],
+              "src": "1348:8:3"
+            },
+            "parameters": {
+              "id": 2325,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2324,
+                  "mutability": "mutable",
+                  "name": "uuid",
+                  "nameLocation": "1304:4:3",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2336,
+                  "src": "1296:12:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 2323,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1296:7:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1295:14:3"
+            },
+            "returnParameters": {
+              "id": 2330,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2329,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2336,
+                  "src": "1374:15:3",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_ASRecord_$8951_memory_ptr",
+                    "typeString": "struct IASRegistry.ASRecord"
+                  },
+                  "typeName": {
+                    "id": 2328,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 2327,
+                      "name": "ASRecord",
+                      "nameLocations": [
+                        "1374:8:3"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 8951,
+                      "src": "1374:8:3"
+                    },
+                    "referencedDeclaration": 8951,
+                    "src": "1374:8:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_ASRecord_$8951_storage_ptr",
+                      "typeString": "struct IASRegistry.ASRecord"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1373:17:3"
+            },
+            "scope": 2367,
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "id": 2346,
+            "nodeType": "FunctionDefinition",
+            "src": "1487:95:3",
+            "nodes": [],
+            "body": {
+              "id": 2345,
+              "nodeType": "Block",
+              "src": "1550:32:3",
+              "nodes": [],
+              "statements": [
+                {
+                  "expression": {
+                    "id": 2343,
+                    "name": "_asCount",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 2253,
+                    "src": "1567:8:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "functionReturnParameters": 2342,
+                  "id": 2344,
+                  "nodeType": "Return",
+                  "src": "1560:15:3"
+                }
+              ]
+            },
+            "baseFunctions": [
+              8991
+            ],
+            "documentation": {
+              "id": 2337,
+              "nodeType": "StructuredDocumentation",
+              "src": "1440:42:3",
+              "text": " @inheritdoc IASRegistry"
+            },
+            "functionSelector": "d9625064",
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getASCount",
+            "nameLocation": "1496:10:3",
+            "overrides": {
+              "id": 2339,
+              "nodeType": "OverrideSpecifier",
+              "overrides": [],
+              "src": "1523:8:3"
+            },
+            "parameters": {
+              "id": 2338,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1506:2:3"
+            },
+            "returnParameters": {
+              "id": 2342,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2341,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2346,
+                  "src": "1541:7:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 2340,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1541:7:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1540:9:3"
+            },
+            "scope": 2367,
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "id": 2366,
+            "nodeType": "FunctionDefinition",
+            "src": "1725:162:3",
+            "nodes": [],
+            "body": {
+              "id": 2365,
+              "nodeType": "Block",
+              "src": "1800:87:3",
+              "nodes": [],
+              "statements": [
+                {
+                  "expression": {
+                    "arguments": [
+                      {
+                        "arguments": [
+                          {
+                            "expression": {
+                              "id": 2358,
+                              "name": "asRecord",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 2350,
+                              "src": "1844:8:3",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_struct$_ASRecord_$8951_memory_ptr",
+                                "typeString": "struct IASRegistry.ASRecord memory"
+                              }
+                            },
+                            "id": 2359,
+                            "isConstant": false,
+                            "isLValue": true,
+                            "isPure": false,
+                            "lValueRequested": false,
+                            "memberLocation": "1853:6:3",
+                            "memberName": "schema",
+                            "nodeType": "MemberAccess",
+                            "referencedDeclaration": 8950,
+                            "src": "1844:15:3",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_bytes_memory_ptr",
+                              "typeString": "bytes memory"
+                            }
+                          },
+                          {
+                            "expression": {
+                              "id": 2360,
+                              "name": "asRecord",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 2350,
+                              "src": "1861:8:3",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_struct$_ASRecord_$8951_memory_ptr",
+                                "typeString": "struct IASRegistry.ASRecord memory"
+                              }
+                            },
+                            "id": 2361,
+                            "isConstant": false,
+                            "isLValue": true,
+                            "isPure": false,
+                            "lValueRequested": false,
+                            "memberLocation": "1870:8:3",
+                            "memberName": "resolver",
+                            "nodeType": "MemberAccess",
+                            "referencedDeclaration": 8946,
+                            "src": "1861:17:3",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_contract$_IASResolver_$9018",
+                              "typeString": "contract IASResolver"
+                            }
+                          }
+                        ],
+                        "expression": {
+                          "argumentTypes": [
+                            {
+                              "typeIdentifier": "t_bytes_memory_ptr",
+                              "typeString": "bytes memory"
+                            },
+                            {
+                              "typeIdentifier": "t_contract$_IASResolver_$9018",
+                              "typeString": "contract IASResolver"
+                            }
+                          ],
+                          "expression": {
+                            "id": 2356,
+                            "name": "abi",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": -1,
+                            "src": "1827:3:3",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_magic_abi",
+                              "typeString": "abi"
+                            }
+                          },
+                          "id": 2357,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": true,
+                          "lValueRequested": false,
+                          "memberLocation": "1831:12:3",
+                          "memberName": "encodePacked",
+                          "nodeType": "MemberAccess",
+                          "src": "1827:16:3",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_function_abiencodepacked_pure$__$returns$_t_bytes_memory_ptr_$",
+                            "typeString": "function () pure returns (bytes memory)"
+                          }
+                        },
+                        "id": 2362,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "functionCall",
+                        "lValueRequested": false,
+                        "nameLocations": [],
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "1827:52:3",
+                        "tryCall": false,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bytes_memory_ptr",
+                          "typeString": "bytes memory"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_bytes_memory_ptr",
+                          "typeString": "bytes memory"
+                        }
+                      ],
+                      "id": 2355,
+                      "name": "keccak256",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": -8,
+                      "src": "1817:9:3",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_keccak256_pure$_t_bytes_memory_ptr_$returns$_t_bytes32_$",
+                        "typeString": "function (bytes memory) pure returns (bytes32)"
+                      }
+                    },
+                    "id": 2363,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1817:63:3",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "functionReturnParameters": 2354,
+                  "id": 2364,
+                  "nodeType": "Return",
+                  "src": "1810:70:3"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 2347,
+              "nodeType": "StructuredDocumentation",
+              "src": "1588:132:3",
+              "text": " @dev Calculates a UUID for a given AS.\n @param asRecord The input AS.\n @return AS UUID."
+            },
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "_getUUID",
+            "nameLocation": "1734:8:3",
+            "parameters": {
+              "id": 2351,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2350,
+                  "mutability": "mutable",
+                  "name": "asRecord",
+                  "nameLocation": "1759:8:3",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2366,
+                  "src": "1743:24:3",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_ASRecord_$8951_memory_ptr",
+                    "typeString": "struct IASRegistry.ASRecord"
+                  },
+                  "typeName": {
+                    "id": 2349,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 2348,
+                      "name": "ASRecord",
+                      "nameLocations": [
+                        "1743:8:3"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 8951,
+                      "src": "1743:8:3"
+                    },
+                    "referencedDeclaration": 8951,
+                    "src": "1743:8:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_ASRecord_$8951_storage_ptr",
+                      "typeString": "struct IASRegistry.ASRecord"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1742:26:3"
+            },
+            "returnParameters": {
+              "id": 2354,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 2353,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 2366,
+                  "src": "1791:7:3",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 2352,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1791:7:3",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1790:9:3"
+            },
+            "scope": 2367,
+            "stateMutability": "pure",
+            "virtual": false,
+            "visibility": "private"
+          }
+        ],
+        "abstract": false,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 2240,
+              "name": "IASRegistry",
+              "nameLocations": [
+                "240:11:3"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 8992,
+              "src": "240:11:3"
+            },
+            "id": 2241,
+            "nodeType": "InheritanceSpecifier",
+            "src": "240:11:3"
+          }
+        ],
+        "canonicalName": "TellerASRegistry",
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": {
+          "id": 2239,
+          "nodeType": "StructuredDocumentation",
+          "src": "169:41:3",
+          "text": " @title The global AS registry."
+        },
+        "fullyImplemented": true,
+        "linearizedBaseContracts": [
+          2367,
+          8992
+        ],
+        "name": "TellerASRegistry",
+        "nameLocation": "220:16:3",
+        "scope": 2368,
+        "usedErrors": [
+          2243
+        ]
+      }
+    ],
+    "license": "MIT"
+  },
+  "id": 3
+}

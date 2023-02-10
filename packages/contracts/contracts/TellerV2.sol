@@ -991,8 +991,7 @@ contract TellerV2 is
     }
 
     /**
-     * @notice NOTE: This function may be removed at some point in the future. Please refer to the Lender Manager Contract for the updated address.
-     * @notice Returns the lender address for a given bid.
+     * @notice Returns the lender address for a given bid. If the stored lender address is the `LenderManager` NFT address, return the `ownerOf` for the bid ID.
      * @param _bidId The id of the bid/loan to get the lender for.
      * @return lender_ The address of the lender associated with the bid.
      */

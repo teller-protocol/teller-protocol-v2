@@ -4,8 +4,6 @@ pragma solidity >=0.8.0 <0.9.0;
 // Contracts
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/metatx/ERC2771ContextUpgradeable.sol";
-
 import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 
 // Interfaces

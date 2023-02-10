@@ -15,8 +15,6 @@ const deployFn: DeployFunction = migrate(
 
     if ((await tellerV2.lenderManager()) === hre.ethers.constants.AddressZero)
       await tellerV2.setLenderManager(lenderManager.address)
-
-    if (await tellerV2.paused()) await tellerV2.unpauseProtocol()
   }
 )
 

@@ -72,16 +72,14 @@ contract LenderManager is
         internal
         view
         virtual
-        returns (bool)
+        returns (bool isVerified_)
     {
         uint256 _marketId = _getLoanMarketId(_bidId);
 
-        (bool isVerified, ) = marketRegistry.isVerifiedLender(
+        (isVerified_, ) = marketRegistry.isVerifiedLender(
             _marketId,
             _lender
         );
-
-        return isVerified;
     }
 
     /**  ERC721 Functions **/

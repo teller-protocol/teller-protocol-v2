@@ -13,7 +13,9 @@
     "migrate:new": "scripts/contract-migration/create-new.sh write",
     "migrate:new:upgrade": "scripts/contract-migration/create-new.sh upgrade",
     "migrate": "yarn hh deploy --tags migration",
-    "deploy": "yarn hh deploy",
+    "anvil": "anvil",
+
+    "deploy": "forge script deploy/deploy.s.sol --broadcast --fork-url http://localhost:8545",
     "export": "yarn hh export:deployments",
     "accounts": "yarn hh accounts",
     "balance": "yarn hh balance",

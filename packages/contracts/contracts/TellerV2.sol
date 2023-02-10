@@ -575,7 +575,7 @@ contract TellerV2 is
         Bid storage bid = bids[_bidId];
 
         address sender = _msgSenderForMarket(bid.marketplaceId);
-
+				require(sender == bid.lender, "only lender can claim NFT");
         // mint an NFT with the lender manager
         lenderManager.registerLoan(_bidId, sender);
 

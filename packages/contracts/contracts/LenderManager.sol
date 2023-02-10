@@ -16,7 +16,6 @@ import "./interfaces/IMarketRegistry.sol";
 contract LenderManager is
     Initializable,
     OwnableUpgradeable,
-    //ERC2771ContextUpgradeable,
     ERC721Upgradeable,
     ILenderManager
 {

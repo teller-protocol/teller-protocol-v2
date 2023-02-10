@@ -20,7 +20,7 @@ import { Collateral } from "./interfaces/escrow/ICollateralEscrowV1.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./libraries/NumbersLib.sol";
-import "./libraries/DateTimeLib.sol";
+import { BokkyPooBahsDateTimeLibrary as BPBDTL } from "./libraries/DateTimeLib.sol";
 import { V2Calculations, PaymentCycleType } from "./libraries/V2Calculations.sol";
 
 /* Errors */
@@ -355,10 +355,8 @@ contract TellerV2 is
         bid.loanDetails.timestamp = uint32(block.timestamp);
 
         // Set payment cycle type based on market setting (custom or monthly)
-        (uint32 paymentCycleDuration, PaymentCycleType paymentCycleType) = marketRegistry
+        (bid.terms.paymentCycle, bidPaymentCycleType[bidId]) = marketRegistry
             .getPaymentCycle(_marketplaceId);
-        bidPaymentCycleType[bidId] = paymentCycleType;
-        bid.terms.paymentCycle = paymentCycleDuration; // <-- this is enforced to be 30 days if `type == Monthly`
 
         bid.terms.APR = _APR;
 
@@ -804,52 +802,41 @@ contract TellerV2 is
         if (bids[_bidId].state != BidState.ACCEPTED) return dueDate_;
 
         uint32 lastRepaidTimestamp = lastRepaidTimestamp(_bidId);
-        uint32 delta;
 
         // Calculate due date if payment cycle is set to monthly
         if (bidPaymentCycleType[_bidId] == PaymentCycleType.Monthly) {
+            // Calculate the cycle number the last repayment was made
+            uint256 lastPaymentCycle = BPBDTL.diffMonths(
+                bid.loanDetails.acceptedTimestamp,
+                lastRepaidTimestamp
+            );
+            if (BPBDTL.getDay(lastRepaidTimestamp) > BPBDTL.getDay(bid.loanDetails.acceptedTimestamp)) {
+                lastPaymentCycle += 2;
+            } else {
+                lastPaymentCycle += 1;
+            }
+
             dueDate_ = uint32(
-                BokkyPooBahsDateTimeLibrary.addMonths(
+                BPBDTL.addMonths(
                     bid.loanDetails.acceptedTimestamp,
-                    1
+                    lastPaymentCycle
                 )
             );
-            // Calculate the cycle number the last repayment was made
-            delta = uint32(BokkyPooBahsDateTimeLibrary.diffMonths(
-                    bid.loanDetails.acceptedTimestamp,
-                    lastRepaidTimestamp
-                ));
         } else if (bidPaymentCycleType[_bidId] == PaymentCycleType.Seconds) {
             // Start with the original due date being 1 payment cycle since bid was accepted
             dueDate_ = bid.loanDetails.acceptedTimestamp + bid.terms.paymentCycle;
             // Calculate the cycle number the last repayment was made
-            delta = lastRepaidTimestamp - bid.loanDetails.acceptedTimestamp;
-        }
-
-        if (delta > 0) {
-            uint32 repaymentCycle = 1 + (delta / bid.terms.paymentCycle);
-            if (bidPaymentCycleType[_bidId] == PaymentCycleType.Monthly) {
-                dueDate_ = uint32(
-                    BokkyPooBahsDateTimeLibrary.addMonths(
-                        dueDate_,
-                        repaymentCycle
-                    )
-                );
-            } else if (
-                bidPaymentCycleType[_bidId] == PaymentCycleType.Seconds
-            ) {
+            uint32 delta = lastRepaidTimestamp - bid.loanDetails.acceptedTimestamp;
+            if (delta > 0) {
+                uint32 repaymentCycle = uint32(Math.ceilDiv(delta, bid.terms.paymentCycle));
                 dueDate_ += (repaymentCycle * bid.terms.paymentCycle);
             }
         }
 
+        uint32 endOfLoan = bid.loanDetails.acceptedTimestamp + bid.loanDetails.loanDuration;
         //if we are in the last payment cycle, the next due date is the end of loan duration
-        if (
-            dueDate_ >
-            bid.loanDetails.acceptedTimestamp + bid.loanDetails.loanDuration
-        ) {
-            dueDate_ =
-                bid.loanDetails.acceptedTimestamp +
-                bid.loanDetails.loanDuration;
+        if (dueDate_ > endOfLoan) {
+            dueDate_ = endOfLoan;
         }
     }
 

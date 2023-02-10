@@ -19,26 +19,55 @@ contract NextDueDate_Test is Testable, TellerV2 {
 
     function _01_nextDueDate_test() public {
         __bid.loanDetails.acceptedTimestamp = uint32(
-            BokkyPooBahsDateTimeLibrary.timestampFromDate(2020, 1, 31) // Leap year
+            BPBDTL.timestampFromDate(2020, 1, 31) // Leap year
         );
         bids[1] = __bid;
         bidPaymentCycleType[1] = PaymentCycleType.Monthly;
         // Expected date is Feb 29th
         uint32 expectedDate = uint32(
-            BokkyPooBahsDateTimeLibrary.timestampFromDate(2020, 2, 29)
+            BPBDTL.timestampFromDate(2020, 2, 29)
         );
         nextDueDate_runner(expectedDate);
     }
 
     function _02_nextDueDate_test() public {
         __bid.loanDetails.acceptedTimestamp = uint32(
-            BokkyPooBahsDateTimeLibrary.timestampFromDate(2020, 2, 29)
+            BPBDTL.timestampFromDate(2020, 2, 29)
         );
         bids[1] = __bid;
         bidPaymentCycleType[1] = PaymentCycleType.Monthly;
         // Expected date is March 29th
         uint32 expectedDate = uint32(
-            BokkyPooBahsDateTimeLibrary.timestampFromDate(2020, 3, 29)
+            BPBDTL.timestampFromDate(2020, 3, 29)
+        );
+        nextDueDate_runner(expectedDate);
+    }
+
+    function _03_nextDueDate_test() public {
+        __bid.loanDetails.acceptedTimestamp = uint32(
+            BPBDTL.timestampFromDate(2023, 2, 1)
+        );
+        bids[1] = __bid;
+        bidPaymentCycleType[1] = PaymentCycleType.Monthly;
+        // Expected date is March 1st
+        uint32 expectedDate = uint32(
+            BPBDTL.timestampFromDate(2023, 3, 1)
+        );
+        nextDueDate_runner(expectedDate);
+    }
+
+    function _04_nextDueDate_test() public {
+        __bid.loanDetails.acceptedTimestamp = uint32(
+            BPBDTL.timestampFromDate(2023, 1, 31)
+        );
+        __bid.loanDetails.lastRepaidTimestamp = uint32(
+            BPBDTL.timestampFromDate(2023, 2, 1)
+        );
+        bids[1] = __bid;
+        bidPaymentCycleType[1] = PaymentCycleType.Monthly;
+        // Expected date is March 31st
+        uint32 expectedDate = uint32(
+            BPBDTL.timestampFromDate(2023, 3, 31)
         );
         nextDueDate_runner(expectedDate);
     }

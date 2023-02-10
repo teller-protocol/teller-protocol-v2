@@ -15,7 +15,7 @@
     "migrate": "yarn hh deploy --tags migration",
     "anvil": "anvil",
 
-    "deploy": "forge script deploy/deploy.protocol.sol --broadcast --fork-url http://localhost:8545",
+    "deploy": "yarn hh deploy",
     "export": "yarn hh export:deployments",
     "accounts": "yarn hh accounts",
     "balance": "yarn hh balance",

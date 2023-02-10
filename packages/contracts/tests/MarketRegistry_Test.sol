@@ -3,22 +3,22 @@ pragma solidity ^0.8.0;
 
 import { Testable } from "./Testable.sol";
 
-import { TellerV2 } from "../TellerV2.sol";
-import { MarketRegistry } from "../MarketRegistry.sol";
-import { ReputationManager } from "../ReputationManager.sol";
+import { TellerV2 } from "../contracts/TellerV2.sol";
+import { MarketRegistry } from "../contracts/MarketRegistry.sol";
+import { ReputationManager } from "../contracts/ReputationManager.sol";
 
-import "../TellerV2Storage.sol";
+import "../contracts/TellerV2Storage.sol";
 
-import "../interfaces/IMarketRegistry.sol";
-import "../interfaces/IReputationManager.sol";
+import "../contracts/interfaces/IMarketRegistry.sol";
+import "../contracts/interfaces/IReputationManager.sol";
 
-import "../EAS/TellerAS.sol";
+import "../contracts/EAS/TellerAS.sol";
 
-import "../mock/WethMock.sol";
-import "../interfaces/IWETH.sol";
+import "../contracts/mock/WethMock.sol";
+import "../contracts/interfaces/IWETH.sol";
 
 import { User } from "./Test_Helpers.sol";
-import { PaymentType } from "../libraries/V2Calculations.sol";
+import { PaymentType } from "../contracts/libraries/V2Calculations.sol";
 
 contract MarketRegistry_Test is Testable, TellerV2 {
     User private marketOwner;

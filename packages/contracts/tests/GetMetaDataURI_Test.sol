@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
  
 import "./Testable.sol";
-import "../TellerV2.sol";
+import "../contracts/TellerV2.sol";
 
 contract GetMetaDataURI_Test is Testable, TellerV2 {
     constructor() TellerV2(address(0)) {}

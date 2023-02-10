@@ -4,14 +4,14 @@ pragma solidity ^0.8.0;
 import { Testable } from "./Testable.sol";
  
 
-import { CollateralEscrowV1 } from "../escrow/CollateralEscrowV1.sol";
-import "../mock/WethMock.sol";
+import { CollateralEscrowV1 } from "../contracts/escrow/CollateralEscrowV1.sol";
+import "../contracts/mock/WethMock.sol";
 import "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
 import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "../interfaces/IWETH.sol";
-import { CollateralType, CollateralEscrowV1 } from "../escrow/CollateralEscrowV1.sol";
+import "../contracts/interfaces/IWETH.sol";
+import { CollateralType, CollateralEscrowV1 } from "../contracts/escrow/CollateralEscrowV1.sol";
 
 contract CollateralEscrow_Test is Testable {
     BeaconProxy private proxy_;

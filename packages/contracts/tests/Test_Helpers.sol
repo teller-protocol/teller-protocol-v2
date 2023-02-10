@@ -1,13 +1,13 @@
 pragma solidity >=0.8.0 <0.9.0;
 // SPDX-License-Identifier: MIT
 
-import { TellerV2 } from "../TellerV2.sol";
-import "../mock/WethMock.sol";
-import "../interfaces/IMarketRegistry.sol";
-import "../interfaces/ITellerV2.sol";
-import { Collateral } from "../interfaces/escrow/ICollateralEscrowV1.sol";
+import { TellerV2 } from "../contracts/TellerV2.sol";
+import "../contracts/mock/WethMock.sol";
+import "../contracts/interfaces/IMarketRegistry.sol";
+import "../contracts/interfaces/ITellerV2.sol";
+import { Collateral } from "../contracts/interfaces/escrow/ICollateralEscrowV1.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import { PaymentType } from "../libraries/V2Calculations.sol";
+import { PaymentType } from "../contracts/libraries/V2Calculations.sol";
 
 contract User {
     TellerV2 public immutable tellerV2;

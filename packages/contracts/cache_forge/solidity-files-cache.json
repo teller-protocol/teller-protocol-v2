@@ -3,7 +3,7 @@
   "paths": {
     "artifacts": "out",
     "build_infos": "out/build-info",
-    "sources": "contracts",
+    "sources": "tests",
     "tests": "test",
     "scripts": "script",
     "libraries": [
@@ -12,6 +12,87 @@
     ]
   },
   "files": {
+    "contracts/CollateralManager.sol": {
+      "lastModificationDate": 1675970415902,
+      "contentHash": "ce84718de61bed44223fdc1f770bde2f",
+      "sourceName": "contracts/CollateralManager.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "contracts/EAS/TellerAS.sol",
+        "contracts/TellerV2Storage.sol",
+        "contracts/Types.sol",
+        "contracts/interfaces/IASRegistry.sol",
+        "contracts/interfaces/IASResolver.sol",
+        "contracts/interfaces/ICollateralManager.sol",
+        "contracts/interfaces/IEAS.sol",
+        "contracts/interfaces/IEASEIP712Verifier.sol",
+        "contracts/interfaces/IMarketRegistry.sol",
+        "contracts/interfaces/IReputationManager.sol",
+        "contracts/interfaces/ITellerV2.sol",
+        "contracts/interfaces/escrow/ICollateralEscrowV1.sol",
+        "contracts/libraries/NumbersLib.sol",
+        "contracts/libraries/V2Calculations.sol",
+        "contracts/libraries/WadRayMath.sol",
+        "node_modules/@openzeppelin/contracts/interfaces/draft-IERC1822.sol",
+        "node_modules/@openzeppelin/contracts/proxy/ERC1967/ERC1967Upgrade.sol",
+        "node_modules/@openzeppelin/contracts/proxy/Proxy.sol",
+        "node_modules/@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol",
+        "node_modules/@openzeppelin/contracts/proxy/beacon/IBeacon.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol",
+        "node_modules/@openzeppelin/contracts/utils/Address.sol",
+        "node_modules/@openzeppelin/contracts/utils/Context.sol",
+        "node_modules/@openzeppelin/contracts/utils/StorageSlot.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/Math.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SafeCast.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SafeMath.sol",
+        "node_modules/@openzeppelin/contracts/utils/structs/EnumerableSet.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155Upgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/structs/EnumerableSetUpgradeable.sol"
+      ],
+      "versionRequirement": ">=0.8.0, <0.9.0",
+      "artifacts": {
+        "CollateralManager": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "CollateralManager.sol/CollateralManager.json"
+        }
+      }
+    },
     "contracts/EAS/TellerAS.sol": {
       "lastModificationDate": 1672931775247,
       "contentHash": "3bb0eac9c2c681144e64d0951499e7a4",
@@ -58,92 +139,6 @@
         }
       }
     },
-    "contracts/EAS/TellerASEIP712Verifier.sol": {
-      "lastModificationDate": 1672931775247,
-      "contentHash": "0efc2f04beb61b75568465f0e47492c0",
-      "sourceName": "contracts/EAS/TellerASEIP712Verifier.sol",
-      "solcConfig": {
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "metadata": {
-            "bytecodeHash": "ipfs",
-            "appendCBOR": true
-          },
-          "outputSelection": {
-            "*": {
-              "": [
-                "ast"
-              ],
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ]
-            }
-          },
-          "evmVersion": "london",
-          "libraries": {}
-        }
-      },
-      "imports": [
-        "contracts/interfaces/IEASEIP712Verifier.sol"
-      ],
-      "versionRequirement": ">=0.8.0, <0.9.0",
-      "artifacts": {
-        "TellerASEIP712Verifier": {
-          "0.8.17+commit.8df45f5f.Linux.gcc": "TellerASEIP712Verifier.sol/TellerASEIP712Verifier.json"
-        }
-      }
-    },
-    "contracts/EAS/TellerASRegistry.sol": {
-      "lastModificationDate": 1672931775247,
-      "contentHash": "44c40f0bfff645ffae47c36121e9d61f",
-      "sourceName": "contracts/EAS/TellerASRegistry.sol",
-      "solcConfig": {
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "metadata": {
-            "bytecodeHash": "ipfs",
-            "appendCBOR": true
-          },
-          "outputSelection": {
-            "*": {
-              "": [
-                "ast"
-              ],
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ]
-            }
-          },
-          "evmVersion": "london",
-          "libraries": {}
-        }
-      },
-      "imports": [
-        "contracts/Types.sol",
-        "contracts/interfaces/IASRegistry.sol",
-        "contracts/interfaces/IASResolver.sol"
-      ],
-      "versionRequirement": ">=0.8.0, <0.9.0",
-      "artifacts": {
-        "TellerASRegistry": {
-          "0.8.17+commit.8df45f5f.Linux.gcc": "TellerASRegistry.sol/TellerASRegistry.json"
-        }
-      }
-    },
     "contracts/EAS/TellerASResolver.sol": {
       "lastModificationDate": 1672931775247,
       "contentHash": "21a52ff14504c7fcee7a481fe309caf4",
@@ -183,6 +178,129 @@
       "artifacts": {
         "TellerASResolver": {
           "0.8.17+commit.8df45f5f.Linux.gcc": "TellerASResolver.sol/TellerASResolver.json"
+        }
+      }
+    },
+    "contracts/ERC2771ContextUpgradeable.sol": {
+      "lastModificationDate": 1672931775251,
+      "contentHash": "260d5625e94fdbd5d3533194bfa4198b",
+      "sourceName": "contracts/ERC2771ContextUpgradeable.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol"
+      ],
+      "versionRequirement": "^0.8.9",
+      "artifacts": {
+        "ERC2771ContextUpgradeable": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "ERC2771ContextUpgradeable.sol/ERC2771ContextUpgradeable.json"
+        }
+      }
+    },
+    "contracts/LenderCommitmentForwarder.sol": {
+      "lastModificationDate": 1675970413750,
+      "contentHash": "1641234d020c0cb1f9b841487210739d",
+      "sourceName": "contracts/LenderCommitmentForwarder.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "contracts/EAS/TellerAS.sol",
+        "contracts/ERC2771ContextUpgradeable.sol",
+        "contracts/ProtocolFee.sol",
+        "contracts/TellerV2.sol",
+        "contracts/TellerV2Context.sol",
+        "contracts/TellerV2MarketForwarder.sol",
+        "contracts/TellerV2Storage.sol",
+        "contracts/Types.sol",
+        "contracts/interfaces/IASRegistry.sol",
+        "contracts/interfaces/IASResolver.sol",
+        "contracts/interfaces/ICollateralManager.sol",
+        "contracts/interfaces/IEAS.sol",
+        "contracts/interfaces/IEASEIP712Verifier.sol",
+        "contracts/interfaces/IMarketRegistry.sol",
+        "contracts/interfaces/IReputationManager.sol",
+        "contracts/interfaces/ITellerV2.sol",
+        "contracts/interfaces/escrow/ICollateralEscrowV1.sol",
+        "contracts/libraries/NumbersLib.sol",
+        "contracts/libraries/V2Calculations.sol",
+        "contracts/libraries/WadRayMath.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/extensions/draft-IERC20Permit.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol",
+        "node_modules/@openzeppelin/contracts/utils/Address.sol",
+        "node_modules/@openzeppelin/contracts/utils/Context.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/Math.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SafeCast.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SafeMath.sol",
+        "node_modules/@openzeppelin/contracts/utils/structs/EnumerableSet.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol"
+      ],
+      "versionRequirement": ">=0.8.0, <0.9.0",
+      "artifacts": {
+        "LenderCommitmentForwarder": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "LenderCommitmentForwarder.sol/LenderCommitmentForwarder.json"
         }
       }
     },
@@ -252,6 +370,51 @@
         }
       }
     },
+    "contracts/ProtocolFee.sol": {
+      "lastModificationDate": 1672931775251,
+      "contentHash": "27c2d13013849d6ea8811f71cb668f4a",
+      "sourceName": "contracts/ProtocolFee.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "node_modules/@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol"
+      ],
+      "versionRequirement": ">=0.8.0, <0.9.0",
+      "artifacts": {
+        "ProtocolFee": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "ProtocolFee.sol/ProtocolFee.json"
+        }
+      }
+    },
     "contracts/ReputationManager.sol": {
       "lastModificationDate": 1672931775251,
       "contentHash": "56ff465d9f4a6fed53073313f7e8fe40",
@@ -315,6 +478,300 @@
       "artifacts": {
         "ReputationManager": {
           "0.8.17+commit.8df45f5f.Linux.gcc": "ReputationManager.sol/ReputationManager.json"
+        }
+      }
+    },
+    "contracts/TellerV2.sol": {
+      "lastModificationDate": 1676042313139,
+      "contentHash": "18a460820b13598bdb3d3a1e7e0c2283",
+      "sourceName": "contracts/TellerV2.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "contracts/EAS/TellerAS.sol",
+        "contracts/ERC2771ContextUpgradeable.sol",
+        "contracts/ProtocolFee.sol",
+        "contracts/TellerV2Context.sol",
+        "contracts/TellerV2Storage.sol",
+        "contracts/Types.sol",
+        "contracts/interfaces/IASRegistry.sol",
+        "contracts/interfaces/IASResolver.sol",
+        "contracts/interfaces/ICollateralManager.sol",
+        "contracts/interfaces/IEAS.sol",
+        "contracts/interfaces/IEASEIP712Verifier.sol",
+        "contracts/interfaces/IMarketRegistry.sol",
+        "contracts/interfaces/IReputationManager.sol",
+        "contracts/interfaces/ITellerV2.sol",
+        "contracts/interfaces/escrow/ICollateralEscrowV1.sol",
+        "contracts/libraries/NumbersLib.sol",
+        "contracts/libraries/V2Calculations.sol",
+        "contracts/libraries/WadRayMath.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/extensions/draft-IERC20Permit.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol",
+        "node_modules/@openzeppelin/contracts/utils/Address.sol",
+        "node_modules/@openzeppelin/contracts/utils/Context.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/Math.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SafeCast.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SafeMath.sol",
+        "node_modules/@openzeppelin/contracts/utils/structs/EnumerableSet.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol"
+      ],
+      "versionRequirement": ">=0.8.0, <0.9.0",
+      "artifacts": {
+        "TellerV2": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "TellerV2.sol/TellerV2.json"
+        }
+      }
+    },
+    "contracts/TellerV2Autopay.sol": {
+      "lastModificationDate": 1675970415906,
+      "contentHash": "c1637a351df16810fa628c07172e0172",
+      "sourceName": "contracts/TellerV2Autopay.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "contracts/EAS/TellerAS.sol",
+        "contracts/TellerV2Storage.sol",
+        "contracts/Types.sol",
+        "contracts/interfaces/IASRegistry.sol",
+        "contracts/interfaces/IASResolver.sol",
+        "contracts/interfaces/ICollateralManager.sol",
+        "contracts/interfaces/IEAS.sol",
+        "contracts/interfaces/IEASEIP712Verifier.sol",
+        "contracts/interfaces/IMarketRegistry.sol",
+        "contracts/interfaces/IReputationManager.sol",
+        "contracts/interfaces/ITellerV2.sol",
+        "contracts/interfaces/ITellerV2Autopay.sol",
+        "contracts/interfaces/escrow/ICollateralEscrowV1.sol",
+        "contracts/libraries/NumbersLib.sol",
+        "contracts/libraries/V2Calculations.sol",
+        "contracts/libraries/WadRayMath.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/extensions/draft-IERC20Permit.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol",
+        "node_modules/@openzeppelin/contracts/utils/Address.sol",
+        "node_modules/@openzeppelin/contracts/utils/Context.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/Math.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SafeCast.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SafeMath.sol",
+        "node_modules/@openzeppelin/contracts/utils/structs/EnumerableSet.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol"
+      ],
+      "versionRequirement": ">=0.8.0, <0.9.0",
+      "artifacts": {
+        "TellerV2Autopay": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "TellerV2Autopay.sol/TellerV2Autopay.json"
+        }
+      }
+    },
+    "contracts/TellerV2Context.sol": {
+      "lastModificationDate": 1672931775251,
+      "contentHash": "627ec5d67dcb8db2308573c5d3402c00",
+      "sourceName": "contracts/TellerV2Context.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "contracts/EAS/TellerAS.sol",
+        "contracts/ERC2771ContextUpgradeable.sol",
+        "contracts/TellerV2Storage.sol",
+        "contracts/Types.sol",
+        "contracts/interfaces/IASRegistry.sol",
+        "contracts/interfaces/IASResolver.sol",
+        "contracts/interfaces/ICollateralManager.sol",
+        "contracts/interfaces/IEAS.sol",
+        "contracts/interfaces/IEASEIP712Verifier.sol",
+        "contracts/interfaces/IMarketRegistry.sol",
+        "contracts/interfaces/IReputationManager.sol",
+        "contracts/interfaces/escrow/ICollateralEscrowV1.sol",
+        "contracts/libraries/NumbersLib.sol",
+        "contracts/libraries/V2Calculations.sol",
+        "contracts/libraries/WadRayMath.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol",
+        "node_modules/@openzeppelin/contracts/utils/Context.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/Math.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SafeCast.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SafeMath.sol",
+        "node_modules/@openzeppelin/contracts/utils/structs/EnumerableSet.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol"
+      ],
+      "versionRequirement": ">=0.8.0, <0.9.0",
+      "artifacts": {
+        "TellerV2Context": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "TellerV2Context.sol/TellerV2Context.json"
+        }
+      }
+    },
+    "contracts/TellerV2MarketForwarder.sol": {
+      "lastModificationDate": 1676052619072,
+      "contentHash": "e590875ac6cca90b9c6b4a6c0dd530e2",
+      "sourceName": "contracts/TellerV2MarketForwarder.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "contracts/EAS/TellerAS.sol",
+        "contracts/ERC2771ContextUpgradeable.sol",
+        "contracts/ProtocolFee.sol",
+        "contracts/TellerV2.sol",
+        "contracts/TellerV2Context.sol",
+        "contracts/TellerV2Storage.sol",
+        "contracts/Types.sol",
+        "contracts/interfaces/IASRegistry.sol",
+        "contracts/interfaces/IASResolver.sol",
+        "contracts/interfaces/ICollateralManager.sol",
+        "contracts/interfaces/IEAS.sol",
+        "contracts/interfaces/IEASEIP712Verifier.sol",
+        "contracts/interfaces/IMarketRegistry.sol",
+        "contracts/interfaces/IReputationManager.sol",
+        "contracts/interfaces/ITellerV2.sol",
+        "contracts/interfaces/escrow/ICollateralEscrowV1.sol",
+        "contracts/libraries/NumbersLib.sol",
+        "contracts/libraries/V2Calculations.sol",
+        "contracts/libraries/WadRayMath.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/extensions/draft-IERC20Permit.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol",
+        "node_modules/@openzeppelin/contracts/utils/Address.sol",
+        "node_modules/@openzeppelin/contracts/utils/Context.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/Math.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SafeCast.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SafeMath.sol",
+        "node_modules/@openzeppelin/contracts/utils/structs/EnumerableSet.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol"
+      ],
+      "versionRequirement": ">=0.8.0, <0.9.0",
+      "artifacts": {
+        "TellerV2MarketForwarder": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "TellerV2MarketForwarder.sol/TellerV2MarketForwarder.json"
         }
       }
     },
@@ -430,6 +887,59 @@
       "artifacts": {
         "Types": {
           "0.8.17+commit.8df45f5f.Linux.gcc": "Types.sol/Types.json"
+        }
+      }
+    },
+    "contracts/escrow/CollateralEscrowV1.sol": {
+      "lastModificationDate": 1675970415906,
+      "contentHash": "412eb5594d9f0d209adf74f13a1827c8",
+      "sourceName": "contracts/escrow/CollateralEscrowV1.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "contracts/interfaces/escrow/ICollateralEscrowV1.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155Upgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/extensions/draft-IERC20PermitUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable.sol"
+      ],
+      "versionRequirement": ">=0.8.0, <0.9.0",
+      "artifacts": {
+        "CollateralEscrowV1": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "CollateralEscrowV1.sol/CollateralEscrowV1.json"
         }
       }
     },
@@ -807,6 +1317,86 @@
         }
       }
     },
+    "contracts/interfaces/ITellerV2Autopay.sol": {
+      "lastModificationDate": 1672931775255,
+      "contentHash": "5332bcadb6dcc9b028ada2961b727525",
+      "sourceName": "contracts/interfaces/ITellerV2Autopay.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [],
+      "versionRequirement": "^0.8.0",
+      "artifacts": {
+        "ITellerV2Autopay": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "ITellerV2Autopay.sol/ITellerV2Autopay.json"
+        }
+      }
+    },
+    "contracts/interfaces/IWETH.sol": {
+      "lastModificationDate": 1672931775255,
+      "contentHash": "85f2df09f649d86c6b895007d6ce4652",
+      "sourceName": "contracts/interfaces/IWETH.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [],
+      "versionRequirement": "^0.8.0",
+      "artifacts": {
+        "IWETH": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "IWETH.sol/IWETH.json"
+        }
+      }
+    },
     "contracts/interfaces/escrow/ICollateralEscrowV1.sol": {
       "lastModificationDate": 1675970415906,
       "contentHash": "2a321b4d65cf5713b05634189e864f79",
@@ -998,63 +1588,10 @@
         }
       }
     },
-    "deploy/deploy.autopay.sol": {
-      "lastModificationDate": 1676051294452,
-      "contentHash": "423ac3ccbb1a926bacd6288b87e4756d",
-      "sourceName": "deploy/deploy.autopay.sol",
-      "solcConfig": {
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "metadata": {
-            "bytecodeHash": "ipfs",
-            "appendCBOR": true
-          },
-          "outputSelection": {
-            "*": {
-              "": [
-                "ast"
-              ],
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ]
-            }
-          },
-          "evmVersion": "london",
-          "libraries": {}
-        }
-      },
-      "imports": [
-        "lib/forge-std/src/Base.sol",
-        "lib/forge-std/src/Script.sol",
-        "lib/forge-std/src/StdChains.sol",
-        "lib/forge-std/src/StdCheats.sol",
-        "lib/forge-std/src/StdJson.sol",
-        "lib/forge-std/src/StdMath.sol",
-        "lib/forge-std/src/StdStorage.sol",
-        "lib/forge-std/src/StdUtils.sol",
-        "lib/forge-std/src/Vm.sol",
-        "lib/forge-std/src/console.sol",
-        "lib/forge-std/src/console2.sol",
-        "lib/forge-std/src/interfaces/IMulticall3.sol"
-      ],
-      "versionRequirement": ">=0.8.0, <0.9.0",
-      "artifacts": {
-        "DeployAutopay": {
-          "0.8.17+commit.8df45f5f.Linux.gcc": "deploy.autopay.sol/DeployAutopay.json"
-        }
-      }
-    },
-    "deploy/deploy.market_registry.sol": {
-      "lastModificationDate": 1676051348204,
-      "contentHash": "d3c68b67190b41ff5a4e44bb0a91ea41",
-      "sourceName": "deploy/deploy.market_registry.sol",
+    "contracts/mock/MarketRegistryMock.sol": {
+      "lastModificationDate": 1676042313139,
+      "contentHash": "8ab46eb19746249a148a2b71ffacf035",
+      "sourceName": "contracts/mock/MarketRegistryMock.sol",
       "solcConfig": {
         "settings": {
           "optimizer": {
@@ -1085,8 +1622,6 @@
       },
       "imports": [
         "contracts/EAS/TellerAS.sol",
-        "contracts/EAS/TellerASResolver.sol",
-        "contracts/MarketRegistry.sol",
         "contracts/TellerV2Storage.sol",
         "contracts/Types.sol",
         "contracts/interfaces/IASRegistry.sol",
@@ -1100,40 +1635,26 @@
         "contracts/libraries/NumbersLib.sol",
         "contracts/libraries/V2Calculations.sol",
         "contracts/libraries/WadRayMath.sol",
-        "lib/forge-std/src/Base.sol",
-        "lib/forge-std/src/Script.sol",
-        "lib/forge-std/src/StdChains.sol",
-        "lib/forge-std/src/StdCheats.sol",
-        "lib/forge-std/src/StdJson.sol",
-        "lib/forge-std/src/StdMath.sol",
-        "lib/forge-std/src/StdStorage.sol",
-        "lib/forge-std/src/StdUtils.sol",
-        "lib/forge-std/src/Vm.sol",
-        "lib/forge-std/src/console.sol",
-        "lib/forge-std/src/console2.sol",
-        "lib/forge-std/src/interfaces/IMulticall3.sol",
-        "node_modules/@openzeppelin/contracts/proxy/utils/Initializable.sol",
         "node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol",
         "node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol",
         "node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol",
-        "node_modules/@openzeppelin/contracts/utils/Address.sol",
         "node_modules/@openzeppelin/contracts/utils/Context.sol",
         "node_modules/@openzeppelin/contracts/utils/math/Math.sol",
         "node_modules/@openzeppelin/contracts/utils/math/SafeCast.sol",
         "node_modules/@openzeppelin/contracts/utils/math/SafeMath.sol",
         "node_modules/@openzeppelin/contracts/utils/structs/EnumerableSet.sol"
       ],
-      "versionRequirement": ">=0.8.0, <0.9.0",
+      "versionRequirement": "^0.8.0",
       "artifacts": {
-        "DeployMarketRegistry": {
-          "0.8.17+commit.8df45f5f.Linux.gcc": "deploy.market_registry.sol/DeployMarketRegistry.json"
+        "MarketRegistryMock": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "MarketRegistryMock.sol/MarketRegistryMock.json"
         }
       }
     },
-    "deploy/deploy.protocol.sol": {
-      "lastModificationDate": 1676051376220,
-      "contentHash": "d02e9a927664da4967708125952a65b2",
-      "sourceName": "deploy/deploy.protocol.sol",
+    "contracts/mock/TellerV2SolMock.sol": {
+      "lastModificationDate": 1676042313139,
+      "contentHash": "2683d1619f1ad47200bd83b6923be441",
+      "sourceName": "contracts/mock/TellerV2SolMock.sol",
       "solcConfig": {
         "settings": {
           "optimizer": {
@@ -1164,11 +1685,10 @@
       },
       "imports": [
         "contracts/EAS/TellerAS.sol",
-        "contracts/EAS/TellerASEIP712Verifier.sol",
-        "contracts/EAS/TellerASRegistry.sol",
-        "contracts/EAS/TellerASResolver.sol",
-        "contracts/MarketRegistry.sol",
-        "contracts/ReputationManager.sol",
+        "contracts/ERC2771ContextUpgradeable.sol",
+        "contracts/ProtocolFee.sol",
+        "contracts/TellerV2.sol",
+        "contracts/TellerV2Context.sol",
         "contracts/TellerV2Storage.sol",
         "contracts/Types.sol",
         "contracts/interfaces/IASRegistry.sol",
@@ -1183,45 +1703,35 @@
         "contracts/libraries/NumbersLib.sol",
         "contracts/libraries/V2Calculations.sol",
         "contracts/libraries/WadRayMath.sol",
-        "deploy/deploy.autopay.sol",
-        "deploy/deploy.market_registry.sol",
-        "deploy/deploy.teller_as.sol",
-        "deploy/deploy.teller_v2.sol",
-        "deploy/deploy.tlr_token.sol",
-        "lib/forge-std/src/Base.sol",
-        "lib/forge-std/src/Script.sol",
-        "lib/forge-std/src/StdChains.sol",
-        "lib/forge-std/src/StdCheats.sol",
-        "lib/forge-std/src/StdJson.sol",
-        "lib/forge-std/src/StdMath.sol",
-        "lib/forge-std/src/StdStorage.sol",
-        "lib/forge-std/src/StdUtils.sol",
-        "lib/forge-std/src/Vm.sol",
-        "lib/forge-std/src/console.sol",
-        "lib/forge-std/src/console2.sol",
-        "lib/forge-std/src/interfaces/IMulticall3.sol",
-        "node_modules/@openzeppelin/contracts/proxy/utils/Initializable.sol",
         "node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol",
         "node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol",
         "node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/extensions/draft-IERC20Permit.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol",
         "node_modules/@openzeppelin/contracts/utils/Address.sol",
         "node_modules/@openzeppelin/contracts/utils/Context.sol",
         "node_modules/@openzeppelin/contracts/utils/math/Math.sol",
         "node_modules/@openzeppelin/contracts/utils/math/SafeCast.sol",
         "node_modules/@openzeppelin/contracts/utils/math/SafeMath.sol",
-        "node_modules/@openzeppelin/contracts/utils/structs/EnumerableSet.sol"
+        "node_modules/@openzeppelin/contracts/utils/structs/EnumerableSet.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol"
       ],
       "versionRequirement": ">=0.8.0, <0.9.0",
       "artifacts": {
-        "DeployBase": {
-          "0.8.17+commit.8df45f5f.Linux.gcc": "deploy.protocol.sol/DeployBase.json"
+        "TellerV2SolMock": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "TellerV2SolMock.sol/TellerV2SolMock.json"
         }
       }
     },
-    "deploy/deploy.teller_as.sol": {
-      "lastModificationDate": 1676051366404,
-      "contentHash": "61712eca06e57e590c9689ca5ee2893a",
-      "sourceName": "deploy/deploy.teller_as.sol",
+    "contracts/mock/WethMock.sol": {
+      "lastModificationDate": 1672931775255,
+      "contentHash": "b3384feb46a8b17c4da2be115c611139",
+      "sourceName": "contracts/mock/WethMock.sol",
       "solcConfig": {
         "settings": {
           "optimizer": {
@@ -1250,39 +1760,18 @@
           "libraries": {}
         }
       },
-      "imports": [
-        "contracts/EAS/TellerAS.sol",
-        "contracts/EAS/TellerASEIP712Verifier.sol",
-        "contracts/EAS/TellerASRegistry.sol",
-        "contracts/Types.sol",
-        "contracts/interfaces/IASRegistry.sol",
-        "contracts/interfaces/IASResolver.sol",
-        "contracts/interfaces/IEAS.sol",
-        "contracts/interfaces/IEASEIP712Verifier.sol",
-        "lib/forge-std/src/Base.sol",
-        "lib/forge-std/src/Script.sol",
-        "lib/forge-std/src/StdChains.sol",
-        "lib/forge-std/src/StdCheats.sol",
-        "lib/forge-std/src/StdJson.sol",
-        "lib/forge-std/src/StdMath.sol",
-        "lib/forge-std/src/StdStorage.sol",
-        "lib/forge-std/src/StdUtils.sol",
-        "lib/forge-std/src/Vm.sol",
-        "lib/forge-std/src/console.sol",
-        "lib/forge-std/src/console2.sol",
-        "lib/forge-std/src/interfaces/IMulticall3.sol"
-      ],
-      "versionRequirement": ">=0.8.0, <0.9.0",
+      "imports": [],
+      "versionRequirement": "^0.8.0",
       "artifacts": {
-        "DeployTellerAS": {
-          "0.8.17+commit.8df45f5f.Linux.gcc": "deploy.teller_as.sol/DeployTellerAS.json"
+        "WethMock": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "WethMock.sol/WethMock.json"
         }
       }
     },
-    "deploy/deploy.teller_v2.sol": {
-      "lastModificationDate": 1676051275616,
-      "contentHash": "a74ee50e7b8f409eb1d0f5cbdb118e9c",
-      "sourceName": "deploy/deploy.teller_v2.sol",
+    "lib/forge-std/lib/ds-test/src/test.sol": {
+      "lastModificationDate": 1675979446798,
+      "contentHash": "0eadfcf7e099f3b94363a4f6eebb4547",
+      "sourceName": "lib/forge-std/lib/ds-test/src/test.sol",
       "solcConfig": {
         "settings": {
           "optimizer": {
@@ -1311,103 +1800,11 @@
           "libraries": {}
         }
       },
-      "imports": [
-        "contracts/EAS/TellerAS.sol",
-        "contracts/ReputationManager.sol",
-        "contracts/TellerV2Storage.sol",
-        "contracts/Types.sol",
-        "contracts/interfaces/IASRegistry.sol",
-        "contracts/interfaces/IASResolver.sol",
-        "contracts/interfaces/ICollateralManager.sol",
-        "contracts/interfaces/IEAS.sol",
-        "contracts/interfaces/IEASEIP712Verifier.sol",
-        "contracts/interfaces/IMarketRegistry.sol",
-        "contracts/interfaces/IReputationManager.sol",
-        "contracts/interfaces/ITellerV2.sol",
-        "contracts/interfaces/escrow/ICollateralEscrowV1.sol",
-        "contracts/libraries/NumbersLib.sol",
-        "contracts/libraries/V2Calculations.sol",
-        "contracts/libraries/WadRayMath.sol",
-        "lib/forge-std/src/Base.sol",
-        "lib/forge-std/src/Script.sol",
-        "lib/forge-std/src/StdChains.sol",
-        "lib/forge-std/src/StdCheats.sol",
-        "lib/forge-std/src/StdJson.sol",
-        "lib/forge-std/src/StdMath.sol",
-        "lib/forge-std/src/StdStorage.sol",
-        "lib/forge-std/src/StdUtils.sol",
-        "lib/forge-std/src/Vm.sol",
-        "lib/forge-std/src/console.sol",
-        "lib/forge-std/src/console2.sol",
-        "lib/forge-std/src/interfaces/IMulticall3.sol",
-        "node_modules/@openzeppelin/contracts/proxy/utils/Initializable.sol",
-        "node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol",
-        "node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol",
-        "node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol",
-        "node_modules/@openzeppelin/contracts/utils/Address.sol",
-        "node_modules/@openzeppelin/contracts/utils/Context.sol",
-        "node_modules/@openzeppelin/contracts/utils/math/Math.sol",
-        "node_modules/@openzeppelin/contracts/utils/math/SafeCast.sol",
-        "node_modules/@openzeppelin/contracts/utils/math/SafeMath.sol",
-        "node_modules/@openzeppelin/contracts/utils/structs/EnumerableSet.sol"
-      ],
-      "versionRequirement": ">=0.8.0, <0.9.0",
+      "imports": [],
+      "versionRequirement": ">=0.5.0",
       "artifacts": {
-        "DeployTellerV2": {
-          "0.8.17+commit.8df45f5f.Linux.gcc": "deploy.teller_v2.sol/DeployTellerV2.json"
-        }
-      }
-    },
-    "deploy/deploy.tlr_token.sol": {
-      "lastModificationDate": 1676051308848,
-      "contentHash": "0e6622f8133b7d35e9be71a843d9456a",
-      "sourceName": "deploy/deploy.tlr_token.sol",
-      "solcConfig": {
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "metadata": {
-            "bytecodeHash": "ipfs",
-            "appendCBOR": true
-          },
-          "outputSelection": {
-            "*": {
-              "": [
-                "ast"
-              ],
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ]
-            }
-          },
-          "evmVersion": "london",
-          "libraries": {}
-        }
-      },
-      "imports": [
-        "lib/forge-std/src/Base.sol",
-        "lib/forge-std/src/Script.sol",
-        "lib/forge-std/src/StdChains.sol",
-        "lib/forge-std/src/StdCheats.sol",
-        "lib/forge-std/src/StdJson.sol",
-        "lib/forge-std/src/StdMath.sol",
-        "lib/forge-std/src/StdStorage.sol",
-        "lib/forge-std/src/StdUtils.sol",
-        "lib/forge-std/src/Vm.sol",
-        "lib/forge-std/src/console.sol",
-        "lib/forge-std/src/console2.sol",
-        "lib/forge-std/src/interfaces/IMulticall3.sol"
-      ],
-      "versionRequirement": ">=0.8.0, <0.9.0",
-      "artifacts": {
-        "DeployTlrToken": {
-          "0.8.17+commit.8df45f5f.Linux.gcc": "deploy.tlr_token.sol/DeployTlrToken.json"
+        "DSTest": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "test.sol/DSTest.json"
         }
       }
     },
@@ -1460,10 +1857,10 @@
         }
       }
     },
-    "lib/forge-std/src/Script.sol": {
-      "lastModificationDate": 1675979448082,
-      "contentHash": "552c4faf58d718f7561fba160a9f3f1f",
-      "sourceName": "lib/forge-std/src/Script.sol",
+    "lib/forge-std/src/StdAssertions.sol": {
+      "lastModificationDate": 1675979448202,
+      "contentHash": "8ac14e09851bac495a14ff4ee56fdc52",
+      "sourceName": "lib/forge-std/src/StdAssertions.sol",
       "solcConfig": {
         "settings": {
           "optimizer": {
@@ -1493,22 +1890,13 @@
         }
       },
       "imports": [
-        "lib/forge-std/src/Base.sol",
-        "lib/forge-std/src/StdChains.sol",
-        "lib/forge-std/src/StdCheats.sol",
-        "lib/forge-std/src/StdJson.sol",
-        "lib/forge-std/src/StdMath.sol",
-        "lib/forge-std/src/StdStorage.sol",
-        "lib/forge-std/src/StdUtils.sol",
-        "lib/forge-std/src/Vm.sol",
-        "lib/forge-std/src/console.sol",
-        "lib/forge-std/src/console2.sol",
-        "lib/forge-std/src/interfaces/IMulticall3.sol"
+        "lib/forge-std/lib/ds-test/src/test.sol",
+        "lib/forge-std/src/StdMath.sol"
       ],
       "versionRequirement": ">=0.6.2, <0.9.0",
       "artifacts": {
-        "Script": {
-          "0.8.17+commit.8df45f5f.Linux.gcc": "Script.sol/Script.json"
+        "StdAssertions": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "StdAssertions.sol/StdAssertions.json"
         }
       }
     },
@@ -1597,6 +1985,46 @@
         },
         "StdCheatsSafe": {
           "0.8.17+commit.8df45f5f.Linux.gcc": "StdCheats.sol/StdCheatsSafe.json"
+        }
+      }
+    },
+    "lib/forge-std/src/StdError.sol": {
+      "lastModificationDate": 1675979448414,
+      "contentHash": "88409726fb2f43014bbb4778080da3c0",
+      "sourceName": "lib/forge-std/src/StdError.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [],
+      "versionRequirement": ">=0.6.2, <0.9.0",
+      "artifacts": {
+        "stdError": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "StdError.sol/stdError.json"
         }
       }
     },
@@ -1770,6 +2198,61 @@
         }
       }
     },
+    "lib/forge-std/src/Test.sol": {
+      "lastModificationDate": 1675979448710,
+      "contentHash": "e0bc66f9667650c8330c378ed2c328d6",
+      "sourceName": "lib/forge-std/src/Test.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "lib/forge-std/lib/ds-test/src/test.sol",
+        "lib/forge-std/src/Base.sol",
+        "lib/forge-std/src/StdAssertions.sol",
+        "lib/forge-std/src/StdChains.sol",
+        "lib/forge-std/src/StdCheats.sol",
+        "lib/forge-std/src/StdError.sol",
+        "lib/forge-std/src/StdJson.sol",
+        "lib/forge-std/src/StdMath.sol",
+        "lib/forge-std/src/StdStorage.sol",
+        "lib/forge-std/src/StdUtils.sol",
+        "lib/forge-std/src/Vm.sol",
+        "lib/forge-std/src/console.sol",
+        "lib/forge-std/src/console2.sol",
+        "lib/forge-std/src/interfaces/IMulticall3.sol"
+      ],
+      "versionRequirement": ">=0.6.2, <0.9.0",
+      "artifacts": {
+        "Test": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "Test.sol/Test.json"
+        }
+      }
+    },
     "lib/forge-std/src/Vm.sol": {
       "lastModificationDate": 1675979448746,
       "contentHash": "91c6394d033ea2b95631d0da6ab907c1",
@@ -1933,6 +2416,305 @@
         }
       }
     },
+    "node_modules/@openzeppelin/contracts/access/Ownable.sol": {
+      "lastModificationDate": 1676042370320,
+      "contentHash": "e436cea06129be2c73cda4b1acc848b5",
+      "sourceName": "node_modules/@openzeppelin/contracts/access/Ownable.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "node_modules/@openzeppelin/contracts/utils/Context.sol"
+      ],
+      "versionRequirement": "^0.8.0",
+      "artifacts": {
+        "Ownable": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "Ownable.sol/Ownable.json"
+        }
+      }
+    },
+    "node_modules/@openzeppelin/contracts/interfaces/draft-IERC1822.sol": {
+      "lastModificationDate": 1676042370360,
+      "contentHash": "2858d98e74e67987ec81b39605230b74",
+      "sourceName": "node_modules/@openzeppelin/contracts/interfaces/draft-IERC1822.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [],
+      "versionRequirement": "^0.8.0",
+      "artifacts": {
+        "IERC1822Proxiable": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "draft-IERC1822.sol/IERC1822Proxiable.json"
+        }
+      }
+    },
+    "node_modules/@openzeppelin/contracts/proxy/ERC1967/ERC1967Upgrade.sol": {
+      "lastModificationDate": 1676042370332,
+      "contentHash": "6baa887a798e95b14f34e093f117e9b2",
+      "sourceName": "node_modules/@openzeppelin/contracts/proxy/ERC1967/ERC1967Upgrade.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "node_modules/@openzeppelin/contracts/interfaces/draft-IERC1822.sol",
+        "node_modules/@openzeppelin/contracts/proxy/beacon/IBeacon.sol",
+        "node_modules/@openzeppelin/contracts/utils/Address.sol",
+        "node_modules/@openzeppelin/contracts/utils/StorageSlot.sol"
+      ],
+      "versionRequirement": "^0.8.2",
+      "artifacts": {
+        "ERC1967Upgrade": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "ERC1967Upgrade.sol/ERC1967Upgrade.json"
+        }
+      }
+    },
+    "node_modules/@openzeppelin/contracts/proxy/Proxy.sol": {
+      "lastModificationDate": 1676042370336,
+      "contentHash": "40b3d81a836d50ff47e03893dcaaf204",
+      "sourceName": "node_modules/@openzeppelin/contracts/proxy/Proxy.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [],
+      "versionRequirement": "^0.8.0",
+      "artifacts": {
+        "Proxy": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "Proxy.sol/Proxy.json"
+        }
+      }
+    },
+    "node_modules/@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol": {
+      "lastModificationDate": 1676042370332,
+      "contentHash": "dc9dcb6e542154d9cfbfaece646c1092",
+      "sourceName": "node_modules/@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "node_modules/@openzeppelin/contracts/interfaces/draft-IERC1822.sol",
+        "node_modules/@openzeppelin/contracts/proxy/ERC1967/ERC1967Upgrade.sol",
+        "node_modules/@openzeppelin/contracts/proxy/Proxy.sol",
+        "node_modules/@openzeppelin/contracts/proxy/beacon/IBeacon.sol",
+        "node_modules/@openzeppelin/contracts/utils/Address.sol",
+        "node_modules/@openzeppelin/contracts/utils/StorageSlot.sol"
+      ],
+      "versionRequirement": "^0.8.0",
+      "artifacts": {
+        "BeaconProxy": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "BeaconProxy.sol/BeaconProxy.json"
+        }
+      }
+    },
+    "node_modules/@openzeppelin/contracts/proxy/beacon/IBeacon.sol": {
+      "lastModificationDate": 1676042370332,
+      "contentHash": "b6bd23bf19e90b771337037706470933",
+      "sourceName": "node_modules/@openzeppelin/contracts/proxy/beacon/IBeacon.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [],
+      "versionRequirement": "^0.8.0",
+      "artifacts": {
+        "IBeacon": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "IBeacon.sol/IBeacon.json"
+        }
+      }
+    },
+    "node_modules/@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol": {
+      "lastModificationDate": 1676042370332,
+      "contentHash": "8ffefb755605824cf730ce4092b2f581",
+      "sourceName": "node_modules/@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "node_modules/@openzeppelin/contracts/access/Ownable.sol",
+        "node_modules/@openzeppelin/contracts/proxy/beacon/IBeacon.sol",
+        "node_modules/@openzeppelin/contracts/utils/Address.sol",
+        "node_modules/@openzeppelin/contracts/utils/Context.sol"
+      ],
+      "versionRequirement": "^0.8.0",
+      "artifacts": {
+        "UpgradeableBeacon": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "UpgradeableBeacon.sol/UpgradeableBeacon.json"
+        }
+      }
+    },
     "node_modules/@openzeppelin/contracts/proxy/utils/Initializable.sol": {
       "lastModificationDate": 1676042370332,
       "contentHash": "bcba485bbfd0aab6b8875b58224f6330",
@@ -1971,7 +2753,7 @@
       "versionRequirement": "^0.8.2",
       "artifacts": {
         "Initializable": {
-          "0.8.17+commit.8df45f5f.Linux.gcc": "Initializable.sol/Initializable.json"
+          "0.8.17+commit.8df45f5f.Linux.gcc": "proxy/utils/Initializable.sol/Initializable.json"
         }
       }
     },
@@ -2101,6 +2883,90 @@
         }
       }
     },
+    "node_modules/@openzeppelin/contracts/token/ERC20/extensions/draft-IERC20Permit.sol": {
+      "lastModificationDate": 1676042370340,
+      "contentHash": "fb77f144244b9ab12533aa6ce85ef8c5",
+      "sourceName": "node_modules/@openzeppelin/contracts/token/ERC20/extensions/draft-IERC20Permit.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [],
+      "versionRequirement": "^0.8.0",
+      "artifacts": {
+        "IERC20Permit": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "draft-IERC20Permit.sol/IERC20Permit.json"
+        }
+      }
+    },
+    "node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol": {
+      "lastModificationDate": 1676042370344,
+      "contentHash": "3a843b05b85a270e9455e3d2e804e633",
+      "sourceName": "node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/extensions/draft-IERC20Permit.sol",
+        "node_modules/@openzeppelin/contracts/utils/Address.sol"
+      ],
+      "versionRequirement": "^0.8.0",
+      "artifacts": {
+        "SafeERC20": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "SafeERC20.sol/SafeERC20.json"
+        }
+      }
+    },
     "node_modules/@openzeppelin/contracts/utils/Address.sol": {
       "lastModificationDate": 1676042370320,
       "contentHash": "c476b3895a94798b88a4bb97399e6dfe",
@@ -2141,6 +3007,48 @@
         }
       }
     },
+    "node_modules/@openzeppelin/contracts/utils/Arrays.sol": {
+      "lastModificationDate": 1676042370320,
+      "contentHash": "2bd89f9eb95c317b3b21cc83fde01a32",
+      "sourceName": "node_modules/@openzeppelin/contracts/utils/Arrays.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "node_modules/@openzeppelin/contracts/utils/math/Math.sol"
+      ],
+      "versionRequirement": "^0.8.0",
+      "artifacts": {
+        "Arrays": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "Arrays.sol/Arrays.json"
+        }
+      }
+    },
     "node_modules/@openzeppelin/contracts/utils/Context.sol": {
       "lastModificationDate": 1676042370320,
       "contentHash": "5f2c5c4b6af2dd4551027144797bc8be",
@@ -2178,6 +3086,46 @@
       "artifacts": {
         "Context": {
           "0.8.17+commit.8df45f5f.Linux.gcc": "Context.sol/Context.json"
+        }
+      }
+    },
+    "node_modules/@openzeppelin/contracts/utils/StorageSlot.sol": {
+      "lastModificationDate": 1676042370328,
+      "contentHash": "f993f8f50186952a59ee5e3a30b68222",
+      "sourceName": "node_modules/@openzeppelin/contracts/utils/StorageSlot.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [],
+      "versionRequirement": "^0.8.0",
+      "artifacts": {
+        "StorageSlot": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "StorageSlot.sol/StorageSlot.json"
         }
       }
     },
@@ -2338,6 +3286,2168 @@
       "artifacts": {
         "EnumerableSet": {
           "0.8.17+commit.8df45f5f.Linux.gcc": "EnumerableSet.sol/EnumerableSet.json"
+        }
+      }
+    },
+    "node_modules/@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol": {
+      "lastModificationDate": 1676042370312,
+      "contentHash": "403ce8273abde646bff81558ddf512ad",
+      "sourceName": "node_modules/@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol"
+      ],
+      "versionRequirement": "^0.8.0",
+      "artifacts": {
+        "OwnableUpgradeable": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "OwnableUpgradeable.sol/OwnableUpgradeable.json"
+        }
+      }
+    },
+    "node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol": {
+      "lastModificationDate": 1676042370328,
+      "contentHash": "b98e2f3a856e6e7f2106fb919bacab9e",
+      "sourceName": "node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol"
+      ],
+      "versionRequirement": "^0.8.2",
+      "artifacts": {
+        "Initializable": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "utils/Initializable.sol/Initializable.json"
+        }
+      }
+    },
+    "node_modules/@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol": {
+      "lastModificationDate": 1676042370372,
+      "contentHash": "cbe53d6b803c1102081e00b3a0418ea3",
+      "sourceName": "node_modules/@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol"
+      ],
+      "versionRequirement": "^0.8.0",
+      "artifacts": {
+        "PausableUpgradeable": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "PausableUpgradeable.sol/PausableUpgradeable.json"
+        }
+      }
+    },
+    "node_modules/@openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155Upgradeable.sol": {
+      "lastModificationDate": 1676042370352,
+      "contentHash": "a407c5f8256246823385d0d7f0a83f57",
+      "sourceName": "node_modules/@openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155Upgradeable.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable.sol"
+      ],
+      "versionRequirement": "^0.8.0",
+      "artifacts": {
+        "IERC1155Upgradeable": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "IERC1155Upgradeable.sol/IERC1155Upgradeable.json"
+        }
+      }
+    },
+    "node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol": {
+      "lastModificationDate": 1676042370340,
+      "contentHash": "a9ed3c7bc7d9ebb5e34f20829274f088",
+      "sourceName": "node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [],
+      "versionRequirement": "^0.8.0",
+      "artifacts": {
+        "IERC20Upgradeable": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "IERC20Upgradeable.sol/IERC20Upgradeable.json"
+        }
+      }
+    },
+    "node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/extensions/draft-IERC20PermitUpgradeable.sol": {
+      "lastModificationDate": 1676042370336,
+      "contentHash": "afab576c4d1f55fbf293a0daf3826e31",
+      "sourceName": "node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/extensions/draft-IERC20PermitUpgradeable.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [],
+      "versionRequirement": "^0.8.0",
+      "artifacts": {
+        "IERC20PermitUpgradeable": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "draft-IERC20PermitUpgradeable.sol/IERC20PermitUpgradeable.json"
+        }
+      }
+    },
+    "node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol": {
+      "lastModificationDate": 1676042370340,
+      "contentHash": "c7dc9c967eb71371d53462f02b280441",
+      "sourceName": "node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/extensions/draft-IERC20PermitUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol"
+      ],
+      "versionRequirement": "^0.8.0",
+      "artifacts": {
+        "SafeERC20Upgradeable": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "SafeERC20Upgradeable.sol/SafeERC20Upgradeable.json"
+        }
+      }
+    },
+    "node_modules/@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol": {
+      "lastModificationDate": 1676042370344,
+      "contentHash": "ba28cf60b52b00d2b3a190bcdf0952bd",
+      "sourceName": "node_modules/@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [],
+      "versionRequirement": "^0.8.0",
+      "artifacts": {
+        "IERC721ReceiverUpgradeable": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "IERC721ReceiverUpgradeable.sol/IERC721ReceiverUpgradeable.json"
+        }
+      }
+    },
+    "node_modules/@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol": {
+      "lastModificationDate": 1676042370344,
+      "contentHash": "59feb5948371a5644b37b0ea697968a2",
+      "sourceName": "node_modules/@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable.sol"
+      ],
+      "versionRequirement": "^0.8.0",
+      "artifacts": {
+        "IERC721Upgradeable": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "IERC721Upgradeable.sol/IERC721Upgradeable.json"
+        }
+      }
+    },
+    "node_modules/@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol": {
+      "lastModificationDate": 1676042370316,
+      "contentHash": "d42e87f4fba2b03ab4d3c14cb53d0c51",
+      "sourceName": "node_modules/@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [],
+      "versionRequirement": "^0.8.1",
+      "artifacts": {
+        "AddressUpgradeable": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "AddressUpgradeable.sol/AddressUpgradeable.json"
+        }
+      }
+    },
+    "node_modules/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol": {
+      "lastModificationDate": 1676042370320,
+      "contentHash": "6200b84950eb05b4a92a39fd1d6e0f9b",
+      "sourceName": "node_modules/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol"
+      ],
+      "versionRequirement": "^0.8.0",
+      "artifacts": {
+        "ContextUpgradeable": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "ContextUpgradeable.sol/ContextUpgradeable.json"
+        }
+      }
+    },
+    "node_modules/@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol": {
+      "lastModificationDate": 1676042370328,
+      "contentHash": "b9d00086379b2524eb287c850a1b2e54",
+      "sourceName": "node_modules/@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [],
+      "versionRequirement": "^0.8.0",
+      "artifacts": {
+        "StringsUpgradeable": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "StringsUpgradeable.sol/StringsUpgradeable.json"
+        }
+      }
+    },
+    "node_modules/@openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable.sol": {
+      "lastModificationDate": 1676042370324,
+      "contentHash": "d6ecf203a5e72c845be9bbf2f304a289",
+      "sourceName": "node_modules/@openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [],
+      "versionRequirement": "^0.8.0",
+      "artifacts": {
+        "IERC165Upgradeable": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "IERC165Upgradeable.sol/IERC165Upgradeable.json"
+        }
+      }
+    },
+    "node_modules/@openzeppelin/contracts-upgradeable/utils/structs/EnumerableSetUpgradeable.sol": {
+      "lastModificationDate": 1676042370320,
+      "contentHash": "69ca068b2545b9ec7fb8b6c6eba26111",
+      "sourceName": "node_modules/@openzeppelin/contracts-upgradeable/utils/structs/EnumerableSetUpgradeable.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [],
+      "versionRequirement": "^0.8.0",
+      "artifacts": {
+        "EnumerableSetUpgradeable": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "EnumerableSetUpgradeable.sol/EnumerableSetUpgradeable.json"
+        }
+      }
+    },
+    "node_modules/hardhat/console.sol": {
+      "lastModificationDate": 1674508913311,
+      "contentHash": "4ff3cd2f6272c9a6516e9ee4f2b967d3",
+      "sourceName": "node_modules/hardhat/console.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [],
+      "versionRequirement": null,
+      "artifacts": {
+        "console": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "console.sol/console.json"
+        }
+      }
+    },
+    "tests/CollateralEscrow_Test.sol": {
+      "lastModificationDate": 1676054608134,
+      "contentHash": "5570db45bc55a8a601db99160d95ce99",
+      "sourceName": "tests/CollateralEscrow_Test.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "contracts/escrow/CollateralEscrowV1.sol",
+        "contracts/interfaces/IWETH.sol",
+        "contracts/interfaces/escrow/ICollateralEscrowV1.sol",
+        "contracts/mock/WethMock.sol",
+        "lib/forge-std/lib/ds-test/src/test.sol",
+        "lib/forge-std/src/Base.sol",
+        "lib/forge-std/src/StdAssertions.sol",
+        "lib/forge-std/src/StdChains.sol",
+        "lib/forge-std/src/StdCheats.sol",
+        "lib/forge-std/src/StdError.sol",
+        "lib/forge-std/src/StdJson.sol",
+        "lib/forge-std/src/StdMath.sol",
+        "lib/forge-std/src/StdStorage.sol",
+        "lib/forge-std/src/StdUtils.sol",
+        "lib/forge-std/src/Test.sol",
+        "lib/forge-std/src/Vm.sol",
+        "lib/forge-std/src/console.sol",
+        "lib/forge-std/src/console2.sol",
+        "lib/forge-std/src/interfaces/IMulticall3.sol",
+        "node_modules/@openzeppelin/contracts/access/Ownable.sol",
+        "node_modules/@openzeppelin/contracts/interfaces/draft-IERC1822.sol",
+        "node_modules/@openzeppelin/contracts/proxy/ERC1967/ERC1967Upgrade.sol",
+        "node_modules/@openzeppelin/contracts/proxy/Proxy.sol",
+        "node_modules/@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol",
+        "node_modules/@openzeppelin/contracts/proxy/beacon/IBeacon.sol",
+        "node_modules/@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol",
+        "node_modules/@openzeppelin/contracts/utils/Address.sol",
+        "node_modules/@openzeppelin/contracts/utils/Context.sol",
+        "node_modules/@openzeppelin/contracts/utils/StorageSlot.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155Upgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/extensions/draft-IERC20PermitUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable.sol",
+        "tests/Testable.sol"
+      ],
+      "versionRequirement": "^0.8.0",
+      "artifacts": {
+        "CollateralEscrow_Test": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "CollateralEscrow_Test.sol/CollateralEscrow_Test.json"
+        },
+        "User": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "CollateralEscrow_Test.sol/User.json"
+        }
+      }
+    },
+    "tests/GetMetaDataURI_Test.sol": {
+      "lastModificationDate": 1676054618874,
+      "contentHash": "fdb876a2a95273e9ad309069579dfd19",
+      "sourceName": "tests/GetMetaDataURI_Test.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "contracts/EAS/TellerAS.sol",
+        "contracts/ERC2771ContextUpgradeable.sol",
+        "contracts/ProtocolFee.sol",
+        "contracts/TellerV2.sol",
+        "contracts/TellerV2Context.sol",
+        "contracts/TellerV2Storage.sol",
+        "contracts/Types.sol",
+        "contracts/interfaces/IASRegistry.sol",
+        "contracts/interfaces/IASResolver.sol",
+        "contracts/interfaces/ICollateralManager.sol",
+        "contracts/interfaces/IEAS.sol",
+        "contracts/interfaces/IEASEIP712Verifier.sol",
+        "contracts/interfaces/IMarketRegistry.sol",
+        "contracts/interfaces/IReputationManager.sol",
+        "contracts/interfaces/ITellerV2.sol",
+        "contracts/interfaces/escrow/ICollateralEscrowV1.sol",
+        "contracts/libraries/NumbersLib.sol",
+        "contracts/libraries/V2Calculations.sol",
+        "contracts/libraries/WadRayMath.sol",
+        "lib/forge-std/lib/ds-test/src/test.sol",
+        "lib/forge-std/src/Base.sol",
+        "lib/forge-std/src/StdAssertions.sol",
+        "lib/forge-std/src/StdChains.sol",
+        "lib/forge-std/src/StdCheats.sol",
+        "lib/forge-std/src/StdError.sol",
+        "lib/forge-std/src/StdJson.sol",
+        "lib/forge-std/src/StdMath.sol",
+        "lib/forge-std/src/StdStorage.sol",
+        "lib/forge-std/src/StdUtils.sol",
+        "lib/forge-std/src/Test.sol",
+        "lib/forge-std/src/Vm.sol",
+        "lib/forge-std/src/console.sol",
+        "lib/forge-std/src/console2.sol",
+        "lib/forge-std/src/interfaces/IMulticall3.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/extensions/draft-IERC20Permit.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol",
+        "node_modules/@openzeppelin/contracts/utils/Address.sol",
+        "node_modules/@openzeppelin/contracts/utils/Context.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/Math.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SafeCast.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SafeMath.sol",
+        "node_modules/@openzeppelin/contracts/utils/structs/EnumerableSet.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol",
+        "tests/Testable.sol"
+      ],
+      "versionRequirement": "^0.8.0",
+      "artifacts": {
+        "GetMetaDataURI_Test": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "GetMetaDataURI_Test.sol/GetMetaDataURI_Test.json"
+        }
+      }
+    },
+    "tests/LenderCommitmentForwarder_Test.sol": {
+      "lastModificationDate": 1676054628746,
+      "contentHash": "078bf39ff1dac76dbb361df4bf2ac3a9",
+      "sourceName": "tests/LenderCommitmentForwarder_Test.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "contracts/EAS/TellerAS.sol",
+        "contracts/ERC2771ContextUpgradeable.sol",
+        "contracts/LenderCommitmentForwarder.sol",
+        "contracts/ProtocolFee.sol",
+        "contracts/TellerV2.sol",
+        "contracts/TellerV2Context.sol",
+        "contracts/TellerV2MarketForwarder.sol",
+        "contracts/TellerV2Storage.sol",
+        "contracts/Types.sol",
+        "contracts/interfaces/IASRegistry.sol",
+        "contracts/interfaces/IASResolver.sol",
+        "contracts/interfaces/ICollateralManager.sol",
+        "contracts/interfaces/IEAS.sol",
+        "contracts/interfaces/IEASEIP712Verifier.sol",
+        "contracts/interfaces/IMarketRegistry.sol",
+        "contracts/interfaces/IReputationManager.sol",
+        "contracts/interfaces/ITellerV2.sol",
+        "contracts/interfaces/escrow/ICollateralEscrowV1.sol",
+        "contracts/libraries/NumbersLib.sol",
+        "contracts/libraries/V2Calculations.sol",
+        "contracts/libraries/WadRayMath.sol",
+        "lib/forge-std/lib/ds-test/src/test.sol",
+        "lib/forge-std/src/Base.sol",
+        "lib/forge-std/src/StdAssertions.sol",
+        "lib/forge-std/src/StdChains.sol",
+        "lib/forge-std/src/StdCheats.sol",
+        "lib/forge-std/src/StdError.sol",
+        "lib/forge-std/src/StdJson.sol",
+        "lib/forge-std/src/StdMath.sol",
+        "lib/forge-std/src/StdStorage.sol",
+        "lib/forge-std/src/StdUtils.sol",
+        "lib/forge-std/src/Test.sol",
+        "lib/forge-std/src/Vm.sol",
+        "lib/forge-std/src/console.sol",
+        "lib/forge-std/src/console2.sol",
+        "lib/forge-std/src/interfaces/IMulticall3.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/extensions/draft-IERC20Permit.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol",
+        "node_modules/@openzeppelin/contracts/utils/Address.sol",
+        "node_modules/@openzeppelin/contracts/utils/Context.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/Math.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SafeCast.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SafeMath.sol",
+        "node_modules/@openzeppelin/contracts/utils/structs/EnumerableSet.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol",
+        "tests/Testable.sol"
+      ],
+      "versionRequirement": "^0.8.0",
+      "artifacts": {
+        "LenderCommitmentForwarder_Test": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "LenderCommitmentForwarder_Test.sol/LenderCommitmentForwarder_Test.json"
+        },
+        "LenderCommitmentTester": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "LenderCommitmentForwarder_Test.sol/LenderCommitmentTester.json"
+        },
+        "MockMarketRegistry": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "LenderCommitmentForwarder_Test.sol/MockMarketRegistry.json"
+        },
+        "User": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "LenderCommitmentForwarder_Test.sol/User.json"
+        }
+      }
+    },
+    "tests/MarketForwarder_Test.sol": {
+      "lastModificationDate": 1676054638670,
+      "contentHash": "4a33d1eec3c0523607801a80723cfd15",
+      "sourceName": "tests/MarketForwarder_Test.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "contracts/EAS/TellerAS.sol",
+        "contracts/ERC2771ContextUpgradeable.sol",
+        "contracts/ProtocolFee.sol",
+        "contracts/TellerV2.sol",
+        "contracts/TellerV2Context.sol",
+        "contracts/TellerV2MarketForwarder.sol",
+        "contracts/TellerV2Storage.sol",
+        "contracts/Types.sol",
+        "contracts/interfaces/IASRegistry.sol",
+        "contracts/interfaces/IASResolver.sol",
+        "contracts/interfaces/ICollateralManager.sol",
+        "contracts/interfaces/IEAS.sol",
+        "contracts/interfaces/IEASEIP712Verifier.sol",
+        "contracts/interfaces/IMarketRegistry.sol",
+        "contracts/interfaces/IReputationManager.sol",
+        "contracts/interfaces/ITellerV2.sol",
+        "contracts/interfaces/escrow/ICollateralEscrowV1.sol",
+        "contracts/libraries/NumbersLib.sol",
+        "contracts/libraries/V2Calculations.sol",
+        "contracts/libraries/WadRayMath.sol",
+        "lib/forge-std/lib/ds-test/src/test.sol",
+        "lib/forge-std/src/Base.sol",
+        "lib/forge-std/src/StdAssertions.sol",
+        "lib/forge-std/src/StdChains.sol",
+        "lib/forge-std/src/StdCheats.sol",
+        "lib/forge-std/src/StdError.sol",
+        "lib/forge-std/src/StdJson.sol",
+        "lib/forge-std/src/StdMath.sol",
+        "lib/forge-std/src/StdStorage.sol",
+        "lib/forge-std/src/StdUtils.sol",
+        "lib/forge-std/src/Test.sol",
+        "lib/forge-std/src/Vm.sol",
+        "lib/forge-std/src/console.sol",
+        "lib/forge-std/src/console2.sol",
+        "lib/forge-std/src/interfaces/IMulticall3.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/extensions/draft-IERC20Permit.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol",
+        "node_modules/@openzeppelin/contracts/utils/Address.sol",
+        "node_modules/@openzeppelin/contracts/utils/Context.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/Math.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SafeCast.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SafeMath.sol",
+        "node_modules/@openzeppelin/contracts/utils/structs/EnumerableSet.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol",
+        "node_modules/hardhat/console.sol",
+        "tests/Testable.sol"
+      ],
+      "versionRequirement": "^0.8.0",
+      "artifacts": {
+        "MarketForwarderTester": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "MarketForwarder_Test.sol/MarketForwarderTester.json"
+        },
+        "MarketForwarder_Test": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "MarketForwarder_Test.sol/MarketForwarder_Test.json"
+        },
+        "MockMarketRegistry": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "MarketForwarder_Test.sol/MockMarketRegistry.json"
+        },
+        "User": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "MarketForwarder_Test.sol/User.json"
+        }
+      }
+    },
+    "tests/MarketRegistry_Test.sol": {
+      "lastModificationDate": 1676054764617,
+      "contentHash": "6156565a494a3cfbc71e90cb6cb50720",
+      "sourceName": "tests/MarketRegistry_Test.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "contracts/EAS/TellerAS.sol",
+        "contracts/EAS/TellerASResolver.sol",
+        "contracts/ERC2771ContextUpgradeable.sol",
+        "contracts/MarketRegistry.sol",
+        "contracts/ProtocolFee.sol",
+        "contracts/ReputationManager.sol",
+        "contracts/TellerV2.sol",
+        "contracts/TellerV2Context.sol",
+        "contracts/TellerV2Storage.sol",
+        "contracts/Types.sol",
+        "contracts/interfaces/IASRegistry.sol",
+        "contracts/interfaces/IASResolver.sol",
+        "contracts/interfaces/ICollateralManager.sol",
+        "contracts/interfaces/IEAS.sol",
+        "contracts/interfaces/IEASEIP712Verifier.sol",
+        "contracts/interfaces/IMarketRegistry.sol",
+        "contracts/interfaces/IReputationManager.sol",
+        "contracts/interfaces/ITellerV2.sol",
+        "contracts/interfaces/IWETH.sol",
+        "contracts/interfaces/escrow/ICollateralEscrowV1.sol",
+        "contracts/libraries/NumbersLib.sol",
+        "contracts/libraries/V2Calculations.sol",
+        "contracts/libraries/WadRayMath.sol",
+        "contracts/mock/WethMock.sol",
+        "lib/forge-std/lib/ds-test/src/test.sol",
+        "lib/forge-std/src/Base.sol",
+        "lib/forge-std/src/StdAssertions.sol",
+        "lib/forge-std/src/StdChains.sol",
+        "lib/forge-std/src/StdCheats.sol",
+        "lib/forge-std/src/StdError.sol",
+        "lib/forge-std/src/StdJson.sol",
+        "lib/forge-std/src/StdMath.sol",
+        "lib/forge-std/src/StdStorage.sol",
+        "lib/forge-std/src/StdUtils.sol",
+        "lib/forge-std/src/Test.sol",
+        "lib/forge-std/src/Vm.sol",
+        "lib/forge-std/src/console.sol",
+        "lib/forge-std/src/console2.sol",
+        "lib/forge-std/src/interfaces/IMulticall3.sol",
+        "node_modules/@openzeppelin/contracts/proxy/utils/Initializable.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/extensions/draft-IERC20Permit.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol",
+        "node_modules/@openzeppelin/contracts/utils/Address.sol",
+        "node_modules/@openzeppelin/contracts/utils/Context.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/Math.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SafeCast.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SafeMath.sol",
+        "node_modules/@openzeppelin/contracts/utils/structs/EnumerableSet.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol",
+        "tests/Test_Helpers.sol",
+        "tests/Testable.sol"
+      ],
+      "versionRequirement": "^0.8.0",
+      "artifacts": {
+        "MarketRegistry_Test": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "MarketRegistry_Test.sol/MarketRegistry_Test.json"
+        }
+      }
+    },
+    "tests/PMT_Test.sol": {
+      "lastModificationDate": 1676054661546,
+      "contentHash": "019dd87870678799cd700be4a97c9da8",
+      "sourceName": "tests/PMT_Test.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "contracts/EAS/TellerAS.sol",
+        "contracts/ERC2771ContextUpgradeable.sol",
+        "contracts/ProtocolFee.sol",
+        "contracts/TellerV2.sol",
+        "contracts/TellerV2Context.sol",
+        "contracts/TellerV2Storage.sol",
+        "contracts/Types.sol",
+        "contracts/interfaces/IASRegistry.sol",
+        "contracts/interfaces/IASResolver.sol",
+        "contracts/interfaces/ICollateralManager.sol",
+        "contracts/interfaces/IEAS.sol",
+        "contracts/interfaces/IEASEIP712Verifier.sol",
+        "contracts/interfaces/IMarketRegistry.sol",
+        "contracts/interfaces/IReputationManager.sol",
+        "contracts/interfaces/ITellerV2.sol",
+        "contracts/interfaces/escrow/ICollateralEscrowV1.sol",
+        "contracts/libraries/NumbersLib.sol",
+        "contracts/libraries/V2Calculations.sol",
+        "contracts/libraries/WadRayMath.sol",
+        "lib/forge-std/lib/ds-test/src/test.sol",
+        "lib/forge-std/src/Base.sol",
+        "lib/forge-std/src/StdAssertions.sol",
+        "lib/forge-std/src/StdChains.sol",
+        "lib/forge-std/src/StdCheats.sol",
+        "lib/forge-std/src/StdError.sol",
+        "lib/forge-std/src/StdJson.sol",
+        "lib/forge-std/src/StdMath.sol",
+        "lib/forge-std/src/StdStorage.sol",
+        "lib/forge-std/src/StdUtils.sol",
+        "lib/forge-std/src/Test.sol",
+        "lib/forge-std/src/Vm.sol",
+        "lib/forge-std/src/console.sol",
+        "lib/forge-std/src/console2.sol",
+        "lib/forge-std/src/interfaces/IMulticall3.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/extensions/draft-IERC20Permit.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol",
+        "node_modules/@openzeppelin/contracts/utils/Address.sol",
+        "node_modules/@openzeppelin/contracts/utils/Context.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/Math.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SafeCast.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SafeMath.sol",
+        "node_modules/@openzeppelin/contracts/utils/structs/EnumerableSet.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol",
+        "tests/Testable.sol"
+      ],
+      "versionRequirement": "^0.8.0",
+      "artifacts": {
+        "PMT_Test": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "PMT_Test.sol/PMT_Test.json"
+        }
+      }
+    },
+    "tests/TellerV2Autopay_Test.sol": {
+      "lastModificationDate": 1676054693669,
+      "contentHash": "52c7e4659924e9773de84d65a0596119",
+      "sourceName": "tests/TellerV2Autopay_Test.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "contracts/EAS/TellerAS.sol",
+        "contracts/EAS/TellerASResolver.sol",
+        "contracts/ERC2771ContextUpgradeable.sol",
+        "contracts/MarketRegistry.sol",
+        "contracts/ProtocolFee.sol",
+        "contracts/ReputationManager.sol",
+        "contracts/TellerV2.sol",
+        "contracts/TellerV2Autopay.sol",
+        "contracts/TellerV2Context.sol",
+        "contracts/TellerV2Storage.sol",
+        "contracts/Types.sol",
+        "contracts/interfaces/IASRegistry.sol",
+        "contracts/interfaces/IASResolver.sol",
+        "contracts/interfaces/ICollateralManager.sol",
+        "contracts/interfaces/IEAS.sol",
+        "contracts/interfaces/IEASEIP712Verifier.sol",
+        "contracts/interfaces/IMarketRegistry.sol",
+        "contracts/interfaces/IReputationManager.sol",
+        "contracts/interfaces/ITellerV2.sol",
+        "contracts/interfaces/ITellerV2Autopay.sol",
+        "contracts/interfaces/IWETH.sol",
+        "contracts/interfaces/escrow/ICollateralEscrowV1.sol",
+        "contracts/libraries/NumbersLib.sol",
+        "contracts/libraries/V2Calculations.sol",
+        "contracts/libraries/WadRayMath.sol",
+        "contracts/mock/MarketRegistryMock.sol",
+        "contracts/mock/TellerV2SolMock.sol",
+        "contracts/mock/WethMock.sol",
+        "lib/forge-std/lib/ds-test/src/test.sol",
+        "lib/forge-std/src/Base.sol",
+        "lib/forge-std/src/StdAssertions.sol",
+        "lib/forge-std/src/StdChains.sol",
+        "lib/forge-std/src/StdCheats.sol",
+        "lib/forge-std/src/StdError.sol",
+        "lib/forge-std/src/StdJson.sol",
+        "lib/forge-std/src/StdMath.sol",
+        "lib/forge-std/src/StdStorage.sol",
+        "lib/forge-std/src/StdUtils.sol",
+        "lib/forge-std/src/Test.sol",
+        "lib/forge-std/src/Vm.sol",
+        "lib/forge-std/src/console.sol",
+        "lib/forge-std/src/console2.sol",
+        "lib/forge-std/src/interfaces/IMulticall3.sol",
+        "node_modules/@openzeppelin/contracts/proxy/utils/Initializable.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/extensions/draft-IERC20Permit.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol",
+        "node_modules/@openzeppelin/contracts/utils/Address.sol",
+        "node_modules/@openzeppelin/contracts/utils/Context.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/Math.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SafeCast.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SafeMath.sol",
+        "node_modules/@openzeppelin/contracts/utils/structs/EnumerableSet.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol",
+        "tests/Testable.sol"
+      ],
+      "versionRequirement": "^0.8.0",
+      "artifacts": {
+        "TellerV2Autopay_Test": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "TellerV2Autopay_Test.sol/TellerV2Autopay_Test.json"
+        },
+        "User": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "TellerV2Autopay_Test.sol/User.json"
+        }
+      }
+    },
+    "tests/TellerV2Context_Test.sol": {
+      "lastModificationDate": 1676054699833,
+      "contentHash": "c75019210c6d6b67cf818a2967f46be2",
+      "sourceName": "tests/TellerV2Context_Test.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "contracts/EAS/TellerAS.sol",
+        "contracts/ERC2771ContextUpgradeable.sol",
+        "contracts/LenderCommitmentForwarder.sol",
+        "contracts/ProtocolFee.sol",
+        "contracts/TellerV2.sol",
+        "contracts/TellerV2Context.sol",
+        "contracts/TellerV2MarketForwarder.sol",
+        "contracts/TellerV2Storage.sol",
+        "contracts/Types.sol",
+        "contracts/interfaces/IASRegistry.sol",
+        "contracts/interfaces/IASResolver.sol",
+        "contracts/interfaces/ICollateralManager.sol",
+        "contracts/interfaces/IEAS.sol",
+        "contracts/interfaces/IEASEIP712Verifier.sol",
+        "contracts/interfaces/IMarketRegistry.sol",
+        "contracts/interfaces/IReputationManager.sol",
+        "contracts/interfaces/ITellerV2.sol",
+        "contracts/interfaces/escrow/ICollateralEscrowV1.sol",
+        "contracts/libraries/NumbersLib.sol",
+        "contracts/libraries/V2Calculations.sol",
+        "contracts/libraries/WadRayMath.sol",
+        "lib/forge-std/lib/ds-test/src/test.sol",
+        "lib/forge-std/src/Base.sol",
+        "lib/forge-std/src/StdAssertions.sol",
+        "lib/forge-std/src/StdChains.sol",
+        "lib/forge-std/src/StdCheats.sol",
+        "lib/forge-std/src/StdError.sol",
+        "lib/forge-std/src/StdJson.sol",
+        "lib/forge-std/src/StdMath.sol",
+        "lib/forge-std/src/StdStorage.sol",
+        "lib/forge-std/src/StdUtils.sol",
+        "lib/forge-std/src/Test.sol",
+        "lib/forge-std/src/Vm.sol",
+        "lib/forge-std/src/console.sol",
+        "lib/forge-std/src/console2.sol",
+        "lib/forge-std/src/interfaces/IMulticall3.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/extensions/draft-IERC20Permit.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol",
+        "node_modules/@openzeppelin/contracts/utils/Address.sol",
+        "node_modules/@openzeppelin/contracts/utils/Context.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/Math.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SafeCast.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SafeMath.sol",
+        "node_modules/@openzeppelin/contracts/utils/structs/EnumerableSet.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol",
+        "node_modules/hardhat/console.sol",
+        "tests/Testable.sol"
+      ],
+      "versionRequirement": "^0.8.0",
+      "artifacts": {
+        "MockMarketRegistry": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "TellerV2Context_Test.sol/MockMarketRegistry.json"
+        },
+        "TellerV2Context_Test": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "TellerV2Context_Test.sol/TellerV2Context_Test.json"
+        },
+        "User": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "TellerV2Context_Test.sol/User.json"
+        }
+      }
+    },
+    "tests/TellerV2_Test.sol": {
+      "lastModificationDate": 1676054682437,
+      "contentHash": "5b1cf19727ad23bfc1783bfc888b3835",
+      "sourceName": "tests/TellerV2_Test.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "contracts/CollateralManager.sol",
+        "contracts/EAS/TellerAS.sol",
+        "contracts/EAS/TellerASResolver.sol",
+        "contracts/ERC2771ContextUpgradeable.sol",
+        "contracts/LenderCommitmentForwarder.sol",
+        "contracts/MarketRegistry.sol",
+        "contracts/ProtocolFee.sol",
+        "contracts/ReputationManager.sol",
+        "contracts/TellerV2.sol",
+        "contracts/TellerV2Context.sol",
+        "contracts/TellerV2MarketForwarder.sol",
+        "contracts/TellerV2Storage.sol",
+        "contracts/Types.sol",
+        "contracts/escrow/CollateralEscrowV1.sol",
+        "contracts/interfaces/IASRegistry.sol",
+        "contracts/interfaces/IASResolver.sol",
+        "contracts/interfaces/ICollateralManager.sol",
+        "contracts/interfaces/IEAS.sol",
+        "contracts/interfaces/IEASEIP712Verifier.sol",
+        "contracts/interfaces/IMarketRegistry.sol",
+        "contracts/interfaces/IReputationManager.sol",
+        "contracts/interfaces/ITellerV2.sol",
+        "contracts/interfaces/IWETH.sol",
+        "contracts/interfaces/escrow/ICollateralEscrowV1.sol",
+        "contracts/libraries/NumbersLib.sol",
+        "contracts/libraries/V2Calculations.sol",
+        "contracts/libraries/WadRayMath.sol",
+        "contracts/mock/WethMock.sol",
+        "lib/forge-std/lib/ds-test/src/test.sol",
+        "lib/forge-std/src/Base.sol",
+        "lib/forge-std/src/StdAssertions.sol",
+        "lib/forge-std/src/StdChains.sol",
+        "lib/forge-std/src/StdCheats.sol",
+        "lib/forge-std/src/StdError.sol",
+        "lib/forge-std/src/StdJson.sol",
+        "lib/forge-std/src/StdMath.sol",
+        "lib/forge-std/src/StdStorage.sol",
+        "lib/forge-std/src/StdUtils.sol",
+        "lib/forge-std/src/Test.sol",
+        "lib/forge-std/src/Vm.sol",
+        "lib/forge-std/src/console.sol",
+        "lib/forge-std/src/console2.sol",
+        "lib/forge-std/src/interfaces/IMulticall3.sol",
+        "node_modules/@openzeppelin/contracts/access/Ownable.sol",
+        "node_modules/@openzeppelin/contracts/interfaces/draft-IERC1822.sol",
+        "node_modules/@openzeppelin/contracts/proxy/ERC1967/ERC1967Upgrade.sol",
+        "node_modules/@openzeppelin/contracts/proxy/Proxy.sol",
+        "node_modules/@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol",
+        "node_modules/@openzeppelin/contracts/proxy/beacon/IBeacon.sol",
+        "node_modules/@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol",
+        "node_modules/@openzeppelin/contracts/proxy/utils/Initializable.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/extensions/draft-IERC20Permit.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol",
+        "node_modules/@openzeppelin/contracts/utils/Address.sol",
+        "node_modules/@openzeppelin/contracts/utils/Context.sol",
+        "node_modules/@openzeppelin/contracts/utils/StorageSlot.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/Math.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SafeCast.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SafeMath.sol",
+        "node_modules/@openzeppelin/contracts/utils/structs/EnumerableSet.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155Upgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/extensions/draft-IERC20PermitUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/structs/EnumerableSetUpgradeable.sol",
+        "tests/Test_Helpers.sol",
+        "tests/Testable.sol",
+        "tests/resolvers/TestERC20Token.sol"
+      ],
+      "versionRequirement": "^0.8.0",
+      "artifacts": {
+        "TellerV2_Test": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "TellerV2_Test.sol/TellerV2_Test.json"
+        }
+      }
+    },
+    "tests/Test_Helpers.sol": {
+      "lastModificationDate": 1676054709129,
+      "contentHash": "b02da8ffe372e0310efd676a6fcf2a0b",
+      "sourceName": "tests/Test_Helpers.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "contracts/EAS/TellerAS.sol",
+        "contracts/ERC2771ContextUpgradeable.sol",
+        "contracts/ProtocolFee.sol",
+        "contracts/TellerV2.sol",
+        "contracts/TellerV2Context.sol",
+        "contracts/TellerV2Storage.sol",
+        "contracts/Types.sol",
+        "contracts/interfaces/IASRegistry.sol",
+        "contracts/interfaces/IASResolver.sol",
+        "contracts/interfaces/ICollateralManager.sol",
+        "contracts/interfaces/IEAS.sol",
+        "contracts/interfaces/IEASEIP712Verifier.sol",
+        "contracts/interfaces/IMarketRegistry.sol",
+        "contracts/interfaces/IReputationManager.sol",
+        "contracts/interfaces/ITellerV2.sol",
+        "contracts/interfaces/escrow/ICollateralEscrowV1.sol",
+        "contracts/libraries/NumbersLib.sol",
+        "contracts/libraries/V2Calculations.sol",
+        "contracts/libraries/WadRayMath.sol",
+        "contracts/mock/WethMock.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/extensions/draft-IERC20Permit.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol",
+        "node_modules/@openzeppelin/contracts/utils/Address.sol",
+        "node_modules/@openzeppelin/contracts/utils/Context.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/Math.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SafeCast.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SafeMath.sol",
+        "node_modules/@openzeppelin/contracts/utils/structs/EnumerableSet.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol"
+      ],
+      "versionRequirement": ">=0.8.0, <0.9.0",
+      "artifacts": {
+        "User": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "Test_Helpers.sol/User.json"
+        }
+      }
+    },
+    "tests/Testable.sol": {
+      "lastModificationDate": 1676042313155,
+      "contentHash": "1779f610d41df430d955c30d9aa67474",
+      "sourceName": "tests/Testable.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "lib/forge-std/lib/ds-test/src/test.sol",
+        "lib/forge-std/src/Base.sol",
+        "lib/forge-std/src/StdAssertions.sol",
+        "lib/forge-std/src/StdChains.sol",
+        "lib/forge-std/src/StdCheats.sol",
+        "lib/forge-std/src/StdError.sol",
+        "lib/forge-std/src/StdJson.sol",
+        "lib/forge-std/src/StdMath.sol",
+        "lib/forge-std/src/StdStorage.sol",
+        "lib/forge-std/src/StdUtils.sol",
+        "lib/forge-std/src/Test.sol",
+        "lib/forge-std/src/Vm.sol",
+        "lib/forge-std/src/console.sol",
+        "lib/forge-std/src/console2.sol",
+        "lib/forge-std/src/interfaces/IMulticall3.sol"
+      ],
+      "versionRequirement": ">=0.8.0, <0.9.0",
+      "artifacts": {
+        "Testable": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "Testable.sol/Testable.json"
+        }
+      }
+    },
+    "tests/V2Calculations_Test.sol": {
+      "lastModificationDate": 1676054713657,
+      "contentHash": "d4845b3b3ff7330cfaf9eb1a2d896498",
+      "sourceName": "tests/V2Calculations_Test.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "contracts/EAS/TellerAS.sol",
+        "contracts/ERC2771ContextUpgradeable.sol",
+        "contracts/ProtocolFee.sol",
+        "contracts/TellerV2.sol",
+        "contracts/TellerV2Context.sol",
+        "contracts/TellerV2Storage.sol",
+        "contracts/Types.sol",
+        "contracts/interfaces/IASRegistry.sol",
+        "contracts/interfaces/IASResolver.sol",
+        "contracts/interfaces/ICollateralManager.sol",
+        "contracts/interfaces/IEAS.sol",
+        "contracts/interfaces/IEASEIP712Verifier.sol",
+        "contracts/interfaces/IMarketRegistry.sol",
+        "contracts/interfaces/IReputationManager.sol",
+        "contracts/interfaces/ITellerV2.sol",
+        "contracts/interfaces/escrow/ICollateralEscrowV1.sol",
+        "contracts/libraries/NumbersLib.sol",
+        "contracts/libraries/V2Calculations.sol",
+        "contracts/libraries/WadRayMath.sol",
+        "lib/forge-std/lib/ds-test/src/test.sol",
+        "lib/forge-std/src/Base.sol",
+        "lib/forge-std/src/StdAssertions.sol",
+        "lib/forge-std/src/StdChains.sol",
+        "lib/forge-std/src/StdCheats.sol",
+        "lib/forge-std/src/StdError.sol",
+        "lib/forge-std/src/StdJson.sol",
+        "lib/forge-std/src/StdMath.sol",
+        "lib/forge-std/src/StdStorage.sol",
+        "lib/forge-std/src/StdUtils.sol",
+        "lib/forge-std/src/Test.sol",
+        "lib/forge-std/src/Vm.sol",
+        "lib/forge-std/src/console.sol",
+        "lib/forge-std/src/console2.sol",
+        "lib/forge-std/src/interfaces/IMulticall3.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/extensions/draft-IERC20Permit.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol",
+        "node_modules/@openzeppelin/contracts/utils/Address.sol",
+        "node_modules/@openzeppelin/contracts/utils/Arrays.sol",
+        "node_modules/@openzeppelin/contracts/utils/Context.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/Math.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SafeCast.sol",
+        "node_modules/@openzeppelin/contracts/utils/math/SafeMath.sol",
+        "node_modules/@openzeppelin/contracts/utils/structs/EnumerableSet.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol",
+        "node_modules/@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol",
+        "tests/Testable.sol"
+      ],
+      "versionRequirement": "^0.8.0",
+      "artifacts": {
+        "V2Calculations_Test": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "V2Calculations_Test.sol/V2Calculations_Test.json"
+        }
+      }
+    },
+    "tests/resolvers/TestASAttestationResolver.sol": {
+      "lastModificationDate": 1676054789977,
+      "contentHash": "40bcf25066e1a958b90ae1fc12976e2a",
+      "sourceName": "tests/resolvers/TestASAttestationResolver.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "contracts/EAS/TellerAS.sol",
+        "contracts/EAS/TellerASResolver.sol",
+        "contracts/Types.sol",
+        "contracts/interfaces/IASRegistry.sol",
+        "contracts/interfaces/IASResolver.sol",
+        "contracts/interfaces/IEAS.sol",
+        "contracts/interfaces/IEASEIP712Verifier.sol"
+      ],
+      "versionRequirement": ">=0.8.0, <0.9.0",
+      "artifacts": {
+        "TestASAttestationResolver": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "TestASAttestationResolver.sol/TestASAttestationResolver.json"
+        }
+      }
+    },
+    "tests/resolvers/TestASAttesterResolver.sol": {
+      "lastModificationDate": 1676054793437,
+      "contentHash": "31e3d4b6cd8b1a0e2890836e2fbcaca1",
+      "sourceName": "tests/resolvers/TestASAttesterResolver.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "contracts/EAS/TellerASResolver.sol",
+        "contracts/interfaces/IASResolver.sol"
+      ],
+      "versionRequirement": ">=0.8.0, <0.9.0",
+      "artifacts": {
+        "TestASAttesterResolver": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "TestASAttesterResolver.sol/TestASAttesterResolver.json"
+        }
+      }
+    },
+    "tests/resolvers/TestASDataResolver.sol": {
+      "lastModificationDate": 1676054796141,
+      "contentHash": "0aa0799895fa34625ad10d58b3cbb7b8",
+      "sourceName": "tests/resolvers/TestASDataResolver.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "contracts/EAS/TellerASResolver.sol",
+        "contracts/interfaces/IASResolver.sol"
+      ],
+      "versionRequirement": ">=0.8.0, <0.9.0",
+      "artifacts": {
+        "TestASDataResolver": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "TestASDataResolver.sol/TestASDataResolver.json"
+        }
+      }
+    },
+    "tests/resolvers/TestASExpirationTimeResolver.sol": {
+      "lastModificationDate": 1676054798437,
+      "contentHash": "49fdadb3c9258192d6a1409cb397a974",
+      "sourceName": "tests/resolvers/TestASExpirationTimeResolver.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "contracts/EAS/TellerASResolver.sol",
+        "contracts/interfaces/IASResolver.sol"
+      ],
+      "versionRequirement": ">=0.8.0, <0.9.0",
+      "artifacts": {
+        "TestASExpirationTimeResolver": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "TestASExpirationTimeResolver.sol/TestASExpirationTimeResolver.json"
+        }
+      }
+    },
+    "tests/resolvers/TestASPayingResolver.sol": {
+      "lastModificationDate": 1676054800305,
+      "contentHash": "f11da695226b017ebc005d058949d94f",
+      "sourceName": "tests/resolvers/TestASPayingResolver.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "contracts/EAS/TellerASResolver.sol",
+        "contracts/interfaces/IASResolver.sol"
+      ],
+      "versionRequirement": ">=0.8.0, <0.9.0",
+      "artifacts": {
+        "TestASPayingResolver": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "TestASPayingResolver.sol/TestASPayingResolver.json"
+        }
+      }
+    },
+    "tests/resolvers/TestASRecipientResolver.sol": {
+      "lastModificationDate": 1676054802261,
+      "contentHash": "dc2d91d5a342f52aa1b0befb2c8fdb32",
+      "sourceName": "tests/resolvers/TestASRecipientResolver.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "contracts/EAS/TellerASResolver.sol",
+        "contracts/interfaces/IASResolver.sol"
+      ],
+      "versionRequirement": ">=0.8.0, <0.9.0",
+      "artifacts": {
+        "TestASRecipientResolver": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "TestASRecipientResolver.sol/TestASRecipientResolver.json"
+        }
+      }
+    },
+    "tests/resolvers/TestASTokenResolver.sol": {
+      "lastModificationDate": 1676054805324,
+      "contentHash": "a0ca05c32bcc66e5a70a30e1c439f181",
+      "sourceName": "tests/resolvers/TestASTokenResolver.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "contracts/EAS/TellerASResolver.sol",
+        "contracts/interfaces/IASResolver.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/extensions/draft-IERC20Permit.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol",
+        "node_modules/@openzeppelin/contracts/utils/Address.sol"
+      ],
+      "versionRequirement": ">=0.8.0, <0.9.0",
+      "artifacts": {
+        "TestASTokenResolver": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "TestASTokenResolver.sol/TestASTokenResolver.json"
+        }
+      }
+    },
+    "tests/resolvers/TestASValueResolver.sol": {
+      "lastModificationDate": 1676054807400,
+      "contentHash": "0c8f5ad0e559aea322f69dba3860675a",
+      "sourceName": "tests/resolvers/TestASValueResolver.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "contracts/EAS/TellerASResolver.sol",
+        "contracts/interfaces/IASResolver.sol"
+      ],
+      "versionRequirement": ">=0.8.0, <0.9.0",
+      "artifacts": {
+        "TestASValueResolver": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "TestASValueResolver.sol/TestASValueResolver.json"
+        }
+      }
+    },
+    "tests/resolvers/TestERC20Token.sol": {
+      "lastModificationDate": 1676054809124,
+      "contentHash": "9c805d86c059fe3c977380b168b78b42",
+      "sourceName": "tests/resolvers/TestERC20Token.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol",
+        "node_modules/@openzeppelin/contracts/utils/Context.sol"
+      ],
+      "versionRequirement": ">=0.8.0, <0.9.0",
+      "artifacts": {
+        "TestERC20Token": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "TestERC20Token.sol/TestERC20Token.json"
         }
       }
     }

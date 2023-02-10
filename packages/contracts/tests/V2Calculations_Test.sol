@@ -8,9 +8,9 @@ import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
  
 
 import "./Testable.sol";
-import "../TellerV2.sol";
-import { Bid } from "../TellerV2Storage.sol";
-import { PaymentType } from "../libraries/V2Calculations.sol";
+import "../contracts/TellerV2.sol";
+import { Bid } from "../contracts/TellerV2Storage.sol";
+import { PaymentType } from "../contracts/libraries/V2Calculations.sol";
 
 contract V2Calculations_Test is Testable {
     using Arrays for uint256[];

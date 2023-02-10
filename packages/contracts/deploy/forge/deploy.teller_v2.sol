@@ -41,7 +41,7 @@ contract DeployTellerV2 is Script {
         collateralManager = new CollateralManager();
         collateralManager.initialize(address(collateralEscrowBeacon),address(tellerV2));
         
-        address[] memory lendingTokens = _getTokens();
+        address[] memory lendingTokens = new address[](16);
 
         tellerV2.initialize(
           protocolFee,
@@ -56,7 +56,7 @@ contract DeployTellerV2 is Script {
     }
 
 
-    function _getTokens() public view returns (address[] memory){
+ /*   function _getTokens() public view returns (address[] memory){
       //if chainId == 1 
 
       address[] memory tokens = new address[](16);
@@ -72,6 +72,6 @@ contract DeployTellerV2 is Script {
 
       return tokens;
 
-    }
+    }*/
 
 }

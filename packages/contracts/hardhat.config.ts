@@ -157,7 +157,7 @@ export default <HardhatUserConfig>{
 
   paths: {
     cache: './generated/cache',
-    artifacts: './generated/artifacts',
+    artifacts: './generated/artifacts'  
   },
 
   typechain: {

@@ -3,28 +3,28 @@ pragma solidity ^0.8.0;
 
 import { Testable } from "./Testable.sol";
 
-import { TellerV2Autopay } from "../TellerV2Autopay.sol";
-import { MarketRegistry } from "../MarketRegistry.sol";
-import { ReputationManager } from "../ReputationManager.sol";
+import { TellerV2Autopay } from "../contracts/TellerV2Autopay.sol";
+import { MarketRegistry } from "../contracts/MarketRegistry.sol";
+import { ReputationManager } from "../contracts/ReputationManager.sol";
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
-import "../TellerV2Storage.sol";
+import "../contracts/TellerV2Storage.sol";
 
-import "../interfaces/IMarketRegistry.sol";
-import "../interfaces/IReputationManager.sol";
+import "../contracts/interfaces/IMarketRegistry.sol";
+import "../contracts/interfaces/IReputationManager.sol";
 
-import "../EAS/TellerAS.sol";
+import "../contracts/EAS/TellerAS.sol";
 
-import "../mock/WethMock.sol";
+import "../contracts/mock/WethMock.sol";
 
-import "../mock/TellerV2SolMock.sol";
-import "../mock/MarketRegistryMock.sol";
-import "../interfaces/IWETH.sol";
-import "../interfaces/ITellerV2Autopay.sol";
+import "../contracts/mock/TellerV2SolMock.sol";
+import "../contracts/mock/MarketRegistryMock.sol";
+import "../contracts/interfaces/IWETH.sol";
+import "../contracts/interfaces/ITellerV2Autopay.sol";
 
  
-import { PaymentType } from "../libraries/V2Calculations.sol";
+import { PaymentType } from "../contracts/libraries/V2Calculations.sol";
 
 contract TellerV2Autopay_Test is Testable, TellerV2Autopay {
     User private marketOwner;

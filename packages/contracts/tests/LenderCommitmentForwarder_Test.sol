@@ -3,9 +3,9 @@ pragma solidity ^0.8.0;
  
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "../TellerV2MarketForwarder.sol";
+import "../contracts/TellerV2MarketForwarder.sol";
 import { Testable } from "./Testable.sol";
-import { LenderCommitmentForwarder } from "../LenderCommitmentForwarder.sol";
+import { LenderCommitmentForwarder } from "../contracts/LenderCommitmentForwarder.sol";
 
 contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
     LenderCommitmentTester private tester;

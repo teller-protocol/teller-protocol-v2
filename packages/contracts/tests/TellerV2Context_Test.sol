@@ -6,10 +6,10 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 import { Testable } from "./Testable.sol";
-import { TellerV2Context } from "../TellerV2Context.sol";
-import { IMarketRegistry } from "../interfaces/IMarketRegistry.sol";
-import { TellerV2MarketForwarder } from "../TellerV2MarketForwarder.sol";
-import { LenderCommitmentForwarder } from "../LenderCommitmentForwarder.sol";
+import { TellerV2Context } from "../contracts/TellerV2Context.sol";
+import { IMarketRegistry } from "../contracts/interfaces/IMarketRegistry.sol";
+import { TellerV2MarketForwarder } from "../contracts/TellerV2MarketForwarder.sol";
+import { LenderCommitmentForwarder } from "../contracts/LenderCommitmentForwarder.sol";
 
 contract TellerV2Context_Test is Testable, TellerV2Context {
     uint256 private marketId;

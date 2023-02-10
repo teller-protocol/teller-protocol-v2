@@ -5,7 +5,7 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/utils/math/SafeCast.sol";
 
 import "./Testable.sol";
-import "../TellerV2.sol";
+import "../contracts/TellerV2.sol";
 
 contract PMT_Test is Testable, TellerV2 {
     Bid __bid;

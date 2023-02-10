@@ -92,9 +92,6 @@ const deployFn: DeployFunction = async (hre) => {
   const tellerV2IsInitialized = await isInitialized(tellerV2Contract.address)
   if (!tellerV2IsInitialized) {
     const lenderManager = await hre.contracts.get('LenderManager')
-    if (lenderManager.owner() !== tellerV2Contract.address) {
-      await lenderManager.transferOwnership(tellerV2Contract.address)
-    }
     await tellerV2Contract.initialize(
       protocolFee,
       marketRegistry.address,

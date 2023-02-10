@@ -200,7 +200,7 @@ contract TellerV2 is
     }
 
     function setCollateralManager(address _collateralManager)
-        public
+        external
         reinitializer(CURRENT_CODE_VERSION)
         onlyOwner
     {
@@ -223,7 +223,7 @@ contract TellerV2 is
     }
 
     function setLenderManager(address _lenderManager)
-        public
+        external
         reinitializer(CURRENT_CODE_VERSION)
         onlyOwner
     {

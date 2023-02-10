@@ -35,7 +35,7 @@ contract V2Calculations_Test is Testable {
     }
 
     // EMI loan
-    function _01_calculateAmountOwed_test() public {
+    function test_01_calculateAmountOwed() public {
         cyclesToSkip.add(2);
         cyclesWithExtraPayments = [3, 4];
         cyclesWithExtraPaymentsAmounts = [25000e6, 25000e6];
@@ -44,7 +44,7 @@ contract V2Calculations_Test is Testable {
     }
 
     // EMI loan
-    function _02_calculateAmountOwed_test() public {
+    function test_02_calculateAmountOwed() public {
         cyclesToSkip.add(3);
         cyclesToSkip.add(4);
         cyclesToSkip.add(5);
@@ -53,7 +53,7 @@ contract V2Calculations_Test is Testable {
     }
 
     // EMI loan
-    function _03_calculateAmountOwed_test() public {
+    function test_03_calculateAmountOwed() public {
         cyclesWithExtraPayments = [3, 7];
         cyclesWithExtraPaymentsAmounts = [35000e6, 20000e6];
 
@@ -61,13 +61,13 @@ contract V2Calculations_Test is Testable {
     }
 
     // Bullet loan
-    function _04_calculateAmountOwed_test() public {
+    function test_04_calculateAmountOwed() public {
         cyclesToSkip.add(6);
         calculateAmountOwed_runner(36, PaymentType.Bullet);
     }
 
     // Bullet loan
-    function _05_calculateAmountOwed_test() public {
+    function test_05_calculateAmountOwed() public {
         cyclesToSkip.add(12);
         cyclesWithExtraPayments = [1, 8];
         cyclesWithExtraPaymentsAmounts = [15000e6, 10000e6];
@@ -163,7 +163,7 @@ contract V2Calculations_Test is Testable {
         );
     }
 
-    function calculateAmountOwed_test() public {
+    function test_calculateAmountOwed() public {
         uint256 principal = 24486571879936808846;
         uint256 repaidPrincipal = 23410087846643631232;
         uint16 interestRate = 3000;
@@ -198,7 +198,7 @@ contract V2Calculations_Test is Testable {
         );
     }
 
-    function calculateBulletAmountOwed_test() public {
+    function test_calculateBulletAmountOwed() public {
         uint256 _principal = 100000e6;
         uint256 _repaidPrincipal = 0;
         uint16 _apr = 3000;

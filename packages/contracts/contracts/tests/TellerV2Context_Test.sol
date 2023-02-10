@@ -21,7 +21,7 @@ contract TellerV2Context_Test is Testable, TellerV2Context {
 
     constructor() TellerV2Context(address(0)) {}
 
-    function setup_beforeAll() public {
+    function setUp() public {
         marketOwner = new User(TellerV2Context(this));
 
         marketRegistry = IMarketRegistry(
@@ -35,7 +35,7 @@ contract TellerV2Context_Test is Testable, TellerV2Context {
         );
     }
 
-    function isTrustedMarketForwarder_test() public returns (bool) {
+    function test_isTrustedMarketForwarder() public returns (bool) {
         assertEq(
             super.isTrustedMarketForwarder(89, lenderCommitmentForwarder),
             true,

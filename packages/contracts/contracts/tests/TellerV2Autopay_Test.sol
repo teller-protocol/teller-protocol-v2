@@ -41,7 +41,7 @@ contract TellerV2Autopay_Test is Testable, TellerV2Autopay {
         TellerV2SolMock(address(tellerV2)).setMarketRegistry(marketRegistry);
     }
 
-    function setup_beforeAll() public {
+    function setUp() public {
         wethMock = new WethMock();
 
         marketOwner = new User(
@@ -90,7 +90,11 @@ contract TellerV2Autopay_Test is Testable, TellerV2Autopay {
         );
     }
 
-    function setAutoPayEnabled_test() public {
+    function test_setAutoPayEnabled() public {
+
+        setAutoPayEnabled_before();
+
+
         uint256 bidId = 0;
 
         borrower.enableAutoPay(bidId, true);
@@ -164,7 +168,10 @@ contract TellerV2Autopay_Test is Testable, TellerV2Autopay {
         borrower.approveWeth(address(this), borrowerNewBalance);
     }
 
-    function autoPayLoanMinimum_test() public {
+    function test_autoPayLoanMinimum() public {
+
+        autoPayLoanMinimum_before();
+
         uint256 bidId = 0;
 
         uint256 lenderBalanceBefore = ERC20(address(wethMock)).balanceOf(

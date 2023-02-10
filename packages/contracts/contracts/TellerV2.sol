@@ -497,6 +497,15 @@ contract TellerV2 is
         Bid storage bid = bids[_bidId];
 
         address sender = _msgSenderForMarket(bid.marketplaceId);
+        
+
+         (bool isVerified, ) = marketRegistry.isVerifiedLender(
+            bid.marketplaceId,
+            sender
+        );
+        require(isVerified, "Not verified lender");
+
+
 
         require(
             !marketRegistry.isMarketClosed(bid.marketplaceId),

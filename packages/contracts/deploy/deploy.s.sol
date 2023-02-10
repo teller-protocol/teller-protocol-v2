@@ -4,6 +4,10 @@ pragma solidity >=0.8.0 <0.9.0;
 See examples 
 https://github.com/maple-labs/maple-core-v2/tree/main/scripts
 
+TO DEPLOY:
+
+yarn anvil (in other terminal)
+yarn deploy 
 
 */
 

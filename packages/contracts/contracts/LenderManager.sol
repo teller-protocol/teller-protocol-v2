@@ -22,10 +22,8 @@ contract LenderManager is
 {
     IMarketRegistry public immutable marketRegistry;
 
-    constructor(address _marketRegistry)
-    //ERC2771ContextUpgradeable(_trustedForwarder)
-    {
-        marketRegistry = IMarketRegistry(_marketRegistry);
+    constructor(IMarketRegistry _marketRegistry) {
+        marketRegistry = _marketRegistry;
     }
 
     function initialize() external initializer {

@@ -14,7 +14,6 @@
     "migrate:new:upgrade": "scripts/contract-migration/create-new.sh upgrade",
     "migrate": "yarn hh deploy --tags migration",
     "anvil": "anvil",
-
     "deploy": "yarn hh deploy",
     "export": "yarn hh export:deployments",
     "accounts": "yarn hh accounts",

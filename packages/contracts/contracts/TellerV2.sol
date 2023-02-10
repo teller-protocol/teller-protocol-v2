@@ -578,7 +578,7 @@ contract TellerV2 is
 				require(sender == bid.lender, "only lender can claim NFT");
         // mint an NFT with the lender manager
         lenderManager.registerLoan(_bidId, sender);
-
+				// set lender address to the lender manager so we know to check the owner of the NFT for the true lender
         bid.lender = address(lenderManager);
     }
 

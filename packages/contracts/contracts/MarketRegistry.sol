@@ -230,21 +230,19 @@ contract MarketRegistry is
         // Set the market owner
         markets[marketId_].owner = _initialOwner;
 
-        setMarketURI(marketId_, _uri);
-
-        setPaymentDefaultDuration(marketId_, _paymentDefaultDuration);
-        setMarketFeePercent(marketId_, _feePercent);
-        setBidExpirationTime(marketId_, _bidExpirationTime);
-        _setMarketPaymentTypeAndCycle(marketId_, _paymentType, _paymentCycleType, _paymentCycleDuration);
-
-        // Check if market requires lender attestation to join
-        if (_requireLenderAttestation) {
-            markets[marketId_].lenderAttestationRequired = true;
-        }
-        // Check if market requires borrower attestation to join
-        if (_requireBorrowerAttestation) {
-            markets[marketId_].borrowerAttestationRequired = true;
-        }
+        // Initialize market settings
+        _setMarketSettings(
+            marketId_,
+            _paymentCycleDuration,
+            _paymentType,
+            _paymentCycleType,
+            _paymentDefaultDuration,
+            _bidExpirationTime,
+            _feePercent,
+            _requireBorrowerAttestation,
+            _requireLenderAttestation,
+            _uri
+        );
 
         emit MarketCreated(_initialOwner, marketId_);
     }
@@ -505,14 +503,18 @@ contract MarketRegistry is
         bool _lenderAttestationRequired,
         string calldata _metadataURI
     ) public ownsMarket(_marketId) {
-        setMarketURI(_marketId, _metadataURI);
-
-        setPaymentDefaultDuration(_marketId, _paymentDefaultDuration);
-        setBidExpirationTime(_marketId, _bidExpirationTime);
-        setMarketFeePercent(_marketId, _feePercent);
-        setLenderAttestationRequired(_marketId, _lenderAttestationRequired);
-        setBorrowerAttestationRequired(_marketId, _borrowerAttestationRequired);
-        _setMarketPaymentTypeAndCycle(_marketId, _newPaymentType, _paymentCycleType, _paymentCycleDuration);
+        _setMarketSettings(
+            _marketId,
+            _paymentCycleDuration,
+            _newPaymentType,
+            _paymentCycleType,
+            _paymentDefaultDuration,
+            _bidExpirationTime,
+            _feePercent,
+            _borrowerAttestationRequired,
+            _lenderAttestationRequired,
+            _metadataURI
+        );
     }
 
     /**
@@ -919,20 +921,35 @@ contract MarketRegistry is
     }
 
     /**
-     * @notice Sets the duration and type for new loans for this market.
+     * @notice Sets multiple market settings for a given market.
      * @param _marketId The ID of a market.
-     * @param _paymentCycleType Cycle type (seconds or monthly)
-     * @param _duration Delinquency duration for new loans
+     * @param _paymentCycleDuration Delinquency duration for new loans
+     * @param _newPaymentType The payment type for the market.
+     * @param _paymentCycleType The payment cycle type for loans in the market - Seconds or Monthly
+     * @param _paymentDefaultDuration Default duration for new loans
+     * @param _bidExpirationTime Duration of time before a bid is considered out of date
+     * @param _metadataURI A URI that points to a market's metadata.
      */
-
-    function _setMarketPaymentTypeAndCycle(
+    function _setMarketSettings(
         uint256 _marketId,
+        uint32 _paymentCycleDuration,
         PaymentType _newPaymentType,
         PaymentCycleType _paymentCycleType,
-        uint32 _duration
+        uint32 _paymentDefaultDuration,
+        uint32 _bidExpirationTime,
+        uint16 _feePercent,
+        bool _borrowerAttestationRequired,
+        bool _lenderAttestationRequired,
+        string calldata _metadataURI
     ) internal {
+        setMarketURI(_marketId, _metadataURI);
+        setPaymentDefaultDuration(_marketId, _paymentDefaultDuration);
+        setBidExpirationTime(_marketId, _bidExpirationTime);
+        setMarketFeePercent(_marketId, _feePercent);
+        setLenderAttestationRequired(_marketId, _lenderAttestationRequired);
+        setBorrowerAttestationRequired(_marketId, _borrowerAttestationRequired);
         setMarketPaymentType(_marketId, _newPaymentType);
-        setPaymentCycle(_marketId, _paymentCycleType, _duration);
+        setPaymentCycle(_marketId, _paymentCycleType, _paymentCycleDuration);
     }
 
     /**

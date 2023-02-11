@@ -54,12 +54,17 @@ contract MarketRegistry_Test is Testable, TellerV2 {
             PaymentCycleType.Seconds,
             "uri://"
         );
-        ( ,PaymentCycleType paymentCycle) = marketRegistry
+        (uint32 paymentCycleDuration ,PaymentCycleType paymentCycle) = marketRegistry
             .getPaymentCycle(1);
 
         require(
             paymentCycle == PaymentCycleType.Seconds,
             "Market payment cycle type incorrectly created"
+        );
+
+        require(
+            paymentCycleDuration == 8000,
+            "Market payment cycle duration set incorrectly"
         );
 
         // Monthly payment cycle
@@ -75,12 +80,40 @@ contract MarketRegistry_Test is Testable, TellerV2 {
             PaymentCycleType.Monthly,
             "uri://"
         );
-        (, paymentCycle) = marketRegistry.getPaymentCycle(2);
+        (paymentCycleDuration, paymentCycle) = marketRegistry.getPaymentCycle(2);
 
         require(
             paymentCycle == PaymentCycleType.Monthly,
-            "Market payment cycle type incorrectly created"
+            "Monthly market payment cycle type incorrectly created"
         );
+
+        require(
+            paymentCycleDuration == 30 days,
+            "Monthly market payment cycle duration set incorrectly"
+        );
+
+
+        // Monthly payment cycle should fail
+        bool createFailed;
+        try marketOwner.createMarket(
+            address(marketRegistry),
+            3000,
+            7000,
+            5000,
+            500,
+            false,
+            false,
+            PaymentType.EMI,
+            PaymentCycleType.Monthly,
+            "uri://"
+        ) {} catch {
+            createFailed = true;
+        }
+        require(
+            createFailed,
+            "Monthly market should not have been created"
+        );
+
     }
 }
 

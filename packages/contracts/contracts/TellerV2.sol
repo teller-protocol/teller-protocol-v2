@@ -152,7 +152,7 @@ contract TellerV2 is
 
     /** Constant Variables **/
 
-    uint8 public constant CURRENT_CODE_VERSION = 7;
+    uint8 public constant CURRENT_CODE_VERSION = 8;
 
     /** Constructor **/
 

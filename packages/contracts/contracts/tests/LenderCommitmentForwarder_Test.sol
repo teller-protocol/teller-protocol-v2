@@ -122,13 +122,43 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         );
     }
 
+
+     function deleteCommitment_before() public {
+        uint256 commitmentId = lender._createCommitment(
+            marketId,
+            tokenAddress,
+            maxAmount,
+            collateralTokenAddress,
+            maxPrincipalPerCollateralAmount,
+            collateralTokenType,
+            maxLoanDuration,
+            minInterestRate,
+            expiration,
+            address(0)
+        );
+ 
+    }
+
     function deleteCommitment_test() public {
-        //make sure the commitment exists
-        //Test.eq( ,  ,"" );
-        //        super.deleteCommitment(tokenAddress, marketId);
-        //        Commitment memory existingCommitment = lenderMarketCommitments[address(this)][marketId][tokenAddress];
-        //make sure the commitment has been removed
-        //Test.eq( ,  ,"" );
+
+         uint256 commitmentId = 0;
+
+        
+        Test.eq(
+            lenderMarketCommitments[commitmentId].lender,
+            address(lender), 
+            "Not the owner of created commitment"
+        );
+
+        lender._deleteCommitment(commitmentId);
+
+        
+        Test.eq(
+            lenderMarketCommitments[commitmentId].lender,
+            address(0),
+            "The commitment was not deleted"
+        );
+       
     }
 
     function acceptCommitment_before() public {
@@ -352,6 +382,13 @@ contract User {
                 loanDuration,
                 interestRate
             );
+    }
+
+    function _deleteCommitment(
+        uint256 _commitmentId
+    ) public {
+        commitmentForwarder.deleteCommitment(_commitmentId);
+                
     }
 }
 

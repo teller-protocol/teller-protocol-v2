@@ -303,7 +303,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
                 collateralInfo._collateralAddress,
                 collateralInfo._amount
             );
-        } else if (collateralInfo._collateralType == CollateralType.ERC721) {
+        } else if (collateralInfo._collateralType == CollateralType.ERC721_SPECIFIC) {
             IERC721Upgradeable(collateralInfo._collateralAddress).transferFrom(
                 borrower,
                 address(this),
@@ -314,7 +314,23 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
                 collateralInfo._tokenId
             );
             collateralEscrow.depositAsset(
-                CollateralType.ERC721,
+                CollateralType.ERC721_SPECIFIC,
+                collateralInfo._collateralAddress,
+                collateralInfo._amount,
+                collateralInfo._tokenId
+            );
+        } else if (collateralInfo._collateralType == CollateralType.ERC721_ANY) {
+            IERC721Upgradeable(collateralInfo._collateralAddress).transferFrom(
+                borrower,
+                address(this),
+                collateralInfo._tokenId
+            );
+            IERC721Upgradeable(collateralInfo._collateralAddress).approve(
+                escrowAddress,
+                collateralInfo._tokenId
+            );
+            collateralEscrow.depositAsset(
+                CollateralType.ERC721_ANY,
                 collateralInfo._collateralAddress,
                 collateralInfo._amount,
                 collateralInfo._tokenId
@@ -448,12 +464,17 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
                     _borrowerAddress
                 );
         }
-        if (collateralType == CollateralType.ERC721) {
+        if (collateralType == CollateralType.ERC721_SPECIFIC) {
             return
                 _borrowerAddress ==
                 IERC721Upgradeable(_collateralInfo._collateralAddress).ownerOf(
                     _collateralInfo._tokenId
                 );
+        }
+         if (collateralType == CollateralType.ERC721_ANY) {
+            return IERC721Upgradeable(_collateralInfo._collateralAddress).balanceOf(
+                    _borrowerAddress
+                ) > 0;
         }
         if (collateralType == CollateralType.ERC1155) {
             return

@@ -3,8 +3,9 @@ pragma solidity >=0.8.0 <0.9.0;
 
 enum CollateralType {
     ERC20,
-    ERC721,
-    ERC1155
+    ERC721_SPECIFIC,
+    ERC1155,
+    ERC721_ANY,
 }
 
 struct Collateral {

@@ -21,7 +21,7 @@ const deployFn: DeployFunction = async (hre) => {
   const trustedForwarder = await hre.contracts.get('MetaForwarder')
  
 
-  console.log('about to deploy tellerV2')
+  console.log('about to deploy tellerV2 ',trustedForwarder.address)
 
   
   const tellerV2Contract = await deploy({
@@ -95,9 +95,7 @@ const deployFn: DeployFunction = async (hre) => {
     },
     hre,
   })
-
-  console.log('test1')
-
+ 
   const tellerV2IsInitialized = await isInitialized(tellerV2Contract.address)
   if (!tellerV2IsInitialized) {
     console.log('initialize tellerV2')
@@ -111,9 +109,7 @@ const deployFn: DeployFunction = async (hre) => {
       collateralManager.address,
       lenderManager.address
     )
-  }
-
-  console.log('test2')
+  } 
   
   let lenderManagerAddress
   
@@ -122,18 +118,14 @@ const deployFn: DeployFunction = async (hre) => {
   }catch(e){}
   
   if(!lenderManagerAddress || lenderManagerAddress == ethers.constants.AddressZero){
-
     const lenderManager = await hre.contracts.get('LenderManager')
     
- 
     console.log('running onUpgrade for tellerV2 ',lenderManager.address) 
 
     await tellerV2Contract.onUpgrade(lenderManager.address); 
   
   }
- 
- 
-  console.log('test3')
+  
 }
 
 // tags and deployment

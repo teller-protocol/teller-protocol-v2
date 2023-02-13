@@ -102,6 +102,8 @@ const networkUrls: { [network: string]: string } = {
   tenderly: process.env.TENDERLY_RPC_URL ?? '',
 }
 
+console.log('rpc url',process.env.GOERLI_RPC_URL)
+
 const getLatestDeploymentBlock = (networkName: string): number | undefined => {
   try {
     return parseInt(
@@ -211,7 +213,7 @@ export default <HardhatUserConfig>{
 
   namedAccounts: {
     deployer: {
-      default: 0, // here this will by default take the first account as deployer
+      default: '0xAFe87013dc96edE1E116a288D80FcaA0eFFE5fe5', // here this will by default take the first account as deployer
     },
     borrower: 1,
     lender: 2,

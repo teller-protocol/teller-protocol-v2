@@ -213,7 +213,8 @@ export default <HardhatUserConfig>{
 
   namedAccounts: {
     deployer: {
-      default: '0xAFe87013dc96edE1E116a288D80FcaA0eFFE5fe5', // here this will by default take the first account as deployer
+      default: 0, // here this will by default take the first account as deployer
+      31337: '0xAFe87013dc96edE1E116a288D80FcaA0eFFE5fe5' //use the goerli deployer address for hardhat forking
     },
     borrower: 1,
     lender: 2,

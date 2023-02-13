@@ -1,3 +1,4 @@
+import { ethers } from 'hardhat'
 import { DeployFunction } from 'hardhat-deploy/dist/types'
 import { deploy } from 'helpers/deploy-helpers'
 import { migrate } from 'helpers/migration-helpers'
@@ -23,6 +24,14 @@ const deployFn: DeployFunction = migrate(
       `lenderCommitmentForwarder (current): ${await tellerV2.lenderCommitmentForwarder()}`,
       { indent: 1, star: true }
     )
+
+
+
+    const lenderCommitmentForwarderSet = await tellerV2.lenderCommitmentForwarder()
+
+    if(lenderCommitmentForwarderSet != ethers.constants.AddressZero){
+      return 
+    }
 
     await deploy({
       name: 'TellerV2',

@@ -199,14 +199,14 @@ contract TellerV2 is
         }
     }
 
-    function setCollateralManager(address _collateralManager)
+    function onUpgrade(address _lenderManager)
         external
         reinitializer(CURRENT_CODE_VERSION)
         onlyOwner
     {
-        _setCollateralManager(_collateralManager);
+        _setLenderManager(_lenderManager);
     }
-
+ 
     function _setCollateralManager(address _collateralManager)
         internal
         onlyInitializing
@@ -222,13 +222,6 @@ contract TellerV2 is
         collateralManager = ICollateralManager(_collateralManager);
     }
 
-    function setLenderManager(address _lenderManager)
-        external
-        reinitializer(CURRENT_CODE_VERSION)
-        onlyOwner
-    {
-        _setLenderManager(_lenderManager);
-    }
 
     function _setLenderManager(address _lenderManager)
         internal

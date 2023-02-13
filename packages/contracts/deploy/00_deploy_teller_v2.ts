@@ -102,6 +102,13 @@ const deployFn: DeployFunction = async (hre) => {
       lenderManager.address
     )
   }
+
+
+  const lenderManager = await hre.contracts.get('LenderManager')
+  await tellerV2Contract.onUpgrade(lenderManager.address);
+
+
+ 
 }
 
 // tags and deployment

@@ -176,7 +176,7 @@ export default <HardhatUserConfig>{
         version: '0.8.9',
         settings: {
           optimizer: {
-            enabled: true,
+            enabled: !isTesting,
             runs: 200,
           },
         },

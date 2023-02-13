@@ -13,7 +13,7 @@ import { User } from "./Test_Helpers.sol";
 import "../mock/MarketRegistryMock.sol";
 
 contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
-    TellerV2Mock private tellerV2Mock;
+    LenderCommitmentForwarderTest_TellerV2Mock private tellerV2Mock;
     MarketRegistryMock mockMarketRegistry;
 
     LenderCommitmentUser private marketOwner;
@@ -32,13 +32,13 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
 
     constructor()
         LenderCommitmentForwarder(
-            address(new TellerV2Mock()), ///_protocolAddress
+            address(new LenderCommitmentForwarderTest_TellerV2Mock()), ///_protocolAddress
             address(new MarketRegistryMock(address(0)))
         )
     {}
 
     function setup_beforeAll() public {
-        tellerV2Mock = TellerV2Mock(address(getTellerV2()));
+        tellerV2Mock = LenderCommitmentForwarderTest_TellerV2Mock(address(getTellerV2()));
         mockMarketRegistry = MarketRegistryMock(address(getMarketRegistry()));
 
         marketOwner = new LenderCommitmentUser(address(tellerV2Mock), (this));
@@ -234,7 +234,7 @@ contract LenderCommitmentUser is User {
 }
 
 //Move to a helper file !
-contract TellerV2Mock is TellerV2Context {
+contract LenderCommitmentForwarderTest_TellerV2Mock is TellerV2Context {
     constructor() TellerV2Context(address(0)) {}
 
     function __setMarketOwner(User _marketOwner) external {

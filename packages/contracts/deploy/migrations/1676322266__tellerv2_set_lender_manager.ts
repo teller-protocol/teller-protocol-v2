@@ -1,0 +1,32 @@
+import { ethers } from 'hardhat'
+import { DeployFunction } from 'hardhat-deploy/dist/types'
+import { migrate } from 'helpers/migration-helpers'
+import { TellerV2 } from 'types/typechain'
+
+const deployFn: DeployFunction = migrate(
+  __filename, // DO NOT CHANGE THIS LINE - it is used to determine the migration id
+  async (hre) => {
+    const tellerV2 = await hre.contracts.get<TellerV2>('TellerV2')
+
+    let lenderManagerAddress
+    try {
+      lenderManagerAddress = await tellerV2.lenderManager()
+    } catch (e) {}
+
+    if (
+      !lenderManagerAddress ||
+      lenderManagerAddress === ethers.constants.AddressZero
+    ) {
+      const lenderManager = await hre.contracts.get('LenderManager')
+      await tellerV2.onUpgrade(lenderManager.address)
+    }
+  }
+)
+
+/**
+ * List of deployment function tags. Listing a tag here means the migration script will not run
+ * until the tag(s) specified are ran.
+ */
+deployFn.dependencies = ['TellerV2']
+
+export default deployFn

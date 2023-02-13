@@ -20,8 +20,6 @@ const deployFn: DeployFunction = async (hre) => {
 
   const trustedForwarder = await hre.contracts.get('MetaForwarder')
 
-  console.log('about to deploy tellerV2 ', trustedForwarder.address)
-
   const tellerV2Contract = await deploy({
     contract: 'TellerV2',
     args: [trustedForwarder.address],
@@ -50,7 +48,6 @@ const deployFn: DeployFunction = async (hre) => {
   // Execute the initialize method of reputation manager
   const reputationIsInitialized = await isInitialized(reputationManager.address)
   if (!reputationIsInitialized) {
-    console.log('initializing repuration manager')
     await reputationManager.initialize(tellerV2Contract.address)
   }
 
@@ -95,7 +92,6 @@ const deployFn: DeployFunction = async (hre) => {
 
   const tellerV2IsInitialized = await isInitialized(tellerV2Contract.address)
   if (!tellerV2IsInitialized) {
-    console.log('initialize tellerV2')
     const lenderManager = await hre.contracts.get('LenderManager')
     await tellerV2Contract.initialize(
       protocolFee,
@@ -106,23 +102,6 @@ const deployFn: DeployFunction = async (hre) => {
       collateralManager.address,
       lenderManager.address
     )
-  }
-
-  let lenderManagerAddress
-
-  try {
-    lenderManagerAddress = await tellerV2Contract.lenderManager()
-  } catch (e) {}
-
-  if (
-    !lenderManagerAddress ||
-    lenderManagerAddress == ethers.constants.AddressZero
-  ) {
-    const lenderManager = await hre.contracts.get('LenderManager')
-
-    console.log('running onUpgrade for tellerV2 ', lenderManager.address)
-
-    await tellerV2Contract.onUpgrade(lenderManager.address)
   }
 }
 

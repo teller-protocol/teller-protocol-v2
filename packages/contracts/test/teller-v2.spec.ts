@@ -8,6 +8,7 @@ import { isInitialized } from 'helpers/oz-contract-helpers'
 import moment from 'moment'
 import {
   CollateralManager,
+  LenderManager,
   MarketRegistry,
   ReputationManager,
   TellerV2,
@@ -47,6 +48,7 @@ interface SetupReturn {
   marketRegistry: MarketRegistry
   tellerV2: TellerV2Mock
   reputationManager: ReputationManager
+  lenderManager: LenderManager
 }
 
 const setup = deployments.createFixture<SetupReturn, SetupOptions>(
@@ -64,10 +66,15 @@ const setup = deployments.createFixture<SetupReturn, SetupOptions>(
       'ReputationManager'
     )
 
+    const lenderManager = await hre.contracts.get<LenderManager>(
+      'LenderManager'
+    )
+
     return {
       tellerV2,
       marketRegistry,
       reputationManager,
+      lenderManager,
     }
   }
 )
@@ -79,12 +86,14 @@ describe('TellerV2', () => {
   let borrower: Signer
   let lender: Signer
   let marketOwner: Signer
+  let lenderManager: LenderManager
 
   beforeEach(async () => {
     const result = await setup()
     tellerV2 = result.tellerV2
     marketRegistry = result.marketRegistry
     reputationManager = result.reputationManager
+    lenderManager = result.lenderManager
     borrower = await getNamedSigner('borrower')
     lender = await getNamedSigner('lender')
     marketOwner = await getNamedSigner('marketowner')
@@ -127,6 +136,7 @@ describe('TellerV2', () => {
           reputationManager.address,
           AddressZero,
           [(await getTokens(hre)).all.DAI],
+          AddressZero,
           AddressZero
         )
         .should.be.revertedWith(
@@ -362,7 +372,7 @@ describe('TellerV2', () => {
         .emit(tellerV2, 'AcceptedBid')
         .withArgs(bidId, lender.address)
 
-      const stakeholder = await tellerV2.getLoanLender(bidId)
+      const stakeholder = await lenderManager.ownerOf(bidId)
       stakeholder.should.be.eql(lender.address)
     })
 
@@ -433,7 +443,7 @@ describe('TellerV2', () => {
       await tellerV2.mockBid(
         buildBid({
           borrower: await borrower.getAddress(),
-          lender: await lender.getAddress(),
+          lender: NULL_ADDRESS,
           receiver: await borrower.getAddress(),
           loanDetails: {
             lendingToken: token.address,
@@ -787,7 +797,7 @@ export const buildBid = (values: PartialNested<BidParams>): BidParams =>
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   <BidParams>{
     borrower: NULL_ADDRESS,
-    lender: NULL_ADDRESS,
+    _lender: NULL_ADDRESS,
     receiver: NULL_ADDRESS,
     _metadataURI: ethers.utils.id(''),
     marketplaceId: 1,
@@ -822,10 +832,12 @@ export const buildBid = (values: PartialNested<BidParams>): BidParams =>
 
 describe('TellerV2', () => {
   let tellerV2: TellerV2Mock
+  let lender: Signer
 
   beforeEach(async () => {
     const result = await setup()
     tellerV2 = result.tellerV2
+    lender = await getNamedSigner('lender')
   })
 
   describe('calculateAmountOwed', () => {

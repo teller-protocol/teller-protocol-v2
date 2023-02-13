@@ -80,7 +80,11 @@ contract MarketRegistry is
     event MarketCreated(address indexed owner, uint256 marketId);
     event SetMarketURI(uint256 marketId, string uri);
     event SetPaymentCycleDuration(uint256 marketId, uint32 duration); // DEPRECATED - used for subgraph reference
-    event SetPaymentCycle(uint256 marketId, PaymentCycleType paymentCycleType, uint32 value);
+    event SetPaymentCycle(
+        uint256 marketId,
+        PaymentCycleType paymentCycleType,
+        uint32 value
+    );
     event SetPaymentDefaultDuration(uint256 marketId, uint32 duration);
     event SetBidExpirationTime(uint256 marketId, uint32 duration);
     event SetMarketFee(uint256 marketId, uint16 feePct);
@@ -563,18 +567,25 @@ contract MarketRegistry is
      * @param _paymentCycleType Cycle type (seconds or monthly)
      * @param _duration Delinquency duration for new loans
      */
-    function setPaymentCycle(uint256 _marketId, PaymentCycleType _paymentCycleType, uint32 _duration)
-        public
-        ownsMarket(_marketId)
-    {
+    function setPaymentCycle(
+        uint256 _marketId,
+        PaymentCycleType _paymentCycleType,
+        uint32 _duration
+    ) public ownsMarket(_marketId) {
         require(
             (_paymentCycleType == PaymentCycleType.Seconds) ||
-            (_paymentCycleType == PaymentCycleType.Monthly && _duration == 0),
+                (_paymentCycleType == PaymentCycleType.Monthly &&
+                    _duration == 0),
             "Monthly payment cycle value must be 0"
         );
         Marketplace storage market = markets[_marketId];
-        uint32 duration = _paymentCycleType == PaymentCycleType.Seconds ? _duration : 30 days;
-        if (_paymentCycleType != market.paymentCycleType || duration != market.paymentCycleDuration) {
+        uint32 duration = _paymentCycleType == PaymentCycleType.Seconds
+            ? _duration
+            : 30 days;
+        if (
+            _paymentCycleType != market.paymentCycleType ||
+            duration != market.paymentCycleDuration
+        ) {
             markets[_marketId].paymentCycleType = _paymentCycleType;
             markets[_marketId].paymentCycleDuration = duration;
 
@@ -628,7 +639,6 @@ contract MarketRegistry is
             emit SetMarketFee(_marketId, _newPercent);
         }
     }
-
 
     /**
      * @notice Set the payment type for the market.
@@ -787,7 +797,10 @@ contract MarketRegistry is
         override
         returns (uint32, PaymentCycleType)
     {
-        return (markets[_marketId].paymentCycleDuration, markets[_marketId].paymentCycleType);
+        return (
+            markets[_marketId].paymentCycleDuration,
+            markets[_marketId].paymentCycleType
+        );
     }
 
     /**

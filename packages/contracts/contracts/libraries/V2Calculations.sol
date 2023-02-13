@@ -41,7 +41,11 @@ library V2Calculations {
      * @param _timestamp The timestamp at which to get the owed amount at.
      * @param _paymentCycleType The payment cycle type of the loan (Seconds or Monthly).
      */
-    function calculateAmountOwed(Bid storage _bid, uint256 _timestamp, PaymentCycleType _paymentCycleType)
+    function calculateAmountOwed(
+        Bid storage _bid,
+        uint256 _timestamp,
+        PaymentCycleType _paymentCycleType
+    )
         internal
         view
         returns (
@@ -74,7 +78,9 @@ library V2Calculations {
             uint256 interest_
         )
     {
-        owedPrincipal_ = _bid.loanDetails.principal - _bid.loanDetails.totalRepaid.principal;
+        owedPrincipal_ =
+            _bid.loanDetails.principal -
+            _bid.loanDetails.totalRepaid.principal;
 
         uint256 daysInYear = _paymentCycleType == PaymentCycleType.Monthly
             ? 360 days
@@ -85,9 +91,13 @@ library V2Calculations {
         interest_ = (interestOwedInAYear * owedTime) / daysInYear;
 
         // Cast to int265 to avoid underflow errors (negative means loan duration has passed)
-        int256 durationLeftOnLoan = int256(uint256(_bid.loanDetails.loanDuration)) -
-            (int256(_timestamp) - int256(uint256(_bid.loanDetails.acceptedTimestamp)));
-        bool isLastPaymentCycle = durationLeftOnLoan < int256(uint256(_bid.terms.paymentCycle)) || // Check if current payment cycle is within or beyond the last one
+        int256 durationLeftOnLoan = int256(
+            uint256(_bid.loanDetails.loanDuration)
+        ) -
+            (int256(_timestamp) -
+                int256(uint256(_bid.loanDetails.acceptedTimestamp)));
+        bool isLastPaymentCycle = durationLeftOnLoan <
+            int256(uint256(_bid.terms.paymentCycle)) || // Check if current payment cycle is within or beyond the last one
             owedPrincipal_ + interest_ <= _bid.terms.paymentCycleAmount; // Check if what is left to pay is less than the payment cycle amount
 
         if (_bid.paymentType == PaymentType.Bullet) {
@@ -103,7 +113,8 @@ library V2Calculations {
                 : _bid.terms.paymentCycleAmount;
 
             // Calculate accrued amount due since last repayment
-            uint256 owedAmount = (maxCycleOwed * owedTime) / _bid.terms.paymentCycle;
+            uint256 owedAmount = (maxCycleOwed * owedTime) /
+                _bid.terms.paymentCycle;
             duePrincipal_ = Math.min(owedAmount - interest_, owedPrincipal_);
         }
     }

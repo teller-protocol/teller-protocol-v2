@@ -249,8 +249,11 @@ contract V2Calculations_Test is Testable {
         // Within the first payment cycle
         uint256 _timestamp = _acceptedTimestamp + ((365 days / 12) / 2);
 
-        (uint256 _owedPrincipal, uint256 _duePrincipal, uint256 _interest) = V2Calculations
-            .calculateAmountOwed(
+        (
+            uint256 _owedPrincipal,
+            uint256 _duePrincipal,
+            uint256 _interest
+        ) = V2Calculations.calculateAmountOwed(
                 __bid,
                 _lastRepaidTimestamp,
                 _timestamp,

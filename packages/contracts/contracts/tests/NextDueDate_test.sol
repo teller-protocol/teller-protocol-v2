@@ -24,9 +24,7 @@ contract NextDueDate_Test is Testable, TellerV2 {
         bids[1] = __bid;
         bidPaymentCycleType[1] = PaymentCycleType.Monthly;
         // Expected date is Feb 29th
-        uint32 expectedDate = uint32(
-            BPBDTL.timestampFromDate(2020, 2, 29)
-        );
+        uint32 expectedDate = uint32(BPBDTL.timestampFromDate(2020, 2, 29));
         nextDueDate_runner(expectedDate);
     }
 
@@ -37,9 +35,7 @@ contract NextDueDate_Test is Testable, TellerV2 {
         bids[1] = __bid;
         bidPaymentCycleType[1] = PaymentCycleType.Monthly;
         // Expected date is March 29th
-        uint32 expectedDate = uint32(
-            BPBDTL.timestampFromDate(2020, 3, 29)
-        );
+        uint32 expectedDate = uint32(BPBDTL.timestampFromDate(2020, 3, 29));
         nextDueDate_runner(expectedDate);
     }
 
@@ -50,9 +46,7 @@ contract NextDueDate_Test is Testable, TellerV2 {
         bids[1] = __bid;
         bidPaymentCycleType[1] = PaymentCycleType.Monthly;
         // Expected date is March 1st
-        uint32 expectedDate = uint32(
-            BPBDTL.timestampFromDate(2023, 3, 1)
-        );
+        uint32 expectedDate = uint32(BPBDTL.timestampFromDate(2023, 3, 1));
         nextDueDate_runner(expectedDate);
     }
 
@@ -66,9 +60,7 @@ contract NextDueDate_Test is Testable, TellerV2 {
         bids[1] = __bid;
         bidPaymentCycleType[1] = PaymentCycleType.Monthly;
         // Expected date is March 31st
-        uint32 expectedDate = uint32(
-            BPBDTL.timestampFromDate(2023, 3, 31)
-        );
+        uint32 expectedDate = uint32(BPBDTL.timestampFromDate(2023, 3, 31));
         nextDueDate_runner(expectedDate);
     }
 

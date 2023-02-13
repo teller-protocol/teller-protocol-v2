@@ -19,6 +19,12 @@ import "../interfaces/IWETH.sol";
 
 import { PaymentType, PaymentCycleType } from "../libraries/V2Calculations.sol";
 
+/*
+
+This should have more unit tests that operate on MarketRegistry.sol 
+
+*/
+
 contract MarketRegistry_Test is Testable, TellerV2 {
     User private marketOwner;
     User private borrower;
@@ -29,11 +35,11 @@ contract MarketRegistry_Test is Testable, TellerV2 {
     constructor() TellerV2(address(address(0))) {}
 
     function setup_beforeAll() public {
-        wethMock = new WethMock();
+        //wethMock = new WethMock();
 
-        marketOwner = new User(this, wethMock);
-        borrower = new User(this, wethMock);
-        lender = new User(this, wethMock);
+        marketOwner = new User(address(this));
+        borrower = new User(address(this));
+        lender = new User(address(this));
 
         lenderCommitmentForwarder = address(0);
         marketRegistry = IMarketRegistry(new MarketRegistry());
@@ -54,8 +60,10 @@ contract MarketRegistry_Test is Testable, TellerV2 {
             PaymentCycleType.Seconds,
             "uri://"
         );
-        (uint32 paymentCycleDuration ,PaymentCycleType paymentCycle) = marketRegistry
-            .getPaymentCycle(1);
+        (
+            uint32 paymentCycleDuration,
+            PaymentCycleType paymentCycle
+        ) = marketRegistry.getPaymentCycle(1);
 
         require(
             paymentCycle == PaymentCycleType.Seconds,
@@ -80,7 +88,9 @@ contract MarketRegistry_Test is Testable, TellerV2 {
             PaymentCycleType.Monthly,
             "uri://"
         );
-        (paymentCycleDuration, paymentCycle) = marketRegistry.getPaymentCycle(2);
+        (paymentCycleDuration, paymentCycle) = marketRegistry.getPaymentCycle(
+            2
+        );
 
         require(
             paymentCycle == PaymentCycleType.Monthly,
@@ -92,28 +102,25 @@ contract MarketRegistry_Test is Testable, TellerV2 {
             "Monthly market payment cycle duration set incorrectly"
         );
 
-
         // Monthly payment cycle should fail
         bool createFailed;
-        try marketOwner.createMarket(
-            address(marketRegistry),
-            3000,
-            7000,
-            5000,
-            500,
-            false,
-            false,
-            PaymentType.EMI,
-            PaymentCycleType.Monthly,
-            "uri://"
-        ) {} catch {
+        try
+            marketOwner.createMarket(
+                address(marketRegistry),
+                3000,
+                7000,
+                5000,
+                500,
+                false,
+                false,
+                PaymentType.EMI,
+                PaymentCycleType.Monthly,
+                "uri://"
+            )
+        {} catch {
             createFailed = true;
         }
-        require(
-            createFailed,
-            "Monthly market should not have been created"
-        );
-
+        require(createFailed, "Monthly market should not have been created");
     }
 }
 

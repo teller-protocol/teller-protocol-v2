@@ -9,31 +9,47 @@ interface IMarketRegistry {
 
     function isVerifiedLender(uint256 _marketId, address _lender)
         external
+        view
         returns (bool, bytes32);
 
-    function isMarketClosed(uint256 _marketId) external returns (bool);
+    function isMarketClosed(uint256 _marketId) external view returns (bool);
 
     function isVerifiedBorrower(uint256 _marketId, address _borrower)
         external
+        view
         returns (bool, bytes32);
 
-    function getMarketOwner(uint256 _marketId) external returns (address);
+    function getMarketOwner(uint256 _marketId) external view returns (address);
 
     function getMarketFeeRecipient(uint256 _marketId)
         external
+        view
         returns (address);
 
-    function getMarketURI(uint256 _marketId) external returns (string memory);
+    function getMarketURI(uint256 _marketId)
+        external
+        view
+        returns (string memory);
 
-    function getPaymentCycle(uint256 _marketId) external returns (uint32, PaymentCycleType);
+    function getPaymentCycle(uint256 _marketId)
+        external
+        view
+        returns (uint32, PaymentCycleType);
 
     function getPaymentDefaultDuration(uint256 _marketId)
         external
+        view
         returns (uint32);
 
-    function getBidExpirationTime(uint256 _marketId) external returns (uint32);
+    function getBidExpirationTime(uint256 _marketId)
+        external
+        view
+        returns (uint32);
 
-    function getMarketplaceFee(uint256 _marketId) external returns (uint16);
+    function getMarketplaceFee(uint256 _marketId)
+        external
+        view
+        returns (uint16);
 
     function getPaymentType(uint256 _marketId)
         external

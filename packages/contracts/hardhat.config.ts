@@ -102,8 +102,6 @@ const networkUrls: { [network: string]: string } = {
   tenderly: process.env.TENDERLY_RPC_URL ?? '',
 }
 
-console.log('rpc url',process.env.GOERLI_RPC_URL)
-
 const getLatestDeploymentBlock = (networkName: string): number | undefined => {
   try {
     return parseInt(

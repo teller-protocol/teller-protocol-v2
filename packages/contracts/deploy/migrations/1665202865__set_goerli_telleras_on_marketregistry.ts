@@ -1,3 +1,4 @@
+import { ethers } from 'ethers'
 import { DeployFunction } from 'hardhat-deploy/dist/types'
 import { deploy } from 'helpers/deploy-helpers'
 import { migrate } from 'helpers/migration-helpers'
@@ -22,6 +23,15 @@ const deployFn: DeployFunction = migrate(
       indent: 1,
       star: true,
     })
+
+ 
+
+    const tellerAsSet = await marketRegistry.tellerAS()
+
+    if(tellerAsSet != ethers.constants.AddressZero){
+      return 
+    }
+
 
     await deploy({
       name: 'MarketRegistry',

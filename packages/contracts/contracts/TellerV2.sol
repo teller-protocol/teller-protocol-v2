@@ -206,6 +206,10 @@ contract TellerV2 is
     {
         _setLenderManager(_lenderManager);
     }
+
+    function getInitializedVersion() public view returns (uint256){
+        return _getInitializedVersion();    
+    }
  
     function _setCollateralManager(address _collateralManager)
         internal

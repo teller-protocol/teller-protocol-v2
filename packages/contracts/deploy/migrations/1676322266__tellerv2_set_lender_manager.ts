@@ -18,7 +18,9 @@ const deployFn: DeployFunction = migrate(
       lenderManagerAddress === ethers.constants.AddressZero
     ) {
       const lenderManager = await hre.contracts.get('LenderManager')
-      await tellerV2.onUpgrade(lenderManager.address)
+
+      const deployer = await hre.getNamedSigner('deployer')
+      await tellerV2.connect(deployer).onUpgrade(lenderManager.address)
     }
   }
 )

@@ -1,4 +1,4 @@
-import { ethers } from 'hardhat'
+import { ethers, getNamedSigner } from 'hardhat'
 import { DeployFunction } from 'hardhat-deploy/dist/types'
 import { HARDHAT_NETWORK_NAME } from 'hardhat/plugins'
 import { deploy } from 'helpers/deploy-helpers'
@@ -19,7 +19,11 @@ const deployFn: DeployFunction = async (hre) => {
   }
 
   const trustedForwarder = await hre.contracts.get('MetaForwarder')
+ 
 
+  console.log('about to deploy tellerV2')
+
+  
   const tellerV2Contract = await deploy({
     contract: 'TellerV2',
     args: [trustedForwarder.address],
@@ -27,10 +31,11 @@ const deployFn: DeployFunction = async (hre) => {
     proxy: {
       proxyContract: 'OpenZeppelinTransparentProxy',
     },
-    skipIfAlreadyDeployed: false,
+    skipIfAlreadyDeployed: false,  
     hre,
   })
 
+ 
   /*  
      Need to initialize the LenderCommitmentForwarder after TellerV2 has been deployed because it is a MarketForwarder
   */
@@ -48,6 +53,7 @@ const deployFn: DeployFunction = async (hre) => {
   // Execute the initialize method of reputation manager
   const reputationIsInitialized = await isInitialized(reputationManager.address)
   if (!reputationIsInitialized) {
+    console.log('initializing repuration manager')
     await reputationManager.initialize(tellerV2Contract.address)
   }
 
@@ -77,7 +83,7 @@ const deployFn: DeployFunction = async (hre) => {
   const collateralManager = await deploy<CollateralManager>({
     contract: 'CollateralManager',
     args: [],
-    skipIfAlreadyDeployed: false,
+    skipIfAlreadyDeployed: false, 
     proxy: {
       proxyContract: 'OpenZeppelinTransparentProxy',
       execute: {
@@ -90,8 +96,11 @@ const deployFn: DeployFunction = async (hre) => {
     hre,
   })
 
+  console.log('test1')
+
   const tellerV2IsInitialized = await isInitialized(tellerV2Contract.address)
   if (!tellerV2IsInitialized) {
+    console.log('initialize tellerV2')
     const lenderManager = await hre.contracts.get('LenderManager')
     await tellerV2Contract.initialize(
       protocolFee,
@@ -104,15 +113,27 @@ const deployFn: DeployFunction = async (hre) => {
     )
   }
 
+  console.log('test2')
   
-  const lenderManagerAddress = await tellerV2Contract.lenderManager()
+  let lenderManagerAddress
+  
+  try{
+    lenderManagerAddress = await tellerV2Contract.lenderManager()
+  }catch(e){}
+  
+  if(!lenderManagerAddress || lenderManagerAddress == ethers.constants.AddressZero){
 
-  if(lenderManagerAddress == ethers.constants.AddressZero){
     const lenderManager = await hre.contracts.get('LenderManager')
-    await tellerV2Contract.onUpgrade(lenderManager.address);  
+    
+ 
+    console.log('running onUpgrade for tellerV2 ',lenderManager.address) 
+
+    await tellerV2Contract.onUpgrade(lenderManager.address); 
+  
   }
  
  
+  console.log('test3')
 }
 
 // tags and deployment

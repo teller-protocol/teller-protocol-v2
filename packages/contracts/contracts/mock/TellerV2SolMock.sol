@@ -16,6 +16,10 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
         marketRegistry = IMarketRegistry(_marketRegistry);
     }
 
+    function getMarketRegistry() external view returns (IMarketRegistry) {
+        return marketRegistry;
+    }
+
     function submitBid(
         address _lendingToken,
         uint256 _marketId,
@@ -162,6 +166,14 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
         returns (address lender_)
     {
         lender_ = bids[_bidId].lender;
+    }
+
+    function getLoanMarketId(uint256 _bidId)
+        external
+        view
+        returns (uint256 _marketId)
+    {
+        _marketId = bids[_bidId].marketplaceId;
     }
 
     function getLoanLendingToken(uint256 _bidId)

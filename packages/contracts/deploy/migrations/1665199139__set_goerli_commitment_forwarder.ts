@@ -25,12 +25,11 @@ const deployFn: DeployFunction = migrate(
       { indent: 1, star: true }
     )
 
+    const lenderCommitmentForwarderSet =
+      await tellerV2.lenderCommitmentForwarder()
 
-
-    const lenderCommitmentForwarderSet = await tellerV2.lenderCommitmentForwarder()
-
-    if(lenderCommitmentForwarderSet != ethers.constants.AddressZero){
-      return 
+    if (lenderCommitmentForwarderSet != ethers.constants.AddressZero) {
+      return
     }
 
     await deploy({

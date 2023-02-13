@@ -66,10 +66,7 @@ contract LenderManager is
     {
         uint256 _marketId = _getLoanMarketId(_bidId);
 
-        (isVerified_, ) = marketRegistry.isVerifiedLender(
-            _marketId,
-            _lender
-        );
+        (isVerified_, ) = marketRegistry.isVerifiedLender(_marketId, _lender);
     }
 
     /**  ERC721 Functions **/

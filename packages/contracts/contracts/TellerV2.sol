@@ -20,8 +20,6 @@ import { Collateral } from "./interfaces/escrow/ICollateralEscrowV1.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
-
-
 import "./libraries/NumbersLib.sol";
 import { V2Calculations } from "./libraries/V2Calculations.sol";
 
@@ -205,8 +203,8 @@ contract TellerV2 is
         onlyOwner
     {
         _setLenderManager(_lenderManager);
-    } 
- 
+    }
+
     function _setCollateralManager(address _collateralManager)
         internal
         onlyInitializing
@@ -221,7 +219,6 @@ contract TellerV2 is
         );
         collateralManager = ICollateralManager(_collateralManager);
     }
-
 
     function _setLenderManager(address _lenderManager)
         internal
@@ -490,15 +487,12 @@ contract TellerV2 is
         Bid storage bid = bids[_bidId];
 
         address sender = _msgSenderForMarket(bid.marketplaceId);
-        
 
-         (bool isVerified, ) = marketRegistry.isVerifiedLender(
+        (bool isVerified, ) = marketRegistry.isVerifiedLender(
             bid.marketplaceId,
             sender
         );
         require(isVerified, "Not verified lender");
-
-
 
         require(
             !marketRegistry.isMarketClosed(bid.marketplaceId),
@@ -577,10 +571,10 @@ contract TellerV2 is
         Bid storage bid = bids[_bidId];
 
         address sender = _msgSenderForMarket(bid.marketplaceId);
-				require(sender == bid.lender, "only lender can claim NFT");
+        require(sender == bid.lender, "only lender can claim NFT");
         // mint an NFT with the lender manager
         lenderManager.registerLoan(_bidId, sender);
-				// set lender address to the lender manager so we know to check the owner of the NFT for the true lender
+        // set lender address to the lender manager so we know to check the owner of the NFT for the true lender
         bid.lender = address(lenderManager);
     }
 

@@ -24,14 +24,11 @@ const deployFn: DeployFunction = migrate(
       star: true,
     })
 
- 
-
     const tellerAsSet = await marketRegistry.tellerAS()
 
-    if(tellerAsSet != ethers.constants.AddressZero){
-      return 
+    if (tellerAsSet != ethers.constants.AddressZero) {
+      return
     }
-
 
     await deploy({
       name: 'MarketRegistry',

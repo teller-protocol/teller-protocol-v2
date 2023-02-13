@@ -442,7 +442,7 @@ describe('TellerV2', () => {
       await tellerV2.mockBid(
         buildBid({
           borrower: await borrower.getAddress(),
-          _lender: NULL_ADDRESS,
+          lender: NULL_ADDRESS,
           receiver: await borrower.getAddress(),
           loanDetails: {
             lendingToken: token.address,

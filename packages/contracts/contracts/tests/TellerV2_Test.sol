@@ -72,8 +72,8 @@ contract TellerV2_Test is Testable {
         // Deploy Lender manager
         MetaForwarder metaforwarder = new MetaForwarder();
         metaforwarder.initialize();
-        LenderManager lenderManager = new LenderManager(
-            marketRegistry
+        LenderManager lenderManager = new LenderManager( 
+             (marketRegistry)
         );
         lenderManager.initialize();
         lenderManager.transferOwnership(address(tellerV2));
@@ -213,14 +213,19 @@ contract TellerV2_Test is Testable {
     }
 }
 
+
 contract TellerV2User is User {
+
     WethMock public immutable wethMock;
 
-    constructor(address _tellerV2, WethMock _wethMock) User(_tellerV2) {
+    constructor(address _tellerV2, WethMock _wethMock) User(_tellerV2){
+
         wethMock = _wethMock;
     }
 
     function depositToWeth(uint256 amount) public {
         wethMock.deposit{ value: amount }();
     }
+
+
 }

@@ -27,6 +27,6 @@ const deployFn: DeployFunction = migrate(
  * List of deployment function tags. Listing a tag here means the migration script will not run
  * until the tag(s) specified are ran.
  */
-deployFn.dependencies = ['TellerV2']
+deployFn.dependencies = ['teller-v2', 'lender-manager']
 
 export default deployFn

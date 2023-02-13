@@ -555,7 +555,8 @@ contract TellerV2 is
         _repayLoan(
             _bidId,
             Payment({ principal: duePrincipal, interest: interest }),
-            owedPrincipal + interest
+            owedPrincipal + interest,
+            true
         );
     }
 
@@ -572,7 +573,8 @@ contract TellerV2 is
         _repayLoan(
             _bidId,
             Payment({ principal: owedPrincipal, interest: interest }),
-            owedPrincipal + interest
+            owedPrincipal + interest,
+            true
         );
     }
 
@@ -601,7 +603,8 @@ contract TellerV2 is
         _repayLoan(
             _bidId,
             Payment({ principal: _amount - interest, interest: interest }),
-            owedPrincipal + interest
+            owedPrincipal + interest,
+            true
         );
     }
 
@@ -637,7 +640,8 @@ contract TellerV2 is
         _repayLoan(
             _bidId,
             Payment({ principal: owedPrincipal, interest: interest }),
-            owedPrincipal + interest
+            owedPrincipal + interest,
+            false
         );
 
         bid.state = BidState.LIQUIDATED;
@@ -658,7 +662,8 @@ contract TellerV2 is
     function _repayLoan(
         uint256 _bidId,
         Payment memory _payment,
-        uint256 _owedAmount
+        uint256 _owedAmount,
+        bool _shouldWithdrawCollateral
     ) internal {
         Bid storage bid = bids[_bidId];
         uint256 paymentAmount = _payment.principal + _payment.interest;
@@ -676,8 +681,10 @@ contract TellerV2 is
             // Remove borrower's active bid
             _borrowerBidsActive[bid.borrower].remove(_bidId);
 
-            // If loan is backed by collateral, withdraw and send to borrower
-            collateralManager.withdraw(_bidId);
+            // If loan is is being liquidated and backed by collateral, withdraw and send to borrower
+            if (_shouldWithdrawCollateral) {
+                collateralManager.withdraw(_bidId);
+            }
 
             emit LoanRepaid(_bidId);
         } else {

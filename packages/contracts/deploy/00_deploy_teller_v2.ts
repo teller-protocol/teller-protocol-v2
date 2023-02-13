@@ -1,3 +1,4 @@
+import { ethers } from 'hardhat'
 import { DeployFunction } from 'hardhat-deploy/dist/types'
 import { HARDHAT_NETWORK_NAME } from 'hardhat/plugins'
 import { deploy } from 'helpers/deploy-helpers'
@@ -103,17 +104,10 @@ const deployFn: DeployFunction = async (hre) => {
     )
   }
 
-  //if the initialized version is not equal to current code version then the contract should be reinitialized with onUpgrade
-  const currentCodeVersion = await tellerV2Contract.CURRENT_CODE_VERSION()
-  let initializedVersion = undefined
+  
+  const lenderManagerAddress = await tellerV2Contract.lenderManager()
 
-  try{ 
-    initializedVersion = await tellerV2Contract.getInitializedVersion()
-  }catch(error:any){
-    console.log(error)
-  }
-
-  if(currentCodeVersion != initializedVersion){
+  if(lenderManagerAddress == ethers.constants.AddressZero){
     const lenderManager = await hre.contracts.get('LenderManager')
     await tellerV2Contract.onUpgrade(lenderManager.address);  
   }

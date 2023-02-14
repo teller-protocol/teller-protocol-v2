@@ -10,16 +10,21 @@ contract MultiCollateralVault is ERC721 {
 
    event createdVault(  );
 
+   //tokenId => collateralInside 
+   mapping(uint256 => Collateral) public vaults; 
+
+   uint256 public vaultCount;
+ 
 
    constructor(){}
 
 
-   function depositCollateral(){
+   function depositCollateral() public {
 
    }
 
 
-   function withdrawCollateral(){
+   function withdrawCollateral() public {
 
 
    }

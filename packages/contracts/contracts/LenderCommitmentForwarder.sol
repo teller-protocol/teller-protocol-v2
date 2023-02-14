@@ -339,6 +339,11 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         );
 
         if(commitment.collateralTokenType == CollateralType.ERC721 ||
+        commitment.collateralTokenType == CollateralType.ERC721_ANY ){
+              require( _collateralAmount == 1, "Invalid amount for ERC721");
+        }
+
+        if(commitment.collateralTokenType == CollateralType.ERC721 ||
         commitment.collateralTokenType == CollateralType.ERC1155 ){
               require( commitment.collateralTokenId == _collateralTokenId, "Invalid tokenId");
         }

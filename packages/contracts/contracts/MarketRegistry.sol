@@ -576,7 +576,7 @@ contract MarketRegistry is
             (_paymentCycleType == PaymentCycleType.Seconds) ||
                 (_paymentCycleType == PaymentCycleType.Monthly &&
                     _duration == 0),
-            "Monthly payment cycle value must be 0"
+            "monthly payment cycle duration cannot be set"
         );
         Marketplace storage market = markets[_marketId];
         uint32 duration = _paymentCycleType == PaymentCycleType.Seconds

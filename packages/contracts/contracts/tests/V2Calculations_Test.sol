@@ -73,8 +73,32 @@ contract V2Calculations_Test is Testable {
         );
     }
 
-    // Bullet loan
+    // EMI loan - Monthly payment cycle
     function _04_calculateAmountOwed_test() public {
+        cyclesToSkip.add(5);
+        cyclesToSkip.add(7);
+
+        calculateAmountOwed_runner(
+            36,
+            PaymentType.EMI,
+            PaymentCycleType.Monthly
+        );
+    }
+
+    // EMI loan - Monthly payment cycle
+    function _05_calculateAmountOwed_test() public {
+        cyclesWithExtraPayments = [2, 6];
+        cyclesWithExtraPaymentsAmounts = [35000e6, 20000e6];
+
+        calculateAmountOwed_runner(
+            16,
+            PaymentType.EMI,
+            PaymentCycleType.Monthly
+        );
+    }
+
+    // Bullet loan
+    function _06_calculateAmountOwed_test() public {
         cyclesToSkip.add(6);
         calculateAmountOwed_runner(
             36,
@@ -84,7 +108,7 @@ contract V2Calculations_Test is Testable {
     }
 
     // Bullet loan
-    function _05_calculateAmountOwed_test() public {
+    function _07_calculateAmountOwed_test() public {
         cyclesToSkip.add(12);
         cyclesWithExtraPayments = [1, 8];
         cyclesWithExtraPaymentsAmounts = [15000e6, 10000e6];
@@ -92,6 +116,28 @@ contract V2Calculations_Test is Testable {
             36,
             PaymentType.Bullet,
             PaymentCycleType.Seconds
+        );
+    }
+
+    // Bullet loan - Monthly payment cycle
+    function _08_calculateAmountOwed_test() public {
+        cyclesToSkip.add(5);
+        calculateAmountOwed_runner(
+            36,
+            PaymentType.Bullet,
+            PaymentCycleType.Monthly
+        );
+    }
+
+    // Bullet loan - Monthly paymenty cycle
+    function _09_calculateAmountOwed_test() public {
+        cyclesToSkip.add(8);
+        cyclesWithExtraPayments = [3];
+        cyclesWithExtraPaymentsAmounts = [13000e6];
+        calculateAmountOwed_runner(
+            36,
+            PaymentType.Bullet,
+            PaymentCycleType.Monthly
         );
     }
 

@@ -108,7 +108,7 @@ abstract contract TellerV2MarketForwarder is Initializable, ContextUpgradeable {
      */
     function _submitBidWithCollateral(
         CreateLoanArgs memory _createLoanArgs,
-        Collateral[] memory _collateralInfo,
+        Collateral memory _collateralInfo,
         address _borrower
     ) internal virtual returns (uint256 bidId) {
         bytes memory responseData;
@@ -119,7 +119,7 @@ abstract contract TellerV2MarketForwarder is Initializable, ContextUpgradeable {
                 //0x7bbd53d7
                 bytes4(
                     keccak256(
-                        "submitBid(address,uint256,uint256,uint32,uint16,string,address,(uint8,uint256,uint256,address)[])"
+                        "submitBid(address,uint256,uint256,uint32,uint16,string,address,(uint8,uint256,uint256,address))"
                     )
                 ),
                 _createLoanArgs.lendingToken,

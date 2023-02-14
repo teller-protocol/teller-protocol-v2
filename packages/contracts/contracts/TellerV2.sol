@@ -293,7 +293,7 @@ contract TellerV2 is
         uint16 _APR,
         string calldata _metadataURI,
         address _receiver,
-        Collateral[] calldata _collateralInfo
+        Collateral calldata _collateralInfo
     ) public override whenNotPaused returns (uint256 bidId_) {
         bidId_ = _submitBid(
             _lendingToken,

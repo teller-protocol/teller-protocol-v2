@@ -365,7 +365,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         );
     }
 
-    function getRequiredCollateral(uint256 _principalAmount, uint256 _maxPrincipalPerCollateralAmount) public view returns (uint256 _collateralAmountRaw) {
+    function getRequiredCollateral(uint256 _principalAmount, uint256 _maxPrincipalPerCollateralAmount) public view virtual returns (uint256 _collateralAmountRaw) {
         _collateralAmountRaw= (_principalAmount * _maxPrincipalPerCollateralAmount) /  PRINCIPAL_PER_COLLATERAL_EXPANSION_FACTOR  ;
     }
 

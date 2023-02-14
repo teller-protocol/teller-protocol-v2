@@ -39,6 +39,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
     bool acceptBidWasCalled;
     bool submitBidWasCalled;
     bool submitBidWithCollateralWasCalled;
+    uint256 requiredCollateralAmount;
 
     constructor()
         LenderCommitmentForwarder(
@@ -76,6 +77,8 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
 
         delete acceptBidWasCalled;
         delete submitBidWasCalled;
+        delete submitBidWithCollateralWasCalled;
+        delete requiredCollateralAmount;
     }
 
     function updateCommitment_before() public {
@@ -218,9 +221,77 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             maxLoanDuration,
             minInterestRate
         );
+ 
 
         Test.eq(commitment.maxPrincipal == 0, true, "commitment not accepted");
+
+        bool acceptCommitTwiceFails;
+
+        try marketOwner._acceptCommitment(
+            commitmentId,
+            marketId,
+            100,
+            100, //collateralAmount
+            0, //collateralTokenId
+            maxLoanDuration,
+            minInterestRate
+             ){
+
+        }catch{
+                acceptCommitTwiceFails = true;
+        }
+
+        Test.eq(acceptCommitTwiceFails, true, "Should fail when accepting commit twice");
+
+    
     }
+
+     function acceptCommitmentFailsWithInsufficientCollateral_test() public {
+        
+        lender._createCommitment(
+            marketId,
+            tokenAddress,
+            maxAmount,
+            collateralTokenAddress,
+            maxPrincipalPerCollateralAmount,
+            collateralTokenType,
+            maxLoanDuration,
+            minInterestRate,
+            expiration,
+            address(0)
+        );
+
+        uint256 commitmentId = 1;
+
+        Commitment storage commitment = lenderMarketCommitments[commitmentId];
+
+        requiredCollateralAmount = maxAmount + 1;
+
+        bool failedToAcceptCommitment; 
+
+        try marketOwner._acceptCommitment(
+            commitmentId,
+            marketId,
+            maxAmount - 100, //principal 
+            maxAmount, //collateralAmount
+            0, //collateralTokenId
+            maxLoanDuration,
+            minInterestRate
+        ) {
+
+        }catch{
+            failedToAcceptCommitment = true;           
+        }
+
+        Test.eq(
+            failedToAcceptCommitment,
+            true,
+            "Should fail to accept commitment with insufficient collateral"
+        );
+
+       
+ 
+     }
 
 
     function getRequiredCollateral_test() public {
@@ -281,6 +352,12 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         );
 
         return true;
+    }
+
+
+    function getRequiredCollateral(uint256, uint256) public view override returns (uint256) {
+        
+        return requiredCollateralAmount;
     }
 }
 

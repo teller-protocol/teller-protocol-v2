@@ -65,7 +65,9 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         address lender,
         uint256 marketId,
         address lendingToken,
-        uint256 tokenAmount
+        uint256 tokenAmount,
+
+        address collateralToken 
     );
 
     /**
@@ -80,7 +82,9 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         address lender,
         uint256 marketId,
         address lendingToken,
-        uint256 tokenAmount
+        uint256 tokenAmount,
+
+        address collateralToken 
     );
 
     /**
@@ -103,7 +107,11 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint256 marketId,
         address lendingToken,
         uint256 tokenAmount,
-        uint256 indexed bidId
+        uint256 indexed bidId,
+
+        address collateralToken,
+        uint256 collateralAmount,
+        uint256 collateralTokenId
     );
 
     /** External Functions **/
@@ -160,7 +168,8 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             _msgSender(),
             _marketId,
             _principalTokenAddress,
-            _maxPrincipal
+            _maxPrincipal,
+            _collateralTokenAddress 
         );
     }
 
@@ -219,7 +228,8 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             _msgSender(),
             _marketId,
             _principalTokenAddress,
-            _maxPrincipal
+            _maxPrincipal,
+            _collateralTokenAddress
         );
     }
 
@@ -348,7 +358,10 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             _marketId,
             commitment.principalTokenAddress,
             _principalAmount,
-            bidId
+            bidId,
+            commitment.collateralTokenAddress,
+            _collateralAmount,
+            _collateralTokenId
         );
     }
 

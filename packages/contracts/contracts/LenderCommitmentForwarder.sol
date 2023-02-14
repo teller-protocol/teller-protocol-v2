@@ -36,6 +36,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint32 maxDuration;
         uint16 minInterestRate;
         address collateralTokenAddress;
+        uint256 collateralTokenId; 
         uint256 maxPrincipalPerCollateralAmount; //zero means infinite . This is expressed using 16 decimals [PRINCIPAL_PER_COLLATERAL_EXPANSION_FACTOR] so 1 wei is 10^16 and 1 usdc is 10^22 
         CollateralType collateralTokenType; //erc721, erc1155 or erc20
         address lender;
@@ -140,6 +141,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         address _principalTokenAddress,
         uint256 _maxPrincipal,
         address _collateralTokenAddress,
+        uint256 _collateralTokenId,
         uint256 _maxPrincipalPerCollateralAmount,
         CollateralType _collateralTokenType,
         uint32 _maxLoanDuration,
@@ -155,6 +157,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             maxDuration: _maxLoanDuration,
             minInterestRate: _minInterestRate,
             collateralTokenAddress: _collateralTokenAddress,
+            collateralTokenId: _collateralTokenId,
             maxPrincipalPerCollateralAmount: _maxPrincipalPerCollateralAmount,
             collateralTokenType: _collateralTokenType,
             lender: _msgSender(),
@@ -334,6 +337,12 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
 
             "Insufficient collateral"
         );
+
+        if(commitment.collateralTokenType == CollateralType.ERC721 ||
+        commitment.collateralTokenType == CollateralType.ERC1155 ){
+              require( commitment.collateralTokenId == _collateralTokenId, "Invalid tokenId");
+        }
+      
 
         bidId = _submitBidFromCommitment(
             borrower,

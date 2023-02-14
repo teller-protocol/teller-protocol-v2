@@ -31,6 +31,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
     address collateralTokenAddress;
     uint256 maxPrincipalPerCollateralAmount;
     CollateralType collateralTokenType;
+    uint256 collateralTokenId;
 
     uint32 maxLoanDuration;
     uint16 minInterestRate;
@@ -89,6 +90,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             tokenAddress,
             maxAmount,
             collateralTokenAddress,
+            collateralTokenId,
             maxPrincipalPerCollateralAmount,
             collateralTokenType,
             maxLoanDuration,
@@ -134,6 +136,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             tokenAddress,
             maxAmount,
             collateralTokenAddress,
+            collateralTokenId,
             maxPrincipalPerCollateralAmount,
             collateralTokenType,
             maxLoanDuration,
@@ -175,6 +178,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             tokenAddress,
             maxAmount,
             collateralTokenAddress,
+            collateralTokenId,
             maxPrincipalPerCollateralAmount,
             collateralTokenType,
             maxLoanDuration,
@@ -258,6 +262,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             tokenAddress,
             maxAmount,
             collateralTokenAddress,
+            collateralTokenId,
             maxPrincipalPerCollateralAmount,
             collateralTokenType,
             maxLoanDuration,
@@ -308,6 +313,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             tokenAddress,
             maxAmount,
             collateralTokenAddress,
+            collateralTokenId,
             maxPrincipalPerCollateralAmount,
             collateralTokenType,
             maxLoanDuration,
@@ -441,6 +447,7 @@ contract User {
         address tokenAddress,
         uint256 principal,
         address _collateralTokenAddress,
+        uint256 _collateralTokenId,
         uint256 _maxPrincipalPerCollateralAmount,
         CollateralType _collateralTokenType,
         uint32 loanDuration,
@@ -454,6 +461,7 @@ contract User {
                 tokenAddress,
                 principal,
                 _collateralTokenAddress,
+                _collateralTokenId,
                 _maxPrincipalPerCollateralAmount,
                 _collateralTokenType,
                 loanDuration,

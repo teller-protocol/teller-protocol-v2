@@ -303,7 +303,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
                 collateralInfo._collateralAddress,
                 collateralInfo._amount
             );
-        } else if (collateralInfo._collateralType == CollateralType.ERC721) {
+        } else if (collateralInfo._collateralType == CollateralType.ERC721 || collateralInfo._collateralType == CollateralType.ERC721_ANY_ID) {
             IERC721Upgradeable(collateralInfo._collateralAddress).transferFrom(
                 borrower,
                 address(this),
@@ -319,7 +319,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
                 collateralInfo._amount,
                 collateralInfo._tokenId
             );
-        } else if (collateralInfo._collateralType == CollateralType.ERC1155) {
+        } else if (collateralInfo._collateralType == CollateralType.ERC1155 || collateralInfo._collateralType == CollateralType.ERC1155_ANY_ID) {
             bytes memory data;
             IERC1155Upgradeable(collateralInfo._collateralAddress)
                 .safeTransferFrom(
@@ -448,14 +448,14 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
                     _borrowerAddress
                 );
         }
-        if (collateralType == CollateralType.ERC721) {
+        if (collateralType == CollateralType.ERC721 || collateralType == CollateralType.ERC721_ANY_ID) {
             return
                 _borrowerAddress ==
                 IERC721Upgradeable(_collateralInfo._collateralAddress).ownerOf(
                     _collateralInfo._tokenId
                 );
         }
-        if (collateralType == CollateralType.ERC1155) {
+        if (collateralType == CollateralType.ERC1155 || collateralType == CollateralType.ERC1155_ANY_ID ) {
             return
                 _collateralInfo._amount <=
                 IERC1155Upgradeable(_collateralInfo._collateralAddress)

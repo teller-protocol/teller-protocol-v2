@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "../EAS/TellerAS.sol";
-import { PaymentType } from "../libraries/V2Calculations.sol";
+import { PaymentType, PaymentCycleType } from "../libraries/V2Calculations.sol";
 
 interface IMarketRegistry {
     function initialize(TellerAS tellerAs) external;
@@ -31,10 +31,10 @@ interface IMarketRegistry {
         view
         returns (string memory);
 
-    function getPaymentCycleDuration(uint256 _marketId)
+    function getPaymentCycle(uint256 _marketId)
         external
         view
-        returns (uint32);
+        returns (uint32, PaymentCycleType);
 
     function getPaymentDefaultDuration(uint256 _marketId)
         external
@@ -65,6 +65,7 @@ interface IMarketRegistry {
         bool _requireLenderAttestation,
         bool _requireBorrowerAttestation,
         PaymentType _paymentType,
+        PaymentCycleType _paymentCycleType,
         string calldata _uri
     ) external returns (uint256 marketId_);
 

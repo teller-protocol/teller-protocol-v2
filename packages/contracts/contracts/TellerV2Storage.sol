@@ -6,7 +6,7 @@ import "./interfaces/IReputationManager.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "./interfaces/ICollateralManager.sol";
-import { PaymentType } from "./libraries/V2Calculations.sol";
+import { PaymentType, PaymentCycleType } from "./libraries/V2Calculations.sol";
 import "./interfaces/ILenderManager.sol";
 
 enum BidState {
@@ -147,6 +147,8 @@ abstract contract TellerV2Storage_G3 is TellerV2Storage_G2 {
 abstract contract TellerV2Storage_G4 is TellerV2Storage_G3 {
     // Address of the lender manager contract
     ILenderManager public lenderManager;
+    // BidId to payment cycle type (custom or monthly)
+    mapping(uint256 => PaymentCycleType) public bidPaymentCycleType;
 }
 
 abstract contract TellerV2Storage is TellerV2Storage_G4 {}

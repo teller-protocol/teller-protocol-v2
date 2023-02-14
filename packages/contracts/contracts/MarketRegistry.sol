@@ -37,7 +37,7 @@ contract MarketRegistry is
         bool lenderAttestationRequired;
         EnumerableSet.AddressSet verifiedLendersForMarket;
         mapping(address => bytes32) lenderAttestationIds;
-        uint32 paymentCycleDuration; //unix time
+        uint32 paymentCycleDuration; // unix time (seconds)
         uint32 paymentDefaultDuration; //unix time
         uint32 bidExpirationTime; //unix time
         bool borrowerAttestationRequired;
@@ -45,6 +45,7 @@ contract MarketRegistry is
         mapping(address => bytes32) borrowerAttestationIds;
         address feeRecipient;
         PaymentType paymentType;
+        PaymentCycleType paymentCycleType;
     }
 
     bytes32 public lenderAttestationSchemaId;
@@ -78,7 +79,12 @@ contract MarketRegistry is
 
     event MarketCreated(address indexed owner, uint256 marketId);
     event SetMarketURI(uint256 marketId, string uri);
-    event SetPaymentCycleDuration(uint256 marketId, uint32 duration);
+    event SetPaymentCycleDuration(uint256 marketId, uint32 duration); // DEPRECATED - used for subgraph reference
+    event SetPaymentCycle(
+        uint256 marketId,
+        PaymentCycleType paymentCycleType,
+        uint32 value
+    );
     event SetPaymentDefaultDuration(uint256 marketId, uint32 duration);
     event SetBidExpirationTime(uint256 marketId, uint32 duration);
     event SetMarketFee(uint256 marketId, uint16 feePct);
@@ -131,6 +137,7 @@ contract MarketRegistry is
      * @param _requireBorrowerAttestation Boolean that indicates if borrowers require attestation to join market.
      * @param _paymentType The payment type for loans in the market.
      * @param _uri URI string to get metadata details about the market.
+     * @param _paymentCycleType The payment cycle type for loans in the market - Seconds or Monthly
      * @return marketId_ The market ID of the newly created market.
      */
     function createMarket(
@@ -142,6 +149,7 @@ contract MarketRegistry is
         bool _requireLenderAttestation,
         bool _requireBorrowerAttestation,
         PaymentType _paymentType,
+        PaymentCycleType _paymentCycleType,
         string calldata _uri
     ) external returns (uint256 marketId_) {
         marketId_ = _createMarket(
@@ -153,6 +161,7 @@ contract MarketRegistry is
             _requireLenderAttestation,
             _requireBorrowerAttestation,
             _paymentType,
+            _paymentCycleType,
             _uri
         );
     }
@@ -188,6 +197,7 @@ contract MarketRegistry is
             _requireLenderAttestation,
             _requireBorrowerAttestation,
             PaymentType.EMI,
+            PaymentCycleType.Seconds,
             _uri
         );
     }
@@ -202,6 +212,7 @@ contract MarketRegistry is
      * @param _requireBorrowerAttestation Boolean that indicates if borrowers require attestation to join market.
      * @param _paymentType The payment type for loans in the market.
      * @param _uri URI string to get metadata details about the market.
+     * @param _paymentCycleType The payment cycle type for loans in the market - Seconds or Monthly
      * @return marketId_ The market ID of the newly created market.
      */
     function _createMarket(
@@ -213,6 +224,7 @@ contract MarketRegistry is
         bool _requireLenderAttestation,
         bool _requireBorrowerAttestation,
         PaymentType _paymentType,
+        PaymentCycleType _paymentCycleType,
         string calldata _uri
     ) internal returns (uint256 marketId_) {
         require(_initialOwner != address(0), "Invalid owner address");
@@ -222,21 +234,19 @@ contract MarketRegistry is
         // Set the market owner
         markets[marketId_].owner = _initialOwner;
 
-        setMarketURI(marketId_, _uri);
-        setPaymentCycleDuration(marketId_, _paymentCycleDuration);
-        setPaymentDefaultDuration(marketId_, _paymentDefaultDuration);
-        setMarketFeePercent(marketId_, _feePercent);
-        setBidExpirationTime(marketId_, _bidExpirationTime);
-        setMarketPaymentType(marketId_, _paymentType);
-
-        // Check if market requires lender attestation to join
-        if (_requireLenderAttestation) {
-            markets[marketId_].lenderAttestationRequired = true;
-        }
-        // Check if market requires borrower attestation to join
-        if (_requireBorrowerAttestation) {
-            markets[marketId_].borrowerAttestationRequired = true;
-        }
+        // Initialize market settings
+        _setMarketSettings(
+            marketId_,
+            _paymentCycleDuration,
+            _paymentType,
+            _paymentCycleType,
+            _paymentDefaultDuration,
+            _bidExpirationTime,
+            _feePercent,
+            _requireBorrowerAttestation,
+            _requireLenderAttestation,
+            _uri
+        );
 
         emit MarketCreated(_initialOwner, marketId_);
     }
@@ -476,6 +486,8 @@ contract MarketRegistry is
      * @notice Updates multiple market settings for a given market.
      * @param _marketId The ID of a market.
      * @param _paymentCycleDuration Delinquency duration for new loans
+     * @param _newPaymentType The payment type for the market.
+     * @param _paymentCycleType The payment cycle type for loans in the market - Seconds or Monthly
      * @param _paymentDefaultDuration Default duration for new loans
      * @param _bidExpirationTime Duration of time before a bid is considered out of date
      * @param _metadataURI A URI that points to a market's metadata.
@@ -486,6 +498,8 @@ contract MarketRegistry is
     function updateMarketSettings(
         uint256 _marketId,
         uint32 _paymentCycleDuration,
+        PaymentType _newPaymentType,
+        PaymentCycleType _paymentCycleType,
         uint32 _paymentDefaultDuration,
         uint32 _bidExpirationTime,
         uint16 _feePercent,
@@ -493,13 +507,18 @@ contract MarketRegistry is
         bool _lenderAttestationRequired,
         string calldata _metadataURI
     ) public ownsMarket(_marketId) {
-        setMarketURI(_marketId, _metadataURI);
-        setPaymentCycleDuration(_marketId, _paymentCycleDuration);
-        setPaymentDefaultDuration(_marketId, _paymentDefaultDuration);
-        setBidExpirationTime(_marketId, _bidExpirationTime);
-        setMarketFeePercent(_marketId, _feePercent);
-        setLenderAttestationRequired(_marketId, _lenderAttestationRequired);
-        setBorrowerAttestationRequired(_marketId, _borrowerAttestationRequired);
+        _setMarketSettings(
+            _marketId,
+            _paymentCycleDuration,
+            _newPaymentType,
+            _paymentCycleType,
+            _paymentDefaultDuration,
+            _bidExpirationTime,
+            _feePercent,
+            _borrowerAttestationRequired,
+            _lenderAttestationRequired,
+            _metadataURI
+        );
     }
 
     /**
@@ -545,16 +564,32 @@ contract MarketRegistry is
      * @notice Sets the duration of new loans for this market before they turn delinquent.
      * @notice Changing this value does not change the terms of existing loans for this market.
      * @param _marketId The ID of a market.
+     * @param _paymentCycleType Cycle type (seconds or monthly)
      * @param _duration Delinquency duration for new loans
      */
-    function setPaymentCycleDuration(uint256 _marketId, uint32 _duration)
-        public
-        ownsMarket(_marketId)
-    {
-        if (_duration != markets[_marketId].paymentCycleDuration) {
-            markets[_marketId].paymentCycleDuration = _duration;
+    function setPaymentCycle(
+        uint256 _marketId,
+        PaymentCycleType _paymentCycleType,
+        uint32 _duration
+    ) public ownsMarket(_marketId) {
+        require(
+            (_paymentCycleType == PaymentCycleType.Seconds) ||
+                (_paymentCycleType == PaymentCycleType.Monthly &&
+                    _duration == 0),
+            "monthly payment cycle duration cannot be set"
+        );
+        Marketplace storage market = markets[_marketId];
+        uint32 duration = _paymentCycleType == PaymentCycleType.Seconds
+            ? _duration
+            : 30 days;
+        if (
+            _paymentCycleType != market.paymentCycleType ||
+            duration != market.paymentCycleDuration
+        ) {
+            markets[_marketId].paymentCycleType = _paymentCycleType;
+            markets[_marketId].paymentCycleDuration = duration;
 
-            emit SetPaymentCycleDuration(_marketId, _duration);
+            emit SetPaymentCycle(_marketId, _paymentCycleType, duration);
         }
     }
 
@@ -754,14 +789,18 @@ contract MarketRegistry is
      * @notice Gets the loan delinquent duration of a market.
      * @param _marketId The ID of a market.
      * @return Duration of a loan until it is delinquent.
+     * @return The type of payment cycle for loans in the market.
      */
-    function getPaymentCycleDuration(uint256 _marketId)
+    function getPaymentCycle(uint256 _marketId)
         public
         view
         override
-        returns (uint32)
+        returns (uint32, PaymentCycleType)
     {
-        return markets[_marketId].paymentCycleDuration;
+        return (
+            markets[_marketId].paymentCycleDuration,
+            markets[_marketId].paymentCycleType
+        );
     }
 
     /**
@@ -892,6 +931,38 @@ contract MarketRegistry is
         EnumerableSet.AddressSet storage set = markets[_marketId]
             .verifiedBorrowersForMarket;
         return _getStakeholdersForMarket(set, _page, _perPage);
+    }
+
+    /**
+     * @notice Sets multiple market settings for a given market.
+     * @param _marketId The ID of a market.
+     * @param _paymentCycleDuration Delinquency duration for new loans
+     * @param _newPaymentType The payment type for the market.
+     * @param _paymentCycleType The payment cycle type for loans in the market - Seconds or Monthly
+     * @param _paymentDefaultDuration Default duration for new loans
+     * @param _bidExpirationTime Duration of time before a bid is considered out of date
+     * @param _metadataURI A URI that points to a market's metadata.
+     */
+    function _setMarketSettings(
+        uint256 _marketId,
+        uint32 _paymentCycleDuration,
+        PaymentType _newPaymentType,
+        PaymentCycleType _paymentCycleType,
+        uint32 _paymentDefaultDuration,
+        uint32 _bidExpirationTime,
+        uint16 _feePercent,
+        bool _borrowerAttestationRequired,
+        bool _lenderAttestationRequired,
+        string calldata _metadataURI
+    ) internal {
+        setMarketURI(_marketId, _metadataURI);
+        setPaymentDefaultDuration(_marketId, _paymentDefaultDuration);
+        setBidExpirationTime(_marketId, _bidExpirationTime);
+        setMarketFeePercent(_marketId, _feePercent);
+        setLenderAttestationRequired(_marketId, _lenderAttestationRequired);
+        setBorrowerAttestationRequired(_marketId, _borrowerAttestationRequired);
+        setMarketPaymentType(_marketId, _newPaymentType);
+        setPaymentCycle(_marketId, _paymentCycleType, _paymentCycleDuration);
     }
 
     /**

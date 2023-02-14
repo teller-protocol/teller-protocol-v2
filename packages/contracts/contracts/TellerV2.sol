@@ -21,7 +21,8 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 import "./libraries/NumbersLib.sol";
-import { V2Calculations } from "./libraries/V2Calculations.sol";
+import { BokkyPooBahsDateTimeLibrary as BPBDTL } from "./libraries/DateTimeLib.sol";
+import { V2Calculations, PaymentCycleType } from "./libraries/V2Calculations.sol";
 
 /* Errors */
 /**
@@ -375,9 +376,10 @@ contract TellerV2 is
         bid.loanDetails.loanDuration = _duration;
         bid.loanDetails.timestamp = uint32(block.timestamp);
 
-        bid.terms.paymentCycle = marketRegistry.getPaymentCycleDuration(
-            _marketplaceId
-        );
+        // Set payment cycle type based on market setting (custom or monthly)
+        (bid.terms.paymentCycle, bidPaymentCycleType[bidId]) = marketRegistry
+            .getPaymentCycle(_marketplaceId);
+
         bid.terms.APR = _APR;
 
         bidDefaultDuration[bidId] = marketRegistry.getPaymentDefaultDuration(
@@ -393,6 +395,7 @@ contract TellerV2 is
         bid.terms.paymentCycleAmount = V2Calculations
             .calculatePaymentCycleAmount(
                 bid.paymentType,
+                bidPaymentCycleType[bidId],
                 _principal,
                 _duration,
                 bid.terms.paymentCycle,
@@ -590,7 +593,11 @@ contract TellerV2 is
             uint256 owedPrincipal,
             uint256 duePrincipal,
             uint256 interest
-        ) = V2Calculations.calculateAmountOwed(bids[_bidId], block.timestamp);
+        ) = V2Calculations.calculateAmountOwed(
+                bids[_bidId],
+                block.timestamp,
+                bidPaymentCycleType[_bidId]
+            );
         _repayLoan(
             _bidId,
             Payment({ principal: duePrincipal, interest: interest }),
@@ -608,7 +615,11 @@ contract TellerV2 is
         acceptedLoan(_bidId, "repayLoan")
     {
         (uint256 owedPrincipal, , uint256 interest) = V2Calculations
-            .calculateAmountOwed(bids[_bidId], block.timestamp);
+            .calculateAmountOwed(
+                bids[_bidId],
+                block.timestamp,
+                bidPaymentCycleType[_bidId]
+            );
         _repayLoan(
             _bidId,
             Payment({ principal: owedPrincipal, interest: interest }),
@@ -631,7 +642,11 @@ contract TellerV2 is
             uint256 owedPrincipal,
             uint256 duePrincipal,
             uint256 interest
-        ) = V2Calculations.calculateAmountOwed(bids[_bidId], block.timestamp);
+        ) = V2Calculations.calculateAmountOwed(
+                bids[_bidId],
+                block.timestamp,
+                bidPaymentCycleType[_bidId]
+            );
         uint256 minimumOwed = duePrincipal + interest;
 
         // If amount is less than minimumOwed, we revert
@@ -675,7 +690,11 @@ contract TellerV2 is
         Bid storage bid = bids[_bidId];
 
         (uint256 owedPrincipal, , uint256 interest) = V2Calculations
-            .calculateAmountOwed(bid, block.timestamp);
+            .calculateAmountOwed(
+                bid,
+                block.timestamp,
+                bidPaymentCycleType[_bidId]
+            );
         _repayLoan(
             _bidId,
             Payment({ principal: owedPrincipal, interest: interest }),
@@ -762,7 +781,11 @@ contract TellerV2 is
         if (bids[_bidId].state != BidState.ACCEPTED) return owed;
 
         (uint256 owedPrincipal, , uint256 interest) = V2Calculations
-            .calculateAmountOwed(bids[_bidId], block.timestamp);
+            .calculateAmountOwed(
+                bids[_bidId],
+                block.timestamp,
+                bidPaymentCycleType[_bidId]
+            );
         owed.principal = owedPrincipal;
         owed.interest = interest;
     }
@@ -784,7 +807,7 @@ contract TellerV2 is
         ) return owed;
 
         (uint256 owedPrincipal, , uint256 interest) = V2Calculations
-            .calculateAmountOwed(bid, _timestamp);
+            .calculateAmountOwed(bid, _timestamp, bidPaymentCycleType[_bidId]);
         owed.principal = owedPrincipal;
         owed.interest = interest;
     }
@@ -801,7 +824,11 @@ contract TellerV2 is
         if (bids[_bidId].state != BidState.ACCEPTED) return due;
 
         (, uint256 duePrincipal, uint256 interest) = V2Calculations
-            .calculateAmountOwed(bids[_bidId], block.timestamp);
+            .calculateAmountOwed(
+                bids[_bidId],
+                block.timestamp,
+                bidPaymentCycleType[_bidId]
+            );
         due.principal = duePrincipal;
         due.interest = interest;
     }
@@ -823,7 +850,7 @@ contract TellerV2 is
         ) return due;
 
         (, uint256 duePrincipal, uint256 interest) = V2Calculations
-            .calculateAmountOwed(bid, _timestamp);
+            .calculateAmountOwed(bid, _timestamp, bidPaymentCycleType[_bidId]);
         due.principal = duePrincipal;
         due.interest = interest;
     }
@@ -840,25 +867,51 @@ contract TellerV2 is
         Bid storage bid = bids[_bidId];
         if (bids[_bidId].state != BidState.ACCEPTED) return dueDate_;
 
-        // Start with the original due date being 1 payment cycle since bid was accepted
-        dueDate_ = bid.loanDetails.acceptedTimestamp + bid.terms.paymentCycle;
+        uint32 lastRepaidTimestamp = lastRepaidTimestamp(_bidId);
 
-        // Calculate the cycle number the last repayment was made
-        uint32 delta = lastRepaidTimestamp(_bidId) -
-            bid.loanDetails.acceptedTimestamp;
-        if (delta > 0) {
-            uint32 repaymentCycle = 1 + (delta / bid.terms.paymentCycle);
-            dueDate_ += (repaymentCycle * bid.terms.paymentCycle);
-        }
+        // Calculate due date if payment cycle is set to monthly
+        if (bidPaymentCycleType[_bidId] == PaymentCycleType.Monthly) {
+            // Calculate the cycle number the last repayment was made
+            uint256 lastPaymentCycle = BPBDTL.diffMonths(
+                bid.loanDetails.acceptedTimestamp,
+                lastRepaidTimestamp
+            );
+            if (
+                BPBDTL.getDay(lastRepaidTimestamp) >
+                BPBDTL.getDay(bid.loanDetails.acceptedTimestamp)
+            ) {
+                lastPaymentCycle += 2;
+            } else {
+                lastPaymentCycle += 1;
+            }
 
-        //if we are in the last payment cycle, the next due date is the end of loan duration
-        if (
-            dueDate_ >
-            bid.loanDetails.acceptedTimestamp + bid.loanDetails.loanDuration
-        ) {
+            dueDate_ = uint32(
+                BPBDTL.addMonths(
+                    bid.loanDetails.acceptedTimestamp,
+                    lastPaymentCycle
+                )
+            );
+        } else if (bidPaymentCycleType[_bidId] == PaymentCycleType.Seconds) {
+            // Start with the original due date being 1 payment cycle since bid was accepted
             dueDate_ =
                 bid.loanDetails.acceptedTimestamp +
-                bid.loanDetails.loanDuration;
+                bid.terms.paymentCycle;
+            // Calculate the cycle number the last repayment was made
+            uint32 delta = lastRepaidTimestamp -
+                bid.loanDetails.acceptedTimestamp;
+            if (delta > 0) {
+                uint32 repaymentCycle = uint32(
+                    Math.ceilDiv(delta, bid.terms.paymentCycle)
+                );
+                dueDate_ += (repaymentCycle * bid.terms.paymentCycle);
+            }
+        }
+
+        uint32 endOfLoan = bid.loanDetails.acceptedTimestamp +
+            bid.loanDetails.loanDuration;
+        //if we are in the last payment cycle, the next due date is the end of loan duration
+        if (dueDate_ > endOfLoan) {
+            dueDate_ = endOfLoan;
         }
     }
 

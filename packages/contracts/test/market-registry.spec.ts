@@ -196,7 +196,7 @@ describe('MarketRegistry', () => {
       await marketRegistry
         .connect(marketOwner)
         [
-          'createMarket(address,uint32,uint32,uint32,uint16,bool,bool,uint8,string)'
+          'createMarket(address,uint32,uint32,uint32,uint16,bool,bool,uint8,uint8,string)'
         ](
           marketOwnerAddress,
           paymentCycleDuration,
@@ -206,6 +206,7 @@ describe('MarketRegistry', () => {
           false,
           false,
           '0',
+          0,
           uri
         )
         .should.emit(marketRegistry, 'MarketCreated')
@@ -216,7 +217,7 @@ describe('MarketRegistry', () => {
       await marketRegistry
         .connect(marketOwner)
         [
-          'createMarket(address,uint32,uint32,uint32,uint16,bool,bool,uint8,string)'
+          'createMarket(address,uint32,uint32,uint32,uint16,bool,bool,uint8,uint8,string)'
         ](
           ethers.constants.AddressZero,
           paymentCycleDuration,
@@ -226,6 +227,7 @@ describe('MarketRegistry', () => {
           true,
           true,
           '0',
+          0,
           uri
         )
         .should.be.revertedWith('Invalid owner address')
@@ -235,7 +237,7 @@ describe('MarketRegistry', () => {
       await marketRegistry
         .connect(marketOwner)
         [
-          'createMarket(address,uint32,uint32,uint32,uint16,bool,bool,uint8,string)'
+          'createMarket(address,uint32,uint32,uint32,uint16,bool,bool,uint8,uint8,string)'
         ](
           marketOwnerAddress,
           paymentCycleDuration,
@@ -245,6 +247,7 @@ describe('MarketRegistry', () => {
           true,
           true,
           '0',
+          0,
           uriTwo
         )
         .should.emit(marketRegistry, 'MarketCreated')
@@ -255,7 +258,7 @@ describe('MarketRegistry', () => {
       await marketRegistry
         .connect(marketOwner)
         [
-          'createMarket(address,uint32,uint32,uint32,uint16,bool,bool,uint8,string)'
+          'createMarket(address,uint32,uint32,uint32,uint16,bool,bool,uint8,uint8,string)'
         ](
           marketOwnerAddress,
           paymentCycleDuration,
@@ -265,6 +268,7 @@ describe('MarketRegistry', () => {
           true,
           true,
           '0',
+          0,
           uriThree
         )
         .should.emit(marketRegistry, 'MarketCreated')
@@ -275,7 +279,7 @@ describe('MarketRegistry', () => {
       await marketRegistry
         .connect(marketOwner)
         [
-          'createMarket(address,uint32,uint32,uint32,uint16,bool,bool,uint8,string)'
+          'createMarket(address,uint32,uint32,uint32,uint16,bool,bool,uint8,uint8,string)'
         ](
           marketOwnerAddress,
           paymentCycleDuration,
@@ -285,6 +289,7 @@ describe('MarketRegistry', () => {
           true,
           true,
           '0',
+          0,
           uri
         )
         .should.emit(marketRegistry, 'MarketCreated')
@@ -316,23 +321,21 @@ describe('MarketRegistry', () => {
     })
   })
 
-  describe('setMarketPaymentCycleDuration', () => {
+  describe('setPaymentCycle', () => {
     it('should be able to update market payment cycle duration', async () => {
       const setDuration = await marketRegistry
         .connect(marketOwner)
-        .setPaymentCycleDuration(1, 60 * 60 * 60)
-        .should.emit(marketRegistry, 'SetPaymentCycleDuration')
-        .withArgs(1, 60 * 60 * 60)
+        .setPaymentCycle(1, 0, 60 * 60 * 60)
+        .should.emit(marketRegistry, 'SetPaymentCycle')
+        .withArgs(1, 0, 60 * 60 * 60)
 
-      expect(await marketRegistry.getPaymentCycleDuration(1)).to.eql(
-        60 * 60 * 60
-      )
+      expect(await marketRegistry.getPaymentCycle(1)).to.eql([60 * 60 * 60, 0])
     })
 
     it('should not be able to update unowned market metadata uri', async () => {
       const setURI = await marketRegistry
         .connect(marketOwner)
-        .setPaymentCycleDuration(9, 60 * 60 * 60)
+        .setPaymentCycle(9, 0, 60 * 60 * 60)
         .should.be.revertedWith('Not the owner')
     })
   })
@@ -1065,6 +1068,8 @@ describe('MarketRegistry', () => {
           0,
           0,
           0,
+          0,
+          0,
           false,
           false,
           urifour
@@ -1078,6 +1083,8 @@ describe('MarketRegistry', () => {
         .updateMarketSettings(
           marketId,
           paymentCycleDuration.toString(),
+          0,
+          0,
           0,
           0,
           0,

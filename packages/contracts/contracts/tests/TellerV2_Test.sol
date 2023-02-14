@@ -25,7 +25,7 @@ import "./resolvers/TestERC20Token.sol";
 import "@mangrovedao/hardhat-test-solidity/test.sol";
 import "../CollateralManager.sol";
 import { Collateral } from "../interfaces/escrow/ICollateralEscrowV1.sol";
-import { PaymentType } from "../libraries/V2Calculations.sol";
+import { PaymentType, PaymentCycleType } from "../libraries/V2Calculations.sol";
 import { BidState, Payment } from "../TellerV2Storage.sol";
 import "../MetaForwarder.sol";
 import { LenderManager } from "../LenderManager.sol";
@@ -123,6 +123,7 @@ contract TellerV2_Test is Testable {
             false,
             false,
             PaymentType.EMI,
+            PaymentCycleType.Seconds,
             "uri://"
         );
     }

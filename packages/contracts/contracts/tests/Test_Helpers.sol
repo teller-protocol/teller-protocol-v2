@@ -8,7 +8,7 @@ import "../interfaces/ITellerV2.sol";
 import "../interfaces/ITellerV2Context.sol";
 import { Collateral } from "../interfaces/escrow/ICollateralEscrowV1.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import { PaymentType } from "../libraries/V2Calculations.sol";
+import { PaymentType, PaymentCycleType } from "../libraries/V2Calculations.sol";
 
 contract User {
     address public immutable tellerV2;
@@ -34,6 +34,7 @@ contract User {
         bool _requireLenderAttestation,
         bool _requireBorrowerAttestation,
         PaymentType _paymentType,
+        PaymentCycleType _paymentCycleType,
         string calldata _uri
     ) public returns (uint256) {
         return
@@ -46,6 +47,7 @@ contract User {
                 _requireLenderAttestation,
                 _requireBorrowerAttestation,
                 _paymentType,
+                _paymentCycleType,
                 _uri
             );
     }

@@ -317,7 +317,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         );
         require(
             _loanDuration <= commitment.maxDuration,
-            "Commitment duration insufficient"
+            "Maximum Loan duration exceeded"
         );
         require(
             _interestRate >= commitment.minInterestRate,

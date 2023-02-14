@@ -79,6 +79,8 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         delete submitBidWasCalled;
         delete submitBidWithCollateralWasCalled;
         delete requiredCollateralAmount;
+
+        delete commitmentCount;
     }
 
     function updateCommitment_before() public {
@@ -164,6 +166,9 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
        
     }
 
+
+
+
     function acceptCommitment_before() public {
         lender._createCommitment(
             marketId,
@@ -209,13 +214,13 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         Test.eq(
             commitment.maxPrincipal == 100,
             true,
-            "commitment not accepted"
+            "Commitment max principal was not decremented"
         );
 
         bidId = marketOwner._acceptCommitment(
             commitmentId,
             marketId,
-            100,
+            100, //principalAmount
             100, //collateralAmount
             0, //collateralTokenId
             maxLoanDuration,
@@ -230,7 +235,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         try marketOwner._acceptCommitment(
             commitmentId,
             marketId,
-            100,
+            100, //principalAmount
             100, //collateralAmount
             0, //collateralTokenId
             maxLoanDuration,
@@ -246,7 +251,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
     
     }
 
-     function acceptCommitmentFailsWithInsufficientCollateral_test() public {
+    function acceptCommitmentFailsWithInsufficientCollateral_test() public {
         
         lender._createCommitment(
             marketId,
@@ -261,7 +266,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             address(0)
         );
 
-        uint256 commitmentId = 1;
+        uint256 commitmentId = 0;
 
         Commitment storage commitment = lenderMarketCommitments[commitmentId];
 
@@ -292,6 +297,52 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
        
  
      }
+
+
+
+
+    function decrementCommitment_test() public {
+        
+        lender._createCommitment(
+            marketId,
+            tokenAddress,
+            maxAmount,
+            collateralTokenAddress,
+            maxPrincipalPerCollateralAmount,
+            collateralTokenType,
+            maxLoanDuration,
+            minInterestRate,
+            expiration,
+            address(0)
+        );
+
+
+        uint256 commitmentId = 0;
+        uint256 _decrementAmount = 22;
+
+        Commitment storage commitment = lenderMarketCommitments[commitmentId];
+
+      
+        _decrementCommitment(
+            commitmentId,
+            _decrementAmount
+        );
+
+       
+
+        Test.eq(
+            commitment.maxPrincipal == maxAmount - _decrementAmount,
+            true,
+            "Commitment max principal was not decremented"
+        );
+
+        
+       
+    
+    }
+
+
+
 
 
     function getRequiredCollateral_test() public {

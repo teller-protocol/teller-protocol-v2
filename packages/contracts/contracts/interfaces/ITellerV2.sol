@@ -44,7 +44,7 @@ interface ITellerV2 {
         uint16 _APR,
         string calldata _metadataURI,
         address _receiver,
-        Collateral[] calldata _collateralInfo
+        Collateral calldata _collateralInfo
     ) external returns (uint256 bidId_);
 
     /**

@@ -153,7 +153,15 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         uint256 _bidId, 
         Collateral calldata _collateralInfo
     ) external onlyTellerV2 {
-        if (isBidCollateralBacked(_bidId)) {
+
+
+        /*
+            Make sure that the collateralInfo passed in matches that of the bid 
+            (besides tokenId if any erc721 is allowed)
+        */
+
+
+      //  if (isBidCollateralBacked(_bidId)) {
             (address proxyAddress, ) = _deployEscrow(_bidId);
             _escrows[_bidId] = proxyAddress;
 
@@ -165,7 +173,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
             
 
             emit CollateralEscrowDeployed(_bidId, proxyAddress);
-        }
+       // }
     }
 
     /**
@@ -218,14 +226,14 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         external
         onlyTellerV2
     {
-        if (isBidCollateralBacked(_bidId)) {
+       // if (isBidCollateralBacked(_bidId)) {
             BidState bidState = tellerV2.getBidState(_bidId);
             require(
                 bidState == BidState.LIQUIDATED,
                 "Loan has not been liquidated"
             );
             _withdraw(_bidId, _liquidatorAddress);
-        }
+       // }
     }
 
     /* Internal Functions */

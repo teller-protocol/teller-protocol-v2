@@ -375,6 +375,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
     }
 
     //fix tests
+    //use math ceiling (OZ math mul div) 
     function getRequiredCollateral(uint256 _principalAmount, uint256 _maxPrincipalPerCollateralAmount) public view virtual returns (uint256 _collateralAmountRaw) {
         _collateralAmountRaw= (_principalAmount *  PRINCIPAL_PER_COLLATERAL_EXPANSION_FACTOR ) / _maxPrincipalPerCollateralAmount;
     }

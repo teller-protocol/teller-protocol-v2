@@ -11,18 +11,24 @@ import "../TellerV2Context.sol";
 import { Testable } from "./Testable.sol";
 import { LenderCommitmentForwarder } from "../LenderCommitmentForwarder.sol";
 
+
 import {
     Collateral,
     CollateralType
 } from "../interfaces/escrow/ICollateralEscrowV1.sol";
+ 
+import { User } from "./Test_Helpers.sol";
+
+import "../mock/MarketRegistryMock.sol";
+ 
 
 contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
-    LenderCommitmentTester private tester;
-    MockMarketRegistry mockMarketRegistry;
+    LenderCommitmentForwarderTest_TellerV2Mock private tellerV2Mock;
+    MarketRegistryMock mockMarketRegistry;
 
-    User private marketOwner;
-    User private lender;
-    User private borrower;
+    LenderCommitmentUser private marketOwner;
+    LenderCommitmentUser private lender;
+    LenderCommitmentUser private borrower;
 
     address tokenAddress;
     uint256 marketId;
@@ -44,19 +50,21 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
 
     constructor()
         LenderCommitmentForwarder(
-            address(new LenderCommitmentTester()),
-            address(new MockMarketRegistry(address(0)))
+            address(new LenderCommitmentForwarderTest_TellerV2Mock()), ///_protocolAddress
+            address(new MarketRegistryMock(address(0)))
         )
     {}
 
     function setup_beforeAll() public {
-        tester = LenderCommitmentTester(address(getTellerV2()));
-        mockMarketRegistry = MockMarketRegistry(address(getMarketRegistry()));
+        tellerV2Mock = LenderCommitmentForwarderTest_TellerV2Mock(
+            address(getTellerV2())
+        );
+        mockMarketRegistry = MarketRegistryMock(address(getMarketRegistry()));
 
-        marketOwner = new User(tester, (this));
-        borrower = new User(tester, (this));
-        lender = new User(tester, (this));
-        tester.__setMarketOwner(marketOwner);
+        marketOwner = new LenderCommitmentUser(address(tellerV2Mock), (this));
+        borrower = new LenderCommitmentUser(address(tellerV2Mock), (this));
+        lender = new LenderCommitmentUser(address(tellerV2Mock), (this));
+        tellerV2Mock.__setMarketOwner(marketOwner);
 
         mockMarketRegistry.setMarketOwner(address(marketOwner));
 
@@ -418,29 +426,28 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
     }
 }
 
-contract User {
-    TellerV2Context public immutable context;
+contract LenderCommitmentUser is User {
     LenderCommitmentForwarder public immutable commitmentForwarder;
 
     constructor(
-        TellerV2Context _context,
+        address _tellerV2,
         LenderCommitmentForwarder _commitmentForwarder
-    ) {
-        context = _context;
+    ) User(_tellerV2) {
         commitmentForwarder = _commitmentForwarder;
     }
 
+    /*
     function setTrustedMarketForwarder(uint256 _marketId, address _forwarder)
         external
     {
-        context.setTrustedMarketForwarder(_marketId, _forwarder);
+        tellerV2.setTrustedMarketForwarder(_marketId, _forwarder);
     }
 
     function approveMarketForwarder(uint256 _marketId, address _forwarder)
         external
     {
-        context.approveMarketForwarder(_marketId, _forwarder);
-    }
+        tellerV2.approveMarketForwarder(_marketId, _forwarder);
+    }*/
 
     function _createCommitment(
         uint256 marketId,
@@ -528,12 +535,13 @@ contract User {
     }
 }
 
-contract LenderCommitmentTester is TellerV2Context {
+//Move to a helper file !
+contract LenderCommitmentForwarderTest_TellerV2Mock is TellerV2Context {
     constructor() TellerV2Context(address(0)) {}
 
     function __setMarketOwner(User _marketOwner) external {
         marketRegistry = IMarketRegistry(
-            address(new MockMarketRegistry(address(_marketOwner)))
+            address(new MarketRegistryMock(address(_marketOwner)))
         );
     }
 
@@ -554,6 +562,8 @@ contract LenderCommitmentTester is TellerV2Context {
     }
 }
 
+/*
+
 contract MockMarketRegistry {
     address private marketOwner;
 
@@ -569,3 +579,4 @@ contract MockMarketRegistry {
         return address(marketOwner);
     }
 }
+*/

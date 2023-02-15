@@ -8,6 +8,7 @@ import { isInitialized } from 'helpers/oz-contract-helpers'
 import moment from 'moment'
 import {
   CollateralManager,
+  LenderManager,
   MarketRegistry,
   ReputationManager,
   TellerV2,
@@ -47,6 +48,7 @@ interface SetupReturn {
   marketRegistry: MarketRegistry
   tellerV2: TellerV2Mock
   reputationManager: ReputationManager
+  lenderManager: LenderManager
 }
 
 const setup = deployments.createFixture<SetupReturn, SetupOptions>(
@@ -64,10 +66,15 @@ const setup = deployments.createFixture<SetupReturn, SetupOptions>(
       'ReputationManager'
     )
 
+    const lenderManager = await hre.contracts.get<LenderManager>(
+      'LenderManager'
+    )
+
     return {
       tellerV2,
       marketRegistry,
       reputationManager,
+      lenderManager,
     }
   }
 )
@@ -79,12 +86,14 @@ describe('TellerV2', () => {
   let borrower: Signer
   let lender: Signer
   let marketOwner: Signer
+  let lenderManager: LenderManager
 
   beforeEach(async () => {
     const result = await setup()
     tellerV2 = result.tellerV2
     marketRegistry = result.marketRegistry
     reputationManager = result.reputationManager
+    lenderManager = result.lenderManager
     borrower = await getNamedSigner('borrower')
     lender = await getNamedSigner('lender')
     marketOwner = await getNamedSigner('marketowner')
@@ -95,7 +104,7 @@ describe('TellerV2', () => {
     await marketRegistry
       .connect(marketOwner)
       [
-        'createMarket(address,uint32,uint32,uint32,uint16,bool,bool,uint8,string)'
+        'createMarket(address,uint32,uint32,uint32,uint16,bool,bool,uint8,uint8,string)'
       ](
         marketOwnerAddress,
         paymentCycleDuration,
@@ -105,6 +114,7 @@ describe('TellerV2', () => {
         false,
         false,
         '0',
+        0,
         uri
       )
       .should.emit(marketRegistry, 'MarketCreated')
@@ -126,6 +136,7 @@ describe('TellerV2', () => {
           reputationManager.address,
           AddressZero,
           [(await getTokens(hre)).all.DAI],
+          AddressZero,
           AddressZero
         )
         .should.be.revertedWith(
@@ -219,7 +230,7 @@ describe('TellerV2', () => {
       const sample = async (paymentCycle: moment.Duration): Promise<void> => {
         await marketRegistry
           .connect(marketOwner)
-          .setPaymentCycleDuration(marketplaceId, paymentCycle.asSeconds())
+          .setPaymentCycle(marketplaceId, 0, paymentCycle.asSeconds())
 
         const { tellerV2, bidId } = await submitBid({ marketplaceId })
 
@@ -361,7 +372,7 @@ describe('TellerV2', () => {
         .emit(tellerV2, 'AcceptedBid')
         .withArgs(bidId, lender.address)
 
-      const stakeholder = await tellerV2.getLoanLender(bidId)
+      const stakeholder = await lenderManager.ownerOf(bidId)
       stakeholder.should.be.eql(lender.address)
     })
 
@@ -391,7 +402,7 @@ describe('TellerV2', () => {
 
       // pause the protocol
       const deployer = await getNamedSigner('deployer')
-      ///await tellerV2.connect(deployer).pauseProtocol()
+      // /await tellerV2.connect(deployer).pauseProtocol()
 
       // get lender
       const lender = await getNamedSigner('lender')
@@ -432,7 +443,7 @@ describe('TellerV2', () => {
       await tellerV2.mockBid(
         buildBid({
           borrower: await borrower.getAddress(),
-          lender: await lender.getAddress(),
+          lender: NULL_ADDRESS,
           receiver: await borrower.getAddress(),
           loanDetails: {
             lendingToken: token.address,
@@ -821,10 +832,12 @@ export const buildBid = (values: PartialNested<BidParams>): BidParams =>
 
 describe('TellerV2', () => {
   let tellerV2: TellerV2Mock
+  let lender: Signer
 
   beforeEach(async () => {
     const result = await setup()
     tellerV2 = result.tellerV2
+    lender = await getNamedSigner('lender')
   })
 
   describe('calculateAmountOwed', () => {
@@ -1008,7 +1021,7 @@ describe('TellerV2', () => {
     await marketRegistry
       .connect(marketOwner)
       [
-        'createMarket(address,uint32,uint32,uint32,uint16,bool,bool,uint8,string)'
+        'createMarket(address,uint32,uint32,uint32,uint16,bool,bool,uint8,uint8,string)'
       ](
         marketOwnerAddress,
         paymentCycleDuration,
@@ -1018,6 +1031,7 @@ describe('TellerV2', () => {
         false,
         false,
         '0',
+        0,
         uri
       )
       .should.emit(marketRegistry, 'MarketCreated')

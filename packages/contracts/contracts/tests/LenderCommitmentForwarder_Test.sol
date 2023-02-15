@@ -100,18 +100,28 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
     }
 
     function updateCommitment_before() public {
+
+
+        Commitment memory _commitment = Commitment({
+
+            marketId:marketId,
+            principalTokenAddress: tokenAddress,
+            maxPrincipal: maxAmount,
+            collateralTokenAddress: collateralTokenAddress,
+            collateralTokenId: collateralTokenId,
+            maxPrincipalPerCollateralAmount: maxPrincipalPerCollateralAmount,
+            collateralTokenType: collateralTokenType,
+            maxDuration: maxLoanDuration,
+            minInterestRate: minInterestRate,
+            expiration: expiration,
+            borrower: address(0),
+            lender: address(lender)
+
+        });
+
+
         uint256 commitmentId = lender._createCommitment(
-            marketId,
-            tokenAddress,
-            maxAmount,
-            collateralTokenAddress,
-            collateralTokenId,
-            maxPrincipalPerCollateralAmount,
-            collateralTokenType,
-            maxLoanDuration,
-            minInterestRate,
-            expiration,
-            address(0)
+            _commitment
         );
  
     }
@@ -131,34 +141,33 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
 
         lender._updateCommitment(
             commitmentId,
-            marketId,
-            tokenAddress,
-            maxAmount,
-            collateralTokenAddress,
-            collateralTokenId,
-            maxPrincipalPerCollateralAmount,
-            collateralTokenType,
-            maxLoanDuration,
-            minInterestRate,
-            expiration,
-            address(0)
+            existingCommitment
         );
     }
 
 
      function deleteCommitment_before() public {
+
+
+        Commitment memory _commitment = Commitment({
+
+            marketId:marketId,
+            principalTokenAddress: tokenAddress,
+            maxPrincipal: maxAmount,
+            collateralTokenAddress: collateralTokenAddress,
+            collateralTokenId: collateralTokenId,
+            maxPrincipalPerCollateralAmount: maxPrincipalPerCollateralAmount,
+            collateralTokenType: collateralTokenType,
+            maxDuration: maxLoanDuration,
+            minInterestRate: minInterestRate,
+            expiration: expiration,
+            borrower: address(0),
+            lender: address(lender)
+
+        });
+
         uint256 commitmentId = lender._createCommitment(
-            marketId,
-            tokenAddress,
-            maxAmount,
-            collateralTokenAddress,
-            collateralTokenId,
-            maxPrincipalPerCollateralAmount,
-            collateralTokenType,
-            maxLoanDuration,
-            minInterestRate,
-            expiration,
-            address(0)
+         _commitment
         );
  
     }
@@ -189,18 +198,26 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
 
 
     function acceptCommitment_before() public {
+        
+        Commitment memory _commitment = Commitment({
+
+            marketId:marketId,
+            principalTokenAddress: tokenAddress,
+            maxPrincipal: maxAmount,
+            collateralTokenAddress: collateralTokenAddress,
+            collateralTokenId: collateralTokenId,
+            maxPrincipalPerCollateralAmount: maxPrincipalPerCollateralAmount,
+            collateralTokenType: collateralTokenType,
+            maxDuration: maxLoanDuration,
+            minInterestRate: minInterestRate,
+            expiration: expiration,
+            borrower: address(0),
+            lender: address(lender)
+
+        });
+
         lender._createCommitment(
-            marketId,
-            tokenAddress,
-            maxAmount,
-            collateralTokenAddress,
-            collateralTokenId,
-            maxPrincipalPerCollateralAmount,
-            collateralTokenType,
-            maxLoanDuration,
-            minInterestRate,
-            expiration,
-            address(0)
+          _commitment
         );
     }
 
@@ -217,12 +234,11 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
 
         uint256 bidId = marketOwner._acceptCommitment(
             commitmentId,
-            marketId,
+          
             maxAmount - 100, //principal 
             maxAmount, //collateralAmount
-            0, //collateralTokenId
-            maxLoanDuration,
-            minInterestRate
+            0  //collateralTokenId
+            
         );
 
         Test.eq(
@@ -239,12 +255,11 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
 
         bidId = marketOwner._acceptCommitment(
             commitmentId,
-            marketId,
+          
             100, //principalAmount
             100, //collateralAmount
-            0, //collateralTokenId
-            maxLoanDuration,
-            minInterestRate
+            0  //collateralTokenId
+            
         );
  
 
@@ -254,12 +269,11 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
 
         try marketOwner._acceptCommitment(
             commitmentId,
-            marketId,
+         
             100, //principalAmount
             100, //collateralAmount
-            0, //collateralTokenId
-            maxLoanDuration,
-            minInterestRate
+            0  //collateralTokenId
+             
              ){
 
         }catch{
@@ -272,19 +286,26 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
     }
 
     function acceptCommitmentFailsWithInsufficientCollateral_test() public {
-        
+            
+         Commitment memory _commitment = Commitment({
+
+            marketId:marketId,
+            principalTokenAddress: tokenAddress,
+            maxPrincipal: maxAmount,
+            collateralTokenAddress: collateralTokenAddress,
+            collateralTokenId: collateralTokenId,
+            maxPrincipalPerCollateralAmount: maxPrincipalPerCollateralAmount,
+            collateralTokenType: collateralTokenType,
+            maxDuration: maxLoanDuration,
+            minInterestRate: minInterestRate,
+            expiration: expiration,
+            borrower: address(0),
+            lender: address(lender)
+
+        });
+
         lender._createCommitment(
-            marketId,
-            tokenAddress,
-            maxAmount,
-            collateralTokenAddress,
-            collateralTokenId,
-            maxPrincipalPerCollateralAmount,
-            collateralTokenType,
-            maxLoanDuration,
-            minInterestRate,
-            expiration,
-            address(0)
+          _commitment
         );
 
         uint256 commitmentId = 0;
@@ -297,12 +318,11 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
 
         try marketOwner._acceptCommitment(
             commitmentId,
-            marketId,
+            
             maxAmount - 100, //principal 
             maxAmount, //collateralAmount
-            0, //collateralTokenId
-            maxLoanDuration,
-            minInterestRate
+            0  //collateralTokenId
+            
         ) {
 
         }catch{
@@ -323,19 +343,27 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
 
 
     function decrementCommitment_test() public {
-        
+
+           Commitment memory _commitment = Commitment({
+
+            marketId:marketId,
+            principalTokenAddress: tokenAddress,
+            maxPrincipal: maxAmount,
+            collateralTokenAddress: collateralTokenAddress,
+            collateralTokenId: collateralTokenId,
+            maxPrincipalPerCollateralAmount: maxPrincipalPerCollateralAmount,
+            collateralTokenType: collateralTokenType,
+            maxDuration: maxLoanDuration,
+            minInterestRate: minInterestRate,
+            expiration: expiration,
+            borrower: address(0),
+            lender: address(lender)
+
+        });
+
+
         lender._createCommitment(
-            marketId,
-            tokenAddress,
-            maxAmount,
-            collateralTokenAddress,
-            collateralTokenId,
-            maxPrincipalPerCollateralAmount,
-            collateralTokenType,
-            maxLoanDuration,
-            minInterestRate,
-            expiration,
-            address(0)
+           _commitment
         );
 
 
@@ -444,95 +472,39 @@ contract LenderCommitmentUser is User {
         commitmentForwarder = _commitmentForwarder;
     }
 
-    /*
-    function setTrustedMarketForwarder(uint256 _marketId, address _forwarder)
-        external
-    {
-        tellerV2.setTrustedMarketForwarder(_marketId, _forwarder);
-    }
-
-    function approveMarketForwarder(uint256 _marketId, address _forwarder)
-        external
-    {
-        tellerV2.approveMarketForwarder(_marketId, _forwarder);
-    }*/
+     
 
     function _createCommitment(
-        uint256 marketId,
-        address tokenAddress,
-        uint256 principal,
-        address _collateralTokenAddress,
-        uint256 _collateralTokenId,
-        uint256 _maxPrincipalPerCollateralAmount,
-        LenderCommitmentForwarder.CommitmentCollateralType _collateralTokenType,
-        uint32 loanDuration,
-        uint16 interestRate,
-        uint32 expiration,
-        address borrower
+         LenderCommitmentForwarder.Commitment calldata _commitment
     ) public returns (uint256) {
         return
             commitmentForwarder.createCommitment(
-                marketId,
-                tokenAddress,
-                principal,
-                _collateralTokenAddress,
-                _collateralTokenId,
-                _maxPrincipalPerCollateralAmount,
-                _collateralTokenType,
-                loanDuration,
-                interestRate,
-                expiration,
-                borrower
+              _commitment
             );
     }
 
     function _updateCommitment(
         uint256 commitmentId,
-        uint256 marketId,
-        address tokenAddress,
-        uint256 principal,
-        address _collateralTokenAddress,
-        uint256 _collateralTokenId,
-        uint256 _maxPrincipalPerCollateralAmount,
-        LenderCommitmentForwarder.CommitmentCollateralType _collateralTokenType,
-        uint32 loanDuration,
-        uint16 interestRate,
-        uint32 expiration,
-        address borrower
+        LenderCommitmentForwarder.Commitment calldata _commitment
     ) public {
         commitmentForwarder.updateCommitment(
             commitmentId,
-            marketId,
-            tokenAddress,
-            principal,
-            _collateralTokenAddress,
-            _collateralTokenId,
-            _maxPrincipalPerCollateralAmount,
-            _collateralTokenType,
-            loanDuration,
-            interestRate,
-            expiration,
-            borrower
+            _commitment
         );
     }
 
     function _acceptCommitment(
-        uint256 commitmentId,
-        uint256 marketId,
+        uint256 commitmentId,   
         uint256 principal,
         uint256 collateralAmount,
-        uint256 collateralTokenId,
-        uint32 loanDuration,
-        uint16 interestRate
+        uint256 collateralTokenId  
     ) public returns (uint256) {
         return
             commitmentForwarder.acceptCommitment(
-                commitmentId,
-                
+                commitmentId,  
                 principal,
                 collateralAmount,
-                collateralTokenId 
-               
+                collateralTokenId  
             );
     }
 
@@ -571,21 +543,4 @@ contract LenderCommitmentForwarderTest_TellerV2Mock is TellerV2Context {
     }
 }
 
-/*
-
-contract MockMarketRegistry {
-    address private marketOwner;
-
-    constructor(address _marketOwner) {
-        marketOwner = _marketOwner;
-    }
-
-    function setMarketOwner(address _marketOwner) public {
-        marketOwner = _marketOwner;
-    }
-
-    function getMarketOwner(uint256) external view returns (address) {
-        return address(marketOwner);
-    }
-}
-*/
+ 

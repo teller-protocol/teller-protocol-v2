@@ -316,14 +316,8 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             _principalAmount <= commitment.maxPrincipal,
             "Commitment principal insufficient"
         );
-        require(
-            _loanDuration <= commitment.maxDuration,
-            "Maximum Loan duration exceeded"
-        );
-        require(
-            _interestRate >= commitment.minInterestRate,
-            "Interest rate insufficient for commitment"
-        );
+        
+        
         require(
             block.timestamp < commitment.expiration,
             "Commitment has expired"
@@ -356,8 +350,8 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             _collateralAmount,
             _collateralTokenId,
             commitment.collateralTokenType,
-            _loanDuration,
-            _interestRate
+            commitment.maxDuration,
+            commitment.minInterestRate
         );
 
         _acceptBid(bidId, commitment.lender);

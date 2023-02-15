@@ -135,6 +135,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             tokenAddress,
             maxAmount,
             collateralTokenAddress,
+            collateralTokenId,
             maxPrincipalPerCollateralAmount,
             collateralTokenType,
             maxLoanDuration,
@@ -491,6 +492,7 @@ contract LenderCommitmentUser is User {
         address tokenAddress,
         uint256 principal,
         address _collateralTokenAddress,
+        uint256 _collateralTokenId,
         uint256 _maxPrincipalPerCollateralAmount,
         LenderCommitmentForwarder.CommitmentCollateralType _collateralTokenType,
         uint32 loanDuration,
@@ -504,6 +506,7 @@ contract LenderCommitmentUser is User {
             tokenAddress,
             principal,
             _collateralTokenAddress,
+            _collateralTokenId,
             _maxPrincipalPerCollateralAmount,
             _collateralTokenType,
             loanDuration,
@@ -525,12 +528,11 @@ contract LenderCommitmentUser is User {
         return
             commitmentForwarder.acceptCommitment(
                 commitmentId,
-                marketId,
+                
                 principal,
                 collateralAmount,
-                collateralTokenId,
-                loanDuration,
-                interestRate
+                collateralTokenId 
+               
             );
     }
 

@@ -375,7 +375,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
     }
 
     //fix tests
-    //use math ceiling (OZ math mul div) 
+    //use math ceiling (OZ math mul div) -- make sure that 700 / 500 = 1.4 rounds up to 2, requiring a quantity of 2 NFTs 
     function getRequiredCollateral(uint256 _principalAmount, uint256 _maxPrincipalPerCollateralAmount) public view virtual returns (uint256 _collateralAmountRaw) {
         _collateralAmountRaw= (_principalAmount *  PRINCIPAL_PER_COLLATERAL_EXPANSION_FACTOR ) / _maxPrincipalPerCollateralAmount;
     }

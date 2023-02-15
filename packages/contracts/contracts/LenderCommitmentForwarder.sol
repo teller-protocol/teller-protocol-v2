@@ -151,7 +151,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         address _collateralTokenAddress,
         uint256 _collateralTokenId,
         uint256 _maxPrincipalPerCollateralAmount,
-        CollateralType _collateralTokenType,
+        CommitmentCollateralType _collateralTokenType,
         uint32 _maxLoanDuration,
         uint16 _minInterestRate,
         uint32 _expiration,
@@ -207,7 +207,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint256 _maxPrincipal,
         address _collateralTokenAddress,
         uint256 _maxPrincipalPerCollateralAmount,
-        CollateralType _collateralTokenType,
+        CommitmentCollateralType _collateralTokenType,
         uint32 _maxLoanDuration,
         uint16 _minInterestRate,
         uint32 _expiration,
@@ -346,13 +346,13 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             "Insufficient collateral"
         );
 
-        if(commitment.collateralTokenType == CollateralType.ERC721 ||
-        commitment.collateralTokenType == CollateralType.ERC721_ANY ){
+        if(commitment.collateralTokenType == CommitmentCollateralType.ERC721 ||
+        commitment.collateralTokenType == CommitmentCollateralType.ERC721_ANY_ID ){
               require( _collateralAmount == 1, "Invalid amount for ERC721");
         }
 
-        if(commitment.collateralTokenType == CollateralType.ERC721 ||
-        commitment.collateralTokenType == CollateralType.ERC1155 ){
+        if(commitment.collateralTokenType == CommitmentCollateralType.ERC721 ||
+        commitment.collateralTokenType == CommitmentCollateralType.ERC1155 ){
               require( commitment.collateralTokenId == _collateralTokenId, "Invalid tokenId");
         }
       

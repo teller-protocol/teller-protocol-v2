@@ -22,6 +22,13 @@ import { User } from "./Test_Helpers.sol";
 import "../mock/MarketRegistryMock.sol";
  
 
+ /* 
+ add tests for each token type 
+
+ add test for conversion of collateral type -- simple 
+
+ */
+
 contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
     LenderCommitmentForwarderTest_TellerV2Mock private tellerV2Mock;
     MarketRegistryMock mockMarketRegistry;
@@ -36,7 +43,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
 
     address collateralTokenAddress;
     uint256 maxPrincipalPerCollateralAmount;
-    CollateralType collateralTokenType;
+    CommitmentCollateralType collateralTokenType;
     uint256 collateralTokenId;
 
     uint32 maxLoanDuration;
@@ -79,7 +86,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174
         );
         maxPrincipalPerCollateralAmount = 1 * PRINCIPAL_PER_COLLATERAL_EXPANSION_FACTOR;
-        collateralTokenType = CollateralType.ERC20;
+        collateralTokenType = CommitmentCollateralType.ERC20;
 
         marketOwner.setTrustedMarketForwarder(marketId, address(this));
         lender.approveMarketForwarder(marketId, address(this));
@@ -456,7 +463,7 @@ contract LenderCommitmentUser is User {
         address _collateralTokenAddress,
         uint256 _collateralTokenId,
         uint256 _maxPrincipalPerCollateralAmount,
-        CollateralType _collateralTokenType,
+        LenderCommitmentForwarder.CommitmentCollateralType _collateralTokenType,
         uint32 loanDuration,
         uint16 interestRate,
         uint32 expiration,
@@ -485,7 +492,7 @@ contract LenderCommitmentUser is User {
         uint256 principal,
         address _collateralTokenAddress,
         uint256 _maxPrincipalPerCollateralAmount,
-        CollateralType _collateralTokenType,
+        LenderCommitmentForwarder.CommitmentCollateralType _collateralTokenType,
         uint32 loanDuration,
         uint16 interestRate,
         uint32 expiration,

@@ -15,6 +15,9 @@ import "../mock/MarketRegistryMock.sol";
 
 import { User } from "./Test_Helpers.sol";
 
+
+import { TellerV2Context } from "../TellerV2Context.sol";
+
 contract LenderManager_Test is Testable, LenderManager {
     LenderManagerUser private marketOwner;
     LenderManagerUser private lender;

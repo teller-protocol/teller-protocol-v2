@@ -13,6 +13,14 @@ import {
 contract LenderCommitmentForwarder is TellerV2MarketForwarder {
 
 
+    enum CommitmentCollateralType {
+        ERC20,
+        ERC721,
+        ERC1155,
+        ERC721_ANY_ID, //used only for lender commitments
+        ERC1155_ANY_ID //used only for lender commitments
+    }
+
     uint256 public constant PRINCIPAL_PER_COLLATERAL_EXPANSION_FACTOR = 10**16;
 
 
@@ -38,7 +46,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         address collateralTokenAddress;
         uint256 collateralTokenId; 
         uint256 maxPrincipalPerCollateralAmount; //zero means infinite . This is expressed using 16 decimals [PRINCIPAL_PER_COLLATERAL_EXPANSION_FACTOR] so 1 wei is 10^16 and 1 usdc is 10^22 
-        CollateralType collateralTokenType; //erc721, erc1155 or erc20
+        CommitmentCollateralType collateralTokenType; //erc721, erc1155 or erc20
         address lender;
         uint256 marketId;
         address principalTokenAddress;
@@ -391,7 +399,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         address _collateralTokenAddress,
         uint256 _collateralAmount,
         uint256 _collateralTokenId,
-        CollateralType _collateralTokenType,
+        CommitmentCollateralType _collateralTokenType,
         uint32 _loanDuration,
         uint16 _interestRate
     ) internal returns (uint256 bidId) {
@@ -405,7 +413,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         Collateral[] memory collateralInfo = new Collateral[](1);
 
         collateralInfo[0] = Collateral({
-            _collateralType: _collateralTokenType,
+            _collateralType: _getEscrowCollateralType(_collateralTokenType),
             _tokenId: _collateralTokenId,
             _amount: _collateralAmount,
             _collateralAddress: _collateralTokenAddress
@@ -416,5 +424,20 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             collateralInfo,
             _borrower
         );
+    }
+
+    function _getEscrowCollateralType(CommitmentCollateralType _type) internal pure returns (CollateralType){
+
+        if(_type == CommitmentCollateralType.ERC20 ){
+            return CollateralType.ERC20;
+        }
+        if(_type == CommitmentCollateralType.ERC721 || _type == CommitmentCollateralType.ERC721_ANY_ID){
+            return CollateralType.ERC721;
+        }
+        if(_type == CommitmentCollateralType.ERC1155 || _type == CommitmentCollateralType.ERC1155_ANY_ID){
+            return CollateralType.ERC1155;
+        }
+
+        revert("Unknown Collateral Type");
     }
 }

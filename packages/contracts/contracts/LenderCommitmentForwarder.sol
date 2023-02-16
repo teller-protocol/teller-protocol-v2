@@ -143,17 +143,6 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
      */
     function createCommitment(
         Commitment calldata _commitment
-        /*uint256 _marketId,
-        address _principalTokenAddress,
-        uint256 _maxPrincipal,
-        address _collateralTokenAddress,
-        uint256 _collateralTokenId,
-        uint256 _maxPrincipalPerCollateralAmount,
-        CommitmentCollateralType _collateralTokenType,
-        uint32 _maxLoanDuration,
-        uint16 _minInterestRate,
-        uint32 _expiration,
-        address _borrower*/
     ) public returns (uint256 commitmentId) {
         commitmentId = commitmentCount++;
 
@@ -180,17 +169,6 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
     function updateCommitment(
         uint256 _commitmentId,
         Commitment calldata _commitment
-        /*uint256 _marketId,
-        address _principalTokenAddress,
-        uint256 _maxPrincipal,
-        address _collateralTokenAddress,
-        uint256 _collateralTokenId,
-        uint256 _maxPrincipalPerCollateralAmount,
-        CommitmentCollateralType _collateralTokenType,
-        uint32 _maxLoanDuration,
-        uint16 _minInterestRate,
-        uint32 _expiration,
-        address _borrower*/
     ) public {
         require(_commitment.expiration > uint32(block.timestamp));
            require(

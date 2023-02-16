@@ -19,6 +19,7 @@ simplify updateCommitment by using struct arg
 
 contract LenderCommitmentForwarder is TellerV2MarketForwarder {
     enum CommitmentCollateralType {
+        NONE, // no collateral required
         ERC20,
         ERC721,
         ERC1155,
@@ -118,6 +119,43 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint256 indexed bidId
     );
 
+    error InsufficientCommitmentAllocation(uint256 allocated, uint256 requested);
+    error InsufficientBorrowerCollateral(uint256 required, uint256 actual);
+
+    /** Modifiers **/
+
+    modifier commitmentLender(uint256 _commitmentId) {
+        require(lenderMarketCommitments[_commitmentId].lender == _msgSender(), "unauthorized commitment lender");
+        _;
+    }
+
+    modifier withValidCommitment(Commitment storage _commitment) {
+        _requireValidCommitment(_commitment);
+        _;
+    }
+    modifier validateUpdatedCommitment(Commitment storage _commitment) {
+        _;
+        _requireValidCommitment(_commitment);
+
+        if (_commitment.collateralTokenType != CommitmentCollateralType.NONE) {
+            require(
+                _commitment.maxPrincipalPerCollateralAmount > 0,
+                "commitment collateral ratio 0"
+            );
+
+            if (_commitment.collateralTokenType == CommitmentCollateralType.ERC20) {
+                require(
+                    _commitment.collateralTokenId == 0,
+                    "commitment collateral token id must be 0 for ERC20"
+                );
+            }
+        }
+    }
+    function _requireValidCommitment(Commitment storage _commitment) internal {
+        require(_commitment.expiration > uint32(block.timestamp), "expired commitment");
+        require(_commitment.maxPrincipal > 0, "commitment principal allocation 0");
+    }
+
     /** External Functions **/
 
     constructor(address _protocolAddress, address _marketRegistry)
@@ -129,18 +167,18 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
      * @param _commitment The new commitment data expressed as a struct
      */
     function createCommitment(Commitment calldata _commitment)
+        validateUpdatedCommitment(lenderMarketCommitments[commitmentCount++])
         public
-        returns (uint256 commitmentId)
+        returns (uint256 commitmentId_)
     {
-        commitmentId = commitmentCount++;
+        commitmentId_ = commitmentCount;
 
-        require(_commitment.expiration > uint32(block.timestamp));
-        require(_commitment.lender == _msgSender());
+        require(_commitment.lender == _msgSender(), "unauthorized commitment creator");
 
-        lenderMarketCommitments[commitmentId] = _commitment;
+        lenderMarketCommitments[commitmentId_] = _commitment;
 
         emit CreatedCommitment(
-            commitmentId,
+            commitmentId_,
             _commitment.lender,
             _commitment.marketId,
             _commitment.principalTokenAddress,
@@ -152,20 +190,15 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
      * @notice Updates the commitment of a lender to a market.
      * @param _commitmentId The Id of the commitment to update.
      * @param _commitment The new commitment data expressed as a struct
-    
      */
     function updateCommitment(
         uint256 _commitmentId,
         Commitment calldata _commitment
-    ) public {
-        require(_commitment.expiration > uint32(block.timestamp));
-        require(
-            _msgSender() == _commitment.lender,
-            "Unauthorized to update commitment"
-        );
-
-        Commitment storage commitment = lenderMarketCommitments[_commitmentId];
-
+    )
+        commitmentLender(_commitmentId)
+        validateUpdatedCommitment(lenderMarketCommitments[_commitmentId])
+        public
+    {
         lenderMarketCommitments[_commitmentId] = _commitment;
 
         emit UpdatedCommitment(
@@ -182,12 +215,10 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
      * @param _commitmentId The id of the commitment to delete.
    
      */
-    function deleteCommitment(uint256 _commitmentId) public {
-        require(
-            lenderMarketCommitments[_commitmentId].lender == _msgSender(),
-            "Unauthorized to delete commitment"
-        );
-
+    function deleteCommitment(uint256 _commitmentId)
+        commitmentLender(_commitmentId)
+        public
+    {
         delete lenderMarketCommitments[_commitmentId];
         emit DeletedCommitment(_commitmentId);
     }
@@ -211,50 +242,51 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
      * @param _principalAmount The amount of currency to borrow for the loan.
      * @param _collateralAmount The amount of collateral to use for the loan.
      * @param _collateralTokenId The tokenId of collateral to use for the loan if ERC721 or ERC1155.
- 
      */
     function acceptCommitment(
         uint256 _commitmentId,
         uint256 _principalAmount,
         uint256 _collateralAmount,
         uint256 _collateralTokenId
-    ) external returns (uint256 bidId) {
+    )
+        withValidCommitment(lenderMarketCommitments[_commitmentId])
+        external
+        returns (uint256 bidId)
+    {
         address borrower = _msgSender();
 
         Commitment storage commitment = lenderMarketCommitments[_commitmentId];
 
         require(
             commitment.borrower == address(0) ||
-                borrower == commitment.borrower,
-            "Unauthorized borrower for this commitment"
+            borrower == commitment.borrower,
+            "unauthorized commitment borrower"
         );
-
-        require(
-            _principalAmount <= commitment.maxPrincipal,
-            "Commitment principal insufficient"
-        );
-
-        require(
-            block.timestamp < commitment.expiration,
-            "Commitment has expired"
-        );
-
-        require(
-            commitment.maxPrincipalPerCollateralAmount == 0 ||
-                _collateralAmount >=
-                getRequiredCollateral(
-                    _principalAmount,
-                    commitment.maxPrincipalPerCollateralAmount
-                ),
-            "Insufficient collateral"
-        );
+        if (_principalAmount > commitment.maxPrincipal) {
+            revert InsufficientCommitmentAllocation({
+                allocated: commitment.maxPrincipal,
+                requested: _principalAmount
+            });
+        }
+        if (commitment.collateralTokenType != CommitmentCollateralType.NONE) {
+            uint256 requiredCollateral = getRequiredCollateral(
+                _principalAmount,
+                commitment.maxPrincipalPerCollateralAmount
+            );
+            if (_collateralAmount < requiredCollateral) {
+                revert InsufficientBorrowerCollateral({
+                    required: requiredCollateral,
+                    actual: _collateralAmount
+                });
+            }
+        }
 
         if (
             commitment.collateralTokenType == CommitmentCollateralType.ERC721 ||
             commitment.collateralTokenType ==
             CommitmentCollateralType.ERC721_ANY_ID
         ) {
-            require(_collateralAmount == 1, "Invalid amount for ERC721");
+            require(_collateralAmount == 1, "invalid commitment collateral amount for ERC721");
         }
 
         if (
@@ -263,7 +295,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         ) {
             require(
                 commitment.collateralTokenId == _collateralTokenId,
-                "Invalid tokenId"
+                "invalid commitment collateral tokenId"
             );
         }
 

@@ -14,13 +14,7 @@ import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 // Libraries
 import { MathUpgradeable } from "@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20MetadataUpgradeable.sol";
-
-/*
  
-consider borrowers = an array / enumerable set . 
-    
-
-*/
 
 contract LenderCommitmentForwarder is TellerV2MarketForwarder {
 

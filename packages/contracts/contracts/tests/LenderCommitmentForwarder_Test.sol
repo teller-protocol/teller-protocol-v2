@@ -292,6 +292,28 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             "Should fail when accepting as invalid borrower"
         );
 
+
+         lender._updateCommitment(
+            commitmentId,
+            commitment,
+            emptyArray
+        );
+
+        acceptBidWasCalled = false;
+
+        marketOwner._acceptCommitment(
+            commitmentId,
+            0, //principal
+            maxAmount, //collateralAmount
+            0 //collateralTokenId
+        );
+
+        Test.eq(
+            acceptBidWasCalled,
+            true,
+            "Expect accept bid called after exercise"
+        );
+
      }
 
     function acceptCommitmentFailsWithInsufficientCollateral_test() public {

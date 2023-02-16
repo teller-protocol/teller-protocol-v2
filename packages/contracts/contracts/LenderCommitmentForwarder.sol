@@ -8,18 +8,14 @@ import "./TellerV2MarketForwarder.sol";
 import "./interfaces/ICollateralManager.sol";
 import { Collateral, CollateralType } from "./interfaces/escrow/ICollateralEscrowV1.sol";
 
-
 import "@openzeppelin/contracts-upgradeable/utils/structs/EnumerableSetUpgradeable.sol";
 
 // Libraries
 import { MathUpgradeable } from "@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20MetadataUpgradeable.sol";
- 
 
 contract LenderCommitmentForwarder is TellerV2MarketForwarder {
-
     using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
-
 
     enum CommitmentCollateralType {
         NONE, // no collateral required
@@ -56,7 +52,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         address lender;
         uint256 marketId;
         address principalTokenAddress;
-   //     address borrower;
+        //     address borrower;
     }
 
     // Mapping of lender address => market ID => lending token => commitment
@@ -67,8 +63,8 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
 
     uint256 commitmentCount;
 
-
-    mapping(uint256 => EnumerableSetUpgradeable.AddressSet) internal commitmentBorrowersList; 
+    mapping(uint256 => EnumerableSetUpgradeable.AddressSet)
+        internal commitmentBorrowersList;
 
     /**
      * @notice This event is emitted when a lender's commitment is created.
@@ -189,7 +185,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
     function createCommitment(
         Commitment calldata _commitment,
         address[] calldata borrowerAddressList
-        )
+    )
         public
         validateUpdatedCommitment(lenderMarketCommitments[commitmentCount++])
         returns (uint256 commitmentId_)
@@ -203,7 +199,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
 
         lenderMarketCommitments[commitmentId_] = _commitment;
 
-        for(uint256 i = 0; i<borrowerAddressList.length; i++){
+        for (uint256 i = 0; i < borrowerAddressList.length; i++) {
             commitmentBorrowersList[commitmentId_].add(borrowerAddressList[i]);
         }
 
@@ -234,7 +230,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
 
         delete commitmentBorrowersList[_commitmentId];
 
-        for(uint256 i = 0; i < borrowerAddressList.length; i++){
+        for (uint256 i = 0; i < borrowerAddressList.length; i++) {
             commitmentBorrowersList[_commitmentId].add(borrowerAddressList[i]);
         }
 
@@ -295,11 +291,11 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         Commitment storage commitment = lenderMarketCommitments[_commitmentId];
 
         require(
-             commitmentBorrowersList[_commitmentId].length() == 0 ||
-             commitmentBorrowersList[_commitmentId].contains(borrower),
-             "unauthorized commitment borrower"
+            commitmentBorrowersList[_commitmentId].length() == 0 ||
+                commitmentBorrowersList[_commitmentId].contains(borrower),
+            "unauthorized commitment borrower"
         );
- 
+
         if (_principalAmount > commitment.maxPrincipal) {
             revert InsufficientCommitmentAllocation({
                 allocated: commitment.maxPrincipal,
@@ -395,7 +391,11 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             );
     }
 
-    function getCommitmentBorrowers(uint256 _commitmentId) external view returns (address[] memory borrowers_) {
+    function getCommitmentBorrowers(uint256 _commitmentId)
+        external
+        view
+        returns (address[] memory borrowers_)
+    {
         borrowers_ = commitmentBorrowersList[_commitmentId].values();
     }
 

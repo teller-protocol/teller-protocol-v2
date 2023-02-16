@@ -64,7 +64,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         commitment_.maxPrincipal = maxAmount;
         commitment_.maxDuration = maxLoanDuration;
         commitment_.minInterestRate = minInterestRate;
-        commitment_.expiration = expiration; 
+        commitment_.expiration = expiration;
         commitment_.lender = address(lender);
 
         commitment_.collateralTokenType = _collateralType;
@@ -114,7 +114,6 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
 
         borrowersArray = new address[](1);
         borrowersArray[0] = address(borrower);
-         
 
         delete acceptBidWasCalled;
         delete submitBidWasCalled;
@@ -123,20 +122,15 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         delete commitmentCount;
     }
 
-
-
-     function createCommitment_test() public {
+    function createCommitment_test() public {
         uint256 commitmentId = 0;
 
         Commitment storage existingCommitment = _createCommitment(
             CommitmentCollateralType.ERC20,
             1000e6
         );
- 
-        lender._createCommitment( 
-            existingCommitment,
-            emptyArray 
-            );
+
+        lender._createCommitment(existingCommitment, emptyArray);
     }
 
     function updateCommitment_test() public {
@@ -153,11 +147,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             "Not the owner of created commitment"
         );
 
-        lender._updateCommitment(
-            commitmentId,
-            existingCommitment,
-            emptyArray 
-            );
+        lender._updateCommitment(commitmentId, existingCommitment, emptyArray);
     }
 
     function deleteCommitment_test() public {
@@ -189,7 +179,6 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             CommitmentCollateralType.ERC20,
             maxAmount
         );
-         
 
         Test.eq(
             acceptBidWasCalled,
@@ -245,20 +234,15 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         );
     }
 
-     function acceptCommitmentWithBorrowersArray_valid_test() public {
-
+    function acceptCommitmentWithBorrowersArray_valid_test() public {
         uint256 commitmentId = 0;
 
         Commitment storage commitment = _createCommitment(
             CommitmentCollateralType.ERC20,
             maxAmount
-        ); 
-
-        lender._updateCommitment(
-            commitmentId,
-            commitment,
-            borrowersArray
         );
+
+        lender._updateCommitment(commitmentId, commitment, borrowersArray);
 
         uint256 bidId = borrower._acceptCommitment(
             commitmentId,
@@ -272,38 +256,28 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             true,
             "Expect accept bid called after exercise"
         );
+    }
 
-       
-        
-
-     }
-
-      function acceptCommitmentWithBorrowersArray_invalid_test() public {
-
+    function acceptCommitmentWithBorrowersArray_invalid_test() public {
         uint256 commitmentId = 0;
 
         Commitment storage commitment = _createCommitment(
             CommitmentCollateralType.ERC20,
             maxAmount
-        ); 
-
-        lender._updateCommitment(
-            commitmentId,
-            commitment,
-            borrowersArray
         );
 
-      
-        
+        lender._updateCommitment(commitmentId, commitment, borrowersArray);
+
         bool acceptCommitAsMarketOwnerFails;
 
-        try  marketOwner._acceptCommitment(
-            commitmentId,
-            100, //principal
-            maxAmount, //collateralAmount
-            0 //collateralTokenId
-        ){} catch {
-
+        try
+            marketOwner._acceptCommitment(
+                commitmentId,
+                100, //principal
+                maxAmount, //collateralAmount
+                0 //collateralTokenId
+            )
+        {} catch {
             acceptCommitAsMarketOwnerFails = true;
         }
 
@@ -313,12 +287,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             "Should fail when accepting as invalid borrower"
         );
 
-
-         lender._updateCommitment(
-            commitmentId,
-            commitment,
-            emptyArray
-        );
+        lender._updateCommitment(commitmentId, commitment, emptyArray);
 
         acceptBidWasCalled = false;
 
@@ -334,32 +303,19 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             true,
             "Expect accept bid called after exercise"
         );
+    }
 
-     }
-
-       function acceptCommitmentWithBorrowersArray_reset_test() public {
-
+    function acceptCommitmentWithBorrowersArray_reset_test() public {
         uint256 commitmentId = 0;
 
         Commitment storage commitment = _createCommitment(
             CommitmentCollateralType.ERC20,
             maxAmount
-        ); 
-
-        lender._updateCommitment(
-            commitmentId,
-            commitment,
-            borrowersArray
         );
 
-       
+        lender._updateCommitment(commitmentId, commitment, borrowersArray);
 
-        lender._updateCommitment(
-            commitmentId,
-            commitment,
-            emptyArray
-        );
- 
+        lender._updateCommitment(commitmentId, commitment, emptyArray);
 
         marketOwner._acceptCommitment(
             commitmentId,
@@ -373,9 +329,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             true,
             "Expect accept bid called after exercise"
         );
-
-     }
-
+    }
 
     function acceptCommitmentFailsWithInsufficientCollateral_test() public {
         uint256 commitmentId = 0;
@@ -405,8 +359,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         );
     }
 
-
-     function acceptCommitmentFailsWithInvalidAmount_test() public {
+    function acceptCommitmentFailsWithInvalidAmount_test() public {
         uint256 commitmentId = 0;
 
         Commitment storage commitment = _createCommitment(
@@ -500,16 +453,13 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         );
     }
 
-
-     /**
+    /**
      *             collateral token = NFT (10**0)
      *              principal token = USDC (10**6)
      *                    principal = 500 USDC
      * max principal per collateral = 500 USDC
      */
-    function getRequiredCollateral_500_USDC_loan__500_per_ERC721_test()
-        public
-    {
+    function getRequiredCollateral_500_USDC_loan__500_per_ERC721_test() public {
         Test.eq(
             super.getRequiredCollateral(
                 500e6, // 7500 USDC loan
@@ -650,7 +600,11 @@ contract LenderCommitmentUser is User {
         LenderCommitmentForwarder.Commitment calldata _commitment,
         address[] calldata borrowerAddressList
     ) public returns (uint256) {
-        return commitmentForwarder.createCommitment(_commitment,borrowerAddressList);
+        return
+            commitmentForwarder.createCommitment(
+                _commitment,
+                borrowerAddressList
+            );
     }
 
     function _updateCommitment(
@@ -658,7 +612,11 @@ contract LenderCommitmentUser is User {
         LenderCommitmentForwarder.Commitment calldata _commitment,
         address[] calldata borrowerAddressList
     ) public {
-        commitmentForwarder.updateCommitment(commitmentId, _commitment,borrowerAddressList);
+        commitmentForwarder.updateCommitment(
+            commitmentId,
+            _commitment,
+            borrowerAddressList
+        );
     }
 
     function _acceptCommitment(

@@ -9,7 +9,7 @@ import "./interfaces/ICollateralManager.sol";
 import { Collateral, CollateralType } from "./interfaces/escrow/ICollateralEscrowV1.sol";
 
 
-import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+import "@openzeppelin/contracts-upgradeable/utils/structs/EnumerableSetUpgradeable.sol";
 
 // Libraries
 import { MathUpgradeable } from "@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol";
@@ -18,7 +18,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20Metadat
 
 contract LenderCommitmentForwarder is TellerV2MarketForwarder {
 
-    using EnumerableSet for EnumerableSet.AddressSet;
+    using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
 
 
     enum CommitmentCollateralType {
@@ -68,7 +68,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
     uint256 commitmentCount;
 
 
-    mapping(uint256 => EnumerableSet.AddressSet) internal commitmentBorrowersList; 
+    mapping(uint256 => EnumerableSetUpgradeable.AddressSet) internal commitmentBorrowersList; 
 
     /**
      * @notice This event is emitted when a lender's commitment is created.

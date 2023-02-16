@@ -5,10 +5,7 @@ import "./TellerV2MarketForwarder.sol";
 
 import "./interfaces/ICollateralManager.sol";
 
-import {
-    Collateral,
-    CollateralType
-} from "./interfaces/escrow/ICollateralEscrowV1.sol";
+import { Collateral, CollateralType } from "./interfaces/escrow/ICollateralEscrowV1.sol";
 
 /*
 consider lender being in its own mapping 
@@ -20,20 +17,16 @@ simplify updateCommitment by using struct arg
 
 */
 
-
 contract LenderCommitmentForwarder is TellerV2MarketForwarder {
-
-
     enum CommitmentCollateralType {
         ERC20,
         ERC721,
         ERC1155,
-        ERC721_ANY_ID,  
-        ERC1155_ANY_ID  
+        ERC721_ANY_ID,
+        ERC1155_ANY_ID
     }
 
     uint256 public constant PRINCIPAL_PER_COLLATERAL_EXPANSION_FACTOR = 10**16;
-
 
     /**
      * @notice Details about a lender's capital commitment.
@@ -47,7 +40,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
      * @param lender The address of the lender for this commitment.
      * @param marketId The market id for this commitment.
      * @param principalTokenAddress The address for the token contract that will be used to provide principal for loans of this commitment.
-     * @param borrower The address of the borrower that is allowed to accept this commitment.  Zero address is wildcard for any address. 
+     * @param borrower The address of the borrower that is allowed to accept this commitment.  Zero address is wildcard for any address.
      */
     struct Commitment {
         uint256 maxPrincipal;
@@ -55,15 +48,15 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint32 maxDuration;
         uint16 minInterestRate;
         address collateralTokenAddress;
-        uint256 collateralTokenId; 
-        uint256 maxPrincipalPerCollateralAmount; //zero means infinite . This is expressed using 16 decimals [PRINCIPAL_PER_COLLATERAL_EXPANSION_FACTOR] so 1 wei is 10^16 and 1 usdc is 10^22 
+        uint256 collateralTokenId;
+        uint256 maxPrincipalPerCollateralAmount; //zero means infinite . This is expressed using 16 decimals [PRINCIPAL_PER_COLLATERAL_EXPANSION_FACTOR] so 1 wei is 10^16 and 1 usdc is 10^22
         CommitmentCollateralType collateralTokenType; //erc721, erc1155 or erc20
         address lender;
         uint256 marketId;
         address principalTokenAddress;
         address borrower;
     }
- 
+
     // Mapping of lender address => market ID => lending token => commitment
     //mapping(address => mapping(uint256 => mapping(address => Commitment))) public __lenderMarketCommitments_deprecated;
 
@@ -85,8 +78,6 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint256 marketId,
         address lendingToken,
         uint256 tokenAmount
-
-         
     );
 
     /**
@@ -102,8 +93,6 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint256 marketId,
         address lendingToken,
         uint256 tokenAmount
-
-       
     );
 
     /**
@@ -127,8 +116,6 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         address lendingToken,
         uint256 tokenAmount,
         uint256 indexed bidId
-
-    
     );
 
     /** External Functions **/
@@ -137,13 +124,14 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         TellerV2MarketForwarder(_protocolAddress, _marketRegistry)
     {}
 
-  /**
+    /**
      * @notice Created a loan commitment from a lender to a market.
      * @param _commitment The new commitment data expressed as a struct
      */
-    function createCommitment(
-        Commitment calldata _commitment
-    ) public returns (uint256 commitmentId) {
+    function createCommitment(Commitment calldata _commitment)
+        public
+        returns (uint256 commitmentId)
+    {
         commitmentId = commitmentCount++;
 
         require(_commitment.expiration > uint32(block.timestamp));
@@ -171,7 +159,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         Commitment calldata _commitment
     ) public {
         require(_commitment.expiration > uint32(block.timestamp));
-           require(
+        require(
             _msgSender() == _commitment.lender,
             "Unauthorized to update commitment"
         );
@@ -180,14 +168,12 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
 
         lenderMarketCommitments[_commitmentId] = _commitment;
 
-      
-
         emit UpdatedCommitment(
             _commitmentId,
             _commitment.lender,
             _commitment.marketId,
             _commitment.principalTokenAddress,
-            _commitment.maxPrincipal 
+            _commitment.maxPrincipal
         );
     }
 
@@ -202,12 +188,9 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             "Unauthorized to delete commitment"
         );
 
-        
         delete lenderMarketCommitments[_commitmentId];
         emit DeletedCommitment(_commitmentId);
     }
-
-     
 
     /**
      * @notice Reduces the commitment amount for a lender to a market.
@@ -231,7 +214,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
  
      */
     function acceptCommitment(
-        uint256 _commitmentId, 
+        uint256 _commitmentId,
         uint256 _principalAmount,
         uint256 _collateralAmount,
         uint256 _collateralTokenId
@@ -241,39 +224,48 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         Commitment storage commitment = lenderMarketCommitments[_commitmentId];
 
         require(
-            commitment.borrower == address(0) || borrower == commitment.borrower, "Unauthorized borrower for this commitment"
+            commitment.borrower == address(0) ||
+                borrower == commitment.borrower,
+            "Unauthorized borrower for this commitment"
         );
-
-        
 
         require(
             _principalAmount <= commitment.maxPrincipal,
             "Commitment principal insufficient"
         );
-        
-        
+
         require(
             block.timestamp < commitment.expiration,
             "Commitment has expired"
         );
 
         require(
-            commitment.maxPrincipalPerCollateralAmount == 0 || 
-                _collateralAmount >= getRequiredCollateral(_principalAmount, commitment.maxPrincipalPerCollateralAmount),
-
+            commitment.maxPrincipalPerCollateralAmount == 0 ||
+                _collateralAmount >=
+                getRequiredCollateral(
+                    _principalAmount,
+                    commitment.maxPrincipalPerCollateralAmount
+                ),
             "Insufficient collateral"
         );
 
-        if(commitment.collateralTokenType == CommitmentCollateralType.ERC721 ||
-        commitment.collateralTokenType == CommitmentCollateralType.ERC721_ANY_ID ){
-              require( _collateralAmount == 1, "Invalid amount for ERC721");
+        if (
+            commitment.collateralTokenType == CommitmentCollateralType.ERC721 ||
+            commitment.collateralTokenType ==
+            CommitmentCollateralType.ERC721_ANY_ID
+        ) {
+            require(_collateralAmount == 1, "Invalid amount for ERC721");
         }
 
-        if(commitment.collateralTokenType == CommitmentCollateralType.ERC721 ||
-        commitment.collateralTokenType == CommitmentCollateralType.ERC1155 ){
-              require( commitment.collateralTokenId == _collateralTokenId, "Invalid tokenId");
+        if (
+            commitment.collateralTokenType == CommitmentCollateralType.ERC721 ||
+            commitment.collateralTokenType == CommitmentCollateralType.ERC1155
+        ) {
+            require(
+                commitment.collateralTokenId == _collateralTokenId,
+                "Invalid tokenId"
+            );
         }
-      
 
         bidId = _submitBidFromCommitment(
             borrower,
@@ -298,14 +290,19 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             commitment.marketId,
             commitment.principalTokenAddress,
             _principalAmount,
-            bidId 
+            bidId
         );
     }
 
     //fix tests
-    //use math ceiling (OZ math mul div) -- make sure that 700 / 500 = 1.4 rounds up to 2, requiring a quantity of 2 NFTs 
-    function getRequiredCollateral(uint256 _principalAmount, uint256 _maxPrincipalPerCollateralAmount) public view virtual returns (uint256 _collateralAmountRaw) {
-        _collateralAmountRaw= (_principalAmount *  PRINCIPAL_PER_COLLATERAL_EXPANSION_FACTOR ) / _maxPrincipalPerCollateralAmount;
+    //use math ceiling (OZ math mul div) -- make sure that 700 / 500 = 1.4 rounds up to 2, requiring a quantity of 2 NFTs
+    function getRequiredCollateral(
+        uint256 _principalAmount,
+        uint256 _maxPrincipalPerCollateralAmount
+    ) public view virtual returns (uint256 _collateralAmountRaw) {
+        _collateralAmountRaw =
+            (_principalAmount * PRINCIPAL_PER_COLLATERAL_EXPANSION_FACTOR) /
+            _maxPrincipalPerCollateralAmount;
     }
 
     function _submitBidFromCommitment(
@@ -343,15 +340,24 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         );
     }
 
-    function _getEscrowCollateralType(CommitmentCollateralType _type) internal pure returns (CollateralType){
-
-        if(_type == CommitmentCollateralType.ERC20 ){
+    function _getEscrowCollateralType(CommitmentCollateralType _type)
+        internal
+        pure
+        returns (CollateralType)
+    {
+        if (_type == CommitmentCollateralType.ERC20) {
             return CollateralType.ERC20;
         }
-        if(_type == CommitmentCollateralType.ERC721 || _type == CommitmentCollateralType.ERC721_ANY_ID){
+        if (
+            _type == CommitmentCollateralType.ERC721 ||
+            _type == CommitmentCollateralType.ERC721_ANY_ID
+        ) {
             return CollateralType.ERC721;
         }
-        if(_type == CommitmentCollateralType.ERC1155 || _type == CommitmentCollateralType.ERC1155_ANY_ID){
+        if (
+            _type == CommitmentCollateralType.ERC1155 ||
+            _type == CommitmentCollateralType.ERC1155_ANY_ID
+        ) {
             return CollateralType.ERC1155;
         }
 

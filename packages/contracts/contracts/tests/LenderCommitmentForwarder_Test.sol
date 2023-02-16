@@ -11,18 +11,13 @@ import "../TellerV2Context.sol";
 import { Testable } from "./Testable.sol";
 import { LenderCommitmentForwarder } from "../LenderCommitmentForwarder.sol";
 
+import { Collateral, CollateralType } from "../interfaces/escrow/ICollateralEscrowV1.sol";
 
-import {
-    Collateral,
-    CollateralType
-} from "../interfaces/escrow/ICollateralEscrowV1.sol";
- 
 import { User } from "./Test_Helpers.sol";
 
 import "../mock/MarketRegistryMock.sol";
- 
 
- /* 
+/* 
  add tests for each token type 
 
  add test for conversion of collateral type -- simple 
@@ -85,7 +80,9 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         collateralTokenAddress = address(
             0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174
         );
-        maxPrincipalPerCollateralAmount = 1 * PRINCIPAL_PER_COLLATERAL_EXPANSION_FACTOR;
+        maxPrincipalPerCollateralAmount =
+            1 *
+            PRINCIPAL_PER_COLLATERAL_EXPANSION_FACTOR;
         collateralTokenType = CommitmentCollateralType.ERC20;
 
         marketOwner.setTrustedMarketForwarder(marketId, address(this));
@@ -100,11 +97,8 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
     }
 
     function updateCommitment_before() public {
-
-
         Commitment memory _commitment = Commitment({
-
-            marketId:marketId,
+            marketId: marketId,
             principalTokenAddress: tokenAddress,
             maxPrincipal: maxAmount,
             collateralTokenAddress: collateralTokenAddress,
@@ -116,14 +110,9 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             expiration: expiration,
             borrower: address(0),
             lender: address(lender)
-
         });
 
-
-        uint256 commitmentId = lender._createCommitment(
-            _commitment
-        );
- 
+        uint256 commitmentId = lender._createCommitment(_commitment);
     }
 
     function updateCommitment_test() public {
@@ -139,19 +128,12 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             "Not the owner of created commitment"
         );
 
-        lender._updateCommitment(
-            commitmentId,
-            existingCommitment
-        );
+        lender._updateCommitment(commitmentId, existingCommitment);
     }
 
-
-     function deleteCommitment_before() public {
-
-
+    function deleteCommitment_before() public {
         Commitment memory _commitment = Commitment({
-
-            marketId:marketId,
+            marketId: marketId,
             principalTokenAddress: tokenAddress,
             maxPrincipal: maxAmount,
             collateralTokenAddress: collateralTokenAddress,
@@ -163,45 +145,32 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             expiration: expiration,
             borrower: address(0),
             lender: address(lender)
-
         });
 
-        uint256 commitmentId = lender._createCommitment(
-         _commitment
-        );
- 
+        uint256 commitmentId = lender._createCommitment(_commitment);
     }
 
     function deleteCommitment_test() public {
+        uint256 commitmentId = 0;
 
-         uint256 commitmentId = 0;
-
-        
         Test.eq(
             lenderMarketCommitments[commitmentId].lender,
-            address(lender), 
+            address(lender),
             "Not the owner of created commitment"
         );
 
         lender._deleteCommitment(commitmentId);
 
-        
         Test.eq(
             lenderMarketCommitments[commitmentId].lender,
             address(0),
             "The commitment was not deleted"
         );
-       
     }
 
-
-
-
     function acceptCommitment_before() public {
-        
         Commitment memory _commitment = Commitment({
-
-            marketId:marketId,
+            marketId: marketId,
             principalTokenAddress: tokenAddress,
             maxPrincipal: maxAmount,
             collateralTokenAddress: collateralTokenAddress,
@@ -213,12 +182,9 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             expiration: expiration,
             borrower: address(0),
             lender: address(lender)
-
         });
 
-        lender._createCommitment(
-          _commitment
-        );
+        lender._createCommitment(_commitment);
     }
 
     function acceptCommitment_test() public {
@@ -234,11 +200,9 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
 
         uint256 bidId = marketOwner._acceptCommitment(
             commitmentId,
-          
-            maxAmount - 100, //principal 
+            maxAmount - 100, //principal
             maxAmount, //collateralAmount
-            0  //collateralTokenId
-            
+            0 //collateralTokenId
         );
 
         Test.eq(
@@ -255,41 +219,36 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
 
         bidId = marketOwner._acceptCommitment(
             commitmentId,
-          
             100, //principalAmount
             100, //collateralAmount
-            0  //collateralTokenId
-            
+            0 //collateralTokenId
         );
- 
 
         Test.eq(commitment.maxPrincipal == 0, true, "commitment not accepted");
 
         bool acceptCommitTwiceFails;
 
-        try marketOwner._acceptCommitment(
-            commitmentId,
-         
-            100, //principalAmount
-            100, //collateralAmount
-            0  //collateralTokenId
-             
-             ){
-
-        }catch{
-                acceptCommitTwiceFails = true;
+        try
+            marketOwner._acceptCommitment(
+                commitmentId,
+                100, //principalAmount
+                100, //collateralAmount
+                0 //collateralTokenId
+            )
+        {} catch {
+            acceptCommitTwiceFails = true;
         }
 
-        Test.eq(acceptCommitTwiceFails, true, "Should fail when accepting commit twice");
-
-    
+        Test.eq(
+            acceptCommitTwiceFails,
+            true,
+            "Should fail when accepting commit twice"
+        );
     }
 
     function acceptCommitmentFailsWithInsufficientCollateral_test() public {
-            
-         Commitment memory _commitment = Commitment({
-
-            marketId:marketId,
+        Commitment memory _commitment = Commitment({
+            marketId: marketId,
             principalTokenAddress: tokenAddress,
             maxPrincipal: maxAmount,
             collateralTokenAddress: collateralTokenAddress,
@@ -301,12 +260,9 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             expiration: expiration,
             borrower: address(0),
             lender: address(lender)
-
         });
 
-        lender._createCommitment(
-          _commitment
-        );
+        lender._createCommitment(_commitment);
 
         uint256 commitmentId = 0;
 
@@ -314,19 +270,17 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
 
         requiredCollateralAmount = maxAmount + 1;
 
-        bool failedToAcceptCommitment; 
+        bool failedToAcceptCommitment;
 
-        try marketOwner._acceptCommitment(
-            commitmentId,
-            
-            maxAmount - 100, //principal 
-            maxAmount, //collateralAmount
-            0  //collateralTokenId
-            
-        ) {
-
-        }catch{
-            failedToAcceptCommitment = true;           
+        try
+            marketOwner._acceptCommitment(
+                commitmentId,
+                maxAmount - 100, //principal
+                maxAmount, //collateralAmount
+                0 //collateralTokenId
+            )
+        {} catch {
+            failedToAcceptCommitment = true;
         }
 
         Test.eq(
@@ -334,19 +288,11 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             true,
             "Should fail to accept commitment with insufficient collateral"
         );
-
-       
- 
-     }
-
-
-
+    }
 
     function decrementCommitment_test() public {
-
-           Commitment memory _commitment = Commitment({
-
-            marketId:marketId,
+        Commitment memory _commitment = Commitment({
+            marketId: marketId,
             principalTokenAddress: tokenAddress,
             maxPrincipal: maxAmount,
             collateralTokenAddress: collateralTokenAddress,
@@ -358,67 +304,48 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             expiration: expiration,
             borrower: address(0),
             lender: address(lender)
-
         });
 
-
-        lender._createCommitment(
-           _commitment
-        );
-
+        lender._createCommitment(_commitment);
 
         uint256 commitmentId = 0;
         uint256 _decrementAmount = 22;
 
         Commitment storage commitment = lenderMarketCommitments[commitmentId];
 
-      
-        _decrementCommitment(
-            commitmentId,
-            _decrementAmount
-        );
-
-       
+        _decrementCommitment(commitmentId, _decrementAmount);
 
         Test.eq(
             commitment.maxPrincipal == maxAmount - _decrementAmount,
             true,
             "Commitment max principal was not decremented"
         );
-
-        
-       
-    
     }
 
-
-
-
-
     function getRequiredCollateral_test() public {
-
         //For each 1 ETH collateral, can withdraw loan of 2000 USDC
         Test.eq(
-            super.getRequiredCollateral(2 * 10**9,5 * 10**8 * PRINCIPAL_PER_COLLATERAL_EXPANSION_FACTOR),
-            10**18, //requires 1 ETH 
+            super.getRequiredCollateral(
+                2 * 10**9,
+                5 * 10**8 * PRINCIPAL_PER_COLLATERAL_EXPANSION_FACTOR
+            ),
+            10**18, //requires 1 ETH
             "Unexpected result for getRequiredCollateral"
         );
 
-       
         //For each 2000 usdc collateral, can withdraw loan of 1 eth
         Test.eq(
-            super.getRequiredCollateral(10**18,2 * 10**7),
-            2 * 10**9, //requires 2000 USDC 
+            super.getRequiredCollateral(10**18, 2 * 10**7),
+            2 * 10**9, //requires 2000 USDC
             "Unexpected result for getRequiredCollateral"
         );
 
-       //For each 2000 usdc collateral, can withdraw loan of 1 eth -- smallest possible loan is 10**10 wei principal 
-         Test.eq(
-            super.getRequiredCollateral(10**10,2 * 10**7),
-            2 * 10**1,  
+        //For each 2000 usdc collateral, can withdraw loan of 1 eth -- smallest possible loan is 10**10 wei principal
+        Test.eq(
+            super.getRequiredCollateral(10**10, 2 * 10**7),
+            2 * 10**1,
             "Unexpected result for getRequiredCollateral"
         );
-
     }
 
     /*
@@ -455,9 +382,12 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         return true;
     }
 
-
-    function getRequiredCollateral(uint256, uint256) public view override returns (uint256) {
-        
+    function getRequiredCollateral(uint256, uint256)
+        public
+        view
+        override
+        returns (uint256)
+    {
         return requiredCollateralAmount;
     }
 }
@@ -472,47 +402,36 @@ contract LenderCommitmentUser is User {
         commitmentForwarder = _commitmentForwarder;
     }
 
-     
-
     function _createCommitment(
-         LenderCommitmentForwarder.Commitment calldata _commitment
+        LenderCommitmentForwarder.Commitment calldata _commitment
     ) public returns (uint256) {
-        return
-            commitmentForwarder.createCommitment(
-              _commitment
-            );
+        return commitmentForwarder.createCommitment(_commitment);
     }
 
     function _updateCommitment(
         uint256 commitmentId,
         LenderCommitmentForwarder.Commitment calldata _commitment
     ) public {
-        commitmentForwarder.updateCommitment(
-            commitmentId,
-            _commitment
-        );
+        commitmentForwarder.updateCommitment(commitmentId, _commitment);
     }
 
     function _acceptCommitment(
-        uint256 commitmentId,   
+        uint256 commitmentId,
         uint256 principal,
         uint256 collateralAmount,
-        uint256 collateralTokenId  
+        uint256 collateralTokenId
     ) public returns (uint256) {
         return
             commitmentForwarder.acceptCommitment(
-                commitmentId,  
+                commitmentId,
                 principal,
                 collateralAmount,
-                collateralTokenId  
+                collateralTokenId
             );
     }
 
-    function _deleteCommitment(
-        uint256 _commitmentId
-    ) public {
+    function _deleteCommitment(uint256 _commitmentId) public {
         commitmentForwarder.deleteCommitment(_commitmentId);
-                
     }
 }
 
@@ -542,5 +461,3 @@ contract LenderCommitmentForwarderTest_TellerV2Mock is TellerV2Context {
         return _msgDataForMarket(_marketId);
     }
 }
-
- 

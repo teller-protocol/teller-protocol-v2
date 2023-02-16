@@ -448,14 +448,14 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
                     _borrowerAddress
                 );
         }
-        if (collateralType == CollateralType.ERC721 ) {
+        if (collateralType == CollateralType.ERC721) {
             return
                 _borrowerAddress ==
                 IERC721Upgradeable(_collateralInfo._collateralAddress).ownerOf(
                     _collateralInfo._tokenId
                 );
         }
-        if (collateralType == CollateralType.ERC1155  ) {
+        if (collateralType == CollateralType.ERC1155) {
             return
                 _collateralInfo._amount <=
                 IERC1155Upgradeable(_collateralInfo._collateralAddress)

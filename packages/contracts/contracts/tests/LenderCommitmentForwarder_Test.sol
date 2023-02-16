@@ -5,7 +5,7 @@ import "hardhat/console.sol";
 
 import "@mangrovedao/hardhat-test-solidity/test.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "./resolvers/TestERC20Token.sol";
 import "../TellerV2MarketForwarder.sol";
 import "../TellerV2Context.sol";
 import { Testable } from "./Testable.sol";
@@ -36,11 +36,6 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
     uint256 marketId;
     uint256 maxAmount;
 
-    address collateralTokenAddress;
-    uint256 maxPrincipalPerCollateralAmount;
-    CommitmentCollateralType collateralTokenType;
-    uint256 collateralTokenId;
-
     uint32 maxLoanDuration;
     uint16 minInterestRate;
     uint32 expiration;
@@ -48,7 +43,6 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
     bool acceptBidWasCalled;
     bool submitBidWasCalled;
     bool submitBidWithCollateralWasCalled;
-    uint256 requiredCollateralAmount;
 
     constructor()
         LenderCommitmentForwarder(
@@ -56,6 +50,42 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             address(new MarketRegistryMock(address(0)))
         )
     {}
+
+    function _createCommitment(
+        CommitmentCollateralType _collateralType,
+        uint256 _maxPrincipalPerCollateral
+    ) internal returns (Commitment storage commitment_) {
+        commitment_ = lenderMarketCommitments[0];
+        commitment_.marketId = marketId;
+        commitment_.principalTokenAddress = tokenAddress;
+        commitment_.maxPrincipal = maxAmount;
+        commitment_.maxDuration = maxLoanDuration;
+        commitment_.minInterestRate = minInterestRate;
+        commitment_.expiration = expiration;
+        commitment_.borrower = address(0);
+        commitment_.lender = address(lender);
+
+        commitment_.collateralTokenType = _collateralType;
+        commitment_
+            .maxPrincipalPerCollateralAmount = _maxPrincipalPerCollateral;
+        if (_collateralType == CommitmentCollateralType.ERC20) {
+            TestERC20Token collateralToken = new TestERC20Token(
+                "Test Collateral Token",
+                "TCT",
+                0,
+                18
+            );
+            commitment_.collateralTokenAddress = address(collateralToken);
+        } else if (_collateralType == CommitmentCollateralType.ERC721) {
+            commitment_.collateralTokenAddress = address(
+                0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174
+            );
+        } else if (_collateralType == CommitmentCollateralType.ERC1155) {
+            commitment_.collateralTokenAddress = address(
+                0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174
+            );
+        }
+    }
 
     function setup_beforeAll() public {
         tellerV2Mock = LenderCommitmentForwarderTest_TellerV2Mock(
@@ -77,50 +107,23 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         minInterestRate = 3000;
         expiration = uint32(block.timestamp) + uint32(64000);
 
-        collateralTokenAddress = address(
-            0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174
-        );
-        maxPrincipalPerCollateralAmount =
-            1 *
-            PRINCIPAL_PER_COLLATERAL_EXPANSION_FACTOR;
-        collateralTokenType = CommitmentCollateralType.ERC20;
-
         marketOwner.setTrustedMarketForwarder(marketId, address(this));
         lender.approveMarketForwarder(marketId, address(this));
 
         delete acceptBidWasCalled;
         delete submitBidWasCalled;
         delete submitBidWithCollateralWasCalled;
-        delete requiredCollateralAmount;
 
         delete commitmentCount;
-    }
-
-    function updateCommitment_before() public {
-        Commitment memory _commitment = Commitment({
-            marketId: marketId,
-            principalTokenAddress: tokenAddress,
-            maxPrincipal: maxAmount,
-            collateralTokenAddress: collateralTokenAddress,
-            collateralTokenId: collateralTokenId,
-            maxPrincipalPerCollateralAmount: maxPrincipalPerCollateralAmount,
-            collateralTokenType: collateralTokenType,
-            maxDuration: maxLoanDuration,
-            minInterestRate: minInterestRate,
-            expiration: expiration,
-            borrower: address(0),
-            lender: address(lender)
-        });
-
-        uint256 commitmentId = lender._createCommitment(_commitment);
     }
 
     function updateCommitment_test() public {
         uint256 commitmentId = 0;
 
-        Commitment memory existingCommitment = lenderMarketCommitments[
-            commitmentId
-        ];
+        Commitment storage existingCommitment = _createCommitment(
+            CommitmentCollateralType.ERC20,
+            1000e6
+        );
 
         Test.eq(
             address(lender),
@@ -131,30 +134,15 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         lender._updateCommitment(commitmentId, existingCommitment);
     }
 
-    function deleteCommitment_before() public {
-        Commitment memory _commitment = Commitment({
-            marketId: marketId,
-            principalTokenAddress: tokenAddress,
-            maxPrincipal: maxAmount,
-            collateralTokenAddress: collateralTokenAddress,
-            collateralTokenId: collateralTokenId,
-            maxPrincipalPerCollateralAmount: maxPrincipalPerCollateralAmount,
-            collateralTokenType: collateralTokenType,
-            maxDuration: maxLoanDuration,
-            minInterestRate: minInterestRate,
-            expiration: expiration,
-            borrower: address(0),
-            lender: address(lender)
-        });
-
-        uint256 commitmentId = lender._createCommitment(_commitment);
-    }
-
     function deleteCommitment_test() public {
         uint256 commitmentId = 0;
+        Commitment storage commitment = _createCommitment(
+            CommitmentCollateralType.ERC20,
+            1000e6
+        );
 
         Test.eq(
-            lenderMarketCommitments[commitmentId].lender,
+            commitment.lender,
             address(lender),
             "Not the owner of created commitment"
         );
@@ -162,35 +150,19 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         lender._deleteCommitment(commitmentId);
 
         Test.eq(
-            lenderMarketCommitments[commitmentId].lender,
+            commitment.lender,
             address(0),
             "The commitment was not deleted"
         );
     }
 
-    function acceptCommitment_before() public {
-        Commitment memory _commitment = Commitment({
-            marketId: marketId,
-            principalTokenAddress: tokenAddress,
-            maxPrincipal: maxAmount,
-            collateralTokenAddress: collateralTokenAddress,
-            collateralTokenId: collateralTokenId,
-            maxPrincipalPerCollateralAmount: maxPrincipalPerCollateralAmount,
-            collateralTokenType: collateralTokenType,
-            maxDuration: maxLoanDuration,
-            minInterestRate: minInterestRate,
-            expiration: expiration,
-            borrower: address(0),
-            lender: address(lender)
-        });
-
-        lender._createCommitment(_commitment);
-    }
-
     function acceptCommitment_test() public {
         uint256 commitmentId = 0;
 
-        Commitment storage commitment = lenderMarketCommitments[commitmentId];
+        Commitment storage commitment = _createCommitment(
+            CommitmentCollateralType.ERC20,
+            maxAmount
+        );
 
         Test.eq(
             acceptBidWasCalled,
@@ -247,36 +219,20 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
     }
 
     function acceptCommitmentFailsWithInsufficientCollateral_test() public {
-        Commitment memory _commitment = Commitment({
-            marketId: marketId,
-            principalTokenAddress: tokenAddress,
-            maxPrincipal: maxAmount,
-            collateralTokenAddress: collateralTokenAddress,
-            collateralTokenId: collateralTokenId,
-            maxPrincipalPerCollateralAmount: maxPrincipalPerCollateralAmount,
-            collateralTokenType: collateralTokenType,
-            maxDuration: maxLoanDuration,
-            minInterestRate: minInterestRate,
-            expiration: expiration,
-            borrower: address(0),
-            lender: address(lender)
-        });
-
-        lender._createCommitment(_commitment);
-
         uint256 commitmentId = 0;
 
-        Commitment storage commitment = lenderMarketCommitments[commitmentId];
-
-        requiredCollateralAmount = maxAmount + 1;
+        Commitment storage commitment = _createCommitment(
+            CommitmentCollateralType.ERC20,
+            1000e6
+        );
 
         bool failedToAcceptCommitment;
 
         try
             marketOwner._acceptCommitment(
                 commitmentId,
-                maxAmount - 100, //principal
-                maxAmount, //collateralAmount
+                100, //principal
+                0, //collateralAmount
                 0 //collateralTokenId
             )
         {} catch {
@@ -290,28 +246,16 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         );
     }
 
+    function decrementCommitment_before() public {}
+
     function decrementCommitment_test() public {
-        Commitment memory _commitment = Commitment({
-            marketId: marketId,
-            principalTokenAddress: tokenAddress,
-            maxPrincipal: maxAmount,
-            collateralTokenAddress: collateralTokenAddress,
-            collateralTokenId: collateralTokenId,
-            maxPrincipalPerCollateralAmount: maxPrincipalPerCollateralAmount,
-            collateralTokenType: collateralTokenType,
-            maxDuration: maxLoanDuration,
-            minInterestRate: minInterestRate,
-            expiration: expiration,
-            borrower: address(0),
-            lender: address(lender)
-        });
-
-        lender._createCommitment(_commitment);
-
         uint256 commitmentId = 0;
         uint256 _decrementAmount = 22;
 
-        Commitment storage commitment = lenderMarketCommitments[commitmentId];
+        Commitment storage commitment = _createCommitment(
+            CommitmentCollateralType.ERC20,
+            1000e6
+        );
 
         _decrementCommitment(commitmentId, _decrementAmount);
 
@@ -322,29 +266,128 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         );
     }
 
-    function getRequiredCollateral_test() public {
-        //For each 1 ETH collateral, can withdraw loan of 2000 USDC
+    /**
+     *             collateral token = WETH (10**18)
+     *              principal token = USDC (10**6)
+     *                    principal = 700 USDC
+     * max principal per collateral = 500 USDC
+     */
+    function getRequiredCollateral_700_USDC__500_per_WETH_test() public {
+        TestERC20Token collateralToken = new TestERC20Token(
+            "Test Wrapped ETH",
+            "TWETH",
+            0,
+            18
+        );
         Test.eq(
             super.getRequiredCollateral(
-                2 * 10**9,
-                5 * 10**8 * PRINCIPAL_PER_COLLATERAL_EXPANSION_FACTOR
+                700e6, // 700 USDC loan
+                500e6, // 500 USDC per WETH
+                CommitmentCollateralType.ERC20,
+                address(collateralToken)
             ),
-            10**18, //requires 1 ETH
-            "Unexpected result for getRequiredCollateral"
+            14e17, // 1.4 WETH
+            "expected 1.4 WETH collateral"
         );
+    }
 
-        //For each 2000 usdc collateral, can withdraw loan of 1 eth
+    /**
+     *             collateral token = NFT (10**0)
+     *              principal token = USDC (10**6)
+     *                    principal = 700 USDC
+     * max principal per collateral = 500 USDC
+     */
+    function getRequiredCollateral_700_USDC_loan__500_per_ERC1155_test()
+        public
+    {
         Test.eq(
-            super.getRequiredCollateral(10**18, 2 * 10**7),
-            2 * 10**9, //requires 2000 USDC
-            "Unexpected result for getRequiredCollateral"
+            super.getRequiredCollateral(
+                700e6, // 700 USDC loan
+                500e6, // 500 USDC per NFT
+                CommitmentCollateralType.ERC1155,
+                address(0)
+            ),
+            2, // 2 NFTs
+            "expected 2 NFTs collateral"
         );
+    }
 
-        //For each 2000 usdc collateral, can withdraw loan of 1 eth -- smallest possible loan is 10**10 wei principal
+    /**
+     *             collateral token = USDC (10**6)
+     *              principal token = WETH (10**18)
+     *                    principal = 1 WETH
+     * max principal per collateral = 0.00059 WETH
+     */
+    function getRequiredCollateral_1_WETH_loan__00059_per_USDC_test() public {
+        TestERC20Token collateralToken = new TestERC20Token(
+            "Test USDC",
+            "TUSDC",
+            0,
+            6
+        );
         Test.eq(
-            super.getRequiredCollateral(10**10, 2 * 10**7),
-            2 * 10**1,
-            "Unexpected result for getRequiredCollateral"
+            super.getRequiredCollateral(
+                1e18, // 1 WETH loan
+                59e13, // 0.00059 WETH per USDC
+                CommitmentCollateralType.ERC20,
+                address(collateralToken)
+            ),
+            1_694_915_255, // 1,694.915255 USDC (1694.915254237 rounded up to 6 decimals)
+            "expected 1,694.915255 USDC collateral"
+        );
+    }
+
+    /**
+     *             collateral token = USDC (10**6)
+     *              principal token = GWEI (10**9)
+     *                    principal = 6 GWEI
+     * max principal per collateral = 0.00059 WETH
+     */
+    function getRequiredCollateral_6_GWEI_loan__00059_WETH_per_USDC_test()
+        public
+    {
+        TestERC20Token collateralToken = new TestERC20Token(
+            "Test USDC",
+            "TUSDC",
+            0,
+            6
+        );
+        Test.eq(
+            super.getRequiredCollateral(
+                6 gwei, // 6 GWEI loan
+                59e13, // 0.00059 WETH per USDC
+                CommitmentCollateralType.ERC20,
+                address(collateralToken)
+            ),
+            11, // 0.000011 USDC (0.000010169 rounded up to 6 decimals)
+            "expected 0.000011 USDC collateral"
+        );
+    }
+
+    /**
+     *             collateral token = USDC (10**6)
+     *              principal token = WEI (10**0)
+     *                    principal = 1 WEI
+     * max principal per collateral = 0.00059 WETH
+     */
+    function getRequiredCollateral_1_WEI_loan__00059_WETH_per_USDC_test()
+        public
+    {
+        TestERC20Token collateralToken = new TestERC20Token(
+            "Test USDC",
+            "TUSDC",
+            0,
+            6
+        );
+        Test.eq(
+            super.getRequiredCollateral(
+                1, // 1 WEI loan
+                59e13, // 0.00059 WETH per USDC
+                CommitmentCollateralType.ERC20,
+                address(collateralToken)
+            ),
+            1, // 0.000001 USDC
+            "expected at least 1 unit of collateral"
         );
     }
 
@@ -380,15 +423,6 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         );
 
         return true;
-    }
-
-    function getRequiredCollateral(uint256, uint256)
-        public
-        view
-        override
-        returns (uint256)
-    {
-        return requiredCollateralAmount;
     }
 }
 

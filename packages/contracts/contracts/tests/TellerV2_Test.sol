@@ -47,7 +47,7 @@ contract TellerV2_Test is Testable {
     function setup_beforeAll() public {
         // Deploy test tokens
         wethMock = new WethMock();
-        daiMock = new TestERC20Token("Dai", "DAI", 10000000);
+        daiMock = new TestERC20Token("Dai", "DAI", 10000000, 18);
 
         // Deploy Escrow beacon
         CollateralEscrowV1 escrowImplementation = new CollateralEscrowV1();

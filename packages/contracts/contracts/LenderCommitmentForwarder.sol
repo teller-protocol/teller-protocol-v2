@@ -1,11 +1,16 @@
 pragma solidity >=0.8.0 <0.9.0;
 // SPDX-License-Identifier: MIT
 
+// Contracts
 import "./TellerV2MarketForwarder.sol";
 
+// Interfaces
 import "./interfaces/ICollateralManager.sol";
-
 import { Collateral, CollateralType } from "./interfaces/escrow/ICollateralEscrowV1.sol";
+
+// Libraries
+import { MathUpgradeable } from "@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20MetadataUpgradeable.sol";
 
 /*
 consider lender being in its own mapping 
@@ -26,8 +31,6 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         ERC721_ANY_ID,
         ERC1155_ANY_ID
     }
-
-    uint256 public constant PRINCIPAL_PER_COLLATERAL_EXPANSION_FACTOR = 10**16;
 
     /**
      * @notice Details about a lender's capital commitment.
@@ -50,8 +53,8 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint16 minInterestRate;
         address collateralTokenAddress;
         uint256 collateralTokenId;
-        uint256 maxPrincipalPerCollateralAmount; //zero means infinite . This is expressed using 16 decimals [PRINCIPAL_PER_COLLATERAL_EXPANSION_FACTOR] so 1 wei is 10^16 and 1 usdc is 10^22
-        CommitmentCollateralType collateralTokenType; //erc721, erc1155 or erc20
+        uint256 maxPrincipalPerCollateralAmount;
+        CommitmentCollateralType collateralTokenType;
         address lender;
         uint256 marketId;
         address principalTokenAddress;
@@ -119,13 +122,19 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint256 indexed bidId
     );
 
-    error InsufficientCommitmentAllocation(uint256 allocated, uint256 requested);
+    error InsufficientCommitmentAllocation(
+        uint256 allocated,
+        uint256 requested
+    );
     error InsufficientBorrowerCollateral(uint256 required, uint256 actual);
 
     /** Modifiers **/
 
     modifier commitmentLender(uint256 _commitmentId) {
-        require(lenderMarketCommitments[_commitmentId].lender == _msgSender(), "unauthorized commitment lender");
+        require(
+            lenderMarketCommitments[_commitmentId].lender == _msgSender(),
+            "unauthorized commitment lender"
+        );
         _;
     }
 
@@ -143,7 +152,10 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
                 "commitment collateral ratio 0"
             );
 
-            if (_commitment.collateralTokenType == CommitmentCollateralType.ERC20) {
+            if (
+                _commitment.collateralTokenType ==
+                CommitmentCollateralType.ERC20
+            ) {
                 require(
                     _commitment.collateralTokenId == 0,
                     "commitment collateral token id must be 0 for ERC20"
@@ -151,9 +163,16 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             }
         }
     }
+
     function _requireValidCommitment(Commitment storage _commitment) internal {
-        require(_commitment.expiration > uint32(block.timestamp), "expired commitment");
-        require(_commitment.maxPrincipal > 0, "commitment principal allocation 0");
+        require(
+            _commitment.expiration > uint32(block.timestamp),
+            "expired commitment"
+        );
+        require(
+            _commitment.maxPrincipal > 0,
+            "commitment principal allocation 0"
+        );
     }
 
     /** External Functions **/
@@ -167,13 +186,16 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
      * @param _commitment The new commitment data expressed as a struct
      */
     function createCommitment(Commitment calldata _commitment)
-        validateUpdatedCommitment(lenderMarketCommitments[commitmentCount++])
         public
+        validateUpdatedCommitment(lenderMarketCommitments[commitmentCount++])
         returns (uint256 commitmentId_)
     {
         commitmentId_ = commitmentCount;
 
-        require(_commitment.lender == _msgSender(), "unauthorized commitment creator");
+        require(
+            _commitment.lender == _msgSender(),
+            "unauthorized commitment creator"
+        );
 
         lenderMarketCommitments[commitmentId_] = _commitment;
 
@@ -195,9 +217,9 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint256 _commitmentId,
         Commitment calldata _commitment
     )
+        public
         commitmentLender(_commitmentId)
         validateUpdatedCommitment(lenderMarketCommitments[_commitmentId])
-        public
     {
         lenderMarketCommitments[_commitmentId] = _commitment;
 
@@ -216,8 +238,8 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
    
      */
     function deleteCommitment(uint256 _commitmentId)
-        commitmentLender(_commitmentId)
         public
+        commitmentLender(_commitmentId)
     {
         delete lenderMarketCommitments[_commitmentId];
         emit DeletedCommitment(_commitmentId);
@@ -237,8 +259,8 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
     }
 
     /**
-     * @notice Accept the commitment to submitBid and acceptBid using the funds 
-     * @param _commitmentId The id of the commitment being accepted. 
+     * @notice Accept the commitment to submitBid and acceptBid using the funds
+     * @param _commitmentId The id of the commitment being accepted.
      * @param _principalAmount The amount of currency to borrow for the loan.
      * @param _collateralAmount The amount of collateral to use for the loan.
      * @param _collateralTokenId The tokenId of collateral to use for the loan if ERC721 or ERC1155.
@@ -249,8 +271,8 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint256 _collateralAmount,
         uint256 _collateralTokenId
     )
-        withValidCommitment(lenderMarketCommitments[_commitmentId])
         external
+        withValidCommitment(lenderMarketCommitments[_commitmentId])
         returns (uint256 bidId)
     {
         address borrower = _msgSender();
@@ -259,7 +281,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
 
         require(
             commitment.borrower == address(0) ||
-            borrower == commitment.borrower,
+                borrower == commitment.borrower,
             "unauthorized commitment borrower"
         );
         if (_principalAmount > commitment.maxPrincipal) {
@@ -268,17 +290,18 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
                 requested: _principalAmount
             });
         }
-        if (commitment.collateralTokenType != CommitmentCollateralType.NONE) {
-            uint256 requiredCollateral = getRequiredCollateral(
-                _principalAmount,
-                commitment.maxPrincipalPerCollateralAmount
-            );
-            if (_collateralAmount < requiredCollateral) {
-                revert InsufficientBorrowerCollateral({
-                    required: requiredCollateral,
-                    actual: _collateralAmount
-                });
-            }
+
+        uint256 requiredCollateral = getRequiredCollateral(
+            _principalAmount,
+            commitment.maxPrincipalPerCollateralAmount,
+            commitment.collateralTokenType,
+            commitment.collateralTokenAddress
+        );
+        if (_collateralAmount < requiredCollateral) {
+            revert InsufficientBorrowerCollateral({
+                required: requiredCollateral,
+                actual: _collateralAmount
+            });
         }
 
         if (
@@ -286,7 +309,10 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             commitment.collateralTokenType ==
             CommitmentCollateralType.ERC721_ANY_ID
         ) {
-            require(_collateralAmount == 1, "invalid commitment collateral amount for ERC721");
+            require(
+                _collateralAmount == 1,
+                "invalid commitment collateral amount for ERC721"
+            );
         }
 
         if (
@@ -326,15 +352,31 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         );
     }
 
-    //fix tests
-    //use math ceiling (OZ math mul div) -- make sure that 700 / 500 = 1.4 rounds up to 2, requiring a quantity of 2 NFTs
     function getRequiredCollateral(
         uint256 _principalAmount,
-        uint256 _maxPrincipalPerCollateralAmount
-    ) public view virtual returns (uint256 _collateralAmountRaw) {
-        _collateralAmountRaw =
-            (_principalAmount * PRINCIPAL_PER_COLLATERAL_EXPANSION_FACTOR) /
-            _maxPrincipalPerCollateralAmount;
+        uint256 _maxPrincipalPerCollateralAmount,
+        CommitmentCollateralType _collateralTokenType,
+        address _collateralTokenAddress
+    ) public view virtual returns (uint256) {
+        if (_collateralTokenType == CommitmentCollateralType.NONE) {
+            return 0;
+        }
+        if (_collateralTokenType == CommitmentCollateralType.ERC20) {
+            uint8 decimals = IERC20MetadataUpgradeable(_collateralTokenAddress)
+                .decimals();
+            return
+                MathUpgradeable.mulDiv(
+                    _principalAmount,
+                    10**decimals,
+                    _maxPrincipalPerCollateralAmount,
+                    MathUpgradeable.Rounding.Up
+                );
+        }
+        return
+            MathUpgradeable.ceilDiv(
+                _principalAmount,
+                _maxPrincipalPerCollateralAmount
+            );
     }
 
     function _submitBidFromCommitment(
@@ -356,14 +398,16 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         createLoanArgs.duration = _loanDuration;
         createLoanArgs.interestRate = _interestRate;
 
-        Collateral[] memory collateralInfo = new Collateral[](1);
-
-        collateralInfo[0] = Collateral({
-            _collateralType: _getEscrowCollateralType(_collateralTokenType),
-            _tokenId: _collateralTokenId,
-            _amount: _collateralAmount,
-            _collateralAddress: _collateralTokenAddress
-        });
+        Collateral[] memory collateralInfo;
+        if (_collateralTokenType != CommitmentCollateralType.NONE) {
+            collateralInfo = new Collateral[](1);
+            collateralInfo[0] = Collateral({
+                _collateralType: _getEscrowCollateralType(_collateralTokenType),
+                _tokenId: _collateralTokenId,
+                _amount: _collateralAmount,
+                _collateralAddress: _collateralTokenAddress
+            });
+        }
 
         bidId = _submitBidWithCollateral(
             createLoanArgs,

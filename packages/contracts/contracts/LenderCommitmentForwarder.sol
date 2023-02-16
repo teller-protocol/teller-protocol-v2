@@ -395,6 +395,10 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             );
     }
 
+    function getCommitmentBorrowers(uint256 _commitmentId) external view returns (address[] memory borrowers_) {
+        borrowers_ = commitmentBorrowersList[_commitmentId].values();
+    }
+
     function _submitBidFromCommitment(
         address _borrower,
         uint256 _marketId,

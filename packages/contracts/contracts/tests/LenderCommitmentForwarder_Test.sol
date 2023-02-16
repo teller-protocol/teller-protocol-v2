@@ -245,7 +245,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         );
     }
 
-     function acceptCommitmentWithBorrowersArray_test() public {
+     function acceptCommitmentWithBorrowersArray_valid_test() public {
 
         uint256 commitmentId = 0;
 
@@ -273,6 +273,27 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             "Expect accept bid called after exercise"
         );
 
+       
+        
+
+     }
+
+      function acceptCommitmentWithBorrowersArray_invalid_test() public {
+
+        uint256 commitmentId = 0;
+
+        Commitment storage commitment = _createCommitment(
+            CommitmentCollateralType.ERC20,
+            maxAmount
+        ); 
+
+        lender._updateCommitment(
+            commitmentId,
+            commitment,
+            borrowersArray
+        );
+
+      
         
         bool acceptCommitAsMarketOwnerFails;
 
@@ -315,6 +336,46 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         );
 
      }
+
+       function acceptCommitmentWithBorrowersArray_reset_test() public {
+
+        uint256 commitmentId = 0;
+
+        Commitment storage commitment = _createCommitment(
+            CommitmentCollateralType.ERC20,
+            maxAmount
+        ); 
+
+        lender._updateCommitment(
+            commitmentId,
+            commitment,
+            borrowersArray
+        );
+
+       
+
+        lender._updateCommitment(
+            commitmentId,
+            commitment,
+            emptyArray
+        );
+ 
+
+        marketOwner._acceptCommitment(
+            commitmentId,
+            0, //principal
+            maxAmount, //collateralAmount
+            0 //collateralTokenId
+        );
+
+        Test.eq(
+            acceptBidWasCalled,
+            true,
+            "Expect accept bid called after exercise"
+        );
+
+     }
+
 
     function acceptCommitmentFailsWithInsufficientCollateral_test() public {
         uint256 commitmentId = 0;

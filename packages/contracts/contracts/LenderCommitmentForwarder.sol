@@ -276,16 +276,15 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint256 _principalAmount,
         uint256 _collateralAmount,
         uint256 _collateralTokenId
-    )
-        external
-       
+    ) 
+        external       
         returns (uint256 bidId)
     {
         address borrower = _msgSender();
 
         Commitment storage commitment = lenderMarketCommitments[_commitmentId];
 
-        validateCommitment( commitment );
+        validateCommitment(  lenderMarketCommitments[_commitmentId] );
 
         require(
             commitmentBorrowersList[_commitmentId].length() == 0 ||
@@ -306,6 +305,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             commitment.collateralTokenType,
             commitment.collateralTokenAddress
         );
+
         if (_collateralAmount < requiredCollateral) {
             revert InsufficientBorrowerCollateral({
                 required: requiredCollateral,

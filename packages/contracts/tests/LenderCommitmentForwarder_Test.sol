@@ -240,6 +240,45 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         );
     }
 
+     function test_acceptCommitment_with_expiration() public {
+         // acceptCommitment_before();
+
+        uint256 commitmentId = 0;
+
+        Commitment storage commitment = _createCommitment(
+            CommitmentCollateralType.ERC20,
+            maxAmount
+        );
+
+        commitment.expiration = 1676666742;
+
+        vm.warp(1676666742 - 1);
+ 
+        assertEq(
+            acceptBidWasCalled,
+            false,
+            "Expect accept bid not called before exercise"
+        );
+
+        uint256 bidId = borrower._acceptCommitment(
+            commitmentId,
+            maxAmount - 100, //principal
+            maxAmount, //collateralAmount
+            0 //collateralTokenId
+        );
+
+        assertEq(
+            acceptBidWasCalled,
+            true,
+            "Expect accept bid called after exercise"
+        );
+
+       
+
+
+
+    }
+
     function test_acceptCommitmentWithBorrowersArray_valid() public {
         uint256 commitmentId = 0;
 

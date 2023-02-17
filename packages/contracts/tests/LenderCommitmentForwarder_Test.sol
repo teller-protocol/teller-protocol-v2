@@ -139,6 +139,27 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         vm.warp(defaultExpirationTime - 1000);
 
         lender._createCommitment(existingCommitment, emptyArray);
+
+
+         
+    }
+ 
+
+  function test_createCommitmentIncrementsId() public {
+        uint256 commitmentId = 0;
+
+        Commitment storage existingCommitment = _createCommitment(
+            CommitmentCollateralType.ERC20,
+            1000e6
+        );
+ 
+        lender._createCommitment(existingCommitment, emptyArray);
+
+
+
+        lender._createCommitment(existingCommitment, emptyArray);
+
+        assertEq( lenderMarketCommitments[commitmentId+1].lender, address(lender), "Commitment id was not incremented"  );
     }
  
     function test_updateCommitment() public {

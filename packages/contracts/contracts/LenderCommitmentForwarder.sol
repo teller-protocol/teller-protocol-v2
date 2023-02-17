@@ -134,11 +134,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         );
         _;
     }
-
-    
-   
-
-
+ 
     function validateCommitment(Commitment storage _commitment) internal {
         require(
             _commitment.expiration > uint32(block.timestamp),
@@ -185,9 +181,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
        
         returns (uint256 commitmentId_)
     {
-        commitmentId_ = commitmentCount;
-
-
+        commitmentId_ = commitmentCount++; 
 
         require(
             _commitment.lender == _msgSender(),

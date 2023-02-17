@@ -11,32 +11,37 @@ import { TellerV2Context } from "../contracts/TellerV2Context.sol";
 import { IMarketRegistry } from "../contracts/interfaces/IMarketRegistry.sol";
 import { TellerV2MarketForwarder } from "../contracts/TellerV2MarketForwarder.sol";
 
-contract MarketForwarder_Test is Testable, TellerV2MarketForwarder {
-    MarketForwarderTester private tester;
+import { User } from "./Test_Helpers.sol";
 
-    MockMarketRegistry mockMarketRegistry;
+import "../contracts/mock/MarketRegistryMock.sol";
+
+contract MarketForwarder_Test is Testable, TellerV2MarketForwarder {
+    MarketForwarderTester private tellerV2Mock;
+
+    MarketRegistryMock mockMarketRegistry;
 
     uint256 private marketId;
-    User private marketOwner;
-    User private user1;
-    User private user2;
+    MarketForwarderUser private marketOwner;
+    MarketForwarderUser private user1;
+    MarketForwarderUser private user2;
 
     constructor()
         TellerV2MarketForwarder(
             address(new MarketForwarderTester()),
-            address(new MockMarketRegistry(address(0)))
+            address(new MarketRegistryMock(address(0)))
         )
     {}
 
+ 
     function setUp() public {
-        mockMarketRegistry = MockMarketRegistry(address(getMarketRegistry()));
-        tester = MarketForwarderTester(address(getTellerV2()));
+        mockMarketRegistry = MarketRegistryMock(address(getMarketRegistry()));
+        tellerV2Mock = MarketForwarderTester(address(getTellerV2()));
+ 
+        marketOwner = new MarketForwarderUser(address(tellerV2Mock));
+        user1 = new MarketForwarderUser(address(tellerV2Mock));
+        user2 = new MarketForwarderUser(address(tellerV2Mock));
 
-        marketOwner = new User(tester);
-        user1 = new User(tester);
-        user2 = new User(tester);
-
-        tester.__setMarketOwner(marketOwner);
+        tellerV2Mock.__setMarketOwner(marketOwner);
 
         mockMarketRegistry.setMarketOwner(address(marketOwner));
 
@@ -47,11 +52,11 @@ contract MarketForwarder_Test is Testable, TellerV2MarketForwarder {
         marketOwner.setTrustedMarketForwarder(marketId, address(this));
     }
 
+ 
     function test_setTrustedMarketForwarder() public {
         setTrustedMarketForwarder_before();
-
         assertEq(
-            tester.isTrustedMarketForwarder(marketId, address(this)),
+            tellerV2Mock.isTrustedMarketForwarder(marketId, address(this)),
             true,
             "Trusted forwarder was not set"
         );
@@ -64,11 +69,11 @@ contract MarketForwarder_Test is Testable, TellerV2MarketForwarder {
         user2.approveMarketForwarder(marketId, address(this));
     }
 
-    function test_approveMarketForwarder() public {
+ 
+    function test_approveMarketForwarder_test() public {
         approveMarketForwarder_before();
-
         assertEq(
-            tester.hasApprovedMarketForwarder(
+            tellerV2Mock.hasApprovedMarketForwarder(
                 marketId,
                 address(this),
                 address(user1)
@@ -76,8 +81,9 @@ contract MarketForwarder_Test is Testable, TellerV2MarketForwarder {
             true,
             "Borrower did not set market forwarder approval"
         );
+ 
         assertEq(
-            tester.hasApprovedMarketForwarder(
+            tellerV2Mock.hasApprovedMarketForwarder(
                 marketId,
                 address(this),
                 address(user2)
@@ -127,32 +133,19 @@ contract MarketForwarder_Test is Testable, TellerV2MarketForwarder {
     }
 }
 
-contract User {
-    TellerV2Context public immutable context;
-
-    constructor(TellerV2Context _context) {
-        context = _context;
-    }
-
-    function setTrustedMarketForwarder(uint256 _marketId, address _forwarder)
-        external
-    {
-        context.setTrustedMarketForwarder(_marketId, _forwarder);
-    }
-
-    function approveMarketForwarder(uint256 _marketId, address _forwarder)
-        external
-    {
-        context.approveMarketForwarder(_marketId, _forwarder);
-    }
+//This should use the user helper !!
+contract MarketForwarderUser is User {
+    constructor(address _tellerV2) User(_tellerV2) {}
 }
 
+//Move to a helper
+//this is a tellerV2 mock
 contract MarketForwarderTester is TellerV2Context {
     constructor() TellerV2Context(address(0)) {}
 
     function __setMarketOwner(User _marketOwner) external {
         marketRegistry = IMarketRegistry(
-            address(new MockMarketRegistry(address(_marketOwner)))
+            address(new MarketRegistryMock(address(_marketOwner)))
         );
     }
 
@@ -170,21 +163,5 @@ contract MarketForwarderTester is TellerV2Context {
         returns (bytes calldata)
     {
         return _msgDataForMarket(_marketId);
-    }
-}
-
-contract MockMarketRegistry {
-    address private marketOwner;
-
-    constructor(address _marketOwner) {
-        marketOwner = _marketOwner;
-    }
-
-    function setMarketOwner(address _marketOwner) public {
-        marketOwner = _marketOwner;
-    }
-
-    function getMarketOwner(uint256) external view returns (address) {
-        return address(marketOwner);
     }
 }

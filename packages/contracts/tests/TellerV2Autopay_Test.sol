@@ -25,7 +25,7 @@ import "../contracts/interfaces/ITellerV2Autopay.sol";
 
  
 import { PaymentType } from "../contracts/libraries/V2Calculations.sol";
-
+ 
 contract TellerV2Autopay_Test is Testable, TellerV2Autopay {
     User private marketOwner;
     User private borrower;
@@ -37,7 +37,7 @@ contract TellerV2Autopay_Test is Testable, TellerV2Autopay {
     address marketRegistry;
 
     constructor() TellerV2Autopay(address(new TellerV2SolMock())) {
-        marketRegistry = address(new MarketRegistryMock());
+        marketRegistry = address(new MarketRegistryMock(address(0)));
         TellerV2SolMock(address(tellerV2)).setMarketRegistry(marketRegistry);
     }
 
@@ -249,6 +249,7 @@ contract User {
             _requireLenderAttestation,
             _requireBorrowerAttestation,
             _paymentType,
+            PaymentCycleType.Seconds,
             _uri
         );
     }

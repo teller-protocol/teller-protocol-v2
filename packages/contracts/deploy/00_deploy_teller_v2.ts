@@ -1,3 +1,4 @@
+import { ethers, getNamedSigner } from 'hardhat'
 import { DeployFunction } from 'hardhat-deploy/dist/types'
 import { HARDHAT_NETWORK_NAME } from 'hardhat/plugins'
 import { deploy } from 'helpers/deploy-helpers'
@@ -17,29 +18,7 @@ const deployFn: DeployFunction = async (hre) => {
     lendingTokens.push(tokens.all.USDCT)
   }
 
-  const reputationManager = await deploy({
-    contract: 'ReputationManager',
-    args: [],
-    proxy: {
-      proxyContract: 'OpenZeppelinTransparentProxy',
-    },
-    hre,
-  })
-
-  const trustedForwarder = await deploy({
-    contract: 'MetaForwarder',
-    skipIfAlreadyDeployed: true,
-    proxy: {
-      proxyContract: 'OpenZeppelinTransparentProxy',
-      execute: {
-        init: {
-          methodName: 'initialize',
-          args: [],
-        },
-      },
-    },
-    hre,
-  })
+  const trustedForwarder = await hre.contracts.get('MetaForwarder')
 
   const tellerV2Contract = await deploy({
     contract: 'TellerV2',
@@ -58,14 +37,15 @@ const deployFn: DeployFunction = async (hre) => {
   const lenderCommitmentForwarder = await deploy({
     contract: 'LenderCommitmentForwarder',
     args: [tellerV2Contract.address, marketRegistry.address],
-    skipIfAlreadyDeployed: true,
+    skipIfAlreadyDeployed: false,
     proxy: {
       proxyContract: 'OpenZeppelinTransparentProxy',
     },
     hre,
   })
 
-  // execute the initialize method of reputation manager
+  const reputationManager = await hre.contracts.get('ReputationManager')
+  // Execute the initialize method of reputation manager
   const reputationIsInitialized = await isInitialized(reputationManager.address)
   if (!reputationIsInitialized) {
     await reputationManager.initialize(tellerV2Contract.address)
@@ -112,18 +92,25 @@ const deployFn: DeployFunction = async (hre) => {
 
   const tellerV2IsInitialized = await isInitialized(tellerV2Contract.address)
   if (!tellerV2IsInitialized) {
+    const lenderManager = await hre.contracts.get('LenderManager')
     await tellerV2Contract.initialize(
       protocolFee,
       marketRegistry.address,
       reputationManager.address,
       lenderCommitmentForwarder.address,
       lendingTokens,
-      collateralManager.address
+      collateralManager.address,
+      lenderManager.address
     )
   }
 }
 
 // tags and deployment
 deployFn.tags = ['teller-v2']
-deployFn.dependencies = ['market-registry']
+deployFn.dependencies = [
+  'meta-forwarder',
+  'reputation-manager',
+  'market-registry',
+  'lender-manager',
+]
 export default deployFn

@@ -22,15 +22,20 @@ import "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
 import "../contracts/LenderCommitmentForwarder.sol";
 import "./resolvers/TestERC20Token.sol";
  
+ 
 import "../contracts/CollateralManager.sol";
 import { Collateral } from "../contracts/interfaces/escrow/ICollateralEscrowV1.sol";
 import { PaymentType } from "../contracts/libraries/V2Calculations.sol";
 import { BidState, Payment } from "../contracts/TellerV2Storage.sol";
-
+ 
+     
+import "../contracts/MetaForwarder.sol";
+import { LenderManager } from "../contracts/LenderManager.sol";
+ 
 contract TellerV2_Test is Testable {
-    User private marketOwner;
-    User private borrower;
-    User private lender;
+    TellerV2User private marketOwner;
+    TellerV2User private borrower;
+    TellerV2User private lender;
 
     TellerV2 tellerV2;
 
@@ -44,7 +49,7 @@ contract TellerV2_Test is Testable {
     function setUp() public {
         // Deploy test tokens
         wethMock = new WethMock();
-        daiMock = new TestERC20Token("Dai", "DAI", 10000000);
+        daiMock = new TestERC20Token("Dai", "DAI", 10000000, 18);
 
         // Deploy Escrow beacon
         CollateralEscrowV1 escrowImplementation = new CollateralEscrowV1();
@@ -66,6 +71,13 @@ contract TellerV2_Test is Testable {
         collateralManager = new CollateralManager();
         collateralManager.initialize(address(escrowBeacon), address(tellerV2));
 
+        // Deploy Lender manager
+        MetaForwarder metaforwarder = new MetaForwarder();
+        metaforwarder.initialize();
+        LenderManager lenderManager = new LenderManager((marketRegistry));
+        lenderManager.initialize();
+        lenderManager.transferOwnership(address(tellerV2));
+
         // Deploy LenderCommitmentForwarder
         LenderCommitmentForwarder lenderCommitmentForwarder = new LenderCommitmentForwarder(
                 address(tellerV2),
@@ -83,13 +95,14 @@ contract TellerV2_Test is Testable {
             address(reputationManager),
             address(lenderCommitmentForwarder),
             lendingTokens,
-            address(collateralManager)
+            address(collateralManager),
+            address(lenderManager)
         );
 
         // Instantiate users & balances
-        marketOwner = new User(tellerV2, wethMock);
-        borrower = new User(tellerV2, wethMock);
-        lender = new User(tellerV2, wethMock);
+        marketOwner = new TellerV2User(address(tellerV2), wethMock);
+        borrower = new TellerV2User(address(tellerV2), wethMock);
+        lender = new TellerV2User(address(tellerV2), wethMock);
 
         uint256 balance = 50000;
         payable(address(borrower)).transfer(balance);
@@ -112,6 +125,7 @@ contract TellerV2_Test is Testable {
             false,
             false,
             PaymentType.EMI,
+            PaymentCycleType.Seconds,
             "uri://"
         );
     }
@@ -197,5 +211,17 @@ contract TellerV2_Test is Testable {
             borrowerBalanceAfter - borrowerBalanceBefore,
             "Collateral was not sent to borrower after repayment"
         );
+    }
+}
+
+contract TellerV2User is User {
+    WethMock public immutable wethMock;
+
+    constructor(address _tellerV2, WethMock _wethMock) User(_tellerV2) {
+        wethMock = _wethMock;
+    }
+
+    function depositToWeth(uint256 amount) public {
+        wethMock.deposit{ value: amount }();
     }
 }

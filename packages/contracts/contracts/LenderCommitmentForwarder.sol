@@ -1,73 +1,176 @@
 pragma solidity >=0.8.0 <0.9.0;
 // SPDX-License-Identifier: MIT
 
+// Contracts
 import "./TellerV2MarketForwarder.sol";
 
+// Interfaces
+import "./interfaces/ICollateralManager.sol";
+import { Collateral, CollateralType } from "./interfaces/escrow/ICollateralEscrowV1.sol";
+
+import "@openzeppelin/contracts-upgradeable/utils/structs/EnumerableSetUpgradeable.sol";
+
+// Libraries
+import { MathUpgradeable } from "@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20MetadataUpgradeable.sol";
+
 contract LenderCommitmentForwarder is TellerV2MarketForwarder {
+    using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
+
+    enum CommitmentCollateralType {
+        NONE, // no collateral required
+        ERC20,
+        ERC721,
+        ERC1155,
+        ERC721_ANY_ID,
+        ERC1155_ANY_ID
+    }
+
     /**
      * @notice Details about a lender's capital commitment.
-     * @param amount Amount of tokens being committed by the lender.
+     * @param maxPrincipal Amount of tokens being committed by the lender. Max amount that can be loaned.
      * @param expiration Expiration time in seconds, when the commitment expires.
      * @param maxDuration Length of time, in seconds that the lender's capital can be lent out for.
-     * @param minAPR Minimum Annual percentage to be applied for loans using the lender's capital.
+     * @param minInterestRate Minimum Annual percentage to be applied for loans using the lender's capital.
+     * @param collateralTokenAddress The address for the token contract that must be used to provide collateral for loans for this commitment.
+     * @param maxPrincipalPerCollateralAmount The amount of principal that can be used for a loan per each unit of collateral, expanded by 10^8. Use zero for no collateral required.
+     * @param collateralTokenType The type of asset of the collateralTokenAddres (ERC20, ERC721, or ERC1155).
+     * @param lender The address of the lender for this commitment.
+     * @param marketId The market id for this commitment.
+     * @param principalTokenAddress The address for the token contract that will be used to provide principal for loans of this commitment.
+     * @param borrower The address of the borrower that is allowed to accept this commitment.  Zero address is wildcard for any address.
      */
     struct Commitment {
         uint256 maxPrincipal;
         uint32 expiration;
         uint32 maxDuration;
         uint16 minInterestRate;
-    }
-
-    modifier onlyMarketOwner(uint256 marketId) {
-        require(_msgSender() == getTellerV2MarketOwner(marketId));
-        _;
+        address collateralTokenAddress;
+        uint256 collateralTokenId;
+        uint256 maxPrincipalPerCollateralAmount;
+        CommitmentCollateralType collateralTokenType;
+        address lender;
+        uint256 marketId;
+        address principalTokenAddress;
+        //     address borrower;
     }
 
     // Mapping of lender address => market ID => lending token => commitment
-    mapping(address => mapping(uint256 => mapping(address => Commitment)))
-        public lenderMarketCommitments;
+    //mapping(address => mapping(uint256 => mapping(address => Commitment))) public __lenderMarketCommitments_deprecated;
+
+    // CommitmentId => commitment
+    mapping(uint256 => Commitment) public lenderMarketCommitments;
+
+    uint256 commitmentCount;
+
+    mapping(uint256 => EnumerableSetUpgradeable.AddressSet)
+        internal commitmentBorrowersList;
 
     /**
-     * @notice This event is emitted when a lender's commitment is submitted.
+     * @notice This event is emitted when a lender's commitment is created.
+     * @param lender The address of the lender.
+     * @param marketId The Id of the market the commitment applies to.
+     * @param lendingToken The address of the asset being committed.
+     * @param tokenAmount The amount of the asset being committed.
+     */
+    event CreatedCommitment(
+        uint256 indexed commitmentId,
+        address lender,
+        uint256 marketId,
+        address lendingToken,
+        uint256 tokenAmount
+    );
+
+    /**
+     * @notice This event is emitted when a lender's commitment is updated.
      * @param lender The address of the lender.
      * @param marketId The Id of the market the commitment applies to.
      * @param lendingToken The address of the asset being committed.
      * @param tokenAmount The amount of the asset being committed.
      */
     event UpdatedCommitment(
-        address indexed lender,
-        uint256 indexed marketId,
-        address indexed lendingToken,
+        uint256 indexed commitmentId,
+        address lender,
+        uint256 marketId,
+        address lendingToken,
         uint256 tokenAmount
     );
 
     /**
-     * @notice This event is emitted when a lender's commitment has been removed.
-     * @param lender The address of the lender.
-     * @param marketId The Id of the market the commitment removal applies to.
-     * @param lendingToken The address of the asset the commitment removal applies to.
+     * @notice This event is emitted when a lender's commitment has been deleted.
+     * @param commitmentId The id of the commitment that was deleted.
      */
-    event DeletedCommitment(
-        address indexed lender,
-        uint256 indexed marketId,
-        address indexed lendingToken
-    );
+    event DeletedCommitment(uint256 indexed commitmentId);
 
     /**
      * @notice This event is emitted when a lender's commitment is exercised for a loan.
-     * @param lender The address of the lender.
+     * @param borrower The address of the borrower.
      * @param marketId The Id of the market the commitment applies to.
      * @param lendingToken The address of the asset being committed.
      * @param tokenAmount The amount of the asset being committed.
      * @param bidId The bid id for the loan from TellerV2.
      */
     event ExercisedCommitment(
-        address indexed lender,
-        uint256 indexed marketId,
-        address indexed lendingToken,
+        uint256 indexed commitmentId,
+        address borrower,
+        uint256 marketId,
+        address lendingToken,
         uint256 tokenAmount,
-        uint256 bidId
+        uint256 indexed bidId
     );
+
+    error InsufficientCommitmentAllocation(
+        uint256 allocated,
+        uint256 requested
+    );
+    error InsufficientBorrowerCollateral(uint256 required, uint256 actual);
+
+    /** Modifiers **/
+
+    modifier commitmentLender(uint256 _commitmentId) {
+        require(
+            lenderMarketCommitments[_commitmentId].lender == _msgSender(),
+            "unauthorized commitment lender"
+        );
+        _;
+    }
+
+    modifier withValidCommitment(Commitment storage _commitment) {
+        _requireValidCommitment(_commitment);
+        _;
+    }
+    modifier validateUpdatedCommitment(Commitment storage _commitment) {
+        _;
+        _requireValidCommitment(_commitment);
+
+        if (_commitment.collateralTokenType != CommitmentCollateralType.NONE) {
+            require(
+                _commitment.maxPrincipalPerCollateralAmount > 0,
+                "commitment collateral ratio 0"
+            );
+
+            if (
+                _commitment.collateralTokenType ==
+                CommitmentCollateralType.ERC20
+            ) {
+                require(
+                    _commitment.collateralTokenId == 0,
+                    "commitment collateral token id must be 0 for ERC20"
+                );
+            }
+        }
+    }
+
+    function _requireValidCommitment(Commitment storage _commitment) internal {
+        require(
+            _commitment.expiration > uint32(block.timestamp),
+            "expired commitment"
+        );
+        require(
+            _commitment.maxPrincipal > 0,
+            "commitment principal allocation 0"
+        );
+    }
 
     /** External Functions **/
 
@@ -76,141 +179,284 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
     {}
 
     /**
+     * @notice Created a loan commitment from a lender to a market.
+     * @param _commitment The new commitment data expressed as a struct
+     */
+    function createCommitment(
+        Commitment calldata _commitment,
+        address[] calldata borrowerAddressList
+    )
+        public
+        validateUpdatedCommitment(lenderMarketCommitments[commitmentCount++])
+        returns (uint256 commitmentId_)
+    {
+        commitmentId_ = commitmentCount;
+
+        require(
+            _commitment.lender == _msgSender(),
+            "unauthorized commitment creator"
+        );
+
+        lenderMarketCommitments[commitmentId_] = _commitment;
+
+        for (uint256 i = 0; i < borrowerAddressList.length; i++) {
+            commitmentBorrowersList[commitmentId_].add(borrowerAddressList[i]);
+        }
+
+        emit CreatedCommitment(
+            commitmentId_,
+            _commitment.lender,
+            _commitment.marketId,
+            _commitment.principalTokenAddress,
+            _commitment.maxPrincipal
+        );
+    }
+
+    /**
      * @notice Updates the commitment of a lender to a market.
-     * @param _tokenAddress The address of the asset being committed.
-     * @param _marketId The Id of the market the commitment applies to.
-     * @param _maxPrincipal Amount of tokens being committed by the lender.
-     * @param _maxLoanDuration Length of time, in seconds that the lender's capital can be lent out for.
-     * @param _minInterestRate Minimum Annual percentage to be applied for loans using the lender's capital.
-     * @param _expiration Expiration time in seconds, when the commitment expires.
+     * @param _commitmentId The Id of the commitment to update.
+     * @param _commitment The new commitment data expressed as a struct
      */
     function updateCommitment(
-        uint256 _marketId,
-        address _tokenAddress,
-        uint256 _maxPrincipal,
-        uint32 _maxLoanDuration,
-        uint16 _minInterestRate,
-        uint32 _expiration
-    ) public {
-        address lender = _msgSender();
-        require(_expiration > uint32(block.timestamp));
+        uint256 _commitmentId,
+        Commitment calldata _commitment,
+        address[] calldata borrowerAddressList
+    )
+        public
+        commitmentLender(_commitmentId)
+        validateUpdatedCommitment(lenderMarketCommitments[_commitmentId])
+    {
+        lenderMarketCommitments[_commitmentId] = _commitment;
 
-        Commitment storage commitment = lenderMarketCommitments[lender][
-            _marketId
-        ][_tokenAddress];
-        commitment.maxPrincipal = _maxPrincipal;
-        commitment.expiration = _expiration;
-        commitment.maxDuration = _maxLoanDuration;
-        commitment.minInterestRate = _minInterestRate;
+        delete commitmentBorrowersList[_commitmentId];
 
-        emit UpdatedCommitment(lender, _marketId, _tokenAddress, _maxPrincipal);
-    }
-
-    /**
-     * @notice Removes the commitment of a lender to a market.
-     * @param _marketId The Id of the market the commitment removal applies to.
-     * @param _tokenAddress The address of the asset for which the commitment is being removed.
-     */
-    function deleteCommitment(uint256 _marketId, address _tokenAddress) public {
-        _deleteCommitment(_msgSender(), _marketId, _tokenAddress);
-    }
-
-    /**
-     * @notice Removes the commitment of a lender to a market.
-     * @param _lender The address of the lender of the commitment.
-     * @param _marketId The Id of the market the commitment removal applies to.
-     * @param _tokenAddress The address of the asset for which the commitment is being removed.
-     */
-    function _deleteCommitment(
-        address _lender,
-        uint256 _marketId,
-        address _tokenAddress
-    ) internal {
-        if (
-            lenderMarketCommitments[_lender][_marketId][_tokenAddress]
-                .maxPrincipal > 0
-        ) {
-            delete lenderMarketCommitments[_lender][_marketId][_tokenAddress];
-            emit DeletedCommitment(_lender, _marketId, _tokenAddress);
+        for (uint256 i = 0; i < borrowerAddressList.length; i++) {
+            commitmentBorrowersList[_commitmentId].add(borrowerAddressList[i]);
         }
+
+        emit UpdatedCommitment(
+            _commitmentId,
+            _commitment.lender,
+            _commitment.marketId,
+            _commitment.principalTokenAddress,
+            _commitment.maxPrincipal
+        );
+    }
+
+    /**
+     * @notice Removes the commitment of a lender to a market.
+     * @param _commitmentId The id of the commitment to delete.
+   
+     */
+    function deleteCommitment(uint256 _commitmentId)
+        public
+        commitmentLender(_commitmentId)
+    {
+        delete lenderMarketCommitments[_commitmentId];
+        emit DeletedCommitment(_commitmentId);
     }
 
     /**
      * @notice Reduces the commitment amount for a lender to a market.
-     * @param _lender The address of the lender of the commitment.
-     * @param _marketId The Id of the market the commitment removal applies to.
-     * @param _tokenAddress The address of the asset for which the commitment is being removed.
+     * @param _commitmentId The id of the commitment to modify.
      * @param _tokenAmountDelta The amount of change in the maxPrincipal.
      */
     function _decrementCommitment(
-        address _lender,
-        uint256 _marketId,
-        address _tokenAddress,
+        uint256 _commitmentId,
         uint256 _tokenAmountDelta
     ) internal {
-        lenderMarketCommitments[_lender][_marketId][_tokenAddress]
+        lenderMarketCommitments[_commitmentId]
             .maxPrincipal -= _tokenAmountDelta;
     }
 
     /**
      * @notice Accept the commitment to submitBid and acceptBid using the funds
-     * @param _marketId The Id of the market the commitment removal applies to.
-     * @param _lender The address of the lender of the commitment.
-     * @param _tokenAddress The address of the asset for which the commitment is being removed.
-     * @param _principal The amount of currency to borrow for the loan.
-     * @param _loanDuration The loan duration for the TellerV2 loan.
-     * @param _interestRate The interest rate for the TellerV2 loan.
+     * @param _commitmentId The id of the commitment being accepted.
+     * @param _principalAmount The amount of currency to borrow for the loan.
+     * @param _collateralAmount The amount of collateral to use for the loan.
+     * @param _collateralTokenId The tokenId of collateral to use for the loan if ERC721 or ERC1155.
      */
     function acceptCommitment(
-        uint256 _marketId,
-        address _lender,
-        address _tokenAddress,
-        uint256 _principal,
-        uint32 _loanDuration,
-        uint16 _interestRate
-    ) external onlyMarketOwner(_marketId) returns (uint256 bidId) {
+        uint256 _commitmentId,
+        uint256 _principalAmount,
+        uint256 _collateralAmount,
+        uint256 _collateralTokenId
+    )
+        external
+        withValidCommitment(lenderMarketCommitments[_commitmentId])
+        returns (uint256 bidId)
+    {
         address borrower = _msgSender();
 
-        Commitment storage commitment = lenderMarketCommitments[_lender][
-            _marketId
-        ][_tokenAddress];
+        Commitment storage commitment = lenderMarketCommitments[_commitmentId];
 
         require(
-            _principal <= commitment.maxPrincipal,
-            "Commitment principal insufficient"
-        );
-        require(
-            _loanDuration <= commitment.maxDuration,
-            "Commitment duration insufficient"
-        );
-        require(
-            _interestRate >= commitment.minInterestRate,
-            "Interest rate insufficient for commitment"
-        );
-        require(
-            block.timestamp < commitment.expiration,
-            "Commitment has expired"
+            commitmentBorrowersList[_commitmentId].length() == 0 ||
+                commitmentBorrowersList[_commitmentId].contains(borrower),
+            "unauthorized commitment borrower"
         );
 
+        if (_principalAmount > commitment.maxPrincipal) {
+            revert InsufficientCommitmentAllocation({
+                allocated: commitment.maxPrincipal,
+                requested: _principalAmount
+            });
+        }
+
+        uint256 requiredCollateral = getRequiredCollateral(
+            _principalAmount,
+            commitment.maxPrincipalPerCollateralAmount,
+            commitment.collateralTokenType,
+            commitment.collateralTokenAddress
+        );
+        if (_collateralAmount < requiredCollateral) {
+            revert InsufficientBorrowerCollateral({
+                required: requiredCollateral,
+                actual: _collateralAmount
+            });
+        }
+
+        if (
+            commitment.collateralTokenType == CommitmentCollateralType.ERC721 ||
+            commitment.collateralTokenType ==
+            CommitmentCollateralType.ERC721_ANY_ID
+        ) {
+            require(
+                _collateralAmount == 1,
+                "invalid commitment collateral amount for ERC721"
+            );
+        }
+
+        if (
+            commitment.collateralTokenType == CommitmentCollateralType.ERC721 ||
+            commitment.collateralTokenType == CommitmentCollateralType.ERC1155
+        ) {
+            require(
+                commitment.collateralTokenId == _collateralTokenId,
+                "invalid commitment collateral tokenId"
+            );
+        }
+
+        bidId = _submitBidFromCommitment(
+            borrower,
+            commitment.marketId,
+            commitment.principalTokenAddress,
+            _principalAmount,
+            commitment.collateralTokenAddress,
+            _collateralAmount,
+            _collateralTokenId,
+            commitment.collateralTokenType,
+            commitment.maxDuration,
+            commitment.minInterestRate
+        );
+
+        _acceptBid(bidId, commitment.lender);
+
+        _decrementCommitment(_commitmentId, _principalAmount);
+
+        emit ExercisedCommitment(
+            _commitmentId,
+            borrower,
+            commitment.marketId,
+            commitment.principalTokenAddress,
+            _principalAmount,
+            bidId
+        );
+    }
+
+    function getRequiredCollateral(
+        uint256 _principalAmount,
+        uint256 _maxPrincipalPerCollateralAmount,
+        CommitmentCollateralType _collateralTokenType,
+        address _collateralTokenAddress
+    ) public view virtual returns (uint256) {
+        if (_collateralTokenType == CommitmentCollateralType.NONE) {
+            return 0;
+        }
+        if (_collateralTokenType == CommitmentCollateralType.ERC20) {
+            uint8 decimals = IERC20MetadataUpgradeable(_collateralTokenAddress)
+                .decimals();
+            return
+                MathUpgradeable.mulDiv(
+                    _principalAmount,
+                    10**decimals,
+                    _maxPrincipalPerCollateralAmount,
+                    MathUpgradeable.Rounding.Up
+                );
+        }
+        return
+            MathUpgradeable.ceilDiv(
+                _principalAmount,
+                _maxPrincipalPerCollateralAmount
+            );
+    }
+
+    function getCommitmentBorrowers(uint256 _commitmentId)
+        external
+        view
+        returns (address[] memory borrowers_)
+    {
+        borrowers_ = commitmentBorrowersList[_commitmentId].values();
+    }
+
+    function _submitBidFromCommitment(
+        address _borrower,
+        uint256 _marketId,
+        address _principalTokenAddress,
+        uint256 _principalAmount,
+        address _collateralTokenAddress,
+        uint256 _collateralAmount,
+        uint256 _collateralTokenId,
+        CommitmentCollateralType _collateralTokenType,
+        uint32 _loanDuration,
+        uint16 _interestRate
+    ) internal returns (uint256 bidId) {
         CreateLoanArgs memory createLoanArgs;
         createLoanArgs.marketId = _marketId;
-        createLoanArgs.lendingToken = _tokenAddress;
-        createLoanArgs.principal = _principal;
+        createLoanArgs.lendingToken = _principalTokenAddress;
+        createLoanArgs.principal = _principalAmount;
         createLoanArgs.duration = _loanDuration;
         createLoanArgs.interestRate = _interestRate;
 
-        bidId = _submitBid(createLoanArgs, borrower);
+        Collateral[] memory collateralInfo;
+        if (_collateralTokenType != CommitmentCollateralType.NONE) {
+            collateralInfo = new Collateral[](1);
+            collateralInfo[0] = Collateral({
+                _collateralType: _getEscrowCollateralType(_collateralTokenType),
+                _tokenId: _collateralTokenId,
+                _amount: _collateralAmount,
+                _collateralAddress: _collateralTokenAddress
+            });
+        }
 
-        _acceptBid(bidId, _lender);
-
-        _decrementCommitment(_lender, _marketId, _tokenAddress, _principal);
-
-        emit ExercisedCommitment(
-            _lender,
-            _marketId,
-            _tokenAddress,
-            _principal,
-            bidId
+        bidId = _submitBidWithCollateral(
+            createLoanArgs,
+            collateralInfo,
+            _borrower
         );
+    }
+
+    function _getEscrowCollateralType(CommitmentCollateralType _type)
+        internal
+        pure
+        returns (CollateralType)
+    {
+        if (_type == CommitmentCollateralType.ERC20) {
+            return CollateralType.ERC20;
+        }
+        if (
+            _type == CommitmentCollateralType.ERC721 ||
+            _type == CommitmentCollateralType.ERC721_ANY_ID
+        ) {
+            return CollateralType.ERC721;
+        }
+        if (
+            _type == CommitmentCollateralType.ERC1155 ||
+            _type == CommitmentCollateralType.ERC1155_ANY_ID
+        ) {
+            return CollateralType.ERC1155;
+        }
+
+        revert("Unknown Collateral Type");
     }
 }

@@ -19,8 +19,10 @@ import { Collateral } from "./interfaces/escrow/ICollateralEscrowV1.sol";
 // Libraries
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+
 import "./libraries/NumbersLib.sol";
-import { V2Calculations } from "./libraries/V2Calculations.sol";
+import { BokkyPooBahsDateTimeLibrary as BPBDTL } from "./libraries/DateTimeLib.sol";
+import { V2Calculations, PaymentCycleType } from "./libraries/V2Calculations.sol";
 
 /* Errors */
 /**
@@ -149,7 +151,7 @@ contract TellerV2 is
 
     /** Constant Variables **/
 
-    uint8 public constant CURRENT_CODE_VERSION = 7;
+    uint8 public constant CURRENT_CODE_VERSION = 8;
 
     /** Constructor **/
 
@@ -160,8 +162,12 @@ contract TellerV2 is
     /**
      * @notice Initializes the proxy.
      * @param _protocolFee The fee collected by the protocol for loan processing.
+     * @param _marketRegistry The address of the market registry contract for the protocol.
+     * @param _reputationManager The address of the reputation manager contract.
+     * @param _lenderCommitmentForwarder The address of the lender commitment forwarder contract.
      * @param _lendingTokens The list of tokens allowed as lending assets on the protocol.
      * @param _collateralManagerAddress The address of the collateral manager contracts.
+     * @param _lenderManager The address of the lender manager contract for loans on the protocol.
      */
     function initialize(
         uint16 _protocolFee,
@@ -169,7 +175,8 @@ contract TellerV2 is
         address _reputationManager,
         address _lenderCommitmentForwarder,
         address[] calldata _lendingTokens,
-        address _collateralManagerAddress
+        address _collateralManagerAddress,
+        address _lenderManager
     ) external initializer {
         __ProtocolFee_init(_protocolFee);
 
@@ -179,6 +186,7 @@ contract TellerV2 is
         marketRegistry = IMarketRegistry(_marketRegistry);
         reputationManager = IReputationManager(_reputationManager);
         _setCollateralManager(_collateralManagerAddress);
+        _setLenderManager(_lenderManager);
 
         require(_lendingTokens.length > 0, "No lending tokens specified");
         for (uint256 i = 0; i < _lendingTokens.length; i++) {
@@ -190,12 +198,12 @@ contract TellerV2 is
         }
     }
 
-    function setCollateralManager(address _collateralManager)
-        public
+    function onUpgrade(address _lenderManager)
+        external
         reinitializer(CURRENT_CODE_VERSION)
         onlyOwner
     {
-        _setCollateralManager(_collateralManager);
+        _setLenderManager(_lenderManager);
     }
 
     function _setCollateralManager(address _collateralManager)
@@ -211,6 +219,21 @@ contract TellerV2 is
             "Collateral Manager must be a contract"
         );
         collateralManager = ICollateralManager(_collateralManager);
+    }
+
+    function _setLenderManager(address _lenderManager)
+        internal
+        onlyInitializing
+    {
+        require(
+            address(lenderManager) == address(0),
+            "LenderManager already set"
+        );
+        require(
+            _lenderManager.isContract(),
+            "LenderManager must be a contract"
+        );
+        lenderManager = ILenderManager(_lenderManager);
     }
 
     /**
@@ -353,9 +376,10 @@ contract TellerV2 is
         bid.loanDetails.loanDuration = _duration;
         bid.loanDetails.timestamp = uint32(block.timestamp);
 
-        bid.terms.paymentCycle = marketRegistry.getPaymentCycleDuration(
-            _marketplaceId
-        );
+        // Set payment cycle type based on market setting (custom or monthly)
+        (bid.terms.paymentCycle, bidPaymentCycleType[bidId]) = marketRegistry
+            .getPaymentCycle(_marketplaceId);
+
         bid.terms.APR = _APR;
 
         bidDefaultDuration[bidId] = marketRegistry.getPaymentDefaultDuration(
@@ -371,6 +395,7 @@ contract TellerV2 is
         bid.terms.paymentCycleAmount = V2Calculations
             .calculatePaymentCycleAmount(
                 bid.paymentType,
+                bidPaymentCycleType[bidId],
                 _principal,
                 _duration,
                 bid.terms.paymentCycle,
@@ -465,6 +490,7 @@ contract TellerV2 is
         Bid storage bid = bids[_bidId];
 
         address sender = _msgSenderForMarket(bid.marketplaceId);
+
         (bool isVerified, ) = marketRegistry.isVerifiedLender(
             bid.marketplaceId,
             sender
@@ -502,29 +528,29 @@ contract TellerV2 is
             amountToMarketplace;
         //transfer fee to protocol
         bid.loanDetails.lendingToken.safeTransferFrom(
-            bid.lender,
+            sender,
             owner(),
             amountToProtocol
         );
 
         //transfer fee to marketplace
         bid.loanDetails.lendingToken.safeTransferFrom(
-            bid.lender,
+            sender,
             marketRegistry.getMarketFeeRecipient(bid.marketplaceId),
             amountToMarketplace
         );
 
         //transfer funds to borrower
         bid.loanDetails.lendingToken.safeTransferFrom(
-            bid.lender,
+            sender,
             bid.receiver,
             amountToBorrower
         );
 
         // Record volume filled by lenders
-        lenderVolumeFilled[address(bid.loanDetails.lendingToken)][
-            bid.lender
-        ] += bid.loanDetails.principal;
+        lenderVolumeFilled[address(bid.loanDetails.lendingToken)][sender] += bid
+            .loanDetails
+            .principal;
         totalVolumeFilled[address(bid.loanDetails.lendingToken)] += bid
             .loanDetails
             .principal;
@@ -533,10 +559,26 @@ contract TellerV2 is
         _borrowerBidsActive[bid.borrower].add(_bidId);
 
         // Emit AcceptedBid
-        emit AcceptedBid(_bidId, bid.lender);
+        emit AcceptedBid(_bidId, sender);
 
         emit FeePaid(_bidId, "protocol", amountToProtocol);
         emit FeePaid(_bidId, "marketplace", amountToMarketplace);
+    }
+
+    function claimLoanNFT(uint256 _bidId)
+        external
+        acceptedLoan(_bidId, "claimLoanNFT")
+        whenNotPaused
+    {
+        // Retrieve bid
+        Bid storage bid = bids[_bidId];
+
+        address sender = _msgSenderForMarket(bid.marketplaceId);
+        require(sender == bid.lender, "only lender can claim NFT");
+        // mint an NFT with the lender manager
+        lenderManager.registerLoan(_bidId, sender);
+        // set lender address to the lender manager so we know to check the owner of the NFT for the true lender
+        bid.lender = address(lenderManager);
     }
 
     /**
@@ -551,7 +593,11 @@ contract TellerV2 is
             uint256 owedPrincipal,
             uint256 duePrincipal,
             uint256 interest
-        ) = V2Calculations.calculateAmountOwed(bids[_bidId], block.timestamp);
+        ) = V2Calculations.calculateAmountOwed(
+                bids[_bidId],
+                block.timestamp,
+                bidPaymentCycleType[_bidId]
+            );
         _repayLoan(
             _bidId,
             Payment({ principal: duePrincipal, interest: interest }),
@@ -569,7 +615,11 @@ contract TellerV2 is
         acceptedLoan(_bidId, "repayLoan")
     {
         (uint256 owedPrincipal, , uint256 interest) = V2Calculations
-            .calculateAmountOwed(bids[_bidId], block.timestamp);
+            .calculateAmountOwed(
+                bids[_bidId],
+                block.timestamp,
+                bidPaymentCycleType[_bidId]
+            );
         _repayLoan(
             _bidId,
             Payment({ principal: owedPrincipal, interest: interest }),
@@ -592,7 +642,11 @@ contract TellerV2 is
             uint256 owedPrincipal,
             uint256 duePrincipal,
             uint256 interest
-        ) = V2Calculations.calculateAmountOwed(bids[_bidId], block.timestamp);
+        ) = V2Calculations.calculateAmountOwed(
+                bids[_bidId],
+                block.timestamp,
+                bidPaymentCycleType[_bidId]
+            );
         uint256 minimumOwed = duePrincipal + interest;
 
         // If amount is less than minimumOwed, we revert
@@ -636,7 +690,11 @@ contract TellerV2 is
         Bid storage bid = bids[_bidId];
 
         (uint256 owedPrincipal, , uint256 interest) = V2Calculations
-            .calculateAmountOwed(bid, block.timestamp);
+            .calculateAmountOwed(
+                bid,
+                block.timestamp,
+                bidPaymentCycleType[_bidId]
+            );
         _repayLoan(
             _bidId,
             Payment({ principal: owedPrincipal, interest: interest }),
@@ -690,10 +748,13 @@ contract TellerV2 is
         } else {
             emit LoanRepayment(_bidId);
         }
+
+        address lender = getLoanLender(_bidId);
+
         // Send payment to the lender
         bid.loanDetails.lendingToken.safeTransferFrom(
             _msgSenderForMarket(bid.marketplaceId),
-            bid.lender,
+            lender,
             paymentAmount
         );
 
@@ -720,7 +781,11 @@ contract TellerV2 is
         if (bids[_bidId].state != BidState.ACCEPTED) return owed;
 
         (uint256 owedPrincipal, , uint256 interest) = V2Calculations
-            .calculateAmountOwed(bids[_bidId], block.timestamp);
+            .calculateAmountOwed(
+                bids[_bidId],
+                block.timestamp,
+                bidPaymentCycleType[_bidId]
+            );
         owed.principal = owedPrincipal;
         owed.interest = interest;
     }
@@ -742,7 +807,7 @@ contract TellerV2 is
         ) return owed;
 
         (uint256 owedPrincipal, , uint256 interest) = V2Calculations
-            .calculateAmountOwed(bid, _timestamp);
+            .calculateAmountOwed(bid, _timestamp, bidPaymentCycleType[_bidId]);
         owed.principal = owedPrincipal;
         owed.interest = interest;
     }
@@ -759,7 +824,11 @@ contract TellerV2 is
         if (bids[_bidId].state != BidState.ACCEPTED) return due;
 
         (, uint256 duePrincipal, uint256 interest) = V2Calculations
-            .calculateAmountOwed(bids[_bidId], block.timestamp);
+            .calculateAmountOwed(
+                bids[_bidId],
+                block.timestamp,
+                bidPaymentCycleType[_bidId]
+            );
         due.principal = duePrincipal;
         due.interest = interest;
     }
@@ -781,7 +850,7 @@ contract TellerV2 is
         ) return due;
 
         (, uint256 duePrincipal, uint256 interest) = V2Calculations
-            .calculateAmountOwed(bid, _timestamp);
+            .calculateAmountOwed(bid, _timestamp, bidPaymentCycleType[_bidId]);
         due.principal = duePrincipal;
         due.interest = interest;
     }
@@ -798,25 +867,51 @@ contract TellerV2 is
         Bid storage bid = bids[_bidId];
         if (bids[_bidId].state != BidState.ACCEPTED) return dueDate_;
 
-        // Start with the original due date being 1 payment cycle since bid was accepted
-        dueDate_ = bid.loanDetails.acceptedTimestamp + bid.terms.paymentCycle;
+        uint32 lastRepaidTimestamp = lastRepaidTimestamp(_bidId);
 
-        // Calculate the cycle number the last repayment was made
-        uint32 delta = lastRepaidTimestamp(_bidId) -
-            bid.loanDetails.acceptedTimestamp;
-        if (delta > 0) {
-            uint32 repaymentCycle = 1 + (delta / bid.terms.paymentCycle);
-            dueDate_ += (repaymentCycle * bid.terms.paymentCycle);
-        }
+        // Calculate due date if payment cycle is set to monthly
+        if (bidPaymentCycleType[_bidId] == PaymentCycleType.Monthly) {
+            // Calculate the cycle number the last repayment was made
+            uint256 lastPaymentCycle = BPBDTL.diffMonths(
+                bid.loanDetails.acceptedTimestamp,
+                lastRepaidTimestamp
+            );
+            if (
+                BPBDTL.getDay(lastRepaidTimestamp) >
+                BPBDTL.getDay(bid.loanDetails.acceptedTimestamp)
+            ) {
+                lastPaymentCycle += 2;
+            } else {
+                lastPaymentCycle += 1;
+            }
 
-        //if we are in the last payment cycle, the next due date is the end of loan duration
-        if (
-            dueDate_ >
-            bid.loanDetails.acceptedTimestamp + bid.loanDetails.loanDuration
-        ) {
+            dueDate_ = uint32(
+                BPBDTL.addMonths(
+                    bid.loanDetails.acceptedTimestamp,
+                    lastPaymentCycle
+                )
+            );
+        } else if (bidPaymentCycleType[_bidId] == PaymentCycleType.Seconds) {
+            // Start with the original due date being 1 payment cycle since bid was accepted
             dueDate_ =
                 bid.loanDetails.acceptedTimestamp +
-                bid.loanDetails.loanDuration;
+                bid.terms.paymentCycle;
+            // Calculate the cycle number the last repayment was made
+            uint32 delta = lastRepaidTimestamp -
+                bid.loanDetails.acceptedTimestamp;
+            if (delta > 0) {
+                uint32 repaymentCycle = uint32(
+                    Math.ceilDiv(delta, bid.terms.paymentCycle)
+                );
+                dueDate_ += (repaymentCycle * bid.terms.paymentCycle);
+            }
+        }
+
+        uint32 endOfLoan = bid.loanDetails.acceptedTimestamp +
+            bid.loanDetails.loanDuration;
+        //if we are in the last payment cycle, the next due date is the end of loan duration
+        if (dueDate_ > endOfLoan) {
+            dueDate_ = endOfLoan;
         }
     }
 
@@ -928,7 +1023,7 @@ contract TellerV2 is
      * @return borrower_ The address of the borrower associated with the bid.
      */
     function getLoanBorrower(uint256 _bidId)
-        external
+        public
         view
         returns (address borrower_)
     {
@@ -936,16 +1031,20 @@ contract TellerV2 is
     }
 
     /**
-     * @notice Returns the lender address for a given bid.
+     * @notice Returns the lender address for a given bid. If the stored lender address is the `LenderManager` NFT address, return the `ownerOf` for the bid ID.
      * @param _bidId The id of the bid/loan to get the lender for.
      * @return lender_ The address of the lender associated with the bid.
      */
     function getLoanLender(uint256 _bidId)
-        external
+        public
         view
         returns (address lender_)
     {
         lender_ = bids[_bidId].lender;
+
+        if (lender_ == address(lenderManager)) {
+            return lenderManager.ownerOf(_bidId);
+        }
     }
 
     function getLoanLendingToken(uint256 _bidId)
@@ -954,6 +1053,14 @@ contract TellerV2 is
         returns (address token_)
     {
         token_ = address(bids[_bidId].loanDetails.lendingToken);
+    }
+
+    function getLoanMarketId(uint256 _bidId)
+        external
+        view
+        returns (uint256 _marketId)
+    {
+        _marketId = bids[_bidId].marketplaceId;
     }
 
     /** OpenZeppelin Override Functions **/

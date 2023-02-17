@@ -38,7 +38,7 @@ const setup = deployments.createFixture<SetupReturn, SetupOptions>(
   }
 )
 
-describe('LenderCommitmentForwarder', () => {
+describe.skip('LenderCommitmentForwarder', () => {
   let LenderCommitmentForwarder: LenderCommitmentForwarder
   let lender: Signer
   let lenderAddress: string

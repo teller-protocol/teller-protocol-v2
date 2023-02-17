@@ -1,25 +1,21 @@
 pragma solidity >=0.8.0 <0.9.0;
 // SPDX-License-Identifier: MIT
 
+
 import { TellerV2 } from "../contracts/TellerV2.sol";
 import "../contracts/mock/WethMock.sol";
 import "../contracts/interfaces/IMarketRegistry.sol";
 import "../contracts/interfaces/ITellerV2.sol";
+import "../contracts/interfaces/ITellerV2Context.sol";
 import { Collateral } from "../contracts/interfaces/escrow/ICollateralEscrowV1.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { PaymentType } from "../contracts/libraries/V2Calculations.sol";
 
 contract User {
-    TellerV2 public immutable tellerV2;
-    WethMock public immutable wethMock;
+    address public immutable tellerV2;
 
-    constructor(TellerV2 _tellerV2, WethMock _wethMock) {
+    constructor(address _tellerV2 /*, WethMock _wethMock*/) {
         tellerV2 = _tellerV2;
-        wethMock = _wethMock;
-    }
-
-    function depositToWeth(uint256 amount) public {
-        wethMock.deposit{ value: amount }();
     }
 
     function addAllowance(
@@ -39,6 +35,7 @@ contract User {
         bool _requireLenderAttestation,
         bool _requireBorrowerAttestation,
         PaymentType _paymentType,
+        PaymentCycleType _paymentCycleType,
         string calldata _uri
     ) public returns (uint256) {
         return
@@ -51,6 +48,7 @@ contract User {
                 _requireLenderAttestation,
                 _requireBorrowerAttestation,
                 _paymentType,
+                _paymentCycleType,
                 _uri
             );
     }
@@ -105,6 +103,24 @@ contract User {
 
     function repayLoanFull(uint256 _bidId) public {
         return ITellerV2(tellerV2).repayLoanFull(_bidId);
+    }
+
+    function setTrustedMarketForwarder(uint256 _marketId, address _forwarder)
+        external
+    {
+        ITellerV2Context(tellerV2).setTrustedMarketForwarder(
+            _marketId,
+            _forwarder
+        );
+    }
+
+    function approveMarketForwarder(uint256 _marketId, address _forwarder)
+        external
+    {
+        ITellerV2Context(tellerV2).approveMarketForwarder(
+            _marketId,
+            _forwarder
+        );
     }
 
     receive() external payable {}

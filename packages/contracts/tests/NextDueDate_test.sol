@@ -1,10 +1,9 @@
 pragma solidity ^0.8.0;
 // SPDX-License-Identifier: MIT
 
-import "@mangrovedao/hardhat-test-solidity/test.sol";
-
+ 
 import "./Testable.sol";
-import "../TellerV2.sol";
+import "../contracts/TellerV2.sol";
 
 contract NextDueDate_Test is Testable, TellerV2 {
     Bid __bid;
@@ -17,7 +16,7 @@ contract NextDueDate_Test is Testable, TellerV2 {
         __bid.state = BidState.ACCEPTED;
     }
 
-    function _01_nextDueDate_test() public {
+    function test_01_nextDueDate() public {
         __bid.loanDetails.acceptedTimestamp = uint32(
             BPBDTL.timestampFromDate(2020, 1, 31) // Leap year
         );
@@ -28,7 +27,7 @@ contract NextDueDate_Test is Testable, TellerV2 {
         nextDueDate_runner(expectedDate);
     }
 
-    function _02_nextDueDate_test() public {
+    function test_02_nextDueDate() public {
         __bid.loanDetails.acceptedTimestamp = uint32(
             BPBDTL.timestampFromDate(2020, 2, 29)
         );
@@ -39,7 +38,7 @@ contract NextDueDate_Test is Testable, TellerV2 {
         nextDueDate_runner(expectedDate);
     }
 
-    function _03_nextDueDate_test() public {
+    function test_03_nextDueDate() public {
         __bid.loanDetails.acceptedTimestamp = uint32(
             BPBDTL.timestampFromDate(2023, 2, 1)
         );
@@ -50,7 +49,7 @@ contract NextDueDate_Test is Testable, TellerV2 {
         nextDueDate_runner(expectedDate);
     }
 
-    function _04_nextDueDate_test() public {
+    function test_04_nextDueDate() public {
         __bid.loanDetails.acceptedTimestamp = uint32(
             BPBDTL.timestampFromDate(2023, 1, 31)
         );
@@ -66,6 +65,6 @@ contract NextDueDate_Test is Testable, TellerV2 {
 
     function nextDueDate_runner(uint256 _expected) private {
         uint256 nextDueDate = calculateNextDueDate(1);
-        Test.eq(nextDueDate, _expected, "Next due date incorrect");
+        assertEq(nextDueDate, _expected, "Next due date incorrect");
     }
 }

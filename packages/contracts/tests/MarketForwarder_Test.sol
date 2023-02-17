@@ -70,7 +70,7 @@ contract MarketForwarder_Test is Testable, TellerV2MarketForwarder {
     }
 
  
-    function test_approveMarketForwarder_test() public {
+    function test_approveMarketForwarder() public {
         approveMarketForwarder_before();
         assertEq(
             tellerV2Mock.hasApprovedMarketForwarder(

@@ -1,21 +1,21 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "@mangrovedao/hardhat-test-solidity/test.sol";
+ 
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
-import "../TellerV2MarketForwarder.sol";
+import "../contracts/TellerV2MarketForwarder.sol";
 import { Testable } from "./Testable.sol";
-import { LenderManager } from "../LenderManager.sol";
+import { LenderManager } from "../contracts/LenderManager.sol";
 
-import "../mock/MarketRegistryMock.sol";
+import "../contracts/mock/MarketRegistryMock.sol";
 
 import { User } from "./Test_Helpers.sol";
 
-import { TellerV2Context } from "../TellerV2Context.sol";
+import { TellerV2Context } from "../contracts/TellerV2Context.sol";
 
 contract LenderManager_Test is Testable, LenderManager {
     LenderManagerUser private marketOwner;
@@ -34,7 +34,9 @@ contract LenderManager_Test is Testable, LenderManager {
         )
     {}
 
-    function setup_beforeAll() public {
+ 
+
+    function setUp() public {
         mockTellerV2 = new LenderCommitmentTester();
 
         marketOwner = new LenderManagerUser(
@@ -49,21 +51,21 @@ contract LenderManager_Test is Testable, LenderManager {
         delete mockedHasMarketVerification;
     }
 
-    function registerLoan_test() public {
+    function test_registerLoan() public {
         mockedHasMarketVerification = true;
 
         uint256 bidId = 2;
 
         super.registerLoan(bidId, address(lender));
 
-        Test.eq(
+        assertEq(
             super._exists(bidId),
             true,
             "Loan registration did not mint nft"
         );
     }
 
-    function transferFrom_test() public {
+    function test_transferFrom() public {
         mockedHasMarketVerification = true;
 
         uint256 bidId = 2;
@@ -72,14 +74,14 @@ contract LenderManager_Test is Testable, LenderManager {
 
         lender.transferLoan(bidId, address(borrower));
 
-        Test.eq(
+        assertEq(
             super.ownerOf(bidId),
             address(borrower),
             "Loan nft was not transferred"
         );
     }
 
-    function transferFromToInvalidRecipient_test() public {
+    function test_transferFromToInvalidRecipient() public {
         mockedHasMarketVerification = true;
 
         uint256 bidId = 2;
@@ -94,9 +96,9 @@ contract LenderManager_Test is Testable, LenderManager {
             transferFailed = true;
         }
 
-        Test.eq(transferFailed, true, "Loan transfer should have failed");
+        assertEq(transferFailed, true, "Loan transfer should have failed");
 
-        Test.eq(
+        assertEq(
             super.ownerOf(bidId),
             address(lender),
             "Loan nft is no longer owned by lender"

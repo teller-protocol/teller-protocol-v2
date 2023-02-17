@@ -42,7 +42,7 @@ contract MarketRegistry_Test is Testable, TellerV2 {
         reputationManager = IReputationManager(new ReputationManager());
     }
 
-    function createMarket_test() public {
+    function test_createMarket() public {
         // Standard seconds payment cycle
         marketOwner.createMarket(
             address(marketRegistry),

@@ -135,15 +135,21 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         _;
     }
 
-    modifier withValidCommitment(Commitment storage _commitment) {
-        _requireValidCommitment(_commitment);
-        _;
-    }
-    modifier validateUpdatedCommitment(Commitment storage _commitment) {
-        _;
-        _requireValidCommitment(_commitment);
+    
+   
 
-        if (_commitment.collateralTokenType != CommitmentCollateralType.NONE) {
+
+    function validateCommitment(Commitment storage _commitment) internal {
+        require(
+            _commitment.expiration > uint32(block.timestamp),
+            "expired commitment"
+        );
+        require(
+            _commitment.maxPrincipal > 0,
+            "commitment principal allocation 0"
+        );
+
+         if (_commitment.collateralTokenType != CommitmentCollateralType.NONE) {
             require(
                 _commitment.maxPrincipalPerCollateralAmount > 0,
                 "commitment collateral ratio 0"
@@ -161,17 +167,6 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         }
     }
 
-    function _requireValidCommitment(Commitment storage _commitment) internal {
-        require(
-            _commitment.expiration > uint32(block.timestamp),
-            "expired commitment"
-        );
-        require(
-            _commitment.maxPrincipal > 0,
-            "commitment principal allocation 0"
-        );
-    }
-
     /** External Functions **/
 
     constructor(address _protocolAddress, address _marketRegistry)
@@ -187,10 +182,12 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         address[] calldata borrowerAddressList
     )
         public
-        validateUpdatedCommitment(lenderMarketCommitments[commitmentCount++])
+       
         returns (uint256 commitmentId_)
     {
         commitmentId_ = commitmentCount;
+
+
 
         require(
             _commitment.lender == _msgSender(),
@@ -198,6 +195,9 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         );
 
         lenderMarketCommitments[commitmentId_] = _commitment;
+
+
+        validateCommitment(lenderMarketCommitments[commitmentId_]);
 
         for (uint256 i = 0; i < borrowerAddressList.length; i++) {
             commitmentBorrowersList[commitmentId_].add(borrowerAddressList[i]);
@@ -223,10 +223,11 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         address[] calldata borrowerAddressList
     )
         public
-        commitmentLender(_commitmentId)
-        validateUpdatedCommitment(lenderMarketCommitments[_commitmentId])
+        commitmentLender(_commitmentId) 
     {
         lenderMarketCommitments[_commitmentId] = _commitment;
+
+        validateCommitment(lenderMarketCommitments[_commitmentId]);
 
         delete commitmentBorrowersList[_commitmentId];
 
@@ -283,12 +284,14 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint256 _collateralTokenId
     )
         external
-        withValidCommitment(lenderMarketCommitments[_commitmentId])
+       
         returns (uint256 bidId)
     {
         address borrower = _msgSender();
 
         Commitment storage commitment = lenderMarketCommitments[_commitmentId];
+
+        validateCommitment( commitment );
 
         require(
             commitmentBorrowersList[_commitmentId].length() == 0 ||
@@ -376,10 +379,11 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         if (_collateralTokenType == CommitmentCollateralType.ERC20) {
             uint8 decimals = IERC20MetadataUpgradeable(_collateralTokenAddress)
                 .decimals();
+
             return
                 MathUpgradeable.mulDiv(
                     _principalAmount,
-                    10**decimals,
+                    10**decimals, //multiply by the collateral token decimals 
                     _maxPrincipalPerCollateralAmount,
                     MathUpgradeable.Rounding.Up
                 );

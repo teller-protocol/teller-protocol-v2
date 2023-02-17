@@ -1,0 +1,521 @@
+{
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_bidId",
+          "type": "uint256"
+        }
+      ],
+      "name": "autoPayLoanMinimum",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint16",
+          "name": "_newFee",
+          "type": "uint16"
+        },
+        {
+          "internalType": "address",
+          "name": "_newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "initialize",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_bidId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "_autoPayEnabled",
+          "type": "bool"
+        }
+      ],
+      "name": "setAutoPayEnabled",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint16",
+          "name": "_newFee",
+          "type": "uint16"
+        }
+      ],
+      "name": "setAutopayFee",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": {
+    "object": "0x",
+    "sourceMap": "",
+    "linkReferences": {}
+  },
+  "deployedBytecode": {
+    "object": "0x",
+    "sourceMap": "",
+    "linkReferences": {}
+  },
+  "methodIdentifiers": {
+    "autoPayLoanMinimum(uint256)": "2fa7b9fd",
+    "initialize(uint16,address)": "e0dbcde5",
+    "setAutoPayEnabled(uint256,bool)": "10a34194",
+    "setAutopayFee(uint16)": "b0b69ed4"
+  },
+  "rawMetadata": "{\"compiler\":{\"version\":\"0.8.17+commit.8df45f5f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_bidId\",\"type\":\"uint256\"}],\"name\":\"autoPayLoanMinimum\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint16\",\"name\":\"_newFee\",\"type\":\"uint16\"},{\"internalType\":\"address\",\"name\":\"_newOwner\",\"type\":\"address\"}],\"name\":\"initialize\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_bidId\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"_autoPayEnabled\",\"type\":\"bool\"}],\"name\":\"setAutoPayEnabled\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint16\",\"name\":\"_newFee\",\"type\":\"uint16\"}],\"name\":\"setAutopayFee\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/interfaces/ITellerV2Autopay.sol\":\"ITellerV2Autopay\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[\":@ensdomains/=node_modules/@ensdomains/\",\":@mangrovedao/=node_modules/@mangrovedao/\",\":@openzeppelin/=node_modules/@openzeppelin/\",\":ds-test/=lib/forge-std/lib/ds-test/src/\",\":eth-gas-reporter/=node_modules/eth-gas-reporter/\",\":forge-std/=lib/forge-std/src/\",\":hardhat-deploy/=node_modules/hardhat-deploy/\",\":hardhat/=node_modules/hardhat/\"]},\"sources\":{\"contracts/interfaces/ITellerV2Autopay.sol\":{\"keccak256\":\"0x375b493547dafd238f26ee323da88ae76fb38643fabc8cc57d9910b2969df21e\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://93804aef41335a11c239e25e4e3d7a44b40528059c0db8da8474cc206cb04318\",\"dweb:/ipfs/QmWyiewLzu3E6624sfun6n5Hh7R2PfS4XDpwFi12Vaf3L3\"]}},\"version\":1}",
+  "metadata": {
+    "compiler": {
+      "version": "0.8.17+commit.8df45f5f"
+    },
+    "language": "Solidity",
+    "output": {
+      "abi": [
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "_bidId",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function",
+          "name": "autoPayLoanMinimum"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint16",
+              "name": "_newFee",
+              "type": "uint16"
+            },
+            {
+              "internalType": "address",
+              "name": "_newOwner",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function",
+          "name": "initialize"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "_bidId",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bool",
+              "name": "_autoPayEnabled",
+              "type": "bool"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function",
+          "name": "setAutoPayEnabled"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint16",
+              "name": "_newFee",
+              "type": "uint16"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function",
+          "name": "setAutopayFee"
+        }
+      ],
+      "devdoc": {
+        "kind": "dev",
+        "methods": {},
+        "version": 1
+      },
+      "userdoc": {
+        "kind": "user",
+        "methods": {},
+        "version": 1
+      }
+    },
+    "settings": {
+      "remappings": [
+        ":@ensdomains/=node_modules/@ensdomains/",
+        ":@mangrovedao/=node_modules/@mangrovedao/",
+        ":@openzeppelin/=node_modules/@openzeppelin/",
+        ":ds-test/=lib/forge-std/lib/ds-test/src/",
+        ":eth-gas-reporter/=node_modules/eth-gas-reporter/",
+        ":forge-std/=lib/forge-std/src/",
+        ":hardhat-deploy/=node_modules/hardhat-deploy/",
+        ":hardhat/=node_modules/hardhat/"
+      ],
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "metadata": {
+        "bytecodeHash": "ipfs"
+      },
+      "compilationTarget": {
+        "contracts/interfaces/ITellerV2Autopay.sol": "ITellerV2Autopay"
+      },
+      "libraries": {}
+    },
+    "sources": {
+      "contracts/interfaces/ITellerV2Autopay.sol": {
+        "keccak256": "0x375b493547dafd238f26ee323da88ae76fb38643fabc8cc57d9910b2969df21e",
+        "urls": [
+          "bzz-raw://93804aef41335a11c239e25e4e3d7a44b40528059c0db8da8474cc206cb04318",
+          "dweb:/ipfs/QmWyiewLzu3E6624sfun6n5Hh7R2PfS4XDpwFi12Vaf3L3"
+        ],
+        "license": "MIT"
+      }
+    },
+    "version": 1
+  },
+  "ast": {
+    "absolutePath": "contracts/interfaces/ITellerV2Autopay.sol",
+    "id": 10037,
+    "exportedSymbols": {
+      "ITellerV2Autopay": [
+        10036
+      ]
+    },
+    "nodeType": "SourceUnit",
+    "src": "32:318:26",
+    "nodes": [
+      {
+        "id": 10011,
+        "nodeType": "PragmaDirective",
+        "src": "32:23:26",
+        "nodes": [],
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".0"
+        ]
+      },
+      {
+        "id": 10036,
+        "nodeType": "ContractDefinition",
+        "src": "57:292:26",
+        "nodes": [
+          {
+            "id": 10018,
+            "nodeType": "FunctionDefinition",
+            "src": "90:74:26",
+            "nodes": [],
+            "functionSelector": "10a34194",
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "setAutoPayEnabled",
+            "nameLocation": "99:17:26",
+            "parameters": {
+              "id": 10016,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 10013,
+                  "mutability": "mutable",
+                  "name": "_bidId",
+                  "nameLocation": "125:6:26",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10018,
+                  "src": "117:14:26",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 10012,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "117:7:26",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 10015,
+                  "mutability": "mutable",
+                  "name": "_autoPayEnabled",
+                  "nameLocation": "138:15:26",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10018,
+                  "src": "133:20:26",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 10014,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "133:4:26",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "116:38:26"
+            },
+            "returnParameters": {
+              "id": 10017,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "163:0:26"
+            },
+            "scope": 10036,
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "id": 10023,
+            "nodeType": "FunctionDefinition",
+            "src": "170:53:26",
+            "nodes": [],
+            "functionSelector": "2fa7b9fd",
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "autoPayLoanMinimum",
+            "nameLocation": "179:18:26",
+            "parameters": {
+              "id": 10021,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 10020,
+                  "mutability": "mutable",
+                  "name": "_bidId",
+                  "nameLocation": "206:6:26",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10023,
+                  "src": "198:14:26",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 10019,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "198:7:26",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "197:16:26"
+            },
+            "returnParameters": {
+              "id": 10022,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "222:0:26"
+            },
+            "scope": 10036,
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "id": 10030,
+            "nodeType": "FunctionDefinition",
+            "src": "229:64:26",
+            "nodes": [],
+            "functionSelector": "e0dbcde5",
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "initialize",
+            "nameLocation": "238:10:26",
+            "parameters": {
+              "id": 10028,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 10025,
+                  "mutability": "mutable",
+                  "name": "_newFee",
+                  "nameLocation": "256:7:26",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10030,
+                  "src": "249:14:26",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint16",
+                    "typeString": "uint16"
+                  },
+                  "typeName": {
+                    "id": 10024,
+                    "name": "uint16",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "249:6:26",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint16",
+                      "typeString": "uint16"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 10027,
+                  "mutability": "mutable",
+                  "name": "_newOwner",
+                  "nameLocation": "273:9:26",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10030,
+                  "src": "265:17:26",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 10026,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "265:7:26",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "248:35:26"
+            },
+            "returnParameters": {
+              "id": 10029,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "292:0:26"
+            },
+            "scope": 10036,
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "id": 10035,
+            "nodeType": "FunctionDefinition",
+            "src": "299:48:26",
+            "nodes": [],
+            "functionSelector": "b0b69ed4",
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "setAutopayFee",
+            "nameLocation": "308:13:26",
+            "parameters": {
+              "id": 10033,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 10032,
+                  "mutability": "mutable",
+                  "name": "_newFee",
+                  "nameLocation": "329:7:26",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10035,
+                  "src": "322:14:26",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint16",
+                    "typeString": "uint16"
+                  },
+                  "typeName": {
+                    "id": 10031,
+                    "name": "uint16",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "322:6:26",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint16",
+                      "typeString": "uint16"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "321:16:26"
+            },
+            "returnParameters": {
+              "id": 10034,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "346:0:26"
+            },
+            "scope": 10036,
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "ITellerV2Autopay",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "linearizedBaseContracts": [
+          10036
+        ],
+        "name": "ITellerV2Autopay",
+        "nameLocation": "67:16:26",
+        "scope": 10037,
+        "usedErrors": []
+      }
+    ],
+    "license": "MIT"
+  },
+  "id": 26
+}

@@ -227,8 +227,8 @@
       }
     },
     "contracts/LenderCommitmentForwarder.sol": {
-      "lastModificationDate": 1676670788871,
-      "contentHash": "357353757094d80355300c51108738b9",
+      "lastModificationDate": 1676678045965,
+      "contentHash": "4e4778c4dc890d61cbd8a97cdb4b8908",
       "sourceName": "contracts/LenderCommitmentForwarder.sol",
       "solcConfig": {
         "settings": {

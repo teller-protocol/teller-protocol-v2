@@ -248,6 +248,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         commitmentLender(_commitmentId)
     {
         delete lenderMarketCommitments[_commitmentId];
+        delete commitmentBorrowersList[_commitmentId];
         emit DeletedCommitment(_commitmentId);
     }
 

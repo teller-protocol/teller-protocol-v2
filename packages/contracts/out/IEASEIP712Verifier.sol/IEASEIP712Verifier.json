@@ -1,0 +1,914 @@
+{
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "recipient",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "schema",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "uint256",
+          "name": "expirationTime",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "refUUID",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "bytes",
+          "name": "data",
+          "type": "bytes"
+        },
+        {
+          "internalType": "address",
+          "name": "attester",
+          "type": "address"
+        },
+        {
+          "internalType": "uint8",
+          "name": "v",
+          "type": "uint8"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "r",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "s",
+          "type": "bytes32"
+        }
+      ],
+      "name": "attest",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "getNonce",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "uuid",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "address",
+          "name": "attester",
+          "type": "address"
+        },
+        {
+          "internalType": "uint8",
+          "name": "v",
+          "type": "uint8"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "r",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "s",
+          "type": "bytes32"
+        }
+      ],
+      "name": "revoke",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": {
+    "object": "0x",
+    "sourceMap": "",
+    "linkReferences": {}
+  },
+  "deployedBytecode": {
+    "object": "0x",
+    "sourceMap": "",
+    "linkReferences": {}
+  },
+  "methodIdentifiers": {
+    "attest(address,bytes32,uint256,bytes32,bytes,address,uint8,bytes32,bytes32)": "6aeb49a5",
+    "getNonce(address)": "2d0335ab",
+    "revoke(bytes32,address,uint8,bytes32,bytes32)": "1863f01d"
+  },
+  "rawMetadata": "{\"compiler\":{\"version\":\"0.8.17+commit.8df45f5f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"recipient\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"schema\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"expirationTime\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"refUUID\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"},{\"internalType\":\"address\",\"name\":\"attester\",\"type\":\"address\"},{\"internalType\":\"uint8\",\"name\":\"v\",\"type\":\"uint8\"},{\"internalType\":\"bytes32\",\"name\":\"r\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"s\",\"type\":\"bytes32\"}],\"name\":\"attest\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"getNonce\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"uuid\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"attester\",\"type\":\"address\"},{\"internalType\":\"uint8\",\"name\":\"v\",\"type\":\"uint8\"},{\"internalType\":\"bytes32\",\"name\":\"r\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"s\",\"type\":\"bytes32\"}],\"name\":\"revoke\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"attest(address,bytes32,uint256,bytes32,bytes,address,uint8,bytes32,bytes32)\":{\"details\":\"Verifies signed attestation.\",\"params\":{\"attester\":\"The attesting account.\",\"data\":\"Additional custom data.\",\"expirationTime\":\"The expiration time of the attestation.\",\"r\":\"The x-coordinate of the nonce R.\",\"recipient\":\"The recipient of the attestation.\",\"refUUID\":\"An optional related attestation's UUID.\",\"s\":\"The signature data.\",\"schema\":\"The UUID of the AS.\",\"v\":\"The recovery ID.\"}},\"getNonce(address)\":{\"details\":\"Returns the current nonce per-account.\",\"params\":{\"account\":\"The requested accunt.\"},\"returns\":{\"_0\":\"The current nonce.\"}},\"revoke(bytes32,address,uint8,bytes32,bytes32)\":{\"details\":\"Verifies signed revocations.\",\"params\":{\"attester\":\"The attesting account.\",\"r\":\"The x-coordinate of the nonce R.\",\"s\":\"The signature data.\",\"uuid\":\"The UUID of the attestation to revoke.\",\"v\":\"The recovery ID.\"}}},\"title\":\"EIP712 typed signatures verifier for EAS delegated attestations interface.\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/interfaces/IEASEIP712Verifier.sol\":\"IEASEIP712Verifier\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[\":@ensdomains/=node_modules/@ensdomains/\",\":@mangrovedao/=node_modules/@mangrovedao/\",\":@openzeppelin/=node_modules/@openzeppelin/\",\":ds-test/=lib/forge-std/lib/ds-test/src/\",\":eth-gas-reporter/=node_modules/eth-gas-reporter/\",\":forge-std/=lib/forge-std/src/\",\":hardhat-deploy/=node_modules/hardhat-deploy/\",\":hardhat/=node_modules/hardhat/\"]},\"sources\":{\"contracts/interfaces/IEASEIP712Verifier.sol\":{\"keccak256\":\"0xeca3ac3bacec52af15b2c86c5bf1a1be315aade51fa86f95da2b426b28486b1e\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://5e3d65dfbe36cc3718f5472061d283bf53ce920b929ed1a3cbab7c7129b7fe9d\",\"dweb:/ipfs/QmPDqoVWC95KkxoWeq4sreQYA2ELsMPhowi7eunU8c6qjW\"]}},\"version\":1}",
+  "metadata": {
+    "compiler": {
+      "version": "0.8.17+commit.8df45f5f"
+    },
+    "language": "Solidity",
+    "output": {
+      "abi": [
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "recipient",
+              "type": "address"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "schema",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "uint256",
+              "name": "expirationTime",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "refUUID",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "bytes",
+              "name": "data",
+              "type": "bytes"
+            },
+            {
+              "internalType": "address",
+              "name": "attester",
+              "type": "address"
+            },
+            {
+              "internalType": "uint8",
+              "name": "v",
+              "type": "uint8"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "r",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "s",
+              "type": "bytes32"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function",
+          "name": "attest"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "account",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function",
+          "name": "getNonce",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ]
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "bytes32",
+              "name": "uuid",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "address",
+              "name": "attester",
+              "type": "address"
+            },
+            {
+              "internalType": "uint8",
+              "name": "v",
+              "type": "uint8"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "r",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "s",
+              "type": "bytes32"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function",
+          "name": "revoke"
+        }
+      ],
+      "devdoc": {
+        "kind": "dev",
+        "methods": {
+          "attest(address,bytes32,uint256,bytes32,bytes,address,uint8,bytes32,bytes32)": {
+            "details": "Verifies signed attestation.",
+            "params": {
+              "attester": "The attesting account.",
+              "data": "Additional custom data.",
+              "expirationTime": "The expiration time of the attestation.",
+              "r": "The x-coordinate of the nonce R.",
+              "recipient": "The recipient of the attestation.",
+              "refUUID": "An optional related attestation's UUID.",
+              "s": "The signature data.",
+              "schema": "The UUID of the AS.",
+              "v": "The recovery ID."
+            }
+          },
+          "getNonce(address)": {
+            "details": "Returns the current nonce per-account.",
+            "params": {
+              "account": "The requested accunt."
+            },
+            "returns": {
+              "_0": "The current nonce."
+            }
+          },
+          "revoke(bytes32,address,uint8,bytes32,bytes32)": {
+            "details": "Verifies signed revocations.",
+            "params": {
+              "attester": "The attesting account.",
+              "r": "The x-coordinate of the nonce R.",
+              "s": "The signature data.",
+              "uuid": "The UUID of the attestation to revoke.",
+              "v": "The recovery ID."
+            }
+          }
+        },
+        "version": 1
+      },
+      "userdoc": {
+        "kind": "user",
+        "methods": {},
+        "version": 1
+      }
+    },
+    "settings": {
+      "remappings": [
+        ":@ensdomains/=node_modules/@ensdomains/",
+        ":@mangrovedao/=node_modules/@mangrovedao/",
+        ":@openzeppelin/=node_modules/@openzeppelin/",
+        ":ds-test/=lib/forge-std/lib/ds-test/src/",
+        ":eth-gas-reporter/=node_modules/eth-gas-reporter/",
+        ":forge-std/=lib/forge-std/src/",
+        ":hardhat-deploy/=node_modules/hardhat-deploy/",
+        ":hardhat/=node_modules/hardhat/"
+      ],
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "metadata": {
+        "bytecodeHash": "ipfs"
+      },
+      "compilationTarget": {
+        "contracts/interfaces/IEASEIP712Verifier.sol": "IEASEIP712Verifier"
+      },
+      "libraries": {}
+    },
+    "sources": {
+      "contracts/interfaces/IEASEIP712Verifier.sol": {
+        "keccak256": "0xeca3ac3bacec52af15b2c86c5bf1a1be315aade51fa86f95da2b426b28486b1e",
+        "urls": [
+          "bzz-raw://5e3d65dfbe36cc3718f5472061d283bf53ce920b929ed1a3cbab7c7129b7fe9d",
+          "dweb:/ipfs/QmPDqoVWC95KkxoWeq4sreQYA2ELsMPhowi7eunU8c6qjW"
+        ],
+        "license": "MIT"
+      }
+    },
+    "version": 1
+  },
+  "ast": {
+    "absolutePath": "contracts/interfaces/IEASEIP712Verifier.sol",
+    "id": 9612,
+    "exportedSymbols": {
+      "IEASEIP712Verifier": [
+        9611
+      ]
+    },
+    "nodeType": "SourceUnit",
+    "src": "0:1605:21",
+    "nodes": [
+      {
+        "id": 9565,
+        "nodeType": "PragmaDirective",
+        "src": "0:31:21",
+        "nodes": [],
+        "literals": [
+          "solidity",
+          ">=",
+          "0.8",
+          ".0",
+          "<",
+          "0.9",
+          ".0"
+        ]
+      },
+      {
+        "id": 9611,
+        "nodeType": "ContractDefinition",
+        "src": "159:1445:21",
+        "nodes": [
+          {
+            "id": 9574,
+            "nodeType": "FunctionDefinition",
+            "src": "353:67:21",
+            "nodes": [],
+            "documentation": {
+              "id": 9567,
+              "nodeType": "StructuredDocumentation",
+              "src": "194:154:21",
+              "text": " @dev Returns the current nonce per-account.\n @param account The requested accunt.\n @return The current nonce."
+            },
+            "functionSelector": "2d0335ab",
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getNonce",
+            "nameLocation": "362:8:21",
+            "parameters": {
+              "id": 9570,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 9569,
+                  "mutability": "mutable",
+                  "name": "account",
+                  "nameLocation": "379:7:21",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9574,
+                  "src": "371:15:21",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 9568,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "371:7:21",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "370:17:21"
+            },
+            "returnParameters": {
+              "id": 9573,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 9572,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9574,
+                  "src": "411:7:21",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 9571,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "411:7:21",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "410:9:21"
+            },
+            "scope": 9611,
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "id": 9596,
+            "nodeType": "FunctionDefinition",
+            "src": "927:249:21",
+            "nodes": [],
+            "documentation": {
+              "id": 9575,
+              "nodeType": "StructuredDocumentation",
+              "src": "426:496:21",
+              "text": " @dev Verifies signed attestation.\n @param recipient The recipient of the attestation.\n @param schema The UUID of the AS.\n @param expirationTime The expiration time of the attestation.\n @param refUUID An optional related attestation's UUID.\n @param data Additional custom data.\n @param attester The attesting account.\n @param v The recovery ID.\n @param r The x-coordinate of the nonce R.\n @param s The signature data."
+            },
+            "functionSelector": "6aeb49a5",
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "attest",
+            "nameLocation": "936:6:21",
+            "parameters": {
+              "id": 9594,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 9577,
+                  "mutability": "mutable",
+                  "name": "recipient",
+                  "nameLocation": "960:9:21",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9596,
+                  "src": "952:17:21",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 9576,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "952:7:21",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 9579,
+                  "mutability": "mutable",
+                  "name": "schema",
+                  "nameLocation": "987:6:21",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9596,
+                  "src": "979:14:21",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 9578,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "979:7:21",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 9581,
+                  "mutability": "mutable",
+                  "name": "expirationTime",
+                  "nameLocation": "1011:14:21",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9596,
+                  "src": "1003:22:21",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 9580,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1003:7:21",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 9583,
+                  "mutability": "mutable",
+                  "name": "refUUID",
+                  "nameLocation": "1043:7:21",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9596,
+                  "src": "1035:15:21",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 9582,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1035:7:21",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 9585,
+                  "mutability": "mutable",
+                  "name": "data",
+                  "nameLocation": "1075:4:21",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9596,
+                  "src": "1060:19:21",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_calldata_ptr",
+                    "typeString": "bytes"
+                  },
+                  "typeName": {
+                    "id": 9584,
+                    "name": "bytes",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1060:5:21",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_storage_ptr",
+                      "typeString": "bytes"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 9587,
+                  "mutability": "mutable",
+                  "name": "attester",
+                  "nameLocation": "1097:8:21",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9596,
+                  "src": "1089:16:21",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 9586,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1089:7:21",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 9589,
+                  "mutability": "mutable",
+                  "name": "v",
+                  "nameLocation": "1121:1:21",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9596,
+                  "src": "1115:7:21",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint8",
+                    "typeString": "uint8"
+                  },
+                  "typeName": {
+                    "id": 9588,
+                    "name": "uint8",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1115:5:21",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint8",
+                      "typeString": "uint8"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 9591,
+                  "mutability": "mutable",
+                  "name": "r",
+                  "nameLocation": "1140:1:21",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9596,
+                  "src": "1132:9:21",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 9590,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1132:7:21",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 9593,
+                  "mutability": "mutable",
+                  "name": "s",
+                  "nameLocation": "1159:1:21",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9596,
+                  "src": "1151:9:21",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 9592,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1151:7:21",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "942:224:21"
+            },
+            "returnParameters": {
+              "id": 9595,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1175:0:21"
+            },
+            "scope": 9611,
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "id": 9610,
+            "nodeType": "FunctionDefinition",
+            "src": "1468:134:21",
+            "nodes": [],
+            "documentation": {
+              "id": 9597,
+              "nodeType": "StructuredDocumentation",
+              "src": "1182:281:21",
+              "text": " @dev Verifies signed revocations.\n @param uuid The UUID of the attestation to revoke.\n @param attester The attesting account.\n @param v The recovery ID.\n @param r The x-coordinate of the nonce R.\n @param s The signature data."
+            },
+            "functionSelector": "1863f01d",
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "revoke",
+            "nameLocation": "1477:6:21",
+            "parameters": {
+              "id": 9608,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 9599,
+                  "mutability": "mutable",
+                  "name": "uuid",
+                  "nameLocation": "1501:4:21",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9610,
+                  "src": "1493:12:21",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 9598,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1493:7:21",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 9601,
+                  "mutability": "mutable",
+                  "name": "attester",
+                  "nameLocation": "1523:8:21",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9610,
+                  "src": "1515:16:21",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 9600,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1515:7:21",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 9603,
+                  "mutability": "mutable",
+                  "name": "v",
+                  "nameLocation": "1547:1:21",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9610,
+                  "src": "1541:7:21",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint8",
+                    "typeString": "uint8"
+                  },
+                  "typeName": {
+                    "id": 9602,
+                    "name": "uint8",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1541:5:21",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint8",
+                      "typeString": "uint8"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 9605,
+                  "mutability": "mutable",
+                  "name": "r",
+                  "nameLocation": "1566:1:21",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9610,
+                  "src": "1558:9:21",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 9604,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1558:7:21",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 9607,
+                  "mutability": "mutable",
+                  "name": "s",
+                  "nameLocation": "1585:1:21",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9610,
+                  "src": "1577:9:21",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 9606,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1577:7:21",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1483:109:21"
+            },
+            "returnParameters": {
+              "id": 9609,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1601:0:21"
+            },
+            "scope": 9611,
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "IEASEIP712Verifier",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": {
+          "id": 9566,
+          "nodeType": "StructuredDocumentation",
+          "src": "66:92:21",
+          "text": " @title EIP712 typed signatures verifier for EAS delegated attestations interface."
+        },
+        "fullyImplemented": false,
+        "linearizedBaseContracts": [
+          9611
+        ],
+        "name": "IEASEIP712Verifier",
+        "nameLocation": "169:18:21",
+        "scope": 9612,
+        "usedErrors": []
+      }
+    ],
+    "license": "MIT"
+  },
+  "id": 21
+}

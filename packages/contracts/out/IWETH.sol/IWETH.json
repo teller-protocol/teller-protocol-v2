@@ -1,0 +1,587 @@
+{
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "balanceOf",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "deposit",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "value",
+          "type": "uint256"
+        }
+      ],
+      "name": "transfer",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "withdraw",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": {
+    "object": "0x",
+    "sourceMap": "",
+    "linkReferences": {}
+  },
+  "deployedBytecode": {
+    "object": "0x",
+    "sourceMap": "",
+    "linkReferences": {}
+  },
+  "methodIdentifiers": {
+    "balanceOf(address)": "70a08231",
+    "deposit()": "d0e30db0",
+    "transfer(address,uint256)": "a9059cbb",
+    "withdraw(uint256)": "2e1a7d4d"
+  },
+  "rawMetadata": "{\"compiler\":{\"version\":\"0.8.17+commit.8df45f5f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"balanceOf\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"deposit\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"}],\"name\":\"transfer\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"withdraw\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"author\":\"develop@teller.finance\",\"kind\":\"dev\",\"methods\":{\"balanceOf(address)\":{\"params\":{\"account\":\"Address to get balance of.\"}},\"transfer(address,uint256)\":{\"params\":{\"to\":\"Address to transfer to\",\"value\":\"Amount of WETH to transfer\"}},\"withdraw(uint256)\":{\"params\":{\"amount\":\"The amount of ETH to withdraw.\"}}},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{\"balanceOf(address)\":{\"notice\":\"It gets the ETH deposit balance of an {account}.\"},\"deposit()\":{\"notice\":\"It deposits ETH into the contract and increases the caller's internal balance of WETH.\"},\"transfer(address,uint256)\":{\"notice\":\"It transfers the WETH amount specified to the given {account}.\"},\"withdraw(uint256)\":{\"notice\":\"It withdraws ETH from the contract by sending it to the caller and reducing the caller's internal balance of WETH.\"}},\"notice\":\"It is the interface of functions that we use for the canonical WETH contract.\",\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/interfaces/IWETH.sol\":\"IWETH\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[\":@ensdomains/=node_modules/@ensdomains/\",\":@mangrovedao/=node_modules/@mangrovedao/\",\":@openzeppelin/=node_modules/@openzeppelin/\",\":ds-test/=lib/forge-std/lib/ds-test/src/\",\":eth-gas-reporter/=node_modules/eth-gas-reporter/\",\":forge-std/=lib/forge-std/src/\",\":hardhat-deploy/=node_modules/hardhat-deploy/\",\":hardhat/=node_modules/hardhat/\"]},\"sources\":{\"contracts/interfaces/IWETH.sol\":{\"keccak256\":\"0x346a3ac1d441ea92f67e8c2d5f208910fd79dae96b4d8b94be8b0a235e23c751\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://d67005488217e3f4da8f552c2a448aa7b0dab707ed8fb1b2d4cf30b899c63e91\",\"dweb:/ipfs/Qmb2nfYxWa1p5MjVafmMzT1VevJvfgdpuit5zrYUvhDvbU\"]}},\"version\":1}",
+  "metadata": {
+    "compiler": {
+      "version": "0.8.17+commit.8df45f5f"
+    },
+    "language": "Solidity",
+    "output": {
+      "abi": [
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "account",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function",
+          "name": "balanceOf",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ]
+        },
+        {
+          "inputs": [],
+          "stateMutability": "payable",
+          "type": "function",
+          "name": "deposit"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "to",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "value",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function",
+          "name": "transfer",
+          "outputs": [
+            {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
+            }
+          ]
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function",
+          "name": "withdraw"
+        }
+      ],
+      "devdoc": {
+        "kind": "dev",
+        "methods": {
+          "balanceOf(address)": {
+            "params": {
+              "account": "Address to get balance of."
+            }
+          },
+          "transfer(address,uint256)": {
+            "params": {
+              "to": "Address to transfer to",
+              "value": "Amount of WETH to transfer"
+            }
+          },
+          "withdraw(uint256)": {
+            "params": {
+              "amount": "The amount of ETH to withdraw."
+            }
+          }
+        },
+        "version": 1
+      },
+      "userdoc": {
+        "kind": "user",
+        "methods": {
+          "balanceOf(address)": {
+            "notice": "It gets the ETH deposit balance of an {account}."
+          },
+          "deposit()": {
+            "notice": "It deposits ETH into the contract and increases the caller's internal balance of WETH."
+          },
+          "transfer(address,uint256)": {
+            "notice": "It transfers the WETH amount specified to the given {account}."
+          },
+          "withdraw(uint256)": {
+            "notice": "It withdraws ETH from the contract by sending it to the caller and reducing the caller's internal balance of WETH."
+          }
+        },
+        "version": 1
+      }
+    },
+    "settings": {
+      "remappings": [
+        ":@ensdomains/=node_modules/@ensdomains/",
+        ":@mangrovedao/=node_modules/@mangrovedao/",
+        ":@openzeppelin/=node_modules/@openzeppelin/",
+        ":ds-test/=lib/forge-std/lib/ds-test/src/",
+        ":eth-gas-reporter/=node_modules/eth-gas-reporter/",
+        ":forge-std/=lib/forge-std/src/",
+        ":hardhat-deploy/=node_modules/hardhat-deploy/",
+        ":hardhat/=node_modules/hardhat/"
+      ],
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "metadata": {
+        "bytecodeHash": "ipfs"
+      },
+      "compilationTarget": {
+        "contracts/interfaces/IWETH.sol": "IWETH"
+      },
+      "libraries": {}
+    },
+    "sources": {
+      "contracts/interfaces/IWETH.sol": {
+        "keccak256": "0x346a3ac1d441ea92f67e8c2d5f208910fd79dae96b4d8b94be8b0a235e23c751",
+        "urls": [
+          "bzz-raw://d67005488217e3f4da8f552c2a448aa7b0dab707ed8fb1b2d4cf30b899c63e91",
+          "dweb:/ipfs/Qmb2nfYxWa1p5MjVafmMzT1VevJvfgdpuit5zrYUvhDvbU"
+        ],
+        "license": "MIT"
+      }
+    },
+    "version": 1
+  },
+  "ast": {
+    "absolutePath": "contracts/interfaces/IWETH.sol",
+    "id": 10065,
+    "exportedSymbols": {
+      "IWETH": [
+        10064
+      ]
+    },
+    "nodeType": "SourceUnit",
+    "src": "32:1044:28",
+    "nodes": [
+      {
+        "id": 10034,
+        "nodeType": "PragmaDirective",
+        "src": "32:23:28",
+        "nodes": [],
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".0"
+        ]
+      },
+      {
+        "id": 10064,
+        "nodeType": "ContractDefinition",
+        "src": "191:884:28",
+        "nodes": [
+          {
+            "id": 10041,
+            "nodeType": "FunctionDefinition",
+            "src": "411:43:28",
+            "nodes": [],
+            "documentation": {
+              "id": 10036,
+              "nodeType": "StructuredDocumentation",
+              "src": "213:193:28",
+              "text": " @notice It withdraws ETH from the contract by sending it to the caller and reducing the caller's internal balance of WETH.\n @param amount The amount of ETH to withdraw."
+            },
+            "functionSelector": "2e1a7d4d",
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "withdraw",
+            "nameLocation": "420:8:28",
+            "parameters": {
+              "id": 10039,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 10038,
+                  "mutability": "mutable",
+                  "name": "amount",
+                  "nameLocation": "437:6:28",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10041,
+                  "src": "429:14:28",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 10037,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "429:7:28",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "428:16:28"
+            },
+            "returnParameters": {
+              "id": 10040,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "453:0:28"
+            },
+            "scope": 10064,
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "id": 10045,
+            "nodeType": "FunctionDefinition",
+            "src": "578:36:28",
+            "nodes": [],
+            "documentation": {
+              "id": 10042,
+              "nodeType": "StructuredDocumentation",
+              "src": "460:113:28",
+              "text": " @notice It deposits ETH into the contract and increases the caller's internal balance of WETH."
+            },
+            "functionSelector": "d0e30db0",
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "deposit",
+            "nameLocation": "587:7:28",
+            "parameters": {
+              "id": 10043,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "594:2:28"
+            },
+            "returnParameters": {
+              "id": 10044,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "613:0:28"
+            },
+            "scope": 10064,
+            "stateMutability": "payable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "id": 10053,
+            "nodeType": "FunctionDefinition",
+            "src": "749:68:28",
+            "nodes": [],
+            "documentation": {
+              "id": 10046,
+              "nodeType": "StructuredDocumentation",
+              "src": "620:124:28",
+              "text": " @notice It gets the ETH deposit balance of an {account}.\n @param account Address to get balance of."
+            },
+            "functionSelector": "70a08231",
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "balanceOf",
+            "nameLocation": "758:9:28",
+            "parameters": {
+              "id": 10049,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 10048,
+                  "mutability": "mutable",
+                  "name": "account",
+                  "nameLocation": "776:7:28",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10053,
+                  "src": "768:15:28",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 10047,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "768:7:28",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "767:17:28"
+            },
+            "returnParameters": {
+              "id": 10052,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 10051,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10053,
+                  "src": "808:7:28",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 10050,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "808:7:28",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "807:9:28"
+            },
+            "scope": 10064,
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "id": 10063,
+            "nodeType": "FunctionDefinition",
+            "src": "1004:69:28",
+            "nodes": [],
+            "documentation": {
+              "id": 10054,
+              "nodeType": "StructuredDocumentation",
+              "src": "823:176:28",
+              "text": " @notice It transfers the WETH amount specified to the given {account}.\n @param to Address to transfer to\n @param value Amount of WETH to transfer"
+            },
+            "functionSelector": "a9059cbb",
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "transfer",
+            "nameLocation": "1013:8:28",
+            "parameters": {
+              "id": 10059,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 10056,
+                  "mutability": "mutable",
+                  "name": "to",
+                  "nameLocation": "1030:2:28",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10063,
+                  "src": "1022:10:28",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 10055,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1022:7:28",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 10058,
+                  "mutability": "mutable",
+                  "name": "value",
+                  "nameLocation": "1042:5:28",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10063,
+                  "src": "1034:13:28",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 10057,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1034:7:28",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1021:27:28"
+            },
+            "returnParameters": {
+              "id": 10062,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 10061,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10063,
+                  "src": "1067:4:28",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 10060,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1067:4:28",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1066:6:28"
+            },
+            "scope": 10064,
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "IWETH",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": {
+          "id": 10035,
+          "nodeType": "StructuredDocumentation",
+          "src": "57:133:28",
+          "text": " @notice It is the interface of functions that we use for the canonical WETH contract.\n @author develop@teller.finance"
+        },
+        "fullyImplemented": false,
+        "linearizedBaseContracts": [
+          10064
+        ],
+        "name": "IWETH",
+        "nameLocation": "201:5:28",
+        "scope": 10065,
+        "usedErrors": []
+      }
+    ],
+    "license": "MIT"
+  },
+  "id": 28
+}

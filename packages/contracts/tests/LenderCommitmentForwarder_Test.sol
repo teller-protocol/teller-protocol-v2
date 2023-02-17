@@ -155,9 +155,11 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
  
         lender._createCommitment(existingCommitment, emptyArray);
 
-
+        assertEq(commitmentCount, 1, "commitment count not incremented");
 
         lender._createCommitment(existingCommitment, emptyArray);
+
+        assertEq(commitmentCount, 2, "commitment count not incremented");
 
         assertEq( lenderMarketCommitments[commitmentId+1].lender, address(lender), "Commitment id was not incremented"  );
     }

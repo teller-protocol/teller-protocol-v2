@@ -380,12 +380,10 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             uint8 decimals = IERC20MetadataUpgradeable(_collateralTokenAddress)
                 .decimals();
 
-    
-
             return
                 MathUpgradeable.mulDiv(
                     _principalAmount,
-                    10**decimals,
+                    10**decimals, //multiply by the collateral token decimals 
                     _maxPrincipalPerCollateralAmount,
                     MathUpgradeable.Rounding.Up
                 );

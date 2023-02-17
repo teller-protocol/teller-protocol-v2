@@ -34,6 +34,9 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
     LenderCommitmentUser private lender;
     LenderCommitmentUser private borrower;
 
+
+    uint32 defaultExpirationTime = 1676666742;
+
     address tokenAddress;
     uint256 marketId;
     uint256 maxAmount;
@@ -67,7 +70,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         commitment_.maxPrincipal = maxAmount;
         commitment_.maxDuration = maxLoanDuration;
         commitment_.minInterestRate = minInterestRate;
-        commitment_.expiration = expiration;
+        commitment_.expiration = defaultExpirationTime;
         commitment_.lender = address(lender);
 
         commitment_.collateralTokenType = _collateralType;
@@ -132,6 +135,8 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             CommitmentCollateralType.ERC20,
             1000e6
         );
+
+        vm.warp(defaultExpirationTime - 1000);
 
         lender._createCommitment(existingCommitment, emptyArray);
     }
@@ -250,9 +255,9 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             maxAmount
         );
 
-        commitment.expiration = 1676666742;
+        commitment.expiration = defaultExpirationTime;
 
-        vm.warp(1676666742 - 1);
+        vm.warp(defaultExpirationTime - 1);
  
         assertEq(
             acceptBidWasCalled,
@@ -586,7 +591,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         assertEq(
             super.getRequiredCollateral(
                 1, // 1 WEI loan
-                59e13, // 0.00059 WETH per USDC
+                59e13, // 0.00059 WETH per microUSDC
                 CommitmentCollateralType.ERC20,
                 address(collateralToken)
             ),
@@ -595,6 +600,53 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         );
 
     }
+
+    function test_getRequiredCollateral_1_USDC_loan__1_USDC_per_Wei()
+        public
+    {
+        TestERC20Token collateralToken = new TestERC20Token(
+            "Test WETH",
+            "TWETH",
+            0,
+            18
+        );
+        assertEq(
+            super.getRequiredCollateral(
+                1e6, // 1 USDC
+                1e24, // must provide 1 wei to get loan of 1 usdc
+                CommitmentCollateralType.ERC20,
+                address(collateralToken)
+            ),
+            1, // 1 wei 
+            "expected at least 1 unit of collateral"
+        );
+
+    }
+
+
+    function test_getRequiredCollateral_1_wei_loan__1_Wei_per_USDC()
+        public
+    {
+        TestERC20Token collateralToken = new TestERC20Token(
+            "Test USDC",
+            "TUSDC",
+            0,
+            6
+        );
+
+        assertEq(
+            super.getRequiredCollateral(
+                1, // 1 wei
+                1 , // must provide 1 usdc  to get loan of 1 wei    
+                CommitmentCollateralType.ERC20,
+                address(collateralToken)
+            ),
+            1e6, // 1 usdc 
+            "expected at least 1 unit of collateral"
+        );
+
+    }
+
 
     /*
         Overrider methods for exercise 

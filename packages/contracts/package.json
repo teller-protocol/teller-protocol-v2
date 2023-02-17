@@ -3,7 +3,7 @@
   "version": "2.1.1",
   "license": "MIT",
   "scripts": {
-    "test": "DISABLE_LOGS=true TS_NODE_TRANSPILE_ONLY=1 TESTING=1 yarn hh test",
+    "test": "NODE_OPTIONS=--max_old_space_size=8048 DISABLE_LOGS=true TS_NODE_TRANSPILE_ONLY=1 TESTING=1 yarn hh test",
     "coverage": "DISABLE_LOGS=true TS_NODE_TRANSPILE_ONLY=1 TESTING=1 yarn hh coverage",
     "shell": "yarn solidity-shell",
     "chain": "yarn hh node --no-deploy",

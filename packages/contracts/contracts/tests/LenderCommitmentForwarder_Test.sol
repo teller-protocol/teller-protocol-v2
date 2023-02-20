@@ -551,6 +551,28 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         );
     }
 
+    function getRequiredCollateral_1_wei_loan__1_Wei_per_USDC_test()
+        public
+    {
+        TestERC20Token collateralToken = new TestERC20Token(
+            "Test USDC",
+            "TUSDC",
+            0,
+            6
+        );
+        Test.eq(
+            super.getRequiredCollateral(
+                1, // 1 wei
+                1, // must provide 1 usdc  to get loan of 1 wei  
+                CommitmentCollateralType.ERC20,
+                address(collateralToken)
+            ),
+            1, // 1 usdc
+            "expected at least 1 unit of collateral"
+        );
+    }
+
+
     /*
         Overrider methods for exercise 
     */

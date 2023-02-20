@@ -37,8 +37,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
      * @param collateralTokenType The type of asset of the collateralTokenAddres (ERC20, ERC721, or ERC1155).
      * @param lender The address of the lender for this commitment.
      * @param marketId The market id for this commitment.
-     * @param principalTokenAddress The address for the token contract that will be used to provide principal for loans of this commitment.
-     * @param borrower The address of the borrower that is allowed to accept this commitment.  Zero address is wildcard for any address.
+     * @param principalTokenAddress The address for the token contract that will be used to provide principal for loans of this commitment. 
      */
     struct Commitment {
         uint256 maxPrincipal;
@@ -51,8 +50,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         CommitmentCollateralType collateralTokenType;
         address lender;
         uint256 marketId;
-        address principalTokenAddress;
-        //     address borrower;
+        address principalTokenAddress; 
     }
 
     // Mapping of lender address => market ID => lending token => commitment
@@ -304,7 +302,8 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             _principalAmount,
             commitment.maxPrincipalPerCollateralAmount,
             commitment.collateralTokenType,
-            commitment.collateralTokenAddress
+            commitment.collateralTokenAddress, 
+            commitment.principalTokenAddress
         );
         if (_collateralAmount < requiredCollateral) {
             revert InsufficientBorrowerCollateral({
@@ -365,28 +364,39 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint256 _principalAmount,
         uint256 _maxPrincipalPerCollateralAmount,
         CommitmentCollateralType _collateralTokenType,
-        address _collateralTokenAddress
+        address _collateralTokenAddress,
+        address _principalTokenAddress
     ) public view virtual returns (uint256) {
         if (_collateralTokenType == CommitmentCollateralType.NONE) {
             return 0;
         }
-        if (_collateralTokenType == CommitmentCollateralType.ERC20) {
-            uint8 decimals = IERC20MetadataUpgradeable(_collateralTokenAddress)
-                .decimals();
 
-            return
-                MathUpgradeable.mulDiv(
-                    _principalAmount,
-                    10**decimals, //multiply by the collateral token decimals 
-                    _maxPrincipalPerCollateralAmount,
-                    MathUpgradeable.Rounding.Up
-                );
+        uint8 collateralDecimals = 1;
+        uint8 principalDecimals = 1;
+
+        if (_collateralTokenType == CommitmentCollateralType.ERC20) {
+            collateralDecimals = IERC20MetadataUpgradeable(_collateralTokenAddress)
+                .decimals();
         }
+
+        //principal will always be ERC20 
+        principalDecimals = IERC20MetadataUpgradeable(_collateralTokenAddress)
+            .decimals();
+    
+
+        return
+            MathUpgradeable.mulDiv(
+                _principalAmount,
+                (10**collateralDecimals) * (10**principalDecimals), //multiply by the collateral token decimals 
+                _maxPrincipalPerCollateralAmount,
+                MathUpgradeable.Rounding.Up
+            );
+        /*
         return
             MathUpgradeable.ceilDiv(
                 _principalAmount,
                 _maxPrincipalPerCollateralAmount
-            );
+            );*/
     }
 
     function getCommitmentBorrowers(uint256 _commitmentId)

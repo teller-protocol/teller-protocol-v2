@@ -426,6 +426,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
      *                    principal = 700 USDC
      * max principal per collateral = 500 USDC
      */
+     //why do we do decimal expansion like this here ?
     function getRequiredCollateral_700_USDC__500_per_WETH_test() public {
         
         TestERC20Token usdcToken = new TestERC20Token(
@@ -444,7 +445,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         Test.eq(
             super.getRequiredCollateral(
                 700 * 10e6, // 700 USDC loan
-                500 * 10e12 ,// (10e18 / 10e6), // 500 USDC per WETH
+                500 * (10**6) * (10**6) ,// (10e18 / 10e6), // 500 USDC per WETH
                 CommitmentCollateralType.ERC20,
                 address(collateralToken),
                 address(usdcToken)
@@ -474,7 +475,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         Test.eq(
             super.getRequiredCollateral(
                 700e6, // 700 USDC loan
-                500e6 * (10**6), // 500 USDC per NFT
+                500e6 * (10**6) * (10**0), // 500 USDC per NFT
                 CommitmentCollateralType.ERC1155,
                 address(0),
                 address(usdcToken)

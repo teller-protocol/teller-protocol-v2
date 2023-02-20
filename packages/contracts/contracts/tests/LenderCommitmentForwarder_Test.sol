@@ -32,7 +32,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
     LenderCommitmentUser private lender;
     LenderCommitmentUser private borrower;
 
-    address tokenAddress;
+  //  address tokenAddress;
     uint256 marketId;
     uint256 maxAmount;
 
@@ -47,7 +47,8 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
     bool submitBidWasCalled;
     bool submitBidWithCollateralWasCalled;
 
-      TestERC20Token principalToken;
+    TestERC20Token principalToken;
+    uint8 constant principalTokenDecimals = 18;
 
     constructor()
         LenderCommitmentForwarder(
@@ -56,13 +57,55 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         )
     {}
 
-    function _createCommitment(
+ 
+    function setup_beforeAll() public {
+        tellerV2Mock = LenderCommitmentForwarderTest_TellerV2Mock(
+            address(getTellerV2())
+        );
+        mockMarketRegistry = MarketRegistryMock(address(getMarketRegistry()));
+
+        marketOwner = new LenderCommitmentUser(address(tellerV2Mock), (this));
+        borrower = new LenderCommitmentUser(address(tellerV2Mock), (this));
+        lender = new LenderCommitmentUser(address(tellerV2Mock), (this));
+        tellerV2Mock.__setMarketOwner(marketOwner);
+
+        mockMarketRegistry.setMarketOwner(address(marketOwner));
+
+        //tokenAddress = address(0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174);
+        marketId = 2;
+        maxAmount = 100000000000000000000;
+        maxLoanDuration = 2480000;
+        minInterestRate = 3000;
+        expiration = uint32(block.timestamp) + uint32(64000);
+
+        marketOwner.setTrustedMarketForwarder(marketId, address(this));
+        lender.approveMarketForwarder(marketId, address(this));
+
+        borrowersArray = new address[](1);
+        borrowersArray[0] = address(borrower);
+
+        principalToken = new TestERC20Token(
+            "Test Wrapped ETH",
+            "TWETH",
+            0,
+            principalTokenDecimals
+        );
+
+        delete acceptBidWasCalled;
+        delete submitBidWasCalled;
+        delete submitBidWithCollateralWasCalled;
+
+        delete commitmentCount;
+    }
+
+
+   function _createCommitment(
         CommitmentCollateralType _collateralType,
         uint256 _maxPrincipalPerCollateral
     ) internal returns (Commitment storage commitment_) {
         commitment_ = lenderMarketCommitments[0];
         commitment_.marketId = marketId;
-        commitment_.principalTokenAddress = tokenAddress;
+        commitment_.principalTokenAddress = address(principalToken);
         commitment_.maxPrincipal = maxAmount;
         commitment_.maxDuration = maxLoanDuration;
         commitment_.minInterestRate = minInterestRate;
@@ -71,7 +114,8 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
 
         commitment_.collateralTokenType = _collateralType;
         commitment_
-            .maxPrincipalPerCollateralAmount = _maxPrincipalPerCollateral;
+            .maxPrincipalPerCollateralAmount = _maxPrincipalPerCollateral * 10**principalTokenDecimals;
+        
         if (_collateralType == CommitmentCollateralType.ERC20) {
             TestERC20Token collateralToken = new TestERC20Token(
                 "Test Collateral Token",
@@ -91,52 +135,12 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         }
     }
 
-    function setup_beforeAll() public {
-        tellerV2Mock = LenderCommitmentForwarderTest_TellerV2Mock(
-            address(getTellerV2())
-        );
-        mockMarketRegistry = MarketRegistryMock(address(getMarketRegistry()));
-
-        marketOwner = new LenderCommitmentUser(address(tellerV2Mock), (this));
-        borrower = new LenderCommitmentUser(address(tellerV2Mock), (this));
-        lender = new LenderCommitmentUser(address(tellerV2Mock), (this));
-        tellerV2Mock.__setMarketOwner(marketOwner);
-
-        mockMarketRegistry.setMarketOwner(address(marketOwner));
-
-        tokenAddress = address(0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174);
-        marketId = 2;
-        maxAmount = 100000000000000000000;
-        maxLoanDuration = 2480000;
-        minInterestRate = 3000;
-        expiration = uint32(block.timestamp) + uint32(64000);
-
-        marketOwner.setTrustedMarketForwarder(marketId, address(this));
-        lender.approveMarketForwarder(marketId, address(this));
-
-        borrowersArray = new address[](1);
-        borrowersArray[0] = address(borrower);
-
-        principalToken = new TestERC20Token(
-            "Test Wrapped ETH",
-            "TWETH",
-            0,
-            18
-        );
-
-        delete acceptBidWasCalled;
-        delete submitBidWasCalled;
-        delete submitBidWithCollateralWasCalled;
-
-        delete commitmentCount;
-    }
-
     function createCommitment_test() public {
         uint256 commitmentId = 0;
 
         Commitment storage existingCommitment = _createCommitment(
             CommitmentCollateralType.ERC20,
-            1000e6
+            1000e6 * 1e18
         );
 
         lender._createCommitment(existingCommitment, emptyArray);

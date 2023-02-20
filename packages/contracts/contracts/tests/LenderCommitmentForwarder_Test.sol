@@ -655,7 +655,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         Test.eq(
             super.getRequiredCollateral(
                 6 gwei, // 6 GWEI loan
-                59e13 * (10**9), // 0.00059 WETH per USDC
+                59e13 * (1e9), // 0.00059 WETH per gwei
                 CommitmentCollateralType.ERC20,
                 address(collateralToken),
                 address(gweiToken)
@@ -688,7 +688,29 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
                 address(collateralToken),
                 address(principalToken)
             ),
-            1, // 0.000001 USDC
+            1, // 0.001695 USDC
+            "expected at least 1 unit of collateral"
+        );
+    }
+
+        function getRequiredCollateral_1_GWEI_loan__00059_WETH_per_USDC_test()
+        public
+    {
+        TestERC20Token collateralToken = new TestERC20Token(
+            "Test USDC",
+            "TUSDC",
+            0,
+            6
+        );
+        Test.eq(
+            super.getRequiredCollateral(
+                1e9, // 1 GWEI loan
+                59e13 * 1e18, // 0.00059 WETH per USDC base unit (hence why not multiplying by 1e6)
+                CommitmentCollateralType.ERC20,
+                address(collateralToken),
+                address(principalToken)
+            ),
+            2, //  
             "expected at least 1 unit of collateral"
         );
     }

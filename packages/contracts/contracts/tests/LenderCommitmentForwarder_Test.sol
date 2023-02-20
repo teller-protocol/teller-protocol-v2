@@ -512,7 +512,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         Test.eq(
             super.getRequiredCollateral(
                 1e18, // 1 WETH loan
-                59e13 * 10e18, // 0.00059 WETH per USDC
+                59e13 * 10e6 * 10e10, // 0.00059 WETH per USDC   //why does this work ?
                 CommitmentCollateralType.ERC20,
                 address(collateralToken),
                 address(principalToken)

@@ -47,6 +47,8 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
     bool submitBidWasCalled;
     bool submitBidWithCollateralWasCalled;
 
+      TestERC20Token principalToken;
+
     constructor()
         LenderCommitmentForwarder(
             address(new LenderCommitmentForwarderTest_TellerV2Mock()), ///_protocolAddress
@@ -114,6 +116,13 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
 
         borrowersArray = new address[](1);
         borrowersArray[0] = address(borrower);
+
+        principalToken = new TestERC20Token(
+            "Test Wrapped ETH",
+            "TWETH",
+            0,
+            18
+        );
 
         delete acceptBidWasCalled;
         delete submitBidWasCalled;
@@ -425,7 +434,8 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
                 700e6, // 700 USDC loan
                 500e6, // 500 USDC per WETH
                 CommitmentCollateralType.ERC20,
-                address(collateralToken)
+                address(collateralToken),
+                address(principalToken)
             ),
             14e17, // 1.4 WETH
             "expected 1.4 WETH collateral"
@@ -446,7 +456,8 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
                 700e6, // 700 USDC loan
                 500e6, // 500 USDC per NFT
                 CommitmentCollateralType.ERC1155,
-                address(0)
+                address(0),
+                address(principalToken)
             ),
             2, // 2 NFTs
             "expected 2 NFTs collateral"
@@ -465,7 +476,8 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
                 500e6, // 7500 USDC loan
                 500e6, // 500 USDC per NFT
                 CommitmentCollateralType.ERC721,
-                address(0)
+                address(0),
+                address(principalToken)
             ),
             1, // 1 NFT
             "expected 1 NFT collateral"
@@ -490,7 +502,8 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
                 1e18, // 1 WETH loan
                 59e13, // 0.00059 WETH per USDC
                 CommitmentCollateralType.ERC20,
-                address(collateralToken)
+                address(collateralToken),
+                address(principalToken)
             ),
             1_694_915_255, // 1,694.915255 USDC (1694.915254237 rounded up to 6 decimals)
             "expected 1,694.915255 USDC collateral"
@@ -517,7 +530,8 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
                 6 gwei, // 6 GWEI loan
                 59e13, // 0.00059 WETH per USDC
                 CommitmentCollateralType.ERC20,
-                address(collateralToken)
+                address(collateralToken),
+                address(principalToken)
             ),
             11, // 0.000011 USDC (0.000010169 rounded up to 6 decimals)
             "expected 0.000011 USDC collateral"
@@ -544,7 +558,8 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
                 1, // 1 WEI loan
                 59e13, // 0.00059 WETH per USDC
                 CommitmentCollateralType.ERC20,
-                address(collateralToken)
+                address(collateralToken),
+                address(principalToken)
             ),
             1, // 0.000001 USDC
             "expected at least 1 unit of collateral"
@@ -565,7 +580,8 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
                 1, // 1 wei
                 1, // must provide 1 usdc  to get loan of 1 wei  
                 CommitmentCollateralType.ERC20,
-                address(collateralToken)
+                address(collateralToken),
+                address(principalToken)
             ),
             1, // 1 usdc
             "expected at least 1 unit of collateral"

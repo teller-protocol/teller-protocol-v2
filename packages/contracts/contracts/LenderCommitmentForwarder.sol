@@ -362,7 +362,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
 
     function getRequiredCollateral(
         uint256 _principalAmount,
-        uint256 _maxPrincipalPerCollateralAmount,
+        uint256 _maxPrincipalPerCollateralAmount, //should be expressed expanded by collateralTokenDecimals and principalTokenDecimals 
         CommitmentCollateralType _collateralTokenType,
         address _collateralTokenAddress,
         address _principalTokenAddress
@@ -386,7 +386,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
 
         return
             MathUpgradeable.mulDiv(
-                _principalAmount,
+                _principalAmount, 
                 (10**collateralDecimals) * (10**principalDecimals), //multiply by the collateral token decimals 
                 _maxPrincipalPerCollateralAmount,
                 MathUpgradeable.Rounding.Up

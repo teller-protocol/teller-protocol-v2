@@ -504,7 +504,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         Test.eq(
             super.getRequiredCollateral(
                 500e6, // 7500 USDC loan
-                500e6 * (1e6), // 500 USDC per NFT
+                500e6 * (1e6), // 500 USDC per NFT, expanded by principal token decimals 
                 CommitmentCollateralType.ERC721,
                 address(0),
                 address(usdcToken)
@@ -704,13 +704,36 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         );
         Test.eq(
             super.getRequiredCollateral(
-                1, // 1 wei
-                1e6 * 1e18 , // must provide 1 usdc  to get loan of 1 wei  
+                1e9, // 1 gwei
+                1 * 1e6 * 1e18 , // must provide 1:1 ratio usdc base unit to wei   
                 CommitmentCollateralType.ERC20,
                 address(collateralToken),
                 address(principalToken)
             ),
-            1, // 1 usdc base unit
+            1e9, // 1 usdc $
+            "expected at least 1 unit of collateral"
+        );
+    } 
+
+
+     function getRequiredCollateral_1_wei_loan__1_Wei_per_USDC_unit_test()
+        public
+    {
+        TestERC20Token collateralToken = new TestERC20Token(
+            "Test USDC",
+            "TUSDC",
+            0,
+            6
+        );
+        Test.eq(
+            super.getRequiredCollateral(
+                1, // 1 wei
+                1 * 1e6 * 1e18 , // must provide 1 usdc  to get loan of 1 wei  
+                CommitmentCollateralType.ERC20,
+                address(collateralToken),
+                address(principalToken)
+            ),
+            1, // 1 usdc $
             "expected at least 1 unit of collateral"
         );
     } 

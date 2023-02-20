@@ -463,13 +463,21 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
     function getRequiredCollateral_700_USDC_loan__500_per_ERC1155_test()
         public
     {
+
+          TestERC20Token usdcToken = new TestERC20Token(
+            "Test USDC",
+            "TUSDC",
+            0,
+            6
+        );
+
         Test.eq(
             super.getRequiredCollateral(
                 700e6, // 700 USDC loan
-                500e6 * 10e18, // 500 USDC per NFT
+                500e6 * (10**6), // 500 USDC per NFT
                 CommitmentCollateralType.ERC1155,
                 address(0),
-                address(principalToken)
+                address(usdcToken)
             ),
             2, // 2 NFTs
             "expected 2 NFTs collateral"
@@ -502,6 +510,8 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
      *                    principal = 1 WETH
      * max principal per collateral = 0.00059 WETH
      */
+
+     //WHY do we expand by 10**18!? 
     function getRequiredCollateral_1_WETH_loan__00059_per_USDC_test() public {
         TestERC20Token collateralToken = new TestERC20Token(
             "Test USDC",
@@ -512,7 +522,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         Test.eq(
             super.getRequiredCollateral(
                 1e18, // 1 WETH loan
-                59e13 * 10e6 * 10e10, // 0.00059 WETH per USDC   //why does this work ?
+                59e13 * (10**18 ), // 0.00059 WETH per USDC base unit  //why does this work ?
                 CommitmentCollateralType.ERC20,
                 address(collateralToken),
                 address(principalToken)
@@ -528,9 +538,19 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
      *                    principal = 6 GWEI
      * max principal per collateral = 0.00059 WETH
      */
+ 
     function getRequiredCollateral_6_GWEI_loan__00059_WETH_per_USDC_test()
         public
     {
+
+        TestERC20Token gweiToken = new TestERC20Token(
+            "Test USDC",
+            "TUSDC",
+            0,
+            9
+        );
+
+
         TestERC20Token collateralToken = new TestERC20Token(
             "Test USDC",
             "TUSDC",
@@ -540,10 +560,10 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         Test.eq(
             super.getRequiredCollateral(
                 6 gwei, // 6 GWEI loan
-                59e13 * 10e18, // 0.00059 WETH per USDC
+                59e13 * (10**9), // 0.00059 WETH per USDC
                 CommitmentCollateralType.ERC20,
                 address(collateralToken),
-                address(principalToken)
+                address(gweiToken)
             ),
             11, // 0.000011 USDC (0.000010169 rounded up to 6 decimals)
             "expected 0.000011 USDC collateral"
@@ -568,7 +588,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         Test.eq(
             super.getRequiredCollateral(
                 1, // 1 WEI loan
-                59e13 * 10e6, // 0.00059 WETH per USDC
+                59e13 * 10**18, // 0.00059 WETH per USDC
                 CommitmentCollateralType.ERC20,
                 address(collateralToken),
                 address(principalToken)

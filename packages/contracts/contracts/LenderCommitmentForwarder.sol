@@ -371,8 +371,8 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             return 0;
         }
 
-        uint8 collateralDecimals = 1;
-        uint8 principalDecimals = 1;
+        uint8 collateralDecimals = 0;
+        uint8 principalDecimals = 0;
 
         if (_collateralTokenType == CommitmentCollateralType.ERC20) {
             collateralDecimals = IERC20MetadataUpgradeable(_collateralTokenAddress)
@@ -387,7 +387,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         return
             MathUpgradeable.mulDiv(
                 _principalAmount, 
-                (10**collateralDecimals) * (10**principalDecimals), //multiply by the collateral token decimals 
+                (10**(collateralDecimals + principalDecimals) ), //multiply by the collateral token decimals 
                 _maxPrincipalPerCollateralAmount,
                 MathUpgradeable.Rounding.Up
             );

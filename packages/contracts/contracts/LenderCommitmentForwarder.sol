@@ -360,6 +360,14 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         );
     }
 
+    /**
+     * @notice Calculate the amount of collateral required to borrow a loan with _principalAmount of principal
+     * @param _principalAmount The amount of currency to borrow for the loan.
+     * @param _maxPrincipalPerCollateralAmount The ratio for the amount of principal that can be borrowed for each amount of collateral.  This is expanded by the principal decimals and collateral decimals. 
+     * @param _collateralTokenType The type of collateral for the loan either ERC20, ERC721, ERC1155, or None.
+     * @param _collateralTokenAddress The contract address for the collateral for the loan.
+     * @param _principalTokenAddress The contract address for the principal for the loan.
+     */
     function getRequiredCollateral(
         uint256 _principalAmount,
         uint256 _maxPrincipalPerCollateralAmount, //should be expressed expanded by collateralTokenDecimals and principalTokenDecimals 
@@ -383,20 +391,20 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         principalDecimals = IERC20MetadataUpgradeable(_principalTokenAddress)
             .decimals();
     
+        /*
 
+        The principalAmount is expanded by (collateralDecimals+principalDecimals)
+        and then it is divided by _maxPrincipalPerCollateralAmount which has already been expanded by (collateralDecimals+principalDecimals)
+
+        */
         return
             MathUpgradeable.mulDiv(
                 _principalAmount, 
-                (10**(collateralDecimals + principalDecimals) ), //multiply by the collateral token decimals 
+                (10**(collateralDecimals + principalDecimals) ), 
                 _maxPrincipalPerCollateralAmount,
                 MathUpgradeable.Rounding.Up
             );
-        /*
-        return
-            MathUpgradeable.ceilDiv(
-                _principalAmount,
-                _maxPrincipalPerCollateralAmount
-            );*/
+         
     }
 
     function getCommitmentBorrowers(uint256 _commitmentId)

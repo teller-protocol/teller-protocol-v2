@@ -37,7 +37,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
      * @param collateralTokenType The type of asset of the collateralTokenAddres (ERC20, ERC721, or ERC1155).
      * @param lender The address of the lender for this commitment.
      * @param marketId The market id for this commitment.
-     * @param principalTokenAddress The address for the token contract that will be used to provide principal for loans of this commitment. 
+     * @param principalTokenAddress The address for the token contract that will be used to provide principal for loans of this commitment.
      */
     struct Commitment {
         uint256 maxPrincipal;
@@ -50,7 +50,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         CommitmentCollateralType collateralTokenType;
         address lender;
         uint256 marketId;
-        address principalTokenAddress; 
+        address principalTokenAddress;
     }
 
     // Mapping of lender address => market ID => lending token => commitment
@@ -132,7 +132,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         );
         _;
     }
- 
+
     function validateCommitment(Commitment storage _commitment) internal {
         require(
             _commitment.expiration > uint32(block.timestamp),
@@ -143,7 +143,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             "commitment principal allocation 0"
         );
 
-         if (_commitment.collateralTokenType != CommitmentCollateralType.NONE) {
+        if (_commitment.collateralTokenType != CommitmentCollateralType.NONE) {
             require(
                 _commitment.maxPrincipalPerCollateralAmount > 0,
                 "commitment collateral ratio 0"
@@ -174,12 +174,8 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
     function createCommitment(
         Commitment calldata _commitment,
         address[] calldata borrowerAddressList
-    )
-        public
-       
-        returns (uint256 commitmentId_)
-    {
-        commitmentId_ = commitmentCount++; 
+    ) public returns (uint256 commitmentId_) {
+        commitmentId_ = commitmentCount++;
 
         require(
             _commitment.lender == _msgSender(),
@@ -187,7 +183,6 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         );
 
         lenderMarketCommitments[commitmentId_] = _commitment;
-
 
         validateCommitment(lenderMarketCommitments[commitmentId_]);
 
@@ -213,10 +208,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint256 _commitmentId,
         Commitment calldata _commitment,
         address[] calldata borrowerAddressList
-    )
-        public
-        commitmentLender(_commitmentId) 
-    {
+    ) public commitmentLender(_commitmentId) {
         lenderMarketCommitments[_commitmentId] = _commitment;
 
         validateCommitment(lenderMarketCommitments[_commitmentId]);
@@ -274,16 +266,12 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint256 _principalAmount,
         uint256 _collateralAmount,
         uint256 _collateralTokenId
-    )
-        external
-       
-        returns (uint256 bidId)
-    {
+    ) external returns (uint256 bidId) {
         address borrower = _msgSender();
 
         Commitment storage commitment = lenderMarketCommitments[_commitmentId];
 
-        validateCommitment( commitment );
+        validateCommitment(commitment);
 
         require(
             commitmentBorrowersList[_commitmentId].length() == 0 ||
@@ -302,7 +290,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             _principalAmount,
             commitment.maxPrincipalPerCollateralAmount,
             commitment.collateralTokenType,
-            commitment.collateralTokenAddress, 
+            commitment.collateralTokenAddress,
             commitment.principalTokenAddress
         );
         if (_collateralAmount < requiredCollateral) {
@@ -363,14 +351,14 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
     /**
      * @notice Calculate the amount of collateral required to borrow a loan with _principalAmount of principal
      * @param _principalAmount The amount of currency to borrow for the loan.
-     * @param _maxPrincipalPerCollateralAmount The ratio for the amount of principal that can be borrowed for each amount of collateral.  This is expanded by the principal decimals and collateral decimals. 
+     * @param _maxPrincipalPerCollateralAmount The ratio for the amount of principal that can be borrowed for each amount of collateral.  This is expanded by the principal decimals and collateral decimals.
      * @param _collateralTokenType The type of collateral for the loan either ERC20, ERC721, ERC1155, or None.
      * @param _collateralTokenAddress The contract address for the collateral for the loan.
      * @param _principalTokenAddress The contract address for the principal for the loan.
      */
     function getRequiredCollateral(
         uint256 _principalAmount,
-        uint256 _maxPrincipalPerCollateralAmount, //should be expressed expanded by collateralTokenDecimals and principalTokenDecimals 
+        uint256 _maxPrincipalPerCollateralAmount, //should be expressed expanded by collateralTokenDecimals and principalTokenDecimals
         CommitmentCollateralType _collateralTokenType,
         address _collateralTokenAddress,
         address _principalTokenAddress
@@ -383,14 +371,15 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint8 principalDecimals = 0;
 
         if (_collateralTokenType == CommitmentCollateralType.ERC20) {
-            collateralDecimals = IERC20MetadataUpgradeable(_collateralTokenAddress)
-                .decimals();
+            collateralDecimals = IERC20MetadataUpgradeable(
+                _collateralTokenAddress
+            ).decimals();
         }
 
-        //principal will always be ERC20 
+        //principal will always be ERC20
         principalDecimals = IERC20MetadataUpgradeable(_principalTokenAddress)
             .decimals();
-    
+
         /*
 
         The principalAmount is expanded by (collateralDecimals+principalDecimals)
@@ -399,12 +388,11 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         */
         return
             MathUpgradeable.mulDiv(
-                _principalAmount, 
-                (10**(collateralDecimals + principalDecimals) ), 
+                _principalAmount,
+                (10**(collateralDecimals + principalDecimals)),
                 _maxPrincipalPerCollateralAmount,
                 MathUpgradeable.Rounding.Up
             );
-         
     }
 
     function getCommitmentBorrowers(uint256 _commitmentId)

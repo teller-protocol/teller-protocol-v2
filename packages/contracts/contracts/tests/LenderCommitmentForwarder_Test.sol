@@ -524,7 +524,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         Test.eq(
             super.getRequiredCollateral(
                 1e18, // 1 WETH loan
-                59e13 * (1e18), // 0.00059 WETH per USDC base unit   
+                59e13 * (1e18), // 0.00059 WETH per USDC base unit
                 CommitmentCollateralType.ERC20,
                 address(collateralToken),
                 address(principalToken)
@@ -533,7 +533,6 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             "expected 1,694.915255 USDC collateral"
         );
     }
-
 
     /**
      *             collateral token = WETH (10**18)
@@ -571,7 +570,6 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         );
     }
 
-
     /**
      *             collateral token = WETH (10**18)
      *              principal token = USDC (10**6)
@@ -608,13 +606,12 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         );
     }
 
-   
     /**
      *             collateral token = WETH (10**18)
      *              principal token = USDC (10**8)
      *                    principal = 8888 USDC
-     * max principal per collateral =  8888000000 wei per USDC base unit 
-    */
+     * max principal per collateral =  8888000000 wei per USDC base unit
+     */
     function getRequiredCollateral_8888_USDC_loan__unit_test() public {
         TestERC20Token usdcToken = new TestERC20Token(
             "Test USDC",
@@ -633,7 +630,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         Test.eq(
             super.getRequiredCollateral(
                 8888 * (1e6), // 8888 USDC loan  //principal
-                8888000000 * (1e6), // 8888000000 wei  per USDC base unit  
+                8888000000 * (1e6), // 8888000000 wei  per USDC base unit
                 CommitmentCollateralType.ERC20,
                 address(collateralToken),
                 address(usdcToken)
@@ -696,7 +693,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         Test.eq(
             super.getRequiredCollateral(
                 1, // 1 WEI loan
-                59e13 * 1e18, // 0.00059 WETH per USDC base unit 
+                59e13 * 1e18, // 0.00059 WETH per USDC base unit
                 CommitmentCollateralType.ERC20,
                 address(collateralToken),
                 address(principalToken)
@@ -706,14 +703,12 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         );
     }
 
-
-
     /**
      *             collateral token = USDC (10**6)
      *              principal token = WETH (10**18)
      *                    principal = 1 GWEI
      * max principal per collateral = 0.00059 WETH per gwei
-    */
+     */
     function getRequiredCollateral_1_GWEI_loan__00059_WETH_per_USDC_test()
         public
     {
@@ -736,8 +731,6 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         );
     }
 
-
-
     /**
      *             collateral token = USDC (10**6)
      *              principal token = WETH (10**18)
@@ -759,18 +752,17 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
                 address(collateralToken),
                 address(principalToken)
             ),
-            1e3*1e6, // 1000 usdc $
+            1e3 * 1e6, // 1000 usdc $
             "expected at least 1 unit of collateral"
         );
     }
-
 
     /**
      *             collateral token = USDC (10**6)
      *              principal token = WETH (10**18)
      *                    principal = 1 wei
      * max principal per collateral = 1 wei per usdc $
-    */
+     */
     function getRequiredCollateral_1_wei_loan__1_Wei_per_USDC_unit_test()
         public
     {
@@ -788,7 +780,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
                 address(collateralToken),
                 address(principalToken)
             ),
-            1, // 1 usdc base unit 
+            1, // 1 usdc base unit
             "expected at least 1 unit of collateral"
         );
     }

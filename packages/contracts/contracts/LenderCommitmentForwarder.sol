@@ -377,7 +377,6 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
                 _collateralTokenAddress
             ).decimals();
         }
- 
 
         /*
 

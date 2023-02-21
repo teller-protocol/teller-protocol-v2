@@ -186,11 +186,18 @@ type Commitment @entity {
   id: ID!
 
   # Offer
-  committedAmount: BigInt!
+  committedAmount: BigInt! # Max principal
   expirationTimestamp: BigInt!
   maxDuration: BigInt!
   minAPY: BigInt!
   bids: [Bid!]! @derivedFrom(field: "commitment")
+  principalTokenAddress: Bytes!
+
+  # Required Collateral
+  collateralTokenAddress: Bytes!
+  collateralTokenId: BigInt!
+  collateralTokenType: String
+  maxPrincipalPerCollateralAmount: BigInt!
 
   # Lender
   lender: Lender!

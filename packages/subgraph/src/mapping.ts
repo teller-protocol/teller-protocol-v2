@@ -8,9 +8,9 @@ import {
   CollateralClaimed
 } from "../generated/CollateralManager/CollateralManager";
 import {
+  CreatedCommitment,
   DeletedCommitment,
   ExercisedCommitment,
-  LenderCommitmentForwarder,
   UpdatedCommitment
 } from "../generated/LenderCommitmentForwarder/LenderCommitmentForwarder";
 import {
@@ -60,12 +60,13 @@ import {
   loadBorrowerByMarketId,
   loadBorrowerTokenVolume,
   loadCollateral,
-  loadCommitmentByMarketId,
+  loadCommitment,
   loadLenderByMarketId,
   loadLenderTokenVolume,
   loadMarketById,
   loadProtocolTokenVolume,
-  loadTokenVolumeByMarketId
+  loadTokenVolumeByMarketId,
+  updateLenderCommitment
 } from "./helpers/loaders";
 import {
   updateBid,
@@ -710,25 +711,36 @@ export function handleTellerV2Upgraded(event: Upgraded): void {
   }
 }
 
-export function handleUpdatedCommitment(event: UpdatedCommitment): void {
-  const commitment = loadCommitmentByMarketId(
+export function handleCreatedCommitment(event: CreatedCommitment): void {
+  const commitmentId = event.params.commitmentId.toString();
+  const commitment = loadCommitment(commitmentId);
+  updateLenderCommitment(
+    commitmentId,
     event.params.lender,
     event.params.marketId.toString(),
-    event.params.lendingToken
-  );
-  commitment.committedAmount = event.params.tokenAmount;
-  const lenderCommitmentForwarderInstance = LenderCommitmentForwarder.bind(
+    event.params.lendingToken,
+    event.params.tokenAmount,
     event.address
   );
-  const lenderCommitment = lenderCommitmentForwarderInstance.lenderMarketCommitments(
+}
+
+export function handleCreatedCommitments(events: CreatedCommitment[]): void {
+  events.forEach(event => {
+    handleCreatedCommitment(event);
+  });
+}
+
+export function handleUpdatedCommitment(event: UpdatedCommitment): void {
+  const commitmentId = event.params.commitmentId.toString();
+  const commitment = loadCommitment(commitmentId);
+  updateLenderCommitment(
+    commitmentId,
     event.params.lender,
-    event.params.marketId,
-    event.params.lendingToken
+    event.params.marketId.toString(),
+    event.params.lendingToken,
+    event.params.tokenAmount,
+    event.address
   );
-  commitment.expirationTimestamp = lenderCommitment.value1;
-  commitment.maxDuration = lenderCommitment.value2;
-  commitment.minAPY = BigInt.fromI32(lenderCommitment.value3);
-  commitment.save();
 }
 
 export function handleUpdatedCommitments(events: UpdatedCommitment[]): void {
@@ -738,15 +750,13 @@ export function handleUpdatedCommitments(events: UpdatedCommitment[]): void {
 }
 
 export function handleDeletedCommitment(event: DeletedCommitment): void {
-  const commitment = loadCommitmentByMarketId(
-    event.params.lender,
-    event.params.marketId.toString(),
-    event.params.lendingToken
-  );
+  const commitmentId = event.params.commitmentId.toString();
+  const commitment = loadCommitment(commitmentId);
   commitment.committedAmount = BigInt.zero();
   commitment.expirationTimestamp = BigInt.zero();
   commitment.maxDuration = BigInt.zero();
   commitment.minAPY = BigInt.zero();
+  commitment.maxPrincipalPerCollateralAmount = BigInt.zero();
   commitment.save();
 }
 
@@ -757,11 +767,8 @@ export function handleDeletedCommitments(events: DeletedCommitment[]): void {
 }
 
 export function handleExercisedCommitment(event: ExercisedCommitment): void {
-  const commitment = loadCommitmentByMarketId(
-    event.params.lender,
-    event.params.marketId.toString(),
-    event.params.lendingToken
-  );
+  const commitmentId = event.params.commitmentId.toString();
+  const commitment = loadCommitment(commitmentId);
   const committedAmount = commitment.committedAmount;
   // Updated stored committed amount
   if (committedAmount) {

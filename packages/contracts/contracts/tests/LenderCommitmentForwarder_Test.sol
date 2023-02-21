@@ -769,7 +769,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
      *             collateral token = USDC (10**6)
      *              principal token = WETH (10**18)
      *                    principal = 1 wei
-     * max principal per collateral = 0.000001 usdc
+     * max principal per collateral = 1 wei per usdc $
     */
     function getRequiredCollateral_1_wei_loan__1_Wei_per_USDC_unit_test()
         public

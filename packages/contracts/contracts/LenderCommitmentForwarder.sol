@@ -358,7 +358,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
      */
     function getRequiredCollateral(
         uint256 _principalAmount,
-        uint256 _maxPrincipalPerCollateralAmount, //should be expressed expanded by collateralTokenDecimals and principalTokenDecimals
+        uint256 _maxPrincipalPerCollateralAmount,
         CommitmentCollateralType _collateralTokenType,
         address _collateralTokenAddress,
         address _principalTokenAddress

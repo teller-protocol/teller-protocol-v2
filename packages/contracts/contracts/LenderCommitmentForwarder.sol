@@ -247,8 +247,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint256 _commitmentId,
         uint256 _tokenAmountDelta
     ) internal {
-        commitments[_commitmentId]
-            .maxPrincipal -= _tokenAmountDelta;
+        commitments[_commitmentId].maxPrincipal -= _tokenAmountDelta;
     }
 
     /**

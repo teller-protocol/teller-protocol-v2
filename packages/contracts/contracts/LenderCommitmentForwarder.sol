@@ -33,7 +33,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
      * @param maxDuration Length of time, in seconds that the lender's capital can be lent out for.
      * @param minInterestRate Minimum Annual percentage to be applied for loans using the lender's capital.
      * @param collateralTokenAddress The address for the token contract that must be used to provide collateral for loans for this commitment.
-     * @param maxPrincipalPerCollateralAmount The amount of principal that can be used for a loan per each unit of collateral, expanded by 10^8. Use zero for no collateral required.
+     * @param maxPrincipalPerCollateralAmount The amount of principal that can be used for a loan per each unit of collateral, expanded additionally by principal decimals.
      * @param collateralTokenType The type of asset of the collateralTokenAddres (ERC20, ERC721, or ERC1155).
      * @param lender The address of the lender for this commitment.
      * @param marketId The market id for this commitment.

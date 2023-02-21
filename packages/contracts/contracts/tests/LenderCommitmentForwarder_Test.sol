@@ -32,7 +32,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
     LenderCommitmentUser private lender;
     LenderCommitmentUser private borrower;
 
-    address tokenAddress;
+    //  address tokenAddress;
     uint256 marketId;
     uint256 maxAmount;
 
@@ -47,6 +47,9 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
     bool submitBidWasCalled;
     bool submitBidWithCollateralWasCalled;
 
+    TestERC20Token principalToken;
+    uint8 constant principalTokenDecimals = 18;
+
     constructor()
         LenderCommitmentForwarder(
             address(new LenderCommitmentForwarderTest_TellerV2Mock()), ///_protocolAddress
@@ -54,13 +57,53 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         )
     {}
 
+    function setup_beforeAll() public {
+        tellerV2Mock = LenderCommitmentForwarderTest_TellerV2Mock(
+            address(getTellerV2())
+        );
+        mockMarketRegistry = MarketRegistryMock(address(getMarketRegistry()));
+
+        marketOwner = new LenderCommitmentUser(address(tellerV2Mock), (this));
+        borrower = new LenderCommitmentUser(address(tellerV2Mock), (this));
+        lender = new LenderCommitmentUser(address(tellerV2Mock), (this));
+        tellerV2Mock.__setMarketOwner(marketOwner);
+
+        mockMarketRegistry.setMarketOwner(address(marketOwner));
+
+        //tokenAddress = address(0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174);
+        marketId = 2;
+        maxAmount = 100000000000000000000;
+        maxLoanDuration = 2480000;
+        minInterestRate = 3000;
+        expiration = uint32(block.timestamp) + uint32(64000);
+
+        marketOwner.setTrustedMarketForwarder(marketId, address(this));
+        lender.approveMarketForwarder(marketId, address(this));
+
+        borrowersArray = new address[](1);
+        borrowersArray[0] = address(borrower);
+
+        principalToken = new TestERC20Token(
+            "Test Wrapped ETH",
+            "TWETH",
+            0,
+            principalTokenDecimals
+        );
+
+        delete acceptBidWasCalled;
+        delete submitBidWasCalled;
+        delete submitBidWithCollateralWasCalled;
+
+        delete commitmentCount;
+    }
+
     function _createCommitment(
         CommitmentCollateralType _collateralType,
         uint256 _maxPrincipalPerCollateral
     ) internal returns (Commitment storage commitment_) {
         commitment_ = lenderMarketCommitments[0];
         commitment_.marketId = marketId;
-        commitment_.principalTokenAddress = tokenAddress;
+        commitment_.principalTokenAddress = address(principalToken);
         commitment_.maxPrincipal = maxAmount;
         commitment_.maxDuration = maxLoanDuration;
         commitment_.minInterestRate = minInterestRate;
@@ -68,8 +111,10 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         commitment_.lender = address(lender);
 
         commitment_.collateralTokenType = _collateralType;
-        commitment_
-            .maxPrincipalPerCollateralAmount = _maxPrincipalPerCollateral;
+        commitment_.maxPrincipalPerCollateralAmount =
+            _maxPrincipalPerCollateral *
+            10**principalTokenDecimals;
+
         if (_collateralType == CommitmentCollateralType.ERC20) {
             TestERC20Token collateralToken = new TestERC20Token(
                 "Test Collateral Token",
@@ -89,45 +134,12 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         }
     }
 
-    function setup_beforeAll() public {
-        tellerV2Mock = LenderCommitmentForwarderTest_TellerV2Mock(
-            address(getTellerV2())
-        );
-        mockMarketRegistry = MarketRegistryMock(address(getMarketRegistry()));
-
-        marketOwner = new LenderCommitmentUser(address(tellerV2Mock), (this));
-        borrower = new LenderCommitmentUser(address(tellerV2Mock), (this));
-        lender = new LenderCommitmentUser(address(tellerV2Mock), (this));
-        tellerV2Mock.__setMarketOwner(marketOwner);
-
-        mockMarketRegistry.setMarketOwner(address(marketOwner));
-
-        tokenAddress = address(0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174);
-        marketId = 2;
-        maxAmount = 100000000000000000000;
-        maxLoanDuration = 2480000;
-        minInterestRate = 3000;
-        expiration = uint32(block.timestamp) + uint32(64000);
-
-        marketOwner.setTrustedMarketForwarder(marketId, address(this));
-        lender.approveMarketForwarder(marketId, address(this));
-
-        borrowersArray = new address[](1);
-        borrowersArray[0] = address(borrower);
-
-        delete acceptBidWasCalled;
-        delete submitBidWasCalled;
-        delete submitBidWithCollateralWasCalled;
-
-        delete commitmentCount;
-    }
-
     function createCommitment_test() public {
         uint256 commitmentId = 0;
 
         Commitment storage existingCommitment = _createCommitment(
             CommitmentCollateralType.ERC20,
-            1000e6
+            1000e6 * 1e18
         );
 
         lender._createCommitment(existingCommitment, emptyArray);
@@ -414,6 +426,13 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
      * max principal per collateral = 500 USDC
      */
     function getRequiredCollateral_700_USDC__500_per_WETH_test() public {
+        TestERC20Token usdcToken = new TestERC20Token(
+            "Test USDC",
+            "TUSDC",
+            0,
+            6
+        );
+
         TestERC20Token collateralToken = new TestERC20Token(
             "Test Wrapped ETH",
             "TWETH",
@@ -422,10 +441,11 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         );
         Test.eq(
             super.getRequiredCollateral(
-                700e6, // 700 USDC loan
-                500e6, // 500 USDC per WETH
+                700 * (1e6), // 700 USDC loan
+                500 * (1e6) * (1e6), // 500 USDC loan allowed per WETH, expanded by principal token decimals
                 CommitmentCollateralType.ERC20,
-                address(collateralToken)
+                address(collateralToken),
+                address(usdcToken)
             ),
             14e17, // 1.4 WETH
             "expected 1.4 WETH collateral"
@@ -441,12 +461,20 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
     function getRequiredCollateral_700_USDC_loan__500_per_ERC1155_test()
         public
     {
+        TestERC20Token usdcToken = new TestERC20Token(
+            "Test USDC",
+            "TUSDC",
+            0,
+            6
+        );
+
         Test.eq(
             super.getRequiredCollateral(
                 700e6, // 700 USDC loan
-                500e6, // 500 USDC per NFT
+                500e6 * (10**6) * (10**0), // 500 USDC per NFT
                 CommitmentCollateralType.ERC1155,
-                address(0)
+                address(0),
+                address(usdcToken)
             ),
             2, // 2 NFTs
             "expected 2 NFTs collateral"
@@ -460,12 +488,20 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
      * max principal per collateral = 500 USDC
      */
     function getRequiredCollateral_500_USDC_loan__500_per_ERC721_test() public {
+        TestERC20Token usdcToken = new TestERC20Token(
+            "Test USDC",
+            "TUSDC",
+            0,
+            6
+        );
+
         Test.eq(
             super.getRequiredCollateral(
                 500e6, // 7500 USDC loan
-                500e6, // 500 USDC per NFT
+                500e6 * (1e6), // 500 USDC per NFT, expanded by principal token decimals
                 CommitmentCollateralType.ERC721,
-                address(0)
+                address(0),
+                address(usdcToken)
             ),
             1, // 1 NFT
             "expected 1 NFT collateral"
@@ -488,12 +524,122 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         Test.eq(
             super.getRequiredCollateral(
                 1e18, // 1 WETH loan
-                59e13, // 0.00059 WETH per USDC
+                59e13 * (1e18), // 0.00059 WETH per USDC base unit   
                 CommitmentCollateralType.ERC20,
-                address(collateralToken)
+                address(collateralToken),
+                address(principalToken)
             ),
             1_694_915_255, // 1,694.915255 USDC (1694.915254237 rounded up to 6 decimals)
             "expected 1,694.915255 USDC collateral"
+        );
+    }
+
+
+    /**
+     *             collateral token = WETH (10**18)
+     *              principal token = USDC (10**6)
+     *                    principal = 1000 USDC $
+     * max principal per collateral = 1.0 WETH
+     */
+    function getRequiredCollateral_1000_USDC_loan_9_gwei_per_usdc_unit_test()
+        public
+    {
+        TestERC20Token usdcToken = new TestERC20Token(
+            "Test USDC",
+            "TUSDC",
+            0,
+            6
+        );
+
+        TestERC20Token collateralToken = new TestERC20Token(
+            "Test WETH",
+            "TWETH",
+            0,
+            18
+        );
+
+        Test.eq(
+            super.getRequiredCollateral(
+                1000 * (1e6), // 1000 USDC loan  //principal
+                1e9 * (1e6), // 1000000000 wei  per USDC base unit   //ratio
+                CommitmentCollateralType.ERC20,
+                address(collateralToken),
+                address(usdcToken)
+            ),
+            1e18, // 1 wETH
+            "expected 1 ETH required collateral"
+        );
+    }
+
+
+    /**
+     *             collateral token = WETH (10**18)
+     *              principal token = USDC (10**6)
+     *                    principal = 8888 USDC $
+     * max principal per collateral = 1 gwei per USDDC base unit
+     */
+    function getRequiredCollateral_8888_USDC_loan__9_gwei_per_usdc_unit_test()
+        public
+    {
+        TestERC20Token usdcToken = new TestERC20Token(
+            "Test USDC",
+            "TUSDC",
+            0,
+            6
+        );
+
+        TestERC20Token collateralToken = new TestERC20Token(
+            "Test WETH",
+            "TWETH",
+            0,
+            18
+        );
+
+        Test.eq(
+            super.getRequiredCollateral(
+                8888 * (1e6), // 8888 USDC loan  //principal
+                1e9 * (1e6), // 1000000000 wei  per USDC base unit   //ratio
+                CommitmentCollateralType.ERC20,
+                address(collateralToken),
+                address(usdcToken)
+            ),
+            8888e15, // 8.888 wETH
+            "expected 1 ETH required collateral"
+        );
+    }
+
+   
+    /**
+     *             collateral token = WETH (10**18)
+     *              principal token = USDC (10**8)
+     *                    principal = 8888 USDC
+     * max principal per collateral =  8888000000 wei per USDC base unit 
+    */
+    function getRequiredCollateral_8888_USDC_loan__unit_test() public {
+        TestERC20Token usdcToken = new TestERC20Token(
+            "Test USDC",
+            "TUSDC",
+            0,
+            6
+        );
+
+        TestERC20Token collateralToken = new TestERC20Token(
+            "Test WETH",
+            "TWETH",
+            0,
+            18
+        );
+
+        Test.eq(
+            super.getRequiredCollateral(
+                8888 * (1e6), // 8888 USDC loan  //principal
+                8888000000 * (1e6), // 8888000000 wei  per USDC base unit  
+                CommitmentCollateralType.ERC20,
+                address(collateralToken),
+                address(usdcToken)
+            ),
+            1e18, // 1 wETH
+            "expected 1 ETH required collateral"
         );
     }
 
@@ -501,11 +647,18 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
      *             collateral token = USDC (10**6)
      *              principal token = GWEI (10**9)
      *                    principal = 6 GWEI
-     * max principal per collateral = 0.00059 WETH
+     * max principal per collateral = 0.00059 USDC per gwei
      */
     function getRequiredCollateral_6_GWEI_loan__00059_WETH_per_USDC_test()
         public
     {
+        TestERC20Token gweiToken = new TestERC20Token(
+            "Test USDC",
+            "TUSDC",
+            0,
+            9
+        );
+
         TestERC20Token collateralToken = new TestERC20Token(
             "Test USDC",
             "TUSDC",
@@ -515,9 +668,10 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         Test.eq(
             super.getRequiredCollateral(
                 6 gwei, // 6 GWEI loan
-                59e13, // 0.00059 WETH per USDC
+                59e13 * (1e9), // 0.00059 USDC per gwei
                 CommitmentCollateralType.ERC20,
-                address(collateralToken)
+                address(collateralToken),
+                address(gweiToken)
             ),
             11, // 0.000011 USDC (0.000010169 rounded up to 6 decimals)
             "expected 0.000011 USDC collateral"
@@ -528,7 +682,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
      *             collateral token = USDC (10**6)
      *              principal token = WEI (10**0)
      *                    principal = 1 WEI
-     * max principal per collateral = 0.00059 WETH
+     * max principal per collateral = // 0.00059 WETH per usdc base unit
      */
     function getRequiredCollateral_1_WEI_loan__00059_WETH_per_USDC_test()
         public
@@ -542,11 +696,99 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         Test.eq(
             super.getRequiredCollateral(
                 1, // 1 WEI loan
-                59e13, // 0.00059 WETH per USDC
+                59e13 * 1e18, // 0.00059 WETH per USDC base unit 
                 CommitmentCollateralType.ERC20,
-                address(collateralToken)
+                address(collateralToken),
+                address(principalToken)
             ),
-            1, // 0.000001 USDC
+            1, // 0.001695 USDC rounded up
+            "expected at least 1 unit of collateral"
+        );
+    }
+
+
+
+    /**
+     *             collateral token = USDC (10**6)
+     *              principal token = WETH (10**18)
+     *                    principal = 1 GWEI
+     * max principal per collateral = 0.00059 WETH per gwei
+    */
+    function getRequiredCollateral_1_GWEI_loan__00059_WETH_per_USDC_test()
+        public
+    {
+        TestERC20Token collateralToken = new TestERC20Token(
+            "Test USDC",
+            "TUSDC",
+            0,
+            6
+        );
+        Test.eq(
+            super.getRequiredCollateral(
+                1e9, // 1 GWEI loan
+                59e13 * 1e18, // 0.00059 WETH per USDC base unit (hence why not multiplying by 1e6)
+                CommitmentCollateralType.ERC20,
+                address(collateralToken),
+                address(principalToken)
+            ),
+            2,
+            "expected at least 2 units of collateral"
+        );
+    }
+
+
+
+    /**
+     *             collateral token = USDC (10**6)
+     *              principal token = WETH (10**18)
+     *                    principal = 1 GWEI
+     * max principal per collateral = 1 wei per usdc $
+     */
+    function getRequiredCollateral_1_wei_loan__1_Wei_per_USDC_test() public {
+        TestERC20Token collateralToken = new TestERC20Token(
+            "Test USDC",
+            "TUSDC",
+            0,
+            6
+        );
+        Test.eq(
+            super.getRequiredCollateral(
+                1e9, // 1 gwei
+                (1 * 1e6) * 1e18, // must provide 1:1 ratio usdc $ to wei
+                CommitmentCollateralType.ERC20,
+                address(collateralToken),
+                address(principalToken)
+            ),
+            1e3*1e6, // 1000 usdc $
+            "expected at least 1 unit of collateral"
+        );
+    }
+
+
+    /**
+     *             collateral token = USDC (10**6)
+     *              principal token = WETH (10**18)
+     *                    principal = 1 wei
+     * max principal per collateral = 1 wei per usdc $
+    */
+    function getRequiredCollateral_1_wei_loan__1_Wei_per_USDC_unit_test()
+        public
+    {
+        TestERC20Token collateralToken = new TestERC20Token(
+            "Test USDC",
+            "TUSDC",
+            0,
+            6
+        );
+        Test.eq(
+            super.getRequiredCollateral(
+                1, // 1 wei
+                (1 * 1e6) * 1e18, // must provide 1 usdc to get loan of 1 wei, expanded by principal decimals
+                CommitmentCollateralType.ERC20,
+                address(collateralToken),
+                address(principalToken)
+            ),
+            1, // 1 usdc base unit 
             "expected at least 1 unit of collateral"
         );
     }

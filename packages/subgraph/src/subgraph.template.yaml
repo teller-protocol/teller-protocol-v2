@@ -63,6 +63,8 @@ dataSources:
           handler: handleSetMarketFeeRecipient
         - event: SetPaymentCycleDuration(uint256,uint32)
           handler: handleSetPaymentCycleDuration
+        - event: SetPaymentCycle(uint256,uint8,uint32)
+          handler: handleSetPaymentCycle
         - event: SetPaymentDefaultDuration(uint256,uint32)
           handler: handleSetPaymentDefaultDuration
         - event: SetBidExpirationTime(uint256,uint32)

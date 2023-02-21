@@ -8,6 +8,9 @@ import {
   CollateralClaimed
 } from "../generated/CollateralManager/CollateralManager";
 import {
+  Transfer
+} from "../generated/LenderManager/LenderManager";
+import {
   CreatedCommitment,
   DeletedCommitment,
   ExercisedCommitment,
@@ -921,14 +924,14 @@ export function handleCollateralClaimeds(events: CollateralClaimed[]): void {
  * Sets a new lender when a bid is accepted or the ownership of a loan is transferred.
  * @param event NewLenderSet
  */
-export function handleNewLenderSet(event: NewLenderSet): void {
-  const bid = loadBidById(event.params._bidId.toString());
-  bid.lenderAddress = event.params.lender
+export function handleNewLenderSet(event: Transfer): void {
+  const bid = loadBidById(event.params.tokenId.toString());
+  bid.lenderAddress = event.params.to;
 
   const lender: Lender = loadLenderByMarketId(
-      event.params.lender,
-      bid.marketplaceId.toString(),
-      event.block.timestamp
+    event.params.to,
+    bid.marketplaceId.toString(),
+    event.block.timestamp
   );
   const lenderBid = new LenderBid(lender.id.concat(bid.id));
   lenderBid.bid = bid.id;
@@ -937,8 +940,8 @@ export function handleNewLenderSet(event: NewLenderSet): void {
   bid.save();
 }
 
-export function handleNewLenderSets(events: NewLenderSet[]): void {
+export function handleNewLenderSets(events: Transfer[]): void {
   events.forEach(event => {
     handleNewLenderSet(event);
-  })
+  });
 }

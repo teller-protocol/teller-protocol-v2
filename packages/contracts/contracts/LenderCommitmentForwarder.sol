@@ -377,14 +377,12 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
                 _collateralTokenAddress
             ).decimals();
         }
-
-<<<<<<< HEAD
-=======
+ 
         //principal will always be ERC20
         principalDecimals = IERC20MetadataUpgradeable(_principalTokenAddress)
             .decimals();
 
->>>>>>> 4e428c8d1cff81e05eda0f446ae55b7fc2259599
+ 
         /*
 
         The principalAmount is expanded by (collateralDecimals+principalDecimals)

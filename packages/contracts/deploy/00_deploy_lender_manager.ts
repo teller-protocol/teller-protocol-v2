@@ -21,16 +21,11 @@ const deployFn: DeployFunction = async (hre) => {
       execute: {
         init,
       },
-      upgradeIndex: 0,
+      upgradeIndex: 1,
     },
-    skipIfAlreadyDeployed: true,
+    skipIfAlreadyDeployed: false,
     hre,
   })
-}
-
-interface DeployArgs {
-  implName: string
-  init: { methodName: string; args: any[] }
 }
 
 // tags and deployment

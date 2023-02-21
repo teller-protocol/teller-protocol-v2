@@ -105,11 +105,13 @@ dataSources:
         - name: LenderCommitmentForwarder
           file: ./abis/{{network}}_LenderCommitmentForwarder.json
       eventHandlers:
-        - event: UpdatedCommitment(indexed address,indexed uint256,indexed address,uint256)
+        - event: CreatedCommitment(indexed uint256,address,uint256,address,uint256)
+          handler: handleCreatedCommitment
+        - event: UpdatedCommitment(indexed uint256,address,uint256,address,uint256)
           handler: handleUpdatedCommitment
-        - event: DeletedCommitment(indexed address,indexed uint256,indexed address)
+        - event: DeletedCommitment(indexed uint256)
           handler: handleDeletedCommitment
-        - event: ExercisedCommitment(indexed address,indexed uint256,indexed address,uint256,uint256)
+        - event: ExercisedCommitment(indexed uint256,address,uint256,address,uint256,indexed uint256)
           handler: handleExercisedCommitment
       file: ./src/mapping.ts
   - kind: ethereum/contract

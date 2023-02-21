@@ -51,6 +51,7 @@ export function loadMarketById(id: string): MarketPlace {
     marketPlace._durationTotal = BigInt.zero();
     marketPlace.totalNumberOfLenders = BigInt.zero();
     marketPlace.paymentType = "EMI";
+    marketPlace.paymentCycleType = "Seconds";
   }
   marketPlace.save();
   return marketPlace;

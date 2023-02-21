@@ -101,7 +101,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         CommitmentCollateralType _collateralType,
         uint256 _maxPrincipalPerCollateral
     ) internal returns (Commitment storage commitment_) {
-        commitment_ = lenderMarketCommitments[0];
+        commitment_ = commitments[0];
         commitment_.marketId = marketId;
         commitment_.principalTokenAddress = address(principalToken);
         commitment_.maxPrincipal = maxAmount;

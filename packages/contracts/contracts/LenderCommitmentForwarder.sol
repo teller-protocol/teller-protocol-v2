@@ -34,7 +34,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
      * @param minInterestRate Minimum Annual percentage to be applied for loans using the lender's capital.
      * @param collateralTokenAddress The address for the token contract that must be used to provide collateral for loans for this commitment.
      * @param maxPrincipalPerCollateralAmount The amount of principal that can be used for a loan per each unit of collateral, expanded additionally by principal decimals.
-     * @param collateralTokenType The type of asset of the collateralTokenAddres (ERC20, ERC721, or ERC1155).
+     * @param collateralTokenType The type of asset of the collateralTokenAddress (ERC20, ERC721, or ERC1155).
      * @param lender The address of the lender for this commitment.
      * @param marketId The market id for this commitment.
      * @param principalTokenAddress The address for the token contract that will be used to provide principal for loans of this commitment.
@@ -53,11 +53,8 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         address principalTokenAddress;
     }
 
-    // Mapping of lender address => market ID => lending token => commitment
-    //mapping(address => mapping(uint256 => mapping(address => Commitment))) public __lenderMarketCommitments_deprecated;
-
     // CommitmentId => commitment
-    mapping(uint256 => Commitment) public lenderMarketCommitments;
+    mapping(uint256 => Commitment) public commitments;
 
     uint256 commitmentCount;
 
@@ -127,7 +124,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
 
     modifier commitmentLender(uint256 _commitmentId) {
         require(
-            lenderMarketCommitments[_commitmentId].lender == _msgSender(),
+            commitments[_commitmentId].lender == _msgSender(),
             "unauthorized commitment lender"
         );
         _;
@@ -182,9 +179,9 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             "unauthorized commitment creator"
         );
 
-        lenderMarketCommitments[commitmentId_] = _commitment;
+        commitments[commitmentId_] = _commitment;
 
-        validateCommitment(lenderMarketCommitments[commitmentId_]);
+        validateCommitment(commitments[commitmentId_]);
 
         for (uint256 i = 0; i < borrowerAddressList.length; i++) {
             commitmentBorrowersList[commitmentId_].add(borrowerAddressList[i]);
@@ -209,9 +206,9 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         Commitment calldata _commitment,
         address[] calldata borrowerAddressList
     ) public commitmentLender(_commitmentId) {
-        lenderMarketCommitments[_commitmentId] = _commitment;
+        commitments[_commitmentId] = _commitment;
 
-        validateCommitment(lenderMarketCommitments[_commitmentId]);
+        validateCommitment(commitments[_commitmentId]);
 
         delete commitmentBorrowersList[_commitmentId];
 
@@ -237,7 +234,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         public
         commitmentLender(_commitmentId)
     {
-        delete lenderMarketCommitments[_commitmentId];
+        delete commitments[_commitmentId];
         emit DeletedCommitment(_commitmentId);
     }
 
@@ -250,7 +247,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint256 _commitmentId,
         uint256 _tokenAmountDelta
     ) internal {
-        lenderMarketCommitments[_commitmentId]
+        commitments[_commitmentId]
             .maxPrincipal -= _tokenAmountDelta;
     }
 
@@ -269,7 +266,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
     ) external returns (uint256 bidId) {
         address borrower = _msgSender();
 
-        Commitment storage commitment = lenderMarketCommitments[_commitmentId];
+        Commitment storage commitment = commitments[_commitmentId];
 
         validateCommitment(commitment);
 

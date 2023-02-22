@@ -93,6 +93,14 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint256 tokenAmount
     );
 
+     /**
+     * @notice This event is emitted when the allowed borrowers for a commitment is updated.
+     * @param commitmentId The id of the commitment that was updated.
+     */
+    event UpdatedCommitmentBorrowers(
+        uint256 indexed commitmentId
+    );
+
     /**
      * @notice This event is emitted when a lender's commitment has been deleted.
      * @param commitmentId The id of the commitment that was deleted.
@@ -166,10 +174,12 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
     /**
      * @notice Creates a loan commitment from a lender for a market.
      * @param _commitment The new commitment data expressed as a struct
+     * @param _borrowerAddressList The array of borrowers that are allowed to accept loans using this commitment
+     * @return commitmentId_ returns the commitmentId for the created commitment
      */
     function createCommitment(
         Commitment calldata _commitment,
-        address[] calldata borrowerAddressList
+        address[] calldata _borrowerAddressList
     ) public returns (uint256 commitmentId_) {
         commitmentId_ = commitmentCount++;
 
@@ -182,7 +192,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
 
         validateCommitment(commitments[commitmentId_]);
 
-        _addBorrowersToCommitmentAllowlist(commitmentId_,borrowerAddressList);
+        _addBorrowersToCommitmentAllowlist(commitmentId_,_borrowerAddressList);
         
         emit CreatedCommitment(
             commitmentId_,
@@ -196,12 +206,11 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
     /**
      * @notice Updates the commitment of a lender to a market.
      * @param _commitmentId The Id of the commitment to update.
-     * @param _commitment The new commitment data expressed as a struct
+     * @param _commitment The new commitment data expressed as a struct 
      */
     function updateCommitment(
         uint256 _commitmentId,
-        Commitment calldata _commitment,
-        address[] calldata borrowerAddressList
+        Commitment calldata _commitment
     ) public commitmentLender(_commitmentId) {
         require(_commitment.principalTokenAddress == commitments[_commitmentId].principalTokenAddress, "Principal token address cannot be updated.");
         require(_commitment.marketId == commitments[_commitmentId].marketId, "Market Id cannot be updated.");
@@ -210,18 +219,30 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
 
         validateCommitment(commitments[_commitmentId]);
 
-        delete commitmentBorrowersList[_commitmentId];
-
-        
-        _addBorrowersToCommitmentAllowlist(_commitmentId,borrowerAddressList);
-        
-
         emit UpdatedCommitment(
             _commitmentId,
             _commitment.lender,
             _commitment.marketId,
             _commitment.principalTokenAddress,
             _commitment.maxPrincipal
+        );
+    } 
+
+    /**
+     * @notice Updates the borrowers allowed to accept a commitment 
+     * @param _commitmentId The Id of the commitment to update. 
+     * @param _borrowerAddressList The array of borrowers that are allowed to accept loans using this commitment
+     */
+    function updateCommitmentBorrowers(
+        uint256 _commitmentId, 
+        address[] calldata _borrowerAddressList
+    ) public commitmentLender(_commitmentId) {
+         
+        delete commitmentBorrowersList[_commitmentId];
+        _addBorrowersToCommitmentAllowlist(_commitmentId,_borrowerAddressList);
+        
+        emit UpdatedCommitmentBorrowers(
+            _commitmentId 
         );
     } 
 

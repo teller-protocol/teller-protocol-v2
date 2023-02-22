@@ -164,7 +164,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             "Not the owner of created commitment"
         );
 
-        lender._updateCommitment(commitmentId, existingCommitment, emptyArray);
+        lender._updateCommitment(commitmentId, existingCommitment);
     }
 
     function deleteCommitment_test() public {
@@ -268,7 +268,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             maxAmount
         );
 
-        lender._updateCommitment(commitmentId, commitment, borrowersArray);
+        lender._updateCommitmentBorrowers(commitmentId, borrowersArray);
 
         uint256 bidId = borrower._acceptCommitment(
             commitmentId,
@@ -295,7 +295,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             maxAmount
         );
 
-        lender._updateCommitment(commitmentId, commitment, borrowersArray);
+        lender._updateCommitmentBorrowers(commitmentId, borrowersArray);
 
         bool acceptCommitAsMarketOwnerFails;
 
@@ -319,7 +319,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             "Should fail when accepting as invalid borrower"
         );
 
-        lender._updateCommitment(commitmentId, commitment, emptyArray);
+        lender._updateCommitmentBorrowers(commitmentId,  emptyArray);
 
         acceptBidWasCalled = false;
 
@@ -348,9 +348,9 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             maxAmount
         );
 
-        lender._updateCommitment(commitmentId, commitment, borrowersArray);
+        lender._updateCommitmentBorrowers(commitmentId, borrowersArray);
 
-        lender._updateCommitment(commitmentId, commitment, emptyArray);
+        lender._updateCommitmentBorrowers(commitmentId, emptyArray);
 
         marketOwner._acceptCommitment(
             commitmentId,
@@ -875,12 +875,20 @@ contract LenderCommitmentUser is User {
 
     function _updateCommitment(
         uint256 commitmentId,
-        LenderCommitmentForwarder.Commitment calldata _commitment,
-        address[] calldata borrowerAddressList
+        LenderCommitmentForwarder.Commitment calldata _commitment 
     ) public {
         commitmentForwarder.updateCommitment(
             commitmentId,
-            _commitment,
+            _commitment 
+        );
+    }
+
+      function _updateCommitmentBorrowers(
+        uint256 commitmentId, 
+        address[] calldata borrowerAddressList
+    ) public {
+        commitmentForwarder.updateCommitmentBorrowers(
+            commitmentId,
             borrowerAddressList
         );
     }

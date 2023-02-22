@@ -99,6 +99,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
 
     /**
      * @notice This event is emitted when a lender's commitment is exercised for a loan.
+     * @param commitmentId The id of the commitment that was exercised.
      * @param borrower The address of the borrower.
      * @param marketId The Id of the market the commitment applies to.
      * @param lendingToken The address of the asset being committed.

@@ -1,4 +1,4 @@
-import { Address, BigInt, Value } from "@graphprotocol/graph-ts";
+import { Address, BigInt, Bytes, Value } from "@graphprotocol/graph-ts";
 
 import { LenderCommitmentForwarder } from "../../generated/LenderCommitmentForwarder/LenderCommitmentForwarder";
 import {
@@ -258,6 +258,7 @@ export function loadCommitment(commitmentId: string): Commitment {
     commitment.collateralTokenId = BigInt.zero();
     commitment.collateralTokenType = "";
     commitment.maxPrincipalPerCollateralAmount = BigInt.zero();
+    commitment.commitmentBorrowers = [];
 
     commitment.save();
   }
@@ -311,6 +312,12 @@ export function updateLenderCommitment(
   commitment.maxPrincipalPerCollateralAmount = lenderCommitment.value6;
   commitment.collateralTokenType = lenderCommitment.value7.toString();
   commitment.principalTokenAddress = lenderCommitment.value10;
+  const borrowers = lenderCommitmentForwarderInstance.getCommitmentBorrowers(
+    BigInt.fromString(commitmentId)
+  );
+  if (borrowers) {
+    commitment.commitmentBorrowers = changetype<Bytes[]>(borrowers);
+  }
   commitment.save();
 }
 

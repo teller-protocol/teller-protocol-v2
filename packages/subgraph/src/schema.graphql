@@ -199,6 +199,8 @@ type Commitment @entity {
   collateralTokenType: String
   maxPrincipalPerCollateralAmount: BigInt!
 
+  commitmentBorrowers: [Bytes!]!
+
   # Lender
   lender: Lender!
   lenderAddress: Bytes!

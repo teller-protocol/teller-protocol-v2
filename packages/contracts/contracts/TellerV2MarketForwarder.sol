@@ -108,8 +108,7 @@ abstract contract TellerV2MarketForwarder is Initializable, ContextUpgradeable {
         bytes memory responseData;
 
         responseData = _forwardCall(
-            
-             abi.encodeWithSignature(
+            abi.encodeWithSignature(
                 "submitBid(address,uint256,uint256,uint32,uint16,string,address,(uint8,uint256,uint256,address)[])",
                 _createLoanArgs.lendingToken,
                 _createLoanArgs.marketId,

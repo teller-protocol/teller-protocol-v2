@@ -126,7 +126,6 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             10**principalTokenDecimals;
 
         if (_collateralType == CommitmentCollateralType.ERC20) {
-           
             commitment_.collateralTokenAddress = address(collateralToken);
         } else if (_collateralType == CommitmentCollateralType.ERC721) {
             commitment_.collateralTokenAddress = address(
@@ -319,7 +318,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             "Should fail when accepting as invalid borrower"
         );
 
-        lender._updateCommitmentBorrowers(commitmentId,  emptyArray);
+        lender._updateCommitmentBorrowers(commitmentId, emptyArray);
 
         acceptBidWasCalled = false;
 
@@ -875,16 +874,13 @@ contract LenderCommitmentUser is User {
 
     function _updateCommitment(
         uint256 commitmentId,
-        LenderCommitmentForwarder.Commitment calldata _commitment 
+        LenderCommitmentForwarder.Commitment calldata _commitment
     ) public {
-        commitmentForwarder.updateCommitment(
-            commitmentId,
-            _commitment 
-        );
+        commitmentForwarder.updateCommitment(commitmentId, _commitment);
     }
 
-      function _updateCommitmentBorrowers(
-        uint256 commitmentId, 
+    function _updateCommitmentBorrowers(
+        uint256 commitmentId,
         address[] calldata borrowerAddressList
     ) public {
         commitmentForwarder.updateCommitmentBorrowers(
@@ -898,7 +894,6 @@ contract LenderCommitmentUser is User {
         uint256 principal,
         uint256 collateralAmount,
         uint256 collateralTokenId,
-
         address collateralTokenAddress,
         uint16 interestRate,
         uint32 loanDuration

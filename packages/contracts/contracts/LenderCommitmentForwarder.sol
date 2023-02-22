@@ -67,15 +67,11 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
     /**
      * @notice This event is emitted when a lender's commitment is created.
      * @param lender The address of the lender.
-     * @param marketId The Id of the market the commitment applies to.
-     * @param lendingToken The address of the asset being committed.
      * @param tokenAmount The amount of the asset being committed.
      */
     event CreatedCommitment(
         uint256 indexed commitmentId,
-        address lender,
-        uint256 marketId,
-        address lendingToken,
+        address lender, 
         uint256 tokenAmount
     );
 
@@ -83,15 +79,11 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
      * @notice This event is emitted when a lender's commitment is updated.
      * @param commitmentId The id of the commitment that was updated.
      * @param lender The address of the lender.
-     * @param marketId The Id of the market the commitment applies to.
-     * @param lendingToken The address of the asset being committed.
      * @param tokenAmount The amount of the asset being committed.
      */
     event UpdatedCommitment(
         uint256 indexed commitmentId,
         address lender,
-        uint256 marketId,
-        address lendingToken,
         uint256 tokenAmount
     );
 
@@ -104,16 +96,12 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
     /**
      * @notice This event is emitted when a lender's commitment is exercised for a loan.
      * @param borrower The address of the borrower.
-     * @param marketId The Id of the market the commitment applies to.
-     * @param lendingToken The address of the asset being committed.
      * @param tokenAmount The amount of the asset being committed.
      * @param bidId The bid id for the loan from TellerV2.
      */
     event ExercisedCommitment(
         uint256 indexed commitmentId,
-        address borrower,
-        uint256 marketId,
-        address lendingToken,
+        address borrower, 
         uint256 tokenAmount,
         uint256 bidId
     );
@@ -194,8 +182,6 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         emit CreatedCommitment(
             commitmentId_,
             _commitment.lender,
-            _commitment.marketId,
-            _commitment.principalTokenAddress,
             _commitment.maxPrincipal
         );
     }
@@ -235,8 +221,6 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         emit UpdatedCommitment(
             _commitmentId,
             _commitment.lender,
-            _commitment.marketId,
-            _commitment.principalTokenAddress,
             _commitment.maxPrincipal
         );
     }
@@ -353,8 +337,6 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         emit ExercisedCommitment(
             _commitmentId,
             borrower,
-            commitment.marketId,
-            commitment.principalTokenAddress,
             _principalAmount,
             bidId
         );

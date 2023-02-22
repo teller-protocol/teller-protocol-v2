@@ -182,10 +182,8 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
 
         validateCommitment(commitments[commitmentId_]);
 
-        for (uint256 i = 0; i < borrowerAddressList.length; i++) {
-            _addBorrowerToCommitmentAllowlist(commitmentId_,borrowerAddressList[i]);
-        }
-
+        _addBorrowersToCommitmentAllowlist(commitmentId_,borrowerAddressList);
+        
         emit CreatedCommitment(
             commitmentId_,
             _commitment.lender,
@@ -214,9 +212,9 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
 
         delete commitmentBorrowersList[_commitmentId];
 
-        for (uint256 i = 0; i < borrowerAddressList.length; i++) {
-            _addBorrowerToCommitmentAllowlist(_commitmentId,borrowerAddressList[i]);
-        }
+        
+        _addBorrowersToCommitmentAllowlist(_commitmentId,borrowerAddressList);
+        
 
         emit UpdatedCommitment(
             _commitmentId,
@@ -230,13 +228,15 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
      /**
      * @notice Adds a borrower to the allowlist for a commmitment.
      * @param _commitmentId The id of the commitment that will allow the new borrower
-     * @param _borrower the address of the borrower that will be allowed to accept loans using the commitment
+     * @param _borrowerArray the address array of the borrowers that will be allowed to accept loans using the commitment
      */
-    function _addBorrowerToCommitmentAllowlist(
+    function _addBorrowersToCommitmentAllowlist(
         uint256 _commitmentId,
-        address _borrower
+        address[] calldata _borrowerArray
     ) internal {
-        commitmentBorrowersList[_commitmentId].add(_borrower);
+        for (uint256 i = 0; i < _borrowerArray.length; i++) {
+            commitmentBorrowersList[_commitmentId].add(_borrowerArray[i]);
+        }
     } 
 
 
@@ -264,30 +264,28 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
     ) internal {
         commitments[_commitmentId].maxPrincipal -= _tokenAmountDelta;
     }
-
-
-
-
-    //add borrower verified inputs to accept commitment
  
 
 
     /**
      * @notice Accept the commitment to submitBid and acceptBid using the funds
+     * @dev LoanDuration must be longer than the market payment cycle 
      * @param _commitmentId The id of the commitment being accepted.
      * @param _principalAmount The amount of currency to borrow for the loan.
      * @param _collateralAmount The amount of collateral to use for the loan.
      * @param _collateralTokenId The tokenId of collateral to use for the loan if ERC721 or ERC1155.
+     * @param _collateralTokenAddress The contract address to use for the loan collateral token.s
+     * @param _interestRate The interest rate APY to use for the loan in basis points.
+     * @param _loanDuration The overall duratiion for the loan.  Must be longer than market payment cycle duration.
      */
     function acceptCommitment(
         uint256 _commitmentId,
         uint256 _principalAmount,
         uint256 _collateralAmount,
         uint256 _collateralTokenId,
-        
         address _collateralTokenAddress,
         uint16 _interestRate,
-        uint32  _loanDuration //must be longer than the market payment cycle 
+        uint32  _loanDuration 
     ) external returns (uint256 bidId) {
         address borrower = _msgSender();
 

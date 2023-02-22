@@ -50,6 +50,9 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
     TestERC20Token principalToken;
     uint8 constant principalTokenDecimals = 18;
 
+    TestERC20Token collateralToken;
+    uint8 constant collateralTokenDecimals = 6;
+
     constructor()
         LenderCommitmentForwarder(
             address(new LenderCommitmentForwarderTest_TellerV2Mock()), ///_protocolAddress
@@ -90,6 +93,13 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             principalTokenDecimals
         );
 
+        collateralToken = new TestERC20Token(
+            "Test USDC",
+            "TUSDC",
+            0,
+            collateralTokenDecimals
+        );
+
         delete acceptBidWasCalled;
         delete submitBidWasCalled;
         delete submitBidWithCollateralWasCalled;
@@ -116,12 +126,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             10**principalTokenDecimals;
 
         if (_collateralType == CommitmentCollateralType.ERC20) {
-            TestERC20Token collateralToken = new TestERC20Token(
-                "Test Collateral Token",
-                "TCT",
-                0,
-                18
-            );
+           
             commitment_.collateralTokenAddress = address(collateralToken);
         } else if (_collateralType == CommitmentCollateralType.ERC721) {
             commitment_.collateralTokenAddress = address(
@@ -202,7 +207,10 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             commitmentId,
             maxAmount - 100, //principal
             maxAmount, //collateralAmount
-            0 //collateralTokenId
+            0, //collateralTokenId
+            address(collateralToken),
+            minInterestRate,
+            maxLoanDuration
         );
 
         Test.eq(
@@ -221,7 +229,10 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             commitmentId,
             100, //principalAmount
             100, //collateralAmount
-            0 //collateralTokenId
+            0, //collateralTokenId
+            address(collateralToken),
+            minInterestRate,
+            maxLoanDuration
         );
 
         Test.eq(commitment.maxPrincipal == 0, true, "commitment not accepted");
@@ -233,7 +244,10 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
                 commitmentId,
                 100, //principalAmount
                 100, //collateralAmount
-                0 //collateralTokenId
+                0, //collateralTokenId
+                address(collateralToken),
+                minInterestRate,
+                maxLoanDuration
             )
         {} catch {
             acceptCommitTwiceFails = true;
@@ -260,7 +274,10 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             commitmentId,
             0, //principal
             maxAmount, //collateralAmount
-            0 //collateralTokenId
+            0, //collateralTokenId
+            address(collateralToken),
+            minInterestRate,
+            maxLoanDuration
         );
 
         Test.eq(
@@ -287,7 +304,10 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
                 commitmentId,
                 100, //principal
                 maxAmount, //collateralAmount
-                0 //collateralTokenId
+                0, //collateralTokenId
+                address(collateralToken),
+                minInterestRate,
+                maxLoanDuration
             )
         {} catch {
             acceptCommitAsMarketOwnerFails = true;
@@ -307,7 +327,10 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             commitmentId,
             0, //principal
             maxAmount, //collateralAmount
-            0 //collateralTokenId
+            0, //collateralTokenId
+            address(collateralToken),
+            minInterestRate,
+            maxLoanDuration
         );
 
         Test.eq(
@@ -333,7 +356,10 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             commitmentId,
             0, //principal
             maxAmount, //collateralAmount
-            0 //collateralTokenId
+            0, //collateralTokenId
+            address(collateralToken),
+            minInterestRate,
+            maxLoanDuration
         );
 
         Test.eq(
@@ -358,7 +384,10 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
                 commitmentId,
                 100, //principal
                 0, //collateralAmount
-                0 //collateralTokenId
+                0, //collateralTokenId
+                address(collateralToken),
+                minInterestRate,
+                maxLoanDuration
             )
         {} catch {
             failedToAcceptCommitment = true;
@@ -386,7 +415,10 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
                 commitmentId,
                 100, //principal
                 2, //collateralAmount
-                22 //collateralTokenId
+                22, //collateralTokenId
+                address(collateralToken),
+                minInterestRate,
+                maxLoanDuration
             )
         {} catch {
             failedToAcceptCommitment = true;
@@ -857,14 +889,21 @@ contract LenderCommitmentUser is User {
         uint256 commitmentId,
         uint256 principal,
         uint256 collateralAmount,
-        uint256 collateralTokenId
+        uint256 collateralTokenId,
+
+        address collateralTokenAddress,
+        uint16 interestRate,
+        uint32 loanDuration
     ) public returns (uint256) {
         return
             commitmentForwarder.acceptCommitment(
                 commitmentId,
                 principal,
                 collateralAmount,
-                collateralTokenId
+                collateralTokenId,
+                collateralTokenAddress,
+                interestRate,
+                loanDuration
             );
     }
 

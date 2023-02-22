@@ -166,7 +166,7 @@ contract TellerV2 is
      * @param _reputationManager The address of the reputation manager contract.
      * @param _lenderCommitmentForwarder The address of the lender commitment forwarder contract.
      * @param _lendingTokens The list of tokens allowed as lending assets on the protocol.
-     * @param _collateralManagerAddress The address of the collateral manager contracts.
+     * @param _collateralManager The address of the collateral manager contracts.
      * @param _lenderManager The address of the lender manager contract for loans on the protocol.
      */
     function initialize(
@@ -175,7 +175,7 @@ contract TellerV2 is
         address _reputationManager,
         address _lenderCommitmentForwarder,
         address[] calldata _lendingTokens,
-        address _collateralManagerAddress,
+        address _collateralManager,
         address _lenderManager
     ) external initializer {
         __ProtocolFee_init(_protocolFee);

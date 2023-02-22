@@ -715,7 +715,6 @@ export function handleTellerV2Upgraded(event: Upgraded): void {
 
 export function handleCreatedCommitment(event: CreatedCommitment): void {
   const commitmentId = event.params.commitmentId.toString();
-  const commitment = loadCommitment(commitmentId);
   updateLenderCommitment(
     commitmentId,
     event.params.lender,
@@ -724,7 +723,6 @@ export function handleCreatedCommitment(event: CreatedCommitment): void {
     event.params.tokenAmount,
     event.address
   );
-  commitment.save();
 }
 
 export function handleCreatedCommitments(events: CreatedCommitment[]): void {
@@ -735,7 +733,6 @@ export function handleCreatedCommitments(events: CreatedCommitment[]): void {
 
 export function handleUpdatedCommitment(event: UpdatedCommitment): void {
   const commitmentId = event.params.commitmentId.toString();
-  const commitment = loadCommitment(commitmentId);
   updateLenderCommitment(
     commitmentId,
     event.params.lender,

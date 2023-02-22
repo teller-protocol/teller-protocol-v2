@@ -424,7 +424,6 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
 
         /*
 
-        The principalAmount is expanded by (collateralDecimals+principalDecimals)
         The principalAmount is expanded by (collateralDecimals+principalDecimals) to increase precision
         and then it is divided by _maxPrincipalPerCollateralAmount which should already been expanded by principalDecimals
         */

@@ -300,7 +300,7 @@ export function updateLenderCommitment(
   const lenderCommitmentForwarderInstance = LenderCommitmentForwarder.bind(
     eventAddress
   );
-  const lenderCommitment = lenderCommitmentForwarderInstance.lenderMarketCommitments(
+  const lenderCommitment = lenderCommitmentForwarderInstance.commitments(
     BigInt.fromString(commitmentId)
   );
 
@@ -312,12 +312,6 @@ export function updateLenderCommitment(
   commitment.maxPrincipalPerCollateralAmount = lenderCommitment.value6;
   commitment.collateralTokenType = lenderCommitment.value7.toString();
   commitment.principalTokenAddress = lenderCommitment.value10;
-  const borrowers = lenderCommitmentForwarderInstance.getCommitmentBorrowers(
-    BigInt.fromString(commitmentId)
-  );
-  if (borrowers) {
-    commitment.commitmentBorrowers = changetype<Bytes[]>(borrowers);
-  }
   commitment.save();
 }
 

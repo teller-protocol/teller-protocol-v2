@@ -1,5 +1,6 @@
 {
   "1665199139__set_goerli_commitment_forwarder.ts": 1665201712,
   "1665202865__set_goerli_telleras_on_marketregistry.ts": 1665204147,
-  "1671231764__transfer_collateralLManager_ownership_to_tellerv2.ts": 1672794417
+  "1671231764__transfer_collateralLManager_ownership_to_tellerv2.ts": 1672794417,
+  "1676322266__tellerv2_set_lender_manager.ts": 1676659899
 }

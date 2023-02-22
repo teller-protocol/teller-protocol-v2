@@ -1,7 +1,7 @@
 pragma solidity >=0.8.0 <0.9.0;
 // SPDX-License-Identifier: MIT
 
-import "./TellerV2.sol";
+import "./interfaces/ITellerV2.sol";
 
 import "./interfaces/IMarketRegistry.sol";
 
@@ -36,8 +36,8 @@ abstract contract TellerV2MarketForwarder is Initializable, ContextUpgradeable {
         _marketRegistry = _marketRegistryAddress;
     }
 
-    function getTellerV2() public view returns (TellerV2) {
-        return TellerV2(_tellerV2);
+    function getTellerV2() public view returns (address) {
+        return _tellerV2;
     }
 
     function getMarketRegistry() public view returns (address) {
@@ -78,15 +78,9 @@ abstract contract TellerV2MarketForwarder is Initializable, ContextUpgradeable {
     ) internal virtual returns (uint256 bidId) {
         bytes memory responseData;
 
-        bytes4 submitBidSelector = bytes4(
-            keccak256(
-                "ITellerV2.submitBid(address,uint256,uint256,uint32,uint16,string,address)"
-            )
-        );
-
         responseData = _forwardCall(
-            abi.encodeWithSelector(
-                submitBidSelector,
+            abi.encodeWithSignature(
+                "submitBid(address,uint256,uint256,uint32,uint16,string,address)",
                 _createLoanArgs.lendingToken,
                 _createLoanArgs.marketId,
                 _createLoanArgs.principal,
@@ -94,6 +88,36 @@ abstract contract TellerV2MarketForwarder is Initializable, ContextUpgradeable {
                 _createLoanArgs.interestRate,
                 _createLoanArgs.metadataURI,
                 _createLoanArgs.recipient
+            ),
+            _borrower
+        );
+
+        return abi.decode(responseData, (uint256));
+    }
+
+    /**
+     * @notice Creates a new loan using the TellerV2 lending protocol.
+     * @param _createLoanArgs Details describing the loan agreement.]
+     * @param _borrower The borrower address for the new loan.
+     */
+    function _submitBidWithCollateral(
+        CreateLoanArgs memory _createLoanArgs,
+        Collateral[] memory _collateralInfo,
+        address _borrower
+    ) internal virtual returns (uint256 bidId) {
+        bytes memory responseData;
+
+        responseData = _forwardCall(
+            abi.encodeWithSignature(
+                "submitBid(address,uint256,uint256,uint32,uint16,string,address,(uint8,uint256,uint256,address)[])",
+                _createLoanArgs.lendingToken,
+                _createLoanArgs.marketId,
+                _createLoanArgs.principal,
+                _createLoanArgs.duration,
+                _createLoanArgs.interestRate,
+                _createLoanArgs.metadataURI,
+                _createLoanArgs.recipient,
+                _collateralInfo
             ),
             _borrower
         );

@@ -1,0 +1,3 @@
+[submodule "packages/contracts/teller-math-lib"]
+	path = packages/contracts/teller-math-lib
+	url = git@github.com:teller-protocol/teller-math-lib.git

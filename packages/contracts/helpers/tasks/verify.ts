@@ -1,3 +1,4 @@
+import { ContractByName } from '@tenderly/hardhat-tenderly/dist/tenderly/types'
 import { task } from 'hardhat/config'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
 
@@ -24,22 +25,17 @@ const tenderlyVerify = async (
   const { deployments, tenderly } = hre
 
   const allDeployments = await deployments.all().then((all) =>
-    Object.entries(all).map(([name, { address }]) => ({
-      name: name,
-      customName: name,
-      address,
-    }))
+    Object.entries(all).map<ContractByName>(
+      ([name, { address, libraries }]) => ({
+        name,
+        address,
+        libraries,
+      })
+    )
   )
 
   // await to make sure contracts are verified and pushed
-  await Promise.all(
-    allDeployments.map(async (deployment) => {
-      await Promise.all([
-        tenderly.verify(deployment),
-        tenderly.push(deployment),
-      ])
-    })
-  )
+  await tenderly.verify(...allDeployments)
 }
 
 task(

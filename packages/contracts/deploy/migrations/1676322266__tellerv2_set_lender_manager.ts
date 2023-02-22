@@ -20,7 +20,7 @@ const deployFn: DeployFunction = migrate(
       const lenderManager = await hre.contracts.get('LenderManager')
 
       const deployer = await hre.getNamedSigner('deployer')
-      await tellerV2.connect(deployer).onUpgrade(lenderManager.address)
+      await tellerV2.connect(deployer).setLenderManager(lenderManager.address)
     }
   }
 )

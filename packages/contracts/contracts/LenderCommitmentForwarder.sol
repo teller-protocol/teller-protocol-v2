@@ -109,7 +109,6 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
      */
     event ExercisedCommitment(
         uint256 indexed commitmentId,
-        address borrower,
         uint256 marketId,
         address lendingToken,
         uint256 tokenAmount,

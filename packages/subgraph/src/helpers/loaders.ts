@@ -250,7 +250,7 @@ export function loadCommitment(commitmentId: string): Commitment {
     commitment.lender = "";
     commitment.lenderAddress = Address.zero();
     commitment.marketplace = "";
-    commitment.marketplaceId = BigInt.zero();;
+    commitment.marketplaceId = BigInt.zero();
     commitment.stats = "";
 
     commitment.principalTokenAddress = Address.zero();
@@ -281,12 +281,8 @@ export function updateLenderCommitment(
   lendingTokenAddress: Address,
   committedAmount: BigInt,
   eventAddress: Address
-): void {
+): Commitment {
   const commitment = loadCommitment(commitmentId);
-
-  const stats = new TokenVolume(`commitment-stats-${commitment.id}`);
-  initTokenVolume(stats, lendingTokenAddress);
-  stats.save();
 
   const lender = loadLenderByMarketId(lenderAddress, marketId);
 
@@ -294,7 +290,6 @@ export function updateLenderCommitment(
   commitment.lenderAddress = lender.lenderAddress;
   commitment.marketplace = marketId;
   commitment.marketplaceId = BigInt.fromString(marketId);
-  commitment.stats = stats.id;
   commitment.committedAmount = committedAmount;
 
   const lenderCommitmentForwarderInstance = LenderCommitmentForwarder.bind(
@@ -313,6 +308,7 @@ export function updateLenderCommitment(
   commitment.collateralTokenType = lenderCommitment.value7.toString();
   commitment.principalTokenAddress = lenderCommitment.value10;
   commitment.save();
+  return commitment;
 }
 
 export function getBid(

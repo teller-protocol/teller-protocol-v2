@@ -55,6 +55,7 @@ import {
   SubmittedBid,
   TellerV2
 } from "../generated/TellerV2/TellerV2";
+import { initTokenVolume } from "./helpers/intializers";
 
 import {
   getBid,
@@ -715,7 +716,7 @@ export function handleTellerV2Upgraded(event: Upgraded): void {
 
 export function handleCreatedCommitment(event: CreatedCommitment): void {
   const commitmentId = event.params.commitmentId.toString();
-  updateLenderCommitment(
+  const commitment = updateLenderCommitment(
     commitmentId,
     event.params.lender,
     event.params.marketId.toString(),
@@ -723,6 +724,13 @@ export function handleCreatedCommitment(event: CreatedCommitment): void {
     event.params.tokenAmount,
     event.address
   );
+
+  const stats = new TokenVolume(`commitment-stats-${commitment.id}`);
+  initTokenVolume(stats, event.params.lendingToken);
+  stats.save();
+
+  commitment.stats = stats.id;
+  commitment.save();
 }
 
 export function handleCreatedCommitments(events: CreatedCommitment[]): void {

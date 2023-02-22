@@ -61,15 +61,19 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
     mapping(uint256 => EnumerableSetUpgradeable.AddressSet)
         internal commitmentBorrowersList;
 
+  
     /**
      * @notice This event is emitted when a lender's commitment is created.
-     * @param commitmentId The id of the commitment that was created.
      * @param lender The address of the lender.
+     * @param marketId The Id of the market the commitment applies to.
+     * @param lendingToken The address of the asset being committed.
      * @param tokenAmount The amount of the asset being committed.
      */
     event CreatedCommitment(
         uint256 indexed commitmentId,
-        address lender, 
+        address lender,
+        uint256 marketId,
+        address lendingToken,
         uint256 tokenAmount
     );
 
@@ -77,11 +81,15 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
      * @notice This event is emitted when a lender's commitment is updated.
      * @param commitmentId The id of the commitment that was updated.
      * @param lender The address of the lender.
+     * @param marketId The Id of the market the commitment applies to.
+     * @param lendingToken The address of the asset being committed.
      * @param tokenAmount The amount of the asset being committed.
      */
     event UpdatedCommitment(
         uint256 indexed commitmentId,
         address lender,
+        uint256 marketId,
+        address lendingToken,
         uint256 tokenAmount
     );
 
@@ -181,6 +189,8 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         emit CreatedCommitment(
             commitmentId_,
             _commitment.lender,
+            _commitment.marketId,
+            _commitment.principalTokenAddress,
             _commitment.maxPrincipal
         );
     }
@@ -195,6 +205,9 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         Commitment calldata _commitment,
         address[] calldata borrowerAddressList
     ) public commitmentLender(_commitmentId) {
+        require(_commitment.principalTokenAddress == commitments[_commitmentId].principalTokenAddress, "Principal token address cannot be updated.");
+        require(_commitment.marketId == commitments[_commitmentId].marketId, "Market Id cannot be updated.");
+
         commitments[_commitmentId] = _commitment;
 
         validateCommitment(commitments[_commitmentId]);
@@ -208,6 +221,8 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         emit UpdatedCommitment(
             _commitmentId,
             _commitment.lender,
+            _commitment.marketId,
+            _commitment.principalTokenAddress,
             _commitment.maxPrincipal
         );
     } 
@@ -250,6 +265,13 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         commitments[_commitmentId].maxPrincipal -= _tokenAmountDelta;
     }
 
+
+
+
+    //add borrower verified inputs to accept commitment
+ 
+
+
     /**
      * @notice Accept the commitment to submitBid and acceptBid using the funds
      * @param _commitmentId The id of the commitment being accepted.
@@ -261,13 +283,21 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint256 _commitmentId,
         uint256 _principalAmount,
         uint256 _collateralAmount,
-        uint256 _collateralTokenId
+        uint256 _collateralTokenId,
+        
+        address _collateralTokenAddress,
+        uint16 _interestRate,
+        uint32  _loanDuration //must be longer than the market payment cycle 
     ) external returns (uint256 bidId) {
         address borrower = _msgSender();
 
         Commitment storage commitment = commitments[_commitmentId];
 
         validateCommitment(commitment);
+
+        require(_collateralTokenAddress == commitment.collateralTokenAddress,"Mismatching collateral token");
+        require(_interestRate >= commitment.minInterestRate,"Invalid interest rate");
+        require(_loanDuration <= commitment.maxDuration,"Invalid loan max duration");
 
         require(
             commitmentBorrowersList[_commitmentId].length() == 0 ||
@@ -326,8 +356,8 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             _collateralAmount,
             _collateralTokenId,
             commitment.collateralTokenType,
-            commitment.maxDuration,
-            commitment.minInterestRate
+            _loanDuration,
+            _interestRate
         );
 
         _acceptBid(bidId, commitment.lender);

@@ -65,7 +65,11 @@ const deployFn: DeployFunction = async (hre) => {
     skipIfAlreadyDeployed: true,
     hre,
   })
-  if (collateralEscrowBeaconImpl.deployResult.newlyDeployed) {
+  const currentEscrowBeaconImpl = await collateralEscrowBeacon.implementation()
+  if (
+    collateralEscrowBeaconImpl.deployResult.newlyDeployed &&
+    currentEscrowBeaconImpl !== collateralEscrowBeaconImpl.address
+  ) {
     hre.log(
       `Upgrading CollateralEscrow beacon to ${collateralEscrowBeaconImpl.address}... `,
       { indent: 2, star: true, nl: false }

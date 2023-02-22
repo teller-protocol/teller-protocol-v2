@@ -402,7 +402,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
     /**
      * @notice Calculate the amount of collateral required to borrow a loan with _principalAmount of principal
      * @param _principalAmount The amount of currency to borrow for the loan.
-     * @param _maxPrincipalPerCollateralAmount The ratio for the amount of principal that can be borrowed for each amount of collateral.  This is expanded additionally by the principal decimals.
+     * @param _maxPrincipalPerCollateralAmount The ratio for the amount of principal that can be borrowed for each amount of collateral. This is expanded additionally by the principal decimals.
      * @param _collateralTokenType The type of collateral for the loan either ERC20, ERC721, ERC1155, or None.
      * @param _collateralTokenAddress The contract address for the collateral for the loan.
      * @param _principalTokenAddress The contract address for the principal for the loan.
@@ -430,10 +430,9 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         }
 
         /*
-
-        The principalAmount is expanded by (collateralDecimals+principalDecimals) to increase precision
-        and then it is divided by _maxPrincipalPerCollateralAmount which should already been expanded by principalDecimals
-        */
+         * The principalAmount is expanded by (collateralDecimals+principalDecimals) to increase precision
+         * and then it is divided by _maxPrincipalPerCollateralAmount which should already been expanded by principalDecimals
+         */
         return
             MathUpgradeable.mulDiv(
                 _principalAmount,

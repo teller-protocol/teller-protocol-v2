@@ -65,30 +65,23 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
      * @notice This event is emitted when a lender's commitment is created.
      * @param commitmentId The id of the commitment that was created.
      * @param lender The address of the lender.
-     * @param marketId The Id of the market the commitment applies to.
-     * @param lendingToken The address of the asset being committed.
      * @param tokenAmount The amount of the asset being committed.
      */
     event CreatedCommitment(
         uint256 indexed commitmentId,
-        address lender,
-        uint256 marketId,
-        address lendingToken,
+        address lender, 
         uint256 tokenAmount
     );
 
     /**
      * @notice This event is emitted when a lender's commitment is updated.
+     * @param commitmentId The id of the commitment that was updated.
      * @param lender The address of the lender.
-     * @param marketId The Id of the market the commitment applies to.
-     * @param lendingToken The address of the asset being committed.
      * @param tokenAmount The amount of the asset being committed.
      */
     event UpdatedCommitment(
         uint256 indexed commitmentId,
         address lender,
-        uint256 marketId,
-        address lendingToken,
         uint256 tokenAmount
     );
 
@@ -102,17 +95,14 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
      * @notice This event is emitted when a lender's commitment is exercised for a loan.
      * @param commitmentId The id of the commitment that was exercised.
      * @param borrower The address of the borrower.
-     * @param marketId The Id of the market the commitment applies to.
-     * @param lendingToken The address of the asset being committed.
      * @param tokenAmount The amount of the asset being committed.
      * @param bidId The bid id for the loan from TellerV2.
      */
     event ExercisedCommitment(
         uint256 indexed commitmentId,
-        uint256 marketId,
-        address lendingToken,
+        address borrower,  
         uint256 tokenAmount,
-        uint256 indexed bidId
+        uint256 bidId
     );
 
     error InsufficientCommitmentAllocation(
@@ -166,7 +156,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
     {}
 
     /**
-     * @notice Created a loan commitment from a lender to a market.
+     * @notice Creates a loan commitment from a lender for a market.
      * @param _commitment The new commitment data expressed as a struct
      */
     function createCommitment(
@@ -185,14 +175,12 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         validateCommitment(commitments[commitmentId_]);
 
         for (uint256 i = 0; i < borrowerAddressList.length; i++) {
-            commitmentBorrowersList[commitmentId_].add(borrowerAddressList[i]);
+            _addBorrowerToCommitmentAllowlist(commitmentId_,borrowerAddressList[i]);
         }
 
         emit CreatedCommitment(
             commitmentId_,
             _commitment.lender,
-            _commitment.marketId,
-            _commitment.principalTokenAddress,
             _commitment.maxPrincipal
         );
     }
@@ -214,22 +202,32 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         delete commitmentBorrowersList[_commitmentId];
 
         for (uint256 i = 0; i < borrowerAddressList.length; i++) {
-            commitmentBorrowersList[_commitmentId].add(borrowerAddressList[i]);
+            _addBorrowerToCommitmentAllowlist(_commitmentId,borrowerAddressList[i]);
         }
 
         emit UpdatedCommitment(
             _commitmentId,
             _commitment.lender,
-            _commitment.marketId,
-            _commitment.principalTokenAddress,
             _commitment.maxPrincipal
         );
-    }
+    } 
+
+     /**
+     * @notice Adds a borrower to the allowlist for a commmitment.
+     * @param _commitmentId The id of the commitment that will allow the new borrower
+     * @param _borrower the address of the borrower that will be allowed to accept loans using the commitment
+     */
+    function _addBorrowerToCommitmentAllowlist(
+        uint256 _commitmentId,
+        address _borrower
+    ) internal {
+        commitmentBorrowersList[_commitmentId].add(_borrower);
+    } 
+
 
     /**
      * @notice Removes the commitment of a lender to a market.
      * @param _commitmentId The id of the commitment to delete.
-   
      */
     function deleteCommitment(uint256 _commitmentId)
         public
@@ -338,8 +336,6 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         emit ExercisedCommitment(
             _commitmentId,
             borrower,
-            commitment.marketId,
-            commitment.principalTokenAddress,
             _principalAmount,
             bidId
         );
@@ -390,6 +386,10 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             );
     }
 
+    /**
+     * @notice Return the array of borrowers that are allowlisted for a commitment
+     * @param _commitmentId The commitment id for the commitment to query.
+     */
     function getCommitmentBorrowers(uint256 _commitmentId)
         external
         view
@@ -398,6 +398,19 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         borrowers_ = commitmentBorrowersList[_commitmentId].values();
     }
 
+    /**
+     * @notice Internal function to submit a bid to the lending protocol using a commitment
+     * @param _borrower The address of the borrower for the loan.
+     * @param _marketId The id for the market of the loan in the lending protocol.
+     * @param _principalTokenAddress The contract address for the principal token.
+     * @param _principalAmount The amount of principal to borrow for the loan.
+     * @param _collateralTokenAddress The contract address for the collateral token.
+     * @param _collateralAmount The amount of collateral to use for the loan.
+     * @param _collateralTokenId The tokenId for the collateral (if it is ERC721 or ERC1155).
+     * @param _collateralTokenType The type of collateral token (ERC20,ERC721,ERC1177,None).
+     * @param _loanDuration The duration of the loan in seconds delta.  Must be longer than loan payment cycle for the market.
+     * @param _interestRate The amount of interest APY for the loan expressed in basis points.
+     */
     function _submitBidFromCommitment(
         address _borrower,
         uint256 _marketId,
@@ -435,6 +448,10 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         );
     }
 
+    /**
+     * @notice Return the collateral type based on the commitmentcollateral type.  Collateral type is used in the base lending protocol.
+     * @param _type The type of collateral to be used for the loan.
+     */
     function _getEscrowCollateralType(CommitmentCollateralType _type)
         internal
         pure

@@ -26,7 +26,7 @@ contract MarketRegistry is
 
     /** Constant Variables **/
 
-    uint256 public constant CURRENT_CODE_VERSION = 7;
+    uint256 public constant CURRENT_CODE_VERSION = 8;
 
     /* Storage Variables */
 
@@ -114,17 +114,6 @@ contract MarketRegistry is
             "(uint256 marketId, address borrowerAddress)",
             this
         );
-    }
-
-    /**
-     * @notice Sets the new tellerAS on upgrade
-     */
-    function onUpgrade() external {
-        require(
-            version != CURRENT_CODE_VERSION,
-            "Contract already upgraded to latest version!"
-        );
-        version = CURRENT_CODE_VERSION;
     }
 
     /**

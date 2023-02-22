@@ -81,6 +81,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
 
     /**
      * @notice This event is emitted when a lender's commitment is updated.
+     * @param commitmentId The id of the commitment that was updated.
      * @param lender The address of the lender.
      * @param marketId The Id of the market the commitment applies to.
      * @param lendingToken The address of the asset being committed.
@@ -114,7 +115,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint256 marketId,
         address lendingToken,
         uint256 tokenAmount,
-        uint256 indexed bidId
+        uint256 bidId
     );
 
     error InsufficientCommitmentAllocation(
@@ -231,7 +232,6 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
     /**
      * @notice Removes the commitment of a lender to a market.
      * @param _commitmentId The id of the commitment to delete.
-   
      */
     function deleteCommitment(uint256 _commitmentId)
         public

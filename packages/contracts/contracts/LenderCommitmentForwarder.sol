@@ -394,6 +394,10 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             );
     }
 
+    /**
+     * @notice Return the array of borrowers that are allowlisted for a commitment
+     * @param _commitmentId The commitment id for the commitment to query.
+     */
     function getCommitmentBorrowers(uint256 _commitmentId)
         external
         view
@@ -402,6 +406,19 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         borrowers_ = commitmentBorrowersList[_commitmentId].values();
     }
 
+    /**
+     * @notice Internal function to submit a bid to the lending protocol using a commitment
+     * @param _borrower The address of the borrower for the loan.
+     * @param _marketId The id for the market of the loan in the lending protocol.
+     * @param _principalTokenAddress The contract address for the principal token.
+     * @param _principalAmount The amount of principal to borrow for the loan.
+     * @param _collateralTokenAddress The contract address for the collateral token.
+     * @param _collateralAmount The amount of collateral to use for the loan.
+     * @param _collateralTokenId The tokenId for the collateral (if it is ERC721 or ERC1155).
+     * @param _collateralTokenType The type of collateral token (ERC20,ERC721,ERC1177,None).
+     * @param _loanDuration The duration of the loan in seconds delta.  Must be longer than loan payment cycle for the market.
+     * @param _interestRate The amount of interest APY for the loan expressed in basis points.
+     */
     function _submitBidFromCommitment(
         address _borrower,
         uint256 _marketId,
@@ -439,6 +456,10 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         );
     }
 
+    /**
+     * @notice Return the collateral type based on the commitmentcollateral type.  Collateral type is used in the base lending protocol.
+     * @param _type The type of collateral to be used for the loan.
+     */
     function _getEscrowCollateralType(CommitmentCollateralType _type)
         internal
         pure

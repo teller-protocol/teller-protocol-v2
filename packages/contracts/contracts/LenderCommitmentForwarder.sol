@@ -298,6 +298,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
      * @param _collateralTokenAddress The contract address to use for the loan collateral token.s
      * @param _interestRate The interest rate APY to use for the loan in basis points.
      * @param _loanDuration The overall duratiion for the loan.  Must be longer than market payment cycle duration.
+     * @return bidId The ID of the loan that was created on TellerV2
      */
     function acceptCommitment(
         uint256 _commitmentId,

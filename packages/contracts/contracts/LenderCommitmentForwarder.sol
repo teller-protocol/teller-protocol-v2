@@ -169,7 +169,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
     {}
 
     /**
-     * @notice Created a loan commitment from a lender to a market.
+     * @notice Creates a loan commitment from a lender for a market.
      * @param _commitment The new commitment data expressed as a struct
      */
     function createCommitment(
@@ -188,7 +188,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         validateCommitment(lenderMarketCommitments[commitmentId_]);
 
         for (uint256 i = 0; i < borrowerAddressList.length; i++) {
-            commitmentBorrowersList[commitmentId_].add(borrowerAddressList[i]);
+            _addBorrowerToCommitmentAllowlist(commitmentId_,borrowerAddressList[i]);
         }
 
         emit CreatedCommitment(
@@ -198,6 +198,18 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             _commitment.principalTokenAddress,
             _commitment.maxPrincipal
         );
+    }
+
+     /**
+     * @notice Adds a borrower to the allowlist for a commmitment.
+     * @param _commitmentId The id of the commitment that will allow the new borrower
+     * @param _borrower the address of the borrower that will be allowed to accept loans using the commitment
+     */
+    function _addBorrowerToCommitmentAllowlist(
+        uint256 _commitmentId,
+        address _borrower
+    ) internal {
+        commitmentBorrowersList[_commitmentId].add(_borrower);
     }
 
     /**
@@ -217,7 +229,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         delete commitmentBorrowersList[_commitmentId];
 
         for (uint256 i = 0; i < borrowerAddressList.length; i++) {
-            commitmentBorrowersList[_commitmentId].add(borrowerAddressList[i]);
+            _addBorrowerToCommitmentAllowlist(_commitmentId,borrowerAddressList[i]);
         }
 
         emit UpdatedCommitment(

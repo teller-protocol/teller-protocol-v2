@@ -186,18 +186,6 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         );
     }
 
-     /**
-     * @notice Adds a borrower to the allowlist for a commmitment.
-     * @param _commitmentId The id of the commitment that will allow the new borrower
-     * @param _borrower the address of the borrower that will be allowed to accept loans using the commitment
-     */
-    function _addBorrowerToCommitmentAllowlist(
-        uint256 _commitmentId,
-        address _borrower
-    ) internal {
-        commitmentBorrowersList[_commitmentId].add(_borrower);
-    }
-
     /**
      * @notice Updates the commitment of a lender to a market.
      * @param _commitmentId The Id of the commitment to update.
@@ -223,7 +211,20 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             _commitment.lender,
             _commitment.maxPrincipal
         );
-    }
+    } 
+
+     /**
+     * @notice Adds a borrower to the allowlist for a commmitment.
+     * @param _commitmentId The id of the commitment that will allow the new borrower
+     * @param _borrower the address of the borrower that will be allowed to accept loans using the commitment
+     */
+    function _addBorrowerToCommitmentAllowlist(
+        uint256 _commitmentId,
+        address _borrower
+    ) internal {
+        commitmentBorrowersList[_commitmentId].add(_borrower);
+    } 
+
 
     /**
      * @notice Removes the commitment of a lender to a market.

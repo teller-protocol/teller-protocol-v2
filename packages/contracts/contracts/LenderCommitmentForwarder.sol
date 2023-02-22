@@ -440,6 +440,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
     /**
      * @notice Return the array of borrowers that are allowlisted for a commitment
      * @param _commitmentId The commitment id for the commitment to query.
+     * @return borrowers_ An array of addresses restricted to accept the commitment. Empty array means unrestricted.
      */
     function getCommitmentBorrowers(uint256 _commitmentId)
         external

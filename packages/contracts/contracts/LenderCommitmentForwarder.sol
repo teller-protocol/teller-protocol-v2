@@ -257,9 +257,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         for (uint256 i = 0; i < _borrowerArray.length; i++) {
             commitmentBorrowersList[_commitmentId].add(_borrowerArray[i]);
         }
-        if (_borrowerArray.length > 0) {
-            emit UpdatedCommitmentBorrowers(_commitmentId);
-        }
+        emit UpdatedCommitmentBorrowers(_commitmentId);
     }
 
     /**

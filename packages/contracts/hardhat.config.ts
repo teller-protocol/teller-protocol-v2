@@ -235,7 +235,6 @@ export default <HardhatUserConfig>{
   networks: {
     hardhat: networkConfig({
       chainId: 31337,
-      live: true,
       allowUnlimitedContractSize: true,
       saveDeployments: !isTesting,
       forking:
@@ -266,6 +265,7 @@ export default <HardhatUserConfig>{
       url: networkUrls.goerli,
       chainId: 5,
       live: true,
+      gasPrice: ethers.utils.parseUnits('200', 'gwei').toNumber(),
 
       verify: {
         etherscan: {

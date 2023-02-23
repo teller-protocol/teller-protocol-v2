@@ -21,17 +21,15 @@ import "../contracts/escrow/CollateralEscrowV1.sol";
 import "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
 import "../contracts/LenderCommitmentForwarder.sol";
 import "./resolvers/TestERC20Token.sol";
- 
- 
+
 import "../contracts/CollateralManager.sol";
 import { Collateral } from "../contracts/interfaces/escrow/ICollateralEscrowV1.sol";
 import { PaymentType } from "../contracts/libraries/V2Calculations.sol";
 import { BidState, Payment } from "../contracts/TellerV2Storage.sol";
- 
-     
+
 import "../contracts/MetaForwarder.sol";
 import { LenderManager } from "../contracts/LenderManager.sol";
- 
+
 contract TellerV2_Test is Testable {
     TellerV2User private marketOwner;
     TellerV2User private borrower;

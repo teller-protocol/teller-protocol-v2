@@ -28,31 +28,31 @@ contract StdCheatsTest is Test {
 
     function testHoax() public {
         hoax(address(1337));
-        test.bar{value: 100}(address(1337));
+        test.bar{ value: 100 }(address(1337));
     }
 
     function testHoaxOrigin() public {
         hoax(address(1337), address(1337));
-        test.origin{value: 100}(address(1337));
+        test.origin{ value: 100 }(address(1337));
     }
 
     function testHoaxDifferentAddresses() public {
         hoax(address(1337), address(7331));
-        test.origin{value: 100}(address(1337), address(7331));
+        test.origin{ value: 100 }(address(1337), address(7331));
     }
 
     function testStartHoax() public {
         startHoax(address(1337));
-        test.bar{value: 100}(address(1337));
-        test.bar{value: 100}(address(1337));
+        test.bar{ value: 100 }(address(1337));
+        test.bar{ value: 100 }(address(1337));
         vm.stopPrank();
         test.bar(address(this));
     }
 
     function testStartHoaxOrigin() public {
         startHoax(address(1337), address(1337));
-        test.origin{value: 100}(address(1337));
-        test.origin{value: 100}(address(1337));
+        test.origin{ value: 100 }(address(1337));
+        test.origin{ value: 100 }(address(1337));
         vm.stopPrank();
         test.bar(address(this));
     }
@@ -68,7 +68,7 @@ contract StdCheatsTest is Test {
     }
 
     function testMakeAddrEquivalence() public {
-        (address addr,) = makeAddrAndKey("1337");
+        (address addr, ) = makeAddrAndKey("1337");
         assertEq(makeAddr("1337"), addr);
     }
 
@@ -114,7 +114,11 @@ contract StdCheatsTest is Test {
     }
 
     function testDeployCodeVal() public {
-        address deployed = deployCode("StdCheats.t.sol:Bar", bytes(""), 1 ether);
+        address deployed = deployCode(
+            "StdCheats.t.sol:Bar",
+            bytes(""),
+            1 ether
+        );
         assertEq(string(getCode(deployed)), string(getCode(address(test))));
         assertEq(deployed.balance, 1 ether);
     }
@@ -131,7 +135,9 @@ contract StdCheatsTest is Test {
     }
 
     function testDeployCodeFail() public {
-        vm.expectRevert(bytes("StdCheats deployCode(string): Deployment failed."));
+        vm.expectRevert(
+            bytes("StdCheats deployCode(string): Deployment failed.")
+        );
         this.deployCodeHelper("StdCheats.t.sol:RevertingContract");
     }
 
@@ -144,7 +150,10 @@ contract StdCheatsTest is Test {
             // by using o_code = new bytes(size)
             o_code := mload(0x40)
             // new "memory end" including padding
-            mstore(0x40, add(o_code, and(add(add(size, 0x20), 0x1f), not(0x1f))))
+            mstore(
+                0x40,
+                add(o_code, and(add(add(size, 0x20), 0x1f), not(0x1f)))
+            )
             // store length in memory
             mstore(o_code, size)
             // actually retrieve the code, this needs assembly
@@ -153,11 +162,15 @@ contract StdCheatsTest is Test {
     }
 
     function testDeriveRememberKey() public {
-        string memory mnemonic = "test test test test test test test test test test test junk";
+        string
+            memory mnemonic = "test test test test test test test test test test test junk";
 
         (address deployer, uint256 privateKey) = deriveRememberKey(mnemonic, 0);
         assertEq(deployer, 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266);
-        assertEq(privateKey, 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80);
+        assertEq(
+            privateKey,
+            0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+        );
     }
 
     function testBytesToUint() public {
@@ -169,10 +182,16 @@ contract StdCheatsTest is Test {
 
     function testParseJsonTxDetail() public {
         string memory root = vm.projectRoot();
-        string memory path = string.concat(root, "/test/fixtures/broadcast.log.json");
+        string memory path = string.concat(
+            root,
+            "/test/fixtures/broadcast.log.json"
+        );
         string memory json = vm.readFile(path);
         bytes memory transactionDetails = json.parseRaw(".transactions[0].tx");
-        RawTx1559Detail memory rawTxDetail = abi.decode(transactionDetails, (RawTx1559Detail));
+        RawTx1559Detail memory rawTxDetail = abi.decode(
+            transactionDetails,
+            (RawTx1559Detail)
+        );
         Tx1559Detail memory txDetail = rawToConvertedEIP1559Detail(rawTxDetail);
         assertEq(txDetail.from, 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266);
         assertEq(txDetail.to, 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512);
@@ -188,7 +207,10 @@ contract StdCheatsTest is Test {
 
     function testReadEIP1559Transaction() public view {
         string memory root = vm.projectRoot();
-        string memory path = string.concat(root, "/test/fixtures/broadcast.log.json");
+        string memory path = string.concat(
+            root,
+            "/test/fixtures/broadcast.log.json"
+        );
         uint256 index = 0;
         Tx1559 memory transaction = readTx1559(path, index);
         transaction;
@@ -196,14 +218,20 @@ contract StdCheatsTest is Test {
 
     function testReadEIP1559Transactions() public view {
         string memory root = vm.projectRoot();
-        string memory path = string.concat(root, "/test/fixtures/broadcast.log.json");
+        string memory path = string.concat(
+            root,
+            "/test/fixtures/broadcast.log.json"
+        );
         Tx1559[] memory transactions = readTx1559s(path);
         transactions;
     }
 
     function testReadReceipt() public {
         string memory root = vm.projectRoot();
-        string memory path = string.concat(root, "/test/fixtures/broadcast.log.json");
+        string memory path = string.concat(
+            root,
+            "/test/fixtures/broadcast.log.json"
+        );
         uint256 index = 5;
         Receipt memory receipt = readReceipt(path, index);
         assertEq(
@@ -214,7 +242,10 @@ contract StdCheatsTest is Test {
 
     function testReadReceipts() public view {
         string memory root = vm.projectRoot();
-        string memory path = string.concat(root, "/test/fixtures/broadcast.log.json");
+        string memory path = string.concat(
+            root,
+            "/test/fixtures/broadcast.log.json"
+        );
         Receipt[] memory receipts = readReceipts(path);
         receipts;
     }
@@ -257,7 +288,10 @@ contract StdCheatsTest is Test {
     function bytesToUint_test(bytes memory b) private pure returns (uint256) {
         uint256 number;
         for (uint256 i = 0; i < b.length; i++) {
-            number = number + uint256(uint8(b[i])) * (2 ** (8 * (b.length - (i + 1))));
+            number =
+                number +
+                uint256(uint8(b[i])) *
+                (2**(8 * (b.length - (i + 1))));
         }
         return number;
     }
@@ -265,8 +299,11 @@ contract StdCheatsTest is Test {
     function testAssumeNoPrecompiles(address addr) external {
         assumeNoPrecompiles(addr, getChain("optimism_goerli").chainId);
         assertTrue(
-            addr < address(1) || (addr > address(9) && addr < address(0x4200000000000000000000000000000000000000))
-                || addr > address(0x4200000000000000000000000000000000000800)
+            addr < address(1) ||
+                (addr > address(9) &&
+                    addr <
+                    address(0x4200000000000000000000000000000000000000)) ||
+                addr > address(0x4200000000000000000000000000000000000800)
         );
     }
 
@@ -289,8 +326,9 @@ contract StdCheatsTest is Test {
     function testAssumePayable(address addr) external {
         assumePayable(addr);
         assertTrue(
-            addr != 0x7109709ECfa91a80626fF3989D68f67F5b1DD12D && addr != 0x000000000000000000636F6e736F6c652e6c6f67
-                && addr != 0x4e59b44847b379578588920cA78FbF26c0B4956C
+            addr != 0x7109709ECfa91a80626fF3989D68f67F5b1DD12D &&
+                addr != 0x000000000000000000636F6e736F6c652e6c6f67 &&
+                addr != 0x4e59b44847b379578588920cA78FbF26c0B4956C
         );
     }
 }
@@ -312,7 +350,10 @@ contract Bar {
         require(tx.origin == expectedSender, "!prank");
     }
 
-    function origin(address expectedSender, address expectedOrigin) public payable {
+    function origin(address expectedSender, address expectedOrigin)
+        public
+        payable
+    {
         require(msg.sender == expectedSender, "!prank");
         require(tx.origin == expectedOrigin, "!prank");
     }

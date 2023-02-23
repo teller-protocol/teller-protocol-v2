@@ -6,23 +6,41 @@ import "../src/Test.sol";
 contract StdChainsTest is Test {
     function testChainRpcInitialization() public {
         // RPCs specified in `foundry.toml` should be updated.
-        assertEq(getChain(1).rpcUrl, "https://mainnet.infura.io/v3/16a8be88795540b9b3903d8de0f7baa5");
-        assertEq(getChain("optimism_goerli").rpcUrl, "https://goerli.optimism.io/");
-        assertEq(getChain("arbitrum_one_goerli").rpcUrl, "https://goerli-rollup.arbitrum.io/rpc/");
+        assertEq(
+            getChain(1).rpcUrl,
+            "https://mainnet.infura.io/v3/16a8be88795540b9b3903d8de0f7baa5"
+        );
+        assertEq(
+            getChain("optimism_goerli").rpcUrl,
+            "https://goerli.optimism.io/"
+        );
+        assertEq(
+            getChain("arbitrum_one_goerli").rpcUrl,
+            "https://goerli-rollup.arbitrum.io/rpc/"
+        );
 
         // Environment variables should be the next fallback
-        assertEq(getChain("arbitrum_nova").rpcUrl, "https://nova.arbitrum.io/rpc");
+        assertEq(
+            getChain("arbitrum_nova").rpcUrl,
+            "https://nova.arbitrum.io/rpc"
+        );
         vm.setEnv("ARBITRUM_NOVA_RPC_URL", "myoverride");
         assertEq(getChain("arbitrum_nova").rpcUrl, "myoverride");
         vm.setEnv("ARBITRUM_NOVA_RPC_URL", "https://nova.arbitrum.io/rpc");
 
         // Cannot override RPCs defined in `foundry.toml`
         vm.setEnv("MAINNET_RPC_URL", "myoverride2");
-        assertEq(getChain("mainnet").rpcUrl, "https://mainnet.infura.io/v3/16a8be88795540b9b3903d8de0f7baa5");
+        assertEq(
+            getChain("mainnet").rpcUrl,
+            "https://mainnet.infura.io/v3/16a8be88795540b9b3903d8de0f7baa5"
+        );
 
         // Other RPCs should remain unchanged.
         assertEq(getChain(31337).rpcUrl, "http://127.0.0.1:8545");
-        assertEq(getChain("sepolia").rpcUrl, "https://sepolia.infura.io/v3/f4a0bdad42674adab5fc0ac077ffab2b");
+        assertEq(
+            getChain("sepolia").rpcUrl,
+            "https://sepolia.infura.io/v3/f4a0bdad42674adab5fc0ac077ffab2b"
+        );
     }
 
     function testRpc(string memory rpcAlias) internal {
@@ -50,12 +68,16 @@ contract StdChainsTest is Test {
     }
 
     function testChainNoDefault() public {
-        vm.expectRevert("StdChains getChain(string): Chain with alias \"does_not_exist\" not found.");
+        vm.expectRevert(
+            'StdChains getChain(string): Chain with alias "does_not_exist" not found.'
+        );
         getChain("does_not_exist");
     }
 
     function testSetChainFirstFails() public {
-        vm.expectRevert("StdChains setChain(string,ChainData): Chain ID 31337 already used by \"anvil\".");
+        vm.expectRevert(
+            'StdChains setChain(string,ChainData): Chain ID 31337 already used by "anvil".'
+        );
         setChain("anvil2", ChainData("Anvil", 31337, "URL"));
     }
 
@@ -68,15 +90,23 @@ contract StdChainsTest is Test {
     }
 
     function testCannotSetChain_ChainIdExists() public {
-        setChain("custom_chain", ChainData("Custom Chain", 123456789, "https://custom.chain/"));
+        setChain(
+            "custom_chain",
+            ChainData("Custom Chain", 123456789, "https://custom.chain/")
+        );
 
-        vm.expectRevert('StdChains setChain(string,ChainData): Chain ID 123456789 already used by "custom_chain".');
+        vm.expectRevert(
+            'StdChains setChain(string,ChainData): Chain ID 123456789 already used by "custom_chain".'
+        );
 
         setChain("another_custom_chain", ChainData("", 123456789, ""));
     }
 
     function testSetChain() public {
-        setChain("custom_chain", ChainData("Custom Chain", 123456789, "https://custom.chain/"));
+        setChain(
+            "custom_chain",
+            ChainData("Custom Chain", 123456789, "https://custom.chain/")
+        );
         Chain memory customChain = getChain("custom_chain");
         assertEq(customChain.name, "Custom Chain");
         assertEq(customChain.chainId, 123456789);
@@ -102,12 +132,16 @@ contract StdChainsTest is Test {
     }
 
     function testSetNoEmptyAlias() public {
-        vm.expectRevert("StdChains setChain(string,ChainData): Chain alias cannot be the empty string.");
+        vm.expectRevert(
+            "StdChains setChain(string,ChainData): Chain alias cannot be the empty string."
+        );
         setChain("", ChainData("", 123456789, ""));
     }
 
     function testSetNoChainId0() public {
-        vm.expectRevert("StdChains setChain(string,ChainData): Chain ID cannot be 0.");
+        vm.expectRevert(
+            "StdChains setChain(string,ChainData): Chain ID cannot be 0."
+        );
         setChain("alias", ChainData("", 0, ""));
     }
 
@@ -117,26 +151,40 @@ contract StdChainsTest is Test {
     }
 
     function testGetNoEmptyAlias() public {
-        vm.expectRevert("StdChains getChain(string): Chain alias cannot be the empty string.");
+        vm.expectRevert(
+            "StdChains getChain(string): Chain alias cannot be the empty string."
+        );
         getChain("");
     }
 
     function testChainIdNotFound() public {
-        vm.expectRevert("StdChains getChain(string): Chain with alias \"no_such_alias\" not found.");
+        vm.expectRevert(
+            'StdChains getChain(string): Chain with alias "no_such_alias" not found.'
+        );
         getChain("no_such_alias");
     }
 
     function testChainAliasNotFound() public {
-        vm.expectRevert("StdChains getChain(uint256): Chain with ID 321 not found.");
+        vm.expectRevert(
+            "StdChains getChain(uint256): Chain with ID 321 not found."
+        );
         getChain(321);
     }
 
     function testSetChain_ExistingOne() public {
-        setChain("custom_chain", ChainData("Custom Chain", 123456789, "https://custom.chain/"));
+        setChain(
+            "custom_chain",
+            ChainData("Custom Chain", 123456789, "https://custom.chain/")
+        );
         assertEq(getChain(123456789).chainId, 123456789);
 
-        setChain("custom_chain", ChainData("Modified Chain", 999999999, "https://modified.chain/"));
-        vm.expectRevert("StdChains getChain(uint256): Chain with ID 123456789 not found.");
+        setChain(
+            "custom_chain",
+            ChainData("Modified Chain", 999999999, "https://modified.chain/")
+        );
+        vm.expectRevert(
+            "StdChains getChain(uint256): Chain with ID 123456789 not found."
+        );
         getChain(123456789);
 
         Chain memory modifiedChain = getChain(999999999);

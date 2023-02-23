@@ -16,11 +16,10 @@ import "../contracts/EAS/TellerAS.sol";
 
 import "../contracts/mock/WethMock.sol";
 import "../contracts/interfaces/IWETH.sol";
- 
+
 import { User } from "./Test_Helpers.sol";
-import { PaymentType ,  PaymentCycleType} from "../contracts/libraries/V2Calculations.sol";
- 
- 
+import { PaymentType, PaymentCycleType } from "../contracts/libraries/V2Calculations.sol";
+
 contract MarketRegistry_Test is Testable, TellerV2 {
     User private marketOwner;
     User private borrower;
@@ -30,9 +29,7 @@ contract MarketRegistry_Test is Testable, TellerV2 {
 
     constructor() TellerV2(address(address(0))) {}
 
- 
     function setUp() public {
- 
         marketOwner = new User(address(this));
         borrower = new User(address(this));
         lender = new User(address(this));

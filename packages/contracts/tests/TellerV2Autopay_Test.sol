@@ -23,9 +23,8 @@ import "../contracts/mock/MarketRegistryMock.sol";
 import "../contracts/interfaces/IWETH.sol";
 import "../contracts/interfaces/ITellerV2Autopay.sol";
 
- 
 import { PaymentType } from "../contracts/libraries/V2Calculations.sol";
- 
+
 contract TellerV2Autopay_Test is Testable, TellerV2Autopay {
     User private marketOwner;
     User private borrower;
@@ -91,9 +90,7 @@ contract TellerV2Autopay_Test is Testable, TellerV2Autopay {
     }
 
     function test_setAutoPayEnabled() public {
-
         setAutoPayEnabled_before();
-
 
         uint256 bidId = 0;
 
@@ -169,7 +166,6 @@ contract TellerV2Autopay_Test is Testable, TellerV2Autopay {
     }
 
     function test_autoPayLoanMinimum() public {
-
         autoPayLoanMinimum_before();
 
         uint256 bidId = 0;

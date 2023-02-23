@@ -2,7 +2,6 @@
 pragma solidity ^0.8.0;
 
 import { Testable } from "./Testable.sol";
- 
 
 import { CollateralEscrowV1 } from "../contracts/escrow/CollateralEscrowV1.sol";
 import "../contracts/mock/WethMock.sol";
@@ -46,7 +45,7 @@ contract CollateralEscrow_Test is Testable {
 
         uint256 storedBalance = borrower.getBalance(address(wethMock));
 
-        assertEq(storedBalance, 0,"Stored balance was not withdrawn");
+        assertEq(storedBalance, 0, "Stored balance was not withdrawn");
 
         try borrower.withdraw(address(wethMock), amount, address(borrower)) {
             fail("No collateral balance for asset");

@@ -1,14 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
- 
+
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "../contracts/TellerV2MarketForwarder.sol";
- 
-  
-import "./resolvers/TestERC20Token.sol"; 
-import "../contracts/TellerV2Context.sol";
 
+import "./resolvers/TestERC20Token.sol";
+import "../contracts/TellerV2Context.sol";
 
 import { Testable } from "./Testable.sol";
 import { LenderCommitmentForwarder } from "../contracts/LenderCommitmentForwarder.sol";
@@ -18,7 +16,6 @@ import { Collateral, CollateralType } from "../contracts/interfaces/escrow/IColl
 import { User } from "./Test_Helpers.sol";
 
 import "../contracts/mock/MarketRegistryMock.sol";
-
 
 contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
     LenderCommitmentForwarderTest_TellerV2Mock private tellerV2Mock;
@@ -55,9 +52,8 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             address(new MarketRegistryMock(address(0)))
         )
     {}
- 
+
     function setUp() public {
- 
         tellerV2Mock = LenderCommitmentForwarderTest_TellerV2Mock(
             address(getTellerV2())
         );
@@ -453,9 +449,8 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
      *                    principal = 700 USDC
      * max principal per collateral = 500 USDC
      */
- 
+
     function test_getRequiredCollateral_700_USDC__500_per_WETH() public {
- 
         TestERC20Token usdcToken = new TestERC20Token(
             "Test USDC",
             "TUSDC",
@@ -498,7 +493,6 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             6
         );
 
-
         assertEq(
             super.getRequiredCollateral(
                 700e6, // 700 USDC loan
@@ -518,7 +512,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
      *                    principal = 500 USDC
      * max principal per collateral = 500 USDC
      */
- 
+
     function test_getRequiredCollateral_500_USDC_loan__500_per_ERC721() public {
         TestERC20Token usdcToken = new TestERC20Token(
             "Test USDC",
@@ -527,7 +521,6 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             6
         );
 
- 
         assertEq(
             super.getRequiredCollateral(
                 500e6, // 7500 USDC loan
@@ -573,7 +566,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
      *                    principal = 1000 USDC $
      * max principal per collateral = 1.0 WETH
      */
- 
+
     function test_getRequiredCollateral_1000_USDC_loan_9_gwei_per_usdc_unit()
         public
     {
@@ -610,7 +603,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
      *                    principal = 8888 USDC $
      * max principal per collateral = 1 gwei per USDDC base unit
      */
- 
+
     function test_getRequiredCollateral_8888_USDC_loan__9_gwei_per_usdc_unit()
         public
     {
@@ -628,7 +621,6 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             18
         );
 
- 
         assertEq(
             super.getRequiredCollateral(
                 8888 * (1e6), // 8888 USDC loan  //principal
@@ -647,8 +639,8 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
      *              principal token = USDC (10**8)
      *                    principal = 8888 USDC
      * max principal per collateral =  8888000000 wei per USDC base unit
-     */ 
-    function test_getRequiredCollateral_8888_USDC_loan__unit() public { 
+     */
+    function test_getRequiredCollateral_8888_USDC_loan__unit() public {
         TestERC20Token usdcToken = new TestERC20Token(
             "Test USDC",
             "TUSDC",
@@ -662,8 +654,8 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             0,
             18
         );
- 
-        assertEq( 
+
+        assertEq(
             super.getRequiredCollateral(
                 8888 * (1e6), // 8888 USDC loan  //principal
                 8888000000 * (1e6), // 8888000000 wei  per USDC base unit
@@ -710,7 +702,8 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             "expected 0.000011 USDC collateral"
         );
     }
-   /**
+
+    /**
      *             collateral token = USDC (10**6)
      *              principal token = WEI (10**0)
      *                    principal = 1 WEI

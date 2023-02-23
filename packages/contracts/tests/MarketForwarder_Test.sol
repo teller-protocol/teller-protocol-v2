@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "hardhat/console.sol";
- 
+
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
@@ -32,11 +32,10 @@ contract MarketForwarder_Test is Testable, TellerV2MarketForwarder {
         )
     {}
 
- 
     function setUp() public {
         mockMarketRegistry = MarketRegistryMock(address(getMarketRegistry()));
         tellerV2Mock = MarketForwarderTester(address(getTellerV2()));
- 
+
         marketOwner = new MarketForwarderUser(address(tellerV2Mock));
         user1 = new MarketForwarderUser(address(tellerV2Mock));
         user2 = new MarketForwarderUser(address(tellerV2Mock));
@@ -52,7 +51,6 @@ contract MarketForwarder_Test is Testable, TellerV2MarketForwarder {
         marketOwner.setTrustedMarketForwarder(marketId, address(this));
     }
 
- 
     function test_setTrustedMarketForwarder() public {
         setTrustedMarketForwarder_before();
         assertEq(
@@ -69,7 +67,6 @@ contract MarketForwarder_Test is Testable, TellerV2MarketForwarder {
         user2.approveMarketForwarder(marketId, address(this));
     }
 
- 
     function test_approveMarketForwarder() public {
         approveMarketForwarder_before();
         assertEq(
@@ -81,7 +78,7 @@ contract MarketForwarder_Test is Testable, TellerV2MarketForwarder {
             true,
             "Borrower did not set market forwarder approval"
         );
- 
+
         assertEq(
             tellerV2Mock.hasApprovedMarketForwarder(
                 marketId,

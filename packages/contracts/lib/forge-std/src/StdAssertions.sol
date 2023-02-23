@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.6.2 <0.9.0;
 
-import {DSTest} from "ds-test/test.sol";
-import {stdMath} from "./StdMath.sol";
+import { DSTest } from "ds-test/test.sol";
+import { stdMath } from "./StdMath.sol";
 
 abstract contract StdAssertions is DSTest {
     event log_array(uint256[] val);
@@ -45,7 +45,10 @@ abstract contract StdAssertions is DSTest {
         assertEq0(a, b);
     }
 
-    function assertEq(bytes memory a, bytes memory b, string memory err) internal virtual {
+    function assertEq(bytes memory a, bytes memory b, string memory err)
+        internal
+        virtual
+    {
         assertEq0(a, b, err);
     }
 
@@ -76,21 +79,30 @@ abstract contract StdAssertions is DSTest {
         }
     }
 
-    function assertEq(uint256[] memory a, uint256[] memory b, string memory err) internal virtual {
+    function assertEq(uint256[] memory a, uint256[] memory b, string memory err)
+        internal
+        virtual
+    {
         if (keccak256(abi.encode(a)) != keccak256(abi.encode(b))) {
             emit log_named_string("Error", err);
             assertEq(a, b);
         }
     }
 
-    function assertEq(int256[] memory a, int256[] memory b, string memory err) internal virtual {
+    function assertEq(int256[] memory a, int256[] memory b, string memory err)
+        internal
+        virtual
+    {
         if (keccak256(abi.encode(a)) != keccak256(abi.encode(b))) {
             emit log_named_string("Error", err);
             assertEq(a, b);
         }
     }
 
-    function assertEq(address[] memory a, address[] memory b, string memory err) internal virtual {
+    function assertEq(address[] memory a, address[] memory b, string memory err)
+        internal
+        virtual
+    {
         if (keccak256(abi.encode(a)) != keccak256(abi.encode(b))) {
             emit log_named_string("Error", err);
             assertEq(a, b);
@@ -102,7 +114,10 @@ abstract contract StdAssertions is DSTest {
         assertEq(uint256(a), uint256(b));
     }
 
-    function assertApproxEqAbs(uint256 a, uint256 b, uint256 maxDelta) internal virtual {
+    function assertApproxEqAbs(uint256 a, uint256 b, uint256 maxDelta)
+        internal
+        virtual
+    {
         uint256 delta = stdMath.delta(a, b);
 
         if (delta > maxDelta) {
@@ -115,7 +130,12 @@ abstract contract StdAssertions is DSTest {
         }
     }
 
-    function assertApproxEqAbs(uint256 a, uint256 b, uint256 maxDelta, string memory err) internal virtual {
+    function assertApproxEqAbs(
+        uint256 a,
+        uint256 b,
+        uint256 maxDelta,
+        string memory err
+    ) internal virtual {
         uint256 delta = stdMath.delta(a, b);
 
         if (delta > maxDelta) {
@@ -124,7 +144,12 @@ abstract contract StdAssertions is DSTest {
         }
     }
 
-    function assertApproxEqAbsDecimal(uint256 a, uint256 b, uint256 maxDelta, uint256 decimals) internal virtual {
+    function assertApproxEqAbsDecimal(
+        uint256 a,
+        uint256 b,
+        uint256 maxDelta,
+        uint256 decimals
+    ) internal virtual {
         uint256 delta = stdMath.delta(a, b);
 
         if (delta > maxDelta) {
@@ -137,10 +162,13 @@ abstract contract StdAssertions is DSTest {
         }
     }
 
-    function assertApproxEqAbsDecimal(uint256 a, uint256 b, uint256 maxDelta, uint256 decimals, string memory err)
-        internal
-        virtual
-    {
+    function assertApproxEqAbsDecimal(
+        uint256 a,
+        uint256 b,
+        uint256 maxDelta,
+        uint256 decimals,
+        string memory err
+    ) internal virtual {
         uint256 delta = stdMath.delta(a, b);
 
         if (delta > maxDelta) {
@@ -149,7 +177,10 @@ abstract contract StdAssertions is DSTest {
         }
     }
 
-    function assertApproxEqAbs(int256 a, int256 b, uint256 maxDelta) internal virtual {
+    function assertApproxEqAbs(int256 a, int256 b, uint256 maxDelta)
+        internal
+        virtual
+    {
         uint256 delta = stdMath.delta(a, b);
 
         if (delta > maxDelta) {
@@ -162,7 +193,12 @@ abstract contract StdAssertions is DSTest {
         }
     }
 
-    function assertApproxEqAbs(int256 a, int256 b, uint256 maxDelta, string memory err) internal virtual {
+    function assertApproxEqAbs(
+        int256 a,
+        int256 b,
+        uint256 maxDelta,
+        string memory err
+    ) internal virtual {
         uint256 delta = stdMath.delta(a, b);
 
         if (delta > maxDelta) {
@@ -171,7 +207,12 @@ abstract contract StdAssertions is DSTest {
         }
     }
 
-    function assertApproxEqAbsDecimal(int256 a, int256 b, uint256 maxDelta, uint256 decimals) internal virtual {
+    function assertApproxEqAbsDecimal(
+        int256 a,
+        int256 b,
+        uint256 maxDelta,
+        uint256 decimals
+    ) internal virtual {
         uint256 delta = stdMath.delta(a, b);
 
         if (delta > maxDelta) {
@@ -184,10 +225,13 @@ abstract contract StdAssertions is DSTest {
         }
     }
 
-    function assertApproxEqAbsDecimal(int256 a, int256 b, uint256 maxDelta, uint256 decimals, string memory err)
-        internal
-        virtual
-    {
+    function assertApproxEqAbsDecimal(
+        int256 a,
+        int256 b,
+        uint256 maxDelta,
+        uint256 decimals,
+        string memory err
+    ) internal virtual {
         uint256 delta = stdMath.delta(a, b);
 
         if (delta > maxDelta) {
@@ -268,7 +312,10 @@ abstract contract StdAssertions is DSTest {
         }
     }
 
-    function assertApproxEqRel(int256 a, int256 b, uint256 maxPercentDelta) internal virtual {
+    function assertApproxEqRel(int256 a, int256 b, uint256 maxPercentDelta)
+        internal
+        virtual
+    {
         if (b == 0) return assertEq(a, b); // If the expected is 0, actual must be too.
 
         uint256 percentDelta = stdMath.percentDelta(a, b);
@@ -283,7 +330,12 @@ abstract contract StdAssertions is DSTest {
         }
     }
 
-    function assertApproxEqRel(int256 a, int256 b, uint256 maxPercentDelta, string memory err) internal virtual {
+    function assertApproxEqRel(
+        int256 a,
+        int256 b,
+        uint256 maxPercentDelta,
+        string memory err
+    ) internal virtual {
         if (b == 0) return assertEq(a, b, err); // If the expected is 0, actual must be too.
 
         uint256 percentDelta = stdMath.percentDelta(a, b);
@@ -294,7 +346,12 @@ abstract contract StdAssertions is DSTest {
         }
     }
 
-    function assertApproxEqRelDecimal(int256 a, int256 b, uint256 maxPercentDelta, uint256 decimals) internal virtual {
+    function assertApproxEqRelDecimal(
+        int256 a,
+        int256 b,
+        uint256 maxPercentDelta,
+        uint256 decimals
+    ) internal virtual {
         if (b == 0) return assertEq(a, b); // If the expected is 0, actual must be too.
 
         uint256 percentDelta = stdMath.percentDelta(a, b);
@@ -309,10 +366,13 @@ abstract contract StdAssertions is DSTest {
         }
     }
 
-    function assertApproxEqRelDecimal(int256 a, int256 b, uint256 maxPercentDelta, uint256 decimals, string memory err)
-        internal
-        virtual
-    {
+    function assertApproxEqRelDecimal(
+        int256 a,
+        int256 b,
+        uint256 maxPercentDelta,
+        uint256 decimals,
+        string memory err
+    ) internal virtual {
         if (b == 0) return assertEq(a, b, err); // If the expected is 0, actual must be too.
 
         uint256 percentDelta = stdMath.percentDelta(a, b);

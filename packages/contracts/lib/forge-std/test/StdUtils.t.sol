@@ -29,9 +29,15 @@ contract StdUtilsTest is Test {
 
     function testBound_WithinRange() public {
         assertEq(bound(uint256(51), 50, 150), 51);
-        assertEq(bound(uint256(51), 50, 150), bound(bound(uint256(51), 50, 150), 50, 150));
+        assertEq(
+            bound(uint256(51), 50, 150),
+            bound(bound(uint256(51), 50, 150), 50, 150)
+        );
         assertEq(bound(uint256(149), 50, 150), 149);
-        assertEq(bound(uint256(149), 50, 150), bound(bound(uint256(149), 50, 150), 50, 150));
+        assertEq(
+            bound(uint256(149), 50, 150),
+            bound(bound(uint256(149), 50, 150), 50, 150)
+        );
     }
 
     function testBound_EdgeCoverage() public {
@@ -46,7 +52,7 @@ contract StdUtilsTest is Test {
     }
 
     function testBound_DistributionIsEven(uint256 min, uint256 size) public {
-        size = size % 100 + 1;
+        size = (size % 100) + 1;
         min = bound(min, UINT256_MAX / 2, UINT256_MAX / 2 + size);
         uint256 max = min + size - 1;
         uint256 result;
@@ -54,10 +60,10 @@ contract StdUtilsTest is Test {
         for (uint256 i = 1; i <= size * 4; ++i) {
             // x > max
             result = bound(max + i, min, max);
-            assertEq(result, min + (i - 1) % size);
+            assertEq(result, min + ((i - 1) % size));
             // x < min
             result = bound(min - i, min, max);
-            assertEq(result, max - (i - 1) % size);
+            assertEq(result, max - ((i - 1) % size));
         }
     }
 
@@ -73,18 +79,36 @@ contract StdUtilsTest is Test {
     }
 
     function testBoundUint256Max() public {
-        assertEq(bound(0, type(uint256).max - 1, type(uint256).max), type(uint256).max - 1);
-        assertEq(bound(1, type(uint256).max - 1, type(uint256).max), type(uint256).max);
+        assertEq(
+            bound(0, type(uint256).max - 1, type(uint256).max),
+            type(uint256).max - 1
+        );
+        assertEq(
+            bound(1, type(uint256).max - 1, type(uint256).max),
+            type(uint256).max
+        );
     }
 
     function testCannotBoundMaxLessThanMin() public {
-        vm.expectRevert(bytes("StdUtils bound(uint256,uint256,uint256): Max is less than min."));
+        vm.expectRevert(
+            bytes(
+                "StdUtils bound(uint256,uint256,uint256): Max is less than min."
+            )
+        );
         bound(uint256(5), 100, 10);
     }
 
-    function testCannotBoundMaxLessThanMin(uint256 num, uint256 min, uint256 max) public {
+    function testCannotBoundMaxLessThanMin(
+        uint256 num,
+        uint256 min,
+        uint256 max
+    ) public {
         vm.assume(min > max);
-        vm.expectRevert(bytes("StdUtils bound(uint256,uint256,uint256): Max is less than min."));
+        vm.expectRevert(
+            bytes(
+                "StdUtils bound(uint256,uint256,uint256): Max is less than min."
+            )
+        );
         bound(num, min, max);
     }
 
@@ -129,7 +153,7 @@ contract StdUtilsTest is Test {
     }
 
     function testBoundInt_DistributionIsEven(int256 min, uint256 size) public {
-        size = size % 100 + 1;
+        size = (size % 100) + 1;
         min = bound(min, -int256(size / 2), int256(size - size / 2));
         int256 max = min + int256(size) - 1;
         int256 result;
@@ -156,23 +180,43 @@ contract StdUtilsTest is Test {
     }
 
     function testBoundIntInt256Max() public {
-        assertEq(bound(0, type(int256).max - 1, type(int256).max), type(int256).max - 1);
-        assertEq(bound(1, type(int256).max - 1, type(int256).max), type(int256).max);
+        assertEq(
+            bound(0, type(int256).max - 1, type(int256).max),
+            type(int256).max - 1
+        );
+        assertEq(
+            bound(1, type(int256).max - 1, type(int256).max),
+            type(int256).max
+        );
     }
 
     function testBoundIntInt256Min() public {
-        assertEq(bound(0, type(int256).min, type(int256).min + 1), type(int256).min);
-        assertEq(bound(1, type(int256).min, type(int256).min + 1), type(int256).min + 1);
+        assertEq(
+            bound(0, type(int256).min, type(int256).min + 1),
+            type(int256).min
+        );
+        assertEq(
+            bound(1, type(int256).min, type(int256).min + 1),
+            type(int256).min + 1
+        );
     }
 
     function testCannotBoundIntMaxLessThanMin() public {
-        vm.expectRevert(bytes("StdUtils bound(int256,int256,int256): Max is less than min."));
+        vm.expectRevert(
+            bytes("StdUtils bound(int256,int256,int256): Max is less than min.")
+        );
         bound(-5, 100, 10);
     }
 
-    function testCannotBoundIntMaxLessThanMin(int256 num, int256 min, int256 max) public {
+    function testCannotBoundIntMaxLessThanMin(
+        int256 num,
+        int256 min,
+        int256 max
+    ) public {
         vm.assume(min > max);
-        vm.expectRevert(bytes("StdUtils bound(int256,int256,int256): Max is less than min."));
+        vm.expectRevert(
+            bytes("StdUtils bound(int256,int256,int256): Max is less than min.")
+        );
         bound(num, min, max);
     }
 
@@ -181,7 +225,8 @@ contract StdUtilsTest is Test {
     //////////////////////////////////////////////////////////////////////////*/
 
     function testBytesToUint() external {
-        bytes memory maxUint = hex"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff";
+        bytes
+            memory maxUint = hex"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff";
         bytes memory two = hex"02";
         bytes memory millionEther = hex"d3c21bcecceda1000000";
 
@@ -191,8 +236,11 @@ contract StdUtilsTest is Test {
     }
 
     function testCannotConvertGT32Bytes() external {
-        bytes memory thirty3Bytes = hex"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff";
-        vm.expectRevert("StdUtils bytesToUint(bytes): Bytes length exceeds 32.");
+        bytes
+            memory thirty3Bytes = hex"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff";
+        vm.expectRevert(
+            "StdUtils bytesToUint(bytes): Bytes length exceeds 32."
+        );
         bytesToUint(thirty3Bytes);
     }
 
@@ -215,14 +263,21 @@ contract StdUtilsTest is Test {
         bytes32 salt = bytes32(uint256(31415));
         bytes32 initcodeHash = keccak256(abi.encode(0x6080));
         address deployer = 0x6C9FC64A53c1b71FB3f9Af64d1ae3A4931A5f4E9;
-        address create2Address = computeCreate2Address(salt, initcodeHash, deployer);
+        address create2Address = computeCreate2Address(
+            salt,
+            initcodeHash,
+            deployer
+        );
         assertEq(create2Address, 0xB147a5d25748fda14b463EB04B111027C290f4d3);
     }
 
     function testComputeCreate2AddressWithDefaultDeployer() external {
         bytes32 salt = 0xc290c670fde54e5ef686f9132cbc8711e76a98f0333a438a92daa442c71403c0;
         bytes32 initcodeHash = hashInitCode(hex"6080", "");
-        assertEq(initcodeHash, 0x1a578b7a4b0b5755db6d121b4118d4bc68fe170dca840c59bc922f14175a76b0);
+        assertEq(
+            initcodeHash,
+            0x1a578b7a4b0b5755db6d121b4118d4bc68fe170dca840c59bc922f14175a76b0
+        );
         address create2Address = computeCreate2Address(salt, initcodeHash);
         assertEq(create2Address, 0xc0ffEe2198a06235aAbFffe5Db0CacF1717f5Ac6);
     }
@@ -244,7 +299,7 @@ contract StdUtilsForkTest is Test {
 
     function setUp() public {
         // All tests of the `getTokenBalances` method are fork tests using live contracts.
-        vm.createSelectFork({urlOrAlias: "mainnet", blockNumber: 16_428_900});
+        vm.createSelectFork({ urlOrAlias: "mainnet", blockNumber: 16_428_900 });
     }
 
     function testCannotGetTokenBalances_NonTokenContract() external {
@@ -262,10 +317,12 @@ contract StdUtilsForkTest is Test {
     }
 
     function testCannotGetTokenBalances_EOA() external {
-        address eoa = vm.addr({privateKey: 1});
+        address eoa = vm.addr({ privateKey: 1 });
         address[] memory addresses = new address[](1);
         addresses[0] = USDC_HOLDER_0;
-        vm.expectRevert("StdUtils getTokenBalances(address,address[]): Token address is not a contract.");
+        vm.expectRevert(
+            "StdUtils getTokenBalances(address,address[]): Token address is not a contract."
+        );
         getTokenBalances(eoa, addresses);
     }
 

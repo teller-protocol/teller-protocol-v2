@@ -39,7 +39,9 @@ contract StdInvariant {
         _targetedArtifacts.push(newTargetedArtifact_);
     }
 
-    function targetArtifactSelector(FuzzSelector memory newTargetedArtifactSelector_) internal {
+    function targetArtifactSelector(
+        FuzzSelector memory newTargetedArtifactSelector_
+    ) internal {
         _targetedArtifactSelectors.push(newTargetedArtifactSelector_);
     }
 
@@ -58,35 +60,67 @@ contract StdInvariant {
     // Functions for forge:
     // These are called by forge to run invariant tests and don't need to be called in tests.
 
-    function excludeArtifacts() public view returns (string[] memory excludedArtifacts_) {
+    function excludeArtifacts()
+        public
+        view
+        returns (string[] memory excludedArtifacts_)
+    {
         excludedArtifacts_ = _excludedArtifacts;
     }
 
-    function excludeContracts() public view returns (address[] memory excludedContracts_) {
+    function excludeContracts()
+        public
+        view
+        returns (address[] memory excludedContracts_)
+    {
         excludedContracts_ = _excludedContracts;
     }
 
-    function excludeSenders() public view returns (address[] memory excludedSenders_) {
+    function excludeSenders()
+        public
+        view
+        returns (address[] memory excludedSenders_)
+    {
         excludedSenders_ = _excludedSenders;
     }
 
-    function targetArtifacts() public view returns (string[] memory targetedArtifacts_) {
+    function targetArtifacts()
+        public
+        view
+        returns (string[] memory targetedArtifacts_)
+    {
         targetedArtifacts_ = _targetedArtifacts;
     }
 
-    function targetArtifactSelectors() public view returns (FuzzSelector[] memory targetedArtifactSelectors_) {
+    function targetArtifactSelectors()
+        public
+        view
+        returns (FuzzSelector[] memory targetedArtifactSelectors_)
+    {
         targetedArtifactSelectors_ = _targetedArtifactSelectors;
     }
 
-    function targetContracts() public view returns (address[] memory targetedContracts_) {
+    function targetContracts()
+        public
+        view
+        returns (address[] memory targetedContracts_)
+    {
         targetedContracts_ = _targetedContracts;
     }
 
-    function targetSelectors() public view returns (FuzzSelector[] memory targetedSelectors_) {
+    function targetSelectors()
+        public
+        view
+        returns (FuzzSelector[] memory targetedSelectors_)
+    {
         targetedSelectors_ = _targetedSelectors;
     }
 
-    function targetSenders() public view returns (address[] memory targetedSenders_) {
+    function targetSenders()
+        public
+        view
+        returns (address[] memory targetedSenders_)
+    {
         targetedSenders_ = _targetedSenders;
     }
 }

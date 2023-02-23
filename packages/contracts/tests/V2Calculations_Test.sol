@@ -1,11 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
- 
+
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@openzeppelin/contracts/utils/Arrays.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
-
- 
 
 import "./Testable.sol";
 import "../contracts/TellerV2.sol";
@@ -72,7 +70,6 @@ contract V2Calculations_Test is Testable {
         );
     }
 
- 
     // EMI loan - Monthly payment cycle
     function test_04_calculateAmountOwed() public {
         cyclesToSkip.add(5);
@@ -99,7 +96,6 @@ contract V2Calculations_Test is Testable {
 
     // Bullet loan
     function test_06_calculateAmountOwed() public {
-
         cyclesToSkip.add(6);
         calculateAmountOwed_runner(
             36,
@@ -109,9 +105,8 @@ contract V2Calculations_Test is Testable {
     }
 
     // Bullet loan
- 
-    function test_07_calculateAmountOwed() public {
 
+    function test_07_calculateAmountOwed() public {
         cyclesToSkip.add(12);
         cyclesWithExtraPayments = [1, 8];
         cyclesWithExtraPaymentsAmounts = [15000e6, 10000e6];
@@ -314,8 +309,16 @@ contract V2Calculations_Test is Testable {
             _principal,
             "First cycle bullet owed principal incorrect"
         );
-        assertEq(_duePrincipal, 0, "First cycle bullet due principal incorrect");
-        assertEq(_interest, 1250000000, "First cycle bullet interest incorrect");
+        assertEq(
+            _duePrincipal,
+            0,
+            "First cycle bullet due principal incorrect"
+        );
+        assertEq(
+            _interest,
+            1250000000,
+            "First cycle bullet interest incorrect"
+        );
 
         // Within random payment cycle
         _timestamp = _acceptedTimestamp + ((365 days / 12) * 3);

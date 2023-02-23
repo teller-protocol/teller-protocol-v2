@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
- 
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
@@ -33,8 +32,6 @@ contract LenderManager_Test is Testable, LenderManager {
             new MarketRegistryMock(address(0))
         )
     {}
-
- 
 
     function setUp() public {
         mockTellerV2 = new LenderCommitmentTester();

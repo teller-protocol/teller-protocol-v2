@@ -243,9 +243,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
     ) public commitmentLender(_commitmentId) {
         delete commitmentBorrowersList[_commitmentId];
         _addBorrowersToCommitmentAllowlist(_commitmentId, _borrowerAddressList);
- 
-        emit UpdatedCommitmentBorrowers(_commitmentId);
- 
+  
     }
 
     /**
@@ -259,8 +257,9 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
     ) internal {
         for (uint256 i = 0; i < _borrowerArray.length; i++) {
             commitmentBorrowersList[_commitmentId].add(_borrowerArray[i]);
-        }
-
+ 
+        }  
+        emit UpdatedCommitmentBorrowers(_commitmentId);
  
     }
 

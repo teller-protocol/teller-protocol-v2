@@ -1,0 +1,1248 @@
+{
+  "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint8",
+          "name": "version",
+          "type": "uint8"
+        }
+      ],
+      "name": "Initialized",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "previousOwner",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnershipTransferred",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint16",
+          "name": "newFee",
+          "type": "uint16"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint16",
+          "name": "oldFee",
+          "type": "uint16"
+        }
+      ],
+      "name": "ProtocolFeeSet",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "protocolFee",
+      "outputs": [
+        {
+          "internalType": "uint16",
+          "name": "",
+          "type": "uint16"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "renounceOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint16",
+          "name": "newFee",
+          "type": "uint16"
+        }
+      ],
+      "name": "setProtocolFee",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "transferOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": {
+    "object": "0x608060405234801561001057600080fd5b506102f5806100206000396000f3fe608060405234801561001057600080fd5b50600436106100575760003560e01c8063715018a61461005c5780638da5cb5b14610066578063b0e21e8a14610086578063e4467f351461009c578063f2fde38b146100af575b600080fd5b6100646100c2565b005b6033546040516001600160a01b0390911681526020015b60405180910390f35b60655460405161ffff909116815260200161007d565b6100646100aa36600461026b565b6100d6565b6100646100bd366004610296565b610144565b6100ca6101bf565b6100d46000610219565b565b6100de6101bf565b60655461ffff828116911614610141576065805461ffff83811661ffff198316811790935560408051938452911660208301819052917f4810ece076cee6c6042808956f3f65dad1bc72b75181341d7bed810d39deda0f910160405180910390a1505b50565b61014c6101bf565b6001600160a01b0381166101b65760405162461bcd60e51b815260206004820152602660248201527f4f776e61626c653a206e6577206f776e657220697320746865207a65726f206160448201526564647265737360d01b60648201526084015b60405180910390fd5b61014181610219565b6033546001600160a01b031633146100d45760405162461bcd60e51b815260206004820181905260248201527f4f776e61626c653a2063616c6c6572206973206e6f7420746865206f776e657260448201526064016101ad565b603380546001600160a01b038381166001600160a01b0319831681179093556040519116919082907f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e090600090a35050565b60006020828403121561027d57600080fd5b813561ffff8116811461028f57600080fd5b9392505050565b6000602082840312156102a857600080fd5b81356001600160a01b038116811461028f57600080fdfea2646970667358221220dcc330b92989876f25c635201ab73be39267aa34e09cf7ef50e34457cf03e86764736f6c63430008110033",
+    "sourceMap": "142:1400:8:-:0;;;;;;;;;;;;;;;;;;;",
+    "linkReferences": {}
+  },
+  "deployedBytecode": {
+    "object": "0x608060405234801561001057600080fd5b50600436106100575760003560e01c8063715018a61461005c5780638da5cb5b14610066578063b0e21e8a14610086578063e4467f351461009c578063f2fde38b146100af575b600080fd5b6100646100c2565b005b6033546040516001600160a01b0390911681526020015b60405180910390f35b60655460405161ffff909116815260200161007d565b6100646100aa36600461026b565b6100d6565b6100646100bd366004610296565b610144565b6100ca6101bf565b6100d46000610219565b565b6100de6101bf565b60655461ffff828116911614610141576065805461ffff83811661ffff198316811790935560408051938452911660208301819052917f4810ece076cee6c6042808956f3f65dad1bc72b75181341d7bed810d39deda0f910160405180910390a1505b50565b61014c6101bf565b6001600160a01b0381166101b65760405162461bcd60e51b815260206004820152602660248201527f4f776e61626c653a206e6577206f776e657220697320746865207a65726f206160448201526564647265737360d01b60648201526084015b60405180910390fd5b61014181610219565b6033546001600160a01b031633146100d45760405162461bcd60e51b815260206004820181905260248201527f4f776e61626c653a2063616c6c6572206973206e6f7420746865206f776e657260448201526064016101ad565b603380546001600160a01b038381166001600160a01b0319831681179093556040519116919082907f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e090600090a35050565b60006020828403121561027d57600080fd5b813561ffff8116811461028f57600080fd5b9392505050565b6000602082840312156102a857600080fd5b81356001600160a01b038116811461028f57600080fdfea2646970667358221220dcc330b92989876f25c635201ab73be39267aa34e09cf7ef50e34457cf03e86764736f6c63430008110033",
+    "sourceMap": "142:1400:8:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;2071:101:50;;;:::i;:::-;;1441:85;1513:6;;1441:85;;-1:-1:-1;;;;;1513:6:50;;;160:51:121;;148:2;133:18;1441:85:50;;;;;;;;1023:96:8;1100:12;;1023:96;;1100:12;;;;366:38:121;;354:2;339:18;1023:96:8;222:188:121;1271:269:8;;;;;;:::i;:::-;;:::i;2321:198:50:-;;;;;;:::i;:::-;;:::i;2071:101::-;1334:13;:11;:13::i;:::-;2135:30:::1;2162:1;2135:18;:30::i;:::-;2071:101::o:0;1271:269:8:-;1334:13:50;:11;:13::i;:::-;1398:12:8::1;::::0;::::1;1388:22:::0;;::::1;1398:12:::0;::::1;1384:35:::0;1412:7:::1;1384:35;1445:12;::::0;;::::1;1467:21:::0;;::::1;-1:-1:-1::0;;1467:21:8;::::1;::::0;::::1;::::0;;;1503:30:::1;::::0;;1178:34:121;;;1445:12:8;::::1;1243:2:121::0;1228:18;;1221:43;;;1445:12:8;1503:30:::1;::::0;1126:18:121;1503:30:8::1;;;;;;;1335:205;1357:1:50;1271:269:8::0;:::o;2321:198:50:-;1334:13;:11;:13::i;:::-;-1:-1:-1;;;;;2409:22:50;::::1;2401:73;;;::::0;-1:-1:-1;;;2401:73:50;;1477:2:121;2401:73:50::1;::::0;::::1;1459:21:121::0;1516:2;1496:18;;;1489:30;1555:34;1535:18;;;1528:62;-1:-1:-1;;;1606:18:121;;;1599:36;1652:19;;2401:73:50::1;;;;;;;;;2484:28;2503:8;2484:18;:28::i;1599:130::-:0;1513:6;;-1:-1:-1;;;;;1513:6:50;929:10:64;1662:23:50;1654:68;;;;-1:-1:-1;;;1654:68:50;;1884:2:121;1654:68:50;;;1866:21:121;;;1903:18;;;1896:30;1962:34;1942:18;;;1935:62;2014:18;;1654:68:50;1682:356:121;2673:187:50;2765:6;;;-1:-1:-1;;;;;2781:17:50;;;-1:-1:-1;;;;;;2781:17:50;;;;;;;2813:40;;2765:6;;;2781:17;2765:6;;2813:40;;2746:16;;2813:40;2736:124;2673:187;:::o;415:272:121:-;473:6;526:2;514:9;505:7;501:23;497:32;494:52;;;542:1;539;532:12;494:52;581:9;568:23;631:6;624:5;620:18;613:5;610:29;600:57;;653:1;650;643:12;600:57;676:5;415:272;-1:-1:-1;;;415:272:121:o;692:286::-;751:6;804:2;792:9;783:7;779:23;775:32;772:52;;;820:1;817;810:12;772:52;846:23;;-1:-1:-1;;;;;898:31:121;;888:42;;878:70;;944:1;941;934:12",
+    "linkReferences": {}
+  },
+  "methodIdentifiers": {
+    "owner()": "8da5cb5b",
+    "protocolFee()": "b0e21e8a",
+    "renounceOwnership()": "715018a6",
+    "setProtocolFee(uint16)": "e4467f35",
+    "transferOwnership(address)": "f2fde38b"
+  },
+  "rawMetadata": "{\"compiler\":{\"version\":\"0.8.17+commit.8df45f5f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint8\",\"name\":\"version\",\"type\":\"uint8\"}],\"name\":\"Initialized\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint16\",\"name\":\"newFee\",\"type\":\"uint16\"},{\"indexed\":false,\"internalType\":\"uint16\",\"name\":\"oldFee\",\"type\":\"uint16\"}],\"name\":\"ProtocolFeeSet\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"protocolFee\",\"outputs\":[{\"internalType\":\"uint16\",\"name\":\"\",\"type\":\"uint16\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint16\",\"name\":\"newFee\",\"type\":\"uint16\"}],\"name\":\"setProtocolFee\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"events\":{\"ProtocolFeeSet(uint16,uint16)\":{\"params\":{\"newFee\":\"The new protocol fee set.\",\"oldFee\":\"The previously set protocol fee.\"}}},\"kind\":\"dev\",\"methods\":{\"owner()\":{\"details\":\"Returns the address of the current owner.\"},\"renounceOwnership()\":{\"details\":\"Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner.\"},\"setProtocolFee(uint16)\":{\"params\":{\"newFee\":\"The new protocol fee to be set.\"}},\"transferOwnership(address)\":{\"details\":\"Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner.\"}},\"version\":1},\"userdoc\":{\"events\":{\"ProtocolFeeSet(uint16,uint16)\":{\"notice\":\"This event is emitted when the protocol fee has been updated.\"}},\"kind\":\"user\",\"methods\":{\"protocolFee()\":{\"notice\":\"Returns the current protocol fee.\"},\"setProtocolFee(uint16)\":{\"notice\":\"Lets the DAO/owner of the protocol to set a new protocol fee.\"}},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/ProtocolFee.sol\":\"ProtocolFee\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[\":@ensdomains/=node_modules/@ensdomains/\",\":@mangrovedao/=node_modules/@mangrovedao/\",\":@openzeppelin/=node_modules/@openzeppelin/\",\":ds-test/=lib/forge-std/lib/ds-test/src/\",\":eth-gas-reporter/=node_modules/eth-gas-reporter/\",\":forge-std/=lib/forge-std/src/\",\":hardhat-deploy/=node_modules/hardhat-deploy/\",\":hardhat/=node_modules/hardhat/\"]},\"sources\":{\"contracts/ProtocolFee.sol\":{\"keccak256\":\"0x8a4fbca87131233a11efc1c5006a9b9d5ea45b82078c85726ce9e07ef13e2893\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://158488abd8c3e29e1d4f83173120a3d808a38f330067d94852df767ef00b4acf\",\"dweb:/ipfs/QmRc4iCqThiNT2uptvpHZPV5WCbgD5X86Ty1AfSyim2B2V\"]},\"node_modules/@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol\":{\"keccak256\":\"0x247c62047745915c0af6b955470a72d1696ebad4352d7d3011aef1a2463cd888\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://d7fc8396619de513c96b6e00301b88dd790e83542aab918425633a5f7297a15a\",\"dweb:/ipfs/QmXbP4kiZyp7guuS7xe8KaybnwkRPGrBc2Kbi3vhcTfpxb\"]},\"node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol\":{\"keccak256\":\"0x037c334add4b033ad3493038c25be1682d78c00992e1acb0e2795caff3925271\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://8a313cf42389440e2706837c91370323b85971c06afd6d056d21e2bc86459618\",\"dweb:/ipfs/QmT8XUrUvQ9aZaPKrqgRU2JVGWnaxBcUYJA7Q7K5KcLBSZ\"]},\"node_modules/@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol\":{\"keccak256\":\"0x2edcb41c121abc510932e8d83ff8b82cf9cdde35e7c297622f5c29ef0af25183\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://72460c66cd1c3b1c11b863e0d8df0a1c56f37743019e468dc312c754f43e3b06\",\"dweb:/ipfs/QmPExYKiNb9PUsgktQBupPaM33kzDHxaYoVeJdLhv8s879\"]},\"node_modules/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol\":{\"keccak256\":\"0x963ea7f0b48b032eef72fe3a7582edf78408d6f834115b9feadd673a4d5bd149\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://d6520943ea55fdf5f0bafb39ed909f64de17051bc954ff3e88c9e5621412c79c\",\"dweb:/ipfs/QmWZ4rAKTQbNG2HxGs46AcTXShsVytKeLs7CUCdCSv5N7a\"]}},\"version\":1}",
+  "metadata": {
+    "compiler": {
+      "version": "0.8.17+commit.8df45f5f"
+    },
+    "language": "Solidity",
+    "output": {
+      "abi": [
+        {
+          "inputs": [
+            {
+              "internalType": "uint8",
+              "name": "version",
+              "type": "uint8",
+              "indexed": false
+            }
+          ],
+          "type": "event",
+          "name": "Initialized",
+          "anonymous": false
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "previousOwner",
+              "type": "address",
+              "indexed": true
+            },
+            {
+              "internalType": "address",
+              "name": "newOwner",
+              "type": "address",
+              "indexed": true
+            }
+          ],
+          "type": "event",
+          "name": "OwnershipTransferred",
+          "anonymous": false
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint16",
+              "name": "newFee",
+              "type": "uint16",
+              "indexed": false
+            },
+            {
+              "internalType": "uint16",
+              "name": "oldFee",
+              "type": "uint16",
+              "indexed": false
+            }
+          ],
+          "type": "event",
+          "name": "ProtocolFeeSet",
+          "anonymous": false
+        },
+        {
+          "inputs": [],
+          "stateMutability": "view",
+          "type": "function",
+          "name": "owner",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ]
+        },
+        {
+          "inputs": [],
+          "stateMutability": "view",
+          "type": "function",
+          "name": "protocolFee",
+          "outputs": [
+            {
+              "internalType": "uint16",
+              "name": "",
+              "type": "uint16"
+            }
+          ]
+        },
+        {
+          "inputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function",
+          "name": "renounceOwnership"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint16",
+              "name": "newFee",
+              "type": "uint16"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function",
+          "name": "setProtocolFee"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "newOwner",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function",
+          "name": "transferOwnership"
+        }
+      ],
+      "devdoc": {
+        "kind": "dev",
+        "methods": {
+          "owner()": {
+            "details": "Returns the address of the current owner."
+          },
+          "renounceOwnership()": {
+            "details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner."
+          },
+          "setProtocolFee(uint16)": {
+            "params": {
+              "newFee": "The new protocol fee to be set."
+            }
+          },
+          "transferOwnership(address)": {
+            "details": "Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner."
+          }
+        },
+        "version": 1
+      },
+      "userdoc": {
+        "kind": "user",
+        "methods": {
+          "protocolFee()": {
+            "notice": "Returns the current protocol fee."
+          },
+          "setProtocolFee(uint16)": {
+            "notice": "Lets the DAO/owner of the protocol to set a new protocol fee."
+          }
+        },
+        "version": 1
+      }
+    },
+    "settings": {
+      "remappings": [
+        ":@ensdomains/=node_modules/@ensdomains/",
+        ":@mangrovedao/=node_modules/@mangrovedao/",
+        ":@openzeppelin/=node_modules/@openzeppelin/",
+        ":ds-test/=lib/forge-std/lib/ds-test/src/",
+        ":eth-gas-reporter/=node_modules/eth-gas-reporter/",
+        ":forge-std/=lib/forge-std/src/",
+        ":hardhat-deploy/=node_modules/hardhat-deploy/",
+        ":hardhat/=node_modules/hardhat/"
+      ],
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "metadata": {
+        "bytecodeHash": "ipfs"
+      },
+      "compilationTarget": {
+        "contracts/ProtocolFee.sol": "ProtocolFee"
+      },
+      "libraries": {}
+    },
+    "sources": {
+      "contracts/ProtocolFee.sol": {
+        "keccak256": "0x8a4fbca87131233a11efc1c5006a9b9d5ea45b82078c85726ce9e07ef13e2893",
+        "urls": [
+          "bzz-raw://158488abd8c3e29e1d4f83173120a3d808a38f330067d94852df767ef00b4acf",
+          "dweb:/ipfs/QmRc4iCqThiNT2uptvpHZPV5WCbgD5X86Ty1AfSyim2B2V"
+        ],
+        "license": "MIT"
+      },
+      "node_modules/@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol": {
+        "keccak256": "0x247c62047745915c0af6b955470a72d1696ebad4352d7d3011aef1a2463cd888",
+        "urls": [
+          "bzz-raw://d7fc8396619de513c96b6e00301b88dd790e83542aab918425633a5f7297a15a",
+          "dweb:/ipfs/QmXbP4kiZyp7guuS7xe8KaybnwkRPGrBc2Kbi3vhcTfpxb"
+        ],
+        "license": "MIT"
+      },
+      "node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol": {
+        "keccak256": "0x037c334add4b033ad3493038c25be1682d78c00992e1acb0e2795caff3925271",
+        "urls": [
+          "bzz-raw://8a313cf42389440e2706837c91370323b85971c06afd6d056d21e2bc86459618",
+          "dweb:/ipfs/QmT8XUrUvQ9aZaPKrqgRU2JVGWnaxBcUYJA7Q7K5KcLBSZ"
+        ],
+        "license": "MIT"
+      },
+      "node_modules/@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol": {
+        "keccak256": "0x2edcb41c121abc510932e8d83ff8b82cf9cdde35e7c297622f5c29ef0af25183",
+        "urls": [
+          "bzz-raw://72460c66cd1c3b1c11b863e0d8df0a1c56f37743019e468dc312c754f43e3b06",
+          "dweb:/ipfs/QmPExYKiNb9PUsgktQBupPaM33kzDHxaYoVeJdLhv8s879"
+        ],
+        "license": "MIT"
+      },
+      "node_modules/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol": {
+        "keccak256": "0x963ea7f0b48b032eef72fe3a7582edf78408d6f834115b9feadd673a4d5bd149",
+        "urls": [
+          "bzz-raw://d6520943ea55fdf5f0bafb39ed909f64de17051bc954ff3e88c9e5621412c79c",
+          "dweb:/ipfs/QmWZ4rAKTQbNG2HxGs46AcTXShsVytKeLs7CUCdCSv5N7a"
+        ],
+        "license": "MIT"
+      }
+    },
+    "version": 1
+  },
+  "ast": {
+    "absolutePath": "contracts/ProtocolFee.sol",
+    "id": 5235,
+    "exportedSymbols": {
+      "AddressUpgradeable": [
+        41826
+      ],
+      "ContextUpgradeable": [
+        41868
+      ],
+      "Initializable": [
+        39742
+      ],
+      "OwnableUpgradeable": [
+        39385
+      ],
+      "ProtocolFee": [
+        5234
+      ]
+    },
+    "nodeType": "SourceUnit",
+    "src": "0:1543:8",
+    "nodes": [
+      {
+        "id": 5157,
+        "nodeType": "PragmaDirective",
+        "src": "0:31:8",
+        "nodes": [],
+        "literals": [
+          "solidity",
+          ">=",
+          "0.8",
+          ".0",
+          "<",
+          "0.9",
+          ".0"
+        ]
+      },
+      {
+        "id": 5158,
+        "nodeType": "ImportDirective",
+        "src": "65:75:8",
+        "nodes": [],
+        "absolutePath": "node_modules/@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol",
+        "file": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol",
+        "nameLocation": "-1:-1:-1",
+        "scope": 5235,
+        "sourceUnit": 39386,
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "id": 5234,
+        "nodeType": "ContractDefinition",
+        "src": "142:1400:8",
+        "nodes": [
+          {
+            "id": 5162,
+            "nodeType": "VariableDeclaration",
+            "src": "236:27:8",
+            "nodes": [],
+            "constant": false,
+            "mutability": "mutable",
+            "name": "_protocolFee",
+            "nameLocation": "251:12:8",
+            "scope": 5234,
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint16",
+              "typeString": "uint16"
+            },
+            "typeName": {
+              "id": 5161,
+              "name": "uint16",
+              "nodeType": "ElementaryTypeName",
+              "src": "236:6:8",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint16",
+                "typeString": "uint16"
+              }
+            },
+            "visibility": "private"
+          },
+          {
+            "id": 5169,
+            "nodeType": "EventDefinition",
+            "src": "464:51:8",
+            "nodes": [],
+            "anonymous": false,
+            "documentation": {
+              "id": 5163,
+              "nodeType": "StructuredDocumentation",
+              "src": "270:189:8",
+              "text": " @notice This event is emitted when the protocol fee has been updated.\n @param newFee The new protocol fee set.\n @param oldFee The previously set protocol fee."
+            },
+            "eventSelector": "4810ece076cee6c6042808956f3f65dad1bc72b75181341d7bed810d39deda0f",
+            "name": "ProtocolFeeSet",
+            "nameLocation": "470:14:8",
+            "parameters": {
+              "id": 5168,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 5165,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "newFee",
+                  "nameLocation": "492:6:8",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 5169,
+                  "src": "485:13:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint16",
+                    "typeString": "uint16"
+                  },
+                  "typeName": {
+                    "id": 5164,
+                    "name": "uint16",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "485:6:8",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint16",
+                      "typeString": "uint16"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 5167,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "oldFee",
+                  "nameLocation": "507:6:8",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 5169,
+                  "src": "500:13:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint16",
+                    "typeString": "uint16"
+                  },
+                  "typeName": {
+                    "id": 5166,
+                    "name": "uint16",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "500:6:8",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint16",
+                      "typeString": "uint16"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "484:30:8"
+            }
+          },
+          {
+            "id": 5185,
+            "nodeType": "FunctionDefinition",
+            "src": "656:150:8",
+            "nodes": [],
+            "body": {
+              "id": 5184,
+              "nodeType": "Block",
+              "src": "726:80:8",
+              "nodes": [],
+              "statements": [
+                {
+                  "expression": {
+                    "arguments": [],
+                    "expression": {
+                      "argumentTypes": [],
+                      "id": 5177,
+                      "name": "__Ownable_init",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 39280,
+                      "src": "736:14:8",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_internal_nonpayable$__$returns$__$",
+                        "typeString": "function ()"
+                      }
+                    },
+                    "id": 5178,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "736:16:8",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 5179,
+                  "nodeType": "ExpressionStatement",
+                  "src": "736:16:8"
+                },
+                {
+                  "expression": {
+                    "arguments": [
+                      {
+                        "id": 5181,
+                        "name": "initFee",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 5172,
+                        "src": "791:7:8",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint16",
+                          "typeString": "uint16"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_uint16",
+                          "typeString": "uint16"
+                        }
+                      ],
+                      "id": 5180,
+                      "name": "__ProtocolFee_init_unchained",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 5197,
+                      "src": "762:28:8",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_internal_nonpayable$_t_uint16_$returns$__$",
+                        "typeString": "function (uint16)"
+                      }
+                    },
+                    "id": 5182,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "762:37:8",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 5183,
+                  "nodeType": "ExpressionStatement",
+                  "src": "762:37:8"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 5170,
+              "nodeType": "StructuredDocumentation",
+              "src": "521:130:8",
+              "text": " @notice Initialized the protocol fee.\n @param initFee The initial protocol fee to be set on the protocol."
+            },
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [
+              {
+                "id": 5175,
+                "kind": "modifierInvocation",
+                "modifierName": {
+                  "id": 5174,
+                  "name": "onlyInitializing",
+                  "nameLocations": [
+                    "709:16:8"
+                  ],
+                  "nodeType": "IdentifierPath",
+                  "referencedDeclaration": 39687,
+                  "src": "709:16:8"
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "709:16:8"
+              }
+            ],
+            "name": "__ProtocolFee_init",
+            "nameLocation": "665:18:8",
+            "parameters": {
+              "id": 5173,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 5172,
+                  "mutability": "mutable",
+                  "name": "initFee",
+                  "nameLocation": "691:7:8",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 5185,
+                  "src": "684:14:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint16",
+                    "typeString": "uint16"
+                  },
+                  "typeName": {
+                    "id": 5171,
+                    "name": "uint16",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "684:6:8",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint16",
+                      "typeString": "uint16"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "683:16:8"
+            },
+            "returnParameters": {
+              "id": 5176,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "726:0:8"
+            },
+            "scope": 5234,
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "internal"
+          },
+          {
+            "id": 5197,
+            "nodeType": "FunctionDefinition",
+            "src": "812:140:8",
+            "nodes": [],
+            "body": {
+              "id": 5196,
+              "nodeType": "Block",
+              "src": "912:40:8",
+              "nodes": [],
+              "statements": [
+                {
+                  "expression": {
+                    "arguments": [
+                      {
+                        "id": 5193,
+                        "name": "initFee",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 5187,
+                        "src": "937:7:8",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint16",
+                          "typeString": "uint16"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_uint16",
+                          "typeString": "uint16"
+                        }
+                      ],
+                      "id": 5192,
+                      "name": "setProtocolFee",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 5233,
+                      "src": "922:14:8",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_internal_nonpayable$_t_uint16_$returns$__$",
+                        "typeString": "function (uint16)"
+                      }
+                    },
+                    "id": 5194,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "922:23:8",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 5195,
+                  "nodeType": "ExpressionStatement",
+                  "src": "922:23:8"
+                }
+              ]
+            },
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [
+              {
+                "id": 5190,
+                "kind": "modifierInvocation",
+                "modifierName": {
+                  "id": 5189,
+                  "name": "onlyInitializing",
+                  "nameLocations": [
+                    "891:16:8"
+                  ],
+                  "nodeType": "IdentifierPath",
+                  "referencedDeclaration": 39687,
+                  "src": "891:16:8"
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "891:16:8"
+              }
+            ],
+            "name": "__ProtocolFee_init_unchained",
+            "nameLocation": "821:28:8",
+            "parameters": {
+              "id": 5188,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 5187,
+                  "mutability": "mutable",
+                  "name": "initFee",
+                  "nameLocation": "857:7:8",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 5197,
+                  "src": "850:14:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint16",
+                    "typeString": "uint16"
+                  },
+                  "typeName": {
+                    "id": 5186,
+                    "name": "uint16",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "850:6:8",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint16",
+                      "typeString": "uint16"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "849:16:8"
+            },
+            "returnParameters": {
+              "id": 5191,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "912:0:8"
+            },
+            "scope": 5234,
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "internal"
+          },
+          {
+            "id": 5206,
+            "nodeType": "FunctionDefinition",
+            "src": "1023:96:8",
+            "nodes": [],
+            "body": {
+              "id": 5205,
+              "nodeType": "Block",
+              "src": "1083:36:8",
+              "nodes": [],
+              "statements": [
+                {
+                  "expression": {
+                    "id": 5203,
+                    "name": "_protocolFee",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 5162,
+                    "src": "1100:12:8",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint16",
+                      "typeString": "uint16"
+                    }
+                  },
+                  "functionReturnParameters": 5202,
+                  "id": 5204,
+                  "nodeType": "Return",
+                  "src": "1093:19:8"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 5198,
+              "nodeType": "StructuredDocumentation",
+              "src": "958:60:8",
+              "text": " @notice Returns the current protocol fee."
+            },
+            "functionSelector": "b0e21e8a",
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "protocolFee",
+            "nameLocation": "1032:11:8",
+            "parameters": {
+              "id": 5199,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1043:2:8"
+            },
+            "returnParameters": {
+              "id": 5202,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 5201,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 5206,
+                  "src": "1075:6:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint16",
+                    "typeString": "uint16"
+                  },
+                  "typeName": {
+                    "id": 5200,
+                    "name": "uint16",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1075:6:8",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint16",
+                      "typeString": "uint16"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1074:8:8"
+            },
+            "scope": 5234,
+            "stateMutability": "view",
+            "virtual": true,
+            "visibility": "public"
+          },
+          {
+            "id": 5233,
+            "nodeType": "FunctionDefinition",
+            "src": "1271:269:8",
+            "nodes": [],
+            "body": {
+              "id": 5232,
+              "nodeType": "Block",
+              "src": "1335:205:8",
+              "nodes": [],
+              "statements": [
+                {
+                  "condition": {
+                    "commonType": {
+                      "typeIdentifier": "t_uint16",
+                      "typeString": "uint16"
+                    },
+                    "id": 5216,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftExpression": {
+                      "id": 5214,
+                      "name": "newFee",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 5209,
+                      "src": "1388:6:8",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint16",
+                        "typeString": "uint16"
+                      }
+                    },
+                    "nodeType": "BinaryOperation",
+                    "operator": "==",
+                    "rightExpression": {
+                      "id": 5215,
+                      "name": "_protocolFee",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 5162,
+                      "src": "1398:12:8",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint16",
+                        "typeString": "uint16"
+                      }
+                    },
+                    "src": "1388:22:8",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "id": 5218,
+                  "nodeType": "IfStatement",
+                  "src": "1384:35:8",
+                  "trueBody": {
+                    "functionReturnParameters": 5213,
+                    "id": 5217,
+                    "nodeType": "Return",
+                    "src": "1412:7:8"
+                  }
+                },
+                {
+                  "assignments": [
+                    5220
+                  ],
+                  "declarations": [
+                    {
+                      "constant": false,
+                      "id": 5220,
+                      "mutability": "mutable",
+                      "name": "oldFee",
+                      "nameLocation": "1436:6:8",
+                      "nodeType": "VariableDeclaration",
+                      "scope": 5232,
+                      "src": "1429:13:8",
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint16",
+                        "typeString": "uint16"
+                      },
+                      "typeName": {
+                        "id": 5219,
+                        "name": "uint16",
+                        "nodeType": "ElementaryTypeName",
+                        "src": "1429:6:8",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint16",
+                          "typeString": "uint16"
+                        }
+                      },
+                      "visibility": "internal"
+                    }
+                  ],
+                  "id": 5222,
+                  "initialValue": {
+                    "id": 5221,
+                    "name": "_protocolFee",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 5162,
+                    "src": "1445:12:8",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint16",
+                      "typeString": "uint16"
+                    }
+                  },
+                  "nodeType": "VariableDeclarationStatement",
+                  "src": "1429:28:8"
+                },
+                {
+                  "expression": {
+                    "id": 5225,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "id": 5223,
+                      "name": "_protocolFee",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 5162,
+                      "src": "1467:12:8",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint16",
+                        "typeString": "uint16"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "id": 5224,
+                      "name": "newFee",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 5209,
+                      "src": "1482:6:8",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint16",
+                        "typeString": "uint16"
+                      }
+                    },
+                    "src": "1467:21:8",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint16",
+                      "typeString": "uint16"
+                    }
+                  },
+                  "id": 5226,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1467:21:8"
+                },
+                {
+                  "eventCall": {
+                    "arguments": [
+                      {
+                        "id": 5228,
+                        "name": "newFee",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 5209,
+                        "src": "1518:6:8",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint16",
+                          "typeString": "uint16"
+                        }
+                      },
+                      {
+                        "id": 5229,
+                        "name": "oldFee",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 5220,
+                        "src": "1526:6:8",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint16",
+                          "typeString": "uint16"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_uint16",
+                          "typeString": "uint16"
+                        },
+                        {
+                          "typeIdentifier": "t_uint16",
+                          "typeString": "uint16"
+                        }
+                      ],
+                      "id": 5227,
+                      "name": "ProtocolFeeSet",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 5169,
+                      "src": "1503:14:8",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_event_nonpayable$_t_uint16_$_t_uint16_$returns$__$",
+                        "typeString": "function (uint16,uint16)"
+                      }
+                    },
+                    "id": 5230,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1503:30:8",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 5231,
+                  "nodeType": "EmitStatement",
+                  "src": "1498:35:8"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 5207,
+              "nodeType": "StructuredDocumentation",
+              "src": "1125:141:8",
+              "text": " @notice Lets the DAO/owner of the protocol to set a new protocol fee.\n @param newFee The new protocol fee to be set."
+            },
+            "functionSelector": "e4467f35",
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [
+              {
+                "id": 5212,
+                "kind": "modifierInvocation",
+                "modifierName": {
+                  "id": 5211,
+                  "name": "onlyOwner",
+                  "nameLocations": [
+                    "1325:9:8"
+                  ],
+                  "nodeType": "IdentifierPath",
+                  "referencedDeclaration": 39299,
+                  "src": "1325:9:8"
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "1325:9:8"
+              }
+            ],
+            "name": "setProtocolFee",
+            "nameLocation": "1280:14:8",
+            "parameters": {
+              "id": 5210,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 5209,
+                  "mutability": "mutable",
+                  "name": "newFee",
+                  "nameLocation": "1302:6:8",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 5233,
+                  "src": "1295:13:8",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint16",
+                    "typeString": "uint16"
+                  },
+                  "typeName": {
+                    "id": 5208,
+                    "name": "uint16",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1295:6:8",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint16",
+                      "typeString": "uint16"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1294:15:8"
+            },
+            "returnParameters": {
+              "id": 5213,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1335:0:8"
+            },
+            "scope": 5234,
+            "stateMutability": "nonpayable",
+            "virtual": true,
+            "visibility": "public"
+          }
+        ],
+        "abstract": false,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 5159,
+              "name": "OwnableUpgradeable",
+              "nameLocations": [
+                "166:18:8"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 39385,
+              "src": "166:18:8"
+            },
+            "id": 5160,
+            "nodeType": "InheritanceSpecifier",
+            "src": "166:18:8"
+          }
+        ],
+        "canonicalName": "ProtocolFee",
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "fullyImplemented": true,
+        "linearizedBaseContracts": [
+          5234,
+          39385,
+          41868,
+          39742
+        ],
+        "name": "ProtocolFee",
+        "nameLocation": "151:11:8",
+        "scope": 5235,
+        "usedErrors": []
+      }
+    ],
+    "license": "MIT"
+  },
+  "id": 8
+}

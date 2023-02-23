@@ -1,0 +1,85 @@
+{
+  "abi": [],
+  "bytecode": {
+    "object": "0x",
+    "linkReferences": {}
+  },
+  "deployedBytecode": {
+    "object": "0x",
+    "linkReferences": {}
+  },
+  "ast": {
+    "absolutePath": "contracts/Types.sol",
+    "id": 8714,
+    "exportedSymbols": {
+      "EMPTY_UUID": [
+        8713
+      ]
+    },
+    "nodeType": "SourceUnit",
+    "src": "0:150:15",
+    "nodes": [
+      {
+        "id": 8710,
+        "nodeType": "PragmaDirective",
+        "src": "0:31:15",
+        "nodes": [],
+        "literals": [
+          "solidity",
+          ">=",
+          "0.8",
+          ".0",
+          "<",
+          "0.9",
+          ".0"
+        ]
+      },
+      {
+        "id": 8713,
+        "nodeType": "VariableDeclaration",
+        "src": "117:31:15",
+        "nodes": [],
+        "constant": true,
+        "mutability": "constant",
+        "name": "EMPTY_UUID",
+        "nameLocation": "134:10:15",
+        "scope": 8714,
+        "stateVariable": false,
+        "storageLocation": "default",
+        "typeDescriptions": {
+          "typeIdentifier": "t_bytes32",
+          "typeString": "bytes32"
+        },
+        "typeName": {
+          "id": 8711,
+          "name": "bytes32",
+          "nodeType": "ElementaryTypeName",
+          "src": "117:7:15",
+          "typeDescriptions": {
+            "typeIdentifier": "t_bytes32",
+            "typeString": "bytes32"
+          }
+        },
+        "value": {
+          "hexValue": "30",
+          "id": 8712,
+          "isConstant": false,
+          "isLValue": false,
+          "isPure": true,
+          "kind": "number",
+          "lValueRequested": false,
+          "nodeType": "Literal",
+          "src": "147:1:15",
+          "typeDescriptions": {
+            "typeIdentifier": "t_rational_0_by_1",
+            "typeString": "int_const 0"
+          },
+          "value": "0"
+        },
+        "visibility": "internal"
+      }
+    ],
+    "license": "MIT"
+  },
+  "id": 15
+}

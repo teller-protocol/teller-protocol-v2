@@ -1,0 +1,736 @@
+{
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "targetAttester",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [],
+      "name": "NotPayable",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "isPayable",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes",
+          "name": "",
+          "type": "bytes"
+        },
+        {
+          "internalType": "bytes",
+          "name": "",
+          "type": "bytes"
+        },
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "msgSender",
+          "type": "address"
+        }
+      ],
+      "name": "resolve",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "stateMutability": "payable",
+      "type": "receive"
+    }
+  ],
+  "bytecode": {
+    "object": "0x60a060405234801561001057600080fd5b5060405161027e38038061027e83398101604081905261002f91610040565b6001600160a01b0316608052610070565b60006020828403121561005257600080fd5b81516001600160a01b038116811461006957600080fd5b9392505050565b6080516101f461008a6000396000606001526101f46000f3fe60806040526004361061002d5760003560e01c8063947a75b414610050578063ce46e046146100ab57600080fd5b3661004b57604051631574f9f360e01b815260040160405180910390fd5b600080fd5b61009761005e366004610124565b7f00000000000000000000000000000000000000000000000000000000000000006001600160a01b039081169116149695505050505050565b604051901515815260200160405180910390f35b3480156100b757600080fd5b506000610097565b80356001600160a01b03811681146100d657600080fd5b919050565b60008083601f8401126100ed57600080fd5b50813567ffffffffffffffff81111561010557600080fd5b60208301915083602082850101111561011d57600080fd5b9250929050565b600080600080600080600060a0888a03121561013f57600080fd5b610148886100bf565b9650602088013567ffffffffffffffff8082111561016557600080fd5b6101718b838c016100db565b909850965060408a013591508082111561018a57600080fd5b506101978a828b016100db565b909550935050606088013591506101b0608089016100bf565b90509295989194975092955056fea2646970667358221220c0e5c3dcefc1330cc46208517435c907813de8689ccd873bbf46ad96f285426764736f6c63430008110033",
+    "sourceMap": "221:493:111:-:0;;;327:85;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::i;:::-;-1:-1:-1;;;;;373:32:111;;;221:493;;14:290:121;84:6;137:2;125:9;116:7;112:23;108:32;105:52;;;153:1;150;143:12;105:52;179:16;;-1:-1:-1;;;;;224:31:121;;214:42;;204:70;;270:1;267;260:12;204:70;293:5;14:290;-1:-1:-1;;;14:290:121:o;:::-;221:493:111;;;;;;;;;;;;",
+    "linkReferences": {}
+  },
+  "deployedBytecode": {
+    "object": "0x60806040526004361061002d5760003560e01c8063947a75b414610050578063ce46e046146100ab57600080fd5b3661004b57604051631574f9f360e01b815260040160405180910390fd5b600080fd5b61009761005e366004610124565b7f00000000000000000000000000000000000000000000000000000000000000006001600160a01b039081169116149695505050505050565b604051901515815260200160405180910390f35b3480156100b757600080fd5b506000610097565b80356001600160a01b03811681146100d657600080fd5b919050565b60008083601f8401126100ed57600080fd5b50813567ffffffffffffffff81111561010557600080fd5b60208301915083602082850101111561011d57600080fd5b9250929050565b600080600080600080600060a0888a03121561013f57600080fd5b610148886100bf565b9650602088013567ffffffffffffffff8082111561016557600080fd5b6101718b838c016100db565b909850965060408a013591508082111561018a57600080fd5b506101978a828b016100db565b909550935050606088013591506101b0608089016100bf565b90509295989194975092955056fea2646970667358221220c0e5c3dcefc1330cc46208517435c907813de8689ccd873bbf46ad96f285426764736f6c63430008110033",
+    "sourceMap": "221:493:111:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;414:12:2;;-1:-1:-1;;;414:12:2;;;;;;;;;;;221:493:111;;;;418:294;;;;;;:::i;:::-;690:15;-1:-1:-1;;;;;677:28:111;;;;;;;;-1:-1:-1;;;;;;418:294:111;;;;1649:14:121;;1642:22;1624:41;;1612:2;1597:18;418:294:111;;;;;;;230:94:2;;;;;;;;;;-1:-1:-1;289:4:2;230:94;;14:173:121;82:20;;-1:-1:-1;;;;;131:31:121;;121:42;;111:70;;177:1;174;167:12;111:70;14:173;;;:::o;192:347::-;243:8;253:6;307:3;300:4;292:6;288:17;284:27;274:55;;325:1;322;315:12;274:55;-1:-1:-1;348:20:121;;391:18;380:30;;377:50;;;423:1;420;413:12;377:50;460:4;452:6;448:17;436:29;;512:3;505:4;496:6;488;484:19;480:30;477:39;474:59;;;529:1;526;519:12;474:59;192:347;;;;;:::o;544:935::-;661:6;669;677;685;693;701;709;762:3;750:9;741:7;737:23;733:33;730:53;;;779:1;776;769:12;730:53;802:29;821:9;802:29;:::i;:::-;792:39;;882:2;871:9;867:18;854:32;905:18;946:2;938:6;935:14;932:34;;;962:1;959;952:12;932:34;1001:58;1051:7;1042:6;1031:9;1027:22;1001:58;:::i;:::-;1078:8;;-1:-1:-1;975:84:121;-1:-1:-1;1166:2:121;1151:18;;1138:32;;-1:-1:-1;1182:16:121;;;1179:36;;;1211:1;1208;1201:12;1179:36;;1250:60;1302:7;1291:8;1280:9;1276:24;1250:60;:::i;:::-;1329:8;;-1:-1:-1;1224:86:121;-1:-1:-1;;1411:2:121;1396:18;;1383:32;;-1:-1:-1;1434:39:121;1468:3;1453:19;;1434:39;:::i;:::-;1424:49;;544:935;;;;;;;;;;:::o",
+    "linkReferences": {},
+    "immutableReferences": {
+      "64619": [
+        {
+          "start": 96,
+          "length": 32
+        }
+      ]
+    }
+  },
+  "methodIdentifiers": {
+    "isPayable()": "ce46e046",
+    "resolve(address,bytes,bytes,uint256,address)": "947a75b4"
+  },
+  "rawMetadata": "{\"compiler\":{\"version\":\"0.8.17+commit.8df45f5f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"targetAttester\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[],\"name\":\"NotPayable\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"isPayable\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"msgSender\",\"type\":\"address\"}],\"name\":\"resolve\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"stateMutability\":\"payable\",\"type\":\"receive\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"isPayable()\":{\"details\":\"Returns whether the resolver supports ETH transfers\"}},\"title\":\"A sample AS resolver that checks whether the attestation is from a specific attester.\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"tests/resolvers/TestASAttesterResolver.sol\":\"TestASAttesterResolver\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[\":@ensdomains/=node_modules/@ensdomains/\",\":@mangrovedao/=node_modules/@mangrovedao/\",\":@openzeppelin/=node_modules/@openzeppelin/\",\":ds-test/=lib/forge-std/lib/ds-test/src/\",\":eth-gas-reporter/=node_modules/eth-gas-reporter/\",\":forge-std/=lib/forge-std/src/\",\":hardhat-deploy/=node_modules/hardhat-deploy/\",\":hardhat/=node_modules/hardhat/\"]},\"sources\":{\"contracts/EAS/TellerASResolver.sol\":{\"keccak256\":\"0x8002d1725fd711dacd001e06d98fe2afc4814d2939d06df70c5b3ffcf5ec7f15\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://bf5541bff874031b5b5bd99c16c9b9a02470bf71f2ccbe3de67cb226cfab78ed\",\"dweb:/ipfs/QmNSd856Quf5zhKFYUh2RjeD29fcAkSQNX9SREictuwuUA\"]},\"contracts/interfaces/IASResolver.sol\":{\"keccak256\":\"0xfce671ea099d9f997a69c3447eb4a9c9693d37c5b97e43ada376e614e1c7cb61\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://6673f2ba98aafbeb4bdbfbc2392b164a7ae4e82b8b8a5f5b9b484fbdf4653cc1\",\"dweb:/ipfs/QmVSkwZpHzgpTyzcydE8SptJiGRvK89KahhxBuwNZNm8d2\"]},\"tests/resolvers/TestASAttesterResolver.sol\":{\"keccak256\":\"0x9bdea8ec05f0d8be358dabfcb302d5eb26f9371950c484a38e9e602f1ac88ebf\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://8a359b367e439bcc63cf16f574028be801e94c91a56eb9eae6281d06aba11891\",\"dweb:/ipfs/QmfAm5bYXPisGrETM4o11qjKTjZhataUgWHAyokvr7cJQA\"]}},\"version\":1}",
+  "metadata": {
+    "compiler": {
+      "version": "0.8.17+commit.8df45f5f"
+    },
+    "language": "Solidity",
+    "output": {
+      "abi": [
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "targetAttester",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "constructor"
+        },
+        {
+          "inputs": [],
+          "type": "error",
+          "name": "NotPayable"
+        },
+        {
+          "inputs": [],
+          "stateMutability": "pure",
+          "type": "function",
+          "name": "isPayable",
+          "outputs": [
+            {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
+            }
+          ]
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            },
+            {
+              "internalType": "bytes",
+              "name": "",
+              "type": "bytes"
+            },
+            {
+              "internalType": "bytes",
+              "name": "",
+              "type": "bytes"
+            },
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            },
+            {
+              "internalType": "address",
+              "name": "msgSender",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "payable",
+          "type": "function",
+          "name": "resolve",
+          "outputs": [
+            {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
+            }
+          ]
+        },
+        {
+          "inputs": [],
+          "stateMutability": "payable",
+          "type": "receive"
+        }
+      ],
+      "devdoc": {
+        "kind": "dev",
+        "methods": {
+          "isPayable()": {
+            "details": "Returns whether the resolver supports ETH transfers"
+          }
+        },
+        "version": 1
+      },
+      "userdoc": {
+        "kind": "user",
+        "methods": {},
+        "version": 1
+      }
+    },
+    "settings": {
+      "remappings": [
+        ":@ensdomains/=node_modules/@ensdomains/",
+        ":@mangrovedao/=node_modules/@mangrovedao/",
+        ":@openzeppelin/=node_modules/@openzeppelin/",
+        ":ds-test/=lib/forge-std/lib/ds-test/src/",
+        ":eth-gas-reporter/=node_modules/eth-gas-reporter/",
+        ":forge-std/=lib/forge-std/src/",
+        ":hardhat-deploy/=node_modules/hardhat-deploy/",
+        ":hardhat/=node_modules/hardhat/"
+      ],
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "metadata": {
+        "bytecodeHash": "ipfs"
+      },
+      "compilationTarget": {
+        "tests/resolvers/TestASAttesterResolver.sol": "TestASAttesterResolver"
+      },
+      "libraries": {}
+    },
+    "sources": {
+      "contracts/EAS/TellerASResolver.sol": {
+        "keccak256": "0x8002d1725fd711dacd001e06d98fe2afc4814d2939d06df70c5b3ffcf5ec7f15",
+        "urls": [
+          "bzz-raw://bf5541bff874031b5b5bd99c16c9b9a02470bf71f2ccbe3de67cb226cfab78ed",
+          "dweb:/ipfs/QmNSd856Quf5zhKFYUh2RjeD29fcAkSQNX9SREictuwuUA"
+        ],
+        "license": "MIT"
+      },
+      "contracts/interfaces/IASResolver.sol": {
+        "keccak256": "0xfce671ea099d9f997a69c3447eb4a9c9693d37c5b97e43ada376e614e1c7cb61",
+        "urls": [
+          "bzz-raw://6673f2ba98aafbeb4bdbfbc2392b164a7ae4e82b8b8a5f5b9b484fbdf4653cc1",
+          "dweb:/ipfs/QmVSkwZpHzgpTyzcydE8SptJiGRvK89KahhxBuwNZNm8d2"
+        ],
+        "license": "MIT"
+      },
+      "tests/resolvers/TestASAttesterResolver.sol": {
+        "keccak256": "0x9bdea8ec05f0d8be358dabfcb302d5eb26f9371950c484a38e9e602f1ac88ebf",
+        "urls": [
+          "bzz-raw://8a359b367e439bcc63cf16f574028be801e94c91a56eb9eae6281d06aba11891",
+          "dweb:/ipfs/QmfAm5bYXPisGrETM4o11qjKTjZhataUgWHAyokvr7cJQA"
+        ],
+        "license": "MIT"
+      }
+    },
+    "version": 1
+  },
+  "ast": {
+    "absolutePath": "tests/resolvers/TestASAttesterResolver.sol",
+    "id": 64652,
+    "exportedSymbols": {
+      "IASResolver": [
+        9261
+      ],
+      "TellerASResolver": [
+        2052
+      ],
+      "TestASAttesterResolver": [
+        64651
+      ]
+    },
+    "nodeType": "SourceUnit",
+    "src": "0:715:111",
+    "nodes": [
+      {
+        "id": 64613,
+        "nodeType": "PragmaDirective",
+        "src": "0:31:111",
+        "nodes": [],
+        "literals": [
+          "solidity",
+          ">=",
+          "0.8",
+          ".0",
+          "<",
+          "0.9",
+          ".0"
+        ]
+      },
+      {
+        "id": 64614,
+        "nodeType": "ImportDirective",
+        "src": "65:50:111",
+        "nodes": [],
+        "absolutePath": "contracts/EAS/TellerASResolver.sol",
+        "file": "../../contracts/EAS/TellerASResolver.sol",
+        "nameLocation": "-1:-1:-1",
+        "scope": 64652,
+        "sourceUnit": 2053,
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "id": 64651,
+        "nodeType": "ContractDefinition",
+        "src": "221:493:111",
+        "nodes": [
+          {
+            "id": 64619,
+            "nodeType": "VariableDeclaration",
+            "src": "279:41:111",
+            "nodes": [],
+            "constant": false,
+            "mutability": "immutable",
+            "name": "_targetAttester",
+            "nameLocation": "305:15:111",
+            "scope": 64651,
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_address",
+              "typeString": "address"
+            },
+            "typeName": {
+              "id": 64618,
+              "name": "address",
+              "nodeType": "ElementaryTypeName",
+              "src": "279:7:111",
+              "stateMutability": "nonpayable",
+              "typeDescriptions": {
+                "typeIdentifier": "t_address",
+                "typeString": "address"
+              }
+            },
+            "visibility": "private"
+          },
+          {
+            "id": 64629,
+            "nodeType": "FunctionDefinition",
+            "src": "327:85:111",
+            "nodes": [],
+            "body": {
+              "id": 64628,
+              "nodeType": "Block",
+              "src": "363:49:111",
+              "nodes": [],
+              "statements": [
+                {
+                  "expression": {
+                    "id": 64626,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "id": 64624,
+                      "name": "_targetAttester",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 64619,
+                      "src": "373:15:111",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_address",
+                        "typeString": "address"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "id": 64625,
+                      "name": "targetAttester",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 64621,
+                      "src": "391:14:111",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_address",
+                        "typeString": "address"
+                      }
+                    },
+                    "src": "373:32:111",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "id": 64627,
+                  "nodeType": "ExpressionStatement",
+                  "src": "373:32:111"
+                }
+              ]
+            },
+            "implemented": true,
+            "kind": "constructor",
+            "modifiers": [],
+            "name": "",
+            "nameLocation": "-1:-1:-1",
+            "parameters": {
+              "id": 64622,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 64621,
+                  "mutability": "mutable",
+                  "name": "targetAttester",
+                  "nameLocation": "347:14:111",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 64629,
+                  "src": "339:22:111",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 64620,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "339:7:111",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "338:24:111"
+            },
+            "returnParameters": {
+              "id": 64623,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "363:0:111"
+            },
+            "scope": 64651,
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "public"
+          },
+          {
+            "id": 64650,
+            "nodeType": "FunctionDefinition",
+            "src": "418:294:111",
+            "nodes": [],
+            "body": {
+              "id": 64649,
+              "nodeType": "Block",
+              "src": "660:52:111",
+              "nodes": [],
+              "statements": [
+                {
+                  "expression": {
+                    "commonType": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    },
+                    "id": 64647,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftExpression": {
+                      "id": 64645,
+                      "name": "msgSender",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 64639,
+                      "src": "677:9:111",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_address",
+                        "typeString": "address"
+                      }
+                    },
+                    "nodeType": "BinaryOperation",
+                    "operator": "==",
+                    "rightExpression": {
+                      "id": 64646,
+                      "name": "_targetAttester",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 64619,
+                      "src": "690:15:111",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_address",
+                        "typeString": "address"
+                      }
+                    },
+                    "src": "677:28:111",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "functionReturnParameters": 64644,
+                  "id": 64648,
+                  "nodeType": "Return",
+                  "src": "670:35:111"
+                }
+              ]
+            },
+            "baseFunctions": [
+              9260
+            ],
+            "functionSelector": "947a75b4",
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "resolve",
+            "nameLocation": "427:7:111",
+            "overrides": {
+              "id": 64641,
+              "nodeType": "OverrideSpecifier",
+              "overrides": [],
+              "src": "636:8:111"
+            },
+            "parameters": {
+              "id": 64640,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 64631,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 64650,
+                  "src": "444:7:111",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 64630,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "444:7:111",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 64633,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 64650,
+                  "src": "477:14:111",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_calldata_ptr",
+                    "typeString": "bytes"
+                  },
+                  "typeName": {
+                    "id": 64632,
+                    "name": "bytes",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "477:5:111",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_storage_ptr",
+                      "typeString": "bytes"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 64635,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 64650,
+                  "src": "514:14:111",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_calldata_ptr",
+                    "typeString": "bytes"
+                  },
+                  "typeName": {
+                    "id": 64634,
+                    "name": "bytes",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "514:5:111",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_storage_ptr",
+                      "typeString": "bytes"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 64637,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 64650,
+                  "src": "549:7:111",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 64636,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "549:7:111",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 64639,
+                  "mutability": "mutable",
+                  "name": "msgSender",
+                  "nameLocation": "595:9:111",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 64650,
+                  "src": "587:17:111",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 64638,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "587:7:111",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "434:176:111"
+            },
+            "returnParameters": {
+              "id": 64644,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 64643,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 64650,
+                  "src": "654:4:111",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 64642,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "654:4:111",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "653:6:111"
+            },
+            "scope": 64651,
+            "stateMutability": "payable",
+            "virtual": true,
+            "visibility": "external"
+          }
+        ],
+        "abstract": false,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 64616,
+              "name": "TellerASResolver",
+              "nameLocations": [
+                "256:16:111"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 2052,
+              "src": "256:16:111"
+            },
+            "id": 64617,
+            "nodeType": "InheritanceSpecifier",
+            "src": "256:16:111"
+          }
+        ],
+        "canonicalName": "TestASAttesterResolver",
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": {
+          "id": 64615,
+          "nodeType": "StructuredDocumentation",
+          "src": "117:103:111",
+          "text": " @title A sample AS resolver that checks whether the attestation is from a specific attester."
+        },
+        "fullyImplemented": true,
+        "linearizedBaseContracts": [
+          64651,
+          2052,
+          9261
+        ],
+        "name": "TestASAttesterResolver",
+        "nameLocation": "230:22:111",
+        "scope": 64652,
+        "usedErrors": [
+          2030
+        ]
+      }
+    ],
+    "license": "MIT"
+  },
+  "id": 111
+}

@@ -1,0 +1,1022 @@
+{
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_account",
+          "type": "address"
+        }
+      ],
+      "name": "getCurrentDefaultLoanIds",
+      "outputs": [
+        {
+          "internalType": "uint256[]",
+          "name": "",
+          "type": "uint256[]"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_account",
+          "type": "address"
+        }
+      ],
+      "name": "getCurrentDelinquentLoanIds",
+      "outputs": [
+        {
+          "internalType": "uint256[]",
+          "name": "",
+          "type": "uint256[]"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_account",
+          "type": "address"
+        }
+      ],
+      "name": "getDefaultedLoanIds",
+      "outputs": [
+        {
+          "internalType": "uint256[]",
+          "name": "",
+          "type": "uint256[]"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_account",
+          "type": "address"
+        }
+      ],
+      "name": "getDelinquentLoanIds",
+      "outputs": [
+        {
+          "internalType": "uint256[]",
+          "name": "",
+          "type": "uint256[]"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "protocolAddress",
+          "type": "address"
+        }
+      ],
+      "name": "initialize",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_account",
+          "type": "address"
+        }
+      ],
+      "name": "updateAccountReputation",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_account",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_bidId",
+          "type": "uint256"
+        }
+      ],
+      "name": "updateAccountReputation",
+      "outputs": [
+        {
+          "internalType": "enum RepMark",
+          "name": "",
+          "type": "uint8"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": {
+    "object": "0x",
+    "sourceMap": "",
+    "linkReferences": {}
+  },
+  "deployedBytecode": {
+    "object": "0x",
+    "sourceMap": "",
+    "linkReferences": {}
+  },
+  "methodIdentifiers": {
+    "getCurrentDefaultLoanIds(address)": "287b498a",
+    "getCurrentDelinquentLoanIds(address)": "e0d5343d",
+    "getDefaultedLoanIds(address)": "03c04b28",
+    "getDelinquentLoanIds(address)": "76604b37",
+    "initialize(address)": "c4d66de8",
+    "updateAccountReputation(address)": "7076185c",
+    "updateAccountReputation(address,uint256)": "c7312e47"
+  },
+  "rawMetadata": "{\"compiler\":{\"version\":\"0.8.17+commit.8df45f5f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_account\",\"type\":\"address\"}],\"name\":\"getCurrentDefaultLoanIds\",\"outputs\":[{\"internalType\":\"uint256[]\",\"name\":\"\",\"type\":\"uint256[]\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_account\",\"type\":\"address\"}],\"name\":\"getCurrentDelinquentLoanIds\",\"outputs\":[{\"internalType\":\"uint256[]\",\"name\":\"\",\"type\":\"uint256[]\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_account\",\"type\":\"address\"}],\"name\":\"getDefaultedLoanIds\",\"outputs\":[{\"internalType\":\"uint256[]\",\"name\":\"\",\"type\":\"uint256[]\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_account\",\"type\":\"address\"}],\"name\":\"getDelinquentLoanIds\",\"outputs\":[{\"internalType\":\"uint256[]\",\"name\":\"\",\"type\":\"uint256[]\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"protocolAddress\",\"type\":\"address\"}],\"name\":\"initialize\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_account\",\"type\":\"address\"}],\"name\":\"updateAccountReputation\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_account\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_bidId\",\"type\":\"uint256\"}],\"name\":\"updateAccountReputation\",\"outputs\":[{\"internalType\":\"enum RepMark\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/interfaces/IReputationManager.sol\":\"IReputationManager\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[\":@ensdomains/=node_modules/@ensdomains/\",\":@mangrovedao/=node_modules/@mangrovedao/\",\":@openzeppelin/=node_modules/@openzeppelin/\",\":ds-test/=lib/forge-std/lib/ds-test/src/\",\":eth-gas-reporter/=node_modules/eth-gas-reporter/\",\":forge-std/=lib/forge-std/src/\",\":hardhat-deploy/=node_modules/hardhat-deploy/\",\":hardhat/=node_modules/hardhat/\"]},\"sources\":{\"contracts/interfaces/IReputationManager.sol\":{\"keccak256\":\"0x8d6e50fd460912231e53135b4459aa2f6f16007ae8deb32bc2cee1e88311a8d8\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://03916311f51b553acf71bad455de12f056d367b5fe2ba5ad1caa74fabd3315d0\",\"dweb:/ipfs/QmXnPx58qKBv5mCuUWP2AemjKsQWzGY1nMemS5NoJQ35NK\"]}},\"version\":1}",
+  "metadata": {
+    "compiler": {
+      "version": "0.8.17+commit.8df45f5f"
+    },
+    "language": "Solidity",
+    "output": {
+      "abi": [
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "_account",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function",
+          "name": "getCurrentDefaultLoanIds",
+          "outputs": [
+            {
+              "internalType": "uint256[]",
+              "name": "",
+              "type": "uint256[]"
+            }
+          ]
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "_account",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function",
+          "name": "getCurrentDelinquentLoanIds",
+          "outputs": [
+            {
+              "internalType": "uint256[]",
+              "name": "",
+              "type": "uint256[]"
+            }
+          ]
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "_account",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function",
+          "name": "getDefaultedLoanIds",
+          "outputs": [
+            {
+              "internalType": "uint256[]",
+              "name": "",
+              "type": "uint256[]"
+            }
+          ]
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "_account",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function",
+          "name": "getDelinquentLoanIds",
+          "outputs": [
+            {
+              "internalType": "uint256[]",
+              "name": "",
+              "type": "uint256[]"
+            }
+          ]
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "protocolAddress",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function",
+          "name": "initialize"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "_account",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function",
+          "name": "updateAccountReputation"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "_account",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "_bidId",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function",
+          "name": "updateAccountReputation",
+          "outputs": [
+            {
+              "internalType": "enum RepMark",
+              "name": "",
+              "type": "uint8"
+            }
+          ]
+        }
+      ],
+      "devdoc": {
+        "kind": "dev",
+        "methods": {},
+        "version": 1
+      },
+      "userdoc": {
+        "kind": "user",
+        "methods": {},
+        "version": 1
+      }
+    },
+    "settings": {
+      "remappings": [
+        ":@ensdomains/=node_modules/@ensdomains/",
+        ":@mangrovedao/=node_modules/@mangrovedao/",
+        ":@openzeppelin/=node_modules/@openzeppelin/",
+        ":ds-test/=lib/forge-std/lib/ds-test/src/",
+        ":eth-gas-reporter/=node_modules/eth-gas-reporter/",
+        ":forge-std/=lib/forge-std/src/",
+        ":hardhat-deploy/=node_modules/hardhat-deploy/",
+        ":hardhat/=node_modules/hardhat/"
+      ],
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "metadata": {
+        "bytecodeHash": "ipfs"
+      },
+      "compilationTarget": {
+        "contracts/interfaces/IReputationManager.sol": "IReputationManager"
+      },
+      "libraries": {}
+    },
+    "sources": {
+      "contracts/interfaces/IReputationManager.sol": {
+        "keccak256": "0x8d6e50fd460912231e53135b4459aa2f6f16007ae8deb32bc2cee1e88311a8d8",
+        "urls": [
+          "bzz-raw://03916311f51b553acf71bad455de12f056d367b5fe2ba5ad1caa74fabd3315d0",
+          "dweb:/ipfs/QmXnPx58qKBv5mCuUWP2AemjKsQWzGY1nMemS5NoJQ35NK"
+        ],
+        "license": "MIT"
+      }
+    },
+    "version": 1
+  },
+  "ast": {
+    "absolutePath": "contracts/interfaces/IReputationManager.sol",
+    "id": 9873,
+    "exportedSymbols": {
+      "IReputationManager": [
+        9872
+      ],
+      "RepMark": [
+        9819
+      ]
+    },
+    "nodeType": "SourceUnit",
+    "src": "32:789:24",
+    "nodes": [
+      {
+        "id": 9815,
+        "nodeType": "PragmaDirective",
+        "src": "32:23:24",
+        "nodes": [],
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".0"
+        ]
+      },
+      {
+        "id": 9819,
+        "nodeType": "EnumDefinition",
+        "src": "57:54:24",
+        "nodes": [],
+        "canonicalName": "RepMark",
+        "members": [
+          {
+            "id": 9816,
+            "name": "Good",
+            "nameLocation": "76:4:24",
+            "nodeType": "EnumValue",
+            "src": "76:4:24"
+          },
+          {
+            "id": 9817,
+            "name": "Delinquent",
+            "nameLocation": "86:10:24",
+            "nodeType": "EnumValue",
+            "src": "86:10:24"
+          },
+          {
+            "id": 9818,
+            "name": "Default",
+            "nameLocation": "102:7:24",
+            "nodeType": "EnumValue",
+            "src": "102:7:24"
+          }
+        ],
+        "name": "RepMark",
+        "nameLocation": "62:7:24"
+      },
+      {
+        "id": 9872,
+        "nodeType": "ContractDefinition",
+        "src": "113:707:24",
+        "nodes": [
+          {
+            "id": 9824,
+            "nodeType": "FunctionDefinition",
+            "src": "148:54:24",
+            "nodes": [],
+            "functionSelector": "c4d66de8",
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "initialize",
+            "nameLocation": "157:10:24",
+            "parameters": {
+              "id": 9822,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 9821,
+                  "mutability": "mutable",
+                  "name": "protocolAddress",
+                  "nameLocation": "176:15:24",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9824,
+                  "src": "168:23:24",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 9820,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "168:7:24",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "167:25:24"
+            },
+            "returnParameters": {
+              "id": 9823,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "201:0:24"
+            },
+            "scope": 9872,
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "id": 9832,
+            "nodeType": "FunctionDefinition",
+            "src": "208:100:24",
+            "nodes": [],
+            "functionSelector": "76604b37",
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getDelinquentLoanIds",
+            "nameLocation": "217:20:24",
+            "parameters": {
+              "id": 9827,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 9826,
+                  "mutability": "mutable",
+                  "name": "_account",
+                  "nameLocation": "246:8:24",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9832,
+                  "src": "238:16:24",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 9825,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "238:7:24",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "237:18:24"
+            },
+            "returnParameters": {
+              "id": 9831,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 9830,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9832,
+                  "src": "290:16:24",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_uint256_$dyn_memory_ptr",
+                    "typeString": "uint256[]"
+                  },
+                  "typeName": {
+                    "baseType": {
+                      "id": 9828,
+                      "name": "uint256",
+                      "nodeType": "ElementaryTypeName",
+                      "src": "290:7:24",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "id": 9829,
+                    "nodeType": "ArrayTypeName",
+                    "src": "290:9:24",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_uint256_$dyn_storage_ptr",
+                      "typeString": "uint256[]"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "289:18:24"
+            },
+            "scope": 9872,
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "id": 9840,
+            "nodeType": "FunctionDefinition",
+            "src": "314:99:24",
+            "nodes": [],
+            "functionSelector": "03c04b28",
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getDefaultedLoanIds",
+            "nameLocation": "323:19:24",
+            "parameters": {
+              "id": 9835,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 9834,
+                  "mutability": "mutable",
+                  "name": "_account",
+                  "nameLocation": "351:8:24",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9840,
+                  "src": "343:16:24",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 9833,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "343:7:24",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "342:18:24"
+            },
+            "returnParameters": {
+              "id": 9839,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 9838,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9840,
+                  "src": "395:16:24",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_uint256_$dyn_memory_ptr",
+                    "typeString": "uint256[]"
+                  },
+                  "typeName": {
+                    "baseType": {
+                      "id": 9836,
+                      "name": "uint256",
+                      "nodeType": "ElementaryTypeName",
+                      "src": "395:7:24",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "id": 9837,
+                    "nodeType": "ArrayTypeName",
+                    "src": "395:9:24",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_uint256_$dyn_storage_ptr",
+                      "typeString": "uint256[]"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "394:18:24"
+            },
+            "scope": 9872,
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "id": 9848,
+            "nodeType": "FunctionDefinition",
+            "src": "419:107:24",
+            "nodes": [],
+            "functionSelector": "e0d5343d",
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getCurrentDelinquentLoanIds",
+            "nameLocation": "428:27:24",
+            "parameters": {
+              "id": 9843,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 9842,
+                  "mutability": "mutable",
+                  "name": "_account",
+                  "nameLocation": "464:8:24",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9848,
+                  "src": "456:16:24",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 9841,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "456:7:24",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "455:18:24"
+            },
+            "returnParameters": {
+              "id": 9847,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 9846,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9848,
+                  "src": "508:16:24",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_uint256_$dyn_memory_ptr",
+                    "typeString": "uint256[]"
+                  },
+                  "typeName": {
+                    "baseType": {
+                      "id": 9844,
+                      "name": "uint256",
+                      "nodeType": "ElementaryTypeName",
+                      "src": "508:7:24",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "id": 9845,
+                    "nodeType": "ArrayTypeName",
+                    "src": "508:9:24",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_uint256_$dyn_storage_ptr",
+                      "typeString": "uint256[]"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "507:18:24"
+            },
+            "scope": 9872,
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "id": 9856,
+            "nodeType": "FunctionDefinition",
+            "src": "532:104:24",
+            "nodes": [],
+            "functionSelector": "287b498a",
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getCurrentDefaultLoanIds",
+            "nameLocation": "541:24:24",
+            "parameters": {
+              "id": 9851,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 9850,
+                  "mutability": "mutable",
+                  "name": "_account",
+                  "nameLocation": "574:8:24",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9856,
+                  "src": "566:16:24",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 9849,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "566:7:24",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "565:18:24"
+            },
+            "returnParameters": {
+              "id": 9855,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 9854,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9856,
+                  "src": "618:16:24",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_uint256_$dyn_memory_ptr",
+                    "typeString": "uint256[]"
+                  },
+                  "typeName": {
+                    "baseType": {
+                      "id": 9852,
+                      "name": "uint256",
+                      "nodeType": "ElementaryTypeName",
+                      "src": "618:7:24",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "id": 9853,
+                    "nodeType": "ArrayTypeName",
+                    "src": "618:9:24",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_uint256_$dyn_storage_ptr",
+                      "typeString": "uint256[]"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "617:18:24"
+            },
+            "scope": 9872,
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "id": 9861,
+            "nodeType": "FunctionDefinition",
+            "src": "642:60:24",
+            "nodes": [],
+            "functionSelector": "7076185c",
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "updateAccountReputation",
+            "nameLocation": "651:23:24",
+            "parameters": {
+              "id": 9859,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 9858,
+                  "mutability": "mutable",
+                  "name": "_account",
+                  "nameLocation": "683:8:24",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9861,
+                  "src": "675:16:24",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 9857,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "675:7:24",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "674:18:24"
+            },
+            "returnParameters": {
+              "id": 9860,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "701:0:24"
+            },
+            "scope": 9872,
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "id": 9871,
+            "nodeType": "FunctionDefinition",
+            "src": "708:110:24",
+            "nodes": [],
+            "functionSelector": "c7312e47",
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "updateAccountReputation",
+            "nameLocation": "717:23:24",
+            "parameters": {
+              "id": 9866,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 9863,
+                  "mutability": "mutable",
+                  "name": "_account",
+                  "nameLocation": "749:8:24",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9871,
+                  "src": "741:16:24",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 9862,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "741:7:24",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 9865,
+                  "mutability": "mutable",
+                  "name": "_bidId",
+                  "nameLocation": "767:6:24",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9871,
+                  "src": "759:14:24",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 9864,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "759:7:24",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "740:34:24"
+            },
+            "returnParameters": {
+              "id": 9870,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 9869,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 9871,
+                  "src": "809:7:24",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_enum$_RepMark_$9819",
+                    "typeString": "enum RepMark"
+                  },
+                  "typeName": {
+                    "id": 9868,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 9867,
+                      "name": "RepMark",
+                      "nameLocations": [
+                        "809:7:24"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 9819,
+                      "src": "809:7:24"
+                    },
+                    "referencedDeclaration": 9819,
+                    "src": "809:7:24",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_enum$_RepMark_$9819",
+                      "typeString": "enum RepMark"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "808:9:24"
+            },
+            "scope": 9872,
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "IReputationManager",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "linearizedBaseContracts": [
+          9872
+        ],
+        "name": "IReputationManager",
+        "nameLocation": "123:18:24",
+        "scope": 9873,
+        "usedErrors": []
+      }
+    ],
+    "license": "MIT"
+  },
+  "id": 24
+}

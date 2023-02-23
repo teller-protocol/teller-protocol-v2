@@ -131,7 +131,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         }
     }
 
-    function createCommitment_test() public {
+    function test_createCommitment() public {
         uint256 commitmentId = 0;
 
         Commitment storage existingCommitment = _createCommitment(
@@ -425,7 +425,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
 
     function decrementCommitment_before() public {}
 
-    function decrementCommitment_test() public {
+    function test_decrementCommitment() public {
         uint256 commitmentId = 0;
         uint256 _decrementAmount = 22;
 

@@ -725,6 +725,8 @@ export function handleCreatedCommitment(event: CreatedCommitment): void {
     event.address
   );
 
+  commitment.createdAt = event.block.timestamp;
+
   const stats = new TokenVolume(`commitment-stats-${commitment.id}`);
   initTokenVolume(stats, event.params.lendingToken);
   stats.save();

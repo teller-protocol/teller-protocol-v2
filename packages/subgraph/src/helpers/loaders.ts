@@ -252,6 +252,7 @@ export function loadCommitment(commitmentId: string): Commitment {
     commitment.marketplace = "";
     commitment.marketplaceId = BigInt.zero();
     commitment.stats = "";
+    commitment.createdAt = BigInt.zero();
 
     commitment.principalTokenAddress = Address.zero();
     commitment.collateralTokenAddress = Address.zero();

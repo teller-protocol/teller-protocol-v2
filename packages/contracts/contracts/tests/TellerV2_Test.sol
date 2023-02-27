@@ -82,17 +82,12 @@ contract TellerV2_Test is Testable {
                 address(marketRegistry)
             );
 
-        address[] memory lendingTokens = new address[](2);
-        lendingTokens[0] = address(wethMock);
-        lendingTokens[1] = address(daiMock);
-
         // Initialize protocol
         tellerV2.initialize(
             50,
             address(marketRegistry),
             address(reputationManager),
             address(lenderCommitmentForwarder),
-            lendingTokens,
             address(collateralManager),
             address(lenderManager)
         );

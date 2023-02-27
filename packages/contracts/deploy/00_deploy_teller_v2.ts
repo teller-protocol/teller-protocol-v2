@@ -1,22 +1,13 @@
-import { ethers, getNamedSigner } from 'hardhat'
 import { DeployFunction } from 'hardhat-deploy/dist/types'
 import { HARDHAT_NETWORK_NAME } from 'hardhat/plugins'
 import { deploy } from 'helpers/deploy-helpers'
 import { isInitialized } from 'helpers/oz-contract-helpers'
 import { CollateralManager, UpgradeableBeacon } from 'types/typechain'
 
-import { getTokens } from '~~/config'
-
 const deployFn: DeployFunction = async (hre) => {
   const protocolFee = 5 // 0.05%
 
   const marketRegistry = await hre.contracts.get('MarketRegistry')
-
-  const tokens = await getTokens(hre)
-  const lendingTokens = [tokens.all.DAI, tokens.all.USDC, tokens.all.WETH]
-  if ('USDCT' in tokens.all) {
-    lendingTokens.push(tokens.all.USDCT)
-  }
 
   const trustedForwarder = await hre.contracts.get('MetaForwarder')
 
@@ -102,7 +93,6 @@ const deployFn: DeployFunction = async (hre) => {
       marketRegistry.address,
       reputationManager.address,
       lenderCommitmentForwarder.address,
-      lendingTokens,
       collateralManager.address,
       lenderManager.address
     )

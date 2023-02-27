@@ -21,7 +21,6 @@ const deployFn: DeployFunction = async (hre) => {
       execute: {
         init,
       },
-      upgradeIndex: 1,
     },
     skipIfAlreadyDeployed: false,
     hre,

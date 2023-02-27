@@ -19,7 +19,7 @@ const deployFn: DeployFunction = async (hre) => {
   const tellerV2Contract = await deploy<TellerV2>({
     contract: 'TellerV2',
     args: [trustedForwarder.address],
-    mock: hre.network.name === HARDHAT_NETWORK_NAME,
+    // mock: hre.network.name === HARDHAT_NETWORK_NAME,
     proxy: {
       proxyContract: 'OpenZeppelinTransparentProxy',
     },

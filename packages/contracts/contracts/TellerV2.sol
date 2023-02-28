@@ -165,7 +165,6 @@ contract TellerV2 is
      * @param _marketRegistry The address of the market registry contract for the protocol.
      * @param _reputationManager The address of the reputation manager contract.
      * @param _lenderCommitmentForwarder The address of the lender commitment forwarder contract.
-     * @param _lendingTokens The list of tokens allowed as lending assets on the protocol.
      * @param _collateralManager The address of the collateral manager contracts.
      * @param _lenderManager The address of the lender manager contract for loans on the protocol.
      */
@@ -174,7 +173,6 @@ contract TellerV2 is
         address _marketRegistry,
         address _reputationManager,
         address _lenderCommitmentForwarder,
-        address[] calldata _lendingTokens,
         address _collateralManager,
         address _lenderManager
     ) external initializer {
@@ -207,15 +205,6 @@ contract TellerV2 is
         collateralManager = ICollateralManager(_collateralManager);
 
         _setLenderManager(_lenderManager);
-
-        require(_lendingTokens.length > 0, "No lending tokens specified");
-        for (uint256 i = 0; i < _lendingTokens.length; i++) {
-            require(
-                _lendingTokens[i].isContract(),
-                "lending token not contract"
-            );
-            addLendingToken(_lendingTokens[i]);
-        }
     }
 
     function setLenderManager(address _lenderManager)
@@ -358,10 +347,6 @@ contract TellerV2 is
         require(
             !marketRegistry.isMarketClosed(_marketplaceId),
             "Market is closed"
-        );
-        require(
-            lendingTokensSet.contains(_lendingToken),
-            "Lending token not authorized"
         );
 
         // Set response bid ID.
@@ -992,30 +977,6 @@ contract TellerV2 is
      */
     function lastRepaidTimestamp(uint256 _bidId) public view returns (uint32) {
         return V2Calculations.lastRepaidTimestamp(bids[_bidId]);
-    }
-
-    /**
-     * @notice Returns the list of authorized tokens on the protocol.
-     */
-    function getLendingTokens() public view returns (address[] memory) {
-        return lendingTokensSet.values();
-    }
-
-    /**
-     * @notice Lets the DAO/owner of the protocol add an authorized lending token.
-     * @param _lendingToken The contract address of the lending token.
-     */
-    function addLendingToken(address _lendingToken) public onlyOwner {
-        require(_lendingToken.isContract(), "Incorrect lending token address");
-        lendingTokensSet.add(_lendingToken);
-    }
-
-    /**
-     * @notice Lets the DAO/owner of the protocol remove an authorized lending token.
-     * @param _lendingToken The contract address of the lending token.
-     */
-    function removeLendingToken(address _lendingToken) public onlyOwner {
-        lendingTokensSet.remove(_lendingToken);
     }
 
     /**

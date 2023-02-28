@@ -1,29 +1,25 @@
-import { ethers, getNamedSigner } from 'hardhat'
 import { DeployFunction } from 'hardhat-deploy/dist/types'
 import { HARDHAT_NETWORK_NAME } from 'hardhat/plugins'
 import { deploy } from 'helpers/deploy-helpers'
 import { isInitialized } from 'helpers/oz-contract-helpers'
-import { CollateralManager, UpgradeableBeacon } from 'types/typechain'
-
-import { getTokens } from '~~/config'
+import {
+  CollateralManager,
+  ReputationManager,
+  TellerV2,
+  UpgradeableBeacon,
+} from 'types/typechain'
 
 const deployFn: DeployFunction = async (hre) => {
   const protocolFee = 5 // 0.05%
 
   const marketRegistry = await hre.contracts.get('MarketRegistry')
 
-  const tokens = await getTokens(hre)
-  const lendingTokens = [tokens.all.DAI, tokens.all.USDC, tokens.all.WETH]
-  if ('USDCT' in tokens.all) {
-    lendingTokens.push(tokens.all.USDCT)
-  }
-
   const trustedForwarder = await hre.contracts.get('MetaForwarder')
 
-  const tellerV2Contract = await deploy({
+  const tellerV2Contract = await deploy<TellerV2>({
     contract: 'TellerV2',
     args: [trustedForwarder.address],
-    mock: hre.network.name === HARDHAT_NETWORK_NAME,
+    // mock: hre.network.name === HARDHAT_NETWORK_NAME,
     proxy: {
       proxyContract: 'OpenZeppelinTransparentProxy',
     },
@@ -44,11 +40,16 @@ const deployFn: DeployFunction = async (hre) => {
     hre,
   })
 
-  const reputationManager = await hre.contracts.get('ReputationManager')
+  const reputationManager = await hre.contracts.get<ReputationManager>(
+    'ReputationManager'
+  )
   // Execute the initialize method of reputation manager
   const reputationIsInitialized = await isInitialized(reputationManager.address)
   if (!reputationIsInitialized) {
-    await reputationManager.initialize(tellerV2Contract.address)
+    const { wait } = await reputationManager.initialize(
+      tellerV2Contract.address
+    )
+    await wait(1)
   }
 
   const collateralEscrowBeaconImpl = await deploy({
@@ -97,15 +98,15 @@ const deployFn: DeployFunction = async (hre) => {
   const tellerV2IsInitialized = await isInitialized(tellerV2Contract.address)
   if (!tellerV2IsInitialized) {
     const lenderManager = await hre.contracts.get('LenderManager')
-    await tellerV2Contract.initialize(
+    const { wait } = await tellerV2Contract.initialize(
       protocolFee,
       marketRegistry.address,
       reputationManager.address,
       lenderCommitmentForwarder.address,
-      lendingTokens,
       collateralManager.address,
       lenderManager.address
     )
+    await wait(1)
   }
 }
 

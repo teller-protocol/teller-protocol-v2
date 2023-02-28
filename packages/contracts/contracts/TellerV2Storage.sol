@@ -96,13 +96,13 @@ abstract contract TellerV2Storage_G0 {
     mapping(address => uint256[]) public borrowerBids;
 
     // Mapping of volume filled by lenders.
-    mapping(address => uint256) public _lenderVolumeFilled; // DEPRECIATED
+    mapping(address => uint256) public __lenderVolumeFilled; // DEPRECIATED
 
     // Volume filled by all lenders.
-    uint256 public _totalVolumeFilled; // DEPRECIATED
+    uint256 public __totalVolumeFilled; // DEPRECIATED
 
     // List of allowed lending tokens
-    EnumerableSet.AddressSet internal lendingTokensSet;
+    EnumerableSet.AddressSet internal __lendingTokensSet; // DEPRECATED
 
     IMarketRegistry public marketRegistry;
     IReputationManager public reputationManager;

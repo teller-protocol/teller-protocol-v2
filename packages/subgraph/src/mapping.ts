@@ -963,15 +963,19 @@ export function handleNewLenderSet(event: Transfer): void {
   const bid = loadBidById(event.params.tokenId.toString());
   bid.lenderAddress = event.params.to;
 
-  const lender: Lender = loadLenderByMarketId(
-    event.params.to,
-    bid.marketplaceId.toString(),
-    event.block.timestamp
-  );
-  const lenderBid = new LenderBid(lender.id.concat(bid.id));
-  lenderBid.bid = bid.id;
-  lenderBid.lender = lender.id;
-  lenderBid.save();
+  if (bid.lender) {
+    const lenderBid = LenderBid.load(bid.lender);
+    if (lenderBid) {
+      const lender = loadLenderByMarketId(
+        event.params.to,
+        bid.marketplaceId.toString(),
+        event.block.timestamp
+      );
+      lenderBid.lender = lender.id;
+      lenderBid.save();
+    }
+  }
+
   bid.save();
 }
 

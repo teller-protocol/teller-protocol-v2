@@ -1,4 +1,4 @@
-import { Address, BigInt } from "@graphprotocol/graph-ts";
+import {Address, BigInt, Bytes} from "@graphprotocol/graph-ts";
 
 import {
   CollateralEscrowDeployed,
@@ -14,7 +14,9 @@ import {
   CreatedCommitment,
   DeletedCommitment,
   ExercisedCommitment,
-  UpdatedCommitment
+  LenderCommitmentForwarder,
+  UpdatedCommitment,
+  UpdatedCommitmentBorrowers
 } from "../generated/LenderCommitmentForwarder/LenderCommitmentForwarder";
 import {
   BorrowerAttestation,
@@ -56,6 +58,7 @@ import {
   SubmittedBid,
   TellerV2
 } from "../generated/TellerV2/TellerV2";
+import { initTokenVolume } from "./helpers/intializers";
 
 import {
   getBid,
@@ -716,8 +719,7 @@ export function handleTellerV2Upgraded(event: Upgraded): void {
 
 export function handleCreatedCommitment(event: CreatedCommitment): void {
   const commitmentId = event.params.commitmentId.toString();
-  const commitment = loadCommitment(commitmentId);
-  updateLenderCommitment(
+  const commitment = updateLenderCommitment(
     commitmentId,
     event.params.lender,
     event.params.marketId.toString(),
@@ -725,6 +727,15 @@ export function handleCreatedCommitment(event: CreatedCommitment): void {
     event.params.tokenAmount,
     event.address
   );
+
+  commitment.createdAt = event.block.timestamp;
+
+  const stats = new TokenVolume(`commitment-stats-${commitment.id}`);
+  initTokenVolume(stats, event.params.lendingToken);
+  stats.save();
+
+  commitment.stats = stats.id;
+  commitment.save();
 }
 
 export function handleCreatedCommitments(events: CreatedCommitment[]): void {
@@ -735,7 +746,6 @@ export function handleCreatedCommitments(events: CreatedCommitment[]): void {
 
 export function handleUpdatedCommitment(event: UpdatedCommitment): void {
   const commitmentId = event.params.commitmentId.toString();
-  const commitment = loadCommitment(commitmentId);
   updateLenderCommitment(
     commitmentId,
     event.params.lender,
@@ -808,6 +818,31 @@ export function handleExercisedCommitments(
 ): void {
   events.forEach(event => {
     handleExercisedCommitment(event);
+  });
+}
+
+export function handeUpdatedCommitmentBorrower(
+  event: UpdatedCommitmentBorrowers
+): void {
+  const commitmentId = event.params.commitmentId.toString();
+  const commitment = loadCommitment(commitmentId);
+  const lenderCommitmentForwarderInstance = LenderCommitmentForwarder.bind(
+    event.address
+  );
+  const borrowers = lenderCommitmentForwarderInstance.getCommitmentBorrowers(
+    BigInt.fromString(commitmentId)
+  );
+  if (borrowers) {
+    commitment.commitmentBorrowers = changetype<Bytes[]>(borrowers);
+  }
+  commitment.save();
+}
+
+export function handeUpdatedCommitmentBorrowers(
+  events: UpdatedCommitmentBorrowers[]
+): void {
+  events.forEach(event => {
+    handeUpdatedCommitmentBorrower(event);
   });
 }
 

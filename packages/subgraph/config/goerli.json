@@ -1,13 +1,13 @@
 {
   "network": "goerli",
-  "address_teller_v2": "0x1D0eBC060f2897dAc14E482De600cea7896c0A3E",
-  "block_teller_v2": "6896250",
-  "address_market_registry": "0x1815F01083AFD110373e952b6488f33b048F096b",
-  "block_market_registry": "6896250",
-  "address_lender_commitment": "0xC2418B857F9147AF5eB4517B23e9a966b368328f",
-  "block_lender_commitment": "7664450",
-  "address_collateral_manager": "0xB12B265F9D59B4aa571000ffc865a9a72A1451fb",
-  "block_collateral_manager": "8252657",
-  "address_lender_manager": "0x7a0e887a639e01e4564528d6d851BbD1bf1Db1Ed",
-  "block_lender_manager": "8508947"
+  "address_teller_v2": "0x195c6608705546725DF0629dd60690Cf2b367734",
+  "block_teller_v2": "8538452",
+  "address_market_registry": "0x74FFC87282ab32c8E0969E26F93C820a213ae146",
+  "block_market_registry": "8538442",
+  "address_lender_commitment": "0xB1b668592A4FCA5d0Cd91D4E5D8b33cb95043E43",
+  "block_lender_commitment": "8538455",
+  "address_collateral_manager": "0xD66de8b25C4165dA2e7696e15E8436380823B118",
+  "block_collateral_manager": "8538491",
+  "address_lender_manager": "0x98Ca52786e967d1469090AdC075416948Ca004A7",
+  "block_lender_manager": "8538444"
 }

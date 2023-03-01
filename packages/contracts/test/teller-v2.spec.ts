@@ -135,7 +135,6 @@ describe('TellerV2', () => {
           marketRegistry.address,
           reputationManager.address,
           AddressZero,
-          [(await getTokens(hre)).all.DAI],
           AddressZero,
           AddressZero
         )

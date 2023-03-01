@@ -16,13 +16,9 @@ const deployFn: DeployFunction = async (hre) => {
           args: [tellerAS.address],
           methodName: 'initialize',
         },
-        onUpgrade: {
-          args: [],
-          methodName: 'onUpgrade',
-        },
       },
     },
-    skipIfAlreadyDeployed: true,
+    skipIfAlreadyDeployed: false,
     hre,
   })
 }

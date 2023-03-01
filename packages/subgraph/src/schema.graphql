@@ -184,6 +184,7 @@ type MarketVolume @entity {
 
 type Commitment @entity {
   id: ID!
+  createdAt: BigInt!
 
   # Offer
   committedAmount: BigInt! # Max principal
@@ -198,6 +199,8 @@ type Commitment @entity {
   collateralTokenId: BigInt!
   collateralTokenType: String
   maxPrincipalPerCollateralAmount: BigInt!
+
+  commitmentBorrowers: [Bytes!]!
 
   # Lender
   lender: Lender!

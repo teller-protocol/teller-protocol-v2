@@ -1,7 +1,6 @@
 // This adds support for typescript paths mappings
 import 'tsconfig-paths/register'
 import '@nomiclabs/hardhat-waffle'
-import '@tenderly/hardhat-tenderly'
 import 'hardhat-contract-sizer'
 import 'hardhat-deploy'
 import 'hardhat-gas-reporter'
@@ -18,6 +17,7 @@ import {
   TransactionRequest,
 } from '@ethersproject/providers'
 import { HardhatEthersHelpers } from '@nomiclabs/hardhat-ethers/types'
+import * as tdly from '@tenderly/hardhat-tenderly'
 import chalk from 'chalk'
 import { config } from 'dotenv'
 import { ethers, Signer, utils } from 'ethers'
@@ -27,7 +27,6 @@ import {
   NetworkUserConfig,
 } from 'hardhat/types'
 import rrequire from 'helpers/rrequire'
-import { projectBase } from 'helpers/tenderly'
 import semver from 'semver'
 
 const NODE_VERSION = 'v16'
@@ -37,6 +36,8 @@ if (!semver.satisfies(process.version, NODE_VERSION))
   )
 
 config()
+tdly.setup({ automaticVerifications: true })
+
 const { isAddress, getAddress, formatUnits, parseUnits, parseEther } = utils
 
 const {
@@ -149,7 +150,8 @@ export default <HardhatUserConfig>{
 
   tenderly: {
     username: 'teller',
-    project: '{see `updateTenderlyConfig` function in utils/hre-extensions.ts}',
+    project: 'v2',
+    privateVerification: true,
     forkNetwork: networkUrls.tenderly,
   },
 
@@ -165,7 +167,7 @@ export default <HardhatUserConfig>{
   external: {
     contracts: [
       {
-        artifacts: 'node_modules/hardhat-deploy/extendedArtifacts',
+        artifacts: './node_modules/hardhat-deploy/extendedArtifacts',
       },
     ],
   },
@@ -176,7 +178,7 @@ export default <HardhatUserConfig>{
         version: '0.8.9',
         settings: {
           optimizer: {
-            enabled: true, //!isTesting, //need this for now due to large size of tellerV2.test
+            enabled: true, // !isTesting, //need this for now due to large size of tellerV2.test
             runs: 200,
           },
         },
@@ -212,7 +214,7 @@ export default <HardhatUserConfig>{
   namedAccounts: {
     deployer: {
       default: 0, // here this will by default take the first account as deployer
-      31337: '0xAFe87013dc96edE1E116a288D80FcaA0eFFE5fe5', //use the goerli deployer address for hardhat forking
+      31337: '0xAFe87013dc96edE1E116a288D80FcaA0eFFE5fe5', // use the goerli deployer address for hardhat forking
     },
     borrower: 1,
     lender: 2,

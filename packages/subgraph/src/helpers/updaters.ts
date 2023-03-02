@@ -6,6 +6,7 @@ import {
   Borrower,
   Collateral,
   Commitment,
+  Lender,
   Payment,
   TokenVolume
 } from "../../generated/schema";
@@ -118,17 +119,39 @@ export function updateBid(
   bid.save();
 }
 
-export function updateTokenVolumeOnAccept(
-  tokenVolume: TokenVolume,
-  storedBid: TellerV2__bidsResult
-): void {
+export function updateBidTokenVolumesOnAccept(bid: Bid, lender: Lender): void {
+  incrementLenderStats(lender, bid);
+
+  // Update the market's token volume
+  const tokenVolume = loadTokenVolumeByMarketId(
+    Address.fromBytes(bid.lendingTokenAddress),
+    bid.marketplace
+  );
+  updateTokenVolumeOnAccept(tokenVolume, bid);
+
+  // Update the protocol's overall token volume
+  const protocolVolume = loadProtocolTokenVolume(
+    Address.fromBytes(bid.lendingTokenAddress)
+  );
+  updateTokenVolumeOnAccept(protocolVolume, bid);
+
+  // Update the borrower's token volume
+  const borrowerVolume = loadBorrowerTokenVolume(
+    Address.fromBytes(bid.lendingTokenAddress),
+    bid.borrower
+  );
+  updateTokenVolumeOnAccept(borrowerVolume, bid);
+}
+
+function updateTokenVolumeOnAccept(tokenVolume: TokenVolume, bid: Bid): void {
   if (tokenVolume.lendingTokenAddress == Address.zero()) {
-    tokenVolume.lendingTokenAddress = storedBid.value5.lendingToken;
+    tokenVolume.lendingTokenAddress = bid.lendingTokenAddress;
   }
-  const capitalOwed = storedBid.value5.principal;
   const outstandingTokenCapital = tokenVolume.outstandingCapital;
   if (outstandingTokenCapital) {
-    tokenVolume.outstandingCapital = outstandingTokenCapital.plus(capitalOwed);
+    tokenVolume.outstandingCapital = outstandingTokenCapital.plus(
+      bid.principal
+    );
   }
   const tokenActiveLoans = tokenVolume.activeLoans;
   const tokenClosedLoans = tokenVolume.closedLoans;
@@ -142,36 +165,31 @@ export function updateTokenVolumeOnAccept(
     loaned &&
     tokenDurationTotal
   ) {
-    const updatedAPRTotal = tokenAprTotal.plus(
-      BigInt.fromI32(storedBid.value6.APR)
-    );
+    const updatedAPRTotal = tokenAprTotal.plus(bid.apr);
     tokenVolume._aprTotal = updatedAPRTotal;
     const updatedTokenActiveLoans = tokenActiveLoans.plus(BigInt.fromI32(1));
     const totalTokenLoans = updatedTokenActiveLoans.plus(tokenClosedLoans);
     tokenVolume.activeLoans = updatedTokenActiveLoans;
 
     tokenVolume.aprAverage = updatedAPRTotal.div(totalTokenLoans);
-    const updatedTokenLoanTotal = loaned.plus(storedBid.value5.principal);
+    const updatedTokenLoanTotal = loaned.plus(bid.principal);
     tokenVolume.loanAverage = updatedTokenLoanTotal.div(totalTokenLoans);
 
-    const updatedDurationTotal = tokenDurationTotal.plus(
-      storedBid.value5.loanDuration
-    );
+    const updatedDurationTotal = tokenDurationTotal.plus(bid.loanDuration);
     tokenVolume._durationTotal = updatedDurationTotal;
     tokenVolume.durationAverage = updatedDurationTotal.div(totalTokenLoans);
   }
   const totalTokensLoaned = tokenVolume.totalLoaned;
-  const principalAmount = storedBid.value5.principal;
   const highestLoan = tokenVolume.highestLoan;
   const lowestLoan = tokenVolume.lowestLoan;
   if (totalTokensLoaned && highestLoan && lowestLoan) {
-    tokenVolume.totalLoaned = totalTokensLoaned.plus(principalAmount);
+    tokenVolume.totalLoaned = totalTokensLoaned.plus(bid.principal);
     tokenVolume.highestLoan =
-      principalAmount > highestLoan ? principalAmount : highestLoan;
+      bid.principal > highestLoan ? bid.principal : highestLoan;
     tokenVolume.lowestLoan = lowestLoan.equals(BigInt.zero())
-      ? principalAmount
-      : principalAmount < lowestLoan
-      ? principalAmount
+      ? bid.principal
+      : bid.principal < lowestLoan
+      ? bid.principal
       : lowestLoan;
   }
   tokenVolume.save();
@@ -247,7 +265,7 @@ export function updateOutstandingCapital(
   // Update lender's token volume
   const lenderVolume = loadLenderTokenVolume(
     storedBid.value5.lendingToken,
-    lender
+    bid.lender!
   );
   updateTokenVolumeOnPayment(
     _lastPayment,
@@ -285,8 +303,8 @@ export function updateOutstandingCapital(
 
   // Update borrower's token volume
   const borrowerVolume = loadBorrowerTokenVolume(
-    storedBid.value5.lendingToken,
-    borrower
+    Address.fromBytes(bid.lendingTokenAddress),
+    bid.borrower
   );
   updateTokenVolumeOnPayment(
     _lastPayment,

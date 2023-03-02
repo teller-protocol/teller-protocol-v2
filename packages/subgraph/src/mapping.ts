@@ -1,15 +1,12 @@
-import {Address, BigInt, Bytes} from "@graphprotocol/graph-ts";
+import { Address, BigInt, Bytes } from "@graphprotocol/graph-ts";
 
 import {
-  CollateralEscrowDeployed,
+  CollateralClaimed,
   CollateralCommitted,
   CollateralDeposited,
-  CollateralWithdrawn,
-  CollateralClaimed
+  CollateralEscrowDeployed,
+  CollateralWithdrawn
 } from "../generated/CollateralManager/CollateralManager";
-import {
-  Transfer
-} from "../generated/LenderManager/LenderManager";
 import {
   CreatedCommitment,
   DeletedCommitment,
@@ -18,6 +15,7 @@ import {
   UpdatedCommitment,
   UpdatedCommitmentBorrowers
 } from "../generated/LenderCommitmentForwarder/LenderCommitmentForwarder";
+import { Transfer } from "../generated/LenderManager/LenderManager";
 import {
   BorrowerAttestation,
   BorrowerExitMarket,
@@ -58,8 +56,8 @@ import {
   SubmittedBid,
   TellerV2
 } from "../generated/TellerV2/TellerV2";
-import { initTokenVolume } from "./helpers/intializers";
 
+import { initTokenVolume } from "./helpers/intializers";
 import {
   getBid,
   loadBidById,
@@ -68,7 +66,6 @@ import {
   loadCollateral,
   loadCommitment,
   loadLenderByMarketId,
-  loadLenderTokenVolume,
   loadMarketById,
   loadProtocolTokenVolume,
   loadTokenVolumeByMarketId,
@@ -77,7 +74,7 @@ import {
 import {
   updateBid,
   updateCollateral,
-  updateTokenVolumeOnAccept
+  updateBidTokenVolumesOnAccept
 } from "./helpers/updaters";
 
 export function handleSubmittedBid(event: SubmittedBid): void {
@@ -132,7 +129,7 @@ export function handleSubmittedBid(event: SubmittedBid): void {
   bid.marketplace = market.id;
   bid.marketplaceId = BigInt.fromString(market.id);
 
-  loadBorrowerTokenVolume(lendingTokenAddress, borrower);
+  loadBorrowerTokenVolume(lendingTokenAddress, borrowerBid.id);
 
   const requests = market.openRequests;
   if (requests) {
@@ -167,10 +164,12 @@ export function handleSubmittedBids(events: SubmittedBid[]): void {
 }
 
 export function handleAcceptedBid(event: AcceptedBid): void {
-  const tellerV2Instance = TellerV2.bind(event.address);
-  const storedBid = getBid(event.address, event.params.bidId);
+  const bid = Bid.load(event.params.bidId.toString());
+  if (!bid) return;
 
-  const marketPlace = loadMarketById(storedBid.value3.toString());
+  const tellerV2Instance = TellerV2.bind(event.address);
+
+  const marketPlace = loadMarketById(bid.marketplace);
 
   const lender: Lender = loadLenderByMarketId(
     event.params.lender,
@@ -178,7 +177,6 @@ export function handleAcceptedBid(event: AcceptedBid): void {
     event.block.timestamp
   );
 
-  const bid = loadBidById(event.params.bidId.toString());
   const lenderBid = new LenderBid(lender.id.concat(bid.id));
   lenderBid.bid = bid.id;
   lenderBid.lender = lender.id;
@@ -192,12 +190,11 @@ export function handleAcceptedBid(event: AcceptedBid): void {
   bid.updatedAt = event.block.timestamp;
   bid.transactionHash = event.transaction.hash.toHex();
   bid.status = "Accepted";
-  bid.acceptedTimestamp = storedBid.value5.acceptedTimestamp;
-  bid.endDate = storedBid.value5.acceptedTimestamp.plus(
-    storedBid.value5.loanDuration
-  );
+  bid.acceptedTimestamp = event.block.timestamp;
+  bid.endDate = bid.acceptedTimestamp.plus(bid.loanDuration);
   bid.nextDueDate = tellerV2Instance.calculateNextDueDate(event.params.bidId);
   bid.lenderAddress = event.params.lender;
+  bid.save();
 
   // Update market entity
   const requests = marketPlace.openRequests;
@@ -208,9 +205,7 @@ export function handleAcceptedBid(event: AcceptedBid): void {
   const _durationTotal = marketPlace._durationTotal;
 
   if (requests && marketFee && activeLoanCount && _durationTotal) {
-    const updatedAPRTotal = _aprTotal.plus(
-      BigInt.fromI32(storedBid.value6.APR)
-    );
+    const updatedAPRTotal = _aprTotal.plus(bid.apr);
     const updatedActiveLoans = activeLoanCount.plus(BigInt.fromI32(1));
     marketPlace.openRequests = requests.minus(BigInt.fromI32(1));
     marketPlace.activeLoans = updatedActiveLoans;
@@ -219,69 +214,26 @@ export function handleAcceptedBid(event: AcceptedBid): void {
     const totalLoans = updatedActiveLoans.plus(marketPlace.closedLoans);
     marketPlace.aprAverage = updatedAPRTotal.div(totalLoans);
 
-    const updatedDurationTotal = _durationTotal.plus(
-      storedBid.value5.loanDuration
-    );
+    const updatedDurationTotal = _durationTotal.plus(bid.loanDuration);
     marketPlace._durationTotal = updatedDurationTotal;
     marketPlace.durationAverage = updatedDurationTotal.div(totalLoans);
-  }
-
-  const loanCount = lender.activeLoans;
-  const totalLoaned = lender.totalLoaned;
-  // If this is the lenders first loan, increment the totalNumberOfLenders on the associated Market
-  if (totalLoaned.isZero()) {
-    const numLenders = marketPlace.totalNumberOfLenders;
-    marketPlace.totalNumberOfLenders = numLenders.plus(BigInt.fromI32(1));
     marketPlace.save();
   }
-  if (totalLoaned && loanCount) {
-    lender.activeLoans = loanCount.plus(BigInt.fromI32(1));
-    lender.totalLoaned = totalLoaned.plus(storedBid.value5.principal);
-  }
-  const lenderAcceptedBids = lender.bidsAccepted;
-  if (lenderAcceptedBids) {
-    lender.bidsAccepted = lenderAcceptedBids.plus(BigInt.fromI32(1));
-  }
+
+  incrementLenderStats(lender, bid);
 
   // Update borrower entity
-  const borrower: Borrower = loadBorrowerByMarketId(
-    storedBid.value0,
-    marketPlace.id,
-    event.block.timestamp
-  );
-  const borrowerAcceptedBids = borrower.bidsAccepted;
-  const borrowerActiveLoans = borrower.activeLoans;
-  if (borrowerAcceptedBids && borrowerAcceptedBids) {
-    borrower.activeLoans = borrowerActiveLoans.plus(BigInt.fromI32(1));
-    borrower.bidsAccepted = borrowerAcceptedBids.plus(BigInt.fromI32(1));
+  const borrowerBid = BorrowerBid.load(bid.borrower);
+  if (borrowerBid) {
+    const borrower = Borrower.load(borrowerBid.borrower);
+    if (borrower) {
+      borrower.activeLoans = borrower.activeLoans.plus(BigInt.fromI32(1));
+      borrower.bidsAccepted = borrower.bidsAccepted.plus(BigInt.fromI32(1));
+      borrower.save();
+    }
   }
 
-  // Load TokenVolume entity for the bid's associated lendingToken in the market
-  const lendingTokenAddress = storedBid.value5.lendingToken;
-
-  // Update the market's token volume
-  const tokenVolume = loadTokenVolumeByMarketId(
-    lendingTokenAddress,
-    marketPlace.id
-  );
-  updateTokenVolumeOnAccept(tokenVolume, storedBid);
-
-  // Update the protocol's overall token volume
-  const protocolVolume = loadProtocolTokenVolume(storedBid.value5.lendingToken);
-  updateTokenVolumeOnAccept(protocolVolume, storedBid);
-
-  // Update the lender's token volume
-  const lenderVolume = loadLenderTokenVolume(lendingTokenAddress, lender);
-  updateTokenVolumeOnAccept(lenderVolume, storedBid);
-
-  // Update the borrower's token volume
-  const borrowerVolume = loadBorrowerTokenVolume(lendingTokenAddress, borrower);
-  updateTokenVolumeOnAccept(borrowerVolume, storedBid);
-
-  bid.save();
-  marketPlace.save();
-  lender.save();
-  borrower.save();
+  updateBidTokenVolumesOnAccept(bid, lender);
 }
 
 export function handleAcceptedBids(events: AcceptedBid[]): void {

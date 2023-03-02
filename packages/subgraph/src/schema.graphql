@@ -7,6 +7,7 @@ type MarketPlace @entity {
   isMarketOpen: Boolean
   paymentDefaultDuration: BigInt!
   paymentCycleDuration: BigInt!
+  paymentCycleType: String!
   bidExpirationTime: BigInt!
   borrowerAttestationRequired: Boolean
   lenderAttestationRequired: Boolean

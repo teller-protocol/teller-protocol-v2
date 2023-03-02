@@ -33,6 +33,7 @@ import {
   SetMarketPaymentType,
   SetMarketURI,
   SetPaymentCycleDuration,
+  SetPaymentCycle,
   SetPaymentDefaultDuration,
   Upgraded
 } from "../generated/MarketRegistry/MarketRegistry";
@@ -411,6 +412,31 @@ export function handleSetPaymentCycleDurations(
 ): void {
   events.forEach(event => {
     handleSetPaymentCycleDuration(event);
+  });
+}
+
+export function handleSetPaymentCycle(
+  event: SetPaymentCycle
+): void {
+  const marketPlace: MarketPlace = loadMarketById(
+    event.params.marketId.toString()
+  );
+  marketPlace.paymentCycleDuration = event.params.value;
+
+  if (event.params.paymentCycleType == i32(0)) {
+    marketPlace.paymentCycleType = "Seconds";
+  } else if (event.params.paymentCycleType == i32(1)) {
+    marketPlace.paymentCycleType = "Monthly";
+  }
+
+  marketPlace.save();
+}
+
+export function handleSetPaymentCycles(
+  events: SetPaymentCycle[]
+): void {
+  events.forEach(event => {
+    handleSetPaymentCycle(event);
   });
 }
 

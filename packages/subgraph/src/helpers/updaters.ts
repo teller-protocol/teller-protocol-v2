@@ -7,6 +7,7 @@ import {
   Collateral,
   Commitment,
   Lender,
+  MarketPlace,
   Payment,
   TokenVolume
 } from "../../generated/schema";
@@ -339,4 +340,35 @@ function getTypeString(tokenType: i32): string {
     type = "ERC1155";
   }
   return type;
+}
+
+export function incrementLenderStats(lender: Lender, bid: Bid): void {
+  // If this is the lenders first loan, increment the totalNumberOfLenders on the associated Market
+  if (lender.totalLoaned.isZero()) {
+    const market = MarketPlace.load(bid.marketplace);
+    if (market) {
+      const numLenders = market.totalNumberOfLenders;
+      market.totalNumberOfLenders = numLenders.plus(BigInt.fromI32(1));
+      market.save();
+    }
+  }
+
+  lender.activeLoans = lender.activeLoans.plus(BigInt.fromI32(1));
+  lender.totalLoaned = lender.totalLoaned.plus(bid.principal);
+  lender.bidsAccepted = lender.bidsAccepted.plus(BigInt.fromI32(1));
+  lender.save();
+
+  // Update the lender's token volume
+  const lenderVolume = loadLenderTokenVolume(
+    Address.fromBytes(bid.lendingTokenAddress),
+    bid.lender!
+  );
+  updateTokenVolumeOnAccept(lenderVolume, bid);
+}
+
+export function decrementLenderStats(lender: Lender, bid: Bid): void {
+  lender.activeLoans = lender.activeLoans.minus(BigInt.fromI32(1));
+  lender.totalLoaned = lender.totalLoaned.minus(bid.principal);
+  lender.bidsAccepted = lender.bidsAccepted.minus(BigInt.fromI32(1));
+  lender.save();
 }

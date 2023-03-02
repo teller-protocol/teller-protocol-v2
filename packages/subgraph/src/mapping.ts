@@ -72,6 +72,8 @@ import {
   updateLenderCommitment
 } from "./helpers/loaders";
 import {
+  decrementLenderStats,
+  incrementLenderStats,
   updateBid,
   updateCollateral,
   updateBidTokenVolumesOnAccept
@@ -914,10 +916,17 @@ export function handleCollateralClaimeds(events: CollateralClaimed[]): void {
 export function handleNewLenderSet(event: Transfer): void {
   const bid = loadBidById(event.params.tokenId.toString());
   bid.lenderAddress = event.params.to;
+  bid.save();
 
-  if (bid.lender) {
-    const lenderBid = LenderBid.load(bid.lender);
+  const bidLenderId = bid.lender;
+  if (bidLenderId) {
+    const lenderBid = LenderBid.load(bidLenderId);
     if (lenderBid) {
+      const oldLender = Lender.load(lenderBid.lender);
+      if (oldLender) {
+        decrementLenderStats(oldLender, bid);
+      }
+
       const lender = loadLenderByMarketId(
         event.params.to,
         bid.marketplaceId.toString(),
@@ -925,10 +934,10 @@ export function handleNewLenderSet(event: Transfer): void {
       );
       lenderBid.lender = lender.id;
       lenderBid.save();
+
+      incrementLenderStats(lender, bid);
     }
   }
-
-  bid.save();
 }
 
 export function handleNewLenderSets(events: Transfer[]): void {

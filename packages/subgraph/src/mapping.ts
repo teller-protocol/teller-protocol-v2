@@ -1,4 +1,4 @@
-import { Address, BigInt, Bytes } from "@graphprotocol/graph-ts";
+import { Address, BigInt, Bytes, store } from "@graphprotocol/graph-ts";
 
 import {
   CollateralClaimed,
@@ -131,7 +131,7 @@ export function handleSubmittedBid(event: SubmittedBid): void {
   bid.marketplace = market.id;
   bid.marketplaceId = BigInt.fromString(market.id);
 
-  loadBorrowerTokenVolume(lendingTokenAddress, borrowerBid.id);
+  loadBorrowerTokenVolume(lendingTokenAddress, borrower);
 
   const requests = market.openRequests;
   if (requests) {
@@ -178,7 +178,7 @@ export function handleAcceptedBid(event: AcceptedBid): void {
     event.block.timestamp
   );
 
-  const lenderBid = new LenderBid(lender.id.concat(bid.id));
+  const lenderBid = new LenderBid(bid.id);
   lenderBid.bid = bid.id;
   lenderBid.lender = lender.id;
   lenderBid.save();
@@ -221,20 +221,18 @@ export function handleAcceptedBid(event: AcceptedBid): void {
     marketPlace.save();
   }
 
-  incrementLenderStats(lender, bid);
-
   // Update borrower entity
-  const borrowerBid = BorrowerBid.load(bid.borrower);
-  if (borrowerBid) {
-    const borrower = Borrower.load(borrowerBid.borrower);
-    if (borrower) {
-      borrower.activeLoans = borrower.activeLoans.plus(BigInt.fromI32(1));
-      borrower.bidsAccepted = borrower.bidsAccepted.plus(BigInt.fromI32(1));
-      borrower.save();
-    }
+  const borrower = loadBorrowerByMarketId(
+    Address.fromBytes(bid.borrowerAddress),
+    marketPlace.id
+  );
+  if (borrower) {
+    borrower.activeLoans = borrower.activeLoans.plus(BigInt.fromI32(1));
+    borrower.bidsAccepted = borrower.bidsAccepted.plus(BigInt.fromI32(1));
+    borrower.save();
   }
 
-  updateBidTokenVolumesOnAccept(bid, lender);
+  updateBidTokenVolumesOnAccept(bid, borrower, lender);
 }
 
 export function handleAcceptedBids(events: AcceptedBid[]): void {
@@ -913,30 +911,26 @@ export function handleCollateralClaimeds(events: CollateralClaimed[]): void {
  * @param event NewLenderSet
  */
 export function handleNewLenderSet(event: Transfer): void {
+  // Ignore the mint event as it is not a transfer of ownership
+  if (event.params.from == Address.zero()) return;
+
   const bid = loadBidById(event.params.tokenId);
   bid.lenderAddress = event.params.to;
   bid.save();
 
-  const bidLenderId = bid.lender;
-  if (bidLenderId) {
-    const lenderBid = LenderBid.load(bidLenderId);
-    if (lenderBid) {
-      const oldLender = Lender.load(lenderBid.lender);
-      if (oldLender) {
-        decrementLenderStats(oldLender, bid);
-      }
+  const oldLender = loadLenderByMarketId(event.params.from, bid.marketplace);
+  decrementLenderStats(oldLender, bid);
 
-      const lender = loadLenderByMarketId(
-        event.params.to,
-        bid.marketplaceId.toString(),
-        event.block.timestamp
-      );
-      lenderBid.lender = lender.id;
-      lenderBid.save();
+  const newLender = loadLenderByMarketId(
+    event.params.to,
+    bid.marketplace,
+    event.block.timestamp
+  );
+  incrementLenderStats(newLender, bid);
 
-      incrementLenderStats(lender, bid);
-    }
-  }
+  const lenderBid = new LenderBid(bid.id);
+  lenderBid.lender = newLender.id;
+  lenderBid.save();
 }
 
 export function handleNewLenderSets(events: Transfer[]): void {

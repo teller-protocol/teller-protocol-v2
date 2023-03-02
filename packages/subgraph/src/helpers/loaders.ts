@@ -4,11 +4,9 @@ import { LenderCommitmentForwarder } from "../../generated/LenderCommitmentForwa
 import {
   Bid,
   Borrower,
-  BorrowerBid,
   Collateral,
   Commitment,
   Lender,
-  LenderBid,
   MarketPlace,
   MarketVolume,
   TokenVolume,
@@ -79,13 +77,18 @@ export function loadLenderByMarketId(
     lender.isAttested = false;
     lender.activeLoans = BigInt.zero();
     lender.closedLoans = BigInt.zero();
-    lender.totalLoaned = BigInt.zero();
     lender.bidsAccepted = BigInt.zero();
     lender.firstInteractionDate = timestamp;
     lender.lenderAddress = lenderAddress;
     lender.user = user.id;
     lender.marketplace = market.id;
     lender.marketplaceId = market.marketplaceId;
+
+    // increment total number of lenders for market
+    market.totalNumberOfLenders = market.totalNumberOfLenders.plus(
+      BigInt.fromI32(1)
+    );
+    market.save();
   }
 
   lender.save();
@@ -202,52 +205,36 @@ export function loadTokenVolumeByMarketId(
 
 /**
  * @param {Address} lendingTokenAddress - Address of the token being lent
- * @param {Lender} lenderBidId - LenderBid entity ID
+ * @param {Lender} lender - Lender entity
  * @returns {TokenVolume} The TokenVolume entity for the given market's corresponding asset
  */
 export function loadLenderTokenVolume(
   lendingTokenAddress: Address,
-  lenderBidId: string
+  lender: Lender
 ): TokenVolume {
-  const lenderBid = LenderBid.load(lenderBidId);
-  if (lenderBid) {
-    const lender = Lender.load(lenderBid.lender);
-    if (lender) {
-      return loadTokenVolumeWithValues(
-        ["lender", lender.id, lender.marketplace],
-        lendingTokenAddress,
-        ["marketplace", "lender"],
-        [Value.fromString(lender.marketplace), Value.fromString(lender.id)]
-      );
-    }
-  }
-
-  throw new Error("Failed to load lender TokenVolume");
+  return loadTokenVolumeWithValues(
+    ["lender", lender.id, lender.marketplace],
+    lendingTokenAddress,
+    ["marketplace", "lender"],
+    [Value.fromString(lender.marketplace), Value.fromString(lender.id)]
+  );
 }
 
 /**
  * @param {Address} lendingTokenAddress - Address of the token being lent
- * @param {Borrower} borrowerBidId - BorrowerBid entity ID
+ * @param {Borrower} borrower - Borrower entity
  * @returns {TokenVolume} The TokenVolume entity for the given market's corresponding asset
  */
 export function loadBorrowerTokenVolume(
   lendingTokenAddress: Address,
-  borrowerBidId: string
+  borrower: Borrower
 ): TokenVolume {
-  const borrowerBid = BorrowerBid.load(borrowerBidId);
-  if (borrowerBid) {
-    const borrower = Borrower.load(borrowerBid.borrower);
-    if (borrower) {
-      return loadTokenVolumeWithValues(
-        ["borrower", borrower.id, borrower.marketplace],
-        lendingTokenAddress,
-        ["marketplace", "borrower"],
-        [Value.fromString(borrower.marketplace), Value.fromString(borrower.id)]
-      );
-    }
-  }
-
-  throw new Error("Failed to load borrower TokenVolume");
+  return loadTokenVolumeWithValues(
+    ["borrower", borrower.id, borrower.marketplace],
+    lendingTokenAddress,
+    ["marketplace", "borrower"],
+    [Value.fromString(borrower.marketplace), Value.fromString(borrower.id)]
+  );
 }
 
 /**

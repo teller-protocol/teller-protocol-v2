@@ -1,4 +1,4 @@
-import { Address, BigInt, Bytes, Value } from "@graphprotocol/graph-ts";
+import { Address, BigInt, Value } from "@graphprotocol/graph-ts";
 
 import { LenderCommitmentForwarder } from "../../generated/LenderCommitmentForwarder/LenderCommitmentForwarder";
 import {
@@ -24,7 +24,7 @@ import {
 
 import { initTokenVolume } from "./intializers";
 
-export function loadBidById(id: string): Bid {
+export function loadBidById(id: BigInt): Bid {
   const bid: Bid | null = Bid.load(id);
 
   if (!bid) throw new Error("unable to load bid");

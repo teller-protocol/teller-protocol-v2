@@ -166,8 +166,7 @@ export function handleSubmittedBids(events: SubmittedBid[]): void {
 }
 
 export function handleAcceptedBid(event: AcceptedBid): void {
-  const bid = Bid.load(event.params.bidId.toString());
-  if (!bid) return;
+  const bid = loadBidById(event.params.bidId);
 
   const tellerV2Instance = TellerV2.bind(event.address);
 
@@ -245,7 +244,7 @@ export function handleAcceptedBids(events: AcceptedBid[]): void {
 }
 
 export function handleCancelledBid(event: CancelledBid): void {
-  const bid: Bid = loadBidById(event.params.bidId.toString());
+  const bid: Bid = loadBidById(event.params.bidId);
 
   bid.updatedAt = event.block.timestamp;
   bid.transactionHash = event.transaction.hash.toHex();
@@ -268,7 +267,7 @@ export function handleCancelledBids(events: CancelledBid[]): void {
 }
 
 export function handleLoanRepayment(event: LoanRepayment): void {
-  const bid: Bid = loadBidById(event.params.bidId.toString());
+  const bid: Bid = loadBidById(event.params.bidId);
   bid.updatedAt = event.block.timestamp;
   bid.transactionHash = event.transaction.hash.toHex();
   updateBid(bid, event, "Repayment");
@@ -281,7 +280,7 @@ export function handleLoanRepayments(events: LoanRepayment[]): void {
 }
 
 export function handleLoanRepaid(event: LoanRepaid): void {
-  const bid: Bid = loadBidById(event.params.bidId.toString());
+  const bid: Bid = loadBidById(event.params.bidId);
 
   bid.updatedAt = event.block.timestamp;
   bid.transactionHash = event.transaction.hash.toHex();
@@ -296,7 +295,7 @@ export function handleLoanRepaids(events: LoanRepaid[]): void {
 }
 
 export function handleLoanLiquidated(event: LoanLiquidated): void {
-  const bid: Bid = loadBidById(event.params.bidId.toString());
+  const bid: Bid = loadBidById(event.params.bidId);
 
   bid.updatedAt = event.block.timestamp;
   bid.transactionHash = event.transaction.hash.toHex();
@@ -492,7 +491,7 @@ export function handleSetBorrowerAttestationRequired(
 }
 
 export function handleFeePaid(event: FeePaid): void {
-  const bid: Bid = loadBidById(event.params.bidId.toString());
+  const bid: Bid = loadBidById(event.params.bidId);
   const lendingTokenAddress = Address.fromBytes(bid.lendingTokenAddress);
 
   // If indexed fee type is `marketplace`
@@ -662,7 +661,7 @@ export function handleTellerV2Upgraded(event: Upgraded): void {
   ) {
     for (let i = 62; i < 66; i++) {
       const storedBid = getBid(event.address, BigInt.fromI32(i));
-      const bid = loadBidById(i.toString());
+      const bid = loadBidById(BigInt.fromI32(i));
       if (bid.bidId) {
         bid.paymentCycleAmount = storedBid.value6.paymentCycleAmount;
         bid.save();
@@ -744,7 +743,7 @@ export function handleExercisedCommitment(event: ExercisedCommitment): void {
     );
   }
   // Link commitment to bid
-  const bid: Bid = loadBidById(event.params.bidId.toString());
+  const bid: Bid = loadBidById(event.params.bidId);
   bid.commitment = commitment.id;
   bid.commitmentId = commitment.id;
 
@@ -824,7 +823,7 @@ export function handleSetMarketPaymentTypes(
 export function handleCollateralEscrowDeployed(
   event: CollateralEscrowDeployed
 ): void {
-  const bid: Bid = loadBidById(event.params._bidId.toString());
+  const bid: Bid = loadBidById(event.params._bidId);
   bid.collateralEscrow = event.params._collateralEscrow;
   bid.save();
 }
@@ -898,7 +897,7 @@ export function handleCollateralWithdrawns(
  * @param event
  */
 export function handleCollateralClaimed(event: CollateralClaimed): void {
-  const bid = loadBidById(event.params._bidId.toString());
+  const bid = loadBidById(event.params._bidId);
   bid.status = "Liquidated";
   bid.save();
 }
@@ -914,7 +913,7 @@ export function handleCollateralClaimeds(events: CollateralClaimed[]): void {
  * @param event NewLenderSet
  */
 export function handleNewLenderSet(event: Transfer): void {
-  const bid = loadBidById(event.params.tokenId.toString());
+  const bid = loadBidById(event.params.tokenId);
   bid.lenderAddress = event.params.to;
   bid.save();
 

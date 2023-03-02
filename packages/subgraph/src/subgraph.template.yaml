@@ -1,6 +1,11 @@
 specVersion: 0.0.2
 schema:
   file: ./src/schema.graphql
+#features:
+#  - grafting
+#graft:
+#  base: QmTLXdRafXTKTKnarVedwi8RCtAaPaD3dm7y9fSQc2mfEM
+#  block: 39823700
 dataSources:
   - kind: ethereum/contract
     name: TellerV2
@@ -143,4 +148,28 @@ dataSources:
           handler: handleCollateralWithdrawn
         - event: CollateralClaimed(uint256)
           handler: handleCollateralClaimed
+      file: ./src/mapping.ts
+  - kind: ethereum/contract
+    name: LenderManager
+    network: {{network}}
+    source:
+      address: '{{address_lender_manager}}'
+      abi: LenderManager
+      startBlock: {{block_lender_manager}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Bid
+        - MarketPlace
+        - Lender
+        - TokenVolume
+        - LenderBid
+      abis:
+        - name: LenderManager
+          file: ./abis/{{network}}_LenderManager.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleNewLenderSet
       file: ./src/mapping.ts

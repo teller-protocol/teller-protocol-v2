@@ -126,7 +126,6 @@ type Lender @entity {
   isAttested: Boolean!
   activeLoans: BigInt!
   closedLoans: BigInt!
-  totalLoaned: BigInt!
   bidsAccepted: BigInt!
   tokenVolume: [TokenVolume!] @derivedFrom(field: "lender")
   marketplace: MarketPlace!
@@ -159,21 +158,26 @@ type TokenVolume @entity {
   borrower: Borrower
   commitment: Commitment
 
-  # TokenStats
+  ## TokenStats ##
   lendingTokenAddress: Bytes!
-  outstandingCapital: BigInt!
-  totalLoaned: BigInt!
-  aprAverage: BigInt!
-  _aprTotal: BigInt!
-  loanAverage: BigInt!
-  highestLoan: BigInt!
-  lowestLoan: BigInt!
-  durationAverage: BigInt!
-  _durationTotal: BigInt!
+  bids: [Bid!]!
   activeLoans: BigInt!
   closedLoans: BigInt!
+
+  outstandingCapital: BigInt!
+  totalLoaned: BigInt!
+  loanAverage: BigInt!
+
   commissionEarned: BigInt!
   totalRepaidInterest: BigInt!
+
+  _aprTotal: BigInt!
+  aprAverage: BigInt!
+
+  _durationTotal: BigInt!
+  durationAverage: BigInt!
+
+  ## end TokenStats ##
 }
 
 type MarketVolume @entity {

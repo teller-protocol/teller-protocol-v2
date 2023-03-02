@@ -1,4 +1,4 @@
-import { Address, BigInt, Bytes, Value } from "@graphprotocol/graph-ts";
+import { Address, BigInt, Value } from "@graphprotocol/graph-ts";
 
 import { LenderCommitmentForwarder } from "../../generated/LenderCommitmentForwarder/LenderCommitmentForwarder";
 import {
@@ -22,8 +22,8 @@ import {
 
 import { initTokenVolume } from "./intializers";
 
-export function loadBidById(id: string): Bid {
-  const bid: Bid | null = Bid.load(id);
+export function loadBidById(id: BigInt): Bid {
+  const bid: Bid | null = Bid.load(id.toString());
 
   if (!bid) throw new Error("unable to load bid");
 
@@ -77,13 +77,18 @@ export function loadLenderByMarketId(
     lender.isAttested = false;
     lender.activeLoans = BigInt.zero();
     lender.closedLoans = BigInt.zero();
-    lender.totalLoaned = BigInt.zero();
     lender.bidsAccepted = BigInt.zero();
     lender.firstInteractionDate = timestamp;
     lender.lenderAddress = lenderAddress;
     lender.user = user.id;
     lender.marketplace = market.id;
     lender.marketplaceId = market.marketplaceId;
+
+    // increment total number of lenders for market
+    market.totalNumberOfLenders = market.totalNumberOfLenders.plus(
+      BigInt.fromI32(1)
+    );
+    market.save();
   }
 
   lender.save();

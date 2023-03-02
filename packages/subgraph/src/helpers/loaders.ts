@@ -25,7 +25,7 @@ import {
 import { initTokenVolume } from "./intializers";
 
 export function loadBidById(id: BigInt): Bid {
-  const bid: Bid | null = Bid.load(id);
+  const bid: Bid | null = Bid.load(id.toString());
 
   if (!bid) throw new Error("unable to load bid");
 

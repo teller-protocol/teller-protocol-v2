@@ -21,3 +21,6 @@ echo '{}' > $contracts_export_file
 yarn hardhat export --export-all $contracts_export_file
 json=$(cat $contracts_export_file)
 echo "$json" | jq '. |= del(."31337")' | jq '. |= with_entries({ key: .key, value: .value | to_entries | .[].value })' > $contracts_export_file
+
+## Copy Math Library Helpers ##
+yarn tsc -p teller-math-lib/tsconfig.json --outDir build/math

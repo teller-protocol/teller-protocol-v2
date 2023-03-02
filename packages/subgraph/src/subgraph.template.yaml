@@ -1,6 +1,11 @@
 specVersion: 0.0.2
 schema:
   file: ./src/schema.graphql
+#features:
+#  - grafting
+#graft:
+#  base: QmTLXdRafXTKTKnarVedwi8RCtAaPaD3dm7y9fSQc2mfEM
+#  block: 39823700
 dataSources:
   - kind: ethereum/contract
     name: TellerV2
@@ -113,8 +118,10 @@ dataSources:
           handler: handleUpdatedCommitment
         - event: DeletedCommitment(indexed uint256)
           handler: handleDeletedCommitment
-        - event: ExercisedCommitment(indexed uint256,address,uint256,address,uint256,indexed uint256)
+        - event: ExercisedCommitment(indexed uint256,address,uint256,uint256)
           handler: handleExercisedCommitment
+        - event: UpdatedCommitmentBorrowers(indexed uint256)
+          handler: handeUpdatedCommitmentBorrower
       file: ./src/mapping.ts
   - kind: ethereum/contract
     name: CollateralManager
@@ -159,6 +166,8 @@ dataSources:
         - Bid
         - MarketPlace
         - Lender
+        - TokenVolume
+        - LenderBid
       abis:
         - name: LenderManager
           file: ./abis/{{network}}_LenderManager.json

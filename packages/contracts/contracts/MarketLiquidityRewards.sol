@@ -33,8 +33,10 @@ InitializableUpgradeable
     } 
 
     modifier onlyMarketOwner(uint256 _marketId){
+        require(msg.sender == IMarketRegistry(marketRegistry).getMarketOwner(_marketId), "Only market owner can call this function.");
+    _;
+}
 
-    }
 
     constructor(address _tellerV2, address _marketRegistry) {
         tellerV2 = _tellerV2;
@@ -84,18 +86,37 @@ InitializableUpgradeable
 
          
         require(!rewardClaimedForBid[_bid],"reward already claimed");
-        rewardClaimedForBid[_bid] = true;
+        rewardClaimedForBid[_bid] = true; // leave this here to defend against re-entrancy 
 
         LoanData storage loanData = ITellerV2(tellerV2).bids[_bidId] ;  
 
+        uint256 marketId = loanData.marketId;
+        address borrower = loanData.borrower;
+        uint256 rewardAmount = _calculateRewardAmount(loanData.principal);
+
         //require that msgsender is the loan borrower 
+        require(_msgSender() == borrower, "Only the borrower can claim reward.");
 
 
-        //transfer token to the msgsender 
-      //  IERC20(  ).transfer(   )
+        //transfer tokens reward to the msgsender 
+        IERC20(allocatedRewards[marketId].tokenAddress).transfer(_msgSender(), rewardAmount);
 
+        _decrementAllocatedAmount(marketId,rewardAmount);
 
+    }   
+
+    function _decrementAllocatedAmount(uint256 _marketId, uint256 _rewardAmount) internal {
+        allocatedRewards[_marketId].tokenAmount -= _rewardAmount;
     }
+
+ 
+    function _calculateRewardAmount(uint256 _loanAmount) internal view returns (uint256) {
+        
+        //change calc -- maybe based on something set by the market owner in teh struct 
+       
+        return _loanAmount / 1000;
+    }
+
 
 
 

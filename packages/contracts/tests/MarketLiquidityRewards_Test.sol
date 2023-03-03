@@ -97,21 +97,21 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
         rewardToken = new TestERC20Token(
             "Test Wrapped ETH",
             "TWETH",
-            0,
+            100000,
             rewardTokenDecimals
         );
 
         principalToken = new TestERC20Token(
             "Test Wrapped ETH",
             "TWETH",
-            0,
+            100000,
             principalTokenDecimals
         );
 
         collateralToken = new TestERC20Token(
             "Test USDC",
             "TUSDC",
-            0,
+            100000,
             collateralTokenDecimals
         );
 
@@ -554,20 +554,21 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
  function allocateRewards(
         MarketLiquidityRewards.RewardAllocation calldata _allocation        
     ) public override returns (uint256 allocationId_ ) {
+         super.allocateRewards(_allocation);
     }
 
     function increaseAllocationAmount(
         uint256 _allocationId,
         uint256 _tokenAmount 
     ) public override {
-        
+        super.increaseAllocationAmount(_allocationId,_tokenAmount);
     }
 
     function deallocateRewards(
         uint256 _allocationId,
         uint256 _tokenAmount
     ) public override {
-          
+           super.deallocateRewards(_allocationId,_tokenAmount);
     }
 
 

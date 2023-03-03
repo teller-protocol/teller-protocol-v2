@@ -32,32 +32,23 @@ export function updateTokenVolumeOnPayment(
   bidState: string,
   tokenVolume: TokenVolume
 ): void {
-  const outstandingTokenCapital = tokenVolume.outstandingCapital;
-  if (outstandingTokenCapital) {
-    tokenVolume.outstandingCapital = outstandingTokenCapital.minus(lastPayment);
-    if (outstandingTokenCapital.minus(lastPayment).lt(BigInt.zero())) {
-      tokenVolume.outstandingCapital = BigInt.zero();
-    }
+  tokenVolume.outstandingCapital = tokenVolume.outstandingCapital.minus(
+    lastPayment
+  );
+  if (tokenVolume.outstandingCapital.lt(BigInt.zero())) {
+    tokenVolume.outstandingCapital = BigInt.zero();
   }
 
-  const totalRepaidInterest = tokenVolume.totalRepaidInterest;
-  if (totalRepaidInterest) {
-    tokenVolume.totalRepaidInterest = totalRepaidInterest.plus(
-      lastInterestPayment
-    );
-    tokenVolume.save();
-  }
+  tokenVolume.totalRepaidInterest = tokenVolume.totalRepaidInterest.plus(
+    lastInterestPayment
+  );
 
   if (bidState == "Repaid") {
-    const activeTokenLoanCount = tokenVolume.activeLoans;
-    if (activeTokenLoanCount) {
-      tokenVolume.activeLoans = activeTokenLoanCount.minus(BigInt.fromI32(1));
-    }
-    const closedTokenLoanCount = tokenVolume.closedLoans;
-    if (closedTokenLoanCount) {
-      tokenVolume.closedLoans = closedTokenLoanCount.plus(BigInt.fromI32(1));
-    }
+    tokenVolume.activeLoans = tokenVolume.activeLoans.minus(BigInt.fromI32(1));
+    tokenVolume.closedLoans = tokenVolume.closedLoans.plus(BigInt.fromI32(1));
   }
+
+  tokenVolume.save();
 }
 
 export function updateBid(

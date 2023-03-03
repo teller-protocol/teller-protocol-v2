@@ -5215,8 +5215,8 @@
       }
     },
     "tests/MarketLiquidityRewards_Test.sol": {
-      "lastModificationDate": 1677876576420,
-      "contentHash": "a6549cd7e2e0c2d0ab774d015c45f1cd",
+      "lastModificationDate": 1677876902688,
+      "contentHash": "c57c2a4db81d43abdef126889b2be4b8",
       "sourceName": "tests/MarketLiquidityRewards_Test.sol",
       "solcConfig": {
         "settings": {
@@ -5249,7 +5249,6 @@
       "imports": [
         "contracts/EAS/TellerAS.sol",
         "contracts/ERC2771ContextUpgradeable.sol",
-        "contracts/LenderCommitmentForwarder.sol",
         "contracts/MarketLiquidityRewards.sol",
         "contracts/ProtocolFee.sol",
         "contracts/TellerV2.sol",
@@ -5304,14 +5303,12 @@
         "node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol",
         "node_modules/@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol",
         "node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol",
-        "node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20MetadataUpgradeable.sol",
         "node_modules/@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol",
         "node_modules/@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol",
         "node_modules/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol",
         "node_modules/@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol",
         "node_modules/@openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable.sol",
         "node_modules/@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol",
-        "node_modules/@openzeppelin/contracts-upgradeable/utils/structs/EnumerableSetUpgradeable.sol",
         "tests/Test_Helpers.sol",
         "tests/Testable.sol",
         "tests/resolvers/TestERC20Token.sol",

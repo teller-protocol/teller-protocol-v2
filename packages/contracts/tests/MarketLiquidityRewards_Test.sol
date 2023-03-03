@@ -55,7 +55,7 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
  
 
  
-    
+
     constructor(  )
           MarketLiquidityRewards(
         address(0),
@@ -115,10 +115,31 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
             collateralTokenDecimals
         );
 
+        IERC20Upgradeable(address(rewardToken)).transfer(address(lender),10000);
        
         //delete allocationCount;
     }
 
+    function _setAllocation(uint256 allocationId) internal {
+
+        uint256 rewardTokenAmount = 0;
+
+        RewardAllocation memory _allocation = IMarketLiquidityRewards.RewardAllocation({
+
+            allocator: address(lender),
+            marketId: marketId,
+            rewardTokenAddress: address(rewardToken),
+            rewardTokenAmount: rewardTokenAmount, 
+
+            requiredPrincipalTokenAddress: address(principalToken),
+            requiredCollateralTokenAddress: address(collateralToken),
+
+            rewardPerLoanPrincipalAmount: 0
+        }); 
+
+        allocatedRewards[allocationId] = _allocation;
+
+    }
 
 
     function test_allocateRewards() public {
@@ -150,6 +171,38 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
         );*/
 
     }
+
+      function test_increaseAllocationAmount() public {
+
+        uint256 allocationId = 0;
+        uint256 amountToIncrease = 100;
+        
+
+        _setAllocation(allocationId);
+
+        uint256 amountBefore = allocatedRewards[allocationId].rewardTokenAmount;
+
+        lender._approveERC20Token(
+            address(rewardToken),
+            address(this),
+            amountToIncrease
+        );
+
+        lender._increaseAllocationAmount(
+            allocationId,
+            amountToIncrease
+        );
+
+        uint256 amountAfter = allocatedRewards[allocationId].rewardTokenAmount;
+
+
+        assertEq(
+            amountAfter,
+            amountBefore + amountToIncrease,
+            "Allocation did not increase"
+        );
+
+      }
 
 
 /*
@@ -510,10 +563,12 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
         
     }
 
-        function deallocateRewards(
+    function deallocateRewards(
         uint256 _allocationId,
-        uint256 _amount
-    ) public override {}
+        uint256 _tokenAmount
+    ) public override {
+          
+    }
 
 
 
@@ -549,7 +604,7 @@ contract MarketLiquidityUser is User {
  
 
     function _claimRewards(
-         uint256 _allocationId,
+        uint256 _allocationId,
         uint256 _bidId 
     ) public  {
         return
@@ -557,6 +612,14 @@ contract MarketLiquidityUser is User {
                 _allocationId,
                 _bidId
             );
+    }
+
+    function _approveERC20Token(
+        address tokenAddress,
+        address guy,
+        uint256 wad
+    ) public  {
+        IERC20Upgradeable(tokenAddress).approve(guy,wad);
     }
 
   

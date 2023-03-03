@@ -117,15 +117,15 @@ Initializable
 
     function deallocateRewards(
         uint256 _allocationId,
-        uint256 _amount
+        uint256 _tokenAmount
     ) public virtual {
 
         require(msg.sender == allocatedRewards[_allocationId].allocator,"Only the allocator can deallocate rewards.");
 
         //subtract amount reward before transfer 
-        allocatedRewards[_allocationId].rewardTokenAmount -= _amount;
+        allocatedRewards[_allocationId].rewardTokenAmount -= _tokenAmount;
 
-        IERC20Upgradeable(allocatedRewards[_allocationId].rewardTokenAddress).transfer(msg.sender , _amount );
+        IERC20Upgradeable(allocatedRewards[_allocationId].rewardTokenAddress).transfer(msg.sender , _tokenAmount );
 
          if( allocatedRewards[_allocationId].rewardTokenAmount == 0 ) {
                 delete allocatedRewards[_allocationId];

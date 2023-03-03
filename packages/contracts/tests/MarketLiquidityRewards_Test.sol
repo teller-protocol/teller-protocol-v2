@@ -49,14 +49,9 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
 
  
 
-  /*   constructor(
-        address _tellerV2,
-        address _marketRegistry
-    ) {
-      //  tellerV2 = _tellerV2;
-     //   marketRegistry = _marketRegistry;
-     
-    }*/
+ 
+
+    constructor(address _tellerV2, address _marketRegistry) MarketLiquidityRewards(address(0),address(0)) {}
 
     function setUp() public {
         tellerV2Mock = new TellerV2Mock();

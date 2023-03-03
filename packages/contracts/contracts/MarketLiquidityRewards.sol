@@ -43,8 +43,8 @@ contract MarketLiquidityRewards is
 IMarketLiquidityRewards,
 Initializable
 {
-    address constant tellerV2;
-    address constant marketRegistry;
+    address immutable tellerV2;
+    address immutable marketRegistry;
 
     uint256 allocationCount;
  
@@ -102,7 +102,7 @@ Initializable
             "Invalid allocator address"
         );
 
-        IERC20Upgradeable(_allocation.rewardTokenAddress).transferFrom( msg.sender , _allocation.rewardTokenAmount, address(this) );
+        IERC20Upgradeable(_allocation.rewardTokenAddress).transferFrom( msg.sender , address(this), _allocation.rewardTokenAmount );
 
         allocatedRewards[allocationId_] = _allocation ;
 
@@ -183,7 +183,7 @@ Initializable
         require(marketId == allocatedRewards[_allocationId].marketId, "MarketId mismatch for allocation");
 
         //transfer tokens reward to the msgsender 
-        IERC20Upgradeable(allocatedRewards[_allocationId].tokenAddress).transfer(msg.sender, amountToReward);
+        IERC20Upgradeable(allocatedRewards[_allocationId].rewardTokenAddress).transfer(msg.sender, amountToReward);
 
         _decrementAllocatedAmount(_allocationId,amountToReward);
 
@@ -192,7 +192,7 @@ Initializable
     }   
 
     function _decrementAllocatedAmount(uint256 _allocationId, uint256 _amount) internal {
-        allocatedRewards[_allocationId].tokenAmount -= _amount;
+        allocatedRewards[_allocationId].rewardTokenAmount -= _amount;
     }
 
  

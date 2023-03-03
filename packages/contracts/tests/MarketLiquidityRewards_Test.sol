@@ -41,6 +41,11 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
     uint16 minInterestRate;
     uint32 expiration;
 
+
+   
+    TestERC20Token rewardToken;
+    uint8 constant rewardTokenDecimals = 18;
+
    
     TestERC20Token principalToken;
     uint8 constant principalTokenDecimals = 18;
@@ -93,6 +98,13 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
         borrowersArray = new address[](1);
         borrowersArray[0] = address(borrower);
 
+        rewardToken = new TestERC20Token(
+            "Test Wrapped ETH",
+            "TWETH",
+            0,
+            rewardTokenDecimals
+        );
+
         principalToken = new TestERC20Token(
             "Test Wrapped ETH",
             "TWETH",
@@ -109,6 +121,38 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
 
        
         //delete allocationCount;
+    }
+
+
+
+    function test_allocateRewards() public {
+
+        uint256 rewardTokenAmount = 500;
+        
+        RewardAllocation memory _allocation = IMarketLiquidityRewards.RewardAllocation({
+
+            allocator: address(lender),
+            marketId: marketId,
+            rewardTokenAddress: address(rewardToken),
+            rewardTokenAmount: rewardTokenAmount, 
+
+            requiredPrincipalTokenAddress: address(principalToken),
+            requiredCollateralTokenAddress: address(collateralToken),
+
+            rewardPerLoanPrincipalAmount: 0
+        }); 
+ 
+
+        uint256 allocationId = lender._allocateRewards(
+            _allocation
+        );
+
+         /*  assertEq(
+            allocationId,
+            address(lender),
+            "Allocate r"
+        );*/
+
     }
 
 

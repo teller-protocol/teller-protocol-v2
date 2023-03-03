@@ -48,7 +48,7 @@
   ],
   "devDependencies": {
     "@eth-optimism/hardhat-ovm": "^0.2.2",
-    "@ethereum-attestation-service/sdk": "^0.11.2",
+    "@ethereum-attestation-service/eas-sdk": "^0.26.1",
     "@ethereumjs/vm": "^5.5.3",
     "@ethersproject/providers": "^5.6.7",
     "@mangrovedao/hardhat-test-solidity": "^0.0.16",

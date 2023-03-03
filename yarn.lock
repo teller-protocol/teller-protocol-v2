@@ -115,12 +115,26 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ethereum-attestation-service/sdk@npm:^0.11.2":
-  version: 0.11.2
-  resolution: "@ethereum-attestation-service/sdk@npm:0.11.2"
+"@ethereum-attestation-service/eas-contracts@npm:^0.26.1":
+  version: 0.26.1
+  resolution: "@ethereum-attestation-service/eas-contracts@npm:0.26.1"
   dependencies:
-    ethers: ^5.4.2
-  checksum: a1ee269e834139eb92c42cbaa2732a1ee983d0910933408040b2c222218c1503facad06291f516fed45dc6734a68e8579d7a7dcc6716ac87fed588198713fb28
+    "@typechain/ethers-v5": ^10.2.0
+    "@typechain/hardhat": ^6.1.5
+    hardhat: 2.12.6
+    typechain: ^8.1.1
+  checksum: 709c64288fad9f27dc733435dd39ef430c172241e1ec65614614c251bd20396a3678cfffa0d2657c1a39f91e94e66534bf73e3f997c8d5c726ac65a1cd4b0026
+  languageName: node
+  linkType: hard
+
+"@ethereum-attestation-service/eas-sdk@npm:^0.26.1":
+  version: 0.26.1
+  resolution: "@ethereum-attestation-service/eas-sdk@npm:0.26.1"
+  dependencies:
+    "@ethereum-attestation-service/eas-contracts": ^0.26.1
+    ethers: ^5.7.2
+    multiformats: 9.9.0
+  checksum: d47394e7cbef51a3e03b208aff59cd92d85ac02ce43d05f2e3edefe60e436809a17fcae8485b06532f260b37fe48eae0e364291e4a5a211305a53ab78f68426a
   languageName: node
   linkType: hard
 
@@ -1697,7 +1711,7 @@ __metadata:
   resolution: "@teller-protocol/v2-contracts@workspace:packages/contracts"
   dependencies:
     "@eth-optimism/hardhat-ovm": ^0.2.2
-    "@ethereum-attestation-service/sdk": ^0.11.2
+    "@ethereum-attestation-service/eas-sdk": ^0.26.1
     "@ethereumjs/vm": ^5.5.3
     "@ethersproject/providers": ^5.6.7
     "@mangrovedao/hardhat-test-solidity": ^0.0.16
@@ -1785,8 +1799,8 @@ __metadata:
   linkType: soft
 
 "@tenderly/hardhat-tenderly@https://github.com/passabilities/hardhat-tenderly#workspace=@tenderly/hardhat-tenderly":
-  version: 1.6.2
-  resolution: "@tenderly/hardhat-tenderly@https://github.com/passabilities/hardhat-tenderly.git#workspace=%40tenderly%2Fhardhat-tenderly&commit=44ef3138d83d08016d96048a1c19f79db55ab683"
+  version: 1.6.1
+  resolution: "@tenderly/hardhat-tenderly@https://github.com/passabilities/hardhat-tenderly.git#workspace=%40tenderly%2Fhardhat-tenderly&commit=0ce111380597b6b0e5adae3ac5aeba8763fda8d1"
   dependencies:
     "@ethersproject/bignumber": ^5.7.0
     "@nomiclabs/hardhat-ethers": ^2.1.1
@@ -1801,7 +1815,7 @@ __metadata:
   peerDependencies:
     hardhat: ^2.10.2
     tenderly: ^0.4.0
-  checksum: 3442c34e2b634057c3c84cfc7ac3c09f70ebb1cc52f63e2b228df97a8eacd3926e30984a3b7e458210e25ceec5b87f95d55a1e44379dd6c5d7ab87afe2366883
+  checksum: 8b0782b678afb94c603300e9bfcb48127fe37552b9deecfb266f9138603c00289b185c937164c9861fd6f5abeae9f53a5457869be95f00a2d77b485f36182eda
   languageName: node
   linkType: hard
 
@@ -7224,7 +7238,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ethers@npm:^5.0.1, ethers@npm:^5.0.2, ethers@npm:^5.4.2, ethers@npm:^5.5.2, ethers@npm:^5.5.3, ethers@npm:^5.7.0, ethers@npm:^5.7.2":
+"ethers@npm:^5.0.1, ethers@npm:^5.0.2, ethers@npm:^5.5.2, ethers@npm:^5.5.3, ethers@npm:^5.7.0, ethers@npm:^5.7.2":
   version: 5.7.2
   resolution: "ethers@npm:5.7.2"
   dependencies:
@@ -8735,6 +8749,74 @@ __metadata:
     hardhat-completion: dist/src/completion.js
     hh: dist/src/index.js
   checksum: df9caf38881ed72f954e4ed5703826923d74c8fe02974bf62e7547478200177f8cbf7e4aa96f55e9be638f07719dcf8f73e2e88a8643fbff6de3e8f7b56c58f9
+  languageName: node
+  linkType: hard
+
+"hardhat@npm:2.12.6":
+  version: 2.12.6
+  resolution: "hardhat@npm:2.12.6"
+  dependencies:
+    "@ethersproject/abi": ^5.1.2
+    "@metamask/eth-sig-util": ^4.0.0
+    "@nomicfoundation/ethereumjs-block": ^4.0.0
+    "@nomicfoundation/ethereumjs-blockchain": ^6.0.0
+    "@nomicfoundation/ethereumjs-common": ^3.0.0
+    "@nomicfoundation/ethereumjs-evm": ^1.0.0
+    "@nomicfoundation/ethereumjs-rlp": ^4.0.0
+    "@nomicfoundation/ethereumjs-statemanager": ^1.0.0
+    "@nomicfoundation/ethereumjs-trie": ^5.0.0
+    "@nomicfoundation/ethereumjs-tx": ^4.0.0
+    "@nomicfoundation/ethereumjs-util": ^8.0.0
+    "@nomicfoundation/ethereumjs-vm": ^6.0.0
+    "@nomicfoundation/solidity-analyzer": ^0.1.0
+    "@sentry/node": ^5.18.1
+    "@types/bn.js": ^5.1.0
+    "@types/lru-cache": ^5.1.0
+    abort-controller: ^3.0.0
+    adm-zip: ^0.4.16
+    aggregate-error: ^3.0.0
+    ansi-escapes: ^4.3.0
+    chalk: ^2.4.2
+    chokidar: ^3.4.0
+    ci-info: ^2.0.0
+    debug: ^4.1.1
+    enquirer: ^2.3.0
+    env-paths: ^2.2.0
+    ethereum-cryptography: ^1.0.3
+    ethereumjs-abi: ^0.6.8
+    find-up: ^2.1.0
+    fp-ts: 1.19.3
+    fs-extra: ^7.0.1
+    glob: 7.2.0
+    immutable: ^4.0.0-rc.12
+    io-ts: 1.10.4
+    keccak: ^3.0.2
+    lodash: ^4.17.11
+    mnemonist: ^0.38.0
+    mocha: ^10.0.0
+    p-map: ^4.0.0
+    qs: ^6.7.0
+    raw-body: ^2.4.1
+    resolve: 1.17.0
+    semver: ^6.3.0
+    solc: 0.7.3
+    source-map-support: ^0.5.13
+    stacktrace-parser: ^0.1.10
+    tsort: 0.0.1
+    undici: ^5.14.0
+    uuid: ^8.3.2
+    ws: ^7.4.6
+  peerDependencies:
+    ts-node: "*"
+    typescript: "*"
+  peerDependenciesMeta:
+    ts-node:
+      optional: true
+    typescript:
+      optional: true
+  bin:
+    hardhat: internal/cli/cli.js
+  checksum: c97c5ed2336541e8b0a3034dc5c94319cffbf93fa1b6385091858f8eefb392129c6109cbaca0837fd4dff4d627b3e3ccb931706257a5d0bee71fc7f7fe90a536
   languageName: node
   linkType: hard
 
@@ -12168,6 +12250,13 @@ __metadata:
     buffer: ^5.6.0
     varint: ^5.0.0
   checksum: e6a2916fa76c023b1c90b32ae74f8a781cf0727f71660b245a5ed1db46add6f2ce1586bee5713b16caf0a724e81bfe0678d89910c20d3bb5fd9649dacb2be79e
+  languageName: node
+  linkType: hard
+
+"multiformats@npm:9.9.0":
+  version: 9.9.0
+  resolution: "multiformats@npm:9.9.0"
+  checksum: d3e8c1be400c09a014f557ea02251a2710dbc9fca5aa32cc702ff29f636c5471e17979f30bdcb0a9cbb556f162a8591dc2e1219c24fc21394a56115b820bb84e
   languageName: node
   linkType: hard
 
@@ -16724,6 +16813,15 @@ __metadata:
   version: 1.9.1
   resolution: "underscore@npm:1.9.1"
   checksum: bee6f587661a6a9ca2f77e611896141e0287af51d8ca6034b11d0d4163ddbdd181a9720078ddbe94d265b7694f4880bc7f4c2ad260cfb8985ee2f9adcf13df03
+  languageName: node
+  linkType: hard
+
+"undici@npm:^5.14.0":
+  version: 5.20.0
+  resolution: "undici@npm:5.20.0"
+  dependencies:
+    busboy: ^1.6.0
+  checksum: 25412a785b2bd0b12f0bb0ec47ef00aa7a611ca0e570cb7af97cffe6a42e0d78e4b15190363a43771e9002defc3c6647c1b2d52201b3f64e2196819db4d150d3
   languageName: node
   linkType: hard
 

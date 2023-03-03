@@ -134,9 +134,7 @@ interface ITellerV2 {
         address lender,
         uint256 marketId,
         address principalTokenAddress,
-        uint256 principalAmount,
-        address collateralTokenAddress,
-        uint256 collateralAmount    
+        uint256 principalAmount       
     );
 
 }

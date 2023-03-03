@@ -13,8 +13,8 @@
   },
   "files": {
     "contracts/CollateralManager.sol": {
-      "lastModificationDate": 1676560228422,
-      "contentHash": "ce84718de61bed44223fdc1f770bde2f",
+      "lastModificationDate": 1677875457140,
+      "contentHash": "7df6f6ae149eb06b8a13a7df39cdb6b9",
       "sourceName": "contracts/CollateralManager.sol",
       "solcConfig": {
         "settings": {
@@ -379,8 +379,8 @@
       }
     },
     "contracts/MarketLiquidityRewards.sol": {
-      "lastModificationDate": 1677873363450,
-      "contentHash": "bdc80511a523c75fd3e7671bebc7df8d",
+      "lastModificationDate": 1677875490296,
+      "contentHash": "acba0e69c30ac850ea70ca0bd9ad5648",
       "sourceName": "contracts/MarketLiquidityRewards.sol",
       "solcConfig": {
         "settings": {
@@ -681,8 +681,8 @@
       }
     },
     "contracts/TellerV2.sol": {
-      "lastModificationDate": 1677870816212,
-      "contentHash": "f7be0a57049da78f840aeefa97cb5bc1",
+      "lastModificationDate": 1677874418630,
+      "contentHash": "fd4bee441a37599f271b5cfa8646d614",
       "sourceName": "contracts/TellerV2.sol",
       "solcConfig": {
         "settings": {
@@ -1235,8 +1235,8 @@
       }
     },
     "contracts/interfaces/ICollateralManager.sol": {
-      "lastModificationDate": 1676402952935,
-      "contentHash": "96de2727ccc28a1420b7a4c4264c3ab7",
+      "lastModificationDate": 1677875217330,
+      "contentHash": "3ff0ad533107e1f1d677acdbe58851db",
       "sourceName": "contracts/interfaces/ICollateralManager.sol",
       "solcConfig": {
         "settings": {
@@ -1550,8 +1550,8 @@
       }
     },
     "contracts/interfaces/ITellerV2.sol": {
-      "lastModificationDate": 1677868058095,
-      "contentHash": "e404497e357b5799ed09f307cc14a48f",
+      "lastModificationDate": 1677875486292,
+      "contentHash": "2a016a2fe0296817682e190339ac2fa6",
       "sourceName": "contracts/interfaces/ITellerV2.sol",
       "solcConfig": {
         "settings": {
@@ -1969,6 +1969,49 @@
         }
       }
     },
+    "contracts/mock/CollateralManagerMock.sol": {
+      "lastModificationDate": 1677876073079,
+      "contentHash": "391c139eb2994b201332664d2ccb1480",
+      "sourceName": "contracts/mock/CollateralManagerMock.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "contracts/interfaces/ICollateralManager.sol",
+        "contracts/interfaces/escrow/ICollateralEscrowV1.sol"
+      ],
+      "versionRequirement": "^0.8.0",
+      "artifacts": {
+        "CollateralManagerMock": {
+          "0.8.17+commit.8df45f5f.Linux.gcc": "CollateralManagerMock.sol/CollateralManagerMock.json"
+        }
+      }
+    },
     "contracts/mock/MarketRegistryMock.sol": {
       "lastModificationDate": 1676657851237,
       "contentHash": "17dfed48ed9f1f1e5277cc75fc9f7327",
@@ -2036,8 +2079,8 @@
       }
     },
     "contracts/mock/TellerV2SolMock.sol": {
-      "lastModificationDate": 1677870782721,
-      "contentHash": "e539c7bdf4d6c7578411a0b67f87825b",
+      "lastModificationDate": 1677875441833,
+      "contentHash": "ff8baa74adba06bf12880898b6ea0563",
       "sourceName": "contracts/mock/TellerV2SolMock.sol",
       "solcConfig": {
         "settings": {
@@ -5172,8 +5215,8 @@
       }
     },
     "tests/MarketLiquidityRewards_Test.sol": {
-      "lastModificationDate": 1677874097186,
-      "contentHash": "d83d68e29548bf0446c108c0c9e0c66c",
+      "lastModificationDate": 1677875910105,
+      "contentHash": "f954d035c498d664a99a93b8b6f199d0",
       "sourceName": "tests/MarketLiquidityRewards_Test.sol",
       "solcConfig": {
         "settings": {
@@ -5230,6 +5273,7 @@
         "contracts/libraries/NumbersLib.sol",
         "contracts/libraries/V2Calculations.sol",
         "contracts/libraries/WadRayMath.sol",
+        "contracts/mock/CollateralManagerMock.sol",
         "contracts/mock/MarketRegistryMock.sol",
         "contracts/mock/WethMock.sol",
         "lib/forge-std/lib/ds-test/src/test.sol",

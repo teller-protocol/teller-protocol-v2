@@ -16,13 +16,14 @@ import { Collateral, CollateralType } from "../contracts/interfaces/escrow/IColl
 import { User } from "./Test_Helpers.sol";
 
 import "../contracts/mock/MarketRegistryMock.sol";
-
+import "../contracts/mock/CollateralManagerMock.sol";
 
 import "../contracts/MarketLiquidityRewards.sol";
 
 contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
     TellerV2Mock private tellerV2Mock;
     MarketRegistryMock mockMarketRegistry;
+    CollateralManagerMock mockCollateralManager;
     MarketLiquidityRewards marketLiquidityRewards;
 
     MarketLiquidityUser private marketOwner;
@@ -51,14 +52,25 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
 
  
 
-    constructor(address _tellerV2, address _marketRegistry) MarketLiquidityRewards(address(0),address(0)) {}
+    constructor(
+        address _tellerV2,
+         address _marketRegistry,
+         address _collateralManager)
+          MarketLiquidityRewards(
+        address(0),
+         address(0),
+         address(0)
+         ) {}
 
     function setUp() public {
         tellerV2Mock = new TellerV2Mock();
         mockMarketRegistry = new MarketRegistryMock(address(marketOwner));
+        mockCollateralManager = new CollateralManagerMock();
 
-        marketLiquidityRewards = new MarketLiquidityRewards( 
-            address(tellerV2Mock), address(mockMarketRegistry)
+        marketLiquidityRewards = new MarketLiquidityRewards(
+            address(tellerV2Mock), 
+            address(mockMarketRegistry),
+            address(mockCollateralManager)
         );
 
         marketOwner = new MarketLiquidityUser(address(tellerV2Mock), (this));

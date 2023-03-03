@@ -7,6 +7,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "./interfaces/IMarketLiquidityRewards.sol";
 
 import "./interfaces/IMarketRegistry.sol";
+import "./interfaces/ICollateralManager.sol";
 import "./interfaces/ITellerV2.sol";
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
@@ -45,6 +46,7 @@ Initializable
 {
     address immutable tellerV2;
     address immutable marketRegistry;
+    address immutable collateralManager;
 
     uint256 allocationCount;
  
@@ -55,7 +57,6 @@ Initializable
     //bidId => allocationId => rewardWasClaimed 
     mapping(uint256 => mapping(uint256 =>bool) ) public rewardClaimedForBid;
 
-   
 
     modifier onlyMarketOwner(uint256 _marketId){
         require(msg.sender == IMarketRegistry(marketRegistry).getMarketOwner(_marketId), "Only market owner can call this function.");
@@ -64,9 +65,10 @@ Initializable
 
     event CreatedAllocation(uint256 allocationId, address allocator, uint256 marketId);
 
-    constructor(address _tellerV2, address _marketRegistry) {
+    constructor(address _tellerV2, address _marketRegistry, address _collateralManager) {
         tellerV2 = _tellerV2;
         marketRegistry = _marketRegistry;
+        collateralManager = _collateralManager;
     }
 
     function initialize() external initializer {
@@ -154,15 +156,25 @@ Initializable
             address lender,
             uint256 marketId,
             address principalTokenAddress,
-            uint256 principalAmount,
-            address collateralTokenAddress,
-            uint256 collateralAmount    
+            uint256 principalAmount
         ) = ITellerV2(tellerV2).getLoanSummary(_bidId);
+
+        address collateralTokenAddress =  allocatedRewards[_allocationId].requiredCollateralTokenAddress;
+
+
+
+        //make sure the loan follows the rules related to the allocation 
+
+        if(collateralTokenAddress != address(0)){
+             uint256 collateralAmount = ICollateralManager(collateralManager).getCollateralAmount(_bidId, collateralTokenAddress);
+
+             //require collateral amount 
+        }
+      
         
         uint256 amountToReward = _calculateRewardAmount(principalAmount);
         
         //require that loan status is PAID (optionally)
-
 
         //require that msgsender is the loan borrower 
         require(msg.sender == borrower, "Only the borrower can claim reward.");

@@ -21,7 +21,7 @@ import "../contracts/mock/MarketRegistryMock.sol";
 import "../contracts/MarketLiquidityRewards.sol";
 
 contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
-    LenderCommitmentForwarderTest_TellerV2Mock private tellerV2Mock;
+    MarketLiquidityRewards_Test_TellerV2Mock private tellerV2Mock;
     MarketRegistryMock mockMarketRegistry;
 
     MarketLiquidityUser private marketOwner;
@@ -39,10 +39,7 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
     uint16 minInterestRate;
     uint32 expiration;
 
-    bool acceptBidWasCalled;
-    bool submitBidWasCalled;
-    bool submitBidWithCollateralWasCalled;
-
+   
     TestERC20Token principalToken;
     uint8 constant principalTokenDecimals = 18;
 
@@ -51,16 +48,14 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
 
     constructor()
         LenderCommitmentForwarder(
-            address(new LenderCommitmentForwarderTest_TellerV2Mock()), ///_protocolAddress
+            address(new MarketLiquidityRewards_Test_TellerV2Mock()), ///_protocolAddress
             address(new MarketRegistryMock(address(0)))
         )
     {}
 
     function setUp() public {
-        tellerV2Mock = LenderCommitmentForwarderTest_TellerV2Mock(
-            address(getTellerV2())
-        );
-        mockMarketRegistry = MarketRegistryMock(address(getMarketRegistry()));
+        tellerV2Mock = MarketLiquidityRewards_Test_TellerV2Mock();
+        mockMarketRegistry = MarketRegistryMock(address(marketOwner));
 
         marketOwner = new MarketLiquidityUser(address(tellerV2Mock), (this));
         borrower = new MarketLiquidityUser(address(tellerV2Mock), (this));
@@ -96,11 +91,8 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
             collateralTokenDecimals
         );
 
-        delete acceptBidWasCalled;
-        delete submitBidWasCalled;
-        delete submitBidWithCollateralWasCalled;
-
-        delete commitmentCount;
+       
+        delete allocationCount;
     }
 
 
@@ -451,38 +443,11 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
    */
 
     /*
-        Overrider methods for exercise 
+        Override methods  
     */
+ 
 
-    function _submitBid(CreateLoanArgs memory, address)
-        internal
-        override
-        returns (uint256 bidId)
-    {
-        submitBidWasCalled = true;
-        return 1;
-    }
-
-    function _submitBidWithCollateral(
-        CreateLoanArgs memory,
-        Collateral[] memory,
-        address
-    ) internal override returns (uint256 bidId) {
-        submitBidWithCollateralWasCalled = true;
-        return 1;
-    }
-
-    function _acceptBid(uint256, address) internal override returns (bool) {
-        acceptBidWasCalled = true;
-
-        assertEq(
-            submitBidWithCollateralWasCalled,
-            true,
-            "Submit bid must be called before accept bid"
-        );
-
-        return true;
-    }
+ 
 }
 
 contract MarketLiquidityUser is User {
@@ -496,49 +461,38 @@ contract MarketLiquidityUser is User {
     }
 
     function _allocateRewards(
-       
-        address[] calldata borrowerAddressList
+       MarketLiquidityRewards.RewardAllocation calldata _allocation  
     ) public returns (uint256) {
         return
             liquidityRewards.allocateRewards(
-                _commitment,
-                borrowerAddressList
+               _allocation
             );
     }
 
     function _increaseAllocationAmount(
-        uint256 commitmentId,
-        LenderCommitmentForwarder.Commitment calldata _commitment
+        uint256 _allocationId,
+        uint256 _allocationAmount
     ) public {
-        commitmentForwarder.increaseAllocationAmount(commitmentId, _commitment);
+        liquidityRewards.increaseAllocationAmount(
+            _allocationId, _allocationAmount);
     }
  
 
     function _claimRewards(
-        uint256 commitmentId,
-        uint256 principal,
-        uint256 collateralAmount,
-        uint256 collateralTokenId,
-        address collateralTokenAddress,
-        uint16 interestRate,
-        uint32 loanDuration
-    ) public returns (uint256) {
+         uint256 _allocationId,
+        uint256 _bidId 
+    ) public  {
         return
-            commitmentForwarder.claimRewards(
-                commitmentId,
-                principal,
-                collateralAmount,
-                collateralTokenId,
-                collateralTokenAddress,
-                interestRate,
-                loanDuration
+            liquidityRewards.claimRewards(
+                _allocationId,
+                _bidId
             );
     }
 
   
 }
  
-contract MarketLiquidityRewardsTest_TellerV2Mock is TellerV2Context {
+contract MarketLiquidityRewards_Test_TellerV2Mock is TellerV2Context {
     constructor() TellerV2Context(address(0)) {}
 
     function __setMarketOwner(User _marketOwner) external {

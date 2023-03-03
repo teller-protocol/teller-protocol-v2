@@ -1040,8 +1040,8 @@ contract TellerV2 is
             bids[_bidId].marketId,
             bids[_bidId].loanDetails.lendingToken,
             bids[_bidId].loanDetails.principal,
-            bids[_bidId].loanDetails.lendingToken,
-            bids[_bidId].loanDetails.principal, 
+            bids[_bidId].loanDetails.lendingToken, //FIX ME
+            bids[_bidId].loanDetails.principal, //FIX ME
         );
     }
 

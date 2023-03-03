@@ -122,7 +122,7 @@ dataSources:
           handler: handleExercisedCommitment
         - event: UpdatedCommitmentBorrowers(indexed uint256)
           handler: handeUpdatedCommitmentBorrower
-      file: ./src/mapping.ts
+      file: ./src/lender-commitment/mapping.ts
   - kind: ethereum/contract
     name: CollateralManager
     network: {{network}}

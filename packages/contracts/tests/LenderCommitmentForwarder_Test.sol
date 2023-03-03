@@ -54,10 +54,8 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
     {}
 
     function setUp() public {
-        tellerV2Mock = LenderCommitmentForwarderTest_TellerV2Mock(
-             
-        );
-        mockMarketRegistry = MarketRegistryMock(address(marketOwner));
+        tellerV2Mock = LenderCommitmentForwarderTest_TellerV2Mock( address(getTellerV2()));
+        mockMarketRegistry = MarketRegistryMock(address(getMarketRegistry()));
 
         marketOwner = new LenderCommitmentUser(address(tellerV2Mock), (this));
         borrower = new LenderCommitmentUser(address(tellerV2Mock), (this));

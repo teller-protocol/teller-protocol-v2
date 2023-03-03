@@ -20,7 +20,7 @@ import "../contracts/mock/MarketRegistryMock.sol";
 
 import "../contracts/MarketLiquidityRewards.sol";
 
-contract MarketLiquidityRewards_Test is Testable {
+contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
     TellerV2Mock private tellerV2Mock;
     MarketRegistryMock mockMarketRegistry;
     MarketLiquidityRewards marketLiquidityRewards;
@@ -47,8 +47,15 @@ contract MarketLiquidityRewards_Test is Testable {
     TestERC20Token collateralToken;
     uint8 constant collateralTokenDecimals = 6;
 
-    constructor()
-    {  }
+ 
+
+     constructor(
+        address _tellerV2,
+        address _marketRegistry
+    ) {
+      //  tellerV2 = _tellerV2;
+     //   marketRegistry = _marketRegistry;
+    }
 
     function setUp() public {
         tellerV2Mock = TellerV2Mock();
@@ -443,7 +450,24 @@ contract MarketLiquidityRewards_Test is Testable {
 
    */
  
-      
+ function allocateRewards(
+        MarketLiquidityRewards.RewardAllocation calldata _allocation        
+    ) public override returns (uint256 allocationId_ ) {
+    }
+
+    function increaseAllocationAmount(
+        uint256 _allocationId,
+        uint256 _tokenAmount 
+    ) public override {
+        
+    }
+
+        function deallocateRewards(
+        uint256 _allocationId,
+        uint256 _amount
+    ) public override {}
+
+
 
  
 }

@@ -55,20 +55,7 @@ Initializable
     //bidId => allocationId => rewardWasClaimed 
     mapping(uint256 => mapping(uint256 =>bool) ) public rewardClaimedForBid;
 
-    struct RewardAllocation {
-        address allocator;
-        uint256 marketId;
-        address rewardTokenAddress;
-        uint256 rewardTokenAmount;
-
-
-        //parametersfor loan which affect claimability 
-        address requiredPrincipalTokenAddress; //0 for any 
-        address requiredCollateralTokenAddress; //0 for any  -- could be an enumerable set?
-
-        uint256 rewardPerLoanPrincipalAmount; 
-       
-    } 
+   
 
     modifier onlyMarketOwner(uint256 _marketId){
         require(msg.sender == IMarketRegistry(marketRegistry).getMarketOwner(_marketId), "Only market owner can call this function.");
@@ -93,7 +80,7 @@ Initializable
 
     function allocateRewards(
         RewardAllocation calldata _allocation        
-    ) public returns (uint256 allocationId_ ) { 
+    ) public virtual returns (uint256 allocationId_ ) { 
 
         allocationId_ = allocationCount++;
 
@@ -117,7 +104,7 @@ Initializable
     function increaseAllocationAmount(
         uint256 _allocationId,
         uint256 _tokenAmount 
-    ) public {
+    ) public virtual {
         
 
         IERC20Upgradeable(allocatedRewards[_allocationId].rewardTokenAddress).transferFrom(msg.sender,address(this),_tokenAmount);
@@ -129,7 +116,7 @@ Initializable
     function deallocateRewards(
         uint256 _allocationId,
         uint256 _amount
-    ) public {
+    ) public virtual {
 
         require(msg.sender == allocatedRewards[_allocationId].allocator,"Only the allocator can deallocate rewards.");
 
@@ -151,7 +138,7 @@ Initializable
     function claimRewards(
         uint256 _allocationId,
         uint256 _bidId       
-    ) external {
+    ) external virtual {
 
         require(!rewardClaimedForBid[_bidId][_allocationId],"reward already claimed");
         rewardClaimedForBid[_bidId][_allocationId] = true; // leave this here to defend against re-entrancy 

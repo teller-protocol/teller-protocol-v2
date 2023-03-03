@@ -2,11 +2,25 @@
 pragma solidity ^0.8.0;
 
 interface IMarketLiquidityRewards {
+
+     struct RewardAllocation {
+        address allocator;
+        uint256 marketId;
+        address rewardTokenAddress;
+        uint256 rewardTokenAmount;
+
+
+        //parametersfor loan which affect claimability 
+        address requiredPrincipalTokenAddress; //0 for any 
+        address requiredCollateralTokenAddress; //0 for any  -- could be an enumerable set?
+
+        uint256 rewardPerLoanPrincipalAmount; 
+       
+    } 
+
     function allocateRewards(
-        uint256 _marketId,
-        address _tokenAddress,
-        uint256 _tokenAmount
-    ) external;
+         RewardAllocation calldata _allocation  
+    ) external returns (uint256 allocationId_ );
 
     function increaseAllocationAmount(
         uint256 _allocationId,

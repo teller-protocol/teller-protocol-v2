@@ -131,14 +131,14 @@ Initializable
         uint256 _amount
     ) public {
 
-        require(msg.sender == allocatedRewards[_marketId].allocator,"Only the allocator can deallocate rewards.");
+        require(msg.sender == allocatedRewards[_allocationId].allocator,"Only the allocator can deallocate rewards.");
 
         //subtract amount reward before transfer 
         allocatedRewards[_allocationId].rewardTokenAmount -= _amount;
 
         IERC20Upgradeable(allocatedRewards[_allocationId].rewardTokenAddress).transfer(msg.sender , _amount );
 
-         if( allocatedRewards[_marketId].rewardTokenAmount == 0 ) {
+         if( allocatedRewards[_allocationId].rewardTokenAmount == 0 ) {
                 delete allocatedRewards[_allocationId];
                 //emit event 
         }
@@ -160,9 +160,19 @@ Initializable
  
         //optimize gas by turning these into one single call 
 
-        uint256 marketId = ITellerV2(tellerV2).getMarketIdForLoan(_bidId);
-        address borrower = ITellerV2(tellerV2).getBorrowerForLoan(_bidId);
-        uint256 amountToReward = _calculateRewardAmount(loanData.principal);
+      //  uint256 marketId = ITellerV2(tellerV2).getMarketIdForLoan(_bidId);
+       // address borrower = ITellerV2(tellerV2).getBorrowerForLoan(_bidId);
+        
+        ( address borrower,
+            address lender,
+            uint256 marketId,
+            address principalTokenAddress,
+            uint256 principalAmount,
+            address collateralTokenAddress,
+            uint256 collateralAmount    
+        ) = ITellerV2(tellerV2).getLoanSummary(_bidId);
+        
+        uint256 amountToReward = _calculateRewardAmount(principalAmount);
         
         //require that loan status is PAID (optionally)
 

@@ -1025,6 +1025,27 @@ contract TellerV2 is
         _marketId = bids[_bidId].marketplaceId;
     }
 
+   function getLoanSummary(uint256 _bidId) external view returns (
+        address borrower,
+        address lender,
+        uint256 marketId,
+        address principalTokenAddress,
+        uint256 principalAmount,
+        address collateralTokenAddress,
+        uint256 collateralAmount    
+    ){
+        return (
+            bids[_bidId].borrower,
+            bids[_bidId].lender,
+            bids[_bidId].marketId,
+            bids[_bidId].loanDetails.lendingToken,
+            bids[_bidId].loanDetails.principal,
+            bids[_bidId].loanDetails.lendingToken,
+            bids[_bidId].loanDetails.principal, 
+        );
+    }
+
+
     /** OpenZeppelin Override Functions **/
 
     function _msgSender()

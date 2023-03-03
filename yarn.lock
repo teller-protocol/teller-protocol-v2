@@ -1799,8 +1799,8 @@ __metadata:
   linkType: soft
 
 "@tenderly/hardhat-tenderly@https://github.com/passabilities/hardhat-tenderly#workspace=@tenderly/hardhat-tenderly":
-  version: 1.6.1
-  resolution: "@tenderly/hardhat-tenderly@https://github.com/passabilities/hardhat-tenderly.git#workspace=%40tenderly%2Fhardhat-tenderly&commit=0ce111380597b6b0e5adae3ac5aeba8763fda8d1"
+  version: 1.6.2
+  resolution: "@tenderly/hardhat-tenderly@https://github.com/passabilities/hardhat-tenderly.git#workspace=%40tenderly%2Fhardhat-tenderly&commit=fa4972ff94485965b374cda73c245649481f0fbe"
   dependencies:
     "@ethersproject/bignumber": ^5.7.0
     "@nomiclabs/hardhat-ethers": ^2.1.1
@@ -1815,7 +1815,7 @@ __metadata:
   peerDependencies:
     hardhat: ^2.10.2
     tenderly: ^0.4.0
-  checksum: 8b0782b678afb94c603300e9bfcb48127fe37552b9deecfb266f9138603c00289b185c937164c9861fd6f5abeae9f53a5457869be95f00a2d77b485f36182eda
+  checksum: aaecbec7f94b0af890a7fcddda11c94a3019ca9acc9caaa0cd879cc2c17485b7b29df7d4a8455ffeaee748dd5b8455b7b31f7440e92c9b6993d3a1ff6d9ce356
   languageName: node
   linkType: hard
 
@@ -16506,9 +16506,9 @@ __metadata:
   linkType: hard
 
 "tslog@npm:^4.3.1, tslog@npm:^4.4.0":
-  version: 4.7.5
-  resolution: "tslog@npm:4.7.5"
-  checksum: ed514850adbcd912c43cf10d72ef7c4ca003f9218e835a39903ae331f02eae7f0b38061121400ceee8fdecdb8d829e10b0cf9508c78069fe6969d093c541b0f4
+  version: 4.8.1
+  resolution: "tslog@npm:4.8.1"
+  checksum: 66e6937d47a03b56e0a2d03afb88f3316a1603b66ed03dc25fb7d61ff93c348a125da9212e18e7a40ab0fab88b2d1fa9f99f43b0ce1607cd9ffad8527139dffe
   languageName: node
   linkType: hard
 

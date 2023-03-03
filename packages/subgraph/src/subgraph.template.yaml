@@ -150,7 +150,7 @@ dataSources:
           handler: handleCollateralWithdrawn
         - event: CollateralClaimed(uint256)
           handler: handleCollateralClaimed
-      file: ./src/mapping.ts
+      file: ./src/collateral-manager/mapping.ts
   - kind: ethereum/contract
     name: LenderManager
     network: {{network}}

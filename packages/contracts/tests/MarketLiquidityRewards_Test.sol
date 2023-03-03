@@ -17,6 +17,9 @@ import { User } from "./Test_Helpers.sol";
 
 import "../contracts/mock/MarketRegistryMock.sol";
 
+
+import "../contracts/MarketLiquidityRewards.sol";
+
 contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
     LenderCommitmentForwarderTest_TellerV2Mock private tellerV2Mock;
     MarketRegistryMock mockMarketRegistry;

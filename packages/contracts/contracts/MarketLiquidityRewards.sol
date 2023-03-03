@@ -2,10 +2,14 @@
 pragma solidity ^0.8.0;
 
 
-import "@openzeppelin/contracts-upgradeable/proxy/utils/InitializableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
+import "./interfaces/IMarketLiquidityRewards.sol";
 
+import "./interfaces/IMarketRegistry.sol";
+import "./interfaces/ITellerV2.sol";
 
+import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 /*
 - Claim reward for a loan based on loanId (use a brand new contract)
 - This contract holds the reward tokens in escrow.
@@ -37,7 +41,7 @@ maxPrincipalPerCollateral
  
 contract MarketLiquidityRewards is 
 IMarketLiquidityRewards,
-InitializableUpgradeable
+Initializable
 {
     address constant tellerV2;
     address constant marketRegistry;
@@ -71,6 +75,8 @@ InitializableUpgradeable
         _;
     }
 
+    event CreatedAllocation(uint256 allocationId, address allocator, uint256 marketId);
+
     constructor(address _tellerV2, address _marketRegistry) {
         tellerV2 = _tellerV2;
         marketRegistry = _marketRegistry;
@@ -92,11 +98,11 @@ InitializableUpgradeable
         allocationId_ = allocationCount++;
 
          require(
-            _allocation.allocator == _msgSender(),
+            _allocation.allocator == msg.sender,
             "Invalid allocator address"
         );
 
-        IERC20(_tokenAddress).transferFrom( _msgSender() , _tokenAmount, address(this) );
+        IERC20Upgradeable(_allocation.rewardTokenAddress).transferFrom( msg.sender , _allocation.rewardTokenAmount, address(this) );
 
         allocatedRewards[allocationId_] = _allocation ;
 
@@ -114,7 +120,7 @@ InitializableUpgradeable
     ) public {
         
 
-        IERC20(allocatedRewards[_allocationId].rewardTokenAddress).transferFrom(_msgSender(),address(this),_tokenAmount);
+        IERC20Upgradeable(allocatedRewards[_allocationId].rewardTokenAddress).transferFrom(msg.sender,address(this),_tokenAmount);
         allocatedRewards[_allocationId].rewardTokenAmount += _tokenAmount;
 
         //emit event 
@@ -125,12 +131,12 @@ InitializableUpgradeable
         uint256 _amount
     ) public {
 
-        require(_msgSender() == allocatedRewards[_marketId].allocator,"Only the allocator can deallocate rewards.");
+        require(msg.sender == allocatedRewards[_marketId].allocator,"Only the allocator can deallocate rewards.");
 
         //subtract amount reward before transfer 
         allocatedRewards[_allocationId].rewardTokenAmount -= _amount;
 
-        IERC20(allocatedRewards[_allocationId].rewardTokenAddress).transfer( _msgSender() , _amount );
+        IERC20Upgradeable(allocatedRewards[_allocationId].rewardTokenAddress).transfer(msg.sender , _amount );
 
          if( allocatedRewards[_marketId].rewardTokenAmount == 0 ) {
                 delete allocatedRewards[_allocationId];
@@ -147,8 +153,8 @@ InitializableUpgradeable
         uint256 _bidId       
     ) external {
 
-        require(!rewardClaimedForBid[_bid][_allocationId],"reward already claimed");
-        rewardClaimedForBid[_bid][_allocationId] = true; // leave this here to defend against re-entrancy 
+        require(!rewardClaimedForBid[_bidId][_allocationId],"reward already claimed");
+        rewardClaimedForBid[_bidId][_allocationId] = true; // leave this here to defend against re-entrancy 
 
         
  
@@ -162,12 +168,12 @@ InitializableUpgradeable
 
 
         //require that msgsender is the loan borrower 
-        require(_msgSender() == borrower, "Only the borrower can claim reward.");
+        require(msg.sender == borrower, "Only the borrower can claim reward.");
 
         require(marketId == allocatedRewards[_allocationId].marketId, "MarketId mismatch for allocation");
 
         //transfer tokens reward to the msgsender 
-        IERC20(allocatedRewards[_allocationId].tokenAddress).transfer(_msgSender(), amountToReward);
+        IERC20Upgradeable(allocatedRewards[_allocationId].tokenAddress).transfer(msg.sender, amountToReward);
 
         _decrementAllocatedAmount(_allocationId,amountToReward);
 

@@ -94,7 +94,7 @@ dataSources:
           handler: handleMarketRegistryUpgraded
         - event: SetMarketPaymentType(uint256,uint8)
           handler: handleSetMarketPaymentType
-      file: ./src/mapping.ts
+      file: ./src/market-registry/mapping.ts
   - kind: ethereum/contract
     name: LenderCommitmentForwarder
     network: {{network}}

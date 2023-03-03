@@ -7,6 +7,8 @@ import {
   Collateral,
   Commitment,
   Lender,
+  LoanCounts,
+  MarketPlace,
   Payment,
   TokenVolume
 } from "../../generated/schema";
@@ -18,8 +20,10 @@ import {
 import {
   getBid,
   loadBorrowerByMarketId,
+  loadBorrowerFromBidId,
   loadBorrowerTokenVolume,
   loadLenderByMarketId,
+  loadLenderFromBidId,
   loadLenderTokenVolume,
   loadMarketById,
   loadProtocolTokenVolume,
@@ -43,15 +47,138 @@ export function updateTokenVolumeOnPayment(
     lastInterestPayment
   );
 
-  if (bidState == "Repaid") {
-    tokenVolume.activeLoans = tokenVolume.activeLoans.minus(BigInt.fromI32(1));
-    tokenVolume.closedLoans = tokenVolume.closedLoans.plus(BigInt.fromI32(1));
-  }
-
   tokenVolume.save();
 }
 
-export function updateBid(
+export function updateLoanCountsFromBid(bid: Bid, prevStatus: string): void {
+  // TODO: protocol loan stats
+
+  const market = MarketPlace.load(bid.marketplace);
+  if (market) updateLoanCounts(bid, market.loanCounts, prevStatus);
+
+  const borrower = loadBorrowerFromBidId(bid.id);
+  updateLoanCounts(bid, borrower.loanCounts, prevStatus);
+
+  const lender = loadLenderFromBidId(bid.id);
+  if (lender) updateLoanCounts(bid, lender.loanCounts, prevStatus);
+}
+
+function updateLoanCounts(
+  bid: Bid,
+  loanCountsId: string,
+  prevStatus: string
+): LoanCounts {
+  incrementLoanCounts(loanCountsId, bid.status);
+  return decrementLoanCounts(loanCountsId, prevStatus);
+}
+
+export function incrementLoanCounts(
+  loanCountsId: string,
+  status: string
+): LoanCounts {
+  const loanCounts = LoanCounts.load(loanCountsId);
+  if (!loanCounts) throw new Error("Loan counts not found");
+
+  const ONE = BigInt.fromI32(1);
+
+  switch (bidStatusToEnum(status)) {
+    case BidStatus.Submitted:
+      loanCounts.submitted = loanCounts.submitted.plus(ONE);
+      loanCounts.total = loanCounts.total.plus(ONE);
+      break;
+    case BidStatus.Cancelled:
+      loanCounts.cancelled = loanCounts.cancelled.plus(ONE);
+      break;
+    case BidStatus.Accepted:
+      loanCounts.accepted = loanCounts.accepted.plus(ONE);
+      loanCounts.total = loanCounts.total.plus(ONE);
+      break;
+    case BidStatus.Repaid:
+      loanCounts.repaid = loanCounts.repaid.plus(ONE);
+      loanCounts.total = loanCounts.total.plus(ONE);
+      break;
+    case BidStatus.Defaulted:
+      loanCounts.defaulted = loanCounts.defaulted.plus(ONE);
+      loanCounts.total = loanCounts.total.plus(ONE);
+      break;
+    case BidStatus.Liquidated:
+      loanCounts.liquidated = loanCounts.liquidated.plus(ONE);
+      loanCounts.total = loanCounts.total.plus(ONE);
+      break;
+  }
+  loanCounts.save();
+
+  return loanCounts;
+}
+
+enum BidStatus {
+  None,
+  Submitted,
+  Cancelled,
+  Accepted,
+  Repaid,
+  Defaulted,
+  Liquidated
+}
+
+export function bidStatusToEnum(status: string): BidStatus {
+  if (status === "Submitted") {
+    return BidStatus.Submitted;
+  } else if (status === "Cancelled") {
+    return BidStatus.Cancelled;
+  } else if (status === "Accepted") {
+    return BidStatus.Accepted;
+  } else if (status === "Repaid") {
+    return BidStatus.Repaid;
+  } else if (status === "Defaulted") {
+    return BidStatus.Defaulted;
+  } else if (status === "Liquidated") {
+    return BidStatus.Liquidated;
+  } else {
+    return BidStatus.None;
+  }
+}
+
+export function decrementLoanCounts(
+  loanCountsId: string,
+  status: string
+): LoanCounts {
+  const loanCounts = LoanCounts.load(loanCountsId);
+  if (!loanCounts) throw new Error("Loan counts not found");
+
+  const ONE = BigInt.fromI32(1);
+
+  switch (bidStatusToEnum(status)) {
+    case BidStatus.Submitted:
+      loanCounts.submitted = loanCounts.submitted.minus(ONE);
+      loanCounts.total = loanCounts.total.minus(ONE);
+      break;
+    case BidStatus.Cancelled:
+      loanCounts.cancelled = loanCounts.cancelled.minus(ONE);
+      break;
+    case BidStatus.Accepted:
+      loanCounts.accepted = loanCounts.accepted.minus(ONE);
+      loanCounts.total = loanCounts.total.minus(ONE);
+      break;
+    case BidStatus.Repaid:
+      loanCounts.repaid = loanCounts.repaid.minus(ONE);
+      loanCounts.total = loanCounts.total.minus(ONE);
+      break;
+    case BidStatus.Defaulted:
+      loanCounts.defaulted = loanCounts.defaulted.minus(ONE);
+      loanCounts.total = loanCounts.total.minus(ONE);
+      break;
+    case BidStatus.Liquidated:
+      loanCounts.liquidated = loanCounts.liquidated.minus(ONE);
+      loanCounts.total = loanCounts.total.minus(ONE);
+      break;
+  }
+
+  loanCounts.save();
+  return loanCounts;
+}
+
+export function updateBidOnPayment(
   bid: Bid,
   event: ethereum.Event,
   bidState: string
@@ -138,31 +265,39 @@ export function updateBidTokenVolumesOnAccept(
   addBidToTokenVolume(borrowerVolume, bid);
 }
 
-function addBidToTokenVolume(tokenVolume: TokenVolume, bid: Bid): void {
-  tokenVolume.bids = tokenVolume.bids.concat([bid.id]);
+export function addBidToTokenVolume(tokenVolume: TokenVolume, bid: Bid): void {
+  const bidIds = tokenVolume.bids;
+  const index = bidIds.indexOf(bid.id);
+  if (index == -1) {
+    tokenVolume.bids = tokenVolume.bids.concat([bid.id]);
+  }
 
   tokenVolume.outstandingCapital = tokenVolume.outstandingCapital.plus(
     bid.principal.minus(bid.totalRepaidPrincipal)
   );
 
-  tokenVolume.activeLoans = tokenVolume.activeLoans.plus(BigInt.fromI32(1));
-  const totalTokenLoans = tokenVolume.activeLoans.plus(tokenVolume.closedLoans);
+  const loanCounts = incrementLoanCounts(tokenVolume.loanCounts, bid.status);
 
   tokenVolume._aprTotal = tokenVolume._aprTotal.plus(bid.apr);
-  tokenVolume.aprAverage = tokenVolume._aprTotal.div(totalTokenLoans);
+  tokenVolume.aprAverage = tokenVolume._aprTotal.div(loanCounts.total);
 
   tokenVolume.totalLoaned = tokenVolume.totalLoaned.plus(bid.principal);
-  tokenVolume.loanAverage = tokenVolume.totalLoaned.div(totalTokenLoans);
+  tokenVolume.loanAverage = tokenVolume.totalLoaned.div(loanCounts.total);
 
   tokenVolume._durationTotal = tokenVolume._durationTotal.plus(
     bid.loanDuration
   );
-  tokenVolume.durationAverage = tokenVolume._durationTotal.div(totalTokenLoans);
+  tokenVolume.durationAverage = tokenVolume._durationTotal.div(
+    loanCounts.total
+  );
 
   tokenVolume.save();
 }
 
-function removeBidFromTokenVolume(tokenVolume: TokenVolume, bid: Bid): void {
+export function removeBidFromTokenVolume(
+  tokenVolume: TokenVolume,
+  bid: Bid
+): void {
   const bidIds = tokenVolume.bids;
   const index = bidIds.indexOf(bid.id);
   if (index > -1) {
@@ -174,19 +309,21 @@ function removeBidFromTokenVolume(tokenVolume: TokenVolume, bid: Bid): void {
     bid.principal.minus(bid.totalRepaidPrincipal)
   );
 
-  tokenVolume.activeLoans = tokenVolume.activeLoans.minus(BigInt.fromI32(1));
-  const totalTokenLoans = tokenVolume.activeLoans.plus(tokenVolume.closedLoans);
+  const loanCounts = LoanCounts.load(tokenVolume.loanCounts);
+  if (!loanCounts) throw new Error("Loan counts not found");
 
   tokenVolume._aprTotal = tokenVolume._aprTotal.minus(bid.apr);
-  tokenVolume.aprAverage = tokenVolume._aprTotal.div(totalTokenLoans);
+  tokenVolume.aprAverage = tokenVolume._aprTotal.div(loanCounts.total);
 
   tokenVolume.totalLoaned = tokenVolume.totalLoaned.minus(bid.principal);
-  tokenVolume.loanAverage = tokenVolume.totalLoaned.div(totalTokenLoans);
+  tokenVolume.loanAverage = tokenVolume.totalLoaned.div(loanCounts.total);
 
   tokenVolume._durationTotal = tokenVolume._durationTotal.minus(
     bid.loanDuration
   );
-  tokenVolume.durationAverage = tokenVolume._durationTotal.div(totalTokenLoans);
+  tokenVolume.durationAverage = tokenVolume._durationTotal.div(
+    loanCounts.total
+  );
 
   tokenVolume.save();
 }
@@ -205,36 +342,6 @@ export function updateOutstandingCapital(
     market.id
   );
 
-  if (bidState == "Repaid") {
-    const activeLoanCount = lender.activeLoans;
-    const closedLoanCount = lender.closedLoans;
-    if (activeLoanCount) {
-      lender.activeLoans = activeLoanCount.minus(BigInt.fromI32(1));
-    }
-    if (closedLoanCount) {
-      lender.closedLoans = closedLoanCount.plus(BigInt.fromI32(1));
-    }
-    const borrowerActiveLoans = borrower.activeLoans;
-    const borrowerClosedLoans = borrower.closedLoans;
-    if (borrowerActiveLoans) {
-      borrower.activeLoans = borrowerActiveLoans.minus(BigInt.fromI32(1));
-    }
-    if (borrowerClosedLoans) {
-      borrower.closedLoans = borrowerClosedLoans.plus(BigInt.fromI32(1));
-    }
-  }
-
-  if (bidState == "Repaid") {
-    const acLoanCount = market.activeLoans;
-    const clLoanCount = market.closedLoans;
-    if (acLoanCount) {
-      market.activeLoans = acLoanCount.minus(BigInt.fromI32(1));
-    }
-    if (clLoanCount) {
-      market.closedLoans = clLoanCount.plus(BigInt.fromI32(1));
-    }
-  }
-
   // Update market's token volume
   const tokenVolume = loadTokenVolumeByMarketId(
     storedBid.value5.lendingToken,
@@ -246,7 +353,6 @@ export function updateOutstandingCapital(
     bidState,
     tokenVolume
   );
-  tokenVolume.save();
 
   // Update protocol's overall token volume
   const protocolVolume = loadProtocolTokenVolume(storedBid.value5.lendingToken);
@@ -256,7 +362,6 @@ export function updateOutstandingCapital(
     bidState,
     protocolVolume
   );
-  protocolVolume.save();
 
   // Update lender's token volume
   const lenderVolume = loadLenderTokenVolume(
@@ -338,9 +443,7 @@ function getTypeString(tokenType: i32): string {
 }
 
 export function incrementLenderStats(lender: Lender, bid: Bid): void {
-  lender.activeLoans = lender.activeLoans.plus(BigInt.fromI32(1));
-  lender.bidsAccepted = lender.bidsAccepted.plus(BigInt.fromI32(1));
-  lender.save();
+  incrementLoanCounts(lender.loanCounts, bid.status);
 
   // Update the lender's token volume
   const lenderVolume = loadLenderTokenVolume(
@@ -351,9 +454,7 @@ export function incrementLenderStats(lender: Lender, bid: Bid): void {
 }
 
 export function decrementLenderStats(lender: Lender, bid: Bid): void {
-  lender.activeLoans = lender.activeLoans.minus(BigInt.fromI32(1));
-  lender.bidsAccepted = lender.bidsAccepted.minus(BigInt.fromI32(1));
-  lender.save();
+  decrementLoanCounts(lender.loanCounts, bid.status);
 
   // Update the lender's token volume
   const lenderVolume = loadLenderTokenVolume(

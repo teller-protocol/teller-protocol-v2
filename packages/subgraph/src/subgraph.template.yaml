@@ -1,11 +1,6 @@
 specVersion: 0.0.2
 schema:
   file: ./src/schema.graphql
-#features:
-#  - grafting
-#graft:
-#  base: QmTLXdRafXTKTKnarVedwi8RCtAaPaD3dm7y9fSQc2mfEM
-#  block: 39823700
 dataSources:
   - kind: ethereum/contract
     name: TellerV2

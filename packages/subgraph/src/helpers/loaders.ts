@@ -4,9 +4,12 @@ import { LenderCommitmentForwarder } from "../../generated/LenderCommitmentForwa
 import {
   Bid,
   Borrower,
+  BorrowerBid,
   Collateral,
   Commitment,
   Lender,
+  LenderBid,
+  LoanCounts,
   MarketPlace,
   MarketVolume,
   TokenVolume,
@@ -30,30 +33,71 @@ export function loadBidById(id: BigInt): Bid {
   return bid;
 }
 
+export function loadBorrowerFromBidId(bidId: string): Borrower {
+  const borrowerBid = BorrowerBid.load(bidId)!;
+  const borrower = Borrower.load(borrowerBid.borrower);
+
+  if (!borrower) throw new Error("unable to load borrower");
+
+  return borrower;
+}
+
+export function loadLenderFromBidId(bidId: string): Lender | null {
+  const lenderBid = LenderBid.load(bidId);
+  if (lenderBid) {
+    return Lender.load(lenderBid.lender);
+  }
+  return null;
+}
+
+export function loadLoanCounts(id: string): LoanCounts {
+  let loanCounts = LoanCounts.load(id);
+
+  if (!loanCounts) {
+    loanCounts = new LoanCounts(id);
+    loanCounts.total = BigInt.zero();
+    loanCounts.submitted = BigInt.zero();
+    loanCounts.cancelled = BigInt.zero();
+    loanCounts.accepted = BigInt.zero();
+    loanCounts.repaid = BigInt.zero();
+    loanCounts.defaulted = BigInt.zero();
+    loanCounts.liquidated = BigInt.zero();
+    loanCounts.save();
+  }
+
+  return loanCounts;
+}
+
 export function loadMarketById(id: string): MarketPlace {
   let marketPlace: MarketPlace | null = MarketPlace.load(id);
 
   if (!marketPlace) {
     marketPlace = new MarketPlace(id);
     marketPlace.marketplaceId = BigInt.fromString(id);
+    marketPlace.isMarketOpen = false;
+
     marketPlace.marketplaceFeePercent = BigInt.zero();
-    marketPlace.openRequests = BigInt.zero();
     marketPlace.paymentDefaultDuration = BigInt.zero();
     marketPlace.paymentCycleDuration = BigInt.zero();
     marketPlace.bidExpirationTime = BigInt.zero();
     marketPlace.borrowerAttestationRequired = false;
     marketPlace.lenderAttestationRequired = false;
-    marketPlace.activeLoans = BigInt.zero();
-    marketPlace.closedLoans = BigInt.zero();
+
+    const loanCounts = loadLoanCounts(`market-${id}`);
+    marketPlace.loanCounts = loanCounts.id;
+
     marketPlace.aprAverage = BigInt.zero();
     marketPlace._aprTotal = BigInt.zero();
     marketPlace.durationAverage = BigInt.zero();
     marketPlace._durationTotal = BigInt.zero();
+
     marketPlace.totalNumberOfLenders = BigInt.zero();
+
     marketPlace.paymentType = "EMI";
     marketPlace.paymentCycleType = "Seconds";
+
+    marketPlace.save();
   }
-  marketPlace.save();
   return marketPlace;
 }
 
@@ -63,7 +107,7 @@ export function loadLenderByMarketId(
   timestamp: BigInt = BigInt.zero()
 ): Lender {
   const market = loadMarketById(marketId);
-  const idString = market.id.concat(lenderAddress.toHexString());
+  const idString = `${market.id}-${lenderAddress.toHexString()}`;
   let lender: Lender | null = Lender.load(idString);
 
   let user: User | null = User.load(lenderAddress.toHexString());
@@ -76,14 +120,17 @@ export function loadLenderByMarketId(
   if (!lender) {
     lender = new Lender(idString);
     lender.isAttested = false;
-    lender.activeLoans = BigInt.zero();
-    lender.closedLoans = BigInt.zero();
-    lender.bidsAccepted = BigInt.zero();
+
+    const loanCounts = loadLoanCounts(`lender-${idString}`);
+    lender.loanCounts = loanCounts.id;
+
     lender.firstInteractionDate = timestamp;
     lender.lenderAddress = lenderAddress;
     lender.user = user.id;
     lender.marketplace = market.id;
     lender.marketplaceId = market.marketplaceId;
+
+    lender.save();
 
     // increment total number of lenders for market
     market.totalNumberOfLenders = market.totalNumberOfLenders.plus(
@@ -92,7 +139,6 @@ export function loadLenderByMarketId(
     market.save();
   }
 
-  lender.save();
   return lender;
 }
 
@@ -102,7 +148,7 @@ export function loadBorrowerByMarketId(
   timestamp: BigInt = BigInt.zero()
 ): Borrower {
   const market = loadMarketById(marketId);
-  const idString = market.id.concat(borrowerAddress.toHexString());
+  const idString = `${market.id}-${borrowerAddress.toHexString()}`;
   let borrower: Borrower | null = Borrower.load(idString);
 
   let user: User | null = User.load(borrowerAddress.toHexString());
@@ -115,17 +161,19 @@ export function loadBorrowerByMarketId(
   if (!borrower) {
     borrower = new Borrower(idString);
     borrower.isAttested = false;
-    borrower.activeLoans = BigInt.zero();
-    borrower.closedLoans = BigInt.zero();
-    borrower.bidsAccepted = BigInt.zero();
+
+    const loanCounts = loadLoanCounts(`borrower-${idString}`);
+    borrower.loanCounts = loanCounts.id;
+
     borrower.firstInteractionDate = timestamp;
     borrower.borrowerAddress = borrowerAddress;
     borrower.user = user.id;
     borrower.marketplace = market.id;
     borrower.marketplaceId = market.marketplaceId;
+
+    borrower.save();
   }
 
-  borrower.save();
   return borrower;
 }
 
@@ -259,6 +307,10 @@ export function loadCommitment(commitmentId: string): Commitment {
     commitment.marketplaceId = BigInt.zero();
     commitment.stats = "";
     commitment.createdAt = BigInt.zero();
+
+    const loanCounts = loadLoanCounts(`commitment-${idString}`);
+    loanCounts.save();
+    commitment.loanCounts = loanCounts.id;
 
     commitment.principalTokenAddress = Address.zero();
     commitment.collateralTokenAddress = Address.zero();

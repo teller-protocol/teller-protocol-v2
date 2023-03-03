@@ -6,7 +6,8 @@ import {
   BorrowerBid,
   FundedTx,
   Lender,
-  LenderBid
+  LenderBid,
+  LoanCounts
 } from "../generated/schema";
 import {
   AcceptedBid,
@@ -24,17 +25,19 @@ import {
   getBid,
   loadBidById,
   loadBorrowerByMarketId,
+  loadBorrowerFromBidId,
   loadBorrowerTokenVolume,
   loadLenderByMarketId,
   loadMarketById,
   loadProtocolTokenVolume,
-  loadTokenVolumeByMarketId,
+  loadTokenVolumeByMarketId
 } from "./helpers/loaders";
 import {
   decrementLenderStats,
   incrementLenderStats,
-  updateBid,
-  updateBidTokenVolumesOnAccept
+  updateBidOnPayment,
+  updateBidTokenVolumesOnAccept,
+  updateLoanCountsFromBid
 } from "./helpers/updaters";
 
 export function handleSubmittedBid(event: SubmittedBid): void {
@@ -51,7 +54,8 @@ export function handleSubmittedBid(event: SubmittedBid): void {
   );
 
   const bid = new Bid(event.params.bidId.toString());
-  const borrowerBid = new BorrowerBid(borrower.id.concat(bid.id));
+
+  const borrowerBid = new BorrowerBid(bid.id);
   borrowerBid.bid = bid.id;
   borrowerBid.borrower = borrower.id;
   borrowerBid.save();
@@ -91,11 +95,6 @@ export function handleSubmittedBid(event: SubmittedBid): void {
 
   loadBorrowerTokenVolume(lendingTokenAddress, borrower);
 
-  const requests = market.openRequests;
-  if (requests) {
-    market.openRequests = requests.plus(BigInt.fromI32(1));
-  }
-
   if (!tellerV2Instance.try_bidExpirationTime(event.params.bidId).reverted) {
     bid.expiresAt = event.block.timestamp.plus(
       tellerV2Instance.bidExpirationTime(event.params.bidId)
@@ -104,9 +103,7 @@ export function handleSubmittedBid(event: SubmittedBid): void {
     bid.expiresAt = BigInt.zero();
   }
 
-  const marketPlace = loadMarketById(storedBid.value3.toString());
-
-  const paymentDefaultDuration = marketPlace.paymentDefaultDuration;
+  const paymentDefaultDuration = market.paymentDefaultDuration;
   if (paymentDefaultDuration) {
     bid.paymentDefaultDuration = paymentDefaultDuration;
   } else {
@@ -115,6 +112,8 @@ export function handleSubmittedBid(event: SubmittedBid): void {
 
   bid.save();
   market.save();
+
+  updateLoanCountsFromBid(bid, "");
 }
 
 export function handleSubmittedBids(events: SubmittedBid[]): void {
@@ -125,6 +124,7 @@ export function handleSubmittedBids(events: SubmittedBid[]): void {
 
 export function handleAcceptedBid(event: AcceptedBid): void {
   const bid = loadBidById(event.params.bidId);
+  const borrower = loadBorrowerFromBidId(bid.id);
 
   const tellerV2Instance = TellerV2.bind(event.address);
 
@@ -154,40 +154,22 @@ export function handleAcceptedBid(event: AcceptedBid): void {
   bid.nextDueDate = tellerV2Instance.calculateNextDueDate(event.params.bidId);
   bid.lenderAddress = event.params.lender;
   bid.save();
+  updateLoanCountsFromBid(bid, "Submitted");
 
   // Update market entity
-  const requests = marketPlace.openRequests;
-  const marketFee = marketPlace.marketplaceFeePercent;
-  const activeLoanCount = marketPlace.activeLoans;
+  const marketLoanStats = LoanCounts.load(marketPlace.loanCounts);
+  if (marketLoanStats) {
+    marketPlace._aprTotal = marketPlace._aprTotal.plus(bid.apr);
+    marketPlace.aprAverage = marketPlace._aprTotal.div(marketLoanStats.total);
 
-  const _aprTotal = marketPlace._aprTotal;
-  const _durationTotal = marketPlace._durationTotal;
+    marketPlace._durationTotal = marketPlace._durationTotal.plus(
+      bid.loanDuration
+    );
+    marketPlace.durationAverage = marketPlace._durationTotal.div(
+      marketLoanStats.total
+    );
 
-  if (requests && marketFee && activeLoanCount && _durationTotal) {
-    const updatedAPRTotal = _aprTotal.plus(bid.apr);
-    const updatedActiveLoans = activeLoanCount.plus(BigInt.fromI32(1));
-    marketPlace.openRequests = requests.minus(BigInt.fromI32(1));
-    marketPlace.activeLoans = updatedActiveLoans;
-
-    marketPlace._aprTotal = updatedAPRTotal;
-    const totalLoans = updatedActiveLoans.plus(marketPlace.closedLoans);
-    marketPlace.aprAverage = updatedAPRTotal.div(totalLoans);
-
-    const updatedDurationTotal = _durationTotal.plus(bid.loanDuration);
-    marketPlace._durationTotal = updatedDurationTotal;
-    marketPlace.durationAverage = updatedDurationTotal.div(totalLoans);
     marketPlace.save();
-  }
-
-  // Update borrower entity
-  const borrower = loadBorrowerByMarketId(
-    Address.fromBytes(bid.borrowerAddress),
-    marketPlace.id
-  );
-  if (borrower) {
-    borrower.activeLoans = borrower.activeLoans.plus(BigInt.fromI32(1));
-    borrower.bidsAccepted = borrower.bidsAccepted.plus(BigInt.fromI32(1));
-    borrower.save();
   }
 
   updateBidTokenVolumesOnAccept(bid, borrower, lender);
@@ -205,15 +187,9 @@ export function handleCancelledBid(event: CancelledBid): void {
   bid.updatedAt = event.block.timestamp;
   bid.transactionHash = event.transaction.hash.toHex();
   bid.status = "Cancelled";
-
-  const marketPlace = loadMarketById(bid.marketplaceId.toString());
-  const requests = marketPlace.openRequests;
-  if (requests) {
-    marketPlace.openRequests = requests.minus(BigInt.fromI32(1));
-    marketPlace.save();
-  }
-
   bid.save();
+
+  updateLoanCountsFromBid(bid, "Submitted");
 }
 
 export function handleCancelledBids(events: CancelledBid[]): void {
@@ -226,7 +202,7 @@ export function handleLoanRepayment(event: LoanRepayment): void {
   const bid: Bid = loadBidById(event.params.bidId);
   bid.updatedAt = event.block.timestamp;
   bid.transactionHash = event.transaction.hash.toHex();
-  updateBid(bid, event, "Repayment");
+  updateBidOnPayment(bid, event, "Repayment");
 }
 
 export function handleLoanRepayments(events: LoanRepayment[]): void {
@@ -241,7 +217,9 @@ export function handleLoanRepaid(event: LoanRepaid): void {
   bid.updatedAt = event.block.timestamp;
   bid.transactionHash = event.transaction.hash.toHex();
 
-  updateBid(bid, event, "Repaid");
+  const prevStatus = bid.status;
+  updateBidOnPayment(bid, event, "Repaid");
+  updateLoanCountsFromBid(bid, prevStatus);
 }
 
 export function handleLoanRepaids(events: LoanRepaid[]): void {
@@ -256,7 +234,9 @@ export function handleLoanLiquidated(event: LoanLiquidated): void {
   bid.updatedAt = event.block.timestamp;
   bid.transactionHash = event.transaction.hash.toHex();
 
-  updateBid(bid, event, "Liquidated");
+  const prevStatus = bid.status;
+  updateBidOnPayment(bid, event, "Liquidated");
+  updateLoanCountsFromBid(bid, prevStatus);
 }
 
 export function handleLoanLiquidateds(events: LoanLiquidated[]): void {

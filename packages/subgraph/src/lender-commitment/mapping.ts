@@ -15,6 +15,7 @@ import {
   loadCommitment,
   updateLenderCommitment
 } from "../helpers/loaders";
+import { addBidToTokenVolume, incrementLoanCounts } from "../helpers/updaters";
 
 export function handleCreatedCommitment(event: CreatedCommitment): void {
   const commitmentId = event.params.commitmentId.toString();
@@ -96,19 +97,11 @@ export function handleExercisedCommitment(event: ExercisedCommitment): void {
   bid.save();
   commitment.save();
 
+  incrementLoanCounts(commitment.loanCounts, bid.status);
+
   const stats = TokenVolume.load(commitment.stats);
   if (stats) {
-    stats.activeLoans = stats.activeLoans.plus(BigInt.fromI32(1));
-
-    stats.totalLoaned = stats.totalLoaned.plus(bid.principal);
-    stats.outstandingCapital = stats.outstandingCapital.plus(bid.principal);
-
-    const totalLoans = stats.activeLoans.plus(stats.closedLoans);
-    stats._aprTotal = stats._aprTotal.plus(bid.apr);
-    stats.aprAverage = stats._aprTotal.div(totalLoans);
-    stats.loanAverage = stats.totalLoaned.div(totalLoans);
-    stats.durationAverage = stats._durationTotal.div(totalLoans);
-    stats.save();
+    addBidToTokenVolume(stats, bid);
   }
 }
 

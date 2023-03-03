@@ -1,31 +1,36 @@
 type MarketPlace @entity {
   id: ID!
   marketplaceId: BigInt!
+
   owner: Bytes
   feeRecipient: Bytes
   metadataURI: String
-  isMarketOpen: Boolean
+  isMarketOpen: Boolean!
   paymentDefaultDuration: BigInt!
   paymentCycleDuration: BigInt!
   paymentCycleType: String!
+  paymentType: String!
   bidExpirationTime: BigInt!
-  borrowerAttestationRequired: Boolean
-  lenderAttestationRequired: Boolean
+  borrowerAttestationRequired: Boolean!
+  lenderAttestationRequired: Boolean!
   marketplaceFeePercent: BigInt!
-  openRequests: BigInt!
-  activeLoans: BigInt!
-  closedLoans: BigInt!
+
+  loanCounts: LoanCounts!
+
   aprAverage: BigInt!
   _aprTotal: BigInt!
-  durationAverage: BigInt
-  _durationTotal: BigInt
-  totalNumberOfLenders: BigInt!
+  durationAverage: BigInt!
+  _durationTotal: BigInt!
+
   tokenVolumes: [MarketVolume!]! @derivedFrom(field: "market")
+
+  totalNumberOfLenders: BigInt!
   lenders: [Lender!]! @derivedFrom(field: "marketplace")
+
   borrowers: [Borrower!]! @derivedFrom(field: "marketplace")
+
   bids: [Bid!]! @derivedFrom(field: "marketplace")
   commitments: [Commitment!]! @derivedFrom(field: "marketplace")
-  paymentType: String!
 }
 
 type Bid @entity {
@@ -125,9 +130,9 @@ type Lender @entity {
   firstInteractionDate: BigInt!
   attestedTimestamp: BigInt
   isAttested: Boolean!
-  activeLoans: BigInt!
-  closedLoans: BigInt!
-  bidsAccepted: BigInt!
+
+  loanCounts: LoanCounts!
+
   tokenVolume: [TokenVolume!] @derivedFrom(field: "lender")
   marketplace: MarketPlace!
   user: User!
@@ -142,13 +147,25 @@ type Borrower @entity {
   firstInteractionDate: BigInt!
   attestedTimestamp: BigInt
   isAttested: Boolean!
-  activeLoans: BigInt!
-  closedLoans: BigInt!
-  bidsAccepted: BigInt!
+
+  loanCounts: LoanCounts!
+
   tokenVolume: [TokenVolume!] @derivedFrom(field: "borrower")
   marketplace: MarketPlace!
   user: User!
   bids: [BorrowerBid!] @derivedFrom(field: "borrower")
+}
+
+type LoanCounts @entity {
+  id: ID!
+
+  total: BigInt!
+  submitted: BigInt!
+  cancelled: BigInt!
+  accepted: BigInt!
+  repaid: BigInt!
+  defaulted: BigInt!
+  liquidated: BigInt!
 }
 
 type TokenVolume @entity {
@@ -162,8 +179,7 @@ type TokenVolume @entity {
   ## TokenStats ##
   lendingTokenAddress: Bytes!
   bids: [Bid!]!
-  activeLoans: BigInt!
-  closedLoans: BigInt!
+  loanCounts: LoanCounts!
 
   outstandingCapital: BigInt!
   totalLoaned: BigInt!
@@ -217,4 +233,5 @@ type Commitment @entity {
 
   # TokenStats
   stats: TokenVolume!
+  loanCounts: LoanCounts!
 }

@@ -40,7 +40,7 @@ fi
 # Export the deployed contracts config to the subgraph directory
 yarn workspace @teller-protocol/v2-contracts export --network "$network" &&
   # Generate the subgraph definition
-  yarn mustache "$network_config" src/subgraph.template.yaml > subgraph.yaml
+  yarn mustache "$network_config" src/subgraph.template.yaml > subgraph.yaml &&
   # Generate AssemblyScript types for the subgraph
   yarn graph codegen &&
   # Build the subgraph

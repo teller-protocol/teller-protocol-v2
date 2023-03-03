@@ -172,7 +172,7 @@ export function handleAcceptedBid(event: AcceptedBid): void {
     marketPlace.save();
   }
 
-  updateBidTokenVolumesOnAccept(bid, borrower, lender);
+  updateBidTokenVolumesOnAccept(bid);
 }
 
 export function handleAcceptedBids(events: AcceptedBid[]): void {

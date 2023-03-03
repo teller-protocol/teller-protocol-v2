@@ -1034,15 +1034,14 @@ contract TellerV2 is
         address collateralTokenAddress,
         uint256 collateralAmount    
     ){
-        return (
-            bids[_bidId].borrower,
-            bids[_bidId].lender,
-            bids[_bidId].marketId,
-            bids[_bidId].loanDetails.lendingToken,
-            bids[_bidId].loanDetails.principal,
-            bids[_bidId].loanDetails.lendingToken, //FIX ME
-            bids[_bidId].loanDetails.principal, //FIX ME
-        );
+       borrower=  bids[_bidId].borrower;
+        lender =    bids[_bidId].lender;
+        marketId =   bids[_bidId].marketplaceId;
+        principalTokenAddress =    address(bids[_bidId].loanDetails.lendingToken);
+         principalAmount =   bids[_bidId].loanDetails.principal;
+         collateralTokenAddress=   address(bids[_bidId].loanDetails.lendingToken); //FIX ME
+          collateralAmount=   bids[_bidId].loanDetails.principal; //FIX ME
+    
     }
 
 

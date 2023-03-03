@@ -20,9 +20,10 @@ import "../contracts/mock/MarketRegistryMock.sol";
 
 import "../contracts/MarketLiquidityRewards.sol";
 
-contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
-    MarketLiquidityRewards_Test_TellerV2Mock private tellerV2Mock;
+contract MarketLiquidityRewards_Test is Testable {
+    TellerV2Mock private tellerV2Mock;
     MarketRegistryMock mockMarketRegistry;
+    MarketLiquidityRewards marketLiquidityRewards;
 
     MarketLiquidityUser private marketOwner;
     MarketLiquidityUser private lender;
@@ -47,15 +48,15 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
     uint8 constant collateralTokenDecimals = 6;
 
     constructor()
-        LenderCommitmentForwarder(
-            address(new MarketLiquidityRewards_Test_TellerV2Mock()), ///_protocolAddress
-            address(new MarketRegistryMock(address(0)))
-        )
-    {}
+    {  }
 
     function setUp() public {
-        tellerV2Mock = MarketLiquidityRewards_Test_TellerV2Mock();
+        tellerV2Mock = TellerV2Mock();
         mockMarketRegistry = MarketRegistryMock(address(marketOwner));
+
+        marketLiquidityRewards = new MarketLiquidityRewards( 
+            address(tellerV2Mock), address(mockMarketRegistry)
+        );
 
         marketOwner = new MarketLiquidityUser(address(tellerV2Mock), (this));
         borrower = new MarketLiquidityUser(address(tellerV2Mock), (this));
@@ -92,7 +93,7 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
         );
 
        
-        delete allocationCount;
+        //delete allocationCount;
     }
 
 
@@ -441,11 +442,8 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
     }
 
    */
-
-    /*
-        Override methods  
-    */
  
+      
 
  
 }
@@ -492,7 +490,7 @@ contract MarketLiquidityUser is User {
   
 }
  
-contract MarketLiquidityRewards_Test_TellerV2Mock is TellerV2Context {
+contract TellerV2Mock is TellerV2Context {
     constructor() TellerV2Context(address(0)) {}
 
     function __setMarketOwner(User _marketOwner) external {

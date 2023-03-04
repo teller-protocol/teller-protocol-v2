@@ -317,11 +317,10 @@ export function handleNewLenderSet(event: Transfer): void {
     bid.marketplace,
     event.block.timestamp
   );
-  incrementLenderStats(newLender, bid);
-
   const lenderBid = new LenderBid(bid.id);
   lenderBid.lender = newLender.id;
   lenderBid.save();
+  incrementLenderStats(newLender, bid);
 }
 
 export function handleNewLenderSets(events: Transfer[]): void {

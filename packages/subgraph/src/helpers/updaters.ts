@@ -109,7 +109,7 @@ function updateLenderLoanCounts(
   prevStatus: string,
   type: UpdateLoanCountsType = UpdateLoanCountsType.Increment |
     UpdateLoanCountsType.Decrement
-): void {
+): boolean {
   if (bidStatusToEnum(prevStatus) == BidStatus.Submitted) {
     // eslint-disable-next-line no-param-reassign
     type = UpdateLoanCountsType.Increment;
@@ -124,7 +124,9 @@ function updateLenderLoanCounts(
       lender
     );
     updateLoanCounts(lenderVolume.loanCounts, bid.status, prevStatus, type);
+    return true;
   }
+  return false;
 }
 
 enum UpdateLoanCountsType {
@@ -206,17 +208,17 @@ enum BidStatus {
 }
 
 export function bidStatusToEnum(status: string): BidStatus {
-  if (status === "Submitted") {
+  if (status == "Submitted") {
     return BidStatus.Submitted;
-  } else if (status === "Cancelled") {
+  } else if (status == "Cancelled") {
     return BidStatus.Cancelled;
-  } else if (status === "Accepted") {
+  } else if (status == "Accepted") {
     return BidStatus.Accepted;
-  } else if (status === "Repaid") {
+  } else if (status == "Repaid") {
     return BidStatus.Repaid;
-  } else if (status === "Defaulted") {
+  } else if (status == "Defaulted") {
     return BidStatus.Defaulted;
-  } else if (status === "Liquidated") {
+  } else if (status == "Liquidated") {
     return BidStatus.Liquidated;
   } else {
     return BidStatus.None;
@@ -532,7 +534,12 @@ function getTypeString(tokenType: i32): string {
 }
 
 export function incrementLenderStats(lender: Lender, bid: Bid): void {
-  updateLenderLoanCounts(bid, "", UpdateLoanCountsType.Increment);
+  const successful = updateLenderLoanCounts(
+    bid,
+    "",
+    UpdateLoanCountsType.Increment
+  );
+  if (!successful) throw new Error("Failed to increment lender loan counts");
 
   // Update the lender's token volume
   const lenderVolume = loadLenderTokenVolume(
@@ -543,7 +550,8 @@ export function incrementLenderStats(lender: Lender, bid: Bid): void {
 }
 
 export function decrementLenderStats(lender: Lender, bid: Bid): void {
-  updateLenderLoanCounts(bid, "", UpdateLoanCountsType.Decrement);
+  // Pass the current status as the previous status to be decremented
+  updateLenderLoanCounts(bid, bid.status, UpdateLoanCountsType.Decrement);
 
   // Update the lender's token volume
   const lenderVolume = loadLenderTokenVolume(

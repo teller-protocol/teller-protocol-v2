@@ -308,10 +308,6 @@ export function loadCommitment(commitmentId: string): Commitment {
     commitment.stats = "";
     commitment.createdAt = BigInt.zero();
 
-    const loanCounts = loadLoanCounts(`commitment-${idString}`);
-    loanCounts.save();
-    commitment.loanCounts = loanCounts.id;
-
     commitment.principalTokenAddress = Address.zero();
     commitment.collateralTokenAddress = Address.zero();
     commitment.collateralTokenId = BigInt.zero();

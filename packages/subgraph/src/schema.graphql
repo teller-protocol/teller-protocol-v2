@@ -233,5 +233,4 @@ type Commitment @entity {
 
   # TokenStats
   stats: TokenVolume!
-  loanCounts: LoanCounts!
 }

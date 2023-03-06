@@ -15,7 +15,7 @@ type MarketPlace @entity {
   lenderAttestationRequired: Boolean!
   marketplaceFeePercent: BigInt!
 
-  loanCounts: LoanCounts!
+  loans: LoanCounts!
 
   aprAverage: BigInt!
   _aprTotal: BigInt!
@@ -131,7 +131,7 @@ type Lender @entity {
   attestedTimestamp: BigInt
   isAttested: Boolean!
 
-  loanCounts: LoanCounts!
+  loans: LoanCounts!
 
   tokenVolume: [TokenVolume!] @derivedFrom(field: "lender")
   marketplace: MarketPlace!
@@ -148,7 +148,7 @@ type Borrower @entity {
   attestedTimestamp: BigInt
   isAttested: Boolean!
 
-  loanCounts: LoanCounts!
+  loans: LoanCounts!
 
   tokenVolume: [TokenVolume!] @derivedFrom(field: "borrower")
   marketplace: MarketPlace!
@@ -159,13 +159,29 @@ type Borrower @entity {
 type LoanCounts @entity {
   id: ID!
 
-  total: BigInt!
-  submitted: BigInt!
-  cancelled: BigInt!
-  accepted: BigInt!
-  repaid: BigInt!
-  defaulted: BigInt!
-  liquidated: BigInt!
+  all: [Bid!]!
+  totalCount: BigInt!
+
+  submitted: [Bid!]!
+  submittedCount: BigInt!
+
+  cancelled: [Bid!]!
+  cancelledCount: BigInt!
+
+  accepted: [Bid!]!
+  acceptedCount: BigInt!
+
+  repaid: [Bid!]!
+  repaidCount: BigInt!
+
+  late: [Bid!]!
+  lateCount: BigInt!
+
+  defaulted: [Bid!]!
+  defaultedCount: BigInt!
+
+  liquidated: [Bid!]!
+  liquidatedCount: BigInt!
 }
 
 type TokenVolume @entity {
@@ -179,7 +195,7 @@ type TokenVolume @entity {
   ## TokenStats ##
   lendingTokenAddress: Bytes!
   bids: [Bid!]!
-  loanCounts: LoanCounts!
+  loans: LoanCounts!
 
   outstandingCapital: BigInt!
   totalLoaned: BigInt!

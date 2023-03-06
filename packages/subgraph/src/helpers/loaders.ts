@@ -51,21 +51,39 @@ export function loadLenderFromBidId(bidId: string): Lender | null {
 }
 
 export function loadLoanCounts(id: string): LoanCounts {
-  let loanCounts = LoanCounts.load(id);
+  let loans = LoanCounts.load(id);
 
-  if (!loanCounts) {
-    loanCounts = new LoanCounts(id);
-    loanCounts.total = BigInt.zero();
-    loanCounts.submitted = BigInt.zero();
-    loanCounts.cancelled = BigInt.zero();
-    loanCounts.accepted = BigInt.zero();
-    loanCounts.repaid = BigInt.zero();
-    loanCounts.defaulted = BigInt.zero();
-    loanCounts.liquidated = BigInt.zero();
-    loanCounts.save();
+  if (!loans) {
+    loans = new LoanCounts(id);
+
+    loans.all = [];
+    loans.totalCount = BigInt.zero();
+
+    loans.submitted = [];
+    loans.submittedCount = BigInt.zero();
+
+    loans.cancelled = [];
+    loans.cancelledCount = BigInt.zero();
+
+    loans.accepted = [];
+    loans.acceptedCount = BigInt.zero();
+
+    loans.repaid = [];
+    loans.repaidCount = BigInt.zero();
+
+    loans.late = [];
+    loans.lateCount = BigInt.zero();
+
+    loans.defaulted = [];
+    loans.defaultedCount = BigInt.zero();
+
+    loans.liquidated = [];
+    loans.liquidatedCount = BigInt.zero();
+
+    loans.save();
   }
 
-  return loanCounts;
+  return loans;
 }
 
 export function loadMarketById(id: string): MarketPlace {
@@ -83,8 +101,8 @@ export function loadMarketById(id: string): MarketPlace {
     marketPlace.borrowerAttestationRequired = false;
     marketPlace.lenderAttestationRequired = false;
 
-    const loanCounts = loadLoanCounts(`market-${id}`);
-    marketPlace.loanCounts = loanCounts.id;
+    const loans = loadLoanCounts(`market-${id}`);
+    marketPlace.loans = loans.id;
 
     marketPlace.aprAverage = BigInt.zero();
     marketPlace._aprTotal = BigInt.zero();
@@ -121,8 +139,8 @@ export function loadLenderByMarketId(
     lender = new Lender(idString);
     lender.isAttested = false;
 
-    const loanCounts = loadLoanCounts(`lender-${idString}`);
-    lender.loanCounts = loanCounts.id;
+    const loans = loadLoanCounts(`lender-${idString}`);
+    lender.loans = loans.id;
 
     lender.firstInteractionDate = timestamp;
     lender.lenderAddress = lenderAddress;
@@ -162,8 +180,8 @@ export function loadBorrowerByMarketId(
     borrower = new Borrower(idString);
     borrower.isAttested = false;
 
-    const loanCounts = loadLoanCounts(`borrower-${idString}`);
-    borrower.loanCounts = loanCounts.id;
+    const loans = loadLoanCounts(`borrower-${idString}`);
+    borrower.loans = loans.id;
 
     borrower.firstInteractionDate = timestamp;
     borrower.borrowerAddress = borrowerAddress;

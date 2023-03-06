@@ -157,16 +157,16 @@ export function handleAcceptedBid(event: AcceptedBid): void {
   updateLoanCountsFromBid(bid, "Submitted");
 
   // Update market entity
-  const marketLoanStats = LoanCounts.load(marketPlace.loanCounts);
+  const marketLoanStats = LoanCounts.load(marketPlace.loans);
   if (marketLoanStats) {
     marketPlace._aprTotal = marketPlace._aprTotal.plus(bid.apr);
-    marketPlace.aprAverage = marketPlace._aprTotal.div(marketLoanStats.total);
+    marketPlace.aprAverage = marketPlace._aprTotal.div(marketLoanStats.totalCount);
 
     marketPlace._durationTotal = marketPlace._durationTotal.plus(
       bid.loanDuration
     );
     marketPlace.durationAverage = marketPlace._durationTotal.div(
-      marketLoanStats.total
+      marketLoanStats.totalCount
     );
 
     marketPlace.save();

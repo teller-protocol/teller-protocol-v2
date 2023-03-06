@@ -11,8 +11,8 @@ export function initTokenVolume(
   token.lendingTokenAddress = tokenAddress;
   token.bids = [];
 
-  const loanCounts = loadLoanCounts(`token-volume-${token.id}`);
-  token.loanCounts = loanCounts.id;
+  const loans = loadLoanCounts(`token-volume-${token.id}`);
+  token.loans = loans.id;
 
   token.outstandingCapital = BigInt.zero();
   token.totalLoaned = BigInt.zero();

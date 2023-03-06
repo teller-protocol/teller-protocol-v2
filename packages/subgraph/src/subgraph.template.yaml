@@ -162,7 +162,6 @@ dataSources:
         - MarketPlace
         - Lender
         - TokenVolume
-        - LenderBid
       abis:
         - name: LenderManager
           file: ./abis/{{network}}_LenderManager.json

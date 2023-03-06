@@ -4,14 +4,13 @@ import { LenderCommitmentForwarder } from "../../generated/LenderCommitmentForwa
 import {
   Bid,
   Borrower,
-  BorrowerBid,
   Collateral,
   Commitment,
   Lender,
-  LenderBid,
   LoanCounts,
   MarketPlace,
   MarketVolume,
+  Protocol,
   TokenVolume,
   User
 } from "../../generated/schema";
@@ -25,29 +24,22 @@ import {
 
 import { initTokenVolume } from "./intializers";
 
+export function loadProtocol(): Protocol {
+  let protocol = Protocol.load("v2");
+  if (!protocol) {
+    protocol = new Protocol("v2");
+    protocol.loans = loadLoanCounts(`protocol-${protocol.id}`).id;
+    protocol.save();
+  }
+  return protocol;
+}
+
 export function loadBidById(id: BigInt): Bid {
   const bid: Bid | null = Bid.load(id.toString());
 
   if (!bid) throw new Error("unable to load bid");
 
   return bid;
-}
-
-export function loadBorrowerFromBidId(bidId: string): Borrower {
-  const borrowerBid = BorrowerBid.load(bidId)!;
-  const borrower = Borrower.load(borrowerBid.borrower);
-
-  if (!borrower) throw new Error("unable to load borrower");
-
-  return borrower;
-}
-
-export function loadLenderFromBidId(bidId: string): Lender | null {
-  const lenderBid = LenderBid.load(bidId);
-  if (lenderBid) {
-    return Lender.load(lenderBid.lender);
-  }
-  return null;
 }
 
 export function loadLoanCounts(id: string): LoanCounts {
@@ -103,11 +95,6 @@ export function loadMarketById(id: string): MarketPlace {
 
     const loans = loadLoanCounts(`market-${id}`);
     marketPlace.loans = loans.id;
-
-    marketPlace.aprAverage = BigInt.zero();
-    marketPlace._aprTotal = BigInt.zero();
-    marketPlace.durationAverage = BigInt.zero();
-    marketPlace._durationTotal = BigInt.zero();
 
     marketPlace.totalNumberOfLenders = BigInt.zero();
 
@@ -196,18 +183,6 @@ export function loadBorrowerByMarketId(
 }
 
 /**
- * Loads a token volume entity from the store or creates a new one if it does not exist.
- * @param prefixes An array of prefixes to use to find the token volume.
- * @param tokenAddress The address of the token.
- */
-function loadTokenVolume(
-  prefixes: string[],
-  tokenAddress: Address
-): TokenVolume {
-  return loadTokenVolumeWithValues(prefixes, tokenAddress);
-}
-
-/**
  * Loads a token volume entity from the store or creates a new one if it does not exist. Default values
  * can be set if the entity did not previously exist.
  * @param prefixes An array of prefixes to use to find the token volume.
@@ -239,7 +214,13 @@ function loadTokenVolumeWithValues(
 }
 
 export function loadProtocolTokenVolume(tokenAddress: Address): TokenVolume {
-  return loadTokenVolume(["protocol"], tokenAddress);
+  const protocol = loadProtocol();
+  return loadTokenVolumeWithValues(
+    ["protocol", protocol.id],
+    tokenAddress,
+    ["protocol"],
+    [Value.fromString(protocol.id)]
+  );
 }
 
 /**

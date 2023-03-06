@@ -1,14 +1,7 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 
 import { Transfer } from "../generated/LenderManager/LenderManager";
-import {
-  Bid,
-  BorrowerBid,
-  FundedTx,
-  Lender,
-  LenderBid,
-  LoanCounts
-} from "../generated/schema";
+import { Bid, FundedTx, Lender } from "../generated/schema";
 import {
   AcceptedBid,
   CancelledBid,
@@ -25,7 +18,6 @@ import {
   getBid,
   loadBidById,
   loadBorrowerByMarketId,
-  loadBorrowerFromBidId,
   loadBorrowerTokenVolume,
   loadLenderByMarketId,
   loadMarketById,
@@ -36,7 +28,6 @@ import {
   decrementLenderStats,
   incrementLenderStats,
   updateBidOnPayment,
-  updateBidTokenVolumesOnAccept,
   updateLoanCountsFromBid
 } from "./helpers/updaters";
 
@@ -54,13 +45,8 @@ export function handleSubmittedBid(event: SubmittedBid): void {
   );
 
   const bid = new Bid(event.params.bidId.toString());
-
-  const borrowerBid = new BorrowerBid(bid.id);
-  borrowerBid.bid = bid.id;
-  borrowerBid.borrower = borrower.id;
-  borrowerBid.save();
-
   bid.bidId = event.params.bidId;
+  bid.borrower = borrower.id;
   bid.createdAt = event.block.timestamp;
   bid.updatedAt = event.block.timestamp;
   bid.transactionHash = event.transaction.hash.toHex();
@@ -124,7 +110,6 @@ export function handleSubmittedBids(events: SubmittedBid[]): void {
 
 export function handleAcceptedBid(event: AcceptedBid): void {
   const bid = loadBidById(event.params.bidId);
-  const borrower = loadBorrowerFromBidId(bid.id);
 
   const tellerV2Instance = TellerV2.bind(event.address);
 
@@ -135,11 +120,7 @@ export function handleAcceptedBid(event: AcceptedBid): void {
     marketPlace.id,
     event.block.timestamp
   );
-
-  const lenderBid = new LenderBid(bid.id);
-  lenderBid.bid = bid.id;
-  lenderBid.lender = lender.id;
-  lenderBid.save();
+  bid.lender = lender.id;
 
   const fundedTx = new FundedTx(event.transaction.hash.toHex());
   fundedTx.bid = bid.id;
@@ -155,24 +136,6 @@ export function handleAcceptedBid(event: AcceptedBid): void {
   bid.lenderAddress = event.params.lender;
   bid.save();
   updateLoanCountsFromBid(bid, "Submitted");
-
-  // Update market entity
-  const marketLoanStats = LoanCounts.load(marketPlace.loans);
-  if (marketLoanStats) {
-    marketPlace._aprTotal = marketPlace._aprTotal.plus(bid.apr);
-    marketPlace.aprAverage = marketPlace._aprTotal.div(marketLoanStats.totalCount);
-
-    marketPlace._durationTotal = marketPlace._durationTotal.plus(
-      bid.loanDuration
-    );
-    marketPlace.durationAverage = marketPlace._durationTotal.div(
-      marketLoanStats.totalCount
-    );
-
-    marketPlace.save();
-  }
-
-  updateBidTokenVolumesOnAccept(bid);
 }
 
 export function handleAcceptedBids(events: AcceptedBid[]): void {
@@ -306,8 +269,6 @@ export function handleNewLenderSet(event: Transfer): void {
   if (event.params.from == Address.zero()) return;
 
   const bid = loadBidById(event.params.tokenId);
-  bid.lenderAddress = event.params.to;
-  bid.save();
 
   const oldLender = loadLenderByMarketId(event.params.from, bid.marketplace);
   decrementLenderStats(oldLender, bid);
@@ -317,9 +278,9 @@ export function handleNewLenderSet(event: Transfer): void {
     bid.marketplace,
     event.block.timestamp
   );
-  const lenderBid = new LenderBid(bid.id);
-  lenderBid.lender = newLender.id;
-  lenderBid.save();
+  bid.lender = newLender.id;
+  bid.lenderAddress = event.params.to;
+  bid.save();
   incrementLenderStats(newLender, bid);
 }
 

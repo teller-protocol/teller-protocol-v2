@@ -21,12 +21,11 @@ import { BidStatus, bidStatusToEnum, isBidLate } from "./bid";
 import {
   getBid,
   loadBorrowerByMarketId,
-  loadBorrowerFromBidId,
   loadBorrowerTokenVolume,
   loadLenderByMarketId,
-  loadLenderFromBidId,
   loadLenderTokenVolume,
   loadMarketById,
+  loadProtocol,
   loadProtocolTokenVolume,
   loadTokenVolumeByMarketId
 } from "./loaders";
@@ -65,13 +64,14 @@ function updateProtocolLoanCounts(
   type: UpdateLoanCountsType = UpdateLoanCountsType.Increment |
     UpdateLoanCountsType.Decrement
 ): void {
-  // TODO: protocol loan stats
+  const protocol = loadProtocol();
+  updateLoanCounts(protocol.loans, bid.id, bid.status, prevStatus, type);
 
   // Update the protocol's overall token volume
   const protocolVolume = loadProtocolTokenVolume(
     Address.fromBytes(bid.lendingTokenAddress)
   );
-  updateLoanCounts(protocolVolume.loans, bid.id, bid.status, prevStatus, type);
+  updateTokenVolumeLoanCounts(protocolVolume, bid, prevStatus, type);
 }
 
 function updateMarketLoanCounts(
@@ -88,7 +88,7 @@ function updateMarketLoanCounts(
     Address.fromBytes(bid.lendingTokenAddress),
     bid.marketplace
   );
-  updateLoanCounts(marketVolume.loans, bid.id, bid.status, prevStatus, type);
+  updateTokenVolumeLoanCounts(marketVolume, bid, prevStatus, type);
 }
 
 function updateBorrowerLoanCounts(
@@ -97,14 +97,16 @@ function updateBorrowerLoanCounts(
   type: UpdateLoanCountsType = UpdateLoanCountsType.Increment |
     UpdateLoanCountsType.Decrement
 ): void {
-  const borrower = loadBorrowerFromBidId(bid.id);
-  updateLoanCounts(borrower.loans, bid.id, bid.status, prevStatus, type);
+  const borrower = Borrower.load(bid.borrower);
+  if (borrower) {
+    updateLoanCounts(borrower.loans, bid.id, bid.status, prevStatus, type);
 
-  const borrowerVolume = loadBorrowerTokenVolume(
-    Address.fromBytes(bid.lendingTokenAddress),
-    borrower
-  );
-  updateLoanCounts(borrowerVolume.loans, bid.id, bid.status, prevStatus, type);
+    const borrowerVolume = loadBorrowerTokenVolume(
+      Address.fromBytes(bid.lendingTokenAddress),
+      borrower
+    );
+    updateTokenVolumeLoanCounts(borrowerVolume, bid, prevStatus, type);
+  }
 }
 
 function updateLenderLoanCounts(
@@ -112,24 +114,40 @@ function updateLenderLoanCounts(
   prevStatus: string,
   type: UpdateLoanCountsType = UpdateLoanCountsType.Increment |
     UpdateLoanCountsType.Decrement
-): boolean {
+): void {
   if (bidStatusToEnum(prevStatus) == BidStatus.Submitted) {
     // eslint-disable-next-line no-param-reassign
     type = UpdateLoanCountsType.Increment;
   }
 
-  const lender = loadLenderFromBidId(bid.id);
-  if (lender) {
-    updateLoanCounts(lender.loans, bid.id, bid.status, prevStatus, type);
+  const lenderId = bid.lender;
+  if (lenderId) {
+    const lender = Lender.load(lenderId);
+    if (lender) {
+      updateLoanCounts(lender.loans, bid.id, bid.status, prevStatus, type);
 
-    const lenderVolume = loadLenderTokenVolume(
-      Address.fromBytes(bid.lendingTokenAddress),
-      lender
-    );
-    updateLoanCounts(lenderVolume.loans, bid.id, bid.status, prevStatus, type);
-    return true;
+      const lenderVolume = loadLenderTokenVolume(
+        Address.fromBytes(bid.lendingTokenAddress),
+        lender
+      );
+      updateTokenVolumeLoanCounts(lenderVolume, bid, prevStatus, type);
+    }
   }
-  return false;
+}
+
+function updateTokenVolumeLoanCounts(
+  tokenVolume: TokenVolume,
+  bid: Bid,
+  prevStatus: string,
+  type: UpdateLoanCountsType = UpdateLoanCountsType.Increment |
+    UpdateLoanCountsType.Decrement
+): void {
+  updateLoanCounts(tokenVolume.loans, bid.id, bid.status, prevStatus, type);
+
+  const bidStatus = bidStatusToEnum(bid.status);
+  if (bidStatus == BidStatus.Accepted) {
+    addBidToTokenVolume(tokenVolume, bid);
+  }
 }
 
 enum UpdateLoanCountsType {
@@ -159,6 +177,7 @@ function updateLoanCounts(
     loans = decrementLoanCounts(loanCountsId, bidId, prevStatus);
   }
   if (!loans) throw new Error("Loan counts not found");
+  loans.save();
   return loans;
 }
 
@@ -200,17 +219,15 @@ export function incrementLoanCounts(
       loans.liquidated = addToArray(loans.liquidated, bidId);
       loans.liquidatedCount = BigInt.fromI32(loans.liquidated.length);
       break;
+    case BidStatus.None:
+      return loans;
     default:
-      throw new Error("Invalid bid status");
+      throw new Error(`Invalid bid status: ${status}`);
   }
 
-  if (bidStatus != BidStatus.Cancelled) {
-    loans.all = addToArray(loans.all, bidId);
-    loans.totalCount = BigInt.fromI32(loans.all.length);
-  }
+  updateTotalLoanCounts(loans);
 
   loans.save();
-
   return loans;
 }
 
@@ -252,17 +269,27 @@ export function decrementLoanCounts(
       loans.liquidated = removeFromArray(loans.liquidated, bidId);
       loans.liquidatedCount = BigInt.fromI32(loans.liquidated.length);
       break;
+    case BidStatus.None:
+      return loans;
     default:
-      throw new Error("Invalid bid status");
+      throw new Error(`Invalid bid status: ${status}`);
   }
 
-  if (bidStatus != BidStatus.Cancelled) {
-    loans.all = removeFromArray(loans.all, bidId);
-    loans.totalCount = BigInt.fromI32(loans.all.length);
-  }
+  updateTotalLoanCounts(loans);
 
   loans.save();
   return loans;
+}
+
+function updateTotalLoanCounts(loanCounts: LoanCounts): void {
+  const allLoans = loanCounts.submitted
+    .concat(loanCounts.accepted)
+    .concat(loanCounts.repaid)
+    .concat(loanCounts.late)
+    .concat(loanCounts.defaulted)
+    .concat(loanCounts.liquidated);
+  loanCounts.all = allLoans;
+  loanCounts.totalCount = BigInt.fromI32(allLoans.length);
 }
 
 export function updateBidOnPayment(
@@ -324,45 +351,7 @@ export function updateBidOnPayment(
   bid.save();
 }
 
-export function updateBidTokenVolumesOnAccept(bid: Bid): void {
-  // Update the borrower's token volume
-  const borrower = loadBorrowerFromBidId(bid.id);
-  const borrowerVolume = loadBorrowerTokenVolume(
-    Address.fromBytes(bid.lendingTokenAddress),
-    borrower
-  );
-  addBidToTokenVolume(borrowerVolume, bid);
-
-  // Update the lender's token volume
-  const lender = loadLenderFromBidId(bid.id);
-  if (!lender) throw new Error("Lender not found");
-  const lenderVolume = loadLenderTokenVolume(
-    Address.fromBytes(bid.lendingTokenAddress),
-    lender
-  );
-  addBidToTokenVolume(lenderVolume, bid);
-
-  // Update the market's token volume
-  const tokenVolume = loadTokenVolumeByMarketId(
-    Address.fromBytes(bid.lendingTokenAddress),
-    bid.marketplace
-  );
-  addBidToTokenVolume(tokenVolume, bid);
-
-  // Update the protocol's overall token volume
-  const protocolVolume = loadProtocolTokenVolume(
-    Address.fromBytes(bid.lendingTokenAddress)
-  );
-  addBidToTokenVolume(protocolVolume, bid);
-}
-
 export function addBidToTokenVolume(tokenVolume: TokenVolume, bid: Bid): void {
-  const bidIds = tokenVolume.bids;
-  const index = bidIds.indexOf(bid.id);
-  if (index == -1) {
-    tokenVolume.bids = tokenVolume.bids.concat([bid.id]);
-  }
-
   tokenVolume.outstandingCapital = tokenVolume.outstandingCapital.plus(
     bid.principal.minus(bid.totalRepaidPrincipal)
   );
@@ -390,13 +379,6 @@ export function removeBidFromTokenVolume(
   tokenVolume: TokenVolume,
   bid: Bid
 ): void {
-  const bidIds = tokenVolume.bids;
-  const index = bidIds.indexOf(bid.id);
-  if (index > -1) {
-    bidIds.splice(index, 1);
-    tokenVolume.bids = bidIds;
-  }
-
   tokenVolume.outstandingCapital = tokenVolume.outstandingCapital.minus(
     bid.principal.minus(bid.totalRepaidPrincipal)
   );
@@ -535,12 +517,7 @@ function getTypeString(tokenType: i32): string {
 }
 
 export function incrementLenderStats(lender: Lender, bid: Bid): void {
-  const successful = updateLenderLoanCounts(
-    bid,
-    "",
-    UpdateLoanCountsType.Increment
-  );
-  if (!successful) throw new Error("Failed to increment lender loan counts");
+  updateLenderLoanCounts(bid, "", UpdateLoanCountsType.Increment);
 
   // Update the lender's token volume
   const lenderVolume = loadLenderTokenVolume(

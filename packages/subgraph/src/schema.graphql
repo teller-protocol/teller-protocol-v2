@@ -1,3 +1,10 @@
+type Protocol @entity {
+  id: ID!
+
+  loans: LoanCounts!
+  tokenVolumes: [TokenVolume!]! @derivedFrom(field: "protocol")
+}
+
 type MarketPlace @entity {
   id: ID!
   marketplaceId: BigInt!
@@ -17,11 +24,6 @@ type MarketPlace @entity {
 
   loans: LoanCounts!
 
-  aprAverage: BigInt!
-  _aprTotal: BigInt!
-  durationAverage: BigInt!
-  _durationTotal: BigInt!
-
   tokenVolumes: [MarketVolume!]! @derivedFrom(field: "market")
 
   totalNumberOfLenders: BigInt!
@@ -29,7 +31,6 @@ type MarketPlace @entity {
 
   borrowers: [Borrower!]! @derivedFrom(field: "marketplace")
 
-  bids: [Bid!]! @derivedFrom(field: "marketplace")
   commitments: [Commitment!]! @derivedFrom(field: "marketplace")
 }
 
@@ -43,12 +44,12 @@ type Bid @entity {
   fundedTx: FundedTx @derivedFrom(field: "bid")
 
   borrowerAddress: Bytes!
-  borrower: BorrowerBid! @derivedFrom(field: "bid")
+  borrower: Borrower!
 
   receiverAddress: Bytes!
 
   lenderAddress: Bytes
-  lender: LenderBid @derivedFrom(field: "bid")
+  lender: Lender
 
   marketplaceId: BigInt!
   metadataURI: String!
@@ -111,18 +112,6 @@ type User @entity {
   borrowers: [Borrower!]! @derivedFrom(field: "user")
 }
 
-type LenderBid @entity {
-  id: ID!
-  lender: Lender!
-  bid: Bid!
-}
-
-type BorrowerBid @entity {
-  id: ID!
-  borrower: Borrower!
-  bid: Bid!
-}
-
 type Lender @entity {
   id: ID!
   marketplaceId: BigInt!
@@ -136,7 +125,6 @@ type Lender @entity {
   tokenVolume: [TokenVolume!] @derivedFrom(field: "lender")
   marketplace: MarketPlace!
   user: User!
-  bids: [LenderBid!] @derivedFrom(field: "lender")
   commitment: Commitment
 }
 
@@ -153,7 +141,6 @@ type Borrower @entity {
   tokenVolume: [TokenVolume!] @derivedFrom(field: "borrower")
   marketplace: MarketPlace!
   user: User!
-  bids: [BorrowerBid!] @derivedFrom(field: "borrower")
 }
 
 type LoanCounts @entity {
@@ -187,6 +174,7 @@ type LoanCounts @entity {
 type TokenVolume @entity {
   id: ID!
 
+  protocol: Protocol
   marketplace: MarketPlace
   lender: Lender
   borrower: Borrower
@@ -194,7 +182,6 @@ type TokenVolume @entity {
 
   ## TokenStats ##
   lendingTokenAddress: Bytes!
-  bids: [Bid!]!
   loans: LoanCounts!
 
   outstandingCapital: BigInt!
@@ -228,7 +215,6 @@ type Commitment @entity {
   expirationTimestamp: BigInt!
   maxDuration: BigInt!
   minAPY: BigInt!
-  bids: [Bid!]! @derivedFrom(field: "commitment")
   principalTokenAddress: Bytes!
 
   # Required Collateral

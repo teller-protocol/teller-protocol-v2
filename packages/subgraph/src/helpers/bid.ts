@@ -5,6 +5,7 @@ import { Bid } from "../../generated/schema";
 export enum BidStatus {
   None,
   Submitted,
+  Expired,
   Cancelled,
   Accepted,
   Repaid,
@@ -16,6 +17,8 @@ export enum BidStatus {
 export function bidStatusToEnum(status: string): BidStatus {
   if (status == "Submitted") {
     return BidStatus.Submitted;
+  } else if (status == "Expired") {
+    return BidStatus.Expired;
   } else if (status == "Cancelled") {
     return BidStatus.Cancelled;
   } else if (status == "Accepted") {

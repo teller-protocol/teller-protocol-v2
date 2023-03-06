@@ -152,6 +152,9 @@ type LoanCounts @entity {
   submitted: [Bid!]!
   submittedCount: BigInt!
 
+  expired: [Bid!]!
+  expiredCount: BigInt!
+
   cancelled: [Bid!]!
   cancelledCount: BigInt!
 

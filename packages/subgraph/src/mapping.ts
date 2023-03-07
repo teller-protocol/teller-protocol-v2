@@ -102,7 +102,7 @@ export function handleSubmittedBid(event: SubmittedBid): void {
   bid.save();
   market.save();
 
-  updateLoanCountsFromBid(bid, "");
+  updateLoanCountsFromBid(bid.id, "");
 }
 
 export function handleSubmittedBids(events: SubmittedBid[]): void {
@@ -139,9 +139,9 @@ export function handleAcceptedBid(event: AcceptedBid): void {
   bid.lenderAddress = event.params.lender;
   bid.save();
 
-  updateLoanCountsFromBid(bid, "Submitted");
+  updateLoanCountsFromBid(bid.id, "Submitted");
 
-  const tokenVolumes = getTokenVolumesForBid(bid);
+  const tokenVolumes = getTokenVolumesForBid(bid.id);
   for (let i = 0; i < tokenVolumes.length; i++) {
     addBidToTokenVolume(tokenVolumes[i], bid);
   }
@@ -163,7 +163,7 @@ export function handleCancelledBid(event: CancelledBid): void {
   bid.status = "Cancelled";
   bid.save();
 
-  updateLoanCountsFromBid(bid, prevStatus);
+  updateLoanCountsFromBid(bid.id, prevStatus);
 }
 
 export function handleCancelledBids(events: CancelledBid[]): void {
@@ -176,12 +176,9 @@ export function handleLoanRepayment(event: LoanRepayment): void {
   const bid: Bid = loadBidById(event.params.bidId);
   bid.updatedAt = event.block.timestamp;
   bid.transactionHash = event.transaction.hash.toHex();
-
-  const prevStatus = bid.status;
-  bid.status = "Accepted";
   bid.save();
 
-  updateBidOnPayment(bid, event, PaymentEventType.Repayment, prevStatus);
+  updateBidOnPayment(bid, event, PaymentEventType.Repayment);
 }
 
 export function handleLoanRepayments(events: LoanRepayment[]): void {
@@ -195,12 +192,9 @@ export function handleLoanRepaid(event: LoanRepaid): void {
 
   bid.updatedAt = event.block.timestamp;
   bid.transactionHash = event.transaction.hash.toHex();
-
-  const prevStatus = bid.status;
-  bid.status = "Repaid";
   bid.save();
 
-  updateBidOnPayment(bid, event, PaymentEventType.Repaid, prevStatus);
+  updateBidOnPayment(bid, event, PaymentEventType.Repaid);
 }
 
 export function handleLoanRepaids(events: LoanRepaid[]): void {
@@ -214,13 +208,10 @@ export function handleLoanLiquidated(event: LoanLiquidated): void {
 
   bid.updatedAt = event.block.timestamp;
   bid.transactionHash = event.transaction.hash.toHex();
-
-  const prevStatus = bid.status;
-  bid.status = "Liquidated";
   bid.liquidatorAddress = event.params.liquidator;
   bid.save();
 
-  updateBidOnPayment(bid, event, PaymentEventType.Liquidated, prevStatus);
+  updateBidOnPayment(bid, event, PaymentEventType.Liquidated);
 }
 
 export function handleLoanLiquidateds(events: LoanLiquidated[]): void {

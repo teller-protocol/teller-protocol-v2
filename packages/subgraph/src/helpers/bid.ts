@@ -1,4 +1,4 @@
-import { ethereum } from "@graphprotocol/graph-ts";
+import { BigInt } from "@graphprotocol/graph-ts";
 
 import { Bid } from "../../generated/schema";
 
@@ -36,15 +36,15 @@ export function bidStatusToEnum(status: string): BidStatus {
   }
 }
 
-export function isBidLate(bid: Bid, block: ethereum.Block): boolean {
-  return bid.nextDueDate ? bid.nextDueDate < block.timestamp : false;
+export function isBidLate(bid: Bid, timestamp: BigInt): boolean {
+  return bid.nextDueDate ? bid.nextDueDate < timestamp : false;
 }
 
-export function isBidDefaulted(bid: Bid, block: ethereum.Block): boolean {
+export function isBidDefaulted(bid: Bid, timestamp: BigInt): boolean {
   if (!bid.nextDueDate) return false;
 
   const defaultTimestamp = bid.lastRepaidTimestamp.plus(
     bid.paymentDefaultDuration
   );
-  return defaultTimestamp < block.timestamp;
+  return defaultTimestamp < timestamp;
 }

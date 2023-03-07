@@ -104,9 +104,9 @@ type Payment @entity {
   bid: Bid!
   principal: BigInt!
   interest: BigInt!
-  paymentDate: BigInt
+  paymentDate: BigInt!
   outstandingCapital: BigInt!
-  status: String
+  status: String!
 }
 
 type User @entity {

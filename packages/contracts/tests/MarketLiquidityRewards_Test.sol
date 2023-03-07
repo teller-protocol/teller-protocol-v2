@@ -160,6 +160,12 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
         }); 
  
 
+        lender._approveERC20Token(
+            address(rewardToken),
+            address(this),
+            rewardTokenAmount
+        );
+
         uint256 allocationId = lender._allocateRewards(
             _allocation
         );
@@ -204,6 +210,17 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
 
       }
 
+/*
+
+    deallocate
+
+*/
+
+/*
+
+    claim rewards 
+
+*/
 
 /*
     function _createCommitment(

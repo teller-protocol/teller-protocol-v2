@@ -1,28 +1,26 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 
-import { TokenVolume } from "../../generated/schema";
+import { Token, TokenVolume } from "../../generated/schema";
 
 import { loadLoanCounts } from "./loaders";
 
-export function initTokenVolume(
-  token: TokenVolume,
-  tokenAddress: Address
-): void {
-  token.lendingTokenAddress = tokenAddress;
+export function initTokenVolume(tokenVolume: TokenVolume, token: Token): void {
+  tokenVolume.token = token.id;
+  tokenVolume.lendingTokenAddress = Address.fromString(token.id);
 
-  const loans = loadLoanCounts(`token-volume-${token.id}`);
-  token.loans = loans.id;
+  const loans = loadLoanCounts(`token-volume-${tokenVolume.id}`);
+  tokenVolume.loans = loans.id;
 
-  token.outstandingCapital = BigInt.zero();
-  token.totalLoaned = BigInt.zero();
-  token.loanAverage = BigInt.zero();
+  tokenVolume.outstandingCapital = BigInt.zero();
+  tokenVolume.totalLoaned = BigInt.zero();
+  tokenVolume.loanAverage = BigInt.zero();
 
-  token.commissionEarned = BigInt.zero();
-  token.totalRepaidInterest = BigInt.zero();
+  tokenVolume.commissionEarned = BigInt.zero();
+  tokenVolume.totalRepaidInterest = BigInt.zero();
 
-  token._aprTotal = BigInt.zero();
-  token.aprAverage = BigInt.zero();
+  tokenVolume._aprTotal = BigInt.zero();
+  tokenVolume.aprAverage = BigInt.zero();
 
-  token._durationTotal = BigInt.zero();
-  token.durationAverage = BigInt.zero();
+  tokenVolume._durationTotal = BigInt.zero();
+  tokenVolume.durationAverage = BigInt.zero();
 }

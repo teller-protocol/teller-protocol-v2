@@ -1,5 +1,6 @@
 import { Address, BigInt, Value } from "@graphprotocol/graph-ts";
 
+import { IERC20Metadata } from "../../generated/Blocks/IERC20Metadata";
 import { LenderCommitmentForwarder } from "../../generated/LenderCommitmentForwarder/LenderCommitmentForwarder";
 import {
   Bid,
@@ -11,6 +12,7 @@ import {
   MarketPlace,
   MarketVolume,
   Protocol,
+  Token,
   TokenVolume,
   User
 } from "../../generated/schema";
@@ -34,6 +36,19 @@ export function loadProtocol(): Protocol {
   return protocol;
 }
 
+export function loadToken(address: Address): Token {
+  let token = Token.load(address.toHexString());
+  if (!token) {
+    token = new Token(address.toHex());
+    const tokenContract = IERC20Metadata.bind(address);
+    token.name = tokenContract.name();
+    token.symbol = tokenContract.symbol();
+    token.decimals = BigInt.fromI32(tokenContract.decimals());
+    token.save();
+  }
+  return token;
+}
+
 export function loadBidById(id: BigInt): Bid {
   const bid: Bid | null = Bid.load(id.toString());
 
@@ -53,6 +68,9 @@ export function loadLoanCounts(id: string): LoanCounts {
 
     loans.submitted = [];
     loans.submittedCount = BigInt.zero();
+
+    loans.expired = [];
+    loans.expiredCount = BigInt.zero();
 
     loans.cancelled = [];
     loans.cancelledCount = BigInt.zero();
@@ -198,19 +216,19 @@ function loadTokenVolumeWithValues(
 ): TokenVolume {
   prefixes.push(tokenAddress.toHexString());
   const id = prefixes.join("-");
-  let token = TokenVolume.load(id);
+  let tokenVolume = TokenVolume.load(id);
 
-  if (!token) {
-    token = new TokenVolume(id);
-    initTokenVolume(token, tokenAddress);
+  if (!tokenVolume) {
+    tokenVolume = new TokenVolume(id);
+    initTokenVolume(tokenVolume, loadToken(tokenAddress));
 
     for (let i = 0; i < keys.length; i++) {
-      token.set(keys[i], values[i]);
+      tokenVolume.set(keys[i], values[i]);
     }
-    token.save();
+    tokenVolume.save();
   }
 
-  return token;
+  return tokenVolume;
 }
 
 export function loadProtocolTokenVolume(tokenAddress: Address): TokenVolume {

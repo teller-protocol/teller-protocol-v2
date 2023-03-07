@@ -20,6 +20,8 @@ dataSources:
           file: ./abis/{{network}}_TellerV2.json
         - name: TellerV0Storage
           file: ../../packages/contracts/generated/artifacts/contracts/TellerV0Storage.sol/TellerV0Storage.json
+        - name: IERC20Metadata
+          file: ../../packages/contracts/generated/artifacts/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol/IERC20Metadata.json
       eventHandlers:
         - event: SubmittedBid(indexed uint256,indexed address,address,indexed bytes32)
           handler: handleSubmittedBid

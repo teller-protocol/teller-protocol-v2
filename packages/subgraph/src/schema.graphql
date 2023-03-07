@@ -51,10 +51,12 @@ type Bid @entity {
   lenderAddress: Bytes
   lender: Lender
 
+  lendingToken: Token!
+  lendingTokenAddress: Bytes!
+
   marketplaceId: BigInt!
   metadataURI: String!
   status: String!
-  lendingTokenAddress: Bytes!
   principal: BigInt!
   acceptedTimestamp: BigInt!
   lastRepaidTimestamp: BigInt!
@@ -174,6 +176,13 @@ type LoanCounts @entity {
   liquidatedCount: BigInt!
 }
 
+type Token @entity {
+  id: ID!
+  name: String!
+  symbol: String!
+  decimals: BigInt!
+}
+
 type TokenVolume @entity {
   id: ID!
 
@@ -184,6 +193,7 @@ type TokenVolume @entity {
   commitment: Commitment
 
   ## TokenStats ##
+  token: Token!
   lendingTokenAddress: Bytes!
   loans: LoanCounts!
 

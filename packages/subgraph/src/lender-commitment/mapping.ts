@@ -13,6 +13,7 @@ import { initTokenVolume } from "../helpers/intializers";
 import {
   loadBidById,
   loadCommitment,
+  loadToken,
   updateLenderCommitment
 } from "../helpers/loaders";
 import { addBidToTokenVolume, incrementLoanCounts } from "../helpers/updaters";
@@ -31,7 +32,7 @@ export function handleCreatedCommitment(event: CreatedCommitment): void {
   commitment.createdAt = event.block.timestamp;
 
   const stats = new TokenVolume(`commitment-stats-${commitment.id}`);
-  initTokenVolume(stats, event.params.lendingToken);
+  initTokenVolume(stats, loadToken(event.params.lendingToken));
   stats.save();
 
   commitment.stats = stats.id;

@@ -60,8 +60,9 @@ export function handleSubmittedBid(event: SubmittedBid): void {
   }
 
   const lendingTokenAddress = storedBid.value5.lendingToken;
-  bid.receiverAddress = storedBid.value1;
+  bid.lendingToken = lendingTokenAddress.toHexString();
   bid.lendingTokenAddress = lendingTokenAddress;
+  bid.receiverAddress = storedBid.value1;
   bid.principal = storedBid.value5.principal;
   bid.loanDuration = storedBid.value5.loanDuration;
   bid.paymentCycle = storedBid.value6.paymentCycle;

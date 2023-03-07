@@ -194,15 +194,20 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
         address lender,
         uint256 marketId,
         address principalTokenAddress,
-        uint256 principalAmount
+        uint256 principalAmount,
+         uint32 timestamp ,
+         BidState bidState  
         
     ){
-            borrower=  bids[_bidId].borrower;
-        lender =    bids[_bidId].lender;
-        marketId =   bids[_bidId].marketplaceId;
-        principalTokenAddress =    address(bids[_bidId].loanDetails.lendingToken);
-         principalAmount =   bids[_bidId].loanDetails.principal;
-        
+      Bid storage bid = bids[_bidId];
+
+        borrower=  bid.borrower;
+        lender =    bid.lender;
+        marketId =   bid.marketplaceId;
+        principalTokenAddress =    address(bid.loanDetails.lendingToken);
+        principalAmount =   bid.loanDetails.principal;
+        timestamp = bid.loanDetails.timestamp;
+        bidState = bid.state;
     }
 
     function setLastRepaidTimestamp(uint256 _bidId, uint32 _timestamp) public {

@@ -10,6 +10,8 @@ import "./interfaces/IMarketRegistry.sol";
 import "./interfaces/ICollateralManager.sol";
 import "./interfaces/ITellerV2.sol";
 
+import {  BidState } from "./TellerV2Storage.sol";
+
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 /*
 - Claim reward for a loan based on loanId (use a brand new contract)
@@ -164,42 +166,50 @@ Initializable
         uint256 _bidId       
     ) external virtual {
 
+        RewardAllocation storage allocatedReward = allocatedRewards[_allocationId];
+
         require(!rewardClaimedForBid[_bidId][_allocationId],"reward already claimed");
         rewardClaimedForBid[_bidId][_allocationId] = true; // leave this here to defend against re-entrancy 
 
         //optimize gas by turning these into one single call 
       
         ( address borrower,
-            address lender,
-            uint256 marketId,
-            address principalTokenAddress,
-            uint256 principalAmount
+          address lender,
+          uint256 marketId,
+          address principalTokenAddress,
+          uint256 principalAmount,
+          uint32 timestamp,
+          BidState bidState
         ) = ITellerV2(tellerV2).getLoanSummary(_bidId);
 
-        address collateralTokenAddress =  allocatedRewards[_allocationId].requiredCollateralTokenAddress;
+        address collateralTokenAddress = allocatedReward.requiredCollateralTokenAddress;
 
 
         //make sure the loan follows the rules related to the allocation 
+
+        //require that loan status is PAID  
+        _verifyLoanStatus( bidState, BidState.PAID );
+
+        //require that the loan was started in the correct timeframe 
+        _verifyLoanStartTime(timestamp, allocatedReward.bidStartTimeMin, allocatedReward.bidStartTimeMax);
+
 
         if(collateralTokenAddress != address(0)){
              uint256 collateralAmount = ICollateralManager(collateralManager).getCollateralAmount(_bidId, collateralTokenAddress);
 
              //require collateral amount 
-             _verifyCollateralAmount();
+             _verifyCollateralAmount(collateralAmount, principalAmount, allocatedReward.minimumCollateralPerPrincipalAmount);
         }
-      
-        
-        
-        //require that loan status is PAID (optionally)
-        _verifyLoanStatus();
+       
+        _verifyPrincipalTokenAddress(
+            principalTokenAddress,
+            allocatedReward.requiredPrincipalTokenAddress
+        );
 
-        //require that the loan was started in the correct timeframe 
-        _verifyLoanStartTime();
-
-        _verifyPrincipalTokenAddress();
-
-        _verifyCollateralTokenAddress();
-
+        _verifyCollateralTokenAddress(
+            collateralTokenAddress,
+            allocatedReward.requiredCollateralTokenAddress
+        );
 
         uint256 amountToReward = _calculateRewardAmount(
             principalAmount,
@@ -238,33 +248,35 @@ Initializable
         return _loanPrincipal / 1000;
     }
 
-    function _verifyCollateralAmount() internal {
+    function _verifyCollateralAmount(uint256 collateralAmount, uint256 principalAmount, uint256 minimumCollateralPerPrincipalAmount) internal {
 
         // require()
 
     }
 
-    function _verifyLoanStatus() internal {
+    function _verifyLoanStatus(BidState actualBidState, BidState expectedBidState) internal {
+ 
+        require(actualBidState == expectedBidState, "Invalid bid state for loan.");
 
-            // require()
+    }
 
-        }
+    function _verifyLoanStartTime(uint32 loanStartTime, uint32 minStartTime, uint32 maxStartTime) internal {
 
-    function _verifyLoanStartTime() internal {
-
-            // require()
-
-        }
-
-    function _verifyPrincipalTokenAddress() internal {
-
-            // require()
+            require(minStartTime == 0 || loanStartTime > minStartTime, "Loan was submitted before the min start time.");
+            require(maxStartTime == 0 || loanStartTime < maxStartTime, "Loan was submitted after the max start time.");
 
         }
 
-    function _verifyCollateralTokenAddress() internal {
+    function _verifyPrincipalTokenAddress(address loanTokenAddress, address expectedTokenAddress) internal {
 
-            // require()
+            require(expectedTokenAddress == address(0) || loanTokenAddress == expectedTokenAddress,"Invalid principal token address.");
+
+        }
+
+    function _verifyCollateralTokenAddress(address loanTokenAddress, address expectedTokenAddress) internal {
+
+                require(expectedTokenAddress == address(0) || loanTokenAddress == expectedTokenAddress,"Invalid collateral token address.");
+
 
         }
 

@@ -25,8 +25,10 @@ import {
   loadTokenVolumeByMarketId
 } from "./helpers/loaders";
 import {
-  decrementLenderStats,
-  incrementLenderStats,
+  addBidToTokenVolume,
+  getTokenVolumesForBid,
+  PaymentEventType,
+  replaceLender,
   updateBidOnPayment,
   updateLoanCountsFromBid
 } from "./helpers/updaters";
@@ -136,7 +138,13 @@ export function handleAcceptedBid(event: AcceptedBid): void {
   bid.nextDueDate = tellerV2Instance.calculateNextDueDate(event.params.bidId);
   bid.lenderAddress = event.params.lender;
   bid.save();
+
   updateLoanCountsFromBid(bid, "Submitted");
+
+  const tokenVolumes = getTokenVolumesForBid(bid);
+  for (let i = 0; i < tokenVolumes.length; i++) {
+    addBidToTokenVolume(tokenVolumes[i], bid);
+  }
 }
 
 export function handleAcceptedBids(events: AcceptedBid[]): void {
@@ -150,10 +158,12 @@ export function handleCancelledBid(event: CancelledBid): void {
 
   bid.updatedAt = event.block.timestamp;
   bid.transactionHash = event.transaction.hash.toHex();
+
+  const prevStatus = bid.status;
   bid.status = "Cancelled";
   bid.save();
 
-  updateLoanCountsFromBid(bid, "Submitted");
+  updateLoanCountsFromBid(bid, prevStatus);
 }
 
 export function handleCancelledBids(events: CancelledBid[]): void {
@@ -166,7 +176,12 @@ export function handleLoanRepayment(event: LoanRepayment): void {
   const bid: Bid = loadBidById(event.params.bidId);
   bid.updatedAt = event.block.timestamp;
   bid.transactionHash = event.transaction.hash.toHex();
-  updateBidOnPayment(bid, event, "Repayment");
+
+  const prevStatus = bid.status;
+  bid.status = "Accepted";
+  bid.save();
+
+  updateBidOnPayment(bid, event, PaymentEventType.Repayment, prevStatus);
 }
 
 export function handleLoanRepayments(events: LoanRepayment[]): void {
@@ -182,8 +197,10 @@ export function handleLoanRepaid(event: LoanRepaid): void {
   bid.transactionHash = event.transaction.hash.toHex();
 
   const prevStatus = bid.status;
-  updateBidOnPayment(bid, event, "Repaid");
-  updateLoanCountsFromBid(bid, prevStatus);
+  bid.status = "Repaid";
+  bid.save();
+
+  updateBidOnPayment(bid, event, PaymentEventType.Repaid, prevStatus);
 }
 
 export function handleLoanRepaids(events: LoanRepaid[]): void {
@@ -199,8 +216,11 @@ export function handleLoanLiquidated(event: LoanLiquidated): void {
   bid.transactionHash = event.transaction.hash.toHex();
 
   const prevStatus = bid.status;
-  updateBidOnPayment(bid, event, "Liquidated");
-  updateLoanCountsFromBid(bid, prevStatus);
+  bid.status = "Liquidated";
+  bid.liquidatorAddress = event.params.liquidator;
+  bid.save();
+
+  updateBidOnPayment(bid, event, PaymentEventType.Liquidated, prevStatus);
 }
 
 export function handleLoanLiquidateds(events: LoanLiquidated[]): void {
@@ -271,18 +291,12 @@ export function handleNewLenderSet(event: Transfer): void {
 
   const bid = loadBidById(event.params.tokenId);
 
-  const oldLender = loadLenderByMarketId(event.params.from, bid.marketplace);
-  decrementLenderStats(oldLender, bid);
-
   const newLender = loadLenderByMarketId(
     event.params.to,
     bid.marketplace,
     event.block.timestamp
   );
-  bid.lender = newLender.id;
-  bid.lenderAddress = event.params.to;
-  bid.save();
-  incrementLenderStats(newLender, bid);
+  replaceLender(bid, newLender);
 }
 
 export function handleNewLenderSets(events: Transfer[]): void {

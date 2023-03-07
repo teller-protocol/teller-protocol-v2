@@ -2,14 +2,13 @@ import { Address, BigInt } from "@graphprotocol/graph-ts";
 
 import { Token, TokenVolume } from "../../generated/schema";
 
-import { loadLoanCounts } from "./loaders";
+import { loadLoanCount } from "./loaders";
 
 export function initTokenVolume(tokenVolume: TokenVolume, token: Token): void {
   tokenVolume.token = token.id;
   tokenVolume.lendingTokenAddress = Address.fromString(token.id);
 
-  const loans = loadLoanCounts(`token-volume-${tokenVolume.id}`);
-  tokenVolume.loans = loans.id;
+  loadLoanCount("tokenVolume", tokenVolume.id);
 
   tokenVolume.outstandingCapital = BigInt.zero();
   tokenVolume.totalLoaned = BigInt.zero();

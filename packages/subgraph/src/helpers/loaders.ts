@@ -8,7 +8,7 @@ import {
   Collateral,
   Commitment,
   Lender,
-  LoanCounts,
+  LoanCount,
   MarketPlace,
   MarketVolume,
   Protocol,
@@ -30,7 +30,7 @@ export function loadProtocol(): Protocol {
   let protocol = Protocol.load("v2");
   if (!protocol) {
     protocol = new Protocol("v2");
-    protocol.loans = loadLoanCounts(`protocol-${protocol.id}`).id;
+    loadLoanCount("protocol", protocol.id);
     protocol.save();
   }
   return protocol;
@@ -57,11 +57,14 @@ export function loadBidById(id: BigInt): Bid {
   return bid;
 }
 
-export function loadLoanCounts(id: string): LoanCounts {
-  let loans = LoanCounts.load(id);
+export function loadLoanCount(entityType: string, entityId: string): LoanCount {
+  const id = `${entityType}-${entityId}`;
+  let loans = LoanCount.load(id);
 
   if (!loans) {
-    loans = new LoanCounts(id);
+    loans = new LoanCount(id);
+
+    loans.set(`_${entityType}`, Value.fromString(entityId));
 
     loans.all = [];
     loans.totalCount = BigInt.zero();
@@ -111,8 +114,7 @@ export function loadMarketById(id: string): MarketPlace {
     marketPlace.borrowerAttestationRequired = false;
     marketPlace.lenderAttestationRequired = false;
 
-    const loans = loadLoanCounts(`market-${id}`);
-    marketPlace.loans = loans.id;
+    loadLoanCount("market", id);
 
     marketPlace.totalNumberOfLenders = BigInt.zero();
 
@@ -144,8 +146,7 @@ export function loadLenderByMarketId(
     lender = new Lender(idString);
     lender.isAttested = false;
 
-    const loans = loadLoanCounts(`lender-${idString}`);
-    lender.loans = loans.id;
+    loadLoanCount("lender", idString);
 
     lender.firstInteractionDate = timestamp;
     lender.lenderAddress = lenderAddress;
@@ -185,8 +186,7 @@ export function loadBorrowerByMarketId(
     borrower = new Borrower(idString);
     borrower.isAttested = false;
 
-    const loans = loadLoanCounts(`borrower-${idString}`);
-    borrower.loans = loans.id;
+    loadLoanCount("borrower", idString);
 
     borrower.firstInteractionDate = timestamp;
     borrower.borrowerAddress = borrowerAddress;

@@ -29,10 +29,15 @@ dataSources:
           handler: handleAcceptedBid
         - event: CancelledBid(indexed uint256)
           handler: handleCancelledBid
+
+        # NOTE: Handle liquidation event before repayment event
+        - event: LoanLiquidated(indexed uint256,indexed address)
+          handler: handleLoanLiquidated
         - event: LoanRepayment(indexed uint256)
           handler: handleLoanRepayment
         - event: LoanRepaid(indexed uint256)
           handler: handleLoanRepaid
+
         - event: FeePaid(indexed uint256,indexed string,indexed uint256)
           handler: handleFeePaid
         - event: Upgraded(indexed address)

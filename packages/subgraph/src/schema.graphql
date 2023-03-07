@@ -1,7 +1,7 @@
 type Protocol @entity {
   id: ID!
 
-  loans: LoanCounts!
+  loans: LoanCount! @derivedFrom(field: "_protocol")
   tokenVolumes: [TokenVolume!]! @derivedFrom(field: "protocol")
 }
 
@@ -22,7 +22,7 @@ type MarketPlace @entity {
   lenderAttestationRequired: Boolean!
   marketplaceFeePercent: BigInt!
 
-  loans: LoanCounts!
+  loans: LoanCount! @derivedFrom(field: "_market")
 
   tokenVolumes: [MarketVolume!]! @derivedFrom(field: "market")
 
@@ -47,6 +47,8 @@ type Bid @entity {
   borrower: Borrower!
 
   receiverAddress: Bytes!
+
+  liquidatorAddress: Bytes
 
   lenderAddress: Bytes
   lender: Lender
@@ -122,7 +124,7 @@ type Lender @entity {
   attestedTimestamp: BigInt
   isAttested: Boolean!
 
-  loans: LoanCounts!
+  loans: LoanCount! @derivedFrom(field: "_lender")
 
   tokenVolume: [TokenVolume!] @derivedFrom(field: "lender")
   marketplace: MarketPlace!
@@ -138,14 +140,14 @@ type Borrower @entity {
   attestedTimestamp: BigInt
   isAttested: Boolean!
 
-  loans: LoanCounts!
+  loans: LoanCount! @derivedFrom(field: "_borrower")
 
   tokenVolume: [TokenVolume!] @derivedFrom(field: "borrower")
   marketplace: MarketPlace!
   user: User!
 }
 
-type LoanCounts @entity {
+type LoanCount @entity {
   id: ID!
 
   all: [Bid!]!
@@ -174,6 +176,14 @@ type LoanCounts @entity {
 
   liquidated: [Bid!]!
   liquidatedCount: BigInt!
+
+  ## Entity Relationships ##
+  _protocol: Protocol
+  _market: MarketPlace
+  _lender: Lender
+  _borrower: Borrower
+  _tokenVolume: TokenVolume
+  ## end Entity Relationships ##
 }
 
 type Token @entity {
@@ -186,16 +196,18 @@ type Token @entity {
 type TokenVolume @entity {
   id: ID!
 
+  ## Entity Relationships ##
   protocol: Protocol
   marketplace: MarketPlace
   lender: Lender
   borrower: Borrower
   commitment: Commitment
+  ## end Entity Relationships ##
 
   ## TokenStats ##
   token: Token!
   lendingTokenAddress: Bytes!
-  loans: LoanCounts!
+  loans: LoanCount! @derivedFrom(field: "_tokenVolume")
 
   outstandingCapital: BigInt!
   totalLoaned: BigInt!

@@ -16,7 +16,7 @@ import {
   loadToken,
   updateLenderCommitment
 } from "../helpers/loaders";
-import { addBidToTokenVolume, incrementLoanCounts } from "../helpers/updaters";
+import { addBidToTokenVolume } from "../helpers/updaters";
 
 export function handleCreatedCommitment(event: CreatedCommitment): void {
   const commitmentId = event.params.commitmentId.toString();
@@ -100,8 +100,8 @@ export function handleExercisedCommitment(event: ExercisedCommitment): void {
 
   const stats = TokenVolume.load(commitment.stats);
   if (stats) {
-    incrementLoanCounts(stats.loans, bid.id, bid.status);
-    addBidToTokenVolume(stats, bid);
+    // incrementLoanCounts(stats.loans, bid.id, bid.status);
+    // addBidToTokenVolume(stats, bid);
   }
 }
 

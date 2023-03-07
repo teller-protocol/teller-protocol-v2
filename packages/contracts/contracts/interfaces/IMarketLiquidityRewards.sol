@@ -16,8 +16,8 @@ interface IMarketLiquidityRewards {
 
         uint256 rewardPerLoanPrincipalAmount; 
 
-        uint256 bidStartTimeMin;
-        uint256 bidStartTimeMax;
+        uint32 bidStartTimeMin;
+        uint32 bidStartTimeMax;
        
     } 
 

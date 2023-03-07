@@ -15,6 +15,9 @@ interface IMarketLiquidityRewards {
         address requiredCollateralTokenAddress; //0 for any  -- could be an enumerable set?
 
         uint256 rewardPerLoanPrincipalAmount; 
+
+        uint256 bidStartTimeMin;
+        uint256 bidStartTimeMax;
        
     } 
 

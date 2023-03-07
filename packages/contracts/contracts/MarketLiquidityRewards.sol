@@ -65,6 +65,15 @@ Initializable
 
     event CreatedAllocation(uint256 allocationId, address allocator, uint256 marketId);
 
+    event IncreasedAllocation(uint256 allocationId, uint256 amount);
+
+    event DecreasedAllocation(uint256 allocationId, uint256 amount);
+
+    event DeletedAllocation(uint256 allocationId);
+
+    event ClaimedRewards(uint256 allocationId, uint256 bidId, address recipient, uint256 amount);
+    
+
     constructor(address _tellerV2, address _marketRegistry, address _collateralManager) {
         tellerV2 = _tellerV2;
         marketRegistry = _marketRegistry;
@@ -112,7 +121,11 @@ Initializable
         IERC20Upgradeable(allocatedRewards[_allocationId].rewardTokenAddress).transferFrom(msg.sender,address(this),_tokenAmount);
         allocatedRewards[_allocationId].rewardTokenAmount += _tokenAmount;
 
-        //emit event 
+           
+        emit IncreasedAllocation( 
+            _allocationId,
+            _tokenAmount
+        );
     }
 
     function deallocateRewards(
@@ -127,13 +140,22 @@ Initializable
 
         IERC20Upgradeable(allocatedRewards[_allocationId].rewardTokenAddress).transfer(msg.sender , _tokenAmount );
 
+
+            emit DecreasedAllocation( 
+                _allocationId,
+                _tokenAmount
+            );
+            
+
          if( allocatedRewards[_allocationId].rewardTokenAmount == 0 ) {
-                delete allocatedRewards[_allocationId];
-                //emit event 
+            delete allocatedRewards[_allocationId];               
+               
+            emit DeletedAllocation( 
+                _allocationId 
+            );
         }
     
 
-        //emit event 
     }
 
 
@@ -186,7 +208,14 @@ Initializable
 
         _decrementAllocatedAmount(_allocationId,amountToReward);
 
-        //emit event 
+        
+    
+        emit ClaimedRewards(
+            _allocationId,
+            _bidId,
+            msg.sender,
+            amountToReward
+        );
 
     }   
 

@@ -40,9 +40,12 @@ interface IMarketLiquidityRewards {
         uint256 _bidId
     ) external;
 
-    function allocatedRewards(uint256 _allocationId) external view returns (address allocator, uint256 marketId, address rewardTokenAddress, uint256 rewardTokenAmount, address requiredPrincipalTokenAddress, address requiredCollateralTokenAddress, uint256 rewardPerLoanPrincipalAmount);
-
-    function rewardClaimedForBid(uint256 _bidId, uint256 _allocationId) external view returns (bool);
+    
+ 
+    function rewardClaimedForBid(
+        uint256 _bidId,
+        uint256 _allocationId) 
+        external view returns (bool);
 
     function initialize() external;
 }

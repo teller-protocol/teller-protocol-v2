@@ -29,6 +29,12 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
     MarketLiquidityUser private lender;
     MarketLiquidityUser private borrower;
 
+
+
+    uint256 immutable startTime = 1678122531;
+
+
+
     //  address tokenAddress;
     uint256 marketId;
     uint256 maxAmount;
@@ -39,6 +45,7 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
     uint32 maxLoanDuration;
     uint16 minInterestRate;
     uint32 expiration;
+    
 
 
    
@@ -116,7 +123,9 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
         );
 
         IERC20Upgradeable(address(rewardToken)).transfer(address(lender),10000);
-       
+
+
+        vm.warp(startTime+100);
         //delete allocationCount;
     }
 
@@ -134,7 +143,11 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
             requiredPrincipalTokenAddress: address(principalToken),
             requiredCollateralTokenAddress: address(collateralToken),
 
-            rewardPerLoanPrincipalAmount: 0
+            rewardPerLoanPrincipalAmount: 0,
+
+            
+            bidStartTimeMin: uint32(startTime),
+            bidStartTimeMax: uint32(startTime + 10000)
         }); 
 
         allocatedRewards[allocationId] = _allocation;
@@ -156,7 +169,10 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
             requiredPrincipalTokenAddress: address(principalToken),
             requiredCollateralTokenAddress: address(collateralToken),
 
-            rewardPerLoanPrincipalAmount: 0
+            rewardPerLoanPrincipalAmount: 0,
+
+            bidStartTimeMin: uint32(startTime),
+            bidStartTimeMax: uint32(startTime + 10000)
         }); 
  
 

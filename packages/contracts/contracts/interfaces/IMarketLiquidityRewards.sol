@@ -5,12 +5,13 @@ interface IMarketLiquidityRewards {
 
      struct RewardAllocation {
         address allocator;
-        uint256 marketId;
         address rewardTokenAddress;
         uint256 rewardTokenAmount;
 
 
-        //parametersfor loan which affect claimability 
+        uint256 marketId;
+
+        //requirements for loan 
         address requiredPrincipalTokenAddress; //0 for any 
         address requiredCollateralTokenAddress; //0 for any  -- could be an enumerable set?
 

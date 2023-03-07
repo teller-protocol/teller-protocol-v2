@@ -167,13 +167,8 @@ Initializable
         require(!rewardClaimedForBid[_bidId][_allocationId],"reward already claimed");
         rewardClaimedForBid[_bidId][_allocationId] = true; // leave this here to defend against re-entrancy 
 
-        
- 
         //optimize gas by turning these into one single call 
-
-      //  uint256 marketId = ITellerV2(tellerV2).getMarketIdForLoan(_bidId);
-       // address borrower = ITellerV2(tellerV2).getBorrowerForLoan(_bidId);
-        
+      
         ( address borrower,
             address lender,
             uint256 marketId,
@@ -184,19 +179,32 @@ Initializable
         address collateralTokenAddress =  allocatedRewards[_allocationId].requiredCollateralTokenAddress;
 
 
-
         //make sure the loan follows the rules related to the allocation 
 
         if(collateralTokenAddress != address(0)){
              uint256 collateralAmount = ICollateralManager(collateralManager).getCollateralAmount(_bidId, collateralTokenAddress);
 
              //require collateral amount 
+             _verifyCollateralAmount();
         }
       
         
-        uint256 amountToReward = _calculateRewardAmount(principalAmount);
         
         //require that loan status is PAID (optionally)
+        _verifyLoanStatus();
+
+        //require that the loan was started in the correct timeframe 
+        _verifyLoanStartTime();
+
+        _verifyPrincipalTokenAddress();
+
+        _verifyCollateralTokenAddress();
+
+
+        uint256 amountToReward = _calculateRewardAmount(
+            principalAmount,
+            allocatedRewards[_allocationId].rewardPerLoanPrincipalAmount            
+            );
 
         //require that msgsender is the loan borrower 
         require(msg.sender == borrower, "Only the borrower can claim reward.");
@@ -207,7 +215,6 @@ Initializable
         IERC20Upgradeable(allocatedRewards[_allocationId].rewardTokenAddress).transfer(msg.sender, amountToReward);
 
         _decrementAllocatedAmount(_allocationId,amountToReward);
-
         
     
         emit ClaimedRewards(
@@ -224,13 +231,42 @@ Initializable
     }
 
  
-    function _calculateRewardAmount(uint256 _loanPrincipal) internal view returns (uint256) {
+    function _calculateRewardAmount(uint256 _loanPrincipal, uint256 rewardPerLoanPrincipalAmount) internal view returns (uint256) {
         
         //change calc -- maybe based on something set by the market owner in teh struct 
        
         return _loanPrincipal / 1000;
     }
 
+    function _verifyCollateralAmount() internal {
+
+        // require()
+
+    }
+
+    function _verifyLoanStatus() internal {
+
+            // require()
+
+        }
+
+    function _verifyLoanStartTime() internal {
+
+            // require()
+
+        }
+
+    function _verifyPrincipalTokenAddress() internal {
+
+            // require()
+
+        }
+
+    function _verifyCollateralTokenAddress() internal {
+
+            // require()
+
+        }
 
 
 

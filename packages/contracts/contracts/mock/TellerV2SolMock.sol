@@ -195,8 +195,8 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
         uint256 marketId,
         address principalTokenAddress,
         uint256 principalAmount,
-         uint32 timestamp ,
-         BidState bidState  
+        uint32 acceptedTimestamp ,
+        BidState bidState  
         
     ){
       Bid storage bid = bids[_bidId];
@@ -206,7 +206,7 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
         marketId =   bid.marketplaceId;
         principalTokenAddress =    address(bid.loanDetails.lendingToken);
         principalAmount =   bid.loanDetails.principal;
-        timestamp = bid.loanDetails.timestamp;
+        acceptedTimestamp = bid.loanDetails.acceptedTimestamp;
         bidState = bid.state;
     }
 

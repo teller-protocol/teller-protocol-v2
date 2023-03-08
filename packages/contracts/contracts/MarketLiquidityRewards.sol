@@ -262,23 +262,23 @@ Initializable
 
     function _verifyLoanStartTime(uint32 loanStartTime, uint32 minStartTime, uint32 maxStartTime) internal {
 
-            require(minStartTime == 0 || loanStartTime > minStartTime, "Loan was submitted before the min start time.");
-            require(maxStartTime == 0 || loanStartTime < maxStartTime, "Loan was submitted after the max start time.");
+        require(minStartTime == 0 || loanStartTime > minStartTime, "Loan was submitted before the min start time.");
+        require(maxStartTime == 0 || loanStartTime < maxStartTime, "Loan was submitted after the max start time.");
 
-        }
+    }
 
     function _verifyPrincipalTokenAddress(address loanTokenAddress, address expectedTokenAddress) internal {
 
-            require(expectedTokenAddress == address(0) || loanTokenAddress == expectedTokenAddress,"Invalid principal token address.");
+        require(expectedTokenAddress == address(0) || loanTokenAddress == expectedTokenAddress,"Invalid principal token address.");
 
-        }
+    }
 
     function _verifyCollateralTokenAddress(address loanTokenAddress, address expectedTokenAddress) internal {
 
-                require(expectedTokenAddress == address(0) || loanTokenAddress == expectedTokenAddress,"Invalid collateral token address.");
+        require(expectedTokenAddress == address(0) || loanTokenAddress == expectedTokenAddress,"Invalid collateral token address.");
 
 
-        }
+    }
 
 
 

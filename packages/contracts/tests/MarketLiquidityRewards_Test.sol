@@ -143,6 +143,7 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
             requiredPrincipalTokenAddress: address(principalToken),
             requiredCollateralTokenAddress: address(collateralToken),
 
+            minimumCollateralPerPrincipalAmount: 0,
             rewardPerLoanPrincipalAmount: 0,
 
             
@@ -169,6 +170,7 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
             requiredPrincipalTokenAddress: address(principalToken),
             requiredCollateralTokenAddress: address(collateralToken),
 
+            minimumCollateralPerPrincipalAmount: 0,
             rewardPerLoanPrincipalAmount: 0,
 
             bidStartTimeMin: uint32(startTime),

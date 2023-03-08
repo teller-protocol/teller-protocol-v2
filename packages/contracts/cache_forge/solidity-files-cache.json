@@ -379,8 +379,8 @@
       }
     },
     "contracts/MarketLiquidityRewards.sol": {
-      "lastModificationDate": 1678212202874,
-      "contentHash": "98cf3f5cd2b0e819dabd350fc8fc067b",
+      "lastModificationDate": 1678289177584,
+      "contentHash": "9952310f65fbe109fc6b05e3a3526e78",
       "sourceName": "contracts/MarketLiquidityRewards.sol",
       "solcConfig": {
         "settings": {
@@ -681,8 +681,8 @@
       }
     },
     "contracts/TellerV2.sol": {
-      "lastModificationDate": 1677874418630,
-      "contentHash": "fd4bee441a37599f271b5cfa8646d614",
+      "lastModificationDate": 1678289280311,
+      "contentHash": "8452e21595b08be3b4a6098be7c128e8",
       "sourceName": "contracts/TellerV2.sol",
       "solcConfig": {
         "settings": {
@@ -1404,8 +1404,8 @@
       }
     },
     "contracts/interfaces/IMarketLiquidityRewards.sol": {
-      "lastModificationDate": 1678212202030,
-      "contentHash": "77f01af74b6c5b90ae2d04dd8bbf1014",
+      "lastModificationDate": 1678226514696,
+      "contentHash": "1d5862195f44176865f226cc44f6abbe",
       "sourceName": "contracts/interfaces/IMarketLiquidityRewards.sol",
       "solcConfig": {
         "settings": {
@@ -1550,8 +1550,8 @@
       }
     },
     "contracts/interfaces/ITellerV2.sol": {
-      "lastModificationDate": 1677875486292,
-      "contentHash": "2a016a2fe0296817682e190339ac2fa6",
+      "lastModificationDate": 1678289257787,
+      "contentHash": "d71b4d2f21a859c0ff1c1dff617f672d",
       "sourceName": "contracts/interfaces/ITellerV2.sol",
       "solcConfig": {
         "settings": {
@@ -2079,8 +2079,8 @@
       }
     },
     "contracts/mock/TellerV2SolMock.sol": {
-      "lastModificationDate": 1677875441833,
-      "contentHash": "ff8baa74adba06bf12880898b6ea0563",
+      "lastModificationDate": 1678289240091,
+      "contentHash": "6531d227e45a9af2c5d7d6b9bedf2c14",
       "sourceName": "contracts/mock/TellerV2SolMock.sol",
       "solcConfig": {
         "settings": {
@@ -5215,8 +5215,8 @@
       }
     },
     "tests/MarketLiquidityRewards_Test.sol": {
-      "lastModificationDate": 1678168645821,
-      "contentHash": "8dc7eb5fcf6796a2dbacd24afcf06270",
+      "lastModificationDate": 1678289373954,
+      "contentHash": "28361d893aacd125e24960b51d9faffb",
       "sourceName": "tests/MarketLiquidityRewards_Test.sol",
       "solcConfig": {
         "settings": {

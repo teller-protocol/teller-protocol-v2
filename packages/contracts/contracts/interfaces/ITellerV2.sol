@@ -135,8 +135,8 @@ interface ITellerV2 {
         uint256 marketId,
         address principalTokenAddress,
         uint256 principalAmount,
-        uint32 timestamp ,
-         BidState bidState  
+        uint32 acceptedTimestamp,
+        BidState bidState  
     );
 
 }

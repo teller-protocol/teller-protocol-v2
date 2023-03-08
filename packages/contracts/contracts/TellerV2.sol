@@ -1031,7 +1031,7 @@ contract TellerV2 is
         uint256 marketId,
         address principalTokenAddress,
         uint256 principalAmount,
-        uint32 timestamp,
+        uint32 acceptedTimestamp,
         BidState bidState
     ){
         Bid storage bid = bids[_bidId];
@@ -1041,7 +1041,7 @@ contract TellerV2 is
         marketId =   bid.marketplaceId;
         principalTokenAddress =    address(bid.loanDetails.lendingToken);
         principalAmount =   bid.loanDetails.principal;
-        timestamp = bid.loanDetails.timestamp;
+        acceptedTimestamp = bid.loanDetails.acceptedTimestamp;
         bidState = bid.state;
     }
 

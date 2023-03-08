@@ -21,8 +21,16 @@ interface IMarketLiquidityRewards {
 
         uint32 bidStartTimeMin;
         uint32 bidStartTimeMax;
+
+        AllocationStrategy allocationStrategy;
        
     } 
+
+
+    enum AllocationStrategy {
+        BORROWER,   
+        LENDER            
+    }
 
     function allocateRewards(
          RewardAllocation calldata _allocation  

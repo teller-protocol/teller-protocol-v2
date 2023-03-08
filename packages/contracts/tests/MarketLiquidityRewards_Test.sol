@@ -148,7 +148,9 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
 
             
             bidStartTimeMin: uint32(startTime),
-            bidStartTimeMax: uint32(startTime + 10000)
+            bidStartTimeMax: uint32(startTime + 10000),
+
+            allocationStrategy: AllocationStrategy.BORROWER 
         }); 
 
         allocatedRewards[allocationId] = _allocation;
@@ -174,7 +176,9 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
             rewardPerLoanPrincipalAmount: 0,
 
             bidStartTimeMin: uint32(startTime),
-            bidStartTimeMax: uint32(startTime + 10000)
+            bidStartTimeMax: uint32(startTime + 10000),
+
+            allocationStrategy: AllocationStrategy.BORROWER 
         }); 
  
 
@@ -239,6 +243,30 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
     claim rewards 
 
 */
+
+ function test_calculateRewardAmount() public {
+
+    uint256 loanPrincipal = 1e8;
+    uint256 principalTokenDecimals = 1e18;
+
+    uint256 rewardPerLoanPrincipalAmount = 1e16; // expanded by token decimals so really 0.01
+
+
+    uint256 rewardAmount = super._calculateRewardAmount(
+        loanPrincipal,
+        principalTokenDecimals,
+        rewardPerLoanPrincipalAmount
+    );
+
+     assertEq(
+            rewardAmount,
+            1e6,
+            "Invalid reward amount"
+        );
+
+
+
+ }
 
 /*
     function _createCommitment(

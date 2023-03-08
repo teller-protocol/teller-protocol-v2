@@ -12,7 +12,14 @@ import "./interfaces/ITellerV2.sol";
 
 import {  BidState } from "./TellerV2Storage.sol";
 
-import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+
+// Libraries
+import { MathUpgradeable } from "@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol";
+
+import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20MetadataUpgradeable.sol";
+
+
+
 /*
 - Claim reward for a loan based on loanId (use a brand new contract)
 - This contract holds the reward tokens in escrow.
@@ -67,6 +74,8 @@ Initializable
 
     event CreatedAllocation(uint256 allocationId, address allocator, uint256 marketId);
 
+    event UpdatedAllocation(uint256 allocationId);
+
     event IncreasedAllocation(uint256 allocationId, uint256 amount);
 
     event DecreasedAllocation(uint256 allocationId, uint256 amount);
@@ -113,6 +122,39 @@ Initializable
             _allocation.marketId
         );
     }
+
+
+    /**
+        @notice 
+    
+    */
+
+    function updateAllocation(
+        uint256 _allocationId,
+        uint256 _minimumCollateralPerPrincipalAmount,
+        uint256 _rewardPerLoanPrincipalAmount,
+        uint32 _bidStartTimeMin,
+        uint32 _bidStartTimeMax 
+    ) public virtual {
+
+        RewardAllocation storage allocation = allocatedRewards[_allocationId];
+
+        require(msg.sender == allocation.allocator,"Only the allocator can deallocate rewards.");
+
+        allocation.minimumCollateralPerPrincipalAmount = _minimumCollateralPerPrincipalAmount;
+        allocation.rewardPerLoanPrincipalAmount = _rewardPerLoanPrincipalAmount;
+        allocation.bidStartTimeMin = _bidStartTimeMin;
+        allocation.bidStartTimeMax = _bidStartTimeMax;
+
+        emit UpdatedAllocation(_allocationId);
+
+    }
+
+
+    /**
+        @notice 
+    
+    */
 
     function increaseAllocationAmount(
         uint256 _allocationId,
@@ -187,8 +229,7 @@ Initializable
 
         //make sure the loan follows the rules related to the allocation 
 
-        //require that loan status is PAID  
-        _verifyLoanStatus( bidState, BidState.PAID );
+      
 
         //require that the loan was started in the correct timeframe 
         _verifyLoanStartTime(timestamp, allocatedReward.bidStartTimeMin, allocatedReward.bidStartTimeMax);
@@ -211,18 +252,43 @@ Initializable
             allocatedReward.requiredCollateralTokenAddress
         );
 
-        uint256 amountToReward = _calculateRewardAmount(
-            principalAmount,
-            allocatedRewards[_allocationId].rewardPerLoanPrincipalAmount            
-            );
 
-        //require that msgsender is the loan borrower 
-        require(msg.sender == borrower, "Only the borrower can claim reward.");
 
         require(marketId == allocatedRewards[_allocationId].marketId, "MarketId mismatch for allocation");
 
+
+        uint256 principalTokenDecimals = IERC20MetadataUpgradeable(principalTokenAddress).decimals();
+
+        uint256 amountToReward = _calculateRewardAmount(
+            principalAmount,
+            principalTokenDecimals,
+            allocatedReward.rewardPerLoanPrincipalAmount            
+            );
+
+
+
+        address rewardRecipient;
+
+        if(allocatedReward.allocationStrategy==AllocationStrategy.BORROWER){
+
+            require(bidState == BidState.PAID , "Invalid bid state for loan.");
+
+            rewardRecipient = borrower;
+
+        }else if(allocatedReward.allocationStrategy==AllocationStrategy.LENDER){
+
+            //Loan must have been accepted in the past 
+            require(bidState >= BidState.ACCEPTED , "Invalid bid state for loan.");
+
+            rewardRecipient = lender; 
+
+        }else {
+             revert("Unknown allocation strategy");
+        }
+              
+
         //transfer tokens reward to the msgsender 
-        IERC20Upgradeable(allocatedRewards[_allocationId].rewardTokenAddress).transfer(msg.sender, amountToReward);
+        IERC20Upgradeable(allocatedRewards[_allocationId].rewardTokenAddress).transfer(rewardRecipient, amountToReward);
 
         _decrementAllocatedAmount(_allocationId,amountToReward);
         
@@ -230,7 +296,7 @@ Initializable
         emit ClaimedRewards(
             _allocationId,
             _bidId,
-            msg.sender,
+            rewardRecipient,
             amountToReward
         );
 
@@ -241,11 +307,18 @@ Initializable
     }
 
  
-    function _calculateRewardAmount(uint256 _loanPrincipal, uint256 rewardPerLoanPrincipalAmount) internal view returns (uint256) {
+    function _calculateRewardAmount(uint256 _loanPrincipal, uint256 _principalTokenDecimals, uint256 _rewardPerLoanPrincipalAmount) internal view returns (uint256) {
         
-        //change calc -- maybe based on something set by the market owner in teh struct 
-       
-        return _loanPrincipal / 1000;
+        return MathUpgradeable.mulDiv(
+            _loanPrincipal,
+            _rewardPerLoanPrincipalAmount,   //expanded by principal token decimals 
+            10 ** _principalTokenDecimals
+           
+        );
+
+         
+
+       // return _loanPrincipal* principalPerRewardAmount;
     }
 
     function _verifyCollateralAmount(uint256 collateralAmount, uint256 principalAmount, uint256 minimumCollateralPerPrincipalAmount) internal {
@@ -254,11 +327,7 @@ Initializable
 
     }
 
-    function _verifyLoanStatus(BidState actualBidState, BidState expectedBidState) internal {
- 
-        require(actualBidState == expectedBidState, "Invalid bid state for loan.");
-
-    }
+   
 
     function _verifyLoanStartTime(uint32 loanStartTime, uint32 minStartTime, uint32 maxStartTime) internal {
 

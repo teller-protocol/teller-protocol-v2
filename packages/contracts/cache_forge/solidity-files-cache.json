@@ -379,8 +379,8 @@
       }
     },
     "contracts/MarketLiquidityRewards.sol": {
-      "lastModificationDate": 1678293039502,
-      "contentHash": "f826142e6e1f32bdec75823158bc4534",
+      "lastModificationDate": 1678296828486,
+      "contentHash": "1ee0b2bbc6c8c13a434fdfce5d367963",
       "sourceName": "contracts/MarketLiquidityRewards.sol",
       "solcConfig": {
         "settings": {
@@ -5217,8 +5217,8 @@
       }
     },
     "tests/MarketLiquidityRewards_Test.sol": {
-      "lastModificationDate": 1678294468641,
-      "contentHash": "263fc3f774c700b3f672c4f7674399db",
+      "lastModificationDate": 1678296588565,
+      "contentHash": "6d8b82fe2037b598f17dd86c78590fd2",
       "sourceName": "tests/MarketLiquidityRewards_Test.sol",
       "solcConfig": {
         "settings": {

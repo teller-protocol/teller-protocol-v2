@@ -235,11 +235,13 @@ Initializable
         _verifyLoanStartTime(timestamp, allocatedReward.bidStartTimeMin, allocatedReward.bidStartTimeMax);
 
 
+      
+
         if(collateralTokenAddress != address(0)){
              uint256 collateralAmount = ICollateralManager(collateralManager).getCollateralAmount(_bidId, collateralTokenAddress);
-
+          
              //require collateral amount 
-             _verifyCollateralAmount(collateralAmount, principalAmount, allocatedReward.minimumCollateralPerPrincipalAmount);
+             _verifyCollateralAmount(collateralTokenAddress, collateralAmount, principalTokenAddress, principalAmount, allocatedReward.minimumCollateralPerPrincipalAmount);
         }
        
         _verifyPrincipalTokenAddress(
@@ -258,7 +260,7 @@ Initializable
 
 
         uint256 principalTokenDecimals = IERC20MetadataUpgradeable(principalTokenAddress).decimals();
-
+     
         uint256 amountToReward = _calculateRewardAmount(
             principalAmount,
             principalTokenDecimals,
@@ -314,16 +316,29 @@ Initializable
             _rewardPerLoanPrincipalAmount,   //expanded by principal token decimals 
             10 ** _principalTokenDecimals
            
-        );
+        ); 
 
-         
-
-       // return _loanPrincipal* principalPerRewardAmount;
     }
 
-    function _verifyCollateralAmount(uint256 collateralAmount, uint256 principalAmount, uint256 minimumCollateralPerPrincipalAmount) internal {
+    function _verifyCollateralAmount(address _collateralTokenAddress, uint256 _collateralAmount,  address _principalTokenAddress, uint256 _principalAmount, uint256 _minimumCollateralPerPrincipalAmount) internal {
 
-        // require()
+        uint256 principalTokenDecimals = IERC20MetadataUpgradeable(_principalTokenAddress).decimals();
+
+        uint256 collateralTokenDecimals = IERC20MetadataUpgradeable(_collateralTokenAddress).decimals();
+
+        uint256 minCollateral = _requiredCollateralAmount( _principalAmount, principalTokenDecimals, collateralTokenDecimals, _minimumCollateralPerPrincipalAmount );
+
+        require( _collateralAmount >=  minCollateral, "Loan does not meet minimum collateralization ratio.");
+
+    }
+
+    function _requiredCollateralAmount(  uint256 _principalAmount, uint256 _principalTokenDecimals, uint256 _collateralTokenDecimals, uint256 _minimumCollateralPerPrincipalAmount ) internal view returns (uint256) {
+
+        return MathUpgradeable.mulDiv(
+            _principalAmount,
+            _minimumCollateralPerPrincipalAmount,  //expanded by principal token decimals and collateral token decimals 
+            10 ** (_principalTokenDecimals+_collateralTokenDecimals)
+        );
 
     }
 

@@ -244,7 +244,7 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
 
 */
 
- function test_calculateRewardAmount() public {
+ function test_calculateRewardAmount_weth_principal() public {
 
     uint256 loanPrincipal = 1e8;
     uint256 principalTokenDecimals = 18;
@@ -267,6 +267,59 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
 
 
  }
+
+  function test_calculateRewardAmount_usdc_principal() public {
+
+    uint256 loanPrincipal = 1e8;
+    uint256 principalTokenDecimals = 6;
+
+    uint256 rewardPerLoanPrincipalAmount = 1e4; // expanded by token decimals so really 0.01
+
+
+    uint256 rewardAmount = super._calculateRewardAmount(
+        loanPrincipal,
+        principalTokenDecimals,
+        rewardPerLoanPrincipalAmount
+    );
+
+     assertEq(
+            rewardAmount,
+            1e6,
+            "Invalid reward amount"
+        );
+
+
+
+ }
+
+  function test_requiredCollateralAmount() public {
+
+   
+    uint256 collateralTokenDecimals = 6;
+
+    uint256 loanPrincipal = 1e8;
+    uint256 principalTokenDecimals = 6;
+
+    uint256 minimumCollateralPerPrincipal = 1e4  * 1e6 ; // expanded by token decimals so really 0.01
+
+    uint256 minCollateral = _requiredCollateralAmount(
+        loanPrincipal,
+        principalTokenDecimals,
+        collateralTokenDecimals,
+        minimumCollateralPerPrincipal
+    );
+
+
+     assertEq(
+            minCollateral,
+            1e6,
+            "Invalid min collateral calculation"
+        );
+
+    
+     
+    
+  }
 
 /*
     function _createCommitment(

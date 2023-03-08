@@ -247,7 +247,7 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
  function test_calculateRewardAmount() public {
 
     uint256 loanPrincipal = 1e8;
-    uint256 principalTokenDecimals = 1e18;
+    uint256 principalTokenDecimals = 18;
 
     uint256 rewardPerLoanPrincipalAmount = 1e16; // expanded by token decimals so really 0.01
 

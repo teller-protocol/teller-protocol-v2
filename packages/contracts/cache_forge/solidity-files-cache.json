@@ -5217,8 +5217,8 @@
       }
     },
     "tests/MarketLiquidityRewards_Test.sol": {
-      "lastModificationDate": 1678293015313,
-      "contentHash": "98d7592113432f946d2ea019a49d25c4",
+      "lastModificationDate": 1678294468641,
+      "contentHash": "263fc3f774c700b3f672c4f7674399db",
       "sourceName": "tests/MarketLiquidityRewards_Test.sol",
       "solcConfig": {
         "settings": {

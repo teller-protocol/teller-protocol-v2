@@ -96,9 +96,11 @@ Initializable
     }
 
 
-/**
-
- */
+  /**
+    * @notice Creates a new token allocation and transfers the token amount into escrow in this contract
+    * @param _allocation - The RewardAllocation struct data to create
+    * @return allocationId_ 
+    */
 
     function allocateRewards(
         RewardAllocation calldata _allocation        
@@ -123,10 +125,13 @@ Initializable
         );
     }
 
-
-    /**
-        @notice 
-    
+  /**
+    * @notice Allows the allocator to update properties of an allocation
+    * @param _allocationId - The id for the allocation 
+    * @param _minimumCollateralPerPrincipalAmount - The required collateralization ratio
+    * @param _rewardPerLoanPrincipalAmount - The reward to give per principal amount 
+    * @param _bidStartTimeMin - The block timestamp that loans must have been accepted after to claim rewards
+    * @param _bidStartTimeMax - The block timestamp that loans must have been accepted before to claim rewards
     */
 
     function updateAllocation(
@@ -152,10 +157,10 @@ Initializable
 
 
     /**
-        @notice 
-    
-    */
-
+      * @notice Allows anyone to add tokens to an allocation
+      * @param _allocationId - The id for the allocation 
+      * @param _tokenAmount - The amount of tokens to add
+     */
     function increaseAllocationAmount(
         uint256 _allocationId,
         uint256 _tokenAmount 
@@ -172,6 +177,11 @@ Initializable
         );
     }
 
+    /**
+      * @notice Allows the allocator to withdraw some of all of the funds within an allocation
+      * @param _allocationId - The id for the allocation 
+      * @param _tokenAmount - The amount of tokens to withdraw
+     */
     function deallocateRewards(
         uint256 _allocationId,
         uint256 _tokenAmount

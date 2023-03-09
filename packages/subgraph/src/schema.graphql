@@ -165,14 +165,17 @@ type LoanCount @entity {
   accepted: [Bid!]!
   acceptedCount: BigInt!
 
-  repaid: [Bid!]!
-  repaidCount: BigInt!
+  dueSoon: [Bid!]!
+  dueSoonCount: BigInt!
 
   late: [Bid!]!
   lateCount: BigInt!
 
   defaulted: [Bid!]!
   defaultedCount: BigInt!
+
+  repaid: [Bid!]!
+  repaidCount: BigInt!
 
   liquidated: [Bid!]!
   liquidatedCount: BigInt!

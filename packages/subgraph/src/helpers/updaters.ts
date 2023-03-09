@@ -107,6 +107,10 @@ export function incrementLoanCount(
       loanCount.submitted = addToArray(loanCount.submitted, bidId);
       loanCount.submittedCount = BigInt.fromI32(loanCount.submitted.length);
       break;
+    case BidStatus.Expired:
+      loanCount.expired = addToArray(loanCount.expired, bidId);
+      loanCount.expiredCount = BigInt.fromI32(loanCount.expired.length);
+      break;
     case BidStatus.Cancelled:
       loanCount.cancelled = addToArray(loanCount.cancelled, bidId);
       loanCount.cancelledCount = BigInt.fromI32(loanCount.cancelled.length);
@@ -115,9 +119,9 @@ export function incrementLoanCount(
       loanCount.accepted = addToArray(loanCount.accepted, bidId);
       loanCount.acceptedCount = BigInt.fromI32(loanCount.accepted.length);
       break;
-    case BidStatus.Repaid:
-      loanCount.repaid = addToArray(loanCount.repaid, bidId);
-      loanCount.repaidCount = BigInt.fromI32(loanCount.repaid.length);
+    case BidStatus.DueSoon:
+      loanCount.dueSoon = addToArray(loanCount.dueSoon, bidId);
+      loanCount.dueSoonCount = BigInt.fromI32(loanCount.dueSoon.length);
       break;
     case BidStatus.Late:
       loanCount.late = addToArray(loanCount.late, bidId);
@@ -126,6 +130,10 @@ export function incrementLoanCount(
     case BidStatus.Defaulted:
       loanCount.defaulted = addToArray(loanCount.defaulted, bidId);
       loanCount.defaultedCount = BigInt.fromI32(loanCount.defaulted.length);
+      break;
+    case BidStatus.Repaid:
+      loanCount.repaid = addToArray(loanCount.repaid, bidId);
+      loanCount.repaidCount = BigInt.fromI32(loanCount.repaid.length);
       break;
     case BidStatus.Liquidated:
       loanCount.liquidated = addToArray(loanCount.liquidated, bidId);
@@ -157,6 +165,10 @@ export function decrementLoanCount(
       loanCount.submitted = removeFromArray(loanCount.submitted, bidId);
       loanCount.submittedCount = BigInt.fromI32(loanCount.submitted.length);
       break;
+    case BidStatus.Expired:
+      loanCount.expired = removeFromArray(loanCount.expired, bidId);
+      loanCount.expiredCount = BigInt.fromI32(loanCount.expired.length);
+      break;
     case BidStatus.Cancelled:
       loanCount.cancelled = removeFromArray(loanCount.cancelled, bidId);
       loanCount.cancelledCount = BigInt.fromI32(loanCount.cancelled.length);
@@ -165,9 +177,9 @@ export function decrementLoanCount(
       loanCount.accepted = removeFromArray(loanCount.accepted, bidId);
       loanCount.acceptedCount = BigInt.fromI32(loanCount.accepted.length);
       break;
-    case BidStatus.Repaid:
-      loanCount.repaid = removeFromArray(loanCount.repaid, bidId);
-      loanCount.repaidCount = BigInt.fromI32(loanCount.repaid.length);
+    case BidStatus.DueSoon:
+      loanCount.dueSoon = removeFromArray(loanCount.dueSoon, bidId);
+      loanCount.dueSoonCount = BigInt.fromI32(loanCount.dueSoon.length);
       break;
     case BidStatus.Late:
       loanCount.late = removeFromArray(loanCount.late, bidId);
@@ -176,6 +188,10 @@ export function decrementLoanCount(
     case BidStatus.Defaulted:
       loanCount.defaulted = removeFromArray(loanCount.defaulted, bidId);
       loanCount.defaultedCount = BigInt.fromI32(loanCount.defaulted.length);
+      break;
+    case BidStatus.Repaid:
+      loanCount.repaid = removeFromArray(loanCount.repaid, bidId);
+      loanCount.repaidCount = BigInt.fromI32(loanCount.repaid.length);
       break;
     case BidStatus.Liquidated:
       loanCount.liquidated = removeFromArray(loanCount.liquidated, bidId);
@@ -193,15 +209,16 @@ export function decrementLoanCount(
   return loanCount;
 }
 
-function updateTotalLoanCount(loanCount: LoanCount): void {
-  const allLoans = loanCount.submitted
-    .concat(loanCount.accepted)
-    .concat(loanCount.repaid)
-    .concat(loanCount.late)
-    .concat(loanCount.defaulted)
-    .concat(loanCount.liquidated);
-  loanCount.all = allLoans;
-  loanCount.totalCount = BigInt.fromI32(allLoans.length);
+function updateTotalLoanStatusCount(loanStatusCount: LoanStatusCount): void {
+  const allLoans = loanStatusCount.submitted
+    .concat(loanStatusCount.accepted)
+    .concat(loanStatusCount.dueSoon)
+    .concat(loanStatusCount.late)
+    .concat(loanStatusCount.defaulted)
+    .concat(loanStatusCount.repaid)
+    .concat(loanStatusCount.liquidated);
+  loanStatusCount.all = allLoans;
+  loanStatusCount.totalCount = BigInt.fromI32(allLoans.length);
 }
 
 export enum PaymentEventType {

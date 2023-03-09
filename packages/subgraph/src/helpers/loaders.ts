@@ -81,14 +81,17 @@ export function loadLoanCount(entityType: string, entityId: string): LoanCount {
     loans.accepted = [];
     loans.acceptedCount = BigInt.zero();
 
-    loans.repaid = [];
-    loans.repaidCount = BigInt.zero();
+    loans.dueSoon = [];
+    loans.dueSoonCount = BigInt.zero();
 
     loans.late = [];
     loans.lateCount = BigInt.zero();
 
     loans.defaulted = [];
     loans.defaultedCount = BigInt.zero();
+
+    loans.repaid = [];
+    loans.repaidCount = BigInt.zero();
 
     loans.liquidated = [];
     loans.liquidatedCount = BigInt.zero();

@@ -270,7 +270,7 @@ function test_claimRewards() public {
         mockBid.loanDetails.lendingToken= (principalToken);
         mockBid.loanDetails.principal=0;
         mockBid.loanDetails.acceptedTimestamp= uint32(block.timestamp);
-        mockBid.state=BidState.ACCEPTED; 
+        mockBid.state=BidState.PAID; 
 
         TellerV2Mock(tellerV2).setMockBid(mockBid);
 

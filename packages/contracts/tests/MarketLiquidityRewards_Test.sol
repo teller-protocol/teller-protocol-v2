@@ -279,13 +279,7 @@ function test_claimRewards() public {
         
 
         _setAllocation(allocationId);
- 
-      /*  lender._approveERC20Token(
-            address(rewardToken),
-            address(this),
-            amountToIncrease
-        );*/
-
+  
         borrower._claimRewards(
             allocationId,
             bidId

@@ -290,6 +290,15 @@ function test_claimRewards() public {
             true,
             "verifyLoanStartTime was not called"
         );
+
+
+        //add more assertions here 
+
+
+
+        //add some negative tests , override some of the verifies  and unit test them 
+
+        //add comments to all of the methods
         
 
 }

@@ -20,11 +20,7 @@ import "../contracts/mock/CollateralManagerMock.sol";
 import "../contracts/MarketLiquidityRewards.sol";
 
 contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
-    TellerV2Mock private tellerV2Mock;
-    MarketRegistryMock mockMarketRegistry;
-    CollateralManagerMock mockCollateralManager;
-  //  MarketLiquidityRewards marketLiquidityRewards;
-
+  
     MarketLiquidityUser private marketOwner;
     MarketLiquidityUser private lender;
     MarketLiquidityUser private borrower;
@@ -61,20 +57,18 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
 
  
 
+    bool verifyLoanStartTimeWasCalled;
  
 
     constructor(  )
           MarketLiquidityRewards(
         address(new TellerV2Mock()),
-         address(0),
-         address(0)
+         address( new MarketRegistryMock( address(0) )),
+         address(new CollateralManagerMock())
          ) {}
 
     function setUp() public {
-       
-        mockMarketRegistry = new MarketRegistryMock(address(marketOwner));
-        mockCollateralManager = new CollateralManagerMock();
-
+     
      
 
         marketOwner = new MarketLiquidityUser(address(tellerV2), (this));
@@ -82,7 +76,7 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
         lender = new MarketLiquidityUser(address(tellerV2), (this));
         TellerV2Mock(tellerV2).__setMarketOwner(marketOwner);
 
-        mockMarketRegistry.setMarketOwner(address(marketOwner));
+        MarketRegistryMock(marketRegistry).setMarketOwner(address(marketOwner));
 
         //tokenAddress = address(0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174);
         marketId = 2;
@@ -123,6 +117,8 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
 
         vm.warp(startTime+100);
         //delete allocationCount;
+
+        verifyLoanStartTimeWasCalled = false;
     }
 
     function _setAllocation(uint256 allocationId) internal {
@@ -265,6 +261,18 @@ function test_deallocateRewards() public {
 
 function test_claimRewards() public {
 
+        Bid memory mockBid  ;
+
+        
+        mockBid.borrower=address(borrower);
+        mockBid.lender=address(lender);
+        mockBid.marketplaceId= marketId;
+        mockBid.loanDetails.lendingToken= (principalToken);
+        mockBid.loanDetails.principal=0;
+        mockBid.loanDetails.acceptedTimestamp= uint32(block.timestamp);
+        mockBid.state=BidState.ACCEPTED; 
+
+        TellerV2Mock(tellerV2).setMockBid(mockBid);
 
        uint256 allocationId = 0;
        uint256 bidId = 0;
@@ -282,6 +290,13 @@ function test_claimRewards() public {
             allocationId,
             bidId
         );
+
+       assertEq(
+            verifyLoanStartTimeWasCalled,
+            true,
+            "verifyLoanStartTime was not called"
+        );
+        
 
 }
 
@@ -384,6 +399,10 @@ function test_claimRewards() public {
 
 
 
+    function _verifyLoanStartTime(uint32 loanStartTime, uint32 minStartTime, uint32 maxStartTime) internal override {
+
+        verifyLoanStartTimeWasCalled = true;
+    }
  
 }
 
@@ -446,6 +465,11 @@ contract MarketLiquidityUser is User {
 }
  
 contract TellerV2Mock is TellerV2Context {
+
+
+    Bid  mockBid;
+
+
     constructor() TellerV2Context(address(0)) {}
 
     function __setMarketOwner(User _marketOwner) external {
@@ -470,6 +494,11 @@ contract TellerV2Mock is TellerV2Context {
         return _msgDataForMarket(_marketId);
     }
 
+    function setMockBid( Bid calldata bid ) public {
+
+        mockBid = bid;
+
+    }
 
     function getLoanSummary(uint256 _bidId) external view returns (
         address borrower,
@@ -482,15 +511,18 @@ contract TellerV2Mock is TellerV2Context {
         
     ){
 
-        Bid storage bid = bids[_bidId];
+        Bid storage bid = mockBid;
 
-        borrower = address(0);
-        lender = address(0);
-        marketId = 0;
-        principalTokenAddress = address(0);
-        principalAmount = 0;
-        acceptedTimestamp = 0;
-        bidState = BidState.ACCEPTED; 
+        borrower = bid.borrower;
+        lender = bid.lender;
+        marketId = bid.marketplaceId;
+        principalTokenAddress = address(bid.loanDetails.lendingToken);
+        principalAmount = bid.loanDetails.principal;
+        acceptedTimestamp = bid.loanDetails.acceptedTimestamp;
+        bidState = bid.state; 
 
     }
+ 
+
+
 }

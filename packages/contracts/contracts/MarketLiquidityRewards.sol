@@ -202,7 +202,11 @@ Initializable
 
     }
 
-
+    
+    /**
+        @notice 
+        
+     */
     function claimRewards(
         uint256 _allocationId,
         uint256 _bidId       
@@ -228,14 +232,11 @@ Initializable
 
 
         //make sure the loan follows the rules related to the allocation 
-
-      
+ 
 
         //require that the loan was started in the correct timeframe 
         _verifyLoanStartTime(timestamp, allocatedReward.bidStartTimeMin, allocatedReward.bidStartTimeMax);
 
-
-      
 
         if(collateralTokenAddress != address(0)){
              uint256 collateralAmount = ICollateralManager(collateralManager).getCollateralAmount(_bidId, collateralTokenAddress);
@@ -344,20 +345,20 @@ Initializable
 
    
 
-    function _verifyLoanStartTime(uint32 loanStartTime, uint32 minStartTime, uint32 maxStartTime) internal {
+    function _verifyLoanStartTime(uint32 loanStartTime, uint32 minStartTime, uint32 maxStartTime) internal virtual {
 
         require(minStartTime == 0 || loanStartTime > minStartTime, "Loan was submitted before the min start time.");
         require(maxStartTime == 0 || loanStartTime < maxStartTime, "Loan was submitted after the max start time.");
 
     }
 
-    function _verifyPrincipalTokenAddress(address loanTokenAddress, address expectedTokenAddress) internal {
+    function _verifyPrincipalTokenAddress(address loanTokenAddress, address expectedTokenAddress) internal virtual {
 
         require(expectedTokenAddress == address(0) || loanTokenAddress == expectedTokenAddress,"Invalid principal token address.");
 
     }
 
-    function _verifyCollateralTokenAddress(address loanTokenAddress, address expectedTokenAddress) internal {
+    function _verifyCollateralTokenAddress(address loanTokenAddress, address expectedTokenAddress) internal virtual {
 
         require(expectedTokenAddress == address(0) || loanTokenAddress == expectedTokenAddress,"Invalid collateral token address.");
 

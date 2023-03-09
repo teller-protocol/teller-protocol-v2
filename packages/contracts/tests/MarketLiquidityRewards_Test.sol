@@ -58,6 +58,11 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
  
 
     bool verifyLoanStartTimeWasCalled;
+    bool verifyPrincipalTokenAddressWasCalled;
+    bool verifyCollateralTokenAddressWasCalled;
+    
+    bool verifyRewardRecipientWasCalled;
+    bool verifyCollateralAmountWasCalled;
  
 
     constructor(  )
@@ -119,6 +124,13 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
         //delete allocationCount;
 
         verifyLoanStartTimeWasCalled = false;
+        verifyPrincipalTokenAddressWasCalled = false;
+        verifyCollateralTokenAddressWasCalled = false;
+
+        verifyRewardRecipientWasCalled = false;
+        verifyCollateralAmountWasCalled = false;
+ 
+
     }
 
     function _setAllocation(uint256 allocationId) internal {
@@ -400,11 +412,27 @@ function test_claimRewards() public {
            super.deallocateRewards(_allocationId,_tokenAmount);
     }
 
-
-
+    function _verifyAndReturnRewardRecipient( AllocationStrategy strategy, BidState bidState, address borrower, address lender  ) internal override returns (address rewardRecipient) {
+     verifyRewardRecipientWasCalled = true; 
+        return address(borrower);
+    }
+ 
+    function _verifyCollateralAmount(address _collateralTokenAddress, uint256 _collateralAmount,  address _principalTokenAddress, uint256 _principalAmount, uint256 _minimumCollateralPerPrincipalAmount) internal override {
+        verifyCollateralAmountWasCalled = true;
+    }
     function _verifyLoanStartTime(uint32 loanStartTime, uint32 minStartTime, uint32 maxStartTime) internal override {
 
         verifyLoanStartTimeWasCalled = true;
+    }
+
+    function _verifyPrincipalTokenAddress(address loanTokenAddress, address expectedTokenAddress) internal override {
+
+        verifyPrincipalTokenAddressWasCalled = true;
+    }
+
+    function _verifyCollateralTokenAddress(address loanTokenAddress, address expectedTokenAddress) internal override {
+
+          verifyCollateralTokenAddressWasCalled = true;
     }
  
 }

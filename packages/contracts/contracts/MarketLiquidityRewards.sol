@@ -270,25 +270,9 @@ Initializable
 
 
 
-        address rewardRecipient;
+        address rewardRecipient = _verifyAndReturnRewardRecipient( allocatedReward.allocationStrategy, bidState, borrower, lender );
+ 
 
-        if(allocatedReward.allocationStrategy==AllocationStrategy.BORROWER){
-
-            require(bidState == BidState.PAID , "Invalid bid state for loan.");
-
-            rewardRecipient = borrower;
-
-        }else if(allocatedReward.allocationStrategy==AllocationStrategy.LENDER){
-
-            //Loan must have been accepted in the past 
-            require(bidState >= BidState.ACCEPTED , "Invalid bid state for loan.");
-
-            rewardRecipient = lender; 
-
-        }else {
-             revert("Unknown allocation strategy");
-        }
-              
 
         //transfer tokens reward to the msgsender 
         IERC20Upgradeable(allocatedRewards[_allocationId].rewardTokenAddress).transfer(rewardRecipient, amountToReward);
@@ -304,6 +288,27 @@ Initializable
         );
 
     }   
+
+    function _verifyAndReturnRewardRecipient( AllocationStrategy strategy, BidState bidState, address borrower, address lender  ) internal virtual returns (address rewardRecipient) {
+
+        if(strategy== AllocationStrategy.BORROWER){
+
+            require(bidState == BidState.PAID , "Invalid bid state for loan.");
+
+            rewardRecipient = borrower;
+
+        }else if(strategy== AllocationStrategy.LENDER){
+
+            //Loan must have been accepted in the past 
+            require(bidState >= BidState.ACCEPTED , "Invalid bid state for loan.");
+
+            rewardRecipient = lender; 
+
+        }else {
+             revert("Unknown allocation strategy");
+        } 
+
+    }
 
     function _decrementAllocatedAmount(uint256 _allocationId, uint256 _amount) internal {
         allocatedRewards[_allocationId].rewardTokenAmount -= _amount;
@@ -321,7 +326,7 @@ Initializable
 
     }
 
-    function _verifyCollateralAmount(address _collateralTokenAddress, uint256 _collateralAmount,  address _principalTokenAddress, uint256 _principalAmount, uint256 _minimumCollateralPerPrincipalAmount) internal {
+    function _verifyCollateralAmount(address _collateralTokenAddress, uint256 _collateralAmount,  address _principalTokenAddress, uint256 _principalAmount, uint256 _minimumCollateralPerPrincipalAmount) internal virtual {
 
         uint256 principalTokenDecimals = IERC20MetadataUpgradeable(_principalTokenAddress).decimals();
 

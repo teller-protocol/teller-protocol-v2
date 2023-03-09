@@ -35,6 +35,7 @@
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-simple-import-sort": "^7.0.0",
     "eslint-plugin-unused-imports": "^2.0.0",
+    "hbs-cli": "^1.4.1",
     "matchstick-as": "^0.4.0",
     "typescript": "^4.9.4"
   }

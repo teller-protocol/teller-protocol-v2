@@ -1,7 +1,7 @@
 type Protocol @entity {
   id: ID!
 
-  loans: LoanCount! @derivedFrom(field: "_protocol")
+  loans: LoanStatusCount! @derivedFrom(field: "_protocol")
   tokenVolumes: [TokenVolume!]! @derivedFrom(field: "protocol")
 }
 
@@ -22,7 +22,7 @@ type MarketPlace @entity {
   lenderAttestationRequired: Boolean!
   marketplaceFeePercent: BigInt!
 
-  loans: LoanCount! @derivedFrom(field: "_market")
+  loans: LoanStatusCount! @derivedFrom(field: "_market")
 
   tokenVolumes: [MarketVolume!]! @derivedFrom(field: "market")
 
@@ -124,7 +124,7 @@ type Lender @entity {
   attestedTimestamp: BigInt
   isAttested: Boolean!
 
-  loans: LoanCount! @derivedFrom(field: "_lender")
+  loans: LoanStatusCount! @derivedFrom(field: "_lender")
 
   tokenVolume: [TokenVolume!] @derivedFrom(field: "lender")
   marketplace: MarketPlace!
@@ -140,14 +140,46 @@ type Borrower @entity {
   attestedTimestamp: BigInt
   isAttested: Boolean!
 
-  loans: LoanCount! @derivedFrom(field: "_borrower")
+  loans: LoanStatusCount! @derivedFrom(field: "_borrower")
 
   tokenVolume: [TokenVolume!] @derivedFrom(field: "borrower")
   marketplace: MarketPlace!
   user: User!
 }
 
-type LoanCount @entity {
+interface ILoanStatusCount {
+  all: [Bid!]!
+  totalCount: BigInt!
+
+  submitted: [Bid!]!
+  submittedCount: BigInt!
+
+  expired: [Bid!]!
+  expiredCount: BigInt!
+
+  cancelled: [Bid!]!
+  cancelledCount: BigInt!
+
+  accepted: [Bid!]!
+  acceptedCount: BigInt!
+
+  dueSoon: [Bid!]!
+  dueSoonCount: BigInt!
+
+  late: [Bid!]!
+  lateCount: BigInt!
+
+  defaulted: [Bid!]!
+  defaultedCount: BigInt!
+
+  repaid: [Bid!]!
+  repaidCount: BigInt!
+
+  liquidated: [Bid!]!
+  liquidatedCount: BigInt!
+}
+
+type LoanStatusCount implements ILoanStatusCount @entity {
   id: ID!
 
   all: [Bid!]!
@@ -210,7 +242,7 @@ type TokenVolume @entity {
   ## TokenStats ##
   token: Token!
   lendingTokenAddress: Bytes!
-  loans: LoanCount! @derivedFrom(field: "_tokenVolume")
+  loans: LoanStatusCount! @derivedFrom(field: "_tokenVolume")
 
   outstandingCapital: BigInt!
   totalLoaned: BigInt!

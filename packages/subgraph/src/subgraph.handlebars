@@ -1,14 +1,56 @@
 specVersion: 0.0.2
 schema:
   file: ./src/schema.graphql
+{{#with grafting}}
+{{#if enabled}}
+features:
+  - grafting
+graft:
+  base: {{base}}
+  block: {{block}}
+{{/if}}
+{{/with}}
 dataSources:
+{{#if block_handler.enabled}}
+  - kind: ethereum/contract
+    name: Blocks
+    network: {{network}}
+    source:
+      {{#with block_handler}}
+      address: '{{../contracts.teller_v2.address}}'
+      abi: TellerV2
+      startBlock: {{block}}
+      {{/with}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Protocol
+        - LoanStatusCount
+        - TokenVolume
+        - Token
+        - Bid
+      abis:
+        - name: TellerV2
+          file: ./abis/{{network}}_TellerV2.json
+        - name: TellerV0Storage
+          file: ../../packages/contracts/generated/artifacts/contracts/TellerV0Storage.sol/TellerV0Storage.json
+        - name: IERC20Metadata
+          file: ../../packages/contracts/generated/artifacts/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol/IERC20Metadata.json
+      blockHandlers:
+        - handler: handleBlock
+      file: ./src/block-handler.ts
+{{/if}}
   - kind: ethereum/contract
     name: TellerV2
     network: {{network}}
     source:
-      address: '{{address_teller_v2}}'
+      {{#with contracts.teller_v2}}
+      address: '{{address}}'
       abi: TellerV2
-      startBlock: {{block_teller_v2}}
+      startBlock: {{block}}
+      {{/with}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -46,9 +88,11 @@ dataSources:
     name: MarketRegistry
     network: {{network}}
     source:
-      address: '{{address_market_registry}}'
+      {{#with contracts.market_registry}}
+      address: '{{address}}'
       abi: MarketRegistry
-      startBlock: {{block_market_registry}}
+      startBlock: {{block}}
+      {{/with}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -100,9 +144,11 @@ dataSources:
     name: LenderCommitmentForwarder
     network: {{network}}
     source:
-      address: '{{address_lender_commitment}}'
+      {{#with contracts.lender_commitment}}
+      address: '{{address}}'
       abi: LenderCommitmentForwarder
-      startBlock: {{block_lender_commitment}}
+      startBlock: {{block}}
+      {{/with}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -112,6 +158,8 @@ dataSources:
       abis:
         - name: LenderCommitmentForwarder
           file: ./abis/{{network}}_LenderCommitmentForwarder.json
+        - name: IERC20Metadata
+          file: ../../packages/contracts/generated/artifacts/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol/IERC20Metadata.json
       eventHandlers:
         - event: CreatedCommitment(indexed uint256,address,uint256,address,uint256)
           handler: handleCreatedCommitment
@@ -128,9 +176,11 @@ dataSources:
     name: CollateralManager
     network: {{network}}
     source:
-      address: '{{address_collateral_manager}}'
+      {{#with contracts.collateral_manager}}
+      address: '{{address}}'
       abi: CollateralManager
-      startBlock: {{block_collateral_manager}}
+      startBlock: {{block}}
+      {{/with}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -156,9 +206,11 @@ dataSources:
     name: LenderManager
     network: {{network}}
     source:
-      address: '{{address_lender_manager}}'
+      {{#with contracts.lender_manager}}
+      address: '{{address}}'
       abi: LenderManager
-      startBlock: {{block_lender_manager}}
+      startBlock: {{block}}
+      {{/with}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5

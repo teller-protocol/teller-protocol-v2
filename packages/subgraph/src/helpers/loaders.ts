@@ -8,7 +8,7 @@ import {
   Collateral,
   Commitment,
   Lender,
-  LoanCount,
+  LoanStatusCount,
   MarketPlace,
   MarketVolume,
   Protocol,
@@ -30,7 +30,7 @@ export function loadProtocol(): Protocol {
   let protocol = Protocol.load("v2");
   if (!protocol) {
     protocol = new Protocol("v2");
-    loadLoanCount("protocol", protocol.id);
+    loadLoanStatusCount("protocol", protocol.id);
     protocol.save();
   }
   return protocol;
@@ -57,12 +57,15 @@ export function loadBidById(id: BigInt): Bid {
   return bid;
 }
 
-export function loadLoanCount(entityType: string, entityId: string): LoanCount {
+export function loadLoanStatusCount(
+  entityType: string,
+  entityId: string
+): LoanStatusCount {
   const id = `${entityType}-${entityId}`;
-  let loans = LoanCount.load(id);
+  let loans = LoanStatusCount.load(id);
 
   if (!loans) {
-    loans = new LoanCount(id);
+    loans = new LoanStatusCount(id);
 
     loans.set(`_${entityType}`, Value.fromString(entityId));
 
@@ -117,7 +120,7 @@ export function loadMarketById(id: string): MarketPlace {
     marketPlace.borrowerAttestationRequired = false;
     marketPlace.lenderAttestationRequired = false;
 
-    loadLoanCount("market", id);
+    loadLoanStatusCount("market", id);
 
     marketPlace.totalNumberOfLenders = BigInt.zero();
 
@@ -149,7 +152,7 @@ export function loadLenderByMarketId(
     lender = new Lender(idString);
     lender.isAttested = false;
 
-    loadLoanCount("lender", idString);
+    loadLoanStatusCount("lender", idString);
 
     lender.firstInteractionDate = timestamp;
     lender.lenderAddress = lenderAddress;
@@ -189,7 +192,7 @@ export function loadBorrowerByMarketId(
     borrower = new Borrower(idString);
     borrower.isAttested = false;
 
-    loadLoanCount("borrower", idString);
+    loadLoanStatusCount("borrower", idString);
 
     borrower.firstInteractionDate = timestamp;
     borrower.borrowerAddress = borrowerAddress;

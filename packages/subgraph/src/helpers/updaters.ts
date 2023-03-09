@@ -5,7 +5,7 @@ import {
   Bid,
   Collateral,
   Lender,
-  LoanCount,
+  LoanStatusCount,
   Payment,
   TokenVolume
 } from "../../generated/schema";
@@ -23,25 +23,32 @@ import {
 } from "./loaders";
 import { addToArray, removeFromArray } from "./utils";
 
-export function getLoanCountIdsForBid(bidId: string): string[] {
+export function updateBidStatus(bid: Bid, status: string): void {
+  const prevStatus = bid.isSet("status") ? bid.status : "";
+  bid.status = status;
+  bid.save();
+  updateLoanStatusCountsFromBid(bid.id, prevStatus);
+}
+
+export function getLoanStatusCountIdsForBid(bidId: string): string[] {
   const bid = Bid.load(bidId);
   if (!bid) throw new Error(`Bid ${bidId} does not exist`);
 
-  const loanCountIds = [
+  const loanStatusCountIds = [
     "protocol-v2",
     `market-${bid.marketplace}`,
     `borrower-${bid.borrower}`
   ];
 
   const lenderId = bid.lender;
-  if (lenderId) loanCountIds.push(`lender-${lenderId}`);
+  if (lenderId) loanStatusCountIds.push(`lender-${lenderId}`);
 
   const tokenVolumes = getTokenVolumesForBid(bid.id);
   for (let i = 0; i < tokenVolumes.length; i++) {
-    loanCountIds.push(`tokenVolume-${tokenVolumes[i].id}`);
+    loanStatusCountIds.push(`tokenVolume-${tokenVolumes[i].id}`);
   }
 
-  return loanCountIds;
+  return loanStatusCountIds;
 }
 
 export function getTokenVolumesForBid(bidId: string): TokenVolume[] {
@@ -80,133 +87,185 @@ export function getTokenVolumesForBid(bidId: string): TokenVolume[] {
   return tokenVolumes;
 }
 
-export function updateLoanCountsFromBid(
+export function updateLoanStatusCountsFromBid(
   bidId: string,
   prevStatus: string
 ): void {
   const bid = Bid.load(bidId);
   if (!bid) throw new Error(`Bid ${bidId} does not exist`);
-  const loanCountIds = getLoanCountIdsForBid(bidId);
-  for (let i = 0; i < loanCountIds.length; i++) {
-    incrementLoanCount(loanCountIds[i], bid.id, bid.status);
-    decrementLoanCount(loanCountIds[i], bid.id, prevStatus);
+  const loanStatusCountIds = getLoanStatusCountIdsForBid(bidId);
+  for (let i = 0; i < loanStatusCountIds.length; i++) {
+    incrementLoanStatusCount(loanStatusCountIds[i], bid.id, bid.status);
+    decrementLoanStatusCount(loanStatusCountIds[i], bid.id, prevStatus);
   }
 }
 
-export function incrementLoanCount(
-  loanCountId: string,
+export function incrementLoanStatusCount(
+  loanStatusCountId: string,
   bidId: string,
   status: string
-): LoanCount {
-  const loanCount = LoanCount.load(loanCountId);
-  if (!loanCount) throw new Error(`Loan count not found: ${loanCountId}`);
+): LoanStatusCount {
+  const loanStatusCount = LoanStatusCount.load(loanStatusCountId);
+  if (!loanStatusCount)
+    throw new Error(`Loan status count not found: ${loanStatusCountId}`);
 
   const bidStatus = bidStatusToEnum(status);
   switch (bidStatus) {
     case BidStatus.Submitted:
-      loanCount.submitted = addToArray(loanCount.submitted, bidId);
-      loanCount.submittedCount = BigInt.fromI32(loanCount.submitted.length);
+      loanStatusCount.submitted = addToArray(loanStatusCount.submitted, bidId);
+      loanStatusCount.submittedCount = BigInt.fromI32(
+        loanStatusCount.submitted.length
+      );
       break;
     case BidStatus.Expired:
-      loanCount.expired = addToArray(loanCount.expired, bidId);
-      loanCount.expiredCount = BigInt.fromI32(loanCount.expired.length);
+      loanStatusCount.expired = addToArray(loanStatusCount.expired, bidId);
+      loanStatusCount.expiredCount = BigInt.fromI32(
+        loanStatusCount.expired.length
+      );
       break;
     case BidStatus.Cancelled:
-      loanCount.cancelled = addToArray(loanCount.cancelled, bidId);
-      loanCount.cancelledCount = BigInt.fromI32(loanCount.cancelled.length);
+      loanStatusCount.cancelled = addToArray(loanStatusCount.cancelled, bidId);
+      loanStatusCount.cancelledCount = BigInt.fromI32(
+        loanStatusCount.cancelled.length
+      );
       break;
     case BidStatus.Accepted:
-      loanCount.accepted = addToArray(loanCount.accepted, bidId);
-      loanCount.acceptedCount = BigInt.fromI32(loanCount.accepted.length);
+      loanStatusCount.accepted = addToArray(loanStatusCount.accepted, bidId);
+      loanStatusCount.acceptedCount = BigInt.fromI32(
+        loanStatusCount.accepted.length
+      );
       break;
     case BidStatus.DueSoon:
-      loanCount.dueSoon = addToArray(loanCount.dueSoon, bidId);
-      loanCount.dueSoonCount = BigInt.fromI32(loanCount.dueSoon.length);
+      loanStatusCount.dueSoon = addToArray(loanStatusCount.dueSoon, bidId);
+      loanStatusCount.dueSoonCount = BigInt.fromI32(
+        loanStatusCount.dueSoon.length
+      );
       break;
     case BidStatus.Late:
-      loanCount.late = addToArray(loanCount.late, bidId);
-      loanCount.lateCount = BigInt.fromI32(loanCount.late.length);
+      loanStatusCount.late = addToArray(loanStatusCount.late, bidId);
+      loanStatusCount.lateCount = BigInt.fromI32(loanStatusCount.late.length);
       break;
     case BidStatus.Defaulted:
-      loanCount.defaulted = addToArray(loanCount.defaulted, bidId);
-      loanCount.defaultedCount = BigInt.fromI32(loanCount.defaulted.length);
+      loanStatusCount.defaulted = addToArray(loanStatusCount.defaulted, bidId);
+      loanStatusCount.defaultedCount = BigInt.fromI32(
+        loanStatusCount.defaulted.length
+      );
       break;
     case BidStatus.Repaid:
-      loanCount.repaid = addToArray(loanCount.repaid, bidId);
-      loanCount.repaidCount = BigInt.fromI32(loanCount.repaid.length);
+      loanStatusCount.repaid = addToArray(loanStatusCount.repaid, bidId);
+      loanStatusCount.repaidCount = BigInt.fromI32(
+        loanStatusCount.repaid.length
+      );
       break;
     case BidStatus.Liquidated:
-      loanCount.liquidated = addToArray(loanCount.liquidated, bidId);
-      loanCount.liquidatedCount = BigInt.fromI32(loanCount.liquidated.length);
+      loanStatusCount.liquidated = addToArray(
+        loanStatusCount.liquidated,
+        bidId
+      );
+      loanStatusCount.liquidatedCount = BigInt.fromI32(
+        loanStatusCount.liquidated.length
+      );
       break;
     case BidStatus.None:
-      return loanCount;
+      return loanStatusCount;
     default:
       throw new Error(`Invalid bid status: ${status}`);
   }
 
-  updateTotalLoanCount(loanCount);
+  updateTotalLoanStatusCount(loanStatusCount);
 
-  loanCount.save();
-  return loanCount;
+  loanStatusCount.save();
+  return loanStatusCount;
 }
 
-export function decrementLoanCount(
-  loanCountId: string,
+export function decrementLoanStatusCount(
+  loanStatusCountId: string,
   bidId: string,
   status: string
-): LoanCount {
-  const loanCount = LoanCount.load(loanCountId);
-  if (!loanCount) throw new Error(`Loan count not found: ${loanCountId}`);
+): LoanStatusCount {
+  const loanStatusCount = LoanStatusCount.load(loanStatusCountId);
+  if (!loanStatusCount)
+    throw new Error(`Loan status count not found: ${loanStatusCountId}`);
 
   const bidStatus = bidStatusToEnum(status);
   switch (bidStatus) {
     case BidStatus.Submitted:
-      loanCount.submitted = removeFromArray(loanCount.submitted, bidId);
-      loanCount.submittedCount = BigInt.fromI32(loanCount.submitted.length);
+      loanStatusCount.submitted = removeFromArray(
+        loanStatusCount.submitted,
+        bidId
+      );
+      loanStatusCount.submittedCount = BigInt.fromI32(
+        loanStatusCount.submitted.length
+      );
       break;
     case BidStatus.Expired:
-      loanCount.expired = removeFromArray(loanCount.expired, bidId);
-      loanCount.expiredCount = BigInt.fromI32(loanCount.expired.length);
+      loanStatusCount.expired = removeFromArray(loanStatusCount.expired, bidId);
+      loanStatusCount.expiredCount = BigInt.fromI32(
+        loanStatusCount.expired.length
+      );
       break;
     case BidStatus.Cancelled:
-      loanCount.cancelled = removeFromArray(loanCount.cancelled, bidId);
-      loanCount.cancelledCount = BigInt.fromI32(loanCount.cancelled.length);
+      loanStatusCount.cancelled = removeFromArray(
+        loanStatusCount.cancelled,
+        bidId
+      );
+      loanStatusCount.cancelledCount = BigInt.fromI32(
+        loanStatusCount.cancelled.length
+      );
       break;
     case BidStatus.Accepted:
-      loanCount.accepted = removeFromArray(loanCount.accepted, bidId);
-      loanCount.acceptedCount = BigInt.fromI32(loanCount.accepted.length);
+      loanStatusCount.accepted = removeFromArray(
+        loanStatusCount.accepted,
+        bidId
+      );
+      loanStatusCount.acceptedCount = BigInt.fromI32(
+        loanStatusCount.accepted.length
+      );
       break;
     case BidStatus.DueSoon:
-      loanCount.dueSoon = removeFromArray(loanCount.dueSoon, bidId);
-      loanCount.dueSoonCount = BigInt.fromI32(loanCount.dueSoon.length);
+      loanStatusCount.dueSoon = removeFromArray(loanStatusCount.dueSoon, bidId);
+      loanStatusCount.dueSoonCount = BigInt.fromI32(
+        loanStatusCount.dueSoon.length
+      );
       break;
     case BidStatus.Late:
-      loanCount.late = removeFromArray(loanCount.late, bidId);
-      loanCount.lateCount = BigInt.fromI32(loanCount.late.length);
+      loanStatusCount.late = removeFromArray(loanStatusCount.late, bidId);
+      loanStatusCount.lateCount = BigInt.fromI32(loanStatusCount.late.length);
       break;
     case BidStatus.Defaulted:
-      loanCount.defaulted = removeFromArray(loanCount.defaulted, bidId);
-      loanCount.defaultedCount = BigInt.fromI32(loanCount.defaulted.length);
+      loanStatusCount.defaulted = removeFromArray(
+        loanStatusCount.defaulted,
+        bidId
+      );
+      loanStatusCount.defaultedCount = BigInt.fromI32(
+        loanStatusCount.defaulted.length
+      );
       break;
     case BidStatus.Repaid:
-      loanCount.repaid = removeFromArray(loanCount.repaid, bidId);
-      loanCount.repaidCount = BigInt.fromI32(loanCount.repaid.length);
+      loanStatusCount.repaid = removeFromArray(loanStatusCount.repaid, bidId);
+      loanStatusCount.repaidCount = BigInt.fromI32(
+        loanStatusCount.repaid.length
+      );
       break;
     case BidStatus.Liquidated:
-      loanCount.liquidated = removeFromArray(loanCount.liquidated, bidId);
-      loanCount.liquidatedCount = BigInt.fromI32(loanCount.liquidated.length);
+      loanStatusCount.liquidated = removeFromArray(
+        loanStatusCount.liquidated,
+        bidId
+      );
+      loanStatusCount.liquidatedCount = BigInt.fromI32(
+        loanStatusCount.liquidated.length
+      );
       break;
     case BidStatus.None:
-      return loanCount;
+      return loanStatusCount;
     default:
       throw new Error(`Invalid bid status: ${status}`);
   }
 
-  updateTotalLoanCount(loanCount);
+  updateTotalLoanStatusCount(loanStatusCount);
 
-  loanCount.save();
-  return loanCount;
+  loanStatusCount.save();
+  return loanStatusCount;
 }
 
 function updateTotalLoanStatusCount(loanStatusCount: LoanStatusCount): void {
@@ -232,21 +291,16 @@ export function updateBidOnPayment(
   event: ethereum.Event,
   paymentEventType: PaymentEventType
 ): void {
-  const prevStatus = bid.status;
   if (bid.status != "Liquidated") {
     if (paymentEventType == PaymentEventType.Repayment) {
-      bid.status = "Accepted";
+      updateBidStatus(bid, "Accepted");
     } else if (paymentEventType == PaymentEventType.Repaid) {
-      bid.status = "Repaid";
+      updateBidStatus(bid, "Repaid");
     }
   }
   if (paymentEventType == PaymentEventType.Liquidated) {
-    bid.status = "Liquidated";
+    updateBidStatus(bid, "Liquidated");
   }
-
-  bid.save();
-
-  updateLoanCountsFromBid(bid.id, prevStatus);
 
   // NOTE: possible to have multiple payments in the same transaction
   const paymentId = event.transaction.hash.toHex();
@@ -346,7 +400,7 @@ function updateBidTokenVolumesOnPayment(
 }
 
 export function addBidToTokenVolume(tokenVolume: TokenVolume, bid: Bid): void {
-  const loans = incrementLoanCount(
+  const loans = incrementLoanStatusCount(
     `tokenVolume-${tokenVolume.id}`,
     bid.id,
     bid.status
@@ -376,7 +430,7 @@ export function removeBidFromTokenVolume(
   tokenVolume: TokenVolume,
   bid: Bid
 ): void {
-  const loans = decrementLoanCount(
+  const loans = decrementLoanStatusCount(
     `tokenVolume-${tokenVolume.id}`,
     bid.id,
     bid.status
@@ -432,7 +486,7 @@ export function replaceLender(bid: Bid, newLender: Lender): void {
     oldLender
   );
   removeBidFromTokenVolume(oldLenderVolume, bid);
-  decrementLoanCount(`lender-${oldLender.id}`, bid.id, bid.status);
+  decrementLoanStatusCount(`lender-${oldLender.id}`, bid.id, bid.status);
 
   bid.lender = newLender.id;
   bid.lenderAddress = newLender.lenderAddress;
@@ -443,5 +497,5 @@ export function replaceLender(bid: Bid, newLender: Lender): void {
     newLender
   );
   addBidToTokenVolume(newLenderVolume, bid);
-  incrementLoanCount(`lender-${newLender.id}`, bid.id, bid.status);
+  incrementLoanStatusCount(`lender-${newLender.id}`, bid.id, bid.status);
 }

@@ -3,6 +3,8 @@
 # First parameter defines the name of the network to use
 network=$1
 
+template_file="./src/subgraph.handlebars"
+
 # Ensure a network name was given
 if [ -z "$network" ]; then
   read -r -p 'Network name: ' network
@@ -29,7 +31,7 @@ if [ -n "${network_map[$network]}" ]; then
 fi
 
 # Ensure the network config file is defined
-network_config="config/$graph_network.json"
+network_config="./config/$graph_network.json"
 if ! test -f "$network_config"; then
   echo
   echo "No network config file defined: $network_config"
@@ -40,7 +42,7 @@ fi
 # Export the deployed contracts config to the subgraph directory
 yarn workspace @teller-protocol/v2-contracts export --network "$network" &&
   # Generate the subgraph definition
-  yarn mustache "$network_config" src/subgraph.template.yaml > subgraph.yaml &&
+  yarn hbs -D "$network_config" "$template_file" -o . -e yaml &&
   # Generate AssemblyScript types for the subgraph
   yarn graph codegen &&
   # Build the subgraph

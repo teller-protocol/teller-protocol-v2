@@ -3,16 +3,16 @@ import { BigInt } from "@graphprotocol/graph-ts";
 import { Bid } from "../../generated/schema";
 
 export enum BidStatus {
-  None = 1,
-  Submitted = 2,
-  Expired = 4,
-  Cancelled = 8,
-  Accepted = 16,
-  DueSoon = 32,
-  Late = 64,
-  Defaulted = 128,
-  Repaid = 256,
-  Liquidated = 512
+  None,
+  Submitted,
+  Expired,
+  Cancelled,
+  Accepted,
+  DueSoon,
+  Late,
+  Defaulted,
+  Repaid,
+  Liquidated
 }
 
 export function bidStatusToEnum(status: string): BidStatus {
@@ -63,43 +63,29 @@ function bidStatusToString(status: BidStatus): string {
   }
 }
 
-function hasAllowedStatus(status: string, bitOredAllowedStatus: i32): boolean {
-  const bidStatus = BigInt.fromI32(bidStatusToEnum(status));
-  const allowedStatus = BigInt.fromI32(bitOredAllowedStatus);
-  return bidStatus.bitAnd(allowedStatus) == bidStatus;
-}
-
 export function isBidExpired(bid: Bid, timestamp: BigInt): boolean {
-  return bidStatusToEnum(bid.status) == BidStatus.Submitted
-    ? bid.expiresAt < timestamp
-    : false;
+  return bid.expiresAt < timestamp;
 }
 
 export function isBidDueSoon(bid: Bid, timestamp: BigInt): boolean {
-  const allowedStatus = BidStatus.Accepted;
   const dueDate = bid.nextDueDate;
-  if (hasAllowedStatus(bid.status, allowedStatus) || !dueDate) return false;
+  if (!dueDate) return false;
 
-  const dueSoonTimestamp = dueDate.plus(BigInt.fromI32(60 * 60 * 24 * 7));
+  const dueSoonTimestamp = dueDate.minus(BigInt.fromI32(60 * 60 * 24 * 7));
   return dueSoonTimestamp < timestamp;
 }
 
 export function isBidLate(bid: Bid, timestamp: BigInt): boolean {
-  const allowedStatus = BidStatus.Accepted | BidStatus.DueSoon;
   const dueDate = bid.nextDueDate;
-  if (hasAllowedStatus(bid.status, allowedStatus) || !dueDate) return false;
+  if (!dueDate) return false;
 
-  return bidStatusToEnum(bid.status) == BidStatus.Accepted
-    ? dueDate < timestamp
-    : false;
+  return dueDate < timestamp;
 }
 
 export function isBidDefaulted(bid: Bid, timestamp: BigInt): boolean {
-  const allowedStatus = BidStatus.Accepted | BidStatus.DueSoon | BidStatus.Late;
-  if (hasAllowedStatus(bid.status, allowedStatus)) return false;
-
-  const defaultTimestamp = bid.lastRepaidTimestamp.plus(
-    bid.paymentDefaultDuration
-  );
-  return defaultTimestamp < timestamp;
+  const lastPaidTimestamp =
+    bid.lastRepaidTimestamp == BigInt.zero()
+      ? bid.acceptedTimestamp
+      : bid.lastRepaidTimestamp;
+  return timestamp.minus(lastPaidTimestamp) > bid.paymentDefaultDuration;
 }

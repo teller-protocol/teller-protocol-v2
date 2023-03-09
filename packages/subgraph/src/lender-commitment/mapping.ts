@@ -100,7 +100,7 @@ export function handleExercisedCommitment(event: ExercisedCommitment): void {
 
   const stats = TokenVolume.load(commitment.stats);
   if (stats) {
-    // incrementLoanCounts(stats.loans, bid.id, bid.status);
+    // incrementLoanStatusCounts(stats.loans, bid.id, bid.status);
     // addBidToTokenVolume(stats, bid);
   }
 }

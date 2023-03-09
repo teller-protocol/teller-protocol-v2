@@ -30,7 +30,7 @@ import {
   PaymentEventType,
   replaceLender,
   updateBidOnPayment,
-  updateLoanCountsFromBid
+  updateBidStatus
 } from "./helpers/updaters";
 
 export function handleSubmittedBid(event: SubmittedBid): void {
@@ -53,7 +53,6 @@ export function handleSubmittedBid(event: SubmittedBid): void {
   bid.updatedAt = event.block.timestamp;
   bid.transactionHash = event.transaction.hash.toHex();
   bid.borrowerAddress = event.params.borrower;
-  bid.status = "Submitted";
 
   if (tellerV2Instance.try_getMetadataURI(event.params.bidId).reverted) {
     bid.metadataURI = event.params.metadataURI.toHexString();
@@ -99,10 +98,10 @@ export function handleSubmittedBid(event: SubmittedBid): void {
     bid.paymentDefaultDuration = BigInt.zero();
   }
 
+  updateBidStatus(bid, "Submitted");
+
   bid.save();
   market.save();
-
-  updateLoanCountsFromBid(bid.id, "");
 }
 
 export function handleSubmittedBids(events: SubmittedBid[]): void {
@@ -132,14 +131,13 @@ export function handleAcceptedBid(event: AcceptedBid): void {
 
   bid.updatedAt = event.block.timestamp;
   bid.transactionHash = event.transaction.hash.toHex();
-  bid.status = "Accepted";
   bid.acceptedTimestamp = event.block.timestamp;
   bid.endDate = bid.acceptedTimestamp.plus(bid.loanDuration);
   bid.nextDueDate = tellerV2Instance.calculateNextDueDate(event.params.bidId);
   bid.lenderAddress = event.params.lender;
   bid.save();
 
-  updateLoanCountsFromBid(bid.id, "Submitted");
+  updateBidStatus(bid, "Accepted");
 
   const tokenVolumes = getTokenVolumesForBid(bid.id);
   for (let i = 0; i < tokenVolumes.length; i++) {
@@ -159,11 +157,7 @@ export function handleCancelledBid(event: CancelledBid): void {
   bid.updatedAt = event.block.timestamp;
   bid.transactionHash = event.transaction.hash.toHex();
 
-  const prevStatus = bid.status;
-  bid.status = "Cancelled";
-  bid.save();
-
-  updateLoanCountsFromBid(bid.id, prevStatus);
+  updateBidStatus(bid, "Cancelled");
 }
 
 export function handleCancelledBids(events: CancelledBid[]): void {

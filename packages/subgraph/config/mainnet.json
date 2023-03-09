@@ -1,13 +1,32 @@
 {
   "network": "mainnet",
-  "address_teller_v2": "0x00182FdB0B880eE24D428e3Cc39383717677C37e",
-  "block_teller_v2": "15094705",
-  "address_market_registry": "0x5e30357d5136Bc4BfaDBA1ab341D0da09Fe7a9F1",
-  "block_market_registry": "15094705",
-  "address_lender_commitment": "0x17A8e82351661DFD568FEE6D7c38695b67e1e924",
-  "block_lender_commitment": "15222115",
-  "address_collateral_manager": "0x2551A099129ad9b0b1FEc16f34D9CB73c237be8b",
-  "block_collateral_manager": "16472617",
-  "address_lender_manager": "0xDBb554e621e1cC52D9aD63b6E47FC98568264115",
-  "block_lender_manager": "16722875"
+  "grafting": {
+    "enabled": false,
+    "base": "",
+    "block": ""
+  },
+  "block_handler": {
+    "enabled": false,
+    "block": "0"
+  },
+  "teller_v2": {
+    "address_": "0x00182FdB0B880eE24D428e3Cc39383717677C37e",
+    "block": "15094705"
+  },
+  "market_registry": {
+    "address_": "0x5e30357d5136Bc4BfaDBA1ab341D0da09Fe7a9F1",
+    "block": "15094705"
+  },
+  "lender_commitment": {
+    "address_": "0x17A8e82351661DFD568FEE6D7c38695b67e1e924",
+    "block": "15222115"
+  },
+  "collateral_manager": {
+    "address_": "0x2551A099129ad9b0b1FEc16f34D9CB73c237be8b",
+    "block": "16472617"
+  },
+  "lender_manager": {
+    "address_": "0xDBb554e621e1cC52D9aD63b6E47FC98568264115",
+    "block": "16722875"
+  }
 }

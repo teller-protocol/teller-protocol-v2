@@ -71,15 +71,11 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
          ) {}
 
     function setUp() public {
-       // tellerV2Mock = new TellerV2Mock();
+       
         mockMarketRegistry = new MarketRegistryMock(address(marketOwner));
         mockCollateralManager = new CollateralManagerMock();
 
-       /**  marketLiquidityRewards = new MarketLiquidityRewards(
-            address(tellerV2Mock), 
-            address(mockMarketRegistry),
-            address(mockCollateralManager)
-        );*/
+     
 
         marketOwner = new MarketLiquidityUser(address(tellerV2), (this));
         borrower = new MarketLiquidityUser(address(tellerV2), (this));
@@ -472,5 +468,29 @@ contract TellerV2Mock is TellerV2Context {
         returns (bytes calldata)
     {
         return _msgDataForMarket(_marketId);
+    }
+
+
+    function getLoanSummary(uint256 _bidId) external view returns (
+        address borrower,
+        address lender,
+        uint256 marketId,
+        address principalTokenAddress,
+        uint256 principalAmount,
+        uint32 acceptedTimestamp ,
+        BidState bidState  
+        
+    ){
+
+        Bid storage bid = bids[_bidId];
+
+        borrower = address(0);
+        lender = address(0);
+        marketId = 0;
+        principalTokenAddress = address(0);
+        principalAmount = 0;
+        acceptedTimestamp = 0;
+        bidState = BidState.ACCEPTED; 
+
     }
 }

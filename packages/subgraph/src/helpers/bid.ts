@@ -71,7 +71,8 @@ export function isBidDueSoon(bid: Bid, timestamp: BigInt): boolean {
   const dueDate = bid.nextDueDate;
   if (!dueDate) return false;
 
-  const dueSoonTimestamp = dueDate.minus(BigInt.fromI32(60 * 60 * 24 * 7));
+  const dueSoonDuration = bid.paymentCycle.div(BigInt.fromI32(4));
+  const dueSoonTimestamp = dueDate.minus(dueSoonDuration);
   return dueSoonTimestamp < timestamp;
 }
 

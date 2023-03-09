@@ -303,6 +303,30 @@ function test_claimRewards() public {
             "verifyLoanStartTime was not called"
         );
 
+       assertEq(
+            verifyPrincipalTokenAddressWasCalled,
+            true,
+            " verifyPrincipalTokenAddress was not called"
+        );
+
+        assertEq(
+            verifyCollateralTokenAddressWasCalled,
+            true,
+            "verifyCollateralTokenAddress was not called"
+        );
+
+        assertEq(
+            verifyRewardRecipientWasCalled,
+            true,
+            "verifyRewardRecipient was not called"
+        );
+
+
+        assertEq(
+            verifyCollateralAmountWasCalled,
+            true,
+            "verifyCollateralAmount was not called"
+        );
 
         //add more assertions here 
 
@@ -386,8 +410,7 @@ function test_claimRewards() public {
             1e6,
             "Invalid min collateral calculation"
         );
-
-    
+ 
      
     
   } 

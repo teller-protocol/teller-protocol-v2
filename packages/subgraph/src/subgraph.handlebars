@@ -11,6 +11,7 @@ graft:
 {{/if}}
 {{/with}}
 dataSources:
+{{#if grafting.enabled}}
 {{#if block_handler.enabled}}
   - kind: ethereum/contract
     name: Blocks
@@ -41,6 +42,7 @@ dataSources:
       blockHandlers:
         - handler: handleBlock
       file: ./src/block-handler.ts
+{{/if}}
 {{/if}}
   - kind: ethereum/contract
     name: TellerV2

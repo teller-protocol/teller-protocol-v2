@@ -238,11 +238,56 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
 
 */
 
+function test_deallocateRewards() public {
+
+        uint256 allocationId = 0;
+        
+
+        _setAllocation(allocationId);
+
+        uint256 amountBefore = allocatedRewards[allocationId].rewardTokenAmount;
+
+       
+        lender._deallocateRewards(
+            allocationId,
+            amountBefore
+        );
+
+      uint256 amountAfter = allocatedRewards[allocationId].rewardTokenAmount;
+
+        assertEq(
+            amountAfter,
+            0,
+            "Allocation was not deleted"
+        );
+
+}
+
 /*
-
     claim rewards 
-
 */
+
+function test_claimRewards() public {
+
+
+       uint256 allocationId = 0;
+       uint256 bidId = 0;
+        
+
+        _setAllocation(allocationId);
+ 
+      /*  lender._approveERC20Token(
+            address(rewardToken),
+            address(this),
+            amountToIncrease
+        );*/
+
+        borrower._claimRewards(
+            allocationId,
+            bidId
+        );
+
+}
 
  function test_calculateRewardAmount_weth_principal() public {
 
@@ -319,353 +364,7 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
     
      
     
-  }
-
-/*
-    function _createCommitment(
-        CommitmentCollateralType _collateralType,
-        uint256 _maxPrincipalPerCollateral
-    ) internal returns (Commitment storage commitment_) {
-        commitment_ = commitments[0];
-        commitment_.marketId = marketId;
-        commitment_.principalTokenAddress = address(principalToken);
-        commitment_.maxPrincipal = maxAmount;
-        commitment_.maxDuration = maxLoanDuration;
-        commitment_.minInterestRate = minInterestRate;
-        commitment_.expiration = expiration;
-        commitment_.lender = address(lender);
-
-        commitment_.collateralTokenType = _collateralType;
-        commitment_.maxPrincipalPerCollateralAmount =
-            _maxPrincipalPerCollateral *
-            10**principalTokenDecimals;
-
-        if (_collateralType == CommitmentCollateralType.ERC20) {
-            commitment_.collateralTokenAddress = address(collateralToken);
-        } else if (_collateralType == CommitmentCollateralType.ERC721) {
-            commitment_.collateralTokenAddress = address(
-                0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174
-            );
-        } else if (_collateralType == CommitmentCollateralType.ERC1155) {
-            commitment_.collateralTokenAddress = address(
-                0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174
-            );
-        }
-    }
-
-    function test_createCommitment() public {
-        uint256 commitmentId = 0;
-
-        Commitment storage existingCommitment = _createCommitment(
-            CommitmentCollateralType.ERC20,
-            1000e6 * 1e18
-        );
-
-        lender._createCommitment(existingCommitment, emptyArray);
-    }
-
-    function test_updateCommitment() public {
-        uint256 commitmentId = 0;
-
-        Commitment storage existingCommitment = _createCommitment(
-            CommitmentCollateralType.ERC20,
-            1000e6
-        );
-
-        assertEq(
-            address(lender),
-            existingCommitment.lender,
-            "Not the owner of created commitment"
-        );
-
-        lender._updateCommitment(commitmentId, existingCommitment);
-    }
-
-    function test_deleteCommitment() public {
-        uint256 commitmentId = 0;
-        Commitment storage commitment = _createCommitment(
-            CommitmentCollateralType.ERC20,
-            1000e6
-        );
-
-        assertEq(
-            commitment.lender,
-            address(lender),
-            "Not the owner of created commitment"
-        );
-
-        lender._deleteCommitment(commitmentId);
-
-        assertEq(
-            commitment.lender,
-            address(0),
-            "The commitment was not deleted"
-        );
-    }
-
-    function test_acceptCommitment() public {
-        uint256 commitmentId = 0;
-
-        Commitment storage commitment = _createCommitment(
-            CommitmentCollateralType.ERC20,
-            maxAmount
-        );
-
-        assertEq(
-            acceptBidWasCalled,
-            false,
-            "Expect accept bid not called before exercise"
-        );
-
-        uint256 bidId = borrower._acceptCommitment(
-            commitmentId,
-            maxAmount - 100, //principal
-            maxAmount, //collateralAmount
-            0, //collateralTokenId
-            address(collateralToken),
-            minInterestRate,
-            maxLoanDuration
-        );
-
-        assertEq(
-            acceptBidWasCalled,
-            true,
-            "Expect accept bid called after exercise"
-        );
-
-        assertEq(
-            commitment.maxPrincipal == 100,
-            true,
-            "Commitment max principal was not decremented"
-        );
-
-        bidId = borrower._acceptCommitment(
-            commitmentId,
-            100, //principalAmount
-            100, //collateralAmount
-            0, //collateralTokenId
-            address(collateralToken),
-            minInterestRate,
-            maxLoanDuration
-        );
-
-        assertEq(commitment.maxPrincipal == 0, true, "commitment not accepted");
-
-        bool acceptCommitTwiceFails;
-
-        try
-            borrower._acceptCommitment(
-                commitmentId,
-                100, //principalAmount
-                100, //collateralAmount
-                0, //collateralTokenId
-                address(collateralToken),
-                minInterestRate,
-                maxLoanDuration
-            )
-        {} catch {
-            acceptCommitTwiceFails = true;
-        }
-
-        assertEq(
-            acceptCommitTwiceFails,
-            true,
-            "Should fail when accepting commit twice"
-        );
-    }
-
-    function test_acceptCommitmentWithBorrowersArray_valid() public {
-        uint256 commitmentId = 0;
-
-        Commitment storage commitment = _createCommitment(
-            CommitmentCollateralType.ERC20,
-            maxAmount
-        );
-
-        lender._updateCommitmentBorrowers(commitmentId, borrowersArray);
-
-        uint256 bidId = borrower._acceptCommitment(
-            commitmentId,
-            0, //principal
-            maxAmount, //collateralAmount
-            0, //collateralTokenId
-            address(collateralToken),
-            minInterestRate,
-            maxLoanDuration
-        );
-
-        assertEq(
-            acceptBidWasCalled,
-            true,
-            "Expect accept bid called after exercise"
-        );
-    }
-
-    function test_acceptCommitmentWithBorrowersArray_invalid() public {
-        uint256 commitmentId = 0;
-
-        Commitment storage commitment = _createCommitment(
-            CommitmentCollateralType.ERC20,
-            maxAmount
-        );
-
-        lender._updateCommitmentBorrowers(commitmentId, borrowersArray);
-
-        bool acceptCommitAsMarketOwnerFails;
-
-        try
-            marketOwner._acceptCommitment(
-                commitmentId,
-                100, //principal
-                maxAmount, //collateralAmount
-                0, //collateralTokenId
-                address(collateralToken),
-                minInterestRate,
-                maxLoanDuration
-            )
-        {} catch {
-            acceptCommitAsMarketOwnerFails = true;
-        }
-
-        assertEq(
-            acceptCommitAsMarketOwnerFails,
-            true,
-            "Should fail when accepting as invalid borrower"
-        );
-
-        lender._updateCommitmentBorrowers(commitmentId, emptyArray);
-
-        acceptBidWasCalled = false;
-
-        marketOwner._acceptCommitment(
-            commitmentId,
-            0, //principal
-            maxAmount, //collateralAmount
-            0, //collateralTokenId
-            address(collateralToken),
-            minInterestRate,
-            maxLoanDuration
-        );
-
-        assertEq(
-            acceptBidWasCalled,
-            true,
-            "Expect accept bid called after exercise"
-        );
-    }
-
-    function test_acceptCommitmentWithBorrowersArray_reset() public {
-        uint256 commitmentId = 0;
-
-        Commitment storage commitment = _createCommitment(
-            CommitmentCollateralType.ERC20,
-            maxAmount
-        );
-
-        lender._updateCommitmentBorrowers(commitmentId, borrowersArray);
-
-        lender._updateCommitmentBorrowers(commitmentId, emptyArray);
-
-        marketOwner._acceptCommitment(
-            commitmentId,
-            0, //principal
-            maxAmount, //collateralAmount
-            0, //collateralTokenId
-            address(collateralToken),
-            minInterestRate,
-            maxLoanDuration
-        );
-
-        assertEq(
-            acceptBidWasCalled,
-            true,
-            "Expect accept bid called after exercise"
-        );
-    }
-
-    function test_acceptCommitmentFailsWithInsufficientCollateral() public {
-        uint256 commitmentId = 0;
-
-        Commitment storage commitment = _createCommitment(
-            CommitmentCollateralType.ERC20,
-            1000e6
-        );
-
-        bool failedToAcceptCommitment;
-
-        try
-            marketOwner._acceptCommitment(
-                commitmentId,
-                100, //principal
-                0, //collateralAmount
-                0, //collateralTokenId
-                address(collateralToken),
-                minInterestRate,
-                maxLoanDuration
-            )
-        {} catch {
-            failedToAcceptCommitment = true;
-        }
-
-        assertEq(
-            failedToAcceptCommitment,
-            true,
-            "Should fail to accept commitment with insufficient collateral"
-        );
-    }
-
-    function test_acceptCommitmentFailsWithInvalidAmount() public {
-        uint256 commitmentId = 0;
-
-        Commitment storage commitment = _createCommitment(
-            CommitmentCollateralType.ERC721,
-            1000e6
-        );
-
-        bool failedToAcceptCommitment;
-
-        try
-            marketOwner._acceptCommitment(
-                commitmentId,
-                100, //principal
-                2, //collateralAmount
-                22, //collateralTokenId
-                address(collateralToken),
-                minInterestRate,
-                maxLoanDuration
-            )
-        {} catch {
-            failedToAcceptCommitment = true;
-        }
-
-        assertEq(
-            failedToAcceptCommitment,
-            true,
-            "Should fail to accept commitment with invalid amount for ERC721"
-        );
-    }
-
-    function decrementCommitment_before() public {}
-
-    function test_decrementCommitment() public {
-        uint256 commitmentId = 0;
-        uint256 _decrementAmount = 22;
-
-        Commitment storage commitment = _createCommitment(
-            CommitmentCollateralType.ERC20,
-            1000e6
-        );
-
-        _decrementCommitment(commitmentId, _decrementAmount);
-
-        assertEq(
-            commitment.maxPrincipal == maxAmount - _decrementAmount,
-            true,
-            "Commitment max principal was not decremented"
-        );
-    }
-
-   */
+  } 
  
  function allocateRewards(
         MarketLiquidityRewards.RewardAllocation calldata _allocation        
@@ -717,6 +416,14 @@ contract MarketLiquidityUser is User {
     ) public {
         liquidityRewards.increaseAllocationAmount(
             _allocationId, _allocationAmount);
+    }
+
+   function _deallocateRewards(
+        uint256 _allocationId,
+        uint256 _amount
+    ) public {
+        liquidityRewards.deallocateRewards(
+            _allocationId, _amount);
     }
  
 

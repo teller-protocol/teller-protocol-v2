@@ -204,8 +204,9 @@ Initializable
 
     
     /**
-        @notice 
-        
+      * @notice Allows a borrower or lender to withdraw the allocated ERC20 reward for their loan
+      * @param _allocationId - The id for the reward allocation 
+      * @param _bidId - The id for the loan.  Each loan only grants one reward per allocation.
      */
     function claimRewards(
         uint256 _allocationId,
@@ -229,11 +230,7 @@ Initializable
         ) = ITellerV2(tellerV2).getLoanSummary(_bidId);
 
         address collateralTokenAddress = allocatedReward.requiredCollateralTokenAddress;
-
-
-        //make sure the loan follows the rules related to the allocation 
  
-
         //require that the loan was started in the correct timeframe 
         _verifyLoanStartTime(timestamp, allocatedReward.bidStartTimeMin, allocatedReward.bidStartTimeMax);
 

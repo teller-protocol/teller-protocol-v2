@@ -327,13 +327,10 @@ function test_claimRewards() public {
             true,
             "verifyCollateralAmount was not called"
         );
-
-        //add more assertions here 
-
+ 
 
 
-        //add some negative tests , override some of the verifies  and unit test them 
-
+        //add some negative tests  (unit)
         //add comments to all of the methods
         
 

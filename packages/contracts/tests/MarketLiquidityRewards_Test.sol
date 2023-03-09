@@ -23,7 +23,7 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
     TellerV2Mock private tellerV2Mock;
     MarketRegistryMock mockMarketRegistry;
     CollateralManagerMock mockCollateralManager;
-    MarketLiquidityRewards marketLiquidityRewards;
+  //  MarketLiquidityRewards marketLiquidityRewards;
 
     MarketLiquidityUser private marketOwner;
     MarketLiquidityUser private lender;
@@ -65,26 +65,26 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
 
     constructor(  )
           MarketLiquidityRewards(
-        address(0),
+        address(new TellerV2Mock()),
          address(0),
          address(0)
          ) {}
 
     function setUp() public {
-        tellerV2Mock = new TellerV2Mock();
+       // tellerV2Mock = new TellerV2Mock();
         mockMarketRegistry = new MarketRegistryMock(address(marketOwner));
         mockCollateralManager = new CollateralManagerMock();
 
-        marketLiquidityRewards = new MarketLiquidityRewards(
+       /**  marketLiquidityRewards = new MarketLiquidityRewards(
             address(tellerV2Mock), 
             address(mockMarketRegistry),
             address(mockCollateralManager)
-        );
+        );*/
 
-        marketOwner = new MarketLiquidityUser(address(tellerV2Mock), (this));
-        borrower = new MarketLiquidityUser(address(tellerV2Mock), (this));
-        lender = new MarketLiquidityUser(address(tellerV2Mock), (this));
-        tellerV2Mock.__setMarketOwner(marketOwner);
+        marketOwner = new MarketLiquidityUser(address(tellerV2), (this));
+        borrower = new MarketLiquidityUser(address(tellerV2), (this));
+        lender = new MarketLiquidityUser(address(tellerV2), (this));
+        TellerV2Mock(tellerV2).__setMarketOwner(marketOwner);
 
         mockMarketRegistry.setMarketOwner(address(marketOwner));
 

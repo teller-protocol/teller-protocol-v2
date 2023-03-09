@@ -24,7 +24,7 @@ export function bidStatusToEnum(status: string): BidStatus {
     return BidStatus.Cancelled;
   } else if (status == "Accepted") {
     return BidStatus.Accepted;
-  } else if (status == "DueSoon") {
+  } else if (status == "Due Soon") {
     return BidStatus.DueSoon;
   } else if (status == "Late") {
     return BidStatus.Late;
@@ -39,7 +39,7 @@ export function bidStatusToEnum(status: string): BidStatus {
   }
 }
 
-function bidStatusToString(status: BidStatus): string {
+export function bidStatusToString(status: BidStatus): string {
   if (status == BidStatus.Submitted) {
     return "Submitted";
   } else if (status == BidStatus.Expired) {

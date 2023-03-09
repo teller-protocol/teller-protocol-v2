@@ -6,6 +6,7 @@ import {
   CollateralWithdrawn
 } from "../../generated/CollateralManager/CollateralManager";
 import { Bid } from "../../generated/schema";
+import { BidStatus } from "../helpers/bid";
 import { loadBidById, loadCollateral } from "../helpers/loaders";
 import { updateBidStatus, updateCollateral } from "../helpers/updaters";
 
@@ -87,7 +88,7 @@ export function handleCollateralWithdrawns(
  */
 export function handleCollateralClaimed(event: CollateralClaimed): void {
   const bid = loadBidById(event.params._bidId);
-  updateBidStatus(bid, "Liquidated");
+  updateBidStatus(bid, BidStatus.Liquidated);
 }
 
 export function handleCollateralClaimeds(events: CollateralClaimed[]): void {

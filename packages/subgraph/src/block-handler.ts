@@ -3,13 +3,14 @@ import { ethereum } from "@graphprotocol/graph-ts";
 import { Bid } from "../generated/schema";
 
 import {
+  BidStatus,
   isBidDefaulted,
   isBidDueSoon,
   isBidExpired,
   isBidLate
 } from "./helpers/bid";
 import { loadLoanStatusCount } from "./helpers/loaders";
-import { updateBidStatus } from "./helpers/updaters";
+import { updateBidStatus, updateLoanStatusCountsFromBid } from "./helpers/updaters";
 
 export function handleBlock(block: ethereum.Block): void {
   checkActiveBids(block);
@@ -27,7 +28,7 @@ export function checkActiveBids(block: ethereum.Block): void {
     const bid = Bid.load(pendingBids[i]);
     if (!bid) continue;
     if (isBidExpired(bid, block.timestamp)) {
-      updateBidStatus(bid, "Expired");
+      updateBidStatus(bid, BidStatus.Expired);
     }
   }
 
@@ -36,7 +37,7 @@ export function checkActiveBids(block: ethereum.Block): void {
     if (!bid) continue;
 
     if (isBidDueSoon(bid, block.timestamp)) {
-      updateBidStatus(bid, "Due Soon");
+      updateBidStatus(bid, BidStatus.DueSoon);
       dueSoonLoans.push(bid.id);
     }
   }
@@ -46,7 +47,7 @@ export function checkActiveBids(block: ethereum.Block): void {
     if (!bid) continue;
 
     if (isBidLate(bid, block.timestamp)) {
-      updateBidStatus(bid, "Late");
+      updateBidStatus(bid, BidStatus.Late);
       lateLoans.push(bid.id);
     }
   }
@@ -56,7 +57,7 @@ export function checkActiveBids(block: ethereum.Block): void {
     if (!bid) continue;
 
     if (isBidDefaulted(bid, block.timestamp)) {
-      updateBidStatus(bid, "Defaulted");
+      updateBidStatus(bid, BidStatus.Defaulted);
     }
   }
 }

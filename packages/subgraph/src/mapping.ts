@@ -14,6 +14,7 @@ import {
   Upgraded
 } from "../generated/TellerV2/TellerV2";
 
+import { BidStatus } from "./helpers/bid";
 import {
   getBid,
   loadBidById,
@@ -98,7 +99,7 @@ export function handleSubmittedBid(event: SubmittedBid): void {
     bid.paymentDefaultDuration = BigInt.zero();
   }
 
-  updateBidStatus(bid, "Submitted");
+  updateBidStatus(bid, BidStatus.Submitted);
 
   bid.save();
   market.save();
@@ -137,7 +138,7 @@ export function handleAcceptedBid(event: AcceptedBid): void {
   bid.lenderAddress = event.params.lender;
   bid.save();
 
-  updateBidStatus(bid, "Accepted");
+  updateBidStatus(bid, BidStatus.Accepted);
 
   const tokenVolumes = getTokenVolumesForBid(bid.id);
   for (let i = 0; i < tokenVolumes.length; i++) {
@@ -157,7 +158,7 @@ export function handleCancelledBid(event: CancelledBid): void {
   bid.updatedAt = event.block.timestamp;
   bid.transactionHash = event.transaction.hash.toHex();
 
-  updateBidStatus(bid, "Cancelled");
+  updateBidStatus(bid, BidStatus.Cancelled);
 }
 
 export function handleCancelledBids(events: CancelledBid[]): void {

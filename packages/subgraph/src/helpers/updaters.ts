@@ -11,7 +11,12 @@ import {
 } from "../../generated/schema";
 import { TellerV2 } from "../../generated/TellerV2/TellerV2";
 
-import { BidStatus, bidStatusToEnum, isBidLate } from "./bid";
+import {
+  BidStatus,
+  bidStatusToEnum,
+  bidStatusToString,
+  isBidLate
+} from "./bid";
 import {
   getBid,
   loadBorrowerByMarketId,
@@ -23,9 +28,9 @@ import {
 } from "./loaders";
 import { addToArray, removeFromArray } from "./utils";
 
-export function updateBidStatus(bid: Bid, status: string): void {
+export function updateBidStatus(bid: Bid, status: BidStatus): void {
   const prevStatus = bid.isSet("status") ? bid.status : "";
-  bid.status = status;
+  bid.status = bidStatusToString(status);
   bid.save();
   updateLoanStatusCountsFromBid(bid.id, prevStatus);
 }
@@ -291,15 +296,15 @@ export function updateBidOnPayment(
   event: ethereum.Event,
   paymentEventType: PaymentEventType
 ): void {
-  if (bid.status != "Liquidated") {
+  if (bidStatusToEnum(bid.status) != BidStatus.Liquidated) {
     if (paymentEventType == PaymentEventType.Repayment) {
-      updateBidStatus(bid, "Accepted");
+      updateBidStatus(bid, BidStatus.Accepted);
     } else if (paymentEventType == PaymentEventType.Repaid) {
-      updateBidStatus(bid, "Repaid");
+      updateBidStatus(bid, BidStatus.Repaid);
     }
   }
   if (paymentEventType == PaymentEventType.Liquidated) {
-    updateBidStatus(bid, "Liquidated");
+    updateBidStatus(bid, BidStatus.Liquidated);
   }
 
   // NOTE: possible to have multiple payments in the same transaction

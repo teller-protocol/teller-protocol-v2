@@ -55,9 +55,9 @@ interface ICollateralManager {
         returns (Collateral[] memory);
 
     function getCollateralAmount(uint256 _bidId, address collateralAssetAddress)
-        external view 
+        external
+        view
         returns (uint256 _amount);
-    
 
     /**
      * @notice Withdraws deposited collateral from the created escrow of a bid.

@@ -26,7 +26,6 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     // bidIds -> validated collateral info
     mapping(uint256 => CollateralInfo) internal _bidCollaterals;
 
-
     /*
         Since collateralInfo is mapped (address assetAddress => Collateral) that means
         that only a single tokenId per nft per loan can be collateralized. 
@@ -224,14 +223,16 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         }
     }
 
-
     function getCollateralAmount(uint256 _bidId, address collateralAssetAddress)
-        public view 
+        public
+        view
         returns (uint256 _amount)
     {
         CollateralInfo storage bidCollateral = _bidCollaterals[_bidId];
-        
-        Collateral storage assetInfo = bidCollateral.collateralInfo[collateralAssetAddress];
+
+        Collateral storage assetInfo = bidCollateral.collateralInfo[
+            collateralAssetAddress
+        ];
 
         return assetInfo._amount;
     }

@@ -188,24 +188,26 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
         token_ = address(bids[_bidId].loanDetails.lendingToken);
     }
 
+    function getLoanSummary(uint256 _bidId)
+        external
+        view
+        returns (
+            address borrower,
+            address lender,
+            uint256 marketId,
+            address principalTokenAddress,
+            uint256 principalAmount,
+            uint32 acceptedTimestamp,
+            BidState bidState
+        )
+    {
+        Bid storage bid = bids[_bidId];
 
-   function getLoanSummary(uint256 _bidId) external view returns (
-        address borrower,
-        address lender,
-        uint256 marketId,
-        address principalTokenAddress,
-        uint256 principalAmount,
-        uint32 acceptedTimestamp ,
-        BidState bidState  
-        
-    ){
-      Bid storage bid = bids[_bidId];
-
-        borrower=  bid.borrower;
-        lender =    bid.lender;
-        marketId =   bid.marketplaceId;
-        principalTokenAddress =    address(bid.loanDetails.lendingToken);
-        principalAmount =   bid.loanDetails.principal;
+        borrower = bid.borrower;
+        lender = bid.lender;
+        marketId = bid.marketplaceId;
+        principalTokenAddress = address(bid.loanDetails.lendingToken);
+        principalAmount = bid.loanDetails.principal;
         acceptedTimestamp = bid.loanDetails.acceptedTimestamp;
         bidState = bid.state;
     }

@@ -262,12 +262,12 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
             );
         }
 
-        _verifyPrincipalTokenAddress(
+        _verifyExpectedTokenAddress(
             principalTokenAddress,
             allocatedReward.requiredPrincipalTokenAddress
         );
 
-        _verifyCollateralTokenAddress(
+        _verifyExpectedTokenAddress(
             collateralTokenAddress,
             allocatedReward.requiredCollateralTokenAddress
         );
@@ -455,10 +455,10 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
 
    /**
      * @notice Verifies that the loan principal token address is per the requirements of the allocation
-     * @param _loanTokenAddress - The contract address of the principal token
+     * @param _loanTokenAddress - The contract address of the token
      * @param _expectedTokenAddress - The expected contract address per the allocation
      */
-    function _verifyPrincipalTokenAddress(
+    function _verifyExpectedTokenAddress(
         address _loanTokenAddress,
         address _expectedTokenAddress
     ) internal virtual {
@@ -469,19 +469,5 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
         );
     }
 
-   /**
-     * @notice Verifies that the loan collateral token address is per the requirements of the allocation
-     * @param _loanTokenAddress - The contract address of the collateral token
-     * @param _expectedTokenAddress - The expected contract address per the allocation
-     */
-    function _verifyCollateralTokenAddress(
-        address _loanTokenAddress,
-        address _expectedTokenAddress
-    ) internal virtual {
-        require(
-            _expectedTokenAddress == address(0) ||
-                _loanTokenAddress == _expectedTokenAddress,
-            "Invalid collateral token address."
-        );
-    }
+ 
 }

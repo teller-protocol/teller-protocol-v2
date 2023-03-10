@@ -47,8 +47,7 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
     uint8 constant collateralTokenDecimals = 6;
 
     bool verifyLoanStartTimeWasCalled;
-    bool verifyPrincipalTokenAddressWasCalled;
-    bool verifyCollateralTokenAddressWasCalled;
+    bool verifyExpectedTokenAddressWasCalled; 
 
     bool verifyRewardRecipientWasCalled;
     bool verifyCollateralAmountWasCalled;
@@ -112,8 +111,7 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
         //delete allocationCount;
 
         verifyLoanStartTimeWasCalled = false;
-        verifyPrincipalTokenAddressWasCalled = false;
-        verifyCollateralTokenAddressWasCalled = false;
+        verifyExpectedTokenAddressWasCalled = false; 
 
         verifyRewardRecipientWasCalled = false;
         verifyCollateralAmountWasCalled = false;
@@ -249,16 +247,11 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
         );
 
         assertEq(
-            verifyPrincipalTokenAddressWasCalled,
+            verifyExpectedTokenAddressWasCalled,
             true,
-            " verifyPrincipalTokenAddress was not called"
+            " verifyExpectedTokenAddress was not called"
         );
-
-        assertEq(
-            verifyCollateralTokenAddressWasCalled,
-            true,
-            "verifyCollateralTokenAddress was not called"
-        );
+ 
 
         assertEq(
             verifyRewardRecipientWasCalled,
@@ -324,6 +317,33 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
         assertEq(minCollateral, 1e6, "Invalid min collateral calculation");
     }
 
+
+
+    function test_verifyAndReturnRewardRecipient() public {
+
+    }
+
+    function test_decrementAllocatedAmount() public {
+        
+    }
+
+    function test_calculateRewardAmount() public {
+        
+    }
+
+    function test_verifyCollateralAmount() public {
+        
+    }
+
+    function test_verifyLoanStartTime() public {
+        
+    }
+
+    function test_verifyExpectedTokenAddress() public {
+        
+    }
+
+
     function allocateRewards(
         MarketLiquidityRewards.RewardAllocation calldata _allocation
     ) public override returns (uint256 allocationId_) {
@@ -372,19 +392,14 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
         verifyLoanStartTimeWasCalled = true;
     }
 
-    function _verifyPrincipalTokenAddress(
+    function _verifyExpectedTokenAddress(
         address loanTokenAddress,
         address expectedTokenAddress
     ) internal override {
-        verifyPrincipalTokenAddressWasCalled = true;
+        verifyExpectedTokenAddressWasCalled = true;
     }
 
-    function _verifyCollateralTokenAddress(
-        address loanTokenAddress,
-        address expectedTokenAddress
-    ) internal override {
-        verifyCollateralTokenAddressWasCalled = true;
-    }
+ 
 }
 
 contract MarketLiquidityUser is User {

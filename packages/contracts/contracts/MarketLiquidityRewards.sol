@@ -463,8 +463,8 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
         address _expectedTokenAddress
     ) internal virtual {
         require(
-            expectedTokenAddress == address(0) ||
-                loanTokenAddress == expectedTokenAddress,
+            _expectedTokenAddress == address(0) ||
+                _loanTokenAddress == _expectedTokenAddress,
             "Invalid principal token address."
         );
     }
@@ -479,8 +479,8 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
         address _expectedTokenAddress
     ) internal virtual {
         require(
-            expectedTokenAddress == address(0) ||
-                loanTokenAddress == expectedTokenAddress,
+            _expectedTokenAddress == address(0) ||
+                _loanTokenAddress == _expectedTokenAddress,
             "Invalid collateral token address."
         );
     }

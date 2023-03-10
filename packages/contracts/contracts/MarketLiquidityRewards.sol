@@ -404,6 +404,7 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
             _minimumCollateralPerPrincipalAmount
         );
 
+       
         require(
             _collateralAmount >= minCollateral,
             "Loan does not meet minimum collateralization ratio."
@@ -423,7 +424,7 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
         uint256 _principalTokenDecimals,
         uint256 _collateralTokenDecimals,
         uint256 _minimumCollateralPerPrincipalAmount
-    ) internal view returns (uint256) {
+    ) internal virtual view returns (uint256) {
         return
             MathUpgradeable.mulDiv(
                 _principalAmount,

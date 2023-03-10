@@ -164,11 +164,7 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
 
         uint256 allocationId = lender._allocateRewards(_allocation);
 
-        /*  assertEq(
-            allocationId,
-            address(lender),
-            "Allocate r"
-        );*/
+     
     }
 
     function test_increaseAllocationAmount() public {
@@ -196,12 +192,7 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
         );
     }
 
-    /*
-
-    deallocate
-
-*/
-
+   
     function test_deallocateRewards() public {
         uint256 allocationId = 0;
 
@@ -215,10 +206,7 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
 
         assertEq(amountAfter, 0, "Allocation was not deleted");
     }
-
-    /*
-    claim rewards 
-*/
+ 
 
     function test_claimRewards() public {
         Bid memory mockBid;
@@ -307,7 +295,7 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
 
         uint256 minimumCollateralPerPrincipal = 1e4 * 1e6; // expanded by token decimals so really 0.01
 
-        uint256 minCollateral = _requiredCollateralAmount(
+        uint256 minCollateral = super._requiredCollateralAmount(
             loanPrincipal,
             principalTokenDecimals,
             collateralTokenDecimals,
@@ -318,10 +306,6 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
     }
 
 
-
-    function test_verifyAndReturnRewardRecipient() public {
-        
-    }
 
     function test_decrementAllocatedAmount() public {
         uint256 allocationId = 0;
@@ -340,11 +324,19 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
     }
  
 
-    function test_verifyCollateralAmount() public {
+   /* function test_verifyCollateralAmount() public {
         
+        vm.expectRevert();
+        super._verifyCollateralAmount(
+            address(collateralToken),
+            100,
+            address(principalToken),
+            1000,
+            5000 * 1e18 * 1e18 
+        );
 
 
-    }
+    }*/
 
     function test_verifyLoanStartTime_min() public {
 
@@ -356,6 +348,35 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
             300
          ) ;
        
+    }
+
+
+
+    function test_verifyAndReturnRewardRecipient() public {
+        
+        address recipient = super._verifyAndReturnRewardRecipient(
+            AllocationStrategy.BORROWER,
+            BidState.PAID,
+            address(borrower),
+            address(lender)
+        );
+
+        assertEq(recipient,address(borrower),"incorrect address returned");
+
+    }
+
+    function test_verifyAndReturnRewardRecipient_reverts() public {
+
+        vm.expectRevert();
+
+        address recipient = super._verifyAndReturnRewardRecipient(
+            AllocationStrategy.BORROWER,
+            BidState.PENDING,
+            address(borrower),
+            address(lender)
+        );
+
+         
     }
 
     function test_verifyLoanStartTime_max() public {
@@ -372,10 +393,11 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
 
 
     function test_verifyExpectedTokenAddress() public {
+       
         vm.expectRevert(bytes("Invalid expected token address."));
 
-
         super._verifyExpectedTokenAddress(address(principalToken),address(collateralToken));
+   
     }
 
 
@@ -398,6 +420,9 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
     {
         super.deallocateRewards(_allocationId, _tokenAmount);
     }
+
+ 
+
 
     function _verifyAndReturnRewardRecipient(
         AllocationStrategy strategy,

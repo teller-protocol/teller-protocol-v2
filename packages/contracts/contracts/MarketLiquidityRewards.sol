@@ -432,24 +432,35 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
             );
     }
 
+   /**
+     * @notice Verifies that the loan start time is within the bounds set by the allocation requirements
+     * @param _loanStartTime - The timestamp when the loan was accepted
+     * @param _minStartTime - The minimum time required, after which the loan must have been accepted
+     * @param _maxStartTime - The maximum time required, before which the loan must have been accepted
+     */
     function _verifyLoanStartTime(
-        uint32 loanStartTime,
-        uint32 minStartTime,
-        uint32 maxStartTime
+        uint32 _loanStartTime,
+        uint32 _minStartTime,
+        uint32 _maxStartTime
     ) internal virtual {
         require(
-            minStartTime == 0 || loanStartTime > minStartTime,
+            _minStartTime == 0 || _loanStartTime > _minStartTime,
             "Loan was submitted before the min start time."
         );
         require(
-            maxStartTime == 0 || loanStartTime < maxStartTime,
+            _maxStartTime == 0 || _loanStartTime < _maxStartTime,
             "Loan was submitted after the max start time."
         );
     }
 
+   /**
+     * @notice Verifies that the loan principal token address is per the requirements of the allocation
+     * @param _loanTokenAddress - The contract address of the principal token
+     * @param _expectedTokenAddress - The expected contract address per the allocation
+     */
     function _verifyPrincipalTokenAddress(
-        address loanTokenAddress,
-        address expectedTokenAddress
+        address _loanTokenAddress,
+        address _expectedTokenAddress
     ) internal virtual {
         require(
             expectedTokenAddress == address(0) ||
@@ -458,9 +469,14 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
         );
     }
 
+   /**
+     * @notice Verifies that the loan collateral token address is per the requirements of the allocation
+     * @param _loanTokenAddress - The contract address of the collateral token
+     * @param _expectedTokenAddress - The expected contract address per the allocation
+     */
     function _verifyCollateralTokenAddress(
-        address loanTokenAddress,
-        address expectedTokenAddress
+        address _loanTokenAddress,
+        address _expectedTokenAddress
     ) internal virtual {
         require(
             expectedTokenAddress == address(0) ||

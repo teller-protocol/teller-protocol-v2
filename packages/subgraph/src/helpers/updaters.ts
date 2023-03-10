@@ -98,6 +98,9 @@ export function updateLoanStatusCountsFromBid(
 ): void {
   const bid = Bid.load(bidId);
   if (!bid) throw new Error(`Bid ${bidId} does not exist`);
+
+  if (bid.status == prevStatus) return;
+
   const loanStatusCountIds = getLoanStatusCountIdsForBid(bidId);
   for (let i = 0; i < loanStatusCountIds.length; i++) {
     incrementLoanStatusCount(loanStatusCountIds[i], bid.id, bid.status);

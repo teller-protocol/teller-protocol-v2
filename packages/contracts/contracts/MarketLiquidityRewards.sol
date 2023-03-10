@@ -465,7 +465,7 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
         require(
             _expectedTokenAddress == address(0) ||
                 _loanTokenAddress == _expectedTokenAddress,
-            "Invalid principal token address."
+            "Invalid expected token address."
         );
     }
 

@@ -320,27 +320,62 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
 
 
     function test_verifyAndReturnRewardRecipient() public {
-
+        
     }
 
     function test_decrementAllocatedAmount() public {
-        
-    }
+        uint256 allocationId = 0;
 
-    function test_calculateRewardAmount() public {
-        
+        _setAllocation(allocationId);
+
+        uint256 amount = 100;
+
+
+        allocatedRewards[allocationId].rewardTokenAmount += amount;
+
+
+        super._decrementAllocatedAmount(allocationId,amount);
+
+        assertEq(allocatedRewards[allocationId].rewardTokenAmount, 0, "allocation amount not decremented");
     }
+ 
 
     function test_verifyCollateralAmount() public {
         
+
+
     }
 
-    function test_verifyLoanStartTime() public {
-        
+    function test_verifyLoanStartTime_min() public {
+
+      vm.expectRevert(bytes("Loan was submitted before the min start time."));
+
+       super._verifyLoanStartTime(
+            100,
+            200,
+            300
+         ) ;
+       
     }
+
+    function test_verifyLoanStartTime_max() public {
+
+      vm.expectRevert(bytes("Loan was submitted after the max start time."));
+
+       super._verifyLoanStartTime(
+            400,
+            200,
+            300
+         ) ;
+       
+    }
+
 
     function test_verifyExpectedTokenAddress() public {
-        
+        vm.expectRevert(bytes("Invalid expected token address."));
+
+
+        super._verifyExpectedTokenAddress(address(principalToken),address(collateralToken));
     }
 
 

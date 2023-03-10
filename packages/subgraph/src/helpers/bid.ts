@@ -15,52 +15,24 @@ export enum BidStatus {
   Liquidated
 }
 
+const BidStatusValues = new Array<string>(10);
+BidStatusValues[BidStatus.None] = "";
+BidStatusValues[BidStatus.Submitted] = "Submitted";
+BidStatusValues[BidStatus.Expired] = "Expired";
+BidStatusValues[BidStatus.Cancelled] = "Cancelled";
+BidStatusValues[BidStatus.Accepted] = "Accepted";
+BidStatusValues[BidStatus.DueSoon] = "Due Soon";
+BidStatusValues[BidStatus.Late] = "Late";
+BidStatusValues[BidStatus.Defaulted] = "Defaulted";
+BidStatusValues[BidStatus.Repaid] = "Repaid";
+BidStatusValues[BidStatus.Liquidated] = "Liquidated";
+
 export function bidStatusToEnum(status: string): BidStatus {
-  if (status == "Submitted") {
-    return BidStatus.Submitted;
-  } else if (status == "Expired") {
-    return BidStatus.Expired;
-  } else if (status == "Cancelled") {
-    return BidStatus.Cancelled;
-  } else if (status == "Accepted") {
-    return BidStatus.Accepted;
-  } else if (status == "Due Soon") {
-    return BidStatus.DueSoon;
-  } else if (status == "Late") {
-    return BidStatus.Late;
-  } else if (status == "Defaulted") {
-    return BidStatus.Defaulted;
-  } else if (status == "Repaid") {
-    return BidStatus.Repaid;
-  } else if (status == "Liquidated") {
-    return BidStatus.Liquidated;
-  } else {
-    return BidStatus.None;
-  }
+  return BidStatusValues.indexOf(status);
 }
 
 export function bidStatusToString(status: BidStatus): string {
-  if (status == BidStatus.Submitted) {
-    return "Submitted";
-  } else if (status == BidStatus.Expired) {
-    return "Expired";
-  } else if (status == BidStatus.Cancelled) {
-    return "Cancelled";
-  } else if (status == BidStatus.Accepted) {
-    return "Accepted";
-  } else if (status == BidStatus.DueSoon) {
-    return "Due Soon";
-  } else if (status == BidStatus.Late) {
-    return "Late";
-  } else if (status == BidStatus.Defaulted) {
-    return "Defaulted";
-  } else if (status == BidStatus.Repaid) {
-    return "Repaid";
-  } else if (status == BidStatus.Liquidated) {
-    return "Liquidated";
-  } else {
-    return "None";
-  }
+  return BidStatusValues[status];
 }
 
 export function isBidExpired(bid: Bid, timestamp: BigInt): boolean {

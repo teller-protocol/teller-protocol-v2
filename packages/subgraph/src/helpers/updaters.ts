@@ -28,11 +28,18 @@ import {
 } from "./loaders";
 import { addToArray, removeFromArray } from "./utils";
 
-export function updateBidStatus(bid: Bid, status: BidStatus): void {
+/**
+ * Updates the status of a bid. Returns the previous status.
+ * @param bid {Bid} - The bid to update
+ * @param status {BidStatus} - The new status of the bid
+ * @returns The previous status of the bid
+ */
+export function updateBidStatus(bid: Bid, status: BidStatus): BidStatus {
   const prevStatus = bid.isSet("status") ? bid.status : "";
   bid.status = bidStatusToString(status);
   bid.save();
   updateLoanStatusCountsFromBid(bid.id, prevStatus);
+  return bidStatusToEnum(prevStatus);
 }
 
 export function getLoanStatusCountIdsForBid(bidId: string): string[] {

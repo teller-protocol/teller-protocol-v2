@@ -40,10 +40,21 @@ export function loadToken(address: Address): Token {
   let token = Token.load(address.toHexString());
   if (!token) {
     token = new Token(address.toHex());
+
     const tokenContract = IERC20Metadata.bind(address);
-    token.name = tokenContract.name();
-    token.symbol = tokenContract.symbol();
-    token.decimals = BigInt.fromI32(tokenContract.decimals());
+    const name = tokenContract.try_name();
+    if (!name.reverted) {
+      token.name = tokenContract.name();
+    }
+    const symbol = tokenContract.try_symbol();
+    if (!symbol.reverted) {
+      token.symbol = symbol.value;
+    }
+    const decimals = tokenContract.try_decimals();
+    if (!decimals.reverted) {
+      token.decimals = BigInt.fromI32(decimals.value);
+    }
+
     token.save();
   }
   return token;

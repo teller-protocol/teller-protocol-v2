@@ -223,9 +223,9 @@ type LoanStatusCount implements ILoanStatusCount @entity {
 
 type Token @entity {
   id: ID!
-  name: String!
-  symbol: String!
-  decimals: BigInt!
+  name: String
+  symbol: String
+  decimals: BigInt
 }
 
 type TokenVolume @entity {

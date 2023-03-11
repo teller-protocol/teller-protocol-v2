@@ -10,7 +10,7 @@ import {
   isBidLate
 } from "./helpers/bid";
 import { loadLoanStatusCount } from "./helpers/loaders";
-import { updateBidStatus, updateLoanStatusCountsFromBid } from "./helpers/updaters";
+import { updateBidStatus } from "./helpers/updaters";
 
 export function handleBlock(block: ethereum.Block): void {
   checkActiveBids(block);
@@ -18,7 +18,6 @@ export function handleBlock(block: ethereum.Block): void {
 
 export function checkActiveBids(block: ethereum.Block): void {
   const loans = loadLoanStatusCount("protocol", "v2");
-
   const pendingBids = loans.submitted;
   const lateLoans = loans.late;
   const dueSoonLoans = loans.dueSoon;

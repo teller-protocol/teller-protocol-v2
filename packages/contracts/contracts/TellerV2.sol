@@ -153,6 +153,9 @@ contract TellerV2 is
 
     uint8 public constant CURRENT_CODE_VERSION = 9;
 
+
+    uint32 public constant LIQUIDATION_DELAY = 86400;//ONE DAY IN SECONDS 
+
     /** Constructor **/
 
     constructor(address trustedForwarder) TellerV2Context(trustedForwarder) {}
@@ -671,7 +674,7 @@ contract TellerV2 is
         external
         acceptedLoan(_bidId, "liquidateLoan")
     {
-        require(isLoanDefaulted(_bidId), "Loan must be defaulted.");
+        require(isLoanLiquidateable(_bidId), "Loan must be liquidateable.");
 
         Bid storage bid = bids[_bidId];
 
@@ -928,6 +931,28 @@ contract TellerV2 is
         if (bidDefaultDuration[_bidId] == 0) return false;
 
         return (uint32(block.timestamp) - lastRepaidTimestamp(_bidId) >
+            bidDefaultDuration[_bidId]);
+    }
+
+
+    /**
+     * @notice Checks to see if a loan was delinquent for longer than liquidation delay.
+     * @param _bidId The id of the loan bid to check for.
+     */
+    function isLoanLiquidateable(uint256 _bidId)
+        public
+        view
+        override
+        returns (bool)
+    {
+        Bid storage bid = bids[_bidId];
+
+        // Make sure loan cannot be liquidated if it is not active
+        if (bid.state != BidState.ACCEPTED) return false;
+
+        if (bidDefaultDuration[_bidId] == 0) return false;
+
+        return (uint32(block.timestamp) - LIQUIDATION_DELAY - lastRepaidTimestamp(_bidId)  >
             bidDefaultDuration[_bidId]);
     }
 

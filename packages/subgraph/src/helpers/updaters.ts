@@ -6,6 +6,7 @@ import {
   Borrower,
   Collateral,
   Commitment,
+  Lender,
   Payment,
   TokenVolume
 } from "../../generated/schema";
@@ -118,62 +119,84 @@ export function updateBid(
   bid.save();
 }
 
-export function updateTokenVolumeOnAccept(
-  tokenVolume: TokenVolume,
-  storedBid: TellerV2__bidsResult
+export function updateBidTokenVolumesOnAccept(
+  bid: Bid,
+  borrower: Borrower,
+  lender: Lender
 ): void {
-  if (tokenVolume.lendingTokenAddress == Address.zero()) {
-    tokenVolume.lendingTokenAddress = storedBid.value5.lendingToken;
-  }
-  const capitalOwed = storedBid.value5.principal;
-  const outstandingTokenCapital = tokenVolume.outstandingCapital;
-  if (outstandingTokenCapital) {
-    tokenVolume.outstandingCapital = outstandingTokenCapital.plus(capitalOwed);
-  }
-  const tokenActiveLoans = tokenVolume.activeLoans;
-  const tokenClosedLoans = tokenVolume.closedLoans;
-  const tokenAprTotal = tokenVolume._aprTotal;
-  const tokenDurationTotal = tokenVolume._durationTotal;
-  const loaned = tokenVolume.totalLoaned;
-  if (
-    tokenAprTotal &&
-    tokenActiveLoans &&
-    tokenClosedLoans &&
-    loaned &&
-    tokenDurationTotal
-  ) {
-    const updatedAPRTotal = tokenAprTotal.plus(
-      BigInt.fromI32(storedBid.value6.APR)
-    );
-    tokenVolume._aprTotal = updatedAPRTotal;
-    const updatedTokenActiveLoans = tokenActiveLoans.plus(BigInt.fromI32(1));
-    const totalTokenLoans = updatedTokenActiveLoans.plus(tokenClosedLoans);
-    tokenVolume.activeLoans = updatedTokenActiveLoans;
+  incrementLenderStats(lender, bid);
 
-    tokenVolume.aprAverage = updatedAPRTotal.div(totalTokenLoans);
-    const updatedTokenLoanTotal = loaned.plus(storedBid.value5.principal);
-    tokenVolume.loanAverage = updatedTokenLoanTotal.div(totalTokenLoans);
+  // Update the market's token volume
+  const tokenVolume = loadTokenVolumeByMarketId(
+    Address.fromBytes(bid.lendingTokenAddress),
+    bid.marketplace
+  );
+  addBidToTokenVolume(tokenVolume, bid);
 
-    const updatedDurationTotal = tokenDurationTotal.plus(
-      storedBid.value5.loanDuration
-    );
-    tokenVolume._durationTotal = updatedDurationTotal;
-    tokenVolume.durationAverage = updatedDurationTotal.div(totalTokenLoans);
+  // Update the protocol's overall token volume
+  const protocolVolume = loadProtocolTokenVolume(
+    Address.fromBytes(bid.lendingTokenAddress)
+  );
+  addBidToTokenVolume(protocolVolume, bid);
+
+  // Update the borrower's token volume
+  const borrowerVolume = loadBorrowerTokenVolume(
+    Address.fromBytes(bid.lendingTokenAddress),
+    borrower
+  );
+  addBidToTokenVolume(borrowerVolume, bid);
+}
+
+function addBidToTokenVolume(tokenVolume: TokenVolume, bid: Bid): void {
+  tokenVolume.bids = tokenVolume.bids.concat([bid.id]);
+
+  tokenVolume.outstandingCapital = tokenVolume.outstandingCapital.plus(
+    bid.principal.minus(bid.totalRepaidPrincipal)
+  );
+
+  tokenVolume.activeLoans = tokenVolume.activeLoans.plus(BigInt.fromI32(1));
+  const totalTokenLoans = tokenVolume.activeLoans.plus(tokenVolume.closedLoans);
+
+  tokenVolume._aprTotal = tokenVolume._aprTotal.plus(bid.apr);
+  tokenVolume.aprAverage = tokenVolume._aprTotal.div(totalTokenLoans);
+
+  tokenVolume.totalLoaned = tokenVolume.totalLoaned.plus(bid.principal);
+  tokenVolume.loanAverage = tokenVolume.totalLoaned.div(totalTokenLoans);
+
+  tokenVolume._durationTotal = tokenVolume._durationTotal.plus(
+    bid.loanDuration
+  );
+  tokenVolume.durationAverage = tokenVolume._durationTotal.div(totalTokenLoans);
+
+  tokenVolume.save();
+}
+
+function removeBidFromTokenVolume(tokenVolume: TokenVolume, bid: Bid): void {
+  const bidIds = tokenVolume.bids;
+  const index = bidIds.indexOf(bid.id);
+  if (index > -1) {
+    bidIds.splice(index, 1);
+    tokenVolume.bids = bidIds;
   }
-  const totalTokensLoaned = tokenVolume.totalLoaned;
-  const principalAmount = storedBid.value5.principal;
-  const highestLoan = tokenVolume.highestLoan;
-  const lowestLoan = tokenVolume.lowestLoan;
-  if (totalTokensLoaned && highestLoan && lowestLoan) {
-    tokenVolume.totalLoaned = totalTokensLoaned.plus(principalAmount);
-    tokenVolume.highestLoan =
-      principalAmount > highestLoan ? principalAmount : highestLoan;
-    tokenVolume.lowestLoan = lowestLoan.equals(BigInt.zero())
-      ? principalAmount
-      : principalAmount < lowestLoan
-      ? principalAmount
-      : lowestLoan;
-  }
+
+  tokenVolume.outstandingCapital = tokenVolume.outstandingCapital.minus(
+    bid.principal.minus(bid.totalRepaidPrincipal)
+  );
+
+  tokenVolume.activeLoans = tokenVolume.activeLoans.minus(BigInt.fromI32(1));
+  const totalTokenLoans = tokenVolume.activeLoans.plus(tokenVolume.closedLoans);
+
+  tokenVolume._aprTotal = tokenVolume._aprTotal.minus(bid.apr);
+  tokenVolume.aprAverage = tokenVolume._aprTotal.div(totalTokenLoans);
+
+  tokenVolume.totalLoaned = tokenVolume.totalLoaned.minus(bid.principal);
+  tokenVolume.loanAverage = tokenVolume.totalLoaned.div(totalTokenLoans);
+
+  tokenVolume._durationTotal = tokenVolume._durationTotal.minus(
+    bid.loanDuration
+  );
+  tokenVolume.durationAverage = tokenVolume._durationTotal.div(totalTokenLoans);
+
   tokenVolume.save();
 }
 
@@ -285,7 +308,7 @@ export function updateOutstandingCapital(
 
   // Update borrower's token volume
   const borrowerVolume = loadBorrowerTokenVolume(
-    storedBid.value5.lendingToken,
+    Address.fromBytes(bid.lendingTokenAddress),
     borrower
   );
   updateTokenVolumeOnPayment(
@@ -321,4 +344,30 @@ function getTypeString(tokenType: i32): string {
     type = "ERC1155";
   }
   return type;
+}
+
+export function incrementLenderStats(lender: Lender, bid: Bid): void {
+  lender.activeLoans = lender.activeLoans.plus(BigInt.fromI32(1));
+  lender.bidsAccepted = lender.bidsAccepted.plus(BigInt.fromI32(1));
+  lender.save();
+
+  // Update the lender's token volume
+  const lenderVolume = loadLenderTokenVolume(
+    Address.fromBytes(bid.lendingTokenAddress),
+    lender
+  );
+  addBidToTokenVolume(lenderVolume, bid);
+}
+
+export function decrementLenderStats(lender: Lender, bid: Bid): void {
+  lender.activeLoans = lender.activeLoans.minus(BigInt.fromI32(1));
+  lender.bidsAccepted = lender.bidsAccepted.minus(BigInt.fromI32(1));
+  lender.save();
+
+  // Update the lender's token volume
+  const lenderVolume = loadLenderTokenVolume(
+    Address.fromBytes(bid.lendingTokenAddress),
+    lender
+  );
+  removeBidFromTokenVolume(lenderVolume, bid);
 }

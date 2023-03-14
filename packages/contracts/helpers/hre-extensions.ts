@@ -4,7 +4,6 @@ import 'hardhat-deploy'
 import { BigNumber, BigNumberish, Contract, Signer } from 'ethers'
 import { ERC20 } from 'generated/typechain'
 import { extendEnvironment } from 'hardhat/config'
-import { HardhatRuntimeEnvironment } from 'hardhat/types'
 import moment from 'moment'
 
 import { getTokens } from '../config'
@@ -141,21 +140,8 @@ interface ContractsGetConfig {
   from?: string | Signer
   at?: string
 }
-
-/**
- * Updates the Tenderly project name in the config based on the network being
- *  used.
- * @param hre {HardhatRuntimeEnvironment} Hardhat Environment variable to modify
- *  directly
- */
-const updateTenderlyConfig = (hre: HardhatRuntimeEnvironment): void => {
-  hre.config.tenderly.project = 'v2'
-}
-
 extendEnvironment((hre) => {
   const { deployments, ethers, network } = hre
-
-  updateTenderlyConfig(hre)
 
   hre.contracts = {
     async get<C extends Contract>(

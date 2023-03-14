@@ -1250,17 +1250,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nomicfoundation/hardhat-foundry@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "@nomicfoundation/hardhat-foundry@npm:1.0.0"
-  dependencies:
-    chalk: ^2.4.2
-  peerDependencies:
-    hardhat: ^2.12.6
-  checksum: 9c3d3746a37d6d6a7246af6f9b945129f3f6fadb2aad528632f75c3c7a1768e0faf75ddf7577072aebea98a2ab287a1a6422af741eed4c666bd6e70c9d81f712
-  languageName: node
-  linkType: hard
-
 "@nomicfoundation/solidity-analyzer-darwin-arm64@npm:0.1.0":
   version: 0.1.0
   resolution: "@nomicfoundation/solidity-analyzer-darwin-arm64@npm:0.1.0"
@@ -1697,7 +1686,6 @@ __metadata:
     "@ethereum-attestation-service/sdk": ^0.11.2
     "@ethereumjs/vm": ^5.5.3
     "@ethersproject/providers": ^5.6.7
-    "@nomicfoundation/hardhat-foundry": ^1.0.0
     "@nomiclabs/hardhat-ethers": ^2.2.1
     "@nomiclabs/hardhat-waffle": ^2.0.0
     "@openzeppelin/contracts": ^4.8.0
@@ -8511,7 +8499,7 @@ __metadata:
     yargs-parser: ^16.1.0
   bin:
     gluegun: bin/gluegun
-  checksum: 872685026db07ad1687056a78388f17c6a9bcd22bbf9d99d1e2b21e2d196c6e99a128bcff48063b3f0cf692a4365142fae9dd06cf8c532bc557a45f8ac853308
+  checksum: 7a45a5a606a1e651c891467a693552b5237f8e90410f9c9daad4621ff0693d1c92b69aa35fc30eccf7c3b92ee724f15fc297e054086cfb312717ef01f48d2290
   languageName: node
   linkType: hard
 

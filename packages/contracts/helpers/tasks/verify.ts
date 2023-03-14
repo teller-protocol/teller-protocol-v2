@@ -1,9 +1,14 @@
-import { ContractByName } from '@tenderly/hardhat-tenderly/dist/tenderly/types'
-import { task } from 'hardhat/config'
+import { ContractByAddress } from '@tenderly/hardhat-tenderly/dist/tenderly/types'
+import { subtask, task } from 'hardhat/config'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
 
+interface VerifyContractsArgs {
+  onlyEtherscan: boolean
+  onlyTenderly: boolean
+}
+
 export const verifyContracts = async (
-  args: null,
+  args: VerifyContractsArgs,
   hre: HardhatRuntimeEnvironment
 ): Promise<void> => {
   const { network } = hre
@@ -12,33 +17,54 @@ export const verifyContracts = async (
   if (!network.config.live)
     throw new Error('Must be on a live network to submit to Tenderly')
 
-  // Verify contracts on Etherscan
-  await hre.run('etherscan-verify', { solcInput: true, sleep: true })
-
-  // Save and verify contracts on Tenderly
-  await tenderlyVerify(hre)
+  let runArgs: VerifyRunArgs = {
+    etherscan: true,
+    tenderly: true,
+  }
+  if (args.onlyTenderly) runArgs = { tenderly: true }
+  if (args.onlyEtherscan) runArgs = { etherscan: true }
+  await hre.run('verify:run', runArgs)
 }
 
-const tenderlyVerify = async (
-  hre: HardhatRuntimeEnvironment
-): Promise<void> => {
+interface VerifyRunArgs {
+  etherscan?: boolean
+  tenderly?: boolean
+}
+
+subtask('verify:run').setAction(
+  async (
+    args: VerifyRunArgs,
+    hre: HardhatRuntimeEnvironment
+  ): Promise<void> => {
+    if (args.etherscan)
+      await hre.run('etherscan-verify', { solcInput: true, sleep: true })
+    if (args.tenderly) await hre.run('verify:tenderly')
+  }
+)
+
+subtask(
+  'verify:tenderly',
+  'Verifies and pushes all deployed contracts to Tenderly'
+).setAction(async (_, hre: HardhatRuntimeEnvironment): Promise<void> => {
   const { deployments, tenderly } = hre
 
+  const networkId = await hre.getChainId()
+
   const allDeployments = await deployments.all().then((all) =>
-    Object.entries(all).map<ContractByName>(
-      ([name, { address, libraries }]) => ({
-        name,
+    Object.entries(all).map<ContractByAddress>(([name, { address }]) => {
+      return {
         address,
-        libraries,
-      })
-    )
+        display_name: name,
+        network_id: networkId,
+      }
+    })
   )
 
   // await to make sure contracts are verified and pushed
-  await tenderly.verify(...allDeployments)
-}
+  await tenderly.addToProject(...allDeployments)
+})
 
-task(
-  'verify',
-  'Verifies and pushes all deployed contracts to Tenderly'
-).setAction(verifyContracts)
+task('verify', 'Verifies and pushes all deployed contracts to Tenderly')
+  .addFlag('onlyEtherscan', 'Will only verify contracts on Etherscan')
+  .addFlag('onlyTenderly', 'Will only verify contracts on Tenderly')
+  .setAction(verifyContracts)

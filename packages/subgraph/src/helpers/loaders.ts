@@ -28,7 +28,12 @@ export function loadProtocol(): Protocol {
   let protocol = Protocol.load("v2");
   if (!protocol) {
     protocol = new Protocol("v2");
+
     loadLoanStatusCount("protocol", protocol.id);
+
+    protocol._durationTotal = BigInt.zero();
+    protocol.durationAverage = BigInt.zero();
+
     protocol.save();
   }
   return protocol;
@@ -131,6 +136,9 @@ export function loadMarketById(id: string): MarketPlace {
 
     loadLoanStatusCount("market", id);
 
+    marketPlace._durationTotal = BigInt.zero();
+    marketPlace.durationAverage = BigInt.zero();
+
     marketPlace.totalNumberOfLenders = BigInt.zero();
 
     marketPlace.paymentType = "EMI";
@@ -147,7 +155,7 @@ export function loadLenderByMarketId(
   timestamp: BigInt = BigInt.zero()
 ): Lender {
   const market = loadMarketById(marketId);
-  const idString = `${market.id}-${lenderAddress.toHexString()}`;
+  const idString = `lender-${market.id}-${lenderAddress.toHexString()}`;
   let lender: Lender | null = Lender.load(idString);
 
   let user: User | null = User.load(lenderAddress.toHexString());
@@ -162,6 +170,9 @@ export function loadLenderByMarketId(
     lender.isAttested = false;
 
     loadLoanStatusCount("lender", idString);
+
+    lender._durationTotal = BigInt.zero();
+    lender.durationAverage = BigInt.zero();
 
     lender.firstInteractionDate = timestamp;
     lender.lenderAddress = lenderAddress;
@@ -187,7 +198,7 @@ export function loadBorrowerByMarketId(
   timestamp: BigInt = BigInt.zero()
 ): Borrower {
   const market = loadMarketById(marketId);
-  const idString = `${market.id}-${borrowerAddress.toHexString()}`;
+  const idString = `borrower-${market.id}-${borrowerAddress.toHexString()}`;
   let borrower: Borrower | null = Borrower.load(idString);
 
   let user: User | null = User.load(borrowerAddress.toHexString());
@@ -202,6 +213,9 @@ export function loadBorrowerByMarketId(
     borrower.isAttested = false;
 
     loadLoanStatusCount("borrower", idString);
+
+    borrower._durationTotal = BigInt.zero();
+    borrower.durationAverage = BigInt.zero();
 
     borrower.firstInteractionDate = timestamp;
     borrower.borrowerAddress = borrowerAddress;

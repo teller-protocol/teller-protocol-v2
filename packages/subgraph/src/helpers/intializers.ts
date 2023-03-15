@@ -21,6 +21,6 @@ export function initTokenVolume(tokenVolume: TokenVolume, token: Token): void {
   tokenVolume._aprWeightedTotal = BigInt.zero();
   tokenVolume.aprAverage = BigInt.zero();
 
-  tokenVolume._durationWeightedTotal = BigInt.zero();
+  tokenVolume._durationTotal = BigInt.zero();
   tokenVolume.durationAverage = BigInt.zero();
 }

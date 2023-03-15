@@ -1,13 +1,22 @@
-import { Address, BigInt, ethereum, Value } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigInt,
+  Entity,
+  ethereum,
+  Value
+} from "@graphprotocol/graph-ts";
 
 import { CollateralCommitted } from "../../generated/CollateralManager/CollateralManager";
 import {
   Bid,
+  Borrower,
   Collateral,
   Commitment,
   Lender,
   LoanStatusCount,
+  MarketPlace,
   Payment,
+  Protocol,
   TokenVolume
 } from "../../generated/schema";
 import { TellerV2 } from "../../generated/TellerV2/TellerV2";
@@ -199,19 +208,14 @@ function updateLoanStatusCount(
         BidStatus.Liquidated
       ];
       if (acceptedLoanStatuses.includes(status)) {
-        const tokenVolumeId = loanStatusCount._tokenVolume;
-        const tokenVolume = TokenVolume.load(
-          tokenVolumeId ? tokenVolumeId : ""
-        );
-        if (tokenVolume)
-          switch (fnNameType) {
-            case ArrayUpdaterFn.ADD:
-              addBidToTokenVolume(tokenVolume, bidId);
-              break;
-            case ArrayUpdaterFn.DELETE:
-              removeBidFromTokenVolume(tokenVolume, bidId);
-              break;
-          }
+        switch (fnNameType) {
+          case ArrayUpdaterFn.ADD:
+            addBidToTokenVolumeFromStatusCount(loanStatusCount, bidId);
+            break;
+          case ArrayUpdaterFn.DELETE:
+            removeBidFromTokenVolumeFromStatusCount(loanStatusCount, bidId);
+            break;
+        }
       }
     }
 
@@ -338,7 +342,15 @@ function updateBidTokenVolumesOnPayment(
   }
 }
 
-function addBidToTokenVolume(tokenVolume: TokenVolume, bidId: string): void {
+function addBidToTokenVolumeFromStatusCount(
+  loanStatusCount: LoanStatusCount,
+  bidId: string
+): void {
+  const tokenVolumeId = loanStatusCount._tokenVolume;
+  if (!tokenVolumeId) return;
+  const tokenVolume = TokenVolume.load(tokenVolumeId ? tokenVolumeId : "");
+  if (!tokenVolume) throw new Error("TokenVolume not found");
+
   const bid = Bid.load(bidId);
   if (!bid) throw new Error(`Bid not found: ${bidId}`);
 
@@ -360,20 +372,24 @@ function addBidToTokenVolume(tokenVolume: TokenVolume, bidId: string): void {
     tokenVolume.totalLoaned
   );
 
-  tokenVolume._durationWeightedTotal = tokenVolume._durationWeightedTotal.plus(
-    bid.loanDuration.times(bid.principal)
-  );
-  tokenVolume.durationAverage = tokenVolume._durationWeightedTotal.div(
-    tokenVolume.totalLoaned
+  updateDurationAverageFromStatusCount(
+    UpdateDurationAverage.Add,
+    loanStatusCount,
+    bid
   );
 
   tokenVolume.save();
 }
 
-function removeBidFromTokenVolume(
-  tokenVolume: TokenVolume,
+function removeBidFromTokenVolumeFromStatusCount(
+  loanStatusCount: LoanStatusCount,
   bidId: string
 ): void {
+  const tokenVolumeId = loanStatusCount._tokenVolume;
+  if (!tokenVolumeId) return;
+  const tokenVolume = TokenVolume.load(tokenVolumeId ? tokenVolumeId : "");
+  if (!tokenVolume) throw new Error("TokenVolume not found");
+
   const bid = Bid.load(bidId);
   if (!bid) throw new Error(`Bid not found: ${bidId}`);
 
@@ -398,15 +414,95 @@ function removeBidFromTokenVolume(
       tokenVolume._loanAcceptedCount
     );
 
-    tokenVolume._durationWeightedTotal = tokenVolume._durationWeightedTotal.minus(
-      bid.loanDuration.times(bid.principal)
-    );
-    tokenVolume.durationAverage = tokenVolume._durationWeightedTotal.div(
-      tokenVolume.totalLoaned
+    updateDurationAverageFromStatusCount(
+      UpdateDurationAverage.Remove,
+      loanStatusCount,
+      bid
     );
   }
 
   tokenVolume.save();
+}
+
+enum UpdateDurationAverage {
+  Add,
+  Remove
+}
+function updateDurationAverageFromStatusCount(
+  type: UpdateDurationAverage,
+  loanStatusCount: LoanStatusCount,
+  bid: Bid
+): void {
+  const tokenVolumeId = loanStatusCount._tokenVolume;
+  if (tokenVolumeId) {
+    const tokenVolume = TokenVolume.load(tokenVolumeId);
+    if (!tokenVolume)
+      throw new Error(`TokenVolume not found: ${tokenVolumeId}`);
+
+    setEntityDurationAverage(
+      type,
+      tokenVolume,
+      bid,
+      loanStatusCount.totalCount
+    );
+    tokenVolume.save();
+  }
+
+  const protocolId = loanStatusCount._protocol;
+  if (protocolId) {
+    const protocol = Protocol.load(protocolId);
+    if (!protocol) throw new Error(`Protocol not found: ${protocolId}`);
+
+    setEntityDurationAverage(type, protocol, bid, loanStatusCount.totalCount);
+    protocol.save();
+  }
+
+  const marketId = loanStatusCount._market;
+  if (marketId) {
+    const market = MarketPlace.load(marketId);
+    if (!market) throw new Error(`Market not found: ${marketId}`);
+
+    setEntityDurationAverage(type, market, bid, loanStatusCount.totalCount);
+    market.save();
+  }
+
+  const lenderId = loanStatusCount._lender;
+  if (lenderId) {
+    const lender = Lender.load(lenderId);
+    if (!lender) throw new Error(`Lender not found: ${lenderId}`);
+
+    setEntityDurationAverage(type, lender, bid, loanStatusCount.totalCount);
+    lender.save();
+  }
+
+  const borrowerId = loanStatusCount._borrower;
+  if (borrowerId) {
+    const borrower = Borrower.load(borrowerId);
+    if (!borrower) throw new Error(`Borrower not found: ${borrowerId}`);
+
+    setEntityDurationAverage(type, borrower, bid, loanStatusCount.totalCount);
+    borrower.save();
+  }
+}
+
+function setEntityDurationAverage(
+  type: UpdateDurationAverage,
+  entity: Entity,
+  bid: Bid,
+  totalLoanCount: BigInt
+): void {
+  let durationTotal = entity.mustGet("_durationTotal").toBigInt();
+
+  const updateAmount = bid.loanDuration.times(bid.principal);
+  durationTotal =
+    type == UpdateDurationAverage.Add
+      ? durationTotal.plus(updateAmount)
+      : durationTotal.minus(updateAmount);
+  entity.set("_durationTotal", Value.fromBigInt(durationTotal));
+  entity.set(
+    "durationAverage",
+    Value.fromBigInt(durationTotal.div(totalLoanCount))
+  );
 }
 
 export function updateCollateral(

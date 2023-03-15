@@ -3,6 +3,9 @@ type Protocol implements IHasLoans @entity {
 
   loans: LoanStatusCount! @derivedFrom(field: "_protocol")
   tokenVolumes: [TokenVolume!]! @derivedFrom(field: "protocol")
+
+  _durationTotal: BigInt!
+  durationAverage: BigInt!
 }
 
 type MarketPlace implements IHasLoans @entity {
@@ -24,6 +27,9 @@ type MarketPlace implements IHasLoans @entity {
 
   loans: LoanStatusCount! @derivedFrom(field: "_market")
   tokenVolumes: [TokenVolume!]! @derivedFrom(field: "market")
+
+  _durationTotal: BigInt!
+  durationAverage: BigInt!
 
   totalNumberOfLenders: BigInt!
   lenders: [Lender!]! @derivedFrom(field: "marketplace")
@@ -126,6 +132,9 @@ type Lender implements IHasLoans @entity {
   loans: LoanStatusCount! @derivedFrom(field: "_lender")
   tokenVolumes: [TokenVolume!]! @derivedFrom(field: "lender")
 
+  _durationTotal: BigInt!
+  durationAverage: BigInt!
+
   marketplace: MarketPlace!
   user: User!
   commitments: [Commitment!]! @derivedFrom(field: "lender")
@@ -142,13 +151,24 @@ type Borrower implements IHasLoans @entity {
   loans: LoanStatusCount! @derivedFrom(field: "_borrower")
   tokenVolumes: [TokenVolume!]! @derivedFrom(field: "borrower")
 
+  _durationTotal: BigInt!
+  durationAverage: BigInt!
+
   marketplace: MarketPlace!
   user: User!
 }
 
-interface IHasLoans {
+interface IHasLoans implements IDurationAverage {
   loans: LoanStatusCount!
   tokenVolumes: [TokenVolume!]!
+
+  _durationTotal: BigInt!
+  durationAverage: BigInt!
+}
+
+interface IDurationAverage {
+  _durationTotal: BigInt!
+  durationAverage: BigInt!
 }
 
 interface ILoanStatusCount {
@@ -232,7 +252,7 @@ type Token @entity {
   decimals: BigInt
 }
 
-type TokenVolume @entity {
+type TokenVolume implements IDurationAverage @entity {
   id: ID!
 
   ## Entity Relationships ##
@@ -258,7 +278,7 @@ type TokenVolume @entity {
   _aprWeightedTotal: BigInt!
   aprAverage: BigInt!
 
-  _durationWeightedTotal: BigInt!
+  _durationTotal: BigInt!
   durationAverage: BigInt!
 
   ## end TokenStats ##

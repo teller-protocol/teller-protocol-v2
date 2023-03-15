@@ -15,7 +15,7 @@ export enum BidStatus {
   Liquidated
 }
 
-const BidStatusValues = new Array<string>(10);
+export const BidStatusValues = new Array<string>(10);
 BidStatusValues[BidStatus.None] = "";
 BidStatusValues[BidStatus.Submitted] = "Submitted";
 BidStatusValues[BidStatus.Expired] = "Expired";

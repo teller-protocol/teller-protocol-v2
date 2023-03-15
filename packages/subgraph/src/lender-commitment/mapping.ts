@@ -8,15 +8,13 @@ import {
   UpdatedCommitment,
   UpdatedCommitmentBorrowers
 } from "../../generated/LenderCommitmentForwarder/LenderCommitmentForwarder";
-import { Bid, TokenVolume } from "../../generated/schema";
-import { initTokenVolume } from "../helpers/intializers";
-import {
-  loadBidById,
-  loadCommitment,
-  loadToken,
-  updateLenderCommitment
-} from "../helpers/loaders";
-import { addBidToTokenVolume } from "../helpers/updaters";
+import { Bid } from "../../generated/schema";
+import { BidStatus } from "../helpers/bid";
+import { loadBidById, loadCommitmentTokenVolume } from "../helpers/loaders";
+import { updateBidStatus } from "../helpers/updaters";
+
+import { loadCommitment } from "./loaders";
+import { updateLenderCommitment } from "./updaters";
 
 export function handleCreatedCommitment(event: CreatedCommitment): void {
   const commitmentId = event.params.commitmentId.toString();
@@ -31,11 +29,12 @@ export function handleCreatedCommitment(event: CreatedCommitment): void {
 
   commitment.createdAt = event.block.timestamp;
 
-  const stats = new TokenVolume(`commitment-stats-${commitment.id}`);
-  initTokenVolume(stats, loadToken(event.params.lendingToken));
-  stats.save();
+  const volume = loadCommitmentTokenVolume(
+    event.params.lendingToken,
+    commitment
+  );
+  commitment.tokenVolume = volume.id;
 
-  commitment.stats = stats.id;
   commitment.save();
 }
 
@@ -98,11 +97,7 @@ export function handleExercisedCommitment(event: ExercisedCommitment): void {
   bid.save();
   commitment.save();
 
-  const stats = TokenVolume.load(commitment.stats);
-  if (stats) {
-    // incrementLoanStatusCounts(stats.loans, bid.id, bid.status);
-    // addBidToTokenVolume(stats, bid);
-  }
+  updateBidStatus(bid, BidStatus.Accepted);
 }
 
 export function handleExercisedCommitments(

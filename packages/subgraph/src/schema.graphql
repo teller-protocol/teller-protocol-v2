@@ -1,11 +1,11 @@
-type Protocol @entity {
+type Protocol implements IHasLoans @entity {
   id: ID!
 
   loans: LoanStatusCount! @derivedFrom(field: "_protocol")
   tokenVolumes: [TokenVolume!]! @derivedFrom(field: "protocol")
 }
 
-type MarketPlace @entity {
+type MarketPlace implements IHasLoans @entity {
   id: ID!
   marketplaceId: BigInt!
 
@@ -23,8 +23,7 @@ type MarketPlace @entity {
   marketplaceFeePercent: BigInt!
 
   loans: LoanStatusCount! @derivedFrom(field: "_market")
-
-  tokenVolumes: [MarketVolume!]! @derivedFrom(field: "market")
+  tokenVolumes: [TokenVolume!]! @derivedFrom(field: "market")
 
   totalNumberOfLenders: BigInt!
   lenders: [Lender!]! @derivedFrom(field: "marketplace")
@@ -116,7 +115,7 @@ type User @entity {
   borrowers: [Borrower!]! @derivedFrom(field: "user")
 }
 
-type Lender @entity {
+type Lender implements IHasLoans @entity {
   id: ID!
   marketplaceId: BigInt!
   lenderAddress: Bytes!
@@ -125,14 +124,14 @@ type Lender @entity {
   isAttested: Boolean!
 
   loans: LoanStatusCount! @derivedFrom(field: "_lender")
+  tokenVolumes: [TokenVolume!]! @derivedFrom(field: "lender")
 
-  tokenVolume: [TokenVolume!] @derivedFrom(field: "lender")
   marketplace: MarketPlace!
   user: User!
-  commitment: Commitment
+  commitments: [Commitment!]! @derivedFrom(field: "lender")
 }
 
-type Borrower @entity {
+type Borrower implements IHasLoans @entity {
   id: ID!
   marketplaceId: BigInt!
   borrowerAddress: Bytes!
@@ -141,10 +140,15 @@ type Borrower @entity {
   isAttested: Boolean!
 
   loans: LoanStatusCount! @derivedFrom(field: "_borrower")
+  tokenVolumes: [TokenVolume!]! @derivedFrom(field: "borrower")
 
-  tokenVolume: [TokenVolume!] @derivedFrom(field: "borrower")
   marketplace: MarketPlace!
   user: User!
+}
+
+interface IHasLoans {
+  loans: LoanStatusCount!
+  tokenVolumes: [TokenVolume!]!
 }
 
 interface ILoanStatusCount {
@@ -233,10 +237,9 @@ type TokenVolume @entity {
 
   ## Entity Relationships ##
   protocol: Protocol
-  marketplace: MarketPlace
+  market: MarketPlace
   lender: Lender
   borrower: Borrower
-  commitment: Commitment
   ## end Entity Relationships ##
 
   ## TokenStats ##
@@ -246,29 +249,26 @@ type TokenVolume @entity {
 
   outstandingCapital: BigInt!
   totalLoaned: BigInt!
+  _loanAcceptedCount: BigInt!
   loanAverage: BigInt!
 
   commissionEarned: BigInt!
   totalRepaidInterest: BigInt!
 
-  _aprTotal: BigInt!
+  _aprWeightedTotal: BigInt!
   aprAverage: BigInt!
 
-  _durationTotal: BigInt!
+  _durationWeightedTotal: BigInt!
   durationAverage: BigInt!
 
   ## end TokenStats ##
 }
 
-type MarketVolume @entity {
-  id: ID!
-  market: MarketPlace!
-  volume: TokenVolume!
-}
-
 type Commitment @entity {
   id: ID!
   createdAt: BigInt!
+  updatedAt: BigInt!
+  status: String!
 
   # Offer
   committedAmount: BigInt! # Max principal
@@ -294,5 +294,5 @@ type Commitment @entity {
   marketplaceId: BigInt!
 
   # TokenStats
-  stats: TokenVolume!
+  tokenVolume: TokenVolume!
 }

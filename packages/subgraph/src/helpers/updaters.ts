@@ -1,9 +1,10 @@
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum, Value } from "@graphprotocol/graph-ts";
 
 import { CollateralCommitted } from "../../generated/CollateralManager/CollateralManager";
 import {
   Bid,
   Collateral,
+  Commitment,
   Lender,
   LoanStatusCount,
   Payment,
@@ -15,18 +16,22 @@ import {
   BidStatus,
   bidStatusToEnum,
   bidStatusToString,
+  BidStatusValues,
   isBidLate
 } from "./bid";
+import { initTokenVolume } from "./intializers";
 import {
   getBid,
   loadBorrowerByMarketId,
   loadBorrowerTokenVolume,
+  loadCommitmentTokenVolume,
   loadLenderByMarketId,
   loadLenderTokenVolume,
   loadProtocolTokenVolume,
+  loadToken,
   loadTokenVolumeByMarketId
 } from "./loaders";
-import { addToArray, removeFromArray } from "./utils";
+import { addToArray, camelize, removeFromArray } from "./utils";
 
 /**
  * Updates the status of a bid. Returns the previous status.
@@ -96,203 +101,122 @@ export function getTokenVolumesForBid(bidId: string): TokenVolume[] {
     tokenVolumes.push(lenderVolume);
   }
 
+  const commitmentId = bid.commitment;
+  if (commitmentId) {
+    const commitment = Commitment.load(commitmentId);
+    if (!commitment)
+      throw new Error(`Commitment ${commitmentId} does not exist`);
+
+    const commitmentVolume = loadCommitmentTokenVolume(
+      lendingTokenAddress,
+      commitment
+    );
+    tokenVolumes.push(commitmentVolume);
+  }
+
   return tokenVolumes;
 }
 
-export function updateLoanStatusCountsFromBid(
+function updateLoanStatusCountsFromBid(
   bidId: string,
   prevStatus: string
 ): void {
   const bid = Bid.load(bidId);
   if (!bid) throw new Error(`Bid ${bidId} does not exist`);
 
-  if (bid.status == prevStatus) return;
-
   const loanStatusCountIds = getLoanStatusCountIdsForBid(bidId);
   for (let i = 0; i < loanStatusCountIds.length; i++) {
-    incrementLoanStatusCount(loanStatusCountIds[i], bid.id, bid.status);
-    decrementLoanStatusCount(loanStatusCountIds[i], bid.id, prevStatus);
+    const countId = loanStatusCountIds[i];
+    const loanStatusCount = LoanStatusCount.load(countId);
+    if (!loanStatusCount)
+      throw new Error(`Loan status count not found: ${countId}`);
+
+    // Decrement the previous status count before incrementing the new status count
+    // This is to prevent the count from being decremented if the status is the same
+    updateLoanStatusCount(
+      loanStatusCount,
+      bid.id,
+      prevStatus,
+      ArrayUpdaterFn.DELETE
+    );
+    updateLoanStatusCount(
+      loanStatusCount,
+      bid.id,
+      bid.status,
+      ArrayUpdaterFn.ADD
+    );
   }
 }
 
-export function incrementLoanStatusCount(
-  loanStatusCountId: string,
+enum ArrayUpdaterFn {
+  ADD,
+  DELETE
+}
+function updateLoanStatusCount(
+  loanStatusCount: LoanStatusCount,
   bidId: string,
-  status: string
-): LoanStatusCount {
-  const loanStatusCount = LoanStatusCount.load(loanStatusCountId);
-  if (!loanStatusCount)
-    throw new Error(`Loan status count not found: ${loanStatusCountId}`);
+  statusStr: string,
+  fnNameType: ArrayUpdaterFn
+): void {
+  const status = bidStatusToEnum(statusStr);
+  if (status === BidStatus.None) return;
 
-  const bidStatus = bidStatusToEnum(status);
-  switch (bidStatus) {
-    case BidStatus.Submitted:
-      loanStatusCount.submitted = addToArray(loanStatusCount.submitted, bidId);
-      loanStatusCount.submittedCount = BigInt.fromI32(
-        loanStatusCount.submitted.length
+  const arrayName = camelize(statusStr);
+  const countName = `${arrayName}Count`;
+  const arrayValue = loanStatusCount.get(arrayName);
+  if (arrayValue) {
+    const arrayOrig = arrayValue.toStringArray();
+    const arrayUpdated =
+      fnNameType == ArrayUpdaterFn.ADD
+        ? addToArray(arrayOrig, bidId)
+        : removeFromArray(arrayOrig, bidId);
+
+    if (arrayOrig.length != arrayUpdated.length) {
+      loanStatusCount.set(arrayName, Value.fromStringArray(arrayUpdated));
+      loanStatusCount.set(
+        countName,
+        Value.fromBigInt(BigInt.fromI32(arrayUpdated.length))
       );
-      break;
-    case BidStatus.Expired:
-      loanStatusCount.expired = addToArray(loanStatusCount.expired, bidId);
-      loanStatusCount.expiredCount = BigInt.fromI32(
-        loanStatusCount.expired.length
-      );
-      break;
-    case BidStatus.Cancelled:
-      loanStatusCount.cancelled = addToArray(loanStatusCount.cancelled, bidId);
-      loanStatusCount.cancelledCount = BigInt.fromI32(
-        loanStatusCount.cancelled.length
-      );
-      break;
-    case BidStatus.Accepted:
-      loanStatusCount.accepted = addToArray(loanStatusCount.accepted, bidId);
-      loanStatusCount.acceptedCount = BigInt.fromI32(
-        loanStatusCount.accepted.length
-      );
-      break;
-    case BidStatus.DueSoon:
-      loanStatusCount.dueSoon = addToArray(loanStatusCount.dueSoon, bidId);
-      loanStatusCount.dueSoonCount = BigInt.fromI32(
-        loanStatusCount.dueSoon.length
-      );
-      break;
-    case BidStatus.Late:
-      loanStatusCount.late = addToArray(loanStatusCount.late, bidId);
-      loanStatusCount.lateCount = BigInt.fromI32(loanStatusCount.late.length);
-      break;
-    case BidStatus.Defaulted:
-      loanStatusCount.defaulted = addToArray(loanStatusCount.defaulted, bidId);
-      loanStatusCount.defaultedCount = BigInt.fromI32(
-        loanStatusCount.defaulted.length
-      );
-      break;
-    case BidStatus.Repaid:
-      loanStatusCount.repaid = addToArray(loanStatusCount.repaid, bidId);
-      loanStatusCount.repaidCount = BigInt.fromI32(
-        loanStatusCount.repaid.length
-      );
-      break;
-    case BidStatus.Liquidated:
-      loanStatusCount.liquidated = addToArray(
-        loanStatusCount.liquidated,
-        bidId
-      );
-      loanStatusCount.liquidatedCount = BigInt.fromI32(
-        loanStatusCount.liquidated.length
-      );
-      break;
-    case BidStatus.None:
-      return loanStatusCount;
-    default:
-      throw new Error(`Invalid bid status: ${status}`);
+
+      let allLoans: string[] = [];
+      // Skip the first element because it is the "None" status
+      for (let i = 1; i < BidStatusValues.length; i++) {
+        const loanStatusArray = loanStatusCount.mustGet(
+          camelize(BidStatusValues[i])
+        );
+        allLoans = allLoans.concat(loanStatusArray.toStringArray());
+      }
+      loanStatusCount.all = allLoans;
+      loanStatusCount.totalCount = BigInt.fromI32(allLoans.length);
+      loanStatusCount.save();
+
+      const acceptedLoanStatuses = [
+        BidStatus.Accepted,
+        BidStatus.DueSoon,
+        BidStatus.Late,
+        BidStatus.Defaulted,
+        BidStatus.Repaid,
+        BidStatus.Liquidated
+      ];
+      if (acceptedLoanStatuses.includes(status)) {
+        const tokenVolumeId = loanStatusCount._tokenVolume;
+        const tokenVolume = TokenVolume.load(
+          tokenVolumeId ? tokenVolumeId : ""
+        );
+        if (tokenVolume)
+          switch (fnNameType) {
+            case ArrayUpdaterFn.ADD:
+              addBidToTokenVolume(tokenVolume, bidId);
+              break;
+            case ArrayUpdaterFn.DELETE:
+              removeBidFromTokenVolume(tokenVolume, bidId);
+              break;
+          }
+      }
+    }
+
+    loanStatusCount.save();
   }
-
-  updateTotalLoanStatusCount(loanStatusCount);
-
-  loanStatusCount.save();
-  return loanStatusCount;
-}
-
-export function decrementLoanStatusCount(
-  loanStatusCountId: string,
-  bidId: string,
-  status: string
-): LoanStatusCount {
-  const loanStatusCount = LoanStatusCount.load(loanStatusCountId);
-  if (!loanStatusCount)
-    throw new Error(`Loan status count not found: ${loanStatusCountId}`);
-
-  const bidStatus = bidStatusToEnum(status);
-  switch (bidStatus) {
-    case BidStatus.Submitted:
-      loanStatusCount.submitted = removeFromArray(
-        loanStatusCount.submitted,
-        bidId
-      );
-      loanStatusCount.submittedCount = BigInt.fromI32(
-        loanStatusCount.submitted.length
-      );
-      break;
-    case BidStatus.Expired:
-      loanStatusCount.expired = removeFromArray(loanStatusCount.expired, bidId);
-      loanStatusCount.expiredCount = BigInt.fromI32(
-        loanStatusCount.expired.length
-      );
-      break;
-    case BidStatus.Cancelled:
-      loanStatusCount.cancelled = removeFromArray(
-        loanStatusCount.cancelled,
-        bidId
-      );
-      loanStatusCount.cancelledCount = BigInt.fromI32(
-        loanStatusCount.cancelled.length
-      );
-      break;
-    case BidStatus.Accepted:
-      loanStatusCount.accepted = removeFromArray(
-        loanStatusCount.accepted,
-        bidId
-      );
-      loanStatusCount.acceptedCount = BigInt.fromI32(
-        loanStatusCount.accepted.length
-      );
-      break;
-    case BidStatus.DueSoon:
-      loanStatusCount.dueSoon = removeFromArray(loanStatusCount.dueSoon, bidId);
-      loanStatusCount.dueSoonCount = BigInt.fromI32(
-        loanStatusCount.dueSoon.length
-      );
-      break;
-    case BidStatus.Late:
-      loanStatusCount.late = removeFromArray(loanStatusCount.late, bidId);
-      loanStatusCount.lateCount = BigInt.fromI32(loanStatusCount.late.length);
-      break;
-    case BidStatus.Defaulted:
-      loanStatusCount.defaulted = removeFromArray(
-        loanStatusCount.defaulted,
-        bidId
-      );
-      loanStatusCount.defaultedCount = BigInt.fromI32(
-        loanStatusCount.defaulted.length
-      );
-      break;
-    case BidStatus.Repaid:
-      loanStatusCount.repaid = removeFromArray(loanStatusCount.repaid, bidId);
-      loanStatusCount.repaidCount = BigInt.fromI32(
-        loanStatusCount.repaid.length
-      );
-      break;
-    case BidStatus.Liquidated:
-      loanStatusCount.liquidated = removeFromArray(
-        loanStatusCount.liquidated,
-        bidId
-      );
-      loanStatusCount.liquidatedCount = BigInt.fromI32(
-        loanStatusCount.liquidated.length
-      );
-      break;
-    case BidStatus.None:
-      return loanStatusCount;
-    default:
-      throw new Error(`Invalid bid status: ${status}`);
-  }
-
-  updateTotalLoanStatusCount(loanStatusCount);
-
-  loanStatusCount.save();
-  return loanStatusCount;
-}
-
-function updateTotalLoanStatusCount(loanStatusCount: LoanStatusCount): void {
-  const allLoans = loanStatusCount.submitted
-    .concat(loanStatusCount.accepted)
-    .concat(loanStatusCount.dueSoon)
-    .concat(loanStatusCount.late)
-    .concat(loanStatusCount.defaulted)
-    .concat(loanStatusCount.repaid)
-    .concat(loanStatusCount.liquidated);
-  loanStatusCount.all = allLoans;
-  loanStatusCount.totalCount = BigInt.fromI32(allLoans.length);
 }
 
 export enum PaymentEventType {
@@ -414,59 +338,73 @@ function updateBidTokenVolumesOnPayment(
   }
 }
 
-export function addBidToTokenVolume(tokenVolume: TokenVolume, bid: Bid): void {
-  const loans = incrementLoanStatusCount(
-    `tokenVolume-${tokenVolume.id}`,
-    bid.id,
-    bid.status
-  );
+function addBidToTokenVolume(tokenVolume: TokenVolume, bidId: string): void {
+  const bid = Bid.load(bidId);
+  if (!bid) throw new Error(`Bid not found: ${bidId}`);
 
+  tokenVolume._loanAcceptedCount = tokenVolume._loanAcceptedCount.plus(
+    BigInt.fromI32(1)
+  );
   tokenVolume.outstandingCapital = tokenVolume.outstandingCapital.plus(
     bid.principal.minus(bid.totalRepaidPrincipal)
   );
-
-  tokenVolume._aprTotal = tokenVolume._aprTotal.plus(bid.apr);
-  tokenVolume.aprAverage = tokenVolume._aprTotal.div(loans.totalCount);
-
   tokenVolume.totalLoaned = tokenVolume.totalLoaned.plus(bid.principal);
-  tokenVolume.loanAverage = tokenVolume.totalLoaned.div(loans.totalCount);
-
-  tokenVolume._durationTotal = tokenVolume._durationTotal.plus(
-    bid.loanDuration
+  tokenVolume.loanAverage = tokenVolume.totalLoaned.div(
+    tokenVolume._loanAcceptedCount
   );
-  tokenVolume.durationAverage = tokenVolume._durationTotal.div(
-    loans.totalCount
+
+  tokenVolume._aprWeightedTotal = tokenVolume._aprWeightedTotal.plus(
+    bid.apr.times(bid.principal)
+  );
+  tokenVolume.aprAverage = tokenVolume._aprWeightedTotal.div(
+    tokenVolume.totalLoaned
+  );
+
+  tokenVolume._durationWeightedTotal = tokenVolume._durationWeightedTotal.plus(
+    bid.loanDuration.times(bid.principal)
+  );
+  tokenVolume.durationAverage = tokenVolume._durationWeightedTotal.div(
+    tokenVolume.totalLoaned
   );
 
   tokenVolume.save();
 }
 
-export function removeBidFromTokenVolume(
+function removeBidFromTokenVolume(
   tokenVolume: TokenVolume,
-  bid: Bid
+  bidId: string
 ): void {
-  const loans = decrementLoanStatusCount(
-    `tokenVolume-${tokenVolume.id}`,
-    bid.id,
-    bid.status
-  );
+  const bid = Bid.load(bidId);
+  if (!bid) throw new Error(`Bid not found: ${bidId}`);
 
-  tokenVolume.outstandingCapital = tokenVolume.outstandingCapital.minus(
-    bid.principal.minus(bid.totalRepaidPrincipal)
+  tokenVolume._loanAcceptedCount = tokenVolume._loanAcceptedCount.minus(
+    BigInt.fromI32(1)
   );
+  if (tokenVolume._loanAcceptedCount.isZero()) {
+    initTokenVolume(tokenVolume, loadToken(bid.lendingTokenAddress));
+  } else {
+    tokenVolume.outstandingCapital = tokenVolume.outstandingCapital.minus(
+      bid.principal.minus(bid.totalRepaidPrincipal)
+    );
+    tokenVolume.totalLoaned = tokenVolume.totalLoaned.minus(bid.principal);
+    tokenVolume.loanAverage = tokenVolume.totalLoaned.div(
+      tokenVolume._loanAcceptedCount
+    );
 
-  tokenVolume._aprTotal = tokenVolume._aprTotal.minus(bid.apr);
-  tokenVolume.aprAverage = tokenVolume._aprTotal.div(loans.totalCount);
+    tokenVolume._aprWeightedTotal = tokenVolume._aprWeightedTotal.minus(
+      bid.apr.times(bid.principal)
+    );
+    tokenVolume.aprAverage = tokenVolume._aprWeightedTotal.div(
+      tokenVolume._loanAcceptedCount
+    );
 
-  tokenVolume.totalLoaned = tokenVolume.totalLoaned.minus(bid.principal);
-  tokenVolume.loanAverage = tokenVolume.totalLoaned.div(loans.totalCount);
-
-  tokenVolume._durationTotal = tokenVolume._durationTotal.minus(
-    bid.loanDuration
-  );
-  tokenVolume.durationAverage = tokenVolume._durationTotal.div(
-    loans.totalCount
-  );
+    tokenVolume._durationWeightedTotal = tokenVolume._durationWeightedTotal.minus(
+      bid.loanDuration.times(bid.principal)
+    );
+    tokenVolume.durationAverage = tokenVolume._durationWeightedTotal.div(
+      tokenVolume.totalLoaned
+    );
+  }
 
   tokenVolume.save();
 }
@@ -494,23 +432,22 @@ function getTypeString(tokenType: i32): string {
 }
 
 export function replaceLender(bid: Bid, newLender: Lender): void {
-  const oldLender = Lender.load(bid.lender!);
-  if (!oldLender) throw new Error(`Lender not found for bid: ${bid.id}}`);
-  const oldLenderVolume = loadLenderTokenVolume(
-    Address.fromBytes(bid.lendingTokenAddress),
-    oldLender
+  const oldLenderCount = LoanStatusCount.load(`lender-${bid.lender!}`);
+  if (!oldLenderCount)
+    throw new Error(`LoanStatusCount not found: ${bid.lender!}`);
+  updateLoanStatusCount(
+    oldLenderCount,
+    bid.id,
+    bid.status,
+    ArrayUpdaterFn.DELETE
   );
-  removeBidFromTokenVolume(oldLenderVolume, bid);
-  decrementLoanStatusCount(`lender-${oldLender.id}`, bid.id, bid.status);
 
   bid.lender = newLender.id;
   bid.lenderAddress = newLender.lenderAddress;
   bid.save();
 
-  const newLenderVolume = loadLenderTokenVolume(
-    Address.fromBytes(bid.lendingTokenAddress),
-    newLender
-  );
-  addBidToTokenVolume(newLenderVolume, bid);
-  incrementLoanStatusCount(`lender-${newLender.id}`, bid.id, bid.status);
+  const newLenderCount = LoanStatusCount.load(`lender-${newLender.id}`);
+  if (!newLenderCount)
+    throw new Error(`LoanStatusCount not found: ${newLender.id}`);
+  updateLoanStatusCount(newLenderCount, bid.id, bid.status, ArrayUpdaterFn.ADD);
 }

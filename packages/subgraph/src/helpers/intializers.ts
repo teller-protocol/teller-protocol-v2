@@ -12,14 +12,15 @@ export function initTokenVolume(tokenVolume: TokenVolume, token: Token): void {
 
   tokenVolume.outstandingCapital = BigInt.zero();
   tokenVolume.totalLoaned = BigInt.zero();
+  tokenVolume._loanAcceptedCount = BigInt.zero();
   tokenVolume.loanAverage = BigInt.zero();
 
   tokenVolume.commissionEarned = BigInt.zero();
   tokenVolume.totalRepaidInterest = BigInt.zero();
 
-  tokenVolume._aprTotal = BigInt.zero();
+  tokenVolume._aprWeightedTotal = BigInt.zero();
   tokenVolume.aprAverage = BigInt.zero();
 
-  tokenVolume._durationTotal = BigInt.zero();
+  tokenVolume._durationWeightedTotal = BigInt.zero();
   tokenVolume.durationAverage = BigInt.zero();
 }

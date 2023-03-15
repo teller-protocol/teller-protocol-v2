@@ -26,8 +26,6 @@ import {
   loadTokenVolumeByMarketId
 } from "./helpers/loaders";
 import {
-  addBidToTokenVolume,
-  getTokenVolumesForBid,
   PaymentEventType,
   replaceLender,
   updateBidOnPayment,
@@ -139,11 +137,6 @@ export function handleAcceptedBid(event: AcceptedBid): void {
   bid.save();
 
   updateBidStatus(bid, BidStatus.Accepted);
-
-  const tokenVolumes = getTokenVolumesForBid(bid.id);
-  for (let i = 0; i < tokenVolumes.length; i++) {
-    addBidToTokenVolume(tokenVolumes[i], bid);
-  }
 }
 
 export function handleAcceptedBids(events: AcceptedBid[]): void {
@@ -233,6 +226,8 @@ export function handleFeePaid(event: FeePaid): void {
       event.params.amount
     );
     tokenVolume.save();
+
+    // TODO: why are we adding the market commission earned to the protocol volume?
     const protocolVolume = loadProtocolTokenVolume(lendingTokenAddress);
     if (protocolVolume) {
       const protocolCommissionEarned = protocolVolume.commissionEarned;

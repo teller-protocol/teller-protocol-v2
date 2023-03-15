@@ -1,7 +1,6 @@
-import { Address, BigInt, Value } from "@graphprotocol/graph-ts";
+import { Address, BigInt, Bytes, Value } from "@graphprotocol/graph-ts";
 
 import { IERC20Metadata } from "../../generated/Blocks/IERC20Metadata";
-import { LenderCommitmentForwarder } from "../../generated/LenderCommitmentForwarder/LenderCommitmentForwarder";
 import {
   Bid,
   Borrower,
@@ -10,7 +9,6 @@ import {
   Lender,
   LoanStatusCount,
   MarketPlace,
-  MarketVolume,
   Protocol,
   Token,
   TokenVolume,
@@ -36,12 +34,12 @@ export function loadProtocol(): Protocol {
   return protocol;
 }
 
-export function loadToken(address: Address): Token {
+export function loadToken(address: Bytes): Token {
   let token = Token.load(address.toHexString());
   if (!token) {
     token = new Token(address.toHex());
 
-    const tokenContract = IERC20Metadata.bind(address);
+    const tokenContract = IERC20Metadata.bind(Address.fromBytes(address));
     const name = tokenContract.try_name();
     if (!name.reverted) {
       token.name = tokenContract.name();
@@ -270,18 +268,9 @@ export function loadTokenVolumeByMarketId(
   const tokenVolume = loadTokenVolumeWithValues(
     ["market", marketId],
     lendingTokenAddress,
-    ["marketplace"],
+    ["market"],
     [Value.fromString(marketId)]
   );
-
-  const marketVolumeId = `${marketId}-${tokenVolume.id}`;
-  let marketVolume = MarketVolume.load(marketVolumeId);
-  if (!marketVolume) {
-    marketVolume = new MarketVolume(marketVolumeId);
-    marketVolume.market = marketId;
-    marketVolume.volume = tokenVolume.id;
-    marketVolume.save();
-  }
 
   return tokenVolume;
 }
@@ -321,83 +310,18 @@ export function loadBorrowerTokenVolume(
 }
 
 /**
- * @param {string} commitmentId - ID of the commitment
- * @returns {Commitment} The Commitment entity for the lender
- */
-export function loadCommitment(commitmentId: string): Commitment {
-  const idString = commitmentId;
-  let commitment = Commitment.load(idString);
-
-  if (!commitment) {
-    commitment = new Commitment(idString);
-
-    commitment.committedAmount = BigInt.zero();
-    commitment.expirationTimestamp = BigInt.zero();
-    commitment.maxDuration = BigInt.zero();
-    commitment.minAPY = BigInt.zero();
-    commitment.lender = "";
-    commitment.lenderAddress = Address.zero();
-    commitment.marketplace = "";
-    commitment.marketplaceId = BigInt.zero();
-    commitment.stats = "";
-    commitment.createdAt = BigInt.zero();
-
-    commitment.principalTokenAddress = Address.zero();
-    commitment.collateralTokenAddress = Address.zero();
-    commitment.collateralTokenId = BigInt.zero();
-    commitment.collateralTokenType = "";
-    commitment.maxPrincipalPerCollateralAmount = BigInt.zero();
-    commitment.commitmentBorrowers = [];
-
-    commitment.save();
-  }
-  return commitment;
-}
-
-/**
- * @param {string} commitmentId - ID of the commitment
- * @param {Address} lenderAddress - Address of the lender
- * @param {string} marketId - Market id
  * @param {Address} lendingTokenAddress - Address of the token being lent
- * @param {BigInt} committedAmount - The maximum that can be loaned
- * @param {Address} eventAddress - Address of the emitted event
+ * @param {Commitment} commitment - Commitment entity
+ * @returns {TokenVolume} The TokenVolume entity for the given commitment
  */
-
-export function updateLenderCommitment(
-  commitmentId: string,
-  lenderAddress: Address,
-  marketId: string,
+export function loadCommitmentTokenVolume(
   lendingTokenAddress: Address,
-  committedAmount: BigInt,
-  eventAddress: Address
-): Commitment {
-  const commitment = loadCommitment(commitmentId);
-
-  const lender = loadLenderByMarketId(lenderAddress, marketId);
-
-  commitment.lender = lender.id;
-  commitment.lenderAddress = lender.lenderAddress;
-  commitment.marketplace = marketId;
-  commitment.marketplaceId = BigInt.fromString(marketId);
-  commitment.committedAmount = committedAmount;
-
-  const lenderCommitmentForwarderInstance = LenderCommitmentForwarder.bind(
-    eventAddress
+  commitment: Commitment
+): TokenVolume {
+  return loadTokenVolumeWithValues(
+    ["commitment", commitment.id],
+    lendingTokenAddress
   );
-  const lenderCommitment = lenderCommitmentForwarderInstance.commitments(
-    BigInt.fromString(commitmentId)
-  );
-
-  commitment.expirationTimestamp = lenderCommitment.value1;
-  commitment.maxDuration = lenderCommitment.value2;
-  commitment.minAPY = BigInt.fromI32(lenderCommitment.value3);
-  commitment.collateralTokenAddress = lenderCommitment.value4;
-  commitment.collateralTokenId = lenderCommitment.value5;
-  commitment.maxPrincipalPerCollateralAmount = lenderCommitment.value6;
-  commitment.collateralTokenType = lenderCommitment.value7.toString();
-  commitment.principalTokenAddress = lenderCommitment.value10;
-  commitment.save();
-  return commitment;
 }
 
 export function getBid(

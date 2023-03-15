@@ -35,14 +35,14 @@ contract EnumerableSetAllowlist is IAllowlistManager,IEnumerableSetAllowlist {
 
  
     /**
-     * @notice Adds a borrower to the allowlist for a commmitment.
+     * @notice Adds a addresses to the allowlist for a commmitment.
      * @param _commitmentId The id of the commitment that will allow the new borrower
      * @param _addressList the address array that will be allowed to accept loans using the commitment
      */
     function _addToAllowlist(
         uint256 _commitmentId,
         address[] calldata _addressList
-    ) internal {
+    ) internal virtual {
         for (uint256 i = 0; i < _addressList.length; i++) {
             allowList[_commitmentId].add(_addressList[i]);
         }
@@ -50,7 +50,7 @@ contract EnumerableSetAllowlist is IAllowlistManager,IEnumerableSetAllowlist {
     }
 
 
-    function addressIsAllowed(uint256 _commitmentId, address _account) public returns (bool _allowed) {
+    function addressIsAllowed(uint256 _commitmentId, address _account) public virtual returns (bool _allowed) {
         _allowed = allowList[_commitmentId].contains(_account);
     }
 

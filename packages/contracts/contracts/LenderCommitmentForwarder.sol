@@ -327,7 +327,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             "Invalid loan max duration"
         );
 
-       require(
+        require(
             __commitmentBorrowersList[_commitmentId].length() == 0 ||
                  commitmentAllowListManagers[_commitmentId] != address(0),
             "Commitments with legacy borrower list must now set an allow list manager"

@@ -100,6 +100,11 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint256 tokenAmount
     );
 
+    event UpdatedAllowlistManager(
+        uint256 indexed commitmentId,
+        address manager
+    );
+
     /**
      * @notice This event is emitted when the allowed borrowers for a commitment is updated.
      * @param commitmentId The id of the commitment that was updated.
@@ -242,6 +247,18 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         );
     }
 
+      function updateAllowlistManager(
+        uint256 _commitmentId,
+        address _allowlistManager
+    ) public commitmentLender(_commitmentId) {
+       
+        commitmentAllowListManagers[_commitmentId] = _allowlistManager;
+
+        emit UpdatedAllowlistManager(_commitmentId,_allowlistManager);
+        //emit UpdatedAllowList(_commitmentId);
+    }
+
+
     /**
      * @notice Updates the borrowers allowed to accept a commitment
      * @param _commitmentId The Id of the commitment to update.
@@ -251,9 +268,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint256 _commitmentId,
         address[] calldata _borrowerAddressList
     ) public commitmentLender(_commitmentId) {
-        //delete commitmentBorrowersList[_commitmentId];
-        //_addBorrowersToCommitmentAllowlist(_commitmentId, _borrowerAddressList);
-
+       
         address allowlistManager = commitmentAllowListManagers[_commitmentId];
 
         IEnumerableSetAllowlist(allowlistManager).setAllowlist(_commitmentId, _borrowerAddressList);

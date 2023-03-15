@@ -213,6 +213,11 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             _commitment.principalTokenAddress,
             _commitment.maxPrincipal
         );
+
+        emit UpdatedAllowlistManager(
+            commitmentId_,
+            borrowerAllowlistManager
+        );
     }
 
     /**

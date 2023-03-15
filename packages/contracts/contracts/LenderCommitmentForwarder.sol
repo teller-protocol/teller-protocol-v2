@@ -6,16 +6,22 @@ import "./TellerV2MarketForwarder.sol";
 
 // Interfaces
 import "./interfaces/ICollateralManager.sol";
+
+import "./interfaces/IAllowlistManager.sol";
+import "./interfaces/IEnumerableSetAllowlist.sol";
 import { Collateral, CollateralType } from "./interfaces/escrow/ICollateralEscrowV1.sol";
 
-import "@openzeppelin/contracts-upgradeable/utils/structs/EnumerableSetUpgradeable.sol";
+//import "@openzeppelin/contracts-upgradeable/utils/structs/EnumerableSetUpgradeable.sol";
 
 // Libraries
 import { MathUpgradeable } from "@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20MetadataUpgradeable.sol";
 
+
+
+
 contract LenderCommitmentForwarder is TellerV2MarketForwarder {
-    using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
+   // using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
 
     enum CommitmentCollateralType {
         NONE, // no collateral required
@@ -58,8 +64,10 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
 
     uint256 commitmentCount;
 
-    mapping(uint256 => EnumerableSetUpgradeable.AddressSet)
-        internal commitmentBorrowersList;
+    mapping(uint256 => address)
+        internal __commitmentBorrowersList; //DEPRECATED -> moved to manager
+
+    mapping(uint256 => address) public commitmentAllowListManagers;
 
     /**
      * @notice This event is emitted when a lender's commitment is created.
@@ -171,12 +179,13 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
     /**
      * @notice Creates a loan commitment from a lender for a market.
      * @param _commitment The new commitment data expressed as a struct
-     * @param _borrowerAddressList The array of borrowers that are allowed to accept loans using this commitment
+     * @param borrowerAllowlistManager The address of the allowlist contract 
      * @return commitmentId_ returns the commitmentId for the created commitment
      */
     function createCommitment(
         Commitment calldata _commitment,
-        address[] calldata _borrowerAddressList
+   //     address[] calldata _borrowerAddressList,
+        address borrowerAllowlistManager
     ) public returns (uint256 commitmentId_) {
         commitmentId_ = commitmentCount++;
 
@@ -186,10 +195,11 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         );
 
         commitments[commitmentId_] = _commitment;
+        commitmentAllowListManagers[commitmentId_] = borrowerAllowlistManager;
 
         validateCommitment(commitments[commitmentId_]);
 
-        _addBorrowersToCommitmentAllowlist(commitmentId_, _borrowerAddressList);
+        //_addBorrowersToCommitmentAllowlist(commitmentId_, _borrowerAddressList);
 
         emit CreatedCommitment(
             commitmentId_,
@@ -241,24 +251,16 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint256 _commitmentId,
         address[] calldata _borrowerAddressList
     ) public commitmentLender(_commitmentId) {
-        delete commitmentBorrowersList[_commitmentId];
-        _addBorrowersToCommitmentAllowlist(_commitmentId, _borrowerAddressList);
+        //delete commitmentBorrowersList[_commitmentId];
+        //_addBorrowersToCommitmentAllowlist(_commitmentId, _borrowerAddressList);
+
+        address allowlistManager = commitmentAllowListManagers[_commitmentId];
+
+        IEnumerableSetAllowlist(allowlistManager).setAllowlist(_commitmentId, _borrowerAddressList);
+
+        //emit UpdatedAllowList(_commitmentId);
     }
 
-    /**
-     * @notice Adds a borrower to the allowlist for a commmitment.
-     * @param _commitmentId The id of the commitment that will allow the new borrower
-     * @param _borrowerArray the address array of the borrowers that will be allowed to accept loans using the commitment
-     */
-    function _addBorrowersToCommitmentAllowlist(
-        uint256 _commitmentId,
-        address[] calldata _borrowerArray
-    ) internal {
-        for (uint256 i = 0; i < _borrowerArray.length; i++) {
-            commitmentBorrowersList[_commitmentId].add(_borrowerArray[i]);
-        }
-        emit UpdatedCommitmentBorrowers(_commitmentId);
-    }
 
     /**
      * @notice Removes the commitment of a lender to a market.
@@ -269,7 +271,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         commitmentLender(_commitmentId)
     {
         delete commitments[_commitmentId];
-        delete commitmentBorrowersList[_commitmentId];
+        //delete commitmentBorrowersList[_commitmentId];
         emit DeletedCommitment(_commitmentId);
     }
 
@@ -325,11 +327,19 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             "Invalid loan max duration"
         );
 
-        require(
+       /* require(
             commitmentBorrowersList[_commitmentId].length() == 0 ||
                 commitmentBorrowersList[_commitmentId].contains(borrower),
             "unauthorized commitment borrower"
+        );*/
+
+        require(commitmentAllowListManagers[_commitmentId] == address(0) ||
+            IAllowlistManager(commitmentAllowListManagers[_commitmentId]).addressIsAllowed(
+                _commitmentId, borrower
+            ),
+            "Borrower not allowlisted"
         );
+ 
 
         if (_principalAmount > commitment.maxPrincipal) {
             revert InsufficientCommitmentAllocation({
@@ -446,13 +456,13 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
      * @param _commitmentId The commitment id for the commitment to query.
      * @return borrowers_ An array of addresses restricted to accept the commitment. Empty array means unrestricted.
      */
-    function getCommitmentBorrowers(uint256 _commitmentId)
+   /* function getCommitmentBorrowers(uint256 _commitmentId)
         external
         view
         returns (address[] memory borrowers_)
     {
         borrowers_ = commitmentBorrowersList[_commitmentId].values();
-    }
+    }*/
 
     /**
      * @notice Internal function to submit a bid to the lending protocol using a commitment

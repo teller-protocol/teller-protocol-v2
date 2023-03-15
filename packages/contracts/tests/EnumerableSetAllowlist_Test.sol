@@ -6,6 +6,8 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
  
 import "./resolvers/TestERC20Token.sol";
  
+import "forge-std/console.sol";
+  
 import { Testable } from "./Testable.sol";
 import { LenderCommitmentForwarder } from "../contracts/LenderCommitmentForwarder.sol";
 
@@ -20,21 +22,22 @@ contract EnumerableSetAllowlist_Test is Testable, EnumerableSetAllowlist {
     address[] emptyArray;
     address[] borrowersArray;
 
-    User private marketOwner;
-    User private lender;
-    User private borrower;
+    
+    AllowlistUser private lender;
+    AllowlistUser private borrower;
 
     bool addToAllowlistCalled; 
 
 
     constructor()
-    EnumerableSetAllowlist(address(0))
+    EnumerableSetAllowlist(address(new AllowlistUser(address(this))))
     {}
 
     function setUp() public {
-        
-        //allowlistManager = new AllowlistManagerMock();
+         
 
+      borrower = new AllowlistUser(address(this));
+ 
       borrowersArray = new address[](1);
       borrowersArray[0] = address(borrower);
         
@@ -43,156 +46,58 @@ contract EnumerableSetAllowlist_Test is Testable, EnumerableSetAllowlist {
  
     function test_setAllowlist() public {
 
-        super.setAllowlist(
+
+        bool isAllowedBefore = addressIsAllowed(0,address(borrower));
+
+        assertEq(
+            isAllowedBefore,
+            false,
+            "Expected borrower to be disallowed"
+        );
+
+
+
+      
+        AllowlistUser(authorized).call_setAllowList(
             0,
             borrowersArray
         );
 
-        assertEq(
-            addToAllowlistCalled,
-            true,
-            "addToAllowlist not called"
-        );
-    }
+        address[] memory allowedBorrowers = super.getAllowedAddresses(0);
+          
 
-    function test_addToAllowlist() public {
-
-        
-        super._addToAllowlist(
-            0,
-            borrowersArray
-        );
-
-        bool isAllowed = super.addressIsAllowed(0,address(borrower));
+        bool isAllowedAfter = addressIsAllowed(0,address(borrower));
 
         assertEq(
-            isAllowed,
+            isAllowedAfter,
             true,
             "Expected borrower to be allowed"
         );
+
+  
+    }
+ 
+ 
+
+}
+
+
+contract AllowlistUser {
+
+    address allowlistManager;
+
+    constructor( address _allowlistManager ){
+        allowlistManager = _allowlistManager; 
     }
 
+    function call_setAllowList(
+        uint256 commitmentId,
+        address[] memory borrowersArray
+    ) public { 
+         
+       EnumerableSetAllowlist(allowlistManager).setAllowlist(  0, borrowersArray );
 
-
-    //overrides 
-
-    function _addToAllowlist( 
-        uint256 _commitmentId,
-        address[] calldata _addressList
-    ) internal override {
-        addToAllowlistCalled = true;
     }
-
-   
-
- /*   function test_acceptCommitmentWithBorrowersArray_valid() public {
-        uint256 commitmentId = 0;
-
-        Commitment storage commitment = _createCommitment(
-            CommitmentCollateralType.ERC20,
-            maxAmount
-        );
-
-        lender._updateCommitmentBorrowers(commitmentId, borrowersArray);
-
-        uint256 bidId = borrower._acceptCommitment(
-            commitmentId,
-            0, //principal
-            maxAmount, //collateralAmount
-            0, //collateralTokenId
-            address(collateralToken),
-            minInterestRate,
-            maxLoanDuration
-        );
-
-        assertEq(
-            acceptBidWasCalled,
-            true,
-            "Expect accept bid called after exercise"
-        );
-    }
-
-    function test_acceptCommitmentWithBorrowersArray_invalid() public {
-        uint256 commitmentId = 0;
-
-        Commitment storage commitment = _createCommitment(
-            CommitmentCollateralType.ERC20,
-            maxAmount
-        );
-
-        lender._updateCommitmentBorrowers(commitmentId, borrowersArray);
-
-        bool acceptCommitAsMarketOwnerFails;
-
-        try
-            marketOwner._acceptCommitment(
-                commitmentId,
-                100, //principal
-                maxAmount, //collateralAmount
-                0, //collateralTokenId
-                address(collateralToken),
-                minInterestRate,
-                maxLoanDuration
-            )
-        {} catch {
-            acceptCommitAsMarketOwnerFails = true;
-        }
-
-        assertEq(
-            acceptCommitAsMarketOwnerFails,
-            true,
-            "Should fail when accepting as invalid borrower"
-        );
-
-        lender._updateCommitmentBorrowers(commitmentId, emptyArray);
-
-        acceptBidWasCalled = false;
-
-        marketOwner._acceptCommitment(
-            commitmentId,
-            0, //principal
-            maxAmount, //collateralAmount
-            0, //collateralTokenId
-            address(collateralToken),
-            minInterestRate,
-            maxLoanDuration
-        );
-
-        assertEq(
-            acceptBidWasCalled,
-            true,
-            "Expect accept bid called after exercise"
-        );
-    }
-
-    function test_acceptCommitmentWithBorrowersArray_reset() public {
-        uint256 commitmentId = 0;
-
-        Commitment storage commitment = _createCommitment(
-            CommitmentCollateralType.ERC20,
-            maxAmount
-        );
-
-        lender._updateCommitmentBorrowers(commitmentId, borrowersArray);
-
-        lender._updateCommitmentBorrowers(commitmentId, emptyArray);
-
-        marketOwner._acceptCommitment(
-            commitmentId,
-            0, //principal
-            maxAmount, //collateralAmount
-            0, //collateralTokenId
-            address(collateralToken),
-            minInterestRate,
-            maxLoanDuration
-        );
-
-        assertEq(
-            acceptBidWasCalled,
-            true,
-            "Expect accept bid called after exercise"
-        );
-    }*/
-
+       
 
 }

@@ -29,6 +29,7 @@ contract EnumerableSetAllowlist is IAllowlistManager,IEnumerableSetAllowlist {
         uint256 _commitmentId,
         address[] calldata _addressList
     ) public onlyAuthorized {
+       
         delete allowList[_commitmentId];
         _addToAllowlist(_commitmentId, _addressList);
     }
@@ -43,6 +44,7 @@ contract EnumerableSetAllowlist is IAllowlistManager,IEnumerableSetAllowlist {
         uint256 _commitmentId,
         address[] calldata _addressList
     ) internal virtual {
+        
         for (uint256 i = 0; i < _addressList.length; i++) {
             allowList[_commitmentId].add(_addressList[i]);
         }
@@ -50,8 +52,16 @@ contract EnumerableSetAllowlist is IAllowlistManager,IEnumerableSetAllowlist {
     }
 
 
-    function addressIsAllowed(uint256 _commitmentId, address _account) public virtual returns (bool _allowed) {
-        _allowed = allowList[_commitmentId].contains(_account);
+    function addressIsAllowed(uint256 _commitmentId, address _account) public virtual returns (bool) {
+        return allowList[_commitmentId].contains(_account);
+    }
+
+    function getAllowedAddresses(uint256 _commitmentId)
+        public
+        view
+        returns (address[] memory borrowers_)
+    {
+        borrowers_ = allowList[_commitmentId].values();
     }
 
 }

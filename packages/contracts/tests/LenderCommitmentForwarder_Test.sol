@@ -16,6 +16,7 @@ import { Collateral, CollateralType } from "../contracts/interfaces/escrow/IColl
 import { User } from "./Test_Helpers.sol";
 
 import "../contracts/mock/MarketRegistryMock.sol";
+import "../contracts/mock/AllowlistManagerMock.sol";
 
 contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
     LenderCommitmentForwarderTest_TellerV2Mock private tellerV2Mock;
@@ -40,6 +41,8 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
     bool submitBidWasCalled;
     bool submitBidWithCollateralWasCalled;
 
+    AllowlistManagerMock allowlistManager; 
+
     TestERC20Token principalToken;
     uint8 constant principalTokenDecimals = 18;
 
@@ -59,12 +62,16 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         );
         mockMarketRegistry = MarketRegistryMock(address(getMarketRegistry()));
 
-        marketOwner = new LenderCommitmentUser(address(tellerV2Mock), (this));
-        borrower = new LenderCommitmentUser(address(tellerV2Mock), (this));
-        lender = new LenderCommitmentUser(address(tellerV2Mock), (this));
+        allowlistManager = new AllowlistManagerMock();
+
+        marketOwner = new LenderCommitmentUser(address(tellerV2Mock), (this), address(allowlistManager));
+        borrower = new LenderCommitmentUser(address(tellerV2Mock), (this), address(allowlistManager));
+        lender = new LenderCommitmentUser(address(tellerV2Mock), (this), address(allowlistManager));
         tellerV2Mock.__setMarketOwner(marketOwner);
 
         mockMarketRegistry.setMarketOwner(address(marketOwner));
+
+      
 
         //tokenAddress = address(0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174);
         marketId = 2;
@@ -850,12 +857,15 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
 
 contract LenderCommitmentUser is User {
     LenderCommitmentForwarder public immutable commitmentForwarder;
+    AllowlistManagerMock allowlistManager;
 
     constructor(
         address _tellerV2,
-        LenderCommitmentForwarder _commitmentForwarder
+        LenderCommitmentForwarder _commitmentForwarder,
+        address _allowlistManager
     ) User(_tellerV2) {
         commitmentForwarder = _commitmentForwarder;
+        allowlistManager = AllowlistManagerMock(_allowlistManager);
     }
 
     function _createCommitment(
@@ -865,7 +875,7 @@ contract LenderCommitmentUser is User {
         return
             commitmentForwarder.createCommitment(
                 _commitment,
-                borrowerAddressList
+                address(allowlistManager)
             );
     }
 

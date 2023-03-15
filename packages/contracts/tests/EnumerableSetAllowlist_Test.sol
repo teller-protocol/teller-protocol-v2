@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
  
-import "./resolvers/TestERC20Token.sol";
+import "./tokens/TestERC20Token.sol";
  
 import "forge-std/console.sol";
   

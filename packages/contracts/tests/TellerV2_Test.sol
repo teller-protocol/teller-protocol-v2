@@ -20,7 +20,7 @@ import { User } from "./Test_Helpers.sol";
 import "../contracts/escrow/CollateralEscrowV1.sol";
 import "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
 import "../contracts/LenderCommitmentForwarder.sol";
-import "./resolvers/TestERC20Token.sol";
+import "./tokens/TestERC20Token.sol";
 
 import "../contracts/CollateralManager.sol";
 import { Collateral } from "../contracts/interfaces/escrow/ICollateralEscrowV1.sol";

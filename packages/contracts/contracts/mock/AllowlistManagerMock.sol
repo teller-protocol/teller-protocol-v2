@@ -1,5 +1,5 @@
 
-import "../interfaces/IAllowlistManager.sol";
+import "../interfaces/allowlist/IAllowlistManager.sol";
 contract AllowlistManagerMock is IAllowlistManager {
 
 

@@ -7,8 +7,8 @@ import "./TellerV2MarketForwarder.sol";
 // Interfaces
 import "./interfaces/ICollateralManager.sol";
 
-import "./interfaces/IAllowlistManager.sol";
-import "./interfaces/IEnumerableSetAllowlist.sol";
+import "./interfaces/allowlist/IAllowlistManager.sol";
+import "./interfaces/allowlist/IEnumerableSetAllowlist.sol";
 import { Collateral, CollateralType } from "./interfaces/escrow/ICollateralEscrowV1.sol";
 
 import "@openzeppelin/contracts-upgradeable/utils/structs/EnumerableSetUpgradeable.sol";

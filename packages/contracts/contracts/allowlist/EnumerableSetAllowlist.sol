@@ -1,7 +1,8 @@
+pragma solidity >=0.8.0 <0.9.0;
+// SPDX-License-Identifier: MIT
 
-
-import "../interfaces/IAllowlistManager.sol";
-import "../interfaces/IEnumerableSetAllowlist.sol";
+import "../interfaces/allowlist/IAllowlistManager.sol";
+import "../interfaces/allowlist/IEnumerableSetAllowlist.sol";
 
 import "@openzeppelin/contracts-upgradeable/utils/structs/EnumerableSetUpgradeable.sol";
 

@@ -18,7 +18,7 @@ import { User } from "./Test_Helpers.sol";
 import "../contracts/mock/MarketRegistryMock.sol";
 import "../contracts/mock/AllowlistManagerMock.sol";
 
-contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
+contract EnumerableSetAllowlist_Test is Testable, LenderCommitmentForwarder {
     LenderCommitmentForwarderTest_TellerV2Mock private tellerV2Mock;
     MarketRegistryMock mockMarketRegistry;
 

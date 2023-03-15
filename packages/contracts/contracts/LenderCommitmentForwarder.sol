@@ -11,7 +11,7 @@ import "./interfaces/IAllowlistManager.sol";
 import "./interfaces/IEnumerableSetAllowlist.sol";
 import { Collateral, CollateralType } from "./interfaces/escrow/ICollateralEscrowV1.sol";
 
-//import "@openzeppelin/contracts-upgradeable/utils/structs/EnumerableSetUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/structs/EnumerableSetUpgradeable.sol";
 
 // Libraries
 import { MathUpgradeable } from "@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol";
@@ -21,7 +21,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20Metadat
 
 
 contract LenderCommitmentForwarder is TellerV2MarketForwarder {
-   // using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
+   using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
 
     enum CommitmentCollateralType {
         NONE, // no collateral required
@@ -64,7 +64,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
 
     uint256 commitmentCount;
 
-    mapping(uint256 => address)
+    mapping(uint256 => EnumerableSetUpgradeable.AddressSet)
         internal __commitmentBorrowersList; //DEPRECATED -> moved to manager
 
     mapping(uint256 => address) public commitmentAllowListManagers;
@@ -327,11 +327,12 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             "Invalid loan max duration"
         );
 
-       /* require(
-            commitmentBorrowersList[_commitmentId].length() == 0 ||
-                commitmentBorrowersList[_commitmentId].contains(borrower),
-            "unauthorized commitment borrower"
-        );*/
+       require(
+            __commitmentBorrowersList[_commitmentId].length() == 0 ||
+                 commitmentAllowListManagers[_commitmentId] != address(0),
+            "Commitments with legacy borrower list must now set an allow list manager"
+        ); 
+       
 
         require(commitmentAllowListManagers[_commitmentId] == address(0) ||
             IAllowlistManager(commitmentAllowListManagers[_commitmentId]).addressIsAllowed(
@@ -407,6 +408,8 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             bidId
         );
     }
+
+ 
 
     /**
      * @notice Calculate the amount of collateral required to borrow a loan with _principalAmount of principal

@@ -154,6 +154,8 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
 
     function isLoanDefaulted(uint256 _bidId) public view returns (bool) {}
 
+    function isLoanLiquidateable(uint256 _bidId) public view returns (bool) {}
+
     function isPaymentLate(uint256 _bidId) public view returns (bool) {}
 
     function getLoanBorrower(uint256 _bidId)

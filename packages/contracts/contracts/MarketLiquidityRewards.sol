@@ -208,7 +208,7 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
     /**
      * @notice Allows a borrower or lender to withdraw the allocated ERC20 reward for their loan
      * @param _allocationId - The id for the reward allocation
-     * @param _bidId - The id for the loan.  Each loan only grants one reward per allocation.
+     * @param _bidId - The id for the loan. Each loan only grants one reward per allocation.
      */
     function claimRewards(uint256 _allocationId, uint256 _bidId)
         external
@@ -223,8 +223,6 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
             "reward already claimed"
         );
         rewardClaimedForBid[_bidId][_allocationId] = true; // leave this here to defend against re-entrancy
-
-        //optimize gas by turning these into one single call
 
         (
             address borrower,

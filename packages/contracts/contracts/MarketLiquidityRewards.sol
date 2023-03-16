@@ -102,7 +102,6 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
      * @param _allocation - The RewardAllocation struct data to create
      * @return allocationId_
      */
-
     function allocateRewards(RewardAllocation calldata _allocation)
         public
         virtual
@@ -138,7 +137,6 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
      * @param _bidStartTimeMin - The block timestamp that loans must have been accepted after to claim rewards
      * @param _bidStartTimeMax - The block timestamp that loans must have been accepted before to claim rewards
      */
-
     function updateAllocation(
         uint256 _allocationId,
         uint256 _minimumCollateralPerPrincipalAmount,
@@ -150,7 +148,7 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
 
         require(
             msg.sender == allocation.allocator,
-            "Only the allocator can deallocate rewards."
+            "Only the allocator can update allocation rewards."
         );
 
         allocation
@@ -179,7 +177,7 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
     }
 
     /**
-     * @notice Allows the allocator to withdraw some of all of the funds within an allocation
+     * @notice Allows the allocator to withdraw some or all of the funds within an allocation
      * @param _allocationId - The id for the allocation
      * @param _tokenAmount - The amount of tokens to withdraw
      */

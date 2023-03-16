@@ -333,7 +333,7 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
     }*/
 
     function test_verifyLoanStartTime_min() public {
-        vm.expectRevert(bytes("Loan was submitted before the min start time."));
+        vm.expectRevert(bytes("Loan was accepted before the min start time."));
 
         super._verifyLoanStartTime(100, 200, 300);
     }
@@ -361,7 +361,7 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
     }
 
     function test_verifyLoanStartTime_max() public {
-        vm.expectRevert(bytes("Loan was submitted after the max start time."));
+        vm.expectRevert(bytes("Loan was accepted after the max start time."));
 
         super._verifyLoanStartTime(400, 200, 300);
     }

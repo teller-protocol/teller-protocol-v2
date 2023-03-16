@@ -198,12 +198,14 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
         IERC20Upgradeable(allocatedRewards[_allocationId].rewardTokenAddress)
             .transfer(msg.sender, _tokenAmount);
 
-        emit DecreasedAllocation(_allocationId, _tokenAmount);
+     
 
         if (allocatedRewards[_allocationId].rewardTokenAmount == 0) {
             delete allocatedRewards[_allocationId];
 
             emit DeletedAllocation(_allocationId);
+        }else{
+            emit DecreasedAllocation(_allocationId, _tokenAmount);
         }
     }
 
@@ -281,17 +283,19 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
             principalTokenAddress
         ).decimals();
 
-        uint256 amountToReward = _calculateRewardAmount(
-            principalAmount,
-            principalTokenDecimals,
-            allocatedReward.rewardPerLoanPrincipalAmount
-        );
 
         address rewardRecipient = _verifyAndReturnRewardRecipient(
             allocatedReward.allocationStrategy,
             bidState,
             borrower,
             lender
+        );
+
+
+        uint256 amountToReward = _calculateRewardAmount(
+            principalAmount,
+            principalTokenDecimals,
+            allocatedReward.rewardPerLoanPrincipalAmount
         );
 
         //transfer tokens reward to the msgsender

@@ -264,6 +264,8 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
     }
 
 
+//should be able to set this in one tx 
+
     /**
      * @notice Updates the borrowers allowed to accept a commitment
      * @param _commitmentId The Id of the commitment to update.

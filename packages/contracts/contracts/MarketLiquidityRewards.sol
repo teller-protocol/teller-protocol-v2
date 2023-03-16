@@ -440,11 +440,11 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
     ) internal virtual {
         require(
             _minStartTime == 0 || _loanStartTime > _minStartTime,
-            "Loan was submitted before the min start time."
+            "Loan was accepted before the min start time."
         );
         require(
             _maxStartTime == 0 || _loanStartTime < _maxStartTime,
-            "Loan was submitted after the max start time."
+            "Loan was accepted after the max start time."
         );
     }
 

@@ -236,7 +236,7 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
             uint256 marketId,
             address principalTokenAddress,
             uint256 principalAmount,
-            uint32 timestamp,
+            uint32 acceptedTimestamp,
             BidState bidState
         ) = ITellerV2(tellerV2).getLoanSummary(_bidId);
 
@@ -245,7 +245,7 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
 
         //require that the loan was started in the correct timeframe
         _verifyLoanStartTime(
-            timestamp,
+            acceptedTimestamp,
             allocatedReward.bidStartTimeMin,
             allocatedReward.bidStartTimeMax
         );

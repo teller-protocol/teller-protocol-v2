@@ -26,7 +26,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     // bidIds -> validated collateral info
     mapping(uint256 => CollateralInfo) internal _bidCollaterals;
 
-    /*
+    /**
      * Since collateralInfo is mapped (address assetAddress => Collateral) that means
      * that only a single tokenId per nft per loan can be collateralized. 
      * Ex. Two bored apes cannot be used as collateral for a single loan.

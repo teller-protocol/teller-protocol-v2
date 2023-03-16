@@ -3,28 +3,22 @@ pragma solidity ^0.8.0;
 
 import { Testable } from "./Testable.sol";
 
-import { TellerV2 } from "../TellerV2.sol";
-import { MarketRegistry } from "../MarketRegistry.sol";
-import { ReputationManager } from "../ReputationManager.sol";
+import { TellerV2 } from "../contracts/TellerV2.sol";
+import { MarketRegistry } from "../contracts/MarketRegistry.sol";
+import { ReputationManager } from "../contracts/ReputationManager.sol";
 
-import "../TellerV2Storage.sol";
+import "../contracts/TellerV2Storage.sol";
 
-import "../interfaces/IMarketRegistry.sol";
-import "../interfaces/IReputationManager.sol";
+import "../contracts/interfaces/IMarketRegistry.sol";
+import "../contracts/interfaces/IReputationManager.sol";
 
-import "../EAS/TellerAS.sol";
+import "../contracts/EAS/TellerAS.sol";
 
-import "../mock/WethMock.sol";
-import "../interfaces/IWETH.sol";
+import "../contracts/mock/WethMock.sol";
+import "../contracts/interfaces/IWETH.sol";
 
-import { PaymentType, PaymentCycleType } from "../libraries/V2Calculations.sol";
-import "./Test_Helpers.sol";
-
-/*
-
-This should have more unit tests that operate on MarketRegistry.sol 
-
-*/
+import { User } from "./Test_Helpers.sol";
+import { PaymentType, PaymentCycleType } from "../contracts/libraries/V2Calculations.sol";
 
 contract MarketRegistry_Test is Testable, TellerV2 {
     User private marketOwner;
@@ -35,9 +29,7 @@ contract MarketRegistry_Test is Testable, TellerV2 {
 
     constructor() TellerV2(address(address(0))) {}
 
-    function setup_beforeAll() public {
-        //wethMock = new WethMock();
-
+    function setUp() public {
         marketOwner = new User(address(this));
         borrower = new User(address(this));
         lender = new User(address(this));
@@ -47,7 +39,7 @@ contract MarketRegistry_Test is Testable, TellerV2 {
         reputationManager = IReputationManager(new ReputationManager());
     }
 
-    function createMarket_test() public {
+    function test_createMarket() public {
         // Standard seconds payment cycle
         marketOwner.createMarket(
             address(marketRegistry),

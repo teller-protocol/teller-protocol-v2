@@ -2,18 +2,18 @@
 pragma solidity ^0.8.0;
 
 import "hardhat/console.sol";
-import "@mangrovedao/hardhat-test-solidity/test.sol";
+
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 import { Testable } from "./Testable.sol";
-import { TellerV2Context } from "../TellerV2Context.sol";
-import { IMarketRegistry } from "../interfaces/IMarketRegistry.sol";
-import { TellerV2MarketForwarder } from "../TellerV2MarketForwarder.sol";
+import { TellerV2Context } from "../contracts/TellerV2Context.sol";
+import { IMarketRegistry } from "../contracts/interfaces/IMarketRegistry.sol";
+import { TellerV2MarketForwarder } from "../contracts/TellerV2MarketForwarder.sol";
 
 import { User } from "./Test_Helpers.sol";
 
-import "../mock/MarketRegistryMock.sol";
+import "../contracts/mock/MarketRegistryMock.sol";
 
 contract MarketForwarder_Test is Testable, TellerV2MarketForwarder {
     MarketForwarderTester private tellerV2Mock;
@@ -32,7 +32,7 @@ contract MarketForwarder_Test is Testable, TellerV2MarketForwarder {
         )
     {}
 
-    function setup_beforeAll() public {
+    function setUp() public {
         mockMarketRegistry = MarketRegistryMock(address(getMarketRegistry()));
         tellerV2Mock = MarketForwarderTester(address(getTellerV2()));
 
@@ -51,8 +51,9 @@ contract MarketForwarder_Test is Testable, TellerV2MarketForwarder {
         marketOwner.setTrustedMarketForwarder(marketId, address(this));
     }
 
-    function setTrustedMarketForwarder_test() public {
-        Test.eq(
+    function test_setTrustedMarketForwarder() public {
+        setTrustedMarketForwarder_before();
+        assertEq(
             tellerV2Mock.isTrustedMarketForwarder(marketId, address(this)),
             true,
             "Trusted forwarder was not set"
@@ -66,8 +67,9 @@ contract MarketForwarder_Test is Testable, TellerV2MarketForwarder {
         user2.approveMarketForwarder(marketId, address(this));
     }
 
-    function approveMarketForwarder_test() public {
-        Test.eq(
+    function test_approveMarketForwarder() public {
+        approveMarketForwarder_before();
+        assertEq(
             tellerV2Mock.hasApprovedMarketForwarder(
                 marketId,
                 address(this),
@@ -76,7 +78,8 @@ contract MarketForwarder_Test is Testable, TellerV2MarketForwarder {
             true,
             "Borrower did not set market forwarder approval"
         );
-        Test.eq(
+
+        assertEq(
             tellerV2Mock.hasApprovedMarketForwarder(
                 marketId,
                 address(this),
@@ -91,7 +94,9 @@ contract MarketForwarder_Test is Testable, TellerV2MarketForwarder {
         approveMarketForwarder_before();
     }
 
-    function forwardUserCall_test() public {
+    function test_forwardUserCall() public {
+        forwardUserCall_before();
+
         address expectedSender = address(user1);
         address sender = abi.decode(
             _forwardCall(
@@ -103,7 +108,7 @@ contract MarketForwarder_Test is Testable, TellerV2MarketForwarder {
             ),
             (address)
         );
-        Test.eq(
+        assertEq(
             sender,
             expectedSender,
             "Sender address for market does not match expected"
@@ -117,7 +122,7 @@ contract MarketForwarder_Test is Testable, TellerV2MarketForwarder {
             _forwardCall(expectedData, expectedSender),
             (bytes)
         );
-        Test.eq0(
+        assertEq0(
             data,
             expectedData,
             "Function calldata for market does not match expected"

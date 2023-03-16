@@ -3,28 +3,27 @@ pragma solidity ^0.8.0;
 
 import { Testable } from "./Testable.sol";
 
-import { TellerV2Autopay } from "../TellerV2Autopay.sol";
-import { MarketRegistry } from "../MarketRegistry.sol";
-import { ReputationManager } from "../ReputationManager.sol";
+import { TellerV2Autopay } from "../contracts/TellerV2Autopay.sol";
+import { MarketRegistry } from "../contracts/MarketRegistry.sol";
+import { ReputationManager } from "../contracts/ReputationManager.sol";
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
-import "../TellerV2Storage.sol";
+import "../contracts/TellerV2Storage.sol";
 
-import "../interfaces/IMarketRegistry.sol";
-import "../interfaces/IReputationManager.sol";
+import "../contracts/interfaces/IMarketRegistry.sol";
+import "../contracts/interfaces/IReputationManager.sol";
 
-import "../EAS/TellerAS.sol";
+import "../contracts/EAS/TellerAS.sol";
 
-import "../mock/WethMock.sol";
+import "../contracts/mock/WethMock.sol";
 
-import "../mock/TellerV2SolMock.sol";
-import "../mock/MarketRegistryMock.sol";
-import "../interfaces/IWETH.sol";
-import "../interfaces/ITellerV2Autopay.sol";
+import "../contracts/mock/TellerV2SolMock.sol";
+import "../contracts/mock/MarketRegistryMock.sol";
+import "../contracts/interfaces/IWETH.sol";
+import "../contracts/interfaces/ITellerV2Autopay.sol";
 
-import "@mangrovedao/hardhat-test-solidity/test.sol";
-import { PaymentType, PaymentCycleType } from "../libraries/V2Calculations.sol";
+import { PaymentType } from "../contracts/libraries/V2Calculations.sol";
 
 contract TellerV2Autopay_Test is Testable, TellerV2Autopay {
     User private marketOwner;
@@ -41,7 +40,7 @@ contract TellerV2Autopay_Test is Testable, TellerV2Autopay {
         TellerV2SolMock(address(tellerV2)).setMarketRegistry(marketRegistry);
     }
 
-    function setup_beforeAll() public {
+    function setUp() public {
         wethMock = new WethMock();
 
         marketOwner = new User(
@@ -90,39 +89,41 @@ contract TellerV2Autopay_Test is Testable, TellerV2Autopay {
         );
     }
 
-    function setAutoPayEnabled_test() public {
+    function test_setAutoPayEnabled() public {
+        setAutoPayEnabled_before();
+
         uint256 bidId = 0;
 
         borrower.enableAutoPay(bidId, true);
 
-        Test.eq(
+        assertEq(
             loanAutoPayEnabled[bidId],
             true,
             "Autopay not enabled after setAutoPayEnabled"
         );
     }
 
-    function setAutopayFee_test() public {
+    function test_setAutopayFee() public {
         _setAutopayFee(4);
-        Test.eq(4, getAutopayFee(), "Auto pay fee not set");
+        assertEq(4, getAutopayFee(), "Auto pay fee not set");
     }
 
-    function setAutopayFeeOnlyOwner_test() public {
+    function test_setAutopayFeeOnlyOwner() public {
         User user = new User(
             address(this),
             address(tellerV2),
             address(wethMock)
         );
         try user.setAutopayFee(4) {
-            Test.fail("Auto pay fee set by non owner");
+            fail("Auto pay fee set by non owner");
         } catch Error(string memory reason) {
-            Test.eq(
+            assertEq(
                 reason,
                 "Ownable: caller is not the owner",
                 "Should not be able to set autopay fee"
             );
         } catch {
-            Test.fail("Unknown error");
+            fail("Unknown error");
         }
     }
 
@@ -164,7 +165,9 @@ contract TellerV2Autopay_Test is Testable, TellerV2Autopay {
         borrower.approveWeth(address(this), borrowerNewBalance);
     }
 
-    function autoPayLoanMinimum_test() public {
+    function test_autoPayLoanMinimum() public {
+        autoPayLoanMinimum_before();
+
         uint256 bidId = 0;
 
         uint256 lenderBalanceBefore = ERC20(address(wethMock)).balanceOf(
@@ -185,7 +188,7 @@ contract TellerV2Autopay_Test is Testable, TellerV2Autopay {
 
         uint256 lenderBalanceDelta = lenderBalanceAfter - lenderBalanceBefore;
 
-        Test.eq(
+        assertEq(
             lenderBalanceDelta,
             2,
             "lender did not receive the auto pay charge"
@@ -194,7 +197,7 @@ contract TellerV2Autopay_Test is Testable, TellerV2Autopay {
         uint256 borrowerBalanceDelta = borrowerBalanceBefore -
             borrowerBalanceAfter;
 
-        Test.eq(borrowerBalanceDelta, 4002, "borrower did not autopay");
+        assertEq(borrowerBalanceDelta, 4002, "borrower did not autopay");
     }
 
     function getEstimatedMinimumPayment(uint256 _bidId)

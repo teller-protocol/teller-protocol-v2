@@ -1,28 +1,21 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "hardhat/console.sol";
-
-import "@mangrovedao/hardhat-test-solidity/test.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
-import "./resolvers/TestERC20Token.sol";
-import "../TellerV2MarketForwarder.sol";
-import "../TellerV2Context.sol";
-import { Testable } from "./Testable.sol";
-import { LenderCommitmentForwarder } from "../LenderCommitmentForwarder.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "../contracts/TellerV2MarketForwarder.sol";
 
-import { Collateral, CollateralType } from "../interfaces/escrow/ICollateralEscrowV1.sol";
+import "./resolvers/TestERC20Token.sol";
+import "../contracts/TellerV2Context.sol";
+
+import { Testable } from "./Testable.sol";
+import { LenderCommitmentForwarder } from "../contracts/LenderCommitmentForwarder.sol";
+
+import { Collateral, CollateralType } from "../contracts/interfaces/escrow/ICollateralEscrowV1.sol";
 
 import { User } from "./Test_Helpers.sol";
 
-import "../mock/MarketRegistryMock.sol";
-
-/* 
- add tests for each token type 
-
- add test for conversion of collateral type -- simple 
-
- */
+import "../contracts/mock/MarketRegistryMock.sol";
 
 contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
     LenderCommitmentForwarderTest_TellerV2Mock private tellerV2Mock;
@@ -60,7 +53,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         )
     {}
 
-    function setup_beforeAll() public {
+    function setUp() public {
         tellerV2Mock = LenderCommitmentForwarderTest_TellerV2Mock(
             address(getTellerV2())
         );
@@ -138,7 +131,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         }
     }
 
-    function createCommitment_test() public {
+    function test_createCommitment() public {
         uint256 commitmentId = 0;
 
         Commitment storage existingCommitment = _createCommitment(
@@ -149,7 +142,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         lender._createCommitment(existingCommitment, emptyArray);
     }
 
-    function updateCommitment_test() public {
+    function test_updateCommitment() public {
         uint256 commitmentId = 0;
 
         Commitment storage existingCommitment = _createCommitment(
@@ -157,7 +150,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             1000e6
         );
 
-        Test.eq(
+        assertEq(
             address(lender),
             existingCommitment.lender,
             "Not the owner of created commitment"
@@ -166,14 +159,14 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         lender._updateCommitment(commitmentId, existingCommitment);
     }
 
-    function deleteCommitment_test() public {
+    function test_deleteCommitment() public {
         uint256 commitmentId = 0;
         Commitment storage commitment = _createCommitment(
             CommitmentCollateralType.ERC20,
             1000e6
         );
 
-        Test.eq(
+        assertEq(
             commitment.lender,
             address(lender),
             "Not the owner of created commitment"
@@ -181,14 +174,14 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
 
         lender._deleteCommitment(commitmentId);
 
-        Test.eq(
+        assertEq(
             commitment.lender,
             address(0),
             "The commitment was not deleted"
         );
     }
 
-    function acceptCommitment_test() public {
+    function test_acceptCommitment() public {
         uint256 commitmentId = 0;
 
         Commitment storage commitment = _createCommitment(
@@ -196,7 +189,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             maxAmount
         );
 
-        Test.eq(
+        assertEq(
             acceptBidWasCalled,
             false,
             "Expect accept bid not called before exercise"
@@ -212,13 +205,13 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             maxLoanDuration
         );
 
-        Test.eq(
+        assertEq(
             acceptBidWasCalled,
             true,
             "Expect accept bid called after exercise"
         );
 
-        Test.eq(
+        assertEq(
             commitment.maxPrincipal == 100,
             true,
             "Commitment max principal was not decremented"
@@ -234,7 +227,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             maxLoanDuration
         );
 
-        Test.eq(commitment.maxPrincipal == 0, true, "commitment not accepted");
+        assertEq(commitment.maxPrincipal == 0, true, "commitment not accepted");
 
         bool acceptCommitTwiceFails;
 
@@ -252,14 +245,14 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             acceptCommitTwiceFails = true;
         }
 
-        Test.eq(
+        assertEq(
             acceptCommitTwiceFails,
             true,
             "Should fail when accepting commit twice"
         );
     }
 
-    function acceptCommitmentWithBorrowersArray_valid_test() public {
+    function test_acceptCommitmentWithBorrowersArray_valid() public {
         uint256 commitmentId = 0;
 
         Commitment storage commitment = _createCommitment(
@@ -279,14 +272,14 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             maxLoanDuration
         );
 
-        Test.eq(
+        assertEq(
             acceptBidWasCalled,
             true,
             "Expect accept bid called after exercise"
         );
     }
 
-    function acceptCommitmentWithBorrowersArray_invalid_test() public {
+    function test_acceptCommitmentWithBorrowersArray_invalid() public {
         uint256 commitmentId = 0;
 
         Commitment storage commitment = _createCommitment(
@@ -312,7 +305,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             acceptCommitAsMarketOwnerFails = true;
         }
 
-        Test.eq(
+        assertEq(
             acceptCommitAsMarketOwnerFails,
             true,
             "Should fail when accepting as invalid borrower"
@@ -332,14 +325,14 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             maxLoanDuration
         );
 
-        Test.eq(
+        assertEq(
             acceptBidWasCalled,
             true,
             "Expect accept bid called after exercise"
         );
     }
 
-    function acceptCommitmentWithBorrowersArray_reset_test() public {
+    function test_acceptCommitmentWithBorrowersArray_reset() public {
         uint256 commitmentId = 0;
 
         Commitment storage commitment = _createCommitment(
@@ -361,14 +354,14 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             maxLoanDuration
         );
 
-        Test.eq(
+        assertEq(
             acceptBidWasCalled,
             true,
             "Expect accept bid called after exercise"
         );
     }
 
-    function acceptCommitmentFailsWithInsufficientCollateral_test() public {
+    function test_acceptCommitmentFailsWithInsufficientCollateral() public {
         uint256 commitmentId = 0;
 
         Commitment storage commitment = _createCommitment(
@@ -392,14 +385,14 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             failedToAcceptCommitment = true;
         }
 
-        Test.eq(
+        assertEq(
             failedToAcceptCommitment,
             true,
             "Should fail to accept commitment with insufficient collateral"
         );
     }
 
-    function acceptCommitmentFailsWithInvalidAmount_test() public {
+    function test_acceptCommitmentFailsWithInvalidAmount() public {
         uint256 commitmentId = 0;
 
         Commitment storage commitment = _createCommitment(
@@ -423,7 +416,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             failedToAcceptCommitment = true;
         }
 
-        Test.eq(
+        assertEq(
             failedToAcceptCommitment,
             true,
             "Should fail to accept commitment with invalid amount for ERC721"
@@ -432,7 +425,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
 
     function decrementCommitment_before() public {}
 
-    function decrementCommitment_test() public {
+    function test_decrementCommitment() public {
         uint256 commitmentId = 0;
         uint256 _decrementAmount = 22;
 
@@ -443,7 +436,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
 
         _decrementCommitment(commitmentId, _decrementAmount);
 
-        Test.eq(
+        assertEq(
             commitment.maxPrincipal == maxAmount - _decrementAmount,
             true,
             "Commitment max principal was not decremented"
@@ -456,7 +449,8 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
      *                    principal = 700 USDC
      * max principal per collateral = 500 USDC
      */
-    function getRequiredCollateral_700_USDC__500_per_WETH_test() public {
+
+    function test_getRequiredCollateral_700_USDC__500_per_WETH() public {
         TestERC20Token usdcToken = new TestERC20Token(
             "Test USDC",
             "TUSDC",
@@ -470,7 +464,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             0,
             18
         );
-        Test.eq(
+        assertEq(
             super.getRequiredCollateral(
                 700 * (1e6), // 700 USDC loan
                 500 * (1e6) * (1e6), // 500 USDC loan allowed per WETH, expanded by principal token decimals
@@ -489,7 +483,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
      *                    principal = 700 USDC
      * max principal per collateral = 500 USDC
      */
-    function getRequiredCollateral_700_USDC_loan__500_per_ERC1155_test()
+    function test_getRequiredCollateral_700_USDC_loan__500_per_ERC1155()
         public
     {
         TestERC20Token usdcToken = new TestERC20Token(
@@ -499,7 +493,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             6
         );
 
-        Test.eq(
+        assertEq(
             super.getRequiredCollateral(
                 700e6, // 700 USDC loan
                 500e6 * (10**6) * (10**0), // 500 USDC per NFT
@@ -518,7 +512,8 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
      *                    principal = 500 USDC
      * max principal per collateral = 500 USDC
      */
-    function getRequiredCollateral_500_USDC_loan__500_per_ERC721_test() public {
+
+    function test_getRequiredCollateral_500_USDC_loan__500_per_ERC721() public {
         TestERC20Token usdcToken = new TestERC20Token(
             "Test USDC",
             "TUSDC",
@@ -526,7 +521,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             6
         );
 
-        Test.eq(
+        assertEq(
             super.getRequiredCollateral(
                 500e6, // 7500 USDC loan
                 500e6 * (1e6), // 500 USDC per NFT, expanded by principal token decimals
@@ -545,14 +540,14 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
      *                    principal = 1 WETH
      * max principal per collateral = 0.00059 WETH
      */
-    function getRequiredCollateral_1_WETH_loan__00059_per_USDC_test() public {
+    function test_getRequiredCollateral_1_WETH_loan__00059_per_USDC() public {
         TestERC20Token collateralToken = new TestERC20Token(
             "Test USDC",
             "TUSDC",
             0,
             6
         );
-        Test.eq(
+        assertEq(
             super.getRequiredCollateral(
                 1e18, // 1 WETH loan
                 59e13 * (1e18), // 0.00059 WETH per USDC base unit
@@ -571,7 +566,8 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
      *                    principal = 1000 USDC $
      * max principal per collateral = 1.0 WETH
      */
-    function getRequiredCollateral_1000_USDC_loan_9_gwei_per_usdc_unit_test()
+
+    function test_getRequiredCollateral_1000_USDC_loan_9_gwei_per_usdc_unit()
         public
     {
         TestERC20Token usdcToken = new TestERC20Token(
@@ -588,7 +584,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             18
         );
 
-        Test.eq(
+        assertEq(
             super.getRequiredCollateral(
                 1000 * (1e6), // 1000 USDC loan  //principal
                 1e9 * (1e6), // 1000000000 wei  per USDC base unit   //ratio
@@ -607,7 +603,8 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
      *                    principal = 8888 USDC $
      * max principal per collateral = 1 gwei per USDDC base unit
      */
-    function getRequiredCollateral_8888_USDC_loan__9_gwei_per_usdc_unit_test()
+
+    function test_getRequiredCollateral_8888_USDC_loan__9_gwei_per_usdc_unit()
         public
     {
         TestERC20Token usdcToken = new TestERC20Token(
@@ -624,7 +621,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             18
         );
 
-        Test.eq(
+        assertEq(
             super.getRequiredCollateral(
                 8888 * (1e6), // 8888 USDC loan  //principal
                 1e9 * (1e6), // 1000000000 wei  per USDC base unit   //ratio
@@ -643,7 +640,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
      *                    principal = 8888 USDC
      * max principal per collateral =  8888000000 wei per USDC base unit
      */
-    function getRequiredCollateral_8888_USDC_loan__unit_test() public {
+    function test_getRequiredCollateral_8888_USDC_loan__unit() public {
         TestERC20Token usdcToken = new TestERC20Token(
             "Test USDC",
             "TUSDC",
@@ -658,7 +655,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             18
         );
 
-        Test.eq(
+        assertEq(
             super.getRequiredCollateral(
                 8888 * (1e6), // 8888 USDC loan  //principal
                 8888000000 * (1e6), // 8888000000 wei  per USDC base unit
@@ -677,7 +674,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
      *                    principal = 6 GWEI
      * max principal per collateral = 0.00059 USDC per gwei
      */
-    function getRequiredCollateral_6_GWEI_loan__00059_WETH_per_USDC_test()
+    function test_getRequiredCollateral_6_GWEI_loan__00059_WETH_per_USDC()
         public
     {
         TestERC20Token gweiToken = new TestERC20Token(
@@ -693,7 +690,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             0,
             6
         );
-        Test.eq(
+        assertEq(
             super.getRequiredCollateral(
                 6 gwei, // 6 GWEI loan
                 59e13 * (1e9), // 0.00059 USDC per gwei
@@ -712,7 +709,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
      *                    principal = 1 WEI
      * max principal per collateral = // 0.00059 WETH per usdc base unit
      */
-    function getRequiredCollateral_1_WEI_loan__00059_WETH_per_USDC_test()
+    function test_getRequiredCollateral_1_WEI_loan__00059_WETH_per_USDC()
         public
     {
         TestERC20Token collateralToken = new TestERC20Token(
@@ -721,7 +718,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             0,
             6
         );
-        Test.eq(
+        assertEq(
             super.getRequiredCollateral(
                 1, // 1 WEI loan
                 59e13 * 1e18, // 0.00059 WETH per USDC base unit
@@ -740,7 +737,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
      *                    principal = 1 GWEI
      * max principal per collateral = 0.00059 WETH per gwei
      */
-    function getRequiredCollateral_1_GWEI_loan__00059_WETH_per_USDC_test()
+    function test_getRequiredCollateral_1_GWEI_loan__00059_WETH_per_USDC()
         public
     {
         TestERC20Token collateralToken = new TestERC20Token(
@@ -749,7 +746,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             0,
             6
         );
-        Test.eq(
+        assertEq(
             super.getRequiredCollateral(
                 1e9, // 1 GWEI loan
                 59e13 * 1e18, // 0.00059 WETH per USDC base unit (hence why not multiplying by 1e6)
@@ -768,14 +765,14 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
      *                    principal = 1 GWEI
      * max principal per collateral = 1 wei per usdc $
      */
-    function getRequiredCollateral_1_wei_loan__1_Wei_per_USDC_test() public {
+    function test_getRequiredCollateral_1_wei_loan__1_Wei_per_USDC() public {
         TestERC20Token collateralToken = new TestERC20Token(
             "Test USDC",
             "TUSDC",
             0,
             6
         );
-        Test.eq(
+        assertEq(
             super.getRequiredCollateral(
                 1e9, // 1 gwei
                 (1 * 1e6) * 1e18, // must provide 1:1 ratio usdc $ to wei
@@ -794,7 +791,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
      *                    principal = 1 wei
      * max principal per collateral = 1 wei per usdc $
      */
-    function getRequiredCollateral_1_wei_loan__1_Wei_per_USDC_unit_test()
+    function test_getRequiredCollateral_1_wei_loan__1_Wei_per_USDC_unit()
         public
     {
         TestERC20Token collateralToken = new TestERC20Token(
@@ -803,7 +800,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             0,
             6
         );
-        Test.eq(
+        assertEq(
             super.getRequiredCollateral(
                 1, // 1 wei
                 (1 * 1e6) * 1e18, // must provide 1 usdc to get loan of 1 wei, expanded by principal decimals
@@ -841,7 +838,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
     function _acceptBid(uint256, address) internal override returns (bool) {
         acceptBidWasCalled = true;
 
-        Test.eq(
+        assertEq(
             submitBidWithCollateralWasCalled,
             true,
             "Submit bid must be called before accept bid"

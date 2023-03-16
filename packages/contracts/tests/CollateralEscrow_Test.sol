@@ -2,16 +2,15 @@
 pragma solidity ^0.8.0;
 
 import { Testable } from "./Testable.sol";
-import "@mangrovedao/hardhat-test-solidity/test.sol";
 
-import { CollateralEscrowV1 } from "../escrow/CollateralEscrowV1.sol";
-import "../mock/WethMock.sol";
+import { CollateralEscrowV1 } from "../contracts/escrow/CollateralEscrowV1.sol";
+import "../contracts/mock/WethMock.sol";
 import "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
 import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "../interfaces/IWETH.sol";
-import { CollateralType, CollateralEscrowV1 } from "../escrow/CollateralEscrowV1.sol";
+import "../contracts/interfaces/IWETH.sol";
+import { CollateralType, CollateralEscrowV1 } from "../contracts/escrow/CollateralEscrowV1.sol";
 
 contract CollateralEscrow_Test is Testable {
     BeaconProxy private proxy_;
@@ -19,7 +18,7 @@ contract CollateralEscrow_Test is Testable {
     WethMock wethMock;
     uint256 amount = 1000;
 
-    function setup_beforeAll() public {
+    function setUp() public {
         // Deploy implementation
         CollateralEscrowV1 escrowImplementation = new CollateralEscrowV1();
         // Deploy beacon contract with implementation
@@ -35,29 +34,29 @@ contract CollateralEscrow_Test is Testable {
         borrower.depositToWeth(borrowerBalance);
     }
 
-    function depositAsset_test() public {
+    function test_depositAsset() public {
         _depositAsset();
     }
 
-    function withdrawAsset_test() public {
+    function test_withdrawAsset() public {
         _depositAsset();
 
         borrower.withdraw(address(wethMock), amount, address(borrower));
 
         uint256 storedBalance = borrower.getBalance(address(wethMock));
 
-        Test.eq(storedBalance, 0, "Escrow withdraw unsuccessful");
+        assertEq(storedBalance, 0, "Stored balance was not withdrawn");
 
         try borrower.withdraw(address(wethMock), amount, address(borrower)) {
-            Test.fail("No collateral balance for asset");
+            fail("No collateral balance for asset");
         } catch Error(string memory reason) {
-            Test.eq(
+            assertEq(
                 reason,
                 "No collateral balance for asset",
                 "Should not be able to withdraw already withdrawn assets"
             );
         } catch {
-            Test.fail("Unknown error");
+            fail("Unknown error");
         }
     }
 
@@ -68,7 +67,7 @@ contract CollateralEscrow_Test is Testable {
 
         uint256 storedBalance = borrower.getBalance(address(wethMock));
 
-        Test.eq(storedBalance, amount, "Escrow deposit unsuccessful");
+        assertEq(storedBalance, amount, "Escrow deposit unsuccessful");
     }
 }
 

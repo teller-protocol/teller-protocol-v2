@@ -1,17 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "@mangrovedao/hardhat-test-solidity/test.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@openzeppelin/contracts/utils/Arrays.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 
-import "hardhat/console.sol";
-
 import "./Testable.sol";
-import "../TellerV2.sol";
-import { Bid } from "../TellerV2Storage.sol";
-import { PaymentType } from "../libraries/V2Calculations.sol";
+import "../contracts/TellerV2.sol";
+import { Bid } from "../contracts/TellerV2Storage.sol";
+import { PaymentType } from "../contracts/libraries/V2Calculations.sol";
 
 contract V2Calculations_Test is Testable {
     using Arrays for uint256[];
@@ -36,7 +33,7 @@ contract V2Calculations_Test is Testable {
     }
 
     // EMI loan
-    function _01_calculateAmountOwed_test() public {
+    function test_01_calculateAmountOwed() public {
         cyclesToSkip.add(2);
         cyclesWithExtraPayments = [3, 4];
         cyclesWithExtraPaymentsAmounts = [25000e6, 25000e6];
@@ -49,7 +46,7 @@ contract V2Calculations_Test is Testable {
     }
 
     // EMI loan
-    function _02_calculateAmountOwed_test() public {
+    function test_02_calculateAmountOwed() public {
         cyclesToSkip.add(3);
         cyclesToSkip.add(4);
         cyclesToSkip.add(5);
@@ -62,7 +59,7 @@ contract V2Calculations_Test is Testable {
     }
 
     // EMI loan
-    function _03_calculateAmountOwed_test() public {
+    function test_03_calculateAmountOwed() public {
         cyclesWithExtraPayments = [3, 7];
         cyclesWithExtraPaymentsAmounts = [35000e6, 20000e6];
 
@@ -74,7 +71,7 @@ contract V2Calculations_Test is Testable {
     }
 
     // EMI loan - Monthly payment cycle
-    function _04_calculateAmountOwed_test() public {
+    function test_04_calculateAmountOwed() public {
         cyclesToSkip.add(5);
         cyclesToSkip.add(7);
 
@@ -86,7 +83,7 @@ contract V2Calculations_Test is Testable {
     }
 
     // EMI loan - Monthly payment cycle
-    function _05_calculateAmountOwed_test() public {
+    function test_05_calculateAmountOwed() public {
         cyclesWithExtraPayments = [2, 6];
         cyclesWithExtraPaymentsAmounts = [35000e6, 20000e6];
 
@@ -98,7 +95,7 @@ contract V2Calculations_Test is Testable {
     }
 
     // Bullet loan
-    function _06_calculateAmountOwed_test() public {
+    function test_06_calculateAmountOwed() public {
         cyclesToSkip.add(6);
         calculateAmountOwed_runner(
             36,
@@ -108,7 +105,8 @@ contract V2Calculations_Test is Testable {
     }
 
     // Bullet loan
-    function _07_calculateAmountOwed_test() public {
+
+    function test_07_calculateAmountOwed() public {
         cyclesToSkip.add(12);
         cyclesWithExtraPayments = [1, 8];
         cyclesWithExtraPaymentsAmounts = [15000e6, 10000e6];
@@ -120,7 +118,7 @@ contract V2Calculations_Test is Testable {
     }
 
     // Bullet loan - Monthly payment cycle
-    function _08_calculateAmountOwed_test() public {
+    function test_08_calculateAmountOwed() public {
         cyclesToSkip.add(5);
         calculateAmountOwed_runner(
             36,
@@ -130,7 +128,7 @@ contract V2Calculations_Test is Testable {
     }
 
     // Bullet loan - Monthly paymenty cycle
-    function _09_calculateAmountOwed_test() public {
+    function test_09_calculateAmountOwed() public {
         cyclesToSkip.add(8);
         cyclesWithExtraPayments = [3];
         cyclesWithExtraPaymentsAmounts = [13000e6];
@@ -220,19 +218,19 @@ contract V2Calculations_Test is Testable {
             // Set last repaid time
             __bid.loanDetails.lastRepaidTimestamp = uint32(nowTimestamp);
         }
-        Test.eq(
+        assertEq(
             cycleIndex,
             expectedTotalCycles,
             "Expected number of cycles incorrect"
         );
-        Test.eq(
+        assertEq(
             cycleIndex <= cycleCount + 1,
             true,
             "Payment cycle exceeded agreed terms"
         );
     }
 
-    function calculateAmountOwed_test() public {
+    function test_calculateAmountOwed() public {
         uint256 principal = 24486571879936808846;
         uint256 repaidPrincipal = 23410087846643631232;
         uint16 interestRate = 3000;
@@ -256,19 +254,19 @@ contract V2Calculations_Test is Testable {
         console.log(_owedPrincipal);
         console.log(_duePrincipal);
 
-        Test.eq(
+        assertEq(
             _owedPrincipal,
             1076484033293177614,
             "Expected number of cycles incorrect"
         );
-        Test.eq(
+        assertEq(
             _duePrincipal,
             1076484033293177614,
             "Expected number of cycles incorrect"
         );
     }
 
-    function calculateBulletAmountOwed_test() public {
+    function test_calculateBulletAmountOwed() public {
         uint256 _principal = 100000e6;
         uint256 _repaidPrincipal = 0;
         uint16 _apr = 3000;
@@ -306,13 +304,21 @@ contract V2Calculations_Test is Testable {
                 PaymentCycleType.Seconds
             );
 
-        Test.eq(
+        assertEq(
             _owedPrincipal,
             _principal,
             "First cycle bullet owed principal incorrect"
         );
-        Test.eq(_duePrincipal, 0, "First cycle bullet due principal incorrect");
-        Test.eq(_interest, 1250000000, "First cycle bullet interest incorrect");
+        assertEq(
+            _duePrincipal,
+            0,
+            "First cycle bullet due principal incorrect"
+        );
+        assertEq(
+            _interest,
+            1250000000,
+            "First cycle bullet interest incorrect"
+        );
 
         // Within random payment cycle
         _timestamp = _acceptedTimestamp + ((365 days / 12) * 3);
@@ -328,13 +334,13 @@ contract V2Calculations_Test is Testable {
                 PaymentCycleType.Seconds
             );
 
-        Test.eq(
+        assertEq(
             _owedPrincipal,
             _principal,
             "Second cycle bullet Owed principal incorrect"
         );
-        Test.eq(_duePrincipal, 0, "Second cycle bullet principal incorrect");
-        Test.eq(
+        assertEq(_duePrincipal, 0, "Second cycle bullet principal incorrect");
+        assertEq(
             _interest,
             7500000000,
             "Second cycle bullet interest incorrect"
@@ -351,17 +357,17 @@ contract V2Calculations_Test is Testable {
                 PaymentCycleType.Seconds
             );
 
-        Test.eq(
+        assertEq(
             _owedPrincipal,
             _principal,
             "Final cycle bullet Owed principal incorrect"
         );
-        Test.eq(
+        assertEq(
             _duePrincipal,
             _principal,
             "Final cycle bullet principal incorrect"
         );
-        Test.eq(
+        assertEq(
             _interest,
             29589041095,
             "Final cycle bullet interest incorrect"
@@ -378,17 +384,17 @@ contract V2Calculations_Test is Testable {
                 PaymentCycleType.Seconds
             );
 
-        Test.eq(
+        assertEq(
             _owedPrincipal,
             _principal,
             "Final cycle bullet Owed principal incorrect"
         );
-        Test.eq(
+        assertEq(
             _duePrincipal,
             _principal,
             "Final cycle bullet principal incorrect"
         );
-        Test.eq(
+        assertEq(
             _interest,
             ((_principal * _apr) / 10000) * 2,
             "Final cycle bullet interest incorrect"

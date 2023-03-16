@@ -1014,20 +1014,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mangrovedao/hardhat-test-solidity@npm:^0.0.16":
-  version: 0.0.16
-  resolution: "@mangrovedao/hardhat-test-solidity@npm:0.0.16"
-  dependencies:
-    chai: ^4.2.0
-    debug: ^4.3.2
-    mocha: ^7.1.2
-  peerDependencies:
-    hardhat: ^2.0.0
-    hardhat-deploy: ">=0.8.9"
-  checksum: 3cec5b3fb4fc4b1dcf46e6480c309d448b5ba8ded46de2ad94c49a362ff41e866a6f76d6f4f02f31bbce31dbe993ea6b5940046a667c1260d989f75e8e762520
-  languageName: node
-  linkType: hard
-
 "@metamask/eth-sig-util@npm:^4.0.0":
   version: 4.0.1
   resolution: "@metamask/eth-sig-util@npm:4.0.1"
@@ -1373,7 +1359,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nomiclabs/hardhat-ethers@npm:^2.1.1, @nomiclabs/hardhat-ethers@npm:^2.2.2":
+"@nomiclabs/hardhat-ethers@npm:^2.1.1, @nomiclabs/hardhat-ethers@npm:^2.2.1":
   version: 2.2.2
   resolution: "@nomiclabs/hardhat-ethers@npm:2.2.2"
   peerDependencies:
@@ -1700,8 +1686,7 @@ __metadata:
     "@ethereum-attestation-service/sdk": ^0.11.2
     "@ethereumjs/vm": ^5.5.3
     "@ethersproject/providers": ^5.6.7
-    "@mangrovedao/hardhat-test-solidity": ^0.0.16
-    "@nomiclabs/hardhat-ethers": ^2.2.2
+    "@nomiclabs/hardhat-ethers": ^2.2.1
     "@nomiclabs/hardhat-waffle": ^2.0.0
     "@openzeppelin/contracts": ^4.8.0
     "@openzeppelin/contracts-upgradeable": ^4.8.0
@@ -4600,7 +4585,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chai@npm:^4.2.0, chai@npm:^4.3.4":
+"chai@npm:^4.3.4":
   version: 4.3.6
   resolution: "chai@npm:4.3.6"
   dependencies:
@@ -11975,7 +11960,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mocha@npm:^7.1.1, mocha@npm:^7.1.2":
+"mocha@npm:^7.1.1":
   version: 7.2.0
   resolution: "mocha@npm:7.2.0"
   dependencies:

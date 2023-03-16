@@ -1,8 +1,8 @@
 pragma solidity >=0.8.0 <0.9.0;
 // SPDX-License-Identifier: MIT
 
-import "../../EAS/TellerASResolver.sol";
-import "../../EAS/TellerAS.sol";
+import "../../contracts/EAS/TellerASResolver.sol";
+import "../../contracts/EAS/TellerAS.sol";
 
 /**
  * @title A sample AS resolver that checks whether an attestations attest to an existing attestation.

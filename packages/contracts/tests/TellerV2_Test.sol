@@ -3,32 +3,32 @@ pragma solidity ^0.8.0;
 
 import { Testable } from "./Testable.sol";
 
-import { TellerV2 } from "../TellerV2.sol";
-import { MarketRegistry } from "../MarketRegistry.sol";
-import { ReputationManager } from "../ReputationManager.sol";
+import { TellerV2 } from "../contracts/TellerV2.sol";
+import { MarketRegistry } from "../contracts/MarketRegistry.sol";
+import { ReputationManager } from "../contracts/ReputationManager.sol";
 
-import "../interfaces/IMarketRegistry.sol";
-import "../interfaces/IReputationManager.sol";
+import "../contracts/interfaces/IMarketRegistry.sol";
+import "../contracts/interfaces/IReputationManager.sol";
 
-import "../EAS/TellerAS.sol";
+import "../contracts/EAS/TellerAS.sol";
 
-import "../mock/WethMock.sol";
-import "../interfaces/IWETH.sol";
+import "../contracts/mock/WethMock.sol";
+import "../contracts/interfaces/IWETH.sol";
 
 import { User } from "./Test_Helpers.sol";
 
-import "../escrow/CollateralEscrowV1.sol";
+import "../contracts/escrow/CollateralEscrowV1.sol";
 import "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
-import "../LenderCommitmentForwarder.sol";
+import "../contracts/LenderCommitmentForwarder.sol";
 import "./resolvers/TestERC20Token.sol";
 
-import "@mangrovedao/hardhat-test-solidity/test.sol";
-import "../CollateralManager.sol";
-import { Collateral } from "../interfaces/escrow/ICollateralEscrowV1.sol";
-import { PaymentType, PaymentCycleType } from "../libraries/V2Calculations.sol";
-import { BidState, Payment } from "../TellerV2Storage.sol";
-import "../MetaForwarder.sol";
-import { LenderManager } from "../LenderManager.sol";
+import "../contracts/CollateralManager.sol";
+import { Collateral } from "../contracts/interfaces/escrow/ICollateralEscrowV1.sol";
+import { PaymentType } from "../contracts/libraries/V2Calculations.sol";
+import { BidState, Payment } from "../contracts/TellerV2Storage.sol";
+
+import "../contracts/MetaForwarder.sol";
+import { LenderManager } from "../contracts/LenderManager.sol";
 
 contract TellerV2_Test is Testable {
     TellerV2User private marketOwner;
@@ -44,7 +44,7 @@ contract TellerV2_Test is Testable {
     uint256 marketId1;
     uint256 collateralAmount = 10;
 
-    function setup_beforeAll() public {
+    function setUp() public {
         // Deploy test tokens
         wethMock = new WethMock();
         daiMock = new TestERC20Token("Dai", "DAI", 10000000, 18);
@@ -160,7 +160,7 @@ contract TellerV2_Test is Testable {
         lender.acceptBid(_bidId);
     }
 
-    function collateralEscrow_test() public {
+    function test_collateralEscrow() public {
         // Submit bid as borrower
         uint256 bidId = submitCollateralBid();
         // Accept bid as lender
@@ -173,11 +173,11 @@ contract TellerV2_Test is Testable {
         uint256 storedBidId = escrow.getBid();
 
         // Test that the created escrow has the same bidId and collateral stored
-        Test.eq(bidId, storedBidId, "Collateral escrow was not created");
+        assertEq(bidId, storedBidId, "Collateral escrow was not created");
 
         uint256 escrowBalance = wethMock.balanceOf(escrowAddress);
 
-        Test.eq(collateralAmount, escrowBalance, "Collateral was not stored");
+        assertEq(collateralAmount, escrowBalance, "Collateral was not stored");
 
         // Repay loan
         uint256 borrowerBalanceBefore = wethMock.balanceOf(address(borrower));
@@ -191,7 +191,7 @@ contract TellerV2_Test is Testable {
 
         // Check escrow balance
         uint256 escrowBalanceAfter = wethMock.balanceOf(escrowAddress);
-        Test.eq(
+        assertEq(
             0,
             escrowBalanceAfter,
             "Collateral was not withdrawn from escrow on repayment"
@@ -199,7 +199,7 @@ contract TellerV2_Test is Testable {
 
         // Check borrower balance for collateral
         uint256 borrowerBalanceAfter = wethMock.balanceOf(address(borrower));
-        Test.eq(
+        assertEq(
             collateralAmount,
             borrowerBalanceAfter - borrowerBalanceBefore,
             "Collateral was not sent to borrower after repayment"

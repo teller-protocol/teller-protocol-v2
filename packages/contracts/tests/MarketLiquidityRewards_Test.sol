@@ -47,7 +47,7 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
     uint8 constant collateralTokenDecimals = 6;
 
     bool verifyLoanStartTimeWasCalled;
-    bool verifyExpectedTokenAddressWasCalled; 
+    bool verifyExpectedTokenAddressWasCalled;
 
     bool verifyRewardRecipientWasCalled;
     bool verifyCollateralAmountWasCalled;
@@ -111,7 +111,7 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
         //delete allocationCount;
 
         verifyLoanStartTimeWasCalled = false;
-        verifyExpectedTokenAddressWasCalled = false; 
+        verifyExpectedTokenAddressWasCalled = false;
 
         verifyRewardRecipientWasCalled = false;
         verifyCollateralAmountWasCalled = false;
@@ -163,8 +163,6 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
         );
 
         uint256 allocationId = lender._allocateRewards(_allocation);
-
-     
     }
 
     function test_increaseAllocationAmount() public {
@@ -192,7 +190,6 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
         );
     }
 
-   
     function test_deallocateRewards() public {
         uint256 allocationId = 0;
 
@@ -206,7 +203,6 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
 
         assertEq(amountAfter, 0, "Allocation was not deleted");
     }
- 
 
     function test_claimRewards() public {
         Bid memory mockBid;
@@ -239,7 +235,6 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
             true,
             " verifyExpectedTokenAddress was not called"
         );
- 
 
         assertEq(
             verifyRewardRecipientWasCalled,
@@ -305,8 +300,6 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
         assertEq(minCollateral, 1e6, "Invalid min collateral calculation");
     }
 
-
-
     function test_decrementAllocatedAmount() public {
         uint256 allocationId = 0;
 
@@ -314,17 +307,18 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
 
         uint256 amount = 100;
 
-
         allocatedRewards[allocationId].rewardTokenAmount += amount;
 
+        super._decrementAllocatedAmount(allocationId, amount);
 
-        super._decrementAllocatedAmount(allocationId,amount);
-
-        assertEq(allocatedRewards[allocationId].rewardTokenAmount, 0, "allocation amount not decremented");
+        assertEq(
+            allocatedRewards[allocationId].rewardTokenAmount,
+            0,
+            "allocation amount not decremented"
+        );
     }
- 
 
-   /* function test_verifyCollateralAmount() public {
+    /* function test_verifyCollateralAmount() public {
         
         vm.expectRevert();
         super._verifyCollateralAmount(
@@ -339,21 +333,12 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
     }*/
 
     function test_verifyLoanStartTime_min() public {
+        vm.expectRevert(bytes("Loan was submitted before the min start time."));
 
-      vm.expectRevert(bytes("Loan was submitted before the min start time."));
-
-       super._verifyLoanStartTime(
-            100,
-            200,
-            300
-         ) ;
-       
+        super._verifyLoanStartTime(100, 200, 300);
     }
 
-
-
     function test_verifyAndReturnRewardRecipient() public {
-        
         address recipient = super._verifyAndReturnRewardRecipient(
             AllocationStrategy.BORROWER,
             BidState.PAID,
@@ -361,12 +346,10 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
             address(lender)
         );
 
-        assertEq(recipient,address(borrower),"incorrect address returned");
-
+        assertEq(recipient, address(borrower), "incorrect address returned");
     }
 
     function test_verifyAndReturnRewardRecipient_reverts() public {
-
         vm.expectRevert();
 
         address recipient = super._verifyAndReturnRewardRecipient(
@@ -375,31 +358,22 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
             address(borrower),
             address(lender)
         );
-
-         
     }
 
     function test_verifyLoanStartTime_max() public {
+        vm.expectRevert(bytes("Loan was submitted after the max start time."));
 
-      vm.expectRevert(bytes("Loan was submitted after the max start time."));
-
-       super._verifyLoanStartTime(
-            400,
-            200,
-            300
-         ) ;
-       
+        super._verifyLoanStartTime(400, 200, 300);
     }
-
 
     function test_verifyExpectedTokenAddress() public {
-       
         vm.expectRevert(bytes("Invalid expected token address."));
 
-        super._verifyExpectedTokenAddress(address(principalToken),address(collateralToken));
-   
+        super._verifyExpectedTokenAddress(
+            address(principalToken),
+            address(collateralToken)
+        );
     }
-
 
     function allocateRewards(
         MarketLiquidityRewards.RewardAllocation calldata _allocation
@@ -420,9 +394,6 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
     {
         super.deallocateRewards(_allocationId, _tokenAmount);
     }
-
- 
-
 
     function _verifyAndReturnRewardRecipient(
         AllocationStrategy strategy,
@@ -458,8 +429,6 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
     ) internal override {
         verifyExpectedTokenAddressWasCalled = true;
     }
-
- 
 }
 
 contract MarketLiquidityUser is User {

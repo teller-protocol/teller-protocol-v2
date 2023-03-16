@@ -198,13 +198,11 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
         IERC20Upgradeable(allocatedRewards[_allocationId].rewardTokenAddress)
             .transfer(msg.sender, _tokenAmount);
 
-     
-
         if (allocatedRewards[_allocationId].rewardTokenAmount == 0) {
             delete allocatedRewards[_allocationId];
 
             emit DeletedAllocation(_allocationId);
-        }else{
+        } else {
             emit DecreasedAllocation(_allocationId, _tokenAmount);
         }
     }
@@ -283,14 +281,12 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
             principalTokenAddress
         ).decimals();
 
-
         address rewardRecipient = _verifyAndReturnRewardRecipient(
             allocatedReward.allocationStrategy,
             bidState,
             borrower,
             lender
         );
-
 
         uint256 amountToReward = _calculateRewardAmount(
             principalAmount,
@@ -312,12 +308,12 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
         );
     }
 
-   /**
+    /**
      * @notice Verifies that the bid state is appropriate for claiming rewards based on the allocation strategy and then returns the address of the reward recipient(borrower or lender)
      * @param _strategy - The strategy for the reward allocation.
-     * @param _bidState - The bid state of the loan. 
-     * @param _borrower - The borrower of the loan. 
-     * @param _lender - The lender of the loan. 
+     * @param _bidState - The bid state of the loan.
+     * @param _borrower - The borrower of the loan.
+     * @param _lender - The lender of the loan.
      * @return rewardRecipient_ The address that will receive the rewards. Either the borrower or lender.
      */
     function _verifyAndReturnRewardRecipient(
@@ -343,12 +339,10 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
         }
     }
 
-
-
-   /**
+    /**
      * @notice Decrements the amount allocated to keep track of tokens in escrow
      * @param _allocationId - The id for the allocation to decrement
-     * @param _amount - The amount of ERC20 to decrement 
+     * @param _amount - The amount of ERC20 to decrement
      */
     function _decrementAllocatedAmount(uint256 _allocationId, uint256 _amount)
         internal
@@ -356,8 +350,7 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
         allocatedRewards[_allocationId].rewardTokenAmount -= _amount;
     }
 
-
-   /**
+    /**
      * @notice Calculates the reward to claim for the allocation
      * @param _loanPrincipal - The amount of principal for the loan for which to reward
      * @param _principalTokenDecimals - The number of decimals of the principal token
@@ -377,8 +370,7 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
             );
     }
 
-
-   /**
+    /**
      * @notice Verifies that the collateral ratio for the loan was sufficient based on _minimumCollateralPerPrincipalAmount of the allocation
      * @param _collateralTokenAddress - The contract address for the collateral token
      * @param _collateralAmount - The number of decimals of the collateral token
@@ -408,15 +400,13 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
             _minimumCollateralPerPrincipalAmount
         );
 
-       
         require(
             _collateralAmount >= minCollateral,
             "Loan does not meet minimum collateralization ratio."
         );
     }
 
-
-   /**
+    /**
      * @notice Calculates the minimum amount of collateral the loan requires based on principal amount
      * @param _principalAmount - The number of decimals of the principal token
      * @param _principalTokenDecimals - The number of decimals of the principal token
@@ -428,7 +418,7 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
         uint256 _principalTokenDecimals,
         uint256 _collateralTokenDecimals,
         uint256 _minimumCollateralPerPrincipalAmount
-    ) internal virtual view returns (uint256) {
+    ) internal view virtual returns (uint256) {
         return
             MathUpgradeable.mulDiv(
                 _principalAmount,
@@ -437,7 +427,7 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
             );
     }
 
-   /**
+    /**
      * @notice Verifies that the loan start time is within the bounds set by the allocation requirements
      * @param _loanStartTime - The timestamp when the loan was accepted
      * @param _minStartTime - The minimum time required, after which the loan must have been accepted
@@ -458,7 +448,7 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
         );
     }
 
-   /**
+    /**
      * @notice Verifies that the loan principal token address is per the requirements of the allocation
      * @param _loanTokenAddress - The contract address of the token
      * @param _expectedTokenAddress - The expected contract address per the allocation
@@ -473,6 +463,4 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
             "Invalid expected token address."
         );
     }
-
- 
 }

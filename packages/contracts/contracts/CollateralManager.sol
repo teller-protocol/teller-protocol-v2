@@ -225,7 +225,8 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     /**
      * @notice Gets the collateral asset amount for a given bid id on the TellerV2 contract.
      * @param _bidId The ID of a bid on TellerV2.
-     * @return _collateralAddress An address used as collateral.
+     * @param _collateralAddress An address used as collateral.
+     * @return amount_ The amount of collateral of type _collateralAddress.
      */
     function getCollateralAmount(uint256 _bidId, address _collateralAddress)
         public

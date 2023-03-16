@@ -190,6 +190,10 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
             "Only the allocator can deallocate rewards."
         );
 
+        if(_tokenAmount > allocatedRewards[_allocationId].rewardTokenAmount){
+            _tokenAmount = allocatedRewards[_allocationId].rewardTokenAmount;
+        }
+
         //subtract amount reward before transfer
         allocatedRewards[_allocationId].rewardTokenAmount -= _tokenAmount;
 

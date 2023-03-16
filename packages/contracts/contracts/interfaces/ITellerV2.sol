@@ -89,7 +89,6 @@ interface ITellerV2 {
      */
     function isLoanDefaulted(uint256 _bidId) external view returns (bool);
 
-
     /**
      * @notice Checks to see if a loan was delinquent for longer than liquidation delay.
      * @param _bidId The id of the loan bid to check for.

@@ -153,8 +153,7 @@ contract TellerV2 is
 
     uint8 public constant CURRENT_CODE_VERSION = 9;
 
-
-    uint32 public constant LIQUIDATION_DELAY = 86400;//ONE DAY IN SECONDS 
+    uint32 public constant LIQUIDATION_DELAY = 86400; //ONE DAY IN SECONDS
 
     /** Constructor **/
 
@@ -916,6 +915,7 @@ contract TellerV2 is
     /**
      * @notice Checks to see if a borrower is delinquent.
      * @param _bidId The id of the loan bid to check for.
+     * @return bool True if the loan is defaulted.
      */
     function isLoanDefaulted(uint256 _bidId)
         public
@@ -923,26 +923,32 @@ contract TellerV2 is
         override
         returns (bool)
     {
-        Bid storage bid = bids[_bidId];
-
-        // Make sure loan cannot be liquidated if it is not active
-        if (bid.state != BidState.ACCEPTED) return false;
-
-        if (bidDefaultDuration[_bidId] == 0) return false;
-
-        return (uint32(block.timestamp) - lastRepaidTimestamp(_bidId) >
-            bidDefaultDuration[_bidId]);
+        return _canLiquidateLoan(_bidId, 0);
     }
-
 
     /**
      * @notice Checks to see if a loan was delinquent for longer than liquidation delay.
      * @param _bidId The id of the loan bid to check for.
+     * @return bool True if the loan is liquidateable.
      */
     function isLoanLiquidateable(uint256 _bidId)
         public
         view
         override
+        returns (bool)
+    {
+        return _canLiquidateLoan(_bidId, LIQUIDATION_DELAY);
+    }
+
+    /**
+     * @notice Checks to see if a borrower is delinquent.
+     * @param _bidId The id of the loan bid to check for.
+     * @param _liquidationDelay Amount of additional seconds after a loan defaulted to allow a liquidation.
+     * @return bool True if the loan is liquidateable.
+     */
+    function _canLiquidateLoan(uint256 _bidId, uint32 _liquidationDelay)
+        internal
+        view
         returns (bool)
     {
         Bid storage bid = bids[_bidId];
@@ -952,7 +958,9 @@ contract TellerV2 is
 
         if (bidDefaultDuration[_bidId] == 0) return false;
 
-        return (uint32(block.timestamp) - LIQUIDATION_DELAY - lastRepaidTimestamp(_bidId)  >
+        return (uint32(block.timestamp) -
+            _liquidationDelay -
+            lastRepaidTimestamp(_bidId) >
             bidDefaultDuration[_bidId]);
     }
 

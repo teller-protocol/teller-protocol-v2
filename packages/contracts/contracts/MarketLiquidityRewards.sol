@@ -190,12 +190,12 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
             "Only the allocator can deallocate rewards."
         );
 
-        if(_tokenAmount > allocatedRewards[_allocationId].rewardTokenAmount){
+        if (_tokenAmount > allocatedRewards[_allocationId].rewardTokenAmount) {
             _tokenAmount = allocatedRewards[_allocationId].rewardTokenAmount;
         }
 
         //subtract amount reward before transfer
-        allocatedRewards[_allocationId].rewardTokenAmount -= _tokenAmount;
+        _decrementAllocatedAmount(_allocationId, _tokenAmount);
 
         IERC20Upgradeable(allocatedRewards[_allocationId].rewardTokenAddress)
             .transfer(msg.sender, _tokenAmount);
@@ -294,11 +294,11 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
             allocatedReward.rewardPerLoanPrincipalAmount
         );
 
+        _decrementAllocatedAmount(_allocationId, amountToReward);
+
         //transfer tokens reward to the msgsender
         IERC20Upgradeable(allocatedRewards[_allocationId].rewardTokenAddress)
             .transfer(rewardRecipient, amountToReward);
-
-        _decrementAllocatedAmount(_allocationId, amountToReward);
 
         emit ClaimedRewards(
             _allocationId,

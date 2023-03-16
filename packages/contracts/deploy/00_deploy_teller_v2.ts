@@ -33,7 +33,7 @@ const deployFn: DeployFunction = async (hre) => {
   const lenderCommitmentForwarder = await deploy({
     contract: 'LenderCommitmentForwarder',
     args: [tellerV2Contract.address, marketRegistry.address],
-    skipIfAlreadyDeployed: false,
+    skipIfAlreadyDeployed: true,
     proxy: {
       proxyContract: 'OpenZeppelinTransparentProxy',
     },

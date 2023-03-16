@@ -222,18 +222,14 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         }
     }
 
-    function getCollateralAmount(uint256 _bidId, address collateralAssetAddress)
+    function getCollateralAmount(uint256 _bidId, address _collateralAddress)
         public
         view
-        returns (uint256 _amount)
+        returns (uint256 amount_)
     {
-        CollateralInfo storage bidCollateral = _bidCollaterals[_bidId];
-
-        Collateral storage assetInfo = bidCollateral.collateralInfo[
-            collateralAssetAddress
-        ];
-
-        return assetInfo._amount;
+        amount_ = _bidCollaterals[_bidId]
+            .collateralInfo[_collateralAddress]
+            ._amount;
     }
 
     /**

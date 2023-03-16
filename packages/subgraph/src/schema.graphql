@@ -269,6 +269,13 @@ type TokenVolume implements IDurationAverage @entity {
 
   outstandingCapital: BigInt!
   totalLoaned: BigInt!
+  totalActive: BigInt!
+  totalDueSoon: BigInt!
+  totalLate: BigInt!
+  totalDefaulted: BigInt!
+  totalRepaid: BigInt!
+  totalLiquidated: BigInt!
+
   _loanAcceptedCount: BigInt!
   loanAverage: BigInt!
 
@@ -277,6 +284,8 @@ type TokenVolume implements IDurationAverage @entity {
 
   _aprWeightedTotal: BigInt!
   aprAverage: BigInt!
+  _aprActiveWeightedTotal: BigInt!
+  aprActiveAverage: BigInt!
 
   _durationTotal: BigInt!
   durationAverage: BigInt!

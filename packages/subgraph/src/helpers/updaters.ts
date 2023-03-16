@@ -210,10 +210,14 @@ function updateLoanStatusCount(
       if (acceptedLoanStatuses.includes(status)) {
         switch (fnNameType) {
           case ArrayUpdaterFn.ADD:
-            addBidToTokenVolumeFromStatusCount(loanStatusCount, bidId);
+            addBidToTokenVolumeFromStatusCount(loanStatusCount, bidId, status);
             break;
           case ArrayUpdaterFn.DELETE:
-            removeBidFromTokenVolumeFromStatusCount(loanStatusCount, bidId);
+            removeBidFromTokenVolumeFromStatusCount(
+              loanStatusCount,
+              bidId,
+              status
+            );
             break;
         }
       }
@@ -344,7 +348,8 @@ function updateBidTokenVolumesOnPayment(
 
 function addBidToTokenVolumeFromStatusCount(
   loanStatusCount: LoanStatusCount,
-  bidId: string
+  bidId: string,
+  bidStatus: BidStatus
 ): void {
   const tokenVolumeId = loanStatusCount._tokenVolume;
   if (!tokenVolumeId) return;
@@ -361,6 +366,30 @@ function addBidToTokenVolumeFromStatusCount(
     bid.principal.minus(bid.totalRepaidPrincipal)
   );
   tokenVolume.totalLoaned = tokenVolume.totalLoaned.plus(bid.principal);
+  switch (bidStatus) {
+    case BidStatus.Accepted:
+      tokenVolume.totalActive = tokenVolume.totalActive.plus(bid.principal);
+      break;
+    case BidStatus.DueSoon:
+      tokenVolume.totalDueSoon = tokenVolume.totalDueSoon.plus(bid.principal);
+      break;
+    case BidStatus.Late:
+      tokenVolume.totalLate = tokenVolume.totalLate.plus(bid.principal);
+      break;
+    case BidStatus.Defaulted:
+      tokenVolume.totalDefaulted = tokenVolume.totalDefaulted.plus(
+        bid.principal
+      );
+      break;
+    case BidStatus.Repaid:
+      tokenVolume.totalRepaid = tokenVolume.totalRepaid.plus(bid.principal);
+      break;
+    case BidStatus.Liquidated:
+      tokenVolume.totalLiquidated = tokenVolume.totalLiquidated.plus(
+        bid.principal
+      );
+      break;
+  }
   tokenVolume.loanAverage = tokenVolume.totalLoaned.div(
     tokenVolume._loanAcceptedCount
   );
@@ -371,6 +400,20 @@ function addBidToTokenVolumeFromStatusCount(
   tokenVolume.aprAverage = tokenVolume._aprWeightedTotal.div(
     tokenVolume.totalLoaned
   );
+  const activeLoanStatuses = [
+    BidStatus.Accepted,
+    BidStatus.DueSoon,
+    BidStatus.Late,
+    BidStatus.Defaulted
+  ];
+  if (activeLoanStatuses.includes(bidStatus)) {
+    tokenVolume._aprActiveWeightedTotal = tokenVolume._aprActiveWeightedTotal.plus(
+      bid.apr.times(bid.principal)
+    );
+    tokenVolume.aprActiveAverage = tokenVolume._aprActiveWeightedTotal.div(
+      tokenVolume.outstandingCapital
+    );
+  }
 
   updateDurationAverageFromStatusCount(
     UpdateDurationAverage.Add,
@@ -383,7 +426,8 @@ function addBidToTokenVolumeFromStatusCount(
 
 function removeBidFromTokenVolumeFromStatusCount(
   loanStatusCount: LoanStatusCount,
-  bidId: string
+  bidId: string,
+  bidStatus: BidStatus
 ): void {
   const tokenVolumeId = loanStatusCount._tokenVolume;
   if (!tokenVolumeId) return;
@@ -403,6 +447,30 @@ function removeBidFromTokenVolumeFromStatusCount(
       bid.principal.minus(bid.totalRepaidPrincipal)
     );
     tokenVolume.totalLoaned = tokenVolume.totalLoaned.minus(bid.principal);
+    switch (bidStatus) {
+      case BidStatus.Accepted:
+        tokenVolume.totalActive = tokenVolume.totalActive.minus(bid.principal);
+        break;
+      case BidStatus.DueSoon:
+        tokenVolume.totalDueSoon = tokenVolume.totalDueSoon.minus(bid.principal);
+        break;
+      case BidStatus.Late:
+        tokenVolume.totalLate = tokenVolume.totalLate.minus(bid.principal);
+        break;
+      case BidStatus.Defaulted:
+        tokenVolume.totalDefaulted = tokenVolume.totalDefaulted.minus(
+          bid.principal
+        );
+        break;
+      case BidStatus.Repaid:
+        tokenVolume.totalRepaid = tokenVolume.totalRepaid.minus(bid.principal);
+        break;
+      case BidStatus.Liquidated:
+        tokenVolume.totalLiquidated = tokenVolume.totalLiquidated.minus(
+          bid.principal
+        );
+        break;
+    }
     tokenVolume.loanAverage = tokenVolume.totalLoaned.div(
       tokenVolume._loanAcceptedCount
     );
@@ -413,6 +481,22 @@ function removeBidFromTokenVolumeFromStatusCount(
     tokenVolume.aprAverage = tokenVolume._aprWeightedTotal.div(
       tokenVolume._loanAcceptedCount
     );
+    const activeLoanStatuses = [
+      BidStatus.Accepted,
+      BidStatus.DueSoon,
+      BidStatus.Late,
+      BidStatus.Defaulted
+    ];
+    if (activeLoanStatuses.includes(bidStatus)) {
+      tokenVolume._aprActiveWeightedTotal = tokenVolume._aprActiveWeightedTotal.minus(
+        bid.apr.times(bid.principal)
+      );
+      tokenVolume.aprActiveAverage = tokenVolume._aprActiveWeightedTotal.isZero()
+        ? BigInt.zero()
+        : tokenVolume._aprActiveWeightedTotal.div(
+            tokenVolume.outstandingCapital
+          );
+    }
 
     updateDurationAverageFromStatusCount(
       UpdateDurationAverage.Remove,

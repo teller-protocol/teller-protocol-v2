@@ -12,6 +12,13 @@ export function initTokenVolume(tokenVolume: TokenVolume, token: Token): void {
 
   tokenVolume.outstandingCapital = BigInt.zero();
   tokenVolume.totalLoaned = BigInt.zero();
+  tokenVolume.totalActive = BigInt.zero();
+  tokenVolume.totalDueSoon = BigInt.zero();
+  tokenVolume.totalLate = BigInt.zero();
+  tokenVolume.totalDefaulted = BigInt.zero();
+  tokenVolume.totalRepaid = BigInt.zero();
+  tokenVolume.totalLiquidated = BigInt.zero();
+
   tokenVolume._loanAcceptedCount = BigInt.zero();
   tokenVolume.loanAverage = BigInt.zero();
 
@@ -20,6 +27,8 @@ export function initTokenVolume(tokenVolume: TokenVolume, token: Token): void {
 
   tokenVolume._aprWeightedTotal = BigInt.zero();
   tokenVolume.aprAverage = BigInt.zero();
+  tokenVolume._aprActiveWeightedTotal = BigInt.zero();
+  tokenVolume.aprActiveAverage = BigInt.zero();
 
   tokenVolume._durationTotal = BigInt.zero();
   tokenVolume.durationAverage = BigInt.zero();

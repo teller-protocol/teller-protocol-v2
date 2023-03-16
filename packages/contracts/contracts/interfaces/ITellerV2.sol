@@ -134,4 +134,17 @@ interface ITellerV2 {
         returns (address token_);
 
     function getLoanMarketId(uint256 _bidId) external view returns (uint256);
+
+    function getLoanSummary(uint256 _bidId)
+        external
+        view
+        returns (
+            address borrower,
+            address lender,
+            uint256 marketId,
+            address principalTokenAddress,
+            uint256 principalAmount,
+            uint32 acceptedTimestamp,
+            BidState bidState
+        );
 }

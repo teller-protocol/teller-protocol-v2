@@ -25,6 +25,12 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     mapping(uint256 => address) public _escrows; // bidIds -> collateralEscrow
     // bidIds -> validated collateral info
     mapping(uint256 => CollateralInfo) internal _bidCollaterals;
+
+    /**
+     * Since collateralInfo is mapped (address assetAddress => Collateral) that means
+     * that only a single tokenId per nft per loan can be collateralized.
+     * Ex. Two bored apes cannot be used as collateral for a single loan.
+     */
     struct CollateralInfo {
         EnumerableSetUpgradeable.AddressSet collateralAddresses;
         mapping(address => Collateral) collateralInfo;
@@ -214,6 +220,22 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         for (uint256 i; i < collateralAddresses.length; i++) {
             infos_[i] = collateral.collateralInfo[collateralAddresses[i]];
         }
+    }
+
+    /**
+     * @notice Gets the collateral asset amount for a given bid id on the TellerV2 contract.
+     * @param _bidId The ID of a bid on TellerV2.
+     * @param _collateralAddress An address used as collateral.
+     * @return amount_ The amount of collateral of type _collateralAddress.
+     */
+    function getCollateralAmount(uint256 _bidId, address _collateralAddress)
+        public
+        view
+        returns (uint256 amount_)
+    {
+        amount_ = _bidCollaterals[_bidId]
+            .collateralInfo[_collateralAddress]
+            ._amount;
     }
 
     /**

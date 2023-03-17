@@ -15,6 +15,7 @@ import { LenderCommitmentForwarder } from "../contracts/LenderCommitmentForwarde
 import { User } from "./Test_Helpers.sol";
  
 import "../contracts/allowlist/EnumerableSetAllowlist.sol";
+import "../contracts/mock/LenderCommitmentForwarderMock.sol";
 
 contract EnumerableSetAllowlist_Test is Testable, EnumerableSetAllowlist {
  
@@ -28,18 +29,22 @@ contract EnumerableSetAllowlist_Test is Testable, EnumerableSetAllowlist {
 
     bool addToAllowlistCalled; 
 
+    LenderCommitmentForwarderMock lenderCommitmentForwarderMock;
+    
 
     constructor()
-    EnumerableSetAllowlist(address(new AllowlistUser(address(this))))
+    EnumerableSetAllowlist(address( new LenderCommitmentForwarderMock() ))
     {}
 
-    function setUp() public {
-         
+    function setUp() public {  
+      borrower = new AllowlistUser(address(this));  
 
-      borrower = new AllowlistUser(address(this));
  
       borrowersArray = new address[](1);
       borrowersArray[0] = address(borrower);
+
+      LenderCommitmentForwarderMock( commitmentManager ).setLender(address(lender));
+
         
       addToAllowlistCalled =  false;
     }
@@ -54,8 +59,11 @@ contract EnumerableSetAllowlist_Test is Testable, EnumerableSetAllowlist {
             false,
             "Expected borrower to be disallowed"
         ); 
+
+
+       
       
-        AllowlistUser(commitmentManager).call_setAllowList(
+        AllowlistUser(lender).call_setAllowList(
             0,
             borrowersArray
         );

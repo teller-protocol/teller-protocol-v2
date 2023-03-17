@@ -31,7 +31,9 @@ contract EnumerableSetAllowlist is IAllowlistManager,IEnumerableSetAllowlist {
     function setAllowlist(
         uint256 _commitmentId,
         address[] calldata _addressList
-    ) public onlyCommitmentOwner(_commitmentId) {
+    ) public
+     onlyCommitmentOwner(_commitmentId) 
+     {
        
         delete allowList[_commitmentId];
         _addToAllowlist(_commitmentId, _addressList);

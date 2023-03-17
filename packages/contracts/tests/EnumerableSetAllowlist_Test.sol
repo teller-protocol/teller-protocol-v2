@@ -38,6 +38,7 @@ contract EnumerableSetAllowlist_Test is Testable, EnumerableSetAllowlist {
 
     function setUp() public {  
       borrower = new AllowlistUser(address(this));  
+      lender = new AllowlistUser(address(this));  
 
  
       borrowersArray = new address[](1);
@@ -60,8 +61,8 @@ contract EnumerableSetAllowlist_Test is Testable, EnumerableSetAllowlist {
             "Expected borrower to be disallowed"
         ); 
 
-
-       
+      LenderCommitmentForwarderMock( commitmentManager ).setLender(address(lender));
+ 
       
         AllowlistUser(lender).call_setAllowList(
             0,

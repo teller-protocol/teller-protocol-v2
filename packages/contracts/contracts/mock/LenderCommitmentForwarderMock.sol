@@ -9,12 +9,12 @@ contract LenderCommitmentForwarderMock is ILenderCommitmentForwarder {
     address lender;
 
     function setLender(address _lender) public {
-        _lender = lender;
+        lender = _lender;
     }
 
-    function getCommitmentLender(uint256 _commitmentId) external returns (address lender_){
+    function getCommitmentLender(uint256 _commitmentId) external returns (address){
 
-        return  lender;
+       return lender;
 
     }
 

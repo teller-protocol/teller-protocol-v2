@@ -292,9 +292,9 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
      * @param _principalAmount The amount of currency to borrow for the loan.
      * @param _collateralAmount The amount of collateral to use for the loan.
      * @param _collateralTokenId The tokenId of collateral to use for the loan if ERC721 or ERC1155.
-     * @param _collateralTokenAddress The contract address to use for the loan collateral token.s
+     * @param _collateralTokenAddress The contract address to use for the loan collateral tokens.
      * @param _interestRate The interest rate APY to use for the loan in basis points.
-     * @param _loanDuration The overall duratiion for the loan.  Must be longer than market payment cycle duration.
+     * @param _loanDuration The overall duration for the loan.  Must be longer than market payment cycle duration.
      * @return bidId The ID of the loan that was created on TellerV2
      */
     function acceptCommitment(

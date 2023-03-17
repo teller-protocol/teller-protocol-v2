@@ -153,6 +153,8 @@ contract TellerV2 is
 
     uint8 public constant CURRENT_CODE_VERSION = 9;
 
+    uint32 public constant LIQUIDATION_DELAY = 86400; //ONE DAY IN SECONDS
+
     /** Constructor **/
 
     constructor(address trustedForwarder) TellerV2Context(trustedForwarder) {}
@@ -671,7 +673,7 @@ contract TellerV2 is
         external
         acceptedLoan(_bidId, "liquidateLoan")
     {
-        require(isLoanDefaulted(_bidId), "Loan must be defaulted.");
+        require(isLoanLiquidateable(_bidId), "Loan must be liquidateable.");
 
         Bid storage bid = bids[_bidId];
 
@@ -913,11 +915,40 @@ contract TellerV2 is
     /**
      * @notice Checks to see if a borrower is delinquent.
      * @param _bidId The id of the loan bid to check for.
+     * @return bool True if the loan is defaulted.
      */
     function isLoanDefaulted(uint256 _bidId)
         public
         view
         override
+        returns (bool)
+    {
+        return _canLiquidateLoan(_bidId, 0);
+    }
+
+    /**
+     * @notice Checks to see if a loan was delinquent for longer than liquidation delay.
+     * @param _bidId The id of the loan bid to check for.
+     * @return bool True if the loan is liquidateable.
+     */
+    function isLoanLiquidateable(uint256 _bidId)
+        public
+        view
+        override
+        returns (bool)
+    {
+        return _canLiquidateLoan(_bidId, LIQUIDATION_DELAY);
+    }
+
+    /**
+     * @notice Checks to see if a borrower is delinquent.
+     * @param _bidId The id of the loan bid to check for.
+     * @param _liquidationDelay Amount of additional seconds after a loan defaulted to allow a liquidation.
+     * @return bool True if the loan is liquidateable.
+     */
+    function _canLiquidateLoan(uint256 _bidId, uint32 _liquidationDelay)
+        internal
+        view
         returns (bool)
     {
         Bid storage bid = bids[_bidId];
@@ -927,7 +958,9 @@ contract TellerV2 is
 
         if (bidDefaultDuration[_bidId] == 0) return false;
 
-        return (uint32(block.timestamp) - lastRepaidTimestamp(_bidId) >
+        return (uint32(block.timestamp) -
+            _liquidationDelay -
+            lastRepaidTimestamp(_bidId) >
             bidDefaultDuration[_bidId]);
     }
 
@@ -1023,6 +1056,30 @@ contract TellerV2 is
         returns (uint256 _marketId)
     {
         _marketId = bids[_bidId].marketplaceId;
+    }
+
+    function getLoanSummary(uint256 _bidId)
+        external
+        view
+        returns (
+            address borrower,
+            address lender,
+            uint256 marketId,
+            address principalTokenAddress,
+            uint256 principalAmount,
+            uint32 acceptedTimestamp,
+            BidState bidState
+        )
+    {
+        Bid storage bid = bids[_bidId];
+
+        borrower = bid.borrower;
+        lender = bid.lender;
+        marketId = bid.marketplaceId;
+        principalTokenAddress = address(bid.loanDetails.lendingToken);
+        principalAmount = bid.loanDetails.principal;
+        acceptedTimestamp = bid.loanDetails.acceptedTimestamp;
+        bidState = bid.state;
     }
 
     /** OpenZeppelin Override Functions **/

@@ -33,7 +33,7 @@ contract EnumerableSetAllowlist is IAllowlistManager,IEnumerableSetAllowlist {
         address[] calldata _addressList
     ) public
      onlyCommitmentOwner(_commitmentId) 
-     {
+    {
        
         delete allowList[_commitmentId];
         _addToAllowlist(_commitmentId, _addressList);

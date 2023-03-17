@@ -90,6 +90,12 @@ interface ITellerV2 {
     function isLoanDefaulted(uint256 _bidId) external view returns (bool);
 
     /**
+     * @notice Checks to see if a loan was delinquent for longer than liquidation delay.
+     * @param _bidId The id of the loan bid to check for.
+     */
+    function isLoanLiquidateable(uint256 _bidId) external view returns (bool);
+
+    /**
      * @notice Checks to see if a borrower is delinquent.
      * @param _bidId The id of the loan bid to check for.
      */
@@ -128,4 +134,17 @@ interface ITellerV2 {
         returns (address token_);
 
     function getLoanMarketId(uint256 _bidId) external view returns (uint256);
+
+    function getLoanSummary(uint256 _bidId)
+        external
+        view
+        returns (
+            address borrower,
+            address lender,
+            uint256 marketId,
+            address principalTokenAddress,
+            uint256 principalAmount,
+            uint32 acceptedTimestamp,
+            BidState bidState
+        );
 }

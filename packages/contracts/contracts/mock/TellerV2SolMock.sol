@@ -154,6 +154,8 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
 
     function isLoanDefaulted(uint256 _bidId) public view returns (bool) {}
 
+    function isLoanLiquidateable(uint256 _bidId) public view returns (bool) {}
+
     function isPaymentLate(uint256 _bidId) public view returns (bool) {}
 
     function getLoanBorrower(uint256 _bidId)
@@ -186,6 +188,30 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
         returns (address token_)
     {
         token_ = address(bids[_bidId].loanDetails.lendingToken);
+    }
+
+    function getLoanSummary(uint256 _bidId)
+        external
+        view
+        returns (
+            address borrower,
+            address lender,
+            uint256 marketId,
+            address principalTokenAddress,
+            uint256 principalAmount,
+            uint32 acceptedTimestamp,
+            BidState bidState
+        )
+    {
+        Bid storage bid = bids[_bidId];
+
+        borrower = bid.borrower;
+        lender = bid.lender;
+        marketId = bid.marketplaceId;
+        principalTokenAddress = address(bid.loanDetails.lendingToken);
+        principalAmount = bid.loanDetails.principal;
+        acceptedTimestamp = bid.loanDetails.acceptedTimestamp;
+        bidState = bid.state;
     }
 
     function setLastRepaidTimestamp(uint256 _bidId, uint32 _timestamp) public {

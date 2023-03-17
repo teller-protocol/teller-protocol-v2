@@ -22,7 +22,7 @@ const deployFn: DeployFunction = async (hre) => {
         init,
       },
     },
-    skipIfAlreadyDeployed: false,
+    skipIfAlreadyDeployed: true,
     hre,
   })
 }

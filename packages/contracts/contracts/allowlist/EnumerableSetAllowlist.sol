@@ -4,6 +4,8 @@ pragma solidity >=0.8.0 <0.9.0;
 import "../interfaces/allowlist/IAllowlistManager.sol";
 import "../interfaces/allowlist/IEnumerableSetAllowlist.sol";
 
+import "../interfaces/ILenderCommitmentForwarder.sol";
+
 import "@openzeppelin/contracts-upgradeable/utils/structs/EnumerableSetUpgradeable.sol";
 
 
@@ -11,25 +13,25 @@ contract EnumerableSetAllowlist is IAllowlistManager,IEnumerableSetAllowlist {
  using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
 
     event UpdatedAllowList(uint256 commitmentId);
-
-    address public immutable authorized;
+ 
+    address public immutable commitmentManager;
 
     mapping(uint256 => EnumerableSetUpgradeable.AddressSet) internal allowList;
 
-    modifier onlyAuthorized(){
-        require(msg.sender == authorized,"Must be authorized.");
+    modifier onlyCommitmentOwner(uint256 _commitmentId){
+        require(msg.sender == ILenderCommitmentForwarder(commitmentManager).getCommitmentLender(_commitmentId),"Must be the lender of the commitment.");
         _;
     }
 
-    constructor(address _authorized){  
-        authorized = _authorized;
+    constructor(address _commitmentManager){  
+        commitmentManager = _commitmentManager;
     }
 
 
     function setAllowlist(
         uint256 _commitmentId,
         address[] calldata _addressList
-    ) public onlyAuthorized {
+    ) public onlyCommitmentOwner(_commitmentId) {
        
         delete allowList[_commitmentId];
         _addToAllowlist(_commitmentId, _addressList);

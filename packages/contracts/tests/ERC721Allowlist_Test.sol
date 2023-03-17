@@ -25,7 +25,7 @@ contract EnumerableSetAllowlist_Test is Testable, ERC721Allowlist {
  
 
     constructor()
-    ERC721Allowlist(address(new AllowlistUser(address(this))) ,address(new TestERC721Token("TEST","TST"))  )
+    ERC721Allowlist(address(new TestERC721Token("TEST","TST"))  )
     {}
 
     function setUp() public {

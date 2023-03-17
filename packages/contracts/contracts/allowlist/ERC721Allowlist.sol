@@ -11,17 +11,12 @@ contract ERC721Allowlist is IAllowlistManager,IERC721Allowlist {
  
     event UpdatedAllowList(uint256 commitmentId);
 
-    address public immutable authorized;
+     
     IERC721Upgradeable public immutable accessToken; //IERC721
 
-  
-    modifier onlyAuthorized(){
-        require(msg.sender == authorized,"Must be authorized.");
-        _;
-    }
+ 
 
-    constructor(address _authorized, address _accessToken){  
-        authorized = _authorized;
+    constructor(address _accessToken){  
         accessToken = IERC721Upgradeable(_accessToken);
     }
 

@@ -53,12 +53,9 @@ contract EnumerableSetAllowlist_Test is Testable, EnumerableSetAllowlist {
             isAllowedBefore,
             false,
             "Expected borrower to be disallowed"
-        );
-
-
-
+        ); 
       
-        AllowlistUser(authorized).call_setAllowList(
+        AllowlistUser(commitmentManager).call_setAllowList(
             0,
             borrowersArray
         );

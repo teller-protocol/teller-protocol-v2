@@ -885,16 +885,6 @@ contract LenderCommitmentUser is User {
         commitmentForwarder.updateCommitment(commitmentId, _commitment);
     }
 
-    function _updateCommitmentBorrowers(
-        uint256 commitmentId,
-        address[] calldata borrowerAddressList
-    ) public {
-        commitmentForwarder.updateCommitmentBorrowers(
-            commitmentId,
-            borrowerAddressList
-        );
-    }
-
     function _acceptCommitment(
         uint256 commitmentId,
         uint256 principal,

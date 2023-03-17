@@ -9,6 +9,9 @@ import "./interfaces/ICollateralManager.sol";
 
 import "./interfaces/allowlist/IAllowlistManager.sol";
 import "./interfaces/allowlist/IEnumerableSetAllowlist.sol";
+
+import "./interfaces/ILenderCommitmentForwarder.sol";
+
 import { Collateral, CollateralType } from "./interfaces/escrow/ICollateralEscrowV1.sol";
 
 import "@openzeppelin/contracts-upgradeable/utils/structs/EnumerableSetUpgradeable.sol";
@@ -20,7 +23,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20Metadat
 
 
 
-contract LenderCommitmentForwarder is TellerV2MarketForwarder {
+contract LenderCommitmentForwarder is TellerV2MarketForwarder, ILenderCommitmentForwarder {
    using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
 
     enum CommitmentCollateralType {
@@ -147,6 +150,11 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         _;
     }
 
+
+    function getCommitmentLender(uint256 _commitmentId) public returns (address lender_){
+        lender_ = commitments[_commitmentId].lender;
+    }
+
     function validateCommitment(Commitment storage _commitment) internal {
         require(
             _commitment.expiration > uint32(block.timestamp),
@@ -189,7 +197,6 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
      */
     function createCommitment(
         Commitment calldata _commitment,
-   //     address[] calldata _borrowerAddressList,
         address borrowerAllowlistManager
     ) public returns (uint256 commitmentId_) {
         commitmentId_ = commitmentCount++;
@@ -252,7 +259,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         );
     }
 
-      function updateAllowlistManager(
+    function updateAllowlistManager(
         uint256 _commitmentId,
         address _allowlistManager
     ) public commitmentLender(_commitmentId) {
@@ -260,29 +267,8 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         commitmentAllowListManagers[_commitmentId] = _allowlistManager;
 
         emit UpdatedAllowlistManager(_commitmentId,_allowlistManager);
-        //emit UpdatedAllowList(_commitmentId);
     }
-
-
-//should be able to set this in one tx 
-
-    /**
-     * @notice Updates the borrowers allowed to accept a commitment
-     * @param _commitmentId The Id of the commitment to update.
-     * @param _borrowerAddressList The array of borrowers that are allowed to accept loans using this commitment
-     */
-    function updateCommitmentBorrowers(
-        uint256 _commitmentId,
-        address[] calldata _borrowerAddressList
-    ) public commitmentLender(_commitmentId) {
-       
-        address allowlistManager = commitmentAllowListManagers[_commitmentId];
-
-        IEnumerableSetAllowlist(allowlistManager).setAllowlist(_commitmentId, _borrowerAddressList);
-
-        //emit UpdatedAllowList(_commitmentId);
-    }
-
+ 
 
     /**
      * @notice Removes the commitment of a lender to a market.

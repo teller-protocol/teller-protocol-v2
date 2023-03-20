@@ -806,12 +806,12 @@ export function handeUpdatedCommitmentBorrower(
   const lenderCommitmentForwarderInstance = LenderCommitmentForwarder.bind(
     event.address
   );
-  const borrowers = lenderCommitmentForwarderInstance.getCommitmentBorrowers(
+  /*const borrowers = lenderCommitmentForwarderInstance.getCommitmentBorrowers(
     BigInt.fromString(commitmentId)
   );
   if (borrowers) {
     commitment.commitmentBorrowers = changetype<Bytes[]>(borrowers);
-  }
+  }*/
   commitment.save();
 }
 

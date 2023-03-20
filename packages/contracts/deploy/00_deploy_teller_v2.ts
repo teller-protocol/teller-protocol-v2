@@ -58,14 +58,16 @@ const deployFn: DeployFunction = async (hre) => {
     skipIfAlreadyDeployed: true,
     hre,
   })
-
+ 
   const collateralEscrowBeacon = await deploy<UpgradeableBeacon>({
-    contract: 'UpgradeableBeacon',
+    contract: 'CollateralUpgradeableBeacon',
     name: 'CollateralEscrowBeacon',
     args: [collateralEscrowBeaconImpl.address],
     skipIfAlreadyDeployed: true,
     hre,
   })
+
+ 
   const currentEscrowBeaconImpl = await collateralEscrowBeacon.implementation()
   if (
     collateralEscrowBeaconImpl.deployResult.newlyDeployed &&
@@ -78,6 +80,8 @@ const deployFn: DeployFunction = async (hre) => {
     await collateralEscrowBeacon.upgradeTo(collateralEscrowBeaconImpl.address)
     hre.log(`done`)
   }
+
+ 
 
   const collateralManager = await deploy<CollateralManager>({
     contract: 'CollateralManager',
@@ -94,6 +98,9 @@ const deployFn: DeployFunction = async (hre) => {
     },
     hre,
   })
+
+
+  
 
   const tellerV2IsInitialized = await isInitialized(tellerV2Contract.address)
   if (!tellerV2IsInitialized) {

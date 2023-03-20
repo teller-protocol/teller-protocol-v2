@@ -132,12 +132,14 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
+      entities:
+        - Commitment
       abis:
         - name: EnumerableSetAllowlist
           file: ./abis/{{network}}_EnumerableSetAllowlist.json
       eventHandlers: 
       - event: UpdatedAllowList(uint256)
-        handler: handleUpdatedAllowlist
+        handler: handleUpdatedAllowLists
       file: ./src/allowlist-mapping.ts
   - kind: ethereum/contract
     name: CollateralManager

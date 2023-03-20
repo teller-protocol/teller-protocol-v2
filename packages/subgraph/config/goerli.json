@@ -9,5 +9,7 @@
   "address_collateral_manager": "0x62824Ff0BDbc42874e23f3cA9966866659F39b09",
   "block_collateral_manager": "8688915",
   "address_lender_manager": "0x786a95b7605E52a6E8E6dA20d44a1E0aDA5E58b1",
-  "block_lender_manager": "8688915"
+  "block_lender_manager": "8688915",
+  "address_enumerable_set_allowlist": "0x5fe160b786a0274e115c2bee948ab60fc0bdab2f",
+  "block_enumerable_set_allowlist": "8688915"
 }

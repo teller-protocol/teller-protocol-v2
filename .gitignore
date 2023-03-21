@@ -2,6 +2,7 @@
 **/node_modules
 
 packages/contracts/generated
+packages/contracts/lib/forge-std
 packages/contracts/deployments/hardhat
 packages/contracts/deployments/tenderly
 packages/contracts/deployments/localhost

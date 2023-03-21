@@ -6,6 +6,12 @@ import "./TellerV2MarketForwarder.sol";
 
 // Interfaces
 import "./interfaces/ICollateralManager.sol";
+
+import "./interfaces/allowlist/IAllowlistManager.sol";
+import "./interfaces/allowlist/IEnumerableSetAllowlist.sol";
+
+import "./interfaces/ILenderCommitmentForwarder.sol";
+
 import { Collateral, CollateralType } from "./interfaces/escrow/ICollateralEscrowV1.sol";
 
 import "@openzeppelin/contracts-upgradeable/utils/structs/EnumerableSetUpgradeable.sol";
@@ -14,8 +20,11 @@ import "@openzeppelin/contracts-upgradeable/utils/structs/EnumerableSetUpgradeab
 import { MathUpgradeable } from "@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20MetadataUpgradeable.sol";
 
-contract LenderCommitmentForwarder is TellerV2MarketForwarder {
-    using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
+
+
+
+contract LenderCommitmentForwarder is TellerV2MarketForwarder, ILenderCommitmentForwarder {
+   using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
 
     enum CommitmentCollateralType {
         NONE, // no collateral required
@@ -59,7 +68,9 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
     uint256 commitmentCount;
 
     mapping(uint256 => EnumerableSetUpgradeable.AddressSet)
-        internal commitmentBorrowersList;
+        internal __commitmentBorrowersList; //DEPRECATED -> moved to manager
+
+    mapping(uint256 => address) public commitmentAllowListManagers;
 
     /**
      * @notice This event is emitted when a lender's commitment is created.
@@ -90,6 +101,11 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint256 marketId,
         address lendingToken,
         uint256 tokenAmount
+    );
+
+    event UpdatedAllowlistManager(
+        uint256 indexed commitmentId,
+        address manager
     );
 
     /**
@@ -134,6 +150,11 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         _;
     }
 
+
+    function getCommitmentLender(uint256 _commitmentId) public returns (address lender_){
+        lender_ = commitments[_commitmentId].lender;
+    }
+
     function validateCommitment(Commitment storage _commitment) internal {
         require(
             _commitment.expiration > uint32(block.timestamp),
@@ -171,12 +192,12 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
     /**
      * @notice Creates a loan commitment from a lender for a market.
      * @param _commitment The new commitment data expressed as a struct
-     * @param _borrowerAddressList The array of borrowers that are allowed to accept loans using this commitment
+     * @param borrowerAllowlistManager The address of the allowlist contract 
      * @return commitmentId_ returns the commitmentId for the created commitment
      */
     function createCommitment(
         Commitment calldata _commitment,
-        address[] calldata _borrowerAddressList
+        address borrowerAllowlistManager
     ) public returns (uint256 commitmentId_) {
         commitmentId_ = commitmentCount++;
 
@@ -186,10 +207,11 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         );
 
         commitments[commitmentId_] = _commitment;
+        commitmentAllowListManagers[commitmentId_] = borrowerAllowlistManager;
 
         validateCommitment(commitments[commitmentId_]);
 
-        _addBorrowersToCommitmentAllowlist(commitmentId_, _borrowerAddressList);
+        //_addBorrowersToCommitmentAllowlist(commitmentId_, _borrowerAddressList);
 
         emit CreatedCommitment(
             commitmentId_,
@@ -197,6 +219,11 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             _commitment.marketId,
             _commitment.principalTokenAddress,
             _commitment.maxPrincipal
+        );
+
+        emit UpdatedAllowlistManager(
+            commitmentId_,
+            borrowerAllowlistManager
         );
     }
 
@@ -232,33 +259,16 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         );
     }
 
-    /**
-     * @notice Updates the borrowers allowed to accept a commitment
-     * @param _commitmentId The Id of the commitment to update.
-     * @param _borrowerAddressList The array of borrowers that are allowed to accept loans using this commitment
-     */
-    function updateCommitmentBorrowers(
+    function updateAllowlistManager(
         uint256 _commitmentId,
-        address[] calldata _borrowerAddressList
+        address _allowlistManager
     ) public commitmentLender(_commitmentId) {
-        delete commitmentBorrowersList[_commitmentId];
-        _addBorrowersToCommitmentAllowlist(_commitmentId, _borrowerAddressList);
-    }
+       
+        commitmentAllowListManagers[_commitmentId] = _allowlistManager;
 
-    /**
-     * @notice Adds a borrower to the allowlist for a commmitment.
-     * @param _commitmentId The id of the commitment that will allow the new borrower
-     * @param _borrowerArray the address array of the borrowers that will be allowed to accept loans using the commitment
-     */
-    function _addBorrowersToCommitmentAllowlist(
-        uint256 _commitmentId,
-        address[] calldata _borrowerArray
-    ) internal {
-        for (uint256 i = 0; i < _borrowerArray.length; i++) {
-            commitmentBorrowersList[_commitmentId].add(_borrowerArray[i]);
-        }
-        emit UpdatedCommitmentBorrowers(_commitmentId);
+        emit UpdatedAllowlistManager(_commitmentId,_allowlistManager);
     }
+ 
 
     /**
      * @notice Removes the commitment of a lender to a market.
@@ -269,7 +279,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         commitmentLender(_commitmentId)
     {
         delete commitments[_commitmentId];
-        delete commitmentBorrowersList[_commitmentId];
+        //delete commitmentBorrowersList[_commitmentId];
         emit DeletedCommitment(_commitmentId);
     }
 
@@ -326,10 +336,19 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         );
 
         require(
-            commitmentBorrowersList[_commitmentId].length() == 0 ||
-                commitmentBorrowersList[_commitmentId].contains(borrower),
-            "unauthorized commitment borrower"
+            __commitmentBorrowersList[_commitmentId].length() == 0 ||
+                 commitmentAllowListManagers[_commitmentId] != address(0),
+            "Commitments with legacy borrower list must now set an allow list manager"
+        ); 
+       
+
+        require(commitmentAllowListManagers[_commitmentId] == address(0) ||
+            IAllowlistManager(commitmentAllowListManagers[_commitmentId]).addressIsAllowed(
+                _commitmentId, borrower
+            ),
+            "Borrower not allowlisted"
         );
+ 
 
         if (_principalAmount > commitment.maxPrincipal) {
             revert InsufficientCommitmentAllocation({
@@ -398,6 +417,8 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         );
     }
 
+ 
+
     /**
      * @notice Calculate the amount of collateral required to borrow a loan with _principalAmount of principal
      * @param _principalAmount The amount of currency to borrow for the loan.
@@ -446,13 +467,13 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
      * @param _commitmentId The commitment id for the commitment to query.
      * @return borrowers_ An array of addresses restricted to accept the commitment. Empty array means unrestricted.
      */
-    function getCommitmentBorrowers(uint256 _commitmentId)
+   /* function getCommitmentBorrowers(uint256 _commitmentId)
         external
         view
         returns (address[] memory borrowers_)
     {
         borrowers_ = commitmentBorrowersList[_commitmentId].values();
-    }
+    }*/
 
     /**
      * @notice Internal function to submit a bid to the lending protocol using a commitment

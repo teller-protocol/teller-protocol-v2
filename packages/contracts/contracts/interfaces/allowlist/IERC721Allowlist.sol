@@ -1,0 +1,6 @@
+
+
+interface IERC721Allowlist {
+
+    
+}

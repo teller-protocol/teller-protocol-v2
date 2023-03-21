@@ -20,9 +20,9 @@ import "../contracts/mock/MarketRegistryMock.sol";
 contract LenderCommitmentForwarder_Override is LenderCommitmentForwarder {
     
 
-    bool submitBidWasCalled;
-    bool submitBidWithCollateralWasCalled;
-    bool acceptBidWasCalled;
+    bool public submitBidWasCalled;
+    bool public submitBidWithCollateralWasCalled;
+    bool public acceptBidWasCalled;
 
 
      constructor(address tellerV2, address marketRegistry)
@@ -32,6 +32,28 @@ contract LenderCommitmentForwarder_Override is LenderCommitmentForwarder {
         )
     {}
 
+
+    function setCommitment(
+        uint256 _commitmentId,
+        Commitment memory _commitment
+    ) public {
+        
+
+        commitments[_commitmentId] = _commitment; 
+ 
+    }
+
+    function getCommitmentLender(
+        uint256 _commitmentId
+    ) public returns (address) {
+        return commitments[_commitmentId].lender;
+    }
+
+    function getCommitmentMarketId(
+        uint256 _commitmentId
+    ) public returns (uint256) {
+        return commitments[_commitmentId].marketId;
+    }
 
     /*
         Overrider methods 

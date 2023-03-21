@@ -120,9 +120,27 @@ dataSources:
           handler: handleDeletedCommitment
         - event: ExercisedCommitment(indexed uint256,address,uint256,uint256)
           handler: handleExercisedCommitment
-        - event: UpdatedCommitmentBorrowers(indexed uint256)
-          handler: handeUpdatedCommitmentBorrower
       file: ./src/mapping.ts
+  - kind: ethereum/contract
+    name: EnumerableSetAllowlist
+    network: {{network}}
+    source: 
+      address: '{{address_enumerable_set_allowlist}}'
+      abi: EnumerableSetAllowlist
+      startBlock: {{block_enumerable_set_allowlist}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Commitment
+      abis:
+        - name: EnumerableSetAllowlist
+          file: ./abis/{{network}}_EnumerableSetAllowlist.json
+      eventHandlers: 
+      - event: UpdatedAllowList(uint256)
+        handler: handleUpdatedAllowLists
+      file: ./src/allowlist-mapping.ts
   - kind: ethereum/contract
     name: CollateralManager
     network: {{network}}

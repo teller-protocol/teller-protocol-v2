@@ -1,13 +1,15 @@
 {
   "network": "goerli",
-  "address_teller_v2": "0x195c6608705546725DF0629dd60690Cf2b367734",
-  "block_teller_v2": "8538452",
-  "address_market_registry": "0x74FFC87282ab32c8E0969E26F93C820a213ae146",
-  "block_market_registry": "8538442",
-  "address_lender_commitment": "0xB1b668592A4FCA5d0Cd91D4E5D8b33cb95043E43",
-  "block_lender_commitment": "8538455",
-  "address_collateral_manager": "0xD66de8b25C4165dA2e7696e15E8436380823B118",
-  "block_collateral_manager": "8538491",
-  "address_lender_manager": "0x98Ca52786e967d1469090AdC075416948Ca004A7",
-  "block_lender_manager": "8538444"
+  "address_teller_v2": "0x3a8C417a743A60ECfF3988C34783D65362b62915",
+  "block_teller_v2": "8688915",
+  "address_market_registry": "0x04F6908B97E4E985b849174f9904FaF0a0E50413",
+  "block_market_registry": "8688915",
+  "address_lender_commitment": "0xEb73653c0a3B6BFb65b4DfE3cbc73A961919C8B6",
+  "block_lender_commitment": "8688915",
+  "address_collateral_manager": "0x62824Ff0BDbc42874e23f3cA9966866659F39b09",
+  "block_collateral_manager": "8688915",
+  "address_lender_manager": "0x786a95b7605E52a6E8E6dA20d44a1E0aDA5E58b1",
+  "block_lender_manager": "8688915",
+  "address_enumerable_set_allowlist": "0x5fe160b786a0274e115c2bee948ab60fc0bdab2f",
+  "block_enumerable_set_allowlist": "8688915"
 }

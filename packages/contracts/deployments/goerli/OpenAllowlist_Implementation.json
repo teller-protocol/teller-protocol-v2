@@ -1,0 +1,83 @@
+{
+  "address": "0xB95ab1668e84644B54256b4f207Faf3F43e7482e",
+  "abi": [
+    {
+      "inputs": [],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "commitmentId",
+          "type": "uint256"
+        }
+      ],
+      "name": "UpdatedAllowList",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "addressIsAllowed",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "transactionHash": "0x62df76df4181f5e1b80abfad9769e0493c145b7b5f12596f77c30bd791ba8f87",
+  "receipt": {
+    "to": null,
+    "from": "0x5a5B978142C8F08Dd013901b50892baC49f3b700",
+    "contractAddress": "0xB95ab1668e84644B54256b4f207Faf3F43e7482e",
+    "transactionIndex": 10,
+    "gasUsed": "95785",
+    "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "blockHash": "0x3ebc0ce290f568fadad0716d5f71b6aa55c8800815a196a4e89134b21c8c58a5",
+    "transactionHash": "0x62df76df4181f5e1b80abfad9769e0493c145b7b5f12596f77c30bd791ba8f87",
+    "logs": [],
+    "blockNumber": 8689041,
+    "cumulativeGasUsed": "476810",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": [],
+  "numDeployments": 1,
+  "solcInputHash": "e0730cda169a6d13b8fda0f782338556",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.9+commit.e5eed63a\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"commitmentId\",\"type\":\"uint256\"}],\"name\":\"UpdatedAllowList\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"addressIsAllowed\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/allowlist/OpenAllowlist.sol\":\"OpenAllowlist\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"contracts/allowlist/OpenAllowlist.sol\":{\"content\":\"\\npragma solidity >=0.8.0 <0.9.0;\\n// SPDX-License-Identifier: MIT\\nimport \\\"../interfaces/allowlist/IAllowlistManager.sol\\\";\\n  \\n\\ncontract OpenAllowlist is IAllowlistManager  {\\n \\n    event UpdatedAllowList(uint256 commitmentId); \\n\\n    constructor( ){  \\n        \\n    }\\n\\n    function addressIsAllowed(uint256, address) public virtual returns (bool) {\\n        return true;\\n    }\\n\\n     \\n}\",\"keccak256\":\"0xa56fef86b903c5d30eb8db9c7181de0bd0babcce189b8c59cb0aceae733464e3\",\"license\":\"MIT\"},\"contracts/interfaces/allowlist/IAllowlistManager.sol\":{\"content\":\"\\n\\n\\ninterface IAllowlistManager {\\n\\n \\n    function addressIsAllowed(uint256 _commitmentId,address _account) external returns (bool allowed_) ;\\n \\n}\",\"keccak256\":\"0x98b599ad422554ec62b370cad7c7c976a8698b4eb416229e07282f7fc0925ad5\"}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b5060c48061001f6000396000f3fe6080604052348015600f57600080fd5b506004361060285760003560e01c8063b0b5316d14602d575b600080fd5b604060383660046054565b600192915050565b604051901515815260200160405180910390f35b60008060408385031215606657600080fd5b8235915060208301356001600160a01b0381168114608357600080fd5b80915050925092905056fea264697066735822122029fbf2e43a4514252fecd104dee724239be7e1a56ed24d1599279241e265c86b64736f6c63430008090033",
+  "deployedBytecode": "0x6080604052348015600f57600080fd5b506004361060285760003560e01c8063b0b5316d14602d575b600080fd5b604060383660046054565b600192915050565b604051901515815260200160405180910390f35b60008060408385031215606657600080fd5b8235915060208301356001600160a01b0381168114608357600080fd5b80915050925092905056fea264697066735822122029fbf2e43a4514252fecd104dee724239be7e1a56ed24d1599279241e265c86b64736f6c63430008090033",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {},
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [],
+    "types": null
+  }
+}

@@ -1,7 +1,16 @@
+import { getNamedAccounts } from 'hardhat'
 import { DeployFunction } from 'hardhat-deploy/dist/types'
 import { deploy } from 'helpers/deploy-helpers'
 
 const deployFn: DeployFunction = async (hre) => {
+
+
+
+
+  let {deployer} = await getNamedAccounts()
+
+  console.log('deployer',deployer)
+
   const trustedForwarder = await deploy({
     contract: 'MetaForwarder',
     skipIfAlreadyDeployed: true,

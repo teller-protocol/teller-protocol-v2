@@ -115,4 +115,7 @@ contract MarketRegistryMock is IMarketRegistry {
         bool _requireBorrowerAttestation,
         string calldata _uri
     ) public returns (uint256) {}
+
+    function closeMarket(uint256 _marketId) public {}
+
 }

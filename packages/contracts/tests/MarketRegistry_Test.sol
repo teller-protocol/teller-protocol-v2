@@ -22,6 +22,9 @@ import { PaymentType, PaymentCycleType } from "../contracts/libraries/V2Calculat
 
 import {MarketRegistry_Override} from "./MarketRegistry_Override.sol";
 
+
+import {TellerASMock} from "../contracts/mock/TellerASMock.sol";
+
 contract MarketRegistry_Test is Testable {
     MarketRegistryUser private marketOwner;
     MarketRegistryUser private borrower;
@@ -32,6 +35,8 @@ contract MarketRegistry_Test is Testable {
 
     TellerV2Mock tellerV2;
     MarketRegistry_Override marketRegistry;
+
+    TellerASMock tellerASMock;
     
     uint32 expirationTime = 5000;
     uint256 marketId = 2;
@@ -44,10 +49,13 @@ contract MarketRegistry_Test is Testable {
         tellerV2 = new TellerV2Mock(   );
         marketRegistry = new MarketRegistry_Override(   );
 
+        marketRegistry.initialize( tellerASMock );
+
         marketOwner = new MarketRegistryUser(address(tellerV2),address(marketRegistry));
         borrower = new MarketRegistryUser(address(tellerV2),address(marketRegistry));
         lender = new MarketRegistryUser(address(tellerV2),address(marketRegistry));
 
+        marketRegistry.setMarketOwner(address(marketOwner));
       
 
         tellerV2.setMarketRegistry(address(marketRegistry));
@@ -193,6 +201,13 @@ contract MarketRegistry_Test is Testable {
     }
 
     function test_attestStakeholder() public {
+
+
+        assertEq(
+            marketRegistry.getMarketOwner(marketId),
+            address(marketOwner),
+            "Not overriding market owner"
+        );
         
         bool isLender = true; 
 
@@ -293,11 +308,11 @@ contract MarketRegistry_Test is Testable {
 
 contract MarketRegistryUser is User {
 
-    IMarketRegistry marketRegistry;
+    MarketRegistry_Override marketRegistry;
 
     constructor(address _tellerV2,address _marketRegistry) User(_tellerV2) {
 
-        marketRegistry = IMarketRegistry(_marketRegistry);
+        marketRegistry = MarketRegistry_Override(payable(_marketRegistry));
 
     }
 
@@ -387,3 +402,5 @@ contract TellerV2Mock is TellerV2Context {
         bidState = bid.state;
     }
 }
+
+

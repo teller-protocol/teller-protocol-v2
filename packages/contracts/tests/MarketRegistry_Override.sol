@@ -21,14 +21,23 @@ import { User } from "./Test_Helpers.sol";
 import { PaymentType, PaymentCycleType } from "../contracts/libraries/V2Calculations.sol";
 
 contract MarketRegistry_Override is MarketRegistry {
-   
+    
+    address globalMarketOwner;
+
 
     bool public attestStakeholderWasCalled;
-    
+
     constructor() MarketRegistry() {}
+
+
+    function setMarketOwner(
+        address _owner
+    ) public {
+        globalMarketOwner = _owner;
+    }
     
 
-       function attestStakeholder(
+    function attestStakeholder(
         uint256 _marketId,
         address _stakeholderAddress,
         uint256 _expirationTime,
@@ -45,6 +54,10 @@ contract MarketRegistry_Override is MarketRegistry {
 
 
     //overrides 
+
+    function _getMarketOwner(uint256 marketId) internal view override returns (address) {
+        return globalMarketOwner;
+    }
 
     function _attestStakeholder(
          uint256 _marketId,

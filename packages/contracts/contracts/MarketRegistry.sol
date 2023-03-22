@@ -65,7 +65,7 @@ contract MarketRegistry is
     /* Modifiers */
 
     modifier ownsMarket(uint256 _marketId) {
-        require(markets[_marketId].owner == _msgSender(), "Not the owner");
+        require(_getMarketOwner(_marketId) == _msgSender(), "Not the owner");
         _;
     }
 
@@ -451,7 +451,7 @@ contract MarketRegistry is
         return
             (_attestingSchemaId == attestationSchemaId &&
                 recipient == lenderAddress &&
-                attestor == markets[marketId].owner) ||
+                attestor == _getMarketOwner(marketId) ) ||
             attestor == address(this);
     }
 
@@ -737,6 +737,21 @@ contract MarketRegistry is
         override
         returns (address)
     {
+        return _getMarketOwner(_marketId);
+    }
+
+
+    /**
+     * @notice Gets the address of a market's owner.
+     * @param _marketId The ID of a market.
+     * @return The address of a market's owner.
+     */
+     function _getMarketOwner(uint256 _marketId)
+        internal
+        view
+        virtual
+        returns (address)
+    {
         return markets[_marketId].owner;
     }
 
@@ -754,7 +769,7 @@ contract MarketRegistry is
         address recipient = markets[_marketId].feeRecipient;
 
         if (recipient == address(0)) {
-            return markets[_marketId].owner;
+            return _getMarketOwner(_marketId);
         }
 
         return recipient;
@@ -1006,7 +1021,7 @@ contract MarketRegistry is
         )
     {
         require(
-            _msgSender() == markets[_marketId].owner,
+            _msgSender() == _getMarketOwner(_marketId),
             "Not the market owner"
         );
 
@@ -1055,7 +1070,7 @@ contract MarketRegistry is
         bytes32 uuid;
         {
             bytes memory data = abi.encode(_marketId, _stakeholderAddress);
-            address attestor = markets[_marketId].owner;
+            address attestor = _getMarketOwner(_marketId);
             // Submit attestation for stakeholder to join a market (attestation must be signed by market owner)
             uuid = tellerAS.attestByDelegation(
                 _stakeholderAddress,
@@ -1128,7 +1143,7 @@ contract MarketRegistry is
         bool _isLender
     ) internal {
         require(
-            _msgSender() == markets[_marketId].owner,
+            _msgSender() == _getMarketOwner(_marketId),
             "Not the market owner"
         );
 

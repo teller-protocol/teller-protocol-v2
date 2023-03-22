@@ -36,11 +36,11 @@ contract MarketLiquidityRewards_Override is MarketLiquidityRewards {
     uint32 expiration;
 
  
-    bool verifyLoanStartTimeWasCalled;
-    bool verifyExpectedTokenAddressWasCalled;
+    bool public verifyLoanStartTimeWasCalled;
+    bool public verifyExpectedTokenAddressWasCalled;
 
-    bool verifyRewardRecipientWasCalled;
-    bool verifyCollateralAmountWasCalled;
+    bool public verifyRewardRecipientWasCalled;
+    bool public verifyCollateralAmountWasCalled;
 
     constructor(address tellerV2, address marketRegistry, address collateralManager)
         MarketLiquidityRewards(
@@ -49,7 +49,47 @@ contract MarketLiquidityRewards_Override is MarketLiquidityRewards {
     {}
 
      
+     function setAllocation(uint256 _allocationId, RewardAllocation memory _allocation) public {
 
+        allocatedRewards[_allocationId] = _allocation;
+
+     }
+
+    function getRewardTokenAmount(uint256 allocationId) public view returns (uint256) {
+        return allocatedRewards[allocationId].rewardTokenAmount;
+    }
+
+    function calculateRewardAmount(
+        uint256 loanPrincipal,
+        uint256 principalTokenDecimals,
+        uint256 rewardPerLoanPrincipalAmount
+
+    ) public view returns (uint256) {
+        return super._calculateRewardAmount(
+            loanPrincipal,
+            principalTokenDecimals,
+            rewardPerLoanPrincipalAmount
+
+        );
+    }
+
+
+     function requiredCollateralAmount(
+        uint256 loanPrincipal,
+        uint256 principalTokenDecimals,
+        uint256 collateralTokenDecimals
+        uint256 minimumCollateralPerPrincipal
+
+    ) public view returns (uint256) {
+        return super._requiredCollateralAmount(
+            loanPrincipal,
+            principalTokenDecimals,
+            collateralTokenDecimals
+            rewardPerLoanPrincipalAmount,
+            minimumCollateralPerPrincipal
+
+        );
+    }
 
     //overrides 
 
@@ -107,5 +147,7 @@ contract MarketLiquidityRewards_Override is MarketLiquidityRewards {
     ) internal override {
         verifyExpectedTokenAddressWasCalled = true;
     }
+
+    
 }
  

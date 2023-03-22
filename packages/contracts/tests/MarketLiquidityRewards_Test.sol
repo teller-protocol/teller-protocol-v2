@@ -75,7 +75,7 @@ contract MarketLiquidityRewards_Test is Testable  {
 
 
 
-        tellerV2Mock.__setMarketOwner(address(marketOwner));
+        tellerV2Mock.__setMarketOwner( marketOwner );
 
 
         marketLiquidityRewards = new MarketLiquidityRewards_Override(
@@ -136,14 +136,14 @@ contract MarketLiquidityRewards_Test is Testable  {
         vm.warp(startTime + 100);
         //delete allocationCount;
 
-        verifyLoanStartTimeWasCalled = false;
+      /*  verifyLoanStartTimeWasCalled = false;
         verifyExpectedTokenAddressWasCalled = false;
 
         verifyRewardRecipientWasCalled = false;
-        verifyCollateralAmountWasCalled = false;
+        verifyCollateralAmountWasCalled = false;*/
     }
 
-    function _setAllocation(uint256 allocationId) internal {
+    function _setAllocation(uint256 _allocationId) internal {
         uint256 rewardTokenAmount = 0;
 
         MarketLiquidityRewards.RewardAllocation memory _allocation = IMarketLiquidityRewards
@@ -158,10 +158,11 @@ contract MarketLiquidityRewards_Test is Testable  {
                 rewardPerLoanPrincipalAmount: 0,
                 bidStartTimeMin: uint32(startTime),
                 bidStartTimeMax: uint32(startTime + 10000),
-                allocationStrategy: MarketLiquidityRewards.AllocationStrategy.BORROWER
+                allocationStrategy: IMarketLiquidityRewards.AllocationStrategy.BORROWER
             });
 
-        allocatedRewards[allocationId] = _allocation;
+      
+        marketLiquidityRewards.setAllocation(_allocationId,_allocation);
     }
 
     function test_allocateRewards() public {
@@ -179,7 +180,7 @@ contract MarketLiquidityRewards_Test is Testable  {
                 rewardPerLoanPrincipalAmount: 0,
                 bidStartTimeMin: uint32(startTime),
                 bidStartTimeMax: uint32(startTime + 10000),
-                allocationStrategy: AllocationStrategy.BORROWER
+                allocationStrategy: IMarketLiquidityRewards.AllocationStrategy.BORROWER
             });
 
         lender._approveERC20Token(
@@ -197,7 +198,7 @@ contract MarketLiquidityRewards_Test is Testable  {
 
         _setAllocation(allocationId);
 
-        uint256 amountBefore = allocatedRewards[allocationId].rewardTokenAmount;
+        uint256 amountBefore = marketLiquidityRewards.getRewardTokenAmount(allocationId);
 
         lender._approveERC20Token(
             address(rewardToken),
@@ -207,7 +208,7 @@ contract MarketLiquidityRewards_Test is Testable  {
 
         lender._increaseAllocationAmount(allocationId, amountToIncrease);
 
-        uint256 amountAfter = allocatedRewards[allocationId].rewardTokenAmount;
+        uint256 amountAfter = marketLiquidityRewards.getRewardTokenAmount(allocationId);
 
         assertEq(
             amountAfter,
@@ -221,11 +222,11 @@ contract MarketLiquidityRewards_Test is Testable  {
 
         _setAllocation(allocationId);
 
-        uint256 amountBefore = allocatedRewards[allocationId].rewardTokenAmount;
+        uint256 amountBefore = marketLiquidityRewards.getRewardTokenAmount(allocationId);
 
         lender._deallocateRewards(allocationId, amountBefore);
 
-        uint256 amountAfter = allocatedRewards[allocationId].rewardTokenAmount;
+        uint256 amountAfter = marketLiquidityRewards.getRewardTokenAmount(allocationId);
 
         assertEq(amountAfter, 0, "Allocation was not deleted");
     }
@@ -251,25 +252,25 @@ contract MarketLiquidityRewards_Test is Testable  {
         borrower._claimRewards(allocationId, bidId);
 
         assertEq(
-            verifyLoanStartTimeWasCalled,
+            marketLiquidityRewards.verifyLoanStartTimeWasCalled(),
             true,
             "verifyLoanStartTime was not called"
         );
 
         assertEq(
-            verifyExpectedTokenAddressWasCalled,
+            marketLiquidityRewards.verifyExpectedTokenAddressWasCalled(),
             true,
             " verifyExpectedTokenAddress was not called"
         );
 
         assertEq(
-            verifyRewardRecipientWasCalled,
+            marketLiquidityRewards.verifyRewardRecipientWasCalled(),
             true,
             "verifyRewardRecipient was not called"
         );
 
         assertEq(
-            verifyCollateralAmountWasCalled,
+            marketLiquidityRewards.verifyCollateralAmountWasCalled(),
             true,
             "verifyCollateralAmount was not called"
         );
@@ -284,7 +285,7 @@ contract MarketLiquidityRewards_Test is Testable  {
 
         uint256 rewardPerLoanPrincipalAmount = 1e16; // expanded by token decimals so really 0.01
 
-        uint256 rewardAmount = super._calculateRewardAmount(
+        uint256 rewardAmount = marketLiquidityRewards.calculateRewardAmount(
             loanPrincipal,
             principalTokenDecimals,
             rewardPerLoanPrincipalAmount
@@ -299,7 +300,7 @@ contract MarketLiquidityRewards_Test is Testable  {
 
         uint256 rewardPerLoanPrincipalAmount = 1e4; // expanded by token decimals so really 0.01
 
-        uint256 rewardAmount = super._calculateRewardAmount(
+        uint256 rewardAmount = marketLiquidityRewards.calculateRewardAmount(
             loanPrincipal,
             principalTokenDecimals,
             rewardPerLoanPrincipalAmount
@@ -316,7 +317,7 @@ contract MarketLiquidityRewards_Test is Testable  {
 
         uint256 minimumCollateralPerPrincipal = 1e4 * 1e6; // expanded by token decimals so really 0.01
 
-        uint256 minCollateral = super._requiredCollateralAmount(
+        uint256 minCollateral = marketLiquidityRewards.requiredCollateralAmount(
             loanPrincipal,
             principalTokenDecimals,
             collateralTokenDecimals,
@@ -333,12 +334,13 @@ contract MarketLiquidityRewards_Test is Testable  {
 
         uint256 amount = 100;
 
-        allocatedRewards[allocationId].rewardTokenAmount += amount;
+       // allocatedRewards[allocationId].rewardTokenAmount += amount;
+        marketLiquidityRewards.increaseAllocationAmount(allocationId,amount);
 
         super._decrementAllocatedAmount(allocationId, amount);
 
         assertEq(
-            allocatedRewards[allocationId].rewardTokenAmount,
+            marketLiquidityRewards.getRewardTokenAmount(allocationId),
             0,
             "allocation amount not decremented"
         );
@@ -401,69 +403,17 @@ contract MarketLiquidityRewards_Test is Testable  {
         );
     }
 
-    function allocateRewards(
-        MarketLiquidityRewards.RewardAllocation calldata _allocation
-    ) public override returns (uint256 allocationId_) {
-        super.allocateRewards(_allocation);
-    }
-
-    function increaseAllocationAmount(
-        uint256 _allocationId,
-        uint256 _tokenAmount
-    ) public override {
-        super.increaseAllocationAmount(_allocationId, _tokenAmount);
-    }
-
-    function deallocateRewards(uint256 _allocationId, uint256 _tokenAmount)
-        public
-        override
-    {
-        super.deallocateRewards(_allocationId, _tokenAmount);
-    }
-
-    function _verifyAndReturnRewardRecipient(
-        MarketLiquidityRewards.AllocationStrategy strategy,
-        BidState bidState,
-        address borrower,
-        address lender
-    ) internal override returns (address rewardRecipient) {
-        verifyRewardRecipientWasCalled = true;
-        return address(borrower);
-    }
-
-    function _verifyCollateralAmount(
-        address _collateralTokenAddress,
-        uint256 _collateralAmount,
-        address _principalTokenAddress,
-        uint256 _principalAmount,
-        uint256 _minimumCollateralPerPrincipalAmount
-    ) internal override {
-        verifyCollateralAmountWasCalled = true;
-    }
-
-    function _verifyLoanStartTime(
-        uint32 loanStartTime,
-        uint32 minStartTime,
-        uint32 maxStartTime
-    ) internal override {
-        verifyLoanStartTimeWasCalled = true;
-    }
-
-    function _verifyExpectedTokenAddress(
-        address loanTokenAddress,
-        address expectedTokenAddress
-    ) internal override {
-        verifyExpectedTokenAddressWasCalled = true;
-    }
+ 
+ 
 }
 
 contract MarketLiquidityUser is User {
     MarketLiquidityRewards public immutable liquidityRewards;
 
-    constructor(address _tellerV2, MarketLiquidityRewards _liquidityRewards)
+    constructor(address _tellerV2, address _liquidityRewards)
         User(_tellerV2)
     {
-        liquidityRewards = _liquidityRewards;
+        liquidityRewards = MarketLiquidityRewards(_liquidityRewards);
     }
 
     function _allocateRewards(

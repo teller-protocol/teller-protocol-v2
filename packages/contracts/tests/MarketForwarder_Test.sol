@@ -45,7 +45,9 @@ contract MarketForwarder_Test is Testable {
 
         mockMarketRegistry = new MarketRegistryMock( address(marketOwner)  );
 
-        tellerV2Mock.__setMarketOwner(marketOwner);
+      //  tellerV2Mock.__setMarketOwner(marketOwner);
+
+        tellerV2Mock.setMarketRegistry(address(mockMarketRegistry));
 
         mockMarketRegistry.setMarketOwner(address(marketOwner));
 
@@ -147,11 +149,12 @@ contract MarketForwarderUser is User {
 contract MarketForwarderTellerV2Mock is TellerV2Context {
     constructor() TellerV2Context(address(0)) {}
 
-    function __setMarketOwner(User _marketOwner) external {
+    function setMarketRegistry(address _marketRegistry) external {
         marketRegistry = IMarketRegistry(
-            address(new MarketRegistryMock(address(_marketOwner)))
+           _marketRegistry
         );
     }
+
 
     function getSenderForMarket(uint256 _marketId)
         external

@@ -55,6 +55,12 @@ contract MarketLiquidityRewards_Override is MarketLiquidityRewards {
 
      }
 
+    function setAllocatedAmount(uint256 _allocationId, uint256 _amount) public {
+
+        allocatedRewards[_allocationId].rewardTokenAmount = _amount;
+
+     }
+
     function getRewardTokenAmount(uint256 allocationId) public view returns (uint256) {
         return allocatedRewards[allocationId].rewardTokenAmount;
     }

@@ -189,7 +189,7 @@ contract MarketLiquidityRewards_Test is Testable  {
 
         lender._approveERC20Token(
             address(rewardToken),
-            address(this),
+            address(marketLiquidityRewards),
             rewardTokenAmount
         );
 
@@ -206,7 +206,7 @@ contract MarketLiquidityRewards_Test is Testable  {
 
         lender._approveERC20Token(
             address(rewardToken),
-            address(this),
+            address(marketLiquidityRewards),
             amountToIncrease
         );
 
@@ -338,8 +338,8 @@ contract MarketLiquidityRewards_Test is Testable  {
 
         uint256 amount = 100;
 
-       // allocatedRewards[allocationId].rewardTokenAmount += amount;
-        marketLiquidityRewards.increaseAllocationAmount(allocationId,amount);
+       
+        marketLiquidityRewards.setAllocatedAmount(allocationId,amount);
 
         marketLiquidityRewards.decrementAllocatedAmount(allocationId, amount);
 

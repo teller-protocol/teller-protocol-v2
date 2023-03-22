@@ -186,6 +186,71 @@ contract MarketRegistry_Test is Testable {
         }
         require(createFailed, "Monthly market should not have been created");
     }
+
+
+    function test_attestLender() public {}
+
+    function test_attestLenderDelegated() public {}
+
+
+    function test_revokeLender() public {}
+
+    function test_lenderExitMarket() public {}
+
+
+
+    function test_attestBorrowerDelegated() public {}
+
+    function test_revokeBorrower() public {}
+
+    function test_borrowerExitMarket() public {}
+
+    function test_resolve() public {}
+
+    function test_transferMarketOwnership() public {}
+
+    function test_updateMarketSettings() public {}
+
+    function test_setMarketFeeRecipient() public {} 
+
+    function test_setMarketURI() public {} 
+
+    function test_setPaymentCycle() public {} 
+
+    function test_setPaymentDefaultDuration() public {} 
+
+    function test_setBidExpirationTime() public {} 
+
+    function test_setMarketFeePercent() public {} 
+
+    function test_setMarketPaymentType() public {} 
+
+    function test_setLenderAttestationRequired() public {}
+
+    function test_setBorrowerAttestationRequired() public {} 
+
+    function test_getMarketOwner() public {} 
+
+    function test_getMarketFeeRecipient() public {} 
+
+    function test_getMarketURI() public {} 
+
+    function test_getPaymentCycle() public {} 
+
+    function test_getPaymentDefaultDuration() public {} 
+
+    function test_getPaymentType() public {} 
+
+    function test_getBidExpirationTime() public {} 
+
+    function test_getMarketplaceFee() public {} 
+
+    function test_isVerifiedLender() public {} 
+
+    function test_isVerifiedBorrower() public {} 
+
+
+
 }
 
 
@@ -204,7 +269,7 @@ contract MarketRegistryUser is User {
     function closeMarket(uint256 marketId) public {
 
         marketRegistry.closeMarket(marketId);
-        
+
     }
 
 

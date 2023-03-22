@@ -49,6 +49,8 @@ contract MarketRegistry_Test is Testable {
         tellerV2 = new TellerV2Mock(   );
         marketRegistry = new MarketRegistry_Override(   );
 
+        tellerASMock = new TellerASMock();
+
         marketRegistry.initialize( tellerASMock );
 
         marketOwner = new MarketRegistryUser(address(tellerV2),address(marketRegistry));

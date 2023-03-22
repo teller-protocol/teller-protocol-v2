@@ -13,14 +13,13 @@ import { Testable } from "./Testable.sol";
 import { Collateral, CollateralType } from "../contracts/interfaces/escrow/ICollateralEscrowV1.sol";
 
 import { User } from "./Test_Helpers.sol";
-import {MarketLiquidityRewards_Override} from "./MarketLiquidityRewards_Override.sol";
 
 import "../contracts/mock/MarketRegistryMock.sol";
 import "../contracts/mock/CollateralManagerMock.sol";
 
 import "../contracts/MarketLiquidityRewards.sol";
 
-contract MarketLiquidityRewards_Test is Testable  {
+contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
     MarketLiquidityUser private marketOwner;
     MarketLiquidityUser private lender;
     MarketLiquidityUser private borrower;
@@ -47,52 +46,27 @@ contract MarketLiquidityRewards_Test is Testable  {
     TestERC20Token collateralToken;
     uint8 constant collateralTokenDecimals = 6;
 
-    MarketLiquidityRewards_Override marketLiquidityRewards;
+    bool verifyLoanStartTimeWasCalled;
+    bool verifyExpectedTokenAddressWasCalled;
 
-    
-    TellerV2Mock tellerV2Mock;
-    MarketRegistryMock marketRegistryMock;
-    CollateralManagerMock collateralManagerMock;
-
+    bool verifyRewardRecipientWasCalled;
+    bool verifyCollateralAmountWasCalled;
 
     constructor()
-     /*   MarketLiquidityRewards(
+        MarketLiquidityRewards(
             address(new TellerV2Mock()),
             address(new MarketRegistryMock(address(0))),
             address(new CollateralManagerMock())
-        )*/
+        )
     {}
 
     function setUp() public {
+        marketOwner = new MarketLiquidityUser(address(tellerV2), (this));
+        borrower = new MarketLiquidityUser(address(tellerV2), (this));
+        lender = new MarketLiquidityUser(address(tellerV2), (this));
+        TellerV2Mock(tellerV2).__setMarketOwner(marketOwner);
 
-
-
-        tellerV2Mock = new TellerV2Mock();
-
-        marketRegistryMock = new MarketRegistryMock(address(0));
-
-        collateralManagerMock = new CollateralManagerMock();
-
-
-
-        tellerV2Mock.__setMarketOwner(address(marketOwner));
-
-
-        marketLiquidityRewards = new MarketLiquidityRewards_Override(
-            address(tellerV2Mock),
-            address(marketRegistryMock),
-            address(collateralManagerMock)
-            
-            );
-
-        borrower = new MarketLiquidityUser(address(tellerV2Mock), address(marketLiquidityRewards));
-        lender = new MarketLiquidityUser(address(tellerV2Mock), address(marketLiquidityRewards));
-
-        marketOwner = new MarketLiquidityUser(address(tellerV2Mock), address(marketLiquidityRewards));
-   
-
-
-        marketRegistryMock.setMarketOwner(address(marketOwner));
+        MarketRegistryMock(marketRegistry).setMarketOwner(address(marketOwner));
 
         //tokenAddress = address(0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174);
         marketId = 2;
@@ -146,7 +120,7 @@ contract MarketLiquidityRewards_Test is Testable  {
     function _setAllocation(uint256 allocationId) internal {
         uint256 rewardTokenAmount = 0;
 
-        MarketLiquidityRewards.RewardAllocation memory _allocation = IMarketLiquidityRewards
+        RewardAllocation memory _allocation = IMarketLiquidityRewards
             .RewardAllocation({
                 allocator: address(lender),
                 marketId: marketId,
@@ -158,7 +132,7 @@ contract MarketLiquidityRewards_Test is Testable  {
                 rewardPerLoanPrincipalAmount: 0,
                 bidStartTimeMin: uint32(startTime),
                 bidStartTimeMax: uint32(startTime + 10000),
-                allocationStrategy: MarketLiquidityRewards.AllocationStrategy.BORROWER
+                allocationStrategy: AllocationStrategy.BORROWER
             });
 
         allocatedRewards[allocationId] = _allocation;
@@ -167,7 +141,7 @@ contract MarketLiquidityRewards_Test is Testable  {
     function test_allocateRewards() public {
         uint256 rewardTokenAmount = 500;
 
-        MarketLiquidityRewards.RewardAllocation memory _allocation = IMarketLiquidityRewards
+        RewardAllocation memory _allocation = IMarketLiquidityRewards
             .RewardAllocation({
                 allocator: address(lender),
                 marketId: marketId,
@@ -241,7 +215,7 @@ contract MarketLiquidityRewards_Test is Testable  {
         mockBid.loanDetails.acceptedTimestamp = uint32(block.timestamp);
         mockBid.state = BidState.PAID;
 
-        tellerV2Mock.setMockBid(mockBid);
+        TellerV2Mock(tellerV2).setMockBid(mockBid);
 
         uint256 allocationId = 0;
         uint256 bidId = 0;
@@ -366,7 +340,7 @@ contract MarketLiquidityRewards_Test is Testable  {
 
     function test_verifyAndReturnRewardRecipient() public {
         address recipient = super._verifyAndReturnRewardRecipient(
-            MarketLiquidityRewards.AllocationStrategy.BORROWER,
+            AllocationStrategy.BORROWER,
             BidState.PAID,
             address(borrower),
             address(lender)
@@ -379,7 +353,7 @@ contract MarketLiquidityRewards_Test is Testable  {
         vm.expectRevert();
 
         address recipient = super._verifyAndReturnRewardRecipient(
-            MarketLiquidityRewards.AllocationStrategy.BORROWER,
+            AllocationStrategy.BORROWER,
             BidState.PENDING,
             address(borrower),
             address(lender)
@@ -422,7 +396,7 @@ contract MarketLiquidityRewards_Test is Testable  {
     }
 
     function _verifyAndReturnRewardRecipient(
-        MarketLiquidityRewards.AllocationStrategy strategy,
+        AllocationStrategy strategy,
         BidState bidState,
         address borrower,
         address lender

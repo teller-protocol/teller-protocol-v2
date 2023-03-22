@@ -1000,6 +1000,7 @@ contract MarketRegistry is
         bool _isLender
     )
         internal
+        virtual
         withAttestingSchema(
             _isLender ? lenderAttestationSchemaId : borrowerAttestationSchemaId
         )

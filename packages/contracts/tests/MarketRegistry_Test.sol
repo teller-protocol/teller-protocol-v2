@@ -20,16 +20,21 @@ import "../contracts/interfaces/IWETH.sol";
 import { User } from "./Test_Helpers.sol";
 import { PaymentType, PaymentCycleType } from "../contracts/libraries/V2Calculations.sol";
 
+import {MarketRegistry_Override} from "./MarketRegistry_Override.sol";
+
 contract MarketRegistry_Test is Testable {
     MarketRegistryUser private marketOwner;
     MarketRegistryUser private borrower;
     MarketRegistryUser private lender;
+    MarketRegistryUser private stakeholder;
 
     WethMock wethMock;
 
     TellerV2Mock tellerV2;
-    MarketRegistry marketRegistry;
- 
+    MarketRegistry_Override marketRegistry;
+    
+    uint32 expirationTime = 5000;
+    uint256 marketId = 2;
 
     constructor()  {}
 
@@ -37,7 +42,7 @@ contract MarketRegistry_Test is Testable {
       
 
         tellerV2 = new TellerV2Mock(   );
-        marketRegistry = new MarketRegistry(   );
+        marketRegistry = new MarketRegistry_Override(   );
 
         marketOwner = new MarketRegistryUser(address(tellerV2),address(marketRegistry));
         borrower = new MarketRegistryUser(address(tellerV2),address(marketRegistry));
@@ -187,8 +192,39 @@ contract MarketRegistry_Test is Testable {
         require(createFailed, "Monthly market should not have been created");
     }
 
+    function test_attestStakeholder() public {
+        
+        bool isLender = true; 
 
-    function test_attestLender() public {}
+        marketOwner.attestStakeholder(
+            marketId,
+            address(lender),
+            expirationTime,
+            isLender
+        );
+
+        assertEq(
+            marketRegistry.attestStakeholderWasCalled(),
+            true,
+            "Attest stakeholder was not called"
+        );
+    }
+
+    function test_attestLender() public {
+ 
+
+        marketRegistry.attestLender(
+            marketId,
+            address(lender),
+            expirationTime 
+        );
+
+        assertEq(
+            marketRegistry.attestStakeholderWasCalled(),
+            true,
+            "Attest stakeholder was not called"
+        );
+    }
 
     function test_attestLenderDelegated() public {}
 
@@ -271,6 +307,23 @@ contract MarketRegistryUser is User {
         marketRegistry.closeMarket(marketId);
 
     }
+
+    function attestStakeholder(
+        uint256 _marketId,
+        address _stakeholderAddress,
+        uint256 _expirationTime,
+        bool _isLender
+    ) public {
+
+        marketRegistry.attestStakeholder(
+            _marketId,
+            _stakeholderAddress,
+            _expirationTime,
+            _isLender
+        );
+    }
+
+     
 
 
 

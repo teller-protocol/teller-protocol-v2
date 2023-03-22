@@ -77,19 +77,56 @@ contract MarketLiquidityRewards_Override is MarketLiquidityRewards {
      function requiredCollateralAmount(
         uint256 loanPrincipal,
         uint256 principalTokenDecimals,
-        uint256 collateralTokenDecimals
+        uint256 collateralTokenDecimals,
         uint256 minimumCollateralPerPrincipal
 
     ) public view returns (uint256) {
         return super._requiredCollateralAmount(
             loanPrincipal,
             principalTokenDecimals,
-            collateralTokenDecimals
-            rewardPerLoanPrincipalAmount,
+            collateralTokenDecimals,
+            
             minimumCollateralPerPrincipal
 
         );
     }
+
+
+    function decrementAllocatedAmount(uint256 _allocationId, uint256 _tokenAmount)
+        public
+    {
+        super._decrementAllocatedAmount(_allocationId, _tokenAmount);
+    }
+
+    function verifyLoanStartTime(
+        uint32 a,
+        uint32 b,
+        uint32 c
+    ) public {
+          super._verifyLoanStartTime(a,b,c);
+    }
+
+    function verifyExpectedTokenAddress(
+        address a,
+        address b
+    ) public {
+          super._verifyExpectedTokenAddress(a,b);
+    }
+
+       function verifyAndReturnRewardRecipient(
+        AllocationStrategy allocationStrategy,
+        BidState bidState,
+        address borrower,
+        address lender 
+    ) public returns (address) {
+        return  super._verifyAndReturnRewardRecipient(
+            allocationStrategy,
+            bidState,
+            borrower,
+            lender
+        );
+    }
+
 
     //overrides 
 
@@ -112,6 +149,8 @@ contract MarketLiquidityRewards_Override is MarketLiquidityRewards {
     {
         super.deallocateRewards(_allocationId, _tokenAmount);
     }
+
+
 
     function _verifyAndReturnRewardRecipient(
         AllocationStrategy strategy,

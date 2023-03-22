@@ -71,11 +71,13 @@ contract MarketLiquidityRewards_Test is Testable  {
 
         marketRegistryMock = new MarketRegistryMock(address(0));
 
+
+      
         collateralManagerMock = new CollateralManagerMock();
 
 
 
-        tellerV2Mock.__setMarketOwner( marketOwner );
+        tellerV2Mock.setMarketRegistry( address(marketRegistryMock) );
 
 
         marketLiquidityRewards = new MarketLiquidityRewards_Override(
@@ -101,8 +103,10 @@ contract MarketLiquidityRewards_Test is Testable  {
         minInterestRate = 3000;
         expiration = uint32(block.timestamp) + uint32(64000);
 
-        marketOwner.setTrustedMarketForwarder(marketId, address(this));
-        lender.approveMarketForwarder(marketId, address(this));
+
+        //failing 
+        marketOwner.setTrustedMarketForwarder(marketId, address(marketLiquidityRewards));
+        lender.approveMarketForwarder(marketId, address(marketLiquidityRewards));
 
         borrowersArray = new address[](1);
         borrowersArray[0] = address(borrower);
@@ -337,7 +341,7 @@ contract MarketLiquidityRewards_Test is Testable  {
        // allocatedRewards[allocationId].rewardTokenAmount += amount;
         marketLiquidityRewards.increaseAllocationAmount(allocationId,amount);
 
-        super._decrementAllocatedAmount(allocationId, amount);
+        marketLiquidityRewards.decrementAllocatedAmount(allocationId, amount);
 
         assertEq(
             marketLiquidityRewards.getRewardTokenAmount(allocationId),
@@ -363,12 +367,12 @@ contract MarketLiquidityRewards_Test is Testable  {
     function test_verifyLoanStartTime_min() public {
         vm.expectRevert(bytes("Loan was accepted before the min start time."));
 
-        super._verifyLoanStartTime(100, 200, 300);
+        marketLiquidityRewards.verifyLoanStartTime(100, 200, 300);
     }
 
     function test_verifyAndReturnRewardRecipient() public {
-        address recipient = super._verifyAndReturnRewardRecipient(
-            MarketLiquidityRewards.AllocationStrategy.BORROWER,
+        address recipient = marketLiquidityRewards.verifyAndReturnRewardRecipient(
+            IMarketLiquidityRewards.AllocationStrategy.BORROWER,
             BidState.PAID,
             address(borrower),
             address(lender)
@@ -380,8 +384,8 @@ contract MarketLiquidityRewards_Test is Testable  {
     function test_verifyAndReturnRewardRecipient_reverts() public {
         vm.expectRevert();
 
-        address recipient = super._verifyAndReturnRewardRecipient(
-            MarketLiquidityRewards.AllocationStrategy.BORROWER,
+        address recipient = marketLiquidityRewards.verifyAndReturnRewardRecipient(
+            IMarketLiquidityRewards.AllocationStrategy.BORROWER,
             BidState.PENDING,
             address(borrower),
             address(lender)
@@ -391,13 +395,13 @@ contract MarketLiquidityRewards_Test is Testable  {
     function test_verifyLoanStartTime_max() public {
         vm.expectRevert(bytes("Loan was accepted after the max start time."));
 
-        super._verifyLoanStartTime(400, 200, 300);
+        marketLiquidityRewards.verifyLoanStartTime(400, 200, 300);
     }
 
     function test_verifyExpectedTokenAddress() public {
         vm.expectRevert(bytes("Invalid expected token address."));
 
-        super._verifyExpectedTokenAddress(
+        marketLiquidityRewards.verifyExpectedTokenAddress(
             address(principalToken),
             address(collateralToken)
         );
@@ -452,9 +456,11 @@ contract TellerV2Mock is TellerV2Context {
 
     constructor() TellerV2Context(address(0)) {}
 
-    function __setMarketOwner(User _marketOwner) external {
+  
+
+    function setMarketRegistry(address _marketRegistry) external {
         marketRegistry = IMarketRegistry(
-            address(new MarketRegistryMock(address(_marketOwner)))
+           _marketRegistry
         );
     }
 

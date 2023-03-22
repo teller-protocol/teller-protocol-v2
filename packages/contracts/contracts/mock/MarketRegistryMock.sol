@@ -34,7 +34,7 @@ contract MarketRegistryMock is IMarketRegistry {
         isVerified_ = true;
     }
 
-    function getMarketOwner(uint256 _marketId) public view returns (address) {
+    function getMarketOwner(uint256 _marketId) public view override returns (address) {
         return address(marketOwner);
     }
 

@@ -21,11 +21,13 @@ import { User } from "./Test_Helpers.sol";
 import { PaymentType, PaymentCycleType } from "../contracts/libraries/V2Calculations.sol";
 
 contract MarketRegistry_Override is MarketRegistry {
+     using EnumerableSet for EnumerableSet.AddressSet;
     
     address globalMarketOwner;
 
 
     bool public attestStakeholderWasCalled;
+    bool public attestStakeholderVerificationWasCalled;
 
     constructor() MarketRegistry() {}
 
@@ -50,7 +52,18 @@ contract MarketRegistry_Override is MarketRegistry {
           _expirationTime,
           _isLender
         );
-    } 
+    }
+
+
+    function attestStakeholderVerification(
+         uint256 _marketId,
+        address _stakeholderAddress,
+        bytes32 _uuid,
+        bool _isLender
+
+    ) public {  
+        super._attestStakeholderVerification(_marketId,_stakeholderAddress,_uuid,_isLender);
+    }
 
 
     //overrides 
@@ -69,9 +82,37 @@ contract MarketRegistry_Override is MarketRegistry {
         attestStakeholderWasCalled = true;
     } 
 
- 
+    function _attestStakeholderVerification(
+         uint256 _marketId,
+        address _stakeholderAddress,
+        bytes32 _uuid,
+        bool _isLender
+
+    ) internal override {  
+       attestStakeholderVerificationWasCalled = true;
+    }
 
 
+    function marketVerifiedLendersContains(uint256 _marketId, address guy) public returns (bool) {
+        return markets[_marketId].verifiedLendersForMarket.contains(guy);
+    }
+
+    function marketVerifiedBorrowersContains(uint256 _marketId, address guy) public returns (bool) {
+        return markets[_marketId].verifiedBorrowersForMarket.contains(guy);
+    }
+
+    function getLenderAttestationId(uint256 _marketId, address guy) public returns (bytes32){
+
+        return markets[_marketId].lenderAttestationIds[guy];
+
+    }
+
+    function getBorrowerAttestationId(uint256 _marketId, address guy) public returns (bytes32){
+
+        return markets[_marketId].borrowerAttestationIds[guy];
+
+    }
+  
 
 }
 

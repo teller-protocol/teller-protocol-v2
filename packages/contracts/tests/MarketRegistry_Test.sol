@@ -41,6 +41,8 @@ contract MarketRegistry_Test is Testable {
     uint32 expirationTime = 5000;
     uint256 marketId = 2;
 
+    bytes32 uuid = bytes32("0x042");
+
     constructor()  {}
 
     function setUp() public {
@@ -221,10 +223,80 @@ contract MarketRegistry_Test is Testable {
         );
 
         assertEq(
-            marketRegistry.attestStakeholderWasCalled(),
+            marketRegistry.attestStakeholderVerificationWasCalled(),
             true,
-            "Attest stakeholder was not called"
+            "Attest stakeholder verification was not called"
         );
+    }
+
+    function test_attestStakeholder_notMarketOwner() public {
+
+        bool isLender = true; 
+
+        vm.expectRevert();
+
+        marketRegistry.attestStakeholder(
+            marketId,
+            address(lender),
+            expirationTime,
+            isLender
+        );
+
+    }
+
+
+    function test_attestStakeholderVerification_lender() public {
+
+        bool isLender = true; 
+
+        marketRegistry.attestStakeholderVerification( 
+            marketId,
+            address(lender),
+            uuid,
+            isLender
+         );
+
+        //expect that the lender is attested  
+
+        assertEq(
+            marketRegistry.marketVerifiedLendersContains(marketId,address(lender)),
+            true,
+            "Did not add lender to verified set"
+        );
+
+        assertEq(
+            marketRegistry.getLenderAttestationId(marketId,address(lender)),
+            uuid,
+            "Did not set market attestation Id"
+        );
+        
+    }
+
+        function test_attestStakeholderVerification_borrower() public {
+
+        bool isLender = false; 
+
+        marketRegistry.attestStakeholderVerification( 
+            marketId,
+            address(borrower),
+            uuid,
+            isLender
+         );
+
+        //expect that the borrower is attested  
+
+        assertEq(
+            marketRegistry.marketVerifiedBorrowersContains(marketId,address(borrower)),
+            true,
+            "Did not add lender to verified set"
+        );
+
+        assertEq(
+            marketRegistry.getBorrowerAttestationId(marketId,address(borrower)),
+            uuid,
+            "Did not set market attestation Id"
+        );
+        
     }
 
     function test_attestLender() public {
@@ -301,6 +373,8 @@ contract MarketRegistry_Test is Testable {
     function test_isVerifiedLender() public {} 
 
     function test_isVerifiedBorrower() public {} 
+
+    function test_isVerified() public {}
 
 
 

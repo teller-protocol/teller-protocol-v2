@@ -1104,7 +1104,7 @@ contract MarketRegistry is
         address _stakeholderAddress,
         bytes32 _uuid,
         bool _isLender
-    ) internal {
+    ) internal virtual {
         if (_isLender) {
             // Store the lender attestation ID for the market ID
             markets[_marketId].lenderAttestationIds[

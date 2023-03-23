@@ -734,6 +734,7 @@ contract MarketRegistry is
     function getMarketOwner(uint256 _marketId)
         public
         view
+        virtual
         override
         returns (address)
     {
@@ -1061,7 +1062,7 @@ contract MarketRegistry is
         bytes32 _r,
         bytes32 _s
     )
-        internal
+        internal virtual
         withAttestingSchema(
             _isLender ? lenderAttestationSchemaId : borrowerAttestationSchemaId
         )
@@ -1141,7 +1142,7 @@ contract MarketRegistry is
         uint256 _marketId,
         address _stakeholderAddress,
         bool _isLender
-    ) internal {
+    ) internal virtual {
         require(
             _msgSender() == _getMarketOwner(_marketId),
             "Not the market owner"
@@ -1194,7 +1195,7 @@ contract MarketRegistry is
         uint256 _marketId,
         address _stakeholderAddress,
         bool _isLender
-    ) internal returns (bytes32 uuid_) {
+    ) internal virtual returns (bytes32 uuid_) {
         if (_isLender) {
             uuid_ = markets[_marketId].lenderAttestationIds[
                 _stakeholderAddress
@@ -1229,7 +1230,7 @@ contract MarketRegistry is
         bool _attestationRequired,
         mapping(address => bytes32) storage _stakeholderAttestationIds,
         EnumerableSet.AddressSet storage _verifiedStakeholderForMarket
-    ) internal view returns (bool isVerified_, bytes32 uuid_) {
+    ) internal view virtual returns (bool isVerified_, bytes32 uuid_) {
         if (_attestationRequired) {
             isVerified_ =
                 _verifiedStakeholderForMarket.contains(_stakeholderAddress) &&

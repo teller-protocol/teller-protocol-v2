@@ -97,7 +97,7 @@ export function loadToken(
     const tokenContract = IERC20Metadata.bind(address);
     const name = tokenContract.try_name();
     if (!name.reverted) {
-      token.name = tokenContract.name();
+      token.name = name.value;
     }
     const symbol = tokenContract.try_symbol();
     if (!symbol.reverted) {

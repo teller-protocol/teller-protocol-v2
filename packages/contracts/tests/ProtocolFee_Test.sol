@@ -52,11 +52,18 @@ contract ProtocolFee_Test is Testable  {
       
         protocolFee.protocolFeeInit(initialFee);
         
-    }
+          assertEq(
+            protocolFee.protocolFee(),
+            initialFee,
+            "did not initialize fee properly"
+        );
 
+    }
+ 
+ 
     function test_setProtocolFee_while_not_initializing() public {
         protocolFee.initialize(initialFee);
-        
+
         vm.expectRevert("Initializable: contract is already initialized");
         
         protocolFee.initialize(initialFee);

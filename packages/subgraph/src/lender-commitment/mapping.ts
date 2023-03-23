@@ -10,11 +10,14 @@ import {
 } from "../../generated/LenderCommitmentForwarder/LenderCommitmentForwarder";
 import { Bid } from "../../generated/schema";
 import { BidStatus } from "../helpers/bid";
-import { loadBidById, loadCommitmentTokenVolume } from "../helpers/loaders";
+import { loadBidById } from "../helpers/loaders";
 import { updateBidStatus } from "../helpers/updaters";
 
 import { loadCommitment } from "./loaders";
-import { updateLenderCommitment } from "./updaters";
+import {
+  updateAvailableTokensFromCommitment,
+  updateLenderCommitment
+} from "./updaters";
 
 export function handleCreatedCommitment(event: CreatedCommitment): void {
   const commitmentId = event.params.commitmentId.toString();
@@ -28,12 +31,6 @@ export function handleCreatedCommitment(event: CreatedCommitment): void {
   );
 
   commitment.createdAt = event.block.timestamp;
-
-  const volume = loadCommitmentTokenVolume(
-    event.params.lendingToken,
-    commitment
-  );
-  commitment.tokenVolume = volume.id;
 
   commitment.save();
 }
@@ -82,13 +79,12 @@ export function handleDeletedCommitments(events: DeletedCommitment[]): void {
 export function handleExercisedCommitment(event: ExercisedCommitment): void {
   const commitmentId = event.params.commitmentId.toString();
   const commitment = loadCommitment(commitmentId);
-  const committedAmount = commitment.committedAmount;
-  // Updated stored committed amount
-  if (committedAmount) {
-    commitment.committedAmount = committedAmount.minus(
-      event.params.tokenAmount
-    );
-  }
+
+  const amountAvailable = commitment.committedAmount.minus(
+    event.params.tokenAmount
+  );
+  updateAvailableTokensFromCommitment(commitment, amountAvailable);
+
   // Link commitment to bid
   const bid: Bid = loadBidById(event.params.bidId);
   bid.commitment = commitment.id;

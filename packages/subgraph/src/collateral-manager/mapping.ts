@@ -30,7 +30,9 @@ export function handleCollateralCommitted(event: CollateralCommitted): void {
   // Load collateral by bidId and collateral address
   const collateral = loadCollateral(
     event.params._bidId.toString(),
-    event.params._collateralAddress
+    event.params._collateralAddress,
+    event.params._type,
+    event.params._tokenId
   );
   updateCollateral(collateral, event);
   collateral.status = "Committed";
@@ -48,7 +50,9 @@ export function handleCollateralCommitteds(
 export function handleCollateralDeposited(event: CollateralDeposited): void {
   const collateral = loadCollateral(
     event.params._bidId.toString(),
-    event.params._collateralAddress
+    event.params._collateralAddress,
+    event.params._type,
+    event.params._tokenId
   );
   updateCollateral(collateral, event);
   collateral.status = "Deposited";
@@ -66,7 +70,9 @@ export function handleCollateralDepositeds(
 export function handleCollateralWithdrawn(event: CollateralWithdrawn): void {
   const collateral = loadCollateral(
     event.params._bidId.toString(),
-    event.params._collateralAddress
+    event.params._collateralAddress,
+    event.params._type,
+    event.params._tokenId
   );
   updateCollateral(collateral, event);
   collateral.receiver = event.params._recipient;

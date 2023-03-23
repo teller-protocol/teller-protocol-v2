@@ -84,18 +84,29 @@ type Bid @entity {
   _lastTotalRepaidInterestAmount: BigInt!
   paymentDefaultDuration: BigInt!
   collateralEscrow: Bytes
-  collateral: [Collateral!] @derivedFrom(field: "bid")
+  collateral: [BidCollateral!] @derivedFrom(field: "bid")
 }
 
-type Collateral @entity {
+type BidCollateral @entity {
   id: ID!
   amount: BigInt!
-  tokenId: BigInt!
+  tokenId: BigInt
   type: String
   collateralAddress: Bytes!
+  token: Token!
   bid: Bid!
   status: String
   receiver: Bytes
+}
+
+type Token @entity {
+  id: ID!
+  address: Bytes!
+  type: String
+  nftId: BigInt
+  name: String
+  symbol: String
+  decimals: BigInt
 }
 
 type FundedTx @entity {
@@ -245,11 +256,13 @@ type LoanStatusCount implements ILoanStatusCount @entity {
   ## end Entity Relationships ##
 }
 
-type Token @entity {
+type CollateralPairTokenVolume @entity {
   id: ID!
-  name: String
-  symbol: String
-  decimals: BigInt
+  lendingToken: Token!
+  collateralToken: Token!
+  tokenVolume: TokenVolume!
+
+  _totalTokenVolume: TokenVolume!
 }
 
 type TokenVolume implements IDurationAverage @entity {
@@ -267,7 +280,10 @@ type TokenVolume implements IDurationAverage @entity {
   lendingTokenAddress: Bytes!
   loans: LoanStatusCount! @derivedFrom(field: "_tokenVolume")
 
+  collateralTokenVolumes: [CollateralPairTokenVolume!]! @derivedFrom(field: "_totalTokenVolume")
+
   outstandingCapital: BigInt!
+  totalAvailable: BigInt! # available for lending via commitments
   totalLoaned: BigInt!
   totalActive: BigInt!
   totalDueSoon: BigInt!
@@ -304,11 +320,13 @@ type Commitment @entity {
   expirationTimestamp: BigInt!
   maxDuration: BigInt!
   minAPY: BigInt!
+  principalToken: Token!
   principalTokenAddress: Bytes!
 
   # Required Collateral
+  collateralToken: Token!
   collateralTokenAddress: Bytes!
-  collateralTokenId: BigInt!
+  collateralTokenId: BigInt
   collateralTokenType: String
   maxPrincipalPerCollateralAmount: BigInt!
 
@@ -324,4 +342,12 @@ type Commitment @entity {
 
   # TokenStats
   tokenVolume: TokenVolume!
+}
+
+type NormalizedMarketCommitments @entity {
+  id: ID!
+
+  min
+
+  _market: MarketPlace!
 }

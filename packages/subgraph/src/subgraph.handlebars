@@ -37,6 +37,8 @@ dataSources:
           file: ./abis/{{network}}_TellerV2.json
         - name: TellerV0Storage
           file: ../../packages/contracts/generated/artifacts/contracts/TellerV0Storage.sol/TellerV0Storage.json
+        - name: ERC165
+          file: ../../packages/contracts/generated/artifacts/@openzeppelin/contracts/utils/introspection/ERC165.sol/ERC165.json
         - name: IERC20Metadata
           file: ../../packages/contracts/generated/artifacts/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol/IERC20Metadata.json
       blockHandlers:
@@ -59,11 +61,17 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - Bid
+        - Borrower
+        - Lender
+        - Token
+        - TokenVolume
       abis:
         - name: TellerV2
           file: ./abis/{{network}}_TellerV2.json
         - name: TellerV0Storage
           file: ../../packages/contracts/generated/artifacts/contracts/TellerV0Storage.sol/TellerV0Storage.json
+        - name: ERC165
+          file: ../../packages/contracts/generated/artifacts/@openzeppelin/contracts/utils/introspection/ERC165.sol/ERC165.json
         - name: IERC20Metadata
           file: ../../packages/contracts/generated/artifacts/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol/IERC20Metadata.json
       eventHandlers:
@@ -157,9 +165,13 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - Commitment
+        - Token
+        - TokenVolume
       abis:
         - name: LenderCommitmentForwarder
           file: ./abis/{{network}}_LenderCommitmentForwarder.json
+        - name: ERC165
+          file: ../../packages/contracts/generated/artifacts/@openzeppelin/contracts/utils/introspection/ERC165.sol/ERC165.json
         - name: IERC20Metadata
           file: ../../packages/contracts/generated/artifacts/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol/IERC20Metadata.json
       eventHandlers:
@@ -188,10 +200,16 @@ dataSources:
       apiVersion: 0.0.5
       language: wasm/assemblyscript
       entities:
+        - Bid
+        - BidCollateral
         - Collateral
       abis:
         - name: CollateralManager
           file: ./abis/{{network}}_CollateralManager.json
+        - name: ERC165
+          file: ../../packages/contracts/generated/artifacts/@openzeppelin/contracts/utils/introspection/ERC165.sol/ERC165.json
+        - name: IERC20Metadata
+          file: ../../packages/contracts/generated/artifacts/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol/IERC20Metadata.json
       eventHandlers:
         - event: CollateralEscrowDeployed(uint256,address)
           handler: handleCollateralEscrowDeployed

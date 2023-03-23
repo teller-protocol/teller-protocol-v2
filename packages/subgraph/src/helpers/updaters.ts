@@ -10,7 +10,7 @@ import { CollateralCommitted } from "../../generated/CollateralManager/Collatera
 import {
   Bid,
   Borrower,
-  Collateral,
+  BidCollateral,
   Commitment,
   Lender,
   LoanStatusCount,
@@ -38,7 +38,8 @@ import {
   loadLenderTokenVolume,
   loadProtocolTokenVolume,
   loadToken,
-  loadTokenVolumeByMarketId
+  loadMarketTokenVolume,
+  loadCollateralTokenVolume
 } from "./loaders";
 import { addToArray, camelize, removeFromArray } from "./utils";
 
@@ -80,13 +81,15 @@ export function getLoanStatusCountIdsForBid(bidId: string): string[] {
 export function getTokenVolumesForBid(bidId: string): TokenVolume[] {
   const bid = Bid.load(bidId);
   if (!bid) throw new Error(`Bid ${bidId} does not exist`);
+
   const tokenVolumes = new Array<TokenVolume>(0);
   const lendingTokenAddress = Address.fromBytes(bid.lendingTokenAddress);
+  // TODO: load token volume for the collateral tokens
 
   const protocolVolume = loadProtocolTokenVolume(lendingTokenAddress);
   tokenVolumes.push(protocolVolume);
 
-  const marketVolume = loadTokenVolumeByMarketId(
+  const marketVolume = loadMarketTokenVolume(
     lendingTokenAddress,
     bid.marketplace
   );
@@ -121,6 +124,20 @@ export function getTokenVolumesForBid(bidId: string): TokenVolume[] {
       commitment
     );
     tokenVolumes.push(commitmentVolume);
+  }
+
+  const collateralIds = bid.collateral;
+  if (collateralIds) {
+    for (let i = 0; i < tokenVolumes.length; i++) {
+      for (let j = 0; j < collateralIds.length; j++) {
+        const collateral = BidCollateral.load(collateralIds[j])!;
+        const collateralTokenVolume = loadCollateralTokenVolume(
+          tokenVolumes[i],
+          collateral.collateralAddress
+        );
+        tokenVolumes.push(collateralTokenVolume);
+      }
+    }
   }
 
   return tokenVolumes;
@@ -452,7 +469,9 @@ function removeBidFromTokenVolumeFromStatusCount(
         tokenVolume.totalActive = tokenVolume.totalActive.minus(bid.principal);
         break;
       case BidStatus.DueSoon:
-        tokenVolume.totalDueSoon = tokenVolume.totalDueSoon.minus(bid.principal);
+        tokenVolume.totalDueSoon = tokenVolume.totalDueSoon.minus(
+          bid.principal
+        );
         break;
       case BidStatus.Late:
         tokenVolume.totalLate = tokenVolume.totalLate.minus(bid.principal);
@@ -590,25 +609,13 @@ function setEntityDurationAverage(
 }
 
 export function updateCollateral(
-  collateral: Collateral,
+  collateral: BidCollateral,
   event: ethereum.Event
 ): void {
   const evt = changetype<CollateralCommitted>(event);
   collateral.amount = evt.params._amount;
   collateral.tokenId = evt.params._tokenId;
-  collateral.type = getTypeString(evt.params._type);
   collateral.collateralAddress = evt.params._collateralAddress;
-}
-function getTypeString(tokenType: i32): string {
-  let type = "";
-  if (tokenType == i32(0)) {
-    type = "ERC20";
-  } else if (tokenType == i32(1)) {
-    type = "ERC721";
-  } else if (tokenType == i32(2)) {
-    type = "ERC1155";
-  }
-  return type;
 }
 
 export function replaceLender(bid: Bid, newLender: Lender): void {

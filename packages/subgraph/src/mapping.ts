@@ -22,8 +22,8 @@ import {
   loadBorrowerTokenVolume,
   loadLenderByMarketId,
   loadMarketById,
-  loadProtocolTokenVolume,
-  loadTokenVolumeByMarketId
+  loadMarketTokenVolume,
+  loadProtocolTokenVolume
 } from "./helpers/loaders";
 import {
   PaymentEventType,
@@ -212,30 +212,29 @@ export function handleFeePaid(event: FeePaid): void {
   const bid: Bid = loadBidById(event.params.bidId);
   const lendingTokenAddress = Address.fromBytes(bid.lendingTokenAddress);
 
-  // If indexed fee type is `marketplace`
+  if (
+    event.params.feeType.toHexString() ==
+    "0xfb342fa999fea16067b1f01baf96673f31a25f2b1443e6754d93fc40b57e8df2" // bytes value of "protocol"
+  ) {
+    const protocolVolume = loadProtocolTokenVolume(lendingTokenAddress);
+    protocolVolume.commissionEarned = protocolVolume.commissionEarned.plus(
+      event.params.amount
+    );
+    protocolVolume.save();
+  }
+
   if (
     event.params.feeType.toHexString() ==
     "0xcef6e888ca344077e889d6d961447b180a6f2c1f8a3a4b954e2385449143c6c8" // bytes value of "marketplace"
   ) {
-    const tokenVolume = loadTokenVolumeByMarketId(
+    const marketVolume = loadMarketTokenVolume(
       lendingTokenAddress,
       bid.marketplaceId.toString()
     );
-    const marketCommissionEarned = tokenVolume.commissionEarned;
-    tokenVolume.commissionEarned = marketCommissionEarned.plus(
+    marketVolume.commissionEarned = marketVolume.commissionEarned.plus(
       event.params.amount
     );
-    tokenVolume.save();
-
-    // TODO: why are we adding the market commission earned to the protocol volume?
-    const protocolVolume = loadProtocolTokenVolume(lendingTokenAddress);
-    if (protocolVolume) {
-      const protocolCommissionEarned = protocolVolume.commissionEarned;
-      protocolVolume.commissionEarned = protocolCommissionEarned.plus(
-        event.params.amount
-      );
-      protocolVolume.save();
-    }
+    marketVolume.save();
   }
 }
 

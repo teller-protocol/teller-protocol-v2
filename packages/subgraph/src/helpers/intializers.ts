@@ -6,11 +6,12 @@ import { loadLoanStatusCount } from "./loaders";
 
 export function initTokenVolume(tokenVolume: TokenVolume, token: Token): void {
   tokenVolume.token = token.id;
-  tokenVolume.lendingTokenAddress = Address.fromString(token.id);
+  tokenVolume.lendingTokenAddress = Address.fromBytes(token.address);
 
   loadLoanStatusCount("tokenVolume", tokenVolume.id);
 
   tokenVolume.outstandingCapital = BigInt.zero();
+  tokenVolume.totalAvailable = BigInt.zero();
   tokenVolume.totalLoaned = BigInt.zero();
   tokenVolume.totalActive = BigInt.zero();
   tokenVolume.totalDueSoon = BigInt.zero();

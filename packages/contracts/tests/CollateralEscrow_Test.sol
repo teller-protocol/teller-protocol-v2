@@ -38,7 +38,7 @@ contract CollateralEscrow_Test is Testable {
         _depositAsset();
     }
 
-    function test_withdrawAsset() public {
+    function test_withdrawAsset_ERC20() public {
         _depositAsset();
 
         borrower.withdraw(address(wethMock), amount, address(borrower));
@@ -60,12 +60,33 @@ contract CollateralEscrow_Test is Testable {
         }
     }
 
-    function _depositAsset() internal {
+    function _depositAsset_ERC20() internal {
         borrower.approveWeth(amount);
 
         borrower.deposit(CollateralType.ERC20, address(wethMock), amount, 0);
 
         uint256 storedBalance = borrower.getBalance(address(wethMock));
+
+        assertEq(storedBalance, amount, "Escrow deposit unsuccessful");
+    }
+
+
+    function _depositAsset_ERC721() internal {
+        borrower.approveWeth(amount);
+
+        borrower.deposit(CollateralType.ERC721, address(erc721Mock), amount, 0);
+
+        uint256 storedBalance = borrower.getBalance(address(erc721Mock));
+
+        assertEq(storedBalance, amount, "Escrow deposit unsuccessful");
+    }
+
+     function _depositAsset_ERC1155() internal {
+        borrower.approveWeth(amount);
+
+        borrower.deposit(CollateralType.ERC1155, address(erc1155Mock), amount, 0);
+
+        uint256 storedBalance = borrower.getBalance(address(erc1155Mock));
 
         assertEq(storedBalance, amount, "Escrow deposit unsuccessful");
     }

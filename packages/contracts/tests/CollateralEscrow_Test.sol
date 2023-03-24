@@ -46,7 +46,10 @@ contract CollateralEscrow_Test is Testable {
 
         uint256 borrowerBalance = 50000;
         payable(address(borrower)).transfer(borrowerBalance);
-       // borrower.depositToWeth(borrowerBalance);
+
+        wethMock.transfer(address(borrower),1e18);
+        erc721Mock.mint(address(borrower));
+        erc1155Mock.mint(address(borrower)); 
     }
 
    /* function test_depositAsset() public {
@@ -159,4 +162,28 @@ contract User {
     }
 
     receive() external payable {}
+
+    //receive 721
+    function onERC721Received(
+        address,
+        address,
+        uint256,
+        bytes calldata
+    ) external returns (bytes4) {
+        return this.onERC721Received.selector;
+    }
+
+    //receive 1155
+    function onERC1155Received(
+        address,
+        address,
+        uint256,
+        uint256,
+        bytes calldata
+    ) external returns (bytes4) {
+        return this.onERC1155Received.selector;
+    }
+
+
+
 }

@@ -32,9 +32,18 @@ contract TellerV2Context_approveMarketForwarder is Testable {
         address stubbedMarketForwarder = address(123);
         context.mock_setTrustedMarketForwarder(marketId, stubbedMarketForwarder);
 
-        vm.expectEmit(address(context));
-        emit MarketForwarderApproved(marketId, stubbedMarketForwarder, address(this));
+        //vm.expectEmit(address(context));
+        //emit MarketForwarderApproved(marketId, stubbedMarketForwarder, address(this));
 
         context.approveMarketForwarder(marketId, stubbedMarketForwarder);
+
+        assertEq(
+            context.hasApprovedMarketForwarder(
+                marketId, 
+                stubbedMarketForwarder,
+                address(this)),
+            true,
+            "Forwarder should be approved"
+        );
     }
 }

@@ -22,16 +22,12 @@ import { CollateralEscrowV1_Override } from "./CollateralEscrow_Override.sol";
 contract CollateralEscrow_Test is Testable {
     BeaconProxy private proxy_;
     User private borrower;
-    //WethMock wethMock;
+   
 
     TestERC20Token wethMock;
     TestERC721Token erc721Mock;
     TestERC1155Token erc1155Mock;
- 
-    
-
-
-
+  
     uint256 amount = 1000;
 
     function setUp() public {
@@ -48,28 +44,18 @@ contract CollateralEscrow_Test is Testable {
 
         borrower = new User(escrowBeacon, address(wethMock), address(erc721Mock), address(erc1155Mock));
 
-      
-
         uint256 borrowerBalance = 50000;
         payable(address(borrower)).transfer(borrowerBalance);
 
        
-    }
-
-   /* function test_depositAsset() public {
-        _depositAsset();
-    }*/
+    } 
 
     function test_withdrawAsset_ERC20() public {
          
-
         CollateralEscrowV1_Override escrow = CollateralEscrowV1_Override(address(borrower.getEscrow()));
- 
 
         wethMock.transfer(address(escrow),amount);
         escrow.setStoredBalance(CollateralType.ERC20, address(wethMock), amount, 0, address(borrower) );
-
-        
 
         borrower.withdraw(address(wethMock), amount, address(borrower));
 
@@ -90,19 +76,42 @@ contract CollateralEscrow_Test is Testable {
         }
     }
 
-       function test_withdrawAsset_ERC721() public {
+    function test_withdrawAsset_invalid_store() public {
          
+        CollateralEscrowV1_Override escrow = CollateralEscrowV1_Override(address(borrower.getEscrow()));
+
+        wethMock.transfer(address(escrow),amount);
+
+        vm.expectRevert("No collateral balance for asset");
+       
+        borrower.withdraw(address(wethMock), amount, address(borrower));
+
+        
+    }
+
+
+
+    function test_withdrawAsset_invalid_owner() public {
+         
+        CollateralEscrowV1_Override escrow = CollateralEscrowV1_Override(address(borrower.getEscrow()));
+
+        wethMock.transfer(address(escrow),amount);
+
+        vm.expectRevert("Ownable: caller is not the owner");
+       
+        escrow.withdraw(address(wethMock), amount, address(borrower));
+
+    }
+
+
+    function test_withdrawAsset_ERC721() public {
 
         CollateralEscrowV1_Override escrow = CollateralEscrowV1_Override(address(borrower.getEscrow()));
- 
 
         uint256 tokenId = erc721Mock.mint(address(escrow));
         escrow.setStoredBalance(CollateralType.ERC721, address(erc721Mock), 1, tokenId, address(borrower) );
 
-        
         borrower.withdraw(address(erc721Mock), 1, address(borrower));
-
-
 
         uint256 storedBalance = borrower.getBalance(address(erc721Mock));
 
@@ -122,8 +131,6 @@ contract CollateralEscrow_Test is Testable {
     }
 
     function test_depositToken_ERC20() public {
-
-
 
         wethMock.transfer(address(borrower),1e18);
 
@@ -148,6 +155,32 @@ contract CollateralEscrow_Test is Testable {
 
         assertEq(storedBalance, amount, "Escrow deposit unsuccessful");
     }
+
+
+
+    function test_depositAsset_invalid_owner() public {
+        CollateralEscrowV1_Override escrow = CollateralEscrowV1_Override(address(borrower.getEscrow()));
+
+    
+        vm.expectRevert("Ownable: caller is not the owner");
+        
+        escrow.depositAsset(CollateralType.ERC20, address(wethMock), amount, 0);
+
+      
+    }
+
+
+    function test_depositAsset_invalid_amount() public {
+
+        vm.expectRevert("Deposit amount cannot be zero");
+
+        borrower.deposit(CollateralType.ERC20, address(wethMock), 0, 0);
+
+     
+    }
+
+
+
 
 
     function test_depositAsset_ERC721() public {

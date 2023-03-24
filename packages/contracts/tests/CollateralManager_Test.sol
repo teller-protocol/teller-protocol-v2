@@ -65,6 +65,9 @@ contract CollateralManager_Test is Testable {
         collateralManager.initialize(address(escrowBeacon), address(tellerV2Mock) );
     } 
 
+
+    
+
   
 }
 

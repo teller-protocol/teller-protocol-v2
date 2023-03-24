@@ -42,7 +42,7 @@ contract CollateralEscrow_Test is Testable {
         erc721Mock = new TestERC721Token("ERC721", "ERC721");
         erc1155Mock = new TestERC1155Token("ERC1155");
 
-        borrower = new User(escrowBeacon, address(wethMock), address(erc721Mock), address(erc1155Mock));
+        borrower = new User(escrowBeacon );
 
         uint256 borrowerBalance = 50000;
         payable(address(borrower)).transfer(borrowerBalance);
@@ -212,7 +212,7 @@ contract User {
     CollateralEscrowV1 public escrow;
    
 
-    constructor(UpgradeableBeacon escrowBeacon, address _wethMock, address _erc721Mock, address _erc1155Mock) {
+    constructor(UpgradeableBeacon escrowBeacon) {
         // Deploy escrow
         BeaconProxy proxy_ = new BeaconProxy(
             address(escrowBeacon),

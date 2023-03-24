@@ -1,34 +1,34 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import { Testable } from "./Testable.sol";
+import { Testable } from "../Testable.sol";
 
-import { TellerV2 } from "../contracts/TellerV2.sol";
-import { MarketRegistry } from "../contracts/MarketRegistry.sol";
-import { ReputationManager } from "../contracts/ReputationManager.sol";
+import { TellerV2 } from "../../contracts/TellerV2.sol";
+import { MarketRegistry } from "../../contracts/MarketRegistry.sol";
+import { ReputationManager } from "../../contracts/ReputationManager.sol";
 
-import "../contracts/interfaces/IMarketRegistry.sol";
-import "../contracts/interfaces/IReputationManager.sol";
+import "../../contracts/interfaces/IMarketRegistry.sol";
+import "../../contracts/interfaces/IReputationManager.sol";
 
-import "../contracts/EAS/TellerAS.sol";
+import "../../contracts/EAS/TellerAS.sol";
 
-import "../contracts/mock/WethMock.sol";
-import "../contracts/interfaces/IWETH.sol";
+import "../../contracts/mock/WethMock.sol";
+import "../../contracts/interfaces/IWETH.sol";
 
-import { User } from "./Test_Helpers.sol";
+import { User } from "../Test_Helpers.sol";
 
-import "../contracts/escrow/CollateralEscrowV1.sol";
+import "../../contracts/escrow/CollateralEscrowV1.sol";
 import "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
-import "../contracts/LenderCommitmentForwarder.sol";
-import "./tokens/TestERC20Token.sol";
+import "../../contracts/LenderCommitmentForwarder.sol";
+import "../tokens/TestERC20Token.sol";
 
-import "../contracts/CollateralManager.sol";
-import { Collateral } from "../contracts/interfaces/escrow/ICollateralEscrowV1.sol";
-import { PaymentType } from "../contracts/libraries/V2Calculations.sol";
-import { BidState, Payment } from "../contracts/TellerV2Storage.sol";
+import "../../contracts/CollateralManager.sol";
+import { Collateral } from "../../contracts/interfaces/escrow/ICollateralEscrowV1.sol";
+import { PaymentType } from "../../contracts/libraries/V2Calculations.sol";
+import { BidState, Payment } from "../../contracts/TellerV2Storage.sol";
 
-import "../contracts/MetaForwarder.sol";
-import { LenderManager } from "../contracts/LenderManager.sol";
+import "../../contracts/MetaForwarder.sol";
+import { LenderManager } from "../../contracts/LenderManager.sol";
 
 contract TellerV2_Test is Testable {
     TellerV2User private marketOwner;

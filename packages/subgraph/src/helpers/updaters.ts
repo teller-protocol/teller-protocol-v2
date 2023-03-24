@@ -17,7 +17,8 @@ import {
   MarketPlace,
   Payment,
   Protocol,
-  TokenVolume
+  TokenVolume,
+  Token
 } from "../../generated/schema";
 import { TellerV2 } from "../../generated/TellerV2/TellerV2";
 
@@ -84,7 +85,6 @@ export function getTokenVolumesForBid(bidId: string): TokenVolume[] {
 
   const tokenVolumes = new Array<TokenVolume>(0);
   const lendingTokenAddress = Address.fromBytes(bid.lendingTokenAddress);
-  // TODO: load token volume for the collateral tokens
 
   const protocolVolume = loadProtocolTokenVolume(lendingTokenAddress);
   tokenVolumes.push(protocolVolume);
@@ -128,12 +128,14 @@ export function getTokenVolumesForBid(bidId: string): TokenVolume[] {
 
   const collateralIds = bid.collateral;
   if (collateralIds) {
-    for (let i = 0; i < tokenVolumes.length; i++) {
-      for (let j = 0; j < collateralIds.length; j++) {
-        const collateral = BidCollateral.load(collateralIds[j])!;
+    const volumeCount = tokenVolumes.length;
+    for (let j = 0; j < collateralIds.length; j++) {
+      const collateral = BidCollateral.load(collateralIds[j])!;
+      const collateralToken = Token.load(collateral.token)!;
+      for (let i = 0; i < volumeCount; i++) {
         const collateralTokenVolume = loadCollateralTokenVolume(
           tokenVolumes[i],
-          collateral.collateralAddress
+          collateralToken
         );
         tokenVolumes.push(collateralTokenVolume);
       }

@@ -31,8 +31,6 @@ export function loadCommitment(commitmentId: string): Commitment {
     commitment.principalTokenAddress = Address.zero();
 
     commitment.collateralToken = "";
-    commitment.collateralTokenAddress = Address.zero();
-    commitment.collateralTokenType = "";
     commitment.maxPrincipalPerCollateralAmount = BigInt.zero();
     commitment.commitmentBorrowers = [];
 

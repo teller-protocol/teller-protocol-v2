@@ -1,7 +1,6 @@
-import { ethereum, Address, BigInt, Bytes, Value } from "@graphprotocol/graph-ts";
+import { Address, BigInt, Bytes, Value } from "@graphprotocol/graph-ts";
 
 import { IERC20Metadata } from "../../generated/Blocks/IERC20Metadata";
-import { IERC721Upgradeable } from "../../generated/CollateralManager/IERC721Upgradeable";
 import {
   Bid,
   Borrower,
@@ -391,21 +390,18 @@ export function loadCommitmentTokenVolume(
 
 export function loadCollateralTokenVolume(
   tokenVolume: TokenVolume,
-  collateralTokenAddress: Bytes
+  collateralToken: Token
 ): TokenVolume {
   const collateralTokenVolume = loadTokenVolumeWithValues(
-    ["collateral", collateralTokenAddress.toHex()],
+    [tokenVolume.id, "-collateral", collateralToken.id],
     tokenVolume.lendingTokenAddress
   );
 
   const pairVolume = new CollateralPairTokenVolume(
     `${tokenVolume.id}--${collateralTokenVolume.id}`
   );
-  pairVolume.lendingToken = loadToken(
-    tokenVolume.lendingTokenAddress,
-    TokenType.ERC20
-  ).id;
-  pairVolume.collateralToken = loadToken(collateralTokenAddress).id;
+  pairVolume.lendingToken = loadToken(tokenVolume.lendingTokenAddress).id;
+  pairVolume.collateralToken = collateralToken.id;
   pairVolume.tokenVolume = collateralTokenVolume.id;
   pairVolume._totalTokenVolume = tokenVolume.id;
   pairVolume.save();

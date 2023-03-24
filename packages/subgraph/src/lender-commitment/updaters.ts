@@ -1,7 +1,7 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 
 import { LenderCommitmentForwarder } from "../../generated/LenderCommitmentForwarder/LenderCommitmentForwarder";
-import { Commitment, TokenVolume } from "../../generated/schema";
+import { Commitment, Token, TokenVolume } from "../../generated/schema";
 import {
   loadCommitmentTokenVolume,
   loadLenderByMarketId,
@@ -10,7 +10,6 @@ import {
   loadMarketTokenVolume,
   loadToken,
   TokenType,
-  getTokenTypeString,
   loadCollateralTokenVolume
 } from "../helpers/loaders";
 
@@ -78,16 +77,15 @@ export function updateLenderCommitment(
     case CollateralTokenType.ERC1155_ANY_ID:
       tokenType = TokenType.ERC1155;
   }
-  const collateralToken = loadToken(
-    lenderCommitment.value4,
-    tokenType,
-    lenderCommitment.value5
-  );
-  commitment.collateralToken = collateralToken.id;
-  commitment.collateralTokenAddress = collateralToken.address;
-  commitment.collateralTokenId = collateralToken.nftId;
-  commitment.maxPrincipalPerCollateralAmount = lenderCommitment.value6;
-  commitment.collateralTokenType = getTokenTypeString(tokenType);
+  if (tokenType != TokenType.NONE) {
+    const collateralToken = loadToken(
+      lenderCommitment.value4,
+      tokenType,
+      lenderCommitment.value5
+    );
+    commitment.collateralToken = collateralToken.id;
+    commitment.maxPrincipalPerCollateralAmount = lenderCommitment.value6;
+  }
 
   const volume = loadCommitmentTokenVolume(lendingTokenAddress, commitment);
   commitment.tokenVolume = volume.id;
@@ -143,13 +141,18 @@ function getTokenVolumesFromCommitment(commitment: Commitment): TokenVolume[] {
   );
   tokenVolumes.push(lenderVolume);
 
-  for (let i = 0; i < tokenVolumes.length; i++) {
-    const tokenVolume = tokenVolumes[i];
-    const collateralVolume = loadCollateralTokenVolume(
-      tokenVolume,
-      commitment.collateralTokenAddress
-    );
-    tokenVolumes.push(collateralVolume);
+  const collateralTokenId = commitment.collateralToken;
+  if (collateralTokenId !== null) {
+    const collateralToken = Token.load(collateralTokenId)!;
+    const volumesCount = tokenVolumes.length;
+    for (let i = 0; i < volumesCount; i++) {
+      const tokenVolume = tokenVolumes[i];
+      const collateralVolume = loadCollateralTokenVolume(
+        tokenVolume,
+        collateralToken
+      );
+      tokenVolumes.push(collateralVolume);
+    }
   }
 
   return tokenVolumes;

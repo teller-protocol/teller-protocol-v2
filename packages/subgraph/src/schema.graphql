@@ -324,11 +324,8 @@ type Commitment @entity {
   principalTokenAddress: Bytes!
 
   # Required Collateral
-  collateralToken: Token!
-  collateralTokenAddress: Bytes!
-  collateralTokenId: BigInt
-  collateralTokenType: String
-  maxPrincipalPerCollateralAmount: BigInt!
+  collateralToken: Token
+  maxPrincipalPerCollateralAmount: BigInt
 
   commitmentBorrowers: [Bytes!]!
 
@@ -344,10 +341,10 @@ type Commitment @entity {
   tokenVolume: TokenVolume!
 }
 
-type NormalizedMarketCommitments @entity {
+type CommitmentCollateral @entity {
   id: ID!
+  commitment: Commitment!
 
-  min
-
-  _market: MarketPlace!
+  token: Token!
+  maxPrincipalPerCollateralAmount: BigInt!
 }

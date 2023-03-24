@@ -65,6 +65,7 @@ dataSources:
         - Lender
         - Token
         - TokenVolume
+        - LoanStatusCount
       abis:
         - name: TellerV2
           file: ./abis/{{network}}_TellerV2.json
@@ -167,6 +168,8 @@ dataSources:
         - Commitment
         - Token
         - TokenVolume
+        - CollateralPairTokenVolume
+        - LoanStatusCount
       abis:
         - name: LenderCommitmentForwarder
           file: ./abis/{{network}}_LenderCommitmentForwarder.json

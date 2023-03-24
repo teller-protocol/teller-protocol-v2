@@ -37,13 +37,16 @@ contract CollateralEscrow_Test is Testable {
         UpgradeableBeacon escrowBeacon = new UpgradeableBeacon(
             address(escrowImplementation)
         );
-        // Deploy escrow
+        
         wethMock = new TestERC20Token("wrappedETH", "WETH", 1e24, 18);
+        erc721Mock = new TestERC721Token("ERC721", "ERC721");
+        erc1155Mock = new TestERC1155Token("ERC1155");
+
         borrower = new User(escrowBeacon, address(wethMock));
 
         uint256 borrowerBalance = 50000;
         payable(address(borrower)).transfer(borrowerBalance);
-        borrower.depositToWeth(borrowerBalance);
+       // borrower.depositToWeth(borrowerBalance);
     }
 
    /* function test_depositAsset() public {

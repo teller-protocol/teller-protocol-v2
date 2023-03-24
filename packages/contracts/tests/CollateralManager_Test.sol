@@ -29,7 +29,7 @@ contract CollateralManager_Test is Testable {
     TestERC721Token erc721Mock;
     TestERC1155Token erc1155Mock;
 
-    TellerV2SolMock tellerV2Mock;
+    TellerV2_Mock tellerV2Mock;
    
 
     function setUp() public {
@@ -46,7 +46,7 @@ contract CollateralManager_Test is Testable {
         erc721Mock = new TestERC721Token("ERC721", "ERC721");
         erc1155Mock = new TestERC1155Token("ERC1155");
 
-        tellerV2Mock = new TellerV2SolMock();
+        tellerV2Mock = new TellerV2_Mock();
         borrower = new User( );
 
 
@@ -94,6 +94,28 @@ contract CollateralManager_Test is Testable {
         uint256 bidId = 0 ;
         uint256 amount = 1000;
         wethMock.transfer(address(borrower), amount);
+
+        borrower.approveERC20( address(wethMock), address(collateralManager), amount  );
+    
+
+        Collateral memory collateral = Collateral({
+            _collateralType: CollateralType.ERC20,
+            _amount: amount,
+            _tokenId: 0, 
+            _collateralAddress: address(wethMock)
+        });
+
+        tellerV2Mock.setBorrower(address(borrower));
+
+        collateralManager.mock_deposit(bidId, collateral);
+
+         
+    }
+
+    function test_deposit_invalid_bid() public  {
+        uint256 bidId = 0 ;
+        uint256 amount = 1000;
+        wethMock.transfer(address(borrower), amount);
         wethMock.approve(address(collateralManager), amount);
 
         Collateral memory collateral = Collateral({
@@ -103,9 +125,87 @@ contract CollateralManager_Test is Testable {
             _collateralAddress: address(wethMock)
         });
 
+
+        tellerV2Mock.setBorrower(address(0));
+
+        vm.expectRevert("Bid does not exist");
         collateralManager.mock_deposit(bidId, collateral);
 
          
+    }
+
+
+
+    function test_checkBalances_empty() public {
+
+        Collateral[] memory collateralArray; 
+
+        (bool valid, bool[] memory checks) = collateralManager.checkBalances(
+            address(borrower),
+            collateralArray
+        );
+
+        assertTrue(valid);
+    }
+
+    function test_checkBalances() public {
+
+        Collateral[] memory collateralArray; 
+
+        collateralArray[0] = Collateral({
+            _collateralType: CollateralType.ERC20,
+            _amount: 1000,
+            _tokenId: 0, 
+            _collateralAddress: address(wethMock)
+        });
+
+        (bool valid, bool[] memory checks) = collateralManager.checkBalances(
+            address(borrower),
+            collateralArray
+        );
+
+        assertTrue(valid);
+    }
+
+
+    function test_revalidateCollateral() public {
+
+        Collateral[] memory collateralArray; 
+
+        uint256 bidId = 0;
+
+        bool valid =  collateralManager.revalidateCollateral(
+            bidId
+        );
+
+        assertTrue(valid);
+    }
+
+    function test_commit_collateral_single() public {
+        uint256 bidId = 0;
+
+        Collateral memory collateral = Collateral({
+            _collateralType: CollateralType.ERC20,
+            _amount: 1000,
+            _tokenId: 0, 
+            _collateralAddress: address(wethMock)
+        });
+
+        
+        collateralManager.commitCollateral(bidId,collateral);
+ 
+
+    }
+
+    function test_commit_collateral_array() public {
+        uint256 bidId = 0;
+
+        Collateral[] memory collateralArray; 
+
+       
+        collateralManager.commitCollateral(bidId, collateralArray);
+
+
     }
   
 }
@@ -117,6 +217,15 @@ contract User {
     
        
     }
+
+
+
+    function approveERC20(address tokenAddress, address to, uint256 amount) public {
+        ERC20(tokenAddress).approve(address(to), amount);
+    }
+
+
+
 
   
 /*
@@ -194,5 +303,22 @@ contract User {
 contract CollateralEscrowV1_Mock is CollateralEscrowV1 {
     constructor() CollateralEscrowV1() {}
 
+    
+}
+
+contract TellerV2_Mock is TellerV2SolMock {
+
+    address public globalBorrower;
+
+    constructor() TellerV2SolMock() {}
+
+    function setBorrower(address borrower) public {
+        globalBorrower = borrower;
+    }
+
+    
+    function getLoanBorrower(uint256 bidId) public view override returns (address) {
+        return address(globalBorrower);
+    }
     
 }

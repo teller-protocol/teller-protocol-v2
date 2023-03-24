@@ -7,13 +7,23 @@ contract TestERC1155Token is ERC1155 {
     
     uint256 public _totalSupply;
     constructor(
-        string memory _name,
-        string memory _symbol        
-    ) ERC1155(_name, _symbol) { }
+        string memory uri         
+    ) ERC1155(uri) { }
 
-    function mint(address recipient) public returns (uint256) {
+     function mint(address recipient) public returns (uint256) {
+        
+        return mint(recipient, 1);
+        
+    }
+    function mint(address recipient, uint256 amount) public returns (uint256) {
+        
+        return mint(recipient, amount, "0x");
+        
+    }
+
+    function mint(address recipient, uint256 amount, bytes memory data) public returns (uint256) {
         uint256 tokenId = _totalSupply++;
-        _mint(recipient, tokenId);
+        _mint(recipient, tokenId, amount, data);
         return tokenId;
     }
 }

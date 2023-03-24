@@ -38,7 +38,7 @@ contract CollateralEscrow_Test is Testable {
             address(escrowImplementation)
         );
         // Deploy escrow
-        wethMock = new WethMock();
+        wethMock = new TestERC20Token("wrappedETH", "WETH", 1e24, 18);
         borrower = new User(escrowBeacon, address(wethMock));
 
         uint256 borrowerBalance = 50000;

@@ -46,16 +46,14 @@ contract CollateralEscrow_Test is Testable {
         erc721Mock = new TestERC721Token("ERC721", "ERC721");
         erc1155Mock = new TestERC1155Token("ERC1155");
 
-        borrower = new User(escrowBeacon, address(wethMock));
+        borrower = new User(escrowBeacon, address(wethMock), address(erc721Mock), address(erc1155Mock));
 
       
 
         uint256 borrowerBalance = 50000;
         payable(address(borrower)).transfer(borrowerBalance);
 
-        wethMock.transfer(address(borrower),1e18);
-        erc721Mock.mint(address(borrower));
-        erc1155Mock.mint(address(borrower)); 
+       
     }
 
    /* function test_depositAsset() public {
@@ -92,8 +90,44 @@ contract CollateralEscrow_Test is Testable {
         }
     }
 
+       function test_withdrawAsset_ERC721() public {
+         
+
+        CollateralEscrowV1_Override escrow = CollateralEscrowV1_Override(address(borrower.getEscrow()));
+ 
+
+        uint256 tokenId = erc721Mock.mint(address(escrow));
+        escrow.setStoredBalance(CollateralType.ERC721, address(erc721Mock), 1, tokenId, address(borrower) );
+
+        
+        borrower.withdraw(address(erc721Mock), 1, address(borrower));
+
+
+
+        uint256 storedBalance = borrower.getBalance(address(erc721Mock));
+
+        assertEq(storedBalance, 0, "Stored balance was not withdrawn");
+
+        try borrower.withdraw(address(erc721Mock), 1, address(borrower)) {
+            fail("No collateral balance for asset");
+        } catch Error(string memory reason) {
+            assertEq(
+                reason,
+                "No collateral balance for asset",
+                "Should not be able to withdraw already withdrawn assets"
+            );
+        } catch {
+            fail("Unknown error");
+        }
+    }
+
     function test_depositToken_ERC20() public {
-        borrower.approveWeth(amount);
+
+
+
+        wethMock.transfer(address(borrower),1e18);
+
+        borrower.approveERC20(address(wethMock), amount);
 
         borrower.depositToken(  address(wethMock), amount );
 
@@ -103,7 +137,10 @@ contract CollateralEscrow_Test is Testable {
     }
 
     function test_depositAsset_ERC20() public {
-        borrower.approveWeth(amount);
+
+
+        wethMock.transfer(address(borrower),1e18);
+        borrower.approveERC20(address(wethMock), amount);
 
         borrower.deposit(CollateralType.ERC20, address(wethMock), amount, 0);
 
@@ -114,7 +151,9 @@ contract CollateralEscrow_Test is Testable {
 
 
     function test_depositAsset_ERC721() public {
-        uint256 tokenId = 0;
+        uint256 tokenId =  erc721Mock.mint(address(borrower));
+
+        borrower.approveERC721(address(erc721Mock), tokenId);         
 
         borrower.deposit(CollateralType.ERC721, address(erc721Mock), 1, tokenId);
 
@@ -124,7 +163,9 @@ contract CollateralEscrow_Test is Testable {
     }
 
      function test_depositAsset_ERC1155() public {
-        uint256 tokenId = 0;
+        uint256 tokenId = erc1155Mock.mint(address(borrower));
+
+        borrower.approveERC1155(address(erc1155Mock));  
 
         borrower.deposit(CollateralType.ERC1155, address(erc1155Mock), 1, tokenId);
 
@@ -136,16 +177,16 @@ contract CollateralEscrow_Test is Testable {
 
 contract User {
     CollateralEscrowV1 public escrow;
-    address public immutable wethMock;
+   
 
-    constructor(UpgradeableBeacon escrowBeacon, address _wethMock) {
+    constructor(UpgradeableBeacon escrowBeacon, address _wethMock, address _erc721Mock, address _erc1155Mock) {
         // Deploy escrow
         BeaconProxy proxy_ = new BeaconProxy(
             address(escrowBeacon),
             abi.encodeWithSelector(CollateralEscrowV1.initialize.selector, 0)
         );
         escrow = CollateralEscrowV1(address(proxy_));
-        wethMock = _wethMock;
+       
     }
 
     function getEscrow() public view returns (CollateralEscrowV1) {
@@ -189,12 +230,18 @@ contract User {
         escrow.withdraw(_collateralAddress, _amount, _recipient);
     }
 
-    function depositToWeth(uint256 amount) public {
-        IWETH(wethMock).deposit{ value: amount }();
+    
+
+    function approveERC20(address tokenAddress, uint256 amount) public {
+        ERC20(tokenAddress).approve(address(escrow), amount);
     }
 
-    function approveWeth(uint256 amount) public {
-        ERC20(wethMock).approve(address(escrow), amount);
+     function approveERC721(address tokenAddress,uint256 tokenId) public {
+        ERC721(tokenAddress).approve(address(escrow), tokenId);
+    }
+
+     function approveERC1155(address tokenAddress) public {
+        ERC1155(tokenAddress).setApprovalForAll(address(escrow), true);
     }
 
     function getBalance(address _collateralAddress)

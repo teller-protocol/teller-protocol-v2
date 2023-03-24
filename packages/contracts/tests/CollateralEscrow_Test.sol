@@ -10,12 +10,24 @@ import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "../contracts/interfaces/IWETH.sol";
+
+import "./tokens/TestERC20Token.sol";
+import "./tokens/TestERC721Token.sol";
+import "./tokens/TestERC1155Token.sol";
+
 import { CollateralType, CollateralEscrowV1 } from "../contracts/escrow/CollateralEscrowV1.sol";
 
 contract CollateralEscrow_Test is Testable {
     BeaconProxy private proxy_;
     User private borrower;
-    WethMock wethMock;
+    //WethMock wethMock;
+
+    TestERC20Token wethMock;
+    TestERC721Token erc721Mock;
+    TestERC1155Token erc1155Mock;
+
+
+
     uint256 amount = 1000;
 
     function setUp() public {

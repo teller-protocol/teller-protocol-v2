@@ -11,6 +11,22 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "../contracts/interfaces/IWETH.sol";
 import { CollateralType, CollateralEscrowV1 } from "../contracts/escrow/CollateralEscrowV1.sol";
 
-contract CollateralEscrow_Override is CollateralEscrowV1 {
+import {Collateral} from "../contracts/interfaces/escrow/ICollateralEscrowV1.sol";
+
+contract CollateralEscrowV1_Override is CollateralEscrowV1 {
      
+
+    function setStoredBalance(CollateralType collateralType, address assetContractAddress, uint256 assetAmount, uint256 tokenId, address owner  ) public {
+
+        collateralBalances[assetContractAddress] = Collateral({
+            _amount: assetAmount,
+            _collateralAddress: assetContractAddress,
+            _collateralType: collateralType,
+            _tokenId: tokenId
+
+        });
+
+
+    }
+
 }

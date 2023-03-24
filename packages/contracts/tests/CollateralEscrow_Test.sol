@@ -17,6 +17,8 @@ import "./tokens/TestERC1155Token.sol";
 
 import { CollateralType, CollateralEscrowV1 } from "../contracts/escrow/CollateralEscrowV1.sol";
 
+import { CollateralEscrowV1_Override } from "./CollateralEscrow_Override.sol";
+
 contract CollateralEscrow_Test is Testable {
     BeaconProxy private proxy_;
     User private borrower;
@@ -25,6 +27,8 @@ contract CollateralEscrow_Test is Testable {
     TestERC20Token wethMock;
     TestERC721Token erc721Mock;
     TestERC1155Token erc1155Mock;
+ 
+    
 
 
 
@@ -32,7 +36,7 @@ contract CollateralEscrow_Test is Testable {
 
     function setUp() public {
         // Deploy implementation
-        CollateralEscrowV1 escrowImplementation = new CollateralEscrowV1();
+        CollateralEscrowV1 escrowImplementation = new CollateralEscrowV1_Override();
         // Deploy beacon contract with implementation
         UpgradeableBeacon escrowBeacon = new UpgradeableBeacon(
             address(escrowImplementation)
@@ -43,6 +47,8 @@ contract CollateralEscrow_Test is Testable {
         erc1155Mock = new TestERC1155Token("ERC1155");
 
         borrower = new User(escrowBeacon, address(wethMock));
+
+      
 
         uint256 borrowerBalance = 50000;
         payable(address(borrower)).transfer(borrowerBalance);
@@ -57,7 +63,15 @@ contract CollateralEscrow_Test is Testable {
     }*/
 
     function test_withdrawAsset_ERC20() public {
-        _depositAsset_ERC20();
+         
+
+        CollateralEscrowV1_Override escrow = CollateralEscrowV1_Override(address(borrower.getEscrow()));
+ 
+
+        wethMock.transfer(address(escrow),amount);
+        escrow.setStoredBalance(CollateralType.ERC20, address(wethMock), amount, 0, address(borrower) );
+
+        
 
         borrower.withdraw(address(wethMock), amount, address(borrower));
 
@@ -78,7 +92,17 @@ contract CollateralEscrow_Test is Testable {
         }
     }
 
-    function _depositAsset_ERC20() internal {
+    function test_depositToken_ERC20() public {
+        borrower.approveWeth(amount);
+
+        borrower.depositToken(  address(wethMock), amount );
+
+        uint256 storedBalance = borrower.getBalance(address(wethMock));
+
+        assertEq(storedBalance, amount, "Escrow deposit unsuccessful");
+    }
+
+    function test_depositAsset_ERC20() public {
         borrower.approveWeth(amount);
 
         borrower.deposit(CollateralType.ERC20, address(wethMock), amount, 0);
@@ -89,24 +113,24 @@ contract CollateralEscrow_Test is Testable {
     }
 
 
-    function _depositAsset_ERC721() internal {
-        borrower.approveWeth(amount);
+    function test_depositAsset_ERC721() public {
+        uint256 tokenId = 0;
 
-        borrower.deposit(CollateralType.ERC721, address(erc721Mock), amount, 0);
+        borrower.deposit(CollateralType.ERC721, address(erc721Mock), 1, tokenId);
 
         uint256 storedBalance = borrower.getBalance(address(erc721Mock));
 
-        assertEq(storedBalance, amount, "Escrow deposit unsuccessful");
+        assertEq(storedBalance, 1, "Escrow deposit unsuccessful");
     }
 
-     function _depositAsset_ERC1155() internal {
-        borrower.approveWeth(amount);
+     function test_depositAsset_ERC1155() public {
+        uint256 tokenId = 0;
 
-        borrower.deposit(CollateralType.ERC1155, address(erc1155Mock), amount, 0);
+        borrower.deposit(CollateralType.ERC1155, address(erc1155Mock), 1, tokenId);
 
         uint256 storedBalance = borrower.getBalance(address(erc1155Mock));
 
-        assertEq(storedBalance, amount, "Escrow deposit unsuccessful");
+        assertEq(storedBalance, 1, "Escrow deposit unsuccessful");
     }
 }
 
@@ -124,6 +148,10 @@ contract User {
         wethMock = _wethMock;
     }
 
+    function getEscrow() public view returns (CollateralEscrowV1) {
+        return escrow;
+    }
+
     function deposit(
         CollateralType _collateralType,
         address _collateralAddress,
@@ -135,6 +163,21 @@ contract User {
             _collateralAddress,
             _amount,
             _tokenId
+        );
+    }
+
+
+    function depositToken(
+        
+        address _collateralAddress,
+        uint256 _amount
+       
+    ) public {
+        escrow.depositToken(
+         
+            _collateralAddress,
+            _amount
+           
         );
     }
 

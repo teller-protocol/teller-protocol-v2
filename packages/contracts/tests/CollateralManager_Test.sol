@@ -17,9 +17,11 @@ import "./tokens/TestERC1155Token.sol";
 
 import "../contracts/mock/TellerV2SolMock.sol";
 import "../contracts/CollateralManager.sol";
+
+import "./CollateralManager_Override.sol";
  
 contract CollateralManager_Test is Testable {
-    CollateralManager collateralManager;
+    CollateralManager_Override collateralManager;
     User private borrower;
    
 
@@ -45,7 +47,7 @@ contract CollateralManager_Test is Testable {
         erc1155Mock = new TestERC1155Token("ERC1155");
 
         tellerV2Mock = new TellerV2SolMock();
-       // borrower = new User(escrowBeacon, address(wethMock), address(erc721Mock), address(erc1155Mock));
+        borrower = new User( );
 
 
         // Deploy escrow
@@ -59,15 +61,52 @@ contract CollateralManager_Test is Testable {
       //  uint256 borrowerBalance = 50000;
      //   payable(address(borrower)).transfer(borrowerBalance);
 
-        collateralManager = new CollateralManager();
+        collateralManager = new CollateralManager_Override();
 
 
         collateralManager.initialize(address(escrowBeacon), address(tellerV2Mock) );
     } 
 
 
-    
+    function test_setCollateralEscrowBeacon(  ) public {
+        // Deploy implementation
+        CollateralEscrowV1 escrowImplementation = new CollateralEscrowV1_Mock();
+        // Deploy beacon contract with implementation
+        UpgradeableBeacon escrowBeacon = new UpgradeableBeacon(
+            address(escrowImplementation)
+        );
 
+        
+
+        collateralManager.setCollateralEscrowBeacon(address(escrowBeacon));
+        
+        //how to test ?
+    }
+
+
+    function test_isBidCollateralBacked() public {
+        
+    }
+
+
+
+    function test_deposit() public  {
+        uint256 bidId = 0 ;
+        uint256 amount = 1000;
+        wethMock.transfer(address(borrower), amount);
+        wethMock.approve(address(collateralManager), amount);
+
+        Collateral memory collateral = Collateral({
+            _collateralType: CollateralType.ERC20,
+            _amount: amount,
+            _tokenId: 0, 
+            _collateralAddress: address(wethMock)
+        });
+
+        collateralManager.mock_deposit(bidId, collateral);
+
+         
+    }
   
 }
 

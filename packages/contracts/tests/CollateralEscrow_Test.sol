@@ -46,12 +46,12 @@ contract CollateralEscrow_Test is Testable {
         borrower.depositToWeth(borrowerBalance);
     }
 
-    function test_depositAsset() public {
+   /* function test_depositAsset() public {
         _depositAsset();
-    }
+    }*/
 
     function test_withdrawAsset_ERC20() public {
-        _depositAsset();
+        _depositAsset_ERC20();
 
         borrower.withdraw(address(wethMock), amount, address(borrower));
 

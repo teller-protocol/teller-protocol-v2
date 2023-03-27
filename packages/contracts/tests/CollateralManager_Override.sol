@@ -23,6 +23,7 @@ contract CollateralManager_Override is CollateralManager {
     bool public checkBalancesWasCalled;
     bool public checkBalanceWasCalled; 
     address public withdrawInternalWasCalledToRecipient;
+    bool public commitCollateralInternalWasCalled;
 
     bool bidsCollateralBackedGlobally;
 
@@ -39,6 +40,14 @@ contract CollateralManager_Override is CollateralManager {
     }
 
 
+    function _commitCollateralSuper(uint256 _bidId, Collateral memory _collateralInfo) public {
+        super._commitCollateral(_bidId,_collateralInfo);
+    }
+
+
+    function isBidCollateralBackedSuper(uint256 _bidId) public returns (bool) {
+        return super.isBidCollateralBacked(_bidId);
+    }
 
     function _checkBalancesSuper(
          address _borrowerAddress,
@@ -106,6 +115,13 @@ contract CollateralManager_Override is CollateralManager {
     {
         withdrawInternalWasCalledToRecipient = recipient;
 
+    }
+
+     function _commitCollateral(
+        uint256 _bidId,
+        Collateral memory _collateralInfo
+    ) internal override {
+        commitCollateralInternalWasCalled = true;
     }
 
 

@@ -190,7 +190,7 @@ contract CollateralManager_Test is Testable {
       
     }
 
-     function test_liquidateCollateral_invalid_state() public {
+    function test_liquidateCollateral_invalid_state() public {
 
         uint256 bidId = 0;
 
@@ -205,7 +205,7 @@ contract CollateralManager_Test is Testable {
       
     }
 
-        function test_liquidateCollateral_not_backed() public {
+    function test_liquidateCollateral_not_backed() public {
 
         uint256 bidId = 0;
 
@@ -251,25 +251,93 @@ contract CollateralManager_Test is Testable {
         collateralManager.withdraw_internal(bidId,recipient);
 
     }
+/*
+    function test_withdraw_internal_invalid_bid() public {
+
+        uint256 bidId = 0;
+        address recipient = address(borrower);
+
+        vm.expectRevert("Bid does not exist");
+        collateralManager.withdraw_internal(bidId,recipient);
+
+    }
+*/
+
+    function test_getCollateralInfo() public {
+
+        uint256 bidId = 0;
+
+        Collateral memory collateral = Collateral({
+            _collateralType: CollateralType.ERC20,
+            _amount: 1000,
+            _tokenId: 0, 
+            _collateralAddress: address(wethMock)
+        });
+
+        collateralManager.setCollateral(bidId, collateral);
+
+        Collateral memory collateralInfo = collateralManager.getCollateralInfo(bidId);
+
+        assertTrue(collateralInfo._collateralType == CollateralType.ERC20, "collateral type is not correct");
+        assertTrue(collateralInfo._amount == 1000, "collateral amount is not correct");
+        assertTrue(collateralInfo._tokenId == 0, "collateral tokenId is not correct");
+        assertTrue(collateralInfo._collateralAddress == address(wethMock), "collateral address is not correct");
+
+    }
+
+    function test_getCollateralAmount() public {
+
+        uint256 bidId = 0;
+
+        Collateral memory collateral = Collateral({
+            _collateralType: CollateralType.ERC20,
+            _amount: 1000,
+            _tokenId: 0, 
+            _collateralAddress: address(wethMock)
+        });
+
+        collateralManager.setCollateral(bidId, collateral);
+
+        uint256 collateralAmount = collateralManager.getCollateralAmount(bidId);
+
+        assertTrue(collateralAmount == 1000, "collateral amount is not correct");
+
+    }
+
+    function test_getEscrow() public {
+
+        uint256 bidId = 0;
+
+        address escrow = collateralManager.getEscrow(bidId);
+
+        assertTrue(escrow == address(0), "escrow is not correct");
+
+    }
 
 
+    function test_isBidCollateralBacked_empty() public {
 
+        uint256 bidId = 0;
 
-    function test_commitCollateral() public {}
+        bool collateralBacked = collateralManager.isBidCollateralBackedSuper(bidId);
 
+        assertTrue(collateralBacked == false, "collateral backed is not correct");
 
+    }
 
-    function test_getCollateralInfo() public {}
+     function test_isBidCollateralBacked_populated() public {
 
-    function test_getCollateralAmount() public {}
+        uint256 bidId = 0;
 
-    function test_getEscrow() public {}
+        bool collateralBacked = collateralManager.isBidCollateralBackedSuper(bidId);
+
+        assertTrue(collateralBacked, "collateral backed is not correct");
+
+    }
+
 
 
     function test_onERC721Received() public {} 
-
-    function test_isBidCollateralBacked() public {} 
-
 
     function onERC1155Received() public {} 
     
@@ -404,18 +472,28 @@ contract CollateralManager_Test is Testable {
 
         
         collateralManager.commitCollateral(bidId,collateral);
- 
+
+
+        assertTrue(collateralManager.commitCollateralInternalWasCalled(),"commit collateral was not called");
 
     }
 
     function test_commit_collateral_array() public {
         uint256 bidId = 0;
 
-        Collateral[] memory collateralArray; 
+        Collateral[] memory collateralArray = new Collateral[](1); 
+
+        collateralArray[0] = Collateral({
+            _collateralType: CollateralType.ERC20,
+            _amount: 1000,
+            _tokenId: 0, 
+            _collateralAddress: address(wethMock)
+        });
 
        
         collateralManager.commitCollateral(bidId, collateralArray);
 
+        assertTrue(collateralManager.commitCollateralInternalWasCalled(),"commit collateral was not called");
 
     }
   

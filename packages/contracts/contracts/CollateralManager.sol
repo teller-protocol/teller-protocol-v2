@@ -411,7 +411,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     function _commitCollateral(
         uint256 _bidId,
         Collateral memory _collateralInfo
-    ) internal {
+    ) internal virtual {
         CollateralInfo storage collateral = _bidCollaterals[_bidId];
         collateral.collateralAddresses.add(_collateralInfo._collateralAddress);
         collateral.collateralInfo[

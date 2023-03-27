@@ -153,6 +153,7 @@ contract CollateralManager_Test is Testable {
         
         uint256 bidId = 0;
 
+        tellerV2Mock.setBorrower(address(borrower));
         tellerV2Mock.setGlobalBidState(BidState.PAID);
 
         collateralManager.withdraw(bidId);
@@ -166,6 +167,7 @@ contract CollateralManager_Test is Testable {
             
         uint256 bidId = 0;
 
+        tellerV2Mock.setLender(address(lender));
         tellerV2Mock.setBidsDefaultedGlobally(true);
 
         collateralManager.withdraw(bidId);
@@ -448,6 +450,7 @@ contract CollateralEscrowV1_Mock is CollateralEscrowV1 {
 contract TellerV2_Mock is TellerV2SolMock {
 
     address public globalBorrower;
+    address public globalLender;
     bool public bidsDefaultedGlobally;
     BidState public globalBidState;
 
@@ -457,9 +460,16 @@ contract TellerV2_Mock is TellerV2SolMock {
         globalBorrower = borrower;
     }
 
+     function setLender(address lender) public {
+        globalLender = lender;
+    }
+
     
     function getLoanBorrower(uint256 bidId) public view override returns (address) {
         return address(globalBorrower);
+    }
+     function getLoanLender(uint256 bidId) public view override returns (address) {
+        return address(globalLender);
     }
 
     function isLoanDefaulted(uint256 _bidId) public view override returns (bool) {

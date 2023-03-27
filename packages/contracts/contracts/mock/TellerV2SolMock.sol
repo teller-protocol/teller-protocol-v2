@@ -170,6 +170,7 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
     function getLoanLender(uint256 _bidId)
         external
         view
+        virtual
         returns (address lender_)
     {
         lender_ = bids[_bidId].lender;

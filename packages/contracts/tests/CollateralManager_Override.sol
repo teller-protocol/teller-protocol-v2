@@ -24,11 +24,18 @@ contract CollateralManager_Override is CollateralManager {
     bool public checkBalanceWasCalled; 
     address public withdrawInternalWasCalledToRecipient;
 
+    bool bidsCollateralBackedGlobally;
+
 
 
     function mock_deposit( uint256 _bidId, Collateral memory collateralInfo ) public {
 
         _deposit(_bidId, collateralInfo);
+    }
+
+
+    function withdraw_internal(uint256 _bidId, address _receiver) public {
+        super._withdraw(_bidId,_receiver);
     }
 
 
@@ -55,11 +62,19 @@ contract CollateralManager_Override is CollateralManager {
     }
 
 
+    function setBidsCollateralBackedGlobally(bool _backed) public {
+        bidsCollateralBackedGlobally = _backed;
+    }
 
 
     /*
         Overrides
     */
+
+    function isBidCollateralBacked(uint256 _bidId) public override returns (bool) {
+        return bidsCollateralBackedGlobally;
+    }
+
 
     function _checkBalances(
         address _borrowerAddress,

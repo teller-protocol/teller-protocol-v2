@@ -101,7 +101,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
      * @param _bidId The id of the bid to check.
      */
 
-    function isBidCollateralBacked(uint256 _bidId) public returns (bool) {
+    function isBidCollateralBacked(uint256 _bidId) public virtual returns (bool) {
         return _bidCollaterals[_bidId].collateralAddresses.length() > 0;
     }
 

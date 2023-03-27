@@ -24,6 +24,7 @@ contract CollateralManager_Test is Testable {
     CollateralManager_Override collateralManager;
     User private borrower;
     User private lender;
+    User private liquidator;
    
 
     TestERC20Token wethMock;
@@ -50,6 +51,7 @@ contract CollateralManager_Test is Testable {
         tellerV2Mock = new TellerV2_Mock();
         borrower = new User();
         lender = new User();
+        liquidator = new User();
 
 
         // Deploy escrow
@@ -86,10 +88,7 @@ contract CollateralManager_Test is Testable {
     }
 
 
-    function test_isBidCollateralBacked() public {
-        
-    }
-
+  
 
 
     function test_deposit() public  {
@@ -177,19 +176,88 @@ contract CollateralManager_Test is Testable {
 
     }
 
-    function test_withdraw_external_as_borrower_invalid() public {}
 
-    function test_withdraw_external_as_lender_valid() public {}
-    function test_withdraw_external_as_lender_invalid() public {}
+  function test_liquidateCollateral_invalid_sender() public {
 
-    function test_withdraw_internal() public {}
+        uint256 bidId = 0;
+
+       
+        tellerV2Mock.setGlobalBidState(BidState.LIQUIDATED);
+    
+        vm.expectRevert("Sender not authorized");
+        collateralManager.liquidateCollateral(bidId, address(liquidator));
+
+      
+    }
+
+     function test_liquidateCollateral_invalid_state() public {
+
+        uint256 bidId = 0;
+
+        collateralManager.setBidsCollateralBackedGlobally(true);
+
+        vm.prank(address(tellerV2Mock));
+        //tellerV2Mock.setGlobalBidState(BidState.LIQUIDATED);
+    
+        vm.expectRevert("Loan has not been liquidated");
+        collateralManager.liquidateCollateral(bidId, address(liquidator));
+
+      
+    }
+
+        function test_liquidateCollateral_not_backed() public {
+
+        uint256 bidId = 0;
+
+      
+        collateralManager.setBidsCollateralBackedGlobally(false);
+
+        tellerV2Mock.setGlobalBidState(BidState.LIQUIDATED);
+
+        vm.prank(address(tellerV2Mock));
+        collateralManager.liquidateCollateral(bidId, address(liquidator));
+
+        assertTrue(collateralManager.withdrawInternalWasCalledToRecipient()==address(0),"withdraw internal was called");
+
+    }
+   
+   
+    function test_liquidateCollateral() public {
+
+        uint256 bidId = 0;
+
+      
+        collateralManager.setBidsCollateralBackedGlobally(true);
+
+        tellerV2Mock.setGlobalBidState(BidState.LIQUIDATED);
+
+        vm.prank(address(tellerV2Mock));
+        collateralManager.liquidateCollateral(bidId, address(liquidator));
+
+        assertTrue(collateralManager.withdrawInternalWasCalledToRecipient()==address(liquidator),"withdraw internal was not called with correct recipient");
+
+    }
+   
+    function test_withdraw_internal() public {
+
+
+        uint256 bidId = 0;
+        address recipient = address(borrower);
+
+
+        // the escrows should be mocked.. so escrow .withdraw is just mocked 
+
+
+        collateralManager.withdraw_internal(bidId,recipient);
+
+    }
 
 
 
 
     function test_commitCollateral() public {}
 
-    function test_liquidateCollateral() public {}
+
 
     function test_getCollateralInfo() public {}
 
@@ -199,6 +267,8 @@ contract CollateralManager_Test is Testable {
 
 
     function test_onERC721Received() public {} 
+
+    function test_isBidCollateralBacked() public {} 
 
 
     function onERC1155Received() public {} 

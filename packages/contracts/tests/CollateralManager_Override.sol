@@ -22,6 +22,7 @@ contract CollateralManager_Override is CollateralManager {
     
     bool public checkBalancesWasCalled;
     bool public checkBalanceWasCalled; 
+    address public withdrawInternalWasCalledToRecipient;
 
 
 
@@ -82,6 +83,14 @@ contract CollateralManager_Override is CollateralManager {
         checkBalanceWasCalled = true;
 
         return true;
+    }
+
+
+    function _withdraw(uint256 _bidId, address recipient) 
+    internal override 
+    {
+        withdrawInternalWasCalledToRecipient = recipient;
+
     }
 
 

@@ -134,7 +134,7 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
         return (0, bid.loanDetails.principal, 0);
     }
 
-    function getBidState(uint256 _bidId) public view returns (BidState) {
+    function getBidState(uint256 _bidId) public view virtual returns (BidState) {
         return bids[_bidId].state;
     }
 
@@ -152,9 +152,9 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
         returns (uint256[] memory)
     {}
 
-    function isLoanDefaulted(uint256 _bidId) public view returns (bool) {}
+    function isLoanDefaulted(uint256 _bidId) public view virtual returns (bool) {}
 
-    function isLoanLiquidateable(uint256 _bidId) public view returns (bool) {}
+    function isLoanLiquidateable(uint256 _bidId) public view virtual returns (bool) {}
 
     function isPaymentLate(uint256 _bidId) public view returns (bool) {}
 

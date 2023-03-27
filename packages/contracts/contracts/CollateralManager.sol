@@ -375,7 +375,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
      * @param _bidId The id of the bid to withdraw collateral for.
      * @param _receiver The address to withdraw the collateral to.
      */
-    function _withdraw(uint256 _bidId, address _receiver) internal {
+    function _withdraw(uint256 _bidId, address _receiver) internal virtual {
         for (
             uint256 i;
             i < _bidCollaterals[_bidId].collateralAddresses.length();

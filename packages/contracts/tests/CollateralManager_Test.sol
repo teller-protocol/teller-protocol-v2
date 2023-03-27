@@ -23,6 +23,7 @@ import "./CollateralManager_Override.sol";
 contract CollateralManager_Test is Testable {
     CollateralManager_Override collateralManager;
     User private borrower;
+    User private lender;
    
 
     TestERC20Token wethMock;
@@ -47,7 +48,8 @@ contract CollateralManager_Test is Testable {
         erc1155Mock = new TestERC1155Token("ERC1155");
 
         tellerV2Mock = new TellerV2_Mock();
-        borrower = new User( );
+        borrower = new User();
+        lender = new User();
 
 
         // Deploy escrow
@@ -137,7 +139,51 @@ contract CollateralManager_Test is Testable {
 
     function test_deployAndDeposit() public {} 
 
-    function test_withdraw() public {}
+    function test_withdraw_external_invalid_bid_state() public {
+
+        uint256 bidId = 0;
+
+        vm.expectRevert("collateral cannot be withdrawn");
+
+        collateralManager.withdraw(bidId); 
+        
+    }
+
+    function test_withdraw_external_state_paid() public {
+        
+        uint256 bidId = 0;
+
+        tellerV2Mock.setGlobalBidState(BidState.PAID);
+
+        collateralManager.withdraw(bidId);
+
+        assertTrue(collateralManager.withdrawInternalWasCalledToRecipient()==address(borrower),"withdraw internal was not called with correct recipient");
+
+
+    }
+
+    function test_withdraw_external_state_defaulted() public {
+            
+        uint256 bidId = 0;
+
+        tellerV2Mock.setBidsDefaultedGlobally(true);
+
+        collateralManager.withdraw(bidId);
+
+        assertTrue(collateralManager.withdrawInternalWasCalledToRecipient()==address(lender),"withdraw internal was not called with correct recipient");
+
+
+    }
+
+    function test_withdraw_external_as_borrower_invalid() public {}
+
+    function test_withdraw_external_as_lender_valid() public {}
+    function test_withdraw_external_as_lender_invalid() public {}
+
+    function test_withdraw_internal() public {}
+
+
+
 
     function test_commitCollateral() public {}
 
@@ -402,6 +448,8 @@ contract CollateralEscrowV1_Mock is CollateralEscrowV1 {
 contract TellerV2_Mock is TellerV2SolMock {
 
     address public globalBorrower;
+    bool public bidsDefaultedGlobally;
+    BidState public globalBidState;
 
     constructor() TellerV2SolMock() {}
 
@@ -413,5 +461,25 @@ contract TellerV2_Mock is TellerV2SolMock {
     function getLoanBorrower(uint256 bidId) public view override returns (address) {
         return address(globalBorrower);
     }
+
+    function isLoanDefaulted(uint256 _bidId) public view override returns (bool) {
+        return bidsDefaultedGlobally;
+    }
+
+    function getBidState(uint256 _bidId) public view override returns (BidState) {
+        return globalBidState;
+    }
+
+    function setGlobalBidState(BidState _state) public {
+        globalBidState = _state;
+    }
+
+    function setBidsDefaultedGlobally(bool _defaulted) public {
+        bidsDefaultedGlobally = _defaulted;
+    }
+
+
+        
+
     
 }

@@ -36,7 +36,7 @@ contract CollateralManager_Override is CollateralManager {
          address _borrowerAddress,
         Collateral[] memory _collateralInfo,
         bool _shortCircut
-    ) internal returns (bool validated_, bool[] memory checks_) {
+    ) public returns (bool validated_, bool[] memory checks_) {
 
        return super._checkBalances(
         _borrowerAddress,
@@ -49,9 +49,12 @@ contract CollateralManager_Override is CollateralManager {
     function _checkBalanceSuper(
         address _borrowerAddress,
         Collateral memory _collateralInfo
-    ) internal returns (bool) {
+    ) public returns (bool) {
        return super._checkBalance(_borrowerAddress,_collateralInfo);
     }
+
+
+
 
     /*
         Overrides

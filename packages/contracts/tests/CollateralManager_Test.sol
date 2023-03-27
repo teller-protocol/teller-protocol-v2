@@ -158,32 +158,85 @@ contract CollateralManager_Test is Testable {
             _tokenId: 0, 
             _collateralAddress: address(wethMock)
         });
-
-
-
-
-
+ 
+ 
         (bool valid, bool[] memory checks) = collateralManager.checkBalances(
             address(borrower),
             collateralArray
         );
-
-//        assertTrue(valid);
+ 
 
         assertTrue(collateralManager.checkBalancesWasCalled(), "Check balances was not called");
     }
 
      function test_checkBalances_internal() public {
+    
+        
+        Collateral[] memory collateralArray = new Collateral[](1); 
+
+        collateralArray[0] = Collateral({
+            _collateralType: CollateralType.ERC20,
+            _amount: 1000,
+            _tokenId: 0, 
+            _collateralAddress: address(wethMock)
+        });
+ 
+ 
+        (bool valid, bool[] memory checks) = collateralManager._checkBalancesSuper(
+            address(borrower),
+            collateralArray,
+            true 
+        );
+ 
+        assertTrue(collateralManager.checkBalanceWasCalled(), "Check balance was not called");
      }
 
 
 
-     function test_checkBalance_internal() public {
+     function test_checkBalance_internal_insufficient_assets() public {
 
+          Collateral memory collateral =  Collateral({
+            _collateralType: CollateralType.ERC20,
+            _amount: 1000,
+            _tokenId: 0, 
+            _collateralAddress: address(wethMock)
+        });
+
+
+        bool valid = collateralManager._checkBalanceSuper(
+            address(borrower),
+            collateral
+        );
+ 
 
         //need to inject state 
 
-        
+        assertFalse(valid, "check balance super should be invalid");
+     }
+
+
+     function test_checkBalance_internal_sufficient_assets() public {
+
+          Collateral memory collateral =  Collateral({
+            _collateralType: CollateralType.ERC20,
+            _amount: 1000,
+            _tokenId: 0, 
+            _collateralAddress: address(wethMock)
+        });
+
+
+        wethMock.transfer(address(borrower),1000);
+
+
+        bool valid = collateralManager._checkBalanceSuper(
+            address(borrower),
+            collateral
+        );
+ 
+
+        //need to inject state 
+
+        assertTrue(valid, "check balance super not valid");
      }
 
 

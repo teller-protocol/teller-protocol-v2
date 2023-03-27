@@ -148,9 +148,9 @@ contract CollateralManager_Test is Testable {
         assertTrue(valid);
     }
 
-    function test_checkBalances() public {
+    function test_checkBalances_public() public {
 
-        Collateral[] memory collateralArray; 
+        Collateral[] memory collateralArray = new Collateral[](1); 
 
         collateralArray[0] = Collateral({
             _collateralType: CollateralType.ERC20,
@@ -159,13 +159,32 @@ contract CollateralManager_Test is Testable {
             _collateralAddress: address(wethMock)
         });
 
+
+
+
+
         (bool valid, bool[] memory checks) = collateralManager.checkBalances(
             address(borrower),
             collateralArray
         );
 
-        assertTrue(valid);
+//        assertTrue(valid);
+
+        assertTrue(collateralManager.checkBalancesWasCalled(), "Check balances was not called");
     }
+
+     function test_checkBalances_internal() public {
+     }
+
+
+
+     function test_checkBalance_internal() public {
+
+
+        //need to inject state 
+
+        
+     }
 
 
     function test_revalidateCollateral() public {

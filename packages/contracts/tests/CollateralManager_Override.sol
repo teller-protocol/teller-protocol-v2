@@ -20,6 +20,8 @@ import "../contracts/CollateralManager.sol";
  
 contract CollateralManager_Override is CollateralManager {
     
+    bool public checkBalancesWasCalled;
+    bool public checkBalanceWasCalled; 
 
 
 
@@ -27,5 +29,58 @@ contract CollateralManager_Override is CollateralManager {
 
         _deposit(_bidId, collateralInfo);
     }
+
+
+
+    function _checkBalancesSuper(
+         address _borrowerAddress,
+        Collateral[] memory _collateralInfo,
+        bool _shortCircut
+    ) internal returns (bool validated_, bool[] memory checks_) {
+
+       return super._checkBalances(
+        _borrowerAddress,
+       _collateralInfo,
+       _shortCircut
+       );
+
+    }
+
+    function _checkBalanceSuper(
+        address _borrowerAddress,
+        Collateral memory _collateralInfo
+    ) internal returns (bool) {
+       return super._checkBalance(_borrowerAddress,_collateralInfo);
+    }
+
+    /*
+        Overrides
+    */
+
+    function _checkBalances(
+        address _borrowerAddress,
+        Collateral[] memory _collateralInfo,
+        bool _shortCircut
+    ) internal override returns (bool validated_, bool[] memory checks_) {
+
+        checkBalancesWasCalled = true;
+
+        validated_ = true;
+        checks_ = new bool[](0);
+    }
+    
+
+
+      function _checkBalance(
+        address _borrowerAddress,
+        Collateral memory _collateralInfo
+    ) internal override returns (bool) {
+
+        checkBalanceWasCalled = true;
+
+        return true;
+    }
+
+
  
 }

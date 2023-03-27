@@ -17,6 +17,8 @@ import "./interfaces/ICollateralManager.sol";
 import { Collateral, CollateralType, ICollateralEscrowV1 } from "./interfaces/escrow/ICollateralEscrowV1.sol";
 import "./interfaces/ITellerV2.sol";
 
+import "lib/forge-std/src/console.sol";
+
 contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     /* Storage */
     using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
@@ -429,12 +431,16 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
      * @notice Checks the validity of a borrower's multiple collateral balances.
      * @param _borrowerAddress The address of the borrower holding the collateral.
      * @param _collateralInfo Additional information about the collateral assets.
+     * @param _shortCircut  if true, will return immediately until an invalid balance 
      */
     function _checkBalances(
         address _borrowerAddress,
         Collateral[] memory _collateralInfo,
         bool _shortCircut
-    ) internal returns (bool validated_, bool[] memory checks_) {
+    ) internal virtual returns (bool validated_, bool[] memory checks_) {
+      
+        console.logUint(_collateralInfo.length);
+
         checks_ = new bool[](_collateralInfo.length);
         validated_ = true;
         for (uint256 i; i < _collateralInfo.length; i++) {
@@ -461,7 +467,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     function _checkBalance(
         address _borrowerAddress,
         Collateral memory _collateralInfo
-    ) internal returns (bool) {
+    ) internal virtual returns (bool) {
         CollateralType collateralType = _collateralInfo._collateralType;
         if (collateralType == CollateralType.ERC20) {
             return

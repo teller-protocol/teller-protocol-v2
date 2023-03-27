@@ -135,6 +135,27 @@ contract CollateralManager_Test is Testable {
     }
 
 
+    function test_deployAndDeposit() public {} 
+
+    function test_withdraw() public {}
+
+    function test_commitCollateral() public {}
+
+    function test_liquidateCollateral() public {}
+
+    function test_getCollateralInfo() public {}
+
+    function test_getCollateralAmount() public {}
+
+    function test_getEscrow() public {}
+
+
+    function test_onERC721Received() public {} 
+
+
+    function onERC1155Received() public {} 
+    
+
 
     function test_checkBalances_empty() public {
 

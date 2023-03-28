@@ -167,7 +167,16 @@ contract TellerV2_initialize is Testable {
     function test_isLoanExpired() public {} 
 
     function test_lastRepaidTimestamp() public {
+            
+        uint256 bidId = 1 ;
+        setMockBid(1); 
 
+        uint256 lastRepaidTimestamp = tellerV2.lastRepaidTimestamp(bidId);
+
+        assertEq(lastRepaidTimestamp, 100); 
+    
+        
+        
     }
 
     function test_getLoanLender() public {}

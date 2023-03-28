@@ -276,12 +276,12 @@ contract CollateralManager_Test is Testable {
 
         collateralManager.setCollateral(bidId, collateral);
 
-        Collateral memory collateralInfo = collateralManager.getCollateralInfo(bidId);
+        Collateral[] memory collateralInfo = collateralManager.getCollateralInfo(bidId);
 
-        assertTrue(collateralInfo._collateralType == CollateralType.ERC20, "collateral type is not correct");
-        assertTrue(collateralInfo._amount == 1000, "collateral amount is not correct");
-        assertTrue(collateralInfo._tokenId == 0, "collateral tokenId is not correct");
-        assertTrue(collateralInfo._collateralAddress == address(wethMock), "collateral address is not correct");
+        assertTrue(collateralInfo[0]._collateralType == CollateralType.ERC20, "collateral type is not correct");
+        assertTrue(collateralInfo[0]._amount == 1000, "collateral amount is not correct");
+        assertTrue(collateralInfo[0]._tokenId == 0, "collateral tokenId is not correct");
+        assertTrue(collateralInfo[0]._collateralAddress == address(wethMock), "collateral address is not correct");
 
     }
 
@@ -298,7 +298,7 @@ contract CollateralManager_Test is Testable {
 
         collateralManager.setCollateral(bidId, collateral);
 
-        uint256 collateralAmount = collateralManager.getCollateralAmount(bidId);
+        uint256 collateralAmount = collateralManager.getCollateralAmount(bidId,address(wethMock));
 
         assertTrue(collateralAmount == 1000, "collateral amount is not correct");
 

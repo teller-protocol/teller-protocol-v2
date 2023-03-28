@@ -34,6 +34,13 @@ contract CollateralManager_Override is CollateralManager {
         _deposit(_bidId, collateralInfo);
     }
 
+    function setCollateral(uint256 bid, Collateral memory collateralInfo ) public {
+
+    
+
+
+    }
+
 
     function withdraw_internal(uint256 _bidId, address _receiver) public {
         super._withdraw(_bidId,_receiver);

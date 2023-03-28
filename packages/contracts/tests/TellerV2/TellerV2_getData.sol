@@ -173,13 +173,22 @@ contract TellerV2_initialize is Testable {
 
         uint256 lastRepaidTimestamp = tellerV2.lastRepaidTimestamp(bidId);
 
-        assertEq(lastRepaidTimestamp, 100); 
-    
-        
+        assertEq(lastRepaidTimestamp, 100);        
         
     }
 
-    function test_getLoanLender() public {}
+    function test_getLoanLender() public {
+            
+            uint256 bidId = 1 ;
+            setMockBid(1); 
+    
+            address lender = tellerV2.getLoanLender(bidId);
+    
+            assertEq(lender, address(0x1234)); 
+    
+
+
+    }
 
     function test_getLoanLendingToken() public {}
 

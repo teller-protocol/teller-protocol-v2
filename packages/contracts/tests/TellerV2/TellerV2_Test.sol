@@ -163,13 +163,10 @@ contract TellerV2_Test is Testable {
 
 
 
-    /*
-
-    FNDA:0,TellerV2.initialize
-    FNDA:0,TellerV2.setLenderManager
-    FNDA:0,TellerV2._setLenderManager
+    /* 
+     
     FNDA:0,TellerV2.getMetadataURI
-    FNDA:0,TellerV2.setReputationManager
+   
     FNDA:0,TellerV2.cancelBid
     FNDA:0,TellerV2.marketOwnerCancelBid
     FNDA:0,TellerV2._cancelBid

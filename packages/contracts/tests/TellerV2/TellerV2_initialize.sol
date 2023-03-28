@@ -75,6 +75,44 @@ contract TellerV2_initialize is Testable {
     
     }
 
+
+    function test_setLenderManager_not_owner() public {
+
+        vm.expectRevert("Ownable: caller is not the owner");
+
+        tellerV2.setLenderManager(address(lenderManager));
+    }
+
+    function test_setReputationManager_not_owner() public {
+
+        vm.expectRevert("Ownable: caller is not the owner");
+
+        tellerV2.setReputationManager(address(reputationManager));
+    }
+
+    function test_setLenderManager_external() public {
+
+        //how to mock self as the owner ?
+
+        //tellerV2.setLenderManager(address(lenderManager));
+    }
+
+    function test_setReputationManager_external() public {
+
+        //how to mock self as the owner ?
+ 
+
+        //tellerV2.setReputationManager(address(reputationManager));
+    }
+
+    function test_setLenderManager_internal() public {
+        lenderManager = new Contract();
+ 
+        tellerV2.setLenderManagerSuper(address(lenderManager));
+
+        assertEq(address(tellerV2.lenderManager()), address(lenderManager));
+    }
+
    
    
 }

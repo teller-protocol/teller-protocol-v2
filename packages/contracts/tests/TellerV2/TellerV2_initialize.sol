@@ -13,19 +13,30 @@ contract TellerV2_initialize is Testable {
 
     uint16 protocolFee = 5;
 
-    User marketRegistry;
-    User reputationManager;
-    User lenderCommitmentForwarder;
-    User collateralManager;
-    User lenderManager;
+    Contract marketRegistry;
+    Contract reputationManager;
+    Contract lenderCommitmentForwarder;
+    Contract collateralManager;
+    Contract lenderManager;
 
     function setUp() public {
         tellerV2 = new TellerV2_Override();
+
+
+
 
         //stdstore.target(address(tellerV2)).sig("marketRegistry()").checked_write(address(0x1234));
     }
 
     function test_initialize() public {
+
+
+        marketRegistry = new Contract();
+        reputationManager = new Contract();
+        lenderCommitmentForwarder = new Contract();
+        collateralManager = new Contract();
+        lenderManager = new Contract();
+
       
         tellerV2.initialize(
             protocolFee, 
@@ -34,11 +45,34 @@ contract TellerV2_initialize is Testable {
             address(lenderCommitmentForwarder), 
             address(collateralManager),
             address(lenderManager)            
-            );
-
+        );
 
         assertEq(address(tellerV2.marketRegistry()), address(marketRegistry));
-        assertEq(address(tellerV2.lenderManager()), address(lenderManager)); 
+        assertEq(address(tellerV2.lenderManager()), address(lenderManager));
+        
+    }
+
+   function test_initialize_not_contract() public {
+
+        marketRegistry = new Contract();
+        reputationManager = new Contract();
+        
+        collateralManager = new Contract();
+        lenderManager = new Contract();
+
+        vm.expectRevert("LenderCommitmentForwarder must be a contract");
+        
+      
+        tellerV2.initialize(
+            protocolFee, 
+            address(marketRegistry), 
+            address(reputationManager), 
+            address(lenderCommitmentForwarder), 
+            address(collateralManager),
+            address(lenderManager)            
+        );
+
+    
     }
 
    
@@ -46,4 +80,23 @@ contract TellerV2_initialize is Testable {
 }
 
 
-contract User {}
+contract User {} 
+
+contract Contract {
+
+    //adding some storage so this is recognizes as a contract 
+    address public target;
+
+    constructor( ) {
+        target = msg.sender;
+    }
+
+    function execute(bytes memory data) public returns (bytes memory) {
+        (bool success, bytes memory result) = target.delegatecall(data);
+        require(success, "User: delegatecall failed");
+        return result;
+    }
+ 
+
+
+}

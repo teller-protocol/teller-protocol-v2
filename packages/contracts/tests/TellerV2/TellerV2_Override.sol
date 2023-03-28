@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import { TellerV2, Bid } from "../../contracts/TellerV2.sol";
+import { TellerV2, Bid, BidState, Collateral, Payment, LoanDetails, Terms } from "../../contracts/TellerV2.sol";
+
+ 
 
 contract TellerV2_Override is TellerV2 {
     constructor()

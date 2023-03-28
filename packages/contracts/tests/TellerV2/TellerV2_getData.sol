@@ -4,7 +4,15 @@ pragma solidity ^0.8.0;
 import { StdStorage, stdStorage } from "forge-std/StdStorage.sol";
 import { Testable } from "../Testable.sol";
 import { TellerV2_Override } from "./TellerV2_Override.sol";
-import { Bid, BidState, Collateral } from "../../contracts/TellerV2.sol";
+import { Bid, BidState, Collateral, Payment, LoanDetails, Terms } from "../../contracts/TellerV2.sol";
+ 
+
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+
+import { PaymentType, PaymentCycleType } from "../../contracts/libraries/V2Calculations.sol";
+
+
+
 
 contract TellerV2_initialize is Testable {
   
@@ -12,10 +20,13 @@ contract TellerV2_initialize is Testable {
     TellerV2_Override tellerV2;
 
     uint16 protocolFee = 5;
- 
+    
+    ERC20 lendingToken;
 
     function setUp() public {
         tellerV2 = new TellerV2_Override();
+
+        lendingToken = new ERC20("Wrapped Ether","WETH");
 
  
     }
@@ -50,7 +61,7 @@ contract TellerV2_initialize is Testable {
                 paymentCycle: 2000,
                 APR: 10
             }),
-            state: BidState.Accepted,
+            state: BidState.PENDING,
             paymentType: PaymentType.EMI 
          })
 

@@ -34,10 +34,12 @@ contract CollateralManager_Override is CollateralManager {
         _deposit(_bidId, collateralInfo);
     }
 
-    function setCollateral(uint256 bid, Collateral memory collateralInfo ) public {
 
-    
+    //force adds collateral info for a bid even if it doesnt exist (for testing)
+    function commitCollateralSuper(uint256 bidId, Collateral memory collateralInfo ) public {
 
+
+        super._commitCollateral(bidId, collateralInfo);
 
     }
 

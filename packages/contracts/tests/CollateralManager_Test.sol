@@ -274,7 +274,7 @@ contract CollateralManager_Test is Testable {
             _collateralAddress: address(wethMock)
         });
 
-        collateralManager.setCollateral(bidId, collateral);
+        collateralManager.commitCollateralSuper(bidId, collateral);
 
         Collateral[] memory collateralInfo = collateralManager.getCollateralInfo(bidId);
 
@@ -296,7 +296,7 @@ contract CollateralManager_Test is Testable {
             _collateralAddress: address(wethMock)
         });
 
-        collateralManager.setCollateral(bidId, collateral);
+        collateralManager.commitCollateralSuper(bidId, collateral);
 
         uint256 collateralAmount = collateralManager.getCollateralAmount(bidId,address(wethMock));
 
@@ -328,6 +328,16 @@ contract CollateralManager_Test is Testable {
      function test_isBidCollateralBacked_populated() public {
 
         uint256 bidId = 0;
+
+        Collateral memory collateral = Collateral({
+            _collateralType: CollateralType.ERC20,
+            _amount: 1000,
+            _tokenId: 0, 
+            _collateralAddress: address(wethMock)
+        });
+
+        collateralManager.commitCollateralSuper(bidId, collateral);
+
 
         bool collateralBacked = collateralManager.isBidCollateralBackedSuper(bidId);
 

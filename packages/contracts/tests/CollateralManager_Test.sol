@@ -138,6 +138,11 @@ contract CollateralManager_Test is Testable {
 
     function test_deployAndDeposit() public {} 
 
+    function test_deposit_internal() public {} 
+
+    function test_initialize() public {}
+ 
+
     function test_withdraw_external_invalid_bid_state() public {
 
         uint256 bidId = 0;
@@ -347,9 +352,21 @@ contract CollateralManager_Test is Testable {
 
 
 
-    function test_onERC721Received() public {} 
+    function test_onERC721Received() public {
 
-    function onERC1155Received() public {} 
+       bytes4 response = collateralManager.onERC721Received(address(this), address(borrower), 0, "");
+
+       assertEq(response, bytes4(keccak256("onERC721Received(address,address,uint256,bytes)")),"response is not correct");
+
+    }
+
+    function test_onERC1155Received() public {
+
+       bytes4 response = collateralManager.onERC1155Received(address(this), address(borrower), 0, 0, "");
+
+       assertEq(response, bytes4(keccak256("onERC1155Received(address,address,uint256,uint256,bytes)")),"response is not correct");
+
+    } 
     
 
 

@@ -72,6 +72,21 @@ contract MarketRegistry_Test is Testable {
     }
 
 
+    /*
+
+
+FNDA:0,MarketRegistry.initialize
+FNDA:0,MarketRegistry.updateMarketSettings
+FNDA:0,MarketRegistry.getMarketOwner
+FNDA:0,MarketRegistry.getAllVerifiedLendersForMarket
+FNDA:0,MarketRegistry.getAllVerifiedBorrowersForMarket
+FNDA:0,MarketRegistry._getStakeholdersForMarket
+FNDA:0,MarketRegistry._attestStakeholderViaDelegation
+
+
+    */
+
+
     function test_marketIsClosed() public {
       
         assertEq(

@@ -50,6 +50,13 @@ contract LenderManager_Test is Testable  {
       
     }
 
+
+    /*
+FNDA:0,LenderManager._getLoanMarketId
+FNDA:0,LenderManager._hasMarketVerification
+FNDA:0,LenderManager._baseURI
+    */
+
     function test_registerLoan() public {
       
 

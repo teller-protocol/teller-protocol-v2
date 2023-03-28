@@ -147,6 +147,13 @@ contract MarketLiquidityRewards_Test is Testable  {
         verifyCollateralAmountWasCalled = false;*/
     }
 
+    /*
+FNDA:0,MarketLiquidityRewards.initialize
+FNDA:0,MarketLiquidityRewards.updateAllocation
+FNDA:0,MarketLiquidityRewards._verifyCollateralAmount
+
+    */
+
     function _setAllocation(uint256 _allocationId) internal {
         uint256 rewardTokenAmount = 0;
 

@@ -160,6 +160,45 @@ contract TellerV2_Test is Testable {
         lender.acceptBid(_bidId);
     }
 
+
+
+
+    /*
+
+    FNDA:0,TellerV2.initialize
+    FNDA:0,TellerV2.setLenderManager
+    FNDA:0,TellerV2._setLenderManager
+    FNDA:0,TellerV2.getMetadataURI
+    FNDA:0,TellerV2.setReputationManager
+    FNDA:0,TellerV2.cancelBid
+    FNDA:0,TellerV2.marketOwnerCancelBid
+    FNDA:0,TellerV2._cancelBid
+    FNDA:0,TellerV2.claimLoanNFT
+    FNDA:0,TellerV2.repayLoanMinimum
+    FNDA:0,TellerV2.repayLoan
+    FNDA:0,TellerV2.pauseProtocol
+    FNDA:0,TellerV2.unpauseProtocol
+    FNDA:0,TellerV2.liquidateLoanFull
+    FNDA:0,TellerV2.calculateAmountOwed
+    FNDA:0,TellerV2.calculateAmountDue
+    FNDA:0,TellerV2.calculateAmountDue
+    FNDA:0,TellerV2.calculateNextDueDate
+    FNDA:0,TellerV2.isLoanLiquidateable
+    FNDA:0,TellerV2.getBorrowerActiveLoanIds
+    FNDA:0,TellerV2.getBorrowerLoanIds
+    FNDA:0,TellerV2.isLoanExpired
+    FNDA:0,TellerV2.lastRepaidTimestamp
+    FNDA:0,TellerV2.getLoanLender
+    FNDA:0,TellerV2.getLoanLendingToken
+    FNDA:0,TellerV2.getLoanMarketId
+    FNDA:0,TellerV2.getLoanSummary
+    FNDA:0,TellerV2._msgData
+
+
+
+    */
+
+
     function test_collateralEscrow() public {
         // Submit bid as borrower
         uint256 bidId = submitCollateralBid();

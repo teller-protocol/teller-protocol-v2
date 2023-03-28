@@ -19,6 +19,10 @@ contract TellerV2_Override is TellerV2 {
         bids[bidId] = bid;
     }
 
+    function mock_addUriToMapping(uint256 bidId, string memory uri) public {
+        uris[bidId] = uri;
+    }
+
     function setLenderManagerSuper(address lenderManager) public initializer {
         _setLenderManager(lenderManager);
     }

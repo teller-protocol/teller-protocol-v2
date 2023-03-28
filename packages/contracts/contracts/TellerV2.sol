@@ -245,7 +245,7 @@ contract TellerV2 is
             keccak256(abi.encodePacked(metadataURI_)) ==
             0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470 // hardcoded constant of keccak256('')
         ) {
-            // Return depreciated bytes32 uri as a string
+            // Return deprecated bytes32 uri as a string
             uint256 convertedURI = uint256(bids[_bidId]._metadataURI);
             metadataURI_ = StringsUpgradeable.toHexString(convertedURI, 32);
         }

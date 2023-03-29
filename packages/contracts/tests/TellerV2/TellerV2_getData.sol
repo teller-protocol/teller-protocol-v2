@@ -210,7 +210,7 @@ contract TellerV2_initialize is Testable {
         
     }
 
-    function test_getLoanLender() public {
+    function test_getLoanLender_without_nft() public {
             
             uint256 bidId = 1 ;
             setMockBid(1); 
@@ -221,7 +221,31 @@ contract TellerV2_initialize is Testable {
 
     }
 
-    function test_getLoanLendingToken() public {}
+
+ function test_getLoanLender_with_nft() public {
+            
+            uint256 bidId = 1 ;
+            setMockBid(1); 
+    
+            //todo mock nft 
+
+    }
+
+    function test_getLoanLendingToken() public {
+
+        uint256 bidId = 1 ;
+        setMockBid(1); 
+
+        address lendingToken = tellerV2.getLoanLendingToken(bidId);
+
+        assertEq(lendingToken,lendingToken,"unexpected lending token");
+
+    }
+
+
+
+
+    
 
     function test_getLoanMarketId() public {
                 

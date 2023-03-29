@@ -36,5 +36,8 @@ contract TellerV2_Override is TellerV2 {
         bidDefaultDuration[bidId] = defaultDuration;
     }
 
+    function mock_setBidExpirationTime(uint256 bidId, uint32 expirationTime) public {
+        bidExpirationTime[bidId] = expirationTime;
+    }
 
 }

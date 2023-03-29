@@ -152,7 +152,7 @@ contract TellerV2_initialize is Testable {
     function test_isLoanLiquidateable_true() public {
 
         uint256 bidId = 1 ;
-        setMockBid(1); 
+        setMockBid(bidId); 
 
         //set to accepted 
         tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
@@ -168,7 +168,36 @@ contract TellerV2_initialize is Testable {
 
     }
  
-    function test_isLoanExpired() public {} 
+    function test_isLoanExpired_false() public {
+
+        uint256 bidId = 1 ;
+        setMockBid(bidId); 
+
+        bool expired = tellerV2.isLoanExpired(bidId);
+
+        assertEq(expired, false); 
+
+    } 
+
+    function test_isLoanExpired_true() public {
+
+         uint256 bidId = 1 ;
+        setMockBid(bidId); 
+
+        tellerV2.mock_setBidState(bidId, BidState.PENDING);
+
+         tellerV2.mock_setBidExpirationTime(bidId, 1000);
+ 
+
+        //fast forward timestamp 
+        vm.warp(1000000000);
+
+        bool expired = tellerV2.isLoanExpired(bidId);
+
+        assertEq(expired, true); 
+
+    } 
+
 
     function test_lastRepaidTimestamp() public {
             

@@ -6,6 +6,10 @@ import { TellerV2, Bid, BidState, Collateral, Payment, LoanDetails, Terms } from
  
 
 contract TellerV2_Override is TellerV2 {
+
+
+    bool public cancelBidWasCalled; 
+
     constructor()
         TellerV2(address(0))
     {
@@ -47,6 +51,28 @@ contract TellerV2_Override is TellerV2 {
 
         __Pausable_init();
 
+    }
+
+
+    function _cancelBidSuper(
+        uint256 bidId
+    ) public {
+        super._cancelBid(bidId);
+    }
+
+
+
+    /*
+
+    Overrides 
+
+    */
+
+
+    function _cancelBid()
+    internal 
+    {
+        cancelBidWasCalled = true;
     }
 
 }

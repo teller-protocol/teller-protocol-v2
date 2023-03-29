@@ -20,7 +20,9 @@ contract TellerV2_initialize is Testable {
 
     TellerV2_Override tellerV2;
 
-    uint16 protocolFee = 5;
+    User borrower;
+    User lender;
+    User receiver; 
     
     ERC20 lendingToken;
 
@@ -45,8 +47,7 @@ contract TellerV2_initialize is Testable {
     FNDA:0,TellerV2.calculateNextDueDate
 
   
-    FNDA:0,TellerV2.getLoanLender 
-    FNDA:0,TellerV2.getLoanSummary
+    FNDA:0,TellerV2.getLoanLender  
 
  
     FNDA:0,TellerV2.getBorrowerActiveLoanIds
@@ -58,9 +59,9 @@ contract TellerV2_initialize is Testable {
 
          tellerV2.mock_setBid(bidId, Bid({
 
-            borrower: address(0x1234),
-            lender: address(0x1234),
-            receiver: address(0x1234),
+            borrower: address(borrower),
+            lender: address(lender),
+            receiver: address(receiver),
             marketplaceId: 100,
             _metadataURI: "0x1234",
 
@@ -203,9 +204,9 @@ contract TellerV2_initialize is Testable {
             uint256 bidId = 1 ;
             setMockBid(1); 
     
-            address lender = tellerV2.getLoanLender(bidId);
+            address lenderAddress = tellerV2.getLoanLender(bidId);
     
-            assertEq(lender, address(0x1234)); 
+            assertEq(lenderAddress, address(lender),"getLoanLender did not return correct result"); 
 
     }
 
@@ -246,7 +247,25 @@ contract TellerV2_initialize is Testable {
 
 }
 
-    function test_getLoanSummary() public {}
+    function test_getLoanSummary() public {
+
+        uint256 bidId = 1 ;
+        setMockBid(1); 
+
+        (address borrower,
+        address lender,
+        uint256 marketId,
+        address principalTokenAddress,
+        uint256 principalAmount,
+        uint32 acceptedTimestamp,
+        BidState bidState) = tellerV2.getLoanSummary(bidId);
+
+        assertEq(borrower, address(borrower), "unexpected borrower from summary");
+        assertEq(lender, address(lender), "unexpected lender from summary");
+        assertEq(marketId, 100, "unexpected marketId from summary");
+
+
+    }
 
   
 }

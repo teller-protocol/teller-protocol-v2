@@ -25,11 +25,10 @@ contract TellerV2_pause_test is Testable {
     ERC20 lendingToken;
 
     function setUp() public {
+        
         tellerV2 = new TellerV2_Override();
 
         lendingToken = new ERC20("Wrapped Ether","WETH");
-  
-
  
     }
 

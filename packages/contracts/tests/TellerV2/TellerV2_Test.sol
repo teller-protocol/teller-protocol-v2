@@ -162,25 +162,7 @@ contract TellerV2_Test is Testable {
 
 
 
-
-    /* 
-      
-    FNDA:0,TellerV2.cancelBid
-    FNDA:0,TellerV2.marketOwnerCancelBid
-    FNDA:0,TellerV2._cancelBid
-    FNDA:0,TellerV2.claimLoanNFT
-    FNDA:0,TellerV2.repayLoanMinimum
-    FNDA:0,TellerV2.repayLoan
-    FNDA:0,TellerV2.pauseProtocol
-    FNDA:0,TellerV2.unpauseProtocol
-    FNDA:0,TellerV2.liquidateLoanFull
  
-    FNDA:0,TellerV2._msgData
-
-
-
-    */
-
 
     function test_collateralEscrow() public {
         // Submit bid as borrower

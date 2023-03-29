@@ -40,4 +40,13 @@ contract TellerV2_Override is TellerV2 {
         bidExpirationTime[bidId] = expirationTime;
     }
 
+
+    function mock_initialize(  )  public initializer {
+
+         __ProtocolFee_init( 0 );
+
+        __Pausable_init();
+
+    }
+
 }

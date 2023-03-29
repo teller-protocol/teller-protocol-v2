@@ -44,23 +44,11 @@ contract TellerV2_initialize is Testable {
     FNDA:0,TellerV2.calculateAmountDue
     FNDA:0,TellerV2.calculateNextDueDate
 
-
-
-
-    FNDA:0,TellerV2.isLoanLiquidateable
-
-    FNDA:0,TellerV2.isLoanExpired
-
-    FNDA:0,TellerV2.lastRepaidTimestamp
-    FNDA:0,TellerV2.getLoanLender
-    FNDA:0,TellerV2.getLoanLendingToken
-    FNDA:0,TellerV2.getLoanMarketId
+  
+    FNDA:0,TellerV2.getLoanLender 
     FNDA:0,TellerV2.getLoanSummary
 
-
-
-
-
+ 
     FNDA:0,TellerV2.getBorrowerActiveLoanIds
     FNDA:0,TellerV2.getBorrowerLoanIds
 

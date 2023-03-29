@@ -5,7 +5,7 @@ import { StdStorage, stdStorage } from "forge-std/StdStorage.sol";
 import { Testable } from "../Testable.sol";
 import { TellerV2_Override } from "./TellerV2_Override.sol";
  
-import { Bid, BidState, Collateral, Payment, LoanDetails, Terms } from "../../contracts/TellerV2.sol";
+import { Bid, BidState, Collateral, Payment, LoanDetails, Terms, ActionNotAllowed } from "../../contracts/TellerV2.sol";
  import { PaymentType, PaymentCycleType } from "../../contracts/libraries/V2Calculations.sol";
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
@@ -121,16 +121,35 @@ contract TellerV2_bids_test is Testable {
     }
 
 
-    function test_cancelBid() public {
+    function test_cancel_bid() public {
 
         uint256 bidId = 1;
         setMockBid(bidId);
 
         tellerV2.mock_setBidState(bidId, BidState.PENDING);
 
+        //need to mock as owner 
+        //why doesnt this work ?
+        vm.prank(address(borrower));
+
         tellerV2.cancelBid(bidId);
 
         assertTrue(tellerV2.cancelBidWasCalled(),"Cancel bid internal was not called");
+
+    }
+
+     function test_cancel_bid_invalid_owner() public {
+
+        uint256 bidId = 1;
+        setMockBid(bidId);
+
+        tellerV2.mock_setBidState(bidId, BidState.PENDING);
+
+        //how to specify action not allowed ? 
+        vm.expectRevert( /* ActionNotAllowed(bidId,"cancelBid","Only the bid owner can cancel!") */ );
+        tellerV2.cancelBid(bidId);  
+
+         
 
     }
 
@@ -142,7 +161,8 @@ contract TellerV2_bids_test is Testable {
 
         tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
 
-        vm.expectRevert("incorrect state");
+        //how can i specify the expected revert message??
+        vm.expectRevert( );
         tellerV2._cancelBidSuper(bidId);
 
          

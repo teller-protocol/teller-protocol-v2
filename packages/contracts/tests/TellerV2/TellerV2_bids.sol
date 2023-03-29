@@ -22,9 +22,12 @@ contract TellerV2_bids_test is Testable {
     User borrower;
     User lender;
     User receiver; 
+
+    User marketOwner;
     
     ERC20 lendingToken;
 
+    uint256 marketplaceId = 100;
 
     function setUp() public {
         tellerV2 = new TellerV2_Override();
@@ -39,7 +42,7 @@ contract TellerV2_bids_test is Testable {
             borrower: address(borrower),
             lender: address(lender),
             receiver: address(receiver),
-            marketplaceId: 100,
+            marketplaceId: marketplaceId,
             _metadataURI: "0x1234",
 
             loanDetails: LoanDetails({
@@ -76,8 +79,10 @@ contract TellerV2_bids_test is Testable {
     todo 
 
     FNDA:0,TellerV2.cancelBid
-    FNDA:0,TellerV2.marketOwnerCancelBid
     FNDA:0,TellerV2._cancelBid
+
+    FNDA:0,TellerV2.marketOwnerCancelBid
+  
     FNDA:0,TellerV2.claimLoanNFT
     FNDA:0,TellerV2.repayLoanMinimum
     FNDA:0,TellerV2.repayLoan
@@ -182,7 +187,34 @@ contract TellerV2_bids_test is Testable {
 
         require(state == BidState.CANCELLED,"bid was not cancelled");
 
-         
+    }
+
+
+    function test_market_owner_cancel_bid() public {
+
+         uint256 bidId = 1;
+        setMockBid(bidId);
+
+        //need to mock set market owner 
+
+        //why doesnt this work ?
+        vm.prank(address(marketOwner));
+
+        tellerV2.marketOwnerCancelBid(bidId);
+
+        assertTrue(tellerV2.cancelBidWasCalled(),"Cancel bid internal was not called");
+
+    }
+
+    function test_market_owner_cancel_bid_invalid_owner() public {
+
+         uint256 bidId = 1;
+        setMockBid(bidId);
+    
+        vm.expectRevert();
+
+        tellerV2.marketOwnerCancelBid(bidId);
+ 
     }
     
     

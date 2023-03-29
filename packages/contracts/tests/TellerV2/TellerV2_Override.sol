@@ -26,4 +26,15 @@ contract TellerV2_Override is TellerV2 {
     function setLenderManagerSuper(address lenderManager) public initializer {
         _setLenderManager(lenderManager);
     }
+
+
+    function mock_setBidState(uint256 bidId, BidState state) public {
+        bids[bidId].state = state;
+    }  
+
+    function mock_setBidDefaultDuration(uint256 bidId, uint32 defaultDuration) public {
+        bidDefaultDuration[bidId] = defaultDuration;
+    }
+
+
 }

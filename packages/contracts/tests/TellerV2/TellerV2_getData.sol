@@ -155,8 +155,12 @@ contract TellerV2_initialize is Testable {
         setMockBid(1); 
 
         //set to accepted 
+        tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
 
-        vm.warp(1000000);
+        tellerV2.mock_setBidDefaultDuration(bidId, 1000);
+
+        //fast forward timestamp 
+        vm.warp(1000000000);
 
         bool liquidateable = tellerV2.isLoanLiquidateable(bidId);
 
@@ -185,14 +189,21 @@ contract TellerV2_initialize is Testable {
             address lender = tellerV2.getLoanLender(bidId);
     
             assertEq(lender, address(0x1234)); 
-    
-
 
     }
 
     function test_getLoanLendingToken() public {}
 
-    function test_getLoanMarketId() public {}
+    function test_getLoanMarketId() public {
+                
+        uint256 bidId = 1 ;
+        setMockBid(1); 
+
+        uint256 marketId = tellerV2.getLoanMarketId(bidId);
+
+        assertEq(marketId, 100);
+
+}
 
     function test_getLoanSummary() public {}
 

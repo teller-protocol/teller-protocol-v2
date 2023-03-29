@@ -83,9 +83,10 @@ contract TellerV2_bids_test is Testable {
 
     FNDA:0,TellerV2.marketOwnerCancelBid
   
-    FNDA:0,TellerV2.claimLoanNFT
+   
     FNDA:0,TellerV2.repayLoanMinimum
     FNDA:0,TellerV2.repayLoan
+     FNDA:0,TellerV2.claimLoanNFT
    
     FNDA:0,TellerV2.liquidateLoanFull
 
@@ -216,6 +217,22 @@ contract TellerV2_bids_test is Testable {
         tellerV2.marketOwnerCancelBid(bidId);
  
     }
+
+
+    function test_repay_loan_minimum() public {} 
+
+
+    function test_repay_loan() public {} 
+
+
+    function test_liquidate_loan_full() public {} 
+
+
+
+    function test_claim_loan_nft() public {} 
+ 
+
+
     
     
 }

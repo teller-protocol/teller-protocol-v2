@@ -251,10 +251,10 @@ contract TellerV2_bids_test is Testable {
 
      function test_repay_loan_internal() public {
 
-          uint256 bidId = 1;
+        uint256 bidId = 1;
         setMockBid(bidId);
 
-
+         tellerV2.setMockMsgSenderForMarket(address(this));
         tellerV2.setReputationManagerSuper(address(reputationManagerMock));
 
         tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
@@ -265,6 +265,8 @@ contract TellerV2_bids_test is Testable {
             interest:10
         });
 
+
+        lendingToken.approve(address(tellerV2), 1e20);
 
         tellerV2._repayLoanSuper(bidId,payment,100,false);
 
@@ -362,6 +364,10 @@ contract TellerV2_bids_test is Testable {
 
          uint256 bidId = 1;
         setMockBid(bidId);
+
+
+        tellerV2.setReputationManagerSuper(address(reputationManagerMock));
+
 
         tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
         vm.warp(2000 * 1e20);  

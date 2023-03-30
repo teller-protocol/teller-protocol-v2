@@ -3,12 +3,15 @@ pragma solidity ^0.8.0;
 
 import { TellerV2, Bid, BidState, Collateral, Payment, LoanDetails, Terms } from "../../contracts/TellerV2.sol";
 
- 
+ import "../../contracts/interfaces/IMarketRegistry.sol";
 
 contract TellerV2_Override is TellerV2 {
 
 
     bool public cancelBidWasCalled; 
+    address public mockMsgSenderForMarket;
+
+
 
     constructor()
         TellerV2(address(0))
@@ -30,6 +33,12 @@ contract TellerV2_Override is TellerV2 {
     function setLenderManagerSuper(address lenderManager) public initializer {
         _setLenderManager(lenderManager);
     }
+    
+    function setMarketRegistrySuper(address _marketRegistry) public initializer {
+        
+        marketRegistry = IMarketRegistry(_marketRegistry);
+    }
+
 
 
     function mock_setBidState(uint256 bidId, BidState state) public {
@@ -53,6 +62,10 @@ contract TellerV2_Override is TellerV2 {
 
     }
 
+    function setMockMsgSenderForMarket(address _sender) public {
+        mockMsgSenderForMarket = _sender;
+    }
+
 
     function _cancelBidSuper(
         uint256 bidId
@@ -68,9 +81,21 @@ contract TellerV2_Override is TellerV2 {
 
     */
 
+    function _msgSenderForMarket(uint256 _marketId)
+        internal
+        view
+        override
+        returns (address)
+    {
+        return mockMsgSenderForMarket;
+    }
 
-    function _cancelBid()
+
+
+
+    function _cancelBid(uint256 _bidId)
     internal 
+    override
     {
         cancelBidWasCalled = true;
     }

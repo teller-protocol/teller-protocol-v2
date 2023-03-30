@@ -11,6 +11,7 @@ import { Bid, BidState, Collateral, Payment, LoanDetails, Terms, ActionNotAllowe
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 
+import "lib/forge-std/src/console.sol";
 
 contract TellerV2_bids_test is Testable {
     using stdStorage for StdStorage;
@@ -24,6 +25,8 @@ contract TellerV2_bids_test is Testable {
     User receiver; 
 
     User marketOwner;
+
+    MarketRegistryMock marketRegistryMock;
     
     ERC20 lendingToken;
 
@@ -32,7 +35,15 @@ contract TellerV2_bids_test is Testable {
     function setUp() public {
         tellerV2 = new TellerV2_Override();
 
-        stdstore.target(address(tellerV2)).sig("marketRegistry()").checked_write(address(0x1234));
+        marketRegistryMock = new MarketRegistryMock();
+
+        borrower = new User();
+        lender = new User();
+        receiver = new User();
+
+        marketOwner = new User();
+         
+        //stdstore.target(address(tellerV2)).sig("marketRegistry()").checked_write(address(0x1234));
     }
 
      function setMockBid(uint256 bidId) public {
@@ -135,7 +146,7 @@ contract TellerV2_bids_test is Testable {
         tellerV2.mock_setBidState(bidId, BidState.PENDING);
 
         //need to mock as owner 
-        //why doesnt this work ?
+        tellerV2.setMockMsgSenderForMarket(address(borrower));
         vm.prank(address(borrower));
 
         tellerV2.cancelBid(bidId);
@@ -149,6 +160,7 @@ contract TellerV2_bids_test is Testable {
         uint256 bidId = 1;
         setMockBid(bidId);
 
+        tellerV2.setMockMsgSenderForMarket(address(lender));
         tellerV2.mock_setBidState(bidId, BidState.PENDING);
 
         //how to specify action not allowed ? 
@@ -198,6 +210,9 @@ contract TellerV2_bids_test is Testable {
 
         //need to mock set market owner 
 
+        tellerV2.setMarketRegistrySuper(address( marketRegistryMock ));
+        marketRegistryMock.setGlobalMarketOwner(address(marketOwner));
+
         //why doesnt this work ?
         vm.prank(address(marketOwner));
 
@@ -241,3 +256,19 @@ contract TellerV2_bids_test is Testable {
 contract User {} 
 
  
+
+ contract MarketRegistryMock {
+
+
+    address public globalMarketOwner;
+
+    function setGlobalMarketOwner(address _globalMarketOwner) public {
+        globalMarketOwner = _globalMarketOwner;
+    }
+
+    function getMarketOwner(uint256 marketId) public returns (address){
+        return globalMarketOwner;
+    }
+
+
+ }

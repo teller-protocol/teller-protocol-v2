@@ -450,6 +450,7 @@ contract TellerV2 is
      */
     function _cancelBid(uint256 _bidId)
         internal
+        virtual
         pendingBid(_bidId, "cancelBid")
     {
         // Set the bid state to CANCELLED

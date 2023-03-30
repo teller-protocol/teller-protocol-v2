@@ -9,7 +9,6 @@ import "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
 import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "../contracts/interfaces/IWETH.sol";
 
 import "./tokens/TestERC20Token.sol";
 import "./tokens/TestERC721Token.sol";

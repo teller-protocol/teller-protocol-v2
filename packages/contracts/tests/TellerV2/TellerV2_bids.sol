@@ -10,6 +10,7 @@ import { Bid, BidState, Collateral, Payment, LoanDetails, Terms, ActionNotAllowe
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
+import "../tokens/TestERC20Token.sol"; 
 
 import "lib/forge-std/src/console.sol";
 
@@ -19,6 +20,9 @@ contract TellerV2_bids_test is Testable {
     TellerV2_Override tellerV2;
 
 
+    TestERC20Token lendingToken;
+
+    TestERC20Token lendingTokenZeroDecimals;
 
     User borrower;
     User lender;
@@ -27,8 +31,7 @@ contract TellerV2_bids_test is Testable {
     User marketOwner;
 
     MarketRegistryMock marketRegistryMock;
-    
-    ERC20 lendingToken;
+     
 
     uint256 marketplaceId = 100;
 
@@ -42,7 +45,11 @@ contract TellerV2_bids_test is Testable {
         receiver = new User();
 
         marketOwner = new User();
-         
+
+        lendingToken = new TestERC20Token("Wrapped Ether","WETH",1e30,18);
+        lendingTokenZeroDecimals = new TestERC20Token("Wrapped Ether","WETH",1e16,0);
+
+
         //stdstore.target(address(tellerV2)).sig("marketRegistry()").checked_write(address(0x1234));
     }
 
@@ -224,7 +231,7 @@ contract TellerV2_bids_test is Testable {
 
     function test_market_owner_cancel_bid_invalid_owner() public {
 
-         uint256 bidId = 1;
+        uint256 bidId = 1;
         setMockBid(bidId);
     
         vm.expectRevert();
@@ -234,7 +241,62 @@ contract TellerV2_bids_test is Testable {
     }
 
 
-    function test_repay_loan_minimum() public {} 
+    function test_repay_loan_minimum() public {
+
+
+        uint256 bidId = 1;
+        setMockBid(bidId);
+
+        tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
+        vm.warp(2000);  
+
+
+        //set the account that will be paying the loan off
+        tellerV2.setMockMsgSenderForMarket(address(this));
+
+
+        //need to get some weth 
+
+        lendingToken.approve(address(tellerV2), 1e20);
+
+        tellerV2.repayLoanMinimum(bidId);
+
+
+    } 
+
+
+    function test_repay_loan_minimum_invalid_balance() public {
+
+
+        uint256 bidId = 1;
+        setMockBid(bidId);
+
+        tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
+
+    
+        //need to get some weth 
+        vm.prank(address(borrower));    
+        //expect arithmetic overflow
+        vm.expectRevert();
+
+        tellerV2.repayLoanMinimum(bidId);
+
+    } 
+
+      function test_repay_loan_minimum_invalid_state() public {
+
+
+        uint256 bidId = 1;
+        setMockBid(bidId);
+
+        tellerV2.mock_setBidState(bidId, BidState.PENDING);
+
+        //how can i fill in a specific revert message ?
+        vm.expectRevert();
+        tellerV2.repayLoanMinimum(bidId);
+
+
+    } 
 
 
     function test_repay_loan() public {} 

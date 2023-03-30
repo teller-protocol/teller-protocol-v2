@@ -241,6 +241,32 @@ contract TellerV2_bids_test is Testable {
     }
 
 
+/*
+
+make this pass ! 
+
+
+
+     function test_repay_loan_internal() public {
+
+          uint256 bidId = 1;
+        setMockBid(bidId);
+
+        tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
+        vm.warp(2000);  
+
+        Payment memory payment = Payment({
+            principal:90,
+            interest:10
+        });
+
+
+        tellerV2._repayLoanSuper(bidId,payment,100,false);
+
+
+     }*/
+
+
     function test_repay_loan_minimum() public {
 
 
@@ -260,6 +286,8 @@ contract TellerV2_bids_test is Testable {
         lendingToken.approve(address(tellerV2), 1e20);
 
         tellerV2.repayLoanMinimum(bidId);
+
+        assertTrue(tellerV2.repayLoanWasCalled(),"repay loan was not called");
 
 
     } 
@@ -299,14 +327,62 @@ contract TellerV2_bids_test is Testable {
     } 
 
 
-    function test_repay_loan() public {} 
+    function test_repay_loan() public {
+
+        uint256 bidId = 1;
+        setMockBid(bidId);
+
+        tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
+        vm.warp(2000);  
 
 
-    function test_liquidate_loan_full() public {} 
+        //set the account that will be paying the loan off
+        tellerV2.setMockMsgSenderForMarket(address(this));
+
+
+        //need to get some weth 
+
+        lendingToken.approve(address(tellerV2), 1e20);
+
+        tellerV2.repayLoan(bidId, 100);
+
+        assertTrue(tellerV2.repayLoanWasCalled(),"repay loan was not called");
+
+
+    } 
+
+
+    function test_liquidate_loan_full() public {
+
+         uint256 bidId = 1;
+        setMockBid(bidId);
+
+        tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
+        vm.warp(2000 * 1e20);  
+
+        tellerV2.mock_setBidDefaultDuration(bidId,1000);
+
+
+        //set the account that will be paying the loan off
+        tellerV2.setMockMsgSenderForMarket(address(this));
+
+
+        //need to get some weth 
+        lendingToken.approve(address(tellerV2), 1e20);
+
+        //why does this fail !? 
+        tellerV2.liquidateLoanFull(bidId);
+
+        assertTrue(tellerV2.repayLoanWasCalled(),"repay loan was not called");
+
+    } 
 
 
 
-    function test_claim_loan_nft() public {} 
+    function test_claim_loan_nft() public {
+
+        
+    } 
  
 
 

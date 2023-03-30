@@ -9,6 +9,7 @@ contract TellerV2_Override is TellerV2 {
 
 
     bool public cancelBidWasCalled; 
+    bool public repayLoanWasCalled;
     address public mockMsgSenderForMarket;
 
 
@@ -72,6 +73,15 @@ contract TellerV2_Override is TellerV2 {
     ) public {
         super._cancelBid(bidId);
     }
+    
+    function _repayLoanSuper( 
+         uint256 _bidId,
+        Payment memory _payment,
+        uint256 _owedAmount,
+        bool _shouldWithdrawCollateral)
+    public {
+        super._repayLoan(_bidId, _payment, _owedAmount, _shouldWithdrawCollateral);
+    }
 
 
 
@@ -98,6 +108,16 @@ contract TellerV2_Override is TellerV2 {
     override
     {
         cancelBidWasCalled = true;
+    }
+
+    function _repayLoan(
+        uint256 _bidId,
+        Payment memory _payment,
+        uint256 _owedAmount,
+        bool _shouldWithdrawCollateral
+    ) internal override {
+
+        repayLoanWasCalled = true;
     }
 
 }

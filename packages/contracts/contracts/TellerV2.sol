@@ -711,7 +711,7 @@ contract TellerV2 is
         Payment memory _payment,
         uint256 _owedAmount,
         bool _shouldWithdrawCollateral
-    ) internal {
+    ) internal virtual {
         Bid storage bid = bids[_bidId];
         uint256 paymentAmount = _payment.principal + _payment.interest;
 

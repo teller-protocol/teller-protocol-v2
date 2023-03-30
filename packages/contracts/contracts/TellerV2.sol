@@ -679,8 +679,7 @@ contract TellerV2 is
         require(isLoanLiquidateable(_bidId), "Loan must be liquidateable.");
 
         Bid storage bid = bids[_bidId];
-
-        console.log("abt to liq");
+ 
 
         (uint256 owedPrincipal, , uint256 interest) = V2Calculations
             .calculateAmountOwed(
@@ -688,9 +687,6 @@ contract TellerV2 is
                 block.timestamp,
                 bidPaymentCycleType[_bidId]
             );
-
-        console.logUint(owedPrincipal);
-        console.logUint(interest);
         _repayLoan(
             _bidId,
             Payment({ principal: owedPrincipal, interest: interest }),
@@ -699,9 +695,7 @@ contract TellerV2 is
         );
 
         bid.state = BidState.LIQUIDATED;
-
-         console.log("abt to liq collateral"); 
-
+ 
         // If loan is backed by collateral, withdraw and send to the liquidator
         address liquidator = _msgSenderForMarket(bid.marketplaceId);
         collateralManager.liquidateCollateral(_bidId, liquidator);

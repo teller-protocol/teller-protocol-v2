@@ -367,7 +367,7 @@ contract TellerV2_bids_test is Testable {
  
     function test_liquidate_loan_full() public {
 
-         uint256 bidId = 1;
+        uint256 bidId = 1;
         setMockBid(bidId);
 
         tellerV2.setCollateralManagerSuper(address(collateralManagerMock));
@@ -383,16 +383,42 @@ contract TellerV2_bids_test is Testable {
         //set the account that will be paying the loan off
         tellerV2.setMockMsgSenderForMarket(address(this));
 
-
-        //need to get some weth 
+ 
         lendingToken.approve(address(tellerV2), 1e20);
-
-        //why does this fail !? 
+ 
         tellerV2.liquidateLoanFull(bidId);
 
         assertTrue(tellerV2.repayLoanWasCalled(),"repay loan was not called");
 
     } 
+
+     function test_liquidate_loan_full_invalid_state() public {
+
+         uint256 bidId = 1;
+        setMockBid(bidId);
+
+        tellerV2.setCollateralManagerSuper(address(collateralManagerMock));
+        
+
+        tellerV2.mock_setBidState(bidId, BidState.PAID);
+        vm.warp(2000 * 1e20);  
+
+        tellerV2.mock_setBidDefaultDuration(bidId,1000);
+
+
+        //set the account that will be paying the loan off
+        tellerV2.setMockMsgSenderForMarket(address(this));
+
+ 
+        lendingToken.approve(address(tellerV2), 1e20);
+    
+        vm.expectRevert(
+             abi.encodeWithSelector( ActionNotAllowed.selector,bidId, "liquidateLoan" , "Loan must be accepted")
+           );
+        tellerV2.liquidateLoanFull(bidId);
+
+
+     }
 
 
 

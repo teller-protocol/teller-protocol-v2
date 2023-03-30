@@ -24,6 +24,8 @@ import "./libraries/NumbersLib.sol";
 import { BokkyPooBahsDateTimeLibrary as BPBDTL } from "./libraries/DateTimeLib.sol";
 import { V2Calculations, PaymentCycleType } from "./libraries/V2Calculations.sol";
 
+import "lib/forge-std/src/console.sol";
+
 /* Errors */
 /**
  * @notice This error is reverted when the action isn't allowed
@@ -715,10 +717,17 @@ contract TellerV2 is
         Bid storage bid = bids[_bidId];
         uint256 paymentAmount = _payment.principal + _payment.interest;
 
+        console.logUint(paymentAmount);
+
+        console.logUint(_owedAmount);
+
         RepMark mark = reputationManager.updateAccountReputation(
             bid.borrower,
             _bidId
         );
+
+
+         console.log("updated rep");
 
         // Check if we are sending a payment or amount remaining
         if (paymentAmount >= _owedAmount) {
@@ -737,8 +746,11 @@ contract TellerV2 is
         } else {
             emit LoanRepayment(_bidId);
         }
-
+    
         address lender = getLoanLender(_bidId);
+
+
+        console.logAddress(address(lender));
 
         // Send payment to the lender
         bid.loanDetails.lendingToken.safeTransferFrom(
@@ -747,14 +759,29 @@ contract TellerV2 is
             paymentAmount
         );
 
+
+        console.logUint(_payment.principal);
+
         // update our mappings
         bid.loanDetails.totalRepaid.principal += _payment.principal;
         bid.loanDetails.totalRepaid.interest += _payment.interest;
         bid.loanDetails.lastRepaidTimestamp = uint32(block.timestamp);
 
+
+
+        console.logUint(_payment.interest);
+
+
         // If the loan is paid in full and has a mark, we should update the current reputation
         if (mark != RepMark.Good) {
+
+
+              console.logUint(_payment.interest);
+
             reputationManager.updateAccountReputation(bid.borrower, _bidId);
+
+
+              console.logUint(_payment.interest);
         }
     }
 

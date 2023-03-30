@@ -4,6 +4,7 @@ pragma solidity ^0.8.0;
 import { TellerV2, Bid, BidState, Collateral, Payment, LoanDetails, Terms } from "../../contracts/TellerV2.sol";
 
  import "../../contracts/interfaces/IMarketRegistry.sol";
+ import "../../contracts/interfaces/IReputationManager.sol";
 
 contract TellerV2_Override is TellerV2 {
 
@@ -38,6 +39,10 @@ contract TellerV2_Override is TellerV2 {
     function setMarketRegistrySuper(address _marketRegistry) public initializer {
         
         marketRegistry = IMarketRegistry(_marketRegistry);
+    }
+
+    function setReputationManagerSuper(address _reputationManager) public initializer {
+        reputationManager = IReputationManager(_reputationManager);
     }
 
 

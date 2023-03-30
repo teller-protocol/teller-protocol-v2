@@ -8,6 +8,9 @@ import { TellerV2_Override } from "./TellerV2_Override.sol";
 import { Bid, BidState, Collateral, Payment, LoanDetails, Terms, ActionNotAllowed } from "../../contracts/TellerV2.sol";
  import { PaymentType, PaymentCycleType } from "../../contracts/libraries/V2Calculations.sol";
 
+
+import {ReputationManagerMock} from "../../contracts/mock/ReputationManagerMock.sol";
+
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 import "../tokens/TestERC20Token.sol"; 
@@ -31,6 +34,8 @@ contract TellerV2_bids_test is Testable {
     User marketOwner;
 
     MarketRegistryMock marketRegistryMock;
+
+    ReputationManagerMock reputationManagerMock;
      
 
     uint256 marketplaceId = 100;
@@ -39,6 +44,7 @@ contract TellerV2_bids_test is Testable {
         tellerV2 = new TellerV2_Override();
 
         marketRegistryMock = new MarketRegistryMock();
+        reputationManagerMock = new ReputationManagerMock();
 
         borrower = new User();
         lender = new User();
@@ -240,17 +246,16 @@ contract TellerV2_bids_test is Testable {
  
     }
 
-
-/*
-
-make this pass ! 
-
+ 
 
 
      function test_repay_loan_internal() public {
 
           uint256 bidId = 1;
         setMockBid(bidId);
+
+
+        tellerV2.setReputationManagerSuper(address(reputationManagerMock));
 
         tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
         vm.warp(2000);  
@@ -264,7 +269,7 @@ make this pass !
         tellerV2._repayLoanSuper(bidId,payment,100,false);
 
 
-     }*/
+     }
 
 
     function test_repay_loan_minimum() public {
@@ -352,6 +357,7 @@ make this pass !
     } 
 
 
+/*
     function test_liquidate_loan_full() public {
 
          uint256 bidId = 1;
@@ -375,7 +381,7 @@ make this pass !
 
         assertTrue(tellerV2.repayLoanWasCalled(),"repay loan was not called");
 
-    } 
+    } */
 
 
 

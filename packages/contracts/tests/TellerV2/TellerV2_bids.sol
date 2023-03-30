@@ -11,6 +11,7 @@ import { Bid, BidState, Collateral, Payment, LoanDetails, Terms, ActionNotAllowe
 
 import {ReputationManagerMock} from "../../contracts/mock/ReputationManagerMock.sol";
 import {CollateralManagerMock} from "../../contracts/mock/CollateralManagerMock.sol";
+import {LenderManagerMock} from "../../contracts/mock/LenderManagerMock.sol";
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
@@ -38,6 +39,7 @@ contract TellerV2_bids_test is Testable {
 
     ReputationManagerMock reputationManagerMock;
     CollateralManagerMock collateralManagerMock;
+    LenderManagerMock lenderManagerMock;
      
 
     uint256 marketplaceId = 100;
@@ -48,6 +50,7 @@ contract TellerV2_bids_test is Testable {
         marketRegistryMock = new MarketRegistryMock();
         reputationManagerMock = new ReputationManagerMock();
         collateralManagerMock = new CollateralManagerMock();
+        lenderManagerMock = new LenderManagerMock();
 
         borrower = new User();
         lender = new User();
@@ -394,7 +397,7 @@ contract TellerV2_bids_test is Testable {
 
      function test_liquidate_loan_full_invalid_state() public {
 
-         uint256 bidId = 1;
+        uint256 bidId = 1;
         setMockBid(bidId);
 
         tellerV2.setCollateralManagerSuper(address(collateralManagerMock));
@@ -421,12 +424,45 @@ contract TellerV2_bids_test is Testable {
      }
 
 
-
+    /*
+    This specifically works in conjunction with the lender manager 
+    */
     function test_claim_loan_nft() public {
-
+        uint256 bidId = 1;
+        setMockBid(bidId);  
         
+
+        tellerV2.setLenderManagerSuper(address(lenderManagerMock)); 
+
+
+        tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
+
+        tellerV2.setMockMsgSenderForMarket(address(lender));
+        vm.prank(address(lender));
+
+        tellerV2.claimLoanNFT(bidId);
+
     } 
  
+
+     function test_claim_loan_nft_invalid_as_borrower() public {
+        uint256 bidId = 1;
+        setMockBid(bidId);  
+        
+
+        tellerV2.setLenderManagerSuper(address(lenderManagerMock)); 
+
+
+        tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
+
+        tellerV2.setMockMsgSenderForMarket(address(borrower));
+        vm.prank(address(borrower));
+
+        vm.expectRevert("only lender can claim NFT");
+
+        tellerV2.claimLoanNFT(bidId);
+
+    } 
 
 
     

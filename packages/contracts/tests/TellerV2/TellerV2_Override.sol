@@ -5,7 +5,9 @@ import { TellerV2, Bid, BidState, Collateral, Payment, LoanDetails, Terms } from
 
  import "../../contracts/interfaces/IMarketRegistry.sol";
  import "../../contracts/interfaces/IReputationManager.sol";
+ import "../../contracts/interfaces/ICollateralManager.sol";
 
+ 
 contract TellerV2_Override is TellerV2 {
 
 
@@ -40,6 +42,13 @@ contract TellerV2_Override is TellerV2 {
         
         marketRegistry = IMarketRegistry(_marketRegistry);
     }
+
+    function setCollateralManagerSuper(address _collateralManager) public initializer {
+        
+        collateralManager = ICollateralManager(_collateralManager);
+    }
+
+
 
     function setReputationManagerSuper(address _reputationManager) public initializer {
         reputationManager = IReputationManager(_reputationManager);

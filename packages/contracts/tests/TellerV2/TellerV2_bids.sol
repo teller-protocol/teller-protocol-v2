@@ -10,6 +10,7 @@ import { Bid, BidState, Collateral, Payment, LoanDetails, Terms, ActionNotAllowe
 
 
 import {ReputationManagerMock} from "../../contracts/mock/ReputationManagerMock.sol";
+import {CollateralManagerMock} from "../../contracts/mock/CollateralManagerMock.sol";
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
@@ -36,6 +37,7 @@ contract TellerV2_bids_test is Testable {
     MarketRegistryMock marketRegistryMock;
 
     ReputationManagerMock reputationManagerMock;
+    CollateralManagerMock collateralManagerMock;
      
 
     uint256 marketplaceId = 100;
@@ -45,6 +47,7 @@ contract TellerV2_bids_test is Testable {
 
         marketRegistryMock = new MarketRegistryMock();
         reputationManagerMock = new ReputationManagerMock();
+        collateralManagerMock = new CollateralManagerMock();
 
         borrower = new User();
         lender = new User();
@@ -254,7 +257,9 @@ contract TellerV2_bids_test is Testable {
         uint256 bidId = 1;
         setMockBid(bidId);
 
+        //set address(this) as the account that will be paying off the loan
          tellerV2.setMockMsgSenderForMarket(address(this));
+
         tellerV2.setReputationManagerSuper(address(reputationManagerMock));
 
         tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
@@ -359,14 +364,14 @@ contract TellerV2_bids_test is Testable {
     } 
 
 
-/*
+ 
     function test_liquidate_loan_full() public {
 
          uint256 bidId = 1;
         setMockBid(bidId);
 
-
-        tellerV2.setReputationManagerSuper(address(reputationManagerMock));
+        tellerV2.setCollateralManagerSuper(address(collateralManagerMock));
+        //tellerV2.setReputationManagerSuper(address(reputationManagerMock));
 
 
         tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
@@ -387,7 +392,7 @@ contract TellerV2_bids_test is Testable {
 
         assertTrue(tellerV2.repayLoanWasCalled(),"repay loan was not called");
 
-    } */
+    } 
 
 
 

@@ -195,6 +195,26 @@ contract CollateralEscrow_Test is Testable {
         assertEq(storedBalance, 1, "Escrow deposit unsuccessful");
     }
 
+
+    function test_depositAsset_ERC721_double_collateral_overwrite_prevention() public {
+        uint256 tokenIdA =  erc721Mock.mint(address(borrower));
+        uint256 tokenIdB =  erc721Mock.mint(address(borrower));
+
+        borrower.approveERC721(address(erc721Mock), tokenIdA);  
+        borrower.approveERC721(address(erc721Mock), tokenIdB);         
+
+        borrower.deposit(CollateralType.ERC721, address(erc721Mock), 1, tokenIdA);
+
+        uint256 storedBalance = borrower.getBalance(address(erc721Mock));
+
+        assertEq(storedBalance, 1, "Escrow deposit unsuccessful");
+
+        vm.expectRevert("Unable to deposit multiple collateral asset instances of the same contract address.");
+        borrower.deposit(CollateralType.ERC721, address(erc721Mock), 1, tokenIdB);
+
+    }
+
+
      function test_depositAsset_ERC1155() public {
         uint256 tokenId = erc1155Mock.mint(address(borrower));
 

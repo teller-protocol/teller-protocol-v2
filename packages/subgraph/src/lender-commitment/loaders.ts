@@ -1,6 +1,7 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 
 import { Commitment } from "../../generated/schema";
+
 import { CommitmentStatus, commitmentStatusToString } from "./utils";
 
 /**

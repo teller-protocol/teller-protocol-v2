@@ -23,7 +23,8 @@ import {
   loadLenderByMarketId,
   loadMarketById,
   loadMarketTokenVolume,
-  loadProtocolTokenVolume
+  loadProtocolTokenVolume,
+  loadToken
 } from "./helpers/loaders";
 import {
   PaymentEventType,
@@ -59,9 +60,9 @@ export function handleSubmittedBid(event: SubmittedBid): void {
     bid.metadataURI = tellerV2Instance.getMetadataURI(event.params.bidId);
   }
 
-  const lendingTokenAddress = storedBid.value5.lendingToken;
-  bid.lendingToken = lendingTokenAddress.toHexString();
-  bid.lendingTokenAddress = lendingTokenAddress;
+  const lendingToken = loadToken(storedBid.value5.lendingToken);
+  bid.lendingToken = lendingToken.id;
+  bid.lendingTokenAddress = lendingToken.address;
   bid.receiverAddress = storedBid.value1;
   bid.principal = storedBid.value5.principal;
   bid.loanDuration = storedBid.value5.loanDuration;
@@ -80,7 +81,7 @@ export function handleSubmittedBid(event: SubmittedBid): void {
   bid.marketplace = market.id;
   bid.marketplaceId = BigInt.fromString(market.id);
 
-  loadBorrowerTokenVolume(lendingTokenAddress, borrower);
+  loadBorrowerTokenVolume(lendingToken.id, borrower);
 
   if (!tellerV2Instance.try_bidExpirationTime(event.params.bidId).reverted) {
     bid.expiresAt = event.block.timestamp.plus(
@@ -210,13 +211,12 @@ export function handleLoanLiquidateds(events: LoanLiquidated[]): void {
 
 export function handleFeePaid(event: FeePaid): void {
   const bid: Bid = loadBidById(event.params.bidId);
-  const lendingTokenAddress = Address.fromBytes(bid.lendingTokenAddress);
 
   if (
     event.params.feeType.toHexString() ==
     "0xfb342fa999fea16067b1f01baf96673f31a25f2b1443e6754d93fc40b57e8df2" // bytes value of "protocol"
   ) {
-    const protocolVolume = loadProtocolTokenVolume(lendingTokenAddress);
+    const protocolVolume = loadProtocolTokenVolume(bid.lendingToken);
     protocolVolume.commissionEarned = protocolVolume.commissionEarned.plus(
       event.params.amount
     );
@@ -228,7 +228,7 @@ export function handleFeePaid(event: FeePaid): void {
     "0xcef6e888ca344077e889d6d961447b180a6f2c1f8a3a4b954e2385449143c6c8" // bytes value of "marketplace"
   ) {
     const marketVolume = loadMarketTokenVolume(
-      lendingTokenAddress,
+      bid.lendingToken,
       bid.marketplaceId.toString()
     );
     marketVolume.commissionEarned = marketVolume.commissionEarned.plus(

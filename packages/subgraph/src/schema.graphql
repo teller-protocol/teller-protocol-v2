@@ -84,7 +84,7 @@ type Bid @entity {
   _lastTotalRepaidInterestAmount: BigInt!
   paymentDefaultDuration: BigInt!
   collateralEscrow: Bytes
-  collateral: [BidCollateral!] @derivedFrom(field: "bid")
+  collateral: [BidCollateral!]
 }
 
 type BidCollateral @entity {
@@ -259,7 +259,7 @@ type LoanStatusCount implements ILoanStatusCount @entity {
 type CollateralPairTokenVolume @entity {
   id: ID!
   lendingToken: Token!
-  collateralToken: Token!
+  collateralToken: Token # if null, then theres no collateral
   tokenVolume: TokenVolume!
 
   _totalTokenVolume: TokenVolume!
@@ -339,12 +339,4 @@ type Commitment @entity {
 
   # TokenStats
   tokenVolume: TokenVolume!
-}
-
-type CommitmentCollateral @entity {
-  id: ID!
-  commitment: Commitment!
-
-  token: Token!
-  maxPrincipalPerCollateralAmount: BigInt!
 }

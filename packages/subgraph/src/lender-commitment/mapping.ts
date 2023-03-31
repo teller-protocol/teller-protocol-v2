@@ -80,10 +80,10 @@ export function handleExercisedCommitment(event: ExercisedCommitment): void {
   const commitmentId = event.params.commitmentId.toString();
   const commitment = loadCommitment(commitmentId);
 
-  const amountAvailable = commitment.committedAmount.minus(
-    event.params.tokenAmount
+  updateAvailableTokensFromCommitment(
+    commitment,
+    event.params.tokenAmount.neg()
   );
-  updateAvailableTokensFromCommitment(commitment, amountAvailable);
 
   // Link commitment to bid
   const bid: Bid = loadBidById(event.params.bidId);

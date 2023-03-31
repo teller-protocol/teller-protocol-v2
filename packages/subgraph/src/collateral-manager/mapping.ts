@@ -31,7 +31,7 @@ export function handleCollateralCommitted(event: CollateralCommitted): void {
   const collateral = loadCollateral(
     event.params._bidId.toString(),
     event.params._collateralAddress,
-    event.params._type,
+    collateralTypeToTokenType(event.params._type),
     event.params._tokenId
   );
   updateCollateral(collateral, event);
@@ -51,7 +51,7 @@ export function handleCollateralDeposited(event: CollateralDeposited): void {
   const collateral = loadCollateral(
     event.params._bidId.toString(),
     event.params._collateralAddress,
-    event.params._type,
+    collateralTypeToTokenType(event.params._type),
     event.params._tokenId
   );
   updateCollateral(collateral, event);
@@ -71,13 +71,28 @@ export function handleCollateralWithdrawn(event: CollateralWithdrawn): void {
   const collateral = loadCollateral(
     event.params._bidId.toString(),
     event.params._collateralAddress,
-    event.params._type,
+    collateralTypeToTokenType(event.params._type),
     event.params._tokenId
   );
   updateCollateral(collateral, event);
   collateral.receiver = event.params._recipient;
   collateral.status = "Withdrawn";
   collateral.save();
+}
+
+/**
+ * Converts the collateral type to the token type. Collateral type enum on the contract is:
+ * enum CollateralType {
+ *   ERC20,
+ *   ERC721,
+ *   ERC1155
+ * }
+ * and the token type enum for Subgraph has 1 extra value for UNKNOWN
+ *
+ * @param type
+ */
+function collateralTypeToTokenType(type: i32): i32 {
+  return i32.add(type, 1);
 }
 
 export function handleCollateralWithdrawns(

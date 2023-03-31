@@ -42,21 +42,24 @@ export function loadProtocol(): Protocol {
 }
 
 export enum TokenType {
-  NONE,
+  UNKNOWN,
   ERC20,
   ERC721,
   ERC1155
 }
-export function getTokenTypeString(type: TokenType): string {
+export function getTokenTypeString(type: TokenType): string | null {
   switch (type) {
+    case TokenType.UNKNOWN:
+      return "UNKNOWN";
     case TokenType.ERC20:
       return "ERC20";
     case TokenType.ERC721:
       return "ERC721";
     case TokenType.ERC1155:
       return "ERC1155";
+    default:
+      return null;
   }
-  return "";
 }
 function supportsInterface(address: Address, interfaceId: string): boolean {
   const erc165Instance = ERC165.bind(address);
@@ -67,31 +70,42 @@ function supportsInterface(address: Address, interfaceId: string): boolean {
 }
 export function loadToken(
   _address: Bytes,
-  type: TokenType = TokenType.NONE,
+  type: TokenType = TokenType.UNKNOWN,
   nftId: BigInt | null = null
 ): Token {
   const address = Address.fromBytes(_address);
+  let token: Token | null = null;
+
+  if (type == TokenType.UNKNOWN) {
+    // check if token is already loaded by the address
+    token = Token.load(address.toHex());
+
+    if (!token) {
+      if (nftId) {
+        if (supportsInterface(address, "0x80ac58cd")) {
+          // ERC721Metadata
+          type = TokenType.ERC721;
+        } else if (supportsInterface(address, "0x0e89341c")) {
+          // ERC1155Metadata
+          type = TokenType.ERC1155;
+        }
+      } else {
+        if (supportsInterface(address, "0x06fdde03")) {
+          // ERC20Metadata
+          type = TokenType.ERC20;
+        }
+      }
+    }
+  }
+
+  if (type == TokenType.ERC20 && nftId) nftId = null;
+
   const id = `${address.toHex()}${nftId ? "-" + nftId.toString() : ""}`;
-  let token = Token.load(id);
+  token = Token.load(id);
+
   if (!token) {
     token = new Token(id);
     token.address = address;
-
-    if (type == TokenType.NONE) {
-      if (supportsInterface(address, "0x06fdde03")) {
-        // ERC20Metadata
-        type = TokenType.ERC20;
-      } else if (supportsInterface(address, "0x80ac58cd")) {
-        // ERC721Metadata
-        type = TokenType.ERC721;
-      } else if (supportsInterface(address, "0x0e89341c")) {
-        // ERC1155Metadata
-        type = TokenType.ERC1155;
-      }
-    }
-
-    token.type = getTokenTypeString(type);
-    token.nftId = nftId;
 
     const tokenContract = IERC20Metadata.bind(address);
     const name = tokenContract.try_name();
@@ -105,7 +119,11 @@ export function loadToken(
     const decimals = tokenContract.try_decimals();
     if (!decimals.reverted) {
       token.decimals = BigInt.fromI32(decimals.value);
+      type = TokenType.ERC20;
     }
+
+    token.type = getTokenTypeString(type);
+    token.nftId = nftId;
 
     token.save();
   }
@@ -282,24 +300,23 @@ export function loadBorrowerByMarketId(
  * Loads a token volume entity from the store or creates a new one if it does not exist. Default values
  * can be set if the entity did not previously exist.
  * @param prefixes An array of prefixes to use to find the token volume.
- * @param tokenAddress The address of the token.
+ * @param tokenId The entity ID of the token.
  * @param keys An array of keys to set on the token volume.
  * @param values An array of values to set on the token volume.
  */
 function loadTokenVolumeWithValues(
   prefixes: string[],
-  tokenAddress: Bytes,
+  tokenId: string,
   keys: string[] = [],
   values: Value[] = []
 ): TokenVolume {
-  prefixes.push(tokenAddress.toHexString());
+  prefixes.push(tokenId);
   const id = prefixes.join("-");
   let tokenVolume = TokenVolume.load(id);
 
   if (!tokenVolume) {
     tokenVolume = new TokenVolume(id);
-    // NOTE: We only track ERC20 token volume loaned on TellerV2
-    initTokenVolume(tokenVolume, loadToken(tokenAddress, TokenType.ERC20));
+    initTokenVolume(tokenVolume, Token.load(tokenId)!);
 
     for (let i = 0; i < keys.length; i++) {
       tokenVolume.set(keys[i], values[i]);
@@ -310,28 +327,28 @@ function loadTokenVolumeWithValues(
   return tokenVolume;
 }
 
-export function loadProtocolTokenVolume(tokenAddress: Bytes): TokenVolume {
+export function loadProtocolTokenVolume(tokenId: string): TokenVolume {
   const protocol = loadProtocol();
   return loadTokenVolumeWithValues(
     ["protocol", protocol.id],
-    tokenAddress,
+    tokenId,
     ["protocol"],
     [Value.fromString(protocol.id)]
   );
 }
 
 /**
- * @param {Bytes} lendingTokenAddress - The address of the token that is being lent
+ * @param {string} lendingTokenId - Token entity ID that is being lent
  * @param {string} marketId - MarketId
  * @returns {TokenVolume} The TokenVolume entity for the given market's corresponding asset
  */
 export function loadMarketTokenVolume(
-  lendingTokenAddress: Bytes,
+  lendingTokenId: string,
   marketId: string
 ): TokenVolume {
   const tokenVolume = loadTokenVolumeWithValues(
     ["market", marketId],
-    lendingTokenAddress,
+    lendingTokenId,
     ["market"],
     [Value.fromString(marketId)]
   );
@@ -340,68 +357,73 @@ export function loadMarketTokenVolume(
 }
 
 /**
- * @param {Bytes} lendingTokenAddress - Address of the token being lent
+ * @param {string} lendingTokenId - Token entity ID being lent
  * @param {Lender} lender - Lender entity
  * @returns {TokenVolume} The TokenVolume entity for the given market's corresponding asset
  */
 export function loadLenderTokenVolume(
-  lendingTokenAddress: Bytes,
+  lendingTokenId: string,
   lender: Lender
 ): TokenVolume {
   return loadTokenVolumeWithValues(
     ["lender", lender.id, lender.marketplace],
-    lendingTokenAddress,
+    lendingTokenId,
     ["marketplace", "lender"],
     [Value.fromString(lender.marketplace), Value.fromString(lender.id)]
   );
 }
 
 /**
- * @param {Bytes} lendingTokenAddress - Address of the token being lent
+ * @param {string} lendingTokenId - Token entity ID being lent
  * @param {Borrower} borrower - Borrower entity
  * @returns {TokenVolume} The TokenVolume entity for the given market's corresponding asset
  */
 export function loadBorrowerTokenVolume(
-  lendingTokenAddress: Bytes,
+  lendingTokenId: string,
   borrower: Borrower
 ): TokenVolume {
   return loadTokenVolumeWithValues(
     ["borrower", borrower.id, borrower.marketplace],
-    lendingTokenAddress,
+    lendingTokenId,
     ["marketplace", "borrower"],
     [Value.fromString(borrower.marketplace), Value.fromString(borrower.id)]
   );
 }
 
 /**
- * @param {Bytes} lendingTokenAddress - Address of the token being lent
+ * @param {string} lendingTokenId - Token entity ID being lent
  * @param {Commitment} commitment - Commitment entity
  * @returns {TokenVolume} The TokenVolume entity for the given commitment
  */
 export function loadCommitmentTokenVolume(
-  lendingTokenAddress: Bytes,
+  lendingTokenId: string,
   commitment: Commitment
 ): TokenVolume {
   return loadTokenVolumeWithValues(
     ["commitment", commitment.id],
-    lendingTokenAddress
+    lendingTokenId
   );
 }
 
 export function loadCollateralTokenVolume(
   tokenVolume: TokenVolume,
-  collateralToken: Token
+  collateralToken: Token | null
 ): TokenVolume {
+  const collateralTokenId = collateralToken ? collateralToken.id : null;
   const collateralTokenVolume = loadTokenVolumeWithValues(
-    [tokenVolume.id, "-collateral", collateralToken.id],
-    tokenVolume.lendingTokenAddress
+    [
+      tokenVolume.id,
+      "-collateral",
+      collateralTokenId ? collateralTokenId : "null"
+    ],
+    tokenVolume.token
   );
 
   const pairVolume = new CollateralPairTokenVolume(
     `${tokenVolume.id}--${collateralTokenVolume.id}`
   );
-  pairVolume.lendingToken = loadToken(tokenVolume.lendingTokenAddress).id;
-  pairVolume.collateralToken = collateralToken.id;
+  pairVolume.lendingToken = tokenVolume.token;
+  pairVolume.collateralToken = collateralTokenId;
   pairVolume.tokenVolume = collateralTokenVolume.id;
   pairVolume._totalTokenVolume = tokenVolume.id;
   pairVolume.save();
@@ -446,9 +468,10 @@ export function loadCollateral(
   bidId: string,
   collateralAddress: Address,
   type: TokenType,
-  nftId: BigInt | null = null
+  nftId: BigInt
 ): BidCollateral {
-  const idString = bidId.concat(collateralAddress.toHexString());
+  const token = loadToken(collateralAddress, type, nftId);
+  const idString = ["bid", bidId, token.id].join("-");
   let collateral = BidCollateral.load(idString);
   if (!collateral) {
     collateral = new BidCollateral(idString);
@@ -456,11 +479,21 @@ export function loadCollateral(
     collateral.tokenId = nftId;
     collateral.collateralAddress = Address.zero();
     collateral.type = getTokenTypeString(type);
-    collateral.token = loadToken(collateralAddress, type, nftId).id;
+    collateral.token = token.id;
     collateral.status = "";
     collateral.receiver = Address.zero();
     collateral.bid = bidId;
     collateral.save();
+
+    const bid = Bid.load(bidId)!;
+    let bidCollaterals = bid.collateral;
+    if (!bidCollaterals) {
+      bidCollaterals = [collateral.id];
+    } else {
+      bidCollaterals.push(collateral.id);
+    }
+    bid.collateral = bidCollaterals;
+    bid.save();
   }
   return collateral;
 }

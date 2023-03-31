@@ -123,7 +123,48 @@ contract TellerV2_bids_test is Testable {
 
     */
 
-    function test_Reverts_when_protocol_IS_paused() public {
+
+    function test_submit_bid_without_collateral() public {
+
+        tellerV2.submitBid(
+            address(1),    // lending token
+            1,             // market ID
+            100,           // principal
+            365 days,      // duration
+            20_00,         // interest rate
+            "",            // metadata URI
+            address(this)  // receiver
+        );
+
+        assertTrue(tellerV2.submitBidWasCalled(),"Submit bid was not called");
+
+    }
+
+    function test_submit_bid_with_collateral() public {
+
+        tellerV2.setCollateralManagerSuper(address(collateralManagerMock));
+
+
+        Collateral[] memory collateral = new Collateral[](1);
+
+        tellerV2.submitBid(
+            address(1),    // lending token
+            1,             // market ID
+            100,           // principal
+            365 days,      // duration
+            20_00,         // interest rate
+            "",            // metadata URI
+            address(this), // receiver
+            collateral     // collateral
+        );
+        
+        assertTrue(tellerV2.submitBidWasCalled(),"Submit bid was not called");
+
+
+    }
+
+
+    function test_submit_bid_reverts_when_protocol_IS_paused() public {
         tellerV2.mock_pause(true);
 
         vm.expectRevert("Pausable: paused");
@@ -138,7 +179,7 @@ contract TellerV2_bids_test is Testable {
         );
     }
 
-    function test_Reverts_when_protocol_IS_paused__with_collateral() public {
+    function test_submit_bid_Reverts_when_protocol_IS_paused__with_collateral() public {
         tellerV2.mock_pause(true);
 
         Collateral[] memory collateral = new Collateral[](1);
@@ -154,6 +195,29 @@ contract TellerV2_bids_test is Testable {
             address(this), // receiver
             collateral     // collateral
         );
+    }
+
+    function test_submit_bid_reverts_when_collateral_invalid() public {
+        Collateral[] memory collateral = new Collateral[](1);
+
+ 
+        tellerV2.setCollateralManagerSuper(address(collateralManagerMock));
+
+        collateralManagerMock.forceSetCommitCollateralValidation(false);
+
+        vm.expectRevert("Collateral balance could not be validated");
+        tellerV2.submitBid(
+            address(1),    // lending token
+            1,             // market ID
+            100,           // principal
+            365 days,      // duration
+            20_00,         // interest rate
+            "",            // metadata URI
+            address(this), // receiver
+            collateral     // collateral
+        );
+
+
     }
 
 

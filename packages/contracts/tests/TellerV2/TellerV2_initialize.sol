@@ -52,7 +52,7 @@ contract TellerV2_initialize is Testable {
         
     }
 
-   function test_initialize_not_contract() public {
+   function test_initialize_lender_commitment_forwarder_not_contract() public {
 
         marketRegistry = new Contract();
         reputationManager = new Contract();
@@ -75,10 +75,108 @@ contract TellerV2_initialize is Testable {
     
     }
 
+ function test_initialize_market_registry_not_contract() public {
+
+        reputationManager = new Contract();
+        
+        lenderCommitmentForwarder = new Contract();
+        collateralManager = new Contract();
+        lenderManager = new Contract();
+
+        vm.expectRevert("MarketRegistry must be a contract");
+        
+      
+        tellerV2.initialize(
+            protocolFee, 
+            address(marketRegistry), 
+            address(reputationManager), 
+            address(lenderCommitmentForwarder), 
+            address(collateralManager),
+            address(lenderManager)            
+        );
+
+    
+    }
+
+
+    function test_initialize_reputation_manager_not_contract() public {
+
+        marketRegistry = new Contract();
+        
+        lenderCommitmentForwarder = new Contract();
+        collateralManager = new Contract();
+        lenderManager = new Contract();
+
+        vm.expectRevert("ReputationManager must be a contract");
+        
+      
+        tellerV2.initialize(
+            protocolFee, 
+            address(marketRegistry), 
+            address(reputationManager), 
+            address(lenderCommitmentForwarder), 
+            address(collateralManager),
+            address(lenderManager)            
+        );
+    }
+
+    function test_initialize_collateral_manager_not_contract() public {
+
+        marketRegistry = new Contract();
+        
+        lenderCommitmentForwarder = new Contract();
+        reputationManager = new Contract();
+        lenderManager = new Contract();
+
+        vm.expectRevert("CollateralManager must be a contract");
+        
+      
+        tellerV2.initialize(
+            protocolFee, 
+            address(marketRegistry), 
+            address(reputationManager), 
+            address(lenderCommitmentForwarder), 
+            address(collateralManager),
+            address(lenderManager)            
+        );
+    }
+
+function test_initialize_lender_manager_not_contract() public {
+
+        marketRegistry = new Contract();
+        
+        lenderCommitmentForwarder = new Contract();
+        reputationManager = new Contract();
+        collateralManager = new Contract();
+
+        vm.expectRevert("LenderManager must be a contract");
+        
+      
+        tellerV2.initialize(
+            protocolFee, 
+            address(marketRegistry), 
+            address(reputationManager), 
+            address(lenderCommitmentForwarder), 
+            address(collateralManager),
+            address(lenderManager)            
+        );
+    }
+
+
 
     function test_setLenderManager_not_owner() public {
 
         vm.expectRevert("Ownable: caller is not the owner");
+
+        tellerV2.setLenderManager(address(lenderManager));
+    }
+
+
+    function test_setLenderManager_not_contract() public {
+
+        tellerV2.mock_initialize();
+
+        vm.expectRevert("LenderManager must be a contract");
 
         tellerV2.setLenderManager(address(lenderManager));
     }

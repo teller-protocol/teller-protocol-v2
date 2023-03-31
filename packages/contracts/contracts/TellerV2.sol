@@ -341,7 +341,7 @@ contract TellerV2 is
         uint16 _APR,
         string calldata _metadataURI,
         address _receiver
-    ) internal returns (uint256 bidId_) {
+    ) internal virtual returns (uint256 bidId_) {
         address sender = _msgSenderForMarket(_marketplaceId);
         (bool isVerified, ) = marketRegistry.isVerifiedBorrower(
             _marketplaceId,

@@ -5,18 +5,22 @@ pragma solidity ^0.8.0;
 import "../interfaces/ICollateralManager.sol";
 
 contract CollateralManagerMock is ICollateralManager {
+
+
+    bool public committedCollateralValid = true;
+
     function commitCollateral(
         uint256 _bidId,
         Collateral[] calldata _collateralInfo
     ) external returns (bool validation_) {
-        return true;
+        validation_=  committedCollateralValid;
     }
 
     function commitCollateral(
         uint256 _bidId,
         Collateral calldata _collateralInfo
     ) external returns (bool validation_) {
-        return true;
+        validation_ =  committedCollateralValid;
     }
 
     function checkBalances(
@@ -86,4 +90,9 @@ contract CollateralManagerMock is ICollateralManager {
     function liquidateCollateral(uint256 _bidId, address _liquidatorAddress)
         external
     {}
+
+
+    function forceSetCommitCollateralValidation(bool _validation) external {
+        committedCollateralValid = _validation;
+    }
 }

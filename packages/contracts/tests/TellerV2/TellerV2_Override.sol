@@ -10,7 +10,7 @@ import { TellerV2, Bid, BidState, Collateral, Payment, LoanDetails, Terms } from
  
 contract TellerV2_Override is TellerV2 {
 
-
+    bool public submitBidWasCalled;
     bool public cancelBidWasCalled; 
     bool public repayLoanWasCalled;
     address public mockMsgSenderForMarket;
@@ -115,6 +115,21 @@ contract TellerV2_Override is TellerV2 {
     }
 
 
+
+    function _submitBid(  
+        address _lendingToken,
+        uint256 _marketplaceId,
+        uint256 _principal,
+        uint32 _duration,
+        uint16 _APR,
+        string calldata _metadataURI,
+        address _receiver)
+    internal 
+    override returns (uint256 _bidId)
+    {
+        submitBidWasCalled = true;
+        _bidId = 0 ;
+    }
 
 
     function _cancelBid(uint256 _bidId)

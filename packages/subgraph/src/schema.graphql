@@ -4,6 +4,8 @@ type Protocol implements IHasLoans @entity {
   loans: LoanStatusCount! @derivedFrom(field: "_protocol")
   tokenVolumes: [TokenVolume!]! @derivedFrom(field: "protocol")
 
+  activeCommitments: [Commitment!]!
+
   _durationTotal: BigInt!
   durationAverage: BigInt!
 }

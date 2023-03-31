@@ -18,6 +18,7 @@ import {
   updateAvailableTokensFromCommitment,
   updateLenderCommitment
 } from "./updaters";
+import { CommitmentStatus, commitmentStatusToString } from "./utils";
 
 export function handleCreatedCommitment(event: CreatedCommitment): void {
   const commitmentId = event.params.commitmentId.toString();
@@ -27,7 +28,8 @@ export function handleCreatedCommitment(event: CreatedCommitment): void {
     event.params.marketId.toString(),
     event.params.lendingToken,
     event.params.tokenAmount,
-    event.address
+    event.address,
+    event.block
   );
 
   commitment.createdAt = event.block.timestamp;
@@ -49,7 +51,8 @@ export function handleUpdatedCommitment(event: UpdatedCommitment): void {
     event.params.marketId.toString(),
     event.params.lendingToken,
     event.params.tokenAmount,
-    event.address
+    event.address,
+    event.block
   );
 }
 
@@ -62,6 +65,7 @@ export function handleUpdatedCommitments(events: UpdatedCommitment[]): void {
 export function handleDeletedCommitment(event: DeletedCommitment): void {
   const commitmentId = event.params.commitmentId.toString();
   const commitment = loadCommitment(commitmentId);
+  commitment.status = commitmentStatusToString(CommitmentStatus.Deleted);
   commitment.committedAmount = BigInt.zero();
   commitment.expirationTimestamp = BigInt.zero();
   commitment.maxDuration = BigInt.zero();

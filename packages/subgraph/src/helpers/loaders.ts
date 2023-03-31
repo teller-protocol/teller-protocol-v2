@@ -33,6 +33,8 @@ export function loadProtocol(): Protocol {
 
     loadLoanStatusCount("protocol", protocol.id);
 
+    protocol.activeCommitments = [];
+
     protocol._durationTotal = BigInt.zero();
     protocol.durationAverage = BigInt.zero();
 

@@ -1,6 +1,7 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 
 import { Commitment } from "../../generated/schema";
+import { loadProtocol } from "../helpers/loaders";
 
 import { CommitmentStatus, commitmentStatusToString } from "./utils";
 
@@ -36,6 +37,12 @@ export function loadCommitment(commitmentId: string): Commitment {
     commitment.commitmentBorrowers = [];
 
     commitment.save();
+
+    const protocol = loadProtocol();
+    const commitments = protocol.activeCommitments;
+    commitments.push(commitment.id);
+    protocol.activeCommitments = commitments;
+    protocol.save();
   }
   return commitment;
 }

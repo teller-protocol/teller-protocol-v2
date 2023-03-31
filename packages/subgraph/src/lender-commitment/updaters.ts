@@ -1,4 +1,4 @@
-import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 
 import { LenderCommitmentForwarder } from "../../generated/LenderCommitmentForwarder/LenderCommitmentForwarder";
 import { Commitment, Token, TokenVolume } from "../../generated/schema";
@@ -14,6 +14,11 @@ import {
 } from "../helpers/loaders";
 
 import { loadCommitment } from "./loaders";
+import {
+  CommitmentStatus,
+  commitmentStatusToEnum,
+  commitmentStatusToString
+} from "./utils";
 
 enum CollateralTokenType {
   NONE,
@@ -31,6 +36,7 @@ enum CollateralTokenType {
  * @param {Address} lendingTokenAddress - Address of the token being lent
  * @param {BigInt} committedAmount - The maximum that can be loaned
  * @param {Address} eventAddress - Address of the emitted event
+ * @param {ethereum.Block} eventBlock - Block of the emitted event
  */
 export function updateLenderCommitment(
   commitmentId: string,
@@ -38,7 +44,8 @@ export function updateLenderCommitment(
   marketId: string,
   lendingTokenAddress: Address,
   committedAmount: BigInt,
-  eventAddress: Address
+  eventAddress: Address,
+  eventBlock: ethereum.Block
 ): Commitment {
   const commitment = loadCommitment(commitmentId);
 
@@ -106,9 +113,16 @@ export function updateAvailableTokensFromCommitment(
   commitment: Commitment,
   committedAmountDiff: BigInt
 ): void {
+  if (committedAmountDiff.isZero()) {
+    return;
+  }
+
   commitment.committedAmount = commitment.committedAmount.plus(
     committedAmountDiff
   );
+  if (commitment.committedAmount == BigInt.zero()) {
+    commitment.status = commitmentStatusToString(CommitmentStatus.Drained);
+  }
   commitment.save();
 
   const tokenVolumes = getTokenVolumesFromCommitment(commitment);

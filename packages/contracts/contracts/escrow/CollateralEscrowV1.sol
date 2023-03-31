@@ -80,6 +80,12 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
             _tokenId
         );
         Collateral storage collateral = collateralBalances[_collateralAddress];
+
+        //Avoids asset overwriting.  Can get rid of this restriction by restructuring collateral balances storage so it isnt a mapping based on address
+        if( (collateral._collateralType == CollateralType.ERC721 || collateral._collateralType == CollateralType.ERC1155) && collateral._amount != 0 ) {
+            revert("Unable to deposit multiple collateral asset instances of the same contract address.");
+        }
+
         collateral._collateralType = _collateralType;
         collateral._amount = _amount;
         collateral._tokenId = _tokenId;

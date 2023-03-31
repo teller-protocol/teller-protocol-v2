@@ -5,7 +5,7 @@ import { StdStorage, stdStorage } from "forge-std/StdStorage.sol";
 import { Testable } from "../Testable.sol";
 import { TellerV2_Override } from "./TellerV2_Override.sol";
  
-import { Bid, BidState, Collateral, Payment, LoanDetails, Terms, ActionNotAllowed } from "../../contracts/TellerV2.sol";
+import { Bid, BidState, Collateral, Payment, LoanDetails, Terms,  ActionNotAllowed } from "../../contracts/TellerV2.sol";
  import { PaymentType, PaymentCycleType } from "../../contracts/libraries/V2Calculations.sol";
 
 
@@ -43,6 +43,16 @@ contract TellerV2_bids_test is Testable {
      
 
     uint256 marketplaceId = 100;
+
+    //have to copy and paste events in here to expectEmit 
+    event SubmittedBid(
+        uint256 indexed bidId,
+        address indexed borrower,
+        address receiver,
+        bytes32 indexed metadataURI
+    );
+
+
 
     function setUp() public {
         tellerV2 = new TellerV2_Override();
@@ -124,7 +134,30 @@ contract TellerV2_bids_test is Testable {
     */
 
 
-    function test_submit_bid_without_collateral() public {
+    //why is this failing ? 
+    function test_submit_bid_internal() public {
+
+
+        tellerV2.setMarketRegistrySuper(address(marketRegistryMock));
+
+      //  vm.expectEmit(false,true,true,false);
+
+     //   emit SubmittedBid(0,address(this),address(this),keccak256(abi.encodePacked("")));
+
+        uint256 bidId = tellerV2._submitBidSuper(
+            address(lendingToken),    // lending token
+            1,             // market ID
+            100,           // principal
+            365 days,      // duration
+            20_00,         // interest rate
+            "",            // metadata URI
+            address(this)  // receiver
+        );
+
+         
+    }
+
+      function test_submit_bid_without_collateral() public {
 
         tellerV2.submitBid(
             address(1),    // lending token
@@ -159,7 +192,6 @@ contract TellerV2_bids_test is Testable {
         );
         
         assertTrue(tellerV2.submitBidWasCalled(),"Submit bid was not called");
-
 
     }
 

@@ -82,6 +82,26 @@ contract TellerV2_Override is TellerV2 {
     }
 
 
+     function _submitBidSuper(
+        address _lendingToken,
+        uint256 _marketplaceId,
+        uint256 _principal,
+        uint32 _duration,
+        uint16 _APR,
+        string calldata _metadataURI,
+        address _receiver
+    ) public returns (uint256) {
+        return super._submitBid(
+            _lendingToken,
+            _marketplaceId,
+            _principal,
+            _duration,
+            _APR,
+            _metadataURI,
+            _receiver
+        );
+    }
+
     function _cancelBidSuper(
         uint256 bidId
     ) public {

@@ -29,7 +29,7 @@ contract LenderManager_Test is Testable, LenderManager {
     constructor()
         LenderManager(
             //address(0),
-            new MarketRegistryMock(address(0))
+            new MarketRegistryMock()
         )
     {}
 
@@ -43,7 +43,9 @@ contract LenderManager_Test is Testable, LenderManager {
         borrower = new LenderManagerUser(address(mockTellerV2), address(this));
         lender = new LenderManagerUser(address(mockTellerV2), address(this));
 
-        mockMarketRegistry = new MarketRegistryMock(address(marketOwner));
+        mockMarketRegistry = new MarketRegistryMock();
+
+        mockMarketRegistry.setMarketOwner(address(marketOwner));
 
         delete mockedHasMarketVerification;
     }
@@ -134,11 +136,7 @@ contract LenderManagerUser is User {
 contract LenderCommitmentTester is TellerV2Context {
     constructor() TellerV2Context(address(0)) {}
 
-    function __setMarketOwner(User _marketOwner) external {
-        marketRegistry = IMarketRegistry(
-            address(new MarketRegistryMock(address(_marketOwner)))
-        );
-    }
+    
 
     function getSenderForMarket(uint256 _marketId)
         external

@@ -342,17 +342,21 @@ contract TellerV2 is
         string calldata _metadataURI,
         address _receiver
     ) internal virtual returns (uint256 bidId_) {
+        
         address sender = _msgSenderForMarket(_marketplaceId);
+        
         (bool isVerified, ) = marketRegistry.isVerifiedBorrower(
             _marketplaceId,
             sender
         );
+        
         require(isVerified, "Not verified borrower");
+        
         require(
             !marketRegistry.isMarketClosed(_marketplaceId),
             "Market is closed"
         );
-
+        
         // Set response bid ID.
         bidId_ = bidId;
 
@@ -391,6 +395,8 @@ contract TellerV2 is
                 bid.terms.paymentCycle,
                 _APR
             );
+
+        
 
         uris[bidId] = _metadataURI;
         bid.state = BidState.PENDING;

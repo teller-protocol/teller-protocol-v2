@@ -69,7 +69,7 @@ contract MarketLiquidityRewards_Test is Testable  {
 
         tellerV2Mock = new TellerV2Mock();
 
-        marketRegistryMock = new MarketRegistryMock(address(0));
+        marketRegistryMock = new MarketRegistryMock();
 
 
       

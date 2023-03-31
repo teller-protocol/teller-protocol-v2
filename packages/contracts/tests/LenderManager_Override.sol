@@ -23,9 +23,13 @@ contract LenderManager_Override is  LenderManager {
 
     constructor(address marketRegistry)
         LenderManager( 
-            new MarketRegistryMock(marketRegistry)
+              MarketRegistryMock(marketRegistry)
         )
-    {}
+    {
+
+
+
+    }
 
     function setHasMarketVerification(bool v) public {
           mockedHasMarketVerification = v;

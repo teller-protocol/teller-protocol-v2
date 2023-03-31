@@ -90,11 +90,7 @@ contract LenderCommitmentForwarder_Override is LenderCommitmentForwarder {
 contract LenderCommitmentForwarderTest_TellerV2Mock is TellerV2Context {
     constructor() TellerV2Context(address(0)) {}
 
-    function __setMarketOwner(User _marketOwner) external {
-        marketRegistry = IMarketRegistry(
-            address(new MarketRegistryMock(address(_marketOwner)))
-        );
-    }
+   
 
     function getSenderForMarket(uint256 _marketId)
         external

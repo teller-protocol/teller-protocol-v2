@@ -55,7 +55,7 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
     constructor()
         MarketLiquidityRewards(
             address(new TellerV2Mock()),
-            address(new MarketRegistryMock(address(0))),
+            address(new MarketRegistryMock()),
             address(new CollateralManagerMock())
         )
     {}
@@ -64,7 +64,7 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
         marketOwner = new MarketLiquidityUser(address(tellerV2), (this));
         borrower = new MarketLiquidityUser(address(tellerV2), (this));
         lender = new MarketLiquidityUser(address(tellerV2), (this));
-        TellerV2Mock(tellerV2).__setMarketOwner(marketOwner);
+        TellerV2Mock(tellerV2).__setMarketRegistry(address(marketRegistry));
 
         MarketRegistryMock(marketRegistry).setMarketOwner(address(marketOwner));
 
@@ -476,10 +476,12 @@ contract TellerV2Mock is TellerV2Context {
 
     constructor() TellerV2Context(address(0)) {}
 
-    function __setMarketOwner(User _marketOwner) external {
+    
+    function __setMarketRegistry(address _marketRegistry) external {
         marketRegistry = IMarketRegistry(
-            address(new MarketRegistryMock(address(_marketOwner)))
+            _marketRegistry
         );
+      
     }
 
     function getSenderForMarket(uint256 _marketId)

@@ -6,10 +6,13 @@ import "../interfaces/IMarketRegistry.sol";
 import { PaymentType } from "../libraries/V2Calculations.sol";
 
 contract MarketRegistryMock is IMarketRegistry {
-    address marketOwner;
+    //address marketOwner;
 
-    constructor(address _marketOwner) {
-        marketOwner = _marketOwner;
+    address public globalMarketOwner;
+
+
+    constructor( ) {
+       
     }
 
     function initialize(TellerAS _tellerAS) external {}
@@ -35,7 +38,7 @@ contract MarketRegistryMock is IMarketRegistry {
     }
 
     function getMarketOwner(uint256 _marketId) public view override returns (address) {
-        return address(marketOwner);
+        return address(globalMarketOwner);
     }
 
     function getMarketFeeRecipient(uint256 _marketId)
@@ -43,7 +46,7 @@ contract MarketRegistryMock is IMarketRegistry {
         view
         returns (address)
     {
-        return address(marketOwner);
+        return address(globalMarketOwner);
     }
 
     function getMarketURI(uint256 _marketId)
@@ -83,7 +86,7 @@ contract MarketRegistryMock is IMarketRegistry {
     }
 
     function setMarketOwner(address _owner) public {
-        marketOwner = _owner;
+        globalMarketOwner = _owner;
     }
 
     function getPaymentType(uint256 _marketId)

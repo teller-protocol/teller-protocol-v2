@@ -12,6 +12,7 @@ import { Bid, BidState, Collateral, Payment, LoanDetails, Terms,  ActionNotAllow
 import {ReputationManagerMock} from "../../contracts/mock/ReputationManagerMock.sol";
 import {CollateralManagerMock} from "../../contracts/mock/CollateralManagerMock.sol";
 import {LenderManagerMock} from "../../contracts/mock/LenderManagerMock.sol";
+import {MarketRegistryMock} from "../../contracts/mock/MarketRegistryMock.sol";
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
@@ -133,16 +134,14 @@ contract TellerV2_bids_test is Testable {
 
     */
 
-
-    //why is this failing ? 
+ 
     function test_submit_bid_internal() public {
-
-
+ 
         tellerV2.setMarketRegistrySuper(address(marketRegistryMock));
 
-      //  vm.expectEmit(false,true,true,false);
+        vm.expectEmit(false,false,false,false);
 
-     //   emit SubmittedBid(0,address(this),address(this),keccak256(abi.encodePacked("")));
+        emit SubmittedBid(0,address(this),address(this),keccak256(abi.encodePacked("")));
 
         uint256 bidId = tellerV2._submitBidSuper(
             address(lendingToken),    // lending token
@@ -154,8 +153,11 @@ contract TellerV2_bids_test is Testable {
             address(this)  // receiver
         );
 
-         
     }
+
+    function test_submit_bid_internal_fails_when_market_closed() public {}
+    function test_submit_bid_internal_fails_when_borrower_not_verified() public {}
+ 
 
       function test_submit_bid_without_collateral() public {
 
@@ -326,7 +328,7 @@ contract TellerV2_bids_test is Testable {
         //need to mock set market owner 
 
         tellerV2.setMarketRegistrySuper(address( marketRegistryMock ));
-        marketRegistryMock.setGlobalMarketOwner(address(marketOwner));
+        marketRegistryMock.setMarketOwner(address(marketOwner));
 
         //why doesnt this work ?
         vm.prank(address(marketOwner));
@@ -568,20 +570,4 @@ contract TellerV2_bids_test is Testable {
 
 contract User {} 
 
- 
-
- contract MarketRegistryMock {
-
-
-    address public globalMarketOwner;
-
-    function setGlobalMarketOwner(address _globalMarketOwner) public {
-        globalMarketOwner = _globalMarketOwner;
-    }
-
-    function getMarketOwner(uint256 marketId) public returns (address){
-        return globalMarketOwner;
-    }
-
-
- }
+  

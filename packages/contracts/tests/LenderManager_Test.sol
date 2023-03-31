@@ -35,7 +35,7 @@ contract LenderManager_Test is Testable  {
         mockTellerV2 = new LenderCommitmentTester();
 
        
-        mockMarketRegistry = new MarketRegistryMock(address(0));
+        mockMarketRegistry = new MarketRegistryMock();
 
         lenderManager = new LenderManager_Override(address(mockMarketRegistry));
 
@@ -138,11 +138,7 @@ contract LenderManagerUser is User {
 contract LenderCommitmentTester is TellerV2Context {
     constructor() TellerV2Context(address(0)) {}
 
-    function __setMarketOwner(User _marketOwner) external {
-        marketRegistry = IMarketRegistry(
-            address(new MarketRegistryMock(address(_marketOwner)))
-        );
-    }
+     
 
     function getSenderForMarket(uint256 _marketId)
         external

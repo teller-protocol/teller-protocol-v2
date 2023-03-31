@@ -43,7 +43,7 @@ contract MarketForwarder_Test is Testable {
         user2 = new MarketForwarderUser(address(tellerV2Mock));
 
 
-        mockMarketRegistry = new MarketRegistryMock( address(marketOwner)  );
+        mockMarketRegistry = new MarketRegistryMock(  );
 
       //  tellerV2Mock.__setMarketOwner(marketOwner);
 

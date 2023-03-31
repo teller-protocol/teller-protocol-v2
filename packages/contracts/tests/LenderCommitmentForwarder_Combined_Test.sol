@@ -49,7 +49,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
     constructor()
         LenderCommitmentForwarder(
             address(new LenderCommitmentForwarderTest_TellerV2Mock()), ///_protocolAddress
-            address(new MarketRegistryMock(address(0)))
+            address(new MarketRegistryMock( ))
         )
     {}
 
@@ -62,7 +62,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         marketOwner = new LenderCommitmentUser(address(tellerV2Mock), (this));
         borrower = new LenderCommitmentUser(address(tellerV2Mock), (this));
         lender = new LenderCommitmentUser(address(tellerV2Mock), (this));
-        tellerV2Mock.__setMarketOwner(marketOwner);
+        tellerV2Mock.__setMarketRegistry(address(mockMarketRegistry));
 
         mockMarketRegistry.setMarketOwner(address(marketOwner));
 
@@ -916,10 +916,11 @@ contract LenderCommitmentUser is User {
 contract LenderCommitmentForwarderTest_TellerV2Mock is TellerV2Context {
     constructor() TellerV2Context(address(0)) {}
 
-    function __setMarketOwner(User _marketOwner) external {
+    function __setMarketRegistry(address _marketRegistry) external {
         marketRegistry = IMarketRegistry(
-            address(new MarketRegistryMock(address(_marketOwner)))
+            _marketRegistry
         );
+      
     }
 
     function getSenderForMarket(uint256 _marketId)

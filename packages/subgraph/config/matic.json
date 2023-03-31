@@ -3,7 +3,7 @@
   "grafting": {
     "enabled": true,
     "base": "QmNmcVUCXBzZS6efu5CCCKTszjDYgZLxrz1qya3ZdWNaVs",
-    "block": "40991390"
+    "block": "40991684"
   },
   "block_handler": {
     "enabled": true,

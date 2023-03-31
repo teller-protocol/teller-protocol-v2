@@ -2,12 +2,12 @@
   "network": "goerli",
   "grafting": {
     "enabled": false,
-    "base": "",
-    "block": ""
+    "base": "Qmb2sKZ9kMN1UqJ36cdGFvrcRfu81MX5iS6oBQ2U45cxCU",
+    "block": "8751571"
   },
   "block_handler": {
-    "enabled": false,
-    "block": "0"
+    "enabled": true,
+    "block": "8751571"
   },
   "contracts": {
     "teller_v2": {

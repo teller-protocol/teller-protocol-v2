@@ -178,22 +178,7 @@ contract TellerV2_initialize is Testable {
         assertEq(lastRepaidTimestamp, 100);        
         
     }
-
-    /*
-
-    //fix me 
-    
-    function test_getLoanLender_without_nft() public {
-            
-            uint256 bidId = 1 ;
-            setMockBid(1); 
-    
-            address lenderAddress = tellerV2.getLoanLender(bidId);
-    
-            assertEq(lenderAddress, address(lender),"getLoanLender did not return correct result"); 
-
-    }*/
-
+ 
 
     function test_getLoanLender_without_nft() public {
             
@@ -330,9 +315,100 @@ contract TellerV2_initialize is Testable {
 
 
     /*
-
-    there are many branches of this to test 
+        there are many branches of this to test 
     */
+
+
+  
+  
+    function test_calculateAmountDue_without_timestamp() public {
+            
+        uint256 bidId = 1 ;
+        setMockBid(1); 
+
+        tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
+
+        Payment memory amountDue = tellerV2.calculateAmountDue(bidId);
+
+        assertEq(amountDue.principal, 10);
+
+    }
+
+
+
+    function test_calculateAmountDue_without_timestamp_not_accepted() public {
+            
+        uint256 bidId = 1 ;
+        setMockBid(1); 
+
+
+        tellerV2.mock_setBidState(bidId, BidState.PENDING);
+
+        Payment memory amountDue = tellerV2.calculateAmountDue(bidId);
+
+        assertEq(amountDue.principal, 0);
+
+    }
+
+      function test_calculateAmountDue_with_timestamp() public {
+            
+        uint256 bidId = 1 ;
+        setMockBid(1); 
+
+        tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
+
+
+        Payment memory amountDue = tellerV2.calculateAmountDue(bidId, 50);
+
+        assertEq(amountDue.principal, 10);
+
+    }
+
+  function test_calculateAmountDue_with_timestamp_not_accepted() public {
+            
+        uint256 bidId = 1 ;
+        setMockBid(1); 
+
+        tellerV2.mock_setBidState(bidId, BidState.PENDING);
+
+      
+
+        Payment memory amountDue = tellerV2.calculateAmountDue(bidId, 1000);
+
+        assertEq(amountDue.principal, 0);
+
+    }
+
+   
+   
+    function test_calculateAmountOwed_without_timestamp() public {
+
+        uint256 bidId = 1 ;
+        setMockBid(1); 
+
+        tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
+
+        Payment memory amountOwed = tellerV2.calculateAmountOwed(bidId);
+
+        assertEq(amountOwed.principal, 10);
+
+
+    }
+
+     function test_calculateAmountOwed_with_timestamp() public {
+
+
+          uint256 bidId = 1 ;
+        setMockBid(1); 
+
+        tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
+
+        Payment memory amountOwed = tellerV2.calculateAmountOwed(bidId,50);
+
+        assertEq(amountOwed.principal, 10);
+    }
+
+
 
     function test_calculateNextDueDate_not_accepted() public {
 

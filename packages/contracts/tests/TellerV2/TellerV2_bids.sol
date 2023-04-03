@@ -837,7 +837,7 @@ contract TellerV2_bids_test is Testable {
 
         tellerV2.claimLoanNFT(bidId);
 
-
+        //assert 
 
     } 
  

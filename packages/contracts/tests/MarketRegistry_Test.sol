@@ -137,6 +137,8 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
 
         marketOwner.closeMarket(marketId);
 
+        
+
         bool marketIsClosed = marketRegistry.isMarketClosed(marketId);
 
         assertEq(
@@ -144,6 +146,54 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
             true,
             "Market not closed"
         );
+      }
+
+      function test_closeMarket_twice() public {
+       
+        uint256 marketId = marketOwner.createMarketSimple(
+            address(marketRegistry),
+            uint32(8000),
+            uint32(7000),
+            uint32(5000),
+            uint16(500),
+            false,
+            false,
+            "uri://"
+        );
+
+
+        marketOwner.closeMarket(marketId);
+
+        marketOwner.closeMarket(marketId);
+
+        bool marketIsClosed = marketRegistry.isMarketClosed(marketId);
+
+        assertEq(
+            marketIsClosed,
+            true,
+            "Market not closed"
+        );
+      }
+
+
+
+       function test_closeMarket_invalid_owner() public {
+       
+        uint256 marketId = marketOwner.createMarketSimple(
+            address(marketRegistry),
+            uint32(8000),
+            uint32(7000),
+            uint32(5000),
+            uint16(500),
+            false,
+            false,
+            "uri://"
+        );
+
+        vm.expectRevert("Not the owner");
+        borrower.closeMarket(marketId);
+
+         
       }
 
     function test_createMarket() public {
@@ -202,26 +252,45 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
             "Monthly market payment cycle duration set incorrectly"
         );
 
+        vm.expectRevert("monthly payment cycle duration cannot be set"); 
+
         // Monthly payment cycle should fail
-        bool createFailed;
-        try
-            marketOwner.createMarket(
-                address(marketRegistry),
-                3000,
-                7000,
-                5000,
-                500,
-                false,
-                false,
-                PaymentType.EMI,
-                PaymentCycleType.Monthly,
-                "uri://"
-            )
-        {} catch {
-            createFailed = true;
-        }
-        require(createFailed, "Monthly market should not have been created");
+        
+        marketOwner.createMarket(
+            address(marketRegistry),
+            3000,
+            7000,
+            5000,
+            500,
+            false,
+            false,
+            PaymentType.EMI,
+            PaymentCycleType.Monthly,
+            "uri://"
+        );
+        
     }
+
+
+
+     function test_createMarket_invalid_initial_owner() public {
+
+         vm.expectRevert(); //"Invalid owner address" 
+        marketOwner.createMarket(
+            address(0),
+            0,
+            7000,
+            5000,
+            500,
+            false,
+            false,
+            PaymentType.EMI,
+            PaymentCycleType.Seconds,
+            "uri://"
+        );
+
+
+     }
 
     function test_attestStakeholder() public {
 
@@ -579,6 +648,19 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
         );
     } 
 
+    function test_setMarketFeeRecipient_not_owner() public {
+
+        marketRegistry.setMarketOwner(address(this));
+
+        marketRegistry.stubMarket(marketId, address(this)); 
+        
+        vm.expectRevert("Not the owner");
+        vm.prank(address(borrower));
+        marketRegistry.setMarketFeeRecipient(marketId, address(lender));
+
+       
+    } 
+
     function test_setMarketURI() public {
 
         marketRegistry.setMarketOwner(address(this));
@@ -594,6 +676,19 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
         ); 
 
     } 
+
+    function test_setMarketURI_not_owner() public {
+
+        marketRegistry.setMarketOwner(address(this));
+
+        marketRegistry.stubMarket(marketId, address(this)); 
+        
+        vm.expectRevert("Not the owner");
+        vm.prank(address(borrower));
+        marketRegistry.setMarketURI(marketId, "ipfs://");
+
+       
+    }
 
     //test more branches of this 
     function test_setPaymentCycle() public {
@@ -619,6 +714,18 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
         ); 
 
     } 
+
+    function test_setPaymentCycle_not_owner() public {
+            
+            marketRegistry.setMarketOwner(address(this));
+    
+            marketRegistry.stubMarket(marketId, address(this)); 
+            
+            vm.expectRevert("Not the owner");
+            vm.prank(address(borrower));
+            marketRegistry.setPaymentCycle(marketId, PaymentCycleType.Seconds, 555);
+
+    }
 
         function test_setPaymentCycle_monthly() public {
 
@@ -675,6 +782,19 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
 
     } 
 
+    function test_setPaymentDefaultDuration_not_owner() public {
+
+        marketRegistry.setMarketOwner(address(this));
+
+        marketRegistry.stubMarket(marketId, address(this)); 
+        
+        vm.expectRevert("Not the owner");
+        vm.prank(address(borrower));
+        marketRegistry.setPaymentDefaultDuration(marketId, 555); 
+       
+
+    }
+
     function test_setBidExpirationTime() public {
 
         marketRegistry.setMarketOwner(address(this));
@@ -693,6 +813,20 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
 
     } 
 
+
+    function test_setBidExpirationTime_not_owner() public {
+
+        marketRegistry.setMarketOwner(address(this));
+
+        marketRegistry.stubMarket(marketId, address(this)); 
+        
+        vm.expectRevert("Not the owner");
+        vm.prank(address(borrower));
+        marketRegistry.setBidExpirationTime(marketId, 555);  
+
+
+    }
+
     function test_setMarketFeePercent() public {
 
         marketRegistry.setMarketOwner(address(this));
@@ -708,6 +842,19 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
         ); 
 
     } 
+    
+    function test_setMarketFeePercent_not_owner() public {
+
+        marketRegistry.setMarketOwner(address(this));
+
+        marketRegistry.stubMarket(marketId, address(this)); 
+        
+        vm.expectRevert("Not the owner");
+        vm.prank(address(borrower));
+        marketRegistry.setMarketFeePercent(marketId, 555);
+
+
+    }
 
     function test_setMarketPaymentType() public {
 
@@ -724,6 +871,18 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
             "Could not set market payment type"
         ); 
 
+
+    } 
+
+    function test_setMarketPaymentType_not_owner() public {
+
+           marketRegistry.setMarketOwner(address(this));
+
+        marketRegistry.stubMarket(marketId, address(this)); 
+        
+        vm.expectRevert("Not the owner");
+        vm.prank(address(borrower));
+        marketRegistry.setMarketPaymentType(marketId, PaymentType.EMI);
 
     } 
 
@@ -903,6 +1062,8 @@ contract MarketRegistryUser is User {
     function closeMarket(uint256 marketId) public {
 
         marketRegistry.closeMarket(marketId);
+
+
 
     }
 

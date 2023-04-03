@@ -24,6 +24,7 @@ contract MarketRegistry_Override is MarketRegistry {
      using EnumerableSet for EnumerableSet.AddressSet;
     
     address globalMarketOwner;
+    address globalFeeRecipient;
 
 
     bool public attestStakeholderWasCalled;
@@ -134,6 +135,11 @@ contract MarketRegistry_Override is MarketRegistry {
     function getMarketOwner(uint256 marketId) public view override returns (address){
 
         return super._getMarketOwner(marketId);
+    }
+ 
+    function setFeeRecipient(uint256 _marketId, address _feeRecipient) public {
+
+       markets[_marketId].feeRecipient = _feeRecipient; 
     }
   
 

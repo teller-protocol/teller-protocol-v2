@@ -30,6 +30,7 @@ contract MarketRegistry_Test is Testable {
     MarketRegistryUser private borrower;
     MarketRegistryUser private lender;
     MarketRegistryUser private stakeholder;
+    MarketRegistryUser private feeRecipient;
 
     WethMock wethMock;
 
@@ -62,6 +63,7 @@ contract MarketRegistry_Test is Testable {
         marketOwner = new MarketRegistryUser(address(tellerV2),address(marketRegistry));
         borrower = new MarketRegistryUser(address(tellerV2),address(marketRegistry));
         lender = new MarketRegistryUser(address(tellerV2),address(marketRegistry));
+        feeRecipient = new MarketRegistryUser(address(tellerV2),address(marketRegistry));
 
         marketRegistry.setMarketOwner(address(marketOwner));
       
@@ -76,11 +78,8 @@ contract MarketRegistry_Test is Testable {
 
 
 FNDA:0,MarketRegistry.initialize
-FNDA:0,MarketRegistry.updateMarketSettings
-FNDA:0,MarketRegistry.getMarketOwner
-FNDA:0,MarketRegistry.getAllVerifiedLendersForMarket
-FNDA:0,MarketRegistry.getAllVerifiedBorrowersForMarket
-FNDA:0,MarketRegistry._getStakeholdersForMarket
+ 
+  
 FNDA:0,MarketRegistry._attestStakeholderViaDelegation
 
 
@@ -627,9 +626,86 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
     }
 
     function test_updateMarketSettings() public {
+            
+        marketRegistry.setMarketOwner(address(this));
+
+        marketRegistry.stubMarket(marketId, address(this)); 
+
+        marketRegistry.updateMarketSettings(
+            marketId, 
+            111,
+            PaymentType.EMI,
+            PaymentCycleType.Seconds,
+            200,
+            300,
+            10,
+            false,
+            false,
+            "ipfs://" 
+            );
+
+        (address owner,uint32 paymentCycleDuration,,,,,) = marketRegistry.getMarketData(marketId);
+
+        assertEq(
+            paymentCycleDuration,
+            111,
+            "Market not updated"
+        );
+
+
+    }
+
+     function test_updateMarketSettings_not_owner() public {
+        vm.expectRevert("Not the owner");
+
+        marketRegistry.updateMarketSettings(
+            marketId, 
+            111,
+            PaymentType.EMI,
+            PaymentCycleType.Seconds,
+            200,
+            300,
+            10,
+            false,
+            false,
+            "ipfs://" 
+            );
 
 
 
+     }
+
+
+    function test_getMarketFeeRecipient_when_unset() public {
+
+        marketRegistry.setMarketOwner(address(marketOwner));
+
+        marketRegistry.stubMarket(marketId, address(this)); 
+
+        address feeRecipient = marketRegistry.getMarketFeeRecipient(marketId);
+
+        assertEq(
+            feeRecipient,
+            address(address(marketOwner)),
+            "Could not get market fee recipient"
+        );
+
+    }
+
+    function test_getMarketFeeRecipient_when_set() public {
+
+        marketRegistry.setMarketOwner(address(marketOwner));
+         marketRegistry.setFeeRecipient(marketId,address(feeRecipient));
+
+        marketRegistry.stubMarket(marketId, address(this)); 
+
+        address feeRecipient = marketRegistry.getMarketFeeRecipient(marketId);
+
+        assertEq(
+            feeRecipient,
+            address(address(feeRecipient)),
+            "Could not get market fee recipient"
+        );
 
     }
 
@@ -925,6 +1001,38 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
 
     }
 
+    function test_setLenderAttestationRequired_not_owner() public {
+
+        marketRegistry.setMarketOwner(address(this));
+
+        marketRegistry.stubMarket(marketId, address(this)); 
+
+        vm.prank(address(borrower));
+        vm.expectRevert("Not the owner");
+        marketRegistry.setLenderAttestationRequired(marketId, true);
+ 
+
+    }
+
+    function test_setLenderAttestationRequired_twice() public {
+        marketRegistry.setMarketOwner(address(this));
+
+        marketRegistry.stubMarket(marketId, address(this)); 
+
+        marketRegistry.setLenderAttestationRequired(marketId, true);
+        marketRegistry.setLenderAttestationRequired(marketId, true);
+
+        (bool lenderReq, bool borrowerReq) = marketRegistry.getMarketAttestationRequirements(marketId);
+
+        assertEq(
+            lenderReq,
+            true,
+            "Could not set lender attestation required"
+        ); 
+
+
+    }
+
     function test_setBorrowerAttestationRequired() public {
 
          marketRegistry.setMarketOwner(address(this));
@@ -940,11 +1048,45 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
             true,
             "Could not set borrower attestation required"
         ); 
-
+ 
 
     } 
+
+
+     function test_setBorrowerAttestationRequired_not_owner() public {
+
+        marketRegistry.setMarketOwner(address(this));
+
+        marketRegistry.stubMarket(marketId, address(this)); 
+
+        vm.prank(address(borrower));
+        vm.expectRevert("Not the owner");
+        marketRegistry.setBorrowerAttestationRequired(marketId, true);
  
-   
+
+    }
+ 
+      function test_setBorrowerAttestationRequired_twice() public {
+
+         marketRegistry.setMarketOwner(address(this));
+
+        marketRegistry.stubMarket(marketId, address(this)); 
+
+        marketRegistry.setBorrowerAttestationRequired( marketId, true);
+        marketRegistry.setBorrowerAttestationRequired( marketId, true);
+
+        (bool lenderReq, bool borrowerReq) = marketRegistry.getMarketAttestationRequirements(marketId);
+
+        assertEq(
+            borrowerReq,
+            true,
+            "Could not set borrower attestation required"
+        ); 
+ 
+
+    } 
+
+
  
 
     function test_isVerifiedLender() public {
@@ -1040,6 +1182,68 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
             "is verified did not return correct result"
         );
 
+    }
+
+    function test_getAllVerifiedBorrowersForMarket() public {
+
+          bool isLender = false; 
+
+        marketRegistry.attestStakeholderVerification( 
+            marketId,
+            address(borrower),
+            uuid,
+            isLender
+         );
+
+        marketRegistry.setMarketOwner(address(this));
+
+        marketRegistry.stubMarket(marketId, address(this)); 
+
+        address[] memory borrowers = marketRegistry.getAllVerifiedBorrowersForMarket(marketId,0,5);
+
+        assertEq(
+            borrowers.length,
+            1,
+            "Did not return correct number of borrowers"
+        );
+
+        assertEq(
+            borrowers[0],
+            address(borrower),
+            "Did not return correct borrower"
+        );
+    
+    }
+
+      function test_getAllVerifiedLendersForMarket() public {
+
+         bool isLender = true; 
+
+        marketRegistry.attestStakeholderVerification( 
+            marketId,
+            address(lender),
+            uuid,
+            isLender
+         );
+
+        marketRegistry.setMarketOwner(address(this));
+
+        marketRegistry.stubMarket(marketId, address(this)); 
+        
+        address[] memory lenders = marketRegistry.getAllVerifiedLendersForMarket(marketId,0,5);
+
+        assertEq(
+            lenders.length,
+            1,
+            "Did not return correct number of lenders"
+        );
+
+        assertEq(
+            lenders[0],
+            address(lender),
+            "Did not return correct lender"
+        );
+    
     }
 
 

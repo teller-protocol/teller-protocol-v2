@@ -324,15 +324,46 @@ contract TellerV2_initialize is Testable {
     function test_calculateAmountDue_without_timestamp() public {
             
         uint256 bidId = 1 ;
-        setMockBid(1); 
+        
+           
+        tellerV2.mock_setBid(bidId, Bid({
 
-        vm.warp(150);
+            borrower: address(borrower),
+            lender: address(lender),
+            receiver: address(receiver),
+            marketplaceId: 100,
+            _metadataURI: "0x1234",
+
+            loanDetails: LoanDetails({
+                lendingToken: lendingToken,
+                principal: 100,
+                timestamp: 100,
+                acceptedTimestamp: 100,
+                lastRepaidTimestamp: 2000,
+                loanDuration: 5000,
+                totalRepaid: Payment({
+                    principal: 0,
+                    interest: 5 
+                })
+
+            }),
+            terms: Terms({
+                paymentCycleAmount: 10,
+                paymentCycle: 2000,
+                APR: 10
+            }),
+            state: BidState.PENDING,
+            paymentType: PaymentType.EMI 
+         }));
+
+
+        vm.warp(2500);
         
         tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
 
         Payment memory amountDue = tellerV2.calculateAmountDue(bidId);
 
-        assertEq(amountDue.principal, 10);
+        assertEq(amountDue.principal, 2);
 
     }
 
@@ -341,7 +372,37 @@ contract TellerV2_initialize is Testable {
     function test_calculateAmountDue_without_timestamp_not_accepted() public {
             
         uint256 bidId = 1 ;
-        setMockBid(1); 
+        
+        tellerV2.mock_setBid(bidId, Bid({
+
+            borrower: address(borrower),
+            lender: address(lender),
+            receiver: address(receiver),
+            marketplaceId: 100,
+            _metadataURI: "0x1234",
+
+            loanDetails: LoanDetails({
+                lendingToken: lendingToken,
+                principal: 100,
+                timestamp: 100,
+                acceptedTimestamp: 100,
+                lastRepaidTimestamp: 2000,
+                loanDuration: 5000,
+                totalRepaid: Payment({
+                    principal: 0,
+                    interest: 5 
+                })
+
+            }),
+            terms: Terms({
+                paymentCycleAmount: 10,
+                paymentCycle: 2000,
+                APR: 10
+            }),
+            state: BidState.PENDING,
+            paymentType: PaymentType.EMI 
+         }));
+
 
 
         tellerV2.mock_setBidState(bidId, BidState.PENDING);
@@ -355,21 +416,82 @@ contract TellerV2_initialize is Testable {
       function test_calculateAmountDue_with_timestamp() public {
             
         uint256 bidId = 1 ;
-        setMockBid(1); 
+       
+       tellerV2.mock_setBid(bidId, Bid({
+
+            borrower: address(borrower),
+            lender: address(lender),
+            receiver: address(receiver),
+            marketplaceId: 100,
+            _metadataURI: "0x1234",
+
+            loanDetails: LoanDetails({
+                lendingToken: lendingToken,
+                principal: 100,
+                timestamp: 100,
+                acceptedTimestamp: 100,
+                lastRepaidTimestamp: 2000,
+                loanDuration: 5000,
+                totalRepaid: Payment({
+                    principal: 0,
+                    interest: 5 
+                })
+
+            }),
+            terms: Terms({
+                paymentCycleAmount: 10,
+                paymentCycle: 2000,
+                APR: 10
+            }),
+            state: BidState.PENDING,
+            paymentType: PaymentType.EMI 
+         }));
+
+
 
         tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
 
 
-        Payment memory amountDue = tellerV2.calculateAmountDue(bidId, 50);
+        Payment memory amountDue = tellerV2.calculateAmountDue(bidId, 5000);
 
-        assertEq(amountDue.principal, 10);
+        assertEq(amountDue.principal, 100);
 
     }
 
   function test_calculateAmountDue_with_timestamp_not_accepted() public {
             
         uint256 bidId = 1 ;
-        setMockBid(1); 
+        
+        tellerV2.mock_setBid(bidId, Bid({
+
+            borrower: address(borrower),
+            lender: address(lender),
+            receiver: address(receiver),
+            marketplaceId: 100,
+            _metadataURI: "0x1234",
+
+            loanDetails: LoanDetails({
+                lendingToken: lendingToken,
+                principal: 100,
+                timestamp: 100,
+                acceptedTimestamp: 100,
+                lastRepaidTimestamp: 2000,
+                loanDuration: 5000,
+                totalRepaid: Payment({
+                    principal: 0,
+                    interest: 5 
+                })
+
+            }),
+            terms: Terms({
+                paymentCycleAmount: 10,
+                paymentCycle: 2000,
+                APR: 10
+            }),
+            state: BidState.PENDING,
+            paymentType: PaymentType.EMI 
+         }));
+
 
         tellerV2.mock_setBidState(bidId, BidState.PENDING);
 
@@ -386,14 +508,43 @@ contract TellerV2_initialize is Testable {
     function test_calculateAmountOwed_without_timestamp() public {
 
         uint256 bidId = 1 ;
-        setMockBid(1); 
+        tellerV2.mock_setBid(bidId, Bid({
+
+            borrower: address(borrower),
+            lender: address(lender),
+            receiver: address(receiver),
+            marketplaceId: 100,
+            _metadataURI: "0x1234",
+
+            loanDetails: LoanDetails({
+                lendingToken: lendingToken,
+                principal: 100,
+                timestamp: 100,
+                acceptedTimestamp: 100,
+                lastRepaidTimestamp: 2000,
+                loanDuration: 5000,
+                totalRepaid: Payment({
+                    principal: 0,
+                    interest: 5 
+                })
+
+            }),
+            terms: Terms({
+                paymentCycleAmount: 10,
+                paymentCycle: 2000,
+                APR: 10
+            }),
+            state: BidState.PENDING,
+            paymentType: PaymentType.EMI 
+         }));
+
 
         tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
-        vm.warp(150);
+        vm.warp(2500);
 
         Payment memory amountOwed = tellerV2.calculateAmountOwed(bidId);
 
-        assertEq(amountOwed.principal, 10);
+        assertEq(amountOwed.principal, 100);
 
 
     }
@@ -401,14 +552,43 @@ contract TellerV2_initialize is Testable {
      function test_calculateAmountOwed_with_timestamp() public {
 
 
-          uint256 bidId = 1 ;
-        setMockBid(1); 
+        uint256 bidId = 1 ;
+        tellerV2.mock_setBid(bidId, Bid({
+
+            borrower: address(borrower),
+            lender: address(lender),
+            receiver: address(receiver),
+            marketplaceId: 100,
+            _metadataURI: "0x1234",
+
+            loanDetails: LoanDetails({
+                lendingToken: lendingToken,
+                principal: 100,
+                timestamp: 100,
+                acceptedTimestamp: 100,
+                lastRepaidTimestamp: 2000,
+                loanDuration: 5000,
+                totalRepaid: Payment({
+                    principal: 0,
+                    interest: 5 
+                })
+
+            }),
+            terms: Terms({
+                paymentCycleAmount: 10,
+                paymentCycle: 2000,
+                APR: 10
+            }),
+            state: BidState.PENDING,
+            paymentType: PaymentType.EMI 
+         }));
+
 
         tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
 
-        Payment memory amountOwed = tellerV2.calculateAmountOwed(bidId,50);
+        Payment memory amountOwed = tellerV2.calculateAmountOwed(bidId,2500);
 
-        assertEq(amountOwed.principal, 10);
+        assertEq(amountOwed.principal, 100);
     }
 
 

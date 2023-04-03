@@ -381,7 +381,7 @@ contract TellerV2_initialize is Testable {
 
     }
 
-      function test_calculateNextDueDate_seconds() public {
+    function test_calculateNextDueDate_seconds() public {
 
         uint256 bidId = 1 ;
         
@@ -422,6 +422,154 @@ contract TellerV2_initialize is Testable {
         uint256 nextDueDate = tellerV2.calculateNextDueDate(bidId);
 
         assertEq(nextDueDate, 4100, "unexpected due date");
+
+    }
+
+     function test_calculateNextDueDate_lastPaymentCycle() public {
+
+        uint256 bidId = 1 ;
+        
+         tellerV2.mock_setBid(bidId, Bid({
+
+            borrower: address(borrower),
+            lender: address(lender),
+            receiver: address(receiver),
+            marketplaceId: 100,
+            _metadataURI: "0x1234",
+
+            loanDetails: LoanDetails({
+                lendingToken: lendingToken,
+                principal: 100,
+                timestamp: 100,
+                acceptedTimestamp: 100,
+                lastRepaidTimestamp: 4000,
+                loanDuration: 5000,
+                totalRepaid: Payment({
+                    principal: 100,
+                    interest: 5 
+                })
+
+            }),
+            terms: Terms({
+                paymentCycleAmount: 10,
+                paymentCycle: 2000,
+                APR: 10
+            }),
+            state: BidState.PENDING,
+            paymentType: PaymentType.EMI 
+         }));
+
+    //vm.warp(5200);
+
+        tellerV2.mock_setBidPaymentCycleType(bidId, PaymentCycleType.Seconds);
+
+        tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
+
+        uint256 nextDueDate = tellerV2.calculateNextDueDate(bidId);
+
+
+        uint256 endOfLoanExpected = 100 + 5000 ;
+
+
+        assertEq(nextDueDate, endOfLoanExpected, "unexpected due date");
+
+    }
+
+
+    function test_isPaymentLate_invalid_state() public {
+
+         uint256 bidId = 1 ;
+        setMockBid(1); 
+
+        tellerV2.mock_setBidState(bidId, BidState.PENDING);
+
+        bool isLate = tellerV2.isPaymentLate(1);
+
+        assertEq(isLate, false, "unexpected late status");
+    }
+
+    function test_isPaymentLate() public {
+
+        uint256 bidId = 1 ;
+        setMockBid(1); 
+
+        tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
+
+        bool isLate = tellerV2.isPaymentLate(1);
+
+        assertEq(isLate, false, "unexpected late status");
+    }
+
+
+     //test all branches
+    function test_canLiquidateLoan_internal() public {
+
+        uint256 bidId = 1 ;
+        setMockBid(1); 
+
+        tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
+        tellerV2.mock_setBidDefaultDuration(bidId,1000);
+
+        vm.warp(1e10);
+
+        bool canLiq = tellerV2._canLiquidateLoanSuper(bidId, 500);
+
+        assertEq(canLiq, true, "unexpected liquidation status");
+
+    }   
+
+    function test_canLiquidateLoan_internal_invalid_state() public {
+
+        uint256 bidId = 1 ;
+        setMockBid(1); 
+
+        tellerV2.mock_setBidState(bidId, BidState.PENDING);
+        tellerV2.mock_setBidDefaultDuration(bidId,1000);
+
+
+        bool canLiq = tellerV2._canLiquidateLoanSuper(bidId, 500);
+
+        assertEq(canLiq, false, "unexpected liquidation status");
+
+    }  
+
+        function test_canLiquidateLoan_internal_zero_default_duration() public {
+
+        uint256 bidId = 1 ;
+        setMockBid(1); 
+
+        tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
+        tellerV2.mock_setBidDefaultDuration(bidId,0);
+
+        vm.warp(1e10);
+
+
+
+        bool canLiq = tellerV2._canLiquidateLoanSuper(bidId, 500);
+
+        assertEq(canLiq, false, "unexpected liquidation status");
+
+    }  
+
+
+    function test_canLiquidateLoan_internal_false() public {
+
+        uint256 bidId = 1 ;
+        setMockBid(1); 
+
+        tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
+        tellerV2.mock_setBidDefaultDuration(bidId,10000000);
+    
+        vm.warp(50000);
+
+        bool canLiq = tellerV2._canLiquidateLoanSuper(bidId, 5500);
+
+        assertEq(canLiq, false, "unexpected liquidation status");
+
+    }   
+
+    //test all branches
+    function test_isLoanExpired() public {
 
     }
 

@@ -43,11 +43,22 @@ contract TellerV2_pause_test is Testable {
 
      function test_pauseProtocol_invalid_if_paused() public {
 
-      
+        tellerV2.mock_initialize();
+ 
+
+        tellerV2.pauseProtocol();
+
+        vm.expectRevert();
+        tellerV2.pauseProtocol();
     
     }
 
-      function test_unpauseProtocol_invalid_if_unpaused() public {
+    function test_unpauseProtocol_invalid_if_unpaused() public {
+        
+        tellerV2.mock_initialize();
+ 
+        vm.expectRevert();
+        tellerV2.unpauseProtocol();
  
     
     }

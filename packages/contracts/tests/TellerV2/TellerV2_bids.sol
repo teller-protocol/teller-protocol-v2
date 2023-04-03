@@ -679,9 +679,7 @@ contract TellerV2_bids_test is Testable {
 
         //set the account that will be paying the loan off
         tellerV2.setMockMsgSenderForMarket(address(this));
-
-
-        //need to get some weth 
+ 
 
         lendingToken.approve(address(tellerV2), 1e20);
 
@@ -693,13 +691,75 @@ contract TellerV2_bids_test is Testable {
     } 
 
 
-     function test_repay_loan_invalid_state() public {}
+     function test_repay_loan_invalid_state() public {
+
+        uint256 bidId = 1;
+        setMockBid(bidId);
+
+        tellerV2.mock_setBidState(bidId, BidState.PENDING);
+        
+        //set the account that will be paying the loan off
+        tellerV2.setMockMsgSenderForMarket(address(this));
+ 
+
+        lendingToken.approve(address(tellerV2), 1e20);
+
+       
+        vm.expectRevert(
+             abi.encodeWithSelector( ActionNotAllowed.selector,bidId, "repayLoan" , "Loan must be accepted")
+         );
+
+        tellerV2.repayLoan(bidId, 100);
+
+     }
 
 
-    function test_repay_loan_full() public {}
+    function test_repay_loan_full() public {
+
+        uint256 bidId = 1;
+        setMockBid(bidId);
+
+        tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
+
+        vm.warp(2000);
+        
+        //set the account that will be paying the loan off
+        tellerV2.setMockMsgSenderForMarket(address(this));
+ 
+
+        lendingToken.approve(address(tellerV2), 1e20);
+
+        
+
+        tellerV2.repayLoanFull(bidId);
 
 
-    function test_repay_loan_full_invalid_state() public {}
+        assertTrue(tellerV2.repayLoanWasCalled(),"repay loan was not called");
+
+
+    }
+
+
+    function test_repay_loan_full_invalid_state() public {
+
+            uint256 bidId = 1;
+        setMockBid(bidId);
+
+        tellerV2.mock_setBidState(bidId, BidState.PENDING);
+        
+        //set the account that will be paying the loan off
+        tellerV2.setMockMsgSenderForMarket(address(this));
+ 
+
+        lendingToken.approve(address(tellerV2), 1e20);
+
+       
+        vm.expectRevert(
+             abi.encodeWithSelector( ActionNotAllowed.selector,bidId, "repayLoan" , "Loan must be accepted")
+         );
+
+        tellerV2.repayLoanFull(bidId);
+    }
 
 
  
@@ -777,6 +837,8 @@ contract TellerV2_bids_test is Testable {
 
         tellerV2.claimLoanNFT(bidId);
 
+
+
     } 
  
 
@@ -800,6 +862,25 @@ contract TellerV2_bids_test is Testable {
     } 
 
   function test_claim_loan_nft_invalid_when_paused() public {
+
+        uint256 bidId = 1;
+        setMockBid(bidId);  
+        
+
+        tellerV2.mock_setLenderManager(address(lenderManagerMock)); 
+
+
+        tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
+
+        tellerV2.setMockMsgSenderForMarket(address(lender));
+      
+        tellerV2.mock_initialize();
+        tellerV2.pauseProtocol();
+
+        vm.expectRevert("Pausable: paused");
+        vm.prank(address(lender));
+        tellerV2.claimLoanNFT(bidId);
+
 
   }
 

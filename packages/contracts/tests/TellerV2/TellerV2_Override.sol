@@ -6,7 +6,9 @@ import { TellerV2, Bid, BidState, Collateral, Payment, LoanDetails, Terms } from
  import "../../contracts/interfaces/IMarketRegistry.sol";
  import "../../contracts/interfaces/IReputationManager.sol";
  import "../../contracts/interfaces/ICollateralManager.sol";
+ import "../../contracts/interfaces/ILenderManager.sol";
 
+ 
  
 contract TellerV2_Override is TellerV2 {
 
@@ -32,6 +34,11 @@ contract TellerV2_Override is TellerV2 {
 
     function mock_addUriToMapping(uint256 bidId, string memory uri) public {
         uris[bidId] = uri;
+    }
+
+      function mock_setLenderManager(address _lenderManager) public {
+      
+        lenderManager = ILenderManager(_lenderManager);
     }
 
     function setLenderManagerSuper(address lenderManager) public initializer {
@@ -121,6 +128,13 @@ contract TellerV2_Override is TellerV2 {
         super._repayLoan(_bidId, _payment, _owedAmount, _shouldWithdrawCollateral);
     }
 
+    function _canLiquidateLoanSuper(uint256 _bidId, uint32 _liquidationDelay)
+        public
+        view
+        returns (bool)
+    {
+        return _canLiquidateLoan(_bidId, _liquidationDelay);
+    }
 
 
     /*

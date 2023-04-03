@@ -21,6 +21,11 @@ contract LenderManagerMock is ILenderManager, ERC721Upgradeable {
 
         registeredLoan[_bidId] = _newLender;
     }
+
+
+    function ownerOf(uint256 _bidId) public view override(ERC721Upgradeable,IERC721Upgradeable) returns (address) {
+        return registeredLoan[_bidId];
+    }
  
  
 }

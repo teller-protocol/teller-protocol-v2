@@ -12,6 +12,10 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 import { PaymentType, PaymentCycleType } from "../../contracts/libraries/V2Calculations.sol";
 
+import {ReputationManagerMock} from "../../contracts/mock/ReputationManagerMock.sol";
+import {CollateralManagerMock} from "../../contracts/mock/CollateralManagerMock.sol";
+import {LenderManagerMock} from "../../contracts/mock/LenderManagerMock.sol";
+import {MarketRegistryMock} from "../../contracts/mock/MarketRegistryMock.sol";
 
 
 
@@ -26,11 +30,16 @@ contract TellerV2_initialize is Testable {
     
     ERC20 lendingToken;
 
+    LenderManagerMock lenderManagerMock;
+
+
+
     function setUp() public {
         tellerV2 = new TellerV2_Override();
 
         lendingToken = new ERC20("Wrapped Ether","WETH");
 
+        lenderManagerMock = new LenderManagerMock();
  
     }
 
@@ -186,13 +195,90 @@ contract TellerV2_initialize is Testable {
     }*/
 
 
- function test_getLoanLender_with_nft() public {
+    function test_getLoanLender_without_nft() public {
             
             uint256 bidId = 1 ;
-            setMockBid(1); 
-    
-            //todo mock nft 
+            
+            tellerV2.mock_setBid(bidId, Bid({
 
+            borrower: address(borrower),
+            lender: address(lender),
+            receiver: address(receiver),
+            marketplaceId: 100,
+            _metadataURI: "0x1234",
+
+            loanDetails: LoanDetails({
+                lendingToken: lendingToken,
+                principal: 100,
+                timestamp: 100,
+                acceptedTimestamp: 100,
+                lastRepaidTimestamp: 2000,
+                loanDuration: 5000,
+                totalRepaid: Payment({
+                    principal: 100,
+                    interest: 5 
+                })
+
+            }),
+            terms: Terms({
+                paymentCycleAmount: 10,
+                paymentCycle: 2000,
+                APR: 10
+            }),
+            state: BidState.PENDING,
+            paymentType: PaymentType.EMI 
+         }));
+
+ 
+
+            tellerV2.mock_setLenderManager(address(lenderManagerMock));
+
+            address result = tellerV2.getLoanLender(bidId);
+
+            assertEq(result, address(lender),"getLoanLender did not return correct result");
+    }
+
+       function test_getLoanLender_with_nft() public {
+            
+            uint256 bidId = 1 ;
+
+               tellerV2.mock_setBid(bidId, Bid({
+
+            borrower: address(borrower),
+            lender: address(lenderManagerMock),
+            receiver: address(receiver),
+            marketplaceId: 100,
+            _metadataURI: "0x1234",
+
+            loanDetails: LoanDetails({
+                lendingToken: lendingToken,
+                principal: 100,
+                timestamp: 100,
+                acceptedTimestamp: 100,
+                lastRepaidTimestamp: 2000,
+                loanDuration: 5000,
+                totalRepaid: Payment({
+                    principal: 100,
+                    interest: 5 
+                })
+
+            }),
+            terms: Terms({
+                paymentCycleAmount: 10,
+                paymentCycle: 2000,
+                APR: 10
+            }),
+            state: BidState.PENDING,
+            paymentType: PaymentType.EMI 
+         }));
+
+            tellerV2.mock_setLenderManager(address(lenderManagerMock));
+
+            address result = tellerV2.getLoanLender(bidId);
+
+            lenderManagerMock.registerLoan(bidId, address(this));
+
+            assertEq(result, lenderManagerMock.ownerOf(bidId),"getLoanLender did not return correct result");
     }
 
     function test_getLoanLendingToken() public {
@@ -544,7 +630,7 @@ contract TellerV2_initialize is Testable {
         uint256 bidId = 1 ;
         setMockBid(1);
 
-        tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
+        tellerV2.mock_setBidState(bidId, BidState.PENDING);
         tellerV2.mock_setBidDefaultDuration(bidId,500);
 
         vm.warp(1e10);
@@ -571,7 +657,7 @@ contract TellerV2_initialize is Testable {
         uint256 bidId = 1 ;
         setMockBid(1);
 
-        tellerV2.mock_setBidState(bidId, BidState.PENDING);
+        tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
         tellerV2.mock_setBidDefaultDuration(bidId,500);
 
         vm.warp(1e10);

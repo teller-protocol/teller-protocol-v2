@@ -38,19 +38,19 @@ contract TellerV2_Override is TellerV2 {
         _setLenderManager(lenderManager);
     }
     
-    function setMarketRegistrySuper(address _marketRegistry) public initializer {
+    function setMarketRegistrySuper(address _marketRegistry) public {
         
         marketRegistry = IMarketRegistry(_marketRegistry);
     }
 
-    function setCollateralManagerSuper(address _collateralManager) public initializer {
+    function setCollateralManagerSuper(address _collateralManager) public  {
         
         collateralManager = ICollateralManager(_collateralManager);
     }
 
 
 
-    function setReputationManagerSuper(address _reputationManager) public initializer {
+    function setReputationManagerSuper(address _reputationManager) public {
         reputationManager = IReputationManager(_reputationManager);
     }
 
@@ -59,6 +59,10 @@ contract TellerV2_Override is TellerV2 {
     function mock_setBidState(uint256 bidId, BidState state) public {
         bids[bidId].state = state;
     }  
+
+    function mock_setBidPaymentCycleType(uint256 bidId, PaymentCycleType paymentCycleType) public {
+        bidPaymentCycleType[bidId] = PaymentCycleType(paymentCycleType);
+    }
 
     function mock_setBidDefaultDuration(uint256 bidId, uint32 defaultDuration) public {
         bidDefaultDuration[bidId] = defaultDuration;

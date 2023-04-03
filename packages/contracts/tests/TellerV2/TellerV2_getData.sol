@@ -175,7 +175,7 @@ contract TellerV2_initialize is Testable {
 
         tellerV2.mock_setBidState(bidId, BidState.PENDING);
 
-         tellerV2.mock_setBidExpirationTime(bidId, 1000);
+        tellerV2.mock_setBidExpirationTime(bidId, 1000);
  
 
         //fast forward timestamp 
@@ -268,6 +268,160 @@ contract TellerV2_initialize is Testable {
         assertEq(lender, address(lender), "unexpected lender from summary");
         assertEq(marketId, 100, "unexpected marketId from summary");
 
+
+    }
+
+
+    /*
+
+    there are many branches of this to test 
+    */
+
+    function test_calculateNextDueDate_not_accepted() public {
+
+        uint256 bidId = 1 ;
+        setMockBid(1); 
+
+        tellerV2.mock_setBidState(bidId, BidState.PENDING);
+
+
+        uint256 nextDueDate = tellerV2.calculateNextDueDate(bidId);
+
+        assertEq(nextDueDate, 0);
+
+    }
+
+
+    function test_calculateNextDueDate_monthly() public {
+
+        uint256 bidId = 1 ;
+        
+         tellerV2.mock_setBid(bidId, Bid({
+
+            borrower: address(borrower),
+            lender: address(lender),
+            receiver: address(receiver),
+            marketplaceId: 100,
+            _metadataURI: "0x1234",
+
+            loanDetails: LoanDetails({
+                lendingToken: lendingToken,
+                principal: 100,
+                timestamp: 100,
+                acceptedTimestamp: 100,
+                lastRepaidTimestamp: 100,
+                loanDuration: 5000,
+                totalRepaid: Payment({
+                    principal: 100,
+                    interest: 5 
+                })
+
+            }),
+            terms: Terms({
+                paymentCycleAmount: 10,
+                paymentCycle: 2000,
+                APR: 10
+            }),
+            state: BidState.PENDING,
+            paymentType: PaymentType.EMI 
+         }));
+
+        tellerV2.mock_setBidPaymentCycleType(bidId, PaymentCycleType.Monthly);
+
+        tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
+
+        uint256 nextDueDate = tellerV2.calculateNextDueDate(bidId);
+
+        assertEq(nextDueDate, 5100, "unexpected due date");
+
+    }
+
+
+    function test_calculateNextDueDate_monthly_after_repayment() public {
+
+        uint256 bidId = 1 ;
+        
+         tellerV2.mock_setBid(bidId, Bid({
+
+            borrower: address(borrower),
+            lender: address(lender),
+            receiver: address(receiver),
+            marketplaceId: 100,
+            _metadataURI: "0x1234",
+
+            loanDetails: LoanDetails({
+                lendingToken: lendingToken,
+                principal: 100,
+                timestamp: 100,
+                acceptedTimestamp: 100,
+                lastRepaidTimestamp: 2000,
+                loanDuration: 5000,
+                totalRepaid: Payment({
+                    principal: 100,
+                    interest: 5 
+                })
+
+            }),
+            terms: Terms({
+                paymentCycleAmount: 10,
+                paymentCycle: 2000,
+                APR: 10
+            }),
+            state: BidState.PENDING,
+            paymentType: PaymentType.EMI 
+         }));
+
+        tellerV2.mock_setBidPaymentCycleType(bidId, PaymentCycleType.Monthly);
+
+        tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
+
+        uint256 nextDueDate = tellerV2.calculateNextDueDate(bidId);
+
+        assertEq(nextDueDate, 5100, "unexpected due date");
+
+    }
+
+      function test_calculateNextDueDate_seconds() public {
+
+        uint256 bidId = 1 ;
+        
+         tellerV2.mock_setBid(bidId, Bid({
+
+            borrower: address(borrower),
+            lender: address(lender),
+            receiver: address(receiver),
+            marketplaceId: 100,
+            _metadataURI: "0x1234",
+
+            loanDetails: LoanDetails({
+                lendingToken: lendingToken,
+                principal: 100,
+                timestamp: 100,
+                acceptedTimestamp: 100,
+                lastRepaidTimestamp: 2000,
+                loanDuration: 5000,
+                totalRepaid: Payment({
+                    principal: 100,
+                    interest: 5 
+                })
+
+            }),
+            terms: Terms({
+                paymentCycleAmount: 10,
+                paymentCycle: 2000,
+                APR: 10
+            }),
+            state: BidState.PENDING,
+            paymentType: PaymentType.EMI 
+         }));
+
+        tellerV2.mock_setBidPaymentCycleType(bidId, PaymentCycleType.Seconds);
+
+        tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
+
+        uint256 nextDueDate = tellerV2.calculateNextDueDate(bidId);
+
+        assertEq(nextDueDate, 4100, "unexpected due date");
 
     }
 

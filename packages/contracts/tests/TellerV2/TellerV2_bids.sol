@@ -36,6 +36,8 @@ contract TellerV2_bids_test is Testable {
 
     User marketOwner;
 
+    User feeRecipient;
+
     MarketRegistryMock marketRegistryMock;
 
     ReputationManagerMock reputationManagerMock;
@@ -68,6 +70,7 @@ contract TellerV2_bids_test is Testable {
         receiver = new User();
 
         marketOwner = new User();
+        feeRecipient = new User();
 
         lendingToken = new TestERC20Token("Wrapped Ether","WETH",1e30,18);
         lendingTokenZeroDecimals = new TestERC20Token("Wrapped Ether","WETH",1e16,0);
@@ -155,8 +158,50 @@ contract TellerV2_bids_test is Testable {
 
     }
 
-    function test_submit_bid_internal_fails_when_market_closed() public {}
-    function test_submit_bid_internal_fails_when_borrower_not_verified() public {}
+    function test_submit_bid_internal_fails_when_market_closed() public {
+
+
+
+        tellerV2.setMarketRegistrySuper(address(marketRegistryMock));
+
+        marketRegistryMock.mock_setGlobalMarketsClosed(true);
+
+        vm.expectRevert("Market is closed");
+
+        tellerV2._submitBidSuper(
+            address(lendingToken),    // lending token
+            1,             // market ID
+            100,           // principal
+            365 days,      // duration
+            20_00,         // interest rate
+            "",            // metadata URI
+            address(this)  // receiver
+        );
+
+    }
+    function test_submit_bid_internal_fails_when_borrower_not_verified() public {
+
+      
+
+         tellerV2.setMarketRegistrySuper(address(marketRegistryMock));
+
+        marketRegistryMock.mock_setBorrowerIsVerified(false);
+
+
+        vm.expectRevert("Not verified borrower");
+
+        tellerV2._submitBidSuper(
+            address(lendingToken),    // lending token
+            1,             // market ID
+            100,           // principal
+            365 days,      // duration
+            20_00,         // interest rate
+            "",            // metadata URI
+            address(this)  // receiver
+        );
+
+
+    }
  
 
       function test_submit_bid_without_collateral() public {
@@ -350,6 +395,72 @@ contract TellerV2_bids_test is Testable {
  
     }
 
+
+
+    function test_lender_accept_bid() public {
+
+        uint256 bidId = 1;
+        setMockBid(bidId);
+
+        //make address (this) be the one that makes the payment 
+        tellerV2.setMockMsgSenderForMarket(address(this));
+
+        tellerV2.mock_setBidState(bidId, BidState.PENDING);
+
+
+        tellerV2.setMarketRegistrySuper(address( marketRegistryMock ));
+        marketRegistryMock.setMarketFeeRecipient(address(feeRecipient));
+
+        tellerV2.setCollateralManagerSuper(address(collateralManagerMock));
+
+        tellerV2.lenderAcceptBid(bidId);
+
+
+        assertTrue(collateralManagerMock.deployAndDepositWasCalled(),"deploy and deposit was not called");
+    }
+
+
+    function test_lender_accept_bid_invalid_state() public {
+
+        uint256 bidId = 1;
+        setMockBid(bidId);
+
+        tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
+
+
+        tellerV2.setMarketRegistrySuper(address( marketRegistryMock ));
+
+        tellerV2.setCollateralManagerSuper(address(collateralManagerMock));
+
+        //expect revert due to bid state 
+        vm.expectRevert();
+
+        tellerV2.lenderAcceptBid(bidId);
+
+    }
+
+    function test_lender_accept_bid_when_paused() public {
+
+
+    }
+
+    function test_lender_accept_bid_when_not_verified() public {
+
+
+    }
+
+    function test_lender_accept_bid_when_market_closed() public {
+
+
+    }
+
+      function test_lender_accept_bid_when_loan_expired() public {
+
+
+    }
+
+
+
  
 
 
@@ -378,6 +489,9 @@ contract TellerV2_bids_test is Testable {
 
 
      }
+
+
+        //NEED TO TEST MORE BRANCHES OF TEST_REPAY_LOAN_INTERNAL
 
 
     function test_repay_loan_minimum() public {
@@ -463,6 +577,15 @@ contract TellerV2_bids_test is Testable {
 
 
     } 
+
+
+     function test_repay_loan_invalid_state() public {}
+
+
+    function test_repay_loan_full() public {}
+
+
+    function test_repay_loan_full_invalid_state() public {}
 
 
  
@@ -562,6 +685,9 @@ contract TellerV2_bids_test is Testable {
 
     } 
 
+  function test_claim_loan_nft_invalid_when_paused() public {
+
+  }
 
     
     

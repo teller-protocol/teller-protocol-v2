@@ -8,6 +8,7 @@ contract CollateralManagerMock is ICollateralManager {
 
 
     bool public committedCollateralValid = true;
+    bool public deployAndDepositWasCalled;
 
     function commitCollateral(
         uint256 _bidId,
@@ -35,7 +36,11 @@ contract CollateralManagerMock is ICollateralManager {
      * @notice Deploys a new collateral escrow.
      * @param _bidId The associated bidId of the collateral escrow.
      */
-    function deployAndDeposit(uint256 _bidId) external {}
+    function deployAndDeposit(uint256 _bidId) external {
+
+        deployAndDepositWasCalled = true;
+        
+    }
 
     /**
      * @notice Gets the address of a deployed escrow.

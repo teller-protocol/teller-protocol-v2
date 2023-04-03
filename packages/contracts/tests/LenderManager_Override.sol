@@ -60,10 +60,34 @@ contract LenderManager_Override is  LenderManager {
          super._mint(to,tokenId);
     }
 
+    function _getLoanMarketIdSuper(uint256 _bidId)
+        public
+        view
+        returns (uint256)
+    {
+        return super._getLoanMarketId(_bidId);
+    }
+
+    function _hasMarketVerificationSuper(address _lender, uint256 _bidId)
+        public
+        view
+        returns (bool)
+    {
+        return super._hasMarketVerification(_lender,_bidId);
+    }
+
+    function _baseURISuper()
+        public
+        view
+        returns (string memory)
+    {
+        return super._baseURI();
+    }
+
 
     //should be able to test the negative case-- use foundry
-    function _checkOwner() internal view override {
+    /*function _checkOwner() internal view override {
         // do nothing
-    }
+    }*/
 }
  

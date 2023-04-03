@@ -32,6 +32,9 @@ contract LenderManager_Test is Testable  {
     {}
 
     function setUp() public {
+
+       
+
         mockTellerV2 = new LenderCommitmentTester();
 
        
@@ -51,15 +54,80 @@ contract LenderManager_Test is Testable  {
     }
 
 
-    /*
-FNDA:0,LenderManager._getLoanMarketId
-FNDA:0,LenderManager._hasMarketVerification
-FNDA:0,LenderManager._baseURI
-    */
+     
+
+    function test_initialize() public {
+        lenderManager.initialize();
+    }
+
+    function test_getLoanMarketId() public {
+
+        lenderManager.initialize();
+
+        uint256 marketId = lenderManager._getLoanMarketIdSuper(1);
+
+        assertEq(marketId,  getLoanMarketId(marketId), "Market id is not correct");
+
+
+    }
+
+    function test_hasMarketVerification() public {
+
+
+        lenderManager.initialize();
+
+        bool hasMarketVerification = lenderManager._hasMarketVerificationSuper(address(lender), 1);
+
+        assertEq(hasMarketVerification, true, "Market verification is not correct");
+    }
+
+    function test_baseURI() public {
+
+        lenderManager.initialize();
+
+        string memory baseURI = lenderManager._baseURISuper();
+
+        assertEq(
+            baseURI,
+            "",
+            "Base URI is not correct"
+        );
+
+
+    }
+
+    function test_mint() public {
+        lenderManager.setHasMarketVerification(true);
+
+        uint256 bidId = 2;
+
+        lenderManager.mint(address(lender), bidId);
+
+        assertEq(
+            lenderManager.exists(bidId),
+            true,
+            "Loan registration did not mint nft"
+        );
+    }
+
+    function test_mintToInvalidRecipient() public {
+        lenderManager.setHasMarketVerification(false);
+
+        uint256 bidId = 2;
+
+        bool mintFailed;
+
+        vm.expectRevert("Not approved by market");
+       
+         lenderManager.mint(address(address(lender)), bidId);
+ 
+    }
+
+     
 
     function test_registerLoan() public {
       
-
+        lenderManager.initialize();
         lenderManager.setHasMarketVerification(true);
 
         uint256 bidId = 2;
@@ -71,6 +139,19 @@ FNDA:0,LenderManager._baseURI
             true,
             "Loan registration did not mint nft"
         );
+    }
+
+
+    function test_registerLoan_invalid_owner() public {
+        lenderManager.setHasMarketVerification(true);
+
+        uint256 bidId = 2;
+
+        vm.prank(address(borrower));
+        vm.expectRevert("Ownable: caller is not the owner");
+        
+        lenderManager.registerLoan(bidId, address(lender));
+
     }
 
     function test_transferFrom() public {
@@ -117,6 +198,19 @@ FNDA:0,LenderManager._baseURI
             address(lender),
             "Loan nft is no longer owned by lender"
         );
+    }
+
+
+    // Overrides 
+
+
+    function getLoanMarketId(uint256 bidId)
+        public
+        view
+      
+        returns (uint256)
+    {
+        return 42;
     }
 
     

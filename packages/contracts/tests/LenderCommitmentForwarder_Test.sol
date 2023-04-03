@@ -55,9 +55,15 @@ contract LenderCommitmentForwarder_Test is Testable {
     uint256 marketId;
   //  address principalTokenAddress;
 
+    /*
+ 
+           
+            FNDA:0,LenderCommitmentForwarder.getCommitmentBorrowers
+            FNDA:0,LenderCommitmentForwarder._getEscrowCollateralType
 
-          
 
+
+    */
 
     constructor()
         
@@ -232,7 +238,8 @@ contract LenderCommitmentForwarder_Test is Testable {
             c   
         );
 
-        lender._updateCommitment(0, c);
+        vm.prank(address(lender));
+        lenderCommitmentForwarder.updateCommitment(0, c);
 
            
         assertEq(lenderCommitmentForwarder.getCommitmentMarketId(0), c.marketId, "unexpected marketId after update");
@@ -257,8 +264,74 @@ contract LenderCommitmentForwarder_Test is Testable {
 
         vm.expectRevert( "unauthorized commitment lender" );
 
+ 
+         vm.prank(address(lender));
+        lenderCommitmentForwarder.updateCommitment(99, c);
 
-        lender._updateCommitment(99, c);
+    }
+
+    function test_updateCommitment_prevent_update_principal_token() public {
+         LenderCommitmentForwarder.Commitment memory c = LenderCommitmentForwarder.Commitment({
+            maxPrincipal: maxPrincipal,
+            expiration: expiration,
+            maxDuration: maxDuration,
+            minInterestRate: minInterestRate,
+            collateralTokenAddress: address(collateralToken),
+            collateralTokenId: collateralTokenId,
+            maxPrincipalPerCollateralAmount:maxPrincipalPerCollateralAmount,
+            collateralTokenType: collateralTokenType,
+            lender: address(lender),
+            marketId: 99,
+            principalTokenAddress: address(principalToken)  
+        });
+
+
+        lenderCommitmentForwarder.setCommitment(
+            0,
+            c   
+        );
+
+        c.principalTokenAddress = address(collateralToken);
+
+        vm.expectRevert("Principal token address cannot be updated.");
+        vm.prank(address(lender));
+        lenderCommitmentForwarder.updateCommitment(0, c);
+
+    }
+    function test_updateCommitment_prevent_update_market_id() public {
+
+         LenderCommitmentForwarder.Commitment memory c = LenderCommitmentForwarder.Commitment({
+            maxPrincipal: maxPrincipal,
+            expiration: expiration,
+            maxDuration: maxDuration,
+            minInterestRate: minInterestRate,
+            collateralTokenAddress: address(collateralToken),
+            collateralTokenId: collateralTokenId,
+            maxPrincipalPerCollateralAmount:maxPrincipalPerCollateralAmount,
+            collateralTokenType: collateralTokenType,
+            lender: address(lender),
+            marketId: 99,
+            principalTokenAddress: address(principalToken)  
+        });
+
+
+        lenderCommitmentForwarder.setCommitment(
+            0,
+            c   
+        );
+
+        c.marketId = 100;
+
+        vm.expectRevert("Market Id cannot be updated.");
+        vm.prank(address(lender));
+        lenderCommitmentForwarder.updateCommitment(0, c);
+
+    }
+
+    function test_updateCommitmentBorrowers() public {  
+        //add more here 
+
+        lenderCommitmentForwarder.updateCommitmentBorrowers(0, emptyArray); 
 
     }
 
@@ -331,6 +404,54 @@ contract LenderCommitmentForwarder_Test is Testable {
         
     }
 
+
+    function test_acceptCommitment_mismatch_collateral_token() public {
+
+
+    }
+
+    function test_acceptCommitment_invalid_interest_rate() public {
+
+
+    }
+
+
+    function test_acceptCommitment_invalid_duration() public {
+
+
+    }
+
+    function test_acceptCommitment_invalid_commitment_borrower() public {
+
+
+    }
+
+    function test_acceptCommitment_insufficient_commitment_allocation() public {
+
+
+    }
+
+    function test_acceptCommitment_insufficient_borrower_collateral() public {
+
+
+    }
+
+
+    function test_acceptCommitment_invalid_721_collateral_amount() public {
+
+
+    }
+
+
+     function test_acceptCommitment_invalid_collateral_id() public {
+
+
+    }
+
+    function test_getRequiredCollateral() public {}
+
+
+
     /*
         Overrider methods for exercise 
     */
@@ -390,23 +511,9 @@ contract LenderCommitmentUser is User {
             );
     }
 
-    function _updateCommitment(
-        uint256 commitmentId,
-        LenderCommitmentForwarder.Commitment calldata _commitment
-    ) public {
-        commitmentForwarder.updateCommitment(commitmentId, _commitment);
-    }
+   
 
-    function _updateCommitmentBorrowers(
-        uint256 commitmentId,
-        address[] calldata borrowerAddressList
-    ) public {
-        commitmentForwarder.updateCommitmentBorrowers(
-            commitmentId,
-            borrowerAddressList
-        );
-    }
-
+ 
     function _acceptCommitment(
         uint256 commitmentId,
         uint256 principal,

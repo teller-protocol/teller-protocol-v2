@@ -31,7 +31,16 @@ contract CollateralManager_Test is Testable {
     TestERC1155Token erc1155Mock;
 
     TellerV2_Mock tellerV2Mock;
-   
+    
+    /*
+
+
+    FNDA:0,CollateralManager.initialize
+    FNDA:0,CollateralManager._deposit
+    FNDA:0,CollateralManager.onERC1155BatchReceived
+
+
+    */
 
     function setUp() public {
         // Deploy implementation

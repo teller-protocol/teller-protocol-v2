@@ -402,6 +402,11 @@ contract TellerV2_bids_test is Testable {
         uint256 bidId = 1;
         setMockBid(bidId);
 
+        tellerV2.mock_initialize();//set address this as owner
+
+
+        lendingToken.approve(address(tellerV2),1e20);
+
         //make address (this) be the one that makes the payment 
         tellerV2.setMockMsgSenderForMarket(address(this));
 
@@ -432,8 +437,10 @@ contract TellerV2_bids_test is Testable {
 
         tellerV2.setCollateralManagerSuper(address(collateralManagerMock));
 
-        //expect revert due to bid state 
-        vm.expectRevert();
+        
+        vm.expectRevert(
+            abi.encodeWithSelector( ActionNotAllowed.selector,bidId, "lenderAcceptBid" , "Bid must be pending")
+        );
 
         tellerV2.lenderAcceptBid(bidId);
 
@@ -441,21 +448,128 @@ contract TellerV2_bids_test is Testable {
 
     function test_lender_accept_bid_when_paused() public {
 
+        uint256 bidId = 1;
+        setMockBid(bidId);
+
+        tellerV2.mock_initialize();//set address this as owner
+
+
+        lendingToken.approve(address(tellerV2),1e20);
+
+        //make address (this) be the one that makes the payment 
+        tellerV2.setMockMsgSenderForMarket(address(this));
+
+        tellerV2.mock_setBidState(bidId, BidState.PENDING);
+
+
+        tellerV2.setMarketRegistrySuper(address( marketRegistryMock ));
+        marketRegistryMock.setMarketFeeRecipient(address(feeRecipient));
+
+        tellerV2.setCollateralManagerSuper(address(collateralManagerMock));
+
+
+        tellerV2.pauseProtocol();
+
+        vm.expectRevert(
+            "Pausable: paused"
+        );
+
+        tellerV2.lenderAcceptBid(bidId);
 
     }
 
     function test_lender_accept_bid_when_not_verified() public {
 
+        uint256 bidId = 1;
+        setMockBid(bidId);
 
+        tellerV2.mock_initialize();//set address this as owner
+
+
+        lendingToken.approve(address(tellerV2),1e20);
+
+        //make address (this) be the one that makes the payment 
+        tellerV2.setMockMsgSenderForMarket(address(this));
+
+        tellerV2.mock_setBidState(bidId, BidState.PENDING);
+
+
+        tellerV2.setMarketRegistrySuper(address( marketRegistryMock ));
+        marketRegistryMock.setMarketFeeRecipient(address(feeRecipient));
+
+        tellerV2.setCollateralManagerSuper(address(collateralManagerMock));
+
+        marketRegistryMock.mock_setLenderIsVerified(false);
+
+        vm.expectRevert(
+            "Not verified lender"
+        );
+
+        tellerV2.lenderAcceptBid(bidId);
     }
 
     function test_lender_accept_bid_when_market_closed() public {
 
+        uint256 bidId = 1;
+        setMockBid(bidId);
 
+        tellerV2.mock_initialize();//set address this as owner
+
+
+        lendingToken.approve(address(tellerV2),1e20);
+
+        //make address (this) be the one that makes the payment 
+        tellerV2.setMockMsgSenderForMarket(address(this));
+
+        tellerV2.mock_setBidState(bidId, BidState.PENDING);
+
+
+        tellerV2.setMarketRegistrySuper(address( marketRegistryMock ));
+        marketRegistryMock.setMarketFeeRecipient(address(feeRecipient));
+
+        tellerV2.setCollateralManagerSuper(address(collateralManagerMock));
+
+        marketRegistryMock.mock_setGlobalMarketsClosed(true);
+
+        vm.expectRevert(
+            "Market is closed"
+        );
+
+        tellerV2.lenderAcceptBid(bidId);
     }
 
-      function test_lender_accept_bid_when_loan_expired() public {
+    function test_lender_accept_bid_when_loan_expired() public {
 
+
+           uint256 bidId = 1;
+        setMockBid(bidId);
+
+        tellerV2.mock_initialize();//set address this as owner
+
+
+        lendingToken.approve(address(tellerV2),1e20);
+
+        //make address (this) be the one that makes the payment 
+        tellerV2.setMockMsgSenderForMarket(address(this));
+
+        tellerV2.mock_setBidState(bidId, BidState.PENDING);
+
+
+        tellerV2.setMarketRegistrySuper(address( marketRegistryMock ));
+        marketRegistryMock.setMarketFeeRecipient(address(feeRecipient));
+
+        tellerV2.setCollateralManagerSuper(address(collateralManagerMock));
+
+
+        tellerV2.mock_setBidExpirationTime(bidId,1000);
+
+        vm.warp(20000);
+        
+        vm.expectRevert(
+            "Bid has expired"
+        );
+
+        tellerV2.lenderAcceptBid(bidId);
 
     }
 

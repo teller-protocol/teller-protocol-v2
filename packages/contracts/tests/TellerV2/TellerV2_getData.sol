@@ -326,6 +326,8 @@ contract TellerV2_initialize is Testable {
         uint256 bidId = 1 ;
         setMockBid(1); 
 
+        vm.warp(150);
+        
         tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
 
         Payment memory amountDue = tellerV2.calculateAmountDue(bidId);
@@ -387,6 +389,7 @@ contract TellerV2_initialize is Testable {
         setMockBid(1); 
 
         tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
+        vm.warp(150);
 
         Payment memory amountOwed = tellerV2.calculateAmountOwed(bidId);
 

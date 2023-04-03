@@ -274,10 +274,10 @@ contract TellerV2_initialize is Testable {
 
             tellerV2.mock_setLenderManager(address(lenderManagerMock));
 
-            address result = tellerV2.getLoanLender(bidId);
+           
 
             lenderManagerMock.registerLoan(bidId, address(this));
-
+             address result = tellerV2.getLoanLender(bidId);
             assertEq(result, lenderManagerMock.ownerOf(bidId),"getLoanLender did not return correct result");
     }
 
@@ -631,7 +631,7 @@ contract TellerV2_initialize is Testable {
         setMockBid(1);
 
         tellerV2.mock_setBidState(bidId, BidState.PENDING);
-        tellerV2.mock_setBidDefaultDuration(bidId,500);
+        tellerV2.mock_setBidExpirationTime(bidId,500);
 
         vm.warp(1e10);
 

@@ -157,36 +157,7 @@ contract TellerV2_initialize is Testable {
 
     }
  
-    function test_isLoanExpired_false() public {
-
-        uint256 bidId = 1 ;
-        setMockBid(bidId); 
-
-        bool expired = tellerV2.isLoanExpired(bidId);
-
-        assertEq(expired, false); 
-
-    } 
-
-    function test_isLoanExpired_true() public {
-
-         uint256 bidId = 1 ;
-        setMockBid(bidId); 
-
-        tellerV2.mock_setBidState(bidId, BidState.PENDING);
-
-        tellerV2.mock_setBidExpirationTime(bidId, 1000);
- 
-
-        //fast forward timestamp 
-        vm.warp(1000000000);
-
-        bool expired = tellerV2.isLoanExpired(bidId);
-
-        assertEq(expired, true); 
-
-    } 
-
+   
 
     function test_lastRepaidTimestamp() public {
             
@@ -569,7 +540,59 @@ contract TellerV2_initialize is Testable {
     }   
 
     //test all branches
-    function test_isLoanExpired() public {
+    function test_isLoanExpired() public {  
+        uint256 bidId = 1 ;
+        setMockBid(1);
+
+        tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
+        tellerV2.mock_setBidDefaultDuration(bidId,500);
+
+        vm.warp(1e10);
+
+        bool is_exp = tellerV2.isLoanExpired(bidId);
+        assertEq(is_exp, true, "unexpected expiration status");
+
+    }
+
+    function test_isLoanExpired_false() public {  
+        uint256 bidId = 1 ;
+        setMockBid(1);
+
+        tellerV2.mock_setBidState(bidId, BidState.PENDING);
+        tellerV2.mock_setBidDefaultDuration(bidId,500);
+ 
+
+        bool is_exp = tellerV2.isLoanExpired(bidId);
+        assertEq(is_exp, false, "unexpected expiration status");
+
+    }
+
+    function test_isLoanExpired_invalid_state() public {  
+        uint256 bidId = 1 ;
+        setMockBid(1);
+
+        tellerV2.mock_setBidState(bidId, BidState.PENDING);
+        tellerV2.mock_setBidDefaultDuration(bidId,500);
+
+        vm.warp(1e10);
+
+        bool is_exp = tellerV2.isLoanExpired(bidId);
+        assertEq(is_exp, false, "unexpected expiration status");
+
+    }
+
+
+    function test_isLoanExpired_zero_default_duration() public {  
+        uint256 bidId = 1 ;
+        setMockBid(1);
+
+        tellerV2.mock_setBidState(bidId, BidState.PENDING);
+        tellerV2.mock_setBidDefaultDuration(bidId,0);
+
+        vm.warp(1e10);
+
+        bool is_exp = tellerV2.isLoanExpired(bidId);
+        assertEq(is_exp, false, "unexpected expiration status");
 
     }
 

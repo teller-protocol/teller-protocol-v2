@@ -460,8 +460,11 @@ contract CollateralManager_Test is Testable {
     function test_deployEscrow_internal() public {
 
         uint256 bidId = 0;
-    
+
         tellerV2Mock.setBorrower(address(borrower));
+
+        //use the mock escrow imp
+        collateralManager.setGlobalEscrowProxyAddress(  address(escrowImplementation) );
 
         (address proxy, address borrower) = collateralManager._deployEscrowSuper(bidId);
  

@@ -282,7 +282,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
      * @param _bidId The associated bidId of the collateral escrow.
      */
     function _deployEscrow(uint256 _bidId)
-        internal
+        internal virtual
         returns (address proxyAddress_, address borrower_)
     {
         proxyAddress_ = _escrows[_bidId];
@@ -305,7 +305,9 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
 
 
     /*
-        Should this be public accessible? if so why does it start with _  ?
+        * @notice Deploys a new collateral escrow contract. Deposits collateral into a collateral escrow.
+        * @param _bidId The associated bidId of the collateral escrow.
+        * @param collateralInfo The collateral info to deposit.
 
     */
     function _deposit(uint256 _bidId, Collateral memory collateralInfo)

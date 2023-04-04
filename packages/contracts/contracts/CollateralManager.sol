@@ -309,8 +309,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
 
     */
     function _deposit(uint256 _bidId, Collateral memory collateralInfo)
-        public
-        payable
+        internal
     {
         require(collateralInfo._amount > 0, "Collateral not validated");
         (address escrowAddress, address borrower) = _deployEscrow(_bidId);

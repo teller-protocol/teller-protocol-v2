@@ -269,7 +269,7 @@ contract CollateralManager_Test is Testable {
 
     } 
 
-    function test_deployAndDeposit() public {
+    function test_deployAndDeposit_not_backed() public {
 
         uint256 bidId = 0 ;
         uint256 amount = 1000;
@@ -293,8 +293,35 @@ contract CollateralManager_Test is Testable {
     }
 
 
+    /*
+    test this better 
+    */
+    function test_deployAndDeposit_backed() public {
 
-    function test_deployAndDeposit_not_collateral_backed() public {}
+        uint256 bidId = 0 ;
+        uint256 amount = 1000;
+        wethMock.transfer(address(borrower), amount);
+        wethMock.approve(address(collateralManager), amount);
+
+        Collateral memory collateral = Collateral({
+            _collateralType: CollateralType.ERC20,
+            _amount: amount,
+            _tokenId: 0, 
+            _collateralAddress: address(wethMock)
+        });
+
+        tellerV2Mock.setBorrower(address(borrower));
+
+        
+
+        collateralManager.setBidsCollateralBackedGlobally(true);
+ 
+        vm.prank(address(tellerV2Mock));
+        collateralManager.deployAndDeposit(bidId);
+
+
+
+    }
 
  
 
@@ -412,13 +439,47 @@ contract CollateralManager_Test is Testable {
         uint256 bidId = 0;
         address recipient = address(borrower);
 
+        wethMock.transfer(address(escrowImplementation), 1000);
 
-        // the escrows should be mocked.. so escrow .withdraw is just mocked 
+         Collateral memory collateralInfo =  Collateral({
+            _collateralType: CollateralType.ERC20,
+            _amount: 1000,
+            _tokenId: 0, 
+            _collateralAddress: address(wethMock)
+        });
 
+        collateralManager._commitCollateralSuper(bidId, collateralInfo);
 
-        collateralManager.withdraw_internal(bidId,recipient);
+        collateralManager.forceSetEscrowAddress(bidId,address(escrowImplementation));
+        collateralManager._withdrawSuper(bidId,recipient);
+
+        assertTrue(escrowImplementation.withdrawWasCalled(),"withdraw was not called on escrow imp");
+ 
 
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /*
     function test_withdraw_internal_invalid_bid() public {
 
@@ -871,6 +932,7 @@ contract User {
 contract CollateralEscrowV1_Mock is CollateralEscrowV1 {
     
     bool public depositAssetWasCalled;
+    bool public withdrawWasCalled;
 
     constructor() CollateralEscrowV1() {}
 
@@ -882,6 +944,15 @@ contract CollateralEscrowV1_Mock is CollateralEscrowV1 {
         uint256 _tokenId
     ) external payable override {
         depositAssetWasCalled = true;
+    }
+
+
+    function withdraw(
+          address _collateralAddress,
+        uint256 _amount,
+        address _recipient
+    ) external override {
+        withdrawWasCalled = true;
     }
 
 

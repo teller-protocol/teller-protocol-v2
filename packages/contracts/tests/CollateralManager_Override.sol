@@ -45,7 +45,7 @@ contract CollateralManager_Override is CollateralManager {
     }
 
 
-    function withdraw_internal(uint256 _bidId, address _receiver) public {
+    function _withdrawSuper(uint256 _bidId, address _receiver) public {
         super._withdraw(_bidId,_receiver);
     }
 
@@ -85,8 +85,13 @@ contract CollateralManager_Override is CollateralManager {
         bidsCollateralBackedGlobally = _backed;
     }
 
+ 
     function _deployEscrowSuper(uint256 _bidId) public returns (address proxyAddress_, address borrower_){
         return super._deployEscrow(_bidId);
+    }
+
+    function forceSetEscrowAddress(uint256 bidId, address _address) public {
+        _escrows[bidId] = _address;
     }
 
 

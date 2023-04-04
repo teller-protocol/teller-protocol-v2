@@ -79,7 +79,7 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
         address _collateralAddress,
         uint256 _amount,
         address _recipient
-    ) external onlyOwner {
+    ) external virtual onlyOwner {
         require(_amount > 0, "Withdraw amount cannot be zero");
         Collateral storage collateral = collateralBalances[_collateralAddress];
         require(

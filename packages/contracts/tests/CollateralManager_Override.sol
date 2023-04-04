@@ -26,6 +26,7 @@ contract CollateralManager_Override is CollateralManager {
     bool public commitCollateralInternalWasCalled;
 
     bool bidsCollateralBackedGlobally;
+    bool public checkBalanceGlobalValid = true;
 
     address public globalEscrowProxyAddress;
 
@@ -94,6 +95,9 @@ contract CollateralManager_Override is CollateralManager {
         _escrows[bidId] = _address;
     }
 
+    function setCheckBalanceGlobalValid(bool _valid) public {
+        checkBalanceGlobalValid = _valid;
+    }
 
     /*
         Overrides
@@ -112,7 +116,7 @@ contract CollateralManager_Override is CollateralManager {
 
         checkBalancesWasCalled = true;
 
-        validated_ = true;
+        validated_ = checkBalanceGlobalValid;
         checks_ = new bool[](0);
     }
     
@@ -125,7 +129,7 @@ contract CollateralManager_Override is CollateralManager {
 
         checkBalanceWasCalled = true;
 
-        return true;
+        return checkBalanceGlobalValid;
     }   
 
     //for mock purposes

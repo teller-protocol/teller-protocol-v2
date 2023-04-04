@@ -31,17 +31,10 @@ contract CollateralManager_Test is Testable {
     TestERC1155Token erc1155Mock;
 
     TellerV2_Mock tellerV2Mock;
-
-
+ 
     
      CollateralEscrowV1_Mock escrowImplementation = new CollateralEscrowV1_Mock();    
-    /*
-
- 
-    FNDA:0,CollateralManager.onERC1155BatchReceived
-
-
-    */
+    
 
     function setUp() public {
         // Deploy implementation
@@ -132,6 +125,31 @@ contract CollateralManager_Test is Testable {
 
         collateralManager.setGlobalEscrowProxyAddress(address(escrowImplementation));
 
+        collateralManager._depositSuper(bidId, collateral);
+
+         
+    }
+
+        function test_deposit_collateral_not_validated() public  {
+        uint256 bidId = 0 ;
+        uint256 amount = 0;
+        wethMock.transfer(address(borrower), amount);
+
+        borrower.approveERC20( address(wethMock), address(collateralManager), amount  );
+    
+
+        Collateral memory collateral = Collateral({
+            _collateralType: CollateralType.ERC20,
+            _amount: amount,
+            _tokenId: 0, 
+            _collateralAddress: address(wethMock)
+        });
+
+        tellerV2Mock.setBorrower(address(borrower));
+
+        collateralManager.setGlobalEscrowProxyAddress(address(escrowImplementation));
+
+        vm.expectRevert("Collateral not validated");
         collateralManager._depositSuper(bidId, collateral);
 
          
@@ -766,6 +784,140 @@ contract CollateralManager_Test is Testable {
      }
 
 
+
+
+    function test_checkBalances_internal_short_circuit_valid() public {
+
+        bool shortCircuit = true;
+
+        Collateral[] memory collateralArray = new Collateral[](2);
+        collateralArray[0] = Collateral({
+            _collateralType: CollateralType.ERC20,
+            _amount: 1000,
+            _tokenId: 0, 
+            _collateralAddress: address(wethMock)
+        });
+        collateralArray[1] = Collateral({
+            _collateralType: CollateralType.ERC20,
+            _amount: 222,
+            _tokenId: 0, 
+            _collateralAddress: address(wethMock)
+        });
+
+         collateralManager.setCheckBalanceGlobalValid(true);
+
+        (bool valid, bool[] memory checks) = collateralManager._checkBalancesSuper(
+            address(borrower),
+            collateralArray,
+            shortCircuit
+        );
+
+
+        assertTrue(valid, "Check balance should be valid");
+        assertEq(checks.length, 2, "Checks length should be 2");
+
+    }
+
+        function test_checkBalances_internal_short_circuit_invalid() public {
+
+        bool shortCircuit = true;
+
+        Collateral[] memory collateralArray = new Collateral[](2);
+        collateralArray[0] = Collateral({
+            _collateralType: CollateralType.ERC20,
+            _amount: 1000,
+            _tokenId: 0, 
+            _collateralAddress: address(wethMock)
+        });
+        collateralArray[1] = Collateral({
+            _collateralType: CollateralType.ERC20,
+            _amount: 222,
+            _tokenId: 0, 
+            _collateralAddress: address(wethMock)
+        });
+
+         collateralManager.setCheckBalanceGlobalValid(false);
+
+        (bool valid, bool[] memory checks) = collateralManager._checkBalancesSuper(
+            address(borrower),
+            collateralArray,
+            shortCircuit
+        );
+
+
+        assertFalse(valid, "Check balance should be invalid");
+        assertEq(checks.length, 2, "Checks length should be 2");
+
+    }
+
+
+    function test_checkBalances_internal_valid() public {
+
+         Collateral[] memory collateralArray = new Collateral[](2);
+        collateralArray[0] = Collateral({
+            _collateralType: CollateralType.ERC20,
+            _amount: 1000,
+            _tokenId: 0, 
+            _collateralAddress: address(wethMock)
+        });
+        collateralArray[1] = Collateral({
+            _collateralType: CollateralType.ERC20,
+            _amount: 222,
+            _tokenId: 0, 
+            _collateralAddress: address(wethMock)
+        });
+
+
+         bool shortCircuit = false;
+
+         collateralManager.setCheckBalanceGlobalValid(true);
+
+
+
+        (bool valid, bool[] memory checks) = collateralManager._checkBalancesSuper(
+            address(borrower),
+            collateralArray,
+            shortCircuit
+        );
+
+        assertTrue(valid, "Check balance should be valid");
+        assertEq(checks.length, 2, "Checks length should be 2");
+
+    }   
+
+
+    function test_checkBalances_internal_invalid() public {
+
+        Collateral[] memory collateralArray = new Collateral[](1);
+        collateralArray[0] = Collateral({
+            _collateralType: CollateralType.ERC20,
+            _amount: 1000,
+            _tokenId: 0, 
+            _collateralAddress: address(wethMock)
+        });
+
+
+         bool shortCircuit = false;
+
+         collateralManager.setCheckBalanceGlobalValid(false);
+
+
+        (bool valid, bool[] memory checks) = collateralManager._checkBalancesSuper(
+            address(borrower),
+            collateralArray,
+            shortCircuit
+        );
+
+          assertFalse(valid, "Check balance should be invalid");
+
+    }
+
+
+
+
+
+
+
       /*function test_checkBalance_internal_none() public {
 
         Collateral memory collateral = Collateral({
@@ -833,7 +985,7 @@ contract CollateralManager_Test is Testable {
      }
 
 
-    function test_revalidateCollateral() public {
+    function test_revalidateCollateral_valid() public {
 
         Collateral[] memory collateralArray; 
 
@@ -844,6 +996,24 @@ contract CollateralManager_Test is Testable {
         );
 
         assertTrue(valid);
+    }
+
+
+     function test_revalidateCollateral_invalid() public {
+
+        Collateral[] memory collateralArray; 
+
+        uint256 bidId = 0;
+
+
+        collateralManager.setCheckBalanceGlobalValid(false);
+
+
+        bool valid =  collateralManager.revalidateCollateral(
+            bidId
+        );
+
+        assertFalse(valid,"collateral should be invalid");
     }
 
     function test_commit_collateral_single() public {

@@ -62,6 +62,12 @@ contract LenderCommitmentForwarder_Override is LenderCommitmentForwarder {
         super._decrementCommitment(_commitmentId, _tokenAmountDelta); 
     }
 
+    function _getEscrowCollateralTypeSuper(
+        CommitmentCollateralType _type
+    ) public returns (CollateralType) {
+        return super._getEscrowCollateralType(_type); 
+    }
+
     function validateCommitmentSuper(
         uint256 _commitmentId
     ) public {

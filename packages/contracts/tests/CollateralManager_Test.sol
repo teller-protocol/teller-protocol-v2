@@ -552,6 +552,23 @@ contract CollateralManager_Test is Testable {
        assertEq(response, bytes4(keccak256("onERC1155Received(address,address,uint256,uint256,bytes)")),"response is not correct");
 
     } 
+
+
+    function test_onERC1155BatchReceived() public {
+
+       bytes4 response = collateralManager.onERC1155BatchReceived(address(this), address(borrower), new uint256[](1), new uint256[](1), "");
+
+       assertEq(response, bytes4(keccak256("onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)")),"response is not correct");
+
+    }
+
+      function test_onERC1155BatchReceived_invalid_batch_length() public {
+
+        vm.expectRevert("Only allowed one asset batch transfer per transaction.");
+       bytes4 response = collateralManager.onERC1155BatchReceived(address(this), address(borrower), new uint256[](2), new uint256[](2), "");
+
+     
+    }
     
 
 
@@ -588,12 +605,11 @@ contract CollateralManager_Test is Testable {
         assertTrue(collateralManager.checkBalancesWasCalled(), "Check balances was not called");
     }
 
-     function test_checkBalances_internal() public {
+     function test_checkBalance_internal_erc20() public {
     
-        
-        Collateral[] memory collateralArray = new Collateral[](1); 
+        wethMock.transfer(address(borrower), 1000);
 
-        collateralArray[0] = Collateral({
+        Collateral memory collateral = Collateral({
             _collateralType: CollateralType.ERC20,
             _amount: 1000,
             _tokenId: 0, 
@@ -601,14 +617,111 @@ contract CollateralManager_Test is Testable {
         });
  
  
-        (bool valid, bool[] memory checks) = collateralManager._checkBalancesSuper(
+        bool valid = collateralManager._checkBalanceSuper(
             address(borrower),
-            collateralArray,
-            true 
+            collateral
         );
  
-        assertTrue(collateralManager.checkBalanceWasCalled(), "Check balance was not called");
+         assertTrue(valid, "Check balance should be valid");
      }
+
+     function test_checkBalance_internal_erc20_invalid() public {
+    
+        
+        Collateral memory collateral = Collateral({
+            _collateralType: CollateralType.ERC20,
+            _amount: 1000,
+            _tokenId: 0, 
+            _collateralAddress: address(wethMock)
+        });
+ 
+ 
+        bool valid = collateralManager._checkBalanceSuper(
+            address(borrower),
+            collateral
+        );
+ 
+         assertFalse(valid, "Check balance should be invalid");
+     }
+
+    function test_checkBalance_internal_erc721() public {
+    
+        erc721Mock.mint(address(borrower));
+
+        Collateral memory collateral = Collateral({
+            _collateralType: CollateralType.ERC721,
+            _amount: 1000,
+            _tokenId: 0, 
+            _collateralAddress: address(erc721Mock)
+        });
+ 
+ 
+        bool valid = collateralManager._checkBalanceSuper(
+            address(borrower),
+            collateral
+        );
+ 
+         assertTrue(valid, "Check balance should be valid");
+     }
+
+     function test_checkBalance_internal_erc721_invalid() public {
+    
+        erc721Mock.mint(address(this));
+
+        Collateral memory collateral = Collateral({
+            _collateralType: CollateralType.ERC721,
+            _amount: 1000,
+            _tokenId: 0, 
+            _collateralAddress: address(erc721Mock)
+        });
+ 
+ 
+        bool valid = collateralManager._checkBalanceSuper(
+            address(borrower),
+            collateral
+        );
+ 
+         assertFalse(valid, "Check balance should be invalid");
+     }
+
+      function test_checkBalance_internal_erc1155() public {
+        
+        erc1155Mock.mint(address(borrower), 5);
+            
+        Collateral memory collateral = Collateral({
+            _collateralType: CollateralType.ERC1155,
+            _amount: 5,
+            _tokenId: 0, 
+            _collateralAddress: address(erc1155Mock)
+        });
+ 
+ 
+        bool valid = collateralManager._checkBalanceSuper(
+            address(borrower),
+            collateral
+        );
+ 
+         assertTrue(valid, "Check balance should be valid");
+     }
+
+
+      /*function test_checkBalance_internal_none() public {
+
+        Collateral memory collateral = Collateral({
+            _collateralType: CollateralType(uint16(5)),
+            _amount: 1000,
+            _tokenId: 0, 
+            _collateralAddress: address(wethMock)
+        }); 
+ 
+        bool valid = collateralManager._checkBalanceSuper(
+            address(borrower),
+            collateral
+        );
+ 
+         assertFalse(valid, "Check balance should be false");
+
+      }*/
 
 
 

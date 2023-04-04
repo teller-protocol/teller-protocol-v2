@@ -130,18 +130,7 @@ contract CollateralEscrow_Test is Testable {
         }
     }
 
-    function test_depositToken_ERC20() public {
-
-        wethMock.transfer(address(borrower),1e18);
-
-        borrower.approveERC20(address(wethMock), amount);
-
-        borrower.depositToken(  address(wethMock), amount );
-
-        uint256 storedBalance = borrower.getBalance(address(wethMock));
-
-        assertEq(storedBalance, amount, "Escrow deposit unsuccessful");
-    }
+  
 
     function test_depositAsset_ERC20() public {
 
@@ -260,20 +249,7 @@ contract User {
         );
     }
 
-
-    function depositToken(
-        
-        address _collateralAddress,
-        uint256 _amount
-       
-    ) public {
-        escrow.depositToken(
-         
-            _collateralAddress,
-            _amount
-           
-        );
-    }
+ 
 
     function withdraw(
         address _collateralAddress,

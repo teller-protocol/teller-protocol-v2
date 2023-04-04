@@ -130,6 +130,8 @@ contract CollateralManager_Test is Testable {
 
         tellerV2Mock.setBorrower(address(borrower));
 
+        collateralManager.setGlobalEscrowProxyAddress(address(escrowImplementation));
+
         collateralManager._depositSuper(bidId, collateral);
 
          
@@ -151,6 +153,8 @@ contract CollateralManager_Test is Testable {
         });
 
         tellerV2Mock.setBorrower(address(borrower));
+
+        collateralManager.setGlobalEscrowProxyAddress(address(escrowImplementation));
 
         collateralManager._depositSuper(bidId, collateral);
 
@@ -176,6 +180,10 @@ contract CollateralManager_Test is Testable {
 
         tellerV2Mock.setBorrower(address(borrower));
 
+
+        collateralManager.setGlobalEscrowProxyAddress(address(escrowImplementation));
+
+        
         collateralManager._depositSuper(bidId, collateral);
 
 

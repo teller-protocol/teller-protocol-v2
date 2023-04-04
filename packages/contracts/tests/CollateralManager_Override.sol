@@ -28,12 +28,7 @@ contract CollateralManager_Override is CollateralManager {
     bool bidsCollateralBackedGlobally;
 
 
-
-    function mock_deposit( uint256 _bidId, Collateral memory collateralInfo ) public {
-
-        _deposit(_bidId, collateralInfo);
-    }
-
+ 
 
     //force adds collateral info for a bid even if it doesnt exist (for testing)
     function commitCollateralSuper(uint256 bidId, Collateral memory collateralInfo ) public {
@@ -82,6 +77,10 @@ contract CollateralManager_Override is CollateralManager {
 
     function setBidsCollateralBackedGlobally(bool _backed) public {
         bidsCollateralBackedGlobally = _backed;
+    }
+
+    function _deployEscrowSuper(uint256 _bidId) public returns (address proxyAddress_, address borrower_){
+        return super._deployEscrow(_bidId);
     }
 
 

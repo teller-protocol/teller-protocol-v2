@@ -302,6 +302,12 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         }
     }
 
+
+
+    /*
+        Should this be public accessible? if so why does it start with _  ?
+
+    */
     function _deposit(uint256 _bidId, Collateral memory collateralInfo)
         public
         payable

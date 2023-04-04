@@ -31,12 +31,13 @@ contract CollateralManager_Test is Testable {
     TestERC1155Token erc1155Mock;
 
     TellerV2_Mock tellerV2Mock;
+
+
     
+     CollateralEscrowV1_Mock escrowImplementation = new CollateralEscrowV1_Mock();    
     /*
 
-
-    FNDA:0,CollateralManager.initialize
-    FNDA:0,CollateralManager._deposit
+ 
     FNDA:0,CollateralManager.onERC1155BatchReceived
 
 
@@ -45,7 +46,7 @@ contract CollateralManager_Test is Testable {
     function setUp() public {
         // Deploy implementation
          // Deploy implementation
-        CollateralEscrowV1 escrowImplementation = new CollateralEscrowV1_Mock();
+       
         // Deploy beacon contract with implementation
         UpgradeableBeacon escrowBeacon = new UpgradeableBeacon(
             address(escrowImplementation)
@@ -95,10 +96,23 @@ contract CollateralManager_Test is Testable {
         //how to test ?
     }
 
+    function test_setCollateralEscrowBeacon_invalid_twice() public {
 
-  
+        CollateralEscrowV1 escrowImplementation = new CollateralEscrowV1_Mock();
+        // Deploy beacon contract with implementation
+        UpgradeableBeacon escrowBeacon = new UpgradeableBeacon(
+            address(escrowImplementation)
+        );
+        collateralManager.setCollateralEscrowBeacon(address(escrowBeacon));
+        
+        vm.expectRevert("Initializable: contract is already initialized");
+        collateralManager.setCollateralEscrowBeacon(address(escrowBeacon));
+        // 
+
+    }
 
 
+    
     function test_deposit() public  {
         uint256 bidId = 0 ;
         uint256 amount = 1000;
@@ -116,10 +130,85 @@ contract CollateralManager_Test is Testable {
 
         tellerV2Mock.setBorrower(address(borrower));
 
-        collateralManager.mock_deposit(bidId, collateral);
+        collateralManager._deposit(bidId, collateral);
 
          
     }
+
+    function test_deposit_erc20() public  {
+        uint256 bidId = 0 ;
+        uint256 amount = 1000;
+        wethMock.transfer(address(borrower), amount);
+
+        borrower.approveERC20( address(wethMock), address(collateralManager), amount  );
+    
+
+        Collateral memory collateral = Collateral({
+            _collateralType: CollateralType.ERC20,
+            _amount: amount,
+            _tokenId: 0, 
+            _collateralAddress: address(wethMock)
+        });
+
+        tellerV2Mock.setBorrower(address(borrower));
+
+        collateralManager._deposit(bidId, collateral);
+
+
+        assertEq(escrowImplementation.depositTokenWasCalled(), true, "deposit token was not called");
+         
+    }
+
+        function test_deposit_erc721() public  {
+        uint256 bidId = 0 ;
+        uint256 amount = 1000;
+        wethMock.transfer(address(borrower), amount);
+
+        borrower.approveERC20( address(wethMock), address(collateralManager), amount  );
+    
+
+        Collateral memory collateral = Collateral({
+            _collateralType: CollateralType.ERC721,
+            _amount: amount,
+            _tokenId: 0, 
+            _collateralAddress: address(wethMock)
+        });
+
+        tellerV2Mock.setBorrower(address(borrower));
+
+        collateralManager._deposit(bidId, collateral);
+
+
+        assertEq(escrowImplementation.depositAssetWasCalled(), true, "deposit asset was not called");
+         
+    }
+
+
+    function test_deposit_erc1155() public  {
+        uint256 bidId = 0 ;
+        uint256 amount = 1000;
+        wethMock.transfer(address(borrower), amount);
+
+        borrower.approveERC20( address(wethMock), address(collateralManager), amount  );
+    
+
+        Collateral memory collateral = Collateral({
+            _collateralType: CollateralType.ERC1155,
+            _amount: amount,
+            _tokenId: 0, 
+            _collateralAddress: address(wethMock)
+        });
+
+        tellerV2Mock.setBorrower(address(borrower));
+
+        collateralManager._deposit(bidId, collateral);
+
+
+        assertEq(escrowImplementation.depositAssetWasCalled(), true, "deposit asset was not called");
+         
+    }
+
+ 
 
     function test_deposit_invalid_bid() public  {
         uint256 bidId = 0 ;
@@ -138,17 +227,23 @@ contract CollateralManager_Test is Testable {
         tellerV2Mock.setBorrower(address(0));
 
         vm.expectRevert("Bid does not exist");
-        collateralManager.mock_deposit(bidId, collateral);
+        collateralManager._deposit(bidId, collateral);
 
+       
          
     }
 
 
     function test_deployAndDeposit() public {} 
 
-    function test_deposit_internal() public {} 
+ 
 
-    function test_initialize() public {}
+    function test_initialize_again() public {
+
+        vm.expectRevert("Initializable: contract is already initialized");
+        collateralManager.initialize(address(0), address(0) );
+
+    }
  
 
     function test_withdraw_external_invalid_bid_state() public {
@@ -225,12 +320,12 @@ contract CollateralManager_Test is Testable {
       
         collateralManager.setBidsCollateralBackedGlobally(false);
 
-        tellerV2Mock.setGlobalBidState(BidState.LIQUIDATED);
+        tellerV2Mock.setGlobalBidState(BidState.PENDING);
 
         vm.prank(address(tellerV2Mock));
         collateralManager.liquidateCollateral(bidId, address(liquidator));
 
-        assertTrue(collateralManager.withdrawInternalWasCalledToRecipient()==address(0),"withdraw internal was called");
+        assertTrue(collateralManager.withdrawInternalWasCalledToRecipient()==address(0),"withdraw internal should not have been called");
 
     }
    
@@ -325,6 +420,26 @@ contract CollateralManager_Test is Testable {
 
         assertTrue(escrow == address(0), "escrow is not correct");
 
+    }
+
+    function test_deployEscrow_internal() public {
+
+        uint256 bidId = 0;
+
+
+        
+
+        (address proxy, address borrower) = collateralManager._deployEscrowSuper(bidId);
+ 
+    }
+
+      function test_deployEscrow_internal_nonexisting_bid() public {
+
+        uint256 bidId = 0;
+
+        vm.expectRevert("Bid does not exist");
+        (address proxy, address borrower) = collateralManager._deployEscrowSuper(bidId);
+ 
     }
 
 
@@ -625,7 +740,15 @@ contract User {
 
 
 contract CollateralEscrowV1_Mock is CollateralEscrowV1 {
+
+    bool public depositTokenWasCalled;
+    bool public depositAssetWasCalled;
+
     constructor() CollateralEscrowV1() {}
+
+
+
+
 
     
 }

@@ -321,9 +321,11 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
                 escrowAddress,
                 collateralInfo._amount
             );
-            collateralEscrow.depositToken(
+            collateralEscrow.depositAsset(
+                CollateralType.ERC20,
                 collateralInfo._collateralAddress,
-                collateralInfo._amount
+                collateralInfo._amount,
+                0
             );
         } else if (collateralInfo._collateralType == CollateralType.ERC721) {
             IERC721Upgradeable(collateralInfo._collateralAddress).transferFrom(

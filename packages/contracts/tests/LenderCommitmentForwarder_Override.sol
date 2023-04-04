@@ -81,6 +81,32 @@ contract LenderCommitmentForwarder_Override is LenderCommitmentForwarder {
         return commitments[_commitmentId].maxPrincipal;
     }
 
+    function  _submitBidFromCommitmentSuper(
+        address _borrower,
+        uint256 _marketId,
+        address _principalTokenAddress,
+        uint256 _principalAmount,
+        address _collateralTokenAddress,
+        uint256 _collateralAmount,
+        uint256 _collateralTokenId,
+        CommitmentCollateralType _collateralTokenType,
+        uint32 _loanDuration,
+        uint16 _interestRate
+    ) public returns (uint256 bidId) {
+
+        return super._submitBidFromCommitment(
+            _borrower,
+            _marketId,
+            _principalTokenAddress,
+            _principalAmount,
+            _collateralTokenAddress,
+            _collateralAmount,
+            _collateralTokenId,
+            _collateralTokenType,
+            _loanDuration,
+            _interestRate
+        );
+    }
 
     /*
         Overrider methods 

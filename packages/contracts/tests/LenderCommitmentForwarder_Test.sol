@@ -531,6 +531,141 @@ contract LenderCommitmentForwarder_Test is Testable {
         );
 
     }
+
+
+    function test_validateCommitment_expired() public {
+    
+        
+      LenderCommitmentForwarder.Commitment memory c = LenderCommitmentForwarder.Commitment({
+            maxPrincipal: maxPrincipal,
+            expiration: expiration,
+            maxDuration: maxDuration,
+            minInterestRate: minInterestRate,
+            collateralTokenAddress: address(collateralToken),
+            collateralTokenId: collateralTokenId,
+            maxPrincipalPerCollateralAmount:maxPrincipalPerCollateralAmount,
+            collateralTokenType: collateralTokenType,
+            lender: address(lender),
+            marketId: marketId,
+            principalTokenAddress: address(principalToken)  
+        });
+
+        uint256 commitmentId = 0;
+
+        lenderCommitmentForwarder.setCommitment(
+            commitmentId,
+            c   
+        );
+
+        vm.warp(expiration + 1);
+
+        vm.expectRevert("expired commitment");
+        lenderCommitmentForwarder.validateCommitmentSuper(
+            commitmentId
+        );
+    
+    }
+
+    function test_validateCommitment_zero_principal_allocation() public {
+    
+        
+      LenderCommitmentForwarder.Commitment memory c = LenderCommitmentForwarder.Commitment({
+            maxPrincipal: 0,
+            expiration: expiration,
+            maxDuration: maxDuration,
+            minInterestRate: minInterestRate,
+            collateralTokenAddress: address(collateralToken),
+            collateralTokenId: collateralTokenId,
+            maxPrincipalPerCollateralAmount:maxPrincipalPerCollateralAmount,
+            collateralTokenType: collateralTokenType,
+            lender: address(lender),
+            marketId: marketId,
+            principalTokenAddress: address(principalToken)  
+        });
+
+        uint256 commitmentId = 0;
+
+        lenderCommitmentForwarder.setCommitment(
+            commitmentId,
+            c   
+        );
+
+        
+
+        vm.expectRevert("commitment principal allocation 0");
+        lenderCommitmentForwarder.validateCommitmentSuper(
+            commitmentId
+        );
+    
+    }
+
+    function test_validateCommitment_zero_collateral_ratio() public {
+    
+        
+      LenderCommitmentForwarder.Commitment memory c = LenderCommitmentForwarder.Commitment({
+            maxPrincipal: maxPrincipal,
+            expiration: expiration,
+            maxDuration: maxDuration,
+            minInterestRate: minInterestRate,
+            collateralTokenAddress: address(collateralToken),
+            collateralTokenId: collateralTokenId,
+            maxPrincipalPerCollateralAmount:0,
+            collateralTokenType: LenderCommitmentForwarder.CommitmentCollateralType.ERC20,
+            lender: address(lender),
+            marketId: marketId,
+            principalTokenAddress: address(principalToken)  
+        });
+
+        uint256 commitmentId = 0;
+
+        lenderCommitmentForwarder.setCommitment(
+            commitmentId,
+            c   
+        );
+
+        
+
+        vm.expectRevert("commitment collateral ratio 0");
+        lenderCommitmentForwarder.validateCommitmentSuper(
+            commitmentId
+        );
+    
+    }
+
+     function test_validateCommitment_erc20_with_token_id() public {
+    
+        
+      LenderCommitmentForwarder.Commitment memory c = LenderCommitmentForwarder.Commitment({
+            maxPrincipal: maxPrincipal,
+            expiration: expiration,
+            maxDuration: maxDuration,
+            minInterestRate: minInterestRate,
+            collateralTokenAddress: address(collateralToken),
+            collateralTokenId: 66,
+            maxPrincipalPerCollateralAmount:maxPrincipalPerCollateralAmount,
+            collateralTokenType: LenderCommitmentForwarder.CommitmentCollateralType.ERC20,
+            lender: address(lender),
+            marketId: marketId,
+            principalTokenAddress: address(principalToken)  
+        });
+
+        uint256 commitmentId = 0;
+
+        lenderCommitmentForwarder.setCommitment(
+            commitmentId,
+            c   
+        );
+
+        
+
+        vm.expectRevert("commitment collateral token id must be 0 for ERC20");
+        lenderCommitmentForwarder.validateCommitmentSuper(
+            commitmentId
+        );
+    
+    }
+ 
+ 
  
 
   function test_acceptCommitment() public {
@@ -1120,6 +1255,65 @@ contract LenderCommitmentForwarder_Test is Testable {
 
         ///assertEq(uint16(cType), uint16(CollateralType.NONE), "unexpected collateral type");
      }
+
+
+     function test_submitBidFromCommitment() public {
+
+        address _borrower = address(borrower);
+        uint256 _marketId = marketId;
+        address _principalTokenAddress =address(principalToken);
+        uint256 _principalAmount = 100;
+        address _collateralTokenAddress = address(collateralToken);
+        uint256 _collateralAmount = 1;
+        uint256 _collateralTokenId = 0;
+        LenderCommitmentForwarder.CommitmentCollateralType _collateralTokenType = LenderCommitmentForwarder.CommitmentCollateralType.ERC20;
+        uint32 _loanDuration = 100;
+        uint16 _interestRate = 100;
+         
+
+        uint256 bidId = lenderCommitmentForwarder._submitBidFromCommitmentSuper(
+            _borrower,
+            _marketId,
+            _principalTokenAddress,
+            _principalAmount,
+            _collateralTokenAddress,
+            _collateralAmount,
+            _collateralTokenId,
+            _collateralTokenType,
+            _loanDuration,
+            _interestRate
+        ); 
+
+  }
+
+
+    function test_submitBidFromCommitment_collateral_none() public {
+
+         address _borrower = address(borrower);
+        uint256 _marketId = marketId;
+        address _principalTokenAddress =address(principalToken);
+        uint256 _principalAmount = 100;
+        address _collateralTokenAddress = address(collateralToken);
+        uint256 _collateralAmount = 1;
+        uint256 _collateralTokenId = 0;
+        LenderCommitmentForwarder.CommitmentCollateralType _collateralTokenType = LenderCommitmentForwarder.CommitmentCollateralType.NONE;
+        uint32 _loanDuration = 100;
+        uint16 _interestRate = 100;
+         
+
+        uint256 bidId = lenderCommitmentForwarder._submitBidFromCommitmentSuper(
+            _borrower,
+            _marketId,
+            _principalTokenAddress,
+            _principalAmount,
+            _collateralTokenAddress,
+            _collateralAmount,
+            _collateralTokenId,
+            _collateralTokenType,
+            _loanDuration,
+            _interestRate
+        ); 
+    }
 
 
 

@@ -48,6 +48,7 @@ const {
   SAVE_GAS_REPORT,
   SKIP_SIZER,
   TESTING,
+  ALCHEMY_API_KEY,
 } = process.env
 
 const isCompiling = COMPILING === 'true'
@@ -90,10 +91,16 @@ const accounts: HardhatNetworkHDAccountsUserConfig = {
 }
 
 const networkUrls: { [network: string]: string } = {
-  mainnet: process.env.MAINNET_RPC_URL ?? '',
-  polygon: process.env.POLYGON_RPC_URL ?? '',
+  mainnet: ALCHEMY_API_KEY
+    ? `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
+    : process.env.MAINNET_RPC_URL ?? '',
+  polygon: ALCHEMY_API_KEY
+    ? `https://polygon-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
+    : process.env.POLYGON_RPC_URL ?? '',
   mumbai: process.env.MUMBAI_RPC_URL ?? '',
-  goerli: process.env.GOERLI_RPC_URL ?? '',
+  goerli: ALCHEMY_API_KEY
+    ? `https://eth-goerli.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
+    : process.env.GOERLI_RPC_URL ?? '',
   xdai: process.env.XDAI_RPC_URL ?? '',
   optimism: process.env.OPTIMISM_RPC_URL ?? '',
   fujiAvalanche: process.env.FUJI_AVALANCHE_RPC_URL ?? '',

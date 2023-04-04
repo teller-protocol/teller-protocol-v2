@@ -98,8 +98,10 @@ export function checkActiveCommitments(block: ethereum.Block): void {
       commitment.status = commitmentStatusToString(status);
       commitment.save();
 
-      updatedCommitments.push(commitment.id);
+      continue;
     }
+
+    updatedCommitments.push(commitment.id);
   }
 
   protocol.activeCommitments = updatedCommitments;

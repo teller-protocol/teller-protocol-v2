@@ -37,29 +37,7 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
     function getBid() external view returns (uint256) {
         return bidId;
     }
-
-    /**
-     * @notice Deposits a collateral ERC20 token into the escrow.
-     * @param _collateralAddress The address of the collateral token.
-     * @param _amount The amount to deposit.
-     */
-    function depositToken(address _collateralAddress, uint256 _amount)
-        external
-        onlyOwner
-    {
-        require(_amount > 0, "Deposit amount cannot be zero");
-        _depositCollateral(
-            CollateralType.ERC20,
-            _collateralAddress,
-            _amount,
-            0
-        );
-        Collateral storage collateral = collateralBalances[_collateralAddress];
-        collateral._collateralType = CollateralType.ERC20;
-        collateral._amount = _amount;
-        emit CollateralDeposited(_collateralAddress, _amount);
-    }
-
+ 
     /**
      * @notice Deposits a collateral asset into the escrow.
      * @param _collateralType The type of collateral asset to deposit (ERC721, ERC1155).

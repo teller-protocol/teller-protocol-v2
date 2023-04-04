@@ -55,6 +55,27 @@ contract LenderCommitmentForwarder_Override is LenderCommitmentForwarder {
         return commitments[_commitmentId].marketId;
     }
 
+     function _decrementCommitmentSuper(
+        uint256 _commitmentId,
+        uint256 _tokenAmountDelta
+    ) public {
+        super._decrementCommitment(_commitmentId, _tokenAmountDelta); 
+    }
+
+    function validateCommitmentSuper(
+        uint256 _commitmentId
+    ) public {
+        super.validateCommitment(commitments[_commitmentId]); 
+    }
+
+
+    function getCommitmentMaxPrincipal(
+        uint256 _commitmentId
+    ) public returns (uint256) {
+        return commitments[_commitmentId].maxPrincipal;
+    }
+
+
     /*
         Overrider methods 
     */

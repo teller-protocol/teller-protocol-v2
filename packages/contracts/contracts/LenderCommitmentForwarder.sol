@@ -14,6 +14,9 @@ import "@openzeppelin/contracts-upgradeable/utils/structs/EnumerableSetUpgradeab
 import { MathUpgradeable } from "@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20MetadataUpgradeable.sol";
 
+import "lib/forge-std/src/console.sol";
+
+
 contract LenderCommitmentForwarder is TellerV2MarketForwarder {
     using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
 
@@ -345,11 +348,18 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             commitment.collateralTokenAddress,
             commitment.principalTokenAddress
         );
+
+
+
+        console.logUint(requiredCollateral); 
+        console.logUint(_collateralAmount);
+
+
         if (_collateralAmount < requiredCollateral) {
             revert InsufficientBorrowerCollateral({
                 required: requiredCollateral,
                 actual: _collateralAmount
-            });
+            });     
         }
 
         if (

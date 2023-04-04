@@ -6,10 +6,13 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "../contracts/TellerV2MarketForwarder.sol";
 
 import "./tokens/TestERC20Token.sol";
+import "./tokens/TestERC721Token.sol";
+import "./tokens/TestERC1155Token.sol";
 import "../contracts/TellerV2Context.sol";
 
 import { Testable } from "./Testable.sol";
 import { LenderCommitmentForwarder } from "../contracts/LenderCommitmentForwarder.sol";
+
 
 import { Collateral, CollateralType } from "../contracts/interfaces/escrow/ICollateralEscrowV1.sol";
 
@@ -40,6 +43,10 @@ contract LenderCommitmentForwarder_Test is Testable {
 
     TestERC20Token collateralToken;
     uint8 constant collateralTokenDecimals = 6;
+
+
+    TestERC721Token erc721Token;
+    TestERC1155Token erc1155Token;
 
     LenderCommitmentForwarder_Override lenderCommitmentForwarder;
 
@@ -89,6 +96,7 @@ contract LenderCommitmentForwarder_Test is Testable {
         //tokenAddress = address(0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174);
         marketId = 2;
         maxPrincipal = 100000000000000000000;
+        maxPrincipalPerCollateralAmount = 100;
         maxDuration = 2480000;
         minInterestRate = 3000;
         expiration = uint32(block.timestamp) + uint32(64000);
@@ -111,6 +119,15 @@ contract LenderCommitmentForwarder_Test is Testable {
             "TUSDC",
             0,
             collateralTokenDecimals
+        );
+
+
+        erc721Token = new TestERC721Token(
+           "ERC721", "ERC721"
+        );
+
+        erc1155Token = new TestERC1155Token(
+            "Test 1155"          
         );
  
         
@@ -328,9 +345,71 @@ contract LenderCommitmentForwarder_Test is Testable {
 
     }
 
-    function test_updateCommitmentBorrowers() public {  
-        //add more here 
+     function test_updateCommitmentBorrowers() public {  
+        
+         LenderCommitmentForwarder.Commitment memory c = LenderCommitmentForwarder.Commitment({
+            maxPrincipal: maxPrincipal,
+            expiration: expiration,
+            maxDuration: maxDuration,
+            minInterestRate: minInterestRate,
+            collateralTokenAddress: address(collateralToken),
+            collateralTokenId: collateralTokenId,
+            maxPrincipalPerCollateralAmount:maxPrincipalPerCollateralAmount,
+            collateralTokenType: collateralTokenType,
+            lender: address(lender),
+            marketId: 99,
+            principalTokenAddress: address(principalToken)  
+        });
 
+
+        lenderCommitmentForwarder.setCommitment(
+            0,
+            c   
+        );
+
+        address[] memory newBorrowers = new address[](1);
+        newBorrowers[0] = address(1);
+
+        vm.prank(address(lender));
+        lenderCommitmentForwarder.updateCommitmentBorrowers(0, newBorrowers); 
+
+        //check an assertion
+        assertEq(lenderCommitmentForwarder.getCommitmentBorrowers(0).length,1, "unexpected borrower count after update");
+
+    }
+
+    function test_updateCommitmentBorrowers_cannot_update_empty() public {  
+       
+
+        vm.expectRevert("unauthorized commitment lender");
+        lenderCommitmentForwarder.updateCommitmentBorrowers(0, emptyArray); 
+
+    }
+
+     function test_updateCommitmentBorrowers_unauthorized() public {  
+       
+
+         LenderCommitmentForwarder.Commitment memory c = LenderCommitmentForwarder.Commitment({
+            maxPrincipal: maxPrincipal,
+            expiration: expiration,
+            maxDuration: maxDuration,
+            minInterestRate: minInterestRate,
+            collateralTokenAddress: address(collateralToken),
+            collateralTokenId: collateralTokenId,
+            maxPrincipalPerCollateralAmount:maxPrincipalPerCollateralAmount,
+            collateralTokenType: collateralTokenType,
+            lender: address(lender),
+            marketId: 99,
+            principalTokenAddress: address(principalToken)  
+        });
+
+
+        lenderCommitmentForwarder.setCommitment(
+            0,
+            c   
+        );
+
+        vm.expectRevert("unauthorized commitment lender");
         lenderCommitmentForwarder.updateCommitmentBorrowers(0, emptyArray); 
 
     }
@@ -363,7 +442,98 @@ contract LenderCommitmentForwarder_Test is Testable {
 
     }
 
-    function test_acceptCommitment() public {
+     function test_deleteCommitment_unauthorized() public {
+            
+             LenderCommitmentForwarder.Commitment memory c = LenderCommitmentForwarder.Commitment({
+                maxPrincipal: maxPrincipal,
+                expiration: expiration,
+                maxDuration: maxDuration,
+                minInterestRate: minInterestRate,
+                collateralTokenAddress: address(collateralToken),
+                collateralTokenId: collateralTokenId,
+                maxPrincipalPerCollateralAmount:maxPrincipalPerCollateralAmount,
+                collateralTokenType: collateralTokenType,
+                lender: address(lender),
+                marketId: marketId,
+                principalTokenAddress: address(principalToken)  
+            });
+
+              lenderCommitmentForwarder.setCommitment(
+                0,
+                c   
+            );
+
+            vm.expectRevert("unauthorized commitment lender");
+
+            lenderCommitmentForwarder.deleteCommitment(0);
+
+     }
+
+   
+
+
+    function test_decrementCommitment() public {
+
+
+        LenderCommitmentForwarder.Commitment memory c = LenderCommitmentForwarder.Commitment({
+            maxPrincipal: maxPrincipal,
+            expiration: expiration,
+            maxDuration: maxDuration,
+            minInterestRate: minInterestRate,
+            collateralTokenAddress: address(collateralToken),
+            collateralTokenId: collateralTokenId,
+            maxPrincipalPerCollateralAmount:maxPrincipalPerCollateralAmount,
+            collateralTokenType: collateralTokenType,
+            lender: address(lender),
+            marketId: marketId,
+            principalTokenAddress: address(principalToken)  
+        });
+
+        uint256 commitmentId = 0;
+
+        lenderCommitmentForwarder.setCommitment(
+            commitmentId,
+            c   
+        );
+
+        lenderCommitmentForwarder._decrementCommitmentSuper(commitmentId,100);
+
+       
+        assertEq(lenderCommitmentForwarder.getCommitmentMaxPrincipal(commitmentId), maxPrincipal-100, "Max principal not decremented");
+
+    }   
+
+    function test_validateCommitment() public {
+
+          LenderCommitmentForwarder.Commitment memory c = LenderCommitmentForwarder.Commitment({
+            maxPrincipal: maxPrincipal,
+            expiration: expiration,
+            maxDuration: maxDuration,
+            minInterestRate: minInterestRate,
+            collateralTokenAddress: address(collateralToken),
+            collateralTokenId: collateralTokenId,
+            maxPrincipalPerCollateralAmount:maxPrincipalPerCollateralAmount,
+            collateralTokenType: collateralTokenType,
+            lender: address(lender),
+            marketId: marketId,
+            principalTokenAddress: address(principalToken)  
+        });
+
+        uint256 commitmentId = 0;
+
+        lenderCommitmentForwarder.setCommitment(
+            commitmentId,
+            c   
+        );
+
+        lenderCommitmentForwarder.validateCommitmentSuper(
+            commitmentId
+        );
+
+    }
+ 
+
+  function test_acceptCommitment() public {
 
         LenderCommitmentForwarder.Commitment memory c = LenderCommitmentForwarder.Commitment({
             maxPrincipal: maxPrincipal,
@@ -404,13 +574,134 @@ contract LenderCommitmentForwarder_Test is Testable {
         
     }
 
+    function test_acceptCommitment_exact_principal() public {
 
+        LenderCommitmentForwarder.Commitment memory c = LenderCommitmentForwarder.Commitment({
+            maxPrincipal: maxPrincipal,
+            expiration: expiration,
+            maxDuration: maxDuration,
+            minInterestRate: minInterestRate,
+            collateralTokenAddress: address(collateralToken),
+            collateralTokenId: collateralTokenId,
+            maxPrincipalPerCollateralAmount:maxPrincipalPerCollateralAmount,
+            collateralTokenType: collateralTokenType,
+            lender: address(lender),
+            marketId: marketId,
+            principalTokenAddress: address(principalToken)  
+        });
+
+        uint256 commitmentId = 0;
+
+        lenderCommitmentForwarder.setCommitment(
+            commitmentId,
+            c   
+        );
+
+        uint256 principalAmount = maxPrincipal;
+        uint256 collateralAmount = 1000;
+        uint16 interestRate = minInterestRate;
+        uint32 loanDuration = maxDuration;
+
+       // vm.expectRevert("collateral token mismatch");
+        lenderCommitmentForwarder.acceptCommitment(
+            commitmentId,
+            principalAmount,
+            collateralAmount,
+            collateralTokenId,
+            address(collateralToken),
+            interestRate,
+            loanDuration
+        );     
+
+
+
+        assertEq(lenderCommitmentForwarder.getCommitmentMaxPrincipal(commitmentId), principalAmount-maxPrincipal, "Max principal not decremented");
+
+
+    }
     function test_acceptCommitment_mismatch_collateral_token() public {
 
+        LenderCommitmentForwarder.Commitment memory c = LenderCommitmentForwarder.Commitment({
+            maxPrincipal: maxPrincipal,
+            expiration: expiration,
+            maxDuration: maxDuration,
+            minInterestRate: minInterestRate,
+            collateralTokenAddress: address(collateralToken),
+            collateralTokenId: collateralTokenId,
+            maxPrincipalPerCollateralAmount:maxPrincipalPerCollateralAmount,
+            collateralTokenType: collateralTokenType,
+            lender: address(lender),
+            marketId: marketId,
+            principalTokenAddress: address(principalToken)  
+        });
+
+        uint256 commitmentId = 0;
+
+        lenderCommitmentForwarder.setCommitment(
+            commitmentId,
+            c   
+        );
+
+        uint256 principalAmount = maxPrincipal;
+        uint256 collateralAmount = 1000;
+        uint16 interestRate = minInterestRate;
+        uint32 loanDuration = maxDuration;
+
+         vm.expectRevert("Mismatching collateral token");
+        lenderCommitmentForwarder.acceptCommitment(
+            commitmentId,
+            principalAmount,
+            collateralAmount,
+            collateralTokenId,
+            address(principalToken),
+            interestRate,
+            loanDuration
+        );     
+
+ 
 
     }
 
     function test_acceptCommitment_invalid_interest_rate() public {
+
+
+
+        LenderCommitmentForwarder.Commitment memory c = LenderCommitmentForwarder.Commitment({
+            maxPrincipal: maxPrincipal,
+            expiration: expiration,
+            maxDuration: maxDuration,
+            minInterestRate: minInterestRate,
+            collateralTokenAddress: address(collateralToken),
+            collateralTokenId: collateralTokenId,
+            maxPrincipalPerCollateralAmount:maxPrincipalPerCollateralAmount,
+            collateralTokenType: collateralTokenType,
+            lender: address(lender),
+            marketId: marketId,
+            principalTokenAddress: address(principalToken)  
+        });
+
+        uint256 commitmentId = 0;
+
+        lenderCommitmentForwarder.setCommitment(
+            commitmentId,
+            c   
+        );
+
+        uint256 principalAmount = maxPrincipal;
+        uint256 collateralAmount = 1000;
+        uint16 interestRate = 0;
+        uint32 loanDuration = maxDuration;
+
+        vm.expectRevert("Invalid interest rate");
+        lenderCommitmentForwarder.acceptCommitment(
+            commitmentId,
+            principalAmount,
+            collateralAmount,
+            collateralTokenId,
+            address(collateralToken),
+            interestRate,
+            loanDuration
+        );     
 
 
     }
@@ -418,10 +709,93 @@ contract LenderCommitmentForwarder_Test is Testable {
 
     function test_acceptCommitment_invalid_duration() public {
 
+         LenderCommitmentForwarder.Commitment memory c = LenderCommitmentForwarder.Commitment({
+            maxPrincipal: maxPrincipal,
+            expiration: expiration,
+            maxDuration: maxDuration,
+            minInterestRate: minInterestRate,
+            collateralTokenAddress: address(collateralToken),
+            collateralTokenId: collateralTokenId,
+            maxPrincipalPerCollateralAmount:maxPrincipalPerCollateralAmount,
+            collateralTokenType: collateralTokenType,
+            lender: address(lender),
+            marketId: marketId,
+            principalTokenAddress: address(principalToken)  
+        });
+
+        uint256 commitmentId = 0;
+
+        lenderCommitmentForwarder.setCommitment(
+            commitmentId,
+            c   
+        );
+
+        uint256 principalAmount = maxPrincipal;
+        uint256 collateralAmount = 1000;
+        uint16 interestRate = minInterestRate;
+        uint32 loanDuration = maxDuration + 100;
+
+        vm.expectRevert("Invalid loan max duration");
+        lenderCommitmentForwarder.acceptCommitment(
+            commitmentId,
+            principalAmount,
+            collateralAmount,
+            collateralTokenId,
+            address(collateralToken),
+            interestRate,
+            loanDuration
+        );     
+
+
 
     }
 
     function test_acceptCommitment_invalid_commitment_borrower() public {
+
+
+         LenderCommitmentForwarder.Commitment memory c = LenderCommitmentForwarder.Commitment({
+            maxPrincipal: maxPrincipal,
+            expiration: expiration,
+            maxDuration: maxDuration,
+            minInterestRate: minInterestRate,
+            collateralTokenAddress: address(collateralToken),
+            collateralTokenId: collateralTokenId,
+            maxPrincipalPerCollateralAmount:maxPrincipalPerCollateralAmount,
+            collateralTokenType: collateralTokenType,
+            lender: address(lender),
+            marketId: marketId,
+            principalTokenAddress: address(principalToken)  
+        });
+
+        uint256 commitmentId = 0;
+
+        lenderCommitmentForwarder.setCommitment(
+            commitmentId,
+            c   
+        );
+
+        uint256 principalAmount = maxPrincipal;
+        uint256 collateralAmount = 1000;
+        uint16 interestRate = minInterestRate;
+        uint32 loanDuration = maxDuration ;
+
+         address[] memory newBorrowers = new address[](1);
+        newBorrowers[0] = address(1);
+
+        vm.prank(address(lender));
+        lenderCommitmentForwarder.updateCommitmentBorrowers(commitmentId, newBorrowers); 
+
+
+        vm.expectRevert("unauthorized commitment borrower");
+        lenderCommitmentForwarder.acceptCommitment(
+            commitmentId,
+            principalAmount,
+            collateralAmount,
+            collateralTokenId,
+            address(collateralToken),
+            interestRate,
+            loanDuration
+        );     
 
 
     }
@@ -429,15 +803,144 @@ contract LenderCommitmentForwarder_Test is Testable {
     function test_acceptCommitment_insufficient_commitment_allocation() public {
 
 
+        LenderCommitmentForwarder.Commitment memory c = LenderCommitmentForwarder.Commitment({
+            maxPrincipal: maxPrincipal,
+            expiration: expiration,
+            maxDuration: maxDuration,
+            minInterestRate: minInterestRate,
+            collateralTokenAddress: address(collateralToken),
+            collateralTokenId: collateralTokenId,
+            maxPrincipalPerCollateralAmount:maxPrincipalPerCollateralAmount,
+            collateralTokenType: collateralTokenType,
+            lender: address(lender),
+            marketId: marketId,
+            principalTokenAddress: address(principalToken)  
+        });
+
+        uint256 commitmentId = 0;
+
+        lenderCommitmentForwarder.setCommitment(
+            commitmentId,
+            c   
+        );
+
+        uint256 principalAmount = maxPrincipal+100;
+        uint256 collateralAmount = 1000;
+        uint16 interestRate = minInterestRate;
+        uint32 loanDuration = maxDuration;
+
+       
+         vm.expectRevert(
+            abi.encodeWithSelector( LenderCommitmentForwarder.InsufficientCommitmentAllocation.selector, c.maxPrincipal, principalAmount)
+        );
+        lenderCommitmentForwarder.acceptCommitment(
+            commitmentId,
+            principalAmount,
+            collateralAmount,
+            collateralTokenId,
+            address(collateralToken),
+            interestRate,
+            loanDuration
+        );     
+
     }
 
     function test_acceptCommitment_insufficient_borrower_collateral() public {
+
+
+        LenderCommitmentForwarder.Commitment memory c = LenderCommitmentForwarder.Commitment({
+            maxPrincipal: maxPrincipal,
+            expiration: expiration,
+            maxDuration: maxDuration,
+            minInterestRate: minInterestRate,
+            collateralTokenAddress: address(collateralToken),
+            collateralTokenId: collateralTokenId,
+            maxPrincipalPerCollateralAmount:  10000,
+            collateralTokenType: collateralTokenType,
+            lender: address(lender),
+            marketId: marketId,
+            principalTokenAddress: address(principalToken)  
+        });
+
+        uint256 commitmentId = 0;
+
+        lenderCommitmentForwarder.setCommitment(
+            commitmentId,
+            c   
+        );
+
+        uint256 principalAmount = maxPrincipal;
+        uint256 collateralAmount = 0;
+        uint16 interestRate = minInterestRate;
+        uint32 loanDuration = maxDuration;
+
+       uint256 requiredCollateralAmount = lenderCommitmentForwarder.getRequiredCollateral(
+            principalAmount,
+            c.maxPrincipalPerCollateralAmount,
+            c.collateralTokenType,
+            c.collateralTokenAddress,
+            c.principalTokenAddress
+        ); 
+
+       
+         vm.expectRevert(
+            abi.encodeWithSelector( LenderCommitmentForwarder.InsufficientBorrowerCollateral.selector, requiredCollateralAmount, collateralAmount)
+        );
+        lenderCommitmentForwarder.acceptCommitment(
+            commitmentId,
+            principalAmount,
+            collateralAmount,
+            collateralTokenId,
+            address(collateralToken),
+            interestRate,
+            loanDuration
+        );     
 
 
     }
 
 
     function test_acceptCommitment_invalid_721_collateral_amount() public {
+
+      
+
+
+         LenderCommitmentForwarder.Commitment memory c = LenderCommitmentForwarder.Commitment({
+            maxPrincipal: 100,
+            expiration: expiration,
+            maxDuration: maxDuration,
+            minInterestRate: minInterestRate,
+            collateralTokenAddress: address(erc721Token),
+            collateralTokenId: 0,
+            maxPrincipalPerCollateralAmount:100 * 1e18, //expand by token decimals 
+            collateralTokenType: LenderCommitmentForwarder.CommitmentCollateralType.ERC721,
+            lender: address(lender),
+            marketId: marketId,
+            principalTokenAddress: address(principalToken)  
+        });
+
+        uint256 commitmentId = 0;
+
+        lenderCommitmentForwarder.setCommitment(
+            commitmentId,
+            c   
+        );
+
+        uint256 principalAmount = c.maxPrincipal;
+        uint256 collateralAmount = 12;
+        uint16 interestRate = minInterestRate;
+        uint32 loanDuration = maxDuration;
+
+        vm.expectRevert("invalid commitment collateral amount for ERC721");
+        lenderCommitmentForwarder.acceptCommitment(
+            commitmentId,
+            principalAmount,
+            collateralAmount,
+            collateralTokenId,
+            address(erc721Token),
+            interestRate,
+            loanDuration
+        );     
 
 
     }
@@ -448,7 +951,110 @@ contract LenderCommitmentForwarder_Test is Testable {
 
     }
 
-    function test_getRequiredCollateral() public {}
+    function test_getRequiredCollateral() public {
+
+
+
+         LenderCommitmentForwarder.Commitment memory c = LenderCommitmentForwarder.Commitment({
+            maxPrincipal: maxPrincipal,
+            expiration: expiration,
+            maxDuration: maxDuration,
+            minInterestRate: minInterestRate,
+            collateralTokenAddress: address(collateralToken),
+            collateralTokenId: collateralTokenId,
+            maxPrincipalPerCollateralAmount:  10000,
+            collateralTokenType: collateralTokenType,
+            lender: address(lender),
+            marketId: marketId,
+            principalTokenAddress: address(principalToken)  
+        });
+
+        uint256 commitmentId = 0;
+
+        lenderCommitmentForwarder.setCommitment(
+            commitmentId,
+            c   
+        );
+
+        uint256 principalAmount = maxPrincipal;
+        uint256 collateralAmount = 0;
+        uint16 interestRate = minInterestRate;
+        uint32 loanDuration = maxDuration;
+
+         
+
+        
+        uint256 requiredCollateral = lenderCommitmentForwarder.getRequiredCollateral(
+            principalAmount,
+            c.maxPrincipalPerCollateralAmount,
+            c.collateralTokenType,
+            c.collateralTokenAddress,
+            c.principalTokenAddress
+        );    
+ 
+        //WTF why is this zero ? 
+        assertEq(requiredCollateral,1000,"unexpected required collateral");
+
+
+    }
+
+    function test_getRequiredCollateral_type_none() public {}
+
+
+
+    function test_getRequiredCollateral_type_erc20() public {}
+
+    function test_getRequiredCollateral_type_erc721() public {
+
+        LenderCommitmentForwarder.Commitment memory c = LenderCommitmentForwarder.Commitment({
+            maxPrincipal: 100,
+            expiration: expiration,
+            maxDuration: maxDuration,
+            minInterestRate: minInterestRate,
+            collateralTokenAddress: address(erc721Token),
+            collateralTokenId: 0,
+            maxPrincipalPerCollateralAmount:100 * 1e18,
+            collateralTokenType: LenderCommitmentForwarder.CommitmentCollateralType.ERC721,
+            lender: address(lender),
+            marketId: marketId,
+            principalTokenAddress: address(principalToken)  
+        });
+
+        uint256 commitmentId = 0;
+
+        lenderCommitmentForwarder.setCommitment(
+            commitmentId,
+            c   
+        );
+
+        uint256 principalAmount = c.maxPrincipal;
+
+        uint256 requiredCollateral = lenderCommitmentForwarder.getRequiredCollateral(
+            principalAmount,
+            c.maxPrincipalPerCollateralAmount,
+            c.collateralTokenType,
+            c.collateralTokenAddress,
+            c.principalTokenAddress
+        );
+
+
+        assertEq(requiredCollateral,1,"unexpected required collateral");
+
+
+
+     }
+
+    function test_getEscrowCollateralType_erc20() public {}
+
+    function test_getEscrowCollateralType_erc721() public {}
+
+    function test_getEscrowCollateralType_erc1155() public {}
+
+
+     function test_getEscrowCollateralType_unknown() public {}
+
+
+
 
 
 

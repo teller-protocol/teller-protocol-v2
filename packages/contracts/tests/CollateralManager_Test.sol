@@ -130,7 +130,7 @@ contract CollateralManager_Test is Testable {
 
         tellerV2Mock.setBorrower(address(borrower));
 
-        collateralManager._deposit(bidId, collateral);
+        collateralManager._depositSuper(bidId, collateral);
 
          
     }
@@ -152,7 +152,7 @@ contract CollateralManager_Test is Testable {
 
         tellerV2Mock.setBorrower(address(borrower));
 
-        collateralManager._deposit(bidId, collateral);
+        collateralManager._depositSuper(bidId, collateral);
 
 
         assertEq(escrowImplementation.depositAssetWasCalled(), true, "deposit token was not called");
@@ -176,7 +176,7 @@ contract CollateralManager_Test is Testable {
 
         tellerV2Mock.setBorrower(address(borrower));
 
-        collateralManager._deposit(bidId, collateral);
+        collateralManager._depositSuper(bidId, collateral);
 
 
         assertEq(escrowImplementation.depositAssetWasCalled(), true, "deposit asset was not called");
@@ -201,7 +201,7 @@ contract CollateralManager_Test is Testable {
 
         tellerV2Mock.setBorrower(address(borrower));
 
-        collateralManager._deposit(bidId, collateral);
+        collateralManager._depositSuper(bidId, collateral);
 
 
         assertEq(escrowImplementation.depositAssetWasCalled(), true, "deposit asset was not called");
@@ -227,7 +227,7 @@ contract CollateralManager_Test is Testable {
         tellerV2Mock.setBorrower(address(0));
 
         vm.expectRevert("Bid does not exist");
-        collateralManager._deposit(bidId, collateral);
+        collateralManager._depositSuper(bidId, collateral);
 
        
          

@@ -49,7 +49,7 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
         address _collateralAddress,
         uint256 _amount,
         uint256 _tokenId
-    ) external payable onlyOwner {
+    ) external payable virtual onlyOwner {
         require(_amount > 0, "Deposit amount cannot be zero");
         _depositCollateral(
             _collateralType,

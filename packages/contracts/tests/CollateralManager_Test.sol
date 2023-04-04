@@ -155,7 +155,7 @@ contract CollateralManager_Test is Testable {
         collateralManager._deposit(bidId, collateral);
 
 
-        assertEq(escrowImplementation.depositTokenWasCalled(), true, "deposit token was not called");
+        assertEq(escrowImplementation.depositAssetWasCalled(), true, "deposit token was not called");
          
     }
 
@@ -234,7 +234,42 @@ contract CollateralManager_Test is Testable {
     }
 
 
-    function test_deployAndDeposit() public {} 
+    function test_deployAndDeposit_invalid_sender() public {
+
+
+        vm.prank(address(lender)); 
+        vm.expectRevert("Sender not authorized");
+
+        collateralManager.deployAndDeposit(0);
+
+    } 
+
+    function test_deployAndDeposit() public {
+
+        uint256 bidId = 0 ;
+        uint256 amount = 1000;
+        wethMock.transfer(address(borrower), amount);
+        wethMock.approve(address(collateralManager), amount);
+
+        Collateral memory collateral = Collateral({
+            _collateralType: CollateralType.ERC20,
+            _amount: amount,
+            _tokenId: 0, 
+            _collateralAddress: address(wethMock)
+        });
+
+        tellerV2Mock.setBorrower(address(borrower));
+ 
+        vm.prank(address(tellerV2Mock));
+        collateralManager.deployAndDeposit(bidId);
+
+       // assertEq(escrowImplementation.depositTokenWasCalled(), true, "deposit token was not called");
+         
+    }
+
+
+
+    function test_deployAndDeposit_not_collateral_backed() public {}
 
  
 
@@ -425,9 +460,8 @@ contract CollateralManager_Test is Testable {
     function test_deployEscrow_internal() public {
 
         uint256 bidId = 0;
-
-
-        
+    
+        tellerV2Mock.setBorrower(address(borrower));
 
         (address proxy, address borrower) = collateralManager._deployEscrowSuper(bidId);
  
@@ -664,53 +698,7 @@ contract User {
     }
 
 
-
-
-  
-/*
-    function depositToken(
-        
-        address _collateralAddress,
-        uint256 _amount
-       
-    ) public {
-        escrow.depositToken(
-         
-            _collateralAddress,
-            _amount
-           
-        );
-    }
-
-    function withdraw(
-        address _collateralAddress,
-        uint256 _amount,
-        address _recipient
-    ) public {
-        escrow.withdraw(_collateralAddress, _amount, _recipient);
-    }
-
-    
-
-    function approveERC20(address tokenAddress, uint256 amount) public {
-        ERC20(tokenAddress).approve(address(escrow), amount);
-    }
-
-     function approveERC721(address tokenAddress,uint256 tokenId) public {
-        ERC721(tokenAddress).approve(address(escrow), tokenId);
-    }
-
-     function approveERC1155(address tokenAddress) public {
-        ERC1155(tokenAddress).setApprovalForAll(address(escrow), true);
-    }
-
-    function getBalance(address _collateralAddress)
-        public
-        returns (uint256 amount_)
-    {
-        (, amount_, , ) = escrow.collateralBalances(_collateralAddress);
-    }
-*/
+ 
     receive() external payable {}
 
     //receive 721
@@ -740,14 +728,20 @@ contract User {
 
 
 contract CollateralEscrowV1_Mock is CollateralEscrowV1 {
-
-    bool public depositTokenWasCalled;
+    
     bool public depositAssetWasCalled;
 
     constructor() CollateralEscrowV1() {}
 
 
-
+    function depositAsset(
+          CollateralType _collateralType,
+        address _collateralAddress,
+        uint256 _amount,
+        uint256 _tokenId
+    ) external payable override {
+        depositAssetWasCalled = true;
+    }
 
 
     

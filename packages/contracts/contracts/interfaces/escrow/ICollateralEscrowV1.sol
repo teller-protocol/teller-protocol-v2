@@ -15,7 +15,6 @@ struct Collateral {
 }
 
 interface ICollateralEscrowV1 {
-   
     /**
      * @notice Deposits a collateral asset into the escrow.
      * @param _collateralType The type of collateral asset to deposit (ERC721, ERC1155).

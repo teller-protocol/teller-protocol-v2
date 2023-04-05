@@ -18,6 +18,7 @@ import { Collateral, CollateralType, ICollateralEscrowV1 } from "./interfaces/es
 import "./interfaces/ITellerV2.sol";
  
 
+
 contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     /* Storage */
     using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
@@ -117,6 +118,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     ) public returns (bool validation_) {
         address borrower = tellerV2.getLoanBorrower(_bidId);
         (validation_, ) = checkBalances(borrower, _collateralInfo);
+ 
         if (validation_) {
             for (uint256 i; i < _collateralInfo.length; i++) {
                 Collateral memory info = _collateralInfo[i];
@@ -311,7 +313,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
 
     */
     function _deposit(uint256 _bidId, Collateral memory collateralInfo)
-        internal
+        internal virtual
     {
         require(collateralInfo._amount > 0, "Collateral not validated");
         (address escrowAddress, address borrower) = _deployEscrow(_bidId);
@@ -477,6 +479,8 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         Collateral memory _collateralInfo
     ) internal virtual returns (bool) {
         CollateralType collateralType = _collateralInfo._collateralType;
+ 
+        
         if (collateralType == CollateralType.ERC20) {
             return
                 _collateralInfo._amount <=

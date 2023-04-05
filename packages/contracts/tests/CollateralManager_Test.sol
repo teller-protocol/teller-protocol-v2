@@ -401,7 +401,6 @@ contract CollateralManager_Test is Testable {
 
         vm.prank(address(lender)); 
         vm.expectRevert("Sender not authorized");
-
         collateralManager.deployAndDeposit(0);
 
     } 
@@ -412,6 +411,9 @@ contract CollateralManager_Test is Testable {
         uint256 amount = 1000;
         wethMock.transfer(address(borrower), amount);
         wethMock.approve(address(collateralManager), amount);
+
+
+        collateralManager.setBidsCollateralBackedGlobally(false);
 
         Collateral memory collateral = Collateral({
             _collateralType: CollateralType.ERC20,
@@ -425,15 +427,47 @@ contract CollateralManager_Test is Testable {
         vm.prank(address(tellerV2Mock));
         collateralManager.deployAndDeposit(bidId);
 
-       // assertEq(escrowImplementation.depositTokenWasCalled(), true, "deposit token was not called");
+
+       assertFalse(collateralManager.deployEscrowInternalWasCalled(), "deploy escrow internal was called");
+ 
          
     }
 
 
-    /*
-    test this better 
-    */
+   
     function test_deployAndDeposit_backed() public {
+
+        uint256 bidId = 0 ;
+        uint256 amount = 1000;
+        wethMock.transfer(address(borrower), amount);
+        wethMock.approve(address(collateralManager), amount);
+
+        Collateral memory collateral = Collateral({
+            _collateralType: CollateralType.ERC20,
+            _amount: amount,
+            _tokenId: 0, 
+            _collateralAddress: address(wethMock)
+        });
+ 
+        collateralManager.commitCollateralSuper(bidId, collateral);
+
+        tellerV2Mock.setBorrower(address(borrower));
+
+        
+
+        collateralManager.setBidsCollateralBackedGlobally(true);
+ 
+        vm.prank(address(tellerV2Mock));
+        collateralManager.deployAndDeposit(bidId);
+
+
+        assertTrue(collateralManager.deployEscrowInternalWasCalled(), "deploy escrow internal was not called");
+
+        assertTrue(collateralManager.depositInternalWasCalled(), "deposit internal was not called");
+        
+    }
+
+      function test_deployAndDeposit_backed_empty_array() public {
 
         uint256 bidId = 0 ;
         uint256 amount = 1000;
@@ -457,8 +491,11 @@ contract CollateralManager_Test is Testable {
         collateralManager.deployAndDeposit(bidId);
 
 
-        assertTrue(collateralManager.deployEscrowInternalWasCalled(), "deploy escrow internal was not called");
+        assertTrue(collateralManager.deployEscrowInternalWasCalled(), "deploy escrow internal was called");
+        assertFalse(collateralManager.depositInternalWasCalled(), "deposit internal was called");
+        
     }
+
 
  
 
@@ -513,6 +550,9 @@ contract CollateralManager_Test is Testable {
         tellerV2Mock.setLender(address(lender));
         tellerV2Mock.setBidsDefaultedGlobally(true);
 
+
+        vm.expectEmit(true,false,false,false);
+        emit CollateralClaimed(bidId);
         collateralManager.withdraw(bidId);
 
         assertEq(collateralManager.withdrawInternalWasCalledToRecipient(),address(lender),"withdraw internal was not called with correct recipient");
@@ -984,7 +1024,7 @@ contract CollateralManager_Test is Testable {
          assertFalse(valid, "Check balance should be invalid");
      }
 
-
+ 
 
 
     function test_checkBalances_internal_short_circuit_valid() public {
@@ -1154,8 +1194,7 @@ contract CollateralManager_Test is Testable {
             collateral
         );
  
-
-        //need to inject state 
+ 
 
         assertFalse(valid, "check balance super should be invalid");
      }
@@ -1244,7 +1283,8 @@ contract CollateralManager_Test is Testable {
             _amount: 1000,
             _tokenId: 0, 
             _collateralAddress: address(wethMock)
-        });
+        }); 
+ 
 
         collateralManager.setCheckBalanceGlobalValid(false);
         collateralManager.commitCollateral(bidId,collateral);
@@ -1274,6 +1314,21 @@ contract CollateralManager_Test is Testable {
 
     }
 
+    function test_commit_collateral_array_empty() public {
+        
+         uint256 bidId = 0;
+
+        Collateral[] memory collateralArray = new Collateral[](0); 
+
+
+        collateralManager.setCheckBalanceGlobalValid(true);
+        collateralManager.commitCollateral(bidId, collateralArray);
+
+        assertFalse(collateralManager.commitCollateralInternalWasCalled(),"commit collateral was not called");
+
+    
+    }
+
 
     function test_commit_collateral_array_invalid() public {
 
@@ -1297,6 +1352,22 @@ contract CollateralManager_Test is Testable {
 
 
     }
+
+      function test_commit_collateral_array_empty_invalid() public {
+
+          uint256 bidId = 0;
+
+        Collateral[] memory collateralArray = new Collateral[](0); 
+ 
+        collateralManager.setCheckBalanceGlobalValid(false);
+        collateralManager.commitCollateral(bidId, collateralArray);
+
+        assertFalse(collateralManager.commitCollateralInternalWasCalled(),"commit collateral should not have been called");
+
+
+
+    }
+  
   
 }
 

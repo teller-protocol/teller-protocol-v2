@@ -31,6 +31,7 @@ contract CollateralManager_Override is CollateralManager {
     address public globalEscrowProxyAddress;
 
     bool public deployEscrowInternalWasCalled;
+    bool public depositInternalWasCalled;
 
 
  
@@ -123,8 +124,15 @@ contract CollateralManager_Override is CollateralManager {
     }
     
 
+    function _deposit(uint256 _bidId, Collateral memory collateralInfo)
+    internal override
+    {
 
-      function _checkBalance(
+        depositInternalWasCalled = true;
+    }
+
+
+    function _checkBalance(
         address _borrowerAddress,
         Collateral memory _collateralInfo
     ) internal override returns (bool) {

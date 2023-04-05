@@ -5,6 +5,8 @@
 import fs from 'fs'
 import readline from 'readline'
 
+
+import chalk from 'chalk';
  /*
 
  fter the "BRDA" tag in an LCOV file, there are typically four numbers separated by commas. These numbers represent the branch coverage data for a particular branch in the code.
@@ -58,13 +60,20 @@ for await (const line of rl) {
      
         const [BRDA, branchValues] = line.split(':')
 
-        const [lineNumber, blockNumber, branchesTaken, totalBranches] = branchValues.split(',')
+        const [lineNumber, blockNumber, branchNumber, execCount] = branchValues.split(',')
 
-        if(branchesTaken < totalBranches){
+       // if(branchesTaken < totalBranches){
 
-          console.log(`Branch: line number:${lineNumber}, block number:${blockNumber}, [ ${branchesTaken} / ${totalBranches} ] `)
 
-        }
+       let color = chalk.white 
+
+       if( isNaN(parseInt(execCount))){
+        color = chalk.red
+       }
+
+          console.log( color (`Branch: line number:${lineNumber}, block number:${blockNumber}, branch number: ${branchNumber} , execCount: ${execCount} ] ` ))
+
+       // }
 
     }
     if(line.startsWith('DA')){

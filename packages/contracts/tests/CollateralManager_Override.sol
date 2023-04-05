@@ -17,11 +17,10 @@ import "./tokens/TestERC1155Token.sol";
 
 import "../contracts/mock/TellerV2SolMock.sol";
 import "../contracts/CollateralManager.sol";
- 
+
 contract CollateralManager_Override is CollateralManager {
-    
     bool public checkBalancesWasCalled;
-    bool public checkBalanceWasCalled; 
+    bool public checkBalanceWasCalled;
     address public withdrawInternalWasCalledToRecipient;
     bool public commitCollateralInternalWasCalled;
 
@@ -33,64 +32,63 @@ contract CollateralManager_Override is CollateralManager {
     bool public deployEscrowInternalWasCalled;
     bool public depositInternalWasCalled;
 
-
- 
-
     //force adds collateral info for a bid even if it doesnt exist (for testing)
-    function commitCollateralSuper(uint256 bidId, Collateral memory collateralInfo ) public {
-
-
+    function commitCollateralSuper(
+        uint256 bidId,
+        Collateral memory collateralInfo
+    ) public {
         super._commitCollateral(bidId, collateralInfo);
-
     }
 
-    function _depositSuper(uint256 _bidId, Collateral memory _collateralInfo) public {
-        super._deposit(_bidId,_collateralInfo);
+    function _depositSuper(uint256 _bidId, Collateral memory _collateralInfo)
+        public
+    {
+        super._deposit(_bidId, _collateralInfo);
     }
-
 
     function _withdrawSuper(uint256 _bidId, address _receiver) public {
-        super._withdraw(_bidId,_receiver);
+        super._withdraw(_bidId, _receiver);
     }
 
-
-    function _commitCollateralSuper(uint256 _bidId, Collateral memory _collateralInfo) public {
-        super._commitCollateral(_bidId,_collateralInfo);
+    function _commitCollateralSuper(
+        uint256 _bidId,
+        Collateral memory _collateralInfo
+    ) public {
+        super._commitCollateral(_bidId, _collateralInfo);
     }
-
 
     function isBidCollateralBackedSuper(uint256 _bidId) public returns (bool) {
         return super.isBidCollateralBacked(_bidId);
     }
 
     function _checkBalancesSuper(
-         address _borrowerAddress,
+        address _borrowerAddress,
         Collateral[] memory _collateralInfo,
         bool _shortCircut
     ) public returns (bool validated_, bool[] memory checks_) {
-
-       return super._checkBalances(
-        _borrowerAddress,
-       _collateralInfo,
-       _shortCircut
-       );
-
+        return
+            super._checkBalances(
+                _borrowerAddress,
+                _collateralInfo,
+                _shortCircut
+            );
     }
 
     function _checkBalanceSuper(
         address _borrowerAddress,
         Collateral memory _collateralInfo
     ) public returns (bool) {
-       return super._checkBalance(_borrowerAddress,_collateralInfo);
+        return super._checkBalance(_borrowerAddress, _collateralInfo);
     }
-
 
     function setBidsCollateralBackedGlobally(bool _backed) public {
         bidsCollateralBackedGlobally = _backed;
     }
 
- 
-    function _deployEscrowSuper(uint256 _bidId) public returns (address proxyAddress_, address borrower_){
+    function _deployEscrowSuper(uint256 _bidId)
+        public
+        returns (address proxyAddress_, address borrower_)
+    {
         return super._deployEscrow(_bidId);
     }
 
@@ -106,69 +104,65 @@ contract CollateralManager_Override is CollateralManager {
         Overrides
     */
 
-    function isBidCollateralBacked(uint256 _bidId) public override returns (bool) {
+    function isBidCollateralBacked(uint256 _bidId)
+        public
+        override
+        returns (bool)
+    {
         return bidsCollateralBackedGlobally;
     }
-
 
     function _checkBalances(
         address _borrowerAddress,
         Collateral[] memory _collateralInfo,
         bool _shortCircut
     ) internal override returns (bool validated_, bool[] memory checks_) {
-
         checkBalancesWasCalled = true;
 
         validated_ = checkBalanceGlobalValid;
         checks_ = new bool[](0);
     }
-    
 
     function _deposit(uint256 _bidId, Collateral memory collateralInfo)
-    internal override
+        internal
+        override
     {
-
         depositInternalWasCalled = true;
     }
-
 
     function _checkBalance(
         address _borrowerAddress,
         Collateral memory _collateralInfo
     ) internal override returns (bool) {
-
         checkBalanceWasCalled = true;
 
         return checkBalanceGlobalValid;
-    }   
+    }
 
     //for mock purposes
     function setGlobalEscrowProxyAddress(address _address) public {
         globalEscrowProxyAddress = _address;
     }
 
-    function _deployEscrow(uint256 _bidId) internal override returns (address proxyAddress_, address borrower_) {
+    function _deployEscrow(uint256 _bidId)
+        internal
+        override
+        returns (address proxyAddress_, address borrower_)
+    {
         proxyAddress_ = globalEscrowProxyAddress;
         borrower_ = tellerV2.getLoanBorrower(_bidId);
 
         deployEscrowInternalWasCalled = true;
     }
 
-
-    function _withdraw(uint256 _bidId, address recipient) 
-    internal override 
-    {
+    function _withdraw(uint256 _bidId, address recipient) internal override {
         withdrawInternalWasCalledToRecipient = recipient;
-
     }
 
-     function _commitCollateral(
+    function _commitCollateral(
         uint256 _bidId,
         Collateral memory _collateralInfo
     ) internal override {
         commitCollateralInternalWasCalled = true;
     }
-
-
- 
 }

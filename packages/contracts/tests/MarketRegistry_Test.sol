@@ -5,12 +5,12 @@ import { Testable } from "./Testable.sol";
 
 import { TellerV2 } from "../contracts/TellerV2.sol";
 import { MarketRegistry } from "../contracts/MarketRegistry.sol";
- 
- import "../contracts/TellerV2Context.sol";
+
+import "../contracts/TellerV2Context.sol";
 
 import "../contracts/TellerV2Storage.sol";
 
-import "../contracts/interfaces/IMarketRegistry.sol"; 
+import "../contracts/interfaces/IMarketRegistry.sol";
 
 import "../contracts/EAS/TellerAS.sol";
 
@@ -20,10 +20,9 @@ import "../contracts/interfaces/IWETH.sol";
 import { User } from "./Test_Helpers.sol";
 import { PaymentType, PaymentCycleType } from "../contracts/libraries/V2Calculations.sol";
 
-import {MarketRegistry_Override} from "./MarketRegistry_Override.sol";
+import { MarketRegistry_Override } from "./MarketRegistry_Override.sol";
 
-
-import {TellerASMock} from "../contracts/mock/TellerASMock.sol";
+import { TellerASMock } from "../contracts/mock/TellerASMock.sol";
 
 contract MarketRegistry_Test is Testable {
     MarketRegistryUser private marketOwner;
@@ -38,7 +37,7 @@ contract MarketRegistry_Test is Testable {
     MarketRegistry_Override marketRegistry;
 
     TellerASMock tellerASMock;
-    
+
     uint32 expirationTime = 5000;
     uint256 marketId = 2;
 
@@ -48,31 +47,39 @@ contract MarketRegistry_Test is Testable {
     bytes32 r = 0x0;
     bytes32 s = 0x0;
 
-    constructor()  {}
+    constructor() {}
 
     function setUp() public {
-      
-
-        tellerV2 = new TellerV2Mock(   );
-        marketRegistry = new MarketRegistry_Override(   );
+        tellerV2 = new TellerV2Mock();
+        marketRegistry = new MarketRegistry_Override();
 
         tellerASMock = new TellerASMock();
 
-        marketRegistry.initialize( tellerASMock );
+        marketRegistry.initialize(tellerASMock);
 
-        marketOwner = new MarketRegistryUser(address(tellerV2),address(marketRegistry));
-        borrower = new MarketRegistryUser(address(tellerV2),address(marketRegistry));
-        lender = new MarketRegistryUser(address(tellerV2),address(marketRegistry));
-        feeRecipient = new MarketRegistryUser(address(tellerV2),address(marketRegistry));
+        marketOwner = new MarketRegistryUser(
+            address(tellerV2),
+            address(marketRegistry)
+        );
+        borrower = new MarketRegistryUser(
+            address(tellerV2),
+            address(marketRegistry)
+        );
+        lender = new MarketRegistryUser(
+            address(tellerV2),
+            address(marketRegistry)
+        );
+        feeRecipient = new MarketRegistryUser(
+            address(tellerV2),
+            address(marketRegistry)
+        );
 
         marketRegistry.setMarketOwner(address(marketOwner));
-      
 
         tellerV2.setMarketRegistry(address(marketRegistry));
- 
-       // reputationManager = IReputationManager(new ReputationManager());
-    }
 
+        // reputationManager = IReputationManager(new ReputationManager());
+    }
 
     /*
 
@@ -85,17 +92,13 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
 
     */
 
-
     function test_marketIsClosed() public {
-      
         assertEq(
             marketRegistry.isMarketClosed(0),
             false,
             "Null market should not be closed"
         );
- 
- 
-      }
+    }
 
     function test_createMarket_simple() public {
         // Standard seconds payment cycle
@@ -110,18 +113,12 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
             "uri://"
         );
 
+        (address owner, , , , , , ) = marketRegistry.getMarketData(marketId);
 
-        (address owner,,,,,,) = marketRegistry.getMarketData(marketId);
+        assertEq(owner, address(marketOwner), "Market not created");
+    }
 
-        assertEq(
-            owner,
-            address(marketOwner),
-            "Market not created"
-        );
-      }
-
-        function test_closeMarket() public {
-       
+    function test_closeMarket() public {
         uint256 marketId = marketOwner.createMarketSimple(
             address(marketRegistry),
             uint32(8000),
@@ -133,22 +130,14 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
             "uri://"
         );
 
-
         marketOwner.closeMarket(marketId);
-
-        
 
         bool marketIsClosed = marketRegistry.isMarketClosed(marketId);
 
-        assertEq(
-            marketIsClosed,
-            true,
-            "Market not closed"
-        );
-      }
+        assertEq(marketIsClosed, true, "Market not closed");
+    }
 
-      function test_closeMarket_twice() public {
-       
+    function test_closeMarket_twice() public {
         uint256 marketId = marketOwner.createMarketSimple(
             address(marketRegistry),
             uint32(8000),
@@ -160,24 +149,16 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
             "uri://"
         );
 
-
         marketOwner.closeMarket(marketId);
 
         marketOwner.closeMarket(marketId);
 
         bool marketIsClosed = marketRegistry.isMarketClosed(marketId);
 
-        assertEq(
-            marketIsClosed,
-            true,
-            "Market not closed"
-        );
-      }
+        assertEq(marketIsClosed, true, "Market not closed");
+    }
 
-
-
-       function test_closeMarket_invalid_owner() public {
-       
+    function test_closeMarket_invalid_owner() public {
         uint256 marketId = marketOwner.createMarketSimple(
             address(marketRegistry),
             uint32(8000),
@@ -191,9 +172,7 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
 
         vm.expectRevert("Not the owner");
         borrower.closeMarket(marketId);
-
-         
-      }
+    }
 
     function test_createMarket() public {
         // Standard seconds payment cycle
@@ -220,7 +199,8 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
         );
 
         assertEq(
-            paymentCycleDuration, 8000,
+            paymentCycleDuration,
+            8000,
             "Market payment cycle duration set incorrectly"
         );
 
@@ -247,14 +227,15 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
         );
 
         assertEq(
-            paymentCycleDuration , 30 days,
+            paymentCycleDuration,
+            30 days,
             "Monthly market payment cycle duration set incorrectly"
         );
 
-        vm.expectRevert("monthly payment cycle duration cannot be set"); 
+        vm.expectRevert("monthly payment cycle duration cannot be set");
 
         // Monthly payment cycle should fail
-        
+
         marketOwner.createMarket(
             address(marketRegistry),
             3000,
@@ -267,14 +248,10 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
             PaymentCycleType.Monthly,
             "uri://"
         );
-        
     }
 
-
-
-     function test_createMarket_invalid_initial_owner() public {
-
-         vm.expectRevert(); //"Invalid owner address" 
+    function test_createMarket_invalid_initial_owner() public {
+        vm.expectRevert(); //"Invalid owner address"
         marketOwner.createMarket(
             address(0),
             0,
@@ -287,15 +264,10 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
             PaymentCycleType.Seconds,
             "uri://"
         );
-
-
-     }
+    }
 
     function test_attestStakeholder() public {
-
-         
-        
-        bool isLender = true; 
+        bool isLender = true;
 
         marketOwner.attestStakeholder(
             marketId,
@@ -312,8 +284,7 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
     }
 
     function test_attestStakeholder_notMarketOwner() public {
-
-        bool isLender = true; 
+        bool isLender = true;
 
         vm.expectRevert("Not the market owner");
 
@@ -323,71 +294,69 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
             expirationTime,
             isLender
         );
-
     }
 
-
     function test_attestStakeholderVerification_lender() public {
+        bool isLender = true;
 
-        bool isLender = true; 
-
-        marketRegistry.attestStakeholderVerification( 
+        marketRegistry.attestStakeholderVerification(
             marketId,
             address(lender),
             uuid,
             isLender
-         );
+        );
 
-        //expect that the lender is attested  
+        //expect that the lender is attested
 
         assertEq(
-            marketRegistry.marketVerifiedLendersContains(marketId,address(lender)),
+            marketRegistry.marketVerifiedLendersContains(
+                marketId,
+                address(lender)
+            ),
             true,
             "Did not add lender to verified set"
         );
 
         assertEq(
-            marketRegistry.getLenderAttestationId(marketId,address(lender)),
+            marketRegistry.getLenderAttestationId(marketId, address(lender)),
             uuid,
             "Did not set market attestation Id"
         );
-        
     }
 
-        function test_attestStakeholderVerification_borrower() public {
+    function test_attestStakeholderVerification_borrower() public {
+        bool isLender = false;
 
-        bool isLender = false; 
-
-        marketRegistry.attestStakeholderVerification( 
+        marketRegistry.attestStakeholderVerification(
             marketId,
             address(borrower),
             uuid,
             isLender
-         );
+        );
 
-        //expect that the borrower is attested  
+        //expect that the borrower is attested
 
         assertEq(
-            marketRegistry.marketVerifiedBorrowersContains(marketId,address(borrower)),
+            marketRegistry.marketVerifiedBorrowersContains(
+                marketId,
+                address(borrower)
+            ),
             true,
             "Did not add lender to verified set"
         );
 
         assertEq(
-            marketRegistry.getBorrowerAttestationId(marketId,address(borrower)),
+            marketRegistry.getBorrowerAttestationId(
+                marketId,
+                address(borrower)
+            ),
             uuid,
             "Did not set market attestation Id"
         );
-        
     }
 
-    function test_attestLender() public { 
-
-        marketRegistry.attestLender(
-            marketId,
-            address(lender),
-            expirationTime 
-        );
+    function test_attestLender() public {
+        marketRegistry.attestLender(marketId, address(lender), expirationTime);
 
         assertEq(
             marketRegistry.attestStakeholderWasCalled(),
@@ -396,19 +365,16 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
         );
     }
 
-
-    function test_attestLender_expired() public { 
-
-    }
-
+    function test_attestLender_expired() public {}
 
     function test_attestLenderDelegated() public {
-
         marketRegistry.attestLender(
             marketId,
             address(lender),
             expirationTime,
-            v,r,s
+            v,
+            r,
+            s
         );
 
         assertEq(
@@ -416,15 +382,13 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
             true,
             "Attest stakeholder via delegation was not called"
         );
-
     }
 
     function test_attestBorrower() public {
-
-          marketRegistry.attestBorrower(
+        marketRegistry.attestBorrower(
             marketId,
             address(borrower),
-            expirationTime 
+            expirationTime
         );
 
         assertEq(
@@ -435,12 +399,13 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
     }
 
     function test_attestBorrowerDelegated() public {
-
-         marketRegistry.attestBorrower(
+        marketRegistry.attestBorrower(
             marketId,
             address(lender),
             expirationTime,
-            v,r,s
+            v,
+            r,
+            s
         );
 
         assertEq(
@@ -448,165 +413,128 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
             true,
             "Attest stakeholder via delegation was not called"
         );
-
     }
 
-
-
     function test_revokeLender() public {
-
-        marketRegistry.revokeLender(
-            marketId,
-            address(lender)
-        );
+        marketRegistry.revokeLender(marketId, address(lender));
 
         assertEq(
             marketRegistry.revokeStakeholderWasCalled(),
             true,
             "Revoke stakeholder was not called"
         );
-
     }
 
     function test_revokeBorrower() public {
-
-        marketRegistry.revokeBorrower(
-            marketId,
-            address(borrower)
-        );
+        marketRegistry.revokeBorrower(marketId, address(borrower));
 
         assertEq(
             marketRegistry.revokeStakeholderWasCalled(),
             true,
             "Revoke stakeholder was not called"
         );
-
-
     }
 
     function test_revokeStakeholder() public {
+        bool isLender = true;
 
-        bool isLender = true;  
-
-        marketOwner.revokeStakeholder(
-            marketId,
-            address(lender), 
-            isLender
-        ); 
+        marketOwner.revokeStakeholder(marketId, address(lender), isLender);
 
         assertEq(
             marketRegistry.revokeStakeholderVerificationWasCalled(),
             true,
             "Revoke stakeholder verification was not called"
         );
-
     }
 
-     function test_revokeStakeholder_notMarketOwner() public {
-
-        bool isLender = true; 
+    function test_revokeStakeholder_notMarketOwner() public {
+        bool isLender = true;
 
         vm.expectRevert("Not the market owner");
 
-        marketRegistry.revokeStakeholder(
-            marketId,
-            address(lender), 
-            isLender
-        );
-
+        marketRegistry.revokeStakeholder(marketId, address(lender), isLender);
     }
 
     function test_revokeLenderViaDelegation() public {
- 
-
-        marketRegistry.revokeLender(
-            marketId,
-            address(lender), 
-            v,r,s
-        ); 
+        marketRegistry.revokeLender(marketId, address(lender), v, r, s);
 
         assertEq(
             marketRegistry.revokeStakeholderVerificationWasCalled(),
             true,
             "Revoke stakeholder verification was not called"
         );
-
     }
 
     function test_revokeBorrowerViaDelegation() public {
- 
-
-        marketRegistry.revokeBorrower(
-            marketId,
-            address(borrower),  
-            v,r,s
-        ); 
+        marketRegistry.revokeBorrower(marketId, address(borrower), v, r, s);
 
         assertEq(
             marketRegistry.revokeStakeholderVerificationWasCalled(),
             true,
             "Revoke stakeholder verification was not called"
         );
-
     }
 
-
-     function test_revokeStakeholderVerification() public {
-
+    function test_revokeStakeholderVerification() public {
         bool isLender = true;
 
-        marketRegistry.forceVerifyLenderForMarket(marketId,address(lender));
+        marketRegistry.forceVerifyLenderForMarket(marketId, address(lender));
 
-        marketRegistry.revokeStakeholderVerification(marketId,address(lender),isLender);
+        marketRegistry.revokeStakeholderVerification(
+            marketId,
+            address(lender),
+            isLender
+        );
 
         assertEq(
-            marketRegistry.marketVerifiedLendersContains(marketId,address(lender)),
+            marketRegistry.marketVerifiedLendersContains(
+                marketId,
+                address(lender)
+            ),
             false,
             "Lender was not revoked"
         );
-
-     }
+    }
 
     function test_lenderExitMarket() public {
-
-        marketRegistry.forceVerifyLenderForMarket(marketId,address(lender));
+        marketRegistry.forceVerifyLenderForMarket(marketId, address(lender));
 
         lender.lenderExitMarket(marketId);
 
         assertEq(
-            marketRegistry.marketVerifiedLendersContains(marketId,address(lender)),
+            marketRegistry.marketVerifiedLendersContains(
+                marketId,
+                address(lender)
+            ),
             false,
             "Lender was not able to exit market"
         );
-
-
     }
 
- 
-
-
     function test_borrowerExitMarket() public {
-
-
-        marketRegistry.forceVerifyBorrowerForMarket(marketId,address(borrower));
+        marketRegistry.forceVerifyBorrowerForMarket(
+            marketId,
+            address(borrower)
+        );
 
         borrower.borrowerExitMarket(marketId);
 
         assertEq(
-            marketRegistry.marketVerifiedBorrowersContains(marketId,address(borrower)),
+            marketRegistry.marketVerifiedBorrowersContains(
+                marketId,
+                address(borrower)
+            ),
             false,
             "Borrower was not able to exit market"
         );
-
     }
 
     function test_resolve() public {}
 
     function test_transferMarketOwnership() public {
-        
         marketRegistry.setMarketOwner(address(this));
 
-        marketRegistry.stubMarket(marketId, address(this)); 
+        marketRegistry.stubMarket(marketId, address(this));
 
         marketRegistry.transferMarketOwnership(marketId, address(lender));
 
@@ -615,24 +543,21 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
             address(lender),
             "Could not transfer ownership"
         );
-        
-
     }
 
-    function test_transferMarketOwnership_notOwner() public { 
+    function test_transferMarketOwnership_notOwner() public {
         vm.expectRevert("Not the owner");
 
-        marketRegistry.transferMarketOwnership(marketId, address(lender)); 
+        marketRegistry.transferMarketOwnership(marketId, address(lender));
     }
 
     function test_updateMarketSettings() public {
-            
         marketRegistry.setMarketOwner(address(this));
 
-        marketRegistry.stubMarket(marketId, address(this)); 
+        marketRegistry.stubMarket(marketId, address(this));
 
         marketRegistry.updateMarketSettings(
-            marketId, 
+            marketId,
             111,
             PaymentType.EMI,
             PaymentCycleType.Seconds,
@@ -641,25 +566,20 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
             10,
             false,
             false,
-            "ipfs://" 
-            );
-
-        (address owner,uint32 paymentCycleDuration,,,,,) = marketRegistry.getMarketData(marketId);
-
-        assertEq(
-            paymentCycleDuration,
-            111,
-            "Market not updated"
+            "ipfs://"
         );
 
+        (address owner, uint32 paymentCycleDuration, , , , , ) = marketRegistry
+            .getMarketData(marketId);
 
+        assertEq(paymentCycleDuration, 111, "Market not updated");
     }
 
-     function test_updateMarketSettings_not_owner() public {
+    function test_updateMarketSettings_not_owner() public {
         vm.expectRevert("Not the owner");
 
         marketRegistry.updateMarketSettings(
-            marketId, 
+            marketId,
             111,
             PaymentType.EMI,
             PaymentCycleType.Seconds,
@@ -668,19 +588,14 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
             10,
             false,
             false,
-            "ipfs://" 
-            );
-
-
-
-     }
-
+            "ipfs://"
+        );
+    }
 
     function test_getMarketFeeRecipient_when_unset() public {
-
         marketRegistry.setMarketOwner(address(marketOwner));
 
-        marketRegistry.stubMarket(marketId, address(this)); 
+        marketRegistry.stubMarket(marketId, address(this));
 
         address feeRecipient = marketRegistry.getMarketFeeRecipient(marketId);
 
@@ -689,15 +604,13 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
             address(address(marketOwner)),
             "Could not get market fee recipient"
         );
-
     }
 
     function test_getMarketFeeRecipient_when_set() public {
-
         marketRegistry.setMarketOwner(address(marketOwner));
-         marketRegistry.setFeeRecipient(marketId,address(feeRecipient));
+        marketRegistry.setFeeRecipient(marketId, address(feeRecipient));
 
-        marketRegistry.stubMarket(marketId, address(this)); 
+        marketRegistry.stubMarket(marketId, address(this));
 
         address feeRecipient = marketRegistry.getMarketFeeRecipient(marketId);
 
@@ -706,14 +619,12 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
             address(address(feeRecipient)),
             "Could not get market fee recipient"
         );
-
     }
 
     function test_setMarketFeeRecipient() public {
-
         marketRegistry.setMarketOwner(address(this));
 
-        marketRegistry.stubMarket(marketId, address(this)); 
+        marketRegistry.stubMarket(marketId, address(this));
 
         marketRegistry.setMarketFeeRecipient(marketId, address(lender));
 
@@ -722,130 +633,103 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
             address(lender),
             "Could not set market fee recipient"
         );
-    } 
+    }
 
     function test_setMarketFeeRecipient_not_owner() public {
-
         marketRegistry.setMarketOwner(address(this));
 
-        marketRegistry.stubMarket(marketId, address(this)); 
-        
+        marketRegistry.stubMarket(marketId, address(this));
+
         vm.expectRevert("Not the owner");
         vm.prank(address(borrower));
         marketRegistry.setMarketFeeRecipient(marketId, address(lender));
-
-       
-    } 
+    }
 
     function test_setMarketURI() public {
-
         marketRegistry.setMarketOwner(address(this));
 
-        marketRegistry.stubMarket(marketId, address(this)); 
+        marketRegistry.stubMarket(marketId, address(this));
 
         marketRegistry.setMarketURI(marketId, "ipfs://");
 
         assertEq(
             marketRegistry.getMarketURI(marketId),
-           "ipfs://",
+            "ipfs://",
             "Could not set market uri"
-        ); 
-
-    } 
+        );
+    }
 
     function test_setMarketURI_not_owner() public {
-
         marketRegistry.setMarketOwner(address(this));
 
-        marketRegistry.stubMarket(marketId, address(this)); 
-        
+        marketRegistry.stubMarket(marketId, address(this));
+
         vm.expectRevert("Not the owner");
         vm.prank(address(borrower));
         marketRegistry.setMarketURI(marketId, "ipfs://");
-
-       
     }
 
-    //test more branches of this 
+    //test more branches of this
     function test_setPaymentCycle() public {
-
         marketRegistry.setMarketOwner(address(this));
 
-        marketRegistry.stubMarket(marketId, address(this)); 
+        marketRegistry.stubMarket(marketId, address(this));
 
         marketRegistry.setPaymentCycle(marketId, PaymentCycleType.Seconds, 555);
 
-        (uint32 duration, PaymentCycleType cType) = marketRegistry.getPaymentCycle(marketId);
+        (uint32 duration, PaymentCycleType cType) = marketRegistry
+            .getPaymentCycle(marketId);
 
-        assertEq(
-            duration,
-            555,
-            "Could not set market payment cycle"
-        ); 
+        assertEq(duration, 555, "Could not set market payment cycle");
 
         require(
-            cType ==
-            PaymentCycleType.Seconds,
+            cType == PaymentCycleType.Seconds,
             "Could not set market payment type"
-        ); 
-
-    } 
-
-    function test_setPaymentCycle_not_owner() public {
-            
-            marketRegistry.setMarketOwner(address(this));
-    
-            marketRegistry.stubMarket(marketId, address(this)); 
-            
-            vm.expectRevert("Not the owner");
-            vm.prank(address(borrower));
-            marketRegistry.setPaymentCycle(marketId, PaymentCycleType.Seconds, 555);
-
+        );
     }
 
-        function test_setPaymentCycle_monthly() public {
-
+    function test_setPaymentCycle_not_owner() public {
         marketRegistry.setMarketOwner(address(this));
 
-        marketRegistry.stubMarket(marketId, address(this)); 
+        marketRegistry.stubMarket(marketId, address(this));
+
+        vm.expectRevert("Not the owner");
+        vm.prank(address(borrower));
+        marketRegistry.setPaymentCycle(marketId, PaymentCycleType.Seconds, 555);
+    }
+
+    function test_setPaymentCycle_monthly() public {
+        marketRegistry.setMarketOwner(address(this));
+
+        marketRegistry.stubMarket(marketId, address(this));
 
         marketRegistry.setPaymentCycle(marketId, PaymentCycleType.Monthly, 0);
 
-        (uint32 duration, PaymentCycleType cType) = marketRegistry.getPaymentCycle(marketId);
+        (uint32 duration, PaymentCycleType cType) = marketRegistry
+            .getPaymentCycle(marketId);
 
-        assertEq(
-            duration,
-            30 days,
-            "Could not set market payment cycle"
-        ); 
+        assertEq(duration, 30 days, "Could not set market payment cycle");
 
         require(
-            cType ==
-            PaymentCycleType.Monthly,
+            cType == PaymentCycleType.Monthly,
             "Could not set market payment type"
-        ); 
-
-    } 
+        );
+    }
 
     function test_setPaymentCycle_monthly_invalid() public {
-
         marketRegistry.setMarketOwner(address(this));
 
-        marketRegistry.stubMarket(marketId, address(this)); 
+        marketRegistry.stubMarket(marketId, address(this));
 
         vm.expectRevert("monthly payment cycle duration cannot be set");
 
         marketRegistry.setPaymentCycle(marketId, PaymentCycleType.Monthly, 555);
-
-        
-
-    } 
+    }
 
     function test_setPaymentDefaultDuration() public {
-
         marketRegistry.setMarketOwner(address(this));
 
-        marketRegistry.stubMarket(marketId, address(this)); 
+        marketRegistry.stubMarket(marketId, address(this));
 
         marketRegistry.setPaymentDefaultDuration(marketId, 555);
 
@@ -853,29 +737,23 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
             marketRegistry.getPaymentDefaultDuration(marketId),
             555,
             "Could not set payment default duration"
-        ); 
-
-
-    } 
+        );
+    }
 
     function test_setPaymentDefaultDuration_not_owner() public {
-
         marketRegistry.setMarketOwner(address(this));
 
-        marketRegistry.stubMarket(marketId, address(this)); 
-        
+        marketRegistry.stubMarket(marketId, address(this));
+
         vm.expectRevert("Not the owner");
         vm.prank(address(borrower));
-        marketRegistry.setPaymentDefaultDuration(marketId, 555); 
-       
-
+        marketRegistry.setPaymentDefaultDuration(marketId, 555);
     }
 
     function test_setBidExpirationTime() public {
-
         marketRegistry.setMarketOwner(address(this));
 
-        marketRegistry.stubMarket(marketId, address(this)); 
+        marketRegistry.stubMarket(marketId, address(this));
 
         marketRegistry.setBidExpirationTime(marketId, 555);
 
@@ -883,31 +761,23 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
             marketRegistry.getBidExpirationTime(marketId),
             555,
             "Could not set bid expiration time"
-        ); 
-
-
-
-    } 
-
+        );
+    }
 
     function test_setBidExpirationTime_not_owner() public {
-
         marketRegistry.setMarketOwner(address(this));
 
-        marketRegistry.stubMarket(marketId, address(this)); 
-        
+        marketRegistry.stubMarket(marketId, address(this));
+
         vm.expectRevert("Not the owner");
         vm.prank(address(borrower));
-        marketRegistry.setBidExpirationTime(marketId, 555);  
-
-
+        marketRegistry.setBidExpirationTime(marketId, 555);
     }
 
     function test_setMarketFeePercent() public {
-
         marketRegistry.setMarketOwner(address(this));
 
-        marketRegistry.stubMarket(marketId, address(this)); 
+        marketRegistry.stubMarket(marketId, address(this));
 
         marketRegistry.setMarketFeePercent(marketId, 555);
 
@@ -915,212 +785,161 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
             marketRegistry.getMarketplaceFee(marketId),
             555,
             "Could not set market fee percent"
-        ); 
+        );
+    }
 
-    } 
-    
     function test_setMarketFeePercent_not_owner() public {
-
         marketRegistry.setMarketOwner(address(this));
 
-        marketRegistry.stubMarket(marketId, address(this)); 
-        
+        marketRegistry.stubMarket(marketId, address(this));
+
         vm.expectRevert("Not the owner");
         vm.prank(address(borrower));
         marketRegistry.setMarketFeePercent(marketId, 555);
-
-
     }
 
     function test_setMarketPaymentType() public {
-
-
         marketRegistry.setMarketOwner(address(this));
 
-        marketRegistry.stubMarket(marketId, address(this)); 
+        marketRegistry.stubMarket(marketId, address(this));
 
         marketRegistry.setMarketPaymentType(marketId, PaymentType.EMI);
 
         require(
-            marketRegistry.getPaymentType(marketId) ==
-            PaymentType.EMI,
+            marketRegistry.getPaymentType(marketId) == PaymentType.EMI,
             "Could not set market payment type"
-        ); 
-
-
-    } 
+        );
+    }
 
     function test_setMarketPaymentType_not_owner() public {
+        marketRegistry.setMarketOwner(address(this));
 
-           marketRegistry.setMarketOwner(address(this));
+        marketRegistry.stubMarket(marketId, address(this));
 
-        marketRegistry.stubMarket(marketId, address(this)); 
-        
         vm.expectRevert("Not the owner");
         vm.prank(address(borrower));
         marketRegistry.setMarketPaymentType(marketId, PaymentType.EMI);
-
-    } 
-
+    }
 
     function test_setMarketPaymentType_bullet() public {
-
-
         marketRegistry.setMarketOwner(address(this));
 
-        marketRegistry.stubMarket(marketId, address(this)); 
+        marketRegistry.stubMarket(marketId, address(this));
 
         marketRegistry.setMarketPaymentType(marketId, PaymentType.Bullet);
 
         require(
-            marketRegistry.getPaymentType(marketId) ==
-            PaymentType.Bullet,
+            marketRegistry.getPaymentType(marketId) == PaymentType.Bullet,
             "Could not set market payment type"
-        ); 
-
-
-    } 
-
+        );
+    }
 
     function test_setLenderAttestationRequired() public {
-
         marketRegistry.setMarketOwner(address(this));
 
-        marketRegistry.stubMarket(marketId, address(this)); 
+        marketRegistry.stubMarket(marketId, address(this));
 
         marketRegistry.setLenderAttestationRequired(marketId, true);
 
-        (bool lenderReq, bool borrowerReq) = marketRegistry.getMarketAttestationRequirements(marketId);
+        (bool lenderReq, bool borrowerReq) = marketRegistry
+            .getMarketAttestationRequirements(marketId);
 
-        assertEq(
-            lenderReq,
-            true,
-            "Could not set lender attestation required"
-        ); 
-
-
+        assertEq(lenderReq, true, "Could not set lender attestation required");
     }
 
     function test_setLenderAttestationRequired_not_owner() public {
-
         marketRegistry.setMarketOwner(address(this));
 
-        marketRegistry.stubMarket(marketId, address(this)); 
+        marketRegistry.stubMarket(marketId, address(this));
 
         vm.prank(address(borrower));
         vm.expectRevert("Not the owner");
         marketRegistry.setLenderAttestationRequired(marketId, true);
- 
-
     }
 
     function test_setLenderAttestationRequired_twice() public {
         marketRegistry.setMarketOwner(address(this));
 
-        marketRegistry.stubMarket(marketId, address(this)); 
+        marketRegistry.stubMarket(marketId, address(this));
 
         marketRegistry.setLenderAttestationRequired(marketId, true);
         marketRegistry.setLenderAttestationRequired(marketId, true);
 
-        (bool lenderReq, bool borrowerReq) = marketRegistry.getMarketAttestationRequirements(marketId);
+        (bool lenderReq, bool borrowerReq) = marketRegistry
+            .getMarketAttestationRequirements(marketId);
 
-        assertEq(
-            lenderReq,
-            true,
-            "Could not set lender attestation required"
-        ); 
-
-
+        assertEq(lenderReq, true, "Could not set lender attestation required");
     }
 
     function test_setBorrowerAttestationRequired() public {
+        marketRegistry.setMarketOwner(address(this));
 
-         marketRegistry.setMarketOwner(address(this));
+        marketRegistry.stubMarket(marketId, address(this));
 
-        marketRegistry.stubMarket(marketId, address(this)); 
+        marketRegistry.setBorrowerAttestationRequired(marketId, true);
 
-        marketRegistry.setBorrowerAttestationRequired( marketId, true);
-
-        (bool lenderReq, bool borrowerReq) = marketRegistry.getMarketAttestationRequirements(marketId);
+        (bool lenderReq, bool borrowerReq) = marketRegistry
+            .getMarketAttestationRequirements(marketId);
 
         assertEq(
             borrowerReq,
             true,
             "Could not set borrower attestation required"
-        ); 
- 
+        );
+    }
 
-    } 
-
-
-     function test_setBorrowerAttestationRequired_not_owner() public {
-
+    function test_setBorrowerAttestationRequired_not_owner() public {
         marketRegistry.setMarketOwner(address(this));
 
-        marketRegistry.stubMarket(marketId, address(this)); 
+        marketRegistry.stubMarket(marketId, address(this));
 
         vm.prank(address(borrower));
         vm.expectRevert("Not the owner");
         marketRegistry.setBorrowerAttestationRequired(marketId, true);
- 
-
     }
- 
-      function test_setBorrowerAttestationRequired_twice() public {
 
-         marketRegistry.setMarketOwner(address(this));
+    function test_setBorrowerAttestationRequired_twice() public {
+        marketRegistry.setMarketOwner(address(this));
 
-        marketRegistry.stubMarket(marketId, address(this)); 
+        marketRegistry.stubMarket(marketId, address(this));
 
-        marketRegistry.setBorrowerAttestationRequired( marketId, true);
-        marketRegistry.setBorrowerAttestationRequired( marketId, true);
+        marketRegistry.setBorrowerAttestationRequired(marketId, true);
+        marketRegistry.setBorrowerAttestationRequired(marketId, true);
 
-        (bool lenderReq, bool borrowerReq) = marketRegistry.getMarketAttestationRequirements(marketId);
+        (bool lenderReq, bool borrowerReq) = marketRegistry
+            .getMarketAttestationRequirements(marketId);
 
         assertEq(
             borrowerReq,
             true,
             "Could not set borrower attestation required"
-        ); 
- 
-
-    } 
-
-
- 
+        );
+    }
 
     function test_isVerifiedLender() public {
-
-        (bool isVerified, bytes32 uuid) = marketRegistry.isVerifiedLender(marketId, address(lender));
-
-        assertEq(
-            isVerified,
-            true,
-            "is verified was not called"
+        (bool isVerified, bytes32 uuid) = marketRegistry.isVerifiedLender(
+            marketId,
+            address(lender)
         );
-    } 
+
+        assertEq(isVerified, true, "is verified was not called");
+    }
 
     function test_isVerifiedBorrower() public {
-
-        (bool isVerified, bytes32 uuid) = marketRegistry.isVerifiedBorrower(marketId, address(lender));
-
-        assertEq(
-            isVerified,
-            true,
-            "is verified was not called"
+        (bool isVerified, bytes32 uuid) = marketRegistry.isVerifiedBorrower(
+            marketId,
+            address(lender)
         );
 
+        assertEq(isVerified, true, "is verified was not called");
+    }
 
-    } 
-
-   function test_isVerified_require_attestation_valid() public { 
-
+    function test_isVerified_require_attestation_valid() public {
         marketRegistry.setMarketOwner(address(this));
 
-        marketRegistry.stubMarket(marketId, address(this)); 
+        marketRegistry.stubMarket(marketId, address(this));
 
         marketRegistry.setLenderAttestationRequired(marketId, true);
-
 
         marketRegistry.attestStakeholderVerification(
             marketId,
@@ -1128,78 +947,65 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
             uuid,
             true
         );
- 
-         (bool isVerified, bytes32 uuid) = marketRegistry.isVerified(
+
+        (bool isVerified, bytes32 uuid) = marketRegistry.isVerified(
             address(lender),
             marketId
-         );
-
-        assertEq(
-            isVerified,
-            true,
-            "is verified did not return correct result"
         );
 
+        assertEq(isVerified, true, "is verified did not return correct result");
     }
 
-    function test_isVerified_require_attestation_invalid() public { 
-
+    function test_isVerified_require_attestation_invalid() public {
         marketRegistry.setMarketOwner(address(this));
 
-        marketRegistry.stubMarket(marketId, address(this)); 
+        marketRegistry.stubMarket(marketId, address(this));
 
         marketRegistry.setLenderAttestationRequired(marketId, true);
- 
-         (bool isVerified, bytes32 uuid) = marketRegistry.isVerified(
+
+        (bool isVerified, bytes32 uuid) = marketRegistry.isVerified(
             address(lender),
             marketId
-         );
+        );
 
         assertEq(
             isVerified,
             false,
             "is verified did not return correct result"
         );
-
     }
 
-      function test_isVerified_no_attestation() public { 
-
+    function test_isVerified_no_attestation() public {
         marketRegistry.setMarketOwner(address(this));
 
-        marketRegistry.stubMarket(marketId, address(this)); 
+        marketRegistry.stubMarket(marketId, address(this));
 
         marketRegistry.setLenderAttestationRequired(marketId, false);
- 
-         (bool isVerified, bytes32 uuid) = marketRegistry.isVerified(
+
+        (bool isVerified, bytes32 uuid) = marketRegistry.isVerified(
             address(lender),
             marketId
-         );
-
-        assertEq(
-            isVerified,
-            true,
-            "is verified did not return correct result"
         );
 
+        assertEq(isVerified, true, "is verified did not return correct result");
     }
 
     function test_getAllVerifiedBorrowersForMarket() public {
+        bool isLender = false;
 
-          bool isLender = false; 
-
-        marketRegistry.attestStakeholderVerification( 
+        marketRegistry.attestStakeholderVerification(
             marketId,
             address(borrower),
             uuid,
             isLender
-         );
+        );
 
         marketRegistry.setMarketOwner(address(this));
 
-        marketRegistry.stubMarket(marketId, address(this)); 
+        marketRegistry.stubMarket(marketId, address(this));
 
-        address[] memory borrowers = marketRegistry.getAllVerifiedBorrowersForMarket(marketId,0,5);
+        address[] memory borrowers = marketRegistry
+            .getAllVerifiedBorrowersForMarket(marketId, 0, 5);
 
         assertEq(
             borrowers.length,
@@ -1212,65 +1018,41 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
             address(borrower),
             "Did not return correct borrower"
         );
-    
     }
 
-      function test_getAllVerifiedLendersForMarket() public {
+    function test_getAllVerifiedLendersForMarket() public {
+        bool isLender = true;
 
-         bool isLender = true; 
-
-        marketRegistry.attestStakeholderVerification( 
+        marketRegistry.attestStakeholderVerification(
             marketId,
             address(lender),
             uuid,
             isLender
-         );
+        );
 
         marketRegistry.setMarketOwner(address(this));
 
-        marketRegistry.stubMarket(marketId, address(this)); 
-        
-        address[] memory lenders = marketRegistry.getAllVerifiedLendersForMarket(marketId,0,5);
+        marketRegistry.stubMarket(marketId, address(this));
 
-        assertEq(
-            lenders.length,
-            1,
-            "Did not return correct number of lenders"
-        );
+        address[] memory lenders = marketRegistry
+            .getAllVerifiedLendersForMarket(marketId, 0, 5);
 
-        assertEq(
-            lenders[0],
-            address(lender),
-            "Did not return correct lender"
-        );
-    
+        assertEq(lenders.length, 1, "Did not return correct number of lenders");
+
+        assertEq(lenders[0], address(lender), "Did not return correct lender");
     }
-
-
-
 }
 
-
-
 contract MarketRegistryUser is User {
-
     MarketRegistry_Override marketRegistry;
 
-    constructor(address _tellerV2,address _marketRegistry) User(_tellerV2) {
-
+    constructor(address _tellerV2, address _marketRegistry) User(_tellerV2) {
         marketRegistry = MarketRegistry_Override(payable(_marketRegistry));
-
     }
-
 
     function closeMarket(uint256 marketId) public {
-
         marketRegistry.closeMarket(marketId);
-
-
-
     }
-
 
     function lenderExitMarket(uint256 marketId) public {
         marketRegistry.lenderExitMarket(marketId);
@@ -1286,7 +1068,6 @@ contract MarketRegistryUser is User {
         uint256 _expirationTime,
         bool _isLender
     ) public {
-
         marketRegistry.attestStakeholder(
             _marketId,
             _stakeholderAddress,
@@ -1300,30 +1081,21 @@ contract MarketRegistryUser is User {
         address _stakeholderAddress,
         bool _isLender
     ) public {
-
         marketRegistry.revokeStakeholder(
             _marketId,
             _stakeholderAddress,
             _isLender
         );
     }
-
-
-
 }
-
 
 contract TellerV2Mock is TellerV2Context {
     Bid mockBid;
 
     constructor() TellerV2Context(address(0)) {}
 
-  
-
     function setMarketRegistry(address _marketRegistry) external {
-        marketRegistry = IMarketRegistry(
-           _marketRegistry
-        );
+        marketRegistry = IMarketRegistry(_marketRegistry);
     }
 
     function getSenderForMarket(uint256 _marketId)
@@ -1370,5 +1142,3 @@ contract TellerV2Mock is TellerV2Context {
         bidState = bid.state;
     }
 }
-
-

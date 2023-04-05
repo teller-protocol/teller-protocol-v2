@@ -32,7 +32,11 @@ contract TellerV2Context_Override is TellerV2Context {
         _approvedForwarderSenders[_forwarder].add(_account);
     }
 
-    function external__msgSenderForMarket(uint256 _marketId) public view returns (address) {
+    function external__msgSenderForMarket(uint256 _marketId)
+        public
+        view
+        returns (address)
+    {
         return _msgSenderForMarket(_marketId);
     }
 }

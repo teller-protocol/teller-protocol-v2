@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "../contracts/TellerV2MarketForwarder.sol";
 import { Testable } from "./Testable.sol";
 import { LenderManager } from "../contracts/LenderManager.sol";
-import {LenderManager_Override} from "./LenderManager_Override.sol";
+import { LenderManager_Override } from "./LenderManager_Override.sol";
 
 import "../contracts/mock/MarketRegistryMock.sol";
 
@@ -17,7 +17,7 @@ import { User } from "./Test_Helpers.sol";
 
 import { TellerV2Context } from "../contracts/TellerV2Context.sol";
 
-contract LenderManager_Test is Testable  {
+contract LenderManager_Test is Testable {
     LenderManagerUser private marketOwner;
     LenderManagerUser private lender;
     LenderManagerUser private borrower;
@@ -27,73 +27,68 @@ contract LenderManager_Test is Testable  {
 
     LenderManager_Override lenderManager;
 
-    constructor()
-       
-    {}
+    constructor() {}
 
     function setUp() public {
-
-       
-
         mockTellerV2 = new LenderCommitmentTester();
 
-       
         mockMarketRegistry = new MarketRegistryMock();
 
         lenderManager = new LenderManager_Override(address(mockMarketRegistry));
 
-        borrower = new LenderManagerUser(address(mockTellerV2), address(lenderManager));
-        lender = new LenderManagerUser(address(mockTellerV2), address(lenderManager));
-         marketOwner = new LenderManagerUser(
+        borrower = new LenderManagerUser(
+            address(mockTellerV2),
+            address(lenderManager)
+        );
+        lender = new LenderManagerUser(
+            address(mockTellerV2),
+            address(lenderManager)
+        );
+        marketOwner = new LenderManagerUser(
             address(mockTellerV2),
             address(lenderManager)
         );
 
         mockMarketRegistry.setMarketOwner(address(marketOwner));
-      
     }
-
-
-     
 
     function test_initialize() public {
         lenderManager.initialize();
     }
 
     function test_getLoanMarketId() public {
-
         lenderManager.initialize();
 
         uint256 marketId = lenderManager._getLoanMarketIdSuper(1);
 
-        assertEq(marketId,  getLoanMarketId(marketId), "Market id is not correct");
-
-
+        assertEq(
+            marketId,
+            getLoanMarketId(marketId),
+            "Market id is not correct"
+        );
     }
 
     function test_hasMarketVerification() public {
-
-
         lenderManager.initialize();
 
-        bool hasMarketVerification = lenderManager._hasMarketVerificationSuper(address(lender), 1);
+        bool hasMarketVerification = lenderManager._hasMarketVerificationSuper(
+            address(lender),
+            1
+        );
 
-        assertEq(hasMarketVerification, true, "Market verification is not correct");
+        assertEq(
+            hasMarketVerification,
+            true,
+            "Market verification is not correct"
+        );
     }
 
     function test_baseURI() public {
-
         lenderManager.initialize();
 
         string memory baseURI = lenderManager._baseURISuper();
 
-        assertEq(
-            baseURI,
-            "",
-            "Base URI is not correct"
-        );
-
-
+        assertEq(baseURI, "", "Base URI is not correct");
     }
 
     function test_mint() public {
@@ -118,15 +113,11 @@ contract LenderManager_Test is Testable  {
         bool mintFailed;
 
         vm.expectRevert("Not approved by market");
-       
-         lenderManager.mint(address(address(lender)), bidId);
- 
+
+        lenderManager.mint(address(address(lender)), bidId);
     }
 
-     
-
     function test_registerLoan() public {
-      
         lenderManager.initialize();
         lenderManager.setHasMarketVerification(true);
 
@@ -141,7 +132,6 @@ contract LenderManager_Test is Testable  {
         );
     }
 
-
     function test_registerLoan_invalid_owner() public {
         lenderManager.setHasMarketVerification(true);
 
@@ -149,14 +139,11 @@ contract LenderManager_Test is Testable  {
 
         vm.prank(address(borrower));
         vm.expectRevert("Ownable: caller is not the owner");
-        
-        lenderManager.registerLoan(bidId, address(lender));
 
+        lenderManager.registerLoan(bidId, address(lender));
     }
 
     function test_transferFrom() public {
-      
-
         lenderManager.setHasMarketVerification(true);
 
         uint256 bidId = 2;
@@ -173,14 +160,10 @@ contract LenderManager_Test is Testable  {
     }
 
     function test_transferFromToInvalidRecipient() public {
-      
-
         lenderManager.setHasMarketVerification(true);
 
         uint256 bidId = 2;
         lenderManager.mint(address(lender), bidId);
-
-        
 
         lenderManager.setHasMarketVerification(false);
 
@@ -200,20 +183,11 @@ contract LenderManager_Test is Testable  {
         );
     }
 
+    // Overrides
 
-    // Overrides 
-
-
-    function getLoanMarketId(uint256 bidId)
-        public
-        view
-      
-        returns (uint256)
-    {
+    function getLoanMarketId(uint256 bidId) public view returns (uint256) {
         return 42;
     }
-
-    
 }
 
 contract LenderManagerUser is User {
@@ -231,8 +205,6 @@ contract LenderManagerUser is User {
 //Move to a helper  or change it
 contract LenderCommitmentTester is TellerV2Context {
     constructor() TellerV2Context(address(0)) {}
-
-     
 
     function getSenderForMarket(uint256 _marketId)
         external

@@ -8,20 +8,26 @@ contract TellerV2Context_hasApprovedMarketForwarder is Testable {
     TellerV2Context_Override private context;
 
     function setUp() public {
-        context = new TellerV2Context_Override(
-            address(0),
-            address(111)
-        );
+        context = new TellerV2Context_Override(address(0), address(111));
     }
 
     function test_False_for_untrusted_forwarders() public {
         uint256 marketId = 7;
         address stubbedMarketForwarder = address(123);
 
-        context.mock_setApprovedMarketForwarder(marketId, stubbedMarketForwarder, address(this), true);
+        context.mock_setApprovedMarketForwarder(
+            marketId,
+            stubbedMarketForwarder,
+            address(this),
+            true
+        );
 
         assertFalse(
-            context.hasApprovedMarketForwarder(marketId, stubbedMarketForwarder, address(this)),
+            context.hasApprovedMarketForwarder(
+                marketId,
+                stubbedMarketForwarder,
+                address(this)
+            ),
             "by default forwarder should not be approved"
         );
     }
@@ -30,10 +36,17 @@ contract TellerV2Context_hasApprovedMarketForwarder is Testable {
         uint256 marketId = 7;
         address stubbedMarketForwarder = address(123);
 
-        context.mock_setTrustedMarketForwarder(marketId, stubbedMarketForwarder);
+        context.mock_setTrustedMarketForwarder(
+            marketId,
+            stubbedMarketForwarder
+        );
 
         assertFalse(
-            context.hasApprovedMarketForwarder(marketId, stubbedMarketForwarder, address(this)),
+            context.hasApprovedMarketForwarder(
+                marketId,
+                stubbedMarketForwarder,
+                address(this)
+            ),
             "by default forwarder should not be approved"
         );
     }
@@ -42,11 +55,23 @@ contract TellerV2Context_hasApprovedMarketForwarder is Testable {
         uint256 marketId = 7;
         address stubbedMarketForwarder = address(123);
 
-        context.mock_setTrustedMarketForwarder(marketId, stubbedMarketForwarder);
-        context.mock_setApprovedMarketForwarder(marketId, stubbedMarketForwarder, address(this), true);
+        context.mock_setTrustedMarketForwarder(
+            marketId,
+            stubbedMarketForwarder
+        );
+        context.mock_setApprovedMarketForwarder(
+            marketId,
+            stubbedMarketForwarder,
+            address(this),
+            true
+        );
 
         assertTrue(
-            context.hasApprovedMarketForwarder(marketId, stubbedMarketForwarder, address(this)),
+            context.hasApprovedMarketForwarder(
+                marketId,
+                stubbedMarketForwarder,
+                address(this)
+            ),
             "forwarder should be approved"
         );
     }

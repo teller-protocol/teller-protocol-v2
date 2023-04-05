@@ -25,19 +25,16 @@ contract User {
         IERC20(_assetContractAddress).approve(_spender, _amount);
     }
 
-
     function createMarketSimple(
-        address marketRegistry,   
+        address marketRegistry,
         uint32 _paymentCycleDuration,
         uint32 _paymentDefaultDuration,
         uint32 _bidExpirationTime,
         uint16 _feePercent,
         bool _requireLenderAttestation,
         bool _requireBorrowerAttestation,
-        
         string calldata _uri
-
-    )public returns (uint256) {
+    ) public returns (uint256) {
         return
             IMarketRegistry(marketRegistry).createMarket(
                 address(this),
@@ -47,7 +44,6 @@ contract User {
                 _feePercent,
                 _requireLenderAttestation,
                 _requireBorrowerAttestation,
-                
                 _uri
             );
     }

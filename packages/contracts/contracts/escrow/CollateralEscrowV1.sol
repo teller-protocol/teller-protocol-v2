@@ -37,8 +37,7 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
     function getBid() external view returns (uint256) {
         return bidId;
     }
- 
- 
+
     /**
      * @notice Deposits a collateral asset into the escrow.
      * @param _collateralType The type of collateral asset to deposit (ERC721, ERC1155).
@@ -61,8 +60,10 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
         Collateral storage collateral = collateralBalances[_collateralAddress];
 
         //Avoids asset overwriting.  Can get rid of this restriction by restructuring collateral balances storage so it isnt a mapping based on address.
-        require(collateral._amount == 0,"Unable to deposit multiple collateral asset instances of the same contract address.");
-         
+        require(
+            collateral._amount == 0,
+            "Unable to deposit multiple collateral asset instances of the same contract address."
+        );
 
         collateral._collateralType = _collateralType;
         collateral._amount = _amount;
@@ -132,10 +133,9 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
                 _amount,
                 data
             );
-        }else{
+        } else {
             revert("Invalid collateral type");
         }
-        
     }
 
     function _withdrawCollateral(
@@ -171,10 +171,9 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
                 _amount,
                 data
             );
-        }else{
-             revert("Invalid collateral type");
+        } else {
+            revert("Invalid collateral type");
         }
-       
     }
 
     // On NFT Received handlers

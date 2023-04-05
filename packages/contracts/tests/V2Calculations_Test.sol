@@ -250,8 +250,6 @@ contract V2Calculations_Test is Testable {
                 PaymentCycleType.Seconds
             );
 
-       
-
         assertEq(
             _owedPrincipal,
             1076484033293177614,

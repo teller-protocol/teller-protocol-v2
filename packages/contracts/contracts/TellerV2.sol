@@ -24,8 +24,6 @@ import "./libraries/NumbersLib.sol";
 import { BokkyPooBahsDateTimeLibrary as BPBDTL } from "./libraries/DateTimeLib.sol";
 import { V2Calculations, PaymentCycleType } from "./libraries/V2Calculations.sol";
 
-import "lib/forge-std/src/console.sol";
-
 /* Errors */
 /**
  * @notice This error is reverted when the action isn't allowed
@@ -342,21 +340,20 @@ contract TellerV2 is
         string calldata _metadataURI,
         address _receiver
     ) internal virtual returns (uint256 bidId_) {
-        
         address sender = _msgSenderForMarket(_marketplaceId);
-        
+
         (bool isVerified, ) = marketRegistry.isVerifiedBorrower(
             _marketplaceId,
             sender
         );
-        
+
         require(isVerified, "Not verified borrower");
-        
+
         require(
             !marketRegistry.isMarketClosed(_marketplaceId),
             "Market is closed"
         );
-        
+
         // Set response bid ID.
         bidId_ = bidId;
 
@@ -395,8 +392,6 @@ contract TellerV2 is
                 bid.terms.paymentCycle,
                 _APR
             );
-
-        
 
         uris[bidId] = _metadataURI;
         bid.state = BidState.PENDING;
@@ -685,7 +680,6 @@ contract TellerV2 is
         require(isLoanLiquidateable(_bidId), "Loan must be liquidateable.");
 
         Bid storage bid = bids[_bidId];
- 
 
         (uint256 owedPrincipal, , uint256 interest) = V2Calculations
             .calculateAmountOwed(
@@ -701,7 +695,7 @@ contract TellerV2 is
         );
 
         bid.state = BidState.LIQUIDATED;
- 
+
         // If loan is backed by collateral, withdraw and send to the liquidator
         address liquidator = _msgSenderForMarket(bid.marketplaceId);
         collateralManager.liquidateCollateral(_bidId, liquidator);
@@ -724,14 +718,11 @@ contract TellerV2 is
         Bid storage bid = bids[_bidId];
         uint256 paymentAmount = _payment.principal + _payment.interest;
 
-       
-
         RepMark mark = reputationManager.updateAccountReputation(
             bid.borrower,
             _bidId
         );
 
- 
         // Check if we are sending a payment or amount remaining
         if (paymentAmount >= _owedAmount) {
             paymentAmount = _owedAmount;
@@ -752,26 +743,21 @@ contract TellerV2 is
 
         address lender = getLoanLender(_bidId);
 
- 
         // Send payment to the lender
         bid.loanDetails.lendingToken.safeTransferFrom(
             _msgSenderForMarket(bid.marketplaceId),
             lender,
             paymentAmount
         );
- 
+
         // update our mappings
         bid.loanDetails.totalRepaid.principal += _payment.principal;
         bid.loanDetails.totalRepaid.interest += _payment.interest;
         bid.loanDetails.lastRepaidTimestamp = uint32(block.timestamp);
 
- 
-
         // If the loan is paid in full and has a mark, we should update the current reputation
         if (mark != RepMark.Good) {
-
             reputationManager.updateAccountReputation(bid.borrower, _bidId);
- 
         }
     }
 

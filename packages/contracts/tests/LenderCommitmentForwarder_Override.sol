@@ -5,7 +5,6 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "../contracts/TellerV2MarketForwarder.sol";
 
- 
 import "../contracts/TellerV2Context.sol";
 
 import { Testable } from "./Testable.sol";
@@ -18,70 +17,60 @@ import { User } from "./Test_Helpers.sol";
 import "../contracts/mock/MarketRegistryMock.sol";
 
 contract LenderCommitmentForwarder_Override is LenderCommitmentForwarder {
-    
-
     bool public submitBidWasCalled;
     bool public submitBidWithCollateralWasCalled;
     bool public acceptBidWasCalled;
 
-
-     constructor(address tellerV2, address marketRegistry)
-        LenderCommitmentForwarder(
-           tellerV2,  
-           marketRegistry
-        )
+    constructor(address tellerV2, address marketRegistry)
+        LenderCommitmentForwarder(tellerV2, marketRegistry)
     {}
 
-
-    function setCommitment(
-        uint256 _commitmentId,
-        Commitment memory _commitment
-    ) public {
-        
-
-        commitments[_commitmentId] = _commitment; 
- 
+    function setCommitment(uint256 _commitmentId, Commitment memory _commitment)
+        public
+    {
+        commitments[_commitmentId] = _commitment;
     }
 
-    function getCommitmentLender(
-        uint256 _commitmentId
-    ) public returns (address) {
+    function getCommitmentLender(uint256 _commitmentId)
+        public
+        returns (address)
+    {
         return commitments[_commitmentId].lender;
     }
 
-    function getCommitmentMarketId(
-        uint256 _commitmentId
-    ) public returns (uint256) {
+    function getCommitmentMarketId(uint256 _commitmentId)
+        public
+        returns (uint256)
+    {
         return commitments[_commitmentId].marketId;
     }
 
-     function _decrementCommitmentSuper(
+    function _decrementCommitmentSuper(
         uint256 _commitmentId,
         uint256 _tokenAmountDelta
     ) public {
-        super._decrementCommitment(_commitmentId, _tokenAmountDelta); 
+        super._decrementCommitment(_commitmentId, _tokenAmountDelta);
     }
 
-    function _getEscrowCollateralTypeSuper(
-        CommitmentCollateralType _type
-    ) public returns (CollateralType) {
-        return super._getEscrowCollateralType(_type); 
+    function _getEscrowCollateralTypeSuper(CommitmentCollateralType _type)
+        public
+        returns (CollateralType)
+    {
+        return super._getEscrowCollateralType(_type);
     }
 
-    function validateCommitmentSuper(
-        uint256 _commitmentId
-    ) public {
-        super.validateCommitment(commitments[_commitmentId]); 
+    function validateCommitmentSuper(uint256 _commitmentId) public {
+        super.validateCommitment(commitments[_commitmentId]);
     }
 
-
-    function getCommitmentMaxPrincipal(
-        uint256 _commitmentId
-    ) public returns (uint256) {
+    function getCommitmentMaxPrincipal(uint256 _commitmentId)
+        public
+        returns (uint256)
+    {
         return commitments[_commitmentId].maxPrincipal;
     }
 
-    function  _submitBidFromCommitmentSuper(
+    function _submitBidFromCommitmentSuper(
         address _borrower,
         uint256 _marketId,
         address _principalTokenAddress,
@@ -93,19 +82,19 @@ contract LenderCommitmentForwarder_Override is LenderCommitmentForwarder {
         uint32 _loanDuration,
         uint16 _interestRate
     ) public returns (uint256 bidId) {
-
-        return super._submitBidFromCommitment(
-            _borrower,
-            _marketId,
-            _principalTokenAddress,
-            _principalAmount,
-            _collateralTokenAddress,
-            _collateralAmount,
-            _collateralTokenId,
-            _collateralTokenType,
-            _loanDuration,
-            _interestRate
-        );
+        return
+            super._submitBidFromCommitment(
+                _borrower,
+                _marketId,
+                _principalTokenAddress,
+                _principalAmount,
+                _collateralTokenAddress,
+                _collateralAmount,
+                _collateralTokenId,
+                _collateralTokenType,
+                _loanDuration,
+                _interestRate
+            );
     }
 
     /*
@@ -133,17 +122,12 @@ contract LenderCommitmentForwarder_Override is LenderCommitmentForwarder {
     function _acceptBid(uint256, address) internal override returns (bool) {
         acceptBidWasCalled = true;
 
-      
-
         return true;
     }
 }
 
-
 contract LenderCommitmentForwarderTest_TellerV2Mock is TellerV2Context {
     constructor() TellerV2Context(address(0)) {}
-
-   
 
     function getSenderForMarket(uint256 _marketId)
         external

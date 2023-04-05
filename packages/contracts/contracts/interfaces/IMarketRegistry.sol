@@ -79,6 +79,6 @@ interface IMarketRegistry {
         bool _requireBorrowerAttestation,
         string calldata _uri
     ) external returns (uint256 marketId_);
-    
-    function closeMarket(uint256 _marketId) external  ;
+
+    function closeMarket(uint256 _marketId) external;
 }

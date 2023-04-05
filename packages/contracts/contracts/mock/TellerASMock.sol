@@ -9,19 +9,19 @@ import "../interfaces/IASRegistry.sol";
 import "../interfaces/IEASEIP712Verifier.sol";
 
 contract TellerASMock is TellerAS {
+    constructor()
+        TellerAS(
+            IASRegistry(new TellerASRegistry()),
+            IEASEIP712Verifier(new TellerASEIP712Verifier())
+        )
+    {}
 
-     constructor( ) TellerAS(
-        IASRegistry(new TellerASRegistry()), 
-        IEASEIP712Verifier(new TellerASEIP712Verifier()
-         )) {
-        
+    function isAttestationActive(bytes32 uuid)
+        public
+        view
+        override
+        returns (bool)
+    {
+        return true;
     }
-
-
-
-    function isAttestationActive(bytes32 uuid) public view override returns (bool){
-         return true;
-    }
-
-
 }

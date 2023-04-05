@@ -8,10 +8,7 @@ contract TellerV2Context_approveMarketForwarder is Testable {
     TellerV2Context_Override private context;
 
     function setUp() public {
-        context = new TellerV2Context_Override(
-            address(0),
-            address(111)
-        );
+        context = new TellerV2Context_Override(address(0), address(111));
     }
 
     function test_Fail_to_approve_untrusted_forwarder() public {
@@ -27,10 +24,14 @@ contract TellerV2Context_approveMarketForwarder is Testable {
         address indexed forwarder,
         address sender
     );
+
     function test_Successfully_approve_trusted_market_forwarder() public {
         uint256 marketId = 7;
         address stubbedMarketForwarder = address(123);
-        context.mock_setTrustedMarketForwarder(marketId, stubbedMarketForwarder);
+        context.mock_setTrustedMarketForwarder(
+            marketId,
+            stubbedMarketForwarder
+        );
 
         //vm.expectEmit(address(context));
         //emit MarketForwarderApproved(marketId, stubbedMarketForwarder, address(this));
@@ -39,9 +40,10 @@ contract TellerV2Context_approveMarketForwarder is Testable {
 
         assertEq(
             context.hasApprovedMarketForwarder(
-                marketId, 
+                marketId,
                 stubbedMarketForwarder,
-                address(this)),
+                address(this)
+            ),
             true,
             "Forwarder should be approved"
         );

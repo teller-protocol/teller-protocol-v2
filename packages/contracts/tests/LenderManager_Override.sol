@@ -16,23 +16,15 @@ import { User } from "./Test_Helpers.sol";
 
 import { TellerV2Context } from "../contracts/TellerV2Context.sol";
 
-contract LenderManager_Override is  LenderManager {
-   
-
+contract LenderManager_Override is LenderManager {
     bool mockedHasMarketVerification;
 
     constructor(address marketRegistry)
-        LenderManager( 
-              MarketRegistryMock(marketRegistry)
-        )
-    {
-
-
-
-    }
+        LenderManager(MarketRegistryMock(marketRegistry))
+    {}
 
     function setHasMarketVerification(bool v) public {
-          mockedHasMarketVerification = v;
+        mockedHasMarketVerification = v;
     }
 
     //override
@@ -45,19 +37,12 @@ contract LenderManager_Override is  LenderManager {
         return mockedHasMarketVerification;
     }
 
-
-    function exists(uint256 tokenId)
-        public
-        view 
-        returns (bool)
-    {
+    function exists(uint256 tokenId) public view returns (bool) {
         return super._exists(tokenId);
     }
 
-    function mint(address to, uint256 tokenId)
-        public    
-    {
-         super._mint(to,tokenId);
+    function mint(address to, uint256 tokenId) public {
+        super._mint(to, tokenId);
     }
 
     function _getLoanMarketIdSuper(uint256 _bidId)
@@ -73,21 +58,15 @@ contract LenderManager_Override is  LenderManager {
         view
         returns (bool)
     {
-        return super._hasMarketVerification(_lender,_bidId);
+        return super._hasMarketVerification(_lender, _bidId);
     }
 
-    function _baseURISuper()
-        public
-        view
-        returns (string memory)
-    {
+    function _baseURISuper() public view returns (string memory) {
         return super._baseURI();
     }
-
 
     //should be able to test the negative case-- use foundry
     /*function _checkOwner() internal view override {
         // do nothing
     }*/
 }
- 

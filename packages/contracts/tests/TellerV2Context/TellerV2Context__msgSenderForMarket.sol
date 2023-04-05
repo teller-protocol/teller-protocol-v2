@@ -12,10 +12,7 @@ contract TellerV2Context__msgSenderForMarket is Testable {
     TellerV2Context_Override private context;
 
     function setUp() public {
-        context = new TellerV2Context_Override(
-            address(0),
-            address(111)
-        );
+        context = new TellerV2Context_Override(address(0), address(111));
     }
 
     function test_Return_actual_caller_for_untrusted_forwarders() public {
@@ -39,15 +36,26 @@ contract TellerV2Context__msgSenderForMarket is Testable {
         address expectedSender = address(4567890);
 
         context.mock_setTrustedMarketForwarder(marketId, address(this));
-        context.mock_setApprovedMarketForwarder(marketId, address(this), expectedSender, true);
+        context.mock_setApprovedMarketForwarder(
+            marketId,
+            address(this),
+            expectedSender,
+            true
+        );
 
         bytes memory data = abi.encodeWithSignature(
             "external__msgSenderForMarket(uint256)",
             marketId
         );
-        bytes memory res = address(context).functionCall(abi.encodePacked(data, expectedSender));
+        bytes memory res = address(context).functionCall(
+            abi.encodePacked(data, expectedSender)
+        );
 
         address sender = abi.decode(res, (address));
-        assertEq(sender, expectedSender, "sender should be the appended 20 bytes");
+        assertEq(
+            sender,
+            expectedSender,
+            "sender should be the appended 20 bytes"
+        );
     }
 }

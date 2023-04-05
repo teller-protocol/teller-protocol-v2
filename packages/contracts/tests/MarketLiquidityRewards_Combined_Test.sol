@@ -476,12 +476,8 @@ contract TellerV2Mock is TellerV2Context {
 
     constructor() TellerV2Context(address(0)) {}
 
-    
     function __setMarketRegistry(address _marketRegistry) external {
-        marketRegistry = IMarketRegistry(
-            _marketRegistry
-        );
-      
+        marketRegistry = IMarketRegistry(_marketRegistry);
     }
 
     function getSenderForMarket(uint256 _marketId)

@@ -28,6 +28,7 @@ contract TellerV2Context_setTrustedMarketForwarder is Testable {
         address forwarder,
         address sender
     );
+
     function test_Market_owner_can_set_trusted_forwarder() public {
         uint256 marketId = 7;
         address newMarketForwarder = address(123);
@@ -38,13 +39,12 @@ contract TellerV2Context_setTrustedMarketForwarder is Testable {
         //emit TrustedMarketForwarderSet(marketId, newMarketForwarder, address(this));
 
         context.setTrustedMarketForwarder(marketId, newMarketForwarder);
-    
-        assertEq(
-         context.isTrustedMarketForwarder(marketId, newMarketForwarder),
-         true,
-         "Trusted forwarder should be set"
-         );
 
+        assertEq(
+            context.isTrustedMarketForwarder(marketId, newMarketForwarder),
+            true,
+            "Trusted forwarder should be set"
+        );
     }
 }
 

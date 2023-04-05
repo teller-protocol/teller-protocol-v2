@@ -451,7 +451,7 @@ contract MarketRegistry is
         return
             (_attestingSchemaId == attestationSchemaId &&
                 recipient == lenderAddress &&
-                attestor == _getMarketOwner(marketId) ) ||
+                attestor == _getMarketOwner(marketId)) ||
             attestor == address(this);
     }
 
@@ -741,13 +741,12 @@ contract MarketRegistry is
         return _getMarketOwner(_marketId);
     }
 
-
     /**
      * @notice Gets the address of a market's owner.
      * @param _marketId The ID of a market.
      * @return The address of a market's owner.
      */
-     function _getMarketOwner(uint256 _marketId)
+    function _getMarketOwner(uint256 _marketId)
         internal
         view
         virtual
@@ -1062,7 +1061,8 @@ contract MarketRegistry is
         bytes32 _r,
         bytes32 _s
     )
-        internal virtual
+        internal
+        virtual
         withAttestingSchema(
             _isLender ? lenderAttestationSchemaId : borrowerAttestationSchemaId
         )

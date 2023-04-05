@@ -16,21 +16,14 @@ import { User } from "./Test_Helpers.sol";
 import "../contracts/mock/MarketRegistryMock.sol";
 
 contract MarketForwarder_Override is TellerV2MarketForwarder {
-    
-
     constructor(address tellerV2, address marketRegistry)
-        TellerV2MarketForwarder(
-           tellerV2,
-           marketRegistry
-        )
+        TellerV2MarketForwarder(tellerV2, marketRegistry)
     {}
-
-    
 
     function forwardCall(bytes memory _data, address _msgSender)
         public
         returns (bytes memory)
     {
-        return super._forwardCall( _data, _msgSender );
+        return super._forwardCall(_data, _msgSender);
     }
-} 
+}

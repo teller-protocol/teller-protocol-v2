@@ -17,10 +17,22 @@ contract TellerV2Context_isTrustedMarketForwarder is Testable {
     }
 
     function test_Lender_Commitment_Forwarder_trusted_by_all_markets() public {
-        bool isTrusted1 = context.isTrustedMarketForwarder(1, lenderCommitmentForwarder);
-        bool isTrusted7 = context.isTrustedMarketForwarder(7, lenderCommitmentForwarder);
-        bool isTrusted34 = context.isTrustedMarketForwarder(34, lenderCommitmentForwarder);
-        bool isTrusted89 = context.isTrustedMarketForwarder(89, lenderCommitmentForwarder);
+        bool isTrusted1 = context.isTrustedMarketForwarder(
+            1,
+            lenderCommitmentForwarder
+        );
+        bool isTrusted7 = context.isTrustedMarketForwarder(
+            7,
+            lenderCommitmentForwarder
+        );
+        bool isTrusted34 = context.isTrustedMarketForwarder(
+            34,
+            lenderCommitmentForwarder
+        );
+        bool isTrusted89 = context.isTrustedMarketForwarder(
+            89,
+            lenderCommitmentForwarder
+        );
         assertTrue(
             isTrusted1 && isTrusted7 && isTrusted34 && isTrusted89,
             "lenderCommitmentForwarder should be a trusted forwarder for all markets"

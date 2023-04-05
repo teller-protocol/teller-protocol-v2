@@ -5,7 +5,6 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "../contracts/TellerV2MarketForwarder.sol";
 
- 
 import "../contracts/TellerV2Context.sol";
 
 import { Testable } from "./Testable.sol";
@@ -20,8 +19,6 @@ import "../contracts/mock/CollateralManagerMock.sol";
 import "../contracts/MarketLiquidityRewards.sol";
 
 contract MarketLiquidityRewards_Override is MarketLiquidityRewards {
-    
-
     uint256 immutable startTime = 1678122531;
 
     //  address tokenAddress;
@@ -35,33 +32,34 @@ contract MarketLiquidityRewards_Override is MarketLiquidityRewards {
     uint16 minInterestRate;
     uint32 expiration;
 
- 
     bool public verifyLoanStartTimeWasCalled;
     bool public verifyExpectedTokenAddressWasCalled;
 
     bool public verifyRewardRecipientWasCalled;
     bool public verifyCollateralAmountWasCalled;
 
-    constructor(address tellerV2, address marketRegistry, address collateralManager)
-        MarketLiquidityRewards(
-           tellerV2,marketRegistry,collateralManager
-        )
-    {}
+    constructor(
+        address tellerV2,
+        address marketRegistry,
+        address collateralManager
+    ) MarketLiquidityRewards(tellerV2, marketRegistry, collateralManager) {}
 
-     
-     function setAllocation(uint256 _allocationId, RewardAllocation memory _allocation) public {
-
+    function setAllocation(
+        uint256 _allocationId,
+        RewardAllocation memory _allocation
+    ) public {
         allocatedRewards[_allocationId] = _allocation;
-
-     }
+    }
 
     function setAllocatedAmount(uint256 _allocationId, uint256 _amount) public {
-
         allocatedRewards[_allocationId].rewardTokenAmount = _amount;
+    }
 
-     }
-
-    function getRewardTokenAmount(uint256 allocationId) public view returns (uint256) {
+    function getRewardTokenAmount(uint256 allocationId)
+        public
+        view
+        returns (uint256)
+    {
         return allocatedRewards[allocationId].rewardTokenAmount;
     }
 
@@ -69,72 +67,61 @@ contract MarketLiquidityRewards_Override is MarketLiquidityRewards {
         uint256 loanPrincipal,
         uint256 principalTokenDecimals,
         uint256 rewardPerLoanPrincipalAmount
-
     ) public view returns (uint256) {
-        return super._calculateRewardAmount(
-            loanPrincipal,
-            principalTokenDecimals,
-            rewardPerLoanPrincipalAmount
-
-        );
+        return
+            super._calculateRewardAmount(
+                loanPrincipal,
+                principalTokenDecimals,
+                rewardPerLoanPrincipalAmount
+            );
     }
 
-
-     function requiredCollateralAmount(
+    function requiredCollateralAmount(
         uint256 loanPrincipal,
         uint256 principalTokenDecimals,
         uint256 collateralTokenDecimals,
         uint256 minimumCollateralPerPrincipal
-
     ) public view returns (uint256) {
-        return super._requiredCollateralAmount(
-            loanPrincipal,
-            principalTokenDecimals,
-            collateralTokenDecimals,
-            
-            minimumCollateralPerPrincipal
-
-        );
+        return
+            super._requiredCollateralAmount(
+                loanPrincipal,
+                principalTokenDecimals,
+                collateralTokenDecimals,
+                minimumCollateralPerPrincipal
+            );
     }
 
-
-    function decrementAllocatedAmount(uint256 _allocationId, uint256 _tokenAmount)
-        public
-    {
+    function decrementAllocatedAmount(
+        uint256 _allocationId,
+        uint256 _tokenAmount
+    ) public {
         super._decrementAllocatedAmount(_allocationId, _tokenAmount);
     }
 
-    function verifyLoanStartTime(
-        uint32 a,
-        uint32 b,
-        uint32 c
-    ) public {
-          super._verifyLoanStartTime(a,b,c);
+    function verifyLoanStartTime(uint32 a, uint32 b, uint32 c) public {
+        super._verifyLoanStartTime(a, b, c);
     }
 
-    function verifyExpectedTokenAddress(
-        address a,
-        address b
-    ) public {
-          super._verifyExpectedTokenAddress(a,b);
+    function verifyExpectedTokenAddress(address a, address b) public {
+        super._verifyExpectedTokenAddress(a, b);
     }
 
-       function verifyAndReturnRewardRecipient(
+    function verifyAndReturnRewardRecipient(
         AllocationStrategy allocationStrategy,
         BidState bidState,
         address borrower,
-        address lender 
+        address lender
     ) public returns (address) {
-        return  super._verifyAndReturnRewardRecipient(
-            allocationStrategy,
-            bidState,
-            borrower,
-            lender
-        );
+        return
+            super._verifyAndReturnRewardRecipient(
+                allocationStrategy,
+                bidState,
+                borrower,
+                lender
+            );
     }
 
-
-    //overrides 
+    //overrides
 
     function allocateRewards(
         MarketLiquidityRewards.RewardAllocation calldata _allocation
@@ -155,8 +142,6 @@ contract MarketLiquidityRewards_Override is MarketLiquidityRewards {
     {
         super.deallocateRewards(_allocationId, _tokenAmount);
     }
-
-
 
     function _verifyAndReturnRewardRecipient(
         AllocationStrategy strategy,
@@ -192,7 +177,4 @@ contract MarketLiquidityRewards_Override is MarketLiquidityRewards {
     ) internal override {
         verifyExpectedTokenAddressWasCalled = true;
     }
-
-    
 }
- 

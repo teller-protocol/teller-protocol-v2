@@ -27,25 +27,19 @@ contract MarketForwarder_Test is Testable {
     MarketForwarderUser private user2;
     MarketForwarder_Override marketForwarder;
 
-    constructor()
-         
-    {}
+    constructor() {}
 
     function setUp() public {
-    
-        tellerV2Mock = new MarketForwarderTellerV2Mock( );
+        tellerV2Mock = new MarketForwarderTellerV2Mock();
 
         marketOwner = new MarketForwarderUser(address(tellerV2Mock));
-
-            
 
         user1 = new MarketForwarderUser(address(tellerV2Mock));
         user2 = new MarketForwarderUser(address(tellerV2Mock));
 
+        mockMarketRegistry = new MarketRegistryMock();
 
-        mockMarketRegistry = new MarketRegistryMock(  );
-
-      //  tellerV2Mock.__setMarketOwner(marketOwner);
+        //  tellerV2Mock.__setMarketOwner(marketOwner);
 
         tellerV2Mock.setMarketRegistry(address(mockMarketRegistry));
 
@@ -60,13 +54,19 @@ contract MarketForwarder_Test is Testable {
     }
 
     function setTrustedMarketForwarder_before() public {
-        marketOwner.setTrustedMarketForwarder(marketId, address(marketForwarder));
+        marketOwner.setTrustedMarketForwarder(
+            marketId,
+            address(marketForwarder)
+        );
     }
 
     function test_setTrustedMarketForwarder() public {
         setTrustedMarketForwarder_before();
         assertEq(
-            tellerV2Mock.isTrustedMarketForwarder(marketId, address(marketForwarder)),
+            tellerV2Mock.isTrustedMarketForwarder(
+                marketId,
+                address(marketForwarder)
+            ),
             true,
             "Trusted forwarder was not set"
         );
@@ -141,20 +141,17 @@ contract MarketForwarder_Test is Testable {
         );
     }
 }
- 
+
 contract MarketForwarderUser is User {
     constructor(address _tellerV2) User(_tellerV2) {}
 }
- 
+
 contract MarketForwarderTellerV2Mock is TellerV2Context {
     constructor() TellerV2Context(address(0)) {}
 
     function setMarketRegistry(address _marketRegistry) external {
-        marketRegistry = IMarketRegistry(
-           _marketRegistry
-        );
+        marketRegistry = IMarketRegistry(_marketRegistry);
     }
-
 
     function getSenderForMarket(uint256 _marketId)
         external

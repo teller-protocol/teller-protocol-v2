@@ -15,10 +15,7 @@ contract MarketRegistryMock is IMarketRegistry {
     bool public globalBorrowerIsVerified = true;
     bool public globalLenderIsVerified = true;
 
-
-    constructor( ) {
-       
-    }
+    constructor() {}
 
     function initialize(TellerAS _tellerAS) external {}
 
@@ -42,7 +39,12 @@ contract MarketRegistryMock is IMarketRegistry {
         isVerified_ = globalBorrowerIsVerified;
     }
 
-    function getMarketOwner(uint256 _marketId) public view override returns (address) {
+    function getMarketOwner(uint256 _marketId)
+        public
+        view
+        override
+        returns (address)
+    {
         return address(globalMarketOwner);
     }
 
@@ -128,11 +130,7 @@ contract MarketRegistryMock is IMarketRegistry {
         string calldata _uri
     ) public returns (uint256) {}
 
-    function closeMarket(uint256 _marketId) public {
-
-
-
-    }
+    function closeMarket(uint256 _marketId) public {}
 
     function mock_setGlobalMarketsClosed(bool closed) public {
         globalMarketsClosed = closed;
@@ -145,5 +143,4 @@ contract MarketRegistryMock is IMarketRegistry {
     function mock_setLenderIsVerified(bool verified) public {
         globalLenderIsVerified = verified;
     }
-
 }

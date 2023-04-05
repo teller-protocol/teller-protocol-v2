@@ -44,6 +44,14 @@ for await (const line of rl) {
     console.log(`---- ${line} ----`);
 
   }
+
+  if(line.startsWith('FNDA:0')){
+
+    const [FNDA, functionName] = line.split(':')
+
+    console.log(`This function has zero test coverage: ${functionName}`);
+  }
+
   
     if(line.startsWith('BRDA')){
 

@@ -130,7 +130,7 @@ contract CollateralManager_Test is Testable {
          
     }
 
-        function test_deposit_collateral_not_validated() public  {
+    function test_deposit_collateral_not_validated() public  {
         uint256 bidId = 0 ;
         uint256 amount = 0;
         wethMock.transfer(address(borrower), amount);
@@ -740,7 +740,7 @@ contract CollateralManager_Test is Testable {
             collateral
         );
  
-         assertTrue(valid, "Check balance should be valid");
+         assertEq(valid, true, "Check balance should be valid");
      }
 
      function test_checkBalance_internal_erc721_invalid() public {
@@ -760,7 +760,7 @@ contract CollateralManager_Test is Testable {
             collateral
         );
  
-         assertFalse(valid, "Check balance should be invalid");
+         assertEq(valid, false, "Check balance should be invalid");
      }
 
       function test_checkBalance_internal_erc1155() public {
@@ -1034,6 +1034,26 @@ contract CollateralManager_Test is Testable {
 
     }
 
+
+    function test_commit_collateral_single_invalid() public {
+          uint256 bidId = 0;
+
+        Collateral memory collateral = Collateral({
+            _collateralType: CollateralType.ERC20,
+            _amount: 1000,
+            _tokenId: 0, 
+            _collateralAddress: address(wethMock)
+        });
+
+        collateralManager.setCheckBalanceGlobalValid(false);
+        collateralManager.commitCollateral(bidId,collateral);
+
+
+        assertFalse(collateralManager.commitCollateralInternalWasCalled(),"commit collateral was not called");
+
+
+    }
+
     function test_commit_collateral_array() public {
         uint256 bidId = 0;
 
@@ -1050,6 +1070,30 @@ contract CollateralManager_Test is Testable {
         collateralManager.commitCollateral(bidId, collateralArray);
 
         assertTrue(collateralManager.commitCollateralInternalWasCalled(),"commit collateral was not called");
+
+    }
+
+
+    function test_commit_collateral_array_invalid() public {
+
+          uint256 bidId = 0;
+
+        Collateral[] memory collateralArray = new Collateral[](1); 
+
+        collateralArray[0] = Collateral({
+            _collateralType: CollateralType.ERC20,
+            _amount: 1000,
+            _tokenId: 0, 
+            _collateralAddress: address(wethMock)
+        });
+
+        collateralManager.setCheckBalanceGlobalValid(false);
+
+        collateralManager.commitCollateral(bidId, collateralArray);
+
+        assertFalse(collateralManager.commitCollateralInternalWasCalled(),"commit collateral should not have been called");
+
+
 
     }
   

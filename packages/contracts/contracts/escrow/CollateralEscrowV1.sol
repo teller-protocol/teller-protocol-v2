@@ -131,7 +131,10 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
                 _amount,
                 data
             );
+        }else{
+            revert("Invalid collateral type");
         }
+        
     }
 
     function _withdrawCollateral(
@@ -167,7 +170,10 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
                 _amount,
                 data
             );
+        }else{
+             revert("Invalid collateral type");
         }
+       
     }
 
     // On NFT Received handlers

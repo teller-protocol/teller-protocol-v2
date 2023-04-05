@@ -62,10 +62,26 @@ for await (const line of rl) {
 
         if(branchesTaken < totalBranches){
 
-          console.log(`Branch not covered: line number:${lineNumber}, block number:${blockNumber}, [ ${branchesTaken} / ${totalBranches} ] `)
+          console.log(`Branch: line number:${lineNumber}, block number:${blockNumber}, [ ${branchesTaken} / ${totalBranches} ] `)
 
         }
 
+    }
+    if(line.startsWith('DA')){
+      const [DA, lineData] = line.split(':')
+
+      const [lineNumber, coverageCount] = lineData.split(',')
+
+      if(coverageCount == '0'){
+        console.log(`Line: ${lineNumber} has ${coverageCount} test coverage`);
+      }
+    
+       
+    }
+
+
+    if(line.startsWith('BRF')){
+      console.log(` ${line} `);
     }
   // Each line in input.txt will be successively available here as `line`.
   

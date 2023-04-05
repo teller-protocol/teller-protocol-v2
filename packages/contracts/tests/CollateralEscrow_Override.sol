@@ -29,5 +29,27 @@ contract CollateralEscrowV1_Override is CollateralEscrowV1 {
 
     }
 
+    function _depositCollateralSuper(
+        
+        CollateralType _collateralType,
+        address _collateralAddress,
+        uint256 _amount,
+        uint256 _tokenId
+    
+
+    ) public {
+        super._depositCollateral(_collateralType, _collateralAddress, _amount, _tokenId);
+    }
+
+
+    function _withdrawCollateralSuper(
+        Collateral memory _collateral,
+        address _collateralAddress,
+        uint256 _amount,
+        address _recipient
+    ) public {
+        super._withdrawCollateral(_collateral, _collateralAddress, _amount, _recipient);
+    }
+
 
 }

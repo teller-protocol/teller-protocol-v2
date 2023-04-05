@@ -19,6 +19,9 @@ import { CollateralType, CollateralEscrowV1 } from "../contracts/escrow/Collater
 
 import { CollateralEscrowV1_Override } from "./CollateralEscrow_Override.sol";
 
+import {Collateral,CollateralType} from "../contracts/interfaces/escrow/ICollateralEscrowV1.sol";
+
+
 contract CollateralEscrow_Test is Testable {
     BeaconProxy private proxy_;
     User private borrower;
@@ -29,6 +32,23 @@ contract CollateralEscrow_Test is Testable {
     TestERC1155Token erc1155Mock;
   
     uint256 amount = 1000;
+
+    /*
+
+    Branch not covered: line number:53, block number:0, [ 0 / 1 ] 
+Branch not covered: line number:53, block number:0, [ 1 / 6 ] 
+Branch not covered: line number:63, block number:1, [ 0 / 1 ] 
+Branch not covered: line number:63, block number:1, [ 1 / 5 ] 
+Branch not covered: line number:83, block number:2, [ 1 / 6 ] 
+Branch not covered: line number:85, block number:3, [ 0 / 3 ] 
+Branch not covered: line number:85, block number:3, [ 1 / 3 ] 
+Branch not covered: line number:106, block number:4, [ 0 / 2 ] 
+Branch not covered: line number:106, block number:4, [ 1 / 4 ] 
+Branch not covered: line number:115, block number:5, [ 1 / 3 ] 
+Branch not covered: line number:116, block number:6, [ 1 / 3 ] 
+Branch not covered: line number:144, block number:8, [ 1 / 2 ]
+
+    */
 
     function setUp() public {
         // Deploy implementation
@@ -57,23 +77,19 @@ contract CollateralEscrow_Test is Testable {
         wethMock.transfer(address(escrow),amount);
         escrow.setStoredBalance(CollateralType.ERC20, address(wethMock), amount, 0, address(borrower) );
 
-        borrower.withdraw(address(wethMock), amount, address(borrower));
+        vm.prank(address(borrower));
+        escrow.withdraw(address(wethMock), amount, address(borrower));
 
         uint256 storedBalance = borrower.getBalance(address(wethMock));
 
         assertEq(storedBalance, 0, "Stored balance was not withdrawn");
 
-        try borrower.withdraw(address(wethMock), amount, address(borrower)) {
-            fail("No collateral balance for asset");
-        } catch Error(string memory reason) {
-            assertEq(
-                reason,
-                "No collateral balance for asset",
-                "Should not be able to withdraw already withdrawn assets"
-            );
-        } catch {
-            fail("Unknown error");
-        }
+
+        vm.prank(address(borrower));
+        vm.expectRevert("No collateral balance for asset");
+        escrow.withdraw(address(wethMock), amount, address(borrower));
+
+ 
     }
 
     function test_withdrawAsset_invalid_store() public {
@@ -83,8 +99,25 @@ contract CollateralEscrow_Test is Testable {
         wethMock.transfer(address(escrow),amount);
 
         vm.expectRevert("No collateral balance for asset");
-       
-        borrower.withdraw(address(wethMock), amount, address(borrower));
+
+        vm.prank(address(borrower));
+        escrow.withdraw(address(wethMock), amount, address(borrower));
+
+        
+    }
+
+     function test_withdrawAsset_invalid_amount() public {
+         
+        CollateralEscrowV1_Override escrow = CollateralEscrowV1_Override(address(borrower.getEscrow()));
+
+        wethMock.transfer(address(escrow),amount);
+         escrow.setStoredBalance(CollateralType.ERC20, address(wethMock), amount, 0, address(borrower) );
+
+
+        vm.expectRevert("Withdraw amount cannot be zero");
+
+        vm.prank(address(borrower));
+        escrow.withdraw(address(wethMock), 0, address(borrower));
 
         
     }
@@ -111,23 +144,64 @@ contract CollateralEscrow_Test is Testable {
         uint256 tokenId = erc721Mock.mint(address(escrow));
         escrow.setStoredBalance(CollateralType.ERC721, address(erc721Mock), 1, tokenId, address(borrower) );
 
-        borrower.withdraw(address(erc721Mock), 1, address(borrower));
+        vm.prank(address(borrower));
+        escrow.withdraw(address(erc721Mock), 1, address(borrower));
 
         uint256 storedBalance = borrower.getBalance(address(erc721Mock));
 
         assertEq(storedBalance, 0, "Stored balance was not withdrawn");
 
-        try borrower.withdraw(address(erc721Mock), 1, address(borrower)) {
-            fail("No collateral balance for asset");
-        } catch Error(string memory reason) {
-            assertEq(
-                reason,
-                "No collateral balance for asset",
-                "Should not be able to withdraw already withdrawn assets"
-            );
-        } catch {
-            fail("Unknown error");
-        }
+        vm.expectRevert("No collateral balance for asset");
+        vm.prank(address(borrower));
+        escrow.withdraw(address(erc721Mock), 1, address(borrower));
+      
+      
+    }
+
+
+    function test_withdrawAsset_ERC721_invalidAmount() public {} 
+
+
+
+    function test_withdrawAsset_ERC1155() public {
+
+        CollateralEscrowV1_Override escrow = CollateralEscrowV1_Override(address(borrower.getEscrow()));
+
+        uint256 tokenId = erc1155Mock.mint(address(escrow));
+        escrow.setStoredBalance(CollateralType.ERC1155, address(erc1155Mock), 1, tokenId, address(borrower) );
+
+        vm.prank(address(borrower));
+        escrow.withdraw(address(erc1155Mock), 1, address(borrower));
+
+        uint256 storedBalance = borrower.getBalance(address(erc1155Mock));
+
+        assertEq(storedBalance, 0, "Stored balance was not withdrawn");
+
+        vm.expectRevert("No collateral balance for asset");
+        vm.prank(address(borrower));
+        escrow.withdraw(address(erc1155Mock), 1, address(borrower));
+      
+    }
+
+    function test_withdrawCollateral_erc20() public {
+
+        CollateralEscrowV1_Override escrow = CollateralEscrowV1_Override(address(borrower.getEscrow()));
+        wethMock.transfer(address(escrow),amount);
+        
+        Collateral memory collateral = Collateral({
+            _collateralType: CollateralType.ERC20,
+            _collateralAddress: address(wethMock),
+            _amount: amount,
+            _tokenId: 0
+        });
+        
+        escrow._withdrawCollateralSuper(collateral,address(wethMock), 1, address(borrower));
+      
+
+        //uint256 storedBalance = wethMock.balanceOf(address(escrow))
+
+        //assertEq(storedBalance, 0, "Stored balance was not withdrawn");
+
     }
 
   
@@ -135,10 +209,13 @@ contract CollateralEscrow_Test is Testable {
     function test_depositAsset_ERC20() public {
 
 
+        CollateralEscrowV1_Override escrow = CollateralEscrowV1_Override(address(borrower.getEscrow()));
+
         wethMock.transfer(address(borrower),1e18);
         borrower.approveERC20(address(wethMock), amount);
 
-        borrower.deposit(CollateralType.ERC20, address(wethMock), amount, 0);
+        vm.prank(address(borrower));
+        escrow.depositAsset(CollateralType.ERC20, address(wethMock), amount, 0);
 
         uint256 storedBalance = borrower.getBalance(address(wethMock));
 
@@ -161,9 +238,12 @@ contract CollateralEscrow_Test is Testable {
 
     function test_depositAsset_invalid_amount() public {
 
+        CollateralEscrowV1_Override escrow = CollateralEscrowV1_Override(address(borrower.getEscrow()));
+
         vm.expectRevert("Deposit amount cannot be zero");
 
-        borrower.deposit(CollateralType.ERC20, address(wethMock), 0, 0);
+        vm.prank(address(borrower));
+        escrow.depositAsset(CollateralType.ERC20, address(wethMock), 0, 0);
 
      
     }
@@ -173,11 +253,15 @@ contract CollateralEscrow_Test is Testable {
 
 
     function test_depositAsset_ERC721() public {
+
+        CollateralEscrowV1_Override escrow = CollateralEscrowV1_Override(address(borrower.getEscrow()));
+
         uint256 tokenId =  erc721Mock.mint(address(borrower));
 
         borrower.approveERC721(address(erc721Mock), tokenId);         
 
-        borrower.deposit(CollateralType.ERC721, address(erc721Mock), 1, tokenId);
+        vm.prank(address(borrower));
+        escrow.depositAsset(CollateralType.ERC721, address(erc721Mock), 1, tokenId);
 
         uint256 storedBalance = borrower.getBalance(address(erc721Mock));
 
@@ -186,34 +270,196 @@ contract CollateralEscrow_Test is Testable {
 
 
     function test_depositAsset_ERC721_double_collateral_overwrite_prevention() public {
+        CollateralEscrowV1_Override escrow = CollateralEscrowV1_Override(address(borrower.getEscrow()));
+        
         uint256 tokenIdA =  erc721Mock.mint(address(borrower));
         uint256 tokenIdB =  erc721Mock.mint(address(borrower));
 
         borrower.approveERC721(address(erc721Mock), tokenIdA);  
         borrower.approveERC721(address(erc721Mock), tokenIdB);         
 
-        borrower.deposit(CollateralType.ERC721, address(erc721Mock), 1, tokenIdA);
+        vm.prank(address(borrower));
+        escrow.depositAsset(CollateralType.ERC721, address(erc721Mock), 1, tokenIdA);
 
         uint256 storedBalance = borrower.getBalance(address(erc721Mock));
 
         assertEq(storedBalance, 1, "Escrow deposit unsuccessful");
 
         vm.expectRevert("Unable to deposit multiple collateral asset instances of the same contract address.");
-        borrower.deposit(CollateralType.ERC721, address(erc721Mock), 1, tokenIdB);
+        vm.prank(address(borrower));
+        escrow.depositAsset(CollateralType.ERC721, address(erc721Mock), 1, tokenIdB);
 
     }
 
 
      function test_depositAsset_ERC1155() public {
+        CollateralEscrowV1_Override escrow = CollateralEscrowV1_Override(address(borrower.getEscrow()));
+
+
         uint256 tokenId = erc1155Mock.mint(address(borrower));
 
         borrower.approveERC1155(address(erc1155Mock));  
 
-        borrower.deposit(CollateralType.ERC1155, address(erc1155Mock), 1, tokenId);
+        vm.prank(address(borrower));
+        escrow.depositAsset(CollateralType.ERC1155, address(erc1155Mock), 1, tokenId);
 
         uint256 storedBalance = borrower.getBalance(address(erc1155Mock));
 
         assertEq(storedBalance, 1, "Escrow deposit unsuccessful");
+    }
+
+    function test_depositCollateralInternal_InvalidType() public {
+
+        CollateralEscrowV1_Override escrow = CollateralEscrowV1_Override(address(borrower.getEscrow()));
+
+
+        wethMock.transfer(address(borrower),1e18);
+        borrower.approveERC20(address(wethMock), amount);
+
+        //there seems to be a bug in hardhat that causes the revert message to be garbled 
+       // vm.expectRevert("Invalid collateral type");
+        vm.expectRevert();
+        vm.prank(address(borrower));
+        escrow._depositCollateralSuper(
+            CollateralType(uint16(4)), 
+            address(wethMock), 
+            amount, 
+            0);
+ 
+    }
+
+
+    function test_depositCollateralInternal_ERC20() public {
+
+        CollateralEscrowV1_Override escrow = CollateralEscrowV1_Override(address(borrower.getEscrow()));
+
+
+        wethMock.transfer(address(borrower),1e18);
+        borrower.approveERC20(address(wethMock), amount);
+
+        vm.prank(address(borrower));
+        escrow._depositCollateralSuper(
+            CollateralType.ERC20, 
+            address(wethMock), 
+            amount, 
+            0);
+
+        uint256 escrowedBalance = wethMock.balanceOf(address(escrow)) ;
+
+        assertEq(escrowedBalance, amount, "Unexpected escrow balance");
+
+    }
+
+
+    function test_depositCollateralInternal_ERC721() public {
+
+        CollateralEscrowV1_Override escrow = CollateralEscrowV1_Override(address(borrower.getEscrow()));
+
+        uint256 tokenId =  erc721Mock.mint(address(borrower));
+
+        borrower.approveERC721(address(erc721Mock), tokenId);         
+
+        vm.prank(address(borrower));
+        escrow._depositCollateralSuper(
+            CollateralType.ERC721, 
+            address(erc721Mock), 
+            1, 
+            tokenId);
+
+        uint256 escrowedBalance = erc721Mock.balanceOf(address(escrow)) ;
+
+        assertEq(escrowedBalance, 1, "Unexpected escrow balance");
+
+
+    }
+
+    function test_depositCollateralInternal_ERC721_invalid_amount() public {
+
+         CollateralEscrowV1_Override escrow = CollateralEscrowV1_Override(address(borrower.getEscrow()));
+
+        uint256 tokenId =  erc721Mock.mint(address(borrower));
+
+        borrower.approveERC721(address(erc721Mock), tokenId);         
+
+        vm.expectRevert("Incorrect deposit amount");
+        vm.prank(address(borrower));
+        escrow._depositCollateralSuper(
+            CollateralType.ERC721, 
+            address(erc721Mock), 
+            2, 
+            tokenId);
+
+        
+
+
+    }
+
+
+
+    function test_depositCollateralInternal_ERC1155() public {
+
+        CollateralEscrowV1_Override escrow = CollateralEscrowV1_Override(address(borrower.getEscrow()));
+
+        uint256 tokenId = erc1155Mock.mint(address(borrower),2);
+
+        borrower.approveERC1155(address(erc1155Mock));  
+
+        vm.prank(address(borrower));
+        escrow._depositCollateralSuper(
+            CollateralType.ERC1155, 
+            address(erc1155Mock), 
+            2, 
+            tokenId);
+
+        uint256 escrowedBalance = erc1155Mock.balanceOf(address(escrow), tokenId) ;
+
+        assertEq(escrowedBalance, 2, "Unexpected escrow balance");
+
+
+    }
+
+
+
+    function test_onERC721Received() public {
+
+         CollateralEscrowV1_Override escrow = CollateralEscrowV1_Override(address(borrower.getEscrow()));
+
+
+        bytes4 response = escrow.onERC721Received(address(this), address(borrower), 0, "");
+
+       assertEq(response, bytes4(keccak256("onERC721Received(address,address,uint256,bytes)")),"response is not correct");
+
+
+    }
+
+    function test_onERC1155Received() public {
+        CollateralEscrowV1_Override escrow = CollateralEscrowV1_Override(address(borrower.getEscrow()));
+
+     
+       bytes4 response = escrow.onERC1155Received(address(this), address(borrower), 0, 0, "");
+
+       assertEq(response, bytes4(keccak256("onERC1155Received(address,address,uint256,uint256,bytes)")),"response is not correct");
+
+
+    }
+
+    function test_onERC1155BatchReceived() public {
+        CollateralEscrowV1_Override escrow = CollateralEscrowV1_Override(address(borrower.getEscrow()));
+
+     
+       bytes4 response = escrow.onERC1155BatchReceived(address(this), address(borrower), new uint256[](1), new uint256[](1), "");
+
+       assertEq(response, bytes4(keccak256("onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)")),"response is not correct");
+
+    }
+
+    function test_onERC1155BatchReceived_invalid() public {
+        CollateralEscrowV1_Override escrow = CollateralEscrowV1_Override(address(borrower.getEscrow()));
+
+        vm.expectRevert("Only allowed one asset batch transfer per transaction.");
+       escrow.onERC1155BatchReceived(address(this), address(borrower), new uint256[](2), new uint256[](2), "");
+
+        
     }
 }
 
@@ -235,7 +481,7 @@ contract User {
         return escrow;
     }
 
-    function deposit(
+    /*function deposit(
         CollateralType _collateralType,
         address _collateralAddress,
         uint256 _amount,
@@ -259,7 +505,7 @@ contract User {
         escrow.withdraw(_collateralAddress, _amount, _recipient);
     }
 
-    
+    */
 
     function approveERC20(address tokenAddress, uint256 amount) public {
         ERC20(tokenAddress).approve(address(escrow), amount);

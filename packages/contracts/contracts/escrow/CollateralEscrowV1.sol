@@ -34,6 +34,10 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
         bidId = _bidId;
     }
 
+    /**
+     * @notice Returns the id of the associated bid.
+     * @return The id of the associated bid.
+     */
     function getBid() external view returns (uint256) {
         return bidId;
     }
@@ -98,6 +102,12 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
         emit CollateralWithdrawn(_collateralAddress, _amount, _recipient);
     }
 
+    /**
+     * @notice Internal function for transferring collateral assets into this contract.
+     * @param _collateralAddress The address of the collateral contract.
+     * @param _amount The amount to deposit.
+     * @param _tokenId The token id of the collateral asset.
+     */
     function _depositCollateral(
         CollateralType _collateralType,
         address _collateralAddress,
@@ -138,6 +148,13 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
         }
     }
 
+    /**
+     * @notice Internal function for transferring collateral assets out of this contract.
+     * @param _collateral The collateral asset to withdraw.
+     * @param _collateralAddress The address of the collateral contract.
+     * @param _amount The amount to withdraw.
+     * @param _recipient The address to send the assets to.
+     */
     function _withdrawCollateral(
         Collateral memory _collateral,
         address _collateralAddress,

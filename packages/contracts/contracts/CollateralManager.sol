@@ -369,6 +369,8 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
                 collateralInfo._amount,
                 collateralInfo._tokenId
             );
+        }else{
+            revert("Unexpected collateral type");
         }
         emit CollateralDeposited(
             _bidId,
@@ -482,20 +484,22 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
                     _borrowerAddress
                 );
         }
-        if (collateralType == CollateralType.ERC721) {
+        else if (collateralType == CollateralType.ERC721) {
             return
                 _borrowerAddress ==
                 IERC721Upgradeable(_collateralInfo._collateralAddress).ownerOf(
                     _collateralInfo._tokenId
                 );
         }
-        if (collateralType == CollateralType.ERC1155) {
+        else if (collateralType == CollateralType.ERC1155) {
             return
                 _collateralInfo._amount <=
                 IERC1155Upgradeable(_collateralInfo._collateralAddress)
                     .balanceOf(_borrowerAddress, _collateralInfo._tokenId);
+        }else{
+             return false;
         }
-        return false;
+       
     }
 
     // On NFT Received handlers

@@ -30,6 +30,8 @@ contract CollateralManager_Override is CollateralManager {
 
     address public globalEscrowProxyAddress;
 
+    bool public deployEscrowInternalWasCalled;
+
 
  
 
@@ -140,6 +142,8 @@ contract CollateralManager_Override is CollateralManager {
     function _deployEscrow(uint256 _bidId) internal override returns (address proxyAddress_, address borrower_) {
         proxyAddress_ = globalEscrowProxyAddress;
         borrower_ = tellerV2.getLoanBorrower(_bidId);
+
+        deployEscrowInternalWasCalled = true;
     }
 
 

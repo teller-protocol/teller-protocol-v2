@@ -198,13 +198,70 @@ Branch not covered: line number:144, block number:8, [ 1 / 2 ]
         escrow._withdrawCollateralSuper(collateral,address(wethMock), 1, address(borrower));
       
 
-        //uint256 storedBalance = wethMock.balanceOf(address(escrow))
-
-        //assertEq(storedBalance, 0, "Stored balance was not withdrawn");
+        uint256 borrowerBalance = wethMock.balanceOf(address(borrower));
+        assertEq(borrowerBalance, amount, "Borrower balance not increased");
 
     }
 
-  
+    function test_withdrawCollateral_erc721() public {
+
+        CollateralEscrowV1_Override escrow = CollateralEscrowV1_Override(address(borrower.getEscrow()));
+        uint256 tokenId = erc721Mock.mint(address(escrow));
+        
+        Collateral memory collateral = Collateral({
+            _collateralType: CollateralType.ERC721,
+            _collateralAddress: address(erc721Mock),
+            _amount: 1,
+            _tokenId: tokenId
+        });
+        
+        escrow._withdrawCollateralSuper(collateral,address(erc721Mock), 1, address(borrower));
+      
+
+        uint256 borrowerBalance = erc721Mock.balanceOf(address(borrower));
+        assertEq(borrowerBalance, 1, "Borrower balance not increased");
+
+    }
+
+    function test_withdrawCollateral_erc721_invalid_amount() public {
+    
+    
+            CollateralEscrowV1_Override escrow = CollateralEscrowV1_Override(address(borrower.getEscrow()));
+        uint256 tokenId = erc721Mock.mint(address(escrow));
+        
+        Collateral memory collateral = Collateral({
+            _collateralType: CollateralType.ERC721,
+            _collateralAddress: address(erc721Mock),
+            _amount: 2,
+            _tokenId: tokenId
+        });
+        
+
+        vm.expectRevert("Incorrect withdrawal amount");
+        escrow._withdrawCollateralSuper(collateral,address(erc721Mock), 2, address(borrower));
+      
+ 
+    }
+
+    function test_withdrawCollateral_erc1155() public {
+
+        CollateralEscrowV1_Override escrow = CollateralEscrowV1_Override(address(borrower.getEscrow()));
+        uint256 tokenId = erc1155Mock.mint(address(escrow));
+        
+        Collateral memory collateral = Collateral({
+            _collateralType: CollateralType.ERC1155,
+            _collateralAddress: address(erc1155Mock),
+            _amount: 1,
+            _tokenId: tokenId
+        });
+        
+        escrow._withdrawCollateralSuper(collateral,address(erc1155Mock), 1, address(borrower));
+      
+
+        uint256 borrowerBalance = erc1155Mock.balanceOf(address(borrower), tokenId);
+        assertEq(borrowerBalance, 1, "Borrower balance not increased");
+
+    }
 
     function test_depositAsset_ERC20() public {
 

@@ -38,6 +38,7 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
         return bidId;
     }
  
+ 
     /**
      * @notice Deposits a collateral asset into the escrow.
      * @param _collateralType The type of collateral asset to deposit (ERC721, ERC1155).

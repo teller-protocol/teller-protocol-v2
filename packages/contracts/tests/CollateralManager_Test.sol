@@ -73,6 +73,25 @@ contract CollateralManager_Test is Testable {
         collateralManager.initialize(address(escrowBeacon), address(tellerV2Mock) );
     } 
 
+    function test_initialize_valid() public {   
+
+         UpgradeableBeacon eBeacon = new UpgradeableBeacon(
+            address(escrowImplementation)
+        );
+
+         CollateralManager_Override tempCManager = new CollateralManager_Override();
+         tempCManager.initialize(address(eBeacon), address(tellerV2Mock) );
+
+         //check for valid
+
+         address managerTellerV2 = address(tempCManager.tellerV2());
+         assertEq(managerTellerV2, address(tellerV2Mock) ,"CollateralManager was not initialized" );
+
+    }
+    
+
+
+
 
     function test_setCollateralEscrowBeacon(  ) public {
         // Deploy implementation
@@ -338,7 +357,7 @@ contract CollateralManager_Test is Testable {
         collateralManager.deployAndDeposit(bidId);
 
 
-
+        assertTrue(collateralManager.deployEscrowInternalWasCalled(), "deploy escrow internal was not called");
     }
 
  
@@ -356,7 +375,6 @@ contract CollateralManager_Test is Testable {
         uint256 bidId = 0;
 
         vm.expectRevert("collateral cannot be withdrawn");
-
         collateralManager.withdraw(bidId); 
         
     }
@@ -478,13 +496,25 @@ contract CollateralManager_Test is Testable {
 
 
 
+ 
 
+    function test_withdraw_internal_emptyArray() public {
+    
+    
+           uint256 bidId = 0;
+        address recipient = address(borrower);
 
+        wethMock.transfer(address(escrowImplementation), 1000);
 
+       
 
+        collateralManager.forceSetEscrowAddress(bidId,address(escrowImplementation));
+        collateralManager._withdrawSuper(bidId,recipient);
 
-
-
+        assertFalse(escrowImplementation.withdrawWasCalled(),"withdraw was not called on escrow imp");
+ 
+    
+    }
 
 
 
@@ -568,10 +598,11 @@ contract CollateralManager_Test is Testable {
         tellerV2Mock.setBorrower(address(borrower));
 
         //use the mock escrow imp
-        collateralManager.setGlobalEscrowProxyAddress(  address(escrowImplementation) );
+        collateralManager.setGlobalEscrowProxyAddress(  address(0) );
 
         (address proxy, address borrower) = collateralManager._deployEscrowSuper(bidId);
- 
+
+        assertTrue(proxy != address(0), "proxy was not depoloyed");
     }
 
       function test_deployEscrow_internal_nonexisting_bid() public {
@@ -581,6 +612,20 @@ contract CollateralManager_Test is Testable {
         vm.expectRevert("Bid does not exist");
         (address proxy, address borrower) = collateralManager._deployEscrowSuper(bidId);
  
+    }
+
+    function test_deployEscrow_internal_proxy_already_deployed() public {
+
+         uint256 bidId = 0;
+
+        tellerV2Mock.setBorrower(address(borrower));
+
+        //use the mock escrow imp
+        collateralManager.setGlobalEscrowProxyAddress(  address(escrowImplementation) );
+
+        (address proxy, address borrower) = collateralManager._deployEscrowSuper(bidId);
+ 
+
     }
 
 
@@ -684,6 +729,29 @@ contract CollateralManager_Test is Testable {
         assertTrue(collateralManager.checkBalancesWasCalled(), "Check balances was not called");
     }
 
+
+   /*  function test_checkBalance_internal_invalid_type() public {
+    
+        wethMock.transfer(address(borrower), 1000);
+
+        Collateral memory collateral = Collateral({
+            _collateralType: CollateralType(uint16(4)),
+            _amount: 1000,
+            _tokenId: 0, 
+            _collateralAddress: address(wethMock)
+        });
+ 
+ 
+        bool valid = collateralManager._checkBalanceSuper(
+            address(borrower),
+            collateral
+        );
+ 
+         assertFalse(valid, "Check balance should be invalid");
+     }*/
+
+
+
      function test_checkBalance_internal_erc20() public {
     
         wethMock.transfer(address(borrower), 1000);
@@ -781,6 +849,26 @@ contract CollateralManager_Test is Testable {
         );
  
          assertTrue(valid, "Check balance should be valid");
+     }
+
+     function test_checkBalance_internal_erc1155_invalid() public {
+        
+        //erc1155Mock.mint(address(this), 5);
+            
+        Collateral memory collateral = Collateral({
+            _collateralType: CollateralType.ERC1155,
+            _amount: 5,
+            _tokenId: 0, 
+            _collateralAddress: address(erc1155Mock)
+        });
+ 
+ 
+        bool valid = collateralManager._checkBalanceSuper(
+            address(borrower),
+            collateral
+        );
+ 
+         assertFalse(valid, "Check balance should be invalid");
      }
 
 
@@ -1026,7 +1114,7 @@ contract CollateralManager_Test is Testable {
             _collateralAddress: address(wethMock)
         });
 
-        
+        collateralManager.setCheckBalanceGlobalValid(true);
         collateralManager.commitCollateral(bidId,collateral);
 
 
@@ -1066,7 +1154,7 @@ contract CollateralManager_Test is Testable {
             _collateralAddress: address(wethMock)
         });
 
-       
+        collateralManager.setCheckBalanceGlobalValid(true);
         collateralManager.commitCollateral(bidId, collateralArray);
 
         assertTrue(collateralManager.commitCollateralInternalWasCalled(),"commit collateral was not called");

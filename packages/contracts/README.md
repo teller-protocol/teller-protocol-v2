@@ -55,17 +55,20 @@ yarn subgraph create-local:polygon
 yarn subgraph deploy-local:polygon
 ```
 
-## API Docs
-
-[https://thegraph.com/docs/en/developer/graphql-api/](https://thegraph.com/docs/en/developer/graphql-api/)
-
-## Graph-node Docker Image
-
-[https://registry.hub.docker.com/r/graphprotocol/graph-node](https://registry.hub.docker.com/r/graphprotocol/graph-node)
 
 ## Unit Testing
 
-[https://docs.scaffoldeth.io/scaffold-eth/toolkit/infrastructure/the-graph](https://docs.scaffoldeth.io/scaffold-eth/toolkit/infrastructure/the-graph)
+1. Set required ENV variables (.env.template)
+DEFAULT_NETWORK=hardhat 
+HARDHAT_DEPLOY_FORK=goerli
+GOERLI_RPC_URL=
+
+2. Install dependencies with 'yarn install'
+
+3. Run tests with 'yarn test' 
+
+4. Display test coverage report with 'yarn coverage' or 'yarn coverage-report'
+
 
 
 ### Git LFS 

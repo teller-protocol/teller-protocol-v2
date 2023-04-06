@@ -88,5 +88,24 @@ To set up the repo locally, you will need `yarn` and `node v16`:
 Run tests locally:
 - Run `yarn contracts test`
 
+
+### Contracts Documentation
+  - [CollateralManager](contracts/CollateralManager.sol/contract.CollateralManager.md)
+  - [LenderCommitmentForwarder](contracts/LenderCommitmentForwarder.sol/contract.LenderCommitmentForwarder.md)
+  - [LenderManager](contracts/LenderManager.sol/contract.LenderManager.md)
+  - [MarketLiquidityRewards](contracts/MarketLiquidityRewards.sol/contract.MarketLiquidityRewards.md)
+  - [MarketRegistry](contracts/MarketRegistry.sol/contract.MarketRegistry.md)
+  - [MetaForwarder](contracts/MetaForwarder.sol/contract.MetaForwarder.md)
+  - [ProtocolFee](contracts/ProtocolFee.sol/contract.ProtocolFee.md)
+  - [ReputationManager](contracts/ReputationManager.sol/contract.ReputationManager.md)
+  - [TLR](contracts/TLR.sol/contract.TLR.md)
+  - [TellerV2](contracts/TellerV2.sol/contract.TellerV2.md)
+  - [TellerV2Autopay](contracts/TellerV2Autopay.sol/contract.TellerV2Autopay.md)
+  - [TellerV2Context](contracts/TellerV2Context.sol/abstract.TellerV2Context.md)
+  - [TellerV2MarketForwarder](contracts/TellerV2MarketForwarder.sol/abstract.TellerV2MarketForwarder.md)
+  - [TellerV2Storage](contracts/TellerV2Storage.sol/abstract.TellerV2Storage.md)
+  - [Types constants](contracts/Types.sol/constants.Types.md)
+
 ## Additional Documentation
-Get more info here: https://teller.gitbook.io/teller-v2/
+Get more info on [Gitbook](https://teller.gitbook.io/teller-v2/)
+

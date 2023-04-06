@@ -1,6 +1,6 @@
 [book]
 src = "src"
-title = ""
+title = "Teller Protocol"
 
 [output.html]
 no-section-label = true

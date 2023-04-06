@@ -1,8 +1,8 @@
 # TellerV2Autopay
-[Git Source](https://github.com/teller-protocol/teller-protocol-v2/blob/cc7fb9358a2518de7ee33e518ebac21eac498b0d/contracts/TellerV2Autopay.sol)
+[Git Source](https://github.com/teller-protocol/teller-protocol-v2/blob/06ebc3cc034145956680b0db36c29ffb293ae345/contracts/TellerV2Autopay.sol)
 
 **Inherits:**
-OwnableUpgradeable, [ITellerV2Autopay](/contracts/interfaces/ITellerV2Autopay.sol/interface.ITellerV2Autopay.md)
+OwnableUpgradeable, ITellerV2Autopay
 
 *Helper contract to autopay loans*
 

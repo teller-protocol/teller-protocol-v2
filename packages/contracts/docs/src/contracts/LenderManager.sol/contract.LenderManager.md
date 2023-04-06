@@ -1,8 +1,8 @@
 # LenderManager
-[Git Source](https://github.com/teller-protocol/teller-protocol-v2/blob/cc7fb9358a2518de7ee33e518ebac21eac498b0d/contracts/LenderManager.sol)
+[Git Source](https://github.com/teller-protocol/teller-protocol-v2/blob/06ebc3cc034145956680b0db36c29ffb293ae345/contracts/LenderManager.sol)
 
 **Inherits:**
-Initializable, OwnableUpgradeable, ERC721Upgradeable, [ILenderManager](/contracts/interfaces/ILenderManager.sol/abstract.ILenderManager.md)
+Initializable, OwnableUpgradeable, ERC721Upgradeable, ILenderManager
 
 
 ## State Variables

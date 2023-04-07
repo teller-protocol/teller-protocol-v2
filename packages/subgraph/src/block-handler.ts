@@ -78,6 +78,8 @@ export function checkActiveCommitments(block: ethereum.Block): void {
     const commitmentId = protocol.activeCommitments[i];
     const commitment = Commitment.load(commitmentId)!;
 
+    // TODO: check the lender's token balance + allowance
+
     if (commitment.expirationTimestamp.lt(block.timestamp)) {
       updateCommitmentStatus(commitment, CommitmentStatus.Expired);
     }

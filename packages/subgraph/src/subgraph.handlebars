@@ -74,6 +74,8 @@ dataSources:
         - name: IERC20Metadata
           file: ../../packages/contracts/generated/artifacts/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol/IERC20Metadata.json
       eventHandlers:
+        # TODO: add MarketForwarderApproved event for Lender entity
+
         - event: SubmittedBid(indexed uint256,indexed address,address,indexed bytes32)
           handler: handleSubmittedBid
         - event: AcceptedBid(indexed uint256,indexed address)

@@ -100,7 +100,11 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
      * @param _bidId The id of the bid to check.
      */
 
-    function isBidCollateralBacked(uint256 _bidId) public returns (bool) {
+    function isBidCollateralBacked(uint256 _bidId)
+        public
+        virtual
+        returns (bool)
+    {
         return _bidCollaterals[_bidId].collateralAddresses.length() > 0;
     }
 
@@ -116,6 +120,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     ) public returns (bool validation_) {
         address borrower = tellerV2.getLoanBorrower(_bidId);
         (validation_, ) = checkBalances(borrower, _collateralInfo);
+
         if (validation_) {
             for (uint256 i; i < _collateralInfo.length; i++) {
                 Collateral memory info = _collateralInfo[i];
@@ -282,6 +287,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
      */
     function _deployEscrow(uint256 _bidId)
         internal
+        virtual
         returns (address proxyAddress_, address borrower_)
     {
         proxyAddress_ = _escrows[_bidId];
@@ -301,9 +307,15 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         }
     }
 
+    /*
+        * @notice Deploys a new collateral escrow contract. Deposits collateral into a collateral escrow.
+        * @param _bidId The associated bidId of the collateral escrow.
+        * @param collateralInfo The collateral info to deposit.
+
+    */
     function _deposit(uint256 _bidId, Collateral memory collateralInfo)
-        public
-        payable
+        internal
+        virtual
     {
         require(collateralInfo._amount > 0, "Collateral not validated");
         (address escrowAddress, address borrower) = _deployEscrow(_bidId);
@@ -321,9 +333,11 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
                 escrowAddress,
                 collateralInfo._amount
             );
-            collateralEscrow.depositToken(
+            collateralEscrow.depositAsset(
+                CollateralType.ERC20,
                 collateralInfo._collateralAddress,
-                collateralInfo._amount
+                collateralInfo._amount,
+                0
             );
         } else if (collateralInfo._collateralType == CollateralType.ERC721) {
             IERC721Upgradeable(collateralInfo._collateralAddress).transferFrom(
@@ -359,6 +373,8 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
                 collateralInfo._amount,
                 collateralInfo._tokenId
             );
+        } else {
+            revert("Unexpected collateral type");
         }
         emit CollateralDeposited(
             _bidId,
@@ -374,7 +390,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
      * @param _bidId The id of the bid to withdraw collateral for.
      * @param _receiver The address to withdraw the collateral to.
      */
-    function _withdraw(uint256 _bidId, address _receiver) internal {
+    function _withdraw(uint256 _bidId, address _receiver) internal virtual {
         for (
             uint256 i;
             i < _bidCollaterals[_bidId].collateralAddresses.length();
@@ -410,7 +426,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     function _commitCollateral(
         uint256 _bidId,
         Collateral memory _collateralInfo
-    ) internal {
+    ) internal virtual {
         CollateralInfo storage collateral = _bidCollaterals[_bidId];
         collateral.collateralAddresses.add(_collateralInfo._collateralAddress);
         collateral.collateralInfo[
@@ -429,12 +445,13 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
      * @notice Checks the validity of a borrower's multiple collateral balances.
      * @param _borrowerAddress The address of the borrower holding the collateral.
      * @param _collateralInfo Additional information about the collateral assets.
+     * @param _shortCircut  if true, will return immediately until an invalid balance
      */
     function _checkBalances(
         address _borrowerAddress,
         Collateral[] memory _collateralInfo,
         bool _shortCircut
-    ) internal returns (bool validated_, bool[] memory checks_) {
+    ) internal virtual returns (bool validated_, bool[] memory checks_) {
         checks_ = new bool[](_collateralInfo.length);
         validated_ = true;
         for (uint256 i; i < _collateralInfo.length; i++) {
@@ -461,29 +478,29 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     function _checkBalance(
         address _borrowerAddress,
         Collateral memory _collateralInfo
-    ) internal returns (bool) {
+    ) internal virtual returns (bool) {
         CollateralType collateralType = _collateralInfo._collateralType;
+
         if (collateralType == CollateralType.ERC20) {
             return
                 _collateralInfo._amount <=
                 IERC20Upgradeable(_collateralInfo._collateralAddress).balanceOf(
                     _borrowerAddress
                 );
-        }
-        if (collateralType == CollateralType.ERC721) {
+        } else if (collateralType == CollateralType.ERC721) {
             return
                 _borrowerAddress ==
                 IERC721Upgradeable(_collateralInfo._collateralAddress).ownerOf(
                     _collateralInfo._tokenId
                 );
-        }
-        if (collateralType == CollateralType.ERC1155) {
+        } else if (collateralType == CollateralType.ERC1155) {
             return
                 _collateralInfo._amount <=
                 IERC1155Upgradeable(_collateralInfo._collateralAddress)
                     .balanceOf(_borrowerAddress, _collateralInfo._tokenId);
+        } else {
+            return false;
         }
-        return false;
     }
 
     // On NFT Received handlers

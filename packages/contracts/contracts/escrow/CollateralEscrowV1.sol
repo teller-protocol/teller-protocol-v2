@@ -34,30 +34,12 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
         bidId = _bidId;
     }
 
+    /**
+     * @notice Returns the id of the associated bid.
+     * @return The id of the associated bid.
+     */
     function getBid() external view returns (uint256) {
         return bidId;
-    }
-
-    /**
-     * @notice Deposits a collateral ERC20 token into the escrow.
-     * @param _collateralAddress The address of the collateral token.
-     * @param _amount The amount to deposit.
-     */
-    function depositToken(address _collateralAddress, uint256 _amount)
-        external
-        onlyOwner
-    {
-        require(_amount > 0, "Deposit amount cannot be zero");
-        _depositCollateral(
-            CollateralType.ERC20,
-            _collateralAddress,
-            _amount,
-            0
-        );
-        Collateral storage collateral = collateralBalances[_collateralAddress];
-        collateral._collateralType = CollateralType.ERC20;
-        collateral._amount = _amount;
-        emit CollateralDeposited(_collateralAddress, _amount);
     }
 
     /**
@@ -71,7 +53,7 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
         address _collateralAddress,
         uint256 _amount,
         uint256 _tokenId
-    ) external payable onlyOwner {
+    ) external payable virtual onlyOwner {
         require(_amount > 0, "Deposit amount cannot be zero");
         _depositCollateral(
             _collateralType,
@@ -80,6 +62,13 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
             _tokenId
         );
         Collateral storage collateral = collateralBalances[_collateralAddress];
+
+        //Avoids asset overwriting.  Can get rid of this restriction by restructuring collateral balances storage so it isnt a mapping based on address.
+        require(
+            collateral._amount == 0,
+            "Unable to deposit multiple collateral asset instances of the same contract address."
+        );
+
         collateral._collateralType = _collateralType;
         collateral._amount = _amount;
         collateral._tokenId = _tokenId;
@@ -96,7 +85,7 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
         address _collateralAddress,
         uint256 _amount,
         address _recipient
-    ) external onlyOwner {
+    ) external virtual onlyOwner {
         require(_amount > 0, "Withdraw amount cannot be zero");
         Collateral storage collateral = collateralBalances[_collateralAddress];
         require(
@@ -113,6 +102,12 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
         emit CollateralWithdrawn(_collateralAddress, _amount, _recipient);
     }
 
+    /**
+     * @notice Internal function for transferring collateral assets into this contract.
+     * @param _collateralAddress The address of the collateral contract.
+     * @param _amount The amount to deposit.
+     * @param _tokenId The token id of the collateral asset.
+     */
     function _depositCollateral(
         CollateralType _collateralType,
         address _collateralAddress,
@@ -148,9 +143,18 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
                 _amount,
                 data
             );
+        } else {
+            revert("Invalid collateral type");
         }
     }
 
+    /**
+     * @notice Internal function for transferring collateral assets out of this contract.
+     * @param _collateral The collateral asset to withdraw.
+     * @param _collateralAddress The address of the collateral contract.
+     * @param _amount The amount to withdraw.
+     * @param _recipient The address to send the assets to.
+     */
     function _withdrawCollateral(
         Collateral memory _collateral,
         address _collateralAddress,
@@ -184,6 +188,8 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
                 _amount,
                 data
             );
+        } else {
+            revert("Invalid collateral type");
         }
     }
 

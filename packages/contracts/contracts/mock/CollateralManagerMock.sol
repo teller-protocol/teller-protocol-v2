@@ -5,18 +5,21 @@ pragma solidity ^0.8.0;
 import "../interfaces/ICollateralManager.sol";
 
 contract CollateralManagerMock is ICollateralManager {
+    bool public committedCollateralValid = true;
+    bool public deployAndDepositWasCalled;
+
     function commitCollateral(
         uint256 _bidId,
         Collateral[] calldata _collateralInfo
     ) external returns (bool validation_) {
-        return true;
+        validation_ = committedCollateralValid;
     }
 
     function commitCollateral(
         uint256 _bidId,
         Collateral calldata _collateralInfo
     ) external returns (bool validation_) {
-        return true;
+        validation_ = committedCollateralValid;
     }
 
     function checkBalances(
@@ -31,7 +34,9 @@ contract CollateralManagerMock is ICollateralManager {
      * @notice Deploys a new collateral escrow.
      * @param _bidId The associated bidId of the collateral escrow.
      */
-    function deployAndDeposit(uint256 _bidId) external {}
+    function deployAndDeposit(uint256 _bidId) external {
+        deployAndDepositWasCalled = true;
+    }
 
     /**
      * @notice Gets the address of a deployed escrow.
@@ -86,4 +91,8 @@ contract CollateralManagerMock is ICollateralManager {
     function liquidateCollateral(uint256 _bidId, address _liquidatorAddress)
         external
     {}
+
+    function forceSetCommitCollateralValidation(bool _validation) external {
+        committedCollateralValid = _validation;
+    }
 }

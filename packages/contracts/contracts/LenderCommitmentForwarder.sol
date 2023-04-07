@@ -345,6 +345,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             commitment.collateralTokenAddress,
             commitment.principalTokenAddress
         );
+
         if (_collateralAmount < requiredCollateral) {
             revert InsufficientBorrowerCollateral({
                 required: requiredCollateral,

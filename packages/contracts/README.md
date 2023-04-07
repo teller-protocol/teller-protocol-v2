@@ -1,71 +1,33 @@
-# Graph Protocol - Teller Sub Graph
+# Teller V2 Protocol 
 
-# Setup commands
+Teller Protocol is a decentralized, non-custodial lending book that allows users to lend and borrow any crypto asset without price-based liquidation.
 
-**note: First make sure that docker is installed and running locally*
 
-[https://docs.scaffoldeth.io/scaffold-eth/toolkit/infrastructure/the-graph](https://docs.scaffoldeth.io/scaffold-eth/toolkit/infrastructure/the-graph)
+## Pre-requisite software
 
-- *For linux users:*
-    - *Install docker , docker-ce  ([https://docs.docker.com/engine/install/ubuntu/](https://docs.docker.com/engine/install/ubuntu/))*
-    - *Elevate docker permissions (sudo chmod 666 /var/run/docker.sock)*
+1. Install NodeJS v16+
 
-Terminal 1 - Hardhat contracts
-- Install packages
-```
-yarn install
-```
-- Start local Hardhat chain
-```
-yarn chain --hostname 0.0.0.0
-```
-- Deploy contracts to localhost chain
-```
-yarn deploy --network localhost
-```
+2. Install rust, 'foundry' and 'forge'
 
-Terminal 2 - Front end
-- Start web app
-```
-yarn start
-```
-
-Terminal 3 - Graph node
-- Clean/reset graph node
-```
-yarn clean-graph-node
-```
-- Run graph node
-```
-yarn run-graph-node
-```
-
-Terminal 4 - Subgraph deployment
-
-- Generate types
-```
-yarn subgraph graph codegen
-```
-- Create subgraph
-```
-yarn subgraph create-local:polygon
-```
-- Deploy subgraph to node
-```
-yarn subgraph deploy-local:polygon
-```
-
-## API Docs
-
-[https://thegraph.com/docs/en/developer/graphql-api/](https://thegraph.com/docs/en/developer/graphql-api/)
-
-## Graph-node Docker Image
-
-[https://registry.hub.docker.com/r/graphprotocol/graph-node](https://registry.hub.docker.com/r/graphprotocol/graph-node)
 
 ## Unit Testing
 
-[https://docs.scaffoldeth.io/scaffold-eth/toolkit/infrastructure/the-graph](https://docs.scaffoldeth.io/scaffold-eth/toolkit/infrastructure/the-graph)
+1. Set required ENV variables (see .env.template)
+DEFAULT_NETWORK=hardhat 
+HARDHAT_DEPLOY_FORK=goerli
+GOERLI_RPC_URL= ...
+
+2. Install dependencies with 'yarn install'
+
+3. Run tests with 'yarn test' 
+
+4. Display test coverage report with 'yarn coverage' or 'yarn coverage-report'
+
+
+
+## Forge docs 
+
+ > forge doc --serve 
 
 
 ### Git LFS 

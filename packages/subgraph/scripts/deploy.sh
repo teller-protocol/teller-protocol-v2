@@ -15,5 +15,5 @@ else
   yarn graph deploy \
     --product hosted-service \
     --node https://api.thegraph.com/deploy/ \
-    "teller-protocol/tellerv2-$network-test"
+    "teller-protocol/tellerv2-$network"
 fi

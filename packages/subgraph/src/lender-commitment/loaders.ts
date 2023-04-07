@@ -3,8 +3,6 @@ import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { Commitment } from "../../generated/schema";
 import { loadProtocol } from "../helpers/loaders";
 
-import { CommitmentStatus, commitmentStatusToString } from "./utils";
-
 /**
  * @param {string} commitmentId - ID of the commitment
  * @returns {Commitment} The Commitment entity for the lender
@@ -17,7 +15,7 @@ export function loadCommitment(commitmentId: string): Commitment {
     commitment = new Commitment(idString);
     commitment.createdAt = BigInt.zero();
     commitment.updatedAt = BigInt.zero();
-    commitment.status = commitmentStatusToString(CommitmentStatus.Active);
+    commitment.status = "";
 
     commitment.committedAmount = BigInt.zero();
     commitment.expirationTimestamp = BigInt.zero();
@@ -37,12 +35,6 @@ export function loadCommitment(commitmentId: string): Commitment {
     commitment.commitmentBorrowers = [];
 
     commitment.save();
-
-    const protocol = loadProtocol();
-    const commitments = protocol.activeCommitments;
-    commitments.push(commitment.id);
-    protocol.activeCommitments = commitments;
-    protocol.save();
   }
   return commitment;
 }

@@ -3,22 +3,20 @@ import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { LenderCommitmentForwarder } from "../../generated/LenderCommitmentForwarder/LenderCommitmentForwarder";
 import { Commitment, Token, TokenVolume } from "../../generated/schema";
 import {
+  loadCollateralTokenVolume,
   loadCommitmentTokenVolume,
   loadLenderByMarketId,
   loadLenderTokenVolume,
-  loadProtocolTokenVolume,
   loadMarketTokenVolume,
+  loadProtocol,
+  loadProtocolTokenVolume,
   loadToken,
-  TokenType,
-  loadCollateralTokenVolume
+  TokenType
 } from "../helpers/loaders";
+import { addToArray, removeFromArray } from "../helpers/utils";
 
 import { loadCommitment } from "./loaders";
-import {
-  CommitmentStatus,
-  commitmentStatusToEnum,
-  commitmentStatusToString
-} from "./utils";
+import { CommitmentStatus, commitmentStatusToString } from "./utils";
 
 enum CollateralTokenType {
   NONE,
@@ -27,6 +25,31 @@ enum CollateralTokenType {
   ERC1155,
   ERC721_ANY_ID,
   ERC1155_ANY_ID
+}
+
+export function updateCommitmentStatus(
+  commitment: Commitment,
+  status: CommitmentStatus
+): void {
+  commitment.status = commitmentStatusToString(status);
+
+  switch (status) {
+    case CommitmentStatus.Active:
+      addCommitmentToProtocol(commitment);
+      break;
+    case CommitmentStatus.Deleted:
+    case CommitmentStatus.Drained:
+    case CommitmentStatus.Expired:
+      updateAvailableTokensFromCommitment(
+        commitment,
+        commitment.committedAmount.neg()
+      );
+      removeCommitmentToProtocol(commitment);
+
+      break;
+  }
+
+  commitment.save();
 }
 
 /**
@@ -103,10 +126,28 @@ export function updateLenderCommitment(
 
   commitment.save();
 
+  updateCommitmentStatus(commitment, CommitmentStatus.Active);
   const committedAmountDiff = committedAmount.minus(commitment.committedAmount);
   updateAvailableTokensFromCommitment(commitment, committedAmountDiff);
 
   return commitment;
+}
+
+function addCommitmentToProtocol(commitment: Commitment): void {
+  const protocol = loadProtocol();
+  protocol.activeCommitments = addToArray(
+    protocol.activeCommitments,
+    commitment.id
+  );
+  protocol.save();
+}
+function removeCommitmentToProtocol(commitment: Commitment): void {
+  const protocol = loadProtocol();
+  protocol.activeCommitments = removeFromArray(
+    protocol.activeCommitments,
+    commitment.id
+  );
+  protocol.save();
 }
 
 export function updateAvailableTokensFromCommitment(
@@ -120,9 +161,6 @@ export function updateAvailableTokensFromCommitment(
   commitment.committedAmount = commitment.committedAmount.plus(
     committedAmountDiff
   );
-  if (commitment.committedAmount == BigInt.zero()) {
-    commitment.status = commitmentStatusToString(CommitmentStatus.Drained);
-  }
   commitment.save();
 
   const tokenVolumes = getTokenVolumesFromCommitment(commitment);

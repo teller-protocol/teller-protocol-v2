@@ -9,16 +9,11 @@ import {
   UpdatedCommitmentBorrowers
 } from "../../generated/LenderCommitmentForwarder/LenderCommitmentForwarder";
 import { Bid } from "../../generated/schema";
-import { BidStatus } from "../helpers/bid";
 import { loadBidById } from "../helpers/loaders";
-import { updateBidStatus } from "../helpers/updaters";
 
 import { loadCommitment } from "./loaders";
-import {
-  updateAvailableTokensFromCommitment,
-  updateLenderCommitment
-} from "./updaters";
-import { CommitmentStatus, commitmentStatusToString } from "./utils";
+import { updateCommitmentStatus, updateLenderCommitment } from "./updaters";
+import { CommitmentStatus } from "./utils";
 
 export function handleCreatedCommitment(event: CreatedCommitment): void {
   const commitmentId = event.params.commitmentId.toString();
@@ -65,8 +60,9 @@ export function handleUpdatedCommitments(events: UpdatedCommitment[]): void {
 export function handleDeletedCommitment(event: DeletedCommitment): void {
   const commitmentId = event.params.commitmentId.toString();
   const commitment = loadCommitment(commitmentId);
-  commitment.status = commitmentStatusToString(CommitmentStatus.Deleted);
-  commitment.committedAmount = BigInt.zero();
+
+  updateCommitmentStatus(commitment, CommitmentStatus.Deleted);
+
   commitment.expirationTimestamp = BigInt.zero();
   commitment.maxDuration = BigInt.zero();
   commitment.minAPY = BigInt.zero();
@@ -84,10 +80,9 @@ export function handleExercisedCommitment(event: ExercisedCommitment): void {
   const commitmentId = event.params.commitmentId.toString();
   const commitment = loadCommitment(commitmentId);
 
-  updateAvailableTokensFromCommitment(
-    commitment,
-    event.params.tokenAmount.neg()
-  );
+  if (event.params.tokenAmount.equals(commitment.committedAmount)) {
+    updateCommitmentStatus(commitment, CommitmentStatus.Drained);
+  }
 
   // Link commitment to bid
   const bid: Bid = loadBidById(event.params.bidId);
@@ -96,8 +91,6 @@ export function handleExercisedCommitment(event: ExercisedCommitment): void {
 
   bid.save();
   commitment.save();
-
-  updateBidStatus(bid, BidStatus.Accepted);
 }
 
 export function handleExercisedCommitments(

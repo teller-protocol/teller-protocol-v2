@@ -11,12 +11,8 @@ import {
 } from "./helpers/bid";
 import { loadLoanStatusCount, loadProtocol } from "./helpers/loaders";
 import { updateBidStatus } from "./helpers/updaters";
-import { updateAvailableTokensFromCommitment } from "./lender-commitment/updaters";
-import {
-  CommitmentStatus,
-  commitmentStatusToEnum,
-  commitmentStatusToString
-} from "./lender-commitment/utils";
+import { updateCommitmentStatus } from "./lender-commitment/updaters";
+import { CommitmentStatus } from "./lender-commitment/utils";
 
 export function handleBlock(block: ethereum.Block): void {
   const mod = block.number.mod(BigInt.fromI32(2));
@@ -78,32 +74,12 @@ export function checkActiveBids(block: ethereum.Block): void {
 export function checkActiveCommitments(block: ethereum.Block): void {
   const protocol = loadProtocol();
   const activeCommitments = protocol.activeCommitments;
-  const updatedCommitments = new Array<string>();
-
   for (let i = 0; i < activeCommitments.length; i++) {
     const commitmentId = protocol.activeCommitments[i];
     const commitment = Commitment.load(commitmentId)!;
 
-    let status = commitmentStatusToEnum(commitment.status);
-    if (status !== CommitmentStatus.Active) continue;
-
     if (commitment.expirationTimestamp.lt(block.timestamp)) {
-      status = CommitmentStatus.Expired;
-
-      updateAvailableTokensFromCommitment(
-        commitment,
-        commitment.committedAmount.neg()
-      );
-
-      commitment.status = commitmentStatusToString(status);
-      commitment.save();
-
-      continue;
+      updateCommitmentStatus(commitment, CommitmentStatus.Expired);
     }
-
-    updatedCommitments.push(commitment.id);
   }
-
-  protocol.activeCommitments = updatedCommitments;
-  protocol.save();
 }

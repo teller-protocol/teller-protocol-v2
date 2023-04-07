@@ -6,11 +6,16 @@ import "../interfaces/IMarketRegistry.sol";
 import { PaymentType } from "../libraries/V2Calculations.sol";
 
 contract MarketRegistryMock is IMarketRegistry {
-    address marketOwner;
+    //address marketOwner;
 
-    constructor(address _marketOwner) {
-        marketOwner = _marketOwner;
-    }
+    address public globalMarketOwner;
+    address public globalMarketFeeRecipient;
+    bool public globalMarketsClosed;
+
+    bool public globalBorrowerIsVerified = true;
+    bool public globalLenderIsVerified = true;
+
+    constructor() {}
 
     function initialize(TellerAS _tellerAS) external {}
 
@@ -19,11 +24,11 @@ contract MarketRegistryMock is IMarketRegistry {
         view
         returns (bool isVerified_, bytes32 uuid_)
     {
-        isVerified_ = true;
+        isVerified_ = globalLenderIsVerified;
     }
 
     function isMarketClosed(uint256 _marketId) public view returns (bool) {
-        return false;
+        return globalMarketsClosed;
     }
 
     function isVerifiedBorrower(uint256 _marketId, address _borrower)
@@ -31,11 +36,16 @@ contract MarketRegistryMock is IMarketRegistry {
         view
         returns (bool isVerified_, bytes32 uuid_)
     {
-        isVerified_ = true;
+        isVerified_ = globalBorrowerIsVerified;
     }
 
-    function getMarketOwner(uint256 _marketId) public view returns (address) {
-        return address(marketOwner);
+    function getMarketOwner(uint256 _marketId)
+        public
+        view
+        override
+        returns (address)
+    {
+        return address(globalMarketOwner);
     }
 
     function getMarketFeeRecipient(uint256 _marketId)
@@ -43,7 +53,7 @@ contract MarketRegistryMock is IMarketRegistry {
         view
         returns (address)
     {
-        return address(marketOwner);
+        return address(globalMarketFeeRecipient);
     }
 
     function getMarketURI(uint256 _marketId)
@@ -83,7 +93,11 @@ contract MarketRegistryMock is IMarketRegistry {
     }
 
     function setMarketOwner(address _owner) public {
-        marketOwner = _owner;
+        globalMarketOwner = _owner;
+    }
+
+    function setMarketFeeRecipient(address _feeRecipient) public {
+        globalMarketFeeRecipient = _feeRecipient;
     }
 
     function getPaymentType(uint256 _marketId)
@@ -115,4 +129,18 @@ contract MarketRegistryMock is IMarketRegistry {
         bool _requireBorrowerAttestation,
         string calldata _uri
     ) public returns (uint256) {}
+
+    function closeMarket(uint256 _marketId) public {}
+
+    function mock_setGlobalMarketsClosed(bool closed) public {
+        globalMarketsClosed = closed;
+    }
+
+    function mock_setBorrowerIsVerified(bool verified) public {
+        globalBorrowerIsVerified = verified;
+    }
+
+    function mock_setLenderIsVerified(bool verified) public {
+        globalLenderIsVerified = verified;
+    }
 }

@@ -65,7 +65,7 @@ contract MarketRegistry is
     /* Modifiers */
 
     modifier ownsMarket(uint256 _marketId) {
-        require(markets[_marketId].owner == _msgSender(), "Not the owner");
+        require(_getMarketOwner(_marketId) == _msgSender(), "Not the owner");
         _;
     }
 
@@ -451,7 +451,7 @@ contract MarketRegistry is
         return
             (_attestingSchemaId == attestationSchemaId &&
                 recipient == lenderAddress &&
-                attestor == markets[marketId].owner) ||
+                attestor == _getMarketOwner(marketId)) ||
             attestor == address(this);
     }
 
@@ -734,7 +734,22 @@ contract MarketRegistry is
     function getMarketOwner(uint256 _marketId)
         public
         view
+        virtual
         override
+        returns (address)
+    {
+        return _getMarketOwner(_marketId);
+    }
+
+    /**
+     * @notice Gets the address of a market's owner.
+     * @param _marketId The ID of a market.
+     * @return The address of a market's owner.
+     */
+    function _getMarketOwner(uint256 _marketId)
+        internal
+        view
+        virtual
         returns (address)
     {
         return markets[_marketId].owner;
@@ -754,7 +769,7 @@ contract MarketRegistry is
         address recipient = markets[_marketId].feeRecipient;
 
         if (recipient == address(0)) {
-            return markets[_marketId].owner;
+            return _getMarketOwner(_marketId);
         }
 
         return recipient;
@@ -1000,12 +1015,13 @@ contract MarketRegistry is
         bool _isLender
     )
         internal
+        virtual
         withAttestingSchema(
             _isLender ? lenderAttestationSchemaId : borrowerAttestationSchemaId
         )
     {
         require(
-            _msgSender() == markets[_marketId].owner,
+            _msgSender() == _getMarketOwner(_marketId),
             "Not the market owner"
         );
 
@@ -1046,6 +1062,7 @@ contract MarketRegistry is
         bytes32 _s
     )
         internal
+        virtual
         withAttestingSchema(
             _isLender ? lenderAttestationSchemaId : borrowerAttestationSchemaId
         )
@@ -1054,7 +1071,7 @@ contract MarketRegistry is
         bytes32 uuid;
         {
             bytes memory data = abi.encode(_marketId, _stakeholderAddress);
-            address attestor = markets[_marketId].owner;
+            address attestor = _getMarketOwner(_marketId);
             // Submit attestation for stakeholder to join a market (attestation must be signed by market owner)
             uuid = tellerAS.attestByDelegation(
                 _stakeholderAddress,
@@ -1088,7 +1105,7 @@ contract MarketRegistry is
         address _stakeholderAddress,
         bytes32 _uuid,
         bool _isLender
-    ) internal {
+    ) internal virtual {
         if (_isLender) {
             // Store the lender attestation ID for the market ID
             markets[_marketId].lenderAttestationIds[
@@ -1125,9 +1142,9 @@ contract MarketRegistry is
         uint256 _marketId,
         address _stakeholderAddress,
         bool _isLender
-    ) internal {
+    ) internal virtual {
         require(
-            _msgSender() == markets[_marketId].owner,
+            _msgSender() == _getMarketOwner(_marketId),
             "Not the market owner"
         );
 
@@ -1178,7 +1195,7 @@ contract MarketRegistry is
         uint256 _marketId,
         address _stakeholderAddress,
         bool _isLender
-    ) internal returns (bytes32 uuid_) {
+    ) internal virtual returns (bytes32 uuid_) {
         if (_isLender) {
             uuid_ = markets[_marketId].lenderAttestationIds[
                 _stakeholderAddress
@@ -1213,7 +1230,7 @@ contract MarketRegistry is
         bool _attestationRequired,
         mapping(address => bytes32) storage _stakeholderAttestationIds,
         EnumerableSet.AddressSet storage _verifiedStakeholderForMarket
-    ) internal view returns (bool isVerified_, bytes32 uuid_) {
+    ) internal view virtual returns (bool isVerified_, bytes32 uuid_) {
         if (_attestationRequired) {
             isVerified_ =
                 _verifiedStakeholderForMarket.contains(_stakeholderAddress) &&

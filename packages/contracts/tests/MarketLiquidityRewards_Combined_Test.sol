@@ -13,14 +13,13 @@ import { Testable } from "./Testable.sol";
 import { Collateral, CollateralType } from "../contracts/interfaces/escrow/ICollateralEscrowV1.sol";
 
 import { User } from "./Test_Helpers.sol";
-import { MarketLiquidityRewards_Override } from "./MarketLiquidityRewards_Override.sol";
 
 import "../contracts/mock/MarketRegistryMock.sol";
 import "../contracts/mock/CollateralManagerMock.sol";
 
 import "../contracts/MarketLiquidityRewards.sol";
 
-contract MarketLiquidityRewards_Test is Testable {
+contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
     MarketLiquidityUser private marketOwner;
     MarketLiquidityUser private lender;
     MarketLiquidityUser private borrower;
@@ -47,52 +46,27 @@ contract MarketLiquidityRewards_Test is Testable {
     TestERC20Token collateralToken;
     uint8 constant collateralTokenDecimals = 6;
 
-    MarketLiquidityRewards_Override marketLiquidityRewards;
+    bool verifyLoanStartTimeWasCalled;
+    bool verifyExpectedTokenAddressWasCalled;
 
-    TellerV2Mock tellerV2Mock;
-    MarketRegistryMock marketRegistryMock;
-    CollateralManagerMock collateralManagerMock;
+    bool verifyRewardRecipientWasCalled;
+    bool verifyCollateralAmountWasCalled;
 
     constructor()
-    /*   MarketLiquidityRewards(
+        MarketLiquidityRewards(
             address(new TellerV2Mock()),
-            address(new MarketRegistryMock(address(0))),
+            address(new MarketRegistryMock()),
             address(new CollateralManagerMock())
-        )*/
-    {
-
-    }
+        )
+    {}
 
     function setUp() public {
-        tellerV2Mock = new TellerV2Mock();
+        marketOwner = new MarketLiquidityUser(address(tellerV2), (this));
+        borrower = new MarketLiquidityUser(address(tellerV2), (this));
+        lender = new MarketLiquidityUser(address(tellerV2), (this));
+        TellerV2Mock(tellerV2).__setMarketRegistry(address(marketRegistry));
 
-        marketRegistryMock = new MarketRegistryMock();
-
-        collateralManagerMock = new CollateralManagerMock();
-
-        tellerV2Mock.setMarketRegistry(address(marketRegistryMock));
-
-        marketLiquidityRewards = new MarketLiquidityRewards_Override(
-            address(tellerV2Mock),
-            address(marketRegistryMock),
-            address(collateralManagerMock)
-        );
-
-        borrower = new MarketLiquidityUser(
-            address(tellerV2Mock),
-            address(marketLiquidityRewards)
-        );
-        lender = new MarketLiquidityUser(
-            address(tellerV2Mock),
-            address(marketLiquidityRewards)
-        );
-
-        marketOwner = new MarketLiquidityUser(
-            address(tellerV2Mock),
-            address(marketLiquidityRewards)
-        );
-
-        marketRegistryMock.setMarketOwner(address(marketOwner));
+        MarketRegistryMock(marketRegistry).setMarketOwner(address(marketOwner));
 
         //tokenAddress = address(0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174);
         marketId = 2;
@@ -101,15 +75,8 @@ contract MarketLiquidityRewards_Test is Testable {
         minInterestRate = 3000;
         expiration = uint32(block.timestamp) + uint32(64000);
 
-        //failing
-        marketOwner.setTrustedMarketForwarder(
-            marketId,
-            address(marketLiquidityRewards)
-        );
-        lender.approveMarketForwarder(
-            marketId,
-            address(marketLiquidityRewards)
-        );
+        marketOwner.setTrustedMarketForwarder(marketId, address(this));
+        lender.approveMarketForwarder(marketId, address(this));
 
         borrowersArray = new address[](1);
         borrowersArray[0] = address(borrower);
@@ -143,25 +110,18 @@ contract MarketLiquidityRewards_Test is Testable {
         vm.warp(startTime + 100);
         //delete allocationCount;
 
-        /*  verifyLoanStartTimeWasCalled = false;
+        verifyLoanStartTimeWasCalled = false;
         verifyExpectedTokenAddressWasCalled = false;
 
         verifyRewardRecipientWasCalled = false;
-        verifyCollateralAmountWasCalled = false;*/
+        verifyCollateralAmountWasCalled = false;
     }
 
-    /*
-FNDA:0,MarketLiquidityRewards.initialize
-FNDA:0,MarketLiquidityRewards.updateAllocation
-FNDA:0,MarketLiquidityRewards._verifyCollateralAmount
-
-    */
-
-    function _setAllocation(uint256 _allocationId) internal {
+    function _setAllocation(uint256 allocationId) internal {
         uint256 rewardTokenAmount = 0;
 
-        MarketLiquidityRewards.RewardAllocation
-            memory _allocation = IMarketLiquidityRewards.RewardAllocation({
+        RewardAllocation memory _allocation = IMarketLiquidityRewards
+            .RewardAllocation({
                 allocator: address(lender),
                 marketId: marketId,
                 rewardTokenAddress: address(rewardToken),
@@ -172,19 +132,17 @@ FNDA:0,MarketLiquidityRewards._verifyCollateralAmount
                 rewardPerLoanPrincipalAmount: 0,
                 bidStartTimeMin: uint32(startTime),
                 bidStartTimeMax: uint32(startTime + 10000),
-                allocationStrategy: IMarketLiquidityRewards
-                    .AllocationStrategy
-                    .BORROWER
+                allocationStrategy: AllocationStrategy.BORROWER
             });
 
-        marketLiquidityRewards.setAllocation(_allocationId, _allocation);
+        allocatedRewards[allocationId] = _allocation;
     }
 
     function test_allocateRewards() public {
         uint256 rewardTokenAmount = 500;
 
-        MarketLiquidityRewards.RewardAllocation
-            memory _allocation = IMarketLiquidityRewards.RewardAllocation({
+        RewardAllocation memory _allocation = IMarketLiquidityRewards
+            .RewardAllocation({
                 allocator: address(lender),
                 marketId: marketId,
                 rewardTokenAddress: address(rewardToken),
@@ -195,14 +153,12 @@ FNDA:0,MarketLiquidityRewards._verifyCollateralAmount
                 rewardPerLoanPrincipalAmount: 0,
                 bidStartTimeMin: uint32(startTime),
                 bidStartTimeMax: uint32(startTime + 10000),
-                allocationStrategy: IMarketLiquidityRewards
-                    .AllocationStrategy
-                    .BORROWER
+                allocationStrategy: AllocationStrategy.BORROWER
             });
 
         lender._approveERC20Token(
             address(rewardToken),
-            address(marketLiquidityRewards),
+            address(this),
             rewardTokenAmount
         );
 
@@ -215,21 +171,17 @@ FNDA:0,MarketLiquidityRewards._verifyCollateralAmount
 
         _setAllocation(allocationId);
 
-        uint256 amountBefore = marketLiquidityRewards.getRewardTokenAmount(
-            allocationId
-        );
+        uint256 amountBefore = allocatedRewards[allocationId].rewardTokenAmount;
 
         lender._approveERC20Token(
             address(rewardToken),
-            address(marketLiquidityRewards),
+            address(this),
             amountToIncrease
         );
 
         lender._increaseAllocationAmount(allocationId, amountToIncrease);
 
-        uint256 amountAfter = marketLiquidityRewards.getRewardTokenAmount(
-            allocationId
-        );
+        uint256 amountAfter = allocatedRewards[allocationId].rewardTokenAmount;
 
         assertEq(
             amountAfter,
@@ -243,15 +195,11 @@ FNDA:0,MarketLiquidityRewards._verifyCollateralAmount
 
         _setAllocation(allocationId);
 
-        uint256 amountBefore = marketLiquidityRewards.getRewardTokenAmount(
-            allocationId
-        );
+        uint256 amountBefore = allocatedRewards[allocationId].rewardTokenAmount;
 
         lender._deallocateRewards(allocationId, amountBefore);
 
-        uint256 amountAfter = marketLiquidityRewards.getRewardTokenAmount(
-            allocationId
-        );
+        uint256 amountAfter = allocatedRewards[allocationId].rewardTokenAmount;
 
         assertEq(amountAfter, 0, "Allocation was not deleted");
     }
@@ -267,7 +215,7 @@ FNDA:0,MarketLiquidityRewards._verifyCollateralAmount
         mockBid.loanDetails.acceptedTimestamp = uint32(block.timestamp);
         mockBid.state = BidState.PAID;
 
-        tellerV2Mock.setMockBid(mockBid);
+        TellerV2Mock(tellerV2).setMockBid(mockBid);
 
         uint256 allocationId = 0;
         uint256 bidId = 0;
@@ -277,25 +225,25 @@ FNDA:0,MarketLiquidityRewards._verifyCollateralAmount
         borrower._claimRewards(allocationId, bidId);
 
         assertEq(
-            marketLiquidityRewards.verifyLoanStartTimeWasCalled(),
+            verifyLoanStartTimeWasCalled,
             true,
             "verifyLoanStartTime was not called"
         );
 
         assertEq(
-            marketLiquidityRewards.verifyExpectedTokenAddressWasCalled(),
+            verifyExpectedTokenAddressWasCalled,
             true,
             " verifyExpectedTokenAddress was not called"
         );
 
         assertEq(
-            marketLiquidityRewards.verifyRewardRecipientWasCalled(),
+            verifyRewardRecipientWasCalled,
             true,
             "verifyRewardRecipient was not called"
         );
 
         assertEq(
-            marketLiquidityRewards.verifyCollateralAmountWasCalled(),
+            verifyCollateralAmountWasCalled,
             true,
             "verifyCollateralAmount was not called"
         );
@@ -310,7 +258,7 @@ FNDA:0,MarketLiquidityRewards._verifyCollateralAmount
 
         uint256 rewardPerLoanPrincipalAmount = 1e16; // expanded by token decimals so really 0.01
 
-        uint256 rewardAmount = marketLiquidityRewards.calculateRewardAmount(
+        uint256 rewardAmount = super._calculateRewardAmount(
             loanPrincipal,
             principalTokenDecimals,
             rewardPerLoanPrincipalAmount
@@ -325,7 +273,7 @@ FNDA:0,MarketLiquidityRewards._verifyCollateralAmount
 
         uint256 rewardPerLoanPrincipalAmount = 1e4; // expanded by token decimals so really 0.01
 
-        uint256 rewardAmount = marketLiquidityRewards.calculateRewardAmount(
+        uint256 rewardAmount = super._calculateRewardAmount(
             loanPrincipal,
             principalTokenDecimals,
             rewardPerLoanPrincipalAmount
@@ -342,7 +290,7 @@ FNDA:0,MarketLiquidityRewards._verifyCollateralAmount
 
         uint256 minimumCollateralPerPrincipal = 1e4 * 1e6; // expanded by token decimals so really 0.01
 
-        uint256 minCollateral = marketLiquidityRewards.requiredCollateralAmount(
+        uint256 minCollateral = super._requiredCollateralAmount(
             loanPrincipal,
             principalTokenDecimals,
             collateralTokenDecimals,
@@ -359,12 +307,12 @@ FNDA:0,MarketLiquidityRewards._verifyCollateralAmount
 
         uint256 amount = 100;
 
-        marketLiquidityRewards.setAllocatedAmount(allocationId, amount);
+        allocatedRewards[allocationId].rewardTokenAmount += amount;
 
-        marketLiquidityRewards.decrementAllocatedAmount(allocationId, amount);
+        super._decrementAllocatedAmount(allocationId, amount);
 
         assertEq(
-            marketLiquidityRewards.getRewardTokenAmount(allocationId),
+            allocatedRewards[allocationId].rewardTokenAmount,
             0,
             "allocation amount not decremented"
         );
@@ -387,17 +335,16 @@ FNDA:0,MarketLiquidityRewards._verifyCollateralAmount
     function test_verifyLoanStartTime_min() public {
         vm.expectRevert(bytes("Loan was accepted before the min start time."));
 
-        marketLiquidityRewards.verifyLoanStartTime(100, 200, 300);
+        super._verifyLoanStartTime(100, 200, 300);
     }
 
     function test_verifyAndReturnRewardRecipient() public {
-        address recipient = marketLiquidityRewards
-            .verifyAndReturnRewardRecipient(
-                IMarketLiquidityRewards.AllocationStrategy.BORROWER,
-                BidState.PAID,
-                address(borrower),
-                address(lender)
-            );
+        address recipient = super._verifyAndReturnRewardRecipient(
+            AllocationStrategy.BORROWER,
+            BidState.PAID,
+            address(borrower),
+            address(lender)
+        );
 
         assertEq(recipient, address(borrower), "incorrect address returned");
     }
@@ -405,36 +352,92 @@ FNDA:0,MarketLiquidityRewards._verifyCollateralAmount
     function test_verifyAndReturnRewardRecipient_reverts() public {
         vm.expectRevert();
 
-        address recipient = marketLiquidityRewards
-            .verifyAndReturnRewardRecipient(
-                IMarketLiquidityRewards.AllocationStrategy.BORROWER,
-                BidState.PENDING,
-                address(borrower),
-                address(lender)
-            );
+        address recipient = super._verifyAndReturnRewardRecipient(
+            AllocationStrategy.BORROWER,
+            BidState.PENDING,
+            address(borrower),
+            address(lender)
+        );
     }
 
     function test_verifyLoanStartTime_max() public {
         vm.expectRevert(bytes("Loan was accepted after the max start time."));
 
-        marketLiquidityRewards.verifyLoanStartTime(400, 200, 300);
+        super._verifyLoanStartTime(400, 200, 300);
     }
 
     function test_verifyExpectedTokenAddress() public {
         vm.expectRevert(bytes("Invalid expected token address."));
 
-        marketLiquidityRewards.verifyExpectedTokenAddress(
+        super._verifyExpectedTokenAddress(
             address(principalToken),
             address(collateralToken)
         );
+    }
+
+    function allocateRewards(
+        MarketLiquidityRewards.RewardAllocation calldata _allocation
+    ) public override returns (uint256 allocationId_) {
+        super.allocateRewards(_allocation);
+    }
+
+    function increaseAllocationAmount(
+        uint256 _allocationId,
+        uint256 _tokenAmount
+    ) public override {
+        super.increaseAllocationAmount(_allocationId, _tokenAmount);
+    }
+
+    function deallocateRewards(uint256 _allocationId, uint256 _tokenAmount)
+        public
+        override
+    {
+        super.deallocateRewards(_allocationId, _tokenAmount);
+    }
+
+    function _verifyAndReturnRewardRecipient(
+        AllocationStrategy strategy,
+        BidState bidState,
+        address borrower,
+        address lender
+    ) internal override returns (address rewardRecipient) {
+        verifyRewardRecipientWasCalled = true;
+        return address(borrower);
+    }
+
+    function _verifyCollateralAmount(
+        address _collateralTokenAddress,
+        uint256 _collateralAmount,
+        address _principalTokenAddress,
+        uint256 _principalAmount,
+        uint256 _minimumCollateralPerPrincipalAmount
+    ) internal override {
+        verifyCollateralAmountWasCalled = true;
+    }
+
+    function _verifyLoanStartTime(
+        uint32 loanStartTime,
+        uint32 minStartTime,
+        uint32 maxStartTime
+    ) internal override {
+        verifyLoanStartTimeWasCalled = true;
+    }
+
+    function _verifyExpectedTokenAddress(
+        address loanTokenAddress,
+        address expectedTokenAddress
+    ) internal override {
+        verifyExpectedTokenAddressWasCalled = true;
     }
 }
 
 contract MarketLiquidityUser is User {
     MarketLiquidityRewards public immutable liquidityRewards;
 
-    constructor(address _tellerV2, address _liquidityRewards) User(_tellerV2) {
-        liquidityRewards = MarketLiquidityRewards(_liquidityRewards);
+    constructor(address _tellerV2, MarketLiquidityRewards _liquidityRewards)
+        User(_tellerV2)
+    {
+        liquidityRewards = _liquidityRewards;
     }
 
     function _allocateRewards(
@@ -473,7 +476,7 @@ contract TellerV2Mock is TellerV2Context {
 
     constructor() TellerV2Context(address(0)) {}
 
-    function setMarketRegistry(address _marketRegistry) external {
+    function __setMarketRegistry(address _marketRegistry) external {
         marketRegistry = IMarketRegistry(_marketRegistry);
     }
 

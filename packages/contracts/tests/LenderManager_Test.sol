@@ -9,6 +9,7 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "../contracts/TellerV2MarketForwarder.sol";
 import { Testable } from "./Testable.sol";
 import { LenderManager } from "../contracts/LenderManager.sol";
+import { LenderManager_Override } from "./LenderManager_Override.sol";
 
 import "../contracts/mock/MarketRegistryMock.sol";
 
@@ -16,7 +17,7 @@ import { User } from "./Test_Helpers.sol";
 
 import { TellerV2Context } from "../contracts/TellerV2Context.sol";
 
-contract LenderManager_Test is Testable, LenderManager {
+contract LenderManager_Test is Testable {
     LenderManagerUser private marketOwner;
     LenderManagerUser private lender;
     LenderManagerUser private borrower;
@@ -24,67 +25,147 @@ contract LenderManager_Test is Testable, LenderManager {
     LenderCommitmentTester mockTellerV2;
     MarketRegistryMock mockMarketRegistry;
 
-    bool mockedHasMarketVerification;
+    LenderManager_Override lenderManager;
 
-    constructor()
-        LenderManager(
-            //address(0),
-            new MarketRegistryMock(address(0))
-        )
-    {}
+    constructor() {}
 
     function setUp() public {
         mockTellerV2 = new LenderCommitmentTester();
 
+        mockMarketRegistry = new MarketRegistryMock();
+
+        lenderManager = new LenderManager_Override(address(mockMarketRegistry));
+
+        borrower = new LenderManagerUser(
+            address(mockTellerV2),
+            address(lenderManager)
+        );
+        lender = new LenderManagerUser(
+            address(mockTellerV2),
+            address(lenderManager)
+        );
         marketOwner = new LenderManagerUser(
             address(mockTellerV2),
-            address(this)
+            address(lenderManager)
         );
-        borrower = new LenderManagerUser(address(mockTellerV2), address(this));
-        lender = new LenderManagerUser(address(mockTellerV2), address(this));
 
-        mockMarketRegistry = new MarketRegistryMock(address(marketOwner));
-
-        delete mockedHasMarketVerification;
+        mockMarketRegistry.setMarketOwner(address(marketOwner));
     }
 
-    function test_registerLoan() public {
-        mockedHasMarketVerification = true;
+    function test_initialize() public {
+        lenderManager.initialize();
+    }
+
+    function test_getLoanMarketId() public {
+        lenderManager.initialize();
+
+        uint256 marketId = lenderManager._getLoanMarketIdSuper(1);
+
+        assertEq(
+            marketId,
+            getLoanMarketId(marketId),
+            "Market id is not correct"
+        );
+    }
+
+    function test_hasMarketVerification() public {
+        lenderManager.initialize();
+
+        bool hasMarketVerification = lenderManager._hasMarketVerificationSuper(
+            address(lender),
+            1
+        );
+
+        assertEq(
+            hasMarketVerification,
+            true,
+            "Market verification is not correct"
+        );
+    }
+
+    function test_baseURI() public {
+        lenderManager.initialize();
+
+        string memory baseURI = lenderManager._baseURISuper();
+
+        assertEq(baseURI, "", "Base URI is not correct");
+    }
+
+    function test_mint() public {
+        lenderManager.setHasMarketVerification(true);
 
         uint256 bidId = 2;
 
-        super.registerLoan(bidId, address(lender));
+        lenderManager.mint(address(lender), bidId);
 
         assertEq(
-            super._exists(bidId),
+            lenderManager.exists(bidId),
             true,
             "Loan registration did not mint nft"
         );
     }
 
-    function test_transferFrom() public {
-        mockedHasMarketVerification = true;
+    function test_mintToInvalidRecipient() public {
+        lenderManager.setHasMarketVerification(false);
 
         uint256 bidId = 2;
 
-        super._mint(address(lender), bidId);
+        bool mintFailed;
+
+        vm.expectRevert("Not approved by market");
+
+        lenderManager.mint(address(address(lender)), bidId);
+    }
+
+    function test_registerLoan() public {
+        lenderManager.initialize();
+        lenderManager.setHasMarketVerification(true);
+
+        uint256 bidId = 2;
+
+        lenderManager.registerLoan(bidId, address(lender));
+
+        assertEq(
+            lenderManager.exists(bidId),
+            true,
+            "Loan registration did not mint nft"
+        );
+    }
+
+    function test_registerLoan_invalid_owner() public {
+        lenderManager.setHasMarketVerification(true);
+
+        uint256 bidId = 2;
+
+        vm.prank(address(borrower));
+        vm.expectRevert("Ownable: caller is not the owner");
+
+        lenderManager.registerLoan(bidId, address(lender));
+    }
+
+    function test_transferFrom() public {
+        lenderManager.setHasMarketVerification(true);
+
+        uint256 bidId = 2;
+
+        lenderManager.mint(address(lender), bidId);
 
         lender.transferLoan(bidId, address(borrower));
 
         assertEq(
-            super.ownerOf(bidId),
+            lenderManager.ownerOf(bidId),
             address(borrower),
             "Loan nft was not transferred"
         );
     }
 
     function test_transferFromToInvalidRecipient() public {
-        mockedHasMarketVerification = true;
+        lenderManager.setHasMarketVerification(true);
 
         uint256 bidId = 2;
-        super._mint(address(lender), bidId);
+        lenderManager.mint(address(lender), bidId);
 
-        mockedHasMarketVerification = false;
+        lenderManager.setHasMarketVerification(false);
 
         bool transferFailed;
 
@@ -96,25 +177,16 @@ contract LenderManager_Test is Testable, LenderManager {
         assertEq(transferFailed, true, "Loan transfer should have failed");
 
         assertEq(
-            super.ownerOf(bidId),
+            lenderManager.ownerOf(bidId),
             address(lender),
             "Loan nft is no longer owned by lender"
         );
     }
 
-    //override
-    function _hasMarketVerification(address _lender, uint256 _bidId)
-        internal
-        view
-        override
-        returns (bool)
-    {
-        return mockedHasMarketVerification;
-    }
+    // Overrides
 
-    //should be able to test the negative case-- use foundry
-    function _checkOwner() internal view override {
-        // do nothing
+    function getLoanMarketId(uint256 bidId) public view returns (uint256) {
+        return 42;
     }
 }
 
@@ -133,12 +205,6 @@ contract LenderManagerUser is User {
 //Move to a helper  or change it
 contract LenderCommitmentTester is TellerV2Context {
     constructor() TellerV2Context(address(0)) {}
-
-    function __setMarketOwner(User _marketOwner) external {
-        marketRegistry = IMarketRegistry(
-            address(new MarketRegistryMock(address(_marketOwner)))
-        );
-    }
 
     function getSenderForMarket(uint256 _marketId)
         external

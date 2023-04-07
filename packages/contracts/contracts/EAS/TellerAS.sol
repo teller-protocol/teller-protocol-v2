@@ -200,6 +200,7 @@ contract TellerAS is IEAS {
     function isAttestationActive(bytes32 uuid)
         public
         view
+        virtual
         override
         returns (bool)
     {

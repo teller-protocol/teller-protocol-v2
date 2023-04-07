@@ -10,14 +10,13 @@ import { Testable } from "./Testable.sol";
 import { TellerV2Context } from "../contracts/TellerV2Context.sol";
 import { IMarketRegistry } from "../contracts/interfaces/IMarketRegistry.sol";
 import { TellerV2MarketForwarder } from "../contracts/TellerV2MarketForwarder.sol";
-import { MarketForwarder_Override } from "./MarketForwarder_Override.sol";
 
 import { User } from "./Test_Helpers.sol";
 
 import "../contracts/mock/MarketRegistryMock.sol";
 
-contract MarketForwarder_Test is Testable {
-    MarketForwarderTellerV2Mock private tellerV2Mock;
+contract MarketForwarder_Test is Testable, TellerV2MarketForwarder {
+    MarketForwarderTester private tellerV2Mock;
 
     MarketRegistryMock mockMarketRegistry;
 
@@ -25,48 +24,37 @@ contract MarketForwarder_Test is Testable {
     MarketForwarderUser private marketOwner;
     MarketForwarderUser private user1;
     MarketForwarderUser private user2;
-    MarketForwarder_Override marketForwarder;
 
-    constructor() {}
+    constructor()
+        TellerV2MarketForwarder(
+            address(new MarketForwarderTester()),
+            address(new MarketRegistryMock())
+        )
+    {}
 
     function setUp() public {
-        tellerV2Mock = new MarketForwarderTellerV2Mock();
+        mockMarketRegistry = MarketRegistryMock(address(getMarketRegistry()));
+        tellerV2Mock = MarketForwarderTester(address(getTellerV2()));
 
         marketOwner = new MarketForwarderUser(address(tellerV2Mock));
-
         user1 = new MarketForwarderUser(address(tellerV2Mock));
         user2 = new MarketForwarderUser(address(tellerV2Mock));
 
-        mockMarketRegistry = new MarketRegistryMock();
-
-        //  tellerV2Mock.__setMarketOwner(marketOwner);
-
-        tellerV2Mock.setMarketRegistry(address(mockMarketRegistry));
+        tellerV2Mock.__setMarketRegistry(address(mockMarketRegistry));
 
         mockMarketRegistry.setMarketOwner(address(marketOwner));
 
         delete marketId;
-
-        marketForwarder = new MarketForwarder_Override(
-            address(tellerV2Mock),
-            address(mockMarketRegistry)
-        );
     }
 
     function setTrustedMarketForwarder_before() public {
-        marketOwner.setTrustedMarketForwarder(
-            marketId,
-            address(marketForwarder)
-        );
+        marketOwner.setTrustedMarketForwarder(marketId, address(this));
     }
 
     function test_setTrustedMarketForwarder() public {
         setTrustedMarketForwarder_before();
         assertEq(
-            tellerV2Mock.isTrustedMarketForwarder(
-                marketId,
-                address(marketForwarder)
-            ),
+            tellerV2Mock.isTrustedMarketForwarder(marketId, address(this)),
             true,
             "Trusted forwarder was not set"
         );
@@ -75,8 +63,8 @@ contract MarketForwarder_Test is Testable {
     function approveMarketForwarder_before() public {
         setTrustedMarketForwarder_before();
 
-        user1.approveMarketForwarder(marketId, address(marketForwarder));
-        user2.approveMarketForwarder(marketId, address(marketForwarder));
+        user1.approveMarketForwarder(marketId, address(this));
+        user2.approveMarketForwarder(marketId, address(this));
     }
 
     function test_approveMarketForwarder() public {
@@ -84,7 +72,7 @@ contract MarketForwarder_Test is Testable {
         assertEq(
             tellerV2Mock.hasApprovedMarketForwarder(
                 marketId,
-                address(marketForwarder),
+                address(this),
                 address(user1)
             ),
             true,
@@ -94,7 +82,7 @@ contract MarketForwarder_Test is Testable {
         assertEq(
             tellerV2Mock.hasApprovedMarketForwarder(
                 marketId,
-                address(marketForwarder),
+                address(this),
                 address(user2)
             ),
             true,
@@ -111,9 +99,9 @@ contract MarketForwarder_Test is Testable {
 
         address expectedSender = address(user1);
         address sender = abi.decode(
-            marketForwarder.forwardCall(
+            _forwardCall(
                 abi.encodeWithSelector(
-                    MarketForwarderTellerV2Mock.getSenderForMarket.selector,
+                    MarketForwarderTester.getSenderForMarket.selector,
                     marketId
                 ),
                 expectedSender
@@ -127,11 +115,11 @@ contract MarketForwarder_Test is Testable {
         );
 
         bytes memory expectedData = abi.encodeWithSelector(
-            MarketForwarderTellerV2Mock.getDataForMarket.selector,
+            MarketForwarderTester.getDataForMarket.selector,
             marketId
         );
         bytes memory data = abi.decode(
-            marketForwarder.forwardCall(expectedData, expectedSender),
+            _forwardCall(expectedData, expectedSender),
             (bytes)
         );
         assertEq0(
@@ -142,14 +130,17 @@ contract MarketForwarder_Test is Testable {
     }
 }
 
+//This should use the user helper !!
 contract MarketForwarderUser is User {
     constructor(address _tellerV2) User(_tellerV2) {}
 }
 
-contract MarketForwarderTellerV2Mock is TellerV2Context {
+//Move to a helper
+//this is a tellerV2 mock
+contract MarketForwarderTester is TellerV2Context {
     constructor() TellerV2Context(address(0)) {}
 
-    function setMarketRegistry(address _marketRegistry) external {
+    function __setMarketRegistry(address _marketRegistry) external {
         marketRegistry = IMarketRegistry(_marketRegistry);
     }
 

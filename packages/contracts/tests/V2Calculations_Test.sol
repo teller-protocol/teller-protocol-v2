@@ -250,10 +250,6 @@ contract V2Calculations_Test is Testable {
                 PaymentCycleType.Seconds
             );
 
-        console.log("calc amt owed test ");
-        console.log(_owedPrincipal);
-        console.log(_duePrincipal);
-
         assertEq(
             _owedPrincipal,
             1076484033293177614,

@@ -245,7 +245,7 @@ contract TellerV2 is
             keccak256(abi.encodePacked(metadataURI_)) ==
             0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470 // hardcoded constant of keccak256('')
         ) {
-            // Return depreciated bytes32 uri as a string
+            // Return deprecated bytes32 uri as a string
             uint256 convertedURI = uint256(bids[_bidId]._metadataURI);
             metadataURI_ = StringsUpgradeable.toHexString(convertedURI, 32);
         }
@@ -339,13 +339,16 @@ contract TellerV2 is
         uint16 _APR,
         string calldata _metadataURI,
         address _receiver
-    ) internal returns (uint256 bidId_) {
+    ) internal virtual returns (uint256 bidId_) {
         address sender = _msgSenderForMarket(_marketplaceId);
+
         (bool isVerified, ) = marketRegistry.isVerifiedBorrower(
             _marketplaceId,
             sender
         );
+
         require(isVerified, "Not verified borrower");
+
         require(
             !marketRegistry.isMarketClosed(_marketplaceId),
             "Market is closed"
@@ -450,6 +453,7 @@ contract TellerV2 is
      */
     function _cancelBid(uint256 _bidId)
         internal
+        virtual
         pendingBid(_bidId, "cancelBid")
     {
         // Set the bid state to CANCELLED
@@ -710,7 +714,7 @@ contract TellerV2 is
         Payment memory _payment,
         uint256 _owedAmount,
         bool _shouldWithdrawCollateral
-    ) internal {
+    ) internal virtual {
         Bid storage bid = bids[_bidId];
         uint256 paymentAmount = _payment.principal + _payment.interest;
 

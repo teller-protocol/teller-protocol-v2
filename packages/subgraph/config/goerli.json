@@ -6,7 +6,7 @@
     "block": "8751571"
   },
   "block_handler": {
-    "enabled": false,
+    "enabled": true,
     "block": "8751571"
   },
   "contracts": {

@@ -29,7 +29,7 @@
     "git:future": "./scripts/git/future.sh",
     "git:portal": "./scripts/git/portal.sh",
     "publish": "yarn npm publish",
-    "clean": "./scripts/clean.sh",
+    "clean": "yarn hh clean && ./scripts/clean.sh",
     "prepack": "./scripts/prepack.sh",
     "docs:build": "forge doc --out docs/",
     "docs:serve": "forge doc --serve --port 3000"

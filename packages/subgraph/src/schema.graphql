@@ -344,7 +344,6 @@ type Commitment @entity {
 }
 
 
-
  
 
 type RewardAllocation @entity {

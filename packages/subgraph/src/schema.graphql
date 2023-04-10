@@ -350,10 +350,12 @@ type RewardAllocation @entity {
   id: ID!
   createdAt: BigInt!
 
-  allocator: Bytes!
+  allocator: User!
   marketplaceId: BigInt!
 
+  rewardToken: Token!
   rewardTokenAddress: Bytes!
+  rewardTokenAmountInitial: BigInt!
   rewardTokenAmountRemaining: BigInt!
 
   requiredPrincipalTokenAddress: Bytes
@@ -374,13 +376,10 @@ type ClaimableReward @entity {
   id: ID!
   createdAt: BigInt!
 
-  claimant: Bytes!
+  claimant: User!
 
   allocation: RewardAllocation!
 
   hasBeenClaimed: Boolean!
-
-
-
 
 }

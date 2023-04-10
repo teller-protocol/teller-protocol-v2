@@ -38,8 +38,8 @@ export function handleCreatedAllocations(events: CreatedAllocation[]): void {
   });
 }
 
-export function handleUpdatedCommitment(event: UpdatedCommitment): void {
-  const commitmentId = event.params.commitmentId.toString();
+export function handleUpdatedAllocation(event: UpdatedAllocation): void {
+  const commitmentId = event.params.allocationId.toString();
   updateLenderCommitment(
     commitmentId,
     event.params.lender,
@@ -51,13 +51,13 @@ export function handleUpdatedCommitment(event: UpdatedCommitment): void {
   );
 }
 
-export function handleUpdatedCommitments(events: UpdatedCommitment[]): void {
+export function handleUpdatedAllocations(events: UpdatedAllocation[]): void {
   events.forEach(event => {
     handleUpdatedCommitment(event);
   });
 }
 
-export function handleDeletedCommitment(event: DeletedCommitment): void {
+export function handleDeletedAllocation(event: DeletedAllocation): void {
   const commitmentId = event.params.commitmentId.toString();
   const commitment = loadCommitment(commitmentId);
 
@@ -70,15 +70,19 @@ export function handleDeletedCommitment(event: DeletedCommitment): void {
   commitment.save();
 }
 
-export function handleDeletedCommitments(events: DeletedCommitment[]): void {
+export function handleDeletedAllocations(events: DeletedAllocation[]): void {
   events.forEach(event => {
     handleDeletedCommitment(event);
   });
 }
 
-export function handleExercisedCommitment(event: ExercisedCommitment): void {
-  const commitmentId = event.params.commitmentId.toString();
-  const commitment = loadCommitment(commitmentId);
+
+
+
+
+export function handleClaimedReward(event: ClaimedRewards): void {
+  const allocationId = event.params.allocationId.toString();
+  const allocation = loadRewardAllocation(allocationId);
 
   if (event.params.tokenAmount.equals(commitment.committedAmount)) {
     updateCommitmentStatus(commitment, CommitmentStatus.Drained);
@@ -93,14 +97,17 @@ export function handleExercisedCommitment(event: ExercisedCommitment): void {
   commitment.save();
 }
 
-export function handleExercisedCommitments(
-  events: ExercisedCommitment[]
+ 
+
+export function handleClaimedRewards(
+  events: ClaimedRewards[]
 ): void {
   events.forEach(event => {
-    handleExercisedCommitment(event);
+    handleClaimedReward(event);
   });
 }
 
+/*
 export function handeUpdatedCommitmentBorrower(
   event: UpdatedCommitmentBorrowers
 ): void {
@@ -125,3 +132,4 @@ export function handeUpdatedCommitmentBorrowers(
     handeUpdatedCommitmentBorrower(event);
   });
 }
+*/

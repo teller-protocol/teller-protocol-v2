@@ -269,7 +269,7 @@ dataSources:
         - event: DeletedAllocation(uint256)
           handler: handleDeletedAllocation
         - event: ClaimedRewards(uint256,uint256,address,uint256)
-          handler: handleClaimedRewards
+          handler: handleClaimedReward
       file: ./src/liquidity-rewards/mapping.ts
 {{/if}}
 {{#if contracts.lender_manager.enabled}}

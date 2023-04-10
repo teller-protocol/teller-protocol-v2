@@ -258,16 +258,18 @@ dataSources:
         - name: IERC20Metadata
           file: ../../packages/contracts/generated/artifacts/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol/IERC20Metadata.json
       eventHandlers:
-        - event: CollateralEscrowDeployed(uint256,address)
-          handler: handleCollateralEscrowDeployed
-        - event: CollateralCommitted(uint256,uint8,address,uint256,uint256)
-          handler: handleCollateralCommitted
-        - event: CollateralDeposited(uint256,uint8,address,uint256,uint256)
-          handler: handleCollateralDeposited
-        - event:  CollateralWithdrawn(uint256,uint8,address,uint256,uint256,address)
-          handler: handleCollateralWithdrawn
-        - event: CollateralClaimed(uint256)
-          handler: handleCollateralClaimed
+        - event: CreatedAllocation(uint256,address,uint256)
+          handler: handleCreatedAllocation
+        - event: IncreasedAllocation(uint256,uint256)
+          handler: handleIncreasedAllocation
+        - event: DecreasedAllocation(uint256,uint256)
+          handler: handleDecreasedAllocation
+        - event: UpdatedAllocation(uint256)
+          handler: handleUpdatedAllocation
+        - event: DeletedAllocation(uint256)
+          handler: handleDeletedAllocation
+        - event: ClaimedRewards(uint256,uint256,address,uint256)
+          handler: handleClaimedRewards
       file: ./src/liquidity-rewards/mapping.ts
 {{/if}}
 {{#if contracts.lender_manager.enabled}}

@@ -342,3 +342,46 @@ type Commitment @entity {
   # TokenStats
   tokenVolume: TokenVolume!
 }
+
+
+
+ 
+
+type RewardAllocation @entity {
+  id: ID!
+  createdAt: BigInt!
+
+  allocator: Bytes!
+  marketplaceId: BigInt!
+
+  rewardTokenAddress: Bytes!
+  rewardTokenAmountRemaining: BigInt!
+
+  requiredPrincipalTokenAddress: Bytes
+  requiredCollateralTokenAddress: Bytes
+
+  minimumCollateralPerPrincipalAmount: BigInt
+  rewardPerLoanPrincipalAmount: BigInt 
+
+  bidStartTimeMin: BigInt 
+  bidStartTimeMax: BigInt 
+
+  allocationStrategy: String 
+
+
+}
+
+type ClaimableReward @entity {
+  id: ID!
+  createdAt: BigInt!
+
+  claimant: Bytes!
+
+  allocation: RewardAllocation!
+
+  hasBeenClaimed: Boolean!
+
+
+
+
+}

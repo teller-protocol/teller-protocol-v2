@@ -12,17 +12,16 @@ import { Bid } from "../../generated/schema";
 import { loadBidById } from "../helpers/loaders";
 
 import { loadRewardAllocation } from "./loaders";
-import { /*updateRewardAllocationStatus, */ updateRewardAllocation } from "./updaters";
+import { /*updateRewardAllocationStatus, */ createRewardAllocation, updateAllocationStatus, updateRewardAllocation } from "./updaters";
+import { AllocationStatus } from "./utils";
 //import { RewardAllocationStatus } from "./utils";
 
 export function handleCreatedAllocation(event: CreatedAllocation): void {
   const allocationId = event.params.allocationId.toString();
-  const allocation = updateRewardAllocation(
+  const allocation = createRewardAllocation(
     allocationId,
- //   event.params.allocator,
- //   event.params.marketId.toString(),
- //   event.params.lendingToken,
- //   event.params.tokenAmount,
+    event.params.allocator,
+    event.params.marketId.toString(),
     event.address,
     event.block
   );
@@ -41,8 +40,7 @@ export function handleCreatedAllocations(events: CreatedAllocation[]): void {
 export function handleUpdatedAllocation(event: UpdatedAllocation): void {
   const allocationId = event.params.allocationId.toString();
   updateRewardAllocation(
-    allocationId,
-    
+    allocationId,    
     event.address,
     event.block
   );
@@ -54,17 +52,50 @@ export function handleUpdatedAllocations(events: UpdatedAllocation[]): void {
   });
 }
 
+export function handleIncreasedAllocation(event: UpdatedAllocation): void {
+  const allocationId = event.params.allocationId.toString();
+  updateRewardAllocation(
+    allocationId,    
+    event.address,
+    event.block
+  );
+}
+
+export function handleIncreasedAllocations(events: UpdatedAllocation[]): void {
+  events.forEach(event => {
+    handleIncreasedAllocation(event);
+  });
+}
+
+
+export function handleDecreasedAllocation(event: UpdatedAllocation): void {
+  const allocationId = event.params.allocationId.toString();
+  updateRewardAllocation(
+    allocationId,    
+    event.address,
+    event.block
+  );
+}
+
+export function handleDecreasedAllocations(events: UpdatedAllocation[]): void {
+  events.forEach(event => {
+    handleDecreasedAllocation(event);
+  });
+}
+
 export function handleDeletedAllocation(event: DeletedAllocation): void {
   const allocationId = event.params.allocationId.toString();
-  const commitment = loadRewardAllocation(allocationId);
+  const allocation = loadRewardAllocation(allocationId);
 
-  updateCommitmentStatus(commitment, CommitmentStatus.Deleted);
+  updateAllocationStatus(allocation, AllocationStatus.Deleted);
 
-  commitment.expirationTimestamp = BigInt.zero();
-  commitment.maxDuration = BigInt.zero();
-  commitment.minAPY = BigInt.zero();
-  commitment.maxPrincipalPerCollateralAmount = BigInt.zero();
-  commitment.save();
+  allocation.rewardTokenAmountRemaining = BigInt.zero();
+
+  /*allocation.expirationTimestamp = BigInt.zero();
+  allocation.maxDuration = BigInt.zero();
+  allocation.minAPY = BigInt.zero();
+  allocation.maxPrincipalPerCollateralAmount = BigInt.zero();*/
+  allocation.save();
 }
 
 export function handleDeletedAllocations(events: DeletedAllocation[]): void {
@@ -81,16 +112,16 @@ export function handleClaimedReward(event: ClaimedRewards): void {
   const allocationId = event.params.allocationId.toString();
   const allocation = loadRewardAllocation(allocationId);
 
-  if (event.params.tokenAmount.equals(allocation.committedAmount)) {
+ /* if (event.params.tokenAmount.equals(allocation.rewardTokenAmountRemaining)) {
     updateCommitmentStatus(commitment, CommitmentStatus.Drained);
-  }
+  }*/
 
   // Link commitment to bid
-  const bid: Bid = loadBidById(event.params.bidId);
-  bid.commitment = commitment.id;
-  bid.commitmentId = commitment.id;
+  /*const bid: Bid = loadBidById(event.params.bidId);
+  bid.commitment = allocation.id;
+  bid.commitmentId = allocation.id;
 
-  bid.save();
+  bid.save();*/
   allocation.save();
 }
 

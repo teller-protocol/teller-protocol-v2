@@ -2,12 +2,11 @@ import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 
 import { MarketLiquidityRewards } from "../../generated/MarketLiquidityRewards/MarketLiquidityRewards";
 import { RewardAllocation, Token, TokenVolume } from "../../generated/schema";
-import {
- 
-} from "../helpers/loaders";
+import { loadToken } from "../helpers/loaders";
 import { addToArray, removeFromArray } from "../helpers/utils";
 
 import { loadRewardAllocation } from "./loaders";
+import { AllocationStatus, allocationStatusToString } from "./utils";
 //import { CommitmentStatus, commitmentStatusToString } from "./utils";
 
 enum CollateralTokenType {
@@ -19,54 +18,54 @@ enum CollateralTokenType {
   ERC1155_ANY_ID
 }
 
-/*
-export function updateRewardAllocationStatus(
-  commitment: RewardAllocation,
-  status: RewardAllocationStatus
+
+export function updateAllocationStatus(
+  allocation: RewardAllocation,
+  status: AllocationStatus
 ): void {
-  commitment.status = commitmentStatusToString(status);
+  allocation.status = allocationStatusToString(status);
 
   switch (status) {
-    case CommitmentStatus.Active:
-      addCommitmentToProtocol(commitment);
+    case AllocationStatus.Active:
+   //   addCommitmentToProtocol(commitment);
       break;
-    case CommitmentStatus.Deleted:
-    case CommitmentStatus.Drained:
-    case CommitmentStatus.Expired:
-      updateAvailableTokensFromCommitment(
+    case AllocationStatus.Deleted:
+    case AllocationStatus.Drained:
+    case AllocationStatus.Expired:
+   /*   updateAvailableTokensFromCommitment(
         commitment,
         commitment.committedAmount.neg()
       );
-      removeCommitmentToProtocol(commitment);
+      removeCommitmentToProtocol(commitment);*/
 
       break;
   }
 
-  commitment.save();
+  allocation.save();
 }
-*/
+
+
+
+
+
 
 /**
- * @param {string} commitmentId - ID of the commitment
- * @param {Address} lenderAddress - Address of the lender
- * @param {string} marketId - Market id
- * @param {Address} lendingTokenAddress - Address of the token being lent
- * @param {BigInt} committedAmount - The maximum that can be loaned
+ * @param {string} allocationId - ID of the commitment
+ * @param {Address} allocatorAddress - Address of the allocator
+ * @param {string} marketplaceId - ID of the marketplace
  * @param {Address} eventAddress - Address of the emitted event
  * @param {ethereum.Block} eventBlock - Block of the emitted event
  */
-export function updateRewardAllocation(
+
+export function createRewardAllocation(
   allocationId: string,
-//  lenderAddress: Address,
-//  marketId: string,
-//  lendingTokenAddress: Address,
-//  committedAmount: BigInt,
+  allocatorAddress: Address,
+  marketplaceId: string,  
   eventAddress: Address,
-  eventBlock: ethereum.Block
+  eventBlock: ethereum.Block  
 ): RewardAllocation {
+
   const allocation = loadRewardAllocation(allocationId);
-
-
 
   const marketLiquidityRewardsInstance = MarketLiquidityRewards.bind(
     eventAddress
@@ -75,8 +74,86 @@ export function updateRewardAllocation(
     BigInt.fromString(allocationId)
   );
 
-  
+  allocation.allocatorAddress = allocatedReward.value0;
+  allocation.rewardTokenAddress = allocatedReward.value1;
+  allocation.rewardTokenAmountInitial = allocatedReward.value2;
+  allocation.rewardTokenAmountRemaining = allocatedReward.value2;
+  allocation.marketplaceId = allocatedReward.value3;
+  allocation.requiredPrincipalTokenAddress = allocatedReward.value4;
+  allocation.requiredCollateralTokenAddress = allocatedReward.value5;
+  allocation.minimumCollateralPerPrincipalAmount = allocatedReward.value6;
+  allocation.rewardPerLoanPrincipalAmount = allocatedReward.value7;
+  allocation.bidStartTimeMin = allocatedReward.value8;
+  allocation.bidStartTimeMax = allocatedReward.value9;
 
+  allocation.save()
+
+ 
+  updateAllocationStatus(allocation, AllocationStatus.Active);
+
+  return allocation;
+}
+
+
+
+/**
+ * @param {string} allocationId - ID of the commitment
+ * @param {Address} eventAddress - Address of the emitted event
+ * @param {ethereum.Block} eventBlock - Block of the emitted event
+ */
+export function updateRewardAllocation(
+  allocationId: string,
+  eventAddress: Address,
+  eventBlock: ethereum.Block
+): RewardAllocation {
+  const allocation = loadRewardAllocation(allocationId);
+
+
+  /*  struct RewardAllocation {
+        address allocator;
+        address rewardTokenAddress;
+        uint256 rewardTokenAmount;
+        uint256 marketId;
+        //requirements for loan
+        address requiredPrincipalTokenAddress; //0 for any
+        address requiredCollateralTokenAddress; //0 for any  -- could be an enumerable set?
+        uint256 minimumCollateralPerPrincipalAmount;
+        uint256 rewardPerLoanPrincipalAmount;
+        uint32 bidStartTimeMin;
+        uint32 bidStartTimeMax;
+        AllocationStrategy allocationStrategy;
+    }
+
+    */
+
+  const marketLiquidityRewardsInstance = MarketLiquidityRewards.bind(
+    eventAddress
+  );
+  const allocatedReward = marketLiquidityRewardsInstance.allocatedRewards(
+    BigInt.fromString(allocationId)
+  );
+
+  allocation.allocatorAddress = allocatedReward.value0;
+  allocation.rewardTokenAddress = allocatedReward.value1;
+ // allocation.rewardTokenAmountInitial = allocatedReward.value2;
+  allocation.rewardTokenAmountRemaining = allocatedReward.value2;
+  allocation.marketplaceId = allocatedReward.value3;
+  allocation.requiredPrincipalTokenAddress = allocatedReward.value4;
+  allocation.requiredCollateralTokenAddress = allocatedReward.value5;
+  allocation.minimumCollateralPerPrincipalAmount = allocatedReward.value6;
+  allocation.rewardPerLoanPrincipalAmount = allocatedReward.value7;
+  allocation.bidStartTimeMin = allocatedReward.value8;
+  allocation.bidStartTimeMax = allocatedReward.value9;
+  //allocation.allocationStrategy = allocatedReward.value10;
+
+
+  allocation.rewardToken = loadToken(allocatedReward.value1).id;
+
+  allocation.save();
+    
+
+ 
+  updateAllocationStatus(allocation, AllocationStatus.Active);
 
 /*
   const lender = loadLenderByMarketId(lenderAddress, marketId);

@@ -351,6 +351,8 @@ type RewardAllocation @entity {
   createdAt: BigInt!
   updatedAt: BigInt!
 
+  status: String!
+
   allocator: User!
   allocatorAddress: Bytes!
 
@@ -376,6 +378,7 @@ type RewardAllocation @entity {
   bidStartTimeMax: BigInt 
 
   allocationStrategy: String 
+ 
 
 
 }

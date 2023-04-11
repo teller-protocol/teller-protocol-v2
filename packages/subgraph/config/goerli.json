@@ -11,7 +11,7 @@
   },
   "contracts": {
     "teller_v2": {
-      "enabled": false,
+      "enabled": true,
       "address": "0x195c6608705546725DF0629dd60690Cf2b367734",
       "block": "8538452"
     },
@@ -21,7 +21,7 @@
       "block": "8538442"
     },
     "lender_commitment": {
-      "enabled": false,
+      "enabled": true,
       "address": "0xB1b668592A4FCA5d0Cd91D4E5D8b33cb95043E43",
       "block": "8538455"
     },
@@ -31,7 +31,7 @@
       "block": "8538491"
     },
     "lender_manager": {
-      "enabled": false,
+      "enabled": true,
       "address": "0x98Ca52786e967d1469090AdC075416948Ca004A7",
       "block": "8538444"
     },

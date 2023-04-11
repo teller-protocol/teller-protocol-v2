@@ -17,7 +17,7 @@ import {
   TransactionRequest,
 } from '@ethersproject/providers'
 import { HardhatEthersHelpers } from '@nomiclabs/hardhat-ethers/types'
-import * as tdly from '@tenderly/hardhat-tenderly'
+import * as tdly from '@teller-protocol/hardhat-tenderly'
 import chalk from 'chalk'
 import { config } from 'dotenv'
 import { ethers, Signer, utils } from 'ethers'

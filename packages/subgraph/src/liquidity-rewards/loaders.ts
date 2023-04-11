@@ -1,6 +1,6 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 
-import { RewardAllocation } from "../../generated/schema";
+import { ClaimableReward, RewardAllocation } from "../../generated/schema";
  
 
 /**
@@ -15,29 +15,61 @@ export function loadRewardAllocation(allocationId: string): RewardAllocation {
     allocation = new RewardAllocation(idString);
     allocation.createdAt = BigInt.zero();
     allocation.updatedAt = BigInt.zero();
-    allocation.status = "";
+    //allocation.status = "";
 
-    allocation.committedAmount = BigInt.zero();
-    allocation.expirationTimestamp = BigInt.zero();
-    allocation.maxDuration = BigInt.zero();
-    allocation.minAPY = BigInt.zero();
-    allocation.lender = "";
-    allocation.lenderAddress = Address.zero();
-    allocation.marketplace = "";
-    allocation.marketplaceId = BigInt.zero();
+    allocation.rewardToken = "";
+    allocation.rewardTokenAddress = Address.zero();
+    allocation.rewardTokenAmountInitial = BigInt.zero();
+    allocation.rewardTokenAmountRemaining = BigInt.zero();
+
+    allocation.allocator="";
+    allocation.allocatorAddress = Address.zero();
+
     allocation.tokenVolume = "";
 
-    allocation.principalToken = "";
-    allocation.principalTokenAddress = Address.zero();
+    allocation.marketplace = "";
+    allocation.marketplaceId = BigInt.zero();
 
-    allocation.collateralToken = "";
-    allocation.maxPrincipalPerCollateralAmount = BigInt.zero();
-    allocation.commitmentBorrowers = [];
+    allocation.requiredPrincipalTokenAddress = Address.zero();
+    allocation.requiredCollateralTokenAddress = Address.zero();
 
+    allocation.minimumCollateralPerPrincipalAmount = BigInt.zero();
+    allocation.rewardPerLoanPrincipalAmount = BigInt.zero();
+
+    allocation.bidStartTimeMin = BigInt.zero();
+    allocation.bidStartTimeMax = BigInt.zero(); 
+    allocation.allocationStrategy = "";
+   
     allocation.save();
   }
   return allocation;
 }
 
 
-//export function loadClaimableReward() 
+export function loadClaimableReward(claimableRewardId: string) : ClaimableReward {
+  const idString = claimableRewardId;
+  let claimableReward = ClaimableReward.load(idString);
+
+  if(!claimableReward){
+    claimableReward = new ClaimableReward(idString);
+
+    claimableReward.createdAt = BigInt.zero();
+    claimableReward.updatedAt = BigInt.zero();
+
+    claimableReward.claimant = "";
+    claimableReward.claimantAddress = Address.zero();
+
+    claimableReward.marketplace = "";
+    claimableReward.marketplaceId = BigInt.zero();
+
+    claimableReward.rewardToken = "";
+    claimableReward.rewardTokenAddress = Address.zero();
+    claimableReward.rewardTokenAmount = BigInt.zero();
+
+    claimableReward.hasBeenClaimed = false;
+
+    claimableReward.save();
+  }
+
+  return claimableReward;
+} 

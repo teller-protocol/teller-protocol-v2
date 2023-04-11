@@ -349,9 +349,17 @@ type Commitment @entity {
 type RewardAllocation @entity {
   id: ID!
   createdAt: BigInt!
+  updatedAt: BigInt!
 
   allocator: User!
+  allocatorAddress: Bytes!
+
+  # Market
+  marketplace: MarketPlace!
   marketplaceId: BigInt!
+
+  # TokenStats
+  tokenVolume: TokenVolume!
 
   rewardToken: Token!
   rewardTokenAddress: Bytes!
@@ -375,10 +383,21 @@ type RewardAllocation @entity {
 type ClaimableReward @entity {
   id: ID!
   createdAt: BigInt!
+  updatedAt: BigInt!
 
   claimant: User!
+  claimantAddress: Bytes!
 
   allocation: RewardAllocation!
+
+  # Market
+  marketplace: MarketPlace!
+  marketplaceId: BigInt!
+
+  # Reward 
+  rewardToken: Token!
+  rewardTokenAddress: Bytes!
+  rewardTokenAmount: BigInt!
 
   hasBeenClaimed: Boolean!
 

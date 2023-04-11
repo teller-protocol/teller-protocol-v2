@@ -56,15 +56,28 @@ export function updateRewardAllocationStatus(
  * @param {ethereum.Block} eventBlock - Block of the emitted event
  */
 export function updateRewardAllocation(
-  commitmentId: string,
-  lenderAddress: Address,
-  marketId: string,
-  lendingTokenAddress: Address,
-  committedAmount: BigInt,
+  allocationId: string,
+//  lenderAddress: Address,
+//  marketId: string,
+//  lendingTokenAddress: Address,
+//  committedAmount: BigInt,
   eventAddress: Address,
   eventBlock: ethereum.Block
 ): RewardAllocation {
-  const commitment = loadRewardAllocation(commitmentId);
+  const allocation = loadRewardAllocation(allocationId);
+
+
+
+  const marketLiquidityRewardsInstance = MarketLiquidityRewards.bind(
+    eventAddress
+  );
+  const allocatedReward = marketLiquidityRewardsInstance.allocatedRewards(
+    BigInt.fromString(allocationId)
+  );
+
+  
+
+
 /*
   const lender = loadLenderByMarketId(lenderAddress, marketId);
 
@@ -124,7 +137,7 @@ export function updateRewardAllocation(
   const committedAmountDiff = committedAmount.minus(commitment.committedAmount);
   updateAvailableTokensFromCommitment(commitment, committedAmountDiff);
   */
-  return commitment;
+  return allocation;
 }
 /* 
 function addCommitmentToProtocol(commitment: Commitment): void {

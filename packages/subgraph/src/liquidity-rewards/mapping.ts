@@ -19,10 +19,10 @@ export function handleCreatedAllocation(event: CreatedAllocation): void {
   const allocationId = event.params.allocationId.toString();
   const allocation = updateRewardAllocation(
     allocationId,
-    event.params.lender,
-    event.params.marketId.toString(),
-    event.params.lendingToken,
-    event.params.tokenAmount,
+ //   event.params.allocator,
+ //   event.params.marketId.toString(),
+ //   event.params.lendingToken,
+ //   event.params.tokenAmount,
     event.address,
     event.block
   );
@@ -42,10 +42,7 @@ export function handleUpdatedAllocation(event: UpdatedAllocation): void {
   const allocationId = event.params.allocationId.toString();
   updateRewardAllocation(
     allocationId,
-    event.params.lender,
-    event.params.marketId.toString(),
-    event.params.lendingToken,
-    event.params.tokenAmount,
+    
     event.address,
     event.block
   );

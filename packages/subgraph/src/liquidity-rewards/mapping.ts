@@ -12,9 +12,9 @@ import { Bid } from "../../generated/schema";
 import { loadBidById } from "../helpers/loaders";
 
 import { loadRewardAllocation } from "./loaders";
-import { /*updateRewardAllocationStatus, */ createRewardAllocation, updateAllocationStatus, updateRewardAllocation } from "./updaters";
+import {  createRewardAllocation, updateAllocationStatus, updateRewardAllocation } from "./updaters";
 import { AllocationStatus } from "./utils";
-//import { RewardAllocationStatus } from "./utils";
+ 
 
 export function handleCreatedAllocation(event: CreatedAllocation): void {
   const allocationId = event.params.allocationId.toString();
@@ -111,6 +111,28 @@ export function handleDeletedAllocations(events: DeletedAllocation[]): void {
 export function handleClaimedReward(event: ClaimedRewards): void {
   const allocationId = event.params.allocationId.toString();
   const allocation = loadRewardAllocation(allocationId);
+
+  //update the reward allocation as the amount remaining most likely changed 
+  updateRewardAllocation(
+    allocationId,    
+    event.address,
+    event.block
+  );
+
+  const bid: Bid = loadBidById(event.params.bidId);
+  
+  const rewardRecipient = event.params.recipient;
+  const amountRewarded = event.params.amount;
+
+  /*
+  const claimedReward = createClaimedReward(
+    allocationId,
+    event.params.bidId,
+    event.params.recipient,
+    event.params.amount,
+    event.address,
+    event.block
+  );*/
 
  /* if (event.params.tokenAmount.equals(allocation.rewardTokenAmountRemaining)) {
     updateCommitmentStatus(commitment, CommitmentStatus.Drained);

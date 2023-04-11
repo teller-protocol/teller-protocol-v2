@@ -384,6 +384,8 @@ type RewardAllocation @entity {
 }
 
 type ClaimableReward @entity {
+  #does this even make sense ?
+
   id: ID!
   createdAt: BigInt!
   updatedAt: BigInt!

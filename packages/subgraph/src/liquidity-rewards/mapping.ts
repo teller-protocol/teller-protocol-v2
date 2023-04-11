@@ -17,8 +17,8 @@ import { /*updateRewardAllocationStatus, */ updateRewardAllocation } from "./upd
 
 export function handleCreatedAllocation(event: CreatedAllocation): void {
   const allocationId = event.params.allocationId.toString();
-  const allocation = updateRewardsAllocation(
-    commitmentId,
+  const allocation = updateRewardAllocation(
+    allocationId,
     event.params.lender,
     event.params.marketId.toString(),
     event.params.lendingToken,
@@ -27,9 +27,9 @@ export function handleCreatedAllocation(event: CreatedAllocation): void {
     event.block
   );
 
-  commitment.createdAt = event.block.timestamp;
+  allocation.createdAt = event.block.timestamp;
 
-  commitment.save();
+  allocation.save();
 }
 
 export function handleCreatedAllocations(events: CreatedAllocation[]): void {
@@ -39,9 +39,9 @@ export function handleCreatedAllocations(events: CreatedAllocation[]): void {
 }
 
 export function handleUpdatedAllocation(event: UpdatedAllocation): void {
-  const commitmentId = event.params.allocationId.toString();
-  updateLenderCommitment(
-    commitmentId,
+  const allocationId = event.params.allocationId.toString();
+  updateRewardAllocation(
+    allocationId,
     event.params.lender,
     event.params.marketId.toString(),
     event.params.lendingToken,
@@ -53,13 +53,13 @@ export function handleUpdatedAllocation(event: UpdatedAllocation): void {
 
 export function handleUpdatedAllocations(events: UpdatedAllocation[]): void {
   events.forEach(event => {
-    handleUpdatedCommitment(event);
+    handleUpdatedAllocation(event);
   });
 }
 
 export function handleDeletedAllocation(event: DeletedAllocation): void {
-  const commitmentId = event.params.commitmentId.toString();
-  const commitment = loadCommitment(commitmentId);
+  const allocationId = event.params.allocationId.toString();
+  const commitment = loadRewardAllocation(allocationId);
 
   updateCommitmentStatus(commitment, CommitmentStatus.Deleted);
 
@@ -72,7 +72,7 @@ export function handleDeletedAllocation(event: DeletedAllocation): void {
 
 export function handleDeletedAllocations(events: DeletedAllocation[]): void {
   events.forEach(event => {
-    handleDeletedCommitment(event);
+    handleDeletedAllocation(event);
   });
 }
 
@@ -84,7 +84,7 @@ export function handleClaimedReward(event: ClaimedRewards): void {
   const allocationId = event.params.allocationId.toString();
   const allocation = loadRewardAllocation(allocationId);
 
-  if (event.params.tokenAmount.equals(commitment.committedAmount)) {
+  if (event.params.tokenAmount.equals(allocation.committedAmount)) {
     updateCommitmentStatus(commitment, CommitmentStatus.Drained);
   }
 
@@ -94,7 +94,7 @@ export function handleClaimedReward(event: ClaimedRewards): void {
   bid.commitmentId = commitment.id;
 
   bid.save();
-  commitment.save();
+  allocation.save();
 }
 
  

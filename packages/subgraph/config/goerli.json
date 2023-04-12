@@ -1,12 +1,12 @@
 {
   "network": "goerli",
   "grafting": {
-    "enabled": false,
+    "enabled": true,
     "base": "Qmb2sKZ9kMN1UqJ36cdGFvrcRfu81MX5iS6oBQ2U45cxCU",
-    "block": "8751571"
+    "block": "8818539"
   },
   "block_handler": {
-    "enabled": true,
+    "enabled": false,
     "block": "8751571"
   },
   "contracts": {
@@ -38,7 +38,7 @@
     "market_liquidity_rewards": {
       "enabled": true,
       "address": "0xfa0a79661ad21fbd416ddbD9a098564b3686adf5",
-      "block": "8538444"
+      "block": "8667201"
     }
   }
 }

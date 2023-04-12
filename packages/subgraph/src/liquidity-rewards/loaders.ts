@@ -15,7 +15,7 @@ export function loadRewardAllocation(allocationId: string): RewardAllocation {
     allocation = new RewardAllocation(idString);
     allocation.createdAt = BigInt.zero();
     allocation.updatedAt = BigInt.zero();
-    //allocation.status = "";
+    allocation.status = "";
 
     allocation.rewardToken = "";
     allocation.rewardTokenAddress = Address.zero();

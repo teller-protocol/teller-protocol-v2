@@ -74,6 +74,7 @@ export function createRewardAllocation(
 
   allocation.allocatorAddress = allocatedReward.value0;
   allocation.rewardTokenAddress = allocatedReward.value1;
+  allocation.rewardToken = loadToken(allocatedReward.value1).id;
   allocation.rewardTokenAmountInitial = allocatedReward.value2;
   allocation.rewardTokenAmountRemaining = allocatedReward.value2;
   allocation.marketplaceId = allocatedReward.value3;
@@ -83,6 +84,7 @@ export function createRewardAllocation(
   allocation.rewardPerLoanPrincipalAmount = allocatedReward.value7;
   allocation.bidStartTimeMin = allocatedReward.value8;
   allocation.bidStartTimeMax = allocatedReward.value9;
+
 
   allocation.save()
 
@@ -133,6 +135,7 @@ export function updateRewardAllocation(
 
   allocation.allocatorAddress = allocatedReward.value0;
   allocation.rewardTokenAddress = allocatedReward.value1;
+  allocation.rewardToken = loadToken(allocatedReward.value1).id;
  // allocation.rewardTokenAmountInitial = allocatedReward.value2;
   allocation.rewardTokenAmountRemaining = allocatedReward.value2;
   allocation.marketplaceId = allocatedReward.value3;

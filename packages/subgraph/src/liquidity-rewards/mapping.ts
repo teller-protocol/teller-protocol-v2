@@ -29,6 +29,11 @@ export function handleCreatedAllocation(event: CreatedAllocation): void {
   allocation.createdAt = event.block.timestamp;
 
   allocation.save();
+
+
+
+    //add rewards to protocol entity ! 
+
 }
 
 export function handleCreatedAllocations(events: CreatedAllocation[]): void {

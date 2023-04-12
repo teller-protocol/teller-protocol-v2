@@ -1,8 +1,8 @@
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 
 import { MarketLiquidityRewards } from "../../generated/MarketLiquidityRewards/MarketLiquidityRewards";
-import { RewardAllocation, Token, TokenVolume } from "../../generated/schema";
-import { loadToken } from "../helpers/loaders";
+import { Bid, RewardAllocation, Token, TokenVolume, User } from "../../generated/schema";
+import { loadBidById, loadLoanStatusCount, loadMarketTokenVolume, loadProtocol, loadToken } from "../helpers/loaders";
 import { addToArray, removeFromArray } from "../helpers/utils";
 
 import { loadRewardAllocation } from "./loaders";
@@ -209,6 +209,146 @@ export function updateRewardAllocation(
   */
   return allocation;
 }
+
+
+
+
+
+
+
+
+
+
+
+/*
+RUN THIS FUNCTION : 
+1. When a bid is accepted or repaid 
+2. When an allocation is created or updated 
+
+
+DESCRIPTION: 
+This function will loop through all of the bids (matching market id and principal token) in order to update the protocol entity array 
+
+ 
+
+verify that the reward is active and has funds remaining 
+
+*/
+
+export function linkRewardToBids(rewardAllocation:RewardAllocation) {
+
+  const loansForMarket = loadLoanStatusCount('market',rewardAllocation.marketplaceId.toString());
+
+  const rewardableLoans = loansForMarket.accepted
+  .concat(loansForMarket.repaid)
+  .concat(loansForMarket.late)
+  .concat(loansForMarket.dueSoon)
+  .concat(loansForMarket.defaulted)
+  .concat(loansForMarket.liquidated)
+  
+  for(let i = 0; i < rewardableLoans.length; i++){
+
+    let bidId = BigInt.fromString(rewardableLoans[i]);
+    let bid = loadBidById(bidId);
+
+    //check to see if the bid is eligible for the reward
+    /*
+    check min and max time stamp for ACCEPTED 
+
+
+
+    
+    */
+    if( //make this a function later
+      (bid.lendingTokenAddress == rewardAllocation.requiredPrincipalTokenAddress || rewardAllocation.requiredPrincipalTokenAddress == Address.empty() )
+      && bid.collateralTokenAddress == rewardAllocation.requiredCollateralTokenAddress 
+      && 
+      
+      ){
+
+
+
+      //create a bid reward entity 
+      let bidReward = new BidReward(`${bid.id.toString()}-${rewardAllocation.id.toString()}`);
+
+      ///this only happens if bid is repaid 
+      let borrower = User.load(bid.borrowerAddress.toString())!
+      borrower.save()
+
+      
+      //this happens in more situations 
+      let lender = User.load(bid.lenderAddress!.toString())!
+
+      lender.save()
+      
+    }
+
+    bid.save()
+
+
+  }
+
+   
+}
+
+
+/*
+  when a bid is accepted or repaid ...
+
+
+  find all of the allocations that are active , see if the bid can be assigned to the allocation 
+*/
+export function linkBidToRewards(bid:Bid){
+
+  let protocol = loadProtocol();
+
+  let activeRewardIds = protocol.activeRewards; 
+
+  for(let i = 0; i < activeRewardIds.length; i++){
+
+    let allocationRewardId = activeRewardIds[i];
+
+    let rewardAllocation = RewardAllocation.load(allocationRewardId)!;
+
+    if( //make this a function later
+    (bid.lendingTokenAddress == rewardAllocation.requiredPrincipalTokenAddress || rewardAllocation.requiredPrincipalTokenAddress == Address.empty() )
+    && bid.collateralTokenAddress == rewardAllocation.requiredCollateralTokenAddress 
+    && 
+    
+    ){
+
+
+
+      //create a bid reward entity 
+      let bidReward = new BidReward(`${bid.id.toString()}-${rewardAllocation.id.toString()}`);
+
+          
+      let borrower = User.load(bid.borrowerAddress.toString())!
+      //modify the entity so it has an array of bidReward 
+
+      borrower.save()
+
+
+      let lender = User.load(bid.lenderAddress!.toString())!
+
+      lender.save()
+
+
+
+
+    
+
+    }
+
+
+
+
+
+  }
+
+}
+
+
 /* 
 function addCommitmentToProtocol(commitment: Commitment): void {
   const protocol = loadProtocol();

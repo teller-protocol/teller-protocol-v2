@@ -5,6 +5,7 @@ type Protocol implements IHasLoans @entity {
   tokenVolumes: [TokenVolume!]! @derivedFrom(field: "protocol")
 
   activeCommitments: [Commitment!]!
+  activeRewards: [RewardAllocation!]!
 
   _durationTotal: BigInt!
   durationAverage: BigInt!
@@ -368,8 +369,8 @@ type RewardAllocation @entity {
   rewardTokenAmountInitial: BigInt!
   rewardTokenAmountRemaining: BigInt!
 
-  requiredPrincipalTokenAddress: Bytes
-  requiredCollateralTokenAddress: Bytes
+  requiredPrincipalTokenAddress: Bytes!
+  requiredCollateralTokenAddress: Bytes!
 
   minimumCollateralPerPrincipalAmount: BigInt!
   rewardPerLoanPrincipalAmount: BigInt!
@@ -383,27 +384,9 @@ type RewardAllocation @entity {
 
 }
 
-type ClaimableReward @entity {
-  #does this even make sense ?
 
-  id: ID!
-  createdAt: BigInt!
-  updatedAt: BigInt!
-
-  claimant: User!
-  claimantAddress: Bytes!
-
-  allocation: RewardAllocation!
-
-  # Market
-  marketplace: MarketPlace!
-  marketplaceId: BigInt!
-
-  # Reward 
-  rewardToken: Token!
-  rewardTokenAddress: Bytes!
-  rewardTokenAmount: BigInt!
-
-  hasBeenClaimed: Boolean!
-
+type BidReward @entity {
+  reward: RewardAllocation!
+  bid: Bid!
 }
+

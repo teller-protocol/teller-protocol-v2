@@ -84,6 +84,7 @@ export function createRewardAllocation(
   allocation.rewardPerLoanPrincipalAmount = allocatedReward.value7;
   allocation.bidStartTimeMin = allocatedReward.value8;
   allocation.bidStartTimeMax = allocatedReward.value9;
+  allocation.allocationStrategy = allocatedReward.value10 == 0 ? "BORROWER" : "LENDER";
 
 
   allocation.save()
@@ -145,7 +146,7 @@ export function updateRewardAllocation(
   allocation.rewardPerLoanPrincipalAmount = allocatedReward.value7;
   allocation.bidStartTimeMin = allocatedReward.value8;
   allocation.bidStartTimeMax = allocatedReward.value9;
-  //allocation.allocationStrategy = allocatedReward.value10;
+  allocation.allocationStrategy = allocatedReward.value10 == 0 ? "BORROWER" : "LENDER";
 
 
   allocation.rewardToken = loadToken(allocatedReward.value1).id;

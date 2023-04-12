@@ -371,13 +371,13 @@ type RewardAllocation @entity {
   requiredPrincipalTokenAddress: Bytes
   requiredCollateralTokenAddress: Bytes
 
-  minimumCollateralPerPrincipalAmount: BigInt
-  rewardPerLoanPrincipalAmount: BigInt 
+  minimumCollateralPerPrincipalAmount: BigInt!
+  rewardPerLoanPrincipalAmount: BigInt!
 
-  bidStartTimeMin: BigInt 
-  bidStartTimeMax: BigInt 
+  bidStartTimeMin: BigInt!
+  bidStartTimeMax: BigInt!
 
-  allocationStrategy: String 
+  allocationStrategy: String!
  
 
 

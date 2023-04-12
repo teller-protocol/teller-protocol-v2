@@ -132,25 +132,16 @@ export function updateRewardAllocation(
   );
   const allocatedReward = marketLiquidityRewardsInstance.allocatedRewards(
     BigInt.fromString(allocationId)
-  );
+  ); 
 
-  allocation.allocatorAddress = allocatedReward.value0;
-  allocation.rewardTokenAddress = allocatedReward.value1;
-  allocation.rewardToken = loadToken(allocatedReward.value1).id;
- // allocation.rewardTokenAmountInitial = allocatedReward.value2;
   allocation.rewardTokenAmountRemaining = allocatedReward.value2;
-  allocation.marketplaceId = allocatedReward.value3;
-  allocation.requiredPrincipalTokenAddress = allocatedReward.value4;
-  allocation.requiredCollateralTokenAddress = allocatedReward.value5;
+   
   allocation.minimumCollateralPerPrincipalAmount = allocatedReward.value6;
   allocation.rewardPerLoanPrincipalAmount = allocatedReward.value7;
   allocation.bidStartTimeMin = allocatedReward.value8;
   allocation.bidStartTimeMax = allocatedReward.value9;
-  allocation.allocationStrategy = allocatedReward.value10 == 0 ? "BORROWER" : "LENDER";
 
-
-  allocation.rewardToken = loadToken(allocatedReward.value1).id;
-
+  
   allocation.save();
     
 

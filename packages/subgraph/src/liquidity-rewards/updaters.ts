@@ -4,6 +4,7 @@ import { MarketLiquidityRewards } from "../../generated/MarketLiquidityRewards/M
 import { Bid, RewardAllocation, Token, TokenVolume, User } from "../../generated/schema";
 import { loadBidById, loadLoanStatusCount, loadMarketTokenVolume, loadProtocol, loadToken } from "../helpers/loaders";
 import { addToArray, removeFromArray } from "../helpers/utils";
+import {bidStatusToString,BidStatus} from "../helpers/bid";
 
 import { loadRewardAllocation, loadBidReward, getBidRewardId } from "./loaders";
 import { AllocationStatus, allocationStatusToString } from "./utils";
@@ -365,7 +366,7 @@ function bidIsEligibleForReward( bid: Bid,  rewardAllocation: RewardAllocation) 
 
 function borrowerIsEligibleForRewardWithBidStatus( bidStatus: string ) : boolean {
 
-  if(bidStatus == 'repaid') return true 
+  if(bidStatus == bidStatusToString(BidStatus.Repaid)) return true 
 
   return false
 }
@@ -373,12 +374,13 @@ function borrowerIsEligibleForRewardWithBidStatus( bidStatus: string ) : boolean
 function lenderIsEligibleForRewardWithBidStatus( bidStatus: string ) : boolean  {
 
 
-  if(bidStatus == 'repaid') return true 
-  if(bidStatus == 'defaulted') return true 
-  if(bidStatus == 'accepted') return true 
-  if(bidStatus == 'dueSoon') return true 
-  if(bidStatus == 'late') return true 
-  if(bidStatus == 'liquidated') return true 
+  if(bidStatus == bidStatusToString(BidStatus.Repaid)) return true 
+  if(bidStatus == bidStatusToString(BidStatus.Defaulted)) return true 
+  if(bidStatus == bidStatusToString(BidStatus.Accepted)) return true 
+  if(bidStatus == bidStatusToString(BidStatus.DueSoon)) return true 
+  if(bidStatus == bidStatusToString(BidStatus.Late)) return true 
+  if(bidStatus == bidStatusToString(BidStatus.Liquidated)) return true 
+ 
 
   return false
 }

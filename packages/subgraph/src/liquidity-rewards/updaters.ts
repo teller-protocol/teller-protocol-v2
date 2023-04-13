@@ -373,8 +373,8 @@ function bidIsEligibleForReward( bid: Bid,  rewardAllocation: RewardAllocation) 
   //if(rewardAllocation.requiredCollateralTokenAddress != Address.empty() &&  bid.collateralTokenAddress != rewardAllocation.requiredCollateralTokenAddress  ) return false;
   //minimumCollateralPerPrincipalAmount 
 
-  if(bid.acceptedTimestamp < rewardAllocation.bidStartTimeMin) return false 
-  if(bid.acceptedTimestamp > rewardAllocation.bidStartTimeMax) return false 
+  if(rewardAllocation.bidStartTimeMin!= 0 && bid.acceptedTimestamp < rewardAllocation.bidStartTimeMin) return false 
+  if(rewardAllocation.bidStartTimeMax != 0 && bid.acceptedTimestamp > rewardAllocation.bidStartTimeMax) return false 
 
 
   

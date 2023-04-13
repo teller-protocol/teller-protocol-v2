@@ -1,6 +1,6 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 
-import { BidReward, RewardAllocation } from "../../generated/schema";
+import { Bid, BidReward, RewardAllocation } from "../../generated/schema";
  
 
 /**
@@ -46,30 +46,29 @@ export function loadRewardAllocation(allocationId: string): RewardAllocation {
 }
 
 
-export function loadClaimableReward(claimableRewardId: string) : ClaimableReward {
-  const idString = claimableRewardId;
-  let claimableReward = ClaimableReward.load(idString);
 
-  if(!claimableReward){
-    claimableReward = new ClaimableReward(idString);
+// let bidReward = new BidReward(`${bid.id.toString()}-${rewardAllocation.id.toString()}`);
 
-    claimableReward.createdAt = BigInt.zero();
-    claimableReward.updatedAt = BigInt.zero();
+export function getBidRewardId(bid:Bid, rewardAllocation:RewardAllocation):string{
+  return `${bid.id.toString()}-${rewardAllocation.id.toString()}`
+}
 
-    claimableReward.claimant = "";
-    claimableReward.claimantAddress = Address.zero();
+export function loadBidReward(bid:Bid, rewardAllocation:RewardAllocation) : BidReward {
+  const idString = getBidRewardId(bid,rewardAllocation);
+  let bidReward = BidReward.load(idString);
 
-    claimableReward.marketplace = "";
-    claimableReward.marketplaceId = BigInt.zero();
+  if(!bidReward){
+    bidReward = new BidReward(idString);
 
-    claimableReward.rewardToken = "";
-    claimableReward.rewardTokenAddress = Address.zero();
-    claimableReward.rewardTokenAmount = BigInt.zero();
+    bidReward.createdAt = BigInt.zero();
+    bidReward.updatedAt = BigInt.zero();
 
-    claimableReward.hasBeenClaimed = false;
+    bidReward.reward = rewardAllocation.id.toString();
+    bidReward.bid = bid.id.toString();
+ 
 
-    claimableReward.save();
+    bidReward.save();
   }
 
-  return claimableReward;
+  return bidReward;
 } 

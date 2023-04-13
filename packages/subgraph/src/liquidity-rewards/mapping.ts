@@ -12,7 +12,7 @@ import { Bid } from "../../generated/schema";
 import { loadBidById, loadProtocol } from "../helpers/loaders";
 
 import { loadRewardAllocation } from "./loaders";
-import {  createRewardAllocation, updateAllocationStatus, updateRewardAllocation } from "./updaters";
+import {  createRewardAllocation, updateAllocationStatus, updateRewardAllocation, linkRewardToBids } from "./updaters";
 import { AllocationStatus } from "./utils";
  
 
@@ -35,12 +35,15 @@ export function handleCreatedAllocation(event: CreatedAllocation): void {
     //add rewards to protocol entity 
     //if the reward is ever drained completely, can remove it from this array [optimization] 
 
-    let protocol = loadProtocol();
+  let protocol = loadProtocol();
 
-    let activeRewardsArray = protocol.activeRewards;
-    activeRewardsArray.push(  allocation.id  );
-    protocol.activeRewards = activeRewardsArray;
-    protocol.save();
+  let activeRewardsArray = protocol.activeRewards;
+  activeRewardsArray.push(  allocation.id  );
+  protocol.activeRewards = activeRewardsArray;
+  protocol.save();
+
+
+  linkRewardToBids(allocation);
 
 }
 
@@ -52,11 +55,13 @@ export function handleCreatedAllocations(events: CreatedAllocation[]): void {
 
 export function handleUpdatedAllocation(event: UpdatedAllocation): void {
   const allocationId = event.params.allocationId.toString();
-  updateRewardAllocation(
+  const allocation = updateRewardAllocation(
     allocationId,    
     event.address,
     event.block
   );
+
+  linkRewardToBids(allocation);
 }
 
 export function handleUpdatedAllocations(events: UpdatedAllocation[]): void {
@@ -67,11 +72,15 @@ export function handleUpdatedAllocations(events: UpdatedAllocation[]): void {
 
 export function handleIncreasedAllocation(event: UpdatedAllocation): void {
   const allocationId = event.params.allocationId.toString();
-  updateRewardAllocation(
+  const allocation = updateRewardAllocation(
     allocationId,    
     event.address,
     event.block
   );
+
+
+  linkRewardToBids(allocation);
+
 }
 
 export function handleIncreasedAllocations(events: UpdatedAllocation[]): void {
@@ -83,11 +92,13 @@ export function handleIncreasedAllocations(events: UpdatedAllocation[]): void {
 
 export function handleDecreasedAllocation(event: UpdatedAllocation): void {
   const allocationId = event.params.allocationId.toString();
-  updateRewardAllocation(
+  const allocation = updateRewardAllocation(
     allocationId,    
     event.address,
     event.block
   );
+
+  linkRewardToBids(allocation);
 }
 
 export function handleDecreasedAllocations(events: UpdatedAllocation[]): void {
@@ -109,6 +120,8 @@ export function handleDeletedAllocation(event: DeletedAllocation): void {
   allocation.minAPY = BigInt.zero();
   allocation.maxPrincipalPerCollateralAmount = BigInt.zero();*/
   allocation.save();
+
+  linkRewardToBids(allocation);
 }
 
 export function handleDeletedAllocations(events: DeletedAllocation[]): void {

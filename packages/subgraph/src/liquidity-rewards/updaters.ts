@@ -5,7 +5,7 @@ import { Bid, RewardAllocation, Token, TokenVolume, User } from "../../generated
 import { loadBidById, loadLoanStatusCount, loadMarketTokenVolume, loadProtocol, loadToken } from "../helpers/loaders";
 import { addToArray, removeFromArray } from "../helpers/utils";
 
-import { loadRewardAllocation } from "./loaders";
+import { loadRewardAllocation, loadBidReward, getBidRewardId } from "./loaders";
 import { AllocationStatus, allocationStatusToString } from "./utils";
 //import { CommitmentStatus, commitmentStatusToString } from "./utils";
 
@@ -147,6 +147,7 @@ export function updateRewardAllocation(
 
  
   updateAllocationStatus(allocation, AllocationStatus.Active);
+ 
 
 /*
   const lender = loadLenderByMarketId(lenderAddress, marketId);
@@ -222,7 +223,7 @@ export function updateRewardAllocation(
 
 /*
 RUN THIS FUNCTION : 
-1. When a bid is accepted or repaid 
+ 
 2. When an allocation is created or updated 
 
 
@@ -260,8 +261,8 @@ export function linkRewardToBids(rewardAllocation:RewardAllocation) : void {
 
 
       //create a bid reward entity 
-      let bidReward = new BidReward(`${bid.id.toString()}-${rewardAllocation.id.toString()}`);
-
+      const bidRewardId = getBidRewardId(bid,rewardAllocation);
+      let bidReward = loadBidReward(bid,rewardAllocation);
       
       if(  borrowerIsEligibleForRewardWithBidStatus( bid.status ) ) {  //  == BidStatus.Accepted){
 

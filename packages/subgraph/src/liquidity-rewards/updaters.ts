@@ -252,18 +252,9 @@ export function linkRewardToBids(rewardAllocation:RewardAllocation) {
     let bid = loadBidById(bidId);
 
     //check to see if the bid is eligible for the reward
-    /*
-    check min and max time stamp for ACCEPTED 
-
-
-
     
-    */
     if( //make this a function later
-      (bid.lendingTokenAddress == rewardAllocation.requiredPrincipalTokenAddress || rewardAllocation.requiredPrincipalTokenAddress == Address.empty() )
-      && bid.collateralTokenAddress == rewardAllocation.requiredCollateralTokenAddress 
-      && 
-      
+       bidIsEligibleForReward(bid,rewardAllocation) 
       ){
 
 
@@ -271,15 +262,24 @@ export function linkRewardToBids(rewardAllocation:RewardAllocation) {
       //create a bid reward entity 
       let bidReward = new BidReward(`${bid.id.toString()}-${rewardAllocation.id.toString()}`);
 
+      
+      if(  borrowerIsEligibleForRewardWithBidStatus( bid.status ) {  //  == BidStatus.Accepted){
+
       ///this only happens if bid is repaid 
       let borrower = User.load(bid.borrowerAddress.toString())!
-      borrower.save()
 
-      
+        //add bid reward to array in here 
+      borrower.save()
+      }
+
+      if(  lenderIsEligibleForRewardWithBidStatus( bid.status ) { 
       //this happens in more situations 
       let lender = User.load(bid.lenderAddress!.toString())!
 
+      //add bid reward to array in here 
+
       lender.save()
+      }
       
     }
 
@@ -311,10 +311,9 @@ export function linkBidToRewards(bid:Bid){
     let rewardAllocation = RewardAllocation.load(allocationRewardId)!;
 
     if( //make this a function later
-    (bid.lendingTokenAddress == rewardAllocation.requiredPrincipalTokenAddress || rewardAllocation.requiredPrincipalTokenAddress == Address.empty() )
-    && bid.collateralTokenAddress == rewardAllocation.requiredCollateralTokenAddress 
-    && 
-    
+
+        bidIsEligibleForReward(bid,rewardAllocation)
+   
     ){
 
 
@@ -349,6 +348,44 @@ export function linkBidToRewards(bid:Bid){
 }
 
 
+function bidIsEligibleForReward( bid: Bid,  rewardAllocation: RewardAllocation) : boolean {
+
+
+  if(bid.marketplaceId != rewardAllocation.marketplaceId) return false;
+
+  if(rewardAllocation.requiredPrincipalTokenAddress != Address.empty() &&  bid.lendingTokenAddress != rewardAllocation.requiredPrincipalTokenAddress  ) return false; 
+
+  //if(rewardAllocation.requiredCollateralTokenAddress != Address.empty() &&  bid.collateralTokenAddress != rewardAllocation.requiredCollateralTokenAddress  ) return false;
+  //minimumCollateralPerPrincipalAmount 
+
+  if(bid.acceptedTimestamp < rewardAllocation.bidStartTimeMin) return false 
+  if(bid.acceptedTimestamp > rewardAllocation.bidStartTimeMax) return false 
+
+
+  
+  return true;
+
+}
+
+function borrowerIsEligibleForRewardWithBidStatus( bidStatus: string ){
+
+  if(bidStatus == 'repaid') return true 
+
+  return false
+}
+
+function lenderIsEligibleForRewardWithBidStatus( bidStatus: string ){
+
+
+  if(bidStatus == 'repaid') return true 
+  if(bidStatus == 'defaulted') return true 
+  if(bidStatus == 'accepted') return true 
+  if(bidStatus == 'dueSoon') return true 
+  if(bidStatus == 'late') return true 
+  if(bidStatus == 'liquidated') return true 
+
+  return false
+}
 /* 
 function addCommitmentToProtocol(commitment: Commitment): void {
   const protocol = loadProtocol();

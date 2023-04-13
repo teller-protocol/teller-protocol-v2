@@ -32,17 +32,14 @@ export function handleCreatedAllocation(event: CreatedAllocation): void {
 
 
 
-    //add rewards to protocol entity ! 
+    //add rewards to protocol entity 
     //if the reward is ever drained completely, can remove it from this array [optimization] 
 
     let protocol = loadProtocol();
 
     let activeRewardsArray = protocol.activeRewards;
-
     activeRewardsArray.push(  allocation  );
-
     protocol.activeRewards = activeRewardsArray;
-
     protocol.save();
 
 }

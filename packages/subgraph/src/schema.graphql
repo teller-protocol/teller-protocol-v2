@@ -387,6 +387,10 @@ type RewardAllocation @entity {
 
 
 type BidReward @entity {
+  id: ID!
+  createdAt: BigInt!
+  updatedAt: BigInt!
+
   reward: RewardAllocation!
   bid: Bid!
 }

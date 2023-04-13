@@ -224,7 +224,7 @@ export function updateRewardAllocation(
 /*
 RUN THIS FUNCTION : 
  
-2. When an allocation is created or updated 
+1. When an allocation is created or updated 
 
 
 DESCRIPTION: 
@@ -269,6 +269,10 @@ export function linkRewardToBids(rewardAllocation:RewardAllocation) : void {
       ///this only happens if bid is repaid 
       let borrower = User.load(bid.borrowerAddress.toString())!
 
+      let borrowerRewardsArray = borrower.bidRewards;
+      borrowerRewardsArray.push(bidReward.id.toString());
+      borrower.bidRewards = borrowerRewardsArray;
+
         //add bid reward to array in here 
       borrower.save()
       }
@@ -278,6 +282,9 @@ export function linkRewardToBids(rewardAllocation:RewardAllocation) : void {
       let lender = User.load(bid.lenderAddress!.toString())!
 
       //add bid reward to array in here 
+      let lenderRewardsArray = lender.bidRewards;
+      lenderRewardsArray.push(bidReward.id.toString());
+      lender.bidRewards = lenderRewardsArray;
 
       lender.save()
       }
@@ -320,19 +327,26 @@ export function linkBidToRewards(bid:Bid) : void {
 
 
       //create a bid reward entity 
-      let bidReward = new BidReward(`${bid.id.toString()}-${rewardAllocation.id.toString()}`);
+      const bidRewardId = getBidRewardId(bid,rewardAllocation);
+      let bidReward = loadBidReward(bid,rewardAllocation);
+      
+      if(  borrowerIsEligibleForRewardWithBidStatus( bid.status ) ) {  //  == BidStatus.Accepted){
 
-          
+      ///this only happens if bid is repaid 
       let borrower = User.load(bid.borrowerAddress.toString())!
-      //modify the entity so it has an array of bidReward 
 
+        //add bid reward to array in here 
       borrower.save()
+      }
 
-
+      if(  lenderIsEligibleForRewardWithBidStatus( bid.status )) { 
+      //this happens in more situations 
       let lender = User.load(bid.lenderAddress!.toString())!
 
-      lender.save()
+      //add bid reward to array in here 
 
+      lender.save()
+      }
 
 
 

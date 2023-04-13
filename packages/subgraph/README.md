@@ -56,3 +56,11 @@ yarn subgraph create-local:polygon
 ```
 yarn subgraph deploy-local:polygon
 ```
+
+
+
+## Simplified Commands 
+
+1. Build:  yarn subgraph build goerli
+
+2. Deploy: yarn subgraph build:deploy goerli 

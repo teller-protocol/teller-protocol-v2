@@ -65,6 +65,27 @@ export function loadBidReward(bid:Bid, rewardAllocation:RewardAllocation) : BidR
 
     bidReward.reward = rewardAllocation.id.toString();
     bidReward.bid = bid.id.toString();
+
+    let lenderAddress = bid.lenderAddress 
+    let borrowerAddress = bid.borrowerAddress
+
+    if(lenderAddress && borrowerAddress){
+
+        //User.load
+    if(rewardAllocation.allocationStrategy == "BORROWER"){
+     
+      bidReward.user = borrowerAddress.toHexString(); ///bid.borrower.user.id.toString();
+      
+    }else{
+     
+      bidReward.user = lenderAddress.toHexString(); ///bid.lender.user.id.toString();
+      
+    }
+    
+
+    }
+  
+    
  
 
     bidReward.save();

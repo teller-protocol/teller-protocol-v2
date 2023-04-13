@@ -111,15 +111,19 @@ export function handleDeletedAllocation(event: DeletedAllocation): void {
   const allocationId = event.params.allocationId.toString();
   const allocation = loadRewardAllocation(allocationId);
 
-  updateAllocationStatus(allocation, AllocationStatus.Deleted);
 
   allocation.rewardTokenAmountRemaining = BigInt.zero();
+
 
   /*allocation.expirationTimestamp = BigInt.zero();
   allocation.maxDuration = BigInt.zero();
   allocation.minAPY = BigInt.zero();
   allocation.maxPrincipalPerCollateralAmount = BigInt.zero();*/
   allocation.save();
+
+
+
+  updateAllocationStatus(allocation, AllocationStatus.Deleted);
 
   linkRewardToBids(allocation);
 }
@@ -133,7 +137,7 @@ export function handleDeletedAllocations(events: DeletedAllocation[]): void {
 
 
 
-
+//todo 
 export function handleClaimedReward(event: ClaimedRewards): void {
   const allocationId = event.params.allocationId.toString();
   const allocation = loadRewardAllocation(allocationId);

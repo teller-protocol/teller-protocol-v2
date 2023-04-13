@@ -133,7 +133,7 @@ type User @entity {
   firstInteractionDate: BigInt!
   lenders: [Lender!]! @derivedFrom(field: "user")
   borrowers: [Borrower!]! @derivedFrom(field: "user")
-  bidRewards: [BidReward!]!
+  bidRewards: [BidReward!]! @derivedFrom(field: "user")
 }
 
 type Lender implements IHasLoans @entity {
@@ -393,5 +393,6 @@ type BidReward @entity {
 
   reward: RewardAllocation!
   bid: Bid!
+  user: User!
 }
 

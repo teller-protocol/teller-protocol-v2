@@ -235,7 +235,7 @@ verify that the reward is active and has funds remaining
 
 */
 
-export function linkRewardToBids(rewardAllocation:RewardAllocation) {
+export function linkRewardToBids(rewardAllocation:RewardAllocation) : void {
 
   const loansForMarket = loadLoanStatusCount('market',rewardAllocation.marketplaceId.toString());
 
@@ -263,7 +263,7 @@ export function linkRewardToBids(rewardAllocation:RewardAllocation) {
       let bidReward = new BidReward(`${bid.id.toString()}-${rewardAllocation.id.toString()}`);
 
       
-      if(  borrowerIsEligibleForRewardWithBidStatus( bid.status ) {  //  == BidStatus.Accepted){
+      if(  borrowerIsEligibleForRewardWithBidStatus( bid.status ) ) {  //  == BidStatus.Accepted){
 
       ///this only happens if bid is repaid 
       let borrower = User.load(bid.borrowerAddress.toString())!
@@ -272,7 +272,7 @@ export function linkRewardToBids(rewardAllocation:RewardAllocation) {
       borrower.save()
       }
 
-      if(  lenderIsEligibleForRewardWithBidStatus( bid.status ) { 
+      if(  lenderIsEligibleForRewardWithBidStatus( bid.status )) { 
       //this happens in more situations 
       let lender = User.load(bid.lenderAddress!.toString())!
 
@@ -298,7 +298,7 @@ export function linkRewardToBids(rewardAllocation:RewardAllocation) {
 
   find all of the allocations that are active , see if the bid can be assigned to the allocation 
 */
-export function linkBidToRewards(bid:Bid){
+export function linkBidToRewards(bid:Bid) : void {
 
   let protocol = loadProtocol();
 
@@ -367,14 +367,14 @@ function bidIsEligibleForReward( bid: Bid,  rewardAllocation: RewardAllocation) 
 
 }
 
-function borrowerIsEligibleForRewardWithBidStatus( bidStatus: string ){
+function borrowerIsEligibleForRewardWithBidStatus( bidStatus: string ) : boolean {
 
   if(bidStatus == 'repaid') return true 
 
   return false
 }
 
-function lenderIsEligibleForRewardWithBidStatus( bidStatus: string ){
+function lenderIsEligibleForRewardWithBidStatus( bidStatus: string ) : boolean  {
 
 
   if(bidStatus == 'repaid') return true 

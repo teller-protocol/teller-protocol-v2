@@ -5,12 +5,12 @@ import {
   Bid,
   Borrower,
   BidCollateral,
-  CollateralPairTokenVolume,
   Commitment,
   Lender,
   LoanStatusCount,
   MarketPlace,
   Protocol,
+  ProtocolCollateral,
   Token,
   TokenVolume,
   User
@@ -310,7 +310,7 @@ function loadTokenVolumeWithValues(
   prefixes: string[],
   tokenId: string,
   keys: string[] = [],
-  values: Value[] = []
+  values: Array<Value | null> = []
 ): TokenVolume {
   prefixes.push(tokenId);
   const id = prefixes.join("-");
@@ -321,7 +321,10 @@ function loadTokenVolumeWithValues(
     initTokenVolume(tokenVolume, Token.load(tokenId)!);
 
     for (let i = 0; i < keys.length; i++) {
-      tokenVolume.set(keys[i], values[i]);
+      const val = values[i];
+      if (val) {
+        tokenVolume.set(keys[i], val);
+      }
     }
     tokenVolume.save();
   }
@@ -412,23 +415,31 @@ export function loadCollateralTokenVolume(
   collateralToken: Token | null
 ): TokenVolume {
   const collateralTokenId = collateralToken ? collateralToken.id : null;
+
+  let protocolCollateralId: string | null = null;
+  if (tokenVolume.protocol) {
+    protocolCollateralId = collateralTokenId
+      ? collateralTokenId
+      : "no-collateral";
+    const protocolCollateral = new ProtocolCollateral(protocolCollateralId);
+    protocolCollateral.collateralToken = collateralTokenId;
+    protocolCollateral.save();
+  }
+
   const collateralTokenVolume = loadTokenVolumeWithValues(
     [
+      "collateral",
       tokenVolume.id,
-      "-collateral",
       collateralTokenId ? collateralTokenId : "null"
     ],
-    tokenVolume.token
+    tokenVolume.token,
+    ["_linkedParentTokenVolume", "_protocolCollateral", "collateralToken"],
+    [
+      Value.fromString(tokenVolume.id),
+      protocolCollateralId ? Value.fromString(protocolCollateralId) : null,
+      collateralTokenId ? Value.fromString(collateralTokenId) : null
+    ]
   );
-
-  const pairVolume = new CollateralPairTokenVolume(
-    `${tokenVolume.id}--${collateralTokenVolume.id}`
-  );
-  pairVolume.lendingToken = tokenVolume.token;
-  pairVolume.collateralToken = collateralTokenId;
-  pairVolume.tokenVolume = collateralTokenVolume.id;
-  pairVolume._totalTokenVolume = tokenVolume.id;
-  pairVolume.save();
 
   return collateralTokenVolume;
 }

@@ -1692,6 +1692,27 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@teller-protocol/hardhat-tenderly@npm:1.6.3":
+  version: 1.6.3
+  resolution: "@teller-protocol/hardhat-tenderly@npm:1.6.3"
+  dependencies:
+    "@ethersproject/bignumber": ^5.7.0
+    "@nomiclabs/hardhat-ethers": ^2.1.1
+    axios: ^0.27.2
+    ethers: ^5.7.0
+    fs-extra: ^10.1.0
+    hardhat: ^2.10.2
+    hardhat-deploy: ^0.11.14
+    js-yaml: ^4.1.0
+    tenderly: ^0.4.0
+    tslog: ^4.3.1
+  peerDependencies:
+    hardhat: ^2.10.2
+    tenderly: ^0.4.0
+  checksum: a6691f72189f36650fdea16a845ea7f66ed246eaba5b9cdf71fbd2d395ee8ded4ffc4c63a1c83be07f41ce9c9b968cd7f24022aad1f5a4da363cc4289ef9dfe4
+  languageName: node
+  linkType: hard
+
 "@teller-protocol/v2-contracts@workspace:packages/contracts":
   version: 0.0.0-use.local
   resolution: "@teller-protocol/v2-contracts@workspace:packages/contracts"
@@ -1705,7 +1726,7 @@ __metadata:
     "@openzeppelin/contracts": ^4.8.0
     "@openzeppelin/contracts-upgradeable": ^4.8.0
     "@openzeppelin/hardhat-upgrades": ^1.21.0
-    "@tenderly/hardhat-tenderly": "https://github.com/passabilities/hardhat-tenderly#workspace=@tenderly/hardhat-tenderly"
+    "@teller-protocol/hardhat-tenderly": 1.6.3
     "@typechain/ethers-v5": ^10.2.0
     "@typechain/hardhat": ^6.1.5
     "@types/chai": ^4.2.22
@@ -1784,27 +1805,6 @@ __metadata:
     typescript: ^4.9.4
   languageName: unknown
   linkType: soft
-
-"@tenderly/hardhat-tenderly@https://github.com/passabilities/hardhat-tenderly#workspace=@tenderly/hardhat-tenderly":
-  version: 1.6.2
-  resolution: "@tenderly/hardhat-tenderly@https://github.com/passabilities/hardhat-tenderly.git#workspace=%40tenderly%2Fhardhat-tenderly&commit=fa4972ff94485965b374cda73c245649481f0fbe"
-  dependencies:
-    "@ethersproject/bignumber": ^5.7.0
-    "@nomiclabs/hardhat-ethers": ^2.1.1
-    axios: ^0.27.2
-    ethers: ^5.7.0
-    fs-extra: ^10.1.0
-    hardhat: ^2.10.2
-    hardhat-deploy: ^0.11.14
-    js-yaml: ^4.1.0
-    tenderly: ^0.4.0
-    tslog: ^4.3.1
-  peerDependencies:
-    hardhat: ^2.10.2
-    tenderly: ^0.4.0
-  checksum: aaecbec7f94b0af890a7fcddda11c94a3019ca9acc9caaa0cd879cc2c17485b7b29df7d4a8455ffeaee748dd5b8455b7b31f7440e92c9b6993d3a1ff6d9ce356
-  languageName: node
-  linkType: hard
 
 "@tootallnate/once@npm:1":
   version: 1.1.2

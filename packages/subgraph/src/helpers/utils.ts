@@ -1,3 +1,5 @@
+import { BigInt } from "@graphprotocol/graph-ts";
+
 export function addToArray<T>(
   array: T[],
   item: T,
@@ -20,4 +22,8 @@ export function removeFromArray<T>(array: T[], item: T): T[] {
 export function camelize(str: string): string {
   const strNoSpace = str.split(" ").join("");
   return strNoSpace.charAt(0).toLowerCase() + strNoSpace.slice(1);
+}
+
+export function safeDiv(a: BigInt, b: BigInt): BigInt {
+  return b.isZero() ? BigInt.zero() : a.div(b);
 }

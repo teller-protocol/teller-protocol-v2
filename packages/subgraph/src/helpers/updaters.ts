@@ -41,7 +41,7 @@ import {
   loadMarketTokenVolume,
   loadProtocolTokenVolume
 } from "./loaders";
-import { addToArray, camelize, removeFromArray } from "./utils";
+import { addToArray, camelize, removeFromArray, safeDiv } from "./utils";
 
 /**
  * Updates the status of a bid. Returns the previous status.
@@ -395,9 +395,6 @@ function addBidToTokenVolumeFromStatusCount(
   tokenVolume._loanAcceptedCount = tokenVolume._loanAcceptedCount.plus(
     BigInt.fromI32(1)
   );
-  tokenVolume.outstandingCapital = tokenVolume.outstandingCapital.plus(
-    bid.principal.minus(bid.totalRepaidPrincipal)
-  );
   tokenVolume.totalLoaned = tokenVolume.totalLoaned.plus(bid.principal);
   switch (bidStatus) {
     case BidStatus.Accepted:
@@ -423,14 +420,16 @@ function addBidToTokenVolumeFromStatusCount(
       );
       break;
   }
-  tokenVolume.loanAverage = tokenVolume.totalLoaned.div(
+  tokenVolume.loanAverage = safeDiv(
+    tokenVolume.totalLoaned,
     tokenVolume._loanAcceptedCount
   );
 
   tokenVolume._aprWeightedTotal = tokenVolume._aprWeightedTotal.plus(
     bid.apr.times(bid.principal)
   );
-  tokenVolume.aprAverage = tokenVolume._aprWeightedTotal.div(
+  tokenVolume.aprAverage = safeDiv(
+    tokenVolume._aprWeightedTotal,
     tokenVolume.totalLoaned
   );
   const activeLoanStatuses = [
@@ -440,10 +439,15 @@ function addBidToTokenVolumeFromStatusCount(
     BidStatus.Defaulted
   ];
   if (activeLoanStatuses.includes(bidStatus)) {
+    tokenVolume.outstandingCapital = tokenVolume.outstandingCapital.plus(
+      bid.principal.minus(bid.totalRepaidPrincipal)
+    );
+
     tokenVolume._aprActiveWeightedTotal = tokenVolume._aprActiveWeightedTotal.plus(
       bid.apr.times(bid.principal)
     );
-    tokenVolume.aprActiveAverage = tokenVolume._aprActiveWeightedTotal.div(
+    tokenVolume.aprActiveAverage = safeDiv(
+      tokenVolume._aprActiveWeightedTotal,
       tokenVolume.outstandingCapital
     );
   }
@@ -495,16 +499,18 @@ function removeBidFromTokenVolumeFromStatusCount(
       );
       break;
   }
-  tokenVolume.loanAverage = tokenVolume._loanAcceptedCount.isZero()
-    ? BigInt.zero()
-    : tokenVolume.totalLoaned.div(tokenVolume._loanAcceptedCount);
+  tokenVolume.loanAverage = safeDiv(
+    tokenVolume.totalLoaned,
+    tokenVolume._loanAcceptedCount
+  );
 
   tokenVolume._aprWeightedTotal = tokenVolume._aprWeightedTotal.minus(
     bid.apr.times(bid.principal)
   );
-  tokenVolume.aprAverage = tokenVolume._loanAcceptedCount.isZero()
-    ? BigInt.zero()
-    : tokenVolume._aprWeightedTotal.div(tokenVolume._loanAcceptedCount);
+  tokenVolume.aprAverage = safeDiv(
+    tokenVolume._aprWeightedTotal,
+    tokenVolume._loanAcceptedCount
+  );
   const activeLoanStatuses = [
     BidStatus.Accepted,
     BidStatus.DueSoon,
@@ -515,9 +521,10 @@ function removeBidFromTokenVolumeFromStatusCount(
     tokenVolume._aprActiveWeightedTotal = tokenVolume._aprActiveWeightedTotal.minus(
       bid.apr.times(bid.principal)
     );
-    tokenVolume.aprActiveAverage = tokenVolume._aprActiveWeightedTotal.isZero()
-      ? BigInt.zero()
-      : tokenVolume._aprActiveWeightedTotal.div(tokenVolume.outstandingCapital);
+    tokenVolume.aprActiveAverage = safeDiv(
+      tokenVolume._aprActiveWeightedTotal,
+      tokenVolume.outstandingCapital
+    );
   }
 
   tokenVolume.save();
@@ -603,11 +610,7 @@ function setEntityDurationAverage(
   entity.set("_durationTotal", Value.fromBigInt(durationTotal));
   entity.set(
     "durationAverage",
-    Value.fromBigInt(
-      durationTotal.isZero() || totalLoanCount.isZero()
-        ? BigInt.zero()
-        : durationTotal.div(totalLoanCount)
-    )
+    Value.fromBigInt(safeDiv(durationTotal, totalLoanCount))
   );
 }
 

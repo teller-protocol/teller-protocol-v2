@@ -22,9 +22,9 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
     ITellerV2 public tellerV2;
     address private collateralEscrowBeacon; // The address of the escrow contract beacon
-   
+
     // bidIds -> collateralEscrow
-    mapping(uint256 => address) public _escrows; 
+    mapping(uint256 => address) public _escrows;
     // bidIds -> validated collateral info
     mapping(uint256 => CollateralInfo) internal _bidCollaterals;
 
@@ -123,7 +123,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         address borrower = tellerV2.getLoanBorrower(_bidId);
         (validation_, ) = checkBalances(borrower, _collateralInfo);
 
-        //if the collateral info is valid, call commitCollateral for each one 
+        //if the collateral info is valid, call commitCollateral for each one
         if (validation_) {
             for (uint256 i; i < _collateralInfo.length; i++) {
                 Collateral memory info = _collateralInfo[i];
@@ -181,7 +181,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
      */
     function deployAndDeposit(uint256 _bidId) external onlyTellerV2 {
         if (isBidCollateralBacked(_bidId)) {
-            //attempt deploy a new collateral escrow contract if there is not already one. Otherwise fetch it. 
+            //attempt deploy a new collateral escrow contract if there is not already one. Otherwise fetch it.
             (address proxyAddress, ) = _deployEscrow(_bidId);
             _escrows[_bidId] = proxyAddress;
 
@@ -469,7 +469,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
             checks_[i] = isValidated;
             if (!isValidated) {
                 validated_ = false;
-                //if short circuit is true, return on the first invalid balance to save execution cycles. Values of checks[] will be invalid/undetermined if shortcircuit is true. 
+                //if short circuit is true, return on the first invalid balance to save execution cycles. Values of checks[] will be invalid/undetermined if shortcircuit is true.
                 if (_shortCircut) {
                     return (validated_, checks_);
                 }

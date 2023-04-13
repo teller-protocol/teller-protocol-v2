@@ -2,6 +2,7 @@
   "name": "@teller-protocol/v2-contracts",
   "version": "3.0.1",
   "license": "MIT",
+  "prettier": "./.prettierrc",
   "scripts": {
     "forge": "forge",
     "test": "DISABLE_LOGS=true TS_NODE_TRANSPILE_ONLY=1 TESTING=1 forge test -vvv",
@@ -26,7 +27,7 @@
     "generate": "yarn ts-node helpers/generate-account.ts",
     "account": "yarn hh account",
     "lint": "eslint '**/*.ts'",
-    "format": "prettier --write --loglevel error '**/*.sol' && yarn lint --fix --quiet",
+    "format": "prettier --resolve-plugins-relative-to . --write --loglevel error '**/*.sol' && yarn lint --fix --quiet",
     "git:future": "./scripts/git/future.sh",
     "git:portal": "./scripts/git/portal.sh",
     "publish": "yarn npm publish",

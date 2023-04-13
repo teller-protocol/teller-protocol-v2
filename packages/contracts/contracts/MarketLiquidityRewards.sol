@@ -183,8 +183,7 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
         IERC20Upgradeable(allocatedRewards[_allocationId].rewardTokenAddress)
             .transfer(msg.sender, _tokenAmount);
 
-
-        //if the allocated rewards are drained completely, delete the storage slot for it 
+        //if the allocated rewards are drained completely, delete the storage slot for it
         if (allocatedRewards[_allocationId].rewardTokenAmount == 0) {
             delete allocatedRewards[_allocationId];
 
@@ -212,7 +211,7 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
             !rewardClaimedForBid[_bidId][_allocationId],
             "reward already claimed"
         );
-        rewardClaimedForBid[_bidId][_allocationId] = true; 
+        rewardClaimedForBid[_bidId][_allocationId] = true;
 
         (
             address borrower,
@@ -249,13 +248,13 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
             );
         }
 
-        //verify that the principal token address of the bid meets the allocation requirements 
+        //verify that the principal token address of the bid meets the allocation requirements
         _verifyExpectedTokenAddress(
             principalTokenAddress,
             allocatedReward.requiredPrincipalTokenAddress
         );
 
-        //verify that the collateral token address of the bid meets the allocation requirements 
+        //verify that the collateral token address of the bid meets the allocation requirements
         _verifyExpectedTokenAddress(
             collateralTokenAddress,
             allocatedReward.requiredCollateralTokenAddress

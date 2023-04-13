@@ -1,6 +1,6 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 
-import { ClaimableReward, RewardAllocation } from "../../generated/schema";
+import { BidReward, RewardAllocation } from "../../generated/schema";
  
 
 /**

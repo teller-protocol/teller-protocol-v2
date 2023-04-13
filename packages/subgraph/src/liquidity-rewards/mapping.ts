@@ -9,7 +9,7 @@ import {
   ClaimedRewards
 } from "../../generated/MarketLiquidityRewards/MarketLiquidityRewards";
 import { Bid } from "../../generated/schema";
-import { loadBidById } from "../helpers/loaders";
+import { loadBidById, loadProtocol } from "../helpers/loaders";
 
 import { loadRewardAllocation } from "./loaders";
 import {  createRewardAllocation, updateAllocationStatus, updateRewardAllocation } from "./updaters";
@@ -38,7 +38,7 @@ export function handleCreatedAllocation(event: CreatedAllocation): void {
     let protocol = loadProtocol();
 
     let activeRewardsArray = protocol.activeRewards;
-    activeRewardsArray.push(  allocation  );
+    activeRewardsArray.push(  allocation.id  );
     protocol.activeRewards = activeRewardsArray;
     protocol.save();
 

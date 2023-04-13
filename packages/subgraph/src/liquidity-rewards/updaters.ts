@@ -326,6 +326,7 @@ export function linkBidToRewards(bid:Bid) : void {
 
 
 
+
       //create a bid reward entity 
       const bidRewardId = getBidRewardId(bid,rewardAllocation);
       let bidReward = loadBidReward(bid,rewardAllocation);
@@ -334,6 +335,10 @@ export function linkBidToRewards(bid:Bid) : void {
 
       ///this only happens if bid is repaid 
       let borrower = User.load(bid.borrowerAddress.toString())!
+
+      let borrowerRewardsArray = borrower.bidRewards;
+      borrowerRewardsArray.push(bidReward.id.toString());
+      borrower.bidRewards = borrowerRewardsArray;
 
         //add bid reward to array in here 
       borrower.save()
@@ -344,11 +349,12 @@ export function linkBidToRewards(bid:Bid) : void {
       let lender = User.load(bid.lenderAddress!.toString())!
 
       //add bid reward to array in here 
+      let lenderRewardsArray = lender.bidRewards;
+      lenderRewardsArray.push(bidReward.id.toString());
+      lender.bidRewards = lenderRewardsArray;
 
       lender.save()
       }
-
-
 
     
 
@@ -373,8 +379,8 @@ function bidIsEligibleForReward( bid: Bid,  rewardAllocation: RewardAllocation) 
   //if(rewardAllocation.requiredCollateralTokenAddress != Address.empty() &&  bid.collateralTokenAddress != rewardAllocation.requiredCollateralTokenAddress  ) return false;
   //minimumCollateralPerPrincipalAmount 
 
-  if(rewardAllocation.bidStartTimeMin!= 0 && bid.acceptedTimestamp < rewardAllocation.bidStartTimeMin) return false 
-  if(rewardAllocation.bidStartTimeMax != 0 && bid.acceptedTimestamp > rewardAllocation.bidStartTimeMax) return false 
+  if(rewardAllocation.bidStartTimeMin > BigInt.zero() && bid.acceptedTimestamp < rewardAllocation.bidStartTimeMin) return false 
+  if(rewardAllocation.bidStartTimeMax > BigInt.zero() && bid.acceptedTimestamp > rewardAllocation.bidStartTimeMax) return false 
 
 
   

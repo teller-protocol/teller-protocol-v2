@@ -258,36 +258,8 @@ export function linkRewardToBids(rewardAllocation:RewardAllocation) : void {
        bidIsEligibleForReward(bid,rewardAllocation) 
       ){
 
+        appendAllocationRewardToBidParticipants(bid,rewardAllocation);
 
-
-      //create a bid reward entity 
-      const bidRewardId = getBidRewardId(bid,rewardAllocation);
-      let bidReward = loadBidReward(bid,rewardAllocation);
-      
-      if(  borrowerIsEligibleForRewardWithBidStatus( bid.status ) ) {  //  == BidStatus.Accepted){
-
-      ///this only happens if bid is repaid 
-      let borrower = User.load(bid.borrowerAddress.toString())!
-
-      let borrowerRewardsArray = borrower.bidRewards;
-      borrowerRewardsArray.push(bidReward.id.toString());
-      borrower.bidRewards = borrowerRewardsArray;
-
-        //add bid reward to array in here 
-      borrower.save()
-      }
-
-      if(  lenderIsEligibleForRewardWithBidStatus( bid.status )) { 
-      //this happens in more situations 
-      let lender = User.load(bid.lenderAddress!.toString())!
-
-      //add bid reward to array in here 
-      let lenderRewardsArray = lender.bidRewards;
-      lenderRewardsArray.push(bidReward.id.toString());
-      lender.bidRewards = lenderRewardsArray;
-
-      lender.save()
-      }
       
     }
 
@@ -325,38 +297,9 @@ export function linkBidToRewards(bid:Bid) : void {
     ){
 
 
+      appendAllocationRewardToBidParticipants(bid,rewardAllocation);
 
-
-      //create a bid reward entity 
-      const bidRewardId = getBidRewardId(bid,rewardAllocation);
-      let bidReward = loadBidReward(bid,rewardAllocation);
       
-      if(  borrowerIsEligibleForRewardWithBidStatus( bid.status ) ) {  //  == BidStatus.Accepted){
-
-      ///this only happens if bid is repaid 
-      let borrower = User.load(bid.borrowerAddress.toString())!
-
-      let borrowerRewardsArray = borrower.bidRewards;
-      borrowerRewardsArray.push(bidReward.id.toString());
-      borrower.bidRewards = borrowerRewardsArray;
-
-        //add bid reward to array in here 
-      borrower.save()
-      }
-
-      if(  lenderIsEligibleForRewardWithBidStatus( bid.status )) { 
-      //this happens in more situations 
-      let lender = User.load(bid.lenderAddress!.toString())!
-
-      //add bid reward to array in here 
-      let lenderRewardsArray = lender.bidRewards;
-      lenderRewardsArray.push(bidReward.id.toString());
-      lender.bidRewards = lenderRewardsArray;
-
-      lender.save()
-      }
-
-    
 
     }
 
@@ -366,6 +309,38 @@ export function linkBidToRewards(bid:Bid) : void {
 
   }
 
+}
+
+
+function appendAllocationRewardToBidParticipants(bid: Bid,  rewardAllocation: RewardAllocation):void{
+   //create a bid reward entity 
+   const bidRewardId = getBidRewardId(bid,rewardAllocation);
+   let bidReward = loadBidReward(bid,rewardAllocation);
+   
+   if(  borrowerIsEligibleForRewardWithBidStatus( bid.status ) ) {  //  == BidStatus.Accepted){
+
+   ///this only happens if bid is repaid 
+   let borrower = User.load(bid.borrowerAddress.toString())!
+
+   let borrowerRewardsArray = borrower.bidRewards;
+   borrowerRewardsArray.push(bidReward.id.toString());
+   borrower.bidRewards = borrowerRewardsArray;
+
+     //add bid reward to array in here 
+   borrower.save()
+   }
+
+   if(  lenderIsEligibleForRewardWithBidStatus( bid.status )) { 
+   //this happens in more situations 
+   let lender = User.load(bid.lenderAddress!.toString())!
+
+   //add bid reward to array in here 
+   let lenderRewardsArray = lender.bidRewards;
+   lenderRewardsArray.push(bidReward.id.toString());
+   lender.bidRewards = lenderRewardsArray;
+
+   lender.save()
+   }
 }
 
 

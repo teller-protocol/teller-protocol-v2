@@ -17,28 +17,10 @@ import { MathUpgradeable } from "@openzeppelin/contracts-upgradeable/utils/math/
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20MetadataUpgradeable.sol";
 
 /*
-- Claim reward for a loan based on loanId (use a brand new contract)
-- This contract holds the reward tokens in escrow.
-- There will be an allocateReward() function, only called by marketOwner, deposits tokens in escrow
-- There will be a claimReward() function -> reads state of loans , only called by borrower -> withdraws tokens from escrow and makes those loans as having claimed rewards
-- unallocateReward()
+- Allocate and claim rewards for loans based on bidId  
 
-This contract could give out 1 OHM when someone takes out a loan (for every 1000 USDC)
-
-
-    ryan ideas : 
-
-
-1. the claimer could be the lender or borrower   
-ie we might be incentivizing one or the other, or both  (or some other address? idk a use case yet tho)
-principalTokenAddress
-2.ie the loan had to be made in USDC or x token
-collateralTokenAddress
-ie Olympus wants to incentivize holders to lock up gOHM as collateral
-maxPrincipalPerCollateral
-3. ie we might incentivize a collateral ratio greater than or less than some number. or this might be blank (would not use an oracle but raw units ? )
-
-4. make sure loans are REPAID before any reward   
+- Anyone can allocate rewards and an allocation has specific parameters that can be set to incentivise certain types of loans
+ 
 
 */
 
@@ -190,6 +172,7 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
             "Only the allocator can deallocate rewards."
         );
 
+        //enforce that the token amount withdraw must be LEQ to the reward amount for this allocation
         if (_tokenAmount > allocatedRewards[_allocationId].rewardTokenAmount) {
             _tokenAmount = allocatedRewards[_allocationId].rewardTokenAmount;
         }
@@ -200,6 +183,7 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
         IERC20Upgradeable(allocatedRewards[_allocationId].rewardTokenAddress)
             .transfer(msg.sender, _tokenAmount);
 
+        //if the allocated rewards are drained completely, delete the storage slot for it
         if (allocatedRewards[_allocationId].rewardTokenAmount == 0) {
             delete allocatedRewards[_allocationId];
 
@@ -222,11 +206,12 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
             _allocationId
         ];
 
+        //set a flag that this reward was claimed for this bid to defend against re-entrancy
         require(
             !rewardClaimedForBid[_bidId][_allocationId],
             "reward already claimed"
         );
-        rewardClaimedForBid[_bidId][_allocationId] = true; // leave this here to defend against re-entrancy
+        rewardClaimedForBid[_bidId][_allocationId] = true;
 
         (
             address borrower,
@@ -248,6 +233,7 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
             allocatedReward.bidStartTimeMax
         );
 
+        //if a collateral token address is set on the allocation, verify that the bid has enough collateral ratio
         if (collateralTokenAddress != address(0)) {
             uint256 collateralAmount = ICollateralManager(collateralManager)
                 .getCollateralAmount(_bidId, collateralTokenAddress);
@@ -262,11 +248,13 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
             );
         }
 
+        //verify that the principal token address of the bid meets the allocation requirements
         _verifyExpectedTokenAddress(
             principalTokenAddress,
             allocatedReward.requiredPrincipalTokenAddress
         );
 
+        //verify that the collateral token address of the bid meets the allocation requirements
         _verifyExpectedTokenAddress(
             collateralTokenAddress,
             allocatedReward.requiredCollateralTokenAddress

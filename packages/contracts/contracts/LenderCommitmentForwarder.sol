@@ -187,8 +187,10 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
 
         commitments[commitmentId_] = _commitment;
 
+        //make sure the commitment data adheres to required specifications and limits
         validateCommitment(commitments[commitmentId_]);
 
+        //the borrower allowlists is in a different storage space so we append them to the array with this method s
         _addBorrowersToCommitmentAllowlist(commitmentId_, _borrowerAddressList);
 
         emit CreatedCommitment(
@@ -221,6 +223,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
 
         commitments[_commitmentId] = _commitment;
 
+        //make sure the commitment data still adheres to required specifications and limits
         validateCommitment(commitments[_commitmentId]);
 
         emit UpdatedCommitment(
@@ -310,16 +313,20 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
 
         Commitment storage commitment = commitments[_commitmentId];
 
+        //make sure the commitment data adheres to required specifications and limits
         validateCommitment(commitment);
 
+        //the collateral token of the commitment should be the same as the acceptor expects
         require(
             _collateralTokenAddress == commitment.collateralTokenAddress,
             "Mismatching collateral token"
         );
+        //the interest rate must be at least as high has the commitment demands. The borrower can use a higher interest rate although that would not be beneficial to the borrower.
         require(
             _interestRate >= commitment.minInterestRate,
             "Invalid interest rate"
         );
+        //the loan duration must be less than the commitment max loan duration. The lender who made the commitment expects the money to be returned before this window.
         require(
             _loanDuration <= commitment.maxDuration,
             "Invalid loan max duration"
@@ -330,7 +337,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
                 commitmentBorrowersList[_commitmentId].contains(borrower),
             "unauthorized commitment borrower"
         );
-
+        //require that the borrower accepting the commitment cannot borrow more than the commitments max principal
         if (_principalAmount > commitment.maxPrincipal) {
             revert InsufficientCommitmentAllocation({
                 allocated: commitment.maxPrincipal,
@@ -353,6 +360,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             });
         }
 
+        //ERC721 assets must have a quantity of 1
         if (
             commitment.collateralTokenType == CommitmentCollateralType.ERC721 ||
             commitment.collateralTokenType ==
@@ -364,6 +372,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             );
         }
 
+        //ERC721 and ERC1155 types strictly enforce a specific token Id.  ERC721_ANY and ERC1155_ANY do not.
         if (
             commitment.collateralTokenType == CommitmentCollateralType.ERC721 ||
             commitment.collateralTokenType == CommitmentCollateralType.ERC1155

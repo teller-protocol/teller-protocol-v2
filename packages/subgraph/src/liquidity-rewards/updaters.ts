@@ -10,6 +10,8 @@ import { loadRewardAllocation, loadBidReward, getBidRewardId } from "./loaders";
 import { AllocationStatus, allocationStatusToString } from "./utils";
 //import { CommitmentStatus, commitmentStatusToString } from "./utils";
 
+ 
+
 enum CollateralTokenType {
   NONE,
   ERC20,
@@ -109,24 +111,7 @@ export function updateRewardAllocation(
   eventBlock: ethereum.Block
 ): RewardAllocation {
   const allocation = loadRewardAllocation(allocationId);
-
-
-  /*  struct RewardAllocation {
-        address allocator;
-        address rewardTokenAddress;
-        uint256 rewardTokenAmount;
-        uint256 marketId;
-        //requirements for loan
-        address requiredPrincipalTokenAddress; //0 for any
-        address requiredCollateralTokenAddress; //0 for any  -- could be an enumerable set?
-        uint256 minimumCollateralPerPrincipalAmount;
-        uint256 rewardPerLoanPrincipalAmount;
-        uint32 bidStartTimeMin;
-        uint32 bidStartTimeMax;
-        AllocationStrategy allocationStrategy;
-    }
-
-    */
+ 
 
   const marketLiquidityRewardsInstance = MarketLiquidityRewards.bind(
     eventAddress
@@ -280,28 +265,30 @@ export function linkRewardToBids(rewardAllocation:RewardAllocation) : void {
   find all of the allocations that are active , see if the bid can be assigned to the allocation 
 */
 export function linkBidToRewards(bid:Bid) : void {
-
+ 
   let protocol = loadProtocol();
 
   let activeRewardIds = protocol.activeRewards; 
 
+
+ 
   for(let i = 0; i < activeRewardIds.length; i++){
 
     let allocationRewardId = activeRewardIds[i];
 
+ 
     let rewardAllocation = RewardAllocation.load(allocationRewardId)!;
+ 
 
-    if( //make this a function later
+    if( 
 
         bidIsEligibleForReward(bid,rewardAllocation)
    
     ){
-
-
+ 
       appendAllocationRewardToBidParticipants(bid,rewardAllocation);
 
-      
-
+       
     }
 
 
@@ -318,10 +305,11 @@ function appendAllocationRewardToBidParticipants(bid: Bid,  rewardAllocation: Re
    const bidRewardId = getBidRewardId(bid,rewardAllocation);
    let bidReward = loadBidReward(bid,rewardAllocation);
    
+   /*
    if(  borrowerIsEligibleForRewardWithBidStatus( bid.status ) ) {  //  == BidStatus.Accepted){
 
    ///this only happens if bid is repaid 
-   let borrower = User.load(bid.borrowerAddress.toString())!
+   let borrower = User.load(bid.borrowerAddress.toHexString())!
 
    let borrowerRewardsArray = borrower.bidRewards;
    borrowerRewardsArray.push(bidReward.id.toString());
@@ -333,7 +321,7 @@ function appendAllocationRewardToBidParticipants(bid: Bid,  rewardAllocation: Re
 
    if(  lenderIsEligibleForRewardWithBidStatus( bid.status )) { 
    //this happens in more situations 
-   let lender = User.load(bid.lenderAddress!.toString())!
+   let lender = User.load(bid.lenderAddress!.toHexString())!
 
    //add bid reward to array in here 
    let lenderRewardsArray = lender.bidRewards;
@@ -341,24 +329,25 @@ function appendAllocationRewardToBidParticipants(bid: Bid,  rewardAllocation: Re
    lender.bidRewards = lenderRewardsArray;
 
    lender.save()
-   }
+   }*/
 }
-
+ 
 
 function bidIsEligibleForReward( bid: Bid,  rewardAllocation: RewardAllocation) : boolean {
 
 
-  if(bid.marketplaceId != rewardAllocation.marketplaceId) return false;
-
-  if(rewardAllocation.requiredPrincipalTokenAddress != Address.empty() &&  bid.lendingTokenAddress != rewardAllocation.requiredPrincipalTokenAddress  ) return false; 
+ if(bid.marketplaceId != rewardAllocation.marketplaceId){ return false;}
+  
+ //must use address.zero and not address.empty 
+  if(rewardAllocation.requiredPrincipalTokenAddress != Address.zero() &&  bid.lendingTokenAddress != rewardAllocation.requiredPrincipalTokenAddress  ) {return false; }
 
   //if(rewardAllocation.requiredCollateralTokenAddress != Address.empty() &&  bid.collateralTokenAddress != rewardAllocation.requiredCollateralTokenAddress  ) return false;
   //minimumCollateralPerPrincipalAmount 
 
-  if(rewardAllocation.bidStartTimeMin > BigInt.zero() && bid.acceptedTimestamp < rewardAllocation.bidStartTimeMin) return false 
-  if(rewardAllocation.bidStartTimeMax > BigInt.zero() && bid.acceptedTimestamp > rewardAllocation.bidStartTimeMax) return false 
+  if(rewardAllocation.bidStartTimeMin > BigInt.zero() && bid.acceptedTimestamp < rewardAllocation.bidStartTimeMin){ return false }
+  if(rewardAllocation.bidStartTimeMax > BigInt.zero() && bid.acceptedTimestamp > rewardAllocation.bidStartTimeMax){ return false }
 
-
+ 
   
   return true;
 
@@ -383,86 +372,4 @@ function lenderIsEligibleForRewardWithBidStatus( bidStatus: string ) : boolean  
  
 
   return false
-}
-/* 
-function addCommitmentToProtocol(commitment: Commitment): void {
-  const protocol = loadProtocol();
-  protocol.activeCommitments = addToArray(
-    protocol.activeCommitments,
-    commitment.id
-  );
-  protocol.save();
-}
-function removeCommitmentToProtocol(commitment: Commitment): void {
-  const protocol = loadProtocol();
-  protocol.activeCommitments = removeFromArray(
-    protocol.activeCommitments,
-    commitment.id
-  );
-  protocol.save();
-}
-
-export function updateAvailableTokensFromCommitment(
-  commitment: Commitment,
-  committedAmountDiff: BigInt
-): void {
-  if (committedAmountDiff.isZero()) {
-    return;
-  }
-
-  commitment.committedAmount = commitment.committedAmount.plus(
-    committedAmountDiff
-  );
-  commitment.save();
-
-  const tokenVolumes = getTokenVolumesFromCommitment(commitment);
-  for (let i = 0; i < tokenVolumes.length; i++) {
-    const tokenVolume = tokenVolumes[i];
-    tokenVolume.totalAvailable = tokenVolume.totalAvailable.plus(
-      committedAmountDiff
-    );
-    tokenVolume.save();
-  }
-}
-
-function getTokenVolumesFromCommitment(commitment: Commitment): TokenVolume[] {
-  const tokenVolumes = new Array<TokenVolume>();
-
-  const protocolVolume = loadProtocolTokenVolume(commitment.principalToken);
-  tokenVolumes.push(protocolVolume);
-
-  const commitmentVolume = loadCommitmentTokenVolume(
-    commitment.principalToken,
-    commitment
-  );
-  tokenVolumes.push(commitmentVolume);
-
-  const marketVolume = loadMarketTokenVolume(
-    commitment.principalToken,
-    commitment.marketplace
-  );
-  tokenVolumes.push(marketVolume);
-
-  const lenderVolume = loadLenderTokenVolume(
-    commitment.principalToken,
-    loadLenderByMarketId(commitment.lenderAddress, commitment.marketplace)
-  );
-  tokenVolumes.push(lenderVolume);
-
-  const collateralTokenId = commitment.collateralToken;
-  const collateralToken = Token.load(
-    collateralTokenId ? collateralTokenId : ""
-  );
-  const volumesCount = tokenVolumes.length;
-  for (let i = 0; i < volumesCount; i++) {
-    const tokenVolume = tokenVolumes[i];
-    const collateralVolume = loadCollateralTokenVolume(
-      tokenVolume,
-      collateralToken
-    );
-    tokenVolumes.push(collateralVolume);
-  }
-
-  return tokenVolumes;
-}
-*/
+} 

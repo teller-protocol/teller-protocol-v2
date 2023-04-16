@@ -115,15 +115,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ethereum-attestation-service/sdk@npm:^0.11.2":
-  version: 0.11.2
-  resolution: "@ethereum-attestation-service/sdk@npm:0.11.2"
-  dependencies:
-    ethers: ^5.4.2
-  checksum: a1ee269e834139eb92c42cbaa2732a1ee983d0910933408040b2c222218c1503facad06291f516fed45dc6734a68e8579d7a7dcc6716ac87fed588198713fb28
-  languageName: node
-  linkType: hard
-
 "@ethereum-waffle/chai@npm:^3.4.4":
   version: 3.4.4
   resolution: "@ethereum-waffle/chai@npm:3.4.4"
@@ -1678,12 +1669,32 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@teller-protocol/hardhat-tenderly@npm:1.6.3":
+  version: 1.6.3
+  resolution: "@teller-protocol/hardhat-tenderly@npm:1.6.3"
+  dependencies:
+    "@ethersproject/bignumber": ^5.7.0
+    "@nomiclabs/hardhat-ethers": ^2.1.1
+    axios: ^0.27.2
+    ethers: ^5.7.0
+    fs-extra: ^10.1.0
+    hardhat: ^2.10.2
+    hardhat-deploy: ^0.11.14
+    js-yaml: ^4.1.0
+    tenderly: ^0.4.0
+    tslog: ^4.3.1
+  peerDependencies:
+    hardhat: ^2.10.2
+    tenderly: ^0.4.0
+  checksum: a6691f72189f36650fdea16a845ea7f66ed246eaba5b9cdf71fbd2d395ee8ded4ffc4c63a1c83be07f41ce9c9b968cd7f24022aad1f5a4da363cc4289ef9dfe4
+  languageName: node
+  linkType: hard
+
 "@teller-protocol/v2-contracts@workspace:packages/contracts":
   version: 0.0.0-use.local
   resolution: "@teller-protocol/v2-contracts@workspace:packages/contracts"
   dependencies:
     "@eth-optimism/hardhat-ovm": ^0.2.2
-    "@ethereum-attestation-service/sdk": ^0.11.2
     "@ethereumjs/vm": ^5.5.3
     "@ethersproject/providers": ^5.6.7
     "@nomiclabs/hardhat-ethers": ^2.2.1
@@ -1691,7 +1702,7 @@ __metadata:
     "@openzeppelin/contracts": ^4.8.0
     "@openzeppelin/contracts-upgradeable": ^4.8.0
     "@openzeppelin/hardhat-upgrades": ^1.21.0
-    "@tenderly/hardhat-tenderly": "https://github.com/passabilities/hardhat-tenderly#workspace=@tenderly/hardhat-tenderly"
+    "@teller-protocol/hardhat-tenderly": 1.6.3
     "@typechain/ethers-v5": ^10.2.0
     "@typechain/hardhat": ^6.1.5
     "@types/chai": ^4.2.22
@@ -1768,27 +1779,6 @@ __metadata:
     typescript: ^4.9.4
   languageName: unknown
   linkType: soft
-
-"@tenderly/hardhat-tenderly@https://github.com/passabilities/hardhat-tenderly#workspace=@tenderly/hardhat-tenderly":
-  version: 1.6.2
-  resolution: "@tenderly/hardhat-tenderly@https://github.com/passabilities/hardhat-tenderly.git#workspace=%40tenderly%2Fhardhat-tenderly&commit=44ef3138d83d08016d96048a1c19f79db55ab683"
-  dependencies:
-    "@ethersproject/bignumber": ^5.7.0
-    "@nomiclabs/hardhat-ethers": ^2.1.1
-    axios: ^0.27.2
-    ethers: ^5.7.0
-    fs-extra: ^10.1.0
-    hardhat: ^2.10.2
-    hardhat-deploy: ^0.11.14
-    js-yaml: ^4.1.0
-    tenderly: ^0.4.0
-    tslog: ^4.3.1
-  peerDependencies:
-    hardhat: ^2.10.2
-    tenderly: ^0.4.0
-  checksum: 3442c34e2b634057c3c84cfc7ac3c09f70ebb1cc52f63e2b228df97a8eacd3926e30984a3b7e458210e25ceec5b87f95d55a1e44379dd6c5d7ab87afe2366883
-  languageName: node
-  linkType: hard
 
 "@tootallnate/once@npm:1":
   version: 1.1.2
@@ -7209,7 +7199,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ethers@npm:^5.0.1, ethers@npm:^5.0.2, ethers@npm:^5.4.2, ethers@npm:^5.5.2, ethers@npm:^5.5.3, ethers@npm:^5.7.0, ethers@npm:^5.7.2":
+"ethers@npm:^5.0.1, ethers@npm:^5.0.2, ethers@npm:^5.5.2, ethers@npm:^5.5.3, ethers@npm:^5.7.0, ethers@npm:^5.7.2":
   version: 5.7.2
   resolution: "ethers@npm:5.7.2"
   dependencies:
@@ -8527,7 +8517,7 @@ __metadata:
     yargs-parser: ^16.1.0
   bin:
     gluegun: bin/gluegun
-  checksum: 872685026db07ad1687056a78388f17c6a9bcd22bbf9d99d1e2b21e2d196c6e99a128bcff48063b3f0cf692a4365142fae9dd06cf8c532bc557a45f8ac853308
+  checksum: 7a45a5a606a1e651c891467a693552b5237f8e90410f9c9daad4621ff0693d1c92b69aa35fc30eccf7c3b92ee724f15fc297e054086cfb312717ef01f48d2290
   languageName: node
   linkType: hard
 

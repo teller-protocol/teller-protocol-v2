@@ -1,4 +1,4 @@
-import { ContractByAddress } from '@tenderly/hardhat-tenderly/dist/tenderly/types'
+import { ContractByAddress } from '@teller-protocol/hardhat-tenderly/dist/tenderly/types'
 import { subtask, task } from 'hardhat/config'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
 

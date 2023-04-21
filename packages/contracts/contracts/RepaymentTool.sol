@@ -30,6 +30,16 @@ contract RepaymentTool is Initializable {
         external
     {
 
+        address lendingToken = tellerV2.getLoanLendingToken(_bidId);
+
+        IERC20(lendingToken).safeTransferFrom(
+        _msgSenderForMarket(bid.marketplaceId),
+            address(this),
+            _amount
+            );
+
+        IERC20(lendingToken).approve(address(tellerV2),_amount);
+
         tellerV2.repayLoan(_bidId, _amount);
  
         if(_claimCollateral){
@@ -41,6 +51,26 @@ contract RepaymentTool is Initializable {
         external
     {
 
+        address lendingToken = tellerV2.getLoanLendingToken(_bidId);
+
+
+        (uint256 owedPrincipal, , uint256 interest) = V2Calculations
+        .calculateAmountOwed(
+            bids[_bidId],
+            block.timestamp,
+            bidPaymentCycleType[_bidId]
+        );
+
+        uint256 paymentAmount = (owedPrincipal + interest);
+
+        IERC20(lendingToken).safeTransferFrom(
+        _msgSenderForMarket(bid.marketplaceId),
+            address(this),
+            paymentAmount
+            );
+
+        IERC20(lendingToken).approve(address(tellerV2),paymentAmount);
+
         tellerV2.repayLoanFull(_bidId);
  
         if(_claimCollateral){
@@ -48,16 +78,7 @@ contract RepaymentTool is Initializable {
         }
     }
 
-    function repayLoanMinumum(uint256 _bidId, bool _claimCollateral)
-       external
-    {
-
-        tellerV2.repayLoanMinimum(_bidId);
  
-        if(_claimCollateral){
-            collateralManager.withdraw(_bidId);
-        }
-    }
 
     function liquidateLoanFull(uint256 _bidId, bool _claimCollateral)
        external 

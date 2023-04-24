@@ -40,5 +40,11 @@ interface IMarketLiquidityRewards {
         view
         returns (bool);
 
+    function getRewardTokenAmount(uint256 _allocationId)
+        external
+        view
+        returns (uint256);
+    
+
     function initialize() external;
 }

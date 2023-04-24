@@ -282,6 +282,10 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
             allocatedReward.rewardPerLoanPrincipalAmount
         );
 
+        if(amountToReward > allocatedReward.rewardTokenAmount) {
+            amountToReward = allocatedReward.rewardTokenAmount;
+        }
+
         _decrementAllocatedAmount(_allocationId, amountToReward);
 
         //transfer tokens reward to the msgsender

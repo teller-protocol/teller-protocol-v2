@@ -1,6 +1,11 @@
-import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
-import { Commitment } from "../../generated/schema";
+import {
+  Commitment,
+  CommitmentZScore,
+  MarketCommitmentStdDev
+} from "../../generated/schema";
+import { addToArray } from "../helpers/utils";
 
 /**
  * @param {string} commitmentId - ID of the commitment
@@ -36,4 +41,54 @@ export function loadCommitment(commitmentId: string): Commitment {
     commitment.save();
   }
   return commitment;
+}
+
+function getMarketCommitmentStdDevId(commitment: Commitment): string {
+  const collateralTokenId = commitment.collateralToken
+    ? commitment.collateralToken
+    : "none";
+  return [
+    "market",
+    commitment.marketplace,
+    "token",
+    commitment.principalToken,
+    "collateral",
+    collateralTokenId
+  ].join("-");
+}
+
+export function loadMarketCommitmentStdDev(
+  commitment: Commitment
+): MarketCommitmentStdDev {
+  const id = getMarketCommitmentStdDevId(commitment);
+  let commitmentZScores = MarketCommitmentStdDev.load(id);
+  if (!commitmentZScores) {
+    commitmentZScores = new MarketCommitmentStdDev(id);
+    commitmentZScores.market = commitment.marketplace;
+    commitmentZScores.lendingToken = commitment.principalToken;
+    commitmentZScores.collateralToken = commitment.collateralToken;
+
+    commitmentZScores.commitmentZScores = [];
+    commitmentZScores.maxPrincipalPerCollateralStdDev = BigDecimal.zero();
+    commitmentZScores.maxPrincipalPerCollateralMean = BigDecimal.zero();
+    commitmentZScores.minApyStdDev = BigDecimal.zero();
+    commitmentZScores.minApyMean = BigDecimal.zero();
+    commitmentZScores.maxDurationStdDev = BigDecimal.zero();
+    commitmentZScores.maxDurationMean = BigDecimal.zero();
+    commitmentZScores.save();
+  }
+
+  return commitmentZScores;
+}
+
+export function loadCommitmentZScore(commitment: Commitment): CommitmentZScore {
+  let commitmentZScore = CommitmentZScore.load(commitment.id);
+  if (!commitmentZScore) {
+    commitmentZScore = new CommitmentZScore(commitment.id);
+    commitmentZScore.commitment = commitment.id;
+    commitmentZScore.zScore = BigDecimal.zero();
+    commitmentZScore.save();
+  }
+
+  return commitmentZScore;
 }

@@ -11,6 +11,12 @@ type Protocol implements IHasLoans @entity {
   durationAverage: BigInt!
 }
 
+type ProtocolCollateral @entity {
+  id: ID!
+  collateralToken: Token
+  tokenVolumesByLendingToken: [TokenVolume!]! @derivedFrom(field: "_protocolCollateral")
+}
+
 type MarketPlace implements IHasLoans @entity {
   id: ID!
   marketplaceId: BigInt!
@@ -260,15 +266,6 @@ type LoanStatusCount implements ILoanStatusCount @entity {
   ## end Entity Relationships ##
 }
 
-type CollateralPairTokenVolume @entity {
-  id: ID!
-  lendingToken: Token!
-  collateralToken: Token # if null, then theres no collateral
-  tokenVolume: TokenVolume!
-
-  _totalTokenVolume: TokenVolume!
-}
-
 type TokenVolume implements IDurationAverage @entity {
   id: ID!
 
@@ -277,14 +274,20 @@ type TokenVolume implements IDurationAverage @entity {
   market: MarketPlace
   lender: Lender
   borrower: Borrower
+
+  # used to group token volumes with collateral by lending token
+  _protocolCollateral: ProtocolCollateral
+
+  _linkedParentTokenVolume: TokenVolume
+  tokenVolumeByCollateral: [TokenVolume!]! @derivedFrom(field: "_linkedParentTokenVolume")
   ## end Entity Relationships ##
 
   ## TokenStats ##
   token: Token!
+  collateralToken: Token # if null, then theres no collateral
   lendingTokenAddress: Bytes!
-  loans: LoanStatusCount! @derivedFrom(field: "_tokenVolume")
 
-  collateralTokenVolumes: [CollateralPairTokenVolume!]! @derivedFrom(field: "_totalTokenVolume")
+  loans: LoanStatusCount! @derivedFrom(field: "_tokenVolume")
 
   outstandingCapital: BigInt!
   totalAvailable: BigInt! # available for lending via commitments

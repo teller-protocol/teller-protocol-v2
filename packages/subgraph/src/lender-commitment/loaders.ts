@@ -1,7 +1,6 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 
 import { Commitment } from "../../generated/schema";
-import { loadProtocol } from "../helpers/loaders";
 
 /**
  * @param {string} commitmentId - ID of the commitment

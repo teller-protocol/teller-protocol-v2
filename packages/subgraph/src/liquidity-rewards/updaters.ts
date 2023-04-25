@@ -1,7 +1,7 @@
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 
 import { MarketLiquidityRewards } from "../../generated/MarketLiquidityRewards/MarketLiquidityRewards";
-import { Bid, RewardAllocation, Token, TokenVolume, User } from "../../generated/schema";
+import { Bid, RewardAllocation, Token, TokenVolume, User, BidCollateral } from "../../generated/schema";
 import { loadBidById, loadLoanStatusCount, loadMarketTokenVolume, loadProtocol, loadToken } from "../helpers/loaders";
 import { addToArray, removeFromArray } from "../helpers/utils";
 import {bidStatusToString,BidStatus} from "../helpers/bid";
@@ -346,17 +346,69 @@ function bidIsEligibleForReward( bid: Bid,  rewardAllocation: RewardAllocation) 
   if(rewardAllocation.bidStartTimeMax > BigInt.zero() && bid.acceptedTimestamp > rewardAllocation.bidStartTimeMax){ return false }
 
   
-  //verify collateral ! 
-
-  if(rewardAllocation.requiredCollateralTokenAddress != Address.empty() && rewardAllocation.minimumCollateralPerPrincipalAmount > 0){
+  //filter by collateral requirements!
+  if(rewardAllocation.requiredCollateralTokenAddress != Address.zero() && rewardAllocation.minimumCollateralPerPrincipalAmount > BigInt.zero()){
 
     //make sure the bid has the required collateral, and with enough ratio 
+
+    let hasValidCollateral = false;   
+
+    let bidCollaterals = bid.collateral;
+
+    if(bidCollaterals){
+      for(let i=0;i<bidCollaterals.length;i++){
+        let bidCollateral = BidCollateral.load(bidCollaterals[i])!;
+
+       
+          let principalToken = Token.load(bid.lendingToken)!;
+          let principalTokenDecimals = principalToken.decimals;
+          if(!principalTokenDecimals){principalTokenDecimals = BigInt.zero();}
+
+          let collateralToken = Token.load(bidCollateral.token)!;
+          let collateralTokenDecimals = collateralToken.decimals; 
+          if(!collateralTokenDecimals){collateralTokenDecimals =  BigInt.zero();} 
+
+          let requiredCollateralAmount = getRequiredCollateralAmount(
+            bid.principal,
+            rewardAllocation.minimumCollateralPerPrincipalAmount,
+            principalTokenDecimals.toI32(),
+            collateralTokenDecimals.toI32()            
+            );
+        
+          if( 
+          bidCollateral.collateralAddress == rewardAllocation.requiredCollateralTokenAddress 
+          && bidCollateral.amount >= requiredCollateralAmount 
+          ){
+            hasValidCollateral = true; 
+            break;
+          } 
+        
+      }
+    }
+
+    if(!hasValidCollateral) return false;
 
   }
 
   
   
   return true;
+
+}
+
+/*
+  Make sure this rounds like the solidity method 
+*/
+function getRequiredCollateralAmount( principal: BigInt, minimumCollateralPerPrincipalAmount: BigInt, principalTokenDecimals: i32, collateralTokenDecimals:i32 ) : BigInt {
+ 
+  let expansion = BigInt.fromI32(10).pow(  (principalTokenDecimals + collateralTokenDecimals) as u8) ;
+
+  let requiredCollateralAmount = (
+    minimumCollateralPerPrincipalAmount * principal / expansion 
+  ); 
+  
+  return requiredCollateralAmount;
+
 
 }
 

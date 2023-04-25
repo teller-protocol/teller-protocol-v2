@@ -341,13 +341,20 @@ function bidIsEligibleForReward( bid: Bid,  rewardAllocation: RewardAllocation) 
  //must use address.zero and not address.empty 
   if(rewardAllocation.requiredPrincipalTokenAddress != Address.zero() &&  bid.lendingTokenAddress != rewardAllocation.requiredPrincipalTokenAddress  ) {return false; }
 
-  //if(rewardAllocation.requiredCollateralTokenAddress != Address.empty() &&  bid.collateralTokenAddress != rewardAllocation.requiredCollateralTokenAddress  ) return false;
-  //minimumCollateralPerPrincipalAmount 
 
   if(rewardAllocation.bidStartTimeMin > BigInt.zero() && bid.acceptedTimestamp < rewardAllocation.bidStartTimeMin){ return false }
   if(rewardAllocation.bidStartTimeMax > BigInt.zero() && bid.acceptedTimestamp > rewardAllocation.bidStartTimeMax){ return false }
 
- 
+  
+  //verify collateral ! 
+
+  if(rewardAllocation.requiredCollateralTokenAddress != Address.empty() && rewardAllocation.minimumCollateralPerPrincipalAmount > 0){
+
+    //make sure the bid has the required collateral, and with enough ratio 
+
+  }
+
+  
   
   return true;
 

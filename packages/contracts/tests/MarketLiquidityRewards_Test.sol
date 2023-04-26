@@ -265,6 +265,7 @@ FNDA:0,MarketLiquidityRewards._verifyCollateralAmount
         mockBid.loanDetails.lendingToken = (principalToken);
         mockBid.loanDetails.principal = 0;
         mockBid.loanDetails.acceptedTimestamp = uint32(block.timestamp);
+        mockBid.loanDetails.lastRepaidTimestamp = uint32(block.timestamp);
         mockBid.state = BidState.PAID;
 
         tellerV2Mock.setMockBid(mockBid);
@@ -307,11 +308,13 @@ FNDA:0,MarketLiquidityRewards._verifyCollateralAmount
     function test_calculateRewardAmount_weth_principal() public {
         uint256 loanPrincipal = 1e8;
         uint256 principalTokenDecimals = 18;
+        uint32 loanDuration = 60*60*24*365;
 
         uint256 rewardPerLoanPrincipalAmount = 1e16; // expanded by token decimals so really 0.01
 
         uint256 rewardAmount = marketLiquidityRewards.calculateRewardAmount(
             loanPrincipal,
+            loanDuration,
             principalTokenDecimals,
             rewardPerLoanPrincipalAmount
         );
@@ -322,11 +325,13 @@ FNDA:0,MarketLiquidityRewards._verifyCollateralAmount
     function test_calculateRewardAmount_usdc_principal() public {
         uint256 loanPrincipal = 1e8;
         uint256 principalTokenDecimals = 6;
+        uint32 loanDuration = 60*60*24*365;
 
         uint256 rewardPerLoanPrincipalAmount = 1e4; // expanded by token decimals so really 0.01
 
         uint256 rewardAmount = marketLiquidityRewards.calculateRewardAmount(
             loanPrincipal,
+            loanDuration,
             principalTokenDecimals,
             rewardPerLoanPrincipalAmount
         );

@@ -65,12 +65,14 @@ contract MarketLiquidityRewards_Override is MarketLiquidityRewards {
 
     function calculateRewardAmount(
         uint256 loanPrincipal,
+        uint32 loanDuration,
         uint256 principalTokenDecimals,
         uint256 rewardPerLoanPrincipalAmount
     ) public view returns (uint256) {
         return
             super._calculateRewardAmount(
                 loanPrincipal,
+                loanDuration,
                 principalTokenDecimals,
                 rewardPerLoanPrincipalAmount
             );

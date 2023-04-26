@@ -63,6 +63,7 @@
     "./build", 
     "./contracts",
     "./coverage",
-    "./docs"
+    "./docs",
+    "./teller-math-lib"
   ]
 }

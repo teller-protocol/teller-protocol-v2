@@ -1,4 +1,11 @@
-import { BigInt } from "@graphprotocol/graph-ts";
+import {
+  BigDecimal,
+  BigInt,
+  Entity,
+  log,
+  TypedMap,
+  Value
+} from "@graphprotocol/graph-ts";
 
 export function addToArray<T>(
   array: T[],
@@ -25,5 +32,73 @@ export function camelize(str: string): string {
 }
 
 export function safeDiv(a: BigInt, b: BigInt): BigInt {
-  return b.isZero() ? BigInt.zero() : a.div(b);
+  return b.isZero() ? b : a.div(b);
+}
+
+export function safeDivBD(a: BigDecimal, b: BigDecimal): BigDecimal {
+  return b.digits.plus(b.exp).isZero() ? b : a.div(b);
+}
+
+export function calcStdDevAndMeanFromEntities(
+  entities: Entity[],
+  key: string
+): BigDecimal[] {
+  const mean = calcMean(entities, key);
+
+  const variance = calcVariance(entities, key, mean);
+  const stdDev = sqrtBD(variance);
+  log.warning("std dev: {}", [stdDev.toString()]);
+
+  return [stdDev, mean];
+}
+
+function sqrtBD(x: BigDecimal): BigDecimal {
+  let z = BigDecimal.fromString("1");
+  for (let i = 0; i < 50; i++) {
+    z = x
+      .div(z)
+      .plus(z)
+      .div(BigDecimal.fromString("2"));
+  }
+  return z;
+}
+
+export function calcMean(entities: Entity[], key: string): BigDecimal {
+  let sum = BigDecimal.zero();
+  for (let i = 0; i < entities.length; i++) {
+    if (!entities[i].isSet(key)) continue;
+    const value = new BigDecimal(entities[i].getBigInt(key));
+    sum = sum.plus(value);
+  }
+  const length = BigDecimal.fromString(entities.length.toString());
+  return safeDivBD(sum, length);
+}
+
+export function calcVariance(
+  entities: Entity[],
+  key: string,
+  mean: BigDecimal
+): BigDecimal {
+  let sum = BigDecimal.zero();
+  for (let i = 0; i < entities.length; i++) {
+    const value = entities[i].isSet(key)
+      ? new BigDecimal(entities[i].getBigInt(key))
+      : BigDecimal.zero();
+    const diff = value.minus(mean);
+    sum = sum.plus(diff.times(diff));
+  }
+  const length = BigDecimal.fromString(entities.length.toString());
+  return safeDivBD(sum, length);
+}
+
+export function calcWeightedDeviation(
+  mean: BigDecimal,
+  stdDev: BigDecimal,
+  weight: BigDecimal,
+  value: BigInt | null
+): BigDecimal {
+  const val = value ? new BigDecimal(value) : BigDecimal.zero();
+  const diff = val.minus(mean);
+  const deviation = safeDivBD(diff, stdDev);
+  return deviation.times(weight);
 }

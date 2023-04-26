@@ -22,7 +22,9 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
     ITellerV2 public tellerV2;
     address private collateralEscrowBeacon; // The address of the escrow contract beacon
-    mapping(uint256 => address) public _escrows; // bidIds -> collateralEscrow
+
+    // bidIds -> collateralEscrow
+    mapping(uint256 => address) public _escrows;
     // bidIds -> validated collateral info
     mapping(uint256 => CollateralInfo) internal _bidCollaterals;
 
@@ -121,6 +123,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         address borrower = tellerV2.getLoanBorrower(_bidId);
         (validation_, ) = checkBalances(borrower, _collateralInfo);
 
+        //if the collateral info is valid, call commitCollateral for each one
         if (validation_) {
             for (uint256 i; i < _collateralInfo.length; i++) {
                 Collateral memory info = _collateralInfo[i];
@@ -178,9 +181,11 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
      */
     function deployAndDeposit(uint256 _bidId) external onlyTellerV2 {
         if (isBidCollateralBacked(_bidId)) {
+            //attempt deploy a new collateral escrow contract if there is not already one. Otherwise fetch it.
             (address proxyAddress, ) = _deployEscrow(_bidId);
             _escrows[_bidId] = proxyAddress;
 
+            //for each bid collateral associated with this loan, deposit the collateral into escrow
             for (
                 uint256 i;
                 i < _bidCollaterals[_bidId].collateralAddresses.length();
@@ -250,8 +255,10 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     function withdraw(uint256 _bidId) external {
         BidState bidState = tellerV2.getBidState(_bidId);
         if (bidState == BidState.PAID) {
+            //if the bid is fully repaid the borrower gets all collateral assets back
             _withdraw(_bidId, tellerV2.getLoanBorrower(_bidId));
         } else if (tellerV2.isLoanDefaulted(_bidId)) {
+            //if the bid is defaulted the lender gets all of the collateral
             _withdraw(_bidId, tellerV2.getLoanLender(_bidId));
             emit CollateralClaimed(_bidId);
         } else {
@@ -462,6 +469,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
             checks_[i] = isValidated;
             if (!isValidated) {
                 validated_ = false;
+                //if short circuit is true, return on the first invalid balance to save execution cycles. Values of checks[] will be invalid/undetermined if shortcircuit is true.
                 if (_shortCircut) {
                     return (validated_, checks_);
                 }

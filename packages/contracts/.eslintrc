@@ -1,4 +1,5 @@
 {
+  "root": true,
   // Specifies the ESLint parser
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
@@ -19,9 +20,11 @@
       "build",
       ".yarn",
       "build-utils",
-      "generated"
+      "generated",
+      "teller-math-lib"
     ]
   },
+   
   "env": {
     "es6": true,
     "node": true

@@ -505,7 +505,7 @@ contract TellerV2Mock is TellerV2Context {
         mockBid = bid;
     }
 
-    function getLoanSummary(uint256 _bidId)
+   function getLoanSummary(uint256 _bidId)
         external
         view
         returns (
@@ -515,6 +515,7 @@ contract TellerV2Mock is TellerV2Context {
             address principalTokenAddress,
             uint256 principalAmount,
             uint32 acceptedTimestamp,
+            uint32 lastRepaidTimestamp,
             BidState bidState
         )
     {
@@ -526,6 +527,7 @@ contract TellerV2Mock is TellerV2Context {
         principalTokenAddress = address(bid.loanDetails.lendingToken);
         principalAmount = bid.loanDetails.principal;
         acceptedTimestamp = bid.loanDetails.acceptedTimestamp;
+        lastRepaidTimestamp = bid.loanDetails.lastRepaidTimestamp;
         bidState = bid.state;
     }
 }

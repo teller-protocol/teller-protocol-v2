@@ -30,9 +30,7 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
     address immutable collateralManager;
 
     uint256 allocationCount;
-
-    uint256 constant ONE_YEAR_SECONDS = 60 * 60 * 24 * 365;
-
+ 
     //allocationId => rewardAllocation
     mapping(uint256 => RewardAllocation) public allocatedRewards;
 
@@ -385,7 +383,7 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
 
         return MathUpgradeable.mulDiv(rewardPerYear,
             _loanDuration,
-            ONE_YEAR_SECONDS);
+            365 days);
     }
 
     /**

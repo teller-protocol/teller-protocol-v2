@@ -5,6 +5,7 @@ type Protocol implements IHasLoans @entity {
   tokenVolumes: [TokenVolume!]! @derivedFrom(field: "protocol")
 
   activeCommitments: [Commitment!]!
+  activeRewards: [RewardAllocation!]!
 
   _durationTotal: BigInt!
   durationAverage: BigInt!
@@ -138,6 +139,7 @@ type User @entity {
   firstInteractionDate: BigInt!
   lenders: [Lender!]! @derivedFrom(field: "user")
   borrowers: [Borrower!]! @derivedFrom(field: "user")
+  bidRewards: [BidReward!]! @derivedFrom(field: "user")
 }
 
 type Lender implements IHasLoans @entity {
@@ -371,3 +373,55 @@ type Commitment @entity {
   # TokenStats
   tokenVolume: TokenVolume!
 }
+
+
+ 
+
+type RewardAllocation @entity {
+  id: ID!
+  createdAt: BigInt!
+  updatedAt: BigInt!
+
+  status: String!
+
+  allocator: User!
+  allocatorAddress: Bytes!
+
+  # Market
+  marketplace: MarketPlace!
+  marketplaceId: BigInt!
+
+  # TokenStats
+  tokenVolume: TokenVolume!
+
+  rewardToken: Token!
+  rewardTokenAddress: Bytes!
+  rewardTokenAmountInitial: BigInt!
+  rewardTokenAmountRemaining: BigInt!
+
+  requiredPrincipalTokenAddress: Bytes!
+  requiredCollateralTokenAddress: Bytes!
+
+  minimumCollateralPerPrincipalAmount: BigInt!
+  rewardPerLoanPrincipalAmount: BigInt!
+
+  bidStartTimeMin: BigInt!
+  bidStartTimeMax: BigInt!
+
+  allocationStrategy: String!
+ 
+
+
+}
+
+
+type BidReward @entity {
+  id: ID!
+  createdAt: BigInt!
+  updatedAt: BigInt!
+
+  reward: RewardAllocation!
+  bid: Bid!
+  user: User!
+}
+

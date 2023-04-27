@@ -1,3 +1,13 @@
+{{#*inline "global_required_abis"}}
+        - name: TellerV2
+          file: ./abis/{{network}}_TellerV2.json
+        - name: TellerV0Storage
+          file: ../../packages/contracts/generated/artifacts/contracts/TellerV0Storage.sol/TellerV0Storage.json
+        - name: ERC165
+          file: ../../packages/contracts/generated/artifacts/@openzeppelin/contracts/utils/introspection/ERC165.sol/ERC165.json
+        - name: IERC20Metadata
+          file: ../../packages/contracts/generated/artifacts/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol/IERC20Metadata.json
+{{/inline}}
 specVersion: 0.0.2
 schema:
   file: ./src/schema.graphql
@@ -44,15 +54,16 @@ dataSources:
         - handler: handleBlock
       file: ./src/block-handler.ts
 {{/if}}
+{{#if contracts.teller_v2.enabled}}
   - kind: ethereum/contract
     name: TellerV2
     network: {{network}}
     source:
-      {{#with contracts.teller_v2}}
+    {{#with contracts.teller_v2}}
       address: '{{address}}'
       abi: TellerV2
       startBlock: {{block}}
-      {{/with}}
+    {{/with}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -95,15 +106,17 @@ dataSources:
         - event: Upgraded(indexed address)
           handler: handleTellerV2Upgraded
       file: ./src/mapping.ts
+{{/if}}
+{{#if contracts.market_registry.enabled}}
   - kind: ethereum/contract
     name: MarketRegistry
     network: {{network}}
     source:
-      {{#with contracts.market_registry}}
+    {{#with contracts.market_registry}}
       address: '{{address}}'
       abi: MarketRegistry
       startBlock: {{block}}
-      {{/with}}
+    {{/with}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -151,15 +164,17 @@ dataSources:
         - event: SetMarketPaymentType(uint256,uint8)
           handler: handleSetMarketPaymentType
       file: ./src/market-registry/mapping.ts
+{{/if}}
+{{#if contracts.lender_commitment.enabled}}
   - kind: ethereum/contract
     name: LenderCommitmentForwarder
     network: {{network}}
     source:
-      {{#with contracts.lender_commitment}}
+    {{#with contracts.lender_commitment}}
       address: '{{address}}'
       abi: LenderCommitmentForwarder
       startBlock: {{block}}
-      {{/with}}
+    {{/with}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -189,15 +204,17 @@ dataSources:
         - event: UpdatedCommitmentBorrowers(indexed uint256)
           handler: handeUpdatedCommitmentBorrower
       file: ./src/lender-commitment/mapping.ts
+{{/if}}
+{{#if contracts.collateral_manager.enabled}}
   - kind: ethereum/contract
     name: CollateralManager
     network: {{network}}
     source:
-      {{#with contracts.collateral_manager}}
+    {{#with contracts.collateral_manager}}
       address: '{{address}}'
       abi: CollateralManager
       startBlock: {{block}}
-      {{/with}}
+    {{/with}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -225,15 +242,53 @@ dataSources:
         - event: CollateralClaimed(uint256)
           handler: handleCollateralClaimed
       file: ./src/collateral-manager/mapping.ts
+{{/if}}
+{{#if contracts.market_liquidity_rewards.enabled}}
+  - kind: ethereum/contract
+    name: MarketLiquidityRewards
+    network: {{network}}
+    source:
+    {{#with contracts.market_liquidity_rewards}}
+      address: '{{address}}'
+      abi: MarketLiquidityRewards
+      startBlock: {{block}}
+    {{/with}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - RewardAllocation
+        - ClaimableReward
+      abis:
+{{> global_required_abis}}
+        - name: MarketLiquidityRewards
+          file: ./abis/{{network}}_MarketLiquidityRewards.json
+      eventHandlers:
+        - event: CreatedAllocation(uint256,address,uint256)
+          handler: handleCreatedAllocation
+        - event: IncreasedAllocation(uint256,uint256)
+          handler: handleIncreasedAllocation
+        - event: DecreasedAllocation(uint256,uint256)
+          handler: handleDecreasedAllocation
+        - event: UpdatedAllocation(uint256)
+          handler: handleUpdatedAllocation
+        - event: DeletedAllocation(uint256)
+          handler: handleDeletedAllocation
+        - event: ClaimedRewards(uint256,uint256,address,uint256)
+          handler: handleClaimedReward
+      file: ./src/liquidity-rewards/mapping.ts
+{{/if}}
+{{#if contracts.lender_manager.enabled}}
   - kind: ethereum/contract
     name: LenderManager
     network: {{network}}
     source:
-      {{#with contracts.lender_manager}}
+    {{#with contracts.lender_manager}}
       address: '{{address}}'
       abi: LenderManager
       startBlock: {{block}}
-      {{/with}}
+    {{/with}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -250,3 +305,4 @@ dataSources:
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleNewLenderSet
       file: ./src/mapping.ts
+{{/if}}

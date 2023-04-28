@@ -203,7 +203,13 @@ export function updateRewardAllocation(
 
 
 
+export function linkRewardToTokenVolume(rewardAllocation:RewardAllocation) : void {
+ 
+  const tokenVolume = loadMarketTokenVolume(rewardAllocation.rewardToken, rewardAllocation.marketplaceId.toString());
+  rewardAllocation.tokenVolume = tokenVolume.id;
+  rewardAllocation.save(); 
 
+}
 
 
 

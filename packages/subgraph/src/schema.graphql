@@ -275,7 +275,7 @@ type TokenVolume implements IDurationAverage @entity {
   lender: Lender
   borrower: Borrower
 
-  allocatedRewards: [RewardAllocation!]
+  allocatedRewards: [RewardAllocation!]! @derivedFrom(field: "_tokenVolume")
 
   # used to group token volumes with collateral by lending token
   _protocolCollateral: ProtocolCollateral
@@ -385,6 +385,8 @@ type RewardAllocation @entity {
   bidStartTimeMax: BigInt!
 
   allocationStrategy: String!
+
+  _tokenVolume: TokenVolume
  
 
 

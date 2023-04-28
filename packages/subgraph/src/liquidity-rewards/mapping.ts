@@ -12,7 +12,7 @@ import { Bid } from "../../generated/schema";
 import { loadBidById, loadProtocol } from "../helpers/loaders";
 
 import { loadRewardAllocation } from "./loaders";
-import {  createRewardAllocation, updateAllocationStatus, updateRewardAllocation, linkRewardToBids } from "./updaters";
+import {  createRewardAllocation, updateAllocationStatus, updateRewardAllocation, linkRewardToBids, linkRewardToTokenVolume } from "./updaters";
 import { AllocationStatus } from "./utils";
  
 
@@ -44,6 +44,7 @@ export function handleCreatedAllocation(event: CreatedAllocation): void {
 
 
   linkRewardToBids(allocation);
+  linkRewardToTokenVolume(allocation);
 
 }
 
@@ -62,6 +63,7 @@ export function handleUpdatedAllocation(event: UpdatedAllocation): void {
   );
 
   linkRewardToBids(allocation);
+  linkRewardToTokenVolume(allocation);
 }
 
 export function handleUpdatedAllocations(events: UpdatedAllocation[]): void {
@@ -80,6 +82,7 @@ export function handleIncreasedAllocation(event: UpdatedAllocation): void {
 
 
   linkRewardToBids(allocation);
+  linkRewardToTokenVolume(allocation);
 
 }
 
@@ -99,6 +102,7 @@ export function handleDecreasedAllocation(event: UpdatedAllocation): void {
   );
 
   linkRewardToBids(allocation);
+  linkRewardToTokenVolume(allocation);
 }
 
 export function handleDecreasedAllocations(events: UpdatedAllocation[]): void {
@@ -126,6 +130,7 @@ export function handleDeletedAllocation(event: DeletedAllocation): void {
   updateAllocationStatus(allocation, AllocationStatus.Deleted);
 
   linkRewardToBids(allocation);
+  linkRewardToTokenVolume(allocation);
 }
 
 export function handleDeletedAllocations(events: DeletedAllocation[]): void {

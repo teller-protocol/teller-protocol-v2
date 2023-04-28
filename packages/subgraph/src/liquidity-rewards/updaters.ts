@@ -76,7 +76,9 @@ export function createRewardAllocation(
   );
 
   let rewardToken = loadToken(allocatedReward.value1).id;
-  //let marketplaceId = allocatedReward.value3;
+  let requiredPrincipalTokenAddress = allocatedReward.value4;
+  let requiredCollateralTokenAddress = allocatedReward.value5;
+   
 
   allocation.allocatorAddress = allocatedReward.value0;
   allocation.rewardTokenAddress = allocatedReward.value1;
@@ -84,15 +86,18 @@ export function createRewardAllocation(
   allocation.rewardTokenAmountInitial = allocatedReward.value2;
   allocation.rewardTokenAmountRemaining = allocatedReward.value2;
   allocation.marketplaceId = BigInt.fromString(marketplaceId);
-  allocation.requiredPrincipalTokenAddress = allocatedReward.value4;
-  allocation.requiredCollateralTokenAddress = allocatedReward.value5;
+  allocation.requiredPrincipalTokenAddress = requiredPrincipalTokenAddress;
+  allocation.requiredCollateralTokenAddress = requiredCollateralTokenAddress;
   allocation.minimumCollateralPerPrincipalAmount = allocatedReward.value6;
   allocation.rewardPerLoanPrincipalAmount = allocatedReward.value7;
   allocation.bidStartTimeMin = allocatedReward.value8;
   allocation.bidStartTimeMax = allocatedReward.value9;
   allocation.allocationStrategy = allocatedReward.value10 == 0 ? "BORROWER" : "LENDER";
-  allocation.tokenVolume = loadMarketTokenVolume(rewardToken, marketplaceId.toString()).id;
-
+  
+  if(requiredPrincipalTokenAddress!= Address.zero()){
+    allocation.tokenVolume = loadMarketTokenVolume(requiredPrincipalTokenAddress.toHexString(), marketplaceId.toString()).id;
+  }
+  
   allocation.save()
 
  
@@ -202,19 +207,7 @@ export function updateRewardAllocation(
 
 
 
-
-
-/*
-
-export function linkRewardToTokenVolume(rewardAllocation:RewardAllocation) : void {
  
-  const tokenVolume = loadMarketTokenVolume(rewardAllocation.rewardToken, rewardAllocation.marketplaceId.toString());
-  rewardAllocation.tokenVolume = tokenVolume.id;
-  rewardAllocation.save(); 
-
-}
-*/
-
 
 /*
 RUN THIS FUNCTION : 
@@ -224,7 +217,6 @@ RUN THIS FUNCTION :
 
 DESCRIPTION: 
 This function will loop through all of the bids (matching market id and principal token) in order to update the protocol entity array 
-
  
 
 verify that the reward is active and has funds remaining 

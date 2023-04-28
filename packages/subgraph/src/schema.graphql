@@ -275,6 +275,8 @@ type TokenVolume implements IDurationAverage @entity {
   lender: Lender
   borrower: Borrower
 
+  allocatedRewards: [RewardAllocation!]
+
   # used to group token volumes with collateral by lending token
   _protocolCollateral: ProtocolCollateral
 

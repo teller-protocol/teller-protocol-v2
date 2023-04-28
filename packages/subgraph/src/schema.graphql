@@ -70,6 +70,8 @@ type Bid @entity {
   lendingToken: Token!
   lendingTokenAddress: Bytes!
 
+  bidRewards: [BidReward!]! @derivedFrom(field: "bid")
+
   marketplaceId: BigInt!
   metadataURI: String!
   status: String!
@@ -386,7 +388,7 @@ type RewardAllocation @entity {
 
   allocationStrategy: String!
 
- 
+  bidRewards: [BidReward!]! @derivedFrom(field: "reward")
 
 
 }

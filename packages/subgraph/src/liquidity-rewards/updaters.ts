@@ -1,16 +1,17 @@
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 
 import { MarketLiquidityRewards } from "../../generated/MarketLiquidityRewards/MarketLiquidityRewards";
-import { Bid, RewardAllocation, Token, TokenVolume, User, BidCollateral } from "../../generated/schema";
+import { Bid, RewardAllocation, Token, TokenVolume, User, BidCollateral, BidReward } from "../../generated/schema";
 import { loadBidById, loadLoanStatusCount, loadMarketTokenVolume, loadProtocol, loadToken } from "../helpers/loaders";
 import { addToArray, removeFromArray } from "../helpers/utils";
 import {bidStatusToString,BidStatus} from "../helpers/bid";
 
 import { loadRewardAllocation, loadBidReward, getBidRewardId } from "./loaders";
-import { AllocationStatus, allocationStatusToString } from "./utils";
+import { AllocationStatus, allocationStatusToEnum, allocationStatusToString } from "./utils";
 //import { CommitmentStatus, commitmentStatusToString } from "./utils";
 
- 
+import { store } from '@graphprotocol/graph-ts'
+
 
 enum CollateralTokenType {
   NONE,
@@ -241,13 +242,11 @@ export function linkRewardToBids(rewardAllocation:RewardAllocation) : void {
 
     //check to see if the bid is eligible for the reward
     
-    if( //make this a function later
+    if( 
+      allocationStatusToEnum(rewardAllocation.status) == AllocationStatus.Active &&
        bidIsEligibleForReward(bid,rewardAllocation) 
       ){
-
-        appendAllocationRewardToBidParticipants(bid,rewardAllocation);
-
-      
+        appendAllocationRewardToBidParticipants(bid,rewardAllocation);      
     }
 
     bid.save()
@@ -276,61 +275,56 @@ export function linkBidToRewards(bid:Bid) : void {
   for(let i = 0; i < activeRewardIds.length; i++){
 
     let allocationRewardId = activeRewardIds[i];
-
  
     let rewardAllocation = RewardAllocation.load(allocationRewardId)!;
- 
 
     if( 
-
-        bidIsEligibleForReward(bid,rewardAllocation)
-   
-    ){
- 
-      appendAllocationRewardToBidParticipants(bid,rewardAllocation);
-
-       
+        allocationStatusToEnum(rewardAllocation.status) == AllocationStatus.Active &&
+        bidIsEligibleForReward(bid,rewardAllocation)   
+    ){ 
+      appendAllocationRewardToBidParticipants(bid,rewardAllocation);       
     }
-
-
-
-
 
   }
 
 }
 
 
+export function unlinkBidsFromReward(reward:RewardAllocation) : void {
+
+  let bidRewards = reward.bidRewards ; 
+
+  for(let i = 0; i < bidRewards.length; i++){
+      
+      let bidRewardId = bidRewards[i];
+  
+      let bidReward = BidReward.load(bidRewardId)!;
+    
+      store.remove('BidReward', bidReward.id) 
+
+  }
+
+
+}
+
+export function unlinkTokenVolumeFromReward(reward:RewardAllocation) : void {
+  
+  const allocation = loadRewardAllocation(reward.id);
+  
+  allocation.tokenVolume = ""
+
+  allocation.save()
+
+}
+
 function appendAllocationRewardToBidParticipants(bid: Bid,  rewardAllocation: RewardAllocation):void{
    //create a bid reward entity 
    const bidRewardId = getBidRewardId(bid,rewardAllocation);
+
+   //this created a bidReward which is an attachment of the reward to a bid 
    let bidReward = loadBidReward(bid,rewardAllocation);
    
-   /*
-   if(  borrowerIsEligibleForRewardWithBidStatus( bid.status ) ) {  //  == BidStatus.Accepted){
-
-   ///this only happens if bid is repaid 
-   let borrower = User.load(bid.borrowerAddress.toHexString())!
-
-   let borrowerRewardsArray = borrower.bidRewards;
-   borrowerRewardsArray.push(bidReward.id.toString());
-   borrower.bidRewards = borrowerRewardsArray;
-
-     //add bid reward to array in here 
-   borrower.save()
-   }
-
-   if(  lenderIsEligibleForRewardWithBidStatus( bid.status )) { 
-   //this happens in more situations 
-   let lender = User.load(bid.lenderAddress!.toHexString())!
-
-   //add bid reward to array in here 
-   let lenderRewardsArray = lender.bidRewards;
-   lenderRewardsArray.push(bidReward.id.toString());
-   lender.bidRewards = lenderRewardsArray;
-
-   lender.save()
-   }*/
+    
 }
  
 
@@ -361,11 +355,11 @@ function bidIsEligibleForReward( bid: Bid,  rewardAllocation: RewardAllocation) 
         let bidCollateral = BidCollateral.load(bidCollaterals[i])!;
 
        
-          let principalToken = Token.load(bid.lendingToken)!;
+          let principalToken = loadToken(Address.fromString(bid.lendingToken) );
           let principalTokenDecimals = principalToken.decimals;
           if(!principalTokenDecimals){principalTokenDecimals = BigInt.zero();}
 
-          let collateralToken = Token.load(bidCollateral.token)!;
+          let collateralToken = loadToken(Address.fromString(bidCollateral.token));
           let collateralTokenDecimals = collateralToken.decimals; 
           if(!collateralTokenDecimals){collateralTokenDecimals =  BigInt.zero();} 
 

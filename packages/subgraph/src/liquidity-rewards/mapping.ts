@@ -12,7 +12,7 @@ import { Bid } from "../../generated/schema";
 import { loadBidById, loadProtocol } from "../helpers/loaders";
 
 import { loadRewardAllocation } from "./loaders";
-import {  createRewardAllocation, updateAllocationStatus, updateRewardAllocation, linkRewardToBids } from "./updaters";
+import {  createRewardAllocation, updateAllocationStatus, updateRewardAllocation, linkRewardToBids, unlinkTokenVolumeFromReward, unlinkBidsFromReward } from "./updaters";
 import { AllocationStatus } from "./utils";
  
 
@@ -122,12 +122,14 @@ export function handleDeletedAllocation(event: DeletedAllocation): void {
   allocation.minAPY = BigInt.zero();
   allocation.maxPrincipalPerCollateralAmount = BigInt.zero();*/
   allocation.save();
-
-
+ 
 
   updateAllocationStatus(allocation, AllocationStatus.Deleted);
+ 
+  unlinkBidsFromReward(allocation); 
 
-  linkRewardToBids(allocation); 
+  unlinkTokenVolumeFromReward(allocation)
+
 }
 
 export function handleDeletedAllocations(events: DeletedAllocation[]): void {

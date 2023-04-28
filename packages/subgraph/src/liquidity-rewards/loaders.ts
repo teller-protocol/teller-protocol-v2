@@ -25,7 +25,7 @@ export function loadRewardAllocation(allocationId: string): RewardAllocation {
     allocation.allocator="";
     allocation.allocatorAddress = Address.zero();
 
-    allocation.tokenVolume = "";
+   // allocation.tokenVolume = "";
 
     allocation.marketplace = "";
     allocation.marketplaceId = BigInt.zero();

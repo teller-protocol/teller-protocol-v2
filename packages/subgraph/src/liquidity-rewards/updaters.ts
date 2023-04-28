@@ -75,12 +75,15 @@ export function createRewardAllocation(
     BigInt.fromString(allocationId)
   );
 
+  let rewardToken = loadToken(allocatedReward.value1).id;
+  //let marketplaceId = allocatedReward.value3;
+
   allocation.allocatorAddress = allocatedReward.value0;
   allocation.rewardTokenAddress = allocatedReward.value1;
-  allocation.rewardToken = loadToken(allocatedReward.value1).id;
+  allocation.rewardToken = rewardToken;
   allocation.rewardTokenAmountInitial = allocatedReward.value2;
   allocation.rewardTokenAmountRemaining = allocatedReward.value2;
-  allocation.marketplaceId = allocatedReward.value3;
+  allocation.marketplaceId = BigInt.fromString(marketplaceId);
   allocation.requiredPrincipalTokenAddress = allocatedReward.value4;
   allocation.requiredCollateralTokenAddress = allocatedReward.value5;
   allocation.minimumCollateralPerPrincipalAmount = allocatedReward.value6;
@@ -88,7 +91,7 @@ export function createRewardAllocation(
   allocation.bidStartTimeMin = allocatedReward.value8;
   allocation.bidStartTimeMax = allocatedReward.value9;
   allocation.allocationStrategy = allocatedReward.value10 == 0 ? "BORROWER" : "LENDER";
-
+  allocation.tokenVolume = loadMarketTokenVolume(rewardToken, marketplaceId.toString()).id;
 
   allocation.save()
 

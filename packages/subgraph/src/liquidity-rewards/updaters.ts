@@ -204,7 +204,7 @@ export function updateRewardAllocation(
 
 
 
-
+/*
 
 export function linkRewardToTokenVolume(rewardAllocation:RewardAllocation) : void {
  
@@ -213,7 +213,7 @@ export function linkRewardToTokenVolume(rewardAllocation:RewardAllocation) : voi
   rewardAllocation.save(); 
 
 }
-
+*/
 
 
 /*

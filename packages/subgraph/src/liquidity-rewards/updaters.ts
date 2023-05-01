@@ -291,6 +291,8 @@ export function linkBidToRewards(bid:Bid) : void {
 
 
 export function unlinkBidsFromReward(reward:RewardAllocation) : void {
+  
+
 
   let bidRewards = reward.bidRewards ; 
 
@@ -299,8 +301,20 @@ export function unlinkBidsFromReward(reward:RewardAllocation) : void {
       let bidRewardId = bidRewards[i];
   
       let bidReward = BidReward.load(bidRewardId)!;
+
+      let rewardAssociations = reward.bidRewards ;
+      let updatedAssociationArray = [] as string[];
+      for(let j=0; j < rewardAssociations.length ; j++){
+      
+        if(rewardAssociations[j] != bidRewardId){
+          updatedAssociationArray.push(bidRewardId);
+        }
+      }
+
+      reward.bidRewards = updatedAssociationArray;
+      reward.save();
     
-      store.remove('BidReward', bidReward.id) 
+      store.remove('BidReward', bidReward.id);
 
   }
 
@@ -323,6 +337,10 @@ function appendAllocationRewardToBidParticipants(bid: Bid,  rewardAllocation: Re
 
    //this created a bidReward which is an attachment of the reward to a bid 
    let bidReward = loadBidReward(bid,rewardAllocation);
+
+
+   rewardAllocation.bidRewards.push(bidReward.id);
+   rewardAllocation.save()
    
     
 }

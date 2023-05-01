@@ -240,6 +240,16 @@ export function linkRewardToBids(rewardAllocation:RewardAllocation) : void {
     let bidId = BigInt.fromString(rewardableLoans[i]);
     let bid = loadBidById(bidId);
 
+    if(rewardAllocation.allocationStrategy == "BORROWER" && 
+    !borrowerIsEligibleForRewardWithBidStatus(bid.status) ){
+      return 
+    }
+
+    if(rewardAllocation.allocationStrategy == "LENDER" && 
+    !lenderIsEligibleForRewardWithBidStatus(bid.status) ){
+      return 
+    }
+
     //check to see if the bid is eligible for the reward
     
     if( 
@@ -302,10 +312,13 @@ export function unlinkBidsFromReward(reward:RewardAllocation) : void {
   
       let bidReward = BidReward.load(bidRewardId)!;
 
+      /*
+        Since we cannot access a derived array, we need to manually push and pop bid rewards from rewards 
+        Since we cannot remove elements from an array, we have to repopulate the array from scratch each time 
+      */
       let rewardAssociations = reward.bidRewards ;
       let updatedAssociationArray = [] as string[];
       for(let j=0; j < rewardAssociations.length ; j++){
-      
         if(rewardAssociations[j] != bidRewardId){
           updatedAssociationArray.push(bidRewardId);
         }
@@ -325,7 +338,7 @@ export function unlinkTokenVolumeFromReward(reward:RewardAllocation) : void {
   
   const allocation = loadRewardAllocation(reward.id);
   
-  allocation.tokenVolume = ""
+  allocation.tokenVolume = null;
 
   allocation.save()
 
@@ -338,7 +351,7 @@ function appendAllocationRewardToBidParticipants(bid: Bid,  rewardAllocation: Re
    //this created a bidReward which is an attachment of the reward to a bid 
    let bidReward = loadBidReward(bid,rewardAllocation);
 
-
+    //manually add the association
    rewardAllocation.bidRewards.push(bidReward.id);
    rewardAllocation.save()
    

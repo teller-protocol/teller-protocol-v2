@@ -388,7 +388,7 @@ type RewardAllocation @entity {
 
   allocationStrategy: String!
 
-  bidRewards: [BidReward!]! @derivedFrom(field: "reward")
+  bidRewards: [BidReward!]! 
 
 
 }

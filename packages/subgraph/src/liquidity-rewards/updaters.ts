@@ -1,12 +1,12 @@
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 
 import { MarketLiquidityRewards } from "../../generated/MarketLiquidityRewards/MarketLiquidityRewards";
-import { Bid, RewardAllocation, Token, TokenVolume, User, BidCollateral, BidReward } from "../../generated/schema";
+import { Bid, RewardAllocation, Token, TokenVolume, User, BidCollateral, BidReward, Commitment } from "../../generated/schema";
 import { loadBidById, loadLoanStatusCount, loadMarketTokenVolume, loadProtocol, loadToken } from "../helpers/loaders";
 import { addToArray, removeFromArray } from "../helpers/utils";
 import {bidStatusToString,BidStatus} from "../helpers/bid";
 
-import { loadRewardAllocation, loadBidReward, getBidRewardId } from "./loaders";
+import { loadRewardAllocation, loadBidReward, getBidRewardId, loadCommitmentReward, getCommitmentRewardId } from "./loaders";
 import { AllocationStatus, allocationStatusToEnum, allocationStatusToString } from "./utils";
 //import { CommitmentStatus, commitmentStatusToString } from "./utils";
 
@@ -208,6 +208,84 @@ export function updateRewardAllocation(
 
 
 
+
+
+
+export function linkRewardToCommitments(rewardAllocation:RewardAllocation) : void {
+  /*
+    match up based on: 
+
+    market Id 
+    principal token address 
+
+  */
+
+    //loop thru all commitments for market 
+    
+  let protocol = loadProtocol();
+
+  let activeCommitmentIds = protocol.activeCommitments; 
+
+
+  for(let i = 0; i < activeCommitmentIds.length; i++){
+
+    let commitmentId = activeCommitmentIds[i];
+ 
+    let commitment = Commitment.load(commitmentId)!;
+
+    if(commitment.marketplaceId == rewardAllocation.marketplaceId 
+      && commitment.principalTokenAddress == rewardAllocation.requiredPrincipalTokenAddress){
+
+      appendCommitmentReward(commitment, rewardAllocation);
+       
+
+    }
+
+  }
+
+
+
+}
+
+
+export function linkCommitmentToRewards(commitment:Commitment) : void {
+
+  let protocol = loadProtocol();
+
+  let activeRewardIds = protocol.activeRewards;
+
+
+  for(let i = 0; i < activeRewardIds.length; i++){
+
+    let rewardId = activeRewardIds[i];
+ 
+    let rewardAllocation = RewardAllocation.load(rewardId)!;
+
+    if(commitment.marketplaceId == rewardAllocation.marketplaceId 
+      && commitment.principalTokenAddress == rewardAllocation.requiredPrincipalTokenAddress){
+
+      appendCommitmentReward(commitment, rewardAllocation);
+       
+
+    }
+
+  } 
+
+}
+
+
+/*
+    Creates a new CommitmentReward entity which is the association between a commitment and a reward allocation
+*/
+
+export function appendCommitmentReward(commitment:Commitment, rewardAllocation:RewardAllocation) : void {
+
+  const commitmentRewardId = getCommitmentRewardId(commitment,rewardAllocation);
+
+  
+  let commitmentReward = loadCommitmentReward(commitment,rewardAllocation);
+
+}
  
 
 /*

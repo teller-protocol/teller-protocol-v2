@@ -1,6 +1,6 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 
-import { Bid, BidReward, RewardAllocation } from "../../generated/schema";
+import { Bid, BidReward, Commitment, CommitmentReward, RewardAllocation } from "../../generated/schema";
  
 
 /**
@@ -45,6 +45,35 @@ export function loadRewardAllocation(allocationId: string): RewardAllocation {
   return allocation;
 }
 
+export function getCommitmentRewardId(commitment:Commitment, rewardAllocation:RewardAllocation):string{
+  return `${commitment.id.toString()}-${rewardAllocation.id.toString()}`
+}
+
+export function loadCommitmentReward(commitment:Commitment, rewardAllocation:RewardAllocation) : CommitmentReward {
+
+  const idString = getCommitmentRewardId(commitment,rewardAllocation);
+  let commitmentReward = CommitmentReward.load(idString);
+
+  if(!commitmentReward){
+    commitmentReward = new CommitmentReward(idString);
+
+    commitmentReward.createdAt = BigInt.zero();
+    commitmentReward.updatedAt = BigInt.zero();
+
+    commitmentReward.reward = rewardAllocation.id.toString();
+    commitmentReward.commitment = commitment.id.toString();
+
+    //calculate apr ?? 
+
+    commitmentReward.apy = BigInt.zero();
+    //commitmentReward.roi = BigInt.zero();
+
+    commitmentReward.save();
+  }
+
+  return commitmentReward
+
+}
 
 
 // let bidReward = new BidReward(`${bid.id.toString()}-${rewardAllocation.id.toString()}`);

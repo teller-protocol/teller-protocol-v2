@@ -350,10 +350,13 @@ type Commitment @entity {
 
   # TokenStats
   tokenVolume: TokenVolume!
+
+
+  commitmentRewards: [CommitmentReward!]! @derivedFrom(field: "commitment")
 }
 
 
-
+# Association between RewardAllocations and Commitments 
 type CommitmentReward @entity {
   id: ID!
   createdAt: BigInt!
@@ -362,7 +365,8 @@ type CommitmentReward @entity {
   reward: RewardAllocation!
   commitment: Commitment!
   
-  apr: BigInt!
+  roi: BigInt! 
+  apy: BigInt!
 }
 
 
@@ -403,6 +407,7 @@ type RewardAllocation @entity {
 
   bidRewards: [BidReward!]! 
 
+  commitmentRewards: [CommitmentReward!]! @derivedFrom(field: "reward")
 
 }
 

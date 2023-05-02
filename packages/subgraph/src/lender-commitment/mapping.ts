@@ -14,6 +14,7 @@ import { loadBidById } from "../helpers/loaders";
 import { loadCommitment } from "./loaders";
 import { updateCommitmentStatus, updateLenderCommitment } from "./updaters";
 import { CommitmentStatus } from "./utils";
+import { linkCommitmentToRewards } from "../liquidity-rewards/updaters";
 
 export function handleCreatedCommitment(event: CreatedCommitment): void {
   const commitmentId = event.params.commitmentId.toString();
@@ -30,6 +31,8 @@ export function handleCreatedCommitment(event: CreatedCommitment): void {
   commitment.createdAt = event.block.timestamp;
 
   commitment.save();
+
+  linkCommitmentToRewards(commitment);
 }
 
 export function handleCreatedCommitments(events: CreatedCommitment[]): void {
@@ -40,6 +43,7 @@ export function handleCreatedCommitments(events: CreatedCommitment[]): void {
 
 export function handleUpdatedCommitment(event: UpdatedCommitment): void {
   const commitmentId = event.params.commitmentId.toString();
+  
   updateLenderCommitment(
     commitmentId,
     event.params.lender,
@@ -49,6 +53,9 @@ export function handleUpdatedCommitment(event: UpdatedCommitment): void {
     event.address,
     event.block
   );
+
+
+  
 }
 
 export function handleUpdatedCommitments(events: UpdatedCommitment[]): void {
@@ -101,7 +108,7 @@ export function handleExercisedCommitments(
   });
 }
 
-export function handeUpdatedCommitmentBorrower(
+export function handleUpdatedCommitmentBorrower(
   event: UpdatedCommitmentBorrowers
 ): void {
   const commitmentId = event.params.commitmentId.toString();
@@ -118,10 +125,10 @@ export function handeUpdatedCommitmentBorrower(
   commitment.save();
 }
 
-export function handeUpdatedCommitmentBorrowers(
+export function handleUpdatedCommitmentBorrowers(
   events: UpdatedCommitmentBorrowers[]
 ): void {
   events.forEach(event => {
-    handeUpdatedCommitmentBorrower(event);
+    handleUpdatedCommitmentBorrower(event);
   });
 }

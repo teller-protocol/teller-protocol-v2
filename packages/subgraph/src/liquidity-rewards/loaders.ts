@@ -65,13 +65,45 @@ export function loadCommitmentReward(commitment:Commitment, rewardAllocation:Rew
 
     //calculate apr ?? 
 
-    commitmentReward.apy = BigInt.zero();
+    commitmentReward.apy = calculateCommitmentRewardApy(commitment, rewardAllocation);
     //commitmentReward.roi = BigInt.zero();
 
     commitmentReward.save();
   }
 
   return commitmentReward
+
+}
+
+
+/*
+
+ Only valid when the reward token is equal to the principal token 
+
+*/
+export function calculateCommitmentRewardApy(commitment:Commitment, rewardAllocation:RewardAllocation) : BigInt {
+
+  let rewardPerPrincipal = rewardAllocation.rewardPerLoanPrincipalAmount;
+  let maxLoanAmountForCommitment = commitment.committedAmount;
+  
+  let maxRewardAmount = rewardAllocation.rewardTokenAmountInitial;
+
+  let rewardTokenAmount = rewardPerPrincipal.times( maxLoanAmountForCommitment );
+
+  if(rewardTokenAmount > maxRewardAmount){
+    rewardTokenAmount = maxRewardAmount;
+  }
+
+  let commitmentDuration = commitment.maxDuration; //in seconds 
+
+  let roi = (rewardTokenAmount).div(maxLoanAmountForCommitment);
+
+  let ONE_YEAR = 365 * 24 * 60 * 60;
+
+  let apy = BigInt.fromI32(ONE_YEAR).times(roi).div(commitmentDuration);
+
+
+  return apy 
 
 }
 

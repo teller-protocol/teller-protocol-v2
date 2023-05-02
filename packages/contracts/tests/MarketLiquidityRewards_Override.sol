@@ -33,7 +33,7 @@ contract MarketLiquidityRewards_Override is MarketLiquidityRewards {
     uint32 expiration;
 
     bool public verifyLoanStartTimeWasCalled;
-    bool public verifyExpectedTokenAddressWasCalled;
+    
 
     bool public verifyRewardRecipientWasCalled;
     bool public verifyCollateralAmountWasCalled;
@@ -103,10 +103,7 @@ contract MarketLiquidityRewards_Override is MarketLiquidityRewards {
     function verifyLoanStartTime(uint32 a, uint32 b, uint32 c) public {
         super._verifyLoanStartTime(a, b, c);
     }
-
-    function verifyExpectedTokenAddress(address a, address b) public {
-        super._verifyExpectedTokenAddress(a, b);
-    }
+ 
 
     function verifyAndReturnRewardRecipient(
         AllocationStrategy allocationStrategy,
@@ -172,11 +169,5 @@ contract MarketLiquidityRewards_Override is MarketLiquidityRewards {
     ) internal override {
         verifyLoanStartTimeWasCalled = true;
     }
-
-    function _verifyExpectedTokenAddress(
-        address loanTokenAddress,
-        address expectedTokenAddress
-    ) internal override {
-        verifyExpectedTokenAddressWasCalled = true;
-    }
+ 
 }

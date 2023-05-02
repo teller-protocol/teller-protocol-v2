@@ -144,7 +144,7 @@ contract MarketLiquidityRewards_Test is Testable {
         //delete allocationCount;
 
         /*  verifyLoanStartTimeWasCalled = false;
-        verifyExpectedTokenAddressWasCalled = false;
+        
 
         verifyRewardRecipientWasCalled = false;
         verifyCollateralAmountWasCalled = false;*/
@@ -283,12 +283,7 @@ FNDA:0,MarketLiquidityRewards._verifyCollateralAmount
             "verifyLoanStartTime was not called"
         );
 
-        assertEq(
-            marketLiquidityRewards.verifyExpectedTokenAddressWasCalled(),
-            true,
-            " verifyExpectedTokenAddress was not called"
-        );
-
+     
         assertEq(
             marketLiquidityRewards.verifyRewardRecipientWasCalled(),
             true,
@@ -424,15 +419,7 @@ FNDA:0,MarketLiquidityRewards._verifyCollateralAmount
 
         marketLiquidityRewards.verifyLoanStartTime(400, 200, 300);
     }
-
-    function test_verifyExpectedTokenAddress() public {
-        vm.expectRevert(bytes("Invalid expected token address."));
-
-        marketLiquidityRewards.verifyExpectedTokenAddress(
-            address(principalToken),
-            address(collateralToken)
-        );
-    }
+ 
 }
 
 contract MarketLiquidityUser is User {

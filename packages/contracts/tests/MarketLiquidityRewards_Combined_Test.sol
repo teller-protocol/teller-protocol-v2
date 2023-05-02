@@ -47,8 +47,8 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
     uint8 constant collateralTokenDecimals = 6;
 
     bool verifyLoanStartTimeWasCalled;
-    bool verifyExpectedTokenAddressWasCalled;
-
+  
+  
     bool verifyRewardRecipientWasCalled;
     bool verifyCollateralAmountWasCalled;
 
@@ -111,8 +111,8 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
         //delete allocationCount;
 
         verifyLoanStartTimeWasCalled = false;
-        verifyExpectedTokenAddressWasCalled = false;
-
+       
+       
         verifyRewardRecipientWasCalled = false;
         verifyCollateralAmountWasCalled = false;
     }
@@ -231,11 +231,7 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
             "verifyLoanStartTime was not called"
         );
 
-        assertEq(
-            verifyExpectedTokenAddressWasCalled,
-            true,
-            " verifyExpectedTokenAddress was not called"
-        );
+         
 
         assertEq(
             verifyRewardRecipientWasCalled,
@@ -370,15 +366,7 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
 
         super._verifyLoanStartTime(400, 200, 300);
     }
-
-    function test_verifyExpectedTokenAddress() public {
-        vm.expectRevert(bytes("Invalid expected token address."));
-
-        super._verifyExpectedTokenAddress(
-            address(principalToken),
-            address(collateralToken)
-        );
-    }
+ 
 
     function allocateRewards(
         MarketLiquidityRewards.RewardAllocation calldata _allocation
@@ -427,13 +415,7 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
     ) internal override {
         verifyLoanStartTimeWasCalled = true;
     }
-
-    function _verifyExpectedTokenAddress(
-        address loanTokenAddress,
-        address expectedTokenAddress
-    ) internal override {
-        verifyExpectedTokenAddressWasCalled = true;
-    }
+ 
 }
 
 contract MarketLiquidityUser is User {

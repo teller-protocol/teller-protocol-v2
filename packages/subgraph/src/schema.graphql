@@ -353,6 +353,19 @@ type Commitment @entity {
 }
 
 
+
+type CommitmentReward @entity {
+  id: ID!
+  createdAt: BigInt!
+  updatedAt: BigInt!
+
+  reward: RewardAllocation!
+  commitment: Commitment!
+  
+  apr: BigInt!
+}
+
+
  
 
 type RewardAllocation @entity {
@@ -403,4 +416,6 @@ type BidReward @entity {
   bid: Bid!
   user: User!
 }
+
+
 

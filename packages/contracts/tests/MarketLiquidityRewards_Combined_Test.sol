@@ -47,8 +47,7 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
     uint8 constant collateralTokenDecimals = 6;
 
     bool verifyLoanStartTimeWasCalled;
-  
-  
+
     bool verifyRewardRecipientWasCalled;
     bool verifyCollateralAmountWasCalled;
 
@@ -111,8 +110,7 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
         //delete allocationCount;
 
         verifyLoanStartTimeWasCalled = false;
-       
-       
+
         verifyRewardRecipientWasCalled = false;
         verifyCollateralAmountWasCalled = false;
     }
@@ -230,8 +228,6 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
             true,
             "verifyLoanStartTime was not called"
         );
-
-         
 
         assertEq(
             verifyRewardRecipientWasCalled,
@@ -366,7 +362,6 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
 
         super._verifyLoanStartTime(400, 200, 300);
     }
- 
 
     function allocateRewards(
         MarketLiquidityRewards.RewardAllocation calldata _allocation
@@ -415,7 +410,6 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
     ) internal override {
         verifyLoanStartTimeWasCalled = true;
     }
- 
 }
 
 contract MarketLiquidityUser is User {

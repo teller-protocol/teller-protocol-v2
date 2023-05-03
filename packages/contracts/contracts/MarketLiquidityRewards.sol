@@ -273,8 +273,11 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
             );
         }
 
-       
-        require(loanSummary.principalTokenAddress == allocatedReward.requiredPrincipalTokenAddress, "Principal token address mismatch for allocation");
+        require(
+            loanSummary.principalTokenAddress ==
+                allocatedReward.requiredPrincipalTokenAddress,
+            "Principal token address mismatch for allocation"
+        );
 
         require(
             loanSummary.marketId == allocatedRewards[_allocationId].marketId,
@@ -462,7 +465,7 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
             "Loan was accepted after the max start time."
         );
     }
- 
+
     /**
      * @notice Returns the amount of reward tokens remaining in the allocation
      * @param _allocationId - The id for the allocation
@@ -475,5 +478,4 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
     {
         return allocatedRewards[_allocationId].rewardTokenAmount;
     }
- 
 }

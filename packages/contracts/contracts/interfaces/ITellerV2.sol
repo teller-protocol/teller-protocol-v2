@@ -145,6 +145,7 @@ interface ITellerV2 {
             address principalTokenAddress,
             uint256 principalAmount,
             uint32 acceptedTimestamp,
+            uint32 lastRepaidTimestamp,
             BidState bidState
         );
 }

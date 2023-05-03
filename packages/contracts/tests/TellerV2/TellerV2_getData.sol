@@ -255,6 +255,7 @@ contract TellerV2_initialize is Testable {
             address principalTokenAddress,
             uint256 principalAmount,
             uint32 acceptedTimestamp,
+            uint32 loanDuration,
             BidState bidState
         ) = tellerV2.getLoanSummary(bidId);
 

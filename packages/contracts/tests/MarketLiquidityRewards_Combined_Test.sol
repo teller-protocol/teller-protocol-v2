@@ -213,6 +213,7 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
         mockBid.loanDetails.lendingToken = (principalToken);
         mockBid.loanDetails.principal = 0;
         mockBid.loanDetails.acceptedTimestamp = uint32(block.timestamp);
+        mockBid.loanDetails.lastRepaidTimestamp = uint32(block.timestamp);
         mockBid.state = BidState.PAID;
 
         TellerV2Mock(tellerV2).setMockBid(mockBid);
@@ -255,11 +256,13 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
     function test_calculateRewardAmount_weth_principal() public {
         uint256 loanPrincipal = 1e8;
         uint256 principalTokenDecimals = 18;
+        uint32 loanDuration = 60 * 60 * 24 * 365;
 
         uint256 rewardPerLoanPrincipalAmount = 1e16; // expanded by token decimals so really 0.01
 
         uint256 rewardAmount = super._calculateRewardAmount(
             loanPrincipal,
+            loanDuration,
             principalTokenDecimals,
             rewardPerLoanPrincipalAmount
         );
@@ -270,11 +273,13 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
     function test_calculateRewardAmount_usdc_principal() public {
         uint256 loanPrincipal = 1e8;
         uint256 principalTokenDecimals = 6;
+        uint32 loanDuration = 60 * 60 * 24 * 365;
 
         uint256 rewardPerLoanPrincipalAmount = 1e4; // expanded by token decimals so really 0.01
 
         uint256 rewardAmount = super._calculateRewardAmount(
             loanPrincipal,
+            loanDuration,
             principalTokenDecimals,
             rewardPerLoanPrincipalAmount
         );
@@ -510,6 +515,7 @@ contract TellerV2Mock is TellerV2Context {
             address principalTokenAddress,
             uint256 principalAmount,
             uint32 acceptedTimestamp,
+            uint32 lastRepaidTimestamp,
             BidState bidState
         )
     {
@@ -521,6 +527,7 @@ contract TellerV2Mock is TellerV2Context {
         principalTokenAddress = address(bid.loanDetails.lendingToken);
         principalAmount = bid.loanDetails.principal;
         acceptedTimestamp = bid.loanDetails.acceptedTimestamp;
+        lastRepaidTimestamp = bid.loanDetails.lastRepaidTimestamp;
         bidState = bid.state;
     }
 }

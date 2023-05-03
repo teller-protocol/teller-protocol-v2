@@ -382,7 +382,7 @@ FNDA:0,MarketLiquidityRewards._verifyCollateralAmount
     function test_calculateRewardAmount_weth_principal() public {
         uint256 loanPrincipal = 1e8;
         uint256 principalTokenDecimals = 18;
-        uint32 loanDuration = 60*60*24*365;
+        uint32 loanDuration = 60 * 60 * 24 * 365;
 
         uint256 rewardPerLoanPrincipalAmount = 1e16; // expanded by token decimals so really 0.01
 
@@ -399,7 +399,7 @@ FNDA:0,MarketLiquidityRewards._verifyCollateralAmount
     function test_calculateRewardAmount_usdc_principal() public {
         uint256 loanPrincipal = 1e8;
         uint256 principalTokenDecimals = 6;
-        uint32 loanDuration = 60*60*24*365;
+        uint32 loanDuration = 60 * 60 * 24 * 365;
 
         uint256 rewardPerLoanPrincipalAmount = 1e4; // expanded by token decimals so really 0.01
 

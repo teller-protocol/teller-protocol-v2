@@ -30,7 +30,7 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
     address immutable collateralManager;
 
     uint256 allocationCount;
- 
+
     //allocationId => rewardAllocation
     mapping(uint256 => RewardAllocation) public allocatedRewards;
 
@@ -194,7 +194,6 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
     }
 
     struct LoanSummary {
-
         address borrower;
         address lender;
         uint256 marketId;
@@ -202,14 +201,13 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
         uint256 principalAmount;
         uint32 acceptedTimestamp;
         uint32 lastRepaidTimestamp;
-        BidState bidState; 
-
+        BidState bidState;
     }
 
-
-
-    function _getLoanSummary(uint256 _bidId) internal returns (LoanSummary memory _summary){
-
+    function _getLoanSummary(uint256 _bidId)
+        internal
+        returns (LoanSummary memory _summary)
+    {
         (
             _summary.borrower,
             _summary.lender,
@@ -220,8 +218,6 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
             _summary.lastRepaidTimestamp,
             _summary.bidState
         ) = ITellerV2(tellerV2).getLoanSummary(_bidId);
-
-
     }
 
     /**
@@ -244,8 +240,7 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
         );
         rewardClaimedForBid[_bidId][_allocationId] = true;
 
-
-        //make this a struct ? 
+        //make this a struct ?
         LoanSummary memory loanSummary = _getLoanSummary(_bidId); //ITellerV2(tellerV2).getLoanSummary(_bidId);
 
         address collateralTokenAddress = allocatedReward
@@ -295,7 +290,8 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
             loanSummary.lender
         );
 
-        uint32 loanDuration = loanSummary.lastRepaidTimestamp - loanSummary.acceptedTimestamp;
+        uint32 loanDuration = loanSummary.lastRepaidTimestamp -
+            loanSummary.acceptedTimestamp;
 
         uint256 amountToReward = _calculateRewardAmount(
             loanSummary.principalAmount,
@@ -378,16 +374,13 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
         uint256 _principalTokenDecimals,
         uint256 _rewardPerLoanPrincipalAmount
     ) internal view returns (uint256) {
-        
-        uint256 rewardPerYear =  MathUpgradeable.mulDiv(
-                _loanPrincipal,
-                _rewardPerLoanPrincipalAmount, //expanded by principal token decimals
-                10**_principalTokenDecimals
+        uint256 rewardPerYear = MathUpgradeable.mulDiv(
+            _loanPrincipal,
+            _rewardPerLoanPrincipalAmount, //expanded by principal token decimals
+            10**_principalTokenDecimals
         );
 
-        return MathUpgradeable.mulDiv(rewardPerYear,
-            _loanDuration,
-            365 days);
+        return MathUpgradeable.mulDiv(rewardPerYear, _loanDuration, 365 days);
     }
 
     /**

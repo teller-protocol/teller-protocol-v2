@@ -4,7 +4,7 @@ import readline from 'readline'
 import chalk from 'chalk'
 /*
 
- fter the "BRDA" tag in an LCOV file, there are typically four numbers separated by commas. These numbers represent the branch coverage data for a particular branch in the code.
+fter the "BRDA" tag in an LCOV file, there are typically four numbers separated by commas. These numbers represent the branch coverage data for a particular branch in the code.
 
 The four numbers have the following meanings:
 
@@ -23,7 +23,7 @@ BRDA:42,0,1,2
 
 const path = './lcov.info'
 
-async function process() {
+async function process(): Promise<void> {
   const fileStream = fs.createReadStream(path)
 
   const rl = readline.createInterface({
@@ -83,4 +83,4 @@ async function process() {
   }
 }
 
-process()
+void process()

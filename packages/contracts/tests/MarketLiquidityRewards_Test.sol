@@ -144,7 +144,7 @@ contract MarketLiquidityRewards_Test is Testable {
         //delete allocationCount;
 
         /*  verifyLoanStartTimeWasCalled = false;
-        verifyExpectedTokenAddressWasCalled = false;
+        
 
         verifyRewardRecipientWasCalled = false;
         verifyCollateralAmountWasCalled = false;*/
@@ -546,15 +546,6 @@ FNDA:0,MarketLiquidityRewards._verifyCollateralAmount
         vm.expectRevert(bytes("Loan was accepted after the max start time."));
 
         marketLiquidityRewards.verifyLoanStartTime(400, 200, 300);
-    }
-
-    function test_verifyExpectedTokenAddress() public {
-        vm.expectRevert(bytes("Invalid expected token address."));
-
-        marketLiquidityRewards.verifyExpectedTokenAddress(
-            address(principalToken),
-            address(collateralToken)
-        );
     }
 }
 

@@ -96,6 +96,11 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
             "Invalid allocator address"
         );
 
+        require(
+            _allocation.requiredPrincipalTokenAddress != address(0),
+            "Invalid required principal token address"
+        );
+
         IERC20Upgradeable(_allocation.rewardTokenAddress).transferFrom(
             msg.sender,
             address(this),
@@ -268,10 +273,10 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
             );
         }
 
-        //verify that the principal token address of the bid meets the allocation requirements
-        _verifyExpectedTokenAddress(
-            loanSummary.principalTokenAddress,
-            allocatedReward.requiredPrincipalTokenAddress
+        require(
+            loanSummary.principalTokenAddress ==
+                allocatedReward.requiredPrincipalTokenAddress,
+            "Principal token address mismatch for allocation"
         );
 
         require(
@@ -458,22 +463,6 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
         require(
             _maxStartTime == 0 || _loanStartTime < _maxStartTime,
             "Loan was accepted after the max start time."
-        );
-    }
-
-    /**
-     * @notice Verifies that the loan principal token address is per the requirements of the allocation
-     * @param _loanTokenAddress - The contract address of the token
-     * @param _expectedTokenAddress - The expected contract address per the allocation
-     */
-    function _verifyExpectedTokenAddress(
-        address _loanTokenAddress,
-        address _expectedTokenAddress
-    ) internal virtual {
-        require(
-            _expectedTokenAddress == address(0) ||
-                _loanTokenAddress == _expectedTokenAddress,
-            "Invalid expected token address."
         );
     }
 

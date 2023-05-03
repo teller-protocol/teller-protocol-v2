@@ -252,7 +252,7 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
     function test_calculateRewardAmount_weth_principal() public {
         uint256 loanPrincipal = 1e8;
         uint256 principalTokenDecimals = 18;
-        uint32 loanDuration = 60*60*24*365;
+        uint32 loanDuration = 60 * 60 * 24 * 365;
 
         uint256 rewardPerLoanPrincipalAmount = 1e16; // expanded by token decimals so really 0.01
 
@@ -269,7 +269,7 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
     function test_calculateRewardAmount_usdc_principal() public {
         uint256 loanPrincipal = 1e8;
         uint256 principalTokenDecimals = 6;
-        uint32 loanDuration = 60*60*24*365;
+        uint32 loanDuration = 60 * 60 * 24 * 365;
 
         uint256 rewardPerLoanPrincipalAmount = 1e4; // expanded by token decimals so really 0.01
 
@@ -487,7 +487,7 @@ contract TellerV2Mock is TellerV2Context {
         mockBid = bid;
     }
 
-   function getLoanSummary(uint256 _bidId)
+    function getLoanSummary(uint256 _bidId)
         external
         view
         returns (

@@ -300,10 +300,79 @@ FNDA:0,MarketLiquidityRewards._verifyCollateralAmount
         //add comments to all of the methods
     }
 
+    function test_claimRewards_round_remainder() public {
+        Bid memory mockBid;
+
+        mockBid.borrower = address(borrower);
+        mockBid.lender = address(lender);
+        mockBid.marketplaceId = marketId;
+        mockBid.loanDetails.lendingToken = (principalToken);
+        mockBid.loanDetails.principal = 10000000;
+        mockBid.loanDetails.acceptedTimestamp = uint32(block.timestamp);
+        mockBid.state = BidState.PAID;
+
+        tellerV2Mock.setMockBid(mockBid);
+
+        uint256 allocationId = 0;
+        uint256 bidId = 0;
+
+        MarketLiquidityRewards.RewardAllocation
+            memory _allocation = IMarketLiquidityRewards.RewardAllocation({
+                allocator: address(this),
+                marketId: marketId,
+                rewardTokenAddress: address(rewardToken),
+                rewardTokenAmount: 1000,
+                requiredPrincipalTokenAddress: address(principalToken),
+                requiredCollateralTokenAddress: address(collateralToken),
+                minimumCollateralPerPrincipalAmount: 0,
+                rewardPerLoanPrincipalAmount: 1000 * 1e18,
+                bidStartTimeMin: uint32(startTime),
+                bidStartTimeMax: uint32(startTime + 10000),
+                allocationStrategy: IMarketLiquidityRewards
+                    .AllocationStrategy
+                    .BORROWER
+            });
+
+        marketLiquidityRewards.setAllocation(allocationId, _allocation);
+
+        //send 1000 tokens to the contract
+        IERC20Upgradeable(address(rewardToken)).transfer(
+            address(marketLiquidityRewards),
+            1000
+        );
+
+        borrower._claimRewards(allocationId, bidId);
+
+        assertEq(
+            marketLiquidityRewards.verifyLoanStartTimeWasCalled(),
+            true,
+            "verifyLoanStartTime was not called"
+        );
+
+
+        assertEq(
+            marketLiquidityRewards.verifyRewardRecipientWasCalled(),
+            true,
+            "verifyRewardRecipient was not called"
+        );
+
+        assertEq(
+            marketLiquidityRewards.verifyCollateralAmountWasCalled(),
+            true,
+            "verifyCollateralAmount was not called"
+        );
+
+        uint256 remainingTokenAmount = marketLiquidityRewards
+            .getRewardTokenAmount(allocationId); //.allocatedRewards[allocationId].rewardTokenAmount;
+
+        //verify that the reward status is updated to drained
+        assertEq(remainingTokenAmount, 0, "Reward was not completely drained");
+    }
+
     function test_calculateRewardAmount_weth_principal() public {
         uint256 loanPrincipal = 1e8;
         uint256 principalTokenDecimals = 18;
-        uint32 loanDuration = 60*60*24*365;
+        uint32 loanDuration = 60 * 60 * 24 * 365;
 
         uint256 rewardPerLoanPrincipalAmount = 1e16; // expanded by token decimals so really 0.01
 
@@ -320,7 +389,7 @@ FNDA:0,MarketLiquidityRewards._verifyCollateralAmount
     function test_calculateRewardAmount_usdc_principal() public {
         uint256 loanPrincipal = 1e8;
         uint256 principalTokenDecimals = 6;
-        uint32 loanDuration = 60*60*24*365;
+        uint32 loanDuration = 60 * 60 * 24 * 365;
 
         uint256 rewardPerLoanPrincipalAmount = 1e4; // expanded by token decimals so really 0.01
 

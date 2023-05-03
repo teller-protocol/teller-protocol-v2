@@ -1078,7 +1078,7 @@ contract TellerV2 is
     {
         Bid storage bid = bids[_bidId];
 
-        borrower = bid.borrower; 
+        borrower = bid.borrower;
         lender = bid.lender;
         marketId = bid.marketplaceId;
         principalTokenAddress = address(bid.loanDetails.lendingToken);

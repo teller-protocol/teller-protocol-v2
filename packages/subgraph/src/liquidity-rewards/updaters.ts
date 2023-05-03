@@ -95,6 +95,9 @@ export function createRewardAllocation(
   allocation.bidStartTimeMax = allocatedReward.value9;
   allocation.allocationStrategy = allocatedReward.value10 == 0 ? "BORROWER" : "LENDER";
   
+
+  allocation.bidRewards = [];
+  
   if(requiredPrincipalTokenAddress!= Address.zero()){
     allocation.tokenVolume = loadMarketTokenVolume(requiredPrincipalTokenAddress.toHexString(), marketplaceId.toString()).id;
   }

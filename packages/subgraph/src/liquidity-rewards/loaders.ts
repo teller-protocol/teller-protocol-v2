@@ -39,6 +39,8 @@ export function loadRewardAllocation(allocationId: string): RewardAllocation {
     allocation.bidStartTimeMin = BigInt.zero();
     allocation.bidStartTimeMax = BigInt.zero(); 
     allocation.allocationStrategy = "";
+
+    allocation.bidRewards = [];
    
     allocation.save();
   }
@@ -102,6 +104,10 @@ export function calculateCommitmentRewardApy(
 
   if(rewardTokenAmount > maxRewardAmount){
     rewardTokenAmount = maxRewardAmount;
+  }
+
+  if(commitmentDuration == BigInt.zero() || maxLoanAmountForCommitment == BigInt.zero()){
+    return BigInt.zero();
   }
 
 

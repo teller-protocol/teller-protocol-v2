@@ -1221,7 +1221,7 @@ contract CollateralManager_Test is Testable {
         );
     }
 
-        function test_commit_collateral_single_not_teller() public {
+    function test_commit_collateral_single_not_teller() public {
         uint256 bidId = 0;
 
         Collateral memory collateral = Collateral({
@@ -1234,8 +1234,6 @@ contract CollateralManager_Test is Testable {
         collateralManager.setCheckBalanceGlobalValid(true);
         vm.expectRevert("Sender not authorized");
         collateralManager.commitCollateral(bidId, collateral);
-
-       
     }
 
     function test_commit_collateral_single_invalid() public {

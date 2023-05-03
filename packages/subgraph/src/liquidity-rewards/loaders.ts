@@ -62,11 +62,14 @@ export function loadCommitmentReward(commitment:Commitment, rewardAllocation:Rew
 
     commitmentReward.reward = rewardAllocation.id.toString();
     commitmentReward.commitment = commitment.id.toString();
+ 
 
-    //calculate apr ?? 
-
-    commitmentReward.apy = calculateCommitmentRewardApy(commitment, rewardAllocation);
-    //commitmentReward.roi = BigInt.zero();
+    commitmentReward.apy = calculateCommitmentRewardApy(
+      commitment, 
+      rewardAllocation,
+      rewardAllocation.rewardTokenAddress == commitment.principalTokenAddress
+      );
+     
 
     commitmentReward.save();
   }
@@ -78,10 +81,14 @@ export function loadCommitmentReward(commitment:Commitment, rewardAllocation:Rew
 
 /*
 
- Only valid when the reward token is equal to the principal token 
+ If reward token is the same as principal token 
 
 */
-export function calculateCommitmentRewardApy(commitment:Commitment, rewardAllocation:RewardAllocation) : BigInt {
+export function calculateCommitmentRewardApy(
+  commitment:Commitment, 
+  rewardAllocation:RewardAllocation,
+  rewardTokenMatchesPrincipalToken:boolean = false
+  ) : BigInt {
 
   let rewardPerPrincipal = rewardAllocation.rewardPerLoanPrincipalAmount;
   let maxLoanAmountForCommitment = commitment.committedAmount;
@@ -90,20 +97,43 @@ export function calculateCommitmentRewardApy(commitment:Commitment, rewardAlloca
 
   let rewardTokenAmount = rewardPerPrincipal.times( maxLoanAmountForCommitment );
 
+  let commitmentDuration = commitment.maxDuration; //in seconds 
+  let ONE_YEAR = 365 * 24 * 60 * 60;
+
   if(rewardTokenAmount > maxRewardAmount){
     rewardTokenAmount = maxRewardAmount;
   }
 
-  let commitmentDuration = commitment.maxDuration; //in seconds 
 
-  let roi = (rewardTokenAmount).div(maxLoanAmountForCommitment);
+  if(rewardTokenMatchesPrincipalToken){
 
-  let ONE_YEAR = 365 * 24 * 60 * 60;
+    let roi = rewardTokenAmount.div(maxLoanAmountForCommitment);
+    
+    let apy = BigInt.fromI32(ONE_YEAR).times(roi).div(commitmentDuration);
 
-  let apy = BigInt.fromI32(ONE_YEAR).times(roi).div(commitmentDuration);
+    return apy 
+
+  }else{
+
+    let collateralToken = commitment.collateralToken;
+    let maxPrincipalPerCollateralAmount = commitment.maxPrincipalPerCollateralAmount; 
+    
+    if( !collateralToken || !maxPrincipalPerCollateralAmount ){
+      return BigInt.zero();
+    } 
+
+    
+    let rewardInPrincipalTokens = rewardTokenAmount.times(maxPrincipalPerCollateralAmount)
 
 
-  return apy 
+    let roi = (rewardInPrincipalTokens).div(maxLoanAmountForCommitment);
+
+
+    let apy = BigInt.fromI32(ONE_YEAR).times(roi).div(commitmentDuration);
+
+
+    return apy 
+  }
 
 }
 

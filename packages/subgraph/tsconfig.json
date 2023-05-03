@@ -6,7 +6,8 @@
     ],
     "types": [
       "node",
-      "ethers"
+      "ethers",
+      "assembly"
     ],
     "allowJs": false,
     "skipLibCheck": false,
@@ -15,6 +16,7 @@
     "strict": true,
     "typeRoots": [
       "node_modules/@types",
+      "node_modules/assemblyscript/std/types",
       "generated"
     ]
     /* List of folders to include type definitions from. */,

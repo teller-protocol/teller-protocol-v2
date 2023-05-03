@@ -2,7 +2,7 @@ import {
   ATTEST_TYPED_SIGNATURE,
   Delegation,
   REVOKE_TYPED_SIGNATURE,
-} from '@ethereum-attestation-service/sdk'
+} from '@ethereum-attestation-service/eas-sdk'
 import chai, { expect } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import hre from 'hardhat'

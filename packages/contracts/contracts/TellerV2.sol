@@ -667,8 +667,7 @@ contract TellerV2 is
     function unpauseProtocol() public virtual onlyOwner whenPaused {
         _unpause();
     }
-
-    //TODO: add an incentive for liquidator
+ 
     /**
      * @notice Function for users to liquidate a defaulted loan.
      * @param _bidId The id of the loan to make the payment towards.
@@ -681,20 +680,22 @@ contract TellerV2 is
 
         Bid storage bid = bids[_bidId];
 
+        //change state here to prevent re-entrancy 
+        bid.state = BidState.LIQUIDATED;
+
         (uint256 owedPrincipal, , uint256 interest) = V2Calculations
             .calculateAmountOwed(
                 bid,
                 block.timestamp,
                 bidPaymentCycleType[_bidId]
-            );
+        );
+        
         _repayLoan(
             _bidId,
             Payment({ principal: owedPrincipal, interest: interest }),
             owedPrincipal + interest,
             false
-        );
-
-        bid.state = BidState.LIQUIDATED;
+        );        
 
         // If loan is backed by collateral, withdraw and send to the liquidator
         address liquidator = _msgSenderForMarket(bid.marketplaceId);

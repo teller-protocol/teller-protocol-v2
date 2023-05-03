@@ -1,7 +1,23 @@
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigDecimal,
+  BigInt,
+  Entity,
+  ethereum,
+  store
+} from "@graphprotocol/graph-ts";
 
-import { LenderCommitmentForwarder } from "../../generated/LenderCommitmentForwarder/LenderCommitmentForwarder";
-import { Commitment, Token, TokenVolume } from "../../generated/schema";
+import {
+  LenderCommitmentForwarder,
+  LenderCommitmentForwarder__commitmentsResult
+} from "../../generated/LenderCommitmentForwarder/LenderCommitmentForwarder";
+import {
+  Commitment,
+  CommitmentZScore,
+  MarketCommitmentStdDev,
+  Token,
+  TokenVolume
+} from "../../generated/schema";
 import {
   loadCollateralTokenVolume,
   loadCommitmentTokenVolume,
@@ -13,9 +29,18 @@ import {
   loadToken,
   TokenType
 } from "../helpers/loaders";
-import { addToArray, removeFromArray } from "../helpers/utils";
+import {
+  addToArray,
+  calcStdDevAndMeanFromEntities,
+  calcWeightedDeviation,
+  removeFromArray
+} from "../helpers/utils";
 
-import { loadCommitment } from "./loaders";
+import {
+  loadCommitment,
+  loadCommitmentZScore,
+  loadMarketCommitmentStdDev
+} from "./loaders";
 import { CommitmentStatus, commitmentStatusToString } from "./utils";
 
 enum CollateralTokenType {
@@ -25,31 +50,6 @@ enum CollateralTokenType {
   ERC1155,
   ERC721_ANY_ID,
   ERC1155_ANY_ID
-}
-
-export function updateCommitmentStatus(
-  commitment: Commitment,
-  status: CommitmentStatus
-): void {
-  commitment.status = commitmentStatusToString(status);
-
-  switch (status) {
-    case CommitmentStatus.Active:
-      addCommitmentToProtocol(commitment);
-      break;
-    case CommitmentStatus.Deleted:
-    case CommitmentStatus.Drained:
-    case CommitmentStatus.Expired:
-      updateAvailableTokensFromCommitment(
-        commitment,
-        commitment.committedAmount.neg()
-      );
-      removeCommitmentToProtocol(commitment);
-
-      break;
-  }
-
-  commitment.save();
 }
 
 /**
@@ -131,6 +131,126 @@ export function updateLenderCommitment(
   updateAvailableTokensFromCommitment(commitment, committedAmountDiff);
 
   return commitment;
+}
+
+export function updateCommitmentStatus(
+  commitment: Commitment,
+  status: CommitmentStatus
+): void {
+  commitment.status = commitmentStatusToString(status);
+
+  const commitmentZScore = loadCommitmentZScore(commitment);
+  const marketCommitments = loadMarketCommitmentStdDev(commitment);
+
+  switch (status) {
+    case CommitmentStatus.Active:
+      addCommitmentToProtocol(commitment);
+      marketCommitments.commitmentZScores = addToArray(
+        marketCommitments.commitmentZScores,
+        commitmentZScore.id
+      );
+      break;
+    case CommitmentStatus.Deleted:
+    case CommitmentStatus.Drained:
+    case CommitmentStatus.Expired:
+      updateAvailableTokensFromCommitment(
+        commitment,
+        commitment.committedAmount.neg()
+      );
+      removeCommitmentToProtocol(commitment);
+      marketCommitments.commitmentZScores = removeFromArray(
+        marketCommitments.commitmentZScores,
+        commitmentZScore.id
+      );
+      // Delete the commitment z-score entity from the store
+      store.remove("CommitmentZScore", commitmentZScore.id);
+
+      break;
+  }
+
+  commitment.save();
+  marketCommitments.save();
+
+  // Update the market commitment standard deviation and rescore the commitments
+  updateMarketCommitmentStdDev(marketCommitments);
+}
+
+export function updateMarketCommitmentStdDev(
+  marketCommitments: MarketCommitmentStdDev
+): void {
+  const commitments = updateMarketCommitmentStdDevAndMean(marketCommitments);
+  for (let i = 0; i < commitments.length; i++) {
+    const commitment = commitments[i];
+    const commitmentZScore = loadCommitmentZScore(commitment);
+
+    updateCommitmentZScore(commitment, commitmentZScore, marketCommitments);
+  }
+}
+
+export function updateMarketCommitmentStdDevAndMean(
+  marketCommitments: MarketCommitmentStdDev
+): Commitment[] {
+  const commitments: Entity[] = [];
+  const commitmentZScores = marketCommitments.commitmentZScores;
+  for (let i = 0; i < commitmentZScores.length; i++) {
+    commitments.push(Commitment.load(commitmentZScores[i])!);
+  }
+
+  const maxPrincipalPerCollateral = calcStdDevAndMeanFromEntities(
+    commitments,
+    "maxPrincipalPerCollateralAmount"
+  );
+  const minApy = calcStdDevAndMeanFromEntities(commitments, "minAPY");
+  const maxDuration = calcStdDevAndMeanFromEntities(commitments, "maxDuration");
+
+  marketCommitments.maxPrincipalPerCollateralStdDev =
+    maxPrincipalPerCollateral[0];
+  marketCommitments.maxPrincipalPerCollateralMean =
+    maxPrincipalPerCollateral[1];
+
+  marketCommitments.minApyStdDev = minApy[0];
+  marketCommitments.minApyMean = minApy[1];
+
+  marketCommitments.maxDurationStdDev = maxDuration[0];
+  marketCommitments.maxDurationMean = maxDuration[1];
+
+  marketCommitments.save();
+
+  return changetype<Commitment[]>(commitments);
+}
+
+export function updateCommitmentZScore(
+  commitment: Commitment,
+  commitmentZScore: CommitmentZScore,
+  marketCommitments: MarketCommitmentStdDev
+): void {
+  commitmentZScore.zScore = BigDecimal.zero()
+    .plus(
+      calcWeightedDeviation(
+        marketCommitments.maxPrincipalPerCollateralMean,
+        marketCommitments.maxPrincipalPerCollateralStdDev,
+        BigDecimal.fromString("4"),
+        commitment.maxPrincipalPerCollateralAmount
+      )
+    )
+    .plus(
+      calcWeightedDeviation(
+        marketCommitments.minApyMean,
+        marketCommitments.minApyStdDev,
+        BigDecimal.fromString("-1.333"),
+        commitment.minAPY
+      )
+    )
+    .plus(
+      calcWeightedDeviation(
+        marketCommitments.maxDurationMean,
+        marketCommitments.maxDurationStdDev,
+        BigDecimal.fromString("0.444"),
+        commitment.maxDuration
+      )
+    );
+
+  commitmentZScore.save();
 }
 
 function addCommitmentToProtocol(commitment: Commitment): void {

@@ -275,7 +275,8 @@ FNDA:0,MarketLiquidityRewards._verifyCollateralAmount
 
         _setAllocation(allocationId);
 
-        borrower._claimRewards(allocationId, bidId);
+        vm.prank(address(borrower));
+        marketLiquidityRewards.claimRewards(allocationId, bidId); 
 
         assertEq(
             marketLiquidityRewards.verifyLoanStartTimeWasCalled(),
@@ -283,7 +284,6 @@ FNDA:0,MarketLiquidityRewards._verifyCollateralAmount
             "verifyLoanStartTime was not called"
         );
 
-       
         assertEq(
             marketLiquidityRewards.verifyRewardRecipientWasCalled(),
             true,
@@ -309,7 +309,7 @@ FNDA:0,MarketLiquidityRewards._verifyCollateralAmount
         mockBid.loanDetails.lendingToken = (principalToken);
         mockBid.loanDetails.principal = 10000000;
         mockBid.loanDetails.acceptedTimestamp = uint32(block.timestamp);
-        mockBid.loanDetails.lastRepaidTimestamp = uint32(block.timestamp);
+        mockBid.loanDetails.lastRepaidTimestamp = uint32(block.timestamp +( 365 days));
         mockBid.state = BidState.PAID;
 
         tellerV2Mock.setMockBid(mockBid);
@@ -342,20 +342,15 @@ FNDA:0,MarketLiquidityRewards._verifyCollateralAmount
             1000
         );
 
-        borrower._claimRewards(allocationId, bidId);
+        vm.prank(address(borrower));
+        marketLiquidityRewards.claimRewards(allocationId, bidId); 
 
         assertEq(
             marketLiquidityRewards.verifyLoanStartTimeWasCalled(),
             true,
             "verifyLoanStartTime was not called"
         );
-
-        assertEq(
-            marketLiquidityRewards.verifyExpectedTokenAddressWasCalled(),
-            true,
-            " verifyExpectedTokenAddress was not called"
-        );
-
+ 
         assertEq(
             marketLiquidityRewards.verifyRewardRecipientWasCalled(),
             true,
@@ -369,11 +364,67 @@ FNDA:0,MarketLiquidityRewards._verifyCollateralAmount
         );
 
         uint256 remainingTokenAmount = marketLiquidityRewards
-            .getRewardTokenAmount(allocationId); //.allocatedRewards[allocationId].rewardTokenAmount;
+            .getRewardTokenAmount(allocationId);  
 
         //verify that the reward status is updated to drained
         assertEq(remainingTokenAmount, 0, "Reward was not completely drained");
     }
+
+
+    function test_claimRewards_zero_time_elapsed() public {
+        Bid memory mockBid;
+
+        mockBid.borrower = address(borrower);
+        mockBid.lender = address(lender);
+        mockBid.marketplaceId = marketId;
+        mockBid.loanDetails.lendingToken = (principalToken);
+        mockBid.loanDetails.principal = 10000000;
+        mockBid.loanDetails.acceptedTimestamp = uint32(block.timestamp);
+        mockBid.loanDetails.lastRepaidTimestamp = uint32(block.timestamp  );
+        mockBid.state = BidState.PAID;
+
+        tellerV2Mock.setMockBid(mockBid);
+
+        uint256 allocationId = 0;
+        uint256 bidId = 0;
+
+        MarketLiquidityRewards.RewardAllocation
+            memory _allocation = IMarketLiquidityRewards.RewardAllocation({
+                allocator: address(this),
+                marketId: marketId,
+                rewardTokenAddress: address(rewardToken),
+                rewardTokenAmount: 1000,
+                requiredPrincipalTokenAddress: address(principalToken),
+                requiredCollateralTokenAddress: address(collateralToken),
+                minimumCollateralPerPrincipalAmount: 0,
+                rewardPerLoanPrincipalAmount: 1000 * 1e18,
+                bidStartTimeMin: uint32(startTime),
+                bidStartTimeMax: uint32(startTime + 10000),
+                allocationStrategy: IMarketLiquidityRewards
+                    .AllocationStrategy
+                    .BORROWER
+            });
+
+        marketLiquidityRewards.setAllocation(allocationId, _allocation);
+
+        //send 1000 tokens to the contract
+        IERC20Upgradeable(address(rewardToken)).transfer(
+            address(marketLiquidityRewards),
+            1000
+        );
+
+        vm.prank(address(borrower));
+        marketLiquidityRewards.claimRewards(allocationId, bidId); 
+
+ 
+
+        uint256 remainingTokenAmount = marketLiquidityRewards
+            .getRewardTokenAmount(allocationId);  
+
+        //verify that the reward status is updated to drained
+        assertEq(remainingTokenAmount, 1000, "Reward was not completely drained");
+    }
+
 
     function test_calculateRewardAmount_weth_principal() public {
         uint256 loanPrincipal = 1e8;

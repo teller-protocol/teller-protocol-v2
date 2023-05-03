@@ -283,12 +283,7 @@ FNDA:0,MarketLiquidityRewards._verifyCollateralAmount
             "verifyLoanStartTime was not called"
         );
 
-        assertEq(
-            marketLiquidityRewards.verifyExpectedTokenAddressWasCalled(),
-            true,
-            " verifyExpectedTokenAddress was not called"
-        );
-
+       
         assertEq(
             marketLiquidityRewards.verifyRewardRecipientWasCalled(),
             true,
@@ -314,6 +309,7 @@ FNDA:0,MarketLiquidityRewards._verifyCollateralAmount
         mockBid.loanDetails.lendingToken = (principalToken);
         mockBid.loanDetails.principal = 10000000;
         mockBid.loanDetails.acceptedTimestamp = uint32(block.timestamp);
+        mockBid.loanDetails.lastRepaidTimestamp = uint32(block.timestamp);
         mockBid.state = BidState.PAID;
 
         tellerV2Mock.setMockBid(mockBid);

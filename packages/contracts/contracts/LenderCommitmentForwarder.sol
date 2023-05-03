@@ -211,6 +211,12 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint256 _commitmentId,
         Commitment calldata _commitment
     ) public commitmentLender(_commitmentId) {
+
+        require(
+            _commitment.lender == _msgSender(),
+            "Commitment lender cannot be updated."
+        );
+
         require(
             _commitment.principalTokenAddress ==
                 commitments[_commitmentId].principalTokenAddress,

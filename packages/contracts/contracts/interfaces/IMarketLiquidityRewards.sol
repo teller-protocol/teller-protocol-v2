@@ -44,7 +44,6 @@ interface IMarketLiquidityRewards {
         external
         view
         returns (uint256);
-    
 
     function initialize() external;
 }

@@ -54,7 +54,7 @@ contract MarketLiquidityRewards_Override is MarketLiquidityRewards {
     function setAllocatedAmount(uint256 _allocationId, uint256 _amount) public {
         allocatedRewards[_allocationId].rewardTokenAmount = _amount;
     }
- 
+
     function calculateRewardAmount(
         uint256 loanPrincipal,
         uint256 principalTokenDecimals,
@@ -169,6 +169,4 @@ contract MarketLiquidityRewards_Override is MarketLiquidityRewards {
     ) internal override {
         verifyExpectedTokenAddressWasCalled = true;
     }
-
-   
 }

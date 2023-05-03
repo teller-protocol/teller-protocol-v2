@@ -282,10 +282,9 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
             allocatedReward.rewardPerLoanPrincipalAmount
         );
 
-        if(amountToReward > allocatedReward.rewardTokenAmount) {
+        if (amountToReward > allocatedReward.rewardTokenAmount) {
             amountToReward = allocatedReward.rewardTokenAmount;
         }
- 
 
         _decrementAllocatedAmount(_allocationId, amountToReward);
 
@@ -458,9 +457,9 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
     }
 
     /**
-      * @notice Returns the amount of reward tokens remaining in the allocation
-      * @param _allocationId - The id for the allocation   
-    */
+     * @notice Returns the amount of reward tokens remaining in the allocation
+     * @param _allocationId - The id for the allocation
+     */
     function getRewardTokenAmount(uint256 _allocationId)
         public
         view

@@ -304,8 +304,6 @@ FNDA:0,MarketLiquidityRewards._verifyCollateralAmount
         //add comments to all of the methods
     }
 
-
-
     function test_claimRewards_round_remainder() public {
         Bid memory mockBid;
 
@@ -342,9 +340,9 @@ FNDA:0,MarketLiquidityRewards._verifyCollateralAmount
         marketLiquidityRewards.setAllocation(allocationId, _allocation);
 
         //send 1000 tokens to the contract
-         IERC20Upgradeable(address(rewardToken)).transfer(
+        IERC20Upgradeable(address(rewardToken)).transfer(
             address(marketLiquidityRewards),
-            1000 
+            1000
         );
 
         borrower._claimRewards(allocationId, bidId);
@@ -373,17 +371,11 @@ FNDA:0,MarketLiquidityRewards._verifyCollateralAmount
             "verifyCollateralAmount was not called"
         );
 
-        uint256 remainingTokenAmount = marketLiquidityRewards.getRewardTokenAmount(allocationId);//.allocatedRewards[allocationId].rewardTokenAmount;
+        uint256 remainingTokenAmount = marketLiquidityRewards
+            .getRewardTokenAmount(allocationId); //.allocatedRewards[allocationId].rewardTokenAmount;
 
         //verify that the reward status is updated to drained
-        assertEq(
-            remainingTokenAmount,
-            0,
-            "Reward was not completely drained"
-        );
-
-
-       
+        assertEq(remainingTokenAmount, 0, "Reward was not completely drained");
     }
 
     function test_calculateRewardAmount_weth_principal() public {

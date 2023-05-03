@@ -1,4 +1,5 @@
 scalar BigInt
+scalar BigDecimal
 scalar Bytes
 
 directive @entity on OBJECT

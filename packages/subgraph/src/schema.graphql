@@ -320,6 +320,32 @@ type TokenVolume implements IDurationAverage @entity {
   ## end TokenStats ##
 }
 
+type MarketCommitmentStdDev @entity {
+  id: ID!
+
+  market: MarketPlace!
+
+  lendingToken: Token!
+  collateralToken: Token
+
+  commitmentZScores: [CommitmentZScore!]!
+
+  maxPrincipalPerCollateralStdDev: BigDecimal!
+  maxPrincipalPerCollateralMean: BigDecimal!
+
+  minApyStdDev: BigDecimal!
+  minApyMean: BigDecimal!
+
+  maxDurationStdDev: BigDecimal!
+  maxDurationMean: BigDecimal!
+}
+
+type CommitmentZScore @entity {
+  id: ID!
+  commitment: Commitment!
+  zScore: BigDecimal!
+}
+
 type Commitment @entity {
   id: ID!
   createdAt: BigInt!

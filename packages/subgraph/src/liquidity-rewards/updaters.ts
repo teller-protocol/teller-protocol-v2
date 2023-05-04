@@ -518,7 +518,7 @@ function getRequiredCollateralAmount(
   collateralTokenDecimals: i32
 ): BigInt {
   const expansion = BigInt.fromI32(10).pow(
-    principalTokenDecimals + collateralTokenDecimals
+    (principalTokenDecimals + collateralTokenDecimals) as u8
   );
 
   const requiredCollateralAmount = minimumCollateralPerPrincipalAmount

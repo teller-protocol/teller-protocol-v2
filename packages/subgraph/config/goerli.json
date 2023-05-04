@@ -6,7 +6,7 @@
     "block": "8818539"
   },
   "block_handler": {
-    "enabled": false,
+    "enabled": true,
     "block": "8751571"
   },
   "contracts": {
@@ -16,7 +16,7 @@
       "block": "8538452"
     },
     "market_registry": {
-      "enabled": false,
+      "enabled": true,
       "address": "0x74FFC87282ab32c8E0969E26F93C820a213ae146",
       "block": "8538442"
     },
@@ -26,7 +26,7 @@
       "block": "8538455"
     },
     "collateral_manager": {
-      "enabled": false,
+      "enabled": true,
       "address": "0xD66de8b25C4165dA2e7696e15E8436380823B118",
       "block": "8538491"
     },

@@ -85,12 +85,4 @@ export function checkActiveCommitments(block: ethereum.Block): void {
     }
   }
 }
-
-export function checkActiveRewards(block: ethereum.Block): void {
-  const protocol = loadProtocol();
-  const activeRewards = protocol.activeRewards;
-  for (let i = 0; i < activeRewards.length; i++) {
-    const rewardId = protocol.activeRewards[i];
-    const reward = Reward.load(rewardId)!;
-  }
-}
+ 

@@ -99,7 +99,15 @@ export function createRewardAllocation(
   allocation.bidRewards = [];
   
   if(requiredPrincipalTokenAddress!= Address.zero()){
-    allocation.tokenVolume = loadMarketTokenVolume(requiredPrincipalTokenAddress.toHexString(), marketplaceId.toString()).id;
+
+    let principalTokenId = loadToken(requiredPrincipalTokenAddress);
+    //i think this is crashing 
+    let marketTokenVolume = loadMarketTokenVolume(
+      principalTokenId.id,
+      marketplaceId.toString()
+      );
+
+    allocation.tokenVolume = marketTokenVolume.id;
   }
   
   allocation.save()

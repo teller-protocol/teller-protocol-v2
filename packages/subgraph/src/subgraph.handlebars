@@ -202,7 +202,7 @@ dataSources:
         - event: ExercisedCommitment(indexed uint256,address,uint256,uint256)
           handler: handleExercisedCommitment
         - event: UpdatedCommitmentBorrowers(indexed uint256)
-          handler: handeUpdatedCommitmentBorrower
+          handler: handleUpdatedCommitmentBorrower
       file: ./src/lender-commitment/mapping.ts
 {{/if}}
 {{#if contracts.collateral_manager.enabled}}

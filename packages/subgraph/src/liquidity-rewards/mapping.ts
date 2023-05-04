@@ -18,7 +18,8 @@ import {
   updateRewardAllocation,
   linkRewardToBids,
   unlinkTokenVolumeFromReward,
-  unlinkBidsFromReward
+  unlinkBidsFromReward,
+  linkRewardToCommitments
 } from "./updaters";
 import { AllocationStatus } from "./utils";
 
@@ -47,6 +48,7 @@ export function handleCreatedAllocation(event: CreatedAllocation): void {
   protocol.save();
 
   linkRewardToBids(allocation);
+  linkRewardToCommitments(allocation);
 }
 
 export function handleCreatedAllocations(events: CreatedAllocation[]): void {
@@ -64,6 +66,7 @@ export function handleUpdatedAllocation(event: UpdatedAllocation): void {
   );
 
   linkRewardToBids(allocation);
+  linkRewardToCommitments(allocation);
 }
 
 export function handleUpdatedAllocations(events: UpdatedAllocation[]): void {
@@ -81,6 +84,7 @@ export function handleIncreasedAllocation(event: UpdatedAllocation): void {
   );
 
   linkRewardToBids(allocation);
+  linkRewardToCommitments(allocation);
 }
 
 export function handleIncreasedAllocations(events: UpdatedAllocation[]): void {
@@ -98,6 +102,7 @@ export function handleDecreasedAllocation(event: UpdatedAllocation): void {
   );
 
   linkRewardToBids(allocation);
+  linkRewardToCommitments(allocation);
 }
 
 export function handleDecreasedAllocations(events: UpdatedAllocation[]): void {
@@ -174,7 +179,7 @@ export function handleClaimedRewards(events: ClaimedRewards[]): void {
 }
 
 /*
-export function handeUpdatedCommitmentBorrower(
+export function handleUpdatedCommitmentBorrower(
   event: UpdatedCommitmentBorrowers
 ): void {
   const commitmentId = event.params.commitmentId.toString();
@@ -191,11 +196,11 @@ export function handeUpdatedCommitmentBorrower(
   commitment.save();
 }
 
-export function handeUpdatedCommitmentBorrowers(
+export function handleUpdatedCommitmentBorrowers(
   events: UpdatedCommitmentBorrowers[]
 ): void {
   events.forEach(event => {
-    handeUpdatedCommitmentBorrower(event);
+    handleUpdatedCommitmentBorrower(event);
   });
 }
 */

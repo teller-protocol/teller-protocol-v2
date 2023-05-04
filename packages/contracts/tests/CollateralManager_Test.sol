@@ -1212,12 +1212,28 @@ contract CollateralManager_Test is Testable {
         });
 
         collateralManager.setCheckBalanceGlobalValid(true);
+        vm.prank(address(tellerV2Mock));
         collateralManager.commitCollateral(bidId, collateral);
 
         assertTrue(
             collateralManager.commitCollateralInternalWasCalled(),
             "commit collateral was not called"
         );
+    }
+
+    function test_commit_collateral_single_not_teller() public {
+        uint256 bidId = 0;
+
+        Collateral memory collateral = Collateral({
+            _collateralType: CollateralType.ERC20,
+            _amount: 1000,
+            _tokenId: 0,
+            _collateralAddress: address(wethMock)
+        });
+
+        collateralManager.setCheckBalanceGlobalValid(true);
+        vm.expectRevert("Sender not authorized");
+        collateralManager.commitCollateral(bidId, collateral);
     }
 
     function test_commit_collateral_single_invalid() public {
@@ -1231,6 +1247,7 @@ contract CollateralManager_Test is Testable {
         });
 
         collateralManager.setCheckBalanceGlobalValid(false);
+        vm.prank(address(tellerV2Mock));
         collateralManager.commitCollateral(bidId, collateral);
 
         assertFalse(
@@ -1252,6 +1269,7 @@ contract CollateralManager_Test is Testable {
         });
 
         collateralManager.setCheckBalanceGlobalValid(true);
+        vm.prank(address(tellerV2Mock));
         collateralManager.commitCollateral(bidId, collateralArray);
 
         assertTrue(
@@ -1266,6 +1284,7 @@ contract CollateralManager_Test is Testable {
         Collateral[] memory collateralArray = new Collateral[](0);
 
         collateralManager.setCheckBalanceGlobalValid(true);
+        vm.prank(address(tellerV2Mock));
         collateralManager.commitCollateral(bidId, collateralArray);
 
         assertFalse(
@@ -1287,7 +1306,7 @@ contract CollateralManager_Test is Testable {
         });
 
         collateralManager.setCheckBalanceGlobalValid(false);
-
+        vm.prank(address(tellerV2Mock));
         collateralManager.commitCollateral(bidId, collateralArray);
 
         assertFalse(
@@ -1302,6 +1321,7 @@ contract CollateralManager_Test is Testable {
         Collateral[] memory collateralArray = new Collateral[](0);
 
         collateralManager.setCheckBalanceGlobalValid(false);
+        vm.prank(address(tellerV2Mock));
         collateralManager.commitCollateral(bidId, collateralArray);
 
         assertFalse(

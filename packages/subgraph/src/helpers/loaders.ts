@@ -72,9 +72,6 @@ function supportsInterface(address: Address, interfaceId: string): boolean {
   return !result.reverted && result.value;
 }
 
-
- 
-
 export function loadToken(
   _address: Bytes,
   type: TokenType = TokenType.UNKNOWN,

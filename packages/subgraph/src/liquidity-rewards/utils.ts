@@ -5,7 +5,6 @@ export enum AllocationStatus {
   Drained
 }
 
-
 const AllocationStatusValues = new Array<string>(10);
 AllocationStatusValues[AllocationStatus.Active] = "Active";
 AllocationStatusValues[AllocationStatus.Expired] = "Expired";
@@ -19,5 +18,3 @@ export function allocationStatusToEnum(status: string): AllocationStatus {
 export function allocationStatusToString(status: AllocationStatus): string {
   return AllocationStatusValues[status];
 }
-
- 

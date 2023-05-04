@@ -1,11 +1,16 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 
-import { Bid, BidReward, Commitment, CommitmentReward, RewardAllocation } from "../../generated/schema";
- 
+import {
+  Bid,
+  BidReward,
+  Commitment,
+  CommitmentReward,
+  RewardAllocation
+} from "../../generated/schema";
 
 /**
  * @param {string} allocationId - ID of the allocation
- * @returns {RewardAllocation} The RewardAllocation entity 
+ * @returns {RewardAllocation} The RewardAllocation entity
  */
 export function loadRewardAllocation(allocationId: string): RewardAllocation {
   const idString = allocationId;
@@ -22,10 +27,10 @@ export function loadRewardAllocation(allocationId: string): RewardAllocation {
     allocation.rewardTokenAmountInitial = BigInt.zero();
     allocation.rewardTokenAmountRemaining = BigInt.zero();
 
-    allocation.allocator="";
+    allocation.allocator = "";
     allocation.allocatorAddress = Address.zero();
 
-   // allocation.tokenVolume = "";
+    // allocation.tokenVolume = "";
 
     allocation.marketplace = "";
     allocation.marketplaceId = BigInt.zero();
@@ -37,26 +42,31 @@ export function loadRewardAllocation(allocationId: string): RewardAllocation {
     allocation.rewardPerLoanPrincipalAmount = BigInt.zero();
 
     allocation.bidStartTimeMin = BigInt.zero();
-    allocation.bidStartTimeMax = BigInt.zero(); 
+    allocation.bidStartTimeMax = BigInt.zero();
     allocation.allocationStrategy = "";
 
     allocation.bidRewards = [];
-   
+
     allocation.save();
   }
   return allocation;
 }
 
-export function getCommitmentRewardId(commitment:Commitment, rewardAllocation:RewardAllocation):string{
-  return `${commitment.id.toString()}-${rewardAllocation.id.toString()}`
+export function getCommitmentRewardId(
+  commitment: Commitment,
+  rewardAllocation: RewardAllocation
+): string {
+  return `${commitment.id.toString()}-${rewardAllocation.id.toString()}`;
 }
 
-export function loadCommitmentReward(commitment:Commitment, rewardAllocation:RewardAllocation) : CommitmentReward {
-
-  const idString = getCommitmentRewardId(commitment,rewardAllocation);
+export function loadCommitmentReward(
+  commitment: Commitment,
+  rewardAllocation: RewardAllocation
+): CommitmentReward {
+  const idString = getCommitmentRewardId(commitment, rewardAllocation);
   let commitmentReward = CommitmentReward.load(idString);
 
-  if(!commitmentReward){
+  if (!commitmentReward) {
     commitmentReward = new CommitmentReward(idString);
 
     commitmentReward.createdAt = BigInt.zero();
@@ -64,123 +74,121 @@ export function loadCommitmentReward(commitment:Commitment, rewardAllocation:Rew
 
     commitmentReward.reward = rewardAllocation.id.toString();
     commitmentReward.commitment = commitment.id.toString();
-    
+
     commitmentReward.roi = calculateCommitmentRewardRoi(
-      commitment, 
+      commitment,
       rewardAllocation,
       rewardAllocation.rewardTokenAddress == commitment.principalTokenAddress
-      );
+    );
 
     commitmentReward.apy = calculateCommitmentRewardApy(
-      commitment, 
+      commitment,
       rewardAllocation,
       rewardAllocation.rewardTokenAddress == commitment.principalTokenAddress
-      );
-     
+    );
 
     commitmentReward.save();
   }
 
-  return commitmentReward
-
+  return commitmentReward;
 }
 
-
 export function calculateCommitmentRewardRoi(
-  commitment:Commitment, 
-  rewardAllocation:RewardAllocation,
-  rewardTokenMatchesPrincipalToken:boolean = false
-  ) : BigInt {
+  commitment: Commitment,
+  rewardAllocation: RewardAllocation,
+  rewardTokenMatchesPrincipalToken: boolean
+): BigInt {
+  const EXPANSION_PERCENT = BigInt.fromI32(10000);
 
+  const rewardPerPrincipal = rewardAllocation.rewardPerLoanPrincipalAmount;
+  const maxLoanAmountForCommitment = commitment.committedAmount;
 
-  let EXPANSION_PERCENT = BigInt.fromI32(10000);
+  const maxRewardAmount = rewardAllocation.rewardTokenAmountInitial;
 
-  let rewardPerPrincipal = rewardAllocation.rewardPerLoanPrincipalAmount;
-  let maxLoanAmountForCommitment = commitment.committedAmount;
-  
-  let maxRewardAmount = rewardAllocation.rewardTokenAmountInitial;
+  let rewardTokenAmount = rewardPerPrincipal.times(maxLoanAmountForCommitment);
 
-  let rewardTokenAmount = rewardPerPrincipal.times( maxLoanAmountForCommitment );
+  const commitmentDuration = commitment.maxDuration; // in seconds
 
-  let commitmentDuration = commitment.maxDuration; //in seconds 
- 
-
-  if(rewardTokenAmount > maxRewardAmount){
+  if (rewardTokenAmount > maxRewardAmount) {
     rewardTokenAmount = maxRewardAmount;
   }
 
-  if(commitmentDuration == BigInt.zero() || maxLoanAmountForCommitment == BigInt.zero()){
+  if (
+    commitmentDuration == BigInt.zero() ||
+    maxLoanAmountForCommitment == BigInt.zero()
+  ) {
     return BigInt.zero();
   }
 
+  if (rewardTokenMatchesPrincipalToken) {
+    const roi = rewardTokenAmount
+      .times(EXPANSION_PERCENT)
+      .div(maxLoanAmountForCommitment);
 
-  if(rewardTokenMatchesPrincipalToken){
+    return roi;
+  } else {
+    const collateralToken = commitment.collateralToken;
+    const maxPrincipalPerCollateralAmount =
+      commitment.maxPrincipalPerCollateralAmount;
 
-    let roi = rewardTokenAmount.times(EXPANSION_PERCENT).div(maxLoanAmountForCommitment);
-     
-    return roi 
-
-  }else{
-
-    let collateralToken = commitment.collateralToken;
-    let maxPrincipalPerCollateralAmount = commitment.maxPrincipalPerCollateralAmount; 
-    
-    if( !collateralToken || !maxPrincipalPerCollateralAmount ){
-      return BigInt.zero();
-    } 
-
-    
-    let rewardInPrincipalTokens = rewardTokenAmount.times(maxPrincipalPerCollateralAmount)
-
-
-    let roi = rewardInPrincipalTokens.times(EXPANSION_PERCENT).div(maxLoanAmountForCommitment);
-
-
-    return roi 
-  }
-
-}
-
-
-
- 
-export function calculateCommitmentRewardApy(
-  commitment:Commitment, 
-  rewardAllocation:RewardAllocation,
-  rewardTokenMatchesPrincipalToken:boolean = false
-  ) : BigInt {
-
-    
-    
-    let commitmentDuration = commitment.maxDuration; //in seconds 
-    let ONE_YEAR = 365 * 24 * 60 * 60;
-
-    if(commitmentDuration == BigInt.zero()){
+    if (!collateralToken || !maxPrincipalPerCollateralAmount) {
       return BigInt.zero();
     }
- 
-    let roi = calculateCommitmentRewardRoi(commitment, rewardAllocation, rewardTokenMatchesPrincipalToken);
 
+    const rewardInPrincipalTokens = rewardTokenAmount.times(
+      maxPrincipalPerCollateralAmount
+    );
 
-    let apy = BigInt.fromI32(ONE_YEAR).times(roi).div(commitmentDuration);
+    const roi = rewardInPrincipalTokens
+      .times(EXPANSION_PERCENT)
+      .div(maxLoanAmountForCommitment);
 
+    return roi;
+  }
+}
 
-    return apy 
-  
+export function calculateCommitmentRewardApy(
+  commitment: Commitment,
+  rewardAllocation: RewardAllocation,
+  rewardTokenMatchesPrincipalToken: boolean
+): BigInt {
+  const commitmentDuration = commitment.maxDuration; // in seconds
+  const ONE_YEAR = 365 * 24 * 60 * 60;
 
+  if (commitmentDuration == BigInt.zero()) {
+    return BigInt.zero();
+  }
+
+  const roi = calculateCommitmentRewardRoi(
+    commitment,
+    rewardAllocation,
+    rewardTokenMatchesPrincipalToken
+  );
+
+  const apy = BigInt.fromI32(ONE_YEAR)
+    .times(roi)
+    .div(commitmentDuration);
+
+  return apy;
 }
 
 // let bidReward = new BidReward(`${bid.id.toString()}-${rewardAllocation.id.toString()}`);
 
-export function getBidRewardId(bid:Bid, rewardAllocation:RewardAllocation):string{
-  return `${bid.id.toString()}-${rewardAllocation.id.toString()}`
+export function getBidRewardId(
+  bid: Bid,
+  rewardAllocation: RewardAllocation
+): string {
+  return `${bid.id.toString()}-${rewardAllocation.id.toString()}`;
 }
 
-export function loadBidReward(bid:Bid, rewardAllocation:RewardAllocation) : BidReward {
-  const idString = getBidRewardId(bid,rewardAllocation);
+export function loadBidReward(
+  bid: Bid,
+  rewardAllocation: RewardAllocation
+): BidReward {
+  const idString = getBidRewardId(bid, rewardAllocation);
   let bidReward = BidReward.load(idString);
 
-  if(!bidReward){
+  if (!bidReward) {
     bidReward = new BidReward(idString);
 
     bidReward.createdAt = BigInt.zero();
@@ -189,30 +197,20 @@ export function loadBidReward(bid:Bid, rewardAllocation:RewardAllocation) : BidR
     bidReward.reward = rewardAllocation.id.toString();
     bidReward.bid = bid.id.toString();
 
-    let lenderAddress = bid.lenderAddress 
-    let borrowerAddress = bid.borrowerAddress
+    const lenderAddress = bid.lenderAddress;
+    const borrowerAddress = bid.borrowerAddress;
 
-    if(lenderAddress && borrowerAddress){
-
-        //User.load
-    if(rewardAllocation.allocationStrategy == "BORROWER"){
-     
-      bidReward.user = borrowerAddress.toHexString(); ///bid.borrower.user.id.toString();
-      
-    }else{
-     
-      bidReward.user = lenderAddress.toHexString(); ///bid.lender.user.id.toString();
-      
+    if (lenderAddress && borrowerAddress) {
+      // User.load
+      if (rewardAllocation.allocationStrategy == "BORROWER") {
+        bidReward.user = borrowerAddress.toHexString(); // /bid.borrower.user.id.toString();
+      } else {
+        bidReward.user = lenderAddress.toHexString(); // /bid.lender.user.id.toString();
+      }
     }
-    
-
-    }
-  
-    
- 
 
     bidReward.save();
   }
 
   return bidReward;
-} 
+}

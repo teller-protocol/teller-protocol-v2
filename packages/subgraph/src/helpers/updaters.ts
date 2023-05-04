@@ -6,7 +6,6 @@ import {
   Value
 } from "@graphprotocol/graph-ts";
 
-
 import {
   Bid,
   BidCollateral,
@@ -613,7 +612,6 @@ function setEntityDurationAverage(
     Value.fromBigInt(safeDiv(durationTotal, totalLoanCount))
   );
 }
-
 
 export function replaceLender(bid: Bid, newLender: Lender): void {
   const oldLenderCount = LoanStatusCount.load(`lender-${bid.lender!}`);

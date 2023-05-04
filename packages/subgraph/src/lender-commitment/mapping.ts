@@ -10,11 +10,11 @@ import {
 } from "../../generated/LenderCommitmentForwarder/LenderCommitmentForwarder";
 import { Bid } from "../../generated/schema";
 import { loadBidById } from "../helpers/loaders";
+import { linkCommitmentToRewards } from "../liquidity-rewards/updaters";
 
 import { loadCommitment } from "./loaders";
 import { updateCommitmentStatus, updateLenderCommitment } from "./updaters";
 import { CommitmentStatus } from "./utils";
-import { linkCommitmentToRewards } from "../liquidity-rewards/updaters";
 
 export function handleCreatedCommitment(event: CreatedCommitment): void {
   const commitmentId = event.params.commitmentId.toString();
@@ -43,7 +43,7 @@ export function handleCreatedCommitments(events: CreatedCommitment[]): void {
 
 export function handleUpdatedCommitment(event: UpdatedCommitment): void {
   const commitmentId = event.params.commitmentId.toString();
-  
+
   updateLenderCommitment(
     commitmentId,
     event.params.lender,
@@ -53,9 +53,6 @@ export function handleUpdatedCommitment(event: UpdatedCommitment): void {
     event.address,
     event.block
   );
-
-
-  
 }
 
 export function handleUpdatedCommitments(events: UpdatedCommitment[]): void {

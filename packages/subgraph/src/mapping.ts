@@ -32,10 +32,7 @@ import {
   updateBidOnPayment,
   updateBidStatus
 } from "./helpers/updaters";
-
-import {
-  linkBidToRewards
-} from "./liquidity-rewards/updaters"
+import { linkBidToRewards } from "./liquidity-rewards/updaters";
 
 export function handleSubmittedBid(event: SubmittedBid): void {
   const tellerV2Instance = TellerV2.bind(event.address);
@@ -143,7 +140,6 @@ export function handleAcceptedBid(event: AcceptedBid): void {
 
   updateBidStatus(bid, BidStatus.Accepted);
 
-
   linkBidToRewards(bid);
 }
 
@@ -191,7 +187,6 @@ export function handleLoanRepaid(event: LoanRepaid): void {
   bid.save();
 
   updateBidOnPayment(bid, event, PaymentEventType.Repaid);
-
 
   linkBidToRewards(bid);
 }

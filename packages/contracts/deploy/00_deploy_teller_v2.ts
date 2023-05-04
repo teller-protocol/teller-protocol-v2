@@ -1,5 +1,4 @@
 import { DeployFunction } from 'hardhat-deploy/dist/types'
-import { HARDHAT_NETWORK_NAME } from 'hardhat/plugins'
 import { deploy } from 'helpers/deploy-helpers'
 import { isInitialized } from 'helpers/oz-contract-helpers'
 import {
@@ -55,7 +54,7 @@ const deployFn: DeployFunction = async (hre) => {
   const collateralEscrowBeaconImpl = await deploy({
     contract: 'CollateralEscrowV1',
     name: 'CollateralEscrow',
-    skipIfAlreadyDeployed: true,
+    skipIfAlreadyDeployed: false,
     hre,
   })
 
@@ -63,7 +62,7 @@ const deployFn: DeployFunction = async (hre) => {
     contract: 'UpgradeableBeacon',
     name: 'CollateralEscrowBeacon',
     args: [collateralEscrowBeaconImpl.address],
-    skipIfAlreadyDeployed: true,
+    skipIfAlreadyDeployed: false,
     hre,
   })
   const currentEscrowBeaconImpl = await collateralEscrowBeacon.implementation()

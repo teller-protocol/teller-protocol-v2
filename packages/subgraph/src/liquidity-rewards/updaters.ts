@@ -101,7 +101,7 @@ export function createRewardAllocation(
   if(requiredPrincipalTokenAddress!= Address.zero()){
 
     let principalTokenId = loadToken(requiredPrincipalTokenAddress);
-    //i think this is crashing 
+    
     let marketTokenVolume = loadMarketTokenVolume(
       principalTokenId.id,
       marketplaceId.toString()

@@ -1,6 +1,12 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 
-import { Bid, BidReward, RewardAllocation } from "../../generated/schema";
+import {
+  Bid,
+  BidReward,
+  Commitment,
+  CommitmentReward,
+  RewardAllocation
+} from "../../generated/schema";
 
 /**
  * @param {string} allocationId - ID of the allocation
@@ -24,7 +30,7 @@ export function loadRewardAllocation(allocationId: string): RewardAllocation {
     allocation.allocator = "";
     allocation.allocatorAddress = Address.zero();
 
-    allocation.tokenVolume = "";
+    // allocation.tokenVolume = "";
 
     allocation.marketplace = "";
     allocation.marketplaceId = BigInt.zero();
@@ -39,9 +45,131 @@ export function loadRewardAllocation(allocationId: string): RewardAllocation {
     allocation.bidStartTimeMax = BigInt.zero();
     allocation.allocationStrategy = "";
 
+    allocation.bidRewards = [];
+
     allocation.save();
   }
   return allocation;
+}
+
+export function getCommitmentRewardId(
+  commitment: Commitment,
+  rewardAllocation: RewardAllocation
+): string {
+  return `${commitment.id.toString()}-${rewardAllocation.id.toString()}`;
+}
+
+export function loadCommitmentReward(
+  commitment: Commitment,
+  rewardAllocation: RewardAllocation
+): CommitmentReward {
+  const idString = getCommitmentRewardId(commitment, rewardAllocation);
+  let commitmentReward = CommitmentReward.load(idString);
+
+  if (!commitmentReward) {
+    commitmentReward = new CommitmentReward(idString);
+
+    commitmentReward.createdAt = BigInt.zero();
+    commitmentReward.updatedAt = BigInt.zero();
+
+    commitmentReward.reward = rewardAllocation.id.toString();
+    commitmentReward.commitment = commitment.id.toString();
+
+    commitmentReward.roi = calculateCommitmentRewardRoi(
+      commitment,
+      rewardAllocation,
+      rewardAllocation.rewardTokenAddress == commitment.principalTokenAddress
+    );
+
+    commitmentReward.apy = calculateCommitmentRewardApy(
+      commitment,
+      rewardAllocation,
+      rewardAllocation.rewardTokenAddress == commitment.principalTokenAddress
+    );
+
+    commitmentReward.save();
+  }
+
+  return commitmentReward;
+}
+
+export function calculateCommitmentRewardRoi(
+  commitment: Commitment,
+  rewardAllocation: RewardAllocation,
+  rewardTokenMatchesPrincipalToken: boolean
+): BigInt {
+  const EXPANSION_PERCENT = BigInt.fromI32(10000);
+
+  const rewardPerPrincipal = rewardAllocation.rewardPerLoanPrincipalAmount;
+  const maxLoanAmountForCommitment = commitment.committedAmount;
+
+  const maxRewardAmount = rewardAllocation.rewardTokenAmountInitial;
+
+  let rewardTokenAmount = rewardPerPrincipal.times(maxLoanAmountForCommitment);
+
+  const commitmentDuration = commitment.maxDuration; // in seconds
+
+  if (rewardTokenAmount > maxRewardAmount) {
+    rewardTokenAmount = maxRewardAmount;
+  }
+
+  if (
+    commitmentDuration == BigInt.zero() ||
+    maxLoanAmountForCommitment == BigInt.zero()
+  ) {
+    return BigInt.zero();
+  }
+
+  if (rewardTokenMatchesPrincipalToken) {
+    const roi = rewardTokenAmount
+      .times(EXPANSION_PERCENT)
+      .div(maxLoanAmountForCommitment);
+
+    return roi;
+  } else {
+    const collateralToken = commitment.collateralToken;
+    const maxPrincipalPerCollateralAmount =
+      commitment.maxPrincipalPerCollateralAmount;
+
+    if (!collateralToken || !maxPrincipalPerCollateralAmount) {
+      return BigInt.zero();
+    }
+
+    const rewardInPrincipalTokens = rewardTokenAmount.times(
+      maxPrincipalPerCollateralAmount
+    );
+
+    const roi = rewardInPrincipalTokens
+      .times(EXPANSION_PERCENT)
+      .div(maxLoanAmountForCommitment);
+
+    return roi;
+  }
+}
+
+export function calculateCommitmentRewardApy(
+  commitment: Commitment,
+  rewardAllocation: RewardAllocation,
+  rewardTokenMatchesPrincipalToken: boolean
+): BigInt {
+  const commitmentDuration = commitment.maxDuration; // in seconds
+  const ONE_YEAR = 365 * 24 * 60 * 60;
+
+  if (commitmentDuration == BigInt.zero()) {
+    return BigInt.zero();
+  }
+
+  const roi = calculateCommitmentRewardRoi(
+    commitment,
+    rewardAllocation,
+    rewardTokenMatchesPrincipalToken
+  );
+
+  const apy = BigInt.fromI32(ONE_YEAR)
+    .times(roi)
+    .div(commitmentDuration);
+
+  return apy;
 }
 
 // let bidReward = new BidReward(`${bid.id.toString()}-${rewardAllocation.id.toString()}`);

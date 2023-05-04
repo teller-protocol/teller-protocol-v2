@@ -70,6 +70,8 @@ type Bid @entity {
   lendingToken: Token!
   lendingTokenAddress: Bytes!
 
+  bidRewards: [BidReward!]! @derivedFrom(field: "bid")
+
   marketplaceId: BigInt!
   metadataURI: String!
   status: String!
@@ -275,6 +277,8 @@ type TokenVolume implements IDurationAverage @entity {
   lender: Lender
   borrower: Borrower
 
+  allocatedRewards: [RewardAllocation!]! @derivedFrom(field: "tokenVolume")
+
   # used to group token volumes with collateral by lending token
   _protocolCollateral: ProtocolCollateral
 
@@ -372,6 +376,23 @@ type Commitment @entity {
 
   # TokenStats
   tokenVolume: TokenVolume!
+
+
+  commitmentRewards: [CommitmentReward!]! @derivedFrom(field: "commitment")
+}
+
+
+# Association between RewardAllocations and Commitments 
+type CommitmentReward @entity {
+  id: ID!
+  createdAt: BigInt!
+  updatedAt: BigInt!
+
+  reward: RewardAllocation!
+  commitment: Commitment!
+  
+  roi: BigInt! 
+  apy: BigInt!
 }
 
 
@@ -392,7 +413,7 @@ type RewardAllocation @entity {
   marketplaceId: BigInt!
 
   # TokenStats
-  tokenVolume: TokenVolume!
+  tokenVolume: TokenVolume
 
   rewardToken: Token!
   rewardTokenAddress: Bytes!
@@ -409,8 +430,10 @@ type RewardAllocation @entity {
   bidStartTimeMax: BigInt!
 
   allocationStrategy: String!
- 
 
+  bidRewards: [BidReward!]! 
+
+  commitmentRewards: [CommitmentReward!]! @derivedFrom(field: "reward")
 
 }
 
@@ -424,4 +447,6 @@ type BidReward @entity {
   bid: Bid!
   user: User!
 }
+
+
 

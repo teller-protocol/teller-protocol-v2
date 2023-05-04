@@ -1,4 +1,4 @@
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum, store } from "@graphprotocol/graph-ts";
 
 import { MarketLiquidityRewards } from "../../generated/MarketLiquidityRewards/MarketLiquidityRewards";
 import {
@@ -7,7 +7,9 @@ import {
   Token,
   TokenVolume,
   User,
-  BidCollateral
+  BidCollateral,
+  BidReward,
+  Commitment
 } from "../../generated/schema";
 import { bidStatusToString, BidStatus } from "../helpers/bid";
 import {
@@ -19,8 +21,18 @@ import {
 } from "../helpers/loaders";
 import { addToArray, removeFromArray } from "../helpers/utils";
 
-import { loadRewardAllocation, loadBidReward, getBidRewardId } from "./loaders";
-import { AllocationStatus, allocationStatusToString } from "./utils";
+import {
+  loadRewardAllocation,
+  loadBidReward,
+  getBidRewardId,
+  loadCommitmentReward,
+  getCommitmentRewardId
+} from "./loaders";
+import {
+  AllocationStatus,
+  allocationStatusToEnum,
+  allocationStatusToString
+} from "./utils";
 // import { CommitmentStatus, commitmentStatusToString } from "./utils";
 
 enum CollateralTokenType {
@@ -81,20 +93,37 @@ export function createRewardAllocation(
     BigInt.fromString(allocationId)
   );
 
+  const rewardToken = loadToken(allocatedReward.value1).id;
+  const requiredPrincipalTokenAddress = allocatedReward.value4;
+  const requiredCollateralTokenAddress = allocatedReward.value5;
+
   allocation.allocatorAddress = allocatedReward.value0;
   allocation.rewardTokenAddress = allocatedReward.value1;
-  allocation.rewardToken = loadToken(allocatedReward.value1).id;
+  allocation.rewardToken = rewardToken;
   allocation.rewardTokenAmountInitial = allocatedReward.value2;
   allocation.rewardTokenAmountRemaining = allocatedReward.value2;
-  allocation.marketplaceId = allocatedReward.value3;
-  allocation.requiredPrincipalTokenAddress = allocatedReward.value4;
-  allocation.requiredCollateralTokenAddress = allocatedReward.value5;
+  allocation.marketplaceId = BigInt.fromString(marketplaceId);
+  allocation.requiredPrincipalTokenAddress = requiredPrincipalTokenAddress;
+  allocation.requiredCollateralTokenAddress = requiredCollateralTokenAddress;
   allocation.minimumCollateralPerPrincipalAmount = allocatedReward.value6;
   allocation.rewardPerLoanPrincipalAmount = allocatedReward.value7;
   allocation.bidStartTimeMin = allocatedReward.value8;
   allocation.bidStartTimeMax = allocatedReward.value9;
   allocation.allocationStrategy =
     allocatedReward.value10 == 0 ? "BORROWER" : "LENDER";
+
+  allocation.bidRewards = [];
+
+  if (requiredPrincipalTokenAddress != Address.zero()) {
+    const principalTokenId = loadToken(requiredPrincipalTokenAddress);
+
+    const marketTokenVolume = loadMarketTokenVolume(
+      principalTokenId.id,
+      marketplaceId.toString()
+    );
+
+    allocation.tokenVolume = marketTokenVolume.id;
+  }
 
   allocation.save();
 
@@ -195,6 +224,74 @@ export function updateRewardAllocation(
   return allocation;
 }
 
+export function linkRewardToCommitments(
+  rewardAllocation: RewardAllocation
+): void {
+  /*
+    match up based on: 
+
+    market Id 
+    principal token address 
+
+  */
+
+  // loop thru all commitments for market
+
+  const protocol = loadProtocol();
+
+  const activeCommitmentIds = protocol.activeCommitments;
+
+  for (let i = 0; i < activeCommitmentIds.length; i++) {
+    const commitmentId = activeCommitmentIds[i];
+
+    const commitment = Commitment.load(commitmentId)!;
+
+    if (
+      commitment.marketplaceId == rewardAllocation.marketplaceId &&
+      commitment.principalTokenAddress ==
+        rewardAllocation.requiredPrincipalTokenAddress
+    ) {
+      appendCommitmentReward(commitment, rewardAllocation);
+    }
+  }
+}
+
+export function linkCommitmentToRewards(commitment: Commitment): void {
+  const protocol = loadProtocol();
+
+  const activeRewardIds = protocol.activeRewards;
+
+  for (let i = 0; i < activeRewardIds.length; i++) {
+    const rewardId = activeRewardIds[i];
+
+    const rewardAllocation = RewardAllocation.load(rewardId)!;
+
+    if (
+      commitment.marketplaceId == rewardAllocation.marketplaceId &&
+      commitment.principalTokenAddress ==
+        rewardAllocation.requiredPrincipalTokenAddress
+    ) {
+      appendCommitmentReward(commitment, rewardAllocation);
+    }
+  }
+}
+
+/*
+    Creates a new CommitmentReward entity which is the association between a commitment and a reward allocation
+*/
+
+export function appendCommitmentReward(
+  commitment: Commitment,
+  rewardAllocation: RewardAllocation
+): void {
+  const commitmentRewardId = getCommitmentRewardId(
+    commitment,
+    rewardAllocation
+  );
+
+  const commitmentReward = loadCommitmentReward(commitment, rewardAllocation);
+}
+
 /*
 RUN THIS FUNCTION : 
  
@@ -226,10 +323,25 @@ export function linkRewardToBids(rewardAllocation: RewardAllocation): void {
     const bidId = BigInt.fromString(rewardableLoans[i]);
     const bid = loadBidById(bidId);
 
+    if (
+      rewardAllocation.allocationStrategy == "BORROWER" &&
+      !borrowerIsEligibleForRewardWithBidStatus(bid.status)
+    ) {
+      return;
+    }
+
+    if (
+      rewardAllocation.allocationStrategy == "LENDER" &&
+      !lenderIsEligibleForRewardWithBidStatus(bid.status)
+    ) {
+      return;
+    }
+
     // check to see if the bid is eligible for the reward
 
     if (
-      // make this a function later
+      allocationStatusToEnum(rewardAllocation.status) ==
+        AllocationStatus.Active &&
       bidIsEligibleForReward(bid, rewardAllocation)
     ) {
       appendAllocationRewardToBidParticipants(bid, rewardAllocation);
@@ -255,10 +367,49 @@ export function linkBidToRewards(bid: Bid): void {
 
     const rewardAllocation = RewardAllocation.load(allocationRewardId)!;
 
-    if (bidIsEligibleForReward(bid, rewardAllocation)) {
+    if (
+      allocationStatusToEnum(rewardAllocation.status) ==
+        AllocationStatus.Active &&
+      bidIsEligibleForReward(bid, rewardAllocation)
+    ) {
       appendAllocationRewardToBidParticipants(bid, rewardAllocation);
     }
   }
+}
+
+export function unlinkBidsFromReward(reward: RewardAllocation): void {
+  const bidRewards = reward.bidRewards;
+
+  for (let i = 0; i < bidRewards.length; i++) {
+    const bidRewardId = bidRewards[i];
+
+    const bidReward = BidReward.load(bidRewardId)!;
+
+    /*
+        Since we cannot access a derived array, we need to manually push and pop bid rewards from rewards 
+        Since we cannot remove elements from an array, we have to repopulate the array from scratch each time 
+      */
+    const rewardAssociations = reward.bidRewards;
+    const updatedAssociationArray = [] as string[];
+    for (let j = 0; j < rewardAssociations.length; j++) {
+      if (rewardAssociations[j] != bidRewardId) {
+        updatedAssociationArray.push(bidRewardId);
+      }
+    }
+
+    reward.bidRewards = updatedAssociationArray;
+    reward.save();
+
+    store.remove("BidReward", bidReward.id);
+  }
+}
+
+export function unlinkTokenVolumeFromReward(reward: RewardAllocation): void {
+  const allocation = loadRewardAllocation(reward.id);
+
+  allocation.tokenVolume = null;
+
+  allocation.save();
 }
 
 function appendAllocationRewardToBidParticipants(
@@ -267,33 +418,13 @@ function appendAllocationRewardToBidParticipants(
 ): void {
   // create a bid reward entity
   const bidRewardId = getBidRewardId(bid, rewardAllocation);
+
+  // this created a bidReward which is an attachment of the reward to a bid
   const bidReward = loadBidReward(bid, rewardAllocation);
 
-  /*
-   if(  borrowerIsEligibleForRewardWithBidStatus( bid.status ) ) {  //  == BidStatus.Accepted){
-
-   ///this only happens if bid is repaid 
-   let borrower = User.load(bid.borrowerAddress.toHexString())!
-
-   let borrowerRewardsArray = borrower.bidRewards;
-   borrowerRewardsArray.push(bidReward.id.toString());
-   borrower.bidRewards = borrowerRewardsArray;
-
-     //add bid reward to array in here 
-   borrower.save()
-   }
-
-   if(  lenderIsEligibleForRewardWithBidStatus( bid.status )) { 
-   //this happens in more situations 
-   let lender = User.load(bid.lenderAddress!.toHexString())!
-
-   //add bid reward to array in here 
-   let lenderRewardsArray = lender.bidRewards;
-   lenderRewardsArray.push(bidReward.id.toString());
-   lender.bidRewards = lenderRewardsArray;
-
-   lender.save()
-   }*/
+  // manually add the association
+  rewardAllocation.bidRewards.push(bidReward.id);
+  rewardAllocation.save();
 }
 
 function bidIsEligibleForReward(
@@ -340,13 +471,15 @@ function bidIsEligibleForReward(
       for (let i = 0; i < bidCollaterals.length; i++) {
         const bidCollateral = BidCollateral.load(bidCollaterals[i])!;
 
-        const principalToken = Token.load(bid.lendingToken)!;
+        const principalToken = loadToken(Address.fromString(bid.lendingToken));
         let principalTokenDecimals = principalToken.decimals;
         if (!principalTokenDecimals) {
           principalTokenDecimals = BigInt.zero();
         }
 
-        const collateralToken = Token.load(bidCollateral.token)!;
+        const collateralToken = loadToken(
+          Address.fromString(bidCollateral.token)
+        );
         let collateralTokenDecimals = collateralToken.decimals;
         if (!collateralTokenDecimals) {
           collateralTokenDecimals = BigInt.zero();
@@ -372,7 +505,6 @@ function bidIsEligibleForReward(
 
     if (!hasValidCollateral) return false;
   }
-
   return true;
 }
 
@@ -389,8 +521,9 @@ function getRequiredCollateralAmount(
     principalTokenDecimals + collateralTokenDecimals
   );
 
-  const requiredCollateralAmount =
-    (minimumCollateralPerPrincipalAmount * principal) / expansion;
+  const requiredCollateralAmount = minimumCollateralPerPrincipalAmount
+    .times(principal)
+    .div(expansion);
 
   return requiredCollateralAmount;
 }

@@ -367,6 +367,23 @@ export function linkBidToRewards(bid: Bid): void {
 
     const rewardAllocation = RewardAllocation.load(allocationRewardId)!;
 
+
+
+    if (
+      rewardAllocation.allocationStrategy == "BORROWER" &&
+      !borrowerIsEligibleForRewardWithBidStatus(bid.status)
+    ) {
+      return;
+    }
+
+    if (
+      rewardAllocation.allocationStrategy == "LENDER" &&
+      !lenderIsEligibleForRewardWithBidStatus(bid.status)
+    ) {
+      return;
+    }
+
+    
     if (
       allocationStatusToEnum(rewardAllocation.status) ==
         AllocationStatus.Active &&

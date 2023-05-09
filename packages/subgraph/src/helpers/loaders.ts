@@ -34,6 +34,7 @@ export function loadProtocol(): Protocol {
     loadLoanStatusCount("protocol", protocol.id);
 
     protocol.activeCommitments = [];
+    protocol.activeRewards = [];
 
     protocol._durationTotal = BigInt.zero();
     protocol.durationAverage = BigInt.zero();
@@ -70,6 +71,7 @@ function supportsInterface(address: Address, interfaceId: string): boolean {
   );
   return !result.reverted && result.value;
 }
+
 export function loadToken(
   _address: Bytes,
   type: TokenType = TokenType.UNKNOWN,

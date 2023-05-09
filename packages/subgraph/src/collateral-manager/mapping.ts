@@ -6,9 +6,10 @@ import {
   CollateralWithdrawn
 } from "../../generated/CollateralManager/CollateralManager";
 import { Bid } from "../../generated/schema";
+import { updateCollateral } from "../collateral-manager/updaters";
 import { BidStatus } from "../helpers/bid";
 import { loadBidById, loadCollateral } from "../helpers/loaders";
-import { updateBidStatus, updateCollateral } from "../helpers/updaters";
+import { updateBidStatus } from "../helpers/updaters";
 
 export function handleCollateralEscrowDeployed(
   event: CollateralEscrowDeployed

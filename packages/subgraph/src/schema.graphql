@@ -5,6 +5,7 @@ type Protocol implements IHasLoans @entity {
   tokenVolumes: [TokenVolume!]! @derivedFrom(field: "protocol")
 
   activeCommitments: [Commitment!]!
+  activeRewards: [RewardAllocation!]!
 
   _durationTotal: BigInt!
   durationAverage: BigInt!
@@ -68,6 +69,8 @@ type Bid @entity {
 
   lendingToken: Token!
   lendingTokenAddress: Bytes!
+
+  bidRewards: [BidReward!]! @derivedFrom(field: "bid")
 
   marketplaceId: BigInt!
   metadataURI: String!
@@ -138,6 +141,7 @@ type User @entity {
   firstInteractionDate: BigInt!
   lenders: [Lender!]! @derivedFrom(field: "user")
   borrowers: [Borrower!]! @derivedFrom(field: "user")
+  bidRewards: [BidReward!]! @derivedFrom(field: "user")
 }
 
 type Lender implements IHasLoans @entity {
@@ -273,6 +277,8 @@ type TokenVolume implements IDurationAverage @entity {
   lender: Lender
   borrower: Borrower
 
+  allocatedRewards: [RewardAllocation!]! @derivedFrom(field: "tokenVolume")
+
   # used to group token volumes with collateral by lending token
   _protocolCollateral: ProtocolCollateral
 
@@ -370,4 +376,77 @@ type Commitment @entity {
 
   # TokenStats
   tokenVolume: TokenVolume!
+
+
+  commitmentRewards: [CommitmentReward!]! @derivedFrom(field: "commitment")
 }
+
+
+# Association between RewardAllocations and Commitments 
+type CommitmentReward @entity {
+  id: ID!
+  createdAt: BigInt!
+  updatedAt: BigInt!
+
+  reward: RewardAllocation!
+  commitment: Commitment!
+  
+  roi: BigInt! 
+  apy: BigInt!
+}
+
+
+ 
+
+type RewardAllocation @entity {
+  id: ID!
+  createdAt: BigInt!
+  updatedAt: BigInt!
+
+  status: String!
+
+  allocator: User!
+  allocatorAddress: Bytes!
+
+  # Market
+  marketplace: MarketPlace!
+  marketplaceId: BigInt!
+
+  # TokenStats
+  tokenVolume: TokenVolume
+
+  rewardToken: Token!
+  rewardTokenAddress: Bytes!
+  rewardTokenAmountInitial: BigInt!
+  rewardTokenAmountRemaining: BigInt!
+
+  requiredPrincipalTokenAddress: Bytes!
+  requiredCollateralTokenAddress: Bytes!
+
+  minimumCollateralPerPrincipalAmount: BigInt!
+  rewardPerLoanPrincipalAmount: BigInt!
+
+  bidStartTimeMin: BigInt!
+  bidStartTimeMax: BigInt!
+
+  allocationStrategy: String!
+
+  bidRewards: [BidReward!]! 
+
+  commitmentRewards: [CommitmentReward!]! @derivedFrom(field: "reward")
+
+}
+
+
+type BidReward @entity {
+  id: ID!
+  createdAt: BigInt!
+  updatedAt: BigInt!
+
+  reward: RewardAllocation!
+  bid: Bid!
+  user: User!
+}
+
+
+

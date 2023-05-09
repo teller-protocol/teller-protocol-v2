@@ -85,4 +85,3 @@ export function checkActiveCommitments(block: ethereum.Block): void {
     }
   }
 }
- 

@@ -17,7 +17,7 @@
     "deploy-local:goerli": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 teller-v2-goerli",
     "deploy-local:localhost": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 teller-v2-localhost",
     "test": "yarn graph test",
-    "lint": "eslint './src/**/*.ts' --fix"
+    "format": "eslint './src/**/*.ts' --fix"
   },
   "dependencies": {
     "mustache": "^4.2.0"

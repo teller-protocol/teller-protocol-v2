@@ -367,8 +367,6 @@ export function linkBidToRewards(bid: Bid): void {
 
     const rewardAllocation = RewardAllocation.load(allocationRewardId)!;
 
-
-
     if (
       rewardAllocation.allocationStrategy == "BORROWER" &&
       !borrowerIsEligibleForRewardWithBidStatus(bid.status)
@@ -383,7 +381,6 @@ export function linkBidToRewards(bid: Bid): void {
       return;
     }
 
-    
     if (
       allocationStatusToEnum(rewardAllocation.status) ==
         AllocationStatus.Active &&
@@ -535,7 +532,7 @@ function getRequiredCollateralAmount(
   collateralTokenDecimals: i32
 ): BigInt {
   const expansion = BigInt.fromI32(10).pow(
-    (principalTokenDecimals + collateralTokenDecimals) as u8
+    principalTokenDecimals + collateralTokenDecimals
   );
 
   const requiredCollateralAmount = minimumCollateralPerPrincipalAmount

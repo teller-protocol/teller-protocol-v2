@@ -148,8 +148,6 @@ const networkConfig = (config: NetworkUserConfig): NetworkUserConfig => ({
       plus it will use *.args for constructor args
 */
 
-const mainnetGwei = 21
-
 // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
 export default <HardhatUserConfig>{
   defaultNetwork,
@@ -264,7 +262,7 @@ export default <HardhatUserConfig>{
       url: networkUrls.mainnet,
       chainId: 1,
       live: true,
-      gasPrice: mainnetGwei * 1000000000,
+      gasPrice: ethers.utils.parseUnits('100', 'gwei').toNumber(),
 
       verify: {
         etherscan: {

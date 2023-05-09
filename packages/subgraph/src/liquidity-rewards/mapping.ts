@@ -11,7 +11,7 @@ import {
 import { Bid } from "../../generated/schema";
 import { loadBidById, loadProtocol } from "../helpers/loaders";
 
-import { loadRewardAllocation } from "./loaders";
+import { loadBidReward, loadRewardAllocation } from "./loaders";
 import {
   createRewardAllocation,
   updateAllocationStatus,
@@ -148,6 +148,15 @@ export function handleClaimedReward(event: ClaimedRewards): void {
 
   const rewardRecipient = event.params.recipient;
   const amountRewarded = event.params.amount;
+
+  let bidReward = loadBidReward(bid,allocation);
+
+  bidReward.claimed = true;
+  
+  bidReward.save();
+
+  //use the bid and the allocation info to update the BidReward entity status 
+
 
   /*
   const claimedReward = createClaimedReward(

@@ -3,15 +3,12 @@ import { Address, BigInt, ethereum, store } from "@graphprotocol/graph-ts";
 import { MarketLiquidityRewards } from "../../generated/MarketLiquidityRewards/MarketLiquidityRewards";
 import {
   Bid,
-  RewardAllocation,
-  Token,
-  TokenVolume,
-  User,
   BidCollateral,
   BidReward,
-  Commitment
+  Commitment,
+  RewardAllocation
 } from "../../generated/schema";
-import { bidStatusToString, BidStatus } from "../helpers/bid";
+import { BidStatus, bidStatusToString } from "../helpers/bid";
 import {
   loadBidById,
   loadLoanStatusCount,
@@ -19,20 +16,20 @@ import {
   loadProtocol,
   loadToken
 } from "../helpers/loaders";
-import { addToArray, removeFromArray } from "../helpers/utils";
 
 import {
-  loadRewardAllocation,
-  loadBidReward,
   getBidRewardId,
+  getCommitmentRewardId,
+  loadBidReward,
   loadCommitmentReward,
-  getCommitmentRewardId
+  loadRewardAllocation
 } from "./loaders";
 import {
   AllocationStatus,
   allocationStatusToEnum,
   allocationStatusToString
 } from "./utils";
+
 // import { CommitmentStatus, commitmentStatusToString } from "./utils";
 
 enum CollateralTokenType {
@@ -228,10 +225,10 @@ export function linkRewardToCommitments(
   rewardAllocation: RewardAllocation
 ): void {
   /*
-    match up based on: 
+    match up based on:
 
-    market Id 
-    principal token address 
+    market Id
+    principal token address
 
   */
 
@@ -293,16 +290,16 @@ export function appendCommitmentReward(
 }
 
 /*
-RUN THIS FUNCTION : 
- 
-1. When an allocation is created or updated 
+RUN THIS FUNCTION :
+
+1. When an allocation is created or updated
 
 
-DESCRIPTION: 
-This function will loop through all of the bids (matching market id and principal token) in order to update the protocol entity array 
- 
+DESCRIPTION:
+This function will loop through all of the bids (matching market id and principal token) in order to update the protocol entity array
 
-verify that the reward is active and has funds remaining 
+
+verify that the reward is active and has funds remaining
 
 */
 
@@ -355,7 +352,7 @@ export function linkRewardToBids(rewardAllocation: RewardAllocation): void {
   when a bid is accepted or repaid ...
 
 
-  find all of the allocations that are active , see if the bid can be assigned to the allocation 
+  find all of the allocations that are active , see if the bid can be assigned to the allocation
 */
 export function linkBidToRewards(bid: Bid): void {
   const protocol = loadProtocol();
@@ -400,8 +397,8 @@ export function unlinkBidsFromReward(reward: RewardAllocation): void {
     const bidReward = BidReward.load(bidRewardId)!;
 
     /*
-        Since we cannot access a derived array, we need to manually push and pop bid rewards from rewards 
-        Since we cannot remove elements from an array, we have to repopulate the array from scratch each time 
+        Since we cannot access a derived array, we need to manually push and pop bid rewards from rewards
+        Since we cannot remove elements from an array, we have to repopulate the array from scratch each time
       */
     const rewardAssociations = reward.bidRewards;
     const updatedAssociationArray = [] as string[];
@@ -502,8 +499,8 @@ function bidIsEligibleForReward(
         const requiredCollateralAmount = getRequiredCollateralAmount(
           bid.principal,
           rewardAllocation.minimumCollateralPerPrincipalAmount,
-          principalTokenDecimals.toI32(),
-          collateralTokenDecimals.toI32()
+          principalTokenDecimals,
+          collateralTokenDecimals
         );
 
         if (
@@ -528,16 +525,15 @@ function bidIsEligibleForReward(
 function getRequiredCollateralAmount(
   principal: BigInt,
   minimumCollateralPerPrincipalAmount: BigInt,
-  principalTokenDecimals: i32,
-  collateralTokenDecimals: i32
+  principalTokenDecimals: BigInt,
+  collateralTokenDecimals: BigInt
 ): BigInt {
-  const expansion = BigInt.fromI32(10).pow(
-    principalTokenDecimals + collateralTokenDecimals
-  );
+  const expansion: i64 =
+    10 ** principalTokenDecimals.plus(collateralTokenDecimals).toI32();
 
   const requiredCollateralAmount = minimumCollateralPerPrincipalAmount
     .times(principal)
-    .div(expansion);
+    .div(BigInt.fromI64(expansion));
 
   return requiredCollateralAmount;
 }

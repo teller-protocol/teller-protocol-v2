@@ -119,7 +119,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     function commitCollateral(
         uint256 _bidId,
         Collateral[] calldata _collateralInfo
-    ) public returns (bool validation_) {
+    ) public onlyTellerV2 returns (bool validation_) {
         address borrower = tellerV2.getLoanBorrower(_bidId);
         (validation_, ) = checkBalances(borrower, _collateralInfo);
 
@@ -141,7 +141,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     function commitCollateral(
         uint256 _bidId,
         Collateral calldata _collateralInfo
-    ) public returns (bool validation_) {
+    ) public onlyTellerV2 returns (bool validation_) {
         address borrower = tellerV2.getLoanBorrower(_bidId);
         validation_ = _checkBalance(borrower, _collateralInfo);
         if (validation_) {

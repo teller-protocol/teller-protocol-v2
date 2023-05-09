@@ -197,6 +197,8 @@ export function loadBidReward(
     bidReward.reward = rewardAllocation.id.toString();
     bidReward.bid = bid.id.toString();
 
+    bidReward.claimed = false;
+
     const lenderAddress = bid.lenderAddress;
     const borrowerAddress = bid.borrowerAddress;
 

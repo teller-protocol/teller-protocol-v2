@@ -17,9 +17,15 @@ import "./interfaces/ICollateralManager.sol";
 import { Collateral, CollateralType, ICollateralEscrowV1 } from "./interfaces/escrow/ICollateralEscrowV1.sol";
 import "./interfaces/ITellerV2.sol";
 
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+
 contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     /* Storage */
     using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
+    using SafeERC20 for ERC20;
+
+
     ITellerV2 public tellerV2;
     address private collateralEscrowBeacon; // The address of the escrow contract beacon
     mapping(uint256 => address) public _escrows; // bidIds -> collateralEscrow
@@ -324,7 +330,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         );
         // Pull collateral from borrower & deposit into escrow
         if (collateralInfo._collateralType == CollateralType.ERC20) {
-            IERC20Upgradeable(collateralInfo._collateralAddress).transferFrom(
+            ERC20(collateralInfo._collateralAddress).safeTransferFrom(
                 borrower,
                 address(this),
                 collateralInfo._amount

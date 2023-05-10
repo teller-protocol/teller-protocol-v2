@@ -139,22 +139,26 @@ export function handleDeletedAllocations(events: DeletedAllocation[]): void {
 // todo
 export function handleClaimedReward(event: ClaimedRewards): void {
   const allocationId = event.params.allocationId.toString();
-  
+
   // update the reward allocation as the amount remaining most likely changed
-  const allocation = updateRewardAllocation(allocationId, event.address, event.block);
-  
+  const allocation = updateRewardAllocation(
+    allocationId,
+    event.address,
+    event.block
+  );
+
   const bid: Bid = loadBidById(event.params.bidId);
 
   const rewardRecipient = event.params.recipient;
   const amountRewarded = event.params.amount;
 
-  let bidReward = loadBidReward(bid,allocation);
+  const bidReward = loadBidReward(bid, allocation);
 
   bidReward.claimed = true;
-  
+
   bidReward.save();
 
-  //use the bid and the allocation info to update the BidReward entity status 
+  // use the bid and the allocation info to update the BidReward entity status
 
   /*
   const claimedReward = createClaimedReward(

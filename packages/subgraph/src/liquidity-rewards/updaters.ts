@@ -156,8 +156,14 @@ export function updateRewardAllocation(
   allocation.bidStartTimeMax = allocatedReward.value9;
 
   allocation.save();
+  
 
-  updateAllocationStatus(allocation, AllocationStatus.Active);
+  if(allocation.rewardTokenAmountRemaining > BigInt.zero()){
+    updateAllocationStatus(allocation, AllocationStatus.Active);
+  }else{
+    updateAllocationStatus(allocation, AllocationStatus.Drained);
+  }
+  
 
   /*
   const lender = loadLenderByMarketId(lenderAddress, marketId);

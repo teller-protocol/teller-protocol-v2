@@ -518,26 +518,37 @@ contract TellerV2 is
             bid.loanDetails.principal -
             amountToProtocol -
             amountToMarketplace;
-        //transfer fee to protocol
+       
+       
+         //transfer fee to protocol
+        if(amountToProtocol > 0){
         bid.loanDetails.lendingToken.safeTransferFrom(
             sender,
             owner(),
             amountToProtocol
         );
+        }
 
         //transfer fee to marketplace
+        if(amountToMarketplace > 0){
         bid.loanDetails.lendingToken.safeTransferFrom(
             sender,
             marketRegistry.getMarketFeeRecipient(bid.marketplaceId),
             amountToMarketplace
         );
+        }
 
         //transfer funds to borrower
+        if(amountToBorrower > 0){
         bid.loanDetails.lendingToken.safeTransferFrom(
             sender,
             bid.receiver,
             amountToBorrower
         );
+        }
+
+
+        
 
         // Record volume filled by lenders
         lenderVolumeFilled[address(bid.loanDetails.lendingToken)][sender] += bid

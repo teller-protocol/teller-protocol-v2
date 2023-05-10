@@ -308,6 +308,8 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
             amountToReward = allocatedReward.rewardTokenAmount;
         }
 
+        require(amountToReward > 0, "Nothing to claim.");
+
         _decrementAllocatedAmount(_allocationId, amountToReward);
 
         //transfer tokens reward to the msgsender

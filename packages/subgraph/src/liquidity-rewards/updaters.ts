@@ -157,7 +157,11 @@ export function updateRewardAllocation(
 
   allocation.save();
 
-  updateAllocationStatus(allocation, AllocationStatus.Active);
+  if (allocation.rewardTokenAmountRemaining > BigInt.zero()) {
+    updateAllocationStatus(allocation, AllocationStatus.Active);
+  } else {
+    updateAllocationStatus(allocation, AllocationStatus.Drained);
+  }
 
   /*
   const lender = loadLenderByMarketId(lenderAddress, marketId);

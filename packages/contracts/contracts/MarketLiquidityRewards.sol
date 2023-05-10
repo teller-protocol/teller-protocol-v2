@@ -21,7 +21,6 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20Metadat
 
 - Anyone can allocate rewards and an allocation has specific parameters that can be set to incentivise certain types of loans
  
-
 */
 
 contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {

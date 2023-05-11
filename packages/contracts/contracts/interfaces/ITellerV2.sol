@@ -51,7 +51,7 @@ interface ITellerV2 {
      * @notice Function for a lender to accept a proposed loan bid.
      * @param _bidId The id of the loan bid to accept.
      */
-    function lenderAcceptBid(uint256 _bidId)
+    function lenderAcceptBid(uint256 _bidId, uint16 _maxMarketFee)
         external
         returns (
             uint256 amountToProtocol,

@@ -467,7 +467,10 @@ contract TellerV2 is
      * @notice Function for a lender to accept a proposed loan bid.
      * @param _bidId The id of the loan bid to accept.
      */
-    function lenderAcceptBid(uint256 _bidId)
+    function lenderAcceptBid(
+        uint256 _bidId,
+        uint16 _maxMarketFee        
+        )
         external
         override
         pendingBid(_bidId, "lenderAcceptBid")
@@ -509,10 +512,15 @@ contract TellerV2 is
         // Tell the collateral manager to deploy the escrow and pull funds from the borrower if applicable
         collateralManager.deployAndDeposit(_bidId);
 
+        uint16 marketplaceFee = marketRegistry.getMarketplaceFee(bid.marketplaceId);
+
+        require(marketplaceFee <= _maxMarketFee, "Unexpected market fee");
+
+
         // Transfer funds to borrower from the lender
         amountToProtocol = bid.loanDetails.principal.percent(protocolFee());
         amountToMarketplace = bid.loanDetails.principal.percent(
-            marketRegistry.getMarketplaceFee(bid.marketplaceId)
+            marketplaceFee
         );
         amountToBorrower =
             bid.loanDetails.principal -

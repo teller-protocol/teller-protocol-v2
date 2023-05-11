@@ -111,7 +111,7 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
         due.interest = interest;
     }
 
-    function lenderAcceptBid(uint256 _bidId)
+    function lenderAcceptBid(uint256 _bidId, uint16 _maxMarketFee)
         public
         returns (
             uint256 amountToProtocol,

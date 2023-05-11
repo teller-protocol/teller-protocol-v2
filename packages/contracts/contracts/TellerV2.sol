@@ -298,7 +298,6 @@ contract TellerV2 is
             _expectedMarketParams,
             _receiver
         );
-
         if(_collateralInfo.length > 0){
             bool validation = collateralManager.commitCollateral(
                 bidId_,

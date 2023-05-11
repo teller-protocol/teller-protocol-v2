@@ -263,20 +263,24 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
      * @notice Sends the deposited collateral to a liquidator of a bid.
      * @notice Can only be called by the protocol.
      * @param _bidId The id of the liquidated bid.
-     * @param _liquidatorAddress The address of the liquidator to send the collateral to.
+     * @param _recipientAddress The address of the recipient for the assets
      */
-    function liquidateCollateral(uint256 _bidId, address _liquidatorAddress)
+    function liquidateCollateral(uint256 _bidId, address _recipientAddress)
         external
-        onlyTellerV2
     {
-        if (isBidCollateralBacked(_bidId)) {
-            BidState bidState = tellerV2.getBidState(_bidId);
-            require(
-                bidState == BidState.LIQUIDATED,
-                "Loan has not been liquidated"
-            );
-            _withdraw(_bidId, _liquidatorAddress);
-        }
+       
+        address _liquidatorAddress = tellerV2.getLoanLiquidator(_bidId);
+        require(msg.sender == _liquidatorAddress, "Not Authorized");
+
+
+        BidState bidState = tellerV2.getBidState(_bidId);
+        require(
+            bidState == BidState.LIQUIDATED,
+            "Loan has not been liquidated"
+        );
+
+        _withdraw(_bidId, _recipientAddress);
+    
     }
 
     /* Internal Functions */

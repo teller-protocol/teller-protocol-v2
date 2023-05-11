@@ -109,14 +109,13 @@ contract TellerV2_Override is TellerV2 {
     function _repayLoanSuper(
         uint256 _bidId,
         Payment memory _payment,
-        uint256 _owedAmount,
-        bool _shouldWithdrawCollateral
+        uint256 _owedAmount
+      
     ) public {
         super._repayLoan(
             _bidId,
             _payment,
-            _owedAmount,
-            _shouldWithdrawCollateral
+            _owedAmount 
         );
     }
 
@@ -163,8 +162,7 @@ contract TellerV2_Override is TellerV2 {
     function _repayLoan(
         uint256 _bidId,
         Payment memory _payment,
-        uint256 _owedAmount,
-        bool _shouldWithdrawCollateral
+        uint256 _owedAmount
     ) internal override {
         repayLoanWasCalled = true;
     }

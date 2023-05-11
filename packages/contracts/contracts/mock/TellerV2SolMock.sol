@@ -151,6 +151,15 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
         return bids[_bidId].loanDetails;
     }
 
+
+    function getLoanLiquidator(uint256 _bidId)
+        external
+        view
+        returns (address liquidator_)
+    {
+        liquidator_ = address(0);
+    }
+
     function getBorrowerActiveLoanIds(address _borrower)
         public
         view

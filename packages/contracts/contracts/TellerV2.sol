@@ -295,16 +295,17 @@ contract TellerV2 is
             _expectedMarketParams,
             _receiver
         );
+        if(_collateralInfo.length > 0){
+            bool validation = collateralManager.commitCollateral(
+                bidId_,
+                _collateralInfo
+            );
 
-        bool validation = collateralManager.commitCollateral(
-            bidId_,
-            _collateralInfo
-        );
-
-        require(
-            validation == true,
-            "Collateral balance could not be validated"
-        );
+            require(
+                validation == true,
+                "Collateral balance could not be validated"
+            );
+        }
     }
 
     function _submitBid(

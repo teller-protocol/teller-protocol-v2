@@ -386,6 +386,11 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             );
         }
 
+
+        commitmentPrincipalAllocated[_commitmentId] += _principalAmount;
+
+        require( commitmentPrincipalAllocated[_commitmentId] <= commitment.maxPrincipal, "Exceeds max principal of commitment");
+
         bidId = _submitBidFromCommitment(
             borrower,
             commitment.marketId,
@@ -400,12 +405,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         );
 
         _acceptBid(bidId, commitment.lender);
-
-        commitmentPrincipalAllocated[_commitmentId] += _principalAmount;
-
-        require( commitmentPrincipalAllocated[_commitmentId] <= commitment.maxPrincipal, "Exceeds max principal of commitment");
-       // _decrementCommitment(_commitmentId, _principalAmount);
-
+ 
         emit ExercisedCommitment(
             _commitmentId,
             borrower,

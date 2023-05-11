@@ -247,22 +247,22 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
      * @notice Withdraws deposited collateral from the created escrow of a bid that has been successfully repaid.
      * @param _bidId The id of the bid to withdraw collateral for.
      */
-    function withdraw(uint256 _bidId) external {
+    function withdraw(uint256 _bidId, address _recipient) external {
         BidState bidState = tellerV2.getBidState(_bidId);
         if (bidState == BidState.PAID) {
             address loanBorrower = tellerV2.getLoanBorrower(_bidId);
 
-            require(msg.sender == loanBorrower, "Not Authorized");
+            require(_msgSender() == loanBorrower, "Not Authorized");
 
-            _withdraw(_bidId, loanBorrower);
+            _withdraw(_bidId, _recipient);
 
             emit CollateralClaimed(_bidId);
         } else if (tellerV2.isLoanDefaulted(_bidId)) {
             address loanLender = tellerV2.getLoanLender(_bidId);
 
-            require(msg.sender == loanBorrower, "Not Authorized");
+            require(_msgSender() == loanLender, "Not Authorized");
 
-            _withdraw(_bidId, loanLender);
+            _withdraw(_bidId, _recipient);
             
             emit CollateralClaimed(_bidId);
         } else {

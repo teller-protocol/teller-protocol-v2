@@ -63,7 +63,7 @@ interface ICollateralManager {
      * @notice Withdraws deposited collateral from the created escrow of a bid.
      * @param _bidId The id of the bid to withdraw collateral for.
      */
-    function withdraw(uint256 _bidId) external;
+    function withdraw(uint256 _bidId, address _recipient) external;
 
     /**
      * @notice Re-checks the validity of a borrower's collateral balance committed to a bid.

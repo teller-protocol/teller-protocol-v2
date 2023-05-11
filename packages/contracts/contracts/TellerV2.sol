@@ -55,6 +55,9 @@ contract TellerV2 is
     using EnumerableSet for EnumerableSet.AddressSet;
     using EnumerableSet for EnumerableSet.UintSet;
 
+ 
+
+
     /** Events */
 
     /**
@@ -259,35 +262,7 @@ contract TellerV2 is
         reputationManager = IReputationManager(_reputationManager);
     }
 
-    /**
-     * @notice Function for a borrower to create a bid for a loan without Collateral.
-     * @param _lendingToken The lending token asset requested to be borrowed.
-     * @param _marketplaceId The unique id of the marketplace for the bid.
-     * @param _principal The principal amount of the loan bid.
-     * @param _duration The recurrent length of time before which a payment is due.
-     * @param _APR The proposed interest rate for the loan bid.
-     * @param _metadataURI The URI for additional borrower loan information as part of loan bid.
-     * @param _receiver The address where the loan amount will be sent to.
-     */
-    function submitBid(
-        address _lendingToken,
-        uint256 _marketplaceId,
-        uint256 _principal,
-        uint32 _duration,
-        uint16 _APR,
-        string calldata _metadataURI,
-        address _receiver
-    ) public override whenNotPaused returns (uint256 bidId_) {
-        bidId_ = _submitBid(
-            _lendingToken,
-            _marketplaceId,
-            _principal,
-            _duration,
-            _APR,
-            _metadataURI,
-            _receiver
-        );
-    }
+     
 
     /**
      * @notice Function for a borrower to create a bid for a loan with Collateral.
@@ -296,27 +271,28 @@ contract TellerV2 is
      * @param _principal The principal amount of the loan bid.
      * @param _duration The recurrent length of time before which a payment is due.
      * @param _APR The proposed interest rate for the loan bid.
-     * @param _metadataURI The URI for additional borrower loan information as part of loan bid.
      * @param _receiver The address where the loan amount will be sent to.
      * @param _collateralInfo Additional information about the collateral asset.
+     * @param _expectedMarketParams Expected parameters of the market
      */
     function submitBid(
         address _lendingToken,
         uint256 _marketplaceId,
         uint256 _principal,
         uint32 _duration,
-        uint16 _APR,
-        string calldata _metadataURI,
+        uint16 _APR, 
         address _receiver,
-        Collateral[] calldata _collateralInfo
+        Collateral[] calldata _collateralInfo,
+        ExpectedMarketParams calldata _expectedMarketParams
     ) public override whenNotPaused returns (uint256 bidId_) {
+ 
         bidId_ = _submitBid(
             _lendingToken,
             _marketplaceId,
             _principal,
             _duration,
-            _APR,
-            _metadataURI,
+            _APR, 
+            _expectedMarketParams,
             _receiver
         );
 
@@ -337,7 +313,8 @@ contract TellerV2 is
         uint256 _principal,
         uint32 _duration,
         uint16 _APR,
-        string calldata _metadataURI,
+        ExpectedMarketParams calldata _expectedMarketParams,
+        //string calldata _metadataURI,
         address _receiver
     ) internal virtual returns (uint256 bidId_) {
         address sender = _msgSenderForMarket(_marketplaceId);
@@ -371,17 +348,26 @@ contract TellerV2 is
         (bid.terms.paymentCycle, bidPaymentCycleType[bidId]) = marketRegistry
             .getPaymentCycle(_marketplaceId);
 
+        
+        require(bid.terms.paymentCycle == _expectedMarketParams.paymentCycleDuration, "Unexpected payment cycle");
+        require(bidPaymentCycleType[bidId] == _expectedMarketParams.paymentCycleType, "Unexpected payment cycle");
+
+
         bid.terms.APR = _APR;
 
         bidDefaultDuration[bidId] = marketRegistry.getPaymentDefaultDuration(
             _marketplaceId
         );
+        require(bidDefaultDuration[bidId] >= _expectedMarketParams.defaultDuration, "Unexpected default duration");
 
         bidExpirationTime[bidId] = marketRegistry.getBidExpirationTime(
             _marketplaceId
         );
+        require(bidExpirationTime[bidId] >= _expectedMarketParams.expirationTime, "Unexpected expiration time");
 
         bid.paymentType = marketRegistry.getPaymentType(_marketplaceId);
+        require(bid.paymentType == _expectedMarketParams.paymentType, "Unexpected payment type");
+
 
         bid.terms.paymentCycleAmount = V2Calculations
             .calculatePaymentCycleAmount(
@@ -392,15 +378,16 @@ contract TellerV2 is
                 bid.terms.paymentCycle,
                 _APR
             );
+         
 
-        uris[bidId] = _metadataURI;
+        //uris[bidId] = _metadataURI;
         bid.state = BidState.PENDING;
 
         emit SubmittedBid(
             bidId,
             bid.borrower,
             bid.receiver,
-            keccak256(abi.encodePacked(_metadataURI))
+            keccak256(abi.encodePacked(""))
         );
 
         // Store bid inside borrower bids mapping

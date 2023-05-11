@@ -1,29 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import { Payment, BidState } from "../TellerV2Storage.sol";
+import { Payment, BidState, ExpectedMarketParams } from "../TellerV2Storage.sol";
 import { Collateral } from "./escrow/ICollateralEscrowV1.sol";
-
+ 
 interface ITellerV2 {
-    /**
-     * @notice Function for a borrower to create a bid for a loan.
-     * @param _lendingToken The lending token asset requested to be borrowed.
-     * @param _marketplaceId The unique id of the marketplace for the bid.
-     * @param _principal The principal amount of the loan bid.
-     * @param _duration The recurrent length of time before which a payment is due.
-     * @param _APR The proposed interest rate for the loan bid.
-     * @param _metadataURI The URI for additional borrower loan information as part of loan bid.
-     * @param _receiver The address where the loan amount will be sent to.
-     */
-    function submitBid(
-        address _lendingToken,
-        uint256 _marketplaceId,
-        uint256 _principal,
-        uint32 _duration,
-        uint16 _APR,
-        string calldata _metadataURI,
-        address _receiver
-    ) external returns (uint256 bidId_);
+    
 
     /**
      * @notice Function for a borrower to create a bid for a loan with Collateral.
@@ -32,19 +14,19 @@ interface ITellerV2 {
      * @param _principal The principal amount of the loan bid.
      * @param _duration The recurrent length of time before which a payment is due.
      * @param _APR The proposed interest rate for the loan bid.
-     * @param _metadataURI The URI for additional borrower loan information as part of loan bid.
      * @param _receiver The address where the loan amount will be sent to.
      * @param _collateralInfo Additional information about the collateral asset.
+      * @param _expectedMarketParams Expected parameters of the market.
      */
     function submitBid(
         address _lendingToken,
         uint256 _marketplaceId,
         uint256 _principal,
         uint32 _duration,
-        uint16 _APR,
-        string calldata _metadataURI,
+        uint16 _APR,       
         address _receiver,
-        Collateral[] calldata _collateralInfo
+        Collateral[] calldata _collateralInfo,
+        ExpectedMarketParams calldata _expectedMarketParams
     ) external returns (uint256 bidId_);
 
     /**

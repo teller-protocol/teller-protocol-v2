@@ -18,6 +18,15 @@ enum BidState {
     LIQUIDATED
 }
 
+
+struct ExpectedMarketParams {
+    uint32 paymentCycleDuration;
+    uint32 defaultDuration;
+    uint32 expirationTime;
+    PaymentType paymentType;
+    PaymentCycleType paymentCycleType;
+}
+
 /**
  * @notice Represents a total amount for a payment.
  * @param principal Amount that counts towards the principal.

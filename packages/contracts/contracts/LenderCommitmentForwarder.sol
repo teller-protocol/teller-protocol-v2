@@ -61,6 +61,8 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
     mapping(uint256 => EnumerableSetUpgradeable.AddressSet)
         internal commitmentBorrowersList;
 
+    mapping (uint256 => uint256) commitmentPrincipalAllocated; 
+
     /**
      * @notice This event is emitted when a lender's commitment is created.
      * @param lender The address of the lender.
@@ -232,6 +234,26 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         );
     }
 
+   /* function updateCommitmentExpiration( 
+        uint256 _commitmentId,
+        uint32 _expiration
+    ) public commitmentLender(_commitmentId) {
+
+        Commitment _commitment storage = commitments[_commitmentId];
+
+        _commitment.expiration = _expirationt;
+
+        validateCommitment(commitments[_commitmentId]);
+
+        emit UpdatedCommitment(
+            _commitmentId,
+            _commitment.lender,
+            _commitment.marketId,
+            _commitment.principalTokenAddress,
+            _commitment.maxPrincipal
+        );
+    }*/
+
     /**
      * @notice Updates the borrowers allowed to accept a commitment
      * @param _commitmentId The Id of the commitment to update.
@@ -273,17 +295,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         emit DeletedCommitment(_commitmentId);
     }
 
-    /**
-     * @notice Reduces the commitment amount for a lender to a market.
-     * @param _commitmentId The id of the commitment to modify.
-     * @param _tokenAmountDelta The amount of change in the maxPrincipal.
-     */
-    function _decrementCommitment(
-        uint256 _commitmentId,
-        uint256 _tokenAmountDelta
-    ) internal {
-        commitments[_commitmentId].maxPrincipal -= _tokenAmountDelta;
-    }
+  
 
     /**
      * @notice Accept the commitment to submitBid and acceptBid using the funds
@@ -389,7 +401,10 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
 
         _acceptBid(bidId, commitment.lender);
 
-        _decrementCommitment(_commitmentId, _principalAmount);
+        commitmentPrincipalAllocated[_commitmentId] += _principalAmount;
+
+        require( commitmentPrincipalAllocated[_commitmentId] <= commitment.maxPrincipal, "Exceeds max principal of commitment");
+       // _decrementCommitment(_commitmentId, _principalAmount);
 
         emit ExercisedCommitment(
             _commitmentId,

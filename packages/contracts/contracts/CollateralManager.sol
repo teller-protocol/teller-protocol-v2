@@ -260,7 +260,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         } else if (tellerV2.isLoanDefaulted(_bidId)) {
             address loanLender = tellerV2.getLoanLender(_bidId);
 
-            require(msg.sender == loanBorrower, "Not Authorized");
+            require(msg.sender == loanLender, "Not Authorized");
 
             _withdraw(_bidId, loanLender);
             

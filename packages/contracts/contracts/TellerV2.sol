@@ -962,6 +962,9 @@ contract TellerV2 is
 
         if (bidDefaultDuration[_bidId] == 0) return false;
 
+        //avoid an underflow 
+        if(uint32(block.timestamp) <  lastRepaidTimestamp(_bidId) + _liquidationDelay ) return false;
+
         return (uint32(block.timestamp) -
             _liquidationDelay -
             lastRepaidTimestamp(_bidId) >

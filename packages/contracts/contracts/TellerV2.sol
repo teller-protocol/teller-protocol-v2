@@ -281,10 +281,13 @@ contract TellerV2 is
         uint256 _principal,
         uint32 _duration,
         uint16 _APR, 
+        uint32 deadline,
         address _receiver,
         Collateral[] calldata _collateralInfo,
         ExpectedMarketParams calldata _expectedMarketParams
     ) public override whenNotPaused returns (uint256 bidId_) {
+
+        require(block.timestamp < deadline, "Deadline not met");
  
         bidId_ = _submitBid(
             _lendingToken,
@@ -296,15 +299,17 @@ contract TellerV2 is
             _receiver
         );
 
-        bool validation = collateralManager.commitCollateral(
-            bidId_,
-            _collateralInfo
-        );
+        if(_collateralInfo.length > 0){
+            bool validation = collateralManager.commitCollateral(
+                bidId_,
+                _collateralInfo
+            );
 
-        require(
-            validation == true,
-            "Collateral balance could not be validated"
-        );
+            require(
+                validation == true,
+                "Collateral balance could not be validated"
+            );
+        }
     }
 
     function _submitBid(

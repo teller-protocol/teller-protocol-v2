@@ -250,9 +250,20 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     function withdraw(uint256 _bidId) external {
         BidState bidState = tellerV2.getBidState(_bidId);
         if (bidState == BidState.PAID) {
-            _withdraw(_bidId, tellerV2.getLoanBorrower(_bidId));
+            address loanBorrower = tellerV2.getLoanBorrower(_bidId);
+
+            require(msg.sender == loanBorrower, "Not Authorized");
+
+            _withdraw(_bidId, loanBorrower);
+
+            emit CollateralClaimed(_bidId);
         } else if (tellerV2.isLoanDefaulted(_bidId)) {
-            _withdraw(_bidId, tellerV2.getLoanLender(_bidId));
+            address loanLender = tellerV2.getLoanLender(_bidId);
+
+            require(msg.sender == loanBorrower, "Not Authorized");
+
+            _withdraw(_bidId, loanLender);
+            
             emit CollateralClaimed(_bidId);
         } else {
             revert("collateral cannot be withdrawn");

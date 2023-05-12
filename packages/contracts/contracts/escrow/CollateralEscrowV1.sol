@@ -163,7 +163,7 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
     ) internal {
         // Withdraw ERC20
         if (_collateral._collateralType == CollateralType.ERC20) {
-            IERC20Upgradeable(_collateralAddress).transfer(
+            SafeERC20Upgradeable(_collateralAddress).safeTransferFrom(
                 _recipient,
                 _collateral._amount
             );

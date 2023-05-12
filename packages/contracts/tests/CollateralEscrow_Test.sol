@@ -207,12 +207,12 @@ Branch not covered: line number:144, block number:8, [ 1 / 2 ]
         escrow._withdrawCollateralSuper(
             collateral,
             address(wethMock),
-            1,
+            amount - 100,
             address(borrower)
         );
 
         uint256 borrowerBalance = wethMock.balanceOf(address(borrower));
-        assertEq(borrowerBalance, amount, "Borrower balance not increased");
+        assertEq(borrowerBalance, amount - 100, "Borrower balance not increased");
     }
 
     function test_withdrawCollateral_erc721() public {

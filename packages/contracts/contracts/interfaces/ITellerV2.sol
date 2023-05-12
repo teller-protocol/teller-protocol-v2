@@ -51,6 +51,18 @@ interface ITellerV2 {
      * @notice Function for a lender to accept a proposed loan bid.
      * @param _bidId The id of the loan bid to accept.
      */
+    function lenderAcceptBid(uint256 _bidId)
+        external
+        returns (
+            uint256 amountToProtocol,
+            uint256 amountToMarketplace,
+            uint256 amountToBorrower
+        );
+
+    /**
+     * @notice Function for a lender to accept a proposed loan bid.
+     * @param _bidId The id of the loan bid to accept.
+     */
     function lenderAcceptBid(uint256 _bidId, uint16 _maxMarketFee)
         external
         returns (
@@ -58,6 +70,7 @@ interface ITellerV2 {
             uint256 amountToMarketplace,
             uint256 amountToBorrower
         );
+
 
     function calculateAmountDue(uint256 _bidId)
         external

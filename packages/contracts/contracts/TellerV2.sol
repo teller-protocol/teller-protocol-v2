@@ -463,6 +463,25 @@ contract TellerV2 is
         emit CancelledBid(_bidId);
     }
 
+   /**
+     * @notice Function for a lender to accept a proposed loan bid.
+     * @param _bidId The id of the loan bid to accept.
+     */
+    function lenderAcceptBid(
+        uint256 _bidId      
+        )
+        external
+        override 
+        returns (
+            uint256 amountToProtocol,
+            uint256 amountToMarketplace,
+            uint256 amountToBorrower
+        )
+    {
+        return _lenderAcceptBid(_bidId);
+    }
+
+
     /**
      * @notice Function for a lender to accept a proposed loan bid.
      * @param _bidId The id of the loan bid to accept.
@@ -473,6 +492,25 @@ contract TellerV2 is
         )
         external
         override
+        pendingBid(_bidId, "lenderAcceptBid")
+        whenNotPaused
+        returns (
+            uint256 amountToProtocol,
+            uint256 amountToMarketplace,
+            uint256 amountToBorrower
+        )
+    {
+        uint16 marketplaceFee = marketRegistry.getMarketplaceFee(bids[_bidId].marketplaceId);
+
+        require(marketplaceFee <= _maxMarketFee, "Unexpected market fee");
+ 
+        return _lenderAcceptBid(_bidId);
+    }
+
+     function _lenderAcceptBid(
+        uint256 _bidId       
+        )
+        internal 
         pendingBid(_bidId, "lenderAcceptBid")
         whenNotPaused
         returns (
@@ -513,9 +551,6 @@ contract TellerV2 is
         collateralManager.deployAndDeposit(_bidId);
 
         uint16 marketplaceFee = marketRegistry.getMarketplaceFee(bid.marketplaceId);
-
-        require(marketplaceFee <= _maxMarketFee, "Unexpected market fee");
-
 
         // Transfer funds to borrower from the lender
         amountToProtocol = bid.loanDetails.principal.percent(protocolFee());
@@ -563,6 +598,8 @@ contract TellerV2 is
 
         emit FeePaid(_bidId, "protocol", amountToProtocol);
         emit FeePaid(_bidId, "marketplace", amountToMarketplace);
+
+
     }
 
     function claimLoanNFT(uint256 _bidId)

@@ -331,6 +331,10 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
             );
             IERC20Upgradeable(collateralInfo._collateralAddress).approve(
                 escrowAddress,
+                0
+            );
+            IERC20Upgradeable(collateralInfo._collateralAddress).approve(
+                escrowAddress,
                 collateralInfo._amount
             );
             collateralEscrow.depositAsset(

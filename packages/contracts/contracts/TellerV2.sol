@@ -262,7 +262,80 @@ contract TellerV2 is
         reputationManager = IReputationManager(_reputationManager);
     }
 
-     
+     /**
+     * @notice Function for a borrower to create a bid for a loan without Collateral.
+     * @param _lendingToken The lending token asset requested to be borrowed.
+     * @param _marketplaceId The unique id of the marketplace for the bid.
+     * @param _principal The principal amount of the loan bid.
+     * @param _duration The recurrent length of time before which a payment is due.
+     * @param _APR The proposed interest rate for the loan bid.
+     * @param _metadataURI The URI for additional borrower loan information as part of loan bid.
+     * @param _receiver The address where the loan amount will be sent to.
+     */
+    function submitBid(
+        address _lendingToken,
+        uint256 _marketplaceId,
+        uint256 _principal,
+        uint32 _duration,
+        uint16 _APR,
+        string calldata _metadataURI,
+        address _receiver
+    ) public override whenNotPaused returns (uint256 bidId_) {
+        bidId_ = _submitBid(
+            _lendingToken,
+            _marketplaceId,
+            _principal,
+            _duration,
+            _APR,
+            _metadataURI,
+            _receiver
+        );
+    }
+
+  /**
+     * @notice Function for a borrower to create a bid for a loan with Collateral.
+     * @param _lendingToken The lending token asset requested to be borrowed.
+     * @param _marketplaceId The unique id of the marketplace for the bid.
+     * @param _principal The principal amount of the loan bid.
+     * @param _duration The recurrent length of time before which a payment is due.
+     * @param _APR The proposed interest rate for the loan bid.
+     * @param _metadataURI calldata _metadataURI,
+     * @param _receiver The address where the loan amount will be sent to.
+     * @param _collateralInfo Additional information about the collateral asset.
+     */
+    function submitBid(
+        address _lendingToken,
+        uint256 _marketplaceId,
+        uint256 _principal,
+        uint32 _duration,
+        uint16 _APR, 
+        address _receiver,
+        string calldata _metadataURI,
+        Collateral[] calldata _collateralInfo
+     ) public override whenNotPaused returns (uint256 bidId_) {
+ 
+        bidId_ = _submitBid(
+            _lendingToken,
+            _marketplaceId,
+            _principal,
+            _duration,
+            _APR, 
+            _metadataURI,
+            _receiver
+        );
+        if(_collateralInfo.length > 0){
+            bool validation = collateralManager.commitCollateral(
+                bidId_,
+                _collateralInfo
+            );
+
+            require(
+                validation == true,
+                "Collateral balance could not be validated"
+            );
+        }
+    }
+
 
     /**
      * @notice Function for a borrower to create a bid for a loan with Collateral.
@@ -282,17 +355,38 @@ contract TellerV2 is
         uint32 _duration,
         uint16 _APR, 
         address _receiver,
+        string calldata _metadataURI,
         Collateral[] calldata _collateralInfo,
         ExpectedMarketParams calldata _expectedMarketParams
     ) public override whenNotPaused returns (uint256 bidId_) {
+
+        (uint32 paymentCycle, PaymentCycleType paymentCycleType) = marketRegistry
+            .getPaymentCycle(_marketplaceId);
+        
+        require(paymentCycle == _expectedMarketParams.paymentCycleDuration, "Unexpected payment cycle");
+        require(paymentCycleType == _expectedMarketParams.paymentCycleType, "Unexpected payment cycle");
+      
+        uint32 defaultDuration = marketRegistry.getPaymentDefaultDuration(
+                _marketplaceId
+        );
+        require(defaultDuration >= _expectedMarketParams.defaultDuration, "Unexpected default duration");
+
+        uint32 expirationTime = marketRegistry.getBidExpirationTime(
+            _marketplaceId
+        );
+        require(expirationTime >= _expectedMarketParams.expirationTime, "Unexpected expiration time");
+
+        PaymentType paymentType = marketRegistry.getPaymentType(_marketplaceId);
+        require(paymentType == _expectedMarketParams.paymentType, "Unexpected payment type");
+
  
         bidId_ = _submitBid(
             _lendingToken,
             _marketplaceId,
             _principal,
             _duration,
-            _APR, 
-            _expectedMarketParams,
+            _APR,
+            _metadataURI,
             _receiver
         );
         if(_collateralInfo.length > 0){
@@ -314,8 +408,8 @@ contract TellerV2 is
         uint256 _principal,
         uint32 _duration,
         uint16 _APR,
-        ExpectedMarketParams calldata _expectedMarketParams,
-        //string calldata _metadataURI,
+        
+        string calldata _metadataURI,
         address _receiver
     ) internal virtual returns (uint256 bidId_) {
         address sender = _msgSenderForMarket(_marketplaceId);
@@ -350,26 +444,20 @@ contract TellerV2 is
             .getPaymentCycle(_marketplaceId);
 
         
-        require(bid.terms.paymentCycle == _expectedMarketParams.paymentCycleDuration, "Unexpected payment cycle");
-        require(bidPaymentCycleType[bidId] == _expectedMarketParams.paymentCycleType, "Unexpected payment cycle");
-
+       
 
         bid.terms.APR = _APR;
 
         bidDefaultDuration[bidId] = marketRegistry.getPaymentDefaultDuration(
             _marketplaceId
         );
-        require(bidDefaultDuration[bidId] >= _expectedMarketParams.defaultDuration, "Unexpected default duration");
-
+        
         bidExpirationTime[bidId] = marketRegistry.getBidExpirationTime(
             _marketplaceId
         );
-        require(bidExpirationTime[bidId] >= _expectedMarketParams.expirationTime, "Unexpected expiration time");
-
+        
         bid.paymentType = marketRegistry.getPaymentType(_marketplaceId);
-        require(bid.paymentType == _expectedMarketParams.paymentType, "Unexpected payment type");
-
-
+        
         bid.terms.paymentCycleAmount = V2Calculations
             .calculatePaymentCycleAmount(
                 bid.paymentType,

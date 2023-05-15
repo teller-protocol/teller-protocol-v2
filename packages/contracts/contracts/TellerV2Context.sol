@@ -24,6 +24,11 @@ abstract contract TellerV2Context is
         address indexed forwarder,
         address sender
     );
+     event MarketForwarderRenounced(
+        uint256 indexed marketId,
+        address indexed forwarder,
+        address sender
+    );
 
     constructor(address trustedForwarder)
         ERC2771ContextUpgradeable(trustedForwarder)
@@ -93,6 +98,18 @@ abstract contract TellerV2Context is
         );
         _approvedForwarderSenders[_forwarder].add(_msgSender());
         emit MarketForwarderApproved(_marketId, _forwarder, _msgSender());
+    }
+
+    /**
+     * @notice Renounces approval of a market forwarder
+     * @param _marketId An ID for a lending market.
+     * @param _forwarder A forwarder contract address.
+     */
+    function renounceMarketForwarder(uint256 _marketId, address _forwarder)
+        external
+    {
+        _approvedForwarderSenders[_forwarder].remove(_msgSender());
+        emit MarketForwarderRenounced(_marketId, _forwarder, _msgSender());
     }
 
     /**

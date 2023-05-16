@@ -125,7 +125,7 @@ contract TellerV2_Override is TellerV2 {
         view
         returns (bool)
     {
-        return _canLiquidateLoan(_bidId, _liquidationDelay);
+        return _isLoanDefaulted(_bidId, _liquidationDelay);
     }
 
     /*

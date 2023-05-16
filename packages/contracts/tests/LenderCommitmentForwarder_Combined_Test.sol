@@ -260,7 +260,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             maxAmount
         );
 
-        lender._updateCommitmentBorrowers(commitmentId, borrowersArray);
+        lender._addCommitmentBorrowers(commitmentId, borrowersArray);
 
         uint256 bidId = borrower._acceptCommitment(
             commitmentId,
@@ -287,34 +287,29 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             maxAmount
         );
 
-        lender._updateCommitmentBorrowers(commitmentId, borrowersArray);
+        lender._addCommitmentBorrowers(commitmentId, borrowersArray);
 
-        bool acceptCommitAsMarketOwnerFails;
-
-        try
-            marketOwner._acceptCommitment(
-                commitmentId,
-                100, //principal
-                maxAmount, //collateralAmount
-                0, //collateralTokenId
-                address(collateralToken),
-                minInterestRate,
-                maxLoanDuration
-            )
-        {} catch {
-            acceptCommitAsMarketOwnerFails = true;
-        }
-
-        assertEq(
-            acceptCommitAsMarketOwnerFails,
-            true,
-            "Should fail when accepting as invalid borrower"
+       
+       vm.expectRevert();
+        marketOwner._acceptCommitment(
+            commitmentId,
+            100, //principal
+            maxAmount, //collateralAmount
+            0, //collateralTokenId
+            address(collateralToken),
+            minInterestRate,
+            maxLoanDuration
         );
+       
+        address[] memory removalArray = new address[](1);
+        removalArray[0] = address(marketOwner);
 
-        lender._updateCommitmentBorrowers(commitmentId, emptyArray);
+
+        lender._removeCommitmentBorrowers(commitmentId, removalArray);
 
         acceptBidWasCalled = false;
 
+        vm.expectRevert("unauthorized commitment borrower");
         marketOwner._acceptCommitment(
             commitmentId,
             0, //principal
@@ -325,11 +320,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             maxLoanDuration
         );
 
-        assertEq(
-            acceptBidWasCalled,
-            true,
-            "Expect accept bid called after exercise"
-        );
+        
     }
 
     function test_acceptCommitmentWithBorrowersArray_reset() public {
@@ -340,10 +331,15 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             maxAmount
         );
 
-        lender._updateCommitmentBorrowers(commitmentId, borrowersArray);
+        lender._addCommitmentBorrowers(commitmentId, borrowersArray);
+  
+        address[] memory removalArray = new address[](1);
+        removalArray[0] = address(marketOwner);
 
-        lender._updateCommitmentBorrowers(commitmentId, emptyArray);
 
+        lender._removeCommitmentBorrowers(commitmentId, removalArray);
+
+        vm.expectRevert("unauthorized commitment borrower");
         marketOwner._acceptCommitment(
             commitmentId,
             0, //principal
@@ -354,11 +350,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             maxLoanDuration
         );
 
-        assertEq(
-            acceptBidWasCalled,
-            true,
-            "Expect accept bid called after exercise"
-        );
+         
     }
 
     function test_acceptCommitmentFailsWithInsufficientCollateral() public {
@@ -876,11 +868,21 @@ contract LenderCommitmentUser is User {
         commitmentForwarder.updateCommitment(commitmentId, _commitment);
     }
 
-    function _updateCommitmentBorrowers(
+    function _addCommitmentBorrowers(
         uint256 commitmentId,
         address[] calldata borrowerAddressList
     ) public {
-        commitmentForwarder.updateCommitmentBorrowers(
+        commitmentForwarder.addCommitmentBorrowers(
+            commitmentId,
+            borrowerAddressList
+        );
+    }
+
+        function _removeCommitmentBorrowers(
+        uint256 commitmentId,
+        address[] calldata borrowerAddressList
+    ) public {
+        commitmentForwarder.removeCommitmentBorrowers(
             commitmentId,
             borrowerAddressList
         );

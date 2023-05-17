@@ -161,81 +161,12 @@ export function updateRewardAllocation(
     updateAllocationStatus(allocation, AllocationStatus.Drained);
   }
 
-  /*
-  const lender = loadLenderByMarketId(lenderAddress, marketId);
-
-  commitment.lender = lender.id;
-  commitment.lenderAddress = lender.lenderAddress;
-  commitment.marketplace = marketId;
-  commitment.marketplaceId = BigInt.fromString(marketId);
-
-  const lenderCommitmentForwarderInstance = LenderCommitmentForwarder.bind(
-    eventAddress
-  );
-  const lenderCommitment = lenderCommitmentForwarderInstance.commitments(
-    BigInt.fromString(commitmentId)
-  );
-
-  commitment.expirationTimestamp = lenderCommitment.value1;
-  commitment.maxDuration = lenderCommitment.value2;
-  commitment.minAPY = BigInt.fromI32(lenderCommitment.value3);
-
-  const lendingToken = loadToken(lendingTokenAddress);
-  commitment.principalToken = lendingToken.id;
-  commitment.principalTokenAddress = lendingTokenAddress;
-
-  if (lenderCommitment.value7 != CollateralTokenType.NONE) {
-    let tokenType = TokenType.UNKNOWN;
-    let nftId: BigInt | null = null;
-    switch (lenderCommitment.value7) {
-      case CollateralTokenType.ERC20:
-        tokenType = TokenType.ERC20;
-        break;
-      case CollateralTokenType.ERC721_ANY_ID:
-        nftId = lenderCommitment.value5;
-      case CollateralTokenType.ERC721:
-        tokenType = TokenType.ERC721;
-        break;
-      case CollateralTokenType.ERC1155_ANY_ID:
-        nftId = lenderCommitment.value5;
-      case CollateralTokenType.ERC1155:
-        tokenType = TokenType.ERC1155;
-        break;
-    }
-    const collateralToken = loadToken(
-      lenderCommitment.value4,
-      tokenType,
-      nftId
-    );
-    commitment.collateralToken = collateralToken.id;
-    commitment.maxPrincipalPerCollateralAmount = lenderCommitment.value6;
-  }
-
-  const volume = loadCommitmentTokenVolume(lendingToken.id, commitment);
-  commitment.tokenVolume = volume.id;
-
-  commitment.save();
-
-  updateCommitmentStatus(commitment, CommitmentStatus.Active);
-  const committedAmountDiff = committedAmount.minus(commitment.committedAmount);
-  updateAvailableTokensFromCommitment(commitment, committedAmountDiff);
-  */
   return allocation;
 }
 
 export function linkRewardToCommitments(
   rewardAllocation: RewardAllocation
 ): void {
-  /*
-    match up based on:
-
-    market Id
-    principal token address
-
-  */
-
-  // loop thru all commitments for market
-
   const protocol = loadProtocol();
 
   const activeCommitmentIds = protocol.activeCommitments;
@@ -396,14 +327,7 @@ export function unlinkBidsFromReward(rewardAllocation: RewardAllocation): void {
   for (let i = 0; i < bidRewards.length; i++) {
     const bidRewardId = bidRewards[i];
 
-    /*
-        Since we cannot access a derived array, we need to manually push and pop bid rewards from rewards
-        
-      */
-
     removeFromArray(rewardAllocation.bidRewards, bidRewardId);
-
-    //rewardAllocation.save();
 
     store.remove("BidReward", bidRewardId);
   }
@@ -413,8 +337,6 @@ export function unlinkTokenVolumeFromReward(
   rewardAllocation: RewardAllocation
 ): void {
   rewardAllocation.tokenVolume = null;
-
-  //rewardAllocation.save();
 }
 
 function appendAllocationRewardToBidParticipants(

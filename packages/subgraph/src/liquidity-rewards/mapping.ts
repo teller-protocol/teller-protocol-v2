@@ -180,30 +180,3 @@ export function handleClaimedRewards(events: ClaimedRewards[]): void {
     handleClaimedReward(event);
   });
 }
-
-/*
-export function handleUpdatedCommitmentBorrower(
-  event: UpdatedCommitmentBorrowers
-): void {
-  const commitmentId = event.params.commitmentId.toString();
-  const commitment = loadCommitment(commitmentId);
-  const lenderCommitmentForwarderInstance = LenderCommitmentForwarder.bind(
-    event.address
-  );
-  const borrowers = lenderCommitmentForwarderInstance.getCommitmentBorrowers(
-    BigInt.fromString(commitmentId)
-  );
-  if (borrowers) {
-    commitment.commitmentBorrowers = changetype<Bytes[]>(borrowers);
-  }
-  commitment.save();
-}
-
-export function handleUpdatedCommitmentBorrowers(
-  events: UpdatedCommitmentBorrowers[]
-): void {
-  events.forEach(event => {
-    handleUpdatedCommitmentBorrower(event);
-  });
-}
-*/

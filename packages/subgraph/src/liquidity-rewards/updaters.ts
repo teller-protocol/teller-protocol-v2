@@ -409,7 +409,7 @@ export function unlinkBidsFromReward(reward: RewardAllocation): void {
     const updatedAssociationArray = [] as string[];
     for (let j = 0; j < rewardAssociations.length; j++) {
       if (rewardAssociations[j] != bidRewardId) {
-        updatedAssociationArray.push(bidRewardId);
+        addToArray(updatedAssociationArray, bidRewardId);
       }
     }
 

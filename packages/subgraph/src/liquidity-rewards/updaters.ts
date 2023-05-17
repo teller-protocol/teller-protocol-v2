@@ -399,8 +399,6 @@ export function unlinkBidsFromReward(reward: RewardAllocation): void {
   for (let i = 0; i < bidRewards.length; i++) {
     const bidRewardId = bidRewards[i];
 
-    const bidReward = BidReward.load(bidRewardId)!;
-
     /*
         Since we cannot access a derived array, we need to manually push and pop bid rewards from rewards
         
@@ -410,7 +408,7 @@ export function unlinkBidsFromReward(reward: RewardAllocation): void {
 
     reward.save();
 
-    store.remove("BidReward", bidReward.id);
+    store.remove("BidReward", bidRewardId);
   }
 }
 

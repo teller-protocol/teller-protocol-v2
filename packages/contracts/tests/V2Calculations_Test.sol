@@ -269,7 +269,7 @@ contract V2Calculations_Test is Testable {
         );
     }
 
-     function test_calculateAmountOwed_irregular_time() public {
+     function test_calculateAmountOwed_irregular_time_end_of_second_to_last_cycle() public {
         uint256 principal = 10000;
         uint256 repaidPrincipal = 0;
         uint16 interestRate = 0;
@@ -281,9 +281,7 @@ contract V2Calculations_Test is Testable {
         __bid.terms.paymentCycle = 3000;
         __bid.loanDetails.acceptedTimestamp = 2000000;
         __bid.paymentType = PaymentType.EMI;
-
-        //warp to near the end part of the second payment cycle 
-        //vm.warp(2000000 + 5500);
+ 
 
         (uint256 _owedPrincipal, uint256 _duePrincipal, uint256 _interest) = V2Calculations
             .calculateAmountOwed(
@@ -301,6 +299,40 @@ contract V2Calculations_Test is Testable {
         assertEq(
             _duePrincipal,
             2500,
+            "Expected due principal incorrect"
+        );
+    }
+
+      function test_calculateAmountOwed_irregular_time_last_cycle() public {
+        uint256 principal = 10000;
+        uint256 repaidPrincipal = 0;
+        uint16 interestRate = 0;
+        __bid.loanDetails.principal = principal;
+        __bid.loanDetails.loanDuration = 8000;
+        __bid.terms.APR = interestRate;
+        __bid.loanDetails.totalRepaid.principal = repaidPrincipal;
+        __bid.terms.paymentCycleAmount = 3000;
+        __bid.terms.paymentCycle = 3000;
+        __bid.loanDetails.acceptedTimestamp = 2000000;
+        __bid.paymentType = PaymentType.EMI;
+ 
+
+        (uint256 _owedPrincipal, uint256 _duePrincipal, uint256 _interest) = V2Calculations
+            .calculateAmountOwed(
+                __bid,
+                2000000 + 3000, //last repaid timestamp
+                2000000 + 7500, //timestamp
+                PaymentCycleType.Seconds
+            );
+
+        assertEq(
+            _owedPrincipal,
+            10000,
+            "Expected owed principal incorrect"
+        );
+        assertEq(
+            _duePrincipal,
+            10000,
             "Expected due principal incorrect"
         );
     }

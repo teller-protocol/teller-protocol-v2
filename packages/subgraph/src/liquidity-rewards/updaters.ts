@@ -257,14 +257,14 @@ export function linkRewardToBids(rewardAllocation: RewardAllocation): void {
       rewardAllocation.allocationStrategy == "BORROWER" &&
       !borrowerIsEligibleForRewardWithBidStatus(bid.status)
     ) {
-      return;
+      continue;
     }
 
     if (
       rewardAllocation.allocationStrategy == "LENDER" &&
       !lenderIsEligibleForRewardWithBidStatus(bid.status)
     ) {
-      return;
+      continue;
     }
 
     // check to see if the bid is eligible for the reward
@@ -301,14 +301,14 @@ export function linkBidToRewards(bid: Bid): void {
       rewardAllocation.allocationStrategy == "BORROWER" &&
       !borrowerIsEligibleForRewardWithBidStatus(bid.status)
     ) {
-      return;
+      continue;
     }
 
     if (
       rewardAllocation.allocationStrategy == "LENDER" &&
       !lenderIsEligibleForRewardWithBidStatus(bid.status)
     ) {
-      return;
+      continue;
     }
 
     if (

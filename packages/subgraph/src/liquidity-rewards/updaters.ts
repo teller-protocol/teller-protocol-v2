@@ -214,12 +214,7 @@ export function appendCommitmentReward(
   commitment: Commitment,
   rewardAllocation: RewardAllocation
 ): void {
-  const commitmentRewardId = getCommitmentRewardId(
-    commitment,
-    rewardAllocation
-  );
-
-  const commitmentReward = loadCommitmentReward(commitment, rewardAllocation);
+  loadCommitmentReward(commitment, rewardAllocation);
 }
 
 /*

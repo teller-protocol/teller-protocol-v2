@@ -29,7 +29,7 @@ import {
   allocationStatusToEnum,
   allocationStatusToString
 } from "./utils";
-import { addToArray } from "../helpers/utils";
+import { addToArray, removeFromArray } from "../helpers/utils";
 
 // import { CommitmentStatus, commitmentStatusToString } from "./utils";
 
@@ -403,17 +403,11 @@ export function unlinkBidsFromReward(reward: RewardAllocation): void {
 
     /*
         Since we cannot access a derived array, we need to manually push and pop bid rewards from rewards
-        Since we cannot remove elements from an array, we have to repopulate the array from scratch each time
+        
       */
-    const rewardAssociations = reward.bidRewards;
-    const updatedAssociationArray = [] as string[];
-    for (let j = 0; j < rewardAssociations.length; j++) {
-      if (rewardAssociations[j] != bidRewardId) {
-        addToArray(updatedAssociationArray, bidRewardId);
-      }
-    }
 
-    reward.bidRewards = updatedAssociationArray;
+    removeFromArray(reward.bidRewards, bidRewardId);
+
     reward.save();
 
     store.remove("BidReward", bidReward.id);

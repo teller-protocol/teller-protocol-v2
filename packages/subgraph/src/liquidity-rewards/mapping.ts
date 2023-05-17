@@ -117,10 +117,6 @@ export function handleDeletedAllocation(event: DeletedAllocation): void {
 
   allocation.rewardTokenAmountRemaining = BigInt.zero();
 
-  /* allocation.expirationTimestamp = BigInt.zero();
-  allocation.maxDuration = BigInt.zero();
-  allocation.minAPY = BigInt.zero();
-  allocation.maxPrincipalPerCollateralAmount = BigInt.zero();*/
   allocation.save();
 
   updateAllocationStatus(allocation, AllocationStatus.Deleted);

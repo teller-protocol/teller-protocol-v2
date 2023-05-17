@@ -412,12 +412,12 @@ export function unlinkBidsFromReward(reward: RewardAllocation): void {
   }
 }
 
-export function unlinkTokenVolumeFromReward(reward: RewardAllocation): void {
-  const allocation = loadRewardAllocation(reward.id);
+export function unlinkTokenVolumeFromReward(
+  rewardAllocation: RewardAllocation
+): void {
+  rewardAllocation.tokenVolume = null;
 
-  allocation.tokenVolume = null;
-
-  allocation.save();
+  rewardAllocation.save();
 }
 
 function appendAllocationRewardToBidParticipants(

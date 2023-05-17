@@ -337,6 +337,40 @@ contract V2Calculations_Test is Testable {
         );
     }
 
+   function test_calculateAmountOwed_irregular_time_late() public {
+        uint256 principal = 10000;
+        uint256 repaidPrincipal = 0;
+        uint16 interestRate = 0;
+        __bid.loanDetails.principal = principal;
+        __bid.loanDetails.loanDuration = 8000;
+        __bid.terms.APR = interestRate;
+        __bid.loanDetails.totalRepaid.principal = repaidPrincipal;
+        __bid.terms.paymentCycleAmount = 3000;
+        __bid.terms.paymentCycle = 3000;
+        __bid.loanDetails.acceptedTimestamp = 2000000;
+        __bid.paymentType = PaymentType.EMI;
+ 
+
+        (uint256 _owedPrincipal, uint256 _duePrincipal, uint256 _interest) = V2Calculations
+            .calculateAmountOwed(
+                __bid,
+                2000000 + 3000, //last repaid timestamp
+                2000000 + 19500, //timestamp
+                PaymentCycleType.Seconds
+            );
+
+        assertEq(
+            _owedPrincipal,
+            10000,
+            "Expected owed principal incorrect"
+        );
+        assertEq(
+            _duePrincipal,
+            10000,
+            "Expected due principal incorrect"
+        );
+    }
+
  
 
 

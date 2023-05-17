@@ -53,11 +53,11 @@ export function updateAllocationStatus(
       //   addCommitmentToProtocol(commitment);
       break;
     case AllocationStatus.Deleted:
-    case AllocationStatus.Drained:
-    case AllocationStatus.Expired:
       unlinkTokenVolumeFromReward(allocation);
       unlinkBidsFromReward(allocation);
-
+      break;
+    case AllocationStatus.Drained:
+    case AllocationStatus.Expired:
       break;
   }
 
@@ -321,11 +321,23 @@ export function linkBidToRewards(bid: Bid): void {
   }
 }
 
+/*
+  Unlink bids that are ineligible to claim because its been deleted and not claimed 
+
+  bidreward claimed = false 
+  reward has been deleted  -> unlink it 
+*/
 export function unlinkBidsFromReward(rewardAllocation: RewardAllocation): void {
   const bidRewards = rewardAllocation.bidRewards;
 
   for (let i = 0; i < bidRewards.length; i++) {
     const bidRewardId = bidRewards[i];
+
+    const bidReward = BidReward.load(bidRewardId);
+    if (bidReward.claimed) {
+      //only unlink unclaimed rewards for drained/deleted rewards
+      continue;
+    }
 
     removeFromArray(rewardAllocation.bidRewards, bidRewardId);
 

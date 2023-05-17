@@ -117,17 +117,9 @@ export function handleDeletedAllocation(event: DeletedAllocation): void {
 
   allocation.rewardTokenAmountRemaining = BigInt.zero();
 
-  /* allocation.expirationTimestamp = BigInt.zero();
-  allocation.maxDuration = BigInt.zero();
-  allocation.minAPY = BigInt.zero();
-  allocation.maxPrincipalPerCollateralAmount = BigInt.zero();*/
-  allocation.save();
-
   updateAllocationStatus(allocation, AllocationStatus.Deleted);
 
-  unlinkBidsFromReward(allocation);
-
-  unlinkTokenVolumeFromReward(allocation);
+  allocation.save();
 }
 
 export function handleDeletedAllocations(events: DeletedAllocation[]): void {
@@ -188,30 +180,3 @@ export function handleClaimedRewards(events: ClaimedRewards[]): void {
     handleClaimedReward(event);
   });
 }
-
-/*
-export function handleUpdatedCommitmentBorrower(
-  event: UpdatedCommitmentBorrowers
-): void {
-  const commitmentId = event.params.commitmentId.toString();
-  const commitment = loadCommitment(commitmentId);
-  const lenderCommitmentForwarderInstance = LenderCommitmentForwarder.bind(
-    event.address
-  );
-  const borrowers = lenderCommitmentForwarderInstance.getCommitmentBorrowers(
-    BigInt.fromString(commitmentId)
-  );
-  if (borrowers) {
-    commitment.commitmentBorrowers = changetype<Bytes[]>(borrowers);
-  }
-  commitment.save();
-}
-
-export function handleUpdatedCommitmentBorrowers(
-  events: UpdatedCommitmentBorrowers[]
-): void {
-  events.forEach(event => {
-    handleUpdatedCommitmentBorrower(event);
-  });
-}
-*/

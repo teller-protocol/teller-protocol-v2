@@ -29,6 +29,7 @@ import {
   allocationStatusToEnum,
   allocationStatusToString
 } from "./utils";
+import { addToArray, removeFromArray } from "../helpers/utils";
 
 // import { CommitmentStatus, commitmentStatusToString } from "./utils";
 
@@ -52,14 +53,11 @@ export function updateAllocationStatus(
       //   addCommitmentToProtocol(commitment);
       break;
     case AllocationStatus.Deleted:
+      unlinkTokenVolumeFromReward(allocation);
+      unlinkBidsFromReward(allocation);
+      break;
     case AllocationStatus.Drained:
     case AllocationStatus.Expired:
-      /*   updateAvailableTokensFromCommitment(
-        commitment,
-        commitment.committedAmount.neg()
-      );
-      removeCommitmentToProtocol(commitment);*/
-
       break;
   }
 
@@ -163,81 +161,12 @@ export function updateRewardAllocation(
     updateAllocationStatus(allocation, AllocationStatus.Drained);
   }
 
-  /*
-  const lender = loadLenderByMarketId(lenderAddress, marketId);
-
-  commitment.lender = lender.id;
-  commitment.lenderAddress = lender.lenderAddress;
-  commitment.marketplace = marketId;
-  commitment.marketplaceId = BigInt.fromString(marketId);
-
-  const lenderCommitmentForwarderInstance = LenderCommitmentForwarder.bind(
-    eventAddress
-  );
-  const lenderCommitment = lenderCommitmentForwarderInstance.commitments(
-    BigInt.fromString(commitmentId)
-  );
-
-  commitment.expirationTimestamp = lenderCommitment.value1;
-  commitment.maxDuration = lenderCommitment.value2;
-  commitment.minAPY = BigInt.fromI32(lenderCommitment.value3);
-
-  const lendingToken = loadToken(lendingTokenAddress);
-  commitment.principalToken = lendingToken.id;
-  commitment.principalTokenAddress = lendingTokenAddress;
-
-  if (lenderCommitment.value7 != CollateralTokenType.NONE) {
-    let tokenType = TokenType.UNKNOWN;
-    let nftId: BigInt | null = null;
-    switch (lenderCommitment.value7) {
-      case CollateralTokenType.ERC20:
-        tokenType = TokenType.ERC20;
-        break;
-      case CollateralTokenType.ERC721_ANY_ID:
-        nftId = lenderCommitment.value5;
-      case CollateralTokenType.ERC721:
-        tokenType = TokenType.ERC721;
-        break;
-      case CollateralTokenType.ERC1155_ANY_ID:
-        nftId = lenderCommitment.value5;
-      case CollateralTokenType.ERC1155:
-        tokenType = TokenType.ERC1155;
-        break;
-    }
-    const collateralToken = loadToken(
-      lenderCommitment.value4,
-      tokenType,
-      nftId
-    );
-    commitment.collateralToken = collateralToken.id;
-    commitment.maxPrincipalPerCollateralAmount = lenderCommitment.value6;
-  }
-
-  const volume = loadCommitmentTokenVolume(lendingToken.id, commitment);
-  commitment.tokenVolume = volume.id;
-
-  commitment.save();
-
-  updateCommitmentStatus(commitment, CommitmentStatus.Active);
-  const committedAmountDiff = committedAmount.minus(commitment.committedAmount);
-  updateAvailableTokensFromCommitment(commitment, committedAmountDiff);
-  */
   return allocation;
 }
 
 export function linkRewardToCommitments(
   rewardAllocation: RewardAllocation
 ): void {
-  /*
-    match up based on:
-
-    market Id
-    principal token address
-
-  */
-
-  // loop thru all commitments for market
-
   const protocol = loadProtocol();
 
   const activeCommitmentIds = protocol.activeCommitments;
@@ -285,12 +214,7 @@ export function appendCommitmentReward(
   commitment: Commitment,
   rewardAllocation: RewardAllocation
 ): void {
-  const commitmentRewardId = getCommitmentRewardId(
-    commitment,
-    rewardAllocation
-  );
-
-  const commitmentReward = loadCommitmentReward(commitment, rewardAllocation);
+  loadCommitmentReward(commitment, rewardAllocation);
 }
 
 /*
@@ -328,14 +252,14 @@ export function linkRewardToBids(rewardAllocation: RewardAllocation): void {
       rewardAllocation.allocationStrategy == "BORROWER" &&
       !borrowerIsEligibleForRewardWithBidStatus(bid.status)
     ) {
-      return;
+      continue;
     }
 
     if (
       rewardAllocation.allocationStrategy == "LENDER" &&
       !lenderIsEligibleForRewardWithBidStatus(bid.status)
     ) {
-      return;
+      continue;
     }
 
     // check to see if the bid is eligible for the reward
@@ -372,14 +296,14 @@ export function linkBidToRewards(bid: Bid): void {
       rewardAllocation.allocationStrategy == "BORROWER" &&
       !borrowerIsEligibleForRewardWithBidStatus(bid.status)
     ) {
-      return;
+      continue;
     }
 
     if (
       rewardAllocation.allocationStrategy == "LENDER" &&
       !lenderIsEligibleForRewardWithBidStatus(bid.status)
     ) {
-      return;
+      continue;
     }
 
     if (
@@ -392,39 +316,37 @@ export function linkBidToRewards(bid: Bid): void {
   }
 }
 
-export function unlinkBidsFromReward(reward: RewardAllocation): void {
-  const bidRewards = reward.bidRewards;
+/*
+  Unlink bids that are ineligible to claim because its been deleted and not claimed 
+
+  bidreward claimed = false 
+  reward has been deleted  -> unlink it 
+*/
+export function unlinkBidsFromReward(rewardAllocation: RewardAllocation): void {
+  const bidRewards = rewardAllocation.bidRewards;
 
   for (let i = 0; i < bidRewards.length; i++) {
     const bidRewardId = bidRewards[i];
 
-    const bidReward = BidReward.load(bidRewardId)!;
-
-    /*
-        Since we cannot access a derived array, we need to manually push and pop bid rewards from rewards
-        Since we cannot remove elements from an array, we have to repopulate the array from scratch each time
-      */
-    const rewardAssociations = reward.bidRewards;
-    const updatedAssociationArray = [] as string[];
-    for (let j = 0; j < rewardAssociations.length; j++) {
-      if (rewardAssociations[j] != bidRewardId) {
-        updatedAssociationArray.push(bidRewardId);
-      }
+    const bidReward = BidReward.load(bidRewardId);
+    if (bidReward.claimed) {
+      //only unlink unclaimed rewards for drained/deleted rewards
+      continue;
     }
 
-    reward.bidRewards = updatedAssociationArray;
-    reward.save();
+    removeFromArray(rewardAllocation.bidRewards, bidRewardId);
 
-    store.remove("BidReward", bidReward.id);
+    store.remove("BidReward", bidRewardId);
   }
+
+  rewardAllocation.save();
 }
 
-export function unlinkTokenVolumeFromReward(reward: RewardAllocation): void {
-  const allocation = loadRewardAllocation(reward.id);
-
-  allocation.tokenVolume = null;
-
-  allocation.save();
+export function unlinkTokenVolumeFromReward(
+  rewardAllocation: RewardAllocation
+): void {
+  rewardAllocation.tokenVolume = null;
+  rewardAllocation.save();
 }
 
 function appendAllocationRewardToBidParticipants(
@@ -437,8 +359,11 @@ function appendAllocationRewardToBidParticipants(
   // this created a bidReward which is an attachment of the reward to a bid
   const bidReward = loadBidReward(bid, rewardAllocation);
 
-  // manually add the association
-  rewardAllocation.bidRewards.push(bidReward.id);
+  //manually add the association
+  rewardAllocation.bidRewards = addToArray(
+    rewardAllocation.bidRewards,
+    bidReward.id
+  );
   rewardAllocation.save();
 }
 

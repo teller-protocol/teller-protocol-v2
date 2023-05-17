@@ -343,12 +343,15 @@ export function unlinkBidsFromReward(rewardAllocation: RewardAllocation): void {
 
     store.remove("BidReward", bidRewardId);
   }
+
+  rewardAllocation.save();
 }
 
 export function unlinkTokenVolumeFromReward(
   rewardAllocation: RewardAllocation
 ): void {
   rewardAllocation.tokenVolume = null;
+  rewardAllocation.save();
 }
 
 function appendAllocationRewardToBidParticipants(

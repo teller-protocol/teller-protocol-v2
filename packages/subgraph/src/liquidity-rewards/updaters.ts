@@ -393,8 +393,8 @@ export function linkBidToRewards(bid: Bid): void {
   }
 }
 
-export function unlinkBidsFromReward(reward: RewardAllocation): void {
-  const bidRewards = reward.bidRewards;
+export function unlinkBidsFromReward(rewardAllocation: RewardAllocation): void {
+  const bidRewards = rewardAllocation.bidRewards;
 
   for (let i = 0; i < bidRewards.length; i++) {
     const bidRewardId = bidRewards[i];
@@ -404,9 +404,9 @@ export function unlinkBidsFromReward(reward: RewardAllocation): void {
         
       */
 
-    removeFromArray(reward.bidRewards, bidRewardId);
+    removeFromArray(rewardAllocation.bidRewards, bidRewardId);
 
-    reward.save();
+    rewardAllocation.save();
 
     store.remove("BidReward", bidRewardId);
   }

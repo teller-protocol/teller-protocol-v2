@@ -121,9 +121,9 @@ export function handleDeletedAllocation(event: DeletedAllocation): void {
 
   updateAllocationStatus(allocation, AllocationStatus.Deleted);
 
-  unlinkBidsFromReward(allocation);
-
   unlinkTokenVolumeFromReward(allocation);
+
+  unlinkBidsFromReward(allocation);
 }
 
 export function handleDeletedAllocations(events: DeletedAllocation[]): void {

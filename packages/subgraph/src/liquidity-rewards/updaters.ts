@@ -29,6 +29,7 @@ import {
   allocationStatusToEnum,
   allocationStatusToString
 } from "./utils";
+import { addToArray } from "../helpers/utils";
 
 // import { CommitmentStatus, commitmentStatusToString } from "./utils";
 
@@ -437,8 +438,11 @@ function appendAllocationRewardToBidParticipants(
   // this created a bidReward which is an attachment of the reward to a bid
   const bidReward = loadBidReward(bid, rewardAllocation);
 
-  // manually add the association
-  rewardAllocation.bidRewards.push(bidReward.id);
+  //manually add the association
+  rewardAllocation.bidRewards = addToArray(
+    rewardAllocation.bidRewards,
+    bidReward.id
+  );
   rewardAllocation.save();
 }
 

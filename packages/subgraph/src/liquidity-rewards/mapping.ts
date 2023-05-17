@@ -117,13 +117,9 @@ export function handleDeletedAllocation(event: DeletedAllocation): void {
 
   allocation.rewardTokenAmountRemaining = BigInt.zero();
 
-  allocation.save();
-
   updateAllocationStatus(allocation, AllocationStatus.Deleted);
 
-  unlinkTokenVolumeFromReward(allocation);
-
-  unlinkBidsFromReward(allocation);
+  allocation.save();
 }
 
 export function handleDeletedAllocations(events: DeletedAllocation[]): void {

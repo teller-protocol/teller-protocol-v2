@@ -55,11 +55,8 @@ export function updateAllocationStatus(
     case AllocationStatus.Deleted:
     case AllocationStatus.Drained:
     case AllocationStatus.Expired:
-      /*   updateAvailableTokensFromCommitment(
-        commitment,
-        commitment.committedAmount.neg()
-      );
-      removeCommitmentToProtocol(commitment);*/
+      unlinkTokenVolumeFromReward(allocation);
+      unlinkBidsFromReward(allocation);
 
       break;
   }
@@ -406,7 +403,7 @@ export function unlinkBidsFromReward(rewardAllocation: RewardAllocation): void {
 
     removeFromArray(rewardAllocation.bidRewards, bidRewardId);
 
-    rewardAllocation.save();
+    //rewardAllocation.save();
 
     store.remove("BidReward", bidRewardId);
   }
@@ -417,7 +414,7 @@ export function unlinkTokenVolumeFromReward(
 ): void {
   rewardAllocation.tokenVolume = null;
 
-  rewardAllocation.save();
+  //rewardAllocation.save();
 }
 
 function appendAllocationRewardToBidParticipants(

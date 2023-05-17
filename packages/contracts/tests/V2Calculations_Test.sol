@@ -32,6 +32,9 @@ contract V2Calculations_Test is Testable {
         delete cyclesWithExtraPaymentsAmounts;
     }
 
+
+
+
     // EMI loan
     function test_01_calculateAmountOwed() public {
         cyclesToSkip.add(2);
@@ -230,6 +233,10 @@ contract V2Calculations_Test is Testable {
         );
     }
 
+
+
+
+
     function test_calculateAmountOwed() public {
         uint256 principal = 24486571879936808846;
         uint256 repaidPrincipal = 23410087846643631232;
@@ -261,6 +268,45 @@ contract V2Calculations_Test is Testable {
             "Expected number of cycles incorrect"
         );
     }
+
+     function test_calculateAmountOwed_irregular_time() public {
+        uint256 principal = 10000;
+        uint256 repaidPrincipal = 0;
+        uint16 interestRate = 0;
+        __bid.loanDetails.principal = principal;
+        __bid.loanDetails.loanDuration = 8000;
+        __bid.terms.APR = interestRate;
+        __bid.loanDetails.totalRepaid.principal = repaidPrincipal;
+        __bid.terms.paymentCycleAmount = 3000;
+        __bid.terms.paymentCycle = 3000;
+        __bid.loanDetails.acceptedTimestamp = 2000000;
+        __bid.paymentType = PaymentType.EMI;
+
+        //warp to near the end part of the second payment cycle 
+        //vm.warp(2000000 + 5500);
+
+        (uint256 _owedPrincipal, uint256 _duePrincipal, uint256 _interest) = V2Calculations
+            .calculateAmountOwed(
+                __bid,
+                2000000 + 3000, //last repaid timestamp
+                2000000 + 5500, //timestamp
+                PaymentCycleType.Seconds
+            );
+
+        assertEq(
+            _owedPrincipal,
+            10000,
+            "Expected owed principal incorrect"
+        );
+        assertEq(
+            _duePrincipal,
+            2500,
+            "Expected due principal incorrect"
+        );
+    }
+
+ 
+
 
     function test_calculateBulletAmountOwed() public {
         uint256 _principal = 100000e6;

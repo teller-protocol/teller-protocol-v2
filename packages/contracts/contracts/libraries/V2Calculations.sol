@@ -98,22 +98,25 @@ library V2Calculations {
 
 
         // Cast to int265 to avoid underflow errors (negative means loan duration has passed)
-        /*int256 durationLeftOnLoan = int256(
+       /* int256 durationLeftOnLoan = int256(
             uint256(_bid.loanDetails.loanDuration)
         ) -
             (int256(_timestamp) -
                 int256(uint256(_bid.loanDetails.acceptedTimestamp)));
-        */
-
-        uint256 endDate = uint256(_bid.loanDetails.acceptedTimestamp) + uint256(_bid.loanDetails.loanDuration);
-        uint256 lastPaymentCycleStart = endDate - uint256(_bid.terms.paymentCycle);
-        bool isLastPaymentCycle = uint256(_timestamp) > lastPaymentCycleStart  || owedPrincipal_ +interest_ <= _bid.terms.paymentCycleAmount;
-
-        /*
-        bool isLastPaymentCycle = durationLeftOnLoan <
+          bool isLastPaymentCycle = durationLeftOnLoan <
             int256(uint256(_bid.terms.paymentCycle)) || // Check if current payment cycle is within or beyond the last one
             owedPrincipal_ + interest_ <= _bid.terms.paymentCycleAmount; // Check if what is left to pay is less than the payment cycle amount
-        */
+            */
+
+        //need to find modulo 
+        uint256 lastPaymentCycleDuration = _bid.loanDetails.loanDuration % _bid.terms.paymentCycle;
+        if( lastPaymentCycleDuration == 0){  lastPaymentCycleDuration = _bid.terms.paymentCycle; }
+
+
+        uint256 endDate = uint256(_bid.loanDetails.acceptedTimestamp) + uint256(_bid.loanDetails.loanDuration);
+        uint256 lastPaymentCycleStart = endDate - uint256(lastPaymentCycleDuration);
+        bool isLastPaymentCycle = uint256(_timestamp) > lastPaymentCycleStart  || owedPrincipal_ +interest_ <= _bid.terms.paymentCycleAmount;
+    
 
 
         if (_bid.paymentType == PaymentType.Bullet) {

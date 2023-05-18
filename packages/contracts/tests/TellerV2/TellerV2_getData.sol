@@ -17,9 +17,7 @@ import { CollateralManagerMock } from "../../contracts/mock/CollateralManagerMoc
 import { LenderManagerMock } from "../../contracts/mock/LenderManagerMock.sol";
 import { MarketRegistryMock } from "../../contracts/mock/MarketRegistryMock.sol";
 
-
 import "../../lib/forge-std/src/console.sol";
-
 
 contract TellerV2_initialize is Testable {
     TellerV2_Override tellerV2;
@@ -140,8 +138,6 @@ contract TellerV2_initialize is Testable {
     }
 
     function test_isLoanLiquidateable_when_repaid_sooner() public {
-
-  
         uint256 bidId = 1;
         setMockBid(bidId);
 
@@ -150,26 +146,24 @@ contract TellerV2_initialize is Testable {
 
         tellerV2.mock_setBidDefaultDuration(bidId, 1000);
         tellerV2.mock_setBidLastRepaidTimestamp(bidId, 1000);
-     
-     
+
         vm.warp(3110);
-        bool defaulted =  tellerV2.isLoanDefaulted(bidId);
+        bool defaulted = tellerV2.isLoanDefaulted(bidId);
         bool liquidateable = tellerV2.isLoanLiquidateable(bidId);
 
         assertEq(defaulted, false);
         assertEq(liquidateable, false);
 
-
-        //fast forward timestamp past the  accepted time + payment cycle + default duration 
+        //fast forward timestamp past the  accepted time + payment cycle + default duration
         vm.warp(5110);
-        defaulted =  tellerV2.isLoanDefaulted(bidId);
+        defaulted = tellerV2.isLoanDefaulted(bidId);
         liquidateable = tellerV2.isLoanLiquidateable(bidId);
 
         assertEq(defaulted, true);
         assertEq(liquidateable, false);
 
         vm.warp(5110 + 1 days);
-        defaulted =  tellerV2.isLoanDefaulted(bidId);
+        defaulted = tellerV2.isLoanDefaulted(bidId);
         liquidateable = tellerV2.isLoanLiquidateable(bidId);
 
         assertEq(defaulted, true);

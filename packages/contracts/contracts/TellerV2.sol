@@ -23,7 +23,6 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./libraries/NumbersLib.sol";
 import { BokkyPooBahsDateTimeLibrary as BPBDTL } from "./libraries/DateTimeLib.sol";
 import { V2Calculations, PaymentCycleType } from "./libraries/V2Calculations.sol";
- 
 
 /* Errors */
 /**
@@ -963,16 +962,15 @@ contract TellerV2 is
 
         uint32 dueDate = calculateNextDueDate(_bidId);
         uint32 defaultDuration = bidDefaultDuration[_bidId];
- 
+
         if (defaultDuration == 0) return false;
-
-
 
         //uint32 endOfLoan = bid.loanDetails.acceptedTimestamp +  bid.loanDetails.loanDuration;
         //uint32 defaultDate = endOfLoan + bidDefaultDuration[_bidId];
-        //In this logic, we should be calculating the default date(s) based relative to a 'due date' and not a 'repaid date' . 
-        
-        return uint32(block.timestamp) >
+        //In this logic, we should be calculating the default date(s) based relative to a 'due date' and not a 'repaid date' .
+
+        return
+            uint32(block.timestamp) >
             dueDate + defaultDuration + _additionalDelay;
     }
 

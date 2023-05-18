@@ -58,6 +58,7 @@ contract TellerV2_Override is TellerV2 {
     ) public {
         bidPaymentCycleType[bidId] = PaymentCycleType(paymentCycleType);
     }
+
     function mock_setBidLastRepaidTimestamp(
         uint256 bidId,
         uint32 lastRepaidTimestamp
@@ -134,8 +135,6 @@ contract TellerV2_Override is TellerV2 {
         return _isLoanDefaulted(_bidId, _liquidationDelay);
     }
 
-    
-
     /*
 
     Overrides 
@@ -149,7 +148,7 @@ contract TellerV2_Override is TellerV2 {
         returns (address)
     {
         return mockMsgSenderForMarket;
-    } 
+    }
 
     function _submitBid(
         address _lendingToken,

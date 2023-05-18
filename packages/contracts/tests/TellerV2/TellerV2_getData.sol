@@ -141,33 +141,7 @@ contract TellerV2_initialize is Testable {
 
     function test_isLoanLiquidateable_when_repaid_sooner() public {
 
-        /*
-
-        Bid({
-                borrower: address(borrower),
-                lender: address(lender),
-                receiver: address(receiver),
-                marketplaceId: 100,
-                _metadataURI: "0x1234",
-                loanDetails: LoanDetails({
-                    lendingToken: lendingToken,
-                    principal: 100,
-                    timestamp: 100,
-                    acceptedTimestamp: 100,
-                    lastRepaidTimestamp: 100,
-                    loanDuration: 5000,
-                    totalRepaid: Payment({ principal: 100, interest: 5 })
-                }),
-                terms: Terms({
-                    paymentCycleAmount: 10,
-                    paymentCycle: 2000,
-                    APR: 10
-                }),
-                state: BidState.PENDING,
-                paymentType: PaymentType.EMI
-            })
-
-        */
+  
         uint256 bidId = 1;
         setMockBid(bidId);
 
@@ -176,14 +150,30 @@ contract TellerV2_initialize is Testable {
 
         tellerV2.mock_setBidDefaultDuration(bidId, 1000);
         tellerV2.mock_setBidLastRepaidTimestamp(bidId, 1000);
-
-        //fast forward timestamp past the  accepted time + payment cycle + default duration 
+     
+     
         vm.warp(3110);
         bool defaulted =  tellerV2.isLoanDefaulted(bidId);
         bool liquidateable = tellerV2.isLoanLiquidateable(bidId);
 
+        assertEq(defaulted, false);
+        assertEq(liquidateable, false);
+
+
+        //fast forward timestamp past the  accepted time + payment cycle + default duration 
+        vm.warp(5110);
+        defaulted =  tellerV2.isLoanDefaulted(bidId);
+        liquidateable = tellerV2.isLoanLiquidateable(bidId);
+
         assertEq(defaulted, true);
         assertEq(liquidateable, false);
+
+        vm.warp(5110 + 1 days);
+        defaulted =  tellerV2.isLoanDefaulted(bidId);
+        liquidateable = tellerV2.isLoanLiquidateable(bidId);
+
+        assertEq(defaulted, true);
+        assertEq(liquidateable, true);
     }
 
     function test_lastRepaidTimestamp() public {

@@ -23,9 +23,7 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./libraries/NumbersLib.sol";
 import { BokkyPooBahsDateTimeLibrary as BPBDTL } from "./libraries/DateTimeLib.sol";
 import { V2Calculations, PaymentCycleType } from "./libraries/V2Calculations.sol";
-
-
-import "../lib/forge-std/src/console.sol";
+ 
 
 /* Errors */
 /**
@@ -965,10 +963,7 @@ contract TellerV2 is
 
         uint32 dueDate = calculateNextDueDate(_bidId);
         uint32 defaultDuration = bidDefaultDuration[_bidId];
-
-        console.logUint(dueDate);
-         console.logUint(defaultDuration);
-
+ 
         if (defaultDuration == 0) return false;
 
 

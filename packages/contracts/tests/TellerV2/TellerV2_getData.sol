@@ -17,6 +17,10 @@ import { CollateralManagerMock } from "../../contracts/mock/CollateralManagerMoc
 import { LenderManagerMock } from "../../contracts/mock/LenderManagerMock.sol";
 import { MarketRegistryMock } from "../../contracts/mock/MarketRegistryMock.sol";
 
+
+import "../../lib/forge-std/src/console.sol";
+
+
 contract TellerV2_initialize is Testable {
     TellerV2_Override tellerV2;
 
@@ -109,7 +113,7 @@ contract TellerV2_initialize is Testable {
         assertEq(uri, "0x1234");
     }
 
-    function test_isLoanLiquidateable_false() public {
+    function test_isLoanLiquidateable_with_valid_bid() public {
         uint256 bidId = 1;
         setMockBid(1);
 
@@ -118,7 +122,7 @@ contract TellerV2_initialize is Testable {
         assertEq(liquidateable, false);
     }
 
-    function test_isLoanLiquidateable_true() public {
+    function test_isLoanLiquidateable_with_very_old_bid() public {
         uint256 bidId = 1;
         setMockBid(bidId);
 
@@ -133,6 +137,53 @@ contract TellerV2_initialize is Testable {
         bool liquidateable = tellerV2.isLoanLiquidateable(bidId);
 
         assertEq(liquidateable, true);
+    }
+
+    function test_isLoanLiquidateable_when_repaid_sooner() public {
+
+        /*
+
+        Bid({
+                borrower: address(borrower),
+                lender: address(lender),
+                receiver: address(receiver),
+                marketplaceId: 100,
+                _metadataURI: "0x1234",
+                loanDetails: LoanDetails({
+                    lendingToken: lendingToken,
+                    principal: 100,
+                    timestamp: 100,
+                    acceptedTimestamp: 100,
+                    lastRepaidTimestamp: 100,
+                    loanDuration: 5000,
+                    totalRepaid: Payment({ principal: 100, interest: 5 })
+                }),
+                terms: Terms({
+                    paymentCycleAmount: 10,
+                    paymentCycle: 2000,
+                    APR: 10
+                }),
+                state: BidState.PENDING,
+                paymentType: PaymentType.EMI
+            })
+
+        */
+        uint256 bidId = 1;
+        setMockBid(bidId);
+
+        //set to accepted
+        tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
+
+        tellerV2.mock_setBidDefaultDuration(bidId, 1000);
+        tellerV2.mock_setBidLastRepaidTimestamp(bidId, 1000);
+
+        //fast forward timestamp past the  accepted time + payment cycle + default duration 
+        vm.warp(3110);
+        bool defaulted =  tellerV2.isLoanDefaulted(bidId);
+        bool liquidateable = tellerV2.isLoanLiquidateable(bidId);
+
+        assertEq(defaulted, true);
+        assertEq(liquidateable, false);
     }
 
     function test_lastRepaidTimestamp() public {

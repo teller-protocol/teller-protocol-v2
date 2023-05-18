@@ -24,6 +24,9 @@ import "./libraries/NumbersLib.sol";
 import { BokkyPooBahsDateTimeLibrary as BPBDTL } from "./libraries/DateTimeLib.sol";
 import { V2Calculations, PaymentCycleType } from "./libraries/V2Calculations.sol";
 
+
+import "../lib/forge-std/src/console.sol";
+
 /* Errors */
 /**
  * @notice This error is reverted when the action isn't allowed
@@ -960,10 +963,15 @@ contract TellerV2 is
         // Make sure loan cannot be liquidated if it is not active
         if (bid.state != BidState.ACCEPTED) return false;
 
-        uint32 dueDate = calculateNextDueDate(bidId);
-        uint32 defaultDuration = bidDefaultDuration[bidId];
+        uint32 dueDate = calculateNextDueDate(_bidId);
+        uint32 defaultDuration = bidDefaultDuration[_bidId];
+
+        console.logUint(dueDate);
+         console.logUint(defaultDuration);
 
         if (defaultDuration == 0) return false;
+
+
 
         //uint32 endOfLoan = bid.loanDetails.acceptedTimestamp +  bid.loanDetails.loanDuration;
         //uint32 defaultDate = endOfLoan + bidDefaultDuration[_bidId];

@@ -1254,6 +1254,9 @@ contract CollateralManager_Test is Testable {
             _collateralAddress: address(wethMock)
         });
 
+          tellerV2Mock.setBorrower(address(borrower));
+
+
         collateralManager.setCheckBalanceGlobalValid(true);
         collateralManager.commitCollateral(bidId, collateralArray);
 
@@ -1265,6 +1268,9 @@ contract CollateralManager_Test is Testable {
 
     function test_commit_collateral_array_empty() public {
         uint256 bidId = 0;
+
+        tellerV2Mock.setBorrower(address(borrower));
+
 
         Collateral[] memory collateralArray = new Collateral[](0);
 
@@ -1291,6 +1297,8 @@ contract CollateralManager_Test is Testable {
 
         collateralManager.setCheckBalanceGlobalValid(false);
 
+        tellerV2Mock.setBorrower(address(borrower));
+
         collateralManager.commitCollateral(bidId, collateralArray);
 
         assertFalse(
@@ -1303,6 +1311,8 @@ contract CollateralManager_Test is Testable {
         uint256 bidId = 0;
 
         Collateral[] memory collateralArray = new Collateral[](0);
+
+        tellerV2Mock.setBorrower(address(borrower));
 
         collateralManager.setCheckBalanceGlobalValid(false);
         collateralManager.commitCollateral(bidId, collateralArray);

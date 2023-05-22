@@ -436,9 +436,12 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     ) internal virtual {
         CollateralInfo storage collateral = _bidCollaterals[_bidId];
 
-        require( collateral.collateralAddresses.contains(
-            _collateralInfo._collateralAddress
-         ) == false, "Cannot commit multiple collateral with the same address" );
+        require(
+            collateral.collateralAddresses.contains(
+                _collateralInfo._collateralAddress
+            ) == false,
+            "Cannot commit multiple collateral with the same address"
+        );
 
         collateral.collateralAddresses.add(_collateralInfo._collateralAddress);
         collateral.collateralInfo[

@@ -726,8 +726,6 @@ contract TellerV2 is
             // Remove borrower's active bid
             _borrowerBidsActive[bid.borrower].remove(_bidId);
 
-          
-
             emit LoanRepaid(_bidId);
         } else {
             emit LoanRepayment(_bidId);

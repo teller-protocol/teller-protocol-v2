@@ -19,6 +19,8 @@ import "../contracts/mock/CollateralManagerMock.sol";
 
 import "../contracts/MarketLiquidityRewards.sol";
 
+import "forge-std/console.sol";
+
 contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
     MarketLiquidityUser private marketOwner;
     MarketLiquidityUser private lender;
@@ -127,7 +129,7 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
                 requiredPrincipalTokenAddress: address(principalToken),
                 requiredCollateralTokenAddress: address(collateralToken),
                 minimumCollateralPerPrincipalAmount: 0,
-                rewardPerLoanPrincipalAmount: 0,
+                rewardPerLoanPrincipalAmount: 1e18,
                 bidStartTimeMin: uint32(startTime),
                 bidStartTimeMax: uint32(startTime + 10000),
                 allocationStrategy: AllocationStrategy.BORROWER
@@ -208,10 +210,13 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
         mockBid.borrower = address(borrower);
         mockBid.lender = address(lender);
         mockBid.marketplaceId = marketId;
+        mockBid.loanDetails.loanDuration = 80000;
         mockBid.loanDetails.lendingToken = (principalToken);
-        mockBid.loanDetails.principal = 0;
+        mockBid.loanDetails.principal = 10000;
         mockBid.loanDetails.acceptedTimestamp = uint32(block.timestamp);
-        mockBid.loanDetails.lastRepaidTimestamp = uint32(block.timestamp);
+        mockBid.loanDetails.lastRepaidTimestamp = uint32(
+            block.timestamp + 5000
+        );
         mockBid.state = BidState.PAID;
 
         TellerV2Mock(tellerV2).setMockBid(mockBid);
@@ -220,6 +225,7 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
         uint256 bidId = 0;
 
         _setAllocation(allocationId);
+        allocatedRewards[allocationId].rewardTokenAmount = 4000;
 
         borrower._claimRewards(allocationId, bidId);
 

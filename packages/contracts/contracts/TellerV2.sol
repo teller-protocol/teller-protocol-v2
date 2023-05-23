@@ -694,9 +694,8 @@ contract TellerV2 is
 
         // If loan is backed by collateral, withdraw and send to the liquidator
         address liquidator = _msgSenderForMarket(bid.marketplaceId);
-       
-        bidLiquidator[_bidId] = liquidator; 
 
+        bidLiquidator[_bidId] = liquidator;
 
         emit LoanLiquidated(_bidId, liquidator);
     }
@@ -727,8 +726,6 @@ contract TellerV2 is
 
             // Remove borrower's active bid
             _borrowerBidsActive[bid.borrower].remove(_bidId);
-
-          
 
             emit LoanRepaid(_bidId);
         } else {
@@ -1022,7 +1019,6 @@ contract TellerV2 is
     {
         borrower_ = bids[_bidId].borrower;
     }
-    
 
     function getLoanLiquidator(uint256 _bidId)
         external

@@ -61,7 +61,6 @@ contract CollateralManager_Test is Testable {
     );
 
     function setUp() public {
-    
         // Deploy beacon contract with implementation
         UpgradeableBeacon escrowBeacon = new UpgradeableBeacon(
             address(escrowImplementation)
@@ -75,7 +74,6 @@ contract CollateralManager_Test is Testable {
         borrower = new User();
         lender = new User();
         liquidator = new User();
- 
 
         //  uint256 borrowerBalance = 50000;
         //   payable(address(borrower)).transfer(borrowerBalance);
@@ -95,7 +93,6 @@ contract CollateralManager_Test is Testable {
 
         CollateralManager_Override tempCManager = new CollateralManager_Override();
         tempCManager.initialize(address(eBeacon), address(tellerV2Mock));
- 
 
         address managerTellerV2 = address(tempCManager.tellerV2());
         assertEq(
@@ -558,7 +555,7 @@ contract CollateralManager_Test is Testable {
         uint256 bidId = 0;
 
         collateralManager.setBidsCollateralBackedGlobally(true);
-        tellerV2Mock.setLoanLiquidator(bidId,address(liquidator));
+        tellerV2Mock.setLoanLiquidator(bidId, address(liquidator));
 
         vm.prank(address(liquidator));
         //tellerV2Mock.setGlobalBidState(BidState.LIQUIDATED);
@@ -594,7 +591,6 @@ contract CollateralManager_Test is Testable {
 
         tellerV2Mock.setGlobalBidState(BidState.LIQUIDATED);
         tellerV2Mock.setLoanLiquidator(bidId, address(liquidator));
-
 
         address loanLiquidator = tellerV2Mock.getLoanLiquidator(bidId);
 

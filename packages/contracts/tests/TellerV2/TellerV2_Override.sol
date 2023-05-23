@@ -110,13 +110,8 @@ contract TellerV2_Override is TellerV2 {
         uint256 _bidId,
         Payment memory _payment,
         uint256 _owedAmount
-      
     ) public {
-        super._repayLoan(
-            _bidId,
-            _payment,
-            _owedAmount 
-        );
+        super._repayLoan(_bidId, _payment, _owedAmount);
     }
 
     function _canLiquidateLoanSuper(uint256 _bidId, uint32 _liquidationDelay)

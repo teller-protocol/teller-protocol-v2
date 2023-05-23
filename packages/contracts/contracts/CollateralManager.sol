@@ -16,7 +16,6 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradea
 import "./interfaces/ICollateralManager.sol";
 import { Collateral, CollateralType, ICollateralEscrowV1 } from "./interfaces/escrow/ICollateralEscrowV1.sol";
 import "./interfaces/ITellerV2.sol";
- 
 
 contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     /* Storage */
@@ -269,11 +268,9 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     function liquidateCollateral(uint256 _bidId, address _recipientAddress)
         external
     {
-       
         address _liquidatorAddress = tellerV2.getLoanLiquidator(_bidId);
-        
-        require(msg.sender == _liquidatorAddress, "Not Authorized");
 
+        require(msg.sender == _liquidatorAddress, "Not Authorized");
 
         BidState bidState = tellerV2.getBidState(_bidId);
         require(
@@ -282,7 +279,6 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         );
 
         _withdraw(_bidId, _recipientAddress);
-    
     }
 
     /* Internal Functions */

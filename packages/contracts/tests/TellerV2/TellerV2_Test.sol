@@ -160,7 +160,7 @@ contract TellerV2_Test is Testable {
         lender.acceptBid(_bidId);
     }
 
-   /* function test_collateralEscrow() public {
+    /* function test_collateralEscrow() public {
         // Submit bid as borrower
         uint256 bidId = submitCollateralBid();
         // Accept bid as lender

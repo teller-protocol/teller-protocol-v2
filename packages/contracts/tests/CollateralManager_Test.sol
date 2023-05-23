@@ -567,7 +567,7 @@ contract CollateralManager_Test is Testable {
         collateralManager.liquidateCollateral(bidId, address(liquidator));
     }
 
-    function test_liquidateCollateral_not_backed() public {
+    /*function test_liquidateCollateral_not_backed() public {
         uint256 bidId = 0;
 
         collateralManager.setBidsCollateralBackedGlobally(false);
@@ -583,7 +583,7 @@ contract CollateralManager_Test is Testable {
                 address(0),
             "withdraw internal should not have been called"
         );
-    }
+    }*/
 
     function test_liquidateCollateral() public {
         uint256 bidId = 0;

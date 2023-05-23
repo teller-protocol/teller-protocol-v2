@@ -25,7 +25,6 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
     using SafeERC20 for ERC20;
 
-
     ITellerV2 public tellerV2;
     address private collateralEscrowBeacon; // The address of the escrow contract beacon
     mapping(uint256 => address) public _escrows; // bidIds -> collateralEscrow

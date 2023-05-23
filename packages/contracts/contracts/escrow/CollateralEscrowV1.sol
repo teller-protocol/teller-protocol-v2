@@ -12,13 +12,12 @@ import "@openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155Upgradeable.so
 import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol";
 import "../interfaces/escrow/ICollateralEscrowV1.sol";
 
-
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
     using SafeERC20 for ERC20;
-     
+
     uint256 public bidId;
     /* Mappings */
     mapping(address => Collateral) public collateralBalances; // collateral address -> collateral
@@ -122,7 +121,7 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
     ) internal {
         // Deposit ERC20
         if (_collateralType == CollateralType.ERC20) {
-            ERC20(_collateralAddress).safeTransferFrom(           
+            ERC20(_collateralAddress).safeTransferFrom(
                 _msgSender(),
                 address(this),
                 _amount
@@ -168,8 +167,8 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
     ) internal {
         // Withdraw ERC20
         if (_collateral._collateralType == CollateralType.ERC20) {
-            ERC20(_collateralAddress).safeTransfer( 
-                 _recipient,               
+            ERC20(_collateralAddress).safeTransfer(
+                _recipient,
                 _collateral._amount
             );
         }

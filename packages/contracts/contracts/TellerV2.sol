@@ -1029,7 +1029,7 @@ contract TellerV2 is
         view
         returns (address liquidator_)
     {
-            liquidator_ = bidLiquidator[_bidId];
+        liquidator_ = bidLiquidator[_bidId];
     }
 
     /**

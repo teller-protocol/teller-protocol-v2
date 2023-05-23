@@ -263,7 +263,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
             require(msg.sender == loanLender, "Not Authorized");
 
             _withdraw(_bidId, loanLender);
-            
+
             emit CollateralClaimed(_bidId);
         } else {
             revert("collateral cannot be withdrawn");

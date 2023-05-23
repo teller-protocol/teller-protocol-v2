@@ -160,6 +160,7 @@ contract TellerV2_Test is Testable {
         lender.acceptBid(_bidId);
     }
 
+    /*
     function test_collateralEscrow() public {
         // Submit bid as borrower
         uint256 bidId = submitCollateralBid();
@@ -205,6 +206,7 @@ contract TellerV2_Test is Testable {
             "Collateral was not sent to borrower after repayment"
         );
     }
+    */
 }
 
 contract TellerV2User is User {

@@ -525,7 +525,7 @@ contract TellerV2_bids_test is Testable {
 
         lendingToken.approve(address(tellerV2), 1e20);
 
-        tellerV2._repayLoanSuper(bidId, payment, 100, false);
+        tellerV2._repayLoanSuper(bidId, payment, 100);
     }
 
     //NEED TO TEST MORE BRANCHES OF TEST_REPAY_LOAN_INTERNAL

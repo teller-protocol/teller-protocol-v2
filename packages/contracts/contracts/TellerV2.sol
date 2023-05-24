@@ -354,12 +354,14 @@ contract TellerV2 is
         uint256 _principal,
         uint32 _duration,
         uint16 _APR, 
+        uint32 deadline, 
         string calldata _metadataURI,
         address _receiver,       
         Collateral[] calldata _collateralInfo,
         ExpectedMarketParams calldata _expectedMarketParams
     ) public override whenNotPaused returns (uint256 bidId_) {
 
+        require(block.timestamp < deadline, "Deadline not met");
         (uint32 paymentCycle, PaymentCycleType paymentCycleType) = marketRegistry
             .getPaymentCycle(_marketplaceId);
         

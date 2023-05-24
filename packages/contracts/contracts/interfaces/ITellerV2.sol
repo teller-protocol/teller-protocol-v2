@@ -68,7 +68,7 @@ interface ITellerV2 {
         uint256 _principal,
         uint32 _duration,
         uint16 _APR,       
-     
+        uint32 deadline, 
         address _receiver,
         Collateral[] calldata _collateralInfo,
         ExpectedMarketParams calldata _expectedMarketParams

@@ -18,6 +18,7 @@
     "migrate:new:upgrade": "scripts/contract-migration/create-new.sh upgrade",
     "migrate": "yarn hh deploy --tags migration",
     "deploy": "yarn hh deploy",
+    "fork": "yarn hh fork",
     "export": "yarn hh export:deployments",
     "accounts": "yarn hh accounts",
     "balance": "yarn hh balance",

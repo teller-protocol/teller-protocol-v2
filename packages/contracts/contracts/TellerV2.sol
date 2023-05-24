@@ -54,8 +54,9 @@ contract TellerV2 is
     using NumbersLib for uint256;
     using EnumerableSet for EnumerableSet.AddressSet;
     using EnumerableSet for EnumerableSet.UintSet;
-    
-    address constant USING_LENDER_MANAGER = 0x0000000000000000000000000000000000000001;
+
+    address constant USING_LENDER_MANAGER =
+        0x0000000000000000000000000000000000000001;
 
     /** Events */
 
@@ -1043,11 +1044,11 @@ contract TellerV2 is
     {
         lender_ = bids[_bidId].lender;
 
-        if(lender_ == address(USING_LENDER_MANAGER)){
+        if (lender_ == address(USING_LENDER_MANAGER)) {
             return lenderManager.ownerOf(_bidId);
         }
 
-        //this is left in for backwards compatibility only 
+        //this is left in for backwards compatibility only
         if (lender_ == address(lenderManager)) {
             return lenderManager.ownerOf(_bidId);
         }

@@ -117,14 +117,14 @@ contract MarketLiquidityRewards_Test is Testable {
         rewardToken = new TestERC20Token(
             "Test Wrapped ETH",
             "TWETH",
-            100000,
+            1e30,
             rewardTokenDecimals
         );
 
         principalToken = new TestERC20Token(
             "Test Wrapped ETH",
             "TWETH",
-            100000,
+            1e30,
             principalTokenDecimals
         );
 
@@ -138,6 +138,11 @@ contract MarketLiquidityRewards_Test is Testable {
         IERC20Upgradeable(address(rewardToken)).transfer(
             address(lender),
             10000
+        );
+
+        IERC20Upgradeable(address(rewardToken)).transfer(
+            address(marketLiquidityRewards),
+            1e12
         );
 
         vm.warp(startTime + 100);
@@ -157,9 +162,9 @@ FNDA:0,MarketLiquidityRewards._verifyCollateralAmount
 
     */
 
-    function _setAllocation(uint256 _allocationId) internal {
-        uint256 rewardTokenAmount = 0;
-
+    function _setAllocation(uint256 _allocationId, uint256 rewardTokenAmount)
+        internal
+    {
         MarketLiquidityRewards.RewardAllocation
             memory _allocation = IMarketLiquidityRewards.RewardAllocation({
                 allocator: address(lender),
@@ -169,7 +174,7 @@ FNDA:0,MarketLiquidityRewards._verifyCollateralAmount
                 requiredPrincipalTokenAddress: address(principalToken),
                 requiredCollateralTokenAddress: address(collateralToken),
                 minimumCollateralPerPrincipalAmount: 0,
-                rewardPerLoanPrincipalAmount: 0,
+                rewardPerLoanPrincipalAmount: 1e18,
                 bidStartTimeMin: uint32(startTime),
                 bidStartTimeMax: uint32(startTime + 10000),
                 allocationStrategy: IMarketLiquidityRewards
@@ -213,7 +218,7 @@ FNDA:0,MarketLiquidityRewards._verifyCollateralAmount
         uint256 allocationId = 0;
         uint256 amountToIncrease = 100;
 
-        _setAllocation(allocationId);
+        _setAllocation(allocationId, 0);
 
         uint256 amountBefore = marketLiquidityRewards.getRewardTokenAmount(
             allocationId
@@ -241,7 +246,7 @@ FNDA:0,MarketLiquidityRewards._verifyCollateralAmount
     function test_deallocateRewards() public {
         uint256 allocationId = 0;
 
-        _setAllocation(allocationId);
+        _setAllocation(allocationId, 0);
 
         uint256 amountBefore = marketLiquidityRewards.getRewardTokenAmount(
             allocationId
@@ -262,10 +267,13 @@ FNDA:0,MarketLiquidityRewards._verifyCollateralAmount
         mockBid.borrower = address(borrower);
         mockBid.lender = address(lender);
         mockBid.marketplaceId = marketId;
+        mockBid.loanDetails.loanDuration = 80000;
         mockBid.loanDetails.lendingToken = (principalToken);
-        mockBid.loanDetails.principal = 0;
+        mockBid.loanDetails.principal = 10000;
         mockBid.loanDetails.acceptedTimestamp = uint32(block.timestamp);
-        mockBid.loanDetails.lastRepaidTimestamp = uint32(block.timestamp);
+        mockBid.loanDetails.lastRepaidTimestamp = uint32(
+            block.timestamp + 5000
+        );
         mockBid.state = BidState.PAID;
 
         tellerV2Mock.setMockBid(mockBid);
@@ -273,7 +281,7 @@ FNDA:0,MarketLiquidityRewards._verifyCollateralAmount
         uint256 allocationId = 0;
         uint256 bidId = 0;
 
-        _setAllocation(allocationId);
+        _setAllocation(allocationId, 4000);
 
         vm.prank(address(borrower));
         marketLiquidityRewards.claimRewards(allocationId, bidId);
@@ -298,6 +306,32 @@ FNDA:0,MarketLiquidityRewards._verifyCollateralAmount
 
         //add some negative tests  (unit)
         //add comments to all of the methods
+    }
+
+    function test_claimRewards_zero_principal() public {
+        Bid memory mockBid;
+
+        mockBid.borrower = address(borrower);
+        mockBid.lender = address(lender);
+        mockBid.marketplaceId = marketId;
+        mockBid.loanDetails.lendingToken = (principalToken);
+        mockBid.loanDetails.principal = 0;
+        mockBid.loanDetails.acceptedTimestamp = uint32(block.timestamp);
+        mockBid.loanDetails.lastRepaidTimestamp = uint32(
+            block.timestamp + 5000
+        );
+        mockBid.state = BidState.PAID;
+
+        tellerV2Mock.setMockBid(mockBid);
+
+        uint256 allocationId = 0;
+        uint256 bidId = 0;
+
+        _setAllocation(allocationId, 0);
+
+        vm.prank(address(borrower));
+        vm.expectRevert("Nothing to claim.");
+        marketLiquidityRewards.claimRewards(allocationId, bidId);
     }
 
     function test_claimRewards_round_remainder() public {
@@ -415,17 +449,8 @@ FNDA:0,MarketLiquidityRewards._verifyCollateralAmount
         );
 
         vm.prank(address(borrower));
+        vm.expectRevert("Nothing to claim.");
         marketLiquidityRewards.claimRewards(allocationId, bidId);
-
-        uint256 remainingTokenAmount = marketLiquidityRewards
-            .getRewardTokenAmount(allocationId);
-
-        //verify that the reward status is updated to drained
-        assertEq(
-            remainingTokenAmount,
-            1000,
-            "Reward was not completely drained"
-        );
     }
 
     function test_calculateRewardAmount_weth_principal() public {
@@ -483,7 +508,7 @@ FNDA:0,MarketLiquidityRewards._verifyCollateralAmount
     function test_decrementAllocatedAmount() public {
         uint256 allocationId = 0;
 
-        _setAllocation(allocationId);
+        _setAllocation(allocationId, 0);
 
         uint256 amount = 100;
 

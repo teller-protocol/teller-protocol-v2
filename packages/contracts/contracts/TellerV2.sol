@@ -309,8 +309,8 @@ contract TellerV2 is
         uint256 _principal,
         uint32 _duration,
         uint16 _APR, 
-        address _receiver,
         string calldata _metadataURI,
+        address _receiver,      
         Collateral[] calldata _collateralInfo
      ) public override whenNotPaused returns (uint256 bidId_) {
  
@@ -354,8 +354,8 @@ contract TellerV2 is
         uint256 _principal,
         uint32 _duration,
         uint16 _APR, 
-        address _receiver,
-        string calldata _metadataURI,
+         string calldata _metadataURI,
+        address _receiver,       
         Collateral[] calldata _collateralInfo,
         ExpectedMarketParams calldata _expectedMarketParams
     ) public override whenNotPaused returns (uint256 bidId_) {

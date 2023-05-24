@@ -17,7 +17,6 @@ import {
   TransactionRequest,
 } from '@ethersproject/providers'
 import { HardhatEthersHelpers } from '@nomiclabs/hardhat-ethers/types'
-import * as tdly from '@teller-protocol/hardhat-tenderly'
 import chalk from 'chalk'
 import { config } from 'dotenv'
 import { ethers, Signer, utils } from 'ethers'
@@ -28,6 +27,7 @@ import {
 } from 'hardhat/types'
 import rrequire from 'helpers/rrequire'
 import semver from 'semver'
+import { logger as tenderlyLogger } from 'tenderly/utils/logger'
 
 const NODE_VERSION = 'v16'
 if (!semver.satisfies(process.version, NODE_VERSION))
@@ -36,7 +36,9 @@ if (!semver.satisfies(process.version, NODE_VERSION))
   )
 
 config()
-tdly.setup({ automaticVerifications: true })
+
+// disable Tenderly's logger
+tenderlyLogger.settings.type = 'hidden'
 
 const { isAddress, getAddress, formatUnits, parseUnits, parseEther } = utils
 
@@ -110,6 +112,7 @@ const networkUrls: { [network: string]: string } = {
   tenderly: process.env.TENDERLY_RPC_URL ?? '',
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const getLatestDeploymentBlock = (networkName: string): number | undefined => {
   try {
     return parseInt(
@@ -144,8 +147,6 @@ const networkConfig = (config: NetworkUserConfig): NetworkUserConfig => ({
       out of the box it will auto deploy anything in the `contracts` folder and named *.sol
       plus it will use *.args for constructor args
 */
-
-const mainnetGwei = 21
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
 export default <HardhatUserConfig>{
@@ -222,7 +223,7 @@ export default <HardhatUserConfig>{
   namedAccounts: {
     deployer: {
       default: 0, // here this will by default take the first account as deployer
-      31337: '0xAFe87013dc96edE1E116a288D80FcaA0eFFE5fe5', // use the goerli deployer address for hardhat forking
+      31337: '0x65B38b3Cd7eFe502DB579c16ECB5B49235d0DAd0', // use the goerli deployer address for hardhat forking
     },
     borrower: 1,
     lender: 2,
@@ -261,7 +262,7 @@ export default <HardhatUserConfig>{
       url: networkUrls.mainnet,
       chainId: 1,
       live: true,
-      gasPrice: mainnetGwei * 1000000000,
+      gasPrice: ethers.utils.parseUnits('100', 'gwei').toNumber(),
 
       verify: {
         etherscan: {

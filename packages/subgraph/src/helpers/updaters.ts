@@ -28,7 +28,6 @@ import {
   BidStatusValues,
   isBidLate
 } from "./bid";
-import { initTokenVolume } from "./intializers";
 import {
   getBid,
   loadBorrowerByMarketId,
@@ -183,6 +182,7 @@ enum ArrayUpdaterFn {
   ADD,
   DELETE
 }
+
 function updateLoanStatusCount(
   loanStatusCount: LoanStatusCount,
   bidId: string,
@@ -397,7 +397,15 @@ function addBidToTokenVolumeFromStatusCount(
   tokenVolume.totalLoaned = tokenVolume.totalLoaned.plus(bid.principal);
   switch (bidStatus) {
     case BidStatus.Accepted:
+    case BidStatus.DueSoon:
+    case BidStatus.Late:
+    case BidStatus.Defaulted:
       tokenVolume.totalActive = tokenVolume.totalActive.plus(bid.principal);
+      break;
+  }
+  switch (bidStatus) {
+    case BidStatus.Accepted:
+      tokenVolume.totalAccepted = tokenVolume.totalAccepted.plus(bid.principal);
       break;
     case BidStatus.DueSoon:
       tokenVolume.totalDueSoon = tokenVolume.totalDueSoon.plus(bid.principal);
@@ -476,7 +484,17 @@ function removeBidFromTokenVolumeFromStatusCount(
   tokenVolume.totalLoaned = tokenVolume.totalLoaned.minus(bid.principal);
   switch (bidStatus) {
     case BidStatus.Accepted:
+    case BidStatus.DueSoon:
+    case BidStatus.Late:
+    case BidStatus.Defaulted:
       tokenVolume.totalActive = tokenVolume.totalActive.minus(bid.principal);
+      break;
+  }
+  switch (bidStatus) {
+    case BidStatus.Accepted:
+      tokenVolume.totalAccepted = tokenVolume.totalAccepted.minus(
+        bid.principal
+      );
       break;
     case BidStatus.DueSoon:
       tokenVolume.totalDueSoon = tokenVolume.totalDueSoon.minus(bid.principal);
@@ -533,6 +551,7 @@ enum UpdateDurationAverage {
   Add,
   Remove
 }
+
 function updateDurationAverageFromStatusCount(
   type: UpdateDurationAverage,
   loanStatusCount: LoanStatusCount,

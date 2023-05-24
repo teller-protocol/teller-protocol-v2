@@ -14,6 +14,7 @@ export function initTokenVolume(tokenVolume: TokenVolume, token: Token): void {
   tokenVolume.totalAvailable = BigInt.zero();
   tokenVolume.totalLoaned = BigInt.zero();
   tokenVolume.totalActive = BigInt.zero();
+  tokenVolume.totalAccepted = BigInt.zero();
   tokenVolume.totalDueSoon = BigInt.zero();
   tokenVolume.totalLate = BigInt.zero();
   tokenVolume.totalDefaulted = BigInt.zero();

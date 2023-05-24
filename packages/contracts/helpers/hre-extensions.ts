@@ -1,6 +1,6 @@
 import '@nomiclabs/hardhat-ethers'
 import 'hardhat-deploy'
-
+import * as tdly from '@teller-protocol/hardhat-tenderly'
 import { BigNumber, BigNumberish, Contract, Signer } from 'ethers'
 import { ERC20 } from 'generated/typechain'
 import { extendEnvironment } from 'hardhat/config'
@@ -140,8 +140,11 @@ interface ContractsGetConfig {
   from?: string | Signer
   at?: string
 }
+
 extendEnvironment((hre) => {
   const { deployments, ethers, network } = hre
+
+  if (!network.live) tdly.setup({ automaticVerifications: true })
 
   hre.contracts = {
     async get<C extends Contract>(

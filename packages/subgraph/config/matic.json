@@ -2,8 +2,8 @@
   "network": "matic",
   "grafting": {
     "enabled": true,
-    "base": "QmRmZFGEw7dXctbwAYY1rozXjRf8qKsD2YcsvvF8a3cZoY",
-    "block": "41532815"
+    "base": "QmQxJtkmBSe7AqoA67Ej6FwSs5bimmGWj251GNJKSinBrC",
+    "block": "42896605"
   },
   "block_handler": {
     "enabled": true,
@@ -11,27 +11,27 @@
   },
   "contracts": {
     "teller_v2": {
-      "enabled": false,
+      "enabled": true,
       "address": "0xD3D79A066F2cD471841C047D372F218252Dbf8Ed",
       "block": "26057300"
     },
     "market_registry": {
-      "enabled": false,
+      "enabled": true,
       "address": "0xeF0f89baC623eD7C875bC2F23b5403DcF90ba8Bd",
       "block": "26024915"
     },
     "lender_commitment": {
-      "enabled": false,
+      "enabled": true,
       "address": "0x1727ADd0680412e839c500ccE4a2A20e3d96fF5C",
       "block": "31180303"
     },
     "collateral_manager": {
-      "enabled": false,
+      "enabled": true,
       "address": "0x76888a882a4fF57455B5e74B791DD19DF3ba51Bb",
       "block": "38446245"
     },
     "lender_manager": {
-      "enabled": false,
+      "enabled": true,
       "address": "0x8199DC6d35275f998aA459b29d642577818E9D3e",
       "block": "39784992"
     },

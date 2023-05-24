@@ -111,6 +111,29 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
         due.interest = interest;
     }
 
+    function lenderAcceptBid(uint256 _bidId)
+        public
+        returns (
+            uint256 amountToProtocol,
+            uint256 amountToMarketplace,
+            uint256 amountToBorrower
+        )
+    {
+        Bid storage bid = bids[_bidId];
+
+        bid.lender = msg.sender;
+
+        //send tokens to caller
+        IERC20(bid.loanDetails.lendingToken).transferFrom(
+            bid.lender,
+            bid.receiver,
+            bid.loanDetails.principal
+        );
+        //for the reciever
+
+        return (0, bid.loanDetails.principal, 0);
+    }
+
     function lenderAcceptBid(uint256 _bidId, uint16 _maxMarketFee)
         public
         returns (

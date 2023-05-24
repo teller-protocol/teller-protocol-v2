@@ -155,6 +155,8 @@ contract TellerV2 is
 
     uint32 public constant LIQUIDATION_DELAY = 86400; //ONE DAY IN SECONDS
 
+    uint32 public constant DEFAULT_MAX_MARKET_FEE = 1000; // 10%
+
     /** Constructor **/
 
     constructor(address trustedForwarder) TellerV2Context(trustedForwarder) {}
@@ -463,33 +465,36 @@ contract TellerV2 is
         emit CancelledBid(_bidId);
     }
 
-   /**
+    /**
      * @notice Function for a lender to accept a proposed loan bid.
      * @param _bidId The id of the loan bid to accept.
      */
-    function lenderAcceptBid(
-        uint256 _bidId      
-        )
+    function lenderAcceptBid(uint256 _bidId)
         external
-        override 
+        override
         returns (
             uint256 amountToProtocol,
             uint256 amountToMarketplace,
             uint256 amountToBorrower
         )
     {
+        uint16 marketplaceFee = marketRegistry.getMarketplaceFee(
+            bids[_bidId].marketplaceId
+        );
+
+        require(
+            marketplaceFee <= DEFAULT_MAX_MARKET_FEE,
+            "Unexpected market fee"
+        );
+
         return _lenderAcceptBid(_bidId);
     }
-
 
     /**
      * @notice Function for a lender to accept a proposed loan bid.
      * @param _bidId The id of the loan bid to accept.
      */
-    function lenderAcceptBid(
-        uint256 _bidId,
-        uint16 _maxMarketFee        
-        )
+    function lenderAcceptBid(uint256 _bidId, uint16 _maxMarketFee)
         external
         override
         pendingBid(_bidId, "lenderAcceptBid")
@@ -500,17 +505,17 @@ contract TellerV2 is
             uint256 amountToBorrower
         )
     {
-        uint16 marketplaceFee = marketRegistry.getMarketplaceFee(bids[_bidId].marketplaceId);
+        uint16 marketplaceFee = marketRegistry.getMarketplaceFee(
+            bids[_bidId].marketplaceId
+        );
 
         require(marketplaceFee <= _maxMarketFee, "Unexpected market fee");
- 
+
         return _lenderAcceptBid(_bidId);
     }
 
-     function _lenderAcceptBid(
-        uint256 _bidId       
-        )
-        internal 
+    function _lenderAcceptBid(uint256 _bidId)
+        internal
         pendingBid(_bidId, "lenderAcceptBid")
         whenNotPaused
         returns (
@@ -550,13 +555,13 @@ contract TellerV2 is
         // Tell the collateral manager to deploy the escrow and pull funds from the borrower if applicable
         collateralManager.deployAndDeposit(_bidId);
 
-        uint16 marketplaceFee = marketRegistry.getMarketplaceFee(bid.marketplaceId);
+        uint16 marketplaceFee = marketRegistry.getMarketplaceFee(
+            bid.marketplaceId
+        );
 
         // Transfer funds to borrower from the lender
         amountToProtocol = bid.loanDetails.principal.percent(protocolFee());
-        amountToMarketplace = bid.loanDetails.principal.percent(
-            marketplaceFee
-        );
+        amountToMarketplace = bid.loanDetails.principal.percent(marketplaceFee);
         amountToBorrower =
             bid.loanDetails.principal -
             amountToProtocol -
@@ -598,8 +603,6 @@ contract TellerV2 is
 
         emit FeePaid(_bidId, "protocol", amountToProtocol);
         emit FeePaid(_bidId, "marketplace", amountToMarketplace);
-
-
     }
 
     function claimLoanNFT(uint256 _bidId)

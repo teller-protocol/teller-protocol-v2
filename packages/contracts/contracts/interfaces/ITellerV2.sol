@@ -71,7 +71,6 @@ interface ITellerV2 {
             uint256 amountToBorrower
         );
 
-
     function calculateAmountDue(uint256 _bidId)
         external
         view

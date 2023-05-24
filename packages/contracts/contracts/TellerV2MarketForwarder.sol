@@ -135,9 +135,12 @@ abstract contract TellerV2MarketForwarder is Initializable, ContextUpgradeable {
         virtual
         returns (bool)
     {
+        bytes4 lender_accept_bid_selector = bytes4(
+            keccak256("lenderAcceptBid(uint256)")
+        );
         // Approve the borrower's loan
         _forwardCall(
-            abi.encodeWithSelector(ITellerV2.lenderAcceptBid.selector, _bidId),
+            abi.encodeWithSelector(lender_accept_bid_selector, _bidId),
             _lender
         );
 

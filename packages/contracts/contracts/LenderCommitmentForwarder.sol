@@ -61,7 +61,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
     mapping(uint256 => EnumerableSetUpgradeable.AddressSet)
         internal commitmentBorrowersList;
 
-    mapping (uint256 => uint256) commitmentPrincipalAllocated; 
+    mapping(uint256 => uint256) commitmentPrincipalAllocated;
 
     /**
      * @notice This event is emitted when a lender's commitment is created.
@@ -234,7 +234,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         );
     }
 
-   /* function updateCommitmentExpiration( 
+    /* function updateCommitmentExpiration( 
         uint256 _commitmentId,
         uint32 _expiration
     ) public commitmentLender(_commitmentId) {
@@ -294,8 +294,6 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         delete commitmentBorrowersList[_commitmentId];
         emit DeletedCommitment(_commitmentId);
     }
-
-  
 
     /**
      * @notice Accept the commitment to submitBid and acceptBid using the funds
@@ -386,10 +384,13 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             );
         }
 
-
         commitmentPrincipalAllocated[_commitmentId] += _principalAmount;
 
-        require( commitmentPrincipalAllocated[_commitmentId] <= commitment.maxPrincipal, "Exceeds max principal of commitment");
+        require(
+            commitmentPrincipalAllocated[_commitmentId] <=
+                commitment.maxPrincipal,
+            "Exceeds max principal of commitment"
+        );
 
         bidId = _submitBidFromCommitment(
             borrower,
@@ -405,7 +406,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         );
 
         _acceptBid(bidId, commitment.lender);
- 
+
         emit ExercisedCommitment(
             _commitmentId,
             borrower,

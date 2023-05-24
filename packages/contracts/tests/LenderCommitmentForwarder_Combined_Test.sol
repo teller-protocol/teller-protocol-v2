@@ -211,8 +211,6 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             "Expect accept bid called after exercise"
         );
 
-  
-
         bidId = borrower._acceptCommitment(
             commitmentId,
             100, //principalAmount
@@ -223,22 +221,17 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             maxLoanDuration
         );
 
-         
+        vm.expectRevert();
 
-         vm.expectRevert();
-        
-            borrower._acceptCommitment(
-                commitmentId,
-                100, //principalAmount
-                100, //collateralAmount
-                0, //collateralTokenId
-                address(collateralToken),
-                minInterestRate,
-                maxLoanDuration
-            );
-      
-
-       
+        borrower._acceptCommitment(
+            commitmentId,
+            100, //principalAmount
+            100, //collateralAmount
+            0, //collateralTokenId
+            address(collateralToken),
+            minInterestRate,
+            maxLoanDuration
+        );
     }
 
     function test_acceptCommitmentWithBorrowersArray_valid() public {
@@ -411,8 +404,6 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             "Should fail to accept commitment with invalid amount for ERC721"
         );
     }
-
-   
 
     /**
      *             collateral token = WETH (10**18)

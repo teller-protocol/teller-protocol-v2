@@ -431,8 +431,6 @@ contract LenderCommitmentForwarder_Test is Testable {
         lenderCommitmentForwarder.deleteCommitment(0);
     }
 
-    
-
     function test_validateCommitment() public {
         LenderCommitmentForwarder.Commitment
             memory c = LenderCommitmentForwarder.Commitment({

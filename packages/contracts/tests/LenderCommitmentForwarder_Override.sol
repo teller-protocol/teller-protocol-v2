@@ -44,7 +44,7 @@ contract LenderCommitmentForwarder_Override is LenderCommitmentForwarder {
     {
         return commitments[_commitmentId].marketId;
     }
- 
+
     function _getEscrowCollateralTypeSuper(CommitmentCollateralType _type)
         public
         returns (CollateralType)

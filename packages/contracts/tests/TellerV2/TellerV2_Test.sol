@@ -191,7 +191,7 @@ contract TellerV2_Test is Testable {
         borrower.repayLoanFull(bidId);
 
         // Check escrow balance
-        uint256 escrowBalanceAfter = wethMock.balanceOf(escrowAddress);
+        /*   uint256 escrowBalanceAfter = wethMock.balanceOf(escrowAddress);
         assertEq(
             0,
             escrowBalanceAfter,
@@ -204,7 +204,7 @@ contract TellerV2_Test is Testable {
             collateralAmount,
             borrowerBalanceAfter - borrowerBalanceBefore,
             "Collateral was not sent to borrower after repayment"
-        );
+        );*/
     }
     */
 }

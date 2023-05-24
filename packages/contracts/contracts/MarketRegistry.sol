@@ -253,7 +253,7 @@ contract MarketRegistry is
         }
     }
 
-     /**
+    /**
      * @notice Returns the status of a market existing and not being closed.
      * @param _marketId The market ID for the market to check.
      */
@@ -263,7 +263,9 @@ contract MarketRegistry is
         override
         returns (bool)
     {
-        return markets[_marketId].owner != address(0) && !marketIsClosed[_marketId];
+        return
+            markets[_marketId].owner != address(0) &&
+            !marketIsClosed[_marketId];
     }
 
     /**

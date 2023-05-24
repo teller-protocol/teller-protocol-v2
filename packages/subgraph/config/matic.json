@@ -2,11 +2,11 @@
   "network": "matic",
   "grafting": {
     "enabled": true,
-    "base": "QmSF3kzYpZ4VqGbhKZk9s1cLELzhkxKpcETrXZMcymtrqQ",
-    "block": "39784992"
+    "base": "QmQxJtkmBSe7AqoA67Ej6FwSs5bimmGWj251GNJKSinBrC",
+    "block": "42896605"
   },
   "block_handler": {
-    "enabled": false,
+    "enabled": true,
     "block": "40918500"
   },
   "contracts": {

@@ -289,8 +289,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
 
         lender._addCommitmentBorrowers(commitmentId, borrowersArray);
 
-       
-       vm.expectRevert();
+        vm.expectRevert();
         marketOwner._acceptCommitment(
             commitmentId,
             100, //principal
@@ -300,10 +299,9 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             minInterestRate,
             maxLoanDuration
         );
-       
+
         address[] memory removalArray = new address[](1);
         removalArray[0] = address(marketOwner);
-
 
         lender._removeCommitmentBorrowers(commitmentId, removalArray);
 
@@ -319,8 +317,6 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             minInterestRate,
             maxLoanDuration
         );
-
-        
     }
 
     function test_acceptCommitmentWithBorrowersArray_reset() public {
@@ -332,10 +328,9 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
         );
 
         lender._addCommitmentBorrowers(commitmentId, borrowersArray);
-  
+
         address[] memory removalArray = new address[](1);
         removalArray[0] = address(marketOwner);
-
 
         lender._removeCommitmentBorrowers(commitmentId, removalArray);
 
@@ -349,8 +344,6 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             minInterestRate,
             maxLoanDuration
         );
-
-         
     }
 
     function test_acceptCommitmentFailsWithInsufficientCollateral() public {
@@ -878,7 +871,7 @@ contract LenderCommitmentUser is User {
         );
     }
 
-        function _removeCommitmentBorrowers(
+    function _removeCommitmentBorrowers(
         uint256 commitmentId,
         address[] calldata borrowerAddressList
     ) public {

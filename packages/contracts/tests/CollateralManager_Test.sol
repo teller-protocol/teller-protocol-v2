@@ -507,7 +507,7 @@ contract CollateralManager_Test is Testable {
         tellerV2Mock.setGlobalBidState(BidState.LIQUIDATED);
 
         vm.expectRevert("collateral cannot be withdrawn");
-        collateralManager.withdraw(bidId,recipient);
+        collateralManager.withdraw(bidId, recipient);
     }
 
     function test_withdraw_external_state_paid() public {
@@ -517,7 +517,7 @@ contract CollateralManager_Test is Testable {
         tellerV2Mock.setGlobalBidState(BidState.PAID);
 
         vm.prank(address(borrower));
-        collateralManager.withdraw(bidId,address(borrower));
+        collateralManager.withdraw(bidId, address(borrower));
 
         assertEq(
             collateralManager.withdrawInternalWasCalledToRecipient(),
@@ -535,7 +535,7 @@ contract CollateralManager_Test is Testable {
         vm.prank(address(lender));
         vm.expectEmit(true, false, false, false);
         emit CollateralClaimed(bidId);
-        collateralManager.withdraw(bidId,address(lender));
+        collateralManager.withdraw(bidId, address(lender));
 
         assertEq(
             collateralManager.withdrawInternalWasCalledToRecipient(),

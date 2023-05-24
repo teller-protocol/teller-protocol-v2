@@ -54,6 +54,19 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
         Collateral[] calldata _collateralInfo
     ) public returns (uint256 bidId_) {}
 
+        function submitBid(
+        address _lendingToken,
+        uint256 _marketplaceId,
+        uint256 _principal,
+        uint32 _duration,
+        uint16 _APR,
+       
+        address _receiver,
+        Collateral[] calldata _collateralInfo,
+         ExpectedMarketParams calldata _expectedMarketParams
+    ) public returns (uint256 bidId_) {}
+
+
     function repayLoanMinimum(uint256 _bidId) external {}
 
     function repayLoanFull(uint256 _bidId) external {}

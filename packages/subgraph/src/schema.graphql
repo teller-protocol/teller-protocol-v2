@@ -297,6 +297,7 @@ type TokenVolume implements IDurationAverage @entity {
   totalAvailable: BigInt! # available for lending via commitments
   totalLoaned: BigInt!
   totalActive: BigInt!
+  totalAccepted: BigInt!
   totalDueSoon: BigInt!
   totalLate: BigInt!
   totalDefaulted: BigInt!

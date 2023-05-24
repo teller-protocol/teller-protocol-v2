@@ -391,13 +391,13 @@ type CommitmentReward @entity {
 
   reward: RewardAllocation!
   commitment: Commitment!
-  
-  roi: BigInt! 
+
+  roi: BigInt!
   apy: BigInt!
 }
 
 
- 
+
 
 type RewardAllocation @entity {
   id: ID!
@@ -432,7 +432,7 @@ type RewardAllocation @entity {
 
   allocationStrategy: String!
 
-  bidRewards: [BidReward!]! 
+  bidRewards: [BidReward!]!
 
   commitmentRewards: [CommitmentReward!]! @derivedFrom(field: "reward")
 

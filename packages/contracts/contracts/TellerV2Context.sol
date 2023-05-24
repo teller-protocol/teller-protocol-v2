@@ -106,7 +106,10 @@ abstract contract TellerV2Context is
         virtual
         returns (address)
     {
-        if ( msg.data.length >= 20 &&  isTrustedMarketForwarder(_marketId, _msgSender())) {
+        if (
+            msg.data.length >= 20 &&
+            isTrustedMarketForwarder(_marketId, _msgSender())
+        ) {
             address sender;
             assembly {
                 sender := shr(96, calldataload(sub(calldatasize(), 20)))

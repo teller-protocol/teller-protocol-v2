@@ -131,11 +131,20 @@ const onDeployResult = async (args: DeployResultArgs): Promise<void> => {
   }
 
   if (result.newlyDeployed) {
-    const gas = chalk.cyan(`${result.receipt!.gasUsed} gas`)
+    const tx = await hre.ethers.provider.getTransaction(
+      result.receipt!.transactionHash
+    )
+    const gas = result.receipt
+      ? ` with ${chalk.cyan(`${result.receipt.gasUsed} gas`)}`
+      : ''
+    const gasPrice = ''
+    // tx.gasPrice
+    //   ? ` @ ${chalk.cyan(
+    //       `${hre.ethers.utils.formatUnits(tx.gasPrice, 'gwei')} gwei`
+    //     )}`
+    //   : ''
     hre.log(
-      ` ${chalk.green('new')} ${chalk.bold(result.address)} ${
-        result.receipt ? 'with ' + gas : ''
-      }`,
+      ` ${chalk.green('new')} ${chalk.bold(result.address)}${gas}${gasPrice}`,
       {
         indent: indent + 2,
       }

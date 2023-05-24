@@ -16,10 +16,10 @@ import {
   loadProtocol,
   loadToken
 } from "../helpers/loaders";
+import { addToArray, removeFromArray } from "../helpers/utils";
 
 import {
   getBidRewardId,
-  getCommitmentRewardId,
   loadBidReward,
   loadCommitmentReward,
   loadRewardAllocation
@@ -29,18 +29,6 @@ import {
   allocationStatusToEnum,
   allocationStatusToString
 } from "./utils";
-import { addToArray, removeFromArray } from "../helpers/utils";
-
-// import { CommitmentStatus, commitmentStatusToString } from "./utils";
-
-enum CollateralTokenType {
-  NONE,
-  ERC20,
-  ERC721,
-  ERC1155,
-  ERC721_ANY_ID,
-  ERC1155_ANY_ID
-}
 
 export function updateAllocationStatus(
   allocation: RewardAllocation,
@@ -329,8 +317,8 @@ export function unlinkBidsFromReward(rewardAllocation: RewardAllocation): void {
     const bidRewardId = bidRewards[i];
 
     const bidReward = BidReward.load(bidRewardId);
-    if (bidReward.claimed) {
-      //only unlink unclaimed rewards for drained/deleted rewards
+    if (bidReward && bidReward.claimed) {
+      // only unlink unclaimed rewards for drained/deleted rewards
       continue;
     }
 
@@ -359,7 +347,7 @@ function appendAllocationRewardToBidParticipants(
   // this created a bidReward which is an attachment of the reward to a bid
   const bidReward = loadBidReward(bid, rewardAllocation);
 
-  //manually add the association
+  // manually add the association
   rewardAllocation.bidRewards = addToArray(
     rewardAllocation.bidRewards,
     bidReward.id

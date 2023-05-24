@@ -24,7 +24,7 @@ abstract contract TellerV2Context is
         address indexed forwarder,
         address sender
     );
-     event MarketForwarderRenounced(
+    event MarketForwarderRenounced(
         uint256 indexed marketId,
         address indexed forwarder,
         address sender

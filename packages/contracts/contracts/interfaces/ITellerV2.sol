@@ -57,7 +57,7 @@ interface ITellerV2 {
      * @param _principal The principal amount of the loan bid.
      * @param _duration The recurrent length of time before which a payment is due.
      * @param _APR The proposed interest rate for the loan bid.
-     * @param _metadataURI The URI for the metadata of the loan bid.
+     
      * @param _receiver The address where the loan amount will be sent to.
      * @param _collateralInfo Additional information about the collateral asset.
       * @param _expectedMarketParams Expected parameters of the market.
@@ -68,7 +68,7 @@ interface ITellerV2 {
         uint256 _principal,
         uint32 _duration,
         uint16 _APR,       
-        string calldata _metadataURI,
+     
         address _receiver,
         Collateral[] calldata _collateralInfo,
         ExpectedMarketParams calldata _expectedMarketParams

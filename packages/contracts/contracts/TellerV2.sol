@@ -354,7 +354,7 @@ contract TellerV2 is
         uint256 _principal,
         uint32 _duration,
         uint16 _APR, 
-         string calldata _metadataURI,
+        string calldata _metadataURI,
         address _receiver,       
         Collateral[] calldata _collateralInfo,
         ExpectedMarketParams calldata _expectedMarketParams

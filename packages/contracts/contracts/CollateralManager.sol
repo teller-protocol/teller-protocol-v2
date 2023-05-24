@@ -442,6 +442,11 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
             ),
             "Cannot commit multiple collateral with the same address"
         );
+        require(
+            _collateralInfo._collateralType != CollateralType.ERC721 ||
+                _collateralInfo._amount == 1,
+            "ERC721 collateral must have amount of 1"
+        );
 
         collateral.collateralAddresses.add(_collateralInfo._collateralAddress);
         collateral.collateralInfo[

@@ -151,4 +151,8 @@ abstract contract TellerV2Storage_G4 is TellerV2Storage_G3 {
     mapping(uint256 => PaymentCycleType) public bidPaymentCycleType;
 }
 
-abstract contract TellerV2Storage is TellerV2Storage_G4 {}
+abstract contract TellerV2Storage_G5 is TellerV2Storage_G4 {
+    mapping(uint256 => address) public bidLiquidator;
+}
+
+abstract contract TellerV2Storage is TellerV2Storage_G5 {}

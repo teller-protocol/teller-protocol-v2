@@ -8,6 +8,8 @@ import "../TellerV2Context.sol";
 import { Collateral } from "../interfaces/escrow/ICollateralEscrowV1.sol";
 import { LoanDetails, Payment, BidState } from "../TellerV2Storage.sol";
 
+import "../../lib/forge-std/src/console.sol";
+
 /*
 This is only used for sol test so its named specifically to avoid being used for the typescript tests.
 */
@@ -151,6 +153,14 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
         return bids[_bidId].loanDetails;
     }
 
+    function getLoanLiquidator(uint256 _bidId)
+        external
+        view
+        returns (address liquidator_)
+    {
+        liquidator_ = bidLiquidator[_bidId];
+    }
+
     function getBorrowerActiveLoanIds(address _borrower)
         public
         view
@@ -233,5 +243,11 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
 
     function setLastRepaidTimestamp(uint256 _bidId, uint32 _timestamp) public {
         bids[_bidId].loanDetails.lastRepaidTimestamp = _timestamp;
+    }
+
+    function setLoanLiquidator(uint256 _bidId, address _liquidator) public {
+        console.logAddress(_liquidator);
+        bidLiquidator[_bidId] = _liquidator;
+        console.logAddress(bidLiquidator[_bidId]);
     }
 }

@@ -128,6 +128,11 @@ interface ITellerV2 {
         view
         returns (address lender_);
 
+    function getLoanLiquidator(uint256 _bidId)
+        external
+        view
+        returns (address liquidator_);
+
     function getLoanLendingToken(uint256 _bidId)
         external
         view

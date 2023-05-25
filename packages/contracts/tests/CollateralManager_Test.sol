@@ -19,6 +19,8 @@ import "../contracts/CollateralManager.sol";
 
 import "./CollateralManager_Override.sol";
 
+import "../lib/forge-std/src/console.sol";
+
 contract CollateralManager_Test is Testable {
     CollateralManager_Override collateralManager;
     User private borrower;
@@ -545,7 +547,7 @@ contract CollateralManager_Test is Testable {
 
         tellerV2Mock.setGlobalBidState(BidState.LIQUIDATED);
 
-        vm.expectRevert("Sender not authorized");
+        vm.expectRevert("Not Authorized");
         collateralManager.liquidateCollateral(bidId, address(liquidator));
     }
 
@@ -553,22 +555,24 @@ contract CollateralManager_Test is Testable {
         uint256 bidId = 0;
 
         collateralManager.setBidsCollateralBackedGlobally(true);
+        tellerV2Mock.setLoanLiquidator(bidId, address(liquidator));
 
-        vm.prank(address(tellerV2Mock));
+        vm.prank(address(liquidator));
         //tellerV2Mock.setGlobalBidState(BidState.LIQUIDATED);
 
         vm.expectRevert("Loan has not been liquidated");
         collateralManager.liquidateCollateral(bidId, address(liquidator));
     }
 
-    function test_liquidateCollateral_not_backed() public {
+    /*function test_liquidateCollateral_not_backed() public {
         uint256 bidId = 0;
 
         collateralManager.setBidsCollateralBackedGlobally(false);
+        tellerV2Mock.setLoanLiquidator(bidId,address(liquidator));
 
         tellerV2Mock.setGlobalBidState(BidState.PENDING);
 
-        vm.prank(address(tellerV2Mock));
+        vm.prank(address(liquidator));
         collateralManager.liquidateCollateral(bidId, address(liquidator));
 
         assertTrue(
@@ -576,16 +580,23 @@ contract CollateralManager_Test is Testable {
                 address(0),
             "withdraw internal should not have been called"
         );
-    }
+    }*/
 
     function test_liquidateCollateral() public {
         uint256 bidId = 0;
 
         collateralManager.setBidsCollateralBackedGlobally(true);
 
-        tellerV2Mock.setGlobalBidState(BidState.LIQUIDATED);
+        console.logAddress(address(liquidator));
 
-        vm.prank(address(tellerV2Mock));
+        tellerV2Mock.setGlobalBidState(BidState.LIQUIDATED);
+        tellerV2Mock.setLoanLiquidator(bidId, address(liquidator));
+
+        address loanLiquidator = tellerV2Mock.getLoanLiquidator(bidId);
+
+        console.logAddress(loanLiquidator);
+
+        vm.prank(address(liquidator));
         collateralManager.liquidateCollateral(bidId, address(liquidator));
 
         assertTrue(

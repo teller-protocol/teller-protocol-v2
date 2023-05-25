@@ -76,8 +76,8 @@ interface ICollateralManager {
      * @notice Sends the deposited collateral to a liquidator of a bid.
      * @notice Can only be called by the protocol.
      * @param _bidId The id of the liquidated bid.
-     * @param _liquidatorAddress The address of the liquidator to send the collateral to.
+     * @param _recipientAddress The address of the recipient of the assets
      */
-    function liquidateCollateral(uint256 _bidId, address _liquidatorAddress)
+    function liquidateCollateral(uint256 _bidId, address _recipientAddress)
         external;
 }

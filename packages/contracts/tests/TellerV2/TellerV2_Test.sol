@@ -189,7 +189,21 @@ contract TellerV2_Test is Testable {
         );
         borrower.repayLoanFull(bidId);
 
-      
+        // Check escrow balance
+        /*   uint256 escrowBalanceAfter = wethMock.balanceOf(escrowAddress);
+        assertEq(
+            0,
+            escrowBalanceAfter,
+            "Collateral was not withdrawn from escrow on repayment"
+        );
+
+        // Check borrower balance for collateral
+        uint256 borrowerBalanceAfter = wethMock.balanceOf(address(borrower));
+        assertEq(
+            collateralAmount,
+            borrowerBalanceAfter - borrowerBalanceBefore,
+            "Collateral was not sent to borrower after repayment"
+        );
     }*/
 }
 

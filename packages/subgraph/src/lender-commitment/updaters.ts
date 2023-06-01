@@ -94,6 +94,7 @@ export function updateLenderCommitment(
   commitment.principalToken = lendingToken.id;
   commitment.principalTokenAddress = lendingTokenAddress;
 
+  commitment.collateralTokenType = BigInt.fromI32(lenderCommitment.value7);
   if (lenderCommitment.value7 != CollateralTokenType.NONE) {
     let tokenType = TokenType.UNKNOWN;
     let nftId: BigInt | null = null;
@@ -261,6 +262,7 @@ function addCommitmentToProtocol(commitment: Commitment): void {
   );
   protocol.save();
 }
+
 function removeCommitmentToProtocol(commitment: Commitment): void {
   const protocol = loadProtocol();
   protocol.activeCommitments = removeFromArray(

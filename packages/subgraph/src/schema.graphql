@@ -363,6 +363,7 @@ type Commitment @entity {
 
   # Required Collateral
   collateralToken: Token
+  collateralTokenType: BigInt!
   maxPrincipalPerCollateralAmount: BigInt
 
   commitmentBorrowers: [Bytes!]!

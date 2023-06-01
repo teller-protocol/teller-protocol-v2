@@ -2,8 +2,8 @@
   "network": "matic",
   "grafting": {
     "enabled": true,
-    "base": "QmQxJtkmBSe7AqoA67Ej6FwSs5bimmGWj251GNJKSinBrC",
-    "block": "42896605"
+    "base": "QmTavWMLQ3kcjpTeH1XN7fVBW3PVKDhsbryNFT2s3KJ4Ys",
+    "block": "43410576"
   },
   "block_handler": {
     "enabled": true,

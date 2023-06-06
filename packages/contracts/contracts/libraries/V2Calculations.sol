@@ -112,14 +112,15 @@ library V2Calculations {
             // Max payable amount in a cycle
             // NOTE: the last cycle could have less than the calculated payment amount
             uint256 maxCycleOwed = isLastPaymentCycle
-                ? owedPrincipal_ + interest_
+                ? owedPrincipal_ + interest_  //you owe everything you didnt pay off so far 
                 : _bid.terms.paymentCycleAmount;
 
                 console.logUint(maxCycleOwed); //8525114154
 
             // Calculate accrued amount due since last repayment
-            uint256 owedAmount = (maxCycleOwed * owedTime) /
-                _bid.terms.paymentCycle;
+
+            // This is based on the current immediate timestamp  -- i think this was wrong 
+            uint256 owedAmount = maxCycleOwed;
 
                 console.logUint(owedAmount); //     7847776317 
                 console.logUint(interest_); //     191780821

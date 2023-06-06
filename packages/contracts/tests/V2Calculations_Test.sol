@@ -396,4 +396,68 @@ contract V2Calculations_Test is Testable {
             "Final cycle bullet interest incorrect"
         );
     }
+
+
+    function test_calculateEMIAmountOwed_last_cycle() public {
+ 
+
+        uint256 _principal = 100000e6;
+        uint256 _repaidPrincipal = 91666666667;
+        uint16 _apr = 3000;
+        uint256 _acceptedTimestamp = 1646159355;
+        uint256 _lastRepaidTimestamp = _acceptedTimestamp + (365 days - 30 days);
+        __bid.loanDetails.loanDuration = 365 days * 1;   //1 year       
+        __bid.loanDetails.principal = _principal;
+        __bid.terms.APR = _apr;
+        __bid.loanDetails.totalRepaid.principal = _repaidPrincipal;
+        __bid.terms.paymentCycleAmount = 8333333333;
+        __bid.terms.paymentCycle = 365 days / 12; // 1 month 
+        __bid.loanDetails.acceptedTimestamp = uint32(_acceptedTimestamp);
+        __bid.paymentType = PaymentType.EMI;
+        uint256 _paymentCycleAmount = V2Calculations
+            .calculatePaymentCycleAmount(
+                PaymentType.EMI,
+                PaymentCycleType.Seconds,
+                _principal,
+                365 days,
+                365 days / 12,
+                _apr
+            );
+        __bid.terms.paymentCycleAmount = _paymentCycleAmount;
+
+        // Within the first payment cycle
+
+        //as you move this closer to 365 days, the owed principal increases for some odd reason ! 
+        uint256 _timestamp = _acceptedTimestamp + ((365 days - 2 days ));  //we are in the last cycle 
+
+        (
+            uint256 _owedPrincipal,
+            uint256 _duePrincipal,
+            uint256 _interest
+        ) = V2Calculations.calculateAmountOwed(
+                __bid,
+                _lastRepaidTimestamp,
+                _timestamp,
+                PaymentCycleType.Seconds
+        );
+
+
+        assertEq(
+            _owedPrincipal,
+            _principal - _repaidPrincipal,
+            "Last cycle EMI owed principal incorrect"
+        );
+         assertEq(
+            _duePrincipal,
+            _principal - _repaidPrincipal,
+            "Last cycle EMI due principal incorrect"
+        );
+
+         assertEq(
+            _interest,
+            2486301368,
+            "Last cycle EMI interest incorrect"
+        );
+
+    }
 }

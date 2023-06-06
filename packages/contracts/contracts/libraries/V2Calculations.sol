@@ -7,6 +7,8 @@ import "./NumbersLib.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import { Bid } from "../TellerV2Storage.sol";
 
+import "forge-std/console.sol";
+
 enum PaymentType {
     EMI,
     Bullet
@@ -105,21 +107,29 @@ library V2Calculations {
                 duePrincipal_ = owedPrincipal_;
             }
         } else {
+            console.log("isLastPaymentCycle", isLastPaymentCycle);
             // Default to PaymentType.EMI
             // Max payable amount in a cycle
             // NOTE: the last cycle could have less than the calculated payment amount
-          /*  uint256 maxCycleOwed = isLastPaymentCycle
+            uint256 maxCycleOwed = isLastPaymentCycle
                 ? owedPrincipal_ + interest_
                 : _bid.terms.paymentCycleAmount;
+
+                console.logUint(maxCycleOwed); //8525114154
 
             // Calculate accrued amount due since last repayment
             uint256 owedAmount = (maxCycleOwed * owedTime) /
                 _bid.terms.paymentCycle;
-            duePrincipal_ = Math.min(owedAmount - interest_, owedPrincipal_);*/
 
-               duePrincipal_ = isLastPaymentCycle 
+                console.logUint(owedAmount); //     7847776317 
+                console.logUint(interest_); //     191780821
+                console.logUint(owedPrincipal_); //8333333333
+
+            duePrincipal_ = Math.min(owedAmount - interest_, owedPrincipal_);
+
+           /*    duePrincipal_ = isLastPaymentCycle 
                 ? owedPrincipal_ 
-                : (_bid.terms.paymentCycleAmount * owedTime) / _bid.terms.paymentCycle;
+                : (_bid.terms.paymentCycleAmount * owedTime) / _bid.terms.paymentCycle;*/
         }
     }
 

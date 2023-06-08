@@ -10,6 +10,10 @@ import "../contracts/TellerV2.sol";
 import { Bid } from "../contracts/TellerV2Storage.sol";
 import { PaymentType } from "../contracts/libraries/V2Calculations.sol";
 
+
+import "forge-std/console.sol";
+
+
 contract V2Calculations_Test is Testable {
     using Arrays for uint256[];
     using EnumerableSet for EnumerableSet.UintSet;
@@ -42,18 +46,39 @@ contract V2Calculations_Test is Testable {
 
 
     /*
-    Why does this not pass ? 
-    function test_01_calculateAmountOwed() public {
-        cyclesToSkip.add(2);
-        cyclesWithExtraPayments = [3, 4];
-        cyclesWithExtraPaymentsAmounts = [25000e6, 25000e6];
+
+
+    the _runner should accept the cycles to skip and extra payments as INPUT  ARGS
+    and it should return a TUPLE of the number of cycles that happened ! 
+
+    */
+
+    
+   // Why does this not pass ? 
+
+    function test_baseline_calculateAmountOwed() public {
+        
 
         calculateAmountOwed_runner(
-            18,
+            36, //the number of payment cycles expected
             PaymentType.EMI,
             PaymentCycleType.Seconds
         );
-    }*/
+    }
+
+    function test_01_calculateAmountOwed() public {
+        cyclesToSkip.add(2);//we dont make a payment in cycle 2   --- rename to 'missed payments' 
+        cyclesWithExtraPayments = [3, 4];
+        cyclesWithExtraPaymentsAmounts = [25000e6, 25000e6];
+
+
+    //why is it saying that its taking 19 ? 
+        calculateAmountOwed_runner(
+            18, //the number of payment cycles expected
+            PaymentType.EMI,
+            PaymentCycleType.Seconds
+        );
+    }
 
     // EMI loan
     function test_02_calculateAmountOwed() public {
@@ -195,6 +220,13 @@ contract V2Calculations_Test is Testable {
             uint256 interest;
             (owedPrincipal, duePrincipal, interest) = V2Calculations
                 .calculateAmountOwed(__bid, nowTimestamp, _paymentCycleType);
+
+
+            console.logUint(cycleIndex);
+            console.logUint(owedPrincipal);
+            console.logUint(duePrincipal);
+            console.logUint(interest);
+
 
             // Check if we should skip this cycle for payments
             if (cyclesToSkip.length() > 0) {

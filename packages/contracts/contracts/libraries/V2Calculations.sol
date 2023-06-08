@@ -111,16 +111,24 @@ library V2Calculations {
             // Default to PaymentType.EMI
             // Max payable amount in a cycle
             // NOTE: the last cycle could have less than the calculated payment amount
-            uint256 maxCycleOwed = isLastPaymentCycle
-                ? owedPrincipal_ + interest_  //you owe everything you didnt pay off so far 
-                : _bid.terms.paymentCycleAmount;
+            uint256 maxCycleOwed =  _bid.terms.paymentCycleAmount;
 
                 console.logUint(maxCycleOwed); //8525114154
 
             // Calculate accrued amount due since last repayment
 
             // This is based on the current immediate timestamp  -- i think this was wrong 
-            uint256 owedAmount = maxCycleOwed;
+          //  uint256 owedAmount = maxCycleOwed;
+
+          //This should be rounded to the nearest full cycle
+          //This should not be based on time but should be based on cycle 
+             uint256 owedAmount = (maxCycleOwed * owedTime) /  _bid.terms.paymentCycle;
+
+            if(isLastPaymentCycle){
+                owedAmount = owedPrincipal_ + interest_;
+            }
+             
+
 
                 console.logUint(owedAmount); //     7847776317 
                 console.logUint(interest_); //     191780821

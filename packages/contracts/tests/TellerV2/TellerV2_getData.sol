@@ -307,7 +307,7 @@ contract TellerV2_initialize is Testable {
 
         Payment memory amountDue = tellerV2.calculateAmountDue(bidId);
 
-        assertEq(amountDue.principal, 10);
+        assertEq(amountDue.principal, 2);
     }
 
     function test_calculateAmountDue_without_timestamp_not_accepted() public {

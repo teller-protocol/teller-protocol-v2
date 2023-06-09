@@ -428,11 +428,26 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         Collateral memory _collateralInfo
     ) internal virtual {
         CollateralInfo storage collateral = _bidCollaterals[_bidId];
+      
+      
+        require(
+            !collateral.collateralAddresses.contains(
+                _collateralInfo._collateralAddress
+            ),
+            "Cannot commit multiple collateral with the same address"
+        );
+        require(
+            _collateralInfo._collateralType != CollateralType.ERC721 ||
+                _collateralInfo._amount == 1,
+            "ERC721 collateral must have amount of 1"
+        );
+      
+      
         collateral.collateralAddresses.add(_collateralInfo._collateralAddress);
         collateral.collateralInfo[
             _collateralInfo._collateralAddress
         ] = _collateralInfo;
-        emit CollateralCommitted(
+        emit CollateralCommitted( 
             _bidId,
             _collateralInfo._collateralType,
             _collateralInfo._collateralAddress,

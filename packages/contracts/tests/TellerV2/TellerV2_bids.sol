@@ -371,6 +371,7 @@ contract TellerV2_bids_test is Testable {
         tellerV2.setMockMsgSenderForMarket(address(this));
 
         tellerV2.mock_setBidState(bidId, BidState.PENDING);
+        tellerV2.mock_setBidExpirationTime(bidId, 500);
 
         tellerV2.setMarketRegistrySuper(address(marketRegistryMock));
         marketRegistryMock.setMarketFeeRecipient(address(feeRecipient));

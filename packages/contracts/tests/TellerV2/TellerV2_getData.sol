@@ -760,9 +760,10 @@ contract TellerV2_initialize is Testable {
         uint256 bidId = 1;
         setMockBid(1);
 
+        //Realized that we should be mock setting bid expiration time here not default time ! 
         tellerV2.mock_setBidState(bidId, BidState.PENDING);
-        tellerV2.mock_setBidDefaultDuration(bidId, 500);
-
+        tellerV2.mock_setBidExpirationTime(bidId, 500);
+     
         bool is_exp = tellerV2.isLoanExpired(bidId);
         assertEq(is_exp, false, "unexpected expiration status");
     }
@@ -772,12 +773,12 @@ contract TellerV2_initialize is Testable {
         setMockBid(1);
 
         tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
-        tellerV2.mock_setBidDefaultDuration(bidId, 500);
+        tellerV2.mock_setBidExpirationTime(bidId, 500);
 
         vm.warp(1e10);
 
         bool is_exp = tellerV2.isLoanExpired(bidId);
-        assertEq(is_exp, false, "unexpected expiration status");
+        assertEq(is_exp, true, "unexpected expiration status");
     }
 
     function test_isLoanExpired_zero_default_duration() public {
@@ -785,12 +786,12 @@ contract TellerV2_initialize is Testable {
         setMockBid(1);
 
         tellerV2.mock_setBidState(bidId, BidState.PENDING);
-        tellerV2.mock_setBidDefaultDuration(bidId, 0);
+        tellerV2.mock_setBidExpirationTime(bidId, 0);
 
         vm.warp(1e10);
 
         bool is_exp = tellerV2.isLoanExpired(bidId);
-        assertEq(is_exp, false, "unexpected expiration status");
+        assertEq(is_exp, true, "unexpected expiration status");
     }
 }
 

@@ -1001,8 +1001,8 @@ contract TellerV2 is
     function isLoanExpired(uint256 _bidId) public view returns (bool) {
         Bid storage bid = bids[_bidId];
 
-        if (bid.state != BidState.PENDING) return false;
-        if (bidExpirationTime[_bidId] == 0) return false;
+        if (bid.state != BidState.PENDING) return true;
+        if (bidExpirationTime[_bidId] == 0) return true;
 
         return (uint32(block.timestamp) >
             bid.loanDetails.timestamp + bidExpirationTime[_bidId]);

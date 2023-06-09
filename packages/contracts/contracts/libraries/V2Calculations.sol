@@ -6,8 +6,7 @@ pragma solidity >=0.8.0 <0.9.0;
 import "./NumbersLib.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import { Bid } from "../TellerV2Storage.sol";
-
-import "forge-std/console.sol";
+ 
 
 enum PaymentType {
     EMI,
@@ -107,33 +106,19 @@ library V2Calculations {
                 duePrincipal_ = owedPrincipal_;
             }
         } else {
-            console.log("isLastPaymentCycle", isLastPaymentCycle);
+           
             // Default to PaymentType.EMI
             // Max payable amount in a cycle
             // NOTE: the last cycle could have less than the calculated payment amount
             uint256 maxCycleOwed =  _bid.terms.paymentCycleAmount;
 
-                console.logUint(maxCycleOwed); //8525114154
+           
 
-            // Calculate accrued amount due since last repayment
-
-            // This is based on the current immediate timestamp  -- i think this was wrong 
-          //  uint256 owedAmount = maxCycleOwed;
-
-          //This should be rounded to the nearest full cycle
-          //This should not be based on time but should be based on cycle 
-             uint256 owedAmount = (maxCycleOwed * owedTime) /  _bid.terms.paymentCycle;
-
-            if(isLastPaymentCycle){
-                owedAmount = owedPrincipal_ + interest_;
-            }
+            uint256 owedAmount = isLastPaymentCycle ? 
+            owedPrincipal_ + interest_ :
+             (maxCycleOwed * owedTime) / _bid.terms.paymentCycle;
              
-
-
-                console.logUint(owedAmount); //     7847776317 
-                console.logUint(interest_); //     191780821
-                console.logUint(owedPrincipal_); //8333333333
-
+ 
             duePrincipal_ = Math.min(owedAmount - interest_, owedPrincipal_);
 
            /*    duePrincipal_ = isLastPaymentCycle 

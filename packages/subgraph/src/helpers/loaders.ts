@@ -50,6 +50,7 @@ export enum TokenType {
   ERC721,
   ERC1155
 }
+
 export function getTokenTypeString(type: TokenType): string | null {
   switch (type) {
     case TokenType.UNKNOWN:
@@ -64,6 +65,7 @@ export function getTokenTypeString(type: TokenType): string | null {
       return null;
   }
 }
+
 function supportsInterface(address: Address, interfaceId: string): boolean {
   const erc165Instance = ERC165.bind(address);
   const result = erc165Instance.try_supportsInterface(
@@ -416,7 +418,23 @@ export function loadCollateralTokenVolume(
   tokenVolume: TokenVolume,
   collateralToken: Token | null
 ): TokenVolume {
-  const collateralTokenId = collateralToken ? collateralToken.id : null;
+  let collateralTokenId: string | null = null;
+  if (collateralToken) {
+    if (collateralToken.nftId === null) {
+      collateralTokenId = collateralToken.id;
+    } else {
+      // If the collateral token is an NFT, we want to make sure a token entity
+      // for the NFT's address so that we can track the volume of all NFTs of
+      // the same collection.
+
+      const nftToken = Token.load(collateralToken.id)!;
+      nftToken.id = collateralToken.address.toHex();
+      nftToken.nftId = null;
+      nftToken.save();
+
+      collateralTokenId = nftToken.id;
+    }
+  }
 
   let protocolCollateralId: string | null = null;
   if (tokenVolume.protocol) {

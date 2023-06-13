@@ -2,8 +2,8 @@
   "network": "goerli",
   "grafting": {
     "enabled": true,
-    "base": "QmenVHEV1jvDySXDt1RziYQG2Xf5aoWDT1V7Mj9V7Zyma2",
-    "block": "9103442"
+    "base": "QmRUA6qarX682evX8Utgu3wP4u4BbdkuMAzJhx6RkCx3wH",
+    "block": "9109155"
   },
   "block_handler": {
     "enabled": true,

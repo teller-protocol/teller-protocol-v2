@@ -102,14 +102,14 @@ export function updateLenderCommitment(
       case CollateralTokenType.ERC20:
         tokenType = TokenType.ERC20;
         break;
-      case CollateralTokenType.ERC721_ANY_ID:
-        nftId = lenderCommitment.value5;
       case CollateralTokenType.ERC721:
+        nftId = lenderCommitment.value5;
+      case CollateralTokenType.ERC721_ANY_ID:
         tokenType = TokenType.ERC721;
         break;
-      case CollateralTokenType.ERC1155_ANY_ID:
-        nftId = lenderCommitment.value5;
       case CollateralTokenType.ERC1155:
+        nftId = lenderCommitment.value5;
+      case CollateralTokenType.ERC1155_ANY_ID:
         tokenType = TokenType.ERC1155;
         break;
     }

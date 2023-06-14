@@ -258,7 +258,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
        
     }
 
- /**
+    /**
      * @notice Withdraws deposited collateral from the created escrow of a bid that has been CLOSED after being defaulted.
      * @param _bidId The id of the bid to withdraw collateral for.
      */

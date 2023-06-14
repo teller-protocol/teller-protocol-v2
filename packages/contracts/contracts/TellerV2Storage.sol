@@ -15,7 +15,8 @@ enum BidState {
     CANCELLED,
     ACCEPTED,
     PAID,
-    LIQUIDATED
+    LIQUIDATED,
+    CLOSED
 }
 
 /**

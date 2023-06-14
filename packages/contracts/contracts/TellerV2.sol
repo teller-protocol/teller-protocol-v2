@@ -678,6 +678,7 @@ contract TellerV2 is
     {
         require(isLoanDefaulted(_bidId),"Loan must be defaulted.");
 
+        Bid storage bid = bids[_bidId];
         bid.state = BidState.CLOSED;
 
         collateralManager.lenderClaimCollateral(_bidId); 

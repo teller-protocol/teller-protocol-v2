@@ -620,6 +620,29 @@ contract TellerV2 is
         );
     }
 
+
+      /**
+     * @notice Function for users to repay an active loan in full.
+     * @param _bidId The id of the loan to make the payment towards.
+     */
+    function repayLoanFullWithoutCollateralWithdraw(uint256 _bidId)
+        external
+        acceptedLoan(_bidId, "repayLoan")
+    {
+        (uint256 owedPrincipal, , uint256 interest) = V2Calculations
+            .calculateAmountOwed(
+                bids[_bidId],
+                block.timestamp,
+                bidPaymentCycleType[_bidId]
+            );
+        _repayLoan(
+            _bidId,
+            Payment({ principal: owedPrincipal, interest: interest }),
+            owedPrincipal + interest,
+            false
+        );
+    }
+
     // function that the borrower (ideally) sends to repay the loan
     /**
      * @notice Function for users to make a payment towards an active loan.

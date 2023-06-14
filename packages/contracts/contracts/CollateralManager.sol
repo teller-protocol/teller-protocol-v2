@@ -249,13 +249,28 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
      */
     function withdraw(uint256 _bidId) external {
         BidState bidState = tellerV2.getBidState(_bidId);
-        if (bidState == BidState.PAID) {
-            _withdraw(_bidId, tellerV2.getLoanBorrower(_bidId));
-        } else if (tellerV2.isLoanDefaulted(_bidId)) {
+
+        require(bidState == BidState.PAID);
+ 
+        _withdraw(_bidId, tellerV2.getLoanBorrower(_bidId));    
+        
+        emit CollateralClaimed(_bidId);
+       
+    }
+
+
+    function lenderClaimCollateral(uint256 _bidId)
+    external
+    onlyTellerV2
+    {
+         if (isBidCollateralBacked(_bidId)) {
+            BidState bidState = tellerV2.getBidState(_bidId);
+            require(
+                bidState == BidState.CLOSED,
+                "Loan has not been liquidated"
+            ); 
             _withdraw(_bidId, tellerV2.getLoanLender(_bidId));
             emit CollateralClaimed(_bidId);
-        } else {
-            revert("collateral cannot be withdrawn");
         }
     }
 

@@ -668,6 +668,18 @@ contract TellerV2 is
         _unpause();
     }
 
+
+    function lenderClaimCollateralFull(uint256 _bidId)
+        external
+        acceptedLoan(_bidId, "lenderClaimCollateral")
+    {
+        require(isLoanDefaulted(_bidId),"Loan must be defaulted.");
+
+        bid.state = BidState.CLOSED;
+
+        collateralManager.lenderClaimCollateral(_bidId); 
+    }
+
     //TODO: add an incentive for liquidator
     /**
      * @notice Function for users to liquidate a defaulted loan.

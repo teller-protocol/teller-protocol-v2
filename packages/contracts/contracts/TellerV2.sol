@@ -621,27 +621,7 @@ contract TellerV2 is
     }
 
 
-      /**
-     * @notice Function for users to repay an active loan in full.
-     * @param _bidId The id of the loan to make the payment towards.
-     */
-    function repayLoanFullWithoutCollateralWithdraw(uint256 _bidId)
-        external
-        acceptedLoan(_bidId, "repayLoan")
-    {
-        (uint256 owedPrincipal, , uint256 interest) = V2Calculations
-            .calculateAmountOwed(
-                bids[_bidId],
-                block.timestamp,
-                bidPaymentCycleType[_bidId]
-            );
-        _repayLoan(
-            _bidId,
-            Payment({ principal: owedPrincipal, interest: interest }),
-            owedPrincipal + interest,
-            false
-        );
-    }
+   
 
     // function that the borrower (ideally) sends to repay the loan
     /**
@@ -676,6 +656,58 @@ contract TellerV2 is
             true
         );
     }
+
+
+     /**
+     * @notice Function for users to repay an active loan in full.
+     * @param _bidId The id of the loan to make the payment towards.
+     */
+    function repayLoanFullWithoutCollateralWithdraw(uint256 _bidId)
+        external
+        acceptedLoan(_bidId, "repayLoan")
+    {
+        (uint256 owedPrincipal, , uint256 interest) = V2Calculations
+            .calculateAmountOwed(
+                bids[_bidId],
+                block.timestamp,
+                bidPaymentCycleType[_bidId]
+            );
+        _repayLoan(
+            _bidId,
+            Payment({ principal: owedPrincipal, interest: interest }),
+            owedPrincipal + interest,
+            false
+        );
+    }
+
+      function repayLoanWithoutCollateralWithdraw(uint256 _bidId, uint256 _amount)
+        external
+        acceptedLoan(_bidId, "repayLoan")
+    {
+        (
+            uint256 owedPrincipal,
+            uint256 duePrincipal,
+            uint256 interest
+        ) = V2Calculations.calculateAmountOwed(
+                bids[_bidId],
+                block.timestamp,
+                bidPaymentCycleType[_bidId]
+            );
+        uint256 minimumOwed = duePrincipal + interest;
+
+        // If amount is less than minimumOwed, we revert
+        if (_amount < minimumOwed) {
+            revert PaymentNotMinimum(_bidId, _amount, minimumOwed);
+        }
+
+        _repayLoan(
+            _bidId,
+            Payment({ principal: _amount - interest, interest: interest }),
+            owedPrincipal + interest,
+            false
+        );
+    }
+
 
     /**
      * @notice Lets the DAO/owner of the protocol implement an emergency stop mechanism.

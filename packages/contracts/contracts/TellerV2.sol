@@ -668,7 +668,10 @@ contract TellerV2 is
         _unpause();
     }
 
-
+   /**
+     * @notice Function for lender to liquidate a defaulted loan.
+     * @param _bidId The id of the loan to set to CLOSED status.
+     */
     function lenderClaimCollateralFull(uint256 _bidId)
         external
         acceptedLoan(_bidId, "lenderClaimCollateral")
@@ -679,8 +682,7 @@ contract TellerV2 is
 
         collateralManager.lenderClaimCollateral(_bidId); 
     }
-
-    //TODO: add an incentive for liquidator
+ 
     /**
      * @notice Function for users to liquidate a defaulted loan.
      * @param _bidId The id of the loan to make the payment towards.

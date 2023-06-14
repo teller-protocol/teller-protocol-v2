@@ -655,7 +655,6 @@ contract TellerV2_bids_test is Testable {
         tellerV2.repayLoanFull(bidId);
     }
 
-
     function test_lender_close_loan() public {
         uint256 bidId = 1;
         setMockBid(bidId);
@@ -677,9 +676,8 @@ contract TellerV2_bids_test is Testable {
 
         // make sure the state is now CLOSED
 
-       // assertTrue(tellerV2.clWasCalled(), "repay loan was not called");
+        // assertTrue(tellerV2.clWasCalled(), "repay loan was not called");
     }
-
 
     function test_liquidate_loan_full() public {
         uint256 bidId = 1;

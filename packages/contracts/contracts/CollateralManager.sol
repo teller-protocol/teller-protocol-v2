@@ -251,27 +251,23 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         BidState bidState = tellerV2.getBidState(_bidId);
 
         require(bidState == BidState.PAID, "collateral cannot be withdrawn");
- 
-        _withdraw(_bidId, tellerV2.getLoanBorrower(_bidId));    
-        
+
+        _withdraw(_bidId, tellerV2.getLoanBorrower(_bidId));
+
         emit CollateralClaimed(_bidId);
-       
     }
 
     /**
      * @notice Withdraws deposited collateral from the created escrow of a bid that has been CLOSED after being defaulted.
      * @param _bidId The id of the bid to withdraw collateral for.
      */
-    function lenderClaimCollateral(uint256 _bidId)
-    external
-    onlyTellerV2
-    {
-         if (isBidCollateralBacked(_bidId)) {
+    function lenderClaimCollateral(uint256 _bidId) external onlyTellerV2 {
+        if (isBidCollateralBacked(_bidId)) {
             BidState bidState = tellerV2.getBidState(_bidId);
             require(
                 bidState == BidState.CLOSED,
                 "Loan has not been liquidated"
-            ); 
+            );
             _withdraw(_bidId, tellerV2.getLoanLender(_bidId));
             emit CollateralClaimed(_bidId);
         }

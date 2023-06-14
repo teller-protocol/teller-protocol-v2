@@ -82,11 +82,7 @@ contract CollateralManagerMock is ICollateralManager {
         return true;
     }
 
-    function lenderClaimCollateral(uint256 _bidId)
-    external
-    {
-       
-    }
+    function lenderClaimCollateral(uint256 _bidId) external {}
 
     /**
      * @notice Sends the deposited collateral to a liquidator of a bid.

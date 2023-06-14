@@ -677,7 +677,7 @@ contract TellerV2_bids_test is Testable {
 
         // make sure the state is now CLOSED
 
-      //  assertTrue(tellerV2.clWasCalled(), "repay loan was not called");
+       // assertTrue(tellerV2.clWasCalled(), "repay loan was not called");
     }
 
 

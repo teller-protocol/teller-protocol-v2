@@ -526,15 +526,29 @@ contract CollateralManager_Test is Testable {
         );
     }
 
-    function test_withdraw_external_state_defaulted() public {
+    function test_lenderClaimCollateral_invalid_sender() public {
+        uint256 bidId = 0;
+
+        tellerV2Mock.setGlobalBidState(BidState.CLOSED);
+
+        vm.expectRevert("Sender not authorized");
+        collateralManager.lenderClaimCollateral(bidId);
+    }
+
+    function test_lenderClaimCollateral() public {
         uint256 bidId = 0;
 
         tellerV2Mock.setLender(address(lender));
-        tellerV2Mock.setBidsDefaultedGlobally(true);
+        //tellerV2Mock.setBidsDefaultedGlobally(true);
+
+        tellerV2Mock.setGlobalBidState(BidState.CLOSED);
+        collateralManager.setBidsCollateralBackedGlobally(true);
+
 
         vm.expectEmit(true, false, false, false);
         emit CollateralClaimed(bidId);
-        collateralManager.withdraw(bidId);
+        vm.prank(address(tellerV2Mock));
+        collateralManager.lenderClaimCollateral(bidId);
 
         assertEq(
             collateralManager.withdrawInternalWasCalledToRecipient(),

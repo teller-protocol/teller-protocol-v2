@@ -669,10 +669,10 @@ contract TellerV2 is
     }
 
    /**
-     * @notice Function for lender to liquidate a defaulted loan.
+     * @notice Function for lender to claim collateral for a defaulted loan. The only purpose of a CLOSED loan is to make collateral claimable by lender.
      * @param _bidId The id of the loan to set to CLOSED status.
      */
-    function lenderClaimCollateralFull(uint256 _bidId)
+    function lenderCloseLoan(uint256 _bidId)
         external
         acceptedLoan(_bidId, "lenderClaimCollateral")
     {

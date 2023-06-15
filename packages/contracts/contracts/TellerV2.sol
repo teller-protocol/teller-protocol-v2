@@ -594,7 +594,8 @@ contract TellerV2 is
             _bidId,
             Payment({ principal: duePrincipal, interest: interest }),
             owedPrincipal + interest,
-            true
+            true,
+            false
         );
     }
 
@@ -616,7 +617,8 @@ contract TellerV2 is
             _bidId,
             Payment({ principal: owedPrincipal, interest: interest }),
             owedPrincipal + interest,
-            true
+            true,
+            false
         );
     }
 
@@ -650,6 +652,37 @@ contract TellerV2 is
             _bidId,
             Payment({ principal: _amount - interest, interest: interest }),
             owedPrincipal + interest,
+            true,
+            false
+        );
+    }
+
+    // function that the borrower  to repay the loan to an escrow account for the lender, without withdrawing collateral
+    function repayLoanToEscrow(uint256 _bidId, uint256 _amount)
+        external
+        acceptedLoan(_bidId, "repayLoan")
+    {
+        (
+            uint256 owedPrincipal,
+            uint256 duePrincipal,
+            uint256 interest
+        ) = V2Calculations.calculateAmountOwed(
+                bids[_bidId],
+                block.timestamp,
+                bidPaymentCycleType[_bidId]
+            );
+        uint256 minimumOwed = duePrincipal + interest;
+
+        // If amount is less than minimumOwed, we revert
+        if (_amount < minimumOwed) {
+            revert PaymentNotMinimum(_bidId, _amount, minimumOwed);
+        }
+
+        _repayLoanToEscrow(
+            _bidId,
+            Payment({ principal: _amount - interest, interest: interest }),
+            owedPrincipal + interest,
+            false,
             true
         );
     }
@@ -713,7 +746,8 @@ contract TellerV2 is
         uint256 _bidId,
         Payment memory _payment,
         uint256 _owedAmount,
-        bool _shouldWithdrawCollateral
+        bool _shouldWithdrawCollateral,
+        bool _payToEscrow
     ) internal virtual {
         Bid storage bid = bids[_bidId];
         uint256 paymentAmount = _payment.principal + _payment.interest;
@@ -743,12 +777,32 @@ contract TellerV2 is
 
         address lender = getLoanLender(_bidId);
 
+        if( _payToEscrow ){
+
+            bid.loanDetails.lendingToken.safeTransferFrom(
+                _msgSenderForMarket(bid.marketplaceId),
+                escrowVault,
+                paymentAmount
+            );
+
+            IEscrowVault(escrowVault).increaseBalance( 
+                lender,
+                address(bid.loanDetails.lendingToken),
+                paymentAmount
+            );
+                
+        
+        }else{
+        
+
         // Send payment to the lender
         bid.loanDetails.lendingToken.safeTransferFrom(
             _msgSenderForMarket(bid.marketplaceId),
             lender,
             paymentAmount
         );
+        }
+
 
         // update our mappings
         bid.loanDetails.totalRepaid.principal += _payment.principal;

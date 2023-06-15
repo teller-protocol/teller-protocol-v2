@@ -606,22 +606,10 @@ contract TellerV2 is
         external
         acceptedLoan(_bidId, "repayLoan")
     {
-        (uint256 owedPrincipal, , uint256 interest) = V2Calculations
-            .calculateAmountOwed(
-                bids[_bidId],
-                block.timestamp,
-                bidPaymentCycleType[_bidId]
-            );
-        _repayLoan(
-            _bidId,
-            Payment({ principal: owedPrincipal, interest: interest }),
-            owedPrincipal + interest,
-            true
-        );
+       
+        _repayLoanFull(_bidId, true);
     }
-
-
-   
+ 
 
     // function that the borrower (ideally) sends to repay the loan
     /**
@@ -633,28 +621,9 @@ contract TellerV2 is
         external
         acceptedLoan(_bidId, "repayLoan")
     {
-        (
-            uint256 owedPrincipal,
-            uint256 duePrincipal,
-            uint256 interest
-        ) = V2Calculations.calculateAmountOwed(
-                bids[_bidId],
-                block.timestamp,
-                bidPaymentCycleType[_bidId]
-            );
-        uint256 minimumOwed = duePrincipal + interest;
+       
 
-        // If amount is less than minimumOwed, we revert
-        if (_amount < minimumOwed) {
-            revert PaymentNotMinimum(_bidId, _amount, minimumOwed);
-        }
-
-        _repayLoan(
-            _bidId,
-            Payment({ principal: _amount - interest, interest: interest }),
-            owedPrincipal + interest,
-            true
-        );
+        _repayLoanAtleastMinimum(_bidId,_amount,true);
     }
 
 
@@ -666,7 +635,25 @@ contract TellerV2 is
         external
         acceptedLoan(_bidId, "repayLoan")
     {
-        (uint256 owedPrincipal, , uint256 interest) = V2Calculations
+     
+        _repayLoanFull(_bidId,false);
+    }
+
+   
+
+    function repayLoanWithoutCollateralWithdraw(uint256 _bidId, uint256 _amount)
+        external
+        acceptedLoan(_bidId, "repayLoan")
+    {
+       _repayLoanAtleastMinimum(_bidId,_amount,false);
+    }
+
+
+
+    function _repayLoanFull(uint256 _bidId, bool withdrawCollateral)
+        internal
+    {
+         (uint256 owedPrincipal, , uint256 interest) = V2Calculations
             .calculateAmountOwed(
                 bids[_bidId],
                 block.timestamp,
@@ -676,15 +663,15 @@ contract TellerV2 is
             _bidId,
             Payment({ principal: owedPrincipal, interest: interest }),
             owedPrincipal + interest,
-            false
+            withdrawCollateral
         );
     }
 
-      function repayLoanWithoutCollateralWithdraw(uint256 _bidId, uint256 _amount)
-        external
-        acceptedLoan(_bidId, "repayLoan")
+
+    function _repayLoanAtleastMinimum(uint256 _bidId, uint256 _amount, bool withdrawCollateral )
+        internal 
     {
-        (
+    (
             uint256 owedPrincipal,
             uint256 duePrincipal,
             uint256 interest
@@ -704,7 +691,7 @@ contract TellerV2 is
             _bidId,
             Payment({ principal: _amount - interest, interest: interest }),
             owedPrincipal + interest,
-            false
+            withdrawCollateral
         );
     }
 

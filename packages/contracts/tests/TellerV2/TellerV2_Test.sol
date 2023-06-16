@@ -29,6 +29,7 @@ import { BidState, Payment } from "../../contracts/TellerV2Storage.sol";
 
 import "../../contracts/MetaForwarder.sol";
 import { LenderManager } from "../../contracts/LenderManager.sol";
+import { EscrowVault } from "../../contracts/EscrowVault.sol";
 
 contract TellerV2_Test is Testable {
     TellerV2User private marketOwner;
@@ -76,6 +77,9 @@ contract TellerV2_Test is Testable {
         lenderManager.initialize();
         lenderManager.transferOwnership(address(tellerV2));
 
+        EscrowVault escrowVault = new EscrowVault();
+        escrowVault.initialize(address(tellerV2));
+
         // Deploy LenderCommitmentForwarder
         LenderCommitmentForwarder lenderCommitmentForwarder = new LenderCommitmentForwarder(
                 address(tellerV2),
@@ -89,7 +93,8 @@ contract TellerV2_Test is Testable {
             address(reputationManager),
             address(lenderCommitmentForwarder),
             address(collateralManager),
-            address(lenderManager)
+            address(lenderManager),
+            address(escrowVault)
         );
 
         // Instantiate users & balances

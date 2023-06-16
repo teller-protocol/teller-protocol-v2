@@ -761,24 +761,33 @@ contract TellerV2 is
         try 
             //first try to pay directly
             //have to use transfer from  (not safe transfer from) for try/catch statement
-            bid.loanDetails.lendingToken.transferFrom(
+            //dont try to use any more than 100k gas for this xfer 
+            bid.loanDetails.lendingToken.transferFrom{gas:100000}(
                     _msgSenderForMarket(bid.marketplaceId),
                     lender,
-                    paymentAmount
+                    paymentAmount) 
 
-        )  {} catch {
+         {} catch {
+
+                address sender = _msgSenderForMarket(bid.marketplaceId);
+
+                uint256 balanceBefore = bid.loanDetails.lendingToken.balanceOf(sender);
             
-            //if unable, pay to escrow
+                 //if unable, pay to escrow
                 bid.loanDetails.lendingToken.safeTransferFrom(
-                    _msgSenderForMarket(bid.marketplaceId),
+                    sender,
                     address(escrowVault),
                     paymentAmount
                 );
 
+                uint256 balanceAfter = bid.loanDetails.lendingToken.balanceOf(sender);
+            
+
+
                 IEscrowVault(escrowVault).increaseBalance( 
                     lender,
                     address(bid.loanDetails.lendingToken),
-                    paymentAmount
+                    balanceAfter - balanceBefore //used for fee-on-send tokens
                 );
 
         }

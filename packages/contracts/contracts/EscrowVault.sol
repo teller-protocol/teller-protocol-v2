@@ -37,11 +37,7 @@ contract EscrowVault is
     //account => token => balance
     mapping( address => mapping( address => uint256 ))  public balances;
 
-     /* Modifiers */
-    modifier onlyTellerV2() {
-        require(_msgSender() == address(tellerV2), "Sender not authorized");
-        _;
-    }
+   
  
     constructor( )  { }
 

@@ -23,7 +23,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 
 // Interfaces
 import "./interfaces/IEscrowVault.sol";
-import "./interfaces/ITellerV2.sol"; 
+ 
 
 contract EscrowVault is
     Initializable,
@@ -33,8 +33,7 @@ contract EscrowVault is
 {
 
     using SafeERC20 for ERC20;
-    ITellerV2 public tellerV2;
-
+   
     //account => token => balance
     mapping( address => mapping( address => uint256 ))  public balances;
 
@@ -47,7 +46,7 @@ contract EscrowVault is
     constructor( )  { }
 
     function initialize( address _tellerV2 ) external initializer {
-        tellerV2 = ITellerV2(_tellerV2);
+        
          __Ownable_init_unchained();
     }
  
@@ -64,7 +63,7 @@ contract EscrowVault is
         )
         public
         override
-        onlyTellerV2
+        onlyOwner
     {
         balances[account][token] += amount;         
     }

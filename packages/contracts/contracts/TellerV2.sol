@@ -15,6 +15,7 @@ import "./interfaces/IMarketRegistry.sol";
 import "./interfaces/IReputationManager.sol";
 import "./interfaces/ITellerV2.sol";
 import { Collateral } from "./interfaces/escrow/ICollateralEscrowV1.sol";
+import "./interfaces/IEscrowVault.sol";
 
 // Libraries
 import "@openzeppelin/contracts/utils/Address.sol";
@@ -176,7 +177,8 @@ contract TellerV2 is
         address _reputationManager,
         address _lenderCommitmentForwarder,
         address _collateralManager,
-        address _lenderManager
+        address _lenderManager,
+        address _escrowVault
     ) external initializer {
         __ProtocolFee_init(_protocolFee);
 
@@ -205,6 +207,14 @@ contract TellerV2 is
             "CollateralManager must be a contract"
         );
         collateralManager = ICollateralManager(_collateralManager);
+
+        require(
+            _escrowVault.isContract(),
+            "EscrowVault must be a contract"
+        );
+        escrowVault = IEscrowVault(_escrowVault);
+
+
 
         _setLenderManager(_lenderManager);
     }
@@ -750,7 +760,8 @@ contract TellerV2 is
 
         try 
             //first try to pay directly
-            bid.loanDetails.lendingToken.safeTransferFrom(
+            //have to use transfer from  (not safe transfer from) for try/catch statement
+            bid.loanDetails.lendingToken.transferFrom(
                     _msgSenderForMarket(bid.marketplaceId),
                     lender,
                     paymentAmount
@@ -760,7 +771,7 @@ contract TellerV2 is
             //if unable, pay to escrow
                 bid.loanDetails.lendingToken.safeTransferFrom(
                     _msgSenderForMarket(bid.marketplaceId),
-                    escrowVault,
+                    address(escrowVault),
                     paymentAmount
                 );
 

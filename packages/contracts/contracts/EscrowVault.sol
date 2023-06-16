@@ -44,9 +44,7 @@ contract EscrowVault is
         _;
     }
  
-    constructor(IMarketRegistry _marketRegistry) {
-        marketRegistry = _marketRegistry;
-    }
+    constructor( )  { }
 
     function initialize( address _tellerV2 ) external initializer {
         tellerV2 = ITellerV2(_tellerV2);

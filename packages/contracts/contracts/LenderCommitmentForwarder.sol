@@ -234,26 +234,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             _commitment.maxPrincipal
         );
     }
-
-    /* function updateCommitmentExpiration( 
-        uint256 _commitmentId,
-        uint32 _expiration
-    ) public commitmentLender(_commitmentId) {
-
-        Commitment _commitment storage = commitments[_commitmentId];
-
-        _commitment.expiration = _expirationt;
-
-        validateCommitment(commitments[_commitmentId]);
-
-        emit UpdatedCommitment(
-            _commitmentId,
-            _commitment.lender,
-            _commitment.marketId,
-            _commitment.principalTokenAddress,
-            _commitment.maxPrincipal
-        );
-    }*/
+ 
 
     /**
      * @notice Updates the borrowers allowed to accept a commitment

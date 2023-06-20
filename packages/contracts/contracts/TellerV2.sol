@@ -965,10 +965,6 @@ contract TellerV2 is
 
         if (defaultDuration == 0) return false;
 
-        //uint32 endOfLoan = bid.loanDetails.acceptedTimestamp +  bid.loanDetails.loanDuration;
-        //uint32 defaultDate = endOfLoan + bidDefaultDuration[_bidId];
-        //In this logic, we should be calculating the default date(s) based relative to a 'due date' and not a 'repaid date' .
-
         return
             uint32(block.timestamp) >
             dueDate + defaultDuration + _additionalDelay;

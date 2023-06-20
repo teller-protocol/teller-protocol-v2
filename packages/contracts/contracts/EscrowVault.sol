@@ -42,14 +42,14 @@ contract EscrowVault is Initializable, ContextUpgradeable, IEscrowVault {
         override
     {
         uint256 balanceBefore = ERC20(token).balanceOf(address(this));
-        ERC20(token).safeTransferFrom(msg.sender, address(this), amount);
+        ERC20(token).safeTransferFrom(_msgSender(), address(this), amount);
         uint256 balanceAfter = ERC20(token).balanceOf(address(this));
 
         balances[account][token] += balanceAfter - balanceBefore; //used for fee-on-transfer tokens
     }
 
     function withdraw(address token, uint256 amount) external {
-        address account = ContextUpgradeable._msgSender();
+        address account = _msgSender();
 
         balances[account][token] -= amount;
         ERC20(token).safeTransfer(account, amount);

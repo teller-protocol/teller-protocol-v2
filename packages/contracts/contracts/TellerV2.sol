@@ -775,12 +775,8 @@ contract TellerV2 is
         } else {
             emit LoanRepayment(_bidId);
         }
- 
 
-        _sendOrEscrowFunds( //send or escrow the funds
-            _bidId,
-            paymentAmount 
-        );
+        _sendOrEscrowFunds(_bidId, paymentAmount); //send or escrow the funds
 
         // update our mappings
         bid.loanDetails.totalRepaid.principal += _payment.principal;
@@ -793,13 +789,13 @@ contract TellerV2 is
         }
     }
 
-    function _sendOrEscrowFunds( uint256 _bidId, uint256 _paymentAmount  )
-    internal 
-    {      
-         Bid storage bid = bids[_bidId];
-         address lender = getLoanLender(_bidId);
+    function _sendOrEscrowFunds(uint256 _bidId, uint256 _paymentAmount)
+        internal
+    {
+        Bid storage bid = bids[_bidId];
+        address lender = getLoanLender(_bidId);
 
-         try
+        try
             //first try to pay directly
             //have to use transfer from  (not safe transfer from) for try/catch statement
             //dont try to use any more than 100k gas for this xfer
@@ -840,7 +836,6 @@ contract TellerV2 is
                 paymentAmountReceived
             );
         }
-
     }
 
     /**

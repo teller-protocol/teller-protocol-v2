@@ -595,6 +595,44 @@ contract CollateralManager_Test is Testable {
         );
     }
 
+    function test_commit_collateral_address_multiple_times() public {
+        uint256 bidId = 0;
+        address recipient = address(borrower);
+
+        wethMock.transfer(address(escrowImplementation), 1000);
+
+        Collateral memory collateralInfo = Collateral({
+            _collateralType: CollateralType.ERC721,
+            _amount: 1,
+            _tokenId: 2,
+            _collateralAddress: address(wethMock)
+        });
+
+        collateralManager._commitCollateralSuper(bidId, collateralInfo);
+
+        vm.expectRevert(
+            "Cannot commit multiple collateral with the same address"
+        );
+        collateralManager._commitCollateralSuper(bidId, collateralInfo);
+    }
+
+    function test_commit_collateral_ERC721_amount_1() public {
+        uint256 bidId = 0;
+        address recipient = address(borrower);
+
+        wethMock.transfer(address(escrowImplementation), 1000);
+
+        Collateral memory collateralInfo = Collateral({
+            _collateralType: CollateralType.ERC721,
+            _amount: 1000,
+            _tokenId: 2,
+            _collateralAddress: address(wethMock)
+        });
+
+        vm.expectRevert("ERC721 collateral must have amount of 1");
+        collateralManager._commitCollateralSuper(bidId, collateralInfo);
+    }
+
     function test_withdraw_internal() public {
         uint256 bidId = 0;
         address recipient = address(borrower);

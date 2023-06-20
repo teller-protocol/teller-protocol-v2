@@ -775,10 +775,31 @@ contract TellerV2 is
         } else {
             emit LoanRepayment(_bidId);
         }
+ 
 
-        address lender = getLoanLender(_bidId);
+        _sendOrEscrowFunds( //send or escrow the funds
+            _bidId,
+            _paymentAmount 
+        );
 
-        try
+        // update our mappings
+        bid.loanDetails.totalRepaid.principal += _payment.principal;
+        bid.loanDetails.totalRepaid.interest += _payment.interest;
+        bid.loanDetails.lastRepaidTimestamp = uint32(block.timestamp);
+
+        // If the loan is paid in full and has a mark, we should update the current reputation
+        if (mark != RepMark.Good) {
+            reputationManager.updateAccountReputation(bid.borrower, _bidId);
+        }
+    }
+
+    function _sendOrEscrowFunds( uint256 _bidId, uint256 _paymentAmount  )
+    internal 
+    {      
+         Bid storage bid = bids[_bidId];
+         address lender = getLoanLender(_bidId);
+
+         try
             //first try to pay directly
             //have to use transfer from  (not safe transfer from) for try/catch statement
             //dont try to use any more than 100k gas for this xfer
@@ -820,15 +841,6 @@ contract TellerV2 is
             );
         }
 
-        // update our mappings
-        bid.loanDetails.totalRepaid.principal += _payment.principal;
-        bid.loanDetails.totalRepaid.interest += _payment.interest;
-        bid.loanDetails.lastRepaidTimestamp = uint32(block.timestamp);
-
-        // If the loan is paid in full and has a mark, we should update the current reputation
-        if (mark != RepMark.Good) {
-            reputationManager.updateAccountReputation(bid.borrower, _bidId);
-        }
     }
 
     /**

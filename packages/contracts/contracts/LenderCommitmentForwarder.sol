@@ -62,7 +62,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
     mapping(uint256 => EnumerableSetUpgradeable.AddressSet)
         internal commitmentBorrowersList;
 
-    mapping(uint256 => uint256) commitmentPrincipalAccepted;
+    mapping(uint256 => uint256) public commitmentPrincipalAccepted;
 
     /**
      * @notice This event is emitted when a lender's commitment is created.

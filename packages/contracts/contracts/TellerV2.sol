@@ -960,10 +960,11 @@ contract TellerV2 is
         // Make sure loan cannot be liquidated if it is not active
         if (bid.state != BidState.ACCEPTED) return false;
 
-        uint32 dueDate = calculateNextDueDate(_bidId);
         uint32 defaultDuration = bidDefaultDuration[_bidId];
 
         if (defaultDuration == 0) return false;
+
+        uint32 dueDate = calculateNextDueDate(_bidId);
 
         return
             uint32(block.timestamp) >

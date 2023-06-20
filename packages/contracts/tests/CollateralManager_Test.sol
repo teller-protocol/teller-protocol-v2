@@ -59,7 +59,6 @@ contract CollateralManager_Test is Testable {
     );
 
     function setUp() public {
-    
         // Deploy beacon contract with implementation
         UpgradeableBeacon escrowBeacon = new UpgradeableBeacon(
             address(escrowImplementation)
@@ -73,7 +72,6 @@ contract CollateralManager_Test is Testable {
         borrower = new User();
         lender = new User();
         liquidator = new User();
- 
 
         //  uint256 borrowerBalance = 50000;
         //   payable(address(borrower)).transfer(borrowerBalance);
@@ -93,7 +91,6 @@ contract CollateralManager_Test is Testable {
 
         CollateralManager_Override tempCManager = new CollateralManager_Override();
         tempCManager.initialize(address(eBeacon), address(tellerV2Mock));
- 
 
         address managerTellerV2 = address(tempCManager.tellerV2());
         assertEq(
@@ -635,8 +632,6 @@ contract CollateralManager_Test is Testable {
         vm.expectRevert("ERC721 collateral must have amount of 1");
         collateralManager._commitCollateralSuper(bidId, collateralInfo);
     }
-
-     
 
     function test_withdraw_internal() public {
         uint256 bidId = 0;

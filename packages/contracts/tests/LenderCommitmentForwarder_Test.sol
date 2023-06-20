@@ -431,35 +431,6 @@ contract LenderCommitmentForwarder_Test is Testable {
         lenderCommitmentForwarder.deleteCommitment(0);
     }
 
-    function test_decrementCommitment() public {
-        LenderCommitmentForwarder.Commitment
-            memory c = LenderCommitmentForwarder.Commitment({
-                maxPrincipal: maxPrincipal,
-                expiration: expiration,
-                maxDuration: maxDuration,
-                minInterestRate: minInterestRate,
-                collateralTokenAddress: address(collateralToken),
-                collateralTokenId: collateralTokenId,
-                maxPrincipalPerCollateralAmount: maxPrincipalPerCollateralAmount,
-                collateralTokenType: collateralTokenType,
-                lender: address(lender),
-                marketId: marketId,
-                principalTokenAddress: address(principalToken)
-            });
-
-        uint256 commitmentId = 0;
-
-        lenderCommitmentForwarder.setCommitment(commitmentId, c);
-
-        lenderCommitmentForwarder._decrementCommitmentSuper(commitmentId, 100);
-
-        assertEq(
-            lenderCommitmentForwarder.getCommitmentMaxPrincipal(commitmentId),
-            maxPrincipal - 100,
-            "Max principal not decremented"
-        );
-    }
-
     function test_validateCommitment() public {
         LenderCommitmentForwarder.Commitment
             memory c = LenderCommitmentForwarder.Commitment({
@@ -660,8 +631,8 @@ contract LenderCommitmentForwarder_Test is Testable {
 
         assertEq(
             lenderCommitmentForwarder.getCommitmentMaxPrincipal(commitmentId),
-            principalAmount - maxPrincipal,
-            "Max principal not decremented"
+            maxPrincipal,
+            "Max principal changed"
         );
     }
 

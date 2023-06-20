@@ -62,6 +62,8 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
     mapping(uint256 => EnumerableSetUpgradeable.AddressSet)
         internal commitmentBorrowersList;
 
+    mapping(uint256 => uint256) public commitmentPrincipalAccepted;
+
     /**
      * @notice This event is emitted when a lender's commitment is created.
      * @param lender The address of the lender.
@@ -304,18 +306,6 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
     }
 
     /**
-     * @notice Reduces the commitment amount for a lender to a market.
-     * @param _commitmentId The id of the commitment to modify.
-     * @param _tokenAmountDelta The amount of change in the maxPrincipal.
-     */
-    function _decrementCommitment(
-        uint256 _commitmentId,
-        uint256 _tokenAmountDelta
-    ) internal {
-        commitments[_commitmentId].maxPrincipal -= _tokenAmountDelta;
-    }
-
-    /**
      * @notice Accept the commitment to submitBid and acceptBid using the funds
      * @dev LoanDuration must be longer than the market payment cycle
      * @param _commitmentId The id of the commitment being accepted.
@@ -353,6 +343,11 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         require(
             _loanDuration <= commitment.maxDuration,
             "Invalid loan max duration"
+        );
+
+         require(
+            commitmentPrincipalAccepted[bidId] <= commitment.maxPrincipal,
+            "Invalid loan max principal"
         );
 
         require(
@@ -404,6 +399,14 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             );
         }
 
+        commitmentPrincipalAccepted[_commitmentId] += _principalAmount;
+
+        require(
+            commitmentPrincipalAccepted[_commitmentId] <=
+                commitment.maxPrincipal,
+            "Exceeds max principal of commitment"
+        );
+
         bidId = _submitBidFromCommitment(
             borrower,
             commitment.marketId,
@@ -418,8 +421,6 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         );
 
         _acceptBid(bidId, commitment.lender);
-
-        _decrementCommitment(_commitmentId, _principalAmount);
 
         emit ExercisedCommitment(
             _commitmentId,

@@ -211,12 +211,6 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             "Expect accept bid called after exercise"
         );
 
-        assertEq(
-            commitment.maxPrincipal == 100,
-            true,
-            "Commitment max principal was not decremented"
-        );
-
         bidId = borrower._acceptCommitment(
             commitmentId,
             100, //principalAmount
@@ -227,28 +221,16 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             maxLoanDuration
         );
 
-        assertEq(commitment.maxPrincipal == 0, true, "commitment not accepted");
+        vm.expectRevert();
 
-        bool acceptCommitTwiceFails;
-
-        try
-            borrower._acceptCommitment(
-                commitmentId,
-                100, //principalAmount
-                100, //collateralAmount
-                0, //collateralTokenId
-                address(collateralToken),
-                minInterestRate,
-                maxLoanDuration
-            )
-        {} catch {
-            acceptCommitTwiceFails = true;
-        }
-
-        assertEq(
-            acceptCommitTwiceFails,
-            true,
-            "Should fail when accepting commit twice"
+        borrower._acceptCommitment(
+            commitmentId,
+            100, //principalAmount
+            100, //collateralAmount
+            0, //collateralTokenId
+            address(collateralToken),
+            minInterestRate,
+            maxLoanDuration
         );
     }
 
@@ -405,26 +387,6 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             failedToAcceptCommitment,
             true,
             "Should fail to accept commitment with invalid amount for ERC721"
-        );
-    }
-
-    function decrementCommitment_before() public {}
-
-    function test_decrementCommitment() public {
-        uint256 commitmentId = 0;
-        uint256 _decrementAmount = 22;
-
-        Commitment storage commitment = _createCommitment(
-            CommitmentCollateralType.ERC20,
-            1000e6
-        );
-
-        _decrementCommitment(commitmentId, _decrementAmount);
-
-        assertEq(
-            commitment.maxPrincipal == maxAmount - _decrementAmount,
-            true,
-            "Commitment max principal was not decremented"
         );
     }
 

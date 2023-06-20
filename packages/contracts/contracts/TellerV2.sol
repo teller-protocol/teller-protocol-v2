@@ -791,24 +791,32 @@ contract TellerV2 is
             address sender = _msgSenderForMarket(bid.marketplaceId);
 
             uint256 balanceBefore = bid.loanDetails.lendingToken.balanceOf(
-                sender
+                address(this)
             );
 
             //if unable, pay to escrow
             bid.loanDetails.lendingToken.safeTransferFrom(
                 sender,
-                address(escrowVault),
+                address(this),
                 paymentAmount
             );
 
             uint256 balanceAfter = bid.loanDetails.lendingToken.balanceOf(
-                sender
+               address(this)
             );
 
-            IEscrowVault(escrowVault).increaseBalance(
+            //used for fee-on-send tokens
+            uint256 paymentAmountReceived = balanceAfter - balanceBefore;
+
+            bid.loanDetails.lendingToken.approve( 
+                address(escrowVault),
+                paymentAmountReceived
+            );
+
+            IEscrowVault(escrowVault).deposit(
                 lender,
                 address(bid.loanDetails.lendingToken),
-                balanceAfter - balanceBefore //used for fee-on-send tokens
+                paymentAmountReceived
             );
         }
 

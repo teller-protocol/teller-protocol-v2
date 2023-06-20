@@ -81,6 +81,12 @@ export const deploy = async <C extends Contract>(
   const contract = (await hre.contracts.get(contractDeployName, {
     at: result.address,
   })) as DeployedContract<C>
+
+  const factory = await hre.ethers.getContractFactory(contractName)
+  await hre.platform.forceImport(result.address, factory, {
+    constructorArgs: args.args,
+  })
+
   contract.deployResult = result
   return contract
 }

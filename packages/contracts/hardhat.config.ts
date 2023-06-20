@@ -8,6 +8,7 @@ import '@nomiclabs/hardhat-ethers'
 import '@typechain/hardhat'
 import 'solidity-coverage'
 import '@openzeppelin/hardhat-upgrades'
+import '@openzeppelin/hardhat-defender'
 
 import fs from 'fs'
 import path from 'path'
@@ -167,6 +168,7 @@ export default <HardhatUserConfig>{
     cache: './generated/cache',
     artifacts: './generated/artifacts',
     sources: './contracts',
+    // deploy: './deploy-old',
   },
 
   typechain: {
@@ -232,6 +234,12 @@ export default <HardhatUserConfig>{
     marketowner: 5,
     funder: 10,
     rando: 14,
+    protocolAdminSafe: {
+      default: 7,
+      1: '0x9E3bfee4C6b4D28b5113E4786A1D9812eB3D2Db6',
+      5: '0x0061CA4F1EB8c3FF93Df074061844d3dd4dC0377',
+      137: '0xFea0FB908E31567CaB641865212cF76BE824D848',
+    },
   },
 
   // if you want to deploy to a testnet, mainnet, or xdai, you will need to configure:

@@ -1,7 +1,21 @@
 import '@nomiclabs/hardhat-ethers'
 import 'hardhat-deploy'
+import { ProposalResponse } from '@openzeppelin/defender-admin-client'
+import { HardhatDefender as OZHD } from '@openzeppelin/hardhat-defender'
+import {
+  getAdminClient,
+  getNetwork,
+} from '@openzeppelin/hardhat-defender/dist/utils'
+import { DeployProxyOptions } from '@openzeppelin/hardhat-upgrades/dist/utils'
 import * as tdly from '@teller-protocol/hardhat-tenderly'
-import { BigNumber, BigNumberish, Contract, Signer } from 'ethers'
+import chalk from 'chalk'
+import {
+  BigNumber,
+  BigNumberish,
+  Contract,
+  Signer,
+  ContractFactory,
+} from 'ethers'
 import { ERC20 } from 'generated/typechain'
 import { extendEnvironment } from 'hardhat/config'
 import moment from 'moment'
@@ -12,6 +26,10 @@ import { formatMsg, FormatMsgConfig } from './formatMsg'
 
 declare module 'hardhat/types/runtime' {
   interface HardhatRuntimeEnvironment {
+    deployProxy: (
+      contractName: string,
+      opts?: DeployProxyOptions & { initArgs?: any[] }
+    ) => Promise<Contract>
     contracts: ContractsExtension
     tokens: TokensExtension
     evm: EVM
@@ -19,6 +37,20 @@ declare module 'hardhat/types/runtime' {
     toBN: (amount: BigNumberish, decimals?: BigNumberish) => BigNumber
     fromBN: (amount: BigNumberish, decimals?: BigNumberish) => BigNumber
     log: (msg: string, config?: LogConfig) => void
+  }
+
+  interface HardhatDefender extends OZHD {
+    proposeUpgradeAndCall: (
+      proxyAddress: string,
+      implFactory: ContractFactory,
+      opts: {
+        constructorArgs?: any[]
+        callFn: string
+        callArgs: any[]
+        title: string
+        description: string
+      }
+    ) => Promise<ProposalResponse>
   }
 }
 
@@ -145,6 +177,66 @@ extendEnvironment((hre) => {
   const { deployments, ethers, network } = hre
 
   if (!network.live) tdly.setup({ automaticVerifications: true })
+
+  hre.deployProxy = async (contractName, { initArgs, ...opts } = {}) => {
+    hre.log('----------')
+    hre.log('')
+    hre.log(`${chalk.underline('Contract')}: ${chalk.bold(`${contractName}`)}`)
+    hre.log('')
+
+    const existingDeployment = await deployments.getOrNull(contractName)
+    let proxy: Contract
+
+    const proxyLabel = chalk.bold(`Proxy: `)
+    const implementationLabel = chalk.bold(`Implementation: `)
+    const maxLabelLength = Math.max(
+      proxyLabel.length,
+      implementationLabel.length
+    )
+
+    if (existingDeployment) {
+      proxy = await ethers.getContractAt(
+        contractName,
+        existingDeployment.address
+      )
+    } else {
+      const implFactory = await hre.ethers.getContractFactory(contractName)
+      proxy = await hre.upgrades.deployProxy(implFactory, initArgs, opts)
+    }
+    hre.log(proxyLabel, {
+      star: false,
+      nl: false,
+      pad: { start: { length: maxLabelLength, char: ' ' } },
+    })
+    hre.log(`${proxy.address}`, { star: false })
+    await proxy.deployTransaction.wait(1)
+
+    const implementation = await hre.upgrades.erc1967.getImplementationAddress(
+      proxy.address
+    )
+    hre.log(implementationLabel, {
+      star: false,
+      nl: false,
+      pad: { start: { length: maxLabelLength, char: ' ' } },
+    })
+    hre.log(`${implementation}`, { star: false })
+
+    const { abi: tpuABI } = await hre.deployments.getArtifact(
+      'TransparentUpgradeableProxy'
+    )
+    await hre.deployments.save(contractName, {
+      address: proxy.address,
+      implementation,
+      abi: tpuABI,
+      transactionHash: proxy.deployTransaction.hash,
+      receipt: await proxy.deployTransaction.wait(),
+    })
+
+    hre.log('')
+    hre.log('----------')
+
+    return proxy
+  }
 
   hre.contracts = {
     async get<C extends Contract>(
@@ -304,5 +396,79 @@ extendEnvironment((hre) => {
     if (disable) return
     const fn = config?.error ? process.stderr : process.stdout
     fn.write(formatMsg(msg, config))
+  }
+
+  hre.defender.proposeUpgradeAndCall = async (
+    proxyAddress: string,
+    implFactory: ContractFactory,
+    opts
+  ): Promise<ProposalResponse> => {
+    const newImpl = await hre.upgrades.prepareUpgrade(
+      proxyAddress,
+      implFactory,
+      {
+        constructorArgs: opts.constructorArgs,
+      }
+    )
+    const newImplAddr =
+      typeof newImpl === 'string'
+        ? newImpl
+        : await newImpl.wait().then((r) => r.contractAddress)
+
+    const adminAddress = await hre.upgrades.erc1967.getAdminAddress(
+      proxyAddress
+    )
+    const { protocolAdminSafe } = await hre.getNamedAccounts()
+
+    const admin = getAdminClient(hre)
+    return await admin.createProposal({
+      contract: {
+        address: adminAddress,
+        network: await getNetwork(hre),
+        // provide abi OR overrideSimulationOpts.transactionData.data
+        // abi: JSON.stringify(contractABI),
+      },
+      title: opts.title,
+      description: opts.description,
+      type: 'custom',
+      // metadata: {
+      //   sendTo: '0xA91382E82fB676d4c935E601305E5253b3829dCD',
+      //   sendValue: '10000000000000000',
+      //   sendCurrency: {
+      //     name: 'Ethereum',
+      //     symbol: 'ETH',
+      //     decimals: 18,
+      //     type: 'native',
+      //   },
+      // },
+      functionInterface: {
+        name: 'upgradeAndCall',
+        inputs: [
+          {
+            internalType: 'contract TransparentUpgradeableProxy',
+            name: 'proxy',
+            type: 'address',
+          },
+          { internalType: 'address', name: 'implementation', type: 'address' },
+          { internalType: 'bytes', name: 'data', type: 'bytes' },
+        ],
+      },
+      functionInputs: [
+        proxyAddress,
+        newImplAddr,
+        implFactory.interface.encodeFunctionData(opts.callFn, opts.callArgs),
+      ],
+      via: protocolAdminSafe,
+      viaType: 'Gnosis Safe',
+      // set simulate to true
+      simulate: true,
+      // optional
+      // overrideSimulationOpts: {
+      //   transactionData: {
+      //     // or instead of ABI, you can provide data
+      //     data: '0xd336c82d',
+      //   },
+      // },
+    })
   }
 })

@@ -606,10 +606,8 @@ contract TellerV2 is
         external
         acceptedLoan(_bidId, "repayLoan")
     {
-       
         _repayLoanFull(_bidId, true);
     }
- 
 
     // function that the borrower (ideally) sends to repay the loan
     /**
@@ -621,13 +619,10 @@ contract TellerV2 is
         external
         acceptedLoan(_bidId, "repayLoan")
     {
-       
-
-        _repayLoanAtleastMinimum(_bidId,_amount,true);
+        _repayLoanAtleastMinimum(_bidId, _amount, true);
     }
 
-
-     /**
+    /**
      * @notice Function for users to repay an active loan in full.
      * @param _bidId The id of the loan to make the payment towards.
      */
@@ -635,25 +630,18 @@ contract TellerV2 is
         external
         acceptedLoan(_bidId, "repayLoan")
     {
-     
-        _repayLoanFull(_bidId,false);
+        _repayLoanFull(_bidId, false);
     }
-
-   
 
     function repayLoanWithoutCollateralWithdraw(uint256 _bidId, uint256 _amount)
         external
         acceptedLoan(_bidId, "repayLoan")
     {
-       _repayLoanAtleastMinimum(_bidId,_amount,false);
+        _repayLoanAtleastMinimum(_bidId, _amount, false);
     }
 
-
-
-    function _repayLoanFull(uint256 _bidId, bool withdrawCollateral)
-        internal
-    {
-         (uint256 owedPrincipal, , uint256 interest) = V2Calculations
+    function _repayLoanFull(uint256 _bidId, bool withdrawCollateral) internal {
+        (uint256 owedPrincipal, , uint256 interest) = V2Calculations
             .calculateAmountOwed(
                 bids[_bidId],
                 block.timestamp,
@@ -667,11 +655,12 @@ contract TellerV2 is
         );
     }
 
-
-    function _repayLoanAtleastMinimum(uint256 _bidId, uint256 _amount, bool withdrawCollateral )
-        internal 
-    {
-    (
+    function _repayLoanAtleastMinimum(
+        uint256 _bidId,
+        uint256 _amount,
+        bool withdrawCollateral
+    ) internal {
+        (
             uint256 owedPrincipal,
             uint256 duePrincipal,
             uint256 interest
@@ -694,7 +683,6 @@ contract TellerV2 is
             withdrawCollateral
         );
     }
-
 
     /**
      * @notice Lets the DAO/owner of the protocol implement an emergency stop mechanism.

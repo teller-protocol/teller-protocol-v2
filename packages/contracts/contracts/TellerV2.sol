@@ -927,7 +927,7 @@ contract TellerV2 is
         override
         returns (bool)
     {
-        return _canLiquidateLoan(_bidId, 0);
+        return _isLoanDefaulted(_bidId, 0);
     }
 
     /**
@@ -941,16 +941,16 @@ contract TellerV2 is
         override
         returns (bool)
     {
-        return _canLiquidateLoan(_bidId, LIQUIDATION_DELAY);
+        return _isLoanDefaulted(_bidId, LIQUIDATION_DELAY);
     }
 
     /**
      * @notice Checks to see if a borrower is delinquent.
      * @param _bidId The id of the loan bid to check for.
-     * @param _liquidationDelay Amount of additional seconds after a loan defaulted to allow a liquidation.
+     * @param _additionalDelay Amount of additional seconds after a loan defaulted to allow a liquidation.
      * @return bool True if the loan is liquidateable.
      */
-    function _canLiquidateLoan(uint256 _bidId, uint32 _liquidationDelay)
+    function _isLoanDefaulted(uint256 _bidId, uint32 _additionalDelay)
         internal
         view
         returns (bool)
@@ -960,12 +960,15 @@ contract TellerV2 is
         // Make sure loan cannot be liquidated if it is not active
         if (bid.state != BidState.ACCEPTED) return false;
 
-        if (bidDefaultDuration[_bidId] == 0) return false;
+        uint32 defaultDuration = bidDefaultDuration[_bidId];
 
-        return (uint32(block.timestamp) -
-            _liquidationDelay -
-            lastRepaidTimestamp(_bidId) >
-            bidDefaultDuration[_bidId]);
+        if (defaultDuration == 0) return false;
+
+        uint32 dueDate = calculateNextDueDate(_bidId);
+
+        return
+            uint32(block.timestamp) >
+            dueDate + defaultDuration + _additionalDelay;
     }
 
     function getBidState(uint256 _bidId)

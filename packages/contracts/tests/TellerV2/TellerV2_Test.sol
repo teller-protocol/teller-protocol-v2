@@ -78,7 +78,7 @@ contract TellerV2_Test is Testable {
         lenderManager.transferOwnership(address(tellerV2));
 
         EscrowVault escrowVault = new EscrowVault();
-        escrowVault.initialize( );
+        escrowVault.initialize();
 
         // Deploy LenderCommitmentForwarder
         LenderCommitmentForwarder lenderCommitmentForwarder = new LenderCommitmentForwarder(

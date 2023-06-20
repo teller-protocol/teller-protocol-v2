@@ -14,7 +14,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-  
+
 import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 
 // Interfaces
@@ -28,9 +28,7 @@ contract EscrowVault is Initializable, IEscrowVault {
 
     constructor() {}
 
-    function initialize( ) external initializer {
-        
-    }
+    function initialize() external initializer {}
 
     /**
      * @notice Deposit tokens on behalf of another account
@@ -39,16 +37,14 @@ contract EscrowVault is Initializable, IEscrowVault {
      */
     function deposit(address account, address token, uint256 amount)
         public
-        override 
-    {   
+        override
+    {
         uint256 balanceBefore = ERC20(token).balanceOf(address(this));
         ERC20(token).safeTransferFrom(msg.sender, address(this), amount);
         uint256 balanceAfter = ERC20(token).balanceOf(address(this));
 
-        balances[account][token] += balanceAfter-balanceBefore; //used for fee-on-transfer tokens
+        balances[account][token] += balanceAfter - balanceBefore; //used for fee-on-transfer tokens
     }
-
-    
 
     function withdraw(address token, uint256 amount) external {
         address account = msg.sender;

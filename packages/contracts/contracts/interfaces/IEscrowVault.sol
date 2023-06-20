@@ -8,6 +8,5 @@ interface IEscrowVault {
      * @param token The address of the token
      * @param amount The amount to increase the balance
      */
-    function deposit(address account, address token, uint256 amount)
-        external;
+    function deposit(address account, address token, uint256 amount) external;
 }

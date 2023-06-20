@@ -802,13 +802,13 @@ contract TellerV2 is
             );
 
             uint256 balanceAfter = bid.loanDetails.lendingToken.balanceOf(
-               address(this)
+                address(this)
             );
 
             //used for fee-on-send tokens
             uint256 paymentAmountReceived = balanceAfter - balanceBefore;
 
-            bid.loanDetails.lendingToken.approve( 
+            bid.loanDetails.lendingToken.approve(
                 address(escrowVault),
                 paymentAmountReceived
             );

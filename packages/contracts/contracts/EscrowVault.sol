@@ -14,13 +14,15 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
 
-import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
+
+
 
 // Interfaces
 import "./interfaces/IEscrowVault.sol";
 
-contract EscrowVault is Initializable, IEscrowVault {
+contract EscrowVault is Initializable, ContextUpgradeable, IEscrowVault {
     using SafeERC20 for ERC20;
 
     //account => token => balance
@@ -47,7 +49,7 @@ contract EscrowVault is Initializable, IEscrowVault {
     }
 
     function withdraw(address token, uint256 amount) external {
-        address account = msg.sender;
+        address account = ContextUpgradeable._msgSender();
 
         balances[account][token] -= amount;
         ERC20(token).safeTransfer(account, amount);

@@ -322,7 +322,7 @@ contract LenderCommitmentForwarder_Test is Testable {
         lenderCommitmentForwarder.updateCommitment(0, c);
     }
 
-    function test_updateCommitmentBorrowers() public {
+    function test_addCommitmentBorrowers() public {
         LenderCommitmentForwarder.Commitment
             memory c = LenderCommitmentForwarder.Commitment({
                 maxPrincipal: maxPrincipal,
@@ -344,7 +344,7 @@ contract LenderCommitmentForwarder_Test is Testable {
         newBorrowers[0] = address(1);
 
         vm.prank(address(lender));
-        lenderCommitmentForwarder.updateCommitmentBorrowers(0, newBorrowers);
+        lenderCommitmentForwarder.addCommitmentBorrowers(0, newBorrowers);
 
         //check an assertion
         assertEq(
@@ -354,12 +354,12 @@ contract LenderCommitmentForwarder_Test is Testable {
         );
     }
 
-    function test_updateCommitmentBorrowers_cannot_update_empty() public {
+    function test_addCommitmentBorrowers_cannot_update_empty() public {
         vm.expectRevert("unauthorized commitment lender");
-        lenderCommitmentForwarder.updateCommitmentBorrowers(0, emptyArray);
+        lenderCommitmentForwarder.addCommitmentBorrowers(0, emptyArray);
     }
 
-    function test_updateCommitmentBorrowers_unauthorized() public {
+    function test_uaddCommitmentBorrowers_unauthorized() public {
         LenderCommitmentForwarder.Commitment
             memory c = LenderCommitmentForwarder.Commitment({
                 maxPrincipal: maxPrincipal,
@@ -378,7 +378,7 @@ contract LenderCommitmentForwarder_Test is Testable {
         lenderCommitmentForwarder.setCommitment(0, c);
 
         vm.expectRevert("unauthorized commitment lender");
-        lenderCommitmentForwarder.updateCommitmentBorrowers(0, emptyArray);
+        lenderCommitmentForwarder.addCommitmentBorrowers(0, emptyArray);
     }
 
     function test_deleteCommitment() public {
@@ -776,7 +776,7 @@ contract LenderCommitmentForwarder_Test is Testable {
         newBorrowers[0] = address(1);
 
         vm.prank(address(lender));
-        lenderCommitmentForwarder.updateCommitmentBorrowers(
+        lenderCommitmentForwarder.addCommitmentBorrowers(
             commitmentId,
             newBorrowers
         );

@@ -58,6 +58,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
 
     uint256 commitmentCount;
 
+    //https://github.com/OpenZeppelin/openzeppelin-contracts-upgradeable/blob/master/contracts/utils/structs/EnumerableSetUpgradeable.sol
     mapping(uint256 => EnumerableSetUpgradeable.AddressSet)
         internal commitmentBorrowersList;
 
@@ -259,12 +260,26 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
      * @param _commitmentId The Id of the commitment to update.
      * @param _borrowerAddressList The array of borrowers that are allowed to accept loans using this commitment
      */
-    function updateCommitmentBorrowers(
+    function addCommitmentBorrowers(
         uint256 _commitmentId,
         address[] calldata _borrowerAddressList
     ) public commitmentLender(_commitmentId) {
-        delete commitmentBorrowersList[_commitmentId];
         _addBorrowersToCommitmentAllowlist(_commitmentId, _borrowerAddressList);
+    }
+
+    /**
+     * @notice Updates the borrowers allowed to accept a commitment
+     * @param _commitmentId The Id of the commitment to update.
+     * @param _borrowerAddressList The array of borrowers that are allowed to accept loans using this commitment
+     */
+    function removeCommitmentBorrowers(
+        uint256 _commitmentId,
+        address[] calldata _borrowerAddressList
+    ) public commitmentLender(_commitmentId) {
+        _removeBorrowersFromCommitmentAllowlist(
+            _commitmentId,
+            _borrowerAddressList
+        );
     }
 
     /**
@@ -278,6 +293,21 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
     ) internal {
         for (uint256 i = 0; i < _borrowerArray.length; i++) {
             commitmentBorrowersList[_commitmentId].add(_borrowerArray[i]);
+        }
+        emit UpdatedCommitmentBorrowers(_commitmentId);
+    }
+
+    /**
+     * @notice Removes a borrower to the allowlist for a commmitment.
+     * @param _commitmentId The id of the commitment that will allow the new borrower
+     * @param _borrowerArray the address array of the borrowers that will be allowed to accept loans using the commitment
+     */
+    function _removeBorrowersFromCommitmentAllowlist(
+        uint256 _commitmentId,
+        address[] calldata _borrowerArray
+    ) internal {
+        for (uint256 i = 0; i < _borrowerArray.length; i++) {
+            commitmentBorrowersList[_commitmentId].remove(_borrowerArray[i]);
         }
         emit UpdatedCommitmentBorrowers(_commitmentId);
     }

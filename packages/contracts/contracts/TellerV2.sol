@@ -779,7 +779,7 @@ contract TellerV2 is
 
         _sendOrEscrowFunds( //send or escrow the funds
             _bidId,
-            _paymentAmount 
+            paymentAmount 
         );
 
         // update our mappings
@@ -806,7 +806,7 @@ contract TellerV2 is
             bid.loanDetails.lendingToken.transferFrom{ gas: 100000 }(
                 _msgSenderForMarket(bid.marketplaceId),
                 lender,
-                paymentAmount
+                _paymentAmount
             )
         {} catch {
             address sender = _msgSenderForMarket(bid.marketplaceId);
@@ -819,7 +819,7 @@ contract TellerV2 is
             bid.loanDetails.lendingToken.safeTransferFrom(
                 sender,
                 address(this),
-                paymentAmount
+                _paymentAmount
             );
 
             uint256 balanceAfter = bid.loanDetails.lendingToken.balanceOf(

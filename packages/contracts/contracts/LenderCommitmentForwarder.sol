@@ -254,7 +254,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint256 _commitmentId,
         address[] calldata _borrowerAddressList
     ) public commitmentLender(_commitmentId) {
-        _removeBorrowersToCommitmentAllowlist(
+        _removeBorrowersFromCommitmentAllowlist(
             _commitmentId,
             _borrowerAddressList
         );
@@ -280,7 +280,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
      * @param _commitmentId The id of the commitment that will allow the new borrower
      * @param _borrowerArray the address array of the borrowers that will be allowed to accept loans using the commitment
      */
-    function _removeBorrowersToCommitmentAllowlist(
+    function _removeBorrowersFromCommitmentAllowlist(
         uint256 _commitmentId,
         address[] calldata _borrowerArray
     ) internal {

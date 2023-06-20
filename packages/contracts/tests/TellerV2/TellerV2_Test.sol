@@ -204,7 +204,7 @@ contract TellerV2_Test is Testable {
             collateralAmount,
             borrowerBalanceAfter - borrowerBalanceBefore,
             "Collateral was not sent to borrower after repayment"
-        );*/
+        ); 
     }
     */
 }

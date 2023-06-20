@@ -208,13 +208,8 @@ contract TellerV2 is
         );
         collateralManager = ICollateralManager(_collateralManager);
 
-        require(
-            _escrowVault.isContract(),
-            "EscrowVault must be a contract"
-        );
+        require(_escrowVault.isContract(), "EscrowVault must be a contract");
         escrowVault = IEscrowVault(_escrowVault);
-
-
 
         _setLenderManager(_lenderManager);
     }
@@ -694,9 +689,6 @@ contract TellerV2 is
         );
     }
 
-
- 
-
     /**
      * @notice Lets the DAO/owner of the protocol implement an emergency stop mechanism.
      */
@@ -786,43 +778,39 @@ contract TellerV2 is
 
         address lender = getLoanLender(_bidId);
 
-          
-
-        try 
+        try
             //first try to pay directly
             //have to use transfer from  (not safe transfer from) for try/catch statement
-            //dont try to use any more than 100k gas for this xfer 
-            bid.loanDetails.lendingToken.transferFrom{gas:100000}(
-                    _msgSenderForMarket(bid.marketplaceId),
-                    lender,
-                    paymentAmount) 
+            //dont try to use any more than 100k gas for this xfer
+            bid.loanDetails.lendingToken.transferFrom{ gas: 100000 }(
+                _msgSenderForMarket(bid.marketplaceId),
+                lender,
+                paymentAmount
+            )
+        {} catch {
+            address sender = _msgSenderForMarket(bid.marketplaceId);
 
-         {} catch {
+            uint256 balanceBefore = bid.loanDetails.lendingToken.balanceOf(
+                sender
+            );
 
-                address sender = _msgSenderForMarket(bid.marketplaceId);
+            //if unable, pay to escrow
+            bid.loanDetails.lendingToken.safeTransferFrom(
+                sender,
+                address(escrowVault),
+                paymentAmount
+            );
 
-                uint256 balanceBefore = bid.loanDetails.lendingToken.balanceOf(sender);
-            
-                 //if unable, pay to escrow
-                bid.loanDetails.lendingToken.safeTransferFrom(
-                    sender,
-                    address(escrowVault),
-                    paymentAmount
-                );
+            uint256 balanceAfter = bid.loanDetails.lendingToken.balanceOf(
+                sender
+            );
 
-                uint256 balanceAfter = bid.loanDetails.lendingToken.balanceOf(sender);
-            
-
-
-                IEscrowVault(escrowVault).increaseBalance( 
-                    lender,
-                    address(bid.loanDetails.lendingToken),
-                    balanceAfter - balanceBefore //used for fee-on-send tokens
-                );
-
+            IEscrowVault(escrowVault).increaseBalance(
+                lender,
+                address(bid.loanDetails.lendingToken),
+                balanceAfter - balanceBefore //used for fee-on-send tokens
+            );
         }
- 
- 
 
         // update our mappings
         bid.loanDetails.totalRepaid.principal += _payment.principal;

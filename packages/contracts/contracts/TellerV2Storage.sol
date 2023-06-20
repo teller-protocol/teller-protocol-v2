@@ -157,5 +157,4 @@ abstract contract TellerV2Storage_G5 is TellerV2Storage_G4 {
     IEscrowVault public escrowVault;
 }
 
-
 abstract contract TellerV2Storage is TellerV2Storage_G5 {}

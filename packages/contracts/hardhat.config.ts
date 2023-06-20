@@ -52,6 +52,8 @@ const {
   SKIP_SIZER,
   TESTING,
   ALCHEMY_API_KEY,
+  DEFENDER_API_KEY,
+  DEFENDER_API_SECRET,
 } = process.env
 
 const isCompiling = COMPILING === 'true'
@@ -155,6 +157,11 @@ export default <HardhatUserConfig>{
 
   etherscan: {
     apiKey: '{see `updateEtherscanConfig` function in utils/hre-extensions.ts}',
+  },
+
+  defender: {
+    apiKey: DEFENDER_API_KEY,
+    apiSecret: DEFENDER_API_SECRET,
   },
 
   tenderly: {

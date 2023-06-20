@@ -514,6 +514,7 @@ contract CollateralManager_Test is Testable {
         tellerV2Mock.setBorrower(address(borrower));
         tellerV2Mock.setGlobalBidState(BidState.PAID);
 
+        vm.prank(address(borrower));
         collateralManager.withdraw(bidId);
 
         assertEq(
@@ -529,6 +530,7 @@ contract CollateralManager_Test is Testable {
         tellerV2Mock.setLender(address(lender));
         tellerV2Mock.setBidsDefaultedGlobally(true);
 
+        vm.prank(address(lender));
         vm.expectEmit(true, false, false, false);
         emit CollateralClaimed(bidId);
         collateralManager.withdraw(bidId);

@@ -62,7 +62,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
     mapping(uint256 => EnumerableSetUpgradeable.AddressSet)
         internal commitmentBorrowersList;
 
-    mapping(uint256 => uint256) commitmentPrincipalAllocated;
+    mapping(uint256 => uint256) commitmentPrincipalAccepted;
 
     /**
      * @notice This event is emitted when a lender's commitment is created.
@@ -234,7 +234,6 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             _commitment.maxPrincipal
         );
     }
- 
 
     /**
      * @notice Updates the borrowers allowed to accept a commitment
@@ -395,10 +394,10 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             );
         }
 
-        commitmentPrincipalAllocated[_commitmentId] += _principalAmount;
+        commitmentPrincipalAccepted[_commitmentId] += _principalAmount;
 
         require(
-            commitmentPrincipalAllocated[_commitmentId] <=
+            commitmentPrincipalAccepted[_commitmentId] <=
                 commitment.maxPrincipal,
             "Exceeds max principal of commitment"
         );

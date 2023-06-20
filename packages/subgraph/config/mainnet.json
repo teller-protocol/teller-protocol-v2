@@ -2,8 +2,8 @@
   "network": "mainnet",
   "grafting": {
     "enabled": true,
-    "base": "QmdZyxR4ZijTnxE3MQdqqCfb3pz1sfoTzqhbPJtPfj15C9",
-    "block": "17387725"
+    "base": "QmWfdFaUZvMmdMr1shEVv72a1VuU4hVwFM2h5FmmFG8tAK",
+    "block": "17504873"
   },
   "block_handler": {
     "enabled": true,

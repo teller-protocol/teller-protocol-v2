@@ -213,6 +213,11 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         Commitment calldata _commitment
     ) public commitmentLender(_commitmentId) {
         require(
+            _commitment.lender == _msgSender(),
+            "Commitment lender cannot be updated."
+        );
+
+        require(
             _commitment.principalTokenAddress ==
                 commitments[_commitmentId].principalTokenAddress,
             "Principal token address cannot be updated."
@@ -345,7 +350,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             "Invalid loan max duration"
         );
 
-         require(
+        require(
             commitmentPrincipalAccepted[bidId] <= commitment.maxPrincipal,
             "Invalid loan max principal"
         );

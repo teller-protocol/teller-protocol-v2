@@ -90,18 +90,8 @@ library V2Calculations {
         uint256 owedTime = _timestamp - uint256(_lastRepaidTimestamp);
         interest_ = (interestOwedInAYear * owedTime) / daysInYear;
 
-        // Cast to int265 to avoid underflow errors (negative means loan duration has passed)
-        /* int256 durationLeftOnLoan = int256(
-            uint256(_bid.loanDetails.loanDuration)
-        ) -
-            (int256(_timestamp) -
-                int256(uint256(_bid.loanDetails.acceptedTimestamp)));
-          bool isLastPaymentCycle = durationLeftOnLoan <
-            int256(uint256(_bid.terms.paymentCycle)) || // Check if current payment cycle is within or beyond the last one
-            owedPrincipal_ + interest_ <= _bid.terms.paymentCycleAmount; // Check if what is left to pay is less than the payment cycle amount
-            */
-
-        //need to find modulo
+        
+       
         uint256 lastPaymentCycleDuration = _bid.loanDetails.loanDuration %
             _bid.terms.paymentCycle;
         if (lastPaymentCycleDuration == 0) {

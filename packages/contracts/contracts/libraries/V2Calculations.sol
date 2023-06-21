@@ -108,10 +108,11 @@ library V2Calculations {
             // Default to PaymentType.EMI
             // Max payable amount in a cycle
             // NOTE: the last cycle could have less than the calculated payment amount
-             
+
             uint256 owedAmount = isLastPaymentCycle
                 ? owedPrincipal_ + interest_
-                : (_bid.terms.paymentCycleAmount * owedTime) / _bid.terms.paymentCycle;
+                : (_bid.terms.paymentCycleAmount * owedTime) /
+                    _bid.terms.paymentCycle;
 
             duePrincipal_ = Math.min(owedAmount - interest_, owedPrincipal_);
         }

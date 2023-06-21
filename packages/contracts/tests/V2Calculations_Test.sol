@@ -435,8 +435,6 @@ contract V2Calculations_Test is Testable {
         __bid.terms.paymentCycleAmount = _paymentCycleAmount;
 
         // Within the first payment cycle
-
-        //as you move this closer to 365 days, the owed principal increases for some odd reason !
         uint256 _timestamp = _acceptedTimestamp + ((365 days - 2 days)); //we are in the last cycle
 
         (

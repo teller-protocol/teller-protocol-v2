@@ -6,7 +6,6 @@
     "forge": "forge",
     "test": "DISABLE_LOGS=true TS_NODE_TRANSPILE_ONLY=1 TESTING=1 forge test -vvv",
     "coverage": "DISABLE_LOGS=true TS_NODE_TRANSPILE_ONLY=1 TESTING=1 forge coverage --report summary",
-  
     "coverage-report": "forge coverage --report lcov && yarn ts-node scripts/output-branch-coverage-summary.ts",
     "test:cover": "yarn test && yarn coverage",
     "shell": "yarn solidity-shell",
@@ -32,7 +31,6 @@
     "publish": "yarn npm publish",
     "clean": "./scripts/clean.sh",
     "prepack": "./scripts/prepack.sh",
-
     "docs:build": "forge doc --out docs/",
     "docs:serve": "forge doc --serve --port 3000"
   },

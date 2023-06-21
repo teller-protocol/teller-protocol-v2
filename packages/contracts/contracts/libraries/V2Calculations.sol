@@ -90,8 +90,6 @@ library V2Calculations {
         uint256 owedTime = _timestamp - uint256(_lastRepaidTimestamp);
         interest_ = (interestOwedInAYear * owedTime) / daysInYear;
 
-        
-       
         uint256 lastPaymentCycleDuration = _bid.loanDetails.loanDuration %
             _bid.terms.paymentCycle;
         if (lastPaymentCycleDuration == 0) {

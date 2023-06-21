@@ -254,6 +254,8 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
      */
     function withdraw(uint256 _bidId) external {
         BidState bidState = tellerV2.getBidState(_bidId);
+
+        require(bidState == BidState.PAID, "collateral cannot be withdrawn");
  
         _withdraw(_bidId, tellerV2.getLoanBorrower(_bidId));
 

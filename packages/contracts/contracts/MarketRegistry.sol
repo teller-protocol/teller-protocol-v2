@@ -624,7 +624,10 @@ contract MarketRegistry is
         public
         ownsMarket(_marketId)
     {
-        require(_newPercent >= 0 && _newPercent <= MAX_MARKET_FEE_PERCENT, "invalid fee percent");
+        require(
+            _newPercent >= 0 && _newPercent <= MAX_MARKET_FEE_PERCENT,
+            "invalid fee percent"
+        );
         if (_newPercent != markets[_marketId].marketplaceFeePercent) {
             markets[_marketId].marketplaceFeePercent = _newPercent;
             emit SetMarketFee(_marketId, _newPercent);

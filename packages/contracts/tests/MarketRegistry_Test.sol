@@ -795,10 +795,7 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
 
         vm.expectRevert("invalid fee percent");
         marketRegistry.setMarketFeePercent(marketId, 1001);
-
-       
     }
-
 
     function test_setMarketFeePercent_not_owner() public {
         marketRegistry.setMarketOwner(address(this));

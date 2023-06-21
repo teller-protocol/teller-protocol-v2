@@ -273,7 +273,6 @@ contract LenderCommitmentForwarder_Test is Testable {
 
         vm.prank(address(lender));
         lenderCommitmentForwarder.updateCommitment(0, c);
- 
     }
 
     function test_updateCommitment_invalid_lender() public {

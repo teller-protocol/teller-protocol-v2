@@ -350,7 +350,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             "Invalid loan max duration"
         );
 
-         require(
+        require(
             commitmentPrincipalAccepted[bidId] <= commitment.maxPrincipal,
             "Invalid loan max principal"
         );

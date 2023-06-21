@@ -536,7 +536,6 @@ contract CollateralManager_Test is Testable {
         uint256 bidId = 0;
 
         tellerV2Mock.setLender(address(lender));
-        //tellerV2Mock.setBidsDefaultedGlobally(true);
 
         tellerV2Mock.setGlobalBidState(BidState.CLOSED);
         collateralManager.setBidsCollateralBackedGlobally(true);

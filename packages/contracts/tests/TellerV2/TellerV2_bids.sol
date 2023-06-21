@@ -674,12 +674,10 @@ contract TellerV2_bids_test is Testable {
 
         tellerV2.lenderCloseLoan(bidId);
 
- 
-         BidState state = tellerV2.getBidState(bidId);
-        // make sure the state is now CLOSED 
+        BidState state = tellerV2.getBidState(bidId);
+        // make sure the state is now CLOSED
 
         require(state == BidState.CLOSED, "bid was not closed");
- 
     }
 
     function test_liquidate_loan_full() public {

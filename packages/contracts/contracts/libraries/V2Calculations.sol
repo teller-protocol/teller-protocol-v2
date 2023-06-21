@@ -90,11 +90,10 @@ library V2Calculations {
         uint256 owedTime = _timestamp - uint256(_lastRepaidTimestamp);
         interest_ = (interestOwedInAYear * owedTime) / daysInYear;
 
-       
-       bool isLastPaymentCycle; 
-       {
-             uint256 lastPaymentCycleDuration = _bid.loanDetails.loanDuration %
-            _bid.terms.paymentCycle;
+        bool isLastPaymentCycle;
+        {
+            uint256 lastPaymentCycleDuration = _bid.loanDetails.loanDuration %
+                _bid.terms.paymentCycle;
             if (lastPaymentCycleDuration == 0) {
                 lastPaymentCycleDuration = _bid.terms.paymentCycle;
             }
@@ -103,10 +102,9 @@ library V2Calculations {
                 uint256(_bid.loanDetails.loanDuration);
             uint256 lastPaymentCycleStart = endDate -
                 uint256(lastPaymentCycleDuration);
-        
 
-
-            isLastPaymentCycle = uint256(_timestamp) > lastPaymentCycleStart ||
+            isLastPaymentCycle =
+                uint256(_timestamp) > lastPaymentCycleStart ||
                 owedPrincipal_ + interest_ <= _bid.terms.paymentCycleAmount;
         }
 

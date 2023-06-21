@@ -18,6 +18,7 @@ import {
   TransactionRequest,
 } from '@ethersproject/providers'
 import { HardhatEthersHelpers } from '@nomiclabs/hardhat-ethers/types'
+import { logger as tenderlyLogger2 } from '@teller-protocol/hardhat-tenderly/dist/utils/logger'
 import chalk from 'chalk'
 import { config } from 'dotenv'
 import { ethers, Signer, utils } from 'ethers'
@@ -40,6 +41,7 @@ config()
 
 // disable Tenderly's logger
 tenderlyLogger.settings.type = 'hidden'
+tenderlyLogger2.settings.type = 'hidden'
 
 const { isAddress, getAddress, formatUnits, parseUnits, parseEther } = utils
 

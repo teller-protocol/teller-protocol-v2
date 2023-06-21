@@ -1,23 +1,27 @@
 import '@nomiclabs/hardhat-ethers'
-import 'hardhat-deploy'
 import { ProposalResponse } from '@openzeppelin/defender-admin-client'
 import { HardhatDefender as OZHD } from '@openzeppelin/hardhat-defender'
 import {
   getAdminClient,
   getNetwork,
 } from '@openzeppelin/hardhat-defender/dist/utils'
-import { DeployProxyOptions } from '@openzeppelin/hardhat-upgrades/dist/utils'
+import {
+  DeployBeaconOptions,
+  DeployProxyOptions,
+} from '@openzeppelin/hardhat-upgrades/dist/utils'
 import * as tdly from '@teller-protocol/hardhat-tenderly'
 import chalk from 'chalk'
 import {
   BigNumber,
   BigNumberish,
   Contract,
-  Signer,
   ContractFactory,
+  Signer,
 } from 'ethers'
 import { ERC20 } from 'generated/typechain'
+import 'hardhat-deploy'
 import { extendEnvironment } from 'hardhat/config'
+import { HardhatRuntimeEnvironment } from 'hardhat/types'
 import moment from 'moment'
 
 import { getTokens } from '../config'
@@ -29,6 +33,10 @@ declare module 'hardhat/types/runtime' {
     deployProxy: (
       contractName: string,
       opts?: DeployProxyOptions & { initArgs?: any[] }
+    ) => Promise<Contract>
+    deployBeacon: (
+      contractName: string,
+      opts?: DeployBeaconOptions
     ) => Promise<Contract>
     contracts: ContractsExtension
     tokens: TokensExtension
@@ -179,63 +187,11 @@ extendEnvironment((hre) => {
   if (!network.live) tdly.setup({ automaticVerifications: true })
 
   hre.deployProxy = async (contractName, { initArgs, ...opts } = {}) => {
-    hre.log('----------')
-    hre.log('')
-    hre.log(`${chalk.underline('Contract')}: ${chalk.bold(`${contractName}`)}`)
-    hre.log('')
+    return await ozDefenderDeploy(hre, 'proxy', contractName, initArgs, opts)
+  }
 
-    const existingDeployment = await deployments.getOrNull(contractName)
-    let proxy: Contract
-
-    const proxyLabel = chalk.bold(`Proxy: `)
-    const implementationLabel = chalk.bold(`Implementation: `)
-    const maxLabelLength = Math.max(
-      proxyLabel.length,
-      implementationLabel.length
-    )
-
-    if (existingDeployment) {
-      proxy = await ethers.getContractAt(
-        contractName,
-        existingDeployment.address
-      )
-    } else {
-      const implFactory = await hre.ethers.getContractFactory(contractName)
-      proxy = await hre.upgrades.deployProxy(implFactory, initArgs, opts)
-    }
-    hre.log(proxyLabel, {
-      star: false,
-      nl: false,
-      pad: { start: { length: maxLabelLength, char: ' ' } },
-    })
-    hre.log(`${proxy.address}`, { star: false })
-    await proxy.deployTransaction.wait(1)
-
-    const implementation = await hre.upgrades.erc1967.getImplementationAddress(
-      proxy.address
-    )
-    hre.log(implementationLabel, {
-      star: false,
-      nl: false,
-      pad: { start: { length: maxLabelLength, char: ' ' } },
-    })
-    hre.log(`${implementation}`, { star: false })
-
-    const { abi: tpuABI } = await hre.deployments.getArtifact(
-      'TransparentUpgradeableProxy'
-    )
-    await hre.deployments.save(contractName, {
-      address: proxy.address,
-      implementation,
-      abi: tpuABI,
-      transactionHash: proxy.deployTransaction.hash,
-      receipt: await proxy.deployTransaction.wait(),
-    })
-
-    hre.log('')
-    hre.log('----------')
-
-    return proxy
+  hre.deployBeacon = async (contractName, opts) => {
+    return await ozDefenderDeploy(hre, 'beacon', contractName, opts)
   }
 
   hre.contracts = {
@@ -399,8 +355,8 @@ extendEnvironment((hre) => {
   }
 
   hre.defender.proposeUpgradeAndCall = async (
-    proxyAddress: string,
-    implFactory: ContractFactory,
+    proxyAddress,
+    implFactory,
     opts
   ): Promise<ProposalResponse> => {
     const newImpl = await hre.upgrades.prepareUpgrade(
@@ -472,3 +428,97 @@ extendEnvironment((hre) => {
     })
   }
 })
+
+type OZDefenderDeployOpts = DeployProxyOptions | DeployBeaconOptions
+async function ozDefenderDeploy(
+  hre: HardhatRuntimeEnvironment,
+  deployType: 'proxy' | 'beacon',
+  contractName: string,
+  opts?: OZDefenderDeployOpts
+): Promise<Contract>
+async function ozDefenderDeploy(
+  hre: HardhatRuntimeEnvironment,
+  deployType: 'proxy' | 'beacon',
+  contractName: string,
+  initArgs?: unknown[],
+  opts?: DeployProxyOptions
+): Promise<Contract>
+async function ozDefenderDeploy(
+  hre: HardhatRuntimeEnvironment,
+  deployType: 'proxy' | 'beacon',
+  contractName: string,
+  initArgs: unknown[] | OZDefenderDeployOpts = [],
+  opts: OZDefenderDeployOpts = {}
+): Promise<Contract> {
+  const isProxy = deployType === 'proxy'
+  const contractTypeStr = isProxy ? 'Proxy' : 'Beacon'
+
+  if (!Array.isArray(initArgs)) {
+    // eslint-disable-next-line no-param-reassign
+    opts = initArgs
+    // eslint-disable-next-line no-param-reassign
+    initArgs = []
+  }
+
+  hre.log('----------')
+  hre.log('')
+  hre.log(
+    `${chalk.underline('Contract')} (${chalk.italic(
+      contractTypeStr
+    )}): ${chalk.bold(`${contractName}`)}`
+  )
+  hre.log('')
+
+  let proxy: Contract
+  const existingDeployment = await hre.deployments.getOrNull(contractName)
+  if (existingDeployment) {
+    proxy = await hre.ethers.getContractAt(
+      contractName,
+      existingDeployment.address
+    )
+  } else {
+    const implFactory = await hre.ethers.getContractFactory(contractName)
+    if (isProxy) {
+      proxy = await hre.upgrades.deployProxy(implFactory, initArgs, opts)
+    } else {
+      proxy = await hre.upgrades.deployBeacon(implFactory, opts)
+    }
+  }
+
+  const proxyLabel = chalk.bold(`${contractTypeStr}: `)
+  const implementationLabel = chalk.bold(`Implementation: `)
+  const maxLabelLength = Math.max(proxyLabel.length, implementationLabel.length)
+  hre.log(proxyLabel, {
+    star: false,
+    nl: false,
+    pad: { start: { length: maxLabelLength, char: ' ' } },
+  })
+  hre.log(`${proxy.address}`, { star: false })
+  await proxy.deployTransaction.wait(1)
+
+  const implementation = isProxy
+    ? await hre.upgrades.erc1967.getImplementationAddress(proxy.address)
+    : await hre.upgrades.beacon.getImplementationAddress(proxy.address)
+  hre.log(implementationLabel, {
+    star: false,
+    nl: false,
+    pad: { start: { length: maxLabelLength, char: ' ' } },
+  })
+  hre.log(`${implementation}`, { star: false })
+
+  const { abi } = await hre.deployments.getArtifact(
+    isProxy ? 'TransparentUpgradeableProxy' : 'UpgradeableBeacon'
+  )
+  await hre.deployments.save(contractName, {
+    address: proxy.address,
+    implementation,
+    abi,
+    transactionHash: proxy.deployTransaction.hash,
+    receipt: await proxy.deployTransaction.wait(),
+  })
+
+  hre.log('')
+  hre.log('----------')
+
+  return proxy
+}

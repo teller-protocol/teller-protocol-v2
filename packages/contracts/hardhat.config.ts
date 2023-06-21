@@ -9,6 +9,7 @@ import '@typechain/hardhat'
 import 'solidity-coverage'
 import '@openzeppelin/hardhat-upgrades'
 import '@openzeppelin/hardhat-defender'
+import '@nomicfoundation/hardhat-verify'
 
 import fs from 'fs'
 import path from 'path'
@@ -276,7 +277,8 @@ export default <HardhatUserConfig>{
       url: 'http://localhost:8545',
     }),
     mainnet: networkConfig({
-      url: networkUrls.mainnet,
+      // url: networkUrls.mainnet,
+      url: 'https://rpc.vnet.tenderly.co/devnet/gnosis-deployment/7b7afc51-fa14-450a-9e0d-b3b18e8352ab',
       chainId: 1,
       live: true,
       // gasPrice: ethers.utils.parseUnits('100', 'gwei').toNumber(),

@@ -17,5 +17,5 @@ const deployFn: DeployFunction = async (hre) => {
 
 // tags and deployment
 deployFn.tags = ['lender-commitment-forwarder']
-deployFn.dependencies = ['teller-v2', 'market-registry']
+deployFn.dependencies = ['teller-v2:deploy', 'market-registry']
 export default deployFn

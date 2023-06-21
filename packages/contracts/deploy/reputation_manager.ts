@@ -13,5 +13,5 @@ const deployFn: DeployFunction = async (hre) => {
 
 // tags and deployment
 deployFn.tags = ['reputation-manager']
-deployFn.dependencies = []
+deployFn.dependencies = ['teller-v2:deploy']
 export default deployFn

@@ -350,8 +350,8 @@ contract TellerV2 is
         require(isVerified, "Not verified borrower");
 
         require(
-            !marketRegistry.isMarketClosed(_marketplaceId),
-            "Market is closed"
+            marketRegistry.isMarketOpen(_marketplaceId),
+            "Market is not open"
         );
 
         // Set response bid ID.

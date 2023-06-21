@@ -154,7 +154,7 @@ contract TellerV2_bids_test is Testable {
 
         marketRegistryMock.mock_setGlobalMarketsClosed(true);
 
-        vm.expectRevert("Market is closed");
+        vm.expectRevert("Market is not open");
 
         tellerV2._submitBidSuper(
             address(lendingToken), // lending token

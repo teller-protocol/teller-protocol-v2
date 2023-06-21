@@ -55,8 +55,11 @@ contract TellerV2 is
     using EnumerableSet for EnumerableSet.AddressSet;
     using EnumerableSet for EnumerableSet.UintSet;
 
+
+    //the first 20 bytes of keccak256("lender manager")
     address constant USING_LENDER_MANAGER =
-        0x0000000000000000000000000000000000000001;
+        0x84d409eed89f6558fe3646397146232665788bf8;
+ 
 
     /** Events */
 

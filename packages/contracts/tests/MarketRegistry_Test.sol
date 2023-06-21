@@ -788,6 +788,18 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
         );
     }
 
+    function test_setMarketFeePercent_too_high() public {
+        marketRegistry.setMarketOwner(address(this));
+
+        marketRegistry.stubMarket(marketId, address(this));
+
+        vm.expectRevert("invalid fee percent");
+        marketRegistry.setMarketFeePercent(marketId, 1001);
+
+       
+    }
+
+
     function test_setMarketFeePercent_not_owner() public {
         marketRegistry.setMarketOwner(address(this));
 

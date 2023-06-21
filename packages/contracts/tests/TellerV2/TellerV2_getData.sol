@@ -305,6 +305,37 @@ contract TellerV2_initialize is Testable {
         assertEq(marketId, 100, "unexpected marketId from summary");
     }
 
+
+      function test_getLoanSummary_lender_manager() public {
+        uint256 bidId = 1;
+        setMockBid(1);
+
+
+        tellerV2.mock_setLenderManager(address(lenderManagerMock));
+
+        lenderManagerMock.registerLoan(bidId, address(this));
+
+        (
+            address borrower,
+            address lender,
+            uint256 marketId,
+            address principalTokenAddress,
+            uint256 principalAmount,
+            uint32 acceptedTimestamp,
+            BidState bidState
+        ) = tellerV2.getLoanSummary(bidId);
+
+
+
+        assertEq(
+            borrower,
+            address(borrower),
+            "unexpected borrower from summary"
+        );
+        assertEq(lender, tellerV2.getLoanLender(bidId), "unexpected lender from summary");
+        assertEq(marketId, 100, "unexpected marketId from summary");
+    }
+
     /*
         there are many branches of this to test 
     */

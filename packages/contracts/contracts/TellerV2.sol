@@ -58,7 +58,7 @@ contract TellerV2 is
 
     //the first 20 bytes of keccak256("lender manager")
     address constant USING_LENDER_MANAGER =
-        0x84d409eed89f6558fe3646397146232665788bf8;
+        0x84D409EeD89F6558fE3646397146232665788bF8;
  
 
     /** Events */

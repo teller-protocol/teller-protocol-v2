@@ -659,7 +659,7 @@ contract TellerV2_bids_test is Testable {
         uint256 bidId = 1;
         setMockBid(bidId);
 
-        tellerV2.setCollateralManagerSuper(address(collateralManagerMock));      
+        tellerV2.setCollateralManagerSuper(address(collateralManagerMock));
 
         tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
         vm.warp(2000 * 1e20);

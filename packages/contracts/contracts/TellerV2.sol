@@ -55,6 +55,12 @@ contract TellerV2 is
     using EnumerableSet for EnumerableSet.AddressSet;
     using EnumerableSet for EnumerableSet.UintSet;
 
+
+    //the first 20 bytes of keccak256("lender manager")
+    address constant USING_LENDER_MANAGER =
+        0x84D409EeD89F6558fE3646397146232665788bF8;
+ 
+
     /** Events */
 
     /**
@@ -570,7 +576,7 @@ contract TellerV2 is
         // mint an NFT with the lender manager
         lenderManager.registerLoan(_bidId, sender);
         // set lender address to the lender manager so we know to check the owner of the NFT for the true lender
-        bid.lender = address(lenderManager);
+        bid.lender = address(USING_LENDER_MANAGER);
     }
 
     /**
@@ -1089,6 +1095,11 @@ contract TellerV2 is
     {
         lender_ = bids[_bidId].lender;
 
+        if (lender_ == address(USING_LENDER_MANAGER)) {
+            return lenderManager.ownerOf(_bidId);
+        }
+
+        //this is left in for backwards compatibility only
         if (lender_ == address(lenderManager)) {
             return lenderManager.ownerOf(_bidId);
         }

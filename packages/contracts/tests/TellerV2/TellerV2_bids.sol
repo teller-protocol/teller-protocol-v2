@@ -655,6 +655,30 @@ contract TellerV2_bids_test is Testable {
         tellerV2.repayLoanFull(bidId);
     }
 
+    function test_lender_close_loan() public {
+        uint256 bidId = 1;
+        setMockBid(bidId);
+
+        tellerV2.setCollateralManagerSuper(address(collateralManagerMock));      
+
+        tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
+        vm.warp(2000 * 1e20);
+
+        tellerV2.mock_setBidDefaultDuration(bidId, 1000);
+
+        //set the account that will be paying the loan off
+        tellerV2.setMockMsgSenderForMarket(address(this));
+
+        lendingToken.approve(address(tellerV2), 1e20);
+
+        tellerV2.lenderCloseLoan(bidId);
+
+        BidState state = tellerV2.getBidState(bidId);
+        // make sure the state is now CLOSED
+
+        require(state == BidState.CLOSED, "bid was not closed");
+    }
+
     function test_liquidate_loan_full() public {
         uint256 bidId = 1;
         setMockBid(bidId);

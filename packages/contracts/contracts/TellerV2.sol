@@ -698,7 +698,22 @@ contract TellerV2 is
         _unpause();
     }
 
-    //TODO: add an incentive for liquidator
+    /**
+     * @notice Function for lender to claim collateral for a defaulted loan. The only purpose of a CLOSED loan is to make collateral claimable by lender.
+     * @param _bidId The id of the loan to set to CLOSED status.
+     */
+    function lenderCloseLoan(uint256 _bidId)
+        external
+        acceptedLoan(_bidId, "lenderClaimCollateral")
+    {
+        require(isLoanDefaulted(_bidId), "Loan must be defaulted.");
+
+        Bid storage bid = bids[_bidId];
+        bid.state = BidState.CLOSED;
+
+        collateralManager.lenderClaimCollateral(_bidId);
+    }
+
     /**
      * @notice Function for users to liquidate a defaulted loan.
      * @param _bidId The id of the loan to make the payment towards.

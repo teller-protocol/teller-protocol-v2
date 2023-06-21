@@ -10,10 +10,6 @@ import "../contracts/TellerV2.sol";
 import { Bid } from "../contracts/TellerV2Storage.sol";
 import { PaymentType } from "../contracts/libraries/V2Calculations.sol";
 
-
-import "forge-std/console.sol";
-
-
 contract V2Calculations_Test is Testable {
     using Arrays for uint256[];
     using EnumerableSet for EnumerableSet.UintSet;
@@ -38,27 +34,7 @@ contract V2Calculations_Test is Testable {
 
     // EMI loan
 
-    /*
-    What does any of this mean? 
-    what does it do? 
-    why does it do it?
-    */
-
-
-    /*
-
-
-    the _runner should accept the cycles to skip and extra payments as INPUT  ARGS
-    and it should return a TUPLE of the number of cycles that happened ! 
-
-    */
-
-    
-   // Why does this not pass ? 
-
     function test_baseline_calculateAmountOwed() public {
-        
-
         calculateAmountOwed_runner(
             36, //the number of payment cycles expected
             PaymentType.EMI,
@@ -67,12 +43,10 @@ contract V2Calculations_Test is Testable {
     }
 
     function test_01_calculateAmountOwed() public {
-        cyclesToSkip.add(2);//we dont make a payment in cycle 2   --- rename to 'missed payments' 
+        cyclesToSkip.add(2); //rename to 'missed payments' ?
         cyclesWithExtraPayments = [3, 4];
         cyclesWithExtraPaymentsAmounts = [25000e6, 25000e6];
 
-
-    //why is it saying that its taking 19 ? 
         calculateAmountOwed_runner(
             18, //the number of payment cycles expected
             PaymentType.EMI,
@@ -128,9 +102,6 @@ contract V2Calculations_Test is Testable {
             PaymentCycleType.Monthly
         );
     }
- 
-
-//Why do these fail based on a change to the EMI loan code !??
 
     // Bullet loan
     function test_06_calculateAmountOwed() public {
@@ -143,7 +114,6 @@ contract V2Calculations_Test is Testable {
     }
 
     // Bullet loan
-
     function test_07_calculateAmountOwed() public {
         cyclesToSkip.add(12);
         cyclesWithExtraPayments = [1, 8];
@@ -176,7 +146,6 @@ contract V2Calculations_Test is Testable {
             PaymentCycleType.Monthly
         );
     }
-     
 
     function calculateAmountOwed_runner(
         uint256 expectedTotalCycles,
@@ -220,13 +189,6 @@ contract V2Calculations_Test is Testable {
             uint256 interest;
             (owedPrincipal, duePrincipal, interest) = V2Calculations
                 .calculateAmountOwed(__bid, nowTimestamp, _paymentCycleType);
-
-
-            console.logUint(cycleIndex);
-            console.logUint(owedPrincipal);
-            console.logUint(duePrincipal);
-            console.logUint(interest);
-
 
             // Check if we should skip this cycle for payments
             if (cyclesToSkip.length() > 0) {
@@ -446,21 +408,19 @@ contract V2Calculations_Test is Testable {
         );
     }
 
-
     function test_calculateEMIAmountOwed_last_cycle() public {
- 
-
         uint256 _principal = 100000e6;
         uint256 _repaidPrincipal = 91666666667;
         uint16 _apr = 3000;
         uint256 _acceptedTimestamp = 1646159355;
-        uint256 _lastRepaidTimestamp = _acceptedTimestamp + (365 days - 30 days);
-        __bid.loanDetails.loanDuration = 365 days * 1;   //1 year       
+        uint256 _lastRepaidTimestamp = _acceptedTimestamp +
+            (365 days - 30 days);
+        __bid.loanDetails.loanDuration = 365 days * 1; //1 year
         __bid.loanDetails.principal = _principal;
         __bid.terms.APR = _apr;
         __bid.loanDetails.totalRepaid.principal = _repaidPrincipal;
         __bid.terms.paymentCycleAmount = 8333333333;
-        __bid.terms.paymentCycle = 365 days / 12; // 1 month 
+        __bid.terms.paymentCycle = 365 days / 12; // 1 month
         __bid.loanDetails.acceptedTimestamp = uint32(_acceptedTimestamp);
         __bid.paymentType = PaymentType.EMI;
         uint256 _paymentCycleAmount = V2Calculations
@@ -476,8 +436,8 @@ contract V2Calculations_Test is Testable {
 
         // Within the first payment cycle
 
-        //as you move this closer to 365 days, the owed principal increases for some odd reason ! 
-        uint256 _timestamp = _acceptedTimestamp + ((365 days - 2 days ));  //we are in the last cycle 
+        //as you move this closer to 365 days, the owed principal increases for some odd reason !
+        uint256 _timestamp = _acceptedTimestamp + ((365 days - 2 days)); //we are in the last cycle
 
         (
             uint256 _owedPrincipal,
@@ -488,25 +448,23 @@ contract V2Calculations_Test is Testable {
                 _lastRepaidTimestamp,
                 _timestamp,
                 PaymentCycleType.Seconds
-        );
-
+            );
 
         assertEq(
             _owedPrincipal,
             _principal - _repaidPrincipal,
             "Last cycle EMI owed principal incorrect"
         );
-         assertEq(
+        assertEq(
             _duePrincipal,
             _principal - _repaidPrincipal,
             "Last cycle EMI due principal incorrect"
         );
 
-      /*  assertEq(
+        /*  assertEq(
             _interest,
             191780821,
             "Last cycle EMI interest incorrect"
         );*/
-
     }
 }

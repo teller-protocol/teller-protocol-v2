@@ -6,7 +6,6 @@ pragma solidity >=0.8.0 <0.9.0;
 import "./NumbersLib.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import { Bid } from "../TellerV2Storage.sol";
- 
 
 enum PaymentType {
     EMI,
@@ -106,24 +105,16 @@ library V2Calculations {
                 duePrincipal_ = owedPrincipal_;
             }
         } else {
-           
             // Default to PaymentType.EMI
             // Max payable amount in a cycle
             // NOTE: the last cycle could have less than the calculated payment amount
-            uint256 maxCycleOwed =  _bid.terms.paymentCycleAmount;
+            uint256 maxCycleOwed = _bid.terms.paymentCycleAmount;
 
-           
+            uint256 owedAmount = isLastPaymentCycle
+                ? owedPrincipal_ + interest_
+                : (maxCycleOwed * owedTime) / _bid.terms.paymentCycle;
 
-            uint256 owedAmount = isLastPaymentCycle ? 
-            owedPrincipal_ + interest_ :
-             (maxCycleOwed * owedTime) / _bid.terms.paymentCycle;
-             
- 
             duePrincipal_ = Math.min(owedAmount - interest_, owedPrincipal_);
-
-           /*    duePrincipal_ = isLastPaymentCycle 
-                ? owedPrincipal_ 
-                : (_bid.terms.paymentCycleAmount * owedTime) / _bid.terms.paymentCycle;*/
         }
     }
 

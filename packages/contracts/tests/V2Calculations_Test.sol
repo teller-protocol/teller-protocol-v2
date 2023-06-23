@@ -33,13 +33,22 @@ contract V2Calculations_Test is Testable {
     }
 
     // EMI loan
+
+    function test_baseline_calculateAmountOwed() public {
+        calculateAmountOwed_runner(
+            36, //the number of payment cycles expected
+            PaymentType.EMI,
+            PaymentCycleType.Seconds
+        );
+    }
+
     function test_01_calculateAmountOwed() public {
-        cyclesToSkip.add(2);
+        cyclesToSkip.add(2); //rename to 'missed payments' ?
         cyclesWithExtraPayments = [3, 4];
         cyclesWithExtraPaymentsAmounts = [25000e6, 25000e6];
 
         calculateAmountOwed_runner(
-            18,
+            18, //the number of payment cycles expected
             PaymentType.EMI,
             PaymentCycleType.Seconds
         );
@@ -105,7 +114,6 @@ contract V2Calculations_Test is Testable {
     }
 
     // Bullet loan
-
     function test_07_calculateAmountOwed() public {
         cyclesToSkip.add(12);
         cyclesWithExtraPayments = [1, 8];
@@ -153,6 +161,9 @@ contract V2Calculations_Test is Testable {
             __bid.terms.paymentCycle,
             __bid.terms.APR
         );
+
+        //need this here or else it defaults to EMI !
+        __bid.paymentType = _paymentType;
 
         // Set the bid's payment cycle amount
         __bid.terms.paymentCycleAmount = paymentCycleAmount;
@@ -260,6 +271,83 @@ contract V2Calculations_Test is Testable {
             1076484033293177614,
             "Expected number of cycles incorrect"
         );
+    }
+
+    function test_calculateAmountOwed_irregular_time_end_of_second_to_last_cycle()
+        public
+    {
+        uint256 principal = 10000;
+        uint256 repaidPrincipal = 0;
+        uint16 interestRate = 0;
+        __bid.loanDetails.principal = principal;
+        __bid.loanDetails.loanDuration = 8000;
+        __bid.terms.APR = interestRate;
+        __bid.loanDetails.totalRepaid.principal = repaidPrincipal;
+        __bid.terms.paymentCycleAmount = 3000;
+        __bid.terms.paymentCycle = 3000;
+        __bid.loanDetails.acceptedTimestamp = 2000000;
+        __bid.paymentType = PaymentType.EMI;
+
+        (uint256 _owedPrincipal, uint256 _duePrincipal, uint256 _interest) = V2Calculations
+            .calculateAmountOwed(
+                __bid,
+                2000000 + 3000, //last repaid timestamp
+                2000000 + 5500, //timestamp
+                PaymentCycleType.Seconds
+            );
+
+        assertEq(_owedPrincipal, 10000, "Expected owed principal incorrect");
+        assertEq(_duePrincipal, 2500, "Expected due principal incorrect");
+    }
+
+    function test_calculateAmountOwed_irregular_time_last_cycle() public {
+        uint256 principal = 10000;
+        uint256 repaidPrincipal = 0;
+        uint16 interestRate = 0;
+        __bid.loanDetails.principal = principal;
+        __bid.loanDetails.loanDuration = 8000;
+        __bid.terms.APR = interestRate;
+        __bid.loanDetails.totalRepaid.principal = repaidPrincipal;
+        __bid.terms.paymentCycleAmount = 3000;
+        __bid.terms.paymentCycle = 3000;
+        __bid.loanDetails.acceptedTimestamp = 2000000;
+        __bid.paymentType = PaymentType.EMI;
+
+        (uint256 _owedPrincipal, uint256 _duePrincipal, uint256 _interest) = V2Calculations
+            .calculateAmountOwed(
+                __bid,
+                2000000 + 3000, //last repaid timestamp
+                2000000 + 7500, //timestamp
+                PaymentCycleType.Seconds
+            );
+
+        assertEq(_owedPrincipal, 10000, "Expected owed principal incorrect");
+        assertEq(_duePrincipal, 10000, "Expected due principal incorrect");
+    }
+
+    function test_calculateAmountOwed_irregular_time_late() public {
+        uint256 principal = 10000;
+        uint256 repaidPrincipal = 0;
+        uint16 interestRate = 0;
+        __bid.loanDetails.principal = principal;
+        __bid.loanDetails.loanDuration = 8000;
+        __bid.terms.APR = interestRate;
+        __bid.loanDetails.totalRepaid.principal = repaidPrincipal;
+        __bid.terms.paymentCycleAmount = 3000;
+        __bid.terms.paymentCycle = 3000;
+        __bid.loanDetails.acceptedTimestamp = 2000000;
+        __bid.paymentType = PaymentType.EMI;
+
+        (uint256 _owedPrincipal, uint256 _duePrincipal, uint256 _interest) = V2Calculations
+            .calculateAmountOwed(
+                __bid,
+                2000000 + 3000, //last repaid timestamp
+                2000000 + 19500, //timestamp
+                PaymentCycleType.Seconds
+            );
+
+        assertEq(_owedPrincipal, 10000, "Expected owed principal incorrect");
+        assertEq(_duePrincipal, 10000, "Expected due principal incorrect");
     }
 
     function test_calculateBulletAmountOwed() public {
@@ -395,5 +483,63 @@ contract V2Calculations_Test is Testable {
             ((_principal * _apr) / 10000) * 2,
             "Final cycle bullet interest incorrect"
         );
+    }
+
+    function test_calculateEMIAmountOwed_last_cycle() public {
+        uint256 _principal = 100000e6;
+        uint256 _repaidPrincipal = 91666666667;
+        uint16 _apr = 3000;
+        uint256 _acceptedTimestamp = 1646159355;
+        uint256 _lastRepaidTimestamp = _acceptedTimestamp +
+            (365 days - 30 days);
+        __bid.loanDetails.loanDuration = 365 days * 1; //1 year
+        __bid.loanDetails.principal = _principal;
+        __bid.terms.APR = _apr;
+        __bid.loanDetails.totalRepaid.principal = _repaidPrincipal;
+        __bid.terms.paymentCycleAmount = 8333333333;
+        __bid.terms.paymentCycle = 365 days / 12; // 1 month
+        __bid.loanDetails.acceptedTimestamp = uint32(_acceptedTimestamp);
+        __bid.paymentType = PaymentType.EMI;
+        uint256 _paymentCycleAmount = V2Calculations
+            .calculatePaymentCycleAmount(
+                PaymentType.EMI,
+                PaymentCycleType.Seconds,
+                _principal,
+                365 days,
+                365 days / 12,
+                _apr
+            );
+        __bid.terms.paymentCycleAmount = _paymentCycleAmount;
+
+        // Within the first payment cycle
+        uint256 _timestamp = _acceptedTimestamp + ((365 days - 2 days)); //we are in the last cycle
+
+        (
+            uint256 _owedPrincipal,
+            uint256 _duePrincipal,
+            uint256 _interest
+        ) = V2Calculations.calculateAmountOwed(
+                __bid,
+                _lastRepaidTimestamp,
+                _timestamp,
+                PaymentCycleType.Seconds
+            );
+
+        assertEq(
+            _owedPrincipal,
+            _principal - _repaidPrincipal,
+            "Last cycle EMI owed principal incorrect"
+        );
+        assertEq(
+            _duePrincipal,
+            _principal - _repaidPrincipal,
+            "Last cycle EMI due principal incorrect"
+        );
+
+        /*  assertEq(
+            _interest,
+            191780821,
+            "Last cycle EMI interest incorrect"
+        );*/
     }
 }

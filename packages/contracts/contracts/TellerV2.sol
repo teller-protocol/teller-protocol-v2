@@ -55,6 +55,12 @@ contract TellerV2 is
     using EnumerableSet for EnumerableSet.AddressSet;
     using EnumerableSet for EnumerableSet.UintSet;
 
+
+    //the first 20 bytes of keccak256("lender manager")
+    address constant USING_LENDER_MANAGER =
+        0x84D409EeD89F6558fE3646397146232665788bF8;
+ 
+
     /** Events */
 
     /**
@@ -350,8 +356,8 @@ contract TellerV2 is
         require(isVerified, "Not verified borrower");
 
         require(
-            !marketRegistry.isMarketClosed(_marketplaceId),
-            "Market is closed"
+            marketRegistry.isMarketOpen(_marketplaceId),
+            "Market is not open"
         );
 
         // Set response bid ID.
@@ -577,7 +583,7 @@ contract TellerV2 is
         // mint an NFT with the lender manager
         lenderManager.registerLoan(_bidId, sender);
         // set lender address to the lender manager so we know to check the owner of the NFT for the true lender
-        bid.lender = address(lenderManager);
+        bid.lender = address(USING_LENDER_MANAGER);
     }
 
     /**
@@ -613,18 +619,7 @@ contract TellerV2 is
         external
         acceptedLoan(_bidId, "repayLoan")
     {
-        (uint256 owedPrincipal, , uint256 interest) = V2Calculations
-            .calculateAmountOwed(
-                bids[_bidId],
-                block.timestamp,
-                bidPaymentCycleType[_bidId]
-            );
-        _repayLoan(
-            _bidId,
-            Payment({ principal: owedPrincipal, interest: interest }),
-            owedPrincipal + interest,
-            true
-        );
+        _repayLoanFull(_bidId, true);
     }
 
     // function that the borrower (ideally) sends to repay the loan
@@ -637,6 +632,47 @@ contract TellerV2 is
         external
         acceptedLoan(_bidId, "repayLoan")
     {
+        _repayLoanAtleastMinimum(_bidId, _amount, true);
+    }
+
+    /**
+     * @notice Function for users to repay an active loan in full.
+     * @param _bidId The id of the loan to make the payment towards.
+     */
+    function repayLoanFullWithoutCollateralWithdraw(uint256 _bidId)
+        external
+        acceptedLoan(_bidId, "repayLoan")
+    {
+        _repayLoanFull(_bidId, false);
+    }
+
+    function repayLoanWithoutCollateralWithdraw(uint256 _bidId, uint256 _amount)
+        external
+        acceptedLoan(_bidId, "repayLoan")
+    {
+        _repayLoanAtleastMinimum(_bidId, _amount, false);
+    }
+
+    function _repayLoanFull(uint256 _bidId, bool withdrawCollateral) internal {
+        (uint256 owedPrincipal, , uint256 interest) = V2Calculations
+            .calculateAmountOwed(
+                bids[_bidId],
+                block.timestamp,
+                bidPaymentCycleType[_bidId]
+            );
+        _repayLoan(
+            _bidId,
+            Payment({ principal: owedPrincipal, interest: interest }),
+            owedPrincipal + interest,
+            withdrawCollateral
+        );
+    }
+
+    function _repayLoanAtleastMinimum(
+        uint256 _bidId,
+        uint256 _amount,
+        bool withdrawCollateral
+    ) internal {
         (
             uint256 owedPrincipal,
             uint256 duePrincipal,
@@ -657,7 +693,7 @@ contract TellerV2 is
             _bidId,
             Payment({ principal: _amount - interest, interest: interest }),
             owedPrincipal + interest,
-            true
+            withdrawCollateral
         );
     }
 
@@ -675,7 +711,22 @@ contract TellerV2 is
         _unpause();
     }
 
-    //TODO: add an incentive for liquidator
+    /**
+     * @notice Function for lender to claim collateral for a defaulted loan. The only purpose of a CLOSED loan is to make collateral claimable by lender.
+     * @param _bidId The id of the loan to set to CLOSED status.
+     */
+    function lenderCloseLoan(uint256 _bidId)
+        external
+        acceptedLoan(_bidId, "lenderClaimCollateral")
+    {
+        require(isLoanDefaulted(_bidId), "Loan must be defaulted.");
+
+        Bid storage bid = bids[_bidId];
+        bid.state = BidState.CLOSED;
+
+        collateralManager.lenderClaimCollateral(_bidId);
+    }
+
     /**
      * @notice Function for users to liquidate a defaulted loan.
      * @param _bidId The id of the loan to make the payment towards.
@@ -934,7 +985,7 @@ contract TellerV2 is
         override
         returns (bool)
     {
-        return _canLiquidateLoan(_bidId, 0);
+        return _isLoanDefaulted(_bidId, 0);
     }
 
     /**
@@ -948,16 +999,16 @@ contract TellerV2 is
         override
         returns (bool)
     {
-        return _canLiquidateLoan(_bidId, LIQUIDATION_DELAY);
+        return _isLoanDefaulted(_bidId, LIQUIDATION_DELAY);
     }
 
     /**
      * @notice Checks to see if a borrower is delinquent.
      * @param _bidId The id of the loan bid to check for.
-     * @param _liquidationDelay Amount of additional seconds after a loan defaulted to allow a liquidation.
+     * @param _additionalDelay Amount of additional seconds after a loan defaulted to allow a liquidation.
      * @return bool True if the loan is liquidateable.
      */
-    function _canLiquidateLoan(uint256 _bidId, uint32 _liquidationDelay)
+    function _isLoanDefaulted(uint256 _bidId, uint32 _additionalDelay)
         internal
         view
         returns (bool)
@@ -967,12 +1018,15 @@ contract TellerV2 is
         // Make sure loan cannot be liquidated if it is not active
         if (bid.state != BidState.ACCEPTED) return false;
 
-        if (bidDefaultDuration[_bidId] == 0) return false;
+        uint32 defaultDuration = bidDefaultDuration[_bidId];
 
-        return (uint32(block.timestamp) -
-            _liquidationDelay -
-            lastRepaidTimestamp(_bidId) >
-            bidDefaultDuration[_bidId]);
+        if (defaultDuration == 0) return false;
+
+        uint32 dueDate = calculateNextDueDate(_bidId);
+
+        return
+            uint32(block.timestamp) >
+            dueDate + defaultDuration + _additionalDelay;
     }
 
     function getBidState(uint256 _bidId)
@@ -1048,6 +1102,11 @@ contract TellerV2 is
     {
         lender_ = bids[_bidId].lender;
 
+        if (lender_ == address(USING_LENDER_MANAGER)) {
+            return lenderManager.ownerOf(_bidId);
+        }
+
+        //this is left in for backwards compatibility only
         if (lender_ == address(lenderManager)) {
             return lenderManager.ownerOf(_bidId);
         }

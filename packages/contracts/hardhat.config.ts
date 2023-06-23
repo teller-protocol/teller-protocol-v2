@@ -277,8 +277,7 @@ export default <HardhatUserConfig>{
       url: 'http://localhost:8545',
     }),
     mainnet: networkConfig({
-      // url: networkUrls.mainnet,
-      url: 'https://rpc.vnet.tenderly.co/devnet/gnosis-deployment/f7ab04b6-12e4-4549-9d22-cc4f7fc5bea5',
+      url: networkUrls.mainnet,
       chainId: 1,
       live: true,
       // gasPrice: ethers.utils.parseUnits('100', 'gwei').toNumber(),

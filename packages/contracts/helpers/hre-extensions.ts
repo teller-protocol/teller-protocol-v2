@@ -9,6 +9,7 @@ import {
   DeployBeaconOptions,
   DeployProxyOptions,
 } from '@openzeppelin/hardhat-upgrades/dist/utils'
+import { PrepareUpgradeOptions } from '@openzeppelin/hardhat-upgrades/src/utils/options'
 import * as ozUpgrades from '@openzeppelin/upgrades-core'
 import * as tdly from '@teller-protocol/hardhat-tenderly'
 import chalk from 'chalk'
@@ -59,12 +60,11 @@ declare module 'hardhat/types/runtime' {
     proposeUpgradeAndCall: (
       proxyAddress: string,
       implFactory: ContractFactory,
-      opts: {
-        constructorArgs?: any[]
-        callFn: string
-        callArgs: any[]
+      opts: PrepareUpgradeOptions & {
         title: string
         description: string
+        callFn: string
+        callArgs: any[]
       }
     ) => Promise<ProposalResponse>
   }
@@ -392,35 +392,34 @@ extendEnvironment((hre) => {
   hre.defender.proposeUpgradeAndCall = async (
     proxyAddress,
     implFactory,
-    opts
+    { title, description, callFn, callArgs, ...opts }
   ): Promise<ProposalResponse> => {
     const newImpl = await hre.upgrades.prepareUpgrade(
       proxyAddress,
       implFactory,
-      {
-        constructorArgs: opts.constructorArgs,
-      }
+      opts
     )
     const newImplAddr =
       typeof newImpl === 'string'
         ? newImpl
         : await newImpl.wait().then((r) => r.contractAddress)
 
-    const adminAddress = await hre.upgrades.erc1967.getAdminAddress(
-      proxyAddress
-    )
+    const proxyAdmin = await hre.upgrades.admin.getInstance()
     const { protocolAdminSafe } = await hre.getNamedAccounts()
 
     const admin = getAdminClient(hre)
     return await admin.createProposal({
       contract: {
-        address: adminAddress,
+        address: proxyAdmin.address,
         network: await getNetwork(hre),
-        // provide abi OR overrideSimulationOpts.transactionData.data
-        // abi: JSON.stringify(contractABI),
+        abi: JSON.stringify(
+          proxyAdmin.interface.fragments.map((fragment) =>
+            JSON.parse(fragment.format('json'))
+          )
+        ),
       },
-      title: opts.title,
-      description: opts.description,
+      title: title,
+      description: description,
       type: 'custom',
       // metadata: {
       //   sendTo: '0xA91382E82fB676d4c935E601305E5253b3829dCD',
@@ -447,19 +446,12 @@ extendEnvironment((hre) => {
       functionInputs: [
         proxyAddress,
         newImplAddr,
-        implFactory.interface.encodeFunctionData(opts.callFn, opts.callArgs),
+        implFactory.interface.encodeFunctionData(callFn, callArgs),
       ],
-      via: protocolAdminSafe,
       viaType: 'Gnosis Safe',
+      via: protocolAdminSafe,
       // set simulate to true
-      simulate: true,
-      // optional
-      // overrideSimulationOpts: {
-      //   transactionData: {
-      //     // or instead of ABI, you can provide data
-      //     data: '0xd336c82d',
-      //   },
-      // },
+      // simulate: true,
     })
   }
 })

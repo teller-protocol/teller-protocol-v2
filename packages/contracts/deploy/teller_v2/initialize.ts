@@ -47,7 +47,7 @@ const deployFn: DeployFunction = async (hre) => {
 
 // tags and deployment
 deployFn.id = 'teller-v2:init'
-deployFn.tags = ['teller-v2']
+deployFn.tags = ['teller-v2', 'teller-v2:init']
 deployFn.dependencies = [
   'teller-v2:deploy',
   'market-registry:deploy',

@@ -205,6 +205,57 @@ contract TellerV2_Test is Testable {
             "Collateral was not sent to borrower after repayment"
         );
     }
+
+    function test_commit_collateral_frontrun_exploit() public {
+        // The original borrower balance for the DAI principal and WETH collateral
+        assertEq(daiMock.balanceOf(address(borrower)), 50000);
+        assertEq(wethMock.balanceOf(address(borrower)), 50000);
+
+        // The original lender balance for the DAI principal -> This will be stolen
+        assertEq(daiMock.balanceOf(address(lender)), 500000);
+
+        // Submit bid as borrower
+        uint256 bidId = submitCollateralBid();
+
+        // The original bid is for 10 WETH
+        uint256 originalCollateralAmount = collateralManager
+            .getCollateralAmount(bidId, address(wethMock));
+        assertEq(originalCollateralAmount, 10);
+
+        // This is just to illustrate that some time passes (but it is irrelevant)
+        vm.warp(100);
+
+        // A potential lender finds the bid attractive and decides to accept the bid
+
+        // The attack begins here
+        // The malicious borrower sees the transaction in the mempool and frontruns it
+
+        // The borrower prepares the malicious bid lowering the amount to the minimum possible
+        Collateral memory info;
+        info._amount = 1; // @audit minimum amount
+        info._tokenId = 0;
+        info._collateralAddress = address(wethMock);
+        info._collateralType = CollateralType.ERC20;
+
+        Collateral[] memory collateralInfo = new Collateral[](1);
+        collateralInfo[0] = info;
+
+        // The malicious borrower performs the attack by frontrunning the tx and updating the bid collateral amount
+        vm.prank(address(borrower));
+        vm.expectRevert();
+        collateralManager.commitCollateral(bidId, info);
+
+        // The lender is now victim to the frontrunning and accepts the malicious bid
+        /*  acceptBid(bidId);
+
+        // The borrower now has the expected 95 DAI from the loan (5 DAI are gone in fees)
+        // But he only provided 1 WETH as collateral instead of the original amount of 10 WETH
+        assertEq(daiMock.balanceOf(address(borrower)), 50095);
+        assertEq(wethMock.balanceOf(address(borrower)), 49999); // @audit only provided 1 WETH
+
+        // The lender lost his principal of 100 DAI, as the loan is only collateralized by 1 WETH instead of 10 WETH
+        assertEq(daiMock.balanceOf(address(lender)), 499900);*/
+    }
 }
 
 contract TellerV2User is User {

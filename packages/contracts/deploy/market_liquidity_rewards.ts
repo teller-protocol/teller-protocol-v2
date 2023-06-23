@@ -8,12 +8,12 @@ const deployFn: DeployFunction = async (hre) => {
   const marketLiquidityRewards = await hre.deployProxy(
     'MarketLiquidityRewards',
     {
+      unsafeAllow: ['constructor', 'state-variable-immutable'],
       constructorArgs: [
         tellerV2.address,
         marketRegistry.address,
         collateralManager.address,
       ],
-      redeployImplementation: 'never',
     }
   )
 
@@ -21,6 +21,11 @@ const deployFn: DeployFunction = async (hre) => {
 }
 
 // tags and deployment
-deployFn.tags = ['liquidity-rewards']
-deployFn.dependencies = ['teller-v2', 'market-registry', 'collateral']
+deployFn.id = 'liquidity-rewards:deploy'
+deployFn.tags = ['liquidity-rewards', 'liquidity-rewards:deploy']
+deployFn.dependencies = [
+  'teller-v2:deploy',
+  'market-registry:deploy',
+  'collateral:deploy',
+]
 export default deployFn

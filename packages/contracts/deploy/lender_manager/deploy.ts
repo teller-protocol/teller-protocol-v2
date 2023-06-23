@@ -6,13 +6,13 @@ const deployFn: DeployFunction = async (hre) => {
   const lenderManager = await hre.deployProxy('LenderManager', {
     constructorArgs: [marketRegistry.address],
     unsafeAllow: ['constructor', 'state-variable-immutable'],
-    redeployImplementation: 'never',
   })
 
   return true
 }
 
 // tags and deployment
-deployFn.tags = ['lender-manager']
-deployFn.dependencies = ['market-registry']
+deployFn.id = 'lender-manager:deploy'
+deployFn.tags = ['lender-manager', 'lender-manager:deploy']
+deployFn.dependencies = ['market-registry:deploy']
 export default deployFn

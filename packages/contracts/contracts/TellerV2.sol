@@ -206,21 +206,6 @@ contract TellerV2 is
         );
         collateralManager = ICollateralManager(_collateralManager);
 
-        _setLenderManager(_lenderManager);
-    }
-
-    function setLenderManager(address _lenderManager)
-        external
-        reinitializer(8)
-        onlyOwner
-    {
-        _setLenderManager(_lenderManager);
-    }
-
-    function _setLenderManager(address _lenderManager)
-        internal
-        onlyInitializing
-    {
         require(
             _lenderManager.isContract(),
             "LenderManager must be a contract"
@@ -249,14 +234,6 @@ contract TellerV2 is
             uint256 convertedURI = uint256(bids[_bidId]._metadataURI);
             metadataURI_ = StringsUpgradeable.toHexString(convertedURI, 32);
         }
-    }
-
-    /**
-     * @notice Lets the DAO/owner of the protocol to set a new reputation manager contract.
-     * @param _reputationManager The new contract address.
-     */
-    function setReputationManager(address _reputationManager) public onlyOwner {
-        reputationManager = IReputationManager(_reputationManager);
     }
 
     /**

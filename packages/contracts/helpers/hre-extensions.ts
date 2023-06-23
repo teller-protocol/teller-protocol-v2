@@ -9,6 +9,7 @@ import {
   DeployBeaconOptions,
   DeployProxyOptions,
 } from '@openzeppelin/hardhat-upgrades/dist/utils'
+import * as ozUpgrades from '@openzeppelin/upgrades-core'
 import * as tdly from '@teller-protocol/hardhat-tenderly'
 import chalk from 'chalk'
 import {
@@ -28,15 +29,22 @@ import { getTokens } from '../config'
 
 import { formatMsg, FormatMsgConfig } from './formatMsg'
 
+interface DeployProxyInitArgs {
+  initArgs?: any[]
+}
+interface DeployCustomName {
+  customName?: string
+}
+
 declare module 'hardhat/types/runtime' {
   interface HardhatRuntimeEnvironment {
     deployProxy: (
       contractName: string,
-      opts?: DeployProxyOptions & { initArgs?: any[] }
+      opts?: DeployProxyOptions & DeployProxyInitArgs & DeployCustomName
     ) => Promise<Contract>
     deployBeacon: (
       contractName: string,
-      opts?: DeployBeaconOptions
+      opts?: DeployBeaconOptions & DeployCustomName
     ) => Promise<Contract>
     contracts: ContractsExtension
     tokens: TokensExtension
@@ -72,6 +80,20 @@ interface ContractsExtension {
     name: string,
     config?: ContractsGetConfig
   ) => Promise<C>
+
+  proxy: {
+    /**
+     * Returns the implementation version of a proxy contract.
+     *
+     * ** Warning **
+     *  This function checks storage slot 0 of the proxy contract. If the
+     *  proxy contract uses a different storage slot for the implementation version
+     *  this function will return an incorrect value.
+     *
+     * @param proxy
+     */
+    initializedVersion: (proxy: string | Contract) => Promise<number>
+  }
 }
 
 interface TokensExtension {
@@ -227,6 +249,19 @@ extendEnvironment((hre) => {
       }
 
       return contract as C
+    },
+
+    proxy: {
+      initializedVersion: async (proxy: string | Contract): Promise<number> => {
+        const address = typeof proxy === 'string' ? proxy : proxy.address
+        const isProxy = await ozUpgrades.isTransparentOrUUPSProxy(
+          hre.ethers.provider,
+          address
+        )
+        if (!isProxy) throw new Error(`Address ${address} is not a proxy`)
+        const storage = await ethers.provider.getStorageAt(address, 0)
+        return BigNumber.from(storage).toNumber()
+      },
     },
   }
 
@@ -429,7 +464,8 @@ extendEnvironment((hre) => {
   }
 })
 
-type OZDefenderDeployOpts = DeployProxyOptions | DeployBeaconOptions
+type OZDefenderDeployOpts = (DeployProxyOptions | DeployBeaconOptions) &
+  DeployCustomName
 async function ozDefenderDeploy(
   hre: HardhatRuntimeEnvironment,
   deployType: 'proxy' | 'beacon',
@@ -470,6 +506,7 @@ async function ozDefenderDeploy(
   hre.log('')
 
   let proxy: Contract
+  const implFactory = await hre.ethers.getContractFactory(contractName)
   const existingDeployment = await hre.deployments.getOrNull(contractName)
   if (existingDeployment) {
     proxy = await hre.ethers.getContractAt(
@@ -477,7 +514,6 @@ async function ozDefenderDeploy(
       existingDeployment.address
     )
   } else {
-    const implFactory = await hre.ethers.getContractFactory(contractName)
     if (isProxy) {
       proxy = await hre.upgrades.deployProxy(implFactory, initArgs, opts)
     } else {
@@ -494,7 +530,7 @@ async function ozDefenderDeploy(
     pad: { start: { length: maxLabelLength, char: ' ' } },
   })
   hre.log(`${proxy.address}`, { star: false })
-  await proxy.deployTransaction.wait(1)
+  await proxy.deployed()
 
   const implementation = isProxy
     ? await hre.upgrades.erc1967.getImplementationAddress(proxy.address)
@@ -506,15 +542,18 @@ async function ozDefenderDeploy(
   })
   hre.log(`${implementation}`, { star: false })
 
-  const { abi } = await hre.deployments.getArtifact(
-    isProxy ? 'TransparentUpgradeableProxy' : 'UpgradeableBeacon'
+  const saveName = opts.customName ?? contractName
+  const abi = implFactory.interface.fragments.map((fragment) =>
+    JSON.parse(fragment.format('json'))
   )
-  await hre.deployments.save(contractName, {
+  await hre.deployments.save(saveName, {
     address: proxy.address,
     implementation,
     abi,
-    transactionHash: proxy.deployTransaction.hash,
-    receipt: await proxy.deployTransaction.wait(),
+    transactionHash:
+      proxy?.deployTransaction?.hash ?? existingDeployment?.transactionHash,
+    receipt:
+      (await proxy?.deployTransaction?.wait()) ?? existingDeployment?.receipt,
   })
 
   hre.log('')

@@ -7,7 +7,6 @@ const deployFn: DeployFunction = async (hre) => {
   const tellerV2 = await hre.contracts.get('TellerV2')
 
   const collateralManager = await hre.deployProxy('CollateralManager', {
-    redeployImplementation: 'never',
     initArgs: [collateralEscrowBeacon.address, tellerV2.address],
   })
 
@@ -15,7 +14,11 @@ const deployFn: DeployFunction = async (hre) => {
 }
 
 // tags and deployment
-deployFn.id = 'collateral:manager'
-deployFn.tags = ['collateral', 'collateral:manager']
-deployFn.dependencies = ['teller-v2:deploy', 'collateral:escrow-beacon']
+deployFn.id = 'collateral:manager:deploy'
+deployFn.tags = [
+  'collateral',
+  'collateral:manager',
+  'collateral:manager:deploy',
+]
+deployFn.dependencies = ['teller-v2:deploy', 'collateral:escrow-beacon:deploy']
 export default deployFn

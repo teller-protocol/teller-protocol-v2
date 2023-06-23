@@ -18,13 +18,13 @@ const deployFn: DeployFunction = async (hre) => {
 
   const marketRegistry = await hre.deployProxy('MarketRegistry', {
     initArgs: [tellerAS.address],
-    redeployImplementation: 'never',
   })
 
   return true
 }
 
 // tags and deployment
-deployFn.tags = ['market-registry']
+deployFn.id = 'market-registry:deploy'
+deployFn.tags = ['market-registry', 'market-registry:deploy']
 deployFn.dependencies = []
 export default deployFn

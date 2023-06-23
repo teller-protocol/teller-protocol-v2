@@ -4,7 +4,8 @@ import { HARDHAT_NETWORK_NAME } from 'hardhat/plugins'
 import { TellerV2 } from 'types/typechain'
 
 const deployFn: DeployFunction = async (hre) => {
-  const protocolFee = await hre.contracts.get('ProtocolFee')
+  const protocolFee = 5 // 0.05%
+
   const marketRegistry = await hre.contracts.get('MarketRegistry')
   const reputationManager = await hre.contracts.get('ReputationManager')
   const lenderCommitmentForwarder = await hre.contracts.get(
@@ -18,7 +19,7 @@ const deployFn: DeployFunction = async (hre) => {
 
   const tellerV2 = await hre.contracts.get<TellerV2>('TellerV2')
   const tx = await tellerV2.initialize(
-    protocolFee.address,
+    protocolFee,
     marketRegistry.address,
     reputationManager.address,
     lenderCommitmentForwarder.address,
@@ -37,18 +38,20 @@ const deployFn: DeployFunction = async (hre) => {
 
   hre.log('done.')
   hre.log(`TellerV2 initialized at tx: ${txLink}`, { star: true, indent: 1 })
+  hre.log('')
 
   return true
 }
 
 // tags and deployment
-deployFn.tags = ['teller-v2', 'teller-v2:initialize']
+deployFn.id = 'teller-v2:init'
+deployFn.tags = ['teller-v2']
 deployFn.dependencies = [
   'teller-v2:deploy',
-  'market-registry',
-  'reputation-manager',
-  'lender-commitment-forwarder',
-  'collateral',
-  'lender-manager',
+  'market-registry:deploy',
+  'reputation-manager:deploy',
+  'lender-commitment-forwarder:deploy',
+  'collateral:manager:deploy',
+  'lender-manager:deploy',
 ]
 export default deployFn

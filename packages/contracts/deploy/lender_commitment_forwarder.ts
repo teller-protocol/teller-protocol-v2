@@ -7,8 +7,8 @@ const deployFn: DeployFunction = async (hre) => {
   const lenderCommitmentForwarder = await hre.deployProxy(
     'LenderCommitmentForwarder',
     {
+      unsafeAllow: ['constructor', 'state-variable-immutable'],
       constructorArgs: [tellerV2.address, marketRegistry.address],
-      redeployImplementation: 'never',
     }
   )
 
@@ -16,6 +16,10 @@ const deployFn: DeployFunction = async (hre) => {
 }
 
 // tags and deployment
-deployFn.tags = ['lender-commitment-forwarder']
-deployFn.dependencies = ['teller-v2:deploy', 'market-registry']
+deployFn.id = 'lender-commitment-forwarder:deploy'
+deployFn.tags = [
+  'lender-commitment-forwarder',
+  'lender-commitment-forwarder:deploy',
+]
+deployFn.dependencies = ['teller-v2:deploy', 'market-registry:deploy']
 export default deployFn

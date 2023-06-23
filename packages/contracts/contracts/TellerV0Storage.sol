@@ -17,7 +17,8 @@ contract TellerV0Storage {
         CANCELLED,
         ACCEPTED,
         PAID,
-        LIQUIDATED
+        LIQUIDATED,
+        CLOSED
     }
 
     /**

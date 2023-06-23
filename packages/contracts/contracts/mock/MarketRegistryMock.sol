@@ -27,6 +27,10 @@ contract MarketRegistryMock is IMarketRegistry {
         isVerified_ = globalLenderIsVerified;
     }
 
+    function isMarketOpen(uint256 _marketId) public view returns (bool) {
+        return !globalMarketsClosed;
+    }
+
     function isMarketClosed(uint256 _marketId) public view returns (bool) {
         return globalMarketsClosed;
     }

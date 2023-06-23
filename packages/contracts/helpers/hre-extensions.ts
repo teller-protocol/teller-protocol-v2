@@ -496,24 +496,36 @@ async function ozDefenderDeploy(
     initArgs = []
   }
 
+  const saveName = opts.customName ?? contractName
+
   hre.log('----------')
   hre.log('')
   hre.log(
     `${chalk.underline('Contract')} (${chalk.italic(
       contractTypeStr
-    )}): ${chalk.bold(`${contractName}`)}`
+    )}): ${chalk.bold(`${saveName}`)} ${
+      saveName !== contractName ? ` (${chalk.italic(`${contractName}`)})` : ''
+    }`
   )
   hre.log('')
 
   let proxy: Contract
   const implFactory = await hre.ethers.getContractFactory(contractName)
-  const existingDeployment = await hre.deployments.getOrNull(contractName)
+  const existingDeployment = await hre.deployments.getOrNull(saveName)
   if (existingDeployment) {
+    hre.log(`${chalk.bold.yellow(`Existing ${deployType} deployment found`)}`, {
+      indent: 1,
+    })
+
     proxy = await hre.ethers.getContractAt(
       contractName,
       existingDeployment.address
     )
   } else {
+    hre.log(`${chalk.bold.green(`Deploying new ${deployType}...`)}`, {
+      indent: 1,
+    })
+
     if (isProxy) {
       proxy = await hre.upgrades.deployProxy(implFactory, initArgs, opts)
     } else {
@@ -542,7 +554,6 @@ async function ozDefenderDeploy(
   })
   hre.log(`${implementation}`, { star: false })
 
-  const saveName = opts.customName ?? contractName
   const abi = implFactory.interface.fragments.map((fragment) =>
     JSON.parse(fragment.format('json'))
   )

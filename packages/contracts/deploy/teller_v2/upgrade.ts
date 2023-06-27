@@ -41,4 +41,7 @@ const deployFn: DeployFunction = async (hre) => {
 deployFn.id = 'teller-v2:upgrade'
 deployFn.tags = ['teller-v2', 'teller-v2:upgrade']
 deployFn.dependencies = ['teller-v2:init']
+deployFn.skip = async (hre) => {
+  return true
+}
 export default deployFn

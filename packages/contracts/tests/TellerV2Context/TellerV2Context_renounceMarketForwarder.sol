@@ -25,6 +25,23 @@ contract TellerV2Context_renounceMarketForwarder is Testable {
             stubbedMarketForwarder
         );
 
+         context.mock_setApprovedMarketForwarder(
+            marketId,
+            stubbedMarketForwarder,
+            address(this),
+            true
+        );
+
+        assertEq(
+            context.hasApprovedMarketForwarder(
+                marketId,
+                stubbedMarketForwarder,
+                address(this)
+            ),
+            true,
+            "Forwarder should be approved"
+        );
+
         
         context.renounceMarketForwarder(marketId, stubbedMarketForwarder);
 

@@ -1267,15 +1267,13 @@ contract CollateralManager_Test is Testable {
         vm.prank(address(tellerV2Mock));
         collateralManager.commitCollateral(bidId, collateral);
 
-        
-
         assertTrue(
             collateralManager.commitCollateralInternalWasCalled(),
             "commit collateral was not called"
         );
     }
 
-        function test_commit_collateral_single_invalid_bid() public {
+    function test_commit_collateral_single_invalid_bid() public {
         uint256 bidId = 0;
 
         Collateral memory collateral = Collateral({
@@ -1289,7 +1287,6 @@ contract CollateralManager_Test is Testable {
         vm.prank(address(tellerV2Mock));
         vm.expectRevert("Loan has no borrower");
         collateralManager.commitCollateral(bidId, collateral);
-  
     }
 
     function test_commit_collateral_single_not_teller() public {
@@ -1355,7 +1352,6 @@ contract CollateralManager_Test is Testable {
         );
     }
 
-
     function test_commit_collateral_invalid_bid() public {
         uint256 bidId = 0;
 
@@ -1374,8 +1370,6 @@ contract CollateralManager_Test is Testable {
         vm.prank(address(tellerV2Mock));
         vm.expectRevert("Loan has no borrower");
         collateralManager.commitCollateral(bidId, collateralArray);
-
-        
     }
 
     function test_commit_collateral_array_empty() public {

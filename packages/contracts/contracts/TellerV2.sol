@@ -56,6 +56,10 @@ contract TellerV2 is
     using EnumerableSet for EnumerableSet.AddressSet;
     using EnumerableSet for EnumerableSet.UintSet;
 
+    //the first 20 bytes of keccak256("lender manager")
+    address constant USING_LENDER_MANAGER =
+        0x84D409EeD89F6558fE3646397146232665788bF8;
+
     /** Events */
 
     /**
@@ -355,8 +359,8 @@ contract TellerV2 is
         require(isVerified, "Not verified borrower");
 
         require(
-            !marketRegistry.isMarketClosed(_marketplaceId),
-            "Market is closed"
+            marketRegistry.isMarketOpen(_marketplaceId),
+            "Market is not open"
         );
 
         // Set response bid ID.
@@ -523,26 +527,33 @@ contract TellerV2 is
             bid.loanDetails.principal -
             amountToProtocol -
             amountToMarketplace;
+
         //transfer fee to protocol
-        bid.loanDetails.lendingToken.safeTransferFrom(
-            sender,
-            owner(),
-            amountToProtocol
-        );
+        if (amountToProtocol > 0) {
+            bid.loanDetails.lendingToken.safeTransferFrom(
+                sender,
+                owner(),
+                amountToProtocol
+            );
+        }
 
         //transfer fee to marketplace
-        bid.loanDetails.lendingToken.safeTransferFrom(
-            sender,
-            marketRegistry.getMarketFeeRecipient(bid.marketplaceId),
-            amountToMarketplace
-        );
+        if (amountToMarketplace > 0) {
+            bid.loanDetails.lendingToken.safeTransferFrom(
+                sender,
+                marketRegistry.getMarketFeeRecipient(bid.marketplaceId),
+                amountToMarketplace
+            );
+        }
 
         //transfer funds to borrower
-        bid.loanDetails.lendingToken.safeTransferFrom(
-            sender,
-            bid.receiver,
-            amountToBorrower
-        );
+        if (amountToBorrower > 0) {
+            bid.loanDetails.lendingToken.safeTransferFrom(
+                sender,
+                bid.receiver,
+                amountToBorrower
+            );
+        }
 
         // Record volume filled by lenders
         lenderVolumeFilled[address(bid.loanDetails.lendingToken)][sender] += bid
@@ -572,10 +583,12 @@ contract TellerV2 is
 
         address sender = _msgSenderForMarket(bid.marketplaceId);
         require(sender == bid.lender, "only lender can claim NFT");
+
+        // set lender address to the lender manager so we know to check the owner of the NFT for the true lender
+        bid.lender = address(USING_LENDER_MANAGER);
+
         // mint an NFT with the lender manager
         lenderManager.registerLoan(_bidId, sender);
-        // set lender address to the lender manager so we know to check the owner of the NFT for the true lender
-        bid.lender = address(lenderManager);
     }
 
     /**
@@ -703,7 +716,22 @@ contract TellerV2 is
         _unpause();
     }
 
-    //TODO: add an incentive for liquidator
+    /**
+     * @notice Function for lender to claim collateral for a defaulted loan. The only purpose of a CLOSED loan is to make collateral claimable by lender.
+     * @param _bidId The id of the loan to set to CLOSED status.
+     */
+    function lenderCloseLoan(uint256 _bidId)
+        external
+        acceptedLoan(_bidId, "lenderClaimCollateral")
+    {
+        require(isLoanDefaulted(_bidId), "Loan must be defaulted.");
+
+        Bid storage bid = bids[_bidId];
+        bid.state = BidState.CLOSED;
+
+        collateralManager.lenderClaimCollateral(_bidId);
+    }
+
     /**
      * @notice Function for users to liquidate a defaulted loan.
      * @param _bidId The id of the loan to make the payment towards.
@@ -716,20 +744,22 @@ contract TellerV2 is
 
         Bid storage bid = bids[_bidId];
 
+        //change state here to prevent re-entrancy
+        bid.state = BidState.LIQUIDATED;
+
         (uint256 owedPrincipal, , uint256 interest) = V2Calculations
             .calculateAmountOwed(
                 bid,
                 block.timestamp,
                 bidPaymentCycleType[_bidId]
             );
+
         _repayLoan(
             _bidId,
             Payment({ principal: owedPrincipal, interest: interest }),
             owedPrincipal + interest,
             false
         );
-
-        bid.state = BidState.LIQUIDATED;
 
         // If loan is backed by collateral, withdraw and send to the liquidator
         address liquidator = _msgSenderForMarket(bid.marketplaceId);
@@ -1121,6 +1151,11 @@ contract TellerV2 is
     {
         lender_ = bids[_bidId].lender;
 
+        if (lender_ == address(USING_LENDER_MANAGER)) {
+            return lenderManager.ownerOf(_bidId);
+        }
+
+        //this is left in for backwards compatibility only
         if (lender_ == address(lenderManager)) {
             return lenderManager.ownerOf(_bidId);
         }
@@ -1158,7 +1193,7 @@ contract TellerV2 is
         Bid storage bid = bids[_bidId];
 
         borrower = bid.borrower;
-        lender = bid.lender;
+        lender = getLoanLender(_bidId);
         marketId = bid.marketplaceId;
         principalTokenAddress = address(bid.loanDetails.lendingToken);
         principalAmount = bid.loanDetails.principal;

@@ -254,7 +254,22 @@ contract MarketRegistry is
     }
 
     /**
-     * @notice Returns the status of a market being open or closed for new bids.
+     * @notice Returns the status of a market existing and not being closed.
+     * @param _marketId The market ID for the market to check.
+     */
+    function isMarketOpen(uint256 _marketId)
+        public
+        view
+        override
+        returns (bool)
+    {
+        return
+            markets[_marketId].owner != address(0) &&
+            !marketIsClosed[_marketId];
+    }
+
+    /**
+     * @notice Returns the status of a market being open or closed for new bids. Does not indicate whether or not a market exists.
      * @param _marketId The market ID for the market to check.
      */
     function isMarketClosed(uint256 _marketId)

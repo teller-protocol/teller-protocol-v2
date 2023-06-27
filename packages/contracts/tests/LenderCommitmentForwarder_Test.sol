@@ -250,6 +250,31 @@ contract LenderCommitmentForwarder_Test is Testable {
         );
     }
 
+    function test_updateCommitment_reject_change_lender() public {
+        LenderCommitmentForwarder.Commitment
+            memory c = LenderCommitmentForwarder.Commitment({
+                maxPrincipal: maxPrincipal,
+                expiration: expiration,
+                maxDuration: maxDuration,
+                minInterestRate: minInterestRate,
+                collateralTokenAddress: address(collateralToken),
+                collateralTokenId: collateralTokenId,
+                maxPrincipalPerCollateralAmount: maxPrincipalPerCollateralAmount,
+                collateralTokenType: collateralTokenType,
+                lender: address(lender),
+                marketId: 99,
+                principalTokenAddress: address(principalToken)
+            });
+
+        lenderCommitmentForwarder.setCommitment(0, c);
+        vm.expectRevert("Commitment lender cannot be updated.");
+
+        c.lender = address(borrower);
+
+        vm.prank(address(lender));
+        lenderCommitmentForwarder.updateCommitment(0, c);
+    }
+
     function test_updateCommitment_invalid_lender() public {
         LenderCommitmentForwarder.Commitment
             memory c = LenderCommitmentForwarder.Commitment({

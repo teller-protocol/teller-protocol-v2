@@ -2,6 +2,7 @@ pragma solidity >=0.8.0 <0.9.0;
 // SPDX-License-Identifier: MIT
 
 import { IMarketRegistry } from "./interfaces/IMarketRegistry.sol";
+import "./interfaces/IEscrowVault.sol";
 import "./interfaces/IReputationManager.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
@@ -152,4 +153,9 @@ abstract contract TellerV2Storage_G4 is TellerV2Storage_G3 {
     mapping(uint256 => PaymentCycleType) public bidPaymentCycleType;
 }
 
-abstract contract TellerV2Storage is TellerV2Storage_G4 {}
+abstract contract TellerV2Storage_G5 is TellerV2Storage_G4 {
+    // Address of the lender manager contract
+    IEscrowVault public escrowVault;
+}
+
+abstract contract TellerV2Storage is TellerV2Storage_G5 {}

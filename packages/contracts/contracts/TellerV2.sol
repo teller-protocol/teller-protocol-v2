@@ -15,6 +15,7 @@ import "./interfaces/IMarketRegistry.sol";
 import "./interfaces/IReputationManager.sol";
 import "./interfaces/ITellerV2.sol";
 import { Collateral } from "./interfaces/escrow/ICollateralEscrowV1.sol";
+import "./interfaces/IEscrowVault.sol";
 
 // Libraries
 import "@openzeppelin/contracts/utils/Address.sol";
@@ -180,7 +181,8 @@ contract TellerV2 is
         address _reputationManager,
         address _lenderCommitmentForwarder,
         address _collateralManager,
-        address _lenderManager
+        address _lenderManager,
+        address _escrowVault
     ) external initializer {
         __ProtocolFee_init(_protocolFee);
 
@@ -211,14 +213,15 @@ contract TellerV2 is
         collateralManager = ICollateralManager(_collateralManager);
 
         _setLenderManager(_lenderManager);
+        _setEscrowVault(_escrowVault);
     }
 
-    function setLenderManager(address _lenderManager)
+    function setEscrowVault(address _escrowVault)
         external
-        reinitializer(8)
+        reinitializer(9)
         onlyOwner
     {
-        _setLenderManager(_lenderManager);
+        _setEscrowVault(_escrowVault);
     }
 
     function _setLenderManager(address _lenderManager)
@@ -230,6 +233,11 @@ contract TellerV2 is
             "LenderManager must be a contract"
         );
         lenderManager = ILenderManager(_lenderManager);
+    }
+
+    function _setEscrowVault(address _escrowVault) internal onlyInitializing {
+        require(_escrowVault.isContract(), "EscrowVault must be a contract");
+        escrowVault = IEscrowVault(_escrowVault);
     }
 
     /**
@@ -801,14 +809,7 @@ contract TellerV2 is
             emit LoanRepayment(_bidId);
         }
 
-        address lender = getLoanLender(_bidId);
-
-        // Send payment to the lender
-        bid.loanDetails.lendingToken.safeTransferFrom(
-            _msgSenderForMarket(bid.marketplaceId),
-            lender,
-            paymentAmount
-        );
+        _sendOrEscrowFunds(_bidId, paymentAmount); //send or escrow the funds
 
         // update our mappings
         bid.loanDetails.totalRepaid.principal += _payment.principal;
@@ -818,6 +819,55 @@ contract TellerV2 is
         // If the loan is paid in full and has a mark, we should update the current reputation
         if (mark != RepMark.Good) {
             reputationManager.updateAccountReputation(bid.borrower, _bidId);
+        }
+    }
+
+    function _sendOrEscrowFunds(uint256 _bidId, uint256 _paymentAmount)
+        internal
+    {
+        Bid storage bid = bids[_bidId];
+        address lender = getLoanLender(_bidId);
+
+        try
+            //first try to pay directly
+            //have to use transfer from  (not safe transfer from) for try/catch statement
+            //dont try to use any more than 100k gas for this xfer
+            bid.loanDetails.lendingToken.transferFrom{ gas: 100000 }(
+                _msgSenderForMarket(bid.marketplaceId),
+                lender,
+                _paymentAmount
+            )
+        {} catch {
+            address sender = _msgSenderForMarket(bid.marketplaceId);
+
+            uint256 balanceBefore = bid.loanDetails.lendingToken.balanceOf(
+                address(this)
+            );
+
+            //if unable, pay to escrow
+            bid.loanDetails.lendingToken.safeTransferFrom(
+                sender,
+                address(this),
+                _paymentAmount
+            );
+
+            uint256 balanceAfter = bid.loanDetails.lendingToken.balanceOf(
+                address(this)
+            );
+
+            //used for fee-on-send tokens
+            uint256 paymentAmountReceived = balanceAfter - balanceBefore;
+
+            bid.loanDetails.lendingToken.approve(
+                address(escrowVault),
+                paymentAmountReceived
+            );
+
+            IEscrowVault(escrowVault).deposit(
+                lender,
+                address(bid.loanDetails.lendingToken),
+                paymentAmountReceived
+            );
         }
     }
 

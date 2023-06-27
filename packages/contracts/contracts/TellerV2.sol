@@ -55,11 +55,9 @@ contract TellerV2 is
     using EnumerableSet for EnumerableSet.AddressSet;
     using EnumerableSet for EnumerableSet.UintSet;
 
-
     //the first 20 bytes of keccak256("lender manager")
     address constant USING_LENDER_MANAGER =
         0x84D409EeD89F6558fE3646397146232665788bF8;
- 
 
     /** Events */
 
@@ -569,16 +567,16 @@ contract TellerV2 is
         whenNotPaused
     {
         // Retrieve bid
-        Bid storage bid = bids[_bidId]; 
-       
+        Bid storage bid = bids[_bidId];
+
         address sender = _msgSenderForMarket(bid.marketplaceId);
         require(sender == bid.lender, "only lender can claim NFT");
 
         // set lender address to the lender manager so we know to check the owner of the NFT for the true lender
-        bid.lender = address(USING_LENDER_MANAGER); 
+        bid.lender = address(USING_LENDER_MANAGER);
 
         // mint an NFT with the lender manager
-        lenderManager.registerLoan(_bidId, sender);        
+        lenderManager.registerLoan(_bidId, sender);
     }
 
     /**

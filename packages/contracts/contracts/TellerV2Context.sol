@@ -108,9 +108,9 @@ abstract contract TellerV2Context is
     function renounceMarketForwarder(uint256 _marketId, address _forwarder)
         external
     {
-        if( _approvedForwarderSenders[_forwarder].contains(_msgSender()) ){
-        _approvedForwarderSenders[_forwarder].remove(_msgSender());
-        emit MarketForwarderRenounced(_marketId, _forwarder, _msgSender());
+        if (_approvedForwarderSenders[_forwarder].contains(_msgSender())) {
+            _approvedForwarderSenders[_forwarder].remove(_msgSender());
+            emit MarketForwarderRenounced(_marketId, _forwarder, _msgSender());
         }
     }
 

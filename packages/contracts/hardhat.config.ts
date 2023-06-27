@@ -98,23 +98,30 @@ const accounts: HardhatNetworkHDAccountsUserConfig = {
   accountsBalance: parseEther('100000000').toString(),
 }
 
-const networkUrls: { [network: string]: string } = {
+type NetworkNames =
+  | 'mainnet'
+  | 'polygon'
+  | 'sepolia'
+  | 'mumbai'
+  | 'goerli'
+  | 'tenderly'
+const networkUrls: Record<NetworkNames, string> = {
+  // Main Networks
   mainnet: ALCHEMY_API_KEY
     ? `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
     : process.env.MAINNET_RPC_URL ?? '',
   polygon: ALCHEMY_API_KEY
     ? `https://polygon-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
     : process.env.POLYGON_RPC_URL ?? '',
+
+  // Test Networks
+  sepolia: ALCHEMY_API_KEY
+    ? `https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
+    : process.env.SEPOLIA_RPC_URL ?? '',
   mumbai: process.env.MUMBAI_RPC_URL ?? '',
   goerli: ALCHEMY_API_KEY
     ? `https://eth-goerli.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
     : process.env.GOERLI_RPC_URL ?? '',
-  xdai: process.env.XDAI_RPC_URL ?? '',
-  optimism: process.env.OPTIMISM_RPC_URL ?? '',
-  fujiAvalanche: process.env.FUJI_AVALANCHE_RPC_URL ?? '',
-  mainnetAvalanche: process.env.MAINNET_AVALANCHE_RPC_URL ?? '',
-  testnetHarmony: process.env.TESTNET_HARMONY_RPC_URL ?? '',
-  mainnetHarmony: process.env.MAINNET_HARMONY_RPC_URL ?? '',
   tenderly: process.env.TENDERLY_RPC_URL ?? '',
 }
 
@@ -248,6 +255,7 @@ export default <HardhatUserConfig>{
       1: '0x9E3bfee4C6b4D28b5113E4786A1D9812eB3D2Db6',
       5: '0x0061CA4F1EB8c3FF93Df074061844d3dd4dC0377',
       137: '0xFea0FB908E31567CaB641865212cF76BE824D848',
+      11155111: '0xb1ff461BB751B87f4F791201a29A8cFa9D30490c',
     },
   },
 
@@ -259,6 +267,7 @@ export default <HardhatUserConfig>{
   // Follow the directions, and uncomment the network you wish to deploy to.
 
   networks: {
+    // Local Networks
     hardhat: networkConfig({
       chainId: 31337,
       allowUnlimitedContractSize: true,
@@ -268,18 +277,45 @@ export default <HardhatUserConfig>{
           ? undefined
           : {
               enabled: true,
-              url: networkUrls[HARDHAT_DEPLOY_FORK],
+              url: networkUrls[HARDHAT_DEPLOY_FORK as keyof typeof networkUrls],
               // blockNumber: getLatestDeploymentBlock(HARDHAT_DEPLOY_FORK),
             },
     }),
     localhost: networkConfig({
       url: 'http://localhost:8545',
     }),
+
+    // Main Networks
     mainnet: networkConfig({
       url: networkUrls.mainnet,
       chainId: 1,
       live: true,
       // gasPrice: ethers.utils.parseUnits('100', 'gwei').toNumber(),
+
+      verify: {
+        etherscan: {
+          apiKey: process.env.ETHERSCAN_VERIFY_API_KEY,
+        },
+      },
+    }),
+    polygon: networkConfig({
+      url: networkUrls.polygon,
+      chainId: 137,
+      live: true,
+      // gasPrice: ethers.utils.parseUnits('110', 'gwei').toNumber(),
+
+      verify: {
+        etherscan: {
+          apiKey: process.env.POLYGONSCAN_VERIFY_API_KEY,
+        },
+      },
+    }),
+
+    // Test Networks
+    sepolia: networkConfig({
+      url: networkUrls.sepolia,
+      chainId: 11155111,
+      live: true,
 
       verify: {
         etherscan: {
@@ -299,23 +335,6 @@ export default <HardhatUserConfig>{
         },
       },
     }),
-    xdai: networkConfig({
-      url: networkUrls.xdai,
-      // chainId: ,
-      gasPrice: 1000000000,
-    }),
-    polygon: networkConfig({
-      url: networkUrls.polygon,
-      chainId: 137,
-      live: true,
-      // gasPrice: ethers.utils.parseUnits('110', 'gwei').toNumber(),
-
-      verify: {
-        etherscan: {
-          apiKey: process.env.POLYGONSCAN_VERIFY_API_KEY,
-        },
-      },
-    }),
     mumbai: networkConfig({
       url: networkUrls.mumbai,
       gasPrice: 2100000000, // @lazycoder - deserves another Sherlock badge
@@ -327,64 +346,6 @@ export default <HardhatUserConfig>{
           apiKey: process.env.POLYGONSCAN_VERIFY_API_KEY,
         },
       },
-    }),
-    localArbitrum: networkConfig({
-      url: 'http://localhost:8547',
-      gasPrice: 0,
-      companionNetworks: {
-        l1: 'localArbitrumL1',
-      },
-    }),
-    localArbitrumL1: networkConfig({
-      url: 'http://localhost:7545',
-      gasPrice: 0,
-      companionNetworks: {
-        l2: 'localArbitrum',
-      },
-    }),
-    optimism: networkConfig({
-      url: networkUrls.optimism,
-      companionNetworks: {
-        l1: 'mainnet',
-      },
-    }),
-    localOptimism: networkConfig({
-      url: 'http://localhost:8545',
-      companionNetworks: {
-        l1: 'localOptimismL1',
-      },
-    }),
-    localOptimismL1: networkConfig({
-      url: 'http://localhost:9545',
-      gasPrice: 0,
-      companionNetworks: {
-        l2: 'localOptimism',
-      },
-    }),
-    localAvalanche: networkConfig({
-      url: 'http://localhost:9650/ext/bc/C/rpc',
-      gasPrice: 225000000000,
-      chainId: 43112,
-    }),
-    fujiAvalanche: networkConfig({
-      url: networkUrls.fujiAvalanche,
-      gasPrice: 225000000000,
-      chainId: 43113,
-    }),
-    mainnetAvalanche: networkConfig({
-      url: networkUrls.mainnetAvalanche,
-      gasPrice: 225000000000,
-      chainId: 43114,
-    }),
-    testnetHarmony: networkConfig({
-      url: networkUrls.testnetHarmony,
-      gasPrice: 1000000000,
-      chainId: 1666700000,
-    }),
-    mainnetHarmony: networkConfig({
-      url: networkUrls.mainnetHarmony,
-      gasPrice: 1000000000,
-      chainId: 1666600000,
     }),
     tenderly: networkConfig({
       url: networkUrls.tenderly,

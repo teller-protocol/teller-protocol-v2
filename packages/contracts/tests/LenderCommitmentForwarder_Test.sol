@@ -250,6 +250,31 @@ contract LenderCommitmentForwarder_Test is Testable {
         );
     }
 
+    function test_updateCommitment_reject_change_lender() public {
+        LenderCommitmentForwarder.Commitment
+            memory c = LenderCommitmentForwarder.Commitment({
+                maxPrincipal: maxPrincipal,
+                expiration: expiration,
+                maxDuration: maxDuration,
+                minInterestRate: minInterestRate,
+                collateralTokenAddress: address(collateralToken),
+                collateralTokenId: collateralTokenId,
+                maxPrincipalPerCollateralAmount: maxPrincipalPerCollateralAmount,
+                collateralTokenType: collateralTokenType,
+                lender: address(lender),
+                marketId: 99,
+                principalTokenAddress: address(principalToken)
+            });
+
+        lenderCommitmentForwarder.setCommitment(0, c);
+        vm.expectRevert("Commitment lender cannot be updated.");
+
+        c.lender = address(borrower);
+
+        vm.prank(address(lender));
+        lenderCommitmentForwarder.updateCommitment(0, c);
+    }
+
     function test_updateCommitment_invalid_lender() public {
         LenderCommitmentForwarder.Commitment
             memory c = LenderCommitmentForwarder.Commitment({
@@ -322,7 +347,7 @@ contract LenderCommitmentForwarder_Test is Testable {
         lenderCommitmentForwarder.updateCommitment(0, c);
     }
 
-    function test_updateCommitmentBorrowers() public {
+    function test_addCommitmentBorrowers() public {
         LenderCommitmentForwarder.Commitment
             memory c = LenderCommitmentForwarder.Commitment({
                 maxPrincipal: maxPrincipal,
@@ -344,7 +369,7 @@ contract LenderCommitmentForwarder_Test is Testable {
         newBorrowers[0] = address(1);
 
         vm.prank(address(lender));
-        lenderCommitmentForwarder.updateCommitmentBorrowers(0, newBorrowers);
+        lenderCommitmentForwarder.addCommitmentBorrowers(0, newBorrowers);
 
         //check an assertion
         assertEq(
@@ -354,12 +379,12 @@ contract LenderCommitmentForwarder_Test is Testable {
         );
     }
 
-    function test_updateCommitmentBorrowers_cannot_update_empty() public {
+    function test_addCommitmentBorrowers_cannot_update_empty() public {
         vm.expectRevert("unauthorized commitment lender");
-        lenderCommitmentForwarder.updateCommitmentBorrowers(0, emptyArray);
+        lenderCommitmentForwarder.addCommitmentBorrowers(0, emptyArray);
     }
 
-    function test_updateCommitmentBorrowers_unauthorized() public {
+    function test_uaddCommitmentBorrowers_unauthorized() public {
         LenderCommitmentForwarder.Commitment
             memory c = LenderCommitmentForwarder.Commitment({
                 maxPrincipal: maxPrincipal,
@@ -378,7 +403,7 @@ contract LenderCommitmentForwarder_Test is Testable {
         lenderCommitmentForwarder.setCommitment(0, c);
 
         vm.expectRevert("unauthorized commitment lender");
-        lenderCommitmentForwarder.updateCommitmentBorrowers(0, emptyArray);
+        lenderCommitmentForwarder.addCommitmentBorrowers(0, emptyArray);
     }
 
     function test_deleteCommitment() public {
@@ -429,35 +454,6 @@ contract LenderCommitmentForwarder_Test is Testable {
         vm.expectRevert("unauthorized commitment lender");
 
         lenderCommitmentForwarder.deleteCommitment(0);
-    }
-
-    function test_decrementCommitment() public {
-        LenderCommitmentForwarder.Commitment
-            memory c = LenderCommitmentForwarder.Commitment({
-                maxPrincipal: maxPrincipal,
-                expiration: expiration,
-                maxDuration: maxDuration,
-                minInterestRate: minInterestRate,
-                collateralTokenAddress: address(collateralToken),
-                collateralTokenId: collateralTokenId,
-                maxPrincipalPerCollateralAmount: maxPrincipalPerCollateralAmount,
-                collateralTokenType: collateralTokenType,
-                lender: address(lender),
-                marketId: marketId,
-                principalTokenAddress: address(principalToken)
-            });
-
-        uint256 commitmentId = 0;
-
-        lenderCommitmentForwarder.setCommitment(commitmentId, c);
-
-        lenderCommitmentForwarder._decrementCommitmentSuper(commitmentId, 100);
-
-        assertEq(
-            lenderCommitmentForwarder.getCommitmentMaxPrincipal(commitmentId),
-            maxPrincipal - 100,
-            "Max principal not decremented"
-        );
     }
 
     function test_validateCommitment() public {
@@ -660,8 +656,8 @@ contract LenderCommitmentForwarder_Test is Testable {
 
         assertEq(
             lenderCommitmentForwarder.getCommitmentMaxPrincipal(commitmentId),
-            principalAmount - maxPrincipal,
-            "Max principal not decremented"
+            maxPrincipal,
+            "Max principal changed"
         );
     }
 
@@ -805,7 +801,7 @@ contract LenderCommitmentForwarder_Test is Testable {
         newBorrowers[0] = address(1);
 
         vm.prank(address(lender));
-        lenderCommitmentForwarder.updateCommitmentBorrowers(
+        lenderCommitmentForwarder.addCommitmentBorrowers(
             commitmentId,
             newBorrowers
         );

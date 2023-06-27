@@ -45,13 +45,6 @@ contract LenderCommitmentForwarder_Override is LenderCommitmentForwarder {
         return commitments[_commitmentId].marketId;
     }
 
-    function _decrementCommitmentSuper(
-        uint256 _commitmentId,
-        uint256 _tokenAmountDelta
-    ) public {
-        super._decrementCommitment(_commitmentId, _tokenAmountDelta);
-    }
-
     function _getEscrowCollateralTypeSuper(CommitmentCollateralType _type)
         public
         returns (CollateralType)

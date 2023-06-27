@@ -178,7 +178,6 @@ export default <HardhatUserConfig>{
     cache: './generated/cache',
     artifacts: './generated/artifacts',
     sources: './contracts',
-    // deploy: './deploy-old',
   },
 
   typechain: {

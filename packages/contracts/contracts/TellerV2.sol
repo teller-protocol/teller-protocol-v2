@@ -212,18 +212,16 @@ contract TellerV2 is
         );
         collateralManager = ICollateralManager(_collateralManager);
 
-        require(_escrowVault.isContract(), "EscrowVault must be a contract");
-        escrowVault = IEscrowVault(_escrowVault);
-
         _setLenderManager(_lenderManager);
+        _setEscrowVault(_escrowVault);
     }
 
-    function setLenderManager(address _lenderManager)
+    function setEscrowVault(address _escrowVault)
         external
-        reinitializer(8)
+        reinitializer(9)
         onlyOwner
     {
-        _setLenderManager(_lenderManager);
+        _setEscrowVault(_escrowVault);
     }
 
     function _setLenderManager(address _lenderManager)
@@ -235,6 +233,14 @@ contract TellerV2 is
             "LenderManager must be a contract"
         );
         lenderManager = ILenderManager(_lenderManager);
+    }
+
+     function _setEscrowVault(address _escrowVault)
+        internal
+        onlyInitializing
+    {
+       require(_escrowVault.isContract(), "EscrowVault must be a contract");
+        escrowVault = IEscrowVault(_escrowVault);
     }
 
     /**

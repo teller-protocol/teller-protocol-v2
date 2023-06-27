@@ -46,6 +46,7 @@ contract TellerV2_initialize is Testable {
 
         assertEq(address(tellerV2.marketRegistry()), address(marketRegistry));
         assertEq(address(tellerV2.lenderManager()), address(lenderManager));
+        assertEq(address(tellerV2.escrowVault()), address(escrowVault));
     }
 
     function test_initialize_lender_commitment_forwarder_not_contract() public {
@@ -151,21 +152,7 @@ contract TellerV2_initialize is Testable {
             address(lenderManager),
             address(escrowVault)
         );
-    }
-
-    function test_setLenderManager_not_owner() public {
-        vm.expectRevert("Ownable: caller is not the owner");
-
-        tellerV2.setLenderManager(address(lenderManager));
-    }
-
-    function test_setLenderManager_not_contract() public {
-        tellerV2.mock_initialize();
-
-        vm.expectRevert("LenderManager must be a contract");
-
-        tellerV2.setLenderManager(address(lenderManager));
-    }
+    } 
 
     function test_setReputationManager_not_owner() public {
         vm.expectRevert("Ownable: caller is not the owner");

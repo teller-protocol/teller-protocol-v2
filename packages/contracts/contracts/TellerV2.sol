@@ -569,14 +569,16 @@ contract TellerV2 is
         whenNotPaused
     {
         // Retrieve bid
-        Bid storage bid = bids[_bidId];
-
+        Bid storage bid = bids[_bidId]; 
+       
         address sender = _msgSenderForMarket(bid.marketplaceId);
         require(sender == bid.lender, "only lender can claim NFT");
-        // mint an NFT with the lender manager
-        lenderManager.registerLoan(_bidId, sender);
+
         // set lender address to the lender manager so we know to check the owner of the NFT for the true lender
-        bid.lender = address(USING_LENDER_MANAGER);
+        bid.lender = address(USING_LENDER_MANAGER); 
+
+        // mint an NFT with the lender manager
+        lenderManager.registerLoan(_bidId, sender);        
     }
 
     /**

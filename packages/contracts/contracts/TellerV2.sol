@@ -235,11 +235,8 @@ contract TellerV2 is
         lenderManager = ILenderManager(_lenderManager);
     }
 
-     function _setEscrowVault(address _escrowVault)
-        internal
-        onlyInitializing
-    {
-       require(_escrowVault.isContract(), "EscrowVault must be a contract");
+    function _setEscrowVault(address _escrowVault) internal onlyInitializing {
+        require(_escrowVault.isContract(), "EscrowVault must be a contract");
         escrowVault = IEscrowVault(_escrowVault);
     }
 

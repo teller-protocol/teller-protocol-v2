@@ -152,7 +152,7 @@ contract TellerV2_initialize is Testable {
             address(lenderManager),
             address(escrowVault)
         );
-    } 
+    }
 
     function test_setReputationManager_not_owner() public {
         vm.expectRevert("Ownable: caller is not the owner");

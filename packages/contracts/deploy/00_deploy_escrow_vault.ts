@@ -10,12 +10,12 @@ const deployFn: DeployFunction = async (hre) => {
       execute: {
         init: {
           args: [],
-          methodName: 'initialize'
-        }
-      }
+          methodName: 'initialize',
+        },
+      },
     },
     skipIfAlreadyDeployed: true,
-    hre
+    hre,
   })
 }
 

@@ -88,7 +88,7 @@ contract LenderManager_Test is Testable {
 
         string memory baseURI = lenderManager._baseURISuper();
 
-        assertEq(baseURI, "", "Base URI is not correct");
+        assertEq(baseURI, "data:image/svg+xml;charset=utf-8,", "Base URI is not correct");
     }
 
     function test_mint() public {

@@ -201,24 +201,77 @@ function _generate_text_label(
     ));
 }
 
-/*
-Not working quite right yet 
-*/
+ 
 function _get_token_amount_formatted( 
     uint256 amount,
     uint256 decimals,
     uint256 precision
 ) public pure returns (string memory) { 
 
-     uint256 before_decimal = amount / 10 ** decimals;
+    
 
-     uint256 after_decimal = amount % 10 ** decimals;
+         require(precision <= decimals, "Precision cannot be greater than decimals");
+
+         uint256 before_decimal = amount / (10 ** decimals);
+
+         uint256 after_decimal = amount % (10 ** decimals);
+
+         // truncate to the required precision
+         after_decimal = after_decimal / (10 ** (decimals - precision));
+
+        if(before_decimal >= 1000000000000000){
+            return "> RANGE";
+        }
+
+        if(before_decimal >= 1000000000000){
+            uint256 trillions = before_decimal / 1000000000000;
+            uint256 billions = (before_decimal % 1000000000000) / 100000000000;  // Get the first digit after the decimal point
+            return string(abi.encodePacked(
+                Strings.toString(trillions),
+                ".",
+                Strings.toString(billions),
+                "T"
+            ));
+        }
+
+         if(before_decimal >= 1000000000){
+            uint256 billions = before_decimal / 1000000000;
+            uint256 millions = (before_decimal % 1000000000) / 100000000;  // Get the first digit after the decimal point
+            return string(abi.encodePacked(
+                Strings.toString(billions),
+                ".",
+                Strings.toString(millions),
+                "B"
+            ));
+        }
+
+         if(before_decimal >= 1000000){
+            uint256 millions = before_decimal / 1000000;
+            uint256 thousands = (before_decimal % 1000000) / 100000;  // Get the first digit after the decimal point
+            return string(abi.encodePacked(
+                Strings.toString(millions),
+                ".",
+                Strings.toString(thousands),
+                "M"
+            ));
+        }
+
+        if(before_decimal >= 1000){
+            uint256 fullThousands = before_decimal / 1000;
+            uint256 remainder = (before_decimal % 1000) / 100;  // Get the first digit after the decimal point
+            return string(abi.encodePacked(
+                Strings.toString(fullThousands),
+                ".",
+                Strings.toString(remainder),
+                "K"
+            ));
+        }
+
   
-        return string(abi.encodePacked( 
+         return string(abi.encodePacked( 
              Strings.toString(before_decimal),
             ".",
              Strings.toString(after_decimal)
-
          ));
         
       
@@ -226,10 +279,16 @@ function _get_token_amount_formatted(
 }
 
 
-function _buildSvgData (
+function _buildSvgData  (
+    string memory loanId,
+    string memory principalAmountFormatted,
+    string memory principalTokenSymbol,
+    string memory collateralLabel,
+    string memory interestRateLabel,
+    string memory loanDurationLabel
 
 
-) returns (string memory) {
+) internal pure returns (string memory) {
 
   return   string(abi.encodePacked(
 
@@ -242,8 +301,8 @@ _clip_path_corners,
  
 
 _generate_large_title( 
- principal_amount_formatted,
- principal_token_symbol
+ principalAmountFormatted,
+ principalTokenSymbol
 ),
 
 _teller_logo,
@@ -251,28 +310,28 @@ _teller_logo,
 
 _generate_text_label(
     "Loan ID:",
-    Strings.toString(bidId),
+    loanId, //Strings.toString(bidId),
     354
 ),
 
 
 _generate_text_label(
     "Collateral:",
-    string(abi.encodePacked(collateral_amount_formatted," ",collateral_token_symbol)), 
+    collateralLabel, //string(abi.encodePacked(collateral_amount_formatted," ",collateral_token_symbol)), 
     384
 ),
 
 
 _generate_text_label(
     "APR:",
-    "30 %",
+    interestRateLabel, //  "30 %",
     414
 ),
 
 
 _generate_text_label(
     "Duration:",
-    "7 days",
+    loanDurationLabel, //"7 days",
     444
 ),
 
@@ -285,6 +344,29 @@ _generate_text_label(
 }
 
 
+
+ function _get_duration_formatted(uint32 sec) internal pure returns (string memory) {
+     
+        uint32 _weeks = sec / 60 / 60 / 24 / 7;
+        uint32 _days = sec / 60 / 60 / 24 % 7;
+        uint32 _hours = sec / 60 / 60 % 24;
+        uint32 _minutes = sec / 60 % 60;
+        sec = sec % 60;
+
+        if (_weeks > 0) {
+            return string(abi.encodePacked(_weeks.toString(), " weeks ", days.toString(), " days"));
+        } else if (_days > 0) {
+            return string(abi.encodePacked(_days.toString(), " days ", hours.toString(), " hours"));
+        } else if (_hours > 0) {
+            return string(abi.encodePacked(_hours.toString(), " hours ", minutes.toString(), " minutes"));
+        } else if (_minutes > 0) {
+            return string(abi.encodePacked(_minutes.toString(), " minutes ", sec.toString(), " seconds"));
+        } else {
+            return string(abi.encodePacked(sec.toString(), " seconds"));
+        }
+ }
+
+
 function generateSVG( 
         uint256 bidId,
         uint256 principalAmount,
@@ -292,35 +374,40 @@ function generateSVG(
         uint256 collateralAmount,
         address collateralTokenAddress,
         uint16 interestRate,
-        uint32 duration
+        uint32 loanDuration
         ) public pure returns (string memory) {
 
 
 
 
-    string memory principal_amount_formatted = _get_token_amount_formatted( 
-        12540000000000000000,
-        18 ,
-        5
-    );
-
-    string memory principal_token_symbol = "USDC";
-
-
-    string memory collateral_amount_formatted = _get_token_amount_formatted( 
-        2000000000000000000000,
-        18 ,
+    string memory principalAmountFormatted = _get_token_amount_formatted( 
+        principalAmount,
+        _get_token_decimals(principalTokenAddress),
         3
     );
 
-    string memory collateral_token_symbol = "WMATIC";
+    string memory principalTokenSymbol = _get_token_symbol(principalTokenAddress);
+
+
+    string memory collateralAmountFormatted = _get_token_amount_formatted( 
+        collateralAmount,
+        _get_token_decimals(collateralTokenAddress),
+        3
+    );
+
+    string memory collateralTokenSymbol = _get_token_symbol(collateralTokenAddress);  
 
 
 
 
     string memory svgData = _buildSvgData(  
-
-
+            Strings.toString(bidId),
+            principalAmountFormatted,
+            principalTokenSymbol,
+            string(abi.encodePacked(collateralAmountFormatted," ",collateralTokenSymbol)),
+            string(abi.encodePacked(_get_interest_rate_formatted(interestRate)," %")),
+            _get_duration_formatted(loanDuration)
+            //"7 days"
 
     )  ;
 

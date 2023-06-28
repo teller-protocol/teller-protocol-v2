@@ -1183,9 +1183,7 @@ contract TellerV2 is
             uint256 principalAmount,
             uint32 acceptedTimestamp,
             uint32 lastRepaidTimestamp,
-            BidState bidState,
-            uint16 interestRate,
-            uint32 duration 
+            BidState bidState
         )
     {
         Bid storage bid = bids[_bidId];
@@ -1197,9 +1195,7 @@ contract TellerV2 is
         principalAmount = bid.loanDetails.principal;
         acceptedTimestamp = bid.loanDetails.acceptedTimestamp;
         lastRepaidTimestamp = V2Calculations.lastRepaidTimestamp(bids[_bidId]);
-        bidState = bid.state;
-        interestRate = bid.terms.APR;
-        duration = bid.loanDetails.loanDuration;
+        bidState = bid.state; 
     }
 
     /** OpenZeppelin Override Functions **/

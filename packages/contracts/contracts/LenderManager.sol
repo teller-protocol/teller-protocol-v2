@@ -6,12 +6,17 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 
+import "@openzeppelin/contracts/utils/Base64.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
+
+
 // Interfaces
 import "./interfaces/ILenderManager.sol";
 import "./interfaces/ITellerV2.sol";
+import "./interfaces/ITellerV2Storage.sol";
 import "./interfaces/IMarketRegistry.sol";
 
-import {Base64, Strings,  LenderManagerArt} from "./libraries/LenderManagerArt.sol";
+import { LenderManagerArt} from "./libraries/LenderManagerArt.sol";
 
 contract LenderManager is
     Initializable,
@@ -85,12 +90,38 @@ contract LenderManager is
         return "data:image/svg+xml;charset=utf-8,";
     }
 
+    struct LoanInformation {
+
+        address principalTokenAddress;
+        uint256 principalAmount;
+        uint16 interestRate;
+        uint32 loanDuration;
+
+
+    }
+
+
+    function _getLoanInformation(uint256 tokenId) 
+    internal view 
+    returns (LoanInformation memory loanInformation_) {
+
+        Bid memory bid = ITellerV2Storage(owner()).bids(tokenId);
+        
+        LoanInformation memory loanInformation = LoanInformation({
+            principalTokenAddress: address(bid.loanDetails.lendingToken),
+            principalAmount: bid.loanDetails.principal,
+            interestRate: bid.terms.APR,
+            loanDuration: bid.loanDetails.loanDuration
+        });
+
+
+        return loanInformation_;
+    }
+
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
         require(_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
 
-      (address borrower, address lender, uint256 marketId, address principalTokenAddress, uint256 principalAmount,
-    uint32 acceptedTimestamp, uint32 lastRepaidTimestamp, BidState bidState,
-    uint16 interestRate, uint32 duration ) = ITellerV2(owner()).getLoanSummary(tokenId);
+    LoanInformation memory loanInformation = _getLoanInformation(tokenId);
 
     uint256 collateralAmount = 0;
     address collateralTokenAddress = address(0);
@@ -99,12 +130,12 @@ contract LenderManager is
         string memory image_svg_encoded = Base64.encode(bytes( 
             LenderManagerArt.generateSVG(
                 tokenId, //tokenId == bidId 
-                principalAmount,
-                principalTokenAddress,
+                loanInformation.principalAmount,
+                loanInformation.principalTokenAddress,
                 collateralAmount,
                 collateralTokenAddress,
-                interestRate,
-                duration 
+                loanInformation.interestRate,
+                loanInformation.loanDuration 
                 ) ));
     
 

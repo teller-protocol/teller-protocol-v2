@@ -853,8 +853,7 @@ function _get_token_amount_formatted(
 }
 
 
-function generateSVG(
-        uint256 tokenId,
+function generateSVG( 
         uint256 bidId,
         uint256 principalAmount,
         address principalTokenAddress,

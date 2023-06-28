@@ -1065,7 +1065,7 @@ contract TellerV2 is
         acceptedTimestamp = bid.loanDetails.acceptedTimestamp;
         lastRepaidTimestamp = V2Calculations.lastRepaidTimestamp(bids[_bidId]);
         bidState = bid.state;
-        interestRate = bid.terms.apr;
+        interestRate = bid.terms.APR;
         duration = bid.loanDetails.loanDuration;
     }
 

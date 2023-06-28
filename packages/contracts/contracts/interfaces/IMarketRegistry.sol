@@ -12,6 +12,8 @@ interface IMarketRegistry {
         view
         returns (bool, bytes32);
 
+    function isMarketOpen(uint256 _marketId) external view returns (bool);
+
     function isMarketClosed(uint256 _marketId) external view returns (bool);
 
     function isVerifiedBorrower(uint256 _marketId, address _borrower)

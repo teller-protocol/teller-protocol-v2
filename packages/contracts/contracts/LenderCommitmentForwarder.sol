@@ -58,8 +58,11 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
 
     uint256 commitmentCount;
 
+    //https://github.com/OpenZeppelin/openzeppelin-contracts-upgradeable/blob/master/contracts/utils/structs/EnumerableSetUpgradeable.sol
     mapping(uint256 => EnumerableSetUpgradeable.AddressSet)
         internal commitmentBorrowersList;
+
+    mapping(uint256 => uint256) public commitmentPrincipalAccepted;
 
     /**
      * @notice This event is emitted when a lender's commitment is created.
@@ -212,6 +215,11 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         Commitment calldata _commitment
     ) public commitmentLender(_commitmentId) {
         require(
+            _commitment.lender == _msgSender(),
+            "Commitment lender cannot be updated."
+        );
+
+        require(
             _commitment.principalTokenAddress ==
                 commitments[_commitmentId].principalTokenAddress,
             "Principal token address cannot be updated."
@@ -240,12 +248,26 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
      * @param _commitmentId The Id of the commitment to update.
      * @param _borrowerAddressList The array of borrowers that are allowed to accept loans using this commitment
      */
-    function updateCommitmentBorrowers(
+    function addCommitmentBorrowers(
         uint256 _commitmentId,
         address[] calldata _borrowerAddressList
     ) public commitmentLender(_commitmentId) {
-        delete commitmentBorrowersList[_commitmentId];
         _addBorrowersToCommitmentAllowlist(_commitmentId, _borrowerAddressList);
+    }
+
+    /**
+     * @notice Updates the borrowers allowed to accept a commitment
+     * @param _commitmentId The Id of the commitment to update.
+     * @param _borrowerAddressList The array of borrowers that are allowed to accept loans using this commitment
+     */
+    function removeCommitmentBorrowers(
+        uint256 _commitmentId,
+        address[] calldata _borrowerAddressList
+    ) public commitmentLender(_commitmentId) {
+        _removeBorrowersFromCommitmentAllowlist(
+            _commitmentId,
+            _borrowerAddressList
+        );
     }
 
     /**
@@ -264,6 +286,21 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
     }
 
     /**
+     * @notice Removes a borrower to the allowlist for a commmitment.
+     * @param _commitmentId The id of the commitment that will allow the new borrower
+     * @param _borrowerArray the address array of the borrowers that will be allowed to accept loans using the commitment
+     */
+    function _removeBorrowersFromCommitmentAllowlist(
+        uint256 _commitmentId,
+        address[] calldata _borrowerArray
+    ) internal {
+        for (uint256 i = 0; i < _borrowerArray.length; i++) {
+            commitmentBorrowersList[_commitmentId].remove(_borrowerArray[i]);
+        }
+        emit UpdatedCommitmentBorrowers(_commitmentId);
+    }
+
+    /**
      * @notice Removes the commitment of a lender to a market.
      * @param _commitmentId The id of the commitment to delete.
      */
@@ -274,18 +311,6 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         delete commitments[_commitmentId];
         delete commitmentBorrowersList[_commitmentId];
         emit DeletedCommitment(_commitmentId);
-    }
-
-    /**
-     * @notice Reduces the commitment amount for a lender to a market.
-     * @param _commitmentId The id of the commitment to modify.
-     * @param _tokenAmountDelta The amount of change in the maxPrincipal.
-     */
-    function _decrementCommitment(
-        uint256 _commitmentId,
-        uint256 _tokenAmountDelta
-    ) internal {
-        commitments[_commitmentId].maxPrincipal -= _tokenAmountDelta;
     }
 
     /**
@@ -330,6 +355,11 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         require(
             _loanDuration <= commitment.maxDuration,
             "Invalid loan max duration"
+        );
+
+        require(
+            commitmentPrincipalAccepted[bidId] <= commitment.maxPrincipal,
+            "Invalid loan max principal"
         );
 
         require(
@@ -383,6 +413,14 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             );
         }
 
+        commitmentPrincipalAccepted[_commitmentId] += _principalAmount;
+
+        require(
+            commitmentPrincipalAccepted[_commitmentId] <=
+                commitment.maxPrincipal,
+            "Exceeds max principal of commitment"
+        );
+
         bidId = _submitBidFromCommitment(
             borrower,
             commitment.marketId,
@@ -397,8 +435,6 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         );
 
         _acceptBid(bidId, commitment.lender);
-
-        _decrementCommitment(_commitmentId, _principalAmount);
 
         emit ExercisedCommitment(
             _commitmentId,

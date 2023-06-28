@@ -211,12 +211,6 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             "Expect accept bid called after exercise"
         );
 
-        assertEq(
-            commitment.maxPrincipal == 100,
-            true,
-            "Commitment max principal was not decremented"
-        );
-
         bidId = borrower._acceptCommitment(
             commitmentId,
             100, //principalAmount
@@ -227,28 +221,16 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             maxLoanDuration
         );
 
-        assertEq(commitment.maxPrincipal == 0, true, "commitment not accepted");
+        vm.expectRevert();
 
-        bool acceptCommitTwiceFails;
-
-        try
-            borrower._acceptCommitment(
-                commitmentId,
-                100, //principalAmount
-                100, //collateralAmount
-                0, //collateralTokenId
-                address(collateralToken),
-                minInterestRate,
-                maxLoanDuration
-            )
-        {} catch {
-            acceptCommitTwiceFails = true;
-        }
-
-        assertEq(
-            acceptCommitTwiceFails,
-            true,
-            "Should fail when accepting commit twice"
+        borrower._acceptCommitment(
+            commitmentId,
+            100, //principalAmount
+            100, //collateralAmount
+            0, //collateralTokenId
+            address(collateralToken),
+            minInterestRate,
+            maxLoanDuration
         );
     }
 
@@ -260,7 +242,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             maxAmount
         );
 
-        lender._updateCommitmentBorrowers(commitmentId, borrowersArray);
+        lender._addCommitmentBorrowers(commitmentId, borrowersArray);
 
         uint256 bidId = borrower._acceptCommitment(
             commitmentId,
@@ -287,34 +269,27 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             maxAmount
         );
 
-        lender._updateCommitmentBorrowers(commitmentId, borrowersArray);
+        lender._addCommitmentBorrowers(commitmentId, borrowersArray);
 
-        bool acceptCommitAsMarketOwnerFails;
-
-        try
-            marketOwner._acceptCommitment(
-                commitmentId,
-                100, //principal
-                maxAmount, //collateralAmount
-                0, //collateralTokenId
-                address(collateralToken),
-                minInterestRate,
-                maxLoanDuration
-            )
-        {} catch {
-            acceptCommitAsMarketOwnerFails = true;
-        }
-
-        assertEq(
-            acceptCommitAsMarketOwnerFails,
-            true,
-            "Should fail when accepting as invalid borrower"
+        vm.expectRevert();
+        marketOwner._acceptCommitment(
+            commitmentId,
+            100, //principal
+            maxAmount, //collateralAmount
+            0, //collateralTokenId
+            address(collateralToken),
+            minInterestRate,
+            maxLoanDuration
         );
 
-        lender._updateCommitmentBorrowers(commitmentId, emptyArray);
+        address[] memory removalArray = new address[](1);
+        removalArray[0] = address(marketOwner);
+
+        lender._removeCommitmentBorrowers(commitmentId, removalArray);
 
         acceptBidWasCalled = false;
 
+        vm.expectRevert("unauthorized commitment borrower");
         marketOwner._acceptCommitment(
             commitmentId,
             0, //principal
@@ -323,12 +298,6 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             address(collateralToken),
             minInterestRate,
             maxLoanDuration
-        );
-
-        assertEq(
-            acceptBidWasCalled,
-            true,
-            "Expect accept bid called after exercise"
         );
     }
 
@@ -340,10 +309,14 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             maxAmount
         );
 
-        lender._updateCommitmentBorrowers(commitmentId, borrowersArray);
+        lender._addCommitmentBorrowers(commitmentId, borrowersArray);
 
-        lender._updateCommitmentBorrowers(commitmentId, emptyArray);
+        address[] memory removalArray = new address[](1);
+        removalArray[0] = address(marketOwner);
 
+        lender._removeCommitmentBorrowers(commitmentId, removalArray);
+
+        vm.expectRevert("unauthorized commitment borrower");
         marketOwner._acceptCommitment(
             commitmentId,
             0, //principal
@@ -352,12 +325,6 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             address(collateralToken),
             minInterestRate,
             maxLoanDuration
-        );
-
-        assertEq(
-            acceptBidWasCalled,
-            true,
-            "Expect accept bid called after exercise"
         );
     }
 
@@ -420,26 +387,6 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
             failedToAcceptCommitment,
             true,
             "Should fail to accept commitment with invalid amount for ERC721"
-        );
-    }
-
-    function decrementCommitment_before() public {}
-
-    function test_decrementCommitment() public {
-        uint256 commitmentId = 0;
-        uint256 _decrementAmount = 22;
-
-        Commitment storage commitment = _createCommitment(
-            CommitmentCollateralType.ERC20,
-            1000e6
-        );
-
-        _decrementCommitment(commitmentId, _decrementAmount);
-
-        assertEq(
-            commitment.maxPrincipal == maxAmount - _decrementAmount,
-            true,
-            "Commitment max principal was not decremented"
         );
     }
 
@@ -876,11 +823,21 @@ contract LenderCommitmentUser is User {
         commitmentForwarder.updateCommitment(commitmentId, _commitment);
     }
 
-    function _updateCommitmentBorrowers(
+    function _addCommitmentBorrowers(
         uint256 commitmentId,
         address[] calldata borrowerAddressList
     ) public {
-        commitmentForwarder.updateCommitmentBorrowers(
+        commitmentForwarder.addCommitmentBorrowers(
+            commitmentId,
+            borrowerAddressList
+        );
+    }
+
+    function _removeCommitmentBorrowers(
+        uint256 commitmentId,
+        address[] calldata borrowerAddressList
+    ) public {
+        commitmentForwarder.removeCommitmentBorrowers(
             commitmentId,
             borrowerAddressList
         );

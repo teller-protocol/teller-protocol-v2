@@ -24,6 +24,11 @@ abstract contract TellerV2Context is
         address indexed forwarder,
         address sender
     );
+    event MarketForwarderRenounced(
+        uint256 indexed marketId,
+        address indexed forwarder,
+        address sender
+    );
 
     constructor(address trustedForwarder)
         ERC2771ContextUpgradeable(trustedForwarder)
@@ -96,6 +101,20 @@ abstract contract TellerV2Context is
     }
 
     /**
+     * @notice Renounces approval of a market forwarder
+     * @param _marketId An ID for a lending market.
+     * @param _forwarder A forwarder contract address.
+     */
+    function renounceMarketForwarder(uint256 _marketId, address _forwarder)
+        external
+    {
+        if (_approvedForwarderSenders[_forwarder].contains(_msgSender())) {
+            _approvedForwarderSenders[_forwarder].remove(_msgSender());
+            emit MarketForwarderRenounced(_marketId, _forwarder, _msgSender());
+        }
+    }
+
+    /**
      * @notice Retrieves the function caller address by checking the appended calldata if the _actual_ caller is a trusted forwarder.
      * @param _marketId An ID for a lending market.
      * @return sender The address to use as the function caller.
@@ -106,7 +125,10 @@ abstract contract TellerV2Context is
         virtual
         returns (address)
     {
-        if (isTrustedMarketForwarder(_marketId, _msgSender())) {
+        if (
+            msg.data.length >= 20 &&
+            isTrustedMarketForwarder(_marketId, _msgSender())
+        ) {
             address sender;
             assembly {
                 sender := shr(96, calldataload(sub(calldatasize(), 20)))

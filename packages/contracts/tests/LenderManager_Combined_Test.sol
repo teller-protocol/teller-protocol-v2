@@ -130,6 +130,18 @@ contract LenderManagerUser is User {
     function transferLoan(uint256 bidId, address to) public {
         IERC721(lenderManager).transferFrom(address(this), to, bidId);
     }
+
+    function onERC721Received(
+        address operator,
+        address from,
+        uint256 tokenId,
+        bytes calldata data
+    ) external returns (bytes4) {
+        return
+            bytes4(
+                keccak256("onERC721Received(address,address,uint256,bytes)")
+            );
+    }
 }
 
 //Move to a helper  or change it

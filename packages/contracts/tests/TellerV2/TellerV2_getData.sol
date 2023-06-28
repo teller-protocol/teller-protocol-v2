@@ -17,6 +17,8 @@ import { CollateralManagerMock } from "../../contracts/mock/CollateralManagerMoc
 import { LenderManagerMock } from "../../contracts/mock/LenderManagerMock.sol";
 import { MarketRegistryMock } from "../../contracts/mock/MarketRegistryMock.sol";
 
+import "../../lib/forge-std/src/console.sol";
+
 contract TellerV2_initialize is Testable {
     TellerV2_Override tellerV2;
 
@@ -34,6 +36,9 @@ contract TellerV2_initialize is Testable {
         lendingToken = new ERC20("Wrapped Ether", "WETH");
 
         lenderManagerMock = new LenderManagerMock();
+
+        borrower = new User();
+        lender = new User();
     }
 
     /*
@@ -109,7 +114,7 @@ contract TellerV2_initialize is Testable {
         assertEq(uri, "0x1234");
     }
 
-    function test_isLoanLiquidateable_false() public {
+    function test_isLoanLiquidateable_with_valid_bid() public {
         uint256 bidId = 1;
         setMockBid(1);
 
@@ -118,7 +123,7 @@ contract TellerV2_initialize is Testable {
         assertEq(liquidateable, false);
     }
 
-    function test_isLoanLiquidateable_true() public {
+    function test_isLoanLiquidateable_with_very_old_bid() public {
         uint256 bidId = 1;
         setMockBid(bidId);
 
@@ -132,6 +137,39 @@ contract TellerV2_initialize is Testable {
 
         bool liquidateable = tellerV2.isLoanLiquidateable(bidId);
 
+        assertEq(liquidateable, true);
+    }
+
+    function test_isLoanLiquidateable_when_repaid_sooner() public {
+        uint256 bidId = 1;
+        setMockBid(bidId);
+
+        //set to accepted
+        tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
+
+        tellerV2.mock_setBidDefaultDuration(bidId, 1000);
+        tellerV2.mock_setBidLastRepaidTimestamp(bidId, 1000);
+
+        vm.warp(3110);
+        bool defaulted = tellerV2.isLoanDefaulted(bidId);
+        bool liquidateable = tellerV2.isLoanLiquidateable(bidId);
+
+        assertEq(defaulted, false);
+        assertEq(liquidateable, false);
+
+        //fast forward timestamp past the  accepted time + payment cycle + default duration
+        vm.warp(5110);
+        defaulted = tellerV2.isLoanDefaulted(bidId);
+        liquidateable = tellerV2.isLoanLiquidateable(bidId);
+
+        assertEq(defaulted, true);
+        assertEq(liquidateable, false);
+
+        vm.warp(5110 + 1 days);
+        defaulted = tellerV2.isLoanDefaulted(bidId);
+        liquidateable = tellerV2.isLoanLiquidateable(bidId);
+
+        assertEq(defaulted, true);
         assertEq(liquidateable, true);
     }
 
@@ -265,6 +303,38 @@ contract TellerV2_initialize is Testable {
             "unexpected borrower from summary"
         );
         assertEq(lender, address(lender), "unexpected lender from summary");
+        assertEq(marketId, 100, "unexpected marketId from summary");
+    }
+
+    function test_getLoanSummary_lender_manager() public {
+        uint256 bidId = 1;
+        setMockBid(1);
+
+        tellerV2.mock_setLenderManager(address(lenderManagerMock));
+
+        lenderManagerMock.registerLoan(bidId, address(this));
+
+        (
+            address borrower,
+            address lender,
+            uint256 marketId,
+            address principalTokenAddress,
+            uint256 principalAmount,
+            uint32 acceptedTimestamp,
+            uint32 lastRepaidTimestamp,
+            BidState bidState
+        ) = tellerV2.getLoanSummary(bidId);
+
+        assertEq(
+            borrower,
+            address(borrower),
+            "unexpected borrower from summary"
+        );
+        assertEq(
+            lender,
+            tellerV2.getLoanLender(bidId),
+            "unexpected lender from summary"
+        );
         assertEq(marketId, 100, "unexpected marketId from summary");
     }
 

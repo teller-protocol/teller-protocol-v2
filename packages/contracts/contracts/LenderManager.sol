@@ -11,12 +11,15 @@ import "./interfaces/ILenderManager.sol";
 import "./interfaces/ITellerV2.sol";
 import "./interfaces/IMarketRegistry.sol";
 
+import {Base64, Strings,  LenderManagerArt} from "./libraries/LenderManagerArt.sol";
+
 contract LenderManager is
     Initializable,
     OwnableUpgradeable,
     ERC721Upgradeable,
     ILenderManager
 {
+   // using Strings for uint256;
     IMarketRegistry public immutable marketRegistry;
 
     constructor(IMarketRegistry _marketRegistry) {
@@ -79,6 +82,58 @@ contract LenderManager is
     }
 
     function _baseURI() internal view override returns (string memory) {
-        return "";
+        return "data:image/svg+xml;charset=utf-8,";
     }
+
+    function tokenURI(uint256 tokenId) public view override returns (string memory) {
+        require(_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
+
+        
+        
+        string memory image_svg_encoded = Base64.encode(bytes( 
+            LenderManagerArt.generateSVG(
+                tokenId,
+                bidId,
+                principalAmount,
+                principalTokenAddress,
+                collateralAmount,
+                collateralTokenAddress,
+                interestRate,
+                duration 
+                ) ));
+    
+
+       string memory name = "Teller Loan NFT";
+       string memory description = "This token represents ownership of a loan.  Repayments of principal and interest will be sent to the owner of this token.  If the loan defaults, the owner of this token will be able to claim the underlying collateral.";
+
+
+
+        string memory encoded_svg =   string(
+                abi.encodePacked(
+                    'data:application/json;base64,',
+                    Base64.encode(
+                        bytes(
+                            abi.encodePacked(
+                                '{"name":"',
+                                name,
+                                '", "description":"',
+                                description, 
+                                '", "image": "',  //use image_data so its a dynamic svg not cached ?
+                                'data:image/svg+xml;base64,',
+                                image_svg_encoded,
+                                '"}'
+                            )
+                        )
+                    )
+                )
+            );
+        
+        return encoded_svg;
+    }
+
+
 }
+
+
+
+ 

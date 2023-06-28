@@ -828,6 +828,31 @@ function _generate_text_label(
     ));
 }
 
+/*
+Not working quite right yet 
+*/
+function _get_token_amount_formatted( 
+    uint256 amount,
+    uint256 decimals,
+    uint256 precision
+) public pure returns (string memory) { 
+
+     uint256 before_decimal = amount / 10 ** decimals;
+
+     uint256 after_decimal = amount % 10 ** decimals;
+  
+        return string(abi.encodePacked( 
+             Strings.toString(before_decimal),
+            ".",
+             Strings.toString(after_decimal)
+
+         ));
+        
+      
+
+}
+
+
 function generateSVG(
         uint256 tokenId,
         uint256 bidId,
@@ -838,6 +863,29 @@ function generateSVG(
         uint16 interestRate,
         uint32 duration
         ) public pure returns (string memory) {
+
+
+
+
+string memory principal_amount_formatted = _get_token_amount_formatted( 
+    12540000000000000000,
+    18 ,
+    5
+);
+
+string memory principal_token_symbol = "USDC";
+
+
+string memory collateral_amount_formatted = _get_token_amount_formatted( 
+    2000000000000000000000,
+    18 ,
+    3
+);
+
+string memory collateral_token_symbol = "WMATIC";
+
+
+
 
     string memory svgData = string(abi.encodePacked(
 
@@ -850,8 +898,8 @@ _clip_path_corners,
  
 
 _generate_large_title( 
-  "1.2540",
-  "USDC"
+ principal_amount_formatted,
+ principal_token_symbol
 ),
 
 _teller_logo,
@@ -859,14 +907,14 @@ _teller_logo,
 
 _generate_text_label(
     "Loan ID:",
-    "111111",
+    Strings.toString(bidId),
     354
 ),
 
 
 _generate_text_label(
     "Collateral:",
-    "3.00 WMATIC",
+    string(abi.encodePacked(collateral_amount_formatted," ",collateral_token_symbol)), 
     384
 ),
 

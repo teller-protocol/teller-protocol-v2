@@ -88,12 +88,17 @@ contract LenderManager is
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
         require(_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
 
+      (address borrower, address lender, uint256 marketId, address principalTokenAddress, uint256 principalAmount,
+    uint32 acceptedTimestamp, uint32 lastRepaidTimestamp, BidState bidState,
+    uint16 interestRate, uint32 duration ) = ITellerV2(owner()).getLoanSummary(tokenId);
+
+    uint256 collateralAmount = 0;
+    address collateralTokenAddress = address(0);
         
         
         string memory image_svg_encoded = Base64.encode(bytes( 
             LenderManagerArt.generateSVG(
-                tokenId,
-                bidId,
+                tokenId, //tokenId == bidId 
                 principalAmount,
                 principalTokenAddress,
                 collateralAmount,

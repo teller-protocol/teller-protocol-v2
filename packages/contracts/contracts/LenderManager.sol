@@ -45,7 +45,7 @@ contract LenderManager is
         override
         onlyOwner
     {
-        _mint(_newLender, _bidId);
+        _safeMint(_newLender, _bidId, "");
     }
 
     /**

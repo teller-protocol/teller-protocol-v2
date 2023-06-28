@@ -121,6 +121,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         Collateral[] calldata _collateralInfo
     ) public onlyTellerV2 returns (bool validation_) {
         address borrower = tellerV2.getLoanBorrower(_bidId);
+        require(borrower != address(0), "Loan has no borrower");
         (validation_, ) = checkBalances(borrower, _collateralInfo);
 
         //if the collateral info is valid, call commitCollateral for each one
@@ -143,6 +144,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         Collateral calldata _collateralInfo
     ) public onlyTellerV2 returns (bool validation_) {
         address borrower = tellerV2.getLoanBorrower(_bidId);
+        require(borrower != address(0), "Loan has no borrower");
         validation_ = _checkBalance(borrower, _collateralInfo);
         if (validation_) {
             _commitCollateral(_bidId, _collateralInfo);
@@ -254,15 +256,29 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
      */
     function withdraw(uint256 _bidId) external {
         BidState bidState = tellerV2.getBidState(_bidId);
-        if (bidState == BidState.PAID) {
-            //if the bid is fully repaid the borrower gets all collateral assets back
-            _withdraw(_bidId, tellerV2.getLoanBorrower(_bidId));
-        } else if (tellerV2.isLoanDefaulted(_bidId)) {
-            //if the bid is defaulted the lender gets all of the collateral
+
+        require(bidState == BidState.PAID, "collateral cannot be withdrawn");
+
+        _withdraw(_bidId, tellerV2.getLoanBorrower(_bidId));
+
+        emit CollateralClaimed(_bidId);
+    }
+
+    /**
+     * @notice Withdraws deposited collateral from the created escrow of a bid that has been CLOSED after being defaulted.
+     * @param _bidId The id of the bid to withdraw collateral for.
+     */
+    function lenderClaimCollateral(uint256 _bidId) external onlyTellerV2 {
+        if (isBidCollateralBacked(_bidId)) {
+            BidState bidState = tellerV2.getBidState(_bidId);
+
+            require(
+                bidState == BidState.CLOSED,
+                "Loan has not been liquidated"
+            );
+
             _withdraw(_bidId, tellerV2.getLoanLender(_bidId));
             emit CollateralClaimed(_bidId);
-        } else {
-            revert("collateral cannot be withdrawn");
         }
     }
 

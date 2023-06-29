@@ -5,7 +5,7 @@ import { IMarketRegistry } from "./interfaces/IMarketRegistry.sol";
 import "./interfaces/IEscrowVault.sol";
 import "./interfaces/IReputationManager.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./interfaces/ICollateralManager.sol";
 import { PaymentType, PaymentCycleType } from "./libraries/V2Calculations.sol";
 import "./interfaces/ILenderManager.sol";
@@ -64,7 +64,7 @@ struct Bid {
  * @param loanDuration The duration of the loan.
  */
 struct LoanDetails {
-    ERC20 lendingToken;
+    IERC20 lendingToken;
     uint256 principal;
     Payment totalRepaid;
     uint32 timestamp;

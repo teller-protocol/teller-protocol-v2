@@ -12,9 +12,23 @@ import "@openzeppelin/contracts/utils/math/SignedMath.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
   
  
+//must use this custom interface since the OZ one doesnt support decimals
+interface IERC20 {
+    function totalSupply() external view returns (uint256);
+    function balanceOf(address account) external view returns (uint256);
+    function transfer(address recipient, uint256 amount) external returns (bool);
+    function allowance(address owner, address spender) external view returns (uint256);
+    function approve(address spender, uint256 amount) external returns (bool);
+    function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
+    function decimals() external view returns (uint8);
+    function symbol() external view returns (string memory);
+}
 
 library LenderManagerArt {
  
+ using Strings for uint256;
+using Strings for uint32;
+using Strings for uint16;
 
 
 bytes constant _bg_defs_filter = abi.encodePacked (
@@ -204,10 +218,9 @@ function _generate_text_label(
  
 function _get_token_amount_formatted( 
     uint256 amount,
-    uint256 decimals,
-    uint256 precision
+    uint256 decimals 
 ) public pure returns (string memory) { 
-
+        uint256 precision = Math.min(3,decimals);
     
 
          require(precision <= decimals, "Precision cannot be greater than decimals");
@@ -343,28 +356,53 @@ _generate_text_label(
 
 }
 
-
-
- function _get_duration_formatted(uint32 sec) internal pure returns (string memory) {
-     
-        uint32 _weeks = sec / 60 / 60 / 24 / 7;
-        uint32 _days = sec / 60 / 60 / 24 % 7;
-        uint32 _hours = sec / 60 / 60 % 24;
-        uint32 _minutes = sec / 60 % 60;
-        sec = sec % 60;
-
-        if (_weeks > 0) {
-            return string(abi.encodePacked(_weeks.toString(), " weeks ", days.toString(), " days"));
-        } else if (_days > 0) {
-            return string(abi.encodePacked(_days.toString(), " days ", hours.toString(), " hours"));
-        } else if (_hours > 0) {
-            return string(abi.encodePacked(_hours.toString(), " hours ", minutes.toString(), " minutes"));
-        } else if (_minutes > 0) {
-            return string(abi.encodePacked(_minutes.toString(), " minutes ", sec.toString(), " seconds"));
-        } else {
-            return string(abi.encodePacked(sec.toString(), " seconds"));
+    function _get_token_decimals(address token) internal view returns (uint256) {
+        if(token.code.length == 0){
+            return 0;
         }
- }
+
+        try IERC20(token).decimals() returns (uint8 decimals) {
+            return decimals;
+        } catch {
+            return 18; // Fallback to a standard number of decimals if the call fails
+        }
+    }
+
+    function _get_token_symbol(address token) internal view returns (string memory) {
+         if(token.code.length == 0){
+            return "?";
+        }
+        
+        try IERC20(token).symbol() returns (string memory symbol) {
+            return symbol;
+        } catch {
+            return "?"; // Fallback to 'Unknown' if the call fails
+        }
+    }
+
+function _get_interest_rate_formatted(uint16 interestRate) internal pure returns (string memory) {
+    return string(abi.encodePacked( (interestRate / 100).toString(), " %"));
+}
+
+function _get_duration_formatted(uint32 sec) internal pure returns (string memory) {
+        uint32 _months = sec / 4 weeks;
+        uint32 _weeks = sec / 1 weeks;
+        uint32 _days = sec / 1 days;
+        uint32 _hours = sec / 1 hours;
+        uint32 _minutes = sec / 1 minutes;
+       
+        if (_months > 0) {
+            return string(abi.encodePacked(_months.toString(), " months "));
+        } else if (_weeks > 0) {
+            return string(abi.encodePacked(_weeks.toString(), " weeks "));
+        } else if (_days > 0) {
+            return string(abi.encodePacked(_days.toString(), " days "));
+        } else if (_hours > 0) {
+            return string(abi.encodePacked(_hours.toString(), " hours "));
+        } else {
+            return string(abi.encodePacked(_minutes.toString(), " minutes"));
+        }
+    }
 
 
 function generateSVG( 
@@ -375,39 +413,37 @@ function generateSVG(
         address collateralTokenAddress,
         uint16 interestRate,
         uint32 loanDuration
-        ) public pure returns (string memory) {
+        ) public view returns (string memory) {
 
 
 
-
+  //  uint256 principalTokenDecimals =  _get_token_decimals(principalTokenAddress);
     string memory principalAmountFormatted = _get_token_amount_formatted( 
         principalAmount,
-        _get_token_decimals(principalTokenAddress),
-        3
+        _get_token_decimals(principalTokenAddress)
+      //  Math.min(3,principalTokenDecimals )
     );
 
     string memory principalTokenSymbol = _get_token_symbol(principalTokenAddress);
 
-
+   // uint256 collateralTokenDecimals =  _get_token_decimals(collateralTokenAddress);
     string memory collateralAmountFormatted = _get_token_amount_formatted( 
         collateralAmount,
-        _get_token_decimals(collateralTokenAddress),
-        3
+         _get_token_decimals(collateralTokenAddress)
+       // Math.min(3,collateralTokenDecimals)
     );
 
     string memory collateralTokenSymbol = _get_token_symbol(collateralTokenAddress);  
 
 
 
-
     string memory svgData = _buildSvgData(  
-            Strings.toString(bidId),
+             (bidId).toString(),
             principalAmountFormatted,
             principalTokenSymbol,
             string(abi.encodePacked(collateralAmountFormatted," ",collateralTokenSymbol)),
-            string(abi.encodePacked(_get_interest_rate_formatted(interestRate)," %")),
-            _get_duration_formatted(loanDuration)
-            //"7 days"
+            _get_interest_rate_formatted(interestRate),
+            _get_duration_formatted(loanDuration) 
 
     )  ;
 

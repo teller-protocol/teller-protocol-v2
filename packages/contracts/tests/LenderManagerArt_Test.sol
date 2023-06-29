@@ -8,7 +8,7 @@ import "lib/forge-std/src/console.sol";
 
 import { Testable } from "./Testable.sol";
 import { LenderManagerArt } from "../contracts/libraries/LenderManagerArt.sol";
-
+ 
 import "./tokens/TestERC1155Token.sol";
 import "./tokens/TestERC721Token.sol";
 import "../contracts/mock/WethMock.sol";
@@ -56,7 +56,26 @@ contract LenderManagerArt_Test is Testable {
 
 
     //add more unit tests here 
-    
+    function test_get_token_decimals() public {
+
+
+        uint256 decimals = LenderManagerArt._get_token_decimals(address(wethMock));
+ 
+
+        assertEq(decimals, 18);
+
+
+    }
+
+    function test_get_token_decimals_erc721() public {
+
+        uint256 decimals = LenderManagerArt._get_token_decimals(address(erc721Mock));
+ 
+
+        assertEq(decimals, 0);
+
+    }
+
 
 
 

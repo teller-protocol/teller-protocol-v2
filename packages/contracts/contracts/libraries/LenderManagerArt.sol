@@ -349,36 +349,36 @@ _generate_text_label(
 
  
 "</svg>"
-    ));
+
+));
 
 
 
 }
 
-    function _get_token_decimals(address token) internal view returns (uint256) {
-       
+function _get_token_decimals(address token) public view returns (uint256) {
+    
+    bytes memory data = abi.encodeWithSignature("decimals()");
+    
+    (bool success, bytes memory result) = token.staticcall(data);
 
-        bytes memory data = abi.encodeWithSignature("decimals()");
-        
-        (bool success, bytes memory result) = token.staticcall(data);
-
-        if (!success) {
-            return 0;
-        }
-
-        // Decode the result  
-        uint8 decimals = abi.decode(result, (uint8));
-
-        return decimals;
+    if (!success) {
+        return 0;
     }
+
+    // Decode the result  
+    uint8 decimals = abi.decode(result, (uint8));
+
+    return decimals;
+}
 
  
 
-function _get_interest_rate_formatted(uint16 interestRate) internal pure returns (string memory) {
+function _get_interest_rate_formatted(uint16 interestRate) public pure returns (string memory) {
     return string(abi.encodePacked( (interestRate / 100).toString(), " %"));
 }
 
-function _get_duration_formatted(uint32 sec) internal pure returns (string memory) {
+function _get_duration_formatted(uint32 sec) public pure returns (string memory) {
         uint32 _months = sec / 4 weeks;
         uint32 _weeks = sec / 1 weeks;
         uint32 _days = sec / 1 days;
@@ -399,7 +399,7 @@ function _get_duration_formatted(uint32 sec) internal pure returns (string memor
     }
 
 
- function _get_token_symbol(address nftContract, string memory _fallback) internal view returns (string memory) {
+ function _get_token_symbol(address nftContract, string memory _fallback) public view returns (string memory) {
         bytes memory data = abi.encodeWithSignature("symbol()");
         
         (bool success, bytes memory result) = nftContract.staticcall(data);
@@ -416,7 +416,7 @@ function _get_duration_formatted(uint32 sec) internal pure returns (string memor
 } 
 
 
-function _get_collateral_label(Collateral memory collateral) internal view returns (string memory) {
+function _get_collateral_label(Collateral memory collateral) public view returns (string memory) {
     
     if(collateral._collateralAddress == address(0)){
         return "None";

@@ -10,8 +10,10 @@ pragma solidity ^0.8.4;
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@openzeppelin/contracts/utils/math/SignedMath.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
-  
+
+import { Collateral, CollateralType } from "../interfaces/escrow/ICollateralEscrowV1.sol";
  
+
 //must use this custom interface since the OZ one doesnt support decimals
 interface IERC20 {
     function totalSupply() external view returns (uint256);
@@ -220,10 +222,10 @@ function _get_token_amount_formatted(
     uint256 amount,
     uint256 decimals 
 ) public pure returns (string memory) { 
-        uint256 precision = Math.min(3,decimals);
+         uint256 precision = Math.min(3,decimals);
     
 
-         require(precision <= decimals, "Precision cannot be greater than decimals");
+         //require(precision <= decimals, "Precision cannot be greater than decimals");
 
          uint256 before_decimal = amount / (10 ** decimals);
 
@@ -404,44 +406,62 @@ function _get_duration_formatted(uint32 sec) internal pure returns (string memor
         }
     }
 
+function _get_collateral_label(Collateral memory collateral) internal view returns (string memory) {
+    
+    if(collateral._collateralAddress == address(0)){
+        return "None";
+    }
+    
+    if(collateral._collateralType == CollateralType.ERC20){
+        string memory collateralAmountFormatted = _get_token_amount_formatted( 
+                collateral._amount,
+                _get_token_decimals(collateral._collateralAddress)
+                
+            );
+
+        string memory collateralTokenSymbol = _get_token_symbol(collateral._collateralAddress);  
+
+        return string(abi.encodePacked(collateralAmountFormatted," ",collateralTokenSymbol));
+    }
+
+    if(collateral._collateralType == CollateralType.ERC721){
+        return "ERC721";
+    }
+
+    if(collateral._collateralType == CollateralType.ERC1155){
+        return "ERC1155";
+    }
+   
+     
+  
+}
 
 function generateSVG( 
         uint256 bidId,
         uint256 principalAmount,
         address principalTokenAddress,
-        uint256 collateralAmount,
-        address collateralTokenAddress,
+        Collateral memory collateral,        
         uint16 interestRate,
         uint32 loanDuration
         ) public view returns (string memory) {
 
-
-
-  //  uint256 principalTokenDecimals =  _get_token_decimals(principalTokenAddress);
+ 
     string memory principalAmountFormatted = _get_token_amount_formatted( 
         principalAmount,
         _get_token_decimals(principalTokenAddress)
-      //  Math.min(3,principalTokenDecimals )
+       
     );
 
     string memory principalTokenSymbol = _get_token_symbol(principalTokenAddress);
 
-   // uint256 collateralTokenDecimals =  _get_token_decimals(collateralTokenAddress);
-    string memory collateralAmountFormatted = _get_token_amount_formatted( 
-        collateralAmount,
-         _get_token_decimals(collateralTokenAddress)
-       // Math.min(3,collateralTokenDecimals)
-    );
-
-    string memory collateralTokenSymbol = _get_token_symbol(collateralTokenAddress);  
-
-
+   
 
     string memory svgData = _buildSvgData(  
              (bidId).toString(),
             principalAmountFormatted,
             principalTokenSymbol,
-            string(abi.encodePacked(collateralAmountFormatted," ",collateralTokenSymbol)),
+            _get_collateral_label(collateral),
+           
             _get_interest_rate_formatted(interestRate),
             _get_duration_formatted(loanDuration) 
 

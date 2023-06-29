@@ -7,4 +7,7 @@ interface ITellerV2Storage {
         view 
         returns (Bid memory);
 
+ function collateralManager() external view returns (address);
+
+ 
 }

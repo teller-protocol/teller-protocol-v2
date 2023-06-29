@@ -14,9 +14,11 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 import "./interfaces/ILenderManager.sol";
 import "./interfaces/ITellerV2.sol";
 import "./interfaces/ITellerV2Storage.sol";
+import "./interfaces/ICollateralManager.sol";
 import "./interfaces/IMarketRegistry.sol";
 
 import { LenderManagerArt} from "./libraries/LenderManagerArt.sol";
+import {CollateralType,Collateral} from "./interfaces/escrow/ICollateralEscrowV1.sol";
 
 contract LenderManager is
     Initializable,
@@ -118,13 +120,35 @@ contract LenderManager is
         return loanInformation_;
     }
 
+
+    function _getCollateralInformation(uint256 tokenId)
+    internal view
+    returns (Collateral memory collateral_) {
+
+        address collateralManager = ITellerV2Storage(owner()).collateralManager();
+
+        Collateral[] memory collateralArray = ICollateralManager(collateralManager).getCollateralInfo(tokenId);
+
+        if(collateralArray.length == 0) {
+            return Collateral({
+                _amount: 0,
+                _collateralAddress: address(0),
+                _collateralType: CollateralType.ERC20,
+                _tokenId: 0
+
+            });
+        } 
+
+        return collateralArray[0];
+    }
+
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
         require(_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
 
     LoanInformation memory loanInformation = _getLoanInformation(tokenId);
+ 
 
-    uint256 collateralAmount = 0;
-    address collateralTokenAddress = address(0);
+    Collateral memory collateral = _getCollateralInformation(tokenId);
         
         
         string memory image_svg_encoded = Base64.encode(bytes( 
@@ -132,8 +156,8 @@ contract LenderManager is
                 tokenId, //tokenId == bidId 
                 loanInformation.principalAmount,
                 loanInformation.principalTokenAddress,
-                collateralAmount,
-                collateralTokenAddress,
+                collateral,
+                //collateralTokenAddress,
                 loanInformation.interestRate,
                 loanInformation.loanDuration 
                 ) ));

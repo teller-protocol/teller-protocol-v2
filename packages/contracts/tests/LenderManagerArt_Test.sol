@@ -76,8 +76,60 @@ contract LenderManagerArt_Test is Testable {
 
     }
 
+    function test_get_interest_rate_formatted() public {
+
+        string memory interestRate = LenderManagerArt._get_interest_rate_formatted(30000);
+ 
+        assertEq(interestRate, "300 %");
+
+    }
+
+    function test_get_duration_formatted() public {
+
+        string memory duration = LenderManagerArt._get_duration_formatted(30000);
+ 
+        assertEq(duration, "8 hours");
 
 
+    }
+
+    function test_get_duration_formatted_2() public {
+
+        string memory duration = LenderManagerArt._get_duration_formatted(3000000);
+ 
+        assertEq(duration, "4 weeks");
+
+
+    }
+
+
+    function test_get_token_symbol() public {
+        string memory symbol = LenderManagerArt._get_token_symbol(address(wethMock),"fallback");
+ 
+        assertEq(symbol, "WETH");
+    }
+
+    function test_get_token_symbol_fallback() public {
+        string memory symbol = LenderManagerArt._get_token_symbol(address(0),"fallback");
+ 
+        assertEq(symbol, "fallback");
+    }
+
+    function test_get_collateral_label() public {
+
+
+        Collateral memory _collateral = Collateral({
+            _collateralType: CollateralType.ERC721,
+            _collateralAddress: address(erc721Mock),
+            _amount: 1,
+            _tokenId : 150 
+        });
+
+        string memory label = LenderManagerArt._get_collateral_label(_collateral);
+ 
+        assertEq(label, "BAYC");
+
+    }
 
 
 }

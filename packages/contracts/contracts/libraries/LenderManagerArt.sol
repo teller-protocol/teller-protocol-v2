@@ -359,6 +359,10 @@ _generate_text_label(
 function _get_token_decimals(address token) public view returns (uint256) {
     
     bytes memory data = abi.encodeWithSignature("decimals()");
+
+    if(token.code.length == 0){
+            return 0;
+    }
     
     (bool success, bytes memory result) = token.staticcall(data);
 
@@ -385,14 +389,14 @@ function _get_duration_formatted(uint32 sec) public pure returns (string memory)
         uint32 _hours = sec / 1 hours;
         uint32 _minutes = sec / 1 minutes;
        
-        if (_months > 0) {
-            return string(abi.encodePacked(_months.toString(), " months "));
-        } else if (_weeks > 0) {
-            return string(abi.encodePacked(_weeks.toString(), " weeks "));
-        } else if (_days > 0) {
-            return string(abi.encodePacked(_days.toString(), " days "));
-        } else if (_hours > 0) {
-            return string(abi.encodePacked(_hours.toString(), " hours "));
+        if (_months >= 2) {
+            return string(abi.encodePacked(_months.toString(), " months"));
+        } else if (_weeks >= 2) {
+            return string(abi.encodePacked(_weeks.toString(), " weeks"));
+        } else if (_days >= 2) {
+            return string(abi.encodePacked(_days.toString(), " days"));
+        } else if (_hours >= 2) {
+            return string(abi.encodePacked(_hours.toString(), " hours"));
         } else {
             return string(abi.encodePacked(_minutes.toString(), " minutes"));
         }
@@ -401,6 +405,10 @@ function _get_duration_formatted(uint32 sec) public pure returns (string memory)
 
  function _get_token_symbol(address nftContract, string memory _fallback) public view returns (string memory) {
         bytes memory data = abi.encodeWithSignature("symbol()");
+
+        if(nftContract.code.length == 0){
+            return _fallback;
+        }
         
         (bool success, bytes memory result) = nftContract.staticcall(data);
 

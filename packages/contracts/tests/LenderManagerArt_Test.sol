@@ -8,20 +8,24 @@ import "lib/forge-std/src/console.sol";
 
 import { Testable } from "./Testable.sol";
 import { LenderManagerArt } from "../contracts/libraries/LenderManagerArt.sol";
- 
-  
+
+import "./tokens/TestERC1155Token.sol";
+import "./tokens/TestERC721Token.sol";
 import "../contracts/mock/WethMock.sol";
 
 contract LenderManagerArt_Test is Testable {
    
    WethMock wethMock;
+   TestERC721Token erc721Mock;
+   TestERC1155Token erc1155Mock;
 
     constructor() {}
 
     function setUp() public {
        
        wethMock = new WethMock();
-
+       erc721Mock = new TestERC721Token("BAYC", "BAYC");
+       erc1155Mock = new TestERC1155Token("SAND");
     }
 
     function test_generateSVG() public {
@@ -29,21 +33,19 @@ contract LenderManagerArt_Test is Testable {
  
 
         Collateral memory _collateral = Collateral({
-            _collateralType: CollateralType.ERC20,
-            _collateralAddress: address(wethMock),
-            _amount: 20000,
-            _tokenId : 0 
+            _collateralType: CollateralType.ERC721,
+            _collateralAddress: address(erc721Mock),
+            _amount: 1,
+            _tokenId : 150 
         });
 
         string memory svg = LenderManagerArt.generateSVG(
             22,
             82330000000000420055000,
-            address(wethMock),
-          //  20000,
-          //  address(0),
+            address(wethMock), 
             _collateral,
             300,
-            55000
+            550000
         );
 
 

@@ -6,6 +6,7 @@
 
 pragma solidity ^0.8.4;
 
+import "@openzeppelin/contracts/utils/Address.sol";
 
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@openzeppelin/contracts/utils/math/SignedMath.sol";
@@ -28,9 +29,10 @@ interface IERC20 {
 
 library LenderManagerArt {
  
- using Strings for uint256;
+using Strings for uint256;
 using Strings for uint32;
 using Strings for uint16;
+using Address for address;
 
 
 bytes constant _bg_defs_filter = abi.encodePacked (
@@ -191,9 +193,7 @@ function _generate_large_title(
 "<text y='90px' x='32px' fill='white' font-family='Courier New, monospace' font-weight='200' font-size='12px'><tspan font-size='36px'>",amount,"</tspan> ",symbol,"</text>",
 "</g>",
 "<rect x='16' y='16' width='258' height='468' rx='4' ry='4' fill='rgba(0,0,0,0)' stroke='rgba(255,255,255,0.2)'/>"
-
  
-
   
   ));
 }
@@ -223,10 +223,7 @@ function _get_token_amount_formatted(
     uint256 decimals 
 ) public pure returns (string memory) { 
          uint256 precision = Math.min(3,decimals);
-    
-
-         //require(precision <= decimals, "Precision cannot be greater than decimals");
-
+     
          uint256 before_decimal = amount / (10 ** decimals);
 
          uint256 after_decimal = amount % (10 ** decimals);
@@ -324,28 +321,28 @@ _teller_logo,
 
 
 _generate_text_label(
-    "Loan ID:",
+    "Loan ID: ",
     loanId, //Strings.toString(bidId),
     354
 ),
 
 
 _generate_text_label(
-    "Collateral:",
+    "Collateral: ",
     collateralLabel, //string(abi.encodePacked(collateral_amount_formatted," ",collateral_token_symbol)), 
     384
 ),
 
 
 _generate_text_label(
-    "APR:",
+    "APR: ",
     interestRateLabel, //  "30 %",
     414
 ),
 
 
 _generate_text_label(
-    "Duration:",
+    "Duration: ",
     loanDurationLabel, //"7 days",
     444
 ),
@@ -359,28 +356,23 @@ _generate_text_label(
 }
 
     function _get_token_decimals(address token) internal view returns (uint256) {
-        if(token.code.length == 0){
+       
+
+        bytes memory data = abi.encodeWithSignature("decimals()");
+        
+        (bool success, bytes memory result) = token.staticcall(data);
+
+        if (!success) {
             return 0;
         }
 
-        try IERC20(token).decimals() returns (uint8 decimals) {
-            return decimals;
-        } catch {
-            return 18; // Fallback to a standard number of decimals if the call fails
-        }
+        // Decode the result  
+        uint8 decimals = abi.decode(result, (uint8));
+
+        return decimals;
     }
 
-    function _get_token_symbol(address token) internal view returns (string memory) {
-         if(token.code.length == 0){
-            return "?";
-        }
-        
-        try IERC20(token).symbol() returns (string memory symbol) {
-            return symbol;
-        } catch {
-            return "?"; // Fallback to 'Unknown' if the call fails
-        }
-    }
+ 
 
 function _get_interest_rate_formatted(uint16 interestRate) internal pure returns (string memory) {
     return string(abi.encodePacked( (interestRate / 100).toString(), " %"));
@@ -406,6 +398,24 @@ function _get_duration_formatted(uint32 sec) internal pure returns (string memor
         }
     }
 
+
+ function _get_token_symbol(address nftContract, string memory _fallback) internal view returns (string memory) {
+        bytes memory data = abi.encodeWithSignature("symbol()");
+        
+        (bool success, bytes memory result) = nftContract.staticcall(data);
+
+        if (!success) {
+            return _fallback ;
+        }
+
+        // Decode the result from bytes to string
+        string memory symbol = abi.decode(result, (string));
+
+        return symbol;
+        
+} 
+
+
 function _get_collateral_label(Collateral memory collateral) internal view returns (string memory) {
     
     if(collateral._collateralAddress == address(0)){
@@ -419,17 +429,19 @@ function _get_collateral_label(Collateral memory collateral) internal view retur
                 
             );
 
-        string memory collateralTokenSymbol = _get_token_symbol(collateral._collateralAddress);  
+        string memory collateralTokenSymbol = _get_token_symbol(collateral._collateralAddress,"?");  
 
         return string(abi.encodePacked(collateralAmountFormatted," ",collateralTokenSymbol));
     }
 
-    if(collateral._collateralType == CollateralType.ERC721){
-        return "ERC721";
+    if(collateral._collateralType == CollateralType.ERC721){ 
+
+        return _get_token_symbol(collateral._collateralAddress, "ERC721");
     }
 
     if(collateral._collateralType == CollateralType.ERC1155){
-        return "ERC1155";
+        
+        return _get_token_symbol(collateral._collateralAddress, "ERC1155");
     }
    
      
@@ -452,9 +464,8 @@ function generateSVG(
        
     );
 
-    string memory principalTokenSymbol = _get_token_symbol(principalTokenAddress);
+    string memory principalTokenSymbol = _get_token_symbol(principalTokenAddress, "?");
 
-   
 
     string memory svgData = _buildSvgData(  
              (bidId).toString(),

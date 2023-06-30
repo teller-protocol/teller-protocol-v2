@@ -5,7 +5,6 @@ import "./Testable.sol";
 import "../contracts/TellerV2.sol";
 import { BokkyPooBahsDateTimeLibrary as BPBDTL } from "../contracts/libraries/DateTimeLib.sol";
 
-
 contract NextDueDate_Test is Testable, TellerV2 {
     Bid __bid;
 

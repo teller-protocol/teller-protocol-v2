@@ -165,16 +165,12 @@ library V2Calculations {
             );
     }
 
-
-
     function calculateNextDueDate(
-         Bid storage bid,
-         uint32 lastRepaidTimestamp,
-         PaymentCycleType bidPaymentCycleType
-    ) public view returns (uint32 dueDate_){
-
-      //  uint32 lastRepaidTimestamp = lastRepaidTimestamp(_bidId);
-
+        Bid storage bid,
+        uint32 lastRepaidTimestamp,
+        PaymentCycleType bidPaymentCycleType
+    ) public view returns (uint32 dueDate_) {
+       
         // Calculate due date if payment cycle is set to monthly
         if (bidPaymentCycleType == PaymentCycleType.Monthly) {
             // Calculate the cycle number the last repayment was made
@@ -219,8 +215,5 @@ library V2Calculations {
         if (dueDate_ > endOfLoan) {
             dueDate_ = endOfLoan;
         }
-
-
     }
-
 }

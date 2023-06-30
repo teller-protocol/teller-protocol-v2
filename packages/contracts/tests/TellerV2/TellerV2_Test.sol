@@ -188,7 +188,10 @@ contract TellerV2_Test is Testable {
 
         // Repay loan
         uint256 borrowerBalanceBefore = wethMock.balanceOf(address(borrower));
-        Payment memory amountOwed = tellerV2.calculateAmountOwed(bidId,block.timestamp);
+        Payment memory amountOwed = tellerV2.calculateAmountOwed(
+            bidId,
+            block.timestamp
+        );
         borrower.addAllowance(
             address(daiMock),
             address(tellerV2),

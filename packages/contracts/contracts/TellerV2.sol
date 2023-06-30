@@ -872,27 +872,6 @@ contract TellerV2 is
     }
 
     /**
-     * @notice Calculates the total amount owed for a bid.
-     * @param _bidId The id of the loan bid to calculate the owed amount for.
-     */
-  /*  function calculateAmountOwed(uint256 _bidId)
-        public
-        view
-        returns (Payment memory owed)
-    {
-        if (bids[_bidId].state != BidState.ACCEPTED) return owed;
-
-        (uint256 owedPrincipal, , uint256 interest) = V2Calculations
-            .calculateAmountOwed(
-                bids[_bidId],
-                block.timestamp,
-                bidPaymentCycleType[_bidId]
-            );
-        owed.principal = owedPrincipal;
-        owed.interest = interest;
-    }*/
-
-    /**
      * @notice Calculates the total amount owed for a loan bid at a specific timestamp.
      * @param _bidId The id of the loan bid to calculate the owed amount for.
      * @param _timestamp The timestamp at which to calculate the loan owed amount at.
@@ -913,27 +892,6 @@ contract TellerV2 is
         owed.principal = owedPrincipal;
         owed.interest = interest;
     }
-
-    /**
-     * @notice Calculates the minimum payment amount due for a loan.
-     * @param _bidId The id of the loan bid to get the payment amount for.
-     */
-   /* function calculateAmountDue(uint256 _bidId)
-        public
-        view
-        returns (Payment memory due)
-    {
-        if (bids[_bidId].state != BidState.ACCEPTED) return due;
-
-        (, uint256 duePrincipal, uint256 interest) = V2Calculations
-            .calculateAmountOwed(
-                bids[_bidId],
-                block.timestamp,
-                bidPaymentCycleType[_bidId]
-            );
-        due.principal = duePrincipal;
-        due.interest = interest;
-    }*/
 
     /**
      * @notice Calculates the minimum payment amount due for a loan at a specific timestamp.
@@ -969,12 +927,13 @@ contract TellerV2 is
         Bid storage bid = bids[_bidId];
         if (bids[_bidId].state != BidState.ACCEPTED) return dueDate_;
 
-        return V2Calculations.calculateNextDueDate(
-            bid,
-            lastRepaidTimestamp(_bidId),
-            bidPaymentCycleType[_bidId]
+        return
+            V2Calculations.calculateNextDueDate(
+                bid,
+                lastRepaidTimestamp(_bidId),
+                bidPaymentCycleType[_bidId]
             );
-    }   
+    }
 
     /**
      * @notice Checks to see if a borrower is delinquent.

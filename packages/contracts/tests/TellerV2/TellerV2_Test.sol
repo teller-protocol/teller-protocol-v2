@@ -184,9 +184,11 @@ contract TellerV2_Test is Testable {
 
         assertEq(collateralAmount, escrowBalance, "Collateral was not stored");
 
+        vm.warp(100000);
+
         // Repay loan
         uint256 borrowerBalanceBefore = wethMock.balanceOf(address(borrower));
-        Payment memory amountOwed = tellerV2.calculateAmountOwed(bidId);
+        Payment memory amountOwed = tellerV2.calculateAmountOwed(bidId,block.timestamp);
         borrower.addAllowance(
             address(daiMock),
             address(tellerV2),

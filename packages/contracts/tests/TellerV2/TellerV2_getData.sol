@@ -376,7 +376,7 @@ contract TellerV2_initialize is Testable {
 
         tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
 
-        Payment memory amountDue = tellerV2.calculateAmountDue(bidId);
+        Payment memory amountDue = tellerV2.calculateAmountDue(bidId,block.timestamp);
 
         assertEq(amountDue.principal, 2);
     }
@@ -413,7 +413,7 @@ contract TellerV2_initialize is Testable {
 
         tellerV2.mock_setBidState(bidId, BidState.PENDING);
 
-        Payment memory amountDue = tellerV2.calculateAmountDue(bidId);
+        Payment memory amountDue = tellerV2.calculateAmountDue(bidId,block.timestamp);
 
         assertEq(amountDue.principal, 0);
     }
@@ -524,7 +524,7 @@ contract TellerV2_initialize is Testable {
         tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
         vm.warp(2500);
 
-        Payment memory amountOwed = tellerV2.calculateAmountOwed(bidId);
+        Payment memory amountOwed = tellerV2.calculateAmountOwed(bidId,block.timestamp);
 
         assertEq(amountOwed.principal, 100);
     }

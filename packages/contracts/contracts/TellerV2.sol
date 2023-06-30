@@ -921,7 +921,9 @@ contract TellerV2 is
 
         return
             V2Calculations.calculateNextDueDate(
-                bid,
+                bid.loanDetails.acceptedTimestamp,
+                bid.terms.paymentCycle,
+                bid.loanDetails.loanDuration,
                 lastRepaidTimestamp(_bidId),
                 bidPaymentCycleType[_bidId]
             );

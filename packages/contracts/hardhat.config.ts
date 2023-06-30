@@ -218,7 +218,7 @@ export default <HardhatUserConfig>{
   },
 
   contractSizer: {
-    runOnCompile: skipContractSizer,
+    runOnCompile: !skipContractSizer,
     alphaSort: false,
     disambiguatePaths: false,
   },

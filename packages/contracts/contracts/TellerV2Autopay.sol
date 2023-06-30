@@ -115,7 +115,10 @@ contract TellerV2Autopay is OwnableUpgradeable, ITellerV2Autopay {
         address lendingToken = ITellerV2(tellerV2).getLoanLendingToken(_bidId);
         address borrower = ITellerV2(tellerV2).getLoanBorrower(_bidId);
 
-        uint256 amountToRepayMinimum = getEstimatedMinimumPayment(_bidId);
+        uint256 amountToRepayMinimum = getEstimatedMinimumPayment(
+            _bidId,
+            block.timestamp
+        );
         uint256 autopayFeeAmount = amountToRepayMinimum.percent(
             getAutopayFee()
         );
@@ -139,12 +142,15 @@ contract TellerV2Autopay is OwnableUpgradeable, ITellerV2Autopay {
         emit AutoPaidLoanMinimum(_bidId, msg.sender);
     }
 
-    function getEstimatedMinimumPayment(uint256 _bidId)
+    function getEstimatedMinimumPayment(uint256 _bidId, uint256 _timestamp)
         public
         virtual
         returns (uint256 _amount)
     {
-        Payment memory estimatedPayment = tellerV2.calculateAmountDue(_bidId);
+        Payment memory estimatedPayment = tellerV2.calculateAmountDue(
+            _bidId,
+            _timestamp
+        );
 
         _amount = estimatedPayment.principal + estimatedPayment.interest;
     }

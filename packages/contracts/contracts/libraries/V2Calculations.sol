@@ -166,21 +166,21 @@ library V2Calculations {
     }
 
     function calculateNextDueDate(
-        Bid storage bid,
-        uint32 lastRepaidTimestamp,
-        PaymentCycleType bidPaymentCycleType
+        Bid storage _bid,
+        uint32 _lastRepaidTimestamp,
+        PaymentCycleType _bidPaymentCycleType
     ) public view returns (uint32 dueDate_) {
        
         // Calculate due date if payment cycle is set to monthly
-        if (bidPaymentCycleType == PaymentCycleType.Monthly) {
+        if (_bidPaymentCycleType == PaymentCycleType.Monthly) {
             // Calculate the cycle number the last repayment was made
             uint256 lastPaymentCycle = BPBDTL.diffMonths(
-                bid.loanDetails.acceptedTimestamp,
-                lastRepaidTimestamp
+                _bid.loanDetails.acceptedTimestamp,
+                _lastRepaidTimestamp
             );
             if (
-                BPBDTL.getDay(lastRepaidTimestamp) >
-                BPBDTL.getDay(bid.loanDetails.acceptedTimestamp)
+                BPBDTL.getDay(_lastRepaidTimestamp) >
+                BPBDTL.getDay(_bid.loanDetails.acceptedTimestamp)
             ) {
                 lastPaymentCycle += 2;
             } else {
@@ -189,28 +189,28 @@ library V2Calculations {
 
             dueDate_ = uint32(
                 BPBDTL.addMonths(
-                    bid.loanDetails.acceptedTimestamp,
+                    _bid.loanDetails.acceptedTimestamp,
                     lastPaymentCycle
                 )
             );
-        } else if (bidPaymentCycleType == PaymentCycleType.Seconds) {
+        } else if (_bidPaymentCycleType == PaymentCycleType.Seconds) {
             // Start with the original due date being 1 payment cycle since bid was accepted
             dueDate_ =
-                bid.loanDetails.acceptedTimestamp +
-                bid.terms.paymentCycle;
+                _bid.loanDetails.acceptedTimestamp +
+                _bid.terms.paymentCycle;
             // Calculate the cycle number the last repayment was made
-            uint32 delta = lastRepaidTimestamp -
-                bid.loanDetails.acceptedTimestamp;
+            uint32 delta = _lastRepaidTimestamp -
+                _bid.loanDetails.acceptedTimestamp;
             if (delta > 0) {
                 uint32 repaymentCycle = uint32(
-                    Math.ceilDiv(delta, bid.terms.paymentCycle)
+                    Math.ceilDiv(delta, _bid.terms.paymentCycle)
                 );
-                dueDate_ += (repaymentCycle * bid.terms.paymentCycle);
+                dueDate_ += (repaymentCycle * _bid.terms.paymentCycle);
             }
         }
 
-        uint32 endOfLoan = bid.loanDetails.acceptedTimestamp +
-            bid.loanDetails.loanDuration;
+        uint32 endOfLoan = _bid.loanDetails.acceptedTimestamp +
+            _bid.loanDetails.loanDuration;
         //if we are in the last payment cycle, the next due date is the end of loan duration
         if (dueDate_ > endOfLoan) {
             dueDate_ = endOfLoan;

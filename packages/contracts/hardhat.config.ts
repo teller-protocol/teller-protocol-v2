@@ -107,21 +107,33 @@ type NetworkNames =
   | 'tenderly'
 const networkUrls: Record<NetworkNames, string> = {
   // Main Networks
-  mainnet: ALCHEMY_API_KEY
-    ? `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
-    : process.env.MAINNET_RPC_URL ?? '',
-  polygon: ALCHEMY_API_KEY
-    ? `https://polygon-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
-    : process.env.POLYGON_RPC_URL ?? '',
+  mainnet:
+    process.env.MAINNET_RPC_URL ??
+    (ALCHEMY_API_KEY
+      ? `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
+      : ''),
+  polygon:
+    process.env.POLYGON_RPC_URL ??
+    (ALCHEMY_API_KEY
+      ? `https://polygon-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
+      : ''),
 
   // Test Networks
-  sepolia: ALCHEMY_API_KEY
-    ? `https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
-    : process.env.SEPOLIA_RPC_URL ?? '',
-  mumbai: process.env.MUMBAI_RPC_URL ?? '',
-  goerli: ALCHEMY_API_KEY
-    ? `https://eth-goerli.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
-    : process.env.GOERLI_RPC_URL ?? '',
+  sepolia:
+    process.env.SEPOLIA_RPC_URL ??
+    (ALCHEMY_API_KEY
+      ? `https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
+      : ''),
+  mumbai:
+    process.env.MUMBAI_RPC_URL ??
+    (ALCHEMY_API_KEY
+      ? `https://polygon-mumbai.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
+      : ''),
+  goerli:
+    process.env.GOERLI_RPC_URL ??
+    (ALCHEMY_API_KEY
+      ? `https://eth-goerli.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
+      : ''),
   tenderly: process.env.TENDERLY_RPC_URL ?? '',
 }
 

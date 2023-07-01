@@ -17,6 +17,7 @@ const deployFn: DeployFunction = async (hre) => {
   )
   const collateralManager = await hre.contracts.get('CollateralManager')
   const lenderManager = await hre.contracts.get('LenderManager')
+  const escrowVault = await hre.contracts.get('EscrowVault')
 
   const tellerV2 = await hre.contracts.get<TellerV2>('TellerV2')
   const tx = await tellerV2.initialize(
@@ -25,7 +26,8 @@ const deployFn: DeployFunction = async (hre) => {
     reputationManager.address,
     lenderCommitmentForwarder.address,
     collateralManager.address,
-    lenderManager.address
+    lenderManager.address,
+    escrowVault.address
   )
 
   let txLink = tx.hash
@@ -55,5 +57,6 @@ deployFn.dependencies = [
   'lender-commitment-forwarder:deploy',
   'collateral:manager:deploy',
   'lender-manager:deploy',
+  'escrow-vault:deploy',
 ]
 export default deployFn

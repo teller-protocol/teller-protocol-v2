@@ -1,0 +1,342 @@
+{
+  "address": "0x86D540Ca6de284c18BeED0F6f154499CF9b61322",
+  "abi": [
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "CollateralDeposited",
+      "inputs": [
+        {
+          "type": "address",
+          "name": "_collateralAddress",
+          "indexed": false
+        },
+        {
+          "type": "uint256",
+          "name": "_amount",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "CollateralWithdrawn",
+      "inputs": [
+        {
+          "type": "address",
+          "name": "_collateralAddress",
+          "indexed": false
+        },
+        {
+          "type": "uint256",
+          "name": "_amount",
+          "indexed": false
+        },
+        {
+          "type": "address",
+          "name": "_recipient",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "Initialized",
+      "inputs": [
+        {
+          "type": "uint8",
+          "name": "version",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "OwnershipTransferred",
+      "inputs": [
+        {
+          "type": "address",
+          "name": "previousOwner",
+          "indexed": true
+        },
+        {
+          "type": "address",
+          "name": "newOwner",
+          "indexed": true
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "bidId",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint256"
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "collateralBalances",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint8",
+          "name": "_collateralType"
+        },
+        {
+          "type": "uint256",
+          "name": "_amount"
+        },
+        {
+          "type": "uint256",
+          "name": "_tokenId"
+        },
+        {
+          "type": "address",
+          "name": "_collateralAddress"
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "depositAsset",
+      "constant": false,
+      "stateMutability": "payable",
+      "payable": true,
+      "inputs": [
+        {
+          "type": "uint8",
+          "name": "_collateralType"
+        },
+        {
+          "type": "address",
+          "name": "_collateralAddress"
+        },
+        {
+          "type": "uint256",
+          "name": "_amount"
+        },
+        {
+          "type": "uint256",
+          "name": "_tokenId"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "getBid",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint256"
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "initialize",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_bidId"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "onERC1155BatchReceived",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address"
+        },
+        {
+          "type": "address"
+        },
+        {
+          "type": "uint256[]",
+          "name": "_ids"
+        },
+        {
+          "type": "uint256[]",
+          "name": "_values"
+        },
+        {
+          "type": "bytes"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "bytes4"
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "onERC1155Received",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address"
+        },
+        {
+          "type": "address"
+        },
+        {
+          "type": "uint256",
+          "name": "id"
+        },
+        {
+          "type": "uint256",
+          "name": "value"
+        },
+        {
+          "type": "bytes"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "bytes4"
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "onERC721Received",
+      "constant": true,
+      "stateMutability": "pure",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address"
+        },
+        {
+          "type": "address"
+        },
+        {
+          "type": "uint256"
+        },
+        {
+          "type": "bytes"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "bytes4"
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "owner",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "address"
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "renounceOwnership",
+      "constant": false,
+      "payable": false,
+      "inputs": [],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "transferOwnership",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "newOwner"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "withdraw",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "_collateralAddress"
+        },
+        {
+          "type": "uint256",
+          "name": "_amount"
+        },
+        {
+          "type": "address",
+          "name": "_recipient"
+        }
+      ],
+      "outputs": []
+    }
+  ],
+  "transactionHash": "0x6c6ef58af0b2c0320ac3e83cb4805946a217b1f31cdd1a0c59dc562611d852dd",
+  "receipt": {
+    "to": null,
+    "from": "0x65B38b3Cd7eFe502DB579c16ECB5B49235d0DAd0",
+    "contractAddress": "0x86D540Ca6de284c18BeED0F6f154499CF9b61322",
+    "transactionIndex": 1,
+    "gasUsed": "292193",
+    "logsBloom": "0x00000000000000000000000000000000000000000000000000800000000000000000000000000000002000000000000000000000000000000000000000000000000040000000000000000000000000000001000000000000000000000000000000000000020000000000000000000840000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000100000000000000000020000000000000000000000000000000000000000000000000000000000000000000",
+    "blockHash": "0xc81c34a98eb5ff9890839a10d524eaa04efaf83ed93965f6fe3e73e38653aeb3",
+    "transactionHash": "0x6c6ef58af0b2c0320ac3e83cb4805946a217b1f31cdd1a0c59dc562611d852dd",
+    "logs": [
+      {
+        "transactionIndex": 1,
+        "blockNumber": 8971725,
+        "transactionHash": "0x6c6ef58af0b2c0320ac3e83cb4805946a217b1f31cdd1a0c59dc562611d852dd",
+        "address": "0x86D540Ca6de284c18BeED0F6f154499CF9b61322",
+        "topics": [
+          "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0",
+          "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "0x00000000000000000000000065b38b3cd7efe502db579c16ecb5b49235d0dad0"
+        ],
+        "data": "0x",
+        "logIndex": 0,
+        "blockHash": "0xc81c34a98eb5ff9890839a10d524eaa04efaf83ed93965f6fe3e73e38653aeb3"
+      }
+    ],
+    "blockNumber": 8971725,
+    "cumulativeGasUsed": "313193",
+    "status": 1,
+    "byzantium": true
+  },
+  "numDeployments": 3,
+  "implementation": "0xfF5c6530d761aB1Fa5E78e70C791A260Cfe85FbC"
+}

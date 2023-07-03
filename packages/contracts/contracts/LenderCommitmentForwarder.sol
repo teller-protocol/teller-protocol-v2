@@ -13,6 +13,7 @@ import "@openzeppelin/contracts-upgradeable/utils/structs/EnumerableSetUpgradeab
 // Libraries
 import { MathUpgradeable } from "@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20MetadataUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/cryptography/MerkleProofUpgradeable.sol";
 
 contract LenderCommitmentForwarder is TellerV2MarketForwarder {
     using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
@@ -352,8 +353,20 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint256 _collateralTokenId,
         address _collateralTokenAddress,
         uint16 _interestRate,
-        uint32 _loanDuration
+        uint32 _loanDuration,
+        bytes32[] calldata _merkleProof
     ) external returns (uint256 bidId) {
+
+        bytes32 _merkleRoot = bytes32( commitments[_commitmentId].collateralTokenId );
+        bytes32 _leaf = bytes32(_collateralTokenId); //keccak256(abi.encodePacked(_collateralTokenId));
+
+        //make sure collateral token id is a leaf within the proof
+        require(
+            MerkleProofUpgradeable.verifyCalldata(_merkleProof, _merkleRoot, _leaf),
+            "Invalid proof"
+        );
+
+
        _acceptCommitment(
          _commitmentId, 
         _principalAmount, 

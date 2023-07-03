@@ -661,6 +661,64 @@ contract LenderCommitmentForwarder_Test is Testable {
         );
     }
 
+
+      function test_acceptCommitment_merkle_proof() public {
+
+        //https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/cryptography/MerkleProof.sol
+
+
+        
+        uint256 tokenIdLeaf = 1; 
+        bytes32 merkleLeaf = keccak256(abi.encodePacked(tokenIdLeaf));//  0xc89efdaa54c0f20c7adf612882df0950f5a951637e0307cdcb4c672f298b8bc6;
+        bytes32 merkleRoot = merkleLeaf ;
+        bytes32[] memory merkleProof = new bytes32[](0);
+
+        LenderCommitmentForwarder.Commitment
+            memory c = LenderCommitmentForwarder.Commitment({
+                maxPrincipal: maxPrincipal,
+                expiration: expiration,
+                maxDuration: maxDuration,
+                minInterestRate: minInterestRate,
+                collateralTokenAddress: address(collateralToken),
+                collateralTokenId: uint256(merkleRoot),
+                maxPrincipalPerCollateralAmount: maxPrincipalPerCollateralAmount,
+                collateralTokenType: LenderCommitmentForwarder.CommitmentCollateralType.ERC721_MERKLE_PROOF,
+                lender: address(lender),
+                marketId: marketId,
+                principalTokenAddress: address(principalToken)
+            });
+
+        uint256 commitmentId = 0;
+
+        lenderCommitmentForwarder.setCommitment(commitmentId, c);
+
+        uint256 principalAmount = maxPrincipal;
+        uint256 collateralAmount = 1000;
+        uint16 interestRate = minInterestRate;
+        uint32 loanDuration = maxDuration;
+
+        collateralTokenId = tokenIdLeaf; 
+
+        // vm.expectRevert("collateral token mismatch");
+        lenderCommitmentForwarder.acceptCommitmentWithProof(
+            commitmentId,
+            principalAmount,
+            collateralAmount,
+            collateralTokenId,
+            address(collateralToken),
+            interestRate,
+            loanDuration,
+            merkleProof
+        );
+
+        assertEq(
+            lenderCommitmentForwarder.getCommitmentMaxPrincipal(commitmentId),
+            maxPrincipal,
+            "Max principal changed"
+        );
+    }
+
+
     function test_acceptCommitment_mismatch_collateral_token() public {
         LenderCommitmentForwarder.Commitment
             memory c = LenderCommitmentForwarder.Commitment({

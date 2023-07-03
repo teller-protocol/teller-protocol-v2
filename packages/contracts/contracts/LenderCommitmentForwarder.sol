@@ -25,7 +25,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         ERC1155,
         ERC721_ANY_ID,
         ERC1155_ANY_ID,
-        ERC721_MERKLE_ROOT_HASH
+        ERC721_MERKLE_PROOF
     }
 
     /**
@@ -336,6 +336,12 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint16 _interestRate,
         uint32 _loanDuration
     ) external returns (uint256 bidId) {
+
+        require( 
+         commitments[_commitmentId].collateralTokenType != CommitmentCollateralType.ERC721_MERKLE_PROOF,
+            "Invalid commitment collateral type"
+        );
+
        _acceptCommitment(
         _commitmentId, 
         _principalAmount, 
@@ -358,7 +364,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
     ) external returns (uint256 bidId) {
 
         bytes32 _merkleRoot = bytes32( commitments[_commitmentId].collateralTokenId );
-        bytes32 _leaf = bytes32(_collateralTokenId); //keccak256(abi.encodePacked(_collateralTokenId));
+        bytes32 _leaf = /*bytes32(_collateralTokenId);*/keccak256(abi.encodePacked(_collateralTokenId));
 
         //make sure collateral token id is a leaf within the proof
         require(
@@ -366,8 +372,12 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             "Invalid proof"
         );
 
+        require( 
+         commitments[_commitmentId].collateralTokenType == CommitmentCollateralType.ERC721_MERKLE_PROOF,
+            "Invalid commitment collateral type"
+        );
 
-       _acceptCommitment(
+        return _acceptCommitment(
          _commitmentId, 
         _principalAmount, 
         _collateralAmount, 
@@ -375,6 +385,8 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         _collateralTokenAddress, 
         _interestRate, 
         _loanDuration) ;
+
+     
 
     }
 
@@ -450,7 +462,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             commitment.collateralTokenType ==
             CommitmentCollateralType.ERC721_ANY_ID ||
             commitment.collateralTokenType ==
-            CommitmentCollateralType.ERC721_MERKLE_ROOT_HASH
+            CommitmentCollateralType.ERC721_MERKLE_PROOF
         ) {
             require(
                 _collateralAmount == 1,

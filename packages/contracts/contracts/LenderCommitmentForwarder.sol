@@ -448,7 +448,9 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         if (
             commitment.collateralTokenType == CommitmentCollateralType.ERC721 ||
             commitment.collateralTokenType ==
-            CommitmentCollateralType.ERC721_ANY_ID
+            CommitmentCollateralType.ERC721_ANY_ID ||
+            commitment.collateralTokenType ==
+            CommitmentCollateralType.ERC721_MERKLE_ROOT_HASH
         ) {
             require(
                 _collateralAmount == 1,

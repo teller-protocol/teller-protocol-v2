@@ -23,7 +23,8 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         ERC721,
         ERC1155,
         ERC721_ANY_ID,
-        ERC1155_ANY_ID
+        ERC1155_ANY_ID,
+        ERC721_MERKLE_ROOT_HASH
     }
 
     /**
@@ -334,6 +335,46 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint16 _interestRate,
         uint32 _loanDuration
     ) external returns (uint256 bidId) {
+       _acceptCommitment(
+        _commitmentId, 
+        _principalAmount, 
+        _collateralAmount, 
+        _collateralTokenId, 
+        _collateralTokenAddress, 
+        _interestRate, 
+        _loanDuration) ;
+    }
+
+      function acceptCommitmentWithProof(
+        uint256 _commitmentId,
+        uint256 _principalAmount,
+        uint256 _collateralAmount,
+        uint256 _collateralTokenId,
+        address _collateralTokenAddress,
+        uint16 _interestRate,
+        uint32 _loanDuration
+    ) external returns (uint256 bidId) {
+       _acceptCommitment(
+         _commitmentId, 
+        _principalAmount, 
+        _collateralAmount, 
+        _collateralTokenId, 
+        _collateralTokenAddress, 
+        _interestRate, 
+        _loanDuration) ;
+
+    }
+
+      function _acceptCommitment(
+        uint256 _commitmentId,
+        uint256 _principalAmount,
+        uint256 _collateralAmount,
+        uint256 _collateralTokenId,
+        address _collateralTokenAddress,
+        uint16 _interestRate,
+        uint32 _loanDuration
+    ) internal returns (uint256 bidId) {
+
         address borrower = _msgSender();
 
         Commitment storage commitment = commitments[_commitmentId];
@@ -442,6 +483,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             _principalAmount,
             bidId
         );
+
     }
 
     /**

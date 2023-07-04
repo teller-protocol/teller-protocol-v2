@@ -25,7 +25,8 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         ERC1155,
         ERC721_ANY_ID,
         ERC1155_ANY_ID,
-        ERC721_MERKLE_PROOF
+        ERC721_MERKLE_PROOF,
+        ERC1155_MERKLE_PROOF
     }
 
     /**
@@ -338,7 +339,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
     ) external returns (uint256 bidId) {
 
         require( 
-         commitments[_commitmentId].collateralTokenType != CommitmentCollateralType.ERC721_MERKLE_PROOF,
+         commitments[_commitmentId].collateralTokenType <= CommitmentCollateralType.ERC1155_ANY_ID,
             "Invalid commitment collateral type"
         );
 
@@ -364,7 +365,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
     ) external returns (uint256 bidId) {
 
         bytes32 _merkleRoot = bytes32( commitments[_commitmentId].collateralTokenId );
-        bytes32 _leaf = /*bytes32(_collateralTokenId);*/keccak256(abi.encodePacked(_collateralTokenId));
+        bytes32 _leaf =  keccak256(abi.encodePacked(_collateralTokenId));
 
         //make sure collateral token id is a leaf within the proof
         require(
@@ -373,7 +374,8 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         );
 
         require( 
-         commitments[_commitmentId].collateralTokenType == CommitmentCollateralType.ERC721_MERKLE_PROOF,
+         commitments[_commitmentId].collateralTokenType == CommitmentCollateralType.ERC721_MERKLE_PROOF
+         || commitments[_commitmentId].collateralTokenType == CommitmentCollateralType.ERC1155_MERKLE_PROOF,
             "Invalid commitment collateral type"
         );
 
@@ -462,7 +464,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             commitment.collateralTokenType ==
             CommitmentCollateralType.ERC721_ANY_ID ||
             commitment.collateralTokenType ==
-            CommitmentCollateralType.ERC721_MERKLE_PROOF
+            CommitmentCollateralType.ERC721_MERKLE_PROOF 
         ) {
             require(
                 _collateralAmount == 1,
@@ -640,7 +642,8 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         }
         if (
             _type == CommitmentCollateralType.ERC1155 ||
-            _type == CommitmentCollateralType.ERC1155_ANY_ID
+            _type == CommitmentCollateralType.ERC1155_ANY_ID ||
+            _type == CommitmentCollateralType.ERC1155_MERKLE_PROOF
         ) {
             return CollateralType.ERC1155;
         }

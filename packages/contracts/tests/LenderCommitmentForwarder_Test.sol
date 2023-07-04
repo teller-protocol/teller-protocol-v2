@@ -681,7 +681,7 @@ contract LenderCommitmentForwarder_Test is Testable {
                 minInterestRate: minInterestRate,
                 collateralTokenAddress: address(collateralToken),
                 collateralTokenId: uint256(merkleRoot),
-                maxPrincipalPerCollateralAmount: maxPrincipalPerCollateralAmount,
+                maxPrincipalPerCollateralAmount: maxPrincipal * 1e18,
                 collateralTokenType: LenderCommitmentForwarder.CommitmentCollateralType.ERC721_MERKLE_PROOF,
                 lender: address(lender),
                 marketId: marketId,
@@ -693,7 +693,7 @@ contract LenderCommitmentForwarder_Test is Testable {
         lenderCommitmentForwarder.setCommitment(commitmentId, c);
 
         uint256 principalAmount = maxPrincipal;
-        uint256 collateralAmount = 1000;
+        uint256 collateralAmount = 1;
         uint16 interestRate = minInterestRate;
         uint32 loanDuration = maxDuration;
 

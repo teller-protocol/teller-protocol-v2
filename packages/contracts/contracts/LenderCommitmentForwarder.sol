@@ -47,7 +47,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint32 maxDuration;
         uint16 minInterestRate;
         address collateralTokenAddress;
-        uint256 collateralTokenId;
+        uint256 collateralTokenId; //we use this for the MerkleRootHash  for type ERC721_MERKLE_PROOF
         uint256 maxPrincipalPerCollateralAmount;
         CommitmentCollateralType collateralTokenType;
         address lender;
@@ -633,7 +633,8 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         }
         if (
             _type == CommitmentCollateralType.ERC721 ||
-            _type == CommitmentCollateralType.ERC721_ANY_ID
+            _type == CommitmentCollateralType.ERC721_ANY_ID ||
+            _type == CommitmentCollateralType.ERC721_MERKLE_PROOF
         ) {
             return CollateralType.ERC721;
         }

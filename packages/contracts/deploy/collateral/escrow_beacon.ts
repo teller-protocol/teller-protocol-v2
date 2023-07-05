@@ -9,9 +9,9 @@ const deployFn: DeployFunction = async (hre) => {
     }
   )
 
-  const { protocolAdminSafe } = await hre.getNamedAccounts()
+  const { protocolProxyAdminTimelock } = await hre.getNamedAccounts()
   hre.log('Transferring ownership of CollateralEscrowBeacon to Gnosis Safe...')
-  await collateralEscrowBeacon.transferOwnership(protocolAdminSafe)
+  await collateralEscrowBeacon.transferOwnership(protocolProxyAdminTimelock)
   hre.log('done.')
 
   return true

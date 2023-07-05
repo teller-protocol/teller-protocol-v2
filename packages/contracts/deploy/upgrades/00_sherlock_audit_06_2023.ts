@@ -19,7 +19,7 @@ const deployFn: DeployFunction = async (hre) => {
     'LenderCommitmentForwarder'
   )
 
-  await hre.defender.proposeBatchUpgrade(
+  await hre.defender.proposeBatchTimelock(
     'Sherlock Audit Upgrade',
     `
 # MarketRegistry
@@ -132,6 +132,7 @@ deployFn.tags = [
   'sherlock-audit:upgrade',
 ]
 deployFn.dependencies = [
+  'default-proxy-admin',
   'market-registry:deploy',
   'teller-v2:v2-calculations',
   'teller-v2:init',

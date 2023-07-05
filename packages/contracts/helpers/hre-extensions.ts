@@ -96,6 +96,11 @@ declare module 'hardhat/types/runtime' {
       description: string,
       steps: ProposeUpgradeStep | ProposeUpgradeStep[]
     ) => Promise<ProposalResponse>
+    proposeBatchTimelock: (
+      title: string,
+      description: string,
+      steps: ProposeUpgradeStep | ProposeUpgradeStep[]
+    ) => Promise<{ schedule: ProposalResponse; execute: ProposalResponse }>
   }
 }
 
@@ -434,7 +439,7 @@ extendEnvironment((hre) => {
         : await newImpl.wait().then((r) => r.contractAddress)
 
     const proxyAdmin = await hre.upgrades.admin.getInstance()
-    const { protocolAdminSafe } = await hre.getNamedAccounts()
+    const { protocolProxyAdminSafe } = await hre.getNamedAccounts()
 
     const admin = getAdminClient(hre)
     return await admin.createProposal({
@@ -478,7 +483,7 @@ extendEnvironment((hre) => {
         implFactory.interface.encodeFunctionData(callFn, callArgs),
       ],
       viaType: 'Gnosis Safe',
-      via: protocolAdminSafe,
+      via: protocolProxyAdminSafe,
       // set simulate to true
       // simulate: true,
     })
@@ -492,7 +497,7 @@ extendEnvironment((hre) => {
     const network = await getNetwork(hre)
     const proxyAdmin = await hre.upgrades.admin.getInstance()
 
-    const { protocolAdminSafe } = await hre.getNamedAccounts()
+    const { protocolProxyAdminSafe } = await hre.getNamedAccounts()
 
     const steps = Array.isArray(_steps) ? _steps : [_steps]
     const contracts: PartialContract[] = []
@@ -598,10 +603,161 @@ extendEnvironment((hre) => {
       description: description,
       type: 'batch',
       viaType: 'Gnosis Safe',
-      via: protocolAdminSafe,
+      via: protocolProxyAdminSafe,
       metadata: {},
       steps: proposalSteps,
     })
+  }
+
+  hre.defender.proposeBatchTimelock = async (
+    title,
+    description,
+    _steps
+  ): Promise<{ schedule: ProposalResponse; execute: ProposalResponse }> => {
+    const network = await getNetwork(hre)
+    const proxyAdmin = await hre.upgrades.admin.getInstance()
+
+    const { protocolProxyAdminSafe, protocolProxyAdminTimelock } =
+      await hre.getNamedAccounts()
+
+    const timelockBatchArgs = {
+      targets: new Array<string>(),
+      values: new Array<string>(),
+      payloads: new Array<string>(),
+      predecessor: ethers.utils.formatBytes32String(''),
+      salt: ethers.utils.formatBytes32String(''),
+      delay: moment.duration(3, 'minutes').asSeconds().toString(),
+    }
+
+    const steps = Array.isArray(_steps) ? _steps : [_steps]
+    for (const step of steps) {
+      let refAddress: string
+      let call: { fn: string; args: any[] } | undefined
+      if ('proxy' in step) {
+        refAddress =
+          typeof step.proxy === 'string' ? step.proxy : step.proxy.address
+        call = step.opts?.call
+      } else {
+        refAddress =
+          typeof step.beacon === 'string' ? step.beacon : step.beacon.address
+      }
+
+      const newImpl = await hre.upgrades.prepareUpgrade(
+        refAddress,
+        step.implFactory,
+        step.opts
+      )
+      const newImplAddr =
+        typeof newImpl === 'string'
+          ? newImpl
+          : await newImpl.wait().then((r) => r.contractAddress)
+
+      timelockBatchArgs.values.push('0')
+      if ('proxy' in step) {
+        timelockBatchArgs.targets.push(proxyAdmin.address)
+
+        if (call) {
+          timelockBatchArgs.payloads.push(
+            proxyAdmin.interface.encodeFunctionData('upgradeAndCall', [
+              refAddress,
+              newImplAddr,
+              step.implFactory.interface.encodeFunctionData(call.fn, call.args),
+            ])
+          )
+        } else {
+          timelockBatchArgs.payloads.push(
+            proxyAdmin.interface.encodeFunctionData('upgrade', [
+              refAddress,
+              newImplAddr,
+            ])
+          )
+        }
+      } else {
+        timelockBatchArgs.targets.push(refAddress)
+
+        const iface = new ethers.utils.Interface([
+          ethers.utils.FunctionFragment.from({
+            inputs: [
+              {
+                internalType: 'address',
+                name: 'newImplementation',
+                type: 'address',
+              },
+            ],
+            name: 'upgradeTo',
+            stateMutability: 'nonpayable',
+            type: 'function',
+          }),
+        ])
+        timelockBatchArgs.payloads.push(
+          iface.encodeFunctionData('upgradeTo', [newImplAddr])
+        )
+      }
+    }
+
+    const admin = getAdminClient(hre)
+    return {
+      schedule: await admin.createProposal({
+        title: `${title} (Schedule Timelock)`,
+        description: description,
+        type: 'custom',
+        viaType: 'Gnosis Safe',
+        via: protocolProxyAdminSafe,
+        contract: {
+          name: 'TellerV2 Protocol Timelock',
+          network,
+          address: protocolProxyAdminTimelock,
+        },
+        functionInterface: {
+          name: 'scheduleBatch',
+          inputs: [
+            { internalType: 'address[]', name: 'targets', type: 'address[]' },
+            { internalType: 'uint256[]', name: 'values', type: 'uint256[]' },
+            { internalType: 'bytes[]', name: 'payloads', type: 'bytes[]' },
+            { internalType: 'bytes32', name: 'predecessor', type: 'bytes32' },
+            { internalType: 'bytes32', name: 'salt', type: 'bytes32' },
+            { internalType: 'uint256', name: 'delay', type: 'uint256' },
+          ],
+        },
+        functionInputs: [
+          timelockBatchArgs.targets,
+          timelockBatchArgs.values,
+          timelockBatchArgs.payloads,
+          timelockBatchArgs.predecessor,
+          timelockBatchArgs.salt,
+          timelockBatchArgs.delay,
+        ],
+      }),
+      execute: await admin.createProposal({
+        title: `${title} (Execute Timelock)`,
+        description: description,
+        type: 'custom',
+        viaType: 'Gnosis Safe',
+        via: protocolProxyAdminSafe,
+        contract: {
+          name: 'TellerV2 Protocol Timelock',
+          network,
+          address: protocolProxyAdminTimelock,
+        },
+        functionInterface: {
+          name: 'executeBatch',
+          inputs: [
+            { internalType: 'address[]', name: 'targets', type: 'address[]' },
+            { internalType: 'uint256[]', name: 'values', type: 'uint256[]' },
+            { internalType: 'bytes[]', name: 'payloads', type: 'bytes[]' },
+            { internalType: 'bytes32', name: 'predecessor', type: 'bytes32' },
+            { internalType: 'bytes32', name: 'salt', type: 'bytes32' },
+          ],
+        },
+        functionInputs: [
+          timelockBatchArgs.targets,
+          timelockBatchArgs.values,
+          timelockBatchArgs.payloads,
+          timelockBatchArgs.predecessor,
+          timelockBatchArgs.salt,
+        ],
+      }),
+    }
   }
 })
 

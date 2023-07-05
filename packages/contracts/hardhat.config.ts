@@ -107,21 +107,33 @@ type NetworkNames =
   | 'tenderly'
 const networkUrls: Record<NetworkNames, string> = {
   // Main Networks
-  mainnet: ALCHEMY_API_KEY
-    ? `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
-    : process.env.MAINNET_RPC_URL ?? '',
-  polygon: ALCHEMY_API_KEY
-    ? `https://polygon-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
-    : process.env.POLYGON_RPC_URL ?? '',
+  mainnet:
+    process.env.MAINNET_RPC_URL ??
+    (ALCHEMY_API_KEY
+      ? `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
+      : ''),
+  polygon:
+    process.env.POLYGON_RPC_URL ??
+    (ALCHEMY_API_KEY
+      ? `https://polygon-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
+      : ''),
 
   // Test Networks
-  sepolia: ALCHEMY_API_KEY
-    ? `https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
-    : process.env.SEPOLIA_RPC_URL ?? '',
-  mumbai: process.env.MUMBAI_RPC_URL ?? '',
-  goerli: ALCHEMY_API_KEY
-    ? `https://eth-goerli.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
-    : process.env.GOERLI_RPC_URL ?? '',
+  sepolia:
+    process.env.SEPOLIA_RPC_URL ??
+    (ALCHEMY_API_KEY
+      ? `https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
+      : ''),
+  mumbai:
+    process.env.MUMBAI_RPC_URL ??
+    (ALCHEMY_API_KEY
+      ? `https://polygon-mumbai.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
+      : ''),
+  goerli:
+    process.env.GOERLI_RPC_URL ??
+    (ALCHEMY_API_KEY
+      ? `https://eth-goerli.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
+      : ''),
   tenderly: process.env.TENDERLY_RPC_URL ?? '',
 }
 
@@ -218,7 +230,7 @@ export default <HardhatUserConfig>{
   },
 
   contractSizer: {
-    runOnCompile: skipContractSizer,
+    runOnCompile: !skipContractSizer,
     alphaSort: false,
     disambiguatePaths: false,
   },
@@ -250,12 +262,19 @@ export default <HardhatUserConfig>{
     marketowner: 5,
     funder: 10,
     rando: 14,
-    protocolAdminSafe: {
+    protocolProxyAdminSafe: {
       default: 7,
       1: '0x9E3bfee4C6b4D28b5113E4786A1D9812eB3D2Db6',
       5: '0x0061CA4F1EB8c3FF93Df074061844d3dd4dC0377',
       137: '0xFea0FB908E31567CaB641865212cF76BE824D848',
       11155111: '0xb1ff461BB751B87f4F791201a29A8cFa9D30490c',
+    },
+    protocolProxyAdminTimelock: {
+      default: 8,
+      1: '',
+      5: '0x0e8A920f0338b94828aE84a7C227bC17F3a02f86',
+      137: '',
+      11155111: '',
     },
   },
 

@@ -153,7 +153,7 @@ contract TellerV2_initialize is Testable {
             address(escrowVault)
         );
     }
- 
+
     function test_setLenderManager_external() public {
         //how to mock self as the owner ?
         //tellerV2.setLenderManager(address(lenderManager));

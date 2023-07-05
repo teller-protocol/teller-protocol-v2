@@ -13,18 +13,15 @@ const deployFn: DeployFunction = async (hre) => {
   const deployerAddress = await deployer.getAddress()
 
   const namedAccounts = await hre.getNamedAccounts()
-  const expectedOwner = namedAccounts.protocolAdminSafe
+  const expectedOwner = namedAccounts.protocolProxyAdminTimelock
   const isOwner = currentOwner === expectedOwner
 
   hre.log(`   Current admin owner: ${currentOwner}`)
   hre.log(`  Expected admin owner: ${expectedOwner}`)
   hre.log('')
 
-  let onlyRunOnce = isOwner
-
   if (!isOwner) {
     const canTransferOwnership = currentOwner === deployerAddress
-    onlyRunOnce = canTransferOwnership
     if (canTransferOwnership) {
       hre.log('Transferring Default Proxy Admin ownership to multisig...')
       await hre.upgrades.admin.transferProxyAdminOwnership(
@@ -32,11 +29,11 @@ const deployFn: DeployFunction = async (hre) => {
         deployer
       )
       hre.log(
-        `  ✅  Default Proxy Admin ownership transferred to multisig: ${expectedOwner}`
+        `  ✅  Default Proxy Admin ownership transferred to Timelock: ${expectedOwner}`
       )
     } else {
-      hre.log(
-        `  ❌  Cannot transfer Default Proxy Admin ownership... Must be run by deployer (${deployerAddress}).`
+      throw new Error(
+        `  ❌  Cannot transfer Default Proxy Admin ownership... Must be run by current owner (${currentOwner}).`
       )
     }
   } else {
@@ -46,12 +43,11 @@ const deployFn: DeployFunction = async (hre) => {
   hre.log('')
   hre.log('=================================================================')
 
-  return onlyRunOnce
+  return true
 }
 
 // tags and deployment
 deployFn.id = 'default-proxy-admin:transfer'
 deployFn.tags = ['default-proxy-admin', 'default-proxy-admin:transfer']
 deployFn.dependencies = ['teller-v2:deploy']
-deployFn.runAtTheEnd = true
 export default deployFn

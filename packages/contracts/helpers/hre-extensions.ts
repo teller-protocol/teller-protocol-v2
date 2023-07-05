@@ -81,6 +81,16 @@ declare module 'hardhat/types/runtime' {
   type ProposeUpgradeStep = ProposeProxyUpgradeStep | ProposeBeaconUpgradeStep
 
   interface HardhatDefender extends OZHD {
+    proposeUpgradeAndCall: (
+      proxyAddress: string,
+      implFactory: ContractFactory,
+      opts: PrepareUpgradeOptions & {
+        title: string
+        description: string
+        callFn: string
+        callArgs: any[]
+      }
+    ) => Promise<ProposalResponse>
     proposeBatchUpgrade: (
       title: string,
       description: string,
@@ -406,6 +416,72 @@ extendEnvironment((hre) => {
     if (disable) return
     const fn = config?.error ? process.stderr : process.stdout
     fn.write(formatMsg(msg, config))
+  }
+
+  hre.defender.proposeUpgradeAndCall = async (
+    proxyAddress,
+    implFactory,
+    { title, description, callFn, callArgs, ...opts }
+  ): Promise<ProposalResponse> => {
+    const newImpl = await hre.upgrades.prepareUpgrade(
+      proxyAddress,
+      implFactory,
+      opts
+    )
+    const newImplAddr =
+      typeof newImpl === 'string'
+        ? newImpl
+        : await newImpl.wait().then((r) => r.contractAddress)
+
+    const proxyAdmin = await hre.upgrades.admin.getInstance()
+    const { protocolAdminSafe } = await hre.getNamedAccounts()
+
+    const admin = getAdminClient(hre)
+    return await admin.createProposal({
+      contract: {
+        address: proxyAdmin.address,
+        network: await getNetwork(hre),
+        abi: JSON.stringify(
+          proxyAdmin.interface.fragments.map((fragment) =>
+            JSON.parse(fragment.format('json'))
+          )
+        ),
+      },
+      title: title,
+      description: description,
+      type: 'custom',
+      // metadata: {
+      //   sendTo: '0xA91382E82fB676d4c935E601305E5253b3829dCD',
+      //   sendValue: '10000000000000000',
+      //   sendCurrency: {
+      //     name: 'Ethereum',
+      //     symbol: 'ETH',
+      //     decimals: 18,
+      //     type: 'native',
+      //   },
+      // },
+      functionInterface: {
+        name: 'upgradeAndCall',
+        inputs: [
+          {
+            internalType: 'contract TransparentUpgradeableProxy',
+            name: 'proxy',
+            type: 'address',
+          },
+          { internalType: 'address', name: 'implementation', type: 'address' },
+          { internalType: 'bytes', name: 'data', type: 'bytes' },
+        ],
+      },
+      functionInputs: [
+        proxyAddress,
+        newImplAddr,
+        implFactory.interface.encodeFunctionData(callFn, callArgs),
+      ],
+      viaType: 'Gnosis Safe',
+      via: protocolAdminSafe,
+      // set simulate to true
+      // simulate: true,
+    })
   }
 
   hre.defender.proposeBatchUpgrade = async (

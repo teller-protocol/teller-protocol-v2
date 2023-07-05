@@ -337,23 +337,24 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint16 _interestRate,
         uint32 _loanDuration
     ) external returns (uint256 bidId) {
-
-        require( 
-         commitments[_commitmentId].collateralTokenType <= CommitmentCollateralType.ERC1155_ANY_ID,
+        require(
+            commitments[_commitmentId].collateralTokenType <=
+                CommitmentCollateralType.ERC1155_ANY_ID,
             "Invalid commitment collateral type"
         );
 
-       _acceptCommitment(
-        _commitmentId, 
-        _principalAmount, 
-        _collateralAmount, 
-        _collateralTokenId, 
-        _collateralTokenAddress, 
-        _interestRate, 
-        _loanDuration) ;
+        _acceptCommitment(
+            _commitmentId,
+            _principalAmount,
+            _collateralAmount,
+            _collateralTokenId,
+            _collateralTokenAddress,
+            _interestRate,
+            _loanDuration
+        );
     }
 
-      function acceptCommitmentWithProof(
+    function acceptCommitmentWithProof(
         uint256 _commitmentId,
         uint256 _principalAmount,
         uint256 _collateralAmount,
@@ -363,36 +364,42 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint32 _loanDuration,
         bytes32[] calldata _merkleProof
     ) external returns (uint256 bidId) {
-
-        bytes32 _merkleRoot = bytes32( commitments[_commitmentId].collateralTokenId );
-        bytes32 _leaf =  keccak256(abi.encodePacked(_collateralTokenId));
+        bytes32 _merkleRoot = bytes32(
+            commitments[_commitmentId].collateralTokenId
+        );
+        bytes32 _leaf = keccak256(abi.encodePacked(_collateralTokenId));
 
         //make sure collateral token id is a leaf within the proof
         require(
-            MerkleProofUpgradeable.verifyCalldata(_merkleProof, _merkleRoot, _leaf),
+            MerkleProofUpgradeable.verifyCalldata(
+                _merkleProof,
+                _merkleRoot,
+                _leaf
+            ),
             "Invalid proof"
         );
 
-        require( 
-         commitments[_commitmentId].collateralTokenType == CommitmentCollateralType.ERC721_MERKLE_PROOF
-         || commitments[_commitmentId].collateralTokenType == CommitmentCollateralType.ERC1155_MERKLE_PROOF,
+        require(
+            commitments[_commitmentId].collateralTokenType ==
+                CommitmentCollateralType.ERC721_MERKLE_PROOF ||
+                commitments[_commitmentId].collateralTokenType ==
+                CommitmentCollateralType.ERC1155_MERKLE_PROOF,
             "Invalid commitment collateral type"
         );
 
-        return _acceptCommitment(
-         _commitmentId, 
-        _principalAmount, 
-        _collateralAmount, 
-        _collateralTokenId, 
-        _collateralTokenAddress, 
-        _interestRate, 
-        _loanDuration) ;
-
-     
-
+        return
+            _acceptCommitment(
+                _commitmentId,
+                _principalAmount,
+                _collateralAmount,
+                _collateralTokenId,
+                _collateralTokenAddress,
+                _interestRate,
+                _loanDuration
+            );
     }
 
-      function _acceptCommitment(
+    function _acceptCommitment(
         uint256 _commitmentId,
         uint256 _principalAmount,
         uint256 _collateralAmount,
@@ -401,7 +408,6 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint16 _interestRate,
         uint32 _loanDuration
     ) internal returns (uint256 bidId) {
-
         address borrower = _msgSender();
 
         Commitment storage commitment = commitments[_commitmentId];
@@ -464,7 +470,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             commitment.collateralTokenType ==
             CommitmentCollateralType.ERC721_ANY_ID ||
             commitment.collateralTokenType ==
-            CommitmentCollateralType.ERC721_MERKLE_PROOF 
+            CommitmentCollateralType.ERC721_MERKLE_PROOF
         ) {
             require(
                 _collateralAmount == 1,
@@ -512,7 +518,6 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             _principalAmount,
             bidId
         );
-
     }
 
     /**

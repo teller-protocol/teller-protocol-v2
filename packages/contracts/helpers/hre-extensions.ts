@@ -1,17 +1,59 @@
 import '@nomiclabs/hardhat-ethers'
-import 'hardhat-deploy'
+import { ProposalResponse } from '@openzeppelin/defender-admin-client'
+import {
+  PartialContract,
+  ProposalFunctionInputs,
+  ProposalStep,
+  ProposalTargetFunction,
+} from '@openzeppelin/defender-admin-client/lib/models/proposal'
+import { HardhatDefender as OZHD } from '@openzeppelin/hardhat-defender'
+import {
+  getAdminClient,
+  getNetwork,
+} from '@openzeppelin/hardhat-defender/dist/utils'
+import {
+  DeployBeaconOptions,
+  DeployProxyOptions,
+} from '@openzeppelin/hardhat-upgrades/dist/utils'
+import { PrepareUpgradeOptions } from '@openzeppelin/hardhat-upgrades/src/utils/options'
+import * as ozUpgrades from '@openzeppelin/upgrades-core'
 import * as tdly from '@teller-protocol/hardhat-tenderly'
-import { BigNumber, BigNumberish, Contract, Signer } from 'ethers'
+import chalk from 'chalk'
+import {
+  BigNumber,
+  BigNumberish,
+  Contract,
+  ContractFactory,
+  Signer,
+} from 'ethers'
 import { ERC20 } from 'generated/typechain'
+import 'hardhat-deploy'
 import { extendEnvironment } from 'hardhat/config'
+import { HardhatRuntimeEnvironment } from 'hardhat/types'
 import moment from 'moment'
 
 import { getTokens } from '../config'
 
 import { formatMsg, FormatMsgConfig } from './formatMsg'
 
+interface DeployProxyInitArgs {
+  initArgs?: any[]
+}
+interface DeployExtraOpts {
+  customName?: string
+  libraries?: { [libraryName: string]: string }
+}
+
 declare module 'hardhat/types/runtime' {
   interface HardhatRuntimeEnvironment {
+    deployProxy: <C extends Contract>(
+      contractName: string,
+      opts?: DeployProxyOptions & DeployProxyInitArgs & DeployExtraOpts
+    ) => Promise<C>
+    deployBeacon: <C extends Contract>(
+      contractName: string,
+      opts?: DeployBeaconOptions & DeployExtraOpts
+    ) => Promise<C>
     contracts: ContractsExtension
     tokens: TokensExtension
     evm: EVM
@@ -19,6 +61,46 @@ declare module 'hardhat/types/runtime' {
     toBN: (amount: BigNumberish, decimals?: BigNumberish) => BigNumber
     fromBN: (amount: BigNumberish, decimals?: BigNumberish) => BigNumber
     log: (msg: string, config?: LogConfig) => void
+  }
+
+  interface ProposeProxyUpgradeStep {
+    proxy: string | Contract
+    implFactory: ContractFactory
+    opts?: PrepareUpgradeOptions & {
+      call?: {
+        fn: string
+        args: any[]
+      }
+    }
+  }
+  interface ProposeBeaconUpgradeStep {
+    beacon: string | Contract
+    implFactory: ContractFactory
+    opts?: PrepareUpgradeOptions
+  }
+  type ProposeUpgradeStep = ProposeProxyUpgradeStep | ProposeBeaconUpgradeStep
+
+  interface HardhatDefender extends OZHD {
+    proposeUpgradeAndCall: (
+      proxyAddress: string,
+      implFactory: ContractFactory,
+      opts: PrepareUpgradeOptions & {
+        title: string
+        description: string
+        callFn: string
+        callArgs: any[]
+      }
+    ) => Promise<ProposalResponse>
+    proposeBatchUpgrade: (
+      title: string,
+      description: string,
+      steps: ProposeUpgradeStep | ProposeUpgradeStep[]
+    ) => Promise<ProposalResponse>
+    proposeBatchTimelock: (
+      title: string,
+      description: string,
+      steps: ProposeUpgradeStep | ProposeUpgradeStep[]
+    ) => Promise<{ schedule: ProposalResponse; execute: ProposalResponse }>
   }
 }
 
@@ -32,6 +114,20 @@ interface ContractsExtension {
     name: string,
     config?: ContractsGetConfig
   ) => Promise<C>
+
+  proxy: {
+    /**
+     * Returns the implementation version of a proxy contract.
+     *
+     * ** Warning **
+     *  This function checks storage slot 0 of the proxy contract. If the
+     *  proxy contract uses a different storage slot for the implementation version
+     *  this function will return an incorrect value.
+     *
+     * @param proxy
+     */
+    initializedVersion: (proxy: string | Contract) => Promise<number>
+  }
 }
 
 interface TokensExtension {
@@ -146,6 +242,14 @@ extendEnvironment((hre) => {
 
   if (!network.live) tdly.setup({ automaticVerifications: true })
 
+  hre.deployProxy = async (contractName, { initArgs, ...opts } = {}) => {
+    return await ozDefenderDeploy(hre, 'proxy', contractName, initArgs, opts)
+  }
+
+  hre.deployBeacon = async (contractName, opts) => {
+    return await ozDefenderDeploy(hre, 'beacon', contractName, opts)
+  }
+
   hre.contracts = {
     async get<C extends Contract>(
       name: string,
@@ -179,6 +283,19 @@ extendEnvironment((hre) => {
       }
 
       return contract as C
+    },
+
+    proxy: {
+      initializedVersion: async (proxy: string | Contract): Promise<number> => {
+        const address = typeof proxy === 'string' ? proxy : proxy.address
+        const isProxy = await ozUpgrades.isTransparentOrUUPSProxy(
+          hre.ethers.provider,
+          address
+        )
+        if (!isProxy) throw new Error(`Address ${address} is not a proxy`)
+        const storage = await ethers.provider.getStorageAt(address, 0)
+        return BigNumber.from(storage).toNumber()
+      },
     },
   }
 
@@ -305,4 +422,452 @@ extendEnvironment((hre) => {
     const fn = config?.error ? process.stderr : process.stdout
     fn.write(formatMsg(msg, config))
   }
+
+  hre.defender.proposeUpgradeAndCall = async (
+    proxyAddress,
+    implFactory,
+    { title, description, callFn, callArgs, ...opts }
+  ): Promise<ProposalResponse> => {
+    const newImpl = await hre.upgrades.prepareUpgrade(
+      proxyAddress,
+      implFactory,
+      opts
+    )
+    const newImplAddr =
+      typeof newImpl === 'string'
+        ? newImpl
+        : await newImpl.wait().then((r) => r.contractAddress)
+
+    const proxyAdmin = await hre.upgrades.admin.getInstance()
+    const { protocolProxyAdminSafe } = await hre.getNamedAccounts()
+
+    const admin = getAdminClient(hre)
+    return await admin.createProposal({
+      contract: {
+        address: proxyAdmin.address,
+        network: await getNetwork(hre),
+        abi: JSON.stringify(
+          proxyAdmin.interface.fragments.map((fragment) =>
+            JSON.parse(fragment.format('json'))
+          )
+        ),
+      },
+      title: title,
+      description: description,
+      type: 'custom',
+      // metadata: {
+      //   sendTo: '0xA91382E82fB676d4c935E601305E5253b3829dCD',
+      //   sendValue: '10000000000000000',
+      //   sendCurrency: {
+      //     name: 'Ethereum',
+      //     symbol: 'ETH',
+      //     decimals: 18,
+      //     type: 'native',
+      //   },
+      // },
+      functionInterface: {
+        name: 'upgradeAndCall',
+        inputs: [
+          {
+            internalType: 'contract TransparentUpgradeableProxy',
+            name: 'proxy',
+            type: 'address',
+          },
+          { internalType: 'address', name: 'implementation', type: 'address' },
+          { internalType: 'bytes', name: 'data', type: 'bytes' },
+        ],
+      },
+      functionInputs: [
+        proxyAddress,
+        newImplAddr,
+        implFactory.interface.encodeFunctionData(callFn, callArgs),
+      ],
+      viaType: 'Gnosis Safe',
+      via: protocolProxyAdminSafe,
+      // set simulate to true
+      // simulate: true,
+    })
+  }
+
+  hre.defender.proposeBatchUpgrade = async (
+    title,
+    description,
+    _steps
+  ): Promise<ProposalResponse> => {
+    const network = await getNetwork(hre)
+    const proxyAdmin = await hre.upgrades.admin.getInstance()
+
+    const { protocolProxyAdminSafe } = await hre.getNamedAccounts()
+
+    const steps = Array.isArray(_steps) ? _steps : [_steps]
+    const contracts: PartialContract[] = []
+    const proposalSteps: ProposalStep[] = []
+    for (const step of steps) {
+      let toContractAddress: string
+      let refAddress: string
+      let call: { fn: string; args: any[] } | undefined
+      if ('proxy' in step) {
+        refAddress =
+          typeof step.proxy === 'string' ? step.proxy : step.proxy.address
+        call = step.opts?.call
+      } else {
+        refAddress =
+          typeof step.beacon === 'string' ? step.beacon : step.beacon.address
+      }
+      const newImpl = await hre.upgrades.prepareUpgrade(
+        refAddress,
+        step.implFactory,
+        step.opts
+      )
+      const newImplAddr =
+        typeof newImpl === 'string'
+          ? newImpl
+          : await newImpl.wait().then((r) => r.contractAddress)
+
+      let targetFunction: ProposalTargetFunction
+      let functionInputs: ProposalFunctionInputs
+      if ('proxy' in step) {
+        toContractAddress = proxyAdmin.address
+
+        if (call) {
+          targetFunction = {
+            name: 'upgradeAndCall',
+            inputs: [
+              {
+                internalType: 'contract TransparentUpgradeableProxy',
+                name: 'proxy',
+                type: 'address',
+              },
+              {
+                internalType: 'address',
+                name: 'implementation',
+                type: 'address',
+              },
+              { internalType: 'bytes', name: 'data', type: 'bytes' },
+            ],
+          }
+          functionInputs = [
+            refAddress,
+            newImplAddr,
+            step.implFactory.interface.encodeFunctionData(call.fn, call.args),
+          ]
+        } else {
+          targetFunction = {
+            name: 'upgrade',
+            inputs: [
+              {
+                internalType: 'contract TransparentUpgradeableProxy',
+                name: 'proxy',
+                type: 'address',
+              },
+              {
+                internalType: 'address',
+                name: 'implementation',
+                type: 'address',
+              },
+            ],
+          }
+          functionInputs = [refAddress, newImplAddr]
+        }
+      } else {
+        toContractAddress = refAddress
+        targetFunction = {
+          name: 'upgradeTo',
+          inputs: [
+            {
+              internalType: 'address',
+              name: 'newImplementation',
+              type: 'address',
+            },
+          ],
+        }
+        functionInputs = [newImplAddr]
+      }
+
+      contracts.push({
+        address: toContractAddress,
+        network,
+      })
+      proposalSteps.push({
+        contractId: `${network}-${toContractAddress}`,
+        type: 'custom',
+        targetFunction,
+        functionInputs,
+      })
+    }
+
+    const admin = getAdminClient(hre)
+    return await admin.createProposal({
+      contract: contracts,
+      title: title,
+      description: description,
+      type: 'batch',
+      viaType: 'Gnosis Safe',
+      via: protocolProxyAdminSafe,
+      metadata: {},
+      steps: proposalSteps,
+    })
+  }
+
+  hre.defender.proposeBatchTimelock = async (
+    title,
+    description,
+    _steps
+  ): Promise<{ schedule: ProposalResponse; execute: ProposalResponse }> => {
+    const network = await getNetwork(hre)
+    const proxyAdmin = await hre.upgrades.admin.getInstance()
+
+    const { protocolProxyAdminSafe, protocolProxyAdminTimelock } =
+      await hre.getNamedAccounts()
+
+    const timelockBatchArgs = {
+      targets: new Array<string>(),
+      values: new Array<string>(),
+      payloads: new Array<string>(),
+      predecessor: ethers.utils.formatBytes32String(''),
+      salt: ethers.utils.formatBytes32String(''),
+      delay: moment.duration(3, 'minutes').asSeconds().toString(),
+    }
+
+    const steps = Array.isArray(_steps) ? _steps : [_steps]
+    for (const step of steps) {
+      let refAddress: string
+      let call: { fn: string; args: any[] } | undefined
+      if ('proxy' in step) {
+        refAddress =
+          typeof step.proxy === 'string' ? step.proxy : step.proxy.address
+        call = step.opts?.call
+      } else {
+        refAddress =
+          typeof step.beacon === 'string' ? step.beacon : step.beacon.address
+      }
+
+      const newImpl = await hre.upgrades.prepareUpgrade(
+        refAddress,
+        step.implFactory,
+        step.opts
+      )
+      const newImplAddr =
+        typeof newImpl === 'string'
+          ? newImpl
+          : await newImpl.wait().then((r) => r.contractAddress)
+
+      timelockBatchArgs.values.push('0')
+      if ('proxy' in step) {
+        timelockBatchArgs.targets.push(proxyAdmin.address)
+
+        if (call) {
+          timelockBatchArgs.payloads.push(
+            proxyAdmin.interface.encodeFunctionData('upgradeAndCall', [
+              refAddress,
+              newImplAddr,
+              step.implFactory.interface.encodeFunctionData(call.fn, call.args),
+            ])
+          )
+        } else {
+          timelockBatchArgs.payloads.push(
+            proxyAdmin.interface.encodeFunctionData('upgrade', [
+              refAddress,
+              newImplAddr,
+            ])
+          )
+        }
+      } else {
+        timelockBatchArgs.targets.push(refAddress)
+
+        const iface = new ethers.utils.Interface([
+          ethers.utils.FunctionFragment.from({
+            inputs: [
+              {
+                internalType: 'address',
+                name: 'newImplementation',
+                type: 'address',
+              },
+            ],
+            name: 'upgradeTo',
+            stateMutability: 'nonpayable',
+            type: 'function',
+          }),
+        ])
+        timelockBatchArgs.payloads.push(
+          iface.encodeFunctionData('upgradeTo', [newImplAddr])
+        )
+      }
+    }
+
+    const admin = getAdminClient(hre)
+    return {
+      schedule: await admin.createProposal({
+        title: `${title} (Schedule Timelock)`,
+        description: description,
+        type: 'custom',
+        viaType: 'Gnosis Safe',
+        via: protocolProxyAdminSafe,
+        contract: {
+          name: 'TellerV2 Protocol Timelock',
+          network,
+          address: protocolProxyAdminTimelock,
+        },
+        functionInterface: {
+          name: 'scheduleBatch',
+          inputs: [
+            { internalType: 'address[]', name: 'targets', type: 'address[]' },
+            { internalType: 'uint256[]', name: 'values', type: 'uint256[]' },
+            { internalType: 'bytes[]', name: 'payloads', type: 'bytes[]' },
+            { internalType: 'bytes32', name: 'predecessor', type: 'bytes32' },
+            { internalType: 'bytes32', name: 'salt', type: 'bytes32' },
+            { internalType: 'uint256', name: 'delay', type: 'uint256' },
+          ],
+        },
+        functionInputs: [
+          timelockBatchArgs.targets,
+          timelockBatchArgs.values,
+          timelockBatchArgs.payloads,
+          timelockBatchArgs.predecessor,
+          timelockBatchArgs.salt,
+          timelockBatchArgs.delay,
+        ],
+      }),
+      execute: await admin.createProposal({
+        title: `${title} (Execute Timelock)`,
+        description: description,
+        type: 'custom',
+        viaType: 'Gnosis Safe',
+        via: protocolProxyAdminSafe,
+        contract: {
+          name: 'TellerV2 Protocol Timelock',
+          network,
+          address: protocolProxyAdminTimelock,
+        },
+        functionInterface: {
+          name: 'executeBatch',
+          inputs: [
+            { internalType: 'address[]', name: 'targets', type: 'address[]' },
+            { internalType: 'uint256[]', name: 'values', type: 'uint256[]' },
+            { internalType: 'bytes[]', name: 'payloads', type: 'bytes[]' },
+            { internalType: 'bytes32', name: 'predecessor', type: 'bytes32' },
+            { internalType: 'bytes32', name: 'salt', type: 'bytes32' },
+          ],
+        },
+        functionInputs: [
+          timelockBatchArgs.targets,
+          timelockBatchArgs.values,
+          timelockBatchArgs.payloads,
+          timelockBatchArgs.predecessor,
+          timelockBatchArgs.salt,
+        ],
+      }),
+    }
+  }
 })
+
+type OZDefenderDeployOpts = (DeployProxyOptions | DeployBeaconOptions) &
+  DeployExtraOpts
+async function ozDefenderDeploy(
+  hre: HardhatRuntimeEnvironment,
+  deployType: 'proxy' | 'beacon',
+  contractName: string,
+  opts?: OZDefenderDeployOpts
+): Promise<Contract>
+async function ozDefenderDeploy(
+  hre: HardhatRuntimeEnvironment,
+  deployType: 'proxy' | 'beacon',
+  contractName: string,
+  initArgs?: unknown[],
+  opts?: DeployProxyOptions
+): Promise<Contract>
+async function ozDefenderDeploy(
+  hre: HardhatRuntimeEnvironment,
+  deployType: 'proxy' | 'beacon',
+  contractName: string,
+  initArgs: unknown[] | OZDefenderDeployOpts = [],
+  opts: OZDefenderDeployOpts = {}
+): Promise<Contract> {
+  const isProxy = deployType === 'proxy'
+  const contractTypeStr = isProxy ? 'Proxy' : 'Beacon'
+
+  if (!Array.isArray(initArgs)) {
+    // eslint-disable-next-line no-param-reassign
+    opts = initArgs
+    // eslint-disable-next-line no-param-reassign
+    initArgs = []
+  }
+
+  const saveName = opts.customName ?? contractName
+
+  hre.log('----------')
+  hre.log('')
+  hre.log(
+    `${chalk.underline('Contract')} (${chalk.italic(
+      contractTypeStr
+    )}): ${chalk.bold(`${saveName}`)} ${
+      saveName !== contractName ? ` (${chalk.italic(`${contractName}`)})` : ''
+    }`
+  )
+  hre.log('')
+
+  let proxy: Contract
+  const implFactory = await hre.ethers.getContractFactory(contractName, {
+    libraries: opts.libraries,
+  })
+  const existingDeployment = await hre.deployments.getOrNull(saveName)
+  if (existingDeployment) {
+    hre.log(`${chalk.bold.yellow(`Existing ${deployType} deployment found`)}`, {
+      indent: 1,
+    })
+
+    proxy = await hre.ethers.getContractAt(
+      contractName,
+      existingDeployment.address
+    )
+  } else {
+    hre.log(`${chalk.bold.green(`Deploying new ${deployType}...`)}`, {
+      indent: 1,
+    })
+
+    if (isProxy) {
+      proxy = await hre.upgrades.deployProxy(implFactory, initArgs, opts)
+    } else {
+      proxy = await hre.upgrades.deployBeacon(implFactory, opts)
+    }
+  }
+
+  const proxyLabel = chalk.bold(`${contractTypeStr}: `)
+  const implementationLabel = chalk.bold(`Implementation: `)
+  const maxLabelLength = Math.max(proxyLabel.length, implementationLabel.length)
+  hre.log(proxyLabel, {
+    star: false,
+    nl: false,
+    pad: { start: { length: maxLabelLength, char: ' ' } },
+  })
+  hre.log(`${proxy.address}`, { star: false })
+  await proxy.deployed()
+
+  const implementation = isProxy
+    ? await hre.upgrades.erc1967.getImplementationAddress(proxy.address)
+    : await hre.upgrades.beacon.getImplementationAddress(proxy.address)
+  hre.log(implementationLabel, {
+    star: false,
+    nl: false,
+    pad: { start: { length: maxLabelLength, char: ' ' } },
+  })
+  hre.log(`${implementation}`, { star: false })
+
+  const abi = implFactory.interface.fragments.map((fragment) =>
+    JSON.parse(fragment.format('json'))
+  )
+  await hre.deployments.save(saveName, {
+    address: proxy.address,
+    implementation,
+    abi,
+    transactionHash:
+      proxy?.deployTransaction?.hash ?? existingDeployment?.transactionHash,
+    receipt:
+      (await proxy?.deployTransaction?.wait()) ?? existingDeployment?.receipt,
+  })
+
+  hre.log('')
+  hre.log('----------')
+
+  return proxy
+}

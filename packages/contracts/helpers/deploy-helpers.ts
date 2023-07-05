@@ -28,7 +28,7 @@ export const deploy = async <C extends Contract>(
 ): Promise<DeployedContract<C>> => {
   const args = Object.assign(
     {
-      skipIfAlreadyDeployed: true,
+      skipIfAlreadyDeployed: false,
       indent: 1,
     },
     _args

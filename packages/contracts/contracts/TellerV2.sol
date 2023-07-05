@@ -264,14 +264,6 @@ contract TellerV2 is
     }
 
     /**
-     * @notice Lets the DAO/owner of the protocol to set a new reputation manager contract.
-     * @param _reputationManager The new contract address.
-     */
-    function setReputationManager(address _reputationManager) public onlyOwner {
-        reputationManager = IReputationManager(_reputationManager);
-    }
-
-    /**
      * @notice Function for a borrower to create a bid for a loan without Collateral.
      * @param _lendingToken The lending token asset requested to be borrowed.
      * @param _marketplaceId The unique id of the marketplace for the bid.

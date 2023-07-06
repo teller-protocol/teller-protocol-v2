@@ -13,5 +13,6 @@
   "escrow-vault:deploy": 1688578801,
   "default-proxy-admin:transfer": 1688587184,
   "sherlock-audit:upgrade": 1688587576,
-  "teller-v2:transfer-ownership-to-proxy-admin": 1688588967
+  "teller-v2:transfer-ownership-to-proxy-admin": 1688588967,
+  "lender-manager:upgrade-art": 1688662351
 }

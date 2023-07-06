@@ -17,7 +17,7 @@ import "./interfaces/ITellerV2Storage.sol";
 import "./interfaces/ICollateralManager.sol";
 import "./interfaces/IMarketRegistry.sol";
 
-import { LenderManagerArt} from "./libraries/LenderManagerArt.sol";
+import {LenderManagerArt} from "./libraries/LenderManagerArt.sol";
 import {CollateralType,Collateral} from "./interfaces/escrow/ICollateralEscrowV1.sol";
 
 contract LenderManager is
@@ -157,14 +157,13 @@ contract LenderManager is
                 loanInformation.principalAmount,
                 loanInformation.principalTokenAddress,
                 collateral,
-                //collateralTokenAddress,
                 loanInformation.interestRate,
                 loanInformation.loanDuration 
                 ) ));
     
 
        string memory name = "Teller Loan NFT";
-       string memory description = "This token represents ownership of a loan.  Repayments of principal and interest will be sent to the owner of this token.  If the loan defaults, the owner of this token will be able to claim the underlying collateral.";
+       string memory description = "This token represents ownership of a loan.  Repayments of principal and interest will be sent to the owner of this token.  If the loan defaults, the owner of this token will be able to claim the underlying collateral.  Please externally verify the parameter of the loan as this rendering is only a summary.";
 
 
 
@@ -178,7 +177,7 @@ contract LenderManager is
                                 name,
                                 '", "description":"',
                                 description, 
-                                '", "image": "',  //use image_data so its a dynamic svg not cached ?
+                                '", "image": "',  
                                 'data:image/svg+xml;base64,',
                                 image_svg_encoded,
                                 '"}'

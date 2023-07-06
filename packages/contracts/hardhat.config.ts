@@ -271,10 +271,10 @@ export default <HardhatUserConfig>{
     },
     protocolProxyAdminTimelock: {
       default: 8,
-      1: '',
+      1: '0xe6774DAAEdf6e95b222CD3dE09456ec0a46672C4',
       5: '0x0e8A920f0338b94828aE84a7C227bC17F3a02f86',
-      137: '',
-      11155111: '',
+      137: '0x6eB9b34913Bd96CA2695519eD0F8B8752d43FD2b',
+      11155111: '0xFe5394B67196EA95301D6ECB5389E98A02984cC2',
     },
   },
 

@@ -8,7 +8,7 @@ const deployFn: DeployFunction = async (hre) => {
   const marketRegistry = await hre.contracts.get('MarketRegistry')
    
   const lenderManager = await hre.contracts.get('LenderManager')
-  const lenderManagerArt = await hre.contracts.get('lenderManagerArt')
+  const lenderManagerArt = await hre.contracts.get('LenderManagerArt')
   
   await hre.defender.proposeBatchTimelock(
     'Lender Manager: Art Upgrade',
@@ -28,7 +28,7 @@ const deployFn: DeployFunction = async (hre) => {
           }, 
         }), 
         opts: {
-          unsafeAllow: ['constructor', 'state-variable-immutable'],
+          unsafeAllow: ['constructor', 'state-variable-immutable','external-library-linking',],
           constructorArgs: [marketRegistry.address],
           
         },

@@ -9,5 +9,8 @@
   "reputation-manager:deploy": 1687544178,
   "teller-v2:init": 1687544219,
   "lender-manager:transfer-ownership": 1687544219,
-  "liquidity-rewards:deploy": 1687544220
+  "liquidity-rewards:deploy": 1687544220,
+  "default-proxy-admin:transfer": 1688606154,
+  "escrow-vault:deploy": 1688606320,
+  "sherlock-audit:upgrade": 1688607219
 }

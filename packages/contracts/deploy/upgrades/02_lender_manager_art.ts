@@ -19,20 +19,20 @@ const deployFn: DeployFunction = async (hre) => {
 
 `,
     [
-        //how to deploy and link the lib ?
-      {
-        deploy: lenderManagerArt
-
-      },
        
       {
         proxy: lenderManager.address,
-        implFactory: await hre.ethers.getContractFactory('LenderManager'),
-
+        implFactory: await hre.ethers.getContractFactory('LenderManager', {
+          libraries: {
+            LenderManagerArt: lenderManagerArt.address,
+          }, 
+        }), 
         opts: {
           unsafeAllow: ['constructor', 'state-variable-immutable'],
           constructorArgs: [marketRegistry.address],
+          
         },
+        
       },
     
     ]
@@ -55,7 +55,7 @@ deployFn.tags = [
 ]
 deployFn.dependencies = [ 
   'market-registry:deploy', 
-  'teller-v2:deploy', 
+  'lender-manager:deploy', 
 ]
 deployFn.skip = async (hre) => {
   return false

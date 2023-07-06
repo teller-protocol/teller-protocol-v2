@@ -67,6 +67,7 @@ contract LenderManager_Test is Testable {
             "Market id is not correct"
         );
     }
+    
 
     function test_hasMarketVerification() public {
         lenderManager.initialize();

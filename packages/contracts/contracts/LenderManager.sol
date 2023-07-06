@@ -109,15 +109,13 @@ contract LenderManager is
 
         Bid memory bid = ITellerV2Storage(owner()).bids(tokenId);
         
-        LoanInformation memory loanInformation = LoanInformation({
+         loanInformation_ = LoanInformation({
             principalTokenAddress: address(bid.loanDetails.lendingToken),
             principalAmount: bid.loanDetails.principal,
             interestRate: bid.terms.APR,
             loanDuration: bid.loanDetails.loanDuration
-        });
-
-
-        return loanInformation_;
+        });  
+ 
     }
 
 

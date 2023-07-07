@@ -751,7 +751,9 @@ contract TellerV2 is
         Bid storage bid = bids[_bidId];
         bid.state = BidState.CLOSED;
 
-        collateralManager.lenderClaimCollateral(_bidId);
+        //collateralManager.lenderClaimCollateral(_bidId);
+
+        getCollateralManagerForBid(_bidId).lenderClaimCollateral(_bidId);
     }
 
     /**
@@ -785,7 +787,8 @@ contract TellerV2 is
 
         // If loan is backed by collateral, withdraw and send to the liquidator
         address liquidator = _msgSenderForMarket(bid.marketplaceId);
-        collateralManager.liquidateCollateral(_bidId, liquidator);
+        //collateralManager.liquidateCollateral(_bidId, liquidator);
+        getCollateralManagerForBid(_bidId).liquidateCollateral(_bidId,liquidator);
 
         emit LoanLiquidated(_bidId, liquidator);
     }
@@ -820,7 +823,9 @@ contract TellerV2 is
 
             // If loan is is being liquidated and backed by collateral, withdraw and send to borrower
             if (_shouldWithdrawCollateral) {
-                collateralManager.withdraw(_bidId);
+                //collateralManager.withdraw(_bidId);
+
+                getCollateralManagerForBid(_bidId).withdraw(_bidId);
             }
 
             emit LoanRepaid(_bidId);

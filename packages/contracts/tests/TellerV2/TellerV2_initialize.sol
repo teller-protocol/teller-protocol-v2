@@ -123,7 +123,7 @@ contract TellerV2_initialize is Testable {
         lenderManager = new Contract();
         escrowVault = new Contract();
 
-        vm.expectRevert("CollateralManager must be a contract");
+        vm.expectRevert("CollateralManagerV2 must be a contract");
 
         tellerV2.initialize(
             protocolFee,

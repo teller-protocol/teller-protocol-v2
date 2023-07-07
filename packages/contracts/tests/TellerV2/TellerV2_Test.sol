@@ -92,9 +92,10 @@ contract TellerV2_Test is Testable {
             address(marketRegistry),
             address(reputationManager),
             address(lenderCommitmentForwarder),
-            address(collateralManager),
+         
             address(lenderManager),
-            address(escrowVault)
+            address(escrowVault),
+            address(collateralManager)
         );
 
         // Instantiate users & balances
@@ -186,6 +187,7 @@ contract TellerV2_Test is Testable {
 
         vm.warp(100000);
 
+        
         // Repay loan
         uint256 borrowerBalanceBefore = wethMock.balanceOf(address(borrower));
         Payment memory amountOwed = tellerV2.calculateAmountOwed(

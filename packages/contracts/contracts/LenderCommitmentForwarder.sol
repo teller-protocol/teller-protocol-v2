@@ -6,7 +6,7 @@ import "./TellerV2MarketForwarder.sol";
 
 // Interfaces
 import "./interfaces/ICollateralManager.sol";
-import { Collateral, CollateralType } from "./interfaces/escrow/ICollateralEscrowV1.sol";
+import { Collateral, CollateralType } from "./bundle/interfaces/ICollateralBundle.sol";
 
 import "@openzeppelin/contracts-upgradeable/utils/structs/EnumerableSetUpgradeable.sol";
 
@@ -536,10 +536,10 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         if (_collateralTokenType != CommitmentCollateralType.NONE) {
             collateralInfo = new Collateral[](1);
             collateralInfo[0] = Collateral({
-                _collateralType: _getEscrowCollateralType(_collateralTokenType),
-                _tokenId: _collateralTokenId,
-                _amount: _collateralAmount,
-                _collateralAddress: _collateralTokenAddress
+                collateralType: _getEscrowCollateralType(_collateralTokenType),
+                tokenId: _collateralTokenId,
+                totalAmount: _collateralAmount,
+                assetContract: _collateralTokenAddress
             });
         }
 

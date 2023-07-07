@@ -26,16 +26,16 @@ import "./lib/CurrencyTransferLib.sol";
 
 contract TokenStore is TokenBundle, ERC721HolderUpgradeable, ERC1155HolderUpgradeable {
     /// @dev The address of the native token wrapper contract.
-    address internal immutable nativeTokenWrapper;
+    /*address internal immutable nativeTokenWrapper;
 
     constructor(address _nativeTokenWrapper) {
         nativeTokenWrapper = _nativeTokenWrapper;
-    }
+    }*/
 
     /// @dev Store / escrow multiple ERC1155, ERC721, ERC20 tokens.
     function _storeTokens(
         address _tokenOwner,
-        Collateral[] calldata _tokens,
+        Collateral[] memory _tokens,
         //string memory _uriForTokens,
         uint256 _bundleId
     ) internal {
@@ -67,12 +67,11 @@ contract TokenStore is TokenBundle, ERC721HolderUpgradeable, ERC1155HolderUpgrad
         Collateral memory _token
     ) internal {
         if (_token.collateralType == CollateralType.ERC20) {
-            CurrencyTransferLib.transferCurrencyWithWrapper(
+            CurrencyTransferLib.transferCurrency(
                 _token.assetContract,
                 _from,
                 _to,
-                _token.totalAmount,
-                nativeTokenWrapper
+                _token.totalAmount
             );
         } else if (_token.collateralType == CollateralType.ERC721) {
             IERC721(_token.assetContract).safeTransferFrom(_from, _to, _token.tokenId);

@@ -44,7 +44,7 @@ If the bundle exists and is owned by this contract, we know the collateral is he
 
 */
 
-contract CollateralManager is OwnableUpgradeable, TokenStore, ICollateralManagerV2 {
+contract CollateralManagerV2 is OwnableUpgradeable, TokenStore, ICollateralManagerV2 {
     /* Storage */
     using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
     ITellerV2 public tellerV2;
@@ -66,7 +66,7 @@ contract CollateralManager is OwnableUpgradeable, TokenStore, ICollateralManager
     event CollateralEscrowDeployed(uint256 _bidId, address _collateralEscrow);
 
     //add events back !! 
-   event CollateralCommitted(
+    event CollateralCommitted(
         uint256 _bidId,
         CollateralType _type,
         address _collateralAddress,
@@ -95,6 +95,14 @@ contract CollateralManager is OwnableUpgradeable, TokenStore, ICollateralManager
         require(_msgSender() == address(tellerV2), "Sender not authorized");
         _;
     }
+
+
+
+     
+
+
+
+
 
     /* External Functions */
 
@@ -175,11 +183,18 @@ contract CollateralManager is OwnableUpgradeable, TokenStore, ICollateralManager
      //used to be 'deploy and deposit' 
     function depositCollateral(uint256 _bidId) external onlyTellerV2 {
         
+        uint256 count = _committedBidCollateral[_bidId].count;
+        Collateral[] memory _committedCollateral = new Collateral[](count); 
+
+        for(uint256 i=0;i<count;i++){
+            _committedCollateral[i] = _committedBidCollateral[_bidId].collaterals[i];
+        }
+
             
         address borrower = address(0); //FIX ME 
         _storeTokens(
             borrower,
-            _committedBidCollateral[_bidId],
+            _committedCollateral,
             _bidId
         );
  
@@ -519,9 +534,10 @@ contract CollateralManager is OwnableUpgradeable, TokenStore, ICollateralManager
 
     // On NFT Received handlers
 
-    function onERC721Received(address, address, uint256, bytes calldata)
-        external
+    function onERC721Received(address, address, uint256, bytes memory)
+        public
         pure
+        override
         returns (bytes4)
     {
         return
@@ -535,8 +551,8 @@ contract CollateralManager is OwnableUpgradeable, TokenStore, ICollateralManager
         address,
         uint256 id,
         uint256 value,
-        bytes calldata
-    ) external returns (bytes4) {
+        bytes memory
+    ) public override returns (bytes4) {
         return
             bytes4(
                 keccak256(
@@ -548,10 +564,10 @@ contract CollateralManager is OwnableUpgradeable, TokenStore, ICollateralManager
     function onERC1155BatchReceived(
         address,
         address,
-        uint256[] calldata _ids,
-        uint256[] calldata _values,
-        bytes calldata
-    ) external returns (bytes4) {
+        uint256[] memory _ids,
+        uint256[] memory _values,
+        bytes memory
+    ) public override returns (bytes4) {
         require(
             _ids.length == 1,
             "Only allowed one asset batch transfer per transaction."

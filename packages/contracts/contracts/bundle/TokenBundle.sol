@@ -38,7 +38,7 @@ abstract contract TokenBundle is ICollateralBundle {
     }*/
 
     /// @dev Lets the calling contract create a bundle, by passing in a list of tokens and a unique id.
-    function _createBundle(Collateral[] calldata _tokensToBind, uint256 _bundleId) internal {
+    function _createBundle(Collateral[] memory _tokensToBind, uint256 _bundleId) internal {
         uint256 targetCount = _tokensToBind.length;
 
         require(targetCount > 0, "!Tokens");

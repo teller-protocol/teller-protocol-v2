@@ -172,7 +172,7 @@ contract TellerV2 is
      * @param _marketRegistry The address of the market registry contract for the protocol.
      * @param _reputationManager The address of the reputation manager contract.
      * @param _lenderCommitmentForwarder The address of the lender commitment forwarder contract.
-     * @param _collateralManager The address of the collateral manager contracts.
+     * @param _collateralManager The address of the legacy collateral manager contract.
      * @param _lenderManager The address of the lender manager contract for loans on the protocol.
      */
     function initialize(
@@ -210,7 +210,7 @@ contract TellerV2 is
             _collateralManager.isContract(),
             "CollateralManager must be a contract"
         );
-        collateralManager = ICollateralManager(_collateralManager);
+        collateralManager_legacy = ICollateralManager(_collateralManager);
 
         _setLenderManager(_lenderManager);
         _setEscrowVault(_escrowVault);
@@ -519,7 +519,8 @@ contract TellerV2 is
         bid.lender = sender;
 
         // Tell the collateral manager to deploy the escrow and pull funds from the borrower if applicable
-        collateralManager.deployAndDeposit(_bidId);
+      
+        _depositCollateral(_bidId);
 
         // Transfer funds to borrower from the lender
         amountToProtocol = bid.loanDetails.principal.percent(protocolFee());
@@ -574,6 +575,17 @@ contract TellerV2 is
 
         emit FeePaid(_bidId, "protocol", amountToProtocol);
         emit FeePaid(_bidId, "marketplace", amountToMarketplace);
+    }
+
+
+    function _depositCollateral(uint256 _bidId) 
+    internal 
+    {
+            //get the collateral manager for this bid 
+
+          collateralManager.deployAndDeposit(_bidId);
+
+
     }
 
     function claimLoanNFT(uint256 _bidId)

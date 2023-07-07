@@ -143,7 +143,7 @@ abstract contract TellerV2Storage_G2 is TellerV2Storage_G1 {
 }
 
 abstract contract TellerV2Storage_G3 is TellerV2Storage_G2 {
-    ICollateralManager public collateralManager;
+    ICollateralManager public collateralManager_legacy;
 }
 
 abstract contract TellerV2Storage_G4 is TellerV2Storage_G3 {

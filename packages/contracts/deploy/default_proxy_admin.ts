@@ -13,7 +13,7 @@ const deployFn: DeployFunction = async (hre) => {
   const deployerAddress = await deployer.getAddress()
 
   const namedAccounts = await hre.getNamedAccounts()
-  const expectedOwner = namedAccounts.protocolProxyAdminTimelock
+  const expectedOwner = namedAccounts.protocolTimelock
   const isOwner = currentOwner === expectedOwner
 
   hre.log(`   Current admin owner: ${currentOwner}`)
@@ -23,7 +23,7 @@ const deployFn: DeployFunction = async (hre) => {
   if (!isOwner) {
     const canTransferOwnership = currentOwner === deployerAddress
     if (canTransferOwnership) {
-      hre.log('Transferring Default Proxy Admin ownership to multisig...')
+      hre.log('Transferring Default Proxy Admin ownership to Timelock...')
       await hre.upgrades.admin.transferProxyAdminOwnership(
         expectedOwner,
         deployer

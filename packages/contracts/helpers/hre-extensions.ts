@@ -439,7 +439,7 @@ extendEnvironment((hre) => {
         : await newImpl.wait().then((r) => r.contractAddress)
 
     const proxyAdmin = await hre.upgrades.admin.getInstance()
-    const { protocolProxyAdminSafe } = await hre.getNamedAccounts()
+    const { protocolOwnerSafe } = await hre.getNamedAccounts()
 
     const admin = getAdminClient(hre)
     return await admin.createProposal({
@@ -483,7 +483,7 @@ extendEnvironment((hre) => {
         implFactory.interface.encodeFunctionData(callFn, callArgs),
       ],
       viaType: 'Gnosis Safe',
-      via: protocolProxyAdminSafe,
+      via: protocolOwnerSafe,
       // set simulate to true
       // simulate: true,
     })
@@ -497,7 +497,7 @@ extendEnvironment((hre) => {
     const network = await getNetwork(hre)
     const proxyAdmin = await hre.upgrades.admin.getInstance()
 
-    const { protocolProxyAdminSafe } = await hre.getNamedAccounts()
+    const { protocolOwnerSafe } = await hre.getNamedAccounts()
 
     const steps = Array.isArray(_steps) ? _steps : [_steps]
     const contracts: PartialContract[] = []
@@ -603,7 +603,7 @@ extendEnvironment((hre) => {
       description: description,
       type: 'batch',
       viaType: 'Gnosis Safe',
-      via: protocolProxyAdminSafe,
+      via: protocolOwnerSafe,
       metadata: {},
       steps: proposalSteps,
     })
@@ -617,8 +617,7 @@ extendEnvironment((hre) => {
     const network = await getNetwork(hre)
     const proxyAdmin = await hre.upgrades.admin.getInstance()
 
-    const { protocolProxyAdminSafe, protocolProxyAdminTimelock } =
-      await hre.getNamedAccounts()
+    const { protocolOwnerSafe, protocolTimelock } = await hre.getNamedAccounts()
 
     const timelockBatchArgs = {
       targets: new Array<string>(),
@@ -702,11 +701,11 @@ extendEnvironment((hre) => {
         description: description,
         type: 'custom',
         viaType: 'Gnosis Safe',
-        via: protocolProxyAdminSafe,
+        via: protocolOwnerSafe,
         contract: {
           name: 'TellerV2 Protocol Timelock',
           network,
-          address: protocolProxyAdminTimelock,
+          address: protocolTimelock,
         },
         functionInterface: {
           name: 'scheduleBatch',
@@ -733,11 +732,11 @@ extendEnvironment((hre) => {
         description: description,
         type: 'custom',
         viaType: 'Gnosis Safe',
-        via: protocolProxyAdminSafe,
+        via: protocolOwnerSafe,
         contract: {
           name: 'TellerV2 Protocol Timelock',
           network,
-          address: protocolProxyAdminTimelock,
+          address: protocolTimelock,
         },
         functionInterface: {
           name: 'executeBatch',

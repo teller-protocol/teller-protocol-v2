@@ -268,7 +268,7 @@ export default <HardhatUserConfig>{
     marketowner: 5,
     funder: 10,
     rando: 14,
-    protocolProxyAdminSafe: {
+    protocolOwnerSafe: {
       default: 7,
       1: '0x9E3bfee4C6b4D28b5113E4786A1D9812eB3D2Db6',
       5: '0x0061CA4F1EB8c3FF93Df074061844d3dd4dC0377',
@@ -276,7 +276,7 @@ export default <HardhatUserConfig>{
       42161: '0xD9149bfBfB29cC175041937eF8161600b464051B',
       11155111: '0xb1ff461BB751B87f4F791201a29A8cFa9D30490c',
     },
-    protocolProxyAdminTimelock: {
+    protocolTimelock: {
       default: 8,
       1: '0xe6774DAAEdf6e95b222CD3dE09456ec0a46672C4',
       5: '0x0e8A920f0338b94828aE84a7C227bC17F3a02f86',

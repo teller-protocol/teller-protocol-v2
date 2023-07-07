@@ -12,5 +12,6 @@
   "liquidity-rewards:deploy": 1687544660,
   "default-proxy-admin:transfer": 1688607312,
   "escrow-vault:deploy": 1688607350,
-  "sherlock-audit:upgrade": 1688607472
+  "sherlock-audit:upgrade": 1688607472,
+  "teller-v2:transfer-ownership-to-safe": 1688749381
 }

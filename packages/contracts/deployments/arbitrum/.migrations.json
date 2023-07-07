@@ -11,5 +11,6 @@
   "teller-v2:init": 1688696360,
   "lender-manager:transfer-ownership": 1688696362,
   "liquidity-rewards:deploy": 1688696366,
-  "default-proxy-admin:transfer": 1688696384
+  "default-proxy-admin:transfer": 1688696384,
+  "teller-v2:transfer-ownership-to-safe": 1688749341
 }

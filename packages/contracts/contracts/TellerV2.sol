@@ -540,7 +540,14 @@ contract TellerV2 is
         bid.lender = sender;
 
         // Tell the collateral manager to deploy the escrow and pull funds from the borrower if applicable
-        collateralManagerV2.deposit(_bidId);
+        if(bids[_bidId].collateralManager == address(0)){
+            collateralManagerV1.deployAndDeposit(_bidId);
+        }else{
+            collateralManagerV2.deposit(_bidId);
+        }
+        
+
+
 
         // Transfer funds to borrower from the lender
         amountToProtocol = bid.loanDetails.principal.percent(protocolFee());

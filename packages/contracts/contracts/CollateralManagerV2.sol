@@ -56,8 +56,9 @@ contract CollateralManager is OwnableUpgradeable, TokenStore, ICollateralManager
     // bidIds -> collateralBundleId 
     //mapping(uint256 => CollateralInfo) internal _committedBidCollateral;
 
-     // bidIds -> collateralBundleId 
-    mapping(uint256 => Collateral[]) internal _committedBidCollateral;
+     // bidIds -> collateralBundleInfo
+     //this just bridges the gap between submitBid and acceptBid
+    mapping(uint256 => ICollateralBundle.CollateralBundleInfo) internal _committedBidCollateral;
 
      
 
@@ -65,7 +66,7 @@ contract CollateralManager is OwnableUpgradeable, TokenStore, ICollateralManager
     event CollateralEscrowDeployed(uint256 _bidId, address _collateralEscrow);
 
     //add events back !! 
-  /*  event CollateralCommitted(
+   event CollateralCommitted(
         uint256 _bidId,
         CollateralType _type,
         address _collateralAddress,
@@ -87,7 +88,7 @@ contract CollateralManager is OwnableUpgradeable, TokenStore, ICollateralManager
         uint256 _amount,
         uint256 _tokenId,
         address _recipient
-    );*/
+    ); 
 
     /* Modifiers */
     modifier onlyTellerV2() {
@@ -120,7 +121,7 @@ contract CollateralManager is OwnableUpgradeable, TokenStore, ICollateralManager
         virtual
         returns (bool)
     {
-        return _committedBidCollateral[_bidId].collateralAddresses.length() > 0;
+        return _committedBidCollateral[_bidId].count > 0;
     }
 
     /**
@@ -393,16 +394,20 @@ contract CollateralManager is OwnableUpgradeable, TokenStore, ICollateralManager
      */
     function _withdraw(uint256 _bidId, address _receiver) internal virtual {
        
-        _releaseTokens( _receiver, _bidId  );
+        (uint256 count, Collateral[] memory releasedTokens) = _releaseTokens( _receiver, _bidId  );
 
-        emit CollateralWithdrawn(
-            _bidId,
-            collateralInfo._collateralType,
-            collateralInfo._collateralAddress,
-            collateralInfo._amount,
-            collateralInfo._tokenId,
-            _receiver
-        );
+        for (uint256 i = 0; i < count; i += 1) {
+            emit CollateralWithdrawn(
+                _bidId,
+                releasedTokens[i].collateralType,
+                releasedTokens[i].assetContract,
+                releasedTokens[i].totalAmount,
+                releasedTokens[i].tokenId,
+                _receiver
+            );
+        }
+
+        
         
     }
 
@@ -415,31 +420,37 @@ contract CollateralManager is OwnableUpgradeable, TokenStore, ICollateralManager
         uint256 _bidId,
         Collateral memory _collateralInfo
     ) internal virtual {
-        CollateralInfo storage collateral = _bidCollaterals[_bidId];
+        CollateralBundleInfo storage committedCollateral = _committedBidCollateral[_bidId];
 
-        require(
+       /* require(
             !collateral.collateralAddresses.contains(
                 _collateralInfo._collateralAddress
             ),
             "Cannot commit multiple collateral with the same address"
-        );
+        );*/
         require(
-            _collateralInfo._collateralType != CollateralType.ERC721 ||
-                _collateralInfo._amount == 1,
+            _collateralInfo.collateralType != CollateralType.ERC721 ||
+                _collateralInfo.totalAmount == 1,
             "ERC721 collateral must have amount of 1"
         );
 
-        collateral.collateralAddresses.add(_collateralInfo._collateralAddress);
+        /*collateral.collateralAddresses.add(_collateralInfo._collateralAddress);
         collateral.collateralInfo[
             _collateralInfo._collateralAddress
-        ] = _collateralInfo;
-       
+        ] = _collateralInfo;*/
+
+        uint256 new_count = committedCollateral.count + 1;
+
+        _committedBidCollateral.count = new_count;
+        _committedBidCollateral.collaterals[new_count] = _collateralInfo;
+
+         
         emit CollateralCommitted(
             _bidId,
-            _collateralInfo._collateralType,
-            _collateralInfo._collateralAddress,
-            _collateralInfo._amount,
-            _collateralInfo._tokenId
+            _collateralInfo.collateralType,
+            _collateralInfo.assetContract,
+            _collateralInfo.totalAmount,
+            _collateralInfo.tokenId
         );
     }
 

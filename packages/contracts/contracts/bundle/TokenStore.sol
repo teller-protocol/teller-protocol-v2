@@ -45,7 +45,7 @@ contract TokenStore is TokenBundle, ERC721HolderUpgradeable, ERC1155HolderUpgrad
     }
 
     /// @dev Release stored / escrowed ERC1155, ERC721, ERC20 tokens.
-    function _releaseTokens(address _recipient, uint256 _bundleId) internal {
+    function _releaseTokens(address _recipient, uint256 _bundleId) internal returns ( uint256, Collateral[] memory ) {
         uint256 count = getTokenCountOfBundle(_bundleId);
         Collateral[] memory tokensToRelease = new Collateral[](count);
 
@@ -56,6 +56,8 @@ contract TokenStore is TokenBundle, ERC721HolderUpgradeable, ERC1155HolderUpgrad
         _deleteBundle(_bundleId);
 
         _transferTokenBatch(address(this), _recipient, tokensToRelease);
+
+        return (count,tokensToRelease);
     }
 
     /// @dev Transfers an arbitrary ERC20 / ERC721 / ERC1155 token.

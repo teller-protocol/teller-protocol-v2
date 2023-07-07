@@ -66,7 +66,7 @@ contract TokenStore is TokenBundle, ERC721HolderUpgradeable, ERC1155HolderUpgrad
         address _to,
         Collateral memory _token
     ) internal {
-        if (_token.tokenType == CollateralType.ERC20) {
+        if (_token.collateralType == CollateralType.ERC20) {
             CurrencyTransferLib.transferCurrencyWithWrapper(
                 _token.assetContract,
                 _from,
@@ -74,9 +74,9 @@ contract TokenStore is TokenBundle, ERC721HolderUpgradeable, ERC1155HolderUpgrad
                 _token.totalAmount,
                 nativeTokenWrapper
             );
-        } else if (_token.tokenType == CollateralType.ERC721) {
+        } else if (_token.collateralType == CollateralType.ERC721) {
             IERC721(_token.assetContract).safeTransferFrom(_from, _to, _token.tokenId);
-        } else if (_token.tokenType == CollateralType.ERC1155) {
+        } else if (_token.collateralType == CollateralType.ERC1155) {
             IERC1155(_token.assetContract).safeTransferFrom(_from, _to, _token.tokenId, _token.totalAmount, "");
         }
     }
@@ -98,7 +98,7 @@ contract TokenStore is TokenBundle, ERC721HolderUpgradeable, ERC1155HolderUpgrad
         if (nativeTokenValue != 0) {
             Collateral memory _nativeToken = Collateral({
                 assetContract: CurrencyTransferLib.NATIVE_TOKEN,
-                tokenType: ICollateralBundle.CollateralType.ERC20,
+                collateralType: CollateralType.ERC20,
                 tokenId: 0,
                 totalAmount: nativeTokenValue
             });

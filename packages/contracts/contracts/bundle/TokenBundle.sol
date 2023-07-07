@@ -29,13 +29,13 @@ abstract contract TokenBundle is ICollateralBundle {
 
     /// @dev Returns an asset contained in a particular bundle, at a particular index.
     function getTokenOfBundle(uint256 _bundleId, uint256 index) public view returns (Collateral memory) {
-        return bundle[_bundleId].tokens[index];
+        return bundle[_bundleId].collaterals[index];
     }
 
     /// @dev Returns the struct of a particular bundle.
-    function getBundleInfo(uint256 _bundleId) public view returns (CollateralBundleInfo memory) {
+   /* function getBundleInfo(uint256 _bundleId) public view returns (CollateralBundleInfo memory) {
         return bundle[_bundleId];
-    }
+    }*/
 
     /// @dev Lets the calling contract create a bundle, by passing in a list of tokens and a unique id.
     function _createBundle(Collateral[] calldata _tokensToBind, uint256 _bundleId) internal {
@@ -46,7 +46,7 @@ abstract contract TokenBundle is ICollateralBundle {
 
         for (uint256 i = 0; i < targetCount; i += 1) {
             _checkTokenType(_tokensToBind[i]);
-            bundle[_bundleId].tokens[i] = _tokensToBind[i];
+            bundle[_bundleId].collaterals[i] = _tokensToBind[i];
         }
 
         bundle[_bundleId].count = targetCount;
@@ -63,9 +63,9 @@ abstract contract TokenBundle is ICollateralBundle {
         for (uint256 i = 0; i < check; i += 1) {
             if (i < targetCount) {
                 _checkTokenType(_tokensToBind[i]);
-                bundle[_bundleId].tokens[i] = _tokensToBind[i];
+                bundle[_bundleId].collaterals[i] = _tokensToBind[i];
             } else if (i < currentCount) {
-                delete bundle[_bundleId].tokens[i];
+                delete bundle[_bundleId].collaterals[i];
             }
         }
 
@@ -77,7 +77,7 @@ abstract contract TokenBundle is ICollateralBundle {
         _checkTokenType(_tokenToBind);
         uint256 id = bundle[_bundleId].count;
 
-        bundle[_bundleId].tokens[id] = _tokenToBind;
+        bundle[_bundleId].collaterals[id] = _tokenToBind;
         bundle[_bundleId].count += 1;
     }
 
@@ -89,24 +89,24 @@ abstract contract TokenBundle is ICollateralBundle {
     ) internal {
         require(_index < bundle[_bundleId].count, "index DNE");
         _checkTokenType(_tokenToBind);
-        bundle[_bundleId].tokens[_index] = _tokenToBind;
+        bundle[_bundleId].collaterals[_index] = _tokenToBind;
     }
 
     /// @dev Checks if the type of asset-contract is same as the TokenType specified.
     function _checkTokenType(Collateral memory _token) internal view {
-        if (_token.tokenType == CollateralType.ERC721) {
+        if (_token.collateralType == CollateralType.ERC721) {
             try IERC165(_token.assetContract).supportsInterface(0x80ac58cd) returns (bool supported721) {
                 require(supported721, "!TokenType");
             } catch {
                 revert("!TokenType");
             }
-        } else if (_token.tokenType == CollateralType.ERC1155) {
+        } else if (_token.collateralType == CollateralType.ERC1155) {
             try IERC165(_token.assetContract).supportsInterface(0xd9b67a26) returns (bool supported1155) {
                 require(supported1155, "!TokenType");
             } catch {
                 revert("!TokenType");
             }
-        } else if (_token.tokenType == CollateralType.ERC20) {
+        } else if (_token.collateralType == CollateralType.ERC20) {
             if (_token.assetContract != CurrencyTransferLib.NATIVE_TOKEN) {
                 // 0x36372b07
                 try IERC165(_token.assetContract).supportsInterface(0x80ac58cd) returns (bool supported721) {
@@ -121,14 +121,14 @@ abstract contract TokenBundle is ICollateralBundle {
     }
 
     /// @dev Lets the calling contract set/update the uri of a particular bundle.
-    function _setUriOfBundle(string memory _uri, uint256 _bundleId) internal {
+   /* function _setUriOfBundle(string memory _uri, uint256 _bundleId) internal {
         bundle[_bundleId].uri = _uri;
-    }
+    }*/
 
     /// @dev Lets the calling contract delete a particular bundle.
     function _deleteBundle(uint256 _bundleId) internal {
         for (uint256 i = 0; i < bundle[_bundleId].count; i += 1) {
-            delete bundle[_bundleId].tokens[i];
+            delete bundle[_bundleId].collaterals[i];
         }
         bundle[_bundleId].count = 0;
     }

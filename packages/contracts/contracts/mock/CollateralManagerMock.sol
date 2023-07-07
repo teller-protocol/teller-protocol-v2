@@ -1,6 +1,7 @@
 pragma solidity ^0.8.0;
 
 // SPDX-License-Identifier: MIT
+import  {Collateral,CollateralType } from "../bundle/interfaces/ICollateralBundle.sol";
 
 import "../interfaces/ICollateralManager.sol";
 

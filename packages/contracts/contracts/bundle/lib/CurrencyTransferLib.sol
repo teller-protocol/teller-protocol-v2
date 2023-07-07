@@ -8,10 +8,10 @@ import { IWETH } from "../../interfaces/IWETH.sol";
 
  
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 library CurrencyTransferLib {
-    using SafeERC20Upgradeable for IERC20;
+    using SafeERC20 for IERC20;
 
     /// @dev The address interpreted as native token of the chain.
     address public constant NATIVE_TOKEN = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;

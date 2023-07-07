@@ -40,8 +40,8 @@ contract TellerV2_Override is TellerV2 {
         marketRegistry = IMarketRegistry(_marketRegistry);
     }
 
-    function setCollateralManagerSuper(address _collateralManager) public {
-        collateralManager = ICollateralManager(_collateralManager);
+    function setCollateralManagerV1Super(address _collateralManagerV1) public {
+        collateralManagerV1 = ICollateralManager(_collateralManagerV1);
     }
 
     function setReputationManagerSuper(address _reputationManager) public {

@@ -441,8 +441,8 @@ contract CollateralManager is OwnableUpgradeable, TokenStore, ICollateralManager
 
         uint256 new_count = committedCollateral.count + 1;
 
-        _committedBidCollateral.count = new_count;
-        _committedBidCollateral.collaterals[new_count] = _collateralInfo;
+        committedCollateral.count = new_count;
+        committedCollateral.collaterals[new_count] = _collateralInfo;
 
          
         emit CollateralCommitted(
@@ -493,25 +493,25 @@ contract CollateralManager is OwnableUpgradeable, TokenStore, ICollateralManager
         address _borrowerAddress,
         Collateral memory _collateralInfo
     ) internal virtual returns (bool) {
-        CollateralType collateralType = _collateralInfo._collateralType;
+        CollateralType collateralType = _collateralInfo.collateralType;
 
         if (collateralType == CollateralType.ERC20) {
             return
-                _collateralInfo._amount <=
-                IERC20Upgradeable(_collateralInfo._collateralAddress).balanceOf(
+                _collateralInfo.totalAmount <=
+                IERC20Upgradeable(_collateralInfo.assetContract).balanceOf(
                     _borrowerAddress
                 );
         } else if (collateralType == CollateralType.ERC721) {
             return
                 _borrowerAddress ==
-                IERC721Upgradeable(_collateralInfo._collateralAddress).ownerOf(
-                    _collateralInfo._tokenId
+                IERC721Upgradeable(_collateralInfo.assetContract).ownerOf(
+                    _collateralInfo.tokenId
                 );
         } else if (collateralType == CollateralType.ERC1155) {
             return
-                _collateralInfo._amount <=
-                IERC1155Upgradeable(_collateralInfo._collateralAddress)
-                    .balanceOf(_borrowerAddress, _collateralInfo._tokenId);
+                _collateralInfo.totalAmount <=
+                IERC1155Upgradeable(_collateralInfo.assetContract)
+                    .balanceOf(_borrowerAddress, _collateralInfo.tokenId);
         } else {
             return false;
         }

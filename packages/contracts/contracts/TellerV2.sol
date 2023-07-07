@@ -10,6 +10,9 @@ import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol";
 
+
+import "./interfaces/ICollateralManager.sol";
+
 // Interfaces
 import "./interfaces/IMarketRegistry.sol";
 import "./interfaces/IReputationManager.sol";
@@ -172,7 +175,7 @@ contract TellerV2 is
      * @param _marketRegistry The address of the market registry contract for the protocol.
      * @param _reputationManager The address of the reputation manager contract.
      * @param _lenderCommitmentForwarder The address of the lender commitment forwarder contract.
-     * @param _collateralManager The address of the legacy collateral manager contract.
+     * @param _collateralManager The address of the collateral manager contracts.
      * @param _lenderManager The address of the lender manager contract for loans on the protocol.
      */
     function initialize(
@@ -180,9 +183,10 @@ contract TellerV2 is
         address _marketRegistry,
         address _reputationManager,
         address _lenderCommitmentForwarder,
-        address _collateralManager,
+        address _collateralManagerV1,
         address _lenderManager,
-        address _escrowVault
+        address _escrowVault,
+        address _collateralManagerV2
     ) external initializer {
         __ProtocolFee_init(_protocolFee);
 
@@ -210,18 +214,27 @@ contract TellerV2 is
             _collateralManager.isContract(),
             "CollateralManager must be a contract"
         );
-        collateralManager_legacy = ICollateralManager(_collateralManager);
+        collateralManagerV1 = ICollateralManager(_collateralManagerV1);
 
         _setLenderManager(_lenderManager);
         _setEscrowVault(_escrowVault);
+        _setCollateralManagerV2(_collateralManagerV2);
     }
 
-    function setEscrowVault(address _escrowVault)
+    /*function setEscrowVault(address _escrowVault)
         external
         reinitializer(9)
         onlyOwner
     {
         _setEscrowVault(_escrowVault);
+    }*/
+
+     function setCollateralManagerV2(address _collateralManagerV2)
+        external
+        reinitializer(10)
+        onlyOwner
+    {
+        _setCollateralManagerV2(_collateralManagerV2);
     }
 
     function _setLenderManager(address _lenderManager)
@@ -238,6 +251,11 @@ contract TellerV2 is
     function _setEscrowVault(address _escrowVault) internal onlyInitializing {
         require(_escrowVault.isContract(), "EscrowVault must be a contract");
         escrowVault = IEscrowVault(_escrowVault);
+    }
+
+      function _setCollateralManagerV2(address _collateralManagerV2) internal onlyInitializing {
+        require(_collateralManagerV2.isContract(), "CollateralManagerV2 must be a contract");
+        collateralManagerV2 = ICollateralManagerV2(_collateralManagerV2);
     }
 
     /**
@@ -332,7 +350,7 @@ contract TellerV2 is
             _receiver
         );
 
-        bool validation = collateralManager.commitCollateral(
+        bool validation = collateralManagerV2.commitCollateral(
             bidId_,
             _collateralInfo
         );
@@ -378,6 +396,7 @@ contract TellerV2 is
         bid.loanDetails.principal = _principal;
         bid.loanDetails.loanDuration = _duration;
         bid.loanDetails.timestamp = uint32(block.timestamp);
+        bid.collateralManager = address(collateralManagerV2);
 
         // Set payment cycle type based on market setting (custom or monthly)
         (bid.terms.paymentCycle, bidPaymentCycleType[bidId]) = marketRegistry
@@ -519,8 +538,7 @@ contract TellerV2 is
         bid.lender = sender;
 
         // Tell the collateral manager to deploy the escrow and pull funds from the borrower if applicable
-      
-        _depositCollateral(_bidId);
+        collateralManagerV2.deposit(_bidId);
 
         // Transfer funds to borrower from the lender
         amountToProtocol = bid.loanDetails.principal.percent(protocolFee());
@@ -575,17 +593,6 @@ contract TellerV2 is
 
         emit FeePaid(_bidId, "protocol", amountToProtocol);
         emit FeePaid(_bidId, "marketplace", amountToMarketplace);
-    }
-
-
-    function _depositCollateral(uint256 _bidId) 
-    internal 
-    {
-            //get the collateral manager for this bid 
-
-          collateralManager.deployAndDeposit(_bidId);
-
-
     }
 
     function claimLoanNFT(uint256 _bidId)
@@ -1011,6 +1018,17 @@ contract TellerV2 is
         return
             uint32(block.timestamp) >
             dueDate + defaultDuration + _additionalDelay;
+    }
+
+    function getCollateralManagerForBid(uint256 _bidId)
+        public
+        view 
+        returns (ICollateralManager)
+    {   
+        if(bids[_bidId].collateralManager == address(0)){
+            return ICollateralManager(collateralManagerV1);
+        }
+        return ICollateralManager(bids[_bidId].collateralManager);
     }
 
     function getBidState(uint256 _bidId)

@@ -6,7 +6,8 @@ import "./interfaces/IEscrowVault.sol";
 import "./interfaces/IReputationManager.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "./interfaces/ICollateralManager.sol";
+import "./interfaces/ICollateralManagerV1.sol";
+import "./interfaces/ICollateralManagerV2.sol";
 import { PaymentType, PaymentCycleType } from "./libraries/V2Calculations.sol";
 import "./interfaces/ILenderManager.sol";
 
@@ -51,6 +52,7 @@ struct Bid {
     Terms terms;
     BidState state;
     PaymentType paymentType;
+    address collateralManager; //if this is zero, that means v1 
 }
 
 /**
@@ -143,7 +145,7 @@ abstract contract TellerV2Storage_G2 is TellerV2Storage_G1 {
 }
 
 abstract contract TellerV2Storage_G3 is TellerV2Storage_G2 {
-    ICollateralManager public collateralManager_legacy;
+    ICollateralManager public collateralManagerV1;
 }
 
 abstract contract TellerV2Storage_G4 is TellerV2Storage_G3 {
@@ -158,4 +160,9 @@ abstract contract TellerV2Storage_G5 is TellerV2Storage_G4 {
     IEscrowVault public escrowVault;
 }
 
-abstract contract TellerV2Storage is TellerV2Storage_G5 {}
+abstract contract TellerV2Storage_G6 is TellerV2Storage_G5 {
+     
+    ICollateralManagerV2 public collateralManagerV2;
+}
+
+abstract contract TellerV2Storage is TellerV2Storage_G6 {}

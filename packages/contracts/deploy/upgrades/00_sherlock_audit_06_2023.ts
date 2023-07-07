@@ -139,16 +139,6 @@ deployFn.dependencies = [
   'escrow-vault:deploy',
 ]
 deployFn.skip = async (hre) => {
-  return false
-
-  // const marketRegistry = await hre.contracts.get<MarketRegistry>(
-  //   'MarketRegistry'
-  // )
-  // try {
-  //   await marketRegistry.isMarketOpen(0)
-  //   return false
-  // } catch (e) {
-  //   return true
-  // }
+  return !hre.network.live || hre.network.name === 'arbitrum'
 }
 export default deployFn

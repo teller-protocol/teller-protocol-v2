@@ -50,4 +50,5 @@ const deployFn: DeployFunction = async (hre) => {
 deployFn.id = 'default-proxy-admin:transfer'
 deployFn.tags = ['default-proxy-admin', 'default-proxy-admin:transfer']
 deployFn.dependencies = ['teller-v2:deploy']
+deployFn.runAtTheEnd = true
 export default deployFn

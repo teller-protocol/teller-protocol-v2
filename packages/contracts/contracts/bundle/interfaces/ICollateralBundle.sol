@@ -1,9 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 pragma solidity ^0.8.0;
 
-
-//DO NOT USE ME 
-
 /**
  *  Group together arbitrary ERC20, ERC721 and ERC1155 tokens into a single bundle.
  *
@@ -15,9 +12,9 @@ pragma solidity ^0.8.0;
  *  logic to handle any ERC20, ERC721 or ERC1155 tokens.
  */
 
-interface ITokenBundle {
-    /// @notice The type of assets that can be wrapped.
-    enum TokenType {
+interface ICollateralBundle {
+    /// @notice The type of assets that can be bundled.
+    enum CollateralType {
         ERC20,
         ERC721,
         ERC1155
@@ -25,29 +22,29 @@ interface ITokenBundle {
 
     /**
      *  @notice A generic interface to describe any ERC20, ERC721 or ERC1155 token.
-     *
-     *  @param assetContract The contract address of the asset.
-     *  @param tokenType     The token type (ERC20 / ERC721 / ERC1155) of the asset.
-     *  @param tokenId       The token Id of the asset, if the asset is an ERC721 / ERC1155 NFT.
+     *  @param collateralType     The token type (ERC20 / ERC721 / ERC1155) of the asset.
      *  @param totalAmount   The amount of the asset, if the asset is an ERC20 / ERC1155 fungible token.
+     *  @param tokenId       The token Id of the asset, if the asset is an ERC721 / ERC1155 NFT.
+     *  @param assetContract The contract address of the asset.
+     *  
      */
-    struct Token {
-        address assetContract;
-        TokenType tokenType;
-        uint256 tokenId;
+    struct Collateral {
+        CollateralType collateralType;
         uint256 totalAmount;
+        uint256 tokenId;
+        address assetContract;  
+       
     }
 
     /**
      *  @notice An internal data structure to track a group / bundle of multiple assets i.e. `Token`s.
      *
-     *  @param count    The total number of assets i.e. `Token` in a bundle.
-     *  @param uri      The (metadata) URI assigned to the bundle created
-     *  @param tokens   Mapping from a UID -> to a unique asset i.e. `Token` in the bundle.
+     *  @param count    The total number of assets i.e. `Collateral` in a bundle. 
+     *  @param collaterals   Mapping from a UID -> to a unique asset i.e. `Collateral` in the bundle.
      */
-    struct BundleInfo {
+    struct CollateralBundleInfo {
         uint256 count;
-        //string uri;
-        mapping(uint256 => Token) tokens;
+       
+        mapping(uint256 => Collateral) collaterals;
     }
 }

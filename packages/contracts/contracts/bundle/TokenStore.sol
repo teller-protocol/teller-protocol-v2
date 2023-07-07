@@ -13,7 +13,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC1155/utils/ERC1155HolderUpg
  
 //  ==========  Internal imports    ==========
 
-import { TokenBundle, ITokenBundle } from "./TokenBundle.sol";
+import { TokenBundle, ICollateralBundle } from "./TokenBundle.sol";
 import "./lib/CurrencyTransferLib.sol";
 
 /**
@@ -34,7 +34,7 @@ contract TokenStore is TokenBundle, ERC721HolderUpgradeable, ERC1155HolderUpgrad
     /// @dev Store / escrow multiple ERC1155, ERC721, ERC20 tokens.
     function _storeTokens(
         address _tokenOwner,
-        Token[] calldata _tokens,
+        Collateral[] calldata _tokens,
         //string memory _uriForTokens,
         uint256 _bundleId
     ) internal {
@@ -46,7 +46,7 @@ contract TokenStore is TokenBundle, ERC721HolderUpgradeable, ERC1155HolderUpgrad
     /// @dev Release stored / escrowed ERC1155, ERC721, ERC20 tokens.
     function _releaseTokens(address _recipient, uint256 _bundleId) internal {
         uint256 count = getTokenCountOfBundle(_bundleId);
-        Token[] memory tokensToRelease = new Token[](count);
+        Collateral[] memory tokensToRelease = new Collateral[](count);
 
         for (uint256 i = 0; i < count; i += 1) {
             tokensToRelease[i] = getTokenOfBundle(_bundleId, i);
@@ -61,9 +61,9 @@ contract TokenStore is TokenBundle, ERC721HolderUpgradeable, ERC1155HolderUpgrad
     function _transferToken(
         address _from,
         address _to,
-        Token memory _token
+        Collateral memory _token
     ) internal {
-        if (_token.tokenType == TokenType.ERC20) {
+        if (_token.tokenType == CollateralType.ERC20) {
             CurrencyTransferLib.transferCurrencyWithWrapper(
                 _token.assetContract,
                 _from,
@@ -71,9 +71,9 @@ contract TokenStore is TokenBundle, ERC721HolderUpgradeable, ERC1155HolderUpgrad
                 _token.totalAmount,
                 nativeTokenWrapper
             );
-        } else if (_token.tokenType == TokenType.ERC721) {
+        } else if (_token.tokenType == CollateralType.ERC721) {
             IERC721(_token.assetContract).safeTransferFrom(_from, _to, _token.tokenId);
-        } else if (_token.tokenType == TokenType.ERC1155) {
+        } else if (_token.tokenType == CollateralType.ERC1155) {
             IERC1155(_token.assetContract).safeTransferFrom(_from, _to, _token.tokenId, _token.totalAmount, "");
         }
     }
@@ -82,7 +82,7 @@ contract TokenStore is TokenBundle, ERC721HolderUpgradeable, ERC1155HolderUpgrad
     function _transferTokenBatch(
         address _from,
         address _to,
-        Token[] memory _tokens
+        Collateral[] memory _tokens
     ) internal {
         uint256 nativeTokenValue;
         for (uint256 i = 0; i < _tokens.length; i += 1) {
@@ -93,9 +93,9 @@ contract TokenStore is TokenBundle, ERC721HolderUpgradeable, ERC1155HolderUpgrad
             }
         }
         if (nativeTokenValue != 0) {
-            Token memory _nativeToken = Token({
+            Collateral memory _nativeToken = Collateral({
                 assetContract: CurrencyTransferLib.NATIVE_TOKEN,
-                tokenType: ITokenBundle.TokenType.ERC20,
+                tokenType: ICollateralBundle.CollateralType.ERC20,
                 tokenId: 0,
                 totalAmount: nativeTokenValue
             });

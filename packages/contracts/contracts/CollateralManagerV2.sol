@@ -57,7 +57,7 @@ contract CollateralManager is OwnableUpgradeable, TokenStore, ICollateralManager
     //mapping(uint256 => CollateralInfo) internal _committedBidCollateral;
 
      // bidIds -> collateralBundleId 
-    mapping(uint256 => Token[]) internal _committedBidCollateral;
+    mapping(uint256 => Collateral[]) internal _committedBidCollateral;
 
      
 

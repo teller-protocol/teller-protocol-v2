@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 /// @author thirdweb
 /// https://github.com/thirdweb-dev/contracts/tree/main/contracts/multiwrap
 
-import "./interfaces/ITokenBundle.sol";
+import "./interfaces/ICollateralBundle.sol";
 import "./lib/CurrencyTransferLib.sol";
 
 interface IERC165 {
@@ -18,9 +18,9 @@ interface IERC165 {
  *  @dev     See {ITokenBundle}
  */
 
-abstract contract TokenBundle is ITokenBundle {
+abstract contract TokenBundle is ICollateralBundle {
     /// @dev Mapping from bundle UID => bundle info.
-    mapping(uint256 => BundleInfo) private bundle;
+    mapping(uint256 => CollateralBundleInfo) private bundle;
 
     /// @dev Returns the total number of assets in a particular bundle.
     function getTokenCountOfBundle(uint256 _bundleId) public view returns (uint256) {
@@ -28,17 +28,17 @@ abstract contract TokenBundle is ITokenBundle {
     }
 
     /// @dev Returns an asset contained in a particular bundle, at a particular index.
-    function getTokenOfBundle(uint256 _bundleId, uint256 index) public view returns (Token memory) {
+    function getTokenOfBundle(uint256 _bundleId, uint256 index) public view returns (Collateral memory) {
         return bundle[_bundleId].tokens[index];
     }
 
     /// @dev Returns the struct of a particular bundle.
-    function getBundleInfo(uint256 _bundleId) public view returns (BundleInfo memory) {
+    function getBundleInfo(uint256 _bundleId) public view returns (CollateralBundleInfo memory) {
         return bundle[_bundleId];
     }
 
     /// @dev Lets the calling contract create a bundle, by passing in a list of tokens and a unique id.
-    function _createBundle(Token[] calldata _tokensToBind, uint256 _bundleId) internal {
+    function _createBundle(Collateral[] calldata _tokensToBind, uint256 _bundleId) internal {
         uint256 targetCount = _tokensToBind.length;
 
         require(targetCount > 0, "!Tokens");
@@ -53,7 +53,7 @@ abstract contract TokenBundle is ITokenBundle {
     }
 
     /// @dev Lets the calling contract update a bundle, by passing in a list of tokens and a unique id.
-    function _updateBundle(Token[] memory _tokensToBind, uint256 _bundleId) internal {
+    function _updateBundle(Collateral[] memory _tokensToBind, uint256 _bundleId) internal {
         require(_tokensToBind.length > 0, "!Tokens");
 
         uint256 currentCount = bundle[_bundleId].count;
@@ -73,7 +73,7 @@ abstract contract TokenBundle is ITokenBundle {
     }
 
     /// @dev Lets the calling contract add a token to a bundle for a unique bundle id and index.
-    function _addTokenInBundle(Token memory _tokenToBind, uint256 _bundleId) internal {
+    function _addTokenInBundle(Collateral memory _tokenToBind, uint256 _bundleId) internal {
         _checkTokenType(_tokenToBind);
         uint256 id = bundle[_bundleId].count;
 
@@ -83,7 +83,7 @@ abstract contract TokenBundle is ITokenBundle {
 
     /// @dev Lets the calling contract update a token in a bundle for a unique bundle id and index.
     function _updateTokenInBundle(
-        Token memory _tokenToBind,
+        Collateral memory _tokenToBind,
         uint256 _bundleId,
         uint256 _index
     ) internal {
@@ -93,20 +93,20 @@ abstract contract TokenBundle is ITokenBundle {
     }
 
     /// @dev Checks if the type of asset-contract is same as the TokenType specified.
-    function _checkTokenType(Token memory _token) internal view {
-        if (_token.tokenType == TokenType.ERC721) {
+    function _checkTokenType(Collateral memory _token) internal view {
+        if (_token.tokenType == CollateralType.ERC721) {
             try IERC165(_token.assetContract).supportsInterface(0x80ac58cd) returns (bool supported721) {
                 require(supported721, "!TokenType");
             } catch {
                 revert("!TokenType");
             }
-        } else if (_token.tokenType == TokenType.ERC1155) {
+        } else if (_token.tokenType == CollateralType.ERC1155) {
             try IERC165(_token.assetContract).supportsInterface(0xd9b67a26) returns (bool supported1155) {
                 require(supported1155, "!TokenType");
             } catch {
                 revert("!TokenType");
             }
-        } else if (_token.tokenType == TokenType.ERC20) {
+        } else if (_token.tokenType == CollateralType.ERC20) {
             if (_token.assetContract != CurrencyTransferLib.NATIVE_TOKEN) {
                 // 0x36372b07
                 try IERC165(_token.assetContract).supportsInterface(0x80ac58cd) returns (bool supported721) {

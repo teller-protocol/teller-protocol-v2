@@ -8,9 +8,9 @@ pragma solidity ^0.8.0;
 import "./interfaces/IERC1155.sol";
 import "./interfaces/IERC721.sol";
 
-import "../openzeppelin-presets/utils/ERC1155/ERC1155Holder.sol";
-import "../openzeppelin-presets/utils/ERC721/ERC721Holder.sol";
-
+import "@openzeppelin/contracts-upgradeable/token/ERC721/utils/ERC721HolderUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC1155/utils/ERC1155HolderUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 //  ==========  Internal imports    ==========
 
 import { TokenBundle, ITokenBundle } from "./TokenBundle.sol";

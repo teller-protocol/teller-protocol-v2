@@ -6,10 +6,11 @@ pragma solidity ^0.8.0;
 // Helper interfaces
 import { IWETH } from "../../interfaces/IWETH.sol";
 
-import "../openzeppelin-presets/token/ERC20/utils/SafeERC20.sol";
+ 
+import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 
 library CurrencyTransferLib {
-    using SafeERC20 for IERC20;
+    using SafeERC20Upgradeable for IERC20;
 
     /// @dev The address interpreted as native token of the chain.
     address public constant NATIVE_TOKEN = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;

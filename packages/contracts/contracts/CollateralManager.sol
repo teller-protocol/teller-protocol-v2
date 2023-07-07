@@ -14,7 +14,9 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol"
 import "@openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol";
 import "./interfaces/ICollateralManagerV1.sol";
-import { Collateral, CollateralType, ICollateralEscrowV1 } from "./interfaces/escrow/ICollateralEscrowV1.sol";
+import {  ICollateralEscrowV1 } from "./interfaces/escrow/ICollateralEscrowV1.sol";
+import  {Collateral,CollateralType } from "./bundle/interfaces/ICollateralBundle.sol";
+
 import "./interfaces/ITellerV2.sol";
 
 contract CollateralManager is OwnableUpgradeable, ICollateralManagerV1 {

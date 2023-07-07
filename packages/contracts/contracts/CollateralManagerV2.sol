@@ -120,7 +120,7 @@ contract CollateralManager is OwnableUpgradeable, TokenStore, ICollateralManager
         virtual
         returns (bool)
     {
-        return _bidCollaterals[_bidId].collateralAddresses.length() > 0;
+        return _committedBidCollateral[_bidId].collateralAddresses.length() > 0;
     }
 
     /**
@@ -232,7 +232,7 @@ contract CollateralManager is OwnableUpgradeable, TokenStore, ICollateralManager
         view
         returns (uint256 amount_)
     {
-        Token memory token_data = getTokenOfBundle(_bidId, 0);// first slot 
+        Collateral memory token_data = getTokenOfBundle(_bidId, 0);// first slot 
 
         if( token_data.assetContract != _collateralAddress ) return 0 ; // not as expected
 

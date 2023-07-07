@@ -12,8 +12,7 @@ pragma solidity ^0.8.0;
  *  logic to handle any ERC20, ERC721 or ERC1155 tokens.
  */
 
-interface ICollateralBundle {
-    /// @notice The type of assets that can be bundled.
+   /// @notice The type of assets that can be bundled.
     enum CollateralType {
         ERC20,
         ERC721,
@@ -35,6 +34,10 @@ interface ICollateralBundle {
         address assetContract;  
        
     }
+    
+
+interface ICollateralBundle {
+  
 
     /**
      *  @notice An internal data structure to track a group / bundle of multiple assets i.e. `Token`s.

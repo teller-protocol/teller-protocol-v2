@@ -13,6 +13,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC1155/utils/ERC1155HolderUpg
  
 //  ==========  Internal imports    ==========
 
+import { Collateral,CollateralType } from "./interfaces/ICollateralBundle.sol";
 import { TokenBundle, ICollateralBundle } from "./TokenBundle.sol";
 import "./lib/CurrencyTransferLib.sol";
 

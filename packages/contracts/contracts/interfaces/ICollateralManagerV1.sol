@@ -1,7 +1,9 @@
 // SPDX-Licence-Identifier: MIT
 pragma solidity >=0.8.0 <0.9.0;
 
-import { Collateral } from "./escrow/ICollateralEscrowV1.sol";
+//import { Collateral } from "./escrow/ICollateralEscrowV1.sol";
+
+import {Collateral} from "../bundle/interfaces/ICollateralBundle.sol";
 
 import "./ICollateralManager.sol";
 

@@ -175,15 +175,17 @@ contract TellerV2 is
      * @param _marketRegistry The address of the market registry contract for the protocol.
      * @param _reputationManager The address of the reputation manager contract.
      * @param _lenderCommitmentForwarder The address of the lender commitment forwarder contract.
-     * @param _collateralManager The address of the collateral manager contracts.
+      
      * @param _lenderManager The address of the lender manager contract for loans on the protocol.
+     * @param _escrowVault the address of the escrow vault contract for push pull
+     * @param _collateralManagerV2 the address of the collateral manager V2 contract.
      */
     function initialize(
         uint16 _protocolFee,
         address _marketRegistry,
         address _reputationManager,
         address _lenderCommitmentForwarder,
-        address _collateralManagerV1,
+       // address _collateralManagerV1,
         address _lenderManager,
         address _escrowVault,
         address _collateralManagerV2
@@ -210,11 +212,11 @@ contract TellerV2 is
         );
         reputationManager = IReputationManager(_reputationManager);
 
-        require(
+      /*  require(
             _collateralManager.isContract(),
             "CollateralManager must be a contract"
-        );
-        collateralManagerV1 = ICollateralManager(_collateralManagerV1);
+        );*/
+      //  collateralManagerV1 = ICollateralManager(_collateralManagerV1);
 
         _setLenderManager(_lenderManager);
         _setEscrowVault(_escrowVault);

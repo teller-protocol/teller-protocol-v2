@@ -63,7 +63,9 @@ contract CollateralManager is OwnableUpgradeable, TokenStore, ICollateralManager
 
     /* Events */
     event CollateralEscrowDeployed(uint256 _bidId, address _collateralEscrow);
-    event CollateralCommitted(
+
+    //add events back !! 
+  /*  event CollateralCommitted(
         uint256 _bidId,
         CollateralType _type,
         address _collateralAddress,
@@ -85,7 +87,7 @@ contract CollateralManager is OwnableUpgradeable, TokenStore, ICollateralManager
         uint256 _amount,
         uint256 _tokenId,
         address _recipient
-    );
+    );*/
 
     /* Modifiers */
     modifier onlyTellerV2() {
@@ -97,7 +99,6 @@ contract CollateralManager is OwnableUpgradeable, TokenStore, ICollateralManager
 
     /**
      * @notice Initializes the collateral manager.
-     * @param _collateralEscrowBeacon The address of the escrow implementation.
      * @param _tellerV2 The address of the protocol.
      */
     function initialize(address _tellerV2)

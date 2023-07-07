@@ -5,8 +5,8 @@ pragma solidity ^0.8.0;
 
 //  ==========  External imports    ==========
 
-import "../eip/interface/IERC1155.sol";
-import "../eip/interface/IERC721.sol";
+import "./interfaces/IERC1155.sol";
+import "./interfaces/IERC721.sol";
 
 import "../openzeppelin-presets/utils/ERC1155/ERC1155Holder.sol";
 import "../openzeppelin-presets/utils/ERC721/ERC721Holder.sol";
@@ -14,7 +14,7 @@ import "../openzeppelin-presets/utils/ERC721/ERC721Holder.sol";
 //  ==========  Internal imports    ==========
 
 import { TokenBundle, ITokenBundle } from "./TokenBundle.sol";
-import "../lib/CurrencyTransferLib.sol";
+import "./lib/CurrencyTransferLib.sol";
 
 /**
  *  @title   Token Store

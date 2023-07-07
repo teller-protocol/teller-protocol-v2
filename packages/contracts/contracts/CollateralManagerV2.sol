@@ -402,7 +402,7 @@ contract CollateralManager is OwnableUpgradeable, TokenStore, ICollateralManager
             collateralInfo._tokenId,
             _receiver
         );
-        }
+        
     }
 
     /**
@@ -551,4 +551,6 @@ contract CollateralManager is OwnableUpgradeable, TokenStore, ICollateralManager
                 )
             );
     }
-}
+
+
+} 

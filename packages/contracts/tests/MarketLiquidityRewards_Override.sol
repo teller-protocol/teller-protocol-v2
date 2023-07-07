@@ -39,9 +39,8 @@ contract MarketLiquidityRewards_Override is MarketLiquidityRewards {
 
     constructor(
         address tellerV2,
-        address marketRegistry,
-        address collateralManager
-    ) MarketLiquidityRewards(tellerV2, marketRegistry, collateralManager) {}
+        address marketRegistry 
+    ) MarketLiquidityRewards(tellerV2, marketRegistry) {}
 
     function setAllocation(
         uint256 _allocationId,

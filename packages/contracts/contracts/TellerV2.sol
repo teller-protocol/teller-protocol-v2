@@ -1037,6 +1037,7 @@ contract TellerV2 is
     function getCollateralManagerForBid(uint256 _bidId)
         public
         view 
+        virtual
         returns (ICollateralManager)
     {   
         if(bids[_bidId].collateralManager == address(0)){

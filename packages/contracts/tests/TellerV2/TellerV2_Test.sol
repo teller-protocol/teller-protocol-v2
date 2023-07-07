@@ -253,7 +253,7 @@ contract TellerV2_Test is Testable {
         // The malicious borrower performs the attack by frontrunning the tx and updating the bid collateral amount
         vm.prank(address(borrower));
         vm.expectRevert();
-        collateralManager.commitCollateral(bidId, info);
+        collateralManager.commitCollateral(bidId, collateralInfo);
 
         // The lender is now victim to the frontrunning and accepts the malicious bid
         /*  acceptBid(bidId);

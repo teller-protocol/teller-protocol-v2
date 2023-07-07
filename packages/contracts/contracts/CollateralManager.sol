@@ -135,13 +135,15 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManagerV1 {
         }
     }
 
+
+    //this is not used for anything 
     /**
      * @notice Checks the validity of a borrower's collateral balance and commits it to a bid.
      * @param _bidId The id of the associated bid.
      * @param _collateralInfo Additional information about the collateral asset.
      * @return validation_ Boolean indicating if the collateral balance was validated.
      */
-  /*  function commitCollateral(
+    function commitCollateral(
         uint256 _bidId,
         Collateral calldata _collateralInfo
     ) public onlyTellerV2 returns (bool validation_) {
@@ -151,7 +153,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManagerV1 {
         if (validation_) {
             _commitCollateral(_bidId, _collateralInfo);
         }
-    }*/
+    } 
 
     /**
      * @notice Re-checks the validity of a borrower's collateral balance committed to a bid.

@@ -13,6 +13,7 @@ contract TellerV2_Override is TellerV2 {
     bool public cancelBidWasCalled;
     bool public repayLoanWasCalled;
     address public mockMsgSenderForMarket;
+    address public collateralManagerMock;
 
     constructor() TellerV2(address(0)) {}
 
@@ -40,9 +41,20 @@ contract TellerV2_Override is TellerV2 {
         marketRegistry = IMarketRegistry(_marketRegistry);
     }
 
-    function setCollateralManagerV1Super(address _collateralManagerV1) public {
-        collateralManagerV1 = ICollateralManager(_collateralManagerV1);
+    function setCollateralManagerSuper(address _collateralManager) public {
+        collateralManagerMock = address(_collateralManager);
     }
+
+     function getCollateralManagerForBid(uint256 _bidId)
+        public
+        view 
+        override 
+        returns (ICollateralManager)
+    {   
+        
+        return ICollateralManager(collateralManagerMock);
+    }
+
 
     function setReputationManagerSuper(address _reputationManager) public {
         reputationManager = IReputationManager(_reputationManager);

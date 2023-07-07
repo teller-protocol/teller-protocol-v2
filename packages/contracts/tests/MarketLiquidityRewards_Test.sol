@@ -56,8 +56,7 @@ contract MarketLiquidityRewards_Test is Testable {
     constructor()
     /*   MarketLiquidityRewards(
             address(new TellerV2Mock()),
-            address(new MarketRegistryMock(address(0))),
-            address(new CollateralManagerMock())
+            address(new MarketRegistryMock(address(0)))
         )*/
     {
 
@@ -74,8 +73,7 @@ contract MarketLiquidityRewards_Test is Testable {
 
         marketLiquidityRewards = new MarketLiquidityRewards_Override(
             address(tellerV2Mock),
-            address(marketRegistryMock),
-            address(collateralManagerMock)
+            address(marketRegistryMock) 
         );
 
         borrower = new MarketLiquidityUser(

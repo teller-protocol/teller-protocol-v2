@@ -56,8 +56,7 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
     constructor()
         MarketLiquidityRewards(
             address(new TellerV2Mock()),
-            address(new MarketRegistryMock()),
-            address(new CollateralManagerMock())
+            address(new MarketRegistryMock()) 
         )
     {}
 

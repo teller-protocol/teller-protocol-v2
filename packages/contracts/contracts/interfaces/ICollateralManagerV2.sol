@@ -32,7 +32,7 @@ interface ICollateralManagerV2 is ICollateralManager {
      * @notice Deploys a new collateral escrow.
      * @param _bidId The associated bidId of the collateral escrow.
      */
-    function deposit(uint256 _bidId) external;
+    function depositCollateral(uint256 _bidId) external;
 
     /**
      * @notice Gets the address of a deployed escrow.

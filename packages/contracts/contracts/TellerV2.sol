@@ -543,7 +543,7 @@ contract TellerV2 is
         if(bids[_bidId].collateralManager == address(0)){
             collateralManagerV1.deployAndDeposit(_bidId);
         }else{
-            collateralManagerV2.deposit(_bidId);
+            collateralManagerV2.depositCollateral(_bidId);
         }
         
 

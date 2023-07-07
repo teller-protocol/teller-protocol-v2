@@ -5,12 +5,12 @@ pragma solidity ^0.8.0;
 
 //  ==========  External imports    ==========
 
-import "./interfaces/IERC1155.sol";
-import "./interfaces/IERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
 
 import "@openzeppelin/contracts-upgradeable/token/ERC721/utils/ERC721HolderUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC1155/utils/ERC1155HolderUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
+ 
 //  ==========  Internal imports    ==========
 
 import { TokenBundle, ITokenBundle } from "./TokenBundle.sol";
@@ -23,7 +23,7 @@ import "./lib/CurrencyTransferLib.sol";
  *  @dev     See {CurrencyTransferLib}
  */
 
-contract TokenStore is TokenBundle, ERC721Holder, ERC1155Holder {
+contract TokenStore is TokenBundle, ERC721HolderUpgradeable, ERC1155HolderUpgradeable {
     /// @dev The address of the native token wrapper contract.
     address internal immutable nativeTokenWrapper;
 

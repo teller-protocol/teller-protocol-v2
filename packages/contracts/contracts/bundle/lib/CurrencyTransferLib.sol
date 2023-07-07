@@ -7,6 +7,7 @@ pragma solidity ^0.8.0;
 import { IWETH } from "../../interfaces/IWETH.sol";
 
  
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 
 library CurrencyTransferLib {

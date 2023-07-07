@@ -20,6 +20,9 @@ struct Collateral {
     address _collateralAddress;
 }*/
 
+
+import "../bundle/interfaces/ITokenBundle.sol";
+
 interface ICollateralManagerV2 is ICollateralManager {
 
 
@@ -46,7 +49,7 @@ interface ICollateralManagerV2 is ICollateralManager {
     function getCollateralInfo(uint256 _bidId)
         external
         view
-        returns (Collateral[] memory);
+        returns (ITokenBundle.Token[] memory);
 
     function getCollateralAmount(uint256 _bidId, address collateralAssetAddress)
         external

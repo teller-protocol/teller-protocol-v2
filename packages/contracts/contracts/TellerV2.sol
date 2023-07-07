@@ -762,7 +762,7 @@ contract TellerV2 is
 
         //collateralManager.lenderClaimCollateral(_bidId);
 
-        getCollateralManagerForBid(_bidId).lenderClaimCollateral(_bidId);
+        _getCollateralManagerForBid(_bidId).lenderClaimCollateral(_bidId);
     }
 
     /**
@@ -797,7 +797,7 @@ contract TellerV2 is
         // If loan is backed by collateral, withdraw and send to the liquidator
         address liquidator = _msgSenderForMarket(bid.marketplaceId);
         //collateralManager.liquidateCollateral(_bidId, liquidator);
-        getCollateralManagerForBid(_bidId).liquidateCollateral(_bidId,liquidator);
+        _getCollateralManagerForBid(_bidId).liquidateCollateral(_bidId,liquidator);
 
         emit LoanLiquidated(_bidId, liquidator);
     }
@@ -834,7 +834,7 @@ contract TellerV2 is
             if (_shouldWithdrawCollateral) {
                 //collateralManager.withdraw(_bidId);
 
-                getCollateralManagerForBid(_bidId).withdraw(_bidId);
+                _getCollateralManagerForBid(_bidId).withdraw(_bidId);
             }
 
             emit LoanRepaid(_bidId);
@@ -1036,6 +1036,16 @@ contract TellerV2 is
 
     function getCollateralManagerForBid(uint256 _bidId)
         public
+        view 
+        virtual
+        returns (ICollateralManager)
+    {   
+       
+        return _getCollateralManagerForBid(_bidId);
+    }
+
+      function _getCollateralManagerForBid(uint256 _bidId)
+        internal
         view 
         virtual
         returns (ICollateralManager)

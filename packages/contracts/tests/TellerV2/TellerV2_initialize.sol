@@ -16,7 +16,7 @@ contract TellerV2_initialize is Testable {
     Contract marketRegistry;
     Contract reputationManager;
     Contract lenderCommitmentForwarder;
-    Contract collateralManager;
+    Contract collateralManagerV2;
     Contract lenderManager;
     Contract escrowVault;
 
@@ -30,7 +30,7 @@ contract TellerV2_initialize is Testable {
         marketRegistry = new Contract();
         reputationManager = new Contract();
         lenderCommitmentForwarder = new Contract();
-        collateralManager = new Contract();
+        collateralManagerV2 = new Contract();
         lenderManager = new Contract();
         escrowVault = new Contract();
 
@@ -39,9 +39,10 @@ contract TellerV2_initialize is Testable {
             address(marketRegistry),
             address(reputationManager),
             address(lenderCommitmentForwarder),
-            address(collateralManager),
+       
             address(lenderManager),
-            address(escrowVault)
+            address(escrowVault),
+            address(collateralManagerV2)
         );
 
         assertEq(address(tellerV2.marketRegistry()), address(marketRegistry));
@@ -53,7 +54,7 @@ contract TellerV2_initialize is Testable {
         marketRegistry = new Contract();
         reputationManager = new Contract();
 
-        collateralManager = new Contract();
+        collateralManagerV2 = new Contract();
         lenderManager = new Contract();
         escrowVault = new Contract();
 
@@ -64,9 +65,9 @@ contract TellerV2_initialize is Testable {
             address(marketRegistry),
             address(reputationManager),
             address(lenderCommitmentForwarder),
-            address(collateralManager),
             address(lenderManager),
-            address(escrowVault)
+            address(escrowVault),
+            address(collateralManagerV2)
         );
     }
 
@@ -74,7 +75,7 @@ contract TellerV2_initialize is Testable {
         reputationManager = new Contract();
 
         lenderCommitmentForwarder = new Contract();
-        collateralManager = new Contract();
+        collateralManagerV2 = new Contract();
         lenderManager = new Contract();
         escrowVault = new Contract();
 
@@ -85,9 +86,10 @@ contract TellerV2_initialize is Testable {
             address(marketRegistry),
             address(reputationManager),
             address(lenderCommitmentForwarder),
-            address(collateralManager),
+         
             address(lenderManager),
-            address(escrowVault)
+            address(escrowVault),
+            address(collateralManagerV2)
         );
     }
 
@@ -95,7 +97,7 @@ contract TellerV2_initialize is Testable {
         marketRegistry = new Contract();
 
         lenderCommitmentForwarder = new Contract();
-        collateralManager = new Contract();
+        collateralManagerV2 = new Contract();
         lenderManager = new Contract();
         escrowVault = new Contract();
 
@@ -106,9 +108,10 @@ contract TellerV2_initialize is Testable {
             address(marketRegistry),
             address(reputationManager),
             address(lenderCommitmentForwarder),
-            address(collateralManager),
+          
             address(lenderManager),
-            address(escrowVault)
+            address(escrowVault),
+            address(collateralManagerV2)
         );
     }
 
@@ -127,9 +130,10 @@ contract TellerV2_initialize is Testable {
             address(marketRegistry),
             address(reputationManager),
             address(lenderCommitmentForwarder),
-            address(collateralManager),
+           
             address(lenderManager),
-            address(escrowVault)
+            address(escrowVault),
+            address(collateralManagerV2)
         );
     }
 
@@ -138,7 +142,7 @@ contract TellerV2_initialize is Testable {
 
         lenderCommitmentForwarder = new Contract();
         reputationManager = new Contract();
-        collateralManager = new Contract();
+        collateralManagerV2 = new Contract();
         escrowVault = new Contract();
 
         vm.expectRevert("LenderManager must be a contract");
@@ -148,9 +152,10 @@ contract TellerV2_initialize is Testable {
             address(marketRegistry),
             address(reputationManager),
             address(lenderCommitmentForwarder),
-            address(collateralManager),
+       
             address(lenderManager),
-            address(escrowVault)
+            address(escrowVault),
+            address(collateralManagerV2)
         );
     }
 

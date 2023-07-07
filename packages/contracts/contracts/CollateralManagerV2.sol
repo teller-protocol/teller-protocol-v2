@@ -33,7 +33,7 @@ import "./interfaces/ICollateralManagerV2.sol";
 import "./interfaces/ITellerV2.sol";
 import "./bundle/TokenStore.sol";
 
-import "./bundle/interfaces/ITokenBundle.sol";
+import "./bundle/interfaces/ICollateralBundle.sol";
 
 
 /*

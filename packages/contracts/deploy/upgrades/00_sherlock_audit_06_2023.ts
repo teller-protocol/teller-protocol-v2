@@ -3,7 +3,7 @@ import { DeployFunction } from 'hardhat-deploy/dist/types'
 const deployFn: DeployFunction = async (hre) => {
   hre.log('----------')
   hre.log('')
-  hre.log('TellerV2: Proposing upgrade...')
+  hre.log('Sherlock Audit: Proposing upgrade...')
 
   const trustedForwarder = await hre.contracts.get('MetaForwarder')
   const v2Calculations = await hre.contracts.get('V2Calculations')

@@ -236,4 +236,13 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
     function setLastRepaidTimestamp(uint256 _bidId, uint32 _timestamp) public {
         bids[_bidId].loanDetails.lastRepaidTimestamp = _timestamp;
     }
+
+    function getCollateralManagerForBid(uint256 _bidId)
+        public
+        view 
+        returns (ICollateralManager){
+            return ICollateralManager(address(0));
+        }
+    
+
 }

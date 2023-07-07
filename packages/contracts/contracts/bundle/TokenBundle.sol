@@ -94,25 +94,25 @@ abstract contract TokenBundle is ICollateralBundle {
 
     /// @dev Checks if the type of asset-contract is same as the TokenType specified.
     function _checkTokenType(Collateral memory _token) internal view {
-        if (_token.collateralType == CollateralType.ERC721) {
-            try IERC165(_token.assetContract).supportsInterface(0x80ac58cd) returns (bool supported721) {
+        if (_token._collateralType == CollateralType.ERC721) {
+            try IERC165(_token._collateralAddress).supportsInterface(0x80ac58cd) returns (bool supported721) {
                 require(supported721, "!TokenType");
             } catch {
                 revert("!TokenType");
             }
-        } else if (_token.collateralType == CollateralType.ERC1155) {
-            try IERC165(_token.assetContract).supportsInterface(0xd9b67a26) returns (bool supported1155) {
+        } else if (_token._collateralType == CollateralType.ERC1155) {
+            try IERC165(_token._collateralAddress).supportsInterface(0xd9b67a26) returns (bool supported1155) {
                 require(supported1155, "!TokenType");
             } catch {
                 revert("!TokenType");
             }
-        } else if (_token.collateralType == CollateralType.ERC20) {
-            if (_token.assetContract != CurrencyTransferLib.NATIVE_TOKEN) {
+        } else if (_token._collateralType == CollateralType.ERC20) {
+            if (_token._collateralAddress != CurrencyTransferLib.NATIVE_TOKEN) {
                 // 0x36372b07
-                try IERC165(_token.assetContract).supportsInterface(0x80ac58cd) returns (bool supported721) {
+                try IERC165(_token._collateralAddress).supportsInterface(0x80ac58cd) returns (bool supported721) {
                     require(!supported721, "!TokenType");
 
-                    try IERC165(_token.assetContract).supportsInterface(0xd9b67a26) returns (bool supported1155) {
+                    try IERC165(_token._collateralAddress).supportsInterface(0xd9b67a26) returns (bool supported1155) {
                         require(!supported1155, "!TokenType");
                     } catch Error(string memory) {} catch {}
                 } catch Error(string memory) {} catch {}

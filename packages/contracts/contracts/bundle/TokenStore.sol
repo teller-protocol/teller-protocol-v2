@@ -66,17 +66,17 @@ contract TokenStore is TokenBundle, ERC721HolderUpgradeable, ERC1155HolderUpgrad
         address _to,
         Collateral memory _token
     ) internal {
-        if (_token.collateralType == CollateralType.ERC20) {
+        if (_token._collateralType == CollateralType.ERC20) {
             CurrencyTransferLib.transferCurrency(
-                _token.assetContract,
+                _token._collateralAddress,
                 _from,
                 _to,
-                _token.totalAmount
+                _token._amount
             );
-        } else if (_token.collateralType == CollateralType.ERC721) {
-            IERC721(_token.assetContract).safeTransferFrom(_from, _to, _token.tokenId);
-        } else if (_token.collateralType == CollateralType.ERC1155) {
-            IERC1155(_token.assetContract).safeTransferFrom(_from, _to, _token.tokenId, _token.totalAmount, "");
+        } else if (_token._collateralType == CollateralType.ERC721) {
+            IERC721(_token._collateralAddress).safeTransferFrom(_from, _to, _token._tokenId);
+        } else if (_token._collateralType == CollateralType.ERC1155) {
+            IERC1155(_token._collateralAddress).safeTransferFrom(_from, _to, _token._tokenId, _token._amount, "");
         }
     }
 
@@ -86,20 +86,22 @@ contract TokenStore is TokenBundle, ERC721HolderUpgradeable, ERC1155HolderUpgrad
         address _to,
         Collateral[] memory _tokens
     ) internal {
+
+        //make sure this cannot cause issues 
         uint256 nativeTokenValue;
         for (uint256 i = 0; i < _tokens.length; i += 1) {
-            if (_tokens[i].assetContract == CurrencyTransferLib.NATIVE_TOKEN && _to == address(this)) {
-                nativeTokenValue += _tokens[i].totalAmount;
+            if (_tokens[i]._collateralAddress == CurrencyTransferLib.NATIVE_TOKEN && _to == address(this)) {
+                nativeTokenValue += _tokens[i]._amount;
             } else {
                 _transferToken(_from, _to, _tokens[i]);
             }
         }
         if (nativeTokenValue != 0) {
             Collateral memory _nativeToken = Collateral({
-                assetContract: CurrencyTransferLib.NATIVE_TOKEN,
-                collateralType: CollateralType.ERC20,
-                tokenId: 0,
-                totalAmount: nativeTokenValue
+                _collateralAddress: CurrencyTransferLib.NATIVE_TOKEN,
+                _collateralType: CollateralType.ERC20,
+                _tokenId: 0,
+                _amount: nativeTokenValue
             });
             _transferToken(_from, _to, _nativeToken);
         }

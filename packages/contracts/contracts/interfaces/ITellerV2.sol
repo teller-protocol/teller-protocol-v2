@@ -5,6 +5,7 @@ import { Payment, BidState } from "../TellerV2Storage.sol";
 //import { Collateral } from "./escrow/ICollateralEscrowV1.sol";
 
 import {Collateral} from "../bundle/interfaces/ICollateralBundle.sol";
+import "./ICollateralManager.sol";
 
 interface ITellerV2 {
     /**
@@ -150,4 +151,10 @@ interface ITellerV2 {
             uint32 lastRepaidTimestamp,
             BidState bidState
         );
+
+    function getCollateralManagerForBid(uint256 _bidId)
+        external
+        view 
+        returns (ICollateralManager);
+    
 }

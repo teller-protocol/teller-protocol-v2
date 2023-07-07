@@ -16,7 +16,8 @@ This collateral manager will only accept collateral bundles.
 
 
 // Contracts
- 
+import "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
+
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 // Libraries
@@ -44,11 +45,11 @@ If the bundle exists and is owned by this contract, we know the collateral is he
 
 */
 
-contract CollateralManagerV2 is OwnableUpgradeable, TokenStore, ICollateralManagerV2 {
+contract CollateralManagerV2 is ContextUpgradeable, TokenStore, ICollateralManagerV2 {
     /* Storage */
     using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
     ITellerV2 public tellerV2;
-    //address private collateralBundler; // The address of the collateral bundler 
+    
 
     // bidIds -> collateralEscrow
     //mapping(uint256 => address) public _escrows;
@@ -95,12 +96,7 @@ contract CollateralManagerV2 is OwnableUpgradeable, TokenStore, ICollateralManag
         require(_msgSender() == address(tellerV2), "Sender not authorized");
         _;
     }
-
-
-
-     
-
-
+ 
 
 
 
@@ -115,7 +111,7 @@ contract CollateralManagerV2 is OwnableUpgradeable, TokenStore, ICollateralManag
         initializer
     {
         tellerV2 = ITellerV2(_tellerV2);
-        __Ownable_init_unchained();
+       // __Ownable_init_unchained();
     }
 
    
@@ -132,13 +128,13 @@ contract CollateralManagerV2 is OwnableUpgradeable, TokenStore, ICollateralManag
         return _committedBidCollateral[_bidId].count > 0;
     }
 
-    /**
+   /**
      * @notice Checks the validity of a borrower's multiple collateral balances and commits it to a bid.
      * @param _bidId The id of the associated bid.
      * @param _collateralInfo Additional information about the collateral assets.
      * @return validation_ Boolean indicating if the collateral balances were validated.
      */
-    /*function commitCollateral(
+    function commitCollateral(
         uint256 _bidId,
         Collateral[] calldata _collateralInfo
     ) public onlyTellerV2 returns (bool validation_) {
@@ -153,26 +149,7 @@ contract CollateralManagerV2 is OwnableUpgradeable, TokenStore, ICollateralManag
                 _commitCollateral(_bidId, info);
             }
         }
-    }*/
-
-    /**
-     * @notice Checks the validity of a borrower's collateral balance and commits it to a bid.
-     * @param _bidId The id of the associated bid.
-     * @param _collateralInfo Additional information about the collateral asset.
-     * @return validation_ Boolean indicating if the collateral balance was validated.
-     */
-   /* function commitCollateral(
-        uint256 _bidId,
-        Collateral calldata _collateralInfo
-    ) public onlyTellerV2 returns (bool validation_) {
-        address borrower = tellerV2.getLoanBorrower(_bidId);
-        require(borrower != address(0), "Loan has no borrower");
-        validation_ = _checkBalance(borrower, _collateralInfo);
-        if (validation_) {
-            _commitCollateral(_bidId, _collateralInfo);
-        }
-    }*/
-
+    }
    
 
     /**
@@ -183,12 +160,9 @@ contract CollateralManagerV2 is OwnableUpgradeable, TokenStore, ICollateralManag
      //used to be 'deploy and deposit' 
     function depositCollateral(uint256 _bidId) external onlyTellerV2 {
         
-        uint256 count = _committedBidCollateral[_bidId].count;
-        Collateral[] memory _committedCollateral = new Collateral[](count); 
+       
 
-        for(uint256 i=0;i<count;i++){
-            _committedCollateral[i] = _committedBidCollateral[_bidId].collaterals[i];
-        }
+        Collateral[] memory _committedCollateral = getCollateralInfo(_bidId);
 
             
         address borrower = address(0); //FIX ME 
@@ -220,20 +194,29 @@ contract CollateralManagerV2 is OwnableUpgradeable, TokenStore, ICollateralManag
 
      //use getBundleInfo instead 
 
-   /* function getCollateralInfo(uint256 _bidId)
+   function getCollateralInfo(uint256 _bidId)
         public
         view
         returns (Collateral[] memory infos_)
     {
-        CollateralInfo storage collateral = _bidCollaterals[_bidId];
+      /*  CollateralInfo storage collateral = _bidCollaterals[_bidId];
         address[] memory collateralAddresses = collateral
             .collateralAddresses
             .values();
         infos_ = new Collateral[](collateralAddresses.length);
         for (uint256 i; i < collateralAddresses.length; i++) {
             infos_[i] = collateral.collateralInfo[collateralAddresses[i]];
+        }*/
+
+        uint256 count = _committedBidCollateral[_bidId].count;
+        infos_ = new Collateral[](count); 
+
+        for(uint256 i=0;i<count;i++){
+            infos_[i] = _committedBidCollateral[_bidId].collaterals[i];
         }
-    }*/
+ 
+
+    }
 
 
 
@@ -250,9 +233,9 @@ contract CollateralManagerV2 is OwnableUpgradeable, TokenStore, ICollateralManag
     {
         Collateral memory token_data = getTokenOfBundle(_bidId, 0);// first slot 
 
-        if( token_data.assetContract != _collateralAddress ) return 0 ; // not as expected
+        if( token_data._collateralAddress != _collateralAddress ) return 0 ; // not as expected
 
-        amount_ =  token_data.totalAmount;
+        amount_ =  token_data._amount;
     }
 
     /**
@@ -323,84 +306,7 @@ contract CollateralManagerV2 is OwnableUpgradeable, TokenStore, ICollateralManag
 
 
     /* Internal Functions */
- 
-    /*
-        * @notice Deploys a new collateral escrow contract. Deposits collateral into a collateral escrow.
-        * @param _bidId The associated bidId of the collateral escrow.
-        * @param collateralInfo The collateral info to deposit.
-
-    */
-    /*function _deposit(uint256 _bidId, Collateral memory collateralInfo)
-        internal
-        virtual
-    {
-        require(collateralInfo._amount > 0, "Collateral not validated");
-        (address escrowAddress, address borrower) = _deployEscrow(_bidId);
-        ICollateralEscrowV1 collateralEscrow = ICollateralEscrowV1(
-            escrowAddress
-        );
-        // Pull collateral from borrower & deposit into escrow
-        if (collateralInfo._collateralType == CollateralType.ERC20) {
-            IERC20Upgradeable(collateralInfo._collateralAddress).transferFrom(
-                borrower,
-                address(this),
-                collateralInfo._amount
-            );
-            IERC20Upgradeable(collateralInfo._collateralAddress).approve(
-                escrowAddress,
-                collateralInfo._amount
-            );
-            collateralEscrow.depositAsset(
-                CollateralType.ERC20,
-                collateralInfo._collateralAddress,
-                collateralInfo._amount,
-                0
-            );
-        } else if (collateralInfo._collateralType == CollateralType.ERC721) {
-            IERC721Upgradeable(collateralInfo._collateralAddress).transferFrom(
-                borrower,
-                address(this),
-                collateralInfo._tokenId
-            );
-            IERC721Upgradeable(collateralInfo._collateralAddress).approve(
-                escrowAddress,
-                collateralInfo._tokenId
-            );
-            collateralEscrow.depositAsset(
-                CollateralType.ERC721,
-                collateralInfo._collateralAddress,
-                collateralInfo._amount,
-                collateralInfo._tokenId
-            );
-        } else if (collateralInfo._collateralType == CollateralType.ERC1155) {
-            bytes memory data;
-            IERC1155Upgradeable(collateralInfo._collateralAddress)
-                .safeTransferFrom(
-                    borrower,
-                    address(this),
-                    collateralInfo._tokenId,
-                    collateralInfo._amount,
-                    data
-                );
-            IERC1155Upgradeable(collateralInfo._collateralAddress)
-                .setApprovalForAll(escrowAddress, true);
-            collateralEscrow.depositAsset(
-                CollateralType.ERC1155,
-                collateralInfo._collateralAddress,
-                collateralInfo._amount,
-                collateralInfo._tokenId
-            );
-        } else {
-            revert("Unexpected collateral type");
-        }
-        emit CollateralDeposited(
-            _bidId,
-            collateralInfo._collateralType,
-            collateralInfo._collateralAddress,
-            collateralInfo._amount,
-            collateralInfo._tokenId
-        );
-    }*/
+  
 
     /**
      * @notice Withdraws collateral to a given receiver's address.
@@ -414,10 +320,10 @@ contract CollateralManagerV2 is OwnableUpgradeable, TokenStore, ICollateralManag
         for (uint256 i = 0; i < count; i += 1) {
             emit CollateralWithdrawn(
                 _bidId,
-                releasedTokens[i].collateralType,
-                releasedTokens[i].assetContract,
-                releasedTokens[i].totalAmount,
-                releasedTokens[i].tokenId,
+                releasedTokens[i]._collateralType,
+                releasedTokens[i]._collateralAddress,
+                releasedTokens[i]._amount,
+                releasedTokens[i]._tokenId,
                 _receiver
             );
         }
@@ -444,8 +350,8 @@ contract CollateralManagerV2 is OwnableUpgradeable, TokenStore, ICollateralManag
             "Cannot commit multiple collateral with the same address"
         );*/
         require(
-            _collateralInfo.collateralType != CollateralType.ERC721 ||
-                _collateralInfo.totalAmount == 1,
+            _collateralInfo._collateralType != CollateralType.ERC721 ||
+                _collateralInfo._amount == 1,
             "ERC721 collateral must have amount of 1"
         );
 
@@ -462,10 +368,10 @@ contract CollateralManagerV2 is OwnableUpgradeable, TokenStore, ICollateralManag
          
         emit CollateralCommitted(
             _bidId,
-            _collateralInfo.collateralType,
-            _collateralInfo.assetContract,
-            _collateralInfo.totalAmount,
-            _collateralInfo.tokenId
+            _collateralInfo._collateralType,
+            _collateralInfo._collateralAddress,
+            _collateralInfo._amount,
+            _collateralInfo._tokenId
         );
     }
 
@@ -508,25 +414,25 @@ contract CollateralManagerV2 is OwnableUpgradeable, TokenStore, ICollateralManag
         address _borrowerAddress,
         Collateral memory _collateralInfo
     ) internal virtual returns (bool) {
-        CollateralType collateralType = _collateralInfo.collateralType;
+        CollateralType collateralType = _collateralInfo._collateralType;
 
         if (collateralType == CollateralType.ERC20) {
             return
-                _collateralInfo.totalAmount <=
-                IERC20Upgradeable(_collateralInfo.assetContract).balanceOf(
+                _collateralInfo._amount <=
+                IERC20Upgradeable(_collateralInfo._collateralAddress).balanceOf(
                     _borrowerAddress
                 );
         } else if (collateralType == CollateralType.ERC721) {
             return
                 _borrowerAddress ==
-                IERC721Upgradeable(_collateralInfo.assetContract).ownerOf(
-                    _collateralInfo.tokenId
+                IERC721Upgradeable(_collateralInfo._collateralAddress).ownerOf(
+                    _collateralInfo._tokenId
                 );
         } else if (collateralType == CollateralType.ERC1155) {
             return
-                _collateralInfo.totalAmount <=
-                IERC1155Upgradeable(_collateralInfo.assetContract)
-                    .balanceOf(_borrowerAddress, _collateralInfo.tokenId);
+                _collateralInfo._amount <=
+                IERC1155Upgradeable(_collateralInfo._collateralAddress)
+                    .balanceOf(_borrowerAddress, _collateralInfo._tokenId);
         } else {
             return false;
         }

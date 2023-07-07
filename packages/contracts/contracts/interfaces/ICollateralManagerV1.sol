@@ -8,27 +8,9 @@ import {Collateral} from "../bundle/interfaces/ICollateralBundle.sol";
 import "./ICollateralManager.sol";
 
 interface ICollateralManagerV1 is ICollateralManager {
-    /**
-     * @notice Checks the validity of a borrower's collateral balance.
-     * @param _bidId The id of the associated bid.
-     * @param _collateralInfo Additional information about the collateral asset.
-     * @return validation_ Boolean indicating if the collateral balance was validated.
-     */
-    function commitCollateral(
-        uint256 _bidId,
-        Collateral[] calldata _collateralInfo
-    ) external returns (bool validation_);
 
-    /**
-     * @notice Checks the validity of a borrower's collateral balance and commits it to a bid.
-     * @param _bidId The id of the associated bid.
-     * @param _collateralInfo Additional information about the collateral asset.
-     * @return validation_ Boolean indicating if the collateral balance was validated.
-     */
-    function commitCollateral(
-        uint256 _bidId,
-        Collateral calldata _collateralInfo
-    ) external returns (bool validation_);
+
+    
 
     function checkBalances(
         address _borrowerAddress,
@@ -48,21 +30,7 @@ interface ICollateralManagerV1 is ICollateralManager {
      */
     function getEscrow(uint256 _bidId) external view returns (address);
 
-    /**
-     * @notice Gets the collateral info for a given bid id.
-     * @param _bidId The bidId to return the collateral info for.
-     * @return The stored collateral info.
-     */
-    function getCollateralInfo(uint256 _bidId)
-        external
-        view
-        returns (Collateral[] memory);
-
-    function getCollateralAmount(uint256 _bidId, address collateralAssetAddress)
-        external
-        view
-        returns (uint256 _amount);
-
+   
     
 
     /**

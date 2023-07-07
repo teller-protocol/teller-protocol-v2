@@ -536,10 +536,10 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         if (_collateralTokenType != CommitmentCollateralType.NONE) {
             collateralInfo = new Collateral[](1);
             collateralInfo[0] = Collateral({
-                collateralType: _getEscrowCollateralType(_collateralTokenType),
-                tokenId: _collateralTokenId,
-                totalAmount: _collateralAmount,
-                assetContract: _collateralTokenAddress
+                _collateralType: _getEscrowCollateralType(_collateralTokenType),
+                _tokenId: _collateralTokenId,
+                _amount: _collateralAmount,
+                _collateralAddress: _collateralTokenAddress
             });
         }
 

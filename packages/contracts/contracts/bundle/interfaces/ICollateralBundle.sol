@@ -28,10 +28,10 @@ pragma solidity ^0.8.0;
      *  
      */
     struct Collateral {
-        CollateralType collateralType;
-        uint256 totalAmount;
-        uint256 tokenId;
-        address assetContract;  
+        CollateralType _collateralType;
+        uint256 _amount;
+        uint256 _tokenId;
+        address _collateralAddress;  
        
     }
     

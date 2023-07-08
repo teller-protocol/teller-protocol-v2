@@ -203,7 +203,7 @@ contract TellerV2_bids_test is Testable {
     }
 
     function test_submit_bid_with_collateral() public {
-        tellerV2.setCollateralManagerSuper(address(collateralManagerMock));
+        tellerV2.setCollateralManagerV2Super(address(collateralManagerMock));
 
         Collateral[] memory collateral = new Collateral[](1);
 
@@ -259,7 +259,8 @@ contract TellerV2_bids_test is Testable {
     function test_submit_bid_reverts_when_collateral_invalid() public {
         Collateral[] memory collateral = new Collateral[](1);
 
-        tellerV2.setCollateralManagerSuper(address(collateralManagerMock));
+            //this is not working 
+        tellerV2.setCollateralManagerV2Super(address(collateralManagerMock));
 
         collateralManagerMock.forceSetCommitCollateralValidation(false);
 
@@ -362,6 +363,61 @@ contract TellerV2_bids_test is Testable {
 
     function test_lender_accept_bid() public {
         uint256 bidId = 1;
+       
+         tellerV2.mock_setBid(
+            bidId,
+            Bid({
+                borrower: address(borrower),
+                lender: address(lender),
+                receiver: address(receiver),
+                marketplaceId: marketplaceId,
+                _metadataURI: "0x1234",
+                loanDetails: LoanDetails({
+                    lendingToken: lendingToken,
+                    principal: 100,
+                    timestamp: 100,
+                    acceptedTimestamp: 100,
+                    lastRepaidTimestamp: 100,
+                    loanDuration: 5000,
+                    totalRepaid: Payment({ principal: 100, interest: 5 })
+                }),
+                terms: Terms({
+                    paymentCycleAmount: 10,
+                    paymentCycle: 2000,
+                    APR: 10
+                }),
+                state: BidState.PENDING,
+                paymentType: PaymentType.EMI,
+                collateralManager: address(0)
+            })
+         );
+
+
+        tellerV2.mock_initialize(); //set address this as owner
+
+        lendingToken.approve(address(tellerV2), 1e20);
+
+        //make address (this) be the one that makes the payment
+        tellerV2.setMockMsgSenderForMarket(address(this));
+
+        tellerV2.mock_setBidState(bidId, BidState.PENDING);
+
+        tellerV2.setMarketRegistrySuper(address(marketRegistryMock));
+        marketRegistryMock.setMarketFeeRecipient(address(feeRecipient));
+
+        tellerV2.setCollateralManagerV1Super(address(collateralManagerMock));
+
+        tellerV2.lenderAcceptBid(bidId);
+
+        assertTrue(
+            collateralManagerMock.deployAndDepositWasCalled(),
+            "deploy and deposit was not called"
+        );
+    }
+
+
+    function test_lender_accept_bid_v2CollateralManager() public {
+        uint256 bidId = 1;
         setMockBid(bidId);
 
         tellerV2.mock_initialize(); //set address this as owner
@@ -376,13 +432,13 @@ contract TellerV2_bids_test is Testable {
         tellerV2.setMarketRegistrySuper(address(marketRegistryMock));
         marketRegistryMock.setMarketFeeRecipient(address(feeRecipient));
 
-        tellerV2.setCollateralManagerSuper(address(collateralManagerMock));
+        tellerV2.setCollateralManagerV2Super(address(collateralManagerMock));
 
         tellerV2.lenderAcceptBid(bidId);
 
         assertTrue(
-            collateralManagerMock.deployAndDepositWasCalled(),
-            "deploy and deposit was not called"
+            collateralManagerMock.depositWasCalled(),
+            "deposit was not called"
         );
     }
 

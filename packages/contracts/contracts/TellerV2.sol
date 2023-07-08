@@ -13,6 +13,8 @@ import "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol";
 
 import "./interfaces/ICollateralManager.sol";
 
+
+
 // Interfaces
 import "./interfaces/IMarketRegistry.sol";
 import "./interfaces/IReputationManager.sol";
@@ -27,6 +29,10 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./libraries/NumbersLib.sol";
 
 import { V2Calculations, PaymentCycleType } from "./libraries/V2Calculations.sol";
+
+
+
+import "lib/forge-std/src/console.sol";
 
 /* Errors */
 /**
@@ -351,7 +357,7 @@ contract TellerV2 is
             _metadataURI,
             _receiver
         );
-
+       
         bool validation = collateralManagerV2.commitCollateral(
             bidId_,
             _collateralInfo

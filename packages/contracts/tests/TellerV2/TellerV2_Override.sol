@@ -6,7 +6,12 @@ import { TellerV2, Bid, BidState, Collateral, Payment, LoanDetails, Terms } from
 import "../../contracts/interfaces/IMarketRegistry.sol";
 import "../../contracts/interfaces/IReputationManager.sol";
 import "../../contracts/interfaces/ICollateralManager.sol";
+import "../../contracts/interfaces/ICollateralManagerV1.sol";
+import "../../contracts/interfaces/ICollateralManagerV2.sol";
 import "../../contracts/interfaces/ILenderManager.sol";
+
+
+import "lib/forge-std/src/console.sol";
 
 contract TellerV2_Override is TellerV2 {
     bool public submitBidWasCalled;
@@ -43,6 +48,18 @@ contract TellerV2_Override is TellerV2 {
 
     function setCollateralManagerSuper(address _collateralManager) public {
         collateralManagerMock = address(_collateralManager);
+        
+    }
+
+     function setCollateralManagerV1Super(address _collateralManager) public {
+         
+        collateralManagerV1 = ICollateralManagerV1(_collateralManager);
+    }
+
+    //used for submit bid 
+     function setCollateralManagerV2Super(address _collateralManager) public {
+         
+        collateralManagerV2 = ICollateralManagerV2(_collateralManager);
     }
 
      function getCollateralManagerForBid(uint256 _bidId)
@@ -152,6 +169,18 @@ contract TellerV2_Override is TellerV2 {
     Overrides 
 
     */
+
+    function _getCollateralManagerForBid(uint256 _bidId)
+        internal
+        view  
+        override      
+        returns (ICollateralManager)
+    {   
+        
+        return ICollateralManager(collateralManagerMock);
+    }
+
+
 
     function _msgSenderForMarket(uint256 _marketId)
         internal

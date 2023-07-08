@@ -5,8 +5,7 @@ import { Testable } from "./Testable.sol";
 
 import { CollateralEscrowV1 } from "../contracts/escrow/CollateralEscrowV1.sol";
 import "../contracts/mock/WethMock.sol";
-import "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
-import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
+ 
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
@@ -30,9 +29,7 @@ contract CollateralManagerV2_Test is Testable {
     TestERC1155Token erc1155Mock;
 
     TellerV2_Mock tellerV2Mock;
-
-    CollateralEscrowV1_Mock escrowImplementation =
-        new CollateralEscrowV1_Mock();
+ 
 
     event CollateralCommitted(
         uint256 _bidId,
@@ -59,10 +56,7 @@ contract CollateralManagerV2_Test is Testable {
     );
 
     function setUp() public {
-        // Deploy beacon contract with implementation
-        UpgradeableBeacon escrowBeacon = new UpgradeableBeacon(
-            address(escrowImplementation)
-        );
+        
 
         wethMock = new TestERC20Token("wrappedETH", "WETH", 1e24, 18);
         erc721Mock = new TestERC721Token("ERC721", "ERC721");
@@ -78,53 +72,26 @@ contract CollateralManagerV2_Test is Testable {
 
         collateralManager = new CollateralManagerV2_Override();
 
-        collateralManager.initialize(
-            address(escrowBeacon),
+        collateralManager.initialize( 
             address(tellerV2Mock)
         );
     }
 
     function test_initialize_valid() public {
-        UpgradeableBeacon eBeacon = new UpgradeableBeacon(
-            address(escrowImplementation)
-        );
+        
 
         CollateralManagerV2_Override tempCManager = new CollateralManagerV2_Override();
-        tempCManager.initialize(address(eBeacon), address(tellerV2Mock));
+        tempCManager.initialize( address(tellerV2Mock));
 
         address managerTellerV2 = address(tempCManager.tellerV2());
         assertEq(
             managerTellerV2,
             address(tellerV2Mock),
-            "CollateralManager was not initialized"
+            "CollateralManagerV2 was not initialized"
         );
     }
-
-    function test_setCollateralEscrowBeacon() public {
-        // Deploy implementation
-        CollateralEscrowV1 escrowImplementation = new CollateralEscrowV1_Mock();
-        // Deploy beacon contract with implementation
-        UpgradeableBeacon escrowBeacon = new UpgradeableBeacon(
-            address(escrowImplementation)
-        );
-
-        collateralManager.setCollateralEscrowBeacon(address(escrowBeacon));
-
-        //how to test ?
-    }
-
-    function test_setCollateralEscrowBeacon_invalid_twice() public {
-        CollateralEscrowV1 escrowImplementation = new CollateralEscrowV1_Mock();
-        // Deploy beacon contract with implementation
-        UpgradeableBeacon escrowBeacon = new UpgradeableBeacon(
-            address(escrowImplementation)
-        );
-        collateralManager.setCollateralEscrowBeacon(address(escrowBeacon));
-
-        vm.expectRevert("Initializable: contract is already initialized");
-        collateralManager.setCollateralEscrowBeacon(address(escrowBeacon));
-        //
-    }
+ 
+ 
 
     function test_deposit() public {
         uint256 bidId = 0;
@@ -146,9 +113,7 @@ contract CollateralManagerV2_Test is Testable {
 
         tellerV2Mock.setBorrower(address(borrower));
 
-        collateralManager.setGlobalEscrowProxyAddress(
-            address(escrowImplementation)
-        );
+        
 
         vm.expectEmit(false, false, false, false);
         emit CollateralDeposited(
@@ -181,10 +146,7 @@ contract CollateralManagerV2_Test is Testable {
 
         tellerV2Mock.setBorrower(address(borrower));
 
-        collateralManager.setGlobalEscrowProxyAddress(
-            address(escrowImplementation)
-        );
-
+     
         vm.expectRevert("Collateral not validated");
         collateralManager._depositSuper(bidId, collateral);
     }
@@ -209,9 +171,7 @@ contract CollateralManagerV2_Test is Testable {
 
         tellerV2Mock.setBorrower(address(borrower));
 
-        collateralManager.setGlobalEscrowProxyAddress(
-            address(escrowImplementation)
-        );
+      
 
         vm.expectEmit(false, false, false, false);
         emit CollateralDeposited(
@@ -225,7 +185,7 @@ contract CollateralManagerV2_Test is Testable {
         collateralManager._depositSuper(bidId, collateral);
 
         assertEq(
-            escrowImplementation.depositAssetWasCalled(),
+            collateralManager.depositWasCalled(),
             true,
             "deposit token was not called"
         );
@@ -249,9 +209,7 @@ contract CollateralManagerV2_Test is Testable {
 
         tellerV2Mock.setBorrower(address(borrower));
 
-        collateralManager.setGlobalEscrowProxyAddress(
-            address(escrowImplementation)
-        );
+    
 
         vm.expectEmit(false, false, false, false);
         emit CollateralDeposited(
@@ -265,7 +223,7 @@ contract CollateralManagerV2_Test is Testable {
         collateralManager._depositSuper(bidId, collateral);
 
         assertEq(
-            escrowImplementation.depositAssetWasCalled(),
+            collateralManager.depositWasCalled(),
             true,
             "deposit asset was not called"
         );
@@ -289,9 +247,7 @@ contract CollateralManagerV2_Test is Testable {
 
         tellerV2Mock.setBorrower(address(borrower));
 
-        collateralManager.setGlobalEscrowProxyAddress(
-            address(escrowImplementation)
-        );
+      
 
         vm.expectRevert("Collateral not validated");
         vm.prank(address(borrower));
@@ -316,9 +272,7 @@ contract CollateralManagerV2_Test is Testable {
 
         tellerV2Mock.setBorrower(address(borrower));
 
-        collateralManager.setGlobalEscrowProxyAddress(
-            address(escrowImplementation)
-        );
+      
 
         vm.expectEmit(false, false, false, false);
         emit CollateralDeposited(
@@ -332,7 +286,7 @@ contract CollateralManagerV2_Test is Testable {
         collateralManager._depositSuper(bidId, collateral);
 
         assertEq(
-            escrowImplementation.depositAssetWasCalled(),
+            collateralManager.depositWasCalled(),
             true,
             "deposit asset was not called"
         );
@@ -354,49 +308,22 @@ contract CollateralManagerV2_Test is Testable {
 
         tellerV2Mock.setBorrower(address(borrower));
 
-        collateralManager.setGlobalEscrowProxyAddress(
-            address(escrowImplementation)
-        );
+       
 
         vm.expectRevert("Collateral not validated");
         vm.prank(address(borrower));
         collateralManager._depositSuper(bidId, collateral);
     }
 
-    /*function test_deposit_invalid_bid() public  {
-        uint256 bidId = 0 ;
-        uint256 amount = 1000;
-        wethMock.transfer(address(borrower), amount);
-        wethMock.approve(address(collateralManager), amount);
+   
 
-        //borrower.approveERC20( address(wethMock), address(collateralManager), amount  );
-    
-
-        Collateral memory collateral = Collateral({
-            _collateralType: CollateralType.ERC20,
-            _amount: amount,
-            _tokenId: 0, 
-            _collateralAddress: address(wethMock)
-        });
-
-
-        tellerV2Mock.setBorrower(address(borrower));
-
-        vm.expectRevert("Bid does not exist");
-        vm.prank(address(borrower));
-        collateralManager._depositSuper(bidId, collateral);
-
-       
-         
-    }*/
-
-    function test_deployAndDeposit_invalid_sender() public {
+    function test_deposit_invalid_sender() public {
         vm.prank(address(lender));
         vm.expectRevert("Sender not authorized");
-        collateralManager.deployAndDeposit(0);
+        collateralManager.depositCollateral(0);
     }
 
-    function test_deployAndDeposit_not_backed() public {
+    function test_deposit_not_backed() public {
         uint256 bidId = 0;
         uint256 amount = 1000;
         wethMock.transfer(address(borrower), amount);
@@ -414,15 +341,12 @@ contract CollateralManagerV2_Test is Testable {
         tellerV2Mock.setBorrower(address(borrower));
 
         vm.prank(address(tellerV2Mock));
-        collateralManager.deployAndDeposit(bidId);
+        collateralManager.depositCollateral(bidId);
 
-        assertFalse(
-            collateralManager.deployEscrowInternalWasCalled(),
-            "deploy escrow internal was called"
-        );
+        
     }
 
-    function test_deployAndDeposit_backed() public {
+    function test_deposit_backed() public {
         uint256 bidId = 0;
         uint256 amount = 1000;
         wethMock.transfer(address(borrower), amount);
@@ -442,12 +366,8 @@ contract CollateralManagerV2_Test is Testable {
         collateralManager.setBidsCollateralBackedGlobally(true);
 
         vm.prank(address(tellerV2Mock));
-        collateralManager.deployAndDeposit(bidId);
-
-        assertTrue(
-            collateralManager.deployEscrowInternalWasCalled(),
-            "deploy escrow internal was not called"
-        );
+        collateralManager.depositCollateral(bidId);
+ 
 
         assertTrue(
             collateralManager.depositInternalWasCalled(),
@@ -455,7 +375,7 @@ contract CollateralManagerV2_Test is Testable {
         );
     }
 
-    function test_deployAndDeposit_backed_empty_array() public {
+    function test_deposit_backed_empty_array() public {
         uint256 bidId = 0;
         uint256 amount = 1000;
         wethMock.transfer(address(borrower), amount);
@@ -473,12 +393,9 @@ contract CollateralManagerV2_Test is Testable {
         collateralManager.setBidsCollateralBackedGlobally(true);
 
         vm.prank(address(tellerV2Mock));
-        collateralManager.deployAndDeposit(bidId);
+        collateralManager.depositCollateral(bidId);
 
-        assertTrue(
-            collateralManager.deployEscrowInternalWasCalled(),
-            "deploy escrow internal was called"
-        );
+      
         assertFalse(
             collateralManager.depositInternalWasCalled(),
             "deposit internal was called"
@@ -487,7 +404,7 @@ contract CollateralManagerV2_Test is Testable {
 
     function test_initialize_again() public {
         vm.expectRevert("Initializable: contract is already initialized");
-        collateralManager.initialize(address(0), address(0));
+        collateralManager.initialize( address(0));
     }
 
     function test_withdraw_external_invalid_bid_state() public {
@@ -611,7 +528,7 @@ contract CollateralManagerV2_Test is Testable {
         uint256 bidId = 0;
         address recipient = address(borrower);
 
-        wethMock.transfer(address(escrowImplementation), 1000);
+        //wethMock.transfer(address(escrowImplementation), 1000);
 
         Collateral memory collateralInfo = Collateral({
             _collateralType: CollateralType.ERC721,
@@ -632,7 +549,7 @@ contract CollateralManagerV2_Test is Testable {
         uint256 bidId = 0;
         address recipient = address(borrower);
 
-        wethMock.transfer(address(escrowImplementation), 1000);
+        //wethMock.transfer(address(escrowImplementation), 1000);
 
         Collateral memory collateralInfo = Collateral({
             _collateralType: CollateralType.ERC721,
@@ -649,7 +566,7 @@ contract CollateralManagerV2_Test is Testable {
         uint256 bidId = 0;
         address recipient = address(borrower);
 
-        wethMock.transfer(address(escrowImplementation), 1000);
+        //wethMock.transfer(address(escrowImplementation), 1000);
 
         Collateral memory collateralInfo = Collateral({
             _collateralType: CollateralType.ERC20,
@@ -660,14 +577,11 @@ contract CollateralManagerV2_Test is Testable {
 
         collateralManager._commitCollateralSuper(bidId, collateralInfo);
 
-        collateralManager.forceSetEscrowAddress(
-            bidId,
-            address(escrowImplementation)
-        );
+       
         collateralManager._withdrawSuper(bidId, recipient);
 
         assertTrue(
-            escrowImplementation.withdrawWasCalled(),
+            collateralManager.withdrawWasCalled(),
             "withdraw was not called on escrow imp"
         );
     }
@@ -676,18 +590,15 @@ contract CollateralManagerV2_Test is Testable {
         uint256 bidId = 0;
         address recipient = address(borrower);
 
-        wethMock.transfer(address(escrowImplementation), 1000);
+        //wethMock.transfer(address(escrowImplementation), 1000);
 
-        collateralManager.forceSetEscrowAddress(
-            bidId,
-            address(escrowImplementation)
-        );
+        
         collateralManager._withdrawSuper(bidId, recipient);
 
-        assertFalse(
+       /* assertFalse(
             escrowImplementation.withdrawWasCalled(),
             "withdraw was not called on escrow imp"
-        );
+        );*/
     }
 
     /*
@@ -765,43 +676,7 @@ contract CollateralManagerV2_Test is Testable {
 
         assertTrue(escrow == address(0), "escrow is not correct");
     }
-
-    function test_deployEscrow_internal() public {
-        uint256 bidId = 0;
-
-        tellerV2Mock.setBorrower(address(borrower));
-
-        //use the mock escrow imp
-        collateralManager.setGlobalEscrowProxyAddress(address(0));
-
-        (address proxy, address borrower) = collateralManager
-            ._deployEscrowSuper(bidId);
-
-        assertTrue(proxy != address(0), "proxy was not depoloyed");
-    }
-
-    function test_deployEscrow_internal_nonexisting_bid() public {
-        uint256 bidId = 0;
-
-        vm.expectRevert("Bid does not exist");
-        (address proxy, address borrower) = collateralManager
-            ._deployEscrowSuper(bidId);
-    }
-
-    function test_deployEscrow_internal_proxy_already_deployed() public {
-        uint256 bidId = 0;
-
-        tellerV2Mock.setBorrower(address(borrower));
-
-        //use the mock escrow imp
-        collateralManager.setGlobalEscrowProxyAddress(
-            address(escrowImplementation)
-        );
-
-        (address proxy, address borrower) = collateralManager
-            ._deployEscrowSuper(bidId);
-    }
-
+   
     function test_isBidCollateralBacked_empty() public {
         uint256 bidId = 0;
 

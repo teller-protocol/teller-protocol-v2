@@ -159,7 +159,7 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
         override
         returns (ICollateralManager)
     {
-        console.log("get coll");
+      
         return _getCollateralManagerForBid(_bidId);
     }
 
@@ -168,7 +168,7 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
         view
         returns (ICollateralManager)
     {
-        console.log("get coll 2");
+        
         return ICollateralManager(collateralManagerMock);
     }
 

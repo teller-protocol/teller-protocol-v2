@@ -27,7 +27,8 @@ contract CollateralManagerV2_Override is CollateralManagerV2 {
     bool bidsCollateralBackedGlobally;
     bool public checkBalanceGlobalValid = true;
  
-    bool public depositInternalWasCalled;
+    bool public depositWasCalled;
+    bool public withdrawWasCalled;
 
     //force adds collateral info for a bid even if it doesnt exist (for testing)
     function commitCollateralSuper(
@@ -81,18 +82,8 @@ contract CollateralManagerV2_Override is CollateralManagerV2 {
     function setBidsCollateralBackedGlobally(bool _backed) public {
         bidsCollateralBackedGlobally = _backed;
     }
-
-    function _deployEscrowSuper(uint256 _bidId)
-        public
-        returns (address proxyAddress_, address borrower_)
-    {
-        return super._deployEscrow(_bidId);
-    }
-
-    function forceSetEscrowAddress(uint256 bidId, address _address) public {
-        _escrows[bidId] = _address;
-    }
-
+ 
+ 
     function setCheckBalanceGlobalValid(bool _valid) public {
         checkBalanceGlobalValid = _valid;
     }
@@ -122,9 +113,9 @@ contract CollateralManagerV2_Override is CollateralManagerV2 {
 
     function _deposit(uint256 _bidId, Collateral memory collateralInfo)
         internal
-        override
+        
     {
-        depositInternalWasCalled = true;
+        depositWasCalled = true;
     }
 
     function _checkBalance(
@@ -136,24 +127,12 @@ contract CollateralManagerV2_Override is CollateralManagerV2 {
         return checkBalanceGlobalValid;
     }
 
-    //for mock purposes
-    function setGlobalEscrowProxyAddress(address _address) public {
-        globalEscrowProxyAddress = _address;
-    }
-
-    function _deployEscrow(uint256 _bidId)
-        internal
-        override
-        returns (address proxyAddress_, address borrower_)
-    {
-        proxyAddress_ = globalEscrowProxyAddress;
-        borrower_ = tellerV2.getLoanBorrower(_bidId);
-
-        deployEscrowInternalWasCalled = true;
-    }
+   
+   
 
     function _withdraw(uint256 _bidId, address recipient) internal override {
         withdrawInternalWasCalledToRecipient = recipient;
+        withdrawWasCalled = true;
     }
 
     function _commitCollateral(

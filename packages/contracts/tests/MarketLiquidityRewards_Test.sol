@@ -22,6 +22,9 @@ import "../contracts/MarketLiquidityRewards.sol";
 
 import "../contracts/mock/TellerV2SolMock.sol";
 
+
+import "lib/forge-std/src/console.sol";
+
 contract MarketLiquidityRewards_Test is Testable {
     MarketLiquidityUser private marketOwner;
     MarketLiquidityUser private lender;
@@ -65,6 +68,7 @@ contract MarketLiquidityRewards_Test is Testable {
     }
 
     function setUp() public {
+        
         tellerV2Mock = new TellerV2SolMock();
 
         marketRegistryMock = new MarketRegistryMock();
@@ -73,6 +77,7 @@ contract MarketLiquidityRewards_Test is Testable {
 
         tellerV2Mock.setMarketRegistry(address(marketRegistryMock));
 
+    
         marketLiquidityRewards = new MarketLiquidityRewards_Override(
             address(tellerV2Mock),
             address(marketRegistryMock) 
@@ -92,6 +97,8 @@ contract MarketLiquidityRewards_Test is Testable {
             address(marketLiquidityRewards)
         );
 
+   
+
         marketRegistryMock.setMarketOwner(address(marketOwner));
 
         //tokenAddress = address(0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174);
@@ -100,17 +107,18 @@ contract MarketLiquidityRewards_Test is Testable {
         maxLoanDuration = 2480000;
         minInterestRate = 3000;
         expiration = uint32(block.timestamp) + uint32(64000);
-
-        //failing
+ 
+   
         marketOwner.setTrustedMarketForwarder(
             marketId,
             address(marketLiquidityRewards)
         );
+           
         lender.approveMarketForwarder(
             marketId,
             address(marketLiquidityRewards)
         );
-
+   
         borrowersArray = new address[](1);
         borrowersArray[0] = address(borrower);
 
@@ -134,7 +142,7 @@ contract MarketLiquidityRewards_Test is Testable {
             100000,
             collateralTokenDecimals
         );
-
+           
         IERC20Upgradeable(address(rewardToken)).transfer(
             address(lender),
             10000
@@ -146,21 +154,9 @@ contract MarketLiquidityRewards_Test is Testable {
         );
 
         vm.warp(startTime + 100);
-        //delete allocationCount;
-
-        /*  verifyLoanStartTimeWasCalled = false;
         
-
-        verifyRewardRecipientWasCalled = false;
-        verifyCollateralAmountWasCalled = false;*/
     }
-
-    /*
-FNDA:0,MarketLiquidityRewards.initialize
-FNDA:0,MarketLiquidityRewards.updateAllocation
-FNDA:0,MarketLiquidityRewards._verifyCollateralAmount
-
-    */
+ 
 
     function _setAllocation(uint256 _allocationId, uint256 rewardTokenAmount)
         internal
@@ -262,6 +258,9 @@ FNDA:0,MarketLiquidityRewards._verifyCollateralAmount
     }
 
     function test_claimRewards() public {
+
+         console.log ( "cr 1 ");
+
         Bid memory mockBid;
 
         mockBid.borrower = address(borrower);
@@ -279,12 +278,14 @@ FNDA:0,MarketLiquidityRewards._verifyCollateralAmount
         uint256 allocationId = 0;
         uint256 bidId = 0;
 
+ 
+
+        tellerV2Mock.setCollateralManagerSuper(address(collateralManagerMock));
         tellerV2Mock.setMockBid(bidId,mockBid); 
 
         _setAllocation(allocationId, 4000);
 
-        tellerV2Mock.setCollateralManagerSuper(address(collateralManagerMock));
-
+       
         vm.prank(address(borrower));
         marketLiquidityRewards.claimRewards(allocationId, bidId);
 
@@ -327,7 +328,7 @@ FNDA:0,MarketLiquidityRewards._verifyCollateralAmount
 
         uint256 allocationId = 0;
         uint256 bidId = 0;
-
+        tellerV2Mock.setCollateralManagerSuper(address(collateralManagerMock));
         tellerV2Mock.setMockBid(bidId,mockBid);
 
 
@@ -356,7 +357,7 @@ FNDA:0,MarketLiquidityRewards._verifyCollateralAmount
         uint256 allocationId = 0;
         uint256 bidId = 0;
 
-
+        tellerV2Mock.setCollateralManagerSuper(address(collateralManagerMock));
         tellerV2Mock.setMockBid(bidId,mockBid);
 
         MarketLiquidityRewards.RewardAllocation
@@ -428,6 +429,7 @@ FNDA:0,MarketLiquidityRewards._verifyCollateralAmount
         uint256 allocationId = 0;
         uint256 bidId = 0;
 
+        tellerV2Mock.setCollateralManagerSuper(address(collateralManagerMock));
         tellerV2Mock.setMockBid(bidId,mockBid);
 
 
@@ -609,9 +611,9 @@ contract MarketLiquidityUser is User {
         liquidityRewards.deallocateRewards(_allocationId, _amount);
     }
 
-    function _claimRewards(uint256 _allocationId, uint256 _bidId) public {
+  /*  function _claimRewards(uint256 _allocationId, uint256 _bidId) public {
         return liquidityRewards.claimRewards(_allocationId, _bidId);
-    }
+    }*/
 
     function _approveERC20Token(address tokenAddress, address guy, uint256 wad)
         public

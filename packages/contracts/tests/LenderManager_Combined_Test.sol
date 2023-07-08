@@ -16,7 +16,7 @@ import { User } from "./Test_Helpers.sol";
 
 import { TellerV2Context } from "../contracts/TellerV2Context.sol";
 
-contract LenderManager_Test is Testable, LenderManager {
+contract LenderManager_Combined_Test is Testable, LenderManager {
     LenderManagerUser private marketOwner;
     LenderManagerUser private lender;
     LenderManagerUser private borrower;

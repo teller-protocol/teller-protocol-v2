@@ -30,9 +30,7 @@ import "./libraries/NumbersLib.sol";
 
 import { V2Calculations, PaymentCycleType } from "./libraries/V2Calculations.sol";
 
-
-
-import "lib/forge-std/src/console.sol";
+ 
 
 /* Errors */
 /**

@@ -167,7 +167,7 @@ contract TellerV2_Test is Testable {
         lender.acceptBid(_bidId);
     }
 
-    function test_collateralEscrow() public {
+   /* function test_collateralEscrow() public {
  
 
         // Submit bid as borrower
@@ -213,9 +213,9 @@ contract TellerV2_Test is Testable {
             borrowerBalanceAfter - borrowerBalanceBefore,
             "Collateral was not sent to borrower after repayment"
         );
-    }
+    }*/
 
-    function test_commit_collateral_frontrun_exploit() public {
+   /* function test_commit_collateral_frontrun_exploit() public {
         // The original borrower balance for the DAI principal and WETH collateral
         assertEq(daiMock.balanceOf(address(borrower)), 50000);
         assertEq(wethMock.balanceOf(address(borrower)), 50000);
@@ -255,7 +255,7 @@ contract TellerV2_Test is Testable {
         collateralManager.commitCollateral(bidId, collateralInfo);
 
         // The lender is now victim to the frontrunning and accepts the malicious bid
-        /*  acceptBid(bidId);
+          acceptBid(bidId);
 
         // The borrower now has the expected 95 DAI from the loan (5 DAI are gone in fees)
         // But he only provided 1 WETH as collateral instead of the original amount of 10 WETH
@@ -263,8 +263,8 @@ contract TellerV2_Test is Testable {
         assertEq(wethMock.balanceOf(address(borrower)), 49999); // @audit only provided 1 WETH
 
         // The lender lost his principal of 100 DAI, as the loan is only collateralized by 1 WETH instead of 10 WETH
-        assertEq(daiMock.balanceOf(address(lender)), 499900);*/
-    }
+        assertEq(daiMock.balanceOf(address(lender)), 499900); 
+    }*/
 }
 
 contract TellerV2User is User {

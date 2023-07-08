@@ -1,7 +1,7 @@
 pragma solidity ^0.8.0;
 
 // SPDX-License-Identifier: MIT
-import  {Collateral,CollateralType } from "../bundle/interfaces/ICollateralBundle.sol";
+import { Collateral, CollateralType } from "../bundle/interfaces/ICollateralBundle.sol";
 
 import "../interfaces/ICollateralManager.sol";
 
@@ -40,8 +40,7 @@ contract CollateralManagerMock is ICollateralManager {
         deployAndDepositWasCalled = true;
     }
 
-
-        /**
+    /**
      * @notice Deploys a new collateral escrow.
      * @param _bidId The associated bidId of the collateral escrow.
      */

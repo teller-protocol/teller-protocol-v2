@@ -6,7 +6,6 @@ pragma solidity ^0.8.0;
 // Helper interfaces
 import { IWETH } from "../../interfaces/IWETH.sol";
 
- 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
@@ -14,7 +13,8 @@ library CurrencyTransferLib {
     using SafeERC20 for IERC20;
 
     /// @dev The address interpreted as native token of the chain.
-    address public constant NATIVE_TOKEN = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
+    address public constant NATIVE_TOKEN =
+        0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
 
     /// @dev Transfers a given amount of currency.
     function transferCurrency(
@@ -50,13 +50,21 @@ library CurrencyTransferLib {
             if (_from == address(this)) {
                 // withdraw from weth then transfer withdrawn native token to recipient
                 IWETH(_nativeTokenWrapper).withdraw(_amount);
-                safeTransferNativeTokenWithWrapper(_to, _amount, _nativeTokenWrapper);
+                safeTransferNativeTokenWithWrapper(
+                    _to,
+                    _amount,
+                    _nativeTokenWrapper
+                );
             } else if (_to == address(this)) {
                 // store native currency in weth
                 require(_amount == msg.value, "msg.value != amount");
                 IWETH(_nativeTokenWrapper).deposit{ value: _amount }();
             } else {
-                safeTransferNativeTokenWithWrapper(_to, _amount, _nativeTokenWrapper);
+                safeTransferNativeTokenWithWrapper(
+                    _to,
+                    _amount,
+                    _nativeTokenWrapper
+                );
             }
         } else {
             safeTransferERC20(_currency, _from, _to, _amount);

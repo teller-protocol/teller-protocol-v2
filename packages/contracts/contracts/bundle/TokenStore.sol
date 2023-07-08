@@ -10,10 +10,10 @@ import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
 
 import "@openzeppelin/contracts-upgradeable/token/ERC721/utils/ERC721HolderUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC1155/utils/ERC1155HolderUpgradeable.sol";
- 
+
 //  ==========  Internal imports    ==========
 
-import { Collateral,CollateralType } from "./interfaces/ICollateralBundle.sol";
+import { Collateral, CollateralType } from "./interfaces/ICollateralBundle.sol";
 import { TokenBundle, ICollateralBundle } from "./TokenBundle.sol";
 import "./lib/CurrencyTransferLib.sol";
 
@@ -24,7 +24,11 @@ import "./lib/CurrencyTransferLib.sol";
  *  @dev     See {CurrencyTransferLib}
  */
 
-contract TokenStore is TokenBundle, ERC721HolderUpgradeable, ERC1155HolderUpgradeable {
+contract TokenStore is
+    TokenBundle,
+    ERC721HolderUpgradeable,
+    ERC1155HolderUpgradeable
+{
     /// @dev The address of the native token wrapper contract.
     /*address internal immutable nativeTokenWrapper;
 
@@ -45,7 +49,10 @@ contract TokenStore is TokenBundle, ERC721HolderUpgradeable, ERC1155HolderUpgrad
     }
 
     /// @dev Release stored / escrowed ERC1155, ERC721, ERC20 tokens.
-    function _releaseTokens(address _recipient, uint256 _bundleId) internal returns ( uint256, Collateral[] memory ) {
+    function _releaseTokens(address _recipient, uint256 _bundleId)
+        internal
+        returns (uint256, Collateral[] memory)
+    {
         uint256 count = getTokenCountOfBundle(_bundleId);
         Collateral[] memory tokensToRelease = new Collateral[](count);
 
@@ -57,7 +64,7 @@ contract TokenStore is TokenBundle, ERC721HolderUpgradeable, ERC1155HolderUpgrad
 
         _transferTokenBatch(address(this), _recipient, tokensToRelease);
 
-        return (count,tokensToRelease);
+        return (count, tokensToRelease);
     }
 
     /// @dev Transfers an arbitrary ERC20 / ERC721 / ERC1155 token.
@@ -74,9 +81,19 @@ contract TokenStore is TokenBundle, ERC721HolderUpgradeable, ERC1155HolderUpgrad
                 _token._amount
             );
         } else if (_token._collateralType == CollateralType.ERC721) {
-            IERC721(_token._collateralAddress).safeTransferFrom(_from, _to, _token._tokenId);
+            IERC721(_token._collateralAddress).safeTransferFrom(
+                _from,
+                _to,
+                _token._tokenId
+            );
         } else if (_token._collateralType == CollateralType.ERC1155) {
-            IERC1155(_token._collateralAddress).safeTransferFrom(_from, _to, _token._tokenId, _token._amount, "");
+            IERC1155(_token._collateralAddress).safeTransferFrom(
+                _from,
+                _to,
+                _token._tokenId,
+                _token._amount,
+                ""
+            );
         }
     }
 
@@ -86,11 +103,14 @@ contract TokenStore is TokenBundle, ERC721HolderUpgradeable, ERC1155HolderUpgrad
         address _to,
         Collateral[] memory _tokens
     ) internal {
-
-        //make sure this cannot cause issues 
+        //make sure this cannot cause issues
         uint256 nativeTokenValue;
         for (uint256 i = 0; i < _tokens.length; i += 1) {
-            if (_tokens[i]._collateralAddress == CurrencyTransferLib.NATIVE_TOKEN && _to == address(this)) {
+            if (
+                _tokens[i]._collateralAddress ==
+                CurrencyTransferLib.NATIVE_TOKEN &&
+                _to == address(this)
+            ) {
                 nativeTokenValue += _tokens[i]._amount;
             } else {
                 _transferToken(_from, _to, _tokens[i]);
@@ -106,4 +126,4 @@ contract TokenStore is TokenBundle, ERC721HolderUpgradeable, ERC1155HolderUpgrad
             _transferToken(_from, _to, _nativeToken);
         }
     }
-} 
+}

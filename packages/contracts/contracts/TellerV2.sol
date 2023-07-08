@@ -10,10 +10,7 @@ import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol";
 
-
 import "./interfaces/ICollateralManager.sol";
-
-
 
 // Interfaces
 import "./interfaces/IMarketRegistry.sol";
@@ -29,8 +26,6 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./libraries/NumbersLib.sol";
 
 import { V2Calculations, PaymentCycleType } from "./libraries/V2Calculations.sol";
-
- 
 
 /* Errors */
 /**
@@ -189,7 +184,7 @@ contract TellerV2 is
         address _marketRegistry,
         address _reputationManager,
         address _lenderCommitmentForwarder,
-       // address _collateralManagerV1,
+        // address _collateralManagerV1,
         address _lenderManager,
         address _escrowVault,
         address _collateralManagerV2
@@ -216,11 +211,11 @@ contract TellerV2 is
         );
         reputationManager = IReputationManager(_reputationManager);
 
-      /*  require(
+        /*  require(
             _collateralManager.isContract(),
             "CollateralManager must be a contract"
         );*/
-      //  collateralManagerV1 = ICollateralManager(_collateralManagerV1);
+        //  collateralManagerV1 = ICollateralManager(_collateralManagerV1);
 
         _setLenderManager(_lenderManager);
         _setEscrowVault(_escrowVault);
@@ -235,7 +230,7 @@ contract TellerV2 is
         _setEscrowVault(_escrowVault);
     }*/
 
-     function setCollateralManagerV2(address _collateralManagerV2)
+    function setCollateralManagerV2(address _collateralManagerV2)
         external
         reinitializer(10)
         onlyOwner
@@ -259,8 +254,14 @@ contract TellerV2 is
         escrowVault = IEscrowVault(_escrowVault);
     }
 
-      function _setCollateralManagerV2(address _collateralManagerV2) internal onlyInitializing {
-        require(_collateralManagerV2.isContract(), "CollateralManagerV2 must be a contract");
+    function _setCollateralManagerV2(address _collateralManagerV2)
+        internal
+        onlyInitializing
+    {
+        require(
+            _collateralManagerV2.isContract(),
+            "CollateralManagerV2 must be a contract"
+        );
         collateralManagerV2 = ICollateralManagerV2(_collateralManagerV2);
     }
 
@@ -355,7 +356,7 @@ contract TellerV2 is
             _metadataURI,
             _receiver
         );
-       
+
         bool validation = collateralManagerV2.commitCollateral(
             bidId_,
             _collateralInfo
@@ -544,14 +545,11 @@ contract TellerV2 is
         bid.lender = sender;
 
         // Tell the collateral manager to deploy the escrow and pull funds from the borrower if applicable
-        if(bids[_bidId].collateralManager == address(0)){
+        if (bids[_bidId].collateralManager == address(0)) {
             collateralManagerV1.deployAndDeposit(_bidId);
-        }else{
+        } else {
             collateralManagerV2.depositCollateral(_bidId);
         }
-        
-
-
 
         // Transfer funds to borrower from the lender
         amountToProtocol = bid.loanDetails.principal.percent(protocolFee());
@@ -801,7 +799,10 @@ contract TellerV2 is
         // If loan is backed by collateral, withdraw and send to the liquidator
         address liquidator = _msgSenderForMarket(bid.marketplaceId);
         //collateralManager.liquidateCollateral(_bidId, liquidator);
-        _getCollateralManagerForBid(_bidId).liquidateCollateral(_bidId,liquidator);
+        _getCollateralManagerForBid(_bidId).liquidateCollateral(
+            _bidId,
+            liquidator
+        );
 
         emit LoanLiquidated(_bidId, liquidator);
     }
@@ -1040,21 +1041,20 @@ contract TellerV2 is
 
     function getCollateralManagerForBid(uint256 _bidId)
         public
-        view 
+        view
         virtual
         returns (ICollateralManager)
-    {   
-       
+    {
         return _getCollateralManagerForBid(_bidId);
     }
 
-      function _getCollateralManagerForBid(uint256 _bidId)
+    function _getCollateralManagerForBid(uint256 _bidId)
         internal
-        view 
+        view
         virtual
         returns (ICollateralManager)
-    {   
-        if(bids[_bidId].collateralManager == address(0)){
+    {
+        if (bids[_bidId].collateralManager == address(0)) {
             return ICollateralManager(collateralManagerV1);
         }
         return ICollateralManager(bids[_bidId].collateralManager);

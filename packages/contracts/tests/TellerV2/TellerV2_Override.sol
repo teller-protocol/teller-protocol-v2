@@ -10,7 +10,6 @@ import "../../contracts/interfaces/ICollateralManagerV1.sol";
 import "../../contracts/interfaces/ICollateralManagerV2.sol";
 import "../../contracts/interfaces/ILenderManager.sol";
 
-
 import "lib/forge-std/src/console.sol";
 
 contract TellerV2_Override is TellerV2 {
@@ -48,30 +47,25 @@ contract TellerV2_Override is TellerV2 {
 
     function setCollateralManagerSuper(address _collateralManager) public {
         collateralManagerMock = address(_collateralManager);
-        
     }
 
-     function setCollateralManagerV1Super(address _collateralManager) public {
-         
+    function setCollateralManagerV1Super(address _collateralManager) public {
         collateralManagerV1 = ICollateralManagerV1(_collateralManager);
     }
 
-    //used for submit bid 
-     function setCollateralManagerV2Super(address _collateralManager) public {
-         
+    //used for submit bid
+    function setCollateralManagerV2Super(address _collateralManager) public {
         collateralManagerV2 = ICollateralManagerV2(_collateralManager);
     }
 
-     function getCollateralManagerForBid(uint256 _bidId)
+    function getCollateralManagerForBid(uint256 _bidId)
         public
-        view 
-        override 
+        view
+        override
         returns (ICollateralManager)
-    {   
-        
+    {
         return ICollateralManager(collateralManagerMock);
     }
-
 
     function setReputationManagerSuper(address _reputationManager) public {
         reputationManager = IReputationManager(_reputationManager);
@@ -172,15 +166,12 @@ contract TellerV2_Override is TellerV2 {
 
     function _getCollateralManagerForBid(uint256 _bidId)
         internal
-        view  
-        override      
+        view
+        override
         returns (ICollateralManager)
-    {   
-        
+    {
         return ICollateralManager(collateralManagerMock);
     }
-
-
 
     function _msgSenderForMarket(uint256 _marketId)
         internal

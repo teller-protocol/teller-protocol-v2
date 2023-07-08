@@ -39,7 +39,6 @@ contract TellerV2_initialize is Testable {
             address(marketRegistry),
             address(reputationManager),
             address(lenderCommitmentForwarder),
-       
             address(lenderManager),
             address(escrowVault),
             address(collateralManagerV2)
@@ -86,7 +85,6 @@ contract TellerV2_initialize is Testable {
             address(marketRegistry),
             address(reputationManager),
             address(lenderCommitmentForwarder),
-         
             address(lenderManager),
             address(escrowVault),
             address(collateralManagerV2)
@@ -108,7 +106,6 @@ contract TellerV2_initialize is Testable {
             address(marketRegistry),
             address(reputationManager),
             address(lenderCommitmentForwarder),
-          
             address(lenderManager),
             address(escrowVault),
             address(collateralManagerV2)
@@ -130,7 +127,6 @@ contract TellerV2_initialize is Testable {
             address(marketRegistry),
             address(reputationManager),
             address(lenderCommitmentForwarder),
-           
             address(lenderManager),
             address(escrowVault),
             address(collateralManagerV2)
@@ -152,7 +148,6 @@ contract TellerV2_initialize is Testable {
             address(marketRegistry),
             address(reputationManager),
             address(lenderCommitmentForwarder),
-       
             address(lenderManager),
             address(escrowVault),
             address(collateralManagerV2)

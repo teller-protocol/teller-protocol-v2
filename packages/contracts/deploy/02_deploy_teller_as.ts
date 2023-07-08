@@ -1,4 +1,3 @@
-import { getNamedSigner, toBN } from 'hardhat'
 import { DeployFunction } from 'hardhat-deploy/dist/types'
 import { deploy } from 'helpers/deploy-helpers'
 

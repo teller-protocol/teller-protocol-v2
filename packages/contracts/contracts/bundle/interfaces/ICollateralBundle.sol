@@ -12,42 +12,37 @@ pragma solidity ^0.8.0;
  *  logic to handle any ERC20, ERC721 or ERC1155 tokens.
  */
 
-   /// @notice The type of assets that can be bundled.
-    enum CollateralType {
-        ERC20,
-        ERC721,
-        ERC1155
-    }
+/// @notice The type of assets that can be bundled.
+enum CollateralType {
+    ERC20,
+    ERC721,
+    ERC1155
+}
 
-    /**
-     *  @notice A generic interface to describe any ERC20, ERC721 or ERC1155 token.
-     *  @param collateralType     The token type (ERC20 / ERC721 / ERC1155) of the asset.
-     *  @param totalAmount   The amount of the asset, if the asset is an ERC20 / ERC1155 fungible token.
-     *  @param tokenId       The token Id of the asset, if the asset is an ERC721 / ERC1155 NFT.
-     *  @param assetContract The contract address of the asset.
-     *  
-     */
-    struct Collateral {
-        CollateralType _collateralType;
-        uint256 _amount;
-        uint256 _tokenId;
-        address _collateralAddress;  
-       
-    }
-    
+/**
+ *  @notice A generic interface to describe any ERC20, ERC721 or ERC1155 token.
+ *  @param collateralType     The token type (ERC20 / ERC721 / ERC1155) of the asset.
+ *  @param totalAmount   The amount of the asset, if the asset is an ERC20 / ERC1155 fungible token.
+ *  @param tokenId       The token Id of the asset, if the asset is an ERC721 / ERC1155 NFT.
+ *  @param assetContract The contract address of the asset.
+ *
+ */
+struct Collateral {
+    CollateralType _collateralType;
+    uint256 _amount;
+    uint256 _tokenId;
+    address _collateralAddress;
+}
 
 interface ICollateralBundle {
-  
-
     /**
      *  @notice An internal data structure to track a group / bundle of multiple assets i.e. `Token`s.
      *
-     *  @param count    The total number of assets i.e. `Collateral` in a bundle. 
+     *  @param count    The total number of assets i.e. `Collateral` in a bundle.
      *  @param collaterals   Mapping from a UID -> to a unique asset i.e. `Collateral` in the bundle.
      */
     struct CollateralBundleInfo {
         uint256 count;
-       
         mapping(uint256 => Collateral) collaterals;
     }
 }

@@ -1,7 +1,6 @@
 pragma solidity >=0.8.0 <0.9.0;
 // SPDX-License-Identifier: MIT
 
-
 /*
 
 1. During submitBid, the collateral will be Committed (?) using the 'collateral validator'
@@ -12,8 +11,6 @@ pragma solidity >=0.8.0 <0.9.0;
 This collateral manager will only accept collateral bundles. 
 
 */
-
-
 
 // Contracts
 import "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
@@ -35,7 +32,6 @@ import "./bundle/TokenStore.sol";
 
 import "./bundle/interfaces/ICollateralBundle.sol";
 
-
 /*
 
 This contract is a token store which stores bundles.
@@ -45,28 +41,30 @@ If the bundle exists and is owned by this contract, we know the collateral is he
 
 */
 
-contract CollateralManagerV2 is ContextUpgradeable, TokenStore, ICollateralManagerV2 {
+contract CollateralManagerV2 is
+    ContextUpgradeable,
+    TokenStore,
+    ICollateralManagerV2
+{
     /* Storage */
     using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
     ITellerV2 public tellerV2;
-    
 
     // bidIds -> collateralEscrow
     //mapping(uint256 => address) public _escrows;
 
-    // bidIds -> collateralBundleId 
+    // bidIds -> collateralBundleId
     //mapping(uint256 => CollateralInfo) internal _committedBidCollateral;
 
-     // bidIds -> collateralBundleInfo
-     //this just bridges the gap between submitBid and acceptBid
-    mapping(uint256 => ICollateralBundle.CollateralBundleInfo) internal _committedBidCollateral;
-
-     
+    // bidIds -> collateralBundleInfo
+    //this just bridges the gap between submitBid and acceptBid
+    mapping(uint256 => ICollateralBundle.CollateralBundleInfo)
+        internal _committedBidCollateral;
 
     /* Events */
     event CollateralEscrowDeployed(uint256 _bidId, address _collateralEscrow);
 
-    //add events back !! 
+    //add events back !!
     event CollateralCommitted(
         uint256 _bidId,
         CollateralType _type,
@@ -89,16 +87,13 @@ contract CollateralManagerV2 is ContextUpgradeable, TokenStore, ICollateralManag
         uint256 _amount,
         uint256 _tokenId,
         address _recipient
-    ); 
+    );
 
     /* Modifiers */
     modifier onlyTellerV2() {
         require(_msgSender() == address(tellerV2), "Sender not authorized");
         _;
     }
- 
-
-
 
     /* External Functions */
 
@@ -106,15 +101,11 @@ contract CollateralManagerV2 is ContextUpgradeable, TokenStore, ICollateralManag
      * @notice Initializes the collateral manager.
      * @param _tellerV2 The address of the protocol.
      */
-    function initialize(address _tellerV2)
-        external
-        initializer
-    {
+    function initialize(address _tellerV2) external initializer {
         tellerV2 = ITellerV2(_tellerV2);
-       // __Ownable_init_unchained();
+        // __Ownable_init_unchained();
     }
 
-   
     /**
      * @notice Checks to see if a bid is backed by collateral.
      * @param _bidId The id of the bid to check.
@@ -128,7 +119,7 @@ contract CollateralManagerV2 is ContextUpgradeable, TokenStore, ICollateralManag
         return _committedBidCollateral[_bidId].count > 0;
     }
 
-   /**
+    /**
      * @notice Checks the validity of a borrower's multiple collateral balances and commits it to a bid.
      * @param _bidId The id of the associated bid.
      * @param _collateralInfo Additional information about the collateral assets.
@@ -150,31 +141,20 @@ contract CollateralManagerV2 is ContextUpgradeable, TokenStore, ICollateralManag
             }
         }
     }
-   
 
     /**
      * @notice Deploys a new collateral escrow and deposits collateral.
      * @param _bidId The associated bidId of the collateral escrow.
      */
 
-     //used to be 'deploy and deposit' 
+    //used to be 'deploy and deposit'
     function depositCollateral(uint256 _bidId) external onlyTellerV2 {
-        
-       
-
         Collateral[] memory _committedCollateral = getCollateralInfo(_bidId);
 
-            
-        address borrower = address(0); //FIX ME 
-        _storeTokens(
-            borrower,
-            _committedCollateral,
-            _bidId
-        );
- 
+        address borrower = address(0); //FIX ME
+        _storeTokens(borrower, _committedCollateral, _bidId);
 
-        //emit CollateralDeposited!  
-        
+        //emit CollateralDeposited!
     }
 
     /**
@@ -182,7 +162,7 @@ contract CollateralManagerV2 is ContextUpgradeable, TokenStore, ICollateralManag
      * @notice _bidId The bidId to return the escrow for.
      * @return The address of the escrow.
      */
-   /* function getEscrow(uint256 _bidId) external view returns (address) {
+    /* function getEscrow(uint256 _bidId) external view returns (address) {
         return _escrows[_bidId];
     }*/
 
@@ -192,14 +172,14 @@ contract CollateralManagerV2 is ContextUpgradeable, TokenStore, ICollateralManag
      * @return infos_ The stored collateral info.
      */
 
-     //use getBundleInfo instead 
+    //use getBundleInfo instead
 
-   function getCollateralInfo(uint256 _bidId)
+    function getCollateralInfo(uint256 _bidId)
         public
         view
         returns (Collateral[] memory infos_)
     {
-      /*  CollateralInfo storage collateral = _bidCollaterals[_bidId];
+        /*  CollateralInfo storage collateral = _bidCollaterals[_bidId];
         address[] memory collateralAddresses = collateral
             .collateralAddresses
             .values();
@@ -209,16 +189,12 @@ contract CollateralManagerV2 is ContextUpgradeable, TokenStore, ICollateralManag
         }*/
 
         uint256 count = _committedBidCollateral[_bidId].count;
-        infos_ = new Collateral[](count); 
+        infos_ = new Collateral[](count);
 
-        for(uint256 i=0;i<count;i++){
+        for (uint256 i = 0; i < count; i++) {
             infos_[i] = _committedBidCollateral[_bidId].collaterals[i];
         }
- 
-
     }
-
-
 
     /**
      * @notice Gets the collateral asset amount for a given bid id on the TellerV2 contract.
@@ -231,11 +207,11 @@ contract CollateralManagerV2 is ContextUpgradeable, TokenStore, ICollateralManag
         view
         returns (uint256 amount_)
     {
-        Collateral memory token_data = getTokenOfBundle(_bidId, 0);// first slot 
+        Collateral memory token_data = getTokenOfBundle(_bidId, 0); // first slot
 
-        if( token_data._collateralAddress != _collateralAddress ) return 0 ; // not as expected
+        if (token_data._collateralAddress != _collateralAddress) return 0; // not as expected
 
-        amount_ =  token_data._amount;
+        amount_ = token_data._amount;
     }
 
     /**
@@ -247,7 +223,7 @@ contract CollateralManagerV2 is ContextUpgradeable, TokenStore, ICollateralManag
 
         require(bidState == BidState.PAID, "collateral cannot be withdrawn");
 
-        _withdraw(_bidId, tellerV2.getLoanBorrower(_bidId)); 
+        _withdraw(_bidId, tellerV2.getLoanBorrower(_bidId));
 
         emit CollateralClaimed(_bidId);
     }
@@ -290,8 +266,6 @@ contract CollateralManagerV2 is ContextUpgradeable, TokenStore, ICollateralManag
         }
     }
 
-
-
     /**
      * @notice Checks the validity of a borrower's multiple collateral balances.
      * @param _borrowerAddress The address of the borrower holding the collateral.
@@ -304,9 +278,7 @@ contract CollateralManagerV2 is ContextUpgradeable, TokenStore, ICollateralManag
         return _checkBalances(_borrowerAddress, _collateralInfo, false);
     }
 
-
     /* Internal Functions */
-  
 
     /**
      * @notice Withdraws collateral to a given receiver's address.
@@ -314,8 +286,10 @@ contract CollateralManagerV2 is ContextUpgradeable, TokenStore, ICollateralManag
      * @param _receiver The address to withdraw the collateral to.
      */
     function _withdraw(uint256 _bidId, address _receiver) internal virtual {
-       
-        (uint256 count, Collateral[] memory releasedTokens) = _releaseTokens( _receiver, _bidId  );
+        (uint256 count, Collateral[] memory releasedTokens) = _releaseTokens(
+            _receiver,
+            _bidId
+        );
 
         for (uint256 i = 0; i < count; i += 1) {
             emit CollateralWithdrawn(
@@ -327,9 +301,6 @@ contract CollateralManagerV2 is ContextUpgradeable, TokenStore, ICollateralManag
                 _receiver
             );
         }
-
-        
-        
     }
 
     /**
@@ -341,9 +312,10 @@ contract CollateralManagerV2 is ContextUpgradeable, TokenStore, ICollateralManag
         uint256 _bidId,
         Collateral memory _collateralInfo
     ) internal virtual {
-        CollateralBundleInfo storage committedCollateral = _committedBidCollateral[_bidId];
+        CollateralBundleInfo
+            storage committedCollateral = _committedBidCollateral[_bidId];
 
-       /* require(
+        /* require(
             !collateral.collateralAddresses.contains(
                 _collateralInfo._collateralAddress
             ),
@@ -365,7 +337,6 @@ contract CollateralManagerV2 is ContextUpgradeable, TokenStore, ICollateralManag
         committedCollateral.count = new_count;
         committedCollateral.collaterals[new_count] = _collateralInfo;
 
-         
         emit CollateralCommitted(
             _bidId,
             _collateralInfo._collateralType,
@@ -485,6 +456,4 @@ contract CollateralManagerV2 is ContextUpgradeable, TokenStore, ICollateralManag
                 )
             );
     }
-
-
-} 
+}

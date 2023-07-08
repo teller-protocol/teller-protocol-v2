@@ -1,6 +1,5 @@
 import { DeployFunction } from 'hardhat-deploy/dist/types'
 import { deploy } from 'helpers/deploy-helpers'
-import { MarketRegistry } from 'types/typechain'
 
 const deployFn: DeployFunction = async (hre) => {
   // TellerASRegistry

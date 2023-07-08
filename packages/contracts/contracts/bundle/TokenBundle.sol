@@ -23,22 +23,32 @@ abstract contract TokenBundle is ICollateralBundle {
     mapping(uint256 => CollateralBundleInfo) private bundle;
 
     /// @dev Returns the total number of assets in a particular bundle.
-    function getTokenCountOfBundle(uint256 _bundleId) public view returns (uint256) {
+    function getTokenCountOfBundle(uint256 _bundleId)
+        public
+        view
+        returns (uint256)
+    {
         return bundle[_bundleId].count;
     }
 
     /// @dev Returns an asset contained in a particular bundle, at a particular index.
-    function getTokenOfBundle(uint256 _bundleId, uint256 index) public view returns (Collateral memory) {
+    function getTokenOfBundle(uint256 _bundleId, uint256 index)
+        public
+        view
+        returns (Collateral memory)
+    {
         return bundle[_bundleId].collaterals[index];
     }
 
     /// @dev Returns the struct of a particular bundle.
-   /* function getBundleInfo(uint256 _bundleId) public view returns (CollateralBundleInfo memory) {
+    /* function getBundleInfo(uint256 _bundleId) public view returns (CollateralBundleInfo memory) {
         return bundle[_bundleId];
     }*/
 
     /// @dev Lets the calling contract create a bundle, by passing in a list of tokens and a unique id.
-    function _createBundle(Collateral[] memory _tokensToBind, uint256 _bundleId) internal {
+    function _createBundle(Collateral[] memory _tokensToBind, uint256 _bundleId)
+        internal
+    {
         uint256 targetCount = _tokensToBind.length;
 
         require(targetCount > 0, "!Tokens");
@@ -53,7 +63,9 @@ abstract contract TokenBundle is ICollateralBundle {
     }
 
     /// @dev Lets the calling contract update a bundle, by passing in a list of tokens and a unique id.
-    function _updateBundle(Collateral[] memory _tokensToBind, uint256 _bundleId) internal {
+    function _updateBundle(Collateral[] memory _tokensToBind, uint256 _bundleId)
+        internal
+    {
         require(_tokensToBind.length > 0, "!Tokens");
 
         uint256 currentCount = bundle[_bundleId].count;
@@ -73,7 +85,10 @@ abstract contract TokenBundle is ICollateralBundle {
     }
 
     /// @dev Lets the calling contract add a token to a bundle for a unique bundle id and index.
-    function _addTokenInBundle(Collateral memory _tokenToBind, uint256 _bundleId) internal {
+    function _addTokenInBundle(
+        Collateral memory _tokenToBind,
+        uint256 _bundleId
+    ) internal {
         _checkTokenType(_tokenToBind);
         uint256 id = bundle[_bundleId].count;
 
@@ -95,13 +110,17 @@ abstract contract TokenBundle is ICollateralBundle {
     /// @dev Checks if the type of asset-contract is same as the TokenType specified.
     function _checkTokenType(Collateral memory _token) internal view {
         if (_token._collateralType == CollateralType.ERC721) {
-            try IERC165(_token._collateralAddress).supportsInterface(0x80ac58cd) returns (bool supported721) {
+            try
+                IERC165(_token._collateralAddress).supportsInterface(0x80ac58cd)
+            returns (bool supported721) {
                 require(supported721, "!TokenType");
             } catch {
                 revert("!TokenType");
             }
         } else if (_token._collateralType == CollateralType.ERC1155) {
-            try IERC165(_token._collateralAddress).supportsInterface(0xd9b67a26) returns (bool supported1155) {
+            try
+                IERC165(_token._collateralAddress).supportsInterface(0xd9b67a26)
+            returns (bool supported1155) {
                 require(supported1155, "!TokenType");
             } catch {
                 revert("!TokenType");
@@ -109,10 +128,18 @@ abstract contract TokenBundle is ICollateralBundle {
         } else if (_token._collateralType == CollateralType.ERC20) {
             if (_token._collateralAddress != CurrencyTransferLib.NATIVE_TOKEN) {
                 // 0x36372b07
-                try IERC165(_token._collateralAddress).supportsInterface(0x80ac58cd) returns (bool supported721) {
+                try
+                    IERC165(_token._collateralAddress).supportsInterface(
+                        0x80ac58cd
+                    )
+                returns (bool supported721) {
                     require(!supported721, "!TokenType");
 
-                    try IERC165(_token._collateralAddress).supportsInterface(0xd9b67a26) returns (bool supported1155) {
+                    try
+                        IERC165(_token._collateralAddress).supportsInterface(
+                            0xd9b67a26
+                        )
+                    returns (bool supported1155) {
                         require(!supported1155, "!TokenType");
                     } catch Error(string memory) {} catch {}
                 } catch Error(string memory) {} catch {}
@@ -121,7 +148,7 @@ abstract contract TokenBundle is ICollateralBundle {
     }
 
     /// @dev Lets the calling contract set/update the uri of a particular bundle.
-   /* function _setUriOfBundle(string memory _uri, uint256 _bundleId) internal {
+    /* function _setUriOfBundle(string memory _uri, uint256 _bundleId) internal {
         bundle[_bundleId].uri = _uri;
     }*/
 
@@ -132,4 +159,4 @@ abstract contract TokenBundle is ICollateralBundle {
         }
         bundle[_bundleId].count = 0;
     }
-} 
+}

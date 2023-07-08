@@ -14,8 +14,8 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol"
 import "@openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol";
 import "./interfaces/ICollateralManagerV1.sol";
-import {  ICollateralEscrowV1 } from "./interfaces/escrow/ICollateralEscrowV1.sol";
-import  {Collateral,CollateralType } from "./bundle/interfaces/ICollateralBundle.sol";
+import { ICollateralEscrowV1 } from "./interfaces/escrow/ICollateralEscrowV1.sol";
+import { Collateral, CollateralType } from "./bundle/interfaces/ICollateralBundle.sol";
 
 import "./interfaces/ITellerV2.sol";
 
@@ -135,8 +135,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManagerV1 {
         }
     }
 
-
-    //this is not used for anything 
+    //this is not used for anything
     /**
      * @notice Checks the validity of a borrower's collateral balance and commits it to a bid.
      * @param _bidId The id of the associated bid.
@@ -153,7 +152,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManagerV1 {
         if (validation_) {
             _commitCollateral(_bidId, _collateralInfo);
         }
-    } 
+    }
 
     /**
      * @notice Re-checks the validity of a borrower's collateral balance committed to a bid.

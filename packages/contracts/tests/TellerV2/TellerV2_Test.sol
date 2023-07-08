@@ -69,7 +69,7 @@ contract TellerV2_Test is Testable {
 
         // Deploy Collateral manager
         collateralManager = new CollateralManagerMock();
-      //  collateralManager.initialize(address(escrowBeacon), address(tellerV2));
+        //  collateralManager.initialize(address(escrowBeacon), address(tellerV2));
 
         // Deploy Lender manager
         MetaForwarder metaforwarder = new MetaForwarder();
@@ -93,7 +93,6 @@ contract TellerV2_Test is Testable {
             address(marketRegistry),
             address(reputationManager),
             address(lenderCommitmentForwarder),
-         
             address(lenderManager),
             address(escrowVault),
             address(collateralManager)
@@ -167,7 +166,7 @@ contract TellerV2_Test is Testable {
         lender.acceptBid(_bidId);
     }
 
-   /* function test_collateralEscrow() public {
+    /* function test_collateralEscrow() public {
  
 
         // Submit bid as borrower
@@ -215,7 +214,7 @@ contract TellerV2_Test is Testable {
         );
     }*/
 
-   /* function test_commit_collateral_frontrun_exploit() public {
+    /* function test_commit_collateral_frontrun_exploit() public {
         // The original borrower balance for the DAI principal and WETH collateral
         assertEq(daiMock.balanceOf(address(borrower)), 50000);
         assertEq(wethMock.balanceOf(address(borrower)), 50000);

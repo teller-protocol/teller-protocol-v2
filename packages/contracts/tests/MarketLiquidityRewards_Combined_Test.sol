@@ -19,13 +19,14 @@ import "../contracts/mock/CollateralManagerMock.sol";
 
 import "../contracts/MarketLiquidityRewards.sol";
 
-
 import "../contracts/mock/TellerV2SolMock.sol";
-
 
 import "forge-std/console.sol";
 
-contract MarketLiquidityRewards_Combined_Test is Testable, MarketLiquidityRewards {
+contract MarketLiquidityRewards_Combined_Test is
+    Testable,
+    MarketLiquidityRewards
+{
     MarketLiquidityUser private marketOwner;
     MarketLiquidityUser private lender;
     MarketLiquidityUser private borrower;
@@ -57,13 +58,13 @@ contract MarketLiquidityRewards_Combined_Test is Testable, MarketLiquidityReward
     bool verifyRewardRecipientWasCalled;
     bool verifyCollateralAmountWasCalled;
 
-     TellerV2SolMock tellerV2Mock;
+    TellerV2SolMock tellerV2Mock;
     CollateralManagerMock collateralManagerMock;
 
     constructor()
         MarketLiquidityRewards(
             address(new TellerV2SolMock()),
-            address(new MarketRegistryMock()) 
+            address(new MarketRegistryMock())
         )
     {}
 
@@ -75,12 +76,9 @@ contract MarketLiquidityRewards_Combined_Test is Testable, MarketLiquidityReward
         tellerV2Mock = TellerV2SolMock(tellerV2);
         collateralManagerMock = new CollateralManagerMock();
 
-
         tellerV2Mock.setMarketRegistry(address(marketRegistry));
 
         MarketRegistryMock(marketRegistry).setMarketOwner(address(marketOwner));
-
-
 
         //tokenAddress = address(0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174);
         marketId = 2;
@@ -232,14 +230,11 @@ contract MarketLiquidityRewards_Combined_Test is Testable, MarketLiquidityReward
         );
         mockBid.state = BidState.PAID;
 
-
-
         uint256 allocationId = 0;
         uint256 bidId = 0;
 
         tellerV2Mock.setCollateralManagerSuper(address(collateralManagerMock));
-        tellerV2Mock.setMockBid(bidId,mockBid);
-
+        tellerV2Mock.setMockBid(bidId, mockBid);
 
         _setAllocation(allocationId);
         allocatedRewards[allocationId].rewardTokenAmount = 4000;
@@ -474,4 +469,3 @@ contract MarketLiquidityUser is User {
         IERC20Upgradeable(tokenAddress).approve(guy, wad);
     }
 }
- 

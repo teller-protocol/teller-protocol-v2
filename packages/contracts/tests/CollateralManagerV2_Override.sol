@@ -16,9 +16,9 @@ import "./tokens/TestERC721Token.sol";
 import "./tokens/TestERC1155Token.sol";
 
 import "../contracts/mock/TellerV2SolMock.sol";
-import "../contracts/CollateralManager.sol";
+import "../contracts/CollateralManagerV2.sol";
 
-contract CollateralManagerV2_Override is CollateralManager {
+contract CollateralManagerV2_Override is CollateralManagerV2 {
     bool public checkBalancesWasCalled;
     bool public checkBalanceWasCalled;
     address public withdrawInternalWasCalledToRecipient;
@@ -26,10 +26,7 @@ contract CollateralManagerV2_Override is CollateralManager {
 
     bool bidsCollateralBackedGlobally;
     bool public checkBalanceGlobalValid = true;
-
-    address public globalEscrowProxyAddress;
-
-    bool public deployEscrowInternalWasCalled;
+ 
     bool public depositInternalWasCalled;
 
     //force adds collateral info for a bid even if it doesnt exist (for testing)

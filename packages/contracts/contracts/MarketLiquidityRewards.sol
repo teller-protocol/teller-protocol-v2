@@ -66,11 +66,9 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
         uint256 amount
     );
 
-    constructor(
-        address _tellerV2,
-        address _marketRegistry
-        //address _collateralManager
-    ) {
+    constructor(address _tellerV2, address _marketRegistry)
+    //address _collateralManager
+    {
         tellerV2 = _tellerV2;
         marketRegistry = _marketRegistry;
         //collateralManager = _collateralManager;
@@ -257,12 +255,15 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
             allocatedReward.bidStartTimeMax
         );
 
-        ICollateralManager _collateralManager = ITellerV2(tellerV2).getCollateralManagerForBid(_bidId);
+        ICollateralManager _collateralManager = ITellerV2(tellerV2)
+            .getCollateralManagerForBid(_bidId);
 
         //if a collateral token address is set on the allocation, verify that the bid has enough collateral ratio
         if (collateralTokenAddress != address(0)) {
-            uint256 collateralAmount = _collateralManager
-                .getCollateralAmount(_bidId, collateralTokenAddress);
+            uint256 collateralAmount = _collateralManager.getCollateralAmount(
+                _bidId,
+                collateralTokenAddress
+            );
 
             //require collateral amount
             _verifyCollateralAmount(

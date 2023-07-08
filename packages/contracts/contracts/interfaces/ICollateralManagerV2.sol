@@ -1,11 +1,9 @@
 // SPDX-Licence-Identifier: MIT
 pragma solidity >=0.8.0 <0.9.0;
- 
-
 
 import "./ICollateralManager.sol";
 
- //use TokenBundle 
+//use TokenBundle
 /*
 enum CollateralType {
     ERC20,
@@ -20,14 +18,9 @@ struct Collateral {
     address _collateralAddress;
 }*/
 
-
-import {Collateral} from "../bundle/interfaces/ICollateralBundle.sol";
+import { Collateral } from "../bundle/interfaces/ICollateralBundle.sol";
 
 interface ICollateralManagerV2 is ICollateralManager {
-
-
-  
-
     /**
      * @notice Deploys a new collateral escrow.
      * @param _bidId The associated bidId of the collateral escrow.
@@ -39,7 +32,7 @@ interface ICollateralManagerV2 is ICollateralManager {
      * @notice _bidId The bidId to return the escrow for.
      * @return The address of the escrow.
      */
-   // function getEscrow(uint256 _bidId) external view returns (address);
+    // function getEscrow(uint256 _bidId) external view returns (address);
 
     /**
      * @notice Gets the collateral info for a given bid id.
@@ -55,6 +48,4 @@ interface ICollateralManagerV2 is ICollateralManager {
         external
         view
         returns (uint256 _amount);
-
-   
 }

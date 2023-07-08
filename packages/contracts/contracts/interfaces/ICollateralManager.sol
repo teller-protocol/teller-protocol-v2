@@ -1,12 +1,9 @@
 // SPDX-Licence-Identifier: MIT
 pragma solidity >=0.8.0 <0.9.0;
 
-
-import {Collateral} from "../bundle/interfaces/ICollateralBundle.sol";
-
+import { Collateral } from "../bundle/interfaces/ICollateralBundle.sol";
 
 interface ICollateralManager {
-   
     /**
      * @notice Checks the validity of a borrower's collateral balance.
      * @param _bidId The id of the associated bid.
@@ -18,8 +15,7 @@ interface ICollateralManager {
         Collateral[] calldata _collateralInfo
     ) external returns (bool validation_);
 
- 
-     /**
+    /**
      * @notice Gets the collateral info for a given bid id.
      * @param _bidId The bidId to return the collateral info for.
      * @return The stored collateral info.
@@ -34,14 +30,12 @@ interface ICollateralManager {
         view
         returns (uint256 _amount);
 
- 
     /**
      * @notice Withdraws deposited collateral from the created escrow of a bid.
      * @param _bidId The id of the bid to withdraw collateral for.
      */
     function withdraw(uint256 _bidId) external;
 
-    
     /**
      * @notice Sends the deposited collateral to a lender of a bid.
      * @notice Can only be called by the protocol.

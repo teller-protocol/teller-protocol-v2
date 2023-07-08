@@ -3,15 +3,11 @@ pragma solidity >=0.8.0 <0.9.0;
 
 //import { Collateral } from "./escrow/ICollateralEscrowV1.sol";
 
-import {Collateral} from "../bundle/interfaces/ICollateralBundle.sol";
+import { Collateral } from "../bundle/interfaces/ICollateralBundle.sol";
 
 import "./ICollateralManager.sol";
 
 interface ICollateralManagerV1 is ICollateralManager {
-
-
-    
-
     function checkBalances(
         address _borrowerAddress,
         Collateral[] calldata _collateralInfo
@@ -30,15 +26,10 @@ interface ICollateralManagerV1 is ICollateralManager {
      */
     function getEscrow(uint256 _bidId) external view returns (address);
 
-   
-    
-
     /**
      * @notice Re-checks the validity of a borrower's collateral balance committed to a bid.
      * @param _bidId The id of the associated bid.
      * @return validation_ Boolean indicating if the collateral balance was validated.
      */
     function revalidateCollateral(uint256 _bidId) external returns (bool);
-
-   
 }

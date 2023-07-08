@@ -259,7 +259,7 @@ contract TellerV2_bids_test is Testable {
     function test_submit_bid_reverts_when_collateral_invalid() public {
         Collateral[] memory collateral = new Collateral[](1);
 
-            //this is not working 
+        //this is not working
         tellerV2.setCollateralManagerV2Super(address(collateralManagerMock));
 
         collateralManagerMock.forceSetCommitCollateralValidation(false);
@@ -363,8 +363,8 @@ contract TellerV2_bids_test is Testable {
 
     function test_lender_accept_bid() public {
         uint256 bidId = 1;
-       
-         tellerV2.mock_setBid(
+
+        tellerV2.mock_setBid(
             bidId,
             Bid({
                 borrower: address(borrower),
@@ -390,8 +390,7 @@ contract TellerV2_bids_test is Testable {
                 paymentType: PaymentType.EMI,
                 collateralManager: address(0)
             })
-         );
-
+        );
 
         tellerV2.mock_initialize(); //set address this as owner
 
@@ -414,7 +413,6 @@ contract TellerV2_bids_test is Testable {
             "deploy and deposit was not called"
         );
     }
-
 
     function test_lender_accept_bid_v2CollateralManager() public {
         uint256 bidId = 1;

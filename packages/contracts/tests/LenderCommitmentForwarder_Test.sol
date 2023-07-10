@@ -695,6 +695,7 @@ contract LenderCommitmentForwarder_Test is Testable {
         uint16 interestRate = minInterestRate;
         uint32 loanDuration = maxDuration;
 
+       
         collateralTokenId = tokenIdLeaf;
 
         // vm.expectRevert("collateral token mismatch");
@@ -707,12 +708,19 @@ contract LenderCommitmentForwarder_Test is Testable {
             interestRate,
             loanDuration,
             merkleProof
-        );
+        ); 
+
 
         assertEq(
             lenderCommitmentForwarder.getCommitmentMaxPrincipal(commitmentId),
             maxPrincipal,
             "Max principal changed"
+        );
+
+        assertEq(
+            lenderCommitmentForwarder.getCommitmentAcceptedPrincipal(commitmentId),
+            principalAmount,
+            "Incorrect accepted principal"
         );
     }
 

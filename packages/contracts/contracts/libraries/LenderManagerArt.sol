@@ -321,7 +321,7 @@ library LenderManagerArt {
                     ),
                     _generate_text_label(
                         "APR: ",
-                        interestRateLabel, //  "30 %",
+                        interestRateLabel,
                         414
                     ),
                     _generate_text_label(

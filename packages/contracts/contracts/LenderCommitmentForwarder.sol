@@ -343,7 +343,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             "Invalid commitment collateral type"
         );
 
-        _acceptCommitment(
+        return _acceptCommitment(
             _commitmentId,
             _principalAmount,
             _collateralAmount,
@@ -354,6 +354,19 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         );
     }
 
+    /**
+     * @notice Accept the commitment to submitBid and acceptBid using the funds
+     * @dev LoanDuration must be longer than the market payment cycle
+     * @param _commitmentId The id of the commitment being accepted.
+     * @param _principalAmount The amount of currency to borrow for the loan.
+     * @param _collateralAmount The amount of collateral to use for the loan.
+     * @param _collateralTokenId The tokenId of collateral to use for the loan if ERC721 or ERC1155.
+     * @param _collateralTokenAddress The contract address to use for the loan collateral tokens.
+     * @param _interestRate The interest rate APY to use for the loan in basis points.
+     * @param _loanDuration The overall duration for the loan.  Must be longer than market payment cycle duration.
+     * @param _merkleProof An array of bytes32 which are the roots down the merkle tree, the merkle proof.
+     * @return bidId The ID of the loan that was created on TellerV2
+     */
     function acceptCommitmentWithProof(
         uint256 _commitmentId,
         uint256 _principalAmount,
@@ -364,11 +377,21 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint32 _loanDuration,
         bytes32[] calldata _merkleProof
     ) external returns (uint256 bidId) {
+
+        require(
+            commitments[_commitmentId].collateralTokenType ==
+                CommitmentCollateralType.ERC721_MERKLE_PROOF ||
+                commitments[_commitmentId].collateralTokenType ==
+                CommitmentCollateralType.ERC1155_MERKLE_PROOF,
+            "Invalid commitment collateral type"
+        );
+
+        
         bytes32 _merkleRoot = bytes32(
             commitments[_commitmentId].collateralTokenId
         );
         bytes32 _leaf = keccak256(abi.encodePacked(_collateralTokenId));
-
+        
         //make sure collateral token id is a leaf within the proof
         require(
             MerkleProofUpgradeable.verifyCalldata(
@@ -379,13 +402,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             "Invalid proof"
         );
 
-        require(
-            commitments[_commitmentId].collateralTokenType ==
-                CommitmentCollateralType.ERC721_MERKLE_PROOF ||
-                commitments[_commitmentId].collateralTokenType ==
-                CommitmentCollateralType.ERC1155_MERKLE_PROOF,
-            "Invalid commitment collateral type"
-        );
+        
 
         return
             _acceptCommitment(

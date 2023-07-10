@@ -182,7 +182,17 @@ export default <HardhatUserConfig>{
   defaultNetwork,
 
   etherscan: {
-    apiKey: '{see `updateEtherscanConfig` function in utils/hre-extensions.ts}',
+    apiKey: {
+      // Main Networks
+      mainnet: process.env.ETHERSCAN_VERIFY_API_KEY,
+      polygon: process.env.POLYGONSCAN_VERIFY_API_KEY,
+      arbitrumOne: process.env.ARBISCAN_VERIFY_API_KEY,
+
+      // Test Networks
+      sepolia: process.env.ETHERSCAN_VERIFY_API_KEY,
+      goerli: process.env.ETHERSCAN_VERIFY_API_KEY,
+      mumbai: process.env.POLYGONSCAN_VERIFY_API_KEY,
+    },
   },
 
   defender: {

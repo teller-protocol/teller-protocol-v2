@@ -14,6 +14,7 @@
     "compile": "COMPILING=true yarn hh compile",
     "build": "yarn clean && yarn compile --force && yarn tsc",
     "verify": "yarn hh verify",
+    "verify-all": "yarn hh verify-all",
     "migrate:new": "scripts/contract-migration/create-new.sh write",
     "migrate:new:upgrade": "scripts/contract-migration/create-new.sh upgrade",
     "migrate": "yarn hh deploy --tags migration",

@@ -1,10 +1,9 @@
 // This adds support for typescript paths mappings
 import 'tsconfig-paths/register'
-import '@nomiclabs/hardhat-waffle'
 import 'hardhat-contract-sizer'
 import 'hardhat-deploy'
 import 'hardhat-gas-reporter'
-import '@nomiclabs/hardhat-ethers'
+import '@nomicfoundation/hardhat-ethers'
 import '@typechain/hardhat'
 import 'solidity-coverage'
 import '@openzeppelin/hardhat-upgrades'
@@ -14,15 +13,20 @@ import '@nomicfoundation/hardhat-verify'
 import fs from 'fs'
 import path from 'path'
 
-import {
-  TransactionReceipt,
-  TransactionRequest,
-} from '@ethersproject/providers'
-import { HardhatEthersHelpers } from '@nomiclabs/hardhat-ethers/types'
-import { logger as tenderlyLogger2 } from '@teller-protocol/hardhat-tenderly/dist/utils/logger'
+import { HardhatEthersHelpers } from '@nomicfoundation/hardhat-ethers/types'
+// import { logger as tenderlyLogger2 } from '@teller-protocol/hardhat-tenderly/dist/utils/logger'
 import chalk from 'chalk'
 import { config } from 'dotenv'
-import { ethers, Signer, utils } from 'ethers'
+import {
+  Signer,
+  isAddress,
+  getAddress,
+  formatUnits,
+  parseUnits,
+  parseEther,
+  TransactionRequest,
+  TransactionReceipt,
+} from 'ethers'
 import { HardhatUserConfig, task } from 'hardhat/config'
 import {
   HardhatNetworkHDAccountsUserConfig,
@@ -30,7 +34,7 @@ import {
 } from 'hardhat/types'
 import rrequire from 'helpers/rrequire'
 import semver from 'semver'
-import { logger as tenderlyLogger } from 'tenderly/utils/logger'
+// import { logger as tenderlyLogger } from 'tenderly/utils/logger'
 
 const NODE_VERSION = 'v16'
 if (!semver.satisfies(process.version, NODE_VERSION))
@@ -39,12 +43,6 @@ if (!semver.satisfies(process.version, NODE_VERSION))
   )
 
 config()
-
-// disable Tenderly's logger
-tenderlyLogger.settings.type = 'hidden'
-tenderlyLogger2.settings.type = 'hidden'
-
-const { isAddress, getAddress, formatUnits, parseUnits, parseEther } = utils
 
 const {
   COMPILING,
@@ -207,6 +205,7 @@ export default <HardhatUserConfig>{
 
   typechain: {
     outDir: './generated/typechain',
+    target: 'ethers-v6',
   },
 
   external: {
@@ -366,7 +365,7 @@ export default <HardhatUserConfig>{
       url: networkUrls.goerli,
       chainId: 5,
       live: true,
-      gasPrice: ethers.utils.parseUnits('200', 'gwei').toNumber(),
+      gasPrice: Number(parseUnits('200', 'gwei')),
 
       verify: {
         etherscan: {
@@ -406,9 +405,8 @@ const debug = (text: string): void => {
 
 task('wallet', 'Create a wallet (pk) link', async (_, { ethers }) => {
   const randomWallet = ethers.Wallet.createRandom()
-  const privateKey = randomWallet._signingKey().privateKey
   console.log(`🔐 WALLET Generated as ${randomWallet.address}`)
-  console.log(`🔗 http://localhost:3000/pk#${privateKey}`)
+  console.log(`🔗 http://localhost:3000/pk#${randomWallet.privateKey}`)
 })
 
 task('fundedwallet', 'Create a wallet (pk) link and fund it with deployer?')
@@ -417,7 +415,7 @@ task('fundedwallet', 'Create a wallet (pk) link and fund it with deployer?')
     'Amount of ETH to send to wallet after generating'
   )
   .addOptionalParam('url', 'URL to add pk to')
-  .setAction(async (taskArgs, { ethers }) => {
+  .setAction(async (taskArgs, { ethers, getNamedSigner }) => {
     const randomWallet = ethers.Wallet.createRandom()
     console.log(`🔐 WALLET Generated as ${randomWallet.address}`)
     const url: string = taskArgs.url ? taskArgs.url : 'http://localhost:3000'
@@ -425,14 +423,14 @@ task('fundedwallet', 'Create a wallet (pk) link and fund it with deployer?')
     const amount: string = taskArgs.amount ? taskArgs.amount : '0.01'
     const tx = {
       to: randomWallet.address,
-      value: ethers.utils.parseEther(amount),
+      value: parseEther(amount),
     }
 
     // SEND USING LOCAL DEPLOYER MNEMONIC IF THERE IS ONE
     // IF NOT SEND USING LOCAL HARDHAT NODE:
     const localDeployerMnemonic = getMnemonic()
     if (localDeployerMnemonic) {
-      let deployerWallet = ethers.Wallet.fromMnemonic(localDeployerMnemonic)
+      let deployerWallet = ethers.Wallet.fromPhrase(localDeployerMnemonic)
       deployerWallet = deployerWallet.connect(ethers.provider)
       console.log(
         `💵 Sending ${amount} ETH to ${randomWallet.address} using deployer account`
@@ -452,7 +450,7 @@ task('fundedwallet', 'Create a wallet (pk) link and fund it with deployer?')
       console.log(`${url}/pk#${randomWallet.privateKey}`)
       console.log()
 
-      return await send(ethers.provider.getSigner(), tx)
+      return await send(await getNamedSigner('deployer'), tx)
     }
   })
 
@@ -468,7 +466,7 @@ task(
       return
     }
 
-    let wallet: ReturnType<typeof ethers.Wallet.createRandom>
+    let wallet = ethers.Wallet.createRandom()
     let contractAddress = ''
     let attempt = 0
     let shouldRetry = true
@@ -476,12 +474,12 @@ task(
       if (attempt > 0) {
         process.stdout.clearLine(0)
         process.stdout.cursorTo(0)
+        wallet = ethers.Wallet.createRandom()
       }
       attempt++
       process.stdout.write(`Mining attempt ${attempt}`)
 
-      wallet = ethers.Wallet.createRandom()
-      contractAddress = ethers.utils.getContractAddress({
+      contractAddress = ethers.getCreateAddress({
         from: wallet.address,
         nonce: 0,
       })
@@ -501,15 +499,13 @@ task(
     process.stdout.write('\n')
 
     if (DEBUG) {
-      console.log('mnemonic', wallet!.mnemonic.phrase)
-      console.log('fullPath', wallet!.mnemonic.path)
-      console.log('privateKey', wallet!.privateKey)
+      console.log('mnemonic', wallet.mnemonic!.phrase)
+      console.log('fullPath', wallet.path)
+      console.log('privateKey', wallet.privateKey)
     }
 
     console.log(
-      `⛏  Account Mined as ${
-        wallet!.address
-      } and set as mnemonic in packages/hardhat`
+      `⛏  Account Mined as ${wallet.address} and set as mnemonic in packages/hardhat`
     )
     console.log(
       `📜 This will create the first contract: ${chalk.magenta(
@@ -521,10 +517,10 @@ task(
     )
 
     fs.writeFileSync(
-      `./${wallet!.address}_produces${contractAddress}.secret`,
-      wallet!.mnemonic.phrase
+      `./${wallet.address}_produces${contractAddress}.secret`,
+      wallet.mnemonic!.phrase
     )
-    fs.writeFileSync('./mnemonic.secret', wallet!.mnemonic.phrase)
+    fs.writeFileSync('./mnemonic.secret', wallet.mnemonic!.phrase)
   })
 
 task(
@@ -533,11 +529,11 @@ task(
   async (_, { ethers, config }) => {
     try {
       const mnemonic = getMnemonic()
-      const wallet = ethers.Wallet.fromMnemonic(mnemonic)
+      const wallet = ethers.Wallet.fromPhrase(mnemonic)
 
       if (DEBUG) {
-        console.log('mnemonic', wallet.mnemonic.phrase)
-        console.log('fullPath', wallet.mnemonic.path)
+        console.log('mnemonic', wallet.mnemonic!.phrase)
+        console.log('fullPath', wallet.path)
         console.log('privateKey', wallet.privateKey)
       }
 
@@ -548,10 +544,10 @@ task(
         const network = config.networks[networkName]
         if (!('url' in network)) continue
         try {
-          const provider = new ethers.providers.JsonRpcProvider(network.url)
+          const provider = new ethers.JsonRpcProvider(network.url)
           const balance = await provider.getBalance(wallet.address)
           console.log(` -- ${chalk.bold(networkName)} -- -- -- 📡 `)
-          console.log(`  balance: ${ethers.utils.formatEther(balance)}`)
+          console.log(`  balance: ${ethers.formatEther(balance)}`)
           console.log(
             `  nonce: ${await provider.getTransactionCount(wallet.address)}`
           )
@@ -584,16 +580,17 @@ async function findFirstAddr(
   if (typeof addr === 'string' && isAddress(addr)) {
     return getAddress(addr)
   } else if (typeof addr === 'number') {
-    const accounts = await ethers.provider.listAccounts()
-    if (accounts[addr] !== undefined) {
-      return getAddress(accounts[addr])
+    const signers = await ethers.getSigners()
+    if (signers[addr] !== undefined) {
+      const address = await signers[addr].getAddress()
+      return getAddress(address)
     }
   }
   throw new Error(`Could not normalize address: ${addr}`)
 }
 
 task('accounts', 'Prints the list of accounts', async (_, { ethers }) => {
-  const accounts = await ethers.provider.listAccounts()
+  const accounts = await ethers.getSigners()
   accounts.forEach((account) => console.log(account))
 })
 
@@ -617,7 +614,7 @@ task('balance', "Prints an account's balance")
 async function send(
   signer: Signer,
   txparams: TransactionRequest
-): Promise<TransactionReceipt> {
+): Promise<TransactionReceipt | null> {
   const response = await signer.sendTransaction(txparams)
   debug(`transactionHash: ${response.hash}`)
   const waitBlocksForReceipt = 0 // 2
@@ -635,7 +632,7 @@ task('send', 'Send ETH')
   .setAction(async (taskArgs, { network, ethers }) => {
     const from = await findFirstAddr(ethers, taskArgs.from)
     debug(`Normalized from address: ${from}`)
-    const fromSigner = ethers.provider.getSigner(from)
+    const fromSigner = await ethers.provider.getSigner(from)
 
     let to
     if (taskArgs.to) {
@@ -646,15 +643,12 @@ task('send', 'Send ETH')
     const txRequest: TransactionRequest = {
       from: await fromSigner.getAddress(),
       to,
-      value: parseUnits(
-        taskArgs.amount ? taskArgs.amount : '0',
-        'ether'
-      ).toHexString(),
-      nonce: await fromSigner.getTransactionCount(),
+      value: parseUnits(taskArgs.amount ? taskArgs.amount : '0', 'ether'),
+      nonce: await fromSigner.getNonce(),
       gasPrice: parseUnits(
         taskArgs.gasPrice ? taskArgs.gasPrice : '1.001',
         'gwei'
-      ).toHexString(),
+      ),
       gasLimit: taskArgs.gasLimit ? taskArgs.gasLimit : 24000,
       chainId: network.config.chainId,
     }

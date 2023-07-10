@@ -1,4 +1,4 @@
-import '@nomiclabs/hardhat-ethers'
+import '@nomicfoundation/hardhat-ethers'
 import { ProposalResponse } from '@openzeppelin/defender-admin-client'
 import {
   PartialContract,
@@ -17,13 +17,13 @@ import {
 } from '@openzeppelin/hardhat-upgrades/dist/utils'
 import { PrepareUpgradeOptions } from '@openzeppelin/hardhat-upgrades/src/utils/options'
 import * as ozUpgrades from '@openzeppelin/upgrades-core'
-import * as tdly from '@teller-protocol/hardhat-tenderly'
 import chalk from 'chalk'
 import {
-  BigNumber,
   BigNumberish,
   Contract,
   ContractFactory,
+  HDNodeWallet,
+  Numeric,
   Signer,
 } from 'ethers'
 import { ERC20 } from 'generated/typechain'
@@ -58,8 +58,8 @@ declare module 'hardhat/types/runtime' {
     tokens: TokensExtension
     evm: EVM
     getNamedSigner: (name: string) => Promise<Signer>
-    toBN: (amount: BigNumberish, decimals?: BigNumberish) => BigNumber
-    fromBN: (amount: BigNumberish, decimals?: BigNumberish) => BigNumber
+    toBN: (amount: BigNumberish, decimals?: BigNumberish) => BigInt
+    fromBN: (amount: BigNumberish, decimals?: BigNumberish) => BigInt
     log: (msg: string, config?: LogConfig) => void
   }
 
@@ -164,21 +164,21 @@ interface EVM {
 
   /**
    * This increases the next block's timestamp by the specified amount of seconds.
-   * @param seconds {BigNumberish | moment.Duration} Amount of seconds to increase the next block's timestamp by.
+   * @param seconds {Numeric | moment.Duration} Amount of seconds to increase the next block's timestamp by.
    */
   advanceTime: (
-    seconds: BigNumberish | moment.Duration,
+    seconds: Numeric | moment.Duration,
     option?: AdvanceTimeOptions
   ) => Promise<void>
 
   /**
    * Will mine the specified number of blocks locally. This is helpful when functionality
    * requires a certain number of blocks to be processed for values to change.
-   * @param blocks {number} Amount of blocks to mine.
+   * @param blocks {Numeric} Amount of blocks to mine.
    * @param secsPerBlock {number} Determines how many seconds to increase time by for
    *  each block that is mined. Default is 15.
    */
-  advanceBlocks: (blocks?: number, secsPerBlock?: number) => Promise<void>
+  advanceBlocks: (blocks?: Numeric, secsPerBlock?: number) => Promise<void>
 
   /**
    * Mines a new block.
@@ -233,14 +233,12 @@ interface ImpersonateReturn {
 }
 
 interface ContractsGetConfig {
-  from?: string | Signer
+  from?: string | HDNodeWallet
   at?: string
 }
 
 extendEnvironment((hre) => {
   const { deployments, ethers, network } = hre
-
-  if (!network.live) tdly.setup({ automaticVerifications: true })
 
   hre.deployProxy = async (contractName, { initArgs, ...opts } = {}) => {
     return await ozDefenderDeploy(hre, 'proxy', contractName, initArgs, opts)
@@ -273,28 +271,29 @@ extendEnvironment((hre) => {
           `No deployment exists for ${name}. If expected, supply an address (config.at)`
         )
 
-      let contract = await ethers.getContractAt(abi, address)
-
+      let signer: Signer | undefined
       if (config?.from) {
-        const signer = Signer.isSigner(config.from)
-          ? config.from
-          : ethers.provider.getSigner(config.from)
-        contract = contract.connect(signer)
+        signer =
+          typeof config.from === 'string'
+            ? await ethers.provider.getSigner(config.from)
+            : config.from
       }
+      const contract = await ethers.getContractAt(abi, address, signer)
 
       return contract as C
     },
 
     proxy: {
       initializedVersion: async (proxy: string | Contract): Promise<number> => {
-        const address = typeof proxy === 'string' ? proxy : proxy.address
+        const address =
+          typeof proxy === 'string' ? proxy : await proxy.getAddress()
         const isProxy = await ozUpgrades.isTransparentOrUUPSProxy(
           hre.ethers.provider,
           address
         )
         if (!isProxy) throw new Error(`Address ${address} is not a proxy`)
-        const storage = await ethers.provider.getStorageAt(address, 0)
-        return BigNumber.from(storage).toNumber()
+        const storage = await ethers.provider.getStorage(address, 0)
+        return Number(storage)
       },
     },
   }
@@ -302,11 +301,11 @@ extendEnvironment((hre) => {
   hre.tokens = {
     async get(nameOrAddress: string): Promise<ERC20> {
       let address: string
-      if (ethers.utils.isAddress(nameOrAddress)) {
+      if (ethers.isAddress(nameOrAddress)) {
         address = nameOrAddress
       } else {
         const tokens = await getTokens(hre)
-        address = tokens.all[nameOrAddress.toUpperCase()]
+        address = tokens.all[(nameOrAddress as string).toUpperCase()]
         if (!address) throw new Error(`Token ${nameOrAddress} not found`)
       }
       return await ethers.getContractAt('ERC20', address)
@@ -315,7 +314,7 @@ extendEnvironment((hre) => {
 
   hre.getNamedSigner = async (name: string): Promise<Signer> => {
     const accounts = await hre.getNamedAccounts()
-    return ethers.provider.getSigner(accounts[name])
+    return await ethers.provider.getSigner(accounts[name])
   }
 
   hre.evm = {
@@ -326,14 +325,16 @@ extendEnvironment((hre) => {
     },
 
     async advanceTime(
-      seconds: BigNumberish | moment.Duration,
+      seconds: Numeric | moment.Duration,
       options?: AdvanceTimeOptions
     ): Promise<void> {
       const secs = moment.isDuration(seconds)
         ? seconds
-        : moment.duration(BigNumber.from(seconds).toString(), 's')
+        : moment.duration(seconds.toString(), 's')
       if (options?.withoutBlocks) {
         const block = await ethers.provider.getBlock('latest')
+        if (!block) throw new Error('Could not get latest block')
+
         const timestamp = moment(
           secs.add(block.timestamp, 's').asMilliseconds()
         )
@@ -341,9 +342,7 @@ extendEnvironment((hre) => {
         if (options?.mine) await this.mine()
       } else {
         const secsPerBlock = 15
-        const blocks = BigNumber.from(secs.asSeconds())
-          .div(secsPerBlock)
-          .toNumber()
+        const blocks = BigInt(secs.asSeconds()) / BigInt(secsPerBlock)
         await this.advanceBlocks(blocks, secsPerBlock)
       }
     },
@@ -380,7 +379,7 @@ extendEnvironment((hre) => {
         method: 'hardhat_impersonateAccount',
         params: [address],
       })
-      const signer = ethers.provider.getSigner(address)
+      const signer = await ethers.provider.getSigner(address)
       return {
         signer,
         stop: async () => await this.stopImpersonating(address),
@@ -395,22 +394,22 @@ extendEnvironment((hre) => {
     },
   }
 
-  hre.toBN = (amount: BigNumberish, decimals?: BigNumberish): BigNumber => {
+  hre.toBN = (amount: BigNumberish, decimals?: BigNumberish): BigInt => {
     if (typeof amount === 'string') {
-      return ethers.utils.parseUnits(amount, decimals)
+      return ethers.parseUnits(amount, decimals)
     }
 
-    const num = BigNumber.from(amount)
+    const num = BigInt(amount)
     if (decimals) {
-      return num.mul(BigNumber.from('10').pow(decimals))
+      return num * 10n ** BigInt(decimals)
     }
     return num
   }
 
-  hre.fromBN = (amount: BigNumberish, decimals?: BigNumberish): BigNumber => {
-    const num = BigNumber.from(amount)
+  hre.fromBN = (amount: BigNumberish, decimals?: BigNumberish): BigInt => {
+    const num = BigInt(amount)
     if (decimals) {
-      return num.div(BigNumber.from('10').pow(decimals))
+      return num / 10n ** BigInt(decimals)
     }
     return num
   }
@@ -436,7 +435,10 @@ extendEnvironment((hre) => {
     const newImplAddr =
       typeof newImpl === 'string'
         ? newImpl
-        : await newImpl.wait().then((r) => r.contractAddress)
+        : await newImpl.wait(1).then((r) => {
+            if (!r?.contractAddress) throw new Error('No contract address')
+            return r.contractAddress
+          })
 
     const proxyAdmin = await hre.upgrades.admin.getInstance()
     const { protocolOwnerSafe } = await hre.getNamedAccounts()
@@ -444,7 +446,7 @@ extendEnvironment((hre) => {
     const admin = getAdminClient(hre)
     return await admin.createProposal({
       contract: {
-        address: proxyAdmin.address,
+        address: await proxyAdmin.getAddress(),
         network: await getNetwork(hre),
         abi: JSON.stringify(
           proxyAdmin.interface.fragments.map((fragment) =>
@@ -508,11 +510,15 @@ extendEnvironment((hre) => {
       let call: { fn: string; args: any[] } | undefined
       if ('proxy' in step) {
         refAddress =
-          typeof step.proxy === 'string' ? step.proxy : step.proxy.address
+          typeof step.proxy === 'string'
+            ? step.proxy
+            : await step.proxy.getAddress()
         call = step.opts?.call
       } else {
         refAddress =
-          typeof step.beacon === 'string' ? step.beacon : step.beacon.address
+          typeof step.beacon === 'string'
+            ? step.beacon
+            : await step.beacon.getAddress()
       }
       const newImpl = await hre.upgrades.prepareUpgrade(
         refAddress,
@@ -522,12 +528,15 @@ extendEnvironment((hre) => {
       const newImplAddr =
         typeof newImpl === 'string'
           ? newImpl
-          : await newImpl.wait().then((r) => r.contractAddress)
+          : await newImpl.wait(1).then((r) => {
+              if (!r?.contractAddress) throw new Error('No contract address')
+              return r.contractAddress
+            })
 
       let targetFunction: ProposalTargetFunction
       let functionInputs: ProposalFunctionInputs
       if ('proxy' in step) {
-        toContractAddress = proxyAdmin.address
+        toContractAddress = await proxyAdmin.getAddress()
 
         if (call) {
           targetFunction = {
@@ -623,8 +632,8 @@ extendEnvironment((hre) => {
       targets: new Array<string>(),
       values: new Array<string>(),
       payloads: new Array<string>(),
-      predecessor: ethers.utils.formatBytes32String(''),
-      salt: ethers.utils.formatBytes32String(''),
+      predecessor: ethers.encodeBytes32String(''),
+      salt: ethers.encodeBytes32String(''),
       delay: moment.duration(3, 'minutes').asSeconds().toString(),
     }
 
@@ -634,11 +643,15 @@ extendEnvironment((hre) => {
       let call: { fn: string; args: any[] } | undefined
       if ('proxy' in step) {
         refAddress =
-          typeof step.proxy === 'string' ? step.proxy : step.proxy.address
+          typeof step.proxy === 'string'
+            ? step.proxy
+            : await step.proxy.getAddress()
         call = step.opts?.call
       } else {
         refAddress =
-          typeof step.beacon === 'string' ? step.beacon : step.beacon.address
+          typeof step.beacon === 'string'
+            ? step.beacon
+            : await step.beacon.getAddress()
       }
 
       const newImpl = await hre.upgrades.prepareUpgrade(
@@ -649,11 +662,14 @@ extendEnvironment((hre) => {
       const newImplAddr =
         typeof newImpl === 'string'
           ? newImpl
-          : await newImpl.wait().then((r) => r.contractAddress)
+          : await newImpl.wait(1).then((r) => {
+              if (!r?.contractAddress) throw new Error('No contract address')
+              return r.contractAddress
+            })
 
       timelockBatchArgs.values.push('0')
       if ('proxy' in step) {
-        timelockBatchArgs.targets.push(proxyAdmin.address)
+        timelockBatchArgs.targets.push(await proxyAdmin.getAddress())
 
         if (call) {
           timelockBatchArgs.payloads.push(
@@ -674,8 +690,8 @@ extendEnvironment((hre) => {
       } else {
         timelockBatchArgs.targets.push(refAddress)
 
-        const iface = new ethers.utils.Interface([
-          ethers.utils.FunctionFragment.from({
+        const iface = new ethers.Interface([
+          ethers.FunctionFragment.from({
             inputs: [
               {
                 internalType: 'address',
@@ -842,9 +858,10 @@ async function ozDefenderDeploy(
   hre.log(`${proxy.address}`, { star: false })
   await proxy.deployed()
 
+  const proxyAddress = await proxy.getAddress()
   const implementation = isProxy
-    ? await hre.upgrades.erc1967.getImplementationAddress(proxy.address)
-    : await hre.upgrades.beacon.getImplementationAddress(proxy.address)
+    ? await hre.upgrades.erc1967.getImplementationAddress(proxyAddress)
+    : await hre.upgrades.beacon.getImplementationAddress(proxyAddress)
   hre.log(implementationLabel, {
     star: false,
     nl: false,
@@ -855,14 +872,15 @@ async function ozDefenderDeploy(
   const abi = implFactory.interface.fragments.map((fragment) =>
     JSON.parse(fragment.format('json'))
   )
+  const deployTx = proxy.deploymentTransaction()
+  const transactionHash = deployTx?.hash ?? existingDeployment?.transactionHash
+  const receipt = Object.assign({}, deployTx, existingDeployment?.receipt)
   await hre.deployments.save(saveName, {
-    address: proxy.address,
+    address: proxyAddress,
     implementation,
     abi,
-    transactionHash:
-      proxy?.deployTransaction?.hash ?? existingDeployment?.transactionHash,
-    receipt:
-      (await proxy?.deployTransaction?.wait()) ?? existingDeployment?.receipt,
+    transactionHash,
+    receipt,
   })
 
   hre.log('')

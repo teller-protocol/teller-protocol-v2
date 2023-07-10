@@ -163,11 +163,7 @@
           },
           "t_enum(CollateralType)25222": {
             "label": "enum CollateralType",
-            "members": [
-              "ERC20",
-              "ERC721",
-              "ERC1155"
-            ],
+            "members": ["ERC20", "ERC721", "ERC1155"],
             "numberOfBytes": "1"
           },
           "t_mapping(t_address,t_struct(Collateral)25232_storage)": {
@@ -712,18 +708,12 @@
           },
           "t_enum(PaymentCycleType)27017": {
             "label": "enum PaymentCycleType",
-            "members": [
-              "Seconds",
-              "Monthly"
-            ],
+            "members": ["Seconds", "Monthly"],
             "numberOfBytes": "1"
           },
           "t_enum(PaymentType)27014": {
             "label": "enum PaymentType",
-            "members": [
-              "EMI",
-              "Bullet"
-            ],
+            "members": ["EMI", "Bullet"],
             "numberOfBytes": "1"
           },
           "t_mapping(t_address,t_array(t_uint256)dyn_storage)": {
@@ -1144,10 +1134,7 @@
           },
           "t_enum(AllocationStrategy)19499": {
             "label": "enum IMarketLiquidityRewards.AllocationStrategy",
-            "members": [
-              "BORROWER",
-              "LENDER"
-            ],
+            "members": ["BORROWER", "LENDER"],
             "numberOfBytes": "1"
           },
           "t_mapping(t_uint256,t_bool)": {
@@ -1598,18 +1585,12 @@
           },
           "t_enum(PaymentCycleType)27017": {
             "label": "enum PaymentCycleType",
-            "members": [
-              "Seconds",
-              "Monthly"
-            ],
+            "members": ["Seconds", "Monthly"],
             "numberOfBytes": "1"
           },
           "t_enum(PaymentType)27014": {
             "label": "enum PaymentType",
-            "members": [
-              "EMI",
-              "Bullet"
-            ],
+            "members": ["EMI", "Bullet"],
             "numberOfBytes": "1"
           },
           "t_mapping(t_address,t_bytes32)": {
@@ -2132,18 +2113,12 @@
           },
           "t_enum(PaymentCycleType)27275": {
             "label": "enum PaymentCycleType",
-            "members": [
-              "Seconds",
-              "Monthly"
-            ],
+            "members": ["Seconds", "Monthly"],
             "numberOfBytes": "1"
           },
           "t_enum(PaymentType)27272": {
             "label": "enum PaymentType",
-            "members": [
-              "EMI",
-              "Bullet"
-            ],
+            "members": ["EMI", "Bullet"],
             "numberOfBytes": "1"
           },
           "t_mapping(t_address,t_bytes32)": {
@@ -2627,18 +2602,12 @@
           },
           "t_enum(PaymentCycleType)22798": {
             "label": "enum PaymentCycleType",
-            "members": [
-              "Seconds",
-              "Monthly"
-            ],
+            "members": ["Seconds", "Monthly"],
             "numberOfBytes": "1"
           },
           "t_enum(PaymentType)22795": {
             "label": "enum PaymentType",
-            "members": [
-              "EMI",
-              "Bullet"
-            ],
+            "members": ["EMI", "Bullet"],
             "numberOfBytes": "1"
           },
           "t_mapping(t_address,t_array(t_uint256)dyn_storage)": {
@@ -3011,11 +2980,7 @@
           },
           "t_enum(CollateralType)25478": {
             "label": "enum CollateralType",
-            "members": [
-              "ERC20",
-              "ERC721",
-              "ERC1155"
-            ],
+            "members": ["ERC20", "ERC721", "ERC1155"],
             "numberOfBytes": "1"
           },
           "t_mapping(t_address,t_struct(Collateral)25488_storage)": {
@@ -3205,11 +3170,7 @@
           },
           "t_enum(CollateralType)25478": {
             "label": "enum CollateralType",
-            "members": [
-              "ERC20",
-              "ERC721",
-              "ERC1155"
-            ],
+            "members": ["ERC20", "ERC721", "ERC1155"],
             "numberOfBytes": "1"
           },
           "t_mapping(t_address,t_struct(Collateral)25488_storage)": {
@@ -3340,11 +3301,7 @@
           },
           "t_enum(CollateralType)1731": {
             "label": "enum CollateralType",
-            "members": [
-              "ERC20",
-              "ERC721",
-              "ERC1155"
-            ],
+            "members": ["ERC20", "ERC721", "ERC1155"],
             "numberOfBytes": "1"
           },
           "t_mapping(t_address,t_struct(Collateral)1741_storage)": {

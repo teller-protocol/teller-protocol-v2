@@ -14,5 +14,6 @@
   "default-proxy-admin:transfer": 1688587184,
   "sherlock-audit:upgrade": 1688587576,
   "lender-manager:upgrade-art": 1688662351,
+  "lender-commitment-forwarder:merkle-upgrade": 1688596796,
   "teller-v2:transfer-ownership-to-safe": 1688588967
 }

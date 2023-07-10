@@ -90,7 +90,7 @@ contract LenderManager_Test is Testable {
 
         assertEq(
             baseURI,
-            "data:image/svg+xml;charset=utf-8,",
+            "",
             "Base URI is not correct"
         );
     }

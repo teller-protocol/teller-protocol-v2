@@ -87,7 +87,7 @@ contract LenderManager is
     }
 
     function _baseURI() internal view override returns (string memory) {
-        return "data:image/svg+xml;charset=utf-8,";
+        return "";
     }
 
     struct LoanInformation {

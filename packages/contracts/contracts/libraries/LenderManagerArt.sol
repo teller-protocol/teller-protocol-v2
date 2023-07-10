@@ -316,7 +316,7 @@ library LenderManagerArt {
                     ),
                     _generate_text_label(
                         "Collateral: ",
-                        collateralLabel, //string(abi.encodePacked(collateral_amount_formatted," ",collateral_token_symbol)),
+                        collateralLabel,
                         384
                     ),
                     _generate_text_label(

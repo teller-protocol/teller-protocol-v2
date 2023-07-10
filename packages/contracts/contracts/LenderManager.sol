@@ -25,7 +25,6 @@ contract LenderManager is
     ERC721Upgradeable,
     ILenderManager
 {
-    // using Strings for uint256;
     IMarketRegistry public immutable marketRegistry;
 
     constructor(IMarketRegistry _marketRegistry) {

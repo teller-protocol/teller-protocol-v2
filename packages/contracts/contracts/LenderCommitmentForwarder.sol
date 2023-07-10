@@ -343,15 +343,16 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             "Invalid commitment collateral type"
         );
 
-        return _acceptCommitment(
-            _commitmentId,
-            _principalAmount,
-            _collateralAmount,
-            _collateralTokenId,
-            _collateralTokenAddress,
-            _interestRate,
-            _loanDuration
-        );
+        return
+            _acceptCommitment(
+                _commitmentId,
+                _principalAmount,
+                _collateralAmount,
+                _collateralTokenId,
+                _collateralTokenAddress,
+                _interestRate,
+                _loanDuration
+            );
     }
 
     /**
@@ -377,7 +378,6 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint32 _loanDuration,
         bytes32[] calldata _merkleProof
     ) external returns (uint256 bidId) {
-
         require(
             commitments[_commitmentId].collateralTokenType ==
                 CommitmentCollateralType.ERC721_MERKLE_PROOF ||
@@ -386,12 +386,11 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             "Invalid commitment collateral type"
         );
 
-
         bytes32 _merkleRoot = bytes32(
             commitments[_commitmentId].collateralTokenId
         );
         bytes32 _leaf = keccak256(abi.encodePacked(_collateralTokenId));
-        
+
         //make sure collateral token id is a leaf within the proof
         require(
             MerkleProofUpgradeable.verifyCalldata(
@@ -401,8 +400,6 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             ),
             "Invalid proof"
         );
-
-        
 
         return
             _acceptCommitment(
@@ -416,7 +413,6 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             );
     }
 
-
     /**
      * @notice Accept the commitment to submitBid and acceptBid using the funds
      * @dev LoanDuration must be longer than the market payment cycle
@@ -428,7 +424,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
      * @param _interestRate The interest rate APY to use for the loan in basis points.
      * @param _loanDuration The overall duration for the loan.  Must be longer than market payment cycle duration.
      * @return bidId The ID of the loan that was created on TellerV2
-     */     
+     */
     function _acceptCommitment(
         uint256 _commitmentId,
         uint256 _principalAmount,

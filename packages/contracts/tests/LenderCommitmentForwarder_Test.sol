@@ -695,7 +695,6 @@ contract LenderCommitmentForwarder_Test is Testable {
         uint16 interestRate = minInterestRate;
         uint32 loanDuration = maxDuration;
 
-       
         collateralTokenId = tokenIdLeaf;
 
         // vm.expectRevert("collateral token mismatch");
@@ -708,8 +707,7 @@ contract LenderCommitmentForwarder_Test is Testable {
             interestRate,
             loanDuration,
             merkleProof
-        ); 
-
+        );
 
         assertEq(
             lenderCommitmentForwarder.getCommitmentMaxPrincipal(commitmentId),
@@ -718,7 +716,9 @@ contract LenderCommitmentForwarder_Test is Testable {
         );
 
         assertEq(
-            lenderCommitmentForwarder.getCommitmentAcceptedPrincipal(commitmentId),
+            lenderCommitmentForwarder.getCommitmentAcceptedPrincipal(
+                commitmentId
+            ),
             principalAmount,
             "Incorrect accepted principal"
         );
@@ -733,11 +733,14 @@ contract LenderCommitmentForwarder_Test is Testable {
         bytes32 merkleLeafA = keccak256(abi.encodePacked(tokenIdLeafA)); //  0xc89efdaa54c0f20c7adf612882df0950f5a951637e0307cdcb4c672f298b8bc6;
         bytes32 merkleLeafB = keccak256(abi.encodePacked(tokenIdLeafB));
 
+        //a merkle root is simply the hash of the hashes of the leaves in the layer above, where the leaves are always sorted alphanumerically.
+        //it so happens that the hash of (1) is less than the hash of (3) so we can compute the merkle root manually like this without a sorting function:
+        bytes32 merkleRoot = keccak256(
+            abi.encodePacked(merkleLeafA, merkleLeafB)
+        );
 
-        
-        bytes32 merkleRoot = keccak256( abi.encodePacked(  merkleLeafA, merkleLeafB ) );
         bytes32[] memory merkleProof = new bytes32[](1);
-        merkleProof[0] = merkleLeafB; 
+        merkleProof[0] = merkleLeafB;
 
         LenderCommitmentForwarder.Commitment
             memory c = LenderCommitmentForwarder.Commitment({
@@ -765,7 +768,6 @@ contract LenderCommitmentForwarder_Test is Testable {
         uint16 interestRate = minInterestRate;
         uint32 loanDuration = maxDuration;
 
-       
         collateralTokenId = tokenIdLeafA;
 
         // vm.expectRevert("collateral token mismatch");
@@ -778,8 +780,7 @@ contract LenderCommitmentForwarder_Test is Testable {
             interestRate,
             loanDuration,
             merkleProof
-        ); 
-
+        );
 
         assertEq(
             lenderCommitmentForwarder.getCommitmentMaxPrincipal(commitmentId),
@@ -788,7 +789,9 @@ contract LenderCommitmentForwarder_Test is Testable {
         );
 
         assertEq(
-            lenderCommitmentForwarder.getCommitmentAcceptedPrincipal(commitmentId),
+            lenderCommitmentForwarder.getCommitmentAcceptedPrincipal(
+                commitmentId
+            ),
             principalAmount,
             "Incorrect accepted principal"
         );

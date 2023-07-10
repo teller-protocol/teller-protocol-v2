@@ -4,7 +4,7 @@ const deployFn: DeployFunction = async (hre) => {
   hre.log('----------')
   hre.log('')
   hre.log('LenderCommitmentForwarder: Proposing upgrade...')
- 
+
   const tellerV2 = await hre.contracts.get('TellerV2')
   const marketRegistry = await hre.contracts.get('MarketRegistry')
   const lenderCommitmentForwarder = await hre.contracts.get(
@@ -22,7 +22,6 @@ const deployFn: DeployFunction = async (hre) => {
 * Merkle proofs can be used to create commitments for a set of tokenIds for an ERC721 or ERC1155 collection.
 `,
     [
-      
       {
         proxy: lenderCommitmentForwarder.address,
         implFactory: await hre.ethers.getContractFactory(
@@ -55,10 +54,9 @@ deployFn.tags = [
 deployFn.dependencies = [
   'market-registry:deploy',
   'teller-v2:deploy',
-  'lender-commitment-forwarder:deploy'
+  'lender-commitment-forwarder:deploy',
 ]
 deployFn.skip = async (hre) => {
   return false
- 
 }
 export default deployFn

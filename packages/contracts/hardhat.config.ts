@@ -178,12 +178,10 @@ export default <HardhatUserConfig>{
   defaultNetwork,
 
   etherscan: {
-    apiKey: { 
-      mainnet: process.env.ETHERSCAN_VERIFY_API_KEY ,
-      goerli: process.env.ETHERSCAN_VERIFY_API_KEY ,
-      polygon: process.env.POLYGON_VERIFY_API_KEY ,
-
-    
+    apiKey: {
+      mainnet: process.env.ETHERSCAN_VERIFY_API_KEY,
+      goerli: process.env.ETHERSCAN_VERIFY_API_KEY,
+      polygon: process.env.POLYGON_VERIFY_API_KEY,
     },
   },
 

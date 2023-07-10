@@ -124,17 +124,9 @@ contract LenderManager is
             collateralManager
         ).getCollateralInfo(tokenId);
 
-        if (collateralArray.length == 0) {
-            return
-                Collateral({
-                    _amount: 0,
-                    _collateralAddress: address(0),
-                    _collateralType: CollateralType.ERC20,
-                    _tokenId: 0
-                });
+        if (collateralArray.length > 0) {
+            collateral_ = collateralArray[0];
         }
-
-        return collateralArray[0];
     }
 
     function tokenURI(uint256 tokenId)

@@ -326,7 +326,7 @@ library LenderManagerArt {
                     ),
                     _generate_text_label(
                         "Duration: ",
-                        loanDurationLabel, //"7 days",
+                        loanDurationLabel,
                         444
                     ),
                     "</svg>"

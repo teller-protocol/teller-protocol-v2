@@ -216,11 +216,7 @@ contract TellerV2 is
         _setEscrowVault(_escrowVault);
     }
 
-    function setEscrowVault(address _escrowVault)
-        external
-        reinitializer(9)
-        onlyOwner
-    {
+    function setEscrowVault(address _escrowVault) external reinitializer(9) {
         _setEscrowVault(_escrowVault);
     }
 
@@ -261,14 +257,6 @@ contract TellerV2 is
             uint256 convertedURI = uint256(bids[_bidId]._metadataURI);
             metadataURI_ = StringsUpgradeable.toHexString(convertedURI, 32);
         }
-    }
-
-    /**
-     * @notice Lets the DAO/owner of the protocol to set a new reputation manager contract.
-     * @param _reputationManager The new contract address.
-     */
-    function setReputationManager(address _reputationManager) public onlyOwner {
-        reputationManager = IReputationManager(_reputationManager);
     }
 
     /**

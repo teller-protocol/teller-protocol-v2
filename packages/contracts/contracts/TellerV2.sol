@@ -1115,7 +1115,7 @@ contract TellerV2 is
         principalAmount = bid.loanDetails.principal;
         acceptedTimestamp = bid.loanDetails.acceptedTimestamp;
         lastRepaidTimestamp = V2Calculations.lastRepaidTimestamp(bids[_bidId]);
-        bidState = bid.state; 
+        bidState = bid.state;
     }
 
     /** OpenZeppelin Override Functions **/

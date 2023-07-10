@@ -9,7 +9,6 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "@openzeppelin/contracts/utils/Base64.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
-
 // Interfaces
 import "./interfaces/ILenderManager.sol";
 import "./interfaces/ITellerV2.sol";
@@ -17,8 +16,8 @@ import "./interfaces/ITellerV2Storage.sol";
 import "./interfaces/ICollateralManager.sol";
 import "./interfaces/IMarketRegistry.sol";
 
-import {LenderManagerArt} from "./libraries/LenderManagerArt.sol";
-import {CollateralType,Collateral} from "./interfaces/escrow/ICollateralEscrowV1.sol";
+import { LenderManagerArt } from "./libraries/LenderManagerArt.sol";
+import { CollateralType, Collateral } from "./interfaces/escrow/ICollateralEscrowV1.sol";
 
 contract LenderManager is
     Initializable,
@@ -26,7 +25,7 @@ contract LenderManager is
     ERC721Upgradeable,
     ILenderManager
 {
-   // using Strings for uint256;
+    // using Strings for uint256;
     IMarketRegistry public immutable marketRegistry;
 
     constructor(IMarketRegistry _marketRegistry) {
@@ -93,104 +92,104 @@ contract LenderManager is
     }
 
     struct LoanInformation {
-
         address principalTokenAddress;
         uint256 principalAmount;
         uint16 interestRate;
         uint32 loanDuration;
-
-
     }
 
-
-    function _getLoanInformation(uint256 tokenId) 
-    internal view 
-    returns (LoanInformation memory loanInformation_) {
-
+    function _getLoanInformation(uint256 tokenId)
+        internal
+        view
+        returns (LoanInformation memory loanInformation_)
+    {
         Bid memory bid = ITellerV2Storage(owner()).bids(tokenId);
-        
-         loanInformation_ = LoanInformation({
+
+        loanInformation_ = LoanInformation({
             principalTokenAddress: address(bid.loanDetails.lendingToken),
             principalAmount: bid.loanDetails.principal,
             interestRate: bid.terms.APR,
             loanDuration: bid.loanDetails.loanDuration
-        });  
- 
+        });
     }
 
-
     function _getCollateralInformation(uint256 tokenId)
-    internal view
-    returns (Collateral memory collateral_) {
+        internal
+        view
+        returns (Collateral memory collateral_)
+    {
+        address collateralManager = ITellerV2Storage(owner())
+            .collateralManager();
 
-        address collateralManager = ITellerV2Storage(owner()).collateralManager();
+        Collateral[] memory collateralArray = ICollateralManager(
+            collateralManager
+        ).getCollateralInfo(tokenId);
 
-        Collateral[] memory collateralArray = ICollateralManager(collateralManager).getCollateralInfo(tokenId);
-
-        if(collateralArray.length == 0) {
-            return Collateral({
-                _amount: 0,
-                _collateralAddress: address(0),
-                _collateralType: CollateralType.ERC20,
-                _tokenId: 0
-
-            });
-        } 
+        if (collateralArray.length == 0) {
+            return
+                Collateral({
+                    _amount: 0,
+                    _collateralAddress: address(0),
+                    _collateralType: CollateralType.ERC20,
+                    _tokenId: 0
+                });
+        }
 
         return collateralArray[0];
     }
 
-    function tokenURI(uint256 tokenId) public view override returns (string memory) {
-        require(_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
+    function tokenURI(uint256 tokenId)
+        public
+        view
+        override
+        returns (string memory)
+    {
+        require(
+            _exists(tokenId),
+            "ERC721Metadata: URI query for nonexistent token"
+        );
 
-    LoanInformation memory loanInformation = _getLoanInformation(tokenId);
- 
+        LoanInformation memory loanInformation = _getLoanInformation(tokenId);
 
-    Collateral memory collateral = _getCollateralInformation(tokenId);
-        
-        
-        string memory image_svg_encoded = Base64.encode(bytes( 
-            LenderManagerArt.generateSVG(
-                tokenId, //tokenId == bidId 
-                loanInformation.principalAmount,
-                loanInformation.principalTokenAddress,
-                collateral,
-                loanInformation.interestRate,
-                loanInformation.loanDuration 
-                ) ));
-    
+        Collateral memory collateral = _getCollateralInformation(tokenId);
 
-       string memory name = "Teller Loan NFT";
-       string memory description = "This token represents ownership of a loan.  Repayments of principal and interest will be sent to the owner of this token.  If the loan defaults, the owner of this token will be able to claim the underlying collateral.  Please externally verify the parameter of the loan as this rendering is only a summary.";
+        string memory image_svg_encoded = Base64.encode(
+            bytes(
+                LenderManagerArt.generateSVG(
+                    tokenId, //tokenId == bidId
+                    loanInformation.principalAmount,
+                    loanInformation.principalTokenAddress,
+                    collateral,
+                    loanInformation.interestRate,
+                    loanInformation.loanDuration
+                )
+            )
+        );
 
+        string memory name = "Teller Loan NFT";
+        string
+            memory description = "This token represents ownership of a loan.  Repayments of principal and interest will be sent to the owner of this token.  If the loan defaults, the owner of this token will be able to claim the underlying collateral.  Please externally verify the parameter of the loan as this rendering is only a summary.";
 
-
-        string memory encoded_svg =   string(
-                abi.encodePacked(
-                    'data:application/json;base64,',
-                    Base64.encode(
-                        bytes(
-                            abi.encodePacked(
-                                '{"name":"',
-                                name,
-                                '", "description":"',
-                                description, 
-                                '", "image": "',  
-                                'data:image/svg+xml;base64,',
-                                image_svg_encoded,
-                                '"}'
-                            )
+        string memory encoded_svg = string(
+            abi.encodePacked(
+                "data:application/json;base64,",
+                Base64.encode(
+                    bytes(
+                        abi.encodePacked(
+                            '{"name":"',
+                            name,
+                            '", "description":"',
+                            description,
+                            '", "image": "',
+                            "data:image/svg+xml;base64,",
+                            image_svg_encoded,
+                            '"}'
                         )
                     )
                 )
-            );
-        
+            )
+        );
+
         return encoded_svg;
     }
-
-
 }
-
-
-
- 

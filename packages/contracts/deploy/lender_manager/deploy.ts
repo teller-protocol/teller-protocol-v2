@@ -19,5 +19,8 @@ const deployFn: DeployFunction = async (hre) => {
 // tags and deployment
 deployFn.id = 'lender-manager:deploy'
 deployFn.tags = ['lender-manager', 'lender-manager:deploy']
-deployFn.dependencies = ['market-registry:deploy','lender-manager:lender-manager-art']
+deployFn.dependencies = [
+  'market-registry:deploy',
+  'lender-manager:lender-manager-art',
+]
 export default deployFn

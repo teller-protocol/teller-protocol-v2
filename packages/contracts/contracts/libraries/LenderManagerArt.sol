@@ -309,26 +309,10 @@ library LenderManagerArt {
                         principalTokenSymbol
                     ),
                     _teller_logo,
-                    _generate_text_label(
-                        "Loan ID: ",
-                        loanId,
-                        354
-                    ),
-                    _generate_text_label(
-                        "Collateral: ",
-                        collateralLabel,
-                        384
-                    ),
-                    _generate_text_label(
-                        "APR: ",
-                        interestRateLabel,
-                        414
-                    ),
-                    _generate_text_label(
-                        "Duration: ",
-                        loanDurationLabel,
-                        444
-                    ),
+                    _generate_text_label("Loan ID: ", loanId, 354),
+                    _generate_text_label("Collateral: ", collateralLabel, 384),
+                    _generate_text_label("APR: ", interestRateLabel, 414),
+                    _generate_text_label("Duration: ", loanDurationLabel, 444),
                     "</svg>"
                 )
             );

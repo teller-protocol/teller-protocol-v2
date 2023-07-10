@@ -38,25 +38,25 @@ const deployFn: DeployFunction = async (hre) => {
 
         opts: {
           unsafeAllow: ['constructor', 'state-variable-immutable'],
-          constructorArgs: [tellerV2.address, marketRegistry.address]
-        }
+          constructorArgs: [tellerV2.address, marketRegistry.address],
+        },
       },
       {
         proxy: lenderManager.address,
         implFactory: await hre.ethers.getContractFactory('LenderManager', {
           libraries: {
-            LenderManagerArt: lenderManagerArt.address
-          }
+            LenderManagerArt: lenderManagerArt.address,
+          },
         }),
         opts: {
           unsafeAllow: [
             'constructor',
             'state-variable-immutable',
-            'external-library-linking'
+            'external-library-linking',
           ],
-          constructorArgs: [marketRegistry.address]
-        }
-      }
+          constructorArgs: [marketRegistry.address],
+        },
+      },
     ]
   )
 
@@ -74,14 +74,14 @@ deployFn.tags = [
   'upgrade',
   'lender-commitment-forwarder',
   'lender-manager',
-  'merkle-root-lender-art:upgrade'
+  'merkle-root-lender-art:upgrade',
 ]
 deployFn.dependencies = [
   'market-registry:deploy',
   'teller-v2:deploy',
   'lender-commitment-forwarder:deploy',
   'market-registry:deploy',
-  'lender-manager:deploy'
+  'lender-manager:deploy',
 ]
 deployFn.skip = async (hre) => {
   return false

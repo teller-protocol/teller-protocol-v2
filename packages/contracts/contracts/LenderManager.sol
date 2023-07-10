@@ -135,7 +135,6 @@ contract LenderManager is
         override
         returns (string memory)
     {
-
         LoanInformation memory loanInformation = _getLoanInformation(tokenId);
 
         Collateral memory collateral = _getCollateralInformation(tokenId);

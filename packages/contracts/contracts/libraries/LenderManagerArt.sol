@@ -311,7 +311,7 @@ library LenderManagerArt {
                     _teller_logo,
                     _generate_text_label(
                         "Loan ID: ",
-                        loanId, //Strings.toString(bidId),
+                        loanId,
                         354
                     ),
                     _generate_text_label(

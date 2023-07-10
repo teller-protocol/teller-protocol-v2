@@ -25,12 +25,12 @@ import {
   parseUnits,
   parseEther,
   TransactionRequest,
-  TransactionReceipt
+  TransactionReceipt,
 } from 'ethers'
 import { HardhatUserConfig, task } from 'hardhat/config'
 import {
   HardhatNetworkHDAccountsUserConfig,
-  NetworkUserConfig
+  NetworkUserConfig,
 } from 'hardhat/types'
 import rrequire from 'helpers/rrequire'
 import semver from 'semver'
@@ -54,7 +54,7 @@ const {
   TESTING,
   ALCHEMY_API_KEY,
   DEFENDER_API_KEY,
-  DEFENDER_API_SECRET
+  DEFENDER_API_SECRET,
 } = process.env
 
 const isCompiling = COMPILING === 'true'
@@ -93,7 +93,7 @@ export const getMnemonic = (): string => {
 const accounts: HardhatNetworkHDAccountsUserConfig = {
   mnemonic: getMnemonic(),
   count: 15,
-  accountsBalance: parseEther('100000000').toString()
+  accountsBalance: parseEther('100000000').toString(),
 }
 
 type NetworkNames =
@@ -138,7 +138,7 @@ const networkUrls: Record<NetworkNames, string> = {
     (ALCHEMY_API_KEY
       ? `https://eth-goerli.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
       : ''),
-  tenderly: process.env.TENDERLY_RPC_URL ?? ''
+  tenderly: process.env.TENDERLY_RPC_URL ?? '',
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -165,7 +165,7 @@ const networkConfig = (config: NetworkUserConfig): NetworkUserConfig => ({
   live: false,
   ...config,
   accounts,
-  gas: 'auto'
+  gas: 'auto',
 })
 
 /*
@@ -191,39 +191,39 @@ export default <HardhatUserConfig>{
       // Test Networks
       sepolia: process.env.ETHERSCAN_VERIFY_API_KEY,
       goerli: process.env.ETHERSCAN_VERIFY_API_KEY,
-      mumbai: process.env.POLYGONSCAN_VERIFY_API_KEY
-    }
+      mumbai: process.env.POLYGONSCAN_VERIFY_API_KEY,
+    },
   },
 
   defender: {
     apiKey: DEFENDER_API_KEY,
-    apiSecret: DEFENDER_API_SECRET
+    apiSecret: DEFENDER_API_SECRET,
   },
 
   tenderly: {
     username: 'teller',
     project: 'v2',
     privateVerification: true,
-    forkNetwork: networkUrls.tenderly
+    forkNetwork: networkUrls.tenderly,
   },
 
   paths: {
     cache: './generated/cache',
     artifacts: './generated/artifacts',
-    sources: './contracts'
+    sources: './contracts',
   },
 
   typechain: {
     outDir: './generated/typechain',
-    target: 'ethers-v6'
+    target: 'ethers-v6',
   },
 
   external: {
     contracts: [
       {
-        artifacts: './node_modules/hardhat-deploy/extendedArtifacts'
-      }
-    ]
+        artifacts: './node_modules/hardhat-deploy/extendedArtifacts',
+      },
+    ],
   },
 
   solidity: {
@@ -233,21 +233,21 @@ export default <HardhatUserConfig>{
         settings: {
           optimizer: {
             enabled: true, // !isTesting, //need this for now due to large size of tellerV2.test
-            runs: 200
-          }
-        }
-      }
-    ]
+            runs: 200,
+          },
+        },
+      },
+    ],
   },
 
   ovm: {
-    solcVersion: '0.8.4'
+    solcVersion: '0.8.4',
   },
 
   contractSizer: {
     runOnCompile: !skipContractSizer,
     alphaSort: false,
-    disambiguatePaths: false
+    disambiguatePaths: false,
   },
 
   /**
@@ -262,13 +262,13 @@ export default <HardhatUserConfig>{
     outputFile: SAVE_GAS_REPORT ? 'gas-reporter.txt' : undefined,
     noColors: !!SAVE_GAS_REPORT,
     showMethodSig: false,
-    showTimeSpent: true
+    showTimeSpent: true,
   },
 
   namedAccounts: {
     deployer: {
       default: 0, // here this will by default take the first account as deployer
-      31337: '0x65B38b3Cd7eFe502DB579c16ECB5B49235d0DAd0' // use the goerli deployer address for hardhat forking
+      31337: '0x65B38b3Cd7eFe502DB579c16ECB5B49235d0DAd0', // use the goerli deployer address for hardhat forking
     },
     borrower: 1,
     lender: 2,
@@ -283,7 +283,7 @@ export default <HardhatUserConfig>{
       5: '0x0061CA4F1EB8c3FF93Df074061844d3dd4dC0377',
       137: '0xFea0FB908E31567CaB641865212cF76BE824D848',
       42161: '0xD9149bfBfB29cC175041937eF8161600b464051B',
-      11155111: '0xb1ff461BB751B87f4F791201a29A8cFa9D30490c'
+      11155111: '0xb1ff461BB751B87f4F791201a29A8cFa9D30490c',
     },
     protocolTimelock: {
       default: 8,
@@ -291,8 +291,8 @@ export default <HardhatUserConfig>{
       5: '0x0e8A920f0338b94828aE84a7C227bC17F3a02f86',
       137: '0x6eB9b34913Bd96CA2695519eD0F8B8752d43FD2b',
       42161: '0x6BBf498C429C51d05bcA3fC67D2C720B15FC73B8',
-      11155111: '0xFe5394B67196EA95301D6ECB5389E98A02984cC2'
-    }
+      11155111: '0xFe5394B67196EA95301D6ECB5389E98A02984cC2',
+    },
   },
 
   // if you want to deploy to a testnet, mainnet, or xdai, you will need to configure:
@@ -313,12 +313,12 @@ export default <HardhatUserConfig>{
           ? undefined
           : {
               enabled: true,
-              url: networkUrls[HARDHAT_DEPLOY_FORK as keyof typeof networkUrls]
+              url: networkUrls[HARDHAT_DEPLOY_FORK as keyof typeof networkUrls],
               // blockNumber: getLatestDeploymentBlock(HARDHAT_DEPLOY_FORK),
-            }
+            },
     }),
     localhost: networkConfig({
-      url: 'http://localhost:8545'
+      url: 'http://localhost:8545',
     }),
 
     // Main Networks
@@ -330,9 +330,9 @@ export default <HardhatUserConfig>{
 
       verify: {
         etherscan: {
-          apiKey: process.env.ETHERSCAN_VERIFY_API_KEY
-        }
-      }
+          apiKey: process.env.ETHERSCAN_VERIFY_API_KEY,
+        },
+      },
     }),
     polygon: networkConfig({
       url: networkUrls.polygon,
@@ -342,9 +342,9 @@ export default <HardhatUserConfig>{
 
       verify: {
         etherscan: {
-          apiKey: process.env.POLYGONSCAN_VERIFY_API_KEY
-        }
-      }
+          apiKey: process.env.POLYGONSCAN_VERIFY_API_KEY,
+        },
+      },
     }),
     arbitrum: networkConfig({
       url: networkUrls.arbitrum,
@@ -354,9 +354,9 @@ export default <HardhatUserConfig>{
 
       verify: {
         etherscan: {
-          apiKey: process.env.ARBISCAN_VERIFY_API_KEY
-        }
-      }
+          apiKey: process.env.ARBISCAN_VERIFY_API_KEY,
+        },
+      },
     }),
 
     // Test Networks
@@ -367,9 +367,9 @@ export default <HardhatUserConfig>{
 
       verify: {
         etherscan: {
-          apiKey: process.env.ETHERSCAN_VERIFY_API_KEY
-        }
-      }
+          apiKey: process.env.ETHERSCAN_VERIFY_API_KEY,
+        },
+      },
     }),
     goerli: networkConfig({
       url: networkUrls.goerli,
@@ -379,9 +379,9 @@ export default <HardhatUserConfig>{
 
       verify: {
         etherscan: {
-          apiKey: process.env.ETHERSCAN_VERIFY_API_KEY
-        }
-      }
+          apiKey: process.env.ETHERSCAN_VERIFY_API_KEY,
+        },
+      },
     }),
     mumbai: networkConfig({
       url: networkUrls.mumbai,
@@ -391,18 +391,18 @@ export default <HardhatUserConfig>{
 
       verify: {
         etherscan: {
-          apiKey: process.env.POLYGONSCAN_VERIFY_API_KEY
-        }
-      }
+          apiKey: process.env.POLYGONSCAN_VERIFY_API_KEY,
+        },
+      },
     }),
     tenderly: networkConfig({
-      url: networkUrls.tenderly
-    })
+      url: networkUrls.tenderly,
+    }),
   },
 
   mocha: {
-    timeout: 60000
-  }
+    timeout: 60000,
+  },
 }
 
 const DEBUG = false
@@ -433,7 +433,7 @@ task('fundedwallet', 'Create a wallet (pk) link and fund it with deployer?')
     const amount: string = taskArgs.amount ? taskArgs.amount : '0.01'
     const tx = {
       to: randomWallet.address,
-      value: parseEther(amount)
+      value: parseEther(amount),
     }
 
     // SEND USING LOCAL DEPLOYER MNEMONIC IF THERE IS ONE
@@ -491,7 +491,7 @@ task(
 
       contractAddress = ethers.getCreateAddress({
         from: wallet.address,
-        nonce: 0
+        nonce: 0,
       })
 
       if (taskArgs.searchFor) {
@@ -660,7 +660,7 @@ task('send', 'Send ETH')
         'gwei'
       ),
       gasLimit: taskArgs.gasLimit ? taskArgs.gasLimit : 24000,
-      chainId: network.config.chainId
+      chainId: network.config.chainId,
     }
 
     if (taskArgs.data !== undefined) {

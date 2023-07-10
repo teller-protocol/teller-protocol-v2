@@ -135,10 +135,6 @@ contract LenderManager is
         override
         returns (string memory)
     {
-        require(
-            _exists(tokenId),
-            "ERC721Metadata: URI query for nonexistent token"
-        );
 
         LoanInformation memory loanInformation = _getLoanInformation(tokenId);
 

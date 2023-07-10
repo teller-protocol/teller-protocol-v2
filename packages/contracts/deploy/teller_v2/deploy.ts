@@ -5,7 +5,11 @@ const deployFn: DeployFunction = async (hre) => {
   const v2Calculations = await hre.contracts.get('V2Calculations')
 
   const tellerV2 = await hre.deployProxy('TellerV2', {
-    unsafeAllow: ['constructor', 'state-variable-immutable'],
+    unsafeAllow: [
+      'constructor',
+      'state-variable-immutable',
+      'external-library-linking',
+    ],
     constructorArgs: [trustedForwarder.address],
     initializer: false,
     libraries: {

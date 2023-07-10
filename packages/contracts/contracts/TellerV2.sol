@@ -216,11 +216,7 @@ contract TellerV2 is
         _setEscrowVault(_escrowVault);
     }
 
-    function setEscrowVault(address _escrowVault)
-        external
-        reinitializer(9)
-        onlyOwner
-    {
+    function setEscrowVault(address _escrowVault) external reinitializer(9) {
         _setEscrowVault(_escrowVault);
     }
 

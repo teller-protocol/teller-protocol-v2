@@ -34,7 +34,7 @@ export const deploy = async <C extends Contract>(
     _args
   )
   const {
-    deployments: { deploy, get, fetchIfDifferent },
+    deployments: { deploy, get, getOrNull, fetchIfDifferent },
     getNamedAccounts,
   } = args.hre
 
@@ -50,6 +50,7 @@ export const deploy = async <C extends Contract>(
     from: deployer,
   }
 
+  const existingDeployment = await getOrNull(contractDeployName)
   const { differences: isDifferent } = await fetchIfDifferent(
     contractDeployName,
     {
@@ -60,7 +61,8 @@ export const deploy = async <C extends Contract>(
   )
   let result: DeployResult
 
-  const skippingDifferent = args.skipIfAlreadyDeployed && isDifferent
+  const skippingDifferent =
+    !!existingDeployment && args.skipIfAlreadyDeployed && isDifferent
   if (isDifferent && !skippingDifferent) {
     result = await deploy(contractDeployName, deployOpts)
   } else {

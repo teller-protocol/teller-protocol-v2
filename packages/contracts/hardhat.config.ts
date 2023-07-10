@@ -1,10 +1,9 @@
 // This adds support for typescript paths mappings
 import 'tsconfig-paths/register'
-import '@nomiclabs/hardhat-waffle'
 import 'hardhat-contract-sizer'
 import 'hardhat-deploy'
 import 'hardhat-gas-reporter'
-import '@nomiclabs/hardhat-ethers'
+import '@nomicfoundation/hardhat-ethers'
 import '@typechain/hardhat'
 import 'solidity-coverage'
 import '@openzeppelin/hardhat-upgrades'
@@ -14,23 +13,28 @@ import '@nomicfoundation/hardhat-verify'
 import fs from 'fs'
 import path from 'path'
 
-import {
-  TransactionReceipt,
-  TransactionRequest,
-} from '@ethersproject/providers'
-import { HardhatEthersHelpers } from '@nomiclabs/hardhat-ethers/types'
-import { logger as tenderlyLogger2 } from '@teller-protocol/hardhat-tenderly/dist/utils/logger'
+import { HardhatEthersHelpers } from '@nomicfoundation/hardhat-ethers/types'
+// import { logger as tenderlyLogger2 } from '@teller-protocol/hardhat-tenderly/dist/utils/logger'
 import chalk from 'chalk'
 import { config } from 'dotenv'
-import { ethers, Signer, utils } from 'ethers'
+import {
+  Signer,
+  isAddress,
+  getAddress,
+  formatUnits,
+  parseUnits,
+  parseEther,
+  TransactionRequest,
+  TransactionReceipt
+} from 'ethers'
 import { HardhatUserConfig, task } from 'hardhat/config'
 import {
   HardhatNetworkHDAccountsUserConfig,
-  NetworkUserConfig,
+  NetworkUserConfig
 } from 'hardhat/types'
 import rrequire from 'helpers/rrequire'
 import semver from 'semver'
-import { logger as tenderlyLogger } from 'tenderly/utils/logger'
+// import { logger as tenderlyLogger } from 'tenderly/utils/logger'
 
 const NODE_VERSION = 'v16'
 if (!semver.satisfies(process.version, NODE_VERSION))
@@ -39,12 +43,6 @@ if (!semver.satisfies(process.version, NODE_VERSION))
   )
 
 config()
-
-// disable Tenderly's logger
-tenderlyLogger.settings.type = 'hidden'
-tenderlyLogger2.settings.type = 'hidden'
-
-const { isAddress, getAddress, formatUnits, parseUnits, parseEther } = utils
 
 const {
   COMPILING,
@@ -56,7 +54,7 @@ const {
   TESTING,
   ALCHEMY_API_KEY,
   DEFENDER_API_KEY,
-  DEFENDER_API_SECRET,
+  DEFENDER_API_SECRET
 } = process.env
 
 const isCompiling = COMPILING === 'true'
@@ -95,12 +93,13 @@ export const getMnemonic = (): string => {
 const accounts: HardhatNetworkHDAccountsUserConfig = {
   mnemonic: getMnemonic(),
   count: 15,
-  accountsBalance: parseEther('100000000').toString(),
+  accountsBalance: parseEther('100000000').toString()
 }
 
 type NetworkNames =
   | 'mainnet'
   | 'polygon'
+  | 'arbitrum'
   | 'sepolia'
   | 'mumbai'
   | 'goerli'
@@ -116,6 +115,11 @@ const networkUrls: Record<NetworkNames, string> = {
     process.env.POLYGON_RPC_URL ??
     (ALCHEMY_API_KEY
       ? `https://polygon-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
+      : ''),
+  arbitrum:
+    process.env.ARBITRUM_RPC_URL ??
+    (ALCHEMY_API_KEY
+      ? `https://arb-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
       : ''),
 
   // Test Networks
@@ -134,7 +138,7 @@ const networkUrls: Record<NetworkNames, string> = {
     (ALCHEMY_API_KEY
       ? `https://eth-goerli.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
       : ''),
-  tenderly: process.env.TENDERLY_RPC_URL ?? '',
+  tenderly: process.env.TENDERLY_RPC_URL ?? ''
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -161,7 +165,7 @@ const networkConfig = (config: NetworkUserConfig): NetworkUserConfig => ({
   live: false,
   ...config,
   accounts,
-  gas: 'auto',
+  gas: 'auto'
 })
 
 /*
@@ -179,40 +183,47 @@ export default <HardhatUserConfig>{
 
   etherscan: {
     apiKey: {
+      // Main Networks
       mainnet: process.env.ETHERSCAN_VERIFY_API_KEY,
+      polygon: process.env.POLYGONSCAN_VERIFY_API_KEY,
+      arbitrumOne: process.env.ARBISCAN_VERIFY_API_KEY,
+
+      // Test Networks
+      sepolia: process.env.ETHERSCAN_VERIFY_API_KEY,
       goerli: process.env.ETHERSCAN_VERIFY_API_KEY,
-      polygon: process.env.POLYGON_VERIFY_API_KEY,
-    },
+      mumbai: process.env.POLYGONSCAN_VERIFY_API_KEY
+    }
   },
 
   defender: {
     apiKey: DEFENDER_API_KEY,
-    apiSecret: DEFENDER_API_SECRET,
+    apiSecret: DEFENDER_API_SECRET
   },
 
   tenderly: {
     username: 'teller',
     project: 'v2',
     privateVerification: true,
-    forkNetwork: networkUrls.tenderly,
+    forkNetwork: networkUrls.tenderly
   },
 
   paths: {
     cache: './generated/cache',
     artifacts: './generated/artifacts',
-    sources: './contracts',
+    sources: './contracts'
   },
 
   typechain: {
     outDir: './generated/typechain',
+    target: 'ethers-v6'
   },
 
   external: {
     contracts: [
       {
-        artifacts: './node_modules/hardhat-deploy/extendedArtifacts',
-      },
-    ],
+        artifacts: './node_modules/hardhat-deploy/extendedArtifacts'
+      }
+    ]
   },
 
   solidity: {
@@ -222,21 +233,21 @@ export default <HardhatUserConfig>{
         settings: {
           optimizer: {
             enabled: true, // !isTesting, //need this for now due to large size of tellerV2.test
-            runs: 200,
-          },
-        },
-      },
-    ],
+            runs: 200
+          }
+        }
+      }
+    ]
   },
 
   ovm: {
-    solcVersion: '0.8.4',
+    solcVersion: '0.8.4'
   },
 
   contractSizer: {
     runOnCompile: !skipContractSizer,
     alphaSort: false,
-    disambiguatePaths: false,
+    disambiguatePaths: false
   },
 
   /**
@@ -251,13 +262,13 @@ export default <HardhatUserConfig>{
     outputFile: SAVE_GAS_REPORT ? 'gas-reporter.txt' : undefined,
     noColors: !!SAVE_GAS_REPORT,
     showMethodSig: false,
-    showTimeSpent: true,
+    showTimeSpent: true
   },
 
   namedAccounts: {
     deployer: {
       default: 0, // here this will by default take the first account as deployer
-      31337: '0x65B38b3Cd7eFe502DB579c16ECB5B49235d0DAd0', // use the goerli deployer address for hardhat forking
+      31337: '0x65B38b3Cd7eFe502DB579c16ECB5B49235d0DAd0' // use the goerli deployer address for hardhat forking
     },
     borrower: 1,
     lender: 2,
@@ -266,20 +277,22 @@ export default <HardhatUserConfig>{
     marketowner: 5,
     funder: 10,
     rando: 14,
-    protocolProxyAdminSafe: {
+    protocolOwnerSafe: {
       default: 7,
       1: '0x9E3bfee4C6b4D28b5113E4786A1D9812eB3D2Db6',
       5: '0x0061CA4F1EB8c3FF93Df074061844d3dd4dC0377',
       137: '0xFea0FB908E31567CaB641865212cF76BE824D848',
-      11155111: '0xb1ff461BB751B87f4F791201a29A8cFa9D30490c',
+      42161: '0xD9149bfBfB29cC175041937eF8161600b464051B',
+      11155111: '0xb1ff461BB751B87f4F791201a29A8cFa9D30490c'
     },
-    protocolProxyAdminTimelock: {
+    protocolTimelock: {
       default: 8,
-      1: '',
+      1: '0xe6774DAAEdf6e95b222CD3dE09456ec0a46672C4',
       5: '0x0e8A920f0338b94828aE84a7C227bC17F3a02f86',
-      137: '',
-      11155111: '',
-    },
+      137: '0x6eB9b34913Bd96CA2695519eD0F8B8752d43FD2b',
+      42161: '0x6BBf498C429C51d05bcA3fC67D2C720B15FC73B8',
+      11155111: '0xFe5394B67196EA95301D6ECB5389E98A02984cC2'
+    }
   },
 
   // if you want to deploy to a testnet, mainnet, or xdai, you will need to configure:
@@ -300,12 +313,12 @@ export default <HardhatUserConfig>{
           ? undefined
           : {
               enabled: true,
-              url: networkUrls[HARDHAT_DEPLOY_FORK as keyof typeof networkUrls],
+              url: networkUrls[HARDHAT_DEPLOY_FORK as keyof typeof networkUrls]
               // blockNumber: getLatestDeploymentBlock(HARDHAT_DEPLOY_FORK),
-            },
+            }
     }),
     localhost: networkConfig({
-      url: 'http://localhost:8545',
+      url: 'http://localhost:8545'
     }),
 
     // Main Networks
@@ -317,9 +330,9 @@ export default <HardhatUserConfig>{
 
       verify: {
         etherscan: {
-          apiKey: process.env.ETHERSCAN_VERIFY_API_KEY,
-        },
-      },
+          apiKey: process.env.ETHERSCAN_VERIFY_API_KEY
+        }
+      }
     }),
     polygon: networkConfig({
       url: networkUrls.polygon,
@@ -329,9 +342,21 @@ export default <HardhatUserConfig>{
 
       verify: {
         etherscan: {
-          apiKey: process.env.POLYGONSCAN_VERIFY_API_KEY,
-        },
-      },
+          apiKey: process.env.POLYGONSCAN_VERIFY_API_KEY
+        }
+      }
+    }),
+    arbitrum: networkConfig({
+      url: networkUrls.arbitrum,
+      chainId: 42161,
+      live: true,
+      // gasPrice: ethers.utils.parseUnits('110', 'gwei').toNumber(),
+
+      verify: {
+        etherscan: {
+          apiKey: process.env.ARBISCAN_VERIFY_API_KEY
+        }
+      }
     }),
 
     // Test Networks
@@ -342,21 +367,21 @@ export default <HardhatUserConfig>{
 
       verify: {
         etherscan: {
-          apiKey: process.env.ETHERSCAN_VERIFY_API_KEY,
-        },
-      },
+          apiKey: process.env.ETHERSCAN_VERIFY_API_KEY
+        }
+      }
     }),
     goerli: networkConfig({
       url: networkUrls.goerli,
       chainId: 5,
       live: true,
-      gasPrice: ethers.utils.parseUnits('200', 'gwei').toNumber(),
+      gasPrice: Number(parseUnits('200', 'gwei')),
 
       verify: {
         etherscan: {
-          apiKey: process.env.ETHERSCAN_VERIFY_API_KEY,
-        },
-      },
+          apiKey: process.env.ETHERSCAN_VERIFY_API_KEY
+        }
+      }
     }),
     mumbai: networkConfig({
       url: networkUrls.mumbai,
@@ -366,18 +391,18 @@ export default <HardhatUserConfig>{
 
       verify: {
         etherscan: {
-          apiKey: process.env.POLYGONSCAN_VERIFY_API_KEY,
-        },
-      },
+          apiKey: process.env.POLYGONSCAN_VERIFY_API_KEY
+        }
+      }
     }),
     tenderly: networkConfig({
-      url: networkUrls.tenderly,
-    }),
+      url: networkUrls.tenderly
+    })
   },
 
   mocha: {
-    timeout: 60000,
-  },
+    timeout: 60000
+  }
 }
 
 const DEBUG = false
@@ -390,9 +415,8 @@ const debug = (text: string): void => {
 
 task('wallet', 'Create a wallet (pk) link', async (_, { ethers }) => {
   const randomWallet = ethers.Wallet.createRandom()
-  const privateKey = randomWallet._signingKey().privateKey
   console.log(`🔐 WALLET Generated as ${randomWallet.address}`)
-  console.log(`🔗 http://localhost:3000/pk#${privateKey}`)
+  console.log(`🔗 http://localhost:3000/pk#${randomWallet.privateKey}`)
 })
 
 task('fundedwallet', 'Create a wallet (pk) link and fund it with deployer?')
@@ -401,7 +425,7 @@ task('fundedwallet', 'Create a wallet (pk) link and fund it with deployer?')
     'Amount of ETH to send to wallet after generating'
   )
   .addOptionalParam('url', 'URL to add pk to')
-  .setAction(async (taskArgs, { ethers }) => {
+  .setAction(async (taskArgs, { ethers, getNamedSigner }) => {
     const randomWallet = ethers.Wallet.createRandom()
     console.log(`🔐 WALLET Generated as ${randomWallet.address}`)
     const url: string = taskArgs.url ? taskArgs.url : 'http://localhost:3000'
@@ -409,14 +433,14 @@ task('fundedwallet', 'Create a wallet (pk) link and fund it with deployer?')
     const amount: string = taskArgs.amount ? taskArgs.amount : '0.01'
     const tx = {
       to: randomWallet.address,
-      value: ethers.utils.parseEther(amount),
+      value: parseEther(amount)
     }
 
     // SEND USING LOCAL DEPLOYER MNEMONIC IF THERE IS ONE
     // IF NOT SEND USING LOCAL HARDHAT NODE:
     const localDeployerMnemonic = getMnemonic()
     if (localDeployerMnemonic) {
-      let deployerWallet = ethers.Wallet.fromMnemonic(localDeployerMnemonic)
+      let deployerWallet = ethers.Wallet.fromPhrase(localDeployerMnemonic)
       deployerWallet = deployerWallet.connect(ethers.provider)
       console.log(
         `💵 Sending ${amount} ETH to ${randomWallet.address} using deployer account`
@@ -436,7 +460,7 @@ task('fundedwallet', 'Create a wallet (pk) link and fund it with deployer?')
       console.log(`${url}/pk#${randomWallet.privateKey}`)
       console.log()
 
-      return await send(ethers.provider.getSigner(), tx)
+      return await send(await getNamedSigner('deployer'), tx)
     }
   })
 
@@ -452,7 +476,7 @@ task(
       return
     }
 
-    let wallet: ReturnType<typeof ethers.Wallet.createRandom>
+    let wallet = ethers.Wallet.createRandom()
     let contractAddress = ''
     let attempt = 0
     let shouldRetry = true
@@ -460,14 +484,14 @@ task(
       if (attempt > 0) {
         process.stdout.clearLine(0)
         process.stdout.cursorTo(0)
+        wallet = ethers.Wallet.createRandom()
       }
       attempt++
       process.stdout.write(`Mining attempt ${attempt}`)
 
-      wallet = ethers.Wallet.createRandom()
-      contractAddress = ethers.utils.getContractAddress({
+      contractAddress = ethers.getCreateAddress({
         from: wallet.address,
-        nonce: 0,
+        nonce: 0
       })
 
       if (taskArgs.searchFor) {
@@ -485,15 +509,13 @@ task(
     process.stdout.write('\n')
 
     if (DEBUG) {
-      console.log('mnemonic', wallet!.mnemonic.phrase)
-      console.log('fullPath', wallet!.mnemonic.path)
-      console.log('privateKey', wallet!.privateKey)
+      console.log('mnemonic', wallet.mnemonic!.phrase)
+      console.log('fullPath', wallet.path)
+      console.log('privateKey', wallet.privateKey)
     }
 
     console.log(
-      `⛏  Account Mined as ${
-        wallet!.address
-      } and set as mnemonic in packages/hardhat`
+      `⛏  Account Mined as ${wallet.address} and set as mnemonic in packages/hardhat`
     )
     console.log(
       `📜 This will create the first contract: ${chalk.magenta(
@@ -505,10 +527,10 @@ task(
     )
 
     fs.writeFileSync(
-      `./${wallet!.address}_produces${contractAddress}.secret`,
-      wallet!.mnemonic.phrase
+      `./${wallet.address}_produces${contractAddress}.secret`,
+      wallet.mnemonic!.phrase
     )
-    fs.writeFileSync('./mnemonic.secret', wallet!.mnemonic.phrase)
+    fs.writeFileSync('./mnemonic.secret', wallet.mnemonic!.phrase)
   })
 
 task(
@@ -517,11 +539,11 @@ task(
   async (_, { ethers, config }) => {
     try {
       const mnemonic = getMnemonic()
-      const wallet = ethers.Wallet.fromMnemonic(mnemonic)
+      const wallet = ethers.Wallet.fromPhrase(mnemonic)
 
       if (DEBUG) {
-        console.log('mnemonic', wallet.mnemonic.phrase)
-        console.log('fullPath', wallet.mnemonic.path)
+        console.log('mnemonic', wallet.mnemonic!.phrase)
+        console.log('fullPath', wallet.path)
         console.log('privateKey', wallet.privateKey)
       }
 
@@ -532,10 +554,10 @@ task(
         const network = config.networks[networkName]
         if (!('url' in network)) continue
         try {
-          const provider = new ethers.providers.JsonRpcProvider(network.url)
+          const provider = new ethers.JsonRpcProvider(network.url)
           const balance = await provider.getBalance(wallet.address)
           console.log(` -- ${chalk.bold(networkName)} -- -- -- 📡 `)
-          console.log(`  balance: ${ethers.utils.formatEther(balance)}`)
+          console.log(`  balance: ${ethers.formatEther(balance)}`)
           console.log(
             `  nonce: ${await provider.getTransactionCount(wallet.address)}`
           )
@@ -568,16 +590,17 @@ async function findFirstAddr(
   if (typeof addr === 'string' && isAddress(addr)) {
     return getAddress(addr)
   } else if (typeof addr === 'number') {
-    const accounts = await ethers.provider.listAccounts()
-    if (accounts[addr] !== undefined) {
-      return getAddress(accounts[addr])
+    const signers = await ethers.getSigners()
+    if (signers[addr] !== undefined) {
+      const address = await signers[addr].getAddress()
+      return getAddress(address)
     }
   }
   throw new Error(`Could not normalize address: ${addr}`)
 }
 
 task('accounts', 'Prints the list of accounts', async (_, { ethers }) => {
-  const accounts = await ethers.provider.listAccounts()
+  const accounts = await ethers.getSigners()
   accounts.forEach((account) => console.log(account))
 })
 
@@ -601,7 +624,7 @@ task('balance', "Prints an account's balance")
 async function send(
   signer: Signer,
   txparams: TransactionRequest
-): Promise<TransactionReceipt> {
+): Promise<TransactionReceipt | null> {
   const response = await signer.sendTransaction(txparams)
   debug(`transactionHash: ${response.hash}`)
   const waitBlocksForReceipt = 0 // 2
@@ -619,7 +642,7 @@ task('send', 'Send ETH')
   .setAction(async (taskArgs, { network, ethers }) => {
     const from = await findFirstAddr(ethers, taskArgs.from)
     debug(`Normalized from address: ${from}`)
-    const fromSigner = ethers.provider.getSigner(from)
+    const fromSigner = await ethers.provider.getSigner(from)
 
     let to
     if (taskArgs.to) {
@@ -630,17 +653,14 @@ task('send', 'Send ETH')
     const txRequest: TransactionRequest = {
       from: await fromSigner.getAddress(),
       to,
-      value: parseUnits(
-        taskArgs.amount ? taskArgs.amount : '0',
-        'ether'
-      ).toHexString(),
-      nonce: await fromSigner.getTransactionCount(),
+      value: parseUnits(taskArgs.amount ? taskArgs.amount : '0', 'ether'),
+      nonce: await fromSigner.getNonce(),
       gasPrice: parseUnits(
         taskArgs.gasPrice ? taskArgs.gasPrice : '1.001',
         'gwei'
-      ).toHexString(),
+      ),
       gasLimit: taskArgs.gasLimit ? taskArgs.gasLimit : 24000,
-      chainId: network.config.chainId,
+      chainId: network.config.chainId
     }
 
     if (taskArgs.data !== undefined) {

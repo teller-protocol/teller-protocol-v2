@@ -3,7 +3,7 @@ import { DeployFunction } from 'hardhat-deploy/dist/types'
 const deployFn: DeployFunction = async (hre) => {
   hre.log('----------')
   hre.log('')
-  hre.log('TellerV2: Proposing upgrade...')
+  hre.log('Sherlock Audit: Proposing upgrade...')
 
   const trustedForwarder = await hre.contracts.get('MetaForwarder')
   const v2Calculations = await hre.contracts.get('V2Calculations')
@@ -139,16 +139,6 @@ deployFn.dependencies = [
   'escrow-vault:deploy',
 ]
 deployFn.skip = async (hre) => {
-  return false
-
-  // const marketRegistry = await hre.contracts.get<MarketRegistry>(
-  //   'MarketRegistry'
-  // )
-  // try {
-  //   await marketRegistry.isMarketOpen(0)
-  //   return false
-  // } catch (e) {
-  //   return true
-  // }
+  return !hre.network.live || hre.network.name === 'arbitrum'
 }
 export default deployFn

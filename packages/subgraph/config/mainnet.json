@@ -1,12 +1,12 @@
 {
   "network": "mainnet",
   "grafting": {
-    "enabled": true,
+    "enabled": false,
     "base": "QmWfdFaUZvMmdMr1shEVv72a1VuU4hVwFM2h5FmmFG8tAK",
     "block": "17504873"
   },
   "block_handler": {
-    "enabled": true,
+    "enabled": false,
     "block": "17374919"
   },
   "contracts": {

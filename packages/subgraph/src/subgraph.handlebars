@@ -8,32 +8,30 @@
         - name: IERC20Metadata
           file: ../../packages/contracts/generated/artifacts/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol/IERC20Metadata.json
 {{/inline}}
-specVersion: 0.0.2
+specVersion: 0.0.4
 schema:
   file: ./src/schema.graphql
-{{#with grafting}}
-{{#if enabled}}
 features:
+{{#if grafting.enabled}}
   - grafting
-graft:
-  base: {{base}}
-  block: {{block}}
 {{/if}}
-{{/with}}
+{{#if grafting.enabled}}
+graft:
+  base: {{grafting.base}}
+  block: {{grafting.block}}
+{{/if}}
 dataSources:
 {{#if block_handler.enabled}}
   - kind: ethereum/contract
     name: Blocks
     network: {{network}}
     source:
-      {{#with block_handler}}
-      address: '{{../contracts.teller_v2.address}}'
+      address: '{{contracts.teller_v2.address}}'
       abi: TellerV2
-      startBlock: {{block}}
-      {{/with}}
+      startBlock: {{block_handler.block}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - Protocol
@@ -66,19 +64,21 @@ dataSources:
     {{/with}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - Bid
       abis:
         - name: TellerV2
           file: ./abis/{{network}}_TellerV2.json
+        - name: TellerV0Storage
+          file: ../../packages/contracts/generated/artifacts/contracts/TellerV0Storage.sol/TellerV0Storage.json
         - name: Proxy
           file: ../../packages/contracts/generated/artifacts/@openzeppelin/contracts/proxy/ERC1967/ERC1967Upgrade.sol/ERC1967Upgrade.json
       eventHandlers:
         - event: Upgraded(indexed address)
           handler: handleTellerV2Upgraded
-      file: ./src/mapping.ts
+      file: ./src/teller-v2/proxy.ts
   - kind: ethereum/contract
     name: TellerV2
     network: {{network}}
@@ -90,7 +90,7 @@ dataSources:
     {{/with}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - Bid
@@ -141,7 +141,7 @@ dataSources:
     {{/with}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - MarketPlace
@@ -153,7 +153,7 @@ dataSources:
       eventHandlers:
         - event: Upgraded(indexed address)
           handler: handleMarketRegistryUpgraded
-      file: ./src/market-registry/mapping.ts
+      file: ./src/market-registry/proxy.ts
   - kind: ethereum/contract
     name: MarketRegistry
     network: {{network}}
@@ -165,7 +165,7 @@ dataSources:
     {{/with}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - MarketPlace
@@ -221,7 +221,7 @@ dataSources:
     {{/with}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - Commitment
@@ -261,7 +261,7 @@ dataSources:
     {{/with}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - Bid
@@ -299,7 +299,7 @@ dataSources:
     {{/with}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - RewardAllocation
@@ -335,7 +335,7 @@ dataSources:
     {{/with}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - Bid

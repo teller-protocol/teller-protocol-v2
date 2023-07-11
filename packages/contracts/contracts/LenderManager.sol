@@ -86,10 +86,6 @@ contract LenderManager is
         require(_hasMarketVerification(to, tokenId), "Not approved by market");
     }
 
-    function _baseURI() internal view override returns (string memory) {
-        return "";
-    }
-
     struct LoanInformation {
         address principalTokenAddress;
         uint256 principalAmount;

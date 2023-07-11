@@ -16,7 +16,7 @@ fi
 bump_version() {
   # Ensure we get a new version from the user
   if [ -z "$version_strategy" ]; then
-    read -r -p "Bump version (current: $current_version): (major | minor | patch) " version_strategy
+    read -r -p "Bump version (current: $current_version): (major | minor | patch | prerelease) " version_strategy
   fi
 
   # Bump the version in package.json

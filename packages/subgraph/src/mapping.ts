@@ -10,9 +10,9 @@ import {
   LoanRepaid,
   LoanRepayment,
   SubmittedBid,
-  TellerV2,
-  Upgraded
+  TellerV2
 } from "../generated/TellerV2/TellerV2";
+import { Upgraded } from "../generated/TellerV2_Proxy/Proxy";
 
 import { BidStatus } from "./helpers/bid";
 import {

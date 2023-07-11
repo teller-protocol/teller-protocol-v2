@@ -18,9 +18,9 @@ import {
   SetMarketURI,
   SetPaymentCycle,
   SetPaymentCycleDuration,
-  SetPaymentDefaultDuration,
-  Upgraded
+  SetPaymentDefaultDuration
 } from "../../generated/MarketRegistry/MarketRegistry";
+import { Upgraded } from "../../generated/MarketRegistry_Proxy/Proxy";
 import { Borrower, Lender, MarketPlace } from "../../generated/schema";
 import {
   loadBorrowerByMarketId,

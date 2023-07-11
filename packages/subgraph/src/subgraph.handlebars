@@ -56,6 +56,30 @@ dataSources:
 {{/if}}
 {{#if contracts.teller_v2.enabled}}
   - kind: ethereum/contract
+    name: TellerV2_Proxy
+    network: {{network}}
+    source:
+    {{#with contracts.teller_v2}}
+      address: '{{address}}'
+      abi: Proxy
+      startBlock: {{block}}
+    {{/with}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Bid
+      abis:
+        - name: TellerV2
+          file: ./abis/{{network}}_TellerV2.json
+        - name: Proxy
+          file: ../../packages/contracts/generated/artifacts/@openzeppelin/contracts/proxy/ERC1967/ERC1967Upgrade.sol/ERC1967Upgrade.json
+      eventHandlers:
+        - event: Upgraded(indexed address)
+          handler: handleTellerV2Upgraded
+      file: ./src/mapping.ts
+  - kind: ethereum/contract
     name: TellerV2
     network: {{network}}
     source:
@@ -103,11 +127,33 @@ dataSources:
 
         - event: FeePaid(indexed uint256,indexed string,indexed uint256)
           handler: handleFeePaid
-        - event: Upgraded(indexed address)
-          handler: handleTellerV2Upgraded
       file: ./src/mapping.ts
 {{/if}}
 {{#if contracts.market_registry.enabled}}
+  - kind: ethereum/contract
+    name: MarketRegistry_Proxy
+    network: {{network}}
+    source:
+    {{#with contracts.market_registry}}
+      address: '{{address}}'
+      abi: Proxy
+      startBlock: {{block}}
+    {{/with}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - MarketPlace
+      abis:
+        - name: MarketRegistry
+          file: ./abis/{{network}}_MarketRegistry.json
+        - name: Proxy
+          file: ../../packages/contracts/generated/artifacts/@openzeppelin/contracts/proxy/ERC1967/ERC1967Upgrade.sol/ERC1967Upgrade.json
+      eventHandlers:
+        - event: Upgraded(indexed address)
+          handler: handleMarketRegistryUpgraded
+      file: ./src/market-registry/mapping.ts
   - kind: ethereum/contract
     name: MarketRegistry
     network: {{network}}
@@ -159,8 +205,6 @@ dataSources:
           handler: handleBorrowerExitMarket
         - event: MarketClosed(uint256)
           handler: handleMarketClosed
-        - event: Upgraded(indexed address)
-          handler: handleMarketRegistryUpgraded
         - event: SetMarketPaymentType(uint256,uint8)
           handler: handleSetMarketPaymentType
       file: ./src/market-registry/mapping.ts

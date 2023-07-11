@@ -59,7 +59,6 @@ enum CollateralTokenType {
  * @param {Address} lendingTokenAddress - Address of the token being lent
  * @param {BigInt} committedAmount - The maximum that can be loaned
  * @param {Address} eventAddress - Address of the emitted event
- * @param {ethereum.Block} eventBlock - Block of the emitted event
  */
 export function updateLenderCommitment(
   commitmentId: string,
@@ -67,8 +66,7 @@ export function updateLenderCommitment(
   marketId: string,
   lendingTokenAddress: Address,
   committedAmount: BigInt,
-  eventAddress: Address,
-  eventBlock: ethereum.Block
+  eventAddress: Address
 ): Commitment {
   const commitment = loadCommitment(commitmentId);
 
@@ -93,6 +91,7 @@ export function updateLenderCommitment(
   const lendingToken = loadToken(lendingTokenAddress);
   commitment.principalToken = lendingToken.id;
   commitment.principalTokenAddress = lendingTokenAddress;
+  commitment.maxPrincipal = committedAmount;
 
   commitment.collateralTokenType = BigInt.fromI32(lenderCommitment.value7);
   if (lenderCommitment.value7 != CollateralTokenType.NONE) {
@@ -128,8 +127,7 @@ export function updateLenderCommitment(
   commitment.save();
 
   updateCommitmentStatus(commitment, CommitmentStatus.Active);
-  const committedAmountDiff = committedAmount.minus(commitment.committedAmount);
-  updateAvailableTokensFromCommitment(commitment, committedAmountDiff);
+  updateAvailableTokensFromCommitment(commitment);
 
   return commitment;
 }
@@ -154,10 +152,6 @@ export function updateCommitmentStatus(
     case CommitmentStatus.Deleted:
     case CommitmentStatus.Drained:
     case CommitmentStatus.Expired:
-      updateAvailableTokensFromCommitment(
-        commitment,
-        commitment.committedAmount.neg()
-      );
       removeCommitmentToProtocol(commitment);
       marketCommitments.commitmentZScores = removeFromArray(
         marketCommitments.commitmentZScores,
@@ -273,17 +267,18 @@ function removeCommitmentToProtocol(commitment: Commitment): void {
 }
 
 export function updateAvailableTokensFromCommitment(
-  commitment: Commitment,
-  committedAmountDiff: BigInt
+  commitment: Commitment
 ): void {
-  if (committedAmountDiff.isZero()) {
-    return;
-  }
-
-  commitment.committedAmount = commitment.committedAmount.plus(
-    committedAmountDiff
+  const availableAmount = commitment.maxPrincipal.minus(
+    commitment.acceptedPrincipal
   );
+  const committedAmountDiff = availableAmount.minus(commitment.committedAmount);
+  commitment.committedAmount = availableAmount;
   commitment.save();
+
+  if (availableAmount.equals(BigInt.zero())) {
+    updateCommitmentStatus(commitment, CommitmentStatus.Drained);
+  }
 
   const tokenVolumes = getTokenVolumesFromCommitment(commitment);
   for (let i = 0; i < tokenVolumes.length; i++) {

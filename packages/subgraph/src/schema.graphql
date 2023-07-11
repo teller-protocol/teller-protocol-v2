@@ -354,7 +354,7 @@ type Commitment @entity {
   status: String!
 
   # Offer
-  committedAmount: BigInt! # Max principal
+  committedAmount: BigInt! # Current committed amount
   expirationTimestamp: BigInt!
   maxDuration: BigInt!
   minAPY: BigInt!
@@ -379,6 +379,9 @@ type Commitment @entity {
   # TokenStats
   tokenVolume: TokenVolume!
 
+  # Extra
+  maxPrincipal: BigInt!
+  acceptedPrincipal: BigInt!
 
   commitmentRewards: [CommitmentReward!]! @derivedFrom(field: "commitment")
 }

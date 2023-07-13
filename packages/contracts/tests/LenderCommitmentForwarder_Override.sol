@@ -56,6 +56,13 @@ contract LenderCommitmentForwarder_Override is LenderCommitmentForwarder {
         super.validateCommitment(commitments[_commitmentId]);
     }
 
+    function getCommitmentAcceptedPrincipal(uint256 _commitmentId)
+        public
+        returns (uint256)
+    {
+        return commitmentPrincipalAccepted[_commitmentId];
+    }
+
     function getCommitmentMaxPrincipal(uint256 _commitmentId)
         public
         returns (uint256)

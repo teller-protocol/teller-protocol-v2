@@ -29,10 +29,12 @@ bump_version() {
 # Deploy the subgraph and upload to IPFS
 if [ "$network" = "mainnet" ]; then
   bump_version
-  yarn graph deploy --studio "tellerv2-$network" --version-label "v$new_version"
+  yarn graph deploy \
+    "tellerv2-$network" \
+    --studio \
+    --version-label "v$new_version"
 else
   yarn graph deploy \
-    --product hosted-service \
-    --node https://api.thegraph.com/deploy/ \
-    "teller-protocol/tellerv2-$network-test"
+    "teller-protocol/tellerv2-$network" \
+    --product hosted-service
 fi

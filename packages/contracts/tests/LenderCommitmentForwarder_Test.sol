@@ -661,6 +661,236 @@ contract LenderCommitmentForwarder_Test is Testable {
         );
     }
 
+    function test_acceptCommitment_merkle_proof() public {
+        //https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/cryptography/MerkleProof.sol
+
+        uint256 tokenIdLeaf = 1;
+        bytes32 merkleLeaf = keccak256(abi.encodePacked(tokenIdLeaf)); //  0xc89efdaa54c0f20c7adf612882df0950f5a951637e0307cdcb4c672f298b8bc6;
+        bytes32 merkleRoot = merkleLeaf;
+        bytes32[] memory merkleProof = new bytes32[](0);
+
+        LenderCommitmentForwarder.Commitment
+            memory c = LenderCommitmentForwarder.Commitment({
+                maxPrincipal: maxPrincipal,
+                expiration: expiration,
+                maxDuration: maxDuration,
+                minInterestRate: minInterestRate,
+                collateralTokenAddress: address(collateralToken),
+                collateralTokenId: uint256(merkleRoot),
+                maxPrincipalPerCollateralAmount: maxPrincipal * 1e18,
+                collateralTokenType: LenderCommitmentForwarder
+                    .CommitmentCollateralType
+                    .ERC721_MERKLE_PROOF,
+                lender: address(lender),
+                marketId: marketId,
+                principalTokenAddress: address(principalToken)
+            });
+
+        uint256 commitmentId = 0;
+
+        lenderCommitmentForwarder.setCommitment(commitmentId, c);
+
+        uint256 principalAmount = maxPrincipal;
+        uint256 collateralAmount = 1;
+        uint16 interestRate = minInterestRate;
+        uint32 loanDuration = maxDuration;
+
+        collateralTokenId = tokenIdLeaf;
+
+        // vm.expectRevert("collateral token mismatch");
+        lenderCommitmentForwarder.acceptCommitmentWithProof(
+            commitmentId,
+            principalAmount,
+            collateralAmount,
+            collateralTokenId,
+            address(collateralToken),
+            interestRate,
+            loanDuration,
+            merkleProof
+        );
+
+        assertEq(
+            lenderCommitmentForwarder.getCommitmentMaxPrincipal(commitmentId),
+            maxPrincipal,
+            "Max principal changed"
+        );
+
+        assertEq(
+            lenderCommitmentForwarder.getCommitmentAcceptedPrincipal(
+                commitmentId
+            ),
+            principalAmount,
+            "Incorrect accepted principal"
+        );
+    }
+
+    function test_acceptCommitment_merkle_proof_two() public {
+        //https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/cryptography/MerkleProof.sol
+
+        uint256 tokenIdLeafA = 1;
+        uint256 tokenIdLeafB = 3;
+
+        bytes32 merkleLeafA = keccak256(abi.encodePacked(tokenIdLeafA)); //  0xc89efdaa54c0f20c7adf612882df0950f5a951637e0307cdcb4c672f298b8bc6;
+        bytes32 merkleLeafB = keccak256(abi.encodePacked(tokenIdLeafB));
+
+        //a merkle root is simply the hash of the hashes of the leaves in the layer above, where the leaves are always sorted alphanumerically.
+        //it so happens that the hash of (1) is less than the hash of (3) so we can compute the merkle root manually like this without a sorting function:
+        bytes32 merkleRoot = keccak256(
+            abi.encodePacked(merkleLeafA, merkleLeafB)
+        );
+
+        bytes32[] memory merkleProof = new bytes32[](1);
+        merkleProof[0] = merkleLeafB;
+
+        LenderCommitmentForwarder.Commitment
+            memory c = LenderCommitmentForwarder.Commitment({
+                maxPrincipal: maxPrincipal,
+                expiration: expiration,
+                maxDuration: maxDuration,
+                minInterestRate: minInterestRate,
+                collateralTokenAddress: address(collateralToken),
+                collateralTokenId: uint256(merkleRoot),
+                maxPrincipalPerCollateralAmount: maxPrincipal * 1e18,
+                collateralTokenType: LenderCommitmentForwarder
+                    .CommitmentCollateralType
+                    .ERC721_MERKLE_PROOF,
+                lender: address(lender),
+                marketId: marketId,
+                principalTokenAddress: address(principalToken)
+            });
+
+        uint256 commitmentId = 0;
+
+        lenderCommitmentForwarder.setCommitment(commitmentId, c);
+
+        uint256 principalAmount = maxPrincipal;
+        uint256 collateralAmount = 1;
+        uint16 interestRate = minInterestRate;
+        uint32 loanDuration = maxDuration;
+
+        collateralTokenId = tokenIdLeafA;
+
+        // vm.expectRevert("collateral token mismatch");
+        lenderCommitmentForwarder.acceptCommitmentWithProof(
+            commitmentId,
+            principalAmount,
+            collateralAmount,
+            collateralTokenId,
+            address(collateralToken),
+            interestRate,
+            loanDuration,
+            merkleProof
+        );
+
+        assertEq(
+            lenderCommitmentForwarder.getCommitmentMaxPrincipal(commitmentId),
+            maxPrincipal,
+            "Max principal changed"
+        );
+
+        assertEq(
+            lenderCommitmentForwarder.getCommitmentAcceptedPrincipal(
+                commitmentId
+            ),
+            principalAmount,
+            "Incorrect accepted principal"
+        );
+    }
+
+    function test_acceptCommitment_merkle_proof_invalid_proof() public {
+        uint256 tokenIdLeaf = 1;
+        bytes32 merkleLeaf = keccak256(abi.encodePacked(tokenIdLeaf)); //  0xc89efdaa54c0f20c7adf612882df0950f5a951637e0307cdcb4c672f298b8bc6;
+        bytes32 merkleRoot = keccak256(abi.encodePacked(uint256(2)));
+        bytes32[] memory merkleProof = new bytes32[](0);
+
+        LenderCommitmentForwarder.Commitment
+            memory c = LenderCommitmentForwarder.Commitment({
+                maxPrincipal: maxPrincipal,
+                expiration: expiration,
+                maxDuration: maxDuration,
+                minInterestRate: minInterestRate,
+                collateralTokenAddress: address(collateralToken),
+                collateralTokenId: uint256(merkleRoot),
+                maxPrincipalPerCollateralAmount: maxPrincipal * 1e18,
+                collateralTokenType: LenderCommitmentForwarder
+                    .CommitmentCollateralType
+                    .ERC721_MERKLE_PROOF,
+                lender: address(lender),
+                marketId: marketId,
+                principalTokenAddress: address(principalToken)
+            });
+
+        uint256 commitmentId = 0;
+
+        lenderCommitmentForwarder.setCommitment(commitmentId, c);
+
+        uint256 principalAmount = maxPrincipal;
+        uint256 collateralAmount = 1;
+        uint16 interestRate = minInterestRate;
+        uint32 loanDuration = maxDuration;
+
+        collateralTokenId = tokenIdLeaf;
+
+        vm.expectRevert("Invalid proof");
+        lenderCommitmentForwarder.acceptCommitmentWithProof(
+            commitmentId,
+            principalAmount,
+            collateralAmount,
+            collateralTokenId,
+            address(collateralToken),
+            interestRate,
+            loanDuration,
+            merkleProof
+        );
+    }
+
+    function test_acceptCommitment_merkle_proof_invalid_type() public {
+        uint256 tokenIdLeaf = 1;
+        bytes32 merkleLeaf = keccak256(abi.encodePacked(tokenIdLeaf)); //  0xc89efdaa54c0f20c7adf612882df0950f5a951637e0307cdcb4c672f298b8bc6;
+        bytes32 merkleRoot = merkleLeaf;
+        bytes32[] memory merkleProof = new bytes32[](0);
+
+        LenderCommitmentForwarder.Commitment
+            memory c = LenderCommitmentForwarder.Commitment({
+                maxPrincipal: maxPrincipal,
+                expiration: expiration,
+                maxDuration: maxDuration,
+                minInterestRate: minInterestRate,
+                collateralTokenAddress: address(collateralToken),
+                collateralTokenId: uint256(merkleRoot),
+                maxPrincipalPerCollateralAmount: maxPrincipal * 1e18,
+                collateralTokenType: LenderCommitmentForwarder
+                    .CommitmentCollateralType
+                    .ERC721,
+                lender: address(lender),
+                marketId: marketId,
+                principalTokenAddress: address(principalToken)
+            });
+
+        uint256 commitmentId = 0;
+
+        lenderCommitmentForwarder.setCommitment(commitmentId, c);
+
+        uint256 principalAmount = maxPrincipal;
+        uint256 collateralAmount = 1;
+        uint16 interestRate = minInterestRate;
+        uint32 loanDuration = maxDuration;
+
+        collateralTokenId = tokenIdLeaf;
+
+        vm.expectRevert("Invalid commitment collateral type");
+        lenderCommitmentForwarder.acceptCommitmentWithProof(
+            commitmentId,
+            principalAmount,
+            collateralAmount,
+            collateralTokenId,
+            address(collateralToken),
+            interestRate,
+            loanDuration,
+            merkleProof
+        );
+    }
+
     function test_acceptCommitment_mismatch_collateral_token() public {
         LenderCommitmentForwarder.Commitment
             memory c = LenderCommitmentForwarder.Commitment({

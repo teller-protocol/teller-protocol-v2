@@ -2,201 +2,219 @@
   "address": "0x8cDb56283A26684D6020B3589615df2eDEDc3C8C",
   "abi": [
     {
-      "type": "event",
       "anonymous": false,
-      "name": "Initialized",
       "inputs": [
         {
-          "type": "uint8",
+          "indexed": false,
+          "internalType": "uint8",
           "name": "version",
-          "indexed": false
-        }
-      ]
-    },
-    {
-      "type": "event",
-      "anonymous": false,
-      "name": "MarkAdded",
-      "inputs": [
-        {
-          "type": "address",
-          "name": "account",
-          "indexed": true
-        },
-        {
-          "type": "uint8",
-          "name": "repMark",
-          "indexed": true
-        },
-        {
-          "type": "uint256",
-          "name": "bidId",
-          "indexed": false
-        }
-      ]
-    },
-    {
-      "type": "event",
-      "anonymous": false,
-      "name": "MarkRemoved",
-      "inputs": [
-        {
-          "type": "address",
-          "name": "account",
-          "indexed": true
-        },
-        {
-          "type": "uint8",
-          "name": "repMark",
-          "indexed": true
-        },
-        {
-          "type": "uint256",
-          "name": "bidId",
-          "indexed": false
-        }
-      ]
-    },
-    {
-      "type": "function",
-      "name": "CONTROLLER",
-      "constant": true,
-      "stateMutability": "view",
-      "payable": false,
-      "inputs": [],
-      "outputs": [
-        {
-          "type": "bytes32"
-        }
-      ]
-    },
-    {
-      "type": "function",
-      "name": "getCurrentDefaultLoanIds",
-      "constant": false,
-      "payable": false,
-      "inputs": [
-        {
-          "type": "address",
-          "name": "_account"
-        }
-      ],
-      "outputs": [
-        {
-          "type": "uint256[]"
-        }
-      ]
-    },
-    {
-      "type": "function",
-      "name": "getCurrentDelinquentLoanIds",
-      "constant": false,
-      "payable": false,
-      "inputs": [
-        {
-          "type": "address",
-          "name": "_account"
-        }
-      ],
-      "outputs": [
-        {
-          "type": "uint256[]"
-        }
-      ]
-    },
-    {
-      "type": "function",
-      "name": "getDefaultedLoanIds",
-      "constant": false,
-      "payable": false,
-      "inputs": [
-        {
-          "type": "address",
-          "name": "_account"
-        }
-      ],
-      "outputs": [
-        {
-          "type": "uint256[]"
-        }
-      ]
-    },
-    {
-      "type": "function",
-      "name": "getDelinquentLoanIds",
-      "constant": false,
-      "payable": false,
-      "inputs": [
-        {
-          "type": "address",
-          "name": "_account"
-        }
-      ],
-      "outputs": [
-        {
-          "type": "uint256[]"
-        }
-      ]
-    },
-    {
-      "type": "function",
-      "name": "initialize",
-      "constant": false,
-      "payable": false,
-      "inputs": [
-        {
-          "type": "address",
-          "name": "_tellerV2"
-        }
-      ],
-      "outputs": []
-    },
-    {
-      "type": "function",
-      "name": "tellerV2",
-      "constant": true,
-      "stateMutability": "view",
-      "payable": false,
-      "inputs": [],
-      "outputs": [
-        {
-          "type": "address"
-        }
-      ]
-    },
-    {
-      "type": "function",
-      "name": "updateAccountReputation",
-      "constant": false,
-      "payable": false,
-      "inputs": [
-        {
-          "type": "address",
-          "name": "_account"
-        }
-      ],
-      "outputs": []
-    },
-    {
-      "type": "function",
-      "name": "updateAccountReputation",
-      "constant": false,
-      "payable": false,
-      "inputs": [
-        {
-          "type": "address",
-          "name": "_account"
-        },
-        {
-          "type": "uint256",
-          "name": "_bidId"
-        }
-      ],
-      "outputs": [
-        {
           "type": "uint8"
         }
-      ]
+      ],
+      "name": "Initialized",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "enum RepMark",
+          "name": "repMark",
+          "type": "uint8"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "bidId",
+          "type": "uint256"
+        }
+      ],
+      "name": "MarkAdded",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "enum RepMark",
+          "name": "repMark",
+          "type": "uint8"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "bidId",
+          "type": "uint256"
+        }
+      ],
+      "name": "MarkRemoved",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "CONTROLLER",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_account",
+          "type": "address"
+        }
+      ],
+      "name": "getCurrentDefaultLoanIds",
+      "outputs": [
+        {
+          "internalType": "uint256[]",
+          "name": "",
+          "type": "uint256[]"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_account",
+          "type": "address"
+        }
+      ],
+      "name": "getCurrentDelinquentLoanIds",
+      "outputs": [
+        {
+          "internalType": "uint256[]",
+          "name": "",
+          "type": "uint256[]"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_account",
+          "type": "address"
+        }
+      ],
+      "name": "getDefaultedLoanIds",
+      "outputs": [
+        {
+          "internalType": "uint256[]",
+          "name": "",
+          "type": "uint256[]"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_account",
+          "type": "address"
+        }
+      ],
+      "name": "getDelinquentLoanIds",
+      "outputs": [
+        {
+          "internalType": "uint256[]",
+          "name": "",
+          "type": "uint256[]"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_tellerV2",
+          "type": "address"
+        }
+      ],
+      "name": "initialize",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "tellerV2",
+      "outputs": [
+        {
+          "internalType": "contract ITellerV2",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_account",
+          "type": "address"
+        }
+      ],
+      "name": "updateAccountReputation",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_account",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_bidId",
+          "type": "uint256"
+        }
+      ],
+      "name": "updateAccountReputation",
+      "outputs": [
+        {
+          "internalType": "enum RepMark",
+          "name": "",
+          "type": "uint8"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
     }
   ],
   "transactionHash": "0x0f16959e169ca35e6f2cb648a3e55da3977ce712a7f0b171659a45edd06d535f",
@@ -241,6 +259,6 @@
     "status": 1,
     "byzantium": true
   },
-  "numDeployments": 2,
+  "numDeployments": 3,
   "implementation": "0x2Db50eF7F702fB335ee7AbB915a28AeAD2cb3eE8"
 }

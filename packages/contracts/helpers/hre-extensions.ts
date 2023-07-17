@@ -869,16 +869,21 @@ async function ozDefenderDeploy(
   })
   hre.log(`${implementation}`, { star: false })
 
-  const abi = implFactory.interface.fragments.map((fragment) =>
-    JSON.parse(fragment.format('json'))
-  )
+  const artifact = await hre.artifacts.readArtifact(contractName).catch(() => {
+    if (opts.customName) return hre.artifacts.readArtifact(opts.customName)
+  })
+  if (!artifact)
+    throw new Error(
+      `Unable to find artifact for ${contractName ?? opts.customName}`
+    )
+
   const deployTx = proxy.deploymentTransaction()
   const transactionHash = deployTx?.hash ?? existingDeployment?.transactionHash
   const receipt = Object.assign({}, deployTx, existingDeployment?.receipt)
   await hre.deployments.save(saveName, {
     address: proxyAddress,
     implementation,
-    abi,
+    abi: artifact.abi,
     transactionHash,
     receipt,
   })

@@ -2,87 +2,94 @@
   "address": "0xe938412E18c86D7630F4C37aCb517928411A5960",
   "abi": [
     {
-      "type": "constructor",
-      "payable": false,
-      "inputs": []
+      "inputs": [],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
     },
     {
-      "type": "event",
       "anonymous": false,
-      "name": "Initialized",
       "inputs": [
         {
-          "type": "uint8",
+          "indexed": false,
+          "internalType": "uint8",
           "name": "version",
-          "indexed": false
+          "type": "uint8"
         }
-      ]
+      ],
+      "name": "Initialized",
+      "type": "event"
     },
     {
-      "type": "function",
-      "name": "balances",
-      "constant": true,
-      "stateMutability": "view",
-      "payable": false,
       "inputs": [
         {
+          "internalType": "address",
+          "name": "",
           "type": "address"
         },
         {
+          "internalType": "address",
+          "name": "",
           "type": "address"
         }
       ],
+      "name": "balances",
       "outputs": [
         {
+          "internalType": "uint256",
+          "name": "",
           "type": "uint256"
         }
-      ]
+      ],
+      "stateMutability": "view",
+      "type": "function"
     },
     {
-      "type": "function",
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "token",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
       "name": "deposit",
-      "constant": false,
-      "payable": false,
-      "inputs": [
-        {
-          "type": "address",
-          "name": "account"
-        },
-        {
-          "type": "address",
-          "name": "token"
-        },
-        {
-          "type": "uint256",
-          "name": "amount"
-        }
-      ],
-      "outputs": []
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
     },
     {
-      "type": "function",
-      "name": "initialize",
-      "constant": false,
-      "payable": false,
       "inputs": [],
-      "outputs": []
+      "name": "initialize",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
     },
     {
-      "type": "function",
-      "name": "withdraw",
-      "constant": false,
-      "payable": false,
       "inputs": [
         {
-          "type": "address",
-          "name": "token"
+          "internalType": "address",
+          "name": "token",
+          "type": "address"
         },
         {
-          "type": "uint256",
-          "name": "amount"
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
         }
       ],
-      "outputs": []
+      "name": "withdraw",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
     }
   ],
   "transactionHash": "0xa38f97f6ca99aa0431b53fc9f7a6d87e48adc698bd32d841beb8cbf0fc10dc36",
@@ -189,6 +196,6 @@
     "status": 1,
     "byzantium": true
   },
-  "numDeployments": 1,
+  "numDeployments": 7,
   "implementation": "0x69Cbbd42fa2E1E4Ee3Db8AF179703dadc8809215"
 }

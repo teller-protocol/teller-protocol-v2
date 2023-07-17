@@ -2,556 +2,721 @@
   "address": "0x1727ADd0680412e839c500ccE4a2A20e3d96fF5C",
   "abi": [
     {
-      "type": "constructor",
-      "payable": false,
       "inputs": [
         {
-          "type": "address",
-          "name": "_protocolAddress"
+          "internalType": "address",
+          "name": "_protocolAddress",
+          "type": "address"
         },
         {
-          "type": "address",
-          "name": "_marketRegistry"
+          "internalType": "address",
+          "name": "_marketRegistry",
+          "type": "address"
         }
-      ]
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
     },
     {
-      "type": "error",
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "required",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "actual",
+          "type": "uint256"
+        }
+      ],
       "name": "InsufficientBorrowerCollateral",
-      "inputs": [
-        {
-          "type": "uint256",
-          "name": "required"
-        },
-        {
-          "type": "uint256",
-          "name": "actual"
-        }
-      ]
+      "type": "error"
     },
     {
-      "type": "error",
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "allocated",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "requested",
+          "type": "uint256"
+        }
+      ],
       "name": "InsufficientCommitmentAllocation",
-      "inputs": [
-        {
-          "type": "uint256",
-          "name": "allocated"
-        },
-        {
-          "type": "uint256",
-          "name": "requested"
-        }
-      ]
+      "type": "error"
     },
     {
-      "type": "event",
       "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "commitmentId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "lender",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "marketId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "lendingToken",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "tokenAmount",
+          "type": "uint256"
+        }
+      ],
       "name": "CreatedCommitment",
-      "inputs": [
-        {
-          "type": "uint256",
-          "name": "commitmentId",
-          "indexed": true
-        },
-        {
-          "type": "address",
-          "name": "lender",
-          "indexed": false
-        },
-        {
-          "type": "uint256",
-          "name": "marketId",
-          "indexed": false
-        },
-        {
-          "type": "address",
-          "name": "lendingToken",
-          "indexed": false
-        },
-        {
-          "type": "uint256",
-          "name": "tokenAmount",
-          "indexed": false
-        }
-      ]
+      "type": "event"
     },
     {
-      "type": "event",
       "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "commitmentId",
+          "type": "uint256"
+        }
+      ],
       "name": "DeletedCommitment",
-      "inputs": [
-        {
-          "type": "uint256",
-          "name": "commitmentId",
-          "indexed": true
-        }
-      ]
+      "type": "event"
     },
     {
-      "type": "event",
       "anonymous": false,
-      "name": "ExercisedCommitment",
       "inputs": [
         {
-          "type": "uint256",
+          "indexed": true,
+          "internalType": "uint256",
           "name": "commitmentId",
-          "indexed": true
+          "type": "uint256"
         },
         {
-          "type": "address",
+          "indexed": false,
+          "internalType": "address",
           "name": "borrower",
-          "indexed": false
+          "type": "address"
         },
         {
-          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256",
           "name": "tokenAmount",
-          "indexed": false
+          "type": "uint256"
         },
         {
-          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256",
           "name": "bidId",
-          "indexed": false
+          "type": "uint256"
         }
-      ]
+      ],
+      "name": "ExercisedCommitment",
+      "type": "event"
     },
     {
-      "type": "event",
       "anonymous": false,
-      "name": "Initialized",
       "inputs": [
         {
-          "type": "uint8",
+          "indexed": false,
+          "internalType": "uint8",
           "name": "version",
-          "indexed": false
+          "type": "uint8"
         }
-      ]
+      ],
+      "name": "Initialized",
+      "type": "event"
     },
     {
-      "type": "event",
       "anonymous": false,
-      "name": "UpdatedCommitment",
       "inputs": [
         {
-          "type": "uint256",
+          "indexed": true,
+          "internalType": "uint256",
           "name": "commitmentId",
-          "indexed": true
+          "type": "uint256"
         },
         {
-          "type": "address",
+          "indexed": false,
+          "internalType": "address",
           "name": "lender",
-          "indexed": false
+          "type": "address"
         },
         {
-          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256",
           "name": "marketId",
-          "indexed": false
+          "type": "uint256"
         },
         {
-          "type": "address",
+          "indexed": false,
+          "internalType": "address",
           "name": "lendingToken",
-          "indexed": false
+          "type": "address"
         },
         {
-          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256",
           "name": "tokenAmount",
-          "indexed": false
+          "type": "uint256"
         }
-      ]
+      ],
+      "name": "UpdatedCommitment",
+      "type": "event"
     },
     {
-      "type": "event",
       "anonymous": false,
-      "name": "UpdatedCommitmentBorrowers",
       "inputs": [
         {
-          "type": "uint256",
+          "indexed": true,
+          "internalType": "uint256",
           "name": "commitmentId",
-          "indexed": true
+          "type": "uint256"
         }
-      ]
+      ],
+      "name": "UpdatedCommitmentBorrowers",
+      "type": "event"
     },
     {
-      "type": "function",
+      "inputs": [],
       "name": "_marketRegistry",
-      "constant": true,
-      "stateMutability": "view",
-      "payable": false,
-      "inputs": [],
       "outputs": [
         {
+          "internalType": "address",
+          "name": "",
           "type": "address"
         }
-      ]
+      ],
+      "stateMutability": "view",
+      "type": "function"
     },
     {
-      "type": "function",
+      "inputs": [],
       "name": "_tellerV2",
-      "constant": true,
-      "stateMutability": "view",
-      "payable": false,
-      "inputs": [],
       "outputs": [
         {
+          "internalType": "address",
+          "name": "",
           "type": "address"
         }
-      ]
+      ],
+      "stateMutability": "view",
+      "type": "function"
     },
     {
-      "type": "function",
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_commitmentId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_principalAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_collateralAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_collateralTokenId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "_collateralTokenAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "uint16",
+          "name": "_interestRate",
+          "type": "uint16"
+        },
+        {
+          "internalType": "uint32",
+          "name": "_loanDuration",
+          "type": "uint32"
+        }
+      ],
       "name": "acceptCommitment",
-      "constant": false,
-      "payable": false,
-      "inputs": [
-        {
-          "type": "uint256",
-          "name": "_commitmentId"
-        },
-        {
-          "type": "uint256",
-          "name": "_principalAmount"
-        },
-        {
-          "type": "uint256",
-          "name": "_collateralAmount"
-        },
-        {
-          "type": "uint256",
-          "name": "_collateralTokenId"
-        },
-        {
-          "type": "address",
-          "name": "_collateralTokenAddress"
-        },
-        {
-          "type": "uint16",
-          "name": "_interestRate"
-        },
-        {
-          "type": "uint32",
-          "name": "_loanDuration"
-        }
-      ],
       "outputs": [
         {
-          "type": "uint256",
-          "name": "bidId"
+          "internalType": "uint256",
+          "name": "bidId",
+          "type": "uint256"
         }
-      ]
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
     },
     {
-      "type": "function",
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_commitmentId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_principalAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_collateralAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_collateralTokenId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "_collateralTokenAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "uint16",
+          "name": "_interestRate",
+          "type": "uint16"
+        },
+        {
+          "internalType": "uint32",
+          "name": "_loanDuration",
+          "type": "uint32"
+        },
+        {
+          "internalType": "bytes32[]",
+          "name": "_merkleProof",
+          "type": "bytes32[]"
+        }
+      ],
+      "name": "acceptCommitmentWithProof",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "bidId",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_commitmentId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address[]",
+          "name": "_borrowerAddressList",
+          "type": "address[]"
+        }
+      ],
+      "name": "addCommitmentBorrowers",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "commitmentPrincipalAccepted",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
       "name": "commitments",
-      "constant": true,
-      "stateMutability": "view",
-      "payable": false,
-      "inputs": [
-        {
-          "type": "uint256"
-        }
-      ],
       "outputs": [
         {
-          "type": "uint256",
-          "name": "maxPrincipal"
+          "internalType": "uint256",
+          "name": "maxPrincipal",
+          "type": "uint256"
         },
         {
-          "type": "uint32",
-          "name": "expiration"
+          "internalType": "uint32",
+          "name": "expiration",
+          "type": "uint32"
         },
         {
-          "type": "uint32",
-          "name": "maxDuration"
+          "internalType": "uint32",
+          "name": "maxDuration",
+          "type": "uint32"
         },
         {
-          "type": "uint16",
-          "name": "minInterestRate"
+          "internalType": "uint16",
+          "name": "minInterestRate",
+          "type": "uint16"
         },
         {
-          "type": "address",
-          "name": "collateralTokenAddress"
+          "internalType": "address",
+          "name": "collateralTokenAddress",
+          "type": "address"
         },
         {
-          "type": "uint256",
-          "name": "collateralTokenId"
+          "internalType": "uint256",
+          "name": "collateralTokenId",
+          "type": "uint256"
         },
         {
-          "type": "uint256",
-          "name": "maxPrincipalPerCollateralAmount"
+          "internalType": "uint256",
+          "name": "maxPrincipalPerCollateralAmount",
+          "type": "uint256"
         },
         {
-          "type": "uint8",
-          "name": "collateralTokenType"
+          "internalType": "enum LenderCommitmentForwarder.CommitmentCollateralType",
+          "name": "collateralTokenType",
+          "type": "uint8"
         },
         {
-          "type": "address",
-          "name": "lender"
+          "internalType": "address",
+          "name": "lender",
+          "type": "address"
         },
         {
-          "type": "uint256",
-          "name": "marketId"
+          "internalType": "uint256",
+          "name": "marketId",
+          "type": "uint256"
         },
         {
-          "type": "address",
-          "name": "principalTokenAddress"
+          "internalType": "address",
+          "name": "principalTokenAddress",
+          "type": "address"
         }
-      ]
+      ],
+      "stateMutability": "view",
+      "type": "function"
     },
     {
-      "type": "function",
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "maxPrincipal",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint32",
+              "name": "expiration",
+              "type": "uint32"
+            },
+            {
+              "internalType": "uint32",
+              "name": "maxDuration",
+              "type": "uint32"
+            },
+            {
+              "internalType": "uint16",
+              "name": "minInterestRate",
+              "type": "uint16"
+            },
+            {
+              "internalType": "address",
+              "name": "collateralTokenAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "collateralTokenId",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "maxPrincipalPerCollateralAmount",
+              "type": "uint256"
+            },
+            {
+              "internalType": "enum LenderCommitmentForwarder.CommitmentCollateralType",
+              "name": "collateralTokenType",
+              "type": "uint8"
+            },
+            {
+              "internalType": "address",
+              "name": "lender",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "marketId",
+              "type": "uint256"
+            },
+            {
+              "internalType": "address",
+              "name": "principalTokenAddress",
+              "type": "address"
+            }
+          ],
+          "internalType": "struct LenderCommitmentForwarder.Commitment",
+          "name": "_commitment",
+          "type": "tuple"
+        },
+        {
+          "internalType": "address[]",
+          "name": "_borrowerAddressList",
+          "type": "address[]"
+        }
+      ],
       "name": "createCommitment",
-      "constant": false,
-      "payable": false,
-      "inputs": [
-        {
-          "type": "tuple",
-          "name": "_commitment",
-          "components": [
-            {
-              "type": "uint256",
-              "name": "maxPrincipal"
-            },
-            {
-              "type": "uint32",
-              "name": "expiration"
-            },
-            {
-              "type": "uint32",
-              "name": "maxDuration"
-            },
-            {
-              "type": "uint16",
-              "name": "minInterestRate"
-            },
-            {
-              "type": "address",
-              "name": "collateralTokenAddress"
-            },
-            {
-              "type": "uint256",
-              "name": "collateralTokenId"
-            },
-            {
-              "type": "uint256",
-              "name": "maxPrincipalPerCollateralAmount"
-            },
-            {
-              "type": "uint8",
-              "name": "collateralTokenType"
-            },
-            {
-              "type": "address",
-              "name": "lender"
-            },
-            {
-              "type": "uint256",
-              "name": "marketId"
-            },
-            {
-              "type": "address",
-              "name": "principalTokenAddress"
-            }
-          ]
-        },
-        {
-          "type": "address[]",
-          "name": "_borrowerAddressList"
-        }
-      ],
       "outputs": [
         {
-          "type": "uint256",
-          "name": "commitmentId_"
-        }
-      ]
-    },
-    {
-      "type": "function",
-      "name": "deleteCommitment",
-      "constant": false,
-      "payable": false,
-      "inputs": [
-        {
-          "type": "uint256",
-          "name": "_commitmentId"
-        }
-      ],
-      "outputs": []
-    },
-    {
-      "type": "function",
-      "name": "getCommitmentBorrowers",
-      "constant": true,
-      "stateMutability": "view",
-      "payable": false,
-      "inputs": [
-        {
-          "type": "uint256",
-          "name": "_commitmentId"
-        }
-      ],
-      "outputs": [
-        {
-          "type": "address[]",
-          "name": "borrowers_"
-        }
-      ]
-    },
-    {
-      "type": "function",
-      "name": "getMarketRegistry",
-      "constant": true,
-      "stateMutability": "view",
-      "payable": false,
-      "inputs": [],
-      "outputs": [
-        {
-          "type": "address"
-        }
-      ]
-    },
-    {
-      "type": "function",
-      "name": "getRequiredCollateral",
-      "constant": true,
-      "stateMutability": "view",
-      "payable": false,
-      "inputs": [
-        {
-          "type": "uint256",
-          "name": "_principalAmount"
-        },
-        {
-          "type": "uint256",
-          "name": "_maxPrincipalPerCollateralAmount"
-        },
-        {
-          "type": "uint8",
-          "name": "_collateralTokenType"
-        },
-        {
-          "type": "address",
-          "name": "_collateralTokenAddress"
-        },
-        {
-          "type": "address",
-          "name": "_principalTokenAddress"
-        }
-      ],
-      "outputs": [
-        {
+          "internalType": "uint256",
+          "name": "commitmentId_",
           "type": "uint256"
         }
-      ]
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
     },
     {
-      "type": "function",
-      "name": "getTellerV2",
-      "constant": true,
-      "stateMutability": "view",
-      "payable": false,
-      "inputs": [],
-      "outputs": [
-        {
-          "type": "address"
-        }
-      ]
-    },
-    {
-      "type": "function",
-      "name": "getTellerV2MarketOwner",
-      "constant": false,
-      "payable": false,
       "inputs": [
         {
-          "type": "uint256",
-          "name": "marketId"
+          "internalType": "uint256",
+          "name": "_commitmentId",
+          "type": "uint256"
         }
       ],
-      "outputs": [
-        {
-          "type": "address"
-        }
-      ]
+      "name": "deleteCommitment",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
     },
     {
-      "type": "function",
-      "name": "updateCommitment",
-      "constant": false,
-      "payable": false,
       "inputs": [
         {
-          "type": "uint256",
-          "name": "_commitmentId"
+          "internalType": "uint256",
+          "name": "_commitmentId",
+          "type": "uint256"
+        }
+      ],
+      "name": "getCommitmentBorrowers",
+      "outputs": [
+        {
+          "internalType": "address[]",
+          "name": "borrowers_",
+          "type": "address[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getMarketRegistry",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_principalAmount",
+          "type": "uint256"
         },
         {
-          "type": "tuple",
-          "name": "_commitment",
+          "internalType": "uint256",
+          "name": "_maxPrincipalPerCollateralAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "enum LenderCommitmentForwarder.CommitmentCollateralType",
+          "name": "_collateralTokenType",
+          "type": "uint8"
+        },
+        {
+          "internalType": "address",
+          "name": "_collateralTokenAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_principalTokenAddress",
+          "type": "address"
+        }
+      ],
+      "name": "getRequiredCollateral",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getTellerV2",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "marketId",
+          "type": "uint256"
+        }
+      ],
+      "name": "getTellerV2MarketOwner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_commitmentId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address[]",
+          "name": "_borrowerAddressList",
+          "type": "address[]"
+        }
+      ],
+      "name": "removeCommitmentBorrowers",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_commitmentId",
+          "type": "uint256"
+        },
+        {
           "components": [
             {
-              "type": "uint256",
-              "name": "maxPrincipal"
+              "internalType": "uint256",
+              "name": "maxPrincipal",
+              "type": "uint256"
             },
             {
-              "type": "uint32",
-              "name": "expiration"
+              "internalType": "uint32",
+              "name": "expiration",
+              "type": "uint32"
             },
             {
-              "type": "uint32",
-              "name": "maxDuration"
+              "internalType": "uint32",
+              "name": "maxDuration",
+              "type": "uint32"
             },
             {
-              "type": "uint16",
-              "name": "minInterestRate"
+              "internalType": "uint16",
+              "name": "minInterestRate",
+              "type": "uint16"
             },
             {
-              "type": "address",
-              "name": "collateralTokenAddress"
+              "internalType": "address",
+              "name": "collateralTokenAddress",
+              "type": "address"
             },
             {
-              "type": "uint256",
-              "name": "collateralTokenId"
+              "internalType": "uint256",
+              "name": "collateralTokenId",
+              "type": "uint256"
             },
             {
-              "type": "uint256",
-              "name": "maxPrincipalPerCollateralAmount"
+              "internalType": "uint256",
+              "name": "maxPrincipalPerCollateralAmount",
+              "type": "uint256"
             },
             {
-              "type": "uint8",
-              "name": "collateralTokenType"
+              "internalType": "enum LenderCommitmentForwarder.CommitmentCollateralType",
+              "name": "collateralTokenType",
+              "type": "uint8"
             },
             {
-              "type": "address",
-              "name": "lender"
+              "internalType": "address",
+              "name": "lender",
+              "type": "address"
             },
             {
-              "type": "uint256",
-              "name": "marketId"
+              "internalType": "uint256",
+              "name": "marketId",
+              "type": "uint256"
             },
             {
-              "type": "address",
-              "name": "principalTokenAddress"
+              "internalType": "address",
+              "name": "principalTokenAddress",
+              "type": "address"
             }
-          ]
+          ],
+          "internalType": "struct LenderCommitmentForwarder.Commitment",
+          "name": "_commitment",
+          "type": "tuple"
         }
       ],
-      "outputs": []
-    },
-    {
-      "type": "function",
-      "name": "updateCommitmentBorrowers",
-      "constant": false,
-      "payable": false,
-      "inputs": [
-        {
-          "type": "uint256",
-          "name": "_commitmentId"
-        },
-        {
-          "type": "address[]",
-          "name": "_borrowerAddressList"
-        }
-      ],
-      "outputs": []
+      "name": "updateCommitment",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
     }
   ],
   "transactionHash": "0x4092fd602019b8711c0dff7540a4ba0b72d9e8aad7894cb5b5eb543a80df521c",
@@ -586,6 +751,6 @@
     "status": 1,
     "byzantium": true
   },
-  "numDeployments": 3,
+  "numDeployments": 4,
   "implementation": "0x00212A2deF4015CFA5F0c882829CD5Fafc70f3fd"
 }

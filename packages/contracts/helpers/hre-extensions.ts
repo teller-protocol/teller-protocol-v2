@@ -471,12 +471,11 @@ extendEnvironment((hre) => {
         name: 'upgradeAndCall',
         inputs: [
           {
-            internalType: 'contract TransparentUpgradeableProxy',
             name: 'proxy',
             type: 'address',
           },
-          { internalType: 'address', name: 'implementation', type: 'address' },
-          { internalType: 'bytes', name: 'data', type: 'bytes' },
+          { name: 'implementation', type: 'address' },
+          { name: 'data', type: 'bytes' },
         ],
       },
       functionInputs: [
@@ -543,16 +542,14 @@ extendEnvironment((hre) => {
             name: 'upgradeAndCall',
             inputs: [
               {
-                internalType: 'contract TransparentUpgradeableProxy',
                 name: 'proxy',
                 type: 'address',
               },
               {
-                internalType: 'address',
                 name: 'implementation',
                 type: 'address',
               },
-              { internalType: 'bytes', name: 'data', type: 'bytes' },
+              { name: 'data', type: 'bytes' },
             ],
           }
           functionInputs = [
@@ -565,12 +562,10 @@ extendEnvironment((hre) => {
             name: 'upgrade',
             inputs: [
               {
-                internalType: 'contract TransparentUpgradeableProxy',
                 name: 'proxy',
                 type: 'address',
               },
               {
-                internalType: 'address',
                 name: 'implementation',
                 type: 'address',
               },
@@ -584,7 +579,6 @@ extendEnvironment((hre) => {
           name: 'upgradeTo',
           inputs: [
             {
-              internalType: 'address',
               name: 'newImplementation',
               type: 'address',
             },
@@ -694,7 +688,6 @@ extendEnvironment((hre) => {
           ethers.FunctionFragment.from({
             inputs: [
               {
-                internalType: 'address',
                 name: 'newImplementation',
                 type: 'address',
               },
@@ -726,12 +719,12 @@ extendEnvironment((hre) => {
         functionInterface: {
           name: 'scheduleBatch',
           inputs: [
-            { internalType: 'address[]', name: 'targets', type: 'address[]' },
-            { internalType: 'uint256[]', name: 'values', type: 'uint256[]' },
-            { internalType: 'bytes[]', name: 'payloads', type: 'bytes[]' },
-            { internalType: 'bytes32', name: 'predecessor', type: 'bytes32' },
-            { internalType: 'bytes32', name: 'salt', type: 'bytes32' },
-            { internalType: 'uint256', name: 'delay', type: 'uint256' },
+            { name: 'targets', type: 'address[]' },
+            { name: 'values', type: 'uint256[]' },
+            { name: 'payloads', type: 'bytes[]' },
+            { name: 'predecessor', type: 'bytes32' },
+            { name: 'salt', type: 'bytes32' },
+            { name: 'delay', type: 'uint256' },
           ],
         },
         functionInputs: [
@@ -757,11 +750,11 @@ extendEnvironment((hre) => {
         functionInterface: {
           name: 'executeBatch',
           inputs: [
-            { internalType: 'address[]', name: 'targets', type: 'address[]' },
-            { internalType: 'uint256[]', name: 'values', type: 'uint256[]' },
-            { internalType: 'bytes[]', name: 'payloads', type: 'bytes[]' },
-            { internalType: 'bytes32', name: 'predecessor', type: 'bytes32' },
-            { internalType: 'bytes32', name: 'salt', type: 'bytes32' },
+            { name: 'targets', type: 'address[]' },
+            { name: 'values', type: 'uint256[]' },
+            { name: 'payloads', type: 'bytes[]' },
+            { name: 'predecessor', type: 'bytes32' },
+            { name: 'salt', type: 'bytes32' },
           ],
         },
         functionInputs: [

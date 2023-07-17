@@ -440,6 +440,12 @@ extendEnvironment((hre) => {
             return r.contractAddress
           })
 
+    await updateDeploymentAbi({
+      hre,
+      address: proxyAddress,
+      abi: JSON.parse(implFactory.interface.formatJson()),
+    })
+
     const proxyAdmin = await hre.upgrades.admin.getInstance()
     const { protocolOwnerSafe } = await hre.getNamedAccounts()
 
@@ -661,6 +667,12 @@ extendEnvironment((hre) => {
               return r.contractAddress
             })
 
+      await updateDeploymentAbi({
+        hre,
+        address: refAddress,
+        abi: JSON.parse(step.implFactory.interface.formatJson()),
+      })
+
       timelockBatchArgs.values.push('0')
       if ('proxy' in step) {
         timelockBatchArgs.targets.push(await proxyAdmin.getAddress())
@@ -862,21 +874,14 @@ async function ozDefenderDeploy(
   })
   hre.log(`${implementation}`, { star: false })
 
-  const artifact = await hre.artifacts.readArtifact(contractName).catch(() => {
-    if (opts.customName) return hre.artifacts.readArtifact(opts.customName)
-  })
-  if (!artifact)
-    throw new Error(
-      `Unable to find artifact for ${contractName ?? opts.customName}`
-    )
-
+  const abi = JSON.parse(implFactory.interface.formatJson())
   const deployTx = proxy.deploymentTransaction()
   const transactionHash = deployTx?.hash ?? existingDeployment?.transactionHash
   const receipt = Object.assign({}, deployTx, existingDeployment?.receipt)
   await hre.deployments.save(saveName, {
     address: proxyAddress,
     implementation,
-    abi: artifact.abi,
+    abi,
     transactionHash,
     receipt,
   })
@@ -885,4 +890,24 @@ async function ozDefenderDeploy(
   hre.log('----------')
 
   return proxy
+}
+
+async function updateDeploymentAbi({
+  hre,
+  address,
+  abi,
+}: {
+  hre: HardhatRuntimeEnvironment
+  address: string
+  abi: any[]
+}): Promise<void> {
+  const deployments = await hre.deployments.all()
+  for (const [contractName, deployment] of Object.entries(deployments)) {
+    if (deployment.address === address) {
+      await hre.deployments.save(contractName, {
+        ...deployment,
+        abi,
+      })
+    }
+  }
 }

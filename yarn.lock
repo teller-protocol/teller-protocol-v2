@@ -1008,9 +1008,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@graphprotocol/graph-cli@npm:^0.51.2":
-  version: 0.51.2
-  resolution: "@graphprotocol/graph-cli@npm:0.51.2"
+"@graphprotocol/graph-cli@npm:^0.52.0":
+  version: 0.52.0
+  resolution: "@graphprotocol/graph-cli@npm:0.52.0"
   dependencies:
     "@float-capital/float-subgraph-uncrashable": ^0.0.0-alpha.4
     "@oclif/core": 2.8.6
@@ -1040,7 +1040,7 @@ __metadata:
     yaml: 1.10.2
   bin:
     graph: bin/run
-  checksum: 044a99e9471743cdc4c3d3fc965957d6d3f90c0cb34cb8de74b94d9f38d6bd72a95be912d8930149541fc9b720454e04387f582984e10ffebf081bbb821c4626
+  checksum: 7c6e2dbf022f4229b412e1107bb16b8e5914da2c21802af9a072a79a4f463132a192380e9c395a463c285004abedf16461037cebea7387c580c2de46200ddd40
   languageName: node
   linkType: hard
 
@@ -2093,7 +2093,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@teller-protocol/v2-subgraph@workspace:packages/subgraph"
   dependencies:
-    "@graphprotocol/graph-cli": ^0.51.2
+    "@graphprotocol/graph-cli": ^0.52.0
     "@graphprotocol/graph-ts": ^0.31.0
     "@typescript-eslint/eslint-plugin": ^5.5.0
     "@typescript-eslint/parser": ^5.5.0
@@ -2452,9 +2452,9 @@ __metadata:
   linkType: hard
 
 "@types/node@npm:>=13.7.0":
-  version: 20.4.1
-  resolution: "@types/node@npm:20.4.1"
-  checksum: 22cbcc792f2eb636fe4188778ed0f32658ab872aa7fcb9847b3fa289a42b14b9f5e30c6faec50ef3c7adbc6c2a246926e5858136bb8b10c035a3fcaa6afbeed2
+  version: 20.4.2
+  resolution: "@types/node@npm:20.4.2"
+  checksum: 99e544ea7560d51f01f95627fc40394c24a13da8f041121a0da13e4ef0a2aa332932eaf9a5e8d0e30d1c07106e96a183be392cbba62e8cf0bf6a085d5c0f4149
   languageName: node
   linkType: hard
 

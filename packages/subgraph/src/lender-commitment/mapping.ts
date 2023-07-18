@@ -86,9 +86,16 @@ export function handleExercisedCommitment(event: ExercisedCommitment): void {
   const commitmentId = event.params.commitmentId.toString();
   const commitment = loadCommitment(commitmentId);
 
-  commitment.acceptedPrincipal = commitment.acceptedPrincipal.plus(
-    event.params.tokenAmount
+  const lenderCommitmentForwarderInstance = LenderCommitmentForwarder.bind(
+    event.address
   );
+  const acceptedPrincipalResult = lenderCommitmentForwarderInstance.try_commitmentPrincipalAccepted(
+    BigInt.fromString(commitmentId)
+  );
+
+  commitment.acceptedPrincipal = acceptedPrincipalResult.reverted
+    ? BigInt.zero()
+    : acceptedPrincipalResult.value;
   updateAvailableTokensFromCommitment(commitment);
 
   // Link commitment to bid

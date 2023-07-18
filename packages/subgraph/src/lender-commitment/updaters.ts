@@ -84,41 +84,43 @@ export function updateLenderCommitment(
     BigInt.fromString(commitmentId)
   );
 
-  commitment.expirationTimestamp = lenderCommitment.value1;
-  commitment.maxDuration = lenderCommitment.value2;
-  commitment.minAPY = BigInt.fromI32(lenderCommitment.value3);
+  commitment.expirationTimestamp = lenderCommitment.getExpiration();
+  commitment.maxDuration = lenderCommitment.getMaxDuration();
+  commitment.minAPY = BigInt.fromI32(lenderCommitment.getMinInterestRate());
 
   const lendingToken = loadToken(lendingTokenAddress);
   commitment.principalToken = lendingToken.id;
   commitment.principalTokenAddress = lendingTokenAddress;
-  commitment.maxPrincipal = committedAmount;
+  commitment.maxPrincipal = lenderCommitment.getMaxPrincipal();
 
-  commitment.collateralTokenType = BigInt.fromI32(lenderCommitment.value7);
-  if (lenderCommitment.value7 != CollateralTokenType.NONE) {
+  commitment.collateralTokenType = BigInt.fromI32(
+    lenderCommitment.getCollateralTokenType()
+  );
+  if (lenderCommitment.getCollateralTokenType() != CollateralTokenType.NONE) {
     let tokenType = TokenType.UNKNOWN;
     let nftId: BigInt | null = null;
-    switch (lenderCommitment.value7) {
+    switch (lenderCommitment.getCollateralTokenType()) {
       case CollateralTokenType.ERC20:
         tokenType = TokenType.ERC20;
         break;
       case CollateralTokenType.ERC721:
-        nftId = lenderCommitment.value5;
+        nftId = lenderCommitment.getCollateralTokenId();
       case CollateralTokenType.ERC721_ANY_ID:
         tokenType = TokenType.ERC721;
         break;
       case CollateralTokenType.ERC1155:
-        nftId = lenderCommitment.value5;
+        nftId = lenderCommitment.getCollateralTokenId();
       case CollateralTokenType.ERC1155_ANY_ID:
         tokenType = TokenType.ERC1155;
         break;
     }
     const collateralToken = loadToken(
-      lenderCommitment.value4,
+      lenderCommitment.getCollateralTokenAddress(),
       tokenType,
       nftId
     );
     commitment.collateralToken = collateralToken.id;
-    commitment.maxPrincipalPerCollateralAmount = lenderCommitment.value6;
+    commitment.maxPrincipalPerCollateralAmount = lenderCommitment.getMaxPrincipalPerCollateralAmount();
   }
 
   const volume = loadCommitmentTokenVolume(lendingToken.id, commitment);

@@ -3,8 +3,10 @@ import {
   CollateralCommitted,
   CollateralDeposited,
   CollateralEscrowDeployed,
+  CollateralManager,
   CollateralWithdrawn
 } from "../../generated/CollateralManager/CollateralManager";
+import { TellerV2 } from "../../generated/CollateralManager/TellerV2";
 import { Bid } from "../../generated/schema";
 import { updateCollateral } from "../collateral-manager/updaters";
 import { BidStatus, bidStatusToEnum, isBidDefaulted } from "../helpers/bid";
@@ -110,13 +112,16 @@ export function handleCollateralWithdrawns(
  */
 export function handleCollateralClaimed(event: CollateralClaimed): void {
   const bid = loadBidById(event.params._bidId);
+
   // If the bid is still accepted, then it means the lender has liquidated the loan
   // without making a payment. In this case, we set the bid status to `Liquidated`.
-  if (
-    bidStatusToEnum(bid.status) == BidStatus.Accepted &&
-    isBidDefaulted(bid, event.block.timestamp)
-  ) {
-    updateBidStatus(bid, BidStatus.Liquidated);
+  if (bidStatusToEnum(bid.status) == BidStatus.Accepted) {
+    const collateralManager = CollateralManager.bind(event.address);
+    const tellerV2 = TellerV2.bind(collateralManager.tellerV2());
+
+    if (tellerV2.isLoanDefaulted(bid.bidId)) {
+      updateBidStatus(bid, BidStatus.Liquidated);
+    }
   }
 }
 

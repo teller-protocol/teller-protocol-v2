@@ -1,7 +1,7 @@
 {
   "name": "@teller-protocol/v2-subgraph",
   "license": "UNLICENSED",
-  "version": "0.4.12",
+  "version": "0.4.13",
   "scripts": {
     "build": "./scripts/build.sh",
     "deploy": "./scripts/deploy.sh",
@@ -33,6 +33,5 @@
     "hbs-cli": "^1.4.1",
     "matchstick-as": "^0.4.0",
     "typescript": "^4.9.4"
-  },
-  "stableVersion": "0.4.11"
+  }
 }

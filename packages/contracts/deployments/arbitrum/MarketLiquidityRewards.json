@@ -2,389 +2,440 @@
   "address": "0xAD9AcE8A1Ea7267DC2ab19bf4b10465D56D5eCF0",
   "abi": [
     {
-      "type": "constructor",
-      "payable": false,
       "inputs": [
         {
-          "type": "address",
-          "name": "_tellerV2"
+          "internalType": "address",
+          "name": "_tellerV2",
+          "type": "address"
         },
         {
-          "type": "address",
-          "name": "_marketRegistry"
+          "internalType": "address",
+          "name": "_marketRegistry",
+          "type": "address"
         },
         {
-          "type": "address",
-          "name": "_collateralManager"
+          "internalType": "address",
+          "name": "_collateralManager",
+          "type": "address"
         }
-      ]
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
     },
     {
-      "type": "event",
       "anonymous": false,
-      "name": "ClaimedRewards",
       "inputs": [
         {
-          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256",
           "name": "allocationId",
-          "indexed": false
+          "type": "uint256"
         },
         {
-          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256",
           "name": "bidId",
-          "indexed": false
+          "type": "uint256"
         },
         {
-          "type": "address",
+          "indexed": false,
+          "internalType": "address",
           "name": "recipient",
-          "indexed": false
+          "type": "address"
         },
         {
-          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256",
           "name": "amount",
-          "indexed": false
+          "type": "uint256"
         }
-      ]
+      ],
+      "name": "ClaimedRewards",
+      "type": "event"
     },
     {
-      "type": "event",
       "anonymous": false,
-      "name": "CreatedAllocation",
       "inputs": [
         {
-          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256",
           "name": "allocationId",
-          "indexed": false
+          "type": "uint256"
         },
         {
-          "type": "address",
+          "indexed": false,
+          "internalType": "address",
           "name": "allocator",
-          "indexed": false
+          "type": "address"
         },
         {
-          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256",
           "name": "marketId",
-          "indexed": false
+          "type": "uint256"
         }
-      ]
+      ],
+      "name": "CreatedAllocation",
+      "type": "event"
     },
     {
-      "type": "event",
       "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "allocationId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
       "name": "DecreasedAllocation",
-      "inputs": [
-        {
-          "type": "uint256",
-          "name": "allocationId",
-          "indexed": false
-        },
-        {
-          "type": "uint256",
-          "name": "amount",
-          "indexed": false
-        }
-      ]
+      "type": "event"
     },
     {
-      "type": "event",
       "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "allocationId",
+          "type": "uint256"
+        }
+      ],
       "name": "DeletedAllocation",
-      "inputs": [
-        {
-          "type": "uint256",
-          "name": "allocationId",
-          "indexed": false
-        }
-      ]
+      "type": "event"
     },
     {
-      "type": "event",
       "anonymous": false,
-      "name": "IncreasedAllocation",
       "inputs": [
         {
-          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256",
           "name": "allocationId",
-          "indexed": false
+          "type": "uint256"
         },
         {
-          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256",
           "name": "amount",
-          "indexed": false
+          "type": "uint256"
         }
-      ]
+      ],
+      "name": "IncreasedAllocation",
+      "type": "event"
     },
     {
-      "type": "event",
       "anonymous": false,
-      "name": "Initialized",
       "inputs": [
         {
-          "type": "uint8",
+          "indexed": false,
+          "internalType": "uint8",
           "name": "version",
-          "indexed": false
+          "type": "uint8"
         }
-      ]
+      ],
+      "name": "Initialized",
+      "type": "event"
     },
     {
-      "type": "event",
       "anonymous": false,
-      "name": "UpdatedAllocation",
       "inputs": [
         {
-          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256",
           "name": "allocationId",
-          "indexed": false
+          "type": "uint256"
         }
-      ]
+      ],
+      "name": "UpdatedAllocation",
+      "type": "event"
     },
     {
-      "type": "function",
-      "name": "allocateRewards",
-      "constant": false,
-      "payable": false,
       "inputs": [
         {
-          "type": "tuple",
-          "name": "_allocation",
           "components": [
             {
-              "type": "address",
-              "name": "allocator"
+              "internalType": "address",
+              "name": "allocator",
+              "type": "address"
             },
             {
-              "type": "address",
-              "name": "rewardTokenAddress"
+              "internalType": "address",
+              "name": "rewardTokenAddress",
+              "type": "address"
             },
             {
-              "type": "uint256",
-              "name": "rewardTokenAmount"
+              "internalType": "uint256",
+              "name": "rewardTokenAmount",
+              "type": "uint256"
             },
             {
-              "type": "uint256",
-              "name": "marketId"
+              "internalType": "uint256",
+              "name": "marketId",
+              "type": "uint256"
             },
             {
-              "type": "address",
-              "name": "requiredPrincipalTokenAddress"
+              "internalType": "address",
+              "name": "requiredPrincipalTokenAddress",
+              "type": "address"
             },
             {
-              "type": "address",
-              "name": "requiredCollateralTokenAddress"
+              "internalType": "address",
+              "name": "requiredCollateralTokenAddress",
+              "type": "address"
             },
             {
-              "type": "uint256",
-              "name": "minimumCollateralPerPrincipalAmount"
+              "internalType": "uint256",
+              "name": "minimumCollateralPerPrincipalAmount",
+              "type": "uint256"
             },
             {
-              "type": "uint256",
-              "name": "rewardPerLoanPrincipalAmount"
+              "internalType": "uint256",
+              "name": "rewardPerLoanPrincipalAmount",
+              "type": "uint256"
             },
             {
-              "type": "uint32",
-              "name": "bidStartTimeMin"
+              "internalType": "uint32",
+              "name": "bidStartTimeMin",
+              "type": "uint32"
             },
             {
-              "type": "uint32",
-              "name": "bidStartTimeMax"
+              "internalType": "uint32",
+              "name": "bidStartTimeMax",
+              "type": "uint32"
             },
             {
-              "type": "uint8",
-              "name": "allocationStrategy"
+              "internalType": "enum IMarketLiquidityRewards.AllocationStrategy",
+              "name": "allocationStrategy",
+              "type": "uint8"
             }
-          ]
+          ],
+          "internalType": "struct IMarketLiquidityRewards.RewardAllocation",
+          "name": "_allocation",
+          "type": "tuple"
         }
       ],
+      "name": "allocateRewards",
       "outputs": [
         {
-          "type": "uint256",
-          "name": "allocationId_"
+          "internalType": "uint256",
+          "name": "allocationId_",
+          "type": "uint256"
         }
-      ]
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
     },
     {
-      "type": "function",
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
       "name": "allocatedRewards",
-      "constant": true,
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "allocator",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "rewardTokenAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "rewardTokenAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "marketId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "requiredPrincipalTokenAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "requiredCollateralTokenAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "minimumCollateralPerPrincipalAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "rewardPerLoanPrincipalAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint32",
+          "name": "bidStartTimeMin",
+          "type": "uint32"
+        },
+        {
+          "internalType": "uint32",
+          "name": "bidStartTimeMax",
+          "type": "uint32"
+        },
+        {
+          "internalType": "enum IMarketLiquidityRewards.AllocationStrategy",
+          "name": "allocationStrategy",
+          "type": "uint8"
+        }
+      ],
       "stateMutability": "view",
-      "payable": false,
+      "type": "function"
+    },
+    {
       "inputs": [
         {
+          "internalType": "uint256",
+          "name": "_allocationId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_bidId",
           "type": "uint256"
         }
       ],
-      "outputs": [
-        {
-          "type": "address",
-          "name": "allocator"
-        },
-        {
-          "type": "address",
-          "name": "rewardTokenAddress"
-        },
-        {
-          "type": "uint256",
-          "name": "rewardTokenAmount"
-        },
-        {
-          "type": "uint256",
-          "name": "marketId"
-        },
-        {
-          "type": "address",
-          "name": "requiredPrincipalTokenAddress"
-        },
-        {
-          "type": "address",
-          "name": "requiredCollateralTokenAddress"
-        },
-        {
-          "type": "uint256",
-          "name": "minimumCollateralPerPrincipalAmount"
-        },
-        {
-          "type": "uint256",
-          "name": "rewardPerLoanPrincipalAmount"
-        },
-        {
-          "type": "uint32",
-          "name": "bidStartTimeMin"
-        },
-        {
-          "type": "uint32",
-          "name": "bidStartTimeMax"
-        },
-        {
-          "type": "uint8",
-          "name": "allocationStrategy"
-        }
-      ]
-    },
-    {
-      "type": "function",
       "name": "claimRewards",
-      "constant": false,
-      "payable": false,
-      "inputs": [
-        {
-          "type": "uint256",
-          "name": "_allocationId"
-        },
-        {
-          "type": "uint256",
-          "name": "_bidId"
-        }
-      ],
-      "outputs": []
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
     },
     {
-      "type": "function",
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_allocationId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_tokenAmount",
+          "type": "uint256"
+        }
+      ],
       "name": "deallocateRewards",
-      "constant": false,
-      "payable": false,
-      "inputs": [
-        {
-          "type": "uint256",
-          "name": "_allocationId"
-        },
-        {
-          "type": "uint256",
-          "name": "_tokenAmount"
-        }
-      ],
-      "outputs": []
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
     },
     {
-      "type": "function",
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_allocationId",
+          "type": "uint256"
+        }
+      ],
       "name": "getRewardTokenAmount",
-      "constant": true,
-      "stateMutability": "view",
-      "payable": false,
-      "inputs": [
-        {
-          "type": "uint256",
-          "name": "_allocationId"
-        }
-      ],
       "outputs": [
         {
+          "internalType": "uint256",
+          "name": "",
           "type": "uint256"
         }
-      ]
+      ],
+      "stateMutability": "view",
+      "type": "function"
     },
     {
-      "type": "function",
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_allocationId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_tokenAmount",
+          "type": "uint256"
+        }
+      ],
       "name": "increaseAllocationAmount",
-      "constant": false,
-      "payable": false,
-      "inputs": [
-        {
-          "type": "uint256",
-          "name": "_allocationId"
-        },
-        {
-          "type": "uint256",
-          "name": "_tokenAmount"
-        }
-      ],
-      "outputs": []
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
     },
     {
-      "type": "function",
-      "name": "initialize",
-      "constant": false,
-      "payable": false,
       "inputs": [],
-      "outputs": []
+      "name": "initialize",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
     },
     {
-      "type": "function",
-      "name": "rewardClaimedForBid",
-      "constant": true,
-      "stateMutability": "view",
-      "payable": false,
       "inputs": [
         {
+          "internalType": "uint256",
+          "name": "",
           "type": "uint256"
         },
         {
+          "internalType": "uint256",
+          "name": "",
           "type": "uint256"
         }
       ],
+      "name": "rewardClaimedForBid",
       "outputs": [
         {
+          "internalType": "bool",
+          "name": "",
           "type": "bool"
         }
-      ]
+      ],
+      "stateMutability": "view",
+      "type": "function"
     },
     {
-      "type": "function",
-      "name": "updateAllocation",
-      "constant": false,
-      "payable": false,
       "inputs": [
         {
-          "type": "uint256",
-          "name": "_allocationId"
+          "internalType": "uint256",
+          "name": "_allocationId",
+          "type": "uint256"
         },
         {
-          "type": "uint256",
-          "name": "_minimumCollateralPerPrincipalAmount"
+          "internalType": "uint256",
+          "name": "_minimumCollateralPerPrincipalAmount",
+          "type": "uint256"
         },
         {
-          "type": "uint256",
-          "name": "_rewardPerLoanPrincipalAmount"
+          "internalType": "uint256",
+          "name": "_rewardPerLoanPrincipalAmount",
+          "type": "uint256"
         },
         {
-          "type": "uint32",
-          "name": "_bidStartTimeMin"
+          "internalType": "uint32",
+          "name": "_bidStartTimeMin",
+          "type": "uint32"
         },
         {
-          "type": "uint32",
-          "name": "_bidStartTimeMax"
+          "internalType": "uint32",
+          "name": "_bidStartTimeMax",
+          "type": "uint32"
         }
       ],
-      "outputs": []
+      "name": "updateAllocation",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
     }
   ],
   "transactionHash": "0xe279f1dda9a690efbeb65fe7c35e212858838edf404944fcdeea05321f9981d8",
@@ -491,6 +542,6 @@
     "status": 1,
     "byzantium": true
   },
-  "numDeployments": 1,
+  "numDeployments": 2,
   "implementation": "0x88F8c9e7dACC43Aa37C45C4FfAA204fda821704c"
 }

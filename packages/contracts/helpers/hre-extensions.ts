@@ -440,6 +440,12 @@ extendEnvironment((hre) => {
             return r.contractAddress
           })
 
+    await updateDeploymentAbi({
+      hre,
+      address: proxyAddress,
+      abi: JSON.parse(implFactory.interface.formatJson()),
+    })
+
     const proxyAdmin = await hre.upgrades.admin.getInstance()
     const { protocolOwnerSafe } = await hre.getNamedAccounts()
 
@@ -471,12 +477,11 @@ extendEnvironment((hre) => {
         name: 'upgradeAndCall',
         inputs: [
           {
-            internalType: 'contract TransparentUpgradeableProxy',
             name: 'proxy',
             type: 'address',
           },
-          { internalType: 'address', name: 'implementation', type: 'address' },
-          { internalType: 'bytes', name: 'data', type: 'bytes' },
+          { name: 'implementation', type: 'address' },
+          { name: 'data', type: 'bytes' },
         ],
       },
       functionInputs: [
@@ -543,16 +548,14 @@ extendEnvironment((hre) => {
             name: 'upgradeAndCall',
             inputs: [
               {
-                internalType: 'contract TransparentUpgradeableProxy',
                 name: 'proxy',
                 type: 'address',
               },
               {
-                internalType: 'address',
                 name: 'implementation',
                 type: 'address',
               },
-              { internalType: 'bytes', name: 'data', type: 'bytes' },
+              { name: 'data', type: 'bytes' },
             ],
           }
           functionInputs = [
@@ -565,12 +568,10 @@ extendEnvironment((hre) => {
             name: 'upgrade',
             inputs: [
               {
-                internalType: 'contract TransparentUpgradeableProxy',
                 name: 'proxy',
                 type: 'address',
               },
               {
-                internalType: 'address',
                 name: 'implementation',
                 type: 'address',
               },
@@ -584,7 +585,6 @@ extendEnvironment((hre) => {
           name: 'upgradeTo',
           inputs: [
             {
-              internalType: 'address',
               name: 'newImplementation',
               type: 'address',
             },
@@ -667,6 +667,12 @@ extendEnvironment((hre) => {
               return r.contractAddress
             })
 
+      await updateDeploymentAbi({
+        hre,
+        address: refAddress,
+        abi: JSON.parse(step.implFactory.interface.formatJson()),
+      })
+
       timelockBatchArgs.values.push('0')
       if ('proxy' in step) {
         timelockBatchArgs.targets.push(await proxyAdmin.getAddress())
@@ -694,7 +700,6 @@ extendEnvironment((hre) => {
           ethers.FunctionFragment.from({
             inputs: [
               {
-                internalType: 'address',
                 name: 'newImplementation',
                 type: 'address',
               },
@@ -726,12 +731,12 @@ extendEnvironment((hre) => {
         functionInterface: {
           name: 'scheduleBatch',
           inputs: [
-            { internalType: 'address[]', name: 'targets', type: 'address[]' },
-            { internalType: 'uint256[]', name: 'values', type: 'uint256[]' },
-            { internalType: 'bytes[]', name: 'payloads', type: 'bytes[]' },
-            { internalType: 'bytes32', name: 'predecessor', type: 'bytes32' },
-            { internalType: 'bytes32', name: 'salt', type: 'bytes32' },
-            { internalType: 'uint256', name: 'delay', type: 'uint256' },
+            { name: 'targets', type: 'address[]' },
+            { name: 'values', type: 'uint256[]' },
+            { name: 'payloads', type: 'bytes[]' },
+            { name: 'predecessor', type: 'bytes32' },
+            { name: 'salt', type: 'bytes32' },
+            { name: 'delay', type: 'uint256' },
           ],
         },
         functionInputs: [
@@ -757,11 +762,11 @@ extendEnvironment((hre) => {
         functionInterface: {
           name: 'executeBatch',
           inputs: [
-            { internalType: 'address[]', name: 'targets', type: 'address[]' },
-            { internalType: 'uint256[]', name: 'values', type: 'uint256[]' },
-            { internalType: 'bytes[]', name: 'payloads', type: 'bytes[]' },
-            { internalType: 'bytes32', name: 'predecessor', type: 'bytes32' },
-            { internalType: 'bytes32', name: 'salt', type: 'bytes32' },
+            { name: 'targets', type: 'address[]' },
+            { name: 'values', type: 'uint256[]' },
+            { name: 'payloads', type: 'bytes[]' },
+            { name: 'predecessor', type: 'bytes32' },
+            { name: 'salt', type: 'bytes32' },
           ],
         },
         functionInputs: [
@@ -869,9 +874,7 @@ async function ozDefenderDeploy(
   })
   hre.log(`${implementation}`, { star: false })
 
-  const abi = implFactory.interface.fragments.map((fragment) =>
-    JSON.parse(fragment.format('json'))
-  )
+  const abi = JSON.parse(implFactory.interface.formatJson())
   const deployTx = proxy.deploymentTransaction()
   const transactionHash = deployTx?.hash ?? existingDeployment?.transactionHash
   const receipt = Object.assign({}, deployTx, existingDeployment?.receipt)
@@ -887,4 +890,24 @@ async function ozDefenderDeploy(
   hre.log('----------')
 
   return proxy
+}
+
+async function updateDeploymentAbi({
+  hre,
+  address,
+  abi,
+}: {
+  hre: HardhatRuntimeEnvironment
+  address: string
+  abi: any[]
+}): Promise<void> {
+  const deployments = await hre.deployments.all()
+  for (const [contractName, deployment] of Object.entries(deployments)) {
+    if (deployment.address === address) {
+      await hre.deployments.save(contractName, {
+        ...deployment,
+        abi,
+      })
+    }
+  }
 }

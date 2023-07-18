@@ -2,39 +2,30 @@
 
 # First parameter defines the name of the network to use
 network=$1
-# Second parameter defines the version strategy to deploy
-version_strategy=$2
-
-# Get the current version from package.json
-current_version=$(node -p "require('./package.json').version")
 
 # Ensure a network name was given
 if [ -z "$network" ]; then
   read -r -p 'Network name: ' network
 fi
 
-bump_version() {
-  # Ensure we get a new version from the user
-  if [ -z "$version_strategy" ]; then
-    read -r -p "Bump version (current: $current_version): (major | minor | patch | prerelease) " version_strategy
-  fi
+studio_networks=("mainnet" "arbitrum")
 
-  # Bump the version in package.json
-  yarn version "$version_strategy"
+is_studio=0
 
-  # Get the updated version from package.json
-  new_version=$(node -p "require('./package.json').version")
-}
+for ntwr in "${studio_networks[@]}"; do
+    if [[ $ntwr == $network ]]; then
+        is_studio=1
+        break
+    fi
+done
 
 # Deploy the subgraph and upload to IPFS
-if [ "$network" = "mainnet" ]; then
-  bump_version
+if [[ $is_studio -eq 1 ]]; then
   yarn graph deploy \
     "tellerv2-$network" \
-    --studio \
-    --version-label "v$new_version"
+    --studio
 else
   yarn graph deploy \
-    "teller-protocol/tellerv2-$network" \
+    "teller-protocol/tellerv2-$network-test" \
     --product hosted-service
 fi

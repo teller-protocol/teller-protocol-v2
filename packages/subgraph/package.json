@@ -1,21 +1,15 @@
 {
   "name": "@teller-protocol/v2-subgraph",
   "license": "UNLICENSED",
-  "version": "0.4.11",
+  "version": "0.4.12",
   "scripts": {
     "build": "./scripts/build.sh",
     "deploy": "./scripts/deploy.sh",
     "build:deploy": "./scripts/build_deploy.sh",
     "create-local": "graph create --node http://localhost:8020/ teller-v2",
-    "create-local:polygon": "yarn prepare:polygon && graph create --node http://localhost:8020/ teller-v2-polygon",
-    "create-local:mumbai": "yarn prepare:mumbai && graph create --node http://localhost:8020/ teller-v2-mumbai",
-    "create-local:goerli": "yarn prepare:goerli && graph create --node http://localhost:8020/ teller-v2-goerli",
-    "create-local:localhost": "yarn prepare:localhost && graph create --node http://localhost:8020/ teller-v2-localhost",
     "remove-local": "graph remove --node http://localhost:8020/ teller-v2",
-    "deploy-local:polygon": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 teller-v2-polygon",
-    "deploy-local:mumbai": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 teller-v2-mumbai",
-    "deploy-local:goerli": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 teller-v2-goerli",
-    "deploy-local:localhost": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 teller-v2-localhost",
+    "reset-local": "yarn remove-local && yarn create-local",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 teller-v2",
     "test": "yarn graph test",
     "format": "eslint './src/**/*.ts' --fix"
   },
@@ -23,8 +17,8 @@
     "mustache": "^4.2.0"
   },
   "devDependencies": {
-    "@graphprotocol/graph-cli": "^0.35.0",
-    "@graphprotocol/graph-ts": "^0.28.1",
+    "@graphprotocol/graph-cli": "^0.52.0",
+    "@graphprotocol/graph-ts": "^0.31.0",
     "@typescript-eslint/eslint-plugin": "^5.5.0",
     "@typescript-eslint/parser": "^5.5.0",
     "assemblyscript": "^0.27.1",
@@ -39,5 +33,6 @@
     "hbs-cli": "^1.4.1",
     "matchstick-as": "^0.4.0",
     "typescript": "^4.9.4"
-  }
+  },
+  "stableVersion": "0.4.11"
 }

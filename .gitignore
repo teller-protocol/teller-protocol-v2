@@ -58,3 +58,5 @@ yarn-error.log*
 yalc.lock
 .history
 .bin
+
+.yarn/versions/

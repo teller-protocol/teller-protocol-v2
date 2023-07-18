@@ -59,7 +59,6 @@ enum CollateralTokenType {
  * @param {Address} lendingTokenAddress - Address of the token being lent
  * @param {BigInt} committedAmount - The maximum that can be loaned
  * @param {Address} eventAddress - Address of the emitted event
- * @param {ethereum.Block} eventBlock - Block of the emitted event
  */
 export function updateLenderCommitment(
   commitmentId: string,
@@ -67,8 +66,7 @@ export function updateLenderCommitment(
   marketId: string,
   lendingTokenAddress: Address,
   committedAmount: BigInt,
-  eventAddress: Address,
-  eventBlock: ethereum.Block
+  eventAddress: Address
 ): Commitment {
   const commitment = loadCommitment(commitmentId);
 
@@ -86,40 +84,43 @@ export function updateLenderCommitment(
     BigInt.fromString(commitmentId)
   );
 
-  commitment.expirationTimestamp = lenderCommitment.value1;
-  commitment.maxDuration = lenderCommitment.value2;
-  commitment.minAPY = BigInt.fromI32(lenderCommitment.value3);
+  commitment.expirationTimestamp = lenderCommitment.getExpiration();
+  commitment.maxDuration = lenderCommitment.getMaxDuration();
+  commitment.minAPY = BigInt.fromI32(lenderCommitment.getMinInterestRate());
 
   const lendingToken = loadToken(lendingTokenAddress);
   commitment.principalToken = lendingToken.id;
   commitment.principalTokenAddress = lendingTokenAddress;
+  commitment.maxPrincipal = lenderCommitment.getMaxPrincipal();
 
-  commitment.collateralTokenType = BigInt.fromI32(lenderCommitment.value7);
-  if (lenderCommitment.value7 != CollateralTokenType.NONE) {
+  commitment.collateralTokenType = BigInt.fromI32(
+    lenderCommitment.getCollateralTokenType()
+  );
+  if (lenderCommitment.getCollateralTokenType() != CollateralTokenType.NONE) {
     let tokenType = TokenType.UNKNOWN;
     let nftId: BigInt | null = null;
-    switch (lenderCommitment.value7) {
+    switch (lenderCommitment.getCollateralTokenType()) {
       case CollateralTokenType.ERC20:
         tokenType = TokenType.ERC20;
         break;
       case CollateralTokenType.ERC721:
-        nftId = lenderCommitment.value5;
+        nftId = lenderCommitment.getCollateralTokenId();
       case CollateralTokenType.ERC721_ANY_ID:
         tokenType = TokenType.ERC721;
         break;
       case CollateralTokenType.ERC1155:
-        nftId = lenderCommitment.value5;
+        nftId = lenderCommitment.getCollateralTokenId();
       case CollateralTokenType.ERC1155_ANY_ID:
         tokenType = TokenType.ERC1155;
         break;
     }
     const collateralToken = loadToken(
-      lenderCommitment.value4,
+      lenderCommitment.getCollateralTokenAddress(),
       tokenType,
       nftId
     );
     commitment.collateralToken = collateralToken.id;
-    commitment.maxPrincipalPerCollateralAmount = lenderCommitment.value6;
+    commitment.maxPrincipalPerCollateralAmount = lenderCommitment.getMaxPrincipalPerCollateralAmount();
   }
 
   const volume = loadCommitmentTokenVolume(lendingToken.id, commitment);
@@ -128,8 +129,7 @@ export function updateLenderCommitment(
   commitment.save();
 
   updateCommitmentStatus(commitment, CommitmentStatus.Active);
-  const committedAmountDiff = committedAmount.minus(commitment.committedAmount);
-  updateAvailableTokensFromCommitment(commitment, committedAmountDiff);
+  updateAvailableTokensFromCommitment(commitment);
 
   return commitment;
 }
@@ -154,10 +154,6 @@ export function updateCommitmentStatus(
     case CommitmentStatus.Deleted:
     case CommitmentStatus.Drained:
     case CommitmentStatus.Expired:
-      updateAvailableTokensFromCommitment(
-        commitment,
-        commitment.committedAmount.neg()
-      );
       removeCommitmentToProtocol(commitment);
       marketCommitments.commitmentZScores = removeFromArray(
         marketCommitments.commitmentZScores,
@@ -273,17 +269,18 @@ function removeCommitmentToProtocol(commitment: Commitment): void {
 }
 
 export function updateAvailableTokensFromCommitment(
-  commitment: Commitment,
-  committedAmountDiff: BigInt
+  commitment: Commitment
 ): void {
-  if (committedAmountDiff.isZero()) {
-    return;
-  }
-
-  commitment.committedAmount = commitment.committedAmount.plus(
-    committedAmountDiff
+  const availableAmount = commitment.maxPrincipal.minus(
+    commitment.acceptedPrincipal
   );
+  const committedAmountDiff = availableAmount.minus(commitment.committedAmount);
+  commitment.committedAmount = availableAmount;
   commitment.save();
+
+  if (availableAmount.equals(BigInt.zero())) {
+    updateCommitmentStatus(commitment, CommitmentStatus.Drained);
+  }
 
   const tokenVolumes = getTokenVolumesFromCommitment(commitment);
   for (let i = 0; i < tokenVolumes.length; i++) {

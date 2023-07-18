@@ -11,7 +11,7 @@ if [ -z "$network" ]; then
 fi
 
 # Ensure the network name is valid
-valid_networks=('localhost' 'polygon' 'mumbai' 'mainnet' 'goerli')
+valid_networks=('localhost' 'polygon' 'mumbai' 'mainnet' 'goerli' 'arbitrum')
 if ! echo "${valid_networks[@]}" | grep -q "\b$network\b"; then
   echo
   echo "Invalid network name provided: $network"
@@ -23,6 +23,7 @@ fi
 # Define a map of network names as defined by The Graph
 declare -A network_map
 network_map[polygon]=matic
+network_map[arbitrum]=arbitrum-one
 
 # Normalize network name as defined by The Graph
 graph_network=$network

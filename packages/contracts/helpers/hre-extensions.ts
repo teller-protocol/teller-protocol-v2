@@ -881,7 +881,7 @@ async function ozDefenderDeploy(
   await hre.deployments.save(saveName, {
     address: proxyAddress,
     implementation,
-    abi,
+    abi: artifact.abi,
     transactionHash,
     receipt,
   })

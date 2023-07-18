@@ -2,12 +2,12 @@
   "network": "mainnet",
   "grafting": {
     "enabled": true,
-    "base": "QmWfdFaUZvMmdMr1shEVv72a1VuU4hVwFM2h5FmmFG8tAK",
-    "block": "17504873"
+    "base": "QmcEuL3u81WH2NUKHWXcygRjLHXZF9SmHxJdRSzCeFisXC",
+    "block": "17716529"
   },
   "block_handler": {
     "enabled": true,
-    "block": "17374919"
+    "block": "17715380"
   },
   "contracts": {
     "teller_v2": {

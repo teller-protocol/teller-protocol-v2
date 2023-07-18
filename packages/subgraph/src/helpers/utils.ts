@@ -1,11 +1,4 @@
-import {
-  BigDecimal,
-  BigInt,
-  Entity,
-  log,
-  TypedMap,
-  Value
-} from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt, Entity } from "@graphprotocol/graph-ts";
 
 export function addToArray<T>(
   array: T[],
@@ -47,7 +40,6 @@ export function calcStdDevAndMeanFromEntities(
 
   const variance = calcVariance(entities, key, mean);
   const stdDev = sqrtBD(variance);
-  log.warning("std dev: {}", [stdDev.toString()]);
 
   return [stdDev, mean];
 }

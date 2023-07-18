@@ -30,6 +30,7 @@ const publishSubgraph = async (
 
 const normalizeNetworkName = (name: string): string => {
   if (name === 'polygon') return 'matic'
+  if (name === 'arbitrum') return 'arbitrum-one'
   return name
 }
 

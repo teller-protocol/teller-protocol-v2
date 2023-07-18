@@ -49,8 +49,12 @@ import { addToArray, camelize, removeFromArray, safeDiv } from "./utils";
  */
 export function updateBidStatus(bid: Bid, status: BidStatus): BidStatus {
   const prevStatus = bid.isSet("status") ? bid.status : "";
-  bid.status = bidStatusToString(status);
+  const newStatus = bidStatusToString(status);
+  if (prevStatus == newStatus) return status;
+
+  bid.status = newStatus;
   bid.save();
+
   updateLoanStatusCountsFromBid(bid.id, prevStatus);
   return bidStatusToEnum(prevStatus);
 }
@@ -270,15 +274,14 @@ export function updateBidOnPayment(
   event: ethereum.Event,
   paymentEventType: PaymentEventType
 ): void {
-  if (bidStatusToEnum(bid.status) != BidStatus.Liquidated) {
+  if (paymentEventType == PaymentEventType.Liquidated) {
+    updateBidStatus(bid, BidStatus.Liquidated);
+  } else if (bidStatusToEnum(bid.status) != BidStatus.Liquidated) {
     if (paymentEventType == PaymentEventType.Repayment) {
       updateBidStatus(bid, BidStatus.Accepted);
     } else if (paymentEventType == PaymentEventType.Repaid) {
       updateBidStatus(bid, BidStatus.Repaid);
     }
-  }
-  if (paymentEventType == PaymentEventType.Liquidated) {
-    updateBidStatus(bid, BidStatus.Liquidated);
   }
 
   // NOTE: possible to have multiple payments in the same transaction

@@ -57,8 +57,9 @@ export function isBidLate(bid: Bid, timestamp: BigInt): boolean {
 
 export function isBidDefaulted(bid: Bid, timestamp: BigInt): boolean {
   if (bid.paymentDefaultDuration.isZero()) return false;
-  const lastPaidTimestamp = bid.lastRepaidTimestamp.isZero()
-    ? bid.acceptedTimestamp
-    : bid.lastRepaidTimestamp;
-  return timestamp.minus(lastPaidTimestamp) > bid.paymentDefaultDuration;
+
+  const dueDate = bid.nextDueDate;
+  if (!dueDate) return false;
+
+  return timestamp > dueDate.plus(bid.paymentDefaultDuration);
 }

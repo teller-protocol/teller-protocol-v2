@@ -13,7 +13,11 @@ import { loadBidById } from "../helpers/loaders";
 import { linkCommitmentToRewards } from "../liquidity-rewards/updaters";
 
 import { loadCommitment } from "./loaders";
-import { updateCommitmentStatus, updateLenderCommitment } from "./updaters";
+import {
+  updateAvailableTokensFromCommitment,
+  updateCommitmentStatus,
+  updateLenderCommitment
+} from "./updaters";
 import { CommitmentStatus } from "./utils";
 
 export function handleCreatedCommitment(event: CreatedCommitment): void {
@@ -24,8 +28,7 @@ export function handleCreatedCommitment(event: CreatedCommitment): void {
     event.params.marketId.toString(),
     event.params.lendingToken,
     event.params.tokenAmount,
-    event.address,
-    event.block
+    event.address
   );
 
   commitment.createdAt = event.block.timestamp;
@@ -50,8 +53,7 @@ export function handleUpdatedCommitment(event: UpdatedCommitment): void {
     event.params.marketId.toString(),
     event.params.lendingToken,
     event.params.tokenAmount,
-    event.address,
-    event.block
+    event.address
   );
 }
 
@@ -84,9 +86,17 @@ export function handleExercisedCommitment(event: ExercisedCommitment): void {
   const commitmentId = event.params.commitmentId.toString();
   const commitment = loadCommitment(commitmentId);
 
-  if (event.params.tokenAmount.equals(commitment.committedAmount)) {
-    updateCommitmentStatus(commitment, CommitmentStatus.Drained);
-  }
+  const lenderCommitmentForwarderInstance = LenderCommitmentForwarder.bind(
+    event.address
+  );
+  const acceptedPrincipalResult = lenderCommitmentForwarderInstance.try_commitmentPrincipalAccepted(
+    BigInt.fromString(commitmentId)
+  );
+
+  commitment.acceptedPrincipal = acceptedPrincipalResult.reverted
+    ? BigInt.zero()
+    : acceptedPrincipalResult.value;
+  updateAvailableTokensFromCommitment(commitment);
 
   // Link commitment to bid
   const bid: Bid = loadBidById(event.params.bidId);

@@ -3,10 +3,10 @@
   "grafting": {
     "enabled": true,
     "base": "QmdaYkC1Juetyobg6GtLxFqxUTy5vc5J1yvPVREx8aaa5e",
-    "block": "45237021"
+    "block": "45238303"
   },
   "block_handler": {
-    "enabled": false,
+    "enabled": true,
     "block": "40918500"
   },
   "contracts": {

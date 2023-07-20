@@ -93,7 +93,7 @@ contract CommitmentRolloverLoan {
                 abi.encodePacked(
                     abi.encodeWithSelector(
                         ILenderCommitmentForwarder
-                            .acceptCommitmentWithReceiver
+                            .acceptCommitmentWithRecipient
                             .selector,
                         _commitmentArgs.commitmentId,
                         _commitmentArgs.principalAmount,

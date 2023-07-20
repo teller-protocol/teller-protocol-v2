@@ -7,12 +7,12 @@ import "../utils/ExtensionsContextUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 contract LenderCommitmentForwarderWithExtensions is
-LenderCommitmentForwarder,
-OwnableUpgradeable,
-ExtensionsContextUpgradeable
+    LenderCommitmentForwarder,
+    OwnableUpgradeable,
+    ExtensionsContextUpgradeable
 {
     constructor(address _tellerV2, address _marketRegistry)
-    LenderCommitmentForwarder(_tellerV2, _marketRegistry)
+        LenderCommitmentForwarder(_tellerV2, _marketRegistry)
     {}
 
     function initializeExtensions(address _newOwner) public reinitializer(2) {
@@ -28,21 +28,21 @@ ExtensionsContextUpgradeable
     }
 
     function _msgSender()
-    internal
-    view
-    virtual
-    override(ContextUpgradeable, ERC2771ContextUpgradeable)
-    returns (address sender)
+        internal
+        view
+        virtual
+        override(ContextUpgradeable, ERC2771ContextUpgradeable)
+        returns (address sender)
     {
         return ERC2771ContextUpgradeable._msgSender();
     }
 
     function _msgData()
-    internal
-    view
-    virtual
-    override(ContextUpgradeable, ERC2771ContextUpgradeable)
-    returns (bytes calldata)
+        internal
+        view
+        virtual
+        override(ContextUpgradeable, ERC2771ContextUpgradeable)
+        returns (bytes calldata)
     {
         return ERC2771ContextUpgradeable._msgData();
     }

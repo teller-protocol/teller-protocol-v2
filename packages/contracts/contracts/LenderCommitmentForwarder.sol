@@ -341,21 +341,21 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
     ) public returns (uint256 bidId) {
         require(
             commitments[_commitmentId].collateralTokenType <=
-            CommitmentCollateralType.ERC1155_ANY_ID,
+                CommitmentCollateralType.ERC1155_ANY_ID,
             "Invalid commitment collateral type"
         );
 
         return
             _acceptCommitment(
-            _commitmentId,
-            _principalAmount,
-            _collateralAmount,
-            _collateralTokenId,
-            _collateralTokenAddress,
-            _recipient,
-            _interestRate,
-            _loanDuration
-        );
+                _commitmentId,
+                _principalAmount,
+                _collateralAmount,
+                _collateralTokenId,
+                _collateralTokenAddress,
+                _recipient,
+                _interestRate,
+                _loanDuration
+            );
     }
 
     function acceptCommitment(
@@ -369,15 +369,15 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
     ) public returns (uint256 bidId) {
         return
             acceptCommitmentWithRecipient(
-            _commitmentId,
-            _principalAmount,
-            _collateralAmount,
-            _collateralTokenId,
-            _collateralTokenAddress,
-            address(0),
-            _interestRate,
-            _loanDuration
-        );
+                _commitmentId,
+                _principalAmount,
+                _collateralAmount,
+                _collateralTokenId,
+                _collateralTokenAddress,
+                address(0),
+                _interestRate,
+                _loanDuration
+            );
     }
 
     /**
@@ -407,9 +407,9 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
     ) public returns (uint256 bidId) {
         require(
             commitments[_commitmentId].collateralTokenType ==
-            CommitmentCollateralType.ERC721_MERKLE_PROOF ||
-            commitments[_commitmentId].collateralTokenType ==
-            CommitmentCollateralType.ERC1155_MERKLE_PROOF,
+                CommitmentCollateralType.ERC721_MERKLE_PROOF ||
+                commitments[_commitmentId].collateralTokenType ==
+                CommitmentCollateralType.ERC1155_MERKLE_PROOF,
             "Invalid commitment collateral type"
         );
 
@@ -430,15 +430,15 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
 
         return
             _acceptCommitment(
-            _commitmentId,
-            _principalAmount,
-            _collateralAmount,
-            _collateralTokenId,
-            _collateralTokenAddress,
-            _recipient,
-            _interestRate,
-            _loanDuration
-        );
+                _commitmentId,
+                _principalAmount,
+                _collateralAmount,
+                _collateralTokenId,
+                _collateralTokenAddress,
+                _recipient,
+                _interestRate,
+                _loanDuration
+            );
     }
 
     function acceptCommitmentWithProof(
@@ -453,16 +453,16 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
     ) public returns (uint256 bidId) {
         return
             acceptCommitmentWithRecipientAndProof(
-            _commitmentId,
-            _principalAmount,
-            _collateralAmount,
-            _collateralTokenId,
-            _collateralTokenAddress,
-            address(0),
-            _interestRate,
-            _loanDuration,
-            _merkleProof
-        );
+                _commitmentId,
+                _principalAmount,
+                _collateralAmount,
+                _collateralTokenId,
+                _collateralTokenAddress,
+                address(0),
+                _interestRate,
+                _loanDuration,
+                _merkleProof
+            );
     }
 
     /**
@@ -516,7 +516,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
 
         require(
             commitmentBorrowersList[_commitmentId].length() == 0 ||
-            commitmentBorrowersList[_commitmentId].contains(_msgSender()),
+                commitmentBorrowersList[_commitmentId].contains(_msgSender()),
             "unauthorized commitment borrower"
         );
         //require that the borrower accepting the commitment cannot borrow more than the commitments max principal
@@ -571,7 +571,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
 
         require(
             commitmentPrincipalAccepted[_commitmentId] <=
-            commitment.maxPrincipal,
+                commitment.maxPrincipal,
             "Exceeds max principal of commitment"
         );
 

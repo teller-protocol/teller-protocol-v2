@@ -16,11 +16,11 @@ abstract contract ExtensionsContextUpgradeable is ERC2771ContextUpgradeable {
     constructor() ERC2771ContextUpgradeable(address(0)) {}
 
     function isTrustedForwarder(address forwarder)
-    public
-    view
-    virtual
-    override
-    returns (bool)
+        public
+        view
+        virtual
+        override
+        returns (bool)
     {
         return extensions.contains(forwarder);
     }

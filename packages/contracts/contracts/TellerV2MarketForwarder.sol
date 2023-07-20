@@ -29,6 +29,7 @@ abstract contract TellerV2MarketForwarder is Initializable, ContextUpgradeable {
         uint16 interestRate;
         string metadataURI;
         address recipient;
+        Collateral[] collateral;
     }
 
     constructor(address _protocolAddress, address _marketRegistryAddress) {
@@ -102,7 +103,6 @@ abstract contract TellerV2MarketForwarder is Initializable, ContextUpgradeable {
      */
     function _submitBidWithCollateral(
         CreateLoanArgs memory _createLoanArgs,
-        Collateral[] memory _collateralInfo,
         address _borrower
     ) internal virtual returns (uint256 bidId) {
         bytes memory responseData;
@@ -117,7 +117,7 @@ abstract contract TellerV2MarketForwarder is Initializable, ContextUpgradeable {
                 _createLoanArgs.interestRate,
                 _createLoanArgs.metadataURI,
                 _createLoanArgs.recipient,
-                _collateralInfo
+                _createLoanArgs.collateral
             ),
             _borrower
         );

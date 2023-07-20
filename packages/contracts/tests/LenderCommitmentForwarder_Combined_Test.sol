@@ -775,7 +775,6 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
 
     function _submitBidWithCollateral(
         CreateLoanArgs memory,
-        Collateral[] memory,
         address
     ) internal override returns (uint256 bidId) {
         submitBidWithCollateralWasCalled = true;

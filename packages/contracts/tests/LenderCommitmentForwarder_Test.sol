@@ -1353,62 +1353,6 @@ contract LenderCommitmentForwarder_Test is Testable {
         ///assertEq(uint16(cType), uint16(CollateralType.NONE), "unexpected collateral type");
     }
 
-    function test_submitBidFromCommitment() public {
-        address _borrower = address(borrower);
-        uint256 _marketId = marketId;
-        address _principalTokenAddress = address(principalToken);
-        uint256 _principalAmount = 100;
-        address _collateralTokenAddress = address(collateralToken);
-        uint256 _collateralAmount = 1;
-        uint256 _collateralTokenId = 0;
-        LenderCommitmentForwarder.CommitmentCollateralType _collateralTokenType = LenderCommitmentForwarder
-                .CommitmentCollateralType
-                .ERC20;
-        uint32 _loanDuration = 100;
-        uint16 _interestRate = 100;
-
-        uint256 bidId = lenderCommitmentForwarder._submitBidFromCommitmentSuper(
-            _borrower,
-            _marketId,
-            _principalTokenAddress,
-            _principalAmount,
-            _collateralTokenAddress,
-            _collateralAmount,
-            _collateralTokenId,
-            _collateralTokenType,
-            _loanDuration,
-            _interestRate
-        );
-    }
-
-    function test_submitBidFromCommitment_collateral_none() public {
-        address _borrower = address(borrower);
-        uint256 _marketId = marketId;
-        address _principalTokenAddress = address(principalToken);
-        uint256 _principalAmount = 100;
-        address _collateralTokenAddress = address(collateralToken);
-        uint256 _collateralAmount = 1;
-        uint256 _collateralTokenId = 0;
-        LenderCommitmentForwarder.CommitmentCollateralType _collateralTokenType = LenderCommitmentForwarder
-                .CommitmentCollateralType
-                .NONE;
-        uint32 _loanDuration = 100;
-        uint16 _interestRate = 100;
-
-        uint256 bidId = lenderCommitmentForwarder._submitBidFromCommitmentSuper(
-            _borrower,
-            _marketId,
-            _principalTokenAddress,
-            _principalAmount,
-            _collateralTokenAddress,
-            _collateralAmount,
-            _collateralTokenId,
-            _collateralTokenType,
-            _loanDuration,
-            _interestRate
-        );
-    }
-
     /*
         Overrider methods for exercise 
     */

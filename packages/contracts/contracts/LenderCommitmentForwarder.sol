@@ -329,7 +329,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
      * @param _loanDuration The overall duration for the loan.  Must be longer than market payment cycle duration.
      * @return bidId The ID of the loan that was created on TellerV2
      */
-    function acceptCommitmentWithReceiver(
+    function acceptCommitmentWithRecipient(
         uint256 _commitmentId,
         uint256 _principalAmount,
         uint256 _collateralAmount,
@@ -368,7 +368,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint32 _loanDuration
     ) public returns (uint256 bidId) {
         return
-            acceptCommitmentWithReceiver(
+            acceptCommitmentWithRecipient(
             _commitmentId,
             _principalAmount,
             _collateralAmount,
@@ -394,7 +394,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
      * @param _merkleProof An array of bytes32 which are the roots down the merkle tree, the merkle proof.
      * @return bidId The ID of the loan that was created on TellerV2
      */
-    function acceptCommitmentWithReceiverAndProof(
+    function acceptCommitmentWithRecipientAndProof(
         uint256 _commitmentId,
         uint256 _principalAmount,
         uint256 _collateralAmount,
@@ -452,7 +452,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         bytes32[] calldata _merkleProof
     ) public returns (uint256 bidId) {
         return
-            acceptCommitmentWithReceiverAndProof(
+            acceptCommitmentWithRecipientAndProof(
             _commitmentId,
             _principalAmount,
             _collateralAmount,

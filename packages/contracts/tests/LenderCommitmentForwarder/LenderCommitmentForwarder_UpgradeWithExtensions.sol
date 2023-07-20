@@ -23,7 +23,11 @@ contract LenderCommitmentForwarder_UpgradeWithExtensions is Testable {
 
     function setUp() public {
         admin = new ProxyAdmin();
-        proxy = new TransparentUpgradeableProxy(address(logicV1), address(admin), "");
+        proxy = new TransparentUpgradeableProxy(
+            address(logicV1),
+            address(admin),
+            ""
+        );
 
         // Create 2 commitments to test the ID being incremented
         assertEq(_createCommitment(), 0, "Commitment ID should be 0");
@@ -41,7 +45,8 @@ contract LenderCommitmentForwarder_UpgradeWithExtensions is Testable {
         commitment.lender = address(this);
 
         address[] memory borrowers;
-        commitmentId_ = LenderCommitmentForwarder(address(proxy)).createCommitment(commitment, borrowers);
+        commitmentId_ = LenderCommitmentForwarder(address(proxy))
+            .createCommitment(commitment, borrowers);
     }
 
     function test_storage_slot_data_after_upgrade() public {
@@ -53,16 +58,41 @@ contract LenderCommitmentForwarder_UpgradeWithExtensions is Testable {
         admin.upgradeAndCall(
             proxy,
             address(logicV2),
-            abi.encodeWithSelector(logicV2.initializeExtensions.selector, address(this))
+            abi.encodeWithSelector(
+                logicV2.initializeExtensions.selector,
+                address(this)
+            )
         );
 
         // Verify the owner is set to the correct address
-        address owner = LenderCommitmentForwarderWithExtensions(address(proxy)).owner();
-        assertEq(owner, address(this), "Owner address should be set to this contract address");
+        address owner = LenderCommitmentForwarderWithExtensions(address(proxy))
+            .owner();
+        assertEq(
+            owner,
+            address(this),
+            "Owner address should be set to this contract address"
+        );
 
         // Verify the commitment principalTokenAddress is set to the correct address after the upgrade
-        (,,,,,,,,,,address principalTokenAddress) = LenderCommitmentForwarderWithExtensions(address(proxy))
-            .commitments(1);
-        assertEq(principalTokenAddress, address(123), "Principal token address should be set to 123");
+        (
+            ,
+            ,
+            ,
+            ,
+            ,
+            ,
+            ,
+            ,
+            ,
+            ,
+            address principalTokenAddress
+        ) = LenderCommitmentForwarderWithExtensions(address(proxy)).commitments(
+                1
+            );
+        assertEq(
+            principalTokenAddress,
+            address(123),
+            "Principal token address should be set to 123"
+        );
     }
 }

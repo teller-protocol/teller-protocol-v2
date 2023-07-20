@@ -11,6 +11,7 @@ contract LenderCommitmentForwarderWithExtensions is
     OwnableUpgradeable,
     ExtensionsContextUpgradeable
 {
+    /// @custom:oz-upgrades-unsafe-allow constructor
     constructor(address _tellerV2, address _marketRegistry)
         LenderCommitmentForwarder(_tellerV2, _marketRegistry)
     {}

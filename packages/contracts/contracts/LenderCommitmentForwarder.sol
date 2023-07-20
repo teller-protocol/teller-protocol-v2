@@ -170,6 +170,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
 
     /** External Functions **/
 
+    /// @custom:oz-upgrades-unsafe-allow constructor
     constructor(address _protocolAddress, address _marketRegistry)
         TellerV2MarketForwarder(_protocolAddress, _marketRegistry)
     {}

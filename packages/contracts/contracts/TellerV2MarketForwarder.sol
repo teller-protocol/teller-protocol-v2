@@ -18,7 +18,9 @@ import "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
 abstract contract TellerV2MarketForwarder is Initializable, ContextUpgradeable {
     using AddressUpgradeable for address;
 
+    /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
     address public immutable _tellerV2;
+    /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
     address public immutable _marketRegistry;
 
     struct CreateLoanArgs {
@@ -32,6 +34,7 @@ abstract contract TellerV2MarketForwarder is Initializable, ContextUpgradeable {
         Collateral[] collateral;
     }
 
+    /// @custom:oz-upgrades-unsafe-allow constructor
     constructor(address _protocolAddress, address _marketRegistryAddress) {
         _tellerV2 = _protocolAddress;
         _marketRegistry = _marketRegistryAddress;

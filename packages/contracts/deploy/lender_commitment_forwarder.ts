@@ -8,7 +8,10 @@ const deployFn: DeployFunction = async (hre) => {
     'LenderCommitmentForwarder',
     {
       unsafeAllow: ['constructor', 'state-variable-immutable'],
-      constructorArgs: [tellerV2.address, marketRegistry.address],
+      constructorArgs: [
+        await tellerV2.getAddress(),
+        await marketRegistry.getAddress(),
+      ],
     }
   )
 

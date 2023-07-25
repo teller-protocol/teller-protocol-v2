@@ -6,7 +6,7 @@ const deployFn: DeployFunction = async (hre) => {
   hre.log('Sherlock Audit: Proposing upgrade...')
 
   const trustedForwarder = await hre.contracts.get('MetaForwarder')
-  const v2Calculations = await hre.contracts.get('V2Calculations')
+  const v2Calculations = await hre.deployments.get('V2Calculations')
   const tellerV2 = await hre.contracts.get('TellerV2')
   const marketRegistry = await hre.contracts.get('MarketRegistry')
   const escrowVault = await hre.contracts.get('EscrowVault')
@@ -60,11 +60,11 @@ const deployFn: DeployFunction = async (hre) => {
 `,
     [
       {
-        proxy: marketRegistry.address,
+        proxy: marketRegistry,
         implFactory: await hre.ethers.getContractFactory('MarketRegistry'),
       },
       {
-        proxy: tellerV2.address,
+        proxy: tellerV2,
         implFactory: await hre.ethers.getContractFactory('TellerV2', {
           libraries: {
             V2Calculations: v2Calculations.address,
@@ -77,40 +77,43 @@ const deployFn: DeployFunction = async (hre) => {
             'state-variable-immutable',
             'external-library-linking',
           ],
-          constructorArgs: [trustedForwarder.address],
+          constructorArgs: [trustedForwarder],
 
           call: {
             fn: 'setEscrowVault',
-            args: [escrowVault.address],
+            args: [escrowVault],
           },
         },
       },
       {
-        proxy: collateralManager.address,
+        proxy: collateralManager,
         implFactory: await hre.ethers.getContractFactory('CollateralManager'),
       },
       {
-        beacon: collateralEscrowBeacon.address,
+        beacon: collateralEscrowBeacon,
         implFactory: await hre.ethers.getContractFactory('CollateralEscrowV1'),
       },
       {
-        proxy: lenderManager.address,
+        proxy: lenderManager,
         implFactory: await hre.ethers.getContractFactory('LenderManager'),
 
         opts: {
           unsafeAllow: ['constructor', 'state-variable-immutable'],
-          constructorArgs: [marketRegistry.address],
+          constructorArgs: [await marketRegistry.getAddress()],
         },
       },
       {
-        proxy: lenderCommitmentForwarder.address,
+        proxy: lenderCommitmentForwarder,
         implFactory: await hre.ethers.getContractFactory(
           'LenderCommitmentForwarder'
         ),
 
         opts: {
           unsafeAllow: ['constructor', 'state-variable-immutable'],
-          constructorArgs: [tellerV2.address, marketRegistry.address],
+          constructorArgs: [
+            await tellerV2.getAddress(),
+            await marketRegistry.getAddress(),
+          ],
         },
       },
     ]
@@ -139,6 +142,9 @@ deployFn.dependencies = [
   'escrow-vault:deploy',
 ]
 deployFn.skip = async (hre) => {
-  return !hre.network.live || hre.network.name === 'arbitrum'
+  return (
+    !hre.network.live ||
+    !['mainnet', 'polygon', 'goerli'].includes(hre.network.name)
+  )
 }
 export default deployFn

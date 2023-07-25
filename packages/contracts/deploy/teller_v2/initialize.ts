@@ -22,12 +22,12 @@ const deployFn: DeployFunction = async (hre) => {
   const tellerV2 = await hre.contracts.get<TellerV2>('TellerV2')
   const tx = await tellerV2.initialize(
     protocolFee,
-    marketRegistry.address,
-    reputationManager.address,
-    lenderCommitmentForwarder.address,
-    collateralManager.address,
-    lenderManager.address,
-    escrowVault.address
+    marketRegistry,
+    reputationManager,
+    lenderCommitmentForwarder,
+    collateralManager,
+    lenderManager,
+    escrowVault
   )
 
   let txLink = tx.hash

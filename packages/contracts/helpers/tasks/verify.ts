@@ -40,10 +40,12 @@ task(
       }
     }
 
-    await hre.run(TASK_VERIFY, {
-      address,
-      constructorArgsParams: constructorArgs,
-    })
+    await hre
+      .run(TASK_VERIFY, {
+        address,
+        constructorArgsParams: constructorArgs,
+      })
+      .catch(console.error)
   }
 })
 

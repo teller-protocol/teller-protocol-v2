@@ -13,7 +13,7 @@ const deployFn: DeployFunction = async (hre) => {
   const tellerV2 = await hre.contracts.get('TellerV2')
   const lenderManager = await hre.contracts.get<LenderManager>('LenderManager')
 
-  const tx = await lenderManager.transferOwnership(tellerV2.address)
+  const tx = await lenderManager.transferOwnership(tellerV2)
   await tx.wait(1)
   let txLink = tx.hash
   if (hre.network.name !== HARDHAT_NETWORK_NAME) {

@@ -23,14 +23,17 @@ const deployFn: DeployFunction = async (hre) => {
 `,
     [
       {
-        proxy: lenderCommitmentForwarder.address,
+        proxy: lenderCommitmentForwarder,
         implFactory: await hre.ethers.getContractFactory(
           'LenderCommitmentForwarder'
         ),
 
         opts: {
           unsafeAllow: ['constructor', 'state-variable-immutable'],
-          constructorArgs: [tellerV2.address, marketRegistry.address],
+          constructorArgs: [
+            await tellerV2.getAddress(),
+            await marketRegistry.getAddress(),
+          ],
         },
       },
     ]
@@ -57,6 +60,9 @@ deployFn.dependencies = [
   'lender-commitment-forwarder:deploy',
 ]
 deployFn.skip = async (hre) => {
-  return false
+  return (
+    !hre.network.live ||
+    !['mainnet', 'polygon', 'goerli'].includes(hre.network.name)
+  )
 }
 export default deployFn

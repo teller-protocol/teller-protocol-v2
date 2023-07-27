@@ -1,10 +1,9 @@
 import { DeployFunction } from 'hardhat-deploy/dist/types'
-import { deploy } from 'helpers/deploy-helpers'
 
 const deployFn: DeployFunction = async (hre) => {
-  const v2Calculations = await deploy({
-    contract: 'V2Calculations',
-    hre,
+  const { deployer } = await hre.getNamedAccounts()
+  const v2Calculations = await hre.deployments.deploy('V2Calculations', {
+    from: deployer,
   })
 }
 

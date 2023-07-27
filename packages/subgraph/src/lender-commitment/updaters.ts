@@ -49,7 +49,9 @@ enum CollateralTokenType {
   ERC721,
   ERC1155,
   ERC721_ANY_ID,
-  ERC1155_ANY_ID
+  ERC1155_ANY_ID,
+  ERC721_MERKLE,
+  ERC1155_MERKLE
 }
 
 /**
@@ -104,11 +106,13 @@ export function updateLenderCommitment(
         tokenType = TokenType.ERC20;
         break;
       case CollateralTokenType.ERC721:
+      case CollateralTokenType.ERC721_MERKLE:
         nftId = lenderCommitment.getCollateralTokenId();
       case CollateralTokenType.ERC721_ANY_ID:
         tokenType = TokenType.ERC721;
         break;
       case CollateralTokenType.ERC1155:
+      case CollateralTokenType.ERC1155_MERKLE:
         nftId = lenderCommitment.getCollateralTokenId();
       case CollateralTokenType.ERC1155_ANY_ID:
         tokenType = TokenType.ERC1155;

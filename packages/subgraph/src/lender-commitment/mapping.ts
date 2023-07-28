@@ -93,8 +93,9 @@ export function handleExercisedCommitment(event: ExercisedCommitment): void {
     BigInt.fromString(commitmentId)
   );
 
+  // function only exists after an upgrade
   commitment.acceptedPrincipal = acceptedPrincipalResult.reverted
-    ? BigInt.zero()
+    ? commitment.acceptedPrincipal.plus(event.params.tokenAmount)
     : acceptedPrincipalResult.value;
   updateAvailableTokensFromCommitment(commitment);
 

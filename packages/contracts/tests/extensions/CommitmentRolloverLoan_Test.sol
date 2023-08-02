@@ -5,6 +5,9 @@ import { CommitmentRolloverLoan } from "../../contracts/LenderCommitmentForwarde
 
 import "../../contracts/interfaces/ICommitmentRolloverLoan.sol";
 
+
+import {WethMock} from "../../contracts/mock/WethMock.sol";
+
 import {TellerV2SolMock} from "../../contracts/mock/TellerV2SolMock.sol";
 import {LenderCommitmentForwarderMock} from "../../contracts/mock/LenderCommitmentForwarderMock.sol";
  
@@ -30,6 +33,7 @@ contract CommitmentRolloverLoan_Test is Testable {
 
     CommitmentRolloverLoanMock commitmentRolloverLoan;
     TellerV2SolMock tellerV2;
+    WethMock wethMock;
     LenderCommitmentForwarderMock lenderCommitmentForwarder ;
     //MarketRegistryMock marketRegistryMock;
 
@@ -39,6 +43,7 @@ contract CommitmentRolloverLoan_Test is Testable {
         lender = new User();
 
         tellerV2 = new TellerV2SolMock();
+        wethMock = new WethMock();
 
         //marketRegistryMock = new MarketRegistryMock();
 
@@ -57,21 +62,82 @@ contract CommitmentRolloverLoan_Test is Testable {
 
     function test_rolloverLoan() public {
 
-        uint256 loanId = 0 ;
+         
+       
 
-        ICommitmentRolloverLoan.AcceptCommitmentArgs memory commitmentArgs = ICommitmentRolloverLoan.AcceptCommitmentArgs({
+         address lendingToken = address(wethMock);
+         uint256 marketId = 0;
+         uint256 principalAmount = 500;
+         uint32 duration = 10 days;
+         uint16 interestRate = 100;
+
+         ICommitmentRolloverLoan.AcceptCommitmentArgs memory commitmentArgs = ICommitmentRolloverLoan.AcceptCommitmentArgs({
             commitmentId: 0,
-            principalAmount: 500,
+            principalAmount: principalAmount,
             collateralAmount: 100,
             collateralTokenId: 0,
             collateralTokenAddress: address(0),
-            interestRate: 100,
-            loanDuration: 10 days
-
-
+            interestRate: interestRate,
+            loanDuration: duration
          });
 
         vm.prank(address(borrower));
+        uint256 loanId = tellerV2.submitBid( 
+            lendingToken,
+            marketId,
+            principalAmount,
+            duration,
+            interestRate,
+            "",
+            address(borrower)
+         );
+
+
+        //fix me here -- tellerv2 needs to accept bid to put it in correct state
+        vm.prank(address(borrower));
+        
+        commitmentRolloverLoan.rolloverLoan(
+            loanId,
+            commitmentArgs
+        );
+        
+    }
+
+
+     function test_rolloverLoan_should_revert_if_loan_not_accepted() public {
+ 
+
+         address lendingToken = address(wethMock);
+         uint256 marketId = 0;
+         uint256 principalAmount = 500;
+         uint32 duration = 10 days;
+         uint16 interestRate = 100;
+
+         ICommitmentRolloverLoan.AcceptCommitmentArgs memory commitmentArgs = ICommitmentRolloverLoan.AcceptCommitmentArgs({
+            commitmentId: 0,
+            principalAmount: principalAmount,
+            collateralAmount: 100,
+            collateralTokenId: 0,
+            collateralTokenAddress: address(0),
+            interestRate: interestRate,
+            loanDuration: duration
+         });
+
+        vm.prank(address(borrower));
+        uint256 loanId = tellerV2.submitBid( 
+            lendingToken,
+            marketId,
+            principalAmount,
+            duration,
+            interestRate,
+            "",
+            address(borrower)
+         );
+
+
+        
+        vm.prank(address(borrower));
+        vm.expectRevert();
         commitmentRolloverLoan.rolloverLoan(
             loanId,
             commitmentArgs

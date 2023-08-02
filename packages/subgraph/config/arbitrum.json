@@ -2,12 +2,12 @@
   "network": "arbitrum-one",
   "grafting": {
     "enabled": true,
-    "base": "QmNSvdNafLJupVQFZEuy1h1V8acLMmitkC3iN3r33szFDP",
-    "block": "114523410"
+    "base": "QmQs1hN46EYEF2LCUWqCNBVtExWBv6sRA7CjLHBTjef39M",
+    "block": 117293508
   },
   "block_handler": {
-    "enabled": false,
-    "block": "108629447"
+    "enabled": true,
+    "block": 117293508
   },
   "contracts": {
     "teller_v2": {

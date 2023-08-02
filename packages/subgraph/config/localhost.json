@@ -1,9 +1,0 @@
-{
-  "network": "localhost",
-  "address_teller_v2": "0xeF0f89baC623eD7C875bC2F23b5403DcF90ba8Bd",
-  "block_teller_v2": "24330545",
-  "address_market_registry": "0x5e30357d5136Bc4BfaDBA1ab341D0da09Fe7a9F1",
-  "block_market_registry": "24330545",
-  "address_lender_commitment": "0x3fA5704950a75875490E52Dc2078a3f984Ec78CE",
-  "block_lender_commitment": "15169216"
-}

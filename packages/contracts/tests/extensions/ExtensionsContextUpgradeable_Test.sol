@@ -1,93 +1,68 @@
-
-
 import { Testable } from "../Testable.sol";
 
-import {ExtensionsContextUpgradeable} from "../../contracts/utils/ExtensionsContextUpgradeable.sol";
+import { ExtensionsContextUpgradeable } from "../../contracts/utils/ExtensionsContextUpgradeable.sol";
 
 import { User } from "../Test_Helpers.sol";
 
-
 contract ExtensionsContextMock is ExtensionsContextUpgradeable {
-
     function addExtension(address extension) public {
-
         super._addExtension(extension);
     }
 
     function removeExtension(address extension) public {
-
         super._removeExtension(extension);
     }
-
-
 }
-
 
 contract ExtensionsContext_Test is Testable {
+    constructor() {}
 
+    User private borrower;
+    User private lender;
 
-constructor(){}
+    ExtensionsContextMock extensionsContext;
 
+    function setUp() public {
+        extensionsContext = new ExtensionsContextMock();
+    }
 
-User private borrower;
-User private lender;
+    function test_addExtension() public {
+        extensionsContext.addExtension(address(borrower));
+    }
 
-ExtensionsContextMock extensionsContext;
+    function test_removeExtension() public {
+        vm.expectRevert("ExtensionsContextUpgradeable: extension not added");
+        extensionsContext.removeExtension(address(borrower));
+    }
 
-function setUp() public {
+    function test_addRemoveExtension() public {
+        bool isTrustedBefore = extensionsContext.isTrustedForwarder(
+            address(borrower)
+        );
 
-    extensionsContext = new ExtensionsContextMock();
+        extensionsContext.addExtension(address(borrower));
+        extensionsContext.removeExtension(address(borrower));
 
+        bool isTrustedAfter = extensionsContext.isTrustedForwarder(
+            address(borrower)
+        );
 
-}
- 
-function test_addExtension() public {
+        assertFalse(isTrustedBefore, "Should not be trusted forwarder");
+        assertFalse(isTrustedAfter, "Should not be trusted forwarder");
+    }
 
-    extensionsContext.addExtension( address(borrower) );
- 
-}
+    function test_isTrustedForwarder() public {
+        bool isTrustedBefore = extensionsContext.isTrustedForwarder(
+            address(borrower)
+        );
 
+        extensionsContext.addExtension(address(borrower));
 
+        bool isTrustedAfter = extensionsContext.isTrustedForwarder(
+            address(borrower)
+        );
 
-function test_removeExtension() public {
-
-    vm.expectRevert("ExtensionsContextUpgradeable: extension not added");
-    extensionsContext.removeExtension( address(borrower) );
-
-
-}
-
-
-function test_addRemoveExtension() public {
-
-    bool isTrustedBefore = extensionsContext.isTrustedForwarder( address(borrower) );
-
-    extensionsContext.addExtension( address(borrower) );
-    extensionsContext.removeExtension( address(borrower) );
-
-    bool isTrustedAfter = extensionsContext.isTrustedForwarder( address(borrower) );
-
-  assertFalse(isTrustedBefore,"Should not be trusted forwarder");
-  assertFalse(isTrustedAfter,"Should not be trusted forwarder");
-
-}
-
-
-function test_isTrustedForwarder() public {
-
-  bool isTrustedBefore = extensionsContext.isTrustedForwarder( address(borrower) );
-
-  extensionsContext.addExtension( address(borrower) );
-  
-  bool isTrustedAfter = extensionsContext.isTrustedForwarder( address(borrower) );
-
-  assertFalse(isTrustedBefore,"Should not be trusted forwarder");
-  assertTrue(isTrustedAfter,"Should be trusted forwarder");
-
-
-}
-
-
-
-
+        assertFalse(isTrustedBefore, "Should not be trusted forwarder");
+        assertTrue(isTrustedAfter, "Should be trusted forwarder");
+    }
 }

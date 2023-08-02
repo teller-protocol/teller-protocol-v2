@@ -9,8 +9,8 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "../../interfaces/ITellerV2.sol";
 
 import "../../interfaces/ILenderCommitmentForwarder.sol";
-
-contract CommitmentRolloverLoan {
+import "../../interfaces/ICommitmentRolloverLoan.sol";
+contract CommitmentRolloverLoan is ICommitmentRolloverLoan{
     using AddressUpgradeable for address;
 
     /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
@@ -26,15 +26,6 @@ contract CommitmentRolloverLoan {
         );
     }
 
-    struct AcceptCommitmentArgs {
-        uint256 commitmentId;
-        uint256 principalAmount;
-        uint256 collateralAmount;
-        uint256 collateralTokenId;
-        address collateralTokenAddress;
-        uint16 interestRate;
-        uint32 loanDuration;
-    }
 
     function rolloverLoan(
         uint256 _loanId,

@@ -1,8 +1,7 @@
 import { Testable } from "../Testable.sol";
 
 import { ExtensionsContextUpgradeable } from "../../contracts/utils/ExtensionsContextUpgradeable.sol";
-
-import { User } from "../Test_Helpers.sol";
+ 
 
 contract ExtensionsContextMock is ExtensionsContextUpgradeable {
     function addExtension(address extension) public {
@@ -23,6 +22,9 @@ contract ExtensionsContext_Test is Testable {
     ExtensionsContextMock extensionsContext;
 
     function setUp() public {
+        borrower = new User();
+        lender = new User();
+        
         extensionsContext = new ExtensionsContextMock();
     }
 
@@ -66,3 +68,5 @@ contract ExtensionsContext_Test is Testable {
         assertTrue(isTrustedAfter, "Should be trusted forwarder");
     }
 }
+
+contract User {}

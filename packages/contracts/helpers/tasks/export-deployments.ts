@@ -42,25 +42,10 @@ async function writeSubgraphContract(
   networkName: string
 ): Promise<boolean> {
   try {
-    const deployment = await hre.deployments.get(contractName)
-    const graphConfigPath = `${graphDir}/config/config.json`
-    let graphConfigStr = '{}'
-    try {
-      if (fs.existsSync(graphConfigPath)) {
-        graphConfigStr = fs.readFileSync(graphConfigPath).toString()
-      }
-    } catch (e) {
-      console.log(e)
-    }
-
-    const graphConfig = JSON.parse(graphConfigStr)
-    graphConfig[`${networkName}_${contractName}Address`] = deployment.address
-
-    const folderPath = graphConfigPath.replace('/config.json', '')
+    const folderPath = `${graphDir}/config/`
     if (!fs.existsSync(folderPath)) {
       fs.mkdirSync(folderPath)
     }
-    fs.writeFileSync(graphConfigPath, JSON.stringify(graphConfig, null, 2))
     if (!fs.existsSync(`${graphDir}/abis`)) fs.mkdirSync(`${graphDir}/abis`)
     fs.writeFileSync(
       `${graphDir}/abis/${networkName}_${contractName}.json`,

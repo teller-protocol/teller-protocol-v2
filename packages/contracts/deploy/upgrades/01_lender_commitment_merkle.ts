@@ -14,7 +14,7 @@ const deployFn: DeployFunction = async (hre) => {
   await hre.defender.proposeBatchTimelock(
     'Lender Commitment Forwarder Merkle Upgrade',
     ` 
- 
+
 # LenderCommitmentForwarder
 
 * Adds two new collateral types, ERC721_MERKLE_PROOF and ERC1155_MERKLE_PROOF.
@@ -62,7 +62,7 @@ deployFn.dependencies = [
 deployFn.skip = async (hre) => {
   return (
     !hre.network.live ||
-    !['mainnet', 'polygon', 'goerli'].includes(hre.network.name)
+    !['mainnet', 'polygon', 'arbitrum', 'goerli'].includes(hre.network.name)
   )
 }
 export default deployFn

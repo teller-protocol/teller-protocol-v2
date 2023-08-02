@@ -124,6 +124,7 @@ export function updateLenderCommitment(
       nftId
     );
     commitment.collateralToken = collateralToken.id;
+    commitment.collateralTokenAddress = collateralToken.address;
     commitment.maxPrincipalPerCollateralAmount = lenderCommitment.getMaxPrincipalPerCollateralAmount();
   }
 

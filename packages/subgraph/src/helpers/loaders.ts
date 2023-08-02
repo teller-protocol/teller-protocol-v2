@@ -510,7 +510,7 @@ export function loadCollateral(
     collateral = new BidCollateral(idString);
     collateral.amount = BigInt.zero();
     collateral.tokenId = nftId;
-    collateral.collateralAddress = Address.zero();
+    collateral.collateralAddress = collateralAddress;
     collateral.type = getTokenTypeString(type);
     collateral.token = token.id;
     collateral.status = "";

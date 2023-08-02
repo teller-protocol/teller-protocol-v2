@@ -26,6 +26,7 @@ import {
   parseEther,
   TransactionRequest,
   TransactionReceipt,
+  ethers,
 } from 'ethers'
 import { HardhatUserConfig, task } from 'hardhat/config'
 import {
@@ -350,7 +351,7 @@ export default <HardhatUserConfig>{
       url: networkUrls.mainnet,
       chainId: 1,
       live: true,
-      // gasPrice: ethers.utils.parseUnits('100', 'gwei').toNumber(),
+      gasPrice: Number(ethers.parseUnits('130', 'gwei')),
 
       verify: {
         etherscan: {

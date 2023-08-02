@@ -11,6 +11,8 @@ import "./tokens/TestERC1155Token.sol";
 import "../contracts/TellerV2Context.sol";
 
 import { Testable } from "./Testable.sol";
+
+import "../contracts/interfaces/ILenderCommitmentForwarder.sol";
 import { LenderCommitmentForwarder } from "../contracts/LenderCommitmentForwarder.sol";
 
 import { Collateral, CollateralType } from "../contracts/interfaces/escrow/ICollateralEscrowV1.sol";
@@ -50,7 +52,7 @@ contract LenderCommitmentForwarder_Test is Testable {
     // address collateralTokenAddress;
     uint256 collateralTokenId;
     uint256 maxPrincipalPerCollateralAmount;
-    LenderCommitmentForwarder.CommitmentCollateralType collateralTokenType;
+    ILenderCommitmentForwarder.CommitmentCollateralType collateralTokenType;
 
     uint256 marketId;
 
@@ -133,8 +135,8 @@ contract LenderCommitmentForwarder_Test is Testable {
     }
 
     function test_createCommitment() public {
-        LenderCommitmentForwarder.Commitment
-            memory c = LenderCommitmentForwarder.Commitment({
+        ILenderCommitmentForwarder.Commitment
+            memory c = ILenderCommitmentForwarder.Commitment({
                 maxPrincipal: maxPrincipal,
                 expiration: expiration,
                 maxDuration: maxDuration,
@@ -158,8 +160,8 @@ contract LenderCommitmentForwarder_Test is Testable {
     }
 
     function test_createCommitment_invalid_lender() public {
-        LenderCommitmentForwarder.Commitment
-            memory c = LenderCommitmentForwarder.Commitment({
+        ILenderCommitmentForwarder.Commitment
+            memory c = ILenderCommitmentForwarder.Commitment({
                 maxPrincipal: maxPrincipal,
                 expiration: expiration,
                 maxDuration: maxDuration,
@@ -179,8 +181,8 @@ contract LenderCommitmentForwarder_Test is Testable {
     }
 
     function test_createCommitment_invalid_principal() public {
-        LenderCommitmentForwarder.Commitment
-            memory c = LenderCommitmentForwarder.Commitment({
+        ILenderCommitmentForwarder.Commitment
+            memory c = ILenderCommitmentForwarder.Commitment({
                 maxPrincipal: 0,
                 expiration: expiration,
                 maxDuration: maxDuration,
@@ -200,8 +202,8 @@ contract LenderCommitmentForwarder_Test is Testable {
     }
 
     function test_createCommitment_expired() public {
-        LenderCommitmentForwarder.Commitment
-            memory c = LenderCommitmentForwarder.Commitment({
+        ILenderCommitmentForwarder.Commitment
+            memory c = ILenderCommitmentForwarder.Commitment({
                 maxPrincipal: maxPrincipal,
                 expiration: 0,
                 maxDuration: maxDuration,
@@ -223,8 +225,8 @@ contract LenderCommitmentForwarder_Test is Testable {
     function test_createCommitment_collateralType() public {}
 
     function test_updateCommitment() public {
-        LenderCommitmentForwarder.Commitment
-            memory c = LenderCommitmentForwarder.Commitment({
+        ILenderCommitmentForwarder.Commitment
+            memory c = ILenderCommitmentForwarder.Commitment({
                 maxPrincipal: maxPrincipal,
                 expiration: expiration,
                 maxDuration: maxDuration,
@@ -251,8 +253,8 @@ contract LenderCommitmentForwarder_Test is Testable {
     }
 
     function test_updateCommitment_reject_change_lender() public {
-        LenderCommitmentForwarder.Commitment
-            memory c = LenderCommitmentForwarder.Commitment({
+        ILenderCommitmentForwarder.Commitment
+            memory c = ILenderCommitmentForwarder.Commitment({
                 maxPrincipal: maxPrincipal,
                 expiration: expiration,
                 maxDuration: maxDuration,
@@ -276,8 +278,8 @@ contract LenderCommitmentForwarder_Test is Testable {
     }
 
     function test_updateCommitment_invalid_lender() public {
-        LenderCommitmentForwarder.Commitment
-            memory c = LenderCommitmentForwarder.Commitment({
+        ILenderCommitmentForwarder.Commitment
+            memory c = ILenderCommitmentForwarder.Commitment({
                 maxPrincipal: maxPrincipal,
                 expiration: 0,
                 maxDuration: maxDuration,
@@ -298,8 +300,8 @@ contract LenderCommitmentForwarder_Test is Testable {
     }
 
     function test_updateCommitment_prevent_update_principal_token() public {
-        LenderCommitmentForwarder.Commitment
-            memory c = LenderCommitmentForwarder.Commitment({
+        ILenderCommitmentForwarder.Commitment
+            memory c = ILenderCommitmentForwarder.Commitment({
                 maxPrincipal: maxPrincipal,
                 expiration: expiration,
                 maxDuration: maxDuration,
@@ -323,8 +325,8 @@ contract LenderCommitmentForwarder_Test is Testable {
     }
 
     function test_updateCommitment_prevent_update_market_id() public {
-        LenderCommitmentForwarder.Commitment
-            memory c = LenderCommitmentForwarder.Commitment({
+        ILenderCommitmentForwarder.Commitment
+            memory c = ILenderCommitmentForwarder.Commitment({
                 maxPrincipal: maxPrincipal,
                 expiration: expiration,
                 maxDuration: maxDuration,
@@ -348,8 +350,8 @@ contract LenderCommitmentForwarder_Test is Testable {
     }
 
     function test_addCommitmentBorrowers() public {
-        LenderCommitmentForwarder.Commitment
-            memory c = LenderCommitmentForwarder.Commitment({
+        ILenderCommitmentForwarder.Commitment
+            memory c = ILenderCommitmentForwarder.Commitment({
                 maxPrincipal: maxPrincipal,
                 expiration: expiration,
                 maxDuration: maxDuration,
@@ -385,8 +387,8 @@ contract LenderCommitmentForwarder_Test is Testable {
     }
 
     function test_uaddCommitmentBorrowers_unauthorized() public {
-        LenderCommitmentForwarder.Commitment
-            memory c = LenderCommitmentForwarder.Commitment({
+        ILenderCommitmentForwarder.Commitment
+            memory c = ILenderCommitmentForwarder.Commitment({
                 maxPrincipal: maxPrincipal,
                 expiration: expiration,
                 maxDuration: maxDuration,
@@ -407,8 +409,8 @@ contract LenderCommitmentForwarder_Test is Testable {
     }
 
     function test_deleteCommitment() public {
-        LenderCommitmentForwarder.Commitment
-            memory c = LenderCommitmentForwarder.Commitment({
+        ILenderCommitmentForwarder.Commitment
+            memory c = ILenderCommitmentForwarder.Commitment({
                 maxPrincipal: maxPrincipal,
                 expiration: expiration,
                 maxDuration: maxDuration,
@@ -434,8 +436,8 @@ contract LenderCommitmentForwarder_Test is Testable {
     }
 
     function test_deleteCommitment_unauthorized() public {
-        LenderCommitmentForwarder.Commitment
-            memory c = LenderCommitmentForwarder.Commitment({
+        ILenderCommitmentForwarder.Commitment
+            memory c = ILenderCommitmentForwarder.Commitment({
                 maxPrincipal: maxPrincipal,
                 expiration: expiration,
                 maxDuration: maxDuration,
@@ -457,8 +459,8 @@ contract LenderCommitmentForwarder_Test is Testable {
     }
 
     function test_validateCommitment() public {
-        LenderCommitmentForwarder.Commitment
-            memory c = LenderCommitmentForwarder.Commitment({
+        ILenderCommitmentForwarder.Commitment
+            memory c = ILenderCommitmentForwarder.Commitment({
                 maxPrincipal: maxPrincipal,
                 expiration: expiration,
                 maxDuration: maxDuration,
@@ -480,8 +482,8 @@ contract LenderCommitmentForwarder_Test is Testable {
     }
 
     function test_validateCommitment_expired() public {
-        LenderCommitmentForwarder.Commitment
-            memory c = LenderCommitmentForwarder.Commitment({
+        ILenderCommitmentForwarder.Commitment
+            memory c = ILenderCommitmentForwarder.Commitment({
                 maxPrincipal: maxPrincipal,
                 expiration: expiration,
                 maxDuration: maxDuration,
@@ -506,8 +508,8 @@ contract LenderCommitmentForwarder_Test is Testable {
     }
 
     function test_validateCommitment_zero_principal_allocation() public {
-        LenderCommitmentForwarder.Commitment
-            memory c = LenderCommitmentForwarder.Commitment({
+       ILenderCommitmentForwarder.Commitment
+            memory c = ILenderCommitmentForwarder.Commitment({
                 maxPrincipal: 0,
                 expiration: expiration,
                 maxDuration: maxDuration,
@@ -530,8 +532,8 @@ contract LenderCommitmentForwarder_Test is Testable {
     }
 
     function test_validateCommitment_zero_collateral_ratio() public {
-        LenderCommitmentForwarder.Commitment
-            memory c = LenderCommitmentForwarder.Commitment({
+        ILenderCommitmentForwarder.Commitment
+            memory c = ILenderCommitmentForwarder.Commitment({
                 maxPrincipal: maxPrincipal,
                 expiration: expiration,
                 maxDuration: maxDuration,
@@ -539,7 +541,7 @@ contract LenderCommitmentForwarder_Test is Testable {
                 collateralTokenAddress: address(collateralToken),
                 collateralTokenId: collateralTokenId,
                 maxPrincipalPerCollateralAmount: 0,
-                collateralTokenType: LenderCommitmentForwarder
+                collateralTokenType: ILenderCommitmentForwarder
                     .CommitmentCollateralType
                     .ERC20,
                 lender: address(lender),
@@ -556,8 +558,8 @@ contract LenderCommitmentForwarder_Test is Testable {
     }
 
     function test_validateCommitment_erc20_with_token_id() public {
-        LenderCommitmentForwarder.Commitment
-            memory c = LenderCommitmentForwarder.Commitment({
+        ILenderCommitmentForwarder.Commitment
+            memory c = ILenderCommitmentForwarder.Commitment({
                 maxPrincipal: maxPrincipal,
                 expiration: expiration,
                 maxDuration: maxDuration,
@@ -565,7 +567,7 @@ contract LenderCommitmentForwarder_Test is Testable {
                 collateralTokenAddress: address(collateralToken),
                 collateralTokenId: 66,
                 maxPrincipalPerCollateralAmount: maxPrincipalPerCollateralAmount,
-                collateralTokenType: LenderCommitmentForwarder
+                collateralTokenType: ILenderCommitmentForwarder
                     .CommitmentCollateralType
                     .ERC20,
                 lender: address(lender),
@@ -582,8 +584,8 @@ contract LenderCommitmentForwarder_Test is Testable {
     }
 
     function test_acceptCommitment() public {
-        LenderCommitmentForwarder.Commitment
-            memory c = LenderCommitmentForwarder.Commitment({
+        ILenderCommitmentForwarder.Commitment
+            memory c = ILenderCommitmentForwarder.Commitment({
                 maxPrincipal: maxPrincipal,
                 expiration: expiration,
                 maxDuration: maxDuration,
@@ -619,8 +621,8 @@ contract LenderCommitmentForwarder_Test is Testable {
     }
 
     function test_acceptCommitment_exact_principal() public {
-        LenderCommitmentForwarder.Commitment
-            memory c = LenderCommitmentForwarder.Commitment({
+        ILenderCommitmentForwarder.Commitment
+            memory c = ILenderCommitmentForwarder.Commitment({
                 maxPrincipal: maxPrincipal,
                 expiration: expiration,
                 maxDuration: maxDuration,
@@ -669,8 +671,8 @@ contract LenderCommitmentForwarder_Test is Testable {
         bytes32 merkleRoot = merkleLeaf;
         bytes32[] memory merkleProof = new bytes32[](0);
 
-        LenderCommitmentForwarder.Commitment
-            memory c = LenderCommitmentForwarder.Commitment({
+        ILenderCommitmentForwarder.Commitment
+            memory c = ILenderCommitmentForwarder.Commitment({
                 maxPrincipal: maxPrincipal,
                 expiration: expiration,
                 maxDuration: maxDuration,
@@ -678,7 +680,7 @@ contract LenderCommitmentForwarder_Test is Testable {
                 collateralTokenAddress: address(collateralToken),
                 collateralTokenId: uint256(merkleRoot),
                 maxPrincipalPerCollateralAmount: maxPrincipal * 1e18,
-                collateralTokenType: LenderCommitmentForwarder
+                collateralTokenType: ILenderCommitmentForwarder
                     .CommitmentCollateralType
                     .ERC721_MERKLE_PROOF,
                 lender: address(lender),
@@ -742,8 +744,8 @@ contract LenderCommitmentForwarder_Test is Testable {
         bytes32[] memory merkleProof = new bytes32[](1);
         merkleProof[0] = merkleLeafB;
 
-        LenderCommitmentForwarder.Commitment
-            memory c = LenderCommitmentForwarder.Commitment({
+        ILenderCommitmentForwarder.Commitment
+            memory c = ILenderCommitmentForwarder.Commitment({
                 maxPrincipal: maxPrincipal,
                 expiration: expiration,
                 maxDuration: maxDuration,
@@ -751,7 +753,7 @@ contract LenderCommitmentForwarder_Test is Testable {
                 collateralTokenAddress: address(collateralToken),
                 collateralTokenId: uint256(merkleRoot),
                 maxPrincipalPerCollateralAmount: maxPrincipal * 1e18,
-                collateralTokenType: LenderCommitmentForwarder
+                collateralTokenType: ILenderCommitmentForwarder
                     .CommitmentCollateralType
                     .ERC721_MERKLE_PROOF,
                 lender: address(lender),
@@ -803,8 +805,8 @@ contract LenderCommitmentForwarder_Test is Testable {
         bytes32 merkleRoot = keccak256(abi.encodePacked(uint256(2)));
         bytes32[] memory merkleProof = new bytes32[](0);
 
-        LenderCommitmentForwarder.Commitment
-            memory c = LenderCommitmentForwarder.Commitment({
+        ILenderCommitmentForwarder.Commitment
+            memory c = ILenderCommitmentForwarder.Commitment({
                 maxPrincipal: maxPrincipal,
                 expiration: expiration,
                 maxDuration: maxDuration,
@@ -812,7 +814,7 @@ contract LenderCommitmentForwarder_Test is Testable {
                 collateralTokenAddress: address(collateralToken),
                 collateralTokenId: uint256(merkleRoot),
                 maxPrincipalPerCollateralAmount: maxPrincipal * 1e18,
-                collateralTokenType: LenderCommitmentForwarder
+                collateralTokenType: ILenderCommitmentForwarder
                     .CommitmentCollateralType
                     .ERC721_MERKLE_PROOF,
                 lender: address(lender),
@@ -850,8 +852,8 @@ contract LenderCommitmentForwarder_Test is Testable {
         bytes32 merkleRoot = merkleLeaf;
         bytes32[] memory merkleProof = new bytes32[](0);
 
-        LenderCommitmentForwarder.Commitment
-            memory c = LenderCommitmentForwarder.Commitment({
+        ILenderCommitmentForwarder.Commitment
+            memory c = ILenderCommitmentForwarder.Commitment({
                 maxPrincipal: maxPrincipal,
                 expiration: expiration,
                 maxDuration: maxDuration,
@@ -859,7 +861,7 @@ contract LenderCommitmentForwarder_Test is Testable {
                 collateralTokenAddress: address(collateralToken),
                 collateralTokenId: uint256(merkleRoot),
                 maxPrincipalPerCollateralAmount: maxPrincipal * 1e18,
-                collateralTokenType: LenderCommitmentForwarder
+                collateralTokenType: ILenderCommitmentForwarder
                     .CommitmentCollateralType
                     .ERC721,
                 lender: address(lender),
@@ -892,8 +894,8 @@ contract LenderCommitmentForwarder_Test is Testable {
     }
 
     function test_acceptCommitment_mismatch_collateral_token() public {
-        LenderCommitmentForwarder.Commitment
-            memory c = LenderCommitmentForwarder.Commitment({
+        ILenderCommitmentForwarder.Commitment
+            memory c = ILenderCommitmentForwarder.Commitment({
                 maxPrincipal: maxPrincipal,
                 expiration: expiration,
                 maxDuration: maxDuration,
@@ -929,8 +931,8 @@ contract LenderCommitmentForwarder_Test is Testable {
     }
 
     function test_acceptCommitment_invalid_interest_rate() public {
-        LenderCommitmentForwarder.Commitment
-            memory c = LenderCommitmentForwarder.Commitment({
+        ILenderCommitmentForwarder.Commitment
+            memory c = ILenderCommitmentForwarder.Commitment({
                 maxPrincipal: maxPrincipal,
                 expiration: expiration,
                 maxDuration: maxDuration,
@@ -966,8 +968,8 @@ contract LenderCommitmentForwarder_Test is Testable {
     }
 
     function test_acceptCommitment_invalid_duration() public {
-        LenderCommitmentForwarder.Commitment
-            memory c = LenderCommitmentForwarder.Commitment({
+        ILenderCommitmentForwarder.Commitment
+            memory c = ILenderCommitmentForwarder.Commitment({
                 maxPrincipal: maxPrincipal,
                 expiration: expiration,
                 maxDuration: maxDuration,
@@ -1003,8 +1005,8 @@ contract LenderCommitmentForwarder_Test is Testable {
     }
 
     function test_acceptCommitment_invalid_commitment_borrower() public {
-        LenderCommitmentForwarder.Commitment
-            memory c = LenderCommitmentForwarder.Commitment({
+        ILenderCommitmentForwarder.Commitment
+            memory c = ILenderCommitmentForwarder.Commitment({
                 maxPrincipal: maxPrincipal,
                 expiration: expiration,
                 maxDuration: maxDuration,
@@ -1049,8 +1051,8 @@ contract LenderCommitmentForwarder_Test is Testable {
     }
 
     function test_acceptCommitment_insufficient_commitment_allocation() public {
-        LenderCommitmentForwarder.Commitment
-            memory c = LenderCommitmentForwarder.Commitment({
+        ILenderCommitmentForwarder.Commitment
+            memory c = ILenderCommitmentForwarder.Commitment({
                 maxPrincipal: maxPrincipal,
                 expiration: expiration,
                 maxDuration: maxDuration,
@@ -1094,8 +1096,8 @@ contract LenderCommitmentForwarder_Test is Testable {
     }
 
     function test_acceptCommitment_insufficient_borrower_collateral() public {
-        LenderCommitmentForwarder.Commitment
-            memory c = LenderCommitmentForwarder.Commitment({
+        ILenderCommitmentForwarder.Commitment
+            memory c = ILenderCommitmentForwarder.Commitment({
                 maxPrincipal: maxPrincipal,
                 expiration: expiration,
                 maxDuration: maxDuration,
@@ -1103,7 +1105,7 @@ contract LenderCommitmentForwarder_Test is Testable {
                 collateralTokenAddress: address(collateralToken),
                 collateralTokenId: collateralTokenId,
                 maxPrincipalPerCollateralAmount: 10000,
-                collateralTokenType: LenderCommitmentForwarder
+                collateralTokenType: ILenderCommitmentForwarder
                     .CommitmentCollateralType
                     .ERC20,
                 lender: address(lender),
@@ -1150,8 +1152,7 @@ contract LenderCommitmentForwarder_Test is Testable {
     }
 
     function test_acceptCommitment_invalid_721_collateral_amount() public {
-        LenderCommitmentForwarder.Commitment memory c = LenderCommitmentForwarder
-            .Commitment({
+        ILenderCommitmentForwarder.Commitment memory c = ILenderCommitmentForwarder.Commitment({
                 maxPrincipal: 100,
                 expiration: expiration,
                 maxDuration: maxDuration,
@@ -1159,7 +1160,7 @@ contract LenderCommitmentForwarder_Test is Testable {
                 collateralTokenAddress: address(erc721Token),
                 collateralTokenId: 0,
                 maxPrincipalPerCollateralAmount: 100 * 1e18, //expand by token decimals
-                collateralTokenType: LenderCommitmentForwarder
+                collateralTokenType: ILenderCommitmentForwarder
                     .CommitmentCollateralType
                     .ERC721,
                 lender: address(lender),
@@ -1191,8 +1192,8 @@ contract LenderCommitmentForwarder_Test is Testable {
     function test_acceptCommitment_invalid_collateral_id() public {}
 
     function test_getRequiredCollateral_erc20() public {
-        LenderCommitmentForwarder.Commitment
-            memory c = LenderCommitmentForwarder.Commitment({
+        ILenderCommitmentForwarder.Commitment
+            memory c = ILenderCommitmentForwarder.Commitment({
                 maxPrincipal: maxPrincipal,
                 expiration: expiration,
                 maxDuration: maxDuration,
@@ -1200,7 +1201,7 @@ contract LenderCommitmentForwarder_Test is Testable {
                 collateralTokenAddress: address(collateralToken),
                 collateralTokenId: collateralTokenId,
                 maxPrincipalPerCollateralAmount: 10000,
-                collateralTokenType: LenderCommitmentForwarder
+                collateralTokenType: ILenderCommitmentForwarder
                     .CommitmentCollateralType
                     .ERC20,
                 lender: address(lender),
@@ -1230,8 +1231,8 @@ contract LenderCommitmentForwarder_Test is Testable {
     }
 
     function test_getRequiredCollateral_type_none() public {
-        LenderCommitmentForwarder.Commitment
-            memory c = LenderCommitmentForwarder.Commitment({
+        ILenderCommitmentForwarder.Commitment
+            memory c = ILenderCommitmentForwarder.Commitment({
                 maxPrincipal: maxPrincipal,
                 expiration: expiration,
                 maxDuration: maxDuration,
@@ -1239,7 +1240,7 @@ contract LenderCommitmentForwarder_Test is Testable {
                 collateralTokenAddress: address(collateralToken),
                 collateralTokenId: collateralTokenId,
                 maxPrincipalPerCollateralAmount: 10000,
-                collateralTokenType: LenderCommitmentForwarder
+                collateralTokenType: ILenderCommitmentForwarder
                     .CommitmentCollateralType
                     .NONE,
                 lender: address(lender),
@@ -1269,8 +1270,8 @@ contract LenderCommitmentForwarder_Test is Testable {
     }
 
     function test_getRequiredCollateral_type_erc721() public {
-        LenderCommitmentForwarder.Commitment
-            memory c = LenderCommitmentForwarder.Commitment({
+        ILenderCommitmentForwarder.Commitment
+            memory c = ILenderCommitmentForwarder.Commitment({
                 maxPrincipal: 100,
                 expiration: expiration,
                 maxDuration: maxDuration,
@@ -1278,7 +1279,7 @@ contract LenderCommitmentForwarder_Test is Testable {
                 collateralTokenAddress: address(erc721Token),
                 collateralTokenId: 0,
                 maxPrincipalPerCollateralAmount: 100 * 1e18,
-                collateralTokenType: LenderCommitmentForwarder
+                collateralTokenType: ILenderCommitmentForwarder
                     .CommitmentCollateralType
                     .ERC721,
                 lender: address(lender),
@@ -1307,7 +1308,7 @@ contract LenderCommitmentForwarder_Test is Testable {
     function test_getEscrowCollateralType_erc20() public {
         CollateralType cType = lenderCommitmentForwarder
             ._getEscrowCollateralTypeSuper(
-                LenderCommitmentForwarder.CommitmentCollateralType.ERC20
+                ILenderCommitmentForwarder.CommitmentCollateralType.ERC20
             );
 
         assertEq(
@@ -1320,7 +1321,7 @@ contract LenderCommitmentForwarder_Test is Testable {
     function test_getEscrowCollateralType_erc721() public {
         CollateralType cType = lenderCommitmentForwarder
             ._getEscrowCollateralTypeSuper(
-                LenderCommitmentForwarder.CommitmentCollateralType.ERC721
+                ILenderCommitmentForwarder.CommitmentCollateralType.ERC721
             );
 
         assertEq(
@@ -1333,7 +1334,7 @@ contract LenderCommitmentForwarder_Test is Testable {
     function test_getEscrowCollateralType_erc1155() public {
         CollateralType cType = lenderCommitmentForwarder
             ._getEscrowCollateralTypeSuper(
-                LenderCommitmentForwarder.CommitmentCollateralType.ERC1155
+                ILenderCommitmentForwarder.CommitmentCollateralType.ERC1155
             );
 
         assertEq(
@@ -1347,7 +1348,7 @@ contract LenderCommitmentForwarder_Test is Testable {
         vm.expectRevert("Unknown Collateral Type");
         CollateralType cType = lenderCommitmentForwarder
             ._getEscrowCollateralTypeSuper(
-                LenderCommitmentForwarder.CommitmentCollateralType.NONE
+                ILenderCommitmentForwarder.CommitmentCollateralType.NONE
             );
 
         ///assertEq(uint16(cType), uint16(CollateralType.NONE), "unexpected collateral type");
@@ -1401,7 +1402,7 @@ contract LenderCommitmentUser is User {
     }
 
     function _createCommitment(
-        LenderCommitmentForwarder.Commitment calldata _commitment,
+        ILenderCommitmentForwarder.Commitment calldata _commitment,
         address[] calldata borrowerAddressList
     ) public returns (uint256) {
         return

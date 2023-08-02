@@ -31,22 +31,7 @@ contract CollateralEscrow_Test is Testable {
 
     uint256 amount = 1000;
 
-    /*
-
-    Branch not covered: line number:53, block number:0, [ 0 / 1 ] 
-Branch not covered: line number:53, block number:0, [ 1 / 6 ] 
-Branch not covered: line number:63, block number:1, [ 0 / 1 ] 
-Branch not covered: line number:63, block number:1, [ 1 / 5 ] 
-Branch not covered: line number:83, block number:2, [ 1 / 6 ] 
-Branch not covered: line number:85, block number:3, [ 0 / 3 ] 
-Branch not covered: line number:85, block number:3, [ 1 / 3 ] 
-Branch not covered: line number:106, block number:4, [ 0 / 2 ] 
-Branch not covered: line number:106, block number:4, [ 1 / 4 ] 
-Branch not covered: line number:115, block number:5, [ 1 / 3 ] 
-Branch not covered: line number:116, block number:6, [ 1 / 3 ] 
-Branch not covered: line number:144, block number:8, [ 1 / 2 ]
-
-    */
+   
 
     function setUp() public {
         // Deploy implementation

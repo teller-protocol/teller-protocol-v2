@@ -4,6 +4,7 @@ pragma solidity >=0.8.0 <0.9.0;
 import "./interfaces/ITellerV2.sol";
 
 import "./interfaces/IMarketRegistry.sol";
+import "./interfaces/ITellerV2MarketForwarder.sol";
 
 import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
@@ -15,7 +16,7 @@ import "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
 /**
  * @dev Simple helper contract to forward an encoded function call to the TellerV2 contract. See {TellerV2Context}
  */
-abstract contract TellerV2MarketForwarder is Initializable, ContextUpgradeable {
+abstract contract TellerV2MarketForwarder is Initializable, ContextUpgradeable, ITellerV2MarketForwarder {
     using AddressUpgradeable for address;
 
     /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
@@ -23,16 +24,7 @@ abstract contract TellerV2MarketForwarder is Initializable, ContextUpgradeable {
     /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
     address public immutable _marketRegistry;
 
-    struct CreateLoanArgs {
-        uint256 marketId;
-        address lendingToken;
-        uint256 principal;
-        uint32 duration;
-        uint16 interestRate;
-        string metadataURI;
-        address recipient;
-        Collateral[] collateral;
-    }
+   
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor(address _protocolAddress, address _marketRegistryAddress) {

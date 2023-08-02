@@ -6,6 +6,7 @@ import "./TellerV2MarketForwarder.sol";
 
 // Interfaces
 import "./interfaces/ICollateralManager.sol";
+import "./interfaces/ILenderCommitmentForwarder.sol";
 import { Collateral, CollateralType } from "./interfaces/escrow/ICollateralEscrowV1.sol";
 
 import "@openzeppelin/contracts-upgradeable/utils/structs/EnumerableSetUpgradeable.sol";
@@ -15,46 +16,9 @@ import { MathUpgradeable } from "@openzeppelin/contracts-upgradeable/utils/math/
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20MetadataUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/cryptography/MerkleProofUpgradeable.sol";
 
-contract LenderCommitmentForwarder is TellerV2MarketForwarder {
+contract LenderCommitmentForwarder is TellerV2MarketForwarder, ILenderCommitmentForwarder {
     using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
 
-    enum CommitmentCollateralType {
-        NONE, // no collateral required
-        ERC20,
-        ERC721,
-        ERC1155,
-        ERC721_ANY_ID,
-        ERC1155_ANY_ID,
-        ERC721_MERKLE_PROOF,
-        ERC1155_MERKLE_PROOF
-    }
-
-    /**
-     * @notice Details about a lender's capital commitment.
-     * @param maxPrincipal Amount of tokens being committed by the lender. Max amount that can be loaned.
-     * @param expiration Expiration time in seconds, when the commitment expires.
-     * @param maxDuration Length of time, in seconds that the lender's capital can be lent out for.
-     * @param minInterestRate Minimum Annual percentage to be applied for loans using the lender's capital.
-     * @param collateralTokenAddress The address for the token contract that must be used to provide collateral for loans for this commitment.
-     * @param maxPrincipalPerCollateralAmount The amount of principal that can be used for a loan per each unit of collateral, expanded additionally by principal decimals.
-     * @param collateralTokenType The type of asset of the collateralTokenAddress (ERC20, ERC721, or ERC1155).
-     * @param lender The address of the lender for this commitment.
-     * @param marketId The market id for this commitment.
-     * @param principalTokenAddress The address for the token contract that will be used to provide principal for loans of this commitment.
-     */
-    struct Commitment {
-        uint256 maxPrincipal;
-        uint32 expiration;
-        uint32 maxDuration;
-        uint16 minInterestRate;
-        address collateralTokenAddress;
-        uint256 collateralTokenId; //we use this for the MerkleRootHash  for type ERC721_MERKLE_PROOF
-        uint256 maxPrincipalPerCollateralAmount;
-        CommitmentCollateralType collateralTokenType;
-        address lender;
-        uint256 marketId;
-        address principalTokenAddress;
-    }
 
     // CommitmentId => commitment
     mapping(uint256 => Commitment) public commitments;

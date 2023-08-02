@@ -8,30 +8,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 // Interfaces
 import "../../interfaces/ITellerV2.sol";
 
-interface ILenderCommitmentForwarder {
-    function acceptCommitmentWithRecipient(
-        uint256 _commitmentId,
-        uint256 _principalAmount,
-        uint256 _collateralAmount,
-        uint256 _collateralTokenId,
-        address _collateralTokenAddress,
-        address _recipient,
-        uint16 _interestRate,
-        uint32 _loanDuration
-    ) external returns (uint256 bidId_);
-
-    function acceptCommitmentWithRecipientAndProof(
-        uint256 _commitmentId,
-        uint256 _principalAmount,
-        uint256 _collateralAmount,
-        uint256 _collateralTokenId,
-        address _collateralTokenAddress,
-        address _recipient,
-        uint16 _interestRate,
-        uint32 _loanDuration,
-        bytes32[] calldata _merkleProof
-    ) external returns (uint256 bidId_);
-}
+import "../../interfaces/ILenderCommitmentForwarder.sol";
 
 contract CommitmentRolloverLoan {
     using AddressUpgradeable for address;

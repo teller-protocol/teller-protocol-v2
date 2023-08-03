@@ -50,6 +50,13 @@ contract CommitmentRolloverLoan is ICommitmentRolloverLoan{
         // Approve TellerV2 to spend funds and repay loan
         lendingToken.approve(address(TELLER_V2), fundsReceived);
         TELLER_V2.repayLoanFull(_loanId);
+
+        uint256 fundsRemaining = lendingToken.balanceOf(address(this)) -
+            fundsReceived;
+
+        if(fundsRemaining > 0){
+            lendingToken.transfer(borrower, fundsRemaining);
+        }
     }
 
     function _acceptCommitment(AcceptCommitmentArgs calldata _commitmentArgs)

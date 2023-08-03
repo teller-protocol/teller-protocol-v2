@@ -26,11 +26,11 @@ contract LenderCommitmentForwarderMock is ILenderCommitmentForwarder, ITellerV2M
 
     uint256 commitmentCount;
 
-    bool submitBidWithCollateralWasCalled;
-    bool acceptBidWasCalled;
-    bool submitBidWasCalled;
-    bool acceptCommitmentWithRecipientWasCalled;
-    bool acceptCommitmentWithRecipientAndProofWasCalled;
+    bool public submitBidWithCollateralWasCalled;
+    bool public acceptBidWasCalled;
+    bool public submitBidWasCalled;
+    bool public acceptCommitmentWithRecipientWasCalled;
+    bool public acceptCommitmentWithRecipientAndProofWasCalled;
 
     mapping(uint256 => uint256) public commitmentPrincipalAccepted;
 

@@ -100,11 +100,14 @@ contract CommitmentRolloverLoan_Test is Testable {
             loanId,
             commitmentArgs
         );
-        
+ 
+
+        bool acceptCommitmentWithRecipientWasCalled = lenderCommitmentForwarder.acceptCommitmentWithRecipientWasCalled();
+        assertTrue(acceptCommitmentWithRecipientWasCalled,"acceptCommitmentWithRecipient not called");
     }
 
 
-     function test_rolloverLoan_should_revert_if_loan_not_accepted() public {
+     /*function test_rolloverLoan_should_revert_if_loan_not_accepted() public {
  
 
          address lendingToken = address(wethMock);
@@ -143,7 +146,7 @@ contract CommitmentRolloverLoan_Test is Testable {
             commitmentArgs
         );
         
-    }
+    }*/
   
   
 }

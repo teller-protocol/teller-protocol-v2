@@ -1846,9 +1846,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openzeppelin/hardhat-upgrades@npm:^2.0.1":
-  version: 2.0.1
-  resolution: "@openzeppelin/hardhat-upgrades@npm:2.0.1"
+"@openzeppelin/hardhat-upgrades@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "@openzeppelin/hardhat-upgrades@npm:2.1.0"
   dependencies:
     "@openzeppelin/defender-base-client": ^1.47.0
     "@openzeppelin/platform-deploy-client": ^0.9.0
@@ -1867,7 +1867,7 @@ __metadata:
       optional: true
   bin:
     migrate-oz-cli-project: dist/scripts/migrate-oz-cli-project.js
-  checksum: 7c818766d0d49ae12ff890815be7473696b88e92c9a9a9322afe5e289cbe7f28b14e3e754986cf326e4570060a64cb3022584a72ba48b456ff6c250453b9d49f
+  checksum: 09f43b7b912f06522d829ad9f3ef6bbe6f8ab6e84b2e9d98c781ca27c12dd50de6a65d7bdb025665f061c1eed7e7eb6112cdb7fdbf25bcc32e5317c67249b0f4
   languageName: node
   linkType: hard
 
@@ -2263,7 +2263,7 @@ __metadata:
     "@openzeppelin/contracts-upgradeable": ^4.8.0
     "@openzeppelin/defender-admin-client": ^1.46.0
     "@openzeppelin/hardhat-defender": ^2.0.0
-    "@openzeppelin/hardhat-upgrades": ^2.0.1
+    "@openzeppelin/hardhat-upgrades": ^2.1.0
     "@typechain/ethers-v6": ^0.4.0
     "@typechain/hardhat": ^8.0.0
     "@types/chai": ^4.2.22
@@ -2291,7 +2291,7 @@ __metadata:
     eth-sig-util: ^3.0.1
     ethereum-waffle: ^3.4.0
     ethereumjs-util: ^7.1.5
-    ethers: "git@github.com:ethers-io/ethers.js.git#v6.7.0-progress"
+    ethers: ^6.7.0
     fs-extra: ^10.0.0
     ganache-cli: ^6.12.2
     hardhat: ^2.16.1
@@ -7928,21 +7928,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ethers@git@github.com:ethers-io/ethers.js.git#v6.7.0-progress":
-  version: 6.7.0
-  resolution: "ethers@git@github.com:ethers-io/ethers.js.git#commit=ff9d124c60a865012def4467f0face9c577b1938"
-  dependencies:
-    "@adraffy/ens-normalize": 1.9.2
-    "@noble/hashes": 1.1.2
-    "@noble/secp256k1": 1.7.1
-    "@types/node": 18.15.13
-    aes-js: 4.0.0-beta.5
-    tslib: 2.4.0
-    ws: 8.5.0
-  checksum: 32af0d41410fd85eba78515c971f212a9bd5bc076f35f019cb2df89ce1a23d502fad01972eab82a5847b534ea95b53c88559912ffd352e6f8822bc3213fff162
-  languageName: node
-  linkType: hard
-
 "ethers@npm:5.7.2, ethers@npm:^5.0.1, ethers@npm:^5.0.2, ethers@npm:^5.5.2, ethers@npm:^5.5.3, ethers@npm:^5.7.1, ethers@npm:^5.7.2":
   version: 5.7.2
   resolution: "ethers@npm:5.7.2"
@@ -7995,6 +7980,21 @@ __metadata:
     uuid: 2.0.1
     xmlhttprequest: 1.8.0
   checksum: 357115348a5f1484c7745fae1d852876788216c7d94c072c80132192f1800c4d388433ea2456750856641d6d4eed8a3b41847eb44f5e1c42139963864e3bcc38
+  languageName: node
+  linkType: hard
+
+"ethers@npm:^6.7.0":
+  version: 6.7.0
+  resolution: "ethers@npm:6.7.0"
+  dependencies:
+    "@adraffy/ens-normalize": 1.9.2
+    "@noble/hashes": 1.1.2
+    "@noble/secp256k1": 1.7.1
+    "@types/node": 18.15.13
+    aes-js: 4.0.0-beta.5
+    tslib: 2.4.0
+    ws: 8.5.0
+  checksum: 6d2ea085010da1c34750ce4a00a94d2abbeb3ababb23aa754acc7772682f145e8c1b3862d3b5374e1c182aee569c80ea48191107d469a4de3b0dd6af3d9ce6db
   languageName: node
   linkType: hard
 

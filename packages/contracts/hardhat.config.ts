@@ -101,9 +101,11 @@ type NetworkNames =
   | 'mainnet'
   | 'polygon'
   | 'arbitrum'
+  | 'mantle'
   | 'sepolia'
   | 'mumbai'
   | 'goerli'
+  | 'mantle-testnet'
   | 'tenderly'
 const networkUrls: Record<NetworkNames, string> = {
   // Main Networks
@@ -122,6 +124,7 @@ const networkUrls: Record<NetworkNames, string> = {
     (ALCHEMY_API_KEY
       ? `https://arb-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
       : ''),
+  mantle: 'https://rpc.mantle.xyz',
 
   // Test Networks
   sepolia:
@@ -139,6 +142,7 @@ const networkUrls: Record<NetworkNames, string> = {
     (ALCHEMY_API_KEY
       ? `https://eth-goerli.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
       : ''),
+  'mantle-testnet': 'https://rpc.testnet.mantle.xyz',
   tenderly: process.env.TENDERLY_RPC_URL ?? '',
 }
 
@@ -164,9 +168,9 @@ const getLatestDeploymentBlock = (networkName: string): number | undefined => {
 
 const networkConfig = (config: NetworkUserConfig): NetworkUserConfig => ({
   live: false,
+  // gas: 'auto',
   ...config,
   accounts,
-  gas: 'auto',
 })
 
 /*
@@ -188,12 +192,32 @@ export default <HardhatUserConfig>{
       mainnet: process.env.ETHERSCAN_VERIFY_API_KEY,
       polygon: process.env.POLYGONSCAN_VERIFY_API_KEY,
       arbitrumOne: process.env.ARBISCAN_VERIFY_API_KEY,
+      mantle: process.env.MANTLE_VERIFY_API_KEY ?? 'xyz',
 
       // Test Networks
       sepolia: process.env.ETHERSCAN_VERIFY_API_KEY,
       goerli: process.env.ETHERSCAN_VERIFY_API_KEY,
       mumbai: process.env.POLYGONSCAN_VERIFY_API_KEY,
+      'mantle-testnet': process.env.MANTLE_VERIFY_API_KEY ?? 'xyz',
     },
+    customChains: [
+      {
+        network: 'mantle',
+        chainId: 5000,
+        urls: {
+          apiURL: 'https://explorer.mantle.xyz/api',
+          browserURL: 'https://explorer.mantle.xyz',
+        },
+      },
+      {
+        network: 'mantle-testnet',
+        chainId: 5001,
+        urls: {
+          apiURL: 'https://explorer.testnet.mantle.xyz/api',
+          browserURL: 'https://explorer.testnet.mantle.xyz',
+        },
+      },
+    ],
   },
 
   defender: {
@@ -359,6 +383,22 @@ export default <HardhatUserConfig>{
         },
       },
     }),
+    mantle: networkConfig({
+      url: networkUrls.mantle,
+      chainId: 5000,
+      live: true,
+      // gasPrice: ethers.utils.parseUnits('110', 'gwei').toNumber(),
+
+      // companionNetworks: {
+      //   l1: 'mainnet',
+      // },
+
+      verify: {
+        etherscan: {
+          apiKey: process.env.MANTLE_VERIFY_API_KEY,
+        },
+      },
+    }),
 
     // Test Networks
     sepolia: networkConfig({
@@ -393,6 +433,22 @@ export default <HardhatUserConfig>{
       verify: {
         etherscan: {
           apiKey: process.env.POLYGONSCAN_VERIFY_API_KEY,
+        },
+      },
+    }),
+    'mantle-testnet': networkConfig({
+      url: networkUrls['mantle-testnet'],
+      gas: 5_000_000,
+      chainId: 5001,
+      live: true,
+
+      // companionNetworks: {
+      //   l1: 'goerli',
+      // },
+
+      verify: {
+        etherscan: {
+          apiKey: process.env.MANTLE_VERIFY_API_EY,
         },
       },
     }),

@@ -45,6 +45,10 @@ contract CommitmentRolloverLoan_Test is Testable {
         tellerV2 = new TellerV2SolMock();
         wethMock = new WethMock();
 
+        wethMock.deposit{value:1e18}();
+        wethMock.transfer(address(lender),1e10);
+        wethMock.transfer(address(borrower),1e10);
+
         //marketRegistryMock = new MarketRegistryMock();
 
         lenderCommitmentForwarder = new LenderCommitmentForwarderMock();
@@ -55,16 +59,10 @@ contract CommitmentRolloverLoan_Test is Testable {
 
 
     }
-
-
-    // add more tests here !! 
-
+ 
 
     function test_rolloverLoan() public {
-
-         
-       
-
+ 
          address lendingToken = address(wethMock);
          uint256 marketId = 0;
          uint256 principalAmount = 500;
@@ -148,6 +146,49 @@ contract CommitmentRolloverLoan_Test is Testable {
         
     }*/
   
+
+  function test_rolloverLoan_financial_scenario_A() public {
+
+    address lendingToken = address(wethMock);
+         uint256 marketId = 0;
+         uint256 principalAmount = 500;
+         uint32 duration = 10 days;
+         uint16 interestRate = 100;
+
+         ICommitmentRolloverLoan.AcceptCommitmentArgs memory commitmentArgs = ICommitmentRolloverLoan.AcceptCommitmentArgs({
+            commitmentId: 0,
+            principalAmount: principalAmount,
+            collateralAmount: 100,
+            collateralTokenId: 0,
+            collateralTokenAddress: address(0),
+            interestRate: interestRate,
+            loanDuration: duration
+         });
+
+        vm.prank(address(borrower));
+        uint256 loanId = tellerV2.submitBid( 
+            lendingToken,
+            marketId,
+            principalAmount,
+            duration,
+            interestRate,
+            "",
+            address(borrower)
+         );
+
+        vm.prank(address(lender));
+        wethMock.approve(address(tellerV2),1e18);
+
+        vm.prank(address(lender));
+        (uint256 loanId) = tellerV2.lenderAcceptBid( 
+            loanId  
+         );
+
+
+        
+
+
+  }
   
 }
 

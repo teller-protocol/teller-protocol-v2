@@ -52,7 +52,20 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
         string calldata _metadataURI,
         address _receiver,
         Collateral[] calldata _collateralInfo
-    ) public returns (uint256 bidId_) {}
+    ) public returns (uint256 bidId_) {
+
+
+        submitBid(
+            _lendingToken,
+            _marketplaceId,
+            _principal,
+            _duration,
+            _APR,
+            _metadataURI,
+            _receiver
+
+        );
+    }
 
     function repayLoanMinimum(uint256 _bidId) external {}
 
@@ -122,6 +135,8 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
         Bid storage bid = bids[_bidId];
 
         bid.lender = msg.sender;
+
+        bid.state = BidState.ACCEPTED;
 
         //send tokens to caller
         IERC20(bid.loanDetails.lendingToken).transferFrom(

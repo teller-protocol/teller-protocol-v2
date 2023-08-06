@@ -29,6 +29,7 @@ contract CommitmentRolloverLoan is ICommitmentRolloverLoan{
 
     function rolloverLoan(
         uint256 _loanId,
+        uint256 rolloverAmount,
         AcceptCommitmentArgs calldata _commitmentArgs
     ) external returns (uint256 newLoanId_) {
         address borrower = TELLER_V2.getLoanBorrower(_loanId);
@@ -40,12 +41,23 @@ contract CommitmentRolloverLoan is ICommitmentRolloverLoan{
         );
         uint256 balanceBefore = lendingToken.balanceOf(address(this));
 
+
+        //accept funds from the borrower to this contract 
+        lendingToken.transferFrom( borrower, address(this), rolloverAmount);
+
+        uint256 fundsRecievedByRollover = lendingToken.balanceOf(address(this)) -
+            balanceBefore;
+
+
         // Accept commitment and receive funds to this contract
         newLoanId_ = _acceptCommitment(_commitmentArgs);
 
         // Calculate funds received
-        uint256 fundsReceived = lendingToken.balanceOf(address(this)) -
-            balanceBefore;
+        uint256 fundsReceivedByCommitment = lendingToken.balanceOf(address(this)) - fundsRecievedByRollover - 
+         balanceBefore  ;
+
+   
+        uint256 fundsReceived = fundsRecievedByRollover + fundsReceivedByCommitment;
 
         // Approve TellerV2 to spend funds and repay loan
         lendingToken.approve(address(TELLER_V2), fundsReceived);

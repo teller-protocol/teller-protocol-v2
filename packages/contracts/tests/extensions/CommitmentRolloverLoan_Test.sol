@@ -45,9 +45,9 @@ contract CommitmentRolloverLoan_Test is Testable {
         tellerV2 = new TellerV2SolMock();
         wethMock = new WethMock();
 
-        wethMock.deposit{value:1e18}();
-        wethMock.transfer(address(lender),1e10);
-        wethMock.transfer(address(borrower),1e10);
+        wethMock.deposit{value:100e18}();
+        wethMock.transfer(address(lender),5e18);
+        wethMock.transfer(address(borrower),5e18);
 
         //marketRegistryMock = new MarketRegistryMock();
 
@@ -90,12 +90,14 @@ contract CommitmentRolloverLoan_Test is Testable {
             address(borrower)
          );
 
+        uint256 rolloverAmount = 0; 
 
         //fix me here -- tellerv2 needs to accept bid to put it in correct state
         vm.prank(address(borrower));
         
         commitmentRolloverLoan.rolloverLoan(
             loanId,
+            rolloverAmount,
             commitmentArgs
         );
  
@@ -160,9 +162,11 @@ contract CommitmentRolloverLoan_Test is Testable {
 
   function test_rolloverLoan_financial_scenario_A() public {
 
-    address lendingToken = address(wethMock);
+        address lendingToken = address(wethMock);
+
+        //initial loan - need to pay back 1 weth + 0.1 weth (interest) to the lender 
          uint256 marketId = 0;
-         uint256 principalAmount = 500;
+         uint256 principalAmount =  1e18;
          uint32 duration = 36 days;
          uint16 interestRate = 100;
 
@@ -182,33 +186,48 @@ contract CommitmentRolloverLoan_Test is Testable {
         wethMock.approve(address(tellerV2),1e18);
 
         vm.prank(address(lender));
-        (uint256 amountToProtocol,uint256 amountToMarketplace, uint256 amountToBorrower) = tellerV2.lenderAcceptBid( 
+        (uint256 amountToProtocol,
+        uint256 amountToMarketplace,
+        uint256 amountToBorrower) 
+        = tellerV2.lenderAcceptBid( 
             loanId  
          );
 
         vm.warp(36 days); 
 
-
+        //should get 0.5 weth (0.45 after fees) from accepting this commitment  during the rollover process
+        uint256 commitmentPrincipalAmount = 50 * 1e16; //0.50 weth 
         ICommitmentRolloverLoan.AcceptCommitmentArgs memory commitmentArgs = ICommitmentRolloverLoan.AcceptCommitmentArgs({
-            commitmentId: 0,
-            principalAmount: principalAmount,
-            collateralAmount: 100,
+            commitmentId: 0, 
+            principalAmount: commitmentPrincipalAmount,
+            collateralAmount: 0,
             collateralTokenId: 0,
             collateralTokenAddress: address(0),
             interestRate: interestRate,
             loanDuration: duration
          });
 
+        uint256 rolloverAmount = 65 * 1e16; //0.65 weth 
+
+        uint256 borrowerBalanceBeforeRollover = wethMock.balanceOf(address(borrower));
+
+        vm.prank(address(borrower));
+        wethMock.approve(address(commitmentRolloverLoan), rolloverAmount);
+
 
         vm.prank(address(borrower));
         
-        commitmentRolloverLoan.rolloverLoan(
+        // need to pay 0.65 weth as the borrower ! 
+        uint256 _newLoanId =  commitmentRolloverLoan.rolloverLoan(
             loanId,
+            rolloverAmount,
             commitmentArgs
         );
  
-        
+      uint256 borrowerBalanceAfterRollover = wethMock.balanceOf(address(borrower));
 
+        
+        assertEq(borrowerBalanceBeforeRollover - borrowerBalanceAfterRollover , 65 * 1e16, "incorrect balance after rollover");
 
   }
   

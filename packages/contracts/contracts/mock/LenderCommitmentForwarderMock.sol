@@ -3,13 +3,16 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 //import "../TellerV2MarketForwarder.sol";
 
 import "../TellerV2Context.sol";
  
 //import { LenderCommitmentForwarder } from "../contracts/LenderCommitmentForwarder.sol";
 
+
+
+import "../interfaces/ITellerV2.sol";
 import "../interfaces/ILenderCommitmentForwarder.sol";
 
 import "../interfaces/ITellerV2MarketForwarder.sol";
@@ -35,7 +38,7 @@ contract LenderCommitmentForwarderMock is ILenderCommitmentForwarder, ITellerV2M
     mapping(uint256 => uint256) public commitmentPrincipalAccepted;
 
 
-    constructor( ) 
+    constructor() 
     {}
 
     function setCommitment(uint256 _commitmentId, Commitment memory _commitment)
@@ -81,6 +84,12 @@ contract LenderCommitmentForwarderMock is ILenderCommitmentForwarder, ITellerV2M
         uint32 _loanDuration
     ) public returns (uint256 bidId) {
         acceptCommitmentWithRecipientWasCalled = true;
+
+        Commitment storage commitment = commitments[_commitmentId];
+
+        address lendingToken = commitment.principalTokenAddress;
+
+        _mockAcceptCommitmentTokenTransfer(lendingToken,_principalAmount,_recipient);
     }
      function acceptCommitmentWithRecipientAndProof(
         uint256 _commitmentId,
@@ -94,7 +103,25 @@ contract LenderCommitmentForwarderMock is ILenderCommitmentForwarder, ITellerV2M
         bytes32[] calldata _merkleProof
     ) public returns (uint256 bidId) {
          acceptCommitmentWithRecipientAndProofWasCalled = true;
+
+        Commitment storage commitment = commitments[_commitmentId];
+
+        address lendingToken = commitment.principalTokenAddress;
+
+
+         _mockAcceptCommitmentTokenTransfer(lendingToken,_principalAmount,_recipient);
     }
+
+
+
+    function _mockAcceptCommitmentTokenTransfer(
+        address lendingToken, 
+        uint256 principalAmount, 
+        address _recipient) internal {
+
+
+            IERC20(lendingToken).transfer(_recipient,principalAmount);
+        }
 
     function getCommitmentAcceptedPrincipal(uint256 _commitmentId)
         public

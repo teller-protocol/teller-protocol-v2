@@ -8,6 +8,10 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 // Interfaces
 import "../../interfaces/ITellerV2.sol";
 
+import "lib/forge-std/src/console.sol";
+ 
+
+
 import "../../interfaces/ILenderCommitmentForwarder.sol";
 import "../../interfaces/ICommitmentRolloverLoan.sol";
 contract CommitmentRolloverLoan is ICommitmentRolloverLoan{
@@ -41,6 +45,7 @@ contract CommitmentRolloverLoan is ICommitmentRolloverLoan{
         );
         uint256 balanceBefore = lendingToken.balanceOf(address(this));
 
+        console.logUint( balanceBefore );
 
         //accept funds from the borrower to this contract 
         lendingToken.transferFrom( borrower, address(this), rolloverAmount);
@@ -48,6 +53,7 @@ contract CommitmentRolloverLoan is ICommitmentRolloverLoan{
         uint256 fundsRecievedByRollover = lendingToken.balanceOf(address(this)) -
             balanceBefore;
 
+        console.logUint( fundsRecievedByRollover );
 
         // Accept commitment and receive funds to this contract
         newLoanId_ = _acceptCommitment(_commitmentArgs);
@@ -56,8 +62,11 @@ contract CommitmentRolloverLoan is ICommitmentRolloverLoan{
         uint256 fundsReceivedByCommitment = lendingToken.balanceOf(address(this)) - fundsRecievedByRollover - 
          balanceBefore  ;
 
+        console.logUint( fundsReceivedByCommitment );
    
         uint256 fundsReceived = fundsRecievedByRollover + fundsReceivedByCommitment;
+        
+        console.logUint( fundsReceived );
 
         // Approve TellerV2 to spend funds and repay loan
         lendingToken.approve(address(TELLER_V2), fundsReceived);
@@ -65,6 +74,8 @@ contract CommitmentRolloverLoan is ICommitmentRolloverLoan{
 
         uint256 fundsRemaining = lendingToken.balanceOf(address(this)) -
             fundsReceived;
+
+         console.logUint( fundsRemaining );
 
         if(fundsRemaining > 0){
             lendingToken.transfer(borrower, fundsRemaining);

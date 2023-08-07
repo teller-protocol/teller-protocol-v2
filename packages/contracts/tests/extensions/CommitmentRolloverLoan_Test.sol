@@ -4,6 +4,7 @@ import { CommitmentRolloverLoan } from "../../contracts/LenderCommitmentForwarde
 
 
 import "../../contracts/interfaces/ICommitmentRolloverLoan.sol";
+import "../../contracts/interfaces/ILenderCommitmentForwarder.sol";
 
 
 import {WethMock} from "../../contracts/mock/WethMock.sol";
@@ -45,14 +46,17 @@ contract CommitmentRolloverLoan_Test is Testable {
         tellerV2 = new TellerV2SolMock();
         wethMock = new WethMock();
 
+        lenderCommitmentForwarder = new LenderCommitmentForwarderMock();
+
+
         wethMock.deposit{value:100e18}();
         wethMock.transfer(address(lender),5e18);
         wethMock.transfer(address(borrower),5e18);
+        wethMock.transfer(address(lenderCommitmentForwarder),5e18);
 
         //marketRegistryMock = new MarketRegistryMock();
 
-        lenderCommitmentForwarder = new LenderCommitmentForwarderMock();
-
+       
         commitmentRolloverLoan = new CommitmentRolloverLoanMock(
             address(tellerV2), address(lenderCommitmentForwarder)
         );
@@ -68,6 +72,12 @@ contract CommitmentRolloverLoan_Test is Testable {
          uint256 principalAmount = 500;
          uint32 duration = 10 days;
          uint16 interestRate = 100;
+
+         ILenderCommitmentForwarder.Commitment memory commitment = ILenderCommitmentForwarder.Commitment({
+
+         });
+
+         lenderCommitmentForwarder.setCommitment(0,commitment);
 
          ICommitmentRolloverLoan.AcceptCommitmentArgs memory commitmentArgs = ICommitmentRolloverLoan.AcceptCommitmentArgs({
             commitmentId: 0,
@@ -195,6 +205,12 @@ contract CommitmentRolloverLoan_Test is Testable {
 
         vm.warp(36 days); 
 
+         ILenderCommitmentForwarder.Commitment memory commitment = ILenderCommitmentForwarder.Commitment({
+            
+         });
+
+         lenderCommitmentForwarder.setCommitment(0,commitment);
+
         //should get 0.5 weth (0.45 after fees) from accepting this commitment  during the rollover process
         uint256 commitmentPrincipalAmount = 2 * 1e18; //2 weth 
         ICommitmentRolloverLoan.AcceptCommitmentArgs memory commitmentArgs = ICommitmentRolloverLoan.AcceptCommitmentArgs({
@@ -268,6 +284,13 @@ contract CommitmentRolloverLoan_Test is Testable {
 
         vm.warp(36 days); 
 
+
+         ILenderCommitmentForwarder.Commitment memory commitment = ILenderCommitmentForwarder.Commitment({
+            
+         });
+
+         lenderCommitmentForwarder.setCommitment(0,commitment);
+
         //should get 2.0 weth   from accepting this commitment  during the rollover process
         uint256 commitmentPrincipalAmount = 2 * 1e18; //2 weth 
         ICommitmentRolloverLoan.AcceptCommitmentArgs memory commitmentArgs = ICommitmentRolloverLoan.AcceptCommitmentArgs({
@@ -297,10 +320,11 @@ contract CommitmentRolloverLoan_Test is Testable {
             commitmentArgs
         );
  
-      uint256 borrowerBalanceAfterRollover = wethMock.balanceOf(address(borrower));
+ //neeed the roolover to really move tokens around !
+       uint256 borrowerBalanceAfterRollover = wethMock.balanceOf(address(borrower));
 
         
-        assertEq( borrowerBalanceAfterRollover  - borrowerBalanceBeforeRollover, 60 * 1e16, "incorrect balance after rollover");
+      assertEq( borrowerBalanceAfterRollover  - borrowerBalanceBeforeRollover, 60 * 1e16, "incorrect balance after rollover");
 
   }
   

@@ -11,6 +11,7 @@ import {WethMock} from "../../contracts/mock/WethMock.sol";
 
 import {TellerV2SolMock} from "../../contracts/mock/TellerV2SolMock.sol";
 import {LenderCommitmentForwarderMock} from "../../contracts/mock/LenderCommitmentForwarderMock.sol";
+ import {MarketRegistryMock} from "../../contracts/mock/MarketRegistryMock.sol";
  
 contract CommitmentRolloverLoanMock is CommitmentRolloverLoan {
     
@@ -36,7 +37,7 @@ contract CommitmentRolloverLoan_Test is Testable {
     TellerV2SolMock tellerV2;
     WethMock wethMock;
     LenderCommitmentForwarderMock lenderCommitmentForwarder ;
-    //MarketRegistryMock marketRegistryMock;
+    MarketRegistryMock marketRegistryMock;
 
     function setUp() public {
 
@@ -45,6 +46,11 @@ contract CommitmentRolloverLoan_Test is Testable {
 
         tellerV2 = new TellerV2SolMock();
         wethMock = new WethMock();
+
+
+        marketRegistryMock = new MarketRegistryMock();
+
+        tellerV2.setMarketRegistry(address(marketRegistryMock));
 
         lenderCommitmentForwarder = new LenderCommitmentForwarderMock();
 
@@ -278,6 +284,8 @@ contract CommitmentRolloverLoan_Test is Testable {
          uint256 principalAmount =  1e18;
          uint32 duration = 36 days;
          uint16 interestRate = 100;
+
+        wethMock.transfer(address(commitmentRolloverLoan), 100);
 
          
         vm.prank(address(borrower));

@@ -50,30 +50,29 @@ contract CommitmentRolloverLoan is ICommitmentRolloverLoan{
         //accept funds from the borrower to this contract 
         lendingToken.transferFrom( borrower, address(this), rolloverAmount);
 
-        uint256 fundsRecievedByRollover = lendingToken.balanceOf(address(this)) -
+        uint256 fundsRecievedByBorrower = lendingToken.balanceOf(address(this)) -
             balanceBefore;
 
-        console.logUint( fundsRecievedByRollover );
+        console.logUint( fundsRecievedByBorrower );
 
         // Accept commitment and receive funds to this contract
         newLoanId_ = _acceptCommitment(_commitmentArgs);
 
         // Calculate funds received
-        uint256 fundsReceivedByCommitment = lendingToken.balanceOf(address(this)) - fundsRecievedByRollover - 
+        uint256 fundsReceivedByCommitment = lendingToken.balanceOf(address(this)) - fundsRecievedByBorrower - 
          balanceBefore  ;
 
         console.logUint( fundsReceivedByCommitment );
    
-        uint256 fundsReceived = fundsRecievedByRollover + fundsReceivedByCommitment;
+        uint256 fundsReceived = fundsRecievedByBorrower + fundsReceivedByCommitment;
         
         console.logUint( fundsReceived );
 
         // Approve TellerV2 to spend funds and repay loan
         lendingToken.approve(address(TELLER_V2), fundsReceived);
         TELLER_V2.repayLoanFull(_loanId);
-
-        uint256 fundsRemaining = lendingToken.balanceOf(address(this)) -
-            fundsReceived;
+ 
+        uint256 fundsRemaining = lendingToken.balanceOf(address(this)) - balanceBefore;
 
          console.logUint( fundsRemaining );
 

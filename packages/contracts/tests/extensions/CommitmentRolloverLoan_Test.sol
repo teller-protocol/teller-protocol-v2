@@ -269,7 +269,7 @@ contract CommitmentRolloverLoan_Test is Testable {
       uint256 borrowerBalanceAfterRollover = wethMock.balanceOf(address(borrower));
 
         
-        assertEq(borrowerBalanceBeforeRollover - borrowerBalanceAfterRollover , 65 * 1e16, "incorrect balance after rollover");
+        assertEq(borrowerBalanceAfterRollover - borrowerBalanceBeforeRollover , 65 * 1e16, "incorrect balance after rollover");
 
   }
   

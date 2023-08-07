@@ -6,6 +6,7 @@ import { CommitmentRolloverLoan } from "../../contracts/LenderCommitmentForwarde
 import "../../contracts/interfaces/ICommitmentRolloverLoan.sol";
 import "../../contracts/interfaces/ILenderCommitmentForwarder.sol";
 
+import "../integration/IntegrationTestHelpers.sol";
 
 import {WethMock} from "../../contracts/mock/WethMock.sol";
 
@@ -67,7 +68,7 @@ contract CommitmentRolloverLoan_Test is Testable {
             address(tellerV2), address(lenderCommitmentForwarder)
         );
 
-
+        IntegrationTestHelpers.deployIntegrationSuite();
     }
  
 
@@ -193,7 +194,7 @@ contract CommitmentRolloverLoan_Test is Testable {
         //initial loan - need to pay back 1 weth + 0.1 weth (interest) to the lender 
          uint256 marketId = 0;
          uint256 principalAmount =  1e18;
-         uint32 duration = 36 days;
+         uint32 duration = 365 days;
          uint16 interestRate = 100;
 
          
@@ -219,7 +220,7 @@ contract CommitmentRolloverLoan_Test is Testable {
             loanId  
          );
 
-        vm.warp(36 days); 
+        vm.warp(365 days); 
 
         ILenderCommitmentForwarder.Commitment memory commitment = ILenderCommitmentForwarder.Commitment({
             maxPrincipal: principalAmount,
@@ -282,7 +283,7 @@ contract CommitmentRolloverLoan_Test is Testable {
         //initial loan - need to pay back 1 weth + 0.1 weth (interest) to the lender 
          uint256 marketId = 0;
          uint256 principalAmount =  1e18;
-         uint32 duration = 36 days;
+         uint32 duration = 365 days;
          uint16 interestRate = 100;
 
         wethMock.transfer(address(commitmentRolloverLoan), 100);
@@ -310,7 +311,7 @@ contract CommitmentRolloverLoan_Test is Testable {
             loanId  
          );
 
-        vm.warp(36 days); 
+        vm.warp(365 days); 
 
 
           ILenderCommitmentForwarder.Commitment memory commitment = ILenderCommitmentForwarder.Commitment({

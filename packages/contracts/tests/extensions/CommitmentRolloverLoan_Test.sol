@@ -74,7 +74,17 @@ contract CommitmentRolloverLoan_Test is Testable {
          uint16 interestRate = 100;
 
          ILenderCommitmentForwarder.Commitment memory commitment = ILenderCommitmentForwarder.Commitment({
-
+            maxPrincipal: principalAmount,
+            expiration: uint32(block.timestamp + 1 days),
+            maxDuration: duration,
+            minInterestRate: interestRate, 
+            collateralTokenAddress: address(0), 
+            collateralTokenId: 0 , 
+            maxPrincipalPerCollateralAmount: 0, 
+            collateralTokenType: ILenderCommitmentForwarder.CommitmentCollateralType.NONE, 
+            lender: address(lender) , 
+            marketId: marketId, 
+            principalTokenAddress: lendingToken 
          });
 
          lenderCommitmentForwarder.setCommitment(0,commitment);
@@ -205,8 +215,18 @@ contract CommitmentRolloverLoan_Test is Testable {
 
         vm.warp(36 days); 
 
-         ILenderCommitmentForwarder.Commitment memory commitment = ILenderCommitmentForwarder.Commitment({
-            
+        ILenderCommitmentForwarder.Commitment memory commitment = ILenderCommitmentForwarder.Commitment({
+            maxPrincipal: principalAmount,
+            expiration: uint32(block.timestamp + 1 days),
+            maxDuration: duration,
+            minInterestRate: interestRate, 
+            collateralTokenAddress: address(0), 
+            collateralTokenId: 0 , 
+            maxPrincipalPerCollateralAmount: 0, 
+            collateralTokenType: ILenderCommitmentForwarder.CommitmentCollateralType.NONE, 
+            lender: address(lender) , 
+            marketId: marketId, 
+            principalTokenAddress: lendingToken 
          });
 
          lenderCommitmentForwarder.setCommitment(0,commitment);
@@ -285,8 +305,18 @@ contract CommitmentRolloverLoan_Test is Testable {
         vm.warp(36 days); 
 
 
-         ILenderCommitmentForwarder.Commitment memory commitment = ILenderCommitmentForwarder.Commitment({
-            
+          ILenderCommitmentForwarder.Commitment memory commitment = ILenderCommitmentForwarder.Commitment({
+            maxPrincipal: principalAmount,
+            expiration: uint32(block.timestamp + 1 days),
+            maxDuration: duration,
+            minInterestRate: interestRate, 
+            collateralTokenAddress: address(0), 
+            collateralTokenId: 0 , 
+            maxPrincipalPerCollateralAmount: 0, 
+            collateralTokenType: ILenderCommitmentForwarder.CommitmentCollateralType.NONE, 
+            lender: address(lender) , 
+            marketId: marketId, 
+            principalTokenAddress: lendingToken 
          });
 
          lenderCommitmentForwarder.setCommitment(0,commitment);

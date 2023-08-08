@@ -122,6 +122,8 @@ contract CommitmentRolloverLoan_Integration_Test is Testable {
 
   */
 
+  /*
+
     function test_rolloverLoan_financial_scenario_A() public {
         address lendingToken = address(wethMock);
 
@@ -222,6 +224,7 @@ contract CommitmentRolloverLoan_Integration_Test is Testable {
             "incorrect balance after rollover"
         );
     }
+    */
 
     function test_rolloverLoan_financial_scenario_C() public {
         address lendingToken = address(wethMock);

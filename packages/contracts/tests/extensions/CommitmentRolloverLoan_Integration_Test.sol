@@ -8,11 +8,16 @@ import "../../contracts/interfaces/ITellerV2Context.sol";
 
 import "../integration/IntegrationTestHelpers.sol";
 
+import "../../contracts/utils/ExtensionsContextUpgradeable.sol";
+
 import { WethMock } from "../../contracts/mock/WethMock.sol";
 
 import { TellerV2SolMock } from "../../contracts/mock/TellerV2SolMock.sol";
 import { LenderCommitmentForwarderMock } from "../../contracts/mock/LenderCommitmentForwarderMock.sol";
 import { MarketRegistryMock } from "../../contracts/mock/MarketRegistryMock.sol";
+
+import {LenderCommitmentForwarderWithExtensions} from "../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarderWithExtensions.sol";
+
 
 import { PaymentType,PaymentCycleType } from "../../contracts/libraries/V2Calculations.sol";
 
@@ -55,6 +60,8 @@ contract CommitmentRolloverLoan_Integration_Test is Testable {
         marketRegistry = IMarketRegistry(tellerV2.marketRegistry());
 
         lenderCommitmentForwarder = ILenderCommitmentForwarder(tellerV2.lenderCommitmentForwarder());
+        
+        
         wethMock = new WethMock();
 
         uint32 _paymentCycleDuration = uint32( 1 days );
@@ -95,6 +102,11 @@ contract CommitmentRolloverLoan_Integration_Test is Testable {
             address(tellerV2),
             address(lenderCommitmentForwarder)
         );
+
+        //change this to a nicer interface? 
+        LenderCommitmentForwarderWithExtensions(address(lenderCommitmentForwarder)).initializeExtensions(address(this));
+        LenderCommitmentForwarderWithExtensions(address(lenderCommitmentForwarder)).addExtension(address(commitmentRolloverLoan));
+        
  
     } 
 
@@ -287,15 +299,15 @@ contract CommitmentRolloverLoan_Integration_Test is Testable {
 
         {
       
-        vm.prank(address(marketOwner));
-         ITellerV2Context(address(tellerV2)).setTrustedMarketForwarder(marketId, address(commitmentRolloverLoan));
        // vm.prank(address(marketOwner));
-        // ITellerV2Context(address(tellerV2)).setTrustedMarketForwarder(marketId, address(lenderCommitmentForwarder));
+       //  ITellerV2Context(address(tellerV2)).setTrustedMarketForwarder(marketId, address(commitmentRolloverLoan));
+        vm.prank(address(marketOwner));
+        ITellerV2Context(address(tellerV2)).setTrustedMarketForwarder(marketId, address(lenderCommitmentForwarder));
 
 
         //borrower approves the commitmentrolloverloan as a sender for market 1 
-         vm.prank(address(borrower));
-        ITellerV2Context(address(tellerV2)).approveMarketForwarder(marketId, address(commitmentRolloverLoan));
+       //  vm.prank(address(borrower));
+       // ITellerV2Context(address(tellerV2)).approveMarketForwarder(marketId, address(commitmentRolloverLoan));
           vm.prank(address(borrower));
         ITellerV2Context(address(tellerV2)).approveMarketForwarder(marketId, address(lenderCommitmentForwarder));
         }

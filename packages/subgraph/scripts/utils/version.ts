@@ -31,17 +31,17 @@ export const updatePackageVersion = async (version: string): Promise<void> => {
 
 export const getNextVersion = (releaseType: ReleaseType): string => {
   const latestVersion = getPackageVersion();
-  let nextVersion: string | null;
+  let nextVersion: string | undefined | null;
   switch (releaseType) {
-    case "patch":
+    case "prepatch":
       nextVersion = semver.inc(latestVersion, "prepatch");
       break;
 
-    case "minor":
+    case "preminor":
       nextVersion = semver.inc(latestVersion, "preminor");
       break;
 
-    case "pre":
+    case "prerelease":
       nextVersion = semver.inc(latestVersion, "prerelease");
       break;
 
@@ -49,9 +49,24 @@ export const getNextVersion = (releaseType: ReleaseType): string => {
       nextVersion = semver.inc(latestVersion, "patch");
       break;
 
-    case "missing":
-      nextVersion = latestVersion;
+    case "missing": {
+      const prereleaseValues = semver.prerelease(latestVersion);
+      let prereleaseVersion = 0;
+      if (prereleaseValues != null) {
+        prereleaseVersion = Number(prereleaseValues.slice(-1)[0]);
+        if (isNaN(prereleaseVersion)) {
+          prereleaseVersion = 0;
+        }
+        if (prereleaseVersion > 0) {
+          prereleaseVersion -= 1;
+        }
+      }
+      nextVersion = semver.coerce(latestVersion)?.version;
+      if (nextVersion != null) {
+        nextVersion = `${nextVersion}-${prereleaseVersion}`;
+      }
       break;
+    }
   }
   if (!nextVersion) {
     throw new Error(`Invalid version: ${nextVersion}`);

@@ -5,10 +5,18 @@
     "lib": [
       "esnext"
     ],
-    "moduleResolution": "node",
     "types": [
       "node"
     ],
+    "allowJs": false,
+    "skipLibCheck": false,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "typeRoots": [
+      "node_modules/@types"
+    ],
+    "moduleResolution": "node",
     "noEmit": true
   },
   "include": [

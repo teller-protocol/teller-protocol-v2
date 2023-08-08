@@ -1,13 +1,11 @@
 {
   "network": "arbitrum-one",
+  "export_network_name": "arbitrum-one",
   "grafting": {
-    "enabled": true,
-    "base": "QmQs1hN46EYEF2LCUWqCNBVtExWBv6sRA7CjLHBTjef39M",
-    "block": 117293508
+    "enabled": false
   },
   "block_handler": {
-    "enabled": true,
-    "block": 117293508
+    "enabled": false
   },
   "contracts": {
     "teller_v2": {

@@ -1,5 +1,7 @@
 import * as semver from "semver";
 
+import { ReleaseType } from "../thegraph/utils/types";
+
 import { runCmd } from "./runCmd";
 
 const getValidVersion = (version: string): string => {
@@ -11,7 +13,7 @@ const getValidVersion = (version: string): string => {
 };
 
 export const getPackageVersion = (): string => {
-  const version = process.env.npm_package_version || "0.0.0";
+  const version = process.env.npm_package_version ?? "0.0.0";
   return getValidVersion(version);
 };
 
@@ -27,24 +29,32 @@ export const updatePackageVersion = async (version: string): Promise<void> => {
   process.env.npm_package_version = validVersion;
 };
 
-export const getNextVersion = (
-  releaseType: "patch" | "minor" | "pre" | "release"
-): string => {
+export const getNextVersion = (releaseType: ReleaseType): string => {
   const latestVersion = getPackageVersion();
+  let nextVersion: string | null;
   switch (releaseType) {
     case "patch":
-      return semver.inc(latestVersion, "prepatch");
+      nextVersion = semver.inc(latestVersion, "prepatch");
+      break;
 
     case "minor":
-      return semver.inc(latestVersion, "preminor");
+      nextVersion = semver.inc(latestVersion, "preminor");
+      break;
 
     case "pre":
-      return semver.inc(latestVersion, "prerelease");
+      nextVersion = semver.inc(latestVersion, "prerelease");
+      break;
 
     case "release":
-      return semver.inc(latestVersion, "patch");
+      nextVersion = semver.inc(latestVersion, "patch");
+      break;
 
-    default:
-      throw new Error(`Unknown type: ${releaseType}`);
+    case "missing":
+      nextVersion = latestVersion;
+      break;
   }
+  if (!nextVersion) {
+    throw new Error(`Invalid version: ${nextVersion}`);
+  }
+  return nextVersion;
 };

@@ -31,8 +31,6 @@ contract CollateralEscrow_Test is Testable {
 
     uint256 amount = 1000;
 
-   
-
     function setUp() public {
         // Deploy implementation
         CollateralEscrowV1 escrowImplementation = new CollateralEscrowV1_Override();

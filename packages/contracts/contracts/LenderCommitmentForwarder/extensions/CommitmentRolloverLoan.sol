@@ -9,12 +9,11 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "../../interfaces/ITellerV2.sol";
 
 import "lib/forge-std/src/console.sol";
- 
-
 
 import "../../interfaces/ILenderCommitmentForwarder.sol";
 import "../../interfaces/ICommitmentRolloverLoan.sol";
-contract CommitmentRolloverLoan is ICommitmentRolloverLoan{
+
+contract CommitmentRolloverLoan is ICommitmentRolloverLoan {
     using AddressUpgradeable for address;
 
     /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
@@ -30,7 +29,6 @@ contract CommitmentRolloverLoan is ICommitmentRolloverLoan{
         );
     }
 
-
     function rolloverLoan(
         uint256 _loanId,
         uint256 rolloverAmount,
@@ -45,38 +43,44 @@ contract CommitmentRolloverLoan is ICommitmentRolloverLoan{
         );
         uint256 balanceBefore = lendingToken.balanceOf(address(this));
 
-        console.logUint( balanceBefore );
+        console.logUint(balanceBefore);
 
-        //accept funds from the borrower to this contract 
-        lendingToken.transferFrom( borrower, address(this), rolloverAmount);
+        //accept funds from the borrower to this contract
+        lendingToken.transferFrom(borrower, address(this), rolloverAmount);
 
-        uint256 fundsRecievedByBorrower = lendingToken.balanceOf(address(this)) -
-            balanceBefore;
+        uint256 fundsRecievedByBorrower = lendingToken.balanceOf(
+            address(this)
+        ) - balanceBefore;
 
-        console.logUint( fundsRecievedByBorrower );
+        console.logUint(fundsRecievedByBorrower);
 
         // Accept commitment and receive funds to this contract
         newLoanId_ = _acceptCommitment(_commitmentArgs);
 
         // Calculate funds received
-        uint256 fundsReceivedByCommitment = lendingToken.balanceOf(address(this)) - fundsRecievedByBorrower - 
-         balanceBefore  ;
+        uint256 fundsReceivedByCommitment = lendingToken.balanceOf(
+            address(this)
+        ) -
+            fundsRecievedByBorrower -
+            balanceBefore;
 
-        console.logUint( fundsReceivedByCommitment );
-   
-        uint256 fundsReceived = fundsRecievedByBorrower + fundsReceivedByCommitment;
-        
-        console.logUint( fundsReceived );
+        console.logUint(fundsReceivedByCommitment);
+
+        uint256 fundsReceived = fundsRecievedByBorrower +
+            fundsReceivedByCommitment;
+
+        console.logUint(fundsReceived);
 
         // Approve TellerV2 to spend funds and repay loan
         lendingToken.approve(address(TELLER_V2), fundsReceived);
         TELLER_V2.repayLoanFull(_loanId);
- 
-        uint256 fundsRemaining = lendingToken.balanceOf(address(this)) - balanceBefore;
 
-         console.logUint( fundsRemaining );
+        uint256 fundsRemaining = lendingToken.balanceOf(address(this)) -
+            balanceBefore;
 
-        if(fundsRemaining > 0){
+        console.logUint(fundsRemaining);
+
+        if (fundsRemaining > 0) {
             lendingToken.transfer(borrower, fundsRemaining);
         }
     }

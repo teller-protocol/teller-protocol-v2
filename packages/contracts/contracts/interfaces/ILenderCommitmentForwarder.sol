@@ -1,8 +1,7 @@
 // SPDX-Licence-Identifier: MIT
 pragma solidity >=0.8.0 <0.9.0;
+
 interface ILenderCommitmentForwarder {
-
-
     enum CommitmentCollateralType {
         NONE, // no collateral required
         ERC20,
@@ -40,7 +39,6 @@ interface ILenderCommitmentForwarder {
         uint256 marketId;
         address principalTokenAddress;
     }
-
 
     function acceptCommitmentWithRecipient(
         uint256 _commitmentId,

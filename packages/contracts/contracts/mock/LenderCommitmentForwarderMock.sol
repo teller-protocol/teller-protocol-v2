@@ -7,24 +7,22 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 //import "../TellerV2MarketForwarder.sol";
 
 import "../TellerV2Context.sol";
- 
+
 //import { LenderCommitmentForwarder } from "../contracts/LenderCommitmentForwarder.sol";
-
-
 
 import "../interfaces/ITellerV2.sol";
 import "../interfaces/ILenderCommitmentForwarder.sol";
 
 import "../interfaces/ITellerV2MarketForwarder.sol";
 
-
 import { Collateral, CollateralType } from "../interfaces/escrow/ICollateralEscrowV1.sol";
- 
 
 import "../mock/MarketRegistryMock.sol";
 
-contract LenderCommitmentForwarderMock is ILenderCommitmentForwarder, ITellerV2MarketForwarder {
-    
+contract LenderCommitmentForwarderMock is
+    ILenderCommitmentForwarder,
+    ITellerV2MarketForwarder
+{
     mapping(uint256 => Commitment) public commitments;
 
     uint256 commitmentCount;
@@ -37,9 +35,7 @@ contract LenderCommitmentForwarderMock is ILenderCommitmentForwarder, ITellerV2M
 
     mapping(uint256 => uint256) public commitmentPrincipalAccepted;
 
-
-    constructor() 
-    {}
+    constructor() {}
 
     function setCommitment(uint256 _commitmentId, Commitment memory _commitment)
         public
@@ -61,7 +57,7 @@ contract LenderCommitmentForwarderMock is ILenderCommitmentForwarder, ITellerV2M
         return commitments[_commitmentId].marketId;
     }
 
-   /* function _getEscrowCollateralTypeSuper(CommitmentCollateralType _type)
+    /* function _getEscrowCollateralTypeSuper(CommitmentCollateralType _type)
         public
         returns (CollateralType)
     {
@@ -71,7 +67,6 @@ contract LenderCommitmentForwarderMock is ILenderCommitmentForwarder, ITellerV2M
     function validateCommitmentSuper(uint256 _commitmentId) public {
         super.validateCommitment(commitments[_commitmentId]);
     }*/
-
 
     function acceptCommitmentWithRecipient(
         uint256 _commitmentId,
@@ -89,9 +84,14 @@ contract LenderCommitmentForwarderMock is ILenderCommitmentForwarder, ITellerV2M
 
         address lendingToken = commitment.principalTokenAddress;
 
-        _mockAcceptCommitmentTokenTransfer(lendingToken,_principalAmount,_recipient);
+        _mockAcceptCommitmentTokenTransfer(
+            lendingToken,
+            _principalAmount,
+            _recipient
+        );
     }
-     function acceptCommitmentWithRecipientAndProof(
+
+    function acceptCommitmentWithRecipientAndProof(
         uint256 _commitmentId,
         uint256 _principalAmount,
         uint256 _collateralAmount,
@@ -102,26 +102,26 @@ contract LenderCommitmentForwarderMock is ILenderCommitmentForwarder, ITellerV2M
         uint32 _loanDuration,
         bytes32[] calldata _merkleProof
     ) public returns (uint256 bidId) {
-         acceptCommitmentWithRecipientAndProofWasCalled = true;
+        acceptCommitmentWithRecipientAndProofWasCalled = true;
 
         Commitment storage commitment = commitments[_commitmentId];
 
         address lendingToken = commitment.principalTokenAddress;
 
-
-         _mockAcceptCommitmentTokenTransfer(lendingToken,_principalAmount,_recipient);
+        _mockAcceptCommitmentTokenTransfer(
+            lendingToken,
+            _principalAmount,
+            _recipient
+        );
     }
 
-
-
     function _mockAcceptCommitmentTokenTransfer(
-        address lendingToken, 
-        uint256 principalAmount, 
-        address _recipient) internal {
-
-
-            IERC20(lendingToken).transfer(_recipient,principalAmount);
-        }
+        address lendingToken,
+        uint256 principalAmount,
+        address _recipient
+    ) internal {
+        IERC20(lendingToken).transfer(_recipient, principalAmount);
+    }
 
     function getCommitmentAcceptedPrincipal(uint256 _commitmentId)
         public
@@ -141,7 +141,7 @@ contract LenderCommitmentForwarderMock is ILenderCommitmentForwarder, ITellerV2M
         Override methods 
     */
 
-   /* function _submitBid(CreateLoanArgs memory, address)
+    /* function _submitBid(CreateLoanArgs memory, address)
         internal
         override
         returns (uint256 bidId)
@@ -166,4 +166,3 @@ contract LenderCommitmentForwarderMock is ILenderCommitmentForwarder, ITellerV2M
     }
     */
 }
- 

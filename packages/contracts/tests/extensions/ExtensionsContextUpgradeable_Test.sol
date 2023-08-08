@@ -1,7 +1,6 @@
 import { Testable } from "../Testable.sol";
 
 import { ExtensionsContextUpgradeable } from "../../contracts/utils/ExtensionsContextUpgradeable.sol";
- 
 
 contract ExtensionsContextMock is ExtensionsContextUpgradeable {
     function addExtension(address extension) public {
@@ -24,7 +23,7 @@ contract ExtensionsContext_Test is Testable {
     function setUp() public {
         borrower = new User();
         lender = new User();
-        
+
         extensionsContext = new ExtensionsContextMock();
     }
 

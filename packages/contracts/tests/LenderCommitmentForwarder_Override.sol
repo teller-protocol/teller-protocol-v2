@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "../contracts/TellerV2MarketForwarder.sol";
 
 import "../contracts/TellerV2Context.sol";
- 
+
 import { LenderCommitmentForwarder } from "../contracts/LenderCommitmentForwarder.sol";
 
 import { Collateral, CollateralType } from "../contracts/interfaces/escrow/ICollateralEscrowV1.sol";

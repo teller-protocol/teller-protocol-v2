@@ -1,9 +1,7 @@
-
 import { Collateral } from "./escrow/ICollateralEscrowV1.sol";
 
-
 interface ITellerV2MarketForwarder {
- struct CreateLoanArgs {
+    struct CreateLoanArgs {
         uint256 marketId;
         address lendingToken;
         uint256 principal;

@@ -508,7 +508,7 @@ contract LenderCommitmentForwarder_Test is Testable {
     }
 
     function test_validateCommitment_zero_principal_allocation() public {
-       ILenderCommitmentForwarder.Commitment
+        ILenderCommitmentForwarder.Commitment
             memory c = ILenderCommitmentForwarder.Commitment({
                 maxPrincipal: 0,
                 expiration: expiration,
@@ -1152,7 +1152,8 @@ contract LenderCommitmentForwarder_Test is Testable {
     }
 
     function test_acceptCommitment_invalid_721_collateral_amount() public {
-        ILenderCommitmentForwarder.Commitment memory c = ILenderCommitmentForwarder.Commitment({
+        ILenderCommitmentForwarder.Commitment memory c = ILenderCommitmentForwarder
+            .Commitment({
                 maxPrincipal: 100,
                 expiration: expiration,
                 maxDuration: maxDuration,

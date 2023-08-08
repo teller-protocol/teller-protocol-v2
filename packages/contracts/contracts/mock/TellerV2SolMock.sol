@@ -39,11 +39,9 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
         bid.loanDetails.principal = _principal;
         bid.loanDetails.loanDuration = _duration;
         bid.loanDetails.timestamp = uint32(block.timestamp);
- 
 
         (bid.terms.paymentCycle, bidPaymentCycleType[bidId]) = marketRegistry
             .getPaymentCycle(_marketId);
-
 
         bid.terms.APR = _APR;
 
@@ -60,8 +58,6 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
         address _receiver,
         Collateral[] calldata _collateralInfo
     ) public returns (uint256 bidId_) {
-
-
         submitBid(
             _lendingToken,
             _marketplaceId,
@@ -70,21 +66,15 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
             _APR,
             _metadataURI,
             _receiver
-
         );
     }
 
-    function repayLoanMinimum(uint256 _bidId) external {
-
-
-    }
+    function repayLoanMinimum(uint256 _bidId) external {}
 
     function repayLoanFull(uint256 _bidId) external {
-
-
         Bid storage bid = bids[_bidId];
 
-         (uint256 owedPrincipal , ,  uint256 interest) = V2Calculations
+        (uint256 owedPrincipal, , uint256 interest) = V2Calculations
             .calculateAmountOwed(
                 bids[_bidId],
                 block.timestamp,
@@ -98,7 +88,6 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
             address(this),
             _amount
         );
-
     }
 
     function repayLoan(uint256 _bidId, uint256 _amount) public {

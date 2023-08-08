@@ -30,7 +30,7 @@ library IntegrationTestHelpers {
         return address(marketRegistry);
     }
 
-    function deployIntegrationSuite() public returns (address tellerV2_) {
+    function deployIntegrationSuite() public returns (TellerV2 tellerV2_) {
         address trustedForwarder = address(0);
         TellerV2 tellerV2 = new TellerV2(trustedForwarder);
 
@@ -64,5 +64,7 @@ library IntegrationTestHelpers {
             address(_lenderManager),
             address(_escrowVault)
         );
+
+        return tellerV2;
     }
 }

@@ -141,9 +141,11 @@ contract CommitmentRolloverLoan_Integration_Test is Testable {
 
         vm.warp(365 days);
 
+        uint256 commitmentPrincipalAmount = 2 * 1e18; //2 weth
+
         ILenderCommitmentForwarder.Commitment
             memory commitment = ILenderCommitmentForwarder.Commitment({
-                maxPrincipal: principalAmount,
+                maxPrincipal: commitmentPrincipalAmount,
                 expiration: uint32(block.timestamp + 1 days),
                 maxDuration: duration,
                 minInterestRate: interestRate,
@@ -166,7 +168,7 @@ contract CommitmentRolloverLoan_Integration_Test is Testable {
 
 
         //should get 0.5 weth (0.45 after fees) from accepting this commitment  during the rollover process
-        uint256 commitmentPrincipalAmount = 2 * 1e18; //2 weth
+      
         ICommitmentRolloverLoan.AcceptCommitmentArgs
             memory commitmentArgs = ICommitmentRolloverLoan
                 .AcceptCommitmentArgs({
@@ -242,9 +244,11 @@ contract CommitmentRolloverLoan_Integration_Test is Testable {
 
         vm.warp(365 days);
 
+         uint256 commitmentPrincipalAmount = 2 * 1e18; //2 weth
+
         ILenderCommitmentForwarder.Commitment
             memory commitment = ILenderCommitmentForwarder.Commitment({
-                maxPrincipal: principalAmount,
+                maxPrincipal: commitmentPrincipalAmount,
                 expiration: uint32(block.timestamp + 1 days),
                 maxDuration: duration,
                 minInterestRate: interestRate,
@@ -265,7 +269,7 @@ contract CommitmentRolloverLoan_Integration_Test is Testable {
         uint256 commitmentId = lenderCommitmentForwarder.createCommitment(commitment, _borrowerAddressList);
 
         //should get 2.0 weth   from accepting this commitment  during the rollover process
-        uint256 commitmentPrincipalAmount = 2 * 1e18; //2 weth
+       
         ICommitmentRolloverLoan.AcceptCommitmentArgs
             memory commitmentArgs = ICommitmentRolloverLoan
                 .AcceptCommitmentArgs({

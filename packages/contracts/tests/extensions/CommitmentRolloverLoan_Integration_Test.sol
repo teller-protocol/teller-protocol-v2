@@ -127,15 +127,19 @@ contract CommitmentRolloverLoan_Integration_Test is Testable {
                 principalTokenAddress: lendingToken
             });
 
-        vm.prank(address(lender));
-        lenderCommitmentForwarder.createCommitment(0, commitment);
+     
+         address[] memory _borrowerAddressList;
+
+         vm.prank(address(lender));
+        uint256 commitmentId = lenderCommitmentForwarder.createCommitment(commitment, _borrowerAddressList);
+
 
         //should get 0.5 weth (0.45 after fees) from accepting this commitment  during the rollover process
         uint256 commitmentPrincipalAmount = 2 * 1e18; //2 weth
         ICommitmentRolloverLoan.AcceptCommitmentArgs
             memory commitmentArgs = ICommitmentRolloverLoan
                 .AcceptCommitmentArgs({
-                    commitmentId: 0,
+                    commitmentId: commitmentId,
                     principalAmount: commitmentPrincipalAmount,
                     collateralAmount: 0,
                     collateralTokenId: 0,
@@ -223,16 +227,18 @@ contract CommitmentRolloverLoan_Integration_Test is Testable {
                 marketId: marketId,
                 principalTokenAddress: lendingToken
             });
+        
+        address[] memory _borrowerAddressList;
 
          vm.prank(address(lender));
-        lenderCommitmentForwarder.createCommitment(0, commitment);
+        uint256 commitmentId = lenderCommitmentForwarder.createCommitment(commitment, _borrowerAddressList);
 
         //should get 2.0 weth   from accepting this commitment  during the rollover process
         uint256 commitmentPrincipalAmount = 2 * 1e18; //2 weth
         ICommitmentRolloverLoan.AcceptCommitmentArgs
             memory commitmentArgs = ICommitmentRolloverLoan
                 .AcceptCommitmentArgs({
-                    commitmentId: 0,
+                    commitmentId: commitmentId,
                     principalAmount: commitmentPrincipalAmount,
                     collateralAmount: 0,
                     collateralTokenId: 0,

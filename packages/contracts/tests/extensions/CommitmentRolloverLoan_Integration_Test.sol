@@ -13,6 +13,10 @@ import { TellerV2SolMock } from "../../contracts/mock/TellerV2SolMock.sol";
 import { LenderCommitmentForwarderMock } from "../../contracts/mock/LenderCommitmentForwarderMock.sol";
 import { MarketRegistryMock } from "../../contracts/mock/MarketRegistryMock.sol";
 
+import { PaymentType,PaymentCycleType } from "../../contracts/libraries/V2Calculations.sol";
+
+import "lib/forge-std/src/console.sol";
+
 /*
 contract CommitmentRolloverLoanMock is CommitmentRolloverLoan {
     constructor(address _tellerV2, address _lenderCommitmentForwarder)
@@ -32,22 +36,49 @@ contract CommitmentRolloverLoan_Integration_Test is Testable {
 
     User private borrower;
     User private lender;
+    User private marketOwner;
 
     CommitmentRolloverLoan commitmentRolloverLoan;
     TellerV2 tellerV2;
     WethMock wethMock;
-    LenderCommitmentForwarder lenderCommitmentForwarder;
-    MarketRegistry marketRegistry;
+    ILenderCommitmentForwarder lenderCommitmentForwarder;
+    IMarketRegistry marketRegistry;
 
     function setUp() public {
         borrower = new User();
         lender = new User();
+        marketOwner = new User();
 
         tellerV2 = IntegrationTestHelpers.deployIntegrationSuite();
+
+        marketRegistry = IMarketRegistry(tellerV2.marketRegistry());
+
+        lenderCommitmentForwarder = ILenderCommitmentForwarder(tellerV2.lenderCommitmentForwarder());
         wethMock = new WethMock();
 
-         
+        uint32 _paymentCycleDuration = uint32( 1 days );
+        uint32 _paymentDefaultDuration = uint32( 5 days );
+        uint32 _bidExpirationTime = uint32(7 days);
+        uint16 _feePercent = 100;
+        PaymentType _paymentType = PaymentType.EMI;
+        PaymentCycleType _paymentCycleType = PaymentCycleType.Seconds;
 
+        vm.prank(address(marketOwner));
+        uint256 marketId = marketRegistry.createMarket(
+
+            address(marketOwner),
+            _paymentCycleDuration,
+            _paymentDefaultDuration,
+            _bidExpirationTime,
+            _feePercent,
+            false,
+            false,
+            _paymentType,
+            _paymentCycleType,
+            "uri"
+        );
+
+        console.logUint(marketId);
         //tellerV2.setMarketRegistry(address(marketRegistryMock));
 
         //lenderCommitmentForwarder = new LenderCommitmentForwarderMock();
@@ -82,7 +113,7 @@ contract CommitmentRolloverLoan_Integration_Test is Testable {
         address lendingToken = address(wethMock);
 
         //initial loan - need to pay back 1 weth + 0.1 weth (interest) to the lender
-        uint256 marketId = 0;
+        uint256 marketId = 1;
         uint256 principalAmount = 1e18;
         uint32 duration = 365 days;
         uint16 interestRate = 100;
@@ -181,7 +212,7 @@ contract CommitmentRolloverLoan_Integration_Test is Testable {
         address lendingToken = address(wethMock);
 
         //initial loan - need to pay back 1 weth + 0.1 weth (interest) to the lender
-        uint256 marketId = 0;
+        uint256 marketId = 1;
         uint256 principalAmount = 1e18;
         uint32 duration = 365 days;
         uint16 interestRate = 100;

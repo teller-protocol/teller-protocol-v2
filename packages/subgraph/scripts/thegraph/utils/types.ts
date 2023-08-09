@@ -5,7 +5,9 @@ export type ReleaseType =
   | "release"
   | "missing";
 export const isReleaseType = (_type: string): _type is ReleaseType => {
-  return ["patch", "minor", "pre", "release", "missing"].includes(_type);
+  return ["prepatch", "preminor", "prerelease", "release", "missing"].includes(
+    _type
+  );
 };
 
 export type GraftingType = "latest" | "none";

@@ -104,7 +104,7 @@ export const makeApi = async (): Promise<API> => {
           (version.latestEthereumBlockNumber /
             version.totalEthereumBlocksCount) *
           100
-        ).toFixed(2);
+        ).toFixed(6);
 
         console.log();
         console.log(

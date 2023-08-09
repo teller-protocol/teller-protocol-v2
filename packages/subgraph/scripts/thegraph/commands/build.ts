@@ -1,10 +1,11 @@
 import { runCmd } from "../../utils/runCmd";
+import { API } from "../api";
 import { getConfig, setConfig } from "../utils/config";
 import { getNetworkFromName } from "../utils/getNetworkFromName";
 
-import { getIpfsArgsFromNetwork } from "./args";
-
-export interface BuildOpts {
+export interface BuildArgs {
+  name: string;
+  api: API;
   grafting?: {
     base: string;
     block: number;
@@ -13,10 +14,14 @@ export interface BuildOpts {
     block: number;
   };
 }
-export const build = async (
-  name: string,
-  opts: BuildOpts = {}
-): Promise<string | undefined> => {
+export const build = async (args: BuildArgs): Promise<string | undefined> => {
+  const {
+    name,
+    api,
+    grafting,
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    block_handler
+  } = args;
   const network = getNetworkFromName(name);
 
   console.log("Building subgraph:", name);
@@ -24,11 +29,11 @@ export const build = async (
 
   const config = await getConfig(network);
 
-  if (opts.grafting !== undefined) {
+  if (grafting !== undefined) {
     config.grafting = {
       enabled: true,
-      base: opts.grafting.base,
-      block: opts.grafting.block
+      base: grafting.base,
+      block: grafting.block
     };
   } else {
     config.grafting = {
@@ -37,10 +42,10 @@ export const build = async (
   }
   console.log("Grafting:", JSON.stringify(config.grafting, null, 2));
 
-  if (opts.block_handler !== undefined) {
+  if (block_handler !== undefined) {
     config.block_handler = {
       enabled: true,
-      block: opts.block_handler.block
+      block: block_handler.block
     };
   } else {
     config.block_handler = {
@@ -77,17 +82,13 @@ export const build = async (
   await runCmd("yarn", ["graph", "codegen"], { disableEcho: true });
   return await new Promise<string | undefined>((resolve, reject) => {
     let buildId: string | undefined;
-    void runCmd(
-      "yarn",
-      ["graph", "build", ...getIpfsArgsFromNetwork(network)],
-      {
-        disableEcho: true,
-        onData: data => {
-          const regex = /Build completed: (\w+)/;
-          if (regex.test(data)) buildId = regex.exec(data)![1];
-        }
+    void runCmd("yarn", ["graph", "build", ...api.args.ipfs(name)], {
+      disableEcho: true,
+      onData: data => {
+        const regex = /Build completed: (\w+)/;
+        if (regex.test(data)) buildId = regex.exec(data)![1];
       }
-    ).then(() => {
+    }).then(() => {
       if (buildId != null) {
         console.log("Build ID:", buildId);
       }

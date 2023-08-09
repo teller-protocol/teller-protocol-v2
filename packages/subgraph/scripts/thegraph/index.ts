@@ -5,7 +5,7 @@ import semver from "semver/preload";
 import { getNextVersion, getPackageVersion } from "../utils/version";
 
 import { API, makeApi } from "./api";
-import { build, BuildOpts, deploy } from "./commands";
+import { build, BuildArgs, deploy } from "./commands";
 import {
   GraftingType,
   isGraftingType,
@@ -17,9 +17,7 @@ const mutex = new Mutex();
 
 export const run = async (): Promise<void> => {
   const api = await makeApi();
-  const subgraphs: string[] | undefined = await api.getSubgraphs();
-  let releaseType: ReleaseType | undefined;
-  let graftingType: GraftingType | undefined;
+  let subgraphs: string[] = await api.getSubgraphs();
 
   const packageVersion = getPackageVersion();
   const answers = await prompts([
@@ -74,11 +72,14 @@ export const run = async (): Promise<void> => {
           ),
           value: name
         })
-      )
+      ),
+      min: 1
     }
   ]);
-  if (answers.releaseType === "missing") {
-    releaseType = "missing";
+  subgraphs = answers.subgraphs;
+  const releaseType = answers.releaseType;
+  let graftingType = answers.graftingType;
+  if (releaseType === "missing") {
     graftingType = "none";
   }
 
@@ -147,7 +148,10 @@ const buildAndDeploy = async ({
   // }
   const nextVersion = getNextVersion(releaseType);
 
-  const opts: BuildOpts = {};
+  const args: BuildArgs = {
+    name,
+    api
+  };
   if (graftingType === "latest") {
     if (latestVersion == null) {
       throw new Error(`Subgraph ${name} has no latest version`);
@@ -156,19 +160,19 @@ const buildAndDeploy = async ({
       Object.assign(latestVersion, update);
     }
 
-    opts.grafting = {
+    args.grafting = {
       base: latestVersion.deploymentId,
       block: latestVersion.latestEthereumBlockNumber
     };
-    opts.block_handler = {
+    args.block_handler = {
       block: latestVersion.latestEthereumBlockNumber
     };
   }
 
   await mutex
     .runExclusive(async () => {
-      const buildId = await build(name, opts);
-      await deploy(name, nextVersion);
+      const buildId = await build(args);
+      await deploy({ name, api, newVersion: nextVersion });
     })
     .then(() => {
       if (graftingType === "none") {

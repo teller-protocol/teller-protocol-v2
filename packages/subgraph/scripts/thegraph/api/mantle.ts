@@ -1,50 +1,62 @@
 import * as path from "path";
 
-import axios from "axios";
+import axios, { Axios } from "axios";
 import { makeNodeDisklet } from "disklet";
 import { makeMemlet } from "memlet";
 
 import { getNetworkFromName } from "../utils/getNetworkFromName";
 
-import { API, SubgraphVersion, VersionUpdate } from "./index";
+import { InnerAPI, SubgraphVersion, VersionUpdate } from "./index";
+
+const disklet = makeNodeDisklet(path.join(__dirname, "./config"));
+const memlet = makeMemlet(disklet);
+
+interface IConfig {
+  Cookie?: {
+    value: string;
+    expiration: string;
+  };
+}
+const getConfig = async (): Promise<IConfig> => {
+  return await memlet.getJson("aws.json").catch(() => ({}));
+};
+
+const setConfig = async (_config: IConfig): Promise<void> => {
+  await memlet.setJson("aws.json", _config);
+};
 
 enum Version {
   pending,
   current
 }
 
-export const makeMantle = async (): Promise<API> => {
-  const disklet = makeNodeDisklet(path.join(__dirname, "./config"));
-  const memlet = makeMemlet(disklet);
+const getDomain = (name: string): string => {
+  const subdomain = name.endsWith("-testnet") ? "testnet." : "";
+  return `${subdomain}mantle.xyz`;
+};
 
-  interface IConfig {
-    Cookie?: {
-      value: string;
-      expiration: string;
-    };
+const _apis = new Map<string, Axios>([
+  [
+    "tellerv2-mantle-testnet",
+    axios.create({
+      baseURL: "https://graph.testnet.mantle.xyz/graphql",
+      withCredentials: true
+    })
+  ]
+]);
+const getApi = (name: string): Axios => {
+  const api = _apis.get(name);
+  if (!api) {
+    throw new Error(`No API for subgraph ${name}`);
   }
-  const getConfig = async (): Promise<IConfig> => {
-    return await memlet.getJson("aws.json").catch(() => ({}));
-  };
-  let config = await getConfig();
+  return api;
+};
 
-  const setConfig = async (_config: IConfig): Promise<void> => {
-    config = _config;
-    await memlet.setJson("aws.json", _config);
-  };
-
-  const api = axios.create({
-    baseURL: "https://graph.testnet.mantle.xyz/graphql",
-    withCredentials: true
-  });
-
-  // const socket = await websocket.create(
-  //   "wss://ws.subgraph.teller.org/graphql",
-  //   "aws"
-  // );
+export const makeMantle = async (): Promise<InnerAPI> => {
+  const config = await getConfig();
 
   const getSubgraphs = async (): Promise<string[]> => {
-    return ["tellerv2-mantle-testnet"];
+    return Array.from(_apis.keys());
   };
 
   interface ISubgraphIndexingStatus {
@@ -99,7 +111,7 @@ export const makeMantle = async (): Promise<API> => {
     name: string,
     versionId: Version
   ): Promise<SubgraphVersion | undefined> => {
-    const response = await api.post<{
+    const response = await getApi(name).post<{
       data: { version: ISubgraphIndexingStatus };
     }>("", {
       variables: {
@@ -186,28 +198,20 @@ export const makeMantle = async (): Promise<API> => {
     }, 5000);
   };
 
-  const waitForVersionSync = (
-    name: string,
-    versionId: Version
-  ): Promise<VersionUpdate> => {
-    return new Promise((resolve, reject) => {
-      watchVersionUpdate(name, versionId, (version, unsubscribe) => {
-        console.log("version update:", JSON.stringify(version, null, 2));
-        if (version.failed) {
-          unsubscribe();
-          reject(`Version "${versionId} failed`);
-        } else if (version.synced) {
-          unsubscribe();
-          resolve(version);
-        }
-      });
-    });
-  };
-
   return {
     getSubgraphs,
     getLatestVersion,
     watchVersionUpdate,
-    waitForVersionSync
+    args: {
+      ipfs(name: string) {
+        return ["--ipfs", `https://ipfs.${getDomain(name)}`];
+      },
+      node(name: string) {
+        return ["--node", `https://graph.${getDomain(name)}/deploy`];
+      },
+      product(name: string) {
+        return [];
+      }
+    }
   };
 };

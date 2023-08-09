@@ -8,9 +8,9 @@ import { makeMemlet } from "memlet";
 
 import * as websocket from "../ws";
 
-import { API, SubgraphVersion, VersionUpdate } from "./index";
+import { InnerAPI, SubgraphVersion, VersionUpdate } from "./index";
 
-export const makeStudio = async (): Promise<API> => {
+export const makeStudio = async (): Promise<InnerAPI> => {
   const disklet = makeNodeDisklet(path.join(__dirname, "./config"));
   const memlet = makeMemlet(disklet);
 
@@ -32,7 +32,33 @@ export const makeStudio = async (): Promise<API> => {
 
   const api = axios.create({
     baseURL: "https://api.studio.thegraph.com/graphql",
-    withCredentials: true
+    withCredentials: true,
+    transformResponse: (dataStr: string) => {
+      const data: {
+        errors?: Array<{
+          message: string;
+          locations: Array<{ line: number; column: number }>;
+          path: string[];
+          extensions: { code: string };
+        }>;
+        data?: any;
+      } = JSON.parse(dataStr);
+      if (data.errors) {
+        const messages = data.errors.map(e => {
+          if (e.extensions.code === "UNAUTHENTICATED") {
+            config.Cookie = undefined;
+            void setConfig(config);
+          }
+          return `\t* ${e.message}`;
+        });
+        console.error(`Studio API errors:\n${messages}`);
+        // throw new AggregateError(
+        //   data.errors,
+        //   `Studio API errors:\n${messages}`
+        // );
+      }
+      return data;
+    }
   });
 
   const socket = await websocket.create(
@@ -47,14 +73,14 @@ export const makeStudio = async (): Promise<API> => {
       operationName: "currentUser",
       variables: {},
       query:
-        "fragment AuthUserFragment on User {\n  ethAddress\n  emailAddress\n  deployKey\n  firstLogin\n  isSubsidizedQueriesEligible\n  subsidizedQueriesRemaining\n  queryStatus\n  totalUnpaidInvoiceAmount\n  subgraphsCount\n  ongoingInvoice {\n    totalQueryFees\n    billingPeriodStartsAt\n    billingPeriodEndsAt\n    __typename\n  }\n  __typename\n}\n\nquery currentUser {\n  currentUser {\n    ...AuthUserFragment\n    __typename\n  }\n}"
+        "fragment AuthUserFragment on User {\n  ethAddress\n  emailAddress\n  deployKey\n  firstLogin\n  isSubsidizedQueriesEligible\n  subsidizedQueriesRemaining\n  queryStatus\n  totalUnpaidInvoiceAmount\n  subgraphsCount\n  ongoingInvoice {\n    totalQueryFees\n    billingPeriodStartsAt\n    billingPeriodEndsAt\n }\n}\n\nquery currentUser {\n  currentUser {\n    ...AuthUserFragment\n}\n}"
     });
     return res.data.data.currentUser;
   };
 
-  const login = async (): Promise<void> => {
+  const login = async (reauth = false): Promise<void> => {
     let cookie: string | null = null;
-    if (config.Cookie) {
+    if (!reauth && config.Cookie) {
       if (new Date(config.Cookie.expiration).getTime() > Date.now()) {
         cookie = config.Cookie.value;
       } else {
@@ -71,11 +97,10 @@ export const makeStudio = async (): Promise<API> => {
       const path = "44'/60'/0'/0/0";
       const { address } = await eth.getAddress(path);
 
-      const message = `Sign this message to prove you have access to this wallet in order to sign in to thegraph.com/studio.
-
-  This won't cost you any Ether.
-
-  Timestamp: ${Date.now()}`;
+      const message =
+        "Sign this message to prove you have access to this wallet in order to sign in to thegraph.com/studio.\n\n" +
+        "This won't cost you any Ether.\n\n" +
+        `Timestamp: ${Date.now()}`;
 
       const sig = await eth.signPersonalMessage(
         path,
@@ -141,7 +166,7 @@ export const makeStudio = async (): Promise<API> => {
       operationName: "AuthUserSubgraphs",
       variables: {},
       query:
-        "query AuthUserSubgraphs {\n  authUserSubgraphs {\n    name\n    createdAt\n    versions {\n      label\n indexedNetworkChainUID\n      publishStatus\n      __typename\n    }\n    publishedSubgraphs {\n      networkChainUID\n      __typename\n    }\n    lastVersionCreatedAt\n    __typename\n  }\n}"
+        "query AuthUserSubgraphs {\n  authUserSubgraphs {\n    name\n    createdAt\n    versions {\n      label\n indexedNetworkChainUID\n      publishStatus\n }\n    publishedSubgraphs {\n      networkChainUID\n }\n    lastVersionCreatedAt\n }\n}"
     });
     const subgraphs = res.data?.data?.authUserSubgraphs ?? [];
     return subgraphs.map(subgraph => subgraph.name);
@@ -226,7 +251,7 @@ export const makeStudio = async (): Promise<API> => {
           },
           operationName: "OnVersionUpdate",
           query:
-            "subscription OnVersionUpdate($versionId: Int!) {\n  subgraphVersion(id: $versionId) {\n    latestEthereumBlockNumber\n    totalEthereumBlocksCount\n    synced\n    failed\n    __typename\n  }\n}"
+            "subscription OnVersionUpdate($versionId: Int!) {\n  subgraphVersion(id: $versionId) {\n    latestEthereumBlockNumber\n    totalEthereumBlocksCount\n    synced\n    failed\n}\n}"
         }
       },
       cleaner: (raw: any) => {
@@ -235,28 +260,20 @@ export const makeStudio = async (): Promise<API> => {
     });
   };
 
-  const waitForVersionSync = (
-    name: string,
-    versionId: number
-  ): Promise<VersionUpdate> => {
-    return new Promise((resolve, reject) => {
-      watchVersionUpdate(name, versionId, (version, unsubscribe) => {
-        console.log("version update:", JSON.stringify(version, null, 2));
-        if (version.failed) {
-          unsubscribe();
-          reject(`Version "${versionId} failed`);
-        } else if (version.synced) {
-          unsubscribe();
-          resolve(version);
-        }
-      });
-    });
-  };
-
   return {
     getSubgraphs,
     getLatestVersion,
     watchVersionUpdate,
-    waitForVersionSync
+    args: {
+      ipfs(name: string) {
+        return ["--ipfs", "https://api.thegraph.com/ipfs/api/v0"];
+      },
+      node(name: string) {
+        return [];
+      },
+      product(name: string) {
+        return ["--product", "subgraph-studio"];
+      }
+    }
   };
 };

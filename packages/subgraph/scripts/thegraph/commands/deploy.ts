@@ -1,38 +1,37 @@
 import { runCmd } from "../../utils/runCmd";
 import { updatePackageVersion } from "../../utils/version";
-import { getNetworkFromName } from "../utils/getNetworkFromName";
+import { API } from "../api";
 
-import {
-  getIpfsArgsFromNetwork,
-  getNodeArgsFromNetwork,
-  getProductArgsFromNetwork
-} from "./args";
 import { create } from "./create";
 
-export const deploy = async (
-  name: string,
-  newVersion = "0.0.1"
-): Promise<void> => {
-  const network = getNetworkFromName(name);
+interface DeployArgs {
+  name: string;
+  api: API;
+  newVersion?: string;
+}
+export const deploy = async (args: DeployArgs): Promise<void> => {
+  const { name, api, newVersion } = args;
 
-  await create(name);
+  await create({ name, api });
 
   const versionLabel = `v${newVersion}`;
 
   console.log("Deploying subgraph:", name);
   console.log("Version label:", versionLabel);
 
-  const args: string[] = [
-    "graph",
-    "deploy",
-    "--version-label",
-    versionLabel,
-    ...getNodeArgsFromNetwork(network),
-    ...getIpfsArgsFromNetwork(network),
-    ...getProductArgsFromNetwork(network),
-    name
-  ];
-
-  await runCmd("yarn", args, { disableEcho: true });
+  await runCmd(
+    "yarn",
+    [
+      "graph",
+      "deploy",
+      "--version-label",
+      versionLabel,
+      ...api.args.node(name),
+      ...api.args.ipfs(name),
+      ...api.args.product(name),
+      name
+    ],
+    { disableEcho: true }
+  );
   await updatePackageVersion(versionLabel);
 };

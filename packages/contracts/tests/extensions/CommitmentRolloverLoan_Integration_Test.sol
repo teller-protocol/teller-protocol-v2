@@ -60,14 +60,7 @@ contract CommitmentRolloverLoan_Integration_Test is Testable {
         marketRegistry = IMarketRegistry(tellerV2.marketRegistry());
 
         lenderCommitmentForwarder = ILenderCommitmentForwarder(tellerV2.lenderCommitmentForwarder());
-        
-        console.logAddress(address(borrower));
-        console.logAddress(address(lender));
-        console.logAddress(address(marketOwner));
-        console.logAddress(address(tellerV2));
-        console.logAddress(address(lenderCommitmentForwarder));
-
-
+      
 
         wethMock = new WethMock();
 
@@ -324,9 +317,16 @@ contract CommitmentRolloverLoan_Integration_Test is Testable {
         ITellerV2Context(address(tellerV2)).approveMarketForwarder(marketId, address(lenderCommitmentForwarder));
         }
 
+         //lender approves weth to the rollover contract 
+       
+
         uint256 rolloverAmount = 0;
         vm.prank(address(borrower));
         wethMock.approve(address(commitmentRolloverLoan), rolloverAmount);
+
+        //lender must approve their balance to tellerv2 as usual 
+        vm.prank(address(lender));
+        wethMock.approve(address(tellerV2), commitmentPrincipalAmount);
 
 
         uint256 borrowerBalanceBeforeRollover = wethMock.balanceOf(

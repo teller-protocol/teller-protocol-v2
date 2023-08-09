@@ -61,7 +61,14 @@ contract CommitmentRolloverLoan_Integration_Test is Testable {
 
         lenderCommitmentForwarder = ILenderCommitmentForwarder(tellerV2.lenderCommitmentForwarder());
         
-        
+        console.logAddress(address(borrower));
+        console.logAddress(address(lender));
+        console.logAddress(address(marketOwner));
+        console.logAddress(address(tellerV2));
+        console.logAddress(address(lenderCommitmentForwarder));
+
+
+
         wethMock = new WethMock();
 
         uint32 _paymentCycleDuration = uint32( 1 days );
@@ -308,10 +315,12 @@ contract CommitmentRolloverLoan_Integration_Test is Testable {
         ITellerV2Context(address(tellerV2)).setTrustedMarketForwarder(marketId, address(lenderCommitmentForwarder));
 
 
-        //borrower approves the commitmentrolloverloan as a sender for market 1 
-       //  vm.prank(address(borrower));
-       // ITellerV2Context(address(tellerV2)).approveMarketForwarder(marketId, address(commitmentRolloverLoan));
-          vm.prank(address(borrower));
+        //borrower AND lender  approves the lenderCommitmentForwarder as trusted
+       
+          vm.prank(address(lender));
+        ITellerV2Context(address(tellerV2)).approveMarketForwarder(marketId, address(lenderCommitmentForwarder));
+
+        vm.prank(address(borrower));
         ITellerV2Context(address(tellerV2)).approveMarketForwarder(marketId, address(lenderCommitmentForwarder));
         }
 

@@ -40,11 +40,10 @@ interface ILenderCommitmentForwarder {
         address principalTokenAddress;
     }
 
-
-    function createCommitment( 
-          Commitment calldata _commitment,
+    function createCommitment(
+        Commitment calldata _commitment,
         address[] calldata _borrowerAddressList
-         )   external returns (uint256);
+    ) external returns (uint256);
 
     function acceptCommitmentWithRecipient(
         uint256 _commitmentId,

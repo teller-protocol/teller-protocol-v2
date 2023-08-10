@@ -37,14 +37,11 @@ contract LenderCommitmentForwarderMock is
 
     constructor() {}
 
-
-    function createCommitment( 
-          Commitment calldata _commitment,
+    function createCommitment(
+        Commitment calldata _commitment,
         address[] calldata _borrowerAddressList
-         )   external returns (uint256) {
+    ) external returns (uint256) {}
 
-         }
-         
     function setCommitment(uint256 _commitmentId, Commitment memory _commitment)
         public
     {

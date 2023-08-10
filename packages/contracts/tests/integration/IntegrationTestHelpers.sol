@@ -38,7 +38,7 @@ library IntegrationTestHelpers {
         uint16 _protocolFee = 100;
         address _marketRegistry = deployMarketRegistry();
         ReputationManager _reputationManager = new ReputationManager();
-       /* LenderCommitmentForwarder _lenderCommitmentForwarder = new LenderCommitmentForwarder(
+        /* LenderCommitmentForwarder _lenderCommitmentForwarder = new LenderCommitmentForwarder(
                 address(tellerV2),
                 address(_marketRegistry)
             );*/

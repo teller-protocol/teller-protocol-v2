@@ -8,7 +8,6 @@ import "@openzeppelin/contracts/utils/math/Math.sol";
 import { Bid } from "../TellerV2Storage.sol";
 import { BokkyPooBahsDateTimeLibrary as BPBDTL } from "./DateTimeLib.sol";
 
-
 enum PaymentType {
     EMI,
     Bullet

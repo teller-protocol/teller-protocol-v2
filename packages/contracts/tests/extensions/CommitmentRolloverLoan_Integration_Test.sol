@@ -16,10 +16,9 @@ import { TellerV2SolMock } from "../../contracts/mock/TellerV2SolMock.sol";
 import { LenderCommitmentForwarderMock } from "../../contracts/mock/LenderCommitmentForwarderMock.sol";
 import { MarketRegistryMock } from "../../contracts/mock/MarketRegistryMock.sol";
 
-import {LenderCommitmentForwarderWithExtensions} from "../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarderWithExtensions.sol";
+import { LenderCommitmentForwarderWithExtensions } from "../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarderWithExtensions.sol";
 
-
-import { PaymentType,PaymentCycleType } from "../../contracts/libraries/V2Calculations.sol";
+import { PaymentType, PaymentCycleType } from "../../contracts/libraries/V2Calculations.sol";
 
 import "lib/forge-std/src/console.sol";
 
@@ -59,13 +58,14 @@ contract CommitmentRolloverLoan_Integration_Test is Testable {
 
         marketRegistry = IMarketRegistry(tellerV2.marketRegistry());
 
-        lenderCommitmentForwarder = ILenderCommitmentForwarder(tellerV2.lenderCommitmentForwarder());
-      
+        lenderCommitmentForwarder = ILenderCommitmentForwarder(
+            tellerV2.lenderCommitmentForwarder()
+        );
 
         wethMock = new WethMock();
 
-        uint32 _paymentCycleDuration = uint32( 1 days );
-        uint32 _paymentDefaultDuration = uint32( 5 days );
+        uint32 _paymentCycleDuration = uint32(1 days);
+        uint32 _paymentDefaultDuration = uint32(5 days);
         uint32 _bidExpirationTime = uint32(7 days);
         uint16 _feePercent = 900;
         PaymentType _paymentType = PaymentType.EMI;
@@ -73,7 +73,6 @@ contract CommitmentRolloverLoan_Integration_Test is Testable {
 
         vm.prank(address(marketOwner));
         uint256 marketId = marketRegistry.createMarket(
-
             address(marketOwner),
             _paymentCycleDuration,
             _paymentDefaultDuration,
@@ -103,13 +102,14 @@ contract CommitmentRolloverLoan_Integration_Test is Testable {
             address(lenderCommitmentForwarder)
         );
 
-        //change this to a nicer interface? 
-        LenderCommitmentForwarderWithExtensions(address(lenderCommitmentForwarder)).initializeExtensions(address(this));
-        LenderCommitmentForwarderWithExtensions(address(lenderCommitmentForwarder)).addExtension(address(commitmentRolloverLoan));
-        
- 
-    } 
-
+        //change this to a nicer interface?
+        LenderCommitmentForwarderWithExtensions(
+            address(lenderCommitmentForwarder)
+        ).initializeExtensions(address(this));
+        LenderCommitmentForwarderWithExtensions(
+            address(lenderCommitmentForwarder)
+        ).addExtension(address(commitmentRolloverLoan));
+    }
 
     /*
     scenario A - user needs to pay 0.1weth + 1 weth to the lender. they will get 0.5weth - 0.05 weth = 0.45 weth from the rollover to paybackthe user.  rest 0.65 needs to be paid back by the borrower.abi
@@ -121,9 +121,6 @@ contract CommitmentRolloverLoan_Integration_Test is Testable {
 
 
   */
-
-  /*
-
     function test_rolloverLoan_financial_scenario_A() public {
         address lendingToken = address(wethMock);
 
@@ -131,7 +128,9 @@ contract CommitmentRolloverLoan_Integration_Test is Testable {
         uint256 marketId = 1;
         uint256 principalAmount = 1e18;
         uint32 duration = 365 days;
-        uint16 interestRate = 100;
+        uint16 interestRate = 1000;
+
+        wethMock.transfer(address(commitmentRolloverLoan), 100);
 
         vm.prank(address(borrower));
         uint256 loanId = tellerV2.submitBid(
@@ -154,9 +153,9 @@ contract CommitmentRolloverLoan_Integration_Test is Testable {
             uint256 amountToBorrower
         ) = tellerV2.lenderAcceptBid(loanId);
 
-        vm.warp(365 days);
+        vm.warp(365 days + 1);
 
-        uint256 commitmentPrincipalAmount = 2 * 1e18; //2 weth
+        uint256 commitmentPrincipalAmount = 50 * 1e16; //0.50 weth
 
         ILenderCommitmentForwarder.Commitment
             memory commitment = ILenderCommitmentForwarder.Commitment({
@@ -175,15 +174,16 @@ contract CommitmentRolloverLoan_Integration_Test is Testable {
                 principalTokenAddress: lendingToken
             });
 
-     
-         address[] memory _borrowerAddressList;
+        address[] memory _borrowerAddressList;
 
-         vm.prank(address(lender));
-        uint256 commitmentId = lenderCommitmentForwarder.createCommitment(commitment, _borrowerAddressList);
+        vm.prank(address(lender));
+        uint256 commitmentId = lenderCommitmentForwarder.createCommitment(
+            commitment,
+            _borrowerAddressList
+        );
 
+        //should get 0.45  weth   from accepting this commitment  during the rollover process
 
-        //should get 0.5 weth (0.45 after fees) from accepting this commitment  during the rollover process
-      
         ICommitmentRolloverLoan.AcceptCommitmentArgs
             memory commitmentArgs = ICommitmentRolloverLoan
                 .AcceptCommitmentArgs({
@@ -196,17 +196,45 @@ contract CommitmentRolloverLoan_Integration_Test is Testable {
                     loanDuration: duration
                 });
 
+        {
+            // vm.prank(address(marketOwner));
+            //  ITellerV2Context(address(tellerV2)).setTrustedMarketForwarder(marketId, address(commitmentRolloverLoan));
+            vm.prank(address(marketOwner));
+            ITellerV2Context(address(tellerV2)).setTrustedMarketForwarder(
+                marketId,
+                address(lenderCommitmentForwarder)
+            );
+
+            //borrower AND lender  approves the lenderCommitmentForwarder as trusted
+
+            vm.prank(address(lender));
+            ITellerV2Context(address(tellerV2)).approveMarketForwarder(
+                marketId,
+                address(lenderCommitmentForwarder)
+            );
+
+            vm.prank(address(borrower));
+            ITellerV2Context(address(tellerV2)).approveMarketForwarder(
+                marketId,
+                address(lenderCommitmentForwarder)
+            );
+        }
+
+        //lender approves weth to the rollover contract
+
         uint256 rolloverAmount = 65 * 1e16; //0.65 weth
+        vm.prank(address(borrower));
+        wethMock.approve(address(commitmentRolloverLoan), rolloverAmount);
+
+        //lender must approve their balance to tellerv2 as usual
+        vm.prank(address(lender));
+        wethMock.approve(address(tellerV2), commitmentPrincipalAmount);
 
         uint256 borrowerBalanceBeforeRollover = wethMock.balanceOf(
             address(borrower)
         );
 
         vm.prank(address(borrower));
-        wethMock.approve(address(commitmentRolloverLoan), rolloverAmount);
-
-        vm.prank(address(borrower));
-
         // need to pay 0.65 weth as the borrower !
         uint256 _newLoanId = commitmentRolloverLoan.rolloverLoan(
             loanId,
@@ -214,17 +242,150 @@ contract CommitmentRolloverLoan_Integration_Test is Testable {
             commitmentArgs
         );
 
+        //neeed the roolover to really move tokens around !
         uint256 borrowerBalanceAfterRollover = wethMock.balanceOf(
             address(borrower)
         );
 
         assertEq(
-            borrowerBalanceAfterRollover - borrowerBalanceBeforeRollover,
+            borrowerBalanceBeforeRollover - borrowerBalanceAfterRollover,
             65 * 1e16,
             "incorrect balance after rollover"
         );
     }
-    */
+
+    function test_rolloverLoan_financial_scenario_B() public {
+        address lendingToken = address(wethMock);
+
+        //initial loan - need to pay back 1 weth + 0.1 weth (interest) to the lender
+        uint256 marketId = 1;
+        uint256 principalAmount = 1e18;
+        uint32 duration = 365 days;
+        uint16 interestRate = 1000;
+
+        wethMock.transfer(address(commitmentRolloverLoan), 100);
+
+        vm.prank(address(borrower));
+        uint256 loanId = tellerV2.submitBid(
+            lendingToken,
+            marketId,
+            principalAmount,
+            duration,
+            interestRate,
+            "",
+            address(borrower)
+        );
+
+        vm.prank(address(lender));
+        wethMock.approve(address(tellerV2), 1e18);
+
+        vm.prank(address(lender));
+        (
+            uint256 amountToProtocol,
+            uint256 amountToMarketplace,
+            uint256 amountToBorrower
+        ) = tellerV2.lenderAcceptBid(loanId);
+
+        vm.warp(365 days + 1);
+
+        uint256 commitmentPrincipalAmount = 120 * 1e16; //1.2 weth
+
+        ILenderCommitmentForwarder.Commitment
+            memory commitment = ILenderCommitmentForwarder.Commitment({
+                maxPrincipal: commitmentPrincipalAmount,
+                expiration: uint32(block.timestamp + 1 days),
+                maxDuration: duration,
+                minInterestRate: interestRate,
+                collateralTokenAddress: address(0),
+                collateralTokenId: 0,
+                maxPrincipalPerCollateralAmount: 0,
+                collateralTokenType: ILenderCommitmentForwarder
+                    .CommitmentCollateralType
+                    .NONE,
+                lender: address(lender),
+                marketId: marketId,
+                principalTokenAddress: lendingToken
+            });
+
+        address[] memory _borrowerAddressList;
+
+        vm.prank(address(lender));
+        uint256 commitmentId = lenderCommitmentForwarder.createCommitment(
+            commitment,
+            _borrowerAddressList
+        );
+
+        //should get 0.45  weth   from accepting this commitment  during the rollover process
+
+        ICommitmentRolloverLoan.AcceptCommitmentArgs
+            memory commitmentArgs = ICommitmentRolloverLoan
+                .AcceptCommitmentArgs({
+                    commitmentId: commitmentId,
+                    principalAmount: commitmentPrincipalAmount,
+                    collateralAmount: 0,
+                    collateralTokenId: 0,
+                    collateralTokenAddress: address(0),
+                    interestRate: interestRate,
+                    loanDuration: duration
+                });
+
+        {
+            // vm.prank(address(marketOwner));
+            //  ITellerV2Context(address(tellerV2)).setTrustedMarketForwarder(marketId, address(commitmentRolloverLoan));
+            vm.prank(address(marketOwner));
+            ITellerV2Context(address(tellerV2)).setTrustedMarketForwarder(
+                marketId,
+                address(lenderCommitmentForwarder)
+            );
+
+            //borrower AND lender  approves the lenderCommitmentForwarder as trusted
+
+            vm.prank(address(lender));
+            ITellerV2Context(address(tellerV2)).approveMarketForwarder(
+                marketId,
+                address(lenderCommitmentForwarder)
+            );
+
+            vm.prank(address(borrower));
+            ITellerV2Context(address(tellerV2)).approveMarketForwarder(
+                marketId,
+                address(lenderCommitmentForwarder)
+            );
+        }
+
+        //lender approves weth to the rollover contract
+
+        uint256 rolloverAmount = 2 * 1e16; //0.02 weth
+        vm.prank(address(borrower));
+        wethMock.approve(address(commitmentRolloverLoan), rolloverAmount);
+
+        //lender must approve their balance to tellerv2 as usual
+        vm.prank(address(lender));
+        wethMock.approve(address(tellerV2), commitmentPrincipalAmount);
+
+        uint256 borrowerBalanceBeforeRollover = wethMock.balanceOf(
+            address(borrower)
+        );
+
+        vm.prank(address(borrower));
+        // need to pay 0.65 weth as the borrower !
+        uint256 _newLoanId = commitmentRolloverLoan.rolloverLoan(
+            loanId,
+            rolloverAmount,
+            commitmentArgs
+        );
+
+        //neeed the roolover to really move tokens around !
+        uint256 borrowerBalanceAfterRollover = wethMock.balanceOf(
+            address(borrower)
+        );
+
+        assertEq(
+            borrowerBalanceBeforeRollover - borrowerBalanceAfterRollover,
+            2 * 1e16,
+            "incorrect balance after rollover"
+        );
+    }
 
     function test_rolloverLoan_financial_scenario_C() public {
         address lendingToken = address(wethMock);
@@ -260,7 +421,7 @@ contract CommitmentRolloverLoan_Integration_Test is Testable {
 
         vm.warp(365 days + 1);
 
-         uint256 commitmentPrincipalAmount = 2 * 1e18; //2 weth
+        uint256 commitmentPrincipalAmount = 2 * 1e18; //2 weth
 
         ILenderCommitmentForwarder.Commitment
             memory commitment = ILenderCommitmentForwarder.Commitment({
@@ -278,14 +439,17 @@ contract CommitmentRolloverLoan_Integration_Test is Testable {
                 marketId: marketId,
                 principalTokenAddress: lendingToken
             });
-        
+
         address[] memory _borrowerAddressList;
 
-         vm.prank(address(lender));
-        uint256 commitmentId = lenderCommitmentForwarder.createCommitment(commitment, _borrowerAddressList);
+        vm.prank(address(lender));
+        uint256 commitmentId = lenderCommitmentForwarder.createCommitment(
+            commitment,
+            _borrowerAddressList
+        );
 
         //should get 2.0 weth   from accepting this commitment  during the rollover process
-       
+
         ICommitmentRolloverLoan.AcceptCommitmentArgs
             memory commitmentArgs = ICommitmentRolloverLoan
                 .AcceptCommitmentArgs({
@@ -298,36 +462,39 @@ contract CommitmentRolloverLoan_Integration_Test is Testable {
                     loanDuration: duration
                 });
 
-     
-
         {
-      
-       // vm.prank(address(marketOwner));
-       //  ITellerV2Context(address(tellerV2)).setTrustedMarketForwarder(marketId, address(commitmentRolloverLoan));
-        vm.prank(address(marketOwner));
-        ITellerV2Context(address(tellerV2)).setTrustedMarketForwarder(marketId, address(lenderCommitmentForwarder));
+            // vm.prank(address(marketOwner));
+            //  ITellerV2Context(address(tellerV2)).setTrustedMarketForwarder(marketId, address(commitmentRolloverLoan));
+            vm.prank(address(marketOwner));
+            ITellerV2Context(address(tellerV2)).setTrustedMarketForwarder(
+                marketId,
+                address(lenderCommitmentForwarder)
+            );
 
+            //borrower AND lender  approves the lenderCommitmentForwarder as trusted
 
-        //borrower AND lender  approves the lenderCommitmentForwarder as trusted
-       
-          vm.prank(address(lender));
-        ITellerV2Context(address(tellerV2)).approveMarketForwarder(marketId, address(lenderCommitmentForwarder));
+            vm.prank(address(lender));
+            ITellerV2Context(address(tellerV2)).approveMarketForwarder(
+                marketId,
+                address(lenderCommitmentForwarder)
+            );
 
-        vm.prank(address(borrower));
-        ITellerV2Context(address(tellerV2)).approveMarketForwarder(marketId, address(lenderCommitmentForwarder));
+            vm.prank(address(borrower));
+            ITellerV2Context(address(tellerV2)).approveMarketForwarder(
+                marketId,
+                address(lenderCommitmentForwarder)
+            );
         }
 
-         //lender approves weth to the rollover contract 
-       
+        //lender approves weth to the rollover contract
 
         uint256 rolloverAmount = 0;
         vm.prank(address(borrower));
         wethMock.approve(address(commitmentRolloverLoan), rolloverAmount);
 
-        //lender must approve their balance to tellerv2 as usual 
+        //lender must approve their balance to tellerv2 as usual
         vm.prank(address(lender));
         wethMock.approve(address(tellerV2), commitmentPrincipalAmount);
-
 
         uint256 borrowerBalanceBeforeRollover = wethMock.balanceOf(
             address(borrower)

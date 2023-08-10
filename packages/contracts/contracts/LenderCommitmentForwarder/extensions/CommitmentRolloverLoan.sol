@@ -41,11 +41,11 @@ contract CommitmentRolloverLoan is ICommitmentRolloverLoan {
         );
         uint256 balanceBefore = lendingToken.balanceOf(address(this));
 
-        if(rolloverAmount > 0){
+        if (rolloverAmount > 0) {
             //accept funds from the borrower to this contract
             lendingToken.transferFrom(borrower, address(this), rolloverAmount);
         }
-     
+
         // Accept commitment and receive funds to this contract
         newLoanId_ = _acceptCommitment(_commitmentArgs);
 

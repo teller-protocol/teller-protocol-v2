@@ -67,7 +67,7 @@ contract CommitmentRolloverLoan_Integration_Test is Testable {
         uint32 _paymentCycleDuration = uint32( 1 days );
         uint32 _paymentDefaultDuration = uint32( 5 days );
         uint32 _bidExpirationTime = uint32(7 days);
-        uint16 _feePercent = 100;
+        uint16 _feePercent = 900;
         PaymentType _paymentType = PaymentType.EMI;
         PaymentCycleType _paymentCycleType = PaymentCycleType.Seconds;
 
@@ -114,7 +114,7 @@ contract CommitmentRolloverLoan_Integration_Test is Testable {
     /*
     scenario A - user needs to pay 0.1weth + 1 weth to the lender. they will get 0.5weth - 0.05 weth = 0.45 weth from the rollover to paybackthe user.  rest 0.65 needs to be paid back by the borrower.abi
     Scenario B - user needs to pay 0.1weth + 1 weth back to the lender. They will get 1.2weth - 0.12weth = 1.08 weth from the rollover to pay back the user so 0.02 needs to be paid back to the borrower.abi
-    Scenario C - user needs to pay 0.1 weth + 1 weth back to the lender.  They will get 2 weth - 0.2 weth = 1.8weth so 0.6 weth is given to the borrower .  
+    Scenario C - user needs to pay 0.1 weth + 1 weth back to the lender.  They will get 2 weth - 0.2 weth = 1.8weth so 0.7 weth is given to the borrower .  
 
     assume that 10 pct fee is taken by pool plus protocol for simplicity. 
 
@@ -233,7 +233,7 @@ contract CommitmentRolloverLoan_Integration_Test is Testable {
         uint256 marketId = 1;
         uint256 principalAmount = 1e18;
         uint32 duration = 365 days;
-        uint16 interestRate = 100;
+        uint16 interestRate = 1000;
 
         wethMock.transfer(address(commitmentRolloverLoan), 100);
 
@@ -258,7 +258,7 @@ contract CommitmentRolloverLoan_Integration_Test is Testable {
             uint256 amountToBorrower
         ) = tellerV2.lenderAcceptBid(loanId);
 
-        vm.warp(365 days);
+        vm.warp(365 days + 1);
 
          uint256 commitmentPrincipalAmount = 2 * 1e18; //2 weth
 
@@ -348,7 +348,7 @@ contract CommitmentRolloverLoan_Integration_Test is Testable {
 
         assertEq(
             borrowerBalanceAfterRollover - borrowerBalanceBeforeRollover,
-            60 * 1e16,
+            70 * 1e16,
             "incorrect balance after rollover"
         );
     }

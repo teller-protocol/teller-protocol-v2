@@ -35,7 +35,7 @@ library IntegrationTestHelpers {
         address trustedForwarder = address(0);
         TellerV2 tellerV2 = new TellerV2(trustedForwarder);
 
-        uint16 _protocolFee = 10;
+        uint16 _protocolFee = 100;
         address _marketRegistry = deployMarketRegistry();
         ReputationManager _reputationManager = new ReputationManager();
        /* LenderCommitmentForwarder _lenderCommitmentForwarder = new LenderCommitmentForwarder(

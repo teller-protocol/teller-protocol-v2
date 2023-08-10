@@ -84,7 +84,7 @@ contract CommitmentRolloverLoan_Integration_Test is Testable {
             _paymentCycleType,
             "uri"
         );
- 
+
         //tellerV2.setMarketRegistry(address(marketRegistryMock));
 
         //lenderCommitmentForwarder = new LenderCommitmentForwarderMock();

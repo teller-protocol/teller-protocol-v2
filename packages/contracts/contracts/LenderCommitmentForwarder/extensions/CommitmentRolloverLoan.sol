@@ -65,6 +65,20 @@ contract CommitmentRolloverLoan is ICommitmentRolloverLoan {
         }
     }
 
+
+    /*
+        Returns a positive value if borrower needs to send funds in
+        Returns a negative amt if the borrower will get funds back bc of the rollover 
+    */
+    function calculateRolloverAmount( 
+        uint256 _loanId,        
+        AcceptCommitmentArgs calldata _commitmentArgs
+     ) returns (int256) {
+
+        
+
+     }
+
     function _acceptCommitment(AcceptCommitmentArgs calldata _commitmentArgs)
         internal
         returns (uint256 bidId_)

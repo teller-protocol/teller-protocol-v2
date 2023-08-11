@@ -2329,6 +2329,7 @@ __metadata:
     "@ledgerhq/hw-app-eth": ^6.34.0
     "@ledgerhq/hw-transport-node-hid": ^6.27.19
     "@types/node": ^20.4.5
+    "@types/prompts": ^2.4.4
     "@types/semver": ^7.5.0
     "@types/uuid": ^9.0.2
     "@typescript-eslint/eslint-plugin": ^5.5.0
@@ -2337,6 +2338,7 @@ __metadata:
     async-mutex: ^0.4.0
     axios: ^1.4.0
     cleaners: ^0.3.16
+    cli-progress: ^3.12.0
     eslint: ^7.32.0
     eslint-config-prettier: ^8.3.0
     eslint-config-standard-kit: 0.15.1
@@ -2350,6 +2352,7 @@ __metadata:
     matchstick-as: ^0.4.0
     memlet: ^0.1.7
     mustache: ^4.2.0
+    prompts: ^2.4.2
     semver: ^7.5.4
     ts-node: ^10.9.1
     typescript: ^4.9.4
@@ -2758,6 +2761,16 @@ __metadata:
   version: 2.7.1
   resolution: "@types/prettier@npm:2.7.1"
   checksum: 5e3f58e229d6c73b5f5cae2e8f96c1c4a5b5805f83459e17a045ba8e96152b1d38e86b63e3172fb159dac923388699660862b75b2d37e54220805f0e691e26f1
+  languageName: node
+  linkType: hard
+
+"@types/prompts@npm:^2.4.4":
+  version: 2.4.4
+  resolution: "@types/prompts@npm:2.4.4"
+  dependencies:
+    "@types/node": "*"
+    kleur: ^3.0.3
+  checksum: fa8d9a6f63f5e7f4a5b9bd4d40527ca4b8c8c6a63bf0864bf72ea85706a9e1b292d73c8c9a3b7423fb80a5d3e7d563d0069d6644384438c1251adbd9efc03a12
   languageName: node
   linkType: hard
 
@@ -11503,6 +11516,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"kleur@npm:^3.0.3":
+  version: 3.0.3
+  resolution: "kleur@npm:3.0.3"
+  checksum: df82cd1e172f957bae9c536286265a5cdbd5eeca487cb0a3b2a7b41ef959fc61f8e7c0e9aeea9c114ccf2c166b6a8dd45a46fd619c1c569d210ecd2765ad5169
+  languageName: node
+  linkType: hard
+
 "lcid@npm:^1.0.0":
   version: 1.0.0
   resolution: "lcid@npm:1.0.0"
@@ -14506,6 +14526,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"prompts@npm:^2.4.2":
+  version: 2.4.2
+  resolution: "prompts@npm:2.4.2"
+  dependencies:
+    kleur: ^3.0.3
+    sisteransi: ^1.0.5
+  checksum: d8fd1fe63820be2412c13bfc5d0a01909acc1f0367e32396962e737cb2fc52d004f3302475d5ce7d18a1e8a79985f93ff04ee03007d091029c3f9104bffc007d
+  languageName: node
+  linkType: hard
+
 "proper-lockfile@npm:^4.1.1":
   version: 4.1.2
   resolution: "proper-lockfile@npm:4.1.2"
@@ -16026,6 +16056,13 @@ __metadata:
     once: ^1.3.1
     simple-concat: ^1.0.0
   checksum: e4132fd27cf7af230d853fa45c1b8ce900cb430dd0a3c6d3829649fe4f2b26574c803698076c4006450efb0fad2ba8c5455fbb5755d4b0a5ec42d4f12b31d27e
+  languageName: node
+  linkType: hard
+
+"sisteransi@npm:^1.0.5":
+  version: 1.0.5
+  resolution: "sisteransi@npm:1.0.5"
+  checksum: aba6438f46d2bfcef94cf112c835ab395172c75f67453fe05c340c770d3c402363018ae1ab4172a1026a90c47eaccf3af7b6ff6fa749a680c2929bd7fa2b37a4
   languageName: node
   linkType: hard
 

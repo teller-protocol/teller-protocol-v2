@@ -104,7 +104,7 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
      * @notice Calculates the minimum payment amount due for a loan.
      * @param _bidId The id of the loan bid to get the payment amount for.
      */
-    function calculateAmountDue(uint256 _bidId)
+    function calculateAmountDue(uint256 _bidId,uint256 _timestamp)
         public
         view
         returns (Payment memory due)
@@ -114,35 +114,30 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
         (, uint256 duePrincipal, uint256 interest) = V2Calculations
             .calculateAmountOwed(
                 bids[_bidId],
-                block.timestamp,
+                _timestamp,
                 bidPaymentCycleType[_bidId]
             );
         due.principal = duePrincipal;
         due.interest = interest;
     }
 
-    /**
-     * @notice Calculates the minimum payment amount due for a loan at a specific timestamp.
-     * @param _bidId The id of the loan bid to get the payment amount for.
-     * @param _timestamp The timestamp at which to get the due payment at.
-     */
-    function calculateAmountDue(uint256 _bidId, uint256 _timestamp)
+      function calculateAmountOwed(uint256 _bidId,uint256 _timestamp)
         public
         view
         returns (Payment memory due)
     {
-        Bid storage bid = bids[_bidId];
-        if (
-            bids[_bidId].state != BidState.ACCEPTED ||
-            bid.loanDetails.acceptedTimestamp >= _timestamp
-        ) return due;
+        if (bids[_bidId].state != BidState.ACCEPTED) return due;
 
-        (, uint256 duePrincipal, uint256 interest) = V2Calculations
-            .calculateAmountOwed(bid, _timestamp, bidPaymentCycleType[_bidId]);
-        due.principal = duePrincipal;
+        (uint256 owedPrincipal, , uint256 interest) = V2Calculations
+            .calculateAmountOwed(
+                bids[_bidId],
+                _timestamp,
+                bidPaymentCycleType[_bidId]
+            );
+        due.principal = owedPrincipal;
         due.interest = interest;
     }
-
+ 
     function lenderAcceptBid(uint256 _bidId)
         public
         returns (

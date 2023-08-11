@@ -110,6 +110,97 @@ contract CommitmentRolloverLoan_Integration_Test is Testable {
         ).addExtension(address(commitmentRolloverLoan));
     }
 
+
+    function test_calculateRolloverAmount() public {
+
+         address lendingToken = address(wethMock);
+
+        //initial loan - need to pay back 1 weth + 0.1 weth (interest) to the lender
+        uint256 marketId = 1;
+        uint256 principalAmount = 1e18;
+        uint32 duration = 365 days;
+        uint16 interestRate = 1000;
+
+        wethMock.transfer(address(commitmentRolloverLoan), 100);
+
+        vm.prank(address(borrower));
+        uint256 loanId = tellerV2.submitBid(
+            lendingToken,
+            marketId,
+            principalAmount,
+            duration,
+            interestRate,
+            "",
+            address(borrower)
+        );
+
+        vm.prank(address(lender));
+        wethMock.approve(address(tellerV2), 1e18);
+
+        vm.prank(address(lender));
+        (
+            uint256 amountToProtocol,
+            uint256 amountToMarketplace,
+            uint256 amountToBorrower
+        ) = tellerV2.lenderAcceptBid(loanId);
+
+        vm.warp(365 days + 1);
+
+        uint256 commitmentPrincipalAmount = 50 * 1e16; //0.50 weth
+
+        ILenderCommitmentForwarder.Commitment
+            memory commitment = ILenderCommitmentForwarder.Commitment({
+                maxPrincipal: commitmentPrincipalAmount,
+                expiration: uint32(block.timestamp + 1 days),
+                maxDuration: duration,
+                minInterestRate: interestRate,
+                collateralTokenAddress: address(0),
+                collateralTokenId: 0,
+                maxPrincipalPerCollateralAmount: 0,
+                collateralTokenType: ILenderCommitmentForwarder
+                    .CommitmentCollateralType
+                    .NONE,
+                lender: address(lender),
+                marketId: marketId,
+                principalTokenAddress: lendingToken
+            });
+
+        address[] memory _borrowerAddressList;
+
+        vm.prank(address(lender));
+        uint256 commitmentId = lenderCommitmentForwarder.createCommitment(
+            commitment,
+            _borrowerAddressList
+        );
+
+        //should get 0.45  weth   from accepting this commitment  during the rollover process
+
+        ICommitmentRolloverLoan.AcceptCommitmentArgs
+            memory commitmentArgs = ICommitmentRolloverLoan
+                .AcceptCommitmentArgs({
+                    commitmentId: commitmentId,
+                    principalAmount: commitmentPrincipalAmount,
+                    collateralAmount: 0,
+                    collateralTokenId: 0,
+                    collateralTokenAddress: address(0),
+                    interestRate: interestRate,
+                    loanDuration: duration
+                });
+
+
+        uint256 _timestamp = block.timestamp;
+
+        int256 rolloverAmount = commitmentRolloverLoan.calculateRolloverAmount(
+            loanId, 
+            commitmentArgs,
+            _timestamp
+        );
+
+        assertEq(rolloverAmount,  65 * 1e16 , "Unexpected rollover amount");
+
+
+    }
+
     /*
     scenario A - user needs to pay 0.1weth + 1 weth to the lender. they will get 0.5weth - 0.05 weth = 0.45 weth from the rollover to paybackthe user.  rest 0.65 needs to be paid back by the borrower.abi
     Scenario B - user needs to pay 0.1weth + 1 weth back to the lender. They will get 1.2weth - 0.12weth = 1.08 weth from the rollover to pay back the user so 0.02 needs to be paid back to the borrower.abi

@@ -76,7 +76,7 @@ Gnosis safe deploy script
     function calculateRolloverAmount( 
         uint256 _loanId,        
         AcceptCommitmentArgs calldata _commitmentArgs,
-        uint32 _timestamp
+        uint256 _timestamp
      ) public view returns (int256 _amount) {
 
         //calculate how much the accept commitment will pay out less fees 

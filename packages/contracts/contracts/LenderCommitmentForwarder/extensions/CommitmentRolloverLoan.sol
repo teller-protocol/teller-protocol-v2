@@ -75,10 +75,29 @@ Gnosis safe deploy script
     */
     function calculateRolloverAmount( 
         uint256 _loanId,        
-        AcceptCommitmentArgs calldata _commitmentArgs
-     ) returns (int256) {
+        AcceptCommitmentArgs calldata _commitmentArgs,
+        uint32 _timestamp
+     ) public view returns (int256 _amount) {
 
+        //calculate how much the accept commitment will pay out less fees 
+        //calculate how much repay loan requires 
+
+        Payment memory repayAmountOwed = TELLER_V2.calculateAmountOwed(
+            _loanId,
+            _timestamp
+        );
+
+        _amount += int256(repayAmountOwed.principal) + int256(repayAmountOwed.interest);
+
+
+        //fix these !!! 
+        uint256 commitmentPrincipalRequested = _commitmentArgs.principalAmount;
+        uint256 amountToMarketplace = 0;
+        uint256 amountToProtocol = 0 ;
         
+        uint256 amountToBorrower = commitmentPrincipalRequested - amountToProtocol - amountToMarketplace; 
+        
+        _amount -= int256(amountToBorrower);
 
      }
 

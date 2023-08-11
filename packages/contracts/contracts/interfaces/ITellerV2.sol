@@ -151,11 +151,12 @@ interface ITellerV2 {
         view
         returns (Payment memory owed);
         
-        function calculateAmountDue(uint256 _bidId, uint256 _timestamp)
+    function calculateAmountDue(uint256 _bidId, uint256 _timestamp)
         external
         view
         returns (Payment memory due);
 
+    
 
         
 }

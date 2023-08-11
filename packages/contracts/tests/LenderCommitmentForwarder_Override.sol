@@ -30,19 +30,8 @@ contract LenderCommitmentForwarder_Override is LenderCommitmentForwarder {
         commitments[_commitmentId] = _commitment;
     }
 
-    function getCommitmentLender(uint256 _commitmentId)
-        public
-        returns (address)
-    {
-        return commitments[_commitmentId].lender;
-    }
-
-    function getCommitmentMarketId(uint256 _commitmentId)
-        public
-        returns (uint256)
-    {
-        return commitments[_commitmentId].marketId;
-    }
+  
+ 
 
     function _getEscrowCollateralTypeSuper(CommitmentCollateralType _type)
         public
@@ -55,19 +44,6 @@ contract LenderCommitmentForwarder_Override is LenderCommitmentForwarder {
         super.validateCommitment(commitments[_commitmentId]);
     }
 
-    function getCommitmentAcceptedPrincipal(uint256 _commitmentId)
-        public
-        returns (uint256)
-    {
-        return commitmentPrincipalAccepted[_commitmentId];
-    }
-
-    function getCommitmentMaxPrincipal(uint256 _commitmentId)
-        public
-        returns (uint256)
-    {
-        return commitments[_commitmentId].maxPrincipal;
-    }
 
     /*
         Overrider methods 

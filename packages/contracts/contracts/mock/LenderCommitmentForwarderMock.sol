@@ -49,17 +49,31 @@ contract LenderCommitmentForwarderMock is
     }
 
     function getCommitmentLender(uint256 _commitmentId)
-        public
+        public view
         returns (address)
     {
         return commitments[_commitmentId].lender;
     }
 
     function getCommitmentMarketId(uint256 _commitmentId)
-        public
+        public view
         returns (uint256)
     {
         return commitments[_commitmentId].marketId;
+    }
+
+    function getCommitmentAcceptedPrincipal(uint256 _commitmentId)
+        public view
+        returns (uint256)
+    {
+        return commitmentPrincipalAccepted[_commitmentId];
+    }
+
+    function getCommitmentMaxPrincipal(uint256 _commitmentId)
+        public view
+        returns (uint256)
+    {
+        return commitments[_commitmentId].maxPrincipal;
     }
 
     /* function _getEscrowCollateralTypeSuper(CommitmentCollateralType _type)
@@ -128,19 +142,7 @@ contract LenderCommitmentForwarderMock is
         IERC20(lendingToken).transfer(_recipient, principalAmount);
     }
 
-    function getCommitmentAcceptedPrincipal(uint256 _commitmentId)
-        public
-        returns (uint256)
-    {
-        return commitmentPrincipalAccepted[_commitmentId];
-    }
 
-    function getCommitmentMaxPrincipal(uint256 _commitmentId)
-        public
-        returns (uint256)
-    {
-        return commitments[_commitmentId].maxPrincipal;
-    }
 
     /*
         Override methods 

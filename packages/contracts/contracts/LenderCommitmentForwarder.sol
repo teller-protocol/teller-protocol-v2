@@ -658,4 +658,31 @@ contract LenderCommitmentForwarder is
 
         revert("Unknown Collateral Type");
     }
+
+
+    function getCommitmentMarketId(uint256 _commitmentId) external view returns(uint256){
+        return commitments[_commitmentId].marketId;
+    }
+
+    function getCommitmentLender(uint256 _commitmentId)
+        external view
+        returns (address)
+    {
+        return commitments[_commitmentId].lender;
+    }
+        function getCommitmentAcceptedPrincipal(uint256 _commitmentId)
+        external view
+        returns (uint256)
+    {
+        return commitmentPrincipalAccepted[_commitmentId];
+    }
+
+    function getCommitmentMaxPrincipal(uint256 _commitmentId)
+        external view
+        returns (uint256)
+    {
+        return commitments[_commitmentId].maxPrincipal;
+    }
+
+
 }

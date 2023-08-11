@@ -7,12 +7,16 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 
 // Interfaces
 import "../../interfaces/ITellerV2.sol";
-
+import "../../interfaces/IProtocolFee.sol";
+import "../../interfaces/ITellerV2Storage.sol";
+import "../../interfaces/IMarketRegistry.sol";
 import "../../interfaces/ILenderCommitmentForwarder.sol";
 import "../../interfaces/ICommitmentRolloverLoan.sol";
+import "../../libraries/NumbersLib.sol";
 
 contract CommitmentRolloverLoan is ICommitmentRolloverLoan {
     using AddressUpgradeable for address;
+    using NumbersLib for uint256;
 
     /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
     ITellerV2 public immutable TELLER_V2;
@@ -89,11 +93,14 @@ Gnosis safe deploy script
 
         _amount += int256(repayAmountOwed.principal) + int256(repayAmountOwed.interest);
 
+        uint256 _marketId = _getMarketIdForCommitment(_commitmentArgs.commitmentId);
+        uint16 marketFeePct = _getMarketFeePct(_marketId);
+        uint16 protocolFeePct = _getProtocolFeePct();
 
         //fix these !!! 
         uint256 commitmentPrincipalRequested = _commitmentArgs.principalAmount;
-        uint256 amountToMarketplace = 0;
-        uint256 amountToProtocol = 0 ;
+        uint256 amountToMarketplace = commitmentPrincipalRequested.percent(marketFeePct);
+        uint256 amountToProtocol = commitmentPrincipalRequested.percent(protocolFeePct);
         
         uint256 amountToBorrower = commitmentPrincipalRequested - amountToProtocol - amountToMarketplace; 
         
@@ -126,5 +133,24 @@ Gnosis safe deploy script
             );
 
         (bidId_) = abi.decode(responseData, (uint256));
+    }
+ 
+
+    function _getMarketIdForCommitment(uint256 _commitmentId) internal view returns (uint256){
+
+        return LENDER_COMMITMENT_FORWARDER.getCommitmentMarketId(_commitmentId);
+        
+    }
+
+    function _getMarketFeePct(uint256 _marketId) internal view returns (uint16){
+        address _marketRegistryAddress = ITellerV2Storage(address(TELLER_V2)).marketRegistry();
+        
+        return IMarketRegistry(_marketRegistryAddress).getMarketplaceFee(_marketId);        
+    }
+
+    function _getProtocolFeePct() internal view returns (uint16){
+
+        return IProtocolFee(address(TELLER_V2)).protocolFee();
+        
     }
 }

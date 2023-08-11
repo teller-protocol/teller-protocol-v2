@@ -30,9 +30,6 @@ contract LenderCommitmentForwarder_Override is LenderCommitmentForwarder {
         commitments[_commitmentId] = _commitment;
     }
 
-  
- 
-
     function _getEscrowCollateralTypeSuper(CommitmentCollateralType _type)
         public
         returns (CollateralType)
@@ -43,7 +40,6 @@ contract LenderCommitmentForwarder_Override is LenderCommitmentForwarder {
     function validateCommitmentSuper(uint256 _commitmentId) public {
         super.validateCommitment(commitments[_commitmentId]);
     }
-
 
     /*
         Overrider methods 

@@ -49,28 +49,32 @@ contract LenderCommitmentForwarderMock is
     }
 
     function getCommitmentLender(uint256 _commitmentId)
-        public view
+        public
+        view
         returns (address)
     {
         return commitments[_commitmentId].lender;
     }
 
     function getCommitmentMarketId(uint256 _commitmentId)
-        public view
+        public
+        view
         returns (uint256)
     {
         return commitments[_commitmentId].marketId;
     }
 
     function getCommitmentAcceptedPrincipal(uint256 _commitmentId)
-        public view
+        public
+        view
         returns (uint256)
     {
         return commitmentPrincipalAccepted[_commitmentId];
     }
 
     function getCommitmentMaxPrincipal(uint256 _commitmentId)
-        public view
+        public
+        view
         returns (uint256)
     {
         return commitments[_commitmentId].maxPrincipal;
@@ -141,8 +145,6 @@ contract LenderCommitmentForwarderMock is
     ) internal {
         IERC20(lendingToken).transfer(_recipient, principalAmount);
     }
-
-
 
     /*
         Override methods 

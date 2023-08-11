@@ -104,7 +104,7 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
      * @notice Calculates the minimum payment amount due for a loan.
      * @param _bidId The id of the loan bid to get the payment amount for.
      */
-    function calculateAmountDue(uint256 _bidId,uint256 _timestamp)
+    function calculateAmountDue(uint256 _bidId, uint256 _timestamp)
         public
         view
         returns (Payment memory due)
@@ -121,7 +121,7 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
         due.interest = interest;
     }
 
-      function calculateAmountOwed(uint256 _bidId,uint256 _timestamp)
+    function calculateAmountOwed(uint256 _bidId, uint256 _timestamp)
         public
         view
         returns (Payment memory due)
@@ -137,7 +137,7 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
         due.principal = owedPrincipal;
         due.interest = interest;
     }
- 
+
     function lenderAcceptBid(uint256 _bidId)
         public
         returns (

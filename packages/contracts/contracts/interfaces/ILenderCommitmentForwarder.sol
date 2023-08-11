@@ -40,24 +40,27 @@ interface ILenderCommitmentForwarder {
         address principalTokenAddress;
     }
 
-
     // mapping(uint256 => Commitment) public commitments;
 
-    function getCommitmentMarketId(uint256 _commitmentId) external view returns(uint256);
+    function getCommitmentMarketId(uint256 _commitmentId)
+        external
+        view
+        returns (uint256);
 
     function getCommitmentLender(uint256 _commitmentId)
-        external view
+        external
+        view
         returns (address);
 
     function getCommitmentAcceptedPrincipal(uint256 _commitmentId)
-        external view
+        external
+        view
         returns (uint256);
-
 
     function getCommitmentMaxPrincipal(uint256 _commitmentId)
-        external view
+        external
+        view
         returns (uint256);
-
 
     function createCommitment(
         Commitment calldata _commitment,

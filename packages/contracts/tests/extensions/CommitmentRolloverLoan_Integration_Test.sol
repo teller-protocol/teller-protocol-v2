@@ -110,10 +110,8 @@ contract CommitmentRolloverLoan_Integration_Test is Testable {
         ).addExtension(address(commitmentRolloverLoan));
     }
 
-
     function test_calculateRolloverAmount() public {
-
-         address lendingToken = address(wethMock);
+        address lendingToken = address(wethMock);
 
         //initial loan - need to pay back 1 weth + 0.1 weth (interest) to the lender
         uint256 marketId = 1;
@@ -187,18 +185,15 @@ contract CommitmentRolloverLoan_Integration_Test is Testable {
                     loanDuration: duration
                 });
 
-
         uint256 _timestamp = block.timestamp;
 
         int256 rolloverAmount = commitmentRolloverLoan.calculateRolloverAmount(
-            loanId, 
+            loanId,
             commitmentArgs,
             _timestamp
         );
 
-        assertEq(rolloverAmount,  65 * 1e16 , "Unexpected rollover amount");
-
-
+        assertEq(rolloverAmount, 65 * 1e16, "Unexpected rollover amount");
     }
 
     /*

@@ -31,9 +31,12 @@ const deployFn: DeployFunction = async (hre) => {
 
         opts: {
           unsafeAllow: ['constructor', 'state-variable-immutable'],
-          constructorArgs: [tellerV2.address, lenderCommitmentForwarder.address]
-        }
-      }
+          constructorArgs: [
+            tellerV2.address,
+            lenderCommitmentForwarder.address,
+          ],
+        },
+      },
     ]
   )
 
@@ -50,11 +53,11 @@ deployFn.tags = [
   'proposal',
   'upgrade',
   'commitment-rollover-loan',
-  'commitment-rollover-loan:deploy'
+  'commitment-rollover-loan:deploy',
 ]
 deployFn.dependencies = [
   'teller-v2:deploy',
-  'lender-commitment-forwarder:deploy'
+  'lender-commitment-forwarder:deploy',
 ]
 deployFn.skip = async (hre) => {
   return false

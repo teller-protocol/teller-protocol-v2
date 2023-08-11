@@ -1,6 +1,5 @@
-import { getCurrentChainConfig } from '@nomicfoundation/hardhat-verify/dist/src/chain-config'
 import { DeployFunction } from 'hardhat-deploy/dist/types'
-import { HARDHAT_NETWORK_NAME } from 'hardhat/plugins'
+import { logTxLink } from 'helpers/logTxLink'
 import { TellerV2 } from 'types/typechain'
 
 const deployFn: DeployFunction = async (hre) => {
@@ -20,16 +19,7 @@ const deployFn: DeployFunction = async (hre) => {
       `  ✅  TellerV2 ownership transferred to Safe Multisig (${protocolOwnerSafe})`
     )
 
-    if (hre.network.name !== HARDHAT_NETWORK_NAME) {
-      const chainConfig = await getCurrentChainConfig(
-        hre.network,
-        hre.config.etherscan.customChains
-      )
-      hre.log(`${chainConfig.urls.browserURL}/tx/${tx.hash}`, {
-        star: true,
-        indent: 1,
-      })
-    }
+    await logTxLink(hre, tx.hash)
   } else if (protocolOwnerSafe === currentOwner) {
     hre.log('  ✅  TellerV2 ownership is already set to the Safe Multisig')
   } else {

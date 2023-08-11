@@ -19,13 +19,11 @@ export const getPackageVersion = (): string => {
 
 export const updatePackageVersion = async (version: string): Promise<void> => {
   const validVersion = getValidVersion(version);
-  await runCmd("json", [
-    "-I",
-    "-f",
-    "package.json",
-    "-e",
-    `this.version = "${validVersion}"`
-  ]);
+  await runCmd(
+    "json",
+    ["-I", "-f", "package.json", "-e", `this.version = "${validVersion}"`],
+    { disableEcho: true }
+  );
   process.env.npm_package_version = validVersion;
 };
 

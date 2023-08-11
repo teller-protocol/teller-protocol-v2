@@ -1,10 +1,16 @@
 import { Mutex } from "async-mutex";
+import { MultiBar } from "cli-progress";
 import prompts, { Choice } from "prompts";
 import semver from "semver/preload";
 
-import { getNextVersion, getPackageVersion } from "../utils/version";
+import { Logger } from "../utils/logger";
+import {
+  getNextVersion,
+  getPackageVersion,
+  updatePackageVersion
+} from "../utils/version";
 
-import { API, makeApi } from "./api";
+import { API, makeApi, SubgraphVersion, VersionUpdate } from "./api";
 import { build, BuildArgs, deploy } from "./commands";
 import {
   GraftingType,
@@ -12,11 +18,35 @@ import {
   isReleaseType,
   ReleaseType
 } from "./utils/types";
+import * as websocket from "./ws";
 
 const mutex = new Mutex();
 
+const progressBars = new MultiBar({
+  format:
+    "[{bar}] {name} @ {version} | Duration: {duration_formatted} ETA: {eta_formatted} | Blocks: {percentage}% {value}/{total} - behind: {behind}",
+
+  barsize: 60,
+
+  hideCursor: true,
+  barCompleteChar: "\u2588",
+  barIncompleteChar: "\u2591",
+  stopOnComplete: true,
+
+  // important! redraw everything to avoid "empty" completed bars
+  forceRedraw: true
+});
+const previousLog = progressBars.log.bind(progressBars);
+progressBars.log = (message: string) => previousLog(`${message}\n`);
+
+const logger: Logger = {
+  log: (msg: string) => progressBars.log(msg)
+};
+
 export const run = async (): Promise<void> => {
-  const api = await makeApi();
+  const api = await makeApi({
+    logger
+  });
   let subgraphs: string[] = await api.getSubgraphs();
 
   const packageVersion = getPackageVersion();
@@ -55,6 +85,7 @@ export const run = async (): Promise<void> => {
         answers.releaseType === "missing" ? null : "select",
       choices: [
         { title: "Latest", value: "latest" },
+        { title: "Latest + Block Handler", value: "latest-block-handler" },
         { title: "None", value: "none" }
       ]
     },
@@ -113,19 +144,38 @@ const buildAndDeploySubgraphs = async ({
     throw new Error(`Invalid grafting type: ${graftingType}`);
   }
 
-  for (const name of subgraphs) {
-    if (releaseType === "missing") {
-      const latestVersion = await api.getLatestVersion(name);
-      if (!!latestVersion) {
-        console.log(`Subgraph ${name} is already deployed`);
-        continue;
+  const nextVersion = `v${getNextVersion(releaseType)}`;
+
+  await Promise.all(
+    subgraphs.map(async name => {
+      if (releaseType === "missing") {
+        const latestVersion = await api.getLatestVersion(name);
+        if (!!latestVersion) {
+          progressBars.log(`Subgraph ${name} is already deployed`);
+          return;
+        }
       }
-    }
-    await buildAndDeploy({
-      name,
+
+      await buildAndDeploy({
+        name,
+        api,
+        graftingType,
+        nextVersion,
+        logger
+      });
+    })
+  );
+
+  if (graftingType !== "latest-block-handler") {
+    // make the next version a release if the previous one was missing
+    const nextReleaseType =
+      releaseType === "missing" ? "release" : "prerelease";
+
+    void buildAndDeploySubgraphs({
       api,
-      releaseType,
-      graftingType
+      subgraphs,
+      releaseType: nextReleaseType,
+      graftingType: "latest-block-handler"
     });
   }
 };
@@ -133,56 +183,85 @@ const buildAndDeploySubgraphs = async ({
 const buildAndDeploy = async ({
   name,
   api,
-  releaseType,
-  graftingType
+  graftingType,
+  nextVersion,
+  logger
 }: {
   name: string;
   api: API;
-  releaseType: ReleaseType;
   graftingType: GraftingType;
+  nextVersion: string;
+  logger?: Logger;
 }): Promise<void> => {
-  const latestVersion = await api.getLatestVersion(name);
-  // if (latestVersion?.label?.replace(/^v/, "") === nextVersion) {
-  //   console.log(`Subgraph ${name} is already at version ${nextVersion}`);
-  //   return;
-  // }
-  const nextVersion = getNextVersion(releaseType);
+  const bar = progressBars.create(Infinity, 0, {
+    name,
+    version: "v-",
+    behind: Infinity
+  });
+
+  const waitForSync = async (
+    version: SubgraphVersion
+  ): Promise<VersionUpdate> => {
+    bar.start(
+      version.totalEthereumBlocksCount,
+      version.latestEthereumBlockNumber,
+      {
+        name,
+        version: version.label ?? "",
+        behind:
+          version.totalEthereumBlocksCount - version.latestEthereumBlockNumber
+      }
+    );
+    return await api.waitForVersionSync(name, version.id, updated => {
+      bar.setTotal(updated.totalEthereumBlocksCount);
+
+      const value = updated.synced
+        ? bar.getTotal()
+        : updated.latestEthereumBlockNumber;
+      bar.update(value, {
+        name,
+        version: version.label ?? "",
+        behind:
+          updated.totalEthereumBlocksCount - updated.latestEthereumBlockNumber
+      });
+    });
+  };
 
   const args: BuildArgs = {
     name,
-    api
+    api,
+    logger
   };
-  if (graftingType === "latest") {
+  if (graftingType.startsWith("latest")) {
+    const latestVersion = await api.getLatestVersion(name);
     if (latestVersion == null) {
       throw new Error(`Subgraph ${name} has no latest version`);
-    } else {
-      const update = await api.waitForVersionSync(name, latestVersion.id);
-      Object.assign(latestVersion, update);
     }
+
+    const updatedVersion = await waitForSync(latestVersion);
 
     args.grafting = {
       base: latestVersion.deploymentId,
-      block: latestVersion.latestEthereumBlockNumber
+      block: updatedVersion.latestEthereumBlockNumber
     };
-    args.block_handler = {
-      block: latestVersion.latestEthereumBlockNumber
-    };
+    if (graftingType === "latest-block-handler") {
+      args.block_handler = {
+        block: updatedVersion.latestEthereumBlockNumber
+      };
+    }
   }
 
   await mutex
     .runExclusive(async () => {
       const buildId = await build(args);
-      await deploy({ name, api, newVersion: nextVersion });
+      await deploy({ name, api, newVersion: nextVersion, logger });
     })
     .then(() => {
-      if (graftingType === "none") {
-        void buildAndDeploy({
-          name,
-          api,
-          // make the next version a release if the previous one was missing
-          releaseType: releaseType === "missing" ? "release" : "prerelease",
-          graftingType: "latest"
-        });
-      }
+      void api.getLatestVersion(name).then(latestVersion => {
+        // TODO: there should always be a latest version
+        if (!latestVersion) return;
+
+        void waitForSync(latestVersion);
+      });
     });
 };

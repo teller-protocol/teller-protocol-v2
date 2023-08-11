@@ -1,3 +1,4 @@
+import { Logger } from "../../utils/logger";
 import { runCmd } from "../../utils/runCmd";
 import { API } from "../api";
 import { getConfig, setConfig } from "../utils/config";
@@ -13,6 +14,7 @@ export interface BuildArgs {
   block_handler?: {
     block: number;
   };
+  logger?: Logger;
 }
 export const build = async (args: BuildArgs): Promise<string | undefined> => {
   const {
@@ -20,12 +22,12 @@ export const build = async (args: BuildArgs): Promise<string | undefined> => {
     api,
     grafting,
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    block_handler
+    block_handler,
+    logger
   } = args;
   const network = getNetworkFromName(name);
 
-  console.log("Building subgraph:", name);
-  console.log();
+  logger?.log(`Building subgraph: ${name}`);
 
   const config = await getConfig(network);
 
@@ -40,7 +42,6 @@ export const build = async (args: BuildArgs): Promise<string | undefined> => {
       enabled: false
     };
   }
-  console.log("Grafting:", JSON.stringify(config.grafting, null, 2));
 
   if (block_handler !== undefined) {
     config.block_handler = {
@@ -52,33 +53,40 @@ export const build = async (args: BuildArgs): Promise<string | undefined> => {
       enabled: false
     };
   }
-  console.log("Block Handler:", JSON.stringify(config.block_handler, null, 2));
 
   await setConfig(network, config);
 
-  await runCmd("yarn", [
-    "workspace",
-    "@teller-protocol/v2-contracts",
+  await runCmd(
+    "yarn",
+    [
+      "workspace",
+      "@teller-protocol/v2-contracts",
 
-    "export",
+      "export",
 
-    "--network",
-    network
-  ]);
-  await runCmd("yarn", [
-    "hbs",
+      "--network",
+      network
+    ],
+    { disableEcho: true }
+  );
+  await runCmd(
+    "yarn",
+    [
+      "hbs",
 
-    "-D",
-    `./config/${network}.json`,
+      "-D",
+      `./config/${network}.json`,
 
-    "./src/subgraph.handlebars",
+      "./src/subgraph.handlebars",
 
-    "-o",
-    ".",
+      "-o",
+      ".",
 
-    "-e",
-    "yaml"
-  ]);
+      "-e",
+      "yaml"
+    ],
+    { disableEcho: true }
+  );
   await runCmd("yarn", ["graph", "codegen"], { disableEcho: true });
   return await new Promise<string | undefined>((resolve, reject) => {
     let buildId: string | undefined;
@@ -90,7 +98,7 @@ export const build = async (args: BuildArgs): Promise<string | undefined> => {
       }
     }).then(() => {
       if (buildId != null) {
-        console.log("Build ID:", buildId);
+        logger?.log(`Build ID: ${buildId}`);
       }
       resolve(buildId);
     });

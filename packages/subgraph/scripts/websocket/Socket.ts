@@ -1,6 +1,8 @@
 import { Cleaner } from "cleaners";
 import * as uuid from "uuid";
 
+import { Logger } from "../utils/logger";
+
 import Deferred from "./Deferred";
 import { setupWS } from "./setup";
 import { SocketEmitter, SocketEvent } from "./SocketEmitter";
@@ -55,6 +57,7 @@ interface SocketConfig {
   healthCheck: () => Promise<void>; // function for heartbeat, should submit task itself
   onQueueSpaceCB: OnQueueSpaceCB;
   protocols?: string | string[];
+  logger?: Logger;
 }
 
 interface WsMessage<T> {
@@ -72,8 +75,8 @@ interface PendingMessages<T> {
 
 export function makeSocket(uri: string, config: SocketConfig): Socket {
   let socket: InnerSocket | null;
-  const { emitter, queueSize = 50 } = config;
-  console.log("makeSocket connects to", uri);
+  const { emitter, logger, queueSize = 50 } = config;
+  // console.log("makeSocket connects to", uri);
   const version = "";
   const socketQueueId = uuid.v4();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -81,7 +84,7 @@ export function makeSocket(uri: string, config: SocketConfig): Socket {
   let onQueueSpace = config.onQueueSpaceCB;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let pendingMessages: PendingMessages<any> = {};
-  let lastKeepAlive = 0;
+  let lastKeepAlive = Date.now() + KEEP_ALIVE_MS;
   let lastWakeUp = 0;
   let connected = false;
   let cancelConnect = false;
@@ -132,7 +135,7 @@ export function makeSocket(uri: string, config: SocketConfig): Socket {
   };
 
   const onSocketConnect = (): void => {
-    console.log(`onSocketConnect with server ${uri}`);
+    config?.logger?.log(`onSocketConnect with server ${uri}`);
     if (cancelConnect) {
       if (socket != null) socket.disconnect();
       return;
@@ -234,7 +237,7 @@ export function makeSocket(uri: string, config: SocketConfig): Socket {
         id,
         ...pending.task.message
       };
-      console.log(`transmitMessage with server ${uri}`, message);
+      // console.log(`transmitMessage with server ${uri}`, message);
       socket.send(JSON.stringify(message));
     }
   };

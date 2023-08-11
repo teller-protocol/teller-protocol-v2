@@ -6,11 +6,20 @@ import axios from "axios";
 import { makeNodeDisklet } from "disklet";
 import { makeMemlet } from "memlet";
 
+import { Logger } from "../../utils/logger";
+import { SocketEmitter, SocketEvent } from "../../websocket/SocketEmitter";
 import * as websocket from "../ws";
 
 import { InnerAPI, SubgraphVersion, VersionUpdate } from "./index";
 
-export const makeStudio = async (): Promise<InnerAPI> => {
+interface IStudioConfig {
+  socketEmitter?: SocketEmitter;
+  logger?: Logger;
+}
+
+export const makeStudio = async (
+  studioConfig?: IStudioConfig
+): Promise<InnerAPI> => {
   const disklet = makeNodeDisklet(path.join(__dirname, "./config"));
   const memlet = makeMemlet(disklet);
 
@@ -63,7 +72,10 @@ export const makeStudio = async (): Promise<InnerAPI> => {
 
   const socket = await websocket.create(
     "wss://api.studio.thegraph.com/graphql",
-    "studio"
+    {
+      emitter: studioConfig?.socketEmitter,
+      logger: studioConfig?.logger
+    }
   );
 
   const getCurrentUser = async (): Promise<any> => {
@@ -184,7 +196,8 @@ export const makeStudio = async (): Promise<InnerAPI> => {
     publishStatus: string;
   }
   const getLatestVersion = async (
-    name: string
+    name: string,
+    index = 0
   ): Promise<SubgraphVersion | undefined> => {
     await login();
 
@@ -220,10 +233,11 @@ export const makeStudio = async (): Promise<InnerAPI> => {
     `
     });
     const subgraph = response.data.data.subgraph;
-    const latest = subgraph?.versions?.sort((a, b) => b.id - a.id)?.[0];
+    const latest = subgraph?.versions?.sort((a, b) => b.id - a.id)?.[index];
     if (latest) {
       return {
         id: latest.id,
+        label: latest.label,
         deploymentId: latest.deploymentId,
         latestEthereumBlockNumber: latest.latestEthereumBlockNumber,
         totalEthereumBlocksCount: latest.totalEthereumBlocksCount,
@@ -241,6 +255,9 @@ export const makeStudio = async (): Promise<InnerAPI> => {
       unsubscribe: () => void
     ) => Promise<void> | void
   ): void => {
+    studioConfig?.socketEmitter?.on(SocketEvent.CONNECTION_CLOSE, () => {
+      watchVersionUpdate(name, versionId, cb);
+    });
     return socket.subscribe({
       cb,
       message: {

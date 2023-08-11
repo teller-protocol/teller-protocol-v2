@@ -29,6 +29,7 @@
     "async-mutex": "^0.4.0",
     "axios": "^1.4.0",
     "cleaners": "^0.3.16",
+    "cli-progress": "^3.12.0",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-config-standard-kit": "0.15.1",

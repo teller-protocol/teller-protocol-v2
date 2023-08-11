@@ -4,6 +4,7 @@ import axios, { Axios } from "axios";
 import { makeNodeDisklet } from "disklet";
 import { makeMemlet } from "memlet";
 
+import { Logger } from "../../utils/logger";
 import { getNetworkFromName } from "../utils/getNetworkFromName";
 
 import { InnerAPI, SubgraphVersion, VersionUpdate } from "./index";
@@ -52,7 +53,13 @@ const getApi = (name: string): Axios => {
   return api;
 };
 
-export const makeMantle = async (): Promise<InnerAPI> => {
+interface IMantleConfig {
+  logger?: Logger;
+}
+
+export const makeMantle = async (
+  mantleConfig?: IMantleConfig
+): Promise<InnerAPI> => {
   const config = await getConfig();
 
   const getSubgraphs = async (): Promise<string[]> => {
@@ -98,11 +105,14 @@ export const makeMantle = async (): Promise<InnerAPI> => {
     node: string;
   }
   const getLatestVersion = async (
-    name: string
+    name: string,
+    index = Version.pending
   ): Promise<SubgraphVersion | undefined> => {
-    let version = await getVersion(name, Version.pending);
+    if (index > Version.current) return;
+
+    const version = await getVersion(name, index);
     if (!version) {
-      version = await getVersion(name, Version.current);
+      return await getVersion(name, index + 1);
     }
     return version;
   };

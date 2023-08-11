@@ -1,8 +1,11 @@
+import { Logger } from "../../utils/logger";
+
 import { makeMantle } from "./mantle";
 import { makeStudio } from "./studio";
 
 export interface SubgraphVersion {
   id: number;
+  label?: string;
   deploymentId: string;
   latestEthereumBlockNumber: number;
   totalEthereumBlocksCount: number;
@@ -17,18 +20,21 @@ export interface VersionUpdate {
   failed: boolean;
 }
 
+type VersionUpdateCallback = (
+  version: VersionUpdate,
+  unsubscribe: () => void
+) => Promise<void> | void;
+
 export interface InnerAPI {
   getSubgraphs: () => Promise<string[]>;
   getLatestVersion: (
-    name: string
+    name: string,
+    index?: number
   ) => Promise<SubgraphVersion | null | undefined>;
   watchVersionUpdate: (
     name: string,
     versionId: number,
-    cb: (
-      version: VersionUpdate,
-      unsubscribe: () => void
-    ) => Promise<void> | void
+    cb: VersionUpdateCallback
   ) => void;
 
   args: {
@@ -40,13 +46,22 @@ export interface InnerAPI {
 export interface API extends InnerAPI {
   waitForVersionSync: (
     name: string,
-    versionId: number
+    versionId: number,
+    cb?: VersionUpdateCallback
   ) => Promise<VersionUpdate>;
 }
 
-export const makeApi = async (): Promise<API> => {
-  const studio = await makeStudio();
-  const aws = await makeMantle();
+interface APIConfig {
+  logger?: Logger;
+}
+
+export const makeApi = async (config?: APIConfig): Promise<API> => {
+  const studio = await makeStudio({
+    logger: config?.logger
+  });
+  const aws = await makeMantle({
+    logger: config?.logger
+  });
 
   const nameMap = new Map<string, InnerAPI>();
   const getSubgraphApi = (name: string): InnerAPI => {
@@ -73,19 +88,17 @@ export const makeApi = async (): Promise<API> => {
   };
 
   const getLatestVersion = (
-    name: string
+    name: string,
+    index = 0
   ): Promise<SubgraphVersion | null | undefined> => {
     const api = getSubgraphApi(name);
-    return api.getLatestVersion(name);
+    return api.getLatestVersion(name, index);
   };
 
   const watchVersionUpdate = (
     name: string,
     versionId: number,
-    cb: (
-      version: VersionUpdate,
-      unsubscribe: () => void
-    ) => Promise<void> | void
+    cb: VersionUpdateCallback
   ): void => {
     const api = getSubgraphApi(name);
     api.watchVersionUpdate(name, versionId, cb);
@@ -93,31 +106,17 @@ export const makeApi = async (): Promise<API> => {
 
   const waitForVersionSync = (
     name: string,
-    versionId: number
+    versionId: number,
+    cb?: VersionUpdateCallback
   ): Promise<VersionUpdate> => {
     return new Promise((resolve, reject) => {
-      // start a timer to track how long it took to sync deployment
-      const timerLabel = `${name} sync time`;
-      console.time(timerLabel);
       watchVersionUpdate(name, versionId, (version, unsubscribe) => {
-        const syncedPercent = (
-          (version.latestEthereumBlockNumber /
-            version.totalEthereumBlocksCount) *
-          100
-        ).toFixed(6);
-
-        console.log();
-        console.log(
-          `${name}: ${syncedPercent}% synced \n` +
-            `\t* latest block: ${version.latestEthereumBlockNumber} \n` +
-            `\t* total blocks: ${version.totalEthereumBlocksCount}\n`
-        );
+        void cb?.(version, unsubscribe);
 
         if (version.failed) {
           unsubscribe();
           reject(`Version "${versionId} failed`);
         } else if (version.synced) {
-          console.timeEnd(timerLabel);
           unsubscribe();
           resolve(version);
         }

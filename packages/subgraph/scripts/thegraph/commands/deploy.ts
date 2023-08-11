@@ -1,3 +1,4 @@
+import { Logger } from "../../utils/logger";
 import { runCmd } from "../../utils/runCmd";
 import { updatePackageVersion } from "../../utils/version";
 import { API } from "../api";
@@ -7,17 +8,15 @@ import { create } from "./create";
 interface DeployArgs {
   name: string;
   api: API;
-  newVersion?: string;
+  newVersion: string;
+  logger?: Logger;
 }
 export const deploy = async (args: DeployArgs): Promise<void> => {
-  const { name, api, newVersion } = args;
+  const { name, api, newVersion, logger } = args;
 
   await create({ name, api });
 
-  const versionLabel = `v${newVersion}`;
-
-  console.log("Deploying subgraph:", name);
-  console.log("Version label:", versionLabel);
+  logger?.log(`Deploying subgraph: ${name} ${newVersion}`);
 
   await runCmd(
     "yarn",
@@ -25,7 +24,7 @@ export const deploy = async (args: DeployArgs): Promise<void> => {
       "graph",
       "deploy",
       "--version-label",
-      versionLabel,
+      newVersion,
       ...api.args.node(name),
       ...api.args.ipfs(name),
       ...api.args.product(name),
@@ -33,5 +32,5 @@ export const deploy = async (args: DeployArgs): Promise<void> => {
     ],
     { disableEcho: true }
   );
-  await updatePackageVersion(versionLabel);
+  await updatePackageVersion(newVersion);
 };

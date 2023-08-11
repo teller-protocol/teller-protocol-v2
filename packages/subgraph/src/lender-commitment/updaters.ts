@@ -273,6 +273,7 @@ function removeCommitmentToProtocol(commitment: Commitment): void {
   protocol.save();
 }
 
+// TODO: Need to account for the case where the collateral token changes
 export function updateAvailableTokensFromCommitment(
   commitment: Commitment
 ): void {

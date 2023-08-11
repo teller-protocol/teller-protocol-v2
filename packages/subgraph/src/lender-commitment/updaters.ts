@@ -3,14 +3,10 @@ import {
   BigDecimal,
   BigInt,
   Entity,
-  ethereum,
   store
 } from "@graphprotocol/graph-ts";
 
-import {
-  LenderCommitmentForwarder,
-  LenderCommitmentForwarder__commitmentsResult
-} from "../../generated/LenderCommitmentForwarder/LenderCommitmentForwarder";
+import { LenderCommitmentForwarder } from "../../generated/LenderCommitmentForwarder/LenderCommitmentForwarder";
 import {
   Commitment,
   CommitmentZScore,
@@ -41,7 +37,11 @@ import {
   loadCommitmentZScore,
   loadMarketCommitmentStdDev
 } from "./loaders";
-import { CommitmentStatus, commitmentStatusToString } from "./utils";
+import {
+  CommitmentStatus,
+  commitmentStatusToEnum,
+  commitmentStatusToString
+} from "./utils";
 
 enum CollateralTokenType {
   NONE,
@@ -279,21 +279,26 @@ export function updateAvailableTokensFromCommitment(
   const availableAmount = commitment.maxPrincipal.minus(
     commitment.acceptedPrincipal
   );
-  const committedAmountDiff = availableAmount.minus(commitment.committedAmount);
+
+  let committedAmountDiff: BigInt;
+  if (commitmentStatusToEnum(commitment.status) == CommitmentStatus.Active) {
+    committedAmountDiff = availableAmount.minus(commitment.committedAmount);
+  } else {
+    committedAmountDiff = availableAmount.neg();
+  }
+
   commitment.committedAmount = availableAmount;
   commitment.save();
 
-  if (availableAmount.equals(BigInt.zero())) {
-    updateCommitmentStatus(commitment, CommitmentStatus.Drained);
-  }
-
-  const tokenVolumes = getTokenVolumesFromCommitment(commitment);
-  for (let i = 0; i < tokenVolumes.length; i++) {
-    const tokenVolume = tokenVolumes[i];
-    tokenVolume.totalAvailable = tokenVolume.totalAvailable.plus(
-      committedAmountDiff
-    );
-    tokenVolume.save();
+  if (!committedAmountDiff.equals(BigInt.zero())) {
+    const tokenVolumes = getTokenVolumesFromCommitment(commitment);
+    for (let i = 0; i < tokenVolumes.length; i++) {
+      const tokenVolume = tokenVolumes[i];
+      tokenVolume.totalAvailable = tokenVolume.totalAvailable.plus(
+        committedAmountDiff
+      );
+      tokenVolume.save();
+    }
   }
 }
 

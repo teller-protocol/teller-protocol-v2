@@ -14,9 +14,9 @@ import { linkCommitmentToRewards } from "../liquidity-rewards/updaters";
 
 import { loadCommitment } from "./loaders";
 import {
-  updateAvailableTokensFromCommitment,
   updateCommitmentStatus,
-  updateLenderCommitment
+  updateLenderCommitment,
+  updateAvailableTokensFromCommitment
 } from "./updaters";
 import { CommitmentStatus } from "./utils";
 
@@ -68,6 +68,7 @@ export function handleDeletedCommitment(event: DeletedCommitment): void {
   const commitment = loadCommitment(commitmentId);
 
   updateCommitmentStatus(commitment, CommitmentStatus.Deleted);
+  updateAvailableTokensFromCommitment(commitment);
 
   commitment.expirationTimestamp = BigInt.zero();
   commitment.maxDuration = BigInt.zero();
@@ -90,13 +91,20 @@ export function handleExercisedCommitment(event: ExercisedCommitment): void {
     event.address
   );
   const acceptedPrincipalResult = lenderCommitmentForwarderInstance.try_commitmentPrincipalAccepted(
-    BigInt.fromString(commitmentId)
+    BigInt.fromString(commitment.id)
   );
-
   // function only exists after an upgrade
   commitment.acceptedPrincipal = acceptedPrincipalResult.reverted
-    ? commitment.acceptedPrincipal.plus(event.params.tokenAmount)
+    ? BigInt.zero()
     : acceptedPrincipalResult.value;
+
+  const availableAmount = commitment.maxPrincipal.minus(
+    commitment.acceptedPrincipal
+  );
+  if (availableAmount.equals(BigInt.zero())) {
+    updateCommitmentStatus(commitment, CommitmentStatus.Drained);
+  }
+
   updateAvailableTokensFromCommitment(commitment);
 
   // Link commitment to bid

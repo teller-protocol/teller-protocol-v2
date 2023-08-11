@@ -388,7 +388,7 @@ type Commitment @entity {
 }
 
 
-# Association between RewardAllocations and Commitments 
+# Association between RewardAllocations and Commitments
 type CommitmentReward @entity {
   id: ID!
   createdAt: BigInt!

@@ -9,7 +9,10 @@ const deployFn: DeployFunction = async (hre) => {
     'CommitmentRolloverLoan',
     {
       unsafeAllow: ['constructor', 'state-variable-immutable'],
-      constructorArgs: [tellerV2.address, lenderCommitmentForwarder.address]
+      constructorArgs: [
+        await tellerV2.getAddress(),
+        await lenderCommitmentForwarder.getAddress()
+      ]
     }
   )
 

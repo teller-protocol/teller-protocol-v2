@@ -1,9 +1,10 @@
+import { BigNumberish } from 'ethers'
 import { task } from 'hardhat/config'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
 import { TellerV2 } from 'types/typechain'
 
 interface RepayLoanArgs {
-  bidId: number
+  bidId: BigNumberish
 }
 
 export const repayLoan = async (
@@ -18,10 +19,11 @@ export const repayLoan = async (
   const usdc = await tokens.get('USDC')
 
   // Get total amount due to repay
-  const amountDue = await tellerV2['calculateAmountOwed(uint256)'](bidId)
+  const block = await hre.ethers.provider.getBlock('latest')
+  const amountDue = await tellerV2.calculateAmountOwed(bidId, block!.timestamp)
   log(`${amountDue}`)
   // Approve funds to be repaid
-  await usdc.approve(tellerV2.address, toBN(110, 6))
+  await usdc.approve(tellerV2, toBN(110, 6))
 
   // Repay loan
   await tellerV2.repayLoanFull(bidId)

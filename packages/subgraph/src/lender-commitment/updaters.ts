@@ -3,14 +3,10 @@ import {
   BigDecimal,
   BigInt,
   Entity,
-  ethereum,
   store
 } from "@graphprotocol/graph-ts";
 
-import {
-  LenderCommitmentForwarder,
-  LenderCommitmentForwarder__commitmentsResult
-} from "../../generated/LenderCommitmentForwarder/LenderCommitmentForwarder";
+import { LenderCommitmentForwarder } from "../../generated/LenderCommitmentForwarder/LenderCommitmentForwarder";
 import {
   Commitment,
   CommitmentZScore,
@@ -41,7 +37,11 @@ import {
   loadCommitmentZScore,
   loadMarketCommitmentStdDev
 } from "./loaders";
-import { CommitmentStatus, commitmentStatusToString } from "./utils";
+import {
+  CommitmentStatus,
+  commitmentStatusToEnum,
+  commitmentStatusToString
+} from "./utils";
 
 enum CollateralTokenType {
   NONE,
@@ -49,7 +49,9 @@ enum CollateralTokenType {
   ERC721,
   ERC1155,
   ERC721_ANY_ID,
-  ERC1155_ANY_ID
+  ERC1155_ANY_ID,
+  ERC721_MERKLE,
+  ERC1155_MERKLE
 }
 
 /**
@@ -104,11 +106,13 @@ export function updateLenderCommitment(
         tokenType = TokenType.ERC20;
         break;
       case CollateralTokenType.ERC721:
+      case CollateralTokenType.ERC721_MERKLE:
         nftId = lenderCommitment.getCollateralTokenId();
       case CollateralTokenType.ERC721_ANY_ID:
         tokenType = TokenType.ERC721;
         break;
       case CollateralTokenType.ERC1155:
+      case CollateralTokenType.ERC1155_MERKLE:
         nftId = lenderCommitment.getCollateralTokenId();
       case CollateralTokenType.ERC1155_ANY_ID:
         tokenType = TokenType.ERC1155;
@@ -120,6 +124,7 @@ export function updateLenderCommitment(
       nftId
     );
     commitment.collateralToken = collateralToken.id;
+    commitment.collateralTokenAddress = collateralToken.address;
     commitment.maxPrincipalPerCollateralAmount = lenderCommitment.getMaxPrincipalPerCollateralAmount();
   }
 
@@ -268,27 +273,33 @@ function removeCommitmentToProtocol(commitment: Commitment): void {
   protocol.save();
 }
 
+// TODO: Need to account for the case where the collateral token changes
 export function updateAvailableTokensFromCommitment(
   commitment: Commitment
 ): void {
   const availableAmount = commitment.maxPrincipal.minus(
     commitment.acceptedPrincipal
   );
-  const committedAmountDiff = availableAmount.minus(commitment.committedAmount);
+
+  let committedAmountDiff: BigInt;
+  if (commitmentStatusToEnum(commitment.status) == CommitmentStatus.Active) {
+    committedAmountDiff = availableAmount.minus(commitment.committedAmount);
+  } else {
+    committedAmountDiff = availableAmount.neg();
+  }
+
   commitment.committedAmount = availableAmount;
   commitment.save();
 
-  if (availableAmount.equals(BigInt.zero())) {
-    updateCommitmentStatus(commitment, CommitmentStatus.Drained);
-  }
-
-  const tokenVolumes = getTokenVolumesFromCommitment(commitment);
-  for (let i = 0; i < tokenVolumes.length; i++) {
-    const tokenVolume = tokenVolumes[i];
-    tokenVolume.totalAvailable = tokenVolume.totalAvailable.plus(
-      committedAmountDiff
-    );
-    tokenVolume.save();
+  if (!committedAmountDiff.equals(BigInt.zero())) {
+    const tokenVolumes = getTokenVolumesFromCommitment(commitment);
+    for (let i = 0; i < tokenVolumes.length; i++) {
+      const tokenVolume = tokenVolumes[i];
+      tokenVolume.totalAvailable = tokenVolume.totalAvailable.plus(
+        committedAmountDiff
+      );
+      tokenVolume.save();
+    }
   }
 }
 

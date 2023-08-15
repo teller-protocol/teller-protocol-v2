@@ -18,7 +18,7 @@ export const acceptCollateralBid = async (
   const usdc = await tokens.get('USDC')
 
   // Approve funds to be lent
-  await usdc.approve(tellerV2.address, toBN(100, 6))
+  await usdc.approve(tellerV2, toBN(100, 6))
 
   // Accept bid
   const lentAmount = await tellerV2.lenderAcceptBid(bidId)

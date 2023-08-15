@@ -7,7 +7,10 @@ const deployFn: DeployFunction = async (hre) => {
   const tellerV2 = await hre.contracts.get('TellerV2')
 
   const collateralManager = await hre.deployProxy('CollateralManager', {
-    initArgs: [collateralEscrowBeacon.address, tellerV2.address],
+    initArgs: [
+      await collateralEscrowBeacon.getAddress(),
+      await tellerV2.getAddress(),
+    ],
   })
 
   return true

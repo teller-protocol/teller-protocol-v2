@@ -14,13 +14,13 @@ const deployFn: DeployFunction = async (hre) => {
   })
   const tellerAS = await deploy({
     contract: 'TellerAS',
-    args: [registry.address, verifier.address],
+    args: [await registry.getAddress(), await verifier.getAddress()],
     skipIfAlreadyDeployed: true,
     hre,
   })
 
   const marketRegistry = await hre.deployProxy('MarketRegistry', {
-    initArgs: [tellerAS.address],
+    initArgs: [await tellerAS.getAddress()],
   })
 
   return true

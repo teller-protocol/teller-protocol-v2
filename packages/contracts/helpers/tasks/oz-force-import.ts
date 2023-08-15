@@ -3,14 +3,14 @@ import { task } from 'hardhat/config'
 task('oz:force-import').setAction(async (args, hre) => {
   const fn = async (name: string): Promise<void> => {
     const { address: proxyAddress } = await hre.deployments.get(name)
-    const { args: implArgs } = await hre.deployments.get(
-      `${name}_Implementation`
-    )
+    // const { args: implArgs } = await hre.deployments.get(
+    //   `${name}_Implementation`
+    // )
 
     const factory = await hre.ethers.getContractFactory(name)
     try {
       await hre.platform.forceImport(proxyAddress, factory, {
-        constructorArgs: implArgs,
+        // constructorArgs: implArgs,
       })
     } catch (e) {
       console.log(`Failed to force import for "${name}"`)

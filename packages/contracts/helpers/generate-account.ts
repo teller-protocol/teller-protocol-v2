@@ -11,5 +11,5 @@ console.log(
   "💬 Use 'yarn run account' to get more information about the deployment account."
 )
 
-fs.writeFileSync(`./${wallet.address}.secret`, wallet.mnemonic.phrase)
-fs.writeFileSync('./mnemonic.secret', wallet.mnemonic.phrase)
+fs.writeFileSync(`./${wallet.address}.secret`, wallet.mnemonic!.phrase)
+fs.writeFileSync('./mnemonic.secret', wallet.mnemonic!.phrase)

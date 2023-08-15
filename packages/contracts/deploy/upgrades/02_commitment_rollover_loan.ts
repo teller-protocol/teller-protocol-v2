@@ -20,7 +20,7 @@ const deployFn: DeployFunction = async (hre) => {
  
 # CommitmentRolloverLoan
 
-* Adds a new contract. 
+* Adds a new contract named CommitmentRolloverLoan.  This contract allows users to rollover an active loan into a new loan. 
 `,
     [
       {
@@ -31,12 +31,9 @@ const deployFn: DeployFunction = async (hre) => {
 
         opts: {
           unsafeAllow: ['constructor', 'state-variable-immutable'],
-          constructorArgs: [
-            tellerV2.address,
-            lenderCommitmentForwarder.address,
-          ],
-        },
-      },
+          constructorArgs: [tellerV2.address, lenderCommitmentForwarder.address]
+        }
+      }
     ]
   )
 
@@ -53,11 +50,11 @@ deployFn.tags = [
   'proposal',
   'upgrade',
   'commitment-rollover-loan',
-  'commitment-rollover-loan:deploy',
+  'commitment-rollover-loan:deploy'
 ]
 deployFn.dependencies = [
   'teller-v2:deploy',
-  'lender-commitment-forwarder:deploy',
+  'lender-commitment-forwarder:deploy'
 ]
 deployFn.skip = async (hre) => {
   return false

@@ -1,6 +1,5 @@
 import { Address, BigInt, Bytes, Value } from "@graphprotocol/graph-ts";
 
-import { IERC20Metadata } from "../../generated/Blocks/IERC20Metadata";
 import {
   Bid,
   Borrower,
@@ -16,6 +15,7 @@ import {
   User
 } from "../../generated/schema";
 import { ERC165 } from "../../generated/TellerV2/ERC165";
+import { IERC20Metadata } from "../../generated/TellerV2/IERC20Metadata";
 import { TellerV0Storage } from "../../generated/TellerV2/TellerV0Storage";
 import {
   TellerV2,
@@ -510,7 +510,7 @@ export function loadCollateral(
     collateral = new BidCollateral(idString);
     collateral.amount = BigInt.zero();
     collateral.tokenId = nftId;
-    collateral.collateralAddress = Address.zero();
+    collateral.collateralAddress = collateralAddress;
     collateral.type = getTokenTypeString(type);
     collateral.token = token.id;
     collateral.status = "";

@@ -10,9 +10,9 @@ const deployFn: DeployFunction = async (hre) => {
     {
       unsafeAllow: ['constructor', 'state-variable-immutable'],
       constructorArgs: [
-        tellerV2.address,
-        marketRegistry.address,
-        collateralManager.address,
+        await tellerV2.getAddress(),
+        await marketRegistry.getAddress(),
+        await collateralManager.getAddress(),
       ],
     }
   )

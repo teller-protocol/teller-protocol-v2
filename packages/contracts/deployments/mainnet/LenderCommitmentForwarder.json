@@ -3,6 +3,7 @@
   "abi": [
     {
       "type": "constructor",
+      "stateMutability": "undefined",
       "payable": false,
       "inputs": [
         {
@@ -179,7 +180,8 @@
       "inputs": [],
       "outputs": [
         {
-          "type": "address"
+          "type": "address",
+          "name": ""
         }
       ]
     },
@@ -192,7 +194,8 @@
       "inputs": [],
       "outputs": [
         {
-          "type": "address"
+          "type": "address",
+          "name": ""
         }
       ]
     },
@@ -240,13 +243,96 @@
     },
     {
       "type": "function",
+      "name": "acceptCommitmentWithProof",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_commitmentId"
+        },
+        {
+          "type": "uint256",
+          "name": "_principalAmount"
+        },
+        {
+          "type": "uint256",
+          "name": "_collateralAmount"
+        },
+        {
+          "type": "uint256",
+          "name": "_collateralTokenId"
+        },
+        {
+          "type": "address",
+          "name": "_collateralTokenAddress"
+        },
+        {
+          "type": "uint16",
+          "name": "_interestRate"
+        },
+        {
+          "type": "uint32",
+          "name": "_loanDuration"
+        },
+        {
+          "type": "bytes32[]",
+          "name": "_merkleProof"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": "bidId"
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "addCommitmentBorrowers",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_commitmentId"
+        },
+        {
+          "type": "address[]",
+          "name": "_borrowerAddressList"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "commitmentPrincipalAccepted",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
       "name": "commitments",
       "constant": true,
       "stateMutability": "view",
       "payable": false,
       "inputs": [
         {
-          "type": "uint256"
+          "type": "uint256",
+          "name": ""
         }
       ],
       "outputs": [
@@ -405,7 +491,8 @@
       "inputs": [],
       "outputs": [
         {
-          "type": "address"
+          "type": "address",
+          "name": ""
         }
       ]
     },
@@ -439,7 +526,8 @@
       ],
       "outputs": [
         {
-          "type": "uint256"
+          "type": "uint256",
+          "name": ""
         }
       ]
     },
@@ -452,7 +540,8 @@
       "inputs": [],
       "outputs": [
         {
-          "type": "address"
+          "type": "address",
+          "name": ""
         }
       ]
     },
@@ -469,9 +558,27 @@
       ],
       "outputs": [
         {
-          "type": "address"
+          "type": "address",
+          "name": ""
         }
       ]
+    },
+    {
+      "type": "function",
+      "name": "removeCommitmentBorrowers",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_commitmentId"
+        },
+        {
+          "type": "address[]",
+          "name": "_borrowerAddressList"
+        }
+      ],
+      "outputs": []
     },
     {
       "type": "function",
@@ -535,23 +642,6 @@
         }
       ],
       "outputs": []
-    },
-    {
-      "type": "function",
-      "name": "updateCommitmentBorrowers",
-      "constant": false,
-      "payable": false,
-      "inputs": [
-        {
-          "type": "uint256",
-          "name": "_commitmentId"
-        },
-        {
-          "type": "address[]",
-          "name": "_borrowerAddressList"
-        }
-      ],
-      "outputs": []
     }
   ],
   "transactionHash": "0x13b0c829f782ea24faf2675944a43fe125c05abf7673764ee618e206306bea27",
@@ -570,6 +660,6 @@
     "status": 1,
     "byzantium": true
   },
-  "numDeployments": 3,
+  "numDeployments": 10,
   "implementation": "0x67836900F57360E6F868CA19806Bf4f51c84650B"
 }

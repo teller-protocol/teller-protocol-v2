@@ -3,6 +3,7 @@
   "abi": [
     {
       "type": "constructor",
+      "stateMutability": "undefined",
       "payable": false,
       "inputs": [
         {
@@ -179,7 +180,8 @@
       "inputs": [],
       "outputs": [
         {
-          "type": "address"
+          "type": "address",
+          "name": ""
         }
       ]
     },
@@ -192,7 +194,8 @@
       "inputs": [],
       "outputs": [
         {
-          "type": "address"
+          "type": "address",
+          "name": ""
         }
       ]
     },
@@ -240,6 +243,52 @@
     },
     {
       "type": "function",
+      "name": "acceptCommitmentWithProof",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_commitmentId"
+        },
+        {
+          "type": "uint256",
+          "name": "_principalAmount"
+        },
+        {
+          "type": "uint256",
+          "name": "_collateralAmount"
+        },
+        {
+          "type": "uint256",
+          "name": "_collateralTokenId"
+        },
+        {
+          "type": "address",
+          "name": "_collateralTokenAddress"
+        },
+        {
+          "type": "uint16",
+          "name": "_interestRate"
+        },
+        {
+          "type": "uint32",
+          "name": "_loanDuration"
+        },
+        {
+          "type": "bytes32[]",
+          "name": "_merkleProof"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": "bidId"
+        }
+      ]
+    },
+    {
+      "type": "function",
       "name": "addCommitmentBorrowers",
       "constant": false,
       "payable": false,
@@ -263,12 +312,14 @@
       "payable": false,
       "inputs": [
         {
-          "type": "uint256"
+          "type": "uint256",
+          "name": ""
         }
       ],
       "outputs": [
         {
-          "type": "uint256"
+          "type": "uint256",
+          "name": ""
         }
       ]
     },
@@ -280,7 +331,8 @@
       "payable": false,
       "inputs": [
         {
-          "type": "uint256"
+          "type": "uint256",
+          "name": ""
         }
       ],
       "outputs": [
@@ -439,7 +491,8 @@
       "inputs": [],
       "outputs": [
         {
-          "type": "address"
+          "type": "address",
+          "name": ""
         }
       ]
     },
@@ -473,7 +526,8 @@
       ],
       "outputs": [
         {
-          "type": "uint256"
+          "type": "uint256",
+          "name": ""
         }
       ]
     },
@@ -486,7 +540,8 @@
       "inputs": [],
       "outputs": [
         {
-          "type": "address"
+          "type": "address",
+          "name": ""
         }
       ]
     },
@@ -503,7 +558,8 @@
       ],
       "outputs": [
         {
-          "type": "address"
+          "type": "address",
+          "name": ""
         }
       ]
     },
@@ -668,6 +724,6 @@
     "status": 1,
     "byzantium": true
   },
-  "numDeployments": 1,
+  "numDeployments": 3,
   "implementation": "0x08C12C6943C41D12572B8C39926C3Fca6Dd376F9"
 }

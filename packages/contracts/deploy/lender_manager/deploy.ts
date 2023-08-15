@@ -6,7 +6,7 @@ const deployFn: DeployFunction = async (hre) => {
   const lenderManagerArt = await hre.contracts.get('LenderManagerArt')
 
   const lenderManager = await hre.deployProxy('LenderManager', {
-    constructorArgs: [marketRegistry.address],
+    constructorArgs: [await marketRegistry.getAddress()],
     unsafeAllow: ['constructor', 'state-variable-immutable'],
     libraries: {
       LenderManagerArt: lenderManagerArt.address,

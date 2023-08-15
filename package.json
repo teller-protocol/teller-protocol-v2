@@ -23,7 +23,7 @@
       "packages/subgraph"
     ]
   },
-  "packageManager": "yarn@3.2.2",
+  "packageManager": "yarn@3.6.1",
   "devDependencies": {
     "eslint": "^7.32.0",
     "husky": "^8.0.1",

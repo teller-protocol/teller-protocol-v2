@@ -1,39 +1,37 @@
 {{#*inline "global_required_abis"}}
         - name: TellerV2
-          file: ./abis/{{network}}_TellerV2.json
+          file: ./abis/{{export_network_name}}_TellerV2.json
         - name: TellerV0Storage
-          file: ../../packages/contracts/generated/artifacts/contracts/TellerV0Storage.sol/TellerV0Storage.json
+          file: ../contracts/generated/artifacts/contracts/TellerV0Storage.sol/TellerV0Storage.json
         - name: ERC165
-          file: ../../packages/contracts/generated/artifacts/@openzeppelin/contracts/utils/introspection/ERC165.sol/ERC165.json
+          file: ../contracts/generated/artifacts/@openzeppelin/contracts/utils/introspection/ERC165.sol/ERC165.json
         - name: IERC20Metadata
-          file: ../../packages/contracts/generated/artifacts/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol/IERC20Metadata.json
+          file: ../contracts/generated/artifacts/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol/IERC20Metadata.json
 {{/inline}}
-specVersion: 0.0.2
+specVersion: 0.0.4
 schema:
   file: ./src/schema.graphql
-{{#with grafting}}
-{{#if enabled}}
+{{#if grafting.enabled}}
 features:
   - grafting
-graft:
-  base: {{base}}
-  block: {{block}}
 {{/if}}
-{{/with}}
+{{#if grafting.enabled}}
+graft:
+  base: {{grafting.base}}
+  block: {{grafting.block}}
+{{/if}}
 dataSources:
 {{#if block_handler.enabled}}
   - kind: ethereum/contract
     name: Blocks
     network: {{network}}
     source:
-      {{#with block_handler}}
-      address: '{{../contracts.teller_v2.address}}'
+      address: '{{contracts.teller_v2.address}}'
       abi: TellerV2
-      startBlock: {{block}}
-      {{/with}}
+      startBlock: {{block_handler.block}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - Protocol
@@ -43,18 +41,44 @@ dataSources:
         - Bid
       abis:
         - name: TellerV2
-          file: ./abis/{{network}}_TellerV2.json
+          file: ./abis/{{export_network_name}}_TellerV2.json
         - name: TellerV0Storage
-          file: ../../packages/contracts/generated/artifacts/contracts/TellerV0Storage.sol/TellerV0Storage.json
+          file: ../contracts/generated/artifacts/contracts/TellerV0Storage.sol/TellerV0Storage.json
         - name: ERC165
-          file: ../../packages/contracts/generated/artifacts/@openzeppelin/contracts/utils/introspection/ERC165.sol/ERC165.json
+          file: ../contracts/generated/artifacts/@openzeppelin/contracts/utils/introspection/ERC165.sol/ERC165.json
         - name: IERC20Metadata
-          file: ../../packages/contracts/generated/artifacts/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol/IERC20Metadata.json
+          file: ../contracts/generated/artifacts/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol/IERC20Metadata.json
       blockHandlers:
         - handler: handleBlock
       file: ./src/block-handler.ts
 {{/if}}
 {{#if contracts.teller_v2.enabled}}
+  - kind: ethereum/contract
+    name: TellerV2_Proxy
+    network: {{network}}
+    source:
+    {{#with contracts.teller_v2}}
+      address: '{{address}}'
+      abi: Proxy
+      startBlock: {{block}}
+    {{/with}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Bid
+      abis:
+        - name: TellerV2
+          file: ./abis/{{export_network_name}}_TellerV2.json
+        - name: TellerV0Storage
+          file: ../contracts/generated/artifacts/contracts/TellerV0Storage.sol/TellerV0Storage.json
+        - name: Proxy
+          file: ../contracts/generated/artifacts/@openzeppelin/contracts/proxy/ERC1967/ERC1967Upgrade.sol/ERC1967Upgrade.json
+      eventHandlers:
+        - event: Upgraded(indexed address)
+          handler: handleTellerV2Upgraded
+      file: ./src/teller-v2/proxy.ts
   - kind: ethereum/contract
     name: TellerV2
     network: {{network}}
@@ -66,7 +90,7 @@ dataSources:
     {{/with}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - Bid
@@ -77,13 +101,13 @@ dataSources:
         - LoanStatusCount
       abis:
         - name: TellerV2
-          file: ./abis/{{network}}_TellerV2.json
+          file: ./abis/{{export_network_name}}_TellerV2.json
         - name: TellerV0Storage
-          file: ../../packages/contracts/generated/artifacts/contracts/TellerV0Storage.sol/TellerV0Storage.json
+          file: ../contracts/generated/artifacts/contracts/TellerV0Storage.sol/TellerV0Storage.json
         - name: ERC165
-          file: ../../packages/contracts/generated/artifacts/@openzeppelin/contracts/utils/introspection/ERC165.sol/ERC165.json
+          file: ../contracts/generated/artifacts/@openzeppelin/contracts/utils/introspection/ERC165.sol/ERC165.json
         - name: IERC20Metadata
-          file: ../../packages/contracts/generated/artifacts/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol/IERC20Metadata.json
+          file: ../contracts/generated/artifacts/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol/IERC20Metadata.json
       eventHandlers:
         # TODO: add MarketForwarderApproved event for Lender entity
 
@@ -103,11 +127,33 @@ dataSources:
 
         - event: FeePaid(indexed uint256,indexed string,indexed uint256)
           handler: handleFeePaid
-        - event: Upgraded(indexed address)
-          handler: handleTellerV2Upgraded
       file: ./src/mapping.ts
 {{/if}}
 {{#if contracts.market_registry.enabled}}
+  - kind: ethereum/contract
+    name: MarketRegistry_Proxy
+    network: {{network}}
+    source:
+    {{#with contracts.market_registry}}
+      address: '{{address}}'
+      abi: Proxy
+      startBlock: {{block}}
+    {{/with}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - MarketPlace
+      abis:
+        - name: MarketRegistry
+          file: ./abis/{{export_network_name}}_MarketRegistry.json
+        - name: Proxy
+          file: ../contracts/generated/artifacts/@openzeppelin/contracts/proxy/ERC1967/ERC1967Upgrade.sol/ERC1967Upgrade.json
+      eventHandlers:
+        - event: Upgraded(indexed address)
+          handler: handleMarketRegistryUpgraded
+      file: ./src/market-registry/proxy.ts
   - kind: ethereum/contract
     name: MarketRegistry
     network: {{network}}
@@ -119,13 +165,13 @@ dataSources:
     {{/with}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - MarketPlace
       abis:
         - name: MarketRegistry
-          file: ./abis/{{network}}_MarketRegistry.json
+          file: ./abis/{{export_network_name}}_MarketRegistry.json
       eventHandlers:
         - event: MarketCreated(indexed address,uint256)
           handler: handleMarketCreated
@@ -159,8 +205,6 @@ dataSources:
           handler: handleBorrowerExitMarket
         - event: MarketClosed(uint256)
           handler: handleMarketClosed
-        - event: Upgraded(indexed address)
-          handler: handleMarketRegistryUpgraded
         - event: SetMarketPaymentType(uint256,uint8)
           handler: handleSetMarketPaymentType
       file: ./src/market-registry/mapping.ts
@@ -177,7 +221,7 @@ dataSources:
     {{/with}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - Commitment
@@ -187,11 +231,11 @@ dataSources:
         - LoanStatusCount
       abis:
         - name: LenderCommitmentForwarder
-          file: ./abis/{{network}}_LenderCommitmentForwarder.json
+          file: ./abis/{{export_network_name}}_LenderCommitmentForwarder.json
         - name: ERC165
-          file: ../../packages/contracts/generated/artifacts/@openzeppelin/contracts/utils/introspection/ERC165.sol/ERC165.json
+          file: ../contracts/generated/artifacts/@openzeppelin/contracts/utils/introspection/ERC165.sol/ERC165.json
         - name: IERC20Metadata
-          file: ../../packages/contracts/generated/artifacts/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol/IERC20Metadata.json
+          file: ../contracts/generated/artifacts/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol/IERC20Metadata.json
       eventHandlers:
         - event: CreatedCommitment(indexed uint256,address,uint256,address,uint256)
           handler: handleCreatedCommitment
@@ -217,7 +261,7 @@ dataSources:
     {{/with}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - Bid
@@ -225,11 +269,13 @@ dataSources:
         - Collateral
       abis:
         - name: CollateralManager
-          file: ./abis/{{network}}_CollateralManager.json
+          file: ./abis/{{export_network_name}}_CollateralManager.json
+        - name: TellerV2
+          file: ./abis/{{export_network_name}}_TellerV2.json
         - name: ERC165
-          file: ../../packages/contracts/generated/artifacts/@openzeppelin/contracts/utils/introspection/ERC165.sol/ERC165.json
+          file: ../contracts/generated/artifacts/@openzeppelin/contracts/utils/introspection/ERC165.sol/ERC165.json
         - name: IERC20Metadata
-          file: ../../packages/contracts/generated/artifacts/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol/IERC20Metadata.json
+          file: ../contracts/generated/artifacts/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol/IERC20Metadata.json
       eventHandlers:
         - event: CollateralEscrowDeployed(uint256,address)
           handler: handleCollateralEscrowDeployed
@@ -255,7 +301,7 @@ dataSources:
     {{/with}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - RewardAllocation
@@ -263,7 +309,7 @@ dataSources:
       abis:
 {{> global_required_abis}}
         - name: MarketLiquidityRewards
-          file: ./abis/{{network}}_MarketLiquidityRewards.json
+          file: ./abis/{{export_network_name}}_MarketLiquidityRewards.json
       eventHandlers:
         - event: CreatedAllocation(uint256,address,uint256)
           handler: handleCreatedAllocation
@@ -291,7 +337,7 @@ dataSources:
     {{/with}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - Bid
@@ -300,7 +346,7 @@ dataSources:
         - TokenVolume
       abis:
         - name: LenderManager
-          file: ./abis/{{network}}_LenderManager.json
+          file: ./abis/{{export_network_name}}_LenderManager.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleNewLenderSet

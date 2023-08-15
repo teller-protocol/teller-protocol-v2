@@ -5,7 +5,6 @@ import {
   CommitmentZScore,
   MarketCommitmentStdDev
 } from "../../generated/schema";
-import { addToArray } from "../helpers/utils";
 
 /**
  * @param {string} commitmentId - ID of the commitment
@@ -35,9 +34,13 @@ export function loadCommitment(commitmentId: string): Commitment {
     commitment.principalTokenAddress = Address.zero();
 
     commitment.collateralToken = "";
+    commitment.collateralTokenAddress = Address.zero();
     commitment.collateralTokenType = BigInt.zero();
     commitment.maxPrincipalPerCollateralAmount = BigInt.zero();
     commitment.commitmentBorrowers = [];
+
+    commitment.maxPrincipal = BigInt.zero();
+    commitment.acceptedPrincipal = BigInt.zero();
 
     commitment.save();
   }

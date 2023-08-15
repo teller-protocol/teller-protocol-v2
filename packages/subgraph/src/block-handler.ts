@@ -11,11 +11,14 @@ import {
 } from "./helpers/bid";
 import { loadLoanStatusCount, loadProtocol } from "./helpers/loaders";
 import { updateBidStatus } from "./helpers/updaters";
-import { updateCommitmentStatus } from "./lender-commitment/updaters";
+import {
+  updateAvailableTokensFromCommitment,
+  updateCommitmentStatus
+} from "./lender-commitment/updaters";
 import { CommitmentStatus } from "./lender-commitment/utils";
 
 export function handleBlock(block: ethereum.Block): void {
-  const mod = block.number.mod(BigInt.fromI32(2));
+  const mod = block.number.mod(BigInt.fromI32(10));
   switch (mod.toI32()) {
     case 0:
       checkActiveBids(block);
@@ -82,6 +85,7 @@ export function checkActiveCommitments(block: ethereum.Block): void {
 
     if (commitment.expirationTimestamp.lt(block.timestamp)) {
       updateCommitmentStatus(commitment, CommitmentStatus.Expired);
+      updateAvailableTokensFromCommitment(commitment);
     }
   }
 }

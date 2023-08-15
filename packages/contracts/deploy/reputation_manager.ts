@@ -4,7 +4,7 @@ const deployFn: DeployFunction = async (hre) => {
   const tellerV2 = await hre.contracts.get('TellerV2')
 
   const reputationManager = await hre.deployProxy('ReputationManager', {
-    initArgs: [tellerV2.address],
+    initArgs: [await tellerV2.getAddress()],
   })
 
   return true

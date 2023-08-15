@@ -37,7 +37,7 @@ export const submitCollateralBid = async (
     'CollateralManager'
   )
 
-  const borrowerAddress = await hre.ethers.provider.getSigner().getAddress()
+  const borrower = await hre.ethers.provider.getSigner()
   const collateralAmountBN = toBN(
     collateralAmount,
     await collateralToken.decimals()
@@ -47,27 +47,29 @@ export const submitCollateralBid = async (
   const bidId = await tellerV2[
     'submitBid(address,uint256,uint256,uint32,uint16,string,address,(uint8,uint256,uint256,address)[])'
   ](
-    lendingToken.address, // Lending token
+    lendingToken, // Lending token
     marketPlaceId, // Marketplace Id
     toBN(amountToBorrow, await lendingToken.decimals()), // Principal
     durationInSeconds.toString(), // Duration
     apr.toString(), // APR
     metadataURI, // MetadataURI
-    borrowerAddress, // Receiver
+    borrower, // Receiver
     [
       {
         _collateralType: 0, // ERC20
         _amount: collateralAmountBN,
         _tokenId: 0,
-        _collateralAddress: collateralToken.address,
+        _collateralAddress: collateralToken,
       },
     ]
   )
 
   // Approve collateral manager to be able to pull in committed collateral
-  await collateralToken.approve(collateralManager.address, collateralAmountBN)
+  await collateralToken.approve(collateralManager, collateralAmountBN)
 
-  log(`Submitted collateral bid for ${borrowerAddress}`, { indent: 4 })
+  log(`Submitted collateral bid for ${await borrower.getAddress()}`, {
+    indent: 4,
+  })
 }
 
 task('submit-collateral-bid', 'submits a collateral backed bid')

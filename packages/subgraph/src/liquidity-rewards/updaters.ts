@@ -399,15 +399,13 @@ function bidIsEligibleForReward(
       for (let i = 0; i < bidCollaterals.length; i++) {
         const bidCollateral = BidCollateral.load(bidCollaterals[i])!;
 
-        const principalToken = loadToken(Address.fromString(bid.lendingToken));
+        const principalToken = loadToken(bid.lendingTokenAddress);
         let principalTokenDecimals = principalToken.decimals;
         if (!principalTokenDecimals) {
           principalTokenDecimals = BigInt.zero();
         }
 
-        const collateralToken = loadToken(
-          Address.fromString(bidCollateral.token)
-        );
+        const collateralToken = loadToken(bidCollateral.collateralAddress);
         let collateralTokenDecimals = collateralToken.decimals;
         if (!collateralTokenDecimals) {
           collateralTokenDecimals = BigInt.zero();

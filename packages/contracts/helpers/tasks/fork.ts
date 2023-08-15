@@ -98,26 +98,24 @@ task('fork', 'Forks a chain and starts a JSON-RPC server of that forked chain')
   .setAction(forkNetwork)
 
 subtask('fork:fund-deployer').setAction(async (args, hre) => {
-  const { ethers, network } = hre
+  const { ethers } = hre
 
   const [mainAccount] = await hre.getUnnamedAccounts()
   const { deployer } = await hre.getNamedAccounts()
-  if (
-    ethers.utils.getAddress(mainAccount) !== ethers.utils.getAddress(deployer)
-  ) {
+  if (ethers.getAddress(mainAccount) !== ethers.getAddress(deployer)) {
     const chain = process.env.HARDHAT_DEPLOY_FORK
     if (chain === 'mainnet' || chain === 'goerli') {
       await getFunds({
         to: deployer,
         tokenSym: 'ETH',
-        amount: hre.ethers.utils.parseEther('1000'),
+        amount: hre.ethers.parseEther('1000'),
         hre,
       })
     } else {
       await getFunds({
         to: deployer,
         tokenSym: 'MATIC',
-        amount: hre.ethers.utils.parseEther('10000'),
+        amount: hre.ethers.parseEther('10000'),
         hre,
       })
     }

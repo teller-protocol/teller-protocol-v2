@@ -13,6 +13,7 @@ import "@openzeppelin/contracts-upgradeable/utils/structs/EnumerableSetUpgradeab
 // Libraries
 import { MathUpgradeable } from "@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20MetadataUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/cryptography/MerkleProofUpgradeable.sol";
 
 contract LenderCommitmentForwarder is TellerV2MarketForwarder {
     using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
@@ -23,7 +24,9 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         ERC721,
         ERC1155,
         ERC721_ANY_ID,
-        ERC1155_ANY_ID
+        ERC1155_ANY_ID,
+        ERC721_MERKLE_PROOF,
+        ERC1155_MERKLE_PROOF
     }
 
     /**
@@ -45,7 +48,7 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint32 maxDuration;
         uint16 minInterestRate;
         address collateralTokenAddress;
-        uint256 collateralTokenId;
+        uint256 collateralTokenId; //we use this for the MerkleRootHash  for type ERC721_MERKLE_PROOF
         uint256 maxPrincipalPerCollateralAmount;
         CommitmentCollateralType collateralTokenType;
         address lender;
@@ -58,8 +61,11 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
 
     uint256 commitmentCount;
 
+    //https://github.com/OpenZeppelin/openzeppelin-contracts-upgradeable/blob/master/contracts/utils/structs/EnumerableSetUpgradeable.sol
     mapping(uint256 => EnumerableSetUpgradeable.AddressSet)
         internal commitmentBorrowersList;
+
+    mapping(uint256 => uint256) public commitmentPrincipalAccepted;
 
     /**
      * @notice This event is emitted when a lender's commitment is created.
@@ -212,6 +218,11 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         Commitment calldata _commitment
     ) public commitmentLender(_commitmentId) {
         require(
+            _commitment.lender == _msgSender(),
+            "Commitment lender cannot be updated."
+        );
+
+        require(
             _commitment.principalTokenAddress ==
                 commitments[_commitmentId].principalTokenAddress,
             "Principal token address cannot be updated."
@@ -240,12 +251,26 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
      * @param _commitmentId The Id of the commitment to update.
      * @param _borrowerAddressList The array of borrowers that are allowed to accept loans using this commitment
      */
-    function updateCommitmentBorrowers(
+    function addCommitmentBorrowers(
         uint256 _commitmentId,
         address[] calldata _borrowerAddressList
     ) public commitmentLender(_commitmentId) {
-        delete commitmentBorrowersList[_commitmentId];
         _addBorrowersToCommitmentAllowlist(_commitmentId, _borrowerAddressList);
+    }
+
+    /**
+     * @notice Updates the borrowers allowed to accept a commitment
+     * @param _commitmentId The Id of the commitment to update.
+     * @param _borrowerAddressList The array of borrowers that are allowed to accept loans using this commitment
+     */
+    function removeCommitmentBorrowers(
+        uint256 _commitmentId,
+        address[] calldata _borrowerAddressList
+    ) public commitmentLender(_commitmentId) {
+        _removeBorrowersFromCommitmentAllowlist(
+            _commitmentId,
+            _borrowerAddressList
+        );
     }
 
     /**
@@ -264,6 +289,21 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
     }
 
     /**
+     * @notice Removes a borrower to the allowlist for a commmitment.
+     * @param _commitmentId The id of the commitment that will allow the new borrower
+     * @param _borrowerArray the address array of the borrowers that will be allowed to accept loans using the commitment
+     */
+    function _removeBorrowersFromCommitmentAllowlist(
+        uint256 _commitmentId,
+        address[] calldata _borrowerArray
+    ) internal {
+        for (uint256 i = 0; i < _borrowerArray.length; i++) {
+            commitmentBorrowersList[_commitmentId].remove(_borrowerArray[i]);
+        }
+        emit UpdatedCommitmentBorrowers(_commitmentId);
+    }
+
+    /**
      * @notice Removes the commitment of a lender to a market.
      * @param _commitmentId The id of the commitment to delete.
      */
@@ -274,18 +314,6 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         delete commitments[_commitmentId];
         delete commitmentBorrowersList[_commitmentId];
         emit DeletedCommitment(_commitmentId);
-    }
-
-    /**
-     * @notice Reduces the commitment amount for a lender to a market.
-     * @param _commitmentId The id of the commitment to modify.
-     * @param _tokenAmountDelta The amount of change in the maxPrincipal.
-     */
-    function _decrementCommitment(
-        uint256 _commitmentId,
-        uint256 _tokenAmountDelta
-    ) internal {
-        commitments[_commitmentId].maxPrincipal -= _tokenAmountDelta;
     }
 
     /**
@@ -309,6 +337,103 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         uint16 _interestRate,
         uint32 _loanDuration
     ) external returns (uint256 bidId) {
+        require(
+            commitments[_commitmentId].collateralTokenType <=
+                CommitmentCollateralType.ERC1155_ANY_ID,
+            "Invalid commitment collateral type"
+        );
+
+        return
+            _acceptCommitment(
+                _commitmentId,
+                _principalAmount,
+                _collateralAmount,
+                _collateralTokenId,
+                _collateralTokenAddress,
+                _interestRate,
+                _loanDuration
+            );
+    }
+
+    /**
+     * @notice Accept the commitment to submitBid and acceptBid using the funds
+     * @dev LoanDuration must be longer than the market payment cycle
+     * @param _commitmentId The id of the commitment being accepted.
+     * @param _principalAmount The amount of currency to borrow for the loan.
+     * @param _collateralAmount The amount of collateral to use for the loan.
+     * @param _collateralTokenId The tokenId of collateral to use for the loan if ERC721 or ERC1155.
+     * @param _collateralTokenAddress The contract address to use for the loan collateral tokens.
+     * @param _interestRate The interest rate APY to use for the loan in basis points.
+     * @param _loanDuration The overall duration for the loan.  Must be longer than market payment cycle duration.
+     * @param _merkleProof An array of bytes32 which are the roots down the merkle tree, the merkle proof.
+     * @return bidId The ID of the loan that was created on TellerV2
+     */
+    function acceptCommitmentWithProof(
+        uint256 _commitmentId,
+        uint256 _principalAmount,
+        uint256 _collateralAmount,
+        uint256 _collateralTokenId,
+        address _collateralTokenAddress,
+        uint16 _interestRate,
+        uint32 _loanDuration,
+        bytes32[] calldata _merkleProof
+    ) external returns (uint256 bidId) {
+        require(
+            commitments[_commitmentId].collateralTokenType ==
+                CommitmentCollateralType.ERC721_MERKLE_PROOF ||
+                commitments[_commitmentId].collateralTokenType ==
+                CommitmentCollateralType.ERC1155_MERKLE_PROOF,
+            "Invalid commitment collateral type"
+        );
+
+        bytes32 _merkleRoot = bytes32(
+            commitments[_commitmentId].collateralTokenId
+        );
+        bytes32 _leaf = keccak256(abi.encodePacked(_collateralTokenId));
+
+        //make sure collateral token id is a leaf within the proof
+        require(
+            MerkleProofUpgradeable.verifyCalldata(
+                _merkleProof,
+                _merkleRoot,
+                _leaf
+            ),
+            "Invalid proof"
+        );
+
+        return
+            _acceptCommitment(
+                _commitmentId,
+                _principalAmount,
+                _collateralAmount,
+                _collateralTokenId,
+                _collateralTokenAddress,
+                _interestRate,
+                _loanDuration
+            );
+    }
+
+    /**
+     * @notice Accept the commitment to submitBid and acceptBid using the funds
+     * @dev LoanDuration must be longer than the market payment cycle
+     * @param _commitmentId The id of the commitment being accepted.
+     * @param _principalAmount The amount of currency to borrow for the loan.
+     * @param _collateralAmount The amount of collateral to use for the loan.
+     * @param _collateralTokenId The tokenId of collateral to use for the loan if ERC721 or ERC1155.
+     * @param _collateralTokenAddress The contract address to use for the loan collateral tokens.
+     * @param _interestRate The interest rate APY to use for the loan in basis points.
+     * @param _loanDuration The overall duration for the loan.  Must be longer than market payment cycle duration.
+     * @return bidId The ID of the loan that was created on TellerV2
+     */
+    function _acceptCommitment(
+        uint256 _commitmentId,
+        uint256 _principalAmount,
+        uint256 _collateralAmount,
+        uint256 _collateralTokenId,
+        address _collateralTokenAddress,
+        uint16 _interestRate,
+        uint32 _loanDuration
+    ) internal returns (uint256 bidId) {
         address borrower = _msgSender();
 
         Commitment storage commitment = commitments[_commitmentId];
@@ -330,6 +455,11 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         require(
             _loanDuration <= commitment.maxDuration,
             "Invalid loan max duration"
+        );
+
+        require(
+            commitmentPrincipalAccepted[bidId] <= commitment.maxPrincipal,
+            "Invalid loan max principal"
         );
 
         require(
@@ -364,7 +494,9 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         if (
             commitment.collateralTokenType == CommitmentCollateralType.ERC721 ||
             commitment.collateralTokenType ==
-            CommitmentCollateralType.ERC721_ANY_ID
+            CommitmentCollateralType.ERC721_ANY_ID ||
+            commitment.collateralTokenType ==
+            CommitmentCollateralType.ERC721_MERKLE_PROOF
         ) {
             require(
                 _collateralAmount == 1,
@@ -383,6 +515,14 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
             );
         }
 
+        commitmentPrincipalAccepted[_commitmentId] += _principalAmount;
+
+        require(
+            commitmentPrincipalAccepted[_commitmentId] <=
+                commitment.maxPrincipal,
+            "Exceeds max principal of commitment"
+        );
+
         bidId = _submitBidFromCommitment(
             borrower,
             commitment.marketId,
@@ -397,8 +537,6 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         );
 
         _acceptBid(bidId, commitment.lender);
-
-        _decrementCommitment(_commitmentId, _principalAmount);
 
         emit ExercisedCommitment(
             _commitmentId,
@@ -528,13 +666,15 @@ contract LenderCommitmentForwarder is TellerV2MarketForwarder {
         }
         if (
             _type == CommitmentCollateralType.ERC721 ||
-            _type == CommitmentCollateralType.ERC721_ANY_ID
+            _type == CommitmentCollateralType.ERC721_ANY_ID ||
+            _type == CommitmentCollateralType.ERC721_MERKLE_PROOF
         ) {
             return CollateralType.ERC721;
         }
         if (
             _type == CommitmentCollateralType.ERC1155 ||
-            _type == CommitmentCollateralType.ERC1155_ANY_ID
+            _type == CommitmentCollateralType.ERC1155_ANY_ID ||
+            _type == CommitmentCollateralType.ERC1155_MERKLE_PROOF
         ) {
             return CollateralType.ERC1155;
         }

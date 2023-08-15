@@ -1,6 +1,0 @@
-scalar BigInt
-scalar Bytes
-
-directive @entity on OBJECT
-directive @derivedFrom(field: String!) on FIELD_DEFINITION
-

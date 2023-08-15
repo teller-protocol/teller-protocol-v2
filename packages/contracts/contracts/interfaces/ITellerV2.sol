@@ -59,7 +59,7 @@ interface ITellerV2 {
             uint256 amountToBorrower
         );
 
-    function calculateAmountDue(uint256 _bidId)
+    function calculateAmountDue(uint256 _bidId, uint256 _timestamp)
         external
         view
         returns (Payment memory due);
@@ -145,6 +145,7 @@ interface ITellerV2 {
             address principalTokenAddress,
             uint256 principalAmount,
             uint32 acceptedTimestamp,
+            uint32 lastRepaidTimestamp,
             BidState bidState
         );
 }

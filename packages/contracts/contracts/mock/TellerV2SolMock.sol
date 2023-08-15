@@ -35,7 +35,7 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
         bid.borrower = msg.sender;
         bid.receiver = _receiver != address(0) ? _receiver : bid.borrower;
         bid.marketplaceId = _marketId;
-        bid.loanDetails.lendingToken = ERC20(_lendingToken);
+        bid.loanDetails.lendingToken = IERC20(_lendingToken);
         bid.loanDetails.principal = _principal;
         bid.loanDetails.loanDuration = _duration;
         bid.loanDetails.timestamp = uint32(block.timestamp);
@@ -217,6 +217,7 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
             address principalTokenAddress,
             uint256 principalAmount,
             uint32 acceptedTimestamp,
+            uint32 lastRepaidTimestamp,
             BidState bidState
         )
     {
@@ -228,6 +229,7 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
         principalTokenAddress = address(bid.loanDetails.lendingToken);
         principalAmount = bid.loanDetails.principal;
         acceptedTimestamp = bid.loanDetails.acceptedTimestamp;
+        lastRepaidTimestamp = bid.loanDetails.lastRepaidTimestamp;
         bidState = bid.state;
     }
 

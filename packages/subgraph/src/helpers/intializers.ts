@@ -1,26 +1,37 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 
-import { TokenVolume } from "../../generated/schema";
+import { Token, TokenVolume } from "../../generated/schema";
 
-export function initTokenVolume(
-  token: TokenVolume,
-  tokenAddress: Address
-): void {
-  token.lendingTokenAddress = tokenAddress;
-  token.bids = [];
-  token.activeLoans = BigInt.zero();
-  token.closedLoans = BigInt.zero();
+import { loadLoanStatusCount } from "./loaders";
 
-  token.outstandingCapital = BigInt.zero();
-  token.totalLoaned = BigInt.zero();
-  token.loanAverage = BigInt.zero();
+export function initTokenVolume(tokenVolume: TokenVolume, token: Token): void {
+  tokenVolume.token = token.id;
+  tokenVolume.lendingTokenAddress = Address.fromBytes(token.address);
 
-  token.commissionEarned = BigInt.zero();
-  token.totalRepaidInterest = BigInt.zero();
+  loadLoanStatusCount("tokenVolume", tokenVolume.id);
 
-  token._aprTotal = BigInt.zero();
-  token.aprAverage = BigInt.zero();
+  tokenVolume.outstandingCapital = BigInt.zero();
+  tokenVolume.totalAvailable = BigInt.zero();
+  tokenVolume.totalLoaned = BigInt.zero();
+  tokenVolume.totalActive = BigInt.zero();
+  tokenVolume.totalAccepted = BigInt.zero();
+  tokenVolume.totalDueSoon = BigInt.zero();
+  tokenVolume.totalLate = BigInt.zero();
+  tokenVolume.totalDefaulted = BigInt.zero();
+  tokenVolume.totalRepaid = BigInt.zero();
+  tokenVolume.totalLiquidated = BigInt.zero();
 
-  token._durationTotal = BigInt.zero();
-  token.durationAverage = BigInt.zero();
+  tokenVolume._loanAcceptedCount = BigInt.zero();
+  tokenVolume.loanAverage = BigInt.zero();
+
+  tokenVolume.commissionEarned = BigInt.zero();
+  tokenVolume.totalRepaidInterest = BigInt.zero();
+
+  tokenVolume._aprWeightedTotal = BigInt.zero();
+  tokenVolume.aprAverage = BigInt.zero();
+  tokenVolume._aprActiveWeightedTotal = BigInt.zero();
+  tokenVolume.aprActiveAverage = BigInt.zero();
+
+  tokenVolume._durationTotal = BigInt.zero();
+  tokenVolume.durationAverage = BigInt.zero();
 }

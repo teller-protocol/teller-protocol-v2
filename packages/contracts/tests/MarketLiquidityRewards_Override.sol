@@ -33,7 +33,6 @@ contract MarketLiquidityRewards_Override is MarketLiquidityRewards {
     uint32 expiration;
 
     bool public verifyLoanStartTimeWasCalled;
-    bool public verifyExpectedTokenAddressWasCalled;
 
     bool public verifyRewardRecipientWasCalled;
     bool public verifyCollateralAmountWasCalled;
@@ -55,22 +54,16 @@ contract MarketLiquidityRewards_Override is MarketLiquidityRewards {
         allocatedRewards[_allocationId].rewardTokenAmount = _amount;
     }
 
-    function getRewardTokenAmount(uint256 allocationId)
-        public
-        view
-        returns (uint256)
-    {
-        return allocatedRewards[allocationId].rewardTokenAmount;
-    }
-
     function calculateRewardAmount(
         uint256 loanPrincipal,
+        uint32 loanDuration,
         uint256 principalTokenDecimals,
         uint256 rewardPerLoanPrincipalAmount
     ) public view returns (uint256) {
         return
             super._calculateRewardAmount(
                 loanPrincipal,
+                loanDuration,
                 principalTokenDecimals,
                 rewardPerLoanPrincipalAmount
             );
@@ -100,10 +93,6 @@ contract MarketLiquidityRewards_Override is MarketLiquidityRewards {
 
     function verifyLoanStartTime(uint32 a, uint32 b, uint32 c) public {
         super._verifyLoanStartTime(a, b, c);
-    }
-
-    function verifyExpectedTokenAddress(address a, address b) public {
-        super._verifyExpectedTokenAddress(a, b);
     }
 
     function verifyAndReturnRewardRecipient(
@@ -169,12 +158,5 @@ contract MarketLiquidityRewards_Override is MarketLiquidityRewards {
         uint32 maxStartTime
     ) internal override {
         verifyLoanStartTimeWasCalled = true;
-    }
-
-    function _verifyExpectedTokenAddress(
-        address loanTokenAddress,
-        address expectedTokenAddress
-    ) internal override {
-        verifyExpectedTokenAddressWasCalled = true;
     }
 }

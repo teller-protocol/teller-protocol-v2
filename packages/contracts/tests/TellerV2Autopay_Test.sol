@@ -200,7 +200,7 @@ contract TellerV2Autopay_Test is Testable, TellerV2Autopay {
         assertEq(borrowerBalanceDelta, 4002, "borrower did not autopay");
     }
 
-    function getEstimatedMinimumPayment(uint256 _bidId)
+    function getEstimatedMinimumPayment(uint256 _bidId, uint256 _timestamp)
         public
         override
         returns (uint256 _amount)

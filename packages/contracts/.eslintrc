@@ -10,7 +10,6 @@
     "ecmaFeatures": {
     },
     "tsconfigRootDir": ".",
-    
     "project": [
       "./tsconfig.json"
     ],
@@ -24,7 +23,6 @@
       "teller-math-lib"
     ]
   },
-   
   "env": {
     "es6": true,
     "node": true
@@ -43,17 +41,21 @@
   "plugins": [
     "prettier",
     "simple-import-sort",
+    "unused-imports",
     "@typescript-eslint"
   ],
   "rules": {
     "prettier/prettier": "error",
     "@typescript-eslint/ban-ts-comment": "off",
     "@typescript-eslint/no-empty-function": "warn",
-    "no-unused-vars": 0,
-    "@typescript-eslint/no-unused-vars": [
+    "no-unused-vars": "off",
+    "unused-imports/no-unused-imports": "error",
+    "unused-imports/no-unused-vars": [
       "warn",
       {
-        "ignoreRestSiblings": true,
+        "vars": "all",
+        "varsIgnorePattern": "^_",
+        "args": "after-used",
         "argsIgnorePattern": "^_"
       }
     ],

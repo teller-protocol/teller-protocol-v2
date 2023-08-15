@@ -119,8 +119,9 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     function commitCollateral(
         uint256 _bidId,
         Collateral[] calldata _collateralInfo
-    ) public returns (bool validation_) {
+    ) public onlyTellerV2 returns (bool validation_) {
         address borrower = tellerV2.getLoanBorrower(_bidId);
+        require(borrower != address(0), "Loan has no borrower");
         (validation_, ) = checkBalances(borrower, _collateralInfo);
 
         //if the collateral info is valid, call commitCollateral for each one
@@ -141,8 +142,9 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     function commitCollateral(
         uint256 _bidId,
         Collateral calldata _collateralInfo
-    ) public returns (bool validation_) {
+    ) public onlyTellerV2 returns (bool validation_) {
         address borrower = tellerV2.getLoanBorrower(_bidId);
+        require(borrower != address(0), "Loan has no borrower");
         validation_ = _checkBalance(borrower, _collateralInfo);
         if (validation_) {
             _commitCollateral(_bidId, _collateralInfo);
@@ -254,15 +256,29 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
      */
     function withdraw(uint256 _bidId) external {
         BidState bidState = tellerV2.getBidState(_bidId);
-        if (bidState == BidState.PAID) {
-            //if the bid is fully repaid the borrower gets all collateral assets back
-            _withdraw(_bidId, tellerV2.getLoanBorrower(_bidId));
-        } else if (tellerV2.isLoanDefaulted(_bidId)) {
-            //if the bid is defaulted the lender gets all of the collateral
+
+        require(bidState == BidState.PAID, "collateral cannot be withdrawn");
+
+        _withdraw(_bidId, tellerV2.getLoanBorrower(_bidId));
+
+        emit CollateralClaimed(_bidId);
+    }
+
+    /**
+     * @notice Withdraws deposited collateral from the created escrow of a bid that has been CLOSED after being defaulted.
+     * @param _bidId The id of the bid to withdraw collateral for.
+     */
+    function lenderClaimCollateral(uint256 _bidId) external onlyTellerV2 {
+        if (isBidCollateralBacked(_bidId)) {
+            BidState bidState = tellerV2.getBidState(_bidId);
+
+            require(
+                bidState == BidState.CLOSED,
+                "Loan has not been liquidated"
+            );
+
             _withdraw(_bidId, tellerV2.getLoanLender(_bidId));
             emit CollateralClaimed(_bidId);
-        } else {
-            revert("collateral cannot be withdrawn");
         }
     }
 
@@ -435,6 +451,19 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         Collateral memory _collateralInfo
     ) internal virtual {
         CollateralInfo storage collateral = _bidCollaterals[_bidId];
+
+        require(
+            !collateral.collateralAddresses.contains(
+                _collateralInfo._collateralAddress
+            ),
+            "Cannot commit multiple collateral with the same address"
+        );
+        require(
+            _collateralInfo._collateralType != CollateralType.ERC721 ||
+                _collateralInfo._amount == 1,
+            "ERC721 collateral must have amount of 1"
+        );
+
         collateral.collateralAddresses.add(_collateralInfo._collateralAddress);
         collateral.collateralInfo[
             _collateralInfo._collateralAddress

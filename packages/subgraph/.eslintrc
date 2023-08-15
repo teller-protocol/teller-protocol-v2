@@ -4,7 +4,7 @@
   "parserOptions": {
     "ecmaVersion": 2020, // Allows for the parsing of modern ECMAScript features
     "sourceType": "module", // Allows for the use of imports,
-    "project": "tsconfig.json",
+    "project": ["tsconfig.json", "scripts/tsconfig.json"],
     "tsconfigRootDir": ".",
     "projectFolderIgnoreList": [
       "node_modules/*",
@@ -61,7 +61,7 @@
     "@typescript-eslint/strict-boolean-expressions": "off",
     "@typescript-eslint/unbound-method": 0,
     "@typescript-eslint/no-non-null-assertion": "off",
-    "no-param-reassign": "error",
+    "no-param-reassign": "warn",
     "no-duplicate-imports": "warn",
     //"dynamic-import-chunkname": "warn",
     "import/order": [

@@ -1,4 +1,4 @@
-import { Delegation } from '@ethereum-attestation-service/sdk'
+import { Delegation } from '@ethereum-attestation-service/eas-sdk'
 import { ecsign } from 'ethereumjs-util'
 import { BigNumber, Signer } from 'ethers'
 

@@ -1,6 +1,0 @@
-undecided:
-  - "@scaffold-eth/typescript"
-  - "@scaffold-eth/services"
-  - "@scaffold-eth/subgraph"
-  - "@scaffold-eth/vite-app-ts"
-  - netlify-plugin-builder

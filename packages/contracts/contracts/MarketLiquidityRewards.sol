@@ -21,7 +21,6 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20Metadat
 
 - Anyone can allocate rewards and an allocation has specific parameters that can be set to incentivise certain types of loans
  
-
 */
 
 contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
@@ -94,6 +93,11 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
         require(
             _allocation.allocator == msg.sender,
             "Invalid allocator address"
+        );
+
+        require(
+            _allocation.requiredPrincipalTokenAddress != address(0),
+            "Invalid required principal token address"
         );
 
         IERC20Upgradeable(_allocation.rewardTokenAddress).transferFrom(
@@ -193,6 +197,33 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
         }
     }
 
+    struct LoanSummary {
+        address borrower;
+        address lender;
+        uint256 marketId;
+        address principalTokenAddress;
+        uint256 principalAmount;
+        uint32 acceptedTimestamp;
+        uint32 lastRepaidTimestamp;
+        BidState bidState;
+    }
+
+    function _getLoanSummary(uint256 _bidId)
+        internal
+        returns (LoanSummary memory _summary)
+    {
+        (
+            _summary.borrower,
+            _summary.lender,
+            _summary.marketId,
+            _summary.principalTokenAddress,
+            _summary.principalAmount,
+            _summary.acceptedTimestamp,
+            _summary.lastRepaidTimestamp,
+            _summary.bidState
+        ) = ITellerV2(tellerV2).getLoanSummary(_bidId);
+    }
+
     /**
      * @notice Allows a borrower or lender to withdraw the allocated ERC20 reward for their loan
      * @param _allocationId - The id for the reward allocation
@@ -213,22 +244,15 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
         );
         rewardClaimedForBid[_bidId][_allocationId] = true;
 
-        (
-            address borrower,
-            address lender,
-            uint256 marketId,
-            address principalTokenAddress,
-            uint256 principalAmount,
-            uint32 acceptedTimestamp,
-            BidState bidState
-        ) = ITellerV2(tellerV2).getLoanSummary(_bidId);
+        //make this a struct ?
+        LoanSummary memory loanSummary = _getLoanSummary(_bidId); //ITellerV2(tellerV2).getLoanSummary(_bidId);
 
         address collateralTokenAddress = allocatedReward
             .requiredCollateralTokenAddress;
 
         //require that the loan was started in the correct timeframe
         _verifyLoanStartTime(
-            acceptedTimestamp,
+            loanSummary.acceptedTimestamp,
             allocatedReward.bidStartTimeMin,
             allocatedReward.bidStartTimeMax
         );
@@ -242,45 +266,49 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
             _verifyCollateralAmount(
                 collateralTokenAddress,
                 collateralAmount,
-                principalTokenAddress,
-                principalAmount,
+                loanSummary.principalTokenAddress,
+                loanSummary.principalAmount,
                 allocatedReward.minimumCollateralPerPrincipalAmount
             );
         }
 
-        //verify that the principal token address of the bid meets the allocation requirements
-        _verifyExpectedTokenAddress(
-            principalTokenAddress,
-            allocatedReward.requiredPrincipalTokenAddress
-        );
-
-        //verify that the collateral token address of the bid meets the allocation requirements
-        _verifyExpectedTokenAddress(
-            collateralTokenAddress,
-            allocatedReward.requiredCollateralTokenAddress
+        require(
+            loanSummary.principalTokenAddress ==
+                allocatedReward.requiredPrincipalTokenAddress,
+            "Principal token address mismatch for allocation"
         );
 
         require(
-            marketId == allocatedRewards[_allocationId].marketId,
+            loanSummary.marketId == allocatedRewards[_allocationId].marketId,
             "MarketId mismatch for allocation"
         );
 
         uint256 principalTokenDecimals = IERC20MetadataUpgradeable(
-            principalTokenAddress
+            loanSummary.principalTokenAddress
         ).decimals();
 
         address rewardRecipient = _verifyAndReturnRewardRecipient(
             allocatedReward.allocationStrategy,
-            bidState,
-            borrower,
-            lender
+            loanSummary.bidState,
+            loanSummary.borrower,
+            loanSummary.lender
         );
 
+        uint32 loanDuration = loanSummary.lastRepaidTimestamp -
+            loanSummary.acceptedTimestamp;
+
         uint256 amountToReward = _calculateRewardAmount(
-            principalAmount,
+            loanSummary.principalAmount,
+            loanDuration,
             principalTokenDecimals,
             allocatedReward.rewardPerLoanPrincipalAmount
         );
+
+        if (amountToReward > allocatedReward.rewardTokenAmount) {
+            amountToReward = allocatedReward.rewardTokenAmount;
+        }
+
+        require(amountToReward > 0, "Nothing to claim.");
 
         _decrementAllocatedAmount(_allocationId, amountToReward);
 
@@ -341,21 +369,24 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
     /**
      * @notice Calculates the reward to claim for the allocation
      * @param _loanPrincipal - The amount of principal for the loan for which to reward
+     * @param _loanDuration - The duration of the loan in seconds
      * @param _principalTokenDecimals - The number of decimals of the principal token
      * @param _rewardPerLoanPrincipalAmount - The amount of reward per loan principal amount, expanded by the principal token decimals
      * @return The amount of ERC20 to reward
      */
     function _calculateRewardAmount(
         uint256 _loanPrincipal,
+        uint256 _loanDuration,
         uint256 _principalTokenDecimals,
         uint256 _rewardPerLoanPrincipalAmount
     ) internal view returns (uint256) {
-        return
-            MathUpgradeable.mulDiv(
-                _loanPrincipal,
-                _rewardPerLoanPrincipalAmount, //expanded by principal token decimals
-                10**_principalTokenDecimals
-            );
+        uint256 rewardPerYear = MathUpgradeable.mulDiv(
+            _loanPrincipal,
+            _rewardPerLoanPrincipalAmount, //expanded by principal token decimals
+            10**_principalTokenDecimals
+        );
+
+        return MathUpgradeable.mulDiv(rewardPerYear, _loanDuration, 365 days);
     }
 
     /**
@@ -437,18 +468,15 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
     }
 
     /**
-     * @notice Verifies that the loan principal token address is per the requirements of the allocation
-     * @param _loanTokenAddress - The contract address of the token
-     * @param _expectedTokenAddress - The expected contract address per the allocation
+     * @notice Returns the amount of reward tokens remaining in the allocation
+     * @param _allocationId - The id for the allocation
      */
-    function _verifyExpectedTokenAddress(
-        address _loanTokenAddress,
-        address _expectedTokenAddress
-    ) internal virtual {
-        require(
-            _expectedTokenAddress == address(0) ||
-                _loanTokenAddress == _expectedTokenAddress,
-            "Invalid expected token address."
-        );
+    function getRewardTokenAmount(uint256 _allocationId)
+        public
+        view
+        override
+        returns (uint256)
+    {
+        return allocatedRewards[_allocationId].rewardTokenAmount;
     }
 }

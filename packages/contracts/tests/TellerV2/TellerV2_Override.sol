@@ -32,8 +32,8 @@ contract TellerV2_Override is TellerV2 {
         lenderManager = ILenderManager(_lenderManager);
     }
 
-    function setLenderManagerSuper(address lenderManager) public initializer {
-        _setLenderManager(lenderManager);
+    function setLenderManagerSuper(address _lenderManager) public initializer {
+        lenderManager = ILenderManager(_lenderManager);
     }
 
     function setMarketRegistrySuper(address _marketRegistry) public {
@@ -57,6 +57,13 @@ contract TellerV2_Override is TellerV2 {
         PaymentCycleType paymentCycleType
     ) public {
         bidPaymentCycleType[bidId] = PaymentCycleType(paymentCycleType);
+    }
+
+    function mock_setBidLastRepaidTimestamp(
+        uint256 bidId,
+        uint32 lastRepaidTimestamp
+    ) public {
+        bids[bidId].loanDetails.lastRepaidTimestamp = lastRepaidTimestamp;
     }
 
     function mock_setBidDefaultDuration(uint256 bidId, uint32 defaultDuration)
@@ -125,7 +132,7 @@ contract TellerV2_Override is TellerV2 {
         view
         returns (bool)
     {
-        return _canLiquidateLoan(_bidId, _liquidationDelay);
+        return _isLoanDefaulted(_bidId, _liquidationDelay);
     }
 
     /*

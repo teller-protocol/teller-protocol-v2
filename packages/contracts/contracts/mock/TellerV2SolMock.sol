@@ -4,6 +4,7 @@ pragma solidity >=0.8.0 <0.9.0;
 
 import "../TellerV2.sol";
 import "../interfaces/ITellerV2.sol";
+import "../interfaces/IProtocolFee.sol";
 import "../TellerV2Context.sol";
 import { Collateral } from "../interfaces/escrow/ICollateralEscrowV1.sol";
 import { LoanDetails, Payment, BidState } from "../TellerV2Storage.sol";
@@ -11,13 +12,17 @@ import { LoanDetails, Payment, BidState } from "../TellerV2Storage.sol";
 /*
 This is only used for sol test so its named specifically to avoid being used for the typescript tests.
 */
-contract TellerV2SolMock is ITellerV2, TellerV2Storage {
+contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
     function setMarketRegistry(address _marketRegistry) public {
         marketRegistry = IMarketRegistry(_marketRegistry);
     }
 
     function getMarketRegistry() external view returns (IMarketRegistry) {
         return marketRegistry;
+    }
+
+    function protocolFee() external view returns (uint16){
+        return 100;
     }
 
     function submitBid(
@@ -192,6 +197,8 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
         virtual
         returns (bool)
     {}
+
+
 
     function isLoanLiquidateable(uint256 _bidId)
         public

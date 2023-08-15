@@ -116,8 +116,7 @@ contract CommitmentRolloverLoan_Unit_Test is Testable {
         );
 
         uint256 rolloverAmount = 0;
-
-        //fix me here -- tellerv2 needs to accept bid to put it in correct state
+ 
         vm.prank(address(borrower));
 
         commitmentRolloverLoan.rolloverLoan(
@@ -133,6 +132,133 @@ contract CommitmentRolloverLoan_Unit_Test is Testable {
             "acceptCommitmentWithRecipient not called"
         );
     }
+
+
+
+     function test_rolloverLoan_invalid_caller() public {
+        address lendingToken = address(wethMock);
+        uint256 marketId = 0;
+        uint256 principalAmount = 500;
+        uint32 duration = 10 days;
+        uint16 interestRate = 100;
+
+        ILenderCommitmentForwarder.Commitment
+            memory commitment = ILenderCommitmentForwarder.Commitment({
+                maxPrincipal: principalAmount,
+                expiration: uint32(block.timestamp + 1 days),
+                maxDuration: duration,
+                minInterestRate: interestRate,
+                collateralTokenAddress: address(0),
+                collateralTokenId: 0,
+                maxPrincipalPerCollateralAmount: 0,
+                collateralTokenType: ILenderCommitmentForwarder
+                    .CommitmentCollateralType
+                    .NONE,
+                lender: address(lender),
+                marketId: marketId,
+                principalTokenAddress: lendingToken
+            });
+
+        lenderCommitmentForwarder.setCommitment(0, commitment);
+
+        ICommitmentRolloverLoan.AcceptCommitmentArgs
+            memory commitmentArgs = ICommitmentRolloverLoan
+                .AcceptCommitmentArgs({
+                    commitmentId: 0,
+                    principalAmount: principalAmount,
+                    collateralAmount: 100,
+                    collateralTokenId: 0,
+                    collateralTokenAddress: address(0),
+                    interestRate: interestRate,
+                    loanDuration: duration
+                });
+
+        vm.prank(address(borrower));
+        uint256 loanId = tellerV2.submitBid(
+            lendingToken,
+            marketId,
+            principalAmount,
+            duration,
+            interestRate,
+            "",
+            address(borrower)
+        );
+
+        uint256 rolloverAmount = 0;
+ 
+        vm.prank(address(lender));
+
+        vm.expectRevert("CommitmentRolloverLoan: not borrower");
+
+        commitmentRolloverLoan.rolloverLoan(
+            loanId,
+            rolloverAmount,
+            commitmentArgs
+        );
+     }
+ 
+  function test_calculate_rollover_amount() public {
+
+
+        address lendingToken = address(wethMock);
+        uint256 marketId = 0;
+        uint256 principalAmount = 500;
+        uint32 duration = 10 days;
+        uint16 interestRate = 100;
+
+        ILenderCommitmentForwarder.Commitment
+            memory commitment = ILenderCommitmentForwarder.Commitment({
+                maxPrincipal: principalAmount,
+                expiration: uint32(block.timestamp + 1 days),
+                maxDuration: duration,
+                minInterestRate: interestRate,
+                collateralTokenAddress: address(0),
+                collateralTokenId: 0,
+                maxPrincipalPerCollateralAmount: 0,
+                collateralTokenType: ILenderCommitmentForwarder
+                    .CommitmentCollateralType
+                    .NONE,
+                lender: address(lender),
+                marketId: marketId,
+                principalTokenAddress: lendingToken
+            });
+
+        lenderCommitmentForwarder.setCommitment(0, commitment);
+
+        ICommitmentRolloverLoan.AcceptCommitmentArgs
+            memory commitmentArgs = ICommitmentRolloverLoan
+                .AcceptCommitmentArgs({
+                    commitmentId: 0,
+                    principalAmount: principalAmount,
+                    collateralAmount: 100,
+                    collateralTokenId: 0,
+                    collateralTokenAddress: address(0),
+                    interestRate: interestRate,
+                    loanDuration: duration
+                });
+
+        vm.prank(address(borrower));
+        uint256 loanId = tellerV2.submitBid(
+            lendingToken,
+            marketId,
+            principalAmount,
+            duration,
+            interestRate,
+            "",
+            address(borrower)
+        );
+
+        
+        vm.prank(address(lender)); 
+        int256 rolloverAmount=  commitmentRolloverLoan.calculateRolloverAmount(
+            loanId, 
+            commitmentArgs,
+            block.timestamp
+        );
+
+        assertEq(rolloverAmount, -445 , "invalid rolloveramount");
+
+  }
 }
 
 contract User {}

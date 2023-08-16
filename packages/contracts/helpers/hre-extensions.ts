@@ -81,6 +81,16 @@ declare module 'hardhat/types/runtime' {
   type ProposeUpgradeStep = ProposeProxyUpgradeStep | ProposeBeaconUpgradeStep
 
   interface HardhatDefender extends OZHD {
+    proposeCall:(
+        contractAddress:string,
+        contractImplementation: ContractFactory,
+        callFn: string,
+        callArgs: any[],
+
+        title: string,
+        description: string
+    ) => Promise<ProposalResponse>
+
     proposeUpgradeAndCall: (
       proxyAddress: string,
       implFactory: ContractFactory,
@@ -423,6 +433,54 @@ extendEnvironment((hre) => {
     const fn = config?.error ? process.stderr : process.stdout
     fn.write(formatMsg(msg, config))
   }
+
+ 
+
+  hre.defender.proposeCall = async (
+    contractAddress,
+    contractImplementation,
+    callFn,
+    callArgs,
+    title,
+    description
+  ): Promise<ProposalResponse> => {
+
+    let functionInputs = JSON.parse(JSON.stringify( contractImplementation.interface.getFunction(callFn)?.inputs))  ;
+
+    if (typeof functionInputs == 'undefined') {
+      throw new Error('Function inputs undefined')      
+    }
+
+    const admin = getAdminClient(hre)
+    const { protocolOwnerSafe } = await hre.getNamedAccounts()
+    
+    return await admin.createProposal({
+      contract: {
+        address: contractAddress,
+        network: await getNetwork(hre),
+        abi: JSON.stringify(
+          contractImplementation.interface.fragments.map((fragment) =>
+            JSON.parse(fragment.format('json'))
+          )
+        ),
+      },
+      title: title,
+      description: description,
+      type: 'custom',
+      
+      functionInterface: {
+        name: callFn,
+        inputs: functionInputs,
+        
+      },
+      functionInputs: callArgs,
+      viaType: 'Gnosis Safe',
+      via: protocolOwnerSafe,
+      // set simulate to true
+      // simulate: true,
+    })
+  }
+
 
   hre.defender.proposeUpgradeAndCall = async (
     proxyAddress,

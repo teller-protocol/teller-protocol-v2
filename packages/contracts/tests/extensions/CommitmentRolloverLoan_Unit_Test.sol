@@ -1,6 +1,6 @@
 import { Testable } from "../Testable.sol";
 
-import { CommitmentRolloverLoan } from "../../contracts/LenderCommitmentForwarder/extensions/CommitmentRolloverLoan.sol";
+import { CommitmentRolloverLoan } from "../../contracts/CommitmentRolloverLoan.sol";
 
 import "../../contracts/interfaces/ICommitmentRolloverLoan.sol";
 import "../../contracts/interfaces/ILenderCommitmentForwarder.sol";

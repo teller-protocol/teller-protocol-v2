@@ -2,18 +2,18 @@ pragma solidity >=0.8.0 <0.9.0;
 // SPDX-License-Identifier: MIT
 
 // Contracts
-import "../LenderCommitmentForwarder.sol";
-import "../utils/ExtensionsContextUpgradeable.sol";
+import "./LenderCommitmentForwarder_V1.sol";
+import "./extensions/ExtensionsContextUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-contract LenderCommitmentForwarderWithExtensions is
-    LenderCommitmentForwarder,
+contract LenderCommitmentForwarder_V2 is
+    LenderCommitmentForwarder_V1,
     OwnableUpgradeable,
     ExtensionsContextUpgradeable
 {
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor(address _tellerV2, address _marketRegistry)
-        LenderCommitmentForwarder(_tellerV2, _marketRegistry)
+        LenderCommitmentForwarder_V1(_tellerV2, _marketRegistry)
     {}
 
     function initializeExtensions(address _newOwner) public reinitializer(2) {

@@ -89,4 +89,7 @@ interface ILenderCommitmentForwarder {
         uint32 _loanDuration,
         bytes32[] calldata _merkleProof
     ) external returns (uint256 bidId_);
+
+
+
 }

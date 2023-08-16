@@ -10,8 +10,7 @@ import "../../contracts/EAS/TellerASRegistry.sol";
 import { MarketRegistry } from "../../contracts/MarketRegistry.sol";
 import { EscrowVault } from "../../contracts/EscrowVault.sol";
 import { LenderManager } from "../../contracts/LenderManager.sol";
-import { LenderCommitmentForwarder } from "../../contracts/LenderCommitmentForwarder.sol";
-import { LenderCommitmentForwarderWithExtensions } from "../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarderWithExtensions.sol";
+import { LenderCommitmentForwarder_V2 } from "../../contracts/LenderCommitmentForwarder_V2.sol"; 
 import { CollateralManager } from "../../contracts/CollateralManager.sol";
 import { CollateralEscrowV1 } from "../../contracts/escrow/CollateralEscrowV1.sol";
 
@@ -38,11 +37,8 @@ library IntegrationTestHelpers {
         uint16 _protocolFee = 100;
         address _marketRegistry = deployMarketRegistry();
         ReputationManager _reputationManager = new ReputationManager();
-        /* LenderCommitmentForwarder _lenderCommitmentForwarder = new LenderCommitmentForwarder(
-                address(tellerV2),
-                address(_marketRegistry)
-            );*/
-        LenderCommitmentForwarderWithExtensions _lenderCommitmentForwarder = new LenderCommitmentForwarderWithExtensions(
+       
+        LenderCommitmentForwarder_V2  _lenderCommitmentForwarder = new LenderCommitmentForwarder_V2(
                 address(tellerV2),
                 address(_marketRegistry)
             );

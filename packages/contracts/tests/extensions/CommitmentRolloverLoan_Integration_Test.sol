@@ -1,6 +1,6 @@
 import { Testable } from "../Testable.sol";
 
-import { CommitmentRolloverLoan } from "../../contracts/LenderCommitmentForwarder/extensions/CommitmentRolloverLoan.sol";
+import { CommitmentRolloverLoan } from "../../contracts/CommitmentRolloverLoan.sol";
 
 import "../../contracts/interfaces/ICommitmentRolloverLoan.sol";
 import "../../contracts/interfaces/ILenderCommitmentForwarder.sol";
@@ -8,7 +8,7 @@ import "../../contracts/interfaces/ITellerV2Context.sol";
 
 import "../integration/IntegrationTestHelpers.sol";
 
-import "../../contracts/utils/ExtensionsContextUpgradeable.sol";
+import "../../contracts/extensions/ExtensionsContextUpgradeable.sol";
 
 import { WethMock } from "../../contracts/mock/WethMock.sol";
 
@@ -16,7 +16,11 @@ import { TellerV2SolMock } from "../../contracts/mock/TellerV2SolMock.sol";
 import { LenderCommitmentForwarderMock } from "../../contracts/mock/LenderCommitmentForwarderMock.sol";
 import { MarketRegistryMock } from "../../contracts/mock/MarketRegistryMock.sol";
 
-import { LenderCommitmentForwarderWithExtensions } from "../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarderWithExtensions.sol";
+import { LenderCommitmentForwarder_V1 } from "../../contracts/LenderCommitmentForwarder_V1.sol";
+
+
+import { LenderCommitmentForwarder_V2 } from "../../contracts/LenderCommitmentForwarder_V2.sol";
+
 
 import { PaymentType, PaymentCycleType } from "../../contracts/libraries/V2Calculations.sol";
 
@@ -102,10 +106,11 @@ contract CommitmentRolloverLoan_Integration_Test is Testable {
         );
 
         //change this to a nicer interface?
-        LenderCommitmentForwarderWithExtensions(
+        LenderCommitmentForwarder_V2(
             address(lenderCommitmentForwarder)
         ).initializeExtensions(address(this));
-        LenderCommitmentForwarderWithExtensions(
+
+        LenderCommitmentForwarder_V2(
             address(lenderCommitmentForwarder)
         ).addExtension(address(commitmentRolloverLoan));
     }

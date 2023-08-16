@@ -6,13 +6,13 @@ import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 
 // Interfaces
-import "../../interfaces/ITellerV2.sol";
-import "../../interfaces/IProtocolFee.sol";
-import "../../interfaces/ITellerV2Storage.sol";
-import "../../interfaces/IMarketRegistry.sol";
-import "../../interfaces/ILenderCommitmentForwarder.sol";
-import "../../interfaces/ICommitmentRolloverLoan.sol";
-import "../../libraries/NumbersLib.sol";
+import "./interfaces/ITellerV2.sol";
+import "./interfaces/IProtocolFee.sol";
+import "./interfaces/ITellerV2Storage.sol";
+import "./interfaces/IMarketRegistry.sol";
+import "./interfaces/ILenderCommitmentForwarder.sol";
+import "./interfaces/ICommitmentRolloverLoan.sol";
+import "./libraries/NumbersLib.sol";
 
 contract CommitmentRolloverLoan is ICommitmentRolloverLoan {
     using AddressUpgradeable for address;

@@ -9,7 +9,7 @@ import "./tokens/TestERC20Token.sol";
 import "../contracts/TellerV2Context.sol";
 
 import { Testable } from "./Testable.sol";
-import { LenderCommitmentForwarder } from "../contracts/LenderCommitmentForwarder.sol";
+import { LenderCommitmentForwarder_V1 } from "../contracts/LenderCommitmentForwarder_V1.sol";
 
 import { Collateral, CollateralType } from "../contracts/interfaces/escrow/ICollateralEscrowV1.sol";
 
@@ -17,7 +17,7 @@ import { User } from "./Test_Helpers.sol";
 
 import "../contracts/mock/MarketRegistryMock.sol";
 
-contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
+contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder_V1 {
     LenderCommitmentForwarderTest_TellerV2Mock private tellerV2Mock;
     MarketRegistryMock mockMarketRegistry;
 
@@ -47,7 +47,7 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
     uint8 constant collateralTokenDecimals = 6;
 
     constructor()
-        LenderCommitmentForwarder(
+        LenderCommitmentForwarder_V1(
             address(new LenderCommitmentForwarderTest_TellerV2Mock()), ///_protocolAddress
             address(new MarketRegistryMock())
         )
@@ -796,17 +796,17 @@ contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
 }
 
 contract LenderCommitmentUser is User {
-    LenderCommitmentForwarder public immutable commitmentForwarder;
+    LenderCommitmentForwarder_V1 public immutable commitmentForwarder;
 
     constructor(
         address _tellerV2,
-        LenderCommitmentForwarder _commitmentForwarder
+        LenderCommitmentForwarder_V1 _commitmentForwarder
     ) User(_tellerV2) {
         commitmentForwarder = _commitmentForwarder;
     }
 
     function _createCommitment(
-        LenderCommitmentForwarder.Commitment calldata _commitment,
+        LenderCommitmentForwarder_V1.Commitment calldata _commitment,
         address[] calldata borrowerAddressList
     ) public returns (uint256) {
         return
@@ -818,7 +818,7 @@ contract LenderCommitmentUser is User {
 
     function _updateCommitment(
         uint256 commitmentId,
-        LenderCommitmentForwarder.Commitment calldata _commitment
+        LenderCommitmentForwarder_V1.Commitment calldata _commitment
     ) public {
         commitmentForwarder.updateCommitment(commitmentId, _commitment);
     }

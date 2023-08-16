@@ -7,7 +7,7 @@ import "../contracts/TellerV2MarketForwarder.sol";
 
 import "../contracts/TellerV2Context.sol";
 
-import { LenderCommitmentForwarder } from "../contracts/LenderCommitmentForwarder.sol";
+import { LenderCommitmentForwarder_V1 } from "../contracts/LenderCommitmentForwarder_V1.sol";
 
 import { Collateral, CollateralType } from "../contracts/interfaces/escrow/ICollateralEscrowV1.sol";
 
@@ -15,13 +15,13 @@ import { User } from "./Test_Helpers.sol";
 
 import "../contracts/mock/MarketRegistryMock.sol";
 
-contract LenderCommitmentForwarder_Override is LenderCommitmentForwarder {
+contract LenderCommitmentForwarder_Override is LenderCommitmentForwarder_V1 {
     bool public submitBidWasCalled;
     bool public submitBidWithCollateralWasCalled;
     bool public acceptBidWasCalled;
 
     constructor(address tellerV2, address marketRegistry)
-        LenderCommitmentForwarder(tellerV2, marketRegistry)
+        LenderCommitmentForwarder_V1(tellerV2, marketRegistry)
     {}
 
     function setCommitment(uint256 _commitmentId, Commitment memory _commitment)

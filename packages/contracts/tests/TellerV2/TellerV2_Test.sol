@@ -19,7 +19,7 @@ import { User } from "../Test_Helpers.sol";
 
 import "../../contracts/escrow/CollateralEscrowV1.sol";
 import "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
-import "../../contracts/LenderCommitmentForwarder.sol";
+import "../../contracts/LenderCommitmentForwarder_V1.sol";
 import "../tokens/TestERC20Token.sol";
 
 import "../../contracts/CollateralManager.sol";
@@ -81,7 +81,7 @@ contract TellerV2_Test is Testable {
         escrowVault.initialize();
 
         // Deploy LenderCommitmentForwarder
-        LenderCommitmentForwarder lenderCommitmentForwarder = new LenderCommitmentForwarder(
+        LenderCommitmentForwarder_V1 lenderCommitmentForwarder = new LenderCommitmentForwarder_V1(
                 address(tellerV2),
                 address(marketRegistry)
             );

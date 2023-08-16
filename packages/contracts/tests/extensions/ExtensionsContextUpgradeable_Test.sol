@@ -1,6 +1,6 @@
 import { Testable } from "../Testable.sol";
 
-import { ExtensionsContextUpgradeable } from "../../contracts/utils/ExtensionsContextUpgradeable.sol";
+import { ExtensionsContextUpgradeable } from "../../contracts/extensions/ExtensionsContextUpgradeable.sol";
 
 contract ExtensionsContextMock is ExtensionsContextUpgradeable {
     function addExtension(address extension) public {

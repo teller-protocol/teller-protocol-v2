@@ -2,14 +2,12 @@ mod pb;
 
 use crate::pb::uniswap::types::v1::{Erc20Token, Pools};
 use pb::token::price::v1::TokenPrice;
-use substreams::log;
 use substreams::pb::substreams::Clock;
 use substreams::store::*;
 use substreams_entity_change::pb::entity::entity_change::Operation;
 use substreams_entity_change::pb::entity::value::Typed;
 use substreams_entity_change::pb::entity::EntityChanges;
 use substreams_entity_change::tables::Tables;
-use crate::pb::token::price::v1::TokenPrices;
 
 #[substreams::handlers::store]
 pub fn store_uniswap_v3_prices(
@@ -92,11 +90,14 @@ pub fn graph_out(
 }
 
 fn set_token_data(tables: &mut Tables, token_price: &TokenPrice, token: &Erc20Token) {
+    let address = fmt_address(&token.address);
     tables
-        .create_row("TokenPrice", &token.address)
-        .set("address", &token.address)
-        .set("name", &token.name)
-        .set("symbol", &token.symbol)
+        .create_row("TokenPrice", &address)
+        .set("token", &address)
         .set("priceUSD", &token_price.price_usd)
         .set("timestamp", &token_price.timestamp);
+}
+
+fn fmt_address(address: &str) -> String {
+    format!("0x{}", address)
 }

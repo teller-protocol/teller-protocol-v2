@@ -1,10 +1,11 @@
 specVersion: v0.1.0
 package:
-  name: 'substreams_ethereum_quickstart'
+  name: 'tellerv2_substreams'
   version: v1.0.0
 
 imports:
   uniswap_v3: https://github.com/streamingfast/substreams-uniswap-v3/releases/download/v0.2.8/substreams.spkg
+  entities_change: https://github.com/streamingfast/substreams-sink-entity-changes/releases/download/v1.3.0/substreams-sink-entity-changes-v1.3.0.spkg
 
 protobuf:
   files:
@@ -34,5 +35,4 @@ modules:
       - map: uniswap_v3:map_pools_created
       - store: store_uniswap_v3_prices
     output:
-#      type: proto:sf.substreams.entity.v1.EntityChanges
       type: proto:sf.substreams.sink.entity.v1.EntityChanges

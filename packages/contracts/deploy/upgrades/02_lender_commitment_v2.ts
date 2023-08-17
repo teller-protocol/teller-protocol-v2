@@ -11,19 +11,19 @@ const deployFn: DeployFunction = async (hre) => {
     'LenderCommitmentForwarder_V1'
   )
 
-  const namedAccounts = await hre.getNamedAccounts();
+  const namedAccounts = await hre.getNamedAccounts()
 
-  const {protocolTimelock} = namedAccounts;
+  const { protocolTimelock } = namedAccounts
 
-  await hre.defender.proposeBatchTimelock(
-    'Lender Commitment Forwarder Extension Upgrade',
-    ` 
+  await hre.defender.proposeBatchTimelock({
+    title: 'Lender Commitment Forwarder Extension Upgrade',
+    description: ` 
 
 # LenderCommitmentForwarder_V2
 
 * Upgrades the lender commitment forwarder so that trusted extensions can specify a specific recipient
 `,
-    [
+    _steps: [
       {
         proxy: lenderCommitmentForwarder,
         implFactory: await hre.ethers.getContractFactory(
@@ -38,41 +38,37 @@ const deployFn: DeployFunction = async (hre) => {
           ],
 
           //need to initialize
-          // will this work ?  
+          // will this work ?
           call: {
             fn: 'initializeExtension',
             args: [protocolTimelock]
           }
-
         }
       }
     ]
-  )
- 
+  })
+
   let lenderCommitmentForwarderV2Factory = await hre.ethers.getContractFactory(
     'LenderCommitmentForwarder_V2'
-  );
-  
+  )
+
   const rolloverContractAddress = await hre.ethers.getContractFactory(
     'CommitmentRolloverLoan'
-  );
+  )
 
-  const callTitle ="Add Extension: Rollover Contract Address"
+  const callTitle = 'Add Extension: Rollover Contract Address'
   const callDescription = `
     Adds the rollover contract as an extension to the Lender Commitment Forwarder V2 
-  `;
+  `
 
   await hre.defender.proposeCall(
     await lenderCommitmentForwarder.getAddress(),
-    lenderCommitmentForwarderV2Factory, 
+    lenderCommitmentForwarderV2Factory,
     'addExtension',
     [rolloverContractAddress],
     callTitle,
-    callDescription 
-
-  ) 
- 
-
+    callDescription
+  )
 
   hre.log('done.')
   hre.log('')

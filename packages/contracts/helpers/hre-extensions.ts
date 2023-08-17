@@ -81,7 +81,19 @@ declare module 'hardhat/types/runtime' {
     implFactory: ContractFactory
     opts?: PrepareUpgradeOptions
   }
-  type ProposeUpgradeStep = ProposeProxyUpgradeStep | ProposeBeaconUpgradeStep
+  //type ProposeUpgradeStep = ProposeProxyUpgradeStep | ProposeBeaconUpgradeStep
+
+  interface ProposeCallStep {
+    contractAddress: string
+    contractImplementation: ContractFactory
+    callFn: string
+    callArgs: any[]
+  }
+
+  type ProposalStep =
+    | ProposeCallStep
+    | ProposeProxyUpgradeStep
+    | ProposeBeaconUpgradeStep
 
   interface HardhatDefender extends OZHD {
     proposeCall: (
@@ -104,16 +116,26 @@ declare module 'hardhat/types/runtime' {
         callArgs: any[]
       }
     ) => Promise<ProposalResponse>
-    proposeBatchUpgrade: (
-      title: string,
-      description: string,
-      steps: ProposeUpgradeStep | ProposeUpgradeStep[]
-    ) => Promise<ProposalResponse>
-    proposeBatchTimelock: (
-      title: string,
-      description: string,
-      steps: ProposeUpgradeStep | ProposeUpgradeStep[]
-    ) => Promise<{ schedule: ProposalResponse; execute: ProposalResponse }>
+    proposeBatch: ({
+      title,
+      description,
+      _steps
+    }: {
+      title: string
+      description: string
+      _steps: ProposalStep[]
+    }) => Promise<ProposalResponse>
+    proposeBatchTimelock: ({
+      title,
+      description,
+      _steps,
+      useTimelock
+    }: {
+      title: string
+      description: string
+      _steps: ProposalStep[]
+      useTimelock: boolean
+    }) => Promise<{ schedule: ProposalResponse; execute: ProposalResponse }>
   }
 }
 
@@ -558,6 +580,7 @@ extendEnvironment((hre) => {
     })
   }
 
+  /*
   hre.defender.proposeBatchUpgrade = async (
     title,
     description,
@@ -679,6 +702,7 @@ extendEnvironment((hre) => {
       steps: proposalSteps
     })
   }
+*/
 
   /*
 
@@ -688,11 +712,15 @@ extendEnvironment((hre) => {
   call 
 
   */
-  hre.defender.proposeBatchTimelock = async (
+  hre.defender.proposeBatchTimelock = async ({
     title,
     description,
     _steps
-  ): Promise<{ schedule: ProposalResponse; execute: ProposalResponse }> => {
+  }: {
+    title: string
+    description: string
+    _steps: ProposalStep[]
+  }): Promise<{ schedule: ProposalResponse; execute: ProposalResponse }> => {
     const network = await getNetwork(hre)
     const proxyAdmin = await hre.upgrades.admin.getInstance()
 
@@ -710,6 +738,21 @@ extendEnvironment((hre) => {
 
     const steps = Array.isArray(_steps) ? _steps : [_steps]
     for (const step of steps) {
+      //figure out what TYPE of step it is
+
+      let stepType = getStepType(step)
+
+      switch stepType {
+
+        case 'call': addBatchArgsForCall(step,timelockBatchArgs),
+        case 'upgradeProxy': addBatchArgsForUpgradeProxy(step,timelockBatchArgs),
+        case 'upgradeBeacon': addBatchArgsForUpgradeBeacon(step,timelockBatchArgs),
+
+
+      }
+
+      //remove the below 
+
       let refAddress: string
       let call: { fn: string; args: any[] } | undefined
       if ('proxy' in step) {
@@ -744,6 +787,7 @@ extendEnvironment((hre) => {
         abi: JSON.parse(step.implFactory.interface.formatJson())
       })
 
+      //produce the timelock batch args
       timelockBatchArgs.values.push('0')
       if ('proxy' in step) {
         timelockBatchArgs.targets.push(await proxyAdmin.getAddress())
@@ -798,6 +842,18 @@ extendEnvironment((hre) => {
     })
   }
 })
+
+const getStepType = (step: ProposalStep): string => {
+  if (step.hasOwnProperty('callFn')) {
+    return 'call'
+  } else if (step.hasOwnProperty('proxy')) {
+    return 'upgradeProxy'
+  } else if (step.hasOwnProperty('beacon')) {
+    return 'upgradeBeacon'
+  } else {
+    throw new Error('invalid step - cannot ascertain step type')
+  }
+}
 
 interface TimelockBatchArgs {
   targets: string[]

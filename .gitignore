@@ -22,6 +22,11 @@ packages/subgraph/scripts/thegraph/api/config/studio.json
 packages/subgraph/subgraph.yaml
 packages/subgraph/generated
 packages/subgraph/abis/*
+# Substream
+*.spkg
+packages/subgraph/substreams/target/
+packages/subgraph/substreams/package.tgz
+packages/subgraph/substreams/replay.log
 
 # dependencies
 /node_modules

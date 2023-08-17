@@ -52,6 +52,18 @@ dataSources:
         - handler: handleBlock
       file: ./src/block-handler.ts
 {{/if}}
+
+  - kind: substreams
+    name: tellerv2_substreams
+    network: {{network}}
+    source:
+      package:
+        moduleName: graph_out
+        file: ./substreams/tellerv2-substreams-v1.0.0.spkg
+    mapping:
+      kind: substreams/graph-entities
+      apiVersion: 0.0.5
+
 {{#if contracts.teller_v2.enabled}}
   - kind: ethereum/contract
     name: TellerV2_Proxy

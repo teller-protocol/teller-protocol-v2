@@ -120,6 +120,13 @@ type Token @entity {
   decimals: BigInt
 }
 
+type TokenPrice @entity {
+  id: ID!
+  token: Token!
+  priceUSD: String!
+  timestamp: BigInt!
+}
+
 type FundedTx @entity {
   id: ID!
   bid: Bid!

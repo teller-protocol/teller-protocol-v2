@@ -128,13 +128,11 @@ declare module 'hardhat/types/runtime' {
     proposeBatchTimelock: ({
       title,
       description,
-      _steps,
-      useTimelock
+      _steps
     }: {
       title: string
       description: string
       _steps: ProposalStep[]
-      useTimelock: boolean
     }) => Promise<{ schedule: ProposalResponse; execute: ProposalResponse }>
   }
 }

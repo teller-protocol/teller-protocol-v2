@@ -16,7 +16,7 @@ import { TellerV2SolMock } from "../../contracts/mock/TellerV2SolMock.sol";
 import { LenderCommitmentForwarderMock } from "../../contracts/mock/LenderCommitmentForwarderMock.sol";
 import { MarketRegistryMock } from "../../contracts/mock/MarketRegistryMock.sol";
 
-import { LenderCommitmentForwarder_V1 } from "../../contracts/LenderCommitmentForwarder_V1.sol";
+import { LenderCommitmentForwarder } from "../../contracts/LenderCommitmentForwarder.sol";
 
 
 import { LenderCommitmentForwarder_V2 } from "../../contracts/LenderCommitmentForwarder_V2.sol";

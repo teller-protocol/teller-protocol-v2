@@ -90,7 +90,7 @@ declare module 'hardhat/types/runtime' {
     callArgs: any[]
   }
 
-  type ProposalStep =
+  type BatchProposalStep =
     | ProposeCallStep
     | ProposeProxyUpgradeStep
     | ProposeBeaconUpgradeStep
@@ -123,7 +123,7 @@ declare module 'hardhat/types/runtime' {
     }: {
       title: string
       description: string
-      _steps: ProposalStep[]
+      _steps: BatchProposalStep[]
     }) => Promise<ProposalResponse>
     proposeBatchTimelock: ({
       title,
@@ -132,9 +132,29 @@ declare module 'hardhat/types/runtime' {
     }: {
       title: string
       description: string
-      _steps: ProposalStep[]
+      _steps: BatchProposalStep[]
     }) => Promise<{ schedule: ProposalResponse; execute: ProposalResponse }>
   }
+}
+
+const getStepType = (step: BatchProposalStep): string => {
+  if (step.hasOwnProperty('callFn')) {
+    return 'call'
+  } else if (step.hasOwnProperty('proxy')) {
+    return 'upgradeProxy'
+  } else if (step.hasOwnProperty('beacon')) {
+    return 'upgradeBeacon'
+  } else {
+    throw new Error('invalid step - cannot ascertain step type')
+  }
+}
+interface TimelockBatchArgs {
+  targets: string[]
+  values: string[]
+  payloads: string[]
+  predecessor: string
+  salt: string
+  delay: string
 }
 
 interface LogConfig extends FormatMsgConfig {
@@ -714,15 +734,12 @@ extendEnvironment((hre) => {
     title,
     description,
     _steps
-  }: {
-    title: string
-    description: string
-    _steps: ProposalStep[]
   }): Promise<{ schedule: ProposalResponse; execute: ProposalResponse }> => {
     const network = await getNetwork(hre)
-    const proxyAdmin = await hre.upgrades.admin.getInstance()
 
     const { protocolOwnerSafe, protocolTimelock } = await hre.getNamedAccounts()
+
+    const delay = moment.duration(3, 'minutes').asSeconds().toString()
 
     //build the timelock batch args from the steps
     const timelockBatchArgs: TimelockBatchArgs = {
@@ -730,8 +747,8 @@ extendEnvironment((hre) => {
       values: new Array<string>(),
       payloads: new Array<string>(),
       predecessor: ethers.encodeBytes32String(''),
-      salt: ethers.encodeBytes32String(''),
-      delay: moment.duration(3, 'minutes').asSeconds().toString()
+      salt: ethers.encodeBytes32String(''), //should this have a value ?
+      delay
     }
 
     const steps = Array.isArray(_steps) ? _steps : [_steps]
@@ -742,13 +759,18 @@ extendEnvironment((hre) => {
 
       switch (stepType) {
         case 'call':
-          addBatchArgsForCall(step, timelockBatchArgs)
+          //await addBatchArgsForCall(step, timelockBatchArgs)
           break
         case 'upgradeProxy':
-          addBatchArgsForUpgradeProxy(step, timelockBatchArgs)
+          await addBatchArgsForUpgradeProxy(
+            step,
+            timelockBatchArgs,
+
+            hre
+          )
           break
         case 'upgradeBeacon':
-          addBatchArgsForUpgradeBeacon(step, timelockBatchArgs)
+          await addBatchArgsForUpgradeBeacon(step, timelockBatchArgs, hre)
           break
         default:
           throw new Error('Invalid step type - cannot add batch args')
@@ -756,7 +778,7 @@ extendEnvironment((hre) => {
     } //end loop for steps
 
     const admin = getAdminClient(hre)
-    return createScheduledBatchProposal({
+    return await createScheduledBatchProposal({
       title,
       description,
       network,
@@ -768,24 +790,19 @@ extendEnvironment((hre) => {
   }
 })
 
-const addBatchArgsForUpgradeBeacon = (
-  step: ProposalStep,
-  batchArgs: TimelockBatchArgs
+const addBatchArgsForUpgradeProxy = async (
+  step: BatchProposalStep,
+  batchArgs: TimelockBatchArgs,
+  hre: HardhatRuntimeEnvironment
 ) => {
   let refAddress: string
   let call: { fn: string; args: any[] } | undefined
-  if ('proxy' in step) {
-    refAddress =
-      typeof step.proxy === 'string'
-        ? step.proxy
-        : await step.proxy.getAddress()
-    call = step.opts?.call
-  } else {
-    refAddress =
-      typeof step.beacon === 'string'
-        ? step.beacon
-        : await step.beacon.getAddress()
-  }
+
+  const proxyAdmin = await hre.upgrades.admin.getInstance()
+
+  refAddress =
+    typeof step.proxy === 'string' ? step.proxy : await step.proxy.getAddress()
+  call = step.opts?.call
 
   const newImpl = await hre.upgrades.prepareUpgrade(
     refAddress,
@@ -808,66 +825,78 @@ const addBatchArgsForUpgradeBeacon = (
 
   //produce the timelock batch args
   batchArgs.values.push('0')
-  if ('proxy' in step) {
-    batchArgs.targets.push(await proxyAdmin.getAddress())
 
-    if (call) {
-      batchArgs.payloads.push(
-        proxyAdmin.interface.encodeFunctionData('upgradeAndCall', [
-          refAddress,
-          newImplAddr,
-          step.implFactory.interface.encodeFunctionData(call.fn, call.args)
-        ])
-      )
-    } else {
-      batchArgs.payloads.push(
-        proxyAdmin.interface.encodeFunctionData('upgrade', [
-          refAddress,
-          newImplAddr
-        ])
-      )
-    }
-  } else {
-    batchArgs.targets.push(refAddress)
+  batchArgs.targets.push(await proxyAdmin.getAddress())
 
-    const iface = new ethers.Interface([
-      ethers.FunctionFragment.from({
-        inputs: [
-          {
-            name: 'newImplementation',
-            type: 'address'
-          }
-        ],
-        name: 'upgradeTo',
-        stateMutability: 'nonpayable',
-        type: 'function'
-      })
-    ])
+  if (call) {
     batchArgs.payloads.push(
-      iface.encodeFunctionData('upgradeTo', [newImplAddr])
+      proxyAdmin.interface.encodeFunctionData('upgradeAndCall', [
+        refAddress,
+        newImplAddr,
+        step.implFactory.interface.encodeFunctionData(call.fn, call.args)
+      ])
+    )
+  } else {
+    batchArgs.payloads.push(
+      proxyAdmin.interface.encodeFunctionData('upgrade', [
+        refAddress,
+        newImplAddr
+      ])
     )
   }
 }
 
-const getStepType = (step: ProposalStep): string => {
-  if (step.hasOwnProperty('callFn')) {
-    return 'call'
-  } else if (step.hasOwnProperty('proxy')) {
-    return 'upgradeProxy'
-  } else if (step.hasOwnProperty('beacon')) {
-    return 'upgradeBeacon'
-  } else {
-    throw new Error('invalid step - cannot ascertain step type')
-  }
-}
+const addBatchArgsForUpgradeBeacon = async (
+  step: BatchProposalStep,
+  batchArgs: TimelockBatchArgs,
+  hre: HardhatRuntimeEnvironment
+) => {
+  let refAddress: string
+  // let call: { fn: string; args: any[] } | undefined
 
-interface TimelockBatchArgs {
-  targets: string[]
-  values: string[]
-  payloads: string[]
-  predecessor: string
-  salt: string
-  delay: string
+  refAddress =
+    typeof step.beacon === 'string'
+      ? step.beacon
+      : await step.beacon.getAddress()
+
+  const newImpl = await hre.upgrades.prepareUpgrade(
+    refAddress,
+    step.implFactory,
+    step.opts
+  )
+  const newImplAddr =
+    typeof newImpl === 'string'
+      ? newImpl
+      : await newImpl.wait(1).then((r) => {
+          if (!r?.contractAddress) throw new Error('No contract address')
+          return r.contractAddress
+        })
+
+  await updateDeploymentAbi({
+    hre,
+    address: refAddress,
+    abi: JSON.parse(step.implFactory.interface.formatJson())
+  })
+
+  //produce the timelock batch args
+  batchArgs.values.push('0')
+
+  batchArgs.targets.push(refAddress)
+
+  const iface = new hre.ethers.Interface([
+    hre.ethers.FunctionFragment.from({
+      inputs: [
+        {
+          name: 'newImplementation',
+          type: 'address'
+        }
+      ],
+      name: 'upgradeTo',
+      stateMutability: 'nonpayable',
+      type: 'function'
+    })
+  ])
+  batchArgs.payloads.push(iface.encodeFunctionData('upgradeTo', [newImplAddr]))
 }
 
 const createScheduledBatchProposal = async ({

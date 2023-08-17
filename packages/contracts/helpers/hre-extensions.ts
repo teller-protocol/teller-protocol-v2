@@ -727,7 +727,7 @@ extendEnvironment((hre) => {
     const { protocolOwnerSafe, protocolTimelock } = await hre.getNamedAccounts()
 
     //build the timelock batch args from the steps
-    const timelockBatchArgs = {
+    const timelockBatchArgs: TimelockBatchArgs = {
       targets: new Array<string>(),
       values: new Array<string>(),
       payloads: new Array<string>(),
@@ -755,85 +755,7 @@ extendEnvironment((hre) => {
         default:
           throw new Error('Invalid step type - cannot add batch args')
       }
-
-      //remove the below
-
-      let refAddress: string
-      let call: { fn: string; args: any[] } | undefined
-      if ('proxy' in step) {
-        refAddress =
-          typeof step.proxy === 'string'
-            ? step.proxy
-            : await step.proxy.getAddress()
-        call = step.opts?.call
-      } else {
-        refAddress =
-          typeof step.beacon === 'string'
-            ? step.beacon
-            : await step.beacon.getAddress()
-      }
-
-      const newImpl = await hre.upgrades.prepareUpgrade(
-        refAddress,
-        step.implFactory,
-        step.opts
-      )
-      const newImplAddr =
-        typeof newImpl === 'string'
-          ? newImpl
-          : await newImpl.wait(1).then((r) => {
-              if (!r?.contractAddress) throw new Error('No contract address')
-              return r.contractAddress
-            })
-
-      await updateDeploymentAbi({
-        hre,
-        address: refAddress,
-        abi: JSON.parse(step.implFactory.interface.formatJson())
-      })
-
-      //produce the timelock batch args
-      timelockBatchArgs.values.push('0')
-      if ('proxy' in step) {
-        timelockBatchArgs.targets.push(await proxyAdmin.getAddress())
-
-        if (call) {
-          timelockBatchArgs.payloads.push(
-            proxyAdmin.interface.encodeFunctionData('upgradeAndCall', [
-              refAddress,
-              newImplAddr,
-              step.implFactory.interface.encodeFunctionData(call.fn, call.args)
-            ])
-          )
-        } else {
-          timelockBatchArgs.payloads.push(
-            proxyAdmin.interface.encodeFunctionData('upgrade', [
-              refAddress,
-              newImplAddr
-            ])
-          )
-        }
-      } else {
-        timelockBatchArgs.targets.push(refAddress)
-
-        const iface = new ethers.Interface([
-          ethers.FunctionFragment.from({
-            inputs: [
-              {
-                name: 'newImplementation',
-                type: 'address'
-              }
-            ],
-            name: 'upgradeTo',
-            stateMutability: 'nonpayable',
-            type: 'function'
-          })
-        ])
-        timelockBatchArgs.payloads.push(
-          iface.encodeFunctionData('upgradeTo', [newImplAddr])
-        )
-      }
-    }
+    } //end loop for steps
 
     const admin = getAdminClient(hre)
     return createScheduledBatchProposal({
@@ -847,6 +769,87 @@ extendEnvironment((hre) => {
     })
   }
 })
+
+const addBatchArgsForUpgradeBeacon = (
+  step: ProposalStep,
+  batchArgs: TimelockBatchArgs
+) => {
+  let refAddress: string
+  let call: { fn: string; args: any[] } | undefined
+  if ('proxy' in step) {
+    refAddress =
+      typeof step.proxy === 'string'
+        ? step.proxy
+        : await step.proxy.getAddress()
+    call = step.opts?.call
+  } else {
+    refAddress =
+      typeof step.beacon === 'string'
+        ? step.beacon
+        : await step.beacon.getAddress()
+  }
+
+  const newImpl = await hre.upgrades.prepareUpgrade(
+    refAddress,
+    step.implFactory,
+    step.opts
+  )
+  const newImplAddr =
+    typeof newImpl === 'string'
+      ? newImpl
+      : await newImpl.wait(1).then((r) => {
+          if (!r?.contractAddress) throw new Error('No contract address')
+          return r.contractAddress
+        })
+
+  await updateDeploymentAbi({
+    hre,
+    address: refAddress,
+    abi: JSON.parse(step.implFactory.interface.formatJson())
+  })
+
+  //produce the timelock batch args
+  batchArgs.values.push('0')
+  if ('proxy' in step) {
+    batchArgs.targets.push(await proxyAdmin.getAddress())
+
+    if (call) {
+      batchArgs.payloads.push(
+        proxyAdmin.interface.encodeFunctionData('upgradeAndCall', [
+          refAddress,
+          newImplAddr,
+          step.implFactory.interface.encodeFunctionData(call.fn, call.args)
+        ])
+      )
+    } else {
+      batchArgs.payloads.push(
+        proxyAdmin.interface.encodeFunctionData('upgrade', [
+          refAddress,
+          newImplAddr
+        ])
+      )
+    }
+  } else {
+    batchArgs.targets.push(refAddress)
+
+    const iface = new ethers.Interface([
+      ethers.FunctionFragment.from({
+        inputs: [
+          {
+            name: 'newImplementation',
+            type: 'address'
+          }
+        ],
+        name: 'upgradeTo',
+        stateMutability: 'nonpayable',
+        type: 'function'
+      })
+    ])
+    batchArgs.payloads.push(
+      iface.encodeFunctionData('upgradeTo', [newImplAddr])
+    )
+  }
+}
 
 const getStepType = (step: ProposalStep): string => {
   if (step.hasOwnProperty('callFn')) {

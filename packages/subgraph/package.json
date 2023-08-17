@@ -9,7 +9,13 @@
     "reset-local": "yarn remove-local && yarn create-local",
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 teller-v2",
     "test": "yarn graph test",
-    "format": "eslint './src/**/*.ts' --fix"
+    "format": "eslint './src/**/*.ts' --fix",
+    "substreams": "yarn workspace @teller-protocol/v2-substreams"
+  },
+  "workspaces": {
+    "packages": [
+      "substreams"
+    ]
   },
   "dependencies": {
     "mustache": "^4.2.0"

@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package token.price.v1;
+
+message TokenPrices {
+  repeated TokenPrice tokens = 1;
+}
+
+message TokenPrice {
+  string token = 1;
+  string priceUSD = 2;
+  string timestamp = 3;
+}

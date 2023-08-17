@@ -1,0 +1,37 @@
+specVersion: v0.1.0
+package:
+  name: 'substreams_ethereum_quickstart'
+  version: v1.0.0
+
+imports:
+  uniswap_v3: https://github.com/streamingfast/substreams-uniswap-v3/releases/download/v0.2.8/substreams.spkg
+
+protobuf:
+  files:
+    - token_price.proto
+  importPaths:
+    - ./proto
+
+binaries:
+  default:
+    type: wasm/rust-v1
+    file: ./target/wasm32-unknown-unknown/release/substreams.wasm
+
+modules:
+  - name: store_uniswap_v3_prices
+    kind: store
+    updatePolicy: set
+    valueType: proto:token.price.v1.TokenPrice
+    initialBlock: 12369621
+    inputs:
+      - source: sf.substreams.v1.Clock
+      - map: uniswap_v3:graph_out
+
+  - name: graph_out
+    kind: map
+    initialBlock: 12369621
+    inputs:
+      - map: uniswap_v3:map_pools_created
+      - store: store_uniswap_v3_prices
+    output:
+      type: proto:token.price.v1.TokenPrice

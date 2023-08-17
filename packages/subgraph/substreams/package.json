@@ -1,0 +1,13 @@
+{
+  "name": "@teller-protocol/v2-substreams",
+  "version": "1.0.0",
+  "scripts": {
+    "gen": "substreams protogen substreams.yaml --exclude-paths='sf/substreams,google'",
+    "build": "cargo build --release --target wasm32-unknown-unknown",
+    "gui": "substreams gui -e mainnet.eth.streamingfast.io:443 substreams.yaml graph_out",
+    "r": "substreams run -e mainnet.eth.streamingfast.io:443 substreams.yaml graph_out"
+  },
+  "dependencies": {
+    "@bufbuild/buf": "^1.26.1"
+  }
+}

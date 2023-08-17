@@ -34,4 +34,5 @@ modules:
       - map: uniswap_v3:map_pools_created
       - store: store_uniswap_v3_prices
     output:
-      type: proto:token.price.v1.TokenPrice
+#      type: proto:sf.substreams.entity.v1.EntityChanges
+      type: proto:sf.substreams.sink.entity.v1.EntityChanges

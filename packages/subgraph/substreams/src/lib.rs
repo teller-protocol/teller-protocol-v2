@@ -70,31 +70,9 @@ pub fn store_uniswap_v3_prices(
 pub fn graph_out(
     pools_created: Pools,
     prices_store: StoreGetProto<TokenPrice>,
-) -> Result<TokenPrices, substreams::errors::Error> {
-    log::info!("pools_created: {:?}", pools_created);
+) -> Result<EntityChanges, substreams::errors::Error> {
+    let mut tables = Tables::new();
 
-    // for pool in pools_created.pools {
-    //     let token0 = pool.token0.as_ref().unwrap();
-    //     let token1 = pool.token1.as_ref().unwrap();
-    //
-    //     // let token0_price = prices_store.get_last(format!("TokenPrice:0x{:?}", token0.address.as_str()));
-    //     // let token1_price = prices_store.get_last(format!("TokenPrice:0x{:?}", token1.address.as_str()));
-    //
-    //     log::info!(
-    //         "token0: {}, token1: {}",
-    //         token0.address,
-    //         token1.address,
-    //     );
-    //
-    //     // if token0_price.is_some() {
-    //     //     set_token_data(&mut tables, &token0_price.unwrap(), &token0);
-    //     // }
-    //     // if token1_price.is_some() {
-    //     //     set_token_data(&mut tables, &token1_price.unwrap(), &token1);
-    //     // }
-    // }
-
-    let mut tokens: Vec<TokenPrice> = vec![];
     for pool in pools_created.pools {
         let token0 = pool.token0.as_ref().unwrap();
         let token1 = pool.token1.as_ref().unwrap();
@@ -102,35 +80,21 @@ pub fn graph_out(
         let token0_price = prices_store.get_last(format!("TokenPrice:0x{}", token0.address));
         let token1_price = prices_store.get_last(format!("TokenPrice:0x{}", token1.address));
 
-        match (token0_price, token1_price) {
-            (Some(token0_price), Some(token1_price)) => {
-                log::info!(
-                    "token0: {}, token1: {}",
-                    token0_price.token,
-                    token1_price.token,
-                );
-                tokens.push(TokenPrice {
-                    token: token0.address.clone(),
-                    price_usd: token0_price.price_usd,
-                    timestamp: token0_price.timestamp,
-                });
-                tokens.push(TokenPrice {
-                    token: token1.address.clone(),
-                    price_usd: token1_price.price_usd,
-                    timestamp: token1_price.timestamp,
-                });
-            }
-            _ => {}
+        if token0_price.is_some() {
+            set_token_data(&mut tables, &token0_price.unwrap(), &token0);
+        }
+        if token1_price.is_some() {
+            set_token_data(&mut tables, &token1_price.unwrap(), &token1);
         }
     }
-    Ok(TokenPrices {
-        tokens
-    })
+
+    Ok(tables.to_entity_changes())
 }
 
 fn set_token_data(tables: &mut Tables, token_price: &TokenPrice, token: &Erc20Token) {
     tables
-        .create_row("TokenPrice", token.address.as_str())
+        .create_row("TokenPrice", &token.address)
+        .set("address", &token.address)
         .set("name", &token.name)
         .set("symbol", &token.symbol)
         .set("priceUSD", &token_price.price_usd)

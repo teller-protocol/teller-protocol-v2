@@ -15,6 +15,14 @@ const deployFn: DeployFunction = async (hre) => {
 
   const { protocolTimelock } = namedAccounts
 
+  let lenderCommitmentForwarderV2Factory = await hre.ethers.getContractFactory(
+    'LenderCommitmentForwarder_V2'
+  )
+
+  const rolloverContractAddress = await hre.ethers.getContractFactory(
+    'CommitmentRolloverLoan'
+  )
+
   await hre.defender.proposeBatchTimelock({
     title: 'Lender Commitment Forwarder Extension Upgrade',
     description: ` 
@@ -37,30 +45,30 @@ const deployFn: DeployFunction = async (hre) => {
             await marketRegistry.getAddress()
           ],
 
-          //need to initialize
-          // will this work ?
+          //call initialize
+
           call: {
             fn: 'initializeExtension',
             args: [protocolTimelock]
           }
         }
+      },
+      //protocol timelock adds an extension
+      {
+        contractAddress: await lenderCommitmentForwarder.getAddress(),
+        contractImplementation: lenderCommitmentForwarderV2Factory,
+        callFn: 'addExtension',
+        callArgs: [rolloverContractAddress]
       }
     ]
   })
 
-  let lenderCommitmentForwarderV2Factory = await hre.ethers.getContractFactory(
-    'LenderCommitmentForwarder_V2'
-  )
-
-  const rolloverContractAddress = await hre.ethers.getContractFactory(
-    'CommitmentRolloverLoan'
-  )
-
+  /*
   const callTitle = 'Add Extension: Rollover Contract Address'
   const callDescription = `
     Adds the rollover contract as an extension to the Lender Commitment Forwarder V2 
-  `
-
+  `*/
+  /*
   await hre.defender.proposeCall(
     await lenderCommitmentForwarder.getAddress(),
     lenderCommitmentForwarderV2Factory,
@@ -68,7 +76,7 @@ const deployFn: DeployFunction = async (hre) => {
     [rolloverContractAddress],
     callTitle,
     callDescription
-  )
+  )*/
 
   hre.log('done.')
   hre.log('')
@@ -88,7 +96,8 @@ deployFn.tags = [
 deployFn.dependencies = [
   'market-registry:deploy',
   'teller-v2:deploy',
-  'lender-commitment-forwarder:deploy'
+  'lender-commitment-forwarder:deploy',
+  'commitment-rollover-loan:deploy'
 ]
 deployFn.skip = async (hre) => {
   return (

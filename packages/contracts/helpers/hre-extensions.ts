@@ -759,7 +759,7 @@ extendEnvironment((hre) => {
 
       switch (stepType) {
         case 'call':
-          //await addBatchArgsForCall(step, timelockBatchArgs)
+          await addBatchArgsForCall(step, timelockBatchArgs, hre)
           break
         case 'upgradeProxy':
           await addBatchArgsForUpgradeProxy(
@@ -789,6 +789,14 @@ extendEnvironment((hre) => {
     })
   }
 })
+
+const addBatchArgsForCall = async (
+  step: BatchProposalStep,
+  batchArgs: TimelockBatchArgs,
+  hre: HardhatRuntimeEnvironment
+) => {
+  //TODO
+}
 
 const addBatchArgsForUpgradeProxy = async (
   step: BatchProposalStep,

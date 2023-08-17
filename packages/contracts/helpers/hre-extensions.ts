@@ -753,14 +753,8 @@ extendEnvironment((hre) => {
     const delay = moment.duration(3, 'minutes').asSeconds().toString()
 
     //build the timelock batch args from the steps
-    const timelockBatchArgs: TimelockBatchArgs = {
-      targets: new Array<string>(),
-      values: new Array<string>(),
-      payloads: new Array<string>(),
-      predecessor: ethers.encodeBytes32String(''),
-      salt: ethers.encodeBytes32String(''), //should this have a value ?
-      delay
-    }
+
+    const virtualExecutionPayloadArray: VirtualExecutionPayload[] = []
 
     const steps = Array.isArray(_steps) ? _steps : [_steps]
     for (const step of steps) {
@@ -773,21 +767,21 @@ extendEnvironment((hre) => {
 
       switch (stepType) {
         case 'call':
-          virtualExecutionPayload = await addBatchArgsForCall(
+          virtualExecutionPayload = await getVirtualPayloadForCall(
             step,
 
             hre
           )
           break
         case 'upgradeProxy':
-          virtualExecutionPayload = await addBatchArgsForUpgradeProxy(
+          virtualExecutionPayload = await getVirtualPayloadForUpgradeProxy(
             step,
 
             hre
           )
           break
         case 'upgradeBeacon':
-          virtualExecutionPayload = await addBatchArgsForUpgradeBeacon(
+          virtualExecutionPayload = await getVirtualPayloadForUpgradeBeacon(
             step,
 
             hre
@@ -798,11 +792,18 @@ extendEnvironment((hre) => {
       }
 
       if (virtualExecutionPayload) {
-        timelockBatchArgs.values.push(virtualExecutionPayload.value)
-        timelockBatchArgs.targets.push(virtualExecutionPayload.target)
-        timelockBatchArgs.payloads.push(virtualExecutionPayload.payload)
+        virtualExecutionPayloadArray.push(virtualExecutionPayload)
       }
     } //end loop for steps
+
+    const timelockBatchArgs: TimelockBatchArgs = {
+      targets: virtualExecutionPayloadArray.map((x) => x.target),
+      values: virtualExecutionPayloadArray.map((x) => x.value),
+      payloads: virtualExecutionPayloadArray.map((x) => x.payload),
+      predecessor: ethers.encodeBytes32String(''),
+      salt: ethers.encodeBytes32String(''), //should this have a value ?
+      delay
+    }
 
     const admin = getAdminClient(hre)
     return await createScheduledBatchProposal({
@@ -817,7 +818,7 @@ extendEnvironment((hre) => {
   }
 })
 
-const addBatchArgsForCall = async (
+const getVirtualPayloadForCall = async (
   step: ProposeCallStep,
 
   hre: HardhatRuntimeEnvironment
@@ -832,7 +833,7 @@ const addBatchArgsForCall = async (
   return { value: '0', target: step.contractAddress, payload }
 }
 
-const addBatchArgsForUpgradeProxy = async (
+const getVirtualPayloadForUpgradeProxy = async (
   step: ProposeProxyUpgradeStep,
 
   hre: HardhatRuntimeEnvironment
@@ -886,7 +887,7 @@ const addBatchArgsForUpgradeProxy = async (
   return { value, target, call }
 }
 
-const addBatchArgsForUpgradeBeacon = async (
+const getVirtualPayloadForUpgradeBeacon = async (
   step: ProposeBeaconUpgradeStep,
 
   hre: HardhatRuntimeEnvironment

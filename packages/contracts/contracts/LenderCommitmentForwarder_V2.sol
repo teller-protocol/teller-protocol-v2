@@ -16,6 +16,8 @@ contract LenderCommitmentForwarder_V2 is
         LenderCommitmentForwarder_V1(_tellerV2, _marketRegistry)
     {}
 
+    //override the original initialize and make it call super initialize extensions (so it happens in deploy script for Base network etc ) 
+
     function initializeExtensions(address _newOwner) public reinitializer(2) {
         _transferOwnership(_newOwner);
     }

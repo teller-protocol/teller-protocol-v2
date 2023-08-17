@@ -5,15 +5,20 @@ const deployFn: DeployFunction = async (hre) => {
   const marketRegistry = await hre.contracts.get('MarketRegistry')
 
   const lenderCommitmentForwarder = await hre.deployProxy(
-    'LenderCommitmentForwarder_V1',
+    'LenderCommitmentForwarder',
     {
       unsafeAllow: ['constructor', 'state-variable-immutable'],
       constructorArgs: [
         await tellerV2.getAddress(),
-        await marketRegistry.getAddress(),
-      ],
+        await marketRegistry.getAddress()
+      ]
     }
   )
+  //need to propose a call to addExtension through defender
+
+  //proposeBatch -- singleStep:  addExtension
+
+  //OR do this in another file so we have different skips on it (like in folder named lenderCommitmentForwarder)
 
   return true
 }
@@ -22,7 +27,7 @@ const deployFn: DeployFunction = async (hre) => {
 deployFn.id = 'lender-commitment-forwarder:deploy'
 deployFn.tags = [
   'lender-commitment-forwarder',
-  'lender-commitment-forwarder:deploy',
+  'lender-commitment-forwarder:deploy'
 ]
 deployFn.dependencies = ['teller-v2:deploy', 'market-registry:deploy']
 export default deployFn

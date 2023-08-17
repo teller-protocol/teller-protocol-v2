@@ -489,13 +489,13 @@ extendEnvironment((hre) => {
     title,
     description
   ): Promise<ProposalResponse> => {
-    let functionInputs = JSON.parse(
+    let functionInputsInterface = JSON.parse(
       JSON.stringify(
         contractImplementation.interface.getFunction(callFn)?.inputs
       )
     )
 
-    if (typeof functionInputs == 'undefined') {
+    if (typeof functionInputsInterface == 'undefined') {
       throw new Error('Function inputs undefined')
     }
 
@@ -518,7 +518,7 @@ extendEnvironment((hre) => {
 
       functionInterface: {
         name: callFn,
-        inputs: functionInputs
+        inputs: functionInputsInterface
       },
       functionInputs: callArgs,
       viaType: 'Gnosis Safe',
@@ -602,8 +602,7 @@ extendEnvironment((hre) => {
     })
   }
 
-  /*
-  hre.defender.proposeBatchUpgrade = async (
+  hre.defender.proposeBatch = async (
     title,
     description,
     _steps
@@ -613,10 +612,28 @@ extendEnvironment((hre) => {
 
     const { protocolOwnerSafe } = await hre.getNamedAccounts()
 
-    const steps = Array.isArray(_steps) ? _steps : [_steps]
     const contracts: PartialContract[] = []
     const proposalSteps: ProposalStep[] = []
-    for (const step of steps) {
+    for (const step of _steps) {
+      let virtualExecutionPayload: VirtualExecutionPayload =
+        getVirtualExecutionPayloadForStep(step, hre)
+
+      const toContractAddress = virtualExecutionPayload.target
+
+      contracts.push({
+        address: toContractAddress,
+        network
+      })
+      proposalSteps.push({
+        contractId: `${network}-${toContractAddress}`,
+        type: 'custom',
+        targetFunction: virtualExecutionPayload.targetFunction,
+        functionInputs: virtualExecutionPayload.functionInputs
+      })
+
+      //virtualExecutionPayloadArray.push(virtualExecutionPayload)
+
+      /*
       let toContractAddress: string
       let refAddress: string
       let call: { fn: string; args: any[] } | undefined
@@ -710,7 +727,8 @@ extendEnvironment((hre) => {
         targetFunction,
         functionInputs
       })
-    }
+      */
+    } //end steps loop
 
     const admin = getAdminClient(hre)
     return await admin.createProposal({
@@ -724,21 +742,13 @@ extendEnvironment((hre) => {
       steps: proposalSteps
     })
   }
-*/
-
-  /*
-
-  Refactor this to allow for passing in either  
-
-  upgradeAndCall
-  call 
-
-  */
 
   interface VirtualExecutionPayload {
     target: string
     value: string
-    payload: string
+    payload: string //this is just targetFunction and functionInputs encoded to bytes using the abi
+    targetFunction: ProposalTargetFunction
+    functionInputs: ProposalFunctionInputs
   }
 
   hre.defender.proposeBatchTimelock = async ({
@@ -760,40 +770,10 @@ extendEnvironment((hre) => {
     for (const step of steps) {
       //figure out what TYPE of step it is
 
-      let stepType = getStepType(step)
+      let virtualExecutionPayload: VirtualExecutionPayload =
+        getVirtualExecutionPayloadForStep(step, hre)
 
-      let virtualExecutionPayload: VirtualExecutionPayload | undefined =
-        undefined
-
-      switch (stepType) {
-        case 'call':
-          virtualExecutionPayload = await getVirtualPayloadForCall(
-            step,
-
-            hre
-          )
-          break
-        case 'upgradeProxy':
-          virtualExecutionPayload = await getVirtualPayloadForUpgradeProxy(
-            step,
-
-            hre
-          )
-          break
-        case 'upgradeBeacon':
-          virtualExecutionPayload = await getVirtualPayloadForUpgradeBeacon(
-            step,
-
-            hre
-          )
-          break
-        default:
-          throw new Error('Invalid step type - cannot add batch args')
-      }
-
-      if (virtualExecutionPayload) {
-        virtualExecutionPayloadArray.push(virtualExecutionPayload)
-      }
+      virtualExecutionPayloadArray.push(virtualExecutionPayload)
     } //end loop for steps
 
     const timelockBatchArgs: TimelockBatchArgs = {
@@ -818,19 +798,57 @@ extendEnvironment((hre) => {
   }
 })
 
+const getVirtualExecutionPayloadForStep = async (
+  step: BatchProposalStep,
+  hre: HardhatRuntimeEnvironment
+): VirtualExecutionPayload => {
+  let stepType = getStepType(step)
+
+  switch (stepType) {
+    case 'call':
+      return await getVirtualPayloadForCall(step, hre)
+
+    case 'upgradeProxy':
+      return await getVirtualPayloadForUpgradeProxy(step, hre)
+
+    case 'upgradeBeacon':
+      return await getVirtualPayloadForUpgradeBeacon(step, hre)
+
+    default:
+      throw new Error('Invalid step type - cannot add batch args')
+  }
+}
+
 const getVirtualPayloadForCall = async (
   step: ProposeCallStep,
 
   hre: HardhatRuntimeEnvironment
 ): VirtualExecutionPayload => {
-  const contractInterface = step.contractImplementation
+  const contractImpl = step.contractImplementation
 
-  const payload = contractInterface.interface.encodeFunctionData(
-    step.callFn,
-    step.callArgs
+  const iface = contractImpl.interface
+
+  let functionInputsInterface = JSON.parse(
+    JSON.stringify(iface.getFunction(step.callFn)?.inputs)
   )
 
-  return { value: '0', target: step.contractAddress, payload }
+  const targetFunction: ProposalTargetFunction = {
+    name: step.callFn,
+    inputs: functionInputsInterface
+  }
+
+  const functionInputs: ProposalFunctionInputs = step.callArgs
+
+  return {
+    value: '0',
+    target: step.contractAddress,
+
+    targetFunction,
+    functionInputs,
+
+    //is this right ?
+    payload: iface.encodeFunctionData(targetFunction.name, functionInputs)
+  }
 }
 
 const getVirtualPayloadForUpgradeProxy = async (
@@ -873,18 +891,56 @@ const getVirtualPayloadForUpgradeProxy = async (
   //batchArgs.targets.push(await proxyAdmin.getAddress())
   const target = await proxyAdmin.getAddress()
 
-  let payload: string = call
-    ? proxyAdmin.interface.encodeFunctionData('upgradeAndCall', [
+  let targetFunction: ProposalTargetFunction = call
+    ? {
+        name: 'upgradeAndCall',
+        inputs: [
+          {
+            name: 'proxy',
+            type: 'address'
+          },
+          {
+            name: 'implementation',
+            type: 'address'
+          },
+          { name: 'data', type: 'bytes' }
+        ]
+      }
+    : {
+        name: 'upgrade',
+        inputs: [
+          {
+            name: 'proxy',
+            type: 'address'
+          },
+          {
+            name: 'implementation',
+            type: 'address'
+          }
+        ]
+      }
+  //let functionInputs: ProposalFunctionInputs
+
+  const functionInputs: ProposalFunctionInputs = call
+    ? [
         refAddress,
         newImplAddr,
         step.implFactory.interface.encodeFunctionData(call.fn, call.args)
-      ])
-    : proxyAdmin.interface.encodeFunctionData('upgrade', [
-        refAddress,
-        newImplAddr
-      ])
+      ]
+    : [refAddress, newImplAddr]
 
-  return { value, target, call }
+  if (typeof targetFunction.name === 'undefined') {
+    throw new Error('Missing target function name')
+  }
+
+  const iface = proxyAdmin.interface
+
+  let payload: string = iface.encodeFunctionData(
+    targetFunction.name,
+    functionInputs
+  )
+
+  return { value, target, payload, targetFunction, functionInputs }
 }
 
 const getVirtualPayloadForUpgradeBeacon = async (
@@ -939,10 +995,27 @@ const getVirtualPayloadForUpgradeBeacon = async (
       type: 'function'
     })
   ])
-  const payload = iface.encodeFunctionData('upgradeTo', [newImplAddr])
+
+  const targetFunction: ProposalTargetFunction = {
+    name: 'upgradeTo',
+    inputs: [
+      {
+        name: 'newImplementation',
+        type: 'address'
+      }
+    ]
+  }
+
+  const functionInputs: ProposalFunctionInputs = [newImplAddr]
+
+  if (typeof targetFunction.name == 'undefined') {
+    throw new Error('Missing target function name')
+  }
+
+  const payload = iface.encodeFunctionData(targetFunction.name, functionInputs)
   //batchArgs.payloads.push(iface.encodeFunctionData('upgradeTo', [newImplAddr]))
 
-  return { value, target, payload }
+  return { value, target, payload, targetFunction, functionInputs }
 }
 
 const createScheduledBatchProposal = async ({

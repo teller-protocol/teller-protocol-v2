@@ -742,16 +742,21 @@ extendEnvironment((hre) => {
 
       let stepType = getStepType(step)
 
-      switch stepType {
-
-        case 'call': addBatchArgsForCall(step,timelockBatchArgs),
-        case 'upgradeProxy': addBatchArgsForUpgradeProxy(step,timelockBatchArgs),
-        case 'upgradeBeacon': addBatchArgsForUpgradeBeacon(step,timelockBatchArgs),
-
-
+      switch (stepType) {
+        case 'call':
+          addBatchArgsForCall(step, timelockBatchArgs)
+          break
+        case 'upgradeProxy':
+          addBatchArgsForUpgradeProxy(step, timelockBatchArgs)
+          break
+        case 'upgradeBeacon':
+          addBatchArgsForUpgradeBeacon(step, timelockBatchArgs)
+          break
+        default:
+          throw new Error('Invalid step type - cannot add batch args')
       }
 
-      //remove the below 
+      //remove the below
 
       let refAddress: string
       let call: { fn: string; args: any[] } | undefined

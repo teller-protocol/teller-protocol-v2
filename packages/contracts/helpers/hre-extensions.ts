@@ -32,7 +32,11 @@ import {
 import { ERC20 } from 'generated/typechain'
 import 'hardhat-deploy'
 import { extendEnvironment } from 'hardhat/config'
-import { HardhatRuntimeEnvironment } from 'hardhat/types'
+import {
+  HardhatRuntimeEnvironment,
+  ProposeBeaconUpgradeStep,
+  ProposeProxyUpgradeStep
+} from 'hardhat/types'
 import moment from 'moment'
 
 import { getTokens } from '../config'
@@ -730,6 +734,13 @@ extendEnvironment((hre) => {
   call 
 
   */
+
+  interface VirtualExecutionPayload {
+    target: string
+    value: string
+    payload: string
+  }
+
   hre.defender.proposeBatchTimelock = async ({
     title,
     description,
@@ -757,23 +768,39 @@ extendEnvironment((hre) => {
 
       let stepType = getStepType(step)
 
+      let virtualExecutionPayload: VirtualExecutionPayload | undefined =
+        undefined
+
       switch (stepType) {
         case 'call':
-          await addBatchArgsForCall(step, timelockBatchArgs, hre)
+          virtualExecutionPayload = await addBatchArgsForCall(
+            step,
+
+            hre
+          )
           break
         case 'upgradeProxy':
-          await addBatchArgsForUpgradeProxy(
+          virtualExecutionPayload = await addBatchArgsForUpgradeProxy(
             step,
-            timelockBatchArgs,
 
             hre
           )
           break
         case 'upgradeBeacon':
-          await addBatchArgsForUpgradeBeacon(step, timelockBatchArgs, hre)
+          virtualExecutionPayload = await addBatchArgsForUpgradeBeacon(
+            step,
+
+            hre
+          )
           break
         default:
           throw new Error('Invalid step type - cannot add batch args')
+      }
+
+      if (virtualExecutionPayload) {
+        timelockBatchArgs.values.push(virtualExecutionPayload.value)
+        timelockBatchArgs.targets.push(virtualExecutionPayload.target)
+        timelockBatchArgs.payloads.push(virtualExecutionPayload.payload)
       }
     } //end loop for steps
 
@@ -791,18 +818,25 @@ extendEnvironment((hre) => {
 })
 
 const addBatchArgsForCall = async (
-  step: BatchProposalStep,
-  batchArgs: TimelockBatchArgs,
+  step: ProposeCallStep,
+
   hre: HardhatRuntimeEnvironment
-) => {
-  //TODO
+): VirtualExecutionPayload => {
+  const contractInterface = step.contractImplementation
+
+  const payload = contractInterface.interface.encodeFunctionData(
+    step.callFn,
+    step.callArgs
+  )
+
+  return { value: '0', target: step.contractAddress, payload }
 }
 
 const addBatchArgsForUpgradeProxy = async (
-  step: BatchProposalStep,
-  batchArgs: TimelockBatchArgs,
+  step: ProposeProxyUpgradeStep,
+
   hre: HardhatRuntimeEnvironment
-) => {
+): VirtualExecutionPayload => {
   let refAddress: string
   let call: { fn: string; args: any[] } | undefined
 
@@ -832,33 +866,31 @@ const addBatchArgsForUpgradeProxy = async (
   })
 
   //produce the timelock batch args
-  batchArgs.values.push('0')
+  const value = '0'
+  // batchArgs.values.push('0')
 
-  batchArgs.targets.push(await proxyAdmin.getAddress())
+  //batchArgs.targets.push(await proxyAdmin.getAddress())
+  const target = await proxyAdmin.getAddress()
 
-  if (call) {
-    batchArgs.payloads.push(
-      proxyAdmin.interface.encodeFunctionData('upgradeAndCall', [
+  let payload: string = call
+    ? proxyAdmin.interface.encodeFunctionData('upgradeAndCall', [
         refAddress,
         newImplAddr,
         step.implFactory.interface.encodeFunctionData(call.fn, call.args)
       ])
-    )
-  } else {
-    batchArgs.payloads.push(
-      proxyAdmin.interface.encodeFunctionData('upgrade', [
+    : proxyAdmin.interface.encodeFunctionData('upgrade', [
         refAddress,
         newImplAddr
       ])
-    )
-  }
+
+  return { value, target, call }
 }
 
 const addBatchArgsForUpgradeBeacon = async (
-  step: BatchProposalStep,
-  batchArgs: TimelockBatchArgs,
+  step: ProposeBeaconUpgradeStep,
+
   hre: HardhatRuntimeEnvironment
-) => {
+): VirtualExecutionPayload => {
   let refAddress: string
   // let call: { fn: string; args: any[] } | undefined
 
@@ -886,10 +918,12 @@ const addBatchArgsForUpgradeBeacon = async (
     abi: JSON.parse(step.implFactory.interface.formatJson())
   })
 
+  const value = '0'
+  const target = refAddress
   //produce the timelock batch args
-  batchArgs.values.push('0')
+  // batchArgs.values.push('0')
 
-  batchArgs.targets.push(refAddress)
+  //batchArgs.targets.push(refAddress)
 
   const iface = new hre.ethers.Interface([
     hre.ethers.FunctionFragment.from({
@@ -904,7 +938,10 @@ const addBatchArgsForUpgradeBeacon = async (
       type: 'function'
     })
   ])
-  batchArgs.payloads.push(iface.encodeFunctionData('upgradeTo', [newImplAddr]))
+  const payload = iface.encodeFunctionData('upgradeTo', [newImplAddr])
+  //batchArgs.payloads.push(iface.encodeFunctionData('upgradeTo', [newImplAddr]))
+
+  return { value, target, payload }
 }
 
 const createScheduledBatchProposal = async ({

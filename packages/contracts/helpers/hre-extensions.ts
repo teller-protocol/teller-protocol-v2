@@ -608,7 +608,7 @@ extendEnvironment((hre) => {
     _steps
   ): Promise<ProposalResponse> => {
     const network = await getNetwork(hre)
-    const proxyAdmin = await hre.upgrades.admin.getInstance()
+    //const proxyAdmin = await hre.upgrades.admin.getInstance()
 
     const { protocolOwnerSafe } = await hre.getNamedAccounts()
 
@@ -630,104 +630,6 @@ extendEnvironment((hre) => {
         targetFunction: virtualExecutionPayload.targetFunction,
         functionInputs: virtualExecutionPayload.functionInputs
       })
-
-      //virtualExecutionPayloadArray.push(virtualExecutionPayload)
-
-      /*
-      let toContractAddress: string
-      let refAddress: string
-      let call: { fn: string; args: any[] } | undefined
-      if ('proxy' in step) {
-        refAddress =
-          typeof step.proxy === 'string'
-            ? step.proxy
-            : await step.proxy.getAddress()
-        call = step.opts?.call
-      } else {
-        refAddress =
-          typeof step.beacon === 'string'
-            ? step.beacon
-            : await step.beacon.getAddress()
-      }
-      const newImpl = await hre.upgrades.prepareUpgrade(
-        refAddress,
-        step.implFactory,
-        step.opts
-      )
-      const newImplAddr =
-        typeof newImpl === 'string'
-          ? newImpl
-          : await newImpl.wait(1).then((r) => {
-              if (!r?.contractAddress) throw new Error('No contract address')
-              return r.contractAddress
-            })
-
-      let targetFunction: ProposalTargetFunction
-      let functionInputs: ProposalFunctionInputs
-      if ('proxy' in step) {
-        toContractAddress = await proxyAdmin.getAddress()
-
-        if (call) {
-          targetFunction = {
-            name: 'upgradeAndCall',
-            inputs: [
-              {
-                name: 'proxy',
-                type: 'address'
-              },
-              {
-                name: 'implementation',
-                type: 'address'
-              },
-              { name: 'data', type: 'bytes' }
-            ]
-          }
-          functionInputs = [
-            refAddress,
-            newImplAddr,
-            step.implFactory.interface.encodeFunctionData(call.fn, call.args)
-          ]
-        } else {
-          targetFunction = {
-            name: 'upgrade',
-            inputs: [
-              {
-                name: 'proxy',
-                type: 'address'
-              },
-              {
-                name: 'implementation',
-                type: 'address'
-              }
-            ]
-          }
-          functionInputs = [refAddress, newImplAddr]
-        }
-      } else {
-        toContractAddress = refAddress
-        targetFunction = {
-          name: 'upgradeTo',
-          inputs: [
-            {
-              name: 'newImplementation',
-              type: 'address'
-            }
-          ]
-        }
-        functionInputs = [newImplAddr]
-      }
-
-      contracts.push({
-        address: toContractAddress,
-        network
-      })
-      proposalSteps.push({
-        contractId: `${network}-${toContractAddress}`,
-        type: 'custom',
-        targetFunction,
-        functionInputs
-      })
-      */
     } //end steps loop
 
     const admin = getAdminClient(hre)
@@ -768,8 +670,6 @@ extendEnvironment((hre) => {
 
     const steps = Array.isArray(_steps) ? _steps : [_steps]
     for (const step of steps) {
-      //figure out what TYPE of step it is
-
       let virtualExecutionPayload: VirtualExecutionPayload =
         getVirtualExecutionPayloadForStep(step, hre)
 

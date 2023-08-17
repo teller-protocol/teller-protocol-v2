@@ -11,9 +11,9 @@ const deployFn: DeployFunction = async (hre) => {
     'LenderCommitmentForwarder_V1'
   )
 
-  await hre.defender.proposeBatchTimelock(
-    'Lender Commitment Forwarder Merkle Upgrade',
-    ` 
+  await hre.defender.proposeBatchTimelock({
+    title: 'Lender Commitment Forwarder Merkle Upgrade',
+    description: ` 
 
 # LenderCommitmentForwarder
 
@@ -21,7 +21,7 @@ const deployFn: DeployFunction = async (hre) => {
 * Add a new function acceptCommitmentWithProof which is explicitly used with these new types.
 * Merkle proofs can be used to create commitments for a set of tokenIds for an ERC721 or ERC1155 collection.
 `,
-    [
+    _steps: [
       {
         proxy: lenderCommitmentForwarder,
         implFactory: await hre.ethers.getContractFactory(
@@ -32,12 +32,12 @@ const deployFn: DeployFunction = async (hre) => {
           unsafeAllow: ['constructor', 'state-variable-immutable'],
           constructorArgs: [
             await tellerV2.getAddress(),
-            await marketRegistry.getAddress(),
-          ],
-        },
-      },
+            await marketRegistry.getAddress()
+          ]
+        }
+      }
     ]
-  )
+  })
 
   hre.log('done.')
   hre.log('')
@@ -52,12 +52,12 @@ deployFn.tags = [
   'proposal',
   'upgrade',
   'lender-commitment-forwarder',
-  'lender-commitment-forwarder:merkle-upgrade',
+  'lender-commitment-forwarder:merkle-upgrade'
 ]
 deployFn.dependencies = [
   'market-registry:deploy',
   'teller-v2:deploy',
-  'lender-commitment-forwarder:deploy',
+  'lender-commitment-forwarder:deploy'
 ]
 deployFn.skip = async (hre) => {
   return (

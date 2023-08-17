@@ -2,21 +2,25 @@ pragma solidity >=0.8.0 <0.9.0;
 // SPDX-License-Identifier: MIT
 
 // Contracts
-import "./LenderCommitmentForwarder_V1.sol";
+import "./LenderCommitmentForwarder.sol";
 import "./extensions/ExtensionsContextUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 contract LenderCommitmentForwarder_V2 is
-    LenderCommitmentForwarder_V1,
+    LenderCommitmentForwarder,
     OwnableUpgradeable,
     ExtensionsContextUpgradeable
 {
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor(address _tellerV2, address _marketRegistry)
-        LenderCommitmentForwarder_V1(_tellerV2, _marketRegistry)
+        LenderCommitmentForwarder(_tellerV2, _marketRegistry)
     {}
 
-    //override the original initialize and make it call super initialize extensions (so it happens in deploy script for Base network etc ) 
+   
+    /*function initialize(address _newOwner) external initializer {
+        initializeExtensions(_newOwner);
+    }*/
+
 
     function initializeExtensions(address _newOwner) public reinitializer(2) {
         _transferOwnership(_newOwner);

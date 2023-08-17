@@ -16,9 +16,8 @@ pub fn store_uniswap_v3_prices(
     output: StoreSetProto<TokenPrice>,
 ) {
     let mut changes_iter = changes.entity_changes.iter();
-    let change = changes_iter.find(|entity_change| {
-        entity_change.entity.as_str() == "TokenHourData"
-            && entity_change.operation() == Operation::Create
+    let change = changes_iter.find(|item| {
+        item.entity.as_str() == "TokenHourData" && item.operation() == Operation::Create
     });
 
     match change {
@@ -54,7 +53,11 @@ pub fn store_uniswap_v3_prices(
                         price_usd: price.unwrap(),
                         timestamp: time.to_string(),
                     };
-                    output.set(time as u64, format!("TokenPrice:{token_address}"), &token_price);
+                    output.set(
+                        time as u64,
+                        format!("TokenPrice:{token_address}"),
+                        &token_price,
+                    );
 
                     break;
                 }

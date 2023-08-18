@@ -35,7 +35,8 @@ import { extendEnvironment } from 'hardhat/config'
 import {
   HardhatRuntimeEnvironment,
   ProposeBeaconUpgradeStep,
-  ProposeProxyUpgradeStep
+  ProposeProxyUpgradeStep,
+  VirtualExecutionPayload
 } from 'hardhat/types'
 import moment from 'moment'
 
@@ -87,18 +88,6 @@ declare module 'hardhat/types/runtime' {
   }
   //type ProposeUpgradeStep = ProposeProxyUpgradeStep | ProposeBeaconUpgradeStep
 
-  interface ProposeCallStep {
-    contractAddress: string
-    contractImplementation: ContractFactory
-    callFn: string
-    callArgs: any[]
-  }
-
-  type BatchProposalStep =
-    | ProposeCallStep
-    | ProposeProxyUpgradeStep
-    | ProposeBeaconUpgradeStep
-
   interface HardhatDefender extends OZHD {
     proposeCall: (
       contractAddress: string,
@@ -139,7 +128,27 @@ declare module 'hardhat/types/runtime' {
       _steps: BatchProposalStep[]
     }) => Promise<{ schedule: ProposalResponse; execute: ProposalResponse }>
   }
+
+  interface VirtualExecutionPayload {
+    target: string
+    value: string
+    payload: string //this is just targetFunction and functionInputs encoded to bytes using the abi
+    targetFunction: ProposalTargetFunction
+    functionInputs: ProposalFunctionInputs
+  }
+} //end hre module
+
+interface ProposeCallStep {
+  contractAddress: string
+  contractImplementation: ContractFactory
+  callFn: string
+  callArgs: any[]
 }
+
+type BatchProposalStep =
+  | ProposeCallStep
+  | ProposeProxyUpgradeStep
+  | ProposeBeaconUpgradeStep
 
 const getStepType = (step: BatchProposalStep): string => {
   if (step.hasOwnProperty('callFn')) {
@@ -602,11 +611,11 @@ extendEnvironment((hre) => {
     })
   }
 
-  hre.defender.proposeBatch = async (
+  hre.defender.proposeBatch = async ({
     title,
     description,
     _steps
-  ): Promise<ProposalResponse> => {
+  }): Promise<ProposalResponse> => {
     const network = await getNetwork(hre)
     //const proxyAdmin = await hre.upgrades.admin.getInstance()
 
@@ -616,7 +625,7 @@ extendEnvironment((hre) => {
     const proposalSteps: ProposalStep[] = []
     for (const step of _steps) {
       let virtualExecutionPayload: VirtualExecutionPayload =
-        getVirtualExecutionPayloadForStep(step, hre)
+        await getVirtualExecutionPayloadForStep(step, hre)
 
       const toContractAddress = virtualExecutionPayload.target
 
@@ -645,14 +654,6 @@ extendEnvironment((hre) => {
     })
   }
 
-  interface VirtualExecutionPayload {
-    target: string
-    value: string
-    payload: string //this is just targetFunction and functionInputs encoded to bytes using the abi
-    targetFunction: ProposalTargetFunction
-    functionInputs: ProposalFunctionInputs
-  }
-
   hre.defender.proposeBatchTimelock = async ({
     title,
     description,
@@ -671,7 +672,7 @@ extendEnvironment((hre) => {
     const steps = Array.isArray(_steps) ? _steps : [_steps]
     for (const step of steps) {
       let virtualExecutionPayload: VirtualExecutionPayload =
-        getVirtualExecutionPayloadForStep(step, hre)
+        await getVirtualExecutionPayloadForStep(step, hre)
 
       virtualExecutionPayloadArray.push(virtualExecutionPayload)
     } //end loop for steps
@@ -701,7 +702,7 @@ extendEnvironment((hre) => {
 const getVirtualExecutionPayloadForStep = async (
   step: BatchProposalStep,
   hre: HardhatRuntimeEnvironment
-): VirtualExecutionPayload => {
+): Promise<VirtualExecutionPayload> => {
   let stepType = getStepType(step)
 
   switch (stepType) {
@@ -723,7 +724,7 @@ const getVirtualPayloadForCall = async (
   step: ProposeCallStep,
 
   hre: HardhatRuntimeEnvironment
-): VirtualExecutionPayload => {
+): Promise<VirtualExecutionPayload> => {
   const contractImpl = step.contractImplementation
 
   const iface = contractImpl.interface
@@ -738,6 +739,10 @@ const getVirtualPayloadForCall = async (
   }
 
   const functionInputs: ProposalFunctionInputs = step.callArgs
+
+  if (typeof targetFunction.name == 'undefined') {
+    throw new Error('Target function for call is missing name')
+  }
 
   return {
     value: '0',
@@ -755,7 +760,7 @@ const getVirtualPayloadForUpgradeProxy = async (
   step: ProposeProxyUpgradeStep,
 
   hre: HardhatRuntimeEnvironment
-): VirtualExecutionPayload => {
+): Promise<VirtualExecutionPayload> => {
   let refAddress: string
   let call: { fn: string; args: any[] } | undefined
 
@@ -847,7 +852,7 @@ const getVirtualPayloadForUpgradeBeacon = async (
   step: ProposeBeaconUpgradeStep,
 
   hre: HardhatRuntimeEnvironment
-): VirtualExecutionPayload => {
+): Promise<VirtualExecutionPayload> => {
   let refAddress: string
   // let call: { fn: string; args: any[] } | undefined
 

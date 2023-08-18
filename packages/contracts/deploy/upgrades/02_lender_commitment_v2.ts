@@ -8,7 +8,7 @@ const deployFn: DeployFunction = async (hre) => {
   const tellerV2 = await hre.contracts.get('TellerV2')
   const marketRegistry = await hre.contracts.get('MarketRegistry')
   const lenderCommitmentForwarder = await hre.contracts.get(
-    'LenderCommitmentForwarder_V1'
+    'LenderCommitmentForwarder'
   )
 
   const namedAccounts = await hre.getNamedAccounts()
@@ -48,7 +48,7 @@ const deployFn: DeployFunction = async (hre) => {
           //call initialize
 
           call: {
-            fn: 'initializeExtension',
+            fn: 'initialize',
             args: [protocolTimelock]
           }
         }

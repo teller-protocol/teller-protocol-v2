@@ -791,7 +791,7 @@
     },
     {
       "type": "function",
-      "name": "initializeExtensions",
+      "name": "initialize",
       "constant": false,
       "payable": false,
       "inputs": [
@@ -992,6 +992,6 @@
     "status": 1,
     "byzantium": true
   },
-  "numDeployments": 5,
+  "numDeployments": 12,
   "implementation": "0x9065E7b11d8de642676B49e16A37EF0B7D38e489"
 }

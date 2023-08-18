@@ -836,8 +836,16 @@ const getVirtualPayloadForUpgradeProxy = async (
           }
         ]
       }
-  //let functionInputs: ProposalFunctionInputs
+  /*
+  console.log('creating function inputs ', {
+    call
+  })
 
+  for (let fragment of step.implFactory.interface.fragments) {
+    console.log(fragment)
+  }*/
+
+  //this is failing
   const functionInputs: ProposalFunctionInputs = call
     ? [
         refAddress,

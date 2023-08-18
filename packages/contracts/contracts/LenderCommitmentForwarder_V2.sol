@@ -17,12 +17,12 @@ contract LenderCommitmentForwarder_V2 is
     {}
 
    
-    /*function initialize(address _newOwner) external initializer {
-        initializeExtensions(_newOwner);
-    }*/
+    function initialize(address _newOwner) external initializer {
+        _initializeExtensions(_newOwner);
+    }
 
 
-    function initializeExtensions(address _newOwner) public reinitializer(2) {
+    function _initializeExtensions(address _newOwner) internal onlyInitializing {
         _transferOwnership(_newOwner);
     }
 

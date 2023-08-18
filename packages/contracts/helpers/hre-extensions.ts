@@ -150,6 +150,7 @@ type BatchProposalStep =
   | ProposeProxyUpgradeStep
   | ProposeBeaconUpgradeStep
 
+/*
 const getStepType = (step: BatchProposalStep): string => {
   if (step.hasOwnProperty('callFn')) {
     return 'call'
@@ -160,7 +161,24 @@ const getStepType = (step: BatchProposalStep): string => {
   } else {
     throw new Error('invalid step - cannot ascertain step type')
   }
+}*/
+
+function isCallStep(step: BatchProposalStep): step is ProposeCallStep {
+  return step.hasOwnProperty('callFn')
 }
+
+function isUpgradeProxyStep(
+  step: BatchProposalStep
+): step is ProposeProxyUpgradeStep {
+  return step.hasOwnProperty('proxy')
+}
+
+function isUpgradeBeaconStep(
+  step: BatchProposalStep
+): step is ProposeBeaconUpgradeStep {
+  return step.hasOwnProperty('beacon')
+}
+
 interface TimelockBatchArgs {
   targets: string[]
   values: string[]
@@ -703,20 +721,14 @@ const getVirtualExecutionPayloadForStep = async (
   step: BatchProposalStep,
   hre: HardhatRuntimeEnvironment
 ): Promise<VirtualExecutionPayload> => {
-  let stepType = getStepType(step)
-
-  switch (stepType) {
-    case 'call':
-      return await getVirtualPayloadForCall(step, hre)
-
-    case 'upgradeProxy':
-      return await getVirtualPayloadForUpgradeProxy(step, hre)
-
-    case 'upgradeBeacon':
-      return await getVirtualPayloadForUpgradeBeacon(step, hre)
-
-    default:
-      throw new Error('Invalid step type - cannot add batch args')
+  if (isCallStep(step)) {
+    return await getVirtualPayloadForCall(step, hre)
+  } else if (isUpgradeProxyStep(step)) {
+    return await getVirtualPayloadForUpgradeProxy(step, hre)
+  } else if (isUpgradeBeaconStep(step)) {
+    return await getVirtualPayloadForUpgradeBeacon(step, hre)
+  } else {
+    throw new Error('Invalid step type - cannot add batch args')
   }
 }
 

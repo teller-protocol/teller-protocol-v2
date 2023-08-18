@@ -19,9 +19,16 @@ const deployFn: DeployFunction = async (hre) => {
     'LenderCommitmentForwarder_V2'
   )
 
-  const rolloverContractAddress = await hre.ethers.getContractFactory(
-    'CommitmentRolloverLoan'
-  )
+  const rolloverContract = await hre.contracts.get('CommitmentRolloverLoan')
+
+  const rolloverContractAddress = await rolloverContract.getAddress()
+
+  console.log({
+    protocolTimelock
+  })
+
+  const lenderCommitmmentForwarderAddress =
+    await lenderCommitmentForwarder.getAddress()
 
   await hre.defender.proposeBatchTimelock({
     title: 'Lender Commitment Forwarder Extension Upgrade',
@@ -33,7 +40,7 @@ const deployFn: DeployFunction = async (hre) => {
 `,
     _steps: [
       {
-        proxy: lenderCommitmentForwarder,
+        proxy: lenderCommitmmentForwarderAddress,
         implFactory: await hre.ethers.getContractFactory(
           'LenderCommitmentForwarder_V2'
         ),

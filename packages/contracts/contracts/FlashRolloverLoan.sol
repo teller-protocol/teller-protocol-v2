@@ -35,6 +35,7 @@ contract FlashRolloverLoan is ICommitmentRolloverLoan,ITellerV2FlashCallback {
         FLASH_LOAN_VAULT = _flashLoanVault;
     }
 
+ 
 
 
     modifier onlyFlashLoanVault {
@@ -45,15 +46,20 @@ contract FlashRolloverLoan is ICommitmentRolloverLoan,ITellerV2FlashCallback {
     }
 
 
-    struct RolloverArgs {
-
-
-
+    struct RolloverCommitmentArgs {
+        uint256 loanId;
+        uint256 commitmentId;
+        uint256 principalAmount;
+        uint256 collateralAmount;
+        uint256 collateralTokenId;
+        address collateralTokenAddress;
+        uint16 interestRate;
+        uint32 loanDuration;
     }
 
     /**
      * @notice Allows a borrower to rollover a loan to a new commitment.
-     * @param _loanId The ID of the existing loan.
+      
      * @param _flashLoanAmount The amount to flash borrow.
      * @param _commitmentArgs Arguments for the commitment to accept.
      * @return newLoanId_ The ID of the new loan created by accepting the commitment.
@@ -61,53 +67,52 @@ contract FlashRolloverLoan is ICommitmentRolloverLoan,ITellerV2FlashCallback {
 
      //make sure this cant be re-entered . 
     function rolloverLoanWithFlash(
-        uint256 _loanId,
+        //uint256 _loanId,
         uint256 _flashLoanAmount,
-        AcceptCommitmentArgs calldata _commitmentArgs
+        //_borrowerAmount -- needed ? 
+        RolloverCommitmentArgs calldata _commitmentArgs
     ) external returns (uint256 newLoanId_) {
-        address borrower = TELLER_V2.getLoanBorrower(_loanId);
+
+ 
+
+        uint256 loanId = _commitmentArgs.loanId;
+
+        address borrower = TELLER_V2.getLoanBorrower(loanId);
         require(borrower == msg.sender, "CommitmentRolloverLoan: not borrower");
-
-
-    
-
+ 
 
         // Get lending token and balance before
         address lendingToken =  
-            TELLER_V2.getLoanLendingToken(_loanId)
+            TELLER_V2.getLoanLendingToken(loanId)
          ;
         uint256 balanceBefore = IERC20Upgradeable(lendingToken).balanceOf(address(this));
-
-      //  bytes calldata data = "";
-
-       bytes memory data = abi.encode(
-            RolloverArgs({
-                
-            })
-        );
-
+ 
 
         // Call 'Flash' on the vault 
         IFlashSingleToken(FLASH_LOAN_VAULT).flash( 
             _flashLoanAmount,
             lendingToken,
-            data
+            abi.encode(_commitmentArgs)
          );
         
     }
 
     //this is called by the flash vault ONLY 
     function tellerV2FlashCallback(  
-        uint256 amount, 
-        address token,
-        bytes calldata data
+        uint256 _flashAmount, 
+        address _flashToken,
+        bytes calldata _data
     ) external onlyFlashLoanVault {
 
 
-         RolloverArgs memory _rollover_args = abi.decode(
-                data,
-                (RolloverArgs)
+         RolloverCommitmentArgs memory _rollover_args = abi.decode(
+                _data,
+                (RolloverCommitmentArgs)
             );
+
+
+        IERC20Upgradeable(_flashToken).approve(address(TELLER_V2), _flashAmount);
+        TELLER_V2.repayLoanFull(_rollover_args.loanId);
 
 /*
 
@@ -121,12 +126,15 @@ contract FlashRolloverLoan is ICommitmentRolloverLoan,ITellerV2FlashCallback {
         TELLER_V2.repayLoanFull(_loanId);
  
          
-        // Accept commitment and receive funds to this contract
-        newLoanId_ = _acceptCommitment(_commitmentArgs);
 
 */
-        //repay the flash loan !! 
 
+
+        // Accept commitment and receive funds to this contract
+        uint256 newLoanId_ = _acceptCommitment(   _rollover_args  );
+
+        //repay the flash loan !! 
+         IERC20Upgradeable(_flashToken).transfer( FLASH_LOAN_VAULT, _flashAmount  );
 
 
         // Calculate funds received
@@ -153,7 +161,7 @@ contract FlashRolloverLoan is ICommitmentRolloverLoan,ITellerV2FlashCallback {
      * @param _commitmentArgs Arguments required to accept a commitment.
      * @return bidId_ The ID of the bid associated with the accepted commitment.
      */
-    function _acceptCommitment(AcceptCommitmentArgs calldata _commitmentArgs)
+    function _acceptCommitment(RolloverCommitmentArgs memory _commitmentArgs)
         internal
         returns (uint256 bidId_)
     {

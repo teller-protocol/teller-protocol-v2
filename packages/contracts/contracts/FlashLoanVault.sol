@@ -4,7 +4,7 @@ pragma solidity >=0.8.0 <0.9.0;
 
 
 /*
-Admin can add to a mapping of contracts that can be called ... ? 
+ 
 
 */
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -66,11 +66,11 @@ contract FlashLoanVault is OwnableUpgradeable, IFlashSingleToken {
 
 
 
-    function addToAllowlist(address guy) public onlyOwner { 
+    function addToAllowlist(address guy) external onlyOwner { 
       allowlist.add(guy);
     }
 
-    function removeFromAllowlist(address guy) public onlyOwner { 
+    function removeFromAllowlist(address guy) external onlyOwner { 
        allowlist.remove(guy);
     }
 
@@ -82,7 +82,7 @@ contract FlashLoanVault is OwnableUpgradeable, IFlashSingleToken {
       uint256 amount,
       address token, 
       bytes calldata data
-  ) public onlyAllowlisted {
+  ) external onlyAllowlisted {
       uint256 balanceBefore = IERC20(token).balanceOf(address(this));  
 
       if (amount > 0) IERC20(token).transfer(msg.sender, amount);    

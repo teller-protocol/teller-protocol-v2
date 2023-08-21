@@ -46,53 +46,56 @@ contract FlashRolloverLoan is ICommitmentRolloverLoan,ITellerV2FlashCallback {
     }
 
 
-    struct RolloverCommitmentArgs {
+    /*
+    need to pass loanId and borrower 
+    */
+
+    struct RolloverCallbackArgs {
         uint256 loanId;
-        uint256 commitmentId;
-        uint256 principalAmount;
-        uint256 collateralAmount;
-        uint256 collateralTokenId;
-        address collateralTokenAddress;
-        uint16 interestRate;
-        uint32 loanDuration;
+        address borrower;
+        bytes acceptCommitmentArgs;
     }
+ 
 
     /**
      * @notice Allows a borrower to rollover a loan to a new commitment.
-      
+     * @param _loanId The bid id for the loan to repay 
      * @param _flashLoanAmount The amount to flash borrow.
-     * @param _commitmentArgs Arguments for the commitment to accept.
+     * @param _acceptCommitmentArgs Arguments for the commitment to accept.
      * @return newLoanId_ The ID of the new loan created by accepting the commitment.
      */
 
      //make sure this cant be re-entered . 
     function rolloverLoanWithFlash(
-        //uint256 _loanId,
+        uint256 _loanId,
         uint256 _flashLoanAmount,
         //_borrowerAmount -- needed ? 
-        RolloverCommitmentArgs calldata _commitmentArgs
-    ) external returns (uint256 newLoanId_) {
+        AcceptCommitmentArgs calldata _acceptCommitmentArgs
+    ) external returns (uint256 newLoanId_) { 
 
- 
-
-        uint256 loanId = _commitmentArgs.loanId;
-
-        address borrower = TELLER_V2.getLoanBorrower(loanId);
+       
+        address borrower = TELLER_V2.getLoanBorrower(_loanId);
         require(borrower == msg.sender, "CommitmentRolloverLoan: not borrower");
- 
+     
 
         // Get lending token and balance before
         address lendingToken =  
-            TELLER_V2.getLoanLendingToken(loanId)
+            TELLER_V2.getLoanLendingToken(_loanId)
          ;
         uint256 balanceBefore = IERC20Upgradeable(lendingToken).balanceOf(address(this));
  
 
-        // Call 'Flash' on the vault 
+        // Call 'Flash' on the vault to borrow funds and call tellerV2FlashCallback
         IFlashSingleToken(FLASH_LOAN_VAULT).flash( 
             _flashLoanAmount,
             lendingToken,
-            abi.encode(_commitmentArgs)
+            abi.encode(
+                RolloverCallbackArgs({
+                    loanId: _loanId,
+                    borrower: borrower,
+                    acceptCommitmentArgs: abi.encode(  _acceptCommitmentArgs )
+                })
+            )
          );
         
     }
@@ -104,53 +107,49 @@ contract FlashRolloverLoan is ICommitmentRolloverLoan,ITellerV2FlashCallback {
         bytes calldata _data
     ) external onlyFlashLoanVault {
 
+        // _flashToken should be the lendingToken 
 
-         RolloverCommitmentArgs memory _rollover_args = abi.decode(
+         RolloverCallbackArgs memory _rolloverArgs = abi.decode(
                 _data,
-                (RolloverCommitmentArgs)
+                (RolloverCallbackArgs)
             );
 
 
+        uint256 fundsBeforeRepayment = IERC20Upgradeable(_flashToken).balanceOf(address(this));
+
+
         IERC20Upgradeable(_flashToken).approve(address(TELLER_V2), _flashAmount);
-        TELLER_V2.repayLoanFull(_rollover_args.loanId);
-
-/*
-
-        uint256 fundsReceived = lendingToken.balanceOf(address(this)) -
-            balanceBefore;
+        TELLER_V2.repayLoanFull(_rolloverArgs.loanId);
 
 
-        // Approve TellerV2 to spend funds and repay loan
-        // this puts the collateral in the borrowers wallet 
-        lendingToken.approve(address(TELLER_V2), fundsReceived);
-        TELLER_V2.repayLoanFull(_loanId);
+
+        uint256 fundsAfterRepayment = IERC20Upgradeable(_flashToken).balanceOf(address(this));
+
+
+        uint256 repaymentAmount = fundsBeforeRepayment - fundsAfterRepayment;
  
-         
-
-*/
-
+        AcceptCommitmentArgs memory acceptCommitmentArgs = abi.decode(
+            _rolloverArgs.acceptCommitmentArgs , (AcceptCommitmentArgs)
+        );
 
         // Accept commitment and receive funds to this contract
-        uint256 newLoanId_ = _acceptCommitment(   _rollover_args  );
+        uint256 newLoanId_ = _acceptCommitment(  acceptCommitmentArgs  );
+
+        uint256 fundsAfterAcceptCommitment = IERC20Upgradeable(_flashToken).balanceOf(address(this));
+
+        uint256 acceptCommitmentAmount = fundsAfterAcceptCommitment - fundsAfterRepayment;
 
         //repay the flash loan !! 
-         IERC20Upgradeable(_flashToken).transfer( FLASH_LOAN_VAULT, _flashAmount  );
+        IERC20Upgradeable(_flashToken).transfer( FLASH_LOAN_VAULT, _flashAmount  );
 
 
-        // Calculate funds received
-      /*  uint256 fundsReceived = lendingToken.balanceOf(address(this)) -
-            balanceBefore;
+        uint256 fundsRemaining = _flashAmount + acceptCommitmentAmount - repaymentAmount;
 
-
-
-        uint256 fundsRemaining = lendingToken.balanceOf(address(this)) -
-            balanceBefore;*/
-
-        /*
         if (fundsRemaining > 0) {
-            lendingToken.transfer(borrower, fundsRemaining);
-        }*/
+            IERC20Upgradeable(_flashToken).transfer(_rolloverArgs.borrower, fundsRemaining);
+        }
 
+      
 
 
     }
@@ -161,7 +160,7 @@ contract FlashRolloverLoan is ICommitmentRolloverLoan,ITellerV2FlashCallback {
      * @param _commitmentArgs Arguments required to accept a commitment.
      * @return bidId_ The ID of the bid associated with the accepted commitment.
      */
-    function _acceptCommitment(RolloverCommitmentArgs memory _commitmentArgs)
+    function _acceptCommitment(AcceptCommitmentArgs memory _commitmentArgs)
         internal
         returns (uint256 bidId_)
     {

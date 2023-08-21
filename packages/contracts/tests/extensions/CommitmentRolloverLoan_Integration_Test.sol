@@ -104,11 +104,11 @@ contract CommitmentRolloverLoan_Integration_Test is Testable {
             address(tellerV2),
             address(lenderCommitmentForwarder)
         );
+ 
 
-        //change this to a nicer interface?
         LenderCommitmentForwarder_V2(
             address(lenderCommitmentForwarder)
-        ).initializeExtensions(address(this));
+        ).initialize(address(this));
 
         LenderCommitmentForwarder_V2(
             address(lenderCommitmentForwarder)

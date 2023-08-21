@@ -34,9 +34,7 @@ contract FlashRolloverLoan is ICommitmentRolloverLoan,ITellerV2FlashCallback {
         );
         FLASH_LOAN_VAULT = _flashLoanVault;
     }
-
  
-
 
     modifier onlyFlashLoanVault {
 
@@ -100,7 +98,7 @@ contract FlashRolloverLoan is ICommitmentRolloverLoan,ITellerV2FlashCallback {
         
     }
 
-    //this is called by the flash vault ONLY 
+    //this is to be called by the flash vault ONLY 
     function tellerV2FlashCallback(  
         uint256 _flashAmount, 
         address _flashToken,
@@ -143,14 +141,12 @@ contract FlashRolloverLoan is ICommitmentRolloverLoan,ITellerV2FlashCallback {
         IERC20Upgradeable(_flashToken).transfer( FLASH_LOAN_VAULT, _flashAmount  );
 
 
-        uint256 fundsRemaining = _flashAmount + acceptCommitmentAmount - repaymentAmount;
+        uint256 fundsRemaining = acceptCommitmentAmount - repaymentAmount;
 
         if (fundsRemaining > 0) {
             IERC20Upgradeable(_flashToken).transfer(_rolloverArgs.borrower, fundsRemaining);
         }
-
-      
-
+ 
 
     }
 

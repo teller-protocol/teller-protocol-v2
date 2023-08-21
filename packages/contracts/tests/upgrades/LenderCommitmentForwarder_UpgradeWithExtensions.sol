@@ -59,7 +59,7 @@ contract LenderCommitmentForwarder_UpgradeToV2 is Testable {
             proxy,
             address(logicV2),
             abi.encodeWithSelector(
-                logicV2.initializeExtensions.selector,
+                logicV2.initialize.selector,
                 address(this)
             )
         );

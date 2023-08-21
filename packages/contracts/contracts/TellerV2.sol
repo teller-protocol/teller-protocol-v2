@@ -735,7 +735,7 @@ contract TellerV2 is
 
         Bid storage bid = bids[_bidId];
 
-        //change state here to prevent re-entrancy
+        // change state here to prevent re-entrancy
         bid.state = BidState.LIQUIDATED;
 
         (uint256 owedPrincipal, , uint256 interest) = V2Calculations
@@ -745,6 +745,7 @@ contract TellerV2 is
                 bidPaymentCycleType[_bidId]
             );
 
+        //this sets the state to 'repaid'
         _repayLoan(
             _bidId,
             Payment({ principal: owedPrincipal, interest: interest }),
@@ -761,6 +762,7 @@ contract TellerV2 is
 
     /**
      * @notice Internal function to make a loan payment.
+     * @dev Updates the bid's `status` to `PAID` only if it is not already marked as `LIQUIDATED` 
      * @param _bidId The id of the loan to make the payment towards.
      * @param _payment The Payment struct with payments amounts towards principal and interest respectively.
      * @param _owedAmount The total amount owed on the loan.
@@ -782,7 +784,10 @@ contract TellerV2 is
         // Check if we are sending a payment or amount remaining
         if (paymentAmount >= _owedAmount) {
             paymentAmount = _owedAmount;
-            bid.state = BidState.PAID;
+
+            if (bid.state != BidState.LIQUIDATED) {
+                bid.state = BidState.PAID;
+            }
 
             // Remove borrower's active bid
             _borrowerBidsActive[bid.borrower].remove(_bidId);

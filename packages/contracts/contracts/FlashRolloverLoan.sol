@@ -14,7 +14,9 @@ import "./interfaces/ILenderCommitmentForwarder.sol";
 import "./interfaces/ICommitmentRolloverLoan.sol";
 import "./libraries/NumbersLib.sol";
 
-contract FlashRolloverLoan is ICommitmentRolloverLoan {
+import {IFlashSingleToken, ITellerV2FlashCallback, FlashLoanVault} from "./FlashLoanVault.sol";
+
+contract FlashRolloverLoan is ICommitmentRolloverLoan,ITellerV2FlashCallback {
     using AddressUpgradeable for address;
     using NumbersLib for uint256;
 
@@ -33,10 +35,21 @@ contract FlashRolloverLoan is ICommitmentRolloverLoan {
         FLASH_LOAN_VAULT = _flashLoanVault;
     }
 
+
+
+    modifier onlyFlashLoanVault {
+
+      require( msg.sender == FLASH_LOAN_VAULT );
+
+      _;
+    }
+
+
+
     /**
      * @notice Allows a borrower to rollover a loan to a new commitment.
      * @param _loanId The ID of the existing loan.
-     * @param _rolloverAmount The amount to rollover.
+     * @param _flashLoanAmount The amount to flash borrow.
      * @param _commitmentArgs Arguments for the commitment to accept.
      * @return newLoanId_ The ID of the new loan created by accepting the commitment.
      */
@@ -51,19 +64,40 @@ contract FlashRolloverLoan is ICommitmentRolloverLoan {
         require(borrower == msg.sender, "CommitmentRolloverLoan: not borrower");
 
 
-
-        // Call 'Flash' on the vault using that same 
     
 
 
         // Get lending token and balance before
-        IERC20Upgradeable lendingToken = IERC20Upgradeable(
+        address lendingToken =  
             TELLER_V2.getLoanLendingToken(_loanId)
-        );
-        uint256 balanceBefore = lendingToken.balanceOf(address(this));
+         ;
+        uint256 balanceBefore = IERC20Upgradeable(lendingToken).balanceOf(address(this));
 
+        bytes calldata data = "";
+
+
+        // Call 'Flash' on the vault 
+        IFlashSingleToken(FLASH_LOAN_VAULT).flash( 
+            _flashLoanAmount,
+            lendingToken,
+            data
+         );
         
-    
+    }
+
+    //this is called by the flash vault ONLY 
+    function tellerV2FlashCallback(  
+        uint256 amount, 
+        address token,
+        bytes calldata data
+    ) external onlyFlashLoanVault {
+
+
+/*
+
+        uint256 fundsReceived = lendingToken.balanceOf(address(this)) -
+            balanceBefore;
+
 
         // Approve TellerV2 to spend funds and repay loan
         // this puts the collateral in the borrowers wallet 
@@ -74,7 +108,7 @@ contract FlashRolloverLoan is ICommitmentRolloverLoan {
         // Accept commitment and receive funds to this contract
         newLoanId_ = _acceptCommitment(_commitmentArgs);
 
-
+*/
         //repay the flash loan !! 
 
 
@@ -92,12 +126,10 @@ contract FlashRolloverLoan is ICommitmentRolloverLoan {
         if (fundsRemaining > 0) {
             lendingToken.transfer(borrower, fundsRemaining);
         }*/
+
+
+
     }
-
-    //this is called by the flash vault ONLY 
-    function _rolloverLoanCallback(  
-
-    ) 
 
  
     /**

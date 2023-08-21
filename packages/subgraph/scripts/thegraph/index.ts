@@ -97,6 +97,12 @@ export const run = async (): Promise<void> => {
           description: "Single deployment"
         },
         {
+          title: "Latest + Wait for Sync",
+          value: "latest-synced",
+          description:
+            "Single deployment that waits for the latest deployed subgraph to sync"
+        },
+        {
           title: "None",
           value: "none",
           description: "Resync from the beginning"
@@ -253,16 +259,20 @@ const buildAndDeploy = async ({
     if (latestVersion == null) {
       throw new Error(`Subgraph ${name} has no latest version`);
     }
+    let blockNumber = latestVersion.latestEthereumBlockNumber;
 
-    const updatedVersion = await waitForSync(latestVersion);
+    if (graftingType === "latest-synced") {
+      const updatedVersion = await waitForSync(latestVersion);
+      blockNumber = updatedVersion.latestEthereumBlockNumber;
+    }
 
     args.grafting = {
       base: latestVersion.deploymentId,
-      block: updatedVersion.latestEthereumBlockNumber
+      block: blockNumber
     };
     if (graftingType === "latest-block-handler") {
       args.block_handler = {
-        block: updatedVersion.latestEthereumBlockNumber
+        block: blockNumber
       };
     }
   }

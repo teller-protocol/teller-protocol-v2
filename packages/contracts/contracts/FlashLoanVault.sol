@@ -53,7 +53,7 @@ contract FlashLoanVault is OwnableUpgradeable, IFlashSingleToken {
 
     modifier onlyAllowlisted{
 
-      require( allowlist.contains(msg.sender) );
+      require( allowlist.contains(msg.sender) , "Not allowlisted to flash");
 
       _;
     }

@@ -83,12 +83,17 @@ contract FlashRolloverLoan_Integration_Test is Testable {
         wethMock.transfer(address(borrower), 5e18);
         
         flashLoanVault = new FlashLoanVault();
+        flashLoanVault.initialize();
+
+        wethMock.transfer(address(flashLoanVault), 5e18);
 
         flashRolloverLoan = new FlashRolloverLoan(
             address(tellerV2),
             address(lenderCommitmentForwarder),
             address(flashLoanVault)
         );
+
+        flashLoanVault.addToAllowlist(address(flashRolloverLoan));
 
 
         LenderCommitmentForwarder_V2(
@@ -176,10 +181,37 @@ contract FlashRolloverLoan_Integration_Test is Testable {
                     loanDuration: duration
                 });
 
-        uint256 flashLoanAmount = 100;
+
+        ///approve forwarders
+
+
+            vm.prank(address(marketOwner));
+            ITellerV2Context(address(tellerV2)).setTrustedMarketForwarder(
+                marketId,
+                address(lenderCommitmentForwarder)
+            );
+
+            //borrower AND lender  approves the lenderCommitmentForwarder as trusted
+
+            vm.prank(address(lender));
+            ITellerV2Context(address(tellerV2)).approveMarketForwarder(
+                marketId,
+                address(lenderCommitmentForwarder)
+            );
+
+            vm.prank(address(borrower));
+            ITellerV2Context(address(tellerV2)).approveMarketForwarder(
+                marketId,
+                address(lenderCommitmentForwarder)
+            );
 
 
 
+            //how do we calc how much to flash ?? 
+        uint256 flashLoanAmount = 110 * 1e16;
+
+
+        vm.prank(address(borrower));
         flashRolloverLoan.rolloverLoanWithFlash(
             loanId,
             flashLoanAmount,

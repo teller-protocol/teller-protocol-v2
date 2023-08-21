@@ -131,7 +131,7 @@ contract FlashRolloverLoan is ICommitmentRolloverLoan,ITellerV2FlashCallback {
         );
 
         // Accept commitment and receive funds to this contract
-        uint256 newLoanId_ = _acceptCommitment(  acceptCommitmentArgs  );
+        uint256 newLoanId_ = _acceptCommitment( _rolloverArgs.borrower,  acceptCommitmentArgs  );
 
         uint256 fundsAfterAcceptCommitment = IERC20Upgradeable(_flashToken).balanceOf(address(this));
 
@@ -156,7 +156,7 @@ contract FlashRolloverLoan is ICommitmentRolloverLoan,ITellerV2FlashCallback {
      * @param _commitmentArgs Arguments required to accept a commitment.
      * @return bidId_ The ID of the bid associated with the accepted commitment.
      */
-    function _acceptCommitment(AcceptCommitmentArgs memory _commitmentArgs)
+    function _acceptCommitment(address borrower, AcceptCommitmentArgs memory _commitmentArgs)
         internal
         returns (uint256 bidId_)
     {
@@ -176,7 +176,7 @@ contract FlashRolloverLoan is ICommitmentRolloverLoan,ITellerV2FlashCallback {
                         _commitmentArgs.interestRate,
                         _commitmentArgs.loanDuration
                     ),
-                    msg.sender
+                    borrower //cant be msg.sender because of the flash flow 
                 )
             );
 

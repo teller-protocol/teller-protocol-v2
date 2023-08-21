@@ -45,7 +45,13 @@ contract FlashRolloverLoan_Integration_Test is Testable {
         lender = new User();
         marketOwner = new User();
 
+        console.logAddress(address(borrower));
+          console.logAddress(address(lender));
+            console.logAddress(address(marketOwner));
+
         tellerV2 = IntegrationTestHelpers.deployIntegrationSuite();
+
+           console.logAddress(address(tellerV2));
 
         marketRegistry = IMarketRegistry(tellerV2.marketRegistry());
 
@@ -128,8 +134,10 @@ contract FlashRolloverLoan_Integration_Test is Testable {
             address(borrower)
         );
 
+
+            //why approve so much ? 
         vm.prank(address(lender));
-        wethMock.approve(address(tellerV2), 1e18);
+        wethMock.approve(address(tellerV2), 2e18);
 
         vm.prank(address(lender));
         (

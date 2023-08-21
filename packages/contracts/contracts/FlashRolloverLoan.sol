@@ -45,6 +45,11 @@ contract FlashRolloverLoan is ICommitmentRolloverLoan,ITellerV2FlashCallback {
     }
 
 
+    struct RolloverArgs {
+
+
+
+    }
 
     /**
      * @notice Allows a borrower to rollover a loan to a new commitment.
@@ -73,7 +78,13 @@ contract FlashRolloverLoan is ICommitmentRolloverLoan,ITellerV2FlashCallback {
          ;
         uint256 balanceBefore = IERC20Upgradeable(lendingToken).balanceOf(address(this));
 
-        bytes calldata data = "";
+      //  bytes calldata data = "";
+
+       bytes memory data = abi.encode(
+            RolloverArgs({
+                
+            })
+        );
 
 
         // Call 'Flash' on the vault 
@@ -92,6 +103,11 @@ contract FlashRolloverLoan is ICommitmentRolloverLoan,ITellerV2FlashCallback {
         bytes calldata data
     ) external onlyFlashLoanVault {
 
+
+         RolloverArgs memory _rollover_args = abi.decode(
+                data,
+                (RolloverArgs)
+            );
 
 /*
 

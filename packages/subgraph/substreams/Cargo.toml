@@ -8,13 +8,15 @@ name = "substreams"
 crate-type = ["cdylib"]
 
 [dependencies]
+num-bigint = "0.4.3"
 substreams = "0.5"
 substreams-entity-change = "1.3.0"
 substreams-ethereum = "0.9"
 prost = "0.11"
+prost-types = "0.11.9"
 uniswap-rs = "0.4.0"
 uniswap-utilities = "0.1.4"
-prost-types = "0.11.9"
+hex = "0.4.3"
 
 [profile.release]
 lto = true

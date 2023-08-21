@@ -7,8 +7,8 @@
     "gen": "substreams protogen substreams.yaml --exclude-paths='sf/substreams,google'",
     "build": "cargo build --release --target wasm32-unknown-unknown",
     "pack": "substreams pack ./substreams.yaml",
-    "gui": "substreams gui -e mainnet.eth.streamingfast.io:443 substreams.yaml graph_out",
-    "r": "substreams run -e mainnet.eth.streamingfast.io:443 substreams.yaml graph_out"
+    "gui": "substreams gui -e mainnet.eth.streamingfast.io:443 substreams.yaml map_token_prices",
+    "r": "substreams run -e mainnet.eth.streamingfast.io:443 substreams.yaml map_token_prices"
   },
   "dependencies": {
     "@bufbuild/buf": "^1.26.1"

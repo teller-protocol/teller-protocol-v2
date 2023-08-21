@@ -19,20 +19,11 @@ binaries:
     file: ./target/wasm32-unknown-unknown/release/substreams.wasm
 
 modules:
-  - name: store_uniswap_v3_prices
-    kind: store
-    updatePolicy: set
-    valueType: proto:token.price.v1.TokenPrice
-    initialBlock: 12369621
+  - name: map_token_prices
+    kind: map
+    initialBlock: 17000000
     inputs:
       - source: sf.substreams.v1.Clock
       - map: uniswap_v3:graph_out
-
-  - name: graph_out
-    kind: map
-    initialBlock: 12369621
-    inputs:
-      - map: uniswap_v3:map_pools_created
-      - store: store_uniswap_v3_prices
     output:
       type: proto:sf.substreams.sink.entity.v1.EntityChanges

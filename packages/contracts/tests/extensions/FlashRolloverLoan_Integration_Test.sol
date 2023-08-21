@@ -137,7 +137,7 @@ contract FlashRolloverLoan_Integration_Test is Testable {
 
             //why approve so much ? 
         vm.prank(address(lender));
-        wethMock.approve(address(tellerV2), 2e18);
+        wethMock.approve(address(tellerV2), 5e18);
 
         vm.prank(address(lender));
         (
@@ -148,7 +148,7 @@ contract FlashRolloverLoan_Integration_Test is Testable {
 
         vm.warp(365 days + 1);
 
-        uint256 commitmentPrincipalAmount = 50 * 1e16; //0.50 weth
+        uint256 commitmentPrincipalAmount = 150 * 1e16; //1.50 weth
 
         ILenderCommitmentForwarder.Commitment
             memory commitment = ILenderCommitmentForwarder.Commitment({

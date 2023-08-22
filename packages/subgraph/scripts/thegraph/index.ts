@@ -4,11 +4,7 @@ import prompts, { Choice } from "prompts";
 import semver from "semver/preload";
 
 import { Logger } from "../utils/logger";
-import {
-  getNextVersion,
-  getPackageVersion,
-  updatePackageVersion
-} from "../utils/version";
+import { getNextVersion, getPackageVersion } from "../utils/version";
 
 import { API, makeApi, SubgraphVersion, VersionUpdate } from "./api";
 import { build, BuildArgs, deploy } from "./commands";
@@ -127,13 +123,16 @@ export const run = async (): Promise<void> => {
       min: 1
     }
   ]);
-  subgraphs = answers.subgraphs;
   const releaseType = answers.releaseType;
   let graftingType = answers.graftingType;
   if (releaseType === "missing") {
     graftingType = "none";
-  } else if (releaseType === "release") {
-    graftingType = "latest-block-handler";
+  } else {
+    subgraphs = answers.subgraphs;
+
+    if (releaseType === "release") {
+      graftingType = "latest-block-handler";
+    }
   }
 
   if (!subgraphs || !releaseType || !graftingType)
@@ -168,6 +167,7 @@ const buildAndDeploySubgraphs = async ({
 
   const nextVersion = `v${getNextVersion(releaseType)}`;
 
+  const filteredSubgraphs = new Array<string>();
   await Promise.all(
     subgraphs.map(async name => {
       if (releaseType === "missing") {
@@ -177,6 +177,8 @@ const buildAndDeploySubgraphs = async ({
           return;
         }
       }
+      // only add subgraph if it is not already deployed
+      filteredSubgraphs.push(name);
 
       await buildAndDeploy({
         name,

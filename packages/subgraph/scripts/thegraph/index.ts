@@ -57,7 +57,7 @@ export const run = async (): Promise<void> => {
       type: "select",
       choices: () => {
         const choices: Choice[] = [];
-        const addChoice = (value: ReleaseType): number =>
+        const addChoice = (value: ReleaseType, description?: string): number =>
           choices.push({
             title:
               value === "missing"
@@ -65,11 +65,12 @@ export const run = async (): Promise<void> => {
                     "missing"
                   )})`
                 : `${value} (bump to v${getNextVersion(value)})`,
-            value
+            value,
+            description
           });
         if (semver.prerelease(packageVersion)) {
           addChoice("prerelease");
-          addChoice("release");
+          addChoice("release", "Fork latest release and enable block handler");
         } else {
           addChoice("prepatch");
           addChoice("preminor");
@@ -82,11 +83,30 @@ export const run = async (): Promise<void> => {
       name: "graftingType",
       message: "Select grafting type",
       type: (_, answers) =>
-        answers.releaseType === "missing" ? null : "select",
+        ["missing", "release"].includes(answers.releaseType) ? null : "select",
       choices: [
-        { title: "Latest", value: "latest" },
-        { title: "Latest + Block Handler", value: "latest-block-handler" },
-        { title: "None", value: "none" }
+        {
+          title: "Latest",
+          value: "latest",
+          description:
+            "Double deployment (1st: NO block handler, 2nd: WITH block handler)"
+        },
+        {
+          title: "Latest + Block Handler",
+          value: "latest-block-handler",
+          description: "Single deployment"
+        },
+        {
+          title: "Latest + Wait for Sync",
+          value: "latest-synced",
+          description:
+            "Single deployment that waits for the latest deployed subgraph to sync"
+        },
+        {
+          title: "None",
+          value: "none",
+          description: "Resync from the beginning"
+        }
       ]
     },
     {
@@ -112,6 +132,8 @@ export const run = async (): Promise<void> => {
   let graftingType = answers.graftingType;
   if (releaseType === "missing") {
     graftingType = "none";
+  } else if (releaseType === "release") {
+    graftingType = "latest-block-handler";
   }
 
   if (!subgraphs || !releaseType || !graftingType)
@@ -237,16 +259,20 @@ const buildAndDeploy = async ({
     if (latestVersion == null) {
       throw new Error(`Subgraph ${name} has no latest version`);
     }
+    let blockNumber = latestVersion.latestEthereumBlockNumber;
 
-    const updatedVersion = await waitForSync(latestVersion);
+    if (graftingType === "latest-synced") {
+      const updatedVersion = await waitForSync(latestVersion);
+      blockNumber = updatedVersion.latestEthereumBlockNumber;
+    }
 
     args.grafting = {
       base: latestVersion.deploymentId,
-      block: updatedVersion.latestEthereumBlockNumber
+      block: blockNumber
     };
     if (graftingType === "latest-block-handler") {
       args.block_handler = {
-        block: updatedVersion.latestEthereumBlockNumber
+        block: blockNumber
       };
     }
   }

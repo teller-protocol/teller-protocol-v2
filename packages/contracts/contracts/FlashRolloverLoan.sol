@@ -16,6 +16,7 @@ import "./libraries/NumbersLib.sol";
 
 import {IPool} from "./interfaces/aave/IPool.sol";
 import {IFlashLoanSimpleReceiver} from "./interfaces/aave/IFlashLoanSimpleReceiver.sol";
+import {IPoolAddressesProvider} from "./interfaces/aave/IPoolAddressesProvider.sol";
 //https://docs.aave.com/developers/v/1.0/tutorials/performing-a-flash-loan/...-in-your-project
 
 
@@ -28,20 +29,22 @@ contract FlashRolloverLoan is ICommitmentRolloverLoan,IFlashLoanSimpleReceiver {
     /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
     ILenderCommitmentForwarder public immutable LENDER_COMMITMENT_FORWARDER;
 
-    address public immutable FLASH_LOAN_VAULT;
+    address public immutable POOL_ADDRESSES_PROVIDER;
+    
     /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor(address _tellerV2, address _lenderCommitmentForwarder, address _flashLoanVault) {
+    constructor(address _tellerV2, address _lenderCommitmentForwarder, address _poolAddressesProvider) {
         TELLER_V2 = ITellerV2(_tellerV2);
         LENDER_COMMITMENT_FORWARDER = ILenderCommitmentForwarder(
             _lenderCommitmentForwarder
         );
-        FLASH_LOAN_VAULT = _flashLoanVault;
+        POOL_ADDRESSES_PROVIDER = _poolAddressesProvider;
+       
     }
  
 
-    modifier onlyFlashLoanVault {
+    modifier onlyFlashLoanPool {
 
-      require( msg.sender == FLASH_LOAN_VAULT );
+      require( msg.sender == address(POOL()) );
 
       _;
     }
@@ -82,16 +85,15 @@ contract FlashRolloverLoan is ICommitmentRolloverLoan,IFlashLoanSimpleReceiver {
         address lendingToken =  
             TELLER_V2.getLoanLendingToken(_loanId)
          ;
-        uint256 balanceBefore = IERC20Upgradeable(lendingToken).balanceOf(address(this));
+      //  uint256 balanceBefore = IERC20Upgradeable(lendingToken).balanceOf(address(this));
+         
         
-        //aave lending pool 
-        IPool lendingPool = IPool(FLASH_LOAN_VAULT);
 
-        uint16 _referralCode = 0;
+       // IPool lendingPool = IPool(POOL());
         
         // Call 'Flash' on the vault to borrow funds and call tellerV2FlashCallback
         // This ultimately calls executeOperation 
-        lendingPool.flashLoanSimple(
+        IPool(POOL()).flashLoanSimple(
             address(this), 
            lendingToken, 
            _flashLoanAmount, 
@@ -103,7 +105,7 @@ contract FlashRolloverLoan is ICommitmentRolloverLoan,IFlashLoanSimpleReceiver {
                     acceptCommitmentArgs: abi.encode(  _acceptCommitmentArgs )
                 })
             ),
-            _referralCode
+            0 //referral code 
             ); 
         
     }
@@ -112,12 +114,11 @@ contract FlashRolloverLoan is ICommitmentRolloverLoan,IFlashLoanSimpleReceiver {
     //this is to be called by the flash vault ONLY 
     function executeOperation(  
           address _flashToken,
-        uint256 _flashAmount, 
-      
+        uint256 _flashAmount,       
         uint256 _flashFees, //need to incorporate this ! 
         address initiator,
         bytes calldata _data
-    ) external onlyFlashLoanVault {
+    ) external onlyFlashLoanPool returns (bool)  {
 
         require( initiator == address(this), "This contract must be the initiator" );
 
@@ -144,14 +145,16 @@ contract FlashRolloverLoan is ICommitmentRolloverLoan,IFlashLoanSimpleReceiver {
         );
 
         // Accept commitment and receive funds to this contract
-        uint256 newLoanId_ = _acceptCommitment( _rolloverArgs.borrower,  acceptCommitmentArgs  );
+          _acceptCommitment( _rolloverArgs.borrower,  acceptCommitmentArgs  );
 
         uint256 fundsAfterAcceptCommitment = IERC20Upgradeable(_flashToken).balanceOf(address(this));
 
         uint256 acceptCommitmentAmount = fundsAfterAcceptCommitment - fundsAfterRepayment;
 
+     
+
         //repay the flash loan !! 
-        IERC20Upgradeable(_flashToken).transfer( FLASH_LOAN_VAULT, _flashAmount  );
+        IERC20Upgradeable(_flashToken).transfer( address( POOL() ), _flashAmount  );
 
 
         uint256 fundsRemaining = acceptCommitmentAmount - repaymentAmount;
@@ -160,7 +163,7 @@ contract FlashRolloverLoan is ICommitmentRolloverLoan,IFlashLoanSimpleReceiver {
             IERC20Upgradeable(_flashToken).transfer(_rolloverArgs.borrower, fundsRemaining);
         }
  
-
+        return true;
     }
 
  
@@ -195,6 +198,19 @@ contract FlashRolloverLoan is ICommitmentRolloverLoan,IFlashLoanSimpleReceiver {
 
         (bidId_) = abi.decode(responseData, (uint256));
     }
+
+
+
+  function ADDRESSES_PROVIDER() public view returns (IPoolAddressesProvider){
+    return IPoolAddressesProvider(POOL_ADDRESSES_PROVIDER);
+
+  }
+
+  function POOL() public view returns (IPool){
+    return IPool(ADDRESSES_PROVIDER().getPool());
+  }
+
+
 
     /**
      * @notice Retrieves the market ID associated with a given commitment.

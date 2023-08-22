@@ -14,9 +14,12 @@ import "./interfaces/ILenderCommitmentForwarder.sol";
 import "./interfaces/ICommitmentRolloverLoan.sol";
 import "./libraries/NumbersLib.sol";
 
-import {IFlashSingleToken, ITellerV2FlashCallback, FlashLoanVault} from "./FlashLoanVault.sol";
+import {IPool} from "./interfaces/aave/IPool.sol";
+import {IFlashLoanSimpleReceiver} from "./interfaces/aave/IFlashLoanSimpleReceiver.sol";
+//https://docs.aave.com/developers/v/1.0/tutorials/performing-a-flash-loan/...-in-your-project
 
-contract FlashRolloverLoan is ICommitmentRolloverLoan,ITellerV2FlashCallback {
+
+contract FlashRolloverLoan is ICommitmentRolloverLoan,IFlashLoanSimpleReceiver {
     using AddressUpgradeable for address;
     using NumbersLib for uint256;
 
@@ -51,6 +54,7 @@ contract FlashRolloverLoan is ICommitmentRolloverLoan,ITellerV2FlashCallback {
     struct RolloverCallbackArgs {
         uint256 loanId;
         address borrower;
+        uint256 borrowerAmount;
         bytes acceptCommitmentArgs;
     }
  
@@ -67,43 +71,55 @@ contract FlashRolloverLoan is ICommitmentRolloverLoan,ITellerV2FlashCallback {
     function rolloverLoanWithFlash(
         uint256 _loanId,
         uint256 _flashLoanAmount,
-        //_borrowerAmount -- needed ? 
+        uint256 _borrowerAmount , //an additional amount borrower may have to add 
         AcceptCommitmentArgs calldata _acceptCommitmentArgs
     ) external returns (uint256 newLoanId_) { 
 
-       
         address borrower = TELLER_V2.getLoanBorrower(_loanId);
         require(borrower == msg.sender, "CommitmentRolloverLoan: not borrower");
-     
 
         // Get lending token and balance before
         address lendingToken =  
             TELLER_V2.getLoanLendingToken(_loanId)
          ;
         uint256 balanceBefore = IERC20Upgradeable(lendingToken).balanceOf(address(this));
- 
+        
+        //aave lending pool 
+        IPool lendingPool = IPool(FLASH_LOAN_VAULT);
 
+        uint16 _referralCode = 0;
+        
         // Call 'Flash' on the vault to borrow funds and call tellerV2FlashCallback
-        IFlashSingleToken(FLASH_LOAN_VAULT).flash( 
-            _flashLoanAmount,
-            lendingToken,
-            abi.encode(
+        // This ultimately calls executeOperation 
+        lendingPool.flashLoanSimple(
+            address(this), 
+           lendingToken, 
+           _flashLoanAmount, 
+           abi.encode(
                 RolloverCallbackArgs({
                     loanId: _loanId,
                     borrower: borrower,
+                    borrowerAmount: _borrowerAmount,
                     acceptCommitmentArgs: abi.encode(  _acceptCommitmentArgs )
                 })
-            )
-         );
+            ),
+            _referralCode
+            ); 
         
     }
 
+
     //this is to be called by the flash vault ONLY 
-    function tellerV2FlashCallback(  
+    function executeOperation(  
+          address _flashToken,
         uint256 _flashAmount, 
-        address _flashToken,
+      
+        uint256 _flashFees, //need to incorporate this ! 
+        address initiator,
         bytes calldata _data
     ) external onlyFlashLoanVault {
+
+        require( initiator == address(this), "This contract must be the initiator" );
 
         // _flashToken should be the lendingToken 
 
@@ -119,10 +135,7 @@ contract FlashRolloverLoan is ICommitmentRolloverLoan,ITellerV2FlashCallback {
         IERC20Upgradeable(_flashToken).approve(address(TELLER_V2), _flashAmount);
         TELLER_V2.repayLoanFull(_rolloverArgs.loanId);
 
-
-
         uint256 fundsAfterRepayment = IERC20Upgradeable(_flashToken).balanceOf(address(this));
-
 
         uint256 repaymentAmount = fundsBeforeRepayment - fundsAfterRepayment;
  

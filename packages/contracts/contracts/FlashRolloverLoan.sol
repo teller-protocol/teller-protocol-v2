@@ -113,7 +113,7 @@ contract FlashRolloverLoan is ICommitmentRolloverLoan,IFlashLoanSimpleReceiver {
 
     //this is to be called by the flash vault ONLY 
     function executeOperation(  
-          address _flashToken,
+        address _flashToken,
         uint256 _flashAmount,       
         uint256 _flashFees, //need to incorporate this ! 
         address initiator,
@@ -154,10 +154,10 @@ contract FlashRolloverLoan is ICommitmentRolloverLoan,IFlashLoanSimpleReceiver {
      
 
         //repay the flash loan !! 
-        IERC20Upgradeable(_flashToken).transfer( address( POOL() ), _flashAmount  );
+        IERC20Upgradeable(_flashToken).transfer( address( POOL() ), _flashAmount+ _flashFees );
 
-
-        uint256 fundsRemaining = acceptCommitmentAmount - repaymentAmount;
+        //audit this 
+        uint256 fundsRemaining = acceptCommitmentAmount - repaymentAmount - _flashFees;
 
         if (fundsRemaining > 0) {
             IERC20Upgradeable(_flashToken).transfer(_rolloverArgs.borrower, fundsRemaining);

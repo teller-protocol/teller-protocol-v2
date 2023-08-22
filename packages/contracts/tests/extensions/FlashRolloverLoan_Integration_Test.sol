@@ -1,6 +1,5 @@
 import { Testable } from "../Testable.sol";
-
-import { FlashLoanVault } from "../../contracts/FlashLoanVault.sol";
+ 
 import { FlashRolloverLoan } from "../../contracts/FlashRolloverLoan.sol";
 
 import "../../contracts/interfaces/ICommitmentRolloverLoan.sol";
@@ -33,7 +32,7 @@ contract FlashRolloverLoan_Integration_Test is Testable {
     User private lender;
     User private marketOwner;
 
-    FlashLoanVault flashLoanVault;
+   
     FlashRolloverLoan flashRolloverLoan;
     TellerV2 tellerV2;
     WethMock wethMock;
@@ -87,20 +86,20 @@ contract FlashRolloverLoan_Integration_Test is Testable {
         wethMock.deposit{ value: 100e18 }();
         wethMock.transfer(address(lender), 5e18);
         wethMock.transfer(address(borrower), 5e18);
-        
-        flashLoanVault = new FlashLoanVault();
-        flashLoanVault.initialize();
 
-        wethMock.transfer(address(flashLoanVault), 5e18);
+
+        aavePoolAddressProvider = ?? 
+         
+
+      //  wethMock.transfer(address(flashLoanVault), 5e18);
 
         flashRolloverLoan = new FlashRolloverLoan(
             address(tellerV2),
             address(lenderCommitmentForwarder),
-            address(flashLoanVault)
+            address(aavePoolAddressProvider)
         );
 
-        flashLoanVault.addToAllowlist(address(flashRolloverLoan));
-
+       
 
         LenderCommitmentForwarder_V2(
             address(lenderCommitmentForwarder)

@@ -33,6 +33,7 @@ contract FlashRolloverLoan_Integration_Test is Testable {
     User private marketOwner;
 
    
+    AavePoolAddressProviderMock aavePoolAddressProvider;
     FlashRolloverLoan flashRolloverLoan;
     TellerV2 tellerV2;
     WethMock wethMock;
@@ -57,6 +58,15 @@ contract FlashRolloverLoan_Integration_Test is Testable {
         lenderCommitmentForwarder = ILenderCommitmentForwarder(
             tellerV2.lenderCommitmentForwarder()
         );
+
+        aavePoolAddressProvider = new AavePoolAddressProviderMock(
+            0, address(this)
+        );
+
+        aavePoolMock = new AavePoolMock();
+
+        aavePoolAddressProvider.setPool( address(aavePoolMock) );
+
 
         wethMock = new WethMock();
 
@@ -87,8 +97,7 @@ contract FlashRolloverLoan_Integration_Test is Testable {
         wethMock.transfer(address(lender), 5e18);
         wethMock.transfer(address(borrower), 5e18);
 
-
-        aavePoolAddressProvider = ?? 
+ 
          
 
       //  wethMock.transfer(address(flashLoanVault), 5e18);

@@ -696,14 +696,7 @@ contract TellerV2_bids_test is Testable {
         tellerV2.mock_setBidDefaultDuration(bidId, 1000);
         vm.warp(2000 * 1e20);
 
-        vm.expectRevert(
-            abi.encodeWithSelector(
-                ActionNotAllowed.selector,
-                bidId,
-                "lenderCloseLoan",
-                "Not loan lender"
-            )
-        );
+        vm.expectRevert("only lender can close loan");
         vm.prank(address(borrower));
         tellerV2.lenderCloseLoan(bidId);
     }
@@ -811,14 +804,7 @@ contract TellerV2_bids_test is Testable {
         tellerV2.setMockMsgSenderForMarket(address(borrower));
         vm.prank(address(borrower));
 
-        vm.expectRevert(
-            abi.encodeWithSelector(
-                ActionNotAllowed.selector,
-                bidId,
-                "claimLoanNFT",
-                "Not loan lender"
-            )
-        );
+        vm.expectRevert("only lender can claim NFT");
 
         tellerV2.claimLoanNFT(bidId);
     }

@@ -1,6 +1,7 @@
 pragma solidity ^0.8.0;
 
 import { Testable } from "../Testable.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 import { FlashRolloverLoan } from "../../contracts/FlashRolloverLoan.sol";
 
@@ -24,11 +25,11 @@ contract FlashRolloverLoanMock is FlashRolloverLoan {
         FlashRolloverLoan(_tellerV2, _lenderCommitmentForwarder,_aaveAddressProvider)
     {}
 
-    function acceptCommitment(address borrower, AcceptCommitmentArgs calldata _commitmentArgs)
+    function acceptCommitment(address borrower,address principalToken, AcceptCommitmentArgs calldata _commitmentArgs)
         public
-        returns (uint256 bidId_)
+        returns (uint256 bidId_, uint256 acceptCommitmentAmount_)
     {
-        bidId_ = super._acceptCommitment(borrower,_commitmentArgs);
+        return super._acceptCommitment(borrower,principalToken,_commitmentArgs);
     }
 }
 
@@ -79,7 +80,7 @@ contract FlashRolloverLoan_Unit_Test is Testable {
 
         wethMock.transfer(address(aavePoolMock), 5e18);
 
-        
+
         //marketRegistryMock = new MarketRegistryMock();
 
         flashRolloverLoan = new FlashRolloverLoanMock(
@@ -140,8 +141,11 @@ contract FlashRolloverLoan_Unit_Test is Testable {
             address(borrower)
         );
 
-        uint256 flashAmount = 0;
-        uint256 borrowerAmount = 0;
+        uint256 flashAmount = 500;
+        uint256 borrowerAmount = 5;  //have to pay the aave fee.. 
+
+        vm.prank(address(borrower));
+        IERC20(lendingToken).approve(address(flashRolloverLoan), 1e18);
  
         vm.prank(address(borrower));
 

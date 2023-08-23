@@ -143,43 +143,44 @@ If the new loan pays out (after fees) MORE than the  aave loan amount+ fee) then
 
         require( initiator == address(this), "This contract must be the initiator" );
 
-        // _flashToken should be the lendingToken 
+        // _flashToken == lendingToken 
 
         RolloverCallbackArgs memory _rolloverArgs = abi.decode(
                 _data,
                 (RolloverCallbackArgs)
+            ); 
+       
+        uint256 repaymentAmount = _repayLoanFull ( 
+            _rolloverArgs.loanId, 
+            _flashToken ,
+            _flashAmount
             );
-
-
-        uint256 fundsBeforeRepayment = IERC20Upgradeable(_flashToken).balanceOf(address(this));
-
-
-        IERC20Upgradeable(_flashToken).approve(address(TELLER_V2), _flashAmount);
-        TELLER_V2.repayLoanFull(_rolloverArgs.loanId);
-
-        uint256 fundsAfterRepayment = IERC20Upgradeable(_flashToken).balanceOf(address(this));
-
-        uint256 repaymentAmount = fundsBeforeRepayment - fundsAfterRepayment;
  
+
         AcceptCommitmentArgs memory acceptCommitmentArgs = abi.decode(
             _rolloverArgs.acceptCommitmentArgs , (AcceptCommitmentArgs)
         );
 
         // Accept commitment and receive funds to this contract
-         _acceptCommitment( _rolloverArgs.borrower,  acceptCommitmentArgs  );
+        
             //uint256 newLoanId =
         //use this for event emit 
 
+        (uint256 newLoanId, uint256 acceptCommitmentAmount) = _acceptCommitment( 
+            _rolloverArgs.borrower, 
+            _flashToken,            
+             acceptCommitmentArgs
+              );
 
-        uint256 fundsAfterAcceptCommitment = IERC20Upgradeable(_flashToken).balanceOf(address(this));
+        //uint256 fundsAfterAcceptCommitment = IERC20Upgradeable(_flashToken).balanceOf(address(this));
  
         //repay the flash loan !! 
-        IERC20Upgradeable(_flashToken).transfer( address( POOL() ), _flashAmount+ _flashFees );
+        IERC20Upgradeable(_flashToken).transfer( address( POOL() ), _flashAmount + _flashFees );
 
-        uint256 acceptCommitmentAmount = fundsAfterAcceptCommitment - fundsAfterRepayment;
+        //uint256 acceptCommitmentAmount = fundsAfterAcceptCommitment - fundsAfterRepayment;
 
         //audit this 
-        uint256 fundsRemaining = acceptCommitmentAmount - repaymentAmount - _flashFees;
+        uint256 fundsRemaining = acceptCommitmentAmount  + _rolloverArgs.borrowerAmount - repaymentAmount - _flashFees;
 
         if (fundsRemaining > 0) {
             IERC20Upgradeable(_flashToken).transfer(_rolloverArgs.borrower, fundsRemaining);
@@ -196,7 +197,24 @@ If the new loan pays out (after fees) MORE than the  aave loan amount+ fee) then
 
     //add a function for calculating borrower amount 
 
+    function _repayLoanFull(
+        uint256 _bidId,
+        address _principalToken,
+        uint256 _repayAmount 
+     )
+    internal 
+    returns (uint256 repayAmount_ ){ 
 
+        uint256 fundsBeforeRepayment = IERC20Upgradeable(_principalToken).balanceOf(address(this));
+        
+        IERC20Upgradeable(_principalToken).approve(address(TELLER_V2), _repayAmount);
+        TELLER_V2.repayLoanFull(_bidId); 
+
+        uint256 fundsAfterRepayment = IERC20Upgradeable(_principalToken).balanceOf(address(this));
+
+        repayAmount_ = fundsBeforeRepayment - fundsAfterRepayment; 
+
+    }
 
  
     /**
@@ -204,10 +222,12 @@ If the new loan pays out (after fees) MORE than the  aave loan amount+ fee) then
      * @param _commitmentArgs Arguments required to accept a commitment.
      * @return bidId_ The ID of the bid associated with the accepted commitment.
      */
-    function _acceptCommitment(address borrower, AcceptCommitmentArgs memory _commitmentArgs)
+    function _acceptCommitment(address borrower, address principalToken, AcceptCommitmentArgs memory _commitmentArgs)
         internal
-        returns (uint256 bidId_)
+        returns (uint256 bidId_, uint256 acceptCommitmentAmount_)
     {
+        uint256 fundsBeforeAcceptCommitment = IERC20Upgradeable(principalToken).balanceOf(address(this));
+  
         bytes memory responseData = address(LENDER_COMMITMENT_FORWARDER)
             .functionCall(
                 abi.encodePacked(
@@ -229,6 +249,9 @@ If the new loan pays out (after fees) MORE than the  aave loan amount+ fee) then
             );
 
         (bidId_) = abi.decode(responseData, (uint256));
+
+        uint256 fundsAfterAcceptCommitment = IERC20Upgradeable(principalToken).balanceOf(address(this));
+        acceptCommitmentAmount_ = fundsAfterAcceptCommitment - fundsBeforeAcceptCommitment; 
     }
 
 
@@ -265,9 +288,7 @@ If the new loan pays out (after fees) MORE than the  aave loan amount+ fee) then
         Payment memory repayAmountOwed = TELLER_V2.calculateAmountOwed(
             _loanId,
             _timestamp
-        );
-
-        
+        ); 
 
         /*_borrowerAmount +=
             int256(repayAmountOwed.principal) +

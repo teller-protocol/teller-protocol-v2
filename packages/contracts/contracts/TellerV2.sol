@@ -154,6 +154,20 @@ contract TellerV2 is
         _;
     }
 
+    /**
+     * @notice Ensures that only the lender of a loan can call a function.
+     * @param _bidId The id of a bid.
+     * @param _action The desired action to run on the bid.
+     */
+    modifier onlyLender(uint256 _bidId, string memory _action) {
+        address sender = _msgSenderForMarket(bids[_bidId].marketplaceId);
+        if (sender != getLoanLender(_bidId)) {
+            revert ActionNotAllowed(_bidId, _action, "Not loan lender");
+        }
+
+        _;
+    }
+
     /** Constant Variables **/
 
     uint8 public constant CURRENT_CODE_VERSION = 9;
@@ -567,19 +581,18 @@ contract TellerV2 is
     function claimLoanNFT(uint256 _bidId)
         external
         acceptedLoan(_bidId, "claimLoanNFT")
+        onlyLender(_bidId, "claimLoanNFT")
         whenNotPaused
     {
         // Retrieve bid
         Bid storage bid = bids[_bidId];
 
-        address sender = _msgSenderForMarket(bid.marketplaceId);
-        require(sender == bid.lender, "only lender can claim NFT");
-
+        address lender = bid.lender;
         // set lender address to the lender manager so we know to check the owner of the NFT for the true lender
         bid.lender = address(USING_LENDER_MANAGER);
 
         // mint an NFT with the lender manager
-        lenderManager.registerLoan(_bidId, sender);
+        lenderManager.registerLoan(_bidId, lender);
     }
 
     /**
@@ -713,7 +726,8 @@ contract TellerV2 is
      */
     function lenderCloseLoan(uint256 _bidId)
         external
-        acceptedLoan(_bidId, "lenderClaimCollateral")
+        acceptedLoan(_bidId, "lenderCloseLoan")
+        onlyLender(_bidId, "lenderCloseLoan")
     {
         require(isLoanDefaulted(_bidId), "Loan must be defaulted.");
 

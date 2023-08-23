@@ -776,7 +776,7 @@ contract TellerV2 is
 
     /**
      * @notice Internal function to make a loan payment.
-     * @dev Updates the bid's `status` to `PAID` only if it is not already marked as `LIQUIDATED` 
+     * @dev Updates the bid's `status` to `PAID` only if it is not already marked as `LIQUIDATED`
      * @param _bidId The id of the loan to make the payment towards.
      * @param _payment The Payment struct with payments amounts towards principal and interest respectively.
      * @param _owedAmount The total amount owed on the loan.

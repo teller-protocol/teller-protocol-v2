@@ -289,7 +289,7 @@ export const makeStudio = async (
         return [];
       },
       product(name: string) {
-        return ["--product", "subgraph-studio"];
+        return ["--studio"];
       }
     }
   };

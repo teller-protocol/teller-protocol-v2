@@ -1,3 +1,5 @@
+pragma solidity ^0.8.0;
+
 import { Testable } from "../Testable.sol";
 
 import { FlashRolloverLoan } from "../../contracts/FlashRolloverLoan.sol";
@@ -13,9 +15,13 @@ import { TellerV2SolMock } from "../../contracts/mock/TellerV2SolMock.sol";
 import { LenderCommitmentForwarderMock } from "../../contracts/mock/LenderCommitmentForwarderMock.sol";
 import { MarketRegistryMock } from "../../contracts/mock/MarketRegistryMock.sol";
 
+import {AavePoolAddressProviderMock} from "../../contracts/mock/aave/AavePoolAddressProviderMock.sol";
+import {AavePoolMock} from "../../contracts/mock/aave/AavePoolMock.sol";
+
+
 contract FlashRolloverLoanMock is FlashRolloverLoan {
-    constructor(address _tellerV2, address _lenderCommitmentForwarder, address _flashLoanVault)
-        FlashRolloverLoan(_tellerV2, _lenderCommitmentForwarder,_flashLoanVault)
+    constructor(address _tellerV2, address _lenderCommitmentForwarder, address _aaveAddressProvider)
+        FlashRolloverLoan(_tellerV2, _lenderCommitmentForwarder,_aaveAddressProvider)
     {}
 
     function acceptCommitment(address borrower, AcceptCommitmentArgs calldata _commitmentArgs)
@@ -32,6 +38,8 @@ contract FlashRolloverLoan_Unit_Test is Testable {
     User private borrower;
     User private lender;
 
+    AavePoolMock aavePoolMock;
+    AavePoolAddressProviderMock aavePoolAddressProvider;
     FlashRolloverLoanMock flashRolloverLoan;
     TellerV2SolMock tellerV2;
     WethMock wethMock;
@@ -50,20 +58,34 @@ contract FlashRolloverLoan_Unit_Test is Testable {
         tellerV2.setMarketRegistry(address(marketRegistryMock));
 
         lenderCommitmentForwarder = new LenderCommitmentForwarderMock();
+ 
 
-        flashLoanVault = new FlashLoanVault();
+
+        aavePoolAddressProvider = new AavePoolAddressProviderMock(
+            "marketId", address(this)
+        );
+
+        aavePoolMock = new AavePoolMock();
+
+        bytes32 POOL = 'POOL';
+        aavePoolAddressProvider.setAddress( POOL, address(aavePoolMock) );
+
+
 
         wethMock.deposit{ value: 100e18 }();
         wethMock.transfer(address(lender), 5e18);
         wethMock.transfer(address(borrower), 5e18);
         wethMock.transfer(address(lenderCommitmentForwarder), 5e18);
 
+        wethMock.transfer(address(aavePoolMock), 5e18);
+
+        
         //marketRegistryMock = new MarketRegistryMock();
 
         flashRolloverLoan = new FlashRolloverLoanMock(
             address(tellerV2),
             address(lenderCommitmentForwarder),
-            address(flashLoanVault)
+            address(aavePoolAddressProvider)
         );
 
         IntegrationTestHelpers.deployIntegrationSuite();
@@ -118,13 +140,15 @@ contract FlashRolloverLoan_Unit_Test is Testable {
             address(borrower)
         );
 
-        uint256 rolloverAmount = 0;
+        uint256 flashAmount = 0;
+        uint256 borrowerAmount = 0;
  
         vm.prank(address(borrower));
 
-        commitmentRolloverLoan.rolloverLoan(
+        flashRolloverLoan.rolloverLoanWithFlash(
             loanId,
-            rolloverAmount,
+            flashAmount,
+            borrowerAmount,
             commitmentArgs
         );
 
@@ -187,15 +211,17 @@ contract FlashRolloverLoan_Unit_Test is Testable {
             address(borrower)
         );
 
-        uint256 rolloverAmount = 0;
+        uint256 flashAmount = 0;
+        uint256 borrowerAmount = 0;
  
         vm.prank(address(lender));
 
         vm.expectRevert("CommitmentRolloverLoan: not borrower");
 
-        commitmentRolloverLoan.rolloverLoan(
+        flashRolloverLoan.rolloverLoanWithFlash(
             loanId,
-            rolloverAmount,
+            flashAmount,
+            borrowerAmount,
             commitmentArgs
         );
      }
@@ -253,13 +279,13 @@ contract FlashRolloverLoan_Unit_Test is Testable {
 
         
         vm.prank(address(lender)); 
-        int256 rolloverAmount=  commitmentRolloverLoan.calculateRolloverAmount(
+        (uint256 flashAmount, int256 borrowerAmount) =  flashRolloverLoan.calculateRolloverAmount(
             loanId, 
             commitmentArgs,
             block.timestamp
         );
 
-        assertEq(rolloverAmount, -445 , "invalid rolloveramount");
+        assertEq(borrowerAmount, -445 , "invalid rolloveramount");
 
   }
 }

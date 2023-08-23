@@ -244,6 +244,66 @@ If the new loan pays out (after fees) MORE than the  aave loan amount+ fee) then
 
 
 
+
+    /*
+
+        This assumes that the flash amount will be the repayLoanFull amount !!
+
+    */
+    /**
+     * @notice Calculates the amount for loan rollover, determining if the borrower owes or receives funds.
+     * @param _loanId The ID of the loan to calculate the rollover amount for.
+     * @param _commitmentArgs Arguments for the commitment.
+     * @param _timestamp The timestamp for when the calculation is executed.
+    
+     */
+    function calculateRolloverAmount(
+        uint256 _loanId,
+        AcceptCommitmentArgs calldata _commitmentArgs,
+        uint256 _timestamp
+    ) external view returns (uint256 _flashAmount, int256 _borrowerAmount) {
+        Payment memory repayAmountOwed = TELLER_V2.calculateAmountOwed(
+            _loanId,
+            _timestamp
+        );
+
+        
+
+        /*_borrowerAmount +=
+            int256(repayAmountOwed.principal) +
+            int256(repayAmountOwed.interest);*/
+
+        uint256 _marketId = _getMarketIdForCommitment(
+            _commitmentArgs.commitmentId
+        );
+        uint16 marketFeePct = _getMarketFeePct(_marketId);
+        uint16 protocolFeePct = _getProtocolFeePct();
+
+        uint256 commitmentPrincipalRequested = _commitmentArgs.principalAmount;
+        uint256 amountToMarketplace = commitmentPrincipalRequested.percent(
+            marketFeePct
+        );
+        uint256 amountToProtocol = commitmentPrincipalRequested.percent(
+            protocolFeePct
+        );
+
+        // by default, we will flash exactly what we need to do relayLoanFull
+        _flashAmount = repayAmountOwed.principal 
+             + repayAmountOwed.interest 
+             + amountToMarketplace 
+             + amountToProtocol;
+
+        //fix me ...
+        uint256 amountToBorrower = commitmentPrincipalRequested -
+            amountToProtocol -
+            amountToMarketplace;
+
+        _borrowerAmount -= int256(amountToBorrower);
+    }
+
+
+
+
     /**
      * @notice Retrieves the market ID associated with a given commitment.
      * @param _commitmentId The ID of the commitment for which to fetch the market ID.

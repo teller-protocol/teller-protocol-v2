@@ -25,6 +25,7 @@ import {IPoolAddressesProvider} from "./interfaces/aave/IPoolAddressesProvider.s
 contract FlashRolloverLoan is ICommitmentRolloverLoan,IFlashLoanSimpleReceiver {
     using AddressUpgradeable for address;
     using NumbersLib for uint256;
+    
 
     /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
     ITellerV2 public immutable TELLER_V2;
@@ -131,8 +132,7 @@ If the new loan pays out (after fees) MORE than the  aave loan amount+ fee) then
         
     }
 
-
-    //this is to be called by the flash vault ONLY 
+ 
     function executeOperation(  
         address _flashToken,
         uint256 _flashAmount,       
@@ -142,8 +142,7 @@ If the new loan pays out (after fees) MORE than the  aave loan amount+ fee) then
     ) external onlyFlashLoanPool returns (bool)  {
 
         require( initiator == address(this), "This contract must be the initiator" );
-
-        // _flashToken == lendingToken 
+ 
 
         RolloverCallbackArgs memory _rolloverArgs = abi.decode(
                 _data,
@@ -162,24 +161,18 @@ If the new loan pays out (after fees) MORE than the  aave loan amount+ fee) then
         );
 
         // Accept commitment and receive funds to this contract
-        
-            //uint256 newLoanId =
-        //use this for event emit 
+     
 
         (uint256 newLoanId, uint256 acceptCommitmentAmount) = _acceptCommitment( 
             _rolloverArgs.borrower, 
             _flashToken,            
              acceptCommitmentArgs
               );
-
-        //uint256 fundsAfterAcceptCommitment = IERC20Upgradeable(_flashToken).balanceOf(address(this));
  
         //repay the flash loan !! 
         IERC20Upgradeable(_flashToken).transfer( address( POOL() ), _flashAmount + _flashFees );
-
-        //uint256 acceptCommitmentAmount = fundsAfterAcceptCommitment - fundsAfterRepayment;
-
-        //audit this 
+ 
+        //double check this 
         uint256 fundsRemaining = acceptCommitmentAmount  + _rolloverArgs.borrowerAmount - repaymentAmount - _flashFees;
 
         if (fundsRemaining > 0) {
@@ -283,16 +276,13 @@ If the new loan pays out (after fees) MORE than the  aave loan amount+ fee) then
     function calculateRolloverAmount(
         uint256 _loanId,
         AcceptCommitmentArgs calldata _commitmentArgs,
+        uint16 _flashloanPremiumPct,
         uint256 _timestamp
     ) external view returns (uint256 _flashAmount, int256 _borrowerAmount) {
         Payment memory repayAmountOwed = TELLER_V2.calculateAmountOwed(
             _loanId,
             _timestamp
-        ); 
-
-        /*_borrowerAmount +=
-            int256(repayAmountOwed.principal) +
-            int256(repayAmountOwed.interest);*/
+        );          
 
         uint256 _marketId = _getMarketIdForCommitment(
             _commitmentArgs.commitmentId
@@ -308,18 +298,24 @@ If the new loan pays out (after fees) MORE than the  aave loan amount+ fee) then
             protocolFeePct
         );
 
+        uint256 commitmentPrincipalReceived = commitmentPrincipalRequested 
+        - amountToMarketplace 
+        - amountToProtocol; 
+
         // by default, we will flash exactly what we need to do relayLoanFull
-        _flashAmount = repayAmountOwed.principal 
-             + repayAmountOwed.interest 
-             + amountToMarketplace 
-             + amountToProtocol;
+        uint256 repayFullAmount = repayAmountOwed.principal 
+             + repayAmountOwed.interest  ;
+ 
+        _flashAmount = repayFullAmount ;
+        uint256 _flashLoanFee = _flashAmount.percent(_flashloanPremiumPct);
+
+        uint256 flashLoanFee = 0;
 
         //fix me ...
-        uint256 amountToBorrower = commitmentPrincipalRequested -
-            amountToProtocol -
-            amountToMarketplace;
-
-        _borrowerAmount -= int256(amountToBorrower);
+        _borrowerAmount = int256(commitmentPrincipalReceived) 
+        - int256(repayFullAmount)
+        - int256(_flashLoanFee);
+ 
     }
 
 

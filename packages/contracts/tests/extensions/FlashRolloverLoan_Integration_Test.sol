@@ -16,6 +16,10 @@ import { TellerV2SolMock } from "../../contracts/mock/TellerV2SolMock.sol";
 import { LenderCommitmentForwarderMock } from "../../contracts/mock/LenderCommitmentForwarderMock.sol";
 import { MarketRegistryMock } from "../../contracts/mock/MarketRegistryMock.sol";
 
+import {AavePoolAddressProviderMock} from "../../contracts/mock/aave/AavePoolAddressProviderMock.sol";
+import {AavePoolMock} from "../../contracts/mock/aave/AavePoolMock.sol";
+
+
 import { LenderCommitmentForwarder } from "../../contracts/LenderCommitmentForwarder.sol";
 
 import { LenderCommitmentForwarder_V2 } from "../../contracts/LenderCommitmentForwarder_V2.sol";
@@ -32,7 +36,7 @@ contract FlashRolloverLoan_Integration_Test is Testable {
     User private lender;
     User private marketOwner;
 
-   
+    AavePoolMock aavePoolMock;
     AavePoolAddressProviderMock aavePoolAddressProvider;
     FlashRolloverLoan flashRolloverLoan;
     TellerV2 tellerV2;
@@ -46,12 +50,14 @@ contract FlashRolloverLoan_Integration_Test is Testable {
         marketOwner = new User();
 
         console.logAddress(address(borrower));
-          console.logAddress(address(lender));
-            console.logAddress(address(marketOwner));
+        console.logAddress(address(lender));
+        console.logAddress(address(marketOwner));
 
         tellerV2 = IntegrationTestHelpers.deployIntegrationSuite();
 
-           console.logAddress(address(tellerV2));
+        console.logAddress(address(tellerV2));
+
+
 
         marketRegistry = IMarketRegistry(tellerV2.marketRegistry());
 
@@ -60,12 +66,13 @@ contract FlashRolloverLoan_Integration_Test is Testable {
         );
 
         aavePoolAddressProvider = new AavePoolAddressProviderMock(
-            0, address(this)
+            "marketId", address(this)
         );
 
         aavePoolMock = new AavePoolMock();
 
-        aavePoolAddressProvider.setPool( address(aavePoolMock) );
+        bytes32 POOL = 'POOL';
+        aavePoolAddressProvider.setAddress( POOL, address(aavePoolMock) );
 
 
         wethMock = new WethMock();
@@ -97,7 +104,7 @@ contract FlashRolloverLoan_Integration_Test is Testable {
         wethMock.transfer(address(lender), 5e18);
         wethMock.transfer(address(borrower), 5e18);
 
- 
+        wethMock.transfer(address(aavePoolMock), 5e18);
          
 
       //  wethMock.transfer(address(flashLoanVault), 5e18);
@@ -226,11 +233,13 @@ contract FlashRolloverLoan_Integration_Test is Testable {
             //how do we calc how much to flash ?? 
         uint256 flashLoanAmount = 110 * 1e16;
 
+        uint256 borrowerAmount = 0 ;
 
         vm.prank(address(borrower));
         flashRolloverLoan.rolloverLoanWithFlash(
             loanId,
             flashLoanAmount,
+            borrowerAmount,
             _acceptCommitmentArgs
         );
 

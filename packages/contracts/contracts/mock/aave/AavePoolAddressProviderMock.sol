@@ -11,7 +11,7 @@ import {IPoolAddressesProvider} from '../../interfaces/aave/IPoolAddressesProvid
  * @dev Acts as factory of proxies and admin of those, so with right to change its implementations
  * @dev Owned by the Aave Governance
  */
-contract PoolAddressesProvider is Ownable, IPoolAddressesProvider {
+contract AavePoolAddressProviderMock is Ownable, IPoolAddressesProvider {
   // Identifier of the Aave Market
   string private _marketId;
 
@@ -140,5 +140,13 @@ contract PoolAddressesProvider is Ownable, IPoolAddressesProvider {
     _marketId = newMarketId;
     emit MarketIdSet(oldMarketId, newMarketId);
   }
- 
+
+
+    //removed for the mock 
+   function setAddressAsProxy(bytes32 id, address newImplementationAddress) external{}
+   function setPoolConfiguratorImpl(address newPoolConfiguratorImpl) external{}
+   function setPoolImpl(address newPoolImpl) external {}
+
+
+
 }

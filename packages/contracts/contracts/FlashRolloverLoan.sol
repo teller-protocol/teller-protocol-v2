@@ -5,6 +5,8 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
 // Interfaces
 import "./interfaces/ITellerV2.sol";
 import "./interfaces/IProtocolFee.sol";
@@ -69,8 +71,18 @@ contract FlashRolloverLoan is ICommitmentRolloverLoan,IFlashLoanSimpleReceiver {
      * @param _acceptCommitmentArgs Arguments for the commitment to accept.
      * @return newLoanId_ The ID of the new loan created by accepting the commitment.
      */
+ 
 
-     //make sure this cant be re-entered . 
+/*
+ 
+The flash loan amount can naively be the exact amount needed to repay the old loan 
+
+If the new loan pays out (after fees) MORE than the  aave loan amount+ fee) then borrower amount can be zero 
+
+ 1) I could solve for what the new loans payout (before fees and after fees) would NEED to be to make borrower amount 0...
+
+*/
+
     function rolloverLoanWithFlash(
         uint256 _loanId,
         uint256 _flashLoanAmount,
@@ -85,6 +97,15 @@ contract FlashRolloverLoan is ICommitmentRolloverLoan,IFlashLoanSimpleReceiver {
         address lendingToken =  
             TELLER_V2.getLoanLendingToken(_loanId)
          ;
+
+        if (_borrowerAmount > 0){
+            IERC20(lendingToken).transferFrom(
+                borrower,
+                address(this),
+                _borrowerAmount
+            );
+        }
+       
       //  uint256 balanceBefore = IERC20Upgradeable(lendingToken).balanceOf(address(this));
          
         
@@ -124,7 +145,7 @@ contract FlashRolloverLoan is ICommitmentRolloverLoan,IFlashLoanSimpleReceiver {
 
         // _flashToken should be the lendingToken 
 
-         RolloverCallbackArgs memory _rolloverArgs = abi.decode(
+        RolloverCallbackArgs memory _rolloverArgs = abi.decode(
                 _data,
                 (RolloverCallbackArgs)
             );
@@ -145,26 +166,37 @@ contract FlashRolloverLoan is ICommitmentRolloverLoan,IFlashLoanSimpleReceiver {
         );
 
         // Accept commitment and receive funds to this contract
-          _acceptCommitment( _rolloverArgs.borrower,  acceptCommitmentArgs  );
+         _acceptCommitment( _rolloverArgs.borrower,  acceptCommitmentArgs  );
+            //uint256 newLoanId =
+        //use this for event emit 
+
 
         uint256 fundsAfterAcceptCommitment = IERC20Upgradeable(_flashToken).balanceOf(address(this));
-
-        uint256 acceptCommitmentAmount = fundsAfterAcceptCommitment - fundsAfterRepayment;
-
-     
-
+ 
         //repay the flash loan !! 
         IERC20Upgradeable(_flashToken).transfer( address( POOL() ), _flashAmount+ _flashFees );
+
+        uint256 acceptCommitmentAmount = fundsAfterAcceptCommitment - fundsAfterRepayment;
 
         //audit this 
         uint256 fundsRemaining = acceptCommitmentAmount - repaymentAmount - _flashFees;
 
         if (fundsRemaining > 0) {
             IERC20Upgradeable(_flashToken).transfer(_rolloverArgs.borrower, fundsRemaining);
+            //add an event: tell borrower how much money was sent back here 
         }
+
+
+        //add an event : flash rollover executed 
  
         return true;
     }
+
+
+
+    //add a function for calculating borrower amount 
+
+
 
  
     /**

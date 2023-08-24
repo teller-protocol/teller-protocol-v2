@@ -84,9 +84,11 @@ contract TellerV2_Override is TellerV2 {
         __Pausable_init();
     }
 
+/*
     function setMockMsgSenderForMarket(address _sender) public {
         mockMsgSenderForMarket = _sender;
     }
+*/
 
     function _submitBidSuper(
         address _lendingToken,
@@ -141,6 +143,7 @@ contract TellerV2_Override is TellerV2 {
 
     */
 
+/*
     function _msgSenderForMarket(uint256 _marketId)
         internal
         view
@@ -152,6 +155,7 @@ contract TellerV2_Override is TellerV2 {
         }
         return super._msgSenderForMarket(_marketId);
     }
+    */
 
     function _submitBid(
         address _lendingToken,

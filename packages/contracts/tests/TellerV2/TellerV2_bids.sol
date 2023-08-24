@@ -281,8 +281,7 @@ contract TellerV2_bids_test is Testable {
 
         tellerV2.mock_setBidState(bidId, BidState.PENDING);
 
-        //need to mock as owner
-        tellerV2.setMockMsgSenderForMarket(address(borrower));
+        
         vm.prank(address(borrower));
 
         tellerV2.cancelBid(bidId);
@@ -297,9 +296,10 @@ contract TellerV2_bids_test is Testable {
         uint256 bidId = 1;
         setMockBid(bidId);
 
-        tellerV2.setMockMsgSenderForMarket(address(lender));
+        
         tellerV2.mock_setBidState(bidId, BidState.PENDING);
 
+        vm.prank(address(lender));
         vm.expectRevert(
             abi.encodeWithSelector(
                 ActionNotAllowed.selector,
@@ -373,7 +373,8 @@ contract TellerV2_bids_test is Testable {
         lendingToken.approve(address(tellerV2), 1e20);
 
         //make address (this) be the one that makes the payment
-        tellerV2.setMockMsgSenderForMarket(address(this));
+        //tellerV2.setMockMsgSenderForMarket(address(this));
+      
 
         tellerV2.mock_setBidState(bidId, BidState.PENDING);
 
@@ -382,6 +383,7 @@ contract TellerV2_bids_test is Testable {
 
         tellerV2.setCollateralManagerSuper(address(collateralManagerMock));
 
+        vm.prank(address(this));
         tellerV2.lenderAcceptBid(bidId);
 
         assertTrue(
@@ -421,7 +423,7 @@ contract TellerV2_bids_test is Testable {
         lendingToken.approve(address(tellerV2), 1e20);
 
         //make address (this) be the one that makes the payment
-        tellerV2.setMockMsgSenderForMarket(address(this));
+        //tellerV2.setMockMsgSenderForMarket(address(this));
 
         tellerV2.mock_setBidState(bidId, BidState.PENDING);
 
@@ -430,6 +432,7 @@ contract TellerV2_bids_test is Testable {
 
         tellerV2.setCollateralManagerSuper(address(collateralManagerMock));
 
+          vm.prank(address(this));
         tellerV2.pauseProtocol();
 
         vm.expectRevert("Pausable: paused");
@@ -446,7 +449,7 @@ contract TellerV2_bids_test is Testable {
         lendingToken.approve(address(tellerV2), 1e20);
 
         //make address (this) be the one that makes the payment
-        tellerV2.setMockMsgSenderForMarket(address(this));
+        //tellerV2.setMockMsgSenderForMarket(address(this));
 
         tellerV2.mock_setBidState(bidId, BidState.PENDING);
 
@@ -457,6 +460,7 @@ contract TellerV2_bids_test is Testable {
 
         marketRegistryMock.mock_setLenderIsVerified(false);
 
+          vm.prank(address(this));
         vm.expectRevert("Not verified lender");
 
         tellerV2.lenderAcceptBid(bidId);
@@ -471,7 +475,7 @@ contract TellerV2_bids_test is Testable {
         lendingToken.approve(address(tellerV2), 1e20);
 
         //make address (this) be the one that makes the payment
-        tellerV2.setMockMsgSenderForMarket(address(this));
+        //tellerV2.setMockMsgSenderForMarket(address(this));
 
         tellerV2.mock_setBidState(bidId, BidState.PENDING);
 
@@ -482,6 +486,7 @@ contract TellerV2_bids_test is Testable {
 
         marketRegistryMock.mock_setGlobalMarketsClosed(true);
 
+        vm.prank(address(this));
         vm.expectRevert("Market is closed");
 
         tellerV2.lenderAcceptBid(bidId);
@@ -496,7 +501,7 @@ contract TellerV2_bids_test is Testable {
         lendingToken.approve(address(tellerV2), 1e20);
 
         //make address (this) be the one that makes the payment
-        tellerV2.setMockMsgSenderForMarket(address(this));
+        //tellerV2.setMockMsgSenderForMarket(address(this));
 
         tellerV2.mock_setBidState(bidId, BidState.PENDING);
 
@@ -509,6 +514,7 @@ contract TellerV2_bids_test is Testable {
 
         vm.warp(20000);
 
+          vm.prank(address(this));
         vm.expectRevert("Bid has expired");
 
         tellerV2.lenderAcceptBid(bidId);
@@ -519,7 +525,7 @@ contract TellerV2_bids_test is Testable {
         setMockBid(bidId);
 
         //set address(this) as the account that will be paying off the loan
-        tellerV2.setMockMsgSenderForMarket(address(this));
+        //tellerV2.setMockMsgSenderForMarket(address(this));
 
         tellerV2.setReputationManagerSuper(address(reputationManagerMock));
 
@@ -530,6 +536,7 @@ contract TellerV2_bids_test is Testable {
 
         lendingToken.approve(address(tellerV2), 1e20);
 
+          vm.prank(address(this));
         tellerV2._repayLoanSuper(bidId, payment, 100, false);
 
         BidState bidStateAfter = tellerV2.getBidState(bidId);
@@ -542,7 +549,7 @@ contract TellerV2_bids_test is Testable {
         setMockBid(bidId);
 
         //set address(this) as the account that will be paying off the loan
-        tellerV2.setMockMsgSenderForMarket(address(this));
+        //tellerV2.setMockMsgSenderForMarket(address(this));
 
         tellerV2.setReputationManagerSuper(address(reputationManagerMock));
 
@@ -571,7 +578,7 @@ contract TellerV2_bids_test is Testable {
         vm.warp(2000);
 
         //set the account that will be paying the loan off
-        tellerV2.setMockMsgSenderForMarket(address(this));
+        //tellerV2.setMockMsgSenderForMarket(address(this));
 
         //need to get some weth
 
@@ -615,7 +622,7 @@ contract TellerV2_bids_test is Testable {
         vm.warp(2000);
 
         //set the account that will be paying the loan off
-        tellerV2.setMockMsgSenderForMarket(address(this));
+        //tellerV2.setMockMsgSenderForMarket(address(this));
 
         lendingToken.approve(address(tellerV2), 1e20);
 
@@ -631,7 +638,7 @@ contract TellerV2_bids_test is Testable {
         tellerV2.mock_setBidState(bidId, BidState.PENDING);
 
         //set the account that will be paying the loan off
-        tellerV2.setMockMsgSenderForMarket(address(this));
+        //tellerV2.setMockMsgSenderForMarket(address(this));
 
         lendingToken.approve(address(tellerV2), 1e20);
 
@@ -656,7 +663,7 @@ contract TellerV2_bids_test is Testable {
         vm.warp(2000);
 
         //set the account that will be paying the loan off
-        tellerV2.setMockMsgSenderForMarket(address(this));
+        //tellerV2.setMockMsgSenderForMarket(address(this));
 
         lendingToken.approve(address(tellerV2), 1e20);
 
@@ -672,7 +679,7 @@ contract TellerV2_bids_test is Testable {
         tellerV2.mock_setBidState(bidId, BidState.PENDING);
 
         //set the account that will be paying the loan off
-        tellerV2.setMockMsgSenderForMarket(address(this));
+        //tellerV2.setMockMsgSenderForMarket(address(this));
 
         lendingToken.approve(address(tellerV2), 1e20);
 
@@ -731,7 +738,7 @@ contract TellerV2_bids_test is Testable {
         tellerV2.mock_setBidDefaultDuration(bidId, 1000);
 
         //set the account that will be paying the loan off
-        tellerV2.setMockMsgSenderForMarket(address(this));
+        //tellerV2.setMockMsgSenderForMarket(address(this));
 
         lendingToken.approve(address(tellerV2), 1e20);
 
@@ -759,7 +766,7 @@ contract TellerV2_bids_test is Testable {
         tellerV2.mock_setBidDefaultDuration(bidId, 1000);
 
         //set the account that will be paying the loan off
-        tellerV2.setMockMsgSenderForMarket(address(this));
+        //tellerV2.setMockMsgSenderForMarket(address(this));
 
         lendingToken.approve(address(tellerV2), 1e20);
 
@@ -785,7 +792,7 @@ contract TellerV2_bids_test is Testable {
 
         tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
 
-        tellerV2.setMockMsgSenderForMarket(address(lender));
+        //tellerV2.setMockMsgSenderForMarket(address(lender));
         vm.prank(address(lender));
 
         tellerV2.claimLoanNFT(bidId);
@@ -801,7 +808,7 @@ contract TellerV2_bids_test is Testable {
 
         tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
 
-        tellerV2.setMockMsgSenderForMarket(address(borrower));
+        //tellerV2.setMockMsgSenderForMarket(address(borrower));
         vm.prank(address(borrower));
 
         vm.expectRevert("only lender can claim NFT");
@@ -817,7 +824,7 @@ contract TellerV2_bids_test is Testable {
 
         tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
 
-        tellerV2.setMockMsgSenderForMarket(address(lender));
+        //tellerV2.setMockMsgSenderForMarket(address(lender));
 
         tellerV2.mock_initialize();
         tellerV2.pauseProtocol();

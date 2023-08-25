@@ -1,5 +1,5 @@
 import { Testable } from "../Testable.sol";
- 
+
 import { FlashRolloverLoan } from "../../contracts/FlashRolloverLoan.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
@@ -17,19 +17,17 @@ import { TellerV2SolMock } from "../../contracts/mock/TellerV2SolMock.sol";
 import { LenderCommitmentForwarderMock } from "../../contracts/mock/LenderCommitmentForwarderMock.sol";
 import { MarketRegistryMock } from "../../contracts/mock/MarketRegistryMock.sol";
 
-import {AavePoolAddressProviderMock} from "../../contracts/mock/aave/AavePoolAddressProviderMock.sol";
-import {AavePoolMock} from "../../contracts/mock/aave/AavePoolMock.sol";
-
+import { AavePoolAddressProviderMock } from "../../contracts/mock/aave/AavePoolAddressProviderMock.sol";
+import { AavePoolMock } from "../../contracts/mock/aave/AavePoolMock.sol";
 
 import { LenderCommitmentForwarder } from "../../contracts/LenderCommitmentForwarder.sol";
 
 import { LenderCommitmentForwarder_V2 } from "../../contracts/LenderCommitmentForwarder_V2.sol";
 
-
 import { PaymentType, PaymentCycleType } from "../../contracts/libraries/V2Calculations.sol";
 
 import "lib/forge-std/src/console.sol";
- 
+
 contract FlashRolloverLoan_Integration_Test is Testable {
     constructor() {}
 
@@ -45,10 +43,12 @@ contract FlashRolloverLoan_Integration_Test is Testable {
     ILenderCommitmentForwarder lenderCommitmentForwarder;
     IMarketRegistry marketRegistry;
 
-
-    event RolloverLoanComplete(address borrower, uint256 originalLoanId, uint256 newLoanId, uint256 fundsRemaining);
-
-
+    event RolloverLoanComplete(
+        address borrower,
+        uint256 originalLoanId,
+        uint256 newLoanId,
+        uint256 fundsRemaining
+    );
 
     function setUp() public {
         borrower = new User();
@@ -63,8 +63,6 @@ contract FlashRolloverLoan_Integration_Test is Testable {
 
         console.logAddress(address(tellerV2));
 
-
-
         marketRegistry = IMarketRegistry(tellerV2.marketRegistry());
 
         lenderCommitmentForwarder = ILenderCommitmentForwarder(
@@ -72,14 +70,14 @@ contract FlashRolloverLoan_Integration_Test is Testable {
         );
 
         aavePoolAddressProvider = new AavePoolAddressProviderMock(
-            "marketId", address(this)
+            "marketId",
+            address(this)
         );
 
         aavePoolMock = new AavePoolMock();
 
-        bytes32 POOL = 'POOL';
-        aavePoolAddressProvider.setAddress( POOL, address(aavePoolMock) );
-
+        bytes32 POOL = "POOL";
+        aavePoolAddressProvider.setAddress(POOL, address(aavePoolMock));
 
         wethMock = new WethMock();
 
@@ -104,16 +102,13 @@ contract FlashRolloverLoan_Integration_Test is Testable {
             "uri"
         );
 
-        
-
         wethMock.deposit{ value: 100e18 }();
         wethMock.transfer(address(lender), 5e18);
         wethMock.transfer(address(borrower), 5e18);
 
         wethMock.transfer(address(aavePoolMock), 5e18);
-         
 
-      //  wethMock.transfer(address(flashLoanVault), 5e18);
+        //  wethMock.transfer(address(flashLoanVault), 5e18);
 
         flashRolloverLoan = new FlashRolloverLoan(
             address(tellerV2),
@@ -121,16 +116,11 @@ contract FlashRolloverLoan_Integration_Test is Testable {
             address(aavePoolAddressProvider)
         );
 
-       
+        LenderCommitmentForwarder_V2(address(lenderCommitmentForwarder))
+            .initialize(address(this));
 
-        LenderCommitmentForwarder_V2(
-            address(lenderCommitmentForwarder)
-        ).initialize(address(this));
-
-      
-        LenderCommitmentForwarder_V2(
-            address(lenderCommitmentForwarder)
-        ).addExtension(address(flashRolloverLoan));
+        LenderCommitmentForwarder_V2(address(lenderCommitmentForwarder))
+            .addExtension(address(flashRolloverLoan));
     }
 
     function test_flashRollover() public {
@@ -155,8 +145,6 @@ contract FlashRolloverLoan_Integration_Test is Testable {
             address(borrower)
         );
 
-
-            
         vm.prank(address(lender));
         wethMock.approve(address(tellerV2), 5e18);
 
@@ -186,7 +174,7 @@ contract FlashRolloverLoan_Integration_Test is Testable {
                 lender: address(lender),
                 marketId: marketId,
                 principalTokenAddress: lendingToken
-        });
+            });
 
         address[] memory _borrowerAddressList;
 
@@ -210,41 +198,35 @@ contract FlashRolloverLoan_Integration_Test is Testable {
                     loanDuration: duration
                 });
 
-
         ///approve forwarders
 
+        vm.prank(address(marketOwner));
+        ITellerV2Context(address(tellerV2)).setTrustedMarketForwarder(
+            marketId,
+            address(lenderCommitmentForwarder)
+        );
 
-            vm.prank(address(marketOwner));
-            ITellerV2Context(address(tellerV2)).setTrustedMarketForwarder(
-                marketId,
-                address(lenderCommitmentForwarder)
-            );
+        //borrower AND lender  approves the lenderCommitmentForwarder as trusted
 
-            //borrower AND lender  approves the lenderCommitmentForwarder as trusted
+        vm.prank(address(lender));
+        ITellerV2Context(address(tellerV2)).approveMarketForwarder(
+            marketId,
+            address(lenderCommitmentForwarder)
+        );
 
-            vm.prank(address(lender));
-            ITellerV2Context(address(tellerV2)).approveMarketForwarder(
-                marketId,
-                address(lenderCommitmentForwarder)
-            );
+        vm.prank(address(borrower));
+        ITellerV2Context(address(tellerV2)).approveMarketForwarder(
+            marketId,
+            address(lenderCommitmentForwarder)
+        );
 
-            vm.prank(address(borrower));
-            ITellerV2Context(address(tellerV2)).approveMarketForwarder(
-                marketId,
-                address(lenderCommitmentForwarder)
-            );
-
-
-
-            //how do we calc how much to flash ?? 
+        //how do we calc how much to flash ??
         uint256 flashLoanAmount = 110 * 1e16;
 
-        uint256 borrowerAmount = 0 ;
+        uint256 borrowerAmount = 0;
 
-
-        vm.expectEmit(true,false,false,false);
+        vm.expectEmit(true, false, false, false);
         emit RolloverLoanComplete(address(borrower), 0, 0, 0);
-
 
         vm.prank(address(borrower));
         flashRolloverLoan.rolloverLoanWithFlash(
@@ -253,10 +235,7 @@ contract FlashRolloverLoan_Integration_Test is Testable {
             borrowerAmount,
             _acceptCommitmentArgs
         );
-
-         
     }
- 
 }
 
 contract User {}

@@ -7,8 +7,9 @@ import "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
 import "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
 
 import "../../contracts/LenderCommitmentForwarder.sol";
- 
+
 import "../../contracts/LenderCommitmentForwarder_V2.sol";
+
 contract LenderCommitmentForwarder_UpgradeToV2 is Testable {
     ProxyAdmin internal admin;
     TransparentUpgradeableProxy internal proxy;
@@ -18,7 +19,7 @@ contract LenderCommitmentForwarder_UpgradeToV2 is Testable {
 
     LenderCommitmentForwarder internal logicV1 =
         new LenderCommitmentForwarder(tellerV2, marketRegistry);
-     LenderCommitmentForwarder_V2 internal logicV2 =
+    LenderCommitmentForwarder_V2 internal logicV2 =
         new LenderCommitmentForwarder_V2(tellerV2, marketRegistry);
 
     function setUp() public {
@@ -58,15 +59,11 @@ contract LenderCommitmentForwarder_UpgradeToV2 is Testable {
         admin.upgradeAndCall(
             proxy,
             address(logicV2),
-            abi.encodeWithSelector(
-                logicV2.initialize.selector,
-                address(this)
-            )
+            abi.encodeWithSelector(logicV2.initialize.selector, address(this))
         );
 
         // Verify the owner is set to the correct address
-        address owner = LenderCommitmentForwarder_V2(address(proxy))
-            .owner();
+        address owner = LenderCommitmentForwarder_V2(address(proxy)).owner();
         assertEq(
             owner,
             address(this),
@@ -86,9 +83,7 @@ contract LenderCommitmentForwarder_UpgradeToV2 is Testable {
             ,
             ,
             address principalTokenAddress
-        ) = LenderCommitmentForwarder_V2(address(proxy)).commitments(
-                1
-            );
+        ) = LenderCommitmentForwarder_V2(address(proxy)).commitments(1);
         assertEq(
             principalTokenAddress,
             address(123),

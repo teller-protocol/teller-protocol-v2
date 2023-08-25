@@ -116,7 +116,7 @@ contract CommitmentRolloverLoan_Unit_Test is Testable {
         );
 
         uint256 rolloverAmount = 0;
- 
+
         vm.prank(address(borrower));
 
         commitmentRolloverLoan.rolloverLoan(
@@ -133,9 +133,7 @@ contract CommitmentRolloverLoan_Unit_Test is Testable {
         );
     }
 
-
-
-     function test_rolloverLoan_invalid_caller() public {
+    function test_rolloverLoan_invalid_caller() public {
         address lendingToken = address(wethMock);
         uint256 marketId = 0;
         uint256 principalAmount = 500;
@@ -185,7 +183,7 @@ contract CommitmentRolloverLoan_Unit_Test is Testable {
         );
 
         uint256 rolloverAmount = 0;
- 
+
         vm.prank(address(lender));
 
         vm.expectRevert("CommitmentRolloverLoan: not borrower");
@@ -195,11 +193,9 @@ contract CommitmentRolloverLoan_Unit_Test is Testable {
             rolloverAmount,
             commitmentArgs
         );
-     }
- 
-  function test_calculate_rollover_amount() public {
+    }
 
-
+    function test_calculate_rollover_amount() public {
         address lendingToken = address(wethMock);
         uint256 marketId = 0;
         uint256 principalAmount = 500;
@@ -248,17 +244,15 @@ contract CommitmentRolloverLoan_Unit_Test is Testable {
             address(borrower)
         );
 
-        
-        vm.prank(address(lender)); 
-        int256 rolloverAmount=  commitmentRolloverLoan.calculateRolloverAmount(
-            loanId, 
+        vm.prank(address(lender));
+        int256 rolloverAmount = commitmentRolloverLoan.calculateRolloverAmount(
+            loanId,
             commitmentArgs,
             block.timestamp
         );
 
-        assertEq(rolloverAmount, -445 , "invalid rolloveramount");
-
-  }
+        assertEq(rolloverAmount, -445, "invalid rolloveramount");
+    }
 }
 
 contract User {}

@@ -21,7 +21,7 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
         return marketRegistry;
     }
 
-    function protocolFee() external view returns (uint16){
+    function protocolFee() external view returns (uint16) {
         return 100;
     }
 
@@ -197,8 +197,6 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
         virtual
         returns (bool)
     {}
-
-
 
     function isLoanLiquidateable(uint256 _bidId)
         public

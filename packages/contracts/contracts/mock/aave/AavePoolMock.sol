@@ -1,53 +1,47 @@
 pragma solidity ^0.8.0;
 
+import { IFlashLoanSimpleReceiver } from "../../interfaces/aave/IFlashLoanSimpleReceiver.sol";
 
-import {IFlashLoanSimpleReceiver} from '../../interfaces/aave/IFlashLoanSimpleReceiver.sol';
-  
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-contract AavePoolMock  {
- 
+contract AavePoolMock {
+    bool public flashLoanSimpleWasCalled;
 
-bool public flashLoanSimpleWasCalled;
+    bool public shouldExecuteCallback = true;
 
-bool public shouldExecuteCallback = true;
+    function setShouldExecuteCallback(bool shouldExecute) public {
+        shouldExecuteCallback = shouldExecute;
+    }
 
-function setShouldExecuteCallback( bool shouldExecute ) public {
-    shouldExecuteCallback = shouldExecute;
-}
+    function flashLoanSimple(
+        address receiverAddress,
+        address asset,
+        uint256 amount,
+        bytes calldata params,
+        uint16 referralCode
+    ) external returns (bool success) {
+        uint256 balanceBefore = IERC20(asset).balanceOf(address(this));
 
-function flashLoanSimple(
-    address receiverAddress,
-    address asset,
-    uint256 amount,
-    bytes calldata params,
-    uint16 referralCode
+        IERC20(asset).transfer(receiverAddress, amount);
 
-) external returns (bool success) {
+        uint256 premium = amount / 100;
+        address initiator = msg.sender;
 
-    uint256 balanceBefore = IERC20(asset).balanceOf(address(this));
+        if (shouldExecuteCallback) {
+            success = IFlashLoanSimpleReceiver(receiverAddress)
+                .executeOperation(asset, amount, premium, initiator, params);
 
-    IERC20(asset).transfer( receiverAddress, amount );
+            require(success == true, "executeOperation failed");
+        }
 
-    uint256 premium = amount /100;
-    address initiator = msg.sender;
+        //require balance is what it was plus the fee..
+        uint256 balanceAfter = IERC20(asset).balanceOf(address(this));
 
-    if(shouldExecuteCallback){
-        success = IFlashLoanSimpleReceiver(receiverAddress).executeOperation(
-                asset,amount,premium,initiator,params
+        require(
+            balanceAfter >= balanceBefore + premium,
+            "Must repay flash loan"
         );
 
-        require(success == true, "executeOperation failed");
+        flashLoanSimpleWasCalled = true;
     }
-   
-
-    //require balance is what it was plus the fee.. 
-    uint256 balanceAfter = IERC20(asset).balanceOf(address(this));
-
-    require(balanceAfter >= balanceBefore + premium, "Must repay flash loan");
-
-    flashLoanSimpleWasCalled = true;
-}
-
-
 }

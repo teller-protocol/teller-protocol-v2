@@ -18,9 +18,7 @@ import { MarketRegistryMock } from "../../contracts/mock/MarketRegistryMock.sol"
 
 import { LenderCommitmentForwarder } from "../../contracts/LenderCommitmentForwarder.sol";
 
-
 import { LenderCommitmentForwarder_V2 } from "../../contracts/LenderCommitmentForwarder_V2.sol";
-
 
 import { PaymentType, PaymentCycleType } from "../../contracts/libraries/V2Calculations.sol";
 
@@ -104,15 +102,12 @@ contract CommitmentRolloverLoan_Integration_Test is Testable {
             address(tellerV2),
             address(lenderCommitmentForwarder)
         );
- 
 
-        LenderCommitmentForwarder_V2(
-            address(lenderCommitmentForwarder)
-        ).initialize(address(this));
+        LenderCommitmentForwarder_V2(address(lenderCommitmentForwarder))
+            .initialize(address(this));
 
-        LenderCommitmentForwarder_V2(
-            address(lenderCommitmentForwarder)
-        ).addExtension(address(commitmentRolloverLoan));
+        LenderCommitmentForwarder_V2(address(lenderCommitmentForwarder))
+            .addExtension(address(commitmentRolloverLoan));
     }
 
     function test_calculateRolloverAmount() public {

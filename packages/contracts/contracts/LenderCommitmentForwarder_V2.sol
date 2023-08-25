@@ -16,13 +16,14 @@ contract LenderCommitmentForwarder_V2 is
         LenderCommitmentForwarder(_tellerV2, _marketRegistry)
     {}
 
-   
     function initialize(address _newOwner) external initializer {
         _initializeExtensions(_newOwner);
     }
 
-
-    function _initializeExtensions(address _newOwner) internal onlyInitializing {
+    function _initializeExtensions(address _newOwner)
+        internal
+        onlyInitializing
+    {
         _transferOwnership(_newOwner);
     }
 

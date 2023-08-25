@@ -16,16 +16,18 @@ import "./interfaces/ILenderCommitmentForwarder.sol";
 import "./interfaces/ICommitmentRolloverLoan.sol";
 import "./libraries/NumbersLib.sol";
 
-import {IPool} from "./interfaces/aave/IPool.sol";
-import {IFlashLoanSimpleReceiver} from "./interfaces/aave/IFlashLoanSimpleReceiver.sol";
-import {IPoolAddressesProvider} from "./interfaces/aave/IPoolAddressesProvider.sol";
+import { IPool } from "./interfaces/aave/IPool.sol";
+import { IFlashLoanSimpleReceiver } from "./interfaces/aave/IFlashLoanSimpleReceiver.sol";
+import { IPoolAddressesProvider } from "./interfaces/aave/IPoolAddressesProvider.sol";
+
 //https://docs.aave.com/developers/v/1.0/tutorials/performing-a-flash-loan/...-in-your-project
 
-
-contract FlashRolloverLoan is ICommitmentRolloverLoan,IFlashLoanSimpleReceiver {
+contract FlashRolloverLoan is
+    ICommitmentRolloverLoan,
+    IFlashLoanSimpleReceiver
+{
     using AddressUpgradeable for address;
     using NumbersLib for uint256;
-    
 
     /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
     ITellerV2 public immutable TELLER_V2;
@@ -33,28 +35,35 @@ contract FlashRolloverLoan is ICommitmentRolloverLoan,IFlashLoanSimpleReceiver {
     ILenderCommitmentForwarder public immutable LENDER_COMMITMENT_FORWARDER;
 
     address public immutable POOL_ADDRESSES_PROVIDER;
-    
-    event RolloverLoanComplete(address borrower, uint256 originalLoanId, uint256 newLoanId, uint256 fundsRemaining);
 
+    event RolloverLoanComplete(
+        address borrower,
+        uint256 originalLoanId,
+        uint256 newLoanId,
+        uint256 fundsRemaining
+    );
 
     /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor(address _tellerV2, address _lenderCommitmentForwarder, address _poolAddressesProvider) {
+    constructor(
+        address _tellerV2,
+        address _lenderCommitmentForwarder,
+        address _poolAddressesProvider
+    ) {
         TELLER_V2 = ITellerV2(_tellerV2);
         LENDER_COMMITMENT_FORWARDER = ILenderCommitmentForwarder(
             _lenderCommitmentForwarder
         );
         POOL_ADDRESSES_PROVIDER = _poolAddressesProvider;
-       
-    }
-    
-
-    modifier onlyFlashLoanPool {
-
-      require( msg.sender == address(POOL()) , "FlashRolloverLoan: Must be called by FlashLoanPool" );
-
-      _;
     }
 
+    modifier onlyFlashLoanPool() {
+        require(
+            msg.sender == address(POOL()),
+            "FlashRolloverLoan: Must be called by FlashLoanPool"
+        );
+
+        _;
+    }
 
     /*
     need to pass loanId and borrower 
@@ -66,18 +75,16 @@ contract FlashRolloverLoan is ICommitmentRolloverLoan,IFlashLoanSimpleReceiver {
         uint256 borrowerAmount;
         bytes acceptCommitmentArgs;
     }
- 
 
     /**
      * @notice Allows a borrower to rollover a loan to a new commitment.
-     * @param _loanId The bid id for the loan to repay 
+     * @param _loanId The bid id for the loan to repay
      * @param _flashLoanAmount The amount to flash borrow.
      * @param _acceptCommitmentArgs Arguments for the commitment to accept.
      * @return newLoanId_ The ID of the new loan created by accepting the commitment.
      */
- 
 
-/*
+    /*
  
 The flash loan amount can naively be the exact amount needed to repay the old loan 
 
@@ -90,140 +97,140 @@ If the new loan pays out (after fees) MORE than the  aave loan amount+ fee) then
     function rolloverLoanWithFlash(
         uint256 _loanId,
         uint256 _flashLoanAmount,
-        uint256 _borrowerAmount , //an additional amount borrower may have to add 
+        uint256 _borrowerAmount, //an additional amount borrower may have to add
         AcceptCommitmentArgs calldata _acceptCommitmentArgs
-    ) external returns (uint256 newLoanId_) { 
-
+    ) external returns (uint256 newLoanId_) {
         address borrower = TELLER_V2.getLoanBorrower(_loanId);
         require(borrower == msg.sender, "CommitmentRolloverLoan: not borrower");
 
         // Get lending token and balance before
-        address lendingToken =  
-            TELLER_V2.getLoanLendingToken(_loanId)
-         ;
+        address lendingToken = TELLER_V2.getLoanLendingToken(_loanId);
 
-        if (_borrowerAmount > 0){
+        if (_borrowerAmount > 0) {
             IERC20(lendingToken).transferFrom(
                 borrower,
                 address(this),
                 _borrowerAmount
             );
         }
-    
-        
+
         // Call 'Flash' on the vault to borrow funds and call tellerV2FlashCallback
-        // This ultimately calls executeOperation 
+        // This ultimately calls executeOperation
         IPool(POOL()).flashLoanSimple(
-            address(this), 
-           lendingToken, 
-           _flashLoanAmount, 
-           abi.encode(
+            address(this),
+            lendingToken,
+            _flashLoanAmount,
+            abi.encode(
                 RolloverCallbackArgs({
                     loanId: _loanId,
                     borrower: borrower,
                     borrowerAmount: _borrowerAmount,
-                    acceptCommitmentArgs: abi.encode(  _acceptCommitmentArgs )
+                    acceptCommitmentArgs: abi.encode(_acceptCommitmentArgs)
                 })
             ),
-            0 //referral code 
-            ); 
-        
+            0 //referral code
+        );
     }
 
- 
-    function executeOperation(  
+    function executeOperation(
         address _flashToken,
-        uint256 _flashAmount,       
-        uint256 _flashFees, //need to incorporate this ! 
+        uint256 _flashAmount,
+        uint256 _flashFees, //need to incorporate this !
         address initiator,
         bytes calldata _data
-    ) external onlyFlashLoanPool returns (bool)  {
-
-        require( initiator == address(this), "This contract must be the initiator" );
- 
+    ) external onlyFlashLoanPool returns (bool) {
+        require(
+            initiator == address(this),
+            "This contract must be the initiator"
+        );
 
         RolloverCallbackArgs memory _rolloverArgs = abi.decode(
-                _data,
-                (RolloverCallbackArgs)
-            ); 
-       
-        uint256 repaymentAmount = _repayLoanFull ( 
-            _rolloverArgs.loanId, 
-            _flashToken ,
+            _data,
+            (RolloverCallbackArgs)
+        );
+
+        uint256 repaymentAmount = _repayLoanFull(
+            _rolloverArgs.loanId,
+            _flashToken,
             _flashAmount
-            );
- 
+        );
 
         AcceptCommitmentArgs memory acceptCommitmentArgs = abi.decode(
-            _rolloverArgs.acceptCommitmentArgs , (AcceptCommitmentArgs)
+            _rolloverArgs.acceptCommitmentArgs,
+            (AcceptCommitmentArgs)
         );
 
         // Accept commitment and receive funds to this contract
-     
 
-        (uint256 newLoanId, uint256 acceptCommitmentAmount) = _acceptCommitment( 
-            _rolloverArgs.borrower, 
-            _flashToken,            
-             acceptCommitmentArgs
-              );
- 
-        //repay the flash loan  
-        IERC20Upgradeable(_flashToken).transfer( address( POOL() ), _flashAmount + _flashFees );
- 
-      
-        uint256 fundsRemaining = acceptCommitmentAmount  + _rolloverArgs.borrowerAmount - repaymentAmount - _flashFees;
+        (uint256 newLoanId, uint256 acceptCommitmentAmount) = _acceptCommitment(
+            _rolloverArgs.borrower,
+            _flashToken,
+            acceptCommitmentArgs
+        );
+
+        //repay the flash loan
+        IERC20Upgradeable(_flashToken).transfer(
+            address(POOL()),
+            _flashAmount + _flashFees
+        );
+
+        uint256 fundsRemaining = acceptCommitmentAmount +
+            _rolloverArgs.borrowerAmount -
+            repaymentAmount -
+            _flashFees;
 
         if (fundsRemaining > 0) {
-            IERC20Upgradeable(_flashToken).transfer(_rolloverArgs.borrower, fundsRemaining);
-             
+            IERC20Upgradeable(_flashToken).transfer(
+                _rolloverArgs.borrower,
+                fundsRemaining
+            );
         }
 
-        emit RolloverLoanComplete( 
+        emit RolloverLoanComplete(
             _rolloverArgs.borrower,
             _rolloverArgs.loanId,
-            newLoanId,            
+            newLoanId,
             fundsRemaining
-
         );
- 
+
         return true;
     }
 
-
-
-    //add a function for calculating borrower amount 
+    //add a function for calculating borrower amount
 
     function _repayLoanFull(
         uint256 _bidId,
         address _principalToken,
-        uint256 _repayAmount 
-     )
-    internal 
-    returns (uint256 repayAmount_ ){ 
+        uint256 _repayAmount
+    ) internal returns (uint256 repayAmount_) {
+        uint256 fundsBeforeRepayment = IERC20Upgradeable(_principalToken)
+            .balanceOf(address(this));
 
-        uint256 fundsBeforeRepayment = IERC20Upgradeable(_principalToken).balanceOf(address(this));
-        
-        IERC20Upgradeable(_principalToken).approve(address(TELLER_V2), _repayAmount);
-        TELLER_V2.repayLoanFull(_bidId); 
+        IERC20Upgradeable(_principalToken).approve(
+            address(TELLER_V2),
+            _repayAmount
+        );
+        TELLER_V2.repayLoanFull(_bidId);
 
-        uint256 fundsAfterRepayment = IERC20Upgradeable(_principalToken).balanceOf(address(this));
+        uint256 fundsAfterRepayment = IERC20Upgradeable(_principalToken)
+            .balanceOf(address(this));
 
-        repayAmount_ = fundsBeforeRepayment - fundsAfterRepayment; 
-
+        repayAmount_ = fundsBeforeRepayment - fundsAfterRepayment;
     }
 
- 
     /**
      * @notice Internally accepts a commitment via the `LENDER_COMMITMENT_FORWARDER`.
      * @param _commitmentArgs Arguments required to accept a commitment.
      * @return bidId_ The ID of the bid associated with the accepted commitment.
      */
-    function _acceptCommitment(address borrower, address principalToken, AcceptCommitmentArgs memory _commitmentArgs)
-        internal
-        returns (uint256 bidId_, uint256 acceptCommitmentAmount_)
-    {
-        uint256 fundsBeforeAcceptCommitment = IERC20Upgradeable(principalToken).balanceOf(address(this));
-  
+    function _acceptCommitment(
+        address borrower,
+        address principalToken,
+        AcceptCommitmentArgs memory _commitmentArgs
+    ) internal returns (uint256 bidId_, uint256 acceptCommitmentAmount_) {
+        uint256 fundsBeforeAcceptCommitment = IERC20Upgradeable(principalToken)
+            .balanceOf(address(this));
+
         bytes memory responseData = address(LENDER_COMMITMENT_FORWARDER)
             .functionCall(
                 abi.encodePacked(
@@ -240,29 +247,26 @@ If the new loan pays out (after fees) MORE than the  aave loan amount+ fee) then
                         _commitmentArgs.interestRate,
                         _commitmentArgs.loanDuration
                     ),
-                    borrower //cant be msg.sender because of the flash flow 
+                    borrower //cant be msg.sender because of the flash flow
                 )
             );
 
         (bidId_) = abi.decode(responseData, (uint256));
 
-        uint256 fundsAfterAcceptCommitment = IERC20Upgradeable(principalToken).balanceOf(address(this));
-        acceptCommitmentAmount_ = fundsAfterAcceptCommitment - fundsBeforeAcceptCommitment; 
+        uint256 fundsAfterAcceptCommitment = IERC20Upgradeable(principalToken)
+            .balanceOf(address(this));
+        acceptCommitmentAmount_ =
+            fundsAfterAcceptCommitment -
+            fundsBeforeAcceptCommitment;
     }
 
+    function ADDRESSES_PROVIDER() public view returns (IPoolAddressesProvider) {
+        return IPoolAddressesProvider(POOL_ADDRESSES_PROVIDER);
+    }
 
-
-  function ADDRESSES_PROVIDER() public view returns (IPoolAddressesProvider){
-    return IPoolAddressesProvider(POOL_ADDRESSES_PROVIDER);
-
-  }
-
-  function POOL() public view returns (IPool){
-    return IPool(ADDRESSES_PROVIDER().getPool());
-  }
-
-
-
+    function POOL() public view returns (IPool) {
+        return IPool(ADDRESSES_PROVIDER().getPool());
+    }
 
     /*
 
@@ -285,7 +289,7 @@ If the new loan pays out (after fees) MORE than the  aave loan amount+ fee) then
         Payment memory repayAmountOwed = TELLER_V2.calculateAmountOwed(
             _loanId,
             _timestamp
-        );          
+        );
 
         uint256 _marketId = _getMarketIdForCommitment(
             _commitmentArgs.commitmentId
@@ -301,28 +305,25 @@ If the new loan pays out (after fees) MORE than the  aave loan amount+ fee) then
             protocolFeePct
         );
 
-        uint256 commitmentPrincipalReceived = commitmentPrincipalRequested 
-        - amountToMarketplace 
-        - amountToProtocol; 
+        uint256 commitmentPrincipalReceived = commitmentPrincipalRequested -
+            amountToMarketplace -
+            amountToProtocol;
 
         // by default, we will flash exactly what we need to do relayLoanFull
-        uint256 repayFullAmount = repayAmountOwed.principal 
-             + repayAmountOwed.interest  ;
- 
-        _flashAmount = repayFullAmount ;
+        uint256 repayFullAmount = repayAmountOwed.principal +
+            repayAmountOwed.interest;
+
+        _flashAmount = repayFullAmount;
         uint256 _flashLoanFee = _flashAmount.percent(_flashloanPremiumPct);
 
         uint256 flashLoanFee = 0;
 
         //fix me ...
-        _borrowerAmount = int256(commitmentPrincipalReceived) 
-        - int256(repayFullAmount)
-        - int256(_flashLoanFee);
- 
+        _borrowerAmount =
+            int256(commitmentPrincipalReceived) -
+            int256(repayFullAmount) -
+            int256(_flashLoanFee);
     }
-
-
-
 
     /**
      * @notice Retrieves the market ID associated with a given commitment.

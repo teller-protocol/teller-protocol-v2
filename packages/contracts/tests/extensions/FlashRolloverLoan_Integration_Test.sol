@@ -186,7 +186,7 @@ contract FlashRolloverLoan_Integration_Test is Testable {
                 lender: address(lender),
                 marketId: marketId,
                 principalTokenAddress: lendingToken
-            });
+        });
 
         address[] memory _borrowerAddressList;
 

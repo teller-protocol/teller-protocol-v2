@@ -50,7 +50,7 @@ contract FlashRolloverLoan is ICommitmentRolloverLoan,IFlashLoanSimpleReceiver {
 
     modifier onlyFlashLoanPool {
 
-      require( msg.sender == address(POOL()) );
+      require( msg.sender == address(POOL()) , "FlashRolloverLoan: Must be called by FlashLoanPool" );
 
       _;
     }
@@ -178,14 +178,13 @@ If the new loan pays out (after fees) MORE than the  aave loan amount+ fee) then
              
         }
 
-    
         emit RolloverLoanComplete( 
             _rolloverArgs.borrower,
             _rolloverArgs.loanId,
             newLoanId,            
             fundsRemaining
 
-         );
+        );
  
         return true;
     }

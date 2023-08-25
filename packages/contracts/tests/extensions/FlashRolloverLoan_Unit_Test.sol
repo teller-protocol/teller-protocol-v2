@@ -20,10 +20,12 @@ import {AavePoolAddressProviderMock} from "../../contracts/mock/aave/AavePoolAdd
 import {AavePoolMock} from "../../contracts/mock/aave/AavePoolMock.sol";
 
 
-contract FlashRolloverLoanMock is FlashRolloverLoan {
+contract FlashRolloverLoanOverride is FlashRolloverLoan {
     constructor(address _tellerV2, address _lenderCommitmentForwarder, address _aaveAddressProvider)
         FlashRolloverLoan(_tellerV2, _lenderCommitmentForwarder,_aaveAddressProvider)
     {}
+
+    
 
     function acceptCommitment(address borrower,address principalToken, AcceptCommitmentArgs calldata _commitmentArgs)
         public
@@ -41,7 +43,7 @@ contract FlashRolloverLoan_Unit_Test is Testable {
 
     AavePoolMock aavePoolMock;
     AavePoolAddressProviderMock aavePoolAddressProvider;
-    FlashRolloverLoanMock flashRolloverLoan;
+    FlashRolloverLoanOverride flashRolloverLoan;
     TellerV2SolMock tellerV2;
     WethMock wethMock;
     LenderCommitmentForwarderMock lenderCommitmentForwarder;
@@ -83,7 +85,7 @@ contract FlashRolloverLoan_Unit_Test is Testable {
 
         //marketRegistryMock = new MarketRegistryMock();
 
-        flashRolloverLoan = new FlashRolloverLoanMock(
+        flashRolloverLoan = new FlashRolloverLoanOverride(
             address(tellerV2),
             address(lenderCommitmentForwarder),
             address(aavePoolAddressProvider)
@@ -92,7 +94,7 @@ contract FlashRolloverLoan_Unit_Test is Testable {
         IntegrationTestHelpers.deployIntegrationSuite();
     }
 
-    function test_rolloverLoan() public {
+    function test_rolloverLoanWithFlash() public {
         address lendingToken = address(wethMock);
         uint256 marketId = 0;
         uint256 principalAmount = 500;
@@ -156,12 +158,271 @@ contract FlashRolloverLoan_Unit_Test is Testable {
             commitmentArgs
         );
 
+        bool flashLoanSimpleWasCalled = aavePoolMock
+            .flashLoanSimpleWasCalled();
+        assertTrue(
+            flashLoanSimpleWasCalled,
+            "flashLoanSimpleWasCalled not called"
+        );
+    }
+
+
+ function test_executeOperation() public {
+        address lendingToken = address(wethMock);
+        uint256 marketId = 0;
+        uint256 principalAmount = 500;
+        uint32 duration = 10 days;
+        uint16 interestRate = 100;
+
+
+        wethMock.transfer(address(flashRolloverLoan), 5e18);
+
+
+
+        ILenderCommitmentForwarder.Commitment
+            memory commitment = ILenderCommitmentForwarder.Commitment({
+                maxPrincipal: principalAmount,
+                expiration: uint32(block.timestamp + 1 days),
+                maxDuration: duration,
+                minInterestRate: interestRate,
+                collateralTokenAddress: address(0),
+                collateralTokenId: 0,
+                maxPrincipalPerCollateralAmount: 0,
+                collateralTokenType: ILenderCommitmentForwarder
+                    .CommitmentCollateralType
+                    .NONE,
+                lender: address(lender),
+                marketId: marketId,
+                principalTokenAddress: lendingToken
+            });
+
+        lenderCommitmentForwarder.setCommitment(0, commitment);
+
+        ICommitmentRolloverLoan.AcceptCommitmentArgs
+            memory commitmentArgs = ICommitmentRolloverLoan
+                .AcceptCommitmentArgs({
+                    commitmentId: 0,
+                    principalAmount: principalAmount,
+                    collateralAmount: 100,
+                    collateralTokenId: 0,
+                    collateralTokenAddress: address(0),
+                    interestRate: interestRate,
+                    loanDuration: duration
+                });
+
+        vm.prank(address(borrower));
+        uint256 loanId = tellerV2.submitBid(
+            lendingToken,
+            marketId,
+            principalAmount,
+            duration,
+            interestRate,
+            "",
+            address(borrower)
+        );
+
+        uint256 flashAmount = 500;
+        uint256 borrowerAmount = 5;  //have to pay the aave fee.. 
+
+        vm.prank(address(borrower));
+        IERC20(lendingToken).approve(address(flashRolloverLoan), 1e18);
+ 
+        vm.prank(address( aavePoolMock ));
+
+        uint256 flashFees = 5;
+        address initiator = address(flashRolloverLoan);
+
+        bytes memory flashData = abi.encode(
+                FlashRolloverLoan.RolloverCallbackArgs({
+                    loanId: loanId,
+                    borrower: address(borrower),
+                    borrowerAmount: borrowerAmount,
+                    acceptCommitmentArgs: abi.encode(  commitmentArgs )
+                })
+        );
+
+        flashRolloverLoan.executeOperation(
+            lendingToken,
+            flashAmount,
+            flashFees,
+            initiator,
+
+            flashData
+        );
+
         bool acceptCommitmentWithRecipientWasCalled = lenderCommitmentForwarder
             .acceptCommitmentWithRecipientWasCalled();
         assertTrue(
             acceptCommitmentWithRecipientWasCalled,
             "acceptCommitmentWithRecipient not called"
         );
+    }
+
+ function test_executeOperation_invalid_sender() public {
+        address lendingToken = address(wethMock);
+        uint256 marketId = 0;
+        uint256 principalAmount = 500;
+        uint32 duration = 10 days;
+        uint16 interestRate = 100;
+
+        ILenderCommitmentForwarder.Commitment
+            memory commitment = ILenderCommitmentForwarder.Commitment({
+                maxPrincipal: principalAmount,
+                expiration: uint32(block.timestamp + 1 days),
+                maxDuration: duration,
+                minInterestRate: interestRate,
+                collateralTokenAddress: address(0),
+                collateralTokenId: 0,
+                maxPrincipalPerCollateralAmount: 0,
+                collateralTokenType: ILenderCommitmentForwarder
+                    .CommitmentCollateralType
+                    .NONE,
+                lender: address(lender),
+                marketId: marketId,
+                principalTokenAddress: lendingToken
+            });
+
+        lenderCommitmentForwarder.setCommitment(0, commitment);
+
+        ICommitmentRolloverLoan.AcceptCommitmentArgs
+            memory commitmentArgs = ICommitmentRolloverLoan
+                .AcceptCommitmentArgs({
+                    commitmentId: 0,
+                    principalAmount: principalAmount,
+                    collateralAmount: 100,
+                    collateralTokenId: 0,
+                    collateralTokenAddress: address(0),
+                    interestRate: interestRate,
+                    loanDuration: duration
+                });
+
+        vm.prank(address(borrower));
+        uint256 loanId = tellerV2.submitBid(
+            lendingToken,
+            marketId,
+            principalAmount,
+            duration,
+            interestRate,
+            "",
+            address(borrower)
+        );
+
+        uint256 flashAmount = 500;
+        uint256 borrowerAmount = 5;  //have to pay the aave fee.. 
+
+        vm.prank(address(borrower));
+        IERC20(lendingToken).approve(address(flashRolloverLoan), 1e18);
+ 
+        vm.prank(address( this ));
+
+        uint256 flashFees = 10;
+        address initiator = address(this);
+
+        bytes memory flashData = abi.encode(
+                FlashRolloverLoan.RolloverCallbackArgs({
+                    loanId: loanId,
+                    borrower: address(borrower),
+                    borrowerAmount: borrowerAmount,
+                    acceptCommitmentArgs: abi.encode(  commitmentArgs )
+                })
+        );
+
+        vm.expectRevert("FlashRolloverLoan: Must be called by FlashLoanPool");
+
+        flashRolloverLoan.executeOperation(
+            lendingToken,
+            flashAmount,
+            flashFees,
+            initiator,
+
+            flashData
+        );
+
+        
+    }
+
+
+ function test_executeOperation_invalid_initiator() public {
+        address lendingToken = address(wethMock);
+        uint256 marketId = 0;
+        uint256 principalAmount = 500;
+        uint32 duration = 10 days;
+        uint16 interestRate = 100;
+
+        ILenderCommitmentForwarder.Commitment
+            memory commitment = ILenderCommitmentForwarder.Commitment({
+                maxPrincipal: principalAmount,
+                expiration: uint32(block.timestamp + 1 days),
+                maxDuration: duration,
+                minInterestRate: interestRate,
+                collateralTokenAddress: address(0),
+                collateralTokenId: 0,
+                maxPrincipalPerCollateralAmount: 0,
+                collateralTokenType: ILenderCommitmentForwarder
+                    .CommitmentCollateralType
+                    .NONE,
+                lender: address(lender),
+                marketId: marketId,
+                principalTokenAddress: lendingToken
+            });
+
+        lenderCommitmentForwarder.setCommitment(0, commitment);
+
+        ICommitmentRolloverLoan.AcceptCommitmentArgs
+            memory commitmentArgs = ICommitmentRolloverLoan
+                .AcceptCommitmentArgs({
+                    commitmentId: 0,
+                    principalAmount: principalAmount,
+                    collateralAmount: 100,
+                    collateralTokenId: 0,
+                    collateralTokenAddress: address(0),
+                    interestRate: interestRate,
+                    loanDuration: duration
+                });
+
+        vm.prank(address(borrower));
+        uint256 loanId = tellerV2.submitBid(
+            lendingToken,
+            marketId,
+            principalAmount,
+            duration,
+            interestRate,
+            "",
+            address(borrower)
+        );
+
+        uint256 flashAmount = 500;
+        uint256 borrowerAmount = 5;  //have to pay the aave fee.. 
+
+        vm.prank(address(borrower));
+        IERC20(lendingToken).approve(address(flashRolloverLoan), 1e18);
+ 
+        vm.prank(address( aavePoolMock ));
+
+        uint256 flashFees = 10;
+        address initiator = address(this);
+
+        bytes memory flashData = abi.encode(
+                FlashRolloverLoan.RolloverCallbackArgs({
+                    loanId: loanId,
+                    borrower: address(borrower),
+                    borrowerAmount: borrowerAmount,
+                    acceptCommitmentArgs: abi.encode(  commitmentArgs )
+                })
+        );
+
+        vm.expectRevert("This contract must be the initiator");
+
+        flashRolloverLoan.executeOperation(
+            lendingToken,
+            flashAmount,
+            flashFees,
+            initiator,
+
+            flashData
+        );
+
+        
     }
 
 

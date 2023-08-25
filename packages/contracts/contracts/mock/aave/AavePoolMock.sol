@@ -8,14 +8,22 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 contract AavePoolMock  {
  
 
+bool public flashLoanSimpleWasCalled;
+
+bool public shouldExecuteCallback = true;
+
+function setShouldExecuteCallback( bool shouldExecute ) public {
+    shouldExecuteCallback = shouldExecute;
+}
+
 function flashLoanSimple(
-     address receiverAddress,
+    address receiverAddress,
     address asset,
     uint256 amount,
     bytes calldata params,
     uint16 referralCode
 
-) external {
+) external returns (bool success) {
 
     uint256 balanceBefore = IERC20(asset).balanceOf(address(this));
 
@@ -24,15 +32,21 @@ function flashLoanSimple(
     uint256 premium = amount /100;
     address initiator = msg.sender;
 
-    bool success = IFlashLoanSimpleReceiver(receiverAddress).executeOperation(
-        asset,amount,premium,initiator,params
-    );
+    if(shouldExecuteCallback){
+        success = IFlashLoanSimpleReceiver(receiverAddress).executeOperation(
+                asset,amount,premium,initiator,params
+        );
+
+        require(success == true, "executeOperation failed");
+    }
+   
 
     //require balance is what it was plus the fee.. 
     uint256 balanceAfter = IERC20(asset).balanceOf(address(this));
 
     require(balanceAfter >= balanceBefore + premium, "Must repay flash loan");
 
+    flashLoanSimpleWasCalled = true;
 }
 
 

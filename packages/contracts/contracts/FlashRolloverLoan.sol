@@ -34,6 +34,9 @@ contract FlashRolloverLoan is ICommitmentRolloverLoan,IFlashLoanSimpleReceiver {
 
     address public immutable POOL_ADDRESSES_PROVIDER;
     
+    event RolloverLoanComplete(address borrower, uint256 originalLoanId, uint256 newLoanId, uint256 fundsRemaining);
+
+
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor(address _tellerV2, address _lenderCommitmentForwarder, address _poolAddressesProvider) {
         TELLER_V2 = ITellerV2(_tellerV2);
@@ -43,7 +46,7 @@ contract FlashRolloverLoan is ICommitmentRolloverLoan,IFlashLoanSimpleReceiver {
         POOL_ADDRESSES_PROVIDER = _poolAddressesProvider;
        
     }
- 
+    
 
     modifier onlyFlashLoanPool {
 
@@ -106,12 +109,7 @@ If the new loan pays out (after fees) MORE than the  aave loan amount+ fee) then
                 _borrowerAmount
             );
         }
-       
-      //  uint256 balanceBefore = IERC20Upgradeable(lendingToken).balanceOf(address(this));
-         
-        
-
-       // IPool lendingPool = IPool(POOL());
+    
         
         // Call 'Flash' on the vault to borrow funds and call tellerV2FlashCallback
         // This ultimately calls executeOperation 
@@ -169,19 +167,25 @@ If the new loan pays out (after fees) MORE than the  aave loan amount+ fee) then
              acceptCommitmentArgs
               );
  
-        //repay the flash loan !! 
+        //repay the flash loan  
         IERC20Upgradeable(_flashToken).transfer( address( POOL() ), _flashAmount + _flashFees );
  
-        //double check this 
+      
         uint256 fundsRemaining = acceptCommitmentAmount  + _rolloverArgs.borrowerAmount - repaymentAmount - _flashFees;
 
         if (fundsRemaining > 0) {
             IERC20Upgradeable(_flashToken).transfer(_rolloverArgs.borrower, fundsRemaining);
-            //add an event: tell borrower how much money was sent back here 
+             
         }
 
+    
+        emit RolloverLoanComplete( 
+            _rolloverArgs.borrower,
+            _rolloverArgs.loanId,
+            newLoanId,            
+            fundsRemaining
 
-        //add an event : flash rollover executed 
+         );
  
         return true;
     }

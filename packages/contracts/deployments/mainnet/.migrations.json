@@ -14,5 +14,6 @@
   "escrow-vault:deploy": 1688606320,
   "sherlock-audit:upgrade": 1688607219,
   "teller-v2:transfer-ownership-to-safe": 1688749369,
-  "lender-commitment-forwarder:merkle-upgrade": 1690562624
+  "lender-commitment-forwarder:merkle-upgrade": 1690562624,
+  "teller-v2:loan-liquidated-state-upgrade": 1692997464
 }

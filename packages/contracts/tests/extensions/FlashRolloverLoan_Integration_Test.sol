@@ -45,6 +45,11 @@ contract FlashRolloverLoan_Integration_Test is Testable {
     ILenderCommitmentForwarder lenderCommitmentForwarder;
     IMarketRegistry marketRegistry;
 
+
+    event RolloverLoanComplete(address borrower, uint256 originalLoanId, uint256 newLoanId, uint256 fundsRemaining);
+
+
+
     function setUp() public {
         borrower = new User();
         lender = new User();
@@ -151,7 +156,7 @@ contract FlashRolloverLoan_Integration_Test is Testable {
         );
 
 
-            //why approve so much ? 
+            
         vm.prank(address(lender));
         wethMock.approve(address(tellerV2), 5e18);
 
@@ -235,6 +240,11 @@ contract FlashRolloverLoan_Integration_Test is Testable {
         uint256 flashLoanAmount = 110 * 1e16;
 
         uint256 borrowerAmount = 0 ;
+
+
+        vm.expectEmit(true,false,false,false);
+        emit RolloverLoanComplete(address(borrower), 0, 0, 0);
+
 
         vm.prank(address(borrower));
         flashRolloverLoan.rolloverLoanWithFlash(

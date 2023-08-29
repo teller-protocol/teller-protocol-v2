@@ -9,5 +9,9 @@
   "flash-rollover-loan:deploy": 1693336525,
   "lender-manager:deploy": 1693336549,
   "reputation-manager:deploy": 1693336573,
-  "teller-v2:init": 1693336574
+  "teller-v2:init": 1693336574,
+  "teller-v2:transfer-ownership-to-safe": 1693337380,
+  "lender-manager:transfer-ownership": 1693337401,
+  "liquidity-rewards:deploy": 1693337425,
+  "default-proxy-admin:transfer": 1693337428
 }

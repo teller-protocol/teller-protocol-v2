@@ -113,15 +113,13 @@ export function handleCollateralWithdrawns(
 export function handleCollateralClaimed(event: CollateralClaimed): void {
   const bid = loadBidById(event.params._bidId);
 
-  // If the bid is still accepted, then it means the lender has liquidated the loan
-  // without making a payment. In this case, we set the bid status to `Liquidated`.
-  if (bidStatusToEnum(bid.status) == BidStatus.Accepted) {
-    const collateralManager = CollateralManager.bind(event.address);
-    const tellerV2 = TellerV2.bind(collateralManager.tellerV2());
+  const collateralManager = CollateralManager.bind(event.address);
+  const tellerV2 = TellerV2.bind(collateralManager.tellerV2());
 
-    if (tellerV2.isLoanDefaulted(bid.bidId)) {
-      updateBidStatus(bid, BidStatus.Liquidated);
-    }
+  // If the bid is not Repaid, then it means the lender has liquidated the loan
+  // without making a payment. In this case, we set the bid status to `Liquidated`.
+  if (tellerV2.getBidState(bid.bidId) !== BidStatus.Repaid) {
+    updateBidStatus(bid, BidStatus.Liquidated);
   }
 }
 

@@ -4,6 +4,7 @@ import { DeployFunction } from 'hardhat-deploy/dist/types'
 const aavePoolAddressProvider: { [networkName: string]: string } = {
   mainnet: '0x2f39d218133AFaB8F2B819B1066c7E434Ad94E9e',
   goerli: '0xC911B590248d127aD18546B186cC6B324e99F02c',
+  sepolia: '0x0496275d34753A48320CA58103d5220d394FF77F'
 }
 
 const networksWithAave: string[] = Object.keys(aavePoolAddressProvider)
@@ -21,8 +22,8 @@ const deployFn: DeployFunction = async (hre) => {
     constructorArgs: [
       await tellerV2.getAddress(),
       await lenderCommitmentForwarder.getAddress(),
-      aavePoolAddressProvider[networkName],
-    ],
+      aavePoolAddressProvider[networkName]
+    ]
   })
 
   return true
@@ -33,7 +34,7 @@ deployFn.id = 'flash-rollover-loan:deploy'
 deployFn.tags = ['flash-rollover-loan', 'flash-rollover-loan:deploy']
 deployFn.dependencies = [
   'teller-v2:deploy',
-  'lender-commitment-forwarder:deploy',
+  'lender-commitment-forwarder:deploy'
 ]
 
 deployFn.skip = async (hre) => {

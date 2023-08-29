@@ -1,12 +1,11 @@
 import { Logger } from "../../utils/logger";
 import { runCmd } from "../../utils/runCmd";
-import { API } from "../api";
-import { getConfig, setConfig } from "../utils/config";
+import { API, ISubgraph } from "../api";
+import { getNetworkConfig, setNetworkConfig } from "../utils/config";
 import { getNetworkFromName } from "../utils/getNetworkFromName";
 
 export interface BuildArgs {
-  name: string;
-  api: API;
+  subgraph: ISubgraph;
   grafting?: {
     base: string;
     block: number;
@@ -18,18 +17,17 @@ export interface BuildArgs {
 }
 export const build = async (args: BuildArgs): Promise<string | undefined> => {
   const {
-    name,
-    api,
+    subgraph,
     grafting,
     // eslint-disable-next-line @typescript-eslint/naming-convention
     block_handler,
     logger
   } = args;
-  const network = getNetworkFromName(name);
+  // const network = getNetworkFromName(name);
 
-  logger?.log(`Building subgraph: ${name}`);
+  logger?.log(`Building subgraph: ${subgraph.name} (${subgraph.network})`);
 
-  const config = await getConfig(network);
+  const config = await getNetworkConfig(subgraph.network);
 
   if (grafting !== undefined) {
     config.grafting = {
@@ -54,7 +52,7 @@ export const build = async (args: BuildArgs): Promise<string | undefined> => {
     };
   }
 
-  await setConfig(network, config);
+  await setNetworkConfig(subgraph.network, config);
 
   await runCmd(
     "yarn",
@@ -65,7 +63,7 @@ export const build = async (args: BuildArgs): Promise<string | undefined> => {
       "export",
 
       "--network",
-      network
+      subgraph.network
     ],
     { disableEcho: true }
   );
@@ -75,7 +73,7 @@ export const build = async (args: BuildArgs): Promise<string | undefined> => {
       "hbs",
 
       "-D",
-      `./config/${network}.json`,
+      `./config/${subgraph.network}.json`,
 
       "./src/subgraph.handlebars",
 
@@ -90,7 +88,7 @@ export const build = async (args: BuildArgs): Promise<string | undefined> => {
   await runCmd("yarn", ["graph", "codegen"], { disableEcho: true });
   return await new Promise<string | undefined>((resolve, reject) => {
     let buildId: string | undefined;
-    void runCmd("yarn", ["graph", "build", ...api.args.ipfs(name)], {
+    void runCmd("yarn", ["graph", "build", ...subgraph.api.args.ipfs()], {
       disableEcho: true,
       onData: data => {
         const regex = /Build completed: (\w+)/;

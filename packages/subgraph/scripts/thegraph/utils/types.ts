@@ -10,13 +10,7 @@ export const isReleaseType = (_type: string): _type is ReleaseType => {
   );
 };
 
-export type GraftingType =
-  | "latest"
-  | "latest-block-handler"
-  | "latest-synced"
-  | "none";
+export type GraftingType = "latest" | "latest-block-handler" | "none";
 export const isGraftingType = (_type: string): _type is GraftingType => {
-  return ["latest", "latest-block-handler", "latest-synced", "none"].includes(
-    _type
-  );
+  return ["latest", "latest-block-handler", "none"].includes(_type);
 };

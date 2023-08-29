@@ -1,14 +1,14 @@
-import { Logger } from "../../utils/logger";
+import { getNetworkConfig, listNetworks } from "../utils/config";
 
-import { makeMantle } from "./mantle";
+import { makeAws } from "./aws";
 import { makeStudio } from "./studio";
 
 export interface SubgraphVersion {
   id: number;
   label?: string;
   deploymentId: string;
-  latestEthereumBlockNumber: number;
-  totalEthereumBlocksCount: number;
+  latestEthereumBlockNumber?: number;
+  totalEthereumBlocksCount?: number;
   failed: boolean;
   synced: boolean;
 }
@@ -25,120 +25,89 @@ type VersionUpdateCallback = (
   unsubscribe: () => void
 ) => Promise<void> | void;
 
+export interface ISubgraph {
+  name: string;
+  network: string;
+  graphNetwork: string;
+  api: API;
+}
+
 export interface InnerAPI {
-  getSubgraphs: () => Promise<string[]>;
   getLatestVersion: (
-    name: string,
     index?: number
   ) => Promise<SubgraphVersion | null | undefined>;
-  watchVersionUpdate: (
-    name: string,
-    versionId: number,
-    cb: VersionUpdateCallback
-  ) => void;
+
+  watchVersionUpdate: (versionId: number, cb: VersionUpdateCallback) => void;
 
   args: {
-    ipfs: (name: string) => string[];
-    node: (name: string) => string[];
-    product: (name: string) => string[];
+    ipfs: () => string[];
+    node: () => string[];
+    product: () => string[];
   };
 }
 export interface API extends InnerAPI {
   waitForVersionSync: (
-    name: string,
     versionId: number,
     cb?: VersionUpdateCallback
   ) => Promise<VersionUpdate>;
 }
 
-interface APIConfig {
-  logger?: Logger;
-}
+export const getSubgraphs = async (): Promise<ISubgraph[]> => {
+  const networks = await listNetworks();
+  const subgraphs: ISubgraph[] = [];
+  for (const network of networks) {
+    const networkConfig = await getNetworkConfig(network);
 
-export const makeApi = async (config?: APIConfig): Promise<API> => {
-  const studio = await makeStudio({
-    logger: config?.logger
-  });
-  const aws = await makeMantle({
-    logger: config?.logger
-  });
+    if (!networkConfig.enabled) continue;
 
-  const nameMap = new Map<string, InnerAPI>();
-  const getSubgraphApi = (name: string): InnerAPI => {
-    const api = nameMap.get(name);
-    if (!api) throw new Error(`API for ${name} does not exist`);
-    return api;
-  };
-  const mapSubgraphApis = async (api: InnerAPI): Promise<string[]> => {
-    const names = await api.getSubgraphs();
-    for (const name of names) {
-      if (nameMap.has(name)) {
-        throw new Error(`API for ${name} already exists`);
-      }
-      nameMap.set(name, api);
+    let innerApi: InnerAPI;
+    switch (networkConfig.product) {
+      case "studio":
+        innerApi = await makeStudio({
+          name: networkConfig.name,
+          network: networkConfig.network,
+          logger: networkConfig?.logger
+        });
+        break;
+      case "aws":
+        innerApi = await makeAws({
+          name: networkConfig.name,
+          network: networkConfig.network,
+          logger: networkConfig?.logger
+        });
+        break;
+      default:
+        throw new Error(
+          `Unknown product (${networkConfig.product}) for subgraph "${networkConfig.name}"`
+        );
     }
-    return names;
-  };
 
-  const getSubgraphs = (): Promise<string[]> => {
-    return Promise.all([
-      mapSubgraphApis(studio),
-      mapSubgraphApis(aws)
-    ]).then(s => s.flat());
-  };
+    subgraphs.push({
+      name: networkConfig.name,
+      network: network,
+      graphNetwork: networkConfig.network,
+      api: {
+        ...innerApi,
+        waitForVersionSync: (
+          versionId: number,
+          cb?: VersionUpdateCallback
+        ): Promise<VersionUpdate> => {
+          return new Promise((resolve, reject) => {
+            innerApi.watchVersionUpdate(versionId, (version, unsubscribe) => {
+              void cb?.(version, unsubscribe);
 
-  const getLatestVersion = (
-    name: string,
-    index = 0
-  ): Promise<SubgraphVersion | null | undefined> => {
-    const api = getSubgraphApi(name);
-    return api.getLatestVersion(name, index);
-  };
-
-  const watchVersionUpdate = (
-    name: string,
-    versionId: number,
-    cb: VersionUpdateCallback
-  ): void => {
-    const api = getSubgraphApi(name);
-    api.watchVersionUpdate(name, versionId, cb);
-  };
-
-  const waitForVersionSync = (
-    name: string,
-    versionId: number,
-    cb?: VersionUpdateCallback
-  ): Promise<VersionUpdate> => {
-    return new Promise((resolve, reject) => {
-      watchVersionUpdate(name, versionId, (version, unsubscribe) => {
-        void cb?.(version, unsubscribe);
-
-        if (version.failed) {
-          unsubscribe();
-          reject(`Version "${versionId} failed`);
-        } else if (version.synced) {
-          unsubscribe();
-          resolve(version);
+              if (version.failed) {
+                unsubscribe();
+                reject(`Version "${versionId} failed`);
+              } else if (version.synced) {
+                unsubscribe();
+                resolve(version);
+              }
+            });
+          });
         }
-      });
-    });
-  };
-
-  return {
-    getSubgraphs,
-    getLatestVersion,
-    watchVersionUpdate,
-    waitForVersionSync,
-    args: {
-      ipfs(name: string) {
-        return getSubgraphApi(name).args.ipfs(name);
-      },
-      node(name: string) {
-        return getSubgraphApi(name).args.node(name);
-      },
-      product(name: string) {
-        return getSubgraphApi(name).args.product(name);
       }
-    }
-  };
+    });
+  }
+  return subgraphs;
 };

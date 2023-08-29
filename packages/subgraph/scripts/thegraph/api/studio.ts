@@ -2,6 +2,7 @@ import * as path from "path";
 
 import AppEth from "@ledgerhq/hw-app-eth";
 import Transport from "@ledgerhq/hw-transport-node-hid";
+import { Mutex } from "async-mutex";
 import axios from "axios";
 import { makeNodeDisklet } from "disklet";
 import { makeMemlet } from "memlet";
@@ -12,13 +13,17 @@ import * as websocket from "../ws";
 
 import { InnerAPI, SubgraphVersion, VersionUpdate } from "./index";
 
+const mutex = new Mutex();
+
 interface IStudioConfig {
+  name: string;
+  network: string;
   socketEmitter?: SocketEmitter;
   logger?: Logger;
 }
 
 export const makeStudio = async (
-  studioConfig?: IStudioConfig
+  studioConfig: IStudioConfig
 ): Promise<InnerAPI> => {
   const disklet = makeNodeDisklet(path.join(__dirname, "./config"));
   const memlet = makeMemlet(disklet);
@@ -73,8 +78,8 @@ export const makeStudio = async (
   const socket = await websocket.create(
     "wss://api.studio.thegraph.com/graphql",
     {
-      emitter: studioConfig?.socketEmitter,
-      logger: studioConfig?.logger
+      emitter: studioConfig.socketEmitter,
+      logger: studioConfig.logger
     }
   );
 
@@ -91,70 +96,72 @@ export const makeStudio = async (
   };
 
   const login = async (reauth = false): Promise<void> => {
-    let cookie: string | null = null;
-    if (!reauth && config.Cookie) {
-      if (new Date(config.Cookie.expiration).getTime() > Date.now()) {
-        cookie = config.Cookie.value;
+    await mutex.runExclusive(async () => {
+      let cookie: string | null = null;
+      if (!reauth && config.Cookie) {
+        if (new Date(config.Cookie.expiration).getTime() > Date.now()) {
+          cookie = config.Cookie.value;
+        } else {
+          console.log("Cookie expired, logging in again");
+        }
       } else {
-        console.log("Cookie expired, logging in again");
+        console.log("Not logged in, attempting to log in via ledger...");
       }
-    } else {
-      console.log("Not logged in, attempting to log in via ledger...");
-    }
 
-    if (!cookie) {
-      const transport = await Transport.open("");
-      const eth = new AppEth(transport);
+      if (!cookie) {
+        const transport = await Transport.open("");
+        const eth = new AppEth(transport);
 
-      const path = "44'/60'/0'/0/0";
-      const { address } = await eth.getAddress(path);
+        const path = "44'/60'/0'/0/0";
+        const { address } = await eth.getAddress(path);
 
-      const message =
-        "Sign this message to prove you have access to this wallet in order to sign in to thegraph.com/studio.\n\n" +
-        "This won't cost you any Ether.\n\n" +
-        `Timestamp: ${Date.now()}`;
+        const message =
+          "Sign this message to prove you have access to this wallet in order to sign in to thegraph.com/studio.\n\n" +
+          "This won't cost you any Ether.\n\n" +
+          `Timestamp: ${Date.now()}`;
 
-      const sig = await eth.signPersonalMessage(
-        path,
-        Buffer.from(message).toString("hex")
-      );
-      const signature = `0x${sig.r}${sig.s}${sig.v.toString(16)}`;
+        const sig = await eth.signPersonalMessage(
+          path,
+          Buffer.from(message).toString("hex")
+        );
+        const signature = `0x${sig.r}${sig.s}${sig.v.toString(16)}`;
 
-      await transport.close();
+        await transport.close();
 
-      const login = await api.post("", {
-        operationName: "login",
-        variables: {
-          ethAddress: "0x1a2baa2257343119fb03fd448622456a0c4f2190",
-          message,
-          signature,
-          multisigOwnerAddress: address,
-          networkId: 1
-        },
-        query:
-          "fragment AuthUserFragment on User { id } mutation login($ethAddress: String!, $message: String!, $signature: String!, $multisigOwnerAddress: String, $networkId: Int) { login(ethAddress: $ethAddress, message: $message, signature: $signature, multisigOwnerAddress: $multisigOwnerAddress, networkId: $networkId) { ...AuthUserFragment } }"
-      });
-
-      // extract cookie info
-      const cookieRegex = /^(SubgraphStudioAPI=[^\s]+;).*Expires=([^;]+);/;
-      const cookieRaw = login.headers["set-cookie"]?.find(cookie =>
-        cookieRegex.test(cookie)
-      );
-      if (cookieRaw) {
-        const [_, cookieValue, cookieExpiration] = cookieRaw.match(
-          cookieRegex
-        )!;
-        await setConfig({
-          Cookie: {
-            value: cookieValue,
-            expiration: cookieExpiration
-          }
+        const login = await api.post("", {
+          operationName: "login",
+          variables: {
+            ethAddress: "0x1a76339211668a6939e1d6D13AB902bBef5D9ebc",
+            message,
+            signature,
+            multisigOwnerAddress: address,
+            networkId: 42161
+          },
+          query:
+            "fragment AuthUserFragment on User { id } mutation login($ethAddress: String!, $message: String!, $signature: String!, $multisigOwnerAddress: String, $networkId: Int) { login(ethAddress: $ethAddress, message: $message, signature: $signature, multisigOwnerAddress: $multisigOwnerAddress, networkId: $networkId) { ...AuthUserFragment } }"
         });
-        cookie = cookieValue;
-      }
-    }
 
-    api.defaults.headers.Cookie = cookie;
+        // extract cookie info
+        const cookieRegex = /^(SubgraphStudioAPI=[^\s]+;).*Expires=([^;]+);/;
+        const cookieRaw = login.headers["set-cookie"]?.find(cookie =>
+          cookieRegex.test(cookie)
+        );
+        if (cookieRaw) {
+          const [_, cookieValue, cookieExpiration] = cookieRaw.match(
+            cookieRegex
+          )!;
+          await setConfig({
+            Cookie: {
+              value: cookieValue,
+              expiration: cookieExpiration
+            }
+          });
+          cookie = cookieValue;
+        }
+      }
+
+      api.defaults.headers.Cookie = cookie;
+    });
   };
 
   interface StudioSubgraph {
@@ -187,6 +194,7 @@ export const makeStudio = async (
   interface StudioSubgraphVersion {
     id: number;
     label: string;
+    network: string;
     deploymentId: string;
     queryUrl: string;
     latestEthereumBlockNumber: number;
@@ -196,7 +204,6 @@ export const makeStudio = async (
     publishStatus: string;
   }
   const getLatestVersion = async (
-    name: string,
     index = 0
   ): Promise<SubgraphVersion | undefined> => {
     await login();
@@ -206,7 +213,7 @@ export const makeStudio = async (
     }>("", {
       operationName: "Subgraph",
       variables: {
-        name
+        name: studioConfig.name
       },
       query: `
       query Subgraph($name: String!) {
@@ -217,6 +224,7 @@ export const makeStudio = async (
           versions {
             id
             label
+            network
             deploymentId
             queryUrl
             latestEthereumBlockNumber
@@ -233,7 +241,9 @@ export const makeStudio = async (
     `
     });
     const subgraph = response.data.data.subgraph;
-    const latest = subgraph?.versions?.sort((a, b) => b.id - a.id)?.[index];
+    const latest = subgraph?.versions
+      ?.filter(v => v.network === studioConfig.network)
+      ?.sort((a, b) => b.id - a.id)?.[index];
     if (latest) {
       return {
         id: latest.id,
@@ -248,15 +258,14 @@ export const makeStudio = async (
   };
 
   const watchVersionUpdate = (
-    name: string,
     versionId: number,
     cb: (
       version: VersionUpdate,
       unsubscribe: () => void
     ) => Promise<void> | void
   ): void => {
-    studioConfig?.socketEmitter?.on(SocketEvent.CONNECTION_CLOSE, () => {
-      watchVersionUpdate(name, versionId, cb);
+    studioConfig.socketEmitter?.on(SocketEvent.CONNECTION_CLOSE, () => {
+      watchVersionUpdate(versionId, cb);
     });
     return socket.subscribe({
       cb,
@@ -278,17 +287,16 @@ export const makeStudio = async (
   };
 
   return {
-    getSubgraphs,
     getLatestVersion,
     watchVersionUpdate,
     args: {
-      ipfs(name: string) {
+      ipfs() {
         return ["--ipfs", "https://api.thegraph.com/ipfs/api/v0"];
       },
-      node(name: string) {
+      node() {
         return [];
       },
-      product(name: string) {
+      product() {
         return ["--studio"];
       }
     }

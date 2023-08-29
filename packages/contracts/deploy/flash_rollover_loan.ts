@@ -3,7 +3,7 @@ import { DeployFunction } from 'hardhat-deploy/dist/types'
 //feel free to add more ..
 const aavePoolAddressProvider: { [networkName: string]: string } = {
   mainnet: '0x2f39d218133AFaB8F2B819B1066c7E434Ad94E9e',
-  goerli: '0x73D94B5D5C0a68Fe279a91b23D2165D2DAaA41d3',
+  goerli: '0xC911B590248d127aD18546B186cC6B324e99F02c',
 }
 
 const networksWithAave: string[] = Object.keys(aavePoolAddressProvider)

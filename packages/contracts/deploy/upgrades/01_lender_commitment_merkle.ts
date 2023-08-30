@@ -32,11 +32,11 @@ const deployFn: DeployFunction = async (hre) => {
           unsafeAllow: ['constructor', 'state-variable-immutable'],
           constructorArgs: [
             await tellerV2.getAddress(),
-            await marketRegistry.getAddress(),
-          ],
-        },
-      },
-    ],
+            await marketRegistry.getAddress()
+          ]
+        }
+      }
+    ]
   })
 
   hre.log('done.')
@@ -52,17 +52,19 @@ deployFn.tags = [
   'proposal',
   'upgrade',
   'lender-commitment-forwarder',
-  'lender-commitment-forwarder:merkle-upgrade',
+  'lender-commitment-forwarder:merkle-upgrade'
 ]
 deployFn.dependencies = [
   'market-registry:deploy',
   'teller-v2:deploy',
-  'lender-commitment-forwarder:deploy',
+  'lender-commitment-forwarder:deploy'
 ]
 deployFn.skip = async (hre) => {
   return (
     !hre.network.live ||
-    !['mainnet', 'polygon', 'arbitrum', 'goerli'].includes(hre.network.name)
+    !['mainnet', 'polygon', 'arbitrum', 'goerli', 'sepolia'].includes(
+      hre.network.name
+    )
   )
 }
 export default deployFn

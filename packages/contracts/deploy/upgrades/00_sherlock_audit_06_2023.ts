@@ -77,11 +77,11 @@ const deployFn: DeployFunction = async (hre) => {
             'state-variable-immutable',
             'external-library-linking'
           ],
-          constructorArgs: [trustedForwarder],
+          constructorArgs: [await trustedForwarder.getAddress()],
 
           call: {
             fn: 'setEscrowVault',
-            args: [escrowVault]
+            args: [await escrowVault.getAddress()]
           }
         }
       },

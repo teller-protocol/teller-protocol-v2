@@ -13,5 +13,6 @@
   "teller-v2:transfer-ownership-to-safe": 1693337380,
   "lender-manager:transfer-ownership": 1693337401,
   "liquidity-rewards:deploy": 1693337425,
-  "default-proxy-admin:transfer": 1693337428
+  "default-proxy-admin:transfer": 1693337428,
+  "sherlock-audit:upgrade": 1693421395
 }

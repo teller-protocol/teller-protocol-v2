@@ -18,12 +18,12 @@ const deployFn: DeployFunction = async (hre) => {
   const lenderCommitmentForwarderV2Factory =
     await hre.ethers.getContractFactory('LenderCommitmentForwarder_V2')
 
-  const rolloverContract = await hre.contracts.get('CommitmentRolloverLoan')
+  const rolloverContract = await hre.contracts.get('FlashRolloverLoan')
 
   const rolloverContractAddress = await rolloverContract.getAddress()
 
   console.log({
-    protocolTimelock,
+    protocolTimelock
   })
 
   const lenderCommitmmentForwarderAddress =
@@ -48,25 +48,25 @@ const deployFn: DeployFunction = async (hre) => {
           unsafeAllow: ['constructor', 'state-variable-immutable'],
           constructorArgs: [
             await tellerV2.getAddress(),
-            await marketRegistry.getAddress(),
+            await marketRegistry.getAddress()
           ],
 
           //call initialize
 
           call: {
             fn: 'initialize',
-            args: [protocolTimelock],
-          },
-        },
+            args: [protocolTimelock]
+          }
+        }
       },
       //protocol timelock adds an extension
       {
         contractAddress: await lenderCommitmentForwarder.getAddress(),
         contractImplementation: lenderCommitmentForwarderV2Factory,
         callFn: 'addExtension',
-        callArgs: [rolloverContractAddress],
-      },
-    ],
+        callArgs: [rolloverContractAddress]
+      }
+    ]
   })
 
   /*
@@ -97,18 +97,20 @@ deployFn.tags = [
   'proposal',
   'upgrade',
   'lender-commitment-forwarder',
-  'lender-commitment-forwarder:v2-upgrade',
+  'lender-commitment-forwarder:v2-upgrade'
 ]
 deployFn.dependencies = [
   'market-registry:deploy',
   'teller-v2:deploy',
   'lender-commitment-forwarder:deploy',
-  'commitment-rollover-loan:deploy',
+  'commitment-rollover-loan:deploy'
 ]
 deployFn.skip = async (hre) => {
   return (
     !hre.network.live ||
-    !['mainnet', 'polygon', 'arbitrum', 'goerli','sepolia'].includes(hre.network.name)
+    !['mainnet', 'polygon', 'arbitrum', 'goerli', 'sepolia'].includes(
+      hre.network.name
+    )
   )
 }
 export default deployFn

@@ -1,17 +1,17 @@
-import { Testable } from "../Testable.sol";
+import { Testable } from "../../../Testable.sol";
 
-import { CommitmentRolloverLoan } from "../../contracts/CommitmentRolloverLoan.sol";
+import { CommitmentRolloverLoan } from "../../../../contracts/LenderCommitmentForwarder/extensions/CommitmentRolloverLoan.sol";
 
-import "../../contracts/interfaces/ICommitmentRolloverLoan.sol";
-import "../../contracts/interfaces/ILenderCommitmentForwarder.sol";
+import "../../../../contracts/interfaces/ICommitmentRolloverLoan.sol";
+import "../../../../contracts/interfaces/ILenderCommitmentForwarder.sol";
 
-import "../integration/IntegrationTestHelpers.sol";
+import "../../../integration/IntegrationTestHelpers.sol";
 
-import { WethMock } from "../../contracts/mock/WethMock.sol";
+import { WethMock } from "../../../../contracts/mock/WethMock.sol";
 
-import { TellerV2SolMock } from "../../contracts/mock/TellerV2SolMock.sol";
-import { LenderCommitmentForwarderMock } from "../../contracts/mock/LenderCommitmentForwarderMock.sol";
-import { MarketRegistryMock } from "../../contracts/mock/MarketRegistryMock.sol";
+import { TellerV2SolMock } from "../../../../contracts/mock/TellerV2SolMock.sol";
+import { LenderCommitmentForwarderMock } from "../../../../contracts/mock/LenderCommitmentForwarderMock.sol";
+import { MarketRegistryMock } from "../../../../contracts/mock/MarketRegistryMock.sol";
 
 contract CommitmentRolloverLoanMock is CommitmentRolloverLoan {
     constructor(address _tellerV2, address _lenderCommitmentForwarder)

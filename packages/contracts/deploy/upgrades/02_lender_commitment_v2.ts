@@ -16,7 +16,7 @@ const deployFn: DeployFunction = async (hre) => {
   const { protocolTimelock } = namedAccounts
 
   const lenderCommitmentForwarderV2Factory =
-    await hre.ethers.getContractFactory('LenderCommitmentForwarder_V2')
+    await hre.ethers.getContractFactory('LenderCommitmentForwarder_G2')
 
   const rolloverContract = await hre.contracts.get('FlashRolloverLoan')
 
@@ -33,7 +33,7 @@ const deployFn: DeployFunction = async (hre) => {
     title: 'Lender Commitment Forwarder Extension Upgrade',
     description: ` 
 
-# LenderCommitmentForwarder_V2
+# LenderCommitmentForwarder_G2
 
 * Upgrades the lender commitment forwarder so that trusted extensions can specify a specific recipient
 `,
@@ -41,7 +41,7 @@ const deployFn: DeployFunction = async (hre) => {
       {
         proxy: lenderCommitmmentForwarderAddress,
         implFactory: await hre.ethers.getContractFactory(
-          'LenderCommitmentForwarder_V2'
+          'LenderCommitmentForwarder_G2'
         ),
 
         opts: {
@@ -51,7 +51,7 @@ const deployFn: DeployFunction = async (hre) => {
             await marketRegistry.getAddress()
           ],
 
-          //call initialize
+          // call initialize
 
           call: {
             fn: 'initialize',
@@ -59,7 +59,7 @@ const deployFn: DeployFunction = async (hre) => {
           }
         }
       },
-      //protocol timelock adds an extension
+      // protocol timelock adds an extension
       {
         contractAddress: await lenderCommitmentForwarder.getAddress(),
         contractImplementation: lenderCommitmentForwarderV2Factory,

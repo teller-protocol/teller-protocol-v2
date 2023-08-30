@@ -3,23 +3,23 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "../contracts/TellerV2MarketForwarder.sol";
+import "../../contracts/TellerV2MarketForwarder.sol";
 
-import "./tokens/TestERC20Token.sol";
-import "./tokens/TestERC721Token.sol";
-import "./tokens/TestERC1155Token.sol";
-import "../contracts/TellerV2Context.sol";
+import "../tokens/TestERC20Token.sol";
+import "../tokens/TestERC721Token.sol";
+import "../tokens/TestERC1155Token.sol";
+import "../../contracts/TellerV2Context.sol";
 
-import { Testable } from "./Testable.sol";
+import { Testable } from "../Testable.sol";
 
-import "../contracts/interfaces/ILenderCommitmentForwarder.sol";
-import { LenderCommitmentForwarder } from "../contracts/LenderCommitmentForwarder.sol";
+import "../../contracts/interfaces/ILenderCommitmentForwarder.sol";
+import { LenderCommitmentForwarder_G1 } from "../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarder.sol";
 
-import { Collateral, CollateralType } from "../contracts/interfaces/escrow/ICollateralEscrowV1.sol";
+import { Collateral, CollateralType } from "../../contracts/interfaces/escrow/ICollateralEscrowV1.sol";
 
-import { User } from "./Test_Helpers.sol";
+import { User } from "../Test_Helpers.sol";
 
-import "../contracts/mock/MarketRegistryMock.sol";
+import "../../contracts/mock/MarketRegistryMock.sol";
 
 import { LenderCommitmentForwarder_Override } from "./LenderCommitmentForwarder_Override.sol";
 
@@ -1077,7 +1077,7 @@ contract LenderCommitmentForwarder_Test is Testable {
 
         vm.expectRevert(
             abi.encodeWithSelector(
-                LenderCommitmentForwarder
+                LenderCommitmentForwarder_G1
                     .InsufficientCommitmentAllocation
                     .selector,
                 c.maxPrincipal,
@@ -1133,7 +1133,7 @@ contract LenderCommitmentForwarder_Test is Testable {
 
         vm.expectRevert(
             abi.encodeWithSelector(
-                LenderCommitmentForwarder
+                LenderCommitmentForwarder_G1
                     .InsufficientBorrowerCollateral
                     .selector,
                 requiredCollateralAmount,
@@ -1394,12 +1394,14 @@ contract LenderCommitmentForwarder_Test is Testable {
 }
 
 contract LenderCommitmentUser is User {
-    LenderCommitmentForwarder public immutable commitmentForwarder;
+    LenderCommitmentForwarder_G1 public immutable commitmentForwarder;
 
     constructor(address _tellerV2, address _commitmentForwarder)
         User(_tellerV2)
     {
-        commitmentForwarder = LenderCommitmentForwarder(_commitmentForwarder);
+        commitmentForwarder = LenderCommitmentForwarder_G1(
+            _commitmentForwarder
+        );
     }
 
     function _createCommitment(

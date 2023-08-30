@@ -3,21 +3,24 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "../contracts/TellerV2MarketForwarder.sol";
+import "../../contracts/TellerV2MarketForwarder.sol";
 
-import "./tokens/TestERC20Token.sol";
-import "../contracts/TellerV2Context.sol";
+import "../tokens/TestERC20Token.sol";
+import "../../contracts/TellerV2Context.sol";
 
-import { Testable } from "./Testable.sol";
-import { LenderCommitmentForwarder } from "../contracts/LenderCommitmentForwarder.sol";
+import { Testable } from "../Testable.sol";
+import { LenderCommitmentForwarder } from "../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarder.sol";
 
-import { Collateral, CollateralType } from "../contracts/interfaces/escrow/ICollateralEscrowV1.sol";
+import { Collateral, CollateralType } from "../../contracts/interfaces/escrow/ICollateralEscrowV1.sol";
 
-import { User } from "./Test_Helpers.sol";
+import { User } from "../Test_Helpers.sol";
 
-import "../contracts/mock/MarketRegistryMock.sol";
+import "../../contracts/mock/MarketRegistryMock.sol";
 
-contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
+contract LenderCommitmentForwarder_Test is
+    Testable,
+    LenderCommitmentForwarder
+{
     LenderCommitmentForwarderTest_TellerV2Mock private tellerV2Mock;
     MarketRegistryMock mockMarketRegistry;
 

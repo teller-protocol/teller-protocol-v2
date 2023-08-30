@@ -91,7 +91,7 @@ Run tests locally:
 
 ### Contracts Documentation
   - [CollateralManager](contracts/CollateralManager.sol/contract.CollateralManager.md)
-  - [LenderCommitmentForwarder](contracts/LenderCommitmentForwarder.sol/contract.LenderCommitmentForwarder.md)
+  - [LenderCommitmentForwarder](contracts/LenderCommitmentForwarder/LenderCommitmentForwarder.sol/contract.LenderCommitmentForwarder.md)
   - [LenderManager](contracts/LenderManager.sol/contract.LenderManager.md)
   - [MarketLiquidityRewards](contracts/MarketLiquidityRewards.sol/contract.MarketLiquidityRewards.md)
   - [MarketRegistry](contracts/MarketRegistry.sol/contract.MarketRegistry.md)

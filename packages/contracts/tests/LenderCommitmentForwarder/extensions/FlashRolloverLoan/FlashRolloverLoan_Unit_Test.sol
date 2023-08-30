@@ -1,23 +1,23 @@
 pragma solidity ^0.8.0;
 
-import { Testable } from "../Testable.sol";
+import { Testable } from "../../../Testable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-import { FlashRolloverLoan } from "../../contracts/FlashRolloverLoan.sol";
+import { FlashRolloverLoan } from "../../../../contracts/LenderCommitmentForwarder/extensions/FlashRolloverLoan.sol";
 
-import "../../contracts/interfaces/ICommitmentRolloverLoan.sol";
-import "../../contracts/interfaces/ILenderCommitmentForwarder.sol";
+import "../../../../contracts/interfaces/ICommitmentRolloverLoan.sol";
+import "../../../../contracts/interfaces/ILenderCommitmentForwarder.sol";
 
-import "../integration/IntegrationTestHelpers.sol";
+import "../../../integration/IntegrationTestHelpers.sol";
 
-import { WethMock } from "../../contracts/mock/WethMock.sol";
+import { WethMock } from "../../../../contracts/mock/WethMock.sol";
 
-import { TellerV2SolMock } from "../../contracts/mock/TellerV2SolMock.sol";
-import { LenderCommitmentForwarderMock } from "../../contracts/mock/LenderCommitmentForwarderMock.sol";
-import { MarketRegistryMock } from "../../contracts/mock/MarketRegistryMock.sol";
+import { TellerV2SolMock } from "../../../../contracts/mock/TellerV2SolMock.sol";
+import { LenderCommitmentForwarderMock } from "../../../../contracts/mock/LenderCommitmentForwarderMock.sol";
+import { MarketRegistryMock } from "../../../../contracts/mock/MarketRegistryMock.sol";
 
-import { AavePoolAddressProviderMock } from "../../contracts/mock/aave/AavePoolAddressProviderMock.sol";
-import { AavePoolMock } from "../../contracts/mock/aave/AavePoolMock.sol";
+import { AavePoolAddressProviderMock } from "../../../../contracts/mock/aave/AavePoolAddressProviderMock.sol";
+import { AavePoolMock } from "../../../../contracts/mock/aave/AavePoolMock.sol";
 
 contract FlashRolloverLoanOverride is FlashRolloverLoan {
     constructor(

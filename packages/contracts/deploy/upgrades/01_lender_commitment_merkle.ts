@@ -8,7 +8,7 @@ const deployFn: DeployFunction = async (hre) => {
   const tellerV2 = await hre.contracts.get('TellerV2')
   const marketRegistry = await hre.contracts.get('MarketRegistry')
   const lenderCommitmentForwarder = await hre.contracts.get(
-    'LenderCommitmentForwarder_V1'
+    'LenderCommitmentForwarder'
   )
 
   await hre.defender.proposeBatchTimelock({
@@ -25,7 +25,7 @@ const deployFn: DeployFunction = async (hre) => {
       {
         proxy: lenderCommitmentForwarder,
         implFactory: await hre.ethers.getContractFactory(
-          'LenderCommitmentForwarder_V1'
+          'LenderCommitmentForwarder'
         ),
 
         opts: {

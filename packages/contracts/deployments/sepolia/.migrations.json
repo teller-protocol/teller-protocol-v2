@@ -15,5 +15,6 @@
   "liquidity-rewards:deploy": 1693337425,
   "default-proxy-admin:transfer": 1693337428,
   "sherlock-audit:upgrade": 1693421395,
-  "lender-commitment-forwarder:merkle-upgrade": 1693421477
+  "lender-commitment-forwarder:merkle-upgrade": 1693421477,
+  "lender-commitment-forwarder:v2-upgrade": 1693421538
 }

@@ -168,8 +168,8 @@ If the new loan pays out (after fees) MORE than the  aave loan amount+ fee) then
             acceptCommitmentArgs
         );
 
-        //repay the flash loan
-        IERC20Upgradeable(_flashToken).transfer(
+        //approve the repayment for the flash loan
+        IERC20Upgradeable(_flashToken).approve(
             address(POOL()),
             _flashAmount + _flashFees
         );

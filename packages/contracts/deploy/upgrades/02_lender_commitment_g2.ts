@@ -1,9 +1,11 @@
 import { DeployFunction } from 'hardhat-deploy/dist/types'
 
+import { SUBTASK_GENERATE_ADD_EXTENSIONS_PROPOSAL_STEPS } from '../lender_commitment_forwarder/extensions/00_add_extensions'
+
 const deployFn: DeployFunction = async (hre) => {
   hre.log('----------')
   hre.log('')
-  hre.log('LenderCommitmentForwarder V1: Proposing upgrade...')
+  hre.log('LenderCommitmentForwarder V2: Proposing upgrade...')
 
   const tellerV2 = await hre.contracts.get('TellerV2')
   const marketRegistry = await hre.contracts.get('MarketRegistry')
@@ -11,15 +13,20 @@ const deployFn: DeployFunction = async (hre) => {
     'LenderCommitmentForwarder'
   )
 
+  const { protocolTimelock } = await hre.getNamedAccounts()
+
+  const addExtensionProposalSteps = await hre.run(
+    SUBTASK_GENERATE_ADD_EXTENSIONS_PROPOSAL_STEPS
+  )
+
   await hre.defender.proposeBatchTimelock({
-    title: 'Lender Commitment Forwarder Merkle Upgrade',
+    title: 'Lender Commitment Forwarder Extension Upgrade',
     description: ` 
+# LenderCommitmentForwarder_G2 (Extensions Upgrade)
 
-# LenderCommitmentForwarder
-
-* Adds two new collateral types, ERC721_MERKLE_PROOF and ERC1155_MERKLE_PROOF.
-* Add a new function acceptCommitmentWithProof which is explicitly used with these new types.
-* Merkle proofs can be used to create commitments for a set of tokenIds for an ERC721 or ERC1155 collection.
+* Upgrades the lender commitment forwarder so that trusted extensions can specify a specific recipient
+* Adds a new function acceptCommitmentWithRecipient which is explicitly used with these new types.
+* Adds ${addExtensionProposalSteps.length} new extensions to the forwarder
 `,
     _steps: [
       {
@@ -34,9 +41,17 @@ const deployFn: DeployFunction = async (hre) => {
             await tellerV2.getAddress(),
             await marketRegistry.getAddress(),
           ],
+          call: {
+            fn: 'initialize',
+            args: [protocolTimelock],
+          },
         },
       },
+      ...addExtensionProposalSteps,
     ],
+  })
+  await hre.run('oz:defender:save-proposed-steps', {
+    steps: addExtensionProposalSteps,
   })
 
   hre.log('done.')
@@ -47,17 +62,18 @@ const deployFn: DeployFunction = async (hre) => {
 }
 
 // tags and deployment
-deployFn.id = 'lender-commitment-forwarder:merkle-upgrade'
+deployFn.id = 'lender-commitment-forwarder:g2-upgrade'
 deployFn.tags = [
   'proposal',
   'upgrade',
   'lender-commitment-forwarder',
-  'lender-commitment-forwarder:merkle-upgrade',
+  'lender-commitment-forwarder:g2-upgrade',
 ]
 deployFn.dependencies = [
   'market-registry:deploy',
   'teller-v2:deploy',
   'lender-commitment-forwarder:deploy',
+  'lender-commitment-forwarder:extensions:deploy',
 ]
 deployFn.skip = async (hre) => {
   return (

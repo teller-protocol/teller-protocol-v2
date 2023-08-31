@@ -8,17 +8,17 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 // Interfaces
-import "./interfaces/ITellerV2.sol";
-import "./interfaces/IProtocolFee.sol";
-import "./interfaces/ITellerV2Storage.sol";
-import "./interfaces/IMarketRegistry.sol";
-import "./interfaces/ILenderCommitmentForwarder.sol";
-import "./interfaces/ICommitmentRolloverLoan.sol";
-import "./libraries/NumbersLib.sol";
+import "../../interfaces/ITellerV2.sol";
+import "../../interfaces/IProtocolFee.sol";
+import "../../interfaces/ITellerV2Storage.sol";
+import "../../interfaces/IMarketRegistry.sol";
+import "../../interfaces/ILenderCommitmentForwarder.sol";
+import "../../interfaces/ICommitmentRolloverLoan.sol";
+import "../../libraries/NumbersLib.sol";
 
-import { IPool } from "./interfaces/aave/IPool.sol";
-import { IFlashLoanSimpleReceiver } from "./interfaces/aave/IFlashLoanSimpleReceiver.sol";
-import { IPoolAddressesProvider } from "./interfaces/aave/IPoolAddressesProvider.sol";
+import { IPool } from "../../interfaces/aave/IPool.sol";
+import { IFlashLoanSimpleReceiver } from "../../interfaces/aave/IFlashLoanSimpleReceiver.sol";
+import { IPoolAddressesProvider } from "../../interfaces/aave/IPoolAddressesProvider.sol";
 
 //https://docs.aave.com/developers/v/1.0/tutorials/performing-a-flash-loan/...-in-your-project
 

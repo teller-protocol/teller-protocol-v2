@@ -1,30 +1,30 @@
-import { Testable } from "../Testable.sol";
+import { Testable } from "../../../Testable.sol";
 
-import { FlashRolloverLoan } from "../../contracts/FlashRolloverLoan.sol";
+import { FlashRolloverLoan } from "../../../../contracts/LenderCommitmentForwarder/extensions/FlashRolloverLoan.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-import "../../contracts/interfaces/ICommitmentRolloverLoan.sol";
-import "../../contracts/interfaces/ILenderCommitmentForwarder.sol";
-import "../../contracts/interfaces/ITellerV2Context.sol";
+import "../../../../contracts/interfaces/ICommitmentRolloverLoan.sol";
+import "../../../../contracts/interfaces/ILenderCommitmentForwarder.sol";
+import "../../../../contracts/interfaces/ITellerV2Context.sol";
 
-import "../integration/IntegrationTestHelpers.sol";
+import "../../../integration/IntegrationTestHelpers.sol";
 
-import "../../contracts/extensions/ExtensionsContextUpgradeable.sol";
+import "../../../../contracts/LenderCommitmentForwarder/extensions/ExtensionsContextUpgradeable.sol";
 
-import { WethMock } from "../../contracts/mock/WethMock.sol";
+import { WethMock } from "../../../../contracts/mock/WethMock.sol";
 
-import { TellerV2SolMock } from "../../contracts/mock/TellerV2SolMock.sol";
-import { LenderCommitmentForwarderMock } from "../../contracts/mock/LenderCommitmentForwarderMock.sol";
-import { MarketRegistryMock } from "../../contracts/mock/MarketRegistryMock.sol";
+import { TellerV2SolMock } from "../../../../contracts/mock/TellerV2SolMock.sol";
+import { LenderCommitmentForwarderMock } from "../../../../contracts/mock/LenderCommitmentForwarderMock.sol";
+import { MarketRegistryMock } from "../../../../contracts/mock/MarketRegistryMock.sol";
 
-import { AavePoolAddressProviderMock } from "../../contracts/mock/aave/AavePoolAddressProviderMock.sol";
-import { AavePoolMock } from "../../contracts/mock/aave/AavePoolMock.sol";
+import { AavePoolAddressProviderMock } from "../../../../contracts/mock/aave/AavePoolAddressProviderMock.sol";
+import { AavePoolMock } from "../../../../contracts/mock/aave/AavePoolMock.sol";
 
-import { LenderCommitmentForwarder } from "../../contracts/LenderCommitmentForwarder.sol";
+import { LenderCommitmentForwarder_G1 } from "../../../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarder.sol";
 
-import { LenderCommitmentForwarder_V2 } from "../../contracts/LenderCommitmentForwarder_V2.sol";
+import { LenderCommitmentForwarder_G2 } from "../../../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarder_G2.sol";
 
-import { PaymentType, PaymentCycleType } from "../../contracts/libraries/V2Calculations.sol";
+import { PaymentType, PaymentCycleType } from "../../../../contracts/libraries/V2Calculations.sol";
 
 import "lib/forge-std/src/console.sol";
 
@@ -116,10 +116,10 @@ contract FlashRolloverLoan_Integration_Test is Testable {
             address(aavePoolAddressProvider)
         );
 
-        LenderCommitmentForwarder_V2(address(lenderCommitmentForwarder))
+        LenderCommitmentForwarder_G2(address(lenderCommitmentForwarder))
             .initialize(address(this));
 
-        LenderCommitmentForwarder_V2(address(lenderCommitmentForwarder))
+        LenderCommitmentForwarder_G2(address(lenderCommitmentForwarder))
             .addExtension(address(flashRolloverLoan));
     }
 

@@ -28,15 +28,21 @@ task(
     if (implementation) {
       const manifest = await Manifest.forNetwork(hre.ethers.provider)
       // manifest.g
-      const { txHash } = await manifest.getDeploymentFromAddress(implementation)
-
-      if (txHash) {
-        constructorArgs = await getConstructorArgsFromTx(
-          hre.ethers.provider,
-          implementation,
-          txHash,
-          abi
+      try {
+        const { txHash } = await manifest.getDeploymentFromAddress(
+          implementation
         )
+
+        if (txHash) {
+          constructorArgs = await getConstructorArgsFromTx(
+            hre.ethers.provider,
+            implementation,
+            txHash,
+            abi
+          )
+        }
+      } catch {
+        continue
       }
     }
 

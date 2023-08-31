@@ -32,7 +32,7 @@ const deployFn: DeployFunction = async (hre) => {
       {
         proxy: lenderCommitmentForwarder,
         implFactory: await hre.ethers.getContractFactory(
-          'LenderCommitmentForwarder_G2'
+          'LenderCommitmentForwarder'
         ),
 
         opts: {
@@ -41,9 +41,6 @@ const deployFn: DeployFunction = async (hre) => {
             await tellerV2.getAddress(),
             await marketRegistry.getAddress(),
           ],
-
-          // call initialize
-
           call: {
             fn: 'initialize',
             args: [protocolTimelock],
@@ -52,6 +49,9 @@ const deployFn: DeployFunction = async (hre) => {
       },
       ...addExtensionProposalSteps,
     ],
+  })
+  await hre.run('oz:defender:save-proposed-steps', {
+    steps: addExtensionProposalSteps,
   })
 
   hre.log('done.')
@@ -73,14 +73,12 @@ deployFn.dependencies = [
   'market-registry:deploy',
   'teller-v2:deploy',
   'lender-commitment-forwarder:deploy',
-  'commitment-rollover-loan:deploy',
+  'lender-commitment-forwarder:extensions:deploy',
 ]
 deployFn.skip = async (hre) => {
   return (
     !hre.network.live ||
-    !['mainnet', 'polygon', 'arbitrum', 'goerli', 'sepolia'].includes(
-      hre.network.name
-    )
+    !['mainnet', 'polygon', 'arbitrum', 'goerli'].includes(hre.network.name)
   )
 }
 export default deployFn

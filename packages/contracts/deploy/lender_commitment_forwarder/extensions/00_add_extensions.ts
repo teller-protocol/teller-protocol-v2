@@ -9,10 +9,13 @@ const deployFn: DeployFunction = async (hre) => {
   if (steps.length) {
     await hre.defender.proposeBatchTimelock({
       title: 'Add Extension to LenderCommitmentForwarder',
-      description: ` 
-  # Adds an extension to the LenderCommitmentForwarder
-  `,
+      description: `
+    # Adds an extension to the LenderCommitmentForwarder
+    `,
       _steps: steps,
+    })
+    await hre.run('oz:defender:save-proposed-steps', {
+      steps,
     })
   }
 }
@@ -42,6 +45,8 @@ subtask(
     args: any,
     hre: HardhatRuntimeEnvironment
   ): Promise<BatchProposalStep[]> => {
+    const proposedSteps = await hre.run('oz:defender:get-proposed-steps')
+
     const lenderCommitmentForwarder =
       await hre.contracts.get<LenderCommitmentForwarder>(
         'LenderCommitmentForwarder'
@@ -55,15 +60,34 @@ subtask(
     ])
     const steps: BatchProposalStep[] = []
     for (const extension of extensions) {
-      if (await lenderCommitmentForwarder.isTrustedForwarder(extension))
-        continue
+      let isTrusted: boolean
+      try {
+        isTrusted = await lenderCommitmentForwarder.isTrustedForwarder(
+          extension
+        )
+      } catch {
+        isTrusted = false
+      }
+      if (isTrusted) continue
 
-      steps.push({
+      const step = {
         contractAddress: await lenderCommitmentForwarder.getAddress(),
         contractImplementation: lenderCommitmentForwarderG2Factory,
         callFn: 'addExtension',
         callArgs: [await extension.getAddress()],
-      })
+      }
+      if (
+        proposedSteps.some(
+          (s) =>
+            s.contractAddress === step.contractAddress &&
+            s.contractImplementation.bytecode ===
+              step.contractImplementation.bytecode &&
+            s.callFn === step.callFn &&
+            s.callArgs.toString() === step.callArgs.toString()
+        )
+      )
+        continue
+      steps.push(step)
     }
     return steps
   }

@@ -1,5 +1,7 @@
 import { DeployFunction } from 'hardhat-deploy/dist/types'
 
+import { SUBTASK_GENERATE_ADD_EXTENSIONS_PROPOSAL_STEPS } from '../lender_commitment_forwarder/extensions/00_add_extensions'
+
 const deployFn: DeployFunction = async (hre) => {
   hre.log('----------')
   hre.log('')
@@ -11,35 +13,24 @@ const deployFn: DeployFunction = async (hre) => {
     'LenderCommitmentForwarder'
   )
 
-  const namedAccounts = await hre.getNamedAccounts()
+  const { protocolTimelock } = await hre.getNamedAccounts()
 
-  const { protocolTimelock } = namedAccounts
-
-  const lenderCommitmentForwarderV2Factory =
-    await hre.ethers.getContractFactory('LenderCommitmentForwarder_G2')
-
-  const rolloverContract = await hre.contracts.get('FlashRolloverLoan')
-
-  const rolloverContractAddress = await rolloverContract.getAddress()
-
-  console.log({
-    protocolTimelock
-  })
-
-  const lenderCommitmmentForwarderAddress =
-    await lenderCommitmentForwarder.getAddress()
+  const addExtensionProposalSteps = await hre.run(
+    SUBTASK_GENERATE_ADD_EXTENSIONS_PROPOSAL_STEPS
+  )
 
   await hre.defender.proposeBatchTimelock({
     title: 'Lender Commitment Forwarder Extension Upgrade',
     description: ` 
-
-# LenderCommitmentForwarder_G2
+# LenderCommitmentForwarder_G2 (Extensions Upgrade)
 
 * Upgrades the lender commitment forwarder so that trusted extensions can specify a specific recipient
+* Adds a new function acceptCommitmentWithRecipient which is explicitly used with these new types.
+* Adds ${addExtensionProposalSteps.length} new extensions to the forwarder
 `,
     _steps: [
       {
-        proxy: lenderCommitmmentForwarderAddress,
+        proxy: lenderCommitmentForwarder,
         implFactory: await hre.ethers.getContractFactory(
           'LenderCommitmentForwarder_G2'
         ),
@@ -48,41 +39,20 @@ const deployFn: DeployFunction = async (hre) => {
           unsafeAllow: ['constructor', 'state-variable-immutable'],
           constructorArgs: [
             await tellerV2.getAddress(),
-            await marketRegistry.getAddress()
+            await marketRegistry.getAddress(),
           ],
 
           // call initialize
 
           call: {
             fn: 'initialize',
-            args: [protocolTimelock]
-          }
-        }
+            args: [protocolTimelock],
+          },
+        },
       },
-      // protocol timelock adds an extension
-      {
-        contractAddress: await lenderCommitmentForwarder.getAddress(),
-        contractImplementation: lenderCommitmentForwarderV2Factory,
-        callFn: 'addExtension',
-        callArgs: [rolloverContractAddress]
-      }
-    ]
+      ...addExtensionProposalSteps,
+    ],
   })
-
-  /*
-  const callTitle = 'Add Extension: Rollover Contract Address'
-  const callDescription = `
-    Adds the rollover contract as an extension to the Lender Commitment Forwarder V2 
-  `*/
-  /*
-  await hre.defender.proposeCall(
-    await lenderCommitmentForwarder.getAddress(),
-    lenderCommitmentForwarderV2Factory,
-    'addExtension',
-    [rolloverContractAddress],
-    callTitle,
-    callDescription
-  )*/
 
   hre.log('done.')
   hre.log('')
@@ -92,18 +62,18 @@ const deployFn: DeployFunction = async (hre) => {
 }
 
 // tags and deployment
-deployFn.id = 'lender-commitment-forwarder:v2-upgrade'
+deployFn.id = 'lender-commitment-forwarder:g2-upgrade'
 deployFn.tags = [
   'proposal',
   'upgrade',
   'lender-commitment-forwarder',
-  'lender-commitment-forwarder:v2-upgrade'
+  'lender-commitment-forwarder:g2-upgrade',
 ]
 deployFn.dependencies = [
   'market-registry:deploy',
   'teller-v2:deploy',
   'lender-commitment-forwarder:deploy',
-  'commitment-rollover-loan:deploy'
+  'commitment-rollover-loan:deploy',
 ]
 deployFn.skip = async (hre) => {
   return (

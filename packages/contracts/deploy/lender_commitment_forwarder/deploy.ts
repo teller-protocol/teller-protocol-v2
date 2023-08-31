@@ -14,11 +14,6 @@ const deployFn: DeployFunction = async (hre) => {
       ],
     }
   )
-  //need to propose a call to addExtension through defender
-
-  //proposeBatch -- singleStep:  addExtension
-
-  //OR do this in another file so we have different skips on it (like in folder named lenderCommitmentForwarder)
 
   return true
 }

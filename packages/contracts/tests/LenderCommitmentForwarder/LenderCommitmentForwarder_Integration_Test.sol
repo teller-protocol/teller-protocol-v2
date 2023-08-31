@@ -113,10 +113,9 @@ contract LenderCommitmentForwarder_Integration_Test is Testable {
         vm.prank(address(borrower));
 
         address collateralManager = address(tellerV2.collateralManager());
-        erc721Token.approve(address(collateralManager), 0);
+        erc721Token.setApprovalForAll(address(collateralManager), true);
 
-       
-
+    
         Collateral[] memory collateral = new Collateral[](1);
 
         collateral[0]._collateralType = CollateralType.ERC721; //ERC721
@@ -140,6 +139,8 @@ contract LenderCommitmentForwarder_Integration_Test is Testable {
         vm.prank(address(lender));
         wethMock.approve(address(tellerV2), 1e18);
 
+
+        //not working !! 
         vm.prank(address(lender));
         (
             uint256 amountToProtocol,
@@ -159,10 +160,10 @@ contract LenderCommitmentForwarder_Integration_Test is Testable {
                 minInterestRate: interestRate,
                 collateralTokenAddress: address(0),
                 collateralTokenId: 0,
-                maxPrincipalPerCollateralAmount: 0,
+                maxPrincipalPerCollateralAmount: 1e20,
                 collateralTokenType: ILenderCommitmentForwarder
                     .CommitmentCollateralType
-                    .NONE,
+                    .ERC721,
                 lender: address(lender),
                 marketId: marketId,
                 principalTokenAddress: lendingToken

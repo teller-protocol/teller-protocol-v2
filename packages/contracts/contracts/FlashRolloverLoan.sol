@@ -132,10 +132,13 @@ If the new loan pays out (after fees) MORE than the  aave loan amount+ fee) then
         );
     }
 
+    /*
+        Notice: If collateral is being rolled over, it needs to be pre-approved from the borrower to the collateral manager 
+    */
     function executeOperation(
         address _flashToken,
         uint256 _flashAmount,
-        uint256 _flashFees, //need to incorporate this !
+        uint256 _flashFees,  
         address initiator,
         bytes calldata _data
     ) external onlyFlashLoanPool returns (bool) {

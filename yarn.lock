@@ -2245,6 +2245,12 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@teller-protocol/services@workspace:packages/services":
+  version: 0.0.0-use.local
+  resolution: "@teller-protocol/services@workspace:packages/services"
+  languageName: unknown
+  linkType: soft
+
 "@teller-protocol/v2-contracts@workspace:packages/contracts":
   version: 0.0.0-use.local
   resolution: "@teller-protocol/v2-contracts@workspace:packages/contracts"

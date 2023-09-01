@@ -550,8 +550,8 @@ contract LenderCommitmentForwarder_G1 is
         createLoanArgs.interestRate = _interestRate;
         createLoanArgs.recipient = _recipient;
         if (commitment.collateralTokenType != CommitmentCollateralType.NONE) {
-            Collateral[] memory collateral = new Collateral[](1);
-            collateral[0] = Collateral({
+            createLoanArgs.collateral = new Collateral[](1);
+            createLoanArgs.collateral[0] = Collateral({
                 _collateralType: _getEscrowCollateralType(
                     commitment.collateralTokenType
                 ),

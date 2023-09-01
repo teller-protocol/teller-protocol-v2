@@ -767,15 +767,7 @@ contract LenderCommitmentForwarder_Test is
         Overrider methods for exercise 
     */
 
-    function _submitBid(CreateLoanArgs memory, address)
-        internal
-        override
-        returns (uint256 bidId)
-    {
-        submitBidWasCalled = true;
-        return 1;
-    }
-
+  
     function _submitBidWithCollateral(CreateLoanArgs memory, address)
         internal
         override

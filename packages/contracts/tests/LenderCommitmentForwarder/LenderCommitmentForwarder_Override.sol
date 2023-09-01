@@ -44,15 +44,7 @@ contract LenderCommitmentForwarder_Override is LenderCommitmentForwarder_G1 {
     /*
         Overrider methods 
     */
-
-    function _submitBid(CreateLoanArgs memory, address)
-        internal
-        override
-        returns (uint256 bidId)
-    {
-        submitBidWasCalled = true;
-        return 1;
-    }
+ 
 
     function _submitBidWithCollateral(CreateLoanArgs memory, address)
         internal

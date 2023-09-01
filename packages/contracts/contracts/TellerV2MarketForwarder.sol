@@ -70,7 +70,7 @@ abstract contract TellerV2MarketForwarder is
      * @param _createLoanArgs Details describing the loan agreement.]
      * @param _borrower The borrower address for the new loan.
      */
-    function _submitBid(
+    /*function _submitBid(
         CreateLoanArgs memory _createLoanArgs,
         address _borrower
     ) internal virtual returns (uint256 bidId) {
@@ -91,7 +91,7 @@ abstract contract TellerV2MarketForwarder is
         );
 
         return abi.decode(responseData, (uint256));
-    }
+    }*/
 
     /**
      * @notice Creates a new loan using the TellerV2 lending protocol.

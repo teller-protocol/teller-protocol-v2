@@ -119,8 +119,7 @@ contract LenderCommitmentForwarder_Integration_Test is Testable {
 
         address collateralManager = address(tellerV2.collateralManager());
        // erc721Token.setApprovalForAll(address(collateralManager), true);
-        vm.prank(address(borrower));
-         erc721Token.approve(address(collateralManager), 0);
+       
     
         Collateral[] memory collateral = new Collateral[](1);
 
@@ -151,9 +150,13 @@ contract LenderCommitmentForwarder_Integration_Test is Testable {
         ) = tellerV2.lenderAcceptBid(loanId);
        }*/
 
+        
         address collateralManager = address(tellerV2.collateralManager());
         
-     
+         vm.prank(address(borrower));
+         erc721Token.approve(address(collateralManager), 0);
+
+
         vm.prank(address(lender));
         wethMock.approve(address(tellerV2), 2e18);
 

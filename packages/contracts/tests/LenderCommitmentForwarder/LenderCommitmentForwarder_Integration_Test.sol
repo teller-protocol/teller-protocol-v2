@@ -12,6 +12,7 @@ import { TestERC721Token } from "../tokens/TestERC721Token.sol";
 
 import { TellerV2SolMock } from "../../contracts/mock/TellerV2SolMock.sol";
 import { LenderCommitmentForwarder } from "../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarder.sol";
+import { LenderCommitmentForwarder_G1 } from "../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarder_G1.sol";
 import { MarketRegistryMock } from "../../contracts/mock/MarketRegistryMock.sol";
  
 import { PaymentType, PaymentCycleType } from "../../contracts/libraries/V2Calculations.sol";
@@ -104,6 +105,9 @@ contract LenderCommitmentForwarder_Integration_Test is Testable {
 
         //initial loan - need to pay back 1 weth + 0.1 weth (interest) to the lender
         uint256 marketId = 1;
+       
+       {
+       
         uint256 principalAmount = 1e18;
         uint32 duration = 365 days;
         uint16 interestRate = 1000;
@@ -140,14 +144,15 @@ contract LenderCommitmentForwarder_Integration_Test is Testable {
         vm.prank(address(lender));
         wethMock.approve(address(tellerV2), 1e18);
 
-
-        //not working !! 
+ 
         vm.prank(address(lender));
         (
             uint256 amountToProtocol,
             uint256 amountToMarketplace,
             uint256 amountToBorrower
         ) = tellerV2.lenderAcceptBid(loanId);
+       }
+
 
         vm.warp(365 days + 1);
 
@@ -157,8 +162,8 @@ contract LenderCommitmentForwarder_Integration_Test is Testable {
             memory commitment = ILenderCommitmentForwarder.Commitment({
                 maxPrincipal: commitmentPrincipalAmount,
                 expiration: uint32(block.timestamp + 1 days),
-                maxDuration: duration,
-                minInterestRate: interestRate,
+                maxDuration: 365 days,
+                minInterestRate: 1000,
                 collateralTokenAddress: address(erc721Token),
                 collateralTokenId: 0,
                 maxPrincipalPerCollateralAmount: 1e20,
@@ -177,10 +182,46 @@ contract LenderCommitmentForwarder_Integration_Test is Testable {
             commitment,
             _borrowerAddressList
         );
+
+        uint256 principalAmount = 100;
+        address recipient = address(borrower);
+        uint32 loanDuration = 1 days;
+
+        {
+         vm.prank(address(marketOwner));
+        ITellerV2Context(address(tellerV2)).setTrustedMarketForwarder(
+            marketId,
+            address(lenderCommitmentForwarder)
+        );
+
+        //borrower AND lender  approves the lenderCommitmentForwarder as trusted
+
+        vm.prank(address(borrower));
+        ITellerV2Context(address(tellerV2)).approveMarketForwarder(
+            marketId,
+            address(lenderCommitmentForwarder)
+        );
+
+          vm.prank(address(lender));
+        ITellerV2Context(address(tellerV2)).approveMarketForwarder(
+            marketId,
+            address(lenderCommitmentForwarder)
+
  
-
+        vm.prank(address(borrower));
         //accept commitment and make sure the collateral is moved 
+        LenderCommitmentForwarder_G1(address(lenderCommitmentForwarder)).acceptCommitment(
+            commitmentId,
+            principalAmount,
+            1, //collateral amount 
+            0, //collateral token id 
+            address(erc721Token), //collateral address 
+         //   recipient,
+            1000, //interest rate
+            loanDuration
+         );
 
+        
 
 
 

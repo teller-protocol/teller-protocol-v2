@@ -159,7 +159,7 @@ contract LenderCommitmentForwarder_Integration_Test is Testable {
                 expiration: uint32(block.timestamp + 1 days),
                 maxDuration: duration,
                 minInterestRate: interestRate,
-                collateralTokenAddress: address(0),
+                collateralTokenAddress: address(erc721Token),
                 collateralTokenId: 0,
                 maxPrincipalPerCollateralAmount: 1e20,
                 collateralTokenType: ILenderCommitmentForwarder
@@ -177,22 +177,29 @@ contract LenderCommitmentForwarder_Integration_Test is Testable {
             commitment,
             _borrowerAddressList
         );
+ 
+
+        //accept commitment and make sure the collateral is moved 
+
+
+
 
         //should get 0.45  weth   from accepting this commitment  during the rollover process
-
+    /*
         ICommitmentRolloverLoan.AcceptCommitmentArgs
             memory commitmentArgs = ICommitmentRolloverLoan
                 .AcceptCommitmentArgs({
                     commitmentId: commitmentId,
                     principalAmount: commitmentPrincipalAmount,
-                    collateralAmount: 0,
+                    collateralAmount: 1,
                     collateralTokenId: 0,
-                    collateralTokenAddress: address(0),
+                    collateralTokenAddress: address(erc721Token),
                     interestRate: interestRate,
                     loanDuration: duration
                 });
 
         uint256 _timestamp = block.timestamp;
+        */
 
        /* int256 rolloverAmount = commitmentRolloverLoan.calculateRolloverAmount(
             loanId,
@@ -204,8 +211,6 @@ contract LenderCommitmentForwarder_Integration_Test is Testable {
     */
 
 
-
-      //accept commitment and make sure the collateral is moved 
     
     }
 

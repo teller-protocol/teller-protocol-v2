@@ -3,6 +3,7 @@ import { Testable } from "../Testable.sol";
 import "../../contracts/interfaces/ICommitmentRolloverLoan.sol";
 import "../../contracts/interfaces/ILenderCommitmentForwarder.sol";
 import "../../contracts/interfaces/ITellerV2Context.sol";
+import "../../contracts/interfaces/ICollateralManager.sol";
 
 import "../integration/IntegrationTestHelpers.sol";
  
@@ -106,7 +107,7 @@ contract LenderCommitmentForwarder_Integration_Test is Testable {
         //initial loan - need to pay back 1 weth + 0.1 weth (interest) to the lender
         uint256 marketId = 1;
        
-       {
+     /*   {
        
         uint256 principalAmount = 1e18;
         uint32 duration = 365 days;
@@ -128,7 +129,7 @@ contract LenderCommitmentForwarder_Integration_Test is Testable {
         collateral[0]._amount = 1;
         collateral[0]._collateralAddress = address(erc721Token);
 
-
+   
         vm.prank(address(borrower));
         uint256 loanId = tellerV2.submitBid(
             lendingToken,
@@ -141,9 +142,6 @@ contract LenderCommitmentForwarder_Integration_Test is Testable {
             collateral
         );
 
-        vm.prank(address(lender));
-        wethMock.approve(address(tellerV2), 1e18);
-
  
         vm.prank(address(lender));
         (
@@ -151,8 +149,13 @@ contract LenderCommitmentForwarder_Integration_Test is Testable {
             uint256 amountToMarketplace,
             uint256 amountToBorrower
         ) = tellerV2.lenderAcceptBid(loanId);
-       }
+       }*/
 
+        address collateralManager = address(tellerV2.collateralManager());
+        
+     
+        vm.prank(address(lender));
+        wethMock.approve(address(tellerV2), 2e18);
 
         vm.warp(365 days + 1);
 
@@ -206,11 +209,15 @@ contract LenderCommitmentForwarder_Integration_Test is Testable {
         ITellerV2Context(address(tellerV2)).approveMarketForwarder(
             marketId,
             address(lenderCommitmentForwarder)
+        );
+        }
+
+
 
  
         vm.prank(address(borrower));
         //accept commitment and make sure the collateral is moved 
-        LenderCommitmentForwarder_G1(address(lenderCommitmentForwarder)).acceptCommitment(
+        uint256 bidId = LenderCommitmentForwarder_G1(address(lenderCommitmentForwarder)).acceptCommitment(
             commitmentId,
             principalAmount,
             1, //collateral amount 
@@ -221,36 +228,17 @@ contract LenderCommitmentForwarder_Integration_Test is Testable {
             loanDuration
          );
 
+
+        address ownerOfNft = erc721Token.ownerOf(0);
+
+        address escrowForLoan = ICollateralManager(collateralManager).getEscrow(bidId);
+
+
+        assertEq( ownerOfNft , address(escrowForLoan) , "Nft not moved to collateral escrow"  );
         
 
 
-
-        //should get 0.45  weth   from accepting this commitment  during the rollover process
-    /*
-        ICommitmentRolloverLoan.AcceptCommitmentArgs
-            memory commitmentArgs = ICommitmentRolloverLoan
-                .AcceptCommitmentArgs({
-                    commitmentId: commitmentId,
-                    principalAmount: commitmentPrincipalAmount,
-                    collateralAmount: 1,
-                    collateralTokenId: 0,
-                    collateralTokenAddress: address(erc721Token),
-                    interestRate: interestRate,
-                    loanDuration: duration
-                });
-
-        uint256 _timestamp = block.timestamp;
-        */
-
-       /* int256 rolloverAmount = commitmentRolloverLoan.calculateRolloverAmount(
-            loanId,
-            commitmentArgs,
-            _timestamp
-        );
-
-        assertEq(rolloverAmount, 65 * 1e16, "Unexpected rollover amount");
-    */
-
+ 
 
     
     }

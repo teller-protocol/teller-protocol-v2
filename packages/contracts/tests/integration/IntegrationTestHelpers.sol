@@ -7,6 +7,9 @@ import "../../contracts/EAS/TellerAS.sol";
 import "../../contracts/EAS/TellerASEIP712Verifier.sol";
 import "../../contracts/EAS/TellerASRegistry.sol";
 
+import "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
+import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
+
 import { MarketRegistry } from "../../contracts/MarketRegistry.sol";
 import { EscrowVault } from "../../contracts/EscrowVault.sol";
 import { LenderManager } from "../../contracts/LenderManager.sol";
@@ -42,15 +45,22 @@ library IntegrationTestHelpers {
                 address(tellerV2),
                 address(_marketRegistry)
             );
+
+        CollateralEscrowV1 escrowImplementation = new CollateralEscrowV1();
+        // Deploy beacon contract with implementation
+        UpgradeableBeacon escrowBeacon = new UpgradeableBeacon(
+            address(escrowImplementation)
+        );
+
         CollateralManager _collateralManager = new CollateralManager();
         LenderManager _lenderManager = new LenderManager(
             IMarketRegistry(_marketRegistry)
         );
         EscrowVault _escrowVault = new EscrowVault();
 
-        CollateralEscrowV1 collateralEscrowBeacon = new CollateralEscrowV1();
+       
         _collateralManager.initialize(
-            address(collateralEscrowBeacon),
+            address(escrowBeacon),
             address(tellerV2)
         );
         _lenderManager.initialize();

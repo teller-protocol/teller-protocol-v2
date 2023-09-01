@@ -110,11 +110,12 @@ contract LenderCommitmentForwarder_Integration_Test is Testable {
 
        // wethMock.transfer(address(commitmentRolloverLoan), 100);
 
-        vm.prank(address(borrower));
+       
 
         address collateralManager = address(tellerV2.collateralManager());
-        erc721Token.setApprovalForAll(address(collateralManager), true);
-
+       // erc721Token.setApprovalForAll(address(collateralManager), true);
+        vm.prank(address(borrower));
+         erc721Token.approve(address(collateralManager), 0);
     
         Collateral[] memory collateral = new Collateral[](1);
 
@@ -201,6 +202,10 @@ contract LenderCommitmentForwarder_Integration_Test is Testable {
 
         assertEq(rolloverAmount, 65 * 1e16, "Unexpected rollover amount");
     */
+
+
+
+      //accept commitment and make sure the collateral is moved 
     
     }
 

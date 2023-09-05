@@ -1,4 +1,9 @@
-import { getNetworkConfig, listNetworks } from "../utils/config";
+import { Logger } from "../../utils/logger";
+import {
+  getNetworkConfig,
+  INetworkConfig,
+  listNetworks
+} from "../utils/config";
 
 import { makeAws } from "./aws";
 import { makeStudio } from "./studio";
@@ -30,6 +35,7 @@ export interface ISubgraph {
   network: string;
   graphNetwork: string;
   api: API;
+  config: INetworkConfig;
 }
 
 export interface InnerAPI {
@@ -52,7 +58,11 @@ export interface API extends InnerAPI {
   ) => Promise<VersionUpdate>;
 }
 
-export const getSubgraphs = async (): Promise<ISubgraph[]> => {
+export const getSubgraphs = async ({
+  logger
+}: {
+  logger?: Logger;
+}): Promise<ISubgraph[]> => {
   const networks = await listNetworks();
   const subgraphs: ISubgraph[] = [];
   for (const network of networks) {
@@ -66,14 +76,14 @@ export const getSubgraphs = async (): Promise<ISubgraph[]> => {
         innerApi = await makeStudio({
           name: networkConfig.name,
           network: networkConfig.network,
-          logger: networkConfig?.logger
+          logger
         });
         break;
       case "aws":
         innerApi = await makeAws({
           name: networkConfig.name,
           network: networkConfig.network,
-          logger: networkConfig?.logger
+          logger
         });
         break;
       default:
@@ -106,7 +116,8 @@ export const getSubgraphs = async (): Promise<ISubgraph[]> => {
             });
           });
         }
-      }
+      },
+      config: networkConfig
     });
   }
   return subgraphs;

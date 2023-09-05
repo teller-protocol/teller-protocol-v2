@@ -49,7 +49,14 @@ dataSources:
         - name: IERC20Metadata
           file: ../contracts/generated/artifacts/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol/IERC20Metadata.json
       blockHandlers:
-        - handler: handleBlock
+        - handler: handleActiveBids
+          filter:
+            kind: polling
+            every: 40
+        - handler: handleActiveCommitments
+          filter:
+            kind: polling
+            every: 20
       file: ./src/block-handler.ts
 {{/if}}
 {{#if contracts.teller_v2.enabled}}

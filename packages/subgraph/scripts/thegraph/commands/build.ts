@@ -8,10 +8,10 @@ export interface BuildArgs {
   subgraph: ISubgraph;
   grafting?: {
     base: string;
-    block: number;
+    block: number | string;
   };
   block_handler?: {
-    block: number;
+    block: number | string;
   };
   logger?: Logger;
 }

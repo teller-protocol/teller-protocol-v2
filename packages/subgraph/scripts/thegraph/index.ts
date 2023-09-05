@@ -39,7 +39,9 @@ const logger: Logger = {
 };
 
 export const run = async (): Promise<void> => {
-  let subgraphs = await getSubgraphs();
+  let subgraphs = await getSubgraphs({
+    logger
+  });
 
   const packageVersion = getPackageVersion();
   const answers = await prompts([
@@ -80,13 +82,7 @@ export const run = async (): Promise<void> => {
         {
           title: "Latest",
           value: "latest",
-          description:
-            "Double deployment (1st: NO block handler, 2nd: WITH block handler)"
-        },
-        {
-          title: "Latest + Block Handler",
-          value: "latest-block-handler",
-          description: "Single deployment"
+          description: "Fork latest version"
         },
         {
           title: "None",
@@ -172,6 +168,7 @@ const buildAndDeploySubgraphs = async ({
     })
   );
 
+  return;
   if (graftingType !== "latest-block-handler") {
     // make the next version a release if the previous one was missing
     const nextReleaseType =
@@ -247,12 +244,10 @@ const buildAndDeploy = async ({
       base: latestVersion.deploymentId,
       block: blockNumber
     };
-    if (graftingType === "latest-block-handler") {
-      args.block_handler = {
-        block: blockNumber
-      };
-    }
   }
+  args.block_handler = {
+    block: subgraph.config.contracts.teller_v2.block
+  };
 
   await mutex.runExclusive(async () => {
     const buildId = await build(args);

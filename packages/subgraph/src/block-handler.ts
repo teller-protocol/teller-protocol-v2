@@ -21,15 +21,15 @@ export function handleBlock(block: ethereum.Block): void {
   const mod = block.number.mod(BigInt.fromI32(10));
   switch (mod.toI32()) {
     case 0:
-      checkActiveBids(block);
+      handleActiveBids(block);
       break;
     case 1:
-      checkActiveCommitments(block);
+      handleActiveCommitments(block);
       break;
   }
 }
 
-export function checkActiveBids(block: ethereum.Block): void {
+export function handleActiveBids(block: ethereum.Block): void {
   const loans = loadLoanStatusCount("protocol", "v2");
   const pendingBids = loans.submitted;
   const lateLoans = loans.late;
@@ -74,7 +74,7 @@ export function checkActiveBids(block: ethereum.Block): void {
   }
 }
 
-export function checkActiveCommitments(block: ethereum.Block): void {
+export function handleActiveCommitments(block: ethereum.Block): void {
   const protocol = loadProtocol();
   const activeCommitments = protocol.activeCommitments;
   for (let i = 0; i < activeCommitments.length; i++) {

@@ -23,6 +23,10 @@ export interface INetworkConfig {
   network: string;
   export_network_name: string;
   product: "aws" | "studio";
+  studio: {
+    owner: string;
+    network: string;
+  };
   grafting:
     | {
         enabled: true;

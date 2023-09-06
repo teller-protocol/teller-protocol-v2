@@ -9,38 +9,52 @@ import { makeMemlet } from "memlet";
 
 import { Logger } from "../../utils/logger";
 import { SocketEmitter, SocketEvent } from "../../websocket/SocketEmitter";
+import { auth } from "../commands/auth";
 import * as websocket from "../ws";
 
-import { InnerAPI, SubgraphVersion, VersionUpdate } from "./index";
+import { IApiArgs, InnerAPI, SubgraphVersion, VersionUpdate } from "./index";
 
 const mutex = new Mutex();
 
-interface IStudioConfig {
+interface INetworkConfig {
   name: string;
   network: string;
+  owner: {
+    address: string;
+    network: string;
+  };
   socketEmitter?: SocketEmitter;
   logger?: Logger;
 }
 
+const Network: Record<string, number> = {
+  mainnet: 1,
+  "arbitrum-one": 42161
+};
+
 export const makeStudio = async (
-  studioConfig: IStudioConfig
+  networkConfig: INetworkConfig
 ): Promise<InnerAPI> => {
   const disklet = makeNodeDisklet(path.join(__dirname, "./config"));
   const memlet = makeMemlet(disklet);
 
   interface IConfig {
+    [owner: string]: IOwnerConfig | undefined;
+  }
+  interface IOwnerConfig {
     Cookie?: {
       value: string;
       expiration: string;
     };
+    deployKey?: string;
   }
   const getConfig = async (): Promise<IConfig> => {
     return await memlet.getJson("studio.json").catch(() => ({}));
   };
-  let config = await getConfig();
+  let studioConfig = await getConfig();
 
   const setConfig = async (_config: IConfig): Promise<void> => {
-    config = _config;
+    studioConfig = _config;
     await memlet.setJson("studio.json", _config);
   };
 
@@ -60,12 +74,16 @@ export const makeStudio = async (
       if (data.errors) {
         const messages = data.errors.map(e => {
           if (e.extensions.code === "UNAUTHENTICATED") {
-            config.Cookie = undefined;
-            void setConfig(config);
+            const prev = studioConfig[networkConfig.owner.address] ?? {};
+            studioConfig[networkConfig.owner.address] = {
+              ...prev,
+              Cookie: undefined
+            };
+            void setConfig(studioConfig);
           }
           return `\t* ${e.message}`;
         });
-        console.error(`Studio API errors:\n${messages}`);
+        networkConfig.logger?.error(`Studio API errors:\n${messages}`);
         // throw new AggregateError(
         //   data.errors,
         //   `Studio API errors:\n${messages}`
@@ -78,8 +96,8 @@ export const makeStudio = async (
   const socket = await websocket.create(
     "wss://api.studio.thegraph.com/graphql",
     {
-      emitter: studioConfig.socketEmitter,
-      logger: studioConfig.logger
+      emitter: networkConfig.socketEmitter,
+      logger: networkConfig.logger
     }
   );
 
@@ -95,17 +113,20 @@ export const makeStudio = async (
     return res.data.data.currentUser;
   };
 
-  const login = async (reauth = false): Promise<void> => {
+  const login = async (): Promise<void> => {
     await mutex.runExclusive(async () => {
       let cookie: string | null = null;
-      if (!reauth && config.Cookie) {
-        if (new Date(config.Cookie.expiration).getTime() > Date.now()) {
-          cookie = config.Cookie.value;
+      const Cookie = studioConfig[networkConfig.owner.address]?.Cookie;
+      if (Cookie) {
+        if (new Date(Cookie.expiration).getTime() > Date.now()) {
+          cookie = Cookie.value;
         } else {
-          console.log("Cookie expired, logging in again");
+          networkConfig.logger?.log("Cookie expired, logging in again");
         }
       } else {
-        console.log("Not logged in, attempting to log in via ledger...");
+        networkConfig.logger?.log(
+          "Not logged in, attempting to log in via ledger..."
+        );
       }
 
       if (!cookie) {
@@ -131,11 +152,11 @@ export const makeStudio = async (
         const login = await api.post("", {
           operationName: "login",
           variables: {
-            ethAddress: "0x1a76339211668a6939e1d6D13AB902bBef5D9ebc",
+            ethAddress: networkConfig.owner.address,
             message,
             signature,
             multisigOwnerAddress: address,
-            networkId: 42161
+            networkId: Network[networkConfig.owner.network]
           },
           query:
             "fragment AuthUserFragment on User { id } mutation login($ethAddress: String!, $message: String!, $signature: String!, $multisigOwnerAddress: String, $networkId: Int) { login(ethAddress: $ethAddress, message: $message, signature: $signature, multisigOwnerAddress: $multisigOwnerAddress, networkId: $networkId) { ...AuthUserFragment } }"
@@ -151,9 +172,13 @@ export const makeStudio = async (
             cookieRegex
           )!;
           await setConfig({
-            Cookie: {
-              value: cookieValue,
-              expiration: cookieExpiration
+            ...studioConfig,
+            [networkConfig.owner.address]: {
+              ...studioConfig[networkConfig.owner.address],
+              Cookie: {
+                value: cookieValue,
+                expiration: cookieExpiration
+              }
             }
           });
           cookie = cookieValue;
@@ -213,7 +238,7 @@ export const makeStudio = async (
     }>("", {
       operationName: "Subgraph",
       variables: {
-        name: studioConfig.name
+        name: networkConfig.name
       },
       query: `
       query Subgraph($name: String!) {
@@ -242,7 +267,7 @@ export const makeStudio = async (
     });
     const subgraph = response.data.data.subgraph;
     const latest = subgraph?.versions
-      ?.filter(v => v.network === studioConfig.network)
+      ?.filter(v => v.network === networkConfig.network && !v.failed)
       ?.sort((a, b) => b.id - a.id)?.[index];
     if (latest) {
       return {
@@ -264,7 +289,7 @@ export const makeStudio = async (
       unsubscribe: () => void
     ) => Promise<void> | void
   ): void => {
-    studioConfig.socketEmitter?.on(SocketEvent.CONNECTION_CLOSE, () => {
+    networkConfig.socketEmitter?.on(SocketEvent.CONNECTION_CLOSE, () => {
       watchVersionUpdate(versionId, cb);
     });
     return socket.subscribe({
@@ -286,19 +311,31 @@ export const makeStudio = async (
     });
   };
 
+  const apiArgs: IApiArgs = {
+    ipfs() {
+      return ["--ipfs", "https://api.thegraph.com/ipfs/api/v0"];
+    },
+    node() {
+      return [];
+    },
+    product() {
+      return ["--studio"];
+    }
+  };
+
   return {
     getLatestVersion,
     watchVersionUpdate,
-    args: {
-      ipfs() {
-        return ["--ipfs", "https://api.thegraph.com/ipfs/api/v0"];
-      },
-      node() {
-        return [];
-      },
-      product() {
-        return ["--studio"];
-      }
-    }
+    beforeDeploy: async () => {
+      const deployKey = studioConfig[networkConfig.owner.address]?.deployKey;
+      if (!deployKey) throw new Error("No deploy key found");
+
+      await auth({
+        apiArgs,
+        deployKey,
+        logger: networkConfig.logger
+      });
+    },
+    args: apiArgs
   };
 };

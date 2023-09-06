@@ -4,14 +4,15 @@
   "network": "matic",
   "export_network_name": "polygon",
   "product": "studio",
+  "studio": {
+    "owner": "0x1A2bAA2257343119FB03FD448622456a0c4f2190",
+    "network": "mainnet"
+  },
   "grafting": {
-    "enabled": true,
-    "base": "QmdF2fMcsYWaHQZxk6G1MAhdm1ea8BdV7bfGu9oCnZeatC",
-    "block": 46183705
+    "enabled": false
   },
   "block_handler": {
-    "enabled": true,
-    "block": 46183705
+    "enabled": false
   },
   "contracts": {
     "teller_v2": {

@@ -17,6 +17,8 @@ export const deploy = async (args: DeployArgs): Promise<void> => {
 
   logger?.log(`Deploying subgraph: ${subgraph.name} ${subgraph.network}`);
 
+  await subgraph.api.beforeDeploy?.();
+
   await runCmd(
     "yarn",
     [

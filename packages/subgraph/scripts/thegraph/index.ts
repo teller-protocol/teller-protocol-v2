@@ -35,7 +35,8 @@ const previousLog = progressBars.log.bind(progressBars);
 progressBars.log = (message: string) => previousLog(`${message}\n`);
 
 const logger: Logger = {
-  log: (msg: string) => progressBars.log(msg)
+  log: (msg: string) => progressBars.log(msg),
+  error: (msg: string) => progressBars.log(msg)
 };
 
 export const run = async (): Promise<void> => {
@@ -113,7 +114,7 @@ export const run = async (): Promise<void> => {
     subgraphs = answers.subgraphs;
 
     if (releaseType === "release") {
-      graftingType = "latest-block-handler";
+      graftingType = "latest";
     }
   }
 
@@ -168,18 +169,17 @@ const buildAndDeploySubgraphs = async ({
     })
   );
 
-  return;
-  if (graftingType !== "latest-block-handler") {
-    // make the next version a release if the previous one was missing
-    const nextReleaseType =
-      releaseType === "missing" ? "release" : "prerelease";
-
-    void buildAndDeploySubgraphs({
-      subgraphs: filteredSubgraphs,
-      releaseType: nextReleaseType,
-      graftingType: "latest-block-handler"
-    });
-  }
+  // if (graftingType !== "latest-block-handler") {
+  //   // make the next version a release if the previous one was missing
+  //   const nextReleaseType =
+  //     releaseType === "missing" ? "release" : "prerelease";
+  //
+  //   void buildAndDeploySubgraphs({
+  //     subgraphs: filteredSubgraphs,
+  //     releaseType: nextReleaseType,
+  //     graftingType: "latest-block-handler"
+  //   });
+  // }
 };
 
 const buildAndDeploy = async ({
@@ -234,8 +234,8 @@ const buildAndDeploy = async ({
       throw new Error(`Subgraph ${subgraph.name} has no latest version`);
     }
 
-    const updatedVersion = await waitForSync(latestVersion);
-    const blockNumber = updatedVersion.latestEthereumBlockNumber;
+    // const updatedVersion = await waitForSync(latestVersion);
+    const blockNumber = latestVersion.latestEthereumBlockNumber;
     if (blockNumber == null) {
       throw new Error(`Subgraph ${subgraph.name} has no latest block number`);
     }
@@ -246,15 +246,25 @@ const buildAndDeploy = async ({
     };
   }
   args.block_handler = {
-    block: subgraph.config.contracts.teller_v2.block
+    // block: subgraph.config.contracts.teller_v2.block
+    block: 4236870
   };
 
-  await mutex.runExclusive(async () => {
-    const buildId = await build(args);
-    await deploy({
-      subgraph,
-      newVersion: nextVersion,
-      logger
+  await mutex
+    .runExclusive(async () => {
+      const buildId = await build(args);
+      await deploy({
+        subgraph,
+        newVersion: nextVersion,
+        logger
+      });
+    })
+    .then(() => {
+      void subgraph.api.getLatestVersion().then(latestVersion => {
+        // TODO: there should always be a latest version
+        if (!latestVersion) return;
+
+        void waitForSync(latestVersion);
+      });
     });
-  });
 };

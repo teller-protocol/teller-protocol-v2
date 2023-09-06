@@ -6,11 +6,12 @@
   "product": "aws",
   "grafting": {
     "enabled": true,
-    "base": "QmbgXBkt6pMtg1vNZnPsNwtBa49KRyyy7RNHTdo7jD5mYk",
-    "block": 3487295
+    "base": "QmQZGb9ZszEMFY9oT3NpWAmmiEKyRw6fQuqCqd4vnRhMZZ",
+    "block": 3717569
   },
   "block_handler": {
-    "enabled": false
+    "enabled": true,
+    "block": 3717569
   },
   "contracts": {
     "teller_v2": {

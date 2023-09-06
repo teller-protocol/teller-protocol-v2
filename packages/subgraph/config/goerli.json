@@ -4,11 +4,18 @@
   "network": "goerli",
   "export_network_name": "goerli",
   "product": "studio",
+  "studio": {
+    "owner": "0x1A2bAA2257343119FB03FD448622456a0c4f2190",
+    "network": "mainnet"
+  },
   "grafting": {
-    "enabled": false
+    "enabled": true,
+    "base": "QmRT49FuVSk6yEjDH4VrMwQuiGTnDWTjUvV95LDWvHM8LZ",
+    "block": 9604199
   },
   "block_handler": {
-    "enabled": false
+    "enabled": true,
+    "block": 9604199
   },
   "contracts": {
     "teller_v2": {

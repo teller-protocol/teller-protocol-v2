@@ -3,7 +3,11 @@
   "name": "tellerv2-arbitrum",
   "network": "arbitrum-one",
   "export_network_name": "arbitrum-one",
-  "product": "aws",
+  "product": "studio",
+  "studio": {
+    "owner": "0x1A2bAA2257343119FB03FD448622456a0c4f2190",
+    "network": "mainnet"
+  },
   "grafting": {
     "enabled": false
   },

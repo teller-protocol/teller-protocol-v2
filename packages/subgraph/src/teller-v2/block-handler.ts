@@ -1,33 +1,15 @@
-import { ethereum, BigInt } from "@graphprotocol/graph-ts";
+import { ethereum } from "@graphprotocol/graph-ts";
 
-import { Bid, Commitment } from "../generated/schema";
-
+import { Bid } from "../../generated/schema";
 import {
   BidStatus,
   isBidDefaulted,
   isBidDueSoon,
   isBidExpired,
   isBidLate
-} from "./helpers/bid";
-import { loadLoanStatusCount, loadProtocol } from "./helpers/loaders";
-import { updateBidStatus } from "./helpers/updaters";
-import {
-  updateAvailableTokensFromCommitment,
-  updateCommitmentStatus
-} from "./lender-commitment/updaters";
-import { CommitmentStatus } from "./lender-commitment/utils";
-
-export function handleBlock(block: ethereum.Block): void {
-  const mod = block.number.mod(BigInt.fromI32(10));
-  switch (mod.toI32()) {
-    case 0:
-      handleActiveBids(block);
-      break;
-    case 1:
-      handleActiveCommitments(block);
-      break;
-  }
-}
+} from "../helpers/bid";
+import { loadLoanStatusCount } from "../helpers/loaders";
+import { updateBidStatus } from "../helpers/updaters";
 
 export function handleActiveBids(block: ethereum.Block): void {
   const loans = loadLoanStatusCount("protocol", "v2");
@@ -70,22 +52,6 @@ export function handleActiveBids(block: ethereum.Block): void {
 
     if (isBidDefaulted(bid, block.timestamp)) {
       updateBidStatus(bid, BidStatus.Defaulted);
-    }
-  }
-}
-
-export function handleActiveCommitments(block: ethereum.Block): void {
-  const protocol = loadProtocol();
-  const activeCommitments = protocol.activeCommitments;
-  for (let i = 0; i < activeCommitments.length; i++) {
-    const commitmentId = protocol.activeCommitments[i];
-    const commitment = Commitment.load(commitmentId)!;
-
-    // TODO: check the lender's token balance + allowance
-
-    if (commitment.expirationTimestamp.lt(block.timestamp)) {
-      updateCommitmentStatus(commitment, CommitmentStatus.Expired);
-      updateAvailableTokensFromCommitment(commitment);
     }
   }
 }

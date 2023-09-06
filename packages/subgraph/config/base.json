@@ -4,14 +4,18 @@
   "network": "base",
   "export_network_name": "base",
   "product": "studio",
+  "studio": {
+    "owner": "0x1A2bAA2257343119FB03FD448622456a0c4f2190",
+    "network": "mainnet"
+  },
   "grafting": {
     "enabled": true,
-    "base": "QmTqWN6ATskq7DZVLfqZHRDT1zpD9DzoWd3pPKvEKV4ECm",
-    "block": 2972057
+    "base": "QmYid6Xraxe4rNycXN8dvHxwLZgrJKE5etspBsU6ngG6Q7",
+    "block": 3281862
   },
   "block_handler": {
     "enabled": true,
-    "block": 2972057
+    "block": 3281862
   },
   "contracts": {
     "teller_v2": {

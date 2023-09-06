@@ -4,14 +4,16 @@
   "network": "mainnet",
   "export_network_name": "mainnet",
   "product": "studio",
+  "studio": {
+    "owner": "0x1a76339211668a6939e1d6D13AB902bBef5D9ebc",
+    "network": "arbitrum-one"
+  },
   "grafting": {
-    "enabled": true,
-    "base": "QmSSuE7ucnyiQrkQrMCEpbHus3U4rC1VvwsBGwVYTeH1fo",
-    "block": 15094704
+    "enabled": false
   },
   "block_handler": {
     "enabled": true,
-    "block": 15094704
+    "block": 18078399
   },
   "contracts": {
     "teller_v2": {

@@ -45,11 +45,14 @@ export interface InnerAPI {
 
   watchVersionUpdate: (versionId: number, cb: VersionUpdateCallback) => void;
 
-  args: {
-    ipfs: () => string[];
-    node: () => string[];
-    product: () => string[];
-  };
+  beforeDeploy?: () => Promise<void>;
+
+  args: IApiArgs;
+}
+export interface IApiArgs {
+  ipfs: () => string[];
+  node: () => string[];
+  product: () => string[];
 }
 export interface API extends InnerAPI {
   waitForVersionSync: (
@@ -76,6 +79,10 @@ export const getSubgraphs = async ({
         innerApi = await makeStudio({
           name: networkConfig.name,
           network: networkConfig.network,
+          owner: {
+            address: networkConfig.studio.owner,
+            network: networkConfig.studio.network
+          },
           logger
         });
         break;

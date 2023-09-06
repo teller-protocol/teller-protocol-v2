@@ -352,12 +352,14 @@ extendEnvironment((hre) => {
           `No deployment exists for ${name}. If expected, supply an address (config.at)`
         )
 
-      let signer: Signer | undefined
+      let signer: Signer
       if (config?.from) {
         signer =
           typeof config.from === 'string'
             ? await ethers.provider.getSigner(config.from)
             : config.from
+      } else {
+        signer = await hre.getNamedSigner('deployer')
       }
       const contract = await ethers.getContractAt(abi, address, signer)
 
@@ -397,7 +399,13 @@ extendEnvironment((hre) => {
 
   hre.getNamedSigner = async (name: string): Promise<Signer> => {
     const accounts = await hre.getNamedAccounts()
-    return await ethers.provider.getSigner(accounts[name])
+    const signer = await ethers.provider.getSigner(accounts[name])
+    // NOTE: This is a workaround for the gas estimation bug on Mantle RPC nodes
+    if (typeof hre.network.config.gas === 'number') {
+      signer.provider.estimateGas = () =>
+        Promise.resolve(BigInt(hre.network.config.gas))
+    }
+    return signer
   }
 
   hre.evm = {
@@ -1096,8 +1104,10 @@ async function ozDefenderDeploy<C = BaseContract>(
   hre.log('')
 
   let proxy: BaseContract
+  const deployer = await hre.getNamedSigner('deployer')
   const implFactory = await hre.ethers.getContractFactory(contractName, {
     libraries: opts.libraries,
+    signer: deployer,
   })
   const existingDeployment = await hre.deployments.getOrNull(saveName)
   if (existingDeployment) {
@@ -1107,7 +1117,8 @@ async function ozDefenderDeploy<C = BaseContract>(
 
     proxy = await hre.ethers.getContractAt(
       contractName,
-      existingDeployment.address
+      existingDeployment.address,
+      deployer
     )
   } else {
     hre.log(`${chalk.bold.green(`Deploying new ${deployType}...`)}`, {

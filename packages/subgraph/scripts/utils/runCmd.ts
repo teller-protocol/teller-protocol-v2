@@ -10,23 +10,28 @@ export const runCmd = (
   opts?: RunCmdOptions
 ): Promise<void> => {
   return new Promise((resolve, reject) => {
-    const build = spawn(cmd, args, { stdio: "pipe" });
+    const childProcess = spawn(cmd, args, { stdio: "pipe" });
+
+    let output = "";
+
     const onData = (data: any, stream: NodeJS.WritableStream): void => {
-      const str = data.toString();
-      if (str.includes("Error:")) return reject(`\n${str}`);
+      const str: string = data.toString();
+      output += str;
+      if (/Error:/i.test(str))
+        return reject(`\n\n\n\nCommand: ${cmd} ${args.join(" ")}\n\n${output}`);
       opts?.onData?.(str);
       !opts?.disableEcho && stream.write(data);
     };
-    build.stdout.on("data", data => {
+    childProcess.stdout.on("data", data => {
       onData(data, process.stdout);
     });
-    build.stderr.on("data", data => {
+    childProcess.stderr.on("data", data => {
       onData(data, process.stderr);
     });
-    build.on("error", error => {
+    childProcess.on("error", error => {
       reject(error);
     });
-    build.on("close", () => {
+    childProcess.on("close", () => {
       resolve();
     });
   });

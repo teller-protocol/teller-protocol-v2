@@ -526,9 +526,37 @@ contract TellerV2_bids_test is Testable {
         lendingToken.approve(address(tellerV2), 1e20);
 
         tellerV2._repayLoanSuper(bidId, payment, 100, false);
+
+        BidState bidStateAfter = tellerV2.getBidState(bidId);
+
+        require(bidStateAfter == BidState.PAID, "Should set state to PAID");
     }
 
-    //NEED TO TEST MORE BRANCHES OF TEST_REPAY_LOAN_INTERNAL
+    function test_repay_loan_internal_leave_state_as_liquidated() public {
+        uint256 bidId = 1;
+        setMockBid(bidId);
+
+        //set address(this) as the account that will be paying off the loan
+        tellerV2.setMockMsgSenderForMarket(address(this));
+
+        tellerV2.setReputationManagerSuper(address(reputationManagerMock));
+
+        tellerV2.mock_setBidState(bidId, BidState.LIQUIDATED);
+        vm.warp(2000);
+
+        Payment memory payment = Payment({ principal: 90, interest: 10 });
+
+        lendingToken.approve(address(tellerV2), 1e20);
+
+        tellerV2._repayLoanSuper(bidId, payment, 100, false);
+
+        BidState bidStateAfter = tellerV2.getBidState(bidId);
+
+        require(
+            bidStateAfter == BidState.LIQUIDATED,
+            "Should retain state as LIQUIDATED"
+        );
+    }
 
     function test_repay_loan_minimum() public {
         uint256 bidId = 1;
@@ -699,6 +727,13 @@ contract TellerV2_bids_test is Testable {
         tellerV2.liquidateLoanFull(bidId);
 
         assertTrue(tellerV2.repayLoanWasCalled(), "repay loan was not called");
+
+        BidState bidStateAfter = tellerV2.getBidState(bidId);
+
+        require(
+            bidStateAfter == BidState.LIQUIDATED,
+            "invalid bid state after liquidate loan full"
+        );
     }
 
     function test_liquidate_loan_full_invalid_state() public {

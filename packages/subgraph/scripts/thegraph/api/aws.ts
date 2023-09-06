@@ -1,70 +1,25 @@
-import * as path from "path";
-
-import axios, { Axios } from "axios";
-import { makeNodeDisklet } from "disklet";
-import { makeMemlet } from "memlet";
+import axios from "axios";
 
 import { Logger } from "../../utils/logger";
-import { getNetworkFromName } from "../utils/getNetworkFromName";
 
 import { InnerAPI, SubgraphVersion, VersionUpdate } from "./index";
-
-const disklet = makeNodeDisklet(path.join(__dirname, "./config"));
-const memlet = makeMemlet(disklet);
-
-interface IConfig {
-  Cookie?: {
-    value: string;
-    expiration: string;
-  };
-}
-const getConfig = async (): Promise<IConfig> => {
-  return await memlet.getJson("aws.json").catch(() => ({}));
-};
-
-const setConfig = async (_config: IConfig): Promise<void> => {
-  await memlet.setJson("aws.json", _config);
-};
 
 enum Version {
   pending,
   current
 }
 
-const getDomain = (name: string): string => {
-  const subdomain = name.endsWith("-testnet") ? "testnet." : "";
-  return `${subdomain}mantle.xyz`;
-};
-
-const _apis = new Map<string, Axios>([
-  [
-    "tellerv2-mantle-testnet",
-    axios.create({
-      baseURL: "https://graph.testnet.mantle.xyz/graphql",
-      withCredentials: true
-    })
-  ]
-]);
-const getApi = (name: string): Axios => {
-  const api = _apis.get(name);
-  if (!api) {
-    throw new Error(`No API for subgraph ${name}`);
-  }
-  return api;
-};
-
-interface IMantleConfig {
+interface ISubgraphConfig {
+  name: string;
+  network: string;
   logger?: Logger;
 }
 
-export const makeMantle = async (
-  mantleConfig?: IMantleConfig
-): Promise<InnerAPI> => {
-  const config = await getConfig();
-
-  const getSubgraphs = async (): Promise<string[]> => {
-    return Array.from(_apis.keys());
-  };
+export const makeAws = async (config: ISubgraphConfig): Promise<InnerAPI> => {
+  const api = axios.create({
+    baseURL: `https://indexer.subgraph.teller.org/graphql`,
+    withCredentials: true
+  });
 
   interface ISubgraphIndexingStatus {
     subgraph: string;
@@ -88,16 +43,16 @@ export const makeMantle = async (
     };
     chains: Array<{
       network: string;
-      chainHeadBlock: {
+      chainHeadBlock?: {
         number: string;
       };
-      earliestBlock: {
+      earliestBlock?: {
         number: string;
       };
-      latestBlock: {
+      latestBlock?: {
         number: string;
       };
-      lastHealthyBlock: {
+      lastHealthyBlock?: {
         number: string;
       };
     }>;
@@ -105,27 +60,25 @@ export const makeMantle = async (
     node: string;
   }
   const getLatestVersion = async (
-    name: string,
     index = Version.pending
   ): Promise<SubgraphVersion | undefined> => {
     if (index > Version.current) return;
 
-    const version = await getVersion(name, index);
+    const version = await getVersion(index);
     if (!version) {
-      return await getVersion(name, index + 1);
+      return await getVersion(index + 1);
     }
     return version;
   };
 
   const getVersion = async (
-    name: string,
     versionId: Version
   ): Promise<SubgraphVersion | undefined> => {
-    const response = await getApi(name).post<{
+    const response = await api.post<{
       data: { version: ISubgraphIndexingStatus };
     }>("", {
       variables: {
-        subgraphName: name
+        subgraphName: config.name
       },
       query: `
       query Subgraph($subgraphName: String!) {
@@ -166,17 +119,17 @@ export const makeMantle = async (
     });
     const indexingStatus = response.data?.data?.version;
     if (indexingStatus) {
-      const _network = getNetworkFromName(name);
-      const network = _network.replace("mantle-testnet", "testnet");
       const chain = indexingStatus.chains.find(
-        chain => chain.network === network
+        chain => chain.network === config.network
       );
-      if (!chain) throw new Error(`Invalid chain: ${network}`);
+      if (!chain) throw new Error(`Invalid chain: ${config.network}`);
       return {
         id: versionId,
         deploymentId: indexingStatus.subgraph,
-        latestEthereumBlockNumber: parseInt(chain.latestBlock.number),
-        totalEthereumBlocksCount: parseInt(chain.chainHeadBlock.number),
+        latestEthereumBlockNumber:
+          chain.latestBlock && parseInt(chain.latestBlock.number),
+        totalEthereumBlocksCount:
+          chain.chainHeadBlock && parseInt(chain.chainHeadBlock.number),
         failed: indexingStatus.health === "failed",
         synced: indexingStatus.synced
       };
@@ -184,7 +137,6 @@ export const makeMantle = async (
   };
 
   const watchVersionUpdate = (
-    name: string,
     versionId: Version,
     _cb: (
       version: VersionUpdate,
@@ -192,8 +144,12 @@ export const makeMantle = async (
     ) => Promise<void> | void
   ): void => {
     const intervalId = setInterval(() => {
-      void getVersion(name, versionId).then(version => {
-        if (version) {
+      void getVersion(versionId).then(version => {
+        if (
+          version &&
+          version.latestEthereumBlockNumber !== undefined &&
+          version.totalEthereumBlocksCount !== undefined
+        ) {
           void _cb(
             {
               latestEthereumBlockNumber: version.latestEthereumBlockNumber,
@@ -209,17 +165,16 @@ export const makeMantle = async (
   };
 
   return {
-    getSubgraphs,
     getLatestVersion,
     watchVersionUpdate,
     args: {
-      ipfs(name: string) {
-        return ["--ipfs", `https://ipfs.${getDomain(name)}`];
+      ipfs() {
+        return ["--ipfs", `https://ipfs.subgraph.teller.org`];
       },
-      node(name: string) {
-        return ["--node", `https://graph.${getDomain(name)}/deploy`];
+      node() {
+        return ["--node", `https://api.subgraph.teller.org/deploy`];
       },
-      product(name: string) {
+      product() {
         return [];
       }
     }

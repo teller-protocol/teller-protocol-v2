@@ -3,10 +3,13 @@ pragma solidity ^0.8.0;
 import { Testable } from "../../../Testable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
+
+
 import { FlashRolloverLoan } from "../../../../contracts/LenderCommitmentForwarder/extensions/FlashRolloverLoan.sol";
 
 import "../../../../contracts/interfaces/ICommitmentRolloverLoan.sol";
 import "../../../../contracts/interfaces/ILenderCommitmentForwarder.sol";
+import "../../../../contracts/interfaces/IFlashRolloverLoan.sol";
 
 import "../../../integration/IntegrationTestHelpers.sol";
 
@@ -231,7 +234,7 @@ contract FlashRolloverLoan_Unit_Test is Testable {
         address initiator = address(flashRolloverLoan);
 
         bytes memory flashData = abi.encode(
-            FlashRolloverLoan.RolloverCallbackArgs({
+            IFlashRolloverLoan.RolloverCallbackArgs({
                 loanId: loanId,
                 borrower: address(borrower),
                 borrowerAmount: borrowerAmount,
@@ -316,7 +319,7 @@ contract FlashRolloverLoan_Unit_Test is Testable {
         address initiator = address(this);
 
         bytes memory flashData = abi.encode(
-            FlashRolloverLoan.RolloverCallbackArgs({
+            IFlashRolloverLoan.RolloverCallbackArgs({
                 loanId: loanId,
                 borrower: address(borrower),
                 borrowerAmount: borrowerAmount,
@@ -396,7 +399,7 @@ contract FlashRolloverLoan_Unit_Test is Testable {
         address initiator = address(this);
 
         bytes memory flashData = abi.encode(
-            FlashRolloverLoan.RolloverCallbackArgs({
+            IFlashRolloverLoan.RolloverCallbackArgs({
                 loanId: loanId,
                 borrower: address(borrower),
                 borrowerAmount: borrowerAmount,

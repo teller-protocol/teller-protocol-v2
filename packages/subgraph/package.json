@@ -1,7 +1,7 @@
 {
   "name": "@teller-protocol/v2-subgraph",
   "license": "UNLICENSED",
-  "version": "0.4.17-10",
+  "version": "0.4.20-11",
   "scripts": {
     "deploy:prompt": "ts-node scripts/thegraph",
     "create-local": "graph create --node http://localhost:8020/ teller-v2",
@@ -9,13 +9,14 @@
     "reset-local": "yarn remove-local && yarn create-local",
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 teller-v2",
     "test": "yarn graph test",
-    "format": "eslint './src/**/*.ts' --fix"
+    "format": "eslint './src/**/*.ts' --fix",
+    "ts-node": "ts-node --project ./scripts/tsconfig.json"
   },
   "dependencies": {
     "mustache": "^4.2.0"
   },
   "devDependencies": {
-    "@graphprotocol/graph-cli": "^0.55.0",
+    "@graphprotocol/graph-cli": "^0.57.0",
     "@graphprotocol/graph-ts": "^0.31.0",
     "@ledgerhq/hw-app-eth": "^6.34.0",
     "@ledgerhq/hw-transport-node-hid": "^6.27.19",

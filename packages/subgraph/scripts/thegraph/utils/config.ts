@@ -17,13 +17,55 @@ export const listNetworks = async (): Promise<string[]> => {
   }, []);
 };
 
-export const getNetworkConfig = (network: string): Promise<any> => {
+export interface INetworkConfig {
+  enabled: boolean;
+  name: string;
+  network: string;
+  export_network_name: string;
+  product: "aws" | "studio" | "local";
+  studio: {
+    owner: string;
+    network: string;
+  };
+  grafting:
+    | {
+        enabled: true;
+        base: string;
+        block: string | number;
+      }
+    | {
+        enabled: false;
+      };
+  block_handler:
+    | {
+        enabled: true;
+        block: string | number;
+      }
+    | {
+        enabled: false;
+      };
+  contracts: {
+    teller_v2: INetworkContractConfig;
+    market_registry: INetworkContractConfig;
+    lender_commitment: INetworkContractConfig;
+    collateral_manager: INetworkContractConfig;
+    lender_manager: INetworkContractConfig;
+    market_liquidity_rewards: INetworkContractConfig;
+  };
+}
+interface INetworkContractConfig {
+  enabled: boolean;
+  address: string;
+  block: string;
+}
+
+export const getNetworkConfig = (network: string): Promise<INetworkConfig> => {
   return memlet.getJson(`${network}.json`);
 };
 
 export const setNetworkConfig = async (
   network: string,
-  config: any
+  config: INetworkConfig
 ): Promise<void> => {
   await memlet.setJson(`${network}.json`, config);
 };

@@ -156,9 +156,7 @@ export function updateCommitmentStatus(
         commitmentZScore.id
       );
       break;
-    case CommitmentStatus.Deleted:
-    case CommitmentStatus.Drained:
-    case CommitmentStatus.Expired:
+    default:
       removeCommitmentToProtocol(commitment);
       marketCommitments.commitmentZScores = removeFromArray(
         marketCommitments.commitmentZScores,
@@ -273,25 +271,43 @@ function removeCommitmentToProtocol(commitment: Commitment): void {
   protocol.save();
 }
 
+function minBigInt(ints: BigInt[]): BigInt {
+  let min = ints[0];
+  for (let i = 1; i < ints.length; i++) {
+    if (ints[i].lt(min)) {
+      min = ints[i];
+    }
+  }
+  return min;
+}
+
 // TODO: Need to account for the case where the collateral token changes
 export function updateAvailableTokensFromCommitment(
   commitment: Commitment
 ): void {
-  const availableAmount = commitment.maxPrincipal.minus(
+  const availableCommittedAmount = commitment.maxPrincipal.minus(
     commitment.acceptedPrincipal
   );
+  const availableAmount = minBigInt([
+    availableCommittedAmount,
+    commitment.lenderPrincipalAllowance,
+    commitment.lenderPrincipalBalance
+  ]);
 
   let committedAmountDiff: BigInt;
-  if (commitmentStatusToEnum(commitment.status) == CommitmentStatus.Active) {
-    committedAmountDiff = availableAmount.minus(commitment.committedAmount);
-  } else {
-    committedAmountDiff = availableAmount.neg();
+  switch (commitmentStatusToEnum(commitment.status)) {
+    case CommitmentStatus.Active:
+      committedAmountDiff = availableAmount.minus(commitment.committedAmount);
+      break;
+    default:
+      committedAmountDiff = commitment.committedAmount.neg();
+      break;
   }
 
-  commitment.committedAmount = availableAmount;
-  commitment.save();
+  if (!committedAmountDiff.isZero()) {
+    commitment.committedAmount = availableAmount;
+    commitment.save();
 
-  if (!committedAmountDiff.equals(BigInt.zero())) {
     const tokenVolumes = getTokenVolumesFromCommitment(commitment);
     for (let i = 0; i < tokenVolumes.length; i++) {
       const tokenVolume = tokenVolumes[i];

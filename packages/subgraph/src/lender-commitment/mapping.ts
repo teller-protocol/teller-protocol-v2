@@ -94,9 +94,22 @@ export function handleExercisedCommitment(event: ExercisedCommitment): void {
     BigInt.fromString(commitment.id)
   );
   // function only exists after an upgrade
-  commitment.acceptedPrincipal = acceptedPrincipalResult.reverted
-    ? BigInt.zero()
-    : acceptedPrincipalResult.value;
+  if (acceptedPrincipalResult.reverted) {
+    // keep track of old accepted principal
+    commitment._oldAcceptedPrincipal = commitment._oldAcceptedPrincipal.plus(
+      event.params.tokenAmount
+    );
+  } else {
+    commitment._newAcceptedPrincipal = acceptedPrincipalResult.value;
+    commitment.acceptedPrincipal = acceptedPrincipalResult.value;
+
+    // Link commitment to bid (only after accepted amount is tracked on-chain)
+    //   - Bids created before the upgrade will not be linked as they skew the calculated available amount
+    const bid: Bid = loadBidById(event.params.bidId);
+    bid.commitment = commitment.id;
+    bid.commitmentId = commitment.id;
+    bid.save();
+  }
 
   const availableAmount = commitment.maxPrincipal.minus(
     commitment.acceptedPrincipal
@@ -106,13 +119,6 @@ export function handleExercisedCommitment(event: ExercisedCommitment): void {
   }
 
   updateAvailableTokensFromCommitment(commitment);
-
-  // Link commitment to bid
-  const bid: Bid = loadBidById(event.params.bidId);
-  bid.commitment = commitment.id;
-  bid.commitmentId = commitment.id;
-
-  bid.save();
   commitment.save();
 }
 

@@ -6,6 +6,7 @@ import {
 } from "../utils/config";
 
 import { makeAws } from "./aws";
+import { makeLocal } from "./local";
 import { makeStudio } from "./studio";
 
 export interface SubgraphVersion {
@@ -88,6 +89,13 @@ export const getSubgraphs = async ({
         break;
       case "aws":
         innerApi = await makeAws({
+          name: networkConfig.name,
+          network: networkConfig.network,
+          logger
+        });
+        break;
+      case "local":
+        innerApi = await makeLocal({
           name: networkConfig.name,
           network: networkConfig.network,
           logger

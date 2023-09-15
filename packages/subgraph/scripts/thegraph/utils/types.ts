@@ -10,7 +10,7 @@ export const isReleaseType = (_type: string): _type is ReleaseType => {
   );
 };
 
-export type GraftingType = "latest" | "none";
+export type GraftingType = "latest" | "latest-synced" | "none";
 export const isGraftingType = (_type: string): _type is GraftingType => {
-  return ["latest", "none"].includes(_type);
+  return ["latest", "latest-synced", "none"].includes(_type);
 };

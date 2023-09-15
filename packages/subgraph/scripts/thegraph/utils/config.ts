@@ -22,7 +22,7 @@ export interface INetworkConfig {
   name: string;
   network: string;
   export_network_name: string;
-  product: "aws" | "studio";
+  product: "aws" | "studio" | "local";
   studio: {
     owner: string;
     network: string;

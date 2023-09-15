@@ -33,7 +33,7 @@ dataSources:
     {{/with}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - Bid
@@ -59,7 +59,7 @@ dataSources:
     {{/with}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - Bid
@@ -78,22 +78,18 @@ dataSources:
         - name: IERC20Metadata
           file: ../contracts/generated/artifacts/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol/IERC20Metadata.json
       eventHandlers:
-        # TODO: add MarketForwarderApproved event for Lender entity
-
         - event: SubmittedBid(indexed uint256,indexed address,address,indexed bytes32)
           handler: handleSubmittedBid
         - event: AcceptedBid(indexed uint256,indexed address)
           handler: handleAcceptedBid
         - event: CancelledBid(indexed uint256)
           handler: handleCancelledBid
-
         - event: LoanLiquidated(indexed uint256,indexed address)
           handler: handleLoanLiquidated
         - event: LoanRepayment(indexed uint256)
           handler: handleLoanRepayment
         - event: LoanRepaid(indexed uint256)
           handler: handleLoanRepaid
-
         - event: FeePaid(indexed uint256,indexed string,indexed uint256)
           handler: handleFeePaid
       file: ./src/mapping.ts
@@ -107,7 +103,7 @@ dataSources:
       startBlock: {{block_handler.block}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - Protocol
@@ -144,7 +140,7 @@ dataSources:
     {{/with}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - MarketPlace
@@ -168,7 +164,7 @@ dataSources:
     {{/with}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - MarketPlace
@@ -224,7 +220,7 @@ dataSources:
     {{/with}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - Commitment
@@ -256,24 +252,24 @@ dataSources:
     name: LenderCommitmentForwarder_ActiveCommitments
     network: {{network}}
     source:
-      address: '{{contracts.teller_v2.address}}'
-      abi: TellerV2
-      startBlock: {{block_handler.block}}
+    {{#with contracts.lender_commitment}}
+      address: '{{address}}'
+      abi: LenderCommitmentForwarder
+      startBlock: {{block}}
+    {{/with}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
-        - Protocol
-        - LoanStatusCount
-        - TokenVolume
+        - Commitment
         - Token
-        - Bid
+        - TokenVolume
+        - CollateralPairTokenVolume
+        - LoanStatusCount
       abis:
-        - name: TellerV2
-          file: ./abis/{{export_network_name}}_TellerV2.json
-        - name: TellerV0Storage
-          file: ../contracts/generated/artifacts/contracts/TellerV0Storage.sol/TellerV0Storage.json
+        - name: LenderCommitmentForwarder
+          file: ./abis/{{export_network_name}}_LenderCommitmentForwarder.json
         - name: ERC165
           file: ../contracts/generated/artifacts/@openzeppelin/contracts/utils/introspection/ERC165.sol/ERC165.json
         - name: IERC20Metadata
@@ -282,7 +278,7 @@ dataSources:
         - handler: handleActiveCommitments
           filter:
             kind: polling
-            every: 20
+            every: 30
       file: ./src/lender-commitment/block-handler.ts
   {{/if}}
 {{/if}}
@@ -298,7 +294,7 @@ dataSources:
     {{/with}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - Bid
@@ -338,7 +334,7 @@ dataSources:
     {{/with}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - RewardAllocation
@@ -374,7 +370,7 @@ dataSources:
     {{/with}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - Bid

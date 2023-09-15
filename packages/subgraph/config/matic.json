@@ -9,10 +9,13 @@
     "network": "mainnet"
   },
   "grafting": {
-    "enabled": false
+    "enabled": true,
+    "base": "Qmeq1bTBFvBkXGAaK7YyMToHfnmeo6kWC3Jmq51UioRuDN",
+    "block": "47490000"
   },
   "block_handler": {
-    "enabled": false
+    "enabled": true,
+    "block": "47490000"
   },
   "contracts": {
     "teller_v2": {

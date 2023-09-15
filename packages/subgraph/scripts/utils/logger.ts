@@ -1,12 +1,12 @@
 export interface Logger {
-  log: (msg: string) => void;
-  error: (msg: string) => void;
+  log: (msg?: string) => void;
+  error: (msg?: string) => void;
 }
 const logger: Logger = {
-  log: function(msg: string): void {
+  log: function(msg?: string): void {
     console.log(msg);
   },
-  error: function(msg: string): void {
+  error: function(msg?: string): void {
     console.error(msg);
   }
 };

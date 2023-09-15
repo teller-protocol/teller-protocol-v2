@@ -115,6 +115,8 @@ export const makeStudio = async (
 
   const login = async (): Promise<void> => {
     await mutex.runExclusive(async () => {
+      if (!socket.isConnected()) await socket.connect();
+
       let cookie: string | null = null;
       const Cookie = studioConfig[networkConfig.owner.address]?.Cookie;
       if (Cookie) {
@@ -258,9 +260,6 @@ export const makeStudio = async (
             synced
             publishStatus
           }
-        }
-        authUserSubgraphs {
-          name
         }
       }
     `

@@ -10,6 +10,7 @@ import "../../contracts/TellerV2Context.sol";
 
 import { Testable } from "../Testable.sol";
 import { LenderCommitmentForwarder } from "../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarder.sol";
+import { LenderCommitmentForwarderStaging } from "../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarderStaging.sol";
 
 import { Collateral, CollateralType } from "../../contracts/interfaces/escrow/ICollateralEscrowV1.sol";
 
@@ -19,7 +20,7 @@ import "../../contracts/mock/MarketRegistryMock.sol";
 
 contract LenderCommitmentForwarder_Test is
     Testable,
-    LenderCommitmentForwarder
+    LenderCommitmentForwarderStaging
 {
     LenderCommitmentForwarderTest_TellerV2Mock private tellerV2Mock;
     MarketRegistryMock mockMarketRegistry;

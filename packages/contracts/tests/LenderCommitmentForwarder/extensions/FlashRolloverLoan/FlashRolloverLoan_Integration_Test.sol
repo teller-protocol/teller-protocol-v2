@@ -20,7 +20,7 @@ import { MarketRegistryMock } from "../../../../contracts/mock/MarketRegistryMoc
 import { AavePoolAddressProviderMock } from "../../../../contracts/mock/aave/AavePoolAddressProviderMock.sol";
 import { AavePoolMock } from "../../../../contracts/mock/aave/AavePoolMock.sol";
 
-import { LenderCommitmentForwarder_G1 } from "../../../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarder.sol";
+import { LenderCommitmentForwarder_G1 } from "../../../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarder_G1.sol";
 
 import { LenderCommitmentForwarder_G2 } from "../../../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarder_G2.sol";
 

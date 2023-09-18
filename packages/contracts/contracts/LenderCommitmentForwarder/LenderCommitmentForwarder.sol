@@ -2,11 +2,11 @@ pragma solidity >=0.8.0 <0.9.0;
 // SPDX-License-Identifier: MIT
 
 // Contracts
-import "./TellerV2MarketForwarder.sol";
+import "../TellerV2MarketForwarder.sol";
 
 // Interfaces
-import "./interfaces/ICollateralManager.sol";
-import { Collateral, CollateralType } from "./interfaces/escrow/ICollateralEscrowV1.sol";
+import "../interfaces/ICollateralManager.sol";
+import { Collateral, CollateralType } from "../interfaces/escrow/ICollateralEscrowV1.sol";
 
 import "@openzeppelin/contracts-upgradeable/utils/structs/EnumerableSetUpgradeable.sol";
 

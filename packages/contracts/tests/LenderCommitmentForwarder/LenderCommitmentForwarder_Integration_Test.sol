@@ -96,7 +96,7 @@ contract LenderCommitmentForwarder_Integration_Test is Testable {
         wethMock.transfer(address(borrower), 5e18);
      
 
-        LenderCommitmentForwarder(address(lenderCommitmentForwarder))
+        LenderCommitmentForwarder_G2(address(lenderCommitmentForwarder))
             .initialize(address(this));
  
     }

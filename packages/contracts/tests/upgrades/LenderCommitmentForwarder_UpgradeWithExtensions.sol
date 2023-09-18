@@ -7,8 +7,8 @@ import "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
 import "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
 
 import "../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarder.sol";
-import "../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarder_G1.sol";
-import "../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarder_G2.sol";
+import {LenderCommitmentForwarder_G1} from "../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarder_G1.sol";
+import {LenderCommitmentForwarder_G2} from "../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarder_G2.sol";
 
 contract LenderCommitmentForwarder_UpgradeToG2 is Testable {
     ProxyAdmin internal admin;
@@ -36,7 +36,7 @@ contract LenderCommitmentForwarder_UpgradeToG2 is Testable {
     }
 
     function _createCommitment() internal returns (uint256 commitmentId_) {
-        LenderCommitmentForwarder.Commitment memory commitment;
+        LenderCommitmentForwarder_G1.Commitment memory commitment;
         commitment.marketId = 1;
         commitment.principalTokenAddress = address(123);
         commitment.maxPrincipal = 10_000_000;

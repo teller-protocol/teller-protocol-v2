@@ -7,7 +7,7 @@ import "../../contracts/TellerV2MarketForwarder.sol";
 
 import "../../contracts/TellerV2Context.sol";
 
-import { LenderCommitmentForwarder_G1 } from "../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarder.sol";
+import { LenderCommitmentForwarder_G1 } from "../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarder_G1.sol";
 
 import { Collateral, CollateralType } from "../../contracts/interfaces/escrow/ICollateralEscrowV1.sol";
 

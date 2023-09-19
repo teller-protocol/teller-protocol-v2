@@ -2,11 +2,10 @@ pragma solidity >=0.8.0 <0.9.0;
 // SPDX-License-Identifier: MIT
 
 // Contracts
-import "../TellerV2MarketForwarderStaging.sol";
+import "../TellerV2MarketForwarder.sol";
 
 // Interfaces
 import "../interfaces/ICollateralManager.sol";
-import "../interfaces/ILenderCommitmentForwarder.sol";
 import { Collateral, CollateralType } from "../interfaces/escrow/ICollateralEscrowV1.sol";
 
 import "@openzeppelin/contracts-upgradeable/utils/structs/EnumerableSetUpgradeable.sol";
@@ -16,11 +15,46 @@ import { MathUpgradeable } from "@openzeppelin/contracts-upgradeable/utils/math/
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20MetadataUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/cryptography/MerkleProofUpgradeable.sol";
 
-contract LenderCommitmentForwarder_G1 is
-    TellerV2MarketForwarderStaging,
-    ILenderCommitmentForwarder
-{
+contract LenderCommitmentForwarder is TellerV2MarketForwarder {
     using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
+
+    enum CommitmentCollateralType {
+        NONE, // no collateral required
+        ERC20,
+        ERC721,
+        ERC1155,
+        ERC721_ANY_ID,
+        ERC1155_ANY_ID,
+        ERC721_MERKLE_PROOF,
+        ERC1155_MERKLE_PROOF
+    }
+
+    /**
+     * @notice Details about a lender's capital commitment.
+     * @param maxPrincipal Amount of tokens being committed by the lender. Max amount that can be loaned.
+     * @param expiration Expiration time in seconds, when the commitment expires.
+     * @param maxDuration Length of time, in seconds that the lender's capital can be lent out for.
+     * @param minInterestRate Minimum Annual percentage to be applied for loans using the lender's capital.
+     * @param collateralTokenAddress The address for the token contract that must be used to provide collateral for loans for this commitment.
+     * @param maxPrincipalPerCollateralAmount The amount of principal that can be used for a loan per each unit of collateral, expanded additionally by principal decimals.
+     * @param collateralTokenType The type of asset of the collateralTokenAddress (ERC20, ERC721, or ERC1155).
+     * @param lender The address of the lender for this commitment.
+     * @param marketId The market id for this commitment.
+     * @param principalTokenAddress The address for the token contract that will be used to provide principal for loans of this commitment.
+     */
+    struct Commitment {
+        uint256 maxPrincipal;
+        uint32 expiration;
+        uint32 maxDuration;
+        uint16 minInterestRate;
+        address collateralTokenAddress;
+        uint256 collateralTokenId; //we use this for the MerkleRootHash  for type ERC721_MERKLE_PROOF
+        uint256 maxPrincipalPerCollateralAmount;
+        CommitmentCollateralType collateralTokenType;
+        address lender;
+        uint256 marketId;
+        address principalTokenAddress;
+    }
 
     // CommitmentId => commitment
     mapping(uint256 => Commitment) public commitments;
@@ -136,9 +170,8 @@ contract LenderCommitmentForwarder_G1 is
 
     /** External Functions **/
 
-    /// @custom:oz-upgrades-unsafe-allow constructor
     constructor(address _protocolAddress, address _marketRegistry)
-        TellerV2MarketForwarderStaging(_protocolAddress, _marketRegistry)
+        TellerV2MarketForwarder(_protocolAddress, _marketRegistry)
     {}
 
     /**
@@ -291,21 +324,19 @@ contract LenderCommitmentForwarder_G1 is
      * @param _collateralAmount The amount of collateral to use for the loan.
      * @param _collateralTokenId The tokenId of collateral to use for the loan if ERC721 or ERC1155.
      * @param _collateralTokenAddress The contract address to use for the loan collateral tokens.
-     * @param _recipient The address to receive the loan funds.
      * @param _interestRate The interest rate APY to use for the loan in basis points.
      * @param _loanDuration The overall duration for the loan.  Must be longer than market payment cycle duration.
      * @return bidId The ID of the loan that was created on TellerV2
      */
-    function acceptCommitmentWithRecipient(
+    function acceptCommitment(
         uint256 _commitmentId,
         uint256 _principalAmount,
         uint256 _collateralAmount,
         uint256 _collateralTokenId,
         address _collateralTokenAddress,
-        address _recipient,
         uint16 _interestRate,
         uint32 _loanDuration
-    ) public returns (uint256 bidId) {
+    ) external returns (uint256 bidId) {
         require(
             commitments[_commitmentId].collateralTokenType <=
                 CommitmentCollateralType.ERC1155_ANY_ID,
@@ -319,29 +350,6 @@ contract LenderCommitmentForwarder_G1 is
                 _collateralAmount,
                 _collateralTokenId,
                 _collateralTokenAddress,
-                _recipient,
-                _interestRate,
-                _loanDuration
-            );
-    }
-
-    function acceptCommitment(
-        uint256 _commitmentId,
-        uint256 _principalAmount,
-        uint256 _collateralAmount,
-        uint256 _collateralTokenId,
-        address _collateralTokenAddress,
-        uint16 _interestRate,
-        uint32 _loanDuration
-    ) public returns (uint256 bidId) {
-        return
-            acceptCommitmentWithRecipient(
-                _commitmentId,
-                _principalAmount,
-                _collateralAmount,
-                _collateralTokenId,
-                _collateralTokenAddress,
-                address(0),
                 _interestRate,
                 _loanDuration
             );
@@ -355,23 +363,21 @@ contract LenderCommitmentForwarder_G1 is
      * @param _collateralAmount The amount of collateral to use for the loan.
      * @param _collateralTokenId The tokenId of collateral to use for the loan if ERC721 or ERC1155.
      * @param _collateralTokenAddress The contract address to use for the loan collateral tokens.
-     * @param _recipient The address to receive the loan funds.
      * @param _interestRate The interest rate APY to use for the loan in basis points.
      * @param _loanDuration The overall duration for the loan.  Must be longer than market payment cycle duration.
      * @param _merkleProof An array of bytes32 which are the roots down the merkle tree, the merkle proof.
      * @return bidId The ID of the loan that was created on TellerV2
      */
-    function acceptCommitmentWithRecipientAndProof(
+    function acceptCommitmentWithProof(
         uint256 _commitmentId,
         uint256 _principalAmount,
         uint256 _collateralAmount,
         uint256 _collateralTokenId,
         address _collateralTokenAddress,
-        address _recipient,
         uint16 _interestRate,
         uint32 _loanDuration,
         bytes32[] calldata _merkleProof
-    ) public returns (uint256 bidId) {
+    ) external returns (uint256 bidId) {
         require(
             commitments[_commitmentId].collateralTokenType ==
                 CommitmentCollateralType.ERC721_MERKLE_PROOF ||
@@ -402,33 +408,8 @@ contract LenderCommitmentForwarder_G1 is
                 _collateralAmount,
                 _collateralTokenId,
                 _collateralTokenAddress,
-                _recipient,
                 _interestRate,
                 _loanDuration
-            );
-    }
-
-    function acceptCommitmentWithProof(
-        uint256 _commitmentId,
-        uint256 _principalAmount,
-        uint256 _collateralAmount,
-        uint256 _collateralTokenId,
-        address _collateralTokenAddress,
-        uint16 _interestRate,
-        uint32 _loanDuration,
-        bytes32[] calldata _merkleProof
-    ) public returns (uint256 bidId) {
-        return
-            acceptCommitmentWithRecipientAndProof(
-                _commitmentId,
-                _principalAmount,
-                _collateralAmount,
-                _collateralTokenId,
-                _collateralTokenAddress,
-                address(0),
-                _interestRate,
-                _loanDuration,
-                _merkleProof
             );
     }
 
@@ -440,7 +421,6 @@ contract LenderCommitmentForwarder_G1 is
      * @param _collateralAmount The amount of collateral to use for the loan.
      * @param _collateralTokenId The tokenId of collateral to use for the loan if ERC721 or ERC1155.
      * @param _collateralTokenAddress The contract address to use for the loan collateral tokens.
-     * @param _recipient The address to receive the loan funds.
      * @param _interestRate The interest rate APY to use for the loan in basis points.
      * @param _loanDuration The overall duration for the loan.  Must be longer than market payment cycle duration.
      * @return bidId The ID of the loan that was created on TellerV2
@@ -451,10 +431,11 @@ contract LenderCommitmentForwarder_G1 is
         uint256 _collateralAmount,
         uint256 _collateralTokenId,
         address _collateralTokenAddress,
-        address _recipient,
         uint16 _interestRate,
         uint32 _loanDuration
     ) internal returns (uint256 bidId) {
+        address borrower = _msgSender();
+
         Commitment storage commitment = commitments[_commitmentId];
 
         //make sure the commitment data adheres to required specifications and limits
@@ -483,7 +464,7 @@ contract LenderCommitmentForwarder_G1 is
 
         require(
             commitmentBorrowersList[_commitmentId].length() == 0 ||
-                commitmentBorrowersList[_commitmentId].contains(_msgSender()),
+                commitmentBorrowersList[_commitmentId].contains(borrower),
             "unauthorized commitment borrower"
         );
         //require that the borrower accepting the commitment cannot borrow more than the commitments max principal
@@ -542,32 +523,24 @@ contract LenderCommitmentForwarder_G1 is
             "Exceeds max principal of commitment"
         );
 
-        CreateLoanArgs memory createLoanArgs;
-        createLoanArgs.marketId = commitment.marketId;
-        createLoanArgs.lendingToken = commitment.principalTokenAddress;
-        createLoanArgs.principal = _principalAmount;
-        createLoanArgs.duration = _loanDuration;
-        createLoanArgs.interestRate = _interestRate;
-        createLoanArgs.recipient = _recipient;
-        if (commitment.collateralTokenType != CommitmentCollateralType.NONE) {
-            createLoanArgs.collateral = new Collateral[](1);
-            createLoanArgs.collateral[0] = Collateral({
-                _collateralType: _getEscrowCollateralType(
-                    commitment.collateralTokenType
-                ),
-                _tokenId: _collateralTokenId,
-                _amount: _collateralAmount,
-                _collateralAddress: commitment.collateralTokenAddress
-            });
-        }
-
-        bidId = _submitBidWithCollateral(createLoanArgs, _msgSender());
+        bidId = _submitBidFromCommitment(
+            borrower,
+            commitment.marketId,
+            commitment.principalTokenAddress,
+            _principalAmount,
+            commitment.collateralTokenAddress,
+            _collateralAmount,
+            _collateralTokenId,
+            commitment.collateralTokenType,
+            _loanDuration,
+            _interestRate
+        );
 
         _acceptBid(bidId, commitment.lender);
 
         emit ExercisedCommitment(
             _commitmentId,
-            _msgSender(),
+            borrower,
             _principalAmount,
             bidId
         );
@@ -630,6 +603,56 @@ contract LenderCommitmentForwarder_G1 is
     }
 
     /**
+     * @notice Internal function to submit a bid to the lending protocol using a commitment
+     * @param _borrower The address of the borrower for the loan.
+     * @param _marketId The id for the market of the loan in the lending protocol.
+     * @param _principalTokenAddress The contract address for the principal token.
+     * @param _principalAmount The amount of principal to borrow for the loan.
+     * @param _collateralTokenAddress The contract address for the collateral token.
+     * @param _collateralAmount The amount of collateral to use for the loan.
+     * @param _collateralTokenId The tokenId for the collateral (if it is ERC721 or ERC1155).
+     * @param _collateralTokenType The type of collateral token (ERC20,ERC721,ERC1177,None).
+     * @param _loanDuration The duration of the loan in seconds delta.  Must be longer than loan payment cycle for the market.
+     * @param _interestRate The amount of interest APY for the loan expressed in basis points.
+     */
+    function _submitBidFromCommitment(
+        address _borrower,
+        uint256 _marketId,
+        address _principalTokenAddress,
+        uint256 _principalAmount,
+        address _collateralTokenAddress,
+        uint256 _collateralAmount,
+        uint256 _collateralTokenId,
+        CommitmentCollateralType _collateralTokenType,
+        uint32 _loanDuration,
+        uint16 _interestRate
+    ) internal returns (uint256 bidId) {
+        CreateLoanArgs memory createLoanArgs;
+        createLoanArgs.marketId = _marketId;
+        createLoanArgs.lendingToken = _principalTokenAddress;
+        createLoanArgs.principal = _principalAmount;
+        createLoanArgs.duration = _loanDuration;
+        createLoanArgs.interestRate = _interestRate;
+
+        Collateral[] memory collateralInfo;
+        if (_collateralTokenType != CommitmentCollateralType.NONE) {
+            collateralInfo = new Collateral[](1);
+            collateralInfo[0] = Collateral({
+                _collateralType: _getEscrowCollateralType(_collateralTokenType),
+                _tokenId: _collateralTokenId,
+                _amount: _collateralAmount,
+                _collateralAddress: _collateralTokenAddress
+            });
+        }
+
+        bidId = _submitBidWithCollateral(
+            createLoanArgs,
+            collateralInfo,
+            _borrower
+        );
+    }
+
+    /**
      * @notice Return the collateral type based on the commitmentcollateral type.  Collateral type is used in the base lending protocol.
      * @param _type The type of collateral to be used for the loan.
      */
@@ -657,37 +680,5 @@ contract LenderCommitmentForwarder_G1 is
         }
 
         revert("Unknown Collateral Type");
-    }
-
-    function getCommitmentMarketId(uint256 _commitmentId)
-        external
-        view
-        returns (uint256)
-    {
-        return commitments[_commitmentId].marketId;
-    }
-
-    function getCommitmentLender(uint256 _commitmentId)
-        external
-        view
-        returns (address)
-    {
-        return commitments[_commitmentId].lender;
-    }
-
-    function getCommitmentAcceptedPrincipal(uint256 _commitmentId)
-        external
-        view
-        returns (uint256)
-    {
-        return commitmentPrincipalAccepted[_commitmentId];
-    }
-
-    function getCommitmentMaxPrincipal(uint256 _commitmentId)
-        external
-        view
-        returns (uint256)
-    {
-        return commitments[_commitmentId].maxPrincipal;
     }
 }

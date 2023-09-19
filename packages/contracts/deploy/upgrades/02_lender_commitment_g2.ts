@@ -76,11 +76,14 @@ deployFn.dependencies = [
   'lender-commitment-forwarder:extensions:deploy'
 ]
 deployFn.skip = async (hre) => {
-  return (
+
+  return true //always skip for now 
+  
+ /* return (
     !hre.network.live ||
     !['mainnet', 'polygon', 'arbitrum', 'goerli', 'sepolia'].includes(
       hre.network.name
     )
-  )
+  )*/
 }
 export default deployFn

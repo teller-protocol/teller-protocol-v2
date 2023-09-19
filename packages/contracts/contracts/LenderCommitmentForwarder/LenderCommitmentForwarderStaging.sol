@@ -2,10 +2,10 @@
 pragma solidity ^0.8.0;
 
 import "../interfaces/ILenderCommitmentForwarder.sol";
-import "./LenderCommitmentForwarder_G2.sol";
+import "./LenderCommitmentForwarder_G3.sol";
 
-contract LenderCommitmentForwarderStaging is ILenderCommitmentForwarder, LenderCommitmentForwarder_G2 {
+contract LenderCommitmentForwarderStaging is ILenderCommitmentForwarder, LenderCommitmentForwarder_G3 {
     constructor(address _tellerV2, address _marketRegistry)
-        LenderCommitmentForwarder_G2(_tellerV2, _marketRegistry)
+        LenderCommitmentForwarder_G3(_tellerV2, _marketRegistry)
     {}
 }

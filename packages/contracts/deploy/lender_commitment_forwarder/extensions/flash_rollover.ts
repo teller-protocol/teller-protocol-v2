@@ -11,8 +11,8 @@ const networksWithAave: string[] = Object.keys(aavePoolAddressProvider)
 
 const deployFn: DeployFunction = async (hre) => {
   const tellerV2 = await hre.contracts.get('TellerV2')
-  const lenderCommitmentForwarder = await hre.contracts.get(
-    'LenderCommitmentForwarder'
+  const LenderCommitmentForwarderStaging = await hre.contracts.get(
+    'LenderCommitmentForwarderStaging'
   )
 
   const networkName = hre.network.name
@@ -21,7 +21,7 @@ const deployFn: DeployFunction = async (hre) => {
     unsafeAllow: ['constructor', 'state-variable-immutable'],
     constructorArgs: [
       await tellerV2.getAddress(),
-      await lenderCommitmentForwarder.getAddress(),
+      await LenderCommitmentForwarderStaging.getAddress(),
       aavePoolAddressProvider[networkName]
     ]
   })

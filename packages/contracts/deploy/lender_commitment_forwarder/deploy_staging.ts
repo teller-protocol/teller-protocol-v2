@@ -6,14 +6,16 @@ const deployFn: DeployFunction = async (hre) => {
 
   const { protocolTimelock } = await hre.getNamedAccounts()
 
-  const lenderCommitmentForwarder = await hre.deployProxy(
-    'LenderCommitmentForwarder',
+  const lenderCommitmentForwarderStaging = await hre.deployProxy(
+    'LenderCommitmentForwarderStaging',
     {
       unsafeAllow: ['constructor', 'state-variable-immutable'],
       constructorArgs: [
         await tellerV2.getAddress(),
         await marketRegistry.getAddress()
-      ]
+      ],
+      initializer: 'initialize',
+      initArgs: [protocolTimelock]
     }
   )
 

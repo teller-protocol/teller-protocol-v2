@@ -12,8 +12,9 @@ import { WethMock } from "../../contracts/mock/WethMock.sol";
 import { TestERC721Token } from "../tokens/TestERC721Token.sol";
 
 import { TellerV2SolMock } from "../../contracts/mock/TellerV2SolMock.sol";
-import { LenderCommitmentForwarder } from "../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarder.sol";
-import { LenderCommitmentForwarder_G1 } from "../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarder_G1.sol";
+//import { LenderCommitmentForwarder } from "../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarder.sol";
+import { LenderCommitmentForwarder_G2 } from "../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarder_G2.sol";
+import { LenderCommitmentForwarder_G3 } from "../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarder_G3.sol";
 import { MarketRegistryMock } from "../../contracts/mock/MarketRegistryMock.sol";
  
 import { PaymentType, PaymentCycleType } from "../../contracts/libraries/V2Calculations.sol";
@@ -96,7 +97,7 @@ contract LenderCommitmentForwarder_Integration_Test is Testable {
         wethMock.transfer(address(borrower), 5e18);
      
 
-        LenderCommitmentForwarder_G2(address(lenderCommitmentForwarder))
+        LenderCommitmentForwarder_G3(address(lenderCommitmentForwarder))
             .initialize(address(this));
  
     }
@@ -220,7 +221,7 @@ contract LenderCommitmentForwarder_Integration_Test is Testable {
  
         vm.prank(address(borrower));
         //accept commitment and make sure the collateral is moved 
-        uint256 bidId = LenderCommitmentForwarder_G1(address(lenderCommitmentForwarder)).acceptCommitment(
+        uint256 bidId = LenderCommitmentForwarder_G2(address(lenderCommitmentForwarder)).acceptCommitment(
             commitmentId,
             principalAmount,
             1, //collateral amount 

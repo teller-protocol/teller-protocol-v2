@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.so
 
 import "../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarder.sol";
 import {LenderCommitmentForwarder_G1} from "../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarder_G1.sol";
-import {LenderCommitmentForwarder_G2} from "../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarder_G2.sol";
+import {LenderCommitmentForwarder_G3} from "../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarder_G3.sol";
 
 contract LenderCommitmentForwarder_UpgradeToG2 is Testable {
     ProxyAdmin internal admin;
@@ -19,8 +19,8 @@ contract LenderCommitmentForwarder_UpgradeToG2 is Testable {
 
     LenderCommitmentForwarder_G1 internal logicV1 =
         new LenderCommitmentForwarder_G1(tellerV2, marketRegistry);
-    LenderCommitmentForwarder_G2 internal logicV2 =
-        new LenderCommitmentForwarder_G2(tellerV2, marketRegistry);
+    LenderCommitmentForwarder_G3 internal logicV2 =
+        new LenderCommitmentForwarder_G3(tellerV2, marketRegistry);
 
     function setUp() public {
         admin = new ProxyAdmin();
@@ -53,7 +53,7 @@ contract LenderCommitmentForwarder_UpgradeToG2 is Testable {
     function test_storage_slot_data_after_upgrade() public {
         // This should revert because the contract has not been upgraded yet with that function
         vm.expectRevert();
-        LenderCommitmentForwarder_G2(address(proxy)).owner();
+        LenderCommitmentForwarder_G3(address(proxy)).owner();
 
         // Upgrade contract to V2 and initialize owner
         admin.upgradeAndCall(
@@ -63,7 +63,7 @@ contract LenderCommitmentForwarder_UpgradeToG2 is Testable {
         );
 
         // Verify the owner is set to the correct address
-        address owner = LenderCommitmentForwarder_G2(address(proxy)).owner();
+        address owner = LenderCommitmentForwarder_G3(address(proxy)).owner();
         assertEq(
             owner,
             address(this),
@@ -83,7 +83,7 @@ contract LenderCommitmentForwarder_UpgradeToG2 is Testable {
             ,
             ,
             address principalTokenAddress
-        ) = LenderCommitmentForwarder_G2(address(proxy)).commitments(1);
+        ) = LenderCommitmentForwarder_G3(address(proxy)).commitments(1);
         assertEq(
             principalTokenAddress,
             address(123),

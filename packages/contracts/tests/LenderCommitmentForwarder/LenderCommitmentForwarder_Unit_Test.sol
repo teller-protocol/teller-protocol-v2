@@ -13,7 +13,7 @@ import "../../contracts/TellerV2Context.sol";
 import { Testable } from "../Testable.sol";
 
 import "../../contracts/interfaces/ILenderCommitmentForwarder.sol";
-import { LenderCommitmentForwarder_G1 } from "../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarder_G1.sol";
+import { LenderCommitmentForwarder_G2 } from "../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarder_G2.sol";
 
 import { Collateral, CollateralType } from "../../contracts/interfaces/escrow/ICollateralEscrowV1.sol";
 
@@ -1077,7 +1077,7 @@ contract LenderCommitmentForwarder_Test is Testable {
 
         vm.expectRevert(
             abi.encodeWithSelector(
-                LenderCommitmentForwarder_G1
+                LenderCommitmentForwarder_G2
                     .InsufficientCommitmentAllocation
                     .selector,
                 c.maxPrincipal,
@@ -1133,7 +1133,7 @@ contract LenderCommitmentForwarder_Test is Testable {
 
         vm.expectRevert(
             abi.encodeWithSelector(
-                LenderCommitmentForwarder_G1
+                LenderCommitmentForwarder_G2
                     .InsufficientBorrowerCollateral
                     .selector,
                 requiredCollateralAmount,
@@ -1394,12 +1394,12 @@ contract LenderCommitmentForwarder_Test is Testable {
 }
 
 contract LenderCommitmentUser is User {
-    LenderCommitmentForwarder_G1 public immutable commitmentForwarder;
+    LenderCommitmentForwarder_G2 public immutable commitmentForwarder;
 
     constructor(address _tellerV2, address _commitmentForwarder)
         User(_tellerV2)
     {
-        commitmentForwarder = LenderCommitmentForwarder_G1(
+        commitmentForwarder = LenderCommitmentForwarder_G2(
             _commitmentForwarder
         );
     }

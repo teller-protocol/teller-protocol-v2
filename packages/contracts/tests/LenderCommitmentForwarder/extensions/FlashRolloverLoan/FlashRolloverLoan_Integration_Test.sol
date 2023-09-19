@@ -20,9 +20,9 @@ import { MarketRegistryMock } from "../../../../contracts/mock/MarketRegistryMoc
 import { AavePoolAddressProviderMock } from "../../../../contracts/mock/aave/AavePoolAddressProviderMock.sol";
 import { AavePoolMock } from "../../../../contracts/mock/aave/AavePoolMock.sol";
 
-import { LenderCommitmentForwarder_G1 } from "../../../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarder_G1.sol";
-
 import { LenderCommitmentForwarder_G2 } from "../../../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarder_G2.sol";
+
+import { LenderCommitmentForwarder_G3 } from "../../../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarder_G3.sol";
 
 import { PaymentType, PaymentCycleType } from "../../../../contracts/libraries/V2Calculations.sol";
 
@@ -116,10 +116,10 @@ contract FlashRolloverLoan_Integration_Test is Testable {
             address(aavePoolAddressProvider)
         );
 
-        LenderCommitmentForwarder_G2(address(lenderCommitmentForwarder))
+        LenderCommitmentForwarder_G3(address(lenderCommitmentForwarder))
             .initialize(address(this));
 
-        LenderCommitmentForwarder_G2(address(lenderCommitmentForwarder))
+        LenderCommitmentForwarder_G3(address(lenderCommitmentForwarder))
             .addExtension(address(flashRolloverLoan));
     }
 

@@ -28,6 +28,7 @@ abstract contract ExtensionsContextUpgradeable is ERC2771ContextUpgradeable {
         returns (bool)
     {
         return
+            !blockedExtensions.contains(forwarder) &&
             extensions.contains(forwarder) &&
             extensionApprovals[_msgSender()][forwarder];
     }

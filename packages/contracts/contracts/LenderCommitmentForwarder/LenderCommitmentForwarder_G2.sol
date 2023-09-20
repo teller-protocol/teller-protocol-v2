@@ -2,7 +2,7 @@ pragma solidity >=0.8.0 <0.9.0;
 // SPDX-License-Identifier: MIT
 
 // Contracts
-import "../TellerV2MarketForwarderStaging.sol";
+import "../TellerV2MarketForwarder_G2.sol";
 
 // Interfaces
 import "../interfaces/ICollateralManager.sol";
@@ -140,7 +140,7 @@ contract LenderCommitmentForwarder_G2 is
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor(address _protocolAddress, address _marketRegistry)
-        TellerV2MarketForwarderStaging(_protocolAddress, _marketRegistry)
+        TellerV2MarketForwarder_G2(_protocolAddress, _marketRegistry)
     {}
 
     /**

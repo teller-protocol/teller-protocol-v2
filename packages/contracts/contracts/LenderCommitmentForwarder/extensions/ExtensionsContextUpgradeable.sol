@@ -37,6 +37,14 @@ abstract contract ExtensionsContextUpgradeable is ERC2771ContextUpgradeable {
         return extensions.contains(extension);
     }
 
+    function isExtensionBlocked(address extension) public view returns (bool) {
+        return blockedExtensions.contains(extension);
+    }
+
+    function hasApprovedExtension(address extension, address account) public view returns (bool) {
+        return extensionApprovals[account][extension];
+    }
+
     function approveExtension(address extension) external {
         require(
             _msgSender() != extension,

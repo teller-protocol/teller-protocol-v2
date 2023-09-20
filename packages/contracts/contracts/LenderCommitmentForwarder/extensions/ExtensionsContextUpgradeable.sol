@@ -13,7 +13,7 @@ abstract contract ExtensionsContextUpgradeable is ERC2771ContextUpgradeable {
     mapping(address => mapping(address => bool)) private extensionApprovals;
 
     event ExtensionAdded(address extension);
-    event ExtensionRemoved(address extension);
+    event ExtensionBlocked(address extension);
     event ExtensionApproved(address extension, address sender);
     event ExtensionRevoked(address extension, address sender);
 
@@ -83,7 +83,7 @@ abstract contract ExtensionsContextUpgradeable is ERC2771ContextUpgradeable {
         );
         extensions.remove(extension);
         blockedExtensions.add(extension);
-        emit ExtensionRemoved(extension);
+        emit ExtensionBlocked(extension);
     }
 
     /**

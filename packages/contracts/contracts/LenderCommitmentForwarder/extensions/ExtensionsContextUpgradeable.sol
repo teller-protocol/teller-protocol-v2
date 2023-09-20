@@ -8,6 +8,7 @@ abstract contract ExtensionsContextUpgradeable is ERC2771ContextUpgradeable {
     using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
 
     EnumerableSetUpgradeable.AddressSet private extensions;
+    EnumerableSetUpgradeable.AddressSet private blockedExtensions;
     // Mapping from owner to operator approvals
     mapping(address => mapping(address => bool)) private extensionApprovals;
 
@@ -26,7 +27,9 @@ abstract contract ExtensionsContextUpgradeable is ERC2771ContextUpgradeable {
         override
         returns (bool)
     {
-        return extensions.contains(forwarder) && extensionApprovals[_msgSender()][forwarder];
+        return
+            extensions.contains(forwarder) &&
+            extensionApprovals[_msgSender()][forwarder];
     }
 
     function isExtensionAdded(address extension) public view returns (bool) {
@@ -53,6 +56,10 @@ abstract contract ExtensionsContextUpgradeable is ERC2771ContextUpgradeable {
 
     function _addExtension(address extension) internal {
         require(
+            !blockedExtensions.contains(extension),
+            "ExtensionsContextUpgradeable: extension blocked"
+        );
+        require(
             !extensions.contains(extension),
             "ExtensionsContextUpgradeable: extension already added"
         );
@@ -60,12 +67,13 @@ abstract contract ExtensionsContextUpgradeable is ERC2771ContextUpgradeable {
         emit ExtensionAdded(extension);
     }
 
-    function _removeExtension(address extension) internal {
+    function _blockExtension(address extension) internal {
         require(
             extensions.contains(extension),
             "ExtensionsContextUpgradeable: extension not added"
         );
         extensions.remove(extension);
+        blockedExtensions.add(extension);
         emit ExtensionRemoved(extension);
     }
 
@@ -74,5 +82,5 @@ abstract contract ExtensionsContextUpgradeable is ERC2771ContextUpgradeable {
      * variables without shifting down storage in the inheritance chain.
      * See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps
      */
-    uint256[48] private __gap;
+    uint256[47] private __gap;
 }

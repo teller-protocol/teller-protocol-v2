@@ -29,11 +29,11 @@ contract LenderCommitmentForwarder_G3 is
         _transferOwnership(_newOwner);
     }
 
-    function addExtension(address extension, uint256 marketId) external {
+    function addExtension(address extension) external {
         _addExtension(extension);
     }
 
-    function blockExtension(address extension, uint256 marketId) external onlyOwner {
+    function blockExtension(address extension) external onlyOwner {
         _blockExtension(extension);
     }
 

@@ -7,8 +7,8 @@ contract ExtensionsContextMock is ExtensionsContextUpgradeable {
         super._addExtension(extension);
     }
 
-    function removeExtension(address extension) public {
-        super._removeExtension(extension);
+    function blockExtension(address extension) public {
+        super._blockExtension(extension);
     }
 }
 
@@ -31,18 +31,18 @@ contract ExtensionsContext_Test is Testable {
         extensionsContext.addExtension(address(borrower));
     }
 
-    function test_removeExtension() public {
+    function test_blockExtension() public {
         vm.expectRevert("ExtensionsContextUpgradeable: extension not added");
-        extensionsContext.removeExtension(address(borrower));
+        extensionsContext.blockExtension(address(borrower));
     }
 
-    function test_addRemoveExtension() public {
+    function test_addBlockExtension() public {
         bool isTrustedBefore = extensionsContext.isTrustedForwarder(
             address(borrower)
         );
 
         extensionsContext.addExtension(address(borrower));
-        extensionsContext.removeExtension(address(borrower));
+        extensionsContext.blockExtension(address(borrower));
 
         bool isTrustedAfter = extensionsContext.isTrustedForwarder(
             address(borrower)

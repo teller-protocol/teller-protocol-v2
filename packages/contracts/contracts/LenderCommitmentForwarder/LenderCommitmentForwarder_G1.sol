@@ -15,7 +15,7 @@ import { MathUpgradeable } from "@openzeppelin/contracts-upgradeable/utils/math/
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20MetadataUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/cryptography/MerkleProofUpgradeable.sol";
 
-contract LenderCommitmentForwarder_G1 is TellerV2MarketForwarder {
+contract LenderCommitmentForwarder_G1 is TellerV2MarketForwarder_G1 {
     using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
 
     enum CommitmentCollateralType {

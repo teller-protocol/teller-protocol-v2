@@ -19,7 +19,7 @@ import "@openzeppelin/contracts-upgradeable/utils/cryptography/MerkleProofUpgrad
  
 
 contract LenderCommitmentForwarder_G2 is 
-    TellerV2MarketForwarderStaging,
+    TellerV2MarketForwarder_G2,
     ILenderCommitmentForwarder
 {
     using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;

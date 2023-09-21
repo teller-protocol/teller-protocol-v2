@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../../../../contracts/interfaces/ICommitmentRolloverLoan.sol";
 import "../../../../contracts/interfaces/ILenderCommitmentForwarder.sol";
 import "../../../../contracts/interfaces/ITellerV2Context.sol";
+import "../../../../contracts/interfaces/IExtensionsContext.sol";
 
 import "../../../integration/IntegrationTestHelpers.sol";
 
@@ -123,6 +124,7 @@ contract FlashRolloverLoan_Integration_Test is Testable {
         LenderCommitmentForwarder_G3(address(lenderCommitmentForwarder))
             .addExtension(address(flashRolloverLoan));
 
+      
    
     }
 
@@ -222,6 +224,13 @@ contract FlashRolloverLoan_Integration_Test is Testable {
             marketId,
             address(lenderCommitmentForwarder)
         );
+
+
+        //approve the extension 
+        vm.prank(address(borrower));
+        IExtensionsContext(address(lenderCommitmentForwarder))
+            .approveExtension(address(flashRolloverLoan)); 
+
 
         //how do we calc how much to flash ??
         uint256 flashLoanAmount = 110 * 1e16;

@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import "../../interfaces/IExtensionsContext.sol";
 import "@openzeppelin/contracts-upgradeable/metatx/ERC2771ContextUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/structs/EnumerableSetUpgradeable.sol";
 
-abstract contract ExtensionsContextUpgradeable is ERC2771ContextUpgradeable {
+abstract contract ExtensionsContextUpgradeable is ERC2771ContextUpgradeable, IExtensionsContext {
     using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
 
     EnumerableSetUpgradeable.AddressSet private extensions;

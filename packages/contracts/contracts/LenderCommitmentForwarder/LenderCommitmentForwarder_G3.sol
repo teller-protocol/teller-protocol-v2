@@ -15,7 +15,7 @@ contract LenderCommitmentForwarder_G3 is
     constructor(address _tellerV2, address _marketRegistry)
         LenderCommitmentForwarder_G2(_tellerV2, _marketRegistry)
     {
-        //_disableInitializers();  //we only want this on an upgrade deployment not a new deployment 
+        
     }
 
     function initialize(address _newOwner) external initializer {
@@ -28,32 +28,26 @@ contract LenderCommitmentForwarder_G3 is
     {
         _transferOwnership(_newOwner);
     }
-
-    function addExtension(address extension) external {
-        _addExtension(extension);
-    }
-
-    function blockExtension(address extension) external onlyOwner {
-        _blockExtension(extension);
-    }
+ 
 
     function _msgSender()
         internal
         view
         virtual
-        override(ContextUpgradeable, ERC2771ContextUpgradeable)
+        override(ContextUpgradeable, ExtensionsContextUpgradeable)
         returns (address sender)
     {
-        return ERC2771ContextUpgradeable._msgSender();
+        return ExtensionsContextUpgradeable._msgSender();
     }
 
+/*
     function _msgData()
         internal
         view
         virtual
-        override(ContextUpgradeable, ERC2771ContextUpgradeable)
+        override(ContextUpgradeable, ExtensionsContextUpgradeable)
         returns (bytes calldata)
     {
-        return ERC2771ContextUpgradeable._msgData();
-    }
+        return ExtensionsContextUpgradeable._msgData();
+    }*/
 }

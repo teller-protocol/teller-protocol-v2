@@ -105,6 +105,8 @@ abstract contract TellerV2MarketForwarder_G2 is
     ) internal virtual returns (uint256 bidId) {
         bytes memory responseData;
 
+ 
+
         responseData = _forwardCall(
             abi.encodeWithSignature(
                 "submitBid(address,uint256,uint256,uint32,uint16,string,address,(uint8,uint256,uint256,address)[])",

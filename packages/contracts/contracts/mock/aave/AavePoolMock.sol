@@ -34,8 +34,11 @@ contract AavePoolMock {
             require(success == true, "executeOperation failed");
         }
 
-        IERC20(asset).transferFrom(receiverAddress,address(this), amount+premium);
-
+        IERC20(asset).transferFrom(
+            receiverAddress,
+            address(this),
+            amount + premium
+        );
 
         //require balance is what it was plus the fee..
         uint256 balanceAfter = IERC20(asset).balanceOf(address(this));

@@ -17,10 +17,7 @@ import { User } from "../Test_Helpers.sol";
 
 import "../../contracts/mock/MarketRegistryMock.sol";
 
-contract LenderCommitmentForwarder_Test is
-    Testable,
-    LenderCommitmentForwarder
-{
+contract LenderCommitmentForwarder_Test is Testable, LenderCommitmentForwarder {
     LenderCommitmentForwarderTest_TellerV2Mock private tellerV2Mock;
     MarketRegistryMock mockMarketRegistry;
 
@@ -767,7 +764,6 @@ contract LenderCommitmentForwarder_Test is
         Overrider methods for exercise 
     */
 
-  
     function _submitBidWithCollateral(CreateLoanArgs memory, address)
         internal
         override

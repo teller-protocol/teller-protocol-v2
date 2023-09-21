@@ -58,11 +58,7 @@ library IntegrationTestHelpers {
         );
         EscrowVault _escrowVault = new EscrowVault();
 
-       
-        _collateralManager.initialize(
-            address(escrowBeacon),
-            address(tellerV2)
-        );
+        _collateralManager.initialize(address(escrowBeacon), address(tellerV2));
         _lenderManager.initialize();
         _reputationManager.initialize(address(tellerV2));
 

@@ -11,6 +11,7 @@ contract LenderCommitmentForwarderStaging is
     constructor(address _tellerV2, address _marketRegistry)
         LenderCommitmentForwarder_G3(_tellerV2, _marketRegistry)
     {
-        _disableInitializers(); //we only want this on an proxy deployment so it only affects the impl
+        // we only want this on an proxy deployment so it only affects the impl
+        _disableInitializers(); 
     }
 }

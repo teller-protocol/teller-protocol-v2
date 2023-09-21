@@ -94,8 +94,7 @@ contract LenderCommitmentForwarder_Integration_Test is Testable {
         wethMock.transfer(address(lender), 5e18);
         wethMock.transfer(address(borrower), 5e18);
 
-        LenderCommitmentForwarder_G3(address(lenderCommitmentForwarder))
-            .initialize(address(this));
+       
     }
 
     function test_accept_commitment_with_collateral() public {

@@ -52,24 +52,15 @@ contract LenderCommitmentForwarder_UpgradeToG2 is Testable {
 
     function test_storage_slot_data_after_upgrade() public {
         // This should revert because the contract has not been upgraded yet with that function
-        vm.expectRevert();
-        LenderCommitmentForwarder_G3(address(proxy)).owner();
+    
 
-        // Upgrade contract to V2 and initialize owner
-        admin.upgradeAndCall(
+        // Upgrade contract to V2  
+        admin.upgrade(
             proxy,
-            address(logicV2),
-            abi.encodeWithSelector(logicV2.initialize.selector, address(this))
+            address(logicV2)
         );
 
-        // Verify the owner is set to the correct address
-        address owner = LenderCommitmentForwarder_G3(address(proxy)).owner();
-        assertEq(
-            owner,
-            address(this),
-            "Owner address should be set to this contract address"
-        );
-
+        
         // Verify the commitment principalTokenAddress is set to the correct address after the upgrade
         (
             ,

@@ -113,8 +113,7 @@ contract FlashRolloverLoan_Integration_Test is Testable {
             address(aavePoolAddressProvider)
         );
 
-        LenderCommitmentForwarder_G3(address(lenderCommitmentForwarder))
-            .initialize(address(this));
+        
     }
 
     function test_flashRollover() public {

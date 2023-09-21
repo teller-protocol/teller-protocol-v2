@@ -15,7 +15,10 @@ import "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
 /**
  * @dev Simple helper contract to forward an encoded function call to the TellerV2 contract. See {TellerV2Context}
  */
-abstract contract TellerV2MarketForwarder_G1 is Initializable, ContextUpgradeable {
+abstract contract TellerV2MarketForwarder_G1 is
+    Initializable,
+    ContextUpgradeable
+{
     using AddressUpgradeable for address;
 
     address public immutable _tellerV2;

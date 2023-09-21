@@ -9,12 +9,8 @@ import "../../libraries/NumbersLib.sol";
 
 // Interfaces
 import "./FlashRolloverLoan_G1.sol";
- 
- 
- 
-contract FlashRolloverLoan_G2 is
-   FlashRolloverLoan_G1
-{
+
+contract FlashRolloverLoan_G2 is FlashRolloverLoan_G1 {
     using AddressUpgradeable for address;
     using NumbersLib for uint256;
 
@@ -23,10 +19,14 @@ contract FlashRolloverLoan_G2 is
         address _tellerV2,
         address _lenderCommitmentForwarder,
         address _poolAddressesProvider
-    ) FlashRolloverLoan_G1(_tellerV2,_lenderCommitmentForwarder,_poolAddressesProvider){
-        
-    }
-  
+    )
+        FlashRolloverLoan_G1(
+            _tellerV2,
+            _lenderCommitmentForwarder,
+            _poolAddressesProvider
+        )
+    {}
+
     /*
 
         This assumes that the flash amount will be the repayLoanFull amount !!

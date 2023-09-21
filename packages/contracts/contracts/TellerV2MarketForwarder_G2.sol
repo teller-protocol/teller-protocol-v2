@@ -20,7 +20,6 @@ abstract contract TellerV2MarketForwarder_G2 is
     Initializable,
     ContextUpgradeable,
     ITellerV2MarketForwarder
-    
 {
     using AddressUpgradeable for address;
 

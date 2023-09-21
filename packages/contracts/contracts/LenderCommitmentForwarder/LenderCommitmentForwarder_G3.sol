@@ -15,7 +15,7 @@ contract LenderCommitmentForwarder_G3 is
     constructor(address _tellerV2, address _marketRegistry)
         LenderCommitmentForwarder_G2(_tellerV2, _marketRegistry)
     {
-        _disableInitializers();
+        //_disableInitializers();  //we only want this on an upgrade deployment not a new deployment 
     }
 
     function initialize(address _newOwner) external initializer {

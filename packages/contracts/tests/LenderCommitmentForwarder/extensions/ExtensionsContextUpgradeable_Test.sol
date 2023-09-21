@@ -15,6 +15,8 @@ contract ExtensionsContextMock is ExtensionsContextUpgradeable {
 contract ExtensionsContext_Test is Testable {
     constructor() {}
 
+    User private extensionContract;
+
     User private borrower;
     User private lender;
 
@@ -48,23 +50,29 @@ contract ExtensionsContext_Test is Testable {
             address(borrower)
         );
 
-        assertFalse(isTrustedBefore, "Should not be trusted forwarder");
-        assertFalse(isTrustedAfter, "Should not be trusted forwarder");
+        assertFalse(isTrustedBefore, "Should not be trusted forwarder before");
+        assertFalse(isTrustedAfter, "Should not be trusted forwarder after");
     }
 
     function test_isTrustedForwarder() public {
         bool isTrustedBefore = extensionsContext.isTrustedForwarder(
-            address(borrower)
+            address(extensionContract)
         );
 
-        extensionsContext.addExtension(address(borrower));
+        extensionsContext.addExtension(address(extensionContract));
+  
+        //the user will approve
+        vm.prank(address(borrower));
+        extensionsContext.approveExtension(address(extensionContract));
 
+        vm.prank(address(borrower));
         bool isTrustedAfter = extensionsContext.isTrustedForwarder(
-            address(borrower)
+            address(extensionContract)
         );
 
-        assertFalse(isTrustedBefore, "Should not be trusted forwarder");
-        assertTrue(isTrustedAfter, "Should be trusted forwarder");
+
+        assertFalse(isTrustedBefore, "Should not be trusted forwarder before");
+        assertTrue(isTrustedAfter, "Should be trusted forwarder after");
     }
 }
 

@@ -55,10 +55,7 @@ contract FlashRolloverLoan_Integration_Test is Testable {
         lender = new User();
         marketOwner = new User();
 
-        console.logAddress(address(borrower));
-        console.logAddress(address(lender));
-        console.logAddress(address(marketOwner));
-
+       
         tellerV2 = IntegrationTestHelpers.deployIntegrationSuite();
 
         console.logAddress(address(tellerV2));
@@ -75,6 +72,7 @@ contract FlashRolloverLoan_Integration_Test is Testable {
         );
 
         aavePoolMock = new AavePoolMock();
+ 
 
         bytes32 POOL = "POOL";
         aavePoolAddressProvider.setAddress(POOL, address(aavePoolMock));
@@ -87,6 +85,7 @@ contract FlashRolloverLoan_Integration_Test is Testable {
         uint16 _feePercent = 900;
         PaymentType _paymentType = PaymentType.EMI;
         PaymentCycleType _paymentCycleType = PaymentCycleType.Seconds;
+ 
 
         vm.prank(address(marketOwner));
         uint256 marketId = marketRegistry.createMarket(
@@ -101,6 +100,7 @@ contract FlashRolloverLoan_Integration_Test is Testable {
             _paymentCycleType,
             "uri"
         );
+ 
 
         wethMock.deposit{ value: 100e18 }();
         wethMock.transfer(address(lender), 5e18);
@@ -115,12 +115,15 @@ contract FlashRolloverLoan_Integration_Test is Testable {
             address(lenderCommitmentForwarder),
             address(aavePoolAddressProvider)
         );
+ 
 
         LenderCommitmentForwarder_G3(address(lenderCommitmentForwarder))
             .initialize(address(this));
 
         LenderCommitmentForwarder_G3(address(lenderCommitmentForwarder))
             .addExtension(address(flashRolloverLoan));
+
+   
     }
 
     function test_flashRollover() public {

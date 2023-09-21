@@ -2,7 +2,7 @@ pragma solidity >=0.8.0 <0.9.0;
 // SPDX-License-Identifier: MIT
 
 // Contracts
-import "../TellerV2MarketForwarder.sol";
+import "../TellerV2MarketForwarder_G1.sol";
 
 // Interfaces
 import "../interfaces/ICollateralManager.sol";
@@ -15,7 +15,7 @@ import { MathUpgradeable } from "@openzeppelin/contracts-upgradeable/utils/math/
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20MetadataUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/cryptography/MerkleProofUpgradeable.sol";
 
-contract LenderCommitmentForwarder_G1 is TellerV2MarketForwarder {
+contract LenderCommitmentForwarder_G1 is TellerV2MarketForwarder_G1 {
     using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
 
     enum CommitmentCollateralType {
@@ -171,7 +171,7 @@ contract LenderCommitmentForwarder_G1 is TellerV2MarketForwarder {
     /** External Functions **/
 
     constructor(address _protocolAddress, address _marketRegistry)
-        TellerV2MarketForwarder(_protocolAddress, _marketRegistry)
+        TellerV2MarketForwarder_G1(_protocolAddress, _marketRegistry)
     {}
 
     /**

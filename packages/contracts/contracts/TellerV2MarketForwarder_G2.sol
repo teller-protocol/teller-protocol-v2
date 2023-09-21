@@ -4,6 +4,7 @@ pragma solidity >=0.8.0 <0.9.0;
 import "./interfaces/ITellerV2.sol";
 
 import "./interfaces/IMarketRegistry.sol";
+import "./interfaces/ITellerV2MarketForwarder.sol";
 
 import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
@@ -15,22 +16,20 @@ import "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
 /**
  * @dev Simple helper contract to forward an encoded function call to the TellerV2 contract. See {TellerV2Context}
  */
-abstract contract TellerV2MarketForwarder is Initializable, ContextUpgradeable {
+abstract contract TellerV2MarketForwarder_G2 is
+    Initializable,
+    ContextUpgradeable,
+    ITellerV2MarketForwarder
+    
+{
     using AddressUpgradeable for address;
 
+    /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
     address public immutable _tellerV2;
+    /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
     address public immutable _marketRegistry;
 
-    struct CreateLoanArgs {
-        uint256 marketId;
-        address lendingToken;
-        uint256 principal;
-        uint32 duration;
-        uint16 interestRate;
-        string metadataURI;
-        address recipient;
-    }
-
+    /// @custom:oz-upgrades-unsafe-allow constructor
     constructor(address _protocolAddress, address _marketRegistryAddress) {
         _tellerV2 = _protocolAddress;
         _marketRegistry = _marketRegistryAddress;
@@ -72,7 +71,7 @@ abstract contract TellerV2MarketForwarder is Initializable, ContextUpgradeable {
      * @param _createLoanArgs Details describing the loan agreement.]
      * @param _borrower The borrower address for the new loan.
      */
-    function _submitBid(
+    /*function _submitBid(
         CreateLoanArgs memory _createLoanArgs,
         address _borrower
     ) internal virtual returns (uint256 bidId) {
@@ -93,7 +92,7 @@ abstract contract TellerV2MarketForwarder is Initializable, ContextUpgradeable {
         );
 
         return abi.decode(responseData, (uint256));
-    }
+    }*/
 
     /**
      * @notice Creates a new loan using the TellerV2 lending protocol.
@@ -102,7 +101,6 @@ abstract contract TellerV2MarketForwarder is Initializable, ContextUpgradeable {
      */
     function _submitBidWithCollateral(
         CreateLoanArgs memory _createLoanArgs,
-        Collateral[] memory _collateralInfo,
         address _borrower
     ) internal virtual returns (uint256 bidId) {
         bytes memory responseData;
@@ -117,7 +115,7 @@ abstract contract TellerV2MarketForwarder is Initializable, ContextUpgradeable {
                 _createLoanArgs.interestRate,
                 _createLoanArgs.metadataURI,
                 _createLoanArgs.recipient,
-                _collateralInfo
+                _createLoanArgs.collateral
             ),
             _borrower
         );

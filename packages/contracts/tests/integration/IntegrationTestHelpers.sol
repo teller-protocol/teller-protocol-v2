@@ -13,7 +13,7 @@ import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
 import { MarketRegistry } from "../../contracts/MarketRegistry.sol";
 import { EscrowVault } from "../../contracts/EscrowVault.sol";
 import { LenderManager } from "../../contracts/LenderManager.sol";
-import { LenderCommitmentForwarder_G2 } from "../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarder_G2.sol";
+import { LenderCommitmentForwarder_G3} from "../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarder_G3.sol";
 import { CollateralManager } from "../../contracts/CollateralManager.sol";
 import { CollateralEscrowV1 } from "../../contracts/escrow/CollateralEscrowV1.sol";
 
@@ -41,7 +41,7 @@ library IntegrationTestHelpers {
         address _marketRegistry = deployMarketRegistry();
         ReputationManager _reputationManager = new ReputationManager();
 
-        LenderCommitmentForwarder_G2 _lenderCommitmentForwarder = new LenderCommitmentForwarder_G2(
+        LenderCommitmentForwarder_G3 _lenderCommitmentForwarder = new LenderCommitmentForwarder_G3(
                 address(tellerV2),
                 address(_marketRegistry)
             );

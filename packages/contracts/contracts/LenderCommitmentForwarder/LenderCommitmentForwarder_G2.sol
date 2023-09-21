@@ -16,8 +16,6 @@ import { MathUpgradeable } from "@openzeppelin/contracts-upgradeable/utils/math/
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20MetadataUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/cryptography/MerkleProofUpgradeable.sol";
 
-import "lib/forge-std/src/console.sol";
-
 contract LenderCommitmentForwarder_G2 is
     TellerV2MarketForwarder_G2,
     ILenderCommitmentForwarder

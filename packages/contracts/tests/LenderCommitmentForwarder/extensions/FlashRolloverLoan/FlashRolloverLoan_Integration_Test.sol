@@ -115,9 +115,6 @@ contract FlashRolloverLoan_Integration_Test is Testable {
 
         LenderCommitmentForwarder_G3(address(lenderCommitmentForwarder))
             .initialize(address(this));
-
-        //LenderCommitmentForwarder_G3(address(lenderCommitmentForwarder))
-        //    .addExtension(address(flashRolloverLoan));
     }
 
     function test_flashRollover() public {
@@ -233,7 +230,7 @@ contract FlashRolloverLoan_Integration_Test is Testable {
         /*
         vm.prank(address(lender));
         IExtensionsContext(address(lenderCommitmentForwarder))
-            .approveExtension(address(flashRolloverLoan)); 
+            .approveExtension(address(flashRolloverLoan));
                 */
 
         //how do we calc how much to flash ??

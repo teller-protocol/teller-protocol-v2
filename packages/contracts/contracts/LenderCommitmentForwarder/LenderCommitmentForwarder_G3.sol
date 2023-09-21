@@ -14,9 +14,7 @@ contract LenderCommitmentForwarder_G3 is
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor(address _tellerV2, address _marketRegistry)
         LenderCommitmentForwarder_G2(_tellerV2, _marketRegistry)
-    {
-        
-    }
+    {}
 
     function initialize(address _newOwner) external initializer {
         _initializeExtensions(_newOwner);
@@ -28,7 +26,6 @@ contract LenderCommitmentForwarder_G3 is
     {
         _transferOwnership(_newOwner);
     }
- 
 
     function _msgSender()
         internal
@@ -40,7 +37,7 @@ contract LenderCommitmentForwarder_G3 is
         return ExtensionsContextUpgradeable._msgSender();
     }
 
-/*
+    /*
     function _msgData()
         internal
         view

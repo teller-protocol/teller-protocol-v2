@@ -39,19 +39,19 @@ const deployFn: DeployFunction = async (hre) => {
           unsafeAllow: ['constructor', 'state-variable-immutable'],
           constructorArgs: [
             await tellerV2.getAddress(),
-            await marketRegistry.getAddress()
+            await marketRegistry.getAddress(),
           ],
           call: {
             fn: 'initialize',
-            args: [protocolTimelock]
-          }
-        }
+            args: [protocolTimelock],
+          },
+        },
       },
-      ...addExtensionProposalSteps
-    ]
+      ...addExtensionProposalSteps,
+    ],
   })
   await hre.run('oz:defender:save-proposed-steps', {
-    steps: addExtensionProposalSteps
+    steps: addExtensionProposalSteps,
   })
 
   hre.log('done.')
@@ -67,19 +67,18 @@ deployFn.tags = [
   'proposal',
   'upgrade',
   'lender-commitment-forwarder',
-  'lender-commitment-forwarder:g2-upgrade'
+  'lender-commitment-forwarder:g2-upgrade',
 ]
 deployFn.dependencies = [
   'market-registry:deploy',
   'teller-v2:deploy',
   'lender-commitment-forwarder:deploy',
-  'lender-commitment-forwarder:extensions:deploy'
+  'lender-commitment-forwarder:extensions:deploy',
 ]
 deployFn.skip = async (hre) => {
+  return true //always skip for now
 
-  return true //always skip for now 
-  
- /* return (
+  /* return (
     !hre.network.live ||
     !['mainnet', 'polygon', 'arbitrum', 'goerli', 'sepolia'].includes(
       hre.network.name

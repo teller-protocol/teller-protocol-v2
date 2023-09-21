@@ -15,7 +15,7 @@ import { User } from "./Test_Helpers.sol";
 
 import "../contracts/mock/MarketRegistryMock.sol";
 
-contract MarketForwarder_Test is Testable, TellerV2MarketForwarder_G1{
+contract MarketForwarder_Test is Testable, TellerV2MarketForwarder_G1 {
     MarketForwarderTester private tellerV2Mock;
 
     MarketRegistryMock mockMarketRegistry;

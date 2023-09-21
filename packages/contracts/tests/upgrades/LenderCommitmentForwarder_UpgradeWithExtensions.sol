@@ -7,8 +7,8 @@ import "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
 import "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
 
 import "../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarder.sol";
-import {LenderCommitmentForwarder_G1} from "../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarder_G1.sol";
-import {LenderCommitmentForwarder_G3} from "../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarder_G3.sol";
+import { LenderCommitmentForwarder_G1 } from "../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarder_G1.sol";
+import { LenderCommitmentForwarder_G3 } from "../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarder_G3.sol";
 
 contract LenderCommitmentForwarder_UpgradeToG2 is Testable {
     ProxyAdmin internal admin;

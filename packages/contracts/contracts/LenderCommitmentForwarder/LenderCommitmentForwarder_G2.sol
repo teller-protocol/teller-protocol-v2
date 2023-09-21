@@ -18,7 +18,7 @@ import "@openzeppelin/contracts-upgradeable/utils/cryptography/MerkleProofUpgrad
 
 import "lib/forge-std/src/console.sol";
 
-contract LenderCommitmentForwarder_G2 is 
+contract LenderCommitmentForwarder_G2 is
     TellerV2MarketForwarder_G2,
     ILenderCommitmentForwarder
 {
@@ -562,7 +562,7 @@ contract LenderCommitmentForwarder_G2 is
                 _collateralAddress: commitment.collateralTokenAddress
             });
         }
-         
+
         bidId = _submitBidWithCollateral(createLoanArgs, _msgSender());
 
         _acceptBid(bidId, commitment.lender);

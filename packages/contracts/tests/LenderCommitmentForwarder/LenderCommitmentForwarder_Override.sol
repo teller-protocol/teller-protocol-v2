@@ -44,7 +44,6 @@ contract LenderCommitmentForwarder_Override is LenderCommitmentForwarder_G2 {
     /*
         Overrider methods 
     */
- 
 
     function _submitBidWithCollateral(CreateLoanArgs memory, address)
         internal

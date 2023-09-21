@@ -2,9 +2,7 @@ import { Testable } from "../../Testable.sol";
 
 import { ExtensionsContextUpgradeable } from "../../../contracts/LenderCommitmentForwarder/extensions/ExtensionsContextUpgradeable.sol";
 
-contract ExtensionsContextMock is ExtensionsContextUpgradeable {
-    
-}
+contract ExtensionsContextMock is ExtensionsContextUpgradeable {}
 
 contract ExtensionsContext_Test is Testable {
     constructor() {}
@@ -22,23 +20,22 @@ contract ExtensionsContext_Test is Testable {
 
         extensionsContext = new ExtensionsContextMock();
     }
- 
-  
+
     function test_addingExtension() public {
         bool isTrustedBefore = extensionsContext.hasExtension(
-            address(borrower) , address(extensionContract)
+            address(borrower),
+            address(extensionContract)
         );
 
-       
         //the user will approve
         vm.prank(address(borrower));
         extensionsContext.addExtension(address(extensionContract));
 
         vm.prank(address(borrower));
         bool isTrustedAfter = extensionsContext.hasExtension(
-             address(borrower) ,  address(extensionContract)
+            address(borrower),
+            address(extensionContract)
         );
-
 
         assertFalse(isTrustedBefore, "Should not be trusted forwarder before");
         assertTrue(isTrustedAfter, "Should be trusted forwarder after");

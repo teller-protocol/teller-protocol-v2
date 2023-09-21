@@ -56,7 +56,6 @@ contract FlashRolloverLoan_Integration_Test is Testable {
         lender = new User();
         marketOwner = new User();
 
-       
         tellerV2 = IntegrationTestHelpers.deployIntegrationSuite();
 
         console.logAddress(address(tellerV2));
@@ -73,7 +72,6 @@ contract FlashRolloverLoan_Integration_Test is Testable {
         );
 
         aavePoolMock = new AavePoolMock();
- 
 
         bytes32 POOL = "POOL";
         aavePoolAddressProvider.setAddress(POOL, address(aavePoolMock));
@@ -86,7 +84,6 @@ contract FlashRolloverLoan_Integration_Test is Testable {
         uint16 _feePercent = 900;
         PaymentType _paymentType = PaymentType.EMI;
         PaymentCycleType _paymentCycleType = PaymentCycleType.Seconds;
- 
 
         vm.prank(address(marketOwner));
         uint256 marketId = marketRegistry.createMarket(
@@ -101,7 +98,6 @@ contract FlashRolloverLoan_Integration_Test is Testable {
             _paymentCycleType,
             "uri"
         );
- 
 
         wethMock.deposit{ value: 100e18 }();
         wethMock.transfer(address(lender), 5e18);
@@ -116,16 +112,12 @@ contract FlashRolloverLoan_Integration_Test is Testable {
             address(lenderCommitmentForwarder),
             address(aavePoolAddressProvider)
         );
- 
 
         LenderCommitmentForwarder_G3(address(lenderCommitmentForwarder))
             .initialize(address(this));
 
         //LenderCommitmentForwarder_G3(address(lenderCommitmentForwarder))
         //    .addExtension(address(flashRolloverLoan));
-
-      
-   
     }
 
     function test_flashRollover() public {
@@ -225,19 +217,18 @@ contract FlashRolloverLoan_Integration_Test is Testable {
             address(lenderCommitmentForwarder)
         );
 
-
         //testing something ..
-   /*     vm.prank(address(flashRolloverLoan));
+        /*     vm.prank(address(flashRolloverLoan));
         ITellerV2Context(address(tellerV2)).approveMarketForwarder(
             marketId,
             address(lenderCommitmentForwarder)
         );*/
 
-
-        //borrower must approve the extension 
+        //borrower must approve the extension
         vm.prank(address(borrower));
-        IExtensionsContext(address(lenderCommitmentForwarder))
-            .addExtension(address(flashRolloverLoan)); 
+        IExtensionsContext(address(lenderCommitmentForwarder)).addExtension(
+            address(flashRolloverLoan)
+        );
 
         /*
         vm.prank(address(lender));

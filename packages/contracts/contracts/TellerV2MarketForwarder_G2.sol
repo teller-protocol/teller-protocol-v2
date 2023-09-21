@@ -20,7 +20,6 @@ abstract contract TellerV2MarketForwarder_G2 is
     Initializable,
     ContextUpgradeable,
     ITellerV2MarketForwarder
-    
 {
     using AddressUpgradeable for address;
 
@@ -104,8 +103,6 @@ abstract contract TellerV2MarketForwarder_G2 is
         address _borrower
     ) internal virtual returns (uint256 bidId) {
         bytes memory responseData;
-
- 
 
         responseData = _forwardCall(
             abi.encodeWithSignature(

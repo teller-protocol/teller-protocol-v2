@@ -70,7 +70,6 @@ contract FlashRolloverLoan_G1 is
     need to pass loanId and borrower 
     */
 
-
     /**
      * @notice Allows a borrower to rollover a loan to a new commitment.
      * @param _loanId The bid id for the loan to repay
@@ -133,7 +132,7 @@ If the new loan pays out (after fees) MORE than the  aave loan amount+ fee) then
     function executeOperation(
         address _flashToken,
         uint256 _flashAmount,
-        uint256 _flashFees,  
+        uint256 _flashFees,
         address initiator,
         bytes calldata _data
     ) external onlyFlashLoanPool returns (bool) {
@@ -265,7 +264,4 @@ If the new loan pays out (after fees) MORE than the  aave loan amount+ fee) then
     function POOL() public view returns (IPool) {
         return IPool(ADDRESSES_PROVIDER().getPool());
     }
-
-  
-  
 }

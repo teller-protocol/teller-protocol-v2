@@ -27,31 +27,13 @@ contract LenderCommitmentForwarder_G3 is
         _transferOwnership(_newOwner);
     }
 
-    function addExtension(address extension) external onlyOwner {
-        _addExtension(extension);
-    }
-
-    function removeExtension(address extension) external onlyOwner {
-        _removeExtension(extension);
-    }
-
     function _msgSender()
         internal
         view
         virtual
-        override(ContextUpgradeable, ERC2771ContextUpgradeable)
+        override(ContextUpgradeable, ExtensionsContextUpgradeable)
         returns (address sender)
     {
-        return ERC2771ContextUpgradeable._msgSender();
-    }
-
-    function _msgData()
-        internal
-        view
-        virtual
-        override(ContextUpgradeable, ERC2771ContextUpgradeable)
-        returns (bytes calldata)
-    {
-        return ERC2771ContextUpgradeable._msgData();
+        return ExtensionsContextUpgradeable._msgSender();
     }
 }

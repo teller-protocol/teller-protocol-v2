@@ -1,46 +1,56 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import "../../interfaces/IExtensionsContext.sol";
 import "@openzeppelin/contracts-upgradeable/metatx/ERC2771ContextUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/structs/EnumerableSetUpgradeable.sol";
 
-abstract contract ExtensionsContextUpgradeable is ERC2771ContextUpgradeable {
+abstract contract ExtensionsContextUpgradeable is IExtensionsContext {
     using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
 
-    EnumerableSetUpgradeable.AddressSet internal extensions;
+    // Mapping from owner to operator approvals
+    mapping(address => mapping(address => bool)) private userExtensions;
 
-    event ExtensionAdded(address extension);
-    event ExtensionRemoved(address extension);
+    event ExtensionAdded(address extension, address sender);
+    event ExtensionRevoked(address extension, address sender);
 
-    /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor() ERC2771ContextUpgradeable(address(0)) {}
-
-    function isTrustedForwarder(address forwarder)
+    function hasExtension(address account, address extension)
         public
         view
-        virtual
-        override
         returns (bool)
     {
-        return extensions.contains(forwarder);
+        return userExtensions[account][extension];
     }
 
-    function _addExtension(address extension) internal {
+    function addExtension(address extension) external {
         require(
-            !extensions.contains(extension),
-            "ExtensionsContextUpgradeable: extension already added"
+            _msgSender() != extension,
+            "ExtensionsContextUpgradeable: cannot approve own extension"
         );
-        extensions.add(extension);
-        emit ExtensionAdded(extension);
+
+        userExtensions[_msgSender()][extension] = true;
+        emit ExtensionAdded(extension, _msgSender());
     }
 
-    function _removeExtension(address extension) internal {
-        require(
-            extensions.contains(extension),
-            "ExtensionsContextUpgradeable: extension not added"
-        );
-        extensions.remove(extension);
-        emit ExtensionRemoved(extension);
+    function revokeExtension(address extension) external {
+        userExtensions[_msgSender()][extension] = false;
+        emit ExtensionRevoked(extension, _msgSender());
+    }
+
+    function _msgSender() internal view virtual returns (address sender) {
+        address sender;
+
+        if (msg.data.length >= 20) {
+            assembly {
+                sender := shr(96, calldataload(sub(calldatasize(), 20)))
+            }
+
+            if (hasExtension(sender, msg.sender)) {
+                return sender;
+            }
+        }
+
+        return msg.sender;
     }
 
     /**

@@ -214,24 +214,11 @@ contract FlashRolloverLoan_Integration_Test is Testable {
             address(lenderCommitmentForwarder)
         );
 
-        //testing something ..
-        /*     vm.prank(address(flashRolloverLoan));
-        ITellerV2Context(address(tellerV2)).approveMarketForwarder(
-            marketId,
-            address(lenderCommitmentForwarder)
-        );*/
-
         //borrower must approve the extension
         vm.prank(address(borrower));
         IExtensionsContext(address(lenderCommitmentForwarder)).addExtension(
             address(flashRolloverLoan)
         );
-
-        /*
-        vm.prank(address(lender));
-        IExtensionsContext(address(lenderCommitmentForwarder))
-            .approveExtension(address(flashRolloverLoan));
-                */
 
         //how do we calc how much to flash ??
         uint256 flashLoanAmount = 110 * 1e16;

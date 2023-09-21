@@ -36,15 +36,4 @@ contract LenderCommitmentForwarder_G3 is
     {
         return ExtensionsContextUpgradeable._msgSender();
     }
-
-    /*
-    function _msgData()
-        internal
-        view
-        virtual
-        override(ContextUpgradeable, ExtensionsContextUpgradeable)
-        returns (bytes calldata)
-    {
-        return ExtensionsContextUpgradeable._msgData();
-    }*/
 }

@@ -5,27 +5,29 @@ import { Bid } from "../../generated/schema";
 export enum BidStatus {
   None,
   Submitted,
-  Expired,
   Cancelled,
   Accepted,
+  Repaid,
+  Liquidated,
+
+  Expired,
   DueSoon,
   Late,
-  Defaulted,
-  Repaid,
-  Liquidated
+  Defaulted
 }
 
 export const BidStatusValues = new Array<string>(10);
 BidStatusValues[BidStatus.None] = "";
 BidStatusValues[BidStatus.Submitted] = "Submitted";
-BidStatusValues[BidStatus.Expired] = "Expired";
 BidStatusValues[BidStatus.Cancelled] = "Cancelled";
 BidStatusValues[BidStatus.Accepted] = "Accepted";
+BidStatusValues[BidStatus.Repaid] = "Repaid";
+BidStatusValues[BidStatus.Liquidated] = "Liquidated";
+
+BidStatusValues[BidStatus.Expired] = "Expired";
 BidStatusValues[BidStatus.DueSoon] = "Due Soon";
 BidStatusValues[BidStatus.Late] = "Late";
 BidStatusValues[BidStatus.Defaulted] = "Defaulted";
-BidStatusValues[BidStatus.Repaid] = "Repaid";
-BidStatusValues[BidStatus.Liquidated] = "Liquidated";
 
 export function bidStatusToEnum(status: string): BidStatus {
   return BidStatusValues.indexOf(status);

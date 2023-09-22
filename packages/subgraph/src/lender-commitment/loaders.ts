@@ -26,6 +26,8 @@ export function loadCommitment(commitmentId: string): Commitment {
     commitment.minAPY = BigInt.zero();
     commitment.lender = "";
     commitment.lenderAddress = Address.zero();
+    commitment.lenderPrincipalBalance = BigInt.fromU64(u64.MAX_VALUE); // default to max value - see `updaters.updateAvailableTokensFromCommitment`
+    commitment.lenderPrincipalAllowance = BigInt.fromU64(u64.MAX_VALUE); // default to max value - see `updaters.updateAvailableTokensFromCommitment`
     commitment.marketplace = "";
     commitment.marketplaceId = BigInt.zero();
     commitment.tokenVolume = "";
@@ -41,6 +43,8 @@ export function loadCommitment(commitmentId: string): Commitment {
 
     commitment.maxPrincipal = BigInt.zero();
     commitment.acceptedPrincipal = BigInt.zero();
+    commitment._oldAcceptedPrincipal = BigInt.zero();
+    commitment._newAcceptedPrincipal = BigInt.zero();
 
     commitment.save();
   }

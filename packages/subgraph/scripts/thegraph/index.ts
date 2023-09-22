@@ -1,5 +1,5 @@
 import { Mutex } from "async-mutex";
-import { MultiBar } from "cli-progress";
+import { MultiBar, SingleBar } from "cli-progress";
 import prompts, { Choice } from "prompts";
 import semver from "semver/preload";
 
@@ -35,11 +35,14 @@ const previousLog = progressBars.log.bind(progressBars);
 progressBars.log = (message: string) => previousLog(`${message}\n`);
 
 const logger: Logger = {
-  log: (msg: string) => progressBars.log(msg)
+  log: (msg = "") => progressBars.log(msg),
+  error: (msg = "") => progressBars.log(msg)
 };
 
 export const run = async (): Promise<void> => {
-  let subgraphs = await getSubgraphs();
+  let subgraphs = await getSubgraphs({
+    logger
+  });
 
   const packageVersion = getPackageVersion();
   const answers = await prompts([
@@ -78,23 +81,28 @@ export const run = async (): Promise<void> => {
         ["missing", "release"].includes(answers.releaseType) ? null : "select",
       choices: [
         {
-          title: "Latest",
-          value: "latest",
-          description:
-            "Double deployment (1st: NO block handler, 2nd: WITH block handler)"
-        },
-        {
-          title: "Latest + Block Handler",
-          value: "latest-block-handler",
-          description: "Single deployment"
-        },
-        {
           title: "None",
           value: "none",
-          description: "Resync from the beginning"
+          description: "Resyncing from the beginning."
+        },
+        {
+          title: "Latest",
+          value: "latest",
+          description: "Fork from latest subgraph version (synced or not)."
+        },
+        {
+          title: "Latest (synced ⏳)",
+          value: "latest-synced",
+          description:
+            "Fork from latest, synced subgraph version. Will wait to fully sync before forking."
         }
       ]
     },
+    // {
+    //   name: "blockHandler",
+    //   message: "Enable block handler?",
+    //   type: prev => (prev === "none" ? null : "confirm")
+    // },
     {
       name: "subgraphs",
       message: "Select subgraphs to deploy",
@@ -109,15 +117,16 @@ export const run = async (): Promise<void> => {
       min: 1
     }
   ]);
-  const releaseType = answers.releaseType;
-  let graftingType = answers.graftingType;
+  const releaseType: ReleaseType = answers.releaseType;
+  let graftingType: GraftingType = answers.graftingType;
+  // const blockHandler = answers.blockHandler ?? true;
   if (releaseType === "missing") {
     graftingType = "none";
   } else {
     subgraphs = answers.subgraphs;
 
     if (releaseType === "release") {
-      graftingType = "latest-block-handler";
+      graftingType = "latest-synced";
     }
   }
 
@@ -138,8 +147,8 @@ const buildAndDeploySubgraphs = async ({
   graftingType
 }: {
   subgraphs: ISubgraph[];
-  releaseType: string;
-  graftingType: string;
+  releaseType: ReleaseType;
+  graftingType: GraftingType;
 }): Promise<void> => {
   if (!isReleaseType(releaseType)) {
     throw new Error(`Invalid release type: ${releaseType}`);
@@ -172,7 +181,7 @@ const buildAndDeploySubgraphs = async ({
     })
   );
 
-  if (graftingType !== "latest-block-handler") {
+  if (graftingType !== "latest-synced") {
     // make the next version a release if the previous one was missing
     const nextReleaseType =
       releaseType === "missing" ? "release" : "prerelease";
@@ -180,7 +189,7 @@ const buildAndDeploySubgraphs = async ({
     void buildAndDeploySubgraphs({
       subgraphs: filteredSubgraphs,
       releaseType: nextReleaseType,
-      graftingType: "latest-block-handler"
+      graftingType: "latest-synced"
     });
   }
 };
@@ -196,36 +205,12 @@ const buildAndDeploy = async ({
   nextVersion: string;
   logger?: Logger;
 }): Promise<void> => {
+  let release = await mutex.acquire();
   const bar = progressBars.create(Infinity, 0, {
     name: subgraph.network,
     version: "v-",
     behind: Infinity
   });
-
-  const waitForSync = async (
-    version: SubgraphVersion
-  ): Promise<VersionUpdate> => {
-    const total = version.totalEthereumBlocksCount ?? 0;
-    const value = version.latestEthereumBlockNumber ?? 0;
-    bar.start(total, value, {
-      name: subgraph.network,
-      version: version.label ?? "",
-      behind: total - value
-    });
-    return await subgraph.api.waitForVersionSync(version.id, updated => {
-      bar.setTotal(updated.totalEthereumBlocksCount);
-
-      const value = updated.synced
-        ? bar.getTotal()
-        : updated.latestEthereumBlockNumber;
-      bar.update(value, {
-        name: subgraph.network,
-        version: version.label ?? "",
-        behind:
-          updated.totalEthereumBlocksCount - updated.latestEthereumBlockNumber
-      });
-    });
-  };
 
   const args: BuildArgs = {
     subgraph,
@@ -233,33 +218,102 @@ const buildAndDeploy = async ({
   };
   if (graftingType.startsWith("latest")) {
     const latestVersion = await subgraph.api.getLatestVersion();
-    if (latestVersion == null) {
-      throw new Error(`Subgraph ${subgraph.name} has no latest version`);
+
+    if (latestVersion && graftingType === "latest-synced") {
+      release();
+      const updatedVersion = await waitForSync({
+        subgraph,
+        version: latestVersion,
+        bar
+      });
+      Object.assign(latestVersion, updatedVersion);
+      release = await mutex.acquire();
     }
 
-    const updatedVersion = await waitForSync(latestVersion);
-    const blockNumber = updatedVersion.latestEthereumBlockNumber;
-    if (blockNumber == null) {
-      throw new Error(`Subgraph ${subgraph.name} has no latest block number`);
+    // if there is no latest version block number, wait and try again
+    if (!latestVersion?.latestEthereumBlockNumber) {
+      setTimeout(() => {
+        void buildAndDeploy({
+          subgraph,
+          graftingType,
+          nextVersion,
+          logger
+        });
+      }, 5000);
+      return;
     }
+
+    const graftingBlock = latestVersion.latestEthereumBlockNumber;
+    logger?.log(
+      `Grafting subgraph: ${subgraph.name} (${subgraph.network}) at block ${graftingBlock}`
+    );
 
     args.grafting = {
       base: latestVersion.deploymentId,
-      block: blockNumber
+      block: graftingBlock
     };
-    if (graftingType === "latest-block-handler") {
+
+    if (latestVersion?.synced) {
+      logger?.log(
+        `Enabling block handler for ${subgraph.name} (${subgraph.network})`
+      );
+
       args.block_handler = {
-        block: blockNumber
+        block: subgraph.config.contracts.teller_v2.block
       };
     }
   }
 
-  await mutex.runExclusive(async () => {
-    const buildId = await build(args);
+  const buildId = await build(args);
+  try {
     await deploy({
       subgraph,
       newVersion: nextVersion,
       logger
     });
+  } catch (err) {
+    if (
+      err instanceof Error &&
+      !err.message.includes("HTTP error deploying the subgraph 504")
+    ) {
+      throw err;
+    }
+  }
+  release();
+  void subgraph.api.getLatestVersion().then(async latestVersion => {
+    // TODO: there should always be a latest version
+    if (!latestVersion) return;
+
+    await waitForSync({ subgraph, version: latestVersion, bar });
   });
 };
+async function waitForSync({
+  version,
+  subgraph,
+  bar
+}: {
+  version: SubgraphVersion;
+  subgraph: ISubgraph;
+  bar: SingleBar;
+}): Promise<VersionUpdate> {
+  const total = version.totalEthereumBlocksCount ?? 0;
+  const value = version.latestEthereumBlockNumber ?? 0;
+  bar.start(total, value, {
+    name: subgraph.network,
+    version: version.label ?? "",
+    behind: total - value
+  });
+  return await subgraph.api.waitForVersionSync(version.id, updated => {
+    bar.setTotal(updated.totalEthereumBlocksCount);
+
+    const value = updated.synced
+      ? bar.getTotal()
+      : updated.latestEthereumBlockNumber;
+    bar.update(value, {
+      name: subgraph.network,
+      version: version.label ?? "",
+      behind:
+        updated.totalEthereumBlocksCount - updated.latestEthereumBlockNumber
+    });
+  });
+}

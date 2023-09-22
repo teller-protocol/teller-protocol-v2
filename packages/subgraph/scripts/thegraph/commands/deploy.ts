@@ -15,10 +15,9 @@ export const deploy = async (args: DeployArgs): Promise<void> => {
 
   await create({ subgraph });
 
-  const versionLabelWithNetwork = `${newVersion}+${subgraph.network}`;
-  logger?.log(
-    `Deploying subgraph: ${subgraph.name} ${versionLabelWithNetwork}`
-  );
+  logger?.log(`Deploying subgraph: ${subgraph.name} ${subgraph.network}`);
+
+  await subgraph.api.beforeDeploy?.();
 
   await runCmd(
     "yarn",
@@ -26,7 +25,7 @@ export const deploy = async (args: DeployArgs): Promise<void> => {
       "graph",
       "deploy",
       "--version-label",
-      versionLabelWithNetwork,
+      newVersion,
       ...subgraph.api.args.node(),
       ...subgraph.api.args.ipfs(),
       ...subgraph.api.args.product(),

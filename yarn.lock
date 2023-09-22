@@ -1008,12 +1008,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@graphprotocol/graph-cli@npm:^0.55.0":
-  version: 0.55.0
-  resolution: "@graphprotocol/graph-cli@npm:0.55.0"
+"@graphprotocol/graph-cli@npm:^0.57.0":
+  version: 0.57.0
+  resolution: "@graphprotocol/graph-cli@npm:0.57.0"
   dependencies:
     "@float-capital/float-subgraph-uncrashable": ^0.0.0-alpha.4
     "@oclif/core": 2.8.6
+    "@oclif/plugin-autocomplete": ^2.3.6
+    "@oclif/plugin-not-found": ^2.4.0
     "@whatwg-node/fetch": ^0.8.4
     assemblyscript: 0.19.23
     binary-install-raw: 0.0.13
@@ -1040,7 +1042,7 @@ __metadata:
     yaml: 1.10.2
   bin:
     graph: bin/run
-  checksum: b46a53fd92910e13c93ad114b5f615fee81bedbbfda65bdb928c6720ff14f1a47035a7e2b78e9dfd7b9cbbeaf443e2c1d20a2d03b12cf373ab27b66346bfd43a
+  checksum: 9c0b20c75d35dbd5911b599bae2212697a0a791362a99a8962808d815792231b72ef859f33726f7240c2e7e5f0c8f0fc52dd7c5ad65dd62d2c28da9acde7f983
   languageName: node
   linkType: hard
 
@@ -1756,6 +1758,64 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@oclif/core@npm:^2.15.0":
+  version: 2.15.0
+  resolution: "@oclif/core@npm:2.15.0"
+  dependencies:
+    "@types/cli-progress": ^3.11.0
+    ansi-escapes: ^4.3.2
+    ansi-styles: ^4.3.0
+    cardinal: ^2.1.1
+    chalk: ^4.1.2
+    clean-stack: ^3.0.1
+    cli-progress: ^3.12.0
+    debug: ^4.3.4
+    ejs: ^3.1.8
+    get-package-type: ^0.1.0
+    globby: ^11.1.0
+    hyperlinker: ^1.0.0
+    indent-string: ^4.0.0
+    is-wsl: ^2.2.0
+    js-yaml: ^3.14.1
+    natural-orderby: ^2.0.3
+    object-treeify: ^1.1.33
+    password-prompt: ^1.1.2
+    slice-ansi: ^4.0.0
+    string-width: ^4.2.3
+    strip-ansi: ^6.0.1
+    supports-color: ^8.1.1
+    supports-hyperlinks: ^2.2.0
+    ts-node: ^10.9.1
+    tslib: ^2.5.0
+    widest-line: ^3.1.0
+    wordwrap: ^1.0.0
+    wrap-ansi: ^7.0.0
+  checksum: a4ef8ad00d9bc7cb48e5847bad7def6947f913875f4b0ecec65ab423a3c2a82c87df173c709c3c25396d545f60d20d17d562c474f66230d76de43061ce22ba90
+  languageName: node
+  linkType: hard
+
+"@oclif/plugin-autocomplete@npm:^2.3.6":
+  version: 2.3.8
+  resolution: "@oclif/plugin-autocomplete@npm:2.3.8"
+  dependencies:
+    "@oclif/core": ^2.15.0
+    chalk: ^4.1.0
+    debug: ^4.3.4
+  checksum: 5c15ae7ac2304b8ab09a6c13e9aca52435c7639648e3bb8f6fa5d38987b07e33b4aab850ce61242c50d41cf80510ac93643da0dde6807b629b43d1ea808fba68
+  languageName: node
+  linkType: hard
+
+"@oclif/plugin-not-found@npm:^2.4.0":
+  version: 2.4.1
+  resolution: "@oclif/plugin-not-found@npm:2.4.1"
+  dependencies:
+    "@oclif/core": ^2.15.0
+    chalk: ^4
+    fast-levenshtein: ^3.0.0
+  checksum: 7be4e98aeec1cb5127c3bc3c9c89747374c128e677f5457b53972d3abac579b385efdc10fed610345ef792ba9506ac98fa2fb706627e6728a197da276797df1d
+  languageName: node
+  linkType: hard
+
 "@openzeppelin/contracts-upgradeable@npm:^4.8.0":
   version: 4.8.1
   resolution: "@openzeppelin/contracts-upgradeable@npm:4.8.1"
@@ -2324,7 +2384,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@teller-protocol/v2-subgraph@workspace:packages/subgraph"
   dependencies:
-    "@graphprotocol/graph-cli": ^0.55.0
+    "@graphprotocol/graph-cli": ^0.57.0
     "@graphprotocol/graph-ts": ^0.31.0
     "@ledgerhq/hw-app-eth": ^6.34.0
     "@ledgerhq/hw-transport-node-hid": ^6.27.19
@@ -5377,7 +5437,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chalk@npm:^4.0.0, chalk@npm:^4.0.2, chalk@npm:^4.1.0, chalk@npm:^4.1.1, chalk@npm:^4.1.2":
+"chalk@npm:^4, chalk@npm:^4.0.0, chalk@npm:^4.0.2, chalk@npm:^4.1.0, chalk@npm:^4.1.1, chalk@npm:^4.1.2":
   version: 4.1.2
   resolution: "chalk@npm:4.1.2"
   dependencies:
@@ -8343,6 +8403,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fast-levenshtein@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "fast-levenshtein@npm:3.0.0"
+  dependencies:
+    fastest-levenshtein: ^1.0.7
+  checksum: 02732ba6c656797ca7e987c25f3e53718c8fcc39a4bfab46def78eef7a8729eb629632d4a7eca4c27a33e10deabffa9984839557e18a96e91ecf7ccaeedb9890
+  languageName: node
+  linkType: hard
+
 "fast-querystring@npm:^1.1.1":
   version: 1.1.2
   resolution: "fast-querystring@npm:1.1.2"
@@ -8358,6 +8427,13 @@ __metadata:
   dependencies:
     punycode: ^1.3.2
   checksum: 5043d0c4a8d775ff58504d56c096563c11b113e4cb8a2668c6f824a1cd4fb3812e2fdf76537eb24a7ce4ae7def6bd9747da630c617cf2a4b6ce0c42514e4f21c
+  languageName: node
+  linkType: hard
+
+"fastest-levenshtein@npm:^1.0.7":
+  version: 1.0.16
+  resolution: "fastest-levenshtein@npm:1.0.16"
+  checksum: a78d44285c9e2ae2c25f3ef0f8a73f332c1247b7ea7fb4a191e6bb51aa6ee1ef0dfb3ed113616dcdc7023e18e35a8db41f61c8d88988e877cf510df8edafbc71
   languageName: node
   linkType: hard
 

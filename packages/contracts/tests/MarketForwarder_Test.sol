@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import { Testable } from "./Testable.sol";
 import { TellerV2Context } from "../contracts/TellerV2Context.sol";
 import { IMarketRegistry } from "../contracts/interfaces/IMarketRegistry.sol";
-import { TellerV2MarketForwarder } from "../contracts/TellerV2MarketForwarder.sol";
+import { TellerV2MarketForwarder_G1 } from "../contracts/TellerV2MarketForwarder_G1.sol";
 import { MarketForwarder_Override } from "./MarketForwarder_Override.sol";
 
 import { User } from "./Test_Helpers.sol";

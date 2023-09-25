@@ -4,6 +4,7 @@ pragma solidity >=0.8.0 <0.9.0;
 
 import "../TellerV2.sol";
 import "../interfaces/ITellerV2.sol";
+import "../interfaces/IProtocolFee.sol";
 import "../TellerV2Context.sol";
 import { Collateral } from "../interfaces/escrow/ICollateralEscrowV1.sol";
 import { LoanDetails, Payment, BidState } from "../TellerV2Storage.sol";
@@ -11,7 +12,7 @@ import { LoanDetails, Payment, BidState } from "../TellerV2Storage.sol";
 /*
 This is only used for sol test so its named specifically to avoid being used for the typescript tests.
 */
-contract TellerV2SolMock is ITellerV2, TellerV2Storage {
+contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
     function setMarketRegistry(address _marketRegistry) public {
         marketRegistry = IMarketRegistry(_marketRegistry);
     }
@@ -20,12 +21,16 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
         return marketRegistry;
     }
 
+    function protocolFee() external view returns (uint16) {
+        return 100;
+    }
+
     function submitBid(
         address _lendingToken,
         uint256 _marketId,
         uint256 _principal,
         uint32 _duration,
-        uint16,
+        uint16 _APR,
         string calldata,
         address _receiver
     ) public returns (uint256 bidId_) {
@@ -40,6 +45,11 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
         bid.loanDetails.loanDuration = _duration;
         bid.loanDetails.timestamp = uint32(block.timestamp);
 
+        (bid.terms.paymentCycle, bidPaymentCycleType[bidId]) = marketRegistry
+            .getPaymentCycle(_marketId);
+
+        bid.terms.APR = _APR;
+
         bidId++;
     }
 
@@ -52,11 +62,38 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
         string calldata _metadataURI,
         address _receiver,
         Collateral[] calldata _collateralInfo
-    ) public returns (uint256 bidId_) {}
+    ) public returns (uint256 bidId_) {
+        submitBid(
+            _lendingToken,
+            _marketplaceId,
+            _principal,
+            _duration,
+            _APR,
+            _metadataURI,
+            _receiver
+        );
+    }
 
     function repayLoanMinimum(uint256 _bidId) external {}
 
-    function repayLoanFull(uint256 _bidId) external {}
+    function repayLoanFull(uint256 _bidId) external {
+        Bid storage bid = bids[_bidId];
+
+        (uint256 owedPrincipal, , uint256 interest) = V2Calculations
+            .calculateAmountOwed(
+                bids[_bidId],
+                block.timestamp,
+                bidPaymentCycleType[_bidId]
+            );
+
+        uint256 _amount = owedPrincipal + interest;
+
+        IERC20(bid.loanDetails.lendingToken).transferFrom(
+            msg.sender,
+            address(this),
+            _amount
+        );
+    }
 
     function repayLoan(uint256 _bidId, uint256 _amount) public {
         Bid storage bid = bids[_bidId];
@@ -72,7 +109,7 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
      * @notice Calculates the minimum payment amount due for a loan.
      * @param _bidId The id of the loan bid to get the payment amount for.
      */
-    function calculateAmountDue(uint256 _bidId)
+    function calculateAmountDue(uint256 _bidId, uint256 _timestamp)
         public
         view
         returns (Payment memory due)
@@ -82,32 +119,27 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
         (, uint256 duePrincipal, uint256 interest) = V2Calculations
             .calculateAmountOwed(
                 bids[_bidId],
-                block.timestamp,
+                _timestamp,
                 bidPaymentCycleType[_bidId]
             );
         due.principal = duePrincipal;
         due.interest = interest;
     }
 
-    /**
-     * @notice Calculates the minimum payment amount due for a loan at a specific timestamp.
-     * @param _bidId The id of the loan bid to get the payment amount for.
-     * @param _timestamp The timestamp at which to get the due payment at.
-     */
-    function calculateAmountDue(uint256 _bidId, uint256 _timestamp)
+    function calculateAmountOwed(uint256 _bidId, uint256 _timestamp)
         public
         view
         returns (Payment memory due)
     {
-        Bid storage bid = bids[_bidId];
-        if (
-            bids[_bidId].state != BidState.ACCEPTED ||
-            bid.loanDetails.acceptedTimestamp >= _timestamp
-        ) return due;
+        if (bids[_bidId].state != BidState.ACCEPTED) return due;
 
-        (, uint256 duePrincipal, uint256 interest) = V2Calculations
-            .calculateAmountOwed(bid, _timestamp, bidPaymentCycleType[_bidId]);
-        due.principal = duePrincipal;
+        (uint256 owedPrincipal, , uint256 interest) = V2Calculations
+            .calculateAmountOwed(
+                bids[_bidId],
+                _timestamp,
+                bidPaymentCycleType[_bidId]
+            );
+        due.principal = owedPrincipal;
         due.interest = interest;
     }
 
@@ -122,6 +154,8 @@ contract TellerV2SolMock is ITellerV2, TellerV2Storage {
         Bid storage bid = bids[_bidId];
 
         bid.lender = msg.sender;
+
+        bid.state = BidState.ACCEPTED;
 
         //send tokens to caller
         IERC20(bid.loanDetails.lendingToken).transferFrom(

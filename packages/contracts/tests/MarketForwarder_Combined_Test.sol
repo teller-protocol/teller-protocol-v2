@@ -9,13 +9,13 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import { Testable } from "./Testable.sol";
 import { TellerV2Context } from "../contracts/TellerV2Context.sol";
 import { IMarketRegistry } from "../contracts/interfaces/IMarketRegistry.sol";
-import { TellerV2MarketForwarder } from "../contracts/TellerV2MarketForwarder.sol";
+import { TellerV2MarketForwarder_G1 } from "../contracts/TellerV2MarketForwarder_G1.sol";
 
 import { User } from "./Test_Helpers.sol";
 
 import "../contracts/mock/MarketRegistryMock.sol";
 
-contract MarketForwarder_Test is Testable, TellerV2MarketForwarder {
+contract MarketForwarder_Test is Testable, TellerV2MarketForwarder_G1 {
     MarketForwarderTester private tellerV2Mock;
 
     MarketRegistryMock mockMarketRegistry;
@@ -26,7 +26,7 @@ contract MarketForwarder_Test is Testable, TellerV2MarketForwarder {
     MarketForwarderUser private user2;
 
     constructor()
-        TellerV2MarketForwarder(
+        TellerV2MarketForwarder_G1(
             address(new MarketForwarderTester()),
             address(new MarketRegistryMock())
         )

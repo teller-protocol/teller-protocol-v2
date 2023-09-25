@@ -9,14 +9,14 @@ const deployFn: DeployFunction = async (hre) => {
   const trustedForwarder = await hre.contracts.get('MetaForwarder')
   const v2Calculations = await hre.deployments.get('V2Calculations')
 
-  await hre.defender.proposeBatchTimelock(
-    'TellerV2: Fix Loan Liquidated State',
-    ` 
+  await hre.defender.proposeBatchTimelock({
+    title: 'TellerV2: Fix Loan Liquidated State',
+    description: ` 
 # TellerV2
 
 * Fixes issue where the loan's state was being overwritten from Liquidated to Repaid on liquidation.
 `,
-    [
+    _steps: [
       {
         proxy: tellerV2,
         implFactory: await hre.ethers.getContractFactory('TellerV2', {
@@ -34,8 +34,8 @@ const deployFn: DeployFunction = async (hre) => {
           constructorArgs: [await trustedForwarder.getAddress()],
         },
       },
-    ]
-  )
+    ],
+  })
 
   hre.log('done.')
   hre.log('')

@@ -15,5 +15,7 @@
   "sherlock-audit:upgrade": 1688607472,
   "teller-v2:transfer-ownership-to-safe": 1688749381,
   "lender-commitment-forwarder:merkle-upgrade": 1690562954,
-  "teller-v2:loan-liquidated-state-upgrade": 1692998119
+  "teller-v2:loan-liquidated-state-upgrade": 1692998119,
+  "lender-commitment-forwarder:extensions:flash-rollover:deploy": 1694010171,
+  "lender-commitment-forwarder:staging:deploy": 1695674242
 }

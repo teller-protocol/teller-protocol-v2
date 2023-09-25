@@ -8,7 +8,7 @@
       "inputs": [
         {
           "type": "address",
-          "name": "_protocolAddress"
+          "name": "_tellerV2"
         },
         {
           "type": "address",
@@ -660,6 +660,6 @@
     "status": 1,
     "byzantium": true
   },
-  "numDeployments": 10,
+  "numDeployments": 11,
   "implementation": "0x67836900F57360E6F868CA19806Bf4f51c84650B"
 }

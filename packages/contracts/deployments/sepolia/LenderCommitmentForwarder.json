@@ -1,5 +1,5 @@
 {
-  "address": "0x80e154969eF0090adB2A22a8c8e1697DfD2d80fC",
+  "address": "0x7FA4D022dF7f1ad9Ac6eF7e22578353C69502692",
   "abi": [
     {
       "type": "constructor",
@@ -118,53 +118,12 @@
     {
       "type": "event",
       "anonymous": false,
-      "name": "ExtensionAdded",
-      "inputs": [
-        {
-          "type": "address",
-          "name": "extension",
-          "indexed": false
-        }
-      ]
-    },
-    {
-      "type": "event",
-      "anonymous": false,
-      "name": "ExtensionRemoved",
-      "inputs": [
-        {
-          "type": "address",
-          "name": "extension",
-          "indexed": false
-        }
-      ]
-    },
-    {
-      "type": "event",
-      "anonymous": false,
       "name": "Initialized",
       "inputs": [
         {
           "type": "uint8",
           "name": "version",
           "indexed": false
-        }
-      ]
-    },
-    {
-      "type": "event",
-      "anonymous": false,
-      "name": "OwnershipTransferred",
-      "inputs": [
-        {
-          "type": "address",
-          "name": "previousOwner",
-          "indexed": true
-        },
-        {
-          "type": "address",
-          "name": "newOwner",
-          "indexed": true
         }
       ]
     },
@@ -330,102 +289,6 @@
     },
     {
       "type": "function",
-      "name": "acceptCommitmentWithRecipient",
-      "constant": false,
-      "payable": false,
-      "inputs": [
-        {
-          "type": "uint256",
-          "name": "_commitmentId"
-        },
-        {
-          "type": "uint256",
-          "name": "_principalAmount"
-        },
-        {
-          "type": "uint256",
-          "name": "_collateralAmount"
-        },
-        {
-          "type": "uint256",
-          "name": "_collateralTokenId"
-        },
-        {
-          "type": "address",
-          "name": "_collateralTokenAddress"
-        },
-        {
-          "type": "address",
-          "name": "_recipient"
-        },
-        {
-          "type": "uint16",
-          "name": "_interestRate"
-        },
-        {
-          "type": "uint32",
-          "name": "_loanDuration"
-        }
-      ],
-      "outputs": [
-        {
-          "type": "uint256",
-          "name": "bidId"
-        }
-      ]
-    },
-    {
-      "type": "function",
-      "name": "acceptCommitmentWithRecipientAndProof",
-      "constant": false,
-      "payable": false,
-      "inputs": [
-        {
-          "type": "uint256",
-          "name": "_commitmentId"
-        },
-        {
-          "type": "uint256",
-          "name": "_principalAmount"
-        },
-        {
-          "type": "uint256",
-          "name": "_collateralAmount"
-        },
-        {
-          "type": "uint256",
-          "name": "_collateralTokenId"
-        },
-        {
-          "type": "address",
-          "name": "_collateralTokenAddress"
-        },
-        {
-          "type": "address",
-          "name": "_recipient"
-        },
-        {
-          "type": "uint16",
-          "name": "_interestRate"
-        },
-        {
-          "type": "uint32",
-          "name": "_loanDuration"
-        },
-        {
-          "type": "bytes32[]",
-          "name": "_merkleProof"
-        }
-      ],
-      "outputs": [
-        {
-          "type": "uint256",
-          "name": "bidId"
-        }
-      ]
-    },
-    {
-      "type": "function",
       "name": "addCommitmentBorrowers",
       "constant": false,
       "payable": false,
@@ -437,19 +300,6 @@
         {
           "type": "address[]",
           "name": "_borrowerAddressList"
-        }
-      ],
-      "outputs": []
-    },
-    {
-      "type": "function",
-      "name": "addExtension",
-      "constant": false,
-      "payable": false,
-      "inputs": [
-        {
-          "type": "address",
-          "name": "extension"
         }
       ],
       "outputs": []
@@ -615,25 +465,6 @@
     },
     {
       "type": "function",
-      "name": "getCommitmentAcceptedPrincipal",
-      "constant": true,
-      "stateMutability": "view",
-      "payable": false,
-      "inputs": [
-        {
-          "type": "uint256",
-          "name": "_commitmentId"
-        }
-      ],
-      "outputs": [
-        {
-          "type": "uint256",
-          "name": ""
-        }
-      ]
-    },
-    {
-      "type": "function",
       "name": "getCommitmentBorrowers",
       "constant": true,
       "stateMutability": "view",
@@ -648,63 +479,6 @@
         {
           "type": "address[]",
           "name": "borrowers_"
-        }
-      ]
-    },
-    {
-      "type": "function",
-      "name": "getCommitmentLender",
-      "constant": true,
-      "stateMutability": "view",
-      "payable": false,
-      "inputs": [
-        {
-          "type": "uint256",
-          "name": "_commitmentId"
-        }
-      ],
-      "outputs": [
-        {
-          "type": "address",
-          "name": ""
-        }
-      ]
-    },
-    {
-      "type": "function",
-      "name": "getCommitmentMarketId",
-      "constant": true,
-      "stateMutability": "view",
-      "payable": false,
-      "inputs": [
-        {
-          "type": "uint256",
-          "name": "_commitmentId"
-        }
-      ],
-      "outputs": [
-        {
-          "type": "uint256",
-          "name": ""
-        }
-      ]
-    },
-    {
-      "type": "function",
-      "name": "getCommitmentMaxPrincipal",
-      "constant": true,
-      "stateMutability": "view",
-      "payable": false,
-      "inputs": [
-        {
-          "type": "uint256",
-          "name": "_commitmentId"
-        }
-      ],
-      "outputs": [
-        {
-          "type": "uint256",
-          "name": ""
         }
       ]
     },
@@ -791,52 +565,6 @@
     },
     {
       "type": "function",
-      "name": "initialize",
-      "constant": false,
-      "payable": false,
-      "inputs": [
-        {
-          "type": "address",
-          "name": "_newOwner"
-        }
-      ],
-      "outputs": []
-    },
-    {
-      "type": "function",
-      "name": "isTrustedForwarder",
-      "constant": true,
-      "stateMutability": "view",
-      "payable": false,
-      "inputs": [
-        {
-          "type": "address",
-          "name": "forwarder"
-        }
-      ],
-      "outputs": [
-        {
-          "type": "bool",
-          "name": ""
-        }
-      ]
-    },
-    {
-      "type": "function",
-      "name": "owner",
-      "constant": true,
-      "stateMutability": "view",
-      "payable": false,
-      "inputs": [],
-      "outputs": [
-        {
-          "type": "address",
-          "name": ""
-        }
-      ]
-    },
-    {
-      "type": "function",
       "name": "removeCommitmentBorrowers",
       "constant": false,
       "payable": false,
@@ -848,40 +576,6 @@
         {
           "type": "address[]",
           "name": "_borrowerAddressList"
-        }
-      ],
-      "outputs": []
-    },
-    {
-      "type": "function",
-      "name": "removeExtension",
-      "constant": false,
-      "payable": false,
-      "inputs": [
-        {
-          "type": "address",
-          "name": "extension"
-        }
-      ],
-      "outputs": []
-    },
-    {
-      "type": "function",
-      "name": "renounceOwnership",
-      "constant": false,
-      "payable": false,
-      "inputs": [],
-      "outputs": []
-    },
-    {
-      "type": "function",
-      "name": "transferOwnership",
-      "constant": false,
-      "payable": false,
-      "inputs": [
-        {
-          "type": "address",
-          "name": "newOwner"
         }
       ],
       "outputs": []
@@ -950,13 +644,13 @@
       "outputs": []
     }
   ],
-  "transactionHash": "0xa87f1395aa98b7931584b84ca5ca8f7c86be9f980683f12fd610a75753f9177f",
+  "transactionHash": "0x887ce1bf33a886bd3453f81aaa3aa54f0ebce403d742a735e3c26d5fc0c90450",
   "receipt": {
     "to": null,
-    "from": "0x5a5B978142C8F08Dd013901b50892baC49f3b700",
+    "from": "0x65B38b3Cd7eFe502DB579c16ECB5B49235d0DAd0",
     "blockHash": null,
     "blockNumber": null
   },
-  "numDeployments": 7,
-  "implementation": "0xA8c7DA79473dfe66A2661e5bE6B566bE03BD0ef6"
+  "numDeployments": 1,
+  "implementation": "0xbB2c2d83f30B04Cb0443D75826c4265567005dA9"
 }

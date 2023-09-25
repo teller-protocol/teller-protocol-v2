@@ -1,5 +1,6 @@
 {
-  "address": "0x17A8e82351661DFD568FEE6D7c38695b67e1e924",
+  "address": "0xd23F21685955e2d2637eEAAF6e870d1DB65ac2b7",
+  "fqn": "contracts/LenderCommitmentForwarder/LenderCommitmentForwarderStaging.sol:LenderCommitmentForwarderStaging",
   "abi": [
     {
       "type": "constructor",
@@ -111,6 +112,40 @@
         {
           "type": "uint256",
           "name": "bidId",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "ExtensionAdded",
+      "inputs": [
+        {
+          "type": "address",
+          "name": "extension",
+          "indexed": false
+        },
+        {
+          "type": "address",
+          "name": "sender",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "ExtensionRevoked",
+      "inputs": [
+        {
+          "type": "address",
+          "name": "extension",
+          "indexed": false
+        },
+        {
+          "type": "address",
+          "name": "sender",
           "indexed": false
         }
       ]
@@ -289,6 +324,102 @@
     },
     {
       "type": "function",
+      "name": "acceptCommitmentWithRecipient",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_commitmentId"
+        },
+        {
+          "type": "uint256",
+          "name": "_principalAmount"
+        },
+        {
+          "type": "uint256",
+          "name": "_collateralAmount"
+        },
+        {
+          "type": "uint256",
+          "name": "_collateralTokenId"
+        },
+        {
+          "type": "address",
+          "name": "_collateralTokenAddress"
+        },
+        {
+          "type": "address",
+          "name": "_recipient"
+        },
+        {
+          "type": "uint16",
+          "name": "_interestRate"
+        },
+        {
+          "type": "uint32",
+          "name": "_loanDuration"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": "bidId"
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "acceptCommitmentWithRecipientAndProof",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_commitmentId"
+        },
+        {
+          "type": "uint256",
+          "name": "_principalAmount"
+        },
+        {
+          "type": "uint256",
+          "name": "_collateralAmount"
+        },
+        {
+          "type": "uint256",
+          "name": "_collateralTokenId"
+        },
+        {
+          "type": "address",
+          "name": "_collateralTokenAddress"
+        },
+        {
+          "type": "address",
+          "name": "_recipient"
+        },
+        {
+          "type": "uint16",
+          "name": "_interestRate"
+        },
+        {
+          "type": "uint32",
+          "name": "_loanDuration"
+        },
+        {
+          "type": "bytes32[]",
+          "name": "_merkleProof"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": "bidId"
+        }
+      ]
+    },
+    {
+      "type": "function",
       "name": "addCommitmentBorrowers",
       "constant": false,
       "payable": false,
@@ -300,6 +431,19 @@
         {
           "type": "address[]",
           "name": "_borrowerAddressList"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "addExtension",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "extension"
         }
       ],
       "outputs": []
@@ -465,6 +609,25 @@
     },
     {
       "type": "function",
+      "name": "getCommitmentAcceptedPrincipal",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_commitmentId"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
       "name": "getCommitmentBorrowers",
       "constant": true,
       "stateMutability": "view",
@@ -479,6 +642,63 @@
         {
           "type": "address[]",
           "name": "borrowers_"
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getCommitmentLender",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_commitmentId"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getCommitmentMarketId",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_commitmentId"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getCommitmentMaxPrincipal",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_commitmentId"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
         }
       ]
     },
@@ -565,6 +785,29 @@
     },
     {
       "type": "function",
+      "name": "hasExtension",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "account"
+        },
+        {
+          "type": "address",
+          "name": "extension"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "bool",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
       "name": "removeCommitmentBorrowers",
       "constant": false,
       "payable": false,
@@ -576,6 +819,19 @@
         {
           "type": "address[]",
           "name": "_borrowerAddressList"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "revokeExtension",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "extension"
         }
       ],
       "outputs": []
@@ -644,22 +900,13 @@
       "outputs": []
     }
   ],
-  "transactionHash": "0x13b0c829f782ea24faf2675944a43fe125c05abf7673764ee618e206306bea27",
+  "transactionHash": "0xd70e25caf91c16e0e12ae94507de50ac9006ca177f2146c457d7fe9aa92bf616",
   "receipt": {
     "to": null,
-    "from": "0xAFe87013dc96edE1E116a288D80FcaA0eFFE5fe5",
-    "contractAddress": "0x17A8e82351661DFD568FEE6D7c38695b67e1e924",
-    "transactionIndex": 12,
-    "gasUsed": "544341",
-    "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-    "blockHash": "0xf621138e0daaf18449e8be4ad2cdf87d6b4b073a5a4cbc957f5b9da4e1706cdc",
-    "transactionHash": "0x13b0c829f782ea24faf2675944a43fe125c05abf7673764ee618e206306bea27",
-    "logs": [],
-    "blockNumber": 15222115,
-    "cumulativeGasUsed": "1202014",
-    "status": 1,
-    "byzantium": true
+    "from": "0x65B38b3Cd7eFe502DB579c16ECB5B49235d0DAd0",
+    "blockHash": null,
+    "blockNumber": null
   },
-  "numDeployments": 11,
-  "implementation": "0x67836900F57360E6F868CA19806Bf4f51c84650B"
+  "numDeployments": 1,
+  "implementation": "0x69620F29484C60bbC05a1698Cc793DC35c9beeCc"
 }

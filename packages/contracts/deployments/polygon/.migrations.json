@@ -17,5 +17,5 @@
   "lender-commitment-forwarder:merkle-upgrade": 1690562954,
   "teller-v2:loan-liquidated-state-upgrade": 1692998119,
   "lender-commitment-forwarder:extensions:flash-rollover:deploy": 1694010171,
-  "lender-commitment-forwarder:g2-upgrade": 1694010180
+  "lender-commitment-forwarder:staging:deploy": 1695674242
 }

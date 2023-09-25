@@ -76,8 +76,6 @@ contract FlashRolloverLoan_G3 is
         _;
     }
 
-  
-
 
 
     function rolloverLoanWithFlash(
@@ -222,54 +220,54 @@ contract FlashRolloverLoan_G3 is
         if(usingMerkleProof){
 
 
-        bytes memory responseData = address(LENDER_COMMITMENT_FORWARDER)
-            .functionCall(
-                abi.encodePacked(
-                    abi.encodeWithSelector(
-                        ILenderCommitmentForwarder
-                            .acceptCommitmentWithRecipientAndProof
-                            .selector,
-                        _commitmentArgs.commitmentId,
-                        _commitmentArgs.principalAmount,
-                        _commitmentArgs.collateralAmount,
-                        _commitmentArgs.collateralTokenId,
-                        _commitmentArgs.collateralTokenAddress,
-                        address(this),
-                        _commitmentArgs.interestRate,
-                        _commitmentArgs.loanDuration,
-                        _commitmentArgs.merkleProof
-                    ),
-                    borrower //cant be msg.sender because of the flash flow
-                )
-            );
+            bytes memory responseData = address(LENDER_COMMITMENT_FORWARDER)
+                .functionCall(
+                    abi.encodePacked(
+                        abi.encodeWithSelector(
+                            ILenderCommitmentForwarder
+                                .acceptCommitmentWithRecipientAndProof
+                                .selector,
+                            _commitmentArgs.commitmentId,
+                            _commitmentArgs.principalAmount,
+                            _commitmentArgs.collateralAmount,
+                            _commitmentArgs.collateralTokenId,
+                            _commitmentArgs.collateralTokenAddress,
+                            address(this),
+                            _commitmentArgs.interestRate,
+                            _commitmentArgs.loanDuration,
+                            _commitmentArgs.merkleProof
+                        ),
+                        borrower //cant be msg.sender because of the flash flow
+                    )
+                );
 
-        (bidId_) = abi.decode(responseData, (uint256));
+            (bidId_) = abi.decode(responseData, (uint256));
 
 
         }else{
 
 
-        bytes memory responseData = address(LENDER_COMMITMENT_FORWARDER)
-            .functionCall(
-                abi.encodePacked(
-                    abi.encodeWithSelector(
-                        ILenderCommitmentForwarder
-                            .acceptCommitmentWithRecipient
-                            .selector,
-                        _commitmentArgs.commitmentId,
-                        _commitmentArgs.principalAmount,
-                        _commitmentArgs.collateralAmount,
-                        _commitmentArgs.collateralTokenId,
-                        _commitmentArgs.collateralTokenAddress,
-                        address(this),
-                        _commitmentArgs.interestRate,
-                        _commitmentArgs.loanDuration
-                    ),
-                    borrower //cant be msg.sender because of the flash flow
-                )
-            );
+            bytes memory responseData = address(LENDER_COMMITMENT_FORWARDER)
+                .functionCall(
+                    abi.encodePacked(
+                        abi.encodeWithSelector(
+                            ILenderCommitmentForwarder
+                                .acceptCommitmentWithRecipient
+                                .selector,
+                            _commitmentArgs.commitmentId,
+                            _commitmentArgs.principalAmount,
+                            _commitmentArgs.collateralAmount,
+                            _commitmentArgs.collateralTokenId,
+                            _commitmentArgs.collateralTokenAddress,
+                            address(this),
+                            _commitmentArgs.interestRate,
+                            _commitmentArgs.loanDuration
+                        ),
+                        borrower //cant be msg.sender because of the flash flow
+                    )
+                );
 
-        (bidId_) = abi.decode(responseData, (uint256));
+            (bidId_) = abi.decode(responseData, (uint256));
 
 
         }

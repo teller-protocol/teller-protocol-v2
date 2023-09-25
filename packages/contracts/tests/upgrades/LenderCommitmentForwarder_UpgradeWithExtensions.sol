@@ -52,15 +52,10 @@ contract LenderCommitmentForwarder_UpgradeToG2 is Testable {
 
     function test_storage_slot_data_after_upgrade() public {
         // This should revert because the contract has not been upgraded yet with that function
-    
 
-        // Upgrade contract to V2  
-        admin.upgrade(
-            proxy,
-            address(logicV2)
-        );
+        // Upgrade contract to V2
+        admin.upgrade(proxy, address(logicV2));
 
-        
         // Verify the commitment principalTokenAddress is set to the correct address after the upgrade
         (
             ,

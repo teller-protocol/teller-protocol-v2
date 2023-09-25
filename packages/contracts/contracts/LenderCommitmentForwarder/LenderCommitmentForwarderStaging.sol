@@ -12,6 +12,6 @@ contract LenderCommitmentForwarderStaging is
         LenderCommitmentForwarder_G3(_tellerV2, _marketRegistry)
     {
         // we only want this on an proxy deployment so it only affects the impl
-        _disableInitializers(); 
+        _disableInitializers();
     }
 }

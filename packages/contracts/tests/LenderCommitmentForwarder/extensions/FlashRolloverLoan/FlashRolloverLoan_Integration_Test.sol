@@ -112,8 +112,6 @@ contract FlashRolloverLoan_Integration_Test is Testable {
             address(lenderCommitmentForwarder),
             address(aavePoolAddressProvider)
         );
-
-        
     }
 
     function test_flashRollover() public {

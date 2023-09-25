@@ -4,8 +4,6 @@ const deployFn: DeployFunction = async (hre) => {
   const tellerV2 = await hre.contracts.get('TellerV2')
   const marketRegistry = await hre.contracts.get('MarketRegistry')
 
-  const { protocolTimelock } = await hre.getNamedAccounts()
-
   const lenderCommitmentForwarderStaging = await hre.deployProxy(
     'LenderCommitmentForwarderStaging',
     {
@@ -14,8 +12,6 @@ const deployFn: DeployFunction = async (hre) => {
         await tellerV2.getAddress(),
         await marketRegistry.getAddress(),
       ],
-      initializer: 'initialize',
-      initArgs: [protocolTimelock],
     }
   )
 
@@ -23,7 +19,7 @@ const deployFn: DeployFunction = async (hre) => {
 }
 
 // tags and deployment
-deployFn.id = 'lender-commitment-forwarder:deploy'
+deployFn.id = 'lender-commitment-forwarder:staging:deploy'
 deployFn.tags = [
   'lender-commitment-forwarder',
   'lender-commitment-forwarder:deploy',

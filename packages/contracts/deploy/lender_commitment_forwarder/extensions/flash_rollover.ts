@@ -5,6 +5,8 @@ const aavePoolAddressProvider: { [networkName: string]: string } = {
   goerli: '0xC911B590248d127aD18546B186cC6B324e99F02c',
   sepolia: '0x0496275d34753A48320CA58103d5220d394FF77F',
   polygon: '0xa97684ead0e402dC232d5A977953DF7ECBaB3CDb',
+  arbitrum: '0xa97684ead0e402dC232d5A977953DF7ECBaB3CDb',
+  base: '0xe20fCBdBfFC4Dd138cE8b2E6FBb6CB49777ad64D',
 }
 
 const networksWithAave: string[] = Object.keys(aavePoolAddressProvider)

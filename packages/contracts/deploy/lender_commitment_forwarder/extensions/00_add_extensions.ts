@@ -12,10 +12,10 @@ const deployFn: DeployFunction = async (hre) => {
       description: `
     # Adds an extension to the LenderCommitmentForwarder
     `,
-      _steps: steps,
+      _steps: steps
     })
     await hre.run('oz:defender:save-proposed-steps', {
-      steps,
+      steps
     })
   }
 }
@@ -25,13 +25,17 @@ deployFn.id = 'lender-commitment-forwarder:extensions:add-extensions'
 deployFn.tags = [
   'lender-commitment-forwarder',
   'lender-commitment-forwarder:extensions',
-  'lender-commitment-forwarder:extensions:add-extensions',
+  'lender-commitment-forwarder:extensions:add-extensions'
 ]
 deployFn.dependencies = [
   'lender-commitment-forwarder:g2-upgrade',
   // This waits for all extensions to be deployed before creating a proposal to add them to the forwarder
-  'lender-commitment-forwarder:extensions:deploy',
+  'lender-commitment-forwarder:extensions:deploy'
 ]
+
+deployFn.skip = async (hre) => {
+  return true
+}
 
 export default deployFn
 
@@ -56,7 +60,7 @@ subtask(
 
     const extensions = await Promise.all([
       // Add extensions here
-      hre.contracts.get('FlashRolloverLoan'),
+      hre.contracts.get('FlashRolloverLoan')
     ])
     const steps: BatchProposalStep[] = []
     for (const extension of extensions) {
@@ -74,7 +78,7 @@ subtask(
         contractAddress: await lenderCommitmentForwarder.getAddress(),
         contractImplementation: lenderCommitmentForwarderG2Factory,
         callFn: 'addExtension',
-        callArgs: [await extension.getAddress()],
+        callArgs: [await extension.getAddress()]
       }
       if (
         proposedSteps.some(

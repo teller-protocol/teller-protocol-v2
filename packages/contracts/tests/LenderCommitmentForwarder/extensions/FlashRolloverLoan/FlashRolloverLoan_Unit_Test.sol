@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 import { FlashRolloverLoan } from "../../../../contracts/LenderCommitmentForwarder/extensions/FlashRolloverLoan.sol";
 
-import "../../../../contracts/interfaces/ICommitmentRolloverLoan.sol";
+import "../../../../contracts/interfaces/IFlashRolloverLoan.sol";
 import "../../../../contracts/interfaces/ILenderCommitmentForwarder.sol";
 import "../../../../contracts/interfaces/IFlashRolloverLoan.sol";
 
@@ -124,8 +124,8 @@ contract FlashRolloverLoan_Unit_Test is Testable {
 
         lenderCommitmentForwarder.setCommitment(0, commitment);
 
-        ICommitmentRolloverLoan.AcceptCommitmentArgs
-            memory commitmentArgs = ICommitmentRolloverLoan
+        IFlashRolloverLoan.AcceptCommitmentArgs
+            memory commitmentArgs = IFlashRolloverLoan
                 .AcceptCommitmentArgs({
                     commitmentId: 0,
                     principalAmount: principalAmount,
@@ -133,7 +133,8 @@ contract FlashRolloverLoan_Unit_Test is Testable {
                     collateralTokenId: 0,
                     collateralTokenAddress: address(0),
                     interestRate: interestRate,
-                    loanDuration: duration
+                    loanDuration: duration,
+                    merkleProof: new bytes32[](0)
                 });
 
         vm.prank(address(borrower));
@@ -197,8 +198,8 @@ contract FlashRolloverLoan_Unit_Test is Testable {
 
         lenderCommitmentForwarder.setCommitment(0, commitment);
 
-        ICommitmentRolloverLoan.AcceptCommitmentArgs
-            memory commitmentArgs = ICommitmentRolloverLoan
+        IFlashRolloverLoan.AcceptCommitmentArgs
+            memory commitmentArgs = IFlashRolloverLoan
                 .AcceptCommitmentArgs({
                     commitmentId: 0,
                     principalAmount: principalAmount,
@@ -206,7 +207,8 @@ contract FlashRolloverLoan_Unit_Test is Testable {
                     collateralTokenId: 0,
                     collateralTokenAddress: address(0),
                     interestRate: interestRate,
-                    loanDuration: duration
+                    loanDuration: duration,  
+                    merkleProof: new bytes32[](0)
                 });
 
         vm.prank(address(borrower));
@@ -282,8 +284,8 @@ contract FlashRolloverLoan_Unit_Test is Testable {
 
         lenderCommitmentForwarder.setCommitment(0, commitment);
 
-        ICommitmentRolloverLoan.AcceptCommitmentArgs
-            memory commitmentArgs = ICommitmentRolloverLoan
+        IFlashRolloverLoan.AcceptCommitmentArgs
+            memory commitmentArgs = IFlashRolloverLoan
                 .AcceptCommitmentArgs({
                     commitmentId: 0,
                     principalAmount: principalAmount,
@@ -291,7 +293,8 @@ contract FlashRolloverLoan_Unit_Test is Testable {
                     collateralTokenId: 0,
                     collateralTokenAddress: address(0),
                     interestRate: interestRate,
-                    loanDuration: duration
+                    loanDuration: duration,
+                    merkleProof: new bytes32[](0)
                 });
 
         vm.prank(address(borrower));
@@ -362,8 +365,8 @@ contract FlashRolloverLoan_Unit_Test is Testable {
 
         lenderCommitmentForwarder.setCommitment(0, commitment);
 
-        ICommitmentRolloverLoan.AcceptCommitmentArgs
-            memory commitmentArgs = ICommitmentRolloverLoan
+        IFlashRolloverLoan.AcceptCommitmentArgs
+            memory commitmentArgs = IFlashRolloverLoan
                 .AcceptCommitmentArgs({
                     commitmentId: 0,
                     principalAmount: principalAmount,
@@ -371,7 +374,8 @@ contract FlashRolloverLoan_Unit_Test is Testable {
                     collateralTokenId: 0,
                     collateralTokenAddress: address(0),
                     interestRate: interestRate,
-                    loanDuration: duration
+                    loanDuration: duration,
+                    merkleProof: new bytes32[](0)
                 });
 
         vm.prank(address(borrower));
@@ -442,8 +446,8 @@ contract FlashRolloverLoan_Unit_Test is Testable {
 
         lenderCommitmentForwarder.setCommitment(0, commitment);
 
-        ICommitmentRolloverLoan.AcceptCommitmentArgs
-            memory commitmentArgs = ICommitmentRolloverLoan
+        IFlashRolloverLoan.AcceptCommitmentArgs
+            memory commitmentArgs = IFlashRolloverLoan
                 .AcceptCommitmentArgs({
                     commitmentId: 0,
                     principalAmount: principalAmount,
@@ -451,7 +455,8 @@ contract FlashRolloverLoan_Unit_Test is Testable {
                     collateralTokenId: 0,
                     collateralTokenAddress: address(0),
                     interestRate: interestRate,
-                    loanDuration: duration
+                    loanDuration: duration,
+                    merkleProof: new bytes32[](0)
                 });
 
         vm.prank(address(borrower));
@@ -536,8 +541,8 @@ contract FlashRolloverLoan_Unit_Test is Testable {
 
         lenderCommitmentForwarder.setCommitment(0, commitment);
 
-        ICommitmentRolloverLoan.AcceptCommitmentArgs
-            memory commitmentArgs = ICommitmentRolloverLoan
+        IFlashRolloverLoan.AcceptCommitmentArgs
+            memory commitmentArgs = IFlashRolloverLoan
                 .AcceptCommitmentArgs({
                     commitmentId: 0,
                     principalAmount: newLoanPrincipalAmount,
@@ -545,7 +550,8 @@ contract FlashRolloverLoan_Unit_Test is Testable {
                     collateralTokenId: 0,
                     collateralTokenAddress: address(0),
                     interestRate: interestRate,
-                    loanDuration: duration
+                    loanDuration: duration,
+                    merkleProof: new bytes32[](0)
                 });
 
         vm.prank(address(borrower));

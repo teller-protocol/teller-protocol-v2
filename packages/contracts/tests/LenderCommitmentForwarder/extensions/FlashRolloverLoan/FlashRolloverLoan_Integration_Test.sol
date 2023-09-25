@@ -3,7 +3,7 @@ import { Testable } from "../../../Testable.sol";
 import { FlashRolloverLoan } from "../../../../contracts/LenderCommitmentForwarder/extensions/FlashRolloverLoan.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-import "../../../../contracts/interfaces/ICommitmentRolloverLoan.sol";
+import "../../../../contracts/interfaces/IFlashRolloverLoan.sol";
 import "../../../../contracts/interfaces/ILenderCommitmentForwarder.sol";
 import "../../../../contracts/interfaces/ITellerV2Context.sol";
 import "../../../../contracts/interfaces/IExtensionsContext.sol";
@@ -179,8 +179,10 @@ contract FlashRolloverLoan_Integration_Test is Testable {
 
         //should get 0.45  weth   from accepting this commitment  during the rollover process
 
-        ICommitmentRolloverLoan.AcceptCommitmentArgs
-            memory _acceptCommitmentArgs = ICommitmentRolloverLoan
+        
+
+        IFlashRolloverLoan.AcceptCommitmentArgs
+            memory _acceptCommitmentArgs = IFlashRolloverLoan
                 .AcceptCommitmentArgs({
                     commitmentId: commitmentId,
                     principalAmount: commitmentPrincipalAmount,
@@ -188,7 +190,8 @@ contract FlashRolloverLoan_Integration_Test is Testable {
                     collateralTokenId: 0,
                     collateralTokenAddress: address(0),
                     interestRate: interestRate,
-                    loanDuration: duration
+                    loanDuration: duration,
+                    merkleProof: new bytes32[](0)
                 });
 
         ///approve forwarders

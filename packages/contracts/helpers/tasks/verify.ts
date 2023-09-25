@@ -16,8 +16,12 @@ task(
   if (!network.config.live)
     throw new Error('Must be on a live network to submit to Tenderly')
 
+  const fqns = await hre.artifacts.getAllFullyQualifiedNames()
+
   const deployments = await hre.deployments.all()
-  for (const { address, abi } of Object.values(deployments)) {
+  for (const [name, { address, abi }] of Object.entries(deployments)) {
+    const fqn = fqns.find((fqn) => fqn.endsWith(`${name}.sol:${name}`))
+
     const implementation = await hre.upgrades.erc1967
       .getImplementationAddress(address)
       .catch(() => hre.upgrades.beacon.getImplementationAddress(address))
@@ -50,6 +54,7 @@ task(
       .run(TASK_VERIFY, {
         address,
         constructorArgsParams: constructorArgs,
+        contract: fqn,
       })
       .catch(console.error)
   }

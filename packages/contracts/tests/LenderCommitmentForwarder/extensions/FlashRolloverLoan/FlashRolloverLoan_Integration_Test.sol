@@ -22,10 +22,12 @@ import { AavePoolAddressProviderMock } from "../../../../contracts/mock/aave/Aav
 import { AavePoolMock } from "../../../../contracts/mock/aave/AavePoolMock.sol";
 
 import { LenderCommitmentForwarder_G2 } from "../../../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarder_G2.sol";
-
 import { LenderCommitmentForwarder_G3 } from "../../../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarder_G3.sol";
 
 import { PaymentType, PaymentCycleType } from "../../../../contracts/libraries/V2Calculations.sol";
+
+import { FlashRolloverLoan_G1 } from "../../../../contracts/LenderCommitmentForwarder/extensions/FlashRolloverLoan_G1.sol";
+import { FlashRolloverLoan_G2 } from "../../../../contracts/LenderCommitmentForwarder/extensions/FlashRolloverLoan_G2.sol";
 
 import "lib/forge-std/src/console.sol";
 
@@ -38,7 +40,7 @@ contract FlashRolloverLoan_Integration_Test is Testable {
 
     AavePoolMock aavePoolMock;
     AavePoolAddressProviderMock aavePoolAddressProvider;
-    FlashRolloverLoan flashRolloverLoan;
+    FlashRolloverLoan_G2 flashRolloverLoan;
     TellerV2 tellerV2;
     WethMock wethMock;
     ILenderCommitmentForwarder lenderCommitmentForwarder;
@@ -50,6 +52,8 @@ contract FlashRolloverLoan_Integration_Test is Testable {
         uint256 newLoanId,
         uint256 fundsRemaining
     );
+
+   
 
     function setUp() public {
         borrower = new User();
@@ -107,7 +111,7 @@ contract FlashRolloverLoan_Integration_Test is Testable {
 
         //  wethMock.transfer(address(flashLoanVault), 5e18);
 
-        flashRolloverLoan = new FlashRolloverLoan(
+        flashRolloverLoan = new FlashRolloverLoan_G2(
             address(tellerV2),
             address(lenderCommitmentForwarder),
             address(aavePoolAddressProvider)
@@ -181,17 +185,16 @@ contract FlashRolloverLoan_Integration_Test is Testable {
 
         
 
-        IFlashRolloverLoan.AcceptCommitmentArgs
-            memory _acceptCommitmentArgs = IFlashRolloverLoan
-                .AcceptCommitmentArgs({
+        FlashRolloverLoan_G1.AcceptCommitmentArgs
+            memory _acceptCommitmentArgs = FlashRolloverLoan_G1.AcceptCommitmentArgs({
                     commitmentId: commitmentId,
                     principalAmount: commitmentPrincipalAmount,
                     collateralAmount: 0,
                     collateralTokenId: 0,
                     collateralTokenAddress: address(0),
                     interestRate: interestRate,
-                    loanDuration: duration,
-                    merkleProof: new bytes32[](0)
+                    loanDuration: duration
+                   // merkleProof: new bytes32[](0)
                 });
 
         ///approve forwarders

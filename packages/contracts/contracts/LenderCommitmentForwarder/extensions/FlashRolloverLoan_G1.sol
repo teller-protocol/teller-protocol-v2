@@ -43,6 +43,16 @@ contract FlashRolloverLoan_G1 is
         uint256 fundsRemaining
     );
 
+    struct AcceptCommitmentArgs  {
+        uint256 commitmentId;
+        uint256 principalAmount;
+        uint256 collateralAmount;
+        uint256 collateralTokenId;
+        address collateralTokenAddress;
+        uint16 interestRate;
+        uint32 loanDuration;        
+    }
+
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor(
         address _tellerV2,
@@ -192,8 +202,7 @@ If the new loan pays out (after fees) MORE than the  aave loan amount+ fee) then
         return true;
     }
 
-    //add a function for calculating borrower amount
-
+    
     function _repayLoanFull(
         uint256 _bidId,
         address _principalToken,

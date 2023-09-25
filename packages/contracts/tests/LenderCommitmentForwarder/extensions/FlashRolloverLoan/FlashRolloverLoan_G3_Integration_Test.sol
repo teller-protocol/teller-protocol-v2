@@ -30,7 +30,7 @@ import { FlashRolloverLoan_G3 } from "../../../../contracts/LenderCommitmentForw
  
 import "lib/forge-std/src/console.sol";
 
-contract FlashRolloverLoan_Integration_Test is Testable {
+contract FlashRolloverLoan_G3_Integration_Test is Testable {
     constructor() {}
 
     User private borrower;

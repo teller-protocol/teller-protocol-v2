@@ -29,6 +29,10 @@ contract TellerV2_Override is TellerV2 {
         bids[bidId] = bid;
     }
 
+     function mock_setCollateralManagerForBid(uint256 bidId, address collateralManager) public {
+        collateralManagerForBid[bidId] = collateralManager;
+    }
+
     function mock_addUriToMapping(uint256 bidId, string memory uri) public {
         uris[bidId] = uri;
     }

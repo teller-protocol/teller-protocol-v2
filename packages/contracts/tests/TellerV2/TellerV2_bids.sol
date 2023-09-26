@@ -417,6 +417,8 @@ contract TellerV2_bids_test is Testable {
     function test_lender_accept_bid_v2CollateralManager() public {
         uint256 bidId = 1;
         setMockBid(bidId);
+        tellerV2.mock_setCollateralManagerForBid( bidId, address(collateralManagerMock) );
+   
 
         tellerV2.mock_initialize(); //set address this as owner
 

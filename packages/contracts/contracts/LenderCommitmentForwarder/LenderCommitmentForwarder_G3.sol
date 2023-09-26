@@ -7,14 +7,13 @@ import "./extensions/ExtensionsContextUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 contract LenderCommitmentForwarder_G3 is
-    LenderCommitmentForwarder_G2, 
+    LenderCommitmentForwarder_G2,
     ExtensionsContextUpgradeable
 {
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor(address _tellerV2, address _marketRegistry)
         LenderCommitmentForwarder_G2(_tellerV2, _marketRegistry)
     {}
-
 
     function _msgSender()
         internal

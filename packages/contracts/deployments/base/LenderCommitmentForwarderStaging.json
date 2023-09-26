@@ -1,6 +1,5 @@
 {
-  "address": "0xd23F21685955e2d2637eEAAF6e870d1DB65ac2b7",
-  "fqn": "contracts/LenderCommitmentForwarder/LenderCommitmentForwarderStaging.sol:LenderCommitmentForwarderStaging",
+  "address": "0xf236d5Cc4d45eA0eF223Bfdf9583e655f51C12fB",
   "abi": [
     {
       "type": "constructor",
@@ -900,24 +899,13 @@
       "outputs": []
     }
   ],
-<<<<<<< HEAD
-  "transactionHash": "0xeae42a279e761a298cc916063967d0219ce272ba1a4cb0a2123a614db87f74f5",
-  "receipt": {
-    "to": null,
-    "from": "0x5a5B978142C8F08Dd013901b50892baC49f3b700",
-=======
-  "transactionHash": "0xd70e25caf91c16e0e12ae94507de50ac9006ca177f2146c457d7fe9aa92bf616",
+  "transactionHash": "0x13e7cc07a0fdec017bd4912d3b1a24bdbb13f1d071297cfb2677bc28bc25b185",
   "receipt": {
     "to": null,
     "from": "0x65B38b3Cd7eFe502DB579c16ECB5B49235d0DAd0",
->>>>>>> develop
-    "blockHash": null,
-    "blockNumber": null
+    "blockHash": "0xe077afcfd9590ac347f5a472d011d764f569b311fab8fb7b2c9ef539c89bf3d1",
+    "blockNumber": 4442684
   },
   "numDeployments": 1,
-<<<<<<< HEAD
-  "implementation": "0x8ED313430321D8db958A19E918d8f4F6847aB47d"
-=======
-  "implementation": "0x69620F29484C60bbC05a1698Cc793DC35c9beeCc"
->>>>>>> develop
+  "implementation": "0x760E7d5AB07B6FED640041de8f209fCBD2F83DCe"
 }

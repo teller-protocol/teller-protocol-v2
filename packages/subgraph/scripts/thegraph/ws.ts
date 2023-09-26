@@ -14,9 +14,9 @@ export const create = async (
   const socket = makeSocket(url, {
     emitter,
     healthCheck: async (): Promise<void> => {
-      await socket
-        .send({ type: "ping" })
-        .catch(() => config?.logger?.log("health check failed"));
+      // await socket
+      //   .send({ type: "ping" })
+      //   .catch(() => config?.logger?.log("health check failed"));
     },
     onQueueSpaceCB(
       uri: string
@@ -26,21 +26,20 @@ export const create = async (
     protocols: ["graphql-transport-ws"],
     logger: config?.logger
   });
-  await socket.connect();
 
-  const sendConnectionInit = async (): Promise<void> => {
-    await socket.send({ type: "connection_init" });
-  };
-
-  emitter.on(SocketEvent.CONNECTION_CLOSE, () => {
+  emitter.on(SocketEvent.CONNECTION_OPEN, () => {
+    setTimeout(() => {
+      void socket.send({ type: "connection_init" }).then(console.log);
+    }, 500);
+  });
+  emitter.on(SocketEvent.CONNECTION_CLOSE, (uri, error) => {
     config?.logger?.log("connection closed, reconnecting...");
+    config?.logger?.log(uri);
+    config?.logger?.error(error?.message);
     void socket.connect().then(() => {
       config?.logger?.log("reconnected");
-      void sendConnectionInit();
     });
   });
-
-  await sendConnectionInit();
 
   return socket;
 };

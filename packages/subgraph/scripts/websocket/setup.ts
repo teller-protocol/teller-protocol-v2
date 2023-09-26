@@ -23,8 +23,8 @@ export function setupWS(
   ws.on("error", error => {
     callbacks.onError(error);
   });
-  ws.on("close", _event => {
-    callbacks.onClose();
+  ws.on("close", (_event, reason) => {
+    callbacks.onClose(new Error(`${_event}: ${reason.toString()}`));
   });
 
   return {

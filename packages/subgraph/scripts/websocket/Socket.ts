@@ -108,7 +108,8 @@ export function makeSocket(uri: string, config: SocketConfig): Socket {
     removeIdFromQueue(socketQueueId);
   };
 
-  const onSocketClose = (): void => {
+  const onSocketClose = (_err?: Error): void => {
+    if (_err) handleError(_err);
     const err = error ?? new Error("Socket close");
     console.warn(`onSocketClose due to ${err.message} with server ${uri}`);
     clearTimeout(timer);

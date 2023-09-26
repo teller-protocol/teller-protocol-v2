@@ -3,7 +3,7 @@
   "name": "tellerv2-arbitrum",
   "network": "arbitrum-one",
   "export_network_name": "arbitrum-one",
-  "product": "aws",
+  "product": "local",
   "grafting": {
     "enabled": false
   },

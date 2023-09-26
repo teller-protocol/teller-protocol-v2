@@ -160,7 +160,7 @@ contract CollateralManagerV2 is
 
         //address borrower = getBorrowerForBid(_bidId); //FIX ME
         address borrower = tellerV2.getLoanBorrower(_bidId);
-        
+
         _storeTokens(borrower, _committedCollateral, _bidId);
 
         //emit CollateralDeposited!
@@ -365,7 +365,7 @@ contract CollateralManagerV2 is
         address _borrowerAddress,
         Collateral[] memory _collateralInfo,
         bool _shortCircut
-    ) internal virtual returns (bool validated_, bool[] memory checks_) {
+    ) internal virtual view returns (bool validated_, bool[] memory checks_) {
         checks_ = new bool[](_collateralInfo.length);
         validated_ = true;
         for (uint256 i; i < _collateralInfo.length; i++) {
@@ -393,7 +393,7 @@ contract CollateralManagerV2 is
     function _checkBalance(
         address _borrowerAddress,
         Collateral memory _collateralInfo
-    ) internal virtual returns (bool) {
+    ) internal virtual view returns (bool) {
         CollateralType collateralType = _collateralInfo._collateralType;
 
         if (collateralType == CollateralType.ERC20) {

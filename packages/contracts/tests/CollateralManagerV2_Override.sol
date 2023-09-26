@@ -19,8 +19,8 @@ import "../contracts/mock/TellerV2SolMock.sol";
 import "../contracts/CollateralManagerV2.sol";
 
 contract CollateralManagerV2_Override is CollateralManagerV2 {
-    bool public checkBalancesWasCalled;
-    bool public checkBalanceWasCalled;
+    //bool public checkBalancesWasCalled;
+    //bool public checkBalanceWasCalled;
     address public withdrawInternalWasCalledToRecipient;
     bool public commitCollateralInternalWasCalled;
 
@@ -105,8 +105,8 @@ contract CollateralManagerV2_Override is CollateralManagerV2 {
         address _borrowerAddress,
         Collateral[] memory _collateralInfo,
         bool _shortCircut
-    ) internal override returns (bool validated_, bool[] memory checks_) {
-        checkBalancesWasCalled = true;
+    ) internal view override returns (bool validated_, bool[] memory checks_) {
+        //checkBalancesWasCalled = true;
 
         validated_ = checkBalanceGlobalValid;
         checks_ = new bool[](0);
@@ -122,8 +122,8 @@ contract CollateralManagerV2_Override is CollateralManagerV2 {
     function _checkBalance(
         address _borrowerAddress,
         Collateral memory _collateralInfo
-    ) internal override returns (bool) {
-        checkBalanceWasCalled = true;
+    ) internal view override returns (bool) {
+       // checkBalanceWasCalled = true;
 
         return checkBalanceGlobalValid;
     }

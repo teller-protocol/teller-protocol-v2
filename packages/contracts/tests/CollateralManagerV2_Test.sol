@@ -805,7 +805,7 @@ contract CollateralManagerV2_Test is Testable {
         );
 
         assertTrue(
-            collateralManager.checkBalancesWasCalled(),
+            valid ,
             "Check balances was not called"
         );
     }

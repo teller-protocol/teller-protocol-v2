@@ -62,9 +62,19 @@ contract FlashRolloverLoan_Integration_Test is Testable {
 
         marketRegistry = IMarketRegistry(tellerV2.marketRegistry());
 
-        lenderCommitmentForwarder = ILenderCommitmentForwarder(
-            tellerV2.lenderCommitmentForwarder()
+          
+
+        LenderCommitmentForwarder_G3 _lenderCommitmentForwarder = new LenderCommitmentForwarder_G3(
+                address(tellerV2),
+                address(marketRegistry)
         );
+
+
+       lenderCommitmentForwarder = ILenderCommitmentForwarder(
+            address(_lenderCommitmentForwarder)
+        );
+
+
 
         aavePoolAddressProvider = new AavePoolAddressProviderMock(
             "marketId",

@@ -114,17 +114,17 @@ abstract contract TokenBundle is ICollateralBundle {
             try
                 IERC165(_token._collateralAddress).supportsInterface(0x80ac58cd)
             returns (bool supported721) {
-                require(supported721, "!TokenType");
+                require(supported721, "TokenBundle: ERC721 Interface Not Supported");
             } catch {
-                revert("!TokenType");
+                revert("TokenBundle: ERC721 Interface Not Supported");
             }
         } else if (_token._collateralType == CollateralType.ERC1155) {
             try
                 IERC165(_token._collateralAddress).supportsInterface(0xd9b67a26)
             returns (bool supported1155) {
-                require(supported1155, "!TokenType");
+                require(supported1155, "TokenBundle: ERC1155 Interface Not Supported");
             } catch {
-                revert("!TokenType");
+                revert("TokenBundle: ERC1155 Interface Not Supported");
             }
         } else if (_token._collateralType == CollateralType.ERC20) {
             if (_token._collateralAddress != CurrencyTransferLib.NATIVE_TOKEN) {

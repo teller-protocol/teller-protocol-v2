@@ -137,7 +137,7 @@ contract LenderCommitmentForwarder_Integration_Test is Testable {
                 lender: address(lender),
                 marketId: marketId,
                 principalTokenAddress: lendingToken
-            });
+        });
 
         address[] memory _borrowerAddressList;
 
@@ -175,7 +175,7 @@ contract LenderCommitmentForwarder_Integration_Test is Testable {
 
         vm.prank(address(borrower));
         //accept commitment and make sure the collateral is moved
-        uint256 bidId = LenderCommitmentForwarder_G2(
+        uint256 bidId = LenderCommitmentForwarder_G3(
             address(lenderCommitmentForwarder)
         ).acceptCommitment(
                 commitmentId,

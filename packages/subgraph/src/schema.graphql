@@ -5,6 +5,8 @@ type Protocol implements IHasLoans @entity {
   tokenVolumes: [TokenVolume!]! @derivedFrom(field: "protocol")
 
   activeCommitments: [Commitment!]!
+  inactiveCommitments: [Commitment!]
+
   activeRewards: [RewardAllocation!]!
 
   _durationTotal: BigInt!
@@ -354,7 +356,7 @@ type Commitment @entity {
   status: String!
 
   # Offer
-  committedAmount: BigInt! # Max principal
+  committedAmount: BigInt! # Current committed amount
   expirationTimestamp: BigInt!
   maxDuration: BigInt!
   minAPY: BigInt!
@@ -363,6 +365,7 @@ type Commitment @entity {
 
   # Required Collateral
   collateralToken: Token
+  collateralTokenAddress: Bytes
   collateralTokenType: BigInt!
   maxPrincipalPerCollateralAmount: BigInt
 
@@ -371,6 +374,8 @@ type Commitment @entity {
   # Lender
   lender: Lender!
   lenderAddress: Bytes!
+  lenderPrincipalBalance: BigInt!
+  lenderPrincipalAllowance: BigInt!
 
   # Market
   marketplace: MarketPlace!
@@ -379,12 +384,17 @@ type Commitment @entity {
   # TokenStats
   tokenVolume: TokenVolume!
 
+  # Extra
+  maxPrincipal: BigInt!
+  acceptedPrincipal: BigInt! # funds that were accepted (only tracking _newAcceptedPrincipal value for now)
+  _oldAcceptedPrincipal: BigInt! # funds that were accepted that was not previously tracked on-chain
+  _newAcceptedPrincipal: BigInt! # funds that were accepted AFTER commitmentPrincipalAccepted function was added on-chain
 
   commitmentRewards: [CommitmentReward!]! @derivedFrom(field: "commitment")
 }
 
 
-# Association between RewardAllocations and Commitments 
+# Association between RewardAllocations and Commitments
 type CommitmentReward @entity {
   id: ID!
   createdAt: BigInt!

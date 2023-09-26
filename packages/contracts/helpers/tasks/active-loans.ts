@@ -1,10 +1,9 @@
-import { BigNumber } from 'ethers'
 import { task } from 'hardhat/config'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
 import { TellerV2 } from 'types/typechain'
 
 export interface activeLoansReturn {
-  activeLoans: BigNumber[]
+  activeLoans: Array<bigint>
   activeLoanLenders: string[]
 }
 
@@ -25,7 +24,7 @@ export const getActiveLoans = async (
     const bidId = event.args.bidId
     const bid = await tellerV2.bids(bidId)
     // If Bid state is "Accepted"
-    if (bid.state == 3) {
+    if (bid.state == 3n) {
       // Get active loan lender
       const lender = await tellerV2.getLoanLender(bidId)
       activeLoanLenders.push(lender)

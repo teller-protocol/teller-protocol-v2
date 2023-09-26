@@ -1,13 +1,21 @@
 {
+  "enabled": true,
+  "name": "tellerv2-polygon",
   "network": "matic",
+  "export_network_name": "polygon",
+  "product": "studio",
+  "studio": {
+    "owner": "0x1A2bAA2257343119FB03FD448622456a0c4f2190",
+    "network": "mainnet"
+  },
   "grafting": {
     "enabled": true,
-    "base": "QmQcrhkS3TBDNJxfP4XPHch8zS3pXvvTeDRxtS2fko6mXS",
-    "block": ""
+    "base": "Qmeq1bTBFvBkXGAaK7YyMToHfnmeo6kWC3Jmq51UioRuDN",
+    "block": "47490000"
   },
   "block_handler": {
     "enabled": true,
-    "block": "40918500"
+    "block": "47490000"
   },
   "contracts": {
     "teller_v2": {

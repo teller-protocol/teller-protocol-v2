@@ -1,13 +1,21 @@
 {
+  "enabled": true,
+  "name": "tellerv2-mainnet",
   "network": "mainnet",
+  "export_network_name": "mainnet",
+  "product": "studio",
+  "studio": {
+    "owner": "0x1a76339211668a6939e1d6D13AB902bBef5D9ebc",
+    "network": "arbitrum-one"
+  },
   "grafting": {
     "enabled": true,
-    "base": "QmWfdFaUZvMmdMr1shEVv72a1VuU4hVwFM2h5FmmFG8tAK",
-    "block": "17504873"
+    "base": "QmbdBicEM5r2WfEWs2mndBD4XpDimnAXd3aixeft7pFzLZ",
+    "block": "18123520"
   },
   "block_handler": {
     "enabled": true,
-    "block": "17374919"
+    "block": "18123520"
   },
   "contracts": {
     "teller_v2": {

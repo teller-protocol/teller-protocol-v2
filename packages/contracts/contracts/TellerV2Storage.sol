@@ -91,7 +91,7 @@ abstract contract TellerV2Storage_G0 {
     /** Storage Variables */
 
     // Current number of bids.
-    uint256 public bidId = 0;
+    uint256 public bidId;
 
     // Mapping of bidId to bid information.
     mapping(uint256 => Bid) public bids;

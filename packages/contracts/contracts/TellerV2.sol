@@ -221,14 +221,12 @@ contract TellerV2 is
         _setEscrowVault(_escrowVault);
         _setCollateralManagerV2(_collateralManagerV2);
     }
+ 
+    function _setEscrowVault(address _escrowVault) internal onlyInitializing {
+        require(_escrowVault.isContract(), "EscrowVault must be a contract");
+        escrowVault = IEscrowVault(_escrowVault);
+    } 
 
-    /*function setEscrowVault(address _escrowVault)
-        external
-        reinitializer(9)
-        onlyOwner
-    {
-        _setEscrowVault(_escrowVault);
-    }*/
 
     function setCollateralManagerV2(address _collateralManagerV2)
         external
@@ -247,13 +245,9 @@ contract TellerV2 is
             "LenderManager must be a contract"
         );
         lenderManager = ILenderManager(_lenderManager);
-    }
-
-    function _setEscrowVault(address _escrowVault) internal onlyInitializing {
-        require(_escrowVault.isContract(), "EscrowVault must be a contract");
-        escrowVault = IEscrowVault(_escrowVault);
-    }
-
+    } 
+    
+ 
     function _setCollateralManagerV2(address _collateralManagerV2)
         internal
         onlyInitializing
@@ -286,14 +280,6 @@ contract TellerV2 is
             uint256 convertedURI = uint256(bids[_bidId]._metadataURI);
             metadataURI_ = StringsUpgradeable.toHexString(convertedURI, 32);
         }
-    }
-
-    /**
-     * @notice Lets the DAO/owner of the protocol to set a new reputation manager contract.
-     * @param _reputationManager The new contract address.
-     */
-    function setReputationManager(address _reputationManager) public onlyOwner {
-        reputationManager = IReputationManager(_reputationManager);
     }
 
     /**
@@ -779,7 +765,7 @@ contract TellerV2 is
 
         Bid storage bid = bids[_bidId];
 
-        //change state here to prevent re-entrancy
+        // change state here to prevent re-entrancy
         bid.state = BidState.LIQUIDATED;
 
         (uint256 owedPrincipal, , uint256 interest) = V2Calculations
@@ -789,6 +775,7 @@ contract TellerV2 is
                 bidPaymentCycleType[_bidId]
             );
 
+        //this sets the state to 'repaid'
         _repayLoan(
             _bidId,
             Payment({ principal: owedPrincipal, interest: interest }),
@@ -809,6 +796,7 @@ contract TellerV2 is
 
     /**
      * @notice Internal function to make a loan payment.
+     * @dev Updates the bid's `status` to `PAID` only if it is not already marked as `LIQUIDATED`
      * @param _bidId The id of the loan to make the payment towards.
      * @param _payment The Payment struct with payments amounts towards principal and interest respectively.
      * @param _owedAmount The total amount owed on the loan.
@@ -830,7 +818,10 @@ contract TellerV2 is
         // Check if we are sending a payment or amount remaining
         if (paymentAmount >= _owedAmount) {
             paymentAmount = _owedAmount;
-            bid.state = BidState.PAID;
+
+            if (bid.state != BidState.LIQUIDATED) {
+                bid.state = BidState.PAID;
+            }
 
             // Remove borrower's active bid
             _borrowerBidsActive[bid.borrower].remove(_bidId);

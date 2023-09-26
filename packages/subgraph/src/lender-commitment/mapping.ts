@@ -13,7 +13,11 @@ import { loadBidById } from "../helpers/loaders";
 import { linkCommitmentToRewards } from "../liquidity-rewards/updaters";
 
 import { loadCommitment } from "./loaders";
-import { updateCommitmentStatus, updateLenderCommitment } from "./updaters";
+import {
+  updateCommitmentStatus,
+  updateLenderCommitment,
+  updateAvailableTokensFromCommitment
+} from "./updaters";
 import { CommitmentStatus } from "./utils";
 
 export function handleCreatedCommitment(event: CreatedCommitment): void {
@@ -24,8 +28,7 @@ export function handleCreatedCommitment(event: CreatedCommitment): void {
     event.params.marketId.toString(),
     event.params.lendingToken,
     event.params.tokenAmount,
-    event.address,
-    event.block
+    event.address
   );
 
   commitment.createdAt = event.block.timestamp;
@@ -50,8 +53,7 @@ export function handleUpdatedCommitment(event: UpdatedCommitment): void {
     event.params.marketId.toString(),
     event.params.lendingToken,
     event.params.tokenAmount,
-    event.address,
-    event.block
+    event.address
   );
 }
 
@@ -66,6 +68,7 @@ export function handleDeletedCommitment(event: DeletedCommitment): void {
   const commitment = loadCommitment(commitmentId);
 
   updateCommitmentStatus(commitment, CommitmentStatus.Deleted);
+  updateAvailableTokensFromCommitment(commitment);
 
   commitment.expirationTimestamp = BigInt.zero();
   commitment.maxDuration = BigInt.zero();
@@ -84,16 +87,38 @@ export function handleExercisedCommitment(event: ExercisedCommitment): void {
   const commitmentId = event.params.commitmentId.toString();
   const commitment = loadCommitment(commitmentId);
 
-  if (event.params.tokenAmount.equals(commitment.committedAmount)) {
+  const lenderCommitmentForwarderInstance = LenderCommitmentForwarder.bind(
+    event.address
+  );
+  const acceptedPrincipalResult = lenderCommitmentForwarderInstance.try_commitmentPrincipalAccepted(
+    BigInt.fromString(commitment.id)
+  );
+  // function only exists after an upgrade
+  if (acceptedPrincipalResult.reverted) {
+    // keep track of old accepted principal
+    commitment._oldAcceptedPrincipal = commitment._oldAcceptedPrincipal.plus(
+      event.params.tokenAmount
+    );
+  } else {
+    commitment._newAcceptedPrincipal = acceptedPrincipalResult.value;
+    commitment.acceptedPrincipal = acceptedPrincipalResult.value;
+
+    // Link commitment to bid (only after accepted amount is tracked on-chain)
+    //   - Bids created before the upgrade will not be linked as they skew the calculated available amount
+    const bid: Bid = loadBidById(event.params.bidId);
+    bid.commitment = commitment.id;
+    bid.commitmentId = commitment.id;
+    bid.save();
+  }
+
+  const availableAmount = commitment.maxPrincipal.minus(
+    commitment.acceptedPrincipal
+  );
+  if (availableAmount.equals(BigInt.zero())) {
     updateCommitmentStatus(commitment, CommitmentStatus.Drained);
   }
 
-  // Link commitment to bid
-  const bid: Bid = loadBidById(event.params.bidId);
-  bid.commitment = commitment.id;
-  bid.commitmentId = commitment.id;
-
-  bid.save();
+  updateAvailableTokensFromCommitment(commitment);
   commitment.save();
 }
 

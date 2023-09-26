@@ -5,7 +5,6 @@ import {
   CommitmentZScore,
   MarketCommitmentStdDev
 } from "../../generated/schema";
-import { addToArray } from "../helpers/utils";
 
 /**
  * @param {string} commitmentId - ID of the commitment
@@ -27,6 +26,8 @@ export function loadCommitment(commitmentId: string): Commitment {
     commitment.minAPY = BigInt.zero();
     commitment.lender = "";
     commitment.lenderAddress = Address.zero();
+    commitment.lenderPrincipalBalance = BigInt.fromU64(u64.MAX_VALUE); // default to max value - see `updaters.updateAvailableTokensFromCommitment`
+    commitment.lenderPrincipalAllowance = BigInt.fromU64(u64.MAX_VALUE); // default to max value - see `updaters.updateAvailableTokensFromCommitment`
     commitment.marketplace = "";
     commitment.marketplaceId = BigInt.zero();
     commitment.tokenVolume = "";
@@ -35,9 +36,15 @@ export function loadCommitment(commitmentId: string): Commitment {
     commitment.principalTokenAddress = Address.zero();
 
     commitment.collateralToken = "";
+    commitment.collateralTokenAddress = Address.zero();
     commitment.collateralTokenType = BigInt.zero();
     commitment.maxPrincipalPerCollateralAmount = BigInt.zero();
     commitment.commitmentBorrowers = [];
+
+    commitment.maxPrincipal = BigInt.zero();
+    commitment.acceptedPrincipal = BigInt.zero();
+    commitment._oldAcceptedPrincipal = BigInt.zero();
+    commitment._newAcceptedPrincipal = BigInt.zero();
 
     commitment.save();
   }

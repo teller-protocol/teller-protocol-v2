@@ -15,7 +15,7 @@ import "./tokens/TestERC721Token.sol";
 import "./tokens/TestERC1155Token.sol";
 
 import "../contracts/mock/TellerV2SolMock.sol";
-import "../contracts/CollateralManager.sol";
+import "../contracts/CollateralManagerV1.sol";
 
 import "./CollateralManager_Override.sol";
 

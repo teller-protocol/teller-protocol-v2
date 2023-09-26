@@ -38,11 +38,12 @@ contract CollateralManagerV2_Override is CollateralManagerV2 {
         super._commitCollateral(bidId, collateralInfo);
     }
 
+/*
     function _depositSuper(uint256 _bidId, Collateral memory _collateralInfo)
         public
     {
         super._deposit(_bidId, _collateralInfo);
-    }
+    }*/
 
     function _withdrawSuper(uint256 _bidId, address _receiver) public {
         super._withdraw(_bidId, _receiver);
@@ -93,7 +94,7 @@ contract CollateralManagerV2_Override is CollateralManagerV2 {
     */
 
     function isBidCollateralBacked(uint256 _bidId)
-        public
+        public view
         override
         returns (bool)
     {

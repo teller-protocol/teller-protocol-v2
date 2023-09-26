@@ -112,7 +112,7 @@ contract CollateralManagerV2 is
      */
 
     function isBidCollateralBacked(uint256 _bidId)
-        public
+        public view
         virtual
         returns (bool)
     {
@@ -128,7 +128,11 @@ contract CollateralManagerV2 is
     function commitCollateral(
         uint256 _bidId,
         Collateral[] calldata _collateralInfo
-    ) public onlyTellerV2 returns (bool validation_) {
+    ) 
+    public
+    onlyTellerV2 
+    returns (bool validation_) 
+    {
         address borrower = tellerV2.getLoanBorrower(_bidId);
         require(borrower != address(0), "Loan has no borrower");
         (validation_, ) = checkBalances(borrower, _collateralInfo);
@@ -148,10 +152,15 @@ contract CollateralManagerV2 is
      */
 
     //used to be 'deploy and deposit'
-    function depositCollateral(uint256 _bidId) external onlyTellerV2 {
+    function depositCollateral(uint256 _bidId ) 
+    external
+     onlyTellerV2 
+     {
         Collateral[] memory _committedCollateral = getCollateralInfo(_bidId);
 
-        address borrower = address(0); //FIX ME
+        //address borrower = getBorrowerForBid(_bidId); //FIX ME
+        address borrower = tellerV2.getLoanBorrower(_bidId);
+        
         _storeTokens(borrower, _committedCollateral, _bidId);
 
         //emit CollateralDeposited!
@@ -221,7 +230,7 @@ contract CollateralManagerV2 is
     function withdraw(uint256 _bidId) external {
         BidState bidState = tellerV2.getBidState(_bidId);
 
-        require(bidState == BidState.PAID, "collateral cannot be withdrawn");
+        require(bidState == BidState.PAID, "Loan has not been paid");
 
         _withdraw(_bidId, tellerV2.getLoanBorrower(_bidId));
 
@@ -238,7 +247,7 @@ contract CollateralManagerV2 is
 
             require(
                 bidState == BidState.CLOSED,
-                "Loan has not been liquidated"
+                "Loan has not been closed"
             );
 
             _withdraw(_bidId, tellerV2.getLoanLender(_bidId));
@@ -274,7 +283,7 @@ contract CollateralManagerV2 is
     function checkBalances(
         address _borrowerAddress,
         Collateral[] calldata _collateralInfo
-    ) public returns (bool validated_, bool[] memory checks_) {
+    ) public view returns (bool validated_, bool[] memory checks_) {
         return _checkBalances(_borrowerAddress, _collateralInfo, false);
     }
 

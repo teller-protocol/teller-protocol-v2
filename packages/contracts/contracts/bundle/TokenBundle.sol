@@ -108,7 +108,8 @@ abstract contract TokenBundle is ICollateralBundle {
     }
 
     /// @dev Checks if the type of asset-contract is same as the TokenType specified.
-    function _checkTokenType(Collateral memory _token) internal view {
+    function _checkTokenType(Collateral memory _token) 
+    internal view {
         if (_token._collateralType == CollateralType.ERC721) {
             try
                 IERC165(_token._collateralAddress).supportsInterface(0x80ac58cd)

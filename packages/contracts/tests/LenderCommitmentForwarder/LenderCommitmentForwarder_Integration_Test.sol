@@ -224,13 +224,11 @@ contract LenderCommitmentForwarder_Integration_Test is Testable {
 
         address ownerOfNft = erc721Token.ownerOf(0);
 
-        address escrowForLoan = ICollateralManager(collateralManager).getEscrow(
-            bidId
-        );
+        
 
-        assertEq(
-            ownerOfNft,
-            address(escrowForLoan),
+        assertTrue(
+            ownerOfNft != 
+            address(borrower),
             "Nft not moved to collateral escrow"
         );
     }

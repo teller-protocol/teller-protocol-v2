@@ -19,7 +19,7 @@ import { Collateral, CollateralType } from "./bundle/interfaces/ICollateralBundl
 
 import "./interfaces/ITellerV2.sol";
 
-contract CollateralManager is OwnableUpgradeable, ICollateralManagerV1 {
+contract CollateralManagerV1 is OwnableUpgradeable, ICollateralManagerV1 {
     /* Storage */
     using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
     ITellerV2 public tellerV2;

@@ -1049,6 +1049,12 @@ contract TellerV2 is
         return ICollateralManager(collateralManagerForBid[_bidId]);
     }
 
+
+    //Returns the most modern implementation for the collateral manager 
+    function collateralManager() external view returns (address) {
+        return address(collateralManagerV2);
+    }
+
     function getBidState(uint256 _bidId)
         external
         view

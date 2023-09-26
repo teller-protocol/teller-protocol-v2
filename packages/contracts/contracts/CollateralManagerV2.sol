@@ -129,7 +129,7 @@ contract CollateralManagerV2 is
         uint256 _bidId,
         Collateral[] calldata _collateralInfo
     ) 
-    public
+    external
     onlyTellerV2 
     returns (bool validation_) 
     {
@@ -155,15 +155,18 @@ contract CollateralManagerV2 is
     function depositCollateral(uint256 _bidId ) 
     external
      onlyTellerV2 
-     {
+     {      
+        //if collateral has been committed... 
+        if( isBidCollateralBacked(_bidId) ){
+
         Collateral[] memory _committedCollateral = getCollateralInfo(_bidId);
 
-        //address borrower = getBorrowerForBid(_bidId); //FIX ME
         address borrower = tellerV2.getLoanBorrower(_bidId);
 
         _storeTokens(borrower, _committedCollateral, _bidId);
 
         //emit CollateralDeposited!
+        }
     }
 
     /**

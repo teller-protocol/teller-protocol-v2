@@ -13,7 +13,7 @@ import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
 import { MarketRegistry } from "../../contracts/MarketRegistry.sol";
 import { EscrowVault } from "../../contracts/EscrowVault.sol";
 import { LenderManager } from "../../contracts/LenderManager.sol";
-import { LenderCommitmentForwarder_G3 } from "../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarder_G3.sol";
+//import { LenderCommitmentForwarder_G3 } from "../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarder_G3.sol";
 import { CollateralManagerV2 } from "../../contracts/CollateralManagerV2.sol";
 import { CollateralEscrowV1 } from "../../contracts/escrow/CollateralEscrowV1.sol";
 
@@ -64,6 +64,7 @@ library IntegrationTestHelpers {
       //  _collateralManager.initialize(address(escrowBeacon), address(tellerV2));
         _lenderManager.initialize();
         _reputationManager.initialize(address(tellerV2));
+        _collateralManager.initialize(address(tellerV2));
 
         tellerV2.initialize(
             _protocolFee,

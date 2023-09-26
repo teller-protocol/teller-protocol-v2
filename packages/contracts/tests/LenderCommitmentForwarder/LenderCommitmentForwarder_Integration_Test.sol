@@ -60,8 +60,16 @@ contract LenderCommitmentForwarder_Integration_Test is Testable {
 
         marketRegistry = IMarketRegistry(tellerV2.marketRegistry());
 
-        lenderCommitmentForwarder = ILenderCommitmentForwarder(
-            tellerV2.lenderCommitmentForwarder()
+    
+
+        LenderCommitmentForwarder_G3 _lenderCommitmentForwarder = new LenderCommitmentForwarder_G3(
+                address(tellerV2),
+                address(marketRegistry)
+        );
+
+
+       lenderCommitmentForwarder = ILenderCommitmentForwarder(
+            address(_lenderCommitmentForwarder)
         );
 
         wethMock = new WethMock();
@@ -101,49 +109,7 @@ contract LenderCommitmentForwarder_Integration_Test is Testable {
         //initial loan - need to pay back 1 weth + 0.1 weth (interest) to the lender
         uint256 marketId = 1;
 
-        /*   {
        
-        uint256 principalAmount = 1e18;
-        uint32 duration = 365 days;
-        uint16 interestRate = 1000;
-
-       // wethMock.transfer(address(commitmentRolloverLoan), 100);
-
-       
-
-        address collateralManager = address(tellerV2.collateralManager());
-       // erc721Token.setApprovalForAll(address(collateralManager), true);
-       
-    
-        Collateral[] memory collateral = new Collateral[](1);
-
-        collateral[0]._collateralType = CollateralType.ERC721; //ERC721
-        collateral[0]._tokenId = 0;
-        collateral[0]._amount = 1;
-        collateral[0]._collateralAddress = address(erc721Token);
-
-   
-        vm.prank(address(borrower));
-        uint256 loanId = tellerV2.submitBid(
-            lendingToken,
-            marketId,
-            principalAmount,
-            duration,
-            interestRate,
-            "",
-            address(borrower),
-            collateral
-        );
-
- 
-        vm.prank(address(lender));
-        (
-            uint256 amountToProtocol,
-            uint256 amountToMarketplace,
-            uint256 amountToBorrower
-        ) = tellerV2.lenderAcceptBid(loanId);
-       }*/
-
         address collateralManager = address(tellerV2.collateralManager());
 
         vm.prank(address(borrower));

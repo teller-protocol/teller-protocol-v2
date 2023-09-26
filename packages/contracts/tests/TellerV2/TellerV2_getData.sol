@@ -87,8 +87,7 @@ contract TellerV2_initialize is Testable {
                     APR: 10
                 }),
                 state: BidState.PENDING,
-                paymentType: PaymentType.EMI,
-                collateralManager: address(collateralManagerMock)
+                paymentType: PaymentType.EMI 
             })
         );
     }
@@ -211,8 +210,7 @@ contract TellerV2_initialize is Testable {
                     APR: 10
                 }),
                 state: BidState.PENDING,
-                paymentType: PaymentType.EMI,
-                collateralManager: address(collateralManagerMock)
+                paymentType: PaymentType.EMI 
             })
         );
 
@@ -253,8 +251,7 @@ contract TellerV2_initialize is Testable {
                     APR: 10
                 }),
                 state: BidState.PENDING,
-                paymentType: PaymentType.EMI,
-                collateralManager: address(collateralManagerMock)
+                paymentType: PaymentType.EMI 
             })
         );
 
@@ -373,8 +370,7 @@ contract TellerV2_initialize is Testable {
                     APR: 10
                 }),
                 state: BidState.PENDING,
-                paymentType: PaymentType.EMI,
-                collateralManager: address(collateralManagerMock)
+                paymentType: PaymentType.EMI 
             })
         );
 
@@ -416,8 +412,7 @@ contract TellerV2_initialize is Testable {
                     APR: 10
                 }),
                 state: BidState.PENDING,
-                paymentType: PaymentType.EMI,
-                collateralManager: address(collateralManagerMock)
+                paymentType: PaymentType.EMI 
             })
         );
 
@@ -457,8 +452,7 @@ contract TellerV2_initialize is Testable {
                     APR: 10
                 }),
                 state: BidState.PENDING,
-                paymentType: PaymentType.EMI,
-                collateralManager: address(collateralManagerMock)
+                paymentType: PaymentType.EMI 
             })
         );
 
@@ -495,8 +489,7 @@ contract TellerV2_initialize is Testable {
                     APR: 10
                 }),
                 state: BidState.PENDING,
-                paymentType: PaymentType.EMI,
-                collateralManager: address(collateralManagerMock)
+                paymentType: PaymentType.EMI 
             })
         );
 
@@ -532,8 +525,7 @@ contract TellerV2_initialize is Testable {
                     APR: 10
                 }),
                 state: BidState.PENDING,
-                paymentType: PaymentType.EMI,
-                collateralManager: address(collateralManagerMock)
+                paymentType: PaymentType.EMI 
             })
         );
 
@@ -573,8 +565,7 @@ contract TellerV2_initialize is Testable {
                     APR: 10
                 }),
                 state: BidState.PENDING,
-                paymentType: PaymentType.EMI,
-                collateralManager: address(collateralManagerMock)
+                paymentType: PaymentType.EMI 
             })
         );
 
@@ -622,8 +613,7 @@ contract TellerV2_initialize is Testable {
                     APR: 10
                 }),
                 state: BidState.PENDING,
-                paymentType: PaymentType.EMI,
-                collateralManager: address(collateralManagerMock)
+                paymentType: PaymentType.EMI  
             })
         );
 
@@ -662,8 +652,7 @@ contract TellerV2_initialize is Testable {
                     APR: 10
                 }),
                 state: BidState.PENDING,
-                paymentType: PaymentType.EMI,
-                collateralManager: address(collateralManagerMock)
+                paymentType: PaymentType.EMI 
             })
         );
 
@@ -702,8 +691,7 @@ contract TellerV2_initialize is Testable {
                     APR: 10
                 }),
                 state: BidState.PENDING,
-                paymentType: PaymentType.EMI,
-                collateralManager: address(collateralManagerMock)
+                paymentType: PaymentType.EMI 
             })
         );
 
@@ -742,8 +730,7 @@ contract TellerV2_initialize is Testable {
                     APR: 10
                 }),
                 state: BidState.PENDING,
-                paymentType: PaymentType.EMI,
-                collateralManager: address(collateralManagerMock)
+                paymentType: PaymentType.EMI 
             })
         );
 

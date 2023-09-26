@@ -102,10 +102,11 @@ contract TellerV2_bids_test is Testable {
                     APR: 10
                 }),
                 state: BidState.PENDING,
-                paymentType: PaymentType.EMI,
-                collateralManager: address(collateralManagerMock)
+                paymentType: PaymentType.EMI 
             })
         );
+
+        //tellerV2.mock_setCollateralManagerForBid( address(collateralManagerMock) );
     }
 
     /*
@@ -387,8 +388,7 @@ contract TellerV2_bids_test is Testable {
                     APR: 10
                 }),
                 state: BidState.PENDING,
-                paymentType: PaymentType.EMI,
-                collateralManager: address(0)
+                paymentType: PaymentType.EMI 
             })
         );
 

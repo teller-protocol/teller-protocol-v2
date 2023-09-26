@@ -173,8 +173,7 @@ contract TellerV2 is
      * @param _protocolFee The fee collected by the protocol for loan processing.
      * @param _marketRegistry The address of the market registry contract for the protocol.
      * @param _reputationManager The address of the reputation manager contract.
-     * @param _lenderCommitmentForwarder The address of the lender commitment forwarder contract.
-      
+    
      * @param _lenderManager The address of the lender manager contract for loans on the protocol.
      * @param _escrowVault the address of the escrow vault contract for push pull
      * @param _collateralManagerV2 the address of the collateral manager V2 contract.
@@ -183,7 +182,7 @@ contract TellerV2 is
         uint16 _protocolFee,
         address _marketRegistry,
         address _reputationManager,
-        address _lenderCommitmentForwarder,
+        //address _lenderCommitmentForwarder,
         // address _collateralManagerV1,
         address _lenderManager,
         address _escrowVault,
@@ -193,11 +192,8 @@ contract TellerV2 is
 
         __Pausable_init();
 
-        require(
-            _lenderCommitmentForwarder.isContract(),
-            "LenderCommitmentForwarder must be a contract"
-        );
-        lenderCommitmentForwarder = _lenderCommitmentForwarder;
+        //no longer needed in storage 
+        lenderCommitmentForwarder = address(0);
 
         require(
             _marketRegistry.isContract(),
@@ -388,8 +384,10 @@ contract TellerV2 is
         bid.loanDetails.lendingToken = IERC20(_lendingToken);
         bid.loanDetails.principal = _principal;
         bid.loanDetails.loanDuration = _duration;
-        bid.loanDetails.timestamp = uint32(block.timestamp);
-        bid.collateralManager = address(collateralManagerV2);
+        bid.loanDetails.timestamp = uint32(block.timestamp); 
+
+        //make this new bid use the most recent version of collateral manager 
+        collateralManagerForBid[bidId] = address(collateralManagerV2);
 
         // Set payment cycle type based on market setting (custom or monthly)
         (bid.terms.paymentCycle, bidPaymentCycleType[bidId]) = marketRegistry
@@ -531,7 +529,7 @@ contract TellerV2 is
         bid.lender = sender;
 
         // Tell the collateral manager to deploy the escrow and pull funds from the borrower if applicable
-        if (bids[_bidId].collateralManager == address(0)) {
+        if (collateralManagerForBid[_bidId] == address(0)) {
             collateralManagerV1.deployAndDeposit(_bidId);
         } else {
             collateralManagerV2.depositCollateral(_bidId);
@@ -1045,10 +1043,10 @@ contract TellerV2 is
         virtual
         returns (ICollateralManager)
     {
-        if (bids[_bidId].collateralManager == address(0)) {
+        if (collateralManagerForBid[_bidId] == address(0)) {
             return ICollateralManager(collateralManagerV1);
         }
-        return ICollateralManager(bids[_bidId].collateralManager);
+        return ICollateralManager(collateralManagerForBid[_bidId]);
     }
 
     function getBidState(uint256 _bidId)

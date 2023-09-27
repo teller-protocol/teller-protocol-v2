@@ -145,8 +145,7 @@ contract CollateralManagerV2 is
             for (uint256 i; i < _collateralInfo.length; i++) {
                 Collateral memory info = _collateralInfo[i];
                 _commitCollateral(_bidId, info);
-                console.log("commit collateral");
-                console.logUint(_bidId);
+                
             }
         }
     }
@@ -172,9 +171,10 @@ contract CollateralManagerV2 is
 
 
             uint256 collateralCount = _committedCollateral.length;
-
+           
             for(uint256 i = 0; i < collateralCount; i += 1 ) {
-                emit CollateralDeposited(
+               
+                 emit CollateralDeposited(
                     _bidId,
                     _committedCollateral[i]._collateralType,
                     _committedCollateral[i]._collateralAddress,
@@ -237,6 +237,10 @@ contract CollateralManagerV2 is
     {
         Collateral memory token_data = getTokenOfBundle(_bidId, 0); // first slot
 
+        console.logAddress(token_data._collateralAddress );
+        console.logAddress(_collateralAddress);
+        console.logUint(token_data._amount);
+        
         if (token_data._collateralAddress != _collateralAddress) return 0; // not as expected
 
         amount_ = token_data._amount;

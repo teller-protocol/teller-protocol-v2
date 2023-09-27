@@ -21,10 +21,10 @@ enum CollateralType {
 
 /**
  *  @notice A generic interface to describe any ERC20, ERC721 or ERC1155 token.
- *  @param collateralType     The token type (ERC20 / ERC721 / ERC1155) of the asset.
- *  @param totalAmount   The amount of the asset, if the asset is an ERC20 / ERC1155 fungible token.
- *  @param tokenId       The token Id of the asset, if the asset is an ERC721 / ERC1155 NFT.
- *  @param assetContract The contract address of the asset.
+ *  @param _collateralType     The token type (ERC20 / ERC721 / ERC1155) of the asset.
+ *  @param _amount   The amount of the asset, if the asset is an ERC20 / ERC1155 fungible token.
+ *  @param _tokenId       The token Id of the asset, if the asset is an ERC721 / ERC1155 NFT.
+ *  @param _collateralAddress The contract address of the asset.
  *
  */
 struct Collateral {

@@ -22,7 +22,6 @@ import "../contracts/MarketLiquidityRewards.sol";
 
 import "../contracts/mock/TellerV2SolMock.sol";
 
-import "lib/forge-std/src/console.sol";
 
 contract MarketLiquidityRewards_Test is Testable {
     MarketLiquidityUser private marketOwner;
@@ -250,7 +249,7 @@ contract MarketLiquidityRewards_Test is Testable {
     }
 
     function test_claimRewards() public {
-        console.log("cr 1 ");
+        
 
         Bid memory mockBid;
 

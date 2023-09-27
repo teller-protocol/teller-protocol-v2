@@ -32,6 +32,9 @@ import "./bundle/TokenStore.sol";
 
 import "./bundle/interfaces/ICollateralBundle.sol";
 
+//remove me 
+import "lib/forge-std/src/console.sol";
+
 /*
 
 This contract is a token store which stores bundles.
@@ -142,6 +145,8 @@ contract CollateralManagerV2 is
             for (uint256 i; i < _collateralInfo.length; i++) {
                 Collateral memory info = _collateralInfo[i];
                 _commitCollateral(_bidId, info);
+                console.log("commit collateral");
+                console.logUint(_bidId);
             }
         }
     }
@@ -344,10 +349,15 @@ contract CollateralManagerV2 is
             _collateralInfo._collateralAddress
         ] = _collateralInfo;*/
 
-        uint256 new_count = committedCollateral.count + 1;
+        uint256 new_count = committedCollateral.count + 1; 
 
         committedCollateral.count = new_count;
-        committedCollateral.collaterals[new_count] = _collateralInfo;
+        committedCollateral.collaterals[new_count-1] =   Collateral( {
+            _collateralType: _collateralInfo._collateralType,
+            _amount: _collateralInfo._amount,
+            _tokenId: _collateralInfo._tokenId ,
+            _collateralAddress: _collateralInfo._collateralAddress 
+        });
 
         emit CollateralCommitted(
             _bidId,

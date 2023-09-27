@@ -164,14 +164,25 @@ contract CollateralManagerV2 is
         //if collateral has been committed... 
         if( isBidCollateralBacked(_bidId) ){
 
-        Collateral[] memory _committedCollateral = getCollateralInfo(_bidId);
+            Collateral[] memory _committedCollateral = getCollateralInfo(_bidId);
 
-        address borrower = tellerV2.getLoanBorrower(_bidId);
+            address borrower = tellerV2.getLoanBorrower(_bidId);
 
-        _storeTokens(borrower, _committedCollateral, _bidId);
+            _storeTokens(borrower, _committedCollateral, _bidId);
 
-        //emit CollateralDeposited!
-        }
+
+            uint256 collateralCount = _committedCollateral.length;
+
+            for(uint256 i = 0; i < collateralCount; i += 1 ) {
+                emit CollateralDeposited(
+                    _bidId,
+                    _committedCollateral[i]._collateralType,
+                    _committedCollateral[i]._collateralAddress,
+                    _committedCollateral[i]._amount,
+                    _committedCollateral[i]._tokenId
+                );
+            }
+        }// is backed 
     }
 
     /**

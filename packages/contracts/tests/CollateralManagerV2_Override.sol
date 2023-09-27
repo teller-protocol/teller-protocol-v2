@@ -30,13 +30,7 @@ contract CollateralManagerV2_Override is CollateralManagerV2 {
     bool public depositWasCalled;
     bool public withdrawWasCalled;
 
-    //force adds collateral info for a bid even if it doesnt exist (for testing)
-    function commitCollateralSuper(
-        uint256 bidId,
-        Collateral memory collateralInfo
-    ) public {
-        super._commitCollateral(bidId, collateralInfo);
-    }
+    
 
 /*
     function _depositSuper(uint256 _bidId, Collateral memory _collateralInfo)

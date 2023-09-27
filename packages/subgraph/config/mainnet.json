@@ -10,12 +10,12 @@
   },
   "grafting": {
     "enabled": true,
-    "base": "QmbdBicEM5r2WfEWs2mndBD4XpDimnAXd3aixeft7pFzLZ",
-    "block": "18123520"
+    "base": "QmWCSRpGUL7y4ZbeE8MTrqLrtS5hznfh6gQ5473DHx2252",
+    "block": 18226572
   },
   "block_handler": {
     "enabled": true,
-    "block": "18123520"
+    "block": "15094705"
   },
   "contracts": {
     "teller_v2": {
@@ -32,6 +32,11 @@
       "enabled": true,
       "address": "0x17A8e82351661DFD568FEE6D7c38695b67e1e924",
       "block": "15222115"
+    },
+    "lender_commitment_staging": {
+      "enabled": true,
+      "address": "0x5098102507Da3F71677C5d9e170f91779Fe888F4",
+      "block": "18215202"
     },
     "collateral_manager": {
       "enabled": true,

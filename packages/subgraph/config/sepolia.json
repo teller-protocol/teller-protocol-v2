@@ -1,1 +1,57 @@
-{"enabled":true,"name":"tellerv2-sepolia","network":"sepolia","export_network_name":"sepolia","product":"studio","studio":{"owner":"0x1a76339211668a6939e1d6D13AB902bBef5D9ebc","network":"arbitrum-one"},"grafting":{"enabled":true,"base":"Qme2KhSsqfae43JZyMs6jiySeVajtKUcA7n99iWC8eoQHE","block":4294102},"block_handler":{"enabled":true,"block":"4186270"},"contracts":{"teller_v2":{"enabled":true,"address":"0x9Bb0e7B75eBB00DA5C885Ad9D1091fCFD82a1D03","block":"4186270"},"market_registry":{"enabled":true,"address":"0x51ECa9a04118bedb564feD357647F7b71742b19d","block":"4186280"},"lender_commitment":{"enabled":true,"address":"0x80e154969eF0090adB2A22a8c8e1697DfD2d80fC","block":"4186282"},"collateral_manager":{"enabled":true,"address":"0xe776450f136b97291de9656cda7dC06246CC4812","block":"4186272"},"lender_manager":{"enabled":true,"address":"0xcC79cd79116979E83f393fB0a2CffAFDf80393dd","block":"4186287"},"market_liquidity_rewards":{"enabled":true,"address":"0xC34dbCc2cBCa28377e4A2079896a21ef5Bfa68Cc","block":"4186352"}}}
+{
+  "enabled": true,
+  "name": "tellerv2-sepolia",
+  "network": "sepolia",
+  "export_network_name": "sepolia",
+  "product": "studio",
+  "studio": {
+    "owner": "0x1a76339211668a6939e1d6D13AB902bBef5D9ebc",
+    "network": "arbitrum-one"
+  },
+  "grafting": {
+    "enabled": true,
+    "base": "Qmd2Vufu4JVL25FodXENw1mcNFkbGvwVCUK2vdixRZLhJZ",
+    "block": 4344864
+  },
+  "block_handler": {
+    "enabled": true,
+    "block": "4342453"
+  },
+  "contracts": {
+    "teller_v2": {
+      "enabled": true,
+      "address": "0x50AF6e0A54F663467F8e3B6e76Ae60329c4c26Ef",
+      "block": "4342453"
+    },
+    "market_registry": {
+      "enabled": true,
+      "address": "0x6213d6444C871869C7c8eFBbfC6101a202A08E68",
+      "block": "4342460"
+    },
+    "lender_commitment": {
+      "enabled": true,
+      "address": "0x7FA4D022dF7f1ad9Ac6eF7e22578353C69502692",
+      "block": "4342462"
+    },
+    "lender_commitment_staging": {
+      "enabled": true,
+      "address": "0xd23F21685955e2d2637eEAAF6e870d1DB65ac2b7",
+      "block": "4342465"
+    },
+    "collateral_manager": {
+      "enabled": true,
+      "address": "0xC52A89eB4Ec84D777f9b6BcFd71F1C5Ce5033d08",
+      "block": "4342454"
+    },
+    "lender_manager": {
+      "enabled": true,
+      "address": "0x32436A77A36D0786E01fE850D4E6EA2Fa3C51a12",
+      "block": "4342471"
+    },
+    "market_liquidity_rewards": {
+      "enabled": true,
+      "address": "0x82B9a334867ee3d2022225faD083faC39B133128",
+      "block": "4342479"
+    }
+  }
+}

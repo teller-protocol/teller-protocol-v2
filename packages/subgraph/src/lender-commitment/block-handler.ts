@@ -9,6 +9,7 @@ import {
 
 import { IERC20Metadata } from "../../generated/LenderCommitmentForwarder_ActiveCommitments/IERC20Metadata";
 import { LenderCommitmentForwarder } from "../../generated/LenderCommitmentForwarder_ActiveCommitments/LenderCommitmentForwarder";
+import { LenderCommitmentForwarderStaging } from "../../generated/LenderCommitmentForwarderStaging/LenderCommitmentForwarderStaging";
 import { Commitment } from "../../generated/schema";
 import { loadProtocol } from "../helpers/loaders";
 
@@ -16,7 +17,7 @@ import {
   updateAvailableTokensFromCommitment,
   updateCommitmentStatus
 } from "./updaters";
-import { CommitmentStatus } from "./utils";
+import { CommitmentStatus, isRolloverable } from "./utils";
 
 export function handleActiveCommitments(block: ethereum.Block): void {
   const protocol = loadProtocol();
@@ -83,10 +84,10 @@ export function updateLenderBalanceAndAllowance(
   const balance = lendingToken.balanceOf(lenderAddress);
   commitment.lenderPrincipalBalance = balance;
 
-  const allowance = lendingToken.allowance(
-    lenderAddress,
-    LenderCommitmentForwarder.bind(dataSource.address()).getTellerV2()
-  );
+  const tellerV2Address = isRolloverable()
+    ? LenderCommitmentForwarderStaging.bind(dataSource.address()).getTellerV2()
+    : LenderCommitmentForwarder.bind(dataSource.address()).getTellerV2();
+  const allowance = lendingToken.allowance(lenderAddress, tellerV2Address);
   commitment.lenderPrincipalAllowance = allowance;
 
   commitment.save();

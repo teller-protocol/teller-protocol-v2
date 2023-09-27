@@ -1,3 +1,7 @@
+import { ByteArray, dataSource } from "@graphprotocol/graph-ts";
+
+import { loadProtocol } from "../helpers/loaders";
+
 export enum CommitmentStatus {
   Active,
   Expired,
@@ -19,4 +23,17 @@ export function commitmentStatusToEnum(status: string): CommitmentStatus {
 
 export function commitmentStatusToString(status: CommitmentStatus): string {
   return CommitmentStatusValues[status];
+}
+
+export function setIsRolloverable(): void {
+  const protocol = loadProtocol();
+  protocol.rolloverableLCF = dataSource.address();
+  protocol.save();
+  dataSource.context();
+}
+
+export function isRolloverable(): boolean {
+  const rolloverableLCF = loadProtocol().rolloverableLCF;
+  const lcf = rolloverableLCF ? rolloverableLCF : ByteArray.empty();
+  return dataSource.address().equals(lcf);
 }

@@ -4275,6 +4275,15 @@
           }
         }
       }
+    },
+    "b0877ca8e4dc39ee19b533f6bb983446cd2e45994ca391409044a31bedeeba3f": {
+      "address": "0xdB787C302644B0dAD2f92EdC8B55744D1fa04260",
+      "txHash": "0xcd30bf9fea197de1305d4b37b5be2eb0b44310cbe94249d82ea6c25e541b1acf",
+      "layout": {
+        "solcVersion": "0.8.9",
+        "storage": [],
+        "types": {}
+      }
     }
   }
 }

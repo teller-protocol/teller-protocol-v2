@@ -14,5 +14,6 @@
   "teller-v2:transfer-ownership-to-safe": 1695411205,
   "lender-manager:transfer-ownership": 1695411217,
   "liquidity-rewards:deploy": 1695411253,
-  "default-proxy-admin:transfer": 1695411254
+  "default-proxy-admin:transfer": 1695411254,
+  "flash-rollover:g3-upgrade": 1695920349
 }

@@ -1008,9 +1008,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@graphprotocol/graph-cli@npm:^0.57.0":
-  version: 0.57.0
-  resolution: "@graphprotocol/graph-cli@npm:0.57.0"
+"@graphprotocol/graph-cli@npm:^0.58.0":
+  version: 0.58.0
+  resolution: "@graphprotocol/graph-cli@npm:0.58.0"
   dependencies:
     "@float-capital/float-subgraph-uncrashable": ^0.0.0-alpha.4
     "@oclif/core": 2.8.6
@@ -1042,7 +1042,7 @@ __metadata:
     yaml: 1.10.2
   bin:
     graph: bin/run
-  checksum: 9c0b20c75d35dbd5911b599bae2212697a0a791362a99a8962808d815792231b72ef859f33726f7240c2e7e5f0c8f0fc52dd7c5ad65dd62d2c28da9acde7f983
+  checksum: 66eb0e782f43a391050dbd287e0c0f0b9270cdeffdb3942707600224363f23aabcef97526fabc69e8df1a36b1b8b10b4088e529766d0acc4bb8041e6d5a939cf
   languageName: node
   linkType: hard
 
@@ -2384,7 +2384,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@teller-protocol/v2-subgraph@workspace:packages/subgraph"
   dependencies:
-    "@graphprotocol/graph-cli": ^0.57.0
+    "@graphprotocol/graph-cli": ^0.58.0
     "@graphprotocol/graph-ts": ^0.31.0
     "@ledgerhq/hw-app-eth": ^6.34.0
     "@ledgerhq/hw-transport-node-hid": ^6.27.19

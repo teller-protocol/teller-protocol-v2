@@ -265,28 +265,28 @@ const buildAndDeploy = async ({
   }
 
   const buildId = await build(args);
-  // try {
-  //   await deploy({
-  //     subgraph,
-  //     newVersion: nextVersion,
-  //     logger
-  //   });
-  // } catch (err) {
-  //   if (
-  //     err instanceof Error &&
-  //     !err.message.includes("HTTP error deploying the subgraph 504")
-  //   ) {
-  //     throw err;
-  //   }
-  // }
-  // release();
-  // await new Promise(resolve => setTimeout(resolve, 10000));
-  // void subgraph.api.getLatestVersion().then(async latestVersion => {
-  //   // TODO: there should always be a latest version
-  //   if (!latestVersion) return;
-  //
-  //   await waitForSync({ subgraph, version: latestVersion, bar });
-  // });
+  try {
+    await deploy({
+      subgraph,
+      newVersion: nextVersion,
+      logger
+    });
+  } catch (err) {
+    if (
+      err instanceof Error &&
+      !err.message.includes("HTTP error deploying the subgraph 504")
+    ) {
+      throw err;
+    }
+  }
+  release();
+  await new Promise(resolve => setTimeout(resolve, 10000));
+  void subgraph.api.getLatestVersion().then(async latestVersion => {
+    // TODO: there should always be a latest version
+    if (!latestVersion) return;
+
+    await waitForSync({ subgraph, version: latestVersion, bar });
+  });
 };
 async function waitForSync({
   version,

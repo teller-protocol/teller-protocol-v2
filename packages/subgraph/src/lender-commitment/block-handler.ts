@@ -1,11 +1,4 @@
-import {
-  Address,
-  BigInt,
-  dataSource,
-  Entity,
-  ethereum,
-  Value
-} from "@graphprotocol/graph-ts";
+import { Address, BigInt, dataSource, ethereum } from "@graphprotocol/graph-ts";
 
 import { IERC20Metadata } from "../../generated/LenderCommitmentForwarder_ActiveCommitments/IERC20Metadata";
 import { LenderCommitmentForwarder } from "../../generated/LenderCommitmentForwarder_ActiveCommitments/LenderCommitmentForwarder";
@@ -39,15 +32,13 @@ function handleCommitments(
   // eslint-disable-next-line @typescript-eslint/ban-types
   fnNames: String[]
 ): void {
-  const map = new Entity();
-
   for (let i = 0; i < commitmentIds.length; i++) {
     const commitment = Commitment.load(commitmentIds[i].toString())!;
 
     if (commitment.expirationTimestamp.lt(block.timestamp)) {
       updateCommitmentStatus(commitment, CommitmentStatus.Expired);
     } else {
-      updateLenderBalanceAndAllowance(commitment, block, map);
+      updateLenderBalanceAndAllowance(commitment);
 
       for (let j = 0; j < fnNames.length; j++) {
         if (fnNames[j] === "checkLenderBalanceAndAllowanceForDeactivation") {
@@ -64,21 +55,11 @@ function handleCommitments(
   }
 }
 
-export function updateLenderBalanceAndAllowance(
-  commitment: Commitment,
-  block: ethereum.Block,
-  map: Entity
-): void {
+export function updateLenderBalanceAndAllowance(commitment: Commitment): void {
   const lenderAddress = Address.fromBytes(commitment.lenderAddress);
   const lendingTokenAddress = Address.fromBytes(
     commitment.principalTokenAddress
   );
-
-  const mapKey = `${lenderAddress.toHexString()}-${lendingTokenAddress.toHexString()}`;
-  if (map.isSet(mapKey) && map.getBigInt(mapKey).ge(block.number)) {
-    return;
-  }
-  map.set(mapKey, Value.fromBigInt(block.number));
 
   const lendingToken = IERC20Metadata.bind(lendingTokenAddress);
   const balance = lendingToken.balanceOf(lenderAddress);

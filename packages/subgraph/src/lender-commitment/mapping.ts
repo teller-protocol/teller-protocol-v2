@@ -1,4 +1,4 @@
-import { BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
+import { BigInt, Bytes } from "@graphprotocol/graph-ts";
 
 import {
   CreatedCommitment,
@@ -19,14 +19,7 @@ import {
   updateLenderCommitment,
   updateAvailableTokensFromCommitment
 } from "./updaters";
-import { CommitmentStatus, isRolloverable, setIsRolloverable } from "./utils";
-
-export function handleCreatedCommitmentRolloverable(
-  event: CreatedCommitment
-): void {
-  setIsRolloverable();
-  handleCreatedCommitment(event);
-}
+import { CommitmentStatus, isRolloverable } from "./utils";
 
 export function handleCreatedCommitment(event: CreatedCommitment): void {
   const commitmentId = event.params.commitmentId;

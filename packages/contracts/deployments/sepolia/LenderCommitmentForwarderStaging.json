@@ -900,24 +900,13 @@
       "outputs": []
     }
   ],
-<<<<<<< HEAD
-  "transactionHash": "0xeae42a279e761a298cc916063967d0219ce272ba1a4cb0a2123a614db87f74f5",
-  "receipt": {
-    "to": null,
-    "from": "0x5a5B978142C8F08Dd013901b50892baC49f3b700",
-=======
   "transactionHash": "0xd70e25caf91c16e0e12ae94507de50ac9006ca177f2146c457d7fe9aa92bf616",
   "receipt": {
     "to": null,
     "from": "0x65B38b3Cd7eFe502DB579c16ECB5B49235d0DAd0",
->>>>>>> develop
     "blockHash": null,
     "blockNumber": null
   },
   "numDeployments": 1,
-<<<<<<< HEAD
-  "implementation": "0x8ED313430321D8db958A19E918d8f4F6847aB47d"
-=======
   "implementation": "0x69620F29484C60bbC05a1698Cc793DC35c9beeCc"
->>>>>>> develop
 }

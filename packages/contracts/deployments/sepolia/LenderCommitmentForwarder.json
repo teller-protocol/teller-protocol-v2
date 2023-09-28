@@ -644,11 +644,7 @@
       "outputs": []
     }
   ],
-<<<<<<< HEAD
-  "transactionHash": "0xc7c6b1300ebcbd48f6fb06f3b828169fd17cd8dd06be2e60c65968a5f68aa0f8",
-=======
   "transactionHash": "0x887ce1bf33a886bd3453f81aaa3aa54f0ebce403d742a735e3c26d5fc0c90450",
->>>>>>> develop
   "receipt": {
     "to": null,
     "from": "0x65B38b3Cd7eFe502DB579c16ECB5B49235d0DAd0",
@@ -656,9 +652,6 @@
     "blockNumber": null
   },
   "numDeployments": 1,
-<<<<<<< HEAD
-  "implementation": "0x97b0c7649b21DcfAfe1Fb836b8cE753ad6872954"
-=======
-  "implementation": "0xbB2c2d83f30B04Cb0443D75826c4265567005dA9"
->>>>>>> develop
+ 
+  "implementation": "0x97b0c7649b21DcfAfe1Fb836b8cE753ad6872954" 
 }

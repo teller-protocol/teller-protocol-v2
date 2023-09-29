@@ -11,7 +11,7 @@ import "../../interfaces/ITellerV2.sol";
 import "../../interfaces/IProtocolFee.sol";
 import "../../interfaces/ITellerV2Storage.sol";
 import "../../interfaces/IMarketRegistry.sol";
-import "../../interfaces/ILenderCommitmentForwarder.sol"; 
+import "../../interfaces/ILenderCommitmentForwarder.sol";
 import "../../interfaces/IFlashRolloverLoan.sol";
 import "../../libraries/NumbersLib.sol";
 
@@ -21,11 +21,7 @@ import { IPoolAddressesProvider } from "../../interfaces/aave/IPoolAddressesProv
 
 //https://docs.aave.com/developers/v/1.0/tutorials/performing-a-flash-loan/...-in-your-project
 
-contract FlashRolloverLoan_G1 is
-    
-    IFlashLoanSimpleReceiver,
-    IFlashRolloverLoan
-{
+contract FlashRolloverLoan_G1 is IFlashLoanSimpleReceiver, IFlashRolloverLoan {
     using AddressUpgradeable for address;
     using NumbersLib for uint256;
 
@@ -43,14 +39,14 @@ contract FlashRolloverLoan_G1 is
         uint256 fundsRemaining
     );
 
-    struct AcceptCommitmentArgs  {
+    struct AcceptCommitmentArgs {
         uint256 commitmentId;
         uint256 principalAmount;
         uint256 collateralAmount;
         uint256 collateralTokenId;
         address collateralTokenAddress;
         uint16 interestRate;
-        uint32 loanDuration;        
+        uint32 loanDuration;
     }
 
     /// @custom:oz-upgrades-unsafe-allow constructor
@@ -144,7 +140,7 @@ If the new loan pays out (after fees) MORE than the  aave loan amount+ fee) then
         uint256 _flashFees,
         address initiator,
         bytes calldata _data
-    ) external onlyFlashLoanPool virtual returns (bool) {
+    ) external virtual onlyFlashLoanPool returns (bool) {
         require(
             initiator == address(this),
             "This contract must be the initiator"
@@ -202,7 +198,6 @@ If the new loan pays out (after fees) MORE than the  aave loan amount+ fee) then
         return true;
     }
 
-    
     function _repayLoanFull(
         uint256 _bidId,
         address _principalToken,
@@ -232,7 +227,11 @@ If the new loan pays out (after fees) MORE than the  aave loan amount+ fee) then
         address borrower,
         address principalToken,
         AcceptCommitmentArgs memory _commitmentArgs
-    ) internal virtual returns (uint256 bidId_, uint256 acceptCommitmentAmount_) {
+    )
+        internal
+        virtual
+        returns (uint256 bidId_, uint256 acceptCommitmentAmount_)
+    {
         uint256 fundsBeforeAcceptCommitment = IERC20Upgradeable(principalToken)
             .balanceOf(address(this));
 

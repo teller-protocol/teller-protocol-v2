@@ -8,7 +8,4 @@ interface IFlashRolloverLoan {
         uint256 borrowerAmount;
         bytes acceptCommitmentArgs;
     }
-
- 
-
 }

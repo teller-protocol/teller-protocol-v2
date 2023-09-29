@@ -15,7 +15,6 @@ import "../../../../contracts/LenderCommitmentForwarder/extensions/ExtensionsCon
 import { WethMock } from "../../../../contracts/mock/WethMock.sol";
 import { TestERC721Token } from "../../../tokens/TestERC721Token.sol";
 
-
 import { TellerV2SolMock } from "../../../../contracts/mock/TellerV2SolMock.sol";
 import { LenderCommitmentForwarderMock } from "../../../../contracts/mock/LenderCommitmentForwarderMock.sol";
 import { MarketRegistryMock } from "../../../../contracts/mock/MarketRegistryMock.sol";
@@ -29,7 +28,7 @@ import { LenderCommitmentForwarder_G3 } from "../../../../contracts/LenderCommit
 import { PaymentType, PaymentCycleType } from "../../../../contracts/libraries/V2Calculations.sol";
 
 import { FlashRolloverLoan_G3 } from "../../../../contracts/LenderCommitmentForwarder/extensions/FlashRolloverLoan_G3.sol";
- 
+
 import "lib/forge-std/src/console.sol";
 
 contract FlashRolloverLoan_G3_Integration_Test is Testable {
@@ -54,8 +53,6 @@ contract FlashRolloverLoan_G3_Integration_Test is Testable {
         uint256 newLoanId,
         uint256 fundsRemaining
     );
-
-   
 
     function setUp() public {
         borrower = new User();
@@ -84,11 +81,9 @@ contract FlashRolloverLoan_G3_Integration_Test is Testable {
 
         wethMock = new WethMock();
 
-        testNft = new TestERC721Token("NFT","NFT");
+        testNft = new TestERC721Token("NFT", "NFT");
         testNft.mint(address(borrower));
         testNft.mint(address(borrower));
-
-       
 
         uint32 _paymentCycleDuration = uint32(1 days);
         uint32 _paymentDefaultDuration = uint32(5 days);
@@ -124,15 +119,13 @@ contract FlashRolloverLoan_G3_Integration_Test is Testable {
             address(lenderCommitmentForwarder),
             address(aavePoolAddressProvider)
         );
-
-        
     }
 
     function test_flashRollover() public {
         address lendingToken = address(wethMock);
 
         //initial loan - need to pay back 1 weth + 0.1 weth (interest) to the lender
-     
+
         uint256 principalAmount = 1e18;
         uint32 duration = 365 days;
         uint16 interestRate = 1000;
@@ -142,7 +135,7 @@ contract FlashRolloverLoan_G3_Integration_Test is Testable {
         vm.prank(address(borrower));
         uint256 loanId = tellerV2.submitBid(
             lendingToken,
-            1, //market id 
+            1, //market id
             principalAmount,
             duration,
             interestRate,
@@ -150,21 +143,15 @@ contract FlashRolloverLoan_G3_Integration_Test is Testable {
             address(borrower)
         );
 
-
         vm.prank(address(lender));
         wethMock.approve(address(tellerV2), 5e18);
 
         vm.prank(address(lender));
         tellerV2.lenderAcceptBid(loanId);
 
-
-
         vm.warp(365 days + 1);
 
         uint256 commitmentPrincipalAmount = 150 * 1e16; //1.50 weth
-
-
-
 
         uint256 tokenIdLeafA = 1;
         uint256 tokenIdLeafB = 3;
@@ -175,15 +162,11 @@ contract FlashRolloverLoan_G3_Integration_Test is Testable {
         //a merkle root is simply the hash of the hashes of the leaves in the layer above, where the leaves are always sorted alphanumerically.
         //it so happens that the hash of (1) is less than the hash of (3) so we can compute the merkle root manually like this without a sorting function:
         bytes32 merkleRoot = keccak256(
-            abi.encodePacked(
-                merkleLeafA, 
-                 merkleLeafB )
+            abi.encodePacked(merkleLeafA, merkleLeafB)
         );
- 
-        // should be an nft 
-        address collateralToken = address(testNft);
 
- 
+        // should be an nft
+        address collateralToken = address(testNft);
 
         ILenderCommitmentForwarder.Commitment
             memory commitment = ILenderCommitmentForwarder.Commitment({
@@ -193,7 +176,8 @@ contract FlashRolloverLoan_G3_Integration_Test is Testable {
                 minInterestRate: interestRate,
                 collateralTokenAddress: address(collateralToken),
                 collateralTokenId: uint256(merkleRoot),
-                maxPrincipalPerCollateralAmount: commitmentPrincipalAmount * 1e18,
+                maxPrincipalPerCollateralAmount: commitmentPrincipalAmount *
+                    1e18,
                 collateralTokenType: ILenderCommitmentForwarder
                     .CommitmentCollateralType
                     .ERC721_MERKLE_PROOF,
@@ -210,12 +194,12 @@ contract FlashRolloverLoan_G3_Integration_Test is Testable {
             _borrowerAddressList
         );
 
-        
         bytes32[] memory merkleProof = new bytes32[](1);
-         merkleProof[0] = merkleLeafB;
+        merkleProof[0] = merkleLeafB;
 
         FlashRolloverLoan_G3.AcceptCommitmentArgs
-            memory _acceptCommitmentArgs = FlashRolloverLoan_G3.AcceptCommitmentArgs({
+            memory _acceptCommitmentArgs = FlashRolloverLoan_G3
+                .AcceptCommitmentArgs({
                     commitmentId: commitmentId,
                     principalAmount: commitmentPrincipalAmount,
                     collateralAmount: 1,
@@ -226,45 +210,42 @@ contract FlashRolloverLoan_G3_Integration_Test is Testable {
                     merkleProof: merkleProof
                 });
 
+        {
+            vm.prank(address(marketOwner));
+            ITellerV2Context(address(tellerV2)).setTrustedMarketForwarder(
+                1,
+                address(lenderCommitmentForwarder)
+            );
 
+            //borrower AND lender  approves the lenderCommitmentForwarder as trusted
 
+            vm.prank(address(lender));
+            ITellerV2Context(address(tellerV2)).approveMarketForwarder(
+                1,
+                address(lenderCommitmentForwarder)
+            );
 
-{
-        vm.prank(address(marketOwner));
-        ITellerV2Context(address(tellerV2)).setTrustedMarketForwarder(
-            1,
-            address(lenderCommitmentForwarder)
-        );
+            vm.prank(address(borrower));
+            ITellerV2Context(address(tellerV2)).approveMarketForwarder(
+                1,
+                address(lenderCommitmentForwarder)
+            );
 
-        //borrower AND lender  approves the lenderCommitmentForwarder as trusted
+            //borrower must approve the extension
+            vm.prank(address(borrower));
+            IExtensionsContext(address(lenderCommitmentForwarder)).addExtension(
+                    address(flashRolloverLoan)
+                );
 
-        vm.prank(address(lender));
-        ITellerV2Context(address(tellerV2)).approveMarketForwarder(
-            1,
-            address(lenderCommitmentForwarder)
-        );
+            address collateralManager = address(tellerV2.collateralManager());
 
-        vm.prank(address(borrower));
-        ITellerV2Context(address(tellerV2)).approveMarketForwarder(
-            1,
-            address(lenderCommitmentForwarder)
-        );
-
-        //borrower must approve the extension
-        vm.prank(address(borrower));
-        IExtensionsContext(address(lenderCommitmentForwarder)).addExtension(
-            address(flashRolloverLoan)
-        );
-
-        address collateralManager = address ( tellerV2.collateralManager() );
-
-        vm.prank(address(borrower));
-        testNft.setApprovalForAll( address(collateralManager) , true ) ; 
-}
+            vm.prank(address(borrower));
+            testNft.setApprovalForAll(address(collateralManager), true);
+        }
         //how do we calc how much to flash ??
         uint256 flashLoanAmount = 110 * 1e16;
 
-       // uint256 borrowerAmount = 0;
+        // uint256 borrowerAmount = 0;
 
         vm.expectEmit(true, false, false, false);
         emit RolloverLoanComplete(address(borrower), 0, 0, 0);

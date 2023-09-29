@@ -11,7 +11,7 @@ import "../../interfaces/ITellerV2.sol";
 import "../../interfaces/IProtocolFee.sol";
 import "../../interfaces/ITellerV2Storage.sol";
 import "../../interfaces/IMarketRegistry.sol";
-import "../../interfaces/ILenderCommitmentForwarder.sol"; 
+import "../../interfaces/ILenderCommitmentForwarder.sol";
 import "../../interfaces/IFlashRolloverLoan.sol";
 import "../../libraries/NumbersLib.sol";
 
@@ -19,15 +19,10 @@ import { IPool } from "../../interfaces/aave/IPool.sol";
 import { IFlashLoanSimpleReceiver } from "../../interfaces/aave/IFlashLoanSimpleReceiver.sol";
 import { IPoolAddressesProvider } from "../../interfaces/aave/IPoolAddressesProvider.sol";
 
-
-contract FlashRolloverLoan_G3 is 
-   IFlashLoanSimpleReceiver,
-    IFlashRolloverLoan
- {
+contract FlashRolloverLoan_G3 is IFlashLoanSimpleReceiver, IFlashRolloverLoan {
     using AddressUpgradeable for address;
     using NumbersLib for uint256;
 
-   
     /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
     ITellerV2 public immutable TELLER_V2;
     /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
@@ -42,7 +37,6 @@ contract FlashRolloverLoan_G3 is
         uint256 fundsRemaining
     );
 
-   
     struct AcceptCommitmentArgs {
         uint256 commitmentId;
         uint256 principalAmount;
@@ -51,7 +45,7 @@ contract FlashRolloverLoan_G3 is
         address collateralTokenAddress;
         uint16 interestRate;
         uint32 loanDuration;
-        bytes32[] merkleProof; //empty array if not used 
+        bytes32[] merkleProof; //empty array if not used
     }
 
     /// @custom:oz-upgrades-unsafe-allow constructor
@@ -75,8 +69,6 @@ contract FlashRolloverLoan_G3 is
 
         _;
     }
-
-
 
     function rolloverLoanWithFlash(
         uint256 _loanId,
@@ -116,15 +108,13 @@ contract FlashRolloverLoan_G3 is
         );
     }
 
-
-    
-     function executeOperation(
+    function executeOperation(
         address _flashToken,
         uint256 _flashAmount,
         uint256 _flashFees,
         address initiator,
         bytes calldata _data
-    ) external onlyFlashLoanPool virtual  returns (bool) {
+    ) external virtual onlyFlashLoanPool returns (bool) {
         require(
             initiator == address(this),
             "This contract must be the initiator"
@@ -146,7 +136,6 @@ contract FlashRolloverLoan_G3 is
             (AcceptCommitmentArgs)
         );
 
-      
         // Accept commitment and receive funds to this contract
 
         (uint256 newLoanId, uint256 acceptCommitmentAmount) = _acceptCommitment(
@@ -182,11 +171,7 @@ contract FlashRolloverLoan_G3 is
 
         return true;
     }
-    
 
-
-
-    
     function _repayLoanFull(
         uint256 _bidId,
         address _principalToken,
@@ -211,15 +196,17 @@ contract FlashRolloverLoan_G3 is
         address borrower,
         address principalToken,
         AcceptCommitmentArgs memory _commitmentArgs
-    ) internal virtual  returns (uint256 bidId_, uint256 acceptCommitmentAmount_) {
+    )
+        internal
+        virtual
+        returns (uint256 bidId_, uint256 acceptCommitmentAmount_)
+    {
         uint256 fundsBeforeAcceptCommitment = IERC20Upgradeable(principalToken)
             .balanceOf(address(this));
 
         bool usingMerkleProof = _commitmentArgs.merkleProof.length > 0;
-        
-        if(usingMerkleProof){
 
-
+        if (usingMerkleProof) {
             bytes memory responseData = address(LENDER_COMMITMENT_FORWARDER)
                 .functionCall(
                     abi.encodePacked(
@@ -242,11 +229,7 @@ contract FlashRolloverLoan_G3 is
                 );
 
             (bidId_) = abi.decode(responseData, (uint256));
-
-
-        }else{
-
-
+        } else {
             bytes memory responseData = address(LENDER_COMMITMENT_FORWARDER)
                 .functionCall(
                     abi.encodePacked(
@@ -268,11 +251,7 @@ contract FlashRolloverLoan_G3 is
                 );
 
             (bidId_) = abi.decode(responseData, (uint256));
-
-
         }
-
-       
 
         uint256 fundsAfterAcceptCommitment = IERC20Upgradeable(principalToken)
             .balanceOf(address(this));
@@ -281,8 +260,6 @@ contract FlashRolloverLoan_G3 is
             fundsBeforeAcceptCommitment;
     }
 
-
-    
     function ADDRESSES_PROVIDER() public view returns (IPoolAddressesProvider) {
         return IPoolAddressesProvider(POOL_ADDRESSES_PROVIDER);
     }
@@ -291,10 +268,7 @@ contract FlashRolloverLoan_G3 is
         return IPool(ADDRESSES_PROVIDER().getPool());
     }
 
-
-
-
-      /**
+    /**
      * @notice Calculates the amount for loan rollover, determining if the borrower owes or receives funds.
      * @param _loanId The ID of the loan to calculate the rollover amount for.
      * @param _commitmentArgs Arguments for the commitment.
@@ -336,7 +310,7 @@ contract FlashRolloverLoan_G3 is
 
         _flashAmount = repayFullAmount;
         uint256 _flashLoanFee = _flashAmount.percent(_flashloanPremiumPct);
- 
+
         _borrowerAmount =
             int256(commitmentPrincipalReceived) -
             int256(repayFullAmount) -
@@ -382,6 +356,4 @@ contract FlashRolloverLoan_G3 is
     function _getProtocolFeePct() internal view returns (uint16) {
         return IProtocolFee(address(TELLER_V2)).protocolFee();
     }
-
-
 }

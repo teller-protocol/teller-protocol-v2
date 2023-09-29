@@ -5,7 +5,6 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 import { FlashRolloverLoan } from "../../../../contracts/LenderCommitmentForwarder/extensions/FlashRolloverLoan.sol";
 
- 
 import "../../../../contracts/interfaces/ILenderCommitmentForwarder.sol";
 import "../../../../contracts/interfaces/IFlashRolloverLoan.sol";
 
@@ -20,9 +19,7 @@ import { MarketRegistryMock } from "../../../../contracts/mock/MarketRegistryMoc
 import { AavePoolAddressProviderMock } from "../../../../contracts/mock/aave/AavePoolAddressProviderMock.sol";
 import { AavePoolMock } from "../../../../contracts/mock/aave/AavePoolMock.sol";
 
-
 import { FlashRolloverLoan_G3 } from "../../../../contracts/LenderCommitmentForwarder/extensions/FlashRolloverLoan_G3.sol";
- 
 
 contract FlashRolloverLoanOverride is FlashRolloverLoan_G3 {
     constructor(
@@ -60,7 +57,6 @@ contract FlashRolloverLoan_G3_Unit_Test is Testable {
     WethMock wethMock;
     LenderCommitmentForwarderMock lenderCommitmentForwarder;
     MarketRegistryMock marketRegistryMock;
- 
 
     function setUp() public {
         borrower = new User();
@@ -131,15 +127,15 @@ contract FlashRolloverLoan_G3_Unit_Test is Testable {
 
         FlashRolloverLoan_G3.AcceptCommitmentArgs
             memory commitmentArgs = FlashRolloverLoan_G3.AcceptCommitmentArgs({
-                    commitmentId: 0,
-                    principalAmount: principalAmount,
-                    collateralAmount: 100,
-                    collateralTokenId: 0,
-                    collateralTokenAddress: address(0),
-                    interestRate: interestRate,
-                    loanDuration: duration,
-                    merkleProof: new bytes32[](0)
-                });
+                commitmentId: 0,
+                principalAmount: principalAmount,
+                collateralAmount: 100,
+                collateralTokenId: 0,
+                collateralTokenAddress: address(0),
+                interestRate: interestRate,
+                loanDuration: duration,
+                merkleProof: new bytes32[](0)
+            });
 
         vm.prank(address(borrower));
         uint256 loanId = tellerV2.submitBid(
@@ -173,7 +169,6 @@ contract FlashRolloverLoan_G3_Unit_Test is Testable {
             "flashLoanSimpleWasCalled not called"
         );
     }
-
 
     function test_rolloverLoanWithFlashAndProof() public {
         address lendingToken = address(wethMock);
@@ -205,15 +200,15 @@ contract FlashRolloverLoan_G3_Unit_Test is Testable {
 
         FlashRolloverLoan_G3.AcceptCommitmentArgs
             memory commitmentArgs = FlashRolloverLoan_G3.AcceptCommitmentArgs({
-                    commitmentId: 0,
-                    principalAmount: principalAmount,
-                    collateralAmount: 100,
-                    collateralTokenId: 0,
-                    collateralTokenAddress: address(0),
-                    interestRate: interestRate,
-                    loanDuration: duration,
-                    merkleProof: merkleProof
-                });
+                commitmentId: 0,
+                principalAmount: principalAmount,
+                collateralAmount: 100,
+                collateralTokenId: 0,
+                collateralTokenAddress: address(0),
+                interestRate: interestRate,
+                loanDuration: duration,
+                merkleProof: merkleProof
+            });
 
         vm.prank(address(borrower));
         uint256 loanId = tellerV2.submitBid(
@@ -248,9 +243,6 @@ contract FlashRolloverLoan_G3_Unit_Test is Testable {
         );
     }
 
-
-
-
     function test_executeOperation() public {
         address lendingToken = address(wethMock);
         uint256 marketId = 0;
@@ -280,17 +272,16 @@ contract FlashRolloverLoan_G3_Unit_Test is Testable {
         lenderCommitmentForwarder.setCommitment(0, commitment);
 
         FlashRolloverLoan_G3.AcceptCommitmentArgs
-            memory commitmentArgs = 
-                FlashRolloverLoan_G3.AcceptCommitmentArgs({
-                    commitmentId: 0,
-                    principalAmount: principalAmount,
-                    collateralAmount: 100,
-                    collateralTokenId: 0,
-                    collateralTokenAddress: address(0),
-                    interestRate: interestRate,
-                    loanDuration: duration,
-                    merkleProof: new bytes32[](0)
-                });
+            memory commitmentArgs = FlashRolloverLoan_G3.AcceptCommitmentArgs({
+                commitmentId: 0,
+                principalAmount: principalAmount,
+                collateralAmount: 100,
+                collateralTokenId: 0,
+                collateralTokenAddress: address(0),
+                interestRate: interestRate,
+                loanDuration: duration,
+                merkleProof: new bytes32[](0)
+            });
 
         vm.prank(address(borrower));
         uint256 loanId = tellerV2.submitBid(
@@ -339,8 +330,6 @@ contract FlashRolloverLoan_G3_Unit_Test is Testable {
         );
     }
 
-
-
     function test_executeOperationWithProof() public {
         address lendingToken = address(wethMock);
         uint256 marketId = 0;
@@ -369,22 +358,19 @@ contract FlashRolloverLoan_G3_Unit_Test is Testable {
 
         lenderCommitmentForwarder.setCommitment(0, commitment);
 
-
         bytes32[] memory merkleProof = new bytes32[](1);
 
-
         FlashRolloverLoan_G3.AcceptCommitmentArgs
-            memory commitmentArgs = 
-                FlashRolloverLoan_G3.AcceptCommitmentArgs({
-                    commitmentId: 0,
-                    principalAmount: principalAmount,
-                    collateralAmount: 100,
-                    collateralTokenId: 0,
-                    collateralTokenAddress: address(0),
-                    interestRate: interestRate,
-                    loanDuration: duration,
-                    merkleProof: merkleProof
-                });
+            memory commitmentArgs = FlashRolloverLoan_G3.AcceptCommitmentArgs({
+                commitmentId: 0,
+                principalAmount: principalAmount,
+                collateralAmount: 100,
+                collateralTokenId: 0,
+                collateralTokenAddress: address(0),
+                interestRate: interestRate,
+                loanDuration: duration,
+                merkleProof: merkleProof
+            });
 
         vm.prank(address(borrower));
         uint256 loanId = tellerV2.submitBid(
@@ -426,14 +412,12 @@ contract FlashRolloverLoan_G3_Unit_Test is Testable {
         );
 
         bool acceptCommitmentWithRecipientAndProofWasCalled = lenderCommitmentForwarder
-            .acceptCommitmentWithRecipientAndProofWasCalled();
+                .acceptCommitmentWithRecipientAndProofWasCalled();
         assertTrue(
             acceptCommitmentWithRecipientAndProofWasCalled,
             "acceptCommitmentWithRecipientAndProof not called"
         );
     }
-
-
 
     function test_executeOperation_invalid_sender() public {
         address lendingToken = address(wethMock);
@@ -463,15 +447,15 @@ contract FlashRolloverLoan_G3_Unit_Test is Testable {
 
         FlashRolloverLoan_G3.AcceptCommitmentArgs
             memory commitmentArgs = FlashRolloverLoan_G3.AcceptCommitmentArgs({
-                    commitmentId: 0,
-                    principalAmount: principalAmount,
-                    collateralAmount: 100,
-                    collateralTokenId: 0,
-                    collateralTokenAddress: address(0),
-                    interestRate: interestRate,
-                    loanDuration: duration,
-                    merkleProof: new bytes32[](0)
-                });
+                commitmentId: 0,
+                principalAmount: principalAmount,
+                collateralAmount: 100,
+                collateralTokenId: 0,
+                collateralTokenAddress: address(0),
+                interestRate: interestRate,
+                loanDuration: duration,
+                merkleProof: new bytes32[](0)
+            });
 
         vm.prank(address(borrower));
         uint256 loanId = tellerV2.submitBid(
@@ -543,15 +527,15 @@ contract FlashRolloverLoan_G3_Unit_Test is Testable {
 
         FlashRolloverLoan_G3.AcceptCommitmentArgs
             memory commitmentArgs = FlashRolloverLoan_G3.AcceptCommitmentArgs({
-                    commitmentId: 0,
-                    principalAmount: principalAmount,
-                    collateralAmount: 100,
-                    collateralTokenId: 0,
-                    collateralTokenAddress: address(0),
-                    interestRate: interestRate,
-                    loanDuration: duration,
-                    merkleProof: new bytes32[](0)
-                });
+                commitmentId: 0,
+                principalAmount: principalAmount,
+                collateralAmount: 100,
+                collateralTokenId: 0,
+                collateralTokenAddress: address(0),
+                interestRate: interestRate,
+                loanDuration: duration,
+                merkleProof: new bytes32[](0)
+            });
 
         vm.prank(address(borrower));
         uint256 loanId = tellerV2.submitBid(
@@ -623,15 +607,15 @@ contract FlashRolloverLoan_G3_Unit_Test is Testable {
 
         FlashRolloverLoan_G3.AcceptCommitmentArgs
             memory commitmentArgs = FlashRolloverLoan_G3.AcceptCommitmentArgs({
-                    commitmentId: 0,
-                    principalAmount: principalAmount,
-                    collateralAmount: 100,
-                    collateralTokenId: 0,
-                    collateralTokenAddress: address(0),
-                    interestRate: interestRate,
-                    loanDuration: duration,
-                    merkleProof: new bytes32[](0)
-                });
+                commitmentId: 0,
+                principalAmount: principalAmount,
+                collateralAmount: 100,
+                collateralTokenId: 0,
+                collateralTokenAddress: address(0),
+                interestRate: interestRate,
+                loanDuration: duration,
+                merkleProof: new bytes32[](0)
+            });
 
         vm.prank(address(borrower));
         uint256 loanId = tellerV2.submitBid(
@@ -716,16 +700,16 @@ contract FlashRolloverLoan_G3_Unit_Test is Testable {
         lenderCommitmentForwarder.setCommitment(0, commitment);
 
         FlashRolloverLoan_G3.AcceptCommitmentArgs
-            memory commitmentArgs =  FlashRolloverLoan_G3.AcceptCommitmentArgs({
-                    commitmentId: 0,
-                    principalAmount: newLoanPrincipalAmount,
-                    collateralAmount: 0,
-                    collateralTokenId: 0,
-                    collateralTokenAddress: address(0),
-                    interestRate: interestRate,
-                    loanDuration: duration,
-                    merkleProof: new bytes32[](0)
-                });
+            memory commitmentArgs = FlashRolloverLoan_G3.AcceptCommitmentArgs({
+                commitmentId: 0,
+                principalAmount: newLoanPrincipalAmount,
+                collateralAmount: 0,
+                collateralTokenId: 0,
+                collateralTokenAddress: address(0),
+                interestRate: interestRate,
+                loanDuration: duration,
+                merkleProof: new bytes32[](0)
+            });
 
         vm.prank(address(borrower));
         IERC20(lendingToken).approve(address(flashRolloverLoan), 1e18);

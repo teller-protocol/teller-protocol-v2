@@ -27,6 +27,7 @@ TODO
  as collateral for a single loan 
 
 
+get test coverage up to 80 
 
 */
 contract CollateralManagerV2_Test is Testable {

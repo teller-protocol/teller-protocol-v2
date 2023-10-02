@@ -250,6 +250,23 @@ contract CollateralManagerV2 is
         emit CollateralClaimed(_bidId);
     }
 
+     /**
+     * @notice Withdraws deposited collateral from the created escrow of a bid that has been successfully repaid.
+     * @param _bidId The id of the bid to withdraw collateral for.
+     * @param _recipient The address that will receive the collateral.
+     */
+    function withdrawForRecipient(uint256 _bidId, address _recipient) external {
+        BidState bidState = tellerV2.getBidState(_bidId);
+
+        require(bidState == BidState.PAID, "Loan has not been paid");
+
+        require(_msgSender() == tellerV2.getLoanBorrower(_bidId), "Not authorized");
+        
+        _withdraw(_bidId, _recipient);
+
+        emit CollateralClaimed(_bidId);
+    }
+
     /**
      * @notice Withdraws deposited collateral from the created escrow of a bid that has been CLOSED after being defaulted.
      * @param _bidId The id of the bid to withdraw collateral for.

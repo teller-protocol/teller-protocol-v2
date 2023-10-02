@@ -22,6 +22,9 @@ abstract contract TokenBundle is ICollateralBundle {
     /// @dev Mapping from bundle UID => bundle info.
     mapping(uint256 => CollateralBundleInfo) private bundle;
 
+    /// @dev The number of bundles that have been created
+    uint256 bundleCount = 0; 
+
     /// @dev Returns the total number of assets in a particular bundle.
     function getTokenCountOfBundle(uint256 _bundleId)
         public
@@ -46,20 +49,22 @@ abstract contract TokenBundle is ICollateralBundle {
     }*/
 
     /// @dev Lets the calling contract create a bundle, by passing in a list of tokens and a unique id.
-    function _createBundle(Collateral[] memory _tokensToBind, uint256 _bundleId)
-        internal
-    {
+    function _createBundle(Collateral[] memory _tokensToBind)
+        internal returns (uint256 bundleId_)
+    {   
+        bundleId_ = bundleCount++;
+
         uint256 targetCount = _tokensToBind.length;
 
         require(targetCount > 0, "!Tokens");
-        require(bundle[_bundleId].count == 0, "id exists");
+        require(bundle[bundleId_].count == 0, "Token bundle id exists");
 
         for (uint256 i = 0; i < targetCount; i += 1) {
             _checkTokenType(_tokensToBind[i]);
-            bundle[_bundleId].collaterals[i] = _tokensToBind[i];
+            bundle[bundleId_].collaterals[i] = _tokensToBind[i];
         }
 
-        bundle[_bundleId].count = targetCount;
+        bundle[bundleId_].count = targetCount;
     }
 
     /// @dev Lets the calling contract update a bundle, by passing in a list of tokens and a unique id.

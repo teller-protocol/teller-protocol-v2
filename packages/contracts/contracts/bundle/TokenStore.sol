@@ -39,11 +39,10 @@ contract TokenStore is
     /// @dev Store / escrow multiple ERC1155, ERC721, ERC20 tokens.
     function _storeTokens(
         address _tokenOwner,
-        Collateral[] memory _tokens,
-        //string memory _uriForTokens,
-        uint256 _bundleId
-    ) internal {
-        _createBundle(_tokens, _bundleId);
+        Collateral[] memory _tokens
+        //string memory _uriForTokens 
+    ) internal returns (uint256 bundleId_) {
+        bundleId_ = _createBundle(_tokens);
         //_setUriOfBundle(_uriForTokens, _idForTokens);
         _transferTokenBatch(_tokenOwner, address(this), _tokens);
     }

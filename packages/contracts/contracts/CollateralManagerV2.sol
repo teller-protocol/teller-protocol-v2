@@ -31,9 +31,7 @@ import "./interfaces/ITellerV2.sol";
 import "./bundle/TokenStore.sol";
 
 import "./bundle/interfaces/ICollateralBundle.sol";
-
-//remove me 
-import "lib/forge-std/src/console.sol";
+ 
 
 /*
 
@@ -57,7 +55,7 @@ contract CollateralManagerV2 is
     //mapping(uint256 => address) public _escrows;
 
     // bidIds -> collateralBundleId
-    //mapping(uint256 => CollateralInfo) internal _committedBidCollateral;
+    mapping(uint256 => uint256) internal _collateralBundleIdForBid;
 
     // bidIds -> collateralBundleInfo
     //this just bridges the gap between submitBid and acceptBid
@@ -167,7 +165,9 @@ contract CollateralManagerV2 is
 
             address borrower = tellerV2.getLoanBorrower(_bidId);
 
-            _storeTokens(borrower, _committedCollateral, _bidId);
+            uint256 _bundleId = _storeTokens(borrower, _committedCollateral);
+
+            _collateralBundleIdForBid[_bidId] = _bundleId ;
 
 
             uint256 collateralCount = _committedCollateral.length;
@@ -207,15 +207,6 @@ contract CollateralManagerV2 is
         view
         returns (Collateral[] memory infos_)
     {
-        /*  CollateralInfo storage collateral = _bidCollaterals[_bidId];
-        address[] memory collateralAddresses = collateral
-            .collateralAddresses
-            .values();
-        infos_ = new Collateral[](collateralAddresses.length);
-        for (uint256 i; i < collateralAddresses.length; i++) {
-            infos_[i] = collateral.collateralInfo[collateralAddresses[i]];
-        }*/
-
         uint256 count = _committedBidCollateral[_bidId].count;
         infos_ = new Collateral[](count);
 
@@ -235,11 +226,10 @@ contract CollateralManagerV2 is
         view
         returns (uint256 amount_)
     {
-        Collateral memory token_data = getTokenOfBundle(_bidId, 0); // first slot
 
-        console.logAddress(token_data._collateralAddress );
-        console.logAddress(_collateralAddress);
-        console.logUint(token_data._amount);
+        uint256 bundleId = _collateralBundleIdForBid[_bidId];
+
+        Collateral memory token_data = getTokenOfBundle(bundleId, 0); // first slot
         
         if (token_data._collateralAddress != _collateralAddress) return 0; // not as expected
 
@@ -254,7 +244,7 @@ contract CollateralManagerV2 is
         BidState bidState = tellerV2.getBidState(_bidId);
 
         require(bidState == BidState.PAID, "Loan has not been paid");
-
+        
         _withdraw(_bidId, tellerV2.getLoanBorrower(_bidId));
 
         emit CollateralClaimed(_bidId);
@@ -318,9 +308,12 @@ contract CollateralManagerV2 is
      * @param _receiver The address to withdraw the collateral to.
      */
     function _withdraw(uint256 _bidId, address _receiver) internal virtual {
+
+        uint256 bundleId = _collateralBundleIdForBid[_bidId];
+
         (uint256 count, Collateral[] memory releasedTokens) = _releaseTokens(
             _receiver,
-            _bidId
+            bundleId
         );
 
         for (uint256 i = 0; i < count; i += 1) {

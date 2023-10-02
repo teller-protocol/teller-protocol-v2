@@ -48,6 +48,17 @@ contract FlashRolloverLoan_G3 is IFlashLoanSimpleReceiver, IFlashRolloverLoan {
         bytes32[] merkleProof; //empty array if not used
     }
 
+    /**
+     * @title Constructor for the FlashRolloverLoan Contract
+     *
+     * @notice Initializes the FlashRolloverLoan with necessary contract addresses.
+     *
+     * @dev Using a custom OpenZeppelin upgrades tag. Ensure the constructor logic is safe for upgrades.
+     *
+     * @param _tellerV2 The address of the TellerV2 contract.
+     * @param _lenderCommitmentForwarder The address of the LenderCommitmentForwarder contract.
+     * @param _poolAddressesProvider The address of the PoolAddressesProvider.
+     */
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor(
         address _tellerV2,
@@ -70,6 +81,24 @@ contract FlashRolloverLoan_G3 is IFlashLoanSimpleReceiver, IFlashRolloverLoan {
         _;
     }
 
+    /**
+     * @title Rollover Loan with Flash Loan
+     *
+     * @notice Allows the borrower to rollover their existing loan using a flash loan mechanism.
+     *         The borrower might also provide an additional amount during the rollover.
+     *
+     * @dev The function first verifies that the caller is the borrower of the loan.
+     *      It then optionally transfers the additional amount specified by the borrower.
+     *      A flash loan is then taken from the pool to facilitate the rollover and
+     *      a callback is executed for further operations.
+     *
+     * @param _loanId Identifier of the existing loan to be rolled over.
+     * @param _flashLoanAmount Amount of flash loan to be borrowed for the rollover.
+     * @param _borrowerAmount Additional amount that the borrower may want to add during rollover.
+     * @param _acceptCommitmentArgs Commitment arguments that might be necessary for internal operations.
+     *
+     * @return newLoanId_ Identifier of the new loan post rollover.
+     */
     function rolloverLoanWithFlash(
         uint256 _loanId,
         uint256 _flashLoanAmount,
@@ -108,15 +137,35 @@ contract FlashRolloverLoan_G3 is IFlashLoanSimpleReceiver, IFlashRolloverLoan {
         );
     }
 
+    /**
+     * @title Aave Flash Loan Execution Callback
+     *
+     * @notice Callback function that is triggered by Aave during the flash loan process.
+     *         This function handles the logic to use the borrowed funds to rollover the loan,
+     *         make necessary repayments, and manage the loan commitments.
+     *
+     * @dev The function ensures the initiator is this contract, decodes the data provided by
+     *      the flash loan call, repays the original loan in full, accepts new loan commitments,
+     *      approves the repayment for the flash loan and then handles any remaining funds.
+     *      This function should only be called by the FlashLoanPool as ensured by the `onlyFlashLoanPool` modifier.
+     *
+     * @param _flashToken The token in which the flash loan is borrowed.
+     * @param _flashAmount The amount of tokens borrowed via the flash loan.
+     * @param _flashFees The fees associated with the flash loan to be repaid to Aave.
+     * @param _initiator The address initiating the flash loan (must be this contract).
+     * @param _data Encoded data containing necessary information for loan rollover.
+     *
+     * @return Returns true if the operation was successful.
+     */
     function executeOperation(
         address _flashToken,
         uint256 _flashAmount,
         uint256 _flashFees,
-        address initiator,
+        address _initiator,
         bytes calldata _data
     ) external virtual onlyFlashLoanPool returns (bool) {
         require(
-            initiator == address(this),
+            _initiator == address(this),
             "This contract must be the initiator"
         );
 
@@ -172,6 +221,20 @@ contract FlashRolloverLoan_G3 is IFlashLoanSimpleReceiver, IFlashRolloverLoan {
         return true;
     }
 
+    /**
+     * @title Repay Loan in Full
+     *
+     * @notice Internal function that repays a loan in full on behalf of this contract.
+     *
+     * @dev The function first calculates the funds held by the contract before repayment, then approves
+     *      the repayment amount to the TellerV2 contract and finally repays the loan in full.
+     *
+     * @param _bidId Identifier of the loan to be repaid.
+     * @param _principalToken The token in which the loan was originated.
+     * @param _repayAmount The amount to be repaid.
+     *
+     * @return repayAmount_ The actual amount that was used for repayment.
+     */
     function _repayLoanFull(
         uint256 _bidId,
         address _principalToken,
@@ -192,6 +255,21 @@ contract FlashRolloverLoan_G3 is IFlashLoanSimpleReceiver, IFlashRolloverLoan {
         repayAmount_ = fundsBeforeRepayment - fundsAfterRepayment;
     }
 
+    /**
+     * @title Accept Commitment
+     *
+     * @notice Accepts a loan commitment using either a Merkle proof or standard method.
+     *
+     * @dev The function first checks if a Merkle proof is provided, based on which it calls the relevant
+     *      `acceptCommitment` function in the LenderCommitmentForwarder contract.
+     *
+     * @param borrower The address of the borrower for whom the commitment is being accepted.
+     * @param principalToken The token in which the loan is being accepted.
+     * @param _commitmentArgs The arguments necessary for accepting the commitment.
+     *
+     * @return bidId_ Identifier of the accepted loan.
+     * @return acceptCommitmentAmount_ The amount received from accepting the commitment.
+     */
     function _acceptCommitment(
         address borrower,
         address principalToken,

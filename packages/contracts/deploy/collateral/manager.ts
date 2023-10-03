@@ -9,8 +9,8 @@ const deployFn: DeployFunction = async (hre) => {
   const collateralManager = await hre.deployProxy('CollateralManager', {
     initArgs: [
       await collateralEscrowBeacon.getAddress(),
-      await tellerV2.getAddress(),
-    ],
+      await tellerV2.getAddress()
+    ]
   })
 
   return true
@@ -21,7 +21,11 @@ deployFn.id = 'collateral:manager:deploy'
 deployFn.tags = [
   'collateral',
   'collateral:manager',
-  'collateral:manager:deploy',
+  'collateral:manager:deploy'
 ]
 deployFn.dependencies = ['teller-v2:deploy', 'collateral:escrow-beacon:deploy']
+
+deployFn.skip = async (hre) => {
+  return true
+}
 export default deployFn

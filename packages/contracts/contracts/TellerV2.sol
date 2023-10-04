@@ -170,8 +170,7 @@ contract TellerV2 is
      * @notice Initializes the proxy.
      * @param _protocolFee The fee collected by the protocol for loan processing.
      * @param _marketRegistry The address of the market registry contract for the protocol.
-     * @param _reputationManager The address of the reputation manager contract.
-    
+     * @param _reputationManager The address of the reputation manager contract
      * @param _lenderManager The address of the lender manager contract for loans on the protocol.
      * @param _escrowVault the address of the escrow vault contract for push pull
      * @param _collateralManagerV2 the address of the collateral manager V2 contract.
@@ -181,7 +180,7 @@ contract TellerV2 is
         address _marketRegistry,
         address _reputationManager,
         //address _lenderCommitmentForwarder,
-        // address _collateralManagerV1,
+        //address _collateralManagerV1,
         address _lenderManager,
         address _escrowVault,
         address _collateralManagerV2

@@ -719,6 +719,53 @@
     },
     {
       "type": "function",
+      "name": "collateralManagerForBid",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "collateralManagerV1",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "collateralManagerV2",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
       "name": "escrowVault",
       "constant": true,
       "stateMutability": "view",
@@ -784,6 +831,25 @@
       "outputs": [
         {
           "type": "uint256[]",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getCollateralManagerForBid",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_bidId"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "address",
           "name": ""
         }
       ]
@@ -977,19 +1043,15 @@
         },
         {
           "type": "address",
-          "name": "_lenderCommitmentForwarder"
-        },
-        {
-          "type": "address",
-          "name": "_collateralManager"
-        },
-        {
-          "type": "address",
           "name": "_lenderManager"
         },
         {
           "type": "address",
           "name": "_escrowVault"
+        },
+        {
+          "type": "address",
+          "name": "_collateralManagerV2"
         }
       ],
       "outputs": []
@@ -1425,13 +1487,13 @@
     },
     {
       "type": "function",
-      "name": "setEscrowVault",
+      "name": "setCollateralManagerV2",
       "constant": false,
       "payable": false,
       "inputs": [
         {
           "type": "address",
-          "name": "_escrowVault"
+          "name": "_collateralManagerV2"
         }
       ],
       "outputs": []
@@ -1653,6 +1715,6 @@
     "blockHash": null,
     "blockNumber": null
   },
-  "numDeployments": 1,
+  "numDeployments": 2,
   "implementation": "0x8127a64DAb886e7fB1eC34eFff5aA7435434ECD5"
 }

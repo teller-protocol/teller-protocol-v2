@@ -15,5 +15,6 @@
   "lender-manager:transfer-ownership": 1695411217,
   "liquidity-rewards:deploy": 1695411253,
   "default-proxy-admin:transfer": 1695411254,
-  "collateral:manager-v2:deploy": 1696429515
+  "collateral:manager-v2:deploy": 1696429515,
+  "teller-v2:collateral-manager-v2-upgrade": 1696430336
 }

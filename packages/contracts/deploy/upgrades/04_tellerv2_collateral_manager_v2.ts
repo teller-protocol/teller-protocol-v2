@@ -12,11 +12,11 @@ const deployFn: DeployFunction = async (hre) => {
   const collateralManagerV2 = await hre.contracts.get('CollateralManagerV2')
   
   await hre.defender.proposeBatchTimelock({
-    title: 'TellerV2: Fix Loan Liquidated State',
+    title: 'TellerV2: Upgrade for Collateral Manager V2',
     description: ` 
 # TellerV2
 
-* Fixes issue where the loan's state was being overwritten from Liquidated to Repaid on liquidation.
+* Modifies Teller V2 so that it supports the Collateral Manager V2.
 `,
     _steps: [
       {
@@ -31,8 +31,10 @@ const deployFn: DeployFunction = async (hre) => {
           unsafeAllow: [
             'constructor',
             'state-variable-immutable',
-            'external-library-linking'
+            'external-library-linking',
+            
           ],
+          unsafeAllowRenames:true,
           constructorArgs: [await trustedForwarder.getAddress()],
 
           call: {

@@ -9,8 +9,8 @@ const deployFn: DeployFunction = async (hre) => {
   const trustedForwarder = await hre.contracts.get('MetaForwarder')
   const v2Calculations = await hre.deployments.get('V2Calculations')
 
-  const collateralManagerV2 = await hre.deployments.get('CollateralManagerV2')
-
+  const collateralManagerV2 = await hre.contracts.get('CollateralManagerV2')
+  
   await hre.defender.proposeBatchTimelock({
     title: 'TellerV2: Fix Loan Liquidated State',
     description: ` 
@@ -61,9 +61,9 @@ deployFn.tags = [
 ]
 deployFn.dependencies = ['teller-v2:deploy']
 deployFn.skip = async (hre) => {
-  return !(
-    hre.network.live &&
-    ['mainnet', 'polygon', 'arbitrum', 'goerli'].includes(hre.network.name)
+  return (
+    !hre.network.live ||
+    !['mainnet', 'polygon', 'arbitrum', 'goerli', 'sepolia'].includes(hre.network.name)
   )
 }
 export default deployFn

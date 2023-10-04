@@ -156,9 +156,7 @@ contract TellerV2 is
         _;
     }
 
-    /** Constant Variables **/
-
-    uint8 public constant CURRENT_CODE_VERSION = 9;
+    /** Constant Variables **/ 
 
     uint32 public constant LIQUIDATION_DELAY = 86400; //ONE DAY IN SECONDS
 
@@ -207,30 +205,26 @@ contract TellerV2 is
         );
         reputationManager = IReputationManager(_reputationManager);
 
-        /*  require(
-            _collateralManager.isContract(),
-            "CollateralManager must be a contract"
-        );*/
-        //  collateralManagerV1 = ICollateralManager(_collateralManagerV1);
-
+        
         _setLenderManager(_lenderManager);
         _setEscrowVault(_escrowVault);
         _setCollateralManagerV2(_collateralManagerV2);
     }
  
-    function _setEscrowVault(address _escrowVault) internal onlyInitializing {
-        require(_escrowVault.isContract(), "EscrowVault must be a contract");
-        escrowVault = IEscrowVault(_escrowVault);
-    } 
 
 
     function setCollateralManagerV2(address _collateralManagerV2)
         external
         reinitializer(10)
-        onlyOwner
     {
         _setCollateralManagerV2(_collateralManagerV2);
     }
+
+
+    function _setEscrowVault(address _escrowVault) internal onlyInitializing {
+        require(_escrowVault.isContract(), "EscrowVault must be a contract");
+        escrowVault = IEscrowVault(_escrowVault);
+    } 
 
     function _setLenderManager(address _lenderManager)
         internal

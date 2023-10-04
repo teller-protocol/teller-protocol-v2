@@ -23,7 +23,7 @@ abstract contract TokenBundle is ICollateralBundle {
     mapping(uint256 => CollateralBundleInfo) private bundle;
 
     /// @dev The number of bundles that have been created
-    uint256 bundleCount = 0; 
+    uint256 bundleCount ; 
 
     /// @dev Returns the total number of assets in a particular bundle.
     function getTokenCountOfBundle(uint256 _bundleId)

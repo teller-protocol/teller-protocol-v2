@@ -49,7 +49,6 @@ contract FlashRolloverLoan_G3 is IFlashLoanSimpleReceiver, IFlashRolloverLoan {
     }
 
     /**
-     * @title Constructor for the FlashRolloverLoan Contract
      *
      * @notice Initializes the FlashRolloverLoan with necessary contract addresses.
      *
@@ -81,8 +80,7 @@ contract FlashRolloverLoan_G3 is IFlashLoanSimpleReceiver, IFlashRolloverLoan {
         _;
     }
 
-    /**
-     * @title Rollover Loan with Flash Loan
+    /** 
      *
      * @notice Allows the borrower to rollover their existing loan using a flash loan mechanism.
      *         The borrower might also provide an additional amount during the rollover.
@@ -137,8 +135,7 @@ contract FlashRolloverLoan_G3 is IFlashLoanSimpleReceiver, IFlashRolloverLoan {
         );
     }
 
-    /**
-     * @title Aave Flash Loan Execution Callback
+    /**    
      *
      * @notice Callback function that is triggered by Aave during the flash loan process.
      *         This function handles the logic to use the borrowed funds to rollover the loan,
@@ -222,7 +219,7 @@ contract FlashRolloverLoan_G3 is IFlashLoanSimpleReceiver, IFlashRolloverLoan {
     }
 
     /**
-     * @title Repay Loan in Full
+     * 
      *
      * @notice Internal function that repays a loan in full on behalf of this contract.
      *
@@ -256,7 +253,7 @@ contract FlashRolloverLoan_G3 is IFlashLoanSimpleReceiver, IFlashRolloverLoan {
     }
 
     /**
-     * @title Accept Commitment
+     * 
      *
      * @notice Accepts a loan commitment using either a Merkle proof or standard method.
      *

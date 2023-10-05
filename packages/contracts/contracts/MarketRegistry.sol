@@ -26,23 +26,41 @@ contract MarketRegistry is
 
     /** Constant Variables **/
 
-    uint256 public constant CURRENT_CODE_VERSION = 8;
+    uint256 public constant CURRENT_CODE_VERSION = 9;
 
     /* Storage Variables */
 
     struct Marketplace {
         address owner;
         string metadataURI;
-        uint16 marketplaceFeePercent; // 10000 is 100%
-        bool lenderAttestationRequired;
+       
+       
+        uint16 marketplaceFeePercent;   //DEPRECATED
+        bool lenderAttestationRequired;  
         EnumerableSet.AddressSet verifiedLendersForMarket;
         mapping(address => bytes32) lenderAttestationIds;
+        uint32 paymentCycleDuration;   //DEPRECATED
+        uint32 paymentDefaultDuration; //DEPRECATED
+        uint32 bidExpirationTime;  //DEPRECATED
+        bool borrowerAttestationRequired; 
+        EnumerableSet.AddressSet verifiedBorrowersForMarket;
+        mapping(address => bytes32) borrowerAttestationIds;
+        address feeRecipient;   //DEPRECATED
+        PaymentType paymentType;  //DEPRECATED 
+        PaymentCycleType paymentCycleType;  //DEPRECATED 
+
+       
+    }
+
+
+    struct MarketplaceTerms {
+        
+        uint16 marketplaceFeePercent; // 10000 is 100%
+       
         uint32 paymentCycleDuration; // unix time (seconds)
         uint32 paymentDefaultDuration; //unix time
         uint32 bidExpirationTime; //unix time
-        bool borrowerAttestationRequired;
-        EnumerableSet.AddressSet verifiedBorrowersForMarket;
-        mapping(address => bytes32) borrowerAttestationIds;
+        
         address feeRecipient;
         PaymentType paymentType;
         PaymentCycleType paymentCycleType;
@@ -61,6 +79,14 @@ contract MarketRegistry is
     mapping(uint256 => bool) private marketIsClosed;
 
     TellerAS public tellerAS;
+
+    //uint256 marketTermsCount; //  use a hash here instead of uint256 
+    mapping(bytes32 => MarketplaceTerms) public marketTerms; 
+
+    //market id => market terms.  Used when a new bid is created. If this is blank for a market, new bids cant be created for that market. 
+    mapping(uint256 => bytes32) public currentMarketTermsForMarket; 
+
+  
 
     /* Modifiers */
 
@@ -100,7 +126,10 @@ contract MarketRegistry is
     event SetMarketLenderAttestation(uint256 marketId, bool required);
     event SetMarketBorrowerAttestation(uint256 marketId, bool required);
     event SetMarketPaymentType(uint256 marketId, PaymentType paymentType);
-
+ 
+    event DefineMarketTerms(bytes32 marketTermsId );
+    event SetCurrentMarketTermsForMarket(uint256 marketId, bytes32 marketTermsId);
+  
     /* External Functions */
 
     function initialize(TellerAS _tellerAS) external initializer {
@@ -167,7 +196,7 @@ contract MarketRegistry is
      * @param _uri URI string to get metadata details about the market.
      * @return marketId_ The market ID of the newly created market.
      */
-    function createMarket(
+    /*function createMarket(
         address _initialOwner,
         uint32 _paymentCycleDuration,
         uint32 _paymentDefaultDuration,
@@ -189,7 +218,7 @@ contract MarketRegistry is
             PaymentCycleType.Seconds,
             _uri
         );
-    }
+    }*/
 
     /**
      * @notice Creates a new market.
@@ -222,9 +251,15 @@ contract MarketRegistry is
 
         // Set the market owner
         markets[marketId_].owner = _initialOwner;
+        markets[marketId_].metadataURI = _uri;
+
+        markets[marketId_].borrowerAttestationRequired = _requireBorrowerAttestation;
+        markets[marketId_].lenderAttestationRequired = _requireLenderAttestation;
+       
+        address feeRecipient = _initialOwner; 
 
         // Initialize market settings
-        _setMarketSettings(
+        _updateMarketSettings(
             marketId_,
             _paymentCycleDuration,
             _paymentType,
@@ -232,10 +267,10 @@ contract MarketRegistry is
             _paymentDefaultDuration,
             _bidExpirationTime,
             _feePercent,
-            _requireBorrowerAttestation,
-            _requireLenderAttestation,
-            _uri
-        );
+            
+            feeRecipient
+        ); 
+
 
         emit MarketCreated(_initialOwner, marketId_);
     }
@@ -280,6 +315,509 @@ contract MarketRegistry is
     {
         return marketIsClosed[_marketId];
     }
+
+
+    /**
+     * @notice Transfers ownership of a marketplace.
+     * @param _marketId The ID of a market.
+     * @param _newOwner Address of the new market owner.
+     *
+     * Requirements:
+     * - The caller must be the current owner.
+     */
+    function transferMarketOwnership(uint256 _marketId, address _newOwner)
+        public
+        ownsMarket(_marketId)
+    {
+        markets[_marketId].owner = _newOwner;
+        emit SetMarketOwner(_marketId, _newOwner);
+    }
+
+    /**
+     * @notice Updates multiple market settings for a given market.
+     * @param _marketId The ID of a market.
+     * @param _paymentCycleDuration Delinquency duration for new loans
+     * @param _newPaymentType The payment type for the market.
+     * @param _paymentCycleType The payment cycle type for loans in the market - Seconds or Monthly
+     * @param _paymentDefaultDuration Default duration for new loans
+     * @param _bidExpirationTime Duration of time before a bid is considered out of date
+     * @param _metadataURI A URI that points to a market's metadata.
+     *
+     * Requirements:
+     * - The caller must be the current owner.
+     */
+    function updateMarketSettings(
+        uint256 _marketId,
+        uint32 _paymentCycleDuration,
+        PaymentType _newPaymentType,
+        PaymentCycleType _paymentCycleType,
+        uint32 _paymentDefaultDuration,
+        uint32 _bidExpirationTime,
+        uint16 _feePercent,
+      
+        address _feeRecipient
+    ) public ownsMarket(_marketId) {
+
+ 
+
+        _updateMarketSettings( 
+            _marketId, 
+            _paymentCycleDuration,
+            _newPaymentType,
+            _paymentCycleType,
+            _paymentDefaultDuration,
+            _bidExpirationTime,
+            _feePercent,
+           
+            _feeRecipient
+         );
+      
+       
+       
+    }
+
+       function _updateMarketSettings(
+        uint256 _marketId,
+        uint32 _paymentCycleDuration,
+        PaymentType _newPaymentType,
+        PaymentCycleType _paymentCycleType,
+        uint32 _paymentDefaultDuration,
+        uint32 _bidExpirationTime,
+        uint16 _feePercent,
+        
+        address _feeRecipient
+    ) internal returns (bytes32 marketTermsId_ ) {
+
+ 
+
+        marketTermsId_ = _defineNewMarketTermsRevision( 
+           
+            _paymentCycleDuration,
+            _newPaymentType,
+            _paymentCycleType,
+            _paymentDefaultDuration,
+            _bidExpirationTime,
+            _feePercent,
+        
+            _feeRecipient
+         );
+        emit DefineMarketTerms( marketTermsId_  );
+
+        currentMarketTermsForMarket[_marketId] = marketTermsId_;
+        emit SetCurrentMarketTermsForMarket(_marketId, marketTermsId_);
+       
+       
+    }
+
+
+    function marketHasDefinedTerms(uint256 _marketId) public view returns (bool) { 
+        return currentMarketTermsForMarket[_marketId] != bytes32(0); 
+    }
+
+    function getCurrentTermsForMarket(uint256 _marketId) public view returns (bytes32) {
+        return currentMarketTermsForMarket[_marketId];
+    }
+ 
+ 
+    /**
+     * @notice Sets the metadata URI for a market.
+     * @param _marketId The ID of a market.
+     * @param _uri A URI that points to a market's metadata.
+     *
+     * Requirements:
+     * - The caller must be the current owner.
+     */
+    function setMarketURI(uint256 _marketId, string calldata _uri)
+        public
+        ownsMarket(_marketId)
+    {
+        //We do string comparison by checking the hashes of the strings against one another
+        if (
+            keccak256(abi.encodePacked(_uri)) !=
+            keccak256(abi.encodePacked(markets[_marketId].metadataURI))
+        ) {
+            markets[_marketId].metadataURI = _uri;
+
+            emit SetMarketURI(_marketId, _uri);
+        }
+    }
+   
+
+      
+        //need to rebuild this 
+    /**
+     * @notice Gets the data associated with a market.
+     * @param _marketId The ID of a market.
+     */
+    function getMarketData(uint256 _marketId)
+        public
+        view
+        returns (
+            address owner, 
+            string memory metadataURI, 
+            bool borrowerAttestationRequired,
+            bool lenderAttestationRequired,
+            bytes32 marketTermsId
+        )
+    {
+        return (
+            markets[_marketId].owner,
+            markets[_marketId].metadataURI,
+            markets[_marketId].borrowerAttestationRequired,
+            markets[_marketId].lenderAttestationRequired,
+            currentMarketTermsForMarket[_marketId]
+        );
+    }
+ 
+
+     function getMarketTermsData(bytes32 _marketTermsId)
+        public
+        view
+        returns (
+             
+            uint32 paymentCycleDuration,
+            PaymentType paymentType,
+            PaymentCycleType paymentCycleType,
+            uint32 paymentDefaultDuration,
+            uint32 bidExpirationTime ,
+            uint16 feePercent,
+            address feeRecipient 
+
+        )
+    {
+        return (
+           
+            marketTerms[_marketTermsId].paymentCycleDuration,
+            marketTerms[_marketTermsId].paymentType,
+            marketTerms[_marketTermsId].paymentCycleType,
+              
+            marketTerms[_marketTermsId].paymentDefaultDuration,
+            marketTerms[_marketTermsId].bidExpirationTime,
+            marketTerms[_marketTermsId].marketplaceFeePercent,
+            marketTerms[_marketTermsId].feeRecipient 
+            
+        );
+    }
+
+
+
+    /**
+     * @notice Gets the attestation requirements for a given market.
+     * @param _marketId The ID of the market.
+     */
+    function getMarketAttestationRequirements(uint256 _marketId)
+        public
+        view
+        returns (
+            bool lenderAttestationRequired,
+            bool borrowerAttestationRequired
+        )
+    {
+        
+        return (
+            markets[_marketId].lenderAttestationRequired,
+            markets[_marketId].borrowerAttestationRequired
+        );
+    }
+
+    /**
+     * @notice Gets the address of a market's owner.
+     * @param _marketId The ID of a market.
+     * @return The address of a market's owner.
+     */
+    function getMarketOwner(uint256 _marketId)
+        public
+        view
+        virtual
+        override
+        returns (address)
+    {
+        return _getMarketOwner(_marketId);
+    }
+
+    /**
+     * @notice Gets the address of a market's owner.
+     * @param _marketId The ID of a market.
+     * @return The address of a market's owner.
+     */
+    function _getMarketOwner(uint256 _marketId)
+        internal
+        view
+        virtual
+        returns (address)
+    {
+        return markets[_marketId].owner;
+    }
+
+    
+    /**
+     * @notice Gets the metadata URI of a market.
+     * @param _marketId The ID of a market.
+     * @return URI of a market's metadata.
+     */
+    function getMarketURI(uint256 _marketId)
+        public
+        view
+        override
+        returns (string memory)
+    {
+        return markets[_marketId].metadataURI;
+    }
+
+    function getMarketplaceFeeTerms(bytes32 _marketTermsId) public
+        view
+        
+        returns ( address , uint32 )
+    {
+
+        return (
+            marketTerms[_marketTermsId].marketFeeRecipient,
+            marketTerms[_marketTermsId].marketFee
+        );
+
+    }
+
+    function getMarketTermsForLending(bytes32 _marketTermsId)
+        public
+        view
+        
+        returns ( uint32, PaymentCycleType, PaymentType, uint32, uint32 )
+    {
+        require(_marketTermsId != bytes32(0), "Invalid market terms." );
+ 
+
+        return (
+            marketTerms[_marketTermsId].paymentCycleDuration,
+            marketTerms[_marketTermsId].paymentCycleType,
+            marketTerms[_marketTermsId].paymentType,
+            marketTerms[_marketTermsId].paymentDefaultDuration,
+            marketTerms[_marketTermsId].bidExpirationTime
+        );
+    }
+
+ 
+
+    /**
+     * @notice Gets the loan default duration of a market.
+     * @param _marketId The ID of a market.
+     * @return Duration of a loan repayment interval until it is default.
+     */
+    function getPaymentDefaultDuration(bytes32 _marketTermsId)
+        public
+        view
+        
+        returns (uint32)
+    {
+        return marketTerms[_marketTermsId].bidExpirationTime;
+    }
+
+    /**
+     * @notice Get the payment type of a market.
+     * @param _marketId the ID of the market.
+     * @return The type of payment for loans in the market.
+     */
+    function getPaymentType(bytes32 _marketTermsId)
+        public
+        view
+        override
+        returns (PaymentType)
+    {
+         return marketTerms[_marketTermsId].bidExpirationTime;
+    }
+
+    function getBidExpirationTime(bytes32 _marketTermsId)
+        public
+        view
+        override
+        returns (uint32)
+    {
+        return marketTerms[_marketTermsId].bidExpirationTime;
+    }
+ 
+
+
+
+
+
+    /**
+     * @notice Checks if a lender has been attested and added to a market.
+     * @param _marketId The ID of a market.
+     * @param _lenderAddress Address to check.
+     * @return isVerified_ Boolean indicating if a lender has been added to a market.
+     * @return uuid_ Bytes32 representing the UUID of the lender.
+     */
+    function isVerifiedLender(uint256 _marketId, address _lenderAddress)
+        public
+        view
+        override
+        returns (bool isVerified_, bytes32 uuid_)
+    {
+        return
+            _isVerified(
+                _lenderAddress,
+                markets[_marketId].lenderAttestationRequired,
+                markets[_marketId].lenderAttestationIds,
+                markets[_marketId].verifiedLendersForMarket
+            );
+    }
+
+    /**
+     * @notice Checks if a borrower has been attested and added to a market.
+     * @param _marketId The ID of a market.
+     * @param _borrowerAddress Address of the borrower to check.
+     * @return isVerified_ Boolean indicating if a borrower has been added to a market.
+     * @return uuid_ Bytes32 representing the UUID of the borrower.
+     */
+    function isVerifiedBorrower(uint256 _marketId, address _borrowerAddress)
+        public
+        view
+        override
+        returns (bool isVerified_, bytes32 uuid_)
+    {
+        return
+            _isVerified(
+                _borrowerAddress,
+                markets[_marketId].borrowerAttestationRequired,
+                markets[_marketId].borrowerAttestationIds,
+                markets[_marketId].verifiedBorrowersForMarket
+            );
+    }
+
+    /**
+     * @notice Gets addresses of all attested lenders.
+     * @param _marketId The ID of a market.
+     * @param _page Page index to start from.
+     * @param _perPage Number of items in a page to return.
+     * @return Array of addresses that have been added to a market.
+     */
+    function getAllVerifiedLendersForMarket(
+        uint256 _marketId,
+        uint256 _page,
+        uint256 _perPage
+    ) public view returns (address[] memory) {
+        EnumerableSet.AddressSet storage set = markets[_marketId]
+            .verifiedLendersForMarket;
+
+        return _getStakeholdersForMarket(set, _page, _perPage);
+    }
+
+    /**
+     * @notice Gets addresses of all attested borrowers.
+     * @param _marketId The ID of the market.
+     * @param _page Page index to start from.
+     * @param _perPage Number of items in a page to return.
+     * @return Array of addresses that have been added to a market.
+     */
+    function getAllVerifiedBorrowersForMarket(
+        uint256 _marketId,
+        uint256 _page,
+        uint256 _perPage
+    ) public view returns (address[] memory) {
+        EnumerableSet.AddressSet storage set = markets[_marketId]
+            .verifiedBorrowersForMarket;
+        return _getStakeholdersForMarket(set, _page, _perPage);
+    }
+
+    /**
+     * @notice Sets multiple market settings for a given market.
+     * @param _marketId The ID of a market.
+     * @param _paymentCycleDuration Delinquency duration for new loans
+     * @param _newPaymentType The payment type for the market.
+     * @param _paymentCycleType The payment cycle type for loans in the market - Seconds or Monthly
+     * @param _paymentDefaultDuration Default duration for new loans
+     * @param _bidExpirationTime Duration of time before a bid is considered out of date
+     * @param _metadataURI A URI that points to a market's metadata.
+     */
+   /* function _setMarketSettings(
+        uint256 _marketId,
+        uint32 _paymentCycleDuration,
+        PaymentType _newPaymentType,
+        PaymentCycleType _paymentCycleType,
+        uint32 _paymentDefaultDuration,
+        uint32 _bidExpirationTime,
+        uint16 _feePercent,
+        bool _borrowerAttestationRequired,
+        bool _lenderAttestationRequired,
+        string calldata _metadataURI
+    ) internal {
+        setMarketURI(_marketId, _metadataURI);
+        setPaymentDefaultDuration(_marketId, _paymentDefaultDuration);
+        setBidExpirationTime(_marketId, _bidExpirationTime);
+        setMarketFeePercent(_marketId, _feePercent);
+        setLenderAttestationRequired(_marketId, _lenderAttestationRequired);
+        setBorrowerAttestationRequired(_marketId, _borrowerAttestationRequired);
+        setMarketPaymentType(_marketId, _newPaymentType);
+        setPaymentCycle(_marketId, _paymentCycleType, _paymentCycleDuration);
+    }*/
+
+    function _defineNewMarketTermsRevision(
+        
+        uint32 _paymentCycleDuration,
+        PaymentType _newPaymentType,
+        PaymentCycleType _paymentCycleType,
+        uint32 _paymentDefaultDuration,
+        uint32 _bidExpirationTime,
+        uint16 _feePercent,
+       
+        address _feeRecipient
+     
+
+    ) internal returns (bytes32)  {
+
+        bytes32 marketTermsId = _getMarketTermsHashId ( 
+            _paymentCycleDuration,
+            _newPaymentType,
+            _paymentCycleType,
+            _paymentDefaultDuration,
+            _bidExpirationTime,
+            _feePercent,
+             
+            _feeRecipient 
+        );
+
+      
+        marketTerms[marketTermsId] = MarketplaceTerms({
+            paymentCycleDuration: _paymentCycleDuration,
+            paymentType: _newPaymentType,
+            paymentCycleType: _paymentCycleType,
+            paymentDefaultDuration: _paymentDefaultDuration,
+            bidExpirationTime: _bidExpirationTime,
+            marketplaceFeePercent: _feePercent, 
+          
+            feeRecipient: _feeRecipient
+        });
+
+        return marketTermsId;
+    }
+
+
+    function _getMarketTermsHashId( 
+        uint32 _paymentCycleDuration,
+        PaymentType _newPaymentType,
+        PaymentCycleType _paymentCycleType,
+        uint32 _paymentDefaultDuration,
+        uint32 _bidExpirationTime,
+        uint16 _feePercent,
+      
+        address _feeRecipient
+
+    ) public view returns (bytes32) {
+
+         return keccak256(abi.encode(
+            _paymentCycleDuration,
+            _newPaymentType,
+            _paymentCycleType,
+            _paymentDefaultDuration,
+            _bidExpirationTime,
+            _feePercent,
+           
+            _feeRecipient
+        )); 
+    }
+
+
+    //Attestation Functions 
+
 
     /**
      * @notice Adds a lender to a market.
@@ -470,519 +1008,7 @@ contract MarketRegistry is
             attestor == address(this);
     }
 
-    /**
-     * @notice Transfers ownership of a marketplace.
-     * @param _marketId The ID of a market.
-     * @param _newOwner Address of the new market owner.
-     *
-     * Requirements:
-     * - The caller must be the current owner.
-     */
-    function transferMarketOwnership(uint256 _marketId, address _newOwner)
-        public
-        ownsMarket(_marketId)
-    {
-        markets[_marketId].owner = _newOwner;
-        emit SetMarketOwner(_marketId, _newOwner);
-    }
 
-    /**
-     * @notice Updates multiple market settings for a given market.
-     * @param _marketId The ID of a market.
-     * @param _paymentCycleDuration Delinquency duration for new loans
-     * @param _newPaymentType The payment type for the market.
-     * @param _paymentCycleType The payment cycle type for loans in the market - Seconds or Monthly
-     * @param _paymentDefaultDuration Default duration for new loans
-     * @param _bidExpirationTime Duration of time before a bid is considered out of date
-     * @param _metadataURI A URI that points to a market's metadata.
-     *
-     * Requirements:
-     * - The caller must be the current owner.
-     */
-    function updateMarketSettings(
-        uint256 _marketId,
-        uint32 _paymentCycleDuration,
-        PaymentType _newPaymentType,
-        PaymentCycleType _paymentCycleType,
-        uint32 _paymentDefaultDuration,
-        uint32 _bidExpirationTime,
-        uint16 _feePercent,
-        bool _borrowerAttestationRequired,
-        bool _lenderAttestationRequired,
-        string calldata _metadataURI
-    ) public ownsMarket(_marketId) {
-        _setMarketSettings(
-            _marketId,
-            _paymentCycleDuration,
-            _newPaymentType,
-            _paymentCycleType,
-            _paymentDefaultDuration,
-            _bidExpirationTime,
-            _feePercent,
-            _borrowerAttestationRequired,
-            _lenderAttestationRequired,
-            _metadataURI
-        );
-    }
-
-    /**
-     * @notice Sets the fee recipient address for a market.
-     * @param _marketId The ID of a market.
-     * @param _recipient Address of the new fee recipient.
-     *
-     * Requirements:
-     * - The caller must be the current owner.
-     */
-    function setMarketFeeRecipient(uint256 _marketId, address _recipient)
-        public
-        ownsMarket(_marketId)
-    {
-        markets[_marketId].feeRecipient = _recipient;
-        emit SetMarketFeeRecipient(_marketId, _recipient);
-    }
-
-    /**
-     * @notice Sets the metadata URI for a market.
-     * @param _marketId The ID of a market.
-     * @param _uri A URI that points to a market's metadata.
-     *
-     * Requirements:
-     * - The caller must be the current owner.
-     */
-    function setMarketURI(uint256 _marketId, string calldata _uri)
-        public
-        ownsMarket(_marketId)
-    {
-        //We do string comparison by checking the hashes of the strings against one another
-        if (
-            keccak256(abi.encodePacked(_uri)) !=
-            keccak256(abi.encodePacked(markets[_marketId].metadataURI))
-        ) {
-            markets[_marketId].metadataURI = _uri;
-
-            emit SetMarketURI(_marketId, _uri);
-        }
-    }
-
-    /**
-     * @notice Sets the duration of new loans for this market before they turn delinquent.
-     * @notice Changing this value does not change the terms of existing loans for this market.
-     * @param _marketId The ID of a market.
-     * @param _paymentCycleType Cycle type (seconds or monthly)
-     * @param _duration Delinquency duration for new loans
-     */
-    function setPaymentCycle(
-        uint256 _marketId,
-        PaymentCycleType _paymentCycleType,
-        uint32 _duration
-    ) public ownsMarket(_marketId) {
-        require(
-            (_paymentCycleType == PaymentCycleType.Seconds) ||
-                (_paymentCycleType == PaymentCycleType.Monthly &&
-                    _duration == 0),
-            "monthly payment cycle duration cannot be set"
-        );
-        Marketplace storage market = markets[_marketId];
-        uint32 duration = _paymentCycleType == PaymentCycleType.Seconds
-            ? _duration
-            : 30 days;
-        if (
-            _paymentCycleType != market.paymentCycleType ||
-            duration != market.paymentCycleDuration
-        ) {
-            markets[_marketId].paymentCycleType = _paymentCycleType;
-            markets[_marketId].paymentCycleDuration = duration;
-
-            emit SetPaymentCycle(_marketId, _paymentCycleType, duration);
-        }
-    }
-
-    /**
-     * @notice Sets the duration of new loans for this market before they turn defaulted.
-     * @notice Changing this value does not change the terms of existing loans for this market.
-     * @param _marketId The ID of a market.
-     * @param _duration Default duration for new loans
-     */
-    function setPaymentDefaultDuration(uint256 _marketId, uint32 _duration)
-        public
-        ownsMarket(_marketId)
-    {
-        if (_duration != markets[_marketId].paymentDefaultDuration) {
-            markets[_marketId].paymentDefaultDuration = _duration;
-
-            emit SetPaymentDefaultDuration(_marketId, _duration);
-        }
-    }
-
-    function setBidExpirationTime(uint256 _marketId, uint32 _duration)
-        public
-        ownsMarket(_marketId)
-    {
-        if (_duration != markets[_marketId].bidExpirationTime) {
-            markets[_marketId].bidExpirationTime = _duration;
-
-            emit SetBidExpirationTime(_marketId, _duration);
-        }
-    }
-
-    /**
-     * @notice Sets the fee for the market.
-     * @param _marketId The ID of a market.
-     * @param _newPercent The percentage fee in basis points.
-     *
-     * Requirements:
-     * - The caller must be the current owner.
-     */
-    function setMarketFeePercent(uint256 _marketId, uint16 _newPercent)
-        public
-        ownsMarket(_marketId)
-    {
-        require(_newPercent >= 0 && _newPercent <= 10000, "invalid percent");
-        if (_newPercent != markets[_marketId].marketplaceFeePercent) {
-            markets[_marketId].marketplaceFeePercent = _newPercent;
-            emit SetMarketFee(_marketId, _newPercent);
-        }
-    }
-
-    /**
-     * @notice Set the payment type for the market.
-     * @param _marketId The ID of the market.
-     * @param _newPaymentType The payment type for the market.
-     */
-    function setMarketPaymentType(
-        uint256 _marketId,
-        PaymentType _newPaymentType
-    ) public ownsMarket(_marketId) {
-        if (_newPaymentType != markets[_marketId].paymentType) {
-            markets[_marketId].paymentType = _newPaymentType;
-            emit SetMarketPaymentType(_marketId, _newPaymentType);
-        }
-    }
-
-    /**
-     * @notice Enable/disables market whitelist for lenders.
-     * @param _marketId The ID of a market.
-     * @param _required Boolean indicating if the market requires whitelist.
-     *
-     * Requirements:
-     * - The caller must be the current owner.
-     */
-    function setLenderAttestationRequired(uint256 _marketId, bool _required)
-        public
-        ownsMarket(_marketId)
-    {
-        if (_required != markets[_marketId].lenderAttestationRequired) {
-            markets[_marketId].lenderAttestationRequired = _required;
-            emit SetMarketLenderAttestation(_marketId, _required);
-        }
-    }
-
-    /**
-     * @notice Enable/disables market whitelist for borrowers.
-     * @param _marketId The ID of a market.
-     * @param _required Boolean indicating if the market requires whitelist.
-     *
-     * Requirements:
-     * - The caller must be the current owner.
-     */
-    function setBorrowerAttestationRequired(uint256 _marketId, bool _required)
-        public
-        ownsMarket(_marketId)
-    {
-        if (_required != markets[_marketId].borrowerAttestationRequired) {
-            markets[_marketId].borrowerAttestationRequired = _required;
-            emit SetMarketBorrowerAttestation(_marketId, _required);
-        }
-    }
-
-    /**
-     * @notice Gets the data associated with a market.
-     * @param _marketId The ID of a market.
-     */
-    function getMarketData(uint256 _marketId)
-        public
-        view
-        returns (
-            address owner,
-            uint32 paymentCycleDuration,
-            uint32 paymentDefaultDuration,
-            uint32 loanExpirationTime,
-            string memory metadataURI,
-            uint16 marketplaceFeePercent,
-            bool lenderAttestationRequired
-        )
-    {
-        return (
-            markets[_marketId].owner,
-            markets[_marketId].paymentCycleDuration,
-            markets[_marketId].paymentDefaultDuration,
-            markets[_marketId].bidExpirationTime,
-            markets[_marketId].metadataURI,
-            markets[_marketId].marketplaceFeePercent,
-            markets[_marketId].lenderAttestationRequired
-        );
-    }
-
-    /**
-     * @notice Gets the attestation requirements for a given market.
-     * @param _marketId The ID of the market.
-     */
-    function getMarketAttestationRequirements(uint256 _marketId)
-        public
-        view
-        returns (
-            bool lenderAttestationRequired,
-            bool borrowerAttestationRequired
-        )
-    {
-        return (
-            markets[_marketId].lenderAttestationRequired,
-            markets[_marketId].borrowerAttestationRequired
-        );
-    }
-
-    /**
-     * @notice Gets the address of a market's owner.
-     * @param _marketId The ID of a market.
-     * @return The address of a market's owner.
-     */
-    function getMarketOwner(uint256 _marketId)
-        public
-        view
-        virtual
-        override
-        returns (address)
-    {
-        return _getMarketOwner(_marketId);
-    }
-
-    /**
-     * @notice Gets the address of a market's owner.
-     * @param _marketId The ID of a market.
-     * @return The address of a market's owner.
-     */
-    function _getMarketOwner(uint256 _marketId)
-        internal
-        view
-        virtual
-        returns (address)
-    {
-        return markets[_marketId].owner;
-    }
-
-    /**
-     * @notice Gets the fee recipient of a market.
-     * @param _marketId The ID of a market.
-     * @return The address of a market's fee recipient.
-     */
-    function getMarketFeeRecipient(uint256 _marketId)
-        public
-        view
-        override
-        returns (address)
-    {
-        address recipient = markets[_marketId].feeRecipient;
-
-        if (recipient == address(0)) {
-            return _getMarketOwner(_marketId);
-        }
-
-        return recipient;
-    }
-
-    /**
-     * @notice Gets the metadata URI of a market.
-     * @param _marketId The ID of a market.
-     * @return URI of a market's metadata.
-     */
-    function getMarketURI(uint256 _marketId)
-        public
-        view
-        override
-        returns (string memory)
-    {
-        return markets[_marketId].metadataURI;
-    }
-
-    /**
-     * @notice Gets the loan delinquent duration of a market.
-     * @param _marketId The ID of a market.
-     * @return Duration of a loan until it is delinquent.
-     * @return The type of payment cycle for loans in the market.
-     */
-    function getPaymentCycle(uint256 _marketId)
-        public
-        view
-        override
-        returns (uint32, PaymentCycleType)
-    {
-        return (
-            markets[_marketId].paymentCycleDuration,
-            markets[_marketId].paymentCycleType
-        );
-    }
-
-    /**
-     * @notice Gets the loan default duration of a market.
-     * @param _marketId The ID of a market.
-     * @return Duration of a loan repayment interval until it is default.
-     */
-    function getPaymentDefaultDuration(uint256 _marketId)
-        public
-        view
-        override
-        returns (uint32)
-    {
-        return markets[_marketId].paymentDefaultDuration;
-    }
-
-    /**
-     * @notice Get the payment type of a market.
-     * @param _marketId the ID of the market.
-     * @return The type of payment for loans in the market.
-     */
-    function getPaymentType(uint256 _marketId)
-        public
-        view
-        override
-        returns (PaymentType)
-    {
-        return markets[_marketId].paymentType;
-    }
-
-    function getBidExpirationTime(uint256 marketId)
-        public
-        view
-        override
-        returns (uint32)
-    {
-        return markets[marketId].bidExpirationTime;
-    }
-
-    /**
-     * @notice Gets the marketplace fee in basis points
-     * @param _marketId The ID of a market.
-     * @return fee in basis points
-     */
-    function getMarketplaceFee(uint256 _marketId)
-        public
-        view
-        override
-        returns (uint16 fee)
-    {
-        return markets[_marketId].marketplaceFeePercent;
-    }
-
-    /**
-     * @notice Checks if a lender has been attested and added to a market.
-     * @param _marketId The ID of a market.
-     * @param _lenderAddress Address to check.
-     * @return isVerified_ Boolean indicating if a lender has been added to a market.
-     * @return uuid_ Bytes32 representing the UUID of the lender.
-     */
-    function isVerifiedLender(uint256 _marketId, address _lenderAddress)
-        public
-        view
-        override
-        returns (bool isVerified_, bytes32 uuid_)
-    {
-        return
-            _isVerified(
-                _lenderAddress,
-                markets[_marketId].lenderAttestationRequired,
-                markets[_marketId].lenderAttestationIds,
-                markets[_marketId].verifiedLendersForMarket
-            );
-    }
-
-    /**
-     * @notice Checks if a borrower has been attested and added to a market.
-     * @param _marketId The ID of a market.
-     * @param _borrowerAddress Address of the borrower to check.
-     * @return isVerified_ Boolean indicating if a borrower has been added to a market.
-     * @return uuid_ Bytes32 representing the UUID of the borrower.
-     */
-    function isVerifiedBorrower(uint256 _marketId, address _borrowerAddress)
-        public
-        view
-        override
-        returns (bool isVerified_, bytes32 uuid_)
-    {
-        return
-            _isVerified(
-                _borrowerAddress,
-                markets[_marketId].borrowerAttestationRequired,
-                markets[_marketId].borrowerAttestationIds,
-                markets[_marketId].verifiedBorrowersForMarket
-            );
-    }
-
-    /**
-     * @notice Gets addresses of all attested lenders.
-     * @param _marketId The ID of a market.
-     * @param _page Page index to start from.
-     * @param _perPage Number of items in a page to return.
-     * @return Array of addresses that have been added to a market.
-     */
-    function getAllVerifiedLendersForMarket(
-        uint256 _marketId,
-        uint256 _page,
-        uint256 _perPage
-    ) public view returns (address[] memory) {
-        EnumerableSet.AddressSet storage set = markets[_marketId]
-            .verifiedLendersForMarket;
-
-        return _getStakeholdersForMarket(set, _page, _perPage);
-    }
-
-    /**
-     * @notice Gets addresses of all attested borrowers.
-     * @param _marketId The ID of the market.
-     * @param _page Page index to start from.
-     * @param _perPage Number of items in a page to return.
-     * @return Array of addresses that have been added to a market.
-     */
-    function getAllVerifiedBorrowersForMarket(
-        uint256 _marketId,
-        uint256 _page,
-        uint256 _perPage
-    ) public view returns (address[] memory) {
-        EnumerableSet.AddressSet storage set = markets[_marketId]
-            .verifiedBorrowersForMarket;
-        return _getStakeholdersForMarket(set, _page, _perPage);
-    }
-
-    /**
-     * @notice Sets multiple market settings for a given market.
-     * @param _marketId The ID of a market.
-     * @param _paymentCycleDuration Delinquency duration for new loans
-     * @param _newPaymentType The payment type for the market.
-     * @param _paymentCycleType The payment cycle type for loans in the market - Seconds or Monthly
-     * @param _paymentDefaultDuration Default duration for new loans
-     * @param _bidExpirationTime Duration of time before a bid is considered out of date
-     * @param _metadataURI A URI that points to a market's metadata.
-     */
-    function _setMarketSettings(
-        uint256 _marketId,
-        uint32 _paymentCycleDuration,
-        PaymentType _newPaymentType,
-        PaymentCycleType _paymentCycleType,
-        uint32 _paymentDefaultDuration,
-        uint32 _bidExpirationTime,
-        uint16 _feePercent,
-        bool _borrowerAttestationRequired,
-        bool _lenderAttestationRequired,
-        string calldata _metadataURI
-    ) internal {
-        setMarketURI(_marketId, _metadataURI);
-        setPaymentDefaultDuration(_marketId, _paymentDefaultDuration);
-        setBidExpirationTime(_marketId, _bidExpirationTime);
-        setMarketFeePercent(_marketId, _feePercent);
-        setLenderAttestationRequired(_marketId, _lenderAttestationRequired);
-        setBorrowerAttestationRequired(_marketId, _borrowerAttestationRequired);
-        setMarketPaymentType(_marketId, _newPaymentType);
-        setPaymentCycle(_marketId, _paymentCycleType, _paymentCycleDuration);
-    }
 
     /**
      * @notice Gets addresses of all attested relevant stakeholders.

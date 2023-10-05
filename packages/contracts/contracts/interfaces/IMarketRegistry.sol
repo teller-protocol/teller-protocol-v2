@@ -83,4 +83,6 @@ interface IMarketRegistry {
     ) external returns (uint256 marketId_);
 
     function closeMarket(uint256 _marketId) external;
+
+    function getCurrentTermsForMarket(uint256 _marketId) public view returns (bytes32);
 }

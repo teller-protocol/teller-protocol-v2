@@ -30,8 +30,7 @@ const deployFn: DeployFunction = async (hre) => {
             'constructor',
             'state-variable-immutable',
             'external-library-linking',
-
-          ], 
+          ],
           constructorArgs: [await trustedForwarder.getAddress()],
         },
       },
@@ -57,7 +56,7 @@ deployFn.dependencies = ['teller-v2:deploy']
 deployFn.skip = async (hre) => {
   return (
     !hre.network.live ||
-    !['mainnet', 'polygon', 'arbitrum', 'goerli' ].includes(hre.network.name)
+    !['mainnet', 'polygon', 'arbitrum', 'goerli'].includes(hre.network.name)
   )
 }
 export default deployFn

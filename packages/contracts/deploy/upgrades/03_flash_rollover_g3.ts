@@ -19,7 +19,6 @@ const deployFn: DeployFunction = async (hre) => {
 
   const flashRolloverLoan = await hre.contracts.get('FlashRolloverLoan')
   const tellerV2 = await hre.contracts.get('TellerV2')
-  const marketRegistry = await hre.contracts.get('MarketRegistry')
   const LenderCommitmentForwarderStaging = await hre.contracts.get(
     'LenderCommitmentForwarderStaging'
   )
@@ -56,21 +55,24 @@ const deployFn: DeployFunction = async (hre) => {
 }
 
 // tags and deployment
-deployFn.id = 'flash-rollover:g3-upgrade'
+deployFn.id = 'lender-commitment-forwarder:extensions:flash-rollover:g3-upgrade'
 deployFn.tags = [
   'proposal',
   'upgrade',
-  'flash-rollover',
-  'flash-rollover:g3-upgrade',
+  'lender-commitment-forwarder',
+  'lender-commitment-forwarder:extensions',
+  'lender-commitment-forwarder:extensions:flash-rollover',
+  'lender-commitment-forwarder:extensions:flash-rollover:g3-upgrade',
 ]
 deployFn.dependencies = [
+  'teller-v2:deploy',
+  'lender-commitment-forwarder:staging:deploy',
   'lender-commitment-forwarder:extensions:flash-rollover:deploy',
-  'lender-commitment-forwarder:deploy',
 ]
 deployFn.skip = async (hre) => {
   return !(
     hre.network.live &&
-    ['mainnet', 'polygon', 'arbitrum', 'goerli', 'sepolia'].includes(
+    ['mainnet', 'polygon', 'arbitrum', 'base', 'goerli', 'sepolia'].includes(
       hre.network.name
     )
   )

@@ -3296,6 +3296,15 @@
           }
         }
       }
+    },
+    "96e34f185cbb4ce090fc56a02e7af8191dd2da75fdfe66d0de69fe33029b36fb": {
+      "address": "0x6b9C46C4DA1086693EF05bDe28dDa14C81697a5d",
+      "txHash": "0x2220dbf06dfc5f4599ed8699da153118f57a04e739c7992d65a733044798c440",
+      "layout": {
+        "solcVersion": "0.8.9",
+        "storage": [],
+        "types": {}
+      }
     }
   }
 }

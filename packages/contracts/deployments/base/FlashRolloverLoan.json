@@ -159,6 +159,10 @@
             {
               "type": "uint32",
               "name": "loanDuration"
+            },
+            {
+              "type": "bytes32[]",
+              "name": "merkleProof"
             }
           ]
         },
@@ -202,7 +206,7 @@
         },
         {
           "type": "address",
-          "name": "initiator"
+          "name": "_initiator"
         },
         {
           "type": "bytes",
@@ -265,6 +269,10 @@
             {
               "type": "uint32",
               "name": "loanDuration"
+            },
+            {
+              "type": "bytes32[]",
+              "name": "merkleProof"
             }
           ]
         }
@@ -284,6 +292,6 @@
     "blockHash": "0xaa1af6a9e702b386ced5432bed1247053fbfc09b37b4af1717cf29c7290678be",
     "blockNumber": 4443398
   },
-  "numDeployments": 1,
+  "numDeployments": 5,
   "implementation": "0x193d59841945979e0AA7Cd7D62d7262285390073"
 }

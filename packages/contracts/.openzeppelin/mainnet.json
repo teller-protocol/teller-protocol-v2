@@ -5166,6 +5166,15 @@
           }
         }
       }
+    },
+    "a04e31fde1d9f23cad83afbebb128af0d6eb783548761fe2aa87b91b14b16cdb": {
+      "address": "0x7bFE23e80F9DfFBbb3E1FB613eB4F5a617073fa5",
+      "txHash": "0xd6f0cdb0c0ea5a96238eeeb5bdb4c865a3089103a806ca4ecad18934d431298a",
+      "layout": {
+        "solcVersion": "0.8.9",
+        "storage": [],
+        "types": {}
+      }
     }
   }
 }

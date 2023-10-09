@@ -23,7 +23,7 @@ const deployFn: DeployFunction = async (hre) => {
     'LenderCommitmentForwarderStaging'
   )
 
-  await hre.defender.proposeBatchTimelock({
+  await hre.upgrades.proposeBatchTimelock({
     title: 'Flash Rollover Loan Extension Upgrade',
     description: ` 
 # FlashRolloverLoan G3 (Extensions Upgrade)

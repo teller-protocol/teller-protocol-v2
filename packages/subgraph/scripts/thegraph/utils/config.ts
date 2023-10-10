@@ -22,7 +22,7 @@ export interface INetworkConfig {
   name: string;
   network: string;
   export_network_name: string;
-  product: "aws" | "studio" | "local";
+  product: "aws" | "studio" | "hosted" | "local";
   studio: {
     owner: string;
     network: string;
@@ -48,6 +48,7 @@ export interface INetworkConfig {
     teller_v2: INetworkContractConfig;
     market_registry: INetworkContractConfig;
     lender_commitment: INetworkContractConfig;
+    lender_commitment_staging: INetworkContractConfig;
     collateral_manager: INetworkContractConfig;
     lender_manager: INetworkContractConfig;
     market_liquidity_rewards: INetworkContractConfig;

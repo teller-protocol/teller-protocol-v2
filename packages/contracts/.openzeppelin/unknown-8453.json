@@ -2465,6 +2465,15 @@
         "storage": [],
         "types": {}
       }
+    },
+    "47dd5e0e45e1e67767ef31bcc4f79e8bba0e10f4f48fd4fedbd40da76ad37eb4": {
+      "address": "0x95742cE32E9036958195FC59263136C33038a71F",
+      "txHash": "0x0fea4795da6b3ab1683876034cd4f5223a8772ab8e402fac18878e984b27223b",
+      "layout": {
+        "solcVersion": "0.8.9",
+        "storage": [],
+        "types": {}
+      }
     }
   }
 }

@@ -75,9 +75,6 @@ contract FlashRolloverLoan_G2 is FlashRolloverLoan_G1 {
         _flashAmount = repayFullAmount;
         uint256 _flashLoanFee = _flashAmount.percent(_flashloanPremiumPct);
 
-        uint256 flashLoanFee = 0;
-
-        //fix me ...
         _borrowerAmount =
             int256(commitmentPrincipalReceived) -
             int256(repayFullAmount) -

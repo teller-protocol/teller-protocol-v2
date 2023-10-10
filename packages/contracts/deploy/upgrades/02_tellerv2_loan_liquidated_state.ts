@@ -9,7 +9,7 @@ const deployFn: DeployFunction = async (hre) => {
   const trustedForwarder = await hre.contracts.get('MetaForwarder')
   const v2Calculations = await hre.deployments.get('V2Calculations')
 
-  await hre.defender.proposeBatchTimelock({
+  await hre.upgrades.proposeBatchTimelock({
     title: 'TellerV2: Fix Loan Liquidated State',
     description: ` 
 # TellerV2

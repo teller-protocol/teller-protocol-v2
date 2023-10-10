@@ -37,7 +37,7 @@ contract CollateralManagerV2_Fork_Test is Testable, IntegrationForkSetup {
     CollateralManagerV2_Override collateralManager;
     //User private borrower;
     //User private lender;
-    User private liquidator;
+    address liquidator;
 
     TestERC20Token wethMock;
     TestERC721Token erc721Mock;
@@ -78,9 +78,9 @@ contract CollateralManagerV2_Fork_Test is Testable, IntegrationForkSetup {
         erc1155Mock = new TestERC1155Token("ERC1155");
 
         
-        borrower = new User();
-        lender = new User();
-        liquidator = new User();
+        borrower = address(new User());
+        lender = address(new User());
+        liquidator = address(new User());
 
 
 

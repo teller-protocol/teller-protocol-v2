@@ -1,14 +1,8 @@
-import {
-  Address,
-  BigInt,
-  dataSource,
-  Entity,
-  ethereum,
-  Value
-} from "@graphprotocol/graph-ts";
+import { Address, BigInt, dataSource, ethereum } from "@graphprotocol/graph-ts";
 
 import { IERC20Metadata } from "../../generated/LenderCommitmentForwarder_ActiveCommitments/IERC20Metadata";
 import { LenderCommitmentForwarder } from "../../generated/LenderCommitmentForwarder_ActiveCommitments/LenderCommitmentForwarder";
+import { LenderCommitmentForwarderStaging } from "../../generated/LenderCommitmentForwarderStaging/LenderCommitmentForwarderStaging";
 import { Commitment } from "../../generated/schema";
 import { loadProtocol } from "../helpers/loaders";
 
@@ -16,7 +10,7 @@ import {
   updateAvailableTokensFromCommitment,
   updateCommitmentStatus
 } from "./updaters";
-import { CommitmentStatus } from "./utils";
+import { CommitmentStatus, isRolloverable } from "./utils";
 
 export function handleActiveCommitments(block: ethereum.Block): void {
   const protocol = loadProtocol();
@@ -38,15 +32,13 @@ function handleCommitments(
   // eslint-disable-next-line @typescript-eslint/ban-types
   fnNames: String[]
 ): void {
-  const map = new Entity();
-
   for (let i = 0; i < commitmentIds.length; i++) {
     const commitment = Commitment.load(commitmentIds[i].toString())!;
 
     if (commitment.expirationTimestamp.lt(block.timestamp)) {
       updateCommitmentStatus(commitment, CommitmentStatus.Expired);
     } else {
-      updateLenderBalanceAndAllowance(commitment, block, map);
+      updateLenderBalanceAndAllowance(commitment);
 
       for (let j = 0; j < fnNames.length; j++) {
         if (fnNames[j] === "checkLenderBalanceAndAllowanceForDeactivation") {
@@ -63,30 +55,20 @@ function handleCommitments(
   }
 }
 
-export function updateLenderBalanceAndAllowance(
-  commitment: Commitment,
-  block: ethereum.Block,
-  map: Entity
-): void {
+export function updateLenderBalanceAndAllowance(commitment: Commitment): void {
   const lenderAddress = Address.fromBytes(commitment.lenderAddress);
   const lendingTokenAddress = Address.fromBytes(
     commitment.principalTokenAddress
   );
 
-  const mapKey = `${lenderAddress.toHexString()}-${lendingTokenAddress.toHexString()}`;
-  if (map.isSet(mapKey) && map.getBigInt(mapKey).ge(block.number)) {
-    return;
-  }
-  map.set(mapKey, Value.fromBigInt(block.number));
-
   const lendingToken = IERC20Metadata.bind(lendingTokenAddress);
   const balance = lendingToken.balanceOf(lenderAddress);
   commitment.lenderPrincipalBalance = balance;
 
-  const allowance = lendingToken.allowance(
-    lenderAddress,
-    LenderCommitmentForwarder.bind(dataSource.address()).getTellerV2()
-  );
+  const tellerV2Address = isRolloverable()
+    ? LenderCommitmentForwarderStaging.bind(dataSource.address()).getTellerV2()
+    : LenderCommitmentForwarder.bind(dataSource.address()).getTellerV2();
+  const allowance = lendingToken.allowance(lenderAddress, tellerV2Address);
   commitment.lenderPrincipalAllowance = allowance;
 
   commitment.save();

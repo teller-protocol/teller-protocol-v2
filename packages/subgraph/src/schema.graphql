@@ -111,6 +111,7 @@ type BidCollateral @entity {
   bid: Bid!
   status: String
   receiver: Bytes
+  cmV2: Boolean
 }
 
 type Token @entity {

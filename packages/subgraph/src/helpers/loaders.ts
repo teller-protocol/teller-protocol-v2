@@ -23,6 +23,7 @@ import {
   TellerV2__bidsResultLoanDetailsStruct,
   TellerV2__bidsResultTermsStruct
 } from "../../generated/TellerV2/TellerV2";
+import { isV2 } from "../collateral-manager/utils";
 
 import { initTokenVolume } from "./intializers";
 
@@ -518,6 +519,7 @@ export function loadCollateral(
     collateral.status = "";
     collateral.receiver = Address.zero();
     collateral.bid = bidId;
+    collateral.cmV2 = isV2();
     collateral.save();
 
     const bid = Bid.load(bidId)!;

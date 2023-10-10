@@ -1,0 +1,10 @@
+@ensdomains/=node_modules/@ensdomains/
+@openzeppelin/=node_modules/@openzeppelin/
+@teller-protocol/=node_modules/@teller-protocol/
+base64-sol/=node_modules/base64-sol/
+ds-test/=lib/forge-std/lib/ds-test/src/
+eth-gas-reporter/=node_modules/eth-gas-reporter/
+forge-std/=lib/forge-std/src/
+hardhat-deploy/=node_modules/hardhat-deploy/
+hardhat/=node_modules/hardhat/
+v3-periphery-foundry/=lib/v3-periphery-foundry/contracts/

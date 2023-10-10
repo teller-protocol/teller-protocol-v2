@@ -280,6 +280,7 @@ const buildAndDeploy = async ({
     }
   }
   release();
+  await new Promise(resolve => setTimeout(resolve, 10000));
   void subgraph.api.getLatestVersion().then(async latestVersion => {
     // TODO: there should always be a latest version
     if (!latestVersion) return;

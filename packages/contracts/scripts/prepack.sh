@@ -7,8 +7,11 @@ yarn compile
 
 ## Copy Contract Artifacts
 mkdir -p build/contracts
-cp generated/artifacts/contracts/**/*.json build/contracts
-rm build/contracts/*.dbg.json
+find generated/artifacts/contracts/ \
+  -type d \( -name "mock" -o -name "interfaces" \) -prune -o \
+  -type f -name "*dbg.json" -prune -o \
+  -type f -name "*.json" \
+  -exec bash -c 'rsync --mkpath "$0" build/"$(dirname $(grep -o "contracts/.*" <<< "$0"))"/' {} \;
 
 ## Generate Contract Typings ##
 cp -r generated/typechain build/typechain

@@ -19,7 +19,7 @@ const deployFn: DeployFunction = async (hre) => {
     'LenderCommitmentForwarder'
   )
 
-  await hre.defender.proposeBatchTimelock({
+  await hre.upgrades.proposeBatchTimelock({
     title: 'Sherlock Audit Upgrade',
     description: `
 # MarketRegistry

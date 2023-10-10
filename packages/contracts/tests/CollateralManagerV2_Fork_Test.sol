@@ -18,6 +18,9 @@ import "../contracts/CollateralManagerV2.sol";
 
 import "./CollateralManagerV2_Override.sol";
 
+import "../../util/IntegrationSetup.sol";
+
+
 /*
 
 
@@ -30,7 +33,7 @@ TODO
 get test coverage up to 80 
 
 */
-contract CollateralManagerV2_Fork_Test is Testable {
+contract CollateralManagerV2_Fork_Test is Testable, IntegrationSetup {
     CollateralManagerV2_Override collateralManager;
     User private borrower;
     User private lender;
@@ -79,7 +82,7 @@ contract CollateralManagerV2_Fork_Test is Testable {
         lender = new User();
         liquidator = new User();
 
-        
+
 
         //  uint256 borrowerBalance = 50000;
         //   payable(address(borrower)).transfer(borrowerBalance);
@@ -92,6 +95,16 @@ contract CollateralManagerV2_Fork_Test is Testable {
             address(tellerV2Mock)
         );
         */
+  
+            
+
+
+         super.setUp();
+
+
+         //make some bids here, then perform the upgrade (sim) 
+
+         
     }
 
     function test_initialize_valid() public {

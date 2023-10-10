@@ -521,16 +521,6 @@ export function loadCollateral(
     collateral.bid = bidId;
     collateral.cmV2 = isV2();
     collateral.save();
-
-    const bid = Bid.load(bidId)!;
-    let bidCollaterals = bid.collateral;
-    if (!bidCollaterals) {
-      bidCollaterals = [collateral.id];
-    } else {
-      bidCollaterals.push(collateral.id);
-    }
-    bid.collateral = bidCollaterals;
-    bid.save();
   }
   return collateral;
 }

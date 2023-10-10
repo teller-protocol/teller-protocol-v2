@@ -393,11 +393,13 @@ function bidIsEligibleForReward(
 
     let hasValidCollateral = false;
 
-    const bidCollaterals = bid.collateral;
+    const bidCollaterals = changetype<BidCollateral[]>(
+      store.loadRelated("Bid", bid.id, "collateral")
+    );
 
     if (bidCollaterals) {
       for (let i = 0; i < bidCollaterals.length; i++) {
-        const bidCollateral = BidCollateral.load(bidCollaterals[i])!;
+        const bidCollateral = bidCollaterals[i];
 
         const principalToken = loadToken(bid.lendingTokenAddress);
         let principalTokenDecimals = principalToken.decimals;

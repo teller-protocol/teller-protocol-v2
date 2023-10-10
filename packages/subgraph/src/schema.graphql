@@ -98,7 +98,7 @@ type Bid @entity {
   _lastTotalRepaidInterestAmount: BigInt!
   paymentDefaultDuration: BigInt!
   collateralEscrow: Bytes
-  collateral: [BidCollateral!]
+  collateral: [BidCollateral!]! @derivedFrom(field: "bid")
 }
 
 type BidCollateral @entity {

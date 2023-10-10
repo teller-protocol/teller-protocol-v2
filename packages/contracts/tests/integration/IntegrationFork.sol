@@ -8,6 +8,7 @@ import { ITellerV2 } from "../../contracts/interfaces/ITellerV2.sol";
 import { ILenderCommitmentForwarder } from "../../contracts/interfaces/ILenderCommitmentForwarder.sol";
 
 
+import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract IntegrationForkSetup is Test {
     ITellerV2 internal tellerV2;

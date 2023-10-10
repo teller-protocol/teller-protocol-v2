@@ -18,7 +18,7 @@ import "../contracts/CollateralManagerV2.sol";
 
 import "./CollateralManagerV2_Override.sol";
 
-import "../../util/IntegrationSetup.sol";
+import "./integration/IntegrationFork.sol";
 
 
 /*
@@ -104,7 +104,7 @@ contract CollateralManagerV2_Fork_Test is Testable, IntegrationSetup {
 
          //make some bids here, then perform the upgrade (sim) 
 
-         
+
     }
 
     function test_initialize_valid() public {

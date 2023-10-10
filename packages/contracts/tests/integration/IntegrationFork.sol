@@ -1,7 +1,13 @@
 pragma solidity <0.9.0;
 pragma abicoder v2;
  
-import "./FoundryTest.sol"; 
+import "../util/FoundryTest.sol"; 
+import { IMarketRegistry } from "../../contracts/interfaces/IMarketRegistry.sol";
+import { ITellerV2 } from "../../contracts/interfaces/ITellerV2.sol";
+
+import { ILenderCommitmentForwarder } from "../../contracts/interfaces/ILenderCommitmentForwarder.sol";
+
+
 
 contract IntegrationForkSetup is Test {
     ITellerV2 internal tellerV2;

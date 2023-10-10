@@ -15,16 +15,20 @@ contract IntegrationForkSetup is Test {
     IMarketRegistry internal marketRegistry;
     ILenderCommitmentForwarder internal commitmentForwarder;
     
+    address lender;
+    address borrower;
+
+    address[] tokens; 
 
     uint256 internal marketId;
     // principal => collateral => commitmentId
     mapping(address => mapping(address => uint256)) internal commitmentsIds;
 
-    function setUp() public virtual override {
+    function setUp() public virtual  {
         // NOTE: must fork the network before calling super.setUp()
         uint256 mainnetFork = vm.createSelectFork("mainnet");
 
-        super.setUp();
+       // super.setUp();
 
         _setupTellerProtocol();
 

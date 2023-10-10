@@ -33,10 +33,10 @@ TODO
 get test coverage up to 80 
 
 */
-contract CollateralManagerV2_Fork_Test is Testable, IntegrationSetup {
+contract CollateralManagerV2_Fork_Test is Testable, IntegrationForkSetup {
     CollateralManagerV2_Override collateralManager;
-    User private borrower;
-    User private lender;
+    //User private borrower;
+    //User private lender;
     User private liquidator;
 
     TestERC20Token wethMock;
@@ -70,7 +70,7 @@ contract CollateralManagerV2_Fork_Test is Testable, IntegrationSetup {
         address _recipient
     );
 
-    function setUp() public {
+    function setUp()  public  override{
         
 
         wethMock = new TestERC20Token("wrappedETH", "WETH", 1e24, 18);

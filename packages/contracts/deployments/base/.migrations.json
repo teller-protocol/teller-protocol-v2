@@ -14,5 +14,6 @@
   "liquidity-rewards:deploy": 1692663246,
   "default-proxy-admin:transfer": 1692663253,
   "lender-commitment-forwarder:staging:deploy": 1695674719,
-  "lender-commitment-forwarder:extensions:flash-rollover:deploy": 1695676144
+  "lender-commitment-forwarder:extensions:flash-rollover:deploy": 1695676144,
+  "lender-commitment-forwarder:extensions:flash-rollover:g3-upgrade": 1696628411
 }

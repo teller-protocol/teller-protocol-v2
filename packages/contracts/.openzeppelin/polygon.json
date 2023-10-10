@@ -5210,6 +5210,15 @@
           }
         }
       }
+    },
+    "41d74cc7bd42cbfd94046dfd58ba47e77df827cfcfcfc0668c0aeb037b1ffe40": {
+      "address": "0x5098102507Da3F71677C5d9e170f91779Fe888F4",
+      "txHash": "0xe9b2344d53e398bd0d8d418abefc3d9235bb6c067d2bdac7f40f8d7a92eedc55",
+      "layout": {
+        "solcVersion": "0.8.9",
+        "storage": [],
+        "types": {}
+      }
     }
   }
 }

@@ -1,16 +1,16 @@
 import '@nomicfoundation/hardhat-ethers'
-import { ProposalResponse } from '@openzeppelin/defender-admin-client'
+import {
+  AdminClient,
+  ProposalResponse,
+} from '@openzeppelin/defender-admin-client/lib'
 import {
   PartialContract,
   ProposalFunctionInputs,
   ProposalStep,
   ProposalTargetFunction,
 } from '@openzeppelin/defender-admin-client/lib/models/proposal'
-import { HardhatDefender as OZHD } from '@openzeppelin/hardhat-defender'
-import {
-  getAdminClient,
-  getNetwork,
-} from '@openzeppelin/hardhat-defender/dist/utils'
+import { fromChainId, Network } from '@openzeppelin/defender-base-client'
+import { DefenderHardhatUpgrades } from '@openzeppelin/hardhat-upgrades'
 import {
   DeployBeaconOptions,
   DeployProxyOptions,
@@ -85,7 +85,7 @@ declare module 'hardhat/types/runtime' {
   }
   // type ProposeUpgradeStep = ProposeProxyUpgradeStep | ProposeBeaconUpgradeStep
 
-  interface HardhatDefender extends OZHD {
+  interface HardhatUpgrades extends DefenderHardhatUpgrades {
     proposeCall: (
       contractAddress: string,
       contractImplementation: ContractFactory,
@@ -123,7 +123,10 @@ declare module 'hardhat/types/runtime' {
       title: string
       description: string
       _steps: BatchProposalStep[]
-    }) => Promise<{ schedule: ProposalResponse; execute: ProposalResponse }>
+    }) => Promise<{
+      schedule: ProposalResponse
+      execute: ProposalResponse
+    }>
   }
 
   interface VirtualExecutionPayload {
@@ -513,7 +516,12 @@ extendEnvironment((hre) => {
     fn.write(formatMsg(msg, config))
   }
 
-  hre.defender.proposeCall = async (
+  const defenderAdmin = new AdminClient({
+    apiKey: hre.config.defender!.apiKey,
+    apiSecret: hre.config.defender!.apiSecret,
+  })
+
+  hre.upgrades.proposeCall = async (
     contractAddress,
     contractImplementation,
     callFn,
@@ -531,13 +539,11 @@ extendEnvironment((hre) => {
       throw new Error('Function inputs undefined')
     }
 
-    const admin = getAdminClient(hre)
     const { protocolOwnerSafe } = await hre.getNamedAccounts()
-
-    return await admin.createProposal({
+    return await defenderAdmin.createProposal({
       contract: {
         address: contractAddress,
-        network: await getNetwork(hre),
+        network: await getOZNetwork(hre),
         abi: JSON.stringify(
           contractImplementation.interface.fragments.map((fragment) =>
             JSON.parse(fragment.format('json'))
@@ -560,7 +566,7 @@ extendEnvironment((hre) => {
     })
   }
 
-  hre.defender.proposeUpgradeAndCall = async (
+  hre.upgrades.proposeUpgradeAndCall = async (
     proxyAddress,
     implFactory,
     { title, description, callFn, callArgs, ...opts }
@@ -587,11 +593,10 @@ extendEnvironment((hre) => {
     const proxyAdmin = await hre.upgrades.admin.getInstance()
     const { protocolOwnerSafe } = await hre.getNamedAccounts()
 
-    const admin = getAdminClient(hre)
-    return await admin.createProposal({
+    return await defenderAdmin.createProposal({
       contract: {
         address: await proxyAdmin.getAddress(),
-        network: await getNetwork(hre),
+        network: await getOZNetwork(hre),
         abi: JSON.stringify(
           proxyAdmin.interface.fragments.map((fragment) =>
             JSON.parse(fragment.format('json'))
@@ -634,13 +639,12 @@ extendEnvironment((hre) => {
     })
   }
 
-  hre.defender.proposeBatch = async ({
+  hre.upgrades.proposeBatch = async ({
     title,
     description,
     _steps,
   }): Promise<ProposalResponse> => {
-    const network = await getNetwork(hre)
-    // const proxyAdmin = await hre.upgrades.admin.getInstance()
+    const network = await getOZNetwork(hre)
 
     const { protocolOwnerSafe } = await hre.getNamedAccounts()
 
@@ -654,6 +658,7 @@ extendEnvironment((hre) => {
 
       contracts.push({
         address: toContractAddress,
+        // @ts-ignore
         network,
       })
       proposalSteps.push({
@@ -664,8 +669,7 @@ extendEnvironment((hre) => {
       })
     } // end steps loop
 
-    const admin = getAdminClient(hre)
-    return await admin.createProposal({
+    return await defenderAdmin.createProposal({
       contract: contracts,
       title: title,
       description: description,
@@ -677,11 +681,14 @@ extendEnvironment((hre) => {
     })
   }
 
-  hre.defender.proposeBatchTimelock = async ({
+  hre.upgrades.proposeBatchTimelock = async ({
     title,
     description,
     _steps,
-  }): Promise<{ schedule: ProposalResponse; execute: ProposalResponse }> => {
+  }): Promise<{
+    schedule: ProposalResponse
+    execute: ProposalResponse
+  }> => {
     const delay = moment.duration(3, 'minutes').asSeconds().toString()
 
     // build the timelock batch args from the steps
@@ -705,6 +712,7 @@ extendEnvironment((hre) => {
       delay,
     }
 
+    // @ts-ignore
     return await createScheduledBatchProposal(hre, {
       title,
       description,
@@ -712,6 +720,13 @@ extendEnvironment((hre) => {
     })
   }
 })
+
+async function getOZNetwork(hre: HardhatRuntimeEnvironment): Promise<Network> {
+  const chainId = await hre.getChainId()
+  const network = fromChainId(Number(chainId))
+  if (!network) throw new Error(`Unknown chain id ${chainId}`)
+  return network
+}
 
 const getVirtualExecutionPayloadForStep = async (
   step: BatchProposalStep,
@@ -989,12 +1004,16 @@ const createScheduledBatchProposal = async (
     timelockBatchArgs: TimelockBatchArgs
   }
 ) => {
-  const network = await getNetwork(hre)
-  const admin = getAdminClient(hre)
+  const network = await getOZNetwork(hre)
+  const defenderAdmin = new AdminClient({
+    apiKey: hre.config.defender!.apiKey,
+    apiSecret: hre.config.defender!.apiSecret,
+  })
+
   const { protocolOwnerSafe, protocolTimelock } = await hre.getNamedAccounts()
 
   return {
-    schedule: await admin.createProposal({
+    schedule: await defenderAdmin.createProposal({
       title: `${title} (Schedule Timelock)`,
       description: description,
       type: 'custom',
@@ -1025,7 +1044,7 @@ const createScheduledBatchProposal = async (
         timelockBatchArgs.delay,
       ],
     }),
-    execute: await admin.createProposal({
+    execute: await defenderAdmin.createProposal({
       title: `${title} (Execute Timelock)`,
       description: description,
       type: 'custom',

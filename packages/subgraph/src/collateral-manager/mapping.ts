@@ -135,6 +135,7 @@ export function handleCollateralClaimed(event: CollateralClaimed): void {
   for (let i = 0; i < bidCollaterals.length; i++) {
     const collateral = bidCollaterals[i];
     collateral.status = "Withdrawn";
+    collateral.save();
   }
 }
 

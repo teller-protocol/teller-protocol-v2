@@ -1264,31 +1264,7 @@ contract User {
         return this.onERC1155Received.selector;
     }
 }
-
-contract CollateralEscrowV1_Mock is CollateralEscrowV1 {
-    bool public depositAssetWasCalled;
-    bool public withdrawWasCalled;
-
-    constructor() CollateralEscrowV1() {}
-
-    function depositAsset(
-        CollateralType _collateralType,
-        address _collateralAddress,
-        uint256 _amount,
-        uint256 _tokenId
-    ) external payable override {
-        depositAssetWasCalled = true;
-    }
-
-    function withdraw(
-        address _collateralAddress,
-        uint256 _amount,
-        address _recipient
-    ) external override {
-        withdrawWasCalled = true;
-    }
-}
-
+ 
 contract TellerV2_Mock is TellerV2SolMock {
     address public globalBorrower;
     address public globalLender;

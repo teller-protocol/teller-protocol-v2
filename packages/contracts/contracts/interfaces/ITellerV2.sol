@@ -161,4 +161,10 @@ interface ITellerV2 {
         external
         view
         returns (Payment memory due);
+
+    function collateralManager() external view returns (address);
+
+
+
+    
 }

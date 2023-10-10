@@ -73,7 +73,7 @@ contract CollateralManagerV2 is
         uint256 _amount,
         uint256 _tokenId
     );
-    event CollateralClaimed(uint256 _bidId);
+     
     event CollateralDeposited(
         uint256 _bidId,
         CollateralType _type,
@@ -246,8 +246,7 @@ contract CollateralManagerV2 is
         require(bidState == BidState.PAID, "Loan has not been paid");
         
         _withdraw(_bidId, tellerV2.getLoanBorrower(_bidId));
-
-        emit CollateralClaimed(_bidId);
+ 
     }
 
      /**
@@ -263,8 +262,7 @@ contract CollateralManagerV2 is
         require(_msgSender() == tellerV2.getLoanBorrower(_bidId), "Not authorized");
         
         _withdraw(_bidId, _recipient);
-
-        emit CollateralClaimed(_bidId);
+ 
     }
 
     /**
@@ -280,8 +278,7 @@ contract CollateralManagerV2 is
                 "Loan has not been closed"
             );
 
-            _withdraw(_bidId, tellerV2.getLoanLender(_bidId));
-            emit CollateralClaimed(_bidId);
+            _withdraw(_bidId, tellerV2.getLoanLender(_bidId)); 
         }
     }
 

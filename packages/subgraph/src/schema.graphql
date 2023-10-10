@@ -4,6 +4,7 @@ type Protocol implements IHasLoans @entity {
   loans: LoanStatusCount! @derivedFrom(field: "_protocol")
   tokenVolumes: [TokenVolume!]! @derivedFrom(field: "protocol")
 
+  rolloverableLCF: Bytes
   activeCommitments: [Commitment!]!
   inactiveCommitments: [Commitment!]
 
@@ -351,9 +352,12 @@ type CommitmentZScore @entity {
 
 type Commitment @entity {
   id: ID!
+  commitmentId: BigInt!
   createdAt: BigInt!
   updatedAt: BigInt!
   status: String!
+  forwarderAddress: Bytes! # address of the LenderCommitmentForwarder contract
+  rolloverable: Boolean!
 
   # Offer
   committedAmount: BigInt! # Current committed amount

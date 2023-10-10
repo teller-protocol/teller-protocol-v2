@@ -6,6 +6,7 @@ import {
 } from "../utils/config";
 
 import { makeAws } from "./aws";
+import { makeHosted } from "./hosted";
 import { makeLocal } from "./local";
 import { makeStudio } from "./studio";
 
@@ -84,6 +85,13 @@ export const getSubgraphs = async ({
             address: networkConfig.studio.owner,
             network: networkConfig.studio.network
           },
+          logger
+        });
+        break;
+      case "hosted":
+        innerApi = await makeHosted({
+          name: networkConfig.name,
+          network: networkConfig.network,
           logger
         });
         break;

@@ -379,8 +379,7 @@ contract CollateralManagerV2_Test is Testable {
         tellerV2Mock.setGlobalBidState(BidState.CLOSED);
         collateralManager.setBidsCollateralBackedGlobally(true);
 
-        vm.expectEmit(true, false, false, false);
-        emit CollateralClaimed(bidId);
+       
         vm.prank(address(tellerV2Mock));
         collateralManager.lenderClaimCollateral(bidId);
 

@@ -32,7 +32,7 @@ get test coverage up to 80
 
 */
 contract CollateralManagerV2_Fork_Test is Testable, IntegrationForkSetup {
-    CollateralManagerV2_Override collateralManager;
+    CollateralManagerV2_Override collateralManagerV2;
     //User private borrower;
     //User private lender;
     address liquidator;
@@ -81,7 +81,7 @@ contract CollateralManagerV2_Fork_Test is Testable, IntegrationForkSetup {
 
         /*
         tellerV2Mock = new TellerV2_Mock();
-        collateralManager = new CollateralManagerV2_Override();
+         collateralManager = new CollateralManagerV2_Override();
 
         collateralManager.initialize( 
             address(tellerV2Mock)
@@ -90,11 +90,77 @@ contract CollateralManagerV2_Fork_Test is Testable, IntegrationForkSetup {
 
         super.setUp();
 
-        //make some bids here, then perform the upgrade (sim)
+
+        createPreUpgradeBidsForTests();
+
+
+
+
+        //need to deploy our new version of TellerV2  locally 
+
+        address metaForwarder = address(0); //for this test 
+
+        TellerV2 updatedTellerV2_impl = new TellerV2(metaForwarder);
+
+        //override the old tellerv2 with the new impl 
+        vm.etch(address(tellerV2), address(updatedTellerV2_impl).code);
+
+
+        collateralManagerV2 = new CollateralManagerV2_Override();
+        collateralManagerV2.initialize( 
+            address(tellerV2)
+        );
+
+
+        //call the reinitialzier on our upgraded tellerv2 to set collateral manager v2 
+        TellerV2(address(tellerV2)).setCollateralManagerV2(address(collateralManagerV2));
+       
+
+       
+
+        address _collateralManagerV1Address = tellerV2.collateralManager();
+ 
+
+
+        //perform the contract upgrade of the collateral manager.  How ? 
+         //   1) deploy the contract manager 
+        //  2) do that crazy trick where you can scratch override an address? 
+
+
+
+
     }
 
-    function test_initialize_valid() public {}
+
+    function createPreUpgradeBidsForTests() public {
+
+        //add code here !
+
+
+    } 
+
+    function test_legacy_bid_can_be_accepted_after_upgrade() public {
+
+
+    }
+
+
+    function test_legacy_bid_can_be_paid_withdrawn_after_upgrade() public {
+
+
+    }
+
+
+
+
+
+
+
 }
+
+
+
+
 
 contract User {
     constructor() {}

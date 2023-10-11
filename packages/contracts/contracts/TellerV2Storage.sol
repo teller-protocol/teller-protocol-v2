@@ -52,7 +52,6 @@ struct Bid {
     Terms terms;
     BidState state;
     PaymentType paymentType;
-    
 }
 
 /**
@@ -162,7 +161,7 @@ abstract contract TellerV2Storage_G5 is TellerV2Storage_G4 {
 
 abstract contract TellerV2Storage_G6 is TellerV2Storage_G5 {
     ICollateralManagerV2 public collateralManagerV2;
-    mapping(uint256 => address) public collateralManagerForBid;//if this is zero, that means v1
+    mapping(uint256 => address) public collateralManagerForBid; //if this is zero, that means v1
 }
 
 abstract contract TellerV2Storage is TellerV2Storage_G6 {}

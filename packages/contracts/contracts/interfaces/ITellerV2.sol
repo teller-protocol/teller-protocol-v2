@@ -151,7 +151,7 @@ interface ITellerV2 {
         external
         view
         returns (ICollateralManager);
-        
+
     function calculateAmountOwed(uint256 _bidId, uint256 _timestamp)
         external
         view
@@ -163,8 +163,4 @@ interface ITellerV2 {
         returns (Payment memory due);
 
     function collateralManager() external view returns (address);
-
-
-
-    
 }

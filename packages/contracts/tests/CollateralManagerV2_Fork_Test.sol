@@ -5,7 +5,6 @@ import { Testable } from "./Testable.sol";
 
 import { CollateralEscrowV1 } from "../contracts/escrow/CollateralEscrowV1.sol";
 import "../contracts/mock/WethMock.sol";
- 
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
@@ -19,7 +18,6 @@ import "../contracts/CollateralManagerV2.sol";
 import "./CollateralManagerV2_Override.sol";
 
 import "./integration/IntegrationFork.sol";
-
 
 /*
 
@@ -44,7 +42,6 @@ contract CollateralManagerV2_Fork_Test is Testable, IntegrationForkSetup {
     TestERC1155Token erc1155Mock;
 
     //TellerV2_Mock tellerV2Mock;
- 
 
     event CollateralCommitted(
         uint256 _bidId,
@@ -70,19 +67,14 @@ contract CollateralManagerV2_Fork_Test is Testable, IntegrationForkSetup {
         address _recipient
     );
 
-    function setUp()  public  override{
-        
-
+    function setUp() public override {
         wethMock = new TestERC20Token("wrappedETH", "WETH", 1e24, 18);
         erc721Mock = new TestERC721Token("ERC721", "ERC721");
         erc1155Mock = new TestERC1155Token("ERC1155");
 
-        
         borrower = address(new User());
         lender = address(new User());
         liquidator = address(new User());
-
-
 
         //  uint256 borrowerBalance = 50000;
         //   payable(address(borrower)).transfer(borrowerBalance);
@@ -95,33 +87,17 @@ contract CollateralManagerV2_Fork_Test is Testable, IntegrationForkSetup {
             address(tellerV2Mock)
         );
         */
-  
-            
 
+        super.setUp();
 
-         super.setUp();
-
-
-         //make some bids here, then perform the upgrade (sim) 
-
-
+        //make some bids here, then perform the upgrade (sim)
     }
 
-    function test_initialize_valid() public {
-        
- 
-    }
- 
- 
-   
- 
- 
+    function test_initialize_valid() public {}
 }
 
 contract User {
     constructor() {}
-
-  
 
     receive() external payable {}
 
@@ -144,4 +120,3 @@ contract User {
         return this.onERC1155Received.selector;
     }
 }
-  

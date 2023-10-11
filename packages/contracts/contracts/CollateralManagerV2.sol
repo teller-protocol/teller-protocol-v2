@@ -31,7 +31,6 @@ import "./interfaces/ITellerV2.sol";
 import "./bundle/TokenStore.sol";
 
 import "./bundle/interfaces/ICollateralBundle.sol";
- 
 
 /*
 
@@ -73,7 +72,7 @@ contract CollateralManagerV2 is
         uint256 _amount,
         uint256 _tokenId
     );
-     
+
     event CollateralDeposited(
         uint256 _bidId,
         CollateralType _type,
@@ -113,7 +112,8 @@ contract CollateralManagerV2 is
      */
 
     function isBidCollateralBacked(uint256 _bidId)
-        public view
+        public
+        view
         virtual
         returns (bool)
     {
@@ -129,11 +129,7 @@ contract CollateralManagerV2 is
     function commitCollateral(
         uint256 _bidId,
         Collateral[] calldata _collateralInfo
-    ) 
-    external
-    onlyTellerV2 
-    returns (bool validation_) 
-    {
+    ) external onlyTellerV2 returns (bool validation_) {
         address borrower = tellerV2.getLoanBorrower(_bidId);
         require(borrower != address(0), "Loan has no borrower");
         (validation_, ) = checkBalances(borrower, _collateralInfo);
@@ -143,7 +139,6 @@ contract CollateralManagerV2 is
             for (uint256 i; i < _collateralInfo.length; i++) {
                 Collateral memory info = _collateralInfo[i];
                 _commitCollateral(_bidId, info);
-                
             }
         }
     }
@@ -154,27 +149,23 @@ contract CollateralManagerV2 is
      */
 
     //used to be 'deploy and deposit'
-    function depositCollateral(uint256 _bidId ) 
-    external
-     onlyTellerV2 
-     {      
-        //if collateral has been committed... 
-        if( isBidCollateralBacked(_bidId) ){
-
-            Collateral[] memory _committedCollateral = getCollateralInfo(_bidId);
+    function depositCollateral(uint256 _bidId) external onlyTellerV2 {
+        //if collateral has been committed...
+        if (isBidCollateralBacked(_bidId)) {
+            Collateral[] memory _committedCollateral = getCollateralInfo(
+                _bidId
+            );
 
             address borrower = tellerV2.getLoanBorrower(_bidId);
 
             uint256 _bundleId = _storeTokens(borrower, _committedCollateral);
 
-            _collateralBundleIdForBid[_bidId] = _bundleId ;
-
+            _collateralBundleIdForBid[_bidId] = _bundleId;
 
             uint256 collateralCount = _committedCollateral.length;
-           
-            for(uint256 i = 0; i < collateralCount; i += 1 ) {
-               
-                 emit CollateralDeposited(
+
+            for (uint256 i = 0; i < collateralCount; i += 1) {
+                emit CollateralDeposited(
                     _bidId,
                     _committedCollateral[i]._collateralType,
                     _committedCollateral[i]._collateralAddress,
@@ -182,7 +173,7 @@ contract CollateralManagerV2 is
                     _committedCollateral[i]._tokenId
                 );
             }
-        }// is backed 
+        } // is backed
     }
 
     /**
@@ -226,11 +217,10 @@ contract CollateralManagerV2 is
         view
         returns (uint256 amount_)
     {
-
         uint256 bundleId = _collateralBundleIdForBid[_bidId];
 
         Collateral memory token_data = getTokenOfBundle(bundleId, 0); // first slot
-        
+
         if (token_data._collateralAddress != _collateralAddress) return 0; // not as expected
 
         amount_ = token_data._amount;
@@ -244,12 +234,11 @@ contract CollateralManagerV2 is
         BidState bidState = tellerV2.getBidState(_bidId);
 
         require(bidState == BidState.PAID, "Loan has not been paid");
-        
+
         _withdraw(_bidId, tellerV2.getLoanBorrower(_bidId));
- 
     }
 
-     /**
+    /**
      * @notice Withdraws deposited collateral from the created escrow of a bid that has been successfully repaid.
      * @param _bidId The id of the bid to withdraw collateral for.
      * @param _recipient The address that will receive the collateral.
@@ -259,10 +248,12 @@ contract CollateralManagerV2 is
 
         require(bidState == BidState.PAID, "Loan has not been paid");
 
-        require(_msgSender() == tellerV2.getLoanBorrower(_bidId), "Not authorized");
-        
+        require(
+            _msgSender() == tellerV2.getLoanBorrower(_bidId),
+            "Not authorized"
+        );
+
         _withdraw(_bidId, _recipient);
- 
     }
 
     /**
@@ -273,12 +264,9 @@ contract CollateralManagerV2 is
         if (isBidCollateralBacked(_bidId)) {
             BidState bidState = tellerV2.getBidState(_bidId);
 
-            require(
-                bidState == BidState.CLOSED,
-                "Loan has not been closed"
-            );
+            require(bidState == BidState.CLOSED, "Loan has not been closed");
 
-            _withdraw(_bidId, tellerV2.getLoanLender(_bidId)); 
+            _withdraw(_bidId, tellerV2.getLoanLender(_bidId));
         }
     }
 
@@ -322,7 +310,6 @@ contract CollateralManagerV2 is
      * @param _receiver The address to withdraw the collateral to.
      */
     function _withdraw(uint256 _bidId, address _receiver) internal virtual {
-
         uint256 bundleId = _collateralBundleIdForBid[_bidId];
 
         (uint256 count, Collateral[] memory releasedTokens) = _releaseTokens(
@@ -371,14 +358,14 @@ contract CollateralManagerV2 is
             _collateralInfo._collateralAddress
         ] = _collateralInfo;*/
 
-        uint256 new_count = committedCollateral.count + 1; 
+        uint256 new_count = committedCollateral.count + 1;
 
         committedCollateral.count = new_count;
-        committedCollateral.collaterals[new_count-1] =   Collateral( {
+        committedCollateral.collaterals[new_count - 1] = Collateral({
             _collateralType: _collateralInfo._collateralType,
             _amount: _collateralInfo._amount,
-            _tokenId: _collateralInfo._tokenId ,
-            _collateralAddress: _collateralInfo._collateralAddress 
+            _tokenId: _collateralInfo._tokenId,
+            _collateralAddress: _collateralInfo._collateralAddress
         });
 
         emit CollateralCommitted(
@@ -400,7 +387,7 @@ contract CollateralManagerV2 is
         address _borrowerAddress,
         Collateral[] memory _collateralInfo,
         bool _shortCircut
-    ) internal virtual view returns (bool validated_, bool[] memory checks_) {
+    ) internal view virtual returns (bool validated_, bool[] memory checks_) {
         checks_ = new bool[](_collateralInfo.length);
         validated_ = true;
         for (uint256 i; i < _collateralInfo.length; i++) {
@@ -428,7 +415,7 @@ contract CollateralManagerV2 is
     function _checkBalance(
         address _borrowerAddress,
         Collateral memory _collateralInfo
-    ) internal virtual view returns (bool) {
+    ) internal view virtual returns (bool) {
         CollateralType collateralType = _collateralInfo._collateralType;
 
         if (collateralType == CollateralType.ERC20) {

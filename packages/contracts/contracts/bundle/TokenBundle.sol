@@ -23,7 +23,7 @@ abstract contract TokenBundle is ICollateralBundle {
     mapping(uint256 => CollateralBundleInfo) private bundle;
 
     /// @dev The number of bundles that have been created
-    uint256 bundleCount ; 
+    uint256 bundleCount;
 
     /// @dev Returns the total number of assets in a particular bundle.
     function getTokenCountOfBundle(uint256 _bundleId)
@@ -50,8 +50,9 @@ abstract contract TokenBundle is ICollateralBundle {
 
     /// @dev Lets the calling contract create a bundle, by passing in a list of tokens and a unique id.
     function _createBundle(Collateral[] memory _tokensToBind)
-        internal returns (uint256 bundleId_)
-    {   
+        internal
+        returns (uint256 bundleId_)
+    {
         bundleId_ = bundleCount++;
 
         uint256 targetCount = _tokensToBind.length;
@@ -113,13 +114,15 @@ abstract contract TokenBundle is ICollateralBundle {
     }
 
     /// @dev Checks if the type of asset-contract is same as the TokenType specified.
-    function _checkTokenType(Collateral memory _token) 
-    internal view {
+    function _checkTokenType(Collateral memory _token) internal view {
         if (_token._collateralType == CollateralType.ERC721) {
             try
                 IERC165(_token._collateralAddress).supportsInterface(0x80ac58cd)
             returns (bool supported721) {
-                require(supported721, "TokenBundle: ERC721 Interface Not Supported");
+                require(
+                    supported721,
+                    "TokenBundle: ERC721 Interface Not Supported"
+                );
             } catch {
                 revert("TokenBundle: ERC721 Interface Not Supported");
             }
@@ -127,7 +130,10 @@ abstract contract TokenBundle is ICollateralBundle {
             try
                 IERC165(_token._collateralAddress).supportsInterface(0xd9b67a26)
             returns (bool supported1155) {
-                require(supported1155, "TokenBundle: ERC1155 Interface Not Supported");
+                require(
+                    supported1155,
+                    "TokenBundle: ERC1155 Interface Not Supported"
+                );
             } catch {
                 revert("TokenBundle: ERC1155 Interface Not Supported");
             }

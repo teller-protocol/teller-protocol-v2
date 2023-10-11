@@ -26,13 +26,11 @@ contract CollateralManagerV2_Override is CollateralManagerV2 {
 
     bool bidsCollateralBackedGlobally;
     bool public checkBalanceGlobalValid = true;
- 
+
     bool public depositWasCalled;
     bool public withdrawWasCalled;
 
-    
-
-/*
+    /*
     function _depositSuper(uint256 _bidId, Collateral memory _collateralInfo)
         public
     {
@@ -77,8 +75,7 @@ contract CollateralManagerV2_Override is CollateralManagerV2 {
     function setBidsCollateralBackedGlobally(bool _backed) public {
         bidsCollateralBackedGlobally = _backed;
     }
- 
- 
+
     function setCheckBalanceGlobalValid(bool _valid) public {
         checkBalanceGlobalValid = _valid;
     }
@@ -88,7 +85,8 @@ contract CollateralManagerV2_Override is CollateralManagerV2 {
     */
 
     function isBidCollateralBacked(uint256 _bidId)
-        public view
+        public
+        view
         override
         returns (bool)
     {
@@ -108,7 +106,6 @@ contract CollateralManagerV2_Override is CollateralManagerV2 {
 
     function _deposit(uint256 _bidId, Collateral memory collateralInfo)
         internal
-        
     {
         depositWasCalled = true;
     }
@@ -117,13 +114,10 @@ contract CollateralManagerV2_Override is CollateralManagerV2 {
         address _borrowerAddress,
         Collateral memory _collateralInfo
     ) internal view override returns (bool) {
-       // checkBalanceWasCalled = true;
+        // checkBalanceWasCalled = true;
 
         return checkBalanceGlobalValid;
     }
-
-   
-   
 
     function _withdraw(uint256 _bidId, address recipient) internal override {
         withdrawInternalWasCalledToRecipient = recipient;

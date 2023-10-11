@@ -13,14 +13,12 @@ import { LoanDetails, Payment, BidState } from "../TellerV2Storage.sol";
 This is only used for sol test so its named specifically to avoid being used for the typescript tests.
 */
 contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
-    
     address public collateralManagerMock;
     address public trustedForwarder;
     address public approvedForwarder;
 
     Bid mockBid;
-    
-    
+
     function setMarketRegistry(address _marketRegistry) public {
         marketRegistry = IMarketRegistry(_marketRegistry);
     }
@@ -195,7 +193,6 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
         override
         returns (ICollateralManager)
     {
-      
         return _getCollateralManagerForBid(_bidId);
     }
 
@@ -204,7 +201,6 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
         view
         returns (ICollateralManager)
     {
-        
         return ICollateralManager(collateralManagerMock);
     }
 
@@ -318,10 +314,7 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
         bids[_bidId].loanDetails.lastRepaidTimestamp = _timestamp;
     }
 
-     function collateralManager() external view returns (address){
+    function collateralManager() external view returns (address) {
         return collateralManagerMock;
-     }
-
-
-
+    }
 }

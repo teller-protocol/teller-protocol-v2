@@ -5,7 +5,6 @@ import { Testable } from "./Testable.sol";
 
 import { CollateralEscrowV1 } from "../contracts/escrow/CollateralEscrowV1.sol";
 import "../contracts/mock/WethMock.sol";
- 
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
@@ -41,7 +40,6 @@ contract CollateralManagerV2_Test is Testable {
     TestERC1155Token erc1155Mock;
 
     TellerV2_Mock tellerV2Mock;
- 
 
     event CollateralCommitted(
         uint256 _bidId,
@@ -68,8 +66,6 @@ contract CollateralManagerV2_Test is Testable {
     );
 
     function setUp() public {
-        
-
         wethMock = new TestERC20Token("wrappedETH", "WETH", 1e24, 18);
         erc721Mock = new TestERC721Token("ERC721", "ERC721");
         erc1155Mock = new TestERC1155Token("ERC1155");
@@ -84,16 +80,12 @@ contract CollateralManagerV2_Test is Testable {
 
         collateralManager = new CollateralManagerV2_Override();
 
-        collateralManager.initialize( 
-            address(tellerV2Mock)
-        );
+        collateralManager.initialize(address(tellerV2Mock));
     }
 
     function test_initialize_valid() public {
-        
-
         CollateralManagerV2_Override tempCManager = new CollateralManagerV2_Override();
-        tempCManager.initialize( address(tellerV2Mock));
+        tempCManager.initialize(address(tellerV2Mock));
 
         address managerTellerV2 = address(tempCManager.tellerV2());
         assertEq(
@@ -102,8 +94,6 @@ contract CollateralManagerV2_Test is Testable {
             "CollateralManagerV2 was not initialized"
         );
     }
- 
- 
 
     function test_deposit() public {
         uint256 bidId = 0;
@@ -112,7 +102,6 @@ contract CollateralManagerV2_Test is Testable {
 
         vm.prank(address(borrower));
         wethMock.approve(address(collateralManager), amount);
-       
 
         Collateral memory collateral = Collateral({
             _collateralType: CollateralType.ERC20,
@@ -121,15 +110,12 @@ contract CollateralManagerV2_Test is Testable {
             _collateralAddress: address(wethMock)
         });
 
-            //must pre commit 
+        //must pre commit
         collateralManager._commitCollateralSuper(bidId, collateral);
 
         collateralManager.setBidsCollateralBackedGlobally(true);
 
-        
         tellerV2Mock.setBorrower(address(borrower));
-
-        
 
         vm.expectEmit(false, false, false, false);
         emit CollateralDeposited(
@@ -139,19 +125,16 @@ contract CollateralManagerV2_Test is Testable {
             collateral._amount,
             collateral._tokenId
         );
-          vm.prank(address(tellerV2Mock));
+        vm.prank(address(tellerV2Mock));
         collateralManager.depositCollateral(bidId);
     }
- 
 
     function test_deposit_erc20() public {
         uint256 bidId = 0;
         uint256 amount = 1000;
         wethMock.transfer(address(borrower), amount);
 
-        
-
-         vm.prank(address(borrower));
+        vm.prank(address(borrower));
         wethMock.approve(address(collateralManager), amount);
 
         Collateral memory collateral = Collateral({
@@ -161,15 +144,12 @@ contract CollateralManagerV2_Test is Testable {
             _collateralAddress: address(wethMock)
         });
 
-          //must pre commit 
+        //must pre commit
         collateralManager._commitCollateralSuper(bidId, collateral);
 
         collateralManager.setBidsCollateralBackedGlobally(true);
 
-
         tellerV2Mock.setBorrower(address(borrower));
-
-      
 
         vm.expectEmit(false, false, false, false);
         emit CollateralDeposited(
@@ -179,10 +159,9 @@ contract CollateralManagerV2_Test is Testable {
             collateral._amount,
             collateral._tokenId
         );
-         vm.prank(address(tellerV2Mock));
-         
+        vm.prank(address(tellerV2Mock));
+
         collateralManager.depositCollateral(bidId);
- 
     }
 
     function test_deposit_erc721() public {
@@ -201,17 +180,12 @@ contract CollateralManagerV2_Test is Testable {
             _collateralAddress: address(erc721Mock)
         });
 
-
-           //must pre commit 
+        //must pre commit
         collateralManager._commitCollateralSuper(bidId, collateral);
 
         collateralManager.setBidsCollateralBackedGlobally(true);
 
-
-
         tellerV2Mock.setBorrower(address(borrower));
-
-    
 
         vm.expectEmit(false, false, false, false);
         emit CollateralDeposited(
@@ -221,14 +195,10 @@ contract CollateralManagerV2_Test is Testable {
             collateral._amount,
             collateral._tokenId
         );
-         vm.prank(address(tellerV2Mock));
+        vm.prank(address(tellerV2Mock));
         //collateralManager._depositSuper(bidId, collateral);
         collateralManager.depositCollateral(bidId);
-
-       
     }
-
-   
 
     function test_deposit_erc1155() public {
         uint256 bidId = 0;
@@ -246,17 +216,13 @@ contract CollateralManagerV2_Test is Testable {
             _collateralAddress: address(erc1155Mock)
         });
 
-
-           //must pre commit 
+        //must pre commit
         collateralManager._commitCollateralSuper(bidId, collateral);
 
         collateralManager.setBidsCollateralBackedGlobally(true);
 
-
         tellerV2Mock.setBorrower(address(borrower));
 
-      
-       
         vm.expectEmit(false, false, false, false);
         emit CollateralDeposited(
             bidId,
@@ -265,12 +231,10 @@ contract CollateralManagerV2_Test is Testable {
             collateral._amount,
             collateral._tokenId
         );
-         vm.prank(address(tellerV2Mock));
+        vm.prank(address(tellerV2Mock));
         //collateralManager._depositSuper(bidId, collateral);
         collateralManager.depositCollateral(bidId);
- 
     }
- 
 
     function test_deposit_invalid_sender() public {
         vm.prank(address(lender));
@@ -297,11 +261,9 @@ contract CollateralManagerV2_Test is Testable {
 
         vm.prank(address(tellerV2Mock));
         collateralManager.depositCollateral(bidId);
-
-        
     }
 
-/*
+    /*
     function test_deposit_backed() public {
         uint256 bidId = 0;
         uint256 amount = 1000;
@@ -342,7 +304,7 @@ contract CollateralManagerV2_Test is Testable {
         vm.prank(address(borrower));
         wethMock.approve(address(collateralManager), amount);
 
-       /* Collateral memory collateral = Collateral({
+        /* Collateral memory collateral = Collateral({
             _collateralType: CollateralType.ERC20,
             _amount: amount,
             _tokenId: 0,
@@ -356,7 +318,6 @@ contract CollateralManagerV2_Test is Testable {
         vm.prank(address(tellerV2Mock));
         collateralManager.depositCollateral(bidId);
 
-      
         assertFalse(
             collateralManager.depositWasCalled(),
             "deposit internal was called"
@@ -365,7 +326,7 @@ contract CollateralManagerV2_Test is Testable {
 
     function test_initialize_again() public {
         vm.expectRevert("Initializable: contract is already initialized");
-        collateralManager.initialize( address(0));
+        collateralManager.initialize(address(0));
     }
 
     function test_withdraw_external_invalid_bid_state() public {
@@ -485,8 +446,7 @@ contract CollateralManagerV2_Test is Testable {
         );
     }
 
-
- function test_commit_erc721_amount_invalid() public {
+    function test_commit_erc721_amount_invalid() public {
         uint256 bidId = 0;
         uint256 amount = 1000;
 
@@ -504,13 +464,11 @@ contract CollateralManagerV2_Test is Testable {
 
         tellerV2Mock.setBorrower(address(borrower));
 
-      
-
         vm.expectRevert("ERC721 collateral must have amount of 1");
-       // vm.prank(address(borrower));
+        // vm.prank(address(borrower));
         //collateralManager._depositSuper(bidId, collateral);
-          vm.prank(address(borrower));
-        collateralManager._commitCollateralSuper(bidId,collateral);
+        vm.prank(address(borrower));
+        collateralManager._commitCollateralSuper(bidId, collateral);
     }
 
     function test_commit_collateral_address_multiple_times() public {
@@ -528,11 +486,9 @@ contract CollateralManagerV2_Test is Testable {
 
         collateralManager._commitCollateralSuper(bidId, collateralInfo);
 
-        
         collateralManager._commitCollateralSuper(bidId, collateralInfo);
 
-        //make some positive assertion here about the count 
-
+        //make some positive assertion here about the count
     }
 
     function test_commit_collateral_ERC721_amount_1() public {
@@ -556,11 +512,6 @@ contract CollateralManagerV2_Test is Testable {
         uint256 bidId = 0;
         address recipient = address(borrower);
 
-
-
-
-
-
         uint256 amount = 1000;
 
         wethMock.transfer(address(borrower), amount);
@@ -575,19 +526,14 @@ contract CollateralManagerV2_Test is Testable {
             _collateralAddress: address(wethMock)
         });
 
-
         tellerV2Mock.setBorrower(address(borrower));
 
         collateralManager._commitCollateralSuper(bidId, collateral);
 
         collateralManager.setBidsCollateralBackedGlobally(true);
-        
+
         vm.prank(address(tellerV2Mock));
         collateralManager.depositCollateral(bidId);
-
-
-
-
 
         vm.expectEmit(false, false, false, false);
         emit CollateralWithdrawn(
@@ -598,10 +544,8 @@ contract CollateralManagerV2_Test is Testable {
             collateral._tokenId,
             recipient
         );
-       
-        collateralManager._withdrawSuper(bidId, recipient);
 
-       
+        collateralManager._withdrawSuper(bidId, recipient);
     }
 
     function test_withdraw_internal_emptyArray() public {
@@ -610,10 +554,9 @@ contract CollateralManagerV2_Test is Testable {
 
         //wethMock.transfer(address(escrowImplementation), 1000);
 
-        
         collateralManager._withdrawSuper(bidId, recipient);
 
-       /* assertFalse(
+        /* assertFalse(
             escrowImplementation.withdrawWasCalled(),
             "withdraw was not called on escrow imp"
         );*/
@@ -681,13 +624,12 @@ contract CollateralManagerV2_Test is Testable {
             _collateralAddress: address(wethMock)
         });
 
-
         tellerV2Mock.setBorrower(address(borrower));
 
         collateralManager._commitCollateralSuper(bidId, collateral);
 
         collateralManager.setBidsCollateralBackedGlobally(true);
-        
+
         vm.prank(address(tellerV2Mock));
         collateralManager.depositCollateral(bidId);
 
@@ -701,8 +643,7 @@ contract CollateralManagerV2_Test is Testable {
             "collateral amount is not correct"
         );
     }
- 
-   
+
     function test_isBidCollateralBacked_empty() public {
         uint256 bidId = 0;
 
@@ -831,10 +772,7 @@ contract CollateralManagerV2_Test is Testable {
             collateralArray
         );
 
-        assertTrue(
-            valid ,
-            "Check balances was not called"
-        );
+        assertTrue(valid, "Check balances was not called");
     }
 
     /*  function test_checkBalance_internal_invalid_type() public {
@@ -1130,10 +1068,6 @@ contract CollateralManagerV2_Test is Testable {
         assertTrue(valid, "check balance super not valid");
     }
 
-   
-
-  
-
     function test_commit_collateral_array() public {
         uint256 bidId = 0;
 
@@ -1241,8 +1175,6 @@ contract CollateralManagerV2_Test is Testable {
 contract User {
     constructor() {}
 
-  
-
     receive() external payable {}
 
     //receive 721
@@ -1264,7 +1196,7 @@ contract User {
         return this.onERC1155Received.selector;
     }
 }
- 
+
 contract TellerV2_Mock is TellerV2SolMock {
     address public globalBorrower;
     address public globalLender;

@@ -5,8 +5,6 @@ import "../EAS/TellerAS.sol";
 import { PaymentType, PaymentCycleType } from "../libraries/V2Calculations.sol";
 
 interface IMarketRegistry {
- 
-
     function initialize(TellerAS tellerAs) external;
 
     function isVerifiedLender(uint256 _marketId, address _lender)

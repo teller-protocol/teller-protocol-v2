@@ -29,7 +29,10 @@ contract TellerV2_Override is TellerV2 {
         bids[bidId] = bid;
     }
 
-     function mock_setCollateralManagerForBid(uint256 bidId, address collateralManager) public {
+    function mock_setCollateralManagerForBid(
+        uint256 bidId,
+        address collateralManager
+    ) public {
         collateralManagerForBid[bidId] = collateralManager;
     }
 

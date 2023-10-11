@@ -156,7 +156,7 @@ contract TellerV2 is
         _;
     }
 
-    /** Constant Variables **/ 
+    /** Constant Variables **/
 
     uint32 public constant LIQUIDATION_DELAY = 86400; //ONE DAY IN SECONDS
 
@@ -189,7 +189,7 @@ contract TellerV2 is
 
         __Pausable_init();
 
-        //no longer needed in storage 
+        //no longer needed in storage
         lenderCommitmentForwarder = address(0);
 
         require(
@@ -204,13 +204,10 @@ contract TellerV2 is
         );
         reputationManager = IReputationManager(_reputationManager);
 
-        
         _setLenderManager(_lenderManager);
         _setEscrowVault(_escrowVault);
         _setCollateralManagerV2(_collateralManagerV2);
     }
- 
-
 
     function setCollateralManagerV2(address _collateralManagerV2)
         external
@@ -219,11 +216,10 @@ contract TellerV2 is
         _setCollateralManagerV2(_collateralManagerV2);
     }
 
-
     function _setEscrowVault(address _escrowVault) internal onlyInitializing {
         require(_escrowVault.isContract(), "EscrowVault must be a contract");
         escrowVault = IEscrowVault(_escrowVault);
-    } 
+    }
 
     function _setLenderManager(address _lenderManager)
         internal
@@ -234,9 +230,8 @@ contract TellerV2 is
             "LenderManager must be a contract"
         );
         lenderManager = ILenderManager(_lenderManager);
-    } 
-    
- 
+    }
+
     function _setCollateralManagerV2(address _collateralManagerV2)
         internal
         onlyInitializing
@@ -377,9 +372,9 @@ contract TellerV2 is
         bid.loanDetails.lendingToken = IERC20(_lendingToken);
         bid.loanDetails.principal = _principal;
         bid.loanDetails.loanDuration = _duration;
-        bid.loanDetails.timestamp = uint32(block.timestamp); 
+        bid.loanDetails.timestamp = uint32(block.timestamp);
 
-        //make this new bid use the most recent version of collateral manager 
+        //make this new bid use the most recent version of collateral manager
         collateralManagerForBid[bidId] = address(collateralManagerV2);
 
         // Set payment cycle type based on market setting (custom or monthly)
@@ -1042,8 +1037,7 @@ contract TellerV2 is
         return ICollateralManager(collateralManagerForBid[_bidId]);
     }
 
-
-    //Returns the most modern implementation for the collateral manager 
+    //Returns the most modern implementation for the collateral manager
     function collateralManager() external view returns (address) {
         return address(collateralManagerV2);
     }

@@ -1,44 +1,43 @@
 pragma solidity <0.9.0;
 pragma abicoder v2;
- 
-import "../util/FoundryTest.sol"; 
+
+import "../util/FoundryTest.sol";
 import { IMarketRegistry } from "../../contracts/interfaces/IMarketRegistry.sol";
 import { ITellerV2 } from "../../contracts/interfaces/ITellerV2.sol";
 
 import { ILenderCommitmentForwarder } from "../../contracts/interfaces/ILenderCommitmentForwarder.sol";
-import {ITellerV2Storage} from "../../contracts/interfaces/ITellerV2Storage.sol";
+import { ITellerV2Storage } from "../../contracts/interfaces/ITellerV2Storage.sol";
 
-import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
-import {PaymentType,PaymentCycleType} from "../../contracts/libraries/V2Calculations.sol";
+import { PaymentType, PaymentCycleType } from "../../contracts/libraries/V2Calculations.sol";
 
-import {ITellerV2Context} from "../../contracts/interfaces/ITellerV2Context.sol";
+import { ITellerV2Context } from "../../contracts/interfaces/ITellerV2Context.sol";
 
 contract IntegrationForkSetup is Test {
     ITellerV2 internal tellerV2;
     IMarketRegistry internal marketRegistry;
     ILenderCommitmentForwarder internal commitmentForwarder;
-    
+
     address lender;
     address borrower;
 
-    address[] tokens; 
+    address[] tokens;
 
     uint256 internal marketId;
     // principal => collateral => commitmentId
     mapping(address => mapping(address => uint256)) internal commitmentsIds;
 
-    function setUp() public virtual  {
+    function setUp() public virtual {
         // NOTE: must fork the network before calling super.setUp()
         uint256 mainnetFork = vm.createSelectFork("mainnet");
 
-       // super.setUp();
+        // super.setUp();
 
         _setupTellerProtocol();
 
+        //deploy other contract here
 
-    //deploy other contract here 
-      
         _setupLender();
         _setupBorrower();
     }
@@ -49,7 +48,9 @@ contract IntegrationForkSetup is Test {
         );
         vm.label(address(tellerV2), "tellerV2");
 
-        marketRegistry = IMarketRegistry( ITellerV2Storage(address(tellerV2)).marketRegistry() );
+        marketRegistry = IMarketRegistry(
+            ITellerV2Storage(address(tellerV2)).marketRegistry()
+        );
         vm.label(address(marketRegistry), "marketRegistry");
 
         commitmentForwarder = ILenderCommitmentForwarder(
@@ -69,7 +70,7 @@ contract IntegrationForkSetup is Test {
             PaymentCycleType.Seconds, // payment cycle type
             "" // metadata
         );
-        ITellerV2Context( address ( tellerV2 ) ).setTrustedMarketForwarder(
+        ITellerV2Context(address(tellerV2)).setTrustedMarketForwarder(
             marketId,
             address(commitmentForwarder)
         );
@@ -77,7 +78,10 @@ contract IntegrationForkSetup is Test {
 
     function _setupLender() private {
         vm.startPrank(lender);
-        ITellerV2Context(address(tellerV2)).approveMarketForwarder(marketId, address(commitmentForwarder));
+        ITellerV2Context(address(tellerV2)).approveMarketForwarder(
+            marketId,
+            address(commitmentForwarder)
+        );
 
         for (uint256 i = 0; i < tokens.length; i++) {
             ERC20(tokens[i]).approve(address(tellerV2), type(uint256).max);
@@ -124,8 +128,10 @@ contract IntegrationForkSetup is Test {
 
     function _setupBorrower() private {
         vm.startPrank(borrower);
-        ITellerV2Context(address(tellerV2)).approveMarketForwarder(marketId, address(commitmentForwarder));
-
+        ITellerV2Context(address(tellerV2)).approveMarketForwarder(
+            marketId,
+            address(commitmentForwarder)
+        );
 
         for (uint256 i = 0; i < tokens.length; i++) {
             ERC20(tokens[i]).approve(address(tellerV2), type(uint256).max);

@@ -92,7 +92,7 @@ contract TellerV2_Test is Testable {
             50,
             address(marketRegistry),
             address(reputationManager),
-        //     address(lenderCommitmentForwarder),
+            //     address(lenderCommitmentForwarder),
             address(lenderManager),
             address(escrowVault),
             address(collateralManager)

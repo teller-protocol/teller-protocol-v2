@@ -1,3 +1,5 @@
+import { store } from "@graphprotocol/graph-ts";
+
 import {
   CollateralClaimed,
   CollateralCommitted,
@@ -7,9 +9,9 @@ import {
   CollateralWithdrawn
 } from "../../generated/CollateralManager/CollateralManager";
 import { TellerV2 } from "../../generated/CollateralManager/TellerV2";
-import { Bid } from "../../generated/schema";
+import { Bid, BidCollateral } from "../../generated/schema";
 import { updateCollateral } from "../collateral-manager/updaters";
-import { BidStatus, bidStatusToEnum, isBidDefaulted } from "../helpers/bid";
+import { BidStatus } from "../helpers/bid";
 import { loadBidById, loadCollateral } from "../helpers/loaders";
 import { updateBidStatus } from "../helpers/updaters";
 
@@ -108,6 +110,10 @@ export function handleCollateralWithdrawns(
 
 /**
  * Sets the bid status to `Liquidated` when the collateral is claimed from a defaulted loan.
+ * This was necessary for a small subset of loans that were liquidated before the
+ * we emitted the `LoanLiquidated` event.
+ *
+ * @deprecated CM V2 only emits CollateralWithdrawn events per collateral, so this is no longer needed.
  * @param event
  */
 export function handleCollateralClaimed(event: CollateralClaimed): void {
@@ -120,6 +126,16 @@ export function handleCollateralClaimed(event: CollateralClaimed): void {
   // without making a payment. In this case, we set the bid status to `Liquidated`.
   if (tellerV2.getBidState(bid.bidId) !== BidStatus.Repaid) {
     updateBidStatus(bid, BidStatus.Liquidated);
+  }
+
+  // Ensure the collateral status is set to `Withdrawn`
+  const bidCollaterals = changetype<BidCollateral[]>(
+    store.loadRelated("Bid", bid.id, "collateral")
+  );
+  for (let i = 0; i < bidCollaterals.length; i++) {
+    const collateral = bidCollaterals[i];
+    collateral.status = "Withdrawn";
+    collateral.save();
   }
 }
 

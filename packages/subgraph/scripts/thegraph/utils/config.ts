@@ -50,6 +50,7 @@ export interface INetworkConfig {
     lender_commitment: INetworkContractConfig;
     lender_commitment_staging: INetworkContractConfig;
     collateral_manager: INetworkContractConfig;
+    collateral_manager_v2: INetworkContractConfig;
     lender_manager: INetworkContractConfig;
     market_liquidity_rewards: INetworkContractConfig;
   };

@@ -3,6 +3,7 @@ import {
   BigInt,
   Entity,
   ethereum,
+  store,
   Value
 } from "@graphprotocol/graph-ts";
 
@@ -124,10 +125,12 @@ export function getTokenVolumesForBid(bidId: string): TokenVolume[] {
   }
 
   const volumeCount = tokenVolumes.length;
-  const collateralIds = bid.collateral;
-  if (collateralIds) {
-    for (let j = 0; j < collateralIds.length; j++) {
-      const collateral = BidCollateral.load(collateralIds[j])!;
+  const bidCollaterals = changetype<BidCollateral[]>(
+    store.loadRelated("Bid", bidId, "collateral")
+  );
+  if (bidCollaterals) {
+    for (let j = 0; j < bidCollaterals.length; j++) {
+      const collateral = bidCollaterals[j];
       const collateralToken = Token.load(collateral.token)!;
       for (let i = 0; i < volumeCount; i++) {
         const collateralTokenVolume = loadCollateralTokenVolume(

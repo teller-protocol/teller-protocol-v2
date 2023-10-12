@@ -43,6 +43,9 @@ contract CollateralManagerV2_Fork_Test is Testable, IntegrationForkSetup {
 
     //TellerV2_Mock tellerV2Mock;
 
+
+    uint256 preUpgradeBidId;
+
     event CollateralCommitted(
         uint256 _bidId,
         CollateralType _type,
@@ -112,21 +115,9 @@ contract CollateralManagerV2_Fork_Test is Testable, IntegrationForkSetup {
         );
 
 
-        //call the reinitialzier on our upgraded tellerv2 to set collateral manager v2 
+        //call the reinitializer on our upgraded tellerv2 to set collateral manager v2 
         TellerV2(address(tellerV2)).setCollateralManagerV2(address(collateralManagerV2));
-       
-
-       
-
-        address _collateralManagerV1Address = tellerV2.collateralManager();
- 
-
-
-        //perform the contract upgrade of the collateral manager.  How ? 
-         //   1) deploy the contract manager 
-        //  2) do that crazy trick where you can scratch override an address? 
-
-
+    
 
 
     }
@@ -135,12 +126,25 @@ contract CollateralManagerV2_Fork_Test is Testable, IntegrationForkSetup {
     function createPreUpgradeBidsForTests() public {
 
         //add code here !
+        
+
+        vm.prank(address(borrower));
+        preUpgradeBidId = ITellerV2(tellerV2).submitBid(
+
+        );
 
 
     } 
 
     function test_legacy_bid_can_be_accepted_after_upgrade() public {
 
+        uint256 bidId = preUpgradeBidId;
+
+        vm.prank(address(lender));
+
+        ITellerV2(tellerV2).lenderAcceptBid(bidId);
+
+        //assertions can be made  
 
     }
 

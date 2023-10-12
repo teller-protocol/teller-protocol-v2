@@ -169,11 +169,25 @@ contract CollateralManagerV2_Fork_Test is Testable, IntegrationForkSetup {
 
         uint256 bidId = preUpgradeBidId;
 
+        assertEq(
+            erc721Mock.ownerOf(0),
+            address(borrower),
+            "Borrower should own nft before lender accept"
+        );
+
         vm.prank(address(lender));
 
         ITellerV2(address(tellerV2)).lenderAcceptBid(bidId);
 
-        //repay loan full
+        assertTrue(
+            erc721Mock.ownerOf(0) != address(collateralManagerV2),
+            "collateral manager v2 should not own NFT"
+        );
+
+        assertTrue(
+            erc721Mock.ownerOf(0) != address(borrower),
+            "collateral manager v1 escrow should own NFT"
+        );
 
         vm.warp(block.timestamp + 50000);
 

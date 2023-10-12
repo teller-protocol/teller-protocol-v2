@@ -25,6 +25,7 @@ contract CollateralManagerV2_Override is CollateralManagerV2 {
     uint256 public releaseTokensInternalWasCalledForBundleId;
 
     bool public commitCollateralInternalWasCalled;
+    bool public releaseTokensWasCalled;
 
     bool bidsCollateralBackedGlobally;
     bool public checkBalanceGlobalValid = true;
@@ -133,6 +134,7 @@ contract CollateralManagerV2_Override is CollateralManagerV2 {
         uint256 _bundleId
     ) internal override returns (uint256, Collateral[] memory) {
         releaseTokensInternalWasCalledForBundleId = _bundleId;
+        releaseTokensWasCalled = true;
     }
 
     function _commitCollateral(

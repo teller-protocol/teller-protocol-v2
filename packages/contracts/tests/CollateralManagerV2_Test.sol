@@ -528,7 +528,7 @@ contract CollateralManagerV2_Test is Testable {
     }
 
     function test_withdraw_internal() public {
-        uint256 bidId = 0;
+        uint256 bidId = 4;
         address recipient = address(borrower);
 
         uint256 amount = 1000;
@@ -554,6 +554,7 @@ contract CollateralManagerV2_Test is Testable {
         vm.prank(address(tellerV2Mock));
         collateralManager.depositCollateral(bidId);
 
+        /*
         vm.expectEmit(false, false, false, false);
         emit CollateralWithdrawn(
             bidId,
@@ -562,9 +563,14 @@ contract CollateralManagerV2_Test is Testable {
             collateral._amount,
             collateral._tokenId,
             recipient
-        );
+        );*/
 
         collateralManager._withdrawSuper(bidId, recipient);
+
+        assertTrue(
+            collateralManager.releaseTokensWasCalled(),
+            "release tokens was not called"
+        );
     }
 
     function test_withdraw_internal_emptyArray() public {

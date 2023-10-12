@@ -29,6 +29,7 @@ contract IntegrationForkSetup is Test {
     mapping(address => mapping(address => uint256)) internal commitmentsIds;
 
     function setUp() public virtual {
+        //when this LOC runs, all old vm state is deleted 
         // NOTE: must fork the network before calling super.setUp()
         uint256 mainnetFork = vm.createSelectFork("mainnet");
 

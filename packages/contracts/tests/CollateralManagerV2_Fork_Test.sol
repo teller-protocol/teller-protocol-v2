@@ -40,7 +40,8 @@ contract CollateralManagerV2_Fork_Test is Testable, IntegrationForkSetup {
     //User private lender;
     address liquidator;
 
-    TestERC20Token wethMock;
+    //TestERC20Token wethMock;
+    ERC20 wethMock;
     TestERC721Token erc721Mock;
     TestERC1155Token erc1155Mock;
 
@@ -74,7 +75,14 @@ contract CollateralManagerV2_Fork_Test is Testable, IntegrationForkSetup {
         address _recipient
     );
 
+
     function setUp() public override {
+
+
+        super.setUp();//wipes out the old vm 
+
+
+
         wethMock = new TestERC20Token("wrappedETH", "WETH", 1e24, 18);
         erc721Mock = new TestERC721Token("ERC721", "ERC721");
         erc1155Mock = new TestERC1155Token("ERC1155");
@@ -83,25 +91,14 @@ contract CollateralManagerV2_Fork_Test is Testable, IntegrationForkSetup {
         lender = address(new User());
         liquidator = address(new User());
 
-        //  uint256 borrowerBalance = 50000;
-        //   payable(address(borrower)).transfer(borrowerBalance);
-
-        /*
-        tellerV2Mock = new TellerV2_Mock();
-         collateralManager = new CollateralManagerV2_Override();
-
-        collateralManager.initialize( 
-            address(tellerV2Mock)
-        );
-        */
-
-        super.setUp();
+      
+       
 
 
         createPreUpgradeBidsForTests();
 
-
-
+        //causes revert !? 
+        ERC20( wethMock ).transfer( address(lender) , 1e18  );
 
         //need to deploy our new version of TellerV2  locally 
 
@@ -131,13 +128,15 @@ contract CollateralManagerV2_Fork_Test is Testable, IntegrationForkSetup {
 
         //this works 
 
-        address lendingToken = address(wethMock);
+        address lendingToken = address(wethMock); 
         uint256 marketplaceId = 1;
         uint256 principal = 100;
         uint32 duration = 50000000;
         uint16 apr = 100;
         string memory metadataURI = "";
         address receiver = address(borrower);
+
+        console.logAddress(lendingToken);
         
 
         vm.prank(address(borrower));
@@ -154,20 +153,26 @@ contract CollateralManagerV2_Fork_Test is Testable, IntegrationForkSetup {
 
     } 
 
+    //setup is not running 
     function test_legacy_bid_can_be_accepted_after_upgrade() public {
+        
+        vm.prank(address(lender));
+        ERC20( wethMock ).approve(  address(tellerV2), 1e18   );
+ 
 
         uint256 bidId = preUpgradeBidId;
 
         vm.prank(address(lender));
 
-        ITellerV2(tellerV2).lenderAcceptBid(bidId);
-
-        //assertions can be made  
+        ITellerV2(address(tellerV2)).lenderAcceptBid(bidId);
+ 
 
     }
 
 
     function test_legacy_bid_can_be_paid_withdrawn_after_upgrade() public {
+
+
 
 
     }

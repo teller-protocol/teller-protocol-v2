@@ -553,11 +553,11 @@ contract TellerV2 is
 
         //transfer funds to borrower
         if (amountToBorrower > 0) {
-            bid.loanDetails.lendingToken.safeTransferFrom(
+           bid.loanDetails.lendingToken.safeTransferFrom(
                 sender,
                 bid.receiver,
                 amountToBorrower
-            );
+            );  
         }
 
         // Record volume filled by lenders

@@ -19,6 +19,9 @@ import "./CollateralManagerV2_Override.sol";
 
 import "./integration/IntegrationFork.sol";
 
+
+import "../contracts/interfaces/IWETH.sol";
+ 
 /*
 
 
@@ -42,6 +45,7 @@ contract CollateralManagerV2_Fork_Test is Testable, IntegrationForkSetup {
     TestERC1155Token erc1155Mock;
 
     //TellerV2_Mock tellerV2Mock;
+   
 
 
     uint256 preUpgradeBidId;
@@ -125,12 +129,26 @@ contract CollateralManagerV2_Fork_Test is Testable, IntegrationForkSetup {
 
     function createPreUpgradeBidsForTests() public {
 
-        //add code here !
+        //this works 
+
+        address lendingToken = address(wethMock);
+        uint256 marketplaceId = 1;
+        uint256 principal = 100;
+        uint32 duration = 50000000;
+        uint16 apr = 100;
+        string memory metadataURI = "";
+        address receiver = address(borrower);
         
 
         vm.prank(address(borrower));
         preUpgradeBidId = ITellerV2(tellerV2).submitBid(
-
+            lendingToken,
+            marketplaceId,
+            principal,
+            duration,
+            apr,
+            metadataURI,
+            receiver 
         );
 
 

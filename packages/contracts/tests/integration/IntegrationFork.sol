@@ -16,6 +16,7 @@ import { ITellerV2Context } from "../../contracts/interfaces/ITellerV2Context.so
 
 contract IntegrationForkSetup is Test {
     ITellerV2 internal tellerV2;
+    address collateralManagerV1;
     IMarketRegistry internal marketRegistry;
     ILenderCommitmentForwarder internal commitmentForwarder;
 
@@ -48,6 +49,8 @@ contract IntegrationForkSetup is Test {
             address(0x00182FdB0B880eE24D428e3Cc39383717677C37e)
         );
         vm.label(address(tellerV2), "tellerV2");
+
+        collateralManagerV1 =  address( ITellerV2(address(tellerV2)).collateralManager() );
 
         marketRegistry = IMarketRegistry(
             ITellerV2Storage(address(tellerV2)).marketRegistry()

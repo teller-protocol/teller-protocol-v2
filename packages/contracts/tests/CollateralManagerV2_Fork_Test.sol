@@ -35,6 +35,7 @@ get test coverage up to 80
 
 */
 contract CollateralManagerV2_Fork_Test is Testable, IntegrationForkSetup {
+   
     CollateralManagerV2_Override collateralManagerV2;
     //User private borrower;
     //User private lender;
@@ -79,7 +80,7 @@ contract CollateralManagerV2_Fork_Test is Testable, IntegrationForkSetup {
     function setUp() public override {
 
 
-        super.setUp();//wipes out the old vm 
+        super.setUp();//wipes out the old vm and forks from mainnet
 
 
 
@@ -91,16 +92,21 @@ contract CollateralManagerV2_Fork_Test is Testable, IntegrationForkSetup {
         lender = address(new User());
         liquidator = address(new User());
 
-      
        
+
+
+        
+        ERC20( wethMock ).transfer( address(borrower) , 1e18  );
+        ERC20( wethMock ).transfer( address(lender) , 1e18  );
+
 
 
         createPreUpgradeBidsForTests();
 
-        //causes revert !? 
-        ERC20( wethMock ).transfer( address(lender) , 1e18  );
 
-        //need to deploy our new version of TellerV2  locally 
+
+
+        //deploy our new version of TellerV2  locally 
 
         address metaForwarder = address(0); //for this test 
 
@@ -123,10 +129,10 @@ contract CollateralManagerV2_Fork_Test is Testable, IntegrationForkSetup {
 
     }
 
-
+    //this function is part of setup
     function createPreUpgradeBidsForTests() public {
 
-        //this works 
+       
 
         address lendingToken = address(wethMock); 
         uint256 marketplaceId = 1;
@@ -140,6 +146,19 @@ contract CollateralManagerV2_Fork_Test is Testable, IntegrationForkSetup {
         
 
         vm.prank(address(borrower));
+        ERC20( wethMock ).approve(  address(collateralManagerV1), 1e18   );
+ 
+        
+        Collateral[] memory collateral = new Collateral[](1);
+        collateral[0] =  Collateral({
+            _collateralType: CollateralType.ERC20,
+            _amount: 50,
+            _tokenId: 0,
+            _collateralAddress: address(wethMock)
+        });
+
+
+        vm.prank(address(borrower));
         preUpgradeBidId = ITellerV2(tellerV2).submitBid(
             lendingToken,
             marketplaceId,
@@ -147,7 +166,8 @@ contract CollateralManagerV2_Fork_Test is Testable, IntegrationForkSetup {
             duration,
             apr,
             metadataURI,
-            receiver 
+            receiver,
+            collateral
         );
 
 
@@ -172,7 +192,17 @@ contract CollateralManagerV2_Fork_Test is Testable, IntegrationForkSetup {
 
     function test_legacy_bid_can_be_paid_withdrawn_after_upgrade() public {
 
+        vm.prank(address(lender));
+        ERC20( wethMock ).approve(  address(tellerV2), 1e18   );
+ 
 
+        uint256 bidId = preUpgradeBidId;
+
+        vm.prank(address(lender));
+
+        ITellerV2(address(tellerV2)).lenderAcceptBid(bidId);
+
+        //repay loan full 
 
 
     }

@@ -1,17 +1,6 @@
 pragma solidity >=0.8.0 <0.9.0;
 // SPDX-License-Identifier: MIT
 
-/*
-
-1. During submitBid, the collateral will be Committed (?) using the 'collateral validator'
-
-2. During acceptBid, the collateral gets bundled into the CollateralBundler which mints an NFT (the bundle) which then gets transferred into this contract 
-
-
-This collateral manager will only accept collateral bundles. 
-
-*/
-
 // Contracts
 import "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
 
@@ -165,10 +154,8 @@ contract CollateralManagerV2 is
         } // is backed
     }
 
-    //Can also use getBundleInfo
-
     /**
-     * @notice Gets the collateral info for a given bid id.
+     * @notice Gets the committed collateral info for a given bid id.
      * @param _bidId The bidId to return the collateral info for.
      * @return infos_ The stored collateral info.
      */
@@ -318,22 +305,11 @@ contract CollateralManagerV2 is
         CollateralBundleInfo
             storage committedCollateral = _committedBidCollateral[_bidId];
 
-        /* require(
-            !collateral.collateralAddresses.contains(
-                _collateralInfo._collateralAddress
-            ),
-            "Cannot commit multiple collateral with the same address"
-        );*/
         require(
             _collateralInfo._collateralType != CollateralType.ERC721 ||
                 _collateralInfo._amount == 1,
             "ERC721 collateral must have amount of 1"
         );
-
-        /*collateral.collateralAddresses.add(_collateralInfo._collateralAddress);
-        collateral.collateralInfo[
-            _collateralInfo._collateralAddress
-        ] = _collateralInfo;*/
 
         uint256 new_count = committedCollateral.count + 1;
 

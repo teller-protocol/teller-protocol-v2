@@ -26,7 +26,6 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol"
 import "@openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol";
 import "./interfaces/ICollateralManagerV2.sol";
-//import { Collateral, CollateralType, ICollateralEscrowV1 } from "./interfaces/escrow/ICollateralEscrowV1.sol";
 import "./interfaces/ITellerV2.sol";
 import "./bundle/TokenStore.sol";
 
@@ -50,9 +49,6 @@ contract CollateralManagerV2 is
     using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
     ITellerV2 public tellerV2;
 
-    // bidIds -> collateralEscrow
-    //mapping(uint256 => address) public _escrows;
-
     // bidIds -> collateralBundleId
     mapping(uint256 => uint256) internal _collateralBundleIdForBid;
 
@@ -61,10 +57,6 @@ contract CollateralManagerV2 is
     mapping(uint256 => ICollateralBundle.CollateralBundleInfo)
         internal _committedBidCollateral;
 
-    /* Events */
-    event CollateralEscrowDeployed(uint256 _bidId, address _collateralEscrow);
-
-    //add events back !!
     event CollateralCommitted(
         uint256 _bidId,
         CollateralType _type,
@@ -173,22 +165,13 @@ contract CollateralManagerV2 is
         } // is backed
     }
 
-    /**
-     * @notice Gets the address of a deployed escrow.
-     * @notice _bidId The bidId to return the escrow for.
-     * @return The address of the escrow.
-     */
-    /* function getEscrow(uint256 _bidId) external view returns (address) {
-        return _escrows[_bidId];
-    }*/
+    //Can also use getBundleInfo
 
     /**
      * @notice Gets the collateral info for a given bid id.
      * @param _bidId The bidId to return the collateral info for.
      * @return infos_ The stored collateral info.
      */
-
-    //use getBundleInfo instead
 
     function getCollateralInfo(
         uint256 _bidId
@@ -221,7 +204,7 @@ contract CollateralManagerV2 is
     }
 
     /**
-     * @notice Withdraws deposited collateral from the created escrow of a bid that has been successfully repaid.
+     * @notice Withdraws deposited collateral of a bid that has been successfully repaid.
      * @param _bidId The id of the bid to withdraw collateral for.
      */
     function withdraw(uint256 _bidId) external {
@@ -233,7 +216,7 @@ contract CollateralManagerV2 is
     }
 
     /**
-     * @notice Withdraws deposited collateral from the created escrow of a bid that has been successfully repaid.
+     * @notice Withdraws deposited collateral of a bid that has been successfully repaid.
      * @param _bidId The id of the bid to withdraw collateral for.
      * @param _recipient The address that will receive the collateral.
      */
@@ -251,7 +234,7 @@ contract CollateralManagerV2 is
     }
 
     /**
-     * @notice Withdraws deposited collateral from the created escrow of a bid that has been CLOSED after being defaulted.
+     * @notice Withdraws deposited collateral of a bid that has been CLOSED after being defaulted.
      * @param _bidId The id of the bid to withdraw collateral for.
      */
     function lenderClaimCollateral(uint256 _bidId) external onlyTellerV2 {

@@ -76,7 +76,7 @@ contract MarketRegistryMock is IMarketRegistry_V2 {
         return "url://";
     }
 
-    function getPaymentCycle(uint256 _marketId)
+    /*function getPaymentCycle(uint256 _marketId)
         public
         view
         returns (uint32, PaymentCycleType)
@@ -98,8 +98,9 @@ contract MarketRegistryMock is IMarketRegistry_V2 {
         returns (uint32)
     {
         return 1000;
-    }
+    }*/
 
+    //the current marketplace fee if a new loan is created   NOT for existing loans in this market 
     function getMarketplaceFee(uint256 _marketId) public view returns (uint16) {
         return 1000;
     }
@@ -118,9 +119,7 @@ contract MarketRegistryMock is IMarketRegistry_V2 {
         
         returns ( address , uint16 )
     {
-
-       
-
+ 
     }
 
 
@@ -143,24 +142,66 @@ contract MarketRegistryMock is IMarketRegistry_V2 {
     }
 
 
+
+   function getBidExpirationTime(bytes32 _marketTermsId)
+        external
+        view 
+        returns (uint32){
+
+        }
+
+    function getPaymentDefaultDuration(bytes32 _marketTermsId)
+        external
+        view 
+        returns (uint32){
+            
+        }
+
+    function getPaymentType(bytes32 _marketTermsId)
+        external
+        view  
+        returns (PaymentType){
+            
+        }
+
+    function getPaymentCycleType(bytes32 _marketTermsId)
+        external
+        view 
+        returns (PaymentCycleType){
+            
+        }
+
+     function getPaymentCycleDuration(bytes32 _marketTermsId)
+        external
+        view 
+        returns (uint32){
+            
+        }
+
+
+
+
+
     function getPaymentType(uint256 _marketId)
         public
         view
         returns (PaymentType)
     {}
 
+
     function createMarket(
         address _initialOwner,
-        uint32 _paymentCycleDuration,
-        uint32 _paymentDefaultDuration,
-        uint32 _bidExpirationTime,
-        uint16 _feePercent,
+
         bool _requireLenderAttestation,
         bool _requireBorrowerAttestation,
-        PaymentType _paymentType,
-        PaymentCycleType _paymentCycleType,
-        string calldata _uri
-    ) public returns (uint256,bytes32) {}
+         
+        string calldata _uri,
+
+        MarketplaceTerms memory _marketTermsParams 
+        
+    ) external returns (uint256 marketId_, bytes32 marketTerms_){}
+
+ 
 
   
 

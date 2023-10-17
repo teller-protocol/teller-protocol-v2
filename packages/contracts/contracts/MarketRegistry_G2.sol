@@ -52,21 +52,7 @@ contract MarketRegistry_G2 is
 
        
     }
-
-
-    struct MarketplaceTerms {
-        
-        uint16 marketplaceFeePercent; // 10000 is 100%
-       
-        uint32 paymentCycleDuration; // unix time (seconds)
-        uint32 paymentDefaultDuration; //unix time
-        uint32 bidExpirationTime; //unix time
-        
-        address feeRecipient;
-        PaymentType paymentType;
-        PaymentCycleType paymentCycleType;
-    }
-
+ 
     bytes32 public __lenderAttestationSchemaId; //DEPRECATED
 
     mapping(uint256 => Marketplace) internal markets;
@@ -150,136 +136,85 @@ contract MarketRegistry_G2 is
         ); */
     }
 
+
+
+
     /**
      * @notice Creates a new market.
      * @param _initialOwner Address who will initially own the market.
-     * @param _paymentCycleDuration Length of time in seconds before a bid's next payment is required to be made.
-     * @param _paymentDefaultDuration Length of time in seconds before a loan is considered in default for non-payment.
-     * @param _bidExpirationTime Length of time in seconds before pending bids expire.
+    
      * @param _requireLenderAttestation Boolean that indicates if lenders require attestation to join market.
      * @param _requireBorrowerAttestation Boolean that indicates if borrowers require attestation to join market.
-     * @param _paymentType The payment type for loans in the market.
+  
      * @param _uri URI string to get metadata details about the market.
-     * @param _paymentCycleType The payment cycle type for loans in the market - Seconds or Monthly
+     * @param _marketTermsParams Parameters to define the market terms.
+     
      * @return marketId_ The market ID of the newly created market.
      * @return marketTerms_ The market Terms Hash of the markets terms.
      */
     function createMarket(
         address _initialOwner,
-        uint32 _paymentCycleDuration,
-        uint32 _paymentDefaultDuration,
-        uint32 _bidExpirationTime,
-        uint16 _feePercent,
+
         bool _requireLenderAttestation,
         bool _requireBorrowerAttestation,
-        PaymentType _paymentType,
-        PaymentCycleType _paymentCycleType,
-        string calldata _uri
+         
+        string calldata _uri,
+
+        MarketplaceTerms memory _marketTermsParams 
+        
     ) external returns (uint256 marketId_, bytes32 marketTerms_) {
-        (marketId_,marketTerms_) = _createMarket(
+         marketId_  = _createMarket(
             _initialOwner,
-            _paymentCycleDuration,
-            _paymentDefaultDuration,
-            _bidExpirationTime,
-            _feePercent,
+           
             _requireLenderAttestation,
             _requireBorrowerAttestation,
-            _paymentType,
-            _paymentCycleType,
+           
             _uri
         );
+
+
+        marketTerms_ = _updateMarketSettings(
+            marketId_,
+            _marketTermsParams  
+        ); 
+
     }
 
-    /**
-     * @notice Creates a new market.
-     * @dev Uses the default EMI payment type.
-     * @param _initialOwner Address who will initially own the market.
-     * @param _paymentCycleDuration Length of time in seconds before a bid's next payment is required to be made.
-     * @param _paymentDefaultDuration Length of time in seconds before a loan is considered in default for non-payment.
-     * @param _bidExpirationTime Length of time in seconds before pending bids expire.
-     * @param _requireLenderAttestation Boolean that indicates if lenders require attestation to join market.
-     * @param _requireBorrowerAttestation Boolean that indicates if borrowers require attestation to join market.
-     * @param _uri URI string to get metadata details about the market.
-     * @return marketId_ The market ID of the newly created market.
-     */
-    /*function createMarket(
-        address _initialOwner,
-        uint32 _paymentCycleDuration,
-        uint32 _paymentDefaultDuration,
-        uint32 _bidExpirationTime,
-        uint16 _feePercent,
-        bool _requireLenderAttestation,
-        bool _requireBorrowerAttestation,
-        string calldata _uri
-    ) external returns (uint256 marketId_) {
-        marketId_ = _createMarket(
-            _initialOwner,
-            _paymentCycleDuration,
-            _paymentDefaultDuration,
-            _bidExpirationTime,
-            _feePercent,
-            _requireLenderAttestation,
-            _requireBorrowerAttestation,
-            PaymentType.EMI,
-            PaymentCycleType.Seconds,
-            _uri
-        );
-    }*/
-
+   
     /**
      * @notice Creates a new market.
      * @param _initialOwner Address who will initially own the market.
-     * @param _paymentCycleDuration Length of time in seconds before a bid's next payment is required to be made.
-     * @param _paymentDefaultDuration Length of time in seconds before a loan is considered in default for non-payment.
-     * @param _bidExpirationTime Length of time in seconds before pending bids expire.
+    
      * @param _requireLenderAttestation Boolean that indicates if lenders require attestation to join market.
      * @param _requireBorrowerAttestation Boolean that indicates if borrowers require attestation to join market.
-     * @param _paymentType The payment type for loans in the market.
-     * @param _uri URI string to get metadata details about the market.
-     * @param _paymentCycleType The payment cycle type for loans in the market - Seconds or Monthly
+    
+     * @param _uri URI string to get metadata details about the market. 
      * @return marketId_ The market ID of the newly created market.
      */
     function _createMarket(
         address _initialOwner,
-        uint32 _paymentCycleDuration,
-        uint32 _paymentDefaultDuration,
-        uint32 _bidExpirationTime,
-        uint16 _feePercent,
+        
         bool _requireLenderAttestation,
         bool _requireBorrowerAttestation,
-        PaymentType _paymentType,
-        PaymentCycleType _paymentCycleType,
+         
         string calldata _uri
-    ) internal returns (uint256 marketId_, bytes32 marketTerms_) {
+    ) internal returns (uint256 marketId_ ) {
         require(_initialOwner != address(0), "Invalid owner address");
         // Increment market ID counter
         marketId_ = ++marketCount;
 
-        // Set the market owner
+        // Set the market owner 
         markets[marketId_].owner = _initialOwner;
         markets[marketId_].metadataURI = _uri;
-
         markets[marketId_].borrowerAttestationRequired = _requireBorrowerAttestation;
         markets[marketId_].lenderAttestationRequired = _requireLenderAttestation;
        
-        address feeRecipient = _initialOwner; 
-
-        // Initialize market settings
-        marketTerms_ = _updateMarketSettings(
-            marketId_,
-            _paymentCycleDuration,
-            _paymentType,
-            _paymentCycleType,
-            _paymentDefaultDuration,
-            _bidExpirationTime,
-            _feePercent,
-            
-            feeRecipient
-        ); 
+    
 
 
         emit MarketCreated(_initialOwner, marketId_);
     }
+ 
 
     /**
      * @notice Closes a market so new bids cannot be added.
@@ -340,27 +275,19 @@ contract MarketRegistry_G2 is
     }
 
     /**
-     * @notice Updates multiple market settings for a given market.
+     * @notice Updates multiple market settings for a given market. Does not affect existing bids only new ones created after.
      * @param _marketId The ID of a market.
-     * @param _paymentCycleDuration Delinquency duration for new loans
-     * @param _newPaymentType The payment type for the market.
-     * @param _paymentCycleType The payment cycle type for loans in the market - Seconds or Monthly
-     * @param _paymentDefaultDuration Default duration for new loans
-     * @param _bidExpirationTime Duration of time before a bid is considered out of date 
+     
+     * @param _marketTermsParams The new parameters to use for the market terms 
      *
      * Requirements:
      * - The caller must be the current owner.
      */
     function updateMarketSettings(
-        uint256 _marketId,
-        uint32 _paymentCycleDuration,
-        PaymentType _newPaymentType,
-        PaymentCycleType _paymentCycleType,
-        uint32 _paymentDefaultDuration,
-        uint32 _bidExpirationTime,
-        uint16 _feePercent,
-      
-        address _feeRecipient
+        uint256 _marketId, 
+
+        MarketplaceTerms memory _marketTermsParams   
+        
     ) public ownsMarket(_marketId) 
       returns (bytes32 marketTermsId_ ) 
     {
@@ -369,44 +296,31 @@ contract MarketRegistry_G2 is
 
         return _updateMarketSettings( 
             _marketId, 
-            _paymentCycleDuration,
-            _newPaymentType,
-            _paymentCycleType,
-            _paymentDefaultDuration,
-            _bidExpirationTime,
-            _feePercent,
-           
-            _feeRecipient
+            _marketTermsParams
+            
          );
       
        
        
     }
 
-       function _updateMarketSettings(
+    function _updateMarketSettings(
         uint256 _marketId,
-        uint32 _paymentCycleDuration,
-        PaymentType _newPaymentType,
-        PaymentCycleType _paymentCycleType,
-        uint32 _paymentDefaultDuration,
-        uint32 _bidExpirationTime,
-        uint16 _feePercent,
-        
-        address _feeRecipient
+
+        MarketplaceTerms memory _marketTermsParams 
+      
     ) internal returns (bytes32 marketTermsId_ ) {
 
  
 
-        marketTermsId_ = _defineNewMarketTermsRevision( 
-           
-            _paymentCycleDuration,
-            _newPaymentType,
-            _paymentCycleType,
-            _paymentDefaultDuration,
-            _bidExpirationTime,
-            _feePercent,
-        
-            _feeRecipient
+        marketTermsId_ = _defineNewMarketTermsRevision(  
+            _marketTermsParams.paymentCycleDuration,
+            _marketTermsParams.paymentType,
+            _marketTermsParams.paymentCycleType,
+            _marketTermsParams.paymentDefaultDuration,
+            _marketTermsParams.bidExpirationTime,
+            _marketTermsParams.marketplaceFeePercent, 
+            _marketTermsParams.feeRecipient
          );
         emit DefineMarketTerms( marketTermsId_  );
 
@@ -574,6 +488,7 @@ contract MarketRegistry_G2 is
      
      /**
      * @notice Gets the current marketplace fee of a market. This is a carryover to support legacy contracts
+     * @dev  This is current marketplace fee if a NEW LOAN is created   NOT the fee for any legacy loans in this market 
      * @param _marketId The ID of a market.
      * @return URI of a market's metadata.
      */
@@ -645,10 +560,28 @@ contract MarketRegistry_G2 is
     function getPaymentType(bytes32 _marketTermsId)
         public
         view
-        //override
+       
         returns (PaymentType)
     {
          return marketTerms[_marketTermsId].paymentType;
+    }
+
+    function getPaymentCycleType(bytes32 _marketTermsId)
+        public
+        view
+     
+        returns (PaymentCycleType)
+    {
+         return marketTerms[_marketTermsId].paymentCycleType;
+    }
+
+    function getPaymentCycleDuration(bytes32 _marketTermsId)
+        public
+        view
+        
+        returns (uint32)
+    {
+         return marketTerms[_marketTermsId].paymentCycleDuration;
     }
 
     /**

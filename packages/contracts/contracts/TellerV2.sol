@@ -352,15 +352,16 @@ contract TellerV2 is
         string calldata _metadataURI,
         address _receiver
     ) internal virtual returns (uint256 bidId_) {
-        address sender = _msgSenderForMarket(_marketplaceId);
+       address sender = _msgSenderForMarket(_marketplaceId);
 
-       
+       {
         (bool isVerified, ) = marketRegistry.isVerifiedBorrower(
             _marketplaceId, 
             sender
         );
 
         require(isVerified, "Not verified borrower");
+        }
 
         require(
             marketRegistry.isMarketOpen(_marketplaceId),
@@ -391,8 +392,8 @@ contract TellerV2 is
         (uint32 paymentCycleDuration, 
         PaymentCycleType paymentCycleType,
         PaymentType paymentType, 
-        uint32 defaultDuration,
-        uint32 expirationTime        
+          ,
+                 
         ) = marketRegistry.getMarketTermsForLending(bidMarketTermsId[bidId]);
 
         //use these in MEMORY 
@@ -558,7 +559,7 @@ contract TellerV2 is
             collateralManagerV2.depositCollateral(_bidId);
         }
 
-        (address marketFeeRecipient, uint32 marketFee) = marketRegistry.getMarketplaceFeeTerms( bidTermsId );
+        (address marketFeeRecipient, uint16 marketFee) = marketRegistry.getMarketplaceFeeTerms( bidTermsId );
 
         // Transfer funds to borrower from the lender
         amountToProtocol = bid.loanDetails.principal.percent(protocolFee());
@@ -648,7 +649,8 @@ contract TellerV2 is
         ) = V2Calculations.calculateAmountOwed(
                 bids[_bidId],
                 block.timestamp,
-                _getBidPaymentCycleType(_bidId)
+                _getBidPaymentCycleType(_bidId),
+                _getBidPaymentCycleDuration(_bidId)
             );
         _repayLoan(
             _bidId,
@@ -705,7 +707,8 @@ contract TellerV2 is
             .calculateAmountOwed(
                 bids[_bidId],
                 block.timestamp,
-                _getBidPaymentCycleType(_bidId)
+                _getBidPaymentCycleType(_bidId),
+                _getBidPaymentCycleDuration(_bidId)
             );
         _repayLoan(
             _bidId,
@@ -727,7 +730,8 @@ contract TellerV2 is
         ) = V2Calculations.calculateAmountOwed(
                 bids[_bidId],
                 block.timestamp,
-                _getBidPaymentCycleType(_bidId)
+                _getBidPaymentCycleType(_bidId),
+                _getBidPaymentCycleDuration(_bidId)
             );
         uint256 minimumOwed = duePrincipal + interest;
 
@@ -941,7 +945,12 @@ contract TellerV2 is
         ) return owed;
 
         (uint256 owedPrincipal, , uint256 interest) = V2Calculations
-            .calculateAmountOwed(bid, _timestamp, _getBidPaymentCycleType(_bidId));
+            .calculateAmountOwed(
+                bid, 
+                _timestamp, 
+                _getBidPaymentCycleType(_bidId),
+                _getBidPaymentCycleDuration(_bidId)
+             );
         owed.principal = owedPrincipal;
         owed.interest = interest;
     }
@@ -963,7 +972,12 @@ contract TellerV2 is
         ) return due;
 
         (, uint256 duePrincipal, uint256 interest) = V2Calculations
-            .calculateAmountOwed(bid, _timestamp, _getBidPaymentCycleType(_bidId));
+            .calculateAmountOwed(
+             bid, 
+            _timestamp, 
+            _getBidPaymentCycleType(_bidId),
+            _getBidPaymentCycleDuration(_bidId)
+            );
         due.principal = duePrincipal;
         due.interest = interest;
     }
@@ -1134,9 +1148,8 @@ contract TellerV2 is
 
     function _getBidDefaultDuration(uint256 _bidId) internal view returns(uint32){
         bytes32 bidTermsId = bidMarketTermsId[bidId]; 
-        if (bidTermsId != bytes32(0)){
-
-            return marketRegistry.getBidDefaultDuration(bidTermsId);
+        if (bidTermsId != bytes32(0)){ 
+            return marketRegistry.getPaymentDefaultDuration(bidTermsId);
         }
 
         return bidDefaultDuration[_bidId];

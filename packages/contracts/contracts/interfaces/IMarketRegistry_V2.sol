@@ -8,6 +8,20 @@ interface IMarketRegistry_V2 is IMarketRegistry {
     
 
    
+    struct MarketplaceTerms {
+        
+        uint16 marketplaceFeePercent; // 10000 is 100%
+
+        PaymentType paymentType;
+        PaymentCycleType paymentCycleType;
+        uint32 paymentCycleDuration; // unix time (seconds)
+        uint32 paymentDefaultDuration; //unix time
+        uint32 bidExpirationTime; //unix time
+        
+        address feeRecipient;
+       
+    }
+
 
      
     function getMarketURI(uint256 _marketId)
@@ -27,50 +41,47 @@ interface IMarketRegistry_V2 is IMarketRegistry {
         
         returns ( address , uint16 ) ;
 
-
-   /* function getMarketFeeRecipient(uint256 _marketId)
+    function getBidExpirationTime(bytes32 _marketTermsId)
         external
-        view
-        returns (address);*/
+        view 
+        returns (uint32);
 
-    
-
-    /*function getPaymentCycle(uint256 _marketId)
+    function getPaymentDefaultDuration(bytes32 _marketTermsId)
         external
-        view
-        returns (uint32, PaymentCycleType);*/
+        view 
+        returns (uint32);
 
-    /*function getPaymentDefaultDuration(uint256 _marketId)
+    function getPaymentType(bytes32 _marketTermsId)
         external
-        view
-        returns (uint32);*/
+        view  
+        returns (PaymentType);
 
-    /*function getBidExpirationTime(uint256 _marketId)
+    function getPaymentCycleType(bytes32 _marketTermsId)
         external
-        view
-        returns (uint32);*/
+        view 
+        returns (PaymentCycleType);
 
-    
-    /*function getPaymentType(uint256 _marketId)
+     function getPaymentCycleDuration(bytes32 _marketTermsId)
         external
-        view
-        returns (PaymentType);*/
+        view 
+        returns (uint32);
 
+ 
+ 
    
-
-     function createMarket(
+ 
+    function createMarket(
         address _initialOwner,
-        uint32 _paymentCycleDuration,
-        uint32 _paymentDefaultDuration,
-        uint32 _bidExpirationTime,
-        uint16 _feePercent,
+
         bool _requireLenderAttestation,
         bool _requireBorrowerAttestation,
-        PaymentType _paymentType,
-        PaymentCycleType _paymentCycleType,
-        string calldata _uri
-    ) external returns (uint256 marketId_,
-     bytes32 marketTerms_);
+         
+        string calldata _uri,
+
+        MarketplaceTerms memory _marketTermsParams 
+        
+    ) external returns (uint256 marketId_, bytes32 marketTerms_);
+
      
  
     function closeMarket(uint256 _marketId) external;

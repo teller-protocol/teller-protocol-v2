@@ -22,7 +22,7 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
     
     
     function setMarketRegistry(address _marketRegistry) public {
-        marketRegistry = IMarketRegistry(_marketRegistry);
+        marketRegistry = IMarketRegistry_V2(_marketRegistry);
     }
 
     function getMarketRegistry() external view returns (IMarketRegistry) {
@@ -53,8 +53,8 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
         bid.loanDetails.loanDuration = _duration;
         bid.loanDetails.timestamp = uint32(block.timestamp);
 
-        (bid.terms.paymentCycle, bidPaymentCycleType[bidId]) = marketRegistry
-            .getPaymentCycle(_marketId);
+        /*(bid.terms.paymentCycle, bidPaymentCycleType[bidId]) = marketRegistry
+            .getPaymentCycle(_marketId);*/
 
         bid.terms.APR = _APR;
 
@@ -91,7 +91,8 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
             .calculateAmountOwed(
                 bids[_bidId],
                 block.timestamp,
-                bidPaymentCycleType[_bidId]
+                _getBidPaymentCycleType(_bidId),
+                _getBidPaymentCycleDuration(_bidId)
             );
 
         uint256 _amount = owedPrincipal + interest;
@@ -128,7 +129,8 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
             .calculateAmountOwed(
                 bids[_bidId],
                 _timestamp,
-                bidPaymentCycleType[_bidId]
+                _getBidPaymentCycleType(_bidId),
+                _getBidPaymentCycleDuration(_bidId)
             );
         due.principal = duePrincipal;
         due.interest = interest;
@@ -145,7 +147,8 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
             .calculateAmountOwed(
                 bids[_bidId],
                 _timestamp,
-                bidPaymentCycleType[_bidId]
+                _getBidPaymentCycleType(_bidId),
+                _getBidPaymentCycleDuration(_bidId)
             );
         due.principal = owedPrincipal;
         due.interest = interest;
@@ -316,5 +319,29 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
 
     function setLastRepaidTimestamp(uint256 _bidId, uint32 _timestamp) public {
         bids[_bidId].loanDetails.lastRepaidTimestamp = _timestamp;
+    }
+
+    function _getBidPaymentCycleType(uint256 _bidId) internal view returns(PaymentCycleType){
+        
+        bytes32 bidTermsId = bidMarketTermsId[bidId]; 
+        if (bidTermsId != bytes32(0)){
+
+            return marketRegistry.getPaymentCycleType(bidTermsId);
+        }
+
+        return bidPaymentCycleType[_bidId];
+    }
+
+    function _getBidPaymentCycleDuration(uint256 _bidId) internal view returns(uint32){
+      
+        bytes32 bidTermsId = bidMarketTermsId[bidId]; 
+        if (bidTermsId != bytes32(0)){
+
+            return marketRegistry.getPaymentCycleDuration(bidTermsId);
+        }
+        
+        Bid storage bid = bids[_bidId];
+
+        return bid.terms.paymentCycle ; 
     }
 }

@@ -11,13 +11,15 @@ import "@openzeppelin/contracts/utils/Context.sol";
 
 // Interfaces
 import "./interfaces/IMarketRegistry.sol";
+import "./interfaces/IMarketRegistry_V1.sol";
 
 // Libraries
 import { EnumerableSet } from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import { PaymentType } from "./libraries/V2Calculations.sol";
 
-contract MarketRegistry is
+contract MarketRegistry_G1 is
     IMarketRegistry,
+    IMarketRegistry_V1,
     Initializable,
     Context,
     TellerASResolver

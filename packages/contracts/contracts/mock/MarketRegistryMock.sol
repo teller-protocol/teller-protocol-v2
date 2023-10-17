@@ -2,10 +2,10 @@ pragma solidity ^0.8.0;
 
 // SPDX-License-Identifier: MIT
 
-import "../interfaces/IMarketRegistry.sol";
+import "../interfaces/IMarketRegistry_V2.sol";
 import { PaymentType } from "../libraries/V2Calculations.sol";
 
-contract MarketRegistryMock is IMarketRegistry {
+contract MarketRegistryMock is IMarketRegistry_V2 {
     //address marketOwner;
 
     address public globalMarketOwner;
@@ -17,7 +17,7 @@ contract MarketRegistryMock is IMarketRegistry {
 
     constructor() {}
 
-    function initialize(TellerAS _tellerAS) external {}
+   // function initialize(TellerAS _tellerAS) external {}
 
     function isVerifiedLender(uint256 _marketId, address _lenderAddress)
         public

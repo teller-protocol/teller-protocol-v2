@@ -11,13 +11,15 @@ import "@openzeppelin/contracts/utils/Context.sol";
 
 // Interfaces
 import "./interfaces/IMarketRegistry.sol";
+import "./interfaces/IMarketRegistry_V2.sol";
 
 // Libraries
 import { EnumerableSet } from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import { PaymentType } from "./libraries/V2Calculations.sol";
 
-contract MarketRegistry is
+contract MarketRegistry_G2 is
     IMarketRegistry,
+    IMarketRegistry_V2,
     Initializable,
     Context 
 {
@@ -37,13 +39,13 @@ contract MarketRegistry is
         uint16 marketplaceFeePercent;   //DEPRECATED
         bool lenderAttestationRequired;  
         EnumerableSet.AddressSet verifiedLendersForMarket;
-        mapping(address => bytes32) lenderAttestationIds;
+        mapping(address => bytes32) _lenderAttestationIds; //DEPRECATED
         uint32 paymentCycleDuration;   //DEPRECATED
         uint32 paymentDefaultDuration; //DEPRECATED
         uint32 bidExpirationTime;  //DEPRECATED
         bool borrowerAttestationRequired; 
         EnumerableSet.AddressSet verifiedBorrowersForMarket;
-        mapping(address => bytes32) borrowerAttestationIds;
+        mapping(address => bytes32) _borrowerAttestationIds; //DEPRECATED
         address feeRecipient;   //DEPRECATED
         PaymentType paymentType;  //DEPRECATED 
         PaymentCycleType paymentCycleType;  //DEPRECATED 
@@ -65,7 +67,7 @@ contract MarketRegistry is
         PaymentCycleType paymentCycleType;
     }
 
-    bytes32 public lenderAttestationSchemaId;
+    bytes32 public __lenderAttestationSchemaId; //DEPRECATED
 
     mapping(uint256 => Marketplace) internal markets;
     mapping(bytes32 => uint256) internal __uriToId; //DEPRECATED
@@ -76,19 +78,18 @@ contract MarketRegistry is
     uint256 public version;
 
     mapping(uint256 => bool) private marketIsClosed;
-
-    //TellerAS public tellerAS;
-
-            //How many storage slots was this !? 
-
-
-
+ 
 
     //uint256 marketTermsCount; //  use a hash here instead of uint256 
     mapping(bytes32 => MarketplaceTerms) public marketTerms; 
 
     //market id => market terms.  Used when a new bid is created. If this is blank for a market, new bids cant be created for that market. 
     mapping(uint256 => bytes32) public currentMarketTermsForMarket; 
+
+
+
+    //TellerAS public tellerAS;  //this took 7 storage slots   
+    uint256[7] private __teller_as_gap;
 
   
 
@@ -99,11 +100,11 @@ contract MarketRegistry is
         _;
     }
 
-    modifier withAttestingSchema(bytes32 schemaId) {
+  /*  modifier withAttestingSchema(bytes32 schemaId) {
         _attestingSchemaId = schemaId;
         _;
         _attestingSchemaId = bytes32(0);
-    }
+    }*/
 
     /* Events */
 
@@ -344,8 +345,7 @@ contract MarketRegistry is
      * @param _newPaymentType The payment type for the market.
      * @param _paymentCycleType The payment cycle type for loans in the market - Seconds or Monthly
      * @param _paymentDefaultDuration Default duration for new loans
-     * @param _bidExpirationTime Duration of time before a bid is considered out of date
-     * @param _metadataURI A URI that points to a market's metadata.
+     * @param _bidExpirationTime Duration of time before a bid is considered out of date 
      *
      * Requirements:
      * - The caller must be the current owner.
@@ -568,10 +568,29 @@ contract MarketRegistry is
         return markets[_marketId].metadataURI;
     }
 
+     
+     /**
+     * @notice Gets the current marketplace fee of a market. This is a carryover to support legacy contracts
+     * @param _marketId The ID of a market.
+     * @return URI of a market's metadata.
+     */
+    function getMarketplaceFee(uint256 _marketId)
+        external
+        view
+        returns (uint16)
+    {
+        uint256 _marketTermsId = currentMarketTermsForMarket[_marketId];
+        return marketTerms[_marketTermsId].marketFee ; 
+    
+    }
+
+
+
+
     function getMarketplaceFeeTerms(bytes32 _marketTermsId) public
         view
         
-        returns ( address , uint32 )
+        returns ( address , uint16 )
     {
 
         return (
@@ -603,7 +622,7 @@ contract MarketRegistry is
 
     /**
      * @notice Gets the loan default duration of a market.
-     * @param _marketId The ID of a market.
+     * @param _marketTermsId The ID of the market terms.
      * @return Duration of a loan repayment interval until it is default.
      */
     function getPaymentDefaultDuration(bytes32 _marketTermsId)
@@ -617,22 +636,27 @@ contract MarketRegistry is
 
     /**
      * @notice Get the payment type of a market.
-     * @param _marketId the ID of the market.
+     * @param _marketTermsId the ID of the market terms.
      * @return The type of payment for loans in the market.
      */
     function getPaymentType(bytes32 _marketTermsId)
         public
         view
-        override
+        //override
         returns (PaymentType)
     {
          return marketTerms[_marketTermsId].bidExpirationTime;
     }
 
+    /**
+     * @notice Gets the loan default duration of a market.
+     * @param _marketTermsId The ID of the market terms.
+     * @return Expiration of a loan bid submission until it is no longer acceptable.
+     */
     function getBidExpirationTime(bytes32 _marketTermsId)
         public
         view
-        override
+        //override
         returns (uint32)
     {
         return marketTerms[_marketTermsId].bidExpirationTime;
@@ -648,19 +672,22 @@ contract MarketRegistry is
      * @param _marketId The ID of a market.
      * @param _lenderAddress Address to check.
      * @return isVerified_ Boolean indicating if a lender has been added to a market.
-     * @return uuid_ Bytes32 representing the UUID of the lender.
+     
      */
     function isVerifiedLender(uint256 _marketId, address _lenderAddress)
         public
         view
         override
-        returns (bool isVerified_, bytes32 uuid_)
+        returns (
+            bool isVerified_
+          //  , bytes32 uuid_
+            )
     {
         return
             _isVerified(
                 _lenderAddress,
                 markets[_marketId].lenderAttestationRequired,
-                markets[_marketId].lenderAttestationIds,
+                //markets[_marketId].lenderAttestationIds,
                 markets[_marketId].verifiedLendersForMarket
             );
     }
@@ -670,19 +697,22 @@ contract MarketRegistry is
      * @param _marketId The ID of a market.
      * @param _borrowerAddress Address of the borrower to check.
      * @return isVerified_ Boolean indicating if a borrower has been added to a market.
-     * @return uuid_ Bytes32 representing the UUID of the borrower.
+     
      */
     function isVerifiedBorrower(uint256 _marketId, address _borrowerAddress)
         public
         view
         override
-        returns (bool isVerified_, bytes32 uuid_)
+        returns (
+            bool isVerified_
+           // , bytes32 uuid_
+            )
     {
         return
             _isVerified(
                 _borrowerAddress,
                 markets[_marketId].borrowerAttestationRequired,
-                markets[_marketId].borrowerAttestationIds,
+                //markets[_marketId].borrowerAttestationIds,
                 markets[_marketId].verifiedBorrowersForMarket
             );
     }
@@ -722,16 +752,7 @@ contract MarketRegistry is
         return _getStakeholdersForMarket(set, _page, _perPage);
     }
 
-    /**
-     * @notice Sets multiple market settings for a given market.
-     * @param _marketId The ID of a market.
-     * @param _paymentCycleDuration Delinquency duration for new loans
-     * @param _newPaymentType The payment type for the market.
-     * @param _paymentCycleType The payment cycle type for loans in the market - Seconds or Monthly
-     * @param _paymentDefaultDuration Default duration for new loans
-     * @param _bidExpirationTime Duration of time before a bid is considered out of date
-     * @param _metadataURI A URI that points to a market's metadata.
-     */
+    
    /* function _setMarketSettings(
         uint256 _marketId,
         uint32 _paymentCycleDuration,
@@ -835,28 +856,7 @@ contract MarketRegistry is
         _attestStakeholder(_marketId, _lenderAddress, _expirationTime, true);
     }
 
-    /**
-     * @notice Adds a lender to a market via delegated attestation.
-     * @dev See {_attestStakeholderViaDelegation}.
-     */
-    function attestLender(
-        uint256 _marketId,
-        address _lenderAddress,
-        uint256 _expirationTime,
-        uint8 _v,
-        bytes32 _r,
-        bytes32 _s
-    ) external {
-        _attestStakeholderViaDelegation(
-            _marketId,
-            _lenderAddress,
-            _expirationTime,
-            true,
-            _v,
-            _r,
-            _s
-        );
-    }
+   
 
     /**
      * @notice Removes a lender from an market.
@@ -865,27 +865,7 @@ contract MarketRegistry is
     function revokeLender(uint256 _marketId, address _lenderAddress) external {
         _revokeStakeholder(_marketId, _lenderAddress, true);
     }
-
-    /**
-     * @notice Removes a borrower from a market via delegated revocation.
-     * @dev See {_revokeStakeholderViaDelegation}.
-     */
-    function revokeLender(
-        uint256 _marketId,
-        address _lenderAddress,
-        uint8 _v,
-        bytes32 _r,
-        bytes32 _s
-    ) external {
-        _revokeStakeholderViaDelegation(
-            _marketId,
-            _lenderAddress,
-            true,
-            _v,
-            _r,
-            _s
-        );
-    }
+ 
 
     /**
      * @notice Allows a lender to voluntarily leave a market.
@@ -912,29 +892,7 @@ contract MarketRegistry is
     ) external {
         _attestStakeholder(_marketId, _borrowerAddress, _expirationTime, false);
     }
-
-    /**
-     * @notice Adds a borrower to a market via delegated attestation.
-     * @dev See {_attestStakeholderViaDelegation}.
-     */
-    /*function attestBorrower(
-        uint256 _marketId,
-        address _borrowerAddress,
-        uint256 _expirationTime,
-        uint8 _v,
-        bytes32 _r,
-        bytes32 _s
-    ) external {
-        _attestStakeholderVerification(
-            _marketId,
-            _borrowerAddress,
-            _expirationTime,
-            false,
-            _v,
-            _r,
-            _s
-        );
-    }*/
+ 
 
     /**
      * @notice Removes a borrower from an market.
@@ -945,28 +903,7 @@ contract MarketRegistry is
     {
         _revokeStakeholder(_marketId, _borrowerAddress, false);
     }
-
-    /**
-     * @notice Removes a borrower from a market via delegated revocation.
-     * @dev See {_revokeStakeholderViaDelegation}.
-     */
-  /*  function revokeBorrower(
-        uint256 _marketId,
-        address _borrowerAddress,
-        uint8 _v,
-        bytes32 _r,
-        bytes32 _s
-    ) external {
-        _revokeStakeholderViaDelegation(
-            _marketId,
-            _borrowerAddress,
-            false,
-            _v,
-            _r,
-            _s
-        );
-    }*/
-
+ 
     /**
      * @notice Allows a borrower to voluntarily leave a market.
      * @param _marketId The market ID to leave.
@@ -991,11 +928,11 @@ contract MarketRegistry is
      * @param attestor Market owner's address who signed the attestation.
      * @return Boolean indicating the attestation was successful.
      */
-    function resolve(
+  /*  function resolve(
         address recipient,
         bytes calldata schema,
         bytes calldata data,
-        uint256 /* expirationTime */,
+        uint256 , // uint256  expirationTime  ,
         address attestor
     ) external payable override returns (bool) {
         bytes32 attestationSchemaId = keccak256(
@@ -1010,7 +947,7 @@ contract MarketRegistry is
                 recipient == lenderAddress &&
                 attestor == _getMarketOwner(marketId)) ||
             attestor == address(this);
-    }
+    }*/
 
 
 
@@ -1061,9 +998,9 @@ contract MarketRegistry is
     )
         internal
         virtual
-        withAttestingSchema(
+       /* withAttestingSchema(
             _isLender ? lenderAttestationSchemaId : borrowerAttestationSchemaId
-        )
+        )*/
     {
         require(
             _msgSender() == _getMarketOwner(_marketId),
@@ -1081,22 +1018,11 @@ contract MarketRegistry is
         _attestStakeholderVerification(
             _marketId,
             _stakeholderAddress,
-            uuid,
+           // uuid,
             _isLender
         );
     } 
-
-    /**
-     * @notice Adds a stakeholder (lender or borrower) to a market via delegated attestation.
-     * @dev The signature must match that of the market owner.
-     * @param _marketId The market ID to add a lender to.
-     * @param _stakeholderAddress The address of the lender to add to the market.
-     * @param _expirationTime The expiration time of the attestation.
-     * @param _isLender Boolean indicating if the stakeholder is a lender. Otherwise it is a borrower.
-     * @param _v Signature value
-     * @param _r Signature value
-     * @param _s Signature value
-     */
+ 
   /*  function _attestStakeholderViaDelegation(
         uint256 _marketId,
         address _stakeholderAddress,
@@ -1142,20 +1068,20 @@ contract MarketRegistry is
      * @notice Adds a stakeholder (borrower/lender) to a market.
      * @param _marketId The market ID to add a stakeholder to.
      * @param _stakeholderAddress The address of the stakeholder to add to the market.
-     * @param _uuid The UUID of the attestation created.
+    
      * @param _isLender Boolean indicating if the stakeholder is a lender. Otherwise it is a borrower.
      */
     function _attestStakeholderVerification(
         uint256 _marketId,
         address _stakeholderAddress,
-        bytes32 _uuid,
+      //  bytes32 _uuid,
         bool _isLender
     ) internal virtual {
         if (_isLender) {
             // Store the lender attestation ID for the market ID
-            markets[_marketId].lenderAttestationIds[
+           /* markets[_marketId].lenderAttestationIds[
                 _stakeholderAddress
-            ] = _uuid;
+            ] = _uuid;*/
             // Add lender address to market set
             markets[_marketId].verifiedLendersForMarket.add(
                 _stakeholderAddress
@@ -1164,9 +1090,9 @@ contract MarketRegistry is
             emit LenderAttestation(_marketId, _stakeholderAddress);
         } else {
             // Store the lender attestation ID for the market ID
-            markets[_marketId].borrowerAttestationIds[
+         /*   markets[_marketId].borrowerAttestationIds[
                 _stakeholderAddress
-            ] = _uuid;
+            ] = _uuid;*/
             // Add lender address to market set
             markets[_marketId].verifiedBorrowersForMarket.add(
                 _stakeholderAddress
@@ -1268,21 +1194,21 @@ contract MarketRegistry is
      * @notice Checks if a stakeholder has been attested and added to a market.
      * @param _stakeholderAddress Address of the stakeholder to check.
      * @param _attestationRequired Stored boolean indicating if attestation is required for the stakeholder class.
-     * @param _stakeholderAttestationIds Mapping of attested Ids for the stakeholder class.
+     
      */
     function _isVerified(
         address _stakeholderAddress,
         bool _attestationRequired,
-        mapping(address => bytes32) storage _stakeholderAttestationIds,
+        //mapping(address => bytes32) storage _stakeholderAttestationIds,
         EnumerableSet.AddressSet storage _verifiedStakeholderForMarket
-    ) internal view virtual returns (bool isVerified_, bytes32 uuid_) {
+    ) internal view virtual returns ( bool isVerified_ ) {
         if (_attestationRequired) {
             isVerified_ =
                 _verifiedStakeholderForMarket.contains(_stakeholderAddress); /*&&
                 tellerAS.isAttestationActive(
                     _stakeholderAttestationIds[_stakeholderAddress]
                 );*/
-            uuid_ = _stakeholderAttestationIds[_stakeholderAddress];
+           // uuid_ = _stakeholderAttestationIds[_stakeholderAddress];
         } else {
             isVerified_ = true;
         }

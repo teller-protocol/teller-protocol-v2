@@ -7,10 +7,7 @@ import { PaymentType, PaymentCycleType } from "../libraries/V2Calculations.sol";
 interface IMarketRegistry_V2 is IMarketRegistry {
     
 
-    function isVerifiedLender(uint256 _marketId, address _lender)
-        external
-        view
-        returns (bool);
+   
 
     function isMarketOpen(uint256 _marketId) external view returns (bool);
 
@@ -20,39 +17,48 @@ interface IMarketRegistry_V2 is IMarketRegistry {
         external
         view
         returns (bool); 
-   
-    function getMarketFeeRecipient(uint256 _marketId)
+
+    function isVerifiedLender(uint256 _marketId, address _lender)
         external
         view
-        returns (address);
+        returns (bool);
 
     function getMarketURI(uint256 _marketId)
         external
         view
         returns (string memory);
-
-    function getPaymentCycle(uint256 _marketId)
+   
+   /* function getMarketFeeRecipient(uint256 _marketId)
         external
         view
-        returns (uint32, PaymentCycleType);
-
-    function getPaymentDefaultDuration(uint256 _marketId)
-        external
-        view
-        returns (uint32);
-
-    function getBidExpirationTime(uint256 _marketId)
-        external
-        view
-        returns (uint32);
+        returns (address);*/
 
     
-    function getPaymentType(uint256 _marketId)
+
+    /*function getPaymentCycle(uint256 _marketId)
         external
         view
-        returns (PaymentType);
+        returns (uint32, PaymentCycleType);*/
 
-    function createMarket(
+    /*function getPaymentDefaultDuration(uint256 _marketId)
+        external
+        view
+        returns (uint32);*/
+
+    /*function getBidExpirationTime(uint256 _marketId)
+        external
+        view
+        returns (uint32);*/
+
+    
+    /*function getPaymentType(uint256 _marketId)
+        external
+        view
+        returns (PaymentType);*/
+
+   
+
+     function createMarket(
         address _initialOwner,
         uint32 _paymentCycleDuration,
         uint32 _paymentDefaultDuration,
@@ -63,19 +69,10 @@ interface IMarketRegistry_V2 is IMarketRegistry {
         PaymentType _paymentType,
         PaymentCycleType _paymentCycleType,
         string calldata _uri
-    ) external returns (uint256 marketId_);
-
-    function createMarket(
-        address _initialOwner,
-        uint32 _paymentCycleDuration,
-        uint32 _paymentDefaultDuration,
-        uint32 _bidExpirationTime,
-        uint16 _feePercent,
-        bool _requireLenderAttestation,
-        bool _requireBorrowerAttestation,
-        string calldata _uri
-    ) external returns (uint256 marketId_);
-
+    ) external returns (uint256 marketId_,
+     bytes32 marketTerms_);
+     
+ 
     function closeMarket(uint256 _marketId) external;
 
     function getCurrentTermsForMarket(uint256 _marketId) public view returns (bytes32);

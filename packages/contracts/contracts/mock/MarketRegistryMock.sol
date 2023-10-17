@@ -127,18 +127,9 @@ contract MarketRegistryMock is IMarketRegistry_V2 {
         PaymentType _paymentType,
         PaymentCycleType _paymentCycleType,
         string calldata _uri
-    ) public returns (uint256) {}
+    ) public returns (uint256,bytes32) {}
 
-    function createMarket(
-        address _initialOwner,
-        uint32 _paymentCycleDuration,
-        uint32 _paymentDefaultDuration,
-        uint32 _bidExpirationTime,
-        uint16 _feePercent,
-        bool _requireLenderAttestation,
-        bool _requireBorrowerAttestation,
-        string calldata _uri
-    ) public returns (uint256) {}
+  
 
     function closeMarket(uint256 _marketId) public {}
 

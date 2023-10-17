@@ -162,6 +162,7 @@ contract MarketRegistry_G2 is
      * @param _uri URI string to get metadata details about the market.
      * @param _paymentCycleType The payment cycle type for loans in the market - Seconds or Monthly
      * @return marketId_ The market ID of the newly created market.
+     * @return marketTerms_ The market Terms Hash of the markets terms.
      */
     function createMarket(
         address _initialOwner,
@@ -174,8 +175,8 @@ contract MarketRegistry_G2 is
         PaymentType _paymentType,
         PaymentCycleType _paymentCycleType,
         string calldata _uri
-    ) external returns (uint256 marketId_) {
-        marketId_ = _createMarket(
+    ) external returns (uint256 marketId_, bytes32 marketTerms_) {
+        (marketId_,marketTerms_) = _createMarket(
             _initialOwner,
             _paymentCycleDuration,
             _paymentDefaultDuration,
@@ -249,7 +250,7 @@ contract MarketRegistry_G2 is
         PaymentType _paymentType,
         PaymentCycleType _paymentCycleType,
         string calldata _uri
-    ) internal returns (uint256 marketId_) {
+    ) internal returns (uint256 marketId_, bytes32 marketTerms_) {
         require(_initialOwner != address(0), "Invalid owner address");
         // Increment market ID counter
         marketId_ = ++marketCount;
@@ -264,7 +265,7 @@ contract MarketRegistry_G2 is
         address feeRecipient = _initialOwner; 
 
         // Initialize market settings
-        _updateMarketSettings(
+        marketTerms_ = _updateMarketSettings(
             marketId_,
             _paymentCycleDuration,
             _paymentType,
@@ -360,11 +361,13 @@ contract MarketRegistry_G2 is
         uint16 _feePercent,
       
         address _feeRecipient
-    ) public ownsMarket(_marketId) {
+    ) public ownsMarket(_marketId) 
+      returns (bytes32 marketTermsId_ ) 
+    {
 
  
 
-        _updateMarketSettings( 
+        return _updateMarketSettings( 
             _marketId, 
             _paymentCycleDuration,
             _newPaymentType,

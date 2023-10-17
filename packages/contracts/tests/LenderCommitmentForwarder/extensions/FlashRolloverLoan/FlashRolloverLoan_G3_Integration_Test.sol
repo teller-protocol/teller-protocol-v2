@@ -13,6 +13,7 @@ import "../../../integration/IntegrationTestHelpers.sol";
 import "../../../../contracts/LenderCommitmentForwarder/extensions/ExtensionsContextUpgradeable.sol";
 
 import { WethMock } from "../../../../contracts/mock/WethMock.sol";
+import {IMarketRegistry_V2} from  "../../../../contracts/interfaces/IMarketRegistry_V2.sol";
 import { TestERC721Token } from "../../../tokens/TestERC721Token.sol";
 
 import { TellerV2SolMock } from "../../../../contracts/mock/TellerV2SolMock.sol";
@@ -44,7 +45,7 @@ contract FlashRolloverLoan_G3_Integration_Test is Testable {
     TellerV2 tellerV2;
     WethMock wethMock;
     ILenderCommitmentForwarder lenderCommitmentForwarder;
-    IMarketRegistry marketRegistry;
+    IMarketRegistry_V2 marketRegistry;
     TestERC721Token testNft;
 
     event RolloverLoanComplete(
@@ -63,7 +64,7 @@ contract FlashRolloverLoan_G3_Integration_Test is Testable {
 
         console.logAddress(address(tellerV2));
 
-        marketRegistry = IMarketRegistry(tellerV2.marketRegistry());
+        marketRegistry = IMarketRegistry_V2(tellerV2.marketRegistry());
 
         
 
@@ -99,18 +100,28 @@ contract FlashRolloverLoan_G3_Integration_Test is Testable {
         PaymentType _paymentType = PaymentType.EMI;
         PaymentCycleType _paymentCycleType = PaymentCycleType.Seconds;
 
+
+        IMarketRegistry_V2.MarketplaceTerms memory marketTerms = IMarketRegistry_V2.MarketplaceTerms({
+            paymentCycleDuration:_paymentCycleDuration,
+            paymentDefaultDuration:_paymentDefaultDuration,
+            bidExpirationTime:_bidExpirationTime,
+            marketplaceFeePercent:_feePercent,
+            paymentType:_paymentType,
+            paymentCycleType:_paymentCycleType,
+             feeRecipient: address(marketOwner)
+
+        });
+
+
         vm.prank(address(marketOwner));
-        uint256 marketId = marketRegistry.createMarket(
+        (uint256 marketId, ) = marketRegistry.createMarket(
             address(marketOwner),
-            _paymentCycleDuration,
-            _paymentDefaultDuration,
-            _bidExpirationTime,
-            _feePercent,
+          
             false,
             false,
-            _paymentType,
-            _paymentCycleType,
-            "uri"
+            
+            "uri",
+            marketTerms
         );
 
         wethMock.deposit{ value: 100e18 }();

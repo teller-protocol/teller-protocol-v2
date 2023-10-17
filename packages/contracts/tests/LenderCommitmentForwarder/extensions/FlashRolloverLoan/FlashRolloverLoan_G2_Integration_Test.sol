@@ -13,6 +13,7 @@ import "../../../integration/IntegrationTestHelpers.sol";
 import "../../../../contracts/LenderCommitmentForwarder/extensions/ExtensionsContextUpgradeable.sol";
 
 import { WethMock } from "../../../../contracts/mock/WethMock.sol";
+import { IMarketRegistry_V2 } from "../../../../contracts/interfaces/IMarketRegistry_V2.sol";
 
 import { TellerV2SolMock } from "../../../../contracts/mock/TellerV2SolMock.sol";
 import { LenderCommitmentForwarderMock } from "../../../../contracts/mock/LenderCommitmentForwarderMock.sol";
@@ -44,7 +45,7 @@ contract FlashRolloverLoan_Integration_Test is Testable {
     TellerV2 tellerV2;
     WethMock wethMock;
     ILenderCommitmentForwarder lenderCommitmentForwarder;
-    IMarketRegistry marketRegistry;
+    IMarketRegistry_V2 marketRegistry;
 
     event RolloverLoanComplete(
         address borrower,
@@ -62,7 +63,7 @@ contract FlashRolloverLoan_Integration_Test is Testable {
 
         console.logAddress(address(tellerV2));
 
-        marketRegistry = IMarketRegistry(tellerV2.marketRegistry());
+        marketRegistry = IMarketRegistry_V2(tellerV2.marketRegistry());
 
         LenderCommitmentForwarder_G3 _lenderCommitmentForwarder = new LenderCommitmentForwarder_G3(
                 address(tellerV2),
@@ -92,18 +93,33 @@ contract FlashRolloverLoan_Integration_Test is Testable {
         PaymentType _paymentType = PaymentType.EMI;
         PaymentCycleType _paymentCycleType = PaymentCycleType.Seconds;
 
-        vm.prank(address(marketOwner));
-        uint256 marketId = marketRegistry.createMarket(
-            address(marketOwner),
-            _paymentCycleDuration,
+           /* _paymentCycleDuration,
             _paymentDefaultDuration,
             _bidExpirationTime,
             _feePercent,
+
+            paymentType,
+            _paymentCycleType,*/
+
+         IMarketRegistry_V2.MarketplaceTerms memory marketTerms = IMarketRegistry_V2.MarketplaceTerms({
+            paymentCycleDuration:_paymentCycleDuration,
+            paymentDefaultDuration:_paymentDefaultDuration,
+            bidExpirationTime:_bidExpirationTime,
+            marketplaceFeePercent:_feePercent,
+            paymentType:_paymentType,
+            paymentCycleType:_paymentCycleType,
+             feeRecipient: address(marketOwner)
+
+        });
+
+
+        vm.prank(address(marketOwner));
+       ( uint256 marketId, ) = marketRegistry.createMarket(
+            address(marketOwner),  
             false,
-            false,
-            _paymentType,
-            _paymentCycleType,
-            "uri"
+            false, 
+            "uri",
+            marketTerms
         );
 
         wethMock.deposit{ value: 100e18 }();

@@ -102,7 +102,7 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
 
     function test_createMarket_simple() public {
         // Standard seconds payment cycle
-        uint256 marketId = marketOwner.createMarketSimple(
+        uint256 marketId = marketOwner.createMarket (
             address(marketRegistry),
             uint32(8000),
             uint32(7000),
@@ -119,7 +119,7 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
     }
 
     function test_closeMarket() public {
-        uint256 marketId = marketOwner.createMarketSimple(
+        uint256 marketId = marketOwner.createMarket(
             address(marketRegistry),
             uint32(8000),
             uint32(7000),
@@ -138,7 +138,7 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
     }
 
     function test_closeMarket_twice() public {
-        uint256 marketId = marketOwner.createMarketSimple(
+        uint256 marketId = marketOwner.createMarket(
             address(marketRegistry),
             uint32(8000),
             uint32(7000),

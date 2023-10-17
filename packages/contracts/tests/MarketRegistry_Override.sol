@@ -77,7 +77,7 @@ contract MarketRegistry_Override is MarketRegistry {
         super._attestStakeholderVerification(
             _marketId,
             _stakeholderAddress,
-            _uuid,
+          //  _uuid,
             _isLender
         );
     }
@@ -118,7 +118,7 @@ contract MarketRegistry_Override is MarketRegistry {
         return markets[_marketId].verifiedBorrowersForMarket.contains(guy);
     }
 
-    function getLenderAttestationId(uint256 _marketId, address guy)
+   /* function getLenderAttestationId(uint256 _marketId, address guy)
         public
         returns (bytes32)
     {
@@ -130,7 +130,7 @@ contract MarketRegistry_Override is MarketRegistry {
         returns (bytes32)
     {
         return markets[_marketId].borrowerAttestationIds[guy];
-    }
+    }*/
 
     /*
     @notice returns the actual value in the markets storage mapping, not globalMarketOwner the override
@@ -155,7 +155,7 @@ contract MarketRegistry_Override is MarketRegistry {
         (isVerified_, uuid_) = super._isVerified(
             _stakeholderAddress,
             markets[_marketId].lenderAttestationRequired,
-            markets[_marketId].lenderAttestationIds,
+           // markets[_marketId].lenderAttestationIds,
             markets[_marketId].verifiedLendersForMarket
         );
     }

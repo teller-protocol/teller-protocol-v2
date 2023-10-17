@@ -16,6 +16,10 @@ import { LenderCommitmentForwarder_G2 } from "../../contracts/LenderCommitmentFo
 import { LenderCommitmentForwarder_G3 } from "../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarder_G3.sol";
 import { MarketRegistryMock } from "../../contracts/mock/MarketRegistryMock.sol";
 
+
+import { IMarketRegistry_V2  } from "../../contracts/interfaces/IMarketRegistry_V2.sol";
+
+
 import { PaymentType, PaymentCycleType } from "../../contracts/libraries/V2Calculations.sol";
 
 import { Collateral, CollateralType } from "../../contracts/interfaces/escrow/ICollateralEscrowV1.sol";
@@ -46,7 +50,7 @@ contract LenderCommitmentForwarder_Integration_Test is Testable {
     ILenderCommitmentForwarder lenderCommitmentForwarder;
     TellerV2 tellerV2;
 
-    IMarketRegistry marketRegistry;
+    IMarketRegistry_V2 marketRegistry;
 
     WethMock wethMock;
     TestERC721Token erc721Token;
@@ -58,7 +62,7 @@ contract LenderCommitmentForwarder_Integration_Test is Testable {
 
         tellerV2 = IntegrationTestHelpers.deployIntegrationSuite();
 
-        marketRegistry = IMarketRegistry(tellerV2.marketRegistry());
+        marketRegistry = IMarketRegistry_V2(tellerV2.marketRegistry());
 
         LenderCommitmentForwarder_G3 _lenderCommitmentForwarder = new LenderCommitmentForwarder_G3(
                 address(tellerV2),
@@ -80,19 +84,29 @@ contract LenderCommitmentForwarder_Integration_Test is Testable {
         uint16 _feePercent = 900;
         PaymentType _paymentType = PaymentType.EMI;
         PaymentCycleType _paymentCycleType = PaymentCycleType.Seconds;
+  
+        
+        
+        IMarketRegistry_V2.MarketplaceTerms memory marketTerms = IMarketRegistry_V2.MarketplaceTerms({
+            paymentCycleDuration:_paymentCycleDuration,
+            paymentDefaultDuration:_paymentDefaultDuration,
+            bidExpirationTime:_bidExpirationTime,
+            marketplaceFeePercent:_feePercent,
+            paymentType:_paymentType,
+            paymentCycleType:_paymentCycleType,
+             feeRecipient: address(marketOwner)
+
+        });
 
         vm.prank(address(marketOwner));
-        uint256 marketId = marketRegistry.createMarket(
+        (uint256 marketId, )= marketRegistry.createMarket(
             address(marketOwner),
-            _paymentCycleDuration,
-            _paymentDefaultDuration,
-            _bidExpirationTime,
-            _feePercent,
+            
             false,
             false,
-            _paymentType,
-            _paymentCycleType,
-            "uri"
+            
+            "uri",
+            marketTerms
         );
 
         wethMock.deposit{ value: 100e18 }();

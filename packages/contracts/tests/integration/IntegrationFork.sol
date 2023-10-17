@@ -2,7 +2,7 @@ pragma solidity <0.9.0;
 pragma abicoder v2;
 
 import "../util/FoundryTest.sol";
-import { IMarketRegistry } from "../../contracts/interfaces/IMarketRegistry.sol";
+import { IMarketRegistry_V1 } from "../../contracts/interfaces/IMarketRegistry_V1.sol";
 import { ITellerV2 } from "../../contracts/interfaces/ITellerV2.sol";
 
 import { ILenderCommitmentForwarder } from "../../contracts/interfaces/ILenderCommitmentForwarder.sol";
@@ -17,7 +17,7 @@ import { ITellerV2Context } from "../../contracts/interfaces/ITellerV2Context.so
 contract IntegrationForkSetup is Test {
     ITellerV2 internal tellerV2;
     address collateralManagerV1;
-    IMarketRegistry internal marketRegistry;
+    IMarketRegistry_V1 internal marketRegistry;
     ILenderCommitmentForwarder internal commitmentForwarder;
 
     address lender;
@@ -52,7 +52,7 @@ contract IntegrationForkSetup is Test {
 
         collateralManagerV1 =  address( ITellerV2(address(tellerV2)).collateralManager() );
 
-        marketRegistry = IMarketRegistry(
+        marketRegistry = IMarketRegistry_V1(
             ITellerV2Storage(address(tellerV2)).marketRegistry()
         );
         vm.label(address(marketRegistry), "marketRegistry");

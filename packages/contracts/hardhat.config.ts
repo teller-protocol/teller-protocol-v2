@@ -7,7 +7,6 @@ import '@nomicfoundation/hardhat-ethers'
 import '@typechain/hardhat'
 import 'solidity-coverage'
 import '@openzeppelin/hardhat-upgrades'
-import '@openzeppelin/hardhat-defender'
 import '@nomicfoundation/hardhat-verify'
 
 import fs from 'fs'

@@ -22,7 +22,10 @@ contract CollateralManagerV2_Override is CollateralManagerV2 {
     //bool public checkBalancesWasCalled;
     //bool public checkBalanceWasCalled;
     address public withdrawInternalWasCalledToRecipient;
+    uint256 public releaseTokensInternalWasCalledForBundleId;
+
     bool public commitCollateralInternalWasCalled;
+    bool public releaseTokensWasCalled;
 
     bool bidsCollateralBackedGlobally;
     bool public checkBalanceGlobalValid = true;
@@ -80,16 +83,17 @@ contract CollateralManagerV2_Override is CollateralManagerV2 {
         checkBalanceGlobalValid = _valid;
     }
 
+    function forceSetBundleIdMapping(uint256 _bidId, uint256 _bundleId) public {
+        _collateralBundleIdForBid[_bidId] = _bundleId;
+    }
+
     /*
         Overrides
     */
 
-    function isBidCollateralBacked(uint256 _bidId)
-        public
-        view
-        override
-        returns (bool)
-    {
+    function isBidCollateralBacked(
+        uint256 _bidId
+    ) public view override returns (bool) {
         return bidsCollateralBackedGlobally;
     }
 
@@ -104,9 +108,10 @@ contract CollateralManagerV2_Override is CollateralManagerV2 {
         checks_ = new bool[](0);
     }
 
-    function _deposit(uint256 _bidId, Collateral memory collateralInfo)
-        internal
-    {
+    function _deposit(
+        uint256 _bidId,
+        Collateral memory collateralInfo
+    ) internal {
         depositWasCalled = true;
     }
 
@@ -119,9 +124,17 @@ contract CollateralManagerV2_Override is CollateralManagerV2 {
         return checkBalanceGlobalValid;
     }
 
-    function _withdraw(uint256 _bidId, address recipient) internal override {
+    function _withdraw(uint256 _bundleId, address recipient) internal override {
         withdrawInternalWasCalledToRecipient = recipient;
         withdrawWasCalled = true;
+    }
+
+    function _releaseTokens(
+        address _receiver,
+        uint256 _bundleId
+    ) internal override returns (uint256, Collateral[] memory) {
+        releaseTokensInternalWasCalledForBundleId = _bundleId;
+        releaseTokensWasCalled = true;
     }
 
     function _commitCollateral(

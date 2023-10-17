@@ -1,17 +1,6 @@
 pragma solidity >=0.8.0 <0.9.0;
 // SPDX-License-Identifier: MIT
 
-/*
-
-1. During submitBid, the collateral will be Committed (?) using the 'collateral validator'
-
-2. During acceptBid, the collateral gets bundled into the CollateralBundler which mints an NFT (the bundle) which then gets transferred into this contract 
-
-
-This collateral manager will only accept collateral bundles. 
-
-*/
-
 // Contracts
 import "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
 
@@ -26,7 +15,6 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol"
 import "@openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol";
 import "./interfaces/ICollateralManagerV2.sol";
-//import { Collateral, CollateralType, ICollateralEscrowV1 } from "./interfaces/escrow/ICollateralEscrowV1.sol";
 import "./interfaces/ITellerV2.sol";
 import "./bundle/TokenStore.sol";
 
@@ -50,9 +38,6 @@ contract CollateralManagerV2 is
     using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
     ITellerV2 public tellerV2;
 
-    // bidIds -> collateralEscrow
-    //mapping(uint256 => address) public _escrows;
-
     // bidIds -> collateralBundleId
     mapping(uint256 => uint256) internal _collateralBundleIdForBid;
 
@@ -61,10 +46,6 @@ contract CollateralManagerV2 is
     mapping(uint256 => ICollateralBundle.CollateralBundleInfo)
         internal _committedBidCollateral;
 
-    /* Events */
-    event CollateralEscrowDeployed(uint256 _bidId, address _collateralEscrow);
-
-    //add events back !!
     event CollateralCommitted(
         uint256 _bidId,
         CollateralType _type,
@@ -72,7 +53,7 @@ contract CollateralManagerV2 is
         uint256 _amount,
         uint256 _tokenId
     );
-    event CollateralClaimed(uint256 _bidId);
+
     event CollateralDeposited(
         uint256 _bidId,
         CollateralType _type,
@@ -111,12 +92,9 @@ contract CollateralManagerV2 is
      * @param _bidId The id of the bid to check.
      */
 
-    function isBidCollateralBacked(uint256 _bidId)
-        public
-        view
-        virtual
-        returns (bool)
-    {
+    function isBidCollateralBacked(
+        uint256 _bidId
+    ) public view virtual returns (bool) {
         return _committedBidCollateral[_bidId].count > 0;
     }
 
@@ -177,27 +155,14 @@ contract CollateralManagerV2 is
     }
 
     /**
-     * @notice Gets the address of a deployed escrow.
-     * @notice _bidId The bidId to return the escrow for.
-     * @return The address of the escrow.
-     */
-    /* function getEscrow(uint256 _bidId) external view returns (address) {
-        return _escrows[_bidId];
-    }*/
-
-    /**
-     * @notice Gets the collateral info for a given bid id.
+     * @notice Gets the committed collateral info for a given bid id.
      * @param _bidId The bidId to return the collateral info for.
      * @return infos_ The stored collateral info.
      */
 
-    //use getBundleInfo instead
-
-    function getCollateralInfo(uint256 _bidId)
-        public
-        view
-        returns (Collateral[] memory infos_)
-    {
+    function getCollateralInfo(
+        uint256 _bidId
+    ) public view returns (Collateral[] memory infos_) {
         uint256 count = _committedBidCollateral[_bidId].count;
         infos_ = new Collateral[](count);
 
@@ -212,11 +177,10 @@ contract CollateralManagerV2 is
      * @param _collateralAddress An address used as collateral.
      * @return amount_ The amount of collateral of type _collateralAddress.
      */
-    function getCollateralAmount(uint256 _bidId, address _collateralAddress)
-        public
-        view
-        returns (uint256 amount_)
-    {
+    function getCollateralAmount(
+        uint256 _bidId,
+        address _collateralAddress
+    ) public view returns (uint256 amount_) {
         uint256 bundleId = _collateralBundleIdForBid[_bidId];
 
         Collateral memory token_data = getTokenOfBundle(bundleId, 0); // first slot
@@ -227,7 +191,7 @@ contract CollateralManagerV2 is
     }
 
     /**
-     * @notice Withdraws deposited collateral from the created escrow of a bid that has been successfully repaid.
+     * @notice Withdraws deposited collateral of a bid that has been successfully repaid.
      * @param _bidId The id of the bid to withdraw collateral for.
      */
     function withdraw(uint256 _bidId) external {
@@ -236,12 +200,10 @@ contract CollateralManagerV2 is
         require(bidState == BidState.PAID, "Loan has not been paid");
 
         _withdraw(_bidId, tellerV2.getLoanBorrower(_bidId));
-
-        emit CollateralClaimed(_bidId);
     }
 
     /**
-     * @notice Withdraws deposited collateral from the created escrow of a bid that has been successfully repaid.
+     * @notice Withdraws deposited collateral of a bid that has been successfully repaid.
      * @param _bidId The id of the bid to withdraw collateral for.
      * @param _recipient The address that will receive the collateral.
      */
@@ -256,12 +218,10 @@ contract CollateralManagerV2 is
         );
 
         _withdraw(_bidId, _recipient);
-
-        emit CollateralClaimed(_bidId);
     }
 
     /**
-     * @notice Withdraws deposited collateral from the created escrow of a bid that has been CLOSED after being defaulted.
+     * @notice Withdraws deposited collateral of a bid that has been CLOSED after being defaulted.
      * @param _bidId The id of the bid to withdraw collateral for.
      */
     function lenderClaimCollateral(uint256 _bidId) external onlyTellerV2 {
@@ -271,7 +231,6 @@ contract CollateralManagerV2 is
             require(bidState == BidState.CLOSED, "Loan has not been closed");
 
             _withdraw(_bidId, tellerV2.getLoanLender(_bidId));
-            emit CollateralClaimed(_bidId);
         }
     }
 
@@ -281,10 +240,10 @@ contract CollateralManagerV2 is
      * @param _bidId The id of the liquidated bid.
      * @param _liquidatorAddress The address of the liquidator to send the collateral to.
      */
-    function liquidateCollateral(uint256 _bidId, address _liquidatorAddress)
-        external
-        onlyTellerV2
-    {
+    function liquidateCollateral(
+        uint256 _bidId,
+        address _liquidatorAddress
+    ) external onlyTellerV2 {
         if (isBidCollateralBacked(_bidId)) {
             BidState bidState = tellerV2.getBidState(_bidId);
             require(
@@ -346,22 +305,11 @@ contract CollateralManagerV2 is
         CollateralBundleInfo
             storage committedCollateral = _committedBidCollateral[_bidId];
 
-        /* require(
-            !collateral.collateralAddresses.contains(
-                _collateralInfo._collateralAddress
-            ),
-            "Cannot commit multiple collateral with the same address"
-        );*/
         require(
             _collateralInfo._collateralType != CollateralType.ERC721 ||
                 _collateralInfo._amount == 1,
             "ERC721 collateral must have amount of 1"
         );
-
-        /*collateral.collateralAddresses.add(_collateralInfo._collateralAddress);
-        collateral.collateralInfo[
-            _collateralInfo._collateralAddress
-        ] = _collateralInfo;*/
 
         uint256 new_count = committedCollateral.count + 1;
 
@@ -447,12 +395,12 @@ contract CollateralManagerV2 is
 
     // On NFT Received handlers
 
-    function onERC721Received(address, address, uint256, bytes memory)
-        public
-        pure
-        override
-        returns (bytes4)
-    {
+    function onERC721Received(
+        address,
+        address,
+        uint256,
+        bytes memory
+    ) public pure override returns (bytes4) {
         return
             bytes4(
                 keccak256("onERC721Received(address,address,uint256,bytes)")

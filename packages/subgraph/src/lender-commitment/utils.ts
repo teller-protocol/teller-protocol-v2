@@ -1,3 +1,5 @@
+import { dataSource } from "@graphprotocol/graph-ts";
+
 export enum CommitmentStatus {
   Active,
   Expired,
@@ -19,4 +21,9 @@ export function commitmentStatusToEnum(status: string): CommitmentStatus {
 
 export function commitmentStatusToString(status: CommitmentStatus): string {
   return CommitmentStatusValues[status];
+}
+
+export function isRolloverable(): boolean {
+  const ctx = dataSource.context();
+  return !!ctx.isSet("isRolloverable") && ctx.getBoolean("isRolloverable");
 }

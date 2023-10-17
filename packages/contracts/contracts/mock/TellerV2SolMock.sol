@@ -344,4 +344,8 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
 
         return bid.terms.paymentCycle;
     }
+    
+    function collateralManager() external view returns (address) {
+        return collateralManagerMock;
+    }
 }

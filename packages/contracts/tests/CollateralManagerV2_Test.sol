@@ -347,6 +347,27 @@ contract CollateralManagerV2_Test is Testable {
         collateralManager.withdraw(bidId);
     }
 
+    function test_withdraw_bundle_id_mapping() public {
+        uint256 bidId = 7;
+
+        //set up so bidId 7 maps to some other bundle id
+
+        tellerV2Mock.setBorrower(address(borrower));
+        tellerV2Mock.setGlobalBidState(BidState.PAID);
+
+        //map bid id 7 to bundle 2
+        collateralManager.forceSetBundleIdMapping(7, 2);
+
+        //make sure the correct bundle is withdrawn! might not always match bid id .
+        collateralManager._withdrawSuper(bidId, address(borrower));
+
+        assertEq(
+            collateralManager.releaseTokensInternalWasCalledForBundleId(),
+            2,
+            "release tokens was not called to the correct bundle id"
+        );
+    }
+
     function test_withdraw_external_state_paid() public {
         uint256 bidId = 0;
 
@@ -379,8 +400,6 @@ contract CollateralManagerV2_Test is Testable {
         tellerV2Mock.setGlobalBidState(BidState.CLOSED);
         collateralManager.setBidsCollateralBackedGlobally(true);
 
-        vm.expectEmit(true, false, false, false);
-        emit CollateralClaimed(bidId);
         vm.prank(address(tellerV2Mock));
         collateralManager.lenderClaimCollateral(bidId);
 
@@ -509,7 +528,7 @@ contract CollateralManagerV2_Test is Testable {
     }
 
     function test_withdraw_internal() public {
-        uint256 bidId = 0;
+        uint256 bidId = 4;
         address recipient = address(borrower);
 
         uint256 amount = 1000;
@@ -535,6 +554,7 @@ contract CollateralManagerV2_Test is Testable {
         vm.prank(address(tellerV2Mock));
         collateralManager.depositCollateral(bidId);
 
+        /*
         vm.expectEmit(false, false, false, false);
         emit CollateralWithdrawn(
             bidId,
@@ -543,9 +563,14 @@ contract CollateralManagerV2_Test is Testable {
             collateral._amount,
             collateral._tokenId,
             recipient
-        );
+        );*/
 
         collateralManager._withdrawSuper(bidId, recipient);
+
+        assertTrue(
+            collateralManager.releaseTokensWasCalled(),
+            "release tokens was not called"
+        );
     }
 
     function test_withdraw_internal_emptyArray() public {
@@ -1178,10 +1203,12 @@ contract User {
     receive() external payable {}
 
     //receive 721
-    function onERC721Received(address, address, uint256, bytes calldata)
-        external
-        returns (bytes4)
-    {
+    function onERC721Received(
+        address,
+        address,
+        uint256,
+        bytes calldata
+    ) external returns (bytes4) {
         return this.onERC721Received.selector;
     }
 
@@ -1194,30 +1221,6 @@ contract User {
         bytes calldata
     ) external returns (bytes4) {
         return this.onERC1155Received.selector;
-    }
-}
-
-contract CollateralEscrowV1_Mock is CollateralEscrowV1 {
-    bool public depositAssetWasCalled;
-    bool public withdrawWasCalled;
-
-    constructor() CollateralEscrowV1() {}
-
-    function depositAsset(
-        CollateralType _collateralType,
-        address _collateralAddress,
-        uint256 _amount,
-        uint256 _tokenId
-    ) external payable override {
-        depositAssetWasCalled = true;
-    }
-
-    function withdraw(
-        address _collateralAddress,
-        uint256 _amount,
-        address _recipient
-    ) external override {
-        withdrawWasCalled = true;
     }
 }
 
@@ -1237,39 +1240,27 @@ contract TellerV2_Mock is TellerV2SolMock {
         globalLender = lender;
     }
 
-    function getLoanBorrower(uint256 bidId)
-        public
-        view
-        override
-        returns (address)
-    {
+    function getLoanBorrower(
+        uint256 bidId
+    ) public view override returns (address) {
         return address(globalBorrower);
     }
 
-    function getLoanLender(uint256 bidId)
-        public
-        view
-        override
-        returns (address)
-    {
+    function getLoanLender(
+        uint256 bidId
+    ) public view override returns (address) {
         return address(globalLender);
     }
 
-    function isLoanDefaulted(uint256 _bidId)
-        public
-        view
-        override
-        returns (bool)
-    {
+    function isLoanDefaulted(
+        uint256 _bidId
+    ) public view override returns (bool) {
         return bidsDefaultedGlobally;
     }
 
-    function getBidState(uint256 _bidId)
-        public
-        view
-        override
-        returns (BidState)
-    {
+    function getBidState(
+        uint256 _bidId
+    ) public view override returns (BidState) {
         return globalBidState;
     }
 

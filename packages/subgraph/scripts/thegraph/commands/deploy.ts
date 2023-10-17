@@ -31,7 +31,7 @@ export const deploy = async (args: DeployArgs): Promise<void> => {
       ...subgraph.api.args.product(),
       subgraph.name
     ],
-    { disableEcho: true }
+    { disableEcho: false }
   );
   await updatePackageVersion(newVersion);
 };

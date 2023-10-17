@@ -55,7 +55,7 @@ contract MarketRegistry_Test is Testable {
 
         tellerASMock = new TellerASMock();
 
-        marketRegistry.initialize(tellerASMock);
+       
 
         marketOwner = new MarketRegistryUser(
             address(tellerV2),
@@ -102,7 +102,7 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
 
     function test_createMarket_simple() public {
         // Standard seconds payment cycle
-        uint256 marketId = marketOwner.createMarket (
+        (uint256 marketId,  ) = marketOwner.createMarket (
             address(marketRegistry),
             uint32(8000),
             uint32(7000),
@@ -110,6 +110,11 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
             uint16(500),
             false,
             false,
+
+            PaymentType.EMI ,
+            PaymentCycleType.Seconds ,  
+       
+            address(marketRegistry),
             "uri://"
         );
 
@@ -119,7 +124,7 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
     }
 
     function test_closeMarket() public {
-        uint256 marketId = marketOwner.createMarket(
+        (uint256 marketId,  ) = marketOwner.createMarket(
             address(marketRegistry),
             uint32(8000),
             uint32(7000),
@@ -127,6 +132,10 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
             uint16(500),
             false,
             false,
+              PaymentType.EMI ,
+            PaymentCycleType.Seconds ,  
+       
+            address(marketRegistry),
             "uri://"
         );
 
@@ -138,7 +147,7 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
     }
 
     function test_closeMarket_twice() public {
-        uint256 marketId = marketOwner.createMarket(
+        (uint256 marketId,  ) = marketOwner.createMarket(
             address(marketRegistry),
             uint32(8000),
             uint32(7000),
@@ -146,6 +155,10 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
             uint16(500),
             false,
             false,
+              PaymentType.EMI ,
+            PaymentCycleType.Seconds ,  
+       
+            address(marketRegistry),
             "uri://"
         );
 
@@ -159,7 +172,8 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
     }
 
     function test_closeMarket_invalid_owner() public {
-        uint256 marketId = marketOwner.createMarketSimple(
+        
+        (uint256 marketId,  ) = marketOwner.createMarket(
             address(marketRegistry),
             uint32(8000),
             uint32(7000),
@@ -167,8 +181,13 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
             uint16(500),
             false,
             false,
+              PaymentType.EMI ,
+            PaymentCycleType.Seconds ,  
+       
+            address(marketRegistry),
             "uri://"
         );
+
 
         vm.expectRevert("Not the owner");
         borrower.closeMarket(marketId);
@@ -186,6 +205,7 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
             false,
             PaymentType.EMI,
             PaymentCycleType.Seconds,
+             address(marketRegistry),
             "uri://"
         );
         (
@@ -215,6 +235,7 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
             false,
             PaymentType.EMI,
             PaymentCycleType.Monthly,
+             address(marketRegistry),
             "uri://"
         );
         (paymentCycleDuration, paymentCycle) = marketRegistry.getPaymentCycle(
@@ -246,6 +267,7 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
             false,
             PaymentType.EMI,
             PaymentCycleType.Monthly,
+             address(marketRegistry),
             "uri://"
         );
     }
@@ -262,6 +284,7 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
             false,
             PaymentType.EMI,
             PaymentCycleType.Seconds,
+             address(marketRegistry),
             "uri://"
         );
     }

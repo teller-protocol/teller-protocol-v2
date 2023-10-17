@@ -152,7 +152,7 @@ contract MarketRegistry_Override is MarketRegistry {
         public
         returns (bool isVerified_, bytes32 uuid_)
     {
-        (isVerified_, uuid_) = super._isVerified(
+         isVerified_  = super._isVerified(
             _stakeholderAddress,
             markets[_marketId].lenderAttestationRequired,
            // markets[_marketId].lenderAttestationIds,

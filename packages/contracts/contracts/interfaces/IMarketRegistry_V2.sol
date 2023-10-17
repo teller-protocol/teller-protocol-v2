@@ -10,7 +10,7 @@ interface IMarketRegistry_V2 is IMarketRegistry {
     function isVerifiedLender(uint256 _marketId, address _lender)
         external
         view
-        returns (bool, bytes32);
+        returns (bool);
 
     function isMarketOpen(uint256 _marketId) external view returns (bool);
 
@@ -19,8 +19,7 @@ interface IMarketRegistry_V2 is IMarketRegistry {
     function isVerifiedBorrower(uint256 _marketId, address _borrower)
         external
         view
-        returns (bool, bytes32);
-
+        returns (bool); 
    
     function getMarketFeeRecipient(uint256 _marketId)
         external

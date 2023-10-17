@@ -670,11 +670,11 @@ contract MarketRegistry_G2 is
     /**
      * @notice Checks if a lender has been attested and added to a market.
      * @param _marketId The ID of a market.
-     * @param _lenderAddress Address to check.
+     * @param _lender Address to check.
      * @return isVerified_ Boolean indicating if a lender has been added to a market.
      
      */
-    function isVerifiedLender(uint256 _marketId, address _lenderAddress)
+    function isVerifiedLender(uint256 _marketId, address _lender)
         public
         view
         override
@@ -685,7 +685,7 @@ contract MarketRegistry_G2 is
     {
         return
             _isVerified(
-                _lenderAddress,
+                _lender,
                 markets[_marketId].lenderAttestationRequired,
                 //markets[_marketId].lenderAttestationIds,
                 markets[_marketId].verifiedLendersForMarket
@@ -695,11 +695,11 @@ contract MarketRegistry_G2 is
     /**
      * @notice Checks if a borrower has been attested and added to a market.
      * @param _marketId The ID of a market.
-     * @param _borrowerAddress Address of the borrower to check.
+     * @param _borrower Address of the borrower to check.
      * @return isVerified_ Boolean indicating if a borrower has been added to a market.
      
      */
-    function isVerifiedBorrower(uint256 _marketId, address _borrowerAddress)
+    function isVerifiedBorrower(uint256 _marketId, address _borrower)
         public
         view
         override
@@ -710,7 +710,7 @@ contract MarketRegistry_G2 is
     {
         return
             _isVerified(
-                _borrowerAddress,
+                _borrower,
                 markets[_marketId].borrowerAttestationRequired,
                 //markets[_marketId].borrowerAttestationIds,
                 markets[_marketId].verifiedBorrowersForMarket

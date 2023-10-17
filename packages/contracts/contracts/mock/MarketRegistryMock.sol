@@ -19,10 +19,16 @@ contract MarketRegistryMock is IMarketRegistry_V2 {
 
    // function initialize(TellerAS _tellerAS) external {}
 
+    function getCurrentTermsForMarket(uint256 _marketId) public view returns (bytes32){
+        //impl me ! 
+
+
+    }
+
     function isVerifiedLender(uint256 _marketId, address _lenderAddress)
         public
         view
-        returns (bool isVerified_, bytes32 uuid_)
+        returns (bool isVerified_)
     {
         isVerified_ = globalLenderIsVerified;
     }
@@ -38,7 +44,7 @@ contract MarketRegistryMock is IMarketRegistry_V2 {
     function isVerifiedBorrower(uint256 _marketId, address _borrower)
         public
         view
-        returns (bool isVerified_, bytes32 uuid_)
+        returns (bool isVerified_)
     {
         isVerified_ = globalBorrowerIsVerified;
     }

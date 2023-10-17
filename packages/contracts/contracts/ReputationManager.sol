@@ -39,7 +39,8 @@ contract ReputationManager is IReputationManager, Initializable {
     }
 
     function getDelinquentLoanIds(address _account)
-        public view
+        public
+        view
         override
         returns (uint256[] memory)
     {
@@ -48,7 +49,8 @@ contract ReputationManager is IReputationManager, Initializable {
     }
 
     function getDefaultedLoanIds(address _account)
-        public view
+        public
+        view
         override
         returns (uint256[] memory)
     {
@@ -57,7 +59,8 @@ contract ReputationManager is IReputationManager, Initializable {
     }
 
     function getCurrentDelinquentLoanIds(address _account)
-        public view
+        public
+        view
         override
         returns (uint256[] memory)
     {
@@ -66,7 +69,8 @@ contract ReputationManager is IReputationManager, Initializable {
     }
 
     function getCurrentDefaultLoanIds(address _account)
-        public view
+        public
+        view
         override
         returns (uint256[] memory)
     {
@@ -74,7 +78,7 @@ contract ReputationManager is IReputationManager, Initializable {
         return _currentDefaults[_account].values();
     }
 
-     /*function updateAccountReputation(address _account) public override {
+    /*function updateAccountReputation(address _account) public override {
        uint256[] memory activeBidIds = tellerV2.getBorrowerActiveLoanIds(
             _account
         );

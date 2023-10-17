@@ -51,8 +51,7 @@ struct Bid {
     LoanDetails loanDetails;
     Terms terms;
     BidState state;
-    PaymentType paymentType;  // DEPRECATED
-    
+    PaymentType paymentType; // DEPRECATED
 }
 
 /**
@@ -82,9 +81,9 @@ struct LoanDetails {
  * @param APR Annual percentage rating to be applied on repayments. (10000 == 100%)
  */
 struct Terms {
-    uint256 paymentCycleAmount;   
-    uint32 paymentCycle;  // DEPRECATED
-    uint16 APR; 
+    uint256 paymentCycleAmount;
+    uint32 paymentCycle; // DEPRECATED
+    uint16 APR;
 }
 
 abstract contract TellerV2Storage_G0 {
@@ -129,9 +128,7 @@ abstract contract TellerV2Storage_G0 {
 
     // Mapping of metadataURIs by bidIds.
     // Bid Id => metadataURI string
-    mapping(uint256 => string) public uris;  //DEPRECATED
-
-  
+    mapping(uint256 => string) public uris; //DEPRECATED
 }
 
 abstract contract TellerV2Storage_G1 is TellerV2Storage_G0 {
@@ -164,18 +161,13 @@ abstract contract TellerV2Storage_G5 is TellerV2Storage_G4 {
 
 abstract contract TellerV2Storage_G6 is TellerV2Storage_G5 {
     ICollateralManagerV2 public collateralManagerV2;
-    mapping(uint256 => address) public collateralManagerForBid;//if this is zero, that means v1
+    mapping(uint256 => address) public collateralManagerForBid; //if this is zero, that means v1
 }
-
 
 abstract contract TellerV2Storage_G7 is TellerV2Storage_G6 {
-   // If this is zero for a bid, the bid will use the values in the bid struct / bidDefaultDuration / bidExpirationTime
-    //need internal fns to do this if/then 
-    mapping(uint256 => bytes32) public bidMarketTermsId; 
+    // If this is zero for a bid, the bid will use the values in the bid struct / bidDefaultDuration / bidExpirationTime
+    //need internal fns to do this if/then
+    mapping(uint256 => bytes32) public bidMarketTermsId;
 }
-
-
-
-
 
 abstract contract TellerV2Storage is TellerV2Storage_G7 {}

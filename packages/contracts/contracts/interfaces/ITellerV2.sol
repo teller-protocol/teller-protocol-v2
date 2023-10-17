@@ -101,7 +101,7 @@ interface ITellerV2 {
 
     function getBidState(uint256 _bidId) external view returns (BidState);
 
-   /* 
+    /* 
      function getBorrowerActiveLoanIds(address _borrower)
         external
         view
@@ -153,7 +153,7 @@ interface ITellerV2 {
         external
         view
         returns (ICollateralManager);
-        
+
     function calculateAmountOwed(uint256 _bidId, uint256 _timestamp)
         external
         view

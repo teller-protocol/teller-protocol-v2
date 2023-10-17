@@ -4,12 +4,10 @@ pragma solidity ^0.8.0;
 import "../EAS/TellerAS.sol";
 import { PaymentType, PaymentCycleType } from "../libraries/V2Calculations.sol";
 
- import { IMarketRegistry } from "./IMarketRegistry.sol";
+import { IMarketRegistry } from "./IMarketRegistry.sol";
 
-interface IMarketRegistry_V1 is IMarketRegistry  {
+interface IMarketRegistry_V1 is IMarketRegistry {
     function initialize(TellerAS tellerAs) external;
- 
-   
 
     function getMarketFeeRecipient(uint256 _marketId)
         external
@@ -36,7 +34,6 @@ interface IMarketRegistry_V1 is IMarketRegistry  {
         view
         returns (uint32);
 
-  
     function getPaymentType(uint256 _marketId)
         external
         view

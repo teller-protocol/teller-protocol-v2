@@ -156,7 +156,7 @@ contract TellerV2 is
         _;
     }
 
-    /** Constant Variables **/ 
+    /** Constant Variables **/
 
     uint32 public constant LIQUIDATION_DELAY = 86400; //ONE DAY IN SECONDS
 
@@ -189,7 +189,7 @@ contract TellerV2 is
 
         __Pausable_init();
 
-        //no longer needed in storage 
+        //no longer needed in storage
         lenderCommitmentForwarder = address(0);
 
         require(
@@ -204,13 +204,10 @@ contract TellerV2 is
         );
         reputationManager = IReputationManager(_reputationManager);
 
-        
         _setLenderManager(_lenderManager);
         _setEscrowVault(_escrowVault);
         _setCollateralManagerV2(_collateralManagerV2);
     }
- 
-
 
     function setCollateralManagerV2(address _collateralManagerV2)
         external
@@ -219,11 +216,10 @@ contract TellerV2 is
         _setCollateralManagerV2(_collateralManagerV2);
     }
 
-
     function _setEscrowVault(address _escrowVault) internal onlyInitializing {
         require(_escrowVault.isContract(), "EscrowVault must be a contract");
         escrowVault = IEscrowVault(_escrowVault);
-    } 
+    }
 
     function _setLenderManager(address _lenderManager)
         internal
@@ -234,9 +230,8 @@ contract TellerV2 is
             "LenderManager must be a contract"
         );
         lenderManager = ILenderManager(_lenderManager);
-    } 
-    
- 
+    }
+
     function _setCollateralManagerV2(address _collateralManagerV2)
         internal
         onlyInitializing
@@ -352,15 +347,15 @@ contract TellerV2 is
         string calldata _metadataURI,
         address _receiver
     ) internal virtual returns (uint256 bidId_) {
-       address sender = _msgSenderForMarket(_marketplaceId);
+        address sender = _msgSenderForMarket(_marketplaceId);
 
-       {
-        (bool isVerified, ) = marketRegistry.isVerifiedBorrower(
-            _marketplaceId, 
-            sender
-        );
+        {
+            (bool isVerified, ) = marketRegistry.isVerifiedBorrower(
+                _marketplaceId,
+                sender
+            );
 
-        require(isVerified, "Not verified borrower");
+            require(isVerified, "Not verified borrower");
         }
 
         require(
@@ -379,47 +374,26 @@ contract TellerV2 is
         bid.loanDetails.lendingToken = IERC20(_lendingToken);
         bid.loanDetails.principal = _principal;
         bid.loanDetails.loanDuration = _duration;
-        bid.loanDetails.timestamp = uint32(block.timestamp); 
+        bid.loanDetails.timestamp = uint32(block.timestamp);
 
-        //make this new bid use the most recent version of collateral manager 
+        //make this new bid use the most recent version of collateral manager
         collateralManagerForBid[bidId] = address(collateralManagerV2);
 
         // Set payment cycle type based on market setting (custom or monthly)
 
-        bidMarketTermsId[bidId] = marketRegistry.getCurrentTermsForMarket(_marketplaceId);
-
-
-        (uint32 paymentCycleDuration, 
-        PaymentCycleType paymentCycleType,
-        PaymentType paymentType, 
-          ,
-                 
-        ) = marketRegistry.getMarketTermsForLending(bidMarketTermsId[bidId]);
-
-        //use these in MEMORY 
-        
-
-        bid.terms.APR = _APR;
-
-        /*
-            TODO: consolidate calls to market registry into a single call
-
-            Refactor the market regsitry to use a mapping of stores terms revisions history.  
-              - For a bid, we would store the MarketId and the MarketTermsRevisionId .  
-
-
-            Anywhere where bidDefaultDuration or bidExpirationTime are referenced in here, prob need to do an ext call 
-        */
-
-        /*bidDefaultDuration[bidId] = marketRegistry.getPaymentDefaultDuration(
+        bidMarketTermsId[bidId] = marketRegistry.getCurrentTermsForMarket(
             _marketplaceId
         );
 
-        bidExpirationTime[bidId] = marketRegistry.getBidExpirationTime(
-            _marketplaceId
-        );*/
+        (
+            uint32 paymentCycleDuration,
+            PaymentCycleType paymentCycleType,
+            PaymentType paymentType,
+            ,
 
-        //bid.paymentType = marketRegistry.getPaymentType(_marketplaceId);
+        ) = marketRegistry.getMarketTermsForLending(bidMarketTermsId[bidId]);
+
+        bid.terms.APR = _APR;
 
         bid.terms.paymentCycleAmount = V2Calculations
             .calculatePaymentCycleAmount(
@@ -519,20 +493,17 @@ contract TellerV2 is
         // Retrieve bid
         Bid storage bid = bids[_bidId];
 
-
         address sender = _msgSenderForMarket(bid.marketplaceId);
-        
-        bytes32 bidTermsId = bidMarketTermsId[bidId]; 
 
+        bytes32 bidTermsId = bidMarketTermsId[bidId];
 
-         //bytes32 currentMarketplaceTermsId = marketRegistry.getCurrentTermsForMarket(_marketplaceId);
+        //bytes32 currentMarketplaceTermsId = marketRegistry.getCurrentTermsForMarket(_marketplaceId);
 
         (bool isVerified, ) = marketRegistry.isVerifiedLender(
-            bid.marketplaceId, 
+            bid.marketplaceId,
             sender
         );
 
-        
         require(isVerified, "Not verified lender");
 
         require(
@@ -559,13 +530,12 @@ contract TellerV2 is
             collateralManagerV2.depositCollateral(_bidId);
         }
 
-        (address marketFeeRecipient, uint16 marketFee) = marketRegistry.getMarketplaceFeeTerms( bidTermsId );
+        (address marketFeeRecipient, uint16 marketFee) = marketRegistry
+            .getMarketplaceFeeTerms(bidTermsId);
 
         // Transfer funds to borrower from the lender
         amountToProtocol = bid.loanDetails.principal.percent(protocolFee());
-        amountToMarketplace = bid.loanDetails.principal.percent(
-            marketFee
-        );
+        amountToMarketplace = bid.loanDetails.principal.percent(marketFee);
         amountToBorrower =
             bid.loanDetails.principal -
             amountToProtocol -
@@ -946,11 +916,11 @@ contract TellerV2 is
 
         (uint256 owedPrincipal, , uint256 interest) = V2Calculations
             .calculateAmountOwed(
-                bid, 
-                _timestamp, 
+                bid,
+                _timestamp,
                 _getBidPaymentCycleType(_bidId),
                 _getBidPaymentCycleDuration(_bidId)
-             );
+            );
         owed.principal = owedPrincipal;
         owed.interest = interest;
     }
@@ -973,10 +943,10 @@ contract TellerV2 is
 
         (, uint256 duePrincipal, uint256 interest) = V2Calculations
             .calculateAmountOwed(
-             bid, 
-            _timestamp, 
-            _getBidPaymentCycleType(_bidId),
-            _getBidPaymentCycleDuration(_bidId)
+                bid,
+                _timestamp,
+                _getBidPaymentCycleType(_bidId),
+                _getBidPaymentCycleDuration(_bidId)
             );
         due.principal = duePrincipal;
         due.interest = interest;
@@ -997,7 +967,7 @@ contract TellerV2 is
         return
             V2Calculations.calculateNextDueDate(
                 bid.loanDetails.acceptedTimestamp,
-               _getBidPaymentCycleDuration(_bidId),
+                _getBidPaymentCycleDuration(_bidId),
                 bid.loanDetails.loanDuration,
                 lastRepaidTimestamp(_bidId),
                 _getBidPaymentCycleType(_bidId)
@@ -1089,8 +1059,7 @@ contract TellerV2 is
         return ICollateralManager(collateralManagerForBid[_bidId]);
     }
 
-
-    //Returns the most modern implementation for the collateral manager 
+    //Returns the most modern implementation for the collateral manager
     function collateralManager() external view returns (address) {
         return address(collateralManagerV2);
     }
@@ -1104,7 +1073,7 @@ contract TellerV2 is
         return bids[_bidId].state;
     }
 
-   /* function getBorrowerActiveLoanIds(address _borrower)
+    /* function getBorrowerActiveLoanIds(address _borrower)
         external
         view
         override
@@ -1135,50 +1104,59 @@ contract TellerV2 is
             bid.loanDetails.timestamp + _getBidExpirationTime(_bidId));
     }
 
-    function _getBidExpirationTime(uint256 _bidId) internal view returns(uint32){
- 
-        bytes32 bidTermsId = bidMarketTermsId[bidId]; 
-        if (bidTermsId != bytes32(0)){
-
+    function _getBidExpirationTime(uint256 _bidId)
+        internal
+        view
+        returns (uint32)
+    {
+        bytes32 bidTermsId = bidMarketTermsId[bidId];
+        if (bidTermsId != bytes32(0)) {
             return marketRegistry.getBidExpirationTime(bidTermsId);
         }
 
         return bidExpirationTime[_bidId];
     }
 
-    function _getBidDefaultDuration(uint256 _bidId) internal view returns(uint32){
-        bytes32 bidTermsId = bidMarketTermsId[bidId]; 
-        if (bidTermsId != bytes32(0)){ 
+    function _getBidDefaultDuration(uint256 _bidId)
+        internal
+        view
+        returns (uint32)
+    {
+        bytes32 bidTermsId = bidMarketTermsId[bidId];
+        if (bidTermsId != bytes32(0)) {
             return marketRegistry.getPaymentDefaultDuration(bidTermsId);
         }
 
         return bidDefaultDuration[_bidId];
     }
 
-    function _getBidPaymentCycleType(uint256 _bidId) internal view returns(PaymentCycleType){
-        
-        bytes32 bidTermsId = bidMarketTermsId[bidId]; 
-        if (bidTermsId != bytes32(0)){
-
+    function _getBidPaymentCycleType(uint256 _bidId)
+        internal
+        view
+        returns (PaymentCycleType)
+    {
+        bytes32 bidTermsId = bidMarketTermsId[bidId];
+        if (bidTermsId != bytes32(0)) {
             return marketRegistry.getPaymentCycleType(bidTermsId);
         }
 
         return bidPaymentCycleType[_bidId];
     }
 
-    function _getBidPaymentCycleDuration(uint256 _bidId) internal view returns(uint32){
-      
-        bytes32 bidTermsId = bidMarketTermsId[bidId]; 
-        if (bidTermsId != bytes32(0)){
-
+    function _getBidPaymentCycleDuration(uint256 _bidId)
+        internal
+        view
+        returns (uint32)
+    {
+        bytes32 bidTermsId = bidMarketTermsId[bidId];
+        if (bidTermsId != bytes32(0)) {
             return marketRegistry.getPaymentCycleDuration(bidTermsId);
         }
-        
+
         Bid storage bid = bids[_bidId];
 
-        return bid.terms.paymentCycle ; 
+        return bid.terms.paymentCycle;
     }
-
 
     /**
      * @notice Returns the last repaid timestamp for a loan.

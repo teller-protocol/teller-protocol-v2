@@ -48,10 +48,9 @@ library IntegrationTestHelpers {
             );
             */
 
-
-       // CollateralEscrowV1 escrowImplementation = new CollateralEscrowV1();
+        // CollateralEscrowV1 escrowImplementation = new CollateralEscrowV1();
         // Deploy beacon contract with implementation
-       /* UpgradeableBeacon escrowBeacon = new UpgradeableBeacon(
+        /* UpgradeableBeacon escrowBeacon = new UpgradeableBeacon(
             address(escrowImplementation)
         );*/
 
@@ -61,7 +60,7 @@ library IntegrationTestHelpers {
         );
         EscrowVault _escrowVault = new EscrowVault();
 
-      //  _collateralManager.initialize(address(escrowBeacon), address(tellerV2));
+        //  _collateralManager.initialize(address(escrowBeacon), address(tellerV2));
         _lenderManager.initialize();
         _reputationManager.initialize(address(tellerV2));
         _collateralManager.initialize(address(tellerV2));
@@ -71,7 +70,7 @@ library IntegrationTestHelpers {
             address(_marketRegistry),
             address(_reputationManager),
             //address(_lenderCommitmentForwarder),
-            
+
             address(_lenderManager),
             address(_escrowVault),
             address(_collateralManager)

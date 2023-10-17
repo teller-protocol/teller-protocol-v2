@@ -13,14 +13,12 @@ import { LoanDetails, Payment, BidState } from "../TellerV2Storage.sol";
 This is only used for sol test so its named specifically to avoid being used for the typescript tests.
 */
 contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
-    
     address public collateralManagerMock;
     address public trustedForwarder;
     address public approvedForwarder;
 
     Bid mockBid;
-    
-    
+
     function setMarketRegistry(address _marketRegistry) public {
         marketRegistry = IMarketRegistry_V2(_marketRegistry);
     }
@@ -198,7 +196,6 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
         override
         returns (ICollateralManager)
     {
-      
         return _getCollateralManagerForBid(_bidId);
     }
 
@@ -207,7 +204,6 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
         view
         returns (ICollateralManager)
     {
-        
         return ICollateralManager(collateralManagerMock);
     }
 
@@ -321,27 +317,31 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
         bids[_bidId].loanDetails.lastRepaidTimestamp = _timestamp;
     }
 
-    function _getBidPaymentCycleType(uint256 _bidId) internal view returns(PaymentCycleType){
-        
-        bytes32 bidTermsId = bidMarketTermsId[bidId]; 
-        if (bidTermsId != bytes32(0)){
-
+    function _getBidPaymentCycleType(uint256 _bidId)
+        internal
+        view
+        returns (PaymentCycleType)
+    {
+        bytes32 bidTermsId = bidMarketTermsId[bidId];
+        if (bidTermsId != bytes32(0)) {
             return marketRegistry.getPaymentCycleType(bidTermsId);
         }
 
         return bidPaymentCycleType[_bidId];
     }
 
-    function _getBidPaymentCycleDuration(uint256 _bidId) internal view returns(uint32){
-      
-        bytes32 bidTermsId = bidMarketTermsId[bidId]; 
-        if (bidTermsId != bytes32(0)){
-
+    function _getBidPaymentCycleDuration(uint256 _bidId)
+        internal
+        view
+        returns (uint32)
+    {
+        bytes32 bidTermsId = bidMarketTermsId[bidId];
+        if (bidTermsId != bytes32(0)) {
             return marketRegistry.getPaymentCycleDuration(bidTermsId);
         }
-        
+
         Bid storage bid = bids[_bidId];
 
-        return bid.terms.paymentCycle ; 
+        return bid.terms.paymentCycle;
     }
 }

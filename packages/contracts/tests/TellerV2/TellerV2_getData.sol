@@ -87,7 +87,7 @@ contract TellerV2_initialize is Testable {
                     APR: 10
                 }),
                 state: BidState.PENDING,
-                paymentType: PaymentType.EMI 
+                paymentType: PaymentType.EMI
             })
         );
     }
@@ -210,7 +210,7 @@ contract TellerV2_initialize is Testable {
                     APR: 10
                 }),
                 state: BidState.PENDING,
-                paymentType: PaymentType.EMI 
+                paymentType: PaymentType.EMI
             })
         );
 
@@ -251,7 +251,7 @@ contract TellerV2_initialize is Testable {
                     APR: 10
                 }),
                 state: BidState.PENDING,
-                paymentType: PaymentType.EMI 
+                paymentType: PaymentType.EMI
             })
         );
 
@@ -370,7 +370,7 @@ contract TellerV2_initialize is Testable {
                     APR: 10
                 }),
                 state: BidState.PENDING,
-                paymentType: PaymentType.EMI 
+                paymentType: PaymentType.EMI
             })
         );
 
@@ -412,7 +412,7 @@ contract TellerV2_initialize is Testable {
                     APR: 10
                 }),
                 state: BidState.PENDING,
-                paymentType: PaymentType.EMI 
+                paymentType: PaymentType.EMI
             })
         );
 
@@ -452,7 +452,7 @@ contract TellerV2_initialize is Testable {
                     APR: 10
                 }),
                 state: BidState.PENDING,
-                paymentType: PaymentType.EMI 
+                paymentType: PaymentType.EMI
             })
         );
 
@@ -489,7 +489,7 @@ contract TellerV2_initialize is Testable {
                     APR: 10
                 }),
                 state: BidState.PENDING,
-                paymentType: PaymentType.EMI 
+                paymentType: PaymentType.EMI
             })
         );
 
@@ -525,7 +525,7 @@ contract TellerV2_initialize is Testable {
                     APR: 10
                 }),
                 state: BidState.PENDING,
-                paymentType: PaymentType.EMI 
+                paymentType: PaymentType.EMI
             })
         );
 
@@ -565,7 +565,7 @@ contract TellerV2_initialize is Testable {
                     APR: 10
                 }),
                 state: BidState.PENDING,
-                paymentType: PaymentType.EMI 
+                paymentType: PaymentType.EMI
             })
         );
 
@@ -613,7 +613,7 @@ contract TellerV2_initialize is Testable {
                     APR: 10
                 }),
                 state: BidState.PENDING,
-                paymentType: PaymentType.EMI  
+                paymentType: PaymentType.EMI
             })
         );
 
@@ -652,7 +652,7 @@ contract TellerV2_initialize is Testable {
                     APR: 10
                 }),
                 state: BidState.PENDING,
-                paymentType: PaymentType.EMI 
+                paymentType: PaymentType.EMI
             })
         );
 
@@ -691,7 +691,7 @@ contract TellerV2_initialize is Testable {
                     APR: 10
                 }),
                 state: BidState.PENDING,
-                paymentType: PaymentType.EMI 
+                paymentType: PaymentType.EMI
             })
         );
 
@@ -730,7 +730,7 @@ contract TellerV2_initialize is Testable {
                     APR: 10
                 }),
                 state: BidState.PENDING,
-                paymentType: PaymentType.EMI 
+                paymentType: PaymentType.EMI
             })
         );
 

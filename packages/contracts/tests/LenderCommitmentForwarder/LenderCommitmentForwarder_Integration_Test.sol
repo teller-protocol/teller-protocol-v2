@@ -60,15 +60,12 @@ contract LenderCommitmentForwarder_Integration_Test is Testable {
 
         marketRegistry = IMarketRegistry(tellerV2.marketRegistry());
 
-    
-
         LenderCommitmentForwarder_G3 _lenderCommitmentForwarder = new LenderCommitmentForwarder_G3(
                 address(tellerV2),
                 address(marketRegistry)
-        );
+            );
 
-
-       lenderCommitmentForwarder = ILenderCommitmentForwarder(
+        lenderCommitmentForwarder = ILenderCommitmentForwarder(
             address(_lenderCommitmentForwarder)
         );
 
@@ -109,7 +106,6 @@ contract LenderCommitmentForwarder_Integration_Test is Testable {
         //initial loan - need to pay back 1 weth + 0.1 weth (interest) to the lender
         uint256 marketId = 1;
 
-       
         address collateralManager = address(tellerV2.collateralManager());
 
         vm.prank(address(borrower));
@@ -137,7 +133,7 @@ contract LenderCommitmentForwarder_Integration_Test is Testable {
                 lender: address(lender),
                 marketId: marketId,
                 principalTokenAddress: lendingToken
-        });
+            });
 
         address[] memory _borrowerAddressList;
 
@@ -190,11 +186,8 @@ contract LenderCommitmentForwarder_Integration_Test is Testable {
 
         address ownerOfNft = erc721Token.ownerOf(0);
 
-        
-
         assertTrue(
-            ownerOfNft != 
-            address(borrower),
+            ownerOfNft != address(borrower),
             "Nft not moved to collateral escrow"
         );
     }

@@ -17,15 +17,15 @@ contract MarketRegistryMock is IMarketRegistry_V2 {
 
     constructor() {}
 
-   // function initialize(TellerAS _tellerAS) external {}
+    // function initialize(TellerAS _tellerAS) external {}
 
-    function getCurrentTermsForMarket(uint256 _marketId) public view returns (bytes32){
-        //impl me ! 
-
-
+    function getCurrentTermsForMarket(uint256 _marketId)
+        public
+        view
+        returns (bytes32)
+    {
+        //impl me !
     }
-
- 
 
     function isMarketOpen(uint256 _marketId) public view returns (bool) {
         return !globalMarketsClosed;
@@ -43,10 +43,10 @@ contract MarketRegistryMock is IMarketRegistry_V2 {
         isVerified_ = globalBorrowerIsVerified;
     }
 
-   function isVerifiedLender(uint256 _marketId, address _lenderAddress)
+    function isVerifiedLender(uint256 _marketId, address _lenderAddress)
         public
         view
-        returns (bool isVerified_,bytes32)
+        returns (bool isVerified_, bytes32)
     {
         isVerified_ = globalLenderIsVerified;
     }
@@ -100,7 +100,7 @@ contract MarketRegistryMock is IMarketRegistry_V2 {
         return 1000;
     }*/
 
-    //the current marketplace fee if a new loan is created   NOT for existing loans in this market 
+    //the current marketplace fee if a new loan is created   NOT for existing loans in this market
     function getMarketplaceFee(uint256 _marketId) public view returns (uint16) {
         return 1000;
     }
@@ -113,25 +113,18 @@ contract MarketRegistryMock is IMarketRegistry_V2 {
         globalMarketFeeRecipient = _feeRecipient;
     }
 
-
-  function getMarketplaceFeeTerms(bytes32 _marketTermsId) public
+    function getMarketplaceFeeTerms(bytes32 _marketTermsId)
+        public
         view
-        
-        returns ( address , uint16 )
-    {
- 
-    }
-
+        returns (address, uint16)
+    {}
 
     function getMarketTermsForLending(bytes32 _marketTermsId)
         public
         view
-        
-        returns ( uint32, PaymentCycleType, PaymentType, uint32, uint32 )
+        returns (uint32, PaymentCycleType, PaymentType, uint32, uint32)
     {
         //require(_marketTermsId != bytes32(0), "Invalid market terms." );
- 
-
         /*return (
             marketTerms[_marketTermsId].paymentCycleDuration,
             marketTerms[_marketTermsId].paymentCycleType,
@@ -141,46 +134,35 @@ contract MarketRegistryMock is IMarketRegistry_V2 {
         );*/
     }
 
-
-
-   function getBidExpirationTime(bytes32 _marketTermsId)
+    function getBidExpirationTime(bytes32 _marketTermsId)
         external
-        view 
-        returns (uint32){
-
-        }
+        view
+        returns (uint32)
+    {}
 
     function getPaymentDefaultDuration(bytes32 _marketTermsId)
         external
-        view 
-        returns (uint32){
-            
-        }
+        view
+        returns (uint32)
+    {}
 
     function getPaymentType(bytes32 _marketTermsId)
         external
-        view  
-        returns (PaymentType){
-            
-        }
+        view
+        returns (PaymentType)
+    {}
 
     function getPaymentCycleType(bytes32 _marketTermsId)
         external
-        view 
-        returns (PaymentCycleType){
-            
-        }
+        view
+        returns (PaymentCycleType)
+    {}
 
-     function getPaymentCycleDuration(bytes32 _marketTermsId)
+    function getPaymentCycleDuration(bytes32 _marketTermsId)
         external
-        view 
-        returns (uint32){
-            
-        }
-
-
-
-
+        view
+        returns (uint32)
+    {}
 
     function getPaymentType(uint256 _marketId)
         public
@@ -188,22 +170,13 @@ contract MarketRegistryMock is IMarketRegistry_V2 {
         returns (PaymentType)
     {}
 
-
     function createMarket(
         address _initialOwner,
-
         bool _requireLenderAttestation,
         bool _requireBorrowerAttestation,
-         
         string calldata _uri,
-
-        MarketplaceTerms memory _marketTermsParams 
-        
-    ) external returns (uint256 marketId_, bytes32 marketTerms_){}
-
- 
-
-  
+        MarketplaceTerms memory _marketTermsParams
+    ) external returns (uint256 marketId_, bytes32 marketTerms_) {}
 
     function closeMarket(uint256 _marketId) public {}
 

@@ -13,7 +13,7 @@ import "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol";
 import "./interfaces/ICollateralManager.sol";
 
 // Interfaces
-import "./interfaces/IMarketRegistry.sol";
+import "./interfaces/IMarketRegistry_V2.sol";
 import "./interfaces/IReputationManager.sol";
 import "./interfaces/ITellerV2.sol";
 import { Collateral } from "./interfaces/escrow/ICollateralEscrowV1.sol";
@@ -196,7 +196,7 @@ contract TellerV2 is
             _marketRegistry.isContract(),
             "MarketRegistry must be a contract"
         );
-        marketRegistry = IMarketRegistry(_marketRegistry);
+        marketRegistry = IMarketRegistry_V2(_marketRegistry);
 
         require(
             _reputationManager.isContract(),

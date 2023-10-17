@@ -9,25 +9,25 @@ interface IMarketRegistry_V2 is IMarketRegistry {
 
    
 
-    function isMarketOpen(uint256 _marketId) external view returns (bool);
-
-    function isMarketClosed(uint256 _marketId) external view returns (bool);
-
-    function isVerifiedBorrower(uint256 _marketId, address _borrower)
-        external
-        view
-        returns (bool); 
-
-    function isVerifiedLender(uint256 _marketId, address _lender)
-        external
-        view
-        returns (bool);
-
+     
     function getMarketURI(uint256 _marketId)
         external
         view
         returns (string memory);
+
+    function getMarketTermsForLending(bytes32 _marketTermsId)
+        external
+        view
+        
+        returns ( uint32, PaymentCycleType, PaymentType, uint32, uint32 );
    
+    function getMarketplaceFeeTerms(bytes32 _marketTermsId) 
+        external
+        view
+        
+        returns ( address , uint16 ) ;
+
+
    /* function getMarketFeeRecipient(uint256 _marketId)
         external
         view
@@ -75,5 +75,5 @@ interface IMarketRegistry_V2 is IMarketRegistry {
  
     function closeMarket(uint256 _marketId) external;
 
-    function getCurrentTermsForMarket(uint256 _marketId) public view returns (bytes32);
+    function getCurrentTermsForMarket(uint256 _marketId) external view returns (bytes32);
 }

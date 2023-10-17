@@ -45,7 +45,8 @@ library V2Calculations {
     function calculateAmountOwed(
         Bid storage _bid,
         uint256 _timestamp,
-        PaymentCycleType _paymentCycleType
+        PaymentCycleType _paymentCycleType,
+        uint32 _paymentCycleDuration
     )
         internal
         view
@@ -61,7 +62,8 @@ library V2Calculations {
                 _bid,
                 lastRepaidTimestamp(_bid),
                 _timestamp,
-                _paymentCycleType
+                _paymentCycleType,
+                _paymentCycleDuration
             );
     }
 

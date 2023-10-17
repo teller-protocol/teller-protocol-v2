@@ -582,8 +582,8 @@ contract MarketRegistry_G2 is
         view
         returns (uint16)
     {
-        uint256 _marketTermsId = currentMarketTermsForMarket[_marketId];
-        return marketTerms[_marketTermsId].marketFee ; 
+        bytes32 _marketTermsId = currentMarketTermsForMarket[_marketId];
+        return marketTerms[_marketTermsId].marketplaceFeePercent; 
     
     }
 
@@ -597,8 +597,8 @@ contract MarketRegistry_G2 is
     {
 
         return (
-            marketTerms[_marketTermsId].marketFeeRecipient,
-            marketTerms[_marketTermsId].marketFee
+            marketTerms[_marketTermsId].feeRecipient,
+            marketTerms[_marketTermsId].marketplaceFeePercent
         );
 
     }
@@ -634,7 +634,7 @@ contract MarketRegistry_G2 is
         
         returns (uint32)
     {
-        return marketTerms[_marketTermsId].bidExpirationTime;
+        return marketTerms[_marketTermsId].paymentDefaultDuration;
     }
 
     /**
@@ -648,7 +648,7 @@ contract MarketRegistry_G2 is
         //override
         returns (PaymentType)
     {
-         return marketTerms[_marketTermsId].bidExpirationTime;
+         return marketTerms[_marketTermsId].paymentType;
     }
 
     /**
@@ -675,18 +675,18 @@ contract MarketRegistry_G2 is
      * @param _marketId The ID of a market.
      * @param _lender Address to check.
      * @return isVerified_ Boolean indicating if a lender has been added to a market.
-     
+     * @return uuid_ This is now deprecated and blank
      */
     function isVerifiedLender(uint256 _marketId, address _lender)
         public
         view
         override
         returns (
-            bool isVerified_
-          //  , bytes32 uuid_
+            bool isVerified_,
+            bytes32 uuid_
             )
     {
-        return
+        isVerified_ =  
             _isVerified(
                 _lender,
                 markets[_marketId].lenderAttestationRequired,
@@ -700,18 +700,18 @@ contract MarketRegistry_G2 is
      * @param _marketId The ID of a market.
      * @param _borrower Address of the borrower to check.
      * @return isVerified_ Boolean indicating if a borrower has been added to a market.
-     
+     * @return uuid_ This is now deprecated and blank
      */
     function isVerifiedBorrower(uint256 _marketId, address _borrower)
         public
         view
         override
         returns (
-            bool isVerified_
-           // , bytes32 uuid_
+            bool isVerified_,
+            bytes32 uuid_
             )
     {
-        return
+        isVerified_ =
             _isVerified(
                 _borrower,
                 markets[_marketId].borrowerAttestationRequired,
@@ -1122,11 +1122,18 @@ contract MarketRegistry_G2 is
             "Not the market owner"
         );
 
-        bytes32 uuid = _revokeStakeholderVerification(
+        _revokeStakeholderVerification(
             _marketId,
             _stakeholderAddress,
             _isLender
         );
+
+
+       /* bytes32 uuid = _revokeStakeholderVerification(
+            _marketId,
+            _stakeholderAddress,
+            _isLender
+        );*/
         // NOTE: Disabling the call to revoke the attestation on EAS contracts
         //        tellerAS.revoke(uuid);
     }
@@ -1162,18 +1169,17 @@ contract MarketRegistry_G2 is
      * @notice Removes a stakeholder (borrower/lender) from a market.
      * @param _marketId The market ID to remove the lender from.
      * @param _stakeholderAddress The address of the stakeholder to remove from the market.
-     * @param _isLender Boolean indicating if the stakeholder is a lender. Otherwise it is a borrower.
-     * @return uuid_ The ID of the previously verified attestation.
+     * @param _isLender Boolean indicating if the stakeholder is a lender. Otherwise it is a borrower. 
      */
     function _revokeStakeholderVerification(
         uint256 _marketId,
         address _stakeholderAddress,
         bool _isLender
-    ) internal virtual returns (bytes32 uuid_) {
+    ) internal virtual   {
         if (_isLender) {
-            uuid_ = markets[_marketId].lenderAttestationIds[
+            /*uuid_ = markets[_marketId].lenderAttestationIds[
                 _stakeholderAddress
-            ];
+            ];*/
             // Remove lender address from market set
             markets[_marketId].verifiedLendersForMarket.remove(
                 _stakeholderAddress
@@ -1181,9 +1187,9 @@ contract MarketRegistry_G2 is
 
             emit LenderRevocation(_marketId, _stakeholderAddress);
         } else {
-            uuid_ = markets[_marketId].borrowerAttestationIds[
+            /*uuid_ = markets[_marketId].borrowerAttestationIds[
                 _stakeholderAddress
-            ];
+            ];*/
             // Remove borrower address from market set
             markets[_marketId].verifiedBorrowersForMarket.remove(
                 _stakeholderAddress

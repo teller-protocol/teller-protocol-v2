@@ -5,24 +5,10 @@ import "../EAS/TellerAS.sol";
 import { PaymentType, PaymentCycleType } from "../libraries/V2Calculations.sol";
 
  import { IMarketRegistry } from "./IMarketRegistry.sol";
- 
+
 interface IMarketRegistry_V1 is IMarketRegistry  {
     function initialize(TellerAS tellerAs) external;
-
-    function isVerifiedLender(uint256 _marketId, address _lender)
-        external
-        view
-        returns (bool, bytes32);
-
-    function isMarketOpen(uint256 _marketId) external view returns (bool);
-
-    function isMarketClosed(uint256 _marketId) external view returns (bool);
-
-    function isVerifiedBorrower(uint256 _marketId, address _borrower)
-        external
-        view
-        returns (bool, bytes32);
-
+ 
    
 
     function getMarketFeeRecipient(uint256 _marketId)

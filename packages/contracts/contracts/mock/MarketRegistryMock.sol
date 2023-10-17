@@ -25,13 +25,7 @@ contract MarketRegistryMock is IMarketRegistry_V2 {
 
     }
 
-    function isVerifiedLender(uint256 _marketId, address _lenderAddress)
-        public
-        view
-        returns (bool isVerified_)
-    {
-        isVerified_ = globalLenderIsVerified;
-    }
+ 
 
     function isMarketOpen(uint256 _marketId) public view returns (bool) {
         return !globalMarketsClosed;
@@ -44,9 +38,17 @@ contract MarketRegistryMock is IMarketRegistry_V2 {
     function isVerifiedBorrower(uint256 _marketId, address _borrower)
         public
         view
-        returns (bool isVerified_)
+        returns (bool isVerified_, bytes32)
     {
         isVerified_ = globalBorrowerIsVerified;
+    }
+
+   function isVerifiedLender(uint256 _marketId, address _lenderAddress)
+        public
+        view
+        returns (bool isVerified_,bytes32)
+    {
+        isVerified_ = globalLenderIsVerified;
     }
 
     function getMarketOwner(uint256 _marketId)
@@ -109,6 +111,37 @@ contract MarketRegistryMock is IMarketRegistry_V2 {
     function setMarketFeeRecipient(address _feeRecipient) public {
         globalMarketFeeRecipient = _feeRecipient;
     }
+
+
+  function getMarketplaceFeeTerms(bytes32 _marketTermsId) public
+        view
+        
+        returns ( address , uint16 )
+    {
+
+       
+
+    }
+
+
+    function getMarketTermsForLending(bytes32 _marketTermsId)
+        public
+        view
+        
+        returns ( uint32, PaymentCycleType, PaymentType, uint32, uint32 )
+    {
+        //require(_marketTermsId != bytes32(0), "Invalid market terms." );
+ 
+
+        /*return (
+            marketTerms[_marketTermsId].paymentCycleDuration,
+            marketTerms[_marketTermsId].paymentCycleType,
+            marketTerms[_marketTermsId].paymentType,
+            marketTerms[_marketTermsId].paymentDefaultDuration,
+            marketTerms[_marketTermsId].bidExpirationTime
+        );*/
+    }
+
 
     function getPaymentType(uint256 _marketId)
         public

@@ -1,7 +1,7 @@
 pragma solidity >=0.8.0 <0.9.0;
 // SPDX-License-Identifier: MIT
 
-import { IMarketRegistry } from "./interfaces/IMarketRegistry.sol";
+import { IMarketRegistry_V2 } from "./interfaces/IMarketRegistry_V2.sol";
 import "./interfaces/IEscrowVault.sol";
 import "./interfaces/IReputationManager.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
@@ -108,7 +108,7 @@ abstract contract TellerV2Storage_G0 {
     // List of allowed lending tokens
     EnumerableSet.AddressSet internal __lendingTokensSet; // DEPRECATED
 
-    IMarketRegistry public marketRegistry;
+    IMarketRegistry_V2 public marketRegistry;
     IReputationManager public reputationManager;
 
     // Mapping of borrowers to borrower requests.

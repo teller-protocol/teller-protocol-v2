@@ -25,7 +25,7 @@ import "../tokens/TestERC20Token.sol";
 //import "../../contracts/CollateralManagerV1.sol";
 import "../../contracts/mock/CollateralManagerMock.sol";
 import { Collateral } from "../../contracts/interfaces/escrow/ICollateralEscrowV1.sol";
-import { PaymentType } from "../../contracts/libraries/V2Calculations.sol";
+import { PaymentType, PaymentCycleType } from "../../contracts/libraries/V2Calculations.sol";
 import { BidState, Payment } from "../../contracts/TellerV2Storage.sol";
 
 import "../../contracts/MetaForwarder.sol";

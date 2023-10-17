@@ -8,7 +8,7 @@ import "../contracts/interfaces/ITellerV2.sol";
 import "../contracts/interfaces/ITellerV2Context.sol";
 import { Collateral } from "../contracts/interfaces/escrow/ICollateralEscrowV1.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import { PaymentType } from "../contracts/libraries/V2Calculations.sol";
+import { PaymentType , PaymentCycleType } from "../contracts/libraries/V2Calculations.sol";
 
 contract User {
     address public immutable tellerV2;

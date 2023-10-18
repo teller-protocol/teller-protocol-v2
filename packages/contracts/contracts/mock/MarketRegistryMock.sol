@@ -1,11 +1,11 @@
 pragma solidity ^0.8.0;
 
 // SPDX-License-Identifier: MIT
-
+import "../interfaces/IMarketRegistry.sol";
 import "../interfaces/IMarketRegistry_V2.sol";
 import { PaymentType } from "../libraries/V2Calculations.sol";
 
-contract MarketRegistryMock is IMarketRegistry_V2 {
+contract MarketRegistryMock is IMarketRegistry,IMarketRegistry_V2 {
     //address marketOwner;
 
     address public globalMarketOwner;

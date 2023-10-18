@@ -105,7 +105,7 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
 
           vm.prank(address(marketOwner));
         (uint256 marketId,  ) = marketRegistry.createMarket (
-            address(marketRegistry), 
+            address(marketOwner), 
             false,
             false,  
             "uri://",
@@ -287,7 +287,7 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
         assertEq(
             paymentCycleDuration,
             30 days,
-            "Monthly market payment cycle duration set incorrectly"
+            "Monthly market payment cycle duration returned incorrectly"
         );
 
         
@@ -640,7 +640,7 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
         marketRegistry.setMarketOwner(address(marketOwner));
 
         marketRegistry.stubMarket(marketId, address(this));
-
+        
         address feeRecipient = marketRegistry.getMarketFeeRecipient(marketId);
 
         assertEq(

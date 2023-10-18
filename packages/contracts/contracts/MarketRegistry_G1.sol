@@ -17,8 +17,7 @@ import "./interfaces/IMarketRegistry_V1.sol";
 import { EnumerableSet } from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import { PaymentType } from "./libraries/V2Calculations.sol";
 
-contract MarketRegistry_G1 is
-    IMarketRegistry,
+contract MarketRegistry_G1 is 
     IMarketRegistry_V1,
     Initializable,
     Context,

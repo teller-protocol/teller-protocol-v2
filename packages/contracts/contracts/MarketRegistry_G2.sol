@@ -18,7 +18,6 @@ import { EnumerableSet } from "@openzeppelin/contracts/utils/structs/EnumerableS
 import { PaymentType } from "./libraries/V2Calculations.sol";
 
 contract MarketRegistry_G2 is
-    IMarketRegistry,
     IMarketRegistry_V2,
     Initializable,
     Context
@@ -360,8 +359,9 @@ contract MarketRegistry_G2 is
             address feeRecipient
         )
     {
+     
         return (
-            marketTerms[_marketTermsId].paymentCycleDuration,
+            getPaymentCycleDurationForTerms(_marketTermsId),
             marketTerms[_marketTermsId].paymentType,
             marketTerms[_marketTermsId].paymentCycleType,
             marketTerms[_marketTermsId].paymentDefaultDuration,
@@ -503,7 +503,7 @@ contract MarketRegistry_G2 is
         returns (uint32)
     {
         bytes32 _marketTermsId = currentMarketTermsForMarket[_marketId];
-        return marketTerms[_marketTermsId].paymentCycleDuration;
+        return getPaymentCycleDurationForTerms(_marketTermsId);
     }
 
     /**
@@ -544,8 +544,10 @@ contract MarketRegistry_G2 is
     {
         require(_marketTermsId != bytes32(0), "Invalid market terms.");
 
+        uint32 paymentCycleDuration = getPaymentCycleDurationForTerms(_marketTermsId);
+
         return (
-            marketTerms[_marketTermsId].paymentCycleDuration,
+            paymentCycleDuration,
             marketTerms[_marketTermsId].paymentCycleType,
             marketTerms[_marketTermsId].paymentType,
             marketTerms[_marketTermsId].paymentDefaultDuration,
@@ -595,6 +597,10 @@ contract MarketRegistry_G2 is
         view
         returns (uint32)
     {
+        if(marketTerms[_marketTermsId].paymentCycleType == PaymentCycleType.Monthly){
+            return 30 days;
+        }
+
         return marketTerms[_marketTermsId].paymentCycleDuration;
     }
 

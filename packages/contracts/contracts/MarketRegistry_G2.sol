@@ -722,6 +722,14 @@ contract MarketRegistry_G2 is
         uint16 _feePercent,
         address _feeRecipient
     ) internal returns (bytes32) {
+
+        require(
+            (_paymentCycleType == PaymentCycleType.Seconds) ||
+                (_paymentCycleType == PaymentCycleType.Monthly &&
+                    _paymentCycleDuration == 0),
+            "Monthly payment cycle duration invalid for cycle type"
+        );
+
         bytes32 marketTermsId = _getMarketTermsHashId(
             _paymentCycleDuration,
             _newPaymentType,

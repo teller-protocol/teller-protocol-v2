@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
+import { PaymentType, PaymentCycleType } from "../libraries/V2Calculations.sol";
 
 import { IMarketRegistry } from "./IMarketRegistry.sol";
-import { PaymentType, PaymentCycleType } from "../libraries/V2Calculations.sol";
 
 interface IMarketRegistry_V2 is IMarketRegistry {
     struct MarketplaceTerms {

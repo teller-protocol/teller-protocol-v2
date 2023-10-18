@@ -17,8 +17,7 @@ import "../contracts/EAS/TellerAS.sol";
 
 import "../contracts/mock/WethMock.sol";
 import "../contracts/interfaces/IWETH.sol";
-
-import { User } from "./Test_Helpers.sol";
+ 
 import { PaymentType, PaymentCycleType } from "../contracts/libraries/V2Calculations.sol";
 
 import { MarketRegistry_Override } from "./MarketRegistry_Override.sol";
@@ -26,11 +25,11 @@ import { MarketRegistry_Override } from "./MarketRegistry_Override.sol";
 import { TellerASMock } from "../contracts/mock/TellerASMock.sol";
 
 contract MarketRegistry_Test is Testable {
-    MarketRegistryUser private marketOwner;
-    MarketRegistryUser private borrower;
-    MarketRegistryUser private lender;
-    MarketRegistryUser private stakeholder;
-    MarketRegistryUser private feeRecipient;
+    User private marketOwner;
+    User private borrower;
+    User private lender;
+    //User private stakeholder;
+    User private feeRecipient;
 
     WethMock wethMock;
 
@@ -58,22 +57,10 @@ contract MarketRegistry_Test is Testable {
 
        
 
-        marketOwner = new MarketRegistryUser(
-            address(tellerV2),
-            address(marketRegistry)
-        );
-        borrower = new MarketRegistryUser(
-            address(tellerV2),
-            address(marketRegistry)
-        );
-        lender = new MarketRegistryUser(
-            address(tellerV2),
-            address(marketRegistry)
-        );
-        feeRecipient = new MarketRegistryUser(
-            address(tellerV2),
-            address(marketRegistry)
-        );
+        marketOwner = new User(  );
+        borrower = new User(  );
+        lender =  new User(  );
+        feeRecipient =  new User(  );
 
         marketRegistry.setMarketOwner(address(marketOwner));
 
@@ -103,20 +90,26 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
 
     function test_createMarket_simple() public {
         // Standard seconds payment cycle
-        (uint256 marketId,  ) = marketOwner.createMarket (
-            address(marketRegistry),
-            uint32(8000),
-            uint32(7000),
-            uint32(5000),
-            uint16(500),
-            false,
-            false,
 
-            PaymentType.EMI ,
-            PaymentCycleType.Seconds ,  
-       
-            address(marketRegistry),
-            "uri://"
+      
+
+          IMarketRegistry_V2.MarketplaceTerms memory marketTerms = IMarketRegistry_V2.MarketplaceTerms({
+            paymentCycleDuration:uint32(8000),
+            paymentDefaultDuration:uint32(7000),
+            bidExpirationTime:uint32(5000),
+            marketplaceFeePercent:uint16(500),
+            paymentType: PaymentType.EMI,
+            paymentCycleType:PaymentCycleType.Seconds,
+            feeRecipient: address(marketRegistry)  
+        });
+
+          vm.prank(address(marketOwner));
+        (uint256 marketId,  ) = marketRegistry.createMarket (
+            address(marketRegistry), 
+            false,
+            false,  
+            "uri://",
+            marketTerms
         );
 
         (address owner, , , ,  ) = marketRegistry.getMarketData(marketId);
@@ -125,22 +118,31 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
     }
 
     function test_closeMarket() public {
-        (uint256 marketId,  ) = marketOwner.createMarket(
-            address(marketRegistry),
-            uint32(8000),
-            uint32(7000),
-            uint32(5000),
-            uint16(500),
+           
+        
+        
+        
+        IMarketRegistry_V2.MarketplaceTerms memory marketTerms = IMarketRegistry_V2.MarketplaceTerms({
+            paymentCycleDuration:uint32(8000),
+            paymentDefaultDuration:uint32(7000),
+            bidExpirationTime:uint32(5000),
+            marketplaceFeePercent:uint16(500),
+            paymentType: PaymentType.EMI,
+            paymentCycleType:PaymentCycleType.Seconds,
+            feeRecipient: address(marketRegistry)  
+        });
+
+        vm.prank(address(marketOwner));
+        (uint256 marketId,  ) = marketRegistry.createMarket (
+            address(marketRegistry), 
             false,
-            false,
-              PaymentType.EMI ,
-            PaymentCycleType.Seconds ,  
-       
-            address(marketRegistry),
-            "uri://"
+            false,  
+            "uri://",
+            marketTerms
         );
 
-        marketOwner.closeMarket(marketId);
+        vm.prank(address(marketOwner));
+        marketRegistry.closeMarket(marketId);
 
         bool marketIsClosed = marketRegistry.isMarketClosed(marketId);
 
@@ -148,24 +150,33 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
     }
 
     function test_closeMarket_twice() public {
-        (uint256 marketId,  ) = marketOwner.createMarket(
-            address(marketRegistry),
-            uint32(8000),
-            uint32(7000),
-            uint32(5000),
-            uint16(500),
+        
+        
+
+        IMarketRegistry_V2.MarketplaceTerms memory marketTerms = IMarketRegistry_V2.MarketplaceTerms({
+            paymentCycleDuration:uint32(8000),
+            paymentDefaultDuration:uint32(7000),
+            bidExpirationTime:uint32(5000),
+            marketplaceFeePercent:uint16(500),
+            paymentType: PaymentType.EMI,
+            paymentCycleType:PaymentCycleType.Seconds,
+            feeRecipient: address(marketRegistry)  
+        });
+
+        vm.prank(address(marketOwner));
+        (uint256 marketId,  ) = marketRegistry.createMarket (
+            address(marketRegistry), 
             false,
-            false,
-              PaymentType.EMI ,
-            PaymentCycleType.Seconds ,  
-       
-            address(marketRegistry),
-            "uri://"
+            false,  
+            "uri://",
+            marketTerms
         );
 
-        marketOwner.closeMarket(marketId);
+        vm.prank(address(marketOwner));
+        marketRegistry.closeMarket(marketId);
 
-        marketOwner.closeMarket(marketId);
+        vm.prank(address(marketOwner));
+        marketRegistry.closeMarket(marketId);
 
         bool marketIsClosed = marketRegistry.isMarketClosed(marketId);
 
@@ -173,46 +184,54 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
     }
 
     function test_closeMarket_invalid_owner() public {
-        
-        (uint256 marketId,  ) = marketOwner.createMarket(
-            address(marketRegistry),
-            uint32(8000),
-            uint32(7000),
-            uint32(5000),
-            uint16(500),
+         IMarketRegistry_V2.MarketplaceTerms memory marketTerms = IMarketRegistry_V2.MarketplaceTerms({
+            paymentCycleDuration:uint32(8000),
+            paymentDefaultDuration:uint32(7000),
+            bidExpirationTime:uint32(5000),
+            marketplaceFeePercent:uint16(500),
+            paymentType: PaymentType.EMI,
+            paymentCycleType:PaymentCycleType.Seconds,
+            feeRecipient: address(marketRegistry)  
+        });
+
+        vm.prank(address(marketOwner));
+        (uint256 marketId,  ) = marketRegistry.createMarket (
+            address(marketRegistry), 
             false,
-            false,
-              PaymentType.EMI ,
-            PaymentCycleType.Seconds ,  
-       
-            address(marketRegistry),
-            "uri://"
+            false,  
+            "uri://",
+            marketTerms
         );
 
-
         vm.expectRevert("Not the owner");
-        borrower.closeMarket(marketId);
+        marketRegistry.closeMarket(marketId);
     }
 
     function test_createMarket() public {
         // Standard seconds payment cycle
-        marketOwner.createMarket(
-            address(marketRegistry),
-            8000,
-            7000,
-            5000,
-            500,
+
+         IMarketRegistry_V2.MarketplaceTerms memory marketTerms = IMarketRegistry_V2.MarketplaceTerms({
+            paymentCycleDuration:uint32(8000),
+            paymentDefaultDuration:uint32(7000),
+            bidExpirationTime:uint32(5000),
+            marketplaceFeePercent:uint16(500),
+            paymentType: PaymentType.EMI,
+            paymentCycleType:PaymentCycleType.Seconds,
+            feeRecipient: address(marketRegistry)  
+        });
+
+        vm.prank(address(marketOwner));
+        (uint256 marketId,  ) = marketRegistry.createMarket (
+            address(marketRegistry), 
             false,
-            false,
-            PaymentType.EMI,
-            PaymentCycleType.Seconds,
-             address(marketRegistry),
-            "uri://"
+            false,  
+            "uri://",
+            marketTerms
         );
 
-          marketId = 1;
+        uint256  _marketId = 1;
 
-        bytes32 marketTermsId = marketRegistry.getCurrentTermsForMarket(marketId);
+        bytes32 marketTermsId = marketRegistry.getCurrentTermsForMarket(_marketId);
 
         (
             uint32 paymentCycleDuration,
@@ -232,24 +251,29 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
             "Market payment cycle duration set incorrectly"
         );
 
-        // Monthly payment cycle
-        marketOwner.createMarket(
-            address(marketRegistry),
-            0,
-            7000,
-            5000,
-            500,
+
+        marketTerms = IMarketRegistry_V2.MarketplaceTerms({
+            paymentCycleDuration:uint32(0),
+            paymentDefaultDuration:uint32(7000),
+            bidExpirationTime:uint32(5000),
+            marketplaceFeePercent:uint16(500),
+            paymentType: PaymentType.EMI,
+            paymentCycleType:PaymentCycleType.Monthly,
+            feeRecipient: address(marketRegistry)  
+        });
+
+        vm.prank(address(marketOwner));
+        (marketId,  ) = marketRegistry.createMarket (
+            address(marketRegistry), 
             false,
-            false,
-            PaymentType.EMI,
-            PaymentCycleType.Monthly,
-             address(marketRegistry),
-            "uri://"
+            false,  
+            "uri://",
+            marketTerms
         );
+ 
+        _marketId = 2; 
 
-        marketId = 2; 
-
-        marketTermsId = marketRegistry.getCurrentTermsForMarket(marketId);
+        marketTermsId = marketRegistry.getCurrentTermsForMarket(_marketId);
 
         (paymentCycleDuration, paymentCycleType, , ,) = marketRegistry.getMarketTermsForLending(
            marketTermsId
@@ -266,11 +290,35 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
             "Monthly market payment cycle duration set incorrectly"
         );
 
-        vm.expectRevert("monthly payment cycle duration cannot be set");
+        
+
+
 
         // Monthly payment cycle should fail
 
-        marketOwner.createMarket(
+         marketTerms = IMarketRegistry_V2.MarketplaceTerms({
+            paymentCycleDuration:uint32(3000),
+            paymentDefaultDuration:uint32(7000),
+            bidExpirationTime:uint32(5000),
+            marketplaceFeePercent:uint16(500),
+            paymentType: PaymentType.EMI,
+            paymentCycleType:PaymentCycleType.Monthly,
+            feeRecipient: address(marketRegistry)  
+        });
+
+        //payment cycle duration must be zero for monthly type 
+        vm.expectRevert("Monthly payment cycle duration invalid for cycle type");
+        vm.prank(address(marketOwner));
+        (marketId,  ) = marketRegistry.createMarket (
+            address(marketRegistry), 
+            false,
+            false,  
+            "uri://",
+            marketTerms
+        );
+ 
+
+      /*  marketOwner.createMarket(
             address(marketRegistry),
             3000,
             7000,
@@ -282,30 +330,39 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
             PaymentCycleType.Monthly,
              address(marketRegistry),
             "uri://"
-        );
+        ); */
     }
 
     function test_createMarket_invalid_initial_owner() public {
+        
+
+         IMarketRegistry_V2.MarketplaceTerms memory marketTerms = IMarketRegistry_V2.MarketplaceTerms({
+            paymentCycleDuration:uint32(0),
+            paymentDefaultDuration:uint32(7000),
+            bidExpirationTime:uint32(5000),
+            marketplaceFeePercent:uint16(500),
+            paymentType: PaymentType.EMI,
+            paymentCycleType:PaymentCycleType.Monthly,
+            feeRecipient: address(marketRegistry)  
+        });
+
+       
+
         vm.expectRevert(); //"Invalid owner address"
-        marketOwner.createMarket(
-            address(0),
-            0,
-            7000,
-            5000,
-            500,
+         (uint256 marketId,  ) = marketRegistry.createMarket (
+            address(0), 
             false,
-            false,
-            PaymentType.EMI,
-            PaymentCycleType.Seconds,
-             address(marketRegistry),
-            "uri://"
+            false,  
+            "uri://",
+            marketTerms
         );
+
     }
 
     function test_attestStakeholder() public {
         bool isLender = true;
-
-        marketOwner.attestStakeholder(
+        vm.prank(address(marketOwner));
+        marketRegistry.attestStakeholder(
             marketId,
             address(lender),
             expirationTime,
@@ -430,7 +487,8 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
     function test_revokeStakeholder() public {
         bool isLender = true;
 
-        marketOwner.revokeStakeholder(marketId, address(lender), isLender);
+        vm.prank(address(marketOwner));
+        marketRegistry.revokeStakeholder(marketId, address(lender), isLender);
 
         assertEq(
             marketRegistry.revokeStakeholderVerificationWasCalled(),
@@ -473,7 +531,8 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
     function test_lenderExitMarket() public {
         marketRegistry.forceVerifyLenderForMarket(marketId, address(lender));
 
-        lender.lenderExitMarket(marketId);
+        vm.prank(address(lender));
+        marketRegistry.lenderExitMarket(marketId);
 
         assertEq(
             marketRegistry.marketVerifiedLendersContains(
@@ -490,8 +549,8 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
             marketId,
             address(borrower)
         );
-
-        borrower.borrowerExitMarket(marketId);
+        vm.prank(address(borrower));
+        marketRegistry.borrowerExitMarket(marketId);
 
         assertEq(
             marketRegistry.marketVerifiedBorrowersContains(
@@ -1030,7 +1089,7 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
         assertEq(lenders[0], address(lender), "Did not return correct lender");
     }
 }
-
+/*
 contract MarketRegistryUser is User {
     MarketRegistry_Override marketRegistry;
 
@@ -1076,6 +1135,9 @@ contract MarketRegistryUser is User {
         );
     }
 }
+*/
+
+contract User{}
 
 contract TellerV2Mock is TellerV2Context {
     Bid mockBid;

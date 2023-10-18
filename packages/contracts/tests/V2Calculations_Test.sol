@@ -165,6 +165,8 @@ contract V2Calculations_Test is Testable {
         //need this here or else it defaults to EMI !
         __bid.paymentType = _paymentType;
 
+        uint32 _paymentCycleDuration = __bid.terms.paymentCycle;
+
         // Set the bid's payment cycle amount
         __bid.terms.paymentCycleAmount = paymentCycleAmount;
         // Set accepted bid timestamp to now
@@ -188,7 +190,7 @@ contract V2Calculations_Test is Testable {
             uint256 duePrincipal;
             uint256 interest;
             (owedPrincipal, duePrincipal, interest) = V2Calculations
-                .calculateAmountOwed(__bid, nowTimestamp, _paymentCycleType);
+                .calculateAmountOwed(__bid, nowTimestamp, _paymentCycleType, _paymentCycleDuration);
 
             // Check if we should skip this cycle for payments
             if (cyclesToSkip.length() > 0) {
@@ -258,7 +260,8 @@ contract V2Calculations_Test is Testable {
                 __bid,
                 1658159355, // last repaid timestamp
                 1663189241, //timestamp
-                PaymentCycleType.Seconds
+                PaymentCycleType.Seconds,
+                2592000
             );
 
         assertEq(
@@ -293,7 +296,8 @@ contract V2Calculations_Test is Testable {
                 __bid,
                 2000000 + 3000, //last repaid timestamp
                 2000000 + 5500, //timestamp
-                PaymentCycleType.Seconds
+                PaymentCycleType.Seconds,
+                3000
             );
 
         assertEq(_owedPrincipal, 10000, "Expected owed principal incorrect");
@@ -318,7 +322,8 @@ contract V2Calculations_Test is Testable {
                 __bid,
                 2000000 + 3000, //last repaid timestamp
                 2000000 + 7500, //timestamp
-                PaymentCycleType.Seconds
+                PaymentCycleType.Seconds,
+                3000
             );
 
         assertEq(_owedPrincipal, 10000, "Expected owed principal incorrect");
@@ -343,7 +348,8 @@ contract V2Calculations_Test is Testable {
                 __bid,
                 2000000 + 3000, //last repaid timestamp
                 2000000 + 19500, //timestamp
-                PaymentCycleType.Seconds
+                PaymentCycleType.Seconds,
+                3000
             );
 
         assertEq(_owedPrincipal, 10000, "Expected owed principal incorrect");
@@ -385,7 +391,8 @@ contract V2Calculations_Test is Testable {
                 __bid,
                 _lastRepaidTimestamp,
                 _timestamp,
-                PaymentCycleType.Seconds
+                PaymentCycleType.Seconds,
+                2592000
             );
 
         assertEq(
@@ -415,7 +422,8 @@ contract V2Calculations_Test is Testable {
                 __bid,
                 _lastRepaidTimestamp,
                 _timestamp,
-                PaymentCycleType.Seconds
+                PaymentCycleType.Seconds,
+                __bid.terms.paymentCycle
             );
 
         assertEq(
@@ -438,7 +446,8 @@ contract V2Calculations_Test is Testable {
                 __bid,
                 _lastRepaidTimestamp,
                 _timestamp,
-                PaymentCycleType.Seconds
+                PaymentCycleType.Seconds,
+                __bid.terms.paymentCycle
             );
 
         assertEq(
@@ -465,7 +474,8 @@ contract V2Calculations_Test is Testable {
                 __bid,
                 _lastRepaidTimestamp,
                 _timestamp,
-                PaymentCycleType.Seconds
+                PaymentCycleType.Seconds,
+                __bid.terms.paymentCycle
             );
 
         assertEq(
@@ -522,7 +532,8 @@ contract V2Calculations_Test is Testable {
                 __bid,
                 _lastRepaidTimestamp,
                 _timestamp,
-                PaymentCycleType.Seconds
+                PaymentCycleType.Seconds,
+                __bid.terms.paymentCycle
             );
 
         assertEq(

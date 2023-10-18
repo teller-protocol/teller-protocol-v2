@@ -324,7 +324,7 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
     {
         bytes32 bidTermsId = bidMarketTermsId[bidId];
         if (bidTermsId != bytes32(0)) {
-            return marketRegistry.getPaymentCycleType(bidTermsId);
+            return marketRegistry.getPaymentCycleTypeForTerms(bidTermsId);
         }
 
         return bidPaymentCycleType[_bidId];
@@ -337,7 +337,7 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
     {
         bytes32 bidTermsId = bidMarketTermsId[bidId];
         if (bidTermsId != bytes32(0)) {
-            return marketRegistry.getPaymentCycleDuration(bidTermsId);
+            return marketRegistry.getPaymentCycleDurationForTerms(bidTermsId);
         }
 
         Bid storage bid = bids[_bidId];

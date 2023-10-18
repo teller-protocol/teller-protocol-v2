@@ -447,7 +447,86 @@ contract MarketRegistry_G2 is
         return marketTerms[_marketTermsId].marketplaceFeePercent;
     }
 
-    function getMarketplaceFeeTerms(bytes32 _marketTermsId)
+    function getMarketFeeRecipient(uint256 _marketId)
+        external
+        view
+        returns (address)
+    {
+        bytes32 _marketTermsId = currentMarketTermsForMarket[_marketId];
+        return marketTerms[_marketTermsId].feeRecipient;
+    }
+
+
+   
+
+
+    /**
+     * @notice Gets the loan default duration of a market.
+     * @param _marketId The ID of the market.
+     * @return Duration of a loan repayment interval until it is default.
+     */
+    function getPaymentDefaultDuration(uint256 _marketId)
+        public
+        view
+        returns (uint32)
+    {   
+        bytes32 _marketTermsId = currentMarketTermsForMarket[_marketId];
+        return marketTerms[_marketTermsId].paymentDefaultDuration;
+    }
+
+    /**
+     * @notice Get the payment type of a market.
+     * @param _marketId The ID of the market.
+     * @return The type of payment for loans in the market.
+     */
+    function getPaymentType(uint256 _marketId)
+        public
+        view
+        returns (PaymentType)
+    {
+        bytes32 _marketTermsId = currentMarketTermsForMarket[_marketId];
+        return marketTerms[_marketTermsId].paymentType;
+    }
+
+    function getPaymentCycleType(uint256 _marketId)
+        public
+        view
+        returns (PaymentCycleType)
+    {
+        bytes32 _marketTermsId = currentMarketTermsForMarket[_marketId];
+        return marketTerms[_marketTermsId].paymentCycleType;
+    }
+
+    function getPaymentCycleDuration(uint256 _marketId)
+        public
+        view
+        returns (uint32)
+    {
+        bytes32 _marketTermsId = currentMarketTermsForMarket[_marketId];
+        return marketTerms[_marketTermsId].paymentCycleDuration;
+    }
+
+    /**
+     * @notice Gets the loan default duration of a market.
+     * @param _marketId The ID of the market.
+     * @return Expiration of a loan bid submission until it is no longer acceptable.
+     */
+    function getBidExpirationTime(uint256 _marketId)
+        public
+        view
+        returns (
+            //override
+            uint32
+        )
+    {
+        bytes32 _marketTermsId = currentMarketTermsForMarket[_marketId];
+        return marketTerms[_marketTermsId].bidExpirationTime;
+    }
+
+
+
+
+     function getMarketFeeTerms(bytes32 _marketTermsId)
         public
         view
         returns (address, uint16)
@@ -472,14 +551,17 @@ contract MarketRegistry_G2 is
             marketTerms[_marketTermsId].paymentDefaultDuration,
             marketTerms[_marketTermsId].bidExpirationTime
         );
-    }
+    } 
+
+
+
 
     /**
      * @notice Gets the loan default duration of a market.
      * @param _marketTermsId The ID of the market terms.
      * @return Duration of a loan repayment interval until it is default.
      */
-    function getPaymentDefaultDuration(bytes32 _marketTermsId)
+    function getPaymentDefaultDurationForTerms(bytes32 _marketTermsId)
         public
         view
         returns (uint32)
@@ -492,7 +574,7 @@ contract MarketRegistry_G2 is
      * @param _marketTermsId the ID of the market terms.
      * @return The type of payment for loans in the market.
      */
-    function getPaymentType(bytes32 _marketTermsId)
+    function getPaymentTypeForTerms(bytes32 _marketTermsId)
         public
         view
         returns (PaymentType)
@@ -500,7 +582,7 @@ contract MarketRegistry_G2 is
         return marketTerms[_marketTermsId].paymentType;
     }
 
-    function getPaymentCycleType(bytes32 _marketTermsId)
+    function getPaymentCycleTypeForTerms(bytes32 _marketTermsId)
         public
         view
         returns (PaymentCycleType)
@@ -508,7 +590,7 @@ contract MarketRegistry_G2 is
         return marketTerms[_marketTermsId].paymentCycleType;
     }
 
-    function getPaymentCycleDuration(bytes32 _marketTermsId)
+    function getPaymentCycleDurationForTerms(bytes32 _marketTermsId)
         public
         view
         returns (uint32)
@@ -521,7 +603,7 @@ contract MarketRegistry_G2 is
      * @param _marketTermsId The ID of the market terms.
      * @return Expiration of a loan bid submission until it is no longer acceptable.
      */
-    function getBidExpirationTime(bytes32 _marketTermsId)
+    function getBidExpirationTimeForTerms(bytes32 _marketTermsId)
         public
         view
         returns (
@@ -687,6 +769,42 @@ contract MarketRegistry_G2 is
     }
 
     //Attestation Functions
+
+/**
+     * @notice Enable/disables market whitelist for lenders.
+     * @param _marketId The ID of a market.
+     * @param _required Boolean indicating if the market requires whitelist.
+     *
+     * Requirements:
+     * - The caller must be the current owner.
+     */
+    function setLenderAttestationRequired(uint256 _marketId, bool _required)
+        public
+        ownsMarket(_marketId)
+    {
+        if (_required != markets[_marketId].lenderAttestationRequired) {
+            markets[_marketId].lenderAttestationRequired = _required;
+            emit SetMarketLenderAttestation(_marketId, _required);
+        }
+    }
+
+    /**
+     * @notice Enable/disables market whitelist for borrowers.
+     * @param _marketId The ID of a market.
+     * @param _required Boolean indicating if the market requires whitelist.
+     *
+     * Requirements:
+     * - The caller must be the current owner.
+     */
+    function setBorrowerAttestationRequired(uint256 _marketId, bool _required)
+        public
+        ownsMarket(_marketId)
+    {
+        if (_required != markets[_marketId].borrowerAttestationRequired) {
+            markets[_marketId].borrowerAttestationRequired = _required;
+            emit SetMarketBorrowerAttestation(_marketId, _required);
+        }
+    }
 
     /**
      * @notice Adds a lender to a market.

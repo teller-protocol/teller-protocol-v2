@@ -531,7 +531,7 @@ contract TellerV2 is
         }
 
         (address marketFeeRecipient, uint16 marketFee) = marketRegistry
-            .getMarketplaceFeeTerms(bidTermsId);
+            .getMarketFeeTerms(bidTermsId);
 
         // Transfer funds to borrower from the lender
         amountToProtocol = bid.loanDetails.principal.percent(protocolFee());
@@ -1111,7 +1111,7 @@ contract TellerV2 is
     {
         bytes32 bidTermsId = bidMarketTermsId[bidId];
         if (bidTermsId != bytes32(0)) {
-            return marketRegistry.getBidExpirationTime(bidTermsId);
+            return marketRegistry.getBidExpirationTimeForTerms(bidTermsId);
         }
 
         return bidExpirationTime[_bidId];
@@ -1124,7 +1124,7 @@ contract TellerV2 is
     {
         bytes32 bidTermsId = bidMarketTermsId[bidId];
         if (bidTermsId != bytes32(0)) {
-            return marketRegistry.getPaymentDefaultDuration(bidTermsId);
+            return marketRegistry.getPaymentDefaultDurationForTerms(bidTermsId);
         }
 
         return bidDefaultDuration[_bidId];
@@ -1137,7 +1137,7 @@ contract TellerV2 is
     {
         bytes32 bidTermsId = bidMarketTermsId[bidId];
         if (bidTermsId != bytes32(0)) {
-            return marketRegistry.getPaymentCycleType(bidTermsId);
+            return marketRegistry.getPaymentCycleTypeForTerms(bidTermsId);
         }
 
         return bidPaymentCycleType[_bidId];
@@ -1150,7 +1150,7 @@ contract TellerV2 is
     {
         bytes32 bidTermsId = bidMarketTermsId[bidId];
         if (bidTermsId != bytes32(0)) {
-            return marketRegistry.getPaymentCycleDuration(bidTermsId);
+            return marketRegistry.getPaymentCycleDurationForTerms(bidTermsId);
         }
 
         Bid storage bid = bids[_bidId];

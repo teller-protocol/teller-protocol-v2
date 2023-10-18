@@ -73,7 +73,7 @@ contract User {
         address _feeRecipient,
         string calldata _uri
     ) public returns (uint256,bytes32) {
-          IMarketRegistry_V2.MarketplaceTerms memory marketTerms = IMarketRegistry_V2.MarketplaceTerms({
+        IMarketRegistry_V2.MarketplaceTerms memory marketTerms = IMarketRegistry_V2.MarketplaceTerms({
             paymentCycleDuration:_paymentCycleDuration,
             paymentDefaultDuration:_paymentDefaultDuration,
             bidExpirationTime:_bidExpirationTime,

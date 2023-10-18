@@ -15,42 +15,48 @@ interface IMarketRegistry_V2 is IMarketRegistry {
         address feeRecipient;
     }
 
-    function getMarketURI(uint256 _marketId)
-        external
-        view
-        returns (string memory);
-
+   
     function getMarketTermsForLending(bytes32 _marketTermsId)
         external
         view
         returns (uint32, PaymentCycleType, PaymentType, uint32, uint32);
 
-    function getMarketplaceFeeTerms(bytes32 _marketTermsId)
+    function getMarketFeeTerms(bytes32 _marketTermsId)
         external
         view
         returns (address, uint16);
 
-    function getBidExpirationTime(bytes32 _marketTermsId)
+    function getBidExpirationTimeForTerms(bytes32 _marketTermsId)
         external
         view
         returns (uint32);
 
-    function getPaymentDefaultDuration(bytes32 _marketTermsId)
+    function getPaymentDefaultDurationForTerms(bytes32 _marketTermsId)
         external
         view
         returns (uint32);
 
-    function getPaymentType(bytes32 _marketTermsId)
+    function getPaymentTypeForTerms(bytes32 _marketTermsId)
         external
         view
         returns (PaymentType);
 
-    function getPaymentCycleType(bytes32 _marketTermsId)
+    function getPaymentCycleTypeForTerms(bytes32 _marketTermsId)
         external
         view
         returns (PaymentCycleType);
 
-    function getPaymentCycleDuration(bytes32 _marketTermsId)
+    function getPaymentCycleDurationForTerms(bytes32 _marketTermsId)
+        external
+        view
+        returns (uint32);
+
+    function getPaymentCycleType(uint256 _marketId)
+        external
+        view
+        returns (PaymentCycleType);
+
+    function getPaymentCycleDuration(uint256 _marketId)
         external
         view
         returns (uint32);
@@ -63,7 +69,7 @@ interface IMarketRegistry_V2 is IMarketRegistry {
         MarketplaceTerms memory _marketTermsParams
     ) external returns (uint256 marketId_, bytes32 marketTerms_);
 
-    function closeMarket(uint256 _marketId) external;
+    
 
     function getCurrentTermsForMarket(uint256 _marketId)
         external

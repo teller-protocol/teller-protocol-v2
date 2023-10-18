@@ -8,36 +8,8 @@ import { IMarketRegistry } from "./IMarketRegistry.sol";
 
 interface IMarketRegistry_V1 is IMarketRegistry {
     function initialize(TellerAS tellerAs) external;
+ 
 
-    function getMarketFeeRecipient(uint256 _marketId)
-        external
-        view
-        returns (address);
-
-    function getMarketURI(uint256 _marketId)
-        external
-        view
-        returns (string memory);
-
-    function getPaymentCycle(uint256 _marketId)
-        external
-        view
-        returns (uint32, PaymentCycleType);
-
-    function getPaymentDefaultDuration(uint256 _marketId)
-        external
-        view
-        returns (uint32);
-
-    function getBidExpirationTime(uint256 _marketId)
-        external
-        view
-        returns (uint32);
-
-    function getPaymentType(uint256 _marketId)
-        external
-        view
-        returns (PaymentType);
 
     function createMarket(
         address _initialOwner,
@@ -63,5 +35,8 @@ interface IMarketRegistry_V1 is IMarketRegistry {
         string calldata _uri
     ) external returns (uint256 marketId_);
 
-    function closeMarket(uint256 _marketId) external;
+   function getPaymentCycle(uint256 _marketId)
+        external
+        view
+        returns (uint32, PaymentCycleType);
 }

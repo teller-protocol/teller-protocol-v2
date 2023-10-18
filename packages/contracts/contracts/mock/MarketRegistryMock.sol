@@ -76,13 +76,31 @@ contract MarketRegistryMock is IMarketRegistry_V2 {
         return "url://";
     }
 
-    /*function getPaymentCycle(uint256 _marketId)
+
+    function getPaymentType(uint256 _marketId)
         public
         view
-        returns (uint32, PaymentCycleType)
+        returns (PaymentType)
     {
-        return (1000, PaymentCycleType.Seconds);
+        return PaymentType.EMI;
     }
+
+    function getPaymentCycleDuration(uint256 _marketId)
+        public
+        view
+        returns (uint32)
+    {
+        return 1000;
+    }
+
+    function getPaymentCycleType(uint256 _marketId)
+        external
+        view
+    returns (PaymentCycleType){
+        return PaymentCycleType.Seconds;
+    }
+
+
 
     function getPaymentDefaultDuration(uint256 _marketId)
         public
@@ -98,7 +116,7 @@ contract MarketRegistryMock is IMarketRegistry_V2 {
         returns (uint32)
     {
         return 1000;
-    }*/
+    }
 
     //the current marketplace fee if a new loan is created   NOT for existing loans in this market
     function getMarketplaceFee(uint256 _marketId) public view returns (uint16) {
@@ -113,7 +131,7 @@ contract MarketRegistryMock is IMarketRegistry_V2 {
         globalMarketFeeRecipient = _feeRecipient;
     }
 
-    function getMarketplaceFeeTerms(bytes32 _marketTermsId)
+    function getMarketFeeTerms(bytes32 _marketTermsId)
         public
         view
         returns (address, uint16)
@@ -134,41 +152,36 @@ contract MarketRegistryMock is IMarketRegistry_V2 {
         );*/
     }
 
-    function getBidExpirationTime(bytes32 _marketTermsId)
+    function getBidExpirationTimeForTerms(bytes32 _marketTermsId)
         external
         view
         returns (uint32)
     {}
 
-    function getPaymentDefaultDuration(bytes32 _marketTermsId)
+    function getPaymentDefaultDurationForTerms(bytes32 _marketTermsId)
         external
         view
         returns (uint32)
     {}
 
-    function getPaymentType(bytes32 _marketTermsId)
+    function getPaymentTypeForTerms(bytes32 _marketTermsId)
         external
         view
         returns (PaymentType)
     {}
 
-    function getPaymentCycleType(bytes32 _marketTermsId)
+    function getPaymentCycleTypeForTerms(bytes32 _marketTermsId)
         external
         view
         returns (PaymentCycleType)
     {}
 
-    function getPaymentCycleDuration(bytes32 _marketTermsId)
+    function getPaymentCycleDurationForTerms(bytes32 _marketTermsId)
         external
         view
         returns (uint32)
     {}
 
-    function getPaymentType(uint256 _marketId)
-        public
-        view
-        returns (PaymentType)
-    {}
 
     function createMarket(
         address _initialOwner,

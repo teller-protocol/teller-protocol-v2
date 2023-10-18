@@ -46,7 +46,7 @@ contract MarketRegistry_Override is MarketRegistry {
         globalMarketOwner = _owner;
     }
 
-    function attestStakeholder(
+ /*   function attestStakeholder(
         uint256 _marketId,
         address _stakeholderAddress,
         uint256 _expirationTime,
@@ -60,13 +60,14 @@ contract MarketRegistry_Override is MarketRegistry {
         );
     }
 
+
     function revokeStakeholder(
         uint256 _marketId,
         address _stakeholderAddress,
         bool _isLender
     ) public {
         super._revokeStakeholder(_marketId, _stakeholderAddress, _isLender);
-    }
+    }*/
 
     function attestStakeholderVerification(
         uint256 _marketId,

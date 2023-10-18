@@ -10,7 +10,7 @@ import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
 
 // Interfaces
-import "./interfaces/IMarketRegistry.sol";
+
 import "./interfaces/IMarketRegistry_V2.sol";
 
 // Libraries
@@ -450,12 +450,16 @@ contract MarketRegistry_G2 is
     function getMarketFeeRecipient(uint256 _marketId)
         external
         view
-        returns (address)
+        returns (address _recipient)
     {
         bytes32 _marketTermsId = currentMarketTermsForMarket[_marketId];
-        return marketTerms[_marketTermsId].feeRecipient;
-    }
+        _recipient= marketTerms[_marketTermsId].feeRecipient;
+       
 
+        if (_recipient == address(0)) {
+            return _getMarketOwner(_marketId);
+        }  
+    }
 
    
 

@@ -10,7 +10,7 @@ import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
 
 // Interfaces
-import "./interfaces/IMarketRegistry.sol";
+ 
 import "./interfaces/IMarketRegistry_V1.sol";
 
 // Libraries

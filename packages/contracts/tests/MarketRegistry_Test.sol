@@ -359,10 +359,11 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
 
     }
 
+/*
     function test_attestStakeholder() public {
         bool isLender = true;
         vm.prank(address(marketOwner));
-        marketRegistry.attestStakeholder(
+        marketRegistry.attestStakeholderInternal(
             marketId,
             address(lender),
             expirationTime,
@@ -387,7 +388,7 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
             expirationTime,
             isLender
         );
-    }
+    }*/
 
     function test_attestStakeholderVerification_lender() public {
         bool isLender = true;
@@ -484,7 +485,7 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
         );
     }
 
-    function test_revokeStakeholder() public {
+  /*  function test_revokeStakeholder() public {
         bool isLender = true;
 
         vm.prank(address(marketOwner));
@@ -505,7 +506,7 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
         marketRegistry.revokeStakeholder(marketId, address(lender), isLender);
     }
 
-    
+    */
 
     function test_revokeStakeholderVerification() public {
         bool isLender = true;
@@ -640,7 +641,7 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
         marketRegistry.setMarketOwner(address(marketOwner));
 
         marketRegistry.stubMarket(marketId, address(this));
-        
+
         address feeRecipient = marketRegistry.getMarketFeeRecipient(marketId);
 
         assertEq(

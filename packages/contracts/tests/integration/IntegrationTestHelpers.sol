@@ -22,13 +22,13 @@ import { IMarketRegistry } from "../../contracts/interfaces/IMarketRegistry.sol"
 
 library IntegrationTestHelpers {
     function deployMarketRegistry() public returns (address) {
-        IASRegistry iasRegistry = new TellerASRegistry();
-        IEASEIP712Verifier ieaseip712verifier = new TellerASEIP712Verifier();
+        // IASRegistry iasRegistry = new TellerASRegistry();
+        // IEASEIP712Verifier ieaseip712verifier = new TellerASEIP712Verifier();
 
-        TellerAS tellerAS = new TellerAS((iasRegistry), (ieaseip712verifier));
+        // TellerAS tellerAS = new TellerAS((iasRegistry), (ieaseip712verifier));
         MarketRegistry marketRegistry = new MarketRegistry();
 
-       // marketRegistry.initialize(tellerAS);
+        // marketRegistry.initialize(tellerAS);
 
         return address(marketRegistry);
     }

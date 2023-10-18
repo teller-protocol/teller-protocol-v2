@@ -17,6 +17,9 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
     address public trustedForwarder;
     address public approvedForwarder;
 
+    PaymentCycleType globalBidPaymentCycleType = PaymentCycleType.Seconds;
+    uint32 globalBidPaymentCycleDuration = 3000;
+
     Bid mockBid;
 
     function setMarketRegistry(address _marketRegistry) public {
@@ -116,11 +119,10 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
      * @notice Calculates the minimum payment amount due for a loan.
      * @param _bidId The id of the loan bid to get the payment amount for.
      */
-    function calculateAmountDue(uint256 _bidId, uint256 _timestamp)
-        public
-        view
-        returns (Payment memory due)
-    {
+    function calculateAmountDue(
+        uint256 _bidId,
+        uint256 _timestamp
+    ) public view returns (Payment memory due) {
         if (bids[_bidId].state != BidState.ACCEPTED) return due;
 
         (, uint256 duePrincipal, uint256 interest) = V2Calculations
@@ -134,11 +136,10 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
         due.interest = interest;
     }
 
-    function calculateAmountOwed(uint256 _bidId, uint256 _timestamp)
-        public
-        view
-        returns (Payment memory due)
-    {
+    function calculateAmountOwed(
+        uint256 _bidId,
+        uint256 _timestamp
+    ) public view returns (Payment memory due) {
         if (bids[_bidId].state != BidState.ACCEPTED) return due;
 
         (uint256 owedPrincipal, , uint256 interest) = V2Calculations
@@ -152,7 +153,9 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
         due.interest = interest;
     }
 
-    function lenderAcceptBid(uint256 _bidId)
+    function lenderAcceptBid(
+        uint256 _bidId
+    )
         public
         returns (
             uint256 amountToProtocol,
@@ -177,12 +180,9 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
         return (0, bid.loanDetails.principal, 0);
     }
 
-    function getBidState(uint256 _bidId)
-        public
-        view
-        virtual
-        returns (BidState)
-    {
+    function getBidState(
+        uint256 _bidId
+    ) public view virtual returns (BidState) {
         return bids[_bidId].state;
     }
 
@@ -190,20 +190,15 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
         collateralManagerMock = address(_collateralManager);
     }
 
-    function getCollateralManagerForBid(uint256 _bidId)
-        public
-        view
-        override
-        returns (ICollateralManager)
-    {
+    function getCollateralManagerForBid(
+        uint256 _bidId
+    ) public view override returns (ICollateralManager) {
         return _getCollateralManagerForBid(_bidId);
     }
 
-    function _getCollateralManagerForBid(uint256 _bidId)
-        internal
-        view
-        returns (ICollateralManager)
-    {
+    function _getCollateralManagerForBid(
+        uint256 _bidId
+    ) internal view returns (ICollateralManager) {
         return ICollateralManager(collateralManagerMock);
     }
 
@@ -211,83 +206,67 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
         bids[_bidId] = bid;
     }
 
-    function setTrustedMarketForwarder(uint256 _marketId, address _forwarder)
-        external
-    {
+    function setTrustedMarketForwarder(
+        uint256 _marketId,
+        address _forwarder
+    ) external {
         trustedForwarder = _forwarder;
     }
 
-    function approveMarketForwarder(uint256 _marketId, address _forwarder)
-        external
-    {
+    function approveMarketForwarder(
+        uint256 _marketId,
+        address _forwarder
+    ) external {
         approvedForwarder = _forwarder;
     }
 
-    function getLoanDetails(uint256 _bidId)
-        public
-        view
-        returns (LoanDetails memory)
-    {
+    function getLoanDetails(
+        uint256 _bidId
+    ) public view returns (LoanDetails memory) {
         return bids[_bidId].loanDetails;
     }
 
-    function getBorrowerActiveLoanIds(address _borrower)
-        public
-        view
-        returns (uint256[] memory)
-    {}
+    function getBorrowerActiveLoanIds(
+        address _borrower
+    ) public view returns (uint256[] memory) {}
 
-    function isLoanDefaulted(uint256 _bidId)
-        public
-        view
-        virtual
-        returns (bool)
-    {}
+    function isLoanDefaulted(
+        uint256 _bidId
+    ) public view virtual returns (bool) {}
 
-    function isLoanLiquidateable(uint256 _bidId)
-        public
-        view
-        virtual
-        returns (bool)
-    {}
+    function isLoanLiquidateable(
+        uint256 _bidId
+    ) public view virtual returns (bool) {}
 
     function isPaymentLate(uint256 _bidId) public view returns (bool) {}
 
-    function getLoanBorrower(uint256 _bidId)
-        external
-        view
-        virtual
-        returns (address borrower_)
-    {
+    function getLoanBorrower(
+        uint256 _bidId
+    ) external view virtual returns (address borrower_) {
         borrower_ = bids[_bidId].borrower;
     }
 
-    function getLoanLender(uint256 _bidId)
-        external
-        view
-        virtual
-        returns (address lender_)
-    {
+    function getLoanLender(
+        uint256 _bidId
+    ) external view virtual returns (address lender_) {
         lender_ = bids[_bidId].lender;
     }
 
-    function getLoanMarketId(uint256 _bidId)
-        external
-        view
-        returns (uint256 _marketId)
-    {
+    function getLoanMarketId(
+        uint256 _bidId
+    ) external view returns (uint256 _marketId) {
         _marketId = bids[_bidId].marketplaceId;
     }
 
-    function getLoanLendingToken(uint256 _bidId)
-        external
-        view
-        returns (address token_)
-    {
+    function getLoanLendingToken(
+        uint256 _bidId
+    ) external view returns (address token_) {
         token_ = address(bids[_bidId].loanDetails.lendingToken);
     }
 
-    function getLoanSummary(uint256 _bidId)
+    function getLoanSummary(
+        uint256 _bidId
+    )
         external
         view
         returns (
@@ -317,24 +296,20 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
         bids[_bidId].loanDetails.lastRepaidTimestamp = _timestamp;
     }
 
-    function _getBidPaymentCycleType(uint256 _bidId)
-        internal
-        view
-        returns (PaymentCycleType)
-    {
+    function _getBidPaymentCycleType(
+        uint256 _bidId
+    ) internal view returns (PaymentCycleType) {
         bytes32 bidTermsId = bidMarketTermsId[bidId];
         if (bidTermsId != bytes32(0)) {
             return marketRegistry.getPaymentCycleTypeForTerms(bidTermsId);
         }
 
-        return bidPaymentCycleType[_bidId];
+        return globalBidPaymentCycleType;
     }
 
-    function _getBidPaymentCycleDuration(uint256 _bidId)
-        internal
-        view
-        returns (uint32)
-    {
+    function _getBidPaymentCycleDuration(
+        uint256 _bidId
+    ) internal view returns (uint32) {
         bytes32 bidTermsId = bidMarketTermsId[bidId];
         if (bidTermsId != bytes32(0)) {
             return marketRegistry.getPaymentCycleDurationForTerms(bidTermsId);
@@ -342,9 +317,9 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
 
         Bid storage bid = bids[_bidId];
 
-        return bid.terms.paymentCycle;
+        return globalBidPaymentCycleDuration;
     }
-    
+
     function collateralManager() external view returns (address) {
         return collateralManagerMock;
     }

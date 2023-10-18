@@ -3,7 +3,10 @@ pragma abicoder v2;
 
 import "../util/FoundryTest.sol";
 import { IMarketRegistry_V1 } from "../../contracts/interfaces/IMarketRegistry_V1.sol";
+import { IMarketRegistry_V2 } from "../../contracts/interfaces/IMarketRegistry_V2.sol";
 import { ITellerV2 } from "../../contracts/interfaces/ITellerV2.sol";
+
+import { MarketRegistry } from "../../contracts/MarketRegistry.sol";
 
 import { ILenderCommitmentForwarder } from "../../contracts/interfaces/ILenderCommitmentForwarder.sol";
 import { ITellerV2Storage } from "../../contracts/interfaces/ITellerV2Storage.sol";
@@ -30,7 +33,7 @@ contract IntegrationForkSetup is Test {
     mapping(address => mapping(address => uint256)) internal commitmentsIds;
 
     function setUp() public virtual {
-        //when this LOC runs, all old vm state is deleted 
+        //when this LOC runs, all old vm state is deleted
         // NOTE: must fork the network before calling super.setUp()
         uint256 mainnetFork = vm.createSelectFork("mainnet");
 
@@ -50,7 +53,9 @@ contract IntegrationForkSetup is Test {
         );
         vm.label(address(tellerV2), "tellerV2");
 
-        collateralManagerV1 =  address( ITellerV2(address(tellerV2)).collateralManager() );
+        collateralManagerV1 = address(
+            ITellerV2(address(tellerV2)).collateralManager()
+        );
 
         marketRegistry = IMarketRegistry_V1(
             ITellerV2Storage(address(tellerV2)).marketRegistry()
@@ -74,6 +79,13 @@ contract IntegrationForkSetup is Test {
             PaymentCycleType.Seconds, // payment cycle type
             "" // metadata
         );
+
+        //simulate upgrading the market registry to v2
+        address marketRegistry_V2_Impl = address(new MarketRegistry());
+        vm.etch(address(marketRegistry), address(marketRegistry_V2_Impl).code);
+
+        //need to re-create market by updating its settings
+
         ITellerV2Context(address(tellerV2)).setTrustedMarketForwarder(
             marketId,
             address(commitmentForwarder)

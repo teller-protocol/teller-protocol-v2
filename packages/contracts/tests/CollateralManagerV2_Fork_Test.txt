@@ -21,18 +21,6 @@ import "./integration/IntegrationFork.sol";
 
 import "../contracts/interfaces/IWETH.sol";
 
-/*
-
-
-TODO
- 
- add a test that verifies that you can use 2 NFT from the same project 
- as collateral for a single loan 
-
-
-get test coverage up to 80 
-
-*/
 contract CollateralManagerV2_Fork_Test is Testable, IntegrationForkSetup {
     CollateralManagerV2_Override collateralManagerV2;
     //User private borrower;

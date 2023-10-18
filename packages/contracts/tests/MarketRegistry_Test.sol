@@ -11,6 +11,7 @@ import "../contracts/TellerV2Context.sol";
 import "../contracts/TellerV2Storage.sol";
 
 import "../contracts/interfaces/IMarketRegistry.sol";
+import "../contracts/interfaces/IMarketRegistry_V2.sol";
 
 import "../contracts/EAS/TellerAS.sol";
 
@@ -118,7 +119,7 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
             "uri://"
         );
 
-        (address owner, , , , , , ) = marketRegistry.getMarketData(marketId);
+        (address owner, , , ,  ) = marketRegistry.getMarketData(marketId);
 
         assertEq(owner, address(marketOwner), "Market not created");
     }
@@ -208,13 +209,20 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
              address(marketRegistry),
             "uri://"
         );
+
+        uint256 bidId = 1;
+
+        bytes32 marketTermsId = marketRegistry.getCurrentTermsForMarket(bidId);
+
         (
             uint32 paymentCycleDuration,
-            PaymentCycleType paymentCycle
-        ) = marketRegistry.getPaymentCycle(1);
+            PaymentCycleType paymentCycleType,
+            ,
+            ,
+        ) = marketRegistry.getMarketTermsForLending(marketTermsId);
 
         require(
-            paymentCycle == PaymentCycleType.Seconds,
+            paymentCycleType == PaymentCycleType.Seconds,
             "Market payment cycle type incorrectly created"
         );
 
@@ -238,12 +246,17 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
              address(marketRegistry),
             "uri://"
         );
-        (paymentCycleDuration, paymentCycle) = marketRegistry.getPaymentCycle(
-            2
+
+        bidId = 2; 
+
+        marketTermsId = marketRegistry.getCurrentTermsForMarket(bidId);
+
+        (paymentCycleDuration, paymentCycleType, , ,) = marketRegistry.getMarketTermsForLending(
+           marketTermsId
         );
 
         require(
-            paymentCycle == PaymentCycleType.Monthly,
+            paymentCycleType == PaymentCycleType.Monthly,
             "Monthly market payment cycle type incorrectly created"
         );
 
@@ -339,12 +352,7 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
             true,
             "Did not add lender to verified set"
         );
-
-        assertEq(
-            marketRegistry.getLenderAttestationId(marketId, address(lender)),
-            uuid,
-            "Did not set market attestation Id"
-        );
+ 
     }
 
     function test_attestStakeholderVerification_borrower() public {
@@ -368,14 +376,7 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
             "Did not add lender to verified set"
         );
 
-        assertEq(
-            marketRegistry.getBorrowerAttestationId(
-                marketId,
-                address(borrower)
-            ),
-            uuid,
-            "Did not set market attestation Id"
-        );
+         
     }
 
     function test_attestLender() public {
@@ -390,22 +391,7 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
 
     function test_attestLender_expired() public {}
 
-    function test_attestLenderDelegated() public {
-        marketRegistry.attestLender(
-            marketId,
-            address(lender),
-            expirationTime,
-            v,
-            r,
-            s
-        );
-
-        assertEq(
-            marketRegistry.attestStakeholderViaDelegationWasCalled(),
-            true,
-            "Attest stakeholder via delegation was not called"
-        );
-    }
+   
 
     function test_attestBorrower() public {
         marketRegistry.attestBorrower(
@@ -420,24 +406,7 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
             "Attest stakeholder was not called"
         );
     }
-
-    function test_attestBorrowerDelegated() public {
-        marketRegistry.attestBorrower(
-            marketId,
-            address(lender),
-            expirationTime,
-            v,
-            r,
-            s
-        );
-
-        assertEq(
-            marketRegistry.attestStakeholderViaDelegationWasCalled(),
-            true,
-            "Attest stakeholder via delegation was not called"
-        );
-    }
-
+ 
     function test_revokeLender() public {
         marketRegistry.revokeLender(marketId, address(lender));
 
@@ -478,25 +447,7 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
         marketRegistry.revokeStakeholder(marketId, address(lender), isLender);
     }
 
-    function test_revokeLenderViaDelegation() public {
-        marketRegistry.revokeLender(marketId, address(lender), v, r, s);
-
-        assertEq(
-            marketRegistry.revokeStakeholderVerificationWasCalled(),
-            true,
-            "Revoke stakeholder verification was not called"
-        );
-    }
-
-    function test_revokeBorrowerViaDelegation() public {
-        marketRegistry.revokeBorrower(marketId, address(borrower), v, r, s);
-
-        assertEq(
-            marketRegistry.revokeStakeholderVerificationWasCalled(),
-            true,
-            "Revoke stakeholder verification was not called"
-        );
-    }
+    
 
     function test_revokeStakeholderVerification() public {
         bool isLender = true;

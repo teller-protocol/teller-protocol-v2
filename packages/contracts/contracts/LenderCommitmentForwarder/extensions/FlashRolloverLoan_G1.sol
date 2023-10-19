@@ -18,9 +18,7 @@ import "../../libraries/NumbersLib.sol";
 import { IPool } from "../../interfaces/aave/IPool.sol";
 import { IFlashLoanSimpleReceiver } from "../../interfaces/aave/IFlashLoanSimpleReceiver.sol";
 import { IPoolAddressesProvider } from "../../interfaces/aave/IPoolAddressesProvider.sol";
-
-import "lib/forge-std/src/console.sol";
-
+ 
 //https://docs.aave.com/developers/v/1.0/tutorials/performing-a-flash-loan/...-in-your-project
 
 contract FlashRolloverLoan_G1 is IFlashLoanSimpleReceiver, IFlashRolloverLoan {
@@ -207,10 +205,7 @@ If the new loan pays out (after fees) MORE than the  aave loan amount+ fee) then
     ) internal returns (uint256 repayAmount_) {
         uint256 fundsBeforeRepayment = IERC20Upgradeable(_principalToken)
             .balanceOf(address(this));
-
-        console.log("repay loan full 1");
-         console.logUint( _bidId );
-        console.logAddress(address(TELLER_V2));
+ 
 
         IERC20Upgradeable(_principalToken).approve(
             address(TELLER_V2),

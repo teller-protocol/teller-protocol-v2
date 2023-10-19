@@ -384,10 +384,8 @@ contract TellerV2 is
 
         bidMarketTermsId[bidId_] = marketRegistry.getCurrentTermsForMarket(
             _marketplaceId
-        );
-
-
-
+        ); 
+        
         require(bidMarketTermsId[bidId_] != bytes32(0), "Market does not have assigned terms.");
 
         (

@@ -152,23 +152,13 @@ contract FlashRolloverLoan_Integration_Test is Testable {
             address(borrower)
         );
  
-       console.log("submit bid id is ");
-        console.logUint(bidId);
-
-        uint32 testCycleDuration_orig = tellerV2.getBidPaymentCycleDuration(
-           bidId
-        );
-            console.log("testcycleduration_orig");
-          console.logUint(testCycleDuration_orig);
-
+       
 
 
         vm.prank(address(lender));
         wethMock.approve(address(tellerV2), 5e18);
 
-
-        console.log("submit bid id here is ");
-        console.logUint(bidId);
+ 
 
         vm.prank(address(lender));
         (
@@ -260,14 +250,7 @@ contract FlashRolloverLoan_Integration_Test is Testable {
         vm.expectEmit(true, false, false, false);
         emit RolloverLoanComplete(address(borrower), 0, 0, 0);
 
-        console.logUint(bidId);
-
-        uint32 testCycleDurationtwo = TellerV2(address(tellerV2)).getBidPaymentCycleDuration(
-           bidId
-        );
-            console.log("testcycleduration2");
-          console.logUint(testCycleDurationtwo);
-
+        
 
         vm.prank(address(borrower));
         flashRolloverLoan.rolloverLoanWithFlash(

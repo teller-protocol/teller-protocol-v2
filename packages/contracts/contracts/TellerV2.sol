@@ -385,7 +385,7 @@ contract TellerV2 is
         bidMarketTermsId[bidId_] = marketRegistry.getCurrentTermsForMarket(
             _marketplaceId
         ); 
-        
+
         require(bidMarketTermsId[bidId_] != bytes32(0), "Market does not have assigned terms.");
 
         (
@@ -1123,25 +1123,7 @@ contract TellerV2 is
 
         return bidPaymentCycleType[_bidId];
     }
-
-//DELETE ME 
-    function getBidPaymentCycleDuration(
-        uint256 _bidId
-    ) public view returns (uint32) {
-       
-        bytes32 bidTermsId = bidMarketTermsId[_bidId];
  
-
-        if (bidTermsId != bytes32(0)) {
-           
-            return marketRegistry.getPaymentCycleDurationForTerms(bidTermsId);
-        }
-
-        Bid storage bid = bids[_bidId];
-        
-
-        return bid.terms.paymentCycle;
-    }
 
 
     function _getBidPaymentCycleDuration(

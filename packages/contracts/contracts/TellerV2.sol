@@ -130,6 +130,11 @@ contract TellerV2 is
         uint256 indexed amount
     );
 
+    event SetBidMarketTerms(
+        uint256 indexed bidId,
+        bytes32 indexed marketTermsId 
+    );
+
     /** Modifiers */
 
     /**
@@ -361,10 +366,10 @@ contract TellerV2 is
         );
 
         // Set response bid ID.
-        bidId_ = bidId;
+        bidId_ = nextBidId;
 
         // Create and store our bid into the mapping
-        Bid storage bid = bids[bidId];
+        Bid storage bid = bids[nextBidId];
         bid.borrower = sender;
         bid.receiver = _receiver != address(0) ? _receiver : bid.borrower;
         bid.marketplaceId = _marketplaceId;
@@ -374,13 +379,17 @@ contract TellerV2 is
         bid.loanDetails.timestamp = uint32(block.timestamp);
 
         //make this new bid use the most recent version of collateral manager
-        collateralManagerForBid[bidId] = address(collateralManagerV2);
+        collateralManagerForBid[bidId_] = address(collateralManagerV2);
 
         // Set payment cycle type based on market setting (custom or monthly)
 
-        bidMarketTermsId[bidId] = marketRegistry.getCurrentTermsForMarket(
+        bidMarketTermsId[bidId_] = marketRegistry.getCurrentTermsForMarket(
             _marketplaceId
         );
+
+
+
+        require(bidMarketTermsId[bidId_] != bytes32(0), "Market does not have assigned terms.");
 
         (
             uint32 paymentCycleDuration,
@@ -388,12 +397,8 @@ contract TellerV2 is
             PaymentType paymentType,
             ,
 
-        ) = marketRegistry.getMarketTermsForLending(bidMarketTermsId[bidId]);
-        console.log("inside submit bid");
-        console.logBytes(bidMarketTermsId[bidId]);
-        console.logUint(paymentCycleDuration);
-
-        revert("test revert");
+        ) = marketRegistry.getMarketTermsForLending(bidMarketTermsId[bidId_]);
+      
 
         bid.terms.APR = _APR;
 
@@ -411,17 +416,22 @@ contract TellerV2 is
         bid.state = BidState.PENDING;
 
         emit SubmittedBid(
-            bidId,
+            bidId_,
             bid.borrower,
             bid.receiver,
             keccak256(abi.encodePacked(_metadataURI))
+        );
+
+        emit SetBidMarketTerms(
+            bidId_,
+            bidMarketTermsId[bidId_]
         );
 
         // Store bid inside borrower bids mapping
         //borrowerBids[bid.borrower].push(bidId);
 
         // Increment bid id counter
-        bidId++;
+        nextBidId++;
     }
 
     /**
@@ -495,10 +505,11 @@ contract TellerV2 is
         // Retrieve bid
         Bid storage bid = bids[_bidId];
 
+    
         address sender = _msgSenderForMarket(bid.marketplaceId);
-
-        bytes32 bidTermsId = bidMarketTermsId[bidId];
-
+ 
+        bytes32 bidTermsId = bidMarketTermsId[_bidId];
+        
         //bytes32 currentMarketplaceTermsId = marketRegistry.getCurrentTermsForMarket(_marketplaceId);
 
         (bool isVerified, ) = marketRegistry.isVerifiedLender(
@@ -534,6 +545,8 @@ contract TellerV2 is
 
         (address marketFeeRecipient, uint16 marketFee) = marketRegistry
             .getMarketFeeTerms(bidTermsId);
+ 
+        
 
         // Transfer funds to borrower from the lender
         amountToProtocol = bid.loanDetails.principal.percent(protocolFee());
@@ -670,9 +683,7 @@ contract TellerV2 is
     }
 
     function _repayLoanFull(uint256 _bidId, bool withdrawCollateral) internal {
-        console.log("repay loan full");
-        console.logUint(_getBidPaymentCycleDuration(_bidId));
-
+      
         (uint256 owedPrincipal, , uint256 interest) = V2Calculations
             .calculateAmountOwed(
                 bids[_bidId],
@@ -1086,7 +1097,7 @@ contract TellerV2 is
     function _getBidExpirationTime(
         uint256 _bidId
     ) internal view returns (uint32) {
-        bytes32 bidTermsId = bidMarketTermsId[bidId];
+        bytes32 bidTermsId = bidMarketTermsId[_bidId];
         if (bidTermsId != bytes32(0)) {
             return marketRegistry.getBidExpirationTimeForTerms(bidTermsId);
         }
@@ -1097,7 +1108,7 @@ contract TellerV2 is
     function _getBidDefaultDuration(
         uint256 _bidId
     ) internal view returns (uint32) {
-        bytes32 bidTermsId = bidMarketTermsId[bidId];
+        bytes32 bidTermsId = bidMarketTermsId[_bidId];
         if (bidTermsId != bytes32(0)) {
             return marketRegistry.getPaymentDefaultDurationForTerms(bidTermsId);
         }
@@ -1108,7 +1119,7 @@ contract TellerV2 is
     function _getBidPaymentCycleType(
         uint256 _bidId
     ) internal view returns (PaymentCycleType) {
-        bytes32 bidTermsId = bidMarketTermsId[bidId];
+        bytes32 bidTermsId = bidMarketTermsId[_bidId];
         if (bidTermsId != bytes32(0)) {
             return marketRegistry.getPaymentCycleTypeForTerms(bidTermsId);
         }
@@ -1116,24 +1127,40 @@ contract TellerV2 is
         return bidPaymentCycleType[_bidId];
     }
 
-    function _getBidPaymentCycleDuration(
+//DELETE ME 
+    function getBidPaymentCycleDuration(
         uint256 _bidId
-    ) internal view returns (uint32) {
-        console.log("get payment cycle duration");
-        bytes32 bidTermsId = bidMarketTermsId[bidId];
-
-        console.logBytes32(bidTermsId);
+    ) public view returns (uint32) {
+       
+        bytes32 bidTermsId = bidMarketTermsId[_bidId];
+ 
 
         if (bidTermsId != bytes32(0)) {
-            console.logUint(
-                marketRegistry.getPaymentCycleDurationForTerms(bidTermsId)
-            );
+           
             return marketRegistry.getPaymentCycleDurationForTerms(bidTermsId);
         }
 
         Bid storage bid = bids[_bidId];
+        
 
-        console.logUint(bid.terms.paymentCycle);
+        return bid.terms.paymentCycle;
+    }
+
+
+    function _getBidPaymentCycleDuration(
+        uint256 _bidId
+    ) internal view returns (uint32) {
+        
+        bytes32 bidTermsId = bidMarketTermsId[_bidId];
+ 
+
+        if (bidTermsId != bytes32(0)) {
+            
+            return marketRegistry.getPaymentCycleDurationForTerms(bidTermsId);
+        }
+
+        Bid storage bid = bids[_bidId];
+              
 
         return bid.terms.paymentCycle;
     }

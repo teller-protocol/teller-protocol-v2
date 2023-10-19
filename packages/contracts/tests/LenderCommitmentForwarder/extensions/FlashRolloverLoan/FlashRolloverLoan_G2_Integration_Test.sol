@@ -15,7 +15,7 @@ import "../../../../contracts/LenderCommitmentForwarder/extensions/ExtensionsCon
 import { WethMock } from "../../../../contracts/mock/WethMock.sol";
 import { IMarketRegistry_V2 } from "../../../../contracts/interfaces/IMarketRegistry_V2.sol";
 
-import { TellerV2SolMock } from "../../../../contracts/mock/TellerV2SolMock.sol";
+import { TellerV2  } from "../../../../contracts/TellerV2.sol";
 import { LenderCommitmentForwarderMock } from "../../../../contracts/mock/LenderCommitmentForwarderMock.sol";
 import { MarketRegistryMock } from "../../../../contracts/mock/MarketRegistryMock.sol";
 
@@ -142,7 +142,7 @@ contract FlashRolloverLoan_Integration_Test is Testable {
         //wethMock.transfer(address(flashRolloverLoan), 100);
 
         vm.prank(address(borrower));
-        uint256 loanId = tellerV2.submitBid(
+        uint256 bidId = tellerV2.submitBid(
             lendingToken,
             marketId,
             principalAmount,
@@ -151,16 +151,34 @@ contract FlashRolloverLoan_Integration_Test is Testable {
             "",
             address(borrower)
         );
+ 
+       console.log("submit bid id is ");
+        console.logUint(bidId);
+
+        uint32 testCycleDuration_orig = tellerV2.getBidPaymentCycleDuration(
+           bidId
+        );
+            console.log("testcycleduration_orig");
+          console.logUint(testCycleDuration_orig);
+
+
 
         vm.prank(address(lender));
         wethMock.approve(address(tellerV2), 5e18);
+
+
+        console.log("submit bid id here is ");
+        console.logUint(bidId);
 
         vm.prank(address(lender));
         (
             uint256 amountToProtocol,
             uint256 amountToMarketplace,
             uint256 amountToBorrower
-        ) = tellerV2.lenderAcceptBid(loanId);
+        ) = tellerV2.lenderAcceptBid(bidId);
+
+
+
 
         vm.warp(365 days + 1);
 
@@ -242,9 +260,18 @@ contract FlashRolloverLoan_Integration_Test is Testable {
         vm.expectEmit(true, false, false, false);
         emit RolloverLoanComplete(address(borrower), 0, 0, 0);
 
+        console.logUint(bidId);
+
+        uint32 testCycleDurationtwo = TellerV2(address(tellerV2)).getBidPaymentCycleDuration(
+           bidId
+        );
+            console.log("testcycleduration2");
+          console.logUint(testCycleDurationtwo);
+
+
         vm.prank(address(borrower));
         flashRolloverLoan.rolloverLoanWithFlash(
-            loanId,
+            bidId,
             flashLoanAmount,
             borrowerAmount,
             _acceptCommitmentArgs

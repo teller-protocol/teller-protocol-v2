@@ -147,7 +147,7 @@ contract FlashRolloverLoan_G3_Integration_Test is Testable {
         //wethMock.transfer(address(flashRolloverLoan), 100);
 
         vm.prank(address(borrower));
-        uint256 loanId = tellerV2.submitBid(
+        uint256 bidId = tellerV2.submitBid(
             lendingToken,
             marketId, //market id
             principalAmount,
@@ -156,12 +156,13 @@ contract FlashRolloverLoan_G3_Integration_Test is Testable {
             "",
             address(borrower)
         );
+  
 
         vm.prank(address(lender));
         wethMock.approve(address(tellerV2), 5e18);
 
         vm.prank(address(lender));
-        tellerV2.lenderAcceptBid(loanId);
+        tellerV2.lenderAcceptBid(bidId);
 
         vm.warp(365 days + 1);
 
@@ -266,7 +267,7 @@ contract FlashRolloverLoan_G3_Integration_Test is Testable {
 
         vm.prank(address(borrower));
         flashRolloverLoan.rolloverLoanWithFlash(
-            loanId,
+            bidId,
             flashLoanAmount,
             0,
             _acceptCommitmentArgs

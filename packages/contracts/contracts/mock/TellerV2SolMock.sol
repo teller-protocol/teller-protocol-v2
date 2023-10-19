@@ -43,9 +43,9 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
         string calldata,
         address _receiver
     ) public returns (uint256 bidId_) {
-        bidId_ = bidId;
+        bidId_ = nextBidId;
 
-        Bid storage bid = bids[bidId];
+        Bid storage bid = bids[bidId_];
         bid.borrower = msg.sender;
         bid.receiver = _receiver != address(0) ? _receiver : bid.borrower;
         bid.marketplaceId = _marketId;
@@ -59,7 +59,7 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
 
         bid.terms.APR = _APR;
 
-        bidId++;
+        nextBidId++;
     }
 
     function submitBid(
@@ -299,7 +299,7 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
     function _getBidPaymentCycleType(
         uint256 _bidId
     ) internal view returns (PaymentCycleType) {
-        bytes32 bidTermsId = bidMarketTermsId[bidId];
+        bytes32 bidTermsId = bidMarketTermsId[_bidId];
         if (bidTermsId != bytes32(0)) {
             return marketRegistry.getPaymentCycleTypeForTerms(bidTermsId);
         }
@@ -310,7 +310,7 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
     function _getBidPaymentCycleDuration(
         uint256 _bidId
     ) internal view returns (uint32) {
-        bytes32 bidTermsId = bidMarketTermsId[bidId];
+        bytes32 bidTermsId = bidMarketTermsId[_bidId];
         if (bidTermsId != bytes32(0)) {
             return marketRegistry.getPaymentCycleDurationForTerms(bidTermsId);
         }

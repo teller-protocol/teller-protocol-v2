@@ -209,6 +209,7 @@ If the new loan pays out (after fees) MORE than the  aave loan amount+ fee) then
             .balanceOf(address(this));
 
         console.log("repay loan full 1");
+         console.logUint( _bidId );
         console.logAddress(address(TELLER_V2));
 
         IERC20Upgradeable(_principalToken).approve(

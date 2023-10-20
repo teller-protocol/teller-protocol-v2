@@ -38,6 +38,9 @@ Initializable
     IERC20 public principalToken;
     LenderCommitmentGroupShares public sharesToken;
 
+    //this is all of the principal tokens that have been committed to this contract minus all that have been withdrawn.  This includes the tokens in this contract and lended out in active loans by this contract. 
+    uint256 totalPrincipalTokensOutstandingForGroup;
+
 
     modifier onlyInitialized{
 
@@ -96,10 +99,13 @@ Initializable
 
     function _deploySharesToken() internal {
 
+
+       // uint256 principalTokenDecimals = principalToken.decimals();
+
         sharesToken =  new LenderCommitmentGroupShares(
             "Shares",
             "SHR",
-            18 
+            18   //may want this to equal the decimals of principal token !? 
         );
 
     }
@@ -117,9 +123,14 @@ Initializable
         //gives 
         principalToken.transferFrom(msg.sender, address(this), _amount );
 
+        //approve more tokens to the LCF ! 
+        principalToken.approve( address(LENDER_COMMITMENT_FORWARDER), totalPrincipalTokensOutstandingForGroup + _amount );
+
 
         //mint shares equal to _amount and give them to the shares recipient !!! 
         sharesToken.mint( _sharesRecipient,_amount);
+
+        totalPrincipalTokensOutstandingForGroup += _amount;
 
     }
 
@@ -127,7 +138,7 @@ Initializable
     must be initialized for this to work ! 
     */
     function burnSharesToWithdrawEarnings(
-        uint256 _amount,
+        uint256 _amountSharesTokens,
         address _recipient
     ) external 
     onlyInitialized
@@ -136,8 +147,8 @@ Initializable
         //figure out the ratio of shares tokens that this is 
         uint256 sharesTotalSupplyBeforeBurn = sharesToken.totalSupply();
 
-        //this DOES reduce total supply!
-        sharesToken.burn( msg.sender, _amount );
+        //this DOES reduce total supply! This is necessary for correct math. 
+        sharesToken.burn( msg.sender, _amountSharesTokens );
 
 
         /*  
@@ -147,14 +158,18 @@ Initializable
         */
 
 
-        uint256 currentBalanceOfPrincipalToken = principalToken.balanceOf(address(this));
+       // uint256 currentBalanceOfPrincipalToken = principalToken.balanceOf(address(this));
 
         //WE NEED A BETTER WAY OF GETTING THIS NUMBER !! CURRENT BALANCE IS NOT RLY GOOD SINCE IT DOESNT ACCOUNT FOR TOKENS LENT OUT AND WILL ALWAYS BE VERY SMALL, ALSO CAN BE RACE CONDITION ATTACKED LIKE THIS VIA  A LOAN s
-        uint256 totalPrincipalTokenBalanceOfGroup = currentBalanceOfPrincipalToken;
+       // uint256 totalPrincipalTokensOutstandingOfGroup = currentBalanceOfPrincipalToken;
 
-        uint256 principalTokenAmountToWithdraw = totalPrincipalTokenBalanceOfGroup * _amount / sharesTotalSupplyBeforeBurn;
-    
+        uint256 principalTokenAmountToWithdraw = totalPrincipalTokensOutstandingForGroup * _amountSharesTokens / sharesTotalSupplyBeforeBurn;
+
+        totalPrincipalTokensOutstandingForGroup-=principalTokenAmountToWithdraw;
+
         sharesToken.transfer( _recipient, principalTokenAmountToWithdraw );
+
+        
   
     }
 

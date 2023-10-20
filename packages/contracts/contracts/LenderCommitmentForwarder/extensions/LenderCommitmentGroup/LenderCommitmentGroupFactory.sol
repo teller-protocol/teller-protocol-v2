@@ -7,11 +7,11 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 // Interfaces
-import "../../interfaces/ITellerV2.sol";
-import "../../interfaces/IProtocolFee.sol";
-import "../../interfaces/ITellerV2Storage.sol"; 
-import "../../interfaces/ILenderCommitmentForwarder.sol"; 
-import "../../libraries/NumbersLib.sol";
+import "../../../interfaces/ITellerV2.sol";
+import "../../../interfaces/IProtocolFee.sol";
+import "../../../interfaces/ITellerV2Storage.sol"; 
+import "../../../interfaces/ILenderCommitmentForwarder.sol"; 
+import "../../../libraries/NumbersLib.sol";
  
 
 import "./LenderCommitmentGroup.sol";

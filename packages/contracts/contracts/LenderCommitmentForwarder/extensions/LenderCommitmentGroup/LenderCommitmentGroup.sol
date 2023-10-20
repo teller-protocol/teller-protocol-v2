@@ -7,25 +7,20 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 // Interfaces
-import "../../interfaces/ITellerV2.sol";
-import "../../interfaces/IProtocolFee.sol";
-import "../../interfaces/ITellerV2Storage.sol";
-import "../../interfaces/IMarketRegistry.sol";
-import "../../interfaces/ILenderCommitmentForwarder.sol";
-import "../../interfaces/IFlashRolloverLoan.sol";
-import "../../libraries/NumbersLib.sol";
+import "../../../interfaces/ITellerV2.sol";
+import "../../../interfaces/IProtocolFee.sol";
+import "../../../interfaces/ITellerV2Storage.sol";
+import "../../../interfaces/IMarketRegistry.sol";
+import "../../../interfaces/ILenderCommitmentForwarder.sol";
+import "../../../interfaces/IFlashRolloverLoan.sol";
+import "../../../libraries/NumbersLib.sol";
  
-import { ILenderCommitmentGroup} from "../../interfaces/ILenderCommitmentGroup.sol";
+import "./LenderCommitmentGroupShares.sol";
+
+import { ILenderCommitmentGroup} from "../../../interfaces/ILenderCommitmentGroup.sol";
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-
-/*
-
-
-
-
-*/
-
+ 
 
 contract LenderCommitmentGroup is 
 ILenderCommitmentGroup ,
@@ -40,7 +35,8 @@ Initializable
     ILenderCommitmentForwarder public immutable LENDER_COMMITMENT_FORWARDER;
     
     bool private _initialized;
-    address public principalToken;
+    IERC20 public principalToken;
+    LenderCommitmentGroupShares public sharesToken;
 
 
     modifier onlyInitialized{
@@ -73,9 +69,11 @@ Initializable
 
         _initialized = true;
 
-        principalToken = _createCommitmentArgs.principalTokenAddress;
+        principalToken = IERC20(_createCommitmentArgs.principalTokenAddress);
 
         _createInitialCommitment(_createCommitmentArgs);
+
+        _deploySharesToken();
 
 
     }
@@ -96,6 +94,15 @@ Initializable
  
     }
 
+    function _deploySharesToken() internal {
+
+        sharesToken =  new LenderCommitmentGroupShares(
+            "Shares",
+            "SHR",
+            18 
+        );
+
+    }
     /*
     must be initialized for this to work ! 
     */
@@ -108,11 +115,11 @@ Initializable
 
         //transfers the primary principal token from msg.sender into this contract escrow 
         //gives 
-        IERC20(principalToken).transferFrom(msg.sender, address(this), _amount );
+        principalToken.transferFrom(msg.sender, address(this), _amount );
 
 
         //mint shares equal to _amount and give them to the shares recipient !!! 
-
+        sharesToken.mint( _sharesRecipient,_amount);
 
     }
 
@@ -124,10 +131,31 @@ Initializable
         address _recipient
     ) external 
     onlyInitialized
-    {
+    {   
+
+        //figure out the ratio of shares tokens that this is 
+        uint256 sharesTotalSupplyBeforeBurn = sharesToken.totalSupply();
+
+        //this DOES reduce total supply!
+        sharesToken.burn( msg.sender, _amount );
 
 
+        /*  
+        The fraction of shares that was just burned has 
+        a numerator of _amount and 
+        a denominator of sharesTotalSupplyBeforeBurn !
+        */
 
+
+        uint256 currentBalanceOfPrincipalToken = principalToken.balanceOf(address(this));
+
+        //WE NEED A BETTER WAY OF GETTING THIS NUMBER !! CURRENT BALANCE IS NOT RLY GOOD SINCE IT DOESNT ACCOUNT FOR TOKENS LENT OUT AND WILL ALWAYS BE VERY SMALL, ALSO CAN BE RACE CONDITION ATTACKED LIKE THIS VIA  A LOAN s
+        uint256 totalPrincipalTokenBalanceOfGroup = currentBalanceOfPrincipalToken;
+
+        uint256 principalTokenAmountToWithdraw = totalPrincipalTokenBalanceOfGroup * _amount / sharesTotalSupplyBeforeBurn;
+    
+        sharesToken.transfer( _recipient, principalTokenAmountToWithdraw );
+  
     }
 
 

@@ -42,6 +42,20 @@ Initializable
     uint256 totalPrincipalTokensOutstandingForGroup;
 
 
+    /*
+ IDEA: In a mapping , i can keep track of how much principal tokens outstanding were given to this contract by each lender 
+ Then, a function would allow a lender to 'decrease' the amount of tokens that are earmarked as being able to be lended out by their amount.
+ That way, it allows a lender to disable their committed funds from being used for FUTURE loans, thereby allowing them to prep for a withdraw of those funds. 
+
+ Er maybe this is done based on their shares !! ooo . keep track of amount of shares allowing fund use and amount of shares not allowing it . 
+ or even smarter, this could be done based on your ratio of shares.
+ 
+so if you own 20% of the shares, you can disable 20% of the funds from being used for future loans
+ 
+you enforce that the contract cant give out more loans unless that new loan would NOT cause the contract to have less than 20% liquid
+  */
+
+
     modifier onlyInitialized{
 
         require(_initialized,"Contract must be initialized");
@@ -157,15 +171,14 @@ Initializable
         a denominator of sharesTotalSupplyBeforeBurn !
         */
 
+        /*
+            In this flow, lenders who withdraw first are able to claim the liquid tokens first 
+            while the illiquid assets remain withdrawable by the remaining lenders at a later time. 
 
-       // uint256 currentBalanceOfPrincipalToken = principalToken.balanceOf(address(this));
-
-        //WE NEED A BETTER WAY OF GETTING THIS NUMBER !! CURRENT BALANCE IS NOT RLY GOOD SINCE IT DOESNT ACCOUNT FOR TOKENS LENT OUT AND WILL ALWAYS BE VERY SMALL, ALSO CAN BE RACE CONDITION ATTACKED LIKE THIS VIA  A LOAN s
-       // uint256 totalPrincipalTokensOutstandingOfGroup = currentBalanceOfPrincipalToken;
-
+        */
         uint256 principalTokenAmountToWithdraw = totalPrincipalTokensOutstandingForGroup * _amountSharesTokens / sharesTotalSupplyBeforeBurn;
 
-        totalPrincipalTokensOutstandingForGroup-=principalTokenAmountToWithdraw;
+        totalPrincipalTokensOutstandingForGroup -= principalTokenAmountToWithdraw;
 
         sharesToken.transfer( _recipient, principalTokenAmountToWithdraw );
 

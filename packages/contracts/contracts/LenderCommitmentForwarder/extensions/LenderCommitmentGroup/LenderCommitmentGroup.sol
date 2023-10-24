@@ -39,11 +39,17 @@ Initializable
     LenderCommitmentGroupShares public sharesToken;
 
     //this is all of the principal tokens that have been committed to this contract minus all that have been withdrawn.  This includes the tokens in this contract and lended out in active loans by this contract. 
-    uint256 totalPrincipalTokensOutstandingForGroup;
+    uint256 public totalPrincipalTokensCommitted;
+    //uint256 public totalPrincipalTokensOnLoan;
+
+    mapping (address => uint256) public principalTokensCommittedByLender;
+
+    uint256 public totalPrincipalTokensStagedForWithdraw;
+    mapping (address => uint256) public principalTokensStagedForWithdrawByLender;  
 
 
     /*
- IDEA: In a mapping , i can keep track of how much principal tokens outstanding were given to this contract by each lender 
+ IDEA: In a mapping , i can keep track of how many principal tokens outstanding were given to this contract by each lender 
  Then, a function would allow a lender to 'decrease' the amount of tokens that are earmarked as being able to be lended out by their amount.
  That way, it allows a lender to disable their committed funds from being used for FUTURE loans, thereby allowing them to prep for a withdraw of those funds. 
 
@@ -123,6 +129,32 @@ you enforce that the contract cant give out more loans unless that new loan woul
         );
 
     }
+
+
+    function setTotalPrincipalTokensStagedForWithdraw( 
+        uint256 _amount
+    ) external {
+       
+        _setTotalPrincipalTokensStagedForWithdraw(_amount,msg.sender);
+    }
+
+    function _setTotalPrincipalTokensStagedForWithdraw( 
+        uint256 _amount,
+        address _lender 
+    ) internal {
+        //require that amount be <= the amount committed by this lender 
+        require( _amount <= principalTokensCommittedByLender[_lender] , "cannot stage more tokens than you have committed" );
+
+        totalPrincipalTokensStagedForWithdraw -= principalTokensStagedForWithdrawByLender[_lender]; //reset back to how it is not counting this lenders contribution 
+
+        totalPrincipalTokensStagedForWithdraw += _amount;
+
+        require( totalPrincipalTokensStagedForWithdraw <= totalPrincipalTokensCommitted, "tokens staged for withdraw cannot be greater than tokens committed");
+
+        principalTokensStagedForWithdrawByLender[_lender] = _amount;
+
+    }
+
     /*
     must be initialized for this to work ! 
     */
@@ -137,14 +169,20 @@ you enforce that the contract cant give out more loans unless that new loan woul
         //gives 
         principalToken.transferFrom(msg.sender, address(this), _amount );
 
+
+        uint256 tokensToApprove =  (totalPrincipalTokensCommitted + _amount) > totalPrincipalTokensStagedForWithdraw ?  
+        (totalPrincipalTokensCommitted + _amount) - totalPrincipalTokensStagedForWithdraw 
+        : 0; 
+
         //approve more tokens to the LCF ! 
-        principalToken.approve( address(LENDER_COMMITMENT_FORWARDER), totalPrincipalTokensOutstandingForGroup + _amount );
+        principalToken.approve( address(LENDER_COMMITMENT_FORWARDER), tokensToApprove );
 
 
         //mint shares equal to _amount and give them to the shares recipient !!! 
         sharesToken.mint( _sharesRecipient,_amount);
 
-        totalPrincipalTokensOutstandingForGroup += _amount;
+        totalPrincipalTokensCommitted += _amount;
+        principalTokensCommittedByLender[msg.sender] += _amount;
 
     }
 
@@ -176,9 +214,10 @@ you enforce that the contract cant give out more loans unless that new loan woul
             while the illiquid assets remain withdrawable by the remaining lenders at a later time. 
 
         */
-        uint256 principalTokenAmountToWithdraw = totalPrincipalTokensOutstandingForGroup * _amountSharesTokens / sharesTotalSupplyBeforeBurn;
+        uint256 principalTokenAmountToWithdraw = totalPrincipalTokensCommitted * _amountSharesTokens / sharesTotalSupplyBeforeBurn;
 
-        totalPrincipalTokensOutstandingForGroup -= principalTokenAmountToWithdraw;
+        totalPrincipalTokensCommitted -= principalTokenAmountToWithdraw;
+        principalTokensCommittedByLender[msg.sender] -= principalTokenAmountToWithdraw;
 
         sharesToken.transfer( _recipient, principalTokenAmountToWithdraw );
 

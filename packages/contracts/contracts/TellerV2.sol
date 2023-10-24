@@ -116,6 +116,12 @@ contract TellerV2 is
      */
     event LoanLiquidated(uint256 indexed bidId, address indexed liquidator);
 
+  /**
+     * @notice This event is emitted when a loan has been closed.
+     * @param bidId The id of the bid/loan which was closed.
+     */
+    event LoanClosed(uint256 indexed bidId);
+
     /**
      * @notice This event is emitted when a fee has been paid related to a bid.
      * @param bidId The id of the bid.
@@ -737,6 +743,7 @@ contract TellerV2 is
         //collateralManager.lenderClaimCollateral(_bidId);
 
         _getCollateralManagerForBid(_bidId).lenderClaimCollateral(_bidId);
+        emit LoanClosed(_bidId);
     }
 
     /**

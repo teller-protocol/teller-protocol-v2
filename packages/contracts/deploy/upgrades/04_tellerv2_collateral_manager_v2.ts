@@ -11,7 +11,7 @@ const deployFn: DeployFunction = async (hre) => {
 
   const collateralManagerV2 = await hre.contracts.get('CollateralManagerV2')
 
-  await hre.defender.proposeBatchTimelock({
+  await hre.upgrades.proposeBatchTimelock({
     title: 'TellerV2: Upgrade for Collateral Manager V2',
     description: ` 
 # TellerV2
@@ -23,26 +23,26 @@ const deployFn: DeployFunction = async (hre) => {
         proxy: tellerV2,
         implFactory: await hre.ethers.getContractFactory('TellerV2', {
           libraries: {
-            V2Calculations: v2Calculations.address,
-          },
+            V2Calculations: v2Calculations.address
+          }
         }),
 
         opts: {
           unsafeAllow: [
             'constructor',
             'state-variable-immutable',
-            'external-library-linking',
+            'external-library-linking'
           ],
           unsafeAllowRenames: true,
           constructorArgs: [await trustedForwarder.getAddress()],
 
           call: {
             fn: 'setCollateralManagerV2',
-            args: [await collateralManagerV2.getAddress()],
-          },
-        },
-      },
-    ],
+            args: [await collateralManagerV2.getAddress()]
+          }
+        }
+      }
+    ]
   })
 
   hre.log('done.')
@@ -58,7 +58,7 @@ deployFn.tags = [
   'proposal',
   'upgrade',
   'teller-v2',
-  'teller-v2:collateral-manager-v2-upgrade',
+  'teller-v2:collateral-manager-v2-upgrade'
 ]
 deployFn.dependencies = ['teller-v2:deploy']
 deployFn.skip = async (hre) => {

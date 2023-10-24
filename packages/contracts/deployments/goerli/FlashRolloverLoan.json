@@ -159,6 +159,10 @@
             {
               "type": "uint32",
               "name": "loanDuration"
+            },
+            {
+              "type": "bytes32[]",
+              "name": "merkleProof"
             }
           ]
         },
@@ -202,7 +206,7 @@
         },
         {
           "type": "address",
-          "name": "initiator"
+          "name": "_initiator"
         },
         {
           "type": "bytes",
@@ -265,6 +269,10 @@
             {
               "type": "uint32",
               "name": "loanDuration"
+            },
+            {
+              "type": "bytes32[]",
+              "name": "merkleProof"
             }
           ]
         }
@@ -284,6 +292,6 @@
     "blockHash": null,
     "blockNumber": null
   },
-  "numDeployments": 1,
+  "numDeployments": 2,
   "implementation": "0x0a6186B2b6126cE90cAd0fEa5C060a632914EC4B"
 }

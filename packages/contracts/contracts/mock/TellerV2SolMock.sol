@@ -13,6 +13,12 @@ import { LoanDetails, Payment, BidState } from "../TellerV2Storage.sol";
 This is only used for sol test so its named specifically to avoid being used for the typescript tests.
 */
 contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
+    address public collateralManagerMock;
+    address public trustedForwarder;
+    address public approvedForwarder;
+
+    Bid mockBid;
+
     function setMarketRegistry(address _marketRegistry) public {
         marketRegistry = IMarketRegistry(_marketRegistry);
     }
@@ -177,6 +183,43 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
         return bids[_bidId].state;
     }
 
+    function setCollateralManagerSuper(address _collateralManager) public {
+        collateralManagerMock = address(_collateralManager);
+    }
+
+    function getCollateralManagerForBid(uint256 _bidId)
+        public
+        view
+        override
+        returns (ICollateralManager)
+    {
+        return _getCollateralManagerForBid(_bidId);
+    }
+
+    function _getCollateralManagerForBid(uint256 _bidId)
+        internal
+        view
+        returns (ICollateralManager)
+    {
+        return ICollateralManager(collateralManagerMock);
+    }
+
+    function setMockBid(uint256 _bidId, Bid calldata bid) public {
+        bids[_bidId] = bid;
+    }
+
+    function setTrustedMarketForwarder(uint256 _marketId, address _forwarder)
+        external
+    {
+        trustedForwarder = _forwarder;
+    }
+
+    function approveMarketForwarder(uint256 _marketId, address _forwarder)
+        external
+    {
+        approvedForwarder = _forwarder;
+    }
+
     function getLoanDetails(uint256 _bidId)
         public
         view
@@ -269,5 +312,9 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
 
     function setLastRepaidTimestamp(uint256 _bidId, uint32 _timestamp) public {
         bids[_bidId].loanDetails.lastRepaidTimestamp = _timestamp;
+    }
+
+    function collateralManager() external view returns (address) {
+        return collateralManagerMock;
     }
 }

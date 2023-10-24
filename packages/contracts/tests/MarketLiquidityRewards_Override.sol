@@ -37,11 +37,9 @@ contract MarketLiquidityRewards_Override is MarketLiquidityRewards {
     bool public verifyRewardRecipientWasCalled;
     bool public verifyCollateralAmountWasCalled;
 
-    constructor(
-        address tellerV2,
-        address marketRegistry,
-        address collateralManager
-    ) MarketLiquidityRewards(tellerV2, marketRegistry, collateralManager) {}
+    constructor(address tellerV2, address marketRegistry)
+        MarketLiquidityRewards(tellerV2, marketRegistry)
+    {}
 
     function setAllocation(
         uint256 _allocationId,

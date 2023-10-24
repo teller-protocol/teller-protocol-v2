@@ -19,9 +19,14 @@ import "../contracts/mock/CollateralManagerMock.sol";
 
 import "../contracts/MarketLiquidityRewards.sol";
 
+import "../contracts/mock/TellerV2SolMock.sol";
+
 import "forge-std/console.sol";
 
-contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
+contract MarketLiquidityRewards_Combined_Test is
+    Testable,
+    MarketLiquidityRewards
+{
     MarketLiquidityUser private marketOwner;
     MarketLiquidityUser private lender;
     MarketLiquidityUser private borrower;
@@ -53,11 +58,13 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
     bool verifyRewardRecipientWasCalled;
     bool verifyCollateralAmountWasCalled;
 
+    TellerV2SolMock tellerV2Mock;
+    CollateralManagerMock collateralManagerMock;
+
     constructor()
         MarketLiquidityRewards(
-            address(new TellerV2Mock()),
-            address(new MarketRegistryMock()),
-            address(new CollateralManagerMock())
+            address(new TellerV2SolMock()),
+            address(new MarketRegistryMock())
         )
     {}
 
@@ -65,7 +72,11 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
         marketOwner = new MarketLiquidityUser(address(tellerV2), (this));
         borrower = new MarketLiquidityUser(address(tellerV2), (this));
         lender = new MarketLiquidityUser(address(tellerV2), (this));
-        TellerV2Mock(tellerV2).__setMarketRegistry(address(marketRegistry));
+
+        tellerV2Mock = TellerV2SolMock(tellerV2);
+        collateralManagerMock = new CollateralManagerMock();
+
+        tellerV2Mock.setMarketRegistry(address(marketRegistry));
 
         MarketRegistryMock(marketRegistry).setMarketOwner(address(marketOwner));
 
@@ -219,10 +230,11 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
         );
         mockBid.state = BidState.PAID;
 
-        TellerV2Mock(tellerV2).setMockBid(mockBid);
-
         uint256 allocationId = 0;
         uint256 bidId = 0;
+
+        tellerV2Mock.setCollateralManagerSuper(address(collateralManagerMock));
+        tellerV2Mock.setMockBid(bidId, mockBid);
 
         _setAllocation(allocationId);
         allocatedRewards[allocationId].rewardTokenAmount = 4000;
@@ -455,61 +467,5 @@ contract MarketLiquidityUser is User {
         public
     {
         IERC20Upgradeable(tokenAddress).approve(guy, wad);
-    }
-}
-
-contract TellerV2Mock is TellerV2Context {
-    Bid mockBid;
-
-    constructor() TellerV2Context(address(0)) {}
-
-    function __setMarketRegistry(address _marketRegistry) external {
-        marketRegistry = IMarketRegistry(_marketRegistry);
-    }
-
-    function getSenderForMarket(uint256 _marketId)
-        external
-        view
-        returns (address)
-    {
-        return _msgSenderForMarket(_marketId);
-    }
-
-    function getDataForMarket(uint256 _marketId)
-        external
-        view
-        returns (bytes calldata)
-    {
-        return _msgDataForMarket(_marketId);
-    }
-
-    function setMockBid(Bid calldata bid) public {
-        mockBid = bid;
-    }
-
-    function getLoanSummary(uint256 _bidId)
-        external
-        view
-        returns (
-            address borrower,
-            address lender,
-            uint256 marketId,
-            address principalTokenAddress,
-            uint256 principalAmount,
-            uint32 acceptedTimestamp,
-            uint32 lastRepaidTimestamp,
-            BidState bidState
-        )
-    {
-        Bid storage bid = mockBid;
-
-        borrower = bid.borrower;
-        lender = bid.lender;
-        marketId = bid.marketplaceId;
-        principalTokenAddress = address(bid.loanDetails.lendingToken);
-        principalAmount = bid.loanDetails.principal;
-        acceptedTimestamp = bid.loanDetails.acceptedTimestamp;
-        lastRepaidTimestamp = bid.loanDetails.lastRepaidTimestamp;
-        bidState = bid.state;
     }
 }

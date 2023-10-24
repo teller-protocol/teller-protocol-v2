@@ -29,6 +29,7 @@ contract TellerV2_initialize is Testable {
     ERC20 lendingToken;
 
     LenderManagerMock lenderManagerMock;
+    CollateralManagerMock collateralManagerMock;
 
     function setUp() public {
         tellerV2 = new TellerV2_Override();
@@ -36,6 +37,7 @@ contract TellerV2_initialize is Testable {
         lendingToken = new ERC20("Wrapped Ether", "WETH");
 
         lenderManagerMock = new LenderManagerMock();
+        collateralManagerMock = new CollateralManagerMock();
 
         borrower = new User();
         lender = new User();

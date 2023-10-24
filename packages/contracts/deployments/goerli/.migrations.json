@@ -17,5 +17,11 @@
   "teller-v2:transfer-ownership-to-safe": 1688588967,
   "commitment-rollover-loan:deploy": 1692108434,
   "lender-commitment-forwarder:v2-upgrade": 1692371477,
-  "flash-rollover-loan:deploy": 1693329027
+  "flash-rollover-loan:deploy": 1693329027,
+  "collateral:manager-v2:deploy": 1698172693,
+  "lender-commitment-forwarder:staging:deploy": 1698172718,
+  "lender-commitment-forwarder:extensions:flash-rollover:deploy": 1698172718,
+  "teller-v2:loan-liquidated-state-upgrade": 1698172870,
+  "teller-v2:collateral-manager-v2-upgrade": 1698175349,
+  "lender-commitment-forwarder:extensions:flash-rollover:g3-upgrade": 1698175363
 }

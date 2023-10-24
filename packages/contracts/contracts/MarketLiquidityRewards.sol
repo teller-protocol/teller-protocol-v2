@@ -26,7 +26,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20Metadat
 contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
     address immutable tellerV2;
     address immutable marketRegistry;
-    address immutable collateralManager;
+    //address immutable collateralManager;
 
     uint256 allocationCount;
 
@@ -66,14 +66,12 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
         uint256 amount
     );
 
-    constructor(
-        address _tellerV2,
-        address _marketRegistry,
-        address _collateralManager
-    ) {
+    constructor(address _tellerV2, address _marketRegistry)
+    //address _collateralManager
+    {
         tellerV2 = _tellerV2;
         marketRegistry = _marketRegistry;
-        collateralManager = _collateralManager;
+        //collateralManager = _collateralManager;
     }
 
     function initialize() external initializer {}
@@ -257,10 +255,15 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
             allocatedReward.bidStartTimeMax
         );
 
+        ICollateralManager _collateralManager = ITellerV2(tellerV2)
+            .getCollateralManagerForBid(_bidId);
+
         //if a collateral token address is set on the allocation, verify that the bid has enough collateral ratio
         if (collateralTokenAddress != address(0)) {
-            uint256 collateralAmount = ICollateralManager(collateralManager)
-                .getCollateralAmount(_bidId, collateralTokenAddress);
+            uint256 collateralAmount = _collateralManager.getCollateralAmount(
+                _bidId,
+                collateralTokenAddress
+            );
 
             //require collateral amount
             _verifyCollateralAmount(

@@ -4,6 +4,15 @@ out = 'generated/artifacts_forge'
 libs = ['node_modules', 'lib']
 test = 'tests'
 cache_path  = 'generated/cache_forge'
+remappings = [
+]
+fs_permissions = [
+    { access = "read", path = "./"},
+    { access = "read", path = "./lib"}
+]
+
+[rpc_endpoints]
+mainnet = "https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}"
 
 [doc]
 homepage= "HOME.md"

@@ -10,6 +10,8 @@ import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol";
 
+import "./interfaces/ICollateralManager.sol";
+
 // Interfaces
 import "./interfaces/IMarketRegistry.sol";
 import "./interfaces/IReputationManager.sol";
@@ -114,6 +116,12 @@ contract TellerV2 is
      */
     event LoanLiquidated(uint256 indexed bidId, address indexed liquidator);
 
+  /**
+     * @notice This event is emitted when a loan has been closed.
+     * @param bidId The id of the bid/loan which was closed.
+     */
+    event LoanClosed(uint256 indexed bidId);
+
     /**
      * @notice This event is emitted when a fee has been paid related to a bid.
      * @param bidId The id of the bid.
@@ -156,8 +164,6 @@ contract TellerV2 is
 
     /** Constant Variables **/
 
-    uint8 public constant CURRENT_CODE_VERSION = 9;
-
     uint32 public constant LIQUIDATION_DELAY = 86400; //ONE DAY IN SECONDS
 
     /** Constructor **/
@@ -170,29 +176,27 @@ contract TellerV2 is
      * @notice Initializes the proxy.
      * @param _protocolFee The fee collected by the protocol for loan processing.
      * @param _marketRegistry The address of the market registry contract for the protocol.
-     * @param _reputationManager The address of the reputation manager contract.
-     * @param _lenderCommitmentForwarder The address of the lender commitment forwarder contract.
-     * @param _collateralManager The address of the collateral manager contracts.
+     * @param _reputationManager The address of the reputation manager contract
      * @param _lenderManager The address of the lender manager contract for loans on the protocol.
+     * @param _escrowVault the address of the escrow vault contract for push pull
+     * @param _collateralManagerV2 the address of the collateral manager V2 contract.
      */
     function initialize(
         uint16 _protocolFee,
         address _marketRegistry,
         address _reputationManager,
-        address _lenderCommitmentForwarder,
-        address _collateralManager,
+        //address _lenderCommitmentForwarder,
+        //address _collateralManagerV1,
         address _lenderManager,
-        address _escrowVault
+        address _escrowVault,
+        address _collateralManagerV2
     ) external initializer {
         __ProtocolFee_init(_protocolFee);
 
         __Pausable_init();
 
-        require(
-            _lenderCommitmentForwarder.isContract(),
-            "LenderCommitmentForwarder must be a contract"
-        );
-        lenderCommitmentForwarder = _lenderCommitmentForwarder;
+        //no longer needed in storage
+        lenderCommitmentForwarder = address(0);
 
         require(
             _marketRegistry.isContract(),
@@ -206,18 +210,21 @@ contract TellerV2 is
         );
         reputationManager = IReputationManager(_reputationManager);
 
-        require(
-            _collateralManager.isContract(),
-            "CollateralManager must be a contract"
-        );
-        collateralManager = ICollateralManager(_collateralManager);
-
         _setLenderManager(_lenderManager);
         _setEscrowVault(_escrowVault);
+        _setCollateralManagerV2(_collateralManagerV2);
     }
 
-    function setEscrowVault(address _escrowVault) external reinitializer(9) {
-        _setEscrowVault(_escrowVault);
+    function setCollateralManagerV2(address _collateralManagerV2)
+        external
+        reinitializer(10)
+    {
+        _setCollateralManagerV2(_collateralManagerV2);
+    }
+
+    function _setEscrowVault(address _escrowVault) internal onlyInitializing {
+        require(_escrowVault.isContract(), "EscrowVault must be a contract");
+        escrowVault = IEscrowVault(_escrowVault);
     }
 
     function _setLenderManager(address _lenderManager)
@@ -231,9 +238,15 @@ contract TellerV2 is
         lenderManager = ILenderManager(_lenderManager);
     }
 
-    function _setEscrowVault(address _escrowVault) internal onlyInitializing {
-        require(_escrowVault.isContract(), "EscrowVault must be a contract");
-        escrowVault = IEscrowVault(_escrowVault);
+    function _setCollateralManagerV2(address _collateralManagerV2)
+        internal
+        onlyInitializing
+    {
+        require(
+            _collateralManagerV2.isContract(),
+            "CollateralManagerV2 must be a contract"
+        );
+        collateralManagerV2 = ICollateralManagerV2(_collateralManagerV2);
     }
 
     /**
@@ -320,7 +333,7 @@ contract TellerV2 is
             _receiver
         );
 
-        bool validation = collateralManager.commitCollateral(
+        bool validation = collateralManagerV2.commitCollateral(
             bidId_,
             _collateralInfo
         );
@@ -366,6 +379,9 @@ contract TellerV2 is
         bid.loanDetails.principal = _principal;
         bid.loanDetails.loanDuration = _duration;
         bid.loanDetails.timestamp = uint32(block.timestamp);
+
+        //make this new bid use the most recent version of collateral manager
+        collateralManagerForBid[bidId] = address(collateralManagerV2);
 
         // Set payment cycle type based on market setting (custom or monthly)
         (bid.terms.paymentCycle, bidPaymentCycleType[bidId]) = marketRegistry
@@ -507,7 +523,11 @@ contract TellerV2 is
         bid.lender = sender;
 
         // Tell the collateral manager to deploy the escrow and pull funds from the borrower if applicable
-        collateralManager.deployAndDeposit(_bidId);
+        if (collateralManagerForBid[_bidId] == address(0)) {
+            collateralManagerV1.deployAndDeposit(_bidId);
+        } else {
+            collateralManagerV2.depositCollateral(_bidId);
+        }
 
         // Transfer funds to borrower from the lender
         amountToProtocol = bid.loanDetails.principal.percent(protocolFee());
@@ -539,11 +559,11 @@ contract TellerV2 is
 
         //transfer funds to borrower
         if (amountToBorrower > 0) {
-            bid.loanDetails.lendingToken.safeTransferFrom(
+           bid.loanDetails.lendingToken.safeTransferFrom(
                 sender,
                 bid.receiver,
                 amountToBorrower
-            );
+            );  
         }
 
         // Record volume filled by lenders
@@ -720,7 +740,10 @@ contract TellerV2 is
         Bid storage bid = bids[_bidId];
         bid.state = BidState.CLOSED;
 
-        collateralManager.lenderClaimCollateral(_bidId);
+        //collateralManager.lenderClaimCollateral(_bidId);
+
+        _getCollateralManagerForBid(_bidId).lenderClaimCollateral(_bidId);
+        emit LoanClosed(_bidId);
     }
 
     /**
@@ -755,7 +778,11 @@ contract TellerV2 is
 
         // If loan is backed by collateral, withdraw and send to the liquidator
         address liquidator = _msgSenderForMarket(bid.marketplaceId);
-        collateralManager.liquidateCollateral(_bidId, liquidator);
+        //collateralManager.liquidateCollateral(_bidId, liquidator);
+        _getCollateralManagerForBid(_bidId).liquidateCollateral(
+            _bidId,
+            liquidator
+        );
 
         emit LoanLiquidated(_bidId, liquidator);
     }
@@ -794,7 +821,9 @@ contract TellerV2 is
 
             // If loan is is being liquidated and backed by collateral, withdraw and send to borrower
             if (_shouldWithdrawCollateral) {
-                collateralManager.withdraw(_bidId);
+                //collateralManager.withdraw(_bidId);
+
+                _getCollateralManagerForBid(_bidId).withdraw(_bidId);
             }
 
             emit LoanRepaid(_bidId);
@@ -992,6 +1021,32 @@ contract TellerV2 is
         return
             uint32(block.timestamp) >
             dueDate + defaultDuration + _additionalDelay;
+    }
+
+    function getCollateralManagerForBid(uint256 _bidId)
+        public
+        view
+        virtual
+        returns (ICollateralManager)
+    {
+        return _getCollateralManagerForBid(_bidId);
+    }
+
+    function _getCollateralManagerForBid(uint256 _bidId)
+        internal
+        view
+        virtual
+        returns (ICollateralManager)
+    {
+        if (collateralManagerForBid[_bidId] == address(0)) {
+            return ICollateralManager(collateralManagerV1);
+        }
+        return ICollateralManager(collateralManagerForBid[_bidId]);
+    }
+
+    //Returns the most modern implementation for the collateral manager
+    function collateralManager() external view returns (address) {
+        return address(collateralManagerV2);
     }
 
     function getBidState(uint256 _bidId)

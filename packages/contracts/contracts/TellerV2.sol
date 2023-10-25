@@ -224,6 +224,7 @@ contract TellerV2 is
     function setCollateralManagerV2(
         address _collateralManagerV2
     ) external reinitializer(10) {
+        require(address(_collateralManagerV2) == address(0));
         _setCollateralManagerV2(_collateralManagerV2);
     }
 

@@ -24,6 +24,8 @@ export function handleActiveCommitments(block: ethereum.Block): void {
     ]);
   }
 }
+ 
+
 
 function handleCommitments(
   // eslint-disable-next-line @typescript-eslint/ban-types

@@ -64,3 +64,12 @@ yarn subgraph deploy-local:polygon
 1. Build:  yarn subgraph build goerli
 
 2. Deploy: yarn subgraph build:deploy goerli 
+
+
+## Terminal CLI script 
+
+1. yarn deploy:prompt
+
+ #### notes 
+ Choosing RELEASE will automatically deploy fresh without block handlers then will deploy grafting with block handlers
+ 

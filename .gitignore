@@ -18,7 +18,7 @@ typechain
 
 # Subgraph
 packages/subgraph/config/config.json
-packages/subgraph/scripts/thegraph/api/config/*
+packages/subgraph/scripts/thegraph/api/config/*.json
 packages/subgraph/subgraph.yaml
 packages/subgraph/generated
 packages/subgraph/abis/*

@@ -9,7 +9,7 @@ const deployFn: DeployFunction = async (hre) => {
   const trustedForwarder = await hre.contracts.get('MetaForwarder')
   const v2Calculations = await hre.deployments.get('V2Calculations')
 
-  const marketRegistry = await hre.contracts.get('marketRegistry')
+  //const marketRegistry = await hre.contracts.get('MarketRegistry')
 
   await hre.upgrades.proposeBatchTimelock({
     title: 'TellerV2: Upgrade for Market Registry V2',
@@ -33,7 +33,7 @@ const deployFn: DeployFunction = async (hre) => {
             'state-variable-immutable',
             'external-library-linking'
           ],
-         
+          unsafeAllowRenames: true,
           constructorArgs: [await trustedForwarder.getAddress()],
 
            
@@ -57,13 +57,13 @@ deployFn.tags = [
   'teller-v2',
   'teller-v2:market-registry-v2-upgrade'
 ]
-deployFn.dependencies = ['teller-v2:deploy']
+deployFn.dependencies = ['teller-v2:deploy','market-registry:v2-upgrade']
 deployFn.skip = async (hre) => {
-  return (
+  return     (
     !hre.network.live ||
     !['mainnet', 'polygon', 'arbitrum', 'goerli', 'sepolia'].includes(
       hre.network.name
     )
-  )
+  ) 
 }
 export default deployFn

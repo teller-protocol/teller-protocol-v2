@@ -32,6 +32,9 @@ const Network: Record<string, number> = {
   "arbitrum-one": 42161
 };
 
+const ENABLE_COOKIE = false;
+
+
 export const makeStudio = async (
   networkConfig: INetworkConfig
 ): Promise<InnerAPI> => {
@@ -118,18 +121,24 @@ export const makeStudio = async (
       if (!socket.isConnected()) await socket.connect();
 
       let cookie: string | null = null;
-      // const Cookie = studioConfig[networkConfig.owner.address]?.Cookie;
-      // if (Cookie) {
-      //   if (new Date(Cookie.expiration).getTime() > Date.now()) {
-      //     cookie = Cookie.value;
-      //   } else {
-      //     networkConfig.logger?.log("Cookie expired, logging in again");
-      //   }
-      // } else {
-      //   networkConfig.logger?.log(
-      //     "Not logged in, attempting to log in via ledger..."
-      //   );
-      // }
+
+      if (ENABLE_COOKIE) {
+
+        const existingCookie = studioConfig[networkConfig.owner.address]?.Cookie;
+        if (existingCookie) {
+          if (new Date(existingCookie.expiration).getTime() > Date.now()) {
+            cookie = existingCookie.value;
+          } else {
+            networkConfig.logger?.log("Cookie expired, logging in again");
+          }
+        } else {
+          networkConfig.logger?.log(
+            "Not logged in, attempting to log in via ledger..."
+          );
+        }
+
+      }
+     
 
       if (!cookie) {
         const transport = await Transport.open("");

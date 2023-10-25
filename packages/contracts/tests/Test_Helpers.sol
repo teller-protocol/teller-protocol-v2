@@ -3,12 +3,12 @@ pragma solidity >=0.8.0 <0.9.0;
 
 import { TellerV2 } from "../contracts/TellerV2.sol";
 import "../contracts/mock/WethMock.sol";
-import "../contracts/interfaces/IMarketRegistry.sol";
+import "../contracts/interfaces/IMarketRegistry_V2.sol";
 import "../contracts/interfaces/ITellerV2.sol";
 import "../contracts/interfaces/ITellerV2Context.sol";
 import { Collateral } from "../contracts/interfaces/escrow/ICollateralEscrowV1.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import { PaymentType } from "../contracts/libraries/V2Calculations.sol";
+import { PaymentType , PaymentCycleType } from "../contracts/libraries/V2Calculations.sol";
 
 contract User {
     address public immutable tellerV2;
@@ -25,7 +25,7 @@ contract User {
         IERC20(_assetContractAddress).approve(_spender, _amount);
     }
 
-    function createMarketSimple(
+    /*function createMarketSimple(
         address marketRegistry,
         uint32 _paymentCycleDuration,
         uint32 _paymentDefaultDuration,
@@ -33,21 +33,33 @@ contract User {
         uint16 _feePercent,
         bool _requireLenderAttestation,
         bool _requireBorrowerAttestation,
+        PaymentType _paymentType,
+        PaymentCycleType _paymentCycleType,
+        address _feeRecipient,
         string calldata _uri
-    ) public returns (uint256) {
+    ) public returns (uint256,bytes32) {
+
+        IMarketRegistry_V2.MarketplaceTerms memory marketTerms = IMarketRegistry_V2.MarketplaceTerms({
+            paymentCycleDuration:_paymentCycleDuration,
+            paymentDefaultDuration:_paymentDefaultDuration,
+            bidExpirationTime:_bidExpirationTime,
+            marketplaceFeePercent:_feePercent,
+            paymentType:_paymentType,
+            paymentCycleType:_paymentCycleType,
+             feeRecipient: address(_feeRecipient)
+
+        });
+
         return
-            IMarketRegistry(marketRegistry).createMarket(
-                address(this),
-                _paymentCycleDuration,
-                _paymentDefaultDuration,
-                _bidExpirationTime,
-                _feePercent,
+            IMarketRegistry_V2(marketRegistry).createMarket(
+                address(this), 
                 _requireLenderAttestation,
                 _requireBorrowerAttestation,
-                _uri
+                _uri,
+                marketTerms
             );
     }
-
+*/
     function createMarket(
         address marketRegistry,
         uint32 _paymentCycleDuration,
@@ -58,20 +70,27 @@ contract User {
         bool _requireBorrowerAttestation,
         PaymentType _paymentType,
         PaymentCycleType _paymentCycleType,
+        address _feeRecipient,
         string calldata _uri
-    ) public returns (uint256) {
+    ) public returns (uint256,bytes32) {
+        IMarketRegistry_V2.MarketplaceTerms memory marketTerms = IMarketRegistry_V2.MarketplaceTerms({
+            paymentCycleDuration:_paymentCycleDuration,
+            paymentDefaultDuration:_paymentDefaultDuration,
+            bidExpirationTime:_bidExpirationTime,
+            marketplaceFeePercent:_feePercent,
+            paymentType:_paymentType,
+            paymentCycleType:_paymentCycleType,
+             feeRecipient: address(_feeRecipient)
+
+        });
+
         return
-            IMarketRegistry(marketRegistry).createMarket(
-                address(this),
-                _paymentCycleDuration,
-                _paymentDefaultDuration,
-                _bidExpirationTime,
-                _feePercent,
+            IMarketRegistry_V2(marketRegistry).createMarket(
+                address(this), 
                 _requireLenderAttestation,
                 _requireBorrowerAttestation,
-                _paymentType,
-                _paymentCycleType,
-                _uri
+                _uri,
+                marketTerms
             );
     }
 

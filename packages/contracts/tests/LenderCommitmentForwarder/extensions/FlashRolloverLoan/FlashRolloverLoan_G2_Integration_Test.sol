@@ -13,8 +13,9 @@ import "../../../integration/IntegrationTestHelpers.sol";
 import "../../../../contracts/LenderCommitmentForwarder/extensions/ExtensionsContextUpgradeable.sol";
 
 import { WethMock } from "../../../../contracts/mock/WethMock.sol";
+import { IMarketRegistry_V2 } from "../../../../contracts/interfaces/IMarketRegistry_V2.sol";
 
-import { TellerV2SolMock } from "../../../../contracts/mock/TellerV2SolMock.sol";
+import { TellerV2  } from "../../../../contracts/TellerV2.sol";
 import { LenderCommitmentForwarderMock } from "../../../../contracts/mock/LenderCommitmentForwarderMock.sol";
 import { MarketRegistryMock } from "../../../../contracts/mock/MarketRegistryMock.sol";
 
@@ -44,7 +45,9 @@ contract FlashRolloverLoan_Integration_Test is Testable {
     TellerV2 tellerV2;
     WethMock wethMock;
     ILenderCommitmentForwarder lenderCommitmentForwarder;
-    IMarketRegistry marketRegistry;
+    IMarketRegistry_V2 marketRegistry;
+
+    uint256 marketId;
 
     event RolloverLoanComplete(
         address borrower,
@@ -62,7 +65,7 @@ contract FlashRolloverLoan_Integration_Test is Testable {
 
         console.logAddress(address(tellerV2));
 
-        marketRegistry = IMarketRegistry(tellerV2.marketRegistry());
+        marketRegistry = IMarketRegistry_V2(tellerV2.marketRegistry());
 
         LenderCommitmentForwarder_G3 _lenderCommitmentForwarder = new LenderCommitmentForwarder_G3(
                 address(tellerV2),
@@ -92,18 +95,24 @@ contract FlashRolloverLoan_Integration_Test is Testable {
         PaymentType _paymentType = PaymentType.EMI;
         PaymentCycleType _paymentCycleType = PaymentCycleType.Seconds;
 
+        IMarketRegistry_V2.MarketplaceTerms
+            memory marketTerms = IMarketRegistry_V2.MarketplaceTerms({
+                paymentCycleDuration: _paymentCycleDuration,
+                paymentDefaultDuration: _paymentDefaultDuration,
+                bidExpirationTime: _bidExpirationTime,
+                marketplaceFeePercent: _feePercent,
+                paymentType: _paymentType,
+                paymentCycleType: _paymentCycleType,
+                feeRecipient: address(marketOwner)
+            });
+
         vm.prank(address(marketOwner));
-        uint256 marketId = marketRegistry.createMarket(
+        (marketId, ) = marketRegistry.createMarket(
             address(marketOwner),
-            _paymentCycleDuration,
-            _paymentDefaultDuration,
-            _bidExpirationTime,
-            _feePercent,
             false,
             false,
-            _paymentType,
-            _paymentCycleType,
-            "uri"
+            "uri",
+            marketTerms
         );
 
         wethMock.deposit{ value: 100e18 }();
@@ -125,7 +134,7 @@ contract FlashRolloverLoan_Integration_Test is Testable {
         address lendingToken = address(wethMock);
 
         //initial loan - need to pay back 1 weth + 0.1 weth (interest) to the lender
-        uint256 marketId = 1;
+
         uint256 principalAmount = 1e18;
         uint32 duration = 365 days;
         uint16 interestRate = 1000;
@@ -133,7 +142,7 @@ contract FlashRolloverLoan_Integration_Test is Testable {
         //wethMock.transfer(address(flashRolloverLoan), 100);
 
         vm.prank(address(borrower));
-        uint256 loanId = tellerV2.submitBid(
+        uint256 bidId = tellerV2.submitBid(
             lendingToken,
             marketId,
             principalAmount,
@@ -142,16 +151,24 @@ contract FlashRolloverLoan_Integration_Test is Testable {
             "",
             address(borrower)
         );
+ 
+       
+
 
         vm.prank(address(lender));
         wethMock.approve(address(tellerV2), 5e18);
+
+ 
 
         vm.prank(address(lender));
         (
             uint256 amountToProtocol,
             uint256 amountToMarketplace,
             uint256 amountToBorrower
-        ) = tellerV2.lenderAcceptBid(loanId);
+        ) = tellerV2.lenderAcceptBid(bidId);
+
+
+
 
         vm.warp(365 days + 1);
 
@@ -184,17 +201,18 @@ contract FlashRolloverLoan_Integration_Test is Testable {
 
         //should get 0.45  weth   from accepting this commitment  during the rollover process
 
-        FlashRolloverLoan_G1.AcceptCommitmentArgs memory _acceptCommitmentArgs = FlashRolloverLoan_G1
-            .AcceptCommitmentArgs({
-                commitmentId: commitmentId,
-                principalAmount: commitmentPrincipalAmount,
-                collateralAmount: 0,
-                collateralTokenId: 0,
-                collateralTokenAddress: address(0),
-                interestRate: interestRate,
-                loanDuration: duration
-                // merkleProof: new bytes32[](0)
-            });
+        FlashRolloverLoan_G1.AcceptCommitmentArgs
+            memory _acceptCommitmentArgs = FlashRolloverLoan_G1
+                .AcceptCommitmentArgs({
+                    commitmentId: commitmentId,
+                    principalAmount: commitmentPrincipalAmount,
+                    collateralAmount: 0,
+                    collateralTokenId: 0,
+                    collateralTokenAddress: address(0),
+                    interestRate: interestRate,
+                    loanDuration: duration
+                    // merkleProof: new bytes32[](0)
+                });
 
         ///approve forwarders
 
@@ -232,9 +250,11 @@ contract FlashRolloverLoan_Integration_Test is Testable {
         vm.expectEmit(true, false, false, false);
         emit RolloverLoanComplete(address(borrower), 0, 0, 0);
 
+        
+
         vm.prank(address(borrower));
         flashRolloverLoan.rolloverLoanWithFlash(
-            loanId,
+            bidId,
             flashLoanAmount,
             borrowerAmount,
             _acceptCommitmentArgs

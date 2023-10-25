@@ -9,14 +9,14 @@ const deployFn: DeployFunction = async (hre) => {
   const trustedForwarder = await hre.contracts.get('MetaForwarder')
   const v2Calculations = await hre.deployments.get('V2Calculations')
 
-  const collateralManagerV2 = await hre.contracts.get('CollateralManagerV2')
+  //const marketRegistry = await hre.contracts.get('MarketRegistry')
 
   await hre.upgrades.proposeBatchTimelock({
-    title: 'TellerV2: Upgrade for Collateral Manager V2',
+    title: 'TellerV2: Upgrade for Market Registry V2',
     description: ` 
 # TellerV2
 
-* Modifies Teller V2 so that it supports the Collateral Manager V2.
+* Modifies Teller V2 so that it supports the Market Registry V2.
 `,
     _steps: [
       {
@@ -36,10 +36,7 @@ const deployFn: DeployFunction = async (hre) => {
           unsafeAllowRenames: true,
           constructorArgs: [await trustedForwarder.getAddress()],
 
-          call: {
-            fn: 'setCollateralManagerV2',
-            args: [await collateralManagerV2.getAddress()]
-          }
+           
         }
       }
     ]
@@ -53,20 +50,20 @@ const deployFn: DeployFunction = async (hre) => {
 }
 
 // tags and deployment
-deployFn.id = 'teller-v2:collateral-manager-v2-upgrade'
+deployFn.id = 'teller-v2:market-registry-v2-upgrade'
 deployFn.tags = [
   'proposal',
   'upgrade',
   'teller-v2',
-  'teller-v2:collateral-manager-v2-upgrade'
+  'teller-v2:market-registry-v2-upgrade'
 ]
-deployFn.dependencies = ['teller-v2:deploy','collateral:manager-v2:deploy']
+deployFn.dependencies = ['teller-v2:deploy','market-registry:v2-upgrade']
 deployFn.skip = async (hre) => {
-  return (
+  return     (
     !hre.network.live ||
     !['mainnet', 'polygon', 'arbitrum', 'goerli', 'sepolia'].includes(
       hre.network.name
     )
-  )
+  ) 
 }
 export default deployFn

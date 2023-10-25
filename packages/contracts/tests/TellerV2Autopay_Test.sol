@@ -12,6 +12,9 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "../contracts/TellerV2Storage.sol";
 
 import "../contracts/interfaces/IMarketRegistry.sol";
+
+import "../contracts/interfaces/IMarketRegistry_V2.sol";
+
 import "../contracts/interfaces/IReputationManager.sol";
 
 import "../contracts/EAS/TellerAS.sol";
@@ -65,8 +68,8 @@ contract TellerV2Autopay_Test is Testable, TellerV2Autopay {
     }
 
     function setAutoPayEnabled_before() public {
-        uint256 marketplaceId = 1;
-        marketOwner.createMarketWithinRegistry(
+        
+        /*marketOwner.createMarketWithinRegistry(
             address(marketRegistry),
             8000,
             7000,
@@ -76,7 +79,31 @@ contract TellerV2Autopay_Test is Testable, TellerV2Autopay {
             false,
             PaymentType.EMI,
             "uri://"
+        );*/
+
+         IMarketRegistry_V2.MarketplaceTerms memory marketTerms = IMarketRegistry_V2.MarketplaceTerms({
+            paymentCycleDuration:8000,
+            paymentDefaultDuration:7000,
+            bidExpirationTime:5000,
+            marketplaceFeePercent:500,
+            paymentType:PaymentType.EMI,
+            paymentCycleType:PaymentCycleType.Seconds,
+             feeRecipient: address(this)
+
+        });
+
+       (uint256 marketplaceId, ) =  IMarketRegistry_V2(marketRegistry).createMarket(
+            address(this),
+            
+            false,
+            false,
+            
+            "uri://",
+            marketTerms
         );
+
+
+
 
         uint256 bidId = borrower.submitBid(
             address(wethMock),
@@ -225,7 +252,7 @@ contract User {
         ITellerV2Autopay(tellerV2Autopay).setAutoPayEnabled(bidId, enabled);
     }
 
-    function createMarketWithinRegistry(
+    /*function createMarketWithinRegistry(
         address marketRegistry,
         uint32 _paymentCycleDuration,
         uint32 _paymentDefaultDuration,
@@ -236,19 +263,9 @@ contract User {
         PaymentType _paymentType,
         string calldata _uri
     ) public {
-        IMarketRegistry(marketRegistry).createMarket(
-            address(this),
-            _paymentCycleDuration,
-            _paymentDefaultDuration,
-            _bidExpirationTime,
-            _feePercent,
-            _requireLenderAttestation,
-            _requireBorrowerAttestation,
-            _paymentType,
-            PaymentCycleType.Seconds,
-            _uri
-        );
-    }
+
+       
+    }*/
 
     function autoPayLoanMinimum(uint256 bidId) public {
         ITellerV2Autopay(tellerV2Autopay).autoPayLoanMinimum(bidId);

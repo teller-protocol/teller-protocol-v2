@@ -26,7 +26,7 @@ interface IReputationManager {
         external
         returns (uint256[] memory);
 
-    function updateAccountReputation(address _account) external;
+    //  function updateAccountReputation(address _account) external;
 
     function updateAccountReputation(address _account, uint256 _bidId)
         external

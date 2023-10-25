@@ -101,10 +101,12 @@ interface ITellerV2 {
 
     function getBidState(uint256 _bidId) external view returns (BidState);
 
-    function getBorrowerActiveLoanIds(address _borrower)
+    /* 
+     function getBorrowerActiveLoanIds(address _borrower)
         external
         view
         returns (uint256[] memory);
+    */
 
     /**
      * @notice Returns the borrower address for a given bid.

@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import { TellerV2, Bid, BidState, Collateral, Payment, LoanDetails, Terms } from "../../contracts/TellerV2.sol";
+import { TellerV2, Bid, BidState, Collateral, Payment, LoanDetails, Terms, PaymentCycleType } from "../../contracts/TellerV2.sol";
 
 import "../../contracts/interfaces/IMarketRegistry.sol";
+import "../../contracts/interfaces/IMarketRegistry_V2.sol";
+
 import "../../contracts/interfaces/IReputationManager.sol";
 import "../../contracts/interfaces/ICollateralManager.sol";
 import "../../contracts/interfaces/ICollateralManagerV1.sol";
@@ -49,7 +51,7 @@ contract TellerV2_Override is TellerV2 {
     }
 
     function setMarketRegistrySuper(address _marketRegistry) public {
-        marketRegistry = IMarketRegistry(_marketRegistry);
+        marketRegistry = IMarketRegistry_V2(_marketRegistry);
     }
 
     function setCollateralManagerSuper(address _collateralManager) public {

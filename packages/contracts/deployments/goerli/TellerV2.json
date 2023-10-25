@@ -269,6 +269,23 @@
     {
       "type": "event",
       "anonymous": false,
+      "name": "SetBidMarketTerms",
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "bidId",
+          "indexed": true
+        },
+        {
+          "type": "bytes32",
+          "name": "marketTermsId",
+          "indexed": true
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
       "name": "SubmittedBid",
       "inputs": [
         {
@@ -431,14 +448,19 @@
     },
     {
       "type": "function",
-      "name": "bidId",
+      "name": "bidMarketTermsId",
       "constant": true,
       "stateMutability": "view",
       "payable": false,
-      "inputs": [],
-      "outputs": [
+      "inputs": [
         {
           "type": "uint256",
+          "name": ""
+        }
+      ],
+      "outputs": [
+        {
+          "type": "bytes32",
           "name": ""
         }
       ]
@@ -791,44 +813,6 @@
       "outputs": [
         {
           "type": "uint8",
-          "name": ""
-        }
-      ]
-    },
-    {
-      "type": "function",
-      "name": "getBorrowerActiveLoanIds",
-      "constant": true,
-      "stateMutability": "view",
-      "payable": false,
-      "inputs": [
-        {
-          "type": "address",
-          "name": "_borrower"
-        }
-      ],
-      "outputs": [
-        {
-          "type": "uint256[]",
-          "name": ""
-        }
-      ]
-    },
-    {
-      "type": "function",
-      "name": "getBorrowerLoanIds",
-      "constant": true,
-      "stateMutability": "view",
-      "payable": false,
-      "inputs": [
-        {
-          "type": "address",
-          "name": "_borrower"
-        }
-      ],
-      "outputs": [
-        {
-          "type": "uint256[]",
           "name": ""
         }
       ]
@@ -1323,6 +1307,20 @@
     },
     {
       "type": "function",
+      "name": "nextBidId",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
       "name": "owner",
       "constant": true,
       "stateMutability": "view",
@@ -1748,6 +1746,6 @@
     "status": 1,
     "byzantium": true
   },
-  "numDeployments": 8,
+  "numDeployments": 9,
   "implementation": "0xFe5394B67196EA95301D6ECB5389E98A02984cC2"
 }

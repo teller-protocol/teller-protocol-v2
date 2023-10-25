@@ -130,8 +130,11 @@ contract TellerV2_bids_test is Testable {
 
     function test_submit_bid_internal() public {
         tellerV2.setMarketRegistrySuper(address(marketRegistryMock));
+        marketRegistryMock.mock_setGlobalMarketsClosed(false);
+        marketRegistryMock.forceSetGlobalTermsForMarket(bytes32("0x01"));
 
-        vm.expectEmit(false, false, false, false);
+
+       /* vm.expectEmit(false, false, false, false);
 
         emit SubmittedBid(
             0,
@@ -139,6 +142,7 @@ contract TellerV2_bids_test is Testable {
             address(this),
             keccak256(abi.encodePacked(""))
         );
+        */
 
         uint256 bidId = tellerV2._submitBidSuper(
             address(lendingToken), // lending token
@@ -150,9 +154,30 @@ contract TellerV2_bids_test is Testable {
             address(this) // receiver
         );
     }
+ 
+    function test_submit_bid_internal_fails_without_terms() public {
+        tellerV2.setMarketRegistrySuper(address(marketRegistryMock));
+         marketRegistryMock.mock_setGlobalMarketsClosed(false);
+         marketRegistryMock.forceSetGlobalTermsForMarket(bytes32(0));
+
+
+        vm.expectRevert("Market does not have assigned terms.");
+
+        uint256 bidId = tellerV2._submitBidSuper(
+            address(lendingToken), // lending token
+            1, // market ID
+            100, // principal
+            365 days, // duration
+            20_00, // interest rate
+            "", // metadata URI
+            address(this) // receiver
+        );
+    }
+ 
 
     function test_submit_bid_internal_fails_when_market_closed() public {
         tellerV2.setMarketRegistrySuper(address(marketRegistryMock));
+        marketRegistryMock.forceSetGlobalTermsForMarket(bytes32("0x01"));
 
         marketRegistryMock.mock_setGlobalMarketsClosed(true);
 

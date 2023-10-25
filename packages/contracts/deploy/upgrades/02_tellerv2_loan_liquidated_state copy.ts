@@ -31,6 +31,7 @@ const deployFn: DeployFunction = async (hre) => {
             'state-variable-immutable',
             'external-library-linking',
           ],
+          unsafeAllowRenames:true,
           constructorArgs: [await trustedForwarder.getAddress()],
         },
       },

@@ -243,7 +243,11 @@ const buildAndDeploy = async ({
       return;
     }
 
-    const graftingBlock = latestVersion.latestEthereumBlockNumber;
+        //think abt making this an option for a config file where this is the fallback  
+    const forceGraftingBlock : number | undefined  =  undefined//18429459 ;
+
+
+    const graftingBlock = forceGraftingBlock ??  latestVersion.latestEthereumBlockNumber;
     logger?.log(
       `Grafting subgraph: ${subgraph.name} (${subgraph.network}) at block ${graftingBlock}`
     );

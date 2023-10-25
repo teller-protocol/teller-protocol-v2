@@ -3,7 +3,7 @@ import {
   BigDecimal,
   BigInt,
   Entity,
-  store
+  store 
 } from "@graphprotocol/graph-ts";
 
 import { LenderCommitmentForwarder } from "../../generated/LenderCommitmentForwarder/LenderCommitmentForwarder";
@@ -274,6 +274,7 @@ function addInactiveCommitmentToProtocol(commitment: Commitment): void {
   if (!inactiveArray) {
     inactiveArray = []
   }
+ 
 
   protocol.inactiveCommitments = addToArray(
     inactiveArray,
@@ -288,14 +289,14 @@ function removeInactiveCommitmentToProtocol(commitment: Commitment): void {
   
   let inactiveArray = protocol.inactiveCommitments 
 
-  if (!inactiveArray) {
-    inactiveArray = []
-  }
+  
 
-  protocol.inactiveCommitments = addToArray(
-    inactiveArray,
-    commitment.id
-  );
+  if (inactiveArray) {  
+    protocol.inactiveCommitments = removeFromArray(
+      inactiveArray,
+      commitment.id
+    );
+  }
 
   protocol.save();
 }

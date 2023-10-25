@@ -134,9 +134,33 @@ export const makeStudio = async (
       if (!cookie) {
         const transport = await Transport.open("");
         const eth = new AppEth(transport);
+        
+        let knownAddress = "0xF3E864eAaFf9Cf2cD21A862d51D875093b4B5baA"
 
-        const path = "44'/60'/0'/0/0";
-        const { address } = await eth.getAddress(path);
+        let foundPath = undefined
+        let foundAddress = undefined
+
+        for( let i =0; i< 99 ; i++) {
+
+          const path = `44'/60'/0'/0/${i.toString()}`;
+          console.log("searching ", path)
+          const { address: addressAtPath } = await eth.getAddress(path);
+          
+          console.log({addressAtPath})
+          if(addressAtPath == knownAddress){
+            foundAddress = addressAtPath; 
+            foundPath = path;
+            break
+          }
+        }
+
+        if( !foundPath || !foundAddress) {
+
+          throw new Error("Could not find path")
+        }
+
+       // const path = "44'/60'/0'/0/0";
+       // const { address } = await eth.getAddress(path);
 
         const message =
           "Sign this message to prove you have access to this wallet in order to sign in to thegraph.com/studio.\n\n" +
@@ -144,7 +168,7 @@ export const makeStudio = async (
           `Timestamp: ${Date.now()}`;
 
         const sig = await eth.signPersonalMessage(
-          path,
+          foundPath,
           Buffer.from(message).toString("hex")
         );
         const signature = `0x${sig.r}${sig.s}${sig.v.toString(16)}`;
@@ -157,7 +181,7 @@ export const makeStudio = async (
             ethAddress: networkConfig.owner.address,
             message,
             signature,
-            multisigOwnerAddress: address,
+            multisigOwnerAddress: foundAddress,
             networkId: Network[networkConfig.owner.network]
           },
           query:

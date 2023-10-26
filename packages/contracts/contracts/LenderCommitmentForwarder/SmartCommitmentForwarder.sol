@@ -119,9 +119,7 @@ contract SmartCommitmentForwarder is
             _loanDuration <= _commitment.maxDuration(),
             "Invalid loan max duration"
         );
-
-       
-           
+ 
 
     /*
      //commitmentPrincipalAccepted[bidId] <= commitment.maxPrincipal,
@@ -208,18 +206,15 @@ contract SmartCommitmentForwarder is
         );
 
         CreateLoanArgs memory createLoanArgs;
-    {
-        uint256 commitmentMarketId = _commitment.marketId();
-        address principalTokenAddress = _commitment.principalTokenAddress();
-
+    
        
-        createLoanArgs.marketId = commitmentMarketId;
-        createLoanArgs.lendingToken = principalTokenAddress;
+        createLoanArgs.marketId = _commitment.marketId();
+        createLoanArgs.lendingToken = _commitment.principalTokenAddress();
         createLoanArgs.principal = _principalAmount;
         createLoanArgs.duration = _loanDuration;
         createLoanArgs.interestRate = _interestRate;
         createLoanArgs.recipient = _recipient;        
-    }
+   
 
         if (commitmentCollateralTokenType != CommitmentCollateralType.NONE) {
             createLoanArgs.collateral = new Collateral[](1);

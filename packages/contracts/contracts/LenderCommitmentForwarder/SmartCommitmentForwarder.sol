@@ -207,16 +207,19 @@ contract SmartCommitmentForwarder is
             _principalAmount
         );
 
+        CreateLoanArgs memory createLoanArgs;
+    {
         uint256 commitmentMarketId = _commitment.marketId();
         address principalTokenAddress = _commitment.principalTokenAddress();
 
-        CreateLoanArgs memory createLoanArgs;
+       
         createLoanArgs.marketId = commitmentMarketId;
         createLoanArgs.lendingToken = principalTokenAddress;
         createLoanArgs.principal = _principalAmount;
         createLoanArgs.duration = _loanDuration;
         createLoanArgs.interestRate = _interestRate;
-        createLoanArgs.recipient = _recipient;
+        createLoanArgs.recipient = _recipient;        
+    }
 
         if (commitmentCollateralTokenType != CommitmentCollateralType.NONE) {
             createLoanArgs.collateral = new Collateral[](1);

@@ -14,7 +14,7 @@ import "../../../interfaces/ILenderCommitmentForwarder.sol";
 import "../../../libraries/NumbersLib.sol";
  
 
-import "./LenderCommitmentGroup.sol";
+import "./LenderCommitmentGroup_Simple.sol";
 //import {CreateCommitmentArgs} from "../../interfaces/ILenderCommitmentGroup.sol";
 
 contract LenderCommitmentGroupFactory  {
@@ -61,7 +61,7 @@ contract LenderCommitmentGroupFactory  {
     ) external returns (address newPoolAddress_) {       
 
             //these should be upgradeable proxies ??? 
-        LenderCommitmentGroup _newGroupContract = new LenderCommitmentGroup(
+        LenderCommitmentGroup_Simple _newGroupContract = new LenderCommitmentGroup_Simple(
                 address(TELLER_V2),
                 address(LENDER_COMMITMENT_FORWARDER)
         );

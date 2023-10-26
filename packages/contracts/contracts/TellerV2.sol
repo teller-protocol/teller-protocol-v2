@@ -842,7 +842,7 @@ contract TellerV2 is
             emit LoanRepayment(_bidId);
         }
 
-        _sendOrEscrowFunds(_bidId, paymentAmount); //send or escrow the funds
+        _sendOrEscrowFunds(_bidId,  _payment ); //send or escrow the funds
 
         // update our mappings
         bid.loanDetails.totalRepaid.principal += _payment.principal;
@@ -855,28 +855,74 @@ contract TellerV2 is
         }
     }
 
+
+        function _transferPrincipalAndInterestToLenderDirectly (
+            IERC20 lendingToken,
+            address from,
+            address lender,
+            address interestCollector,
+            Payment memory _payment            
+        ) internal {
+
+             if(interestCollector == address(0)){
+                lendingToken.transferFrom{ gas: 100000 }(
+                        from,
+                        lender,
+                        _payment.principal+_payment.interest
+                    );
+             }else{
+                
+                   lendingToken.transferFrom{ gas: 100000 }(
+                        from,
+                        lender,
+                        _payment.principal
+                    );
+
+                    lendingToken.transferFrom{ gas: 100000 }(
+                        from,
+                        interestCollector,
+                        _payment.interest
+                    );
+                
+            } 
+
+        }
+
+
     function _sendOrEscrowFunds(
         uint256 _bidId,
-        uint256 _paymentAmount
+        Payment memory _payment
+      
     ) internal {
         Bid storage bid = bids[_bidId];
         address lender = getLoanLender(_bidId);
+
+        address interestCollector = interestCollectorForBid[_bidId];
+        
 
         try
             //first try to pay directly
             //have to use transfer from  (not safe transfer from) for try/catch statement
             //dont try to use any more than 100k gas for this xfer
-            bid.loanDetails.lendingToken.transferFrom{ gas: 100000 }(
+            _transferPrincipalAndInterestToLenderDirectly( 
+
+                bid.loanDetails.lendingToken,
                 _msgSenderForMarket(bid.marketplaceId),
                 lender,
-                _paymentAmount
-            )
+                interestCollector,
+                _payment
+              )
+            
+          
+
         {} catch {
             address sender = _msgSenderForMarket(bid.marketplaceId);
 
             uint256 balanceBefore = bid.loanDetails.lendingToken.balanceOf(
                 address(this)
             );
+
+            uint256 _paymentAmount = _payment.principal  + _payment.interest;
 
             //if unable, pay to escrow
             bid.loanDetails.lendingToken.safeTransferFrom(
@@ -1059,23 +1105,18 @@ contract TellerV2 is
     ) external view override returns (BidState) {
         return bids[_bidId].state;
     }
+    function setInterestCollector(uint256 _bidId, address _collector) external {
 
-    /* function getBorrowerActiveLoanIds(address _borrower)
-        external
-        view
-        override
-        returns (uint256[] memory)
-    {
-        return _borrowerBidsActive[_borrower].values();
+        require ( _msgSender() == bids[_bidId].lender );
+
+        interestCollectorForBid[_bidId] = _collector;
+
+
     }
 
-    function getBorrowerLoanIds(address _borrower)
-        external
-        view
-        returns (uint256[] memory)
-    {
-        return borrowerBids[_borrower];
-    }*/
+    function getInterestCollector() external view returns (address) {
+        return interestCollectorForBid[_bidId];
+    }
 
     /**
      * @notice Checks to see if a pending loan has expired so it is no longer able to be accepted.

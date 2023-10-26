@@ -13,20 +13,35 @@ pragma solidity ^0.8.0;
     }
 
 interface ISmartCommitment {
-
-    function collateralTokenAddress() external view returns (address);
-    function minInterestRate() external view returns (uint16);
-    function maxDuration() external view returns (uint32);
-    function isAvailableToBorrow(uint256 _principalAmount) external view returns (bool);
-    function isAllowedToBorrow(address borrower) external view returns (bool);
-    function getRequiredCollateral(uint256 _principalAmount) external view returns (uint256);
+    
+    function getPrincipalTokenAddress() external view returns (address);
+    function getMarketId() external view returns (uint256);
+   
+    function getCollateralTokenAddress() external view returns (address);
     function getCollateralTokenType() external view returns (CommitmentCollateralType);
     function getCollateralTokenId() external view returns (uint256);
-    function withdrawFundsForAcceptBid(uint256 _principalAmount) external;
+    function getMinInterestRate() external view returns (uint16);
+    function getMaxLoanDuration() external view returns (uint32);
+  
+    function getPrincipalAmountAvailableToBorrow() external view returns (uint256);
+    function getRequiredCollateral(uint256 _principalAmount) external view returns (uint256);
 
-    function marketId() external view returns (uint256);
-    function principalTokenAddress() external view returns (address);
-    
+    function isAllowedToBorrow(address borrower) external view returns (bool);
 
-    // Add any other methods that are needed based on your contract logic
+    function withdrawFundsForAcceptBid(
+        
+            address _borrower,
+
+            uint256 _principalAmount,
+
+            uint256 _collateralAmount,
+            address _collateralTokenAddress,
+            uint256 _collateralTokenId,
+            uint32 _loanDuration,
+
+            uint16 _interestRate
+            
+
+    ) external;
+ 
 }

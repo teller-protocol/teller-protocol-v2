@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 
-import "../TellerV2MarketForwarder_G2.sol";
+import "../TellerV2MarketForwarder_G3.sol";
 
 import "../interfaces/ILenderCommitmentForwarder.sol";
 import "./LenderCommitmentForwarder_G1.sol";
@@ -22,7 +22,7 @@ and _acceptBid
 
 
 contract SmartCommitmentForwarder is    
-    TellerV2MarketForwarder_G2
+    TellerV2MarketForwarder_G3
 { 
 
     event ExercisedSmartCommitment(
@@ -77,6 +77,8 @@ contract SmartCommitmentForwarder is
             "Invalid commitment collateral type"
         );
 
+
+    
         return
             _acceptCommitment(
                 _smartCommitmentAddress,
@@ -84,9 +86,9 @@ contract SmartCommitmentForwarder is
                 _collateralAmount,
                 _collateralTokenId,
                 _collateralTokenAddress,
-                _recipient,
+                _recipient,             
                 _interestRate,
-                _loanDuration
+                _loanDuration 
             );
     }
 
@@ -98,122 +100,40 @@ contract SmartCommitmentForwarder is
         address _collateralTokenAddress,
         address _recipient,
         uint16 _interestRate,
-        uint32 _loanDuration
+        uint32 _loanDuration 
     ) internal returns (uint256 bidId) {
         ISmartCommitment _commitment = ISmartCommitment(_smartCommitmentAddress);
         
-       
-
-        //consider putting these into less readonly fn calls 
-        require(
-            _collateralTokenAddress == _commitment.collateralTokenAddress(),
-            "Mismatching collateral token"
-        );
-        //the interest rate must be at least as high has the commitment demands. The borrower can use a higher interest rate although that would not be beneficial to the borrower.
-        require(
-            _interestRate >= _commitment.minInterestRate(),
-            "Invalid interest rate"
-        );
-        //the loan duration must be less than the commitment max loan duration. The lender who made the commitment expects the money to be returned before this window.
-        require(
-            _loanDuration <= _commitment.maxDuration(),
-            "Invalid loan max duration"
-        );
- 
-
-    /*
-     //commitmentPrincipalAccepted[bidId] <= commitment.maxPrincipal,
-
-   //require that the borrower accepting the commitment cannot borrow more than the commitments max principal
-        if (_principalAmount > commitment.maxPrincipal) {
-            revert InsufficientCommitmentAllocation({
-                allocated: commitment.maxPrincipal,
-                requested: _principalAmount
-            });
-        }
-    */
-        require(
-             _commitment.isAvailableToBorrow( _principalAmount),           
-            "Invalid loan max principal"
-        );
-
-        require(
-            _commitment.isAllowedToBorrow( _msgSender()  ),           
-            "unauthorized borrow"
-        );
-
- 
-        uint256 requiredCollateral = _commitment.getRequiredCollateral(
-            _principalAmount 
-        );
-
-        if (_collateralAmount < requiredCollateral) {
-            revert InsufficientBorrowerCollateral({
-                required: requiredCollateral,
-                actual: _collateralAmount
-            });
-        }
-
-        CommitmentCollateralType commitmentCollateralTokenType = _commitment.getCollateralTokenType();
-
-        //ERC721 assets must have a quantity of 1
-        if (
-            commitmentCollateralTokenType == 
-            CommitmentCollateralType.ERC721 ||
-            commitmentCollateralTokenType ==
-            CommitmentCollateralType.ERC721_ANY_ID ||
-            commitmentCollateralTokenType ==
-            CommitmentCollateralType.ERC721_MERKLE_PROOF
-        ) {
-            require(
-                _collateralAmount == 1,
-                "invalid commitment collateral amount for ERC721"
-            );
-        }
-
-        //ERC721 and ERC1155 types strictly enforce a specific token Id.  ERC721_ANY and ERC1155_ANY do not.
-        if (
-            commitmentCollateralTokenType == CommitmentCollateralType.ERC721 ||
-            commitmentCollateralTokenType == CommitmentCollateralType.ERC1155
-        ) { 
-          uint256 commitmentCollateralTokenId = _commitment.getCollateralTokenId(); 
-
-            require(
-                commitmentCollateralTokenId == _collateralTokenId,
-                "invalid commitment collateral tokenId"
-            );
-        }
-
-
-        //do this accounting in the group contract now? 
-
-        /*
-        commitmentPrincipalAccepted[_commitmentId] += _principalAmount;
-
-        require(
-            commitmentPrincipalAccepted[_commitmentId] <=
-                commitment.maxPrincipal,
-            "Exceeds max principal of commitment"
-        ); 
         
-        
-        */
-
-        //this can only be called by contracts that the lending group contract has approved tokens to ..
-        // so the group contract will designate this contract as being 'special '  
         _commitment.withdrawFundsForAcceptBid( 
-            _principalAmount
+            _msgSender(), //borrower
+
+
+            _principalAmount,
+
+            _collateralAmount,
+            _collateralTokenAddress,
+            _collateralTokenId,
+            _loanDuration,
+            _interestRate
+            
         );
+
+          address interestCollector = ISmartCommitment( _smartCommitmentAddress ).getInterestCollector();
+
 
         CreateLoanArgs memory createLoanArgs;
     
        
-        createLoanArgs.marketId = _commitment.marketId();
-        createLoanArgs.lendingToken = _commitment.principalTokenAddress();
+        createLoanArgs.marketId = _commitment.getMarketId();
+        createLoanArgs.lendingToken = _commitment.getPrincipalTokenAddress();
         createLoanArgs.principal = _principalAmount;
         createLoanArgs.duration = _loanDuration;
         createLoanArgs.interestRate = _interestRate;
-        createLoanArgs.recipient = _recipient;        
+        createLoanArgs.recipient = _recipient;    
+       
+
+        CommitmentCollateralType commitmentCollateralTokenType = _commitment.getCollateralTokenType();  
    
 
         if (commitmentCollateralTokenType != CommitmentCollateralType.NONE) {
@@ -230,9 +150,10 @@ contract SmartCommitmentForwarder is
 
         bidId = _submitBidWithCollateral(createLoanArgs, _msgSender());
 
-        _acceptBid(
+        _acceptBidWithInterestCollector(
             bidId, 
-            _smartCommitmentAddress //the lender is the smart commitment contract 
+            _smartCommitmentAddress, //the lender is the smart commitment contract 
+            interestCollector
             );
 
         emit ExercisedSmartCommitment(

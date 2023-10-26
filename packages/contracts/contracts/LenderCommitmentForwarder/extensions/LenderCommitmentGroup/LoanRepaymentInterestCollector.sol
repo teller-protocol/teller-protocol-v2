@@ -4,10 +4,17 @@ pragma solidity ^0.8.0;
  
 
 contract LoanRepaymentInterestCollector  
-     
+     is Ownable
 { 
 
      address public immutable principalToken;
+
+
+    constructor( address _principalToken ){
+
+        principalToken = _principalToken;
+
+    }
 
     function collectInterest()
     external 

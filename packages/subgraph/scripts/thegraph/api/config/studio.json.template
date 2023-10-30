@@ -1,0 +1,17 @@
+{
+    "localWallet":" ",
+    "networkWallets":[
+     
+    "0x1A2bAA2257 0c4f2190": {
+        "deployKey": " ",
+        "network": "mainnet",
+        
+    },
+    "0x1a7633921 ef5D9ebc": {
+        "deployKey": "1384f 4e81ae",
+        "network": "arbitrum-one",
+         
+    }
+]
+    
+}

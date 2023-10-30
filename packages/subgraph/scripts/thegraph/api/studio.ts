@@ -38,25 +38,69 @@ export const makeStudio = async (
   const disklet = makeNodeDisklet(path.join(__dirname, "./config"));
   const memlet = makeMemlet(disklet);
 
-  interface IConfig {
-    [owner: string]: IOwnerConfig | undefined;
+
+  interface ICookieConfig { 
+    cookies: {[owner: string]: ICookieConfig | undefined;}
+  }
+
+  interface IStudioConfig {
+    localWallet: string, 
+    networkWallets: {[owner: string]: IOwnerConfig | undefined;}
   }
   interface IOwnerConfig {
+   
+    deployKey?: string;
+  }
+
+  interface ICookieConfig {
     Cookie?: {
       value: string;
       expiration: string;
     };
-    deployKey?: string;
   }
-  const getConfig = async (): Promise<IConfig> => {
+
+
+  const getStudioConfig = async (): Promise<IStudioConfig> => {
     return await memlet.getJson("studio.json").catch(() => ({}));
   };
-  let studioConfig = await getConfig();
+  let studioConfig = await getStudioConfig();
+  console.log({studioConfig})
 
+  const getCookieConfig= async (): Promise<ICookieConfig> => {
+    return await memlet.getJson("cookies.json").catch(() => ({}));
+  };
+  let cookieConfig = await getCookieConfig();
+
+  const buildCookieConfig = (
+
+    _config: ICookieConfig, 
+    _networkWalletAddress : string,
+    _newCookie: {value: string, expiration:string}
+
+    
+  ) : ICookieConfig => {
+     
+    cookieConfig = _config; 
+
+    //@ts-ignore
+    cookieConfig.cookies[_networkWalletAddress] = {Cookie: _newCookie} 
+  
+    return cookieConfig
+  }
+
+  const saveCookieConfig = async (
+    _config: ICookieConfig 
+    ): Promise<void> => {
+  
+      await memlet.setJson("cookies.json", _config);  
+    
+  };
+
+  /*
   const setConfig = async (_config: IConfig): Promise<void> => {
     studioConfig = _config;
     await memlet.setJson("studio.json", _config);
-  };
+  };*/
 
   const api = axios.create({
     baseURL: "https://api.studio.thegraph.com/graphql",
@@ -74,12 +118,12 @@ export const makeStudio = async (
       if (data.errors) {
         const messages = data.errors.map(e => {
           if (e.extensions.code === "UNAUTHENTICATED") {
-            const prev = studioConfig[networkConfig.owner.address] ?? {};
-            studioConfig[networkConfig.owner.address] = {
+            /*const prev = studioConfig.networkWallets[networkConfig.owner.address] ?? {};
+            studioConfig.networkWallets[networkConfig.owner.address] = {
               ...prev,
               Cookie: undefined
-            };
-            void setConfig(studioConfig);
+            };*/
+            //void setConfig(studioConfig);
           }
           return `\t* ${e.message}`;
         });
@@ -118,7 +162,10 @@ export const makeStudio = async (
       if (!socket.isConnected()) await socket.connect();
 
       let cookie: string | null = null;
-      const Cookie = studioConfig[networkConfig.owner.address]?.Cookie;
+      const Cookie = cookieConfig.cookies[networkConfig.owner.address]?.Cookie;
+
+      console.log({Cookie})
+
       if (Cookie) {
         if (new Date(Cookie.expiration).getTime() > Date.now()) {
           cookie = Cookie.value;
@@ -135,7 +182,11 @@ export const makeStudio = async (
         const transport = await Transport.open("");
         const eth = new AppEth(transport);
         
-        let knownAddress = "0xF3E864eAaFf9Cf2cD21A862d51D875093b4B5baA"
+ 
+
+        let knownAddress = studioConfig.localWallet
+
+        if(!knownAddress) throw new Error("Error: undefined local wallet address in studio.json config")
 
         let foundPath = undefined
         let foundAddress = undefined
@@ -143,7 +194,7 @@ export const makeStudio = async (
         for( let i =0; i< 99 ; i++) {
 
           const path = `44'/60'/0'/0/${i.toString()}`;
-          console.log("searching ", path)
+          console.log(`searching for ${knownAddress} at ${path}`)
           const { address: addressAtPath } = await eth.getAddress(path);
           
           console.log({addressAtPath})
@@ -188,7 +239,7 @@ export const makeStudio = async (
             "fragment AuthUserFragment on User { id } mutation login($ethAddress: String!, $message: String!, $signature: String!, $multisigOwnerAddress: String, $networkId: Int) { login(ethAddress: $ethAddress, message: $message, signature: $signature, multisigOwnerAddress: $multisigOwnerAddress, networkId: $networkId) { ...AuthUserFragment } }"
         });
 
-        // extract cookie info
+        // extract cookie info and save it 
         const cookieRegex = /^(SubgraphStudioAPI=[^\s]+;).*Expires=([^;]+);/;
         const cookieRaw = login.headers["set-cookie"]?.find(cookie =>
           cookieRegex.test(cookie)
@@ -197,20 +248,20 @@ export const makeStudio = async (
           const [_, cookieValue, cookieExpiration] = cookieRaw.match(
             cookieRegex
           )!;
-          await setConfig({
-            ...studioConfig,
-            [networkConfig.owner.address]: {
-              ...studioConfig[networkConfig.owner.address],
-              Cookie: {
-                value: cookieValue,
-                expiration: cookieExpiration
-              }
-            }
-          });
+          
+          let newCookieConfig = buildCookieConfig( cookieConfig, 
+            networkConfig.owner.address, 
+            {value:cookieValue, expiration: cookieExpiration} 
+               )
+
+          await saveCookieConfig(
+            newCookieConfig
+          )
+
           cookie = cookieValue;
         }
       }
-
+      console.log("cookie is ", cookie)
       api.defaults.headers.Cookie = cookie;
     });
   };
@@ -350,7 +401,7 @@ export const makeStudio = async (
     getLatestVersion,
     watchVersionUpdate,
     beforeDeploy: async () => {
-      const deployKey = studioConfig[networkConfig.owner.address]?.deployKey;
+      const deployKey = studioConfig.networkWallets[networkConfig.owner.address]?.deployKey;
       if (!deployKey) throw new Error("No deploy key found");
 
       await auth({

@@ -118,18 +118,18 @@ export const makeStudio = async (
       if (!socket.isConnected()) await socket.connect();
 
       let cookie: string | null = null;
-      // const Cookie = studioConfig[networkConfig.owner.address]?.Cookie;
-      // if (Cookie) {
-      //   if (new Date(Cookie.expiration).getTime() > Date.now()) {
-      //     cookie = Cookie.value;
-      //   } else {
-      //     networkConfig.logger?.log("Cookie expired, logging in again");
-      //   }
-      // } else {
-      //   networkConfig.logger?.log(
-      //     "Not logged in, attempting to log in via ledger..."
-      //   );
-      // }
+      const Cookie = studioConfig[networkConfig.owner.address]?.Cookie;
+      if (Cookie) {
+        if (new Date(Cookie.expiration).getTime() > Date.now()) {
+          cookie = Cookie.value;
+        } else {
+          networkConfig.logger?.log("Cookie expired, logging in again");
+        }
+      } else {
+        networkConfig.logger?.log(
+          "Not logged in, attempting to log in via ledger..."
+        );
+      }
 
       if (!cookie) {
         const transport = await Transport.open("");

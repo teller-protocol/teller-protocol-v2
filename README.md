@@ -90,3 +90,16 @@ Run tests locally:
 
 ## Additional Documentation
 Get more info here: https://teller.gitbook.io/teller-v2/
+
+
+
+### Procedures
+
+The smart contract artifacts (abis) are copied into the 'abis' folder of this submodule using the command
+
+```
+yarn contracts export --network [networkname]
+
+```
+
+If these abis are missing, then deployment may not succeed. 

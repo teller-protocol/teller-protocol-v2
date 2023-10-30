@@ -88,13 +88,13 @@ export const run = async (): Promise<void> => {
         {
           title: "Latest",
           value: "latest",
-          description: "Fork from latest subgraph version (synced or not)."
+          description: "Fork from latest subgraph version (synced or not). Will attempt to deploy without block handlers and then another with block handlers."
         },
         {
           title: "Latest (synced ⏳)",
           value: "latest-synced",
           description:
-            "Fork from latest, synced subgraph version. Will wait to fully sync before forking."
+            "Fork from latest, synced subgraph version. Will wait to fully sync before forking. Has block handlers enabled."
         }
       ]
     },

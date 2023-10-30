@@ -244,7 +244,7 @@ const buildAndDeploy = async ({
     }
 
         //think abt making this an option for a config file where this is the fallback  
-    const forceGraftingBlock : number | undefined  =  undefined//18429459 ;
+    const forceGraftingBlock : number | undefined  =  18215202 ; //18429459 ;
 
 
     const graftingBlock = forceGraftingBlock ??  latestVersion.latestEthereumBlockNumber;

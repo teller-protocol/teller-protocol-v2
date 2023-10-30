@@ -244,16 +244,17 @@ const buildAndDeploy = async ({
     }
 
         //think abt making this an option for a config file where this is the fallback  
-    const forceGraftingBlock : number | undefined  =  18215202 ; //18429459 ;
+    const overrideGraftingBlock : number | undefined  = undefined //  18449365 ; //18429459 ;
+    const overrideDeploymentId: string|undefined = undefined
 
-
-    const graftingBlock = forceGraftingBlock ??  latestVersion.latestEthereumBlockNumber;
+    const deploymentId = overrideDeploymentId ??  latestVersion.deploymentId;
+    const graftingBlock = overrideGraftingBlock ??  latestVersion.latestEthereumBlockNumber;
     logger?.log(
       `Grafting subgraph: ${subgraph.name} (${subgraph.network}) at block ${graftingBlock}`
     );
 
     args.grafting = {
-      base: latestVersion.deploymentId,
+      base: deploymentId,
       block: graftingBlock
     };
 

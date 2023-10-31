@@ -303,7 +303,7 @@ Initializable
   
 
         //mint shares equal to _amount and give them to the shares recipient !!! 
-        sharesToken.mint( _sharesRecipient,_amount);
+        poolSharesToken.mint( _sharesRecipient,_amount);
 
         totalPrincipalTokensCommitted += _amount;
         principalTokensCommittedByLender[msg.sender] += _amount;
@@ -443,7 +443,7 @@ Initializable
     must be initialized for this to work ! 
     */
     function burnSharesToWithdrawEarnings(
-        uint256 _amountSharesTokens,
+        uint256 _amountPoolSharesTokens,
         address _recipient
     ) external 
     onlyAfterInitialized
@@ -457,10 +457,10 @@ Initializable
 
 
         //figure out the ratio of shares tokens that this is 
-        uint256 sharesTotalSupplyBeforeBurn = sharesToken.totalSupply();
+        uint256 poolSharesTotalSupplyBeforeBurn = poolSharesToken.totalSupply();
 
         //this DOES reduce total supply! This is necessary for correct math. 
-        sharesToken.burn( msg.sender, _amountSharesTokens );
+        poolSharesToken.burn( msg.sender, _amountPoolSharesTokens );
 
 
 
@@ -539,8 +539,8 @@ If a lender owns 10% of this pool equity -> they own  10% of current balance of 
 
         uint256 principalTokenEquityAmountSimple =  totalPrincipalTokensCommitted + totalCollectedInterest - ( totalInterestWithdrawn);
 
-        uint256 principalTokenAmountToWithdraw = principalTokenEquityAmountSimple * _amountSharesTokens / sharesTotalSupplyBeforeBurn;
-        uint256 tokensToUncommit = netCommittedTokens * _amountSharesTokens / sharesTotalSupplyBeforeBurn;
+        uint256 principalTokenAmountToWithdraw = principalTokenEquityAmountSimple * _amountPoolSharesTokens / poolSharesTotalSupplyBeforeBurn;
+        uint256 tokensToUncommit = netCommittedTokens * _amountPoolSharesTokens / poolSharesTotalSupplyBeforeBurn;
 
         totalPrincipalTokensCommitted -= tokensToUncommit;
        // totalPrincipalTokensUncommitted += tokensToUncommit;
@@ -551,8 +551,10 @@ If a lender owns 10% of this pool equity -> they own  10% of current balance of 
         //totalPrincipalTokensCommitted -= principalTokenAmountToWithdraw;
         principalTokensCommittedByLender[msg.sender] -= principalTokenAmountToWithdraw;
         
-        sharesToken.transfer( _recipient, principalTokenAmountToWithdraw );
+        principalToken.transfer( _recipient, principalTokenAmountToWithdraw );
 
+
+        //also mint collateral token shares !!  or give them out . 
         
   
     }

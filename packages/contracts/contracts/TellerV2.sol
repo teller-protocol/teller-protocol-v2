@@ -1114,7 +1114,7 @@ contract TellerV2 is
 
     }
 
-    function getInterestCollector() external view returns (address) {
+    function getInterestCollector(uint256 _bidId) external view returns (address) {
         return interestCollectorForBid[_bidId];
     }
 

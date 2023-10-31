@@ -28,7 +28,7 @@ interface ISmartCommitment {
 
     function isAllowedToBorrow(address borrower) external view returns (bool);
 
-    function withdrawFundsForAcceptBid(
+    function acceptFundsForAcceptBid(
         
             address _borrower,
 

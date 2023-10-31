@@ -27,6 +27,101 @@ import {CommitmentCollateralType, ISmartCommitment} from "../../../interfaces/IS
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
  
 
+/*
+
+
+
+If : 
+        If  Lenders have to wait the entire maturity of the pool (expiration) and cant exist early, this becomes way simpler 
+        If we use a price oracle for the 'PrincipalPerCollateralRatio  then this becomes way easier [Issue is the ratio cant be static for a long term]
+
+
+
+        1. We could allow lender to exit early and we give them IOU tokens for their owed active loan collateral OR 
+                we could just not allow lenders to exit early at all .  Allow lenders to just sell their share to someone else.  
+
+        
+ 
+
+
+
+How do we allocate  ?
+  Active, Inactive, collateralValue 
+
+
+
+
+
+
+
+
+
+1. Penalize early exits so exit only 
+
+
+
+3. TVL = currentBalanceOfContract + currentBalanceOfInterestCollector + (totaltokensActivelyBeingBorrowed )( totalLentOutOutstanding   solve for this )  
+3.1 Global Exchange Ratio (used to figure out how many shares to give per unit of input token) =  
+
+
+
+total borrowed amount  - total repaid    
+
+
+
+
+
+4. When you burn, you can specify the number of share tokens you want to burn OR you can specify the specific amt of tvl to withdraw 
+
+5. see if i can implement exchange ratio copying off tvl token 
+
+
+
+6. When withdrawing, should not be penalized because we use Oracle price to calculate actual TVL 
+7. Use Noahs TToken logic for calculating exchange ratio 
+
+https://github.com/teller-protocol/teller-protocol-v1/blob/develop/contracts/lending/ttoken/TToken_V3.sol
+
+
+
+8. Research ticks (a mini pool within a pool)   (each can have a priceOracleRatio, each can have an expiration. )
+9. ( would have to essentially have loops? )
+
+
+
+
+////----
+
+Every time a lender deposits tokens, we can mint an equal amt of RepresentationToken
+
+using MaxPrincipalPerTOken, we can calc how many collateral tokens it would need . 
+
+
+
+
+
+The required collateral ratio could be Dynamic based on pool useage 
+
+
+
+WHen a lender supplies capital via a mini pool. that minipool has Ticks that the lender supplies.  Those ticks are telling us the valid ratio of principal to collateral 
+
+When a borrower comes and asks to use a particular principal to collateral ratio, a tick ,  we use THAT tick's gross tick liquidity value. 
+
+
+
+
+
+
+Consider implementing eip-4626
+
+
+*/
+
+
+
+
+
 contract LenderCommitmentGroup_Smart is 
 ISmartCommitment ,
 Initializable
@@ -62,8 +157,8 @@ Initializable
     // tokens donated to this contract should be ignored? 
   
     uint256 public totalPrincipalTokensCommitted;         //this can be less than we expect if tokens are donated to the contract and withdrawn 
-    uint256 public totalPrincipalTokensUncommitted;  
-    uint256 public totalPrincipalTokensWithdrawnForLending;
+    uint256 public totalPrincipalTokensStagedForWithdrawl;  
+    uint256 public totalPrincipalTokensActivelyLended;
 
     uint256 public totalCollectedInterest;
     uint256 public totalInterestWithdrawn;
@@ -71,7 +166,7 @@ Initializable
     mapping (address => uint256) public principalTokensCommittedByLender;
  
 
-    modifier onlyInitialized{
+    modifier onlyAfterInitialized{
 
         require(_initialized,"Contract must be initialized");
         _;
@@ -178,7 +273,7 @@ Initializable
         uint256 _amount,
         address _sharesRecipient
     ) external 
-        onlyInitialized
+        onlyAfterInitialized
     {
 
         //transfers the primary principal token from msg.sender into this contract escrow 
@@ -195,7 +290,7 @@ Initializable
     }
 
 
-   function withdrawFundsForAcceptBid(
+   function acceptFundsForAcceptBid(
     address _borrower,
     uint256 _principalAmount, 
 
@@ -315,9 +410,23 @@ Initializable
        
         principalToken.transfer( SMART_COMMITMENT_FORWARDER, _principalAmount );
 
-        totalPrincipalTokensWithdrawnForLending += _principalAmount;
+        totalPrincipalTokensActivelyLended += _principalAmount;
 
        //emit event 
+    }
+
+
+    function stageCommittedFundsForWithdrawl(
+        uint256 _amount
+    ) external onlyAfterInitialized {
+
+        require( principalTokensCommittedByLender[msg.sender] > _amount, "Invalid amount" );
+
+        principalTokensStagedForWithdrawlByLender[msg.sender] += _amount; //is this ok ?
+        totalPrincipalTokensStagedForWithdrawl += _amount;
+
+
+
     }
 
    /*
@@ -327,7 +436,7 @@ Initializable
         uint256 _amountSharesTokens,
         address _recipient
     ) external 
-    onlyInitialized
+    onlyAfterInitialized
     {   
 
 
@@ -342,6 +451,63 @@ Initializable
 
         //this DOES reduce total supply! This is necessary for correct math. 
         sharesToken.burn( msg.sender, _amountSharesTokens );
+
+
+
+
+/*
+
+   This pool starts with principal tokens 
+
+   Borrowers take those principal tokens (like uniswap)   -->   LoanValueTokens (fictitious)  (active loans where the lender is this contract) (this pool) 
+
+
+    Eventually this pool has   a combo of principal tokens  and (activeloans)'Loanvaluetokens'  (teller loans who eventual value is pointing at this contract pool) 
+
+   
+
+
+
+*/
+
+
+    /*
+    The pool always has   CurrentBalance of Principal Tokens   + a currency balance of [Loan Value] Collateral IOU (tokens) 
+
+
+    This contract starts with 100% of the outstanding 'collateral IOU tokens' 
+
+     Doesnt make sense:    1. giving the lender their share of the CurrentBalance of principal tokens in this contract 
+        2. giving the lender their share of "Collateral IOU' tokens  representing a share of the collateral outstanding to this contract.  
+
+
+
+If a lender owns 10% of this pool equity -> they own  10% of current balance of principal tokens in here AND they own 10% of the (activeLoans) value [LoanvalueTokens]
+  
+  
+            WHEN THEY GO TO EXIT  w 10% equity  
+        1. it doesnt make sense to just give them   10% of the currenct balance of princpal tokens 
+      2. it doesnt make sense to just give them   20% of the current balance of the contract ( 10% of tvl  in an example of 50pct utilization) 
+   
+   
+    3.   Could give them 10% of the currenct balance of principal tokens  +  Somehow give them an IOU that represents 10% of the active loan value 
+  
+  
+  
+    
+  
+    */
+
+
+
+
+
+
+
+
+
+
+
 
 
         /*  
@@ -360,30 +526,32 @@ Initializable
        // uint256 principalTokenBalance = principalToken.balanceOf(address(this));
 
 
-       
-        uint256 netCommittedTokens = totalPrincipalTokensCommitted - totalPrincipalTokensUncommitted; 
-
 
             //hopefully this is correct ?  have to make sure it isnt negative tho ? 
-       // uint256 totalLendedTokensRepaidFromLending = (principalTokenBalance + totalPrincipalTokensUncommitted + totalPrincipalTokensWithdrawnForLending) - (totalPrincipalTokensCommitted + totalCollectedInterest );
+       // uint256 totalLendedTokensRepaidFromLending = (principalTokenBalance + totalPrincipalTokensUncommitted + totalPrincipalTokensActivelyLended) - (totalPrincipalTokensCommitted + totalCollectedInterest );
  
  
-       // uint256 principalTokenEquityAmount = principalTokenBalance + totalPrincipalTokensWithdrawnForLending - totalLendedTokensRepaidFromLending ;
+       // uint256 principalTokenEquityAmount = principalTokenBalance + totalPrincipalTokensActivelyLended - totalLendedTokensRepaidFromLending ;
+
+       
+        uint256 netCommittedTokens = totalPrincipalTokensCommitted; 
 
       
 
-        uint256 principalTokenEquityAmountSimple =  totalPrincipalTokensCommitted + totalCollectedInterest - (totalPrincipalTokensUncommitted  + totalInterestWithdrawn);
+        uint256 principalTokenEquityAmountSimple =  totalPrincipalTokensCommitted + totalCollectedInterest - ( totalInterestWithdrawn);
 
         uint256 principalTokenAmountToWithdraw = principalTokenEquityAmountSimple * _amountSharesTokens / sharesTotalSupplyBeforeBurn;
         uint256 tokensToUncommit = netCommittedTokens * _amountSharesTokens / sharesTotalSupplyBeforeBurn;
 
-        totalPrincipalTokensUncommitted += tokensToUncommit;
+        totalPrincipalTokensCommitted -= tokensToUncommit;
+       // totalPrincipalTokensUncommitted += tokensToUncommit;
 
         totalInterestWithdrawn += principalTokenAmountToWithdraw - tokensToUncommit;
 
 
         //totalPrincipalTokensCommitted -= principalTokenAmountToWithdraw;
         principalTokensCommittedByLender[msg.sender] -= principalTokenAmountToWithdraw;
+        principalTokensStagedForWithdrawlByLender[msg.sender] -= principalTokenAmountToWithdraw;  //is this ok ?
 
         sharesToken.transfer( _recipient, principalTokenAmountToWithdraw );
 
@@ -391,6 +559,30 @@ Initializable
   
     }
 
+
+/*
+consider passing in both token addresses and then get pool address from that 
+*/
+
+    function getUniswapV3PoolAddress(address tokenA, address tokenB, uint24 fee) 
+    internal view returns (address) {
+        address poolAddress = UNISWAP_V3_FACTORY.getPool(tokenA, tokenB, fee);
+        return poolAddress;
+    }
+    
+    function _getUniswapV3TokenPrice(address poolAddress) 
+    internal view returns (uint256) {
+      //  IUniswapV3Pool pool = IUniswapV3Pool(poolAddress);
+        
+        (uint160 sqrtPriceX96,,,,,) = UNISWAP_V3_POOL.slot0();
+        
+        // sqrtPrice is in X96 format so we scale it down to get the price
+        // Also note that this price is a relative price between the two tokens in the pool
+        // It's not a USD price
+        uint256 price = uint256(sqrtPriceX96).mul(sqrtPriceX96).mul(1e18) >> (96 * 2);
+        
+        return price;
+    }
 
 
     function getCollateralTokenAddress() external view returns (address){
@@ -449,7 +641,7 @@ Initializable
     function getPrincipalAmountAvailableToBorrow( ) public view returns (uint256){
 
         uint256 amountAvailable = totalPrincipalTokensCommitted
-         - totalPrincipalTokensWithdrawnForLending
+         - totalPrincipalTokensActivelyLended
         ;
 
         return amountAvailable;

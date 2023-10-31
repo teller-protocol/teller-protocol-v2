@@ -105,7 +105,7 @@ contract SmartCommitmentForwarder is
         ISmartCommitment _commitment = ISmartCommitment(_smartCommitmentAddress);
         
         
-        _commitment.withdrawFundsForAcceptBid( 
+        _commitment.acceptFundsForAcceptBid( 
             _msgSender(), //borrower
 
 

@@ -92,6 +92,12 @@ https://github.com/teller-protocol/teller-protocol-v1/blob/develop/contracts/len
 
 ////----
 
+
+1. Use 50% forced max utilization ratio as initial game theory 
+2. When pool shares are burned, give the lender : [ their pct shares *  ( currentPrincipalTokens in contract, totalCollateralShares, totalInterestCollected)   ] and later, they can burn the collateral shares for any collateral tokens that are in the contract. 
+3. use noahs TToken contract as reference for ratios 
+
+
 Every time a lender deposits tokens, we can mint an equal amt of RepresentationToken
 
 using MaxPrincipalPerTOken, we can calc how many collateral tokens it would need . 
@@ -135,7 +141,10 @@ Initializable
     address public immutable SMART_COMMITMENT_FORWARDER;
     
     bool private _initialized;
-    LenderCommitmentGroupShares public sharesToken;
+   
+    LenderCommitmentGroupShares public poolSharesToken;
+    LenderCommitmentGroupShares public collateralSharesToken;
+
     LoanRepaymentInterestCollector public interestCollector;
 
 
@@ -157,11 +166,13 @@ Initializable
     // tokens donated to this contract should be ignored? 
   
     uint256 public totalPrincipalTokensCommitted;         //this can be less than we expect if tokens are donated to the contract and withdrawn 
-    uint256 public totalPrincipalTokensStagedForWithdrawl;  
+   
     uint256 public totalPrincipalTokensActivelyLended;
 
     uint256 public totalCollectedInterest;
     uint256 public totalInterestWithdrawn;
+
+    uint16 public liquidityThresholdPercent;  //5000 is 50 pct 
 
     mapping (address => uint256) public principalTokensCommittedByLender;
  
@@ -230,7 +241,9 @@ Initializable
 
        //set initial terms in storage from _createCommitmentArgs
 
-        _deploySharesToken();
+        _deployPoolSharesToken();
+
+        _deployCollateralSharesToken();
 
         _deployInterestCollector();
 
@@ -239,14 +252,22 @@ Initializable
  
  
 
-    function _deploySharesToken() internal {
-
-
+    function _deployPoolSharesToken() internal {
        // uint256 principalTokenDecimals = principalToken.decimals();
 
-        sharesToken =  new LenderCommitmentGroupShares(
-            "Shares",
-            "SHR",
+        poolSharesToken =  new LenderCommitmentGroupShares(
+            "PoolShares",
+            "PSH",
+            18   //may want this to equal the decimals of principal token !? 
+        );
+
+    }
+    function _deployCollateralSharesToken() internal {
+       // uint256 principalTokenDecimals = principalToken.decimals();
+
+        collateralSharesToken =  new LenderCommitmentGroupShares(
+            "CollateralShares",
+            "CSH",
             18   //may want this to equal the decimals of principal token !? 
         );
 
@@ -416,18 +437,7 @@ Initializable
     }
 
 
-    function stageCommittedFundsForWithdrawl(
-        uint256 _amount
-    ) external onlyAfterInitialized {
-
-        require( principalTokensCommittedByLender[msg.sender] > _amount, "Invalid amount" );
-
-        principalTokensStagedForWithdrawlByLender[msg.sender] += _amount; //is this ok ?
-        totalPrincipalTokensStagedForWithdrawl += _amount;
-
-
-
-    }
+    
 
    /*
     must be initialized for this to work ! 
@@ -497,18 +507,7 @@ If a lender owns 10% of this pool equity -> they own  10% of current balance of 
     
   
     */
-
-
-
-
-
-
-
-
-
-
-
-
+ 
 
         /*  
         The fraction of shares that was just burned has 
@@ -551,8 +550,7 @@ If a lender owns 10% of this pool equity -> they own  10% of current balance of 
 
         //totalPrincipalTokensCommitted -= principalTokenAmountToWithdraw;
         principalTokensCommittedByLender[msg.sender] -= principalTokenAmountToWithdraw;
-        principalTokensStagedForWithdrawlByLender[msg.sender] -= principalTokenAmountToWithdraw;  //is this ok ?
-
+        
         sharesToken.transfer( _recipient, principalTokenAmountToWithdraw );
 
         
@@ -563,6 +561,7 @@ If a lender owns 10% of this pool equity -> they own  10% of current balance of 
 /*
 consider passing in both token addresses and then get pool address from that 
 */
+/*
 
     function getUniswapV3PoolAddress(address tokenA, address tokenB, uint24 fee) 
     internal view returns (address) {
@@ -583,7 +582,7 @@ consider passing in both token addresses and then get pool address from that
         
         return price;
     }
-
+*/
 
     function getCollateralTokenAddress() external view returns (address){
 

@@ -14,6 +14,8 @@ import "../../../interfaces/IMarketRegistry.sol";
 //import "../../../interfaces/ISmartCommitmentForwarder.sol";
 import "../../../interfaces/IFlashRolloverLoan.sol";
 import "../../../libraries/NumbersLib.sol";
+
+import "../../../interfaces/uniswap/IUniswapV3Pool.sol";
  
 import "./LenderCommitmentGroupShares.sol";
 
@@ -600,12 +602,12 @@ consider passing in both token addresses and then get pool address from that
     internal view returns (uint256) {
       //  IUniswapV3Pool pool = IUniswapV3Pool(poolAddress);
         
-        (uint160 sqrtPriceX96,,,,,) = UNISWAP_V3_POOL.slot0();
+        (uint160 sqrtPriceX96,,,,,,) = IUniswapV3Pool(UNISWAP_V3_POOL).slot0();
         
         // sqrtPrice is in X96 format so we scale it down to get the price
         // Also note that this price is a relative price between the two tokens in the pool
         // It's not a USD price
-        uint256 price = uint256(sqrtPriceX96).mul(sqrtPriceX96).mul(1e18) >> (96 * 2);
+        uint256 price = uint256(sqrtPriceX96) * (sqrtPriceX96) * (1e18) >> (96 * 2);
         
         return price;
     }

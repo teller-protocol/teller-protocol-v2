@@ -264,6 +264,17 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
         token_ = address(bids[_bidId].loanDetails.lendingToken);
     }
 
+    function getInterestCollectorForBid(uint256 _bidId) 
+    public view returns (address) {
+
+
+    }
+
+    function setInterestCollectorForBid(uint256 _bidId, address _collector)
+    public {
+
+    }
+
     function getLoanSummary(
         uint256 _bidId
     )

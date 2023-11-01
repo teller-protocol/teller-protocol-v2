@@ -118,9 +118,7 @@ contract SmartCommitmentForwarder is
             _interestRate
             
         );
-
-        address interestCollector = ISmartCommitment( _smartCommitmentAddress ).getInterestCollector();
-
+ 
 
         CreateLoanArgs memory createLoanArgs;
     
@@ -150,10 +148,10 @@ contract SmartCommitmentForwarder is
 
         bidId = _submitBidWithCollateral(createLoanArgs, _msgSender());
 
-        _acceptBidWithInterestCollector(
+        _acceptBidWithRepaymentListener(
             bidId, 
             _smartCommitmentAddress, //the lender is the smart commitment contract 
-            interestCollector
+            _smartCommitmentAddress
             );
 
         emit ExercisedSmartCommitment(

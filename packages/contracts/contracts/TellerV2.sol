@@ -19,6 +19,9 @@ import "./interfaces/ITellerV2.sol";
 import { Collateral } from "./interfaces/escrow/ICollateralEscrowV1.sol";
 import "./interfaces/IEscrowVault.sol";
 
+
+import "./interfaces/ILoanRepaymentListener.sol";
+
 // Libraries
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
@@ -899,7 +902,6 @@ contract TellerV2 is
         Bid storage bid = bids[_bidId];
         address lender = getLoanLender(_bidId);
 
-       // address interestCollector = interestCollectorForBid[_bidId];
         
         uint256 _paymentAmount = _payment.principal+_payment.interest;
       
@@ -959,6 +961,19 @@ contract TellerV2 is
                 paymentAmountReceived
             );
         }
+
+
+        address loanRepaymentListener = repaymentListenerForBid[_bidId];
+
+        if (loanRepaymentListener != address(0)){
+            try ILoanRepaymentListener(  loanRepaymentListener ).repayLoanCallback{ gas: 80000 }( //limit gas costs to prevent lender griefing repayments 
+                _bidId,
+                _msgSenderForMarket(bid.marketplaceId),
+                _payment.principal,
+                _payment.interest
+            ) {} catch {}
+        }
+        
     }
 
     /**
@@ -1115,17 +1130,17 @@ contract TellerV2 is
     ) external view override returns (BidState) {
         return bids[_bidId].state;
     }
-    function setInterestCollectorForBid(uint256 _bidId, address _collector) external {
+    function setRepaymentListenerForBid(uint256 _bidId, address _listener) external {
 
         require ( _msgSender() == bids[_bidId].lender );
 
-        interestCollectorForBid[_bidId] = _collector;
+        repaymentListenerForBid[_bidId] = _listener;
 
 
     }
 
-    function getInterestCollectorForBid(uint256 _bidId) external view returns (address) {
-        return interestCollectorForBid[_bidId];
+    function getRepaymentListenerForBid(uint256 _bidId) external view returns (address) {
+        return repaymentListenerForBid[_bidId];
     }
 
     /**

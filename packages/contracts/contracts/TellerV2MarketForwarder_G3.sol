@@ -36,7 +36,7 @@ abstract contract TellerV2MarketForwarder_G3 is
      * @param _bidId The id of the new loan.
      * @param _lender The address of the lender who will provide funds for the new loan.
      */
-    function _acceptBidWithInterestCollector(uint256 _bidId, address _lender, address _interestCollector)
+    function _acceptBidWithRepaymentListener(uint256 _bidId, address _lender, address _listener)
         internal
         virtual
         returns (bool)
@@ -47,7 +47,7 @@ abstract contract TellerV2MarketForwarder_G3 is
             _lender
         );
 
-        ITellerV2(getTellerV2()).setInterestCollectorForBid(_bidId,_interestCollector);
+        ITellerV2(getTellerV2()).setRepaymentListenerForBid(_bidId,_listener);
 
         return true;
     }

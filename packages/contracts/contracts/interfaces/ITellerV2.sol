@@ -168,7 +168,7 @@ interface ITellerV2 {
 
  
 
-    function setInterestCollectorForBid(uint256 _bidId, address _collector) external; 
+    function setRepaymentListenerForBid(uint256 _bidId, address _listener) external; 
 
-    function getInterestCollectorForBid(uint256 _bidId) external view returns (address);
+    function getRepaymentListenerForBid(uint256 _bidId) external view returns (address);
 }

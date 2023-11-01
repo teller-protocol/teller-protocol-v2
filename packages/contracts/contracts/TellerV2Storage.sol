@@ -172,7 +172,7 @@ abstract contract TellerV2Storage_G7 is TellerV2Storage_G6 {
 
 
 abstract contract TellerV2Storage_G8 is TellerV2Storage_G7 { 
-    mapping(uint256 => address) public interestCollectorForBid;
+    mapping(uint256 => address) public repaymentListenerForBid;
 }
 
 abstract contract TellerV2Storage is TellerV2Storage_G8 {}

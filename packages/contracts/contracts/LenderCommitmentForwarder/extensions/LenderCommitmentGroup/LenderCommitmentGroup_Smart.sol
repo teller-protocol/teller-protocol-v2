@@ -18,13 +18,12 @@ import "../../../libraries/NumbersLib.sol";
 import "../../../interfaces/uniswap/IUniswapV3Pool.sol";
  
 import "./LenderCommitmentGroupShares.sol";
-
-import {LoanRepaymentInterestCollector} from "./LoanRepaymentInterestCollector.sol";
-
+ 
 import { MathUpgradeable } from "@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20MetadataUpgradeable.sol";
 
 import {CommitmentCollateralType, ISmartCommitment} from "../../../interfaces/ISmartCommitment.sol";
+import {ILoanRepaymentListener} from "../../../interfaces/ILoanRepaymentListener.sol";
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
  
@@ -136,6 +135,7 @@ Consider implementing eip-4626
 
 contract LenderCommitmentGroup_Smart is 
 ISmartCommitment ,
+ILoanRepaymentListener,
 Initializable
 {
     using AddressUpgradeable for address;
@@ -151,10 +151,7 @@ Initializable
    
     LenderCommitmentGroupShares public poolSharesToken;
     LenderCommitmentGroupShares public collateralSharesToken;
-
-    LoanRepaymentInterestCollector public interestCollector;
-
-
+ 
 
     IERC20 public principalToken;
     address public collateralTokenAddress;
@@ -261,8 +258,7 @@ Initializable
         _deployPoolSharesToken();
 
         _deployCollateralSharesToken();
-
-        _deployInterestCollector();
+ 
 
 
     }
@@ -288,18 +284,7 @@ Initializable
             18   //may want this to equal the decimals of principal token !? 
         );
 
-    }
-    function _deployInterestCollector() internal {
-
-
-       // uint256 principalTokenDecimals = principalToken.decimals();
-
-        interestCollector =  new LoanRepaymentInterestCollector(
-           address(principalToken)
-        );
-
-    }
-    
+    } 
 
 
   
@@ -465,12 +450,10 @@ Initializable
     ) external 
     onlyAfterInitialized
     {   
-
-
-            //pull interest from interest collector 
+ 
                 //
-        uint256 collectedInterest = LoanRepaymentInterestCollector( interestCollector ).collectInterest();
-        totalCollectedInterest += collectedInterest;
+        //uint256 collectedInterest = LoanRepaymentInterestCollector( interestCollector ).collectInterest();
+       
 
 
         //figure out the ratio of shares tokens that this is 
@@ -613,9 +596,15 @@ consider passing in both token addresses and then get pool address from that
     }
 
 
-    function getInterestCollector() public view returns (address) {
+    function repayLoanCallback(
+        uint256 _bidId, 
+        address repayer, 
+        uint256 principalAmount, 
+        uint256 interestAmount
+    ) external  {
+            //can use principal amt to increment amt paid back!! nice for math . 
 
-        return address(interestCollector);
+            totalCollectedInterest += interestAmount;
     }
  
 

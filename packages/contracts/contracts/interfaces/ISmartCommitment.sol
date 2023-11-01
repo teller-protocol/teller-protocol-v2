@@ -26,6 +26,7 @@ interface ISmartCommitment {
     function getPrincipalAmountAvailableToBorrow() external view returns (uint256);
     function getRequiredCollateral(uint256 _principalAmount) external view returns (uint256);
 
+    function getInterestCollector() external view returns (address);
     function isAllowedToBorrow(address borrower) external view returns (bool);
 
     function acceptFundsForAcceptBid(

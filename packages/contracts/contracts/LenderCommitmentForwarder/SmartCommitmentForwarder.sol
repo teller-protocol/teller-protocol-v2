@@ -36,7 +36,7 @@ contract SmartCommitmentForwarder is
 
 
     constructor(address _protocolAddress, address _marketRegistry)
-        TellerV2MarketForwarder_G2(_protocolAddress, _marketRegistry)
+        TellerV2MarketForwarder_G3(_protocolAddress, _marketRegistry)
     {
  
     }
@@ -119,7 +119,7 @@ contract SmartCommitmentForwarder is
             
         );
 
-          address interestCollector = ISmartCommitment( _smartCommitmentAddress ).getInterestCollector();
+        address interestCollector = ISmartCommitment( _smartCommitmentAddress ).getInterestCollector();
 
 
         CreateLoanArgs memory createLoanArgs;

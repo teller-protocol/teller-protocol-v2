@@ -45,6 +45,8 @@ If :
 
 
 
+
+
 How do we allocate  ?
   Active, Inactive, collateralValue 
 
@@ -96,22 +98,24 @@ https://github.com/teller-protocol/teller-protocol-v1/blob/develop/contracts/len
 1. Use 50% forced max utilization ratio as initial game theory 
 2. When pool shares are burned, give the lender : [ their pct shares *  ( currentPrincipalTokens in contract, totalCollateralShares, totalInterestCollected)   ] and later, they can burn the collateral shares for any collateral tokens that are in the contract. 
 3. use noahs TToken contract as reference for ratios 
-
+4.  Need price oracle bc we dont want to use maxPrincipalPerCollateral ratio as a static ideally 
+5. have an LTV ratio 
 
 Every time a lender deposits tokens, we can mint an equal amt of RepresentationToken
 
-using MaxPrincipalPerTOken, we can calc how many collateral tokens it would need . 
+
+
+AAve utilization rate is 50% lets say 
+no matter what , only 50 pct of 100 can be out on loan.
 
 
 
 
+If a lender puts up 50,000 originally, im able to withdraw all my deposits.  Everyone else is in the hole until a borrower repays a loan 
+If there isnt enough liquidity, you just cannot burn those shares. 
 
-The required collateral ratio could be Dynamic based on pool useage 
-
-
-
-WHen a lender supplies capital via a mini pool. that minipool has Ticks that the lender supplies.  Those ticks are telling us the valid ratio of principal to collateral 
-
+ 
+ 
 When a borrower comes and asks to use a particular principal to collateral ratio, a tick ,  we use THAT tick's gross tick liquidity value. 
 
 
@@ -139,6 +143,7 @@ Initializable
     //ITellerV2 public immutable TELLER_V2;
     /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
     address public immutable SMART_COMMITMENT_FORWARDER;
+    address public immutable UNISWAP_V3_POOL; 
     
     bool private _initialized;
    
@@ -157,7 +162,7 @@ Initializable
     uint32 maxLoanDuration;
     uint16 minInterestRate;
 
-    uint256 maxPrincipalPerCollateralAmount;
+    //uint256 maxPrincipalPerCollateralAmount;
 
    
     //this is all of the principal tokens that have been committed to this contract minus all that have been withdrawn.  This includes the tokens in this contract and lended out in active loans by this contract. 
@@ -172,10 +177,13 @@ Initializable
     uint256 public totalCollectedInterest;
     uint256 public totalInterestWithdrawn;
 
-    uint16 public liquidityThresholdPercent;  //5000 is 50 pct 
+    uint16 public liquidityThresholdPercent;  //5000 is 50 pct  // enforce max of 10000
+    uint16 public loanToValuePercent; //the overcollateralization ratio, typically 80 pct 
 
     mapping (address => uint256) public principalTokensCommittedByLender;
- 
+   
+   //try to make apy dynamic . 
+    
 
     modifier onlyAfterInitialized{
 
@@ -195,11 +203,12 @@ Initializable
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor(
       //  address _tellerV2,
-        address _smartCommitmentForwarder     
+        address _smartCommitmentForwarder,
+        address _uniswapV3Pool
     ) {
        // TELLER_V2 = ITellerV2(_tellerV2);
         SMART_COMMITMENT_FORWARDER = _smartCommitmentForwarder;
-
+        UNISWAP_V3_POOL = _uniswapV3Pool;
         
     }
     
@@ -216,7 +225,10 @@ Initializable
         uint32 _maxLoanDuration,
         uint16 _minInterestRate,
 
-        uint256 _maxPrincipalPerCollateralAmount
+        uint16 _liquidityThresholdPercent,
+        uint16 _loanToValuePercent 
+
+        //uint256 _maxPrincipalPerCollateralAmount //use oracle instead 
 
          //ILenderCommitmentForwarder.Commitment calldata _createCommitmentArgs
 
@@ -235,7 +247,10 @@ Initializable
         maxLoanDuration = _maxLoanDuration;
         minInterestRate = _minInterestRate;
 
-        maxPrincipalPerCollateralAmount = _maxPrincipalPerCollateralAmount;
+        liquidityThresholdPercent = _liquidityThresholdPercent;
+        loanToValuePercent = _loanToValuePercent;
+
+      //  maxPrincipalPerCollateralAmount = _maxPrincipalPerCollateralAmount;
        // _createInitialCommitment(_createCommitmentArgs);
 
 
@@ -562,14 +577,24 @@ If a lender owns 10% of this pool equity -> they own  10% of current balance of 
 
 /*
 consider passing in both token addresses and then get pool address from that 
-*/
-/*
+*/  
 
+    //this depends on oracle price 
+
+    function getMaxPrincipalPerCollateralAmount(  ) public returns (uint256) {
+
+
+    }   
+
+
+/*
+//move this into the factory for this contract 
     function getUniswapV3PoolAddress(address tokenA, address tokenB, uint24 fee) 
     internal view returns (address) {
         address poolAddress = UNISWAP_V3_FACTORY.getPool(tokenA, tokenB, fee);
         return poolAddress;
     }
+    */
     
     function _getUniswapV3TokenPrice(address poolAddress) 
     internal view returns (uint256) {
@@ -584,7 +609,13 @@ consider passing in both token addresses and then get pool address from that
         
         return price;
     }
-*/
+
+
+    function getInterestCollector() public view returns (address) {
+
+        return interestCollector;
+    }
+ 
 
     function getCollateralTokenAddress() external view returns (address){
 
@@ -602,6 +633,9 @@ consider passing in both token addresses and then get pool address from that
     }
    
     function getRequiredCollateral(uint256 _principalAmount) public view returns (uint256){
+
+
+      uint256 maxPrincipalPerCollateralAmount = getMaxPrincipalPerCollateralAmount( );
 
        return _getRequiredCollateral(
          _principalAmount,
@@ -641,7 +675,8 @@ consider passing in both token addresses and then get pool address from that
    
     function getPrincipalAmountAvailableToBorrow( ) public view returns (uint256){
 
-        uint256 amountAvailable = totalPrincipalTokensCommitted
+
+        uint256 amountAvailable = totalPrincipalTokensCommitted.percent( liquidityThresholdPercent )
          - totalPrincipalTokensActivelyLended
         ;
 

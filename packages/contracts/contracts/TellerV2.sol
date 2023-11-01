@@ -1105,7 +1105,7 @@ contract TellerV2 is
     ) external view override returns (BidState) {
         return bids[_bidId].state;
     }
-    function setInterestCollector(uint256 _bidId, address _collector) external {
+    function setInterestCollectorForBid(uint256 _bidId, address _collector) external {
 
         require ( _msgSender() == bids[_bidId].lender );
 
@@ -1114,7 +1114,7 @@ contract TellerV2 is
 
     }
 
-    function getInterestCollector(uint256 _bidId) external view returns (address) {
+    function getInterestCollectorForBid(uint256 _bidId) external view returns (address) {
         return interestCollectorForBid[_bidId];
     }
 

@@ -20,12 +20,15 @@ contract LoanRepaymentInterestCollector
     function collectInterest()
     external 
     onlyOwner
+    returns (uint256 amount_)
     {
 
-        uint256 currentBalance = IERC20( principalToken ).balanceOf(address(this));
+        amount_ = IERC20( principalToken ).balanceOf(address(this));
 
-        IERC20(principalToken).transfer(  address(owner) , currentBalance );
-        
+
+        //send tokens to the owner (deployer) 
+        IERC20(principalToken).transfer(  address(owner()) , amount_ );
+         
     }
 
 

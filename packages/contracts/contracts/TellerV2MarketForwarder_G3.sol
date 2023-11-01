@@ -47,7 +47,7 @@ abstract contract TellerV2MarketForwarder_G3 is
             _lender
         );
 
-        ITellerV2(getTellerV2()).setInterestCollector(_interestCollector);
+        ITellerV2(getTellerV2()).setInterestCollectorForBid(_bidId,_interestCollector);
 
         return true;
     }

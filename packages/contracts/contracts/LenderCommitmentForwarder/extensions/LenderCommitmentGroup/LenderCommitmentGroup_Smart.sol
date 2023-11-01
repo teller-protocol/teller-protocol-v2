@@ -583,7 +583,7 @@ consider passing in both token addresses and then get pool address from that
 
     //this depends on oracle price 
 
-    function getMaxPrincipalPerCollateralAmount(  ) public returns (uint256) {
+    function getMaxPrincipalPerCollateralAmount(  ) public view returns (uint256) {
 
 
     }   
@@ -615,7 +615,7 @@ consider passing in both token addresses and then get pool address from that
 
     function getInterestCollector() public view returns (address) {
 
-        return interestCollector;
+        return address(interestCollector);
     }
  
 

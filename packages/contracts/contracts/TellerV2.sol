@@ -855,7 +855,7 @@ contract TellerV2 is
         }
     }
 
-
+/*
         function _transferPrincipalAndInterestToLenderDirectly (
             IERC20 lendingToken,
             address from,
@@ -888,6 +888,8 @@ contract TellerV2 is
 
         }
 
+*/
+
 
     function _sendOrEscrowFunds(
         uint256 _bidId,
@@ -897,14 +899,15 @@ contract TellerV2 is
         Bid storage bid = bids[_bidId];
         address lender = getLoanLender(_bidId);
 
-        address interestCollector = interestCollectorForBid[_bidId];
+       // address interestCollector = interestCollectorForBid[_bidId];
         
-
+        uint256 _paymentAmount = _payment.principal+_payment.interest;
+      
         try
             //first try to pay directly
             //have to use transfer from  (not safe transfer from) for try/catch statement
             //dont try to use any more than 100k gas for this xfer
-            _transferPrincipalAndInterestToLenderDirectly( 
+           /* _transferPrincipalAndInterestToLenderDirectly( 
 
                 bid.loanDetails.lendingToken,
                 _msgSenderForMarket(bid.marketplaceId),
@@ -912,6 +915,13 @@ contract TellerV2 is
                 interestCollector,
                 _payment
               )
+              */
+
+            bid.loanDetails.lendingToken.transferFrom{ gas: 100000 }(
+                _msgSenderForMarket(bid.marketplaceId),
+                lender,
+                _paymentAmount
+            )
             
           
 

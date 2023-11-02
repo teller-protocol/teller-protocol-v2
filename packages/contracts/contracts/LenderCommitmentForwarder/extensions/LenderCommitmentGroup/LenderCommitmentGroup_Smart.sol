@@ -266,7 +266,7 @@ Initializable
 
     uint256 _collateralAmount,
     address _collateralTokenAddress,
- //   uint256 _collateralTokenId,
+    uint256 _collateralTokenId,  //not used 
     uint32 _loanDuration,
 
     uint16 _interestRate
@@ -448,11 +448,41 @@ Initializable
     }
 
 
+    
+    function calculateSplitTokenAmounts( uint256 _principalTokenAmountValue ) 
+      public view returns (uint256 principalAmount_, uint256 collateralAmount_ ) {
+
+        // need to see how many collateral tokens are in the contract atm 
+
+        // need to know how many principal tokens are in the contract atm 
+
+
+    //  need to know how the value of the collateral tokens  IN TERMS OF principal tokens 
+
+ 
+
+        //these should both add up to equal the input:  _principalTokenAmountValue
+      uint256 principalTokenAmountValueToGiveInPrincipalTokens;
+      uint256 principalTokenAmountValueToGiveInCollateralTokens;  
+
+
+      uint256 collateralTokensToGive ;
+
+
+      return (principalTokenAmountValueToGiveInPrincipalTokens , collateralTokensToGive);
+    } 
+
+
+
+
+
+
+
 /*
 consider passing in both token addresses and then get pool address from that 
 */  
 
-    //this depends on oracle price 
+    //this depends on current oracle price from uniswap 
 
     function getMaxPrincipalPerCollateralAmount(  ) public view returns (uint256) {
 

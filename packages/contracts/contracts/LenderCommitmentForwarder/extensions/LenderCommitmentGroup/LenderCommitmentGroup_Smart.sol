@@ -32,67 +32,6 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 
 
-If : 
-        If  Lenders have to wait the entire maturity of the pool (expiration) and cant exist early, this becomes way simpler 
-        If we use a price oracle for the 'PrincipalPerCollateralRatio  then this becomes way easier [Issue is the ratio cant be static for a long term]
-
-
-
-        1. We could allow lender to exit early and we give them IOU tokens for their owed active loan collateral OR 
-                we could just not allow lenders to exit early at all .  Allow lenders to just sell their share to someone else.  
-
-        
- 
-
-
-
-
-
-How do we allocate  ?
-  Active, Inactive, collateralValue 
-
-
-
-
-
-
-
-
-
-1. Penalize early exits so exit only 
-
-
-
-3. TVL = currentBalanceOfContract + currentBalanceOfInterestCollector + (totaltokensActivelyBeingBorrowed )( totalLentOutOutstanding   solve for this )  
-3.1 Global Exchange Ratio (used to figure out how many shares to give per unit of input token) =  
-
-
-
-total borrowed amount  - total repaid    
-
-
-
-
-
-4. When you burn, you can specify the number of share tokens you want to burn OR you can specify the specific amt of tvl to withdraw 
-
-5. see if i can implement exchange ratio copying off tvl token 
-
-
-
-6. When withdrawing, should not be penalized because we use Oracle price to calculate actual TVL 
-7. Use Noahs TToken logic for calculating exchange ratio 
-
-https://github.com/teller-protocol/teller-protocol-v1/blob/develop/contracts/lending/ttoken/TToken_V3.sol
-
-
-
-8. Research ticks (a mini pool within a pool)   (each can have a priceOracleRatio, each can have an expiration. )
-9. ( would have to essentially have loops? )
-
-
-
-
 ////----
 
 
@@ -131,14 +70,8 @@ If a lender puts up 50,000 originally, im able to withdraw all my deposits.  Eve
 If there isnt enough liquidity, you just cannot burn those shares. 
 
  
+  
  
-When a borrower comes and asks to use a particular principal to collateral ratio, a tick ,  we use THAT tick's gross tick liquidity value. 
-
-
-
-
-
-
 Consider implementing eip-4626
 
 
@@ -168,10 +101,12 @@ Initializable
    // LenderCommitmentGroupShares public collateralSharesToken;
  
 
+   
     IERC20 public principalToken;
-    address public collateralTokenAddress;
-    uint256 collateralTokenId;
-    CommitmentCollateralType collateralTokenType;
+    IERC20 public collateralToken;
+   // address public collateralTokenAddress;
+  //  uint256 collateralTokenId;
+  //  CommitmentCollateralType collateralTokenType;
     uint256 marketId;
     uint32 maxLoanDuration;
     uint16 minInterestRate;
@@ -186,7 +121,12 @@ Initializable
   
     uint256 public totalPrincipalTokensCommitted;         //this can be less than we expect if tokens are donated to the contract and withdrawn 
    
-    uint256 public totalPrincipalTokensActivelyLended;
+    uint256 public totalPrincipalTokensLended;
+    uint256 public totalPrincipalTokensRepaid;      //subtract this and the above to find total principal tokens outstanding for loans 
+
+ 
+    uint256 public totalCollateralTokensEscrowedForLoans; // we use this in conjunction with totalPrincipalTokensActivelyLended for a psuedo TWAP price oracle of C tokens, used for exiting  .  Nice bc it is averaged over all of our relevant loans, not the current price.  
+
 
     uint256 public totalCollectedInterest;
     uint256 public totalInterestWithdrawn;
@@ -232,8 +172,8 @@ Initializable
 
         address _collateralTokenAddress,
 
-        uint256 _collateralTokenId,
-        CommitmentCollateralType _collateralTokenType, 
+       // uint256 _collateralTokenId,
+       // CommitmentCollateralType _collateralTokenType, 
 
         uint256 _marketId,
         uint32 _maxLoanDuration,
@@ -252,14 +192,18 @@ Initializable
         _initialized = true;
 
         principalToken = IERC20(_principalTokenAddress);
+        collateralToken = IERC20(_collateralTokenAddress);
 
       
-        collateralTokenAddress = _collateralTokenAddress;
-        collateralTokenId = _collateralTokenId;
-        collateralTokenType = _collateralTokenType;
+       // collateralTokenAddress = _collateralTokenAddress;
+      //  collateralTokenId = _collateralTokenId;
+      //  collateralTokenType = _collateralTokenType;
         marketId = _marketId;
         maxLoanDuration = _maxLoanDuration;
         minInterestRate = _minInterestRate;
+
+
+        require( _liquidityThresholdPercent <= 10000 , "invalid threshold" );
 
         liquidityThresholdPercent = _liquidityThresholdPercent;
         loanToValuePercent = _loanToValuePercent;
@@ -322,7 +266,7 @@ Initializable
 
     uint256 _collateralAmount,
     address _collateralTokenAddress,
-    uint256 _collateralTokenId,
+ //   uint256 _collateralTokenId,
     uint32 _loanDuration,
 
     uint16 _interestRate
@@ -334,7 +278,7 @@ Initializable
 
            //consider putting these into less readonly fn calls 
         require(
-            _collateralTokenAddress == collateralTokenAddress,
+            _collateralTokenAddress == address(collateralToken),
             "Mismatching collateral token"
         );
         //the interest rate must be at least as high has the commitment demands. The borrower can use a higher interest rate although that would not be beneficial to the borrower.
@@ -399,7 +343,7 @@ Initializable
 
         require (_collateralAmount < requiredCollateral , "Insufficient Borrower Collateral" ) ;
 
-        CommitmentCollateralType commitmentCollateralTokenType = collateralTokenType;
+      /*  CommitmentCollateralType commitmentCollateralTokenType = collateralTokenType;
 
         //ERC721 assets must have a quantity of 1
         if (
@@ -428,7 +372,7 @@ Initializable
             );
         }
 
- 
+        */
 
 
 
@@ -436,7 +380,7 @@ Initializable
        
         principalToken.transfer( SMART_COMMITMENT_FORWARDER, _principalAmount );
 
-        totalPrincipalTokensActivelyLended += _principalAmount;
+        totalPrincipalTokensLended += _principalAmount;
 
        //emit event 
     }
@@ -466,74 +410,8 @@ Initializable
         poolSharesToken.burn( msg.sender, _amountPoolSharesTokens );
 
 
-
-
-/*
-
-   This pool starts with principal tokens 
-
-   Borrowers take those principal tokens (like uniswap)   -->   LoanValueTokens (fictitious)  (active loans where the lender is this contract) (this pool) 
-
-
-    Eventually this pool has   a combo of principal tokens  and (activeloans)'Loanvaluetokens'  (teller loans who eventual value is pointing at this contract pool) 
-
-   
-
-
-
-*/
-
-
-    /*
-    The pool always has   CurrentBalance of Principal Tokens   + a currency balance of [Loan Value] Collateral IOU (tokens) 
-
-
-    This contract starts with 100% of the outstanding 'collateral IOU tokens' 
-
-     Doesnt make sense:    1. giving the lender their share of the CurrentBalance of principal tokens in this contract 
-        2. giving the lender their share of "Collateral IOU' tokens  representing a share of the collateral outstanding to this contract.  
-
-
-
-If a lender owns 10% of this pool equity -> they own  10% of current balance of principal tokens in here AND they own 10% of the (activeLoans) value [LoanvalueTokens]
-  
-  
-            WHEN THEY GO TO EXIT  w 10% equity  
-        1. it doesnt make sense to just give them   10% of the currenct balance of princpal tokens 
-      2. it doesnt make sense to just give them   20% of the current balance of the contract ( 10% of tvl  in an example of 50pct utilization) 
-   
-   
-    3.   Could give them 10% of the currenct balance of principal tokens  +  Somehow give them an IOU that represents 10% of the active loan value 
-  
-  
-  
-    
-  
-    */
  
 
-        /*  
-        The fraction of shares that was just burned has 
-        a numerator of _amount and 
-        a denominator of sharesTotalSupplyBeforeBurn !
-        */
-
-        /*
-            In this flow, lenders who withdraw first are able to claim the liquid tokens first 
-            while the illiquid assets remain withdrawable by the remaining lenders at a later time. 
-
-        */
-
-
-       // uint256 principalTokenBalance = principalToken.balanceOf(address(this));
-
-
-
-            //hopefully this is correct ?  have to make sure it isnt negative tho ? 
-       // uint256 totalLendedTokensRepaidFromLending = (principalTokenBalance + totalPrincipalTokensUncommitted + totalPrincipalTokensActivelyLended) - (totalPrincipalTokensCommitted + totalCollectedInterest );
- 
- 
-       // uint256 principalTokenEquityAmount = principalTokenBalance + totalPrincipalTokensActivelyLended - totalLendedTokensRepaidFromLending ;
 
        
         uint256 netCommittedTokens = totalPrincipalTokensCommitted; 
@@ -542,19 +420,26 @@ If a lender owns 10% of this pool equity -> they own  10% of current balance of 
 
         uint256 principalTokenEquityAmountSimple =  totalPrincipalTokensCommitted + totalCollectedInterest - ( totalInterestWithdrawn);
 
-        uint256 principalTokenAmountToWithdraw = principalTokenEquityAmountSimple * _amountPoolSharesTokens / poolSharesTotalSupplyBeforeBurn;
+        uint256 principalTokenValueToWithdraw = principalTokenEquityAmountSimple * _amountPoolSharesTokens / poolSharesTotalSupplyBeforeBurn;
         uint256 tokensToUncommit = netCommittedTokens * _amountPoolSharesTokens / poolSharesTotalSupplyBeforeBurn;
 
         totalPrincipalTokensCommitted -= tokensToUncommit;
        // totalPrincipalTokensUncommitted += tokensToUncommit;
 
-        totalInterestWithdrawn += principalTokenAmountToWithdraw - tokensToUncommit;
+        totalInterestWithdrawn += principalTokenValueToWithdraw - tokensToUncommit;
 
 
-        //totalPrincipalTokensCommitted -= principalTokenAmountToWithdraw;
-        principalTokensCommittedByLender[msg.sender] -= principalTokenAmountToWithdraw;
-        
-        principalToken.transfer( _recipient, principalTokenAmountToWithdraw );
+         
+
+
+        principalTokensCommittedByLender[msg.sender] -= principalTokenValueToWithdraw;
+       
+
+        //implement this --- needs to be based on the amt of tokens in the contract right now !! 
+        (uint256 principalTokenSplitAmount, uint256 collateralTokenSplitAmount) = calculateSplitTokenAmounts( principalTokenValueToWithdraw );
+       
+        principalToken.transfer( _recipient, principalTokenSplitAmount );
+        collateralToken.transfer( _recipient, collateralTokenSplitAmount );
 
 
         //also mint collateral token shares !!  or give them out . 
@@ -606,26 +491,36 @@ consider passing in both token addresses and then get pool address from that
         uint256 interestAmount
     ) external  {
             //can use principal amt to increment amt paid back!! nice for math . 
-
+            totalPrincipalTokensRepaid += principalAmount; 
             totalCollectedInterest += interestAmount;
     }
  
 
+   function getTotalPrincipalTokensOutstandingInActiveLoans() public view returns (uint256) {
+
+         return totalPrincipalTokensLended - totalPrincipalTokensRepaid; 
+  
+
+   }
+
     function getCollateralTokenAddress() external view returns (address){
 
-        return collateralTokenAddress; 
+        return address(collateralToken); 
     }
+
+    
 
     function getCollateralTokenId() external view returns (uint256){
 
-        return collateralTokenId;
+        return 0;
     }
 
     function getCollateralTokenType() external view returns (CommitmentCollateralType){
 
-        return collateralTokenType;
+        return CommitmentCollateralType.ERC20;
     }
    
+
     function getRequiredCollateral(uint256 _principalAmount) public view returns (uint256){
 
 
@@ -634,8 +529,8 @@ consider passing in both token addresses and then get pool address from that
        return _getRequiredCollateral(
          _principalAmount,
         maxPrincipalPerCollateralAmount,
-        collateralTokenType,
-        collateralTokenAddress,
+        //collateralTokenType,
+        address(collateralToken),
         address (principalToken)
        );
 
@@ -669,12 +564,13 @@ consider passing in both token addresses and then get pool address from that
    
     function getPrincipalAmountAvailableToBorrow( ) public view returns (uint256){
 
+        uint256 totalAmountAvailable;  
 
-        uint256 amountAvailable = totalPrincipalTokensCommitted.percent( liquidityThresholdPercent )
-         - totalPrincipalTokensActivelyLended
+        uint256 amountAvailable = totalPrincipalTokensCommitted
+         - getTotalPrincipalTokensOutstandingInActiveLoans() 
         ;
 
-        return amountAvailable;
+        return totalAmountAvailable.percent( liquidityThresholdPercent );
     
     }
 
@@ -683,31 +579,28 @@ consider passing in both token addresses and then get pool address from that
      * @notice Calculate the amount of collateral required to borrow a loan with _principalAmount of principal
      * @param _principalAmount The amount of currency to borrow for the loan.
      * @param _maxPrincipalPerCollateralAmount The ratio for the amount of principal that can be borrowed for each amount of collateral. This is expanded additionally by the principal decimals.
-     * @param _collateralTokenType The type of collateral for the loan either ERC20, ERC721, ERC1155, or None.
      * @param _collateralTokenAddress The contract address for the collateral for the loan.
      * @param _principalTokenAddress The contract address for the principal for the loan.
      */
     function _getRequiredCollateral(
         uint256 _principalAmount,
         uint256 _maxPrincipalPerCollateralAmount,
-        CommitmentCollateralType _collateralTokenType,
+      //  CommitmentCollateralType _collateralTokenType,
         address _collateralTokenAddress,
         address _principalTokenAddress
     ) internal view virtual returns (uint256) {
-        if (_collateralTokenType == CommitmentCollateralType.NONE) {
-            return 0;
-        }
+        
 
         uint8 collateralDecimals;
         uint8 principalDecimals = IERC20MetadataUpgradeable(
             _principalTokenAddress
         ).decimals();
 
-        if (_collateralTokenType == CommitmentCollateralType.ERC20) {
+       // if (_collateralTokenType == CommitmentCollateralType.ERC20) {
             collateralDecimals = IERC20MetadataUpgradeable(
                 _collateralTokenAddress
             ).decimals();
-        }
+       // }
 
         /*
          * The principalAmount is expanded by (collateralDecimals+principalDecimals) to increase precision

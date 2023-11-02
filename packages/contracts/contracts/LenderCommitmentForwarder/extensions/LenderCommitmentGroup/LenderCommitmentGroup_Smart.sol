@@ -96,15 +96,30 @@ https://github.com/teller-protocol/teller-protocol-v1/blob/develop/contracts/len
 ////----
 
 
-1. Use 50% forced max utilization ratio as initial game theory 
+1. Use 50% forced max utilization ratio as initial game theory - have a global utilization limit and a user-signalled utilization limit (based on shares signalling) 
+
 2. When pool shares are burned, give the lender : [ their pct shares *  ( currentPrincipalTokens in contract, totalCollateralShares, totalInterestCollected)   ] and later, they can burn the collateral shares for any collateral tokens that are in the contract. 
-3. use noahs TToken contract as reference for ratios 
+3. use noahs TToken contract as reference for ratios -> amt of tokens to get when committing 
 4.  Need price oracle bc we dont want to use maxPrincipalPerCollateral ratio as a static ideally 
 5. have an LTV ratio 
 
 Every time a lender deposits tokens, we can mint an equal amt of RepresentationToken
 
 
+
+
+// -- EXITING 
+
+When exiting, a lender is burning X shares 
+
+ -  We calculate the total equity value (Z) of the pool  multiplies by their pct of shares (S%)    (naive is just total committed princ tokens and interest , could maybe do better  )
+    - We are going to give the lender  (Z * S%) value.  The way we are going to give it to them is in a split of principal (P) and collateral tokens (C)  which are in the pool right now.   Similar to exiting a uni pool .   C tokens will only be in the pool if bad defaults happened.  
+    
+         NOTE:  We will know the price of C in terms of P due to the ratio of total P used for loans and total C used for loans 
+         
+         NOTE: if there are not enough P and C tokens in the pool to give the lender to equal a value of (Z * S%) then we revert . 
+
+// ---------
 
 AAve utilization rate is 50% lets say 
 no matter what , only 50 pct of 100 can be out on loan.
@@ -150,7 +165,7 @@ Initializable
     bool private _initialized;
    
     LenderCommitmentGroupShares public poolSharesToken;
-    LenderCommitmentGroupShares public collateralSharesToken;
+   // LenderCommitmentGroupShares public collateralSharesToken;
  
 
     IERC20 public principalToken;
@@ -225,7 +240,7 @@ Initializable
         uint16 _minInterestRate,
 
         uint16 _liquidityThresholdPercent,
-        uint16 _loanToValuePercent 
+        uint16 _loanToValuePercent //essentially the overcollateralization ratio.  10000 is 1:1 baseline ?
 
         //uint256 _maxPrincipalPerCollateralAmount //use oracle instead 
 
@@ -256,8 +271,7 @@ Initializable
        //set initial terms in storage from _createCommitmentArgs
 
         _deployPoolSharesToken();
-
-        _deployCollateralSharesToken();
+ 
  
 
 
@@ -274,18 +288,7 @@ Initializable
             18   //may want this to equal the decimals of principal token !? 
         );
 
-    }
-    function _deployCollateralSharesToken() internal {
-       // uint256 principalTokenDecimals = principalToken.decimals();
-
-        collateralSharesToken =  new LenderCommitmentGroupShares(
-            "CollateralShares",
-            "CSH",
-            18   //may want this to equal the decimals of principal token !? 
-        );
-
     } 
-
 
   
 

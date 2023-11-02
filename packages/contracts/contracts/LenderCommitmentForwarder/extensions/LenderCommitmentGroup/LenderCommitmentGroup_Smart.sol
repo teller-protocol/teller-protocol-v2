@@ -60,6 +60,24 @@ When exiting, a lender is burning X shares
 
 // ---------
 
+
+
+// TODO 
+
+
+ 1.   implement the LTV  along with the uniswap oracle price ( they BOTH are used to figure out required collateral per principal for a new loan accept )
+
+ 2. implement share mints scaling by looking at TToken code  (make a fn to find a ratio of committed principal token value to total pool equity value atm   --difference should be the interest in a naive design) 
+
+ 3. finish off the exiting split tokens logic 
+
+ 4. tests 
+
+// ----
+
+
+
+
 AAve utilization rate is 50% lets say 
 no matter what , only 50 pct of 100 can be out on loan.
 

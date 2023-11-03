@@ -25,6 +25,10 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20Metadat
 import {CommitmentCollateralType, ISmartCommitment} from "../../../interfaces/ISmartCommitment.sol";
 import {ILoanRepaymentListener} from "../../../interfaces/ILoanRepaymentListener.sol";
 
+
+
+import {ILenderCommitmentGroup} from "../../../interfaces/ILenderCommitmentGroup.sol";
+
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
  
 
@@ -100,6 +104,7 @@ Consider implementing eip-4626
 
 
 contract LenderCommitmentGroup_Smart is 
+ILenderCommitmentGroup ,
 ISmartCommitment ,
 ILoanRepaymentListener,
 Initializable
@@ -262,18 +267,24 @@ Initializable
         address _sharesRecipient
     ) external 
         onlyAfterInitialized
+        returns (uint256 sharesAmount_)
     {
 
         //transfers the primary principal token from msg.sender into this contract escrow 
         //gives 
         principalToken.transferFrom(msg.sender, address(this), _amount );
-  
 
-        //mint shares equal to _amount and give them to the shares recipient !!! 
-        poolSharesToken.mint( _sharesRecipient,_amount);
+    
 
         totalPrincipalTokensCommitted += _amount;
         principalTokensCommittedByLender[msg.sender] += _amount;
+
+
+        //calculate this !! from ratio  TODO 
+        sharesAmount_ = 0;
+
+        //mint shares equal to _amount and give them to the shares recipient !!! 
+        poolSharesToken.mint( _sharesRecipient,sharesAmount_);
 
     }
 

@@ -6,6 +6,30 @@ pragma solidity ^0.8.0;
 interface ILenderCommitmentGroup{
      
 
+ function initialize( 
+        address _principalTokenAddress,
 
+        address _collateralTokenAddress,
+ 
+        uint256 _marketId,
+        uint32 _maxLoanDuration,
+        uint16 _minInterestRate,
+
+        uint16 _liquidityThresholdPercent,
+        uint16 _loanToValuePercent //essentially the overcollateralization ratio.  10000 is 1:1 baseline ?
+
+        //uint256 _maxPrincipalPerCollateralAmount //use oracle instead 
+
+         //ILenderCommitmentForwarder.Commitment calldata _createCommitmentArgs
+
+    ) external ;
+    
+
+    function addPrincipalToCommitmentGroup(
+        uint256 _amount,
+        address _sharesRecipient
+    ) external  
+    returns (uint256 sharesAmount_);
+    
 
 }

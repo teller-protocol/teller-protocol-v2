@@ -14,8 +14,11 @@ import "../../../interfaces/ILenderCommitmentForwarder.sol";
 import "../../../libraries/NumbersLib.sol";
  
 
-import "./LenderCommitmentGroup_Simple.sol";
+import "./LenderCommitmentGroup_Smart.sol";
 //import {CreateCommitmentArgs} from "../../interfaces/ILenderCommitmentGroup.sol";
+
+
+import {ILenderCommitmentGroup} from "../../../interfaces/ILenderCommitmentGroup.sol";
 
 contract LenderCommitmentGroupFactory  {
     using AddressUpgradeable for address;
@@ -24,7 +27,7 @@ contract LenderCommitmentGroupFactory  {
     /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
     ITellerV2 public immutable TELLER_V2;
     /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
-    ILenderCommitmentForwarder public immutable LENDER_COMMITMENT_FORWARDER;
+    address public immutable LENDER_COMMITMENT_FORWARDER;
  
  
 
@@ -38,9 +41,8 @@ contract LenderCommitmentGroupFactory  {
         address _lenderCommitmentForwarder
     ) {
         TELLER_V2 = ITellerV2(_tellerV2);
-        LENDER_COMMITMENT_FORWARDER = ILenderCommitmentForwarder(
-            _lenderCommitmentForwarder
-        );
+        LENDER_COMMITMENT_FORWARDER =    _lenderCommitmentForwarder;
+      
         
     }
   
@@ -56,28 +58,38 @@ contract LenderCommitmentGroupFactory  {
        
         ILenderCommitmentForwarder.Commitment calldata _createCommitmentArgs,
 
-        uint256 initialPrincipalAmount
+        uint256 _initialPrincipalAmount,
+        uint16 _liquidityThresholdPercent,
+        uint16 _loanToValuePercent
+
 
     ) external returns (address newPoolAddress_) {       
 
             //these should be upgradeable proxies ??? 
-        LenderCommitmentGroup_Simple _newGroupContract = new LenderCommitmentGroup_Simple(
+        address _newGroupContract = address ( new LenderCommitmentGroup_Smart(
                 address(TELLER_V2),
                 address(LENDER_COMMITMENT_FORWARDER)
-        );
+        ) );
 
       
         /*
             The max principal should be a very high number! higher than usual
             The expiration time should be far in the future!  farther than usual 
         */
-        _newGroupContract.initialize(            
-                _createCommitmentArgs
+        ILenderCommitmentGroup(_newGroupContract).initialize(   
+                _createCommitmentArgs.principalTokenAddress,
+                _createCommitmentArgs.collateralTokenAddress,
+                _createCommitmentArgs.marketId,
+                _createCommitmentArgs.maxDuration,
+                _createCommitmentArgs.minInterestRate,
+                
+                _liquidityThresholdPercent,
+                _loanToValuePercent
         );
 
 
         //it is not absolutely necessary to have this call here but it allows the user to potentially save a tx step so it is nice to have .
-        if(initialPrincipalAmount>0){
+        if(_initialPrincipalAmount>0){
 
 
              //should pull in the creators initial committed principal tokens .
@@ -85,14 +97,14 @@ contract LenderCommitmentGroupFactory  {
               //send the initial principal tokens to _newgroupcontract here !
               // so it will have them for addPrincipalToCommitmentGroup which will pull them from here 
 
-            IERC20(_createCommitmentArgs.principalTokenAddress).transferFrom( msg.sender, address(this), initialPrincipalAmount  ) ;
-            IERC20(_createCommitmentArgs.principalTokenAddress).approve( address(_newGroupContract) , initialPrincipalAmount ) ;
+            IERC20(_createCommitmentArgs.principalTokenAddress).transferFrom( msg.sender, address(this), _initialPrincipalAmount  ) ;
+            IERC20(_createCommitmentArgs.principalTokenAddress).approve( address(_newGroupContract) , _initialPrincipalAmount ) ;
 
 
             address sharesRecipient = msg.sender; 
 
-            _newGroupContract.addPrincipalToCommitmentGroup(
-                initialPrincipalAmount,
+            ILenderCommitmentGroup(_newGroupContract).addPrincipalToCommitmentGroup(
+                _initialPrincipalAmount,
                 sharesRecipient
             );
 

@@ -143,7 +143,7 @@ Initializable
     uint256 public totalPrincipalTokensRepaid;      //subtract this and the above to find total principal tokens outstanding for loans 
 
  
-    uint256 public totalCollateralTokensEscrowedForLoans; // we use this in conjunction with totalPrincipalTokensActivelyLended for a psuedo TWAP price oracle of C tokens, used for exiting  .  Nice bc it is averaged over all of our relevant loans, not the current price.  
+    uint256 public totalCollateralTokensEscrowedForLoans; // we use this in conjunction with totalPrincipalTokensLended for a psuedo TWAP price oracle of C tokens, used for exiting  .  Nice bc it is averaged over all of our relevant loans, not the current price.  
 
 
     uint256 public totalCollectedInterest;
@@ -543,6 +543,17 @@ consider passing in both token addresses and then get pool address from that
             totalCollectedInterest += interestAmount;
     }
  
+
+
+
+
+    function getAverageWeightedPriceForCollateralTokensPerPrincipalTokens( ) public view returns (uint256) {
+
+        if( totalPrincipalTokensLended <= 0 ){ return 0 ;}
+
+        return  totalCollateralTokensEscrowedForLoans / totalPrincipalTokensLended;
+    }
+
 
    function getTotalPrincipalTokensOutstandingInActiveLoans() public view returns (uint256) {
 

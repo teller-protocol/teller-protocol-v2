@@ -151,7 +151,7 @@ Initializable
     uint256 public totalCollateralTokensEscrowedForLoans; // we use this in conjunction with totalPrincipalTokensLended for a psuedo TWAP price oracle of C tokens, used for exiting  .  Nice bc it is averaged over all of our relevant loans, not the current price.  
 
 
-    uint256 public totalCollectedInterest;
+    uint256 public totalInterestCollected;
     uint256 public totalInterestWithdrawn;
 
     uint16 public liquidityThresholdPercent;  //5000 is 50 pct  // enforce max of 10000
@@ -281,7 +281,13 @@ Initializable
 
 
         //calculate this !! from ratio  TODO 
-        sharesAmount_ = 0;
+        /*
+        Should get slightly less shares than principal tokens put in !! diluted by ratio of pools actual equity 
+        */
+        uint256 undilutedSharedAmount = _amount;
+
+        uint256 poolTotalEstimatedValue = totalPrincipalTokensCommitted + totalInterestCollected;
+        sharesAmount_ =  undilutedSharedAmount * totalPrincipalTokensCommitted  /  poolTotalEstimatedValue ;
 
         //mint shares equal to _amount and give them to the shares recipient !!! 
         poolSharesToken.mint( _sharesRecipient,sharesAmount_);
@@ -447,7 +453,7 @@ Initializable
 
       
 
-        uint256 principalTokenEquityAmountSimple =  totalPrincipalTokensCommitted + totalCollectedInterest - ( totalInterestWithdrawn);
+        uint256 principalTokenEquityAmountSimple =  totalPrincipalTokensCommitted + totalInterestCollected - ( totalInterestWithdrawn);
 
         uint256 principalTokenValueToWithdraw = principalTokenEquityAmountSimple * _amountPoolSharesTokens / poolSharesTotalSupplyBeforeBurn;
         uint256 tokensToUncommit = netCommittedTokens * _amountPoolSharesTokens / poolSharesTotalSupplyBeforeBurn;
@@ -551,7 +557,7 @@ consider passing in both token addresses and then get pool address from that
     ) external  {
             //can use principal amt to increment amt paid back!! nice for math . 
             totalPrincipalTokensRepaid += principalAmount; 
-            totalCollectedInterest += interestAmount;
+            totalInterestCollected += interestAmount;
     }
  
 

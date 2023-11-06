@@ -22,7 +22,7 @@ interface ILenderCommitmentGroup{
 
          //ILenderCommitmentForwarder.Commitment calldata _createCommitmentArgs
 
-    ) external ;
+    ) external returns (address poolSharesToken) ;
     
 
     function addPrincipalToCommitmentGroup(

@@ -7,7 +7,7 @@ import { Testable } from "../../../Testable.sol";
 import {LenderCommitmentGroupFactory} from "../../../../contracts/LenderCommitmentForwarder/extensions/LenderCommitmentGroup/LenderCommitmentGroupFactory.sol";
 import "../../../../contracts/interfaces/ILenderCommitmentForwarder.sol"; 
 
-contract ExtensionsContext_Test is Testable {
+contract LenderCommitmentGroupFactory_Test is Testable {
     constructor() {}
 
     User private extensionContract;

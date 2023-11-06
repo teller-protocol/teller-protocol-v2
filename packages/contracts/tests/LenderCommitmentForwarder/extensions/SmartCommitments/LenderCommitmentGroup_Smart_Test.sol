@@ -1,10 +1,10 @@
 import { Testable } from "../../../Testable.sol";
 
-//import { ExtensionsContextUpgradeable } from "../../../contracts/LenderCommitmentForwarder/extensions/ExtensionsContextUpgradeable.sol";
+ import { LenderCommitmentGroup_Smart_Override } from "./LenderCommitmentGroup_Smart_Override.sol";
 
-//contract ExtensionsContextMock is ExtensionsContextUpgradeable {}
+//contract LenderCommitmentGroup_Smart_Mock is ExtensionsContextUpgradeable {}
 
-contract ExtensionsContext_Test is Testable {
+contract LenderCommitmentGroup_Smart_Test is Testable {
     constructor() {}
 
     User private extensionContract;
@@ -12,34 +12,46 @@ contract ExtensionsContext_Test is Testable {
     User private borrower;
     User private lender;
 
-   
+    LenderCommitmentGroup_Smart_Override lenderCommitmentGroupSmart;
+
+    address _smartCommitmentForwarder = address(0);   
+    address _uniswapV3Pool = address(0);
 
     function setUp() public {
         borrower = new User();
         lender = new User();
 
-         
+
+
+        lenderCommitmentGroupSmart = new LenderCommitmentGroup_Smart_Override(
+            _smartCommitmentForwarder,
+            _uniswapV3Pool
+        );
     }
 
-   /* function test_addingExtension() public {
-        bool isTrustedBefore = extensionsContext.hasExtension(
-            address(borrower),
-            address(extensionContract)
-        );
+   function test_initialize() public {
 
-        //the user will approve
-        vm.prank(address(borrower));
-        extensionsContext.addExtension(address(extensionContract));
+        address _principalTokenAddress = address(0);
+        address _collateralTokenAddress = address(0);
+        uint256 _marketId = 1;
+        uint32 _maxLoanDuration = 5000000;
+        uint16 _minInterestRate = 0;
+        uint16 _liquidityThresholdPercent = 10000;
+        uint16 _loanToValuePercent = 10000;
 
-        vm.prank(address(borrower));
-        bool isTrustedAfter = extensionsContext.hasExtension(
-            address(borrower),
-            address(extensionContract)
-        );
+       address _poolSharesToken = lenderCommitmentGroupSmart.initialize(
+            _principalTokenAddress,
+            _collateralTokenAddress,
+            _marketId,
+            _maxLoanDuration,
+            _minInterestRate,
+            _liquidityThresholdPercent,
+            _loanToValuePercent
+       );
 
-        assertFalse(isTrustedBefore, "Should not be trusted forwarder before");
-        assertTrue(isTrustedAfter, "Should be trusted forwarder after");
-    }*/
+       // assertFalse(isTrustedBefore, "Should not be trusted forwarder before");
+       // assertTrue(isTrustedAfter, "Should be trusted forwarder after");
+    } 
 }
 
 contract User {}

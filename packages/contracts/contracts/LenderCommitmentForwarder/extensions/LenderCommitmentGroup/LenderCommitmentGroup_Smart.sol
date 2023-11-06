@@ -210,7 +210,7 @@ Initializable
          //ILenderCommitmentForwarder.Commitment calldata _createCommitmentArgs
 
     ) // initializer  ADD ME 
-    external {
+    external returns (address poolSharesToken_) {
 
         _initialized = true;
 
@@ -218,9 +218,9 @@ Initializable
         collateralToken = IERC20(_collateralTokenAddress);
 
       
-       // collateralTokenAddress = _collateralTokenAddress;
-      //  collateralTokenId = _collateralTokenId;
-      //  collateralTokenType = _collateralTokenType;
+        // collateralTokenAddress = _collateralTokenAddress;
+        // collateralTokenId = _collateralTokenId;
+        // collateralTokenType = _collateralTokenType;
         marketId = _marketId;
         maxLoanDuration = _maxLoanDuration;
         minInterestRate = _minInterestRate;
@@ -231,22 +231,21 @@ Initializable
         liquidityThresholdPercent = _liquidityThresholdPercent;
         loanToValuePercent = _loanToValuePercent;
 
-      //  maxPrincipalPerCollateralAmount = _maxPrincipalPerCollateralAmount;
-       // _createInitialCommitment(_createCommitmentArgs);
+        // maxPrincipalPerCollateralAmount = _maxPrincipalPerCollateralAmount;
+        // _createInitialCommitment(_createCommitmentArgs);
 
 
-       //set initial terms in storage from _createCommitmentArgs
+        // set initial terms in storage from _createCommitmentArgs
 
-        _deployPoolSharesToken();
+        poolSharesToken_ =  _deployPoolSharesToken();
  
- 
-
+  
 
     }
  
  
 
-    function _deployPoolSharesToken() internal {
+    function _deployPoolSharesToken() internal returns (address poolSharesToken_)  {
        // uint256 principalTokenDecimals = principalToken.decimals();
 
         poolSharesToken =  new LenderCommitmentGroupShares(
@@ -255,6 +254,7 @@ Initializable
             18   //may want this to equal the decimals of principal token !? 
         );
 
+        return address(poolSharesToken);
     } 
 
   

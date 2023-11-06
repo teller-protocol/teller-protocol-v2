@@ -103,7 +103,7 @@ contract LenderCommitmentGroupFactory  {
 
             address sharesRecipient = msg.sender; 
 
-            ILenderCommitmentGroup(newGroupContract_).addPrincipalToCommitmentGroup(
+            uint256 sharesAmount_ = ILenderCommitmentGroup(newGroupContract_).addPrincipalToCommitmentGroup(
                 _initialPrincipalAmount,
                 sharesRecipient
             );

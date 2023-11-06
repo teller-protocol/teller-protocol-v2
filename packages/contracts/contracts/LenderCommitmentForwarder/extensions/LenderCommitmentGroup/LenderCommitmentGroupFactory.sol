@@ -63,10 +63,10 @@ contract LenderCommitmentGroupFactory  {
         uint16 _loanToValuePercent
 
 
-    ) external returns (address newPoolAddress_) {       
+    ) external returns (address newGroupContract_) {       
 
             //these should be upgradeable proxies ??? 
-        address _newGroupContract = address ( new LenderCommitmentGroup_Smart(
+          newGroupContract_ = address ( new LenderCommitmentGroup_Smart(
                 address(TELLER_V2),
                 address(LENDER_COMMITMENT_FORWARDER)
         ) );
@@ -76,7 +76,7 @@ contract LenderCommitmentGroupFactory  {
             The max principal should be a very high number! higher than usual
             The expiration time should be far in the future!  farther than usual 
         */
-        ILenderCommitmentGroup(_newGroupContract).initialize(   
+        ILenderCommitmentGroup(newGroupContract_).initialize(   
                 _createCommitmentArgs.principalTokenAddress,
                 _createCommitmentArgs.collateralTokenAddress,
                 _createCommitmentArgs.marketId,
@@ -98,12 +98,12 @@ contract LenderCommitmentGroupFactory  {
               // so it will have them for addPrincipalToCommitmentGroup which will pull them from here 
 
             IERC20(_createCommitmentArgs.principalTokenAddress).transferFrom( msg.sender, address(this), _initialPrincipalAmount  ) ;
-            IERC20(_createCommitmentArgs.principalTokenAddress).approve( address(_newGroupContract) , _initialPrincipalAmount ) ;
+            IERC20(_createCommitmentArgs.principalTokenAddress).approve( address(newGroupContract_) , _initialPrincipalAmount ) ;
 
 
             address sharesRecipient = msg.sender; 
 
-            ILenderCommitmentGroup(_newGroupContract).addPrincipalToCommitmentGroup(
+            ILenderCommitmentGroup(newGroupContract_).addPrincipalToCommitmentGroup(
                 _initialPrincipalAmount,
                 sharesRecipient
             );

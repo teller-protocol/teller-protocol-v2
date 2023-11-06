@@ -276,11 +276,11 @@ Initializable
        uint256 poolTotalEstimatedValuePlusInterest = totalPrincipalTokensCommitted + totalInterestCollected;
      
      
-        if (poolTotalEstimatedValuePlusInterest == 0) {
+        if (poolTotalEstimatedValue == 0) {
             return EXCHANGE_RATE_EXPANSION_FACTOR; // 1 to 1 for first swap 
         }
 
-        rate_ = ( poolTotalEstimatedValue * EXCHANGE_RATE_EXPANSION_FACTOR) / poolTotalEstimatedValuePlusInterest;
+        rate_ = ( poolTotalEstimatedValuePlusInterest * EXCHANGE_RATE_EXPANSION_FACTOR) / poolTotalEstimatedValue;
     }
 
 

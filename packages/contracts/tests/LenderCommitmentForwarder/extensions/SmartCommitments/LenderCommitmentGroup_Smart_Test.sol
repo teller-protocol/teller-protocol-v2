@@ -122,7 +122,39 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
             expectedSharesAmount,
             "Received an unexpected amount of shares"
 
-         );
+        );
+
+    
+    }
+
+        function test_addPrincipalToCommitmentGroup_after_interest_payments() public {
+    
+        initialize_group_contract();
+
+        lenderCommitmentGroupSmart.set_totalPrincipalTokensCommitted(1000000);
+        lenderCommitmentGroupSmart.set_totalInterestCollected(1000000);
+
+
+        vm.prank(address(lender));
+        principalToken.approve(address(lenderCommitmentGroupSmart),1000000);
+
+        vm.prank(address(lender));
+        uint256 sharesAmount_ = lenderCommitmentGroupSmart.addPrincipalToCommitmentGroup(
+            1000000,
+            address(borrower)
+        );
+
+           
+        uint256 expectedSharesAmount = 666666;
+
+
+        //use ttoken logic to make this better 
+        assertEq( 
+            sharesAmount_,
+            expectedSharesAmount,
+            "Received an unexpected amount of shares"
+
+        );
 
     
     }

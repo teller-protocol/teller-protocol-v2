@@ -2,6 +2,9 @@ import { Testable } from "../../../Testable.sol";
 
  import { LenderCommitmentGroup_Smart_Override } from "./LenderCommitmentGroup_Smart_Override.sol";
 
+
+import "../../../tokens/TestERC20Token.sol";
+
 //contract LenderCommitmentGroup_Smart_Mock is ExtensionsContextUpgradeable {}
 
 contract LenderCommitmentGroup_Smart_Test is Testable {
@@ -11,6 +14,13 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
 
     User private borrower;
     User private lender;
+
+
+    TestERC20Token principalToken;
+
+    TestERC20Token collateralToken;
+
+    
 
     LenderCommitmentGroup_Smart_Override lenderCommitmentGroupSmart;
 
@@ -23,16 +33,47 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
 
 
 
+        principalToken = new TestERC20Token("wrappedETH", "WETH", 1e24, 18);
+
+        collateralToken = new TestERC20Token("PEPE", "pepe", 1e24, 18);
+
+        principalToken.transfer(address(lender),1e18);
+        collateralToken.transfer(address(borrower),1e18);
+
         lenderCommitmentGroupSmart = new LenderCommitmentGroup_Smart_Override(
             _smartCommitmentForwarder,
             _uniswapV3Pool
         );
     }
 
+
+    function initialize_group_contract() public {
+
+
+        address _principalTokenAddress = address(principalToken);
+        address _collateralTokenAddress = address(collateralToken);
+        uint256 _marketId = 1;
+        uint32 _maxLoanDuration = 5000000;
+        uint16 _minInterestRate = 0;
+        uint16 _liquidityThresholdPercent = 10000;
+        uint16 _loanToValuePercent = 10000;
+
+        address _poolSharesToken = lenderCommitmentGroupSmart.initialize(
+            _principalTokenAddress,
+            _collateralTokenAddress,
+            _marketId,
+            _maxLoanDuration,
+            _minInterestRate,
+            _liquidityThresholdPercent,
+            _loanToValuePercent
+       );
+    }
+
+
    function test_initialize() public {
 
-        address _principalTokenAddress = address(0);
-        address _collateralTokenAddress = address(0);
+        address _principalTokenAddress = address(principalToken);
+        address _collateralTokenAddress = address(collateralToken);
         uint256 _marketId = 1;
         uint32 _maxLoanDuration = 5000000;
         uint16 _minInterestRate = 0;
@@ -52,6 +93,39 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
        // assertFalse(isTrustedBefore, "Should not be trusted forwarder before");
        // assertTrue(isTrustedAfter, "Should be trusted forwarder after");
     } 
+
+
+    
+
+//  https://github.com/teller-protocol/teller-protocol-v1/blob/develop/contracts/lending/ttoken/TToken_V3.sol
+    function test_addPrincipalToCommitmentGroup() public {
+    
+        initialize_group_contract();
+
+
+        vm.prank(address(lender));
+        principalToken.approve(address(lenderCommitmentGroupSmart),1000000);
+
+        vm.prank(address(lender));
+        uint256 sharesAmount_ = lenderCommitmentGroupSmart.addPrincipalToCommitmentGroup(
+            1000000,
+            address(borrower)
+        );
+
+
+        uint256 expectedSharesAmount = 1000000;
+
+
+        //use ttoken logic to make this better 
+        assertEq( 
+            sharesAmount_,
+            expectedSharesAmount,
+            "Received an unexpected amount of shares"
+
+         );
+
+    
+    }
 }
 
 contract User {}

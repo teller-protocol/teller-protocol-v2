@@ -112,6 +112,9 @@ Initializable
     using AddressUpgradeable for address;
     using NumbersLib for uint256;
 
+
+    uint256 public immutable EXCHANGE_RATE_EXPANSION_FACTOR = 1e18;
+
     /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
     //ITellerV2 public immutable TELLER_V2;
     /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
@@ -257,8 +260,38 @@ Initializable
         return address(poolSharesToken);
     } 
 
-  
+ 
 
+    /**
+     * @notice It calculates the current scaled exchange rate for a whole Teller Token based of the underlying token balance.
+     * @return rate_ The current exchange rate, scaled by the EXCHANGE_RATE_FACTOR.
+     */
+    function exchangeRate() public returns (uint256 rate_) {
+     
+       /*
+        Should get slightly less shares than principal tokens put in !! diluted by ratio of pools actual equity 
+      */ 
+
+       uint256 poolTotalEstimatedValue = totalPrincipalTokensCommitted ;
+       uint256 poolTotalEstimatedValuePlusInterest = totalPrincipalTokensCommitted + totalInterestCollected;
+     
+     
+        if (poolTotalEstimatedValuePlusInterest == 0) {
+            return EXCHANGE_RATE_EXPANSION_FACTOR; // 1 to 1 for first swap 
+        }
+
+        rate_ = ( poolTotalEstimatedValue * EXCHANGE_RATE_EXPANSION_FACTOR) / poolTotalEstimatedValuePlusInterest;
+    }
+
+
+ 
+   /* function currentTVL() public override returns (uint256 tvl_) {
+        tvl_ += totalUnderlyingSupply();
+        tvl_ += s().totalBorrowed;
+        tvl_ -= s().totalRepaid;
+    }
+  
+*/
     /*
     must be initialized for this to work ! 
     */
@@ -281,17 +314,21 @@ Initializable
 
 
         //calculate this !! from ratio  TODO 
-        /*
-        Should get slightly less shares than principal tokens put in !! diluted by ratio of pools actual equity 
-        */
-        uint256 undilutedSharedAmount = _amount;
-
-        uint256 poolTotalEstimatedValue = totalPrincipalTokensCommitted + totalInterestCollected;
-        sharesAmount_ =  undilutedSharedAmount * totalPrincipalTokensCommitted  /  poolTotalEstimatedValue ;
+      
+       
+         sharesAmount_ = _valueOfUnderlying(_amount, exchangeRate());
 
         //mint shares equal to _amount and give them to the shares recipient !!! 
         poolSharesToken.mint( _sharesRecipient,sharesAmount_);
 
+    }
+
+      function _valueOfUnderlying(uint256 amount, uint256 rate)
+        internal
+        pure
+        returns (uint256 value_)
+    {
+        value_ = (amount * EXCHANGE_RATE_EXPANSION_FACTOR) / rate;
     }
 
 

@@ -132,7 +132,7 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
         initialize_group_contract();
 
         lenderCommitmentGroupSmart.set_totalPrincipalTokensCommitted(1000000);
-        lenderCommitmentGroupSmart.set_totalInterestCollected(1000000);
+        lenderCommitmentGroupSmart.set_totalInterestCollected(2000000);
 
 
         vm.prank(address(lender));
@@ -145,7 +145,7 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
         );
 
            
-        uint256 expectedSharesAmount = 666666;
+        uint256 expectedSharesAmount = 500000;
 
 
         //use ttoken logic to make this better 

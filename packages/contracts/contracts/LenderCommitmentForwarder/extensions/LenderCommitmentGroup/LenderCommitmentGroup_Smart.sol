@@ -468,9 +468,9 @@ Initializable
         address _recipient
     ) external 
     onlyAfterInitialized
+    returns (uint256 principalTokenSplitAmount_, uint256 collateralTokenSplitAmount_)
     {   
- 
-                //
+  
         //uint256 collectedInterest = LoanRepaymentInterestCollector( interestCollector ).collectInterest();
        
 
@@ -480,10 +480,7 @@ Initializable
 
         //this DOES reduce total supply! This is necessary for correct math. 
         poolSharesToken.burn( msg.sender, _amountPoolSharesTokens );
-
-
  
-
 
        
         uint256 netCommittedTokens = totalPrincipalTokensCommitted; 
@@ -499,19 +496,16 @@ Initializable
        // totalPrincipalTokensUncommitted += tokensToUncommit;
 
         totalInterestWithdrawn += principalTokenValueToWithdraw - tokensToUncommit;
-
-
-         
-
+ 
 
         principalTokensCommittedByLender[msg.sender] -= principalTokenValueToWithdraw;
        
 
         //implement this --- needs to be based on the amt of tokens in the contract right now !! 
-        (uint256 principalTokenSplitAmount, uint256 collateralTokenSplitAmount) = calculateSplitTokenAmounts( principalTokenValueToWithdraw );
+        ( principalTokenSplitAmount_,  collateralTokenSplitAmount_) = calculateSplitTokenAmounts( principalTokenValueToWithdraw );
        
-        principalToken.transfer( _recipient, principalTokenSplitAmount );
-        collateralToken.transfer( _recipient, collateralTokenSplitAmount );
+        principalToken.transfer( _recipient, principalTokenSplitAmount_ );
+        collateralToken.transfer( _recipient, collateralTokenSplitAmount_ );
 
 
         //also mint collateral token shares !!  or give them out . 

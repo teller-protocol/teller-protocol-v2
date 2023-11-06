@@ -127,7 +127,7 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
     
     }
 
-        function test_addPrincipalToCommitmentGroup_after_interest_payments() public {
+    function test_addPrincipalToCommitmentGroup_after_interest_payments() public {
     
         initialize_group_contract();
 
@@ -153,6 +153,56 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
             sharesAmount_,
             expectedSharesAmount,
             "Received an unexpected amount of shares"
+
+        );
+
+    
+    }
+
+
+     function test_burnShares_after_interest_payments() public {
+    
+        initialize_group_contract();
+
+        lenderCommitmentGroupSmart.set_totalPrincipalTokensCommitted(1000000);
+        lenderCommitmentGroupSmart.set_totalInterestCollected(2000000);
+
+
+        vm.prank(address(lender));
+        principalToken.approve(address(lenderCommitmentGroupSmart),1000000);
+
+        vm.prank(address(lender));
+        uint256 sharesAmount_ = lenderCommitmentGroupSmart.addPrincipalToCommitmentGroup(
+            1000000,
+            address(lender)
+        );
+
+           
+        uint256 expectedSharesAmount = 500000;
+
+
+        //actually  mock this ...  like mock mint sharestokens 
+        assertEq( 
+            sharesAmount_,
+            expectedSharesAmount,
+            "Received an unexpected amount of shares"
+
+        );
+
+        
+      vm.prank(address(lender));
+        (uint256 receivedPrincipalTokens, 
+        uint256 receivedCollateralTokens) 
+        = lenderCommitmentGroupSmart
+        .burnSharesToWithdrawEarnings( 
+            sharesAmount_, address(lender) );
+
+
+        uint256 expectedReceivedPrincipalTokens = 1000000; // the orig amt ! 
+       assertEq( 
+            receivedPrincipalTokens,
+            expectedReceivedPrincipalTokens,
+            "Received an unexpected amount of principaltokens"
 
         );
 

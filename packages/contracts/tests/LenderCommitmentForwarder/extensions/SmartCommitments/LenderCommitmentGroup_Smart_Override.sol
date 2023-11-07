@@ -35,6 +35,9 @@ contract LenderCommitmentGroup_Smart_Override is LenderCommitmentGroup_Smart {
         totalInterestCollected = _mockAmt;
         
     }
-   
+    
+    function set_principalTokensCommittedByLender(address lender, uint256 _mockAmt) public {
+        principalTokensCommittedByLender[lender] = _mockAmt;
+    }
 }
  

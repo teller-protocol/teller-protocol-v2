@@ -32,6 +32,9 @@ import {ILenderCommitmentGroup} from "../../../interfaces/ILenderCommitmentGroup
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
  
 
+
+import "lib/forge-std/src/console.sol";
+
 /*
 
 
@@ -472,8 +475,6 @@ Initializable
     {   
   
         //uint256 collectedInterest = LoanRepaymentInterestCollector( interestCollector ).collectInterest();
-       
-
 
         //figure out the ratio of shares tokens that this is 
         uint256 poolSharesTotalSupplyBeforeBurn = poolSharesToken.totalSupply();
@@ -481,22 +482,30 @@ Initializable
         //this DOES reduce total supply! This is necessary for correct math. 
         poolSharesToken.burn( msg.sender, _amountPoolSharesTokens );
  
-
        
         uint256 netCommittedTokens = totalPrincipalTokensCommitted; 
 
-      
-
         uint256 principalTokenEquityAmountSimple =  totalPrincipalTokensCommitted + totalInterestCollected - ( totalInterestWithdrawn);
+
+        console.log("principalTokenEquityAmountSimple");
+        console.logUint(principalTokenEquityAmountSimple);
 
         uint256 principalTokenValueToWithdraw = principalTokenEquityAmountSimple * _amountPoolSharesTokens / poolSharesTotalSupplyBeforeBurn;
         uint256 tokensToUncommit = netCommittedTokens * _amountPoolSharesTokens / poolSharesTotalSupplyBeforeBurn;
+
+        console.log("tokensToUncommit");
+        console.logUint(tokensToUncommit);
 
         totalPrincipalTokensCommitted -= tokensToUncommit;
        // totalPrincipalTokensUncommitted += tokensToUncommit;
 
         totalInterestWithdrawn += principalTokenValueToWithdraw - tokensToUncommit;
  
+         console.log("totalInterestWithdrawn");
+         console.logUint(totalInterestWithdrawn);
+
+          console.logUint(principalTokensCommittedByLender[msg.sender]);
+               console.logUint(principalTokenValueToWithdraw);
 
         principalTokensCommittedByLender[msg.sender] -= principalTokenValueToWithdraw;
        
@@ -504,9 +513,12 @@ Initializable
         //implement this --- needs to be based on the amt of tokens in the contract right now !! 
         ( principalTokenSplitAmount_,  collateralTokenSplitAmount_) = calculateSplitTokenAmounts( principalTokenValueToWithdraw );
        
+        console.log("calculated split amt ");
+
         principalToken.transfer( _recipient, principalTokenSplitAmount_ );
         collateralToken.transfer( _recipient, collateralTokenSplitAmount_ );
 
+         console.log("sent split amt ");
 
         //also mint collateral token shares !!  or give them out . 
         

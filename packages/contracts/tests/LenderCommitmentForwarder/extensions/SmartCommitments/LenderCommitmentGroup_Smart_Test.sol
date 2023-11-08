@@ -19,7 +19,6 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
     TestERC20Token principalToken;
 
     TestERC20Token collateralToken;
-
     
 
     LenderCommitmentGroup_Smart_Override lenderCommitmentGroupSmart;

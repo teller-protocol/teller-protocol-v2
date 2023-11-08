@@ -265,11 +265,11 @@ Initializable
      * @notice It calculates the current scaled exchange rate for a whole Teller Token based of the underlying token balance.
      * @return rate_ The current exchange rate, scaled by the EXCHANGE_RATE_FACTOR.
      */
-    function exchangeRate() public returns (uint256 rate_) {
+    function sharesExchangeRate() public view returns (uint256 rate_) {
      
        /*
         Should get slightly less shares than principal tokens put in !! diluted by ratio of pools actual equity 
-      */ 
+       */ 
 
        uint256 poolTotalEstimatedValue = totalPrincipalTokensCommitted ;
        uint256 poolTotalEstimatedValuePlusInterest = totalPrincipalTokensCommitted + totalInterestCollected;
@@ -283,6 +283,40 @@ Initializable
     }
 
 
+
+/*
+When exiting, a lender is burning X shares 
+
+We calculate the total equity value (Z) of the pool  
+multiplies by their pct of shares (S%)    
+(naive is just total committed princ tokens and interest ,
+ could maybe do better  )
+  We are going to give the lender  (Z * S%) value. 
+   The way we are going to give it to them is in a split of
+    principal (P) and collateral tokens (C)  which are in
+    the pool right now.   Similar to exiting a uni pool .  
+     C tokens will only be in the pool if bad defaults happened.  
+    
+  NOTE:  We will know the price of C in terms of P due to
+   the ratio of total P used for loans and total C used for loans 
+         
+ NOTE: if there are not enough P and C tokens in the pool to 
+ give the lender to equal a value of (Z * S%) then we revert . 
+ 
+*/
+
+    function collateralTokenExchangeRate() public view returns (uint256 rate_) {
+
+        uint256 totalPrincipalTokensUsedForLoans = totalPrincipalTokensLended - totalPrincipalTokensRepaid;
+        uint256 totalCollateralTokensUsedForLoans = totalCollateralTokensEscrowedForLoans;
+
+          if (totalPrincipalTokensUsedForLoans == 0) {
+            return EXCHANGE_RATE_EXPANSION_FACTOR; // 1 to 1 for first swap 
+        }
+
+        rate_ = ( totalCollateralTokensUsedForLoans * EXCHANGE_RATE_EXPANSION_FACTOR) / totalPrincipalTokensUsedForLoans; 
+
+    }
  
    /* function currentTVL() public override returns (uint256 tvl_) {
         tvl_ += totalUnderlyingSupply();
@@ -315,7 +349,7 @@ Initializable
         //calculate this !! from ratio  TODO 
       
        
-         sharesAmount_ = _valueOfUnderlying(_amount, exchangeRate());
+         sharesAmount_ = _valueOfUnderlying(_amount, sharesExchangeRate());
 
         //mint shares equal to _amount and give them to the shares recipient !!! 
         poolSharesToken.mint( _sharesRecipient,sharesAmount_);
@@ -515,6 +549,8 @@ Initializable
        
         console.log("calculated split amt ");
 
+  console.logUint( principalTokenSplitAmount_ );
+  console.logUint( collateralTokenSplitAmount_ );
         principalToken.transfer( _recipient, principalTokenSplitAmount_ );
         collateralToken.transfer( _recipient, collateralTokenSplitAmount_ );
 
@@ -532,22 +568,50 @@ Initializable
     function calculateSplitTokenAmounts( uint256 _principalTokenAmountValue ) 
       public view returns (uint256 principalAmount_, uint256 collateralAmount_ ) {
 
+      console.log("calc split");
+
         // need to see how many collateral tokens are in the contract atm 
 
         // need to know how many principal tokens are in the contract atm 
-        uint256 principalTokenBalance = principalToken.balanceOf(address(this));
-        uint256 collateralTokenBalance = collateralToken.balanceOf(address(this));
+      uint256 principalTokenBalance = principalToken.balanceOf(address(this)); //this is also the principal token value 
+      uint256 collateralTokenBalance = collateralToken.balanceOf(address(this));
 
-        // need to know how the value of the collateral tokens  IN TERMS OF principal tokens 
+    //  need to know how the value of the collateral tokens  IN TERMS OF principal tokens 
+      
+      console.logUint( principalTokenBalance );
+      console.logUint( collateralTokenBalance );
+       
+      uint256 collateralTokenValueInPrincipalToken = _valueOfUnderlying(collateralTokenBalance, collateralTokenExchangeRate());  
+    
+        uint256 ratioOfPrincipalToCollateral = 0;
+        if( collateralTokenValueInPrincipalToken > 0 ) {
+
+            ///expand this ? 
+            ratioOfPrincipalToCollateral  = principalTokenBalance *EXCHANGE_RATE_EXPANSION_FACTOR  / collateralTokenValueInPrincipalToken ;
+        }
+
+
+        //total value of the pool is    collateraltokenvalue in principal tokens + principaltokenvalue in principal tokens 
+        // so lets  do    _principalTokenAmountValue / total value   = U 
+
+        //so then lets give them U% of the balance of principal tokens  and U% of the value of collateral tokens 
+
+        console.logUint( collateralTokenValueInPrincipalToken );
+        console.logUint( ratioOfPrincipalToCollateral );
+
+        console.logUint( _principalTokenAmountValue );
         
- 
+
 
         //these should both add up to equal the input:  _principalTokenAmountValue
-         uint256 principalTokenAmountValueToGiveInPrincipalTokens;
-         uint256 principalTokenAmountValueToGiveInCollateralTokens;  
+      uint256 principalTokenAmountValueToGiveInPrincipalTokens = principalTokenBalance * ratioOfPrincipalToCollateral / EXCHANGE_RATE_EXPANSION_FACTOR  ;
+      uint256 principalTokenAmountValueToGiveInCollateralTokens = 0;// _principalTokenAmountValue - principalTokenAmountValueToGiveInPrincipalTokens;  
 
 
          uint256 collateralTokensToGive ;
+
+  console.logUint( principalTokenAmountValueToGiveInPrincipalTokens );
+    console.logUint( collateralTokensToGive );
 
 
          return (principalTokenAmountValueToGiveInPrincipalTokens , collateralTokensToGive);

@@ -288,31 +288,19 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
         vm.prank(address(lender));
         principalToken.approve(address(lenderCommitmentGroupSmart),1000000);
 
-        vm.prank(address(lender));
-        uint256 sharesAmount_ = lenderCommitmentGroupSmart.addPrincipalToCommitmentGroup(
-            1000000,
-            address(lender)
-        );
 
-           
-        uint256 expectedSharesAmount = 500000;
+        uint256 sharesAmount = 500000;
 
 
-        //actually  mock this ...  like mock mint sharestokens 
-        assertEq( 
-            sharesAmount_,
-            expectedSharesAmount,
-            "Received an unexpected amount of shares"
-
-        );
-
+        lenderCommitmentGroupSmart.mock_mintShares( address(lender),sharesAmount );
+          
         
         vm.prank(address(lender));
         (uint256 receivedPrincipalTokens, 
         uint256 receivedCollateralTokens) 
         = lenderCommitmentGroupSmart
         .burnSharesToWithdrawEarnings( 
-            sharesAmount_, 
+            sharesAmount, 
             address(lender) );
 
 

@@ -552,7 +552,7 @@ multiplies by their pct of shares (S%)
   console.logUint( principalTokenSplitAmount_ );
   console.logUint( collateralTokenSplitAmount_ );
         principalToken.transfer( _recipient, principalTokenSplitAmount_ );
-        collateralToken.transfer( _recipient, collateralTokenSplitAmount_ );
+       collateralToken.transfer( _recipient, collateralTokenSplitAmount_ );
 
          console.log("sent split amt ");
 
@@ -583,12 +583,25 @@ multiplies by their pct of shares (S%)
        
       uint256 collateralTokenValueInPrincipalToken = _valueOfUnderlying(collateralTokenBalance, collateralTokenExchangeRate());  
     
-        uint256 ratioOfPrincipalToCollateral = 0;
+      uint256 totalValueInPrincipalTokens = collateralTokenValueInPrincipalToken + principalTokenBalance;
+
+    console.log("_principalTokenAmountValue");
+    console.logUint( _principalTokenAmountValue );
+
+    console.logUint( totalValueInPrincipalTokens );
+
+      uint16 principalTotalAmountPercent = uint16(  _principalTokenAmountValue * 10000 /  totalValueInPrincipalTokens ); 
+     
+     
+     
+     /*   uint256 ratioOfPrincipalToCollateral = 0;
         if( collateralTokenValueInPrincipalToken > 0 ) {
 
             ///expand this ? 
             ratioOfPrincipalToCollateral  = principalTokenBalance *EXCHANGE_RATE_EXPANSION_FACTOR  / collateralTokenValueInPrincipalToken ;
-        }
+        }*/
+
+        //find the total value thats in this contract 
 
 
         //total value of the pool is    collateraltokenvalue in principal tokens + principaltokenvalue in principal tokens 
@@ -597,24 +610,23 @@ multiplies by their pct of shares (S%)
         //so then lets give them U% of the balance of principal tokens  and U% of the value of collateral tokens 
 
         console.logUint( collateralTokenValueInPrincipalToken );
-        console.logUint( ratioOfPrincipalToCollateral );
+       // console.logUint( ratioOfPrincipalToCollateral );
 
         console.logUint( _principalTokenAmountValue );
         
+        console.logUint( principalTotalAmountPercent );
+
+ 
+        uint256 principalTokensToGive = principalTokenBalance.percent(principalTotalAmountPercent) ;
+        uint256 collateralTokensToGive = collateralTokenBalance.percent(principalTotalAmountPercent);
+
+ // console.logUint( principalTokenAmountValueToGiveInPrincipalTokens );
+    console.log("principalTokensToGive");
+    console.logUint( principalTokensToGive );
+     console.logUint( collateralTokensToGive );
 
 
-        //these should both add up to equal the input:  _principalTokenAmountValue
-      uint256 principalTokenAmountValueToGiveInPrincipalTokens = principalTokenBalance * ratioOfPrincipalToCollateral / EXCHANGE_RATE_EXPANSION_FACTOR  ;
-      uint256 principalTokenAmountValueToGiveInCollateralTokens = 0;// _principalTokenAmountValue - principalTokenAmountValueToGiveInPrincipalTokens;  
-
-
-         uint256 collateralTokensToGive ;
-
-  console.logUint( principalTokenAmountValueToGiveInPrincipalTokens );
-    console.logUint( collateralTokensToGive );
-
-
-         return (principalTokenAmountValueToGiveInPrincipalTokens , collateralTokensToGive);
+         return (principalTokensToGive , collateralTokensToGive);
        } 
 
 

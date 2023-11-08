@@ -45,8 +45,8 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
             _uniswapV3Pool
         );
 
-        principalToken.transfer(address(lenderCommitmentGroupSmart),1e18);
-        collateralToken.transfer(address(lenderCommitmentGroupSmart),1e18);
+        principalToken.transfer(address(lenderCommitmentGroupSmart),1e20);
+        collateralToken.transfer(address(lenderCommitmentGroupSmart),1e20);
 
     }
 

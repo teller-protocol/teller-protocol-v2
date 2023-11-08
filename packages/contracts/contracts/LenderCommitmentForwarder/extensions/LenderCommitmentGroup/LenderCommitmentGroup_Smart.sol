@@ -127,20 +127,16 @@ Initializable
     bool private _initialized;
    
     LenderCommitmentGroupShares public poolSharesToken;
-   // LenderCommitmentGroupShares public collateralSharesToken;
- 
+    
 
    
     IERC20 public principalToken;
     IERC20 public collateralToken;
-   // address public collateralTokenAddress;
-  //  uint256 collateralTokenId;
-  //  CommitmentCollateralType collateralTokenType;
-    uint256 marketId;
+    
+    uint256 marketId;    //remove the marketId enforcement ??? 
     uint32 maxLoanDuration;
     uint16 minInterestRate;
-
-    //uint256 maxPrincipalPerCollateralAmount;
+ 
 
    
     //this is all of the principal tokens that have been committed to this contract minus all that have been withdrawn.  This includes the tokens in this contract and lended out in active loans by this contract. 
@@ -471,7 +467,10 @@ Initializable
         address _recipient
     ) external 
     onlyAfterInitialized
-    returns (uint256 principalTokenSplitAmount_, uint256 collateralTokenSplitAmount_)
+    returns (
+        uint256 principalTokenSplitAmount_, 
+        uint256 collateralTokenSplitAmount_
+        )
     {   
   
         //uint256 collectedInterest = LoanRepaymentInterestCollector( interestCollector ).collectInterest();
@@ -511,7 +510,8 @@ Initializable
        
 
         //implement this --- needs to be based on the amt of tokens in the contract right now !! 
-        ( principalTokenSplitAmount_,  collateralTokenSplitAmount_) = calculateSplitTokenAmounts( principalTokenValueToWithdraw );
+        ( principalTokenSplitAmount_,  collateralTokenSplitAmount_) 
+          = calculateSplitTokenAmounts( principalTokenValueToWithdraw );
        
         console.log("calculated split amt ");
 
@@ -526,29 +526,32 @@ Initializable
     }
 
 
-    
+    /*
+        careful with this because someone donating tokens into the contract could make for weird math ?
+    */
     function calculateSplitTokenAmounts( uint256 _principalTokenAmountValue ) 
       public view returns (uint256 principalAmount_, uint256 collateralAmount_ ) {
 
         // need to see how many collateral tokens are in the contract atm 
 
         // need to know how many principal tokens are in the contract atm 
+        uint256 principalTokenBalance = principalToken.balanceOf(address(this));
+        uint256 collateralTokenBalance = collateralToken.balanceOf(address(this));
 
-
-    //  need to know how the value of the collateral tokens  IN TERMS OF principal tokens 
-
+        // need to know how the value of the collateral tokens  IN TERMS OF principal tokens 
+        
  
 
         //these should both add up to equal the input:  _principalTokenAmountValue
-      uint256 principalTokenAmountValueToGiveInPrincipalTokens;
-      uint256 principalTokenAmountValueToGiveInCollateralTokens;  
+         uint256 principalTokenAmountValueToGiveInPrincipalTokens;
+         uint256 principalTokenAmountValueToGiveInCollateralTokens;  
 
 
-      uint256 collateralTokensToGive ;
+         uint256 collateralTokensToGive ;
 
 
-      return (principalTokenAmountValueToGiveInPrincipalTokens , collateralTokensToGive);
-    } 
+         return (principalTokenAmountValueToGiveInPrincipalTokens , collateralTokensToGive);
+       } 
 
 
 

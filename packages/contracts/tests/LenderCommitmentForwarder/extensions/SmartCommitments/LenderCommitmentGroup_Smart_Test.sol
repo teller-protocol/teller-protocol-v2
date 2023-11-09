@@ -34,13 +34,14 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
     LenderCommitmentGroup_Smart_Override lenderCommitmentGroupSmart;
 
     SmartCommitmentForwarder _smartCommitmentForwarder ;   
-    address _uniswapV3Pool = address(0);
+    UniswapV3PoolMock _uniswapV3Pool ;
 
     function setUp() public {
         borrower = new User();
         lender = new User();
 
         _smartCommitmentForwarder = new SmartCommitmentForwarder();
+        _uniswapV3Pool = new UniswapV3PoolMock();
 
         principalToken = new TestERC20Token("wrappedETH", "WETH", 1e24, 18);
 
@@ -429,3 +430,42 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
 
 contract User {}
 contract SmartCommitmentForwarder {}
+
+contract UniswapV3PoolMock{
+
+  struct Slot0 {
+        // the current price
+        uint160 sqrtPriceX96;
+        // the current tick
+        int24 tick;
+        // the most-recently updated index of the observations array
+        uint16 observationIndex;
+        // the current maximum number of observations that are being stored
+        uint16 observationCardinality;
+        // the next maximum number of observations to store, triggered in observations.write
+        uint16 observationCardinalityNext;
+        // the current protocol fee as a percentage of the swap fee taken on withdrawal
+        // represented as an integer denominator (1/x)%
+        uint8 feeProtocol;
+        // whether the pool is locked
+        bool unlocked;
+    }
+
+
+    function slot0() public returns (Slot0 memory slot0) {
+
+        return Slot0({
+
+            sqrtPriceX96: 1e18 ,
+            tick: 0,
+            observationIndex: 0,
+            observationCardinality:0, 
+            observationCardinalityNext: 0,
+            feeProtocol: 0,
+            unlocked: true          
+
+        });
+
+    }
+
+} 

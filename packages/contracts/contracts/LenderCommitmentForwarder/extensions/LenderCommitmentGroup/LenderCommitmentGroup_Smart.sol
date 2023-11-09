@@ -612,7 +612,7 @@ consider passing in both token addresses and then get pool address from that
 
 
             //use the uniswap pool data !! the slot data 
-
+        uint256 uniswapTokenPriceX96 = _getUniswapV3TokenPairPrice(  );
 
         return 0 ;
 
@@ -628,12 +628,16 @@ consider passing in both token addresses and then get pool address from that
     }
     */
     
-    function _getUniswapV3TokenPrice(address poolAddress) 
+    function _getUniswapV3TokenPairPrice( ) 
     internal view returns (uint256) {
-      //  IUniswapV3Pool pool = IUniswapV3Pool(poolAddress);
+     
         
         (uint160 sqrtPriceX96,,,,,,) = IUniswapV3Pool(UNISWAP_V3_POOL).slot0();
         
+
+        //need to somehow flip this depending on token0 or token1 being principal token vs collateral token 
+
+
         // sqrtPrice is in X96 format so we scale it down to get the price
         // Also note that this price is a relative price between the two tokens in the pool
         // It's not a USD price

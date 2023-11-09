@@ -329,6 +329,51 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
     function test_acceptFundsForAcceptBid() public {
 
 
+         lenderCommitmentGroupSmart.set_mock_getMaxPrincipalPerCollateralAmount( 100 * 1e18 );
+
+
+        principalToken.transfer(address(lenderCommitmentGroupSmart),1e18);
+        collateralToken.transfer(address(lenderCommitmentGroupSmart),1e18);
+ 
+
+
+        initialize_group_contract();
+
+        lenderCommitmentGroupSmart.set_totalPrincipalTokensCommitted(1000000);
+        
+
+
+        uint256 principalAmount = 50;
+        uint256 collateralAmount = 50 * 100 ;
+
+        address collateralTokenAddress = address(lenderCommitmentGroupSmart.collateralToken()); 
+        uint256 collateralTokenId = 0;
+
+        uint32 loanDuration = 5000000;
+        uint16 interestRate = 100;
+
+        vm.prank(address(_smartCommitmentForwarder));
+        lenderCommitmentGroupSmart.acceptFundsForAcceptBid( 
+            address(borrower),
+            principalAmount,
+            collateralAmount,
+            collateralTokenAddress,
+            collateralTokenId,
+            loanDuration,
+            interestRate            
+        );
+
+
+          
+    
+    }
+
+
+
+    function test_acceptFundsForAcceptBid_insufficientCollateral() public {
+
+        lenderCommitmentGroupSmart.set_mock_getMaxPrincipalPerCollateralAmount( 100 * 1e18 );
+
         principalToken.transfer(address(lenderCommitmentGroupSmart),1e18);
         collateralToken.transfer(address(lenderCommitmentGroupSmart),1e18);
  
@@ -340,7 +385,7 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
         
 
 
-        uint256 principalAmount = 50;
+        uint256 principalAmount = 100;
         uint256 collateralAmount = 0;
 
         address collateralTokenAddress = address(lenderCommitmentGroupSmart.collateralToken()); 
@@ -349,6 +394,7 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
         uint32 loanDuration = 5000000;
         uint16 interestRate = 100;
 
+        vm.expectRevert("Insufficient Borrower Collateral");
         vm.prank(address(_smartCommitmentForwarder));
         lenderCommitmentGroupSmart.acceptFundsForAcceptBid( 
             address(borrower),

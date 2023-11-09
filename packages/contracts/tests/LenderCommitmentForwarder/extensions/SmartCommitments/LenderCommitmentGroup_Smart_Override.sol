@@ -12,6 +12,8 @@ contract LenderCommitmentGroup_Smart_Override is LenderCommitmentGroup_Smart {
    // bool public submitBidWithCollateralWasCalled;
   //  bool public acceptBidWasCalled;
 
+    uint256 mockMaxPrincipalPerCollateralAmount;
+
     constructor(
         address _smartCommitmentForwarder, 
         address _uniswapV3Pool
@@ -40,8 +42,21 @@ contract LenderCommitmentGroup_Smart_Override is LenderCommitmentGroup_Smart {
         principalTokensCommittedByLender[lender] = _mockAmt;
     }
 
-     function mock_mintShares(address _sharesRecipient, uint256 _mockAmt) public {
+    function mock_mintShares(address _sharesRecipient, uint256 _mockAmt) public {
          poolSharesToken.mint( _sharesRecipient,_mockAmt);
+    }
+    
+    function set_mock_getMaxPrincipalPerCollateralAmount( uint256 amt ) public {
+
+        mockMaxPrincipalPerCollateralAmount = amt;
+
+    }
+
+      
+    function _getMaxPrincipalPerCollateralAmount(  ) internal override view  returns (uint256) {
+
+       return mockMaxPrincipalPerCollateralAmount ;
+
     }
 }
  

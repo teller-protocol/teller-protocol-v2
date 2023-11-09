@@ -396,9 +396,7 @@ multiplies by their pct of shares (S%)
             _loanDuration <= maxLoanDuration,
             "Invalid loan max duration"
         );
-        
-            console.log("get principal amount available");
-            console.logUint(getPrincipalAmountAvailableToBorrow());
+           console.logUint(getPrincipalAmountAvailableToBorrow());
 
         require(
               getPrincipalAmountAvailableToBorrow() >=  _principalAmount,           
@@ -602,6 +600,17 @@ consider passing in both token addresses and then get pool address from that
 
     function getMaxPrincipalPerCollateralAmount(  ) public view returns (uint256) {
 
+        return _getMaxPrincipalPerCollateralAmount(   );
+
+    }  
+
+
+        /*
+            A ratio expanded by 1e18 
+        */
+    function _getMaxPrincipalPerCollateralAmount(  ) internal virtual view returns (uint256) {
+
+        return 0 ;
 
     }   
 
@@ -681,7 +690,7 @@ consider passing in both token addresses and then get pool address from that
     function getRequiredCollateral(uint256 _principalAmount) public view returns (uint256){
 
 
-      uint256 maxPrincipalPerCollateralAmount = getMaxPrincipalPerCollateralAmount( );
+       uint256 maxPrincipalPerCollateralAmount = _getMaxPrincipalPerCollateralAmount( );
 
        return _getRequiredCollateral(
          _principalAmount,
@@ -746,21 +755,10 @@ consider passing in both token addresses and then get pool address from that
     ) internal view virtual returns (uint256) {
         
 
-        uint8 collateralDecimals;
-        uint8 principalDecimals = IERC20MetadataUpgradeable(
-            _principalTokenAddress
-        ).decimals();
+        
 
-       // if (_collateralTokenType == CommitmentCollateralType.ERC20) {
-            collateralDecimals = IERC20MetadataUpgradeable(
-                _collateralTokenAddress
-            ).decimals();
-       // }
-
-
-        if( _maxPrincipalPerCollateralAmount == 0){
-            return 0 ;
-        }
+        require( _maxPrincipalPerCollateralAmount > 0, "Invalid max principal per collateral amount" );
+      
         /*
          * The principalAmount is expanded by (collateralDecimals+principalDecimals) to increase precision
          * and then it is divided by _maxPrincipalPerCollateralAmount which should already been expanded by principalDecimals
@@ -768,7 +766,7 @@ consider passing in both token addresses and then get pool address from that
         return
             MathUpgradeable.mulDiv(
                 _principalAmount,
-                (10**(collateralDecimals + principalDecimals)),
+                (10**(18)),
                 _maxPrincipalPerCollateralAmount,
                 MathUpgradeable.Rounding.Up
             );

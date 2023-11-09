@@ -7,6 +7,16 @@ import "../../../tokens/TestERC20Token.sol";
 
 //contract LenderCommitmentGroup_Smart_Mock is ExtensionsContextUpgradeable {}
 
+
+
+/*
+TODO 
+
+Write tests for a borrower . borrowing money from the group 
+
+*/
+
+
 contract LenderCommitmentGroup_Smart_Test is Testable {
     constructor() {}
 
@@ -23,14 +33,14 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
 
     LenderCommitmentGroup_Smart_Override lenderCommitmentGroupSmart;
 
-    address _smartCommitmentForwarder = address(0);   
+    SmartCommitmentForwarder _smartCommitmentForwarder ;   
     address _uniswapV3Pool = address(0);
 
     function setUp() public {
         borrower = new User();
         lender = new User();
 
-
+        _smartCommitmentForwarder = new SmartCommitmentForwarder();
 
         principalToken = new TestERC20Token("wrappedETH", "WETH", 1e24, 18);
 
@@ -41,8 +51,8 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
 
       
         lenderCommitmentGroupSmart = new LenderCommitmentGroup_Smart_Override(
-            _smartCommitmentForwarder,
-            _uniswapV3Pool
+            address(_smartCommitmentForwarder),
+            address(_uniswapV3Pool)
         );
 
     
@@ -314,6 +324,47 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
 
     
     }
+
+
+    function test_acceptFundsForAcceptBid() public {
+
+
+        principalToken.transfer(address(lenderCommitmentGroupSmart),1e18);
+        collateralToken.transfer(address(lenderCommitmentGroupSmart),1e18);
+ 
+ 
+
+        initialize_group_contract();
+
+        lenderCommitmentGroupSmart.set_totalPrincipalTokensCommitted(1000000);
+        
+
+
+        uint256 principalAmount = 50;
+        uint256 collateralAmount = 0;
+
+        address collateralTokenAddress = address(lenderCommitmentGroupSmart.collateralToken()); 
+        uint256 collateralTokenId = 0;
+
+        uint32 loanDuration = 5000000;
+        uint16 interestRate = 100;
+
+        vm.prank(address(_smartCommitmentForwarder));
+        lenderCommitmentGroupSmart.acceptFundsForAcceptBid( 
+            address(borrower),
+            principalAmount,
+            collateralAmount,
+            collateralTokenAddress,
+            collateralTokenId,
+            loanDuration,
+            interestRate            
+        );
+
+
+          
+    
+    }
 }
 
 contract User {}
+contract SmartCommitmentForwarder {}

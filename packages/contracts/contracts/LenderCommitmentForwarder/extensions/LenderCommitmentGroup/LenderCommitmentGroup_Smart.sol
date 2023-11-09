@@ -370,7 +370,7 @@ multiplies by their pct of shares (S%)
     uint256 _principalAmount, 
 
     uint256 _collateralAmount,
-    address _collateralTokenAddress,
+    address _collateralTokenAddress, 
     uint256 _collateralTokenId,  //not used 
     uint32 _loanDuration,
 
@@ -397,6 +397,9 @@ multiplies by their pct of shares (S%)
             "Invalid loan max duration"
         );
         
+            console.log("get principal amount available");
+            console.logUint(getPrincipalAmountAvailableToBorrow());
+
         require(
               getPrincipalAmountAvailableToBorrow() >=  _principalAmount,           
             "Invalid loan max principal"
@@ -440,48 +443,14 @@ multiplies by their pct of shares (S%)
         
         */
 
-
- 
-        uint256 requiredCollateral =  getRequiredCollateral(
+            console.log("get required collateral");
+              
+        uint256 requiredCollateral = getRequiredCollateral(
             _principalAmount 
         );
 
-        require (_collateralAmount < requiredCollateral , "Insufficient Borrower Collateral" ) ;
-
-      /*  CommitmentCollateralType commitmentCollateralTokenType = collateralTokenType;
-
-        //ERC721 assets must have a quantity of 1
-        if (
-            commitmentCollateralTokenType == 
-            CommitmentCollateralType.ERC721 ||
-            commitmentCollateralTokenType ==
-            CommitmentCollateralType.ERC721_ANY_ID ||
-            commitmentCollateralTokenType ==
-            CommitmentCollateralType.ERC721_MERKLE_PROOF
-        ) {
-            require(
-                _collateralAmount == 1,
-                "invalid commitment collateral amount for ERC721"
-            );
-        }
-
-        //ERC721 and ERC1155 types strictly enforce a specific token Id.  ERC721_ANY and ERC1155_ANY do not.
-        if (
-            commitmentCollateralTokenType == CommitmentCollateralType.ERC721 ||
-            commitmentCollateralTokenType == CommitmentCollateralType.ERC1155
-        ) { 
-         
-            require(
-                _collateralTokenId == collateralTokenId,
-                "invalid commitment collateral tokenId"
-            );
-        }
-
-        */
-
-
-
-
+        require (_collateralAmount >= requiredCollateral , "Insufficient Borrower Collateral" ) ;
+ 
        
         principalToken.transfer( SMART_COMMITMENT_FORWARDER, _principalAmount );
 
@@ -751,14 +720,12 @@ consider passing in both token addresses and then get pool address from that
     }
    
     function getPrincipalAmountAvailableToBorrow( ) public view returns (uint256){
-
-        uint256 totalAmountAvailable;  
+   
 
         uint256 amountAvailable = totalPrincipalTokensCommitted
-         - getTotalPrincipalTokensOutstandingInActiveLoans() 
-        ;
+         - getTotalPrincipalTokensOutstandingInActiveLoans()  ;
 
-        return totalAmountAvailable.percent( liquidityThresholdPercent );
+        return amountAvailable.percent( liquidityThresholdPercent );
     
     }
 
@@ -790,6 +757,10 @@ consider passing in both token addresses and then get pool address from that
             ).decimals();
        // }
 
+
+        if( _maxPrincipalPerCollateralAmount == 0){
+            return 0 ;
+        }
         /*
          * The principalAmount is expanded by (collateralDecimals+principalDecimals) to increase precision
          * and then it is divided by _maxPrincipalPerCollateralAmount which should already been expanded by principalDecimals

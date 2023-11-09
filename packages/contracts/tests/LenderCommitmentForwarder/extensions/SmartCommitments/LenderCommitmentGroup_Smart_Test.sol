@@ -454,9 +454,11 @@ contract UniswapV3PoolMock{
 
     function slot0() public returns (Slot0 memory slot0) {
 
+        uint160 sqrtPriceX96 = 2 ^ 96;
+
         return Slot0({
 
-            sqrtPriceX96: 1e18 ,
+            sqrtPriceX96: sqrtPriceX96 ,
             tick: 0,
             observationIndex: 0,
             observationCardinality:0, 

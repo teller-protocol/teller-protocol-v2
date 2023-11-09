@@ -628,7 +628,7 @@ consider passing in both token addresses and then get pool address from that
     }
     */
     
-    //this is priceToken1PerToken0
+    //this is priceToken1PerToken0 expanded by 1e18 
     function _getUniswapV3TokenPairPrice( ) 
     internal view returns (uint256) {
         
@@ -645,9 +645,11 @@ consider passing in both token addresses and then get pool address from that
         return price;
     }
 
-    function getCollateralTokensPricePerPrincipalTokens(uint256 collateralTokenAmount) returns (uint256 principalTokenValue_) {
+    function getCollateralTokensPricePerPrincipalTokens(uint256 collateralTokenAmount)
+    public view 
+     returns (uint256 principalTokenValue_) {
 
-        bool principalTokenIsToken0 = true;
+        bool principalTokenIsToken0 = true; //fix me 
 
         uint256 pairPrice = _getUniswapV3TokenPairPrice();
 
@@ -661,6 +663,8 @@ consider passing in both token addresses and then get pool address from that
 
     }
 
+
+//do i have to use the actual token decimals or can i just use 18 ? 
 function token0ToToken1(uint256 amountToken0, uint256 priceToken1PerToken0) internal pure returns (uint256) {
     // Convert amountToken0 to the same decimals as Token1
     uint256 amountToken0WithToken1Decimals = amountToken0 * 10**18;

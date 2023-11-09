@@ -413,6 +413,7 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
     }
 
 
+      /*
        function test_getMaxPrincipalPerCollateralAmount() public {
 
           uint256 maxPrincipalPerCollateralAmount =  lenderCommitmentGroupSmart._super_getMaxPrincipalPerCollateralAmount( );
@@ -423,6 +424,24 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
      
      
        }
+    */
+
+    function test_getCollateralTokensPricePerPrincipalTokens() public {
+
+       //  _uniswapV3Pool.set_mockSqrtPriceX96()
+
+          uint256 amount =  lenderCommitmentGroupSmart.getCollateralTokensPricePerPrincipalTokens( 1000 );
+
+          uint256 expectedAmount = 1000;
+        
+          assertEq( amount, expectedAmount , "Unexpected getCollateralTokensPricePerPrincipalTokens" );
+     
+     
+       }
+
+
+
+       
 
 
 
@@ -432,6 +451,9 @@ contract User {}
 contract SmartCommitmentForwarder {}
 
 contract UniswapV3PoolMock{
+
+ //this represents an equal price ratio  
+  uint160 mockSqrtPriceX96 = 1 << 96; 
 
   struct Slot0 {
         // the current price
@@ -451,14 +473,20 @@ contract UniswapV3PoolMock{
         bool unlocked;
     }
 
+    function set_mockSqrtPriceX96(uint160 _price) public  {
+        mockSqrtPriceX96 = _price;
+    }
+
 
     function slot0() public returns (Slot0 memory slot0) {
 
-        uint160 sqrtPriceX96 = 2 ^ 96;
+
+       
+       
 
         return Slot0({
 
-            sqrtPriceX96: sqrtPriceX96 ,
+            sqrtPriceX96: mockSqrtPriceX96 ,
             tick: 0,
             observationIndex: 0,
             observationCardinality:0, 

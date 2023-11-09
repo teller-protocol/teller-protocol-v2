@@ -610,6 +610,10 @@ consider passing in both token addresses and then get pool address from that
         */
     function _getMaxPrincipalPerCollateralAmount(  ) internal virtual view returns (uint256) {
 
+
+            //use the uniswap pool data !! the slot data 
+
+
         return 0 ;
 
     }   

@@ -58,5 +58,11 @@ contract LenderCommitmentGroup_Smart_Override is LenderCommitmentGroup_Smart {
        return mockMaxPrincipalPerCollateralAmount ;
 
     }
+
+    function _super_getMaxPrincipalPerCollateralAmount(  ) public view  returns (uint256) {
+
+       return super._getMaxPrincipalPerCollateralAmount() ;
+
+    }
 }
  

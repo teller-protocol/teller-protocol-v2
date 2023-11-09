@@ -410,6 +410,21 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
           
     
     }
+
+
+       function test_getMaxPrincipalPerCollateralAmount() public {
+
+          uint256 maxPrincipalPerCollateralAmount =  lenderCommitmentGroupSmart._super_getMaxPrincipalPerCollateralAmount( );
+
+          uint256 expectedMaxPrincipalPerCollateralAmount = 999;
+        
+          assertEq( maxPrincipalPerCollateralAmount, expectedMaxPrincipalPerCollateralAmount , "Unexpected maxPrincipalPerCollateralAmount" );
+     
+     
+       }
+
+
+
 }
 
 contract User {}

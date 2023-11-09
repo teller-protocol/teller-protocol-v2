@@ -628,16 +628,15 @@ consider passing in both token addresses and then get pool address from that
     }
     */
     
+    //this is priceToken1PerToken0
     function _getUniswapV3TokenPairPrice( ) 
     internal view returns (uint256) {
-     
+        
+       // represents the square root of the price of token1 in terms of token0
         
         (uint160 sqrtPriceX96,,,,,,) = IUniswapV3Pool(UNISWAP_V3_POOL).slot0();
         
-
-        //need to somehow flip this depending on token0 or token1 being principal token vs collateral token 
-
-
+        
         // sqrtPrice is in X96 format so we scale it down to get the price
         // Also note that this price is a relative price between the two tokens in the pool
         // It's not a USD price
@@ -645,6 +644,36 @@ consider passing in both token addresses and then get pool address from that
         
         return price;
     }
+
+    function getCollateralTokensPricePerPrincipalTokens(uint256 collateralTokenAmount) returns (uint256 principalTokenValue_) {
+
+        bool principalTokenIsToken0 = true;
+
+        uint256 pairPrice = _getUniswapV3TokenPairPrice();
+
+        if( principalTokenIsToken0 ){
+            principalTokenValue_ =  token1ToToken0( collateralTokenAmount, pairPrice  );
+        }else{
+            principalTokenValue_ =  token0ToToken1( collateralTokenAmount, pairPrice  );
+        }
+
+
+
+    }
+
+function token0ToToken1(uint256 amountToken0, uint256 priceToken1PerToken0) internal pure returns (uint256) {
+    // Convert amountToken0 to the same decimals as Token1
+    uint256 amountToken0WithToken1Decimals = amountToken0 * 10**18;
+    // Now divide by the price to get the amount of token1
+    return amountToken0WithToken1Decimals / priceToken1PerToken0;
+}
+
+function token1ToToken0(uint256 amountToken1, uint256 priceToken1PerToken0) internal pure returns (uint256) {
+    // Multiply the amount of token1 by the price to get the amount in token0's units
+    uint256 amountToken1InToken0 = amountToken1 * priceToken1PerToken0;
+    // Now adjust for the decimal difference
+    return amountToken1InToken0 / 10**18;
+}
 
 
     function repayLoanCallback(

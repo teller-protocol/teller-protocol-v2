@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
 
-
 import "../TellerV2MarketForwarder_G3.sol";
 
 import "../interfaces/ILenderCommitmentForwarder.sol";
 import "./LenderCommitmentForwarder_G1.sol";
 
-import {CommitmentCollateralType, ISmartCommitment } from "../interfaces/ISmartCommitment.sol";
+import { CommitmentCollateralType, ISmartCommitment } from "../interfaces/ISmartCommitment.sol";
+
 /*
 
 Borrower approves this contract as being able to create loans on THEIR Behalf.
@@ -19,12 +19,7 @@ and _acceptBid
 
 */
 
-
-
-contract SmartCommitmentForwarder is    
-    TellerV2MarketForwarder_G3
-{ 
-
+contract SmartCommitmentForwarder is TellerV2MarketForwarder_G3 {
     event ExercisedSmartCommitment(
         address indexed smartCommitmentAddress,
         address borrower,
@@ -34,21 +29,17 @@ contract SmartCommitmentForwarder is
 
     error InsufficientBorrowerCollateral(uint256 required, uint256 actual);
 
-
     constructor(address _protocolAddress, address _marketRegistry)
         TellerV2MarketForwarder_G3(_protocolAddress, _marketRegistry)
-    {
- 
-    }
+    {}
 
-
-        //register a smart contract (lender group) ? necessary ? 
-        //maybe that contract just approves tokens to this contract ? 
-   /*function registerSmartCommitment(  ) external {
+    //register a smart contract (lender group) ? necessary ?
+    //maybe that contract just approves tokens to this contract ?
+    /*function registerSmartCommitment(  ) external {
 
    }*/
 
-  /**
+    /**
      * @notice Accept the commitment to submitBid and acceptBid using the funds
      * @dev LoanDuration must be longer than the market payment cycle
      * @param _smartCommitmentAddress The address of the smart commitment contract.
@@ -72,13 +63,12 @@ contract SmartCommitmentForwarder is
         uint32 _loanDuration
     ) public returns (uint256 bidId) {
         require(
-            ISmartCommitment( _smartCommitmentAddress ).getCollateralTokenType() <=
+            ISmartCommitment(_smartCommitmentAddress)
+                .getCollateralTokenType() <=
                 CommitmentCollateralType.ERC1155_ANY_ID,
             "Invalid commitment collateral type"
         );
 
-
-    
         return
             _acceptCommitment(
                 _smartCommitmentAddress,
@@ -86,9 +76,9 @@ contract SmartCommitmentForwarder is
                 _collateralAmount,
                 _collateralTokenId,
                 _collateralTokenAddress,
-                _recipient,             
+                _recipient,
                 _interestRate,
-                _loanDuration 
+                _loanDuration
             );
     }
 
@@ -100,39 +90,33 @@ contract SmartCommitmentForwarder is
         address _collateralTokenAddress,
         address _recipient,
         uint16 _interestRate,
-        uint32 _loanDuration 
+        uint32 _loanDuration
     ) internal returns (uint256 bidId) {
-        ISmartCommitment _commitment = ISmartCommitment(_smartCommitmentAddress);
-        
-        
-        _commitment.acceptFundsForAcceptBid( 
+        ISmartCommitment _commitment = ISmartCommitment(
+            _smartCommitmentAddress
+        );
+
+        _commitment.acceptFundsForAcceptBid(
             _msgSender(), //borrower
-
-
             _principalAmount,
-
             _collateralAmount,
             _collateralTokenAddress,
             _collateralTokenId,
             _loanDuration,
             _interestRate
-            
         );
- 
 
         CreateLoanArgs memory createLoanArgs;
-    
-       
+
         createLoanArgs.marketId = _commitment.getMarketId();
         createLoanArgs.lendingToken = _commitment.getPrincipalTokenAddress();
         createLoanArgs.principal = _principalAmount;
         createLoanArgs.duration = _loanDuration;
         createLoanArgs.interestRate = _interestRate;
-        createLoanArgs.recipient = _recipient;    
-       
+        createLoanArgs.recipient = _recipient;
 
-        CommitmentCollateralType commitmentCollateralTokenType = _commitment.getCollateralTokenType();  
-   
+        CommitmentCollateralType commitmentCollateralTokenType = _commitment
+            .getCollateralTokenType();
 
         if (commitmentCollateralTokenType != CommitmentCollateralType.NONE) {
             createLoanArgs.collateral = new Collateral[](1);
@@ -149,10 +133,10 @@ contract SmartCommitmentForwarder is
         bidId = _submitBidWithCollateral(createLoanArgs, _msgSender());
 
         _acceptBidWithRepaymentListener(
-            bidId, 
-            _smartCommitmentAddress, //the lender is the smart commitment contract 
+            bidId,
+            _smartCommitmentAddress, //the lender is the smart commitment contract
             _smartCommitmentAddress
-            );
+        );
 
         emit ExercisedSmartCommitment(
             _smartCommitmentAddress,
@@ -162,8 +146,7 @@ contract SmartCommitmentForwarder is
         );
     }
 
-
-  /**
+    /**
      * @notice Return the collateral type based on the commitmentcollateral type.  Collateral type is used in the base lending protocol.
      * @param _type The type of collateral to be used for the loan.
      */
@@ -192,5 +175,4 @@ contract SmartCommitmentForwarder is
 
         revert("Unknown Collateral Type");
     }
-
 }

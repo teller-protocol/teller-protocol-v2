@@ -166,9 +166,11 @@ interface ITellerV2 {
 
     function collateralManager() external view returns (address);
 
- 
+    function setRepaymentListenerForBid(uint256 _bidId, address _listener)
+        external;
 
-    function setRepaymentListenerForBid(uint256 _bidId, address _listener) external; 
-
-    function getRepaymentListenerForBid(uint256 _bidId) external view returns (address);
+    function getRepaymentListenerForBid(uint256 _bidId)
+        external
+        view
+        returns (address);
 }

@@ -15,7 +15,7 @@ import "../../../../contracts/LenderCommitmentForwarder/extensions/ExtensionsCon
 import { WethMock } from "../../../../contracts/mock/WethMock.sol";
 import { IMarketRegistry_V2 } from "../../../../contracts/interfaces/IMarketRegistry_V2.sol";
 
-import { TellerV2  } from "../../../../contracts/TellerV2.sol";
+import { TellerV2 } from "../../../../contracts/TellerV2.sol";
 import { LenderCommitmentForwarderMock } from "../../../../contracts/mock/LenderCommitmentForwarderMock.sol";
 import { MarketRegistryMock } from "../../../../contracts/mock/MarketRegistryMock.sol";
 
@@ -151,14 +151,9 @@ contract FlashRolloverLoan_Integration_Test is Testable {
             "",
             address(borrower)
         );
- 
-       
-
 
         vm.prank(address(lender));
         wethMock.approve(address(tellerV2), 5e18);
-
- 
 
         vm.prank(address(lender));
         (
@@ -166,9 +161,6 @@ contract FlashRolloverLoan_Integration_Test is Testable {
             uint256 amountToMarketplace,
             uint256 amountToBorrower
         ) = tellerV2.lenderAcceptBid(bidId);
-
-
-
 
         vm.warp(365 days + 1);
 
@@ -201,18 +193,17 @@ contract FlashRolloverLoan_Integration_Test is Testable {
 
         //should get 0.45  weth   from accepting this commitment  during the rollover process
 
-        FlashRolloverLoan_G1.AcceptCommitmentArgs
-            memory _acceptCommitmentArgs = FlashRolloverLoan_G1
-                .AcceptCommitmentArgs({
-                    commitmentId: commitmentId,
-                    principalAmount: commitmentPrincipalAmount,
-                    collateralAmount: 0,
-                    collateralTokenId: 0,
-                    collateralTokenAddress: address(0),
-                    interestRate: interestRate,
-                    loanDuration: duration
-                    // merkleProof: new bytes32[](0)
-                });
+        FlashRolloverLoan_G1.AcceptCommitmentArgs memory _acceptCommitmentArgs = FlashRolloverLoan_G1
+            .AcceptCommitmentArgs({
+                commitmentId: commitmentId,
+                principalAmount: commitmentPrincipalAmount,
+                collateralAmount: 0,
+                collateralTokenId: 0,
+                collateralTokenAddress: address(0),
+                interestRate: interestRate,
+                loanDuration: duration
+                // merkleProof: new bytes32[](0)
+            });
 
         ///approve forwarders
 
@@ -249,8 +240,6 @@ contract FlashRolloverLoan_Integration_Test is Testable {
 
         vm.expectEmit(true, false, false, false);
         emit RolloverLoanComplete(address(borrower), 0, 0, 0);
-
-        
 
         vm.prank(address(borrower));
         flashRolloverLoan.rolloverLoanWithFlash(

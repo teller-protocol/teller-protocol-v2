@@ -21,9 +21,11 @@ contract MarketRegistryMock is IMarketRegistry, IMarketRegistry_V2 {
 
     // function initialize(TellerAS _tellerAS) external {}
 
-    function getCurrentTermsForMarket(
-        uint256 _marketId
-    ) public view returns (bytes32) {
+    function getCurrentTermsForMarket(uint256 _marketId)
+        public
+        view
+        returns (bytes32)
+    {
         return globalTermsForMarket;
     }
 
@@ -33,72 +35,90 @@ contract MarketRegistryMock is IMarketRegistry, IMarketRegistry_V2 {
 
     function isMarketOpen(uint256 _marketId) public view returns (bool) {
         return !globalMarketsClosed;
-        
     }
 
     function isMarketClosed(uint256 _marketId) public view returns (bool) {
         return globalMarketsClosed;
     }
 
-    function isVerifiedBorrower(
-        uint256 _marketId,
-        address _borrower
-    ) public view returns (bool isVerified_, bytes32) {
+    function isVerifiedBorrower(uint256 _marketId, address _borrower)
+        public
+        view
+        returns (bool isVerified_, bytes32)
+    {
         isVerified_ = globalBorrowerIsVerified;
     }
 
-    function isVerifiedLender(
-        uint256 _marketId,
-        address _lenderAddress
-    ) public view returns (bool isVerified_, bytes32) {
+    function isVerifiedLender(uint256 _marketId, address _lenderAddress)
+        public
+        view
+        returns (bool isVerified_, bytes32)
+    {
         isVerified_ = globalLenderIsVerified;
     }
 
-    function getMarketOwner(
-        uint256 _marketId
-    ) public view override returns (address) {
+    function getMarketOwner(uint256 _marketId)
+        public
+        view
+        override
+        returns (address)
+    {
         return address(globalMarketOwner);
     }
 
-    function getMarketFeeRecipient(
-        uint256 _marketId
-    ) public view returns (address) {
+    function getMarketFeeRecipient(uint256 _marketId)
+        public
+        view
+        returns (address)
+    {
         return address(globalMarketFeeRecipient);
     }
 
-    function getMarketURI(
-        uint256 _marketId
-    ) public view returns (string memory) {
+    function getMarketURI(uint256 _marketId)
+        public
+        view
+        returns (string memory)
+    {
         return "url://";
     }
 
-    function getPaymentType(
-        uint256 _marketId
-    ) public view returns (PaymentType) {
+    function getPaymentType(uint256 _marketId)
+        public
+        view
+        returns (PaymentType)
+    {
         return PaymentType.EMI;
     }
 
-    function getPaymentCycleDuration(
-        uint256 _marketId
-    ) public view returns (uint32) {
+    function getPaymentCycleDuration(uint256 _marketId)
+        public
+        view
+        returns (uint32)
+    {
         return 1000;
     }
 
-    function getPaymentCycleType(
-        uint256 _marketId
-    ) external view returns (PaymentCycleType) {
+    function getPaymentCycleType(uint256 _marketId)
+        external
+        view
+        returns (PaymentCycleType)
+    {
         return PaymentCycleType.Seconds;
     }
 
-    function getPaymentDefaultDuration(
-        uint256 _marketId
-    ) public view returns (uint32) {
+    function getPaymentDefaultDuration(uint256 _marketId)
+        public
+        view
+        returns (uint32)
+    {
         return 1000;
     }
 
-    function getBidExpirationTime(
-        uint256 _marketId
-    ) public view returns (uint32) {
+    function getBidExpirationTime(uint256 _marketId)
+        public
+        view
+        returns (uint32)
+    {
         return 1000;
     }
 
@@ -115,15 +135,15 @@ contract MarketRegistryMock is IMarketRegistry, IMarketRegistry_V2 {
         globalMarketFeeRecipient = _feeRecipient;
     }
 
-    function getMarketFeeTerms(
-        bytes32 _marketTermsId
-    ) public view returns (address, uint16) {
+    function getMarketFeeTerms(bytes32 _marketTermsId)
+        public
+        view
+        returns (address, uint16)
+    {
         return (address(this), 2000);
     }
 
-    function getMarketTermsForLending(
-        bytes32 _marketTermsId
-    )
+    function getMarketTermsForLending(bytes32 _marketTermsId)
         public
         view
         returns (uint32, PaymentCycleType, PaymentType, uint32, uint32)
@@ -131,33 +151,43 @@ contract MarketRegistryMock is IMarketRegistry, IMarketRegistry_V2 {
         return (2000, PaymentCycleType.Seconds, PaymentType.EMI, 4000, 5000);
     }
 
-    function getBidExpirationTimeForTerms(
-        bytes32 _marketTermsId
-    ) external view returns (uint32) {
+    function getBidExpirationTimeForTerms(bytes32 _marketTermsId)
+        external
+        view
+        returns (uint32)
+    {
         return 4000;
     }
 
-    function getPaymentDefaultDurationForTerms(
-        bytes32 _marketTermsId
-    ) external view returns (uint32) {
+    function getPaymentDefaultDurationForTerms(bytes32 _marketTermsId)
+        external
+        view
+        returns (uint32)
+    {
         return 6000;
     }
 
-    function getPaymentTypeForTerms(
-        bytes32 _marketTermsId
-    ) external view returns (PaymentType) {
+    function getPaymentTypeForTerms(bytes32 _marketTermsId)
+        external
+        view
+        returns (PaymentType)
+    {
         return PaymentType.EMI;
     }
 
-    function getPaymentCycleTypeForTerms(
-        bytes32 _marketTermsId
-    ) external view returns (PaymentCycleType) {
+    function getPaymentCycleTypeForTerms(bytes32 _marketTermsId)
+        external
+        view
+        returns (PaymentCycleType)
+    {
         return PaymentCycleType.Seconds;
     }
 
-    function getPaymentCycleDurationForTerms(
-        bytes32 _marketTermsId
-    ) external view returns (uint32) {
+    function getPaymentCycleDurationForTerms(bytes32 _marketTermsId)
+        external
+        view
+        returns (uint32)
+    {
         return 3000;
     }
 

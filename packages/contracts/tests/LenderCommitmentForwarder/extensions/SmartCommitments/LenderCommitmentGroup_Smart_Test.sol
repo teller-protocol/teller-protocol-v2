@@ -1,21 +1,22 @@
 import { Testable } from "../../../Testable.sol";
 
- import { LenderCommitmentGroup_Smart_Override } from "./LenderCommitmentGroup_Smart_Override.sol";
-
+import { LenderCommitmentGroup_Smart_Override } from "./LenderCommitmentGroup_Smart_Override.sol";
 
 import "../../../tokens/TestERC20Token.sol";
 
 //contract LenderCommitmentGroup_Smart_Mock is ExtensionsContextUpgradeable {}
-
-
 
 /*
 TODO 
 
 Write tests for a borrower . borrowing money from the group 
 
-*/
 
+
+- write tests for the LTV ratio and make sure that is working as expected (mock) 
+- write tests for the global liquidityThresholdPercent and built functionality for a user-specific liquidityThresholdPercent based on signalling shares.
+
+*/
 
 contract LenderCommitmentGroup_Smart_Test is Testable {
     constructor() {}
@@ -25,16 +26,14 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
     User private borrower;
     User private lender;
 
-
     TestERC20Token principalToken;
 
     TestERC20Token collateralToken;
-    
 
     LenderCommitmentGroup_Smart_Override lenderCommitmentGroupSmart;
 
-    SmartCommitmentForwarder _smartCommitmentForwarder ;   
-    UniswapV3PoolMock _uniswapV3Pool ;
+    SmartCommitmentForwarder _smartCommitmentForwarder;
+    UniswapV3PoolMock _uniswapV3Pool;
 
     function setUp() public {
         borrower = new User();
@@ -47,22 +46,16 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
 
         collateralToken = new TestERC20Token("PEPE", "pepe", 1e24, 18);
 
-        principalToken.transfer(address(lender),1e18);
-        collateralToken.transfer(address(borrower),1e18);
+        principalToken.transfer(address(lender), 1e18);
+        collateralToken.transfer(address(borrower), 1e18);
 
-      
         lenderCommitmentGroupSmart = new LenderCommitmentGroup_Smart_Override(
             address(_smartCommitmentForwarder),
             address(_uniswapV3Pool)
         );
-
-    
     }
 
-
     function initialize_group_contract() public {
-
-
         address _principalTokenAddress = address(principalToken);
         address _collateralTokenAddress = address(collateralToken);
         uint256 _marketId = 1;
@@ -79,12 +72,10 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
             _minInterestRate,
             _liquidityThresholdPercent,
             _loanToValuePercent
-       );
+        );
     }
 
-
-   function test_initialize() public {
-
+    function test_initialize() public {
         address _principalTokenAddress = address(principalToken);
         address _collateralTokenAddress = address(collateralToken);
         uint256 _marketId = 1;
@@ -93,7 +84,7 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
         uint16 _liquidityThresholdPercent = 10000;
         uint16 _loanToValuePercent = 10000;
 
-       address _poolSharesToken = lenderCommitmentGroupSmart.initialize(
+        address _poolSharesToken = lenderCommitmentGroupSmart.initialize(
             _principalTokenAddress,
             _collateralTokenAddress,
             _marketId,
@@ -101,295 +92,251 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
             _minInterestRate,
             _liquidityThresholdPercent,
             _loanToValuePercent
-       );
+        );
 
-       // assertFalse(isTrustedBefore, "Should not be trusted forwarder before");
-       // assertTrue(isTrustedAfter, "Should be trusted forwarder after");
-    } 
+        // assertFalse(isTrustedBefore, "Should not be trusted forwarder before");
+        // assertTrue(isTrustedAfter, "Should be trusted forwarder after");
+    }
 
-
-    
-
-//  https://github.com/teller-protocol/teller-protocol-v1/blob/develop/contracts/lending/ttoken/TToken_V3.sol
+    //  https://github.com/teller-protocol/teller-protocol-v1/blob/develop/contracts/lending/ttoken/TToken_V3.sol
     function test_addPrincipalToCommitmentGroup() public {
-        
-        principalToken.transfer(address(lenderCommitmentGroupSmart),1e18);
-        collateralToken.transfer(address(lenderCommitmentGroupSmart),1e18);
-
+        principalToken.transfer(address(lenderCommitmentGroupSmart), 1e18);
+        collateralToken.transfer(address(lenderCommitmentGroupSmart), 1e18);
 
         initialize_group_contract();
 
+        vm.prank(address(lender));
+        principalToken.approve(address(lenderCommitmentGroupSmart), 1000000);
 
         vm.prank(address(lender));
-        principalToken.approve(address(lenderCommitmentGroupSmart),1000000);
-
-        vm.prank(address(lender));
-        uint256 sharesAmount_ = lenderCommitmentGroupSmart.addPrincipalToCommitmentGroup(
-            1000000,
-            address(borrower)
-        );
-
+        uint256 sharesAmount_ = lenderCommitmentGroupSmart
+            .addPrincipalToCommitmentGroup(1000000, address(borrower));
 
         uint256 expectedSharesAmount = 1000000;
 
-
-        //use ttoken logic to make this better 
-        assertEq( 
+        //use ttoken logic to make this better
+        assertEq(
             sharesAmount_,
             expectedSharesAmount,
             "Received an unexpected amount of shares"
-
         );
-
-    
     }
 
-    function test_addPrincipalToCommitmentGroup_after_interest_payments() public {
-    
-
-        principalToken.transfer(address(lenderCommitmentGroupSmart),1e18);
-        collateralToken.transfer(address(lenderCommitmentGroupSmart),1e18);
-
+    function test_addPrincipalToCommitmentGroup_after_interest_payments()
+        public
+    {
+        principalToken.transfer(address(lenderCommitmentGroupSmart), 1e18);
+        collateralToken.transfer(address(lenderCommitmentGroupSmart), 1e18);
 
         initialize_group_contract();
 
         lenderCommitmentGroupSmart.set_totalPrincipalTokensCommitted(1000000);
         lenderCommitmentGroupSmart.set_totalInterestCollected(2000000);
 
+        vm.prank(address(lender));
+        principalToken.approve(address(lenderCommitmentGroupSmart), 1000000);
 
         vm.prank(address(lender));
-        principalToken.approve(address(lenderCommitmentGroupSmart),1000000);
+        uint256 sharesAmount_ = lenderCommitmentGroupSmart
+            .addPrincipalToCommitmentGroup(1000000, address(borrower));
 
-        vm.prank(address(lender));
-        uint256 sharesAmount_ = lenderCommitmentGroupSmart.addPrincipalToCommitmentGroup(
-            1000000,
-            address(borrower)
-        );
-
-           
         uint256 expectedSharesAmount = 500000;
 
-
-        //use ttoken logic to make this better 
-        assertEq( 
+        //use ttoken logic to make this better
+        assertEq(
             sharesAmount_,
             expectedSharesAmount,
             "Received an unexpected amount of shares"
-
         );
-
-    
     }
 
-
-     function test_burnShares_simple() public {
-    
-
-        principalToken.transfer(address(lenderCommitmentGroupSmart),1e18);
-       // collateralToken.transfer(address(lenderCommitmentGroupSmart),1e18);
- 
+    function test_burnShares_simple() public {
+        principalToken.transfer(address(lenderCommitmentGroupSmart), 1e18);
+        // collateralToken.transfer(address(lenderCommitmentGroupSmart),1e18);
 
         initialize_group_contract();
 
         lenderCommitmentGroupSmart.set_totalPrincipalTokensCommitted(1000000);
         lenderCommitmentGroupSmart.set_totalInterestCollected(0);
-        
-        lenderCommitmentGroupSmart.set_principalTokensCommittedByLender(address(lender),1000000);
 
+        lenderCommitmentGroupSmart.set_principalTokensCommittedByLender(
+            address(lender),
+            1000000
+        );
 
         vm.prank(address(lender));
-        principalToken.approve(address(lenderCommitmentGroupSmart),1000000);
+        principalToken.approve(address(lenderCommitmentGroupSmart), 1000000);
 
         vm.prank(address(lender));
 
         uint256 sharesAmount = 500000;
-            //should have all of the shares at this point 
-        lenderCommitmentGroupSmart.mock_mintShares( address(lender),sharesAmount );
-         
-        
+        //should have all of the shares at this point
+        lenderCommitmentGroupSmart.mock_mintShares(
+            address(lender),
+            sharesAmount
+        );
+
         vm.prank(address(lender));
-        (uint256 receivedPrincipalTokens, 
-        uint256 receivedCollateralTokens) 
-        = lenderCommitmentGroupSmart
-        .burnSharesToWithdrawEarnings( 
-            sharesAmount, 
-            address(lender) );
+        (
+            uint256 receivedPrincipalTokens,
+            uint256 receivedCollateralTokens
+        ) = lenderCommitmentGroupSmart.burnSharesToWithdrawEarnings(
+                sharesAmount,
+                address(lender)
+            );
 
-
-        uint256 expectedReceivedPrincipalTokens = 1000000; // the orig amt ! 
-       assertEq( 
+        uint256 expectedReceivedPrincipalTokens = 1000000; // the orig amt !
+        assertEq(
             receivedPrincipalTokens,
             expectedReceivedPrincipalTokens,
             "Received an unexpected amount of principaltokens"
-
         );
-
-    
     }
 
-     function test_burnShares_also_get_collateral() public {
-    
-
-        principalToken.transfer(address(lenderCommitmentGroupSmart),1e18);
-        collateralToken.transfer(address(lenderCommitmentGroupSmart),1e18);
- 
+    function test_burnShares_also_get_collateral() public {
+        principalToken.transfer(address(lenderCommitmentGroupSmart), 1e18);
+        collateralToken.transfer(address(lenderCommitmentGroupSmart), 1e18);
 
         initialize_group_contract();
 
         lenderCommitmentGroupSmart.set_totalPrincipalTokensCommitted(1000000);
         lenderCommitmentGroupSmart.set_totalInterestCollected(0);
-        
-        lenderCommitmentGroupSmart.set_principalTokensCommittedByLender(address(lender),1000000);
 
+        lenderCommitmentGroupSmart.set_principalTokensCommittedByLender(
+            address(lender),
+            1000000
+        );
 
         vm.prank(address(lender));
-        principalToken.approve(address(lenderCommitmentGroupSmart),1000000);
+        principalToken.approve(address(lenderCommitmentGroupSmart), 1000000);
 
         vm.prank(address(lender));
 
         uint256 sharesAmount = 500000;
-            //should have all of the shares at this point 
-        lenderCommitmentGroupSmart.mock_mintShares( address(lender),sharesAmount );
-         
-        
+        //should have all of the shares at this point
+        lenderCommitmentGroupSmart.mock_mintShares(
+            address(lender),
+            sharesAmount
+        );
+
         vm.prank(address(lender));
-        (uint256 receivedPrincipalTokens, 
-        uint256 receivedCollateralTokens) 
-        = lenderCommitmentGroupSmart
-        .burnSharesToWithdrawEarnings( 
-            sharesAmount, 
-            address(lender) );
+        (
+            uint256 receivedPrincipalTokens,
+            uint256 receivedCollateralTokens
+        ) = lenderCommitmentGroupSmart.burnSharesToWithdrawEarnings(
+                sharesAmount,
+                address(lender)
+            );
 
-
-        uint256 expectedReceivedPrincipalTokens = 500000; // the orig amt ! 
-       assertEq( 
+        uint256 expectedReceivedPrincipalTokens = 500000; // the orig amt !
+        assertEq(
             receivedPrincipalTokens,
             expectedReceivedPrincipalTokens,
             "Received an unexpected amount of principal tokens"
-
         );
 
-          uint256 expectedReceivedCollateralTokens = 500000; // the orig amt ! 
-       assertEq( 
+        uint256 expectedReceivedCollateralTokens = 500000; // the orig amt !
+        assertEq(
             receivedCollateralTokens,
             expectedReceivedCollateralTokens,
             "Received an unexpected amount of collateral tokens"
-
         );
-
-    
     }
 
-
-      function test_burnShares_after_interest_payments() public {
-    
-
-        principalToken.transfer(address(lenderCommitmentGroupSmart),1e18);
-      //  collateralToken.transfer(address(lenderCommitmentGroupSmart),1e18);
- 
+    function test_burnShares_after_interest_payments() public {
+        principalToken.transfer(address(lenderCommitmentGroupSmart), 1e18);
+        //  collateralToken.transfer(address(lenderCommitmentGroupSmart),1e18);
 
         initialize_group_contract();
 
-     //   lenderCommitmentGroupSmart.set_totalPrincipalTokensCommitted(1000000);
+        //   lenderCommitmentGroupSmart.set_totalPrincipalTokensCommitted(1000000);
         lenderCommitmentGroupSmart.set_totalInterestCollected(1000000);
-        
-        lenderCommitmentGroupSmart.set_principalTokensCommittedByLender(address(lender),5000000);
 
+        lenderCommitmentGroupSmart.set_principalTokensCommittedByLender(
+            address(lender),
+            5000000
+        );
 
         vm.prank(address(lender));
-        principalToken.approve(address(lenderCommitmentGroupSmart),1000000);
-
+        principalToken.approve(address(lenderCommitmentGroupSmart), 1000000);
 
         uint256 sharesAmount = 500000;
 
+        lenderCommitmentGroupSmart.mock_mintShares(
+            address(lender),
+            sharesAmount
+        );
 
-        lenderCommitmentGroupSmart.mock_mintShares( address(lender),sharesAmount );
-          
-        
         vm.prank(address(lender));
-        (uint256 receivedPrincipalTokens, 
-        uint256 receivedCollateralTokens) 
-        = lenderCommitmentGroupSmart
-        .burnSharesToWithdrawEarnings( 
-            sharesAmount, 
-            address(lender) );
+        (
+            uint256 receivedPrincipalTokens,
+            uint256 receivedCollateralTokens
+        ) = lenderCommitmentGroupSmart.burnSharesToWithdrawEarnings(
+                sharesAmount,
+                address(lender)
+            );
 
-
-        uint256 expectedReceivedPrincipalTokens = 1000000; // the orig amt ! 
-       assertEq( 
+        uint256 expectedReceivedPrincipalTokens = 1000000; // the orig amt !
+        assertEq(
             receivedPrincipalTokens,
             expectedReceivedPrincipalTokens,
             "Received an unexpected amount of principaltokens"
-
         );
-
-    
     }
 
-
     function test_acceptFundsForAcceptBid() public {
+        lenderCommitmentGroupSmart.set_mock_getMaxPrincipalPerCollateralAmount(
+            100 * 1e18
+        );
 
-
-         lenderCommitmentGroupSmart.set_mock_getMaxPrincipalPerCollateralAmount( 100 * 1e18 );
-
-
-        principalToken.transfer(address(lenderCommitmentGroupSmart),1e18);
-        collateralToken.transfer(address(lenderCommitmentGroupSmart),1e18);
- 
-
+        principalToken.transfer(address(lenderCommitmentGroupSmart), 1e18);
+        collateralToken.transfer(address(lenderCommitmentGroupSmart), 1e18);
 
         initialize_group_contract();
 
         lenderCommitmentGroupSmart.set_totalPrincipalTokensCommitted(1000000);
-        
-
 
         uint256 principalAmount = 50;
-        uint256 collateralAmount = 50 * 100 ;
+        uint256 collateralAmount = 50 * 100;
 
-        address collateralTokenAddress = address(lenderCommitmentGroupSmart.collateralToken()); 
+        address collateralTokenAddress = address(
+            lenderCommitmentGroupSmart.collateralToken()
+        );
         uint256 collateralTokenId = 0;
 
         uint32 loanDuration = 5000000;
         uint16 interestRate = 100;
 
         vm.prank(address(_smartCommitmentForwarder));
-        lenderCommitmentGroupSmart.acceptFundsForAcceptBid( 
+        lenderCommitmentGroupSmart.acceptFundsForAcceptBid(
             address(borrower),
             principalAmount,
             collateralAmount,
             collateralTokenAddress,
             collateralTokenId,
             loanDuration,
-            interestRate            
+            interestRate
         );
-
-
-          
-    
     }
 
-
-
     function test_acceptFundsForAcceptBid_insufficientCollateral() public {
+        lenderCommitmentGroupSmart.set_mock_getMaxPrincipalPerCollateralAmount(
+            100 * 1e18
+        );
 
-        lenderCommitmentGroupSmart.set_mock_getMaxPrincipalPerCollateralAmount( 100 * 1e18 );
-
-        principalToken.transfer(address(lenderCommitmentGroupSmart),1e18);
-        collateralToken.transfer(address(lenderCommitmentGroupSmart),1e18);
- 
- 
+        principalToken.transfer(address(lenderCommitmentGroupSmart), 1e18);
+        collateralToken.transfer(address(lenderCommitmentGroupSmart), 1e18);
 
         initialize_group_contract();
 
         lenderCommitmentGroupSmart.set_totalPrincipalTokensCommitted(1000000);
-        
-
 
         uint256 principalAmount = 100;
         uint256 collateralAmount = 0;
 
-        address collateralTokenAddress = address(lenderCommitmentGroupSmart.collateralToken()); 
+        address collateralTokenAddress = address(
+            lenderCommitmentGroupSmart.collateralToken()
+        );
         uint256 collateralTokenId = 0;
 
         uint32 loanDuration = 5000000;
@@ -397,23 +344,18 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
 
         vm.expectRevert("Insufficient Borrower Collateral");
         vm.prank(address(_smartCommitmentForwarder));
-        lenderCommitmentGroupSmart.acceptFundsForAcceptBid( 
+        lenderCommitmentGroupSmart.acceptFundsForAcceptBid(
             address(borrower),
             principalAmount,
             collateralAmount,
             collateralTokenAddress,
             collateralTokenId,
             loanDuration,
-            interestRate            
+            interestRate
         );
-
-
-          
-    
     }
 
-
-      /*
+    /*
        function test_getMaxPrincipalPerCollateralAmount() public {
 
           uint256 maxPrincipalPerCollateralAmount =  lenderCommitmentGroupSmart._super_getMaxPrincipalPerCollateralAmount( );
@@ -427,33 +369,30 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
     */
 
     function test_getCollateralTokensPricePerPrincipalTokens() public {
+        //  _uniswapV3Pool.set_mockSqrtPriceX96()
 
-       //  _uniswapV3Pool.set_mockSqrtPriceX96()
+        uint256 amount = lenderCommitmentGroupSmart
+            .getCollateralTokensPricePerPrincipalTokens(1000);
 
-          uint256 amount =  lenderCommitmentGroupSmart.getCollateralTokensPricePerPrincipalTokens( 1000 );
+        uint256 expectedAmount = 1000;
 
-          uint256 expectedAmount = 1000;
-        
-          assertEq( amount, expectedAmount , "Unexpected getCollateralTokensPricePerPrincipalTokens" );
-     
-     
-       }
-
-    
-
-
-
+        assertEq(
+            amount,
+            expectedAmount,
+            "Unexpected getCollateralTokensPricePerPrincipalTokens"
+        );
+    }
 }
 
 contract User {}
+
 contract SmartCommitmentForwarder {}
 
-contract UniswapV3PoolMock{
+contract UniswapV3PoolMock {
+    //this represents an equal price ratio
+    uint160 mockSqrtPriceX96 = 1 << 96;
 
- //this represents an equal price ratio  
-  uint160 mockSqrtPriceX96 = 1 << 96; 
-
-  struct Slot0 {
+    struct Slot0 {
         // the current price
         uint160 sqrtPriceX96;
         // the current tick
@@ -471,29 +410,20 @@ contract UniswapV3PoolMock{
         bool unlocked;
     }
 
-    function set_mockSqrtPriceX96(uint160 _price) public  {
+    function set_mockSqrtPriceX96(uint160 _price) public {
         mockSqrtPriceX96 = _price;
     }
 
-
     function slot0() public returns (Slot0 memory slot0) {
-
-
-       
-       
-
-        return Slot0({
-
-            sqrtPriceX96: mockSqrtPriceX96 ,
-            tick: 0,
-            observationIndex: 0,
-            observationCardinality:0, 
-            observationCardinalityNext: 0,
-            feeProtocol: 0,
-            unlocked: true          
-
-        });
-
+        return
+            Slot0({
+                sqrtPriceX96: mockSqrtPriceX96,
+                tick: 0,
+                observationIndex: 0,
+                observationCardinality: 0,
+                observationCardinalityNext: 0,
+                feeProtocol: 0,
+                unlocked: true
+            });
     }
-
-} 
+}

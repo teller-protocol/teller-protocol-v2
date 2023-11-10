@@ -62,7 +62,9 @@ contract TellerV2_Test is Testable {
         tellerV2 = new TellerV2(address(0));
 
         // Deploy MarketRegistry & ReputationManager
-        IMarketRegistry_V2 marketRegistry = IMarketRegistry_V2(new MarketRegistry());
+        IMarketRegistry_V2 marketRegistry = IMarketRegistry_V2(
+            new MarketRegistry()
+        );
         IReputationManager reputationManager = IReputationManager(
             new ReputationManager()
         );
@@ -115,27 +117,24 @@ contract TellerV2_Test is Testable {
         // Approve Teller V2 for the lender's dai
         lender.addAllowance(address(daiMock), address(tellerV2), balance * 10);
 
-
-        IMarketRegistry_V2.MarketplaceTerms memory marketTerms = IMarketRegistry_V2.MarketplaceTerms({
-            paymentCycleDuration:8000,
-            paymentDefaultDuration:7000,
-            bidExpirationTime:5000,
-            marketplaceFeePercent:500,
-            paymentType:PaymentType.EMI,
-            paymentCycleType:PaymentCycleType.Seconds,
-             feeRecipient: address(this)
-
-        });
+        IMarketRegistry_V2.MarketplaceTerms
+            memory marketTerms = IMarketRegistry_V2.MarketplaceTerms({
+                paymentCycleDuration: 8000,
+                paymentDefaultDuration: 7000,
+                bidExpirationTime: 5000,
+                marketplaceFeePercent: 500,
+                paymentType: PaymentType.EMI,
+                paymentCycleType: PaymentCycleType.Seconds,
+                feeRecipient: address(this)
+            });
 
         vm.prank(address(marketOwner));
 
-        // Create a market  
-        (marketId1,) = marketRegistry.createMarket(
+        // Create a market
+        (marketId1, ) = marketRegistry.createMarket(
             address(marketRegistry),
-             
             false,
             false,
-             
             "uri://",
             marketTerms
         );

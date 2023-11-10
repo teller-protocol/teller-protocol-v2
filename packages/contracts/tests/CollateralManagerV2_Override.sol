@@ -91,9 +91,12 @@ contract CollateralManagerV2_Override is CollateralManagerV2 {
         Overrides
     */
 
-    function isBidCollateralBacked(
-        uint256 _bidId
-    ) public view override returns (bool) {
+    function isBidCollateralBacked(uint256 _bidId)
+        public
+        view
+        override
+        returns (bool)
+    {
         return bidsCollateralBackedGlobally;
     }
 
@@ -108,10 +111,9 @@ contract CollateralManagerV2_Override is CollateralManagerV2 {
         checks_ = new bool[](0);
     }
 
-    function _deposit(
-        uint256 _bidId,
-        Collateral memory collateralInfo
-    ) internal {
+    function _deposit(uint256 _bidId, Collateral memory collateralInfo)
+        internal
+    {
         depositWasCalled = true;
     }
 
@@ -129,10 +131,11 @@ contract CollateralManagerV2_Override is CollateralManagerV2 {
         withdrawWasCalled = true;
     }
 
-    function _releaseTokens(
-        address _receiver,
-        uint256 _bundleId
-    ) internal override returns (uint256, Collateral[] memory) {
+    function _releaseTokens(address _receiver, uint256 _bundleId)
+        internal
+        override
+        returns (uint256, Collateral[] memory)
+    {
         releaseTokensInternalWasCalledForBundleId = _bundleId;
         releaseTokensWasCalled = true;
     }

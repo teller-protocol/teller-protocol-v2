@@ -12,16 +12,10 @@ contract ExtensionsContext_Test is Testable {
     User private borrower;
     User private lender;
 
-   
-
     function setUp() public {
         borrower = new User();
         lender = new User();
-
-         
     }
-
-   
 }
 
 contract User {}

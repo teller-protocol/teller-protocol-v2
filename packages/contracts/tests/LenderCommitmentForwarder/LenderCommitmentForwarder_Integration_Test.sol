@@ -16,9 +16,7 @@ import { LenderCommitmentForwarder_G2 } from "../../contracts/LenderCommitmentFo
 import { LenderCommitmentForwarder_G3 } from "../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarder_G3.sol";
 import { MarketRegistryMock } from "../../contracts/mock/MarketRegistryMock.sol";
 
-
-import { IMarketRegistry_V2  } from "../../contracts/interfaces/IMarketRegistry_V2.sol";
-
+import { IMarketRegistry_V2 } from "../../contracts/interfaces/IMarketRegistry_V2.sol";
 
 import { PaymentType, PaymentCycleType } from "../../contracts/libraries/V2Calculations.sol";
 
@@ -84,27 +82,23 @@ contract LenderCommitmentForwarder_Integration_Test is Testable {
         uint16 _feePercent = 900;
         PaymentType _paymentType = PaymentType.EMI;
         PaymentCycleType _paymentCycleType = PaymentCycleType.Seconds;
-  
-        
-        
-        IMarketRegistry_V2.MarketplaceTerms memory marketTerms = IMarketRegistry_V2.MarketplaceTerms({
-            paymentCycleDuration:_paymentCycleDuration,
-            paymentDefaultDuration:_paymentDefaultDuration,
-            bidExpirationTime:_bidExpirationTime,
-            marketplaceFeePercent:_feePercent,
-            paymentType:_paymentType,
-            paymentCycleType:_paymentCycleType,
-             feeRecipient: address(marketOwner)
 
-        });
+        IMarketRegistry_V2.MarketplaceTerms
+            memory marketTerms = IMarketRegistry_V2.MarketplaceTerms({
+                paymentCycleDuration: _paymentCycleDuration,
+                paymentDefaultDuration: _paymentDefaultDuration,
+                bidExpirationTime: _bidExpirationTime,
+                marketplaceFeePercent: _feePercent,
+                paymentType: _paymentType,
+                paymentCycleType: _paymentCycleType,
+                feeRecipient: address(marketOwner)
+            });
 
         vm.prank(address(marketOwner));
-        (uint256 marketId, )= marketRegistry.createMarket(
+        (uint256 marketId, ) = marketRegistry.createMarket(
             address(marketOwner),
-            
             false,
             false,
-            
             "uri",
             marketTerms
         );

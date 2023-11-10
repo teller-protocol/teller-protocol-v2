@@ -439,9 +439,7 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
      
        }
 
-
-
-       
+    
 
 
 

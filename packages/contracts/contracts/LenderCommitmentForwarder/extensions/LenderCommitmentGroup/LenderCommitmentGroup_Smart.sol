@@ -589,44 +589,25 @@ multiplies by their pct of shares (S%)
 
 
 
+ 
 
+    function getCollateralRequiredForPrincipalAmount( uint256 _principalAmount  ) public view returns (uint256) {
+        
+        
 
-
-/*
-consider passing in both token addresses and then get pool address from that 
-*/  
-
-    //this depends on current oracle price from uniswap 
-
-    function getMaxPrincipalPerCollateralAmount(  ) public view returns (uint256) {
-
-        return _getMaxPrincipalPerCollateralAmount(   );
+        return _getCollateralRequiredForPrincipalAmount( _principalAmount  );
 
     }  
 
-
-        /*
-            A ratio expanded by 1e18 
-        */
-    function _getMaxPrincipalPerCollateralAmount(  ) internal virtual view returns (uint256) {
-
-
-            //use the uniswap pool data !! the slot data 
-        uint256 uniswapTokenPriceX96 = _getUniswapV3TokenPairPrice(  );
-
-        return 0 ;
-
-    }   
+     function _getCollateralRequiredForPrincipalAmount( uint256 _principalAmount  ) public view returns (uint256) {
+        
+        uint256 baseAmount =  getCollateralTokensPricePerPrincipalTokens(_principalAmount);
+ 
+        return baseAmount.percent(loanToValuePercent);
+    }  
 
 
-/*
-//move this into the factory for this contract 
-    function getUniswapV3PoolAddress(address tokenA, address tokenB, uint24 fee) 
-    internal view returns (address) {
-        address poolAddress = UNISWAP_V3_FACTORY.getPool(tokenA, tokenB, fee);
-        return poolAddress;
-    }
-    */
+        
     
     //this is priceToken1PerToken0 expanded by 1e18 
     function _getUniswapV3TokenPairPrice( ) 
@@ -728,18 +709,11 @@ function token1ToToken0(uint256 amountToken1, uint256 priceToken1PerToken0) inte
     }
    
 
-    function getRequiredCollateral(uint256 _principalAmount) public view returns (uint256){
-
-
-       uint256 maxPrincipalPerCollateralAmount = _getMaxPrincipalPerCollateralAmount( );
-
-       return _getRequiredCollateral(
-         _principalAmount,
-        maxPrincipalPerCollateralAmount,
-        //collateralTokenType,
-        address(collateralToken),
-        address (principalToken)
-       );
+    function getRequiredCollateral(uint256 _principalAmount) public view returns (uint256 requiredCollateral_){
+        
+        requiredCollateral_ = _getCollateralRequiredForPrincipalAmount(  _principalAmount );
+         
+       
 
     }
       
@@ -780,40 +754,6 @@ function token1ToToken0(uint256 amountToken1, uint256 priceToken1PerToken0) inte
     }
 
     
-       /**
-     * @notice Calculate the amount of collateral required to borrow a loan with _principalAmount of principal
-     * @param _principalAmount The amount of currency to borrow for the loan.
-     * @param _maxPrincipalPerCollateralAmount The ratio for the amount of principal that can be borrowed for each amount of collateral. This is expanded additionally by the principal decimals.
-     * @param _collateralTokenAddress The contract address for the collateral for the loan.
-     * @param _principalTokenAddress The contract address for the principal for the loan.
-     */
-    function _getRequiredCollateral(
-        uint256 _principalAmount,
-        uint256 _maxPrincipalPerCollateralAmount,
-      //  CommitmentCollateralType _collateralTokenType,
-        address _collateralTokenAddress,
-        address _principalTokenAddress
-    ) internal view virtual returns (uint256) {
-        
-
-        
-
-        require( _maxPrincipalPerCollateralAmount > 0, "Invalid max principal per collateral amount" );
-      
-        /*
-         * The principalAmount is expanded by (collateralDecimals+principalDecimals) to increase precision
-         * and then it is divided by _maxPrincipalPerCollateralAmount which should already been expanded by principalDecimals
-         */
-        return
-            MathUpgradeable.mulDiv(
-                _principalAmount,
-                (10**(18)),
-                _maxPrincipalPerCollateralAmount,
-                MathUpgradeable.Rounding.Up
-            );
-    }
-
-
    
  
 

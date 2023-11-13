@@ -113,11 +113,11 @@ contract LenderCommitmentGroup_Smart is
     //ITellerV2 public immutable TELLER_V2;
     /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
     address public immutable SMART_COMMITMENT_FORWARDER;
-    address public immutable UNISWAP_V3_POOL;
+    //address public immutable UNISWAP_V3_POOL;
 
     bool private _initialized;
 
-    LenderCommitmentGroupShares public poolSharesToken;
+    // LenderCommitmentGroupShares public poolSharesToken;
 
     IERC20 public principalToken;
     IERC20 public collateralToken;
@@ -144,7 +144,37 @@ contract LenderCommitmentGroup_Smart is
     uint16 public liquidityThresholdPercent; //5000 is 50 pct  // enforce max of 10000
     uint16 public loanToValuePercent; //the overcollateralization ratio, typically 80 pct
 
-    mapping(address => uint256) public principalTokensCommittedByLender;
+   // mapping(address => uint256) public principalTokensCommittedByLender;
+
+    // lenderCommitmentPositionsId => LenderCommitmentPosition
+    mapping(uint256 => LenderCommitmentPosition) public lenderCommitmentPositions;
+    uint256 lenderCommitmentPositionCount;
+
+    struct LenderCommitmentPosition {
+
+        uint256 maxPrincipalPerCollateralAmount;
+
+        uint256 committedPrincipal; 
+
+        //collected interest?  use shares tokens ! ?
+
+
+      //  uint256 sharesAmountTotal;  //instead of erc20 
+       // uint256 sharesAmountActivelyLended; 
+
+        //bool enabled; //lending of this position is allowed 
+        uint16 liquidityThresholdPercent; //acts as the enable
+ 
+
+
+    }
+
+
+    struct AcceptFundPositionParams {
+        uint256 positionId;
+        uint256 principalAmount;
+        uint256 collateralAmount;
+    }
 
     //try to make apy dynamic .
 
@@ -165,12 +195,10 @@ contract LenderCommitmentGroup_Smart is
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor(
         //  address _tellerV2,
-        address _smartCommitmentForwarder,
-        address _uniswapV3Pool
+        address _smartCommitmentForwarder 
     ) {
         // TELLER_V2 = ITellerV2(_tellerV2);
-        SMART_COMMITMENT_FORWARDER = _smartCommitmentForwarder;
-        UNISWAP_V3_POOL = _uniswapV3Pool;
+        SMART_COMMITMENT_FORWARDER = _smartCommitmentForwarder; 
     }
 
     // must send initial principal tokens into this contract just before this is called
@@ -183,17 +211,12 @@ contract LenderCommitmentGroup_Smart is
         uint256 _marketId,
         uint32 _maxLoanDuration,
         uint16 _minInterestRate,
-        uint16 _liquidityThresholdPercent,
+
+        // still needed !?  or move to a lender option ?       
         uint16 _loanToValuePercent //essentially the overcollateralization ratio.  10000 is 1:1 baseline ? // initializer  ADD ME
     )
         external
-        returns (
-            //uint256 _maxPrincipalPerCollateralAmount //use oracle instead
-
-            //ILenderCommitmentForwarder.Commitment calldata _createCommitmentArgs
-
-            address poolSharesToken_
-        )
+        
     {
         _initialized = true;
 
@@ -217,9 +240,10 @@ contract LenderCommitmentGroup_Smart is
 
         // set initial terms in storage from _createCommitmentArgs
 
-        poolSharesToken_ = _deployPoolSharesToken();
+      //  poolSharesToken_ = _deployPoolSharesToken();
     }
 
+    /*
     function _deployPoolSharesToken()
         internal
         returns (address poolSharesToken_)
@@ -234,6 +258,7 @@ contract LenderCommitmentGroup_Smart is
 
         return address(poolSharesToken);
     }
+    */
 
     /**
      * @notice It calculates the current scaled exchange rate for a whole Teller Token based of the underlying token balance.
@@ -279,6 +304,7 @@ multiplies by their pct of shares (S%)
  
 */
 
+
     function collateralTokenExchangeRate() public view returns (uint256 rate_) {
         uint256 totalPrincipalTokensUsedForLoans = totalPrincipalTokensLended -
             totalPrincipalTokensRepaid;
@@ -294,13 +320,7 @@ multiplies by their pct of shares (S%)
             totalPrincipalTokensUsedForLoans;
     }
 
-    /* function currentTVL() public override returns (uint256 tvl_) {
-        tvl_ += totalUnderlyingSupply();
-        tvl_ += s().totalBorrowed;
-        tvl_ -= s().totalRepaid;
-    }
   
-*/
     /*
     must be initialized for this to work ! 
     */
@@ -331,25 +351,40 @@ multiplies by their pct of shares (S%)
         value_ = (amount * EXCHANGE_RATE_EXPANSION_FACTOR) / rate;
     }
 
+
+    
+
+
+
     function acceptFundsForAcceptBid(
         address _borrower,
-        uint256 _principalAmount,
-        uint256 _collateralAmount,
-        address _collateralTokenAddress,
-        uint256 _collateralTokenId, //not used
+
+        AcceptFundPositionParams[] memory acceptPositions,
+
         uint32 _loanDuration,
         uint16 _interestRate
+      
     ) external onlySmartCommitmentForwarder {
         //consider putting these into less readonly fn calls
-        require(
+      /*  require(
             _collateralTokenAddress == address(collateralToken),
             "Mismatching collateral token"
-        );
+        );*/
+
+
         //the interest rate must be at least as high has the commitment demands. The borrower can use a higher interest rate although that would not be beneficial to the borrower.
         require(_interestRate >= minInterestRate, "Invalid interest rate");
         //the loan duration must be less than the commitment max loan duration. The lender who made the commitment expects the money to be returned before this window.
         require(_loanDuration <= maxLoanDuration, "Invalid loan max duration");
+     
         console.logUint(getPrincipalAmountAvailableToBorrow());
+
+        uint256 totalPrincipal = 0;
+
+        for(uint256 i = 0; i < acceptPositions.length; i++){
+            totalPrincipal += acceptPositions[i].principalAmount ;
+
+        }
 
         require(
             getPrincipalAmountAvailableToBorrow() >= _principalAmount,
@@ -358,17 +393,7 @@ multiplies by their pct of shares (S%)
 
         require(isAllowedToBorrow(_borrower), "unauthorized borrow");
 
-        /*
-     //commitmentPrincipalAccepted[bidId] <= commitment.maxPrincipal,
-
-   //require that the borrower accepting the commitment cannot borrow more than the commitments max principal
-        if (_principalAmount > commitment.maxPrincipal) {
-            revert InsufficientCommitmentAllocation({
-                allocated: commitment.maxPrincipal,
-                requested: _principalAmount
-            });
-        }
-    */
+        
 
         //do this accounting in the group contract now?
 

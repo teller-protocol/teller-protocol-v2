@@ -382,8 +382,16 @@ multiplies by their pct of shares (S%)
         uint256 totalPrincipal = 0;
 
         for(uint256 i = 0; i < acceptPositions.length; i++){
+
+            //contribute to total principal 
             totalPrincipal += acceptPositions[i].principalAmount ;
 
+            uint256 positionId = acceptPositions[i].positionId;
+
+            LenderCommitmentPosition memory commitmentPosition = lenderCommitmentPositions[positionId];
+
+            // commitmentPosition
+              
         }
 
         require(

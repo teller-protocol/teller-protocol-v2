@@ -386,8 +386,11 @@ multiplies by their pct of shares (S%)
 
         for(uint256 i = 0; i < acceptPositions.length; i++){
 
+            uint256 _principalAmount = acceptPositions[i].principalAmount;
+            uint256 _collateralAmount = acceptPositions[i].collateralAmount;
+
             //contribute to total principal 
-            totalPrincipal += acceptPositions[i].principalAmount ;
+            totalPrincipal += _principalAmount ;
 
             uint256 positionId = acceptPositions[i].positionId;
 
@@ -397,7 +400,7 @@ multiplies by their pct of shares (S%)
             // make sure that we can borrow this amount from the commitment position 
 
             // mark on the commitment position that this amt has been borrowed now 
-            commitmentPosition.allocatedPrincipal += acceptPositions[i].principalAmount;
+            commitmentPosition.allocatedPrincipal += _principalAmount;
 
               //also incorporate the liquidity threshold percent here 
             uint256 committedPrincipalAvailable = commitmentPosition.committedPrincipal.percent(commitmentPosition.liquidityThresholdPercent);
@@ -447,15 +450,17 @@ multiplies by their pct of shares (S%)
 
        
 
-        principalToken.transfer(SMART_COMMITMENT_FORWARDER, totalPrincipalAmount);
+        principalToken.transfer(SMART_COMMITMENT_FORWARDER, totalPrincipal);
 
-        totalPrincipalTokensLended += totalPrincipalAmount;
+        totalPrincipalTokensLended += totalPrincipal;
 
         //emit event
     }
 
     /*
     must be initialized for this to work ! 
+
+    maybe make this target a specific position instead of just being general shares... ? 
     */
     function burnSharesToWithdrawEarnings(
         uint256 _amountPoolSharesTokens,
@@ -503,12 +508,15 @@ multiplies by their pct of shares (S%)
         console.log("totalInterestWithdrawn");
         console.logUint(totalInterestWithdrawn);
 
-        console.logUint(principalTokensCommittedByLender[msg.sender]);
+      //  console.logUint(principalTokensCommittedByLender[msg.sender]);
         console.logUint(principalTokenValueToWithdraw);
 
-        principalTokensCommittedByLender[
+
+        //modify this in the position somehow ... 
+       /* principalTokensCommittedByLender[
             msg.sender
         ] -= principalTokenValueToWithdraw;
+        */
 
         //implement this --- needs to be based on the amt of tokens in the contract right now !!
         (
@@ -591,6 +599,7 @@ multiplies by their pct of shares (S%)
         return (principalTokensToGive, collateralTokensToGive);
     }
 
+/*
     function getCollateralRequiredForPrincipalAmount(uint256 _principalAmount)
         public
         view
@@ -669,6 +678,8 @@ multiplies by their pct of shares (S%)
         // Now adjust for the decimal difference
         return amountToken1InToken0 / 10**18;
     }
+    */
+    
 
     function repayLoanCallback(
         uint256 _bidId,

@@ -75,7 +75,6 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
         );
     }
 
-/*
     function test_initialize() public {
         address _principalTokenAddress = address(principalToken);
         address _collateralTokenAddress = address(collateralToken);
@@ -356,7 +355,18 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
         );
     }
 
-    
+    /*
+       function test_getMaxPrincipalPerCollateralAmount() public {
+
+          uint256 maxPrincipalPerCollateralAmount =  lenderCommitmentGroupSmart._super_getMaxPrincipalPerCollateralAmount( );
+
+          uint256 expectedMaxPrincipalPerCollateralAmount = 999;
+        
+          assertEq( maxPrincipalPerCollateralAmount, expectedMaxPrincipalPerCollateralAmount , "Unexpected maxPrincipalPerCollateralAmount" );
+     
+     
+       }
+    */
 
     function test_getCollateralTokensPricePerPrincipalTokens() public {
         //  _uniswapV3Pool.set_mockSqrtPriceX96()
@@ -372,8 +382,6 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
             "Unexpected getCollateralTokensPricePerPrincipalTokens"
         );
     }
-
-    */
 }
 
 contract User {}

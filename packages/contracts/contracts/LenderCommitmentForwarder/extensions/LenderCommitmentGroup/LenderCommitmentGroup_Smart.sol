@@ -152,9 +152,11 @@ contract LenderCommitmentGroup_Smart is
 
     struct LenderCommitmentPosition {
 
-        uint256 maxPrincipalPerCollateralAmount;
+        uint256 maxPrincipalPerCollateralAmount;  //allow lender to update and adjust this at any time . 
 
         uint256 committedPrincipal; 
+
+        uint256 allocatedPrincipal;
 
         //collected interest?  use shares tokens ! ?
 
@@ -391,16 +393,39 @@ multiplies by their pct of shares (S%)
             LenderCommitmentPosition memory commitmentPosition = lenderCommitmentPositions[positionId];
 
             // commitmentPosition
-              
+            // make sure that we can borrow this amount from the commitment position 
+
+            // mark on the commitment position that this amt has been borrowed now 
+            commitmentPosition.allocatedPrincipal += acceptPositions[i].principalAmount;
+
+              //also incorporate the liquidity threshold percent here 
+            uint256 committedPrincipalAvailable = commitmentPosition.committedPrincipal.percent(commitmentPosition.liquidityThresholdPercent);
+            require( commitmentPosition.allocatedPrincipal <= committedPrincipalAvailable , "Insufficient committed principal" ); 
+            
+
+
+            //need to make sure the collateral actually gets brought into the contract !  also ideally that happens BEFORE principal is paid to prevent re-enntrancy 
+            uint256 requiredCollateral = getRequiredCollateral( 
+                _principalAmount,
+                commitmentPosition.maxPrincipalPerCollateralAmount
+                );
+
+            require(
+                _collateralAmount >= requiredCollateral,
+                "Insufficient Borrower Collateral"
+            );
+
+
         }
 
+    /*
         require(
             getPrincipalAmountAvailableToBorrow() >= _principalAmount,
             "Invalid loan max principal"
         );
 
         require(isAllowedToBorrow(_borrower), "unauthorized borrow");
-
+    */
         
 
         //do this accounting in the group contract now?
@@ -419,16 +444,11 @@ multiplies by their pct of shares (S%)
 
         console.log("get required collateral");
 
-        uint256 requiredCollateral = getRequiredCollateral(_principalAmount);
+       
 
-        require(
-            _collateralAmount >= requiredCollateral,
-            "Insufficient Borrower Collateral"
-        );
+        principalToken.transfer(SMART_COMMITMENT_FORWARDER, totalPrincipalAmount);
 
-        principalToken.transfer(SMART_COMMITMENT_FORWARDER, _principalAmount);
-
-        totalPrincipalTokensLended += _principalAmount;
+        totalPrincipalTokensLended += totalPrincipalAmount;
 
         //emit event
     }

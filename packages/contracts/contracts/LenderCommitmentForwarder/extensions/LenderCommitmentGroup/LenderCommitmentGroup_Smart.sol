@@ -141,7 +141,7 @@ contract LenderCommitmentGroup_Smart is
     uint256 public totalInterestCollected;
     uint256 public totalInterestWithdrawn;
 
-    uint16 public liquidityThresholdPercent; //5000 is 50 pct  // enforce max of 10000
+    //uint16 public liquidityThresholdPercent; //5000 is 50 pct  // enforce max of 10000
     uint16 public loanToValuePercent; //the overcollateralization ratio, typically 80 pct
 
    // mapping(address => uint256) public principalTokensCommittedByLender;
@@ -232,9 +232,9 @@ contract LenderCommitmentGroup_Smart is
         maxLoanDuration = _maxLoanDuration;
         minInterestRate = _minInterestRate;
 
-        require(_liquidityThresholdPercent <= 10000, "invalid threshold");
+       // require(_liquidityThresholdPercent <= 10000, "invalid threshold");
 
-        liquidityThresholdPercent = _liquidityThresholdPercent;
+       // liquidityThresholdPercent = _liquidityThresholdPercent;
         loanToValuePercent = _loanToValuePercent;
 
         // maxPrincipalPerCollateralAmount = _maxPrincipalPerCollateralAmount;

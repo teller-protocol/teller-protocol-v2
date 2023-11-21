@@ -326,7 +326,8 @@ multiplies by their pct of shares (S%)
     /*
     must be initialized for this to work ! 
     */
-    function addPrincipalToCommitmentGroup(
+    //replace this with some code that injects a position struct 
+  /*  function addPrincipalToCommitmentGroup(
         uint256 _amount,
         address _sharesRecipient
     ) external onlyAfterInitialized returns (uint256 sharesAmount_) {
@@ -343,7 +344,7 @@ multiplies by their pct of shares (S%)
 
         //mint shares equal to _amount and give them to the shares recipient !!!
         poolSharesToken.mint(_sharesRecipient, sharesAmount_);
-    }
+    }*/
 
     function _valueOfUnderlying(uint256 amount, uint256 rate)
         internal

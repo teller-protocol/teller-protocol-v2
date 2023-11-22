@@ -156,22 +156,27 @@ contract LenderCommitmentGroup_Smart is
 
         uint256 poolSharesAmount;  //this position owns this many shares
 
-        uint256 maxPrincipalPerCollateralAmount;  //allow lender to update and adjust this at any time . 
-
+       
         uint256 committedPrincipal; 
 
         uint256 allocatedPrincipal;
 
-        //collected interest?  use shares tokens ! ?
 
 
-      //  uint256 sharesAmountTotal;  //instead of erc20 
-       // uint256 sharesAmountActivelyLended; 
+        uint256 maxPrincipalPerCollateralAmount;  //allow lender to update and adjust this at any time .  
 
-        //bool enabled; //lending of this position is allowed 
+        uint16 loanToValuePercent; 
+
         uint16 liquidityThresholdPercent; //acts as the enable
  
+        
 
+        //collected interest?  use shares tokens ! ? 
+
+        //  uint256 sharesAmountTotal;  //instead of erc20 
+        // uint256 sharesAmountActivelyLended; 
+
+        //bool enabled; //lending of this position is allowed 
 
     }
 

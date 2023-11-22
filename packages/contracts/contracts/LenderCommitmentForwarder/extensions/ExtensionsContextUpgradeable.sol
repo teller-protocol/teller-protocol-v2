@@ -38,8 +38,7 @@ abstract contract ExtensionsContextUpgradeable is IExtensionsContext {
     }
 
     function _msgSender() internal view virtual returns (address sender) {
-        address sender;
-
+        
         if (msg.data.length >= 20) {
             assembly {
                 sender := shr(96, calldataload(sub(calldatasize(), 20)))

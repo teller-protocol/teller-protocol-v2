@@ -23,15 +23,15 @@ contract LenderCommitmentGroupFactory {
     using NumbersLib for uint256;
 
     /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
-    ITellerV2 public immutable TELLER_V2;
+  //  ITellerV2 public immutable TELLER_V2;
     /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
     address public immutable LENDER_COMMITMENT_FORWARDER;
 
     //fix
 
     /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor(address _tellerV2, address _lenderCommitmentForwarder) {
-        TELLER_V2 = ITellerV2(_tellerV2);
+    constructor(  address _lenderCommitmentForwarder) {
+      //  TELLER_V2 = ITellerV2(_tellerV2);
         LENDER_COMMITMENT_FORWARDER = _lenderCommitmentForwarder;
     }
 
@@ -51,7 +51,7 @@ contract LenderCommitmentGroupFactory {
         //these should be upgradeable proxies ???
         newGroupContract_ = address(
             new LenderCommitmentGroup_Smart(
-                address(TELLER_V2),
+               // address(TELLER_V2),
                 address(LENDER_COMMITMENT_FORWARDER)
             )
         );

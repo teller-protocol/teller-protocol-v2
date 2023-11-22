@@ -6,8 +6,9 @@ import "../TellerV2MarketForwarder_G3.sol";
 import "../interfaces/ILenderCommitmentForwarder.sol";
 import "./LenderCommitmentForwarder_G1.sol";
 
-import { CommitmentCollateralType, ISmartCommitment } from "../interfaces/ISmartCommitment.sol";
+import { CommitmentCollateralType, ISmartCommitment,AcceptFundPositionParams } from "../interfaces/ISmartCommitment.sol";
 
+ 
 /*
 
 Borrower approves this contract as being able to create loans on THEIR Behalf.
@@ -96,12 +97,14 @@ contract SmartCommitmentForwarder is TellerV2MarketForwarder_G3 {
             _smartCommitmentAddress
         );
 
+        AcceptFundPositionParams[] memory acceptPositions = new AcceptFundPositionParams[](0);
+            //add here 
+
         _commitment.acceptFundsForAcceptBid(
             _msgSender(), //borrower
-            _principalAmount,
-            _collateralAmount,
-            _collateralTokenAddress,
-            _collateralTokenId,
+            
+            acceptPositions,
+
             _loanDuration,
             _interestRate
         );

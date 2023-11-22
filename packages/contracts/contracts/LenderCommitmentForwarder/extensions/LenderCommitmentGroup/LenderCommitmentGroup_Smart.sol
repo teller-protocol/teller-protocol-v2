@@ -22,7 +22,7 @@ import "./LenderCommitmentGroupShares.sol";
 import { MathUpgradeable } from "@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20MetadataUpgradeable.sol";
 
-import { CommitmentCollateralType, ISmartCommitment } from "../../../interfaces/ISmartCommitment.sol";
+import { CommitmentCollateralType, AcceptFundPositionParams, ISmartCommitment } from "../../../interfaces/ISmartCommitment.sol";
 import { ILoanRepaymentListener } from "../../../interfaces/ILoanRepaymentListener.sol";
 
 import { ILenderCommitmentGroup } from "../../../interfaces/ILenderCommitmentGroup.sol";
@@ -175,13 +175,7 @@ contract LenderCommitmentGroup_Smart is
 
     }
 
-
-    struct AcceptFundPositionParams {
-        uint256 positionId;
-        uint256 principalAmount;
-        uint256 collateralAmount;
-    }
-
+ 
     //try to make apy dynamic .
 
     modifier onlyAfterInitialized() {

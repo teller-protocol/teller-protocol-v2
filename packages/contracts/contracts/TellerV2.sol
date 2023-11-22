@@ -932,7 +932,7 @@ contract TellerV2 is
                 address(this)
             );
 
-            uint256 _paymentAmount = _payment.principal + _payment.interest;
+            //  _paymentAmount = _payment.principal + _payment.interest;
 
             //if unable, pay to escrow
             bid.loanDetails.lendingToken.safeTransferFrom(

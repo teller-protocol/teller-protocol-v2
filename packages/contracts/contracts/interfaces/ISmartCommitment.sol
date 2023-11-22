@@ -12,6 +12,12 @@ enum CommitmentCollateralType {
     ERC1155_MERKLE_PROOF
 }
 
+
+    struct AcceptFundPositionParams {
+        uint256 positionId;
+        uint256 principalAmount;
+        uint256 collateralAmount;
+    }
 interface ISmartCommitment {
     function getPrincipalTokenAddress() external view returns (address);
 
@@ -44,10 +50,8 @@ interface ISmartCommitment {
 
     function acceptFundsForAcceptBid(
         address _borrower,
-        uint256 _principalAmount,
-        uint256 _collateralAmount,
-        address _collateralTokenAddress,
-        uint256 _collateralTokenId,
+        AcceptFundPositionParams[] memory acceptPositions,
+
         uint32 _loanDuration,
         uint16 _interestRate
     ) external;

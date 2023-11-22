@@ -351,7 +351,9 @@ multiplies by their pct of shares (S%)
     }*/
 
     function depositPrincipalForCommitmentPosition(
-           uint256 _amount
+           uint256 _amount,
+           uint256 _maxPrincipalPerCollateralAmount,
+           uint16 _liquidityThresholdPercent
     ) external onlyAfterInitialized returns (uint256 sharesAmount_){
 
 
@@ -363,6 +365,14 @@ multiplies by their pct of shares (S%)
         lenderCommitmentPositions[lenderCommitmentPositionCount++] = LenderCommitmentPosition({
 
             poolSharesAmount: sharesAmount_,
+              //this position owns this many shares
+
+            maxPrincipalPerCollateralAmount: _maxPrincipalPerCollateralAmount,  //allow lender to update and adjust this at any time . 
+
+            committedPrincipal: _amount,
+
+            allocatedPrincipal: 0,
+            liquidityThresholdPercent: _liquidityThresholdPercent
 
 
         });
@@ -530,9 +540,9 @@ multiplies by their pct of shares (S%)
         console.logUint(principalTokenEquityAmountSimple);
 
         uint256 principalTokenValueToWithdraw = (principalTokenEquityAmountSimple *
-                _amountPoolSharesTokens) / poolSharesTotalSupplyBeforeBurn;
+                _amountPoolShares) / poolSharesTotalSupplyBeforeBurn;
         uint256 tokensToUncommit = (netCommittedTokens *
-            _amountPoolSharesTokens) / poolSharesTotalSupplyBeforeBurn;
+            _amountPoolShares)  / poolSharesTotalSupplyBeforeBurn;
 
         console.log("tokensToUncommit");
         console.logUint(tokensToUncommit);

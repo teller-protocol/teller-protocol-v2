@@ -144,6 +144,8 @@ contract LenderCommitmentGroup_Smart is
     //uint16 public liquidityThresholdPercent; //5000 is 50 pct  // enforce max of 10000
     uint16 public loanToValuePercent; //the overcollateralization ratio, typically 80 pct
 
+    uint256 public totalPoolShares; // update this based on LenderCommitmentPsns
+
    // mapping(address => uint256) public principalTokensCommittedByLender;
 
     // lenderCommitmentPositionsId => LenderCommitmentPosition
@@ -151,6 +153,8 @@ contract LenderCommitmentGroup_Smart is
     uint256 lenderCommitmentPositionCount;
 
     struct LenderCommitmentPosition {
+
+        uint256 poolSharesAmount;  //this position owns this many shares
 
         uint256 maxPrincipalPerCollateralAmount;  //allow lender to update and adjust this at any time . 
 
@@ -346,6 +350,31 @@ multiplies by their pct of shares (S%)
         poolSharesToken.mint(_sharesRecipient, sharesAmount_);
     }*/
 
+    function depositPrincipalForCommitmentPosition(
+           uint256 _amount
+    ) external onlyAfterInitialized returns (uint256 sharesAmount_){
+
+
+        principalToken.transferFrom(msg.sender, address(this), _amount);
+
+
+        sharesAmount_ = _valueOfUnderlying(_amount, sharesExchangeRate());
+
+        lenderCommitmentPositions[lenderCommitmentPositionCount++] = LenderCommitmentPosition({
+
+            poolSharesAmount: sharesAmount_,
+
+
+        });
+
+
+        totalPrincipalTokensCommitted += _amount;
+        //principalTokensCommittedByLender[msg.sender] += _amount;
+
+
+
+    }
+
     function _valueOfUnderlying(uint256 amount, uint256 rate)
         internal
         pure
@@ -380,7 +409,7 @@ multiplies by their pct of shares (S%)
         //the loan duration must be less than the commitment max loan duration. The lender who made the commitment expects the money to be returned before this window.
         require(_loanDuration <= maxLoanDuration, "Invalid loan max duration");
      
-        console.logUint(getPrincipalAmountAvailableToBorrow());
+      //  console.logUint(getPrincipalAmountAvailableToBorrow());
 
         uint256 totalPrincipal = 0;
 
@@ -457,13 +486,17 @@ multiplies by their pct of shares (S%)
         //emit event
     }
 
+
+  
+
     /*
     must be initialized for this to work ! 
 
     maybe make this target a specific position instead of just being general shares... ? 
     */
-    function burnSharesToWithdrawEarnings(
-        uint256 _amountPoolSharesTokens,
+    function withdrawFromPosition(
+        uint256 _positionId,
+        uint256 _amountPoolShares,
         address _recipient
     )
         external
@@ -473,13 +506,19 @@ multiplies by their pct of shares (S%)
             uint256 collateralTokenSplitAmount_
         )
     {
+
+        //need to make sure that this position has enough pool shares
+
+
         //uint256 collectedInterest = LoanRepaymentInterestCollector( interestCollector ).collectInterest();
 
         //figure out the ratio of shares tokens that this is
-        uint256 poolSharesTotalSupplyBeforeBurn = poolSharesToken.totalSupply();
+        uint256 poolSharesTotalSupplyBeforeBurn = totalPoolShares;
 
         //this DOES reduce total supply! This is necessary for correct math.
-        poolSharesToken.burn(msg.sender, _amountPoolSharesTokens);
+        //poolSharesToken.burn(msg.sender, _amountPoolSharesTokens);
+        lenderCommitmentPositions[_positionId].poolSharesAmount -= _amountPoolShares;
+        totalPoolShares -= _amountPoolShares;
 
         uint256 netCommittedTokens = totalPrincipalTokensCommitted;
 
@@ -759,7 +798,7 @@ multiplies by their pct of shares (S%)
         return true;
     }
 
-    function getPrincipalAmountAvailableToBorrow()
+ /*   function getPrincipalAmountAvailableToBorrow()
         public
         view
         returns (uint256)
@@ -769,4 +808,5 @@ multiplies by their pct of shares (S%)
 
         return amountAvailable.percent(liquidityThresholdPercent);
     }
+    */
 }

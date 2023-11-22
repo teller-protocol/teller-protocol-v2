@@ -778,14 +778,34 @@ multiplies by their pct of shares (S%)
         return CommitmentCollateralType.ERC20;
     }
 
-    function getRequiredCollateral(uint256 _principalAmount)
+    function getRequiredCollateral(
+        uint256 _principalAmount,
+        uint256 _maxPrincipalPerCollateralAmount
+    )
         public
         view
         returns (uint256 requiredCollateral_)
     {
-        requiredCollateral_ = _getCollateralRequiredForPrincipalAmount(
+        /*requiredCollateral_ = _getCollateralRequiredForPrincipalAmount(
             _principalAmount
-        );
+        );*/
+        
+        uint8 principalDecimals = IERC20MetadataUpgradeable(
+            address(principalToken)
+        ).decimals();
+
+          uint8 collateralDecimals = IERC20MetadataUpgradeable(
+            address(collateralToken)
+        ).decimals();
+        
+
+        requiredCollateral_ = 
+            MathUpgradeable.mulDiv(
+                _principalAmount,
+                (10**(collateralDecimals + principalDecimals)),
+                _maxPrincipalPerCollateralAmount,
+                MathUpgradeable.Rounding.Up
+            );
     }
 
     function getMarketId() external view returns (uint256) {

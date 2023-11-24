@@ -17,6 +17,8 @@ import "../../../libraries/NumbersLib.sol";
 
 import "../../../interfaces/uniswap/IUniswapV3Pool.sol";
 
+import "../../../interfaces/uniswap/IUniswapV3Factory.sol";
+
 import "./LenderCommitmentGroupShares.sol";
 
 import { MathUpgradeable } from "@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol";
@@ -113,7 +115,8 @@ contract LenderCommitmentGroup_Smart is
     //ITellerV2 public immutable TELLER_V2;
     /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
     address public immutable SMART_COMMITMENT_FORWARDER;
-    address public immutable UNISWAP_V3_POOL;
+    address public immutable UNISWAP_V3_FACTORY;
+     address public UNISWAP_V3_POOL;
 
     bool private _initialized;
 
@@ -166,17 +169,19 @@ contract LenderCommitmentGroup_Smart is
     constructor(
         //  address _tellerV2,
         address _smartCommitmentForwarder,
-        address _uniswapV3Pool
+        address _uniswapV3Factory
     ) {
-        // TELLER_V2 = ITellerV2(_tellerV2);
+         
         SMART_COMMITMENT_FORWARDER = _smartCommitmentForwarder;
-        UNISWAP_V3_POOL = _uniswapV3Pool;
+        UNISWAP_V3_FACTORY = _uniswapV3Factory;
+        
     }
 
     // must send initial principal tokens into this contract just before this is called
     function initialize(
         address _principalTokenAddress,
         address _collateralTokenAddress,
+      
         // uint256 _collateralTokenId,
         // CommitmentCollateralType _collateralTokenType,
 
@@ -184,7 +189,9 @@ contract LenderCommitmentGroup_Smart is
         uint32 _maxLoanDuration,
         uint16 _minInterestRate,
         uint16 _liquidityThresholdPercent,
-        uint16 _loanToValuePercent //essentially the overcollateralization ratio.  10000 is 1:1 baseline ? // initializer  ADD ME
+        uint16 _loanToValuePercent, //essentially the overcollateralization ratio.  10000 is 1:1 baseline ? // initializer  ADD ME
+        uint24 _uniswapPoolFee
+        
     )
         external
         returns (
@@ -199,6 +206,14 @@ contract LenderCommitmentGroup_Smart is
 
         principalToken = IERC20(_principalTokenAddress);
         collateralToken = IERC20(_collateralTokenAddress);
+
+        
+        UNISWAP_V3_POOL = IUniswapV3Factory(UNISWAP_V3_FACTORY).getPool( 
+            _principalTokenAddress,
+            _collateralTokenAddress,
+            _uniswapPoolFee
+         );
+
 
         // collateralTokenAddress = _collateralTokenAddress;
         // collateralTokenId = _collateralTokenId;
@@ -218,6 +233,7 @@ contract LenderCommitmentGroup_Smart is
         // set initial terms in storage from _createCommitmentArgs
 
         poolSharesToken_ = _deployPoolSharesToken();
+
     }
 
     function _deployPoolSharesToken()
@@ -615,6 +631,8 @@ multiplies by their pct of shares (S%)
         // Now adjust for the decimal difference
         return amountToken1InToken0 / 10**18;
     }
+
+   
 
     function repayLoanCallback(
         uint256 _bidId,

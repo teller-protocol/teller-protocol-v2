@@ -56,6 +56,8 @@ contract LenderCommitmentGroupFactory {
             )
         );
 
+
+        uint24 _uniswapPoolFee = 300;
         /*
             The max principal should be a very high number! higher than usual
             The expiration time should be far in the future!  farther than usual 
@@ -67,7 +69,8 @@ contract LenderCommitmentGroupFactory {
             _createCommitmentArgs.maxDuration,
             _createCommitmentArgs.minInterestRate,
             _liquidityThresholdPercent,
-            _loanToValuePercent
+            _loanToValuePercent,
+            _uniswapPoolFee
         );
 
         //it is not absolutely necessary to have this call here but it allows the user to potentially save a tx step so it is nice to have .

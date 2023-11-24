@@ -10,7 +10,7 @@ const deployFn: DeployFunction = async (hre) => {
     await SmartCommitmentForwarder.getAddress()
 
   //for sepolia
-  const uniswapV3FactoryAddress = '0x1F98431c8aD98523631AE4a59f267346ea31F984'
+  const uniswapV3FactoryAddress = '0x0227628f3F023bb0B980b67D528571c95c6DaC1c'
 
   const networkName = hre.network.name
 
@@ -29,7 +29,7 @@ const deployFn: DeployFunction = async (hre) => {
 }
 
 // tags and deployment
-deployFn.id = 'lender-commitment-forwarder:extensions:flash-rollover:deploy'
+deployFn.id = 'lender-commitment-group-smart:deploy'
 deployFn.tags = ['lender-commitment-group-smart']
 deployFn.dependencies = [
   'teller-v2:deploy',

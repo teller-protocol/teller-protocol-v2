@@ -14,6 +14,15 @@ const deployFn: DeployFunction = async (hre) => {
 
   const networkName = hre.network.name
 
+  let principalTokenAddress = '0x7b79995e5f793a07bc00c21412e50ecae098e7f9'
+  let collateralTokenAddress = '0x932b4ecd408db358a2ac12289c889701418167ed'
+  let uniswapPoolFee = 300
+  let marketId = 1
+  let minInterestRate = 100
+  let maxLoanDuration = 5000000
+  let liquidityThresholdPercent = 10000
+  let loanToValuePercent = 10000 //make sure this functions as expected
+
   const lenderCommitmentGroupSmart = await hre.deployProxy(
     'LenderCommitmentGroup_Smart',
     {
@@ -21,6 +30,16 @@ const deployFn: DeployFunction = async (hre) => {
       constructorArgs: [
         smartCommitmentForwarderAddress,
         uniswapV3FactoryAddress
+      ],
+      initArgs: [
+        principalTokenAddress,
+        collateralTokenAddress,
+        marketId,
+        maxLoanDuration,
+        minInterestRate,
+        liquidityThresholdPercent,
+        loanToValuePercent,
+        uniswapPoolFee
       ]
     }
   )

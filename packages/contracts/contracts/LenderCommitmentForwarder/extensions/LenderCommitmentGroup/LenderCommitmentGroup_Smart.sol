@@ -588,7 +588,9 @@ multiplies by their pct of shares (S%)
         uint256 price = ((uint256(sqrtPriceX96) * uint256(sqrtPriceX96))  /
            ( 2**96 ) );
 
-        return price;
+
+        //this output is the price ratio expanded by 1e18
+        return price  * 1e18 / (2**96) ;
     }
 
     function getCollateralTokensPricePerPrincipalTokens(
@@ -596,7 +598,7 @@ multiplies by their pct of shares (S%)
     ) public view returns (uint256 principalTokenValue_) {
         bool principalTokenIsToken0 = true; //fix me
 
-        uint256 pairPrice = _getUniswapV3TokenPairPrice() * 1e18 / (2**96) ;
+        uint256 pairPrice = _getUniswapV3TokenPairPrice();
 
         if (principalTokenIsToken0) {
             principalTokenValue_ = token1ToToken0(

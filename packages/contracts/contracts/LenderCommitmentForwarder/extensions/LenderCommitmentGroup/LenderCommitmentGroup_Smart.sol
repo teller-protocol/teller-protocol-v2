@@ -214,6 +214,8 @@ contract LenderCommitmentGroup_Smart is
             _uniswapPoolFee
          );
 
+         require(UNISWAP_V3_POOL != address(0), "Invalid uniswap pool address");
+
 
         // collateralTokenAddress = _collateralTokenAddress;
         // collateralTokenId = _collateralTokenId;

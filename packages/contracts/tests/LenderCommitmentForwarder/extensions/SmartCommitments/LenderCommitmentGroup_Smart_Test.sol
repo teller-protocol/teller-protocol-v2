@@ -63,6 +63,7 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
         uint16 _minInterestRate = 0;
         uint16 _liquidityThresholdPercent = 10000;
         uint16 _loanToValuePercent = 10000;
+        uint24 _uniswapPoolFee = 3000;
 
         address _poolSharesToken = lenderCommitmentGroupSmart.initialize(
             _principalTokenAddress,
@@ -71,7 +72,8 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
             _maxLoanDuration,
             _minInterestRate,
             _liquidityThresholdPercent,
-            _loanToValuePercent
+            _loanToValuePercent,
+            _uniswapPoolFee
         );
     }
 
@@ -83,6 +85,7 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
         uint16 _minInterestRate = 0;
         uint16 _liquidityThresholdPercent = 10000;
         uint16 _loanToValuePercent = 10000;
+        uint24 _uniswapPoolFee = 3000;
 
         address _poolSharesToken = lenderCommitmentGroupSmart.initialize(
             _principalTokenAddress,
@@ -91,7 +94,8 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
             _maxLoanDuration,
             _minInterestRate,
             _liquidityThresholdPercent,
-            _loanToValuePercent
+            _loanToValuePercent,
+            _uniswapPoolFee
         );
 
         // assertFalse(isTrustedBefore, "Should not be trusted forwarder before");

@@ -34,6 +34,7 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
 
     SmartCommitmentForwarder _smartCommitmentForwarder;
     UniswapV3PoolMock _uniswapV3Pool;
+    UniswapV3FactoryMock _uniswapV3Factory;
 
     function setUp() public {
         borrower = new User();
@@ -41,6 +42,10 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
 
         _smartCommitmentForwarder = new SmartCommitmentForwarder();
         _uniswapV3Pool = new UniswapV3PoolMock();
+
+        _uniswapV3Factory = new UniswapV3FactoryMock();
+        _uniswapV3Factory.setPoolMock(address(_uniswapV3Pool));
+ 
 
         principalToken = new TestERC20Token("wrappedETH", "WETH", 1e24, 18);
 
@@ -51,7 +56,7 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
 
         lenderCommitmentGroupSmart = new LenderCommitmentGroup_Smart_Override(
             address(_smartCommitmentForwarder),
-            address(_uniswapV3Pool)
+            address(_uniswapV3Factory)
         );
     }
 
@@ -374,7 +379,10 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
 
     function test_getCollateralTokensPricePerPrincipalTokens() public {
         //  _uniswapV3Pool.set_mockSqrtPriceX96()
-
+        
+        initialize_group_contract();
+        
+        
         uint256 amount = lenderCommitmentGroupSmart
             .getCollateralTokensPricePerPrincipalTokens(1000);
 
@@ -395,6 +403,7 @@ contract SmartCommitmentForwarder {}
 contract UniswapV3PoolMock {
     //this represents an equal price ratio
     uint160 mockSqrtPriceX96 = 1 << 96;
+    
 
     struct Slot0 {
         // the current price
@@ -430,4 +439,31 @@ contract UniswapV3PoolMock {
                 unlocked: true
             });
     }
+ 
+      
+
+}
+
+
+
+contract UniswapV3FactoryMock {
+    
+    address poolMock; 
+
+ 
+    function getPool(address token0,
+                        address token1,
+                        uint24 fee 
+    ) public returns(address){
+        return poolMock;
+    }
+
+    function setPoolMock(address _pool) public {
+
+        poolMock = _pool;
+
+    }
+
+      
+
 }

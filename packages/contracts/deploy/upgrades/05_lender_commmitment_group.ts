@@ -15,6 +15,10 @@ const deployFn: DeployFunction = async (hre) => {
   const lenderCommitmentGroupProxyAddress =
     '0x62babfc668494145051a473112de8d3e93d3927e'
 
+  const LenderCommitmentGroup = await hre.ethers.getContractFactory(
+    'LenderCommitmentGroup_Smart'
+  )
+
   //for sepolia
   const uniswapV3FactoryAddress = '0x0227628f3F023bb0B980b67D528571c95c6DaC1c'
 
@@ -50,6 +54,7 @@ const deployFn: DeployFunction = async (hre) => {
   */
   const lenderCommitmentGroupSmart = await hre.upgrades.upgradeProxy(
     lenderCommitmentGroupProxyAddress,
+    LenderCommitmentGroup,
     {
       unsafeAllow: ['constructor', 'state-variable-immutable'],
       constructorArgs: [

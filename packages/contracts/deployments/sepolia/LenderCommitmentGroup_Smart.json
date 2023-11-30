@@ -687,10 +687,6 @@
     },
     {
       "type": "function",
-  },
-  "numDeployments": 1,
-  "implementation": "0x3136cE4f7d5a37D524E8E46C5D601d2154D99c84"
-}
       "name": "totalPrincipalTokensRepaid",
       "constant": true,
       "stateMutability": "view",
@@ -710,3 +706,7 @@
     "from": "0x5a5B978142C8F08Dd013901b50892baC49f3b700",
     "blockHash": null,
     "blockNumber": null
+  },
+  "numDeployments": 1,
+  "implementation": "0x3136cE4f7d5a37D524E8E46C5D601d2154D99c84"
+}

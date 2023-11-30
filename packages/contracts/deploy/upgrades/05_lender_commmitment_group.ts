@@ -12,6 +12,10 @@ const deployFn: DeployFunction = async (hre) => {
     await SmartCommitmentForwarder.getAddress()
 
   //for sepolia
+  const lenderCommitmentGroupProxyAddress =
+    '0x62babfc668494145051a473112de8d3e93d3927e'
+
+  //for sepolia
   const uniswapV3FactoryAddress = '0x0227628f3F023bb0B980b67D528571c95c6DaC1c'
 
   const networkName = hre.network.name
@@ -28,14 +32,30 @@ const deployFn: DeployFunction = async (hre) => {
   let liquidityThresholdPercent = 10000
   let loanToValuePercent = 10000 //make sure this functions as normal.  If over 100%, getting much better loan terms and i wont repay.  If it is under 100%, it will likely repay.
 
+  /*
+
+  (
+    apeSwapProxyAddress,
+    ApeSwap,
+    {
+      unsafeAllow: ['state-variable-immutable', 'constructor'],
+      constructorArgs: [
+        swapFactoryAddress,
+        contracts.TellerV2.address,
+        contracts.LenderCommitmentForwarderStaging.address
+      ]
+    }
+  )
+
+  */
   const lenderCommitmentGroupSmart = await hre.upgrades.upgradeProxy(
-    'LenderCommitmentGroup_Smart',
+    lenderCommitmentGroupProxyAddress,
     {
       unsafeAllow: ['constructor', 'state-variable-immutable'],
       constructorArgs: [
         smartCommitmentForwarderAddress,
         uniswapV3FactoryAddress
-      ],
+      ] /*,
       initArgs: [
         principalTokenAddress,
         collateralTokenAddress,
@@ -45,7 +65,7 @@ const deployFn: DeployFunction = async (hre) => {
         liquidityThresholdPercent,
         loanToValuePercent,
         uniswapPoolFee
-      ]
+      ]*/
     }
   )
 

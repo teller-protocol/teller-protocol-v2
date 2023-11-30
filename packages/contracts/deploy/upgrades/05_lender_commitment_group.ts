@@ -15,7 +15,11 @@ const deployFn: DeployFunction = async (hre) => {
   const lenderCommitmentGroupProxyAddress =
     '0x62babfc668494145051a473112de8d3e93d3927e'
 
-  const LenderCommitmentGroup = await hre.ethers.getContractFactory(
+  /*const LenderCommitmentGroup = await hre.ethers.getContractFactory(
+    'LenderCommitmentGroup_Smart'
+  )*/
+
+  const LenderCommitmentGroup = await hre.contracts.get(
     'LenderCommitmentGroup_Smart'
   )
 
@@ -36,22 +40,39 @@ const deployFn: DeployFunction = async (hre) => {
   let liquidityThresholdPercent = 10000
   let loanToValuePercent = 10000 //make sure this functions as normal.  If over 100%, getting much better loan terms and i wont repay.  If it is under 100%, it will likely repay.
 
+  await hre.upgrades.proposeBatchTimelock({
+    title: 'Lender Commitment Group Smart: Upgrade ',
+    description: ` 
+# Lender Commitment Group Smart Upgrade
+
+* Upgrades Lender Commitment Group Smart.
+`,
+    _steps: [
+      {
+        proxy: LenderCommitmentGroup,
+        implFactory: await hre.ethers.getContractFactory(
+          'LenderCommitmentGroup_Smart'
+        ),
+
+        opts: {
+          unsafeAllow: ['constructor', 'state-variable-immutable'],
+          //  unsafeAllowRenames: true,
+          constructorArgs: [
+            smartCommitmentForwarderAddress,
+            uniswapV3FactoryAddress
+          ]
+
+          /* call: {
+            fn: 'setCollateralManagerV2',
+            args: [await collateralManagerV2.getAddress()]
+          }
+          */
+        }
+      }
+    ]
+  })
+
   /*
-
-  (
-    apeSwapProxyAddress,
-    ApeSwap,
-    {
-      unsafeAllow: ['state-variable-immutable', 'constructor'],
-      constructorArgs: [
-        swapFactoryAddress,
-        contracts.TellerV2.address,
-        contracts.LenderCommitmentForwarderStaging.address
-      ]
-    }
-  )
-
-  */
   const lenderCommitmentGroupSmart = await hre.upgrades.upgradeProxy(
     lenderCommitmentGroupProxyAddress,
     LenderCommitmentGroup,
@@ -60,19 +81,10 @@ const deployFn: DeployFunction = async (hre) => {
       constructorArgs: [
         smartCommitmentForwarderAddress,
         uniswapV3FactoryAddress
-      ] /*,
-      initArgs: [
-        principalTokenAddress,
-        collateralTokenAddress,
-        marketId,
-        maxLoanDuration,
-        minInterestRate,
-        liquidityThresholdPercent,
-        loanToValuePercent,
-        uniswapPoolFee
-      ]*/
+      ] 
     }
   )
+*/
 
   return true
 }

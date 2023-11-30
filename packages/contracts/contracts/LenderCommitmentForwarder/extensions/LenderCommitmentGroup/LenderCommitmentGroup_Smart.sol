@@ -585,8 +585,8 @@ multiplies by their pct of shares (S%)
         // sqrtPrice is in X96 format so we scale it down to get the price
         // Also note that this price is a relative price between the two tokens in the pool
         // It's not a USD price
-        uint256 price = (uint256(sqrtPriceX96) * (sqrtPriceX96) * (1e18)) >>
-            (96 * 2);
+        uint256 price = ((uint256(sqrtPriceX96) * uint256(sqrtPriceX96))  /
+           ( 2**96 ) );
 
         return price;
     }
@@ -596,7 +596,7 @@ multiplies by their pct of shares (S%)
     ) public view returns (uint256 principalTokenValue_) {
         bool principalTokenIsToken0 = true; //fix me
 
-        uint256 pairPrice = _getUniswapV3TokenPairPrice();
+        uint256 pairPrice = _getUniswapV3TokenPairPrice() * 1e18 / (2**96) ;
 
         if (principalTokenIsToken0) {
             principalTokenValue_ = token1ToToken0(
@@ -631,7 +631,7 @@ multiplies by their pct of shares (S%)
         // Multiply the amount of token1 by the price to get the amount in token0's units
         uint256 amountToken1InToken0 = amountToken1 * priceToken1PerToken0;
         // Now adjust for the decimal difference
-        return amountToken1InToken0 / 10**18;
+        return amountToken1InToken0 / 10**18 ;
     }
 
    

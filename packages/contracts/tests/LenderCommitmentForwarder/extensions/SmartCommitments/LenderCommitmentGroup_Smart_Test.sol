@@ -378,15 +378,14 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
     */
 
     function test_getCollateralTokensPricePerPrincipalTokens() public {
-        //  _uniswapV3Pool.set_mockSqrtPriceX96()
-        
+         
         initialize_group_contract();
         
         
         uint256 amount = lenderCommitmentGroupSmart
-            .getCollateralTokensPricePerPrincipalTokens(1000);
+            .getCollateralTokensPricePerPrincipalTokens(1e14);
 
-        uint256 expectedAmount = 1000;
+        uint256 expectedAmount = 1e14;
 
         assertEq(
             amount,
@@ -402,7 +401,7 @@ contract SmartCommitmentForwarder {}
 
 contract UniswapV3PoolMock {
     //this represents an equal price ratio
-    uint160 mockSqrtPriceX96 = 1 << 96;
+    uint160 mockSqrtPriceX96 = 2 ** 96;
     
 
     struct Slot0 {

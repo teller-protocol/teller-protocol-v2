@@ -192,7 +192,8 @@ contract LenderCommitmentGroup_Smart is
         uint16 _loanToValuePercent, //essentially the overcollateralization ratio.  10000 is 1:1 baseline ? // initializer  ADD ME
         uint24 _uniswapPoolFee
         
-    )
+    )   
+        initializer
         external
         returns (
             //uint256 _maxPrincipalPerCollateralAmount //use oracle instead
@@ -202,7 +203,8 @@ contract LenderCommitmentGroup_Smart is
             address poolSharesToken_
         )
     {
-        _initialized = true;
+        require(!_initialized,"already initialized");
+        _initialized = true; //not necessary ? 
 
         principalToken = IERC20(_principalTokenAddress);
         collateralToken = IERC20(_collateralTokenAddress);
@@ -522,6 +524,8 @@ multiplies by their pct of shares (S%)
 
         uint256 totalValueInPrincipalTokens = collateralTokenValueInPrincipalToken +
                 principalTokenBalance;
+
+        if(totalValueInPrincipalTokens == 0) {return (0,0);}
 
         console.log("_principalTokenAmountValue");
         console.logUint(_principalTokenAmountValue);

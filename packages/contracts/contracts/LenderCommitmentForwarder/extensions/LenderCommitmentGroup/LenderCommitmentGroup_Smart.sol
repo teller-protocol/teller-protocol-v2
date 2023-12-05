@@ -114,9 +114,10 @@ contract LenderCommitmentGroup_Smart is
     /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
     //ITellerV2 public immutable TELLER_V2;
     /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
+    address public immutable TELLER_V2;
     address public immutable SMART_COMMITMENT_FORWARDER;
     address public immutable UNISWAP_V3_FACTORY;
-     address public UNISWAP_V3_POOL;
+    address public UNISWAP_V3_POOL;
 
     bool private _initialized;
 
@@ -167,11 +168,11 @@ contract LenderCommitmentGroup_Smart is
     //maybe make this an initializer instead !?
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor(
-        //  address _tellerV2,
+        address _tellerV2,
         address _smartCommitmentForwarder,
         address _uniswapV3Factory
     ) {
-         
+        TELLER_V2 = _tellerV2;
         SMART_COMMITMENT_FORWARDER = _smartCommitmentForwarder;
         UNISWAP_V3_FACTORY = _uniswapV3Factory;
         
@@ -181,10 +182,7 @@ contract LenderCommitmentGroup_Smart is
     function initialize(
         address _principalTokenAddress,
         address _collateralTokenAddress,
-      
-        // uint256 _collateralTokenId,
-        // CommitmentCollateralType _collateralTokenType,
-
+       
         uint256 _marketId,
         uint32 _maxLoanDuration,
         uint16 _minInterestRate,
@@ -196,10 +194,7 @@ contract LenderCommitmentGroup_Smart is
         initializer
         external
         returns (
-            //uint256 _maxPrincipalPerCollateralAmount //use oracle instead
-
-            //ILenderCommitmentForwarder.Commitment calldata _createCommitmentArgs
-
+            
             address poolSharesToken_
         )
     {
@@ -219,10 +214,13 @@ contract LenderCommitmentGroup_Smart is
          require(UNISWAP_V3_POOL != address(0), "Invalid uniswap pool address");
 
 
-        // collateralTokenAddress = _collateralTokenAddress;
-        // collateralTokenId = _collateralTokenId;
-        // collateralTokenType = _collateralTokenType;
+       
         marketId = _marketId;
+
+        //approve this market as a forwarder 
+        ITellerV2(TELLER_V2).approveMarketForwarder( _marketId, SMART_COMMITMENT_FORWARDER );
+
+
         maxLoanDuration = _maxLoanDuration;
         minInterestRate = _minInterestRate;
 

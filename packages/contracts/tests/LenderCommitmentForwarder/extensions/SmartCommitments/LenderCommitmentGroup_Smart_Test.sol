@@ -4,6 +4,8 @@ import { LenderCommitmentGroup_Smart_Override } from "./LenderCommitmentGroup_Sm
 
 import "../../../tokens/TestERC20Token.sol";
 
+import "../../../../contracts/mock/TellerV2SolMock.sol";
+
 //contract LenderCommitmentGroup_Smart_Mock is ExtensionsContextUpgradeable {}
 
 /*
@@ -32,7 +34,7 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
 
     LenderCommitmentGroup_Smart_Override lenderCommitmentGroupSmart;
 
-    address _tellerV2;
+    TellerV2SolMock _tellerV2;
     SmartCommitmentForwarder _smartCommitmentForwarder;
     UniswapV3PoolMock _uniswapV3Pool;
     UniswapV3FactoryMock _uniswapV3Factory;
@@ -41,7 +43,7 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
         borrower = new User();
         lender = new User();
 
-        _tellerV2 = address(0);
+        _tellerV2 = new TellerV2SolMock();
         _smartCommitmentForwarder = new SmartCommitmentForwarder();
         _uniswapV3Pool = new UniswapV3PoolMock();
 

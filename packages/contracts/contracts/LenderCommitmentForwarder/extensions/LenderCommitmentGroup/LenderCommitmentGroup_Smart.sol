@@ -6,8 +6,8 @@ import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-// Interfaces
-import "../../../interfaces/ITellerV2.sol";
+// Interfaces 
+import "../../../interfaces/ITellerV2Context.sol";
 import "../../../interfaces/IProtocolFee.sol";
 import "../../../interfaces/ITellerV2Storage.sol";
 import "../../../interfaces/IMarketRegistry.sol";
@@ -218,7 +218,7 @@ contract LenderCommitmentGroup_Smart is
         marketId = _marketId;
 
         //approve this market as a forwarder 
-        ITellerV2(TELLER_V2).approveMarketForwarder( _marketId, SMART_COMMITMENT_FORWARDER );
+        ITellerV2Context(TELLER_V2).approveMarketForwarder( _marketId, SMART_COMMITMENT_FORWARDER );
 
 
         maxLoanDuration = _maxLoanDuration;

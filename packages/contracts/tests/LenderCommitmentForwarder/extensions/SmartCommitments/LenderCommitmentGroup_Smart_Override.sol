@@ -13,8 +13,8 @@ contract LenderCommitmentGroup_Smart_Override is LenderCommitmentGroup_Smart {
 
     uint256 mockMaxPrincipalPerCollateralAmount;
 
-    constructor(address _smartCommitmentForwarder, address _uniswapV3Pool)
-        LenderCommitmentGroup_Smart(_smartCommitmentForwarder, _uniswapV3Pool)
+    constructor(address _tellerV2, address _smartCommitmentForwarder, address _uniswapV3Pool)
+        LenderCommitmentGroup_Smart(_tellerV2,_smartCommitmentForwarder, _uniswapV3Pool)
     {}
 
     function set_totalPrincipalTokensCommitted(uint256 _mockAmt) public {

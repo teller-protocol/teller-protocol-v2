@@ -32,6 +32,7 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
 
     LenderCommitmentGroup_Smart_Override lenderCommitmentGroupSmart;
 
+    address _tellerV2;
     SmartCommitmentForwarder _smartCommitmentForwarder;
     UniswapV3PoolMock _uniswapV3Pool;
     UniswapV3FactoryMock _uniswapV3Factory;
@@ -40,6 +41,7 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
         borrower = new User();
         lender = new User();
 
+        _tellerV2 = address(0);
         _smartCommitmentForwarder = new SmartCommitmentForwarder();
         _uniswapV3Pool = new UniswapV3PoolMock();
 
@@ -55,6 +57,7 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
         collateralToken.transfer(address(borrower), 1e18);
 
         lenderCommitmentGroupSmart = new LenderCommitmentGroup_Smart_Override(
+            address(_tellerV2),
             address(_smartCommitmentForwarder),
             address(_uniswapV3Factory)
         );

@@ -17,6 +17,7 @@ contract LenderCommitmentGroupFactory_Test is Testable {
 
     address _tellerV2 = address(0x02);
     address _lenderCommitmentForwarder = address(0x03);
+    address _uniswapV3Factory = address(0x04);
 
     LenderCommitmentGroupFactory factory;
 
@@ -26,7 +27,8 @@ contract LenderCommitmentGroupFactory_Test is Testable {
 
         factory = new LenderCommitmentGroupFactory(
             _tellerV2,
-            _lenderCommitmentForwarder
+            _lenderCommitmentForwarder,
+            _uniswapV3Factory
         );
     }
 

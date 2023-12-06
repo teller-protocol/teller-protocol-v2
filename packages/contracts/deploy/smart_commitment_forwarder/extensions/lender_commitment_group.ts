@@ -6,6 +6,8 @@ const deployFn: DeployFunction = async (hre) => {
     'SmartCommitmentForwarder'
   )
 
+  const tellerV2Address = await tellerV2.getAddress()
+
   const smartCommitmentForwarderAddress =
     await SmartCommitmentForwarder.getAddress()
 
@@ -31,6 +33,7 @@ const deployFn: DeployFunction = async (hre) => {
     {
       unsafeAllow: ['constructor', 'state-variable-immutable'],
       constructorArgs: [
+        tellerV2Address,
         smartCommitmentForwarderAddress,
         uniswapV3FactoryAddress
       ],

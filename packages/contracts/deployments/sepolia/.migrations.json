@@ -20,6 +20,6 @@
   "collateral:manager-v2:deploy": 1700855248,
   "teller-v2:collateral-manager-v2-upgrade": 1700855336,
   "smart-commitment-forwarder:deploy": 1700855352,
-  "lender-commitment-group-smart:deploy": 1701291553,
-  "lender-commitment-group-upgrade": 1701378269
+  "lender-commitment-group-upgrade": 1701378269,
+  "lender-commitment-group-smart:deploy": 1701886933
 }

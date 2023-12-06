@@ -1,11 +1,15 @@
 {
-  "address": "0x62babFC668494145051a473112De8D3e93d3927E",
+  "address": "0x3AF8DB041fcaFA539C2c78f73aa209383ba703ed",
   "abi": [
     {
       "type": "constructor",
       "stateMutability": "undefined",
       "payable": false,
       "inputs": [
+        {
+          "type": "address",
+          "name": "_tellerV2"
+        },
         {
           "type": "address",
           "name": "_smartCommitmentForwarder"
@@ -45,6 +49,20 @@
     {
       "type": "function",
       "name": "SMART_COMMITMENT_FORWARDER",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "TELLER_V2",
       "constant": true,
       "stateMutability": "view",
       "payable": false,
@@ -700,13 +718,13 @@
       ]
     }
   ],
-  "transactionHash": "0x3583c4b384498e0f9cd664860746c36bd3da77c1bb92b61b16187fc23097bc6b",
+  "transactionHash": "0xde00ae12b1f7f6a89401c80961f11f3c394c5a080de4d6a2cafd8ecaf90a06cc",
   "receipt": {
     "to": null,
-    "from": "0x5a5B978142C8F08Dd013901b50892baC49f3b700",
+    "from": "0xD9B023522CeCe02251d877bb0EB4f06fDe6F98E6",
     "blockHash": null,
     "blockNumber": null
   },
-  "numDeployments": 2,
-  "implementation": "0x3136cE4f7d5a37D524E8E46C5D601d2154D99c84"
+  "numDeployments": 1,
+  "implementation": "0xE11884953B18F8ddC55875CBDAb71b624779D3bB"
 }

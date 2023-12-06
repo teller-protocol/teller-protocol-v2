@@ -9,9 +9,8 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 // Interfaces 
 import "../../../interfaces/ITellerV2Context.sol";
 import "../../../interfaces/IProtocolFee.sol";
-import "../../../interfaces/ITellerV2Storage.sol";
-import "../../../interfaces/IMarketRegistry.sol";
-//import "../../../interfaces/ISmartCommitmentForwarder.sol";
+import "../../../interfaces/ITellerV2Storage.sol";  
+
 import "../../../interfaces/IFlashRolloverLoan.sol";
 import "../../../libraries/NumbersLib.sol";
 

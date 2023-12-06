@@ -4,6 +4,10 @@ const deployFn: DeployFunction = async (hre) => {
   hre.log('----------')
   hre.log('')
 
+  const TellerV2 = await hre.contracts.get('TellerV2')
+
+  const tellerV2Address = await TellerV2.getAddress()
+
   const SmartCommitmentForwarder = await hre.contracts.get(
     'SmartCommitmentForwarder'
   )
@@ -13,7 +17,7 @@ const deployFn: DeployFunction = async (hre) => {
 
   //for sepolia
   const lenderCommitmentGroupProxyAddress =
-    '0x62babfc668494145051a473112de8d3e93d3927e'
+    '0x3AF8DB041fcaFA539C2c78f73aa209383ba703ed'
 
   /*const LenderCommitmentGroup = await hre.ethers.getContractFactory(
     'LenderCommitmentGroup_Smart'
@@ -58,6 +62,7 @@ const deployFn: DeployFunction = async (hre) => {
           unsafeAllow: ['constructor', 'state-variable-immutable'],
           //  unsafeAllowRenames: true,
           constructorArgs: [
+            tellerV2Address,
             smartCommitmentForwarderAddress,
             uniswapV3FactoryAddress
           ]

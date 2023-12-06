@@ -411,7 +411,8 @@ multiplies by their pct of shares (S%)
             "Insufficient Borrower Collateral"
         );
 
-        principalToken.transfer(SMART_COMMITMENT_FORWARDER, _principalAmount);
+            //consider changing how this works 
+        principalToken.approve(address(TELLER_V2), _principalAmount);
 
         totalPrincipalTokensLended += _principalAmount;
 

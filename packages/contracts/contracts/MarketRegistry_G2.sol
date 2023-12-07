@@ -56,15 +56,17 @@ contract MarketRegistry_G2 is IMarketRegistry_V2, Initializable, Context {
 
     mapping(uint256 => bool) private marketIsClosed;
 
-    //uint256 marketTermsCount; //  use a hash here instead of uint256
-    mapping(bytes32 => MarketplaceTerms) public marketTerms;
-
-    //market id => market terms.  Used when a new bid is created. If this is blank for a market, new bids cant be created for that market.
-    mapping(uint256 => bytes32) public currentMarketTermsForMarket;
+ 
 
     //TellerAS public tellerAS;  //this took 7 storage slots
     uint256[7] private __teller_as_gap;
 
+   //uint256 marketTermsCount; //  use a hash here instead of uint256
+    mapping(bytes32 => MarketplaceTerms) public marketTerms;
+
+    //market id => market terms.  Used when a new bid is created. If this is blank for a market, new bids cant be created for that market.
+    mapping(uint256 => bytes32) public currentMarketTermsForMarket;
+    
     /* Modifiers */
 
     modifier ownsMarket(uint256 _marketId) {

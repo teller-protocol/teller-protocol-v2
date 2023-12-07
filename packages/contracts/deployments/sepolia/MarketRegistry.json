@@ -2,11 +2,6 @@
   "address": "0x6213d6444C871869C7c8eFBbfC6101a202A08E68",
   "abi": [
     {
-      "type": "error",
-      "name": "NotPayable",
-      "inputs": []
-    },
-    {
       "type": "event",
       "anonymous": false,
       "name": "BorrowerAttestation",
@@ -53,6 +48,18 @@
         {
           "type": "address",
           "name": "borrower",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "DefineMarketTerms",
+      "inputs": [
+        {
+          "type": "bytes32",
+          "name": "marketTermsId",
           "indexed": false
         }
       ]
@@ -162,6 +169,23 @@
         {
           "type": "uint32",
           "name": "duration",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "SetCurrentMarketTermsForMarket",
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "marketId",
+          "indexed": false
+        },
+        {
+          "type": "bytes32",
+          "name": "marketTermsId",
           "indexed": false
         }
       ]
@@ -357,36 +381,60 @@
     },
     {
       "type": "function",
-      "name": "attestBorrower",
-      "constant": false,
+      "name": "__lenderAttestationSchemaId",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "bytes32",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "_getMarketTermsHashId",
+      "constant": true,
+      "stateMutability": "view",
       "payable": false,
       "inputs": [
         {
-          "type": "uint256",
-          "name": "_marketId"
-        },
-        {
-          "type": "address",
-          "name": "_borrowerAddress"
-        },
-        {
-          "type": "uint256",
-          "name": "_expirationTime"
+          "type": "uint32",
+          "name": "_paymentCycleDuration"
         },
         {
           "type": "uint8",
-          "name": "_v"
+          "name": "_newPaymentType"
         },
         {
-          "type": "bytes32",
-          "name": "_r"
+          "type": "uint8",
+          "name": "_paymentCycleType"
         },
         {
-          "type": "bytes32",
-          "name": "_s"
+          "type": "uint32",
+          "name": "_paymentDefaultDuration"
+        },
+        {
+          "type": "uint32",
+          "name": "_bidExpirationTime"
+        },
+        {
+          "type": "uint16",
+          "name": "_feePercent"
+        },
+        {
+          "type": "address",
+          "name": "_feeRecipient"
         }
       ],
-      "outputs": []
+      "outputs": [
+        {
+          "type": "bytes32",
+          "name": ""
+        }
+      ]
     },
     {
       "type": "function",
@@ -405,39 +453,6 @@
         {
           "type": "uint256",
           "name": "_expirationTime"
-        }
-      ],
-      "outputs": []
-    },
-    {
-      "type": "function",
-      "name": "attestLender",
-      "constant": false,
-      "payable": false,
-      "inputs": [
-        {
-          "type": "uint256",
-          "name": "_marketId"
-        },
-        {
-          "type": "address",
-          "name": "_lenderAddress"
-        },
-        {
-          "type": "uint256",
-          "name": "_expirationTime"
-        },
-        {
-          "type": "uint8",
-          "name": "_v"
-        },
-        {
-          "type": "bytes32",
-          "name": "_r"
-        },
-        {
-          "type": "bytes32",
-          "name": "_s"
         }
       ],
       "outputs": []
@@ -514,22 +529,6 @@
           "name": "_initialOwner"
         },
         {
-          "type": "uint32",
-          "name": "_paymentCycleDuration"
-        },
-        {
-          "type": "uint32",
-          "name": "_paymentDefaultDuration"
-        },
-        {
-          "type": "uint32",
-          "name": "_bidExpirationTime"
-        },
-        {
-          "type": "uint16",
-          "name": "_feePercent"
-        },
-        {
           "type": "bool",
           "name": "_requireLenderAttestation"
         },
@@ -538,68 +537,71 @@
           "name": "_requireBorrowerAttestation"
         },
         {
-          "type": "uint8",
-          "name": "_paymentType"
-        },
-        {
-          "type": "uint8",
-          "name": "_paymentCycleType"
-        },
-        {
           "type": "string",
           "name": "_uri"
+        },
+        {
+          "type": "tuple",
+          "name": "_marketTermsParams",
+          "components": [
+            {
+              "type": "uint16",
+              "name": "marketplaceFeePercent"
+            },
+            {
+              "type": "uint8",
+              "name": "paymentType"
+            },
+            {
+              "type": "uint8",
+              "name": "paymentCycleType"
+            },
+            {
+              "type": "uint32",
+              "name": "paymentCycleDuration"
+            },
+            {
+              "type": "uint32",
+              "name": "paymentDefaultDuration"
+            },
+            {
+              "type": "uint32",
+              "name": "bidExpirationTime"
+            },
+            {
+              "type": "address",
+              "name": "feeRecipient"
+            }
+          ]
         }
       ],
       "outputs": [
         {
           "type": "uint256",
           "name": "marketId_"
+        },
+        {
+          "type": "bytes32",
+          "name": "marketTerms_"
         }
       ]
     },
     {
       "type": "function",
-      "name": "createMarket",
-      "constant": false,
+      "name": "currentMarketTermsForMarket",
+      "constant": true,
+      "stateMutability": "view",
       "payable": false,
       "inputs": [
         {
-          "type": "address",
-          "name": "_initialOwner"
-        },
-        {
-          "type": "uint32",
-          "name": "_paymentCycleDuration"
-        },
-        {
-          "type": "uint32",
-          "name": "_paymentDefaultDuration"
-        },
-        {
-          "type": "uint32",
-          "name": "_bidExpirationTime"
-        },
-        {
-          "type": "uint16",
-          "name": "_feePercent"
-        },
-        {
-          "type": "bool",
-          "name": "_requireLenderAttestation"
-        },
-        {
-          "type": "bool",
-          "name": "_requireBorrowerAttestation"
-        },
-        {
-          "type": "string",
-          "name": "_uri"
+          "type": "uint256",
+          "name": ""
         }
       ],
       "outputs": [
         {
-          "type": "uint256",
-          "name": "marketId_"
+          "type": "bytes32",
+          "name": ""
         }
       ]
     },
@@ -666,12 +668,50 @@
       "inputs": [
         {
           "type": "uint256",
-          "name": "marketId"
+          "name": "_marketId"
         }
       ],
       "outputs": [
         {
           "type": "uint32",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getBidExpirationTimeForTerms",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "bytes32",
+          "name": "_marketTermsId"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint32",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getCurrentTermsForMarket",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_marketId"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "bytes32",
           "name": ""
         }
       ]
@@ -717,28 +757,20 @@
           "name": "owner"
         },
         {
-          "type": "uint32",
-          "name": "paymentCycleDuration"
-        },
-        {
-          "type": "uint32",
-          "name": "paymentDefaultDuration"
-        },
-        {
-          "type": "uint32",
-          "name": "loanExpirationTime"
-        },
-        {
           "type": "string",
           "name": "metadataURI"
         },
         {
-          "type": "uint16",
-          "name": "marketplaceFeePercent"
+          "type": "bool",
+          "name": "borrowerAttestationRequired"
         },
         {
           "type": "bool",
           "name": "lenderAttestationRequired"
+        },
+        {
+          "type": "bytes32",
+          "name": "marketTermsId"
         }
       ]
     },
@@ -757,6 +789,29 @@
       "outputs": [
         {
           "type": "address",
+          "name": "_recipient"
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getMarketFeeTerms",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "bytes32",
+          "name": "_marketTermsId"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        },
+        {
+          "type": "uint16",
           "name": ""
         }
       ]
@@ -776,6 +831,84 @@
       "outputs": [
         {
           "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getMarketTermsData",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "bytes32",
+          "name": "_marketTermsId"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint32",
+          "name": "paymentCycleDuration"
+        },
+        {
+          "type": "uint8",
+          "name": "paymentType"
+        },
+        {
+          "type": "uint8",
+          "name": "paymentCycleType"
+        },
+        {
+          "type": "uint32",
+          "name": "paymentDefaultDuration"
+        },
+        {
+          "type": "uint32",
+          "name": "bidExpirationTime"
+        },
+        {
+          "type": "uint16",
+          "name": "feePercent"
+        },
+        {
+          "type": "address",
+          "name": "feeRecipient"
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getMarketTermsForLending",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "bytes32",
+          "name": "_marketTermsId"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint32",
+          "name": ""
+        },
+        {
+          "type": "uint8",
+          "name": ""
+        },
+        {
+          "type": "uint8",
+          "name": ""
+        },
+        {
+          "type": "uint32",
+          "name": ""
+        },
+        {
+          "type": "uint32",
           "name": ""
         }
       ]
@@ -814,13 +947,13 @@
       "outputs": [
         {
           "type": "uint16",
-          "name": "fee"
+          "name": ""
         }
       ]
     },
     {
       "type": "function",
-      "name": "getPaymentCycle",
+      "name": "getPaymentCycleDuration",
       "constant": true,
       "stateMutability": "view",
       "payable": false,
@@ -834,7 +967,60 @@
         {
           "type": "uint32",
           "name": ""
-        },
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getPaymentCycleDurationForTerms",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "bytes32",
+          "name": "_marketTermsId"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint32",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getPaymentCycleType",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_marketId"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint8",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getPaymentCycleTypeForTerms",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "bytes32",
+          "name": "_marketTermsId"
+        }
+      ],
+      "outputs": [
         {
           "type": "uint8",
           "name": ""
@@ -851,6 +1037,25 @@
         {
           "type": "uint256",
           "name": "_marketId"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint32",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getPaymentDefaultDurationForTerms",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "bytes32",
+          "name": "_marketTermsId"
         }
       ],
       "outputs": [
@@ -881,15 +1086,29 @@
     },
     {
       "type": "function",
-      "name": "initialize",
-      "constant": false,
+      "name": "getPaymentTypeForTerms",
+      "constant": true,
+      "stateMutability": "view",
       "payable": false,
       "inputs": [
         {
-          "type": "address",
-          "name": "_tellerAS"
+          "type": "bytes32",
+          "name": "_marketTermsId"
         }
       ],
+      "outputs": [
+        {
+          "type": "uint8",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "initialize",
+      "constant": false,
+      "payable": false,
+      "inputs": [],
       "outputs": []
     },
     {
@@ -932,20 +1151,6 @@
     },
     {
       "type": "function",
-      "name": "isPayable",
-      "constant": true,
-      "stateMutability": "pure",
-      "payable": false,
-      "inputs": [],
-      "outputs": [
-        {
-          "type": "bool",
-          "name": ""
-        }
-      ]
-    },
-    {
-      "type": "function",
       "name": "isVerifiedBorrower",
       "constant": true,
       "stateMutability": "view",
@@ -957,7 +1162,7 @@
         },
         {
           "type": "address",
-          "name": "_borrowerAddress"
+          "name": "_borrower"
         }
       ],
       "outputs": [
@@ -984,7 +1189,7 @@
         },
         {
           "type": "address",
-          "name": "_lenderAddress"
+          "name": "_lender"
         }
       ],
       "outputs": [
@@ -995,20 +1200,6 @@
         {
           "type": "bytes32",
           "name": "uuid_"
-        }
-      ]
-    },
-    {
-      "type": "function",
-      "name": "lenderAttestationSchemaId",
-      "constant": true,
-      "stateMutability": "view",
-      "payable": false,
-      "inputs": [],
-      "outputs": [
-        {
-          "type": "bytes32",
-          "name": ""
         }
       ]
     },
@@ -1041,36 +1232,63 @@
     },
     {
       "type": "function",
-      "name": "resolve",
-      "constant": false,
-      "stateMutability": "payable",
-      "payable": true,
+      "name": "marketHasDefinedTerms",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
       "inputs": [
         {
-          "type": "address",
-          "name": "recipient"
-        },
-        {
-          "type": "bytes",
-          "name": "schema"
-        },
-        {
-          "type": "bytes",
-          "name": "data"
-        },
-        {
           "type": "uint256",
-          "name": ""
-        },
-        {
-          "type": "address",
-          "name": "attestor"
+          "name": "_marketId"
         }
       ],
       "outputs": [
         {
           "type": "bool",
           "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "marketTerms",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "bytes32",
+          "name": ""
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint16",
+          "name": "marketplaceFeePercent"
+        },
+        {
+          "type": "uint8",
+          "name": "paymentType"
+        },
+        {
+          "type": "uint8",
+          "name": "paymentCycleType"
+        },
+        {
+          "type": "uint32",
+          "name": "paymentCycleDuration"
+        },
+        {
+          "type": "uint32",
+          "name": "paymentDefaultDuration"
+        },
+        {
+          "type": "uint32",
+          "name": "bidExpirationTime"
+        },
+        {
+          "type": "address",
+          "name": "feeRecipient"
         }
       ]
     },
@@ -1093,35 +1311,6 @@
     },
     {
       "type": "function",
-      "name": "revokeBorrower",
-      "constant": false,
-      "payable": false,
-      "inputs": [
-        {
-          "type": "uint256",
-          "name": "_marketId"
-        },
-        {
-          "type": "address",
-          "name": "_borrowerAddress"
-        },
-        {
-          "type": "uint8",
-          "name": "_v"
-        },
-        {
-          "type": "bytes32",
-          "name": "_r"
-        },
-        {
-          "type": "bytes32",
-          "name": "_s"
-        }
-      ],
-      "outputs": []
-    },
-    {
-      "type": "function",
       "name": "revokeLender",
       "constant": false,
       "payable": false,
@@ -1133,52 +1322,6 @@
         {
           "type": "address",
           "name": "_lenderAddress"
-        },
-        {
-          "type": "uint8",
-          "name": "_v"
-        },
-        {
-          "type": "bytes32",
-          "name": "_r"
-        },
-        {
-          "type": "bytes32",
-          "name": "_s"
-        }
-      ],
-      "outputs": []
-    },
-    {
-      "type": "function",
-      "name": "revokeLender",
-      "constant": false,
-      "payable": false,
-      "inputs": [
-        {
-          "type": "uint256",
-          "name": "_marketId"
-        },
-        {
-          "type": "address",
-          "name": "_lenderAddress"
-        }
-      ],
-      "outputs": []
-    },
-    {
-      "type": "function",
-      "name": "setBidExpirationTime",
-      "constant": false,
-      "payable": false,
-      "inputs": [
-        {
-          "type": "uint256",
-          "name": "_marketId"
-        },
-        {
-          "type": "uint32",
-          "name": "_duration"
         }
       ],
       "outputs": []
@@ -1219,57 +1362,6 @@
     },
     {
       "type": "function",
-      "name": "setMarketFeePercent",
-      "constant": false,
-      "payable": false,
-      "inputs": [
-        {
-          "type": "uint256",
-          "name": "_marketId"
-        },
-        {
-          "type": "uint16",
-          "name": "_newPercent"
-        }
-      ],
-      "outputs": []
-    },
-    {
-      "type": "function",
-      "name": "setMarketFeeRecipient",
-      "constant": false,
-      "payable": false,
-      "inputs": [
-        {
-          "type": "uint256",
-          "name": "_marketId"
-        },
-        {
-          "type": "address",
-          "name": "_recipient"
-        }
-      ],
-      "outputs": []
-    },
-    {
-      "type": "function",
-      "name": "setMarketPaymentType",
-      "constant": false,
-      "payable": false,
-      "inputs": [
-        {
-          "type": "uint256",
-          "name": "_marketId"
-        },
-        {
-          "type": "uint8",
-          "name": "_newPaymentType"
-        }
-      ],
-      "outputs": []
-    },
-    {
-      "type": "function",
       "name": "setMarketURI",
       "constant": false,
       "payable": false,
@@ -1284,58 +1376,6 @@
         }
       ],
       "outputs": []
-    },
-    {
-      "type": "function",
-      "name": "setPaymentCycle",
-      "constant": false,
-      "payable": false,
-      "inputs": [
-        {
-          "type": "uint256",
-          "name": "_marketId"
-        },
-        {
-          "type": "uint8",
-          "name": "_paymentCycleType"
-        },
-        {
-          "type": "uint32",
-          "name": "_duration"
-        }
-      ],
-      "outputs": []
-    },
-    {
-      "type": "function",
-      "name": "setPaymentDefaultDuration",
-      "constant": false,
-      "payable": false,
-      "inputs": [
-        {
-          "type": "uint256",
-          "name": "_marketId"
-        },
-        {
-          "type": "uint32",
-          "name": "_duration"
-        }
-      ],
-      "outputs": []
-    },
-    {
-      "type": "function",
-      "name": "tellerAS",
-      "constant": true,
-      "stateMutability": "view",
-      "payable": false,
-      "inputs": [],
-      "outputs": [
-        {
-          "type": "address",
-          "name": ""
-        }
-      ]
     },
     {
       "type": "function",
@@ -1365,43 +1405,46 @@
           "name": "_marketId"
         },
         {
-          "type": "uint32",
-          "name": "_paymentCycleDuration"
-        },
-        {
-          "type": "uint8",
-          "name": "_newPaymentType"
-        },
-        {
-          "type": "uint8",
-          "name": "_paymentCycleType"
-        },
-        {
-          "type": "uint32",
-          "name": "_paymentDefaultDuration"
-        },
-        {
-          "type": "uint32",
-          "name": "_bidExpirationTime"
-        },
-        {
-          "type": "uint16",
-          "name": "_feePercent"
-        },
-        {
-          "type": "bool",
-          "name": "_borrowerAttestationRequired"
-        },
-        {
-          "type": "bool",
-          "name": "_lenderAttestationRequired"
-        },
-        {
-          "type": "string",
-          "name": "_metadataURI"
+          "type": "tuple",
+          "name": "_marketTermsParams",
+          "components": [
+            {
+              "type": "uint16",
+              "name": "marketplaceFeePercent"
+            },
+            {
+              "type": "uint8",
+              "name": "paymentType"
+            },
+            {
+              "type": "uint8",
+              "name": "paymentCycleType"
+            },
+            {
+              "type": "uint32",
+              "name": "paymentCycleDuration"
+            },
+            {
+              "type": "uint32",
+              "name": "paymentDefaultDuration"
+            },
+            {
+              "type": "uint32",
+              "name": "bidExpirationTime"
+            },
+            {
+              "type": "address",
+              "name": "feeRecipient"
+            }
+          ]
         }
       ],
-      "outputs": []
+      "outputs": [
+        {
+          "type": "bytes32",
+          "name": "marketTermsId_"
+        }
+      ]
     },
     {
       "type": "function",
@@ -1416,10 +1459,6 @@
           "name": ""
         }
       ]
-    },
-    {
-      "type": "receive",
-      "stateMutability": "payable"
     }
   ],
   "transactionHash": "0x5e60d2097829d8b08d56ee17a76cb74ad250c5496845aa3a7cb9810d45ea14ae",
@@ -1429,6 +1468,6 @@
     "blockHash": null,
     "blockNumber": null
   },
-  "numDeployments": 1,
+  "numDeployments": 2,
   "implementation": "0xd1efDD896dd3bC2CD231981A77eE369955fFFa49"
 }

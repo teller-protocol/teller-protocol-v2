@@ -40,7 +40,12 @@ abstract contract TellerV2MarketForwarder_G3 is TellerV2MarketForwarder_G2 {
             _lender
         );
 
-        ITellerV2(getTellerV2()).setRepaymentListenerForBid(_bidId, _listener);
+         _forwardCall(
+            abi.encodeWithSelector(ITellerV2.setRepaymentListenerForBid.selector, _bidId, _listener),
+            _lender
+        );
+
+        //ITellerV2(getTellerV2()).setRepaymentListenerForBid(_bidId, _listener);
 
         return true;
     }

@@ -118,6 +118,12 @@ contract TellerV2 is
      */
     event LoanLiquidated(uint256 indexed bidId, address indexed liquidator);
 
+  /**
+     * @notice This event is emitted when a loan has been closed.
+     * @param bidId The id of the bid/loan which was closed.
+     */
+    event LoanClosed(uint256 indexed bidId);
+
     /**
      * @notice This event is emitted when a fee has been paid related to a bid.
      * @param bidId The id of the bid.
@@ -219,7 +225,8 @@ contract TellerV2 is
     function setCollateralManagerV2(address _collateralManagerV2)
         external
         reinitializer(11)
-    {
+    {    
+        require(address(_collateralManagerV2) == address(0));
         _setCollateralManagerV2(_collateralManagerV2);
     }
 
@@ -762,6 +769,7 @@ contract TellerV2 is
         //collateralManager.lenderClaimCollateral(_bidId);
 
         _getCollateralManagerForBid(_bidId).lenderClaimCollateral(_bidId);
+        emit LoanClosed(_bidId);
     }
 
     /**
@@ -1154,7 +1162,7 @@ contract TellerV2 is
     function setRepaymentListenerForBid(uint256 _bidId, address _listener)
         external
     {
-        require(_msgSender() == bids[_bidId].lender);
+        require(_msgSender() == bids[_bidId].lender, "Only bid lender may set repayment listener");
 
         repaymentListenerForBid[_bidId] = _listener;
     }

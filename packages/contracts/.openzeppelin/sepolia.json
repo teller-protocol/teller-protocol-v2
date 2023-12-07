@@ -1299,72 +1299,72 @@
             "offset": 0,
             "slot": "1",
             "type": "t_bytes32",
-            "contract": "MarketRegistry",
-            "src": "contracts/MarketRegistry.sol:51"
+            "contract": "MarketRegistry_G1",
+            "src": "contracts/MarketRegistry_G1.sol:52"
           },
           {
             "label": "markets",
             "offset": 0,
             "slot": "2",
-            "type": "t_mapping(t_uint256,t_struct(Marketplace)19589_storage)",
-            "contract": "MarketRegistry",
-            "src": "contracts/MarketRegistry.sol:53"
+            "type": "t_mapping(t_uint256,t_struct(Marketplace)24745_storage)",
+            "contract": "MarketRegistry_G1",
+            "src": "contracts/MarketRegistry_G1.sol:54"
           },
           {
             "label": "__uriToId",
             "offset": 0,
             "slot": "3",
             "type": "t_mapping(t_bytes32,t_uint256)",
-            "contract": "MarketRegistry",
-            "src": "contracts/MarketRegistry.sol:54"
+            "contract": "MarketRegistry_G1",
+            "src": "contracts/MarketRegistry_G1.sol:55"
           },
           {
             "label": "marketCount",
             "offset": 0,
             "slot": "4",
             "type": "t_uint256",
-            "contract": "MarketRegistry",
-            "src": "contracts/MarketRegistry.sol:55"
+            "contract": "MarketRegistry_G1",
+            "src": "contracts/MarketRegistry_G1.sol:56"
           },
           {
             "label": "_attestingSchemaId",
             "offset": 0,
             "slot": "5",
             "type": "t_bytes32",
-            "contract": "MarketRegistry",
-            "src": "contracts/MarketRegistry.sol:56"
+            "contract": "MarketRegistry_G1",
+            "src": "contracts/MarketRegistry_G1.sol:57"
           },
           {
             "label": "borrowerAttestationSchemaId",
             "offset": 0,
             "slot": "6",
             "type": "t_bytes32",
-            "contract": "MarketRegistry",
-            "src": "contracts/MarketRegistry.sol:57"
+            "contract": "MarketRegistry_G1",
+            "src": "contracts/MarketRegistry_G1.sol:58"
           },
           {
             "label": "version",
             "offset": 0,
             "slot": "7",
             "type": "t_uint256",
-            "contract": "MarketRegistry",
-            "src": "contracts/MarketRegistry.sol:59"
+            "contract": "MarketRegistry_G1",
+            "src": "contracts/MarketRegistry_G1.sol:60"
           },
           {
             "label": "marketIsClosed",
             "offset": 0,
             "slot": "8",
             "type": "t_mapping(t_uint256,t_bool)",
-            "contract": "MarketRegistry",
-            "src": "contracts/MarketRegistry.sol:61"
+            "contract": "MarketRegistry_G1",
+            "src": "contracts/MarketRegistry_G1.sol:62"
           },
           {
             "label": "tellerAS",
             "offset": 0,
             "slot": "9",
-            "type": "t_contract(TellerAS)16102",
-            "contract": "MarketRegistry",
-            "src": "contracts/MarketRegistry.sol:63"
+            "type": "t_contract(TellerAS)17066",
+            "contract": "MarketRegistry_G1",
+            "src": "contracts/MarketRegistry_G1.sol:64"
           }
         ],
         "types": {
@@ -1384,11 +1384,11 @@
             "label": "bytes32",
             "numberOfBytes": "32"
           },
-          "t_contract(TellerAS)16102": {
+          "t_contract(TellerAS)17066": {
             "label": "contract TellerAS",
             "numberOfBytes": "20"
           },
-          "t_enum(PaymentCycleType)30587": {
+          "t_enum(PaymentCycleType)39716": {
             "label": "enum PaymentCycleType",
             "members": [
               "Seconds",
@@ -1396,7 +1396,7 @@
             ],
             "numberOfBytes": "1"
           },
-          "t_enum(PaymentType)30584": {
+          "t_enum(PaymentType)39713": {
             "label": "enum PaymentType",
             "members": [
               "EMI",
@@ -1416,28 +1416,28 @@
             "label": "mapping(uint256 => bool)",
             "numberOfBytes": "32"
           },
-          "t_mapping(t_uint256,t_struct(Marketplace)19589_storage)": {
-            "label": "mapping(uint256 => struct MarketRegistry.Marketplace)",
+          "t_mapping(t_uint256,t_struct(Marketplace)24745_storage)": {
+            "label": "mapping(uint256 => struct MarketRegistry_G1.Marketplace)",
             "numberOfBytes": "32"
           },
           "t_string_storage": {
             "label": "string",
             "numberOfBytes": "32"
           },
-          "t_struct(AddressSet)13311_storage": {
+          "t_struct(AddressSet)13762_storage": {
             "label": "struct EnumerableSet.AddressSet",
             "members": [
               {
                 "label": "_inner",
-                "type": "t_struct(Set)12996_storage",
+                "type": "t_struct(Set)13447_storage",
                 "offset": 0,
                 "slot": "0"
               }
             ],
             "numberOfBytes": "64"
           },
-          "t_struct(Marketplace)19589_storage": {
-            "label": "struct MarketRegistry.Marketplace",
+          "t_struct(Marketplace)24745_storage": {
+            "label": "struct MarketRegistry_G1.Marketplace",
             "members": [
               {
                 "label": "owner",
@@ -1465,7 +1465,7 @@
               },
               {
                 "label": "verifiedLendersForMarket",
-                "type": "t_struct(AddressSet)13311_storage",
+                "type": "t_struct(AddressSet)13762_storage",
                 "offset": 0,
                 "slot": "3"
               },
@@ -1501,7 +1501,7 @@
               },
               {
                 "label": "verifiedBorrowersForMarket",
-                "type": "t_struct(AddressSet)13311_storage",
+                "type": "t_struct(AddressSet)13762_storage",
                 "offset": 0,
                 "slot": "7"
               },
@@ -1519,20 +1519,20 @@
               },
               {
                 "label": "paymentType",
-                "type": "t_enum(PaymentType)30584",
+                "type": "t_enum(PaymentType)39713",
                 "offset": 20,
                 "slot": "10"
               },
               {
                 "label": "paymentCycleType",
-                "type": "t_enum(PaymentCycleType)30587",
+                "type": "t_enum(PaymentCycleType)39716",
                 "offset": 21,
                 "slot": "10"
               }
             ],
             "numberOfBytes": "352"
           },
-          "t_struct(Set)12996_storage": {
+          "t_struct(Set)13447_storage": {
             "label": "struct EnumerableSet.Set",
             "members": [
               {
@@ -1566,7 +1566,8 @@
             "label": "uint8",
             "numberOfBytes": "1"
           }
-        }
+        },
+        "namespaces": {}
       }
     },
     "43c5692e4c06ebf809d9849f2d6e9cc09b57e2b164c3db709dc0f5a5d16c8cca": {
@@ -7839,6 +7840,377 @@
                 "type": "t_struct(Set)5375_storage",
                 "offset": 0,
                 "slot": "0"
+              }
+            ],
+            "numberOfBytes": "64"
+          },
+          "t_uint16": {
+            "label": "uint16",
+            "numberOfBytes": "2"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint32": {
+            "label": "uint32",
+            "numberOfBytes": "4"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        },
+        "namespaces": {}
+      }
+    },
+    "20570c57e6662325ec4c9ebc918d7e4112ffb370b4854b74ffbe809c14746099": {
+      "address": "0x90D08f8Df66dFdE93801783FF7A36876453DAE75",
+      "txHash": "0xe68daa11a4feb9104317d8da61da03af6be1e742d4116a5d3f21e0baec4d39a7",
+      "layout": {
+        "solcVersion": "0.8.9",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "label": "__lenderAttestationSchemaId",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_bytes32",
+            "contract": "MarketRegistry_G2",
+            "src": "contracts/MarketRegistry_G2.sol:47"
+          },
+          {
+            "label": "markets",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_mapping(t_uint256,t_struct(Marketplace)6318_storage)",
+            "contract": "MarketRegistry_G2",
+            "src": "contracts/MarketRegistry_G2.sol:49"
+          },
+          {
+            "label": "__uriToId",
+            "offset": 0,
+            "slot": "3",
+            "type": "t_mapping(t_bytes32,t_uint256)",
+            "contract": "MarketRegistry_G2",
+            "src": "contracts/MarketRegistry_G2.sol:50"
+          },
+          {
+            "label": "marketCount",
+            "offset": 0,
+            "slot": "4",
+            "type": "t_uint256",
+            "contract": "MarketRegistry_G2",
+            "src": "contracts/MarketRegistry_G2.sol:51"
+          },
+          {
+            "label": "_attestingSchemaId",
+            "offset": 0,
+            "slot": "5",
+            "type": "t_bytes32",
+            "contract": "MarketRegistry_G2",
+            "src": "contracts/MarketRegistry_G2.sol:52"
+          },
+          {
+            "label": "borrowerAttestationSchemaId",
+            "offset": 0,
+            "slot": "6",
+            "type": "t_bytes32",
+            "contract": "MarketRegistry_G2",
+            "src": "contracts/MarketRegistry_G2.sol:53"
+          },
+          {
+            "label": "version",
+            "offset": 0,
+            "slot": "7",
+            "type": "t_uint256",
+            "contract": "MarketRegistry_G2",
+            "src": "contracts/MarketRegistry_G2.sol:55"
+          },
+          {
+            "label": "marketIsClosed",
+            "offset": 0,
+            "slot": "8",
+            "type": "t_mapping(t_uint256,t_bool)",
+            "contract": "MarketRegistry_G2",
+            "src": "contracts/MarketRegistry_G2.sol:57"
+          },
+          {
+            "label": "__teller_as_gap",
+            "offset": 0,
+            "slot": "9",
+            "type": "t_array(t_uint256)7_storage",
+            "contract": "MarketRegistry_G2",
+            "src": "contracts/MarketRegistry_G2.sol:62"
+          },
+          {
+            "label": "marketTerms",
+            "offset": 0,
+            "slot": "16",
+            "type": "t_mapping(t_bytes32,t_struct(MarketplaceTerms)11373_storage)",
+            "contract": "MarketRegistry_G2",
+            "src": "contracts/MarketRegistry_G2.sol:65"
+          },
+          {
+            "label": "currentMarketTermsForMarket",
+            "offset": 0,
+            "slot": "17",
+            "type": "t_mapping(t_uint256,t_bytes32)",
+            "contract": "MarketRegistry_G2",
+            "src": "contracts/MarketRegistry_G2.sol:68"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_bytes32)dyn_storage": {
+            "label": "bytes32[]",
+            "numberOfBytes": "32"
+          },
+          "t_array(t_uint256)7_storage": {
+            "label": "uint256[7]",
+            "numberOfBytes": "224"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_bytes32": {
+            "label": "bytes32",
+            "numberOfBytes": "32"
+          },
+          "t_enum(PaymentCycleType)13547": {
+            "label": "enum PaymentCycleType",
+            "members": [
+              "Seconds",
+              "Monthly"
+            ],
+            "numberOfBytes": "1"
+          },
+          "t_enum(PaymentType)13544": {
+            "label": "enum PaymentType",
+            "members": [
+              "EMI",
+              "Bullet"
+            ],
+            "numberOfBytes": "1"
+          },
+          "t_mapping(t_address,t_bytes32)": {
+            "label": "mapping(address => bytes32)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_bytes32,t_struct(MarketplaceTerms)11373_storage)": {
+            "label": "mapping(bytes32 => struct IMarketRegistry_V2.MarketplaceTerms)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_bytes32,t_uint256)": {
+            "label": "mapping(bytes32 => uint256)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_bool)": {
+            "label": "mapping(uint256 => bool)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_bytes32)": {
+            "label": "mapping(uint256 => bytes32)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_struct(Marketplace)6318_storage)": {
+            "label": "mapping(uint256 => struct MarketRegistry_G2.Marketplace)",
+            "numberOfBytes": "32"
+          },
+          "t_string_storage": {
+            "label": "string",
+            "numberOfBytes": "32"
+          },
+          "t_struct(AddressSet)5881_storage": {
+            "label": "struct EnumerableSet.AddressSet",
+            "members": [
+              {
+                "label": "_inner",
+                "type": "t_struct(Set)5566_storage",
+                "offset": 0,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "64"
+          },
+          "t_struct(Marketplace)6318_storage": {
+            "label": "struct MarketRegistry_G2.Marketplace",
+            "members": [
+              {
+                "label": "owner",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "metadataURI",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "marketplaceFeePercent",
+                "type": "t_uint16",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "lenderAttestationRequired",
+                "type": "t_bool",
+                "offset": 2,
+                "slot": "2"
+              },
+              {
+                "label": "verifiedLendersForMarket",
+                "type": "t_struct(AddressSet)5881_storage",
+                "offset": 0,
+                "slot": "3"
+              },
+              {
+                "label": "_lenderAttestationIds",
+                "type": "t_mapping(t_address,t_bytes32)",
+                "offset": 0,
+                "slot": "5"
+              },
+              {
+                "label": "paymentCycleDuration",
+                "type": "t_uint32",
+                "offset": 0,
+                "slot": "6"
+              },
+              {
+                "label": "paymentDefaultDuration",
+                "type": "t_uint32",
+                "offset": 4,
+                "slot": "6"
+              },
+              {
+                "label": "bidExpirationTime",
+                "type": "t_uint32",
+                "offset": 8,
+                "slot": "6"
+              },
+              {
+                "label": "borrowerAttestationRequired",
+                "type": "t_bool",
+                "offset": 12,
+                "slot": "6"
+              },
+              {
+                "label": "verifiedBorrowersForMarket",
+                "type": "t_struct(AddressSet)5881_storage",
+                "offset": 0,
+                "slot": "7"
+              },
+              {
+                "label": "_borrowerAttestationIds",
+                "type": "t_mapping(t_address,t_bytes32)",
+                "offset": 0,
+                "slot": "9"
+              },
+              {
+                "label": "feeRecipient",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "10"
+              },
+              {
+                "label": "paymentType",
+                "type": "t_enum(PaymentType)13544",
+                "offset": 20,
+                "slot": "10"
+              },
+              {
+                "label": "paymentCycleType",
+                "type": "t_enum(PaymentCycleType)13547",
+                "offset": 21,
+                "slot": "10"
+              }
+            ],
+            "numberOfBytes": "352"
+          },
+          "t_struct(MarketplaceTerms)11373_storage": {
+            "label": "struct IMarketRegistry_V2.MarketplaceTerms",
+            "members": [
+              {
+                "label": "marketplaceFeePercent",
+                "type": "t_uint16",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "paymentType",
+                "type": "t_enum(PaymentType)13544",
+                "offset": 2,
+                "slot": "0"
+              },
+              {
+                "label": "paymentCycleType",
+                "type": "t_enum(PaymentCycleType)13547",
+                "offset": 3,
+                "slot": "0"
+              },
+              {
+                "label": "paymentCycleDuration",
+                "type": "t_uint32",
+                "offset": 4,
+                "slot": "0"
+              },
+              {
+                "label": "paymentDefaultDuration",
+                "type": "t_uint32",
+                "offset": 8,
+                "slot": "0"
+              },
+              {
+                "label": "bidExpirationTime",
+                "type": "t_uint32",
+                "offset": 12,
+                "slot": "0"
+              },
+              {
+                "label": "feeRecipient",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "1"
+              }
+            ],
+            "numberOfBytes": "64"
+          },
+          "t_struct(Set)5566_storage": {
+            "label": "struct EnumerableSet.Set",
+            "members": [
+              {
+                "label": "_values",
+                "type": "t_array(t_bytes32)dyn_storage",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "_indexes",
+                "type": "t_mapping(t_bytes32,t_uint256)",
+                "offset": 0,
+                "slot": "1"
               }
             ],
             "numberOfBytes": "64"

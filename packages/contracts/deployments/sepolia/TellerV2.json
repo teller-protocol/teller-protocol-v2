@@ -114,6 +114,18 @@
     {
       "type": "event",
       "anonymous": false,
+      "name": "LoanClosed",
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "bidId",
+          "indexed": true
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
       "name": "LoanLiquidated",
       "inputs": [
         {
@@ -1754,6 +1766,6 @@
     "blockHash": null,
     "blockNumber": null
   },
-  "numDeployments": 4,
+  "numDeployments": 5,
   "implementation": "0x8127a64DAb886e7fB1eC34eFff5aA7435434ECD5"
 }

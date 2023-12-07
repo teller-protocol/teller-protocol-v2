@@ -1162,7 +1162,10 @@ contract TellerV2 is
     function setRepaymentListenerForBid(uint256 _bidId, address _listener)
         external
     {
-        require(_msgSender() == bids[_bidId].lender, "Only bid lender may set repayment listener");
+
+        address sender = _msgSenderForMarket(bids[_bidId].marketplaceId);
+
+        require( sender == bids[_bidId].lender , "Only bid lender may set repayment listener");
 
         repaymentListenerForBid[_bidId] = _listener;
     }

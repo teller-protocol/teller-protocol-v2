@@ -42,7 +42,7 @@ const deployFn: DeployFunction = async (hre) => {
   let minInterestRate = 100
   let maxLoanDuration = 5000000
   let liquidityThresholdPercent = 10000
-  let loanToValuePercent = 10000 //make sure this functions as normal.  If over 100%, getting much better loan terms and i wont repay.  If it is under 100%, it will likely repay.
+  let loanToValuePercent = 10000 //mzake sure this functions as normal.  If over 100%, getting much better loan terms and i wont repay.  If it is under 100%, it will likely repay.
 
   await hre.upgrades.proposeBatchTimelock({
     title: 'Lender Commitment Group Smart: Upgrade ',
@@ -101,7 +101,7 @@ deployFn.tags = [
   'lender-commitment-group',
   'lender-commitment-group-upgrade'
 ]
-deployFn.dependencies = ['teller-v2:deploy']
+deployFn.dependencies = ['lender-commitment-group-smart:deploy']
 deployFn.skip = async (hre) => {
   return !hre.network.live || !['sepolia'].includes(hre.network.name)
 }

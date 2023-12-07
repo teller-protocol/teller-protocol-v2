@@ -2,7 +2,7 @@ import { DeployFunction } from 'hardhat-deploy/dist/types'
 
 const deployFn: DeployFunction = async (hre) => {
   hre.log('----------')
-  hre.log('')
+  hre.log('Proposing upgrade:  Lender Commitment Group')
 
   const TellerV2 = await hre.contracts.get('TellerV2')
 

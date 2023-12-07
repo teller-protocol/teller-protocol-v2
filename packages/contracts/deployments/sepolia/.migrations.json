@@ -18,8 +18,8 @@
   "lender-commitment-forwarder:extensions:flash-rollover:g3-upgrade": 1695920349,
   "teller-v2:loan-liquidated-state-upgrade": 1696520015,
   "collateral:manager-v2:deploy": 1700855248,
-  "teller-v2:collateral-manager-v2-upgrade": 1700855336,
   "smart-commitment-forwarder:deploy": 1700855352,
   "lender-commitment-group-smart:deploy": 1701886933,
-  "lender-commitment-group-upgrade": 1701967670
+  "lender-commitment-group-upgrade": 1701967670,
+  "teller-v2:collateral-manager-v2-upgrade": 1701979762
 }

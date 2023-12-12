@@ -96,6 +96,8 @@ contract SmartCommitmentForwarder is TellerV2MarketForwarder_G3 {
             _smartCommitmentAddress
         );
 
+
+        // i could probably remove this 
         _commitment.acceptFundsForAcceptBid(
             _msgSender(), //borrower
             _principalAmount,

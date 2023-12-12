@@ -332,8 +332,7 @@ multiplies by their pct of shares (S%)
         totalPrincipalTokensCommitted += _amount;
         principalTokensCommittedByLender[msg.sender] += _amount;
 
-        //calculate this !! from ratio  TODO
-
+        
         sharesAmount_ = _valueOfUnderlying(_amount, sharesExchangeRate());
 
         //mint shares equal to _amount and give them to the shares recipient !!!
@@ -366,8 +365,7 @@ multiplies by their pct of shares (S%)
         require(_interestRate >= minInterestRate, "Invalid interest rate");
         //the loan duration must be less than the commitment max loan duration. The lender who made the commitment expects the money to be returned before this window.
         require(_loanDuration <= maxLoanDuration, "Invalid loan max duration");
-        console.logUint(getPrincipalAmountAvailableToBorrow());
-
+    
         require(
             getPrincipalAmountAvailableToBorrow() >= _principalAmount,
             "Invalid loan max principal"
@@ -375,33 +373,7 @@ multiplies by their pct of shares (S%)
 
         require(isAllowedToBorrow(_borrower), "unauthorized borrow");
 
-        /*
-     //commitmentPrincipalAccepted[bidId] <= commitment.maxPrincipal,
-
-   //require that the borrower accepting the commitment cannot borrow more than the commitments max principal
-        if (_principalAmount > commitment.maxPrincipal) {
-            revert InsufficientCommitmentAllocation({
-                allocated: commitment.maxPrincipal,
-                requested: _principalAmount
-            });
-        }
-    */
-
-        //do this accounting in the group contract now?
-
-        /*
-        commitmentPrincipalAccepted[_commitmentId] += _principalAmount;
-
-        require(
-            commitmentPrincipalAccepted[_commitmentId] <=
-                commitment.maxPrincipal,
-            "Exceeds max principal of commitment"
-        ); 
         
-        
-        */
-
-        console.log("get required collateral");
 
         uint256 requiredCollateral = getRequiredCollateral(_principalAmount);
 
@@ -446,16 +418,14 @@ multiplies by their pct of shares (S%)
                 totalInterestCollected -
                 (totalInterestWithdrawn);
 
-        console.log("principalTokenEquityAmountSimple");
-        console.logUint(principalTokenEquityAmountSimple);
+       
 
         uint256 principalTokenValueToWithdraw = (principalTokenEquityAmountSimple *
                 _amountPoolSharesTokens) / poolSharesTotalSupplyBeforeBurn;
         uint256 tokensToUncommit = (netCommittedTokens *
             _amountPoolSharesTokens) / poolSharesTotalSupplyBeforeBurn;
 
-        console.log("tokensToUncommit");
-        console.logUint(tokensToUncommit);
+      
 
         totalPrincipalTokensCommitted -= tokensToUncommit;
         // totalPrincipalTokensUncommitted += tokensToUncommit;
@@ -463,13 +433,7 @@ multiplies by their pct of shares (S%)
         totalInterestWithdrawn +=
             principalTokenValueToWithdraw -
             tokensToUncommit;
-
-        console.log("totalInterestWithdrawn");
-        console.logUint(totalInterestWithdrawn);
-
-        console.logUint(principalTokensCommittedByLender[msg.sender]);
-        console.logUint(principalTokenValueToWithdraw);
-
+ 
         principalTokensCommittedByLender[
             msg.sender
         ] -= principalTokenValueToWithdraw;
@@ -480,10 +444,7 @@ multiplies by their pct of shares (S%)
             collateralTokenSplitAmount_
         ) = calculateSplitTokenAmounts(principalTokenValueToWithdraw);
 
-        console.log("calculated split amt ");
-
-        console.logUint(principalTokenSplitAmount_);
-        console.logUint(collateralTokenSplitAmount_);
+       
         principalToken.transfer(_recipient, principalTokenSplitAmount_);
         collateralToken.transfer(_recipient, collateralTokenSplitAmount_);
 
@@ -499,8 +460,7 @@ multiplies by their pct of shares (S%)
         public
         view
         returns (uint256 principalAmount_, uint256 collateralAmount_)
-    {
-        console.log("calc split");
+    { 
 
         // need to see how many collateral tokens are in the contract atm
 
@@ -511,9 +471,7 @@ multiplies by their pct of shares (S%)
         );
 
         //  need to know how the value of the collateral tokens  IN TERMS OF principal tokens
-
-        console.logUint(principalTokenBalance);
-        console.logUint(collateralTokenBalance);
+ 
 
         uint256 collateralTokenValueInPrincipalToken = _valueOfUnderlying(
             collateralTokenBalance,
@@ -525,34 +483,21 @@ multiplies by their pct of shares (S%)
 
         if(totalValueInPrincipalTokens == 0) {return (0,0);}
 
-        console.log("_principalTokenAmountValue");
-        console.logUint(_principalTokenAmountValue);
-
-        console.logUint(totalValueInPrincipalTokens);
+   
 
         //i think i need more significant digits in my percent !?
         uint256 principalTotalAmountPercent = (_principalTokenAmountValue *
             10000 *
             1e18) / totalValueInPrincipalTokens;
 
-        //so then lets give them U% of the balance of principal tokens  and U% of the value of collateral tokens
-
-        console.logUint(collateralTokenValueInPrincipalToken);
-        // console.logUint( ratioOfPrincipalToCollateral );
-
-        console.logUint(_principalTokenAmountValue);
-
-        console.logUint(principalTotalAmountPercent); ///this is 0
+       
 
         uint256 principalTokensToGive = (principalTokenBalance *
             principalTotalAmountPercent) / (1e18 * 10000);
         uint256 collateralTokensToGive = (collateralTokenBalance *
             principalTotalAmountPercent) / (1e18 * 10000);
 
-        // console.logUint( principalTokenAmountValueToGiveInPrincipalTokens );
-        console.log("principalTokensToGive");
-        console.logUint(principalTokensToGive);
-        console.logUint(collateralTokensToGive);
+      
 
         return (principalTokensToGive, collateralTokensToGive);
     }

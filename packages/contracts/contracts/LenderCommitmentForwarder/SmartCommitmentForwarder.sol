@@ -96,18 +96,6 @@ contract SmartCommitmentForwarder is TellerV2MarketForwarder_G3 {
             _smartCommitmentAddress
         );
 
-
-        // i could probably remove this 
-        _commitment.acceptFundsForAcceptBid(
-            _msgSender(), //borrower
-            _principalAmount,
-            _collateralAmount,
-            _collateralTokenAddress,
-            _collateralTokenId,
-            _loanDuration,
-            _interestRate
-        );
-
         CreateLoanArgs memory createLoanArgs;
 
         createLoanArgs.marketId = _commitment.getMarketId();
@@ -134,11 +122,29 @@ contract SmartCommitmentForwarder is TellerV2MarketForwarder_G3 {
 
         bidId = _submitBidWithCollateral(createLoanArgs, _msgSender());
 
+
+
+
+        //make the internals of this do -> _acceptBidWithRepaymentListener so 
+        //the group contract itself if accepting the bid 'bidId' (line above) directly without having to spoof msg sender 
+        _commitment.acceptFundsForAcceptBid(
+            _msgSender(), //borrower
+            _principalAmount,
+            _collateralAmount,
+            _collateralTokenAddress,
+            _collateralTokenId,
+            _loanDuration,
+            _interestRate
+        );
+
+
+    /*
         _acceptBidWithRepaymentListener(
             bidId,
             _smartCommitmentAddress, //the lender is the smart commitment contract
             _smartCommitmentAddress
         );
+*/
 
         emit ExercisedSmartCommitment(
             _smartCommitmentAddress,

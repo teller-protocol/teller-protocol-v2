@@ -23,6 +23,6 @@
   "lender-commitment-group-upgrade": 1701967670,
   "teller-v2:collateral-manager-v2-upgrade": 1701979762,
   "market-registry:v2-upgrade": 1701982450,
-  "smart-commitment-forwarder:upgrade": 1701983886,
-  "teller-v2:market-registry-v2-upgrade": 1701985473
+  "teller-v2:market-registry-v2-upgrade": 1701985473,
+  "smart-commitment-forwarder:upgrade": 1703177926
 }

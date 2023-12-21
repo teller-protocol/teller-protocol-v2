@@ -5219,6 +5219,208 @@
         "storage": [],
         "types": {}
       }
+    },
+    "b901f7ff9c6f87ec2bf862e281e0e57d421afc472cab880785f45d90094c8ca5": {
+      "address": "0xf7B14778035fEAF44540A0bC1D4ED859bCB28229",
+      "txHash": "0x4a4d5dec624ae100331d2eb02206db791f915096a7983474c1af27e00a1d59d9",
+      "layout": {
+        "solcVersion": "0.8.9",
+        "storage": [
+          {
+            "label": "bundle",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_mapping(t_uint256,t_struct(CollateralBundleInfo)33557_storage)",
+            "contract": "TokenBundle",
+            "src": "contracts/bundle/TokenBundle.sol:23"
+          },
+          {
+            "label": "bundleCount",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_uint256",
+            "contract": "TokenBundle",
+            "src": "contracts/bundle/TokenBundle.sol:26"
+          },
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "2",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "3",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "53",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ERC721HolderUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/utils/ERC721HolderUpgradeable.sol:40"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "103",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ERC165Upgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol:41"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "153",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ERC1155ReceiverUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC1155/utils/ERC1155ReceiverUpgradeable.sol:31"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "203",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ERC1155HolderUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC1155/utils/ERC1155HolderUpgradeable.sol:48"
+          },
+          {
+            "label": "tellerV2",
+            "offset": 0,
+            "slot": "253",
+            "type": "t_contract(ITellerV2)35742",
+            "contract": "CollateralManagerV2",
+            "src": "contracts/CollateralManagerV2.sol:39"
+          },
+          {
+            "label": "_collateralBundleIdForBid",
+            "offset": 0,
+            "slot": "254",
+            "type": "t_mapping(t_uint256,t_uint256)",
+            "contract": "CollateralManagerV2",
+            "src": "contracts/CollateralManagerV2.sol:42"
+          },
+          {
+            "label": "_committedBidCollateral",
+            "offset": 0,
+            "slot": "255",
+            "type": "t_mapping(t_uint256,t_struct(CollateralBundleInfo)33557_storage)",
+            "contract": "CollateralManagerV2",
+            "src": "contracts/CollateralManagerV2.sol:46"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(ITellerV2)35742": {
+            "label": "contract ITellerV2",
+            "numberOfBytes": "20"
+          },
+          "t_enum(CollateralType)33539": {
+            "label": "enum CollateralType",
+            "members": [
+              "ERC20",
+              "ERC721",
+              "ERC1155"
+            ],
+            "numberOfBytes": "1"
+          },
+          "t_mapping(t_uint256,t_struct(Collateral)33549_storage)": {
+            "label": "mapping(uint256 => struct Collateral)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_struct(CollateralBundleInfo)33557_storage)": {
+            "label": "mapping(uint256 => struct ICollateralBundle.CollateralBundleInfo)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_uint256)": {
+            "label": "mapping(uint256 => uint256)",
+            "numberOfBytes": "32"
+          },
+          "t_struct(Collateral)33549_storage": {
+            "label": "struct Collateral",
+            "members": [
+              {
+                "label": "_collateralType",
+                "type": "t_enum(CollateralType)33539",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "_amount",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "_tokenId",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "_collateralAddress",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "3"
+              }
+            ],
+            "numberOfBytes": "128"
+          },
+          "t_struct(CollateralBundleInfo)33557_storage": {
+            "label": "struct ICollateralBundle.CollateralBundleInfo",
+            "members": [
+              {
+                "label": "count",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "collaterals",
+                "type": "t_mapping(t_uint256,t_struct(Collateral)33549_storage)",
+                "offset": 0,
+                "slot": "1"
+              }
+            ],
+            "numberOfBytes": "64"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        },
+        "namespaces": {}
+      }
     }
   }
 }

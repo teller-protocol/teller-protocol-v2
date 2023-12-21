@@ -25,4 +25,9 @@ deployFn.tags = [
   'smart-commitment-forwarder:deploy'
 ]
 deployFn.dependencies = ['teller-v2:deploy', 'market-registry:deploy']
+
+deployFn.skip = async (hre) => {
+  return true
+  return !hre.network.live
+}
 export default deployFn

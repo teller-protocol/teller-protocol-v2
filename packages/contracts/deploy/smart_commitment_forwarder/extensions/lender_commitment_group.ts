@@ -62,6 +62,7 @@ deployFn.dependencies = [
 ]
 
 deployFn.skip = async (hre) => {
+  return true
   return !hre.network.live
 }
 export default deployFn

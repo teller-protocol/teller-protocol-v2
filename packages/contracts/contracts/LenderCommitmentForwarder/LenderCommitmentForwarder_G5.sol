@@ -13,8 +13,7 @@ contract LenderCommitmentForwarder_G5 is LenderCommitmentForwarder_G4 {
     {}
 
     function getCommitmentCollateralTokenType(
-        uint256 _commitmentId
-        
+        uint256 _commitmentId 
     ) public view returns (CommitmentCollateralType) {
        return commitments[_commitmentId].collateralTokenType;
     } 

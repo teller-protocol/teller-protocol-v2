@@ -18,6 +18,11 @@ import "../../../libraries/NumbersLib.sol";
 import "../../../interfaces/uniswap/IUniswapV3Pool.sol";
 
 import "../../../interfaces/uniswap/IUniswapV3Factory.sol";
+ 
+import "../../../libraries/uniswap/TickMath.sol";
+import "../../../libraries/uniswap/FixedPoint96.sol";
+import "../../../libraries/uniswap/FullMath.sol";
+
 
 import "./LenderCommitmentGroupShares.sol";
 
@@ -575,7 +580,7 @@ multiplies by their pct of shares (S%)
 
             // tick(imprecise as it's an integer) to price
             sqrtPriceX96 = TickMath.getSqrtRatioAtTick(
-                int24((tickCumulatives[1] - tickCumulatives[0]) / twapInterval)
+                int24((tickCumulatives[1] - tickCumulatives[0]) / int32(twapInterval))
             );
         }
     }

@@ -9,7 +9,8 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 // Interfaces 
 import "../../../interfaces/ITellerV2Context.sol";
 import "../../../interfaces/IProtocolFee.sol";
-import "../../../interfaces/ITellerV2Storage.sol";  
+import "../../../interfaces/ITellerV2Storage.sol"; 
+import "../../../interfaces/ITellerV2.sol"; 
 
 import "../../../interfaces/IFlashRolloverLoan.sol";
 import "../../../libraries/NumbersLib.sol";
@@ -400,9 +401,9 @@ multiplies by their pct of shares (S%)
         uint256 _bidId 
     ) internal {
 
-        TELLER_V2.lenderAcceptBid(_bidId); //this gives out the funds to the borrower
+        ITellerV2(TELLER_V2).lenderAcceptBid(_bidId); //this gives out the funds to the borrower
         
-        TELLER_V2.setRepaymentListenerForBid(_bidId, address(this));
+        ITellerV2(TELLER_V2).setRepaymentListenerForBid(_bidId, address(this));
 
     }
 

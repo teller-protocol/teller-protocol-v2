@@ -44,6 +44,7 @@ interface ISmartCommitment {
 
     function acceptFundsForAcceptBid(
         address _borrower,
+        uint256 _bidId,
         uint256 _principalAmount,
         uint256 _collateralAmount,
         address _collateralTokenAddress,

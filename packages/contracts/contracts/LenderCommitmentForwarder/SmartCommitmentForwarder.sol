@@ -129,6 +129,7 @@ contract SmartCommitmentForwarder is TellerV2MarketForwarder_G3 {
         //the group contract itself if accepting the bid 'bidId' (line above) directly without having to spoof msg sender 
         _commitment.acceptFundsForAcceptBid(
             _msgSender(), //borrower
+            bidId,
             _principalAmount,
             _collateralAmount,
             _collateralTokenAddress,

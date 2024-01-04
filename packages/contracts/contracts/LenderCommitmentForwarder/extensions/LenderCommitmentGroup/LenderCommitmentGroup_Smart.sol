@@ -349,6 +349,7 @@ multiplies by their pct of shares (S%)
 
     function acceptFundsForAcceptBid(
         address _borrower,
+        uint256 _bidId,
         uint256 _principalAmount,
         uint256 _collateralAmount,
         address _collateralTokenAddress,
@@ -385,9 +386,24 @@ multiplies by their pct of shares (S%)
             //consider changing how this works 
         principalToken.approve(address(TELLER_V2), _principalAmount);
 
+        //do not have to spoof/forward as this contract is the lender ! 
+        _acceptBidWithRepaymentListener(
+            _bidId 
+        );
+
         totalPrincipalTokensLended += _principalAmount;
 
         //emit event
+    }
+
+    function  _acceptBidWithRepaymentListener(
+        uint256 _bidId 
+    ) internal {
+
+        TELLER_V2.lenderAcceptBid(_bidId); //this gives out the funds to the borrower
+        
+        TELLER_V2.setRepaymentListenerForBid(_bidId, address(this));
+
     }
 
     /*

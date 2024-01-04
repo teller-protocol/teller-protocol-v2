@@ -323,6 +323,21 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
 
         uint256 bidId = 0;
 
+
+
+        // submit bid 
+        TellerV2SolMock(_tellerV2).submitBid( 
+            address(principalToken),
+            0,
+            principalAmount,
+            loanDuration,
+            interestRate,
+            "",
+            address(this)
+         );
+
+
+
         vm.prank(address(_smartCommitmentForwarder));
         lenderCommitmentGroupSmart.acceptFundsForAcceptBid(
             address(borrower),
@@ -360,6 +375,9 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
         uint16 interestRate = 100;
 
         uint256 bidId = 0;
+
+
+
 
         vm.expectRevert("Insufficient Borrower Collateral");
         vm.prank(address(_smartCommitmentForwarder));

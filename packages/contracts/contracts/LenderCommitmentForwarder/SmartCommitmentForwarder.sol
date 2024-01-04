@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
 
-import "../TellerV2MarketForwarder_G3.sol";
+import "../TellerV2MarketForwarder_G2.sol";
 
 import "../interfaces/ILenderCommitmentForwarder.sol";
 import "./LenderCommitmentForwarder_G1.sol";
@@ -19,7 +19,7 @@ and _acceptBid
 
 */
 
-contract SmartCommitmentForwarder is TellerV2MarketForwarder_G3 {
+contract SmartCommitmentForwarder is TellerV2MarketForwarder_G2 {
     event ExercisedSmartCommitment(
         address indexed smartCommitmentAddress,
         address borrower,
@@ -30,7 +30,7 @@ contract SmartCommitmentForwarder is TellerV2MarketForwarder_G3 {
     error InsufficientBorrowerCollateral(uint256 required, uint256 actual);
 
     constructor(address _protocolAddress, address _marketRegistry)
-        TellerV2MarketForwarder_G3(_protocolAddress, _marketRegistry)
+        TellerV2MarketForwarder_G2(_protocolAddress, _marketRegistry)
     {}
 
     //register a smart contract (lender group) ? necessary ?
@@ -137,15 +137,7 @@ contract SmartCommitmentForwarder is TellerV2MarketForwarder_G3 {
             _loanDuration,
             _interestRate
         );
-
-
-    /*
-        _acceptBidWithRepaymentListener(
-            bidId,
-            _smartCommitmentAddress, //the lender is the smart commitment contract
-            _smartCommitmentAddress
-        );
-*/
+ 
 
         emit ExercisedSmartCommitment(
             _smartCommitmentAddress,

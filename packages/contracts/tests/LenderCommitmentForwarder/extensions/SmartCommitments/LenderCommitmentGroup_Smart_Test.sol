@@ -321,9 +321,12 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
         uint32 loanDuration = 5000000;
         uint16 interestRate = 100;
 
+        uint256 bidId = 0;
+
         vm.prank(address(_smartCommitmentForwarder));
         lenderCommitmentGroupSmart.acceptFundsForAcceptBid(
             address(borrower),
+            bidId,
             principalAmount,
             collateralAmount,
             collateralTokenAddress,
@@ -356,10 +359,13 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
         uint32 loanDuration = 5000000;
         uint16 interestRate = 100;
 
+        uint256 bidId = 0;
+
         vm.expectRevert("Insufficient Borrower Collateral");
         vm.prank(address(_smartCommitmentForwarder));
         lenderCommitmentGroupSmart.acceptFundsForAcceptBid(
             address(borrower),
+            bidId,
             principalAmount,
             collateralAmount,
             collateralTokenAddress,

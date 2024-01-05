@@ -2,9 +2,9 @@ import { Testable } from "../../../Testable.sol";
 
 import { LenderCommitmentGroup_Smart_Override } from "./LenderCommitmentGroup_Smart_Override.sol";
 
-import "../../../tokens/TestERC20Token.sol";
+import {TestERC20Token} from "../../../tokens/TestERC20Token.sol";
 
-import "../../../../contracts/mock/TellerV2SolMock.sol";
+import {TellerV2SolMock} from "../../../../contracts/mock/TellerV2SolMock.sol";
 
 //contract LenderCommitmentGroup_Smart_Mock is ExtensionsContextUpgradeable {}
 
@@ -466,6 +466,27 @@ contract UniswapV3PoolMock {
                 feeProtocol: 0,
                 unlocked: true
             });
+    }
+
+    //mock fn 
+   function observe(uint32[] calldata secondsAgos)
+        external
+        view
+        returns (int56[] memory tickCumulatives, uint160[] memory secondsPerLiquidityCumulativeX128s)
+    {
+        // Initialize the return arrays
+        tickCumulatives = new int56[](secondsAgos.length);
+        secondsPerLiquidityCumulativeX128s = new uint160[](secondsAgos.length);
+
+        // Mock data generation - replace this with your logic or static values
+        for (uint256 i = 0; i < secondsAgos.length; i++) {
+            // Generate mock data. Here we're just using simple static values for demonstration.
+            // You should replace these with dynamic values based on your testing needs.
+            tickCumulatives[i] = int56(1000 * int256(i)); // Example mock data
+            secondsPerLiquidityCumulativeX128s[i] = uint160(2000 * i); // Example mock data
+        }
+
+        return (tickCumulatives, secondsPerLiquidityCumulativeX128s);
     }
  
       

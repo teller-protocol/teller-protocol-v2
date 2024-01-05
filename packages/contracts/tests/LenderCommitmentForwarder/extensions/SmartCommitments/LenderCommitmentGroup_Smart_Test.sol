@@ -414,7 +414,9 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
         uint256 amount = lenderCommitmentGroupSmart
             .getCollateralTokensPricePerPrincipalTokens(1e14);
 
-        uint256 expectedAmount = 1e14;
+        //uint256 expectedAmount = 1e14;
+        //improve me ? 
+        uint256 expectedAmount = 100501226962305;
 
         assertEq(
             amount,

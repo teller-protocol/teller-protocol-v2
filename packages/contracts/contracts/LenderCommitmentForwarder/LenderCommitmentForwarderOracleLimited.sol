@@ -9,6 +9,8 @@ import "../interfaces/ICollateralManager.sol";
 import "../interfaces/ILenderCommitmentForwarder.sol";
 import "./extensions/ExtensionsContextUpgradeable.sol";
 
+import "@openzeppelin/contracts/utils/math/Math.sol";
+
 import { Collateral, CollateralType } from "../interfaces/escrow/ICollateralEscrowV1.sol";
 
 import "@openzeppelin/contracts-upgradeable/utils/structs/EnumerableSetUpgradeable.sol";
@@ -622,7 +624,7 @@ contract LenderCommitmentForwarder_OracleLimited is
             ).decimals();
         }
 
-        uint256 maxPrincipalPerCollateralAmount = min(   
+        uint256 maxPrincipalPerCollateralAmount = Math.min(   
             getUniswapPriceRatioForPool(_principalTokenAddress,_collateralTokenAddress), 
             _maxPrincipalPerCollateralAmount
             );
@@ -643,6 +645,12 @@ contract LenderCommitmentForwarder_OracleLimited is
 
 
     // ---- TWAP 
+
+    function getUniswapV3PoolAddress(address principalTokenAddress, address collateralTokenAddress) public view returns (address){
+
+
+        
+    }
 
     function getUniswapPriceRatioForPool ( address principalTokenAddress, address collateralTokenAddress ) public view returns (uint256 priceRatio) {
 

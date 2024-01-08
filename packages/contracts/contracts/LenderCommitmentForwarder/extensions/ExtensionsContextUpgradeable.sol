@@ -37,7 +37,7 @@ abstract contract ExtensionsContextUpgradeable is IExtensionsContext {
         emit ExtensionRevoked(extension, _msgSender());
     }
 
-    function _msgSender() internal view virtual returns (address sender) {
+    function _msgSender() internal view virtual returns (address) {
         address sender;
 
         if (msg.data.length >= 20) {

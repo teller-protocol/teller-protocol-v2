@@ -18,6 +18,17 @@ import { MathUpgradeable } from "@openzeppelin/contracts-upgradeable/utils/math/
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20MetadataUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/cryptography/MerkleProofUpgradeable.sol";
 
+
+
+import "../interfaces/uniswap/IUniswapV3Pool.sol";
+
+import "../interfaces/uniswap/IUniswapV3Factory.sol";
+ 
+import "../libraries/uniswap/TickMath.sol";
+import "../libraries/uniswap/FixedPoint96.sol";
+import "../libraries/uniswap/FullMath.sol";
+
+
 contract LenderCommitmentForwarder_OracleLimited is
     TellerV2MarketForwarder_G2,
     ExtensionsContextUpgradeable,
@@ -618,6 +629,37 @@ contract LenderCommitmentForwarder_OracleLimited is
                 MathUpgradeable.Rounding.Up
             );
     }
+
+
+
+    // ---- TWAP 
+
+     function getSqrtTwapX96(address uniswapV3Pool, uint32 twapInterval) public view returns (uint160 sqrtPriceX96) {
+        if (twapInterval == 0) {
+            // return the current price if twapInterval == 0
+            (sqrtPriceX96, , , , , , ) = IUniswapV3Pool(uniswapV3Pool).slot0();
+        } else {
+            uint32[] memory secondsAgos = new uint32[](2);
+            secondsAgos[0] = twapInterval; // from (before)
+            secondsAgos[1] = 0; // to (now)
+
+            (int56[] memory tickCumulatives, ) = IUniswapV3Pool(uniswapV3Pool).observe(secondsAgos);
+
+            // tick(imprecise as it's an integer) to price
+            sqrtPriceX96 = TickMath.getSqrtRatioAtTick(
+                int24((tickCumulatives[1] - tickCumulatives[0]) / int32(twapInterval))
+            );
+        }
+    }
+
+    function getPriceX96FromSqrtPriceX96(uint160 sqrtPriceX96) public pure returns(uint256 priceX96) {
+        return FullMath.mulDiv(sqrtPriceX96, sqrtPriceX96, FixedPoint96.Q96);
+    }
+
+    // -----
+
+
+
 
     /**
      * @notice Return the array of borrowers that are allowlisted for a commitment

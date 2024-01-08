@@ -39,6 +39,7 @@ contract LenderCommitmentForwarder_OracleLimited is
     // CommitmentId => commitment
     mapping(uint256 => Commitment) public commitments;
 
+
     uint256 commitmentCount;
 
     //https://github.com/OpenZeppelin/openzeppelin-contracts-upgradeable/blob/master/contracts/utils/structs/EnumerableSetUpgradeable.sol
@@ -46,6 +47,7 @@ contract LenderCommitmentForwarder_OracleLimited is
         internal commitmentBorrowersList;
 
     mapping(uint256 => uint256) public commitmentPrincipalAccepted;
+ 
 
     /**
      * @notice This event is emitted when a lender's commitment is created.
@@ -173,6 +175,8 @@ contract LenderCommitmentForwarder_OracleLimited is
         );
 
         commitments[commitmentId_] = _commitment;
+  
+
 
         //make sure the commitment data adheres to required specifications and limits
         validateCommitment(commitments[commitmentId_]);
@@ -479,6 +483,7 @@ contract LenderCommitmentForwarder_OracleLimited is
             _collateralTokenAddress == commitment.collateralTokenAddress,
             "Mismatching collateral token"
         );
+
         //the interest rate must be at least as high has the commitment demands. The borrower can use a higher interest rate although that would not be beneficial to the borrower.
         require(
             _interestRate >= commitment.minInterestRate,
@@ -617,6 +622,11 @@ contract LenderCommitmentForwarder_OracleLimited is
             ).decimals();
         }
 
+        uint256 maxPrincipalPerCollateralAmount = min(   
+            getUniswapPriceRatioForPool(_principalTokenAddress,_collateralTokenAddress), 
+            _maxPrincipalPerCollateralAmount
+            );
+
         /*
          * The principalAmount is expanded by (collateralDecimals+principalDecimals) to increase precision
          * and then it is divided by _maxPrincipalPerCollateralAmount which should already been expanded by principalDecimals
@@ -625,7 +635,7 @@ contract LenderCommitmentForwarder_OracleLimited is
             MathUpgradeable.mulDiv(
                 _principalAmount,
                 (10**(collateralDecimals + principalDecimals)),
-                _maxPrincipalPerCollateralAmount,
+                maxPrincipalPerCollateralAmount,
                 MathUpgradeable.Rounding.Up
             );
     }
@@ -634,7 +644,27 @@ contract LenderCommitmentForwarder_OracleLimited is
 
     // ---- TWAP 
 
-     function getSqrtTwapX96(address uniswapV3Pool, uint32 twapInterval) public view returns (uint160 sqrtPriceX96) {
+    function getUniswapPriceRatioForPool ( address principalTokenAddress, address collateralTokenAddress ) public view returns (uint256 priceRatio) {
+
+            //scale me out 
+        return getUniswapPriceX96ForPool( principalTokenAddress, collateralTokenAddress  );
+    }
+
+
+    function getUniswapPriceX96ForPool( address principalTokenAddress, address collateralTokenAddress ) public view returns (uint160 sqrtPriceX96) {
+
+        address poolAddress = getUniswapV3PoolAddress(
+            principalTokenAddress,
+            collateralTokenAddress
+        );
+        
+
+        //here, we arent sure if principal token is token 0 or 1 so we have to fix this issue.. ?
+        return getSqrtTwapX96(poolAddress , 0);
+
+    }
+
+    function getSqrtTwapX96(address uniswapV3Pool, uint32 twapInterval) internal view returns (uint160 sqrtPriceX96) {
         if (twapInterval == 0) {
             // return the current price if twapInterval == 0
             (sqrtPriceX96, , , , , , ) = IUniswapV3Pool(uniswapV3Pool).slot0();
@@ -652,7 +682,7 @@ contract LenderCommitmentForwarder_OracleLimited is
         }
     }
 
-    function getPriceX96FromSqrtPriceX96(uint160 sqrtPriceX96) public pure returns(uint256 priceX96) {
+    function getPriceX96FromSqrtPriceX96(uint160 sqrtPriceX96) internal pure returns(uint256 priceX96) {
         return FullMath.mulDiv(sqrtPriceX96, sqrtPriceX96, FixedPoint96.Q96);
     }
 

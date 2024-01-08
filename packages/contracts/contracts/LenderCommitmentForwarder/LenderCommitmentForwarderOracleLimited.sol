@@ -42,6 +42,8 @@ contract LenderCommitmentForwarder_OracleLimited is
     mapping(uint256 => Commitment) public commitments;
 
 
+
+
     uint256 commitmentCount;
 
     //https://github.com/OpenZeppelin/openzeppelin-contracts-upgradeable/blob/master/contracts/utils/structs/EnumerableSetUpgradeable.sol
@@ -50,6 +52,12 @@ contract LenderCommitmentForwarder_OracleLimited is
 
     mapping(uint256 => uint256) public commitmentPrincipalAccepted;
  
+
+
+    mapping(uint256 => address) public commitmentUniswapPoolAddress;
+
+    address immutable UNISWAP_V3_FACTORY ;
+
 
     /**
      * @notice This event is emitted when a lender's commitment is created.
@@ -155,9 +163,15 @@ contract LenderCommitmentForwarder_OracleLimited is
     /** External Functions **/
 
     /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor(address _protocolAddress, address _marketRegistry)
+    constructor(
+        address _protocolAddress, 
+        address _marketRegistry,
+        address _uniswapV3Factory
+        )
         TellerV2MarketForwarder_G2(_protocolAddress, _marketRegistry)
-    {}
+    {
+        UNISWAP_V3_FACTORY = _uniswapV3Factory;
+    }
 
     /**
      * @notice Creates a loan commitment from a lender for a market.
@@ -167,7 +181,8 @@ contract LenderCommitmentForwarder_OracleLimited is
      */
     function createCommitment(
         Commitment calldata _commitment,
-        address[] calldata _borrowerAddressList
+        address[] calldata _borrowerAddressList,
+        uint24 _uniswapPoolFee
     ) public returns (uint256 commitmentId_) {
         commitmentId_ = commitmentCount++;
 
@@ -177,6 +192,14 @@ contract LenderCommitmentForwarder_OracleLimited is
         );
 
         commitments[commitmentId_] = _commitment;
+
+        commitmentUniswapPoolAddress[commitmentId_] = getUniswapV3PoolAddress(
+            _commitment.principalTokenAddress,
+            _commitment.collateralTokenAddress,
+            _uniswapPoolFee
+        ); 
+
+        require(commitmentUniswapPoolAddress[commitmentId_] != address(0),"Uniswap pool does not exist");
   
 
 
@@ -515,9 +538,18 @@ contract LenderCommitmentForwarder_OracleLimited is
             });
         }
 
+ 
+
+        address uniswapPoolAddress = commitmentUniswapPoolAddress[_commitmentId];
+
+        uint256 maxPrincipalPerCollateralAmount = Math.min(   
+            getUniswapPriceRatioForPool(uniswapPoolAddress), 
+            commitment.maxPrincipalPerCollateralAmount
+            );
+ 
         uint256 requiredCollateral = getRequiredCollateral(
             _principalAmount,
-            commitment.maxPrincipalPerCollateralAmount,
+            maxPrincipalPerCollateralAmount,
             commitment.collateralTokenType,
             commitment.collateralTokenAddress,
             commitment.principalTokenAddress
@@ -624,10 +656,7 @@ contract LenderCommitmentForwarder_OracleLimited is
             ).decimals();
         }
 
-        uint256 maxPrincipalPerCollateralAmount = Math.min(   
-            getUniswapPriceRatioForPool(_principalTokenAddress,_collateralTokenAddress), 
-            _maxPrincipalPerCollateralAmount
-            );
+      
 
         /*
          * The principalAmount is expanded by (collateralDecimals+principalDecimals) to increase precision
@@ -637,7 +666,7 @@ contract LenderCommitmentForwarder_OracleLimited is
             MathUpgradeable.mulDiv(
                 _principalAmount,
                 (10**(collateralDecimals + principalDecimals)),
-                maxPrincipalPerCollateralAmount,
+                _maxPrincipalPerCollateralAmount,
                 MathUpgradeable.Rounding.Up
             );
     }
@@ -646,26 +675,30 @@ contract LenderCommitmentForwarder_OracleLimited is
 
     // ---- TWAP 
 
-    function getUniswapV3PoolAddress(address principalTokenAddress, address collateralTokenAddress) public view returns (address){
+    function getUniswapV3PoolAddress(
+        address _principalTokenAddress, 
+        address _collateralTokenAddress,
+        uint24 _uniswapPoolFee
+        ) public view returns (address){
 
+ 
+        return IUniswapV3Factory(UNISWAP_V3_FACTORY).getPool( 
+            _principalTokenAddress,
+            _collateralTokenAddress,
+            _uniswapPoolFee
+         );
 
-        
     }
 
-    function getUniswapPriceRatioForPool ( address principalTokenAddress, address collateralTokenAddress ) public view returns (uint256 priceRatio) {
+    function getUniswapPriceRatioForPool ( address poolAddress ) public view returns (uint256 priceRatio) {
 
             //scale me out 
-        return getUniswapPriceX96ForPool( principalTokenAddress, collateralTokenAddress  );
+        return getUniswapPriceX96ForPool( poolAddress  );
     }
 
 
-    function getUniswapPriceX96ForPool( address principalTokenAddress, address collateralTokenAddress ) public view returns (uint160 sqrtPriceX96) {
-
-        address poolAddress = getUniswapV3PoolAddress(
-            principalTokenAddress,
-            collateralTokenAddress
-        );
-        
+    function getUniswapPriceX96ForPool( address poolAddress ) public view returns (uint160 sqrtPriceX96) {
+  
 
         //here, we arent sure if principal token is token 0 or 1 so we have to fix this issue.. ?
         return getSqrtTwapX96(poolAddress , 0);

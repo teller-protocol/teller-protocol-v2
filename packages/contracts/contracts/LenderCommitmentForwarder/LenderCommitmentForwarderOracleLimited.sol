@@ -6,7 +6,7 @@ import "../TellerV2MarketForwarder_G2.sol";
 
 // Interfaces
 import "../interfaces/ICollateralManager.sol";
-import "../interfaces/ILenderCommitmentForwarder.sol";
+import "../interfaces/ILenderCommitmentForwarderWithUniswap.sol";
 import "./extensions/ExtensionsContextUpgradeable.sol";
 
 import "@openzeppelin/contracts/utils/math/Math.sol";
@@ -34,7 +34,7 @@ import "../libraries/uniswap/FullMath.sol";
 contract LenderCommitmentForwarder_OracleLimited is
     TellerV2MarketForwarder_G2,
     ExtensionsContextUpgradeable,
-    ILenderCommitmentForwarder
+    ILenderCommitmentForwarderWithUniswap
 {
     using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
 
@@ -179,7 +179,7 @@ contract LenderCommitmentForwarder_OracleLimited is
      * @param _borrowerAddressList The array of borrowers that are allowed to accept loans using this commitment
      * @return commitmentId_ returns the commitmentId for the created commitment
      */
-    function createCommitment(
+    function createCommitmentWithUniswap(
         Commitment calldata _commitment,
         address[] calldata _borrowerAddressList,
         uint24 _uniswapPoolFee
@@ -197,7 +197,7 @@ contract LenderCommitmentForwarder_OracleLimited is
             _commitment.principalTokenAddress,
             _commitment.collateralTokenAddress,
             _uniswapPoolFee
-        ); 
+        );
 
         require(commitmentUniswapPoolAddress[commitmentId_] != address(0),"Uniswap pool does not exist");
   
@@ -690,18 +690,20 @@ contract LenderCommitmentForwarder_OracleLimited is
 
     }
 
+
+    //NEED TO FIX THIS 
     function getUniswapPriceRatioForPool ( address poolAddress ) public view returns (uint256 priceRatio) {
 
             //scale me out 
         return getUniswapPriceX96ForPool( poolAddress  );
     }
 
-
+    //NEED TO FIX THIS 
     function getUniswapPriceX96ForPool( address poolAddress ) public view returns (uint160 sqrtPriceX96) {
   
 
         //here, we arent sure if principal token is token 0 or 1 so we have to fix this issue.. ?
-        return getSqrtTwapX96(poolAddress , 0);
+        return getSqrtTwapX96(poolAddress , 4);
 
     }
 

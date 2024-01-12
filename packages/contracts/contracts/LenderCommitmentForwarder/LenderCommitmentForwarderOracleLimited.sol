@@ -31,6 +31,18 @@ import "../libraries/uniswap/FixedPoint96.sol";
 import "../libraries/uniswap/FullMath.sol";
 
 
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
+import "forge-std/console.sol";
+
+
+
+
+interface IERC20Extended is IERC20 {
+    function decimals() external view returns (uint8);
+}
+
+
 contract LenderCommitmentForwarder_OracleLimited is
     TellerV2MarketForwarder_G2,
     ExtensionsContextUpgradeable,
@@ -538,12 +550,17 @@ contract LenderCommitmentForwarder_OracleLimited is
             });
         }
 
- 
+        bool zeroForOne = commitment.collateralTokenAddress > commitment.principalTokenAddress;
 
         address uniswapPoolAddress = commitmentUniswapPoolAddress[_commitmentId];
 
+     {
+            //fix me ...
+        uint256 decimals0 = IERC20Extended(commitment.collateralTokenAddress).decimals();
+        uint256 decimals1 = IERC20Extended(commitment.principalTokenAddress).decimals(); 
+
         uint256 maxPrincipalPerCollateralAmount = Math.min(   
-            getUniswapPriceRatioForPool(uniswapPoolAddress), 
+            getUniswapPriceRatioForPool(uniswapPoolAddress, zeroForOne,decimals0,decimals1), 
             commitment.maxPrincipalPerCollateralAmount
             );
  
@@ -554,6 +571,7 @@ contract LenderCommitmentForwarder_OracleLimited is
             commitment.collateralTokenAddress,
             commitment.principalTokenAddress
         );
+  
 
         if (_collateralAmount < requiredCollateral) {
             revert InsufficientBorrowerCollateral({
@@ -561,6 +579,7 @@ contract LenderCommitmentForwarder_OracleLimited is
                 actual: _collateralAmount
             });
         }
+      }
 
         //ERC721 assets must have a quantity of 1
         if (
@@ -692,18 +711,70 @@ contract LenderCommitmentForwarder_OracleLimited is
 
 
     //NEED TO FIX THIS 
-    function getUniswapPriceRatioForPool ( address poolAddress ) public view returns (uint256 priceRatio) {
+    function getUniswapPriceRatioForPool ( 
+        address poolAddress, 
+        bool zeroForOne,
+        uint256 decimals0,
+        uint256 decimals1
+         ) public view returns (uint256 priceRatio) {
 
             //scale me out 
-        return getUniswapPriceX96ForPool( poolAddress  );
+        uint160 sqrtPriceX96 = getUniswapPriceX96ForPool( poolAddress  );
+ 
+        
+         console.log("est 4");
+
+          console.logUint(sqrtPriceX96);
+
+
+      //  bool zeroForOne = poolKey.token0 == info.principalToken;
+
+
+            // 1. technically we will need to know the impact 
+            // probably need to manually read the supply0 and supply1 
+
+            // 2. make sure the way im doing decimals is correct 
+
+        console.log("est 5");
+        uint256 sqrtPrice = FullMath.mulDiv( sqrtPriceX96, 10**decimals0, 2**96  )   ;
+
+
+        console.logUint(sqrtPrice);
+
+        //uint256 price = sqrtPrice * sqrtPrice;
+
+        uint256 sqrtPriceInverse = FullMath.mulDiv(   10**decimals0, 10**decimals1 , sqrtPrice  )   ;
+        //uint256 priceInverse = sqrtPriceInverse * sqrtPriceInverse; 
+
+
+        uint256 price = zeroForOne ? sqrtPrice * sqrtPrice : sqrtPriceInverse * sqrtPriceInverse;
+
+        //console.logUint(sqrtPriceInverse);
+
+        //console.logUint(priceInverse);
+
+        console.logUint(price);
+
+     //   uint256 min_output = (amountOwed*(price))*9 / 10 ;
+ 
+        console.logUint( price );
+       
+
+        /*uint256 ratio = zeroForOne ? 
+        2 ** 192 / sqrtPriceX96 ** 2 * 10 ** (decimals1-decimals0) : 
+        sqrtPriceX96 ** 2 / 2 ** 192 * 10** (decimals1-decimals0) ;*/
+
+        return price ;
+
     }
 
-    //NEED TO FIX THIS 
+
+
+   
     function getUniswapPriceX96ForPool( address poolAddress ) public view returns (uint160 sqrtPriceX96) {
   
 
-        //here, we arent sure if principal token is token 0 or 1 so we have to fix this issue.. ?
-        return getSqrtTwapX96(poolAddress , 4);
+         return getSqrtTwapX96(poolAddress , 4);
 
     }
 

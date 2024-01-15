@@ -985,8 +985,6 @@ contract TellerV2 is
 
         uint32 defaultDuration = bidDefaultDuration[_bidId];
 
-        if (defaultDuration == 0) return false;
-
         uint32 dueDate = calculateNextDueDate(_bidId);
 
         return

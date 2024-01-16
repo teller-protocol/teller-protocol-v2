@@ -22,6 +22,7 @@ import { User } from "../Test_Helpers.sol";
 import "../../contracts/mock/MarketRegistryMock.sol";
 
 import { LenderCommitmentForwarder_OracleLimited_Override } from "./LenderCommitmentForwarder_OracleLimited_Override.sol";
+import { ILenderCommitmentForwarderWithUniswap } from "../../contracts/interfaces/ILenderCommitmentForwarderWithUniswap.sol";
 
 import {UniswapV3PoolMock} from "../../contracts/mock/uniswap/UniswapV3PoolMock.sol";
 
@@ -46,7 +47,7 @@ contract LenderCommitmentForwarder_OracleLimited_Test is Testable {
     uint8 constant principalTokenDecimals = 18;
 
     TestERC20Token collateralToken;
-    uint8 constant collateralTokenDecimals = 6;
+    uint8 constant collateralTokenDecimals = 18; //try setting this to 6 
 
     TestERC721Token erc721Token;
     TestERC1155Token erc1155Token;
@@ -144,6 +145,10 @@ contract LenderCommitmentForwarder_OracleLimited_Test is Testable {
 
     function test_getUniswapPriceRatioForPool() public {
 
+
+
+                //collateralTokenDecimals = 6; 
+
         bool zeroForOne = true; // ??
 
 
@@ -161,6 +166,30 @@ contract LenderCommitmentForwarder_OracleLimited_Test is Testable {
 
         console.log("price ratio");
         console.logUint(priceRatio);
+
+
+
+        /*
+                validate through this ... 
+
+       
+        );
+
+
+        */
+
+
+        uint256 principalAmount = 1000;
+
+        uint256 requiredCollateral = lenderCommitmentForwarder.getRequiredCollateral(
+            principalAmount,
+            priceRatio,
+            ILenderCommitmentForwarderWithUniswap.CommitmentCollateralType.ERC20,
+            address(collateralToken),
+            address(principalToken)
+            );
+
+        assertEq( requiredCollateral, 10000, "unexpected required collateral" );
 
 
     }

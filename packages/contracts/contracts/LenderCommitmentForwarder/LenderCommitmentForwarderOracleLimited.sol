@@ -552,7 +552,7 @@ contract LenderCommitmentForwarder_OracleLimited is
         address uniswapPoolAddress = commitmentUniswapPoolAddress[_commitmentId];
 
      {
-            //fix me ...
+            
         uint256 decimalsCollateralToken = IERC20MetadataUpgradeable(commitment.collateralTokenAddress).decimals();
         uint256 decimalsPrincipalToken = IERC20MetadataUpgradeable(commitment.principalTokenAddress).decimals(); 
 
@@ -744,7 +744,7 @@ contract LenderCommitmentForwarder_OracleLimited is
 
         //uint256 price = sqrtPrice * sqrtPrice;
 
-        uint256 sqrtPriceInverse = FullMath.mulDiv(expFactor , 1, sqrtPrice );
+        uint256 sqrtPriceInverse = FullMath.mulDiv(expFactor , expFactor, sqrtPrice );
         //uint256 priceInverse = sqrtPriceInverse * sqrtPriceInverse; 
 
 

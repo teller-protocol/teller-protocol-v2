@@ -37,10 +37,7 @@ import "forge-std/console.sol";
 
 
 
-
-interface IERC20Extended is IERC20 {
-    function decimals() external view returns (uint8);
-}
+ 
 
 
 contract LenderCommitmentForwarder_OracleLimited is
@@ -556,11 +553,11 @@ contract LenderCommitmentForwarder_OracleLimited is
 
      {
             //fix me ...
-        uint256 decimals0 = IERC20Extended(commitment.collateralTokenAddress).decimals();
-        uint256 decimals1 = IERC20Extended(commitment.principalTokenAddress).decimals(); 
+        uint256 decimalsCollateralToken = IERC20MetadataUpgradeable(commitment.collateralTokenAddress).decimals();
+        uint256 decimalsPrincipalToken = IERC20MetadataUpgradeable(commitment.principalTokenAddress).decimals(); 
 
         uint256 maxPrincipalPerCollateralAmount = Math.min(   
-            getUniswapPriceRatioForPool(uniswapPoolAddress, zeroForOne,decimals0,decimals1), 
+            getUniswapPriceRatioForPool(uniswapPoolAddress, zeroForOne,decimalsPrincipalToken,decimalsCollateralToken), 
             commitment.maxPrincipalPerCollateralAmount
             );
  
@@ -714,8 +711,8 @@ contract LenderCommitmentForwarder_OracleLimited is
     function getUniswapPriceRatioForPool ( 
         address poolAddress, 
         bool zeroForOne,
-        uint256 decimals0,
-        uint256 decimals1
+        uint256 decimalsPrincipalToken,
+        uint256 decimalsCollateralToken
          ) public view returns (uint256 priceRatio) {
 
             //scale me out 
@@ -725,6 +722,8 @@ contract LenderCommitmentForwarder_OracleLimited is
          console.log("est 4");
 
           console.logUint(sqrtPriceX96);
+
+          uint256 expFactor = 10 ** (decimalsPrincipalToken + decimalsCollateralToken);
 
 
       //  bool zeroForOne = poolKey.token0 == info.principalToken;
@@ -736,14 +735,14 @@ contract LenderCommitmentForwarder_OracleLimited is
             // 2. make sure the way im doing decimals is correct 
 
         console.log("est 5");
-        uint256 sqrtPrice = FullMath.mulDiv( sqrtPriceX96, 10**decimals0, 2**96  )   ;
+        uint256 sqrtPrice = FullMath.mulDiv( sqrtPriceX96, expFactor, 2**96  )   ;
 
 
         console.logUint(sqrtPrice);
 
         //uint256 price = sqrtPrice * sqrtPrice;
 
-        uint256 sqrtPriceInverse = FullMath.mulDiv(   10**decimals0, 10**decimals1 , sqrtPrice  )   ;
+        uint256 sqrtPriceInverse = FullMath.mulDiv(expFactor , 1, sqrtPrice );
         //uint256 priceInverse = sqrtPriceInverse * sqrtPriceInverse; 
 
 

@@ -708,6 +708,7 @@ contract LenderCommitmentForwarder_OracleLimited is
 
 
     //NEED TO FIX THIS 
+    //how does price ratio relate to princpalPerCollateralAmount ? 
     function getUniswapPriceRatioForPool ( 
         address poolAddress, 
         bool zeroForOne,
@@ -715,18 +716,18 @@ contract LenderCommitmentForwarder_OracleLimited is
         uint256 decimalsCollateralToken
          ) public view returns (uint256 priceRatio) {
 
-            //scale me out 
+            //scale me out ?
         uint160 sqrtPriceX96 = getUniswapPriceX96ForPool( poolAddress  );
  
         
-         console.log("est 4");
+        console.log("est 4");
 
-          console.logUint(sqrtPriceX96);
+        console.logUint(sqrtPriceX96);
 
-          uint256 expFactor = 10 ** (decimalsPrincipalToken + decimalsCollateralToken);
+        uint256 expFactor = 10 ** (decimalsPrincipalToken + decimalsCollateralToken);
 
 
-      //  bool zeroForOne = poolKey.token0 == info.principalToken;
+        //  bool zeroForOne = poolKey.token0 == info.principalToken;
 
 
             // 1. technically we will need to know the impact 
@@ -751,17 +752,17 @@ contract LenderCommitmentForwarder_OracleLimited is
         //console.logUint(sqrtPriceInverse);
 
         //console.logUint(priceInverse);
-
-        console.logUint(price);
-
-     //   uint256 min_output = (amountOwed*(price))*9 / 10 ;
+ 
+        // uint256 min_output = (amountOwed*(price))*9 / 10 ;
  
         console.logUint( price );
        
 
-        /*uint256 ratio = zeroForOne ? 
+        /*
+        uint256 ratio = zeroForOne ? 
         2 ** 192 / sqrtPriceX96 ** 2 * 10 ** (decimals1-decimals0) : 
-        sqrtPriceX96 ** 2 / 2 ** 192 * 10** (decimals1-decimals0) ;*/
+        sqrtPriceX96 ** 2 / 2 ** 192 * 10** (decimals1-decimals0) ;
+        */
 
         return price ;
 

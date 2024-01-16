@@ -23,6 +23,10 @@ import "../../contracts/mock/MarketRegistryMock.sol";
 
 import { LenderCommitmentForwarder_OracleLimited_Override } from "./LenderCommitmentForwarder_OracleLimited_Override.sol";
 
+import "forge-std/console.sol";
+
+
+
 contract LenderCommitmentForwarder_OracleLimited_Test is Testable {
     LenderCommitmentForwarderTest_TellerV2Mock private tellerV2Mock;
     MarketRegistryMock mockMarketRegistry;
@@ -56,7 +60,8 @@ contract LenderCommitmentForwarder_OracleLimited_Test is Testable {
 
     uint256 marketId;
 
-    address mockUniswapFactory;  
+    address mockUniswapFactory; 
+    address mockUniswapPool; 
 
     //  address principalTokenAddress;
  
@@ -129,6 +134,27 @@ contract LenderCommitmentForwarder_OracleLimited_Test is Testable {
         erc1155Token = new TestERC1155Token("Test 1155");
     }
 
+
+    // yarn contracts test --match-test test_getUniswapPrice
+
+    function test_getUniswapPriceRatioForPool() public {
+
+        bool zeroForOne = true; // ??
+
+        uint256 priceRatio = lenderCommitmentForwarder.getUniswapPriceRatioForPool(  
+            address(mockUniswapPool),
+            zeroForOne,
+            18,
+            18
+        );
+
+
+        console.logUint(priceRatio);
+
+
+    }
+
+    /*
     function test_createCommitment() public {
         ILenderCommitmentForwarder.Commitment
             memory c = ILenderCommitmentForwarder.Commitment({

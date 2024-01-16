@@ -146,14 +146,20 @@ contract LenderCommitmentForwarder_OracleLimited_Test is Testable {
 
         bool zeroForOne = true; // ??
 
+
+        mockUniswapPool.set_mockSqrtPriceX96( 10 * 2**96 );
+
+        uint32 twapInterval = 0;
+
         uint256 priceRatio = lenderCommitmentForwarder.getUniswapPriceRatioForPool(  
             address(mockUniswapPool),
             zeroForOne,
+            twapInterval,
             18,
             18
         );
 
-
+        console.log("price ratio");
         console.logUint(priceRatio);
 
 

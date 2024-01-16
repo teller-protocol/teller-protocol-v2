@@ -557,7 +557,7 @@ contract LenderCommitmentForwarder_OracleLimited is
         uint256 decimalsPrincipalToken = IERC20MetadataUpgradeable(commitment.principalTokenAddress).decimals(); 
 
         uint256 maxPrincipalPerCollateralAmount = Math.min(   
-            getUniswapPriceRatioForPool(uniswapPoolAddress, zeroForOne,decimalsPrincipalToken,decimalsCollateralToken), 
+            getUniswapPriceRatioForPool(uniswapPoolAddress, zeroForOne, 4,decimalsPrincipalToken,decimalsCollateralToken), 
             commitment.maxPrincipalPerCollateralAmount
             );
  
@@ -712,12 +712,13 @@ contract LenderCommitmentForwarder_OracleLimited is
     function getUniswapPriceRatioForPool ( 
         address poolAddress, 
         bool zeroForOne,
+        uint32 twapInterval,
         uint256 decimalsPrincipalToken,
         uint256 decimalsCollateralToken
          ) public view returns (uint256 priceRatio) {
 
             //scale me out ?
-        uint160 sqrtPriceX96 = getUniswapPriceX96ForPool( poolAddress  );
+        uint160 sqrtPriceX96 = getSqrtTwapX96( poolAddress , twapInterval );
  
         
         console.log("est 4");
@@ -771,12 +772,12 @@ contract LenderCommitmentForwarder_OracleLimited is
 
 
    
-    function getUniswapPriceX96ForPool( address poolAddress ) public view returns (uint160 sqrtPriceX96) {
+   /* function getUniswapPriceX96ForPool( address poolAddress ) public view returns (uint160 sqrtPriceX96) {
   
 
          return getSqrtTwapX96(poolAddress , 4);
 
-    }
+    }*/
 
     function getSqrtTwapX96(address uniswapV3Pool, uint32 twapInterval) internal view returns (uint160 sqrtPriceX96) {
         if (twapInterval == 0) {

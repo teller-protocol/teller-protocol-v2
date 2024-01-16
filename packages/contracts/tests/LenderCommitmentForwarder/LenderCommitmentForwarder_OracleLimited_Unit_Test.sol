@@ -23,6 +23,10 @@ import "../../contracts/mock/MarketRegistryMock.sol";
 
 import { LenderCommitmentForwarder_OracleLimited_Override } from "./LenderCommitmentForwarder_OracleLimited_Override.sol";
 
+import {UniswapV3PoolMock} from "../../contracts/mock/uniswap/UniswapV3PoolMock.sol";
+
+import {UniswapV3FactoryMock} from "../../contracts/mock/uniswap/UniswapV3FactoryMock.sol";
+
 import "forge-std/console.sol";
 
 
@@ -60,8 +64,8 @@ contract LenderCommitmentForwarder_OracleLimited_Test is Testable {
 
     uint256 marketId;
 
-    address mockUniswapFactory; 
-    address mockUniswapPool; 
+    UniswapV3FactoryMock mockUniswapFactory; 
+    UniswapV3PoolMock mockUniswapPool; 
 
     //  address principalTokenAddress;
  
@@ -71,7 +75,8 @@ contract LenderCommitmentForwarder_OracleLimited_Test is Testable {
         tellerV2Mock = new LenderCommitmentForwarderTest_TellerV2Mock();
         mockMarketRegistry = new MarketRegistryMock();
 
-        // mockUniswapFactory = ?? 
+        mockUniswapFactory = new UniswapV3FactoryMock();
+        mockUniswapPool = new UniswapV3PoolMock();
 
         lenderCommitmentForwarder = new LenderCommitmentForwarder_OracleLimited_Override(
             address(tellerV2Mock),

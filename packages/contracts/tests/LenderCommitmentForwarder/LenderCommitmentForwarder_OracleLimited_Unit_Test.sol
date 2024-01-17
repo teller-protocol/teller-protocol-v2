@@ -149,8 +149,8 @@ contract LenderCommitmentForwarder_OracleLimited_Test is Testable {
 
                 //collateralTokenDecimals = 6; 
 
-        bool zeroForOne = true; // ??
-
+        bool zeroForOne = false; // ??
+ 
 
         mockUniswapPool.set_mockSqrtPriceX96( 10 * 2**96 );
 
@@ -175,6 +175,17 @@ contract LenderCommitmentForwarder_OracleLimited_Test is Testable {
        
         );
 
+
+        price ratio is 
+        100000000000000000000000000000000000000
+
+
+        expFactor is 
+        10000000000000000000000000000000000000
+
+        so the math is...
+
+        PA *  expFactor / PR 
 
         */
 

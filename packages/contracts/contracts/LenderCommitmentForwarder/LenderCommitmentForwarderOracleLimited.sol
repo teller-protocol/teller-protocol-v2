@@ -672,7 +672,11 @@ contract LenderCommitmentForwarder_OracleLimited is
             ).decimals();
         }
 
-      
+        console.log("get req col");
+        console.logUint(_principalAmount);
+        console.logUint(  (10**(collateralDecimals + principalDecimals)) ); // 1000000000000000000000000000000000000 1e36 -- correct 
+        console.logUint(_maxPrincipalPerCollateralAmount);  //i think this is incorrect .. it is 1e38 
+
 
         /*
          * The principalAmount is expanded by (collateralDecimals+principalDecimals) to increase precision
@@ -756,7 +760,7 @@ contract LenderCommitmentForwarder_OracleLimited is
  
         // uint256 min_output = (amountOwed*(price))*9 / 10 ;
  
-        console.logUint( price );
+        console.logUint( price / expFactor);
        
 
         /*
@@ -765,7 +769,9 @@ contract LenderCommitmentForwarder_OracleLimited is
         sqrtPriceX96 ** 2 / 2 ** 192 * 10** (decimals1-decimals0) ;
         */
 
-        return price ;
+
+            //for now ... 
+        return price / expFactor ;
 
     }
 

@@ -1,7 +1,7 @@
 // SPDX-Licence-Identifier: MIT
 pragma solidity >=0.8.0 <0.9.0;
 
-interface ILenderCommitmentForwarderWithUniswap {
+interface ILenderCommitmentForwarderWithUniswapRoute {
     enum CommitmentCollateralType {
         NONE, // no collateral required
         ERC20,
@@ -65,7 +65,7 @@ interface ILenderCommitmentForwarderWithUniswap {
     function createCommitmentWithUniswap(
         Commitment calldata _commitment,
         address[] calldata _borrowerAddressList,
-        uint24 uniswapPoolFee
+        address[] calldata _poolRoutes
     ) external returns (uint256);
 
     function acceptCommitmentWithRecipient(

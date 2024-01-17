@@ -6,7 +6,7 @@ import "../TellerV2MarketForwarder_G2.sol";
 
 // Interfaces
 import "../interfaces/ICollateralManager.sol";
-import "../interfaces/ILenderCommitmentForwarderWithUniswap.sol";
+import "../interfaces/ILenderCommitmentForwarderWithUniswapRoutes.sol";
 import "./extensions/ExtensionsContextUpgradeable.sol";
 
 import "@openzeppelin/contracts/utils/math/Math.sol";
@@ -43,7 +43,7 @@ import "forge-std/console.sol";
 contract LenderCommitmentForwarder_OracleLimited is
     TellerV2MarketForwarder_G2,
     ExtensionsContextUpgradeable,
-    ILenderCommitmentForwarderWithUniswap
+    ILenderCommitmentForwarderWithUniswapRoutes
 {
     using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
 
@@ -63,7 +63,10 @@ contract LenderCommitmentForwarder_OracleLimited is
  
 
 
-    mapping(uint256 => address) public commitmentUniswapPoolAddress;
+    //mapping(uint256 => address) public commitmentUniswapPoolAddress;
+
+    mapping(uint256 => EnumerableSetUpgradeable.AddressSet)
+        internal commitmentUniswapPoolRoutes;
 
     address immutable UNISWAP_V3_FACTORY ;
 
@@ -191,7 +194,7 @@ contract LenderCommitmentForwarder_OracleLimited is
     function createCommitmentWithUniswap(
         Commitment calldata _commitment,
         address[] calldata _borrowerAddressList,
-        uint24 _uniswapPoolFee
+        address[] calldata _poolRoutes
     ) public returns (uint256 commitmentId_) {
         commitmentId_ = commitmentCount++;
 
@@ -202,13 +205,19 @@ contract LenderCommitmentForwarder_OracleLimited is
 
         commitments[commitmentId_] = _commitment;
 
-        commitmentUniswapPoolAddress[commitmentId_] = getUniswapV3PoolAddress(
-            _commitment.principalTokenAddress,
-            _commitment.collateralTokenAddress,
-            _uniswapPoolFee
-        );
+      
 
-        require(commitmentUniswapPoolAddress[commitmentId_] != address(0),"Uniswap pool does not exist");
+         require(
+            _poolRoutes.length() == 1 ||  _poolRoutes.length() == 2 ,
+            "invalid pool routes length"
+        );
+        
+
+        for (uint256 i = 0; i < _poolRoutes.length; i++) {
+            commitmentUniswapPoolRoutes[commitmentId_].add(_poolRoutes[i]);
+        }
+
+       // require(commitmentUniswapPoolAddress[commitmentId_] != address(0),"Uniswap pool does not exist");
   
 
 
@@ -303,7 +312,7 @@ contract LenderCommitmentForwarder_OracleLimited is
     ) internal {
         for (uint256 i = 0; i < _borrowerArray.length; i++) {
             commitmentBorrowersList[_commitmentId].add(_borrowerArray[i]);
-        }
+        } 
         emit UpdatedCommitmentBorrowers(_commitmentId);
     }
 
@@ -549,7 +558,7 @@ contract LenderCommitmentForwarder_OracleLimited is
 
         bool zeroForOne = commitment.collateralTokenAddress > commitment.principalTokenAddress;
 
-        address uniswapPoolAddress = commitmentUniswapPoolAddress[_commitmentId];
+        address uniswapPoolAddress = commitmentUniswapPoolRoutes[_commitmentId];
 
      {
             

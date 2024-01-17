@@ -22,7 +22,7 @@ import { User } from "../Test_Helpers.sol";
 import "../../contracts/mock/MarketRegistryMock.sol";
 
 import { LenderCommitmentForwarder_OracleLimited_Override } from "./LenderCommitmentForwarder_OracleLimited_Override.sol";
-import { ILenderCommitmentForwarderWithUniswap } from "../../contracts/interfaces/ILenderCommitmentForwarderWithUniswap.sol";
+import { ILenderCommitmentForwarderWithUniswapRoutes } from "../../contracts/interfaces/ILenderCommitmentForwarderWithUniswapRoutes.sol";
 
 import {UniswapV3PoolMock} from "../../contracts/mock/uniswap/UniswapV3PoolMock.sol";
 
@@ -195,7 +195,7 @@ contract LenderCommitmentForwarder_OracleLimited_Test is Testable {
         uint256 requiredCollateral = lenderCommitmentForwarder.getRequiredCollateral(
             principalAmount,
             priceRatio,
-            ILenderCommitmentForwarderWithUniswap.CommitmentCollateralType.ERC20,
+            ILenderCommitmentForwarderWithUniswapRoutes.CommitmentCollateralType.ERC20,
             address(collateralToken),
             address(principalToken)
             );
@@ -240,7 +240,7 @@ contract LenderCommitmentForwarder_OracleLimited_Test is Testable {
         uint256 requiredCollateral = lenderCommitmentForwarder.getRequiredCollateral(
             principalAmount,
             priceRatio,
-            ILenderCommitmentForwarderWithUniswap.CommitmentCollateralType.ERC20,
+            ILenderCommitmentForwarderWithUniswapRoutes.CommitmentCollateralType.ERC20,
             address(collateralToken),
             address(principalToken)
             );

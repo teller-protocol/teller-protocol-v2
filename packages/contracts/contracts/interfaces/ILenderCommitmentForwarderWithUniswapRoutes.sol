@@ -1,7 +1,7 @@
 // SPDX-Licence-Identifier: MIT
 pragma solidity >=0.8.0 <0.9.0;
 
-interface ILenderCommitmentForwarderWithUniswapRoute {
+interface ILenderCommitmentForwarderWithUniswapRoutes {
     enum CommitmentCollateralType {
         NONE, // no collateral required
         ERC20,

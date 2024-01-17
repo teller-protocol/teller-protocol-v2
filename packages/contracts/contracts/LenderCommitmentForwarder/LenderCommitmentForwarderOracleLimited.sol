@@ -208,7 +208,7 @@ contract LenderCommitmentForwarder_OracleLimited is
       
 
          require(
-            _poolRoutes.length() == 1 ||  _poolRoutes.length() == 2 ,
+            _poolRoutes.length == 1 ||  _poolRoutes.length == 2 ,
             "invalid pool routes length"
         );
         
@@ -558,7 +558,7 @@ contract LenderCommitmentForwarder_OracleLimited is
 
         bool zeroForOne = commitment.collateralTokenAddress > commitment.principalTokenAddress;
 
-        address uniswapPoolAddress = commitmentUniswapPoolRoutes[_commitmentId];
+         EnumerableSetUpgradeable.AddressSet storage uniswapPoolAddress = commitmentUniswapPoolRoutes[_commitmentId];
 
      {
             

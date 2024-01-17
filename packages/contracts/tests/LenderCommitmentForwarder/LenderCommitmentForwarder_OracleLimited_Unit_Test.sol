@@ -143,7 +143,7 @@ contract LenderCommitmentForwarder_OracleLimited_Test is Testable {
 
     // yarn contracts test --match-test test_getUniswapPrice
 
-    function test_getUniswapPriceRatioForPool() public {
+    function test_getUniswapPriceRatioForPool_same_price() public {
 
 
 
@@ -152,7 +152,7 @@ contract LenderCommitmentForwarder_OracleLimited_Test is Testable {
         bool zeroForOne = false; // ??
  
 
-        mockUniswapPool.set_mockSqrtPriceX96( 10 * 2**96 );
+        mockUniswapPool.set_mockSqrtPriceX96( 1 * 2**96 );
 
         uint32 twapInterval = 0;
 
@@ -200,7 +200,52 @@ contract LenderCommitmentForwarder_OracleLimited_Test is Testable {
             address(principalToken)
             );
 
-        assertEq( requiredCollateral, 10000, "unexpected required collateral" );
+        assertEq( requiredCollateral, 1000, "unexpected required collateral" );
+
+
+    }
+
+     function test_getUniswapPriceRatioForPool_different_price() public {
+
+
+
+                //collateralTokenDecimals = 6; 
+
+        bool zeroForOne = false; // ??
+ 
+
+
+            //i think this means the ratio is 100:1 
+        mockUniswapPool.set_mockSqrtPriceX96( 10 * 2**96 );
+
+        uint32 twapInterval = 0;
+
+        uint256 priceRatio = lenderCommitmentForwarder.getUniswapPriceRatioForPool(  
+            address(mockUniswapPool),
+            zeroForOne,
+            twapInterval,
+            18,
+            18
+        );
+
+        console.log("price ratio");
+        console.logUint(priceRatio);
+
+
+ 
+
+
+        uint256 principalAmount = 1000;
+
+        uint256 requiredCollateral = lenderCommitmentForwarder.getRequiredCollateral(
+            principalAmount,
+            priceRatio,
+            ILenderCommitmentForwarderWithUniswap.CommitmentCollateralType.ERC20,
+            address(collateralToken),
+            address(principalToken)
+            );
+
+        assertEq( requiredCollateral, 100000, "unexpected required collateral" );
 
 
     }

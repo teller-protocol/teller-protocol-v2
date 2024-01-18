@@ -40,6 +40,16 @@ interface ILenderCommitmentForwarderWithUniswapRoutes {
         address principalTokenAddress;
     }
 
+    struct PoolRouteConfig {
+
+        address pool;
+        bool zeroForOne; 
+        uint32 twapInterval;
+        uint256 token0Decimals;
+        uint256 token1Decimals;
+
+    }
+
     // mapping(uint256 => Commitment) public commitments;
 
     function getCommitmentMarketId(uint256 _commitmentId)
@@ -65,7 +75,7 @@ interface ILenderCommitmentForwarderWithUniswapRoutes {
     function createCommitmentWithUniswap(
         Commitment calldata _commitment,
         address[] calldata _borrowerAddressList,
-        address[] calldata _poolRoutes
+        PoolRouteConfig[] calldata _poolRoutes
     ) external returns (uint256);
 
     function acceptCommitmentWithRecipient(

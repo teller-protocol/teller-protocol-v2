@@ -65,7 +65,7 @@ contract LenderCommitmentForwarder_OracleLimited is
 
     //mapping(uint256 => address) public commitmentUniswapPoolAddress;
 
-    mapping(uint256 => EnumerableSetUpgradeable.AddressSet)
+    mapping(uint256 => PoolRouteConfig[])
         internal commitmentUniswapPoolRoutes;
 
     address immutable UNISWAP_V3_FACTORY ;
@@ -194,7 +194,7 @@ contract LenderCommitmentForwarder_OracleLimited is
     function createCommitmentWithUniswap(
         Commitment calldata _commitment,
         address[] calldata _borrowerAddressList,
-        address[] calldata _poolRoutes
+        PoolRouteConfig[] calldata _poolRoutes
     ) public returns (uint256 commitmentId_) {
         commitmentId_ = commitmentCount++;
 
@@ -207,14 +207,15 @@ contract LenderCommitmentForwarder_OracleLimited is
 
       
 
+            //routes length of 0 means ignore price oracle limits 
          require(
-            _poolRoutes.length == 1 ||  _poolRoutes.length == 2 ,
+             _poolRoutes.length <= 2 ,
             "invalid pool routes length"
         );
         
 
         for (uint256 i = 0; i < _poolRoutes.length; i++) {
-            commitmentUniswapPoolRoutes[commitmentId_].add(_poolRoutes[i]);
+            commitmentUniswapPoolRoutes[commitmentId_][i] = (_poolRoutes[i]);
         }
 
        // require(commitmentUniswapPoolAddress[commitmentId_] != address(0),"Uniswap pool does not exist");
@@ -556,9 +557,9 @@ contract LenderCommitmentForwarder_OracleLimited is
             });
         }
 
-        bool zeroForOne = commitment.collateralTokenAddress > commitment.principalTokenAddress;
+     //   bool zeroForOne = commitment.collateralTokenAddress > commitment.principalTokenAddress;
 
-         EnumerableSetUpgradeable.AddressSet storage uniswapPoolRoutes = commitmentUniswapPoolRoutes[_commitmentId];
+          
 
      {
             
@@ -566,7 +567,7 @@ contract LenderCommitmentForwarder_OracleLimited is
         //uint256 decimalsPrincipalToken = IERC20MetadataUpgradeable(commitment.principalTokenAddress).decimals(); 
 
         uint256 maxPrincipalPerCollateralAmount = Math.min(   
-            getUniswapPriceRatioForPoolRoutes(uniswapPoolRoutes), 
+            getUniswapPriceRatioForPoolRoutes( commitmentUniswapPoolRoutes[_commitmentId] ), 
             commitment.maxPrincipalPerCollateralAmount
             );
  
@@ -721,13 +722,34 @@ contract LenderCommitmentForwarder_OracleLimited is
 
     /*
 
+
       Find the price of A to B,  B to C 
 
     */
             
-    function getUniswapPriceRatioForPoolRoutes(EnumerableSetUpgradeable.AddressSet storage poolRoutes) internal returns (uint256 priceRatio)  {
+    function getUniswapPriceRatioForPoolRoutes(PoolRouteConfig[] memory poolRoutes) public returns (uint256 priceRatio)  {
 
         //use 4 for twap 
+
+        require( poolRoutes.length >=1 &&  poolRoutes.length <=2 , "invalid pool routes length");
+
+        bool doubleHop = poolRoutes.length == 2;
+
+        if(doubleHop) {
+
+                 //need to multiple both prices together to do the full transformation ..
+
+                //for now .. 
+            return getUniswapPriceRatioForPool( 
+                poolRoutes[0]   
+            );
+        }else{
+
+           
+            return getUniswapPriceRatioForPool( 
+                        poolRoutes[0]   
+                    );
+        } 
         
 
 
@@ -736,22 +758,23 @@ contract LenderCommitmentForwarder_OracleLimited is
     //NEED TO FIX THIS 
     //how does price ratio relate to princpalPerCollateralAmount ? 
     function getUniswapPriceRatioForPool ( 
-        address poolAddress, 
+       /* address poolAddress, 
         bool zeroForOne,
         uint32 twapInterval,
         uint256 decimalsPrincipalToken,
-        uint256 decimalsCollateralToken
+        uint256 decimalsCollateralToken*/
+        PoolRouteConfig memory _poolRouteConfig
          ) public view returns (uint256 priceRatio) {
 
             //scale me out ?
-        uint160 sqrtPriceX96 = getSqrtTwapX96( poolAddress , twapInterval );
+        uint160 sqrtPriceX96 = getSqrtTwapX96( _poolRouteConfig.pool ,_poolRouteConfig.twapInterval );
  
         
         console.log("est 4");
 
         console.logUint(sqrtPriceX96);
 
-        uint256 expFactor = 10 ** (decimalsPrincipalToken + decimalsCollateralToken);
+        uint256 expFactor = 10 ** (_poolRouteConfig.token0Decimals + _poolRouteConfig.token1Decimals);
 
 
         //  bool zeroForOne = poolKey.token0 == info.principalToken;
@@ -774,7 +797,7 @@ contract LenderCommitmentForwarder_OracleLimited is
         //uint256 priceInverse = sqrtPriceInverse * sqrtPriceInverse; 
 
 
-        uint256 price = zeroForOne ? sqrtPrice * sqrtPrice : sqrtPriceInverse * sqrtPriceInverse;
+        uint256 price = _poolRouteConfig.zeroForOne ? sqrtPrice * sqrtPrice : sqrtPriceInverse * sqrtPriceInverse;
 
         //console.logUint(sqrtPriceInverse);
 

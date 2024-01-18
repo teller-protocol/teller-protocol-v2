@@ -565,11 +565,14 @@ contract LenderCommitmentForwarder_OracleLimited is
             
         //uint256 decimalsCollateralToken = IERC20MetadataUpgradeable(commitment.collateralTokenAddress).decimals();
         //uint256 decimalsPrincipalToken = IERC20MetadataUpgradeable(commitment.principalTokenAddress).decimals(); 
+       
+       
+        bool usePoolRoutes = commitmentUniswapPoolRoutes[_commitmentId].length > 0;
 
-        uint256 maxPrincipalPerCollateralAmount = Math.min(   
+        uint256 maxPrincipalPerCollateralAmount = usePoolRoutes ?  Math.min(   
             getUniswapPriceRatioForPoolRoutes( commitmentUniswapPoolRoutes[_commitmentId] ), 
             commitment.maxPrincipalPerCollateralAmount
-            );
+            ) :  commitment.maxPrincipalPerCollateralAmount;
  
         uint256 requiredCollateral = getRequiredCollateral(
             _principalAmount,

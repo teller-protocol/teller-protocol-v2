@@ -740,9 +740,23 @@ contract LenderCommitmentForwarder_OracleLimited is
                  //need to multiple both prices together to do the full transformation ..
 
                 //for now .. 
-            return getUniswapPriceRatioForPool( 
+            uint256 pool0PriceRatio = getUniswapPriceRatioForPool( 
                 poolRoutes[0]   
             );
+
+            uint256 pool1PriceRatio = getUniswapPriceRatioForPool( 
+                poolRoutes[1]   
+            );
+
+                //is this correct ? why use poolRoutes[1] and not [0]? 
+            uint256 expFactor = 10 ** (poolRoutes[1].token0Decimals+ poolRoutes[1].token1Decimals);
+
+            return FullMath.mulDiv(
+                pool0PriceRatio , pool1PriceRatio, expFactor
+            );
+
+
+
         }else{
 
            

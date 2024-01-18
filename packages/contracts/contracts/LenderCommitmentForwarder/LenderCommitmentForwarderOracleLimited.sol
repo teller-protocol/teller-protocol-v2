@@ -558,15 +558,15 @@ contract LenderCommitmentForwarder_OracleLimited is
 
         bool zeroForOne = commitment.collateralTokenAddress > commitment.principalTokenAddress;
 
-         EnumerableSetUpgradeable.AddressSet storage uniswapPoolAddress = commitmentUniswapPoolRoutes[_commitmentId];
+         EnumerableSetUpgradeable.AddressSet storage uniswapPoolRoutes = commitmentUniswapPoolRoutes[_commitmentId];
 
      {
             
-        uint256 decimalsCollateralToken = IERC20MetadataUpgradeable(commitment.collateralTokenAddress).decimals();
-        uint256 decimalsPrincipalToken = IERC20MetadataUpgradeable(commitment.principalTokenAddress).decimals(); 
+        //uint256 decimalsCollateralToken = IERC20MetadataUpgradeable(commitment.collateralTokenAddress).decimals();
+        //uint256 decimalsPrincipalToken = IERC20MetadataUpgradeable(commitment.principalTokenAddress).decimals(); 
 
         uint256 maxPrincipalPerCollateralAmount = Math.min(   
-            getUniswapPriceRatioForPool(uniswapPoolAddress, zeroForOne, 4,decimalsPrincipalToken,decimalsCollateralToken), 
+            getUniswapPriceRatioForPoolRoutes(uniswapPoolRoutes), 
             commitment.maxPrincipalPerCollateralAmount
             );
  
@@ -719,6 +719,19 @@ contract LenderCommitmentForwarder_OracleLimited is
 
     }
 
+    /*
+
+      Find the price of A to B,  B to C 
+
+    */
+            
+    function getUniswapPriceRatioForPoolRoutes(EnumerableSetUpgradeable.AddressSet storage poolRoutes) internal returns (uint256 priceRatio)  {
+
+        //use 4 for twap 
+        
+
+
+    }
 
     //NEED TO FIX THIS 
     //how does price ratio relate to princpalPerCollateralAmount ? 

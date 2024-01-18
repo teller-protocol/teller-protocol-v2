@@ -557,15 +557,10 @@ contract LenderCommitmentForwarder_OracleLimited is
             });
         }
 
-     //   bool zeroForOne = commitment.collateralTokenAddress > commitment.principalTokenAddress;
-
           
 
      {
             
-        //uint256 decimalsCollateralToken = IERC20MetadataUpgradeable(commitment.collateralTokenAddress).decimals();
-        //uint256 decimalsPrincipalToken = IERC20MetadataUpgradeable(commitment.principalTokenAddress).decimals(); 
-       
        
         bool usePoolRoutes = commitmentUniswapPoolRoutes[_commitmentId].length > 0;
 
@@ -684,13 +679,7 @@ contract LenderCommitmentForwarder_OracleLimited is
                 _collateralTokenAddress
             ).decimals();
         }
-
-        console.log("get req col");
-        console.logUint(_principalAmount);
-        console.logUint(  (10**(collateralDecimals + principalDecimals)) ); // 1000000000000000000000000000000000000 1e36 -- correct 
-        console.logUint(_maxPrincipalPerCollateralAmount);  //i think this is incorrect .. it is 1e38 
-
-
+ 
         /*
          * The principalAmount is expanded by (collateralDecimals+principalDecimals) to increase precision
          * and then it is divided by _maxPrincipalPerCollateralAmount which should already been expanded by principalDecimals
@@ -777,15 +766,12 @@ contract LenderCommitmentForwarder_OracleLimited is
  
         uint160 sqrtPriceX96 = getSqrtTwapX96( _poolRouteConfig.pool ,_poolRouteConfig.twapInterval );
  
-        
-        console.log("est 4");
+         
 
         console.logUint(sqrtPriceX96);
 
         uint256 expFactor = 10 ** (_poolRouteConfig.token0Decimals + _poolRouteConfig.token1Decimals);
-
  
-        console.log("est 5");
         uint256 sqrtPrice = FullMath.mulDiv( sqrtPriceX96, expFactor, 2**96  )   ;
 
 
@@ -799,17 +785,11 @@ contract LenderCommitmentForwarder_OracleLimited is
         uint256 price = _poolRouteConfig.zeroForOne ? sqrtPrice * sqrtPrice : sqrtPriceInverse * sqrtPriceInverse;
  
  
-        // uint256 min_output = (amountOwed*(price))*9 / 10 ;
+        
  
         console.logUint( price / expFactor);
        
-
-        /*
-        uint256 ratio = zeroForOne ? 
-        2 ** 192 / sqrtPriceX96 ** 2 * 10 ** (decimals1-decimals0) : 
-        sqrtPriceX96 ** 2 / 2 ** 192 * 10** (decimals1-decimals0) ;
-        */
-
+ 
 
             //for now ... 
         return price / expFactor ;
@@ -817,14 +797,7 @@ contract LenderCommitmentForwarder_OracleLimited is
     }
 
 
-
-   
-   /* function getUniswapPriceX96ForPool( address poolAddress ) public view returns (uint160 sqrtPriceX96) {
-  
-
-         return getSqrtTwapX96(poolAddress , 4);
-
-    }*/
+ 
 
     function getSqrtTwapX96(address uniswapV3Pool, uint32 twapInterval) internal view returns (uint160 sqrtPriceX96) {
         if (twapInterval == 0) {

@@ -721,15 +721,15 @@ contract LenderCommitmentForwarder_OracleLimited is
     }
 
     /*
-
-
+ 
       Find the price of A to B,  B to C 
 
     */
             
-    function getUniswapPriceRatioForPoolRoutes(PoolRouteConfig[] memory poolRoutes) public returns (uint256 priceRatio)  {
-
-        //use 4 for twap 
+    function getUniswapPriceRatioForPoolRoutes(
+        PoolRouteConfig[] memory poolRoutes
+        )   public view returns (uint256 priceRatio)  {
+ 
 
         require( poolRoutes.length >=1 &&  poolRoutes.length <=2 , "invalid pool routes length");
 
@@ -737,9 +737,8 @@ contract LenderCommitmentForwarder_OracleLimited is
 
         if(doubleHop) {
 
-                 //need to multiple both prices together to do the full transformation ..
-
-                //for now .. 
+            //need to multiple both prices together to do the full transformation ..
+ 
             uint256 pool0PriceRatio = getUniswapPriceRatioForPool( 
                 poolRoutes[0]   
             );
@@ -757,9 +756,7 @@ contract LenderCommitmentForwarder_OracleLimited is
 
 
 
-        }else{
-
-           
+        }else{           
             return getUniswapPriceRatioForPool( 
                         poolRoutes[0]   
                     );
@@ -769,18 +766,12 @@ contract LenderCommitmentForwarder_OracleLimited is
 
     }
 
-    //NEED TO FIX THIS 
-    //how does price ratio relate to princpalPerCollateralAmount ? 
-    function getUniswapPriceRatioForPool ( 
-       /* address poolAddress, 
-        bool zeroForOne,
-        uint32 twapInterval,
-        uint256 decimalsPrincipalToken,
-        uint256 decimalsCollateralToken*/
+     
+    
+    function getUniswapPriceRatioForPool (  
         PoolRouteConfig memory _poolRouteConfig
-         ) public view returns (uint256 priceRatio) {
-
-            //scale me out ?
+    ) public view returns (uint256 priceRatio) {
+ 
         uint160 sqrtPriceX96 = getSqrtTwapX96( _poolRouteConfig.pool ,_poolRouteConfig.twapInterval );
  
         
@@ -790,32 +781,20 @@ contract LenderCommitmentForwarder_OracleLimited is
 
         uint256 expFactor = 10 ** (_poolRouteConfig.token0Decimals + _poolRouteConfig.token1Decimals);
 
-
-        //  bool zeroForOne = poolKey.token0 == info.principalToken;
-
-
-            // 1. technically we will need to know the impact 
-            // probably need to manually read the supply0 and supply1 
-
-            // 2. make sure the way im doing decimals is correct 
-
+ 
         console.log("est 5");
         uint256 sqrtPrice = FullMath.mulDiv( sqrtPriceX96, expFactor, 2**96  )   ;
 
 
         console.logUint(sqrtPrice);
 
-        //uint256 price = sqrtPrice * sqrtPrice;
+       
 
         uint256 sqrtPriceInverse = FullMath.mulDiv(expFactor , expFactor, sqrtPrice );
-        //uint256 priceInverse = sqrtPriceInverse * sqrtPriceInverse; 
-
+    
 
         uint256 price = _poolRouteConfig.zeroForOne ? sqrtPrice * sqrtPrice : sqrtPriceInverse * sqrtPriceInverse;
-
-        //console.logUint(sqrtPriceInverse);
-
-        //console.logUint(priceInverse);
+ 
  
         // uint256 min_output = (amountOwed*(price))*9 / 10 ;
  

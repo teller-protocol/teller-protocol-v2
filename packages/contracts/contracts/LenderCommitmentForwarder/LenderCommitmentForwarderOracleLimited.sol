@@ -731,7 +731,7 @@ contract LenderCommitmentForwarder_OracleLimited is
 
     /*
  
-      Find the price of A to B,  B to C 
+      This returns a price ratio which, to be normalized, must be divided by (10 ** (principalTokenDecimals+collateralTokenDecimals))
 
     */
             
@@ -756,13 +756,13 @@ contract LenderCommitmentForwarder_OracleLimited is
                 poolRoutes[1]   
             );
 
-                //is this correct ? why use poolRoutes[1] and not [0]? 
-            uint256 expFactor = 10 ** (poolRoutes[1].token0Decimals+ poolRoutes[1].token1Decimals);
+          //is this correct ? why use poolRoutes[1] and not [0]? 
+          //  uint256 expFactor = 10 ** (poolRoutes[1].token0Decimals+ poolRoutes[1].token1Decimals);
 
             //pool 0 and 1 ratios should alrdy be normalized 
 
             return FullMath.mulDiv(
-                pool0PriceRatio , pool1PriceRatio, expFactor
+                pool0PriceRatio , pool1PriceRatio, 1
             );
 
 

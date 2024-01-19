@@ -28,6 +28,7 @@ import {UniswapV3PoolMock} from "../../contracts/mock/uniswap/UniswapV3PoolMock.
 
 import {UniswapV3FactoryMock} from "../../contracts/mock/uniswap/UniswapV3FactoryMock.sol";
 
+import "../../contracts/libraries/uniswap/FullMath.sol";
  
 import "forge-std/console.sol";
 
@@ -255,14 +256,14 @@ contract LenderCommitmentForwarder_OracleLimited_Test is Testable {
         console.logUint(priceRatio);
 
 
- 
+        uint256 priceRatioNormalized = FullMath.mulDiv(priceRatio,1,10**(principalTokenDecimals+collateralTokenDecimals));
 
 
         uint256 principalAmount = 1000;
 
         uint256 requiredCollateral = lenderCommitmentForwarder.getRequiredCollateral(
             principalAmount,
-            priceRatio,
+            priceRatioNormalized,
             ILenderCommitmentForwarderWithUniswapRoutes.CommitmentCollateralType.ERC20,
             address(collateralToken),
             address(principalToken)
@@ -700,8 +701,15 @@ contract LenderCommitmentForwarder_OracleLimited_Test is Testable {
            poolRoutes
         );
 
+
+        uint256 priceRatioNormalized = FullMath.mulDiv(priceRatio,1,10**(principalTokenDecimals+collateralTokenDecimals));
+
+
         console.log("price ratio");
         console.logUint(priceRatio); 
+        
+        console.log("price ratio normalized");
+        console.logUint(priceRatioNormalized); 
 
 
         uint256 principalAmount = 1000;
@@ -710,7 +718,7 @@ contract LenderCommitmentForwarder_OracleLimited_Test is Testable {
         //which decimals is this using any why?   p / c / i ? 
         uint256 requiredCollateral = lenderCommitmentForwarder.getRequiredCollateral(
             principalAmount,
-            priceRatio,
+            priceRatioNormalized,
             ILenderCommitmentForwarderWithUniswapRoutes.CommitmentCollateralType.ERC20,
             address(collateralToken),
             address(principalToken)

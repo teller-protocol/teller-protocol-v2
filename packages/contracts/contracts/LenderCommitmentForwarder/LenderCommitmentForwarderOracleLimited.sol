@@ -759,6 +759,8 @@ contract LenderCommitmentForwarder_OracleLimited is
                 //is this correct ? why use poolRoutes[1] and not [0]? 
             uint256 expFactor = 10 ** (poolRoutes[1].token0Decimals+ poolRoutes[1].token1Decimals);
 
+            //pool 0 and 1 ratios should alrdy be normalized 
+
             return FullMath.mulDiv(
                 pool0PriceRatio , pool1PriceRatio, expFactor
             );

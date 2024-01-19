@@ -48,10 +48,13 @@ contract LenderCommitmentForwarder_OracleLimited_Test is Testable {
     address[] borrowersArray;
 
     TestERC20Token principalToken;
-    uint8 constant principalTokenDecimals = 18;
+    uint8  principalTokenDecimals = 18;
 
     TestERC20Token collateralToken;
-    uint8 constant collateralTokenDecimals = 18; //try setting this to 6 
+    uint8  collateralTokenDecimals = 18;  
+
+     TestERC20Token intermediateToken;
+    uint8  intermediateTokenDecimals = 18; 
 
     TestERC721Token erc721Token;
     TestERC1155Token erc1155Token;
@@ -273,6 +276,71 @@ contract LenderCommitmentForwarder_OracleLimited_Test is Testable {
 
 
 
+     function test_getUniswapPriceRatioForPool_decimal_scenario_A() public {
+ 
+
+        bool zeroForOne = false;  
+
+        principalTokenDecimals = 18;
+        collateralTokenDecimals = 6; 
+
+        principalToken = new TestERC20Token(
+            "Test Wrapped ETH",
+            "TWETH",
+            0,
+            principalTokenDecimals
+        );
+
+        collateralToken = new TestERC20Token(
+            "Test USDC",
+            "TUSDC",
+            0,
+            collateralTokenDecimals
+        );
+
+
+ 
+        mockUniswapPool.set_mockSqrtPriceX96( 1 * 2**96 );
+
+        uint32 twapInterval = 0;
+
+         ILenderCommitmentForwarderWithUniswapRoutes.PoolRouteConfig memory routeConfig = ILenderCommitmentForwarderWithUniswapRoutes.PoolRouteConfig({
+
+            pool:address(mockUniswapPool),
+            zeroForOne:zeroForOne,
+            twapInterval:twapInterval,
+            token0Decimals:collateralTokenDecimals,
+            token1Decimals:principalTokenDecimals
+        });
+
+
+
+        uint256 priceRatio = lenderCommitmentForwarder.getUniswapPriceRatioForPool(  
+            routeConfig
+        );
+
+        console.log("price ratio");
+        console.logUint(priceRatio);
+ 
+ 
+
+
+        uint256 principalAmount = 1000;
+
+        uint256 requiredCollateral = lenderCommitmentForwarder.getRequiredCollateral(
+            principalAmount,
+            priceRatio,
+            ILenderCommitmentForwarderWithUniswapRoutes.CommitmentCollateralType.ERC20,
+            address(collateralToken),
+            address(principalToken)
+            );
+
+        assertEq( requiredCollateral, 1000, "unexpected required collateral" );
+
+
+    }
+
+
 
      function test_getUniswapPriceRatioForPoolRoutes() public {
 
@@ -281,8 +349,7 @@ contract LenderCommitmentForwarder_OracleLimited_Test is Testable {
 
         mockUniswapPoolSecondary.set_mockSqrtPriceX96( 1 * 2**96 );
 
-         //collateralTokenDecimals = 6;  
-       
+         
 
         uint32 twapInterval = 0; //for now 
 
@@ -406,7 +473,26 @@ contract LenderCommitmentForwarder_OracleLimited_Test is Testable {
         mockUniswapPool.set_mockSqrtPriceX96( 1 * 2**96 );
 
         mockUniswapPoolSecondary.set_mockSqrtPriceX96( 1 * 2**96 );
-  
+
+
+        principalTokenDecimals = 18;
+        collateralTokenDecimals = 6; 
+
+        principalToken = new TestERC20Token(
+            "Test Wrapped ETH",
+            "TWETH",
+            0,
+            principalTokenDecimals
+        );
+
+        collateralToken = new TestERC20Token(
+            "Test USDC",
+            "TUSDC",
+            0,
+            collateralTokenDecimals
+        );
+
+
 
         uint32 twapInterval = 0; //for now 
 
@@ -422,8 +508,8 @@ contract LenderCommitmentForwarder_OracleLimited_Test is Testable {
             pool:address(mockUniswapPool),
             zeroForOne:zeroForOne,
             twapInterval:twapInterval,
-            token0Decimals:18,
-            token1Decimals:6
+            token0Decimals:principalTokenDecimals,
+            token1Decimals:collateralTokenDecimals
         });
 
          poolRoutes[1]  = ILenderCommitmentForwarderWithUniswapRoutes.PoolRouteConfig({
@@ -431,8 +517,8 @@ contract LenderCommitmentForwarder_OracleLimited_Test is Testable {
             pool:address(mockUniswapPoolSecondary),
             zeroForOne:zeroForOne,
             twapInterval:twapInterval,
-            token0Decimals:6,
-            token1Decimals:18
+            token0Decimals:collateralTokenDecimals,
+            token1Decimals:principalTokenDecimals
         }); 
 
 
@@ -460,6 +546,7 @@ contract LenderCommitmentForwarder_OracleLimited_Test is Testable {
     }
 
 
+        //this just happened to work 
   function test_getUniswapPriceRatioForPoolRoutes_decimal_scenario_B() public {
 
 
@@ -473,6 +560,32 @@ contract LenderCommitmentForwarder_OracleLimited_Test is Testable {
         bool zeroForOne = false;
 
 
+        principalTokenDecimals = 18;
+        intermediateTokenDecimals = 18;
+        collateralTokenDecimals = 6; 
+
+        principalToken = new TestERC20Token(
+            "Test Wrapped ETH",
+            "TWETH",
+            0,
+            principalTokenDecimals
+        );
+
+        collateralToken = new TestERC20Token(
+            "Test USDC",
+            "TUSDC",
+            0,
+            collateralTokenDecimals
+        );
+
+
+        intermediateToken = new TestERC20Token(
+            "Test Intermediate",
+            "TINT",
+            0,
+            intermediateTokenDecimals
+        );
+
 
 
         ILenderCommitmentForwarderWithUniswapRoutes.PoolRouteConfig[] memory poolRoutes = new ILenderCommitmentForwarderWithUniswapRoutes.PoolRouteConfig[](2); 
@@ -482,8 +595,8 @@ contract LenderCommitmentForwarder_OracleLimited_Test is Testable {
             pool:address(mockUniswapPool),
             zeroForOne:zeroForOne,
             twapInterval:twapInterval,
-            token0Decimals:6,
-            token1Decimals:18
+            token0Decimals:collateralTokenDecimals,
+            token1Decimals:intermediateTokenDecimals
         });
 
          poolRoutes[1]  = ILenderCommitmentForwarderWithUniswapRoutes.PoolRouteConfig({
@@ -491,8 +604,8 @@ contract LenderCommitmentForwarder_OracleLimited_Test is Testable {
             pool:address(mockUniswapPoolSecondary),
             zeroForOne:zeroForOne,
             twapInterval:twapInterval,
-            token0Decimals:18,
-            token1Decimals:18
+            token0Decimals:intermediateTokenDecimals,
+            token1Decimals:principalTokenDecimals
         }); 
 
 
@@ -506,6 +619,8 @@ contract LenderCommitmentForwarder_OracleLimited_Test is Testable {
 
         uint256 principalAmount = 1000;
 
+
+        //which decimals is this using any why?   p / c / i ? 
         uint256 requiredCollateral = lenderCommitmentForwarder.getRequiredCollateral(
             principalAmount,
             priceRatio,

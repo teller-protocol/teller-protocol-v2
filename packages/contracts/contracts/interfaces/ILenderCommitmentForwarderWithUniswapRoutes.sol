@@ -75,7 +75,8 @@ interface ILenderCommitmentForwarderWithUniswapRoutes {
     function createCommitmentWithUniswap(
         Commitment calldata _commitment,
         address[] calldata _borrowerAddressList,
-        PoolRouteConfig[] calldata _poolRoutes
+        PoolRouteConfig[] calldata _poolRoutes,
+        uint16 _poolOracleLtvRatio
     ) external returns (uint256);
 
     function acceptCommitmentWithRecipient(

@@ -30,6 +30,8 @@ import "../libraries/uniswap/TickMath.sol";
 import "../libraries/uniswap/FixedPoint96.sol";
 import "../libraries/uniswap/FullMath.sol";
 
+import "../libraries/NumbersLib.sol";
+
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
@@ -46,6 +48,7 @@ contract LenderCommitmentForwarder_OracleLimited is
     ILenderCommitmentForwarderWithUniswapRoutes
 {
     using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
+    using NumbersLib for uint256;
 
     // CommitmentId => commitment
     mapping(uint256 => Commitment) public commitments;
@@ -67,6 +70,9 @@ contract LenderCommitmentForwarder_OracleLimited is
 
     mapping(uint256 => PoolRouteConfig[])
         internal commitmentUniswapPoolRoutes;
+
+    mapping(uint256 => uint16)
+        internal commitmentPoolOracleLtvRatio;
 
     address immutable UNISWAP_V3_FACTORY ;
 
@@ -194,7 +200,8 @@ contract LenderCommitmentForwarder_OracleLimited is
     function createCommitmentWithUniswap(
         Commitment calldata _commitment,
         address[] calldata _borrowerAddressList,
-        PoolRouteConfig[] calldata _poolRoutes
+        PoolRouteConfig[] calldata _poolRoutes,
+        uint16 _poolOracleLtvRatio  //generally always between 0 and 100 % , 0 to 10000
     ) public returns (uint256 commitmentId_) {
         commitmentId_ = commitmentCount++;
 
@@ -203,9 +210,7 @@ contract LenderCommitmentForwarder_OracleLimited is
             "unauthorized commitment creator"
         );
 
-        commitments[commitmentId_] = _commitment;
-
-      
+        commitments[commitmentId_] = _commitment; 
 
             //routes length of 0 means ignore price oracle limits 
          require(
@@ -217,6 +222,10 @@ contract LenderCommitmentForwarder_OracleLimited is
         for (uint256 i = 0; i < _poolRoutes.length; i++) {
             commitmentUniswapPoolRoutes[commitmentId_][i] = (_poolRoutes[i]);
         }
+
+        commitmentPoolOracleLtvRatio[commitmentId_] = _poolOracleLtvRatio;
+
+
 
        // require(commitmentUniswapPoolAddress[commitmentId_] != address(0),"Uniswap pool does not exist");
   
@@ -562,15 +571,23 @@ contract LenderCommitmentForwarder_OracleLimited is
      {
             
        
-        bool usePoolRoutes = commitmentUniswapPoolRoutes[_commitmentId].length > 0;
-
+       
+ 
+        uint256 scaledPoolOraclePrice = getUniswapPriceRatioForPoolRoutes( commitmentUniswapPoolRoutes[_commitmentId] ).percent(
+            commitmentPoolOracleLtvRatio[_commitmentId]
+        );
+        
+         bool usePoolRoutes = commitmentUniswapPoolRoutes[_commitmentId].length > 0;
+         
+        //use the worst case ratio either the oracle or the static ratio 
         uint256 maxPrincipalPerCollateralAmount = usePoolRoutes ?  Math.min(   
-            getUniswapPriceRatioForPoolRoutes( commitmentUniswapPoolRoutes[_commitmentId] ), 
+            scaledPoolOraclePrice, 
             commitment.maxPrincipalPerCollateralAmount
             ) :  commitment.maxPrincipalPerCollateralAmount;
  
+ 
         uint256 requiredCollateral = getRequiredCollateral(
-            _principalAmount,
+            _principalAmount, 
             maxPrincipalPerCollateralAmount,
             commitment.collateralTokenType,
             commitment.collateralTokenAddress,
@@ -659,7 +676,7 @@ contract LenderCommitmentForwarder_OracleLimited is
      * @param _principalTokenAddress The contract address for the principal for the loan.
      */
     function getRequiredCollateral(
-        uint256 _principalAmount,
+        uint256 _principalAmount, 
         uint256 _maxPrincipalPerCollateralAmount,
         CommitmentCollateralType _collateralTokenType,
         address _collateralTokenAddress,
@@ -720,7 +737,7 @@ contract LenderCommitmentForwarder_OracleLimited is
             
     function getUniswapPriceRatioForPoolRoutes(
         PoolRouteConfig[] memory poolRoutes
-        )   public view returns (uint256 priceRatio)  {
+    )   public view returns (uint256 priceRatio)  {
  
 
         require( poolRoutes.length >=1 &&  poolRoutes.length <=2 , "invalid pool routes length");

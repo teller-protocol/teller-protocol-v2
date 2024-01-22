@@ -34,11 +34,6 @@ import "../libraries/NumbersLib.sol";
 
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-
-import "forge-std/console.sol";
-
-
-
  
 
 
@@ -748,8 +743,7 @@ contract LenderCommitmentForwarder_OracleLimited is
         bool doubleHop = poolRoutes.length == 2;
 
         if(doubleHop) {
-
-            //need to multiple both prices together to do the full transformation ..
+ 
 
             //this product is expanded hop 0  td0 +1 
             uint256 pool0PriceRatio = getUniswapPriceRatioForPool( 
@@ -776,12 +770,10 @@ contract LenderCommitmentForwarder_OracleLimited is
       
             uint256 expFactor = 10 ** (pool0IntermediateTokenDecimals+pool1IntermediateTokenDecimals);
 
-            //pool 0 and 1 ratios should alrdy be normalized 
+           
             return FullMath.mulDiv(
                 pool0PriceRatio , pool1PriceRatio, expFactor
-            );
-
-
+            ); 
 
         }else{           
             return getUniswapPriceRatioForPool( 
@@ -803,18 +795,13 @@ contract LenderCommitmentForwarder_OracleLimited is
  
         uint160 sqrtPriceX96 = getSqrtTwapX96( _poolRouteConfig.pool ,_poolRouteConfig.twapInterval );
  
-         
-
-        console.logUint(sqrtPriceX96);
+          
 
         uint256 expFactor = 10 ** (_poolRouteConfig.token0Decimals + _poolRouteConfig.token1Decimals);
  
         uint256 sqrtPrice = FullMath.mulDiv( sqrtPriceX96, expFactor, 2**96  )   ;
 
-
-        console.logUint(sqrtPrice);
-
-       
+  
 
         uint256 sqrtPriceInverse = FullMath.mulDiv(expFactor , expFactor, sqrtPrice );
     
@@ -822,9 +809,7 @@ contract LenderCommitmentForwarder_OracleLimited is
         uint256 price = _poolRouteConfig.zeroForOne ? sqrtPrice * sqrtPrice : sqrtPriceInverse * sqrtPriceInverse;
  
  
-        
- 
-        console.logUint( price / expFactor);
+         
        
  
 

@@ -778,8 +778,11 @@ contract LenderCommitmentForwarder_OracleLimited is
             */
 
 
-            uint256 pool0IntermediateTokenDecimals = zeroForOnePool0 ? poolRoutes[0].token1Decimals : poolRoutes[0].token0Decimals;
+            uint256 pool0IntermediateTokenDecimals = !zeroForOnePool0 ? poolRoutes[0].token1Decimals : poolRoutes[0].token0Decimals;
             uint256 pool1IntermediateTokenDecimals = zeroForOnePool1 ? poolRoutes[1].token1Decimals : poolRoutes[1].token0Decimals;
+
+            console.logUint(pool0IntermediateTokenDecimals);
+            console.logUint(pool1IntermediateTokenDecimals);
 
           //is this correct ? why use poolRoutes[1] and not [0]? 
             uint256 expFactor = 10 ** (pool0IntermediateTokenDecimals+pool1IntermediateTokenDecimals);

@@ -765,30 +765,18 @@ contract LenderCommitmentForwarder_OracleLimited is
             bool zeroForOnePool0 = poolRoutes[0].zeroForOne;
             bool zeroForOnePool1 = poolRoutes[1].zeroForOne;
             
-
+ 
             /*
-                USDC -> weth 
-                weth -> pepe 
-
-                divide by the token decimal of weth, two times . 
-
-
-                // see if i can validate that the intermediate token is the same 
-
+              These queries below find the decimals for the intermediate token(s) which should be identical.  
+              The query for pool1 is inverted on purpose.  
             */
-
-
-            uint256 pool0IntermediateTokenDecimals = !zeroForOnePool0 ? poolRoutes[0].token1Decimals : poolRoutes[0].token0Decimals;
-            uint256 pool1IntermediateTokenDecimals = zeroForOnePool1 ? poolRoutes[1].token1Decimals : poolRoutes[1].token0Decimals;
-
-            console.logUint(pool0IntermediateTokenDecimals);
-            console.logUint(pool1IntermediateTokenDecimals);
-
-          //is this correct ? why use poolRoutes[1] and not [0]? 
+            uint256 pool0IntermediateTokenDecimals = zeroForOnePool0 ? poolRoutes[0].token1Decimals : poolRoutes[0].token0Decimals;
+            uint256 pool1IntermediateTokenDecimals = zeroForOnePool1 ? poolRoutes[1].token0Decimals : poolRoutes[1].token1Decimals;
+ 
+      
             uint256 expFactor = 10 ** (pool0IntermediateTokenDecimals+pool1IntermediateTokenDecimals);
 
             //pool 0 and 1 ratios should alrdy be normalized 
-
             return FullMath.mulDiv(
                 pool0PriceRatio , pool1PriceRatio, expFactor
             );

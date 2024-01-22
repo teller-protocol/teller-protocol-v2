@@ -731,7 +731,10 @@ contract LenderCommitmentForwarder_OracleLimited is
 
     /*
  
-      This returns a price ratio which, to be normalized, must be divided by (10 ** (principalTokenDecimals+collateralTokenDecimals))
+      This returns a price ratio which is expanded by the principalTokenDecimals and the collateralTokenDecimals 
+      
+      
+       to be normalized, must be divided by (10 ** (principalTokenDecimals+collateralTokenDecimals))
 
     */
             
@@ -747,22 +750,44 @@ contract LenderCommitmentForwarder_OracleLimited is
         if(doubleHop) {
 
             //need to multiple both prices together to do the full transformation ..
- 
+
+            //this product is expanded hop 0  td0 +1 
             uint256 pool0PriceRatio = getUniswapPriceRatioForPool( 
                 poolRoutes[0]   
             );
 
+            //this product is expanded hop 1  td0 +1 
             uint256 pool1PriceRatio = getUniswapPriceRatioForPool( 
                 poolRoutes[1]   
             );
 
+
+            bool zeroForOnePool0 = poolRoutes[0].zeroForOne;
+            bool zeroForOnePool1 = poolRoutes[1].zeroForOne;
+            
+
+            /*
+                USDC -> weth 
+                weth -> pepe 
+
+                divide by the token decimal of weth, two times . 
+
+
+                // see if i can validate that the intermediate token is the same 
+
+            */
+
+
+            uint256 pool0IntermediateTokenDecimals = zeroForOnePool0 ? poolRoutes[0].token1Decimals : poolRoutes[0].token0Decimals;
+            uint256 pool1IntermediateTokenDecimals = zeroForOnePool1 ? poolRoutes[1].token1Decimals : poolRoutes[1].token0Decimals;
+
           //is this correct ? why use poolRoutes[1] and not [0]? 
-          //  uint256 expFactor = 10 ** (poolRoutes[1].token0Decimals+ poolRoutes[1].token1Decimals);
+            uint256 expFactor = 10 ** (pool0IntermediateTokenDecimals+pool1IntermediateTokenDecimals);
 
             //pool 0 and 1 ratios should alrdy be normalized 
 
             return FullMath.mulDiv(
-                pool0PriceRatio , pool1PriceRatio, 1
+                pool0PriceRatio , pool1PriceRatio, expFactor
             );
 
 
@@ -778,7 +803,9 @@ contract LenderCommitmentForwarder_OracleLimited is
     }
 
      
-    
+    /*
+        The resultant product is expanded by 10 ** (t0d + t1d)
+    */
     function getUniswapPriceRatioForPool (  
         PoolRouteConfig memory _poolRouteConfig
     ) public view returns (uint256 priceRatio) {
@@ -811,7 +838,7 @@ contract LenderCommitmentForwarder_OracleLimited is
  
 
             //for now ... 
-        return price / expFactor ;
+        return price / expFactor ;   //this is still expanded by expFactor... 
 
     }
 

@@ -702,15 +702,12 @@ contract LenderCommitmentForwarder_OracleLimited_Test is Testable {
         );
 
 
-        uint256 priceRatioNormalized = FullMath.mulDiv(priceRatio,1,10**(principalTokenDecimals+collateralTokenDecimals));
+       // uint256 priceRatioNormalized = FullMath.mulDiv(priceRatio,1,10**(principalTokenDecimals+collateralTokenDecimals));
 
 
         console.log("price ratio");
         console.logUint(priceRatio); 
-        
-        console.log("price ratio normalized");
-        console.logUint(priceRatioNormalized); 
-
+ 
 
         uint256 principalAmount = 1000;
 
@@ -718,7 +715,7 @@ contract LenderCommitmentForwarder_OracleLimited_Test is Testable {
         //which decimals is this using any why?   p / c / i ? 
         uint256 requiredCollateral = lenderCommitmentForwarder.getRequiredCollateral(
             principalAmount,
-            priceRatioNormalized,
+            priceRatio,
             ILenderCommitmentForwarderWithUniswapRoutes.CommitmentCollateralType.ERC20,
             address(collateralToken),
             address(principalToken)

@@ -218,13 +218,7 @@ contract LenderCommitmentForwarder_OracleLimited is
             commitmentUniswapPoolRoutes[commitmentId_][i] = (_poolRoutes[i]);
         }
 
-        commitmentPoolOracleLtvRatio[commitmentId_] = _poolOracleLtvRatio;
-
-
-
-       // require(commitmentUniswapPoolAddress[commitmentId_] != address(0),"Uniswap pool does not exist");
-  
-
+        commitmentPoolOracleLtvRatio[commitmentId_] = _poolOracleLtvRatio; 
 
         //make sure the commitment data adheres to required specifications and limits
         validateCommitment(commitments[commitmentId_]);

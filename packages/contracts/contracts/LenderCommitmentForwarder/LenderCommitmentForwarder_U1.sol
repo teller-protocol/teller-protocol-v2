@@ -42,8 +42,8 @@ contract LenderCommitmentForwarder_U1 is
     using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
     using NumbersLib for uint256;
 
-
-    address immutable UNISWAP_V3_FACTORY ;  //does not take a storage slot 
+     //does not take a storage slot 
+    address immutable UNISWAP_V3_FACTORY; 
 
 
     // CommitmentId => commitment

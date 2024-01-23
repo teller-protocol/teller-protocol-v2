@@ -21,8 +21,8 @@ import { User } from "../Test_Helpers.sol";
 
 import "../../contracts/mock/MarketRegistryMock.sol";
 
-import { LenderCommitmentForwarder_OracleLimited_Override } from "./LenderCommitmentForwarder_OracleLimited_Override.sol";
-import { ILenderCommitmentForwarderWithUniswapRoutes   } from "../../contracts/interfaces/ILenderCommitmentForwarderWithUniswapRoutes.sol";
+import { LenderCommitmentForwarder_U1_Override } from "./LenderCommitmentForwarder_OracleLimited_Override.sol";
+import { ILenderCommitmentForwarder_U1   } from "../../contracts/interfaces/ILenderCommitmentForwarder_U1.sol";
 
 import {UniswapV3PoolMock} from "../../contracts/mock/uniswap/UniswapV3PoolMock.sol";
 
@@ -34,7 +34,7 @@ import "forge-std/console.sol";
 
 
 
-contract LenderCommitmentForwarder_OracleLimited_Test is Testable {
+contract LenderCommitmentForwarder_U1_Test is Testable {
 
    
 
@@ -60,7 +60,7 @@ contract LenderCommitmentForwarder_OracleLimited_Test is Testable {
     TestERC721Token erc721Token;
     TestERC1155Token erc1155Token;
 
-    LenderCommitmentForwarder_OracleLimited_Override lenderCommitmentForwarder;
+    ILenderCommitmentForwarder_U1_Override lenderCommitmentForwarder;
 
     uint256 maxPrincipal;
     uint32 expiration;

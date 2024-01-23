@@ -6,7 +6,7 @@ import "../TellerV2MarketForwarder_G2.sol";
 
 // Interfaces
 import "../interfaces/ICollateralManager.sol";
-import "../interfaces/ILenderCommitmentForwarderWithUniswapRoutes.sol";
+import "../interfaces/ILenderCommitmentForwarder_U1.sol";
 import "./extensions/ExtensionsContextUpgradeable.sol";
 
 import "@openzeppelin/contracts/utils/math/Math.sol";
@@ -37,7 +37,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 contract LenderCommitmentForwarder_U1 is
     TellerV2MarketForwarder_G2,
     ExtensionsContextUpgradeable,
-    ILenderCommitmentForwarderWithUniswapRoutes
+    ILenderCommitmentForwarder_U1
 {
     using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
     using NumbersLib for uint256;

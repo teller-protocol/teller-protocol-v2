@@ -42,6 +42,10 @@ contract LenderCommitmentForwarder_U1 is
     using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
     using NumbersLib for uint256;
 
+
+    address immutable UNISWAP_V3_FACTORY ;  //does not take a storage slot 
+
+
     // CommitmentId => commitment
     mapping(uint256 => Commitment) public commitments;
   
@@ -61,8 +65,6 @@ contract LenderCommitmentForwarder_U1 is
 
     mapping(uint256 => uint16)
         internal commitmentPoolOracleLtvRatio;
-
-    address immutable UNISWAP_V3_FACTORY ;
 
 
     /**

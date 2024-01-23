@@ -60,7 +60,7 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
     TestERC721Token erc721Token;
     TestERC1155Token erc1155Token;
 
-    ILenderCommitmentForwarder_U1_Override lenderCommitmentForwarder;
+    LenderCommitmentForwarder_U1_Override lenderCommitmentForwarder;
 
     uint256 maxPrincipal;
     uint32 expiration;
@@ -90,7 +90,7 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
 
         mockUniswapPoolSecondary = new UniswapV3PoolMock();
 
-        lenderCommitmentForwarder = new LenderCommitmentForwarder_OracleLimited_Override(
+        lenderCommitmentForwarder = new LenderCommitmentForwarder_U1_Override(
             address(tellerV2Mock),
             address(mockMarketRegistry),
             address(mockUniswapFactory)
@@ -168,7 +168,7 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
         uint32 twapInterval = 0;
 
 
-        ILenderCommitmentForwarderWithUniswapRoutes.PoolRouteConfig memory routeConfig = ILenderCommitmentForwarderWithUniswapRoutes.PoolRouteConfig({
+        ILenderCommitmentForwarder_U1.PoolRouteConfig memory routeConfig = ILenderCommitmentForwarder_U1.PoolRouteConfig({
 
             pool:address(mockUniswapPool),
             zeroForOne:zeroForOne,
@@ -212,7 +212,7 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
         uint256 requiredCollateral = lenderCommitmentForwarder.getRequiredCollateral(
             principalAmount,
             priceRatio,
-            ILenderCommitmentForwarderWithUniswapRoutes.CommitmentCollateralType.ERC20,
+            ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC20,
             address(collateralToken),
             address(principalToken)
             );
@@ -237,7 +237,7 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
 
         uint32 twapInterval = 0;
 
-         ILenderCommitmentForwarderWithUniswapRoutes.PoolRouteConfig memory routeConfig = ILenderCommitmentForwarderWithUniswapRoutes.PoolRouteConfig({
+         ILenderCommitmentForwarder_U1.PoolRouteConfig memory routeConfig = ILenderCommitmentForwarder_U1.PoolRouteConfig({
 
             pool:address(mockUniswapPool),
             zeroForOne:zeroForOne,
@@ -264,7 +264,7 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
         uint256 requiredCollateral = lenderCommitmentForwarder.getRequiredCollateral(
             principalAmount,
             priceRatio,
-            ILenderCommitmentForwarderWithUniswapRoutes.CommitmentCollateralType.ERC20,
+            ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC20,
             address(collateralToken),
             address(principalToken)
             );
@@ -305,7 +305,7 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
 
         uint32 twapInterval = 0;
 
-         ILenderCommitmentForwarderWithUniswapRoutes.PoolRouteConfig memory routeConfig = ILenderCommitmentForwarderWithUniswapRoutes.PoolRouteConfig({
+         ILenderCommitmentForwarder_U1.PoolRouteConfig memory routeConfig = ILenderCommitmentForwarder_U1.PoolRouteConfig({
 
             pool:address(mockUniswapPool),
             zeroForOne:zeroForOne,
@@ -331,7 +331,7 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
         uint256 requiredCollateral = lenderCommitmentForwarder.getRequiredCollateral(
             principalAmount,
             priceRatio,
-            ILenderCommitmentForwarderWithUniswapRoutes.CommitmentCollateralType.ERC20,
+            ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC20,
             address(collateralToken),
             address(principalToken)
             );
@@ -359,9 +359,9 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
 
 
 
-        ILenderCommitmentForwarderWithUniswapRoutes.PoolRouteConfig[] memory poolRoutes = new ILenderCommitmentForwarderWithUniswapRoutes.PoolRouteConfig[](2); 
+        ILenderCommitmentForwarder_U1.PoolRouteConfig[] memory poolRoutes = new ILenderCommitmentForwarder_U1.PoolRouteConfig[](2); 
 
-        poolRoutes[0] = ILenderCommitmentForwarderWithUniswapRoutes.PoolRouteConfig({
+        poolRoutes[0] = ILenderCommitmentForwarder_U1.PoolRouteConfig({
 
             pool:address(mockUniswapPool),
             zeroForOne:zeroForOne,
@@ -370,7 +370,7 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
             token1Decimals:18
         });
 
-         poolRoutes[1]  = ILenderCommitmentForwarderWithUniswapRoutes.PoolRouteConfig({
+         poolRoutes[1]  = ILenderCommitmentForwarder_U1.PoolRouteConfig({
 
             pool:address(mockUniswapPoolSecondary),
             zeroForOne:zeroForOne,
@@ -393,7 +393,7 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
         uint256 requiredCollateral = lenderCommitmentForwarder.getRequiredCollateral(
             principalAmount,
             priceRatio,
-            ILenderCommitmentForwarderWithUniswapRoutes.CommitmentCollateralType.ERC20,
+            ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC20,
             address(collateralToken),
             address(principalToken)
             );
@@ -422,9 +422,9 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
 
 
 
-        ILenderCommitmentForwarderWithUniswapRoutes.PoolRouteConfig[] memory poolRoutes = new ILenderCommitmentForwarderWithUniswapRoutes.PoolRouteConfig[](2); 
+        ILenderCommitmentForwarder_U1.PoolRouteConfig[] memory poolRoutes = new ILenderCommitmentForwarder_U1.PoolRouteConfig[](2); 
 
-        poolRoutes[0] = ILenderCommitmentForwarderWithUniswapRoutes.PoolRouteConfig({
+        poolRoutes[0] = ILenderCommitmentForwarder_U1.PoolRouteConfig({
 
             pool:address(mockUniswapPool),
             zeroForOne:zeroForOne,
@@ -433,7 +433,7 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
             token1Decimals:18
         });
 
-         poolRoutes[1]  = ILenderCommitmentForwarderWithUniswapRoutes.PoolRouteConfig({
+         poolRoutes[1]  = ILenderCommitmentForwarder_U1.PoolRouteConfig({
 
             pool:address(mockUniswapPoolSecondary),
             zeroForOne:zeroForOne,
@@ -456,7 +456,7 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
         uint256 requiredCollateral = lenderCommitmentForwarder.getRequiredCollateral(
             principalAmount,
             priceRatio,
-            ILenderCommitmentForwarderWithUniswapRoutes.CommitmentCollateralType.ERC20,
+            ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC20,
             address(collateralToken),
             address(principalToken)
             );
@@ -502,9 +502,9 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
 
 
 
-        ILenderCommitmentForwarderWithUniswapRoutes.PoolRouteConfig[] memory poolRoutes = new ILenderCommitmentForwarderWithUniswapRoutes.PoolRouteConfig[](2); 
+        ILenderCommitmentForwarder_U1.PoolRouteConfig[] memory poolRoutes = new ILenderCommitmentForwarder_U1.PoolRouteConfig[](2); 
 
-        poolRoutes[0] = ILenderCommitmentForwarderWithUniswapRoutes.PoolRouteConfig({
+        poolRoutes[0] = ILenderCommitmentForwarder_U1.PoolRouteConfig({
 
             pool:address(mockUniswapPool),
             zeroForOne:zeroForOne,
@@ -513,7 +513,7 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
             token1Decimals:collateralTokenDecimals
         });
 
-         poolRoutes[1]  = ILenderCommitmentForwarderWithUniswapRoutes.PoolRouteConfig({
+         poolRoutes[1]  = ILenderCommitmentForwarder_U1.PoolRouteConfig({
 
             pool:address(mockUniswapPoolSecondary),
             zeroForOne:zeroForOne,
@@ -536,7 +536,7 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
         uint256 requiredCollateral = lenderCommitmentForwarder.getRequiredCollateral(
             principalAmount,
             priceRatio,
-            ILenderCommitmentForwarderWithUniswapRoutes.CommitmentCollateralType.ERC20,
+            ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC20,
             address(collateralToken),
             address(principalToken)
             );
@@ -589,9 +589,9 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
 
 
 
-        ILenderCommitmentForwarderWithUniswapRoutes.PoolRouteConfig[] memory poolRoutes = new ILenderCommitmentForwarderWithUniswapRoutes.PoolRouteConfig[](2); 
+        ILenderCommitmentForwarder_U1.PoolRouteConfig[] memory poolRoutes = new ILenderCommitmentForwarder_U1.PoolRouteConfig[](2); 
 
-        poolRoutes[0] = ILenderCommitmentForwarderWithUniswapRoutes.PoolRouteConfig({
+        poolRoutes[0] = ILenderCommitmentForwarder_U1.PoolRouteConfig({
 
             pool:address(mockUniswapPool),
             zeroForOne:zeroForOne,
@@ -600,7 +600,7 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
             token1Decimals: collateralTokenDecimals
         });
 
-         poolRoutes[1]  = ILenderCommitmentForwarderWithUniswapRoutes.PoolRouteConfig({
+         poolRoutes[1]  = ILenderCommitmentForwarder_U1.PoolRouteConfig({
 
             pool:address(mockUniswapPoolSecondary),
             zeroForOne:zeroForOne,
@@ -625,7 +625,7 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
         uint256 requiredCollateral = lenderCommitmentForwarder.getRequiredCollateral(
             principalAmount,
             priceRatio,
-            ILenderCommitmentForwarderWithUniswapRoutes.CommitmentCollateralType.ERC20,
+            ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC20,
             address(collateralToken),
             address(principalToken)
             );
@@ -676,9 +676,9 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
 
 
 
-        ILenderCommitmentForwarderWithUniswapRoutes.PoolRouteConfig[] memory poolRoutes = new ILenderCommitmentForwarderWithUniswapRoutes.PoolRouteConfig[](2); 
+        ILenderCommitmentForwarder_U1.PoolRouteConfig[] memory poolRoutes = new ILenderCommitmentForwarder_U1.PoolRouteConfig[](2); 
 
-        poolRoutes[0] = ILenderCommitmentForwarderWithUniswapRoutes.PoolRouteConfig({
+        poolRoutes[0] = ILenderCommitmentForwarder_U1.PoolRouteConfig({
 
             pool:address(mockUniswapPool),
             zeroForOne:false,
@@ -687,7 +687,7 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
             token1Decimals: collateralTokenDecimals
         });
 
-         poolRoutes[1]  = ILenderCommitmentForwarderWithUniswapRoutes.PoolRouteConfig({
+         poolRoutes[1]  = ILenderCommitmentForwarder_U1.PoolRouteConfig({
 
             pool:address(mockUniswapPoolSecondary),
             zeroForOne:true,
@@ -712,7 +712,7 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
         uint256 requiredCollateral = lenderCommitmentForwarder.getRequiredCollateral(
             principalAmount,
             priceRatio,
-            ILenderCommitmentForwarderWithUniswapRoutes.CommitmentCollateralType.ERC20,
+            ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC20,
             address(collateralToken),
             address(principalToken)
             );
@@ -766,9 +766,9 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
 
 
 
-        ILenderCommitmentForwarderWithUniswapRoutes.PoolRouteConfig[] memory poolRoutes = new ILenderCommitmentForwarderWithUniswapRoutes.PoolRouteConfig[](2); 
+        ILenderCommitmentForwarder_U1.PoolRouteConfig[] memory poolRoutes = new ILenderCommitmentForwarder_U1.PoolRouteConfig[](2); 
 
-        poolRoutes[0] = ILenderCommitmentForwarderWithUniswapRoutes.PoolRouteConfig({
+        poolRoutes[0] = ILenderCommitmentForwarder_U1.PoolRouteConfig({
 
             pool:address(mockUniswapPool),
             zeroForOne:zeroForOne,
@@ -777,7 +777,7 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
             token1Decimals:intermediateTokenDecimals
         });
 
-         poolRoutes[1]  = ILenderCommitmentForwarderWithUniswapRoutes.PoolRouteConfig({
+         poolRoutes[1]  = ILenderCommitmentForwarder_U1.PoolRouteConfig({
 
             pool:address(mockUniswapPoolSecondary),
             zeroForOne:zeroForOne,
@@ -802,7 +802,7 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
         uint256 requiredCollateral = lenderCommitmentForwarder.getRequiredCollateral(
             principalAmount,
             priceRatio,
-            ILenderCommitmentForwarderWithUniswapRoutes.CommitmentCollateralType.ERC20,
+            ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC20,
             address(collateralToken),
             address(principalToken)
             );
@@ -853,9 +853,9 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
 
 
 
-        ILenderCommitmentForwarderWithUniswapRoutes.PoolRouteConfig[] memory poolRoutes = new ILenderCommitmentForwarderWithUniswapRoutes.PoolRouteConfig[](2); 
+        ILenderCommitmentForwarder_U1.PoolRouteConfig[] memory poolRoutes = new ILenderCommitmentForwarder_U1.PoolRouteConfig[](2); 
 
-        poolRoutes[0] = ILenderCommitmentForwarderWithUniswapRoutes.PoolRouteConfig({
+        poolRoutes[0] = ILenderCommitmentForwarder_U1.PoolRouteConfig({
 
             pool:address(mockUniswapPool),
             zeroForOne:zeroForOne,
@@ -864,7 +864,7 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
             token1Decimals:intermediateTokenDecimals
         });
 
-         poolRoutes[1]  = ILenderCommitmentForwarderWithUniswapRoutes.PoolRouteConfig({
+         poolRoutes[1]  = ILenderCommitmentForwarder_U1.PoolRouteConfig({
 
             pool:address(mockUniswapPoolSecondary),
             zeroForOne:zeroForOne,
@@ -893,7 +893,7 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
         uint256 requiredCollateral = lenderCommitmentForwarder.getRequiredCollateral(
             principalAmount,
             priceRatio,
-            ILenderCommitmentForwarderWithUniswapRoutes.CommitmentCollateralType.ERC20,
+            ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC20,
             address(collateralToken),
             address(principalToken)
             );
@@ -919,9 +919,9 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
 
 
 
-        ILenderCommitmentForwarderWithUniswapRoutes.PoolRouteConfig[] memory poolRoutes = new ILenderCommitmentForwarderWithUniswapRoutes.PoolRouteConfig[](2); 
+        ILenderCommitmentForwarder_U1.PoolRouteConfig[] memory poolRoutes = new ILenderCommitmentForwarder_U1.PoolRouteConfig[](2); 
 
-        poolRoutes[0] = ILenderCommitmentForwarderWithUniswapRoutes.PoolRouteConfig({
+        poolRoutes[0] = ILenderCommitmentForwarder_U1.PoolRouteConfig({
 
             pool:address(mockUniswapPool),
             zeroForOne:zeroForOne,
@@ -930,7 +930,7 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
             token1Decimals:18
         });
 
-         poolRoutes[1]  = ILenderCommitmentForwarderWithUniswapRoutes.PoolRouteConfig({
+         poolRoutes[1]  = ILenderCommitmentForwarder_U1.PoolRouteConfig({
 
             pool:address(mockUniswapPoolSecondary),
             zeroForOne:zeroForOne,
@@ -953,7 +953,7 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
         uint256 requiredCollateral = lenderCommitmentForwarder.getRequiredCollateral(
             principalAmount,
             priceRatio,
-            ILenderCommitmentForwarderWithUniswapRoutes.CommitmentCollateralType.ERC20,
+            ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC20,
             address(collateralToken),
             address(principalToken)
             );

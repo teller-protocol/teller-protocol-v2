@@ -17,5 +17,6 @@
   "default-proxy-admin:transfer": 1695411254,
   "lender-commitment-forwarder:extensions:flash-rollover:g3-upgrade": 1695920349,
   "teller-v2:loan-liquidated-state-upgrade": 1696520015,
-  "collateral:manager-v2:deploy": 1706115485
+  "collateral:manager-v2:deploy": 1706115485,
+  "lender-commitment-forwarder:alpha:deploy": 1706118505
 }

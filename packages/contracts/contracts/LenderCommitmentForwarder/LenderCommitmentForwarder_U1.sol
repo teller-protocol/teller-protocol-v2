@@ -34,16 +34,13 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  
 
 
-contract LenderCommitmentForwarder_U1 is
+contract LenderCommitmentForwarder_U1 is 
     TellerV2MarketForwarder_G2,
-    ExtensionsContextUpgradeable,
-    ILenderCommitmentForwarder_U1
+    ILenderCommitmentForwarder_U1 
+    
 {
     using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
     using NumbersLib for uint256;
-
-     //does not take a storage slot 
-    address immutable UNISWAP_V3_FACTORY; 
 
 
     // CommitmentId => commitment
@@ -57,14 +54,17 @@ contract LenderCommitmentForwarder_U1 is
 
     mapping(uint256 => uint256) public commitmentPrincipalAccepted;
   
-
-    //mapping(uint256 => address) public commitmentUniswapPoolAddress;
-
+ 
     mapping(uint256 => PoolRouteConfig[])
         internal commitmentUniswapPoolRoutes;
 
     mapping(uint256 => uint16)
         internal commitmentPoolOracleLtvRatio;
+
+
+     //does not take a storage slot 
+    address immutable UNISWAP_V3_FACTORY; 
+
 
 
     /**
@@ -912,14 +912,6 @@ contract LenderCommitmentForwarder_U1 is
         return commitments[_commitmentId].maxPrincipal;
     }
 
-    // Overrides
-    function _msgSender()
-        internal
-        view
-        virtual
-        override(ContextUpgradeable, ExtensionsContextUpgradeable)
-        returns (address sender)
-    {
-        return ExtensionsContextUpgradeable._msgSender();
-    }
+    
+    
 }

@@ -432,7 +432,7 @@ export default <HardhatUserConfig>{
       url: networkUrls.sepolia,
       chainId: 11155111,
       live: true,
-      gasPrice: Number(ethers.parseUnits('5', 'gwei')),
+      gasPrice: Number(ethers.parseUnits('150', 'gwei')),
 
       verify: {
         etherscan: {

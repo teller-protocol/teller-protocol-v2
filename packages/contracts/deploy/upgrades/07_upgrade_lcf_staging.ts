@@ -1,4 +1,3 @@
- 
 import { DeployFunction } from 'hardhat-deploy/dist/types'
 
 const deployFn: DeployFunction = async (hre) => {
@@ -20,7 +19,6 @@ const deployFn: DeployFunction = async (hre) => {
     return false
   }*/
 
-
   let uniswapFactoryAddress: string
   switch (hre.network.name) {
     case 'mainnet':
@@ -41,20 +39,21 @@ const deployFn: DeployFunction = async (hre) => {
       throw new Error('No swap factory address found for this network')
   }
 
- 
- 
   const tellerV2 = await hre.contracts.get('TellerV2')
-  
+
   const marketRegistry = await hre.contracts.get('MarketRegistry')
-  
-  const lenderCommitmentForwarderStaging = await hre.contracts.get('LenderCommitmentForwarderStaging')
-  
 
-  let tellerV2ProxyAddress = await tellerV2.getAddress();
-  let marketRegistryProxyAddress = await marketRegistry.getAddress();
-  let lcfStagingProxyAddress = await lenderCommitmentForwarderStaging.getAddress();
+  const lenderCommitmentForwarderStaging = await hre.contracts.get(
+    'LenderCommitmentForwarderStaging'
+  )
 
-  const LenderCommitmentForwarderStagingImplementation = await hre.ethers.getContractFactory('LenderCommitmentForwarderStaging')
+  let tellerV2ProxyAddress = await tellerV2.getAddress()
+  let marketRegistryProxyAddress = await marketRegistry.getAddress()
+  let lcfStagingProxyAddress =
+    await lenderCommitmentForwarderStaging.getAddress()
+
+  const LenderCommitmentForwarderStagingImplementation =
+    await hre.ethers.getContractFactory('LenderCommitmentForwarderStaging')
 
   const upgrade = await hre.upgrades.upgradeProxy(
     lcfStagingProxyAddress,
@@ -64,8 +63,8 @@ const deployFn: DeployFunction = async (hre) => {
       constructorArgs: [
         tellerV2ProxyAddress,
         marketRegistryProxyAddress,
-        uniswapFactoryAddress   
-      ],
+        uniswapFactoryAddress
+      ]
     }
   )
 
@@ -78,14 +77,25 @@ const deployFn: DeployFunction = async (hre) => {
 
 // tags and deployment
 deployFn.id = 'lender-commitment-forwarder:staging:upgrade'
-deployFn.tags = ['proposal', 'upgrade', 'lender-commitment-forwarder:staging', 'lender-commitment-forwarder:staging:upgrade']
+deployFn.tags = [
+  'proposal',
+  'upgrade',
+  'lender-commitment-forwarder:staging',
+  'lender-commitment-forwarder:staging:upgrade'
+]
 deployFn.dependencies = ['lender-commitment-forwarder:staging:deploy']
 deployFn.skip = async (hre) => {
+  return true
   return (
     !hre.network.live ||
-    !['localhost', 'mainnet', 'polygon', 'goerli', 'sepolia','arbitrum'].includes(
-      hre.network.name
-    )
+    ![
+      'localhost',
+      'mainnet',
+      'polygon',
+      'goerli',
+      'sepolia',
+      'arbitrum'
+    ].includes(hre.network.name)
   )
 }
 export default deployFn

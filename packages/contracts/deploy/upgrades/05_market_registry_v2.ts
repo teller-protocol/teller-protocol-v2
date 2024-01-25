@@ -21,7 +21,7 @@ const deployFn: DeployFunction = async (hre) => {
     _steps: [
       {
         proxy: marketRegistry,
-        implFactory: await hre.ethers.getContractFactory('MarketRegistry' ),
+        implFactory: await hre.ethers.getContractFactory('MarketRegistry'),
 
         opts: {
           unsafeAllow: [
@@ -30,10 +30,8 @@ const deployFn: DeployFunction = async (hre) => {
             'external-library-linking'
           ],
           unsafeAllowRenames: true,
-          unsafeSkipStorageCheck:true, //caution !
-          constructorArgs: [ ],
-
-           
+          unsafeSkipStorageCheck: true, //caution !
+          constructorArgs: []
         }
       }
     ]
@@ -48,18 +46,12 @@ const deployFn: DeployFunction = async (hre) => {
 
 // tags and deployment
 deployFn.id = 'market-registry:v2-upgrade'
-deployFn.tags = [
-  'proposal',
-  'upgrade',
-  'market-registry-v2-upgrade'
-]
-deployFn.dependencies = [ ]
+deployFn.tags = ['proposal', 'upgrade', 'market-registry-v2-upgrade']
+deployFn.dependencies = []
 deployFn.skip = async (hre) => {
-  return  (
+  return (
     !hre.network.live ||
-    !['mainnet', 'polygon', 'arbitrum', 'goerli', 'sepolia'].includes(
-      hre.network.name
-    )
+    !['mainnet', 'polygon', 'arbitrum', 'goerli'].includes(hre.network.name)
   )
 }
 export default deployFn

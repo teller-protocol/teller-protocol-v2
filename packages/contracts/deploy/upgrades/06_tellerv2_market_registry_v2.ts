@@ -34,9 +34,7 @@ const deployFn: DeployFunction = async (hre) => {
             'external-library-linking'
           ],
           unsafeAllowRenames: true,
-          constructorArgs: [await trustedForwarder.getAddress()],
-
-           
+          constructorArgs: [await trustedForwarder.getAddress()]
         }
       }
     ]
@@ -57,13 +55,11 @@ deployFn.tags = [
   'teller-v2',
   'teller-v2:market-registry-v2-upgrade'
 ]
-deployFn.dependencies = ['teller-v2:deploy','market-registry:v2-upgrade']
+deployFn.dependencies = ['teller-v2:deploy', 'market-registry:v2-upgrade']
 deployFn.skip = async (hre) => {
-  return     (
+  return (
     !hre.network.live ||
-    !['mainnet', 'polygon', 'arbitrum', 'goerli', 'sepolia'].includes(
-      hre.network.name
-    )
-  ) 
+    !['mainnet', 'polygon', 'arbitrum', 'goerli'].includes(hre.network.name)
+  )
 }
 export default deployFn

@@ -727,11 +727,10 @@ contract LenderCommitmentForwarder_U1 is
     )   public view returns (uint256 priceRatio)  {
  
 
-        require( poolRoutes.length >=1 &&  poolRoutes.length <=2 , "invalid pool routes length");
+        require( poolRoutes.length <= 2 , "invalid pool routes length");
 
-        bool doubleHop = poolRoutes.length == 2;
-
-        if(doubleHop) {
+        
+        if(poolRoutes.length == 2) {
  
 
             //this product is expanded hop 0  td0 +1 
@@ -764,14 +763,14 @@ contract LenderCommitmentForwarder_U1 is
                 pool0PriceRatio , pool1PriceRatio, expFactor
             ); 
 
-        }else{           
+        }else if (poolRoutes.length == 1){           
             return getUniswapPriceRatioForPool( 
                         poolRoutes[0]   
                     );
         } 
         
 
-
+        //else return 0 
     }
 
      

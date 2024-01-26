@@ -1049,6 +1049,6 @@
     "blockHash": null,
     "blockNumber": null
   },
-  "numDeployments": 2,
+  "numDeployments": 3,
   "implementation": "0x9Fa5A22A3c0b8030147d363f68A763DEB9f00acB"
 }

@@ -19,5 +19,5 @@
   "teller-v2:loan-liquidated-state-upgrade": 1696520015,
   "collateral:manager-v2:deploy": 1706115485,
   "lender-commitment-forwarder:alpha:deploy": 1706118505,
-  "lender-commitment-forwarder:alpha:upgrade": 1706214498
+  "lender-commitment-forwarder:alpha:upgrade": 1706298989
 }

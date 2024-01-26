@@ -211,8 +211,8 @@ contract LenderCommitmentForwarder_U1 is
         );
         
 
-        for (uint256 i = 0; i < _poolRoutes.length; i++) {
-            commitmentUniswapPoolRoutes[commitmentId_][i] = (_poolRoutes[i]);
+        for (uint256 i = 0; i < _poolRoutes.length; i++) { 
+             commitmentUniswapPoolRoutes[commitmentId_].push(_poolRoutes[i]);
         }
 
         commitmentPoolOracleLtvRatio[commitmentId_] = _poolOracleLtvRatio; 

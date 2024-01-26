@@ -174,6 +174,11 @@ const networkConfig = (config: NetworkUserConfig): NetworkUserConfig => ({
   accounts
 })
 
+console.log(
+  'process.env.ETHERSCAN_VERIFY_API_KEY',
+  process.env.ETHERSCAN_VERIFY_API_KEY
+)
+
 /*
       📡 This is where you configure your deploy configuration for 🏗 scaffold-eth
 

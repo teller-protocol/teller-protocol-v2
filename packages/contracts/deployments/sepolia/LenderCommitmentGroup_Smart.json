@@ -133,6 +133,10 @@
         },
         {
           "type": "uint256",
+          "name": "_bidId"
+        },
+        {
+          "type": "uint256",
           "name": "_principalAmount"
         },
         {
@@ -395,6 +399,25 @@
     },
     {
       "type": "function",
+      "name": "getPriceX96FromSqrtPriceX96",
+      "constant": true,
+      "stateMutability": "pure",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint160",
+          "name": "sqrtPriceX96"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": "priceX96"
+        }
+      ]
+    },
+    {
+      "type": "function",
       "name": "getPrincipalAmountAvailableToBorrow",
       "constant": true,
       "stateMutability": "view",
@@ -437,6 +460,29 @@
         {
           "type": "uint256",
           "name": "requiredCollateral_"
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getSqrtTwapX96",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "uniswapV3Pool"
+        },
+        {
+          "type": "uint32",
+          "name": "twapInterval"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint160",
+          "name": "sqrtPriceX96"
         }
       ]
     },
@@ -725,6 +771,6 @@
     "blockHash": null,
     "blockNumber": null
   },
-  "numDeployments": 6,
+  "numDeployments": 7,
   "implementation": "0xE11884953B18F8ddC55875CBDAb71b624779D3bB"
 }

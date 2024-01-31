@@ -75,24 +75,14 @@ When exiting, a lender is burning X shares
 // TODO 
 
 
- 1.   implement the LTV  along with the uniswap oracle price ( they BOTH are used to figure out required collateral per principal for a new loan accept )
-
- 2. implement share mints scaling by looking at TToken code  (make a fn to find a ratio of committed principal token value to total pool equity value atm   --difference should be the interest in a naive design) 
-
- 3. finish off the exiting split tokens logic 
-
+ 1.  consider adding TWAP interval as init param
  4. tests 
 
 // ----
 
 
 
-
-AAve utilization rate is 50% lets say 
-no matter what , only 50 pct of 100 can be out on loan.
-
-
-
+ 
 
 If a lender puts up 50,000 originally, im able to withdraw all my deposits.  Everyone else is in the hole until a borrower repays a loan 
 If there isnt enough liquidity, you just cannot burn those shares. 
@@ -131,15 +121,11 @@ contract LenderCommitmentGroup_Smart is
     IERC20 public principalToken;
     IERC20 public collateralToken;
 
-    uint256 marketId; //remove the marketId enforcement ???
+    uint256 marketId;  
     uint32 maxLoanDuration;
     uint16 minInterestRate;
 
-    //this is all of the principal tokens that have been committed to this contract minus all that have been withdrawn.  This includes the tokens in this contract and lended out in active loans by this contract.
-
-    //run lots of tests in which tokens are donated to this contract to be uncommitted to make sure things done break
-    // tokens donated to this contract should be ignored?
-
+  
     uint256 public totalPrincipalTokensCommitted; //this can be less than we expect if tokens are donated to the contract and withdrawn
 
     uint256 public totalPrincipalTokensLended;
@@ -155,7 +141,7 @@ contract LenderCommitmentGroup_Smart is
 
     mapping(address => uint256) public principalTokensCommittedByLender;
 
-    //try to make apy dynamic .
+    
 
     modifier onlyAfterInitialized() {
         require(_initialized, "Contract must be initialized");
@@ -169,8 +155,7 @@ contract LenderCommitmentGroup_Smart is
         );
         _;
     }
-
-    //maybe make this an initializer instead !?
+ 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor(
         address _tellerV2,
@@ -183,7 +168,7 @@ contract LenderCommitmentGroup_Smart is
         
     }
 
-    // must send initial principal tokens into this contract just before this is called
+    
     function initialize(
         address _principalTokenAddress,
         address _collateralTokenAddress,
@@ -317,13 +302,7 @@ multiplies by their pct of shares (S%)
             totalPrincipalTokensUsedForLoans;
     }
 
-    /* function currentTVL() public override returns (uint256 tvl_) {
-        tvl_ += totalUnderlyingSupply();
-        tvl_ += s().totalBorrowed;
-        tvl_ -= s().totalRepaid;
-    }
-  
-*/
+    
     /*
     must be initialized for this to work ! 
     */
@@ -488,6 +467,7 @@ multiplies by their pct of shares (S%)
 
         // need to know how many principal tokens are in the contract atm
         uint256 principalTokenBalance = principalToken.balanceOf(address(this)); //this is also the principal token value
+       
         uint256 collateralTokenBalance = collateralToken.balanceOf(
             address(this)
         );
@@ -524,15 +504,15 @@ multiplies by their pct of shares (S%)
         return (principalTokensToGive, collateralTokensToGive);
     }
 
-    function getCollateralRequiredForPrincipalAmount(uint256 _principalAmount)
+  /*  function getCollateralRequiredForPrincipalAmount(uint256 _principalAmount)
         public
         view
         returns (uint256)
     {
         return _getCollateralRequiredForPrincipalAmount(_principalAmount);
-    }
+    }*/
 
-    function _getCollateralRequiredForPrincipalAmount(uint256 _principalAmount)
+    function getCollateralRequiredForPrincipalAmount(uint256 _principalAmount)
         public
         view
         returns (uint256)
@@ -547,12 +527,9 @@ multiplies by their pct of shares (S%)
     //this is priceToken1PerToken0 expanded by 1e18
     function _getUniswapV3TokenPairPrice() internal view returns (uint256) {
         // represents the square root of the price of token1 in terms of token0
-
-        //(uint160 sqrtPriceX96, , , , , , ) = IUniswapV3Pool(UNISWAP_V3_POOL)
-        //    .slot0();
-
-        //twap interval = 20
-        uint160 sqrtPriceX96 = getSqrtTwapX96(UNISWAP_V3_POOL, 20);
+ 
+        
+        uint160 sqrtPriceX96 = getSqrtTwapX96(5);
 
         // sqrtPrice is in X96 format so we scale it down to get the price
         // Also note that this price is a relative price between the two tokens in the pool
@@ -567,16 +544,16 @@ multiplies by their pct of shares (S%)
 
     // ---- TWAP 
 
-     function getSqrtTwapX96(address uniswapV3Pool, uint32 twapInterval) public view returns (uint160 sqrtPriceX96) {
+     function getSqrtTwapX96(  uint32 twapInterval) public view returns (uint160 sqrtPriceX96) {
         if (twapInterval == 0) {
             // return the current price if twapInterval == 0
-            (sqrtPriceX96, , , , , , ) = IUniswapV3Pool(uniswapV3Pool).slot0();
+            (sqrtPriceX96, , , , , , ) = IUniswapV3Pool(UNISWAP_V3_POOL).slot0();
         } else {
             uint32[] memory secondsAgos = new uint32[](2);
             secondsAgos[0] = twapInterval; // from (before)
             secondsAgos[1] = 0; // to (now)
 
-            (int56[] memory tickCumulatives, ) = IUniswapV3Pool(uniswapV3Pool).observe(secondsAgos);
+            (int56[] memory tickCumulatives, ) = IUniswapV3Pool(UNISWAP_V3_POOL).observe(secondsAgos);
 
             // tick(imprecise as it's an integer) to price
             sqrtPriceX96 = TickMath.getSqrtRatioAtTick(
@@ -584,9 +561,11 @@ multiplies by their pct of shares (S%)
             );
         }
     }
+ 
+    function _getPoolTokens() internal view returns (address token0, address token1) {
 
-    function getPriceX96FromSqrtPriceX96(uint160 sqrtPriceX96) public pure returns(uint256 priceX96) {
-        return FullMath.mulDiv(sqrtPriceX96, sqrtPriceX96, FixedPoint96.Q96);
+        token0 = IUniswapV3Pool(UNISWAP_V3_POOL).token0();
+        token1 = IUniswapV3Pool(UNISWAP_V3_POOL).token1();
     }
 
     // -----
@@ -597,7 +576,11 @@ multiplies by their pct of shares (S%)
     function getCollateralTokensPricePerPrincipalTokens(
         uint256 collateralTokenAmount
     ) public view returns (uint256 principalTokenValue_) {
-        bool principalTokenIsToken0 = true; //fix me
+        
+        //same concept as zeroforone 
+        (address token0,) = _getPoolTokens(); 
+
+        bool principalTokenIsToken0 = (address(principalToken) == token0);  
 
         uint256 pairPrice = _getUniswapV3TokenPairPrice();
 
@@ -692,7 +675,7 @@ multiplies by their pct of shares (S%)
         view
         returns (uint256 requiredCollateral_)
     {
-        requiredCollateral_ = _getCollateralRequiredForPrincipalAmount(
+        requiredCollateral_ = getCollateralRequiredForPrincipalAmount(
             _principalAmount
         );
     }

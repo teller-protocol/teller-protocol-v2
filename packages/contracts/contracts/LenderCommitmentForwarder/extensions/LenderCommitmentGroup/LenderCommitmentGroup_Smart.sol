@@ -55,6 +55,8 @@ import "lib/forge-std/src/console.sol";
 Every time a lender deposits tokens, we can mint an equal amt of RepresentationToken
 
 
+// -- LIMITATIONS 
+1. neither the principal nor collateral token shall not have more than 18 decimals due to the way expansion is configured
 
 
 // -- EXITING 
@@ -75,7 +77,7 @@ When exiting, a lender is burning X shares
 // TODO 
 
 
- 1.  consider adding TWAP interval as init param
+ 
  2. consider adding PATHS to this for the oracle.. so the pair can be USDC to PNDC but use weth as intermediate 
  4. tests 
 
@@ -105,7 +107,7 @@ contract LenderCommitmentGroup_Smart is
     using AddressUpgradeable for address;
     using NumbersLib for uint256;
 
-    uint256 public immutable EXCHANGE_RATE_EXPANSION_FACTOR = 1e18;
+    uint256 public immutable EXCHANGE_RATE_EXPANSION_FACTOR = 1e36;
 
     /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
     //ITellerV2 public immutable TELLER_V2;
@@ -339,6 +341,10 @@ multiplies by their pct of shares (S%)
         pure
         returns (uint256 value_)
     {
+        if (rate == 0){
+            return 0;
+        }
+
         value_ = (amount * EXCHANGE_RATE_EXPANSION_FACTOR) / rate;
     }
 

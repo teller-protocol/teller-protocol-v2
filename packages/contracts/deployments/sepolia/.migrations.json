@@ -23,7 +23,7 @@
   "market-registry:v2-upgrade": 1701982450,
   "teller-v2:market-registry-v2-upgrade": 1701985473,
   "lender-commitment-forwarder:g2-upgrade": 1706720831,
-  "lender-commitment-group-upgrade": 1706732084,
   "lender-commitment-group-smart:deploy": 1706895722,
-  "smart-commitment-forwarder:upgrade": 1706901073
+  "smart-commitment-forwarder:upgrade": 1706901073,
+  "lender-commitment-group-upgrade": 1706905760
 }

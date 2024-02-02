@@ -76,6 +76,7 @@ When exiting, a lender is burning X shares
 
 
  1.  consider adding TWAP interval as init param
+ 2. consider adding PATHS to this for the oracle.. so the pair can be USDC to PNDC but use weth as intermediate 
  4. tests 
 
 // ----
@@ -139,6 +140,8 @@ contract LenderCommitmentGroup_Smart is
     uint16 public liquidityThresholdPercent; //5000 is 50 pct  // enforce max of 10000
     uint16 public loanToValuePercent; //the overcollateralization ratio, typically 80 pct
 
+    uint32 public twapInterval;
+
     mapping(address => uint256) public principalTokensCommittedByLender;
 
     
@@ -178,7 +181,13 @@ contract LenderCommitmentGroup_Smart is
         uint16 _minInterestRate,
         uint16 _liquidityThresholdPercent,
         uint16 _loanToValuePercent, //essentially the overcollateralization ratio.  10000 is 1:1 baseline ? // initializer  ADD ME
-        uint24 _uniswapPoolFee
+        uint24 _uniswapPoolFee,
+        uint32 _twapInterval
+        
+        /// @notice Explain to an end user what this does
+        /// @dev Explain to a developer any extra details
+        /// @return Documents the return variables of a contract’s function state variable
+        /// @inheritdoc	Copies all missing tags from the base function (must be followed by the contract name)
         
     )   
         initializer
@@ -218,6 +227,7 @@ contract LenderCommitmentGroup_Smart is
 
         liquidityThresholdPercent = _liquidityThresholdPercent;
         loanToValuePercent = _loanToValuePercent;
+        twapInterval = _twapInterval;
 
         // maxPrincipalPerCollateralAmount = _maxPrincipalPerCollateralAmount;
         // _createInitialCommitment(_createCommitmentArgs);
@@ -529,7 +539,7 @@ multiplies by their pct of shares (S%)
         // represents the square root of the price of token1 in terms of token0
  
         
-        uint160 sqrtPriceX96 = getSqrtTwapX96(5);
+        uint160 sqrtPriceX96 = getSqrtTwapX96(twapInterval);
 
         // sqrtPrice is in X96 format so we scale it down to get the price
         // Also note that this price is a relative price between the two tokens in the pool
@@ -568,9 +578,7 @@ multiplies by their pct of shares (S%)
         token1 = IUniswapV3Pool(UNISWAP_V3_POOL).token1();
     }
 
-    // -----
-
-
+    // ----- 
 
 
     function getCollateralTokensPricePerPrincipalTokens(

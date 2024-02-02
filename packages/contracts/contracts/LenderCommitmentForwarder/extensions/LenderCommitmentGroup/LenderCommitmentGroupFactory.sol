@@ -48,7 +48,9 @@ contract LenderCommitmentGroupFactory {
         ILenderCommitmentForwarder.Commitment calldata _createCommitmentArgs,
         uint256 _initialPrincipalAmount,
         uint16 _liquidityThresholdPercent,
-        uint16 _loanToValuePercent
+        uint16 _loanToValuePercent,
+        uint24 _uniswapPoolFee,
+        uint32 _twapInterval
     ) external returns (address newGroupContract_) {
         //these should be upgradeable proxies ???
         newGroupContract_ = address(
@@ -59,8 +61,8 @@ contract LenderCommitmentGroupFactory {
             )
         );
 
-
-        uint24 _uniswapPoolFee = 300;
+ 
+        
         /*
             The max principal should be a very high number! higher than usual
             The expiration time should be far in the future!  farther than usual 
@@ -73,7 +75,8 @@ contract LenderCommitmentGroupFactory {
             _createCommitmentArgs.minInterestRate,
             _liquidityThresholdPercent,
             _loanToValuePercent,
-            _uniswapPoolFee
+            _uniswapPoolFee,
+            _twapInterval
         );
 
         //it is not absolutely necessary to have this call here but it allows the user to potentially save a tx step so it is nice to have .

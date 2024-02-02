@@ -10,7 +10,8 @@ interface ILenderCommitmentGroup {
         uint16 _minInterestRate,
         uint16 _liquidityThresholdPercent,
         uint16 _loanToValuePercent, //essentially the overcollateralization ratio.  10000 is 1:1 baseline ?
-        uint24 _uniswapPoolFee
+        uint24 _uniswapPoolFee,
+        uint32 _twapInterval
    
     )
         external

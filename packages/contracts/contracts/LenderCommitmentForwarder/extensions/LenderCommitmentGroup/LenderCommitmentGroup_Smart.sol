@@ -107,7 +107,7 @@ contract LenderCommitmentGroup_Smart is
     using AddressUpgradeable for address;
     using NumbersLib for uint256;
 
-    uint256 public immutable EXCHANGE_RATE_EXPANSION_FACTOR = 1e36;
+    uint256 public immutable EXCHANGE_RATE_EXPANSION_FACTOR = 1e36; //consider making this dynamic 
 
     /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
     //ITellerV2 public immutable TELLER_V2;
@@ -376,11 +376,11 @@ multiplies by their pct of shares (S%)
         require(isAllowedToBorrow(_borrower), "unauthorized borrow");
 
         
-
+        //this is expanded by 10**18 
         uint256 requiredCollateral = getRequiredCollateral(_principalAmount);
 
         require(
-            _collateralAmount >= requiredCollateral,
+            (_collateralAmount * 10**18)  >= requiredCollateral,
             "Insufficient Borrower Collateral"
         );
 
@@ -520,14 +520,7 @@ multiplies by their pct of shares (S%)
         return (principalTokensToGive, collateralTokensToGive);
     }
 
-  /*  function getCollateralRequiredForPrincipalAmount(uint256 _principalAmount)
-        public
-        view
-        returns (uint256)
-    {
-        return _getCollateralRequiredForPrincipalAmount(_principalAmount);
-    }*/
-
+    //this is expanded by 10**18 
     function getCollateralRequiredForPrincipalAmount(uint256 _principalAmount)
         public
         view
@@ -587,6 +580,7 @@ multiplies by their pct of shares (S%)
     // ----- 
 
 
+    //this is expanded by 10e18 
     function getCollateralTokensPricePerPrincipalTokens(
         uint256 collateralTokenAmount
     ) public view returns (uint256 principalTokenValue_) {
@@ -620,7 +614,7 @@ multiplies by their pct of shares (S%)
         // Convert amountToken0 to the same decimals as Token1
         uint256 amountToken0WithToken1Decimals = amountToken0 * 10**18;
         // Now divide by the price to get the amount of token1
-        return amountToken0WithToken1Decimals / priceToken1PerToken0;
+        return (amountToken0WithToken1Decimals * 10**18)  / priceToken1PerToken0;
     }
 
     function token1ToToken0(uint256 amountToken1, uint256 priceToken1PerToken0)
@@ -631,7 +625,7 @@ multiplies by their pct of shares (S%)
         // Multiply the amount of token1 by the price to get the amount in token0's units
         uint256 amountToken1InToken0 = amountToken1 * priceToken1PerToken0;
         // Now adjust for the decimal difference
-        return amountToken1InToken0 / 10**18 ;
+        return amountToken1InToken0  ;
     }
 
    
@@ -684,6 +678,7 @@ multiplies by their pct of shares (S%)
         return CommitmentCollateralType.ERC20;
     }
 
+    //this is expanded by 10**18 
     function getRequiredCollateral(uint256 _principalAmount)
         public
         view

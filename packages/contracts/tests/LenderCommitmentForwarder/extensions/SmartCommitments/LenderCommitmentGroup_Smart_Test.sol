@@ -429,7 +429,7 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
 
         //uint256 expectedAmount = 1e14;
         //todo: why is it this ? 
-        uint256 expectedAmount = 102020031989393; // 100501226962305;
+        uint256 expectedAmount = 102020031989393413700000000000000; // 100501226962305;
 
         assertEq(
             amount,

@@ -495,6 +495,10 @@
         {
           "type": "uint24",
           "name": "_uniswapPoolFee"
+        },
+        {
+          "type": "uint32",
+          "name": "_twapInterval"
         }
       ],
       "outputs": [
@@ -720,6 +724,20 @@
           "name": ""
         }
       ]
+    },
+    {
+      "type": "function",
+      "name": "twapInterval",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint32",
+          "name": ""
+        }
+      ]
     }
   ],
   "transactionHash": "0xde00ae12b1f7f6a89401c80961f11f3c394c5a080de4d6a2cafd8ecaf90a06cc",
@@ -729,6 +747,6 @@
     "blockHash": null,
     "blockNumber": null
   },
-  "numDeployments": 8,
-  "implementation": "0xE11884953B18F8ddC55875CBDAb71b624779D3bB"
+  "numDeployments": 9,
+  "implementation": "0x7292385522F11390B2A7dd4677528fFce03b80db"
 }

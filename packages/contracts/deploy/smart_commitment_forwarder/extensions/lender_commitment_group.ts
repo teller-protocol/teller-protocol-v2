@@ -27,6 +27,7 @@ const deployFn: DeployFunction = async (hre) => {
   let maxLoanDuration = 5000000
   let liquidityThresholdPercent = 10000
   let loanToValuePercent = 10000 //make sure this functions as normal.  If over 100%, getting much better loan terms and i wont repay.  If it is under 100%, it will likely repay.
+  let twapInterval = 5
 
   const lenderCommitmentGroupSmart = await hre.deployProxy(
     'LenderCommitmentGroup_Smart',
@@ -45,7 +46,8 @@ const deployFn: DeployFunction = async (hre) => {
         minInterestRate,
         liquidityThresholdPercent,
         loanToValuePercent,
-        uniswapPoolFee
+        uniswapPoolFee,
+        twapInterval
       ]
     }
   )

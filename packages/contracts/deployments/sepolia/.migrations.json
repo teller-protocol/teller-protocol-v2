@@ -19,11 +19,11 @@
   "teller-v2:loan-liquidated-state-upgrade": 1696520015,
   "collateral:manager-v2:deploy": 1700855248,
   "smart-commitment-forwarder:deploy": 1700855352,
-  "lender-commitment-group-smart:deploy": 1701886933,
   "teller-v2:collateral-manager-v2-upgrade": 1701979762,
   "market-registry:v2-upgrade": 1701982450,
   "teller-v2:market-registry-v2-upgrade": 1701985473,
   "smart-commitment-forwarder:upgrade": 1703177926,
   "lender-commitment-forwarder:g2-upgrade": 1706720831,
-  "lender-commitment-group-upgrade": 1706732084
+  "lender-commitment-group-upgrade": 1706732084,
+  "lender-commitment-group-smart:deploy": 1706894648
 }

@@ -50,10 +50,6 @@ abstract contract TellerV2MarketForwarder_G3 is TellerV2MarketForwarder_G2 {
         return true;
     }
 
-    /**
-     * @dev This empty reserved space is put in place to allow future versions to add new
-     * variables without shifting down storage in the inheritance chain.
-     * See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps
-     */
-    uint256[50] private __gap;
+   //a gap is inherited from g2  so this is actually not necessary going forwards ---leaving it to maintain upgradeability 
+   uint256[50] private __gap;
 }

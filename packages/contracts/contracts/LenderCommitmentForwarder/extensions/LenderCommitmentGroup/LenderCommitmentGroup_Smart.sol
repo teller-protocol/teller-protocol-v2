@@ -210,11 +210,11 @@ contract LenderCommitmentGroup_Smart is
             _uniswapPoolFee
          );
 
-         require(UNISWAP_V3_POOL != address(0), "Invalid uniswap pool address");
-
-
+        require(UNISWAP_V3_POOL != address(0), "Invalid uniswap pool address");
        
         marketId = _marketId;
+
+        //in order for this to succeed, first, that SmartCommitmentForwarder needs to be THE trusted forwarder for the market 
 
         //approve this market as a forwarder 
         ITellerV2Context(TELLER_V2).approveMarketForwarder( _marketId, SMART_COMMITMENT_FORWARDER );

@@ -22,7 +22,7 @@ const deployFn: DeployFunction = async (hre) => {
   let collateralTokenAddress = '0x72292c8464a33f6b5f6efcc0213a89a98c68668b' //0xbtc
   let uniswapPoolFee = 3000
 
-  let marketId = 1
+  let marketId = 4 //for sepolia
   let minInterestRate = 100
   let maxLoanDuration = 5000000
   let liquidityThresholdPercent = 10000

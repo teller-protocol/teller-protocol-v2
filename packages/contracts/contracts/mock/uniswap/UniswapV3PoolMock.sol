@@ -2,6 +2,11 @@
 contract UniswapV3PoolMock {
     //this represents an equal price ratio
     uint160 mockSqrtPriceX96 = 2 ** 96;
+
+    address mockToken0;
+    address mockToken1;
+
+
     
 
     struct Slot0 {
@@ -26,13 +31,21 @@ contract UniswapV3PoolMock {
         mockSqrtPriceX96 = _price;
     }
 
+    function set_mockToken0(address t0) public {
+        mockToken0 = t0;
+    }
+
+
+    function set_mockToken1(address t1) public {
+        mockToken1 = t1;
+    }
 
     function token0() public returns (address) {
-        return address(0);
+        return mockToken0;
     }
 
     function token1() public returns (address) {
-        return address(0);
+        return mockToken1;
     }
 
 

@@ -420,6 +420,10 @@ contract LenderCommitmentGroup_Smart is
 
     /*
     must be initialized for this to work ! 
+
+    consider using the inverse of the SHARES EXCHANGE RATE here - wouldnt that work? why not ? 
+
+    also consider including 'totalSwappedTokensIn'
     */
     function burnSharesToWithdrawEarnings(
         uint256 _amountPoolSharesTokens,
@@ -456,7 +460,7 @@ contract LenderCommitmentGroup_Smart is
       
 
         totalPrincipalTokensCommitted -= tokensToUncommit;
-        // totalPrincipalTokensUncommitted += tokensToUncommit;
+        
 
         totalInterestWithdrawn +=
             principalTokenValueToWithdraw -

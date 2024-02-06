@@ -51,6 +51,8 @@ contract SwapAuctionUpgradeable is Initializable  {
 
     address public tokenIn;
     address public tokenOut;
+
+    uint256 public totalSwappedTokensIn;
  
 
     function __initialize_SwapAuctionUpgradeable (
@@ -65,7 +67,7 @@ contract SwapAuctionUpgradeable is Initializable  {
  
 
 
- function proposeSwapAuction( 
+    function proposeSwapAuction( 
         uint256 _amountIn,
         uint256 _amountOut
      ) external {
@@ -128,9 +130,11 @@ contract SwapAuctionUpgradeable is Initializable  {
             //do this here to prevent re-entrancy calling
          IERC20(tokenOut).transfer(recipient,amountToSend);
 
+         totalSwappedTokensIn += proposedSwap.amountIn;
+
     }
 
-
+    
 
  
     

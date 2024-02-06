@@ -82,9 +82,16 @@ When exiting, a lender is burning X shares
 2. Redemption with ' the split' of principal and collateral is not ideal .  What would be more ideal is a "conversion auction' or a 'swap auction'. 
     In this paradigm, any party can offer to give X principal tokens for the Y collateral tokens that are in the pool.  the auction lasts (1 hour?)  and this way it is always only principal tha is being withdrawn - far less risk of MEV attacker taking more C -- DONE 
 3. it is annoying that a bad default can cause a pool to have to totally exit and close ..this is a minor issue. maybe some form of Insurance can help resurrect a pool in this case, mayeb anyone can restore the health of the pool w a fn call.  
+    a. fix this by changing the shares logic so you do get more shares in this event (i dont think its possible) 
+    b. have a function that lets anyone donate principal tokens to make the pool whole again .  (refill underwater pools w insurance fund??)
+    c. lets pools expire and get unwound and withdrawn completely , make a new pool 
+
+4. build a function to do lender close loan 
+
+
 
 TODO: 
-A. make a collateral to principal swap auction system 
+A. Make a mental map of these subsystems, attack vectors, mitigaions 
 
 B. 
 
@@ -157,7 +164,7 @@ contract LenderCommitmentGroup_Smart is
     
 
     uint256 public totalInterestCollected;
-    uint256 public totalInterestWithdrawn;
+    //uint256 public totalInterestWithdrawn;
 
     uint16 public liquidityThresholdPercent; //5000 is 50 pct  // enforce max of 10000
     uint16 public loanToValuePercent; //the overcollateralization ratio, typically 80 pct
@@ -178,7 +185,7 @@ contract LenderCommitmentGroup_Smart is
         _;
     }
  
-     modifier onlyTellerV2() {
+    modifier onlyTellerV2() {
         require(
             msg.sender == address(TELLER_V2),
             "Can only be called by TellerV2"
@@ -316,7 +323,7 @@ contract LenderCommitmentGroup_Smart is
 
         uint256 poolTotalEstimatedValue = totalPrincipalTokensCommitted;
         uint256 poolTotalEstimatedValuePlusInterest = totalPrincipalTokensCommitted +
-                totalExpectedInterestEarned;
+                totalInterestCollected;
 
         if (poolTotalEstimatedValue == 0) {
             return EXCHANGE_RATE_EXPANSION_FACTOR; // 1 to 1 for first swap
@@ -435,6 +442,10 @@ contract LenderCommitmentGroup_Smart is
 
     /*
     must be initialized for this to work ! 
+
+    consider using the inverse of the SHARES EXCHANGE RATE here - wouldnt that work? why not ? 
+
+    also consider including 'totalSwappedTokensIn'
     */
     function burnSharesToWithdrawEarnings(
         uint256 _amountPoolSharesTokens,
@@ -473,13 +484,15 @@ contract LenderCommitmentGroup_Smart is
         */
         uint256 principalTokenValueToWithdraw = _valueOfUnderlying(_amountPoolSharesTokens, sharesExchangeRateInverse()); 
         
-        uint256 tokensToUncommit = (netCommittedTokens *
-            _amountPoolSharesTokens) / poolSharesTotalSupplyBeforeBurn;
 
-      
+        uint256 tokensToUncommit = principalTokenValueToWithdraw ; /*(netCommittedTokens *
+            _amountPoolSharesTokens) / poolSharesTotalSupplyBeforeBurn;*/
 
+
+  //stop tracking these in general ? dont need them .. ?     
+/*
         totalPrincipalTokensCommitted -= tokensToUncommit;
-        // totalPrincipalTokensUncommitted += tokensToUncommit;
+        
 
         totalInterestWithdrawn +=
             principalTokenValueToWithdraw -
@@ -489,7 +502,7 @@ contract LenderCommitmentGroup_Smart is
             msg.sender
         ] -= principalTokenValueToWithdraw;
 
-      
+      */
 
        // todo fix me ? 
         principalToken.transfer(_recipient, principalTokenValueToWithdraw);

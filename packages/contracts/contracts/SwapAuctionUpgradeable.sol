@@ -31,7 +31,7 @@ LATER: we can build pools that will passively earn money by executing these ...
 */
 
 contract SwapAuctionUpgradeable is Initializable  {
-    using SafeERC20 for ERC20;
+    using SafeERC20 for IERC20;
 
     
 
@@ -67,9 +67,9 @@ contract SwapAuctionUpgradeable is Initializable  {
                            
               );  
 
-        }
+        
  
-        uint256 currentTokenOutBalance = IERC20(tokenOut).balanceOf(address(this));
+       // uint256 currentTokenOutBalance = IERC20(tokenOut).balanceOf(address(this));
        
         // pull in the new amount in 
         IERC20(tokenIn).transferFrom(msg.sender,address(this),_amountIn);

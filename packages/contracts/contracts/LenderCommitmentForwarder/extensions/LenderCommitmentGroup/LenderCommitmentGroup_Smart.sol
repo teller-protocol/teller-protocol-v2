@@ -307,6 +307,28 @@ contract LenderCommitmentGroup_Smart is
             poolTotalEstimatedValue;
     }
 
+
+    //used for burn shares back to principal 
+        function sharesExchangeRateInverse() public view returns (uint256 rate_) {
+        /*
+        Should get slightly less shares than principal tokens put in !! diluted by ratio of pools actual equity 
+       */
+
+        uint256 poolTotalEstimatedValue = totalPrincipalTokensCommitted;
+        uint256 poolTotalEstimatedValuePlusInterest = totalPrincipalTokensCommitted +
+                totalExpectedInterestEarned;
+
+        if (poolTotalEstimatedValue == 0) {
+            return EXCHANGE_RATE_EXPANSION_FACTOR; // 1 to 1 for first swap
+        }
+
+        rate_ =
+            (poolTotalEstimatedValue *
+                EXCHANGE_RATE_EXPANSION_FACTOR) /
+            poolTotalEstimatedValuePlusInterest;
+    }
+
+
     /*
     must be initialized for this to work ! 
     */
@@ -421,8 +443,8 @@ contract LenderCommitmentGroup_Smart is
         external
         
         returns (
-            uint256 principalTokenSplitAmount_,
-            uint256 collateralTokenSplitAmount_
+            uint256 principalTokenSplitAmount_
+             
         )
     {
         //uint256 collectedInterest = LoanRepaymentInterestCollector( interestCollector ).collectInterest();
@@ -433,16 +455,24 @@ contract LenderCommitmentGroup_Smart is
         //this DOES reduce total supply! This is necessary for correct math.
         poolSharesToken.burn(msg.sender, _amountPoolSharesTokens);
 
+         // incorporate sharesExchangeRateInverse somehow
+
+
+
+    /*
         uint256 netCommittedTokens = totalPrincipalTokensCommitted;
 
         uint256 principalTokenEquityAmountSimple = totalPrincipalTokensCommitted +
                 totalInterestCollected -
                 (totalInterestWithdrawn);
 
-       
+        
 
         uint256 principalTokenValueToWithdraw = (principalTokenEquityAmountSimple *
                 _amountPoolSharesTokens) / poolSharesTotalSupplyBeforeBurn;
+        */
+        uint256 principalTokenValueToWithdraw = _valueOfUnderlying(_amountPoolSharesTokens, sharesExchangeRateInverse()); 
+        
         uint256 tokensToUncommit = (netCommittedTokens *
             _amountPoolSharesTokens) / poolSharesTotalSupplyBeforeBurn;
 

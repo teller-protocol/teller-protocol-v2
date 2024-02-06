@@ -295,6 +295,10 @@ contract LenderCommitmentGroup_Smart is
      * @notice It calculates the current scaled exchange rate for a whole Teller Token based of the underlying token balance.
      * @return rate_ The current exchange rate, scaled by the EXCHANGE_RATE_FACTOR.
      */
+
+     /**
+        This is OPTIMISTIC, using the projected interest collected for the rate 
+     */
     function sharesExchangeRate() public view returns (uint256 rate_) {
         /*
         Should get slightly less shares than principal tokens put in !! diluted by ratio of pools actual equity 
@@ -315,7 +319,10 @@ contract LenderCommitmentGroup_Smart is
     }
 
 
-    //used for burn shares back to principal 
+     
+    /**
+        This is PESSIMISTIC, using the total interest collected for the rate 
+     */
         function sharesExchangeRateInverse() public view returns (uint256 rate_) {
         /*
         Should get slightly less shares than principal tokens put in !! diluted by ratio of pools actual equity 

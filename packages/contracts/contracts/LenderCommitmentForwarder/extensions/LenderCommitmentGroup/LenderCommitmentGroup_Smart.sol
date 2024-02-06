@@ -82,11 +82,16 @@ When exiting, a lender is burning X shares
 2. Redemption with ' the split' of principal and collateral is not ideal .  What would be more ideal is a "conversion auction' or a 'swap auction'. 
     In this paradigm, any party can offer to give X principal tokens for the Y collateral tokens that are in the pool.  the auction lasts (1 hour?)  and this way it is always only principal tha is being withdrawn - far less risk of MEV attacker taking more C -- DONE 
 3. it is annoying that a bad default can cause a pool to have to totally exit and close ..this is a minor issue. maybe some form of Insurance can help resurrect a pool in this case, mayeb anyone can restore the health of the pool w a fn call.  
+    a. fix this by changing the shares logic so you do get more shares in this event (i dont think its possible) 
+    b. have a function that lets anyone donate principal tokens to make the pool whole again .  (refill underwater pools w insurance fund??)
+    c. lets pools expire and get unwound and withdrawn completely , make a new pool 
+
 4. build a function to do lender close loan 
 
 
+
 TODO: 
-A. make a collateral to principal swap auction system 
+A. Make a mental map of these subsystems, attack vectors, mitigaions 
 
 B. 
 

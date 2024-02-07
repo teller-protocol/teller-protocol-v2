@@ -25,8 +25,7 @@ import "../../../libraries/uniswap/FullMath.sol";
 
 
 import "./LenderCommitmentGroupShares.sol";
-
-import "../../../SwapAuctionUpgradeable.sol";
+ 
 
 import { MathUpgradeable } from "@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20MetadataUpgradeable.sol";
@@ -128,8 +127,7 @@ contract LenderCommitmentGroup_Smart is
     ILenderCommitmentGroup,
     ISmartCommitment,
     ILoanRepaymentListener,
-    Initializable,
-    SwapAuctionUpgradeable
+    Initializable 
 {
     using AddressUpgradeable for address;
     using NumbersLib for uint256;
@@ -175,6 +173,7 @@ contract LenderCommitmentGroup_Smart is
 
 
     mapping(address => uint256) public principalTokensCommittedByLender;
+    mapping(uint256 => bool) public activeBids;
 
      
     modifier onlySmartCommitmentForwarder() {
@@ -237,8 +236,7 @@ contract LenderCommitmentGroup_Smart is
         principalToken = IERC20(_principalTokenAddress);
         collateralToken = IERC20(_collateralTokenAddress);
 
-        __initialize_SwapAuctionUpgradeable(_collateralTokenAddress,_principalTokenAddress);
-
+         
         
         UNISWAP_V3_POOL = IUniswapV3Factory(UNISWAP_V3_FACTORY).getPool( 
             _principalTokenAddress,
@@ -296,17 +294,15 @@ contract LenderCommitmentGroup_Smart is
      * @return rate_ The current exchange rate, scaled by the EXCHANGE_RATE_FACTOR.
      */
 
-     /**
-        This is OPTIMISTIC, using the projected interest collected for the rate 
-     */
+     
     function sharesExchangeRate() public view returns (uint256 rate_) {
         /*
         Should get slightly less shares than principal tokens put in !! diluted by ratio of pools actual equity 
        */
 
-        uint256 poolTotalEstimatedValue = totalPrincipalTokensCommitted;
-        uint256 poolTotalEstimatedValuePlusInterest = totalPrincipalTokensCommitted +
-                totalExpectedInterestEarned;
+        uint256 poolTotalEstimatedValue = getPoolTotalEstimatedValue();
+        uint256 poolTotalEstimatedValuePlusInterest = getPoolTotalEstimatedValue() +
+                totalInterestCollected;
 
         if (poolTotalEstimatedValue == 0) {
             return EXCHANGE_RATE_EXPANSION_FACTOR; // 1 to 1 for first swap
@@ -320,16 +316,13 @@ contract LenderCommitmentGroup_Smart is
 
 
      
-    /**
-        This is PESSIMISTIC, using the total interest collected for the rate 
-     */
         function sharesExchangeRateInverse() public view returns (uint256 rate_) {
         /*
         Should get slightly less shares than principal tokens put in !! diluted by ratio of pools actual equity 
        */
 
-        uint256 poolTotalEstimatedValue = totalPrincipalTokensCommitted;
-        uint256 poolTotalEstimatedValuePlusInterest = totalPrincipalTokensCommitted +
+        uint256 poolTotalEstimatedValue = getPoolTotalEstimatedValue();
+        uint256 poolTotalEstimatedValuePlusInterest = getPoolTotalEstimatedValue() +
                 totalInterestCollected;
 
         if (poolTotalEstimatedValue == 0) {
@@ -340,6 +333,12 @@ contract LenderCommitmentGroup_Smart is
             (poolTotalEstimatedValue *
                 EXCHANGE_RATE_EXPANSION_FACTOR) /
             poolTotalEstimatedValuePlusInterest;
+    }
+
+
+    function getPoolTotalEstimatedValue() internal view returns (uint256 poolTotalEstimatedValue_) {
+        poolTotalEstimatedValue_ = totalPrincipalTokensCommitted;
+
     }
 
 
@@ -423,6 +422,8 @@ contract LenderCommitmentGroup_Smart is
         totalPrincipalTokensLended += _principalAmount;
         totalExpectedInterestEarned += calculateExpectedInterestEarned( _principalAmount ,_loanDuration,_interestRate);
 
+
+        activeBids[_bidId] = true ; //bool for now 
         //emit event
     }
 
@@ -517,6 +518,25 @@ contract LenderCommitmentGroup_Smart is
         console.log("sent split amt ");
 
        
+    }
+
+
+
+    function liquidateDefaultedLoanWithIncentive(
+        uint256 _bidId,
+        uint256 _tokenAmountToProvide
+    ){
+        require( activeBids[_bidId] == true  , "Invalid bid id for liquidate defaulted loan ");
+
+
+        // use some of the msg.senders tokens and some of the tokens that are within this contract to liquidate the loan -- 
+        // we want all of our defaulted loans to be liquidated asap and this way the principal will flow back into this contract and the collateral should go to msg.sender of thisfn 
+
+        //performs the liquidation using both  _tokenAmountToProvide AND some principal tokens in this contract 
+        //sends the collateral to the recipient
+        ITellerV2(TELLER_V2).liquidateLoanFullWithRecipient(_bidId, msg.sender);
+
+        
     }
 
 

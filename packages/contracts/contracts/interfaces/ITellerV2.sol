@@ -173,4 +173,13 @@ interface ITellerV2 {
         external
         view
         returns (address);
+
+    function liquidateLoanFull(uint256 _bidId)
+        external;
+
+    
+    function liquidateLoanFullWithRecipient(uint256 _bidId, address _recipient)
+        external;
+        
+    
 }

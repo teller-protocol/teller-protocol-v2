@@ -780,6 +780,30 @@ contract TellerV2 is
         external
         acceptedLoan(_bidId, "liquidateLoan")
     {
+        Bid storage bid = bids[_bidId];
+
+         // If loan is backed by collateral, withdraw and send to the liquidator
+        address recipient = _msgSenderForMarket(bid.marketplaceId);
+
+       _liquidateLoanFull(_bidId,recipient);
+    }
+
+     function liquidateLoanFullWithRecipient(uint256 _bidId, address _recipient)
+        external
+        acceptedLoan(_bidId, "liquidateLoan")
+    { 
+
+       _liquidateLoanFull(_bidId,_recipient);
+    }
+
+        /**
+     * @notice Function for users to liquidate a defaulted loan.
+     * @param _bidId The id of the loan to make the payment towards.
+     */
+    function _liquidateLoanFull(uint256 _bidId, address _recipient)
+        internal
+        acceptedLoan(_bidId, "liquidateLoan")
+    {
         require(isLoanLiquidateable(_bidId), "Loan must be liquidateable.");
 
         Bid storage bid = bids[_bidId];
@@ -803,16 +827,19 @@ contract TellerV2 is
             false
         );
 
-        // If loan is backed by collateral, withdraw and send to the liquidator
-        address liquidator = _msgSenderForMarket(bid.marketplaceId);
+       
         //collateralManager.liquidateCollateral(_bidId, liquidator);
         _getCollateralManagerForBid(_bidId).liquidateCollateral(
             _bidId,
-            liquidator
+            _recipient
         );
+
+         address liquidator = _msgSenderForMarket(bid.marketplaceId);
+
 
         emit LoanLiquidated(_bidId, liquidator);
     }
+
 
     /**
      * @notice Internal function to make a loan payment.

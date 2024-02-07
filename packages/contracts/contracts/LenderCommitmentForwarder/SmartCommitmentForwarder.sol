@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
 
-import "../TellerV2MarketForwarder_G4.sol";
+import "../TellerV2MarketForwarder_G3.sol";
 
 import "../interfaces/ILenderCommitmentForwarder.sol";
 import "./LenderCommitmentForwarder_G1.sol";
@@ -18,7 +18,7 @@ and _acceptBid
 
 
 */
-contract SmartCommitmentForwarder is TellerV2MarketForwarder_G4 {
+contract SmartCommitmentForwarder is TellerV2MarketForwarder_G3 {
     event ExercisedSmartCommitment(
         address indexed smartCommitmentAddress,
         address borrower,

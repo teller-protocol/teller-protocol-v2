@@ -526,8 +526,11 @@ contract LenderCommitmentGroup_Smart is
         uint256 _bidId,
         uint256 _tokenAmountToProvide
     ){
-        require( activeBids[_bidId] == true  , "Invalid bid id for liquidate defaulted loan ");
+        require( activeBids[_bidId] == true  , "Invalid bid id for liquidateDefaultedLoanWithIncentive");
 
+        (uint256 incentiveAmount, uint256 amountDue ) = getIncentiveToLiquidateDefaultedLoan(_bidId);
+
+        require(_tokenAmountToProvide + incentiveAmount >= amountDue , "Insufficient _tokenAmountToProvide");
 
         // use some of the msg.senders tokens and some of the tokens that are within this contract to liquidate the loan -- 
         // we want all of our defaulted loans to be liquidated asap and this way the principal will flow back into this contract and the collateral should go to msg.sender of thisfn 
@@ -536,6 +539,26 @@ contract LenderCommitmentGroup_Smart is
         //sends the collateral to the recipient
         ITellerV2(TELLER_V2).liquidateLoanFullWithRecipient(_bidId, msg.sender);
 
+        
+    }
+    
+    /*
+        This function will calculate the incentive amount (using a uniswap bonus plus a timer)
+        of principal tokens that will be given to incentivize liquidating a loan 
+    */
+    function getIncentiveToLiquidateDefaultedLoan(
+        uint256 _bidId
+    ) public view returns (uint256 incentiveAmount_,uint256 amountOwed_) {
+
+        ITellerV2.Payment amountOwedPayment = ITellerV2(TELLER_V2).calculateAmountOwed(_bidId,block.timestamp)  ;
+
+        amountOwed_ = amountOwedPayment.principal + amountOwedPayment.interest;
+
+        uint256 secondsSinceDefaulted = 0;
+
+        uint256 incentiveMultiplier = Math.max( 100000,  secondsSinceDefaulted );
+
+        incentiveAmount_ = Math.mulDiv( amountOwed_ , incentiveMultiplier , 100000 );
         
     }
 

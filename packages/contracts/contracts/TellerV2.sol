@@ -771,7 +771,14 @@ contract TellerV2 is
 
         //handle this differently based on v1 or v2 
         if(_claimCollateral){
-            _getCollateralManagerForBid(_bidId).lenderClaimCollateral(_bidId,_collateralRecipient); 
+           address collateralManagerForBid = address(_getCollateralManagerForBid(_bidId)); 
+
+          if( collateralManagerForBid == address(collateralManagerV2) ){
+             ICollateralManagerV2(collateralManagerForBid).lenderClaimCollateral(_bidId,_collateralRecipient);
+          }else{
+             require( _collateralRecipient == address(0));
+             ICollateralManager(collateralManagerForBid).lenderClaimCollateral(_bidId );
+          }
         }
         
         emit LoanClosed(_bidId);

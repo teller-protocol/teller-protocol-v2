@@ -566,22 +566,22 @@ contract LenderCommitmentGroup_Smart is
     */
     function getMinimumAmountDifferenceToCloseDefaultedLoan(
         uint256 _bidId
-    ) public view returns (int256 amountDifference_,uint256 amountOwed_) {
+    ) public view returns (int256 amountDifference_, uint256 amountOwed_) {
 
          Payment memory amountOwedPayment = ITellerV2(TELLER_V2).calculateAmountOwed(
             _bidId, 
             block.timestamp
             )  ;
 
-        amountOwed_ = int256( amountOwedPayment.principal + amountOwedPayment.interest ) ;
+        amountOwed_ =  amountOwedPayment.principal + amountOwedPayment.interest   ;
 
         require( amountOwed_ > 0, "amountOwed_: detected overflow");
 
         uint256 secondsSinceDefaulted = 0;
 
-        int256 incentiveMultiplier = 5000 - Math.max( 100000,  secondsSinceDefaulted );
+        int256 incentiveMultiplier = int256(5000) - int256( Math.max( 100000,  secondsSinceDefaulted ));
 
-        amountDifference_ = amountOwed_ * incentiveMultiplier / 10000; 
+        amountDifference_ = int256(amountOwed_) * incentiveMultiplier / int256(10000); 
       //  amountDifference_ =  Math.mulDiv( amountOwed_ , incentiveMultiplier , 100000 );
         
     }

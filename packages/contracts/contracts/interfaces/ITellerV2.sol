@@ -174,6 +174,9 @@ interface ITellerV2 {
         view
         returns (address);
 
+    function lenderCloseLoan(uint256 _bidId)
+        external;
+
     function liquidateLoanFull(uint256 _bidId)
         external;
 

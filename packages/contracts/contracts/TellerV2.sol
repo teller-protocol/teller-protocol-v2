@@ -757,18 +757,23 @@ contract TellerV2 is
      * @notice Function for lender to claim collateral for a defaulted loan. The only purpose of a CLOSED loan is to make collateral claimable by lender.
      * @param _bidId The id of the loan to set to CLOSED status.
      */
-    function lenderCloseLoan(uint256 _bidId)
+    function lenderCloseLoan(uint256 _bidId, bool _claimCollateral, address _collateralRecipient)
         external
         acceptedLoan(_bidId, "lenderClaimCollateral")
     {
         require(isLoanDefaulted(_bidId), "Loan must be defaulted.");
-
+       
         Bid storage bid = bids[_bidId];
         bid.state = BidState.CLOSED;
 
-        //collateralManager.lenderClaimCollateral(_bidId);
+        address sender = _msgSenderForMarket(bid.marketplaceId);
+        require(sender == bid.lender, "only lender can close loan");
 
-        _getCollateralManagerForBid(_bidId).lenderClaimCollateral(_bidId);
+        //handle this differently based on v1 or v2 
+        if(_claimCollateral){
+            _getCollateralManagerForBid(_bidId).lenderClaimCollateral(_bidId,_collateralRecipient); 
+        }
+        
         emit LoanClosed(_bidId);
     }
 

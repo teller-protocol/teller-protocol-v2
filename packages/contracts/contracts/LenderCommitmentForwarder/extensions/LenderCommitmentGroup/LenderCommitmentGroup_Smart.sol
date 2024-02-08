@@ -27,6 +27,7 @@ import "../../../libraries/uniswap/FullMath.sol";
 import "./LenderCommitmentGroupShares.sol";
  
 
+
 import { MathUpgradeable } from "@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20MetadataUpgradeable.sol";
 
@@ -34,6 +35,7 @@ import { CommitmentCollateralType, ISmartCommitment } from "../../../interfaces/
 import { ILoanRepaymentListener } from "../../../interfaces/ILoanRepaymentListener.sol";
 
 import { ILenderCommitmentGroup } from "../../../interfaces/ILenderCommitmentGroup.sol";
+ import {Payment} from "../../../TellerV2Storage.sol";
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
@@ -521,47 +523,72 @@ contract LenderCommitmentGroup_Smart is
     }
 
 
+    /*
+
+
+    */
 
     function liquidateDefaultedLoanWithIncentive(
         uint256 _bidId,
-        uint256 _tokenAmountToProvide
+        int256 _tokenAmountDifference
     ){
         require( activeBids[_bidId] == true  , "Invalid bid id for liquidateDefaultedLoanWithIncentive");
+          ( int256 minAmountDifference, uint256 amountDue ) = getMinimumAmountDifferenceToCloseDefaultedLoan(_bidId);
 
-        (uint256 incentiveAmount, uint256 amountDue ) = getIncentiveToLiquidateDefaultedLoan(_bidId);
 
-        require(_tokenAmountToProvide + incentiveAmount >= amountDue , "Insufficient _tokenAmountToProvide");
+         require( _tokenAmountDifference >= minAmountDifference , "Insufficient tokenAmountDifference");
 
-        // use some of the msg.senders tokens and some of the tokens that are within this contract to liquidate the loan -- 
-        // we want all of our defaulted loans to be liquidated asap and this way the principal will flow back into this contract and the collateral should go to msg.sender of thisfn 
 
-        //performs the liquidation using both  _tokenAmountToProvide AND some principal tokens in this contract 
-        //sends the collateral to the recipient
-        ITellerV2(TELLER_V2).liquidateLoanFullWithRecipient(_bidId, msg.sender);
+        if( _tokenAmountDifference > 0){
+            //this is used when the collateral value is higher than the principal (rare) 
+            uint256 tokensToTakeFromSender = abs( _tokenAmountDifference );
 
+            IERC20(principalToken).transferFrom( msg.sender, address(this), amountDue + tokensToTakeFromSender );
+
+        }else {
+            uint256 tokensToGiveToSender = abs( _tokenAmountDifference );
+
+          
+            IERC20(principalToken).transferFrom( msg.sender, address(this), amountDue - tokensToGiveToSender );
+        }
+
+        //this will give collateral to the lender... 
+        ITellerV2(TELLER_V2).lenderCloseLoan(_bidId );
+ 
         
     }
     
     /*
         This function will calculate the incentive amount (using a uniswap bonus plus a timer)
         of principal tokens that will be given to incentivize liquidating a loan 
+
+        Starts at 5000 and ticks down to -5000 
     */
-    function getIncentiveToLiquidateDefaultedLoan(
+    function getMinimumAmountDifferenceToCloseDefaultedLoan(
         uint256 _bidId
-    ) public view returns (uint256 incentiveAmount_,uint256 amountOwed_) {
+    ) public view returns (int256 amountDifference_,uint256 amountOwed_) {
 
-        ITellerV2.Payment amountOwedPayment = ITellerV2(TELLER_V2).calculateAmountOwed(_bidId,block.timestamp)  ;
+         Payment memory amountOwedPayment = ITellerV2(TELLER_V2).calculateAmountOwed(
+            _bidId, 
+            block.timestamp
+            )  ;
 
-        amountOwed_ = amountOwedPayment.principal + amountOwedPayment.interest;
+        amountOwed_ = int256( amountOwedPayment.principal + amountOwedPayment.interest ) ;
+
+        require( amountOwed_ > 0, "amountOwed_: detected overflow");
 
         uint256 secondsSinceDefaulted = 0;
 
-        uint256 incentiveMultiplier = Math.max( 100000,  secondsSinceDefaulted );
+        int256 incentiveMultiplier = 5000 - Math.max( 100000,  secondsSinceDefaulted );
 
-        incentiveAmount_ = Math.mulDiv( amountOwed_ , incentiveMultiplier , 100000 );
+        amountDifference_ = amountOwed_ * incentiveMultiplier / 10000; 
+      //  amountDifference_ =  Math.mulDiv( amountOwed_ , incentiveMultiplier , 100000 );
         
     }
 
+    function abs(int x) private pure returns (uint) {
+        return x >= 0 ? uint(x) : uint(-x);
+    }
 
 
     /*

@@ -226,17 +226,35 @@ contract CollateralManagerV2 is
         _withdraw(_bidId, _recipient);
     }
 
-    /**
+       /**
      * @notice Withdraws deposited collateral of a bid that has been CLOSED after being defaulted.
      * @param _bidId The id of the bid to withdraw collateral for.
      */
-    function lenderClaimCollateral(uint256 _bidId) external onlyTellerV2 {
+    function lenderClaimCollateral(uint256 _bidId ) external onlyTellerV2 {
         if (isBidCollateralBacked(_bidId)) {
             BidState bidState = tellerV2.getBidState(_bidId);
 
             require(bidState == BidState.CLOSED, "Loan has not been closed");
 
-            _withdraw(_bidId, tellerV2.getLoanLender(_bidId));
+            
+            _withdraw(_bidId,  tellerV2.getLoanLender(_bidId));
+        }
+    }
+
+
+    /**
+     * @notice Withdraws deposited collateral of a bid that has been CLOSED after being defaulted.
+     * @param _bidId The id of the bid to withdraw collateral for.
+     */
+    function lenderClaimCollateral(uint256 _bidId, address _collateralRecipient) external onlyTellerV2 {
+        if (isBidCollateralBacked(_bidId)) {
+            BidState bidState = tellerV2.getBidState(_bidId);
+
+            require(bidState == BidState.CLOSED, "Loan has not been closed");
+
+            address recipient = _collateralRecipient == address(0) ? tellerV2.getLoanLender(_bidId) : _collateralRecipient; 
+
+            _withdraw(_bidId, recipient);
         }
     }
 

@@ -754,7 +754,7 @@ contract TellerV2 is
     }
 
 
-      function lenderCloseLoan(uint256 _bidId)
+    function lenderCloseLoan(uint256 _bidId)
         external
         acceptedLoan(_bidId, "lenderClaimCollateral")
     {
@@ -771,7 +771,7 @@ contract TellerV2 is
 
         //handle this differently based on v1 or v2 
          
-           address collateralManagerForBid = address(_getCollateralManagerForBid(_bidId)); 
+        address collateralManagerForBid = address(_getCollateralManagerForBid(_bidId)); 
 
           if( collateralManagerForBid == address(collateralManagerV2) ){
              ICollateralManagerV2(collateralManagerForBid).lenderClaimCollateral(_bidId,_collateralRecipient);
@@ -787,7 +787,7 @@ contract TellerV2 is
      * @notice Function for lender to claim collateral for a defaulted loan. The only purpose of a CLOSED loan is to make collateral claimable by lender.
      * @param _bidId The id of the loan to set to CLOSED status.
      */
-    function lenderCloseLoanWithRecipient(uint256 _bidId, bool _claimCollateral, address _collateralRecipient)
+    function lenderCloseLoanWithRecipient(uint256 _bidId, address _collateralRecipient)
         external
         acceptedLoan(_bidId, "lenderClaimCollateral")
     {
@@ -800,7 +800,7 @@ contract TellerV2 is
         require(sender == bid.lender, "only lender can close loan");
 
         //handle this differently based on v1 or v2 
-        if(_claimCollateral){
+        
            address collateralManagerForBid = address(_getCollateralManagerForBid(_bidId)); 
 
           if( collateralManagerForBid == address(collateralManagerV2) ){
@@ -809,7 +809,7 @@ contract TellerV2 is
              require( _collateralRecipient == address(bid.lender));
              ICollateralManager(collateralManagerForBid).lenderClaimCollateral(_bidId );
           }
-        }
+        
         
         emit LoanClosed(_bidId);
     }

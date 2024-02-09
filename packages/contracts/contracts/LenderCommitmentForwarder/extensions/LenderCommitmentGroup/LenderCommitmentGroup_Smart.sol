@@ -177,6 +177,8 @@ contract LenderCommitmentGroup_Smart is
     mapping(address => uint256) public principalTokensCommittedByLender;
     mapping(uint256 => bool) public activeBids;
 
+    int256 tokenDifferenceFromLiquidations;
+
      
     modifier onlySmartCommitmentForwarder() {
         require(
@@ -318,7 +320,7 @@ contract LenderCommitmentGroup_Smart is
 
 
      
-        function sharesExchangeRateInverse() public view returns (uint256 rate_) {
+    function sharesExchangeRateInverse() public view returns (uint256 rate_) {
         /*
         Should get slightly less shares than principal tokens put in !! diluted by ratio of pools actual equity 
        */
@@ -339,7 +341,14 @@ contract LenderCommitmentGroup_Smart is
 
 
     function getPoolTotalEstimatedValue() internal view returns (uint256 poolTotalEstimatedValue_) {
-        poolTotalEstimatedValue_ = totalPrincipalTokensCommitted;
+        
+      
+        uint256 tokenDifferenceUnsigned =  tokenDifferenceFromLiquidations > int256(0) ? uint256(tokenDifferenceFromLiquidations) : 0;
+
+        int256 poolTotalEstimatedValueSigned = int256(totalPrincipalTokensCommitted) + tokenDifferenceFromLiquidations;
+
+          //if the poolTotalEstimatedValue_ is less than 0, we treat it as 0.  This will prob cause issues ? 
+        poolTotalEstimatedValue_ =  poolTotalEstimatedValueSigned > int256(0) ? uint256(poolTotalEstimatedValueSigned) : 0  ;
 
     }
 
@@ -536,8 +545,10 @@ contract LenderCommitmentGroup_Smart is
           ( int256 minAmountDifference, uint256 amountDue ) = getMinimumAmountDifferenceToCloseDefaultedLoan(_bidId);
 
 
-         require( _tokenAmountDifference >= minAmountDifference , "Insufficient tokenAmountDifference");
+        require( _tokenAmountDifference >= minAmountDifference , "Insufficient tokenAmountDifference");
 
+
+        
 
         if( _tokenAmountDifference > 0){
             //this is used when the collateral value is higher than the principal (rare) 
@@ -545,15 +556,18 @@ contract LenderCommitmentGroup_Smart is
 
             IERC20(principalToken).transferFrom( msg.sender, address(this), amountDue + tokensToTakeFromSender );
 
+            tokenDifferenceFromLiquidations  += int256(tokensToTakeFromSender);
         }else {
             uint256 tokensToGiveToSender = abs( _tokenAmountDifference );
 
           
             IERC20(principalToken).transferFrom( msg.sender, address(this), amountDue - tokensToGiveToSender );
+
+            tokenDifferenceFromLiquidations  -= int256(tokensToGiveToSender);
         }
 
-        //this will give collateral to the lender... 
-        ITellerV2(TELLER_V2).lenderCloseLoan(_bidId );
+        //this will give collateral to the caller... 
+        ITellerV2(TELLER_V2).lenderCloseLoanWithRecipient(_bidId, msg.sender);
  
         
     }
@@ -579,7 +593,7 @@ contract LenderCommitmentGroup_Smart is
 
         uint256 secondsSinceDefaulted = 0;
 
-        int256 incentiveMultiplier = int256(5000) - int256( Math.max( 100000,  secondsSinceDefaulted ));
+        int256 incentiveMultiplier = int256(20000) - int256( Math.max( 100000,  secondsSinceDefaulted ));
 
         amountDifference_ = int256(amountOwed_) * incentiveMultiplier / int256(10000); 
       //  amountDifference_ =  Math.mulDiv( amountOwed_ , incentiveMultiplier , 100000 );

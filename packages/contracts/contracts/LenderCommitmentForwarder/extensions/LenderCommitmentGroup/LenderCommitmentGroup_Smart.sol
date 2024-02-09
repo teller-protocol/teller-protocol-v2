@@ -527,9 +527,13 @@ contract LenderCommitmentGroup_Smart is
       */
 
        // todo fix me ? 
+
+        console.log("sent split amt ");
+         console.logUint(principalTokenValueToWithdraw);
+
+
         principalToken.transfer(_recipient, principalTokenValueToWithdraw);
      
-        console.log("sent split amt ");
 
        
     }

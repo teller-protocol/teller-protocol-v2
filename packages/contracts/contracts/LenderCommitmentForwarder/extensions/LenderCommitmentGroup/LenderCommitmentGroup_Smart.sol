@@ -531,7 +531,7 @@ contract LenderCommitmentGroup_Smart is
     function liquidateDefaultedLoanWithIncentive(
         uint256 _bidId,
         int256 _tokenAmountDifference
-    ){
+    )  public {
         require( activeBids[_bidId] == true  , "Invalid bid id for liquidateDefaultedLoanWithIncentive");
           ( int256 minAmountDifference, uint256 amountDue ) = getMinimumAmountDifferenceToCloseDefaultedLoan(_bidId);
 

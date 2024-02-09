@@ -34,6 +34,25 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
         return 100;
     }
 
+    function lenderCloseLoan(uint256 _bidId)
+        external
+        
+    {
+
+    }
+
+    function liquidateLoanFull(uint256 _bidId)
+        external
+       
+    {
+
+    }
+
+     function liquidateLoanFullWithRecipient(uint256 _bidId, address _recipient)
+        external{
+
+    }
+
     function submitBid(
         address _lendingToken,
         uint256 _marketId,

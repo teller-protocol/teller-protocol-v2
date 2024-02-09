@@ -201,10 +201,9 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
         );
 
         vm.prank(address(lender));
-        (
-            uint256 receivedPrincipalTokens,
-            uint256 receivedCollateralTokens
-        ) = lenderCommitmentGroupSmart.burnSharesToWithdrawEarnings(
+        
+         uint256 receivedPrincipalTokens 
+          = lenderCommitmentGroupSmart.burnSharesToWithdrawEarnings(
                 sharesAmount,
                 address(lender)
             );
@@ -244,10 +243,9 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
         );
 
         vm.prank(address(lender));
-        (
-            uint256 receivedPrincipalTokens,
-            uint256 receivedCollateralTokens
-        ) = lenderCommitmentGroupSmart.burnSharesToWithdrawEarnings(
+    
+            uint256 receivedPrincipalTokens
+         = lenderCommitmentGroupSmart.burnSharesToWithdrawEarnings(
                 sharesAmount,
                 address(lender)
             );
@@ -258,13 +256,7 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
             expectedReceivedPrincipalTokens,
             "Received an unexpected amount of principal tokens"
         );
-
-        uint256 expectedReceivedCollateralTokens = 500000; // the orig amt !
-        assertEq(
-            receivedCollateralTokens,
-            expectedReceivedCollateralTokens,
-            "Received an unexpected amount of collateral tokens"
-        );
+ 
     }
 
     function test_burnShares_after_interest_payments() public {
@@ -292,10 +284,9 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
         );
 
         vm.prank(address(lender));
-        (
-            uint256 receivedPrincipalTokens,
-            uint256 receivedCollateralTokens
-        ) = lenderCommitmentGroupSmart.burnSharesToWithdrawEarnings(
+        
+        uint256 receivedPrincipalTokens
+          = lenderCommitmentGroupSmart.burnSharesToWithdrawEarnings(
                 sharesAmount,
                 address(lender)
             );

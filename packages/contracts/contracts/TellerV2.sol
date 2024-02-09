@@ -753,11 +753,41 @@ contract TellerV2 is
         _unpause();
     }
 
+
+      function lenderCloseLoan(uint256 _bidId)
+        external
+        acceptedLoan(_bidId, "lenderClaimCollateral")
+    {
+
+        require(isLoanDefaulted(_bidId), "Loan must be defaulted.");
+       
+        Bid storage bid = bids[_bidId];
+        bid.state = BidState.CLOSED;
+
+        address sender = _msgSenderForMarket(bid.marketplaceId);
+        require(sender == bid.lender, "only lender can close loan");
+
+        address _collateralRecipient = bid.lender;
+
+        //handle this differently based on v1 or v2 
+         
+           address collateralManagerForBid = address(_getCollateralManagerForBid(_bidId)); 
+
+          if( collateralManagerForBid == address(collateralManagerV2) ){
+             ICollateralManagerV2(collateralManagerForBid).lenderClaimCollateral(_bidId,_collateralRecipient);
+          }else{             
+             ICollateralManager(collateralManagerForBid).lenderClaimCollateral(_bidId );
+          }
+        
+        
+        emit LoanClosed(_bidId);    
+
+    }
     /**
      * @notice Function for lender to claim collateral for a defaulted loan. The only purpose of a CLOSED loan is to make collateral claimable by lender.
      * @param _bidId The id of the loan to set to CLOSED status.
      */
-    function lenderCloseLoan(uint256 _bidId, bool _claimCollateral, address _collateralRecipient)
+    function lenderCloseLoanWithRecipient(uint256 _bidId, bool _claimCollateral, address _collateralRecipient)
         external
         acceptedLoan(_bidId, "lenderClaimCollateral")
     {
@@ -776,7 +806,7 @@ contract TellerV2 is
           if( collateralManagerForBid == address(collateralManagerV2) ){
              ICollateralManagerV2(collateralManagerForBid).lenderClaimCollateral(_bidId,_collateralRecipient);
           }else{
-             require( _collateralRecipient == address(0));
+             require( _collateralRecipient == address(bid.lender));
              ICollateralManager(collateralManagerForBid).lenderClaimCollateral(_bidId );
           }
         }

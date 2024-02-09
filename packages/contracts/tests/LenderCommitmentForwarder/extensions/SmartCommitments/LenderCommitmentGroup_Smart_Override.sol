@@ -12,10 +12,15 @@ contract LenderCommitmentGroup_Smart_Override is LenderCommitmentGroup_Smart {
     //  bool public acceptBidWasCalled;
 
     uint256 mockMaxPrincipalPerCollateralAmount;
+    uint256 mockSharesExchangeRate;
 
     constructor(address _tellerV2, address _smartCommitmentForwarder, address _uniswapV3Pool)
         LenderCommitmentGroup_Smart(_tellerV2,_smartCommitmentForwarder, _uniswapV3Pool)
     {}
+
+    function set_mockSharesExchangeRate(uint256 _mockRate) public {
+        mockSharesExchangeRate = _mockRate;
+    }
 
     function set_totalPrincipalTokensCommitted(uint256 _mockAmt) public {
         totalPrincipalTokensCommitted = _mockAmt;
@@ -40,6 +45,25 @@ contract LenderCommitmentGroup_Smart_Override is LenderCommitmentGroup_Smart {
 
     function set_mock_getMaxPrincipalPerCollateralAmount(uint256 amt) public {
         mockMaxPrincipalPerCollateralAmount = amt;
+    }
+
+
+
+    function sharesExchangeRate() public override view returns (uint256 rate_) {
+        return mockSharesExchangeRate;
+    }
+
+
+    function super_sharesExchangeRate(  ) public view returns (uint256) {
+
+        return super.sharesExchangeRate();
+    }
+
+
+
+    function super_sharesExchangeRateInverse(  ) public view returns (uint256) {
+
+        return super.sharesExchangeRateInverse();
     }
 
     /*

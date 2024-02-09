@@ -180,8 +180,10 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
 
         initialize_group_contract();
 
-        lenderCommitmentGroupSmart.set_totalPrincipalTokensCommitted(1000000);
-        lenderCommitmentGroupSmart.set_totalInterestCollected(0);
+          lenderCommitmentGroupSmart.set_mockSharesExchangeRate( 1e36 );  //the default for now 
+
+       // lenderCommitmentGroupSmart.set_totalPrincipalTokensCommitted(1000000);
+       // lenderCommitmentGroupSmart.set_totalInterestCollected(0);
 
         lenderCommitmentGroupSmart.set_principalTokensCommittedByLender(
             address(lender),
@@ -222,8 +224,8 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
 
         initialize_group_contract();
 
-        lenderCommitmentGroupSmart.set_totalPrincipalTokensCommitted(1000000);
-        lenderCommitmentGroupSmart.set_totalInterestCollected(0);
+        lenderCommitmentGroupSmart.set_mockSharesExchangeRate( 1e36 );  //the default for now 
+
 
         lenderCommitmentGroupSmart.set_principalTokensCommittedByLender(
             address(lender),
@@ -259,6 +261,27 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
  
     }
 
+     //test this thoroughly 
+    function test_get_shares_exchange_rate() public {
+        lenderCommitmentGroupSmart.set_totalInterestCollected(1000000);
+
+        lenderCommitmentGroupSmart.set_principalTokensCommittedByLender(
+            address(lender),
+            5000000
+        );
+
+        uint256 rate = lenderCommitmentGroupSmart.super_sharesExchangeRate();
+    }
+
+
+    function test_get_shares_exchange_rate_inverse() public {
+        lenderCommitmentGroupSmart.set_mockSharesExchangeRate(1000000);
+ 
+
+        uint256 rate = lenderCommitmentGroupSmart.super_sharesExchangeRateInverse();
+    }
+
+
     function test_burnShares_after_interest_payments() public {
         principalToken.transfer(address(lenderCommitmentGroupSmart), 1e18);
         //  collateralToken.transfer(address(lenderCommitmentGroupSmart),1e18);
@@ -266,12 +289,10 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
         initialize_group_contract();
 
         //   lenderCommitmentGroupSmart.set_totalPrincipalTokensCommitted(1000000);
-        lenderCommitmentGroupSmart.set_totalInterestCollected(1000000);
+     
 
-        lenderCommitmentGroupSmart.set_principalTokensCommittedByLender(
-            address(lender),
-            5000000
-        );
+
+        lenderCommitmentGroupSmart.set_mockSharesExchangeRate( 1e36 );  //the default for now 
 
         vm.prank(address(lender));
         principalToken.approve(address(lenderCommitmentGroupSmart), 1000000);

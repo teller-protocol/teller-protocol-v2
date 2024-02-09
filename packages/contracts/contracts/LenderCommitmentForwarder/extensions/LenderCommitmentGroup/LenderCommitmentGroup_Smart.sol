@@ -299,13 +299,13 @@ contract LenderCommitmentGroup_Smart is
      */
 
      
-    function sharesExchangeRate() public view returns (uint256 rate_) {
+    function sharesExchangeRate() public virtual  view returns (uint256 rate_) {
         /*
         Should get slightly less shares than principal tokens put in !! diluted by ratio of pools actual equity 
        */
 
         uint256 poolTotalEstimatedValue = getPoolTotalEstimatedValue();
-        uint256 poolTotalEstimatedValuePlusInterest = getPoolTotalEstimatedValue() +
+        uint256 poolTotalEstimatedValuePlusInterest = poolTotalEstimatedValue +
                 totalInterestCollected;
 
         if (poolTotalEstimatedValue == 0) {
@@ -320,12 +320,12 @@ contract LenderCommitmentGroup_Smart is
 
 
      
-    function sharesExchangeRateInverse() public view returns (uint256 rate_) {
+    function sharesExchangeRateInverse() public virtual view returns (uint256 rate_) {
         /*
         Should get slightly less shares than principal tokens put in !! diluted by ratio of pools actual equity 
        */
 
-        uint256 poolTotalEstimatedValue = getPoolTotalEstimatedValue();
+        /*uint256 poolTotalEstimatedValue = getPoolTotalEstimatedValue();
         uint256 poolTotalEstimatedValuePlusInterest = getPoolTotalEstimatedValue() +
                 totalInterestCollected;
 
@@ -336,7 +336,10 @@ contract LenderCommitmentGroup_Smart is
         rate_ =
             (poolTotalEstimatedValue *
                 EXCHANGE_RATE_EXPANSION_FACTOR) /
-            poolTotalEstimatedValuePlusInterest;
+            poolTotalEstimatedValuePlusInterest;*/
+
+            return  EXCHANGE_RATE_EXPANSION_FACTOR * EXCHANGE_RATE_EXPANSION_FACTOR /  sharesExchangeRate(); 
+
     }
 
 

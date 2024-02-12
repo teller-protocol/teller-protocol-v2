@@ -183,7 +183,52 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
 
         initialize_group_contract();
 
-          lenderCommitmentGroupSmart.set_mockSharesExchangeRate( 1e36 );  //this means 1:1 
+          lenderCommitmentGroupSmart.set_mockSharesExchangeRate( 1e36 );  //this means 1:1 since it is expanded
+
+       // lenderCommitmentGroupSmart.set_totalPrincipalTokensCommitted(1000000);
+       // lenderCommitmentGroupSmart.set_totalInterestCollected(0);
+
+        lenderCommitmentGroupSmart.set_principalTokensCommittedByLender(
+            address(lender),
+            1000000
+        );
+
+        vm.prank(address(lender));
+        principalToken.approve(address(lenderCommitmentGroupSmart), 1000000);
+
+        vm.prank(address(lender));
+
+        uint256 sharesAmount = 1000000;
+        //should have all of the shares at this point
+        lenderCommitmentGroupSmart.mock_mintShares(
+            address(lender),
+            sharesAmount
+        );
+
+        vm.prank(address(lender));
+        
+         uint256 receivedPrincipalTokens 
+          = lenderCommitmentGroupSmart.burnSharesToWithdrawEarnings(
+                sharesAmount,
+                address(lender)
+            );
+
+        uint256 expectedReceivedPrincipalTokens = 1000000; // the orig amt !
+        assertEq(
+            receivedPrincipalTokens,
+            expectedReceivedPrincipalTokens,
+            "Received an unexpected amount of principaltokens"
+        );
+    }
+
+
+    function test_burnShares_simple_with_ratio_math() public {
+        principalToken.transfer(address(lenderCommitmentGroupSmart), 1e18);
+        // collateralToken.transfer(address(lenderCommitmentGroupSmart),1e18);
+
+        initialize_group_contract();
+
+          lenderCommitmentGroupSmart.set_mockSharesExchangeRate( 2e36 );  //this means 1:1 since it is expanded
 
        // lenderCommitmentGroupSmart.set_totalPrincipalTokensCommitted(1000000);
        // lenderCommitmentGroupSmart.set_totalInterestCollected(0);
@@ -288,7 +333,7 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
     }
 
 
-    function test_burnShares_after_interest_payments() public {
+    function test_shares_exchange_rate_after_interest_payments() public {
         principalToken.transfer(address(lenderCommitmentGroupSmart), 1e18);
         //  collateralToken.transfer(address(lenderCommitmentGroupSmart),1e18);
 
@@ -310,20 +355,8 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
             sharesAmount
         );
 
-        vm.prank(address(lender));
+        //todo 
         
-        uint256 receivedPrincipalTokens
-          = lenderCommitmentGroupSmart.burnSharesToWithdrawEarnings(
-                sharesAmount,
-                address(lender)
-            );
-
-        uint256 expectedReceivedPrincipalTokens = 1000000; // the orig amt !
-        assertEq(
-            receivedPrincipalTokens,
-            expectedReceivedPrincipalTokens,
-            "Received an unexpected amount of principaltokens"
-        );
     }
 
     function test_acceptFundsForAcceptBid() public {

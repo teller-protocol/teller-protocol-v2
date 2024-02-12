@@ -476,7 +476,7 @@ contract LenderCommitmentGroup_Smart is
         external
         
         returns (
-            uint256 principalTokenSplitAmount_
+            uint256
              
         )
     {
@@ -533,7 +533,8 @@ contract LenderCommitmentGroup_Smart is
 
 
         principalToken.transfer(_recipient, principalTokenValueToWithdraw);
-     
+
+        return principalTokenValueToWithdraw;
 
        
     }

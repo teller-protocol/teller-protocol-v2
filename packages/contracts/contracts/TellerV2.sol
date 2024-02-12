@@ -1184,13 +1184,25 @@ contract TellerV2 is
 
         uint32 defaultDuration = _getBidDefaultDuration(_bidId);
 
-        if (defaultDuration == 0) return false;
+        //if (defaultDuration == 0) return false;
 
         uint32 dueDate = calculateNextDueDate(_bidId);
 
         return
             uint32(block.timestamp) >
             dueDate + defaultDuration + _additionalDelay;
+    }
+
+    function getLoanDefaultTimestamp(
+        uint256 _bidId
+    ) public view returns (uint256) {
+        Bid storage bid = bids[_bidId]; 
+
+        uint32 defaultDuration = _getBidDefaultDuration(_bidId); 
+
+        uint32 dueDate = calculateNextDueDate(_bidId);
+
+        return dueDate + defaultDuration;
     }
 
     function getCollateralManagerForBid(uint256 _bidId)

@@ -157,7 +157,7 @@ contract LenderCommitmentGroup_Smart is
     uint256 public totalPrincipalTokensCommitted; //this can be less than we expect if tokens are donated to the contract and withdrawn
 
     uint256 public totalPrincipalTokensLended;
-    uint256 public totalExpectedInterestEarned;
+    //uint256 public totalExpectedInterestEarned;
     uint256 public totalPrincipalTokensRepaid; //subtract this and the above to find total principal tokens outstanding for loans
 
     uint256 public totalCollateralTokensEscrowedForLoans; // we use this in conjunction with totalPrincipalTokensLended for a psuedo TWAP price oracle of C tokens, used for exiting  .  Nice bc it is averaged over all of our relevant loans, not the current price.
@@ -434,24 +434,14 @@ contract LenderCommitmentGroup_Smart is
         );
 
         totalPrincipalTokensLended += _principalAmount;
-        totalExpectedInterestEarned += calculateExpectedInterestEarned( _principalAmount ,_loanDuration,_interestRate);
+        //totalExpectedInterestEarned += calculateExpectedInterestEarned( _principalAmount ,_loanDuration,_interestRate);
 
 
         activeBids[_bidId] = true ; //bool for now 
         //emit event
     }
 
-
-    function calculateExpectedInterestEarned (
-        uint256 _principalAmount,
-        uint32 _loanDuration,
-        uint16 _interestRate
-    ) public view returns (uint256){
  
-        return FullMath.mulDiv(  _principalAmount.percent(_interestRate) , _loanDuration, 365 days ) ;
-
-    }
-
     function  _acceptBidWithRepaymentListener(
         uint256 _bidId 
     ) internal {
@@ -526,12 +516,7 @@ contract LenderCommitmentGroup_Smart is
 
       */
 
-       // todo fix me ? 
-
-        console.log("sent split amt ");
-         console.logUint(principalTokenValueToWithdraw);
-
-
+      
         principalToken.transfer(_recipient, principalTokenValueToWithdraw);
 
         return principalTokenValueToWithdraw;
@@ -550,7 +535,9 @@ contract LenderCommitmentGroup_Smart is
         int256 _tokenAmountDifference
     )  public {
         require( activeBids[_bidId] == true  , "Invalid bid id for liquidateDefaultedLoanWithIncentive");
-          ( int256 minAmountDifference, uint256 amountDue ) = getMinimumAmountDifferenceToCloseDefaultedLoan(_bidId);
+
+        uint256 amountDue = getAmountOwedForBid(_bidId);
+           int256 minAmountDifference  = getMinimumAmountDifferenceToCloseDefaultedLoan(_bidId,amountDue);
 
 
         require( _tokenAmountDifference >= minAmountDifference , "Insufficient tokenAmountDifference");
@@ -579,6 +566,21 @@ contract LenderCommitmentGroup_Smart is
  
         
     }
+
+    function getAmountOwedForBid(uint256 _bidId)
+     public view returns (uint256 amountOwed_)
+      {
+
+         Payment memory amountOwedPayment = ITellerV2(TELLER_V2).calculateAmountOwed(
+            _bidId, 
+            block.timestamp
+            )  ;
+
+        amountOwed_ =  amountOwedPayment.principal + amountOwedPayment.interest ;  
+    }
+    
+
+ 
     
     /*
         This function will calculate the incentive amount (using a uniswap bonus plus a timer)
@@ -587,23 +589,21 @@ contract LenderCommitmentGroup_Smart is
         Starts at 5000 and ticks down to -5000 
     */
     function getMinimumAmountDifferenceToCloseDefaultedLoan(
-        uint256 _bidId
-    ) public view returns (int256 amountDifference_, uint256 amountOwed_) {
+        uint256 _bidId,
+        uint256 _amountOwed
+    ) public view returns (int256 amountDifference_ ) {
+       
+        uint256 loanDefaultedTimeStamp = ITellerV2(TELLER_V2).getLoanDefaultTimestamp(_bidId);
+        
+        uint256 secondsSinceDefaulted = loanDefaultedTimeStamp > 0 ? loanDefaultedTimeStamp  :  100000; //need callback for this !? 
 
-         Payment memory amountOwedPayment = ITellerV2(TELLER_V2).calculateAmountOwed(
-            _bidId, 
-            block.timestamp
-            )  ;
+        int256 incentiveMultiplier = int256(10000) - int256( secondsSinceDefaulted );
 
-        amountOwed_ =  amountOwedPayment.principal + amountOwedPayment.interest   ;
+        if(incentiveMultiplier < -10000){
+            incentiveMultiplier = -10000;
+        }
 
-        require( amountOwed_ > 0, "amountOwed_: detected overflow");
-
-        uint256 secondsSinceDefaulted = 0;
-
-        int256 incentiveMultiplier = int256(20000) - int256( Math.max( 100000,  secondsSinceDefaulted ));
-
-        amountDifference_ = int256(amountOwed_) * incentiveMultiplier / int256(10000); 
+        amountDifference_ = int256(_amountOwed) * incentiveMultiplier / int256(10000); 
       //  amountDifference_ =  Math.mulDiv( amountOwed_ , incentiveMultiplier , 100000 );
         
     }

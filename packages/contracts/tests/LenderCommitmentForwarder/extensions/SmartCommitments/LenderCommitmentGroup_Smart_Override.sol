@@ -13,6 +13,7 @@ contract LenderCommitmentGroup_Smart_Override is LenderCommitmentGroup_Smart {
 
     uint256 mockMaxPrincipalPerCollateralAmount;
     uint256 mockSharesExchangeRate;
+    int256 mockMinimumAmountDifferenceToCloseDefaultedLoan;
 
     constructor(address _tellerV2, address _smartCommitmentForwarder, address _uniswapV3Pool)
         LenderCommitmentGroup_Smart(_tellerV2,_smartCommitmentForwarder, _uniswapV3Pool)
@@ -20,6 +21,10 @@ contract LenderCommitmentGroup_Smart_Override is LenderCommitmentGroup_Smart {
 
     function set_mockSharesExchangeRate(uint256 _mockRate) public {
         mockSharesExchangeRate = _mockRate;
+    }
+
+    function set_mockMinimumAmountDifferenceToCloseDefaultedLoan(int256 _amt) public {
+        mockMinimumAmountDifferenceToCloseDefaultedLoan = _amt;
     }
 
     function set_totalPrincipalTokensCommitted(uint256 _mockAmt) public {

@@ -187,5 +187,10 @@ interface ITellerV2 {
     function liquidateLoanFullWithRecipient(uint256 _bidId, address _recipient)
         external;
         
+
+    function getLoanDefaultTimestamp(
+        uint256 _bidId
+    ) external view returns (uint256);
+
     
 }

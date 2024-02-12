@@ -359,6 +359,35 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
         
     }
 
+
+    function test_liquidateDefaultedLoanWithIncentive() public {
+        
+
+        lenderCommitmentGroupSmart.set_mockMinimumAmountDifferenceToCloseDefaultedLoan(400 );  //the default for now 
+
+        uint256 sharesAmount = 10000;
+
+        lenderCommitmentGroupSmart.liquidateDefaultedLoanWithIncentive(
+            address(lender),
+            sharesAmount
+        );
+
+    }
+
+    function test_getMinimumAmountDifferenceToCloseDefaultedLoan() public {
+
+
+        uint256 bidId = 0;
+
+        int256 min_amount = lenderCommitmentGroupSmart.getMinimumAmountDifferenceToCloseDefaultedLoan(
+            bidId 
+        );
+
+
+
+
+    }
+
     function test_acceptFundsForAcceptBid() public {
         lenderCommitmentGroupSmart.set_mock_getMaxPrincipalPerCollateralAmount(
             100 * 1e18

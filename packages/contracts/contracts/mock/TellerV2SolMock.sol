@@ -42,6 +42,15 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
     }
 
 
+
+    function getLoanDefaultTimestamp(
+        uint256 _bidId
+    ) external view returns (uint256){
+  //need to be able to mock this 
+    } 
+
+    
+
     function lenderCloseLoanWithRecipient(uint256 _bidId, address _recipient)
         external
         

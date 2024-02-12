@@ -537,7 +537,10 @@ contract LenderCommitmentGroup_Smart is
         require( activeBids[_bidId] == true  , "Invalid bid id for liquidateDefaultedLoanWithIncentive");
 
         uint256 amountDue = getAmountOwedForBid(_bidId);
-           int256 minAmountDifference  = getMinimumAmountDifferenceToCloseDefaultedLoan(_bidId,amountDue);
+
+        uint256 loanDefaultedTimeStamp = ITellerV2(TELLER_V2).getLoanDefaultTimestamp(_bidId);
+
+        int256 minAmountDifference  = getMinimumAmountDifferenceToCloseDefaultedLoan(_bidId,amountDue,loanDefaultedTimeStamp);
 
 
         require( _tokenAmountDifference >= minAmountDifference , "Insufficient tokenAmountDifference");
@@ -590,12 +593,14 @@ contract LenderCommitmentGroup_Smart is
     */
     function getMinimumAmountDifferenceToCloseDefaultedLoan(
         uint256 _bidId,
-        uint256 _amountOwed
+        uint256 _amountOwed,
+        uint256 _loanDefaultedTimestamp
     ) public view returns (int256 amountDifference_ ) {
        
-        uint256 loanDefaultedTimeStamp = ITellerV2(TELLER_V2).getLoanDefaultTimestamp(_bidId);
+        require(_loanDefaultedTimestamp > 0);
+        require(block.timestamp > _loanDefaultedTimestamp);
         
-        uint256 secondsSinceDefaulted = loanDefaultedTimeStamp > 0 ? loanDefaultedTimeStamp  :  100000; //need callback for this !? 
+        uint256 secondsSinceDefaulted =  block.timestamp - _loanDefaultedTimestamp; 
 
         int256 incentiveMultiplier = int256(10000) - int256( secondsSinceDefaulted );
 
@@ -604,8 +609,7 @@ contract LenderCommitmentGroup_Smart is
         }
 
         amountDifference_ = int256(_amountOwed) * incentiveMultiplier / int256(10000); 
-      //  amountDifference_ =  Math.mulDiv( amountOwed_ , incentiveMultiplier , 100000 );
-        
+       
     }
 
     function abs(int x) private pure returns (uint) {

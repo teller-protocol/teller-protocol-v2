@@ -365,11 +365,14 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
 
         lenderCommitmentGroupSmart.set_mockMinimumAmountDifferenceToCloseDefaultedLoan(400 );  //the default for now 
 
-        uint256 sharesAmount = 10000;
+        uint256 bidId = 0;
+
+        int256 tokenAmountDifference = 4000;
 
         lenderCommitmentGroupSmart.liquidateDefaultedLoanWithIncentive(
-            address(lender),
-            sharesAmount
+           bidId, 
+           tokenAmountDifference
+           
         );
 
     }
@@ -378,9 +381,14 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
 
 
         uint256 bidId = 0;
+        uint256 amountDue = 500;
+
+        uint256 loanDefaultTimestamp = block.timestamp - 1000;
 
         int256 min_amount = lenderCommitmentGroupSmart.getMinimumAmountDifferenceToCloseDefaultedLoan(
-            bidId 
+            bidId,
+            amountDue,
+            loanDefaultTimestamp
         );
 
 

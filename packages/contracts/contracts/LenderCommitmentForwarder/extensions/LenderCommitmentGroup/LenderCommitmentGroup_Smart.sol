@@ -177,6 +177,7 @@ contract LenderCommitmentGroup_Smart is
     mapping(address => uint256) public principalTokensCommittedByLender;
     mapping(uint256 => bool) public activeBids;
 
+    //this excludes interest 
     int256 tokenDifferenceFromLiquidations;
 
      
@@ -294,7 +295,7 @@ contract LenderCommitmentGroup_Smart is
     }
 
     /**
-     * @notice It calculates the current scaled exchange rate for a whole Teller Token based of the underlying token balance.
+     * @notice This determines the number of shares you get for depositing principal tokens and the number of principal tokens you receive for burning shares
      * @return rate_ The current exchange rate, scaled by the EXCHANGE_RATE_FACTOR.
      */
 
@@ -321,22 +322,7 @@ contract LenderCommitmentGroup_Smart is
 
      
     function sharesExchangeRateInverse() public virtual view returns (uint256 rate_) {
-        /*
-        Should get slightly less shares than principal tokens put in !! diluted by ratio of pools actual equity 
-       */
-
-        /*uint256 poolTotalEstimatedValue = getPoolTotalEstimatedValue();
-        uint256 poolTotalEstimatedValuePlusInterest = getPoolTotalEstimatedValue() +
-                totalInterestCollected;
-
-        if (poolTotalEstimatedValue == 0) {
-            return EXCHANGE_RATE_EXPANSION_FACTOR; // 1 to 1 for first swap
-        }
-
-        rate_ =
-            (poolTotalEstimatedValue *
-                EXCHANGE_RATE_EXPANSION_FACTOR) /
-            poolTotalEstimatedValuePlusInterest;*/
+        
 
             return  EXCHANGE_RATE_EXPANSION_FACTOR * EXCHANGE_RATE_EXPANSION_FACTOR /  sharesExchangeRate(); 
 
@@ -539,10 +525,7 @@ contract LenderCommitmentGroup_Smart is
 
         int256 minAmountDifference  = getMinimumAmountDifferenceToCloseDefaultedLoan(_bidId,amountDue,loanDefaultedTimeStamp);
 
-
         require( _tokenAmountDifference >= minAmountDifference , "Insufficient tokenAmountDifference");
-
-
         
 
         if( _tokenAmountDifference > 0){
@@ -561,10 +544,9 @@ contract LenderCommitmentGroup_Smart is
             tokenDifferenceFromLiquidations  -= int256(tokensToGiveToSender);
         }
 
-        //this will give collateral to the caller... 
+        //this will give collateral to the caller
         ITellerV2(TELLER_V2).lenderCloseLoanWithRecipient(_bidId, msg.sender);
- 
-        
+         
     }
 
     function getAmountOwedForBid(uint256 _bidId, bool _includeInterest)

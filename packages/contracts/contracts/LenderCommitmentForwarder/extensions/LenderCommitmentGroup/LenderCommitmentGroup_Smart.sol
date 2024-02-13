@@ -344,10 +344,7 @@ contract LenderCommitmentGroup_Smart is
 
 
     function getPoolTotalEstimatedValue() internal view returns (uint256 poolTotalEstimatedValue_) {
-        
-      
-        uint256 tokenDifferenceUnsigned =  tokenDifferenceFromLiquidations > int256(0) ? uint256(tokenDifferenceFromLiquidations) : 0;
-
+         
         int256 poolTotalEstimatedValueSigned = int256(totalPrincipalTokensCommitted) + tokenDifferenceFromLiquidations;
 
           //if the poolTotalEstimatedValue_ is less than 0, we treat it as 0.  This will prob cause issues ? 
@@ -536,7 +533,7 @@ contract LenderCommitmentGroup_Smart is
     )  public {
         require( activeBids[_bidId] == true  , "Invalid bid id for liquidateDefaultedLoanWithIncentive");
 
-        uint256 amountDue = getAmountOwedForBid(_bidId);
+        uint256 amountDue = getAmountOwedForBid(_bidId, false);
 
         uint256 loanDefaultedTimeStamp = ITellerV2(TELLER_V2).getLoanDefaultTimestamp(_bidId);
 
@@ -570,7 +567,7 @@ contract LenderCommitmentGroup_Smart is
         
     }
 
-    function getAmountOwedForBid(uint256 _bidId)
+    function getAmountOwedForBid(uint256 _bidId, bool _includeInterest)
      public view returns (uint256 amountOwed_)
       {
 
@@ -579,11 +576,10 @@ contract LenderCommitmentGroup_Smart is
             block.timestamp
             )  ;
 
-        amountOwed_ =  amountOwedPayment.principal + amountOwedPayment.interest ;  
-    }
-    
-
- 
+        amountOwed_ = _includeInterest ?  amountOwedPayment.principal + amountOwedPayment.interest :  amountOwedPayment.principal ;
+            
+            /// + amountOwedPayment.interest ;  
+    } 
     
     /*
         This function will calculate the incentive amount (using a uniswap bonus plus a timer)
@@ -597,11 +593,13 @@ contract LenderCommitmentGroup_Smart is
         uint256 _loanDefaultedTimestamp
     ) public view returns (int256 amountDifference_ ) {
        
-        require(_loanDefaultedTimestamp > 0);
-        require(block.timestamp > _loanDefaultedTimestamp);
+        require(_loanDefaultedTimestamp > 0,"Loan defaulted timestamp must be greater than zero");
+        require(block.timestamp > _loanDefaultedTimestamp,"Loan defaulted timestamp must be in the past");
         
         uint256 secondsSinceDefaulted =  block.timestamp - _loanDefaultedTimestamp; 
 
+
+          //make this 10000 be a param in the constructor 
         int256 incentiveMultiplier = int256(10000) - int256( secondsSinceDefaulted );
 
         if(incentiveMultiplier < -10000){

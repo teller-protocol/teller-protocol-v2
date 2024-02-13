@@ -383,6 +383,7 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
         uint256 bidId = 0;
         uint256 amountDue = 500;
 
+        vm.warp(9000);
         uint256 loanDefaultTimestamp = block.timestamp - 1000;
 
         int256 min_amount = lenderCommitmentGroupSmart.getMinimumAmountDifferenceToCloseDefaultedLoan(
@@ -392,7 +393,7 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
         );
 
 
-
+       //assertEq();
 
     }
 

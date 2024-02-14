@@ -29,6 +29,7 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
 
     User private borrower;
     User private lender;
+    User private liquidator;
 
     TestERC20Token principalToken;
 
@@ -44,6 +45,7 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
     function setUp() public {
         borrower = new User();
         lender = new User();
+        liquidator = new User();
 
         _tellerV2 = new TellerV2SolMock();
         _smartCommitmentForwarder = new SmartCommitmentForwarder();
@@ -314,6 +316,8 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
 
      //test this thoroughly 
     function test_get_shares_exchange_rate() public {
+          initialize_group_contract();
+
         lenderCommitmentGroupSmart.set_totalInterestCollected(1000000);
 
         lenderCommitmentGroupSmart.set_principalTokensCommittedByLender(
@@ -334,10 +338,11 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
 
 
     function test_shares_exchange_rate_after_interest_payments() public {
+
+          initialize_group_contract();
         principalToken.transfer(address(lenderCommitmentGroupSmart), 1e18);
         //  collateralToken.transfer(address(lenderCommitmentGroupSmart),1e18);
-
-        initialize_group_contract();
+ 
 
         //   lenderCommitmentGroupSmart.set_totalPrincipalTokensCommitted(1000000);
      
@@ -361,7 +366,9 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
 
 
     function test_liquidateDefaultedLoanWithIncentive() public {
-        
+          initialize_group_contract();
+
+        principalToken.transfer(address(liquidator), 1e18);
 
         lenderCommitmentGroupSmart.mock_setMinimumAmountDifferenceToCloseDefaultedLoan(400 );  //the default for now 
 
@@ -373,10 +380,13 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
    
        // vm.warp(1000);
 
+       vm.prank(address(liquidator));
+       principalToken.approve(address(lenderCommitmentGroupSmart), 1e18);
+
        lenderCommitmentGroupSmart.mock_setMinimumAmountDifferenceToCloseDefaultedLoan(2000);
 
         int256 tokenAmountDifference = 4000;
-
+        vm.prank(address(liquidator));
         lenderCommitmentGroupSmart.liquidateDefaultedLoanWithIncentive(
            bidId, 
            tokenAmountDifference
@@ -386,7 +396,7 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
     }
 
     function test_getMinimumAmountDifferenceToCloseDefaultedLoan() public {
-
+  initialize_group_contract();
 
         uint256 bidId = 0;
         uint256 amountDue = 500;
@@ -467,6 +477,9 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
 
         principalToken.transfer(address(lenderCommitmentGroupSmart), 1e18);
         collateralToken.transfer(address(lenderCommitmentGroupSmart), 1e18);
+
+
+
 
         initialize_group_contract();
 

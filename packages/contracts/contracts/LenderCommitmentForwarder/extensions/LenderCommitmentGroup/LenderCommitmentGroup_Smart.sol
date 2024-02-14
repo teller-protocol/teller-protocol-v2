@@ -539,6 +539,8 @@ contract LenderCommitmentGroup_Smart is
             //this is used when the collateral value is higher than the principal (rare) 
             uint256 tokensToTakeFromSender = abs( _tokenAmountDifference );
 
+            
+
             IERC20(principalToken).transferFrom( msg.sender, address(this), amountDue + tokensToTakeFromSender );
 
             tokenDifferenceFromLiquidations  += int256(tokensToTakeFromSender);

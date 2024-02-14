@@ -196,6 +196,14 @@ contract LenderCommitmentGroup_Smart is
         );
         _;
     }
+
+
+    modifier bidIsActiveForGroup(uint256 _bidId){
+         require( activeBids[_bidId] == true  ,
+          "Bid is not active for group");
+
+        _;
+    }   
  
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor(
@@ -516,9 +524,8 @@ contract LenderCommitmentGroup_Smart is
     function liquidateDefaultedLoanWithIncentive(
         uint256 _bidId,
         int256 _tokenAmountDifference
-    )  public {
-        require( activeBids[_bidId] == true  , "Invalid bid id for liquidateDefaultedLoanWithIncentive");
-
+    )  public bidIsActiveForGroup(_bidId) {
+       
         uint256 amountDue = getAmountOwedForBid(_bidId, false);
 
         uint256 loanDefaultedTimeStamp = ITellerV2(TELLER_V2).getLoanDefaultTimestamp(_bidId);
@@ -573,7 +580,7 @@ contract LenderCommitmentGroup_Smart is
         uint256 _bidId,
         uint256 _amountOwed,
         uint256 _loanDefaultedTimestamp
-    ) public view returns (int256 amountDifference_ ) {
+    ) public view virtual returns (int256 amountDifference_ ) {
        
         require(_loanDefaultedTimestamp > 0,"Loan defaulted timestamp must be greater than zero");
         require(block.timestamp > _loanDefaultedTimestamp,"Loan defaulted timestamp must be in the past");

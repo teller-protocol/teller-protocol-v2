@@ -20,6 +20,9 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
     PaymentCycleType globalBidPaymentCycleType = PaymentCycleType.Seconds;
     uint32 globalBidPaymentCycleDuration = 3000;
 
+
+    uint256 mockLoanDefaultTimestamp;
+  
     Bid mockBid;
 
     function setMarketRegistry(address _marketRegistry) public {
@@ -43,13 +46,20 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
 
 
 
+
+    function mock_setLoanDefaultTimestamp(
+        uint256 _defaultedAt
+    ) external   returns (uint256){
+       mockLoanDefaultTimestamp = _defaultedAt;
+    } 
+
+
     function getLoanDefaultTimestamp(
         uint256 _bidId
     ) external view returns (uint256){
-  //need to be able to mock this 
+      return mockLoanDefaultTimestamp;
     } 
 
-    
 
     function lenderCloseLoanWithRecipient(uint256 _bidId, address _recipient)
         external

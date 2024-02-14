@@ -23,9 +23,38 @@ contract LenderCommitmentGroup_Smart_Override is LenderCommitmentGroup_Smart {
         mockSharesExchangeRate = _mockRate;
     }
 
-    function set_mockMinimumAmountDifferenceToCloseDefaultedLoan(int256 _amt) public {
-        mockMinimumAmountDifferenceToCloseDefaultedLoan = _amt;
+       function set_mockBidAsActiveForGroup(uint256 _bidId,bool _active) public {
+        activeBids[_bidId] = _active;
     }
+ 
+
+
+     function mock_setMinimumAmountDifferenceToCloseDefaultedLoan(
+        int256 _amt
+    ) external   returns (uint256){
+       mockMinimumAmountDifferenceToCloseDefaultedLoan = _amt;
+    } 
+
+
+    function getMinimumAmountDifferenceToCloseDefaultedLoan(
+        uint256 _bidId,
+        uint256 _amountOwed,
+        uint256 _loanDefaultedTimestamp
+    ) public view override returns (int256 amountDifference_ ) {
+
+        return mockMinimumAmountDifferenceToCloseDefaultedLoan;
+    }
+    
+    function super_getMinimumAmountDifferenceToCloseDefaultedLoan(
+        uint256 _bidId,
+        uint256 _amountOwed,
+        uint256 _loanDefaultedTimestamp
+    ) public view returns (int256  ) {
+
+        return super.getMinimumAmountDifferenceToCloseDefaultedLoan(_bidId,_amountOwed,_loanDefaultedTimestamp);
+    }
+
+
 
     function set_totalPrincipalTokensCommitted(uint256 _mockAmt) public {
         totalPrincipalTokensCommitted = _mockAmt;

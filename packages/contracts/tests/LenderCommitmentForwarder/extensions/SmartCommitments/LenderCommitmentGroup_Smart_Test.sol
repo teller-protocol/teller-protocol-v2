@@ -363,9 +363,17 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
     function test_liquidateDefaultedLoanWithIncentive() public {
         
 
-        lenderCommitmentGroupSmart.set_mockMinimumAmountDifferenceToCloseDefaultedLoan(400 );  //the default for now 
+        lenderCommitmentGroupSmart.mock_setMinimumAmountDifferenceToCloseDefaultedLoan(400 );  //the default for now 
 
         uint256 bidId = 0;
+
+        lenderCommitmentGroupSmart.set_mockBidAsActiveForGroup(bidId,true);
+    
+       // _tellerV2.mock_setLoanDefaultTimestamp(block.timestamp);
+   
+       // vm.warp(1000);
+
+       lenderCommitmentGroupSmart.mock_setMinimumAmountDifferenceToCloseDefaultedLoan(2000);
 
         int256 tokenAmountDifference = 4000;
 
@@ -383,10 +391,12 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
         uint256 bidId = 0;
         uint256 amountDue = 500;
 
+       _tellerV2.mock_setLoanDefaultTimestamp(block.timestamp);
+   
         vm.warp(9000);
         uint256 loanDefaultTimestamp = block.timestamp - 1000;
 
-        int256 min_amount = lenderCommitmentGroupSmart.getMinimumAmountDifferenceToCloseDefaultedLoan(
+        int256 min_amount = lenderCommitmentGroupSmart.super_getMinimumAmountDifferenceToCloseDefaultedLoan(
             bidId,
             amountDue,
             loanDefaultTimestamp

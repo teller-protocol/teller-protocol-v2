@@ -264,7 +264,7 @@ const buildAndDeploy = async ({
     }
   }
 
-  const buildId = await build(args);
+  const buildId = await build(args);  
   try {
     await deploy({
       subgraph,

@@ -1,20 +1,13 @@
 
+### Manually build 
+ Yarn contracts export --network polygon
+
+ yarn subgraph hbs -D `./packages/subgraph/config/matic.json` -o . -e yaml
+ yarn subgraph graph codegen
+
+ yarn subgraph graph build 
 
 
-### ROI 
+ ### Deploying 
 
-commitment rewards 
-
-`RewardTokenAmount` = `allocation.RewardPerPrincipal` * `commitment.MaxLoanAmountFromCommitment`
-
-`MaxRewardAmount` = Min(`RewardTokenAmount`, `allocation.AllocatedRewardTokenAmount`)
-
- `RewardinPrincipalTokens` = `MaxRewardAmount` * maxPrincipalPerCollateral 
-
-convert into ROI
-
-`ROI` = `RewardPrincipalTokens` / `MaxLoanAmountFromCommitment`   
-
-convert into APY
-
-`APY` = `ROI` * `1 year` / `CommitmentDuration`
+ Want to sync after LCF_A was deployed 

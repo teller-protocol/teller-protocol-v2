@@ -32,9 +32,6 @@ const Network: Record<string, number> = {
   "arbitrum-one": 42161
 };
 
-const ENABLE_COOKIE = false;
-
-
 export const makeStudio = async (
   networkConfig: INetworkConfig
 ): Promise<InnerAPI> => {
@@ -42,6 +39,8 @@ export const makeStudio = async (
   const memlet = makeMemlet(disklet);
 
   interface IConfig {
+    
+    networkWallets:{ [owner:string] : IDeployKeyConfig}
     [owner: string]: IOwnerConfig | undefined;
   }
   interface IOwnerConfig {
@@ -51,6 +50,12 @@ export const makeStudio = async (
     };
     deployKey?: string;
   }
+  interface IDeployKeyConfig {
+    
+    deployKey: string;
+    network: string;
+  }
+
   const getConfig = async (): Promise<IConfig> => {
     return await memlet.getJson("studio.json").catch(() => ({}));
   };
@@ -121,31 +126,49 @@ export const makeStudio = async (
       if (!socket.isConnected()) await socket.connect();
 
       let cookie: string | null = null;
-
-      if (ENABLE_COOKIE) {
-
-        const existingCookie = studioConfig[networkConfig.owner.address]?.Cookie;
-        if (existingCookie) {
-          if (new Date(existingCookie.expiration).getTime() > Date.now()) {
-            cookie = existingCookie.value;
-          } else {
-            networkConfig.logger?.log("Cookie expired, logging in again");
-          }
+      const Cookie = studioConfig[networkConfig.owner.address]?.Cookie;
+      if (Cookie) {
+        if (new Date(Cookie.expiration).getTime() > Date.now()) {
+          cookie = Cookie.value;
         } else {
-          networkConfig.logger?.log(
-            "Not logged in, attempting to log in via ledger..."
-          );
+          networkConfig.logger?.log("Cookie expired, logging in again");
         }
-
+      } else {
+        networkConfig.logger?.log(
+          "Not logged in, attempting to log in via ledger..."
+        );
       }
-     
 
       if (!cookie) {
         const transport = await Transport.open("");
         const eth = new AppEth(transport);
+        
+        let knownAddress = "0xF3E864eAaFf9Cf2cD21A862d51D875093b4B5baA"
 
-        const path = "44'/60'/0'/0/0";
-        const { address } = await eth.getAddress(path);
+        let foundPath = undefined
+        let foundAddress = undefined
+
+        for( let i =0; i< 99 ; i++) {
+
+          const path = `44'/60'/0'/0/${i.toString()}`;
+          console.log("searching ", path)
+          const { address: addressAtPath } = await eth.getAddress(path);
+          
+          console.log({addressAtPath})
+          if(addressAtPath == knownAddress){
+            foundAddress = addressAtPath; 
+            foundPath = path;
+            break
+          }
+        }
+
+        if( !foundPath || !foundAddress) {
+
+          throw new Error("Could not find path")
+        }
+
+       // const path = "44'/60'/0'/0/0";
+       // const { address } = await eth.getAddress(path);
 
         const message =
           "Sign this message to prove you have access to this wallet in order to sign in to thegraph.com/studio.\n\n" +
@@ -153,7 +176,7 @@ export const makeStudio = async (
           `Timestamp: ${Date.now()}`;
 
         const sig = await eth.signPersonalMessage(
-          path,
+          foundPath,
           Buffer.from(message).toString("hex")
         );
         const signature = `0x${sig.r}${sig.s}${sig.v.toString(16)}`;
@@ -166,7 +189,7 @@ export const makeStudio = async (
             ethAddress: networkConfig.owner.address,
             message,
             signature,
-            multisigOwnerAddress: address,
+            multisigOwnerAddress: foundAddress,
             networkId: Network[networkConfig.owner.network]
           },
           query:
@@ -335,7 +358,7 @@ export const makeStudio = async (
     getLatestVersion,
     watchVersionUpdate,
     beforeDeploy: async () => {
-      const deployKey = studioConfig[networkConfig.owner.address]?.deployKey;
+      const deployKey = studioConfig["networkWallets"][networkConfig.owner.address]?.deployKey;
       if (!deployKey) throw new Error("No deploy key found");
 
       await auth({

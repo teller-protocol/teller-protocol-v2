@@ -341,6 +341,53 @@ dataSources:
           handler: handleUpdatedCommitmentBorrower
       file: ./src/lender-commitment/mapping.ts
 {{/if}}
+{{#if contracts.lender_commitment_alpha.enabled}}
+  - kind: ethereum/contract
+    name: LenderCommitmentForwarderAlpha
+    network: {{network}}
+    context:
+      isRolloverable:
+        type: Bool
+        data: true
+    source:
+    {{#with contracts.lender_commitment_alpha}}
+      address: '{{address}}'
+      abi: LenderCommitmentForwarderAlpha
+      startBlock: {{block}}
+    {{/with}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Protocol
+        - Commitment
+        - Token
+        - TokenVolume
+        - CollateralPairTokenVolume
+        - LoanStatusCount
+      abis:
+        - name: LenderCommitmentForwarder
+          file: ./abis/{{export_network_name}}_LenderCommitmentForwarder.json
+        - name: LenderCommitmentForwarderAlpha
+          file: ./abis/{{export_network_name}}_LenderCommitmentForwarderAlpha.json
+        - name: ERC165
+          file: ../contracts/generated/artifacts/@openzeppelin/contracts/utils/introspection/ERC165.sol/ERC165.json
+        - name: IERC20Metadata
+          file: ../contracts/generated/artifacts/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol/IERC20Metadata.json
+      eventHandlers:
+        - event: CreatedCommitment(indexed uint256,address,uint256,address,uint256)
+          handler: handleCreatedCommitment
+        - event: UpdatedCommitment(indexed uint256,address,uint256,address,uint256)
+          handler: handleUpdatedCommitment
+        - event: DeletedCommitment(indexed uint256)
+          handler: handleDeletedCommitment
+        - event: ExercisedCommitment(indexed uint256,address,uint256,uint256)
+          handler: handleExercisedCommitment
+        - event: UpdatedCommitmentBorrowers(indexed uint256)
+          handler: handleUpdatedCommitmentBorrower
+      file: ./src/lender-commitment/mapping.ts
+{{/if}}
 {{#if contracts.collateral_manager.enabled}}
   - kind: ethereum/contract
     name: CollateralManager

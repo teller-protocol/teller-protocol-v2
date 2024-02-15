@@ -393,7 +393,7 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
                 terms: Terms({
                     paymentCycleAmount: 10,
                     paymentCycle: 2000,
-                    APR: 10
+                    APR: 0
                 }),
                 state: BidState.ACCEPTED,
                 paymentType: PaymentType.EMI
@@ -401,6 +401,9 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
 
 
        }));
+
+
+         vm.warp(1000);
 
        lenderCommitmentGroupSmart.set_mockBidAsActiveForGroup(bidId,true); 
       
@@ -435,8 +438,8 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
 
        _tellerV2.mock_setLoanDefaultTimestamp(block.timestamp);
    
-        vm.warp(9000);
-        uint256 loanDefaultTimestamp = block.timestamp - 1000;
+        vm.warp(10000);
+        uint256 loanDefaultTimestamp = block.timestamp - 2000;
 
         int256 min_amount = lenderCommitmentGroupSmart.super_getMinimumAmountDifferenceToCloseDefaultedLoan(
             bidId,
@@ -444,8 +447,9 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
             loanDefaultTimestamp
         );
 
+      int256 expectedMinAmount = 400; //based on loanDefaultTimestamp gap 
 
-       assertEq(min_amount,100,"min_amount unexpected");
+       assertEq(min_amount,expectedMinAmount,"min_amount unexpected");
 
     }
 

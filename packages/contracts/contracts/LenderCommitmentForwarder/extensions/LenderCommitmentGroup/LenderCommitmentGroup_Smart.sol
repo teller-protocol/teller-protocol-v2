@@ -524,7 +524,8 @@ contract LenderCommitmentGroup_Smart is
     function liquidateDefaultedLoanWithIncentive(
         uint256 _bidId,
         int256 _tokenAmountDifference
-    )  public bidIsActiveForGroup(_bidId) {
+    )  public bidIsActiveForGroup(_bidId)   
+    {
        
         uint256 amountDue = getAmountOwedForBid(_bidId, false);
 
@@ -538,9 +539,7 @@ contract LenderCommitmentGroup_Smart is
         if( _tokenAmountDifference > 0){
             //this is used when the collateral value is higher than the principal (rare) 
             uint256 tokensToTakeFromSender = abs( _tokenAmountDifference );
-
-            
-
+ 
             IERC20(principalToken).transferFrom( msg.sender, address(this), amountDue + tokensToTakeFromSender );
 
             tokenDifferenceFromLiquidations  += int256(tokensToTakeFromSender);
@@ -556,6 +555,7 @@ contract LenderCommitmentGroup_Smart is
         //this will give collateral to the caller
         ITellerV2(TELLER_V2).lenderCloseLoanWithRecipient(_bidId, msg.sender);
          
+        
     }
 
     function getAmountOwedForBid(uint256 _bidId, bool _includeInterest)

@@ -7,7 +7,8 @@ import {TestERC20Token} from "../../../tokens/TestERC20Token.sol";
 import {TellerV2SolMock} from "../../../../contracts/mock/TellerV2SolMock.sol";
 import {UniswapV3PoolMock} from "../../../../contracts/mock/uniswap/UniswapV3PoolMock.sol";
 import {UniswapV3FactoryMock} from "../../../../contracts/mock/uniswap/UniswapV3FactoryMock.sol";
-
+import { PaymentType, PaymentCycleType } from "../../../../contracts/libraries/V2Calculations.sol";
+import { LoanDetails, Payment, BidState , Bid, Terms } from "../../../../contracts/TellerV2Storage.sol";
 //contract LenderCommitmentGroup_Smart_Mock is ExtensionsContextUpgradeable {}
 
 /*
@@ -367,14 +368,41 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
           initialize_group_contract();
 
         principalToken.transfer(address(liquidator), 1e18);
+        uint256 originalBalance = principalToken.balanceOf(address(liquidator));
 
-        lenderCommitmentGroupSmart.mock_setMinimumAmountDifferenceToCloseDefaultedLoan(400 );  //the default for now 
-
+        uint256 amountDue = 100;
+   
+        
         uint256 bidId = 0;
+       _tellerV2.setMockBid(bidId, Bid({
+ 
+                borrower: address(borrower),
+                lender: address(lender),
+                receiver: address(borrower),
+                marketplaceId: 0,
+                _metadataURI: "0x1234",
+                loanDetails: LoanDetails({
+                    lendingToken: principalToken,
+                    principal: 100,
+                    timestamp: 100,
+                    acceptedTimestamp: 100,
+                    lastRepaidTimestamp: 100,
+                    loanDuration: 5000,
+                    totalRepaid: Payment({ principal: amountDue, interest: 0 })
+                }),
+                terms: Terms({
+                    paymentCycleAmount: 10,
+                    paymentCycle: 2000,
+                    APR: 10
+                }),
+                state: BidState.ACCEPTED,
+                paymentType: PaymentType.EMI
+          
 
-        lenderCommitmentGroupSmart.set_mockBidAsActiveForGroup(bidId,true);
-    
-      
+
+       }));
+
+       lenderCommitmentGroupSmart.set_mockBidAsActiveForGroup(bidId,true); 
       
        vm.prank(address(liquidator));
        principalToken.approve(address(lenderCommitmentGroupSmart), 1e18);
@@ -385,9 +413,14 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
         vm.prank(address(liquidator));
         lenderCommitmentGroupSmart.liquidateDefaultedLoanWithIncentive(
            bidId, 
-           tokenAmountDifference
-           
+           tokenAmountDifference           
         );
+
+        uint256 updatedBalance = principalToken.balanceOf(address(liquidator));
+
+        int256 expectedDifference = int256(amountDue) + tokenAmountDifference;
+
+        assertEq(updatedBalance - originalBalance, uint256(expectedDifference), "unexpected tokenDifferenceFromLiquidations");
 
     }
 

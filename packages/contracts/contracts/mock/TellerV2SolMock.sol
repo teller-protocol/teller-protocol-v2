@@ -17,6 +17,9 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
     address public trustedForwarder;
     address public approvedForwarder;
 
+    uint256 public amountOwedMockPrincipal;
+    uint256 public amountOwedMockInterest;
+
     PaymentCycleType globalBidPaymentCycleType = PaymentCycleType.Seconds;
     uint32 globalBidPaymentCycleDuration = 3000;
 
@@ -59,6 +62,9 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
     ) external view returns (uint256){
       return mockLoanDefaultTimestamp;
     } 
+
+
+  
 
 
     function lenderCloseLoanWithRecipient(uint256 _bidId, address _recipient)
@@ -160,6 +166,9 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
             _amount
         );
     }
+
+   
+
 
     /*
      * @notice Calculates the minimum payment amount due for a loan.

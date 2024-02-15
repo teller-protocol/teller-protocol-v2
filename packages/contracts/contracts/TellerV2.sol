@@ -1059,7 +1059,7 @@ contract TellerV2 is
      * @param _timestamp The timestamp at which to calculate the loan owed amount at.
      */
     function calculateAmountOwed(uint256 _bidId, uint256 _timestamp)
-        public
+        public virtual
         view
         returns (Payment memory owed)
     {

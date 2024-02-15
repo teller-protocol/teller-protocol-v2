@@ -64,3 +64,16 @@ yarn subgraph deploy-local:polygon
 1. Build:  yarn subgraph build goerli
 
 2. Deploy: yarn subgraph build:deploy goerli 
+
+
+
+
+## Handlebars 
+
+The script for handlebars is in 
+
+scripts/thegraph/commands/build
+
+
+
+Need to go into subgraph/config for each network 

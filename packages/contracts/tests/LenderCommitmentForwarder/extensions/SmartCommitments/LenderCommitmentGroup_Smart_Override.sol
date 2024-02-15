@@ -15,6 +15,8 @@ contract LenderCommitmentGroup_Smart_Override is LenderCommitmentGroup_Smart {
     uint256 mockSharesExchangeRate;
     int256 mockMinimumAmountDifferenceToCloseDefaultedLoan;
 
+    uint256 mockAmountOwed;
+
     constructor(address _tellerV2, address _smartCommitmentForwarder, address _uniswapV3Pool)
         LenderCommitmentGroup_Smart(_tellerV2,_smartCommitmentForwarder, _uniswapV3Pool)
     {}
@@ -52,6 +54,16 @@ contract LenderCommitmentGroup_Smart_Override is LenderCommitmentGroup_Smart {
     ) public view returns (int256  ) {
 
         return super.getMinimumAmountDifferenceToCloseDefaultedLoan(_bidId,_amountOwed,_loanDefaultedTimestamp);
+    }
+
+    function getAmountOwedForBid(uint256 _bidId, bool _includeInterest)
+     public override view returns (uint256){
+        return mockAmountOwed;
+
+     }
+
+    function set_mockAmountOwedForBid(uint256 _amt) public {
+        mockAmountOwed = _amt;
     }
 
 

@@ -559,7 +559,7 @@ contract LenderCommitmentGroup_Smart is
     }
 
     function getAmountOwedForBid(uint256 _bidId, bool _includeInterest)
-     public view returns (uint256 amountOwed_)
+     public virtual view returns (uint256 amountOwed_)
       {
 
          Payment memory amountOwedPayment = ITellerV2(TELLER_V2).calculateAmountOwed(

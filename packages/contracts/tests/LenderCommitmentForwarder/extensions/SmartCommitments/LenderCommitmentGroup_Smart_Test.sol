@@ -370,11 +370,11 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
         principalToken.transfer(address(liquidator), 1e18);
         uint256 originalBalance = principalToken.balanceOf(address(liquidator));
 
-        uint256 amountDue = 100;
+        uint256 amountOwed = 100;
    
         
         uint256 bidId = 0;
-       _tellerV2.setMockBid(bidId, Bid({
+     /*  _tellerV2.setMockBid(bidId, Bid({
  
                 borrower: address(borrower),
                 lender: address(lender),
@@ -400,7 +400,10 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
           
 
 
-       }));
+       }));*/
+
+       lenderCommitmentGroupSmart.set_mockAmountOwedForBid(amountOwed); 
+
 
 
          vm.warp(1000);
@@ -421,9 +424,9 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
 
         uint256 updatedBalance = principalToken.balanceOf(address(liquidator));
 
-        int256 expectedDifference = int256(amountDue) + tokenAmountDifference;
+        int256 expectedDifference = int256(amountOwed) + tokenAmountDifference;
 
-        assertEq(updatedBalance - originalBalance, uint256(expectedDifference), "unexpected tokenDifferenceFromLiquidations");
+        assertEq(originalBalance - updatedBalance , uint256(expectedDifference), "unexpected tokenDifferenceFromLiquidations");
 
     }
 

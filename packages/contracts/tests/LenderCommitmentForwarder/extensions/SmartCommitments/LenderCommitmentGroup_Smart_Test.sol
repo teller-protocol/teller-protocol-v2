@@ -314,7 +314,7 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
  
     }
 
-     //test this thoroughly 
+     //test this thoroughly -- using spreadsheet data 
     function test_get_shares_exchange_rate() public {
           initialize_group_contract();
 
@@ -341,12 +341,7 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
 
           initialize_group_contract();
         principalToken.transfer(address(lenderCommitmentGroupSmart), 1e18);
-        //  collateralToken.transfer(address(lenderCommitmentGroupSmart),1e18);
- 
-
-        //   lenderCommitmentGroupSmart.set_totalPrincipalTokensCommitted(1000000);
-     
-
+         
 
         lenderCommitmentGroupSmart.set_mockSharesExchangeRate( 1e36 );  //the default for now 
 
@@ -365,6 +360,9 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
     }
 
 
+/*
+    make sure both pos and neg branches get run, and tellerV2 is called at the end 
+*/
     function test_liquidateDefaultedLoanWithIncentive() public {
           initialize_group_contract();
 
@@ -376,10 +374,8 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
 
         lenderCommitmentGroupSmart.set_mockBidAsActiveForGroup(bidId,true);
     
-       // _tellerV2.mock_setLoanDefaultTimestamp(block.timestamp);
-   
-       // vm.warp(1000);
-
+      
+      
        vm.prank(address(liquidator));
        principalToken.approve(address(lenderCommitmentGroupSmart), 1e18);
 
@@ -395,8 +391,11 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
 
     }
 
+/*
+  make sure we get expected data based on the vm warp 
+*/
     function test_getMinimumAmountDifferenceToCloseDefaultedLoan() public {
-  initialize_group_contract();
+       initialize_group_contract();
 
         uint256 bidId = 0;
         uint256 amountDue = 500;
@@ -413,7 +412,7 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
         );
 
 
-       //assertEq();
+       assertEq(min_amount,100,"min_amount unexpected");
 
     }
 

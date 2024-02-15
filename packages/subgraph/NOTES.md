@@ -8,6 +8,8 @@
  yarn subgraph graph build 
 
 
- ### Deploying 
+ ### Deploying Manually
+ yarn subgraph graph deploy --studio
 
- Want to sync after LCF_A was deployed 
+-> see subgraph/config/{networkName} for name 
+-> increment version from package.json 

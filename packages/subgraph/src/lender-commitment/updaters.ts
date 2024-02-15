@@ -159,12 +159,15 @@ export function updateCommitmentStatus(
 
   switch (status) {
     case CommitmentStatus.Active:
+      removeInactiveCommitmentToProtocol(commitment);
       addCommitmentToProtocol(commitment);
       marketCommitments.commitmentZScores = addToArray(
         marketCommitments.commitmentZScores,
         commitmentZScore.id
       );
       break;
+    case CommitmentStatus.Inactive:
+        addInactiveCommitmentToProtocol(commitment);
     default:
       removeCommitmentToProtocol(commitment);
       marketCommitments.commitmentZScores = removeFromArray(
@@ -261,6 +264,45 @@ export function updateCommitmentZScore(
 
   commitmentZScore.save();
 }
+
+
+
+function addInactiveCommitmentToProtocol(commitment: Commitment): void {
+  const protocol = loadProtocol();
+
+  let inactiveArray = protocol.inactiveCommitments 
+
+  if (!inactiveArray) {
+    inactiveArray = []
+  }
+
+
+  protocol.inactiveCommitments = addToArray(
+    inactiveArray,
+    commitment.id
+  );
+  protocol.save();
+}
+
+
+function removeInactiveCommitmentToProtocol(commitment: Commitment): void {
+  const protocol = loadProtocol();
+
+  let inactiveArray = protocol.inactiveCommitments 
+
+
+
+  if (inactiveArray) {  
+    protocol.inactiveCommitments = removeFromArray(
+      inactiveArray,
+      commitment.id
+    );
+  }
+
+  protocol.save();
+}
+
+
 
 function addCommitmentToProtocol(commitment: Commitment): void {
   const protocol = loadProtocol();

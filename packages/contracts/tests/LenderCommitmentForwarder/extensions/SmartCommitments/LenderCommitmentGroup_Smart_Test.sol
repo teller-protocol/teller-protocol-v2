@@ -402,6 +402,8 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
 
         assertEq(originalBalance - updatedBalance , uint256(expectedDifference), "unexpected tokenDifferenceFromLiquidations");
 
+
+    //make sure lenderCloseloan is called 
     }
 
 

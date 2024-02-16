@@ -374,39 +374,13 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
    
         
         uint256 bidId = 0;
-     /*  _tellerV2.setMockBid(bidId, Bid({
- 
-                borrower: address(borrower),
-                lender: address(lender),
-                receiver: address(borrower),
-                marketplaceId: 0,
-                _metadataURI: "0x1234",
-                loanDetails: LoanDetails({
-                    lendingToken: principalToken,
-                    principal: 100,
-                    timestamp: 100,
-                    acceptedTimestamp: 100,
-                    lastRepaidTimestamp: 100,
-                    loanDuration: 5000,
-                    totalRepaid: Payment({ principal: amountDue, interest: 0 })
-                }),
-                terms: Terms({
-                    paymentCycleAmount: 10,
-                    paymentCycle: 2000,
-                    APR: 0
-                }),
-                state: BidState.ACCEPTED,
-                paymentType: PaymentType.EMI
-          
-
-
-       }));*/
+    
 
        lenderCommitmentGroupSmart.set_mockAmountOwedForBid(amountOwed); 
 
+   
 
-
-         vm.warp(1000);
+         vm.warp(1000);   //loanDefaultedTimeStamp ?
 
        lenderCommitmentGroupSmart.set_mockBidAsActiveForGroup(bidId,true); 
       
@@ -430,6 +404,55 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
 
     }
 
+
+    //complete me 
+     function test_liquidateDefaultedLoanWithIncentive_negative_direction() public {
+
+
+        initialize_group_contract();
+
+        principalToken.transfer(address(liquidator), 1e18);
+        uint256 originalBalance = principalToken.balanceOf(address(liquidator));
+
+        uint256 amountOwed = 1000;
+   
+        
+        uint256 bidId = 0;
+    
+
+       lenderCommitmentGroupSmart.set_mockAmountOwedForBid(amountOwed); 
+
+   
+        //time has advanced enough to now have a 50 percent discount s
+         vm.warp(1000);   //loanDefaultedTimeStamp ?
+
+       lenderCommitmentGroupSmart.set_mockBidAsActiveForGroup(bidId,true); 
+      
+       vm.prank(address(liquidator));
+       principalToken.approve(address(lenderCommitmentGroupSmart), 1e18);
+
+       lenderCommitmentGroupSmart.mock_setMinimumAmountDifferenceToCloseDefaultedLoan(-500);
+
+        int256 tokenAmountDifference = -500;
+        vm.prank(address(liquidator));
+        lenderCommitmentGroupSmart.liquidateDefaultedLoanWithIncentive(
+           bidId, 
+           tokenAmountDifference           
+        );
+
+        uint256 updatedBalance = principalToken.balanceOf(address(liquidator));
+
+        require(tokenAmountDifference < 0); //ensure this test is set up properly 
+
+        // we expect it to be amountOwned - abs(tokenAmountDifference ) but we can just test it like this 
+        int256 expectedDifference = int256(amountOwed) + ( tokenAmountDifference);
+
+        assertEq(originalBalance - updatedBalance , uint256(expectedDifference), "unexpected tokenDifferenceFromLiquidations");
+
+
+
+     }
+
 /*
   make sure we get expected data based on the vm warp 
 */
@@ -442,7 +465,7 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
        _tellerV2.mock_setLoanDefaultTimestamp(block.timestamp);
    
         vm.warp(10000);
-        uint256 loanDefaultTimestamp = block.timestamp - 2000;
+        uint256 loanDefaultTimestamp = block.timestamp - 2000; //sim that loan defaulted 2000 seconds ago 
 
         int256 min_amount = lenderCommitmentGroupSmart.super_getMinimumAmountDifferenceToCloseDefaultedLoan(
             bidId,

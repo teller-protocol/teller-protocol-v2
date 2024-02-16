@@ -545,8 +545,7 @@ contract LenderCommitmentGroup_Smart is
             tokenDifferenceFromLiquidations  += int256(tokensToTakeFromSender);
         }else {
             uint256 tokensToGiveToSender = abs( _tokenAmountDifference );
-
-          
+                 
             IERC20(principalToken).transferFrom( msg.sender, address(this), amountDue - tokensToGiveToSender );
 
             tokenDifferenceFromLiquidations  -= int256(tokensToGiveToSender);

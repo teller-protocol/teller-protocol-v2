@@ -483,6 +483,54 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
 
     }
 
+
+      function test_getMinimumAmountDifferenceToCloseDefaultedLoan_zero_time() public {
+       initialize_group_contract();
+
+        uint256 bidId = 0;
+        uint256 amountDue = 500;
+
+       _tellerV2.mock_setLoanDefaultTimestamp(block.timestamp);
+   
+        vm.warp(10000);
+        uint256 loanDefaultTimestamp = block.timestamp ; //sim that loan defaulted 2000 seconds ago 
+
+
+        vm.expectRevert("Loan defaulted timestamp must be in the past");
+        int256 min_amount = lenderCommitmentGroupSmart.super_getMinimumAmountDifferenceToCloseDefaultedLoan(
+            bidId,
+            amountDue,
+            loanDefaultTimestamp
+        );
+
+      
+      
+    }
+
+
+      function test_getMinimumAmountDifferenceToCloseDefaultedLoan_full_time() public {
+       initialize_group_contract();
+
+        uint256 bidId = 0;
+        uint256 amountDue = 500;
+
+       _tellerV2.mock_setLoanDefaultTimestamp(block.timestamp);
+   
+        vm.warp(100000);
+        uint256 loanDefaultTimestamp = block.timestamp - 22000 ; //sim that loan defaulted 2000 seconds ago 
+
+        int256 min_amount = lenderCommitmentGroupSmart.super_getMinimumAmountDifferenceToCloseDefaultedLoan(
+            bidId,
+            amountDue,
+            loanDefaultTimestamp
+        );
+
+      int256 expectedMinAmount = -500; //based on loanDefaultTimestamp gap 
+
+       assertEq(min_amount,expectedMinAmount,"min_amount unexpected");
+
+    }
+
     function test_acceptFundsForAcceptBid() public {
         lenderCommitmentGroupSmart.set_mock_getMaxPrincipalPerCollateralAmount(
             100 * 1e18

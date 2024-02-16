@@ -403,7 +403,8 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
         assertEq(originalBalance - updatedBalance , uint256(expectedDifference), "unexpected tokenDifferenceFromLiquidations");
 
 
-    //make sure lenderCloseloan is called 
+      //make sure lenderCloseloan is called 
+       assertEq( _tellerV2.lenderCloseLoanWasCalled(), true, "lender close loan not called");
     }
 
 
@@ -452,7 +453,8 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
         assertEq(originalBalance - updatedBalance , uint256(expectedDifference), "unexpected tokenDifferenceFromLiquidations");
 
 
-
+      //make sure lenderCloseloan is called 
+       assertEq( _tellerV2.lenderCloseLoanWasCalled(), true, "lender close loan not called");
      }
 
 /*

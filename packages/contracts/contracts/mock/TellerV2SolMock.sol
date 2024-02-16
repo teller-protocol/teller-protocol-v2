@@ -25,6 +25,7 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
 
 
     uint256 mockLoanDefaultTimestamp;
+    bool public lenderCloseLoanWasCalled;
   
     Bid mockBid;
 
@@ -44,9 +45,15 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
         external
         
     {
-
+        lenderCloseLoanWasCalled = true;
     }
 
+  function lenderCloseLoanWithRecipient(uint256 _bidId, address _recipient)
+        external
+        
+    {
+        lenderCloseLoanWasCalled = true;
+    }
 
 
 
@@ -66,13 +73,7 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
 
   
 
-
-    function lenderCloseLoanWithRecipient(uint256 _bidId, address _recipient)
-        external
-        
-    {
-
-    }
+ 
 
     function liquidateLoanFull(uint256 _bidId)
         external

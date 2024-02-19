@@ -11,5 +11,5 @@
  ### Deploying Manually
  yarn subgraph graph deploy --studio
 
--> see subgraph/config/{networkName} for name 
+-> see subgraph/config/{networkName} for name  [tellerv2-polygon]
 -> increment version from package.json 

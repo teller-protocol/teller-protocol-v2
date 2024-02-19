@@ -759,28 +759,10 @@ contract TellerV2 is
         acceptedLoan(_bidId, "lenderClaimCollateral")
     {
 
-        require(isLoanDefaulted(_bidId), "Loan must be defaulted.");
-       
-        Bid storage bid = bids[_bidId];
-        bid.state = BidState.CLOSED;
+         Bid storage bid = bids[_bidId];
+        address _collateralRecipient = bid.lender; 
 
-        address sender = _msgSenderForMarket(bid.marketplaceId);
-        require(sender == bid.lender, "only lender can close loan");
-
-        address _collateralRecipient = bid.lender;
-
-        //handle this differently based on v1 or v2 
-         
-        address collateralManagerForBid = address(_getCollateralManagerForBid(_bidId)); 
-
-          if( collateralManagerForBid == address(collateralManagerV2) ){
-             ICollateralManagerV2(collateralManagerForBid).lenderClaimCollateral(_bidId,_collateralRecipient);
-          }else{             
-             ICollateralManager(collateralManagerForBid).lenderClaimCollateral(_bidId );
-          }
-        
-        
-        emit LoanClosed(_bidId);    
+        _lenderCloseLoanWithRecipient(_bidId,_collateralRecipient);  
 
     }
     /**
@@ -789,6 +771,13 @@ contract TellerV2 is
      */
     function lenderCloseLoanWithRecipient(uint256 _bidId, address _collateralRecipient)
         external
+        
+    {
+        _lenderCloseLoanWithRecipient(_bidId,_collateralRecipient);
+    }
+
+        function _lenderCloseLoanWithRecipient(uint256 _bidId, address _collateralRecipient)
+        internal
         acceptedLoan(_bidId, "lenderClaimCollateral")
     {
         require(isLoanDefaulted(_bidId), "Loan must be defaulted.");
@@ -813,6 +802,7 @@ contract TellerV2 is
         
         emit LoanClosed(_bidId);
     }
+
 
     /**
      * @notice Function for users to liquidate a defaulted loan.

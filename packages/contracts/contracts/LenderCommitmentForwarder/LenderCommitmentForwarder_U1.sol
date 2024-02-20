@@ -58,10 +58,10 @@ contract LenderCommitmentForwarder_U1 is
   
  
     mapping(uint256 => PoolRouteConfig[])
-        internal commitmentUniswapPoolRoutes;
+        public commitmentUniswapPoolRoutes;
 
     mapping(uint256 => uint16)
-        internal commitmentPoolOracleLtvRatio;
+        public commitmentPoolOracleLtvRatio;
 
 
      //does not take a storage slot 

@@ -38,7 +38,7 @@ const deployFn: DeployFunction = async (hre) => {
 
   let tellerV2ProxyAddress = await tellerV2.getAddress()
   let marketRegistryProxyAddress = await marketRegistry.getAddress()
-  let lcfStagingProxyAddress =
+  let lcfAlphaProxyAddress =
     await lenderCommitmentForwarderAlpha.getAddress()
 
   const LenderCommitmentForwarderAlphaImplementation =
@@ -59,7 +59,7 @@ const deployFn: DeployFunction = async (hre) => {
   )*/
 
 
-
+/*
   await hre.upgrades.proposeBatchTimelock({
     title: 'LenderCommitmentForwarderAlpha: Upgrade',
     description: ` 
@@ -89,6 +89,23 @@ const deployFn: DeployFunction = async (hre) => {
     ],
   })
 
+*/
+
+  const upgrade = await hre.upgrades.upgradeProxy(
+    lcfAlphaProxyAddress,
+    LenderCommitmentForwarderAlphaImplementation,
+    {
+      unsafeAllow: ['state-variable-immutable', 'constructor'],
+      constructorArgs: [
+        tellerV2ProxyAddress,
+        marketRegistryProxyAddress,
+        uniswapFactoryAddress
+      ]
+    }
+  )
+
+
+
 
 
   hre.log('done.')
@@ -114,7 +131,8 @@ deployFn.skip = async (hre) => {
     ![
       'localhost',
      
-      'sepolia' 
+      'sepolia' ,
+      'polygon' 
       
     ].includes(hre.network.name)
   )

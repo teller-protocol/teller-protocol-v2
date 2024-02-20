@@ -453,6 +453,25 @@
     },
     {
       "type": "function",
+      "name": "commitmentPoolOracleLtvRatio",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint16",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
       "name": "commitmentPrincipalAccepted",
       "constant": true,
       "stateMutability": "view",
@@ -467,6 +486,45 @@
         {
           "type": "uint256",
           "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "commitmentUniswapPoolRoutes",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        },
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ],
+      "outputs": [
+        {
+          "type": "address",
+          "name": "pool"
+        },
+        {
+          "type": "bool",
+          "name": "zeroForOne"
+        },
+        {
+          "type": "uint32",
+          "name": "twapInterval"
+        },
+        {
+          "type": "uint256",
+          "name": "token0Decimals"
+        },
+        {
+          "type": "uint256",
+          "name": "token1Decimals"
         }
       ]
     },
@@ -1049,6 +1107,6 @@
     "blockHash": null,
     "blockNumber": null
   },
-  "numDeployments": 1,
+  "numDeployments": 2,
   "implementation": "0x0b65C94CfF84afa6D9CE3D287b1227D9Cc7CdfB7"
 }

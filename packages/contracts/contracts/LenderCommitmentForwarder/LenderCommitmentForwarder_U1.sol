@@ -56,12 +56,11 @@ contract LenderCommitmentForwarder_U1 is
 
     mapping(uint256 => uint256) public commitmentPrincipalAccepted;
   
- 
     mapping(uint256 => PoolRouteConfig[])
-        public commitmentUniswapPoolRoutes;
+        internal commitmentUniswapPoolRoutes;
 
     mapping(uint256 => uint16)
-        public commitmentPoolOracleLtvRatio;
+        internal commitmentPoolOracleLtvRatio;
 
 
      //does not take a storage slot 
@@ -696,6 +695,36 @@ contract LenderCommitmentForwarder_U1 is
             );
     }
 
+
+
+     /**
+     * @dev Returns the PoolRouteConfig at a specific index for a given bidId from the commitmentUniswapPoolRoutes mapping.
+     * @param bidId The bidId to access the mapping.
+     * @param index The index in the array of PoolRouteConfigs for the given bidId.
+     * @return The PoolRouteConfig at the specified index.
+     */
+    function getCommitmentUniswapPoolRoute(uint256 bidId, uint index) public view returns (PoolRouteConfig memory) {
+        require(index < commitmentUniswapPoolRoutes[bidId].length, "Index out of bounds");
+        return commitmentUniswapPoolRoutes[bidId][index];
+    }
+
+    /**
+     * @dev Returns the entire array of PoolRouteConfigs for a given bidId from the commitmentUniswapPoolRoutes mapping.
+     * @param bidId The bidId to access the mapping.
+     * @return The entire array of PoolRouteConfigs for the specified bidId.
+     */
+    function getAllCommitmentUniswapPoolRoutes(uint256 bidId) public view returns (PoolRouteConfig[] memory) {
+        return commitmentUniswapPoolRoutes[bidId];
+    }
+
+    /**
+     * @dev Returns the uint16 value for a given bidId from the commitmentPoolOracleLtvRatio mapping.
+     * @param bidId The key to access the mapping.
+     * @return The uint16 value for the specified bidId.
+     */
+    function getCommitmentPoolOracleLtvRatio(uint256 bidId) public view returns (uint16) {
+        return commitmentPoolOracleLtvRatio[bidId];
+    }
 
 
     // ---- TWAP 

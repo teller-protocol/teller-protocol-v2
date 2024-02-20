@@ -698,32 +698,32 @@ contract LenderCommitmentForwarder_U1 is
 
 
      /**
-     * @dev Returns the PoolRouteConfig at a specific index for a given bidId from the commitmentUniswapPoolRoutes mapping.
-     * @param bidId The bidId to access the mapping.
-     * @param index The index in the array of PoolRouteConfigs for the given bidId.
+     * @dev Returns the PoolRouteConfig at a specific index for a given commitmentId from the commitmentUniswapPoolRoutes mapping.
+     * @param commitmentId The commitmentId to access the mapping.
+     * @param index The index in the array of PoolRouteConfigs for the given commitmentId.
      * @return The PoolRouteConfig at the specified index.
      */
-    function getCommitmentUniswapPoolRoute(uint256 bidId, uint index) public view returns (PoolRouteConfig memory) {
-        require(index < commitmentUniswapPoolRoutes[bidId].length, "Index out of bounds");
-        return commitmentUniswapPoolRoutes[bidId][index];
+    function getCommitmentUniswapPoolRoute(uint256 commitmentId, uint index) public view returns (PoolRouteConfig memory) {
+        require(index < commitmentUniswapPoolRoutes[commitmentId].length, "Index out of bounds");
+        return commitmentUniswapPoolRoutes[commitmentId][index];
     }
 
     /**
-     * @dev Returns the entire array of PoolRouteConfigs for a given bidId from the commitmentUniswapPoolRoutes mapping.
-     * @param bidId The bidId to access the mapping.
-     * @return The entire array of PoolRouteConfigs for the specified bidId.
+     * @dev Returns the entire array of PoolRouteConfigs for a given commitmentId from the commitmentUniswapPoolRoutes mapping.
+     * @param commitmentId The commitmentId to access the mapping.
+     * @return The entire array of PoolRouteConfigs for the specified commitmentId.
      */
-    function getAllCommitmentUniswapPoolRoutes(uint256 bidId) public view returns (PoolRouteConfig[] memory) {
-        return commitmentUniswapPoolRoutes[bidId];
+    function getAllCommitmentUniswapPoolRoutes(uint256 commitmentId) public view returns (PoolRouteConfig[] memory) {
+        return commitmentUniswapPoolRoutes[commitmentId];
     }
 
     /**
-     * @dev Returns the uint16 value for a given bidId from the commitmentPoolOracleLtvRatio mapping.
-     * @param bidId The key to access the mapping.
-     * @return The uint16 value for the specified bidId.
+     * @dev Returns the uint16 value for a given commitmentId from the commitmentPoolOracleLtvRatio mapping.
+     * @param commitmentId The key to access the mapping.
+     * @return The uint16 value for the specified commitmentId.
      */
-    function getCommitmentPoolOracleLtvRatio(uint256 bidId) public view returns (uint16) {
-        return commitmentPoolOracleLtvRatio[bidId];
+    function getCommitmentPoolOracleLtvRatio(uint256 commitmentId) public view returns (uint16) {
+        return commitmentPoolOracleLtvRatio[commitmentId];
     }
 
 

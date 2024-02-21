@@ -252,16 +252,23 @@ const buildAndDeploy = async ({
     const graftingBlock = latestVersion.latestEthereumBlockNumber;
    
       //override grafting base here 
-      
-        /*args.grafting = {
-           base: "Qmdv9ReC57dgsNXhLRamkRCRyLQWzMTLikoxHKVjZkJz6Y",
-           block: "53711025"
- 
-        };*/
+
+      const USE_CUSTOM_GRAFTING = false;
+
+      if (USE_CUSTOM_GRAFTING) {
+        args.grafting = {
+          base: "Qmdv9ReC57dgsNXhLRamkRCRyLQWzMTLikoxHKVjZkJz6Y",
+          block: "53711025"
+
+       };
+      }else{
         args.grafting = {
           base: latestVersion.deploymentId,
           block: graftingBlock
         };
+      }
+      
+      
 
       logger?.log(
           `Grafting subgraph: ${subgraph.name} (${subgraph.network}) at block ${args.grafting.block}`

@@ -248,6 +248,8 @@ const buildAndDeploy = async ({
       `Grafting subgraph: ${subgraph.name} (${subgraph.network}) at block ${graftingBlock}`
     );
 
+    //custom graft code goes here 
+
     args.grafting = {
       base: latestVersion.deploymentId,
       block: graftingBlock

@@ -814,26 +814,16 @@ contract LenderCommitmentForwarder_U1 is
  
         uint160 sqrtPriceX96 = getSqrtTwapX96( _poolRouteConfig.pool ,_poolRouteConfig.twapInterval );
  
-          
-
         uint256 expFactor = 10 ** (_poolRouteConfig.token0Decimals + _poolRouteConfig.token1Decimals);
- 
-        uint256 sqrtPrice = FullMath.mulDiv( sqrtPriceX96, expFactor, 2**96  )   ;
 
+        //This is the token 1 per token 0 price 
+        uint256 sqrtPrice = FullMath.mulDiv( sqrtPriceX96, expFactor, 2**96  );
+
+        uint256 sqrtPriceInverse = FullMath.mulDiv(expFactor , expFactor, sqrtPrice );    
+
+        uint256 price = _poolRouteConfig.zeroForOne ?  sqrtPriceInverse * sqrtPriceInverse : sqrtPrice * sqrtPrice;
   
-
-        uint256 sqrtPriceInverse = FullMath.mulDiv(expFactor , expFactor, sqrtPrice );
-    
-
-        uint256 price = _poolRouteConfig.zeroForOne ? sqrtPrice * sqrtPrice : sqrtPriceInverse * sqrtPriceInverse;
- 
- 
-         
-       
- 
-
-            //for now ... 
-        return price / expFactor ;   //this is still expanded by expFactor... 
+        return price / expFactor ;   
 
     }
 

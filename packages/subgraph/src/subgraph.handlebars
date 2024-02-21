@@ -235,10 +235,6 @@ dataSources:
       abis:
         - name: LenderCommitmentForwarder
           file: ./abis/{{export_network_name}}_LenderCommitmentForwarder.json
-        {{#if contracts.lender_commitment_staging.enabled}}
-        - name: LenderCommitmentForwarderStaging
-          file: ./abis/{{export_network_name}}_LenderCommitmentForwarderStaging.json
-        {{/if}}
         - name: ERC165
           file: ../contracts/generated/artifacts/@openzeppelin/contracts/utils/introspection/ERC165.sol/ERC165.json
         - name: IERC20Metadata
@@ -278,10 +274,6 @@ dataSources:
       abis:
         - name: LenderCommitmentForwarder
           file: ./abis/{{export_network_name}}_LenderCommitmentForwarder.json
-        {{#if contracts.lender_commitment_staging.enabled}}
-        - name: LenderCommitmentForwarderStaging
-          file: ./abis/{{export_network_name}}_LenderCommitmentForwarderStaging.json
-        {{/if}}
         - name: ERC165
           file: ../contracts/generated/artifacts/@openzeppelin/contracts/utils/introspection/ERC165.sol/ERC165.json
         - name: IERC20Metadata
@@ -320,8 +312,6 @@ dataSources:
         - CollateralPairTokenVolume
         - LoanStatusCount
       abis:
-        - name: LenderCommitmentForwarder
-          file: ./abis/{{export_network_name}}_LenderCommitmentForwarder.json
         - name: LenderCommitmentForwarderStaging
           file: ./abis/{{export_network_name}}_LenderCommitmentForwarderStaging.json
         - name: ERC165
@@ -367,8 +357,6 @@ dataSources:
         - CollateralPairTokenVolume
         - LoanStatusCount
       abis:
-        - name: LenderCommitmentForwarder
-          file: ./abis/{{export_network_name}}_LenderCommitmentForwarder.json
         - name: LenderCommitmentForwarderAlpha
           file: ./abis/{{export_network_name}}_LenderCommitmentForwarderAlpha.json
         - name: ERC165

@@ -1,8 +1,7 @@
 import { Address, BigInt, dataSource, ethereum } from "@graphprotocol/graph-ts";
 
 import { IERC20Metadata } from "../../generated/LenderCommitmentForwarder_ActiveCommitments/IERC20Metadata";
-import { LenderCommitmentForwarder } from "../../generated/LenderCommitmentForwarder_ActiveCommitments/LenderCommitmentForwarder";
-import { LenderCommitmentForwarderStaging } from "../../generated/LenderCommitmentForwarderStaging/LenderCommitmentForwarderStaging";
+import { LenderCommitmentForwarder } from "../../generated/LenderCommitmentForwarder_ActiveCommitments/LenderCommitmentForwarder"; 
 import { Commitment } from "../../generated/schema";
 import { loadProtocol } from "../helpers/loaders";
 
@@ -68,9 +67,7 @@ export function updateLenderBalanceAndAllowance(commitment: Commitment): void {
     commitment.lenderPrincipalBalance = balanceResult.value;
   } 
 
-  const tellerV2Address = isRolloverable()
-    ? LenderCommitmentForwarderStaging.bind(dataSource.address()).getTellerV2()
-    : LenderCommitmentForwarder.bind(dataSource.address()).getTellerV2();
+  const tellerV2Address =   LenderCommitmentForwarder.bind(dataSource.address()).getTellerV2();
     const allowanceResult = lendingToken.try_allowance(lenderAddress, tellerV2Address); 
 
     if( !allowanceResult.reverted ){

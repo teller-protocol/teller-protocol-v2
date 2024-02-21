@@ -7,7 +7,7 @@ import {
 } from "@graphprotocol/graph-ts";
 
 import { LenderCommitmentForwarder } from "../../generated/LenderCommitmentForwarder/LenderCommitmentForwarder";
-import { LenderCommitmentForwarderStaging } from "../../generated/LenderCommitmentForwarderStaging/LenderCommitmentForwarderStaging";
+
 import {
   Commitment,
   CommitmentZScore,
@@ -81,11 +81,7 @@ export function updateLenderCommitment(
   commitment.marketplace = marketId;
   commitment.marketplaceId = BigInt.fromString(marketId);
 
-  const lenderCommitment = isRolloverable()
-    ? LenderCommitmentForwarderStaging.bind(eventAddress)
-        .commitments(commitmentId)
-        .toMap()
-    : LenderCommitmentForwarder.bind(eventAddress)
+  const lenderCommitment =   LenderCommitmentForwarder.bind(eventAddress)
         .commitments(commitmentId)
         .toMap();
 

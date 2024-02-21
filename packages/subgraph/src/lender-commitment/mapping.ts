@@ -8,7 +8,7 @@ import {
   UpdatedCommitment,
   UpdatedCommitmentBorrowers
 } from "../../generated/LenderCommitmentForwarder/LenderCommitmentForwarder";
-import { LenderCommitmentForwarderStaging } from "../../generated/LenderCommitmentForwarderStaging/LenderCommitmentForwarderStaging";
+
 import { Bid } from "../../generated/schema";
 import { loadBidById } from "../helpers/loaders";
 import { linkCommitmentToRewards } from "../liquidity-rewards/updaters";
@@ -88,13 +88,10 @@ export function handleExercisedCommitment(event: ExercisedCommitment): void {
   const commitmentId = event.params.commitmentId;
   const commitment = loadCommitment(commitmentId);
 
-  const acceptedPrincipalResult = isRolloverable()
-    ? LenderCommitmentForwarderStaging.bind(
-        event.address
-      ).try_commitmentPrincipalAccepted(commitment.commitmentId)
-    : LenderCommitmentForwarder.bind(
+  const acceptedPrincipalResult =  LenderCommitmentForwarder.bind(
         event.address
       ).try_commitmentPrincipalAccepted(commitment.commitmentId);
+
   // function only exists after an upgrade
   if (acceptedPrincipalResult.reverted) {
     // keep track of old accepted principal
@@ -137,13 +134,10 @@ export function handleUpdatedCommitmentBorrower(
 ): void {
   const commitmentId = event.params.commitmentId;
   const commitment = loadCommitment(commitmentId);
-  const borrowers = isRolloverable()
-    ? LenderCommitmentForwarderStaging.bind(
-        event.address
-      ).getCommitmentBorrowers(commitmentId)
-    : LenderCommitmentForwarder.bind(event.address).getCommitmentBorrowers(
+  const borrowers =   LenderCommitmentForwarder.bind(event.address).getCommitmentBorrowers(
         commitmentId
       );
+
   if (borrowers) {
     commitment.commitmentBorrowers = changetype<Bytes[]>(borrowers);
   }

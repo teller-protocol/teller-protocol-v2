@@ -1,6 +1,6 @@
 
 ### Manually build 
- Yarn contracts export --network polygon
+yarn contracts export --network polygon
 
 
 *this works* 

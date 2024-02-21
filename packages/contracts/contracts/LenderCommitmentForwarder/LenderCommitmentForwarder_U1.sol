@@ -557,7 +557,7 @@ contract LenderCommitmentForwarder_U1 is
             
        
        
- 
+            //incorrect expansion here 
         uint256 scaledPoolOraclePrice = getUniswapPriceRatioForPoolRoutes( commitmentUniswapPoolRoutes[_commitmentId] ).percent(
             commitmentPoolOracleLtvRatio[_commitmentId]
         );
@@ -821,8 +821,11 @@ contract LenderCommitmentForwarder_U1 is
 
         uint256 sqrtPriceInverse = FullMath.mulDiv(expFactor , expFactor, sqrtPrice );    
 
-        uint256 price = _poolRouteConfig.zeroForOne ?  sqrtPriceInverse * sqrtPriceInverse : sqrtPrice * sqrtPrice;
-  
+       
+        uint256 price = _poolRouteConfig.zeroForOne ? sqrtPrice * sqrtPrice : sqrtPriceInverse * sqrtPriceInverse;
+
+
+
         return price / expFactor ;   
 
     }

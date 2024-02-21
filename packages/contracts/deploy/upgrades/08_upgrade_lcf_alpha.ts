@@ -59,7 +59,7 @@ const deployFn: DeployFunction = async (hre) => {
   )*/
 
 
-/*
+ 
   await hre.upgrades.proposeBatchTimelock({
     title: 'LenderCommitmentForwarderAlpha: Upgrade',
     description: ` 
@@ -69,7 +69,7 @@ const deployFn: DeployFunction = async (hre) => {
 `,
     _steps: [
       {
-        proxy: lcfStagingProxyAddress,
+        proxy: lcfAlphaProxyAddress,
         implFactory: LenderCommitmentForwarderAlphaImplementation,
 
         opts: {
@@ -88,9 +88,8 @@ const deployFn: DeployFunction = async (hre) => {
       },
     ],
   })
-
-*/
-
+ 
+/*
   const upgrade = await hre.upgrades.upgradeProxy(
     lcfAlphaProxyAddress,
     LenderCommitmentForwarderAlphaImplementation,
@@ -103,7 +102,7 @@ const deployFn: DeployFunction = async (hre) => {
       ]
     }
   )
-
+*/
 
 
 

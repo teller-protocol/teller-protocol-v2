@@ -642,6 +642,47 @@
     },
     {
       "type": "function",
+      "name": "getAllCommitmentUniswapPoolRoutes",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "bidId"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "tuple[]",
+          "name": "",
+          "components": [
+            {
+              "type": "address",
+              "name": "pool"
+            },
+            {
+              "type": "bool",
+              "name": "zeroForOne"
+            },
+            {
+              "type": "uint32",
+              "name": "twapInterval"
+            },
+            {
+              "type": "uint256",
+              "name": "token0Decimals"
+            },
+            {
+              "type": "uint256",
+              "name": "token1Decimals"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "function",
       "name": "getCommitmentAcceptedPrincipal",
       "constant": true,
       "stateMutability": "view",
@@ -732,6 +773,70 @@
         {
           "type": "uint256",
           "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getCommitmentPoolOracleLtvRatio",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "bidId"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint16",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getCommitmentUniswapPoolRoute",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "bidId"
+        },
+        {
+          "type": "uint256",
+          "name": "index"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "tuple",
+          "name": "",
+          "components": [
+            {
+              "type": "address",
+              "name": "pool"
+            },
+            {
+              "type": "bool",
+              "name": "zeroForOne"
+            },
+            {
+              "type": "uint32",
+              "name": "twapInterval"
+            },
+            {
+              "type": "uint256",
+              "name": "token0Decimals"
+            },
+            {
+              "type": "uint256",
+              "name": "token1Decimals"
+            }
+          ]
         }
       ]
     },
@@ -1049,6 +1154,6 @@
     "blockHash": null,
     "blockNumber": null
   },
-  "numDeployments": 1,
+  "numDeployments": 3,
   "implementation": "0x0b65C94CfF84afa6D9CE3D287b1227D9Cc7CdfB7"
 }

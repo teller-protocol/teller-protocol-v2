@@ -56,12 +56,11 @@ contract LenderCommitmentForwarder_U1 is
 
     mapping(uint256 => uint256) public commitmentPrincipalAccepted;
   
- 
     mapping(uint256 => PoolRouteConfig[])
-        public commitmentUniswapPoolRoutes;
+        internal commitmentUniswapPoolRoutes;
 
     mapping(uint256 => uint16)
-        public commitmentPoolOracleLtvRatio;
+        internal commitmentPoolOracleLtvRatio;
 
 
      //does not take a storage slot 
@@ -696,6 +695,36 @@ contract LenderCommitmentForwarder_U1 is
             );
     }
 
+
+
+     /**
+     * @dev Returns the PoolRouteConfig at a specific index for a given commitmentId from the commitmentUniswapPoolRoutes mapping.
+     * @param commitmentId The commitmentId to access the mapping.
+     * @param index The index in the array of PoolRouteConfigs for the given commitmentId.
+     * @return The PoolRouteConfig at the specified index.
+     */
+    function getCommitmentUniswapPoolRoute(uint256 commitmentId, uint index) public view returns (PoolRouteConfig memory) {
+        require(index < commitmentUniswapPoolRoutes[commitmentId].length, "Index out of bounds");
+        return commitmentUniswapPoolRoutes[commitmentId][index];
+    }
+
+    /**
+     * @dev Returns the entire array of PoolRouteConfigs for a given commitmentId from the commitmentUniswapPoolRoutes mapping.
+     * @param commitmentId The commitmentId to access the mapping.
+     * @return The entire array of PoolRouteConfigs for the specified commitmentId.
+     */
+    function getAllCommitmentUniswapPoolRoutes(uint256 commitmentId) public view returns (PoolRouteConfig[] memory) {
+        return commitmentUniswapPoolRoutes[commitmentId];
+    }
+
+    /**
+     * @dev Returns the uint16 value for a given commitmentId from the commitmentPoolOracleLtvRatio mapping.
+     * @param commitmentId The key to access the mapping.
+     * @return The uint16 value for the specified commitmentId.
+     */
+    function getCommitmentPoolOracleLtvRatio(uint256 commitmentId) public view returns (uint16) {
+        return commitmentPoolOracleLtvRatio[commitmentId];
+    }
 
 
     // ---- TWAP 

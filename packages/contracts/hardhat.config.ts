@@ -382,7 +382,7 @@ export default <HardhatUserConfig>{
       url: networkUrls.polygon,
       chainId: 137,
       live: true,
-       gasPrice:Number(ethers.parseUnits('810', 'gwei')),
+       gasPrice:Number(ethers.parseUnits('210', 'gwei')),
 
       verify: {
         etherscan: {

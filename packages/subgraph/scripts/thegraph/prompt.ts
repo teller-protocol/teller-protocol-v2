@@ -253,7 +253,7 @@ const buildAndDeploy = async ({
    
       //override grafting base here 
 
-      const USE_CUSTOM_GRAFTING = false;
+      const USE_CUSTOM_GRAFTING = true;
 
       if (USE_CUSTOM_GRAFTING) {
         args.grafting = {

@@ -14,6 +14,9 @@ import * as websocket from "../ws";
 
 import { IApiArgs, InnerAPI, SubgraphVersion, VersionUpdate } from "./index";
 
+
+const SAVE_LOAD_COOKIE = false;
+
 const mutex = new Mutex();
 
 interface INetworkConfig {
@@ -127,7 +130,7 @@ export const makeStudio = async (
 
       let cookie: string | null = null;
       const Cookie = studioConfig[networkConfig.owner.address]?.Cookie;
-      if (Cookie) {
+      if (Cookie && SAVE_LOAD_COOKIE) {
         if (new Date(Cookie.expiration).getTime() > Date.now()) {
           cookie = Cookie.value;
         } else {

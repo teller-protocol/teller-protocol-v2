@@ -21,6 +21,9 @@ import {
 } from "./updaters";
 import { CommitmentStatus, isRolloverable } from "./utils";
 
+
+import { log } from '@graphprotocol/graph-ts'
+
 export function handleCreatedCommitment(event: CreatedCommitment): void {
   const commitmentId = event.params.commitmentId;
   const commitment = updateLenderCommitment(
@@ -37,6 +40,9 @@ export function handleCreatedCommitment(event: CreatedCommitment): void {
   commitment.save();
 
   linkCommitmentToRewards(commitment);
+
+  log.info("Handle created commitment", [event.address.toString(),commitmentId.toString()])
+
 }
 
 export function handleCreatedCommitments(events: CreatedCommitment[]): void {
@@ -56,6 +62,8 @@ export function handleUpdatedCommitment(event: UpdatedCommitment): void {
     event.params.tokenAmount,
     event.address
   );
+
+  log.info("Handle updated commitment",  [event.address.toString(),commitmentId.toString()])
 }
 
 export function handleUpdatedCommitments(events: UpdatedCommitment[]): void {

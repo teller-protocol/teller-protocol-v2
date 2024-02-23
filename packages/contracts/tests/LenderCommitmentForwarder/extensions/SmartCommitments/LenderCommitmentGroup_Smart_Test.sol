@@ -24,7 +24,7 @@ Write tests for a borrower . borrowing money from the group
 
 
 -write a test that ensures that adding principal then removing it will mean that totalPrincipalCommitted is the net amount 
--write a test that 
+-write a test that ensures that when you put in 100 you get 100 shares and when you put in 20 after that you have 120 shares (makes sure that sharesAmount is correct) 
 
 
 */

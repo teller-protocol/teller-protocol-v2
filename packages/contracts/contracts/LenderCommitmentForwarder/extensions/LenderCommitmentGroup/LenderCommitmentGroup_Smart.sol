@@ -357,11 +357,13 @@ contract LenderCommitmentGroup_Smart is
         //gives
         principalToken.transferFrom(msg.sender, address(this), _amount);
 
+        
+        sharesAmount_ = _valueOfUnderlying(_amount, sharesExchangeRate());
+
+        //this needs to go below sharesAmount = 
         totalPrincipalTokensCommitted += _amount;
         principalTokensCommittedByLender[msg.sender] += _amount;
 
-        
-        sharesAmount_ = _valueOfUnderlying(_amount, sharesExchangeRate());
 
         //mint shares equal to _amount and give them to the shares recipient !!!
         poolSharesToken.mint(_sharesRecipient, sharesAmount_);

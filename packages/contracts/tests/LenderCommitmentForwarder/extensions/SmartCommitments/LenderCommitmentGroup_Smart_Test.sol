@@ -21,6 +21,12 @@ Write tests for a borrower . borrowing money from the group
 - write tests for the LTV ratio and make sure that is working as expected (mock) 
 - write tests for the global liquidityThresholdPercent and built functionality for a user-specific liquidityThresholdPercent based on signalling shares.
 
+
+
+-write a test that ensures that adding principal then removing it will mean that totalPrincipalCommitted is the net amount 
+-write a test that 
+
+
 */
 
 contract LenderCommitmentGroup_Smart_Test is Testable {

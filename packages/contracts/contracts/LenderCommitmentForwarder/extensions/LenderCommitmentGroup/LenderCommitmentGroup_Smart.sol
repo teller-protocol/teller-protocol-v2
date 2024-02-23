@@ -822,7 +822,8 @@ multiplies by their pct of shares (S%)
     }
 
     //this is expanded by 10**18 
-  /*  function getRequiredCollateral(uint256 _principalAmount)
+    //this only exists to comply with the interface 
+   function getRequiredCollateral(uint256 _principalAmount)
         public
         view
         returns (uint256 requiredCollateral_)
@@ -830,7 +831,7 @@ multiplies by their pct of shares (S%)
         requiredCollateral_ = getCollateralRequiredForPrincipalAmount(
             _principalAmount
         );
-    }*/
+    } 
 
     function getMarketId() external view returns (uint256) {
         return marketId;

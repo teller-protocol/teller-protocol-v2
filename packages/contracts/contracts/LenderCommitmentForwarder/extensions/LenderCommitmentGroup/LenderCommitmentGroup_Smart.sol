@@ -153,18 +153,16 @@ contract LenderCommitmentGroup_Smart is
 
     uint256 marketId;  
     
-  
-    uint256 public totalPrincipalTokensCommitted; //this can be less than we expect if tokens are donated to the contract and withdrawn
+    //this should be the net total principal tokens ,  lenderAdded - lenderWithdrawn
+    uint256 public totalPrincipalTokensCommitted;
 
-    uint256 public totalPrincipalTokensLended;
-    //uint256 public totalExpectedInterestEarned;
+    uint256 public totalPrincipalTokensLended; 
     uint256 public totalPrincipalTokensRepaid; //subtract this and the above to find total principal tokens outstanding for loans
 
     uint256 public totalCollateralTokensEscrowedForLoans; // we use this in conjunction with totalPrincipalTokensLended for a psuedo TWAP price oracle of C tokens, used for exiting  .  Nice bc it is averaged over all of our relevant loans, not the current price.
     
 
-    uint256 public totalInterestCollected;
-    //uint256 public totalInterestWithdrawn;
+    uint256 public totalInterestCollected;  
 
     uint16 public liquidityThresholdPercent; //5000 is 50 pct  // enforce max of 10000
     uint16 public loanToValuePercent; //the overcollateralization ratio, typically 80 pct
@@ -178,6 +176,7 @@ contract LenderCommitmentGroup_Smart is
     mapping(uint256 => bool) public activeBids;
 
     //this excludes interest 
+    // maybe it is possible to get rid of this storage slot and juts calculate it from totalPrincipalTokensRepaid, totalPrincipalTokensLended
     int256 tokenDifferenceFromLiquidations;
 
      
@@ -409,7 +408,7 @@ contract LenderCommitmentGroup_Smart is
 
         
         //this is expanded by 10**18 
-        uint256 requiredCollateral = getRequiredCollateral(_principalAmount);
+        uint256 requiredCollateral = getCollateralRequiredForPrincipalAmount(_principalAmount);
 
         require(
             (_collateralAmount * 10**18)  >= requiredCollateral,
@@ -425,8 +424,7 @@ contract LenderCommitmentGroup_Smart is
         );
 
         totalPrincipalTokensLended += _principalAmount;
-        //totalExpectedInterestEarned += calculateExpectedInterestEarned( _principalAmount ,_loanDuration,_interestRate);
-
+        
 
         activeBids[_bidId] = true ; //bool for now 
         //emit event
@@ -469,45 +467,17 @@ contract LenderCommitmentGroup_Smart is
         //this DOES reduce total supply! This is necessary for correct math.
         poolSharesToken.burn(msg.sender, _amountPoolSharesTokens);
 
-         // incorporate sharesExchangeRateInverse somehow
+     
 
-
-
-    /*
-        uint256 netCommittedTokens = totalPrincipalTokensCommitted;
-
-        uint256 principalTokenEquityAmountSimple = totalPrincipalTokensCommitted +
-                totalInterestCollected -
-                (totalInterestWithdrawn);
-
-        
-
-        uint256 principalTokenValueToWithdraw = (principalTokenEquityAmountSimple *
-                _amountPoolSharesTokens) / poolSharesTotalSupplyBeforeBurn;
-        */
+ 
         uint256 principalTokenValueToWithdraw = _valueOfUnderlying(_amountPoolSharesTokens, sharesExchangeRateInverse()); 
         
 
-        uint256 tokensToUncommit = principalTokenValueToWithdraw ; /*(netCommittedTokens *
-            _amountPoolSharesTokens) / poolSharesTotalSupplyBeforeBurn;*/
+        //uint256 tokensToUncommit = principalTokenValueToWithdraw ; 
 
+        totalPrincipalTokensCommitted -= principalTokenValueToWithdraw;
 
-  //stop tracking these in general ? dont need them .. ?     
-/*
-        totalPrincipalTokensCommitted -= tokensToUncommit;
-        
-
-        totalInterestWithdrawn +=
-            principalTokenValueToWithdraw -
-            tokensToUncommit;
  
-        principalTokensCommittedByLender[
-            msg.sender
-        ] -= principalTokenValueToWithdraw;
-
-      */
-
-      
         principalToken.transfer(_recipient, principalTokenValueToWithdraw);
 
         return principalTokenValueToWithdraw;
@@ -538,17 +508,26 @@ contract LenderCommitmentGroup_Smart is
 
         if( _tokenAmountDifference > 0){
             //this is used when the collateral value is higher than the principal (rare) 
+            //the loan will be completely made whole and our contract gets extra funds too 
             uint256 tokensToTakeFromSender = abs( _tokenAmountDifference );
  
             IERC20(principalToken).transferFrom( msg.sender, address(this), amountDue + tokensToTakeFromSender );
 
             tokenDifferenceFromLiquidations  += int256(tokensToTakeFromSender);
-        }else {
+
+
+            totalPrincipalTokensRepaid += amountDue;
+        
+        } else {
+            //the loan will be not be made whole and will be short 
+
             uint256 tokensToGiveToSender = abs( _tokenAmountDifference );
                  
             IERC20(principalToken).transferFrom( msg.sender, address(this), amountDue - tokensToGiveToSender );
 
             tokenDifferenceFromLiquidations  -= int256(tokensToGiveToSender);
+
+            totalPrincipalTokensRepaid += (amountDue - tokensToGiveToSender);
         }
 
         //this will give collateral to the caller
@@ -626,25 +605,7 @@ multiplies by their pct of shares (S%)
  
 */
 
-   /*
-    function collateralTokenExchangeRate() public view returns (uint256 rate_) {
-        uint256 totalPrincipalTokensUsedForLoans = totalPrincipalTokensLended -
-            totalPrincipalTokensRepaid;
-        uint256 totalCollateralTokensUsedForLoans = totalCollateralTokensEscrowedForLoans;
-
-        if (totalPrincipalTokensUsedForLoans == 0) {
-            return EXCHANGE_RATE_EXPANSION_FACTOR; // 1 to 1 for first swap
-        }
-
-        rate_ =
-            (totalCollateralTokensUsedForLoans *
-                EXCHANGE_RATE_EXPANSION_FACTOR) /
-            totalPrincipalTokensUsedForLoans;
-    }
-
-    
-*/
-
+   
     /*
         careful with this because someone donating tokens into the contract could make for weird math ?
     */
@@ -807,7 +768,11 @@ multiplies by their pct of shares (S%)
     }
 
    
+    /*
+    Thisc callback occurs when a TellerV2 repayment happens and when a TellerV2 liquidate happens 
 
+    lenderCloseLoan does not trigger a repayLoanCallback 
+    */
     function repayLoanCallback(
         uint256 _bidId,
         address repayer,
@@ -857,7 +822,7 @@ multiplies by their pct of shares (S%)
     }
 
     //this is expanded by 10**18 
-    function getRequiredCollateral(uint256 _principalAmount)
+  /*  function getRequiredCollateral(uint256 _principalAmount)
         public
         view
         returns (uint256 requiredCollateral_)
@@ -865,7 +830,7 @@ multiplies by their pct of shares (S%)
         requiredCollateral_ = getCollateralRequiredForPrincipalAmount(
             _principalAmount
         );
-    }
+    }*/
 
     function getMarketId() external view returns (uint256) {
         return marketId;
@@ -892,9 +857,9 @@ multiplies by their pct of shares (S%)
         view
         returns (uint256)
     {
-        uint256 amountAvailable = totalPrincipalTokensCommitted -
-            getTotalPrincipalTokensOutstandingInActiveLoans();
+        int256 amountAvailable = int256(totalPrincipalTokensCommitted) -
+            int256(getTotalPrincipalTokensOutstandingInActiveLoans()) + tokenDifferenceFromLiquidations;
 
-        return amountAvailable.percent(liquidityThresholdPercent);
+        return uint256(amountAvailable).percent(liquidityThresholdPercent);
     }
 }

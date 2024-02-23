@@ -39,7 +39,6 @@ import { ILenderCommitmentGroup } from "../../../interfaces/ILenderCommitmentGro
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-import "lib/forge-std/src/console.sol";
 
 /*
 
@@ -133,6 +132,9 @@ contract LenderCommitmentGroup_Smart is
 {
     using AddressUpgradeable for address;
     using NumbersLib for uint256;
+
+    
+    uint256 public immutable STANDARD_EXPANSION_FACTOR = 1e18;
 
     uint256 public immutable EXCHANGE_RATE_EXPANSION_FACTOR = 1e36; //consider making this dynamic 
 
@@ -312,9 +314,11 @@ contract LenderCommitmentGroup_Smart is
         Should get slightly less shares than principal tokens put in !! diluted by ratio of pools actual equity 
        */
 
-        uint256 poolTotalEstimatedValue = getPoolTotalEstimatedValue();
+        uint256 poolTotalEstimatedValue = getPoolTotalEstimatedValue(); 
         uint256 poolTotalEstimatedValuePlusInterest = poolTotalEstimatedValue +
                 totalInterestCollected;
+
+           
 
         if (poolTotalEstimatedValue == 0) {
             return EXCHANGE_RATE_EXPANSION_FACTOR; // 1 to 1 for first swap
@@ -356,13 +360,14 @@ contract LenderCommitmentGroup_Smart is
         //transfers the primary principal token from msg.sender into this contract escrow
         //gives
         principalToken.transferFrom(msg.sender, address(this), _amount);
-
-        
+  
+     
         sharesAmount_ = _valueOfUnderlying(_amount, sharesExchangeRate());
 
-        //this needs to go below sharesAmount = 
+         
         totalPrincipalTokensCommitted += _amount;
         principalTokensCommittedByLender[msg.sender] += _amount;
+        
 
 
         //mint shares equal to _amount and give them to the shares recipient !!!
@@ -413,7 +418,7 @@ contract LenderCommitmentGroup_Smart is
         uint256 requiredCollateral = getCollateralRequiredForPrincipalAmount(_principalAmount);
 
         require(
-            (_collateralAmount * 10**18)  >= requiredCollateral,
+            (_collateralAmount * STANDARD_EXPANSION_FACTOR)  >= requiredCollateral,
             "Insufficient Borrower Collateral"
         );
 
@@ -661,7 +666,7 @@ multiplies by their pct of shares (S%)
 
 */
 
-    //this is expanded by 10**18 
+    //this is expanded by 1e18
     function getCollateralRequiredForPrincipalAmount(uint256 _principalAmount)
         public
         view
@@ -753,9 +758,9 @@ multiplies by their pct of shares (S%)
         returns (uint256)
     {
         // Convert amountToken0 to the same decimals as Token1
-        uint256 amountToken0WithToken1Decimals = amountToken0 * 10**18;
+        uint256 amountToken0WithToken1Decimals = amountToken0 * STANDARD_EXPANSION_FACTOR;
         // Now divide by the price to get the amount of token1
-        return (amountToken0WithToken1Decimals * 10**18)  / priceToken1PerToken0;
+        return (amountToken0WithToken1Decimals * STANDARD_EXPANSION_FACTOR)  / priceToken1PerToken0;
     }
 
     function token1ToToken0(uint256 amountToken1, uint256 priceToken1PerToken0)
@@ -823,7 +828,7 @@ multiplies by their pct of shares (S%)
         return CommitmentCollateralType.ERC20;
     }
 
-    //this is expanded by 10**18 
+    //this is expanded by 1e18 
     //this only exists to comply with the interface 
    function getRequiredCollateral(uint256 _principalAmount)
         public

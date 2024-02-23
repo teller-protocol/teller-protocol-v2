@@ -9,6 +9,10 @@ import {UniswapV3PoolMock} from "../../../../contracts/mock/uniswap/UniswapV3Poo
 import {UniswapV3FactoryMock} from "../../../../contracts/mock/uniswap/UniswapV3FactoryMock.sol";
 import { PaymentType, PaymentCycleType } from "../../../../contracts/libraries/V2Calculations.sol";
 import { LoanDetails, Payment, BidState , Bid, Terms } from "../../../../contracts/TellerV2Storage.sol";
+
+
+import "lib/forge-std/src/console.sol";
+
 //contract LenderCommitmentGroup_Smart_Mock is ExtensionsContextUpgradeable {}
 
 /*
@@ -168,6 +172,36 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
 
         //lenderCommitmentGroupSmart.set_totalPrincipalTokensCommitted(1000000);
         //lenderCommitmentGroupSmart.set_totalInterestCollected(2000000);
+
+        vm.prank(address(lender));
+        principalToken.approve(address(lenderCommitmentGroupSmart), 1000000);
+
+        vm.prank(address(lender));
+        uint256 sharesAmount_ = lenderCommitmentGroupSmart
+            .addPrincipalToCommitmentGroup(1000000, address(borrower));
+
+        uint256 expectedSharesAmount = 500000;
+
+        //use ttoken logic to make this better
+        assertEq(
+            sharesAmount_,
+            expectedSharesAmount,
+            "Received an unexpected amount of shares"
+        );
+    }
+
+    function test_addPrincipalToCommitmentGroup_after_nonzero_shares()
+        public
+    {
+        principalToken.transfer(address(lenderCommitmentGroupSmart), 1e18);
+        collateralToken.transfer(address(lenderCommitmentGroupSmart), 1e18);
+ 
+       
+        initialize_group_contract();
+        lenderCommitmentGroupSmart.set_totalInterestCollected(1e6 * 1);
+        lenderCommitmentGroupSmart.set_totalPrincipalTokensCommitted(1e6 * 1);
+
+        
 
         vm.prank(address(lender));
         principalToken.approve(address(lenderCommitmentGroupSmart), 1000000);

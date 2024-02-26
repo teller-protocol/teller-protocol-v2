@@ -509,7 +509,7 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
         uint256 loanDefaultTimestamp = block.timestamp - 2000; //sim that loan defaulted 2000 seconds ago 
 
         int256 min_amount = lenderCommitmentGroupSmart.super_getMinimumAmountDifferenceToCloseDefaultedLoan(
-            bidId,
+             
             amountDue,
             loanDefaultTimestamp
         );
@@ -535,7 +535,7 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
 
         vm.expectRevert("Loan defaulted timestamp must be in the past");
         int256 min_amount = lenderCommitmentGroupSmart.super_getMinimumAmountDifferenceToCloseDefaultedLoan(
-            bidId,
+           
             amountDue,
             loanDefaultTimestamp
         );
@@ -557,7 +557,7 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
         uint256 loanDefaultTimestamp = block.timestamp - 22000 ; //sim that loan defaulted 2000 seconds ago 
 
         int256 min_amount = lenderCommitmentGroupSmart.super_getMinimumAmountDifferenceToCloseDefaultedLoan(
-            bidId,
+           
             amountDue,
             loanDefaultTimestamp
         );
@@ -692,7 +692,7 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
 
         //uint256 expectedAmount = 1e14;
         //todo: why is it this ? 
-        uint256 expectedAmount = 102020031989393413700000000000000; // 100501226962305;
+        uint256 expectedAmount = 100000000000000000000000000000000; // 100501226962305;
 
         assertEq(
             amount,

@@ -39,7 +39,7 @@ contract LenderCommitmentGroup_Smart_Override is LenderCommitmentGroup_Smart {
 
 
     function getMinimumAmountDifferenceToCloseDefaultedLoan(
-        uint256 _bidId,
+        
         uint256 _amountOwed,
         uint256 _loanDefaultedTimestamp
     ) public view override returns (int256 amountDifference_ ) {
@@ -48,12 +48,12 @@ contract LenderCommitmentGroup_Smart_Override is LenderCommitmentGroup_Smart {
     }
     
     function super_getMinimumAmountDifferenceToCloseDefaultedLoan(
-        uint256 _bidId,
+        
         uint256 _amountOwed,
         uint256 _loanDefaultedTimestamp
     ) public view returns (int256  ) {
 
-        return super.getMinimumAmountDifferenceToCloseDefaultedLoan(_bidId,_amountOwed,_loanDefaultedTimestamp);
+        return super.getMinimumAmountDifferenceToCloseDefaultedLoan(_amountOwed,_loanDefaultedTimestamp);
     }
 
     function getAmountOwedForBid(uint256 _bidId, bool _includeInterest)

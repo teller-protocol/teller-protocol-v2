@@ -500,7 +500,7 @@ contract LenderCommitmentGroup_Smart is
 
         uint256 loanDefaultedTimeStamp = ITellerV2(TELLER_V2).getLoanDefaultTimestamp(_bidId);
 
-        int256 minAmountDifference  = getMinimumAmountDifferenceToCloseDefaultedLoan(_bidId,amountDue,loanDefaultedTimeStamp);
+        int256 minAmountDifference  = getMinimumAmountDifferenceToCloseDefaultedLoan(amountDue,loanDefaultedTimeStamp);
 
         require( _tokenAmountDifference >= minAmountDifference , "Insufficient tokenAmountDifference");
         
@@ -555,8 +555,7 @@ contract LenderCommitmentGroup_Smart is
 
         Starts at 5000 and ticks down to -5000 
     */
-    function getMinimumAmountDifferenceToCloseDefaultedLoan(
-        uint256 _bidId,
+    function getMinimumAmountDifferenceToCloseDefaultedLoan(        
         uint256 _amountOwed,
         uint256 _loanDefaultedTimestamp
     ) public view virtual returns (int256 amountDifference_ ) {
@@ -582,81 +581,7 @@ contract LenderCommitmentGroup_Smart is
         return x >= 0 ? uint(x) : uint(-x);
     }
 
-
-    /*
-When exiting, a lender is burning X shares 
-
-We calculate the total equity value (Z) of the pool  
-multiplies by their pct of shares (S%)    
-(naive is just total committed princ tokens and interest ,
- could maybe do better  )
-  We are going to give the lender  (Z * S%) value. 
-   The way we are going to give it to them is in a split of
-    principal (P) and collateral tokens (C)  which are in
-    the pool right now.   Similar to exiting a uni pool .  
-     C tokens will only be in the pool if bad defaults happened.  
-    
-  NOTE:  We will know the price of C in terms of P due to
-   the ratio of total P used for loans and total C used for loans 
-         
- NOTE: if there are not enough P and C tokens in the pool to 
- give the lender to equal a value of (Z * S%) then we revert . 
  
-*/
-
-   
-    /*
-        careful with this because someone donating tokens into the contract could make for weird math ?
-    */
-  /*
-    function calculateSplitTokenAmounts(uint256 _principalTokenAmountValue)
-        public
-        view
-        returns (uint256 principalAmount_, uint256 collateralAmount_)
-    { 
-
-        // need to see how many collateral tokens are in the contract atm
-
-        // need to know how many principal tokens are in the contract atm
-        uint256 principalTokenBalance = principalToken.balanceOf(address(this)); //this is also the principal token value
-       
-        uint256 collateralTokenBalance = collateralToken.balanceOf(
-            address(this)
-        );
-
-        //  need to know how the value of the collateral tokens  IN TERMS OF principal tokens
- 
-
-        uint256 collateralTokenValueInPrincipalToken = _valueOfUnderlying(
-            collateralTokenBalance,
-            collateralTokenExchangeRate()
-        );
-
-        uint256 totalValueInPrincipalTokens = collateralTokenValueInPrincipalToken +
-                principalTokenBalance;
-
-        if(totalValueInPrincipalTokens == 0) {return (0,0);}
-
-   
-
-        //i think i need more significant digits in my percent !?
-        uint256 principalTotalAmountPercent = (_principalTokenAmountValue *
-            10000 *
-            1e18) / totalValueInPrincipalTokens;
-
-       
-
-        uint256 principalTokensToGive = (principalTokenBalance *
-            principalTotalAmountPercent) / (1e18 * 10000);
-        uint256 collateralTokensToGive = (collateralTokenBalance *
-            principalTotalAmountPercent) / (1e18 * 10000);
-
-      
-
-        return (principalTokensToGive, collateralTokensToGive);
-    }
-
-*/
 
     //this is expanded by 1e18
     function getCollateralRequiredForPrincipalAmount(uint256 _principalAmount)
@@ -664,19 +589,21 @@ multiplies by their pct of shares (S%)
         view
         returns (uint256)
     {
+        //i am not sure this is being used properly.. 
         uint256 baseAmount = getCollateralTokensPricePerPrincipalTokens(
             _principalAmount
         );
 
+        //this is an amount of collateral 
         return baseAmount.percent(loanToValuePercent);
     }
 
     //this is priceToken1PerToken0 expanded by 1e18
-    function _getUniswapV3TokenPairPrice() internal view returns (uint256) {
+    function _getUniswapV3TokenPairPrice(uint32 _twapInterval) internal view returns (uint256) {
         // represents the square root of the price of token1 in terms of token0
  
         
-        uint160 sqrtPriceX96 = getSqrtTwapX96(twapInterval);
+        uint160 sqrtPriceX96 = getSqrtTwapX96(_twapInterval);
 
         // sqrtPrice is in X96 format so we scale it down to get the price
         // Also note that this price is a relative price between the two tokens in the pool
@@ -720,25 +647,28 @@ multiplies by their pct of shares (S%)
 
     //this is expanded by 10e18 
     function getCollateralTokensPricePerPrincipalTokens(
-        uint256 collateralTokenAmount
-    ) public view returns (uint256 principalTokenValue_) {
+        uint256 principalTokenAmountValue
+    ) public view returns (uint256 collateralTokensAmountToMatchValue) {
         
         //same concept as zeroforone 
         (address token0,) = _getPoolTokens(); 
 
         bool principalTokenIsToken0 = (address(principalToken) == token0);  
 
-        uint256 pairPrice = _getUniswapV3TokenPairPrice();
+        uint256 pairPriceWithTwap = _getUniswapV3TokenPairPrice(twapInterval);
+        uint256 pairPriceImmediate = _getUniswapV3TokenPairPrice(0);
+
+        uint256 worstCastPairPrice = Math.min(  pairPriceWithTwap , pairPriceImmediate );
 
         if (principalTokenIsToken0) {
-            principalTokenValue_ = token1ToToken0(
-                collateralTokenAmount,
-                pairPrice
+            collateralTokensAmountToMatchValue = token1ToToken0(
+                principalTokenAmountValue,
+                worstCastPairPrice  //if this is lower, collateral tokens amt will be higher 
             );
         } else {
-            principalTokenValue_ = token0ToToken1(
-                collateralTokenAmount,
-                pairPrice
+            collateralTokensAmountToMatchValue = token0ToToken1(
+                principalTokenAmountValue,
+                worstCastPairPrice  //if this is lower, collateral tokens amt will be higher 
             );
         }
     }

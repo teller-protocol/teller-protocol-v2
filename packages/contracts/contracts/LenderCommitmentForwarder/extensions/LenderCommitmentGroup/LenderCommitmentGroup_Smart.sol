@@ -139,6 +139,9 @@ contract LenderCommitmentGroup_Smart is
     
     uint256 public immutable STANDARD_EXPANSION_FACTOR = 1e18;
 
+    uint256 public immutable UNISWAP_EXPANSION_FACTOR = 2**96;
+
+
     uint256 public immutable EXCHANGE_RATE_EXPANSION_FACTOR = 1e36; //consider making this dynamic 
 
  
@@ -590,24 +593,32 @@ contract LenderCommitmentGroup_Smart is
         return baseAmount.percent(loanToValuePercent);
     }
 
-    //this is priceToken1PerToken0 expanded by 1e18
+    
+    //remember that this result is expanded by UNISWAP_EXPANSION_FACTOR
     function _getUniswapV3TokenPairPrice(uint32 _twapInterval) internal view returns (uint256) {
-        // represents the square root of the price of token1 in terms of token0
- 
+        // represents the square root of the price of token1 in terms of token0 
         
-        uint160 sqrtPriceX96 = getSqrtTwapX96(_twapInterval);
+        uint160 sqrtPriceX96 = getSqrtTwapX96(_twapInterval); 
+       
+        //this output is the price ratio expanded by 1e18
+        return _getPriceFromSqrtX96( sqrtPriceX96 )    ;
+    }
 
-         uint160 sqrtPrice =  sqrtPriceX96/ (2**96)  ;
+     //remember that this result is expanded by UNISWAP_EXPANSION_FACTOR
+     function _getPriceFromSqrtX96(uint160 _sqrtPriceX96) internal pure returns (uint256 price_) {
+
+       // uint160 sqrtPrice =  _sqrtPriceX96    ; 
+
+        uint256 priceX96 = (uint256(_sqrtPriceX96) * uint256(_sqrtPriceX96))  / (2**96) ;
+
 
         // sqrtPrice is in X96 format so we scale it down to get the price
         // Also note that this price is a relative price between the two tokens in the pool
         // It's not a USD price
-        uint256 price = (  (uint256(sqrtPrice) * uint256(sqrtPrice))   );
+        price_ =  priceX96   ;  
 
+     }
 
-        //this output is the price ratio expanded by 1e18
-        return price  * 1e18   ;
-    }
 
     // ---- TWAP 
 
@@ -660,21 +671,29 @@ contract LenderCommitmentGroup_Smart is
         );
     }
 
+    /*
+        Dev Note: pairPriceWithTwap and pairPriceImmediate are expanded by UNISWAP_EXPANSION_FACTOR
+
+    */
      function _getCollateralTokensAmountEquivalentToPrincipalTokens(
         uint256 principalTokenAmountValue,
         uint256 pairPriceWithTwap,
         uint256 pairPriceImmediate,  
         bool principalTokenIsToken0
-    ) internal view  returns (uint256 collateralTokensAmountToMatchValue) {
-        
-        uint256 worstCasePairPrice = Math.min(  pairPriceWithTwap , pairPriceImmediate );
+    ) internal pure  returns (uint256 collateralTokensAmountToMatchValue) {
+              
+        if (principalTokenIsToken0) { 
+            //token 1 to token 0 ?
+            uint256 worstCasePairPrice = Math.min(  pairPriceWithTwap , pairPriceImmediate );
 
-        if (principalTokenIsToken0) {
             collateralTokensAmountToMatchValue = token1ToToken0(
                 principalTokenAmountValue,
                 worstCasePairPrice  //if this is lower, collateral tokens amt will be higher 
             );
-        } else {
+        } else { 
+            //token 0 to token 1 ?
+            uint256 worstCasePairPrice = Math.max(  pairPriceWithTwap , pairPriceImmediate );
+
             collateralTokensAmountToMatchValue = token0ToToken1(
                 principalTokenAmountValue,
                 worstCasePairPrice  //if this is lower, collateral tokens amt will be higher 
@@ -682,16 +701,18 @@ contract LenderCommitmentGroup_Smart is
         }
     }
 
-    //do i have to use the actual token decimals or can i just use 18 ?
+    
+    
+    //remember that the priceToken1PerToken0 is always expanded by 1e18 
     function token0ToToken1(uint256 amountToken0, uint256 priceToken1PerToken0)
         internal
         pure
         returns (uint256)
     {
         // Convert amountToken0 to the same decimals as Token1
-        uint256 amountToken0WithToken1Decimals = amountToken0 * STANDARD_EXPANSION_FACTOR;
+       // uint256 amountToken0WithToken1Decimals = amountToken0 * STANDARD_EXPANSION_FACTOR;
         // Now divide by the price to get the amount of token1
-        return (amountToken0WithToken1Decimals * STANDARD_EXPANSION_FACTOR)  / priceToken1PerToken0;
+        return (amountToken0 * UNISWAP_EXPANSION_FACTOR)  / priceToken1PerToken0;
     }
 
     function token1ToToken0(uint256 amountToken1, uint256 priceToken1PerToken0)
@@ -700,9 +721,9 @@ contract LenderCommitmentGroup_Smart is
         returns (uint256)
     {
         // Multiply the amount of token1 by the price to get the amount in token0's units
-        uint256 amountToken1InToken0 = amountToken1 * priceToken1PerToken0;
+       // uint256 amountToken1InToken0 = amountToken1 * priceToken1PerToken0 / UNISWAP_EXPANSION_FACTOR;
         // Now adjust for the decimal difference
-        return amountToken1InToken0  ;
+        return amountToken1 * priceToken1PerToken0 / UNISWAP_EXPANSION_FACTOR  ;
     }
 
    

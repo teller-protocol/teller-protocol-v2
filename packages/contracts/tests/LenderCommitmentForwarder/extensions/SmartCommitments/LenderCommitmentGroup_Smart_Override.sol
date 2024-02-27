@@ -153,6 +153,13 @@ contract LenderCommitmentGroup_Smart_Override is LenderCommitmentGroup_Smart {
     }
 
 
+    function super_getPriceFromSqrtX96(uint160 _sqrtPriceX96) public pure returns (uint256 price_) {
+
+        price_ =  super._getPriceFromSqrtX96(_sqrtPriceX96);
+    }
+
+
+
 
 
     /*

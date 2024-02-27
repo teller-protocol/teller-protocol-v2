@@ -669,16 +669,18 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
     /*
       improve tests for this 
 
-      AND for _getUniswapV3TokenPairPrice
+      
     */
 
-    function test_getCollateralTokensPriceAmountEquivalentToPrincipalTokens() public {
+    function test_getCollateralTokensAmountEquivalentToPrincipalTokens_scenarioA() public {
          
         initialize_group_contract();
 
-
-        //need to fix this WRT the addition of the price oracle .. ? 
-        
+        uint256 principalTokenAmountValue = 9000;
+        uint256 pairPriceWithTwap = 1 * 2**96;
+        uint256 pairPriceImmediate = 2 * 2**96;
+        bool principalTokenIsToken0 = false;
+ 
         
         uint256 amountCollateral = lenderCommitmentGroupSmart
             .super_getCollateralTokensAmountEquivalentToPrincipalTokens(
@@ -688,14 +690,76 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
                 principalTokenIsToken0                
                 );
 
-        //uint256 expectedAmount = 1e14;
-        //todo: why is it this ? 
-        uint256 expectedAmount = 100000000000000000000000000000000; // 100501226962305;
+       
+        uint256 expectedAmount = 4500;  
 
         assertEq(
             amountCollateral,
             expectedAmount,
             "Unexpected getCollateralTokensPricePerPrincipalTokens"
+        );
+    }
+
+    function test_getCollateralTokensAmountEquivalentToPrincipalTokens_scenarioB() public {
+         
+        initialize_group_contract();
+
+        uint256 principalTokenAmountValue = 9000;
+        uint256 pairPriceWithTwap = 1 * 2**96;
+        uint256 pairPriceImmediate = 2 * 2**96;
+        bool principalTokenIsToken0 = true;
+ 
+        
+        uint256 amountCollateral = lenderCommitmentGroupSmart
+            .super_getCollateralTokensAmountEquivalentToPrincipalTokens(
+                principalTokenAmountValue,
+                pairPriceWithTwap,
+                pairPriceImmediate,
+                principalTokenIsToken0                
+                );
+
+       
+        uint256 expectedAmount = 9000;  
+
+        assertEq(
+            amountCollateral,
+            expectedAmount,
+            "Unexpected getCollateralTokensPricePerPrincipalTokens"
+        );
+    }
+
+
+     /*
+     
+
+      test for _getUniswapV3TokenPairPrice
+    */
+ function test_getPriceFromSqrtX96_scenarioA() public {
+         
+        initialize_group_contract(); 
+ 
+        uint160 sqrtPriceX96 = 771166083179357884152611;
+
+        uint256 priceX96 = lenderCommitmentGroupSmart
+            .super_getPriceFromSqrtX96(
+                 sqrtPriceX96               
+                );
+
+        uint256 price = priceX96 * 1e18 / 2**96;
+
+        uint256 expectedAmountX96 = 7506133033681329001;
+        uint256 expectedAmount = 94740718; 
+
+          assertEq(
+            priceX96,
+            expectedAmountX96,
+            "Unexpected getPriceFromSqrtX96"
+        );
+        
+        assertEq(
+            price,
+            expectedAmount,
+            "Unexpected getPriceFromSqrtX96"
         );
     }
 }

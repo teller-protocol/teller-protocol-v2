@@ -212,9 +212,8 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
         uint256 requiredCollateral = lenderCommitmentForwarder.getRequiredCollateral(
             principalAmount,
             priceRatio,
-            ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC20,
-            address(collateralToken),
-            address(principalToken)
+            ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC20 
+           
             );
 
         assertEq( requiredCollateral, 1000, "unexpected required collateral" );
@@ -264,9 +263,7 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
         uint256 requiredCollateral = lenderCommitmentForwarder.getRequiredCollateral(
             principalAmount,
             priceRatio,
-            ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC20,
-            address(collateralToken),
-            address(principalToken)
+            ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC20 
             );
 
         assertEq( requiredCollateral, 100000, "unexpected required collateral" );
@@ -331,9 +328,7 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
         uint256 requiredCollateral = lenderCommitmentForwarder.getRequiredCollateral(
             principalAmount,
             priceRatio,
-            ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC20,
-            address(collateralToken),
-            address(principalToken)
+            ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC20 
             );
 
         assertEq( requiredCollateral, 1000, "unexpected required collateral" );
@@ -393,9 +388,7 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
         uint256 requiredCollateral = lenderCommitmentForwarder.getRequiredCollateral(
             principalAmount,
             priceRatio,
-            ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC20,
-            address(collateralToken),
-            address(principalToken)
+            ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC20 
             );
 
         assertEq( requiredCollateral, 1000, "unexpected required collateral" );
@@ -456,9 +449,7 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
         uint256 requiredCollateral = lenderCommitmentForwarder.getRequiredCollateral(
             principalAmount,
             priceRatio,
-            ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC20,
-            address(collateralToken),
-            address(principalToken)
+            ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC20 
             );
 
         assertEq( requiredCollateral, 1000, "unexpected required collateral" );
@@ -625,9 +616,7 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
         uint256 requiredCollateral = lenderCommitmentForwarder.getRequiredCollateral(
             principalAmount,
             priceRatio,
-            ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC20,
-            address(collateralToken),
-            address(principalToken)
+            ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC20 
             );
 
         assertEq( requiredCollateral, 1000, "unexpected required collateral" );
@@ -712,9 +701,7 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
         uint256 requiredCollateral = lenderCommitmentForwarder.getRequiredCollateral(
             principalAmount,
             priceRatio,
-            ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC20,
-            address(collateralToken),
-            address(principalToken)
+            ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC20 
             );
 
         assertEq( requiredCollateral, 1000, "unexpected required collateral" );
@@ -802,9 +789,7 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
         uint256 requiredCollateral = lenderCommitmentForwarder.getRequiredCollateral(
             principalAmount,
             priceRatio,
-            ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC20,
-            address(collateralToken),
-            address(principalToken)
+            ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC20 
             );
 
         assertEq( requiredCollateral, 1000, "unexpected required collateral" );
@@ -893,9 +878,7 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
         uint256 requiredCollateral = lenderCommitmentForwarder.getRequiredCollateral(
             principalAmount,
             priceRatio,
-            ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC20,
-            address(collateralToken),
-            address(principalToken)
+            ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC20 
             );
 
         assertEq( requiredCollateral, 1000, "unexpected required collateral" );
@@ -953,9 +936,7 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
         uint256 requiredCollateral = lenderCommitmentForwarder.getRequiredCollateral(
             principalAmount,
             priceRatio,
-            ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC20,
-            address(collateralToken),
-            address(principalToken)
+            ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC20 
             );
 
         assertEq( requiredCollateral, 1000, "unexpected required collateral" );

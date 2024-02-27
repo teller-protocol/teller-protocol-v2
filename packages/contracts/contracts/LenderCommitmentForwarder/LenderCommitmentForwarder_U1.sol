@@ -654,7 +654,7 @@ contract LenderCommitmentForwarder_U1 is
     /**
      * @notice Calculate the amount of collateral required to borrow a loan with _principalAmount of principal
      * @param _principalAmount The amount of currency to borrow for the loan.
-     * @param _maxPrincipalPerCollateralAmount The ratio for the amount of principal that can be borrowed for each amount of collateral. This is expanded additionally by the principal decimals.
+     * @param _maxPrincipalPerCollateralAmount The ratio for the amount of principal that can be borrowed for each amount of collateral.  
      * @param _collateralTokenType The type of collateral for the loan either ERC20, ERC721, ERC1155, or None.
     
      */
@@ -770,7 +770,7 @@ contract LenderCommitmentForwarder_U1 is
 
      
     /*
-        The resultant product is expanded by STANDARD_EXPANSION_FACTOR
+        The resultant product is expanded by STANDARD_EXPANSION_FACTOR one time 
     */
     function getUniswapPriceRatioForPool (  
         PoolRouteConfig memory _poolRouteConfig

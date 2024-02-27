@@ -449,10 +449,8 @@ contract LenderCommitmentGroup_Smart is
     }
 
     /*
-    must be initialized for this to work ! 
-
-    consider using the inverse of the SHARES EXCHANGE RATE here - wouldnt that work? why not ? 
-
+      
+ 
     also consider including 'totalSwappedTokensIn'
     */
     function burnSharesToWithdrawEarnings(
@@ -468,22 +466,16 @@ contract LenderCommitmentGroup_Smart is
     {
         //uint256 collectedInterest = LoanRepaymentInterestCollector( interestCollector ).collectInterest();
 
-        //figure out the ratio of shares tokens that this is
-        uint256 poolSharesTotalSupplyBeforeBurn = poolSharesToken.totalSupply();
+        
+        //uint256 poolSharesTotalSupplyBeforeBurn = poolSharesToken.totalSupply();
 
-        //this DOES reduce total supply! This is necessary for correct math.
-        poolSharesToken.burn(msg.sender, _amountPoolSharesTokens);
-
-     
-
+        //this  reduces total supply 
+        poolSharesToken.burn(msg.sender, _amountPoolSharesTokens); 
  
         uint256 principalTokenValueToWithdraw = _valueOfUnderlying(_amountPoolSharesTokens, sharesExchangeRateInverse()); 
-        
+         
 
-        //uint256 tokensToUncommit = principalTokenValueToWithdraw ; 
-
-        totalPrincipalTokensCommitted -= principalTokenValueToWithdraw;
-
+        totalPrincipalTokensCommitted -= principalTokenValueToWithdraw; 
  
         principalToken.transfer(_recipient, principalTokenValueToWithdraw);
 

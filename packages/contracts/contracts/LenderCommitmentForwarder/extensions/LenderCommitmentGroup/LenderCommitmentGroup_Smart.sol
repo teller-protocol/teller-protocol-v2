@@ -703,27 +703,36 @@ contract LenderCommitmentGroup_Smart is
 
     
     
-    //remember that the priceToken1PerToken0 is always expanded by 1e18 
+    //note: the price is still expanded by UNISWAP_EXPANSION_FACTOR 
     function token0ToToken1(uint256 amountToken0, uint256 priceToken1PerToken0)
         internal
         pure
         returns (uint256)
     {
-        // Convert amountToken0 to the same decimals as Token1
-       // uint256 amountToken0WithToken1Decimals = amountToken0 * STANDARD_EXPANSION_FACTOR;
-        // Now divide by the price to get the amount of token1
-        return (amountToken0 * UNISWAP_EXPANSION_FACTOR)  / priceToken1PerToken0;
+        
+         return  MathUpgradeable.mulDiv(
+                amountToken0,
+                UNISWAP_EXPANSION_FACTOR,
+                priceToken1PerToken0,
+                MathUpgradeable.Rounding.Up
+            );
+
     }
 
+     //note: the price is still expanded by UNISWAP_EXPANSION_FACTOR 
     function token1ToToken0(uint256 amountToken1, uint256 priceToken1PerToken0)
         internal
         pure
         returns (uint256)
     {
-        // Multiply the amount of token1 by the price to get the amount in token0's units
-       // uint256 amountToken1InToken0 = amountToken1 * priceToken1PerToken0 / UNISWAP_EXPANSION_FACTOR;
-        // Now adjust for the decimal difference
-        return amountToken1 * priceToken1PerToken0 / UNISWAP_EXPANSION_FACTOR  ;
+        
+        return  MathUpgradeable.mulDiv(
+                amountToken1,
+                priceToken1PerToken0,
+                UNISWAP_EXPANSION_FACTOR,
+                MathUpgradeable.Rounding.Up
+            );
+
     }
 
    

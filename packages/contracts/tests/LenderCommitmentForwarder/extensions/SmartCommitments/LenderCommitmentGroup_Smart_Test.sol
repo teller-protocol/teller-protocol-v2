@@ -728,6 +728,34 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
         );
     }
 
+     function test_getCollateralTokensAmountEquivalentToPrincipalTokens_scenarioC() public {
+         
+        initialize_group_contract();
+
+        uint256 principalTokenAmountValue = 9000;
+        uint256 pairPriceWithTwap = 1 * 2**96;
+        uint256 pairPriceImmediate = 60000 * 2**96;
+        bool principalTokenIsToken0 = false;
+ 
+        
+        uint256 amountCollateral = lenderCommitmentGroupSmart
+            .super_getCollateralTokensAmountEquivalentToPrincipalTokens(
+                principalTokenAmountValue,
+                pairPriceWithTwap,
+                pairPriceImmediate,
+                principalTokenIsToken0                
+                );
+
+       
+        uint256 expectedAmount = 1;  
+
+        assertEq(
+            amountCollateral,
+            expectedAmount,
+            "Unexpected getCollateralTokensPricePerPrincipalTokens"
+        );
+    }
+
 
      /*
      

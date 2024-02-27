@@ -59,7 +59,7 @@ deployFn.dependencies = ['teller-v2:deploy', 'market-registry:v2-upgrade']
 deployFn.skip = async (hre) => {
   return (
     !hre.network.live ||
-    !['mainnet', 'arbitrum', 'goerli'].includes(hre.network.name)
+    !['mainnet',   'goerli'].includes(hre.network.name)
   )
 }
 export default deployFn

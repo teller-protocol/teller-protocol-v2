@@ -64,7 +64,7 @@ deployFn.dependencies = ['teller-v2:deploy', 'collateral:manager-v2:deploy']
 deployFn.skip = async (hre) => {
   return (
     !hre.network.live ||
-    !['mainnet', 'arbitrum', 'goerli'].includes(hre.network.name)
+    !['mainnet',   'goerli'].includes(hre.network.name)
   )
 }
 export default deployFn

@@ -35,10 +35,12 @@ import { CommitmentCollateralType, ISmartCommitment } from "../../../interfaces/
 import { ILoanRepaymentListener } from "../../../interfaces/ILoanRepaymentListener.sol";
 
 import { ILenderCommitmentGroup } from "../../../interfaces/ILenderCommitmentGroup.sol";
- import {Payment} from "../../../TellerV2Storage.sol";
+import {Payment} from "../../../TellerV2Storage.sol";
+
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-
+import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 /*
 
@@ -128,18 +130,18 @@ contract LenderCommitmentGroup_Smart is
     ILenderCommitmentGroup,
     ISmartCommitment,
     ILoanRepaymentListener,
-    Initializable 
+    Initializable,
+    OwnableUpgradeable,
+    PausableUpgradeable 
 {
     using AddressUpgradeable for address;
-    using NumbersLib for uint256;
-
+    using NumbersLib for uint256; 
     
     uint256 public immutable STANDARD_EXPANSION_FACTOR = 1e18;
 
     uint256 public immutable EXCHANGE_RATE_EXPANSION_FACTOR = 1e36; //consider making this dynamic 
 
-    /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
-    //ITellerV2 public immutable TELLER_V2;
+ 
     /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
     address public immutable TELLER_V2;
     address public immutable SMART_COMMITMENT_FORWARDER;
@@ -178,7 +180,7 @@ contract LenderCommitmentGroup_Smart is
     mapping(uint256 => bool) public activeBids;
 
     //this excludes interest 
-    // maybe it is possible to get rid of this storage slot and juts calculate it from totalPrincipalTokensRepaid, totalPrincipalTokensLended
+    // maybe it is possible to get rid of this storage slot and calculate it from totalPrincipalTokensRepaid, totalPrincipalTokensLended
     int256 tokenDifferenceFromLiquidations;
 
      
@@ -230,12 +232,7 @@ contract LenderCommitmentGroup_Smart is
         uint16 _loanToValuePercent, //essentially the overcollateralization ratio.  10000 is 1:1 baseline ? // initializer  ADD ME
         uint24 _uniswapPoolFee,
         uint32 _twapInterval
-        
-        /// @notice Explain to an end user what this does
-        /// @dev Explain to a developer any extra details
-        /// @return Documents the return variables of a contract’s function state variable
-        /// @inheritdoc	Copies all missing tags from the base function (must be followed by the contract name)
-        
+         
     )   
         initializer
         external
@@ -245,7 +242,9 @@ contract LenderCommitmentGroup_Smart is
         )
     {
        // require(!_initialized,"already initialized");
-       // _initialized = true; //not necessary ? 
+       // _initialized = true;  
+
+        __Pausable_init();
 
         principalToken = IERC20(_principalTokenAddress);
         collateralToken = IERC20(_collateralTokenAddress);
@@ -334,8 +333,7 @@ contract LenderCommitmentGroup_Smart is
      
     function sharesExchangeRateInverse() public virtual view returns (uint256 rate_) {
         
-
-            return  EXCHANGE_RATE_EXPANSION_FACTOR * EXCHANGE_RATE_EXPANSION_FACTOR /  sharesExchangeRate(); 
+        return  EXCHANGE_RATE_EXPANSION_FACTOR * EXCHANGE_RATE_EXPANSION_FACTOR /  sharesExchangeRate(); 
 
     }
 
@@ -360,15 +358,11 @@ contract LenderCommitmentGroup_Smart is
         //transfers the primary principal token from msg.sender into this contract escrow
         //gives
         principalToken.transferFrom(msg.sender, address(this), _amount);
-  
-     
+       
         sharesAmount_ = _valueOfUnderlying(_amount, sharesExchangeRate());
-
          
         totalPrincipalTokensCommitted += _amount;
         principalTokensCommittedByLender[msg.sender] += _amount;
-        
-
 
         //mint shares equal to _amount and give them to the shares recipient !!!
         poolSharesToken.mint(_sharesRecipient, sharesAmount_);
@@ -395,7 +389,7 @@ contract LenderCommitmentGroup_Smart is
         uint256 _collateralTokenId, //not used
         uint32 _loanDuration,
         uint16 _interestRate
-    ) external onlySmartCommitmentForwarder {
+    ) external onlySmartCommitmentForwarder whenNotPaused {
         //consider putting these into less readonly fn calls
         require(
             _collateralTokenAddress == address(collateralToken),
@@ -807,4 +801,20 @@ contract LenderCommitmentGroup_Smart is
 
         return uint256(amountAvailable).percent(liquidityThresholdPercent);
     }
+
+
+     /**
+     * @notice Lets the DAO/owner of the protocol implement an emergency stop mechanism.
+     */
+    function pauseBorrowing() public virtual onlyOwner whenNotPaused {
+        _pause();
+    }
+
+    /**
+     * @notice Lets the DAO/owner of the protocol undo a previously implemented emergency stop.
+     */
+    function unpauseBorrowing() public virtual onlyOwner whenPaused {
+        _unpause();
+    }
+
 }

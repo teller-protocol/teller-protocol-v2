@@ -21,18 +21,23 @@ import { User } from "../Test_Helpers.sol";
 
 import "../../contracts/mock/MarketRegistryMock.sol";
 
-import { LenderCommitmentForwarder_OracleLimited_Override } from "./LenderCommitmentForwarder_OracleLimited_Override.sol";
-import { ILenderCommitmentForwarderWithUniswap } from "../../contracts/interfaces/ILenderCommitmentForwarderWithUniswap.sol";
+import { LenderCommitmentForwarder_U1_Override } from "./LenderCommitmentForwarder_OracleLimited_Override.sol";
+import { ILenderCommitmentForwarder_U1   } from "../../contracts/interfaces/ILenderCommitmentForwarder_U1.sol";
 
 import {UniswapV3PoolMock} from "../../contracts/mock/uniswap/UniswapV3PoolMock.sol";
 
 import {UniswapV3FactoryMock} from "../../contracts/mock/uniswap/UniswapV3FactoryMock.sol";
 
+import "../../contracts/libraries/uniswap/FullMath.sol";
+ 
 import "forge-std/console.sol";
 
 
 
-contract LenderCommitmentForwarder_OracleLimited_Test is Testable {
+contract LenderCommitmentForwarder_U1_Test is Testable {
+
+   
+
     LenderCommitmentForwarderTest_TellerV2Mock private tellerV2Mock;
     MarketRegistryMock mockMarketRegistry;
 
@@ -44,15 +49,18 @@ contract LenderCommitmentForwarder_OracleLimited_Test is Testable {
     address[] borrowersArray;
 
     TestERC20Token principalToken;
-    uint8 constant principalTokenDecimals = 18;
+    uint8  principalTokenDecimals = 18;
 
     TestERC20Token collateralToken;
-    uint8 constant collateralTokenDecimals = 18; //try setting this to 6 
+    uint8  collateralTokenDecimals = 18;  
+
+     TestERC20Token intermediateToken;
+    uint8  intermediateTokenDecimals = 18; 
 
     TestERC721Token erc721Token;
     TestERC1155Token erc1155Token;
 
-    LenderCommitmentForwarder_OracleLimited_Override lenderCommitmentForwarder;
+    LenderCommitmentForwarder_U1_Override lenderCommitmentForwarder;
 
     uint256 maxPrincipal;
     uint32 expiration;
@@ -67,6 +75,7 @@ contract LenderCommitmentForwarder_OracleLimited_Test is Testable {
 
     UniswapV3FactoryMock mockUniswapFactory; 
     UniswapV3PoolMock mockUniswapPool; 
+    UniswapV3PoolMock mockUniswapPoolSecondary; 
 
     //  address principalTokenAddress;
  
@@ -79,7 +88,9 @@ contract LenderCommitmentForwarder_OracleLimited_Test is Testable {
         mockUniswapFactory = new UniswapV3FactoryMock();
         mockUniswapPool = new UniswapV3PoolMock();
 
-        lenderCommitmentForwarder = new LenderCommitmentForwarder_OracleLimited_Override(
+        mockUniswapPoolSecondary = new UniswapV3PoolMock();
+
+        lenderCommitmentForwarder = new LenderCommitmentForwarder_U1_Override(
             address(tellerV2Mock),
             address(mockMarketRegistry),
             address(mockUniswapFactory)
@@ -156,12 +167,18 @@ contract LenderCommitmentForwarder_OracleLimited_Test is Testable {
 
         uint32 twapInterval = 0;
 
+
+        ILenderCommitmentForwarder_U1.PoolRouteConfig memory routeConfig = ILenderCommitmentForwarder_U1.PoolRouteConfig({
+
+            pool:address(mockUniswapPool),
+            zeroForOne:zeroForOne,
+            twapInterval:twapInterval,
+            token0Decimals:18,
+            token1Decimals:18
+        });
+
         uint256 priceRatio = lenderCommitmentForwarder.getUniswapPriceRatioForPool(  
-            address(mockUniswapPool),
-            zeroForOne,
-            twapInterval,
-            18,
-            18
+            routeConfig
         );
 
         console.log("price ratio");
@@ -195,7 +212,7 @@ contract LenderCommitmentForwarder_OracleLimited_Test is Testable {
         uint256 requiredCollateral = lenderCommitmentForwarder.getRequiredCollateral(
             principalAmount,
             priceRatio,
-            ILenderCommitmentForwarderWithUniswap.CommitmentCollateralType.ERC20,
+            ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC20,
             address(collateralToken),
             address(principalToken)
             );
@@ -220,19 +237,26 @@ contract LenderCommitmentForwarder_OracleLimited_Test is Testable {
 
         uint32 twapInterval = 0;
 
+         ILenderCommitmentForwarder_U1.PoolRouteConfig memory routeConfig = ILenderCommitmentForwarder_U1.PoolRouteConfig({
+
+            pool:address(mockUniswapPool),
+            zeroForOne:zeroForOne,
+            twapInterval:twapInterval,
+            token0Decimals:18,
+            token1Decimals:18
+        });
+
+
+
         uint256 priceRatio = lenderCommitmentForwarder.getUniswapPriceRatioForPool(  
-            address(mockUniswapPool),
-            zeroForOne,
-            twapInterval,
-            18,
-            18
+            routeConfig
         );
 
         console.log("price ratio");
         console.logUint(priceRatio);
 
 
- 
+        //uint256 priceRatioNormalized = FullMath.mulDiv(priceRatio,1,10**(principalTokenDecimals+collateralTokenDecimals));
 
 
         uint256 principalAmount = 1000;
@@ -240,7 +264,7 @@ contract LenderCommitmentForwarder_OracleLimited_Test is Testable {
         uint256 requiredCollateral = lenderCommitmentForwarder.getRequiredCollateral(
             principalAmount,
             priceRatio,
-            ILenderCommitmentForwarderWithUniswap.CommitmentCollateralType.ERC20,
+            ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC20,
             address(collateralToken),
             address(principalToken)
             );
@@ -249,6 +273,696 @@ contract LenderCommitmentForwarder_OracleLimited_Test is Testable {
 
 
     }
+
+
+
+
+     function test_getUniswapPriceRatioForPool_decimal_scenario_A() public {
+ 
+
+        bool zeroForOne = false;  
+
+        principalTokenDecimals = 18;
+        collateralTokenDecimals = 6; 
+
+        principalToken = new TestERC20Token(
+            "Test Wrapped ETH",
+            "TWETH",
+            0,
+            principalTokenDecimals
+        );
+
+        collateralToken = new TestERC20Token(
+            "Test USDC",
+            "TUSDC",
+            0,
+            collateralTokenDecimals
+        );
+
+
+ 
+        mockUniswapPool.set_mockSqrtPriceX96( 1 * 2**96 );
+
+        uint32 twapInterval = 0;
+
+         ILenderCommitmentForwarder_U1.PoolRouteConfig memory routeConfig = ILenderCommitmentForwarder_U1.PoolRouteConfig({
+
+            pool:address(mockUniswapPool),
+            zeroForOne:zeroForOne,
+            twapInterval:twapInterval,
+            token0Decimals:collateralTokenDecimals,
+            token1Decimals:principalTokenDecimals
+        });
+
+
+
+        uint256 priceRatio = lenderCommitmentForwarder.getUniswapPriceRatioForPool(  
+            routeConfig
+        );
+
+        console.log("price ratio");
+        console.logUint(priceRatio);
+ 
+ 
+
+
+        uint256 principalAmount = 1000;
+
+        uint256 requiredCollateral = lenderCommitmentForwarder.getRequiredCollateral(
+            principalAmount,
+            priceRatio,
+            ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC20,
+            address(collateralToken),
+            address(principalToken)
+            );
+
+        assertEq( requiredCollateral, 1000, "unexpected required collateral" );
+
+
+    }
+
+
+
+     function test_getUniswapPriceRatioForPoolRoutes() public {
+
+
+        mockUniswapPool.set_mockSqrtPriceX96( 1 * 2**96 );
+
+        mockUniswapPoolSecondary.set_mockSqrtPriceX96( 1 * 2**96 );
+
+         
+
+        uint32 twapInterval = 0; //for now 
+
+        bool zeroForOne = false;
+
+
+
+
+        ILenderCommitmentForwarder_U1.PoolRouteConfig[] memory poolRoutes = new ILenderCommitmentForwarder_U1.PoolRouteConfig[](2); 
+
+        poolRoutes[0] = ILenderCommitmentForwarder_U1.PoolRouteConfig({
+
+            pool:address(mockUniswapPool),
+            zeroForOne:zeroForOne,
+            twapInterval:twapInterval,
+            token0Decimals:18,
+            token1Decimals:18
+        });
+
+         poolRoutes[1]  = ILenderCommitmentForwarder_U1.PoolRouteConfig({
+
+            pool:address(mockUniswapPoolSecondary),
+            zeroForOne:zeroForOne,
+            twapInterval:twapInterval,
+            token0Decimals:18,
+            token1Decimals:18
+        }); 
+
+
+        uint256 priceRatio = lenderCommitmentForwarder.getUniswapPriceRatioForPoolRoutes(  
+           poolRoutes
+        );
+
+        console.log("price ratio");
+        console.logUint(priceRatio); 
+
+
+        uint256 principalAmount = 1000;
+
+        uint256 requiredCollateral = lenderCommitmentForwarder.getRequiredCollateral(
+            principalAmount,
+            priceRatio,
+            ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC20,
+            address(collateralToken),
+            address(principalToken)
+            );
+
+        assertEq( requiredCollateral, 1000, "unexpected required collateral" );
+
+
+    }
+
+
+
+     function test_getUniswapPriceRatioForPoolRoutes_zeroforone() public {
+
+
+        mockUniswapPool.set_mockSqrtPriceX96( 1 * 2**96 );
+
+        mockUniswapPoolSecondary.set_mockSqrtPriceX96( 1 * 2**96 );
+
+         //collateralTokenDecimals = 6;  
+       
+
+        uint32 twapInterval = 0; //for now 
+
+        bool zeroForOne = true;
+
+
+
+
+        ILenderCommitmentForwarder_U1.PoolRouteConfig[] memory poolRoutes = new ILenderCommitmentForwarder_U1.PoolRouteConfig[](2); 
+
+        poolRoutes[0] = ILenderCommitmentForwarder_U1.PoolRouteConfig({
+
+            pool:address(mockUniswapPool),
+            zeroForOne:zeroForOne,
+            twapInterval:twapInterval,
+            token0Decimals:18,
+            token1Decimals:18
+        });
+
+         poolRoutes[1]  = ILenderCommitmentForwarder_U1.PoolRouteConfig({
+
+            pool:address(mockUniswapPoolSecondary),
+            zeroForOne:zeroForOne,
+            twapInterval:twapInterval,
+            token0Decimals:18,
+            token1Decimals:18
+        }); 
+
+
+        uint256 priceRatio = lenderCommitmentForwarder.getUniswapPriceRatioForPoolRoutes(  
+           poolRoutes
+        );
+
+        console.log("price ratio");
+        console.logUint(priceRatio); 
+
+
+        uint256 principalAmount = 1000;
+
+        uint256 requiredCollateral = lenderCommitmentForwarder.getRequiredCollateral(
+            principalAmount,
+            priceRatio,
+            ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC20,
+            address(collateralToken),
+            address(principalToken)
+            );
+
+        assertEq( requiredCollateral, 1000, "unexpected required collateral" );
+
+
+    }
+
+
+            // why does this fail ? 
+    /* function test_getUniswapPriceRatioForPoolRoutes_decimal_scenario_A() public {
+
+
+        mockUniswapPool.set_mockSqrtPriceX96( 1 * 2**96 );
+
+        mockUniswapPoolSecondary.set_mockSqrtPriceX96( 1 * 2**96 );
+
+
+        principalTokenDecimals = 18;
+        collateralTokenDecimals = 6; 
+
+        principalToken = new TestERC20Token(
+            "Test Wrapped ETH",
+            "TWETH",
+            0,
+            principalTokenDecimals
+        );
+
+        collateralToken = new TestERC20Token(
+            "Test USDC",
+            "TUSDC",
+            0,
+            collateralTokenDecimals
+        );
+
+
+
+        uint32 twapInterval = 0; //for now 
+
+        bool zeroForOne = false;
+
+
+
+
+        ILenderCommitmentForwarder_U1.PoolRouteConfig[] memory poolRoutes = new ILenderCommitmentForwarder_U1.PoolRouteConfig[](2); 
+
+        poolRoutes[0] = ILenderCommitmentForwarder_U1.PoolRouteConfig({
+
+            pool:address(mockUniswapPool),
+            zeroForOne:zeroForOne,
+            twapInterval:twapInterval,
+            token0Decimals:principalTokenDecimals,
+            token1Decimals:collateralTokenDecimals
+        });
+
+         poolRoutes[1]  = ILenderCommitmentForwarder_U1.PoolRouteConfig({
+
+            pool:address(mockUniswapPoolSecondary),
+            zeroForOne:zeroForOne,
+            twapInterval:twapInterval,
+            token0Decimals:collateralTokenDecimals,
+            token1Decimals:principalTokenDecimals
+        }); 
+
+
+        uint256 priceRatio = lenderCommitmentForwarder.getUniswapPriceRatioForPoolRoutes(  
+           poolRoutes
+        );
+
+        console.log("price ratio");
+        console.logUint(priceRatio); 
+
+
+        uint256 principalAmount = 1000;
+
+        uint256 requiredCollateral = lenderCommitmentForwarder.getRequiredCollateral(
+            principalAmount,
+            priceRatio,
+            ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC20,
+            address(collateralToken),
+            address(principalToken)
+            );
+
+        assertEq( requiredCollateral, 1000, "unexpected required collateral" );
+
+
+    }
+    */
+
+
+ function test_getUniswapPriceRatioForPoolRoutes_decimal_scenario_A() public {
+
+
+        mockUniswapPool.set_mockSqrtPriceX96( 1 * 2**96 );
+
+        mockUniswapPoolSecondary.set_mockSqrtPriceX96( 1 * 2**96 );
+  
+
+        uint32 twapInterval = 0; //for now 
+
+        bool zeroForOne = false;
+
+
+        principalTokenDecimals = 18;
+        intermediateTokenDecimals = 18;
+        collateralTokenDecimals = 6; 
+
+        principalToken = new TestERC20Token(
+            "Test Wrapped ETH",
+            "TWETH",
+            0,
+            principalTokenDecimals
+        );
+
+        collateralToken = new TestERC20Token(
+            "Test USDC",
+            "TUSDC",
+            0,
+            collateralTokenDecimals
+        );
+
+
+        intermediateToken = new TestERC20Token(
+            "Test Intermediate",
+            "TINT",
+            0,
+            intermediateTokenDecimals
+        );
+
+
+
+        ILenderCommitmentForwarder_U1.PoolRouteConfig[] memory poolRoutes = new ILenderCommitmentForwarder_U1.PoolRouteConfig[](2); 
+
+        poolRoutes[0] = ILenderCommitmentForwarder_U1.PoolRouteConfig({
+
+            pool:address(mockUniswapPool),
+            zeroForOne:zeroForOne,
+            twapInterval:twapInterval,
+            token0Decimals: intermediateTokenDecimals ,
+            token1Decimals: collateralTokenDecimals
+        });
+
+         poolRoutes[1]  = ILenderCommitmentForwarder_U1.PoolRouteConfig({
+
+            pool:address(mockUniswapPoolSecondary),
+            zeroForOne:zeroForOne,
+            twapInterval:twapInterval,
+            token0Decimals:  principalTokenDecimals,
+            token1Decimals: intermediateTokenDecimals 
+        }); 
+
+
+        uint256 priceRatio = lenderCommitmentForwarder.getUniswapPriceRatioForPoolRoutes(  
+           poolRoutes
+        );
+
+        console.log("price ratio");
+        console.logUint(priceRatio); 
+
+
+        uint256 principalAmount = 1000;
+
+
+        //which decimals is this using any why?   p / c / i ? 
+        uint256 requiredCollateral = lenderCommitmentForwarder.getRequiredCollateral(
+            principalAmount,
+            priceRatio,
+            ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC20,
+            address(collateralToken),
+            address(principalToken)
+            );
+
+        assertEq( requiredCollateral, 1000, "unexpected required collateral" );
+
+
+    }
+
+
+ function test_getUniswapPriceRatioForPoolRoutes_decimal_scenario_A2() public {
+
+
+        mockUniswapPool.set_mockSqrtPriceX96( 1 * 2**96 );
+
+        mockUniswapPoolSecondary.set_mockSqrtPriceX96( 1 * 2**96 );
+  
+
+        uint32 twapInterval = 0; //for now 
+ 
+
+
+        principalTokenDecimals = 18;
+        intermediateTokenDecimals = 18;
+        collateralTokenDecimals = 6; 
+
+        principalToken = new TestERC20Token(
+            "Test Wrapped ETH",
+            "TWETH",
+            0,
+            principalTokenDecimals
+        );
+
+        collateralToken = new TestERC20Token(
+            "Test USDC",
+            "TUSDC",
+            0,
+            collateralTokenDecimals
+        );
+
+
+        intermediateToken = new TestERC20Token(
+            "Test Intermediate",
+            "TINT",
+            0,
+            intermediateTokenDecimals
+        );
+
+
+
+        ILenderCommitmentForwarder_U1.PoolRouteConfig[] memory poolRoutes = new ILenderCommitmentForwarder_U1.PoolRouteConfig[](2); 
+
+        poolRoutes[0] = ILenderCommitmentForwarder_U1.PoolRouteConfig({
+
+            pool:address(mockUniswapPool),
+            zeroForOne:false,
+            twapInterval:twapInterval,
+            token0Decimals: intermediateTokenDecimals ,
+            token1Decimals: collateralTokenDecimals
+        });
+
+         poolRoutes[1]  = ILenderCommitmentForwarder_U1.PoolRouteConfig({
+
+            pool:address(mockUniswapPoolSecondary),
+            zeroForOne:true,
+            twapInterval:twapInterval,
+            token0Decimals: intermediateTokenDecimals  ,
+            token1Decimals:   principalTokenDecimals
+        }); 
+
+
+        uint256 priceRatio = lenderCommitmentForwarder.getUniswapPriceRatioForPoolRoutes(  
+           poolRoutes
+        );
+
+        console.log("price ratio");
+        console.logUint(priceRatio); 
+
+
+        uint256 principalAmount = 1000;
+
+
+        //which decimals is this using any why?   p / c / i ? 
+        uint256 requiredCollateral = lenderCommitmentForwarder.getRequiredCollateral(
+            principalAmount,
+            priceRatio,
+            ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC20,
+            address(collateralToken),
+            address(principalToken)
+            );
+
+        assertEq( requiredCollateral, 1000, "unexpected required collateral" );
+
+
+    }
+
+
+
+     
+  function test_getUniswapPriceRatioForPoolRoutes_decimal_scenario_B() public {
+
+
+        mockUniswapPool.set_mockSqrtPriceX96( 1 * 2**96 );
+
+        mockUniswapPoolSecondary.set_mockSqrtPriceX96( 1 * 2**96 );
+  
+
+        uint32 twapInterval = 0; //for now 
+
+        bool zeroForOne = true;
+
+
+        principalTokenDecimals = 18;
+        intermediateTokenDecimals = 18;
+        collateralTokenDecimals = 6; 
+
+        principalToken = new TestERC20Token(
+            "Test Wrapped ETH",
+            "TWETH",
+            0,
+            principalTokenDecimals
+        );
+
+        collateralToken = new TestERC20Token(
+            "Test USDC",
+            "TUSDC",
+            0,
+            collateralTokenDecimals
+        );
+
+
+        intermediateToken = new TestERC20Token(
+            "Test Intermediate",
+            "TINT",
+            0,
+            intermediateTokenDecimals
+        );
+
+
+
+        ILenderCommitmentForwarder_U1.PoolRouteConfig[] memory poolRoutes = new ILenderCommitmentForwarder_U1.PoolRouteConfig[](2); 
+
+        poolRoutes[0] = ILenderCommitmentForwarder_U1.PoolRouteConfig({
+
+            pool:address(mockUniswapPool),
+            zeroForOne:zeroForOne,
+            twapInterval:twapInterval,
+            token0Decimals:collateralTokenDecimals,
+            token1Decimals:intermediateTokenDecimals
+        });
+
+         poolRoutes[1]  = ILenderCommitmentForwarder_U1.PoolRouteConfig({
+
+            pool:address(mockUniswapPoolSecondary),
+            zeroForOne:zeroForOne,
+            twapInterval:twapInterval,
+            token0Decimals:intermediateTokenDecimals,
+            token1Decimals:principalTokenDecimals
+        }); 
+
+
+        uint256 priceRatio = lenderCommitmentForwarder.getUniswapPriceRatioForPoolRoutes(  
+           poolRoutes
+        );
+
+        console.log("price ratio");
+        console.logUint(priceRatio); 
+
+
+        uint256 principalAmount = 1000;
+
+
+        //which decimals is this using any why?   p / c / i ? 
+        uint256 requiredCollateral = lenderCommitmentForwarder.getRequiredCollateral(
+            principalAmount,
+            priceRatio,
+            ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC20,
+            address(collateralToken),
+            address(principalToken)
+            );
+
+        assertEq( requiredCollateral, 1000, "unexpected required collateral" );
+
+
+    }
+
+    function test_getUniswapPriceRatioForPoolRoutes_decimal_scenario_C() public {
+
+
+        mockUniswapPool.set_mockSqrtPriceX96( 1 * 2**96 );
+
+        mockUniswapPoolSecondary.set_mockSqrtPriceX96( 1 * 2**96 );
+  
+
+        uint32 twapInterval = 0; //for now 
+
+        bool zeroForOne = true;
+
+
+        principalTokenDecimals = 6;
+        intermediateTokenDecimals = 18;
+        collateralTokenDecimals = 18; 
+
+        principalToken = new TestERC20Token(
+            "Test Wrapped ETH",
+            "TWETH",
+            0,
+            principalTokenDecimals
+        );
+
+        collateralToken = new TestERC20Token(
+            "Test USDC",
+            "TUSDC",
+            0,
+            collateralTokenDecimals
+        );
+
+
+        intermediateToken = new TestERC20Token(
+            "Test Intermediate",
+            "TINT",
+            0,
+            intermediateTokenDecimals
+        );
+
+
+
+        ILenderCommitmentForwarder_U1.PoolRouteConfig[] memory poolRoutes = new ILenderCommitmentForwarder_U1.PoolRouteConfig[](2); 
+
+        poolRoutes[0] = ILenderCommitmentForwarder_U1.PoolRouteConfig({
+
+            pool:address(mockUniswapPool),
+            zeroForOne:zeroForOne,
+            twapInterval:twapInterval,
+            token0Decimals:collateralTokenDecimals,
+            token1Decimals:intermediateTokenDecimals
+        });
+
+         poolRoutes[1]  = ILenderCommitmentForwarder_U1.PoolRouteConfig({
+
+            pool:address(mockUniswapPoolSecondary),
+            zeroForOne:zeroForOne,
+            twapInterval:twapInterval,
+            token0Decimals:intermediateTokenDecimals,
+            token1Decimals:principalTokenDecimals
+        }); 
+
+
+        uint256 priceRatio = lenderCommitmentForwarder.getUniswapPriceRatioForPoolRoutes(  
+           poolRoutes
+        );
+
+
+       // uint256 priceRatioNormalized = FullMath.mulDiv(priceRatio,1,10**(principalTokenDecimals+collateralTokenDecimals));
+
+
+        console.log("price ratio");
+        console.logUint(priceRatio); 
+ 
+
+        uint256 principalAmount = 1000;
+
+
+        //which decimals is this using any why?   p / c / i ? 
+        uint256 requiredCollateral = lenderCommitmentForwarder.getRequiredCollateral(
+            principalAmount,
+            priceRatio,
+            ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC20,
+            address(collateralToken),
+            address(principalToken)
+            );
+
+        assertEq( requiredCollateral, 1000, "unexpected required collateral" );
+
+
+    }
+
+ function test_getUniswapPriceRatioForPoolRoutes_price_scenario_A() public {
+
+
+        mockUniswapPool.set_mockSqrtPriceX96( 10 * 2**96 );
+
+        uint160 priceTwo =  uint160(1 * 2**96)  / uint160(10);
+        mockUniswapPoolSecondary.set_mockSqrtPriceX96( priceTwo );
+  
+
+        uint32 twapInterval = 0; //for now 
+
+        bool zeroForOne = false;
+
+
+
+
+        ILenderCommitmentForwarder_U1.PoolRouteConfig[] memory poolRoutes = new ILenderCommitmentForwarder_U1.PoolRouteConfig[](2); 
+
+        poolRoutes[0] = ILenderCommitmentForwarder_U1.PoolRouteConfig({
+
+            pool:address(mockUniswapPool),
+            zeroForOne:zeroForOne,
+            twapInterval:twapInterval,
+            token0Decimals:18,
+            token1Decimals:18
+        });
+
+         poolRoutes[1]  = ILenderCommitmentForwarder_U1.PoolRouteConfig({
+
+            pool:address(mockUniswapPoolSecondary),
+            zeroForOne:zeroForOne,
+            twapInterval:twapInterval,
+            token0Decimals:18,
+            token1Decimals:18
+        }); 
+
+
+        uint256 priceRatio = lenderCommitmentForwarder.getUniswapPriceRatioForPoolRoutes(  
+           poolRoutes
+        );
+
+        console.log("price ratio");
+        console.logUint(priceRatio); 
+
+
+        uint256 principalAmount = 1000;
+
+        uint256 requiredCollateral = lenderCommitmentForwarder.getRequiredCollateral(
+            principalAmount,
+            priceRatio,
+            ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC20,
+            address(collateralToken),
+            address(principalToken)
+            );
+
+        assertEq( requiredCollateral, 1000, "unexpected required collateral" );
+
+
+    }
+
 
     /*
     function test_createCommitment() public {

@@ -59,6 +59,7 @@ contract LenderCommitmentForwarder_Override is LenderCommitmentForwarder_G2 {
 
         return true;
     }
+    
 }
 
 contract LenderCommitmentForwarderTest_TellerV2Mock is TellerV2Context {

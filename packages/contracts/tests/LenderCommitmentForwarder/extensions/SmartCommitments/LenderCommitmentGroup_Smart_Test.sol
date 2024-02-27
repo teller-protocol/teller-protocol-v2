@@ -667,19 +667,12 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
     }
 
     /*
-       function test_getMaxPrincipalPerCollateralAmount() public {
+      improve tests for this 
 
-          uint256 maxPrincipalPerCollateralAmount =  lenderCommitmentGroupSmart._super_getMaxPrincipalPerCollateralAmount( );
-
-          uint256 expectedMaxPrincipalPerCollateralAmount = 999;
-        
-          assertEq( maxPrincipalPerCollateralAmount, expectedMaxPrincipalPerCollateralAmount , "Unexpected maxPrincipalPerCollateralAmount" );
-     
-     
-       }
+      AND for _getUniswapV3TokenPairPrice
     */
 
-    function test_getCollateralTokensPricePerPrincipalTokens() public {
+    function test_getCollateralTokensPriceAmountEquivalentToPrincipalTokens() public {
          
         initialize_group_contract();
 
@@ -687,15 +680,20 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
         //need to fix this WRT the addition of the price oracle .. ? 
         
         
-        uint256 amount = lenderCommitmentGroupSmart
-            .getCollateralTokensPricePerPrincipalTokens(1e14);
+        uint256 amountCollateral = lenderCommitmentGroupSmart
+            .super_getCollateralTokensAmountEquivalentToPrincipalTokens(
+                principalTokenAmountValue,
+                pairPriceWithTwap,
+                pairPriceImmediate,
+                principalTokenIsToken0                
+                );
 
         //uint256 expectedAmount = 1e14;
         //todo: why is it this ? 
         uint256 expectedAmount = 100000000000000000000000000000000; // 100501226962305;
 
         assertEq(
-            amount,
+            amountCollateral,
             expectedAmount,
             "Unexpected getCollateralTokensPricePerPrincipalTokens"
         );

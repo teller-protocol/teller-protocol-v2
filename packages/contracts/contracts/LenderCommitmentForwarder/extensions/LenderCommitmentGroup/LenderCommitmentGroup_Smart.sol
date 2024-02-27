@@ -590,7 +590,7 @@ contract LenderCommitmentGroup_Smart is
         returns (uint256)
     {
         //i am not sure this is being used properly.. 
-        uint256 baseAmount = getCollateralTokensPricePerPrincipalTokens(
+        uint256 baseAmount = _calculateCollateralTokensAmountEquivalentToPrincipalTokens(
             _principalAmount
         );
 
@@ -605,15 +605,16 @@ contract LenderCommitmentGroup_Smart is
         
         uint160 sqrtPriceX96 = getSqrtTwapX96(_twapInterval);
 
+         uint160 sqrtPrice =  sqrtPriceX96/ (2**96)  ;
+
         // sqrtPrice is in X96 format so we scale it down to get the price
         // Also note that this price is a relative price between the two tokens in the pool
         // It's not a USD price
-        uint256 price = ((uint256(sqrtPriceX96) * uint256(sqrtPriceX96))  /
-           ( 2**96 ) );
+        uint256 price = (  (uint256(sqrtPrice) * uint256(sqrtPrice))   );
 
 
         //this output is the price ratio expanded by 1e18
-        return price  * 1e18 / (2**96) ;
+        return price  * 1e18   ;
     }
 
     // ---- TWAP 
@@ -636,19 +637,20 @@ contract LenderCommitmentGroup_Smart is
         }
     }
  
-    function _getPoolTokens() internal view returns (address token0, address token1) {
+    function _getPoolTokens() internal view virtual returns (address token0, address token1) {
 
         token0 = IUniswapV3Pool(UNISWAP_V3_POOL).token0();
         token1 = IUniswapV3Pool(UNISWAP_V3_POOL).token1();
+
     }
 
     // ----- 
 
 
     //this is expanded by 10e18 
-    function getCollateralTokensPricePerPrincipalTokens(
+    function _calculateCollateralTokensAmountEquivalentToPrincipalTokens(
         uint256 principalTokenAmountValue
-    ) public view returns (uint256 collateralTokensAmountToMatchValue) {
+    ) internal view  returns (uint256 collateralTokensAmountToMatchValue) {
         
         //same concept as zeroforone 
         (address token0,) = _getPoolTokens(); 
@@ -656,19 +658,34 @@ contract LenderCommitmentGroup_Smart is
         bool principalTokenIsToken0 = (address(principalToken) == token0);  
 
         uint256 pairPriceWithTwap = _getUniswapV3TokenPairPrice(twapInterval);
-        uint256 pairPriceImmediate = _getUniswapV3TokenPairPrice(0);
+        uint256 pairPriceImmediate = _getUniswapV3TokenPairPrice(0); 
 
-        uint256 worstCastPairPrice = Math.min(  pairPriceWithTwap , pairPriceImmediate );
+        return _getCollateralTokensAmountEquivalentToPrincipalTokens(
+            principalTokenAmountValue,
+            pairPriceWithTwap,
+            pairPriceImmediate,
+            principalTokenIsToken0 
+        );
+    }
+
+     function _getCollateralTokensAmountEquivalentToPrincipalTokens(
+        uint256 principalTokenAmountValue,
+        uint256 pairPriceWithTwap,
+        uint256 pairPriceImmediate,  
+        bool principalTokenIsToken0
+    ) internal view  returns (uint256 collateralTokensAmountToMatchValue) {
+        
+        uint256 worstCasePairPrice = Math.min(  pairPriceWithTwap , pairPriceImmediate );
 
         if (principalTokenIsToken0) {
             collateralTokensAmountToMatchValue = token1ToToken0(
                 principalTokenAmountValue,
-                worstCastPairPrice  //if this is lower, collateral tokens amt will be higher 
+                worstCasePairPrice  //if this is lower, collateral tokens amt will be higher 
             );
         } else {
             collateralTokensAmountToMatchValue = token0ToToken1(
                 principalTokenAmountValue,
-                worstCastPairPrice  //if this is lower, collateral tokens amt will be higher 
+                worstCasePairPrice  //if this is lower, collateral tokens amt will be higher 
             );
         }
     }
@@ -698,7 +715,7 @@ contract LenderCommitmentGroup_Smart is
 
    
     /*
-    Thisc callback occurs when a TellerV2 repayment happens and when a TellerV2 liquidate happens 
+    This  callback occurs when a TellerV2 repayment happens or when a TellerV2 liquidate happens 
 
     lenderCloseLoan does not trigger a repayLoanCallback 
     */

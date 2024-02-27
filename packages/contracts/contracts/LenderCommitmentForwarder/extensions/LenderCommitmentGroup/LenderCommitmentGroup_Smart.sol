@@ -466,10 +466,9 @@ contract LenderCommitmentGroup_Smart is
     {
         //uint256 collectedInterest = LoanRepaymentInterestCollector( interestCollector ).collectInterest();
 
-        
         //uint256 poolSharesTotalSupplyBeforeBurn = poolSharesToken.totalSupply();
 
-        //this  reduces total supply 
+        //this reduces total supply 
         poolSharesToken.burn(msg.sender, _amountPoolSharesTokens); 
  
         uint256 principalTokenValueToWithdraw = _valueOfUnderlying(_amountPoolSharesTokens, sharesExchangeRateInverse()); 
@@ -545,8 +544,7 @@ contract LenderCommitmentGroup_Smart is
             )  ;
 
         amountOwed_ = _includeInterest ?  amountOwedPayment.principal + amountOwedPayment.interest :  amountOwedPayment.principal ;
-            
-            /// + amountOwedPayment.interest ;  
+             
     } 
     
     /*
@@ -589,7 +587,7 @@ contract LenderCommitmentGroup_Smart is
         view
         returns (uint256)
     {
-        //i am not sure this is being used properly.. 
+      
         uint256 baseAmount = _calculateCollateralTokensAmountEquivalentToPrincipalTokens(
             _principalAmount
         );

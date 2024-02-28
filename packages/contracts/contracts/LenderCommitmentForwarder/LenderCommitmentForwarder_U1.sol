@@ -69,7 +69,7 @@ contract LenderCommitmentForwarder_U1 is
      //does not take a storage slot 
     address immutable UNISWAP_V3_FACTORY; 
  
-    uint256 immutable STANDARD_EXPANSION_FACTOR = 1e36;
+    uint256 immutable STANDARD_EXPANSION_FACTOR = 1e18;
 
     /**
      * @notice This event is emitted when a lender's commitment is created.

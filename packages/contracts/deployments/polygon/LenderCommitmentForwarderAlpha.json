@@ -649,7 +649,7 @@
       "inputs": [
         {
           "type": "uint256",
-          "name": "bidId"
+          "name": "commitmentId"
         }
       ],
       "outputs": [
@@ -785,7 +785,7 @@
       "inputs": [
         {
           "type": "uint256",
-          "name": "bidId"
+          "name": "commitmentId"
         }
       ],
       "outputs": [
@@ -804,7 +804,7 @@
       "inputs": [
         {
           "type": "uint256",
-          "name": "bidId"
+          "name": "commitmentId"
         },
         {
           "type": "uint256",
@@ -872,14 +872,6 @@
         {
           "type": "uint8",
           "name": "_collateralTokenType"
-        },
-        {
-          "type": "address",
-          "name": "_collateralTokenAddress"
-        },
-        {
-          "type": "address",
-          "name": "_principalTokenAddress"
         }
       ],
       "outputs": [
@@ -1154,6 +1146,6 @@
     "blockHash": null,
     "blockNumber": null
   },
-  "numDeployments": 3,
+  "numDeployments": 4,
   "implementation": "0x0b65C94CfF84afa6D9CE3D287b1227D9Cc7CdfB7"
 }

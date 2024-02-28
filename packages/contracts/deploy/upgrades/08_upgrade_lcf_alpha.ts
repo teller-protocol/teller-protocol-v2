@@ -4,8 +4,7 @@ const deployFn: DeployFunction = async (hre) => {
   hre.log('----------')
   hre.log('')
   hre.log('LenderCommitmentForwarderAlpha: Performing upgrade...')
-
-  //const chainId = await hre.getChainId()
+ 
  
 
   let uniswapFactoryAddress: string
@@ -27,10 +26,7 @@ const deployFn: DeployFunction = async (hre) => {
     default:
       throw new Error('No swap factory address found for this network')
   }
-
-
-  hre.log(   
-     ' hello 1 '  )
+ 
 
 
   const tellerV2 = await hre.contracts.get('TellerV2')
@@ -40,16 +36,9 @@ const deployFn: DeployFunction = async (hre) => {
   const lenderCommitmentForwarderAlpha = await hre.contracts.get(
     'LenderCommitmentForwarderAlpha'
   )
+ 
 
-
-  hre.log(   
-    ' hello 2 '  )
-
-
-  hre.log(   await tellerV2.getAddress()   )
-  hre.log(   await marketRegistry.getAddress()   )
-  hre.log(   await lenderCommitmentForwarderAlpha.getAddress()  )
-  
+ 
   
     //failing here 
   let tellerV2ProxyAddress = await tellerV2.getAddress()
@@ -60,9 +49,7 @@ const deployFn: DeployFunction = async (hre) => {
   const LenderCommitmentForwarderAlphaImplementation =
     await hre.ethers.getContractFactory('LenderCommitmentForwarderAlpha')
 
-    
-  hre.log(   
-    ' hello 3 '  )
+     
 
  
   await hre.upgrades.proposeBatchTimelock({

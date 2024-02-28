@@ -43,21 +43,7 @@ const deployFn: DeployFunction = async (hre) => {
 
   const LenderCommitmentForwarderAlphaImplementation =
     await hre.ethers.getContractFactory('LenderCommitmentForwarderAlpha')
-
-  /*
-  const upgrade = await hre.upgrades.upgradeProxy(
-    lcfStagingProxyAddress,
-    LenderCommitmentForwarderAlphaImplementation,
-    {
-      unsafeAllow: ['state-variable-immutable', 'constructor'],
-      constructorArgs: [
-        tellerV2ProxyAddress,
-        marketRegistryProxyAddress,
-        uniswapFactoryAddress
-      ]
-    }
-  )*/
-
+ 
 
  
   await hre.upgrades.proposeBatchTimelock({
@@ -65,7 +51,7 @@ const deployFn: DeployFunction = async (hre) => {
     description: ` 
 # LenderCommitmentForwarderAlpha
 
-* Fixed issue with zero length path.
+*   Upgrade contract.
 `,
     _steps: [
       {
@@ -88,22 +74,7 @@ const deployFn: DeployFunction = async (hre) => {
       },
     ],
   })
- 
-/*
-  const upgrade = await hre.upgrades.upgradeProxy(
-    lcfAlphaProxyAddress,
-    LenderCommitmentForwarderAlphaImplementation,
-    {
-      unsafeAllow: ['state-variable-immutable', 'constructor'],
-      constructorArgs: [
-        tellerV2ProxyAddress,
-        marketRegistryProxyAddress,
-        uniswapFactoryAddress
-      ]
-    }
-  )
-*/
-
+  
 
 
 

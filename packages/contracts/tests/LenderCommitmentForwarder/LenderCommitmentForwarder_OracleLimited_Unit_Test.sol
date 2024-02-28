@@ -33,6 +33,15 @@ import "../../contracts/libraries/uniswap/FullMath.sol";
 import "forge-std/console.sol";
 
 
+/*
+
+
+            // you have to do that to go from human prices to raw price ratios 
+        // if zeroforone is true, the formula is :   Pdec - Cdec + 18 
+        // if zeroforone is false, the formula is :   Cdec - Pdec + 18 
+
+
+*/
 
 contract LenderCommitmentForwarder_U1_Test is Testable {
 
@@ -1052,6 +1061,7 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
         uint32 twapInterval = 0; //for now 
 
         bool zeroForOne = false;
+
 
 
         //principal is usdc

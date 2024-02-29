@@ -46,6 +46,7 @@ deployFn.dependencies = [
 ]
 
 deployFn.skip = async (hre) => {
+  return true ;
   return !hre.network.live || !networksWithAave.includes(hre.network.name)
 }
 export default deployFn

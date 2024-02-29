@@ -163,7 +163,9 @@ const buildAndDeploySubgraphs = async ({
   await Promise.all(
     subgraphs.map(async subgraph => {
       if (releaseType === "missing") {
-        const latestVersion = await subgraph.api.getLatestVersion();
+         const latestVersion = await subgraph.api.getLatestVersion();
+  
+
         if (!!latestVersion) {
           progressBars.log(`Subgraph ${subgraph.name} is already deployed`);
           return;
@@ -217,7 +219,11 @@ const buildAndDeploy = async ({
     logger
   };
   if (graftingType.startsWith("latest")) {
-    const latestVersion = await subgraph.api.getLatestVersion();
+    
+
+   const latestVersion = await subgraph.api.getLatestVersion();
+    //let latestVersion:any = "0.4.21-11" 
+ 
 
     if (latestVersion && graftingType === "latest-synced") {
       release();
@@ -244,14 +250,30 @@ const buildAndDeploy = async ({
     }
 
     const graftingBlock = latestVersion.latestEthereumBlockNumber;
-    logger?.log(
-      `Grafting subgraph: ${subgraph.name} (${subgraph.network}) at block ${graftingBlock}`
-    );
+   
+      //override grafting base here 
 
-    args.grafting = {
-      base: latestVersion.deploymentId,
-      block: graftingBlock
-    };
+      const USE_CUSTOM_GRAFTING = true;
+
+      if (USE_CUSTOM_GRAFTING) {
+        args.grafting = {
+          base: "Qmdv9ReC57dgsNXhLRamkRCRyLQWzMTLikoxHKVjZkJz6Y",
+          block: "53711025"
+
+       };
+      }else{
+        args.grafting = {
+          base: latestVersion.deploymentId,
+          block: graftingBlock
+        };
+      }
+      
+      
+
+      logger?.log(
+          `Grafting subgraph: ${subgraph.name} (${subgraph.network}) at block ${args.grafting.block}`
+      );
+ 
 
     if (latestVersion?.synced) {
       logger?.log(
@@ -264,7 +286,7 @@ const buildAndDeploy = async ({
     }
   }
 
-  const buildId = await build(args);
+  const buildId = await build(args);  
   try {
     await deploy({
       subgraph,

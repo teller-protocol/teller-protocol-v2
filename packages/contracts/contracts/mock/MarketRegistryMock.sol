@@ -1,11 +1,11 @@
 pragma solidity ^0.8.0;
 
 // SPDX-License-Identifier: MIT
-
 import "../interfaces/IMarketRegistry.sol";
+import "../interfaces/IMarketRegistry_V2.sol";
 import { PaymentType } from "../libraries/V2Calculations.sol";
 
-contract MarketRegistryMock is IMarketRegistry {
+contract MarketRegistryMock is IMarketRegistry, IMarketRegistry_V2 {
     //address marketOwner;
 
     address public globalMarketOwner;
@@ -15,83 +15,94 @@ contract MarketRegistryMock is IMarketRegistry {
     bool public globalBorrowerIsVerified = true;
     bool public globalLenderIsVerified = true;
 
+    bytes32 public globalTermsForMarket;
+
     constructor() {}
 
-    function initialize(TellerAS _tellerAS) external {}
+    // function initialize(TellerAS _tellerAS) external {}
 
-    function isVerifiedLender(uint256 _marketId, address _lenderAddress)
-        public
-        view
-        returns (bool isVerified_, bytes32 uuid_)
-    {
-        isVerified_ = globalLenderIsVerified;
+    function getCurrentTermsForMarket(
+        uint256 _marketId
+    ) public view returns (bytes32) {
+        return globalTermsForMarket;
+    }
+
+    function forceSetGlobalTermsForMarket(bytes32 _term) public {
+        globalTermsForMarket = _term;
     }
 
     function isMarketOpen(uint256 _marketId) public view returns (bool) {
         return !globalMarketsClosed;
+        
     }
 
     function isMarketClosed(uint256 _marketId) public view returns (bool) {
         return globalMarketsClosed;
     }
 
-    function isVerifiedBorrower(uint256 _marketId, address _borrower)
-        public
-        view
-        returns (bool isVerified_, bytes32 uuid_)
-    {
+    function isVerifiedBorrower(
+        uint256 _marketId,
+        address _borrower
+    ) public view returns (bool isVerified_, bytes32) {
         isVerified_ = globalBorrowerIsVerified;
     }
 
-    function getMarketOwner(uint256 _marketId)
-        public
-        view
-        override
-        returns (address)
-    {
+    function isVerifiedLender(
+        uint256 _marketId,
+        address _lenderAddress
+    ) public view returns (bool isVerified_, bytes32) {
+        isVerified_ = globalLenderIsVerified;
+    }
+
+    function getMarketOwner(
+        uint256 _marketId
+    ) public view override returns (address) {
         return address(globalMarketOwner);
     }
 
-    function getMarketFeeRecipient(uint256 _marketId)
-        public
-        view
-        returns (address)
-    {
+    function getMarketFeeRecipient(
+        uint256 _marketId
+    ) public view returns (address) {
         return address(globalMarketFeeRecipient);
     }
 
-    function getMarketURI(uint256 _marketId)
-        public
-        view
-        returns (string memory)
-    {
+    function getMarketURI(
+        uint256 _marketId
+    ) public view returns (string memory) {
         return "url://";
     }
 
-    function getPaymentCycle(uint256 _marketId)
-        public
-        view
-        returns (uint32, PaymentCycleType)
-    {
-        return (1000, PaymentCycleType.Seconds);
+    function getPaymentType(
+        uint256 _marketId
+    ) public view returns (PaymentType) {
+        return PaymentType.EMI;
     }
 
-    function getPaymentDefaultDuration(uint256 _marketId)
-        public
-        view
-        returns (uint32)
-    {
+    function getPaymentCycleDuration(
+        uint256 _marketId
+    ) public view returns (uint32) {
         return 1000;
     }
 
-    function getBidExpirationTime(uint256 _marketId)
-        public
-        view
-        returns (uint32)
-    {
+    function getPaymentCycleType(
+        uint256 _marketId
+    ) external view returns (PaymentCycleType) {
+        return PaymentCycleType.Seconds;
+    }
+
+    function getPaymentDefaultDuration(
+        uint256 _marketId
+    ) public view returns (uint32) {
         return 1000;
     }
 
+    function getBidExpirationTime(
+        uint256 _marketId
+    ) public view returns (uint32) {
+        return 1000;
+    }
+
+    //the current marketplace fee if a new loan is created   NOT for existing loans in this market
     function getMarketplaceFee(uint256 _marketId) public view returns (uint16) {
         return 1000;
     }
@@ -104,35 +115,59 @@ contract MarketRegistryMock is IMarketRegistry {
         globalMarketFeeRecipient = _feeRecipient;
     }
 
-    function getPaymentType(uint256 _marketId)
+    function getMarketFeeTerms(
+        bytes32 _marketTermsId
+    ) public view returns (address, uint16) {
+        return (address(this), 2000);
+    }
+
+    function getMarketTermsForLending(
+        bytes32 _marketTermsId
+    )
         public
         view
-        returns (PaymentType)
-    {}
+        returns (uint32, PaymentCycleType, PaymentType, uint32, uint32)
+    {
+        return (2000, PaymentCycleType.Seconds, PaymentType.EMI, 4000, 5000);
+    }
+
+    function getBidExpirationTimeForTerms(
+        bytes32 _marketTermsId
+    ) external view returns (uint32) {
+        return 4000;
+    }
+
+    function getPaymentDefaultDurationForTerms(
+        bytes32 _marketTermsId
+    ) external view returns (uint32) {
+        return 6000;
+    }
+
+    function getPaymentTypeForTerms(
+        bytes32 _marketTermsId
+    ) external view returns (PaymentType) {
+        return PaymentType.EMI;
+    }
+
+    function getPaymentCycleTypeForTerms(
+        bytes32 _marketTermsId
+    ) external view returns (PaymentCycleType) {
+        return PaymentCycleType.Seconds;
+    }
+
+    function getPaymentCycleDurationForTerms(
+        bytes32 _marketTermsId
+    ) external view returns (uint32) {
+        return 3000;
+    }
 
     function createMarket(
         address _initialOwner,
-        uint32 _paymentCycleDuration,
-        uint32 _paymentDefaultDuration,
-        uint32 _bidExpirationTime,
-        uint16 _feePercent,
         bool _requireLenderAttestation,
         bool _requireBorrowerAttestation,
-        PaymentType _paymentType,
-        PaymentCycleType _paymentCycleType,
-        string calldata _uri
-    ) public returns (uint256) {}
-
-    function createMarket(
-        address _initialOwner,
-        uint32 _paymentCycleDuration,
-        uint32 _paymentDefaultDuration,
-        uint32 _bidExpirationTime,
-        uint16 _feePercent,
-        bool _requireLenderAttestation,
-        bool _requireBorrowerAttestation,
-        string calldata _uri
-    ) public returns (uint256) {}
+        string calldata _uri,
+        MarketplaceTerms memory _marketTermsParams
+    ) external returns (uint256 marketId_, bytes32 marketTerms_) {}
 
     function closeMarket(uint256 _marketId) public {}
 

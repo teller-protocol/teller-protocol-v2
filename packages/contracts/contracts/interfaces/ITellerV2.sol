@@ -2,7 +2,10 @@
 pragma solidity ^0.8.0;
 
 import { Payment, BidState } from "../TellerV2Storage.sol";
-import { Collateral } from "./escrow/ICollateralEscrowV1.sol";
+//import { Collateral } from "./escrow/ICollateralEscrowV1.sol";
+
+import { Collateral } from "../bundle/interfaces/ICollateralBundle.sol";
+import "./ICollateralManager.sol";
 
 interface ITellerV2 {
     /**
@@ -98,10 +101,12 @@ interface ITellerV2 {
 
     function getBidState(uint256 _bidId) external view returns (BidState);
 
-    function getBorrowerActiveLoanIds(address _borrower)
+    /* 
+     function getBorrowerActiveLoanIds(address _borrower)
         external
         view
         returns (uint256[] memory);
+    */
 
     /**
      * @notice Returns the borrower address for a given bid.
@@ -144,6 +149,11 @@ interface ITellerV2 {
             BidState bidState
         );
 
+    function getCollateralManagerForBid(uint256 _bidId)
+        external
+        view
+        returns (ICollateralManager);
+
     function calculateAmountOwed(uint256 _bidId, uint256 _timestamp)
         external
         view
@@ -153,4 +163,6 @@ interface ITellerV2 {
         external
         view
         returns (Payment memory due);
+
+    function collateralManager() external view returns (address);
 }

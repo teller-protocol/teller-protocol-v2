@@ -1,20 +1,20 @@
 
+### Manually build 
+yarn contracts export --network polygon
 
 
-### ROI 
+*this works* 
+yarn subgraph hbs ./src/subgraph.handlebars -D "./config/matic.json"  -o . -e yaml
 
-commitment rewards 
 
-`RewardTokenAmount` = `allocation.RewardPerPrincipal` * `commitment.MaxLoanAmountFromCommitment`
 
-`MaxRewardAmount` = Min(`RewardTokenAmount`, `allocation.AllocatedRewardTokenAmount`)
+ yarn subgraph graph codegen
 
- `RewardinPrincipalTokens` = `MaxRewardAmount` * maxPrincipalPerCollateral 
+ yarn subgraph graph build 
 
-convert into ROI
 
-`ROI` = `RewardPrincipalTokens` / `MaxLoanAmountFromCommitment`   
+ ### Deploying Manually
+ yarn subgraph graph deploy --studio
 
-convert into APY
-
-`APY` = `ROI` * `1 year` / `CommitmentDuration`
+-> see subgraph/config/{networkName} for name  [tellerv2-polygon]
+-> increment version from package.json 

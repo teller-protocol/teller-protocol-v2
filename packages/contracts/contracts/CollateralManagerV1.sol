@@ -13,11 +13,13 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol";
-import "./interfaces/ICollateralManager.sol";
-import { Collateral, CollateralType, ICollateralEscrowV1 } from "./interfaces/escrow/ICollateralEscrowV1.sol";
+import "./interfaces/ICollateralManagerV1.sol";
+import { ICollateralEscrowV1 } from "./interfaces/escrow/ICollateralEscrowV1.sol";
+import { Collateral, CollateralType } from "./bundle/interfaces/ICollateralBundle.sol";
+
 import "./interfaces/ITellerV2.sol";
 
-contract CollateralManager is OwnableUpgradeable, ICollateralManager {
+contract CollateralManagerV1 is OwnableUpgradeable, ICollateralManagerV1 {
     /* Storage */
     using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
     ITellerV2 public tellerV2;
@@ -133,6 +135,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         }
     }
 
+    //this is not used for anything
     /**
      * @notice Checks the validity of a borrower's collateral balance and commits it to a bid.
      * @param _bidId The id of the associated bid.

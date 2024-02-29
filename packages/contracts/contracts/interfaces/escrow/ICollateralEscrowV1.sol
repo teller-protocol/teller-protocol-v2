@@ -1,6 +1,10 @@
 // SPDX-Licence-Identifier: MIT
 pragma solidity >=0.8.0 <0.9.0;
 
+import { Collateral, CollateralType } from "../../bundle/interfaces/ICollateralBundle.sol";
+
+// use the ones in ICollateralBundle instead !
+/*
 enum CollateralType {
     ERC20,
     ERC721,
@@ -13,6 +17,7 @@ struct Collateral {
     uint256 _tokenId;
     address _collateralAddress;
 }
+*/
 
 interface ICollateralEscrowV1 {
     /**

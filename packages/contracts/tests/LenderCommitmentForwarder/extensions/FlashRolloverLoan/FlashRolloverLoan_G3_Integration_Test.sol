@@ -13,6 +13,7 @@ import "../../../integration/IntegrationTestHelpers.sol";
 import "../../../../contracts/LenderCommitmentForwarder/extensions/ExtensionsContextUpgradeable.sol";
 
 import { WethMock } from "../../../../contracts/mock/WethMock.sol";
+import { IMarketRegistry_V2 } from "../../../../contracts/interfaces/IMarketRegistry_V2.sol";
 import { TestERC721Token } from "../../../tokens/TestERC721Token.sol";
 
 import { TellerV2SolMock } from "../../../../contracts/mock/TellerV2SolMock.sol";
@@ -44,8 +45,10 @@ contract FlashRolloverLoan_G3_Integration_Test is Testable {
     TellerV2 tellerV2;
     WethMock wethMock;
     ILenderCommitmentForwarder lenderCommitmentForwarder;
-    IMarketRegistry marketRegistry;
+    IMarketRegistry_V2 marketRegistry;
     TestERC721Token testNft;
+
+    uint256 marketId;
 
     event RolloverLoanComplete(
         address borrower,
@@ -63,10 +66,15 @@ contract FlashRolloverLoan_G3_Integration_Test is Testable {
 
         console.logAddress(address(tellerV2));
 
-        marketRegistry = IMarketRegistry(tellerV2.marketRegistry());
+        marketRegistry = IMarketRegistry_V2(tellerV2.marketRegistry());
+
+        LenderCommitmentForwarder_G3 _lenderCommitmentForwarder = new LenderCommitmentForwarder_G3(
+                address(tellerV2),
+                address(marketRegistry)
+            );
 
         lenderCommitmentForwarder = ILenderCommitmentForwarder(
-            tellerV2.lenderCommitmentForwarder()
+            address(_lenderCommitmentForwarder)
         );
 
         aavePoolAddressProvider = new AavePoolAddressProviderMock(
@@ -92,18 +100,24 @@ contract FlashRolloverLoan_G3_Integration_Test is Testable {
         PaymentType _paymentType = PaymentType.EMI;
         PaymentCycleType _paymentCycleType = PaymentCycleType.Seconds;
 
+        IMarketRegistry_V2.MarketplaceTerms
+            memory marketTerms = IMarketRegistry_V2.MarketplaceTerms({
+                paymentCycleDuration: _paymentCycleDuration,
+                paymentDefaultDuration: _paymentDefaultDuration,
+                bidExpirationTime: _bidExpirationTime,
+                marketplaceFeePercent: _feePercent,
+                paymentType: _paymentType,
+                paymentCycleType: _paymentCycleType,
+                feeRecipient: address(marketOwner)
+            });
+
         vm.prank(address(marketOwner));
-        uint256 marketId = marketRegistry.createMarket(
+        (marketId, ) = marketRegistry.createMarket(
             address(marketOwner),
-            _paymentCycleDuration,
-            _paymentDefaultDuration,
-            _bidExpirationTime,
-            _feePercent,
             false,
             false,
-            _paymentType,
-            _paymentCycleType,
-            "uri"
+            "uri",
+            marketTerms
         );
 
         wethMock.deposit{ value: 100e18 }();
@@ -133,21 +147,22 @@ contract FlashRolloverLoan_G3_Integration_Test is Testable {
         //wethMock.transfer(address(flashRolloverLoan), 100);
 
         vm.prank(address(borrower));
-        uint256 loanId = tellerV2.submitBid(
+        uint256 bidId = tellerV2.submitBid(
             lendingToken,
-            1, //market id
+            marketId, //market id
             principalAmount,
             duration,
             interestRate,
             "",
             address(borrower)
         );
+  
 
         vm.prank(address(lender));
         wethMock.approve(address(tellerV2), 5e18);
 
         vm.prank(address(lender));
-        tellerV2.lenderAcceptBid(loanId);
+        tellerV2.lenderAcceptBid(bidId);
 
         vm.warp(365 days + 1);
 
@@ -213,7 +228,7 @@ contract FlashRolloverLoan_G3_Integration_Test is Testable {
         {
             vm.prank(address(marketOwner));
             ITellerV2Context(address(tellerV2)).setTrustedMarketForwarder(
-                1,
+                marketId,
                 address(lenderCommitmentForwarder)
             );
 
@@ -221,21 +236,21 @@ contract FlashRolloverLoan_G3_Integration_Test is Testable {
 
             vm.prank(address(lender));
             ITellerV2Context(address(tellerV2)).approveMarketForwarder(
-                1,
+                marketId,
                 address(lenderCommitmentForwarder)
             );
 
             vm.prank(address(borrower));
             ITellerV2Context(address(tellerV2)).approveMarketForwarder(
-                1,
+                marketId,
                 address(lenderCommitmentForwarder)
             );
 
             //borrower must approve the extension
             vm.prank(address(borrower));
             IExtensionsContext(address(lenderCommitmentForwarder)).addExtension(
-                    address(flashRolloverLoan)
-                );
+                address(flashRolloverLoan)
+            );
 
             address collateralManager = address(tellerV2.collateralManager());
 
@@ -252,7 +267,7 @@ contract FlashRolloverLoan_G3_Integration_Test is Testable {
 
         vm.prank(address(borrower));
         flashRolloverLoan.rolloverLoanWithFlash(
-            loanId,
+            bidId,
             flashLoanAmount,
             0,
             _acceptCommitmentArgs

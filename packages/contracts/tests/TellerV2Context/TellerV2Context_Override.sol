@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 
 import { TellerV2Context } from "../../contracts/TellerV2Context.sol";
 import { IMarketRegistry } from "../../contracts/interfaces/IMarketRegistry.sol";
+import { IMarketRegistry_V2 } from "../../contracts/interfaces/IMarketRegistry_V2.sol";
 
 contract TellerV2Context_Override is TellerV2Context {
     using EnumerableSet for EnumerableSet.AddressSet;
@@ -12,7 +13,7 @@ contract TellerV2Context_Override is TellerV2Context {
     constructor(address _marketRegistry, address _lenderCommitmentForwarder)
         TellerV2Context(address(0))
     {
-        marketRegistry = IMarketRegistry(_marketRegistry);
+        marketRegistry = IMarketRegistry_V2(_marketRegistry);
         lenderCommitmentForwarder = _lenderCommitmentForwarder;
     }
 

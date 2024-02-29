@@ -16,7 +16,7 @@ contract TellerV2_initialize is Testable {
     Contract marketRegistry;
     Contract reputationManager;
     Contract lenderCommitmentForwarder;
-    Contract collateralManager;
+    Contract collateralManagerV2;
     Contract lenderManager;
     Contract escrowVault;
 
@@ -29,8 +29,8 @@ contract TellerV2_initialize is Testable {
     function test_initialize() public {
         marketRegistry = new Contract();
         reputationManager = new Contract();
-        lenderCommitmentForwarder = new Contract();
-        collateralManager = new Contract();
+        // lenderCommitmentForwarder = new Contract();
+        collateralManagerV2 = new Contract();
         lenderManager = new Contract();
         escrowVault = new Contract();
 
@@ -38,10 +38,10 @@ contract TellerV2_initialize is Testable {
             protocolFee,
             address(marketRegistry),
             address(reputationManager),
-            address(lenderCommitmentForwarder),
-            address(collateralManager),
+            //  address(lenderCommitmentForwarder),
             address(lenderManager),
-            address(escrowVault)
+            address(escrowVault),
+            address(collateralManagerV2)
         );
 
         assertEq(address(tellerV2.marketRegistry()), address(marketRegistry));
@@ -49,32 +49,11 @@ contract TellerV2_initialize is Testable {
         assertEq(address(tellerV2.escrowVault()), address(escrowVault));
     }
 
-    function test_initialize_lender_commitment_forwarder_not_contract() public {
-        marketRegistry = new Contract();
-        reputationManager = new Contract();
-
-        collateralManager = new Contract();
-        lenderManager = new Contract();
-        escrowVault = new Contract();
-
-        vm.expectRevert("LenderCommitmentForwarder must be a contract");
-
-        tellerV2.initialize(
-            protocolFee,
-            address(marketRegistry),
-            address(reputationManager),
-            address(lenderCommitmentForwarder),
-            address(collateralManager),
-            address(lenderManager),
-            address(escrowVault)
-        );
-    }
-
     function test_initialize_market_registry_not_contract() public {
         reputationManager = new Contract();
 
         lenderCommitmentForwarder = new Contract();
-        collateralManager = new Contract();
+        collateralManagerV2 = new Contract();
         lenderManager = new Contract();
         escrowVault = new Contract();
 
@@ -84,10 +63,10 @@ contract TellerV2_initialize is Testable {
             protocolFee,
             address(marketRegistry),
             address(reputationManager),
-            address(lenderCommitmentForwarder),
-            address(collateralManager),
+            //    address(lenderCommitmentForwarder),
             address(lenderManager),
-            address(escrowVault)
+            address(escrowVault),
+            address(collateralManagerV2)
         );
     }
 
@@ -95,7 +74,7 @@ contract TellerV2_initialize is Testable {
         marketRegistry = new Contract();
 
         lenderCommitmentForwarder = new Contract();
-        collateralManager = new Contract();
+        collateralManagerV2 = new Contract();
         lenderManager = new Contract();
         escrowVault = new Contract();
 
@@ -105,10 +84,10 @@ contract TellerV2_initialize is Testable {
             protocolFee,
             address(marketRegistry),
             address(reputationManager),
-            address(lenderCommitmentForwarder),
-            address(collateralManager),
+            //    address(lenderCommitmentForwarder),
             address(lenderManager),
-            address(escrowVault)
+            address(escrowVault),
+            address(collateralManagerV2)
         );
     }
 
@@ -120,16 +99,16 @@ contract TellerV2_initialize is Testable {
         lenderManager = new Contract();
         escrowVault = new Contract();
 
-        vm.expectRevert("CollateralManager must be a contract");
+        vm.expectRevert("CollateralManagerV2 must be a contract");
 
         tellerV2.initialize(
             protocolFee,
             address(marketRegistry),
             address(reputationManager),
-            address(lenderCommitmentForwarder),
-            address(collateralManager),
+            //  address(lenderCommitmentForwarder),
             address(lenderManager),
-            address(escrowVault)
+            address(escrowVault),
+            address(collateralManagerV2)
         );
     }
 
@@ -138,7 +117,7 @@ contract TellerV2_initialize is Testable {
 
         lenderCommitmentForwarder = new Contract();
         reputationManager = new Contract();
-        collateralManager = new Contract();
+        collateralManagerV2 = new Contract();
         escrowVault = new Contract();
 
         vm.expectRevert("LenderManager must be a contract");
@@ -147,10 +126,10 @@ contract TellerV2_initialize is Testable {
             protocolFee,
             address(marketRegistry),
             address(reputationManager),
-            address(lenderCommitmentForwarder),
-            address(collateralManager),
+            //  address(lenderCommitmentForwarder),
             address(lenderManager),
-            address(escrowVault)
+            address(escrowVault),
+            address(collateralManagerV2)
         );
     }
 

@@ -1,18 +1,25 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import { TellerV2, Bid, BidState, Collateral, Payment, LoanDetails, Terms } from "../../contracts/TellerV2.sol";
+import { TellerV2, Bid, BidState, Collateral, Payment, LoanDetails, Terms, PaymentCycleType } from "../../contracts/TellerV2.sol";
 
 import "../../contracts/interfaces/IMarketRegistry.sol";
+import "../../contracts/interfaces/IMarketRegistry_V2.sol";
+
 import "../../contracts/interfaces/IReputationManager.sol";
 import "../../contracts/interfaces/ICollateralManager.sol";
+import "../../contracts/interfaces/ICollateralManagerV1.sol";
+import "../../contracts/interfaces/ICollateralManagerV2.sol";
 import "../../contracts/interfaces/ILenderManager.sol";
+
+import "lib/forge-std/src/console.sol";
 
 contract TellerV2_Override is TellerV2 {
     bool public submitBidWasCalled;
     bool public cancelBidWasCalled;
     bool public repayLoanWasCalled;
     address public mockMsgSenderForMarket;
+    address public collateralManagerMock;
 
     constructor() TellerV2(address(0)) {}
 
@@ -22,6 +29,13 @@ contract TellerV2_Override is TellerV2 {
 
     function mock_setBid(uint256 bidId, Bid memory bid) public {
         bids[bidId] = bid;
+    }
+
+    function mock_setCollateralManagerForBid(
+        uint256 bidId,
+        address collateralManager
+    ) public {
+        collateralManagerForBid[bidId] = collateralManager;
     }
 
     function mock_addUriToMapping(uint256 bidId, string memory uri) public {
@@ -37,11 +51,29 @@ contract TellerV2_Override is TellerV2 {
     }
 
     function setMarketRegistrySuper(address _marketRegistry) public {
-        marketRegistry = IMarketRegistry(_marketRegistry);
+        marketRegistry = IMarketRegistry_V2(_marketRegistry);
     }
 
     function setCollateralManagerSuper(address _collateralManager) public {
-        collateralManager = ICollateralManager(_collateralManager);
+        collateralManagerMock = address(_collateralManager);
+    }
+
+    function setCollateralManagerV1Super(address _collateralManager) public {
+        collateralManagerV1 = ICollateralManagerV1(_collateralManager);
+    }
+
+    //used for submit bid
+    function setCollateralManagerV2Super(address _collateralManager) public {
+        collateralManagerV2 = ICollateralManagerV2(_collateralManager);
+    }
+
+    function getCollateralManagerForBid(uint256 _bidId)
+        public
+        view
+        override
+        returns (ICollateralManager)
+    {
+        return ICollateralManager(collateralManagerMock);
     }
 
     function setReputationManagerSuper(address _reputationManager) public {
@@ -140,6 +172,15 @@ contract TellerV2_Override is TellerV2 {
     Overrides 
 
     */
+
+    function _getCollateralManagerForBid(uint256 _bidId)
+        internal
+        view
+        override
+        returns (ICollateralManager)
+    {
+        return ICollateralManager(collateralManagerMock);
+    }
 
     function _msgSenderForMarket(uint256 _marketId)
         internal

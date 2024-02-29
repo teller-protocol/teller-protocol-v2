@@ -24,4 +24,8 @@ deployFn.tags = [
   'collateral:manager:deploy',
 ]
 deployFn.dependencies = ['teller-v2:deploy', 'collateral:escrow-beacon:deploy']
+
+deployFn.skip = async (hre) => {
+  return true
+}
 export default deployFn

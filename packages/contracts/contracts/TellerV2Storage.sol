@@ -1,12 +1,13 @@
 pragma solidity >=0.8.0 <0.9.0;
 // SPDX-License-Identifier: MIT
 
-import { IMarketRegistry } from "./interfaces/IMarketRegistry.sol";
+import { IMarketRegistry_V2 } from "./interfaces/IMarketRegistry_V2.sol";
 import "./interfaces/IEscrowVault.sol";
 import "./interfaces/IReputationManager.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "./interfaces/ICollateralManager.sol";
+import "./interfaces/ICollateralManagerV1.sol";
+import "./interfaces/ICollateralManagerV2.sol";
 import { PaymentType, PaymentCycleType } from "./libraries/V2Calculations.sol";
 import "./interfaces/ILenderManager.sol";
 
@@ -50,7 +51,7 @@ struct Bid {
     LoanDetails loanDetails;
     Terms terms;
     BidState state;
-    PaymentType paymentType;
+    PaymentType paymentType; // DEPRECATED
 }
 
 /**
@@ -81,7 +82,7 @@ struct LoanDetails {
  */
 struct Terms {
     uint256 paymentCycleAmount;
-    uint32 paymentCycle;
+    uint32 paymentCycle; // DEPRECATED
     uint16 APR;
 }
 
@@ -89,31 +90,31 @@ abstract contract TellerV2Storage_G0 {
     /** Storage Variables */
 
     // Current number of bids.
-    uint256 public bidId;
+    uint256 public nextBidId;
 
     // Mapping of bidId to bid information.
     mapping(uint256 => Bid) public bids;
 
     // Mapping of borrowers to borrower requests.
-    mapping(address => uint256[]) public borrowerBids;
+    mapping(address => uint256[]) public borrowerBids; //DEPRECATED
 
     // Mapping of volume filled by lenders.
-    mapping(address => uint256) public __lenderVolumeFilled; // DEPRECIATED
+    mapping(address => uint256) public __lenderVolumeFilled; // DEPRECATED
 
     // Volume filled by all lenders.
-    uint256 public __totalVolumeFilled; // DEPRECIATED
+    uint256 public __totalVolumeFilled; // DEPRECATED
 
     // List of allowed lending tokens
     EnumerableSet.AddressSet internal __lendingTokensSet; // DEPRECATED
 
-    IMarketRegistry public marketRegistry;
+    IMarketRegistry_V2 public marketRegistry;
     IReputationManager public reputationManager;
 
     // Mapping of borrowers to borrower requests.
-    mapping(address => EnumerableSet.UintSet) internal _borrowerBidsActive;
+    mapping(address => EnumerableSet.UintSet) internal _borrowerBidsActive; //DEPRECATED
 
-    mapping(uint256 => uint32) public bidDefaultDuration;
-    mapping(uint256 => uint32) public bidExpirationTime;
+    mapping(uint256 => uint32) public bidDefaultDuration; //DEPRECATED
+    mapping(uint256 => uint32) public bidExpirationTime; //DEPRECATED
 
     // Mapping of volume filled by lenders.
     // Asset address => Lender address => Volume amount
@@ -127,7 +128,7 @@ abstract contract TellerV2Storage_G0 {
 
     // Mapping of metadataURIs by bidIds.
     // Bid Id => metadataURI string
-    mapping(uint256 => string) public uris;
+    mapping(uint256 => string) public uris; //DEPRECATED
 }
 
 abstract contract TellerV2Storage_G1 is TellerV2Storage_G0 {
@@ -139,18 +140,18 @@ abstract contract TellerV2Storage_G1 is TellerV2Storage_G0 {
 }
 
 abstract contract TellerV2Storage_G2 is TellerV2Storage_G1 {
-    address public lenderCommitmentForwarder;
+    address public lenderCommitmentForwarder; //deprecated
 }
 
 abstract contract TellerV2Storage_G3 is TellerV2Storage_G2 {
-    ICollateralManager public collateralManager;
+    ICollateralManagerV1 public collateralManagerV1;
 }
 
 abstract contract TellerV2Storage_G4 is TellerV2Storage_G3 {
     // Address of the lender manager contract
     ILenderManager public lenderManager;
     // BidId to payment cycle type (custom or monthly)
-    mapping(uint256 => PaymentCycleType) public bidPaymentCycleType;
+    mapping(uint256 => PaymentCycleType) public bidPaymentCycleType; //DEPRECATED
 }
 
 abstract contract TellerV2Storage_G5 is TellerV2Storage_G4 {
@@ -158,4 +159,15 @@ abstract contract TellerV2Storage_G5 is TellerV2Storage_G4 {
     IEscrowVault public escrowVault;
 }
 
-abstract contract TellerV2Storage is TellerV2Storage_G5 {}
+abstract contract TellerV2Storage_G6 is TellerV2Storage_G5 {
+    ICollateralManagerV2 public collateralManagerV2;
+    mapping(uint256 => address) public collateralManagerForBid; //if this is zero, that means v1
+}
+
+abstract contract TellerV2Storage_G7 is TellerV2Storage_G6 {
+    // If this is zero for a bid, the bid will use the values in the bid struct / bidDefaultDuration / bidExpirationTime
+    //need internal fns to do this if/then
+    mapping(uint256 => bytes32) public bidMarketTermsId;
+}
+
+abstract contract TellerV2Storage is TellerV2Storage_G7 {}

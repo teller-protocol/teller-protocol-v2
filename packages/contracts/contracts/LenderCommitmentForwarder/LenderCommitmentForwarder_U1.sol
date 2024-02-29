@@ -45,6 +45,9 @@ contract LenderCommitmentForwarder_U1 is
     using NumbersLib for uint256;
 
 
+
+
+
     // CommitmentId => commitment
     mapping(uint256 => Commitment) public commitments;
   
@@ -65,8 +68,8 @@ contract LenderCommitmentForwarder_U1 is
 
      //does not take a storage slot 
     address immutable UNISWAP_V3_FACTORY; 
-
-
+ 
+    uint256 immutable STANDARD_EXPANSION_FACTOR = 1e18;
 
     /**
      * @notice This event is emitted when a lender's commitment is created.
@@ -555,9 +558,7 @@ contract LenderCommitmentForwarder_U1 is
 
      {
             
-       
-       
-            //incorrect expansion here 
+        
         uint256 scaledPoolOraclePrice = getUniswapPriceRatioForPoolRoutes( commitmentUniswapPoolRoutes[_commitmentId] ).percent(
             commitmentPoolOracleLtvRatio[_commitmentId]
         );
@@ -574,9 +575,7 @@ contract LenderCommitmentForwarder_U1 is
         uint256 requiredCollateral = getRequiredCollateral(
             _principalAmount, 
             maxPrincipalPerCollateralAmount,
-            commitment.collateralTokenType,
-            commitment.collateralTokenAddress,
-            commitment.principalTokenAddress
+            commitment.collateralTokenType  
         );
   
 
@@ -655,41 +654,24 @@ contract LenderCommitmentForwarder_U1 is
     /**
      * @notice Calculate the amount of collateral required to borrow a loan with _principalAmount of principal
      * @param _principalAmount The amount of currency to borrow for the loan.
-     * @param _maxPrincipalPerCollateralAmount The ratio for the amount of principal that can be borrowed for each amount of collateral. This is expanded additionally by the principal decimals.
+     * @param _maxPrincipalPerCollateralAmount The ratio for the amount of principal that can be borrowed for each amount of collateral.  
      * @param _collateralTokenType The type of collateral for the loan either ERC20, ERC721, ERC1155, or None.
-     * @param _collateralTokenAddress The contract address for the collateral for the loan.
-     * @param _principalTokenAddress The contract address for the principal for the loan.
+    
      */
     function getRequiredCollateral(
         uint256 _principalAmount, 
         uint256 _maxPrincipalPerCollateralAmount,
-        CommitmentCollateralType _collateralTokenType,
-        address _collateralTokenAddress,
-        address _principalTokenAddress
+        CommitmentCollateralType _collateralTokenType  
+       
     ) public view virtual returns (uint256) {
         if (_collateralTokenType == CommitmentCollateralType.NONE) {
             return 0;
         }
-
-        uint8 collateralDecimals;
-        uint8 principalDecimals = IERC20MetadataUpgradeable(
-            _principalTokenAddress
-        ).decimals();
-
-        if (_collateralTokenType == CommitmentCollateralType.ERC20) {
-            collateralDecimals = IERC20MetadataUpgradeable(
-                _collateralTokenAddress
-            ).decimals();
-        }
- 
-        /*
-         * The principalAmount is expanded by (collateralDecimals+principalDecimals) to increase precision
-         * and then it is divided by _maxPrincipalPerCollateralAmount which should already been expanded by principalDecimals
-         */
+     
         return
             MathUpgradeable.mulDiv(
                 _principalAmount,
-                (10**(collateralDecimals + principalDecimals)),
+                STANDARD_EXPANSION_FACTOR,
                 _maxPrincipalPerCollateralAmount,
                 MathUpgradeable.Rounding.Up
             );
@@ -746,10 +728,7 @@ contract LenderCommitmentForwarder_U1 is
 
     /*
  
-      This returns a price ratio which is expanded by the principalTokenDecimals and the collateralTokenDecimals 
-      
-      
-       to be normalized, must be divided by (10 ** (principalTokenDecimals+collateralTokenDecimals))
+      This returns a price ratio which to be normalized, must be divided by STANDARD_EXPANSION_FACTOR
 
     */
             
@@ -763,35 +742,20 @@ contract LenderCommitmentForwarder_U1 is
         
         if(poolRoutes.length == 2) {
  
-
-            //this product is expanded hop 0  td0 +1 
+ 
             uint256 pool0PriceRatio = getUniswapPriceRatioForPool( 
                 poolRoutes[0]   
             );
 
-            //this product is expanded hop 1  td0 +1 
+            
             uint256 pool1PriceRatio = getUniswapPriceRatioForPool( 
                 poolRoutes[1]   
             );
 
-
-            bool zeroForOnePool0 = poolRoutes[0].zeroForOne;
-            bool zeroForOnePool1 = poolRoutes[1].zeroForOne;
-            
  
-            /*
-              These queries below find the decimals for the intermediate token(s) which should be identical.  
-              The query for pool1 is inverted on purpose.  
-            */
-            uint256 pool0IntermediateTokenDecimals = zeroForOnePool0 ? poolRoutes[0].token1Decimals : poolRoutes[0].token0Decimals;
-            uint256 pool1IntermediateTokenDecimals = zeroForOnePool1 ? poolRoutes[1].token0Decimals : poolRoutes[1].token1Decimals;
- 
-      
-            uint256 expFactor = 10 ** (pool0IntermediateTokenDecimals+pool1IntermediateTokenDecimals);
-
            
             return FullMath.mulDiv(
-                pool0PriceRatio , pool1PriceRatio, expFactor
+                pool0PriceRatio , pool1PriceRatio, STANDARD_EXPANSION_FACTOR
             ); 
 
         }else if (poolRoutes.length == 1){           
@@ -806,27 +770,25 @@ contract LenderCommitmentForwarder_U1 is
 
      
     /*
-        The resultant product is expanded by 10 ** (t0d + t1d)
+        The resultant product is expanded by STANDARD_EXPANSION_FACTOR one time 
     */
     function getUniswapPriceRatioForPool (  
         PoolRouteConfig memory _poolRouteConfig
     ) public view returns (uint256 priceRatio) {
  
         uint160 sqrtPriceX96 = getSqrtTwapX96( _poolRouteConfig.pool ,_poolRouteConfig.twapInterval );
- 
-        uint256 expFactor = 10 ** (_poolRouteConfig.token0Decimals + _poolRouteConfig.token1Decimals);
-
+  
         //This is the token 1 per token 0 price 
-        uint256 sqrtPrice = FullMath.mulDiv( sqrtPriceX96, expFactor, 2**96  );
+        uint256 sqrtPrice  = FullMath.mulDiv( sqrtPriceX96, STANDARD_EXPANSION_FACTOR, 2**96  );
 
-        uint256 sqrtPriceInverse = FullMath.mulDiv(expFactor , expFactor, sqrtPrice );    
+        uint256 sqrtPriceInverse =   STANDARD_EXPANSION_FACTOR * STANDARD_EXPANSION_FACTOR / sqrtPrice   ;    
 
        
-        uint256 price = _poolRouteConfig.zeroForOne ? sqrtPrice * sqrtPrice : sqrtPriceInverse * sqrtPriceInverse;
+        uint256 price = _poolRouteConfig.zeroForOne ? 
+        sqrtPrice * sqrtPrice : 
+        sqrtPriceInverse * sqrtPriceInverse; 
 
-
-
-        return price / expFactor ;   
+        return price  / STANDARD_EXPANSION_FACTOR;   
 
     }
 

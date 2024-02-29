@@ -169,6 +169,7 @@ contract TellerV2 is
     }
 
     /** Constant Variables **/
+ 
 
     uint32 public constant LIQUIDATION_DELAY = 86400; //ONE DAY IN SECONDS
 
@@ -226,7 +227,9 @@ contract TellerV2 is
     ) external reinitializer(10) {
         require(address(_collateralManagerV2) == address(0));
         _setCollateralManagerV2(_collateralManagerV2);
+  
     }
+     
 
     function _setEscrowVault(address _escrowVault) internal onlyInitializing {
         require(_escrowVault.isContract(), "EscrowVault must be a contract");
@@ -1032,8 +1035,6 @@ contract TellerV2 is
         if (bid.state != BidState.ACCEPTED) return false;
 
         uint32 defaultDuration = _getBidDefaultDuration(_bidId);
-
-        if (defaultDuration == 0) return false;
 
         uint32 dueDate = calculateNextDueDate(_bidId);
 

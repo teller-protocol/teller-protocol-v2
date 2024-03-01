@@ -7,7 +7,7 @@ import {
 } from "@graphprotocol/graph-ts";
 
 import { LenderCommitmentForwarder } from "../../generated/LenderCommitmentForwarder/LenderCommitmentForwarder";
-import { LenderCommitmentForwarderStaging } from "../../generated/LenderCommitmentForwarderStaging/LenderCommitmentForwarderStaging";
+
 import {
   Commitment,
   CommitmentZScore,
@@ -81,11 +81,7 @@ export function updateLenderCommitment(
   commitment.marketplace = marketId;
   commitment.marketplaceId = BigInt.fromString(marketId);
 
-  const lenderCommitment = isRolloverable()
-    ? LenderCommitmentForwarderStaging.bind(eventAddress)
-        .commitments(commitmentId)
-        .toMap()
-    : LenderCommitmentForwarder.bind(eventAddress)
+  const lenderCommitment =   LenderCommitmentForwarder.bind(eventAddress)
         .commitments(commitmentId)
         .toMap();
 
@@ -159,12 +155,15 @@ export function updateCommitmentStatus(
 
   switch (status) {
     case CommitmentStatus.Active:
+      removeInactiveCommitmentToProtocol(commitment);
       addCommitmentToProtocol(commitment);
       marketCommitments.commitmentZScores = addToArray(
         marketCommitments.commitmentZScores,
         commitmentZScore.id
       );
       break;
+    case CommitmentStatus.Inactive:
+        addInactiveCommitmentToProtocol(commitment);
     default:
       removeCommitmentToProtocol(commitment);
       marketCommitments.commitmentZScores = removeFromArray(
@@ -261,6 +260,45 @@ export function updateCommitmentZScore(
 
   commitmentZScore.save();
 }
+
+
+
+function addInactiveCommitmentToProtocol(commitment: Commitment): void {
+  const protocol = loadProtocol();
+
+  let inactiveArray = protocol.inactiveCommitments 
+
+  if (!inactiveArray) {
+    inactiveArray = []
+  }
+
+
+  protocol.inactiveCommitments = addToArray(
+    inactiveArray,
+    commitment.id
+  );
+  protocol.save();
+}
+
+
+function removeInactiveCommitmentToProtocol(commitment: Commitment): void {
+  const protocol = loadProtocol();
+
+  let inactiveArray = protocol.inactiveCommitments 
+
+
+
+  if (inactiveArray) {  
+    protocol.inactiveCommitments = removeFromArray(
+      inactiveArray,
+      commitment.id
+    );
+  }
+
+  protocol.save();
+}
+
+
 
 function addCommitmentToProtocol(commitment: Commitment): void {
   const protocol = loadProtocol();

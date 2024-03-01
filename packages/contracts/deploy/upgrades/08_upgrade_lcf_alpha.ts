@@ -65,7 +65,7 @@ const deployFn: DeployFunction = async (hre) => {
     description: ` 
 # LenderCommitmentForwarderAlpha
 
-* Fixed issue with zero length path.
+* Upgrades to static expansion.
 `,
     _steps: [
       {
@@ -131,6 +131,7 @@ deployFn.skip = async (hre) => {
       'localhost',
      
       'sepolia' ,
+      'arbitrum' ,
       'polygon' 
       
     ].includes(hre.network.name)

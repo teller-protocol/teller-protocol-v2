@@ -1,7 +1,7 @@
 {
   "name": "@teller-protocol/v2-subgraph",
   "license": "UNLICENSED",
-  "version": "0.4.21-4",
+  "version": "0.4.21-11",
   "scripts": {
     "deploy:prompt": "ts-node scripts/thegraph",
     "create-local": "graph create --node http://localhost:8020/ teller-v2",

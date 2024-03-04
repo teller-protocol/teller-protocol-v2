@@ -257,8 +257,8 @@ const buildAndDeploy = async ({
 
       if (USE_CUSTOM_GRAFTING) {
         args.grafting = {
-          base: "Qmdv9ReC57dgsNXhLRamkRCRyLQWzMTLikoxHKVjZkJz6Y",
-          block: "53711025"
+          base: "QmY631pAQ6JqjsUEpx1LKGcpazeqg2r54AC64WcRpgVqwW",
+          block: "11386946"
 
        };
       }else{

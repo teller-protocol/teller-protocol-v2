@@ -711,28 +711,89 @@ contract TellerV2 is
         _unpause();
     }
 
+
+  function lenderCloseLoan(uint256 _bidId)
+        external
+        acceptedLoan(_bidId, "lenderClaimCollateral")
+    {
+
+         Bid storage bid = bids[_bidId];
+        address _collateralRecipient = bid.lender; 
+
+        _lenderCloseLoanWithRecipient(_bidId,_collateralRecipient);  
+
+    }
     /**
      * @notice Function for lender to claim collateral for a defaulted loan. The only purpose of a CLOSED loan is to make collateral claimable by lender.
      * @param _bidId The id of the loan to set to CLOSED status.
      */
-    function lenderCloseLoan(uint256 _bidId)
+    function lenderCloseLoanWithRecipient(uint256 _bidId, address _collateralRecipient)
         external
+        
+    {
+        _lenderCloseLoanWithRecipient(_bidId,_collateralRecipient);
+    }
+
+        function _lenderCloseLoanWithRecipient(uint256 _bidId, address _collateralRecipient)
+        internal
         acceptedLoan(_bidId, "lenderClaimCollateral")
     {
         require(isLoanDefaulted(_bidId), "Loan must be defaulted.");
-
+       
         Bid storage bid = bids[_bidId];
         bid.state = BidState.CLOSED;
 
-        collateralManager.lenderClaimCollateral(_bidId);
+        address sender = _msgSenderForMarket(bid.marketplaceId);
+        require(sender == bid.lender, "only lender can close loan");
+
+        //handle this differently based on v1 or v2 
+        
+           address collateralManagerForBid = address(_getCollateralManagerForBid(_bidId)); 
+
+          if( collateralManagerForBid == address(collateralManagerV2) ){
+             ICollateralManagerV2(collateralManagerForBid).lenderClaimCollateral(_bidId,_collateralRecipient);
+          }else{
+             require( _collateralRecipient == address(bid.lender));
+             ICollateralManager(collateralManagerForBid).lenderClaimCollateral(_bidId );
+          }
+        
+        
+        emit LoanClosed(_bidId);
     }
 
+
+
+    
     /**
      * @notice Function for users to liquidate a defaulted loan.
      * @param _bidId The id of the loan to make the payment towards.
      */
     function liquidateLoanFull(uint256 _bidId)
         external
+        acceptedLoan(_bidId, "liquidateLoan")
+    {
+        Bid storage bid = bids[_bidId];
+
+         // If loan is backed by collateral, withdraw and send to the liquidator
+        address recipient = _msgSenderForMarket(bid.marketplaceId);
+
+       _liquidateLoanFull(_bidId,recipient);
+    }
+
+     function liquidateLoanFullWithRecipient(uint256 _bidId, address _recipient)
+        external
+        acceptedLoan(_bidId, "liquidateLoan")
+    { 
+
+       _liquidateLoanFull(_bidId,_recipient);
+    }
+
+        /**
+     * @notice Function for users to liquidate a defaulted loan.
+     * @param _bidId The id of the loan to make the payment towards.
+     */
+    function _liquidateLoanFull(uint256 _bidId, address _recipient)
+        internal
         acceptedLoan(_bidId, "liquidateLoan")
     {
         require(isLoanLiquidateable(_bidId), "Loan must be liquidateable.");
@@ -746,7 +807,8 @@ contract TellerV2 is
             .calculateAmountOwed(
                 bid,
                 block.timestamp,
-                bidPaymentCycleType[_bidId]
+                _getBidPaymentCycleType(_bidId),
+                _getBidPaymentCycleDuration(_bidId)
             );
 
         //this sets the state to 'repaid'
@@ -757,12 +819,19 @@ contract TellerV2 is
             false
         );
 
-        // If loan is backed by collateral, withdraw and send to the liquidator
-        address liquidator = _msgSenderForMarket(bid.marketplaceId);
-        collateralManager.liquidateCollateral(_bidId, liquidator);
+       
+        //collateralManager.liquidateCollateral(_bidId, liquidator);
+        _getCollateralManagerForBid(_bidId).liquidateCollateral(
+            _bidId,
+            _recipient
+        );
+
+         address liquidator = _msgSenderForMarket(bid.marketplaceId);
+
 
         emit LoanLiquidated(_bidId, liquidator);
     }
+
 
     /**
      * @notice Internal function to make a loan payment.
@@ -1120,6 +1189,44 @@ contract TellerV2 is
         lastRepaidTimestamp = V2Calculations.lastRepaidTimestamp(bids[_bidId]);
         bidState = bid.state;
     }
+
+
+    // Additions for lender groups 
+
+    function getLoanDefaultTimestamp(
+        uint256 _bidId
+    ) public view returns (uint256) {
+        Bid storage bid = bids[_bidId]; 
+
+        uint32 defaultDuration = _getBidDefaultDuration(_bidId); 
+
+        uint32 dueDate = calculateNextDueDate(_bidId);
+
+        return dueDate + defaultDuration;
+    }
+
+
+    function setRepaymentListenerForBid(uint256 _bidId, address _listener)
+        external
+    {
+
+        address sender = _msgSenderForMarket(bids[_bidId].marketplaceId);
+
+        require( sender == bids[_bidId].lender , "Only bid lender may set repayment listener");
+
+        repaymentListenerForBid[_bidId] = _listener;
+    }
+
+    function getRepaymentListenerForBid(uint256 _bidId)
+        external
+        view
+        returns (address)
+    {
+        return repaymentListenerForBid[_bidId];
+    }
+
+    // ----------
+
 
     /** OpenZeppelin Override Functions **/
 

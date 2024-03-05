@@ -17,11 +17,7 @@ import "./interfaces/IMarketRegistry_V2.sol";
 import { EnumerableSet } from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import { PaymentType } from "./libraries/V2Calculations.sol";
 
-contract MarketRegistry_G2 is
-    IMarketRegistry_V2,
-    Initializable,
-    Context
-{
+contract MarketRegistry_G2 is IMarketRegistry_V2, Initializable, Context {
     using EnumerableSet for EnumerableSet.AddressSet;
 
     /** Constant Variables **/
@@ -361,7 +357,6 @@ contract MarketRegistry_G2 is
             address feeRecipient
         )
     {
-     
         return (
             getPaymentCycleDurationForTerms(_marketTermsId),
             marketTerms[_marketTermsId].paymentType,
@@ -455,16 +450,12 @@ contract MarketRegistry_G2 is
         returns (address _recipient)
     {
         bytes32 _marketTermsId = currentMarketTermsForMarket[_marketId];
-        _recipient= marketTerms[_marketTermsId].feeRecipient;
-       
+        _recipient = marketTerms[_marketTermsId].feeRecipient;
 
         if (_recipient == address(0)) {
             return _getMarketOwner(_marketId);
-        }  
+        }
     }
-
-   
-
 
     /**
      * @notice Gets the loan default duration of a market.
@@ -475,7 +466,7 @@ contract MarketRegistry_G2 is
         public
         view
         returns (uint32)
-    {   
+    {
         bytes32 _marketTermsId = currentMarketTermsForMarket[_marketId];
         return marketTerms[_marketTermsId].paymentDefaultDuration;
     }
@@ -529,10 +520,7 @@ contract MarketRegistry_G2 is
         return marketTerms[_marketTermsId].bidExpirationTime;
     }
 
-
-
-
-     function getMarketFeeTerms(bytes32 _marketTermsId)
+    function getMarketFeeTerms(bytes32 _marketTermsId)
         public
         view
         returns (address, uint16)
@@ -550,7 +538,9 @@ contract MarketRegistry_G2 is
     {
         require(_marketTermsId != bytes32(0), "Invalid market terms.");
 
-        uint32 paymentCycleDuration = getPaymentCycleDurationForTerms(_marketTermsId);
+        uint32 paymentCycleDuration = getPaymentCycleDurationForTerms(
+            _marketTermsId
+        );
 
         return (
             paymentCycleDuration,
@@ -559,10 +549,7 @@ contract MarketRegistry_G2 is
             marketTerms[_marketTermsId].paymentDefaultDuration,
             marketTerms[_marketTermsId].bidExpirationTime
         );
-    } 
-
-
-
+    }
 
     /**
      * @notice Gets the loan default duration of a market.
@@ -603,7 +590,10 @@ contract MarketRegistry_G2 is
         view
         returns (uint32)
     {
-        if(marketTerms[_marketTermsId].paymentCycleType == PaymentCycleType.Monthly){
+        if (
+            marketTerms[_marketTermsId].paymentCycleType ==
+            PaymentCycleType.Monthly
+        ) {
             return 30 days;
         }
 
@@ -734,7 +724,6 @@ contract MarketRegistry_G2 is
         uint16 _feePercent,
         address _feeRecipient
     ) internal returns (bytes32) {
-
         require(
             (_paymentCycleType == PaymentCycleType.Seconds) ||
                 (_paymentCycleType == PaymentCycleType.Monthly &&
@@ -790,7 +779,7 @@ contract MarketRegistry_G2 is
 
     //Attestation Functions
 
-/**
+    /**
      * @notice Enable/disables market whitelist for lenders.
      * @param _marketId The ID of a market.
      * @param _required Boolean indicating if the market requires whitelist.

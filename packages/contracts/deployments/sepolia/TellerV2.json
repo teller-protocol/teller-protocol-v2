@@ -114,6 +114,18 @@
     {
       "type": "event",
       "anonymous": false,
+      "name": "LoanClosed",
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "bidId",
+          "indexed": true
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
       "name": "LoanLiquidated",
       "inputs": [
         {
@@ -257,6 +269,23 @@
     {
       "type": "event",
       "anonymous": false,
+      "name": "SetBidMarketTerms",
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "bidId",
+          "indexed": true
+        },
+        {
+          "type": "bytes32",
+          "name": "marketTermsId",
+          "indexed": true
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
       "name": "SubmittedBid",
       "inputs": [
         {
@@ -312,20 +341,6 @@
           "type": "address",
           "name": "account",
           "indexed": false
-        }
-      ]
-    },
-    {
-      "type": "function",
-      "name": "CURRENT_CODE_VERSION",
-      "constant": true,
-      "stateMutability": "view",
-      "payable": false,
-      "inputs": [],
-      "outputs": [
-        {
-          "type": "uint8",
-          "name": ""
         }
       ]
     },
@@ -433,14 +448,19 @@
     },
     {
       "type": "function",
-      "name": "bidId",
+      "name": "bidMarketTermsId",
       "constant": true,
       "stateMutability": "view",
       "payable": false,
-      "inputs": [],
-      "outputs": [
+      "inputs": [
         {
           "type": "uint256",
+          "name": ""
+        }
+      ],
+      "outputs": [
+        {
+          "type": "bytes32",
           "name": ""
         }
       ]
@@ -799,44 +819,6 @@
     },
     {
       "type": "function",
-      "name": "getBorrowerActiveLoanIds",
-      "constant": true,
-      "stateMutability": "view",
-      "payable": false,
-      "inputs": [
-        {
-          "type": "address",
-          "name": "_borrower"
-        }
-      ],
-      "outputs": [
-        {
-          "type": "uint256[]",
-          "name": ""
-        }
-      ]
-    },
-    {
-      "type": "function",
-      "name": "getBorrowerLoanIds",
-      "constant": true,
-      "stateMutability": "view",
-      "payable": false,
-      "inputs": [
-        {
-          "type": "address",
-          "name": "_borrower"
-        }
-      ],
-      "outputs": [
-        {
-          "type": "uint256[]",
-          "name": ""
-        }
-      ]
-    },
-    {
-      "type": "function",
       "name": "getCollateralManagerForBid",
       "constant": true,
       "stateMutability": "view",
@@ -993,6 +975,25 @@
         {
           "type": "string",
           "name": "metadataURI_"
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getRepaymentListenerForBid",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_bidId"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
         }
       ]
     },
@@ -1325,6 +1326,20 @@
     },
     {
       "type": "function",
+      "name": "nextBidId",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
       "name": "owner",
       "constant": true,
       "stateMutability": "view",
@@ -1473,6 +1488,25 @@
     },
     {
       "type": "function",
+      "name": "repaymentListenerForBid",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
       "name": "reputationManager",
       "constant": true,
       "stateMutability": "view",
@@ -1507,6 +1541,23 @@
         {
           "type": "uint16",
           "name": "newFee"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "setRepaymentListenerForBid",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_bidId"
+        },
+        {
+          "type": "address",
+          "name": "_listener"
         }
       ],
       "outputs": []
@@ -1715,6 +1766,6 @@
     "blockHash": null,
     "blockNumber": null
   },
-  "numDeployments": 2,
+  "numDeployments": 5,
   "implementation": "0x8127a64DAb886e7fB1eC34eFff5aA7435434ECD5"
 }

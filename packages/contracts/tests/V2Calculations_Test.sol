@@ -190,7 +190,12 @@ contract V2Calculations_Test is Testable {
             uint256 duePrincipal;
             uint256 interest;
             (owedPrincipal, duePrincipal, interest) = V2Calculations
-                .calculateAmountOwed(__bid, nowTimestamp, _paymentCycleType, _paymentCycleDuration);
+                .calculateAmountOwed(
+                    __bid,
+                    nowTimestamp,
+                    _paymentCycleType,
+                    _paymentCycleDuration
+                );
 
             // Check if we should skip this cycle for payments
             if (cyclesToSkip.length() > 0) {

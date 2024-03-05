@@ -16,5 +16,14 @@
   "liquidity-rewards:deploy": 1695411253,
   "default-proxy-admin:transfer": 1695411254,
   "lender-commitment-forwarder:extensions:flash-rollover:g3-upgrade": 1695920349,
-  "teller-v2:loan-liquidated-state-upgrade": 1696520015
+  "teller-v2:loan-liquidated-state-upgrade": 1696520015,
+  "collateral:manager-v2:deploy": 1700855248,
+  "smart-commitment-forwarder:deploy": 1700855352,
+  "teller-v2:collateral-manager-v2-upgrade": 1701979762,
+  "market-registry:v2-upgrade": 1701982450,
+  "teller-v2:market-registry-v2-upgrade": 1701985473,
+  "lender-commitment-forwarder:g2-upgrade": 1706720831,
+  "smart-commitment-forwarder:upgrade": 1706901073,
+  "lender-commitment-group-upgrade": 1706907208,
+  "lender-commitment-group-smart:deploy": 1708459645
 }

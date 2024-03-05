@@ -37,10 +37,7 @@ contract TokenStore is
     }*/
 
     /// @dev Store / escrow multiple ERC1155, ERC721, ERC20 tokens.
-    function _storeTokens(
-        address _tokenOwner,
-        Collateral[] memory _tokens
-    )
+    function _storeTokens(address _tokenOwner, Collateral[] memory _tokens)
         internal
         returns (
             //string memory _uriForTokens
@@ -53,10 +50,11 @@ contract TokenStore is
     }
 
     /// @dev Release stored / escrowed ERC1155, ERC721, ERC20 tokens.
-    function _releaseTokens(
-        address _recipient,
-        uint256 _bundleId
-    ) internal virtual returns (uint256, Collateral[] memory) {
+    function _releaseTokens(address _recipient, uint256 _bundleId)
+        internal
+        virtual
+        returns (uint256, Collateral[] memory)
+    {
         uint256 count = getTokenCountOfBundle(_bundleId);
         Collateral[] memory tokensToRelease = new Collateral[](count);
 

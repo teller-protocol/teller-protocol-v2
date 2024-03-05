@@ -156,7 +156,6 @@ contract FlashRolloverLoan_G3_Integration_Test is Testable {
             "",
             address(borrower)
         );
-  
 
         vm.prank(address(lender));
         wethMock.approve(address(tellerV2), 5e18);
@@ -249,8 +248,8 @@ contract FlashRolloverLoan_G3_Integration_Test is Testable {
             //borrower must approve the extension
             vm.prank(address(borrower));
             IExtensionsContext(address(lenderCommitmentForwarder)).addExtension(
-                address(flashRolloverLoan)
-            );
+                    address(flashRolloverLoan)
+                );
 
             address collateralManager = address(tellerV2.collateralManager());
 

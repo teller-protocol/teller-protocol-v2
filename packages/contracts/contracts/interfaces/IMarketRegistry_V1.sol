@@ -8,8 +8,6 @@ import { IMarketRegistry } from "./IMarketRegistry.sol";
 
 interface IMarketRegistry_V1 is IMarketRegistry {
     function initialize(TellerAS tellerAs) external;
- 
-
 
     function createMarket(
         address _initialOwner,
@@ -35,7 +33,7 @@ interface IMarketRegistry_V1 is IMarketRegistry {
         string calldata _uri
     ) external returns (uint256 marketId_);
 
-   function getPaymentCycle(uint256 _marketId)
+    function getPaymentCycle(uint256 _marketId)
         external
         view
         returns (uint32, PaymentCycleType);

@@ -68,7 +68,6 @@ contract TellerV2Autopay_Test is Testable, TellerV2Autopay {
     }
 
     function setAutoPayEnabled_before() public {
-        
         /*marketOwner.createMarketWithinRegistry(
             address(marketRegistry),
             8000,
@@ -81,29 +80,19 @@ contract TellerV2Autopay_Test is Testable, TellerV2Autopay {
             "uri://"
         );*/
 
-         IMarketRegistry_V2.MarketplaceTerms memory marketTerms = IMarketRegistry_V2.MarketplaceTerms({
-            paymentCycleDuration:8000,
-            paymentDefaultDuration:7000,
-            bidExpirationTime:5000,
-            marketplaceFeePercent:500,
-            paymentType:PaymentType.EMI,
-            paymentCycleType:PaymentCycleType.Seconds,
-             feeRecipient: address(this)
+        IMarketRegistry_V2.MarketplaceTerms
+            memory marketTerms = IMarketRegistry_V2.MarketplaceTerms({
+                paymentCycleDuration: 8000,
+                paymentDefaultDuration: 7000,
+                bidExpirationTime: 5000,
+                marketplaceFeePercent: 500,
+                paymentType: PaymentType.EMI,
+                paymentCycleType: PaymentCycleType.Seconds,
+                feeRecipient: address(this)
+            });
 
-        });
-
-       (uint256 marketplaceId, ) =  IMarketRegistry_V2(marketRegistry).createMarket(
-            address(this),
-            
-            false,
-            false,
-            
-            "uri://",
-            marketTerms
-        );
-
-
-
+        (uint256 marketplaceId, ) = IMarketRegistry_V2(marketRegistry)
+            .createMarket(address(this), false, false, "uri://", marketTerms);
 
         uint256 bidId = borrower.submitBid(
             address(wethMock),

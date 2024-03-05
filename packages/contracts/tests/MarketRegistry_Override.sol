@@ -46,7 +46,7 @@ contract MarketRegistry_Override is MarketRegistry {
         globalMarketOwner = _owner;
     }
 
- /*   function attestStakeholder(
+    /*   function attestStakeholder(
         uint256 _marketId,
         address _stakeholderAddress,
         uint256 _expirationTime,
@@ -78,7 +78,7 @@ contract MarketRegistry_Override is MarketRegistry {
         super._attestStakeholderVerification(
             _marketId,
             _stakeholderAddress,
-          //  _uuid,
+            //  _uuid,
             _isLender
         );
     }
@@ -119,7 +119,7 @@ contract MarketRegistry_Override is MarketRegistry {
         return markets[_marketId].verifiedBorrowersForMarket.contains(guy);
     }
 
-   /* function getLenderAttestationId(uint256 _marketId, address guy)
+    /* function getLenderAttestationId(uint256 _marketId, address guy)
         public
         returns (bytes32)
     {
@@ -153,10 +153,10 @@ contract MarketRegistry_Override is MarketRegistry {
         public
         returns (bool isVerified_, bytes32 uuid_)
     {
-         isVerified_  = super._isVerified(
+        isVerified_ = super._isVerified(
             _stakeholderAddress,
             markets[_marketId].lenderAttestationRequired,
-           // markets[_marketId].lenderAttestationIds,
+            // markets[_marketId].lenderAttestationIds,
             markets[_marketId].verifiedLendersForMarket
         );
     }
@@ -184,12 +184,13 @@ contract MarketRegistry_Override is MarketRegistry {
     function _attestStakeholderVerification(
         uint256 _marketId,
         address _stakeholderAddress,
-      //  bytes32 _uuid,
+        //  bytes32 _uuid,
         bool _isLender
     ) internal override {
         attestStakeholderVerificationWasCalled = true;
     }
-/*
+
+    /*
     function _attestStakeholderViaDelegation(
         uint256 _marketId,
         address _stakeholderAddress,
@@ -209,7 +210,8 @@ contract MarketRegistry_Override is MarketRegistry {
     ) internal override {
         revokeStakeholderWasCalled = true;
     }
-/*
+
+    /*
     function _revokeStakeholderVerification(
         uint256 _marketId,
         address _stakeholderAddress,
@@ -221,10 +223,10 @@ contract MarketRegistry_Override is MarketRegistry {
     function _isVerified(
         address _stakeholderAddress,
         bool _attestationRequired,
-     //   mapping(address => bytes32) storage _stakeholderAttestationIds,
+        //   mapping(address => bytes32) storage _stakeholderAttestationIds,
         EnumerableSet.AddressSet storage _verifiedStakeholderForMarket
-    ) internal view override returns (bool isVerified_ ) {
+    ) internal view override returns (bool isVerified_) {
         isVerified_ = true;
-      //  uuid_ = bytes32("0x42");
+        //  uuid_ = bytes32("0x42");
     }
 }

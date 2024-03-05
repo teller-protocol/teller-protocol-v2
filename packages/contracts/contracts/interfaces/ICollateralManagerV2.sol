@@ -48,4 +48,11 @@ interface ICollateralManagerV2 is ICollateralManager {
         external
         view
         returns (uint256 _amount);
+
+    /**
+     * @notice Sends the deposited collateral to a lender of a bid.
+     * @notice Can only be called by the protocol.
+     * @param _bidId The id of the liquidated bid.
+     */
+    function lenderClaimCollateral(uint256 _bidId, address _collateralRecipient) external;
 }

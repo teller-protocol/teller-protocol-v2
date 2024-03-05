@@ -4,18 +4,6 @@
     {
       "type": "event",
       "anonymous": false,
-      "name": "CollateralClaimed",
-      "inputs": [
-        {
-          "type": "uint256",
-          "name": "_bidId",
-          "indexed": false
-        }
-      ]
-    },
-    {
-      "type": "event",
-      "anonymous": false,
       "name": "CollateralCommitted",
       "inputs": [
         {
@@ -73,23 +61,6 @@
         {
           "type": "uint256",
           "name": "_tokenId",
-          "indexed": false
-        }
-      ]
-    },
-    {
-      "type": "event",
-      "anonymous": false,
-      "name": "CollateralEscrowDeployed",
-      "inputs": [
-        {
-          "type": "uint256",
-          "name": "_bidId",
-          "indexed": false
-        },
-        {
-          "type": "address",
-          "name": "_collateralEscrow",
           "indexed": false
         }
       ]
@@ -593,6 +564,6 @@
     "blockHash": null,
     "blockNumber": null
   },
-  "numDeployments": 1,
+  "numDeployments": 2,
   "implementation": "0xDF4fc3dEef73E5908C5318BAF74374f046712389"
 }

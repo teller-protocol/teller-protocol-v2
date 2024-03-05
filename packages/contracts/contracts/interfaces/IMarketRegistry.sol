@@ -3,7 +3,6 @@ pragma solidity ^0.8.0;
 
 import { PaymentType, PaymentCycleType } from "../libraries/V2Calculations.sol";
 
-
 interface IMarketRegistry {
     function isMarketOpen(uint256 _marketId) external view returns (bool);
 
@@ -23,8 +22,6 @@ interface IMarketRegistry {
         view
         returns (string memory);
 
-    
-
     function getPaymentDefaultDuration(uint256 _marketId)
         external
         view
@@ -40,7 +37,6 @@ interface IMarketRegistry {
         view
         returns (PaymentType);
 
-
     function getMarketplaceFee(uint256 _marketId)
         external
         view
@@ -55,6 +51,4 @@ interface IMarketRegistry {
         external
         view
         returns (bool, bytes32);
-
-
 }

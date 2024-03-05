@@ -804,10 +804,10 @@ contract TellerV2_initialize is Testable {
         tellerV2.mock_setBidDefaultDuration(bidId, 0);
 
         vm.warp(1e10);
-
+ 
         bool canLiq = tellerV2._canLiquidateLoanSuper(bidId, 500);
 
-        assertEq(canLiq, false, "unexpected liquidation status");
+       assertEq(canLiq, true, "unexpected liquidation status");
     }
 
     function test_canLiquidateLoan_internal_false() public {

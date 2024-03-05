@@ -10,14 +10,14 @@ import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
 
 // Interfaces
- 
+
 import "./interfaces/IMarketRegistry_V1.sol";
 
 // Libraries
 import { EnumerableSet } from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import { PaymentType } from "./libraries/V2Calculations.sol";
 
-contract MarketRegistry_G1 is 
+contract MarketRegistry_G1 is
     IMarketRegistry_V1,
     Initializable,
     Context,

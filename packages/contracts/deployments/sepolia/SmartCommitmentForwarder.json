@@ -1,0 +1,202 @@
+{
+  "address": "0x9afd21f471560Ec280abb087b0c150af9034D79f",
+  "abi": [
+    {
+      "type": "constructor",
+      "stateMutability": "undefined",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "_protocolAddress"
+        },
+        {
+          "type": "address",
+          "name": "_marketRegistry"
+        }
+      ]
+    },
+    {
+      "type": "error",
+      "name": "InsufficientBorrowerCollateral",
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "required"
+        },
+        {
+          "type": "uint256",
+          "name": "actual"
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "ExercisedSmartCommitment",
+      "inputs": [
+        {
+          "type": "address",
+          "name": "smartCommitmentAddress",
+          "indexed": true
+        },
+        {
+          "type": "address",
+          "name": "borrower",
+          "indexed": false
+        },
+        {
+          "type": "uint256",
+          "name": "tokenAmount",
+          "indexed": false
+        },
+        {
+          "type": "uint256",
+          "name": "bidId",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "Initialized",
+      "inputs": [
+        {
+          "type": "uint8",
+          "name": "version",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "_marketRegistry",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "_tellerV2",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "acceptCommitmentWithRecipient",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "_smartCommitmentAddress"
+        },
+        {
+          "type": "uint256",
+          "name": "_principalAmount"
+        },
+        {
+          "type": "uint256",
+          "name": "_collateralAmount"
+        },
+        {
+          "type": "uint256",
+          "name": "_collateralTokenId"
+        },
+        {
+          "type": "address",
+          "name": "_collateralTokenAddress"
+        },
+        {
+          "type": "address",
+          "name": "_recipient"
+        },
+        {
+          "type": "uint16",
+          "name": "_interestRate"
+        },
+        {
+          "type": "uint32",
+          "name": "_loanDuration"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": "bidId"
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getMarketRegistry",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getTellerV2",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getTellerV2MarketOwner",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "marketId"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    }
+  ],
+  "transactionHash": "0x627bd1cca1b77becdbbc502f52d07193a434865aadc6f9cf0cef9cf8496de076",
+  "receipt": {
+    "to": null,
+    "from": "0x5a5B978142C8F08Dd013901b50892baC49f3b700",
+    "blockHash": null,
+    "blockNumber": null
+  },
+  "numDeployments": 4,
+  "implementation": "0x2CeE81430703c5D968ce8457DeD207F45992f7F6"
+}

@@ -92,9 +92,12 @@ contract CollateralManagerV2 is
      * @param _bidId The id of the bid to check.
      */
 
-    function isBidCollateralBacked(
-        uint256 _bidId
-    ) public view virtual returns (bool) {
+    function isBidCollateralBacked(uint256 _bidId)
+        public
+        view
+        virtual
+        returns (bool)
+    {
         return _committedBidCollateral[_bidId].count > 0;
     }
 
@@ -160,9 +163,11 @@ contract CollateralManagerV2 is
      * @return infos_ The stored collateral info.
      */
 
-    function getCollateralInfo(
-        uint256 _bidId
-    ) public view returns (Collateral[] memory infos_) {
+    function getCollateralInfo(uint256 _bidId)
+        public
+        view
+        returns (Collateral[] memory infos_)
+    {
         uint256 count = _committedBidCollateral[_bidId].count;
         infos_ = new Collateral[](count);
 
@@ -177,10 +182,11 @@ contract CollateralManagerV2 is
      * @param _collateralAddress An address used as collateral.
      * @return amount_ The amount of collateral of type _collateralAddress.
      */
-    function getCollateralAmount(
-        uint256 _bidId,
-        address _collateralAddress
-    ) public view returns (uint256 amount_) {
+    function getCollateralAmount(uint256 _bidId, address _collateralAddress)
+        public
+        view
+        returns (uint256 amount_)
+    {
         uint256 bundleId = _collateralBundleIdForBid[_bidId];
 
         Collateral memory token_data = getTokenOfBundle(bundleId, 0); // first slot
@@ -220,17 +226,35 @@ contract CollateralManagerV2 is
         _withdraw(_bidId, _recipient);
     }
 
-    /**
+       /**
      * @notice Withdraws deposited collateral of a bid that has been CLOSED after being defaulted.
      * @param _bidId The id of the bid to withdraw collateral for.
      */
-    function lenderClaimCollateral(uint256 _bidId) external onlyTellerV2 {
+    function lenderClaimCollateral(uint256 _bidId ) external onlyTellerV2 {
         if (isBidCollateralBacked(_bidId)) {
             BidState bidState = tellerV2.getBidState(_bidId);
 
             require(bidState == BidState.CLOSED, "Loan has not been closed");
 
-            _withdraw(_bidId, tellerV2.getLoanLender(_bidId));
+            
+            _withdraw(_bidId,  tellerV2.getLoanLender(_bidId));
+        }
+    }
+
+
+    /**
+     * @notice Withdraws deposited collateral of a bid that has been CLOSED after being defaulted.
+     * @param _bidId The id of the bid to withdraw collateral for.
+     */
+    function lenderClaimCollateral(uint256 _bidId, address _collateralRecipient) external onlyTellerV2 {
+        if (isBidCollateralBacked(_bidId)) {
+            BidState bidState = tellerV2.getBidState(_bidId);
+
+            require(bidState == BidState.CLOSED, "Loan has not been closed");
+
+            address recipient = _collateralRecipient == address(0) ? tellerV2.getLoanLender(_bidId) : _collateralRecipient; 
+
+            _withdraw(_bidId, recipient);
         }
     }
 
@@ -240,10 +264,10 @@ contract CollateralManagerV2 is
      * @param _bidId The id of the liquidated bid.
      * @param _liquidatorAddress The address of the liquidator to send the collateral to.
      */
-    function liquidateCollateral(
-        uint256 _bidId,
-        address _liquidatorAddress
-    ) external onlyTellerV2 {
+    function liquidateCollateral(uint256 _bidId, address _liquidatorAddress)
+        external
+        onlyTellerV2
+    {
         if (isBidCollateralBacked(_bidId)) {
             BidState bidState = tellerV2.getBidState(_bidId);
             require(
@@ -395,12 +419,12 @@ contract CollateralManagerV2 is
 
     // On NFT Received handlers
 
-    function onERC721Received(
-        address,
-        address,
-        uint256,
-        bytes memory
-    ) public pure override returns (bytes4) {
+    function onERC721Received(address, address, uint256, bytes memory)
+        public
+        pure
+        override
+        returns (bytes4)
+    {
         return
             bytes4(
                 keccak256("onERC721Received(address,address,uint256,bytes)")

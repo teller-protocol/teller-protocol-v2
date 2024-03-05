@@ -15,7 +15,6 @@ interface IMarketRegistry_V2 is IMarketRegistry {
         address feeRecipient;
     }
 
-   
     function getMarketTermsForLending(bytes32 _marketTermsId)
         external
         view
@@ -68,8 +67,6 @@ interface IMarketRegistry_V2 is IMarketRegistry {
         string calldata _uri,
         MarketplaceTerms memory _marketTermsParams
     ) external returns (uint256 marketId_, bytes32 marketTerms_);
-
-    
 
     function getCurrentTermsForMarket(uint256 _marketId)
         external

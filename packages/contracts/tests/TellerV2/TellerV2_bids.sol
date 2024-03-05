@@ -133,8 +133,7 @@ contract TellerV2_bids_test is Testable {
         marketRegistryMock.mock_setGlobalMarketsClosed(false);
         marketRegistryMock.forceSetGlobalTermsForMarket(bytes32("0x01"));
 
-
-       /* vm.expectEmit(false, false, false, false);
+        /* vm.expectEmit(false, false, false, false);
 
         emit SubmittedBid(
             0,
@@ -154,12 +153,11 @@ contract TellerV2_bids_test is Testable {
             address(this) // receiver
         );
     }
- 
+
     function test_submit_bid_internal_fails_without_terms() public {
         tellerV2.setMarketRegistrySuper(address(marketRegistryMock));
-         marketRegistryMock.mock_setGlobalMarketsClosed(false);
-         marketRegistryMock.forceSetGlobalTermsForMarket(bytes32(0));
-
+        marketRegistryMock.mock_setGlobalMarketsClosed(false);
+        marketRegistryMock.forceSetGlobalTermsForMarket(bytes32(0));
 
         vm.expectRevert("Market does not have assigned terms.");
 
@@ -173,7 +171,6 @@ contract TellerV2_bids_test is Testable {
             address(this) // receiver
         );
     }
- 
 
     function test_submit_bid_internal_fails_when_market_closed() public {
         tellerV2.setMarketRegistrySuper(address(marketRegistryMock));
@@ -779,7 +776,7 @@ contract TellerV2_bids_test is Testable {
         tellerV2.mock_setBidDefaultDuration(bidId, 1000);
 
         //set the account that will be paying the loan off
-        tellerV2.setMockMsgSenderForMarket(address(this));
+        tellerV2.setMockMsgSenderForMarket(address(lender));
 
         lendingToken.approve(address(tellerV2), 1e20);
 
@@ -789,6 +786,30 @@ contract TellerV2_bids_test is Testable {
         // make sure the state is now CLOSED
 
         require(state == BidState.CLOSED, "bid was not closed");
+    }
+
+      function test_lender_close_loan_only_lender_can_close() public {
+        uint256 bidId = 1;
+        setMockBid(bidId);
+
+        tellerV2.setCollateralManagerSuper(address(collateralManagerMock));
+
+        tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
+        vm.warp(2000 * 1e20);
+
+        tellerV2.mock_setBidDefaultDuration(bidId, 1000);
+
+        //set the account that will be paying the loan off
+        tellerV2.setMockMsgSenderForMarket(address(this));
+
+        lendingToken.approve(address(tellerV2), 1e20);
+
+    
+        vm.expectRevert("only lender can close loan");
+        
+        tellerV2.lenderCloseLoan(bidId);
+ 
+        
     }
 
     function test_liquidate_loan_full() public {

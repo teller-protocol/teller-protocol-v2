@@ -165,4 +165,32 @@ interface ITellerV2 {
         returns (Payment memory due);
 
     function collateralManager() external view returns (address);
+
+    function setRepaymentListenerForBid(uint256 _bidId, address _listener)
+        external;
+
+    function getRepaymentListenerForBid(uint256 _bidId)
+        external
+        view
+        returns (address);
+
+    function lenderCloseLoan(uint256 _bidId)
+        external;
+
+      function lenderCloseLoanWithRecipient(uint256 _bidId, address _recipient)
+        external;
+
+    function liquidateLoanFull(uint256 _bidId)
+        external;
+
+    
+    function liquidateLoanFullWithRecipient(uint256 _bidId, address _recipient)
+        external;
+        
+
+    function getLoanDefaultTimestamp(
+        uint256 _bidId
+    ) external view returns (uint256);
+
+    
 }

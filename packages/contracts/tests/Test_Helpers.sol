@@ -8,7 +8,7 @@ import "../contracts/interfaces/ITellerV2.sol";
 import "../contracts/interfaces/ITellerV2Context.sol";
 import { Collateral } from "../contracts/interfaces/escrow/ICollateralEscrowV1.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import { PaymentType , PaymentCycleType } from "../contracts/libraries/V2Calculations.sol";
+import { PaymentType, PaymentCycleType } from "../contracts/libraries/V2Calculations.sol";
 
 contract User {
     address public immutable tellerV2;
@@ -72,21 +72,21 @@ contract User {
         PaymentCycleType _paymentCycleType,
         address _feeRecipient,
         string calldata _uri
-    ) public returns (uint256,bytes32) {
-        IMarketRegistry_V2.MarketplaceTerms memory marketTerms = IMarketRegistry_V2.MarketplaceTerms({
-            paymentCycleDuration:_paymentCycleDuration,
-            paymentDefaultDuration:_paymentDefaultDuration,
-            bidExpirationTime:_bidExpirationTime,
-            marketplaceFeePercent:_feePercent,
-            paymentType:_paymentType,
-            paymentCycleType:_paymentCycleType,
-             feeRecipient: address(_feeRecipient)
-
-        });
+    ) public returns (uint256, bytes32) {
+        IMarketRegistry_V2.MarketplaceTerms
+            memory marketTerms = IMarketRegistry_V2.MarketplaceTerms({
+                paymentCycleDuration: _paymentCycleDuration,
+                paymentDefaultDuration: _paymentDefaultDuration,
+                bidExpirationTime: _bidExpirationTime,
+                marketplaceFeePercent: _feePercent,
+                paymentType: _paymentType,
+                paymentCycleType: _paymentCycleType,
+                feeRecipient: address(_feeRecipient)
+            });
 
         return
             IMarketRegistry_V2(marketRegistry).createMarket(
-                address(this), 
+                address(this),
                 _requireLenderAttestation,
                 _requireBorrowerAttestation,
                 _uri,

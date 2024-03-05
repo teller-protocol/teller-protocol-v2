@@ -223,7 +223,11 @@ contract LenderCommitmentGroup_Smart is
         
     }
 
-    
+    /*
+
+
+        _liquidityThresholdPercent - When 100% , the entire pool can be drawn for lending.  When 80%, only 80% of the pool can be drawn for lending. 
+    */
     function initialize(
         address _principalTokenAddress,
         address _collateralTokenAddress,
@@ -231,7 +235,7 @@ contract LenderCommitmentGroup_Smart is
         uint256 _marketId,
         uint32 _maxLoanDuration,
         uint16 _minInterestRate,
-        uint16 _liquidityThresholdPercent, //if overdrawn, borrowers cannot take out new loans but lenders can withdraw funds 
+        uint16 _liquidityThresholdPercent, 
         uint16 _loanToValuePercent, //essentially the overcollateralization ratio.  10000 is 1:1 baseline ? // initializer  ADD ME
         uint24 _uniswapPoolFee,
         uint32 _twapInterval

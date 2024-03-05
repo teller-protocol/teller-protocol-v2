@@ -17,6 +17,8 @@ import "./interfaces/ITellerV2.sol";
 import { Collateral } from "./interfaces/escrow/ICollateralEscrowV1.sol";
 import "./interfaces/IEscrowVault.sol";
 
+import {ILoanRepaymentCallbacks} from "./interfaces/ILoanRepaymentCallbacks.sol";
+
 // Libraries
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
@@ -44,6 +46,7 @@ error PaymentNotMinimum(uint256 bidId, uint256 payment, uint256 minimumOwed);
 
 contract TellerV2 is
     ITellerV2,
+    ILoanRepaymentCallbacks,
     OwnableUpgradeable,
     ProtocolFee,
     PausableUpgradeable,

@@ -706,7 +706,7 @@ contract TellerV2 is
 
     /**
      * @notice Lets the DAO/owner of the protocol undo a previously implemented emergency stop.
-     */
+     */t
     function unpauseProtocol() public virtual onlyOwner whenPaused {
         _unpause();
     }

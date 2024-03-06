@@ -85,6 +85,9 @@ contract TellerV2 is
      */
     event AcceptedBid(uint256 indexed bidId, address indexed lender);
 
+
+ 
+
     /**
      * @notice This event is emitted when a previously submitted bid has been cancelled.
      * @param bidId The id of the cancelled bid.
@@ -110,6 +113,13 @@ contract TellerV2 is
      * @param bidId The id of the bid/loan which was repaid.
      */
     event LoanRepaid(uint256 indexed bidId);
+
+     /**
+     * @notice This event is emitted when a loan has been closed by a lender to claim collateral.
+     * @param bidId The id of the bid accepted.
+     */
+    event LoanClosed(uint256 indexed bidId);
+
 
     /**
      * @notice This event is emitted when a loan has been fully repaid.
@@ -706,7 +716,7 @@ contract TellerV2 is
 
     /**
      * @notice Lets the DAO/owner of the protocol undo a previously implemented emergency stop.
-     */t
+     */
     function unpauseProtocol() public virtual onlyOwner whenPaused {
         _unpause();
     }
@@ -746,9 +756,11 @@ contract TellerV2 is
         address sender = _msgSenderForMarket(bid.marketplaceId);
         require(sender == bid.lender, "only lender can close loan");
 
-        //handle this differently based on v1 or v2 
         
-           address collateralManagerForBid = address(_getCollateralManagerForBid(_bidId)); 
+        /*
+
+
+          address collateralManagerForBid = address(_getCollateralManagerForBid(_bidId)); 
 
           if( collateralManagerForBid == address(collateralManagerV2) ){
              ICollateralManagerV2(collateralManagerForBid).lenderClaimCollateral(_bidId,_collateralRecipient);
@@ -756,7 +768,10 @@ contract TellerV2 is
              require( _collateralRecipient == address(bid.lender));
              ICollateralManager(collateralManagerForBid).lenderClaimCollateral(_bidId );
           }
-        
+          
+          */
+
+        collateralManager.lenderClaimCollateral(_bidId);
         
         emit LoanClosed(_bidId);
     }
@@ -820,8 +835,14 @@ contract TellerV2 is
         );
 
        
-        //collateralManager.liquidateCollateral(_bidId, liquidator);
-        _getCollateralManagerForBid(_bidId).liquidateCollateral(
+       /*
+         _getCollateralManagerForBid(_bidId).liquidateCollateral(
+            _bidId,
+            _recipient
+        ); 
+      */
+
+        collateralManager.liquidateCollateral(
             _bidId,
             _recipient
         );
@@ -867,6 +888,7 @@ contract TellerV2 is
 
             // If loan is is being liquidated and backed by collateral, withdraw and send to borrower
             if (_shouldWithdrawCollateral) {
+                //   _getCollateralManagerForBid(_bidId).withdraw(_bidId);
                 collateralManager.withdraw(_bidId);
             }
 
@@ -1227,6 +1249,52 @@ contract TellerV2 is
 
     // ----------
 
+
+
+    function _getBidPaymentCycleType(uint256 _bidId)
+        internal
+        view
+        returns (PaymentCycleType)
+    {
+       /* bytes32 bidTermsId = bidMarketTermsId[_bidId];
+        if (bidTermsId != bytes32(0)) {
+            return marketRegistry.getPaymentCycleTypeForTerms(bidTermsId);
+        }*/
+
+        return bidPaymentCycleType[_bidId];
+    }
+
+    function _getBidPaymentCycleDuration(uint256 _bidId)
+        internal
+        view
+        returns (uint32)
+    {
+        /*bytes32 bidTermsId = bidMarketTermsId[_bidId];
+
+        if (bidTermsId != bytes32(0)) {
+            return marketRegistry.getPaymentCycleDurationForTerms(bidTermsId);
+        }*/
+
+        Bid storage bid = bids[_bidId];
+
+        return bid.terms.paymentCycle;
+    }
+
+      function _getBidDefaultDuration(uint256 _bidId)
+        internal
+        view
+        returns (uint32)
+    {
+       /* bytes32 bidTermsId = bidMarketTermsId[_bidId];
+        if (bidTermsId != bytes32(0)) {
+            return marketRegistry.getPaymentDefaultDurationForTerms(bidTermsId);
+        }*/
+
+        return bidDefaultDuration[_bidId];
+    }
+
+
+    // -----
 
     /** OpenZeppelin Override Functions **/
 

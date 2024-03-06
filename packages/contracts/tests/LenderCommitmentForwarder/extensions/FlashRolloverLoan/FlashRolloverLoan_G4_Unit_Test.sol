@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { FlashRolloverLoan } from "../../../../contracts/LenderCommitmentForwarder/extensions/FlashRolloverLoan.sol";
 
 import "../../../../contracts/interfaces/ILenderCommitmentForwarder.sol";
-import "../../../../contracts/interfaces/IFlashRolloverLoan.sol";
+import "../../../../contracts/interfaces/IFlashRolloverLoan_G4.sol";
 
 import "../../../integration/IntegrationTestHelpers.sol";
 
@@ -308,7 +308,8 @@ contract FlashRolloverLoan_G4_Unit_Test is Testable {
         address initiator = address(flashRolloverLoan);
 
         bytes memory flashData = abi.encode(
-            IFlashRolloverLoan.RolloverCallbackArgs({
+            IFlashRolloverLoan_G4.RolloverCallbackArgs({
+                lenderCommitmentForwarder: address(lenderCommitmentForwarder),
                 loanId: loanId,
                 borrower: address(borrower),
                 borrowerAmount: borrowerAmount,
@@ -397,7 +398,8 @@ contract FlashRolloverLoan_G4_Unit_Test is Testable {
         address initiator = address(flashRolloverLoan);
 
         bytes memory flashData = abi.encode(
-            IFlashRolloverLoan.RolloverCallbackArgs({
+            IFlashRolloverLoan_G4.RolloverCallbackArgs({
+                    lenderCommitmentForwarder: address(lenderCommitmentForwarder),
                 loanId: loanId,
                 borrower: address(borrower),
                 borrowerAmount: borrowerAmount,
@@ -482,7 +484,8 @@ contract FlashRolloverLoan_G4_Unit_Test is Testable {
         address initiator = address(this);
 
         bytes memory flashData = abi.encode(
-            IFlashRolloverLoan.RolloverCallbackArgs({
+            IFlashRolloverLoan_G4.RolloverCallbackArgs({
+                    lenderCommitmentForwarder: address(lenderCommitmentForwarder),
                 loanId: loanId,
                 borrower: address(borrower),
                 borrowerAmount: borrowerAmount,
@@ -562,7 +565,8 @@ contract FlashRolloverLoan_G4_Unit_Test is Testable {
         address initiator = address(this);
 
         bytes memory flashData = abi.encode(
-            IFlashRolloverLoan.RolloverCallbackArgs({
+            IFlashRolloverLoan_G4.RolloverCallbackArgs({
+                    lenderCommitmentForwarder: address(lenderCommitmentForwarder),
                 loanId: loanId,
                 borrower: address(borrower),
                 borrowerAmount: borrowerAmount,

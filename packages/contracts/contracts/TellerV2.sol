@@ -611,7 +611,8 @@ contract TellerV2 is
         ) = V2Calculations.calculateAmountOwed(
                 bids[_bidId],
                 block.timestamp,
-                bidPaymentCycleType[_bidId]
+                 _getBidPaymentCycleType(_bidId),
+                _getBidPaymentCycleDuration(_bidId)
             );
         _repayLoan(
             _bidId,
@@ -668,7 +669,8 @@ contract TellerV2 is
             .calculateAmountOwed(
                 bids[_bidId],
                 block.timestamp,
-                bidPaymentCycleType[_bidId]
+                 _getBidPaymentCycleType(_bidId),
+                _getBidPaymentCycleDuration(_bidId)
             );
         _repayLoan(
             _bidId,
@@ -690,7 +692,8 @@ contract TellerV2 is
         ) = V2Calculations.calculateAmountOwed(
                 bids[_bidId],
                 block.timestamp,
-                bidPaymentCycleType[_bidId]
+                 _getBidPaymentCycleType(_bidId),
+                _getBidPaymentCycleDuration(_bidId)
             );
         uint256 minimumOwed = duePrincipal + interest;
 
@@ -976,7 +979,11 @@ contract TellerV2 is
         ) return owed;
 
         (uint256 owedPrincipal, , uint256 interest) = V2Calculations
-            .calculateAmountOwed(bid, _timestamp, bidPaymentCycleType[_bidId]);
+            .calculateAmountOwed(bid, 
+            _timestamp,
+             _getBidPaymentCycleType(_bidId),
+             _getBidPaymentCycleDuration(_bidId));
+
         owed.principal = owedPrincipal;
         owed.interest = interest;
     }
@@ -998,7 +1005,11 @@ contract TellerV2 is
         ) return due;
 
         (, uint256 duePrincipal, uint256 interest) = V2Calculations
-            .calculateAmountOwed(bid, _timestamp, bidPaymentCycleType[_bidId]);
+            .calculateAmountOwed(
+                bid,
+             _timestamp, 
+             _getBidPaymentCycleType(_bidId),
+             _getBidPaymentCycleDuration(_bidId));
         due.principal = duePrincipal;
         due.interest = interest;
     }

@@ -36,6 +36,9 @@ library V2Calculations {
                 : _bid.loanDetails.lastRepaidTimestamp;
     }
 
+
+
+
     /**
      * @notice Calculates the amount owed for a loan.
      * @param _bid The loan bid struct to get the owed amount for.
@@ -45,7 +48,8 @@ library V2Calculations {
     function calculateAmountOwed(
         Bid storage _bid,
         uint256 _timestamp,
-        PaymentCycleType _paymentCycleType
+        PaymentCycleType _paymentCycleType,
+        uint32 _paymentCycleDuration
     )
         internal
         view
@@ -61,7 +65,8 @@ library V2Calculations {
                 _bid,
                 lastRepaidTimestamp(_bid),
                 _timestamp,
-                _paymentCycleType
+                _paymentCycleType,
+                _paymentCycleDuration
             );
     }
 
@@ -69,7 +74,8 @@ library V2Calculations {
         Bid storage _bid,
         uint256 _lastRepaidTimestamp,
         uint256 _timestamp,
-        PaymentCycleType _paymentCycleType
+        PaymentCycleType _paymentCycleType,
+        uint32 _paymentCycleDuration
     )
         internal
         view
@@ -94,9 +100,9 @@ library V2Calculations {
         bool isLastPaymentCycle;
         {
             uint256 lastPaymentCycleDuration = _bid.loanDetails.loanDuration %
-                _bid.terms.paymentCycle;
+                _paymentCycleDuration;
             if (lastPaymentCycleDuration == 0) {
-                lastPaymentCycleDuration = _bid.terms.paymentCycle;
+                lastPaymentCycleDuration = _paymentCycleDuration;
             }
 
             uint256 endDate = uint256(_bid.loanDetails.acceptedTimestamp) +
@@ -121,11 +127,13 @@ library V2Calculations {
             uint256 owedAmount = isLastPaymentCycle
                 ? owedPrincipal_ + interest_
                 : (_bid.terms.paymentCycleAmount * owedTime) /
-                    _bid.terms.paymentCycle;
+                    _paymentCycleDuration;
 
             duePrincipal_ = Math.min(owedAmount - interest_, owedPrincipal_);
         }
     }
+
+    
 
     /**
      * @notice Calculates the amount owed for a loan for the next payment cycle.

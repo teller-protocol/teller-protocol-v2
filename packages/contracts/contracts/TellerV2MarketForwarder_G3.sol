@@ -42,7 +42,11 @@ abstract contract TellerV2MarketForwarder_G3 is TellerV2MarketForwarder_G2 {
         );
 
         _forwardCall(
-            abi.encodeWithSelector(ILoanRepaymentCallbacks.setRepaymentListenerForBid.selector, _bidId, _listener),
+            abi.encodeWithSelector(
+                ILoanRepaymentCallbacks.setRepaymentListenerForBid.selector,
+                _bidId,
+                _listener
+            ),
             _lender
         );
 
@@ -51,6 +55,6 @@ abstract contract TellerV2MarketForwarder_G3 is TellerV2MarketForwarder_G2 {
         return true;
     }
 
-   //a gap is inherited from g2  so this is actually not necessary going forwards ---leaving it to maintain upgradeability 
-   uint256[50] private __gap;
+    //a gap is inherited from g2  so this is actually not necessary going forwards ---leaving it to maintain upgradeability
+    uint256[50] private __gap;
 }

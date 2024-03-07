@@ -8,8 +8,4 @@ interface ILoanRepaymentListener {
         uint256 principalAmount,
         uint256 interestAmount
     ) external;
-
-    
-
-
 }

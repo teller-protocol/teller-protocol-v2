@@ -19,10 +19,10 @@ import "@openzeppelin/contracts-upgradeable/utils/structs/EnumerableSetUpgradeab
 import { MathUpgradeable } from "@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20MetadataUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/cryptography/MerkleProofUpgradeable.sol";
- 
-import "../interfaces/uniswap/IUniswapV3Pool.sol"; 
+
+import "../interfaces/uniswap/IUniswapV3Pool.sol";
 import "../interfaces/uniswap/IUniswapV3Factory.sol";
- 
+
 import "../libraries/uniswap/TickMath.sol";
 import "../libraries/uniswap/FixedPoint96.sol";
 import "../libraries/uniswap/FullMath.sol";
@@ -32,25 +32,18 @@ import "../libraries/NumbersLib.sol";
 import "./extensions/ExtensionsContextUpgradeable.sol";
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
- 
 
-
-contract LenderCommitmentForwarder_U1 is 
+contract LenderCommitmentForwarder_U1 is
     ExtensionsContextUpgradeable, //this should always be first for upgradeability
     TellerV2MarketForwarder_G2,
-    ILenderCommitmentForwarder_U1 
-    
+    ILenderCommitmentForwarder_U1
 {
     using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
     using NumbersLib for uint256;
 
-
-
-
-
     // CommitmentId => commitment
     mapping(uint256 => Commitment) public commitments;
-  
+
     uint256 commitmentCount;
 
     //https://github.com/OpenZeppelin/openzeppelin-contracts-upgradeable/blob/master/contracts/utils/structs/EnumerableSetUpgradeable.sol
@@ -58,17 +51,14 @@ contract LenderCommitmentForwarder_U1 is
         internal commitmentBorrowersList;
 
     mapping(uint256 => uint256) public commitmentPrincipalAccepted;
-  
-    mapping(uint256 => PoolRouteConfig[])
-        internal commitmentUniswapPoolRoutes;
 
-    mapping(uint256 => uint16)
-        internal commitmentPoolOracleLtvRatio;
+    mapping(uint256 => PoolRouteConfig[]) internal commitmentUniswapPoolRoutes;
 
+    mapping(uint256 => uint16) internal commitmentPoolOracleLtvRatio;
 
-     //does not take a storage slot 
-    address immutable UNISWAP_V3_FACTORY; 
- 
+    //does not take a storage slot
+    address immutable UNISWAP_V3_FACTORY;
+
     uint256 immutable STANDARD_EXPANSION_FACTOR = 1e18;
 
     /**
@@ -176,12 +166,10 @@ contract LenderCommitmentForwarder_U1 is
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor(
-        address _protocolAddress, 
+        address _protocolAddress,
         address _marketRegistry,
         address _uniswapV3Factory
-        )
-        TellerV2MarketForwarder_G2(_protocolAddress, _marketRegistry)
-    {
+    ) TellerV2MarketForwarder_G2(_protocolAddress, _marketRegistry) {
         UNISWAP_V3_FACTORY = _uniswapV3Factory;
     }
 
@@ -195,7 +183,7 @@ contract LenderCommitmentForwarder_U1 is
         Commitment calldata _commitment,
         address[] calldata _borrowerAddressList,
         PoolRouteConfig[] calldata _poolRoutes,
-        uint16 _poolOracleLtvRatio  //generally always between 0 and 100 % , 0 to 10000
+        uint16 _poolOracleLtvRatio //generally always between 0 and 100 % , 0 to 10000
     ) public returns (uint256 commitmentId_) {
         commitmentId_ = commitmentCount++;
 
@@ -204,20 +192,16 @@ contract LenderCommitmentForwarder_U1 is
             "unauthorized commitment creator"
         );
 
-        commitments[commitmentId_] = _commitment; 
+        commitments[commitmentId_] = _commitment;
 
-            //routes length of 0 means ignore price oracle limits 
-         require(
-             _poolRoutes.length <= 2 ,
-            "invalid pool routes length"
-        );
-        
+        //routes length of 0 means ignore price oracle limits
+        require(_poolRoutes.length <= 2, "invalid pool routes length");
 
-        for (uint256 i = 0; i < _poolRoutes.length; i++) { 
-             commitmentUniswapPoolRoutes[commitmentId_].push(_poolRoutes[i]);
+        for (uint256 i = 0; i < _poolRoutes.length; i++) {
+            commitmentUniswapPoolRoutes[commitmentId_].push(_poolRoutes[i]);
         }
 
-        commitmentPoolOracleLtvRatio[commitmentId_] = _poolOracleLtvRatio; 
+        commitmentPoolOracleLtvRatio[commitmentId_] = _poolOracleLtvRatio;
 
         //make sure the commitment data adheres to required specifications and limits
         validateCommitment(commitments[commitmentId_]);
@@ -310,7 +294,7 @@ contract LenderCommitmentForwarder_U1 is
     ) internal {
         for (uint256 i = 0; i < _borrowerArray.length; i++) {
             commitmentBorrowersList[_commitmentId].add(_borrowerArray[i]);
-        } 
+        }
         emit UpdatedCommitmentBorrowers(_commitmentId);
     }
 
@@ -554,38 +538,35 @@ contract LenderCommitmentForwarder_U1 is
             });
         }
 
-          
+        {
+            uint256 scaledPoolOraclePrice = getUniswapPriceRatioForPoolRoutes(
+                commitmentUniswapPoolRoutes[_commitmentId]
+            ).percent(commitmentPoolOracleLtvRatio[_commitmentId]);
 
-     {
-            
-        
-        uint256 scaledPoolOraclePrice = getUniswapPriceRatioForPoolRoutes( commitmentUniswapPoolRoutes[_commitmentId] ).percent(
-            commitmentPoolOracleLtvRatio[_commitmentId]
-        );
-        
-         bool usePoolRoutes = commitmentUniswapPoolRoutes[_commitmentId].length > 0;
-         
-        //use the worst case ratio either the oracle or the static ratio 
-        uint256 maxPrincipalPerCollateralAmount = usePoolRoutes ?  Math.min(   
-            scaledPoolOraclePrice, 
-            commitment.maxPrincipalPerCollateralAmount
-            ) :  commitment.maxPrincipalPerCollateralAmount;
- 
- 
-        uint256 requiredCollateral = getRequiredCollateral(
-            _principalAmount, 
-            maxPrincipalPerCollateralAmount,
-            commitment.collateralTokenType  
-        );
-  
+            bool usePoolRoutes = commitmentUniswapPoolRoutes[_commitmentId]
+                .length > 0;
 
-        if (_collateralAmount < requiredCollateral) {
-            revert InsufficientBorrowerCollateral({
-                required: requiredCollateral,
-                actual: _collateralAmount
-            });
+            //use the worst case ratio either the oracle or the static ratio
+            uint256 maxPrincipalPerCollateralAmount = usePoolRoutes
+                ? Math.min(
+                    scaledPoolOraclePrice,
+                    commitment.maxPrincipalPerCollateralAmount
+                )
+                : commitment.maxPrincipalPerCollateralAmount;
+
+            uint256 requiredCollateral = getRequiredCollateral(
+                _principalAmount,
+                maxPrincipalPerCollateralAmount,
+                commitment.collateralTokenType
+            );
+
+            if (_collateralAmount < requiredCollateral) {
+                revert InsufficientBorrowerCollateral({
+                    required: requiredCollateral,
+                    actual: _collateralAmount
+                });
+            }
         }
-      }
 
         //ERC721 assets must have a quantity of 1
         if (
@@ -659,15 +640,14 @@ contract LenderCommitmentForwarder_U1 is
     
      */
     function getRequiredCollateral(
-        uint256 _principalAmount, 
+        uint256 _principalAmount,
         uint256 _maxPrincipalPerCollateralAmount,
-        CommitmentCollateralType _collateralTokenType  
-       
+        CommitmentCollateralType _collateralTokenType
     ) public view virtual returns (uint256) {
         if (_collateralTokenType == CommitmentCollateralType.NONE) {
             return 0;
         }
-     
+
         return
             MathUpgradeable.mulDiv(
                 _principalAmount,
@@ -677,16 +657,21 @@ contract LenderCommitmentForwarder_U1 is
             );
     }
 
-
-
-     /**
+    /**
      * @dev Returns the PoolRouteConfig at a specific index for a given commitmentId from the commitmentUniswapPoolRoutes mapping.
      * @param commitmentId The commitmentId to access the mapping.
      * @param index The index in the array of PoolRouteConfigs for the given commitmentId.
      * @return The PoolRouteConfig at the specified index.
      */
-    function getCommitmentUniswapPoolRoute(uint256 commitmentId, uint index) public view returns (PoolRouteConfig memory) {
-        require(index < commitmentUniswapPoolRoutes[commitmentId].length, "Index out of bounds");
+    function getCommitmentUniswapPoolRoute(uint256 commitmentId, uint index)
+        public
+        view
+        returns (PoolRouteConfig memory)
+    {
+        require(
+            index < commitmentUniswapPoolRoutes[commitmentId].length,
+            "Index out of bounds"
+        );
         return commitmentUniswapPoolRoutes[commitmentId][index];
     }
 
@@ -695,7 +680,11 @@ contract LenderCommitmentForwarder_U1 is
      * @param commitmentId The commitmentId to access the mapping.
      * @return The entire array of PoolRouteConfigs for the specified commitmentId.
      */
-    function getAllCommitmentUniswapPoolRoutes(uint256 commitmentId) public view returns (PoolRouteConfig[] memory) {
+    function getAllCommitmentUniswapPoolRoutes(uint256 commitmentId)
+        public
+        view
+        returns (PoolRouteConfig[] memory)
+    {
         return commitmentUniswapPoolRoutes[commitmentId];
     }
 
@@ -704,26 +693,27 @@ contract LenderCommitmentForwarder_U1 is
      * @param commitmentId The key to access the mapping.
      * @return The uint16 value for the specified commitmentId.
      */
-    function getCommitmentPoolOracleLtvRatio(uint256 commitmentId) public view returns (uint16) {
+    function getCommitmentPoolOracleLtvRatio(uint256 commitmentId)
+        public
+        view
+        returns (uint16)
+    {
         return commitmentPoolOracleLtvRatio[commitmentId];
     }
 
-
-    // ---- TWAP 
+    // ---- TWAP
 
     function getUniswapV3PoolAddress(
-        address _principalTokenAddress, 
+        address _principalTokenAddress,
         address _collateralTokenAddress,
         uint24 _uniswapPoolFee
-        ) public view returns (address){
-
- 
-        return IUniswapV3Factory(UNISWAP_V3_FACTORY).getPool( 
-            _principalTokenAddress,
-            _collateralTokenAddress,
-            _uniswapPoolFee
-         );
-
+    ) public view returns (address) {
+        return
+            IUniswapV3Factory(UNISWAP_V3_FACTORY).getPool(
+                _principalTokenAddress,
+                _collateralTokenAddress,
+                _uniswapPoolFee
+            );
     }
 
     /*
@@ -731,71 +721,67 @@ contract LenderCommitmentForwarder_U1 is
       This returns a price ratio which to be normalized, must be divided by STANDARD_EXPANSION_FACTOR
 
     */
-            
+
     function getUniswapPriceRatioForPoolRoutes(
         PoolRouteConfig[] memory poolRoutes
-    )   public view returns (uint256 priceRatio)  {
- 
+    ) public view returns (uint256 priceRatio) {
+        require(poolRoutes.length <= 2, "invalid pool routes length");
 
-        require( poolRoutes.length <= 2 , "invalid pool routes length");
-
-        
-        if(poolRoutes.length == 2) {
- 
- 
-            uint256 pool0PriceRatio = getUniswapPriceRatioForPool( 
-                poolRoutes[0]   
+        if (poolRoutes.length == 2) {
+            uint256 pool0PriceRatio = getUniswapPriceRatioForPool(
+                poolRoutes[0]
             );
 
-            
-            uint256 pool1PriceRatio = getUniswapPriceRatioForPool( 
-                poolRoutes[1]   
+            uint256 pool1PriceRatio = getUniswapPriceRatioForPool(
+                poolRoutes[1]
             );
 
- 
-           
-            return FullMath.mulDiv(
-                pool0PriceRatio , pool1PriceRatio, STANDARD_EXPANSION_FACTOR
-            ); 
+            return
+                FullMath.mulDiv(
+                    pool0PriceRatio,
+                    pool1PriceRatio,
+                    STANDARD_EXPANSION_FACTOR
+                );
+        } else if (poolRoutes.length == 1) {
+            return getUniswapPriceRatioForPool(poolRoutes[0]);
+        }
 
-        }else if (poolRoutes.length == 1){           
-            return getUniswapPriceRatioForPool( 
-                        poolRoutes[0]   
-                    );
-        } 
-        
-
-        //else return 0 
+        //else return 0
     }
 
-     
     /*
         The resultant product is expanded by STANDARD_EXPANSION_FACTOR one time 
     */
-    function getUniswapPriceRatioForPool (  
+    function getUniswapPriceRatioForPool(
         PoolRouteConfig memory _poolRouteConfig
     ) public view returns (uint256 priceRatio) {
- 
-        uint160 sqrtPriceX96 = getSqrtTwapX96( _poolRouteConfig.pool ,_poolRouteConfig.twapInterval );
-  
-        //This is the token 1 per token 0 price 
-        uint256 sqrtPrice  = FullMath.mulDiv( sqrtPriceX96, STANDARD_EXPANSION_FACTOR, 2**96  );
+        uint160 sqrtPriceX96 = getSqrtTwapX96(
+            _poolRouteConfig.pool,
+            _poolRouteConfig.twapInterval
+        );
 
-        uint256 sqrtPriceInverse =   STANDARD_EXPANSION_FACTOR * STANDARD_EXPANSION_FACTOR / sqrtPrice   ;    
+        //This is the token 1 per token 0 price
+        uint256 sqrtPrice = FullMath.mulDiv(
+            sqrtPriceX96,
+            STANDARD_EXPANSION_FACTOR,
+            2**96
+        );
 
-       
-        uint256 price = _poolRouteConfig.zeroForOne ? 
-        sqrtPrice * sqrtPrice : 
-        sqrtPriceInverse * sqrtPriceInverse; 
+        uint256 sqrtPriceInverse = (STANDARD_EXPANSION_FACTOR *
+            STANDARD_EXPANSION_FACTOR) / sqrtPrice;
 
-        return price  / STANDARD_EXPANSION_FACTOR;   
+        uint256 price = _poolRouteConfig.zeroForOne
+            ? sqrtPrice * sqrtPrice
+            : sqrtPriceInverse * sqrtPriceInverse;
 
+        return price / STANDARD_EXPANSION_FACTOR;
     }
 
-
- 
-
-    function getSqrtTwapX96(address uniswapV3Pool, uint32 twapInterval) internal view returns (uint160 sqrtPriceX96) {
+    function getSqrtTwapX96(address uniswapV3Pool, uint32 twapInterval)
+        internal
+        view
+        returns (uint160 sqrtPriceX96)
+    {
         if (twapInterval == 0) {
             // return the current price if twapInterval == 0
             (sqrtPriceX96, , , , , , ) = IUniswapV3Pool(uniswapV3Pool).slot0();
@@ -804,23 +790,28 @@ contract LenderCommitmentForwarder_U1 is
             secondsAgos[0] = twapInterval; // from (before)
             secondsAgos[1] = 0; // to (now)
 
-            (int56[] memory tickCumulatives, ) = IUniswapV3Pool(uniswapV3Pool).observe(secondsAgos);
+            (int56[] memory tickCumulatives, ) = IUniswapV3Pool(uniswapV3Pool)
+                .observe(secondsAgos);
 
             // tick(imprecise as it's an integer) to price
             sqrtPriceX96 = TickMath.getSqrtRatioAtTick(
-                int24((tickCumulatives[1] - tickCumulatives[0]) / int32(twapInterval))
+                int24(
+                    (tickCumulatives[1] - tickCumulatives[0]) /
+                        int32(twapInterval)
+                )
             );
         }
     }
 
-    function getPriceX96FromSqrtPriceX96(uint160 sqrtPriceX96) internal pure returns(uint256 priceX96) {
+    function getPriceX96FromSqrtPriceX96(uint160 sqrtPriceX96)
+        internal
+        pure
+        returns (uint256 priceX96)
+    {
         return FullMath.mulDiv(sqrtPriceX96, sqrtPriceX96, FixedPoint96.Q96);
     }
 
     // -----
-
-
-
 
     /**
      * @notice Return the array of borrowers that are allowlisted for a commitment
@@ -898,7 +889,7 @@ contract LenderCommitmentForwarder_U1 is
     }
 
     //Overrides
-      function _msgSender()
+    function _msgSender()
         internal
         view
         virtual
@@ -907,5 +898,4 @@ contract LenderCommitmentForwarder_U1 is
     {
         return ExtensionsContextUpgradeable._msgSender();
     }
-    
 }

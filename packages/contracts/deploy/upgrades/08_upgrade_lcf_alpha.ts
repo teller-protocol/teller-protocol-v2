@@ -6,7 +6,6 @@ const deployFn: DeployFunction = async (hre) => {
   hre.log('LenderCommitmentForwarderAlpha: Performing upgrade...')
 
   const chainId = await hre.getChainId()
- 
 
   let uniswapFactoryAddress: string
   switch (hre.network.name) {
@@ -36,10 +35,9 @@ const deployFn: DeployFunction = async (hre) => {
     'LenderCommitmentForwarderAlpha'
   )
 
-  let tellerV2ProxyAddress = await tellerV2.getAddress()
-  let marketRegistryProxyAddress = await marketRegistry.getAddress()
-  let lcfAlphaProxyAddress =
-    await lenderCommitmentForwarderAlpha.getAddress()
+  const tellerV2ProxyAddress = await tellerV2.getAddress()
+  const marketRegistryProxyAddress = await marketRegistry.getAddress()
+  const lcfAlphaProxyAddress = await lenderCommitmentForwarderAlpha.getAddress()
 
   const LenderCommitmentForwarderAlphaImplementation =
     await hre.ethers.getContractFactory('LenderCommitmentForwarderAlpha')
@@ -58,8 +56,6 @@ const deployFn: DeployFunction = async (hre) => {
     }
   )*/
 
-
- 
   await hre.upgrades.proposeBatchTimelock({
     title: 'LenderCommitmentForwarderAlpha: Upgrade',
     description: ` 
@@ -73,23 +69,19 @@ const deployFn: DeployFunction = async (hre) => {
         implFactory: LenderCommitmentForwarderAlphaImplementation,
 
         opts: {
-          unsafeAllow: [
-            'constructor',
-            'state-variable-immutable' 
-          ],
-        
+          unsafeAllow: ['constructor', 'state-variable-immutable'],
+
           constructorArgs: [
             tellerV2ProxyAddress,
             marketRegistryProxyAddress,
-            uniswapFactoryAddress
-            
+            uniswapFactoryAddress,
           ],
         },
       },
     ],
   })
- 
-/*
+
+  /*
   const upgrade = await hre.upgrades.upgradeProxy(
     lcfAlphaProxyAddress,
     LenderCommitmentForwarderAlphaImplementation,
@@ -104,9 +96,6 @@ const deployFn: DeployFunction = async (hre) => {
   )
 */
 
-
-
-
   hre.log('done.')
   hre.log('')
   hre.log('----------')
@@ -120,20 +109,13 @@ deployFn.tags = [
   'proposal',
   'upgrade',
   'lender-commitment-forwarder:alpha',
-  'lender-commitment-forwarder:alpha:upgrade'
+  'lender-commitment-forwarder:alpha:upgrade',
 ]
 deployFn.dependencies = ['lender-commitment-forwarder:alpha:deploy']
 deployFn.skip = async (hre) => {
- 
   return (
     !hre.network.live ||
-    ![
-      'localhost',
-     
-      'sepolia' ,
-      'polygon' 
-      
-    ].includes(hre.network.name)
+    !['localhost', 'sepolia', 'polygon'].includes(hre.network.name)
   )
 }
 export default deployFn

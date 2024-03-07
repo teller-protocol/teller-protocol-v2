@@ -36,9 +36,6 @@ library V2Calculations {
                 : _bid.loanDetails.lastRepaidTimestamp;
     }
 
-
-
-
     /**
      * @notice Calculates the amount owed for a loan.
      * @param _bid The loan bid struct to get the owed amount for.
@@ -132,8 +129,6 @@ library V2Calculations {
             duePrincipal_ = Math.min(owedAmount - interest_, owedPrincipal_);
         }
     }
-
-    
 
     /**
      * @notice Calculates the amount owed for a loan for the next payment cycle.

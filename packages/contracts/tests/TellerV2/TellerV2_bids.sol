@@ -707,7 +707,7 @@ contract TellerV2_bids_test is Testable {
         require(state == BidState.CLOSED, "bid was not closed");
     }
 
-     function test_lender_close_loan_wrong_origin() public {
+    function test_lender_close_loan_wrong_origin() public {
         uint256 bidId = 1;
         setMockBid(bidId);
 
@@ -725,7 +725,6 @@ contract TellerV2_bids_test is Testable {
 
         vm.expectRevert("only lender can close loan");
         tellerV2.lenderCloseLoan(bidId);
- 
     }
 
     function test_liquidate_loan_full() public {

@@ -41,13 +41,11 @@ interface ILenderCommitmentForwarder_U1 {
     }
 
     struct PoolRouteConfig {
-
         address pool;
-        bool zeroForOne; 
+        bool zeroForOne;
         uint32 twapInterval;
         uint256 token0Decimals;
         uint256 token1Decimals;
-
     }
 
     // mapping(uint256 => Commitment) public commitments;

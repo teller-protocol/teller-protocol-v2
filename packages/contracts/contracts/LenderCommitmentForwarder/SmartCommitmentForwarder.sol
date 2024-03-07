@@ -8,11 +8,6 @@ import "./LenderCommitmentForwarder_G1.sol";
 
 import { CommitmentCollateralType, ISmartCommitment } from "../interfaces/ISmartCommitment.sol";
 
-/*
- 
-
-
-*/
 contract SmartCommitmentForwarder is TellerV2MarketForwarder_G3 {
     event ExercisedSmartCommitment(
         address indexed smartCommitmentAddress,
@@ -26,8 +21,6 @@ contract SmartCommitmentForwarder is TellerV2MarketForwarder_G3 {
     constructor(address _protocolAddress, address _marketRegistry)
         TellerV2MarketForwarder_G3(_protocolAddress, _marketRegistry)
     {}
- 
-   }*/
 
     /**
      * @notice Accept the commitment to submitBid and acceptBid using the funds
@@ -112,8 +105,6 @@ contract SmartCommitmentForwarder is TellerV2MarketForwarder_G3 {
 
         bidId = _submitBidWithCollateral(createLoanArgs, _msgSender());
 
-
- 
         _commitment.acceptFundsForAcceptBid(
             _msgSender(), //borrower
             bidId,
@@ -124,7 +115,6 @@ contract SmartCommitmentForwarder is TellerV2MarketForwarder_G3 {
             _loanDuration,
             _interestRate
         );
- 
 
         emit ExercisedSmartCommitment(
             _smartCommitmentAddress,
@@ -133,7 +123,6 @@ contract SmartCommitmentForwarder is TellerV2MarketForwarder_G3 {
             bidId
         );
     }
- 
 
     /**
      * @notice Return the collateral type based on the commitmentcollateral type.  Collateral type is used in the base lending protocol.

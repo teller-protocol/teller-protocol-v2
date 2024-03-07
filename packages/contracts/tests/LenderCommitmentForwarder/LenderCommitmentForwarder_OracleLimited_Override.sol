@@ -16,13 +16,16 @@ import { User } from "../Test_Helpers.sol";
 import "../../contracts/mock/MarketRegistryMock.sol";
 import "@openzeppelin/contracts-upgradeable/utils/structs/EnumerableSetUpgradeable.sol";
 
-
 contract LenderCommitmentForwarder_U1_Override is LenderCommitmentForwarder_U1 {
     bool public submitBidWasCalled;
     bool public submitBidWithCollateralWasCalled;
     bool public acceptBidWasCalled;
 
-    constructor(address tellerV2, address marketRegistry, address uniswapV3Factory)
+    constructor(
+        address tellerV2,
+        address marketRegistry,
+        address uniswapV3Factory
+    )
         LenderCommitmentForwarder_U1(tellerV2, marketRegistry, uniswapV3Factory)
     {}
 
@@ -61,11 +64,6 @@ contract LenderCommitmentForwarder_U1_Override is LenderCommitmentForwarder_U1 {
 
         return true;
     }
-
- 
- 
-
-
 }
 
 contract LenderCommitmentForwarderTest_TellerV2Mock is TellerV2Context {

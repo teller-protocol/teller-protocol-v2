@@ -18,16 +18,16 @@ const deployFn: DeployFunction = async (hre) => {
 
   //created pool https://sepolia.etherscan.io/tx/0x8ea20095c821f6066252457d7f0438030bc65bb441e1bea56c6ae0efd63016f0
 
-  let principalTokenAddress = '0xfff9976782d46cc05630d1f6ebab18b2324d6b14' //weth
-  let collateralTokenAddress = '0x72292c8464a33f6b5f6efcc0213a89a98c68668b' //0xbtc
-  let uniswapPoolFee = 3000
+  const principalTokenAddress = '0xfff9976782d46cc05630d1f6ebab18b2324d6b14' //weth
+  const collateralTokenAddress = '0x72292c8464a33f6b5f6efcc0213a89a98c68668b' //0xbtc
+  const uniswapPoolFee = 3000
 
-  let marketId = 4 //for sepolia
-  let minInterestRate = 100
-  let maxLoanDuration = 5000000
-  let liquidityThresholdPercent = 10000
-  let loanToValuePercent = 10000 //make sure this functions as normal.  If over 100%, getting much better loan terms and i wont repay.  If it is under 100%, it will likely repay.
-  let twapInterval = 5
+  const marketId = 4 //for sepolia
+  const minInterestRate = 100
+  const maxLoanDuration = 5000000
+  const liquidityThresholdPercent = 10000
+  const loanToValuePercent = 10000 //make sure this functions as normal.  If over 100%, getting much better loan terms and i wont repay.  If it is under 100%, it will likely repay.
+  const twapInterval = 5
 
   const lenderCommitmentGroupSmart = await hre.deployProxy(
     'LenderCommitmentGroup_Smart',
@@ -36,7 +36,7 @@ const deployFn: DeployFunction = async (hre) => {
       constructorArgs: [
         tellerV2Address,
         smartCommitmentForwarderAddress,
-        uniswapV3FactoryAddress
+        uniswapV3FactoryAddress,
       ],
       initArgs: [
         principalTokenAddress,
@@ -47,8 +47,8 @@ const deployFn: DeployFunction = async (hre) => {
         liquidityThresholdPercent,
         loanToValuePercent,
         uniswapPoolFee,
-        twapInterval
-      ]
+        twapInterval,
+      ],
     }
   )
 
@@ -60,7 +60,7 @@ deployFn.id = 'lender-commitment-group-smart:deploy'
 deployFn.tags = ['lender-commitment-group-smart']
 deployFn.dependencies = [
   'teller-v2:deploy',
-  'smart-commitment-forwarder:deploy'
+  'smart-commitment-forwarder:deploy',
 ]
 
 deployFn.skip = async (hre) => {

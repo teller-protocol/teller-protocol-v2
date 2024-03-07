@@ -10,8 +10,8 @@ const deployFn: DeployFunction = async (hre) => {
       unsafeAllow: ['constructor', 'state-variable-immutable'],
       constructorArgs: [
         await tellerV2.getAddress(),
-        await marketRegistry.getAddress()
-      ]
+        await marketRegistry.getAddress(),
+      ],
     }
   )
 
@@ -22,7 +22,7 @@ const deployFn: DeployFunction = async (hre) => {
 deployFn.id = 'smart-commitment-forwarder:deploy'
 deployFn.tags = [
   'smart-commitment-forwarder',
-  'smart-commitment-forwarder:deploy'
+  'smart-commitment-forwarder:deploy',
 ]
 deployFn.dependencies = ['teller-v2:deploy', 'market-registry:deploy']
 

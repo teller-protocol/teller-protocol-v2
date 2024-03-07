@@ -44,11 +44,11 @@ const deployFn: DeployFunction = async (hre) => {
           // unsafeSkipStorageCheck: true, //caution !
           constructorArgs: [
             await tellerV2.getAddress(),
-            await marketRegistry.getAddress()
-          ]
-        }
-      }
-    ]
+            await marketRegistry.getAddress(),
+          ],
+        },
+      },
+    ],
   })
 
   hre.log('done.')

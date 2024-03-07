@@ -34,15 +34,15 @@ const deployFn: DeployFunction = async (hre) => {
 
   //created pool https://sepolia.etherscan.io/tx/0x8ea20095c821f6066252457d7f0438030bc65bb441e1bea56c6ae0efd63016f0
 
-  let principalTokenAddress = '0xfff9976782d46cc05630d1f6ebab18b2324d6b14' //weth
-  let collateralTokenAddress = '0x72292c8464a33f6b5f6efcc0213a89a98c68668b' //0xbtc
-  let uniswapPoolFee = 3000
+  const principalTokenAddress = '0xfff9976782d46cc05630d1f6ebab18b2324d6b14' //weth
+  const collateralTokenAddress = '0x72292c8464a33f6b5f6efcc0213a89a98c68668b' //0xbtc
+  const uniswapPoolFee = 3000
 
-  let marketId = 1
-  let minInterestRate = 100
-  let maxLoanDuration = 5000000
-  let liquidityThresholdPercent = 10000
-  let loanToValuePercent = 10000 //mzake sure this functions as normal.  If over 100%, getting much better loan terms and i wont repay.  If it is under 100%, it will likely repay.
+  const marketId = 1
+  const minInterestRate = 100
+  const maxLoanDuration = 5000000
+  const liquidityThresholdPercent = 10000
+  const loanToValuePercent = 10000 //mzake sure this functions as normal.  If over 100%, getting much better loan terms and i wont repay.  If it is under 100%, it will likely repay.
 
   await hre.upgrades.proposeBatchTimelock({
     title: 'Lender Commitment Group Smart: Upgrade ',
@@ -63,17 +63,17 @@ const deployFn: DeployFunction = async (hre) => {
           constructorArgs: [
             tellerV2Address,
             smartCommitmentForwarderAddress,
-            uniswapV3FactoryAddress
-          ]
+            uniswapV3FactoryAddress,
+          ],
 
           /* call: {
             fn: 'setCollateralManagerV2',
             args: [await collateralManagerV2.getAddress()]
           }
           */
-        }
-      }
-    ]
+        },
+      },
+    ],
   })
 
   /*
@@ -98,7 +98,7 @@ deployFn.id = 'lender-commitment-group-upgrade'
 deployFn.tags = [
   'upgrade',
   'lender-commitment-group',
-  'lender-commitment-group-upgrade'
+  'lender-commitment-group-upgrade',
 ]
 deployFn.dependencies = ['lender-commitment-group-smart:deploy']
 deployFn.skip = async (hre) => {

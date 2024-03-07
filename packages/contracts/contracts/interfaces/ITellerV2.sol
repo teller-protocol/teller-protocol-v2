@@ -154,23 +154,18 @@ interface ITellerV2 {
         view
         returns (Payment memory due);
 
-         function lenderCloseLoan(uint256 _bidId)
+    function lenderCloseLoan(uint256 _bidId) external;
+
+    function lenderCloseLoanWithRecipient(uint256 _bidId, address _recipient)
         external;
 
-      function lenderCloseLoanWithRecipient(uint256 _bidId, address _recipient)
-        external;
+    function liquidateLoanFull(uint256 _bidId) external;
 
-    function liquidateLoanFull(uint256 _bidId)
-        external;
-
-    
     function liquidateLoanFullWithRecipient(uint256 _bidId, address _recipient)
         external;
-        
 
-    function getLoanDefaultTimestamp(
-        uint256 _bidId
-    ) external view returns (uint256);
-
-    
+    function getLoanDefaultTimestamp(uint256 _bidId)
+        external
+        view
+        returns (uint256);
 }

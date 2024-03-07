@@ -11,11 +11,11 @@ library FullMath {
     /// @param denominator The divisor
     /// @return result The 256-bit result
     /// @dev Credit to Remco Bloemen under MIT license https://xn--2-umb.com/21/muldiv
-    function mulDiv(
-        uint256 a,
-        uint256 b,
-        uint256 denominator
-    ) internal pure returns (uint256 result) {
+    function mulDiv(uint256 a, uint256 b, uint256 denominator)
+        internal
+        pure
+        returns (uint256 result)
+    {
         // 512-bit multiply [prod1 prod0] = a * b
         // Compute the product mod 2**256 and mod 2**256 - 1
         // then use the Chinese Remainder Theorem to reconstruct
@@ -61,8 +61,8 @@ library FullMath {
         // Factor powers of two out of denominator
         // Compute largest power of two divisor of denominator.
         // Always >= 1.
-      //  uint256 twos = -denominator & denominator;
-        uint256 twos = ~denominator + 1 & denominator;
+        //  uint256 twos = -denominator & denominator;
+        uint256 twos = (~denominator + 1) & denominator;
         // Divide denominator by power of two
         assembly {
             denominator := div(denominator, twos)
@@ -111,11 +111,11 @@ library FullMath {
     /// @param b The multiplier
     /// @param denominator The divisor
     /// @return result The 256-bit result
-    function mulDivRoundingUp(
-        uint256 a,
-        uint256 b,
-        uint256 denominator
-    ) internal pure returns (uint256 result) {
+    function mulDivRoundingUp(uint256 a, uint256 b, uint256 denominator)
+        internal
+        pure
+        returns (uint256 result)
+    {
         result = mulDiv(a, b, denominator);
         if (mulmod(a, b, denominator) > 0) {
             require(result < type(uint256).max);

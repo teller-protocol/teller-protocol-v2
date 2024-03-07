@@ -27,7 +27,9 @@ deployFn.tags = [
 deployFn.dependencies = ['teller-v2:deploy', 'market-registry:deploy']
 
 deployFn.skip = async (hre) => {
-  return true
-  return !hre.network.live
+    return (
+        !hre.network.live ||
+        !['localhost', 'polygon' ].includes(hre.network.name)
+      )
 }
 export default deployFn

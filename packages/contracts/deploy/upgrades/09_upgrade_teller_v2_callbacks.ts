@@ -10,11 +10,11 @@ const deployFn: DeployFunction = async (hre) => {
   const v2Calculations = await hre.deployments.get('V2Calculations')
 
   await hre.upgrades.proposeBatchTimelock({
-    title: 'TellerV2: Fix Loan Defaulted State',
+    title: 'TellerV2: Add Listener Callbacks',
     description: ` 
 # TellerV2
 
-* Fixes unintended functionality where the loan is not able to be liquidated when default duration was set to zero.
+* Adds support for necessary functions for Lender Commitment Groups.
 `,
     _steps: [
       {
@@ -56,7 +56,7 @@ deployFn.dependencies = ['teller-v2:deploy']
 deployFn.skip = async (hre) => {
   return (
     !hre.network.live ||
-    ![ 'goerli'].includes(hre.network.name)
+    ![  'goerli'].includes(hre.network.name)
   )
 }
 export default deployFn

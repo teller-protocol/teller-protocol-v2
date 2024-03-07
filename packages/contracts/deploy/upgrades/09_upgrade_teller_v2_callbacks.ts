@@ -54,9 +54,6 @@ deployFn.tags = [
 ]
 deployFn.dependencies = ['teller-v2:deploy']
 deployFn.skip = async (hre) => {
-  return (
-    !hre.network.live ||
-    ![  'goerli'].includes(hre.network.name)
-  )
+  return !hre.network.live || !['goerli'].includes(hre.network.name)
 }
 export default deployFn

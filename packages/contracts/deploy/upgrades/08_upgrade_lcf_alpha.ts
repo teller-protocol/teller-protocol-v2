@@ -114,8 +114,7 @@ deployFn.tags = [
 deployFn.dependencies = ['lender-commitment-forwarder:alpha:deploy']
 deployFn.skip = async (hre) => {
   return (
-    !hre.network.live ||
-    !['localhost', 'sepolia' ].includes(hre.network.name)
+    !hre.network.live || !['localhost', 'sepolia'].includes(hre.network.name)
   )
 }
 export default deployFn

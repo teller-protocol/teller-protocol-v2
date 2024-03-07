@@ -13,6 +13,20 @@ import { LoanDetails, Payment, BidState } from "../TellerV2Storage.sol";
 This is only used for sol test so its named specifically to avoid being used for the typescript tests.
 */
 contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
+
+   uint256 public amountOwedMockPrincipal;
+    uint256 public amountOwedMockInterest;
+
+
+      PaymentCycleType globalBidPaymentCycleType = PaymentCycleType.Seconds;
+    uint32 globalBidPaymentCycleDuration = 3000;
+
+
+    uint256 mockLoanDefaultTimestamp;
+    bool public lenderCloseLoanWasCalled;
+  
+
+
     function setMarketRegistry(address _marketRegistry) public {
         marketRegistry = IMarketRegistry(_marketRegistry);
     }
@@ -74,6 +88,43 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
         );
     }
 
+   function lenderCloseLoan(uint256 _bidId)
+        external
+        
+    {
+        lenderCloseLoanWasCalled = true;
+    }
+
+  function lenderCloseLoanWithRecipient(uint256 _bidId, address _recipient)
+        external
+        
+    {
+        lenderCloseLoanWasCalled = true;
+    }
+
+
+
+    function getLoanDefaultTimestamp(
+        uint256 _bidId
+    ) external view returns (uint256){
+      return mockLoanDefaultTimestamp;
+    } 
+
+
+    function liquidateLoanFull(uint256 _bidId)
+        external
+       
+    {
+
+    }
+
+     function liquidateLoanFullWithRecipient(uint256 _bidId, address _recipient)
+        external{
+
+    }
+
+
+
     function repayLoanMinimum(uint256 _bidId) external {}
 
     function repayLoanFull(uint256 _bidId) external {
@@ -83,7 +134,8 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
             .calculateAmountOwed(
                 bids[_bidId],
                 block.timestamp,
-                bidPaymentCycleType[_bidId]
+                 _getBidPaymentCycleType(_bidId),
+                _getBidPaymentCycleDuration(_bidId)
             );
 
         uint256 _amount = owedPrincipal + interest;
@@ -120,7 +172,8 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
             .calculateAmountOwed(
                 bids[_bidId],
                 _timestamp,
-                bidPaymentCycleType[_bidId]
+                _getBidPaymentCycleType(_bidId),
+                _getBidPaymentCycleDuration(_bidId)
             );
         due.principal = duePrincipal;
         due.interest = interest;
@@ -137,7 +190,8 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
             .calculateAmountOwed(
                 bids[_bidId],
                 _timestamp,
-                bidPaymentCycleType[_bidId]
+                _getBidPaymentCycleType(_bidId),
+                _getBidPaymentCycleDuration(_bidId)
             );
         due.principal = owedPrincipal;
         due.interest = interest;
@@ -270,4 +324,36 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
     function setLastRepaidTimestamp(uint256 _bidId, uint32 _timestamp) public {
         bids[_bidId].loanDetails.lastRepaidTimestamp = _timestamp;
     }
+
+
+    function _getBidPaymentCycleType(uint256 _bidId)
+        internal
+        view
+        returns (PaymentCycleType)
+    {
+       /* bytes32 bidTermsId = bidMarketTermsId[_bidId];
+        if (bidTermsId != bytes32(0)) {
+            return marketRegistry.getPaymentCycleTypeForTerms(bidTermsId);
+        }*/
+
+        return globalBidPaymentCycleType;
+    }
+
+    function _getBidPaymentCycleDuration(uint256 _bidId)
+        internal
+        view
+        returns (uint32)
+    {
+       /* bytes32 bidTermsId = bidMarketTermsId[_bidId];
+        if (bidTermsId != bytes32(0)) {
+            return marketRegistry.getPaymentCycleDurationForTerms(bidTermsId);
+        }*/
+
+        Bid storage bid = bids[_bidId];
+
+        return globalBidPaymentCycleDuration;
+    }
+
+
+
 }

@@ -707,6 +707,27 @@ contract TellerV2_bids_test is Testable {
         require(state == BidState.CLOSED, "bid was not closed");
     }
 
+     function test_lender_close_loan_wrong_origin() public {
+        uint256 bidId = 1;
+        setMockBid(bidId);
+
+        tellerV2.setCollateralManagerSuper(address(collateralManagerMock));
+
+        tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
+        vm.warp(2000 * 1e20);
+
+        tellerV2.mock_setBidDefaultDuration(bidId, 1000);
+
+        //set the account that will be paying the loan off
+        tellerV2.setMockMsgSenderForMarket(address(borrower));
+
+        lendingToken.approve(address(tellerV2), 1e20);
+
+        vm.expectRevert("only lender can close loan");
+        tellerV2.lenderCloseLoan(bidId);
+ 
+    }
+
     function test_liquidate_loan_full() public {
         uint256 bidId = 1;
         setMockBid(bidId);

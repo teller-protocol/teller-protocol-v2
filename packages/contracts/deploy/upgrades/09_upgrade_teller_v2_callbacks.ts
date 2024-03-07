@@ -45,15 +45,15 @@ const deployFn: DeployFunction = async (hre) => {
 }
 
 // tags and deployment
-deployFn.id = 'teller-v2:loan-defaulted-state-upgrade'
+deployFn.id = 'teller-v2:callback-upgrade'
 deployFn.tags = [
   'proposal',
   'upgrade',
   'teller-v2',
-  'teller-v2:loan-defaulted-state-upgrade',
+  'teller-v2:callback-upgrade',
 ]
 deployFn.dependencies = ['teller-v2:deploy']
 deployFn.skip = async (hre) => {
-  return !hre.network.live || !['goerli'].includes(hre.network.name)
+  return !hre.network.live || !['goerli', 'polygon'].includes(hre.network.name)
 }
 export default deployFn

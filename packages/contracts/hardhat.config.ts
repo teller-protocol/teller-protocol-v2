@@ -377,7 +377,7 @@ export default <HardhatUserConfig>{
       url: networkUrls.polygon,
       chainId: 137,
       live: true,
-      gasPrice: Number(ethers.parseUnits('350', 'gwei')),
+      gasPrice: Number(ethers.parseUnits('250', 'gwei')),
 
       verify: {
         etherscan: {
@@ -632,7 +632,9 @@ task(
 
       const qrcode = require('qrcode-terminal')
       qrcode.generate(wallet.address)
-      console.log(`‍📬 Deployer Account is ${wallet.address} - ${wallet.privateKey}`)
+      console.log(
+        `‍📬 Deployer Account is ${wallet.address} - ${wallet.privateKey}`
+      )
       for (const networkName in config.networks) {
         const network = config.networks[networkName]
         if (!('url' in network)) continue

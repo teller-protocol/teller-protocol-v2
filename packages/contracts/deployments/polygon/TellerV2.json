@@ -114,6 +114,18 @@
     {
       "type": "event",
       "anonymous": false,
+      "name": "LoanClosed",
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "bidId",
+          "indexed": true
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
       "name": "LoanLiquidated",
       "inputs": [
         {
@@ -809,6 +821,25 @@
     },
     {
       "type": "function",
+      "name": "getLoanDefaultTimestamp",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_bidId"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
       "name": "getLoanLender",
       "constant": true,
       "stateMutability": "view",
@@ -927,6 +958,25 @@
         {
           "type": "string",
           "name": "metadataURI_"
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getRepaymentListenerForBid",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_bidId"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
         }
       ]
     },
@@ -1172,6 +1222,23 @@
     },
     {
       "type": "function",
+      "name": "lenderCloseLoanWithRecipient",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_bidId"
+        },
+        {
+          "type": "address",
+          "name": "_collateralRecipient"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
       "name": "lenderCommitmentForwarder",
       "constant": true,
       "stateMutability": "view",
@@ -1230,6 +1297,23 @@
         {
           "type": "uint256",
           "name": "_bidId"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "liquidateLoanFullWithRecipient",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_bidId"
+        },
+        {
+          "type": "address",
+          "name": "_recipient"
         }
       ],
       "outputs": []
@@ -1411,6 +1495,25 @@
     },
     {
       "type": "function",
+      "name": "repaymentListenerForBid",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
       "name": "reputationManager",
       "constant": true,
       "stateMutability": "view",
@@ -1425,19 +1528,6 @@
     },
     {
       "type": "function",
-      "name": "setEscrowVault",
-      "constant": false,
-      "payable": false,
-      "inputs": [
-        {
-          "type": "address",
-          "name": "_escrowVault"
-        }
-      ],
-      "outputs": []
-    },
-    {
-      "type": "function",
       "name": "setProtocolFee",
       "constant": false,
       "payable": false,
@@ -1445,6 +1535,23 @@
         {
           "type": "uint16",
           "name": "newFee"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "setRepaymentListenerForBid",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_bidId"
+        },
+        {
+          "type": "address",
+          "name": "_listener"
         }
       ],
       "outputs": []
@@ -1704,6 +1811,6 @@
     "status": 1,
     "byzantium": true
   },
-  "numDeployments": 11,
+  "numDeployments": 12,
   "implementation": "0x86D540Ca6de284c18BeED0F6f154499CF9b61322"
 }

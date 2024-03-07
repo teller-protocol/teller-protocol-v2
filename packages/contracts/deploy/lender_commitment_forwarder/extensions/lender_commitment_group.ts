@@ -11,8 +11,6 @@ const deployFn: DeployFunction = async (hre) => {
   const smartCommitmentForwarderAddress =
     await SmartCommitmentForwarder.getAddress()
 
-  
-
   let uniswapV3FactoryAddress: string
   switch (hre.network.name) {
     case 'mainnet':
@@ -33,21 +31,19 @@ const deployFn: DeployFunction = async (hre) => {
       throw new Error('No swap factory address found for this network')
   }
 
-
-
   const networkName = hre.network.name
 
   //created pool https://sepolia.etherscan.io/tx/0x8ea20095c821f6066252457d7f0438030bc65bb441e1bea56c6ae0efd63016f0
 
-  const principalTokenAddress = '0xfff9976782d46cc05630d1f6ebab18b2324d6b14' //weth
-  const collateralTokenAddress = '0x72292c8464a33f6b5f6efcc0213a89a98c68668b' //0xbtc
-  const uniswapPoolFee = 3000
+  const principalTokenAddress = '0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359' //usdc
+  const collateralTokenAddress = '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619' //weth
+  const uniswapPoolFee = 500
 
-  const marketId = 4 //for sepolia
+  const marketId = 41 //for polygon
   const minInterestRate = 100
-  const maxLoanDuration = 5000000
-  const liquidityThresholdPercent = 10000
-  const loanToValuePercent = 10000 //make sure this functions as normal.  If over 100%, getting much better loan terms and i wont repay.  If it is under 100%, it will likely repay.
+  const maxLoanDuration = 10368000
+  const liquidityThresholdPercent = 7500
+  const loanToValuePercent = 9000 //make sure this functions as normal.  If over 100%, getting much better loan terms and i wont repay.  If it is under 100%, it will likely repay.
   const twapInterval = 5
 
   const lenderCommitmentGroupSmart = await hre.deployProxy(
@@ -85,6 +81,6 @@ deployFn.dependencies = [
 ]
 
 deployFn.skip = async (hre) => {
-  return !hre.network.live || !['sepolia','polygon'].includes(hre.network.name)
+  return !hre.network.live || !['sepolia', 'polygon'].includes(hre.network.name)
 }
 export default deployFn

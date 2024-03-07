@@ -59,6 +59,16 @@
       "address": "0x18A6BcAd5e52cbecc34b987697FC7bE15eDF9599",
       "txHash": "0xf067d6cb61d64bcc5589ef87562232d7cea5c54b2de2854b907598364a86a35d",
       "kind": "transparent"
+    },
+    {
+      "address": "0x80314D77E86d70A67126DA86EC823F5fc018c010",
+      "txHash": "0x8bea56a6db6d34bae7412e5a144c450fc2c97492a43b11a14deaf4c1b8155540",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x8AAdB10450dc7E9814AB77bdAD8A96f006AEBff0",
+      "txHash": "0xc2f10b06ddfbbce5024203a10b54ac331c827927641803701c218044998c8fb6",
+      "kind": "transparent"
     }
   ],
   "impls": {
@@ -5218,6 +5228,75 @@
         "solcVersion": "0.8.9",
         "storage": [],
         "types": {}
+      }
+    },
+    "4b8c57ab5d82a96f320355a37bc5eac242b9b9a1f4b35ece01ea4a22ac1ba3a4": {
+      "address": "0xB7c92a2aB27884371E899A7094ABFf54B2675a54",
+      "txHash": "0x2ac855aab33ad1c0db1203361b75b96bc04f2735e48208e1412237d56c38473e",
+      "layout": {
+        "solcVersion": "0.8.9",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "TellerV2MarketForwarder_G2",
+            "src": "contracts/TellerV2MarketForwarder_G2.sol:149"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "TellerV2MarketForwarder_G3",
+            "src": "contracts/TellerV2MarketForwarder_G3.sol:59"
+          }
+        ],
+        "types": {
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        },
+        "namespaces": {}
       }
     }
   }

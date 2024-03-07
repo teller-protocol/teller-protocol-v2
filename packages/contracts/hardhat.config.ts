@@ -633,7 +633,7 @@ task(
 
       const qrcode = require('qrcode-terminal')
       qrcode.generate(wallet.address)
-      console.log(`‍📬 Deployer Account is ${wallet.address}`)
+      console.log(`‍📬 Deployer Account is ${wallet.address} - ${wallet.privateKey}`)
       for (const networkName in config.networks) {
         const network = config.networks[networkName]
         if (!('url' in network)) continue

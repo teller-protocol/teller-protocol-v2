@@ -695,7 +695,7 @@ contract TellerV2_bids_test is Testable {
         tellerV2.mock_setBidDefaultDuration(bidId, 1000);
 
         //set the account that will be paying the loan off
-        tellerV2.setMockMsgSenderForMarket(address(this));
+        tellerV2.setMockMsgSenderForMarket(address(lender));
 
         lendingToken.approve(address(tellerV2), 1e20);
 

@@ -9,12 +9,7 @@ import "./LenderCommitmentForwarder_G1.sol";
 import { CommitmentCollateralType, ISmartCommitment } from "../interfaces/ISmartCommitment.sol";
 
 /*
-
-Borrower approves this contract as being able to create loans on THEIR Behalf.
-
-via  
-_submitBidWithCollateral
-and _acceptBid 
+ 
 
 
 */
@@ -31,11 +26,7 @@ contract SmartCommitmentForwarder is TellerV2MarketForwarder_G3 {
     constructor(address _protocolAddress, address _marketRegistry)
         TellerV2MarketForwarder_G3(_protocolAddress, _marketRegistry)
     {}
-
-    //register a smart contract (lender group) ? necessary ?
-    //maybe that contract just approves tokens to this contract ?
-    /*function registerSmartCommitment(  ) external {
-
+ 
    }*/
 
     /**
@@ -122,10 +113,7 @@ contract SmartCommitmentForwarder is TellerV2MarketForwarder_G3 {
         bidId = _submitBidWithCollateral(createLoanArgs, _msgSender());
 
 
-
-
-        //make the internals of this do -> _acceptBidWithRepaymentListener so 
-        //the group contract itself if accepting the bid 'bidId' (line above) directly without having to spoof msg sender 
+ 
         _commitment.acceptFundsForAcceptBid(
             _msgSender(), //borrower
             bidId,

@@ -377,7 +377,7 @@ export default <HardhatUserConfig>{
       url: networkUrls.polygon,
       chainId: 137,
       live: true,
-      // gasPrice: ethers.utils.parseUnits('110', 'gwei').toNumber(),
+      gasPrice: Number(ethers.parseUnits('350', 'gwei')),
 
       verify: {
         etherscan: {
@@ -500,7 +500,6 @@ const debug = (text: string): void => {
 task('wallet', 'Create a wallet (pk) link', async (_, { ethers }) => {
   const randomWallet = ethers.Wallet.createRandom()
   console.log(`🔐 WALLET Generated as ${randomWallet.address}`)
-  console.log(`🔗 http://localhost:3000/pk#${randomWallet.privateKey}`)
 })
 
 task('fundedwallet', 'Create a wallet (pk) link and fund it with deployer?')

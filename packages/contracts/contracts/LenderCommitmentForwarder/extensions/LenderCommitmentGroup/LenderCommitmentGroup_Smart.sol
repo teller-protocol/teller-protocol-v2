@@ -264,6 +264,7 @@ contract LenderCommitmentGroup_Smart is
 
 
         require(interestRateUpperBound >= interestRateLowerBound, "invalid interest rate bounds");
+        require(interestRateUpperBound <= 10000, "invalid interest rate upper bound");
 
         require(_liquidityThresholdPercent <= 10000, "invalid threshold");
 
@@ -825,22 +826,17 @@ contract LenderCommitmentGroup_Smart is
         return maxLoanDuration;
     }
 
-    //this is always from 0 to 10000
+    //this is always between 0 and 10000
     function getPoolUtilizationRatio() public view returns (uint16) {
 
         if (totalPrincipalTokensCommitted == 0) {
             return 0;
         }
 
-        return uint16(  Math.max(  getTotalPrincipalTokensOutstandingInActiveLoans()  * 10000  /   totalPrincipalTokensCommitted , 10000  ));
+        return uint16(  Math.max(  (totalPrincipalTokensLended - totalPrincipalTokensRepaid)  * 10000  /   totalPrincipalTokensCommitted , 10000  ));
     }   
 
-
-    /*
-uint256 interestRateRange = rateRange.max - rateRange.min;
-        uint256 interestRate = rateRange.min + (utilisationRatio * interestRateRange) / 100;
-    */
-
+ 
     function getMinInterestRate() public view returns (uint16) {
         return interestRateLowerBound + uint16( uint256(interestRateUpperBound-interestRateLowerBound).percent(getPoolUtilizationRatio()) );
     }

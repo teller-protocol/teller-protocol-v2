@@ -307,6 +307,17 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
         bids[_bidId].loanDetails.lastRepaidTimestamp = _timestamp;
     }
 
+
+
+    function mock_setLoanDefaultTimestamp(
+        uint256 _defaultedAt
+    ) external   returns (uint256){
+       mockLoanDefaultTimestamp = _defaultedAt;
+    } 
+
+
+
+
     function _getBidPaymentCycleType(uint256 _bidId)
         internal
         view

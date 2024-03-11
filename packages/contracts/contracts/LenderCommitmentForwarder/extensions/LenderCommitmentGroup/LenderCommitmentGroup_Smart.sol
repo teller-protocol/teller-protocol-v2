@@ -170,8 +170,10 @@ contract LenderCommitmentGroup_Smart is
     uint16 public loanToValuePercent; //the overcollateralization ratio, typically 80 pct
 
     uint32 public twapInterval;
-    uint32 maxLoanDuration;
-    uint16 minInterestRate;
+    uint32 public maxLoanDuration;
+    uint16 public interestRateLowerBound;
+    uint16 public interestRateUpperBound;
+
 
     mapping(address => uint256) public principalTokensCommittedByLender;
     mapping(uint256 => bool) public activeBids;
@@ -223,7 +225,8 @@ contract LenderCommitmentGroup_Smart is
         address _collateralTokenAddress,
         uint256 _marketId,
         uint32 _maxLoanDuration,
-        uint16 _minInterestRate,
+        uint16 _interestRateLowerBound,
+        uint16 _interestRateUpperBound,
         uint16 _liquidityThresholdPercent,
         uint16 _loanToValuePercent, //essentially the overcollateralization ratio.  10000 is 1:1 baseline ? // initializer  ADD ME
         uint24 _uniswapPoolFee,
@@ -256,7 +259,11 @@ contract LenderCommitmentGroup_Smart is
         );
 
         maxLoanDuration = _maxLoanDuration;
-        minInterestRate = _minInterestRate;
+        interestRateLowerBound = _interestRateLowerBound;
+        interestRateUpperBound = _interestRateUpperBound;
+
+
+        require(interestRateUpperBound >= interestRateLowerBound, "invalid interest rate bounds");
 
         require(_liquidityThresholdPercent <= 10000, "invalid threshold");
 
@@ -391,7 +398,7 @@ contract LenderCommitmentGroup_Smart is
             "Mismatching collateral token"
         );
         //the interest rate must be at least as high has the commitment demands. The borrower can use a higher interest rate although that would not be beneficial to the borrower.
-        require(_interestRate >= minInterestRate, "Invalid interest rate");
+        require(_interestRate >= getMinInterestRate(), "Invalid interest rate");
         //the loan duration must be less than the commitment max loan duration. The lender who made the commitment expects the money to be returned before this window.
         require(_loanDuration <= maxLoanDuration, "Invalid loan max duration");
 
@@ -818,8 +825,24 @@ contract LenderCommitmentGroup_Smart is
         return maxLoanDuration;
     }
 
-    function getMinInterestRate() external view returns (uint16) {
-        return minInterestRate;
+    //this is always from 0 to 10000
+    function getPoolUtilizationRatio() public view returns (uint16) {
+
+        if (totalPrincipalTokensCommitted == 0) {
+            return 0;
+        }
+
+        return uint16(  Math.max(  getTotalPrincipalTokensOutstandingInActiveLoans()  * 10000  /   totalPrincipalTokensCommitted , 10000  ));
+    }   
+
+
+    /*
+uint256 interestRateRange = rateRange.max - rateRange.min;
+        uint256 interestRate = rateRange.min + (utilisationRatio * interestRateRange) / 100;
+    */
+
+    function getMinInterestRate() public view returns (uint16) {
+        return interestRateLowerBound + uint16( uint256(interestRateUpperBound-interestRateLowerBound).percent(getPoolUtilizationRatio()) );
     }
 
     function getPrincipalTokenAddress() external view returns (address) {

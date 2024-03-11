@@ -15,6 +15,8 @@ This is only used for sol test so its named specifically to avoid being used for
 contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
     uint256 public amountOwedMockPrincipal;
     uint256 public amountOwedMockInterest;
+      address public approvedForwarder;
+
 
     PaymentCycleType globalBidPaymentCycleType = PaymentCycleType.Seconds;
     uint32 globalBidPaymentCycleDuration = 3000;
@@ -33,6 +35,14 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
     function protocolFee() external view returns (uint16) {
         return 100;
     }
+
+
+    function approveMarketForwarder(uint256 _marketId, address _forwarder)
+        external
+    {
+        approvedForwarder = _forwarder;
+    }
+
 
     function submitBid(
         address _lendingToken,

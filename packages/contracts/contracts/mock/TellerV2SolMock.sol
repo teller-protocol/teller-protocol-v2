@@ -53,9 +53,12 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
         string calldata,
         address _receiver
     ) public returns (uint256 bidId_) {
-        bidId_ = bidId;
+        
 
-        Bid storage bid = bids[bidId];
+
+         bidId_ = bidId;
+
+        Bid storage bid = bids[bidId_];
         bid.borrower = msg.sender;
         bid.receiver = _receiver != address(0) ? _receiver : bid.borrower;
         bid.marketplaceId = _marketId;
@@ -64,12 +67,13 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
         bid.loanDetails.loanDuration = _duration;
         bid.loanDetails.timestamp = uint32(block.timestamp);
 
-        (bid.terms.paymentCycle, bidPaymentCycleType[bidId]) = marketRegistry
-            .getPaymentCycle(_marketId);
+        /*(bid.terms.paymentCycle, bidPaymentCycleType[bidId]) = marketRegistry
+            .getPaymentCycle(_marketId);*/
 
         bid.terms.APR = _APR;
 
-        bidId++;
+        bidId++; //nextBidId
+
     }
 
     function submitBid(

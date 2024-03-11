@@ -593,9 +593,12 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
         uint256 collateralTokenId = 0;
 
         uint32 loanDuration = 5000000;
-        uint16 interestRate = 100;
+        uint16 interestRate = 800;
 
         uint256 bidId = 0;
+
+
+       // TellerV2SolMock(_tellerV2).setMarketRegistry(address(marketRegistry));
 
 
 

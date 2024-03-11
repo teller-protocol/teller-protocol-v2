@@ -9,10 +9,13 @@ import "../TellerV2Context.sol";
 import { Collateral } from "../interfaces/escrow/ICollateralEscrowV1.sol";
 import { LoanDetails, Payment, BidState } from "../TellerV2Storage.sol";
 
+import { ILoanRepaymentCallbacks } from "../interfaces/ILoanRepaymentCallbacks.sol";
+
+
 /*
 This is only used for sol test so its named specifically to avoid being used for the typescript tests.
 */
-contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
+contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage , ILoanRepaymentCallbacks{
     uint256 public amountOwedMockPrincipal;
     uint256 public amountOwedMockInterest;
       address public approvedForwarder;
@@ -330,6 +333,16 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage {
     } 
 
 
+
+    function getRepaymentListenerForBid(uint256 _bidId)
+        public
+        view
+        returns (address)
+    {}
+
+    function setRepaymentListenerForBid(uint256 _bidId, address _listener)
+        public
+    {}
 
 
     function _getBidPaymentCycleType(uint256 _bidId)

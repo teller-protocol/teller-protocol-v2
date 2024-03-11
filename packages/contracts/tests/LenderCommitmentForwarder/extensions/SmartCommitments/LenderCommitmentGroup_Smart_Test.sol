@@ -572,6 +572,51 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
 
     }
 
+
+
+    function test_getMinInterestRate() public {
+        lenderCommitmentGroupSmart.set_mock_getMaxPrincipalPerCollateralAmount(
+            100 * 1e18
+        );
+
+        principalToken.transfer(address(lenderCommitmentGroupSmart), 1e18);
+        collateralToken.transfer(address(lenderCommitmentGroupSmart), 1e18);
+
+        initialize_group_contract();
+
+        lenderCommitmentGroupSmart.set_totalPrincipalTokensCommitted(1000000);
+
+        uint256 principalAmount = 50;
+        uint256 collateralAmount = 50 * 100;
+
+        address collateralTokenAddress = address(
+            lenderCommitmentGroupSmart.collateralToken()
+        );
+        uint256 collateralTokenId = 0;
+
+        uint32 loanDuration = 5000000;
+        uint16 interestRate = 800;
+
+        uint256 bidId = 0;
+
+
+       // TellerV2SolMock(_tellerV2).setMarketRegistry(address(marketRegistry));
+
+
+
+        // submit bid 
+        uint16 minInterestRate = lenderCommitmentGroupSmart.getMinInterestRate( 
+           
+         );
+
+
+
+        assertEq(minInterestRate, 100);
+    }
+
+
+
+
     function test_acceptFundsForAcceptBid() public {
         lenderCommitmentGroupSmart.set_mock_getMaxPrincipalPerCollateralAmount(
             100 * 1e18

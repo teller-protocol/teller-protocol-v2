@@ -833,7 +833,7 @@ contract LenderCommitmentGroup_Smart is
             return 0;
         }
 
-        return uint16(  Math.max(  (totalPrincipalTokensLended - totalPrincipalTokensRepaid)  * 10000  /   totalPrincipalTokensCommitted , 10000  ));
+        return uint16(  Math.min(  (totalPrincipalTokensLended - totalPrincipalTokensRepaid)  * 10000  /   totalPrincipalTokensCommitted , 10000  ));
     }   
 
  

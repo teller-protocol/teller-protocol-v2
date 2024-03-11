@@ -599,10 +599,13 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
 
         uint256 bidId = 0;
 
+ 
+      uint16 poolUtilizationRatio = lenderCommitmentGroupSmart.getPoolUtilizationRatio( 
+           
+         );
 
-       // TellerV2SolMock(_tellerV2).setMarketRegistry(address(marketRegistry));
 
-
+        assertEq(poolUtilizationRatio, 0);
 
         // submit bid 
         uint16 minInterestRate = lenderCommitmentGroupSmart.getMinInterestRate( 
@@ -611,7 +614,7 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
 
 
 
-        assertEq(minInterestRate, 100);
+        assertEq(minInterestRate, 0);
     }
 
 
@@ -638,7 +641,7 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
         uint256 collateralTokenId = 0;
 
         uint32 loanDuration = 5000000;
-        uint16 interestRate = 800;
+        uint16 interestRate = 100;
 
         uint256 bidId = 0;
 
@@ -697,7 +700,7 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
         uint256 collateralTokenId = 0;
 
         uint32 loanDuration = 5000000;
-        uint16 interestRate = 800;
+        uint16 interestRate = 100;
 
         uint256 bidId = 0;
 

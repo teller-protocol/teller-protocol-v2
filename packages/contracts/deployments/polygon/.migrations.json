@@ -22,5 +22,5 @@
   "lender-commitment-forwarder:alpha:deploy": 1706555943,
   "smart-commitment-forwarder:deploy": 1709841715,
   "teller-v2:callback-upgrade": 1709847105,
-  "lender-commitment-group-smart:deploy": 1710268384
+  "lender-commitment-group-smart:deploy": 1710268755
 }

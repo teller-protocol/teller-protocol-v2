@@ -40,8 +40,8 @@ const deployFn: DeployFunction = async (hre) => {
   const uniswapPoolFee = 500
 
   const marketId = 44 //for polygon
-  const minInterestRate = 100
-  const maxInterestRate = 400
+  const minInterestRate = 400
+  const maxInterestRate = 800
   const maxLoanDuration = 10368000
   const liquidityThresholdPercent = 7500
   const loanToValuePercent = 12500 //make sure this functions as normal.  If under 100%, getting much better loan terms and i wont repay.  If it is over 100%, it will likely repay since overcollateralized.

@@ -454,6 +454,20 @@
     },
     {
       "type": "function",
+      "name": "getPoolUtilizationRatio",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint16",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
       "name": "getPrincipalAmountAvailableToBorrow",
       "constant": true,
       "stateMutability": "view",
@@ -556,7 +570,11 @@
         },
         {
           "type": "uint16",
-          "name": "_minInterestRate"
+          "name": "_interestRateLowerBound"
+        },
+        {
+          "type": "uint16",
+          "name": "_interestRateUpperBound"
         },
         {
           "type": "uint16",
@@ -579,6 +597,34 @@
         {
           "type": "address",
           "name": "poolSharesToken_"
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "interestRateLowerBound",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint16",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "interestRateUpperBound",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint16",
+          "name": ""
         }
       ]
     },
@@ -642,6 +688,20 @@
       "outputs": [
         {
           "type": "uint16",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "maxLoanDuration",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint32",
           "name": ""
         }
       ]
@@ -903,6 +963,6 @@
     "blockHash": null,
     "blockNumber": null
   },
-  "numDeployments": 1,
+  "numDeployments": 2,
   "implementation": "0xf6E926D7282Ba2Dc1bd580dA36420d2067bEc4A3"
 }

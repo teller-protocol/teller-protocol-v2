@@ -39,11 +39,12 @@ const deployFn: DeployFunction = async (hre) => {
   const collateralTokenAddress = '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619' //weth
   const uniswapPoolFee = 500
 
-  const marketId = 41 //for polygon
+  const marketId = 44 //for polygon
   const minInterestRate = 100
+  const maxInterestRate = 400
   const maxLoanDuration = 10368000
   const liquidityThresholdPercent = 7500
-  const loanToValuePercent = 9000 //make sure this functions as normal.  If over 100%, getting much better loan terms and i wont repay.  If it is under 100%, it will likely repay.
+  const loanToValuePercent = 12500 //make sure this functions as normal.  If under 100%, getting much better loan terms and i wont repay.  If it is over 100%, it will likely repay since overcollateralized.
   const twapInterval = 5
 
   const lenderCommitmentGroupSmart = await hre.deployProxy(
@@ -61,6 +62,7 @@ const deployFn: DeployFunction = async (hre) => {
         marketId,
         maxLoanDuration,
         minInterestRate,
+        maxInterestRate,
         liquidityThresholdPercent,
         loanToValuePercent,
         uniswapPoolFee,

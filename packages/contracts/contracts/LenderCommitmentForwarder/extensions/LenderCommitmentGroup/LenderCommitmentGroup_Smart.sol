@@ -221,7 +221,7 @@ contract LenderCommitmentGroup_Smart is
     /*
 
 
-        _liquidityThresholdPercent - When 100% , the entire pool can be drawn for lending.  When 80%, only 80% of the pool can be drawn for lending. 
+        
     */
     function initialize(
         address _principalTokenAddress,
@@ -230,8 +230,8 @@ contract LenderCommitmentGroup_Smart is
         uint32 _maxLoanDuration,
         uint16 _interestRateLowerBound,
         uint16 _interestRateUpperBound,
-        uint16 _liquidityThresholdPercent,
-        uint16 _loanToValuePercent, //essentially the overcollateralization ratio.  10000 is 1:1 baseline ? // initializer  ADD ME
+        uint16 _liquidityThresholdPercent, // When 100% , the entire pool can be drawn for lending.  When 80%, only 80% of the pool can be drawn for lending. 
+        uint16 _loanToValuePercent, //the required overcollateralization ratio.  10000 is 1:1 baseline , typically this is above 10000
         uint24 _uniswapPoolFee,
         uint32 _twapInterval
     ) external initializer returns (address poolSharesToken_) {
@@ -266,10 +266,11 @@ contract LenderCommitmentGroup_Smart is
         interestRateUpperBound = _interestRateUpperBound;
 
 
-        require(interestRateUpperBound >= interestRateLowerBound, "invalid interest rate bounds");
-        require(interestRateUpperBound <= 10000, "invalid interest rate upper bound");
+        
+        require(interestRateUpperBound <= 10000, "invalid _interestRateUpperBound");
+        require(interestRateLowerBound <= interestRateUpperBound, "invalid _interestRateLowerBound");
 
-        require(_liquidityThresholdPercent <= 10000, "invalid threshold");
+        require(_liquidityThresholdPercent <= 10000, "invalid _liquidityThresholdPercent"); 
 
         liquidityThresholdPercent = _liquidityThresholdPercent;
         loanToValuePercent = _loanToValuePercent;

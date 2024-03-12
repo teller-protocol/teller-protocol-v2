@@ -21,6 +21,6 @@
   "lender-commitment-forwarder:extensions:flash-rollover:g3-upgrade": 1696628490,
   "lender-commitment-forwarder:alpha:deploy": 1706555943,
   "smart-commitment-forwarder:deploy": 1709841715,
-  "lender-commitment-group-smart:deploy": 1709846146,
-  "teller-v2:callback-upgrade": 1709847105
+  "teller-v2:callback-upgrade": 1709847105,
+  "lender-commitment-group-smart:deploy": 1710268384
 }

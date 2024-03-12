@@ -182,6 +182,9 @@ contract LenderCommitmentGroup_Smart is
     // maybe it is possible to get rid of this storage slot and calculate it from totalPrincipalTokensRepaid, totalPrincipalTokensLended
     int256 tokenDifferenceFromLiquidations;
 
+
+   
+
     modifier onlySmartCommitmentForwarder() {
         require(
             msg.sender == address(SMART_COMMITMENT_FORWARDER),
@@ -272,11 +275,7 @@ contract LenderCommitmentGroup_Smart is
         loanToValuePercent = _loanToValuePercent;
         twapInterval = _twapInterval;
 
-        // maxPrincipalPerCollateralAmount = _maxPrincipalPerCollateralAmount;
-        // _createInitialCommitment(_createCommitmentArgs);
-
-        // set initial terms in storage from _createCommitmentArgs
-
+        
         poolSharesToken_ = _deployPoolSharesToken();
     }
 
@@ -345,7 +344,7 @@ contract LenderCommitmentGroup_Smart is
             totalPrincipalTokensCommitted
         ) + tokenDifferenceFromLiquidations;
 
-        //if the poolTotalEstimatedValue_ is less than 0, we treat it as 0.  This will prob cause issues ?
+        //if the poolTotalEstimatedValue_ is less than 0, we treat it as 0.  
         poolTotalEstimatedValue_ = poolTotalEstimatedValueSigned > int256(0)
             ? uint256(poolTotalEstimatedValueSigned)
             : 0;
@@ -443,17 +442,13 @@ contract LenderCommitmentGroup_Smart is
     }
 
     /*
-      
- 
-    also consider including 'totalSwappedTokensIn'
+       
     */
     function burnSharesToWithdrawEarnings(
         uint256 _amountPoolSharesTokens,
         address _recipient
     ) external returns (uint256) {
-        //uint256 collectedInterest = LoanRepaymentInterestCollector( interestCollector ).collectInterest();
-
-        //uint256 poolSharesTotalSupplyBeforeBurn = poolSharesToken.totalSupply();
+       
 
         //this reduces total supply
         poolSharesToken.burn(msg.sender, _amountPoolSharesTokens);

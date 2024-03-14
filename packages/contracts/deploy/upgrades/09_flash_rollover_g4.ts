@@ -52,14 +52,14 @@ const deployFn: DeployFunction = async (hre) => {
 }
 
 // tags and deployment
-deployFn.id = 'lender-commitment-forwarder:extensions:flash-rollover:g3-upgrade'
+deployFn.id = 'lender-commitment-forwarder:extensions:flash-rollover:g4-upgrade'
 deployFn.tags = [
   'proposal',
   'upgrade',
   'lender-commitment-forwarder',
   'lender-commitment-forwarder:extensions',
   'lender-commitment-forwarder:extensions:flash-rollover',
-  'lender-commitment-forwarder:extensions:flash-rollover:g3-upgrade',
+  'lender-commitment-forwarder:extensions:flash-rollover:g4-upgrade',
 ]
 deployFn.dependencies = [
   'teller-v2:deploy',

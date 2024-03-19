@@ -21,20 +21,20 @@ const deployFn: DeployFunction = async (hre) => {
         proxy: tellerV2,
         implFactory: await hre.ethers.getContractFactory('TellerV2', {
           libraries: {
-            V2Calculations: v2Calculations.address
-          }
+            V2Calculations: v2Calculations.address,
+          },
         }),
 
         opts: {
           unsafeAllow: [
             'constructor',
             'state-variable-immutable',
-            'external-library-linking'
+            'external-library-linking',
           ],
-          constructorArgs: [await trustedForwarder.getAddress()]
-        }
-      }
-    ]
+          constructorArgs: [await trustedForwarder.getAddress()],
+        },
+      },
+    ],
   })
 
   hre.log('done.')
@@ -50,13 +50,13 @@ deployFn.tags = [
   'proposal',
   'upgrade',
   'teller-v2',
-  'teller-v2:loan-defaulted-state-upgrade'
+  'teller-v2:loan-defaulted-state-upgrade',
 ]
 deployFn.dependencies = ['teller-v2:deploy']
 deployFn.skip = async (hre) => {
   return (
     !hre.network.live ||
-    !['mainnet', 'polygon',   'goerli'].includes(hre.network.name)
+    !['mainnet',   'goerli'].includes(hre.network.name)
   )
 }
 export default deployFn

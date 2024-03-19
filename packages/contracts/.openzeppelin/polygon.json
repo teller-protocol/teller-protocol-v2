@@ -5219,6 +5219,16 @@
         "storage": [],
         "types": {}
       }
+    },
+    "81587c95e65cefac18b17ee08a6c9044f48a84bc703e90cfff3bcbd9c9ea33cb": {
+      "address": "0x0848E884b2DBb63727aa3216b921C279f6DC9a91",
+      "txHash": "0x3fa610545987379a4a369d3b85ef9703e6afa43d1f0204cc04c29b740434049d",
+      "layout": {
+        "solcVersion": "0.8.9",
+        "storage": [],
+        "types": {},
+        "namespaces": {}
+      }
     }
   }
 }

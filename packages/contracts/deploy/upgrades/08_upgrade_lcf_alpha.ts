@@ -130,9 +130,8 @@ deployFn.skip = async (hre) => {
     ![
       'localhost',
      
-      'sepolia' ,
-      'arbitrum' ,
-      'polygon' 
+      'sepolia' 
+      
       
     ].includes(hre.network.name)
   )

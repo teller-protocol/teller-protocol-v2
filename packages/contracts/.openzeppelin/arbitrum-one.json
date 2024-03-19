@@ -3305,6 +3305,16 @@
         "storage": [],
         "types": {}
       }
+    },
+    "7b7808d1b2fd011047d4f49edbccaf9bd859bebf2d14fa43e6f0329d8258486e": {
+      "address": "0x28940408c1aD15f81f77D8C0Ed2A45B8e19e7147",
+      "txHash": "0xae1023dc5ef1fc378567c2cacb4fd9bd16cb0ef239be5fa749b0a600013a754b",
+      "layout": {
+        "solcVersion": "0.8.9",
+        "storage": [],
+        "types": {},
+        "namespaces": {}
+      }
     }
   }
 }

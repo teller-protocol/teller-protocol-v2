@@ -12,10 +12,6 @@
         },
         {
           "type": "address",
-          "name": "_lenderCommitmentForwarder"
-        },
-        {
-          "type": "address",
           "name": "_poolAddressesProvider"
         }
       ]
@@ -50,20 +46,6 @@
     {
       "type": "function",
       "name": "ADDRESSES_PROVIDER",
-      "constant": true,
-      "stateMutability": "view",
-      "payable": false,
-      "inputs": [],
-      "outputs": [
-        {
-          "type": "address",
-          "name": ""
-        }
-      ]
-    },
-    {
-      "type": "function",
-      "name": "LENDER_COMMITMENT_FORWARDER",
       "constant": true,
       "stateMutability": "view",
       "payable": false,
@@ -124,6 +106,10 @@
       "stateMutability": "view",
       "payable": false,
       "inputs": [
+        {
+          "type": "address",
+          "name": "_lenderCommitmentForwarder"
+        },
         {
           "type": "uint256",
           "name": "_loanId"
@@ -227,6 +213,10 @@
       "payable": false,
       "inputs": [
         {
+          "type": "address",
+          "name": "_lenderCommitmentForwarder"
+        },
+        {
           "type": "uint256",
           "name": "_loanId"
         },
@@ -292,6 +282,6 @@
     "blockHash": "0xaa1af6a9e702b386ced5432bed1247053fbfc09b37b4af1717cf29c7290678be",
     "blockNumber": 4443398
   },
-  "numDeployments": 5,
+  "numDeployments": 6,
   "implementation": "0x193d59841945979e0AA7Cd7D62d7262285390073"
 }

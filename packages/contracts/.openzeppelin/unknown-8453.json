@@ -2474,6 +2474,16 @@
         "storage": [],
         "types": {}
       }
+    },
+    "dd60914d25956d9f8d49298a598d9aec9b4d7a7835dcce3eef879016bf74bc84": {
+      "address": "0xBf4E3fEA276057D0b26f52141557C835a7E2d534",
+      "txHash": "0x8ecc7b9398c95039a43e91a9af33a7d0d526675868e0b3176cf81ba79462cbdd",
+      "layout": {
+        "solcVersion": "0.8.9",
+        "storage": [],
+        "types": {},
+        "namespaces": {}
+      }
     }
   }
 }

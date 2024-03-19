@@ -7,6 +7,9 @@ import { DeployFunction } from 'hardhat-deploy/dist/types'
 This is an example deploy script that deploys a TransparentUpgradeableProxy manually assuming the impl is already deployed
 */
 const deployFn: DeployFunction = async (hre) => {
+
+  hre.log('Deploy proxy custom...')
+
   const tellerV2 = await hre.contracts.get('TellerV2')
   const marketRegistry = await hre.contracts.get('MarketRegistry')
 
@@ -79,5 +82,14 @@ deployFn.tags = [
   'lender-commitment-forwarder', 
   'lender-commitment-forwarder:proxy:deploy'
 ]
+
+deployFn.skip = async (hre) => {
+  return !(
+    hre.network.live &&
+    [  'localhost'].includes(
+      hre.network.name
+    )
+  )
+}
 deployFn.dependencies = ['teller-v2:deploy', 'market-registry:deploy']
 export default deployFn

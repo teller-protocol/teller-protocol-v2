@@ -3,7 +3,6 @@
 
 pragma solidity ^0.8.0;
 
-
 import {ITransparentUpgradeableProxy} from "./TransparentUpgradeableProxy.sol";
 import {Ownable} from "./Ownable.sol";
 

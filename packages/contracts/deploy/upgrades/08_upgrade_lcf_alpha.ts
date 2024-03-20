@@ -44,28 +44,14 @@ const deployFn: DeployFunction = async (hre) => {
   const LenderCommitmentForwarderAlphaImplementation =
     await hre.ethers.getContractFactory('LenderCommitmentForwarderAlpha')
 
-  /*
-  const upgrade = await hre.upgrades.upgradeProxy(
-    lcfStagingProxyAddress,
-    LenderCommitmentForwarderAlphaImplementation,
-    {
-      unsafeAllow: ['state-variable-immutable', 'constructor'],
-      constructorArgs: [
-        tellerV2ProxyAddress,
-        marketRegistryProxyAddress,
-        uniswapFactoryAddress
-      ]
-    }
-  )*/
-
-
+   
  
   await hre.upgrades.proposeBatchTimelock({
     title: 'LenderCommitmentForwarderAlpha: Upgrade',
     description: ` 
 # LenderCommitmentForwarderAlpha
 
-* Upgrades to static expansion.
+* Upgrade to harden against flash loan attacks.
 `,
     _steps: [
       {
@@ -88,24 +74,7 @@ const deployFn: DeployFunction = async (hre) => {
       },
     ],
   })
- 
-/*
-  const upgrade = await hre.upgrades.upgradeProxy(
-    lcfAlphaProxyAddress,
-    LenderCommitmentForwarderAlphaImplementation,
-    {
-      unsafeAllow: ['state-variable-immutable', 'constructor'],
-      constructorArgs: [
-        tellerV2ProxyAddress,
-        marketRegistryProxyAddress,
-        uniswapFactoryAddress
-      ]
-    }
-  )
-*/
-
-
-
+  
 
   hre.log('done.')
   hre.log('')
@@ -129,7 +98,10 @@ deployFn.skip = async (hre) => {
     !hre.network.live ||
     ![
       'localhost',
-     
+      'polygon',
+      'arbitrum',
+      'base',
+      'mainnet',
       'sepolia' 
       
       

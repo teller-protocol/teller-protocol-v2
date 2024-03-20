@@ -59,15 +59,20 @@ export const makeStudio = async (
     network: string;
   }
 
-  const getConfig = async (): Promise<IConfig> => {
+
+
+
+  const getStudioConfig = async (): Promise<IConfig> => {
     return await memlet.getJson("studio.json").catch(() => ({}));
   };
-  let studioConfig = await getConfig();
+  let studioConfig = await getStudioConfig();
 
+  //deprecated -- dont use cookies 
+  /*
   const setConfig = async (_config: IConfig): Promise<void> => {
     studioConfig = _config;
     await memlet.setJson("studio.json", _config);
-  };
+  };*/
 
   const api = axios.create({
     baseURL: "https://api.studio.thegraph.com/graphql",
@@ -90,7 +95,7 @@ export const makeStudio = async (
               ...prev,
               Cookie: undefined
             };
-            void setConfig(studioConfig);
+         //   void setConfig(studioConfig);
           }
           return `\t* ${e.message}`;
         });
@@ -208,16 +213,17 @@ export const makeStudio = async (
           const [_, cookieValue, cookieExpiration] = cookieRaw.match(
             cookieRegex
           )!;
-          await setConfig({
+          //store this in mem !? 
+         /* await setConfig({
             ...studioConfig,
             [networkConfig.owner.address]: {
               ...studioConfig[networkConfig.owner.address],
-              Cookie: {
-                value: cookieValue,
-                expiration: cookieExpiration
-              }
+           //   Cookie: {
+           //   value: cookieValue,
+           //    expiration: cookieExpiration
+           //  }
             }
-          });
+          });*/
           cookie = cookieValue;
         }
       }
@@ -361,6 +367,11 @@ export const makeStudio = async (
     getLatestVersion,
     watchVersionUpdate,
     beforeDeploy: async () => {
+
+      console.log(studioConfig)
+
+      console.log(networkConfig.owner.address)
+
       const deployKey = studioConfig["networkWallets"][networkConfig.owner.address]?.deployKey;
       if (!deployKey) throw new Error("No deploy key found");
 

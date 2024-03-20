@@ -1,4 +1,7 @@
-import path from "path";
+
+
+const fs = require('fs');
+const path = require('path');
 
 import { makeNodeDisklet } from "disklet";
 import { makeMemlet } from "memlet";
@@ -70,3 +73,63 @@ export const setNetworkConfig = async (
 ): Promise<void> => {
   await memlet.setJson(`${network}.json`, config);
 };
+
+
+
+
+ 
+
+export async function readConfigFile( file_path:any) : Promise<any> {
+
+   
+    try {
+      // Construct the file path
+   
+     // console.log({configPath})
+      // Check if the file exists
+      const exists = await fileExists(file_path);
+      if (exists) {
+        // Read the JSON file
+        const data = await readJSONFile(file_path);
+        
+
+        return data ; 
+      } else {
+        console.log('File not found');
+      }
+    } catch (err) {
+      console.error('Error:', err);
+    }
+  
+  }
+  
+  // Helper function to check if a file exists
+  function fileExists(filePath:String) {
+    return new Promise((resolve, reject) => {
+      fs.access(filePath, fs.constants.F_OK, (err:any) => {
+        if (err) {
+          resolve(false);
+        } else {
+          resolve(true);
+        }
+      });
+    });
+  }
+  
+  // Helper function to read a JSON file
+  function readJSONFile(filePath:String) {
+    return new Promise((resolve, reject) => {
+      fs.readFile(filePath, 'utf8', (err:any, data:any) => {
+        if (err) {
+          reject(err);
+        } else {
+          try {
+            const jsonData = JSON.parse(data);
+            resolve(jsonData);
+          } catch (err) {
+            reject(err);
+          }
+        }
+      });
+    });
+  }

@@ -1146,6 +1146,6 @@
     "blockHash": "0x270954492a1010a4e49fcad7ed5ad2fd4d5d496367ac1067311e3209357f8d3e",
     "blockNumber": 11395281
   },
-  "numDeployments": 1,
+  "numDeployments": 2,
   "implementation": "0x6b1eC259a35005b7562c92f42C490f39131fF1d8"
 }

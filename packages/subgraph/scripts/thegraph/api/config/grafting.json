@@ -5,7 +5,7 @@
         "arbitrum-one" : {
             "graft": true,
             "base":"QmYRVaPzBbj9UP7NkYaSFXfNmvBtGugJ74F8Tf7UAsg8jC",
-            "block":"190383669" 
+            "block":"192411000" 
 
         },
         "base" : {

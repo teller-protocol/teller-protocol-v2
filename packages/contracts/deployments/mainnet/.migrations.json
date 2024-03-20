@@ -21,6 +21,6 @@
   "lender-commitment-forwarder:extensions:flash-rollover:deploy": 1695673933,
   "lender-commitment-forwarder:extensions:flash-rollover:g3-upgrade": 1696625611,
   "lender-commitment-forwarder:alpha:deploy": 1710514296,
-  "lender-commitment-forwarder:proxy:deploy": 1710858663,
-  "lender-commitment-forwarder:extensions:flash-rollover:g4-upgrade": 1710858681
+  "lender-commitment-forwarder:extensions:flash-rollover:g4-upgrade": 1710858681,
+  "lender-commitment-forwarder:alpha:upgrade": 1710880931
 }

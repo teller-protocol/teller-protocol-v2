@@ -1,0 +1,101 @@
+{
+  "address": "0x90D08f8Df66dFdE93801783FF7A36876453DAE75",
+  "abi": [
+    {
+      "type": "constructor",
+      "stateMutability": "undefined",
+      "payable": false,
+      "inputs": []
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "Initialized",
+      "inputs": [
+        {
+          "type": "uint8",
+          "name": "version",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "balances",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": ""
+        },
+        {
+          "type": "address",
+          "name": ""
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "deposit",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "account"
+        },
+        {
+          "type": "address",
+          "name": "token"
+        },
+        {
+          "type": "uint256",
+          "name": "amount"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "initialize",
+      "constant": false,
+      "payable": false,
+      "inputs": [],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "withdraw",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "token"
+        },
+        {
+          "type": "uint256",
+          "name": "amount"
+        }
+      ],
+      "outputs": []
+    }
+  ],
+  "transactionHash": "0x1e2be6a87994d39266ece93ce376cd2791da68e351d7a99dafd22607afcaf6e7",
+  "receipt": {
+    "to": null,
+    "from": "0xD9B023522CeCe02251d877bb0EB4f06fDe6F98E6",
+    "blockHash": "0xe880a10a58f82be2cc72be8882f5f38f99ffc78e80ea8596ba801dc24a2c6d7e",
+    "blockNumber": 26
+  },
+  "numDeployments": 1,
+  "implementation": "0xf7B14778035fEAF44540A0bC1D4ED859bCB28229"
+}

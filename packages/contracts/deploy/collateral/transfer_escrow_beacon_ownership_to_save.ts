@@ -19,9 +19,8 @@ const deployFn: DeployFunction = async (hre) => {
 // tags and deployment
 deployFn.id = 'collateral:escrow-beacon:transfer-ownership-to-gnosis-safe'
 deployFn.tags = [
-  'collateral',
-  'collateral:escrow-beacon',
-  'collateral:escrow-beacon:deploy',
+  'collateral', 
+  'collateral:escrow-beacon:transfer-ownership-to-gnosis-safe',
 ]
 deployFn.dependencies = ['collateral:escrow-beacon:deploy']
 deployFn.skip = async (hre) => {

@@ -11,5 +11,6 @@
   "reputation-manager:deploy": 1711032017,
   "teller-v2:init": 1711032017,
   "lender-manager:transfer-ownership": 1711032017,
-  "liquidity-rewards:deploy": 1711032019
+  "liquidity-rewards:deploy": 1711032019,
+  "deploy-mock-tokens": 1711125342
 }

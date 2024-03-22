@@ -70,7 +70,16 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         _;
     }
 
-    /* External Functions */
+    modifier onlyProtocolOwner() {
+
+        address protocolOwner = OwnableUpgradeable(address(tellerV2)).owner();
+
+        require(_msgSender() == protocolOwner, "Sender not authorized");
+        _;
+    }
+
+
+         /* External Functions */
 
     /**
      * @notice Initializes the collateral manager.
@@ -273,8 +282,8 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     address _recipientAddress
 
     //who is the owner of collateral manager ? 
-    ) external onlyOwner {
-        
+    ) external onlyProtocolOwner {
+  
         ICollateralEscrowV1(_escrows[_bidId]).withdrawDustTokens(
                 _tokenAddress,
                 _amount,

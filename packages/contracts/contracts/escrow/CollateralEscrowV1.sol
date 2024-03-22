@@ -106,7 +106,7 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
         address tokenAddress, 
         uint256 amount,
         address recipient
-    ) external onlyOwner {  //the owner should be collateral manager 
+    ) external virtual onlyOwner {  //the owner should be collateral manager 
         
         require(tokenAddress != address(0), "Invalid token address");
 

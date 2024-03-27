@@ -40,4 +40,10 @@ const deployFn: DeployFunction = async (hre) => {
 deployFn.id = 'teller-v2:transfer-ownership-to-safe'
 deployFn.tags = ['teller-v2', 'teller-v2:transfer-ownership-to-safe']
 deployFn.dependencies = ['teller-v2:init']
+deployFn.skip = async (hre) => {
+  return (
+    !hre.network.live ||
+    !['mainnet', 'polygon', 'arbitrum', 'base'].includes(hre.network.name)
+  )
+}
 export default deployFn

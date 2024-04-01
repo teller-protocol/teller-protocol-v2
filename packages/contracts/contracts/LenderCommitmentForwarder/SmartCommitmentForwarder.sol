@@ -4,11 +4,12 @@ pragma solidity ^0.8.0;
 import "../TellerV2MarketForwarder_G3.sol";
 
 import "../interfaces/ILenderCommitmentForwarder.sol";
+import "../interfaces/ISmartCommitmentForwarder.sol";
 import "./LenderCommitmentForwarder_G1.sol";
 
 import { CommitmentCollateralType, ISmartCommitment } from "../interfaces/ISmartCommitment.sol";
 
-contract SmartCommitmentForwarder is TellerV2MarketForwarder_G3 {
+contract SmartCommitmentForwarder is TellerV2MarketForwarder_G3, ISmartCommitmentForwarder {
     event ExercisedSmartCommitment(
         address indexed smartCommitmentAddress,
         address borrower,
@@ -35,7 +36,7 @@ contract SmartCommitmentForwarder is TellerV2MarketForwarder_G3 {
      * @param _loanDuration The overall duration for the loan.  Must be longer than market payment cycle duration.
      * @return bidId The ID of the loan that was created on TellerV2
      */
-    function acceptCommitmentWithRecipient(
+    function acceptSmartCommitmentWithRecipient(
         address _smartCommitmentAddress,
         uint256 _principalAmount,
         uint256 _collateralAmount,

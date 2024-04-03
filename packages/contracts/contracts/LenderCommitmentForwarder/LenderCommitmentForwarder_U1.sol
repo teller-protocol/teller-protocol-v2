@@ -33,6 +33,14 @@ import "./extensions/ExtensionsContextUpgradeable.sol";
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
+
+
+/*
+
+Only do decimal expansion if it is an ERC20   not anything else !! 
+
+*/
+
 contract LenderCommitmentForwarder_U1 is
     ExtensionsContextUpgradeable, //this should always be first for upgradeability
     TellerV2MarketForwarder_G2,
@@ -648,13 +656,26 @@ contract LenderCommitmentForwarder_U1 is
             return 0;
         }
 
-        return
+        if (_collateralTokenType == CommitmentCollateralType.ERC20) {
+             return
             MathUpgradeable.mulDiv(
                 _principalAmount,
                 STANDARD_EXPANSION_FACTOR,
                 _maxPrincipalPerCollateralAmount,
                 MathUpgradeable.Rounding.Up
             );
+        }
+
+        //for NFTs do not use the expansion factor 
+         return
+            MathUpgradeable.mulDiv(
+                _principalAmount,
+                1,
+                _maxPrincipalPerCollateralAmount,
+                MathUpgradeable.Rounding.Up
+            );
+
+       
     }
 
     /**

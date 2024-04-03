@@ -402,6 +402,64 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
         assertEq(requiredCollateral, 1000, "unexpected required collateral");
     }
 
+
+ function test_getRequiredCollateral_NFT_scenario_A() public {
+        bool zeroForOne = false;
+
+        principalTokenDecimals = 18;
+        collateralTokenDecimals = 6;
+
+        principalToken = new TestERC20Token(
+            "Test Wrapped ETH",
+            "TWETH",
+            0,
+            principalTokenDecimals
+        );
+
+     
+
+        uint256 principalAmount = 1000;
+        maxPrincipalPerCollateralAmount = 5000;
+
+        uint256 requiredCollateral = lenderCommitmentForwarder
+            .getRequiredCollateral(
+                principalAmount,
+                maxPrincipalPerCollateralAmount,
+                ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC721
+            );
+
+        assertEq(requiredCollateral, 1  , "unexpected required collateral");
+    }
+
+    function test_getRequiredCollateral_NFT_Scenario_B() public {
+        bool zeroForOne = false;
+
+        principalTokenDecimals = 18;
+        collateralTokenDecimals = 6;
+
+        principalToken = new TestERC20Token(
+            "Test Wrapped ETH",
+            "TWETH",
+            0,
+            principalTokenDecimals
+        );
+
+     
+
+        uint256 principalAmount = 100000;
+        maxPrincipalPerCollateralAmount = 5000;
+
+        uint256 requiredCollateral = lenderCommitmentForwarder
+            .getRequiredCollateral(
+                principalAmount,
+                maxPrincipalPerCollateralAmount,
+                ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC1155
+            );
+
+        assertEq(requiredCollateral, 20  , "unexpected required collateral");
+    }
+
+
     // why does this fail ?
     /* function test_getUniswapPriceRatioForPoolRoutes_decimal_scenario_A() public {
 

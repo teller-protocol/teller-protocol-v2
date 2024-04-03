@@ -672,7 +672,7 @@ contract LenderCommitmentForwarder_U1 is
             );
         }
 
-        //for NFTs, do not use the expansion factor 
+        //for NFTs, do not use the uniswap expansion factor 
          return
             MathUpgradeable.mulDiv(
                 _principalAmount,

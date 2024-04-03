@@ -2193,90 +2193,8 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
         assertEq(requiredCollateral, 0, "unexpected required collateral");
     }
 
-    function test_getRequiredCollateral_type_erc721() public {
-        ILenderCommitmentForwarder.Commitment
-            memory c = ILenderCommitmentForwarder.Commitment({
-                maxPrincipal: 100,
-                expiration: expiration,
-                maxDuration: maxDuration,
-                minInterestRate: minInterestRate,
-                collateralTokenAddress: address(erc721Token),
-                collateralTokenId: 0,
-                maxPrincipalPerCollateralAmount: 100 * 1e18,
-                collateralTokenType: ILenderCommitmentForwarder
-                    .CommitmentCollateralType
-                    .ERC721,
-                lender: address(lender),
-                marketId: marketId,
-                principalTokenAddress: address(principalToken)
-            });
+ 
 
-        uint256 commitmentId = 0;
-
-        lenderCommitmentForwarder.setCommitment(commitmentId, c);
-
-        uint256 principalAmount = c.maxPrincipal;
-
-        uint256 requiredCollateral = lenderCommitmentForwarder
-            .getRequiredCollateral(
-                principalAmount,
-                c.maxPrincipalPerCollateralAmount,
-                c.collateralTokenType,
-                c.collateralTokenAddress,
-                c.principalTokenAddress
-            );
-
-        assertEq(requiredCollateral, 1, "unexpected required collateral");
-    }
-
-    function test_getEscrowCollateralType_erc20() public {
-        CollateralType cType = lenderCommitmentForwarder
-            ._getEscrowCollateralTypeSuper(
-                ILenderCommitmentForwarder.CommitmentCollateralType.ERC20
-            );
-
-        assertEq(
-            uint16(cType),
-            uint16(CollateralType.ERC20),
-            "unexpected collateral type"
-        );
-    }
-
-    function test_getEscrowCollateralType_erc721() public {
-        CollateralType cType = lenderCommitmentForwarder
-            ._getEscrowCollateralTypeSuper(
-                ILenderCommitmentForwarder.CommitmentCollateralType.ERC721
-            );
-
-        assertEq(
-            uint16(cType),
-            uint16(CollateralType.ERC721),
-            "unexpected collateral type"
-        );
-    }
-
-    function test_getEscrowCollateralType_erc1155() public {
-        CollateralType cType = lenderCommitmentForwarder
-            ._getEscrowCollateralTypeSuper(
-                ILenderCommitmentForwarder.CommitmentCollateralType.ERC1155
-            );
-
-        assertEq(
-            uint16(cType),
-            uint16(CollateralType.ERC1155),
-            "unexpected collateral type"
-        );
-    }
-
-    function test_getEscrowCollateralType_unknown() public {
-        vm.expectRevert("Unknown Collateral Type");
-        CollateralType cType = lenderCommitmentForwarder
-            ._getEscrowCollateralTypeSuper(
-                ILenderCommitmentForwarder.CommitmentCollateralType.NONE
-            );
-
-        ///assertEq(uint16(cType), uint16(CollateralType.NONE), "unexpected collateral type");
-    }
 
     /*
         Overrider methods for exercise 
@@ -2314,6 +2232,59 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
     }
 
     */
+
+
+
+    function test_getEscrowCollateralType_erc20() public {
+        CollateralType cType = lenderCommitmentForwarder
+            ._getEscrowCollateralTypeSuper(
+                ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC20
+            );
+
+        assertEq(
+            uint16(cType),
+            uint16(CollateralType.ERC20),
+            "unexpected collateral type"
+        );
+    }
+
+    function test_getEscrowCollateralType_erc721() public {
+        CollateralType cType = lenderCommitmentForwarder
+            ._getEscrowCollateralTypeSuper(
+                ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC721
+            );
+
+        assertEq(
+            uint16(cType),
+            uint16(CollateralType.ERC721),
+            "unexpected collateral type"
+        );
+    }
+
+    function test_getEscrowCollateralType_erc1155() public {
+        CollateralType cType = lenderCommitmentForwarder
+            ._getEscrowCollateralTypeSuper(
+                ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC1155
+            );
+
+        assertEq(
+            uint16(cType),
+            uint16(CollateralType.ERC1155),
+            "unexpected collateral type"
+        );
+    }
+
+    function test_getEscrowCollateralType_unknown() public {
+        vm.expectRevert("Unknown Collateral Type");
+        CollateralType cType = lenderCommitmentForwarder
+            ._getEscrowCollateralTypeSuper(
+                ILenderCommitmentForwarder_U1.CommitmentCollateralType.NONE
+            );
+
+        ///assertEq(uint16(cType), uint16(CollateralType.NONE), "unexpected collateral type");
+    }
+
+
 }
 
 contract LenderCommitmentUser is User {

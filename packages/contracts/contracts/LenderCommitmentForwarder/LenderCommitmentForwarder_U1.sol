@@ -202,8 +202,14 @@ contract LenderCommitmentForwarder_U1 is
 
         commitments[commitmentId_] = _commitment;
 
+        require(_poolRoutes.length == 0 || _commitment.collateralTokenType != CommitmentCollateralType.ERC20 , "can only use pool routes with ERC20 collateral");
+
+
         //routes length of 0 means ignore price oracle limits
         require(_poolRoutes.length <= 2, "invalid pool routes length");
+
+      
+       
 
         for (uint256 i = 0; i < _poolRoutes.length; i++) {
             commitmentUniswapPoolRoutes[commitmentId_].push(_poolRoutes[i]);
@@ -666,7 +672,7 @@ contract LenderCommitmentForwarder_U1 is
             );
         }
 
-        //for NFTs do not use the expansion factor 
+        //for NFTs, do not use the expansion factor 
          return
             MathUpgradeable.mulDiv(
                 _principalAmount,

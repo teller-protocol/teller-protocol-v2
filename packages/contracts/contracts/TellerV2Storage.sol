@@ -5,7 +5,7 @@ import { IMarketRegistry } from "./interfaces/IMarketRegistry.sol";
 import "./interfaces/IEscrowVault.sol";
 import "./interfaces/IReputationManager.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./interfaces/ICollateralManager.sol";
 import { PaymentType, PaymentCycleType } from "./libraries/V2Calculations.sol";
 import "./interfaces/ILenderManager.sol";
@@ -64,7 +64,7 @@ struct Bid {
  * @param loanDuration The duration of the loan.
  */
 struct LoanDetails {
-    ERC20 lendingToken;
+    IERC20 lendingToken;
     uint256 principal;
     Payment totalRepaid;
     uint32 timestamp;
@@ -89,7 +89,7 @@ abstract contract TellerV2Storage_G0 {
     /** Storage Variables */
 
     // Current number of bids.
-    uint256 public bidId = 0;
+    uint256 public bidId;
 
     // Mapping of bidId to bid information.
     mapping(uint256 => Bid) public bids;
@@ -158,4 +158,8 @@ abstract contract TellerV2Storage_G5 is TellerV2Storage_G4 {
     IEscrowVault public escrowVault;
 }
 
-abstract contract TellerV2Storage is TellerV2Storage_G5 {}
+abstract contract TellerV2Storage_G6 is TellerV2Storage_G5 {
+    mapping(uint256 => address) public repaymentListenerForBid;
+}
+
+abstract contract TellerV2Storage is TellerV2Storage_G6 {}

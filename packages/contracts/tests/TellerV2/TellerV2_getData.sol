@@ -293,6 +293,7 @@ contract TellerV2_initialize is Testable {
             address principalTokenAddress,
             uint256 principalAmount,
             uint32 acceptedTimestamp,
+            uint32 loanDuration,
             BidState bidState
         ) = tellerV2.getLoanSummary(bidId);
 
@@ -320,6 +321,7 @@ contract TellerV2_initialize is Testable {
             address principalTokenAddress,
             uint256 principalAmount,
             uint32 acceptedTimestamp,
+            uint32 lastRepaidTimestamp,
             BidState bidState
         ) = tellerV2.getLoanSummary(bidId);
 
@@ -374,7 +376,10 @@ contract TellerV2_initialize is Testable {
 
         tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
 
-        Payment memory amountDue = tellerV2.calculateAmountDue(bidId);
+        Payment memory amountDue = tellerV2.calculateAmountDue(
+            bidId,
+            block.timestamp
+        );
 
         assertEq(amountDue.principal, 2);
     }
@@ -411,7 +416,10 @@ contract TellerV2_initialize is Testable {
 
         tellerV2.mock_setBidState(bidId, BidState.PENDING);
 
-        Payment memory amountDue = tellerV2.calculateAmountDue(bidId);
+        Payment memory amountDue = tellerV2.calculateAmountDue(
+            bidId,
+            block.timestamp
+        );
 
         assertEq(amountDue.principal, 0);
     }
@@ -522,7 +530,10 @@ contract TellerV2_initialize is Testable {
         tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
         vm.warp(2500);
 
-        Payment memory amountOwed = tellerV2.calculateAmountOwed(bidId);
+        Payment memory amountOwed = tellerV2.calculateAmountOwed(
+            bidId,
+            block.timestamp
+        );
 
         assertEq(amountOwed.principal, 100);
     }
@@ -794,7 +805,7 @@ contract TellerV2_initialize is Testable {
 
         bool canLiq = tellerV2._canLiquidateLoanSuper(bidId, 500);
 
-        assertEq(canLiq, false, "unexpected liquidation status");
+        assertEq(canLiq, true, "unexpected liquidation status");
     }
 
     function test_canLiquidateLoan_internal_false() public {

@@ -1,6 +1,7 @@
 import chalk from 'chalk'
 import { makeNodeDisklet } from 'disklet'
 import { Contract } from 'ethers'
+import hre from 'hardhat'
 import { DeployOptions, DeployResult, Libraries } from 'hardhat-deploy/types'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
 
@@ -15,7 +16,6 @@ interface CommonDeployArgs extends Omit<DeployOptions, 'from'> {
 export interface DeployArgs extends CommonDeployArgs {
   contract: string
   args?: any[]
-  skipIfAlreadyDeployed?: boolean
   mock?: boolean
 }
 
@@ -24,13 +24,19 @@ export type DeployedContract<C extends Contract> = C & {
 }
 
 export const deploy = async <C extends Contract>(
-  args: DeployArgs
+  _args: DeployArgs
 ): Promise<DeployedContract<C>> => {
-  const { hre, skipIfAlreadyDeployed = true, indent = 1 } = args
+  const args = Object.assign(
+    {
+      skipIfAlreadyDeployed: false,
+      indent: 1,
+    },
+    _args
+  )
   const {
-    deployments: { deploy, getOrNull },
+    deployments: { deploy, get, getOrNull, fetchIfDifferent },
     getNamedAccounts,
-  } = hre
+  } = args.hre
 
   const { deployer } = await getNamedAccounts()
 
@@ -38,32 +44,44 @@ export const deploy = async <C extends Contract>(
   const contractName = `${args.contract}${args.mock ? 'Mock' : ''}`
   const contractDeployName = args.name ?? args.contract
 
-  const existingContract = await getOrNull(contractDeployName)
-  let contractAddress: string
+  const deployOpts: DeployOptions = {
+    ...args,
+    contract: contractName,
+    from: deployer,
+  }
+
+  const existingDeployment = await getOrNull(contractDeployName)
+  const { differences: isDifferent } = await fetchIfDifferent(
+    contractDeployName,
+    {
+      ...deployOpts,
+      // We want to always check if the contract is different
+      skipIfAlreadyDeployed: false,
+    }
+  )
   let result: DeployResult
 
-  if (!existingContract || (existingContract && !skipIfAlreadyDeployed)) {
-    result = await deploy(contractDeployName, {
-      ...args,
-      contract: contractName,
-      from: deployer,
-    })
-    contractAddress = result.address
+  const skippingDifferent =
+    !!existingDeployment && args.skipIfAlreadyDeployed && isDifferent
+  if (isDifferent && !skippingDifferent) {
+    result = await deploy(contractDeployName, deployOpts)
   } else {
-    result = { ...existingContract, newlyDeployed: false }
-    contractAddress = existingContract.address
+    result = Object.assign(await get(contractDeployName), {
+      newlyDeployed: false,
+    })
   }
 
   await onDeployResult({
     result,
+    skippingDifferent,
     contract: contractName,
     name: contractDeployName,
     hre,
-    indent,
+    indent: args.indent,
   })
 
   const contract = (await hre.contracts.get(contractDeployName, {
-    at: contractAddress,
+    at: result.address,
   })) as DeployedContract<C>
   contract.deployResult = result
   return contract
@@ -71,6 +89,7 @@ export const deploy = async <C extends Contract>(
 
 interface DeployResultArgs {
   result: DeployResult
+  skippingDifferent: boolean
   hre: HardhatRuntimeEnvironment
   contract: string
   name: string
@@ -78,7 +97,9 @@ interface DeployResultArgs {
 }
 
 const onDeployResult = async (args: DeployResultArgs): Promise<void> => {
-  const { result, hre, contract, name, indent = 1 } = args
+  const { result, skippingDifferent, hre, contract, name, indent = 1 } = args
+
+  hre.log('')
 
   let displayName = name
   if (contract !== name) {
@@ -88,23 +109,54 @@ const onDeployResult = async (args: DeployResultArgs): Promise<void> => {
   //   displayName = `${displayName} (${chalk.bold.italic(result.artifactName)})`
   // }
 
+  if (result.newlyDeployed) {
+    displayName = chalk.greenBright(displayName)
+  }
+  if (skippingDifferent) {
+    displayName = chalk.bgYellow(chalk.black(displayName))
+  }
+
   hre.log(`${displayName}:`, {
     indent,
     star: true,
-    nl: false,
   })
 
-  if (result.newlyDeployed) {
-    const gas = chalk.cyan(`${result.receipt!.gasUsed} gas`)
+  if (skippingDifferent) {
     hre.log(
-      ` ${chalk.green('new')} ${result.address} ${
-        result.receipt ? 'with ' + gas : ''
-      }`
+      chalk.yellowBright(
+        '⚠️ Skipping Contract Deployment ⚠️ Deployed Contract Different than Compiled Contract ⚠️'
+      ),
+      {
+        indent: indent + 2,
+      }
+    )
+  }
+
+  if (result.newlyDeployed) {
+    const tx = await hre.ethers.provider.getTransaction(
+      result.receipt!.transactionHash
+    )
+    const gas = result.receipt
+      ? ` with ${chalk.cyan(`${result.receipt.gasUsed} gas`)}`
+      : ''
+    const gasPrice = ''
+    // tx.gasPrice
+    //   ? ` @ ${chalk.cyan(
+    //       `${hre.ethers.utils.formatUnits(tx.gasPrice, 'gwei')} gwei`
+    //     )}`
+    //   : ''
+    hre.log(
+      ` ${chalk.green('new')} ${chalk.bold(result.address)}${gas}${gasPrice}`,
+      {
+        indent: indent + 2,
+      }
     )
 
     await saveDeploymentBlock(hre.network.name, result.receipt!.blockNumber)
   } else {
-    hre.log(` ${chalk.yellow('reusing')} ${result.address}`)
+    hre.log(`${chalk.yellow('reusing')} ${chalk.bold(result.address)}`, {
+      indent: indent + 2,
+    })
   }
 }
 

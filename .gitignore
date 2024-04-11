@@ -18,6 +18,8 @@ typechain
 
 # Subgraph
 packages/subgraph/config/config.json
+packages/subgraph/scripts/thegraph/api/config/cookies.json
+packages/subgraph/scripts/thegraph/api/config/studio.json
 packages/subgraph/subgraph.yaml
 packages/subgraph/generated
 packages/subgraph/abis/*
@@ -58,3 +60,5 @@ yarn-error.log*
 yalc.lock
 .history
 .bin
+
+.yarn/versions/

@@ -19,7 +19,7 @@ import { User } from "../Test_Helpers.sol";
 
 import "../../contracts/escrow/CollateralEscrowV1.sol";
 import "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
-import "../../contracts/LenderCommitmentForwarder.sol";
+import "../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarder_G1.sol";
 import "../tokens/TestERC20Token.sol";
 
 import "../../contracts/CollateralManager.sol";
@@ -81,7 +81,7 @@ contract TellerV2_Test is Testable {
         escrowVault.initialize();
 
         // Deploy LenderCommitmentForwarder
-        LenderCommitmentForwarder lenderCommitmentForwarder = new LenderCommitmentForwarder(
+        LenderCommitmentForwarder_G1 lenderCommitmentForwarder = new LenderCommitmentForwarder_G1(
                 address(tellerV2),
                 address(marketRegistry)
             );
@@ -184,9 +184,14 @@ contract TellerV2_Test is Testable {
 
         assertEq(collateralAmount, escrowBalance, "Collateral was not stored");
 
+        vm.warp(100000);
+
         // Repay loan
         uint256 borrowerBalanceBefore = wethMock.balanceOf(address(borrower));
-        Payment memory amountOwed = tellerV2.calculateAmountOwed(bidId);
+        Payment memory amountOwed = tellerV2.calculateAmountOwed(
+            bidId,
+            block.timestamp
+        );
         borrower.addAllowance(
             address(daiMock),
             address(tellerV2),

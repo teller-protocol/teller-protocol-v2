@@ -32,8 +32,8 @@ contract TellerV2_Override is TellerV2 {
         lenderManager = ILenderManager(_lenderManager);
     }
 
-    function setLenderManagerSuper(address lenderManager) public initializer {
-        _setLenderManager(lenderManager);
+    function setLenderManagerSuper(address _lenderManager) public initializer {
+        lenderManager = ILenderManager(_lenderManager);
     }
 
     function setMarketRegistrySuper(address _marketRegistry) public {
@@ -147,7 +147,10 @@ contract TellerV2_Override is TellerV2 {
         override
         returns (address)
     {
-        return mockMsgSenderForMarket;
+        if (mockMsgSenderForMarket != address(0)) {
+            return mockMsgSenderForMarket;
+        }
+        return super._msgSenderForMarket(_marketId);
     }
 
     function _submitBid(

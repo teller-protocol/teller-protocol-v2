@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "../contracts/TellerV2MarketForwarder.sol";
+import "../contracts/TellerV2MarketForwarder_G1.sol";
 
 import "./tokens/TestERC20Token.sol";
 import "../contracts/TellerV2Context.sol";
@@ -18,6 +18,8 @@ import "../contracts/mock/MarketRegistryMock.sol";
 import "../contracts/mock/CollateralManagerMock.sol";
 
 import "../contracts/MarketLiquidityRewards.sol";
+
+import "forge-std/console.sol";
 
 contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
     MarketLiquidityUser private marketOwner;
@@ -47,7 +49,6 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
     uint8 constant collateralTokenDecimals = 6;
 
     bool verifyLoanStartTimeWasCalled;
-    bool verifyExpectedTokenAddressWasCalled;
 
     bool verifyRewardRecipientWasCalled;
     bool verifyCollateralAmountWasCalled;
@@ -111,7 +112,6 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
         //delete allocationCount;
 
         verifyLoanStartTimeWasCalled = false;
-        verifyExpectedTokenAddressWasCalled = false;
 
         verifyRewardRecipientWasCalled = false;
         verifyCollateralAmountWasCalled = false;
@@ -129,7 +129,7 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
                 requiredPrincipalTokenAddress: address(principalToken),
                 requiredCollateralTokenAddress: address(collateralToken),
                 minimumCollateralPerPrincipalAmount: 0,
-                rewardPerLoanPrincipalAmount: 0,
+                rewardPerLoanPrincipalAmount: 1e18,
                 bidStartTimeMin: uint32(startTime),
                 bidStartTimeMax: uint32(startTime + 10000),
                 allocationStrategy: AllocationStrategy.BORROWER
@@ -210,9 +210,13 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
         mockBid.borrower = address(borrower);
         mockBid.lender = address(lender);
         mockBid.marketplaceId = marketId;
+        mockBid.loanDetails.loanDuration = 80000;
         mockBid.loanDetails.lendingToken = (principalToken);
-        mockBid.loanDetails.principal = 0;
+        mockBid.loanDetails.principal = 10000;
         mockBid.loanDetails.acceptedTimestamp = uint32(block.timestamp);
+        mockBid.loanDetails.lastRepaidTimestamp = uint32(
+            block.timestamp + 5000
+        );
         mockBid.state = BidState.PAID;
 
         TellerV2Mock(tellerV2).setMockBid(mockBid);
@@ -221,6 +225,7 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
         uint256 bidId = 0;
 
         _setAllocation(allocationId);
+        allocatedRewards[allocationId].rewardTokenAmount = 4000;
 
         borrower._claimRewards(allocationId, bidId);
 
@@ -228,12 +233,6 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
             verifyLoanStartTimeWasCalled,
             true,
             "verifyLoanStartTime was not called"
-        );
-
-        assertEq(
-            verifyExpectedTokenAddressWasCalled,
-            true,
-            " verifyExpectedTokenAddress was not called"
         );
 
         assertEq(
@@ -255,11 +254,13 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
     function test_calculateRewardAmount_weth_principal() public {
         uint256 loanPrincipal = 1e8;
         uint256 principalTokenDecimals = 18;
+        uint32 loanDuration = 60 * 60 * 24 * 365;
 
         uint256 rewardPerLoanPrincipalAmount = 1e16; // expanded by token decimals so really 0.01
 
         uint256 rewardAmount = super._calculateRewardAmount(
             loanPrincipal,
+            loanDuration,
             principalTokenDecimals,
             rewardPerLoanPrincipalAmount
         );
@@ -270,11 +271,13 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
     function test_calculateRewardAmount_usdc_principal() public {
         uint256 loanPrincipal = 1e8;
         uint256 principalTokenDecimals = 6;
+        uint32 loanDuration = 60 * 60 * 24 * 365;
 
         uint256 rewardPerLoanPrincipalAmount = 1e4; // expanded by token decimals so really 0.01
 
         uint256 rewardAmount = super._calculateRewardAmount(
             loanPrincipal,
+            loanDuration,
             principalTokenDecimals,
             rewardPerLoanPrincipalAmount
         );
@@ -366,15 +369,6 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
         super._verifyLoanStartTime(400, 200, 300);
     }
 
-    function test_verifyExpectedTokenAddress() public {
-        vm.expectRevert(bytes("Invalid expected token address."));
-
-        super._verifyExpectedTokenAddress(
-            address(principalToken),
-            address(collateralToken)
-        );
-    }
-
     function allocateRewards(
         MarketLiquidityRewards.RewardAllocation calldata _allocation
     ) public override returns (uint256 allocationId_) {
@@ -421,13 +415,6 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
         uint32 maxStartTime
     ) internal override {
         verifyLoanStartTimeWasCalled = true;
-    }
-
-    function _verifyExpectedTokenAddress(
-        address loanTokenAddress,
-        address expectedTokenAddress
-    ) internal override {
-        verifyExpectedTokenAddressWasCalled = true;
     }
 }
 
@@ -510,6 +497,7 @@ contract TellerV2Mock is TellerV2Context {
             address principalTokenAddress,
             uint256 principalAmount,
             uint32 acceptedTimestamp,
+            uint32 lastRepaidTimestamp,
             BidState bidState
         )
     {
@@ -521,6 +509,7 @@ contract TellerV2Mock is TellerV2Context {
         principalTokenAddress = address(bid.loanDetails.lendingToken);
         principalAmount = bid.loanDetails.principal;
         acceptedTimestamp = bid.loanDetails.acceptedTimestamp;
+        lastRepaidTimestamp = bid.loanDetails.lastRepaidTimestamp;
         bidState = bid.state;
     }
 }

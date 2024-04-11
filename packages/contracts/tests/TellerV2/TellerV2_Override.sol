@@ -147,7 +147,10 @@ contract TellerV2_Override is TellerV2 {
         override
         returns (address)
     {
-        return mockMsgSenderForMarket;
+        if (mockMsgSenderForMarket != address(0)) {
+            return mockMsgSenderForMarket;
+        }
+        return super._msgSenderForMarket(_marketId);
     }
 
     function _submitBid(

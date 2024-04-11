@@ -300,9 +300,14 @@ contract TellerV2_bids_test is Testable {
         tellerV2.setMockMsgSenderForMarket(address(lender));
         tellerV2.mock_setBidState(bidId, BidState.PENDING);
 
-        //how to specify action not allowed ?
-        vm
-            .expectRevert /* ActionNotAllowed(bidId,"cancelBid","Only the bid owner can cancel!") */();
+        vm.expectRevert(
+            abi.encodeWithSelector(
+                ActionNotAllowed.selector,
+                bidId,
+                "cancelBid",
+                "Only the bid owner can cancel!"
+            )
+        );
         tellerV2.cancelBid(bidId);
     }
 
@@ -683,27 +688,37 @@ contract TellerV2_bids_test is Testable {
         tellerV2.repayLoanFull(bidId);
     }
 
+    function test_lender_close_loan_not_lender() public {
+        uint256 bidId = 1;
+        setMockBid(bidId);
+
+        tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
+        tellerV2.mock_setBidDefaultDuration(bidId, 1000);
+        vm.warp(2000 * 1e20);
+
+        vm.expectRevert("only lender can close loan");
+        vm.prank(address(borrower));
+        tellerV2.lenderCloseLoan(bidId);
+    }
+
+       
     function test_lender_close_loan() public {
         uint256 bidId = 1;
         setMockBid(bidId);
 
-        tellerV2.setCollateralManagerSuper(address(collateralManagerMock));
+         //set the account that will be paying the loan off
+       // tellerV2.setMockMsgSenderForMarket(address(lender));
 
+        tellerV2.setCollateralManagerSuper(address(collateralManagerMock));
         tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
+        tellerV2.mock_setBidDefaultDuration(bidId, 1000);
         vm.warp(2000 * 1e20);
 
-        tellerV2.mock_setBidDefaultDuration(bidId, 1000);
-
-        //set the account that will be paying the loan off
-        tellerV2.setMockMsgSenderForMarket(address(lender));
-
-        lendingToken.approve(address(tellerV2), 1e20);
-
+        vm.prank(address(lender));
         tellerV2.lenderCloseLoan(bidId);
 
-        BidState state = tellerV2.getBidState(bidId);
         // make sure the state is now CLOSED
-
+        BidState state = tellerV2.getBidState(bidId);
         require(state == BidState.CLOSED, "bid was not closed");
     }
 

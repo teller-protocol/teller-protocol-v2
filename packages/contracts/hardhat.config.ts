@@ -107,6 +107,7 @@ type NetworkNames =
   | 'goerli'
   | 'mantle-testnet'
   | 'tenderly'
+  | 'clarity'
 const networkUrls: Record<NetworkNames, string> = {
   // Main Networks
   mainnet:
@@ -144,6 +145,7 @@ const networkUrls: Record<NetworkNames, string> = {
       ? `https://eth-goerli.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
       : ''),
   'mantle-testnet': 'https://rpc.testnet.mantle.xyz',
+  'clarity': process.env.CLARITY_RPC_URL ?? '',  
   tenderly: process.env.TENDERLY_RPC_URL ?? '',
 }
 
@@ -195,6 +197,7 @@ export default <HardhatUserConfig>{
       arbitrumOne: process.env.ARBISCAN_VERIFY_API_KEY,
       base: process.env.BASESCAN_VERIFY_API_KEY,
       mantle: process.env.MANTLE_VERIFY_API_KEY ?? 'xyz',
+      clarity: '', //none ? 
 
       // Test Networks
       sepolia: process.env.ETHERSCAN_VERIFY_API_KEY,
@@ -206,6 +209,14 @@ export default <HardhatUserConfig>{
       {
         network: 'base',
         chainId: 8453,
+        urls: {
+          apiURL: 'https://api.basescan.org/api',
+          browserURL: 'https://basescan.org',
+        },
+      },
+      {
+        network: 'clarity',
+        chainId: 66814,
         urls: {
           apiURL: 'https://api.basescan.org/api',
           browserURL: 'https://basescan.org',
@@ -272,6 +283,7 @@ export default <HardhatUserConfig>{
           },
         },
       },
+ 
     ],
   },
 
@@ -377,7 +389,8 @@ export default <HardhatUserConfig>{
       url: networkUrls.polygon,
       chainId: 137,
       live: true,
-      gasPrice: Number(ethers.parseUnits('180', 'gwei')),
+       
+       gasPrice: Number(ethers.parseUnits('350', 'gwei')),
 
       verify: {
         etherscan: {
@@ -409,6 +422,8 @@ export default <HardhatUserConfig>{
         },
       },
     }),
+   
+    
     mantle: networkConfig({
       url: networkUrls.mantle,
       chainId: 5000,
@@ -423,6 +438,24 @@ export default <HardhatUserConfig>{
       verify: {
         etherscan: {
           apiKey: process.env.MANTLE_VERIFY_API_KEY,
+        },
+      },
+    }),
+
+    clarity: networkConfig({
+      url: networkUrls.clarity,
+      chainId: 66814,
+      live: true,
+      gas: 9_000_000,
+      gasPrice: Number(ethers.parseUnits('1.00', 'gwei')),
+
+      // companionNetworks: {
+      //   l1: 'mainnet',
+      // },
+
+      verify: {
+        etherscan: {
+          apiKey: process.env.CLARITY_VERIFY_API_KEY,
         },
       },
     }),

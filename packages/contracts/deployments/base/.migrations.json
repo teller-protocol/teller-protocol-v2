@@ -15,5 +15,8 @@
   "default-proxy-admin:transfer": 1692663253,
   "lender-commitment-forwarder:staging:deploy": 1695674719,
   "lender-commitment-forwarder:extensions:flash-rollover:deploy": 1695676144,
-  "lender-commitment-forwarder:extensions:flash-rollover:g3-upgrade": 1696628411
+  "lender-commitment-forwarder:extensions:flash-rollover:g3-upgrade": 1696628411,
+  "lender-commitment-forwarder:extensions:flash-rollover:g4-upgrade": 1710860922,
+  "lender-commitment-forwarder:alpha:deploy": 1709579909,
+  "lender-commitment-forwarder:alpha:upgrade": 1710880557
 }

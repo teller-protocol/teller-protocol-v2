@@ -56,12 +56,14 @@ const deployFn: DeployFunction = async (hre) => {
     }
   )*/
 
+   
+ 
   await hre.upgrades.proposeBatchTimelock({
     title: 'LenderCommitmentForwarderAlpha: Upgrade',
     description: ` 
 # LenderCommitmentForwarderAlpha
 
-* Fixed issue with zero length path.
+* Upgrade to harden against flash loan attacks.
 `,
     _steps: [
       {
@@ -95,6 +97,7 @@ const deployFn: DeployFunction = async (hre) => {
     }
   )
 */
+  
 
   hre.log('done.')
   hre.log('')
@@ -114,7 +117,17 @@ deployFn.tags = [
 deployFn.dependencies = ['lender-commitment-forwarder:alpha:deploy']
 deployFn.skip = async (hre) => {
   return (
-    !hre.network.live || !['localhost', 'sepolia'].includes(hre.network.name)
+    !hre.network.live ||
+    ![
+      'localhost',
+      'polygon',
+      'arbitrum',
+      'base',
+      'mainnet',
+      'sepolia' 
+      
+      
+    ].includes(hre.network.name)
   )
 }
 export default deployFn

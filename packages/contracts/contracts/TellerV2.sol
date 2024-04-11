@@ -745,9 +745,15 @@ contract TellerV2 is
         uint256 _bidId,
         address _collateralRecipient
     ) internal acceptedLoan(_bidId, "lenderClaimCollateral") {
+
+         Bid storage bid = bids[_bidId];
+         
+        require(
+            _msgSenderForMarket(bid.marketplaceId) == bid.lender,
+            "only lender can close loan"
+        );
         require(isLoanDefaulted(_bidId), "Loan must be defaulted.");
 
-        Bid storage bid = bids[_bidId];
         bid.state = BidState.CLOSED;
 
         address sender = _msgSenderForMarket(bid.marketplaceId);

@@ -17,6 +17,9 @@
   "lender-commitment-forwarder:staging:deploy": 1695676165,
   "lender-commitment-forwarder:extensions:flash-rollover:deploy": 1695676174,
   "teller-v2:loan-liquidated-state-upgrade": 1695676183,
+  "teller-v2:loan-defaulted-state-upgrade": 1695676184,
   "lender-commitment-forwarder:extensions:flash-rollover:g3-upgrade": 1696625803,
-  "lender-commitment-forwarder:alpha:deploy": 1709062560
+  "lender-commitment-forwarder:extensions:flash-rollover:g4-upgrade": 1696625804,
+  "lender-commitment-forwarder:alpha:deploy": 1709062560,
+  "lender-commitment-forwarder:alpha:upgrade": 1710880450
 }

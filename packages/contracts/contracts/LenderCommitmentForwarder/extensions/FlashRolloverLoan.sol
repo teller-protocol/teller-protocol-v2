@@ -5,11 +5,11 @@ import "./FlashRolloverLoan_G5.sol";
 
 contract FlashRolloverLoan is FlashRolloverLoan_G5 {
     constructor(
-        address _tellerV2, 
+        address _tellerV2,
         address _poolAddressesProvider
     )
         FlashRolloverLoan_G5(
-            _tellerV2,  
+            _tellerV2,
             _poolAddressesProvider
         )
     {}

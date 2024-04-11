@@ -15,6 +15,9 @@ import {
   ReleaseType
 } from "./utils/types";
 
+import {readConfigFile} from "./utils/config"
+import path from "path";
+
 const mutex = new Mutex();
 
 const progressBars = new MultiBar({
@@ -252,13 +255,28 @@ const buildAndDeploy = async ({
     const graftingBlock = latestVersion.latestEthereumBlockNumber;
    
       //override grafting base here 
+ 
 
-      const USE_CUSTOM_GRAFTING = true;
+    const grafting_config_data = await readConfigFile(  path.join(__dirname, 'api', 'config',  'grafting.json')  );
+    console.log({grafting_config_data})
+
+    //if (!grafting_config_data) {
+    //throw new Error("no grafting config found ")
+   // }
+
+
+     let grafting_config_for_network = grafting_config_data["networks"][subgraph.network] ;
+
+     console.log( subgraph.network )
+
+     console.log({grafting_config_for_network})
+
+      const USE_CUSTOM_GRAFTING = grafting_config_for_network.graft;
 
       if (USE_CUSTOM_GRAFTING) {
         args.grafting = {
-          base: "Qmdv9ReC57dgsNXhLRamkRCRyLQWzMTLikoxHKVjZkJz6Y",
-          block: "53711025"
+          base: grafting_config_for_network.base,
+          block: grafting_config_for_network.block
 
        };
       }else{
@@ -340,3 +358,4 @@ async function waitForSync({
     });
   });
 }
+

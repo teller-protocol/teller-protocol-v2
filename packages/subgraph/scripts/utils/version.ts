@@ -28,46 +28,34 @@ export const updatePackageVersion = async (version: string): Promise<void> => {
 };
 
 export const getNextVersion = (releaseType: ReleaseType): string => {
-  const latestVersion = getPackageVersion();
-  let nextVersion: string | undefined | null;
+  const latestVersion = new semver.SemVer(getPackageVersion());
+  let nextVersion: semver.SemVer;
   switch (releaseType) {
     case "prepatch":
-      nextVersion = semver.inc(latestVersion, "prepatch");
+      nextVersion = latestVersion.inc("prepatch");
       break;
 
     case "preminor":
-      nextVersion = semver.inc(latestVersion, "preminor");
+      nextVersion = latestVersion.inc("preminor");
       break;
 
     case "prerelease":
-      nextVersion = semver.inc(latestVersion, "prerelease");
+      nextVersion = latestVersion.inc("prerelease");
       break;
 
     case "release":
-      nextVersion = semver.inc(latestVersion, "patch");
+      nextVersion = latestVersion.inc("patch");
       break;
 
     case "missing": {
-      const prereleaseValues = semver.prerelease(latestVersion);
-      let prereleaseVersion = 0;
-      if (prereleaseValues != null) {
-        prereleaseVersion = Number(prereleaseValues.slice(-1)[0]);
-        if (isNaN(prereleaseVersion)) {
-          prereleaseVersion = 0;
-        }
-        if (prereleaseVersion > 0) {
-          prereleaseVersion -= 1;
-        }
-      }
-      nextVersion = semver.coerce(latestVersion)?.version;
-      if (nextVersion != null) {
-        nextVersion = `${nextVersion}-${prereleaseVersion}`;
-      }
+      const patchVersion = latestVersion.prerelease.length
+        ? latestVersion.patch - 1
+        : latestVersion.patch;
+      nextVersion = new semver.SemVer(
+        `${latestVersion.major}.${latestVersion.minor}.${patchVersion}-0`
+      );
       break;
     }
   }
-  if (!nextVersion) {
-    throw new Error(`Invalid version: ${nextVersion}`);
-  }
-  return nextVersion;
+  return nextVersion.version;
 };

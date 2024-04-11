@@ -1,7 +1,7 @@
 import {
   TASK_VERIFY,
   TASK_VERIFY_GET_VERIFICATION_SUBTASKS,
-} from '@nomicfoundation/hardhat-verify/dist/src/task-names'
+} from '@nomicfoundation/hardhat-verify/internal/task-names'
 import { Manifest } from '@openzeppelin/upgrades-core'
 import { ethers, Provider, Result } from 'ethers'
 import { subtask, task } from 'hardhat/config'
@@ -16,8 +16,12 @@ task(
   if (!network.config.live)
     throw new Error('Must be on a live network to submit to Tenderly')
 
+  const fqns = await hre.artifacts.getAllFullyQualifiedNames()
+
   const deployments = await hre.deployments.all()
-  for (const { address, abi } of Object.values(deployments)) {
+  for (const [name, { address, abi }] of Object.entries(deployments)) {
+    const fqn = fqns.find((fqn) => fqn.endsWith(`${name}.sol:${name}`))
+
     const implementation = await hre.upgrades.erc1967
       .getImplementationAddress(address)
       .catch(() => hre.upgrades.beacon.getImplementationAddress(address))
@@ -28,15 +32,21 @@ task(
     if (implementation) {
       const manifest = await Manifest.forNetwork(hre.ethers.provider)
       // manifest.g
-      const { txHash } = await manifest.getDeploymentFromAddress(implementation)
-
-      if (txHash) {
-        constructorArgs = await getConstructorArgsFromTx(
-          hre.ethers.provider,
-          implementation,
-          txHash,
-          abi
+      try {
+        const { txHash } = await manifest.getDeploymentFromAddress(
+          implementation
         )
+
+        if (txHash) {
+          constructorArgs = await getConstructorArgsFromTx(
+            hre.ethers.provider,
+            implementation,
+            txHash,
+            abi
+          )
+        }
+      } catch {
+        continue
       }
     }
 
@@ -44,6 +54,7 @@ task(
       .run(TASK_VERIFY, {
         address,
         constructorArgsParams: constructorArgs,
+        contract: fqn,
       })
       .catch(console.error)
   }

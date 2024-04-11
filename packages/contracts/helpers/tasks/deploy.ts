@@ -16,5 +16,5 @@ subtask(TASK_DEPLOY_RUN_DEPLOY, async (args, hre, runSuper) => {
   if (!hre.network.config.live) return
 
   // Verify contracts
-  await hre.run('verify')
+  await hre.run('verify-all')
 })

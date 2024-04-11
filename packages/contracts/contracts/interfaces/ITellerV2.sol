@@ -59,11 +59,6 @@ interface ITellerV2 {
             uint256 amountToBorrower
         );
 
-    function calculateAmountDue(uint256 _bidId, uint256 _timestamp)
-        external
-        view
-        returns (Payment memory due);
-
     /**
      * @notice Function for users to make the minimum amount due for an active loan.
      * @param _bidId The id of the loan to make the payment towards.
@@ -148,4 +143,14 @@ interface ITellerV2 {
             uint32 lastRepaidTimestamp,
             BidState bidState
         );
+
+    function calculateAmountOwed(uint256 _bidId, uint256 _timestamp)
+        external
+        view
+        returns (Payment memory owed);
+
+    function calculateAmountDue(uint256 _bidId, uint256 _timestamp)
+        external
+        view
+        returns (Payment memory due);
 }

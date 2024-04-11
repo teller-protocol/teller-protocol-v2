@@ -7,7 +7,6 @@ import '@nomicfoundation/hardhat-ethers'
 import '@typechain/hardhat'
 import 'solidity-coverage'
 import '@openzeppelin/hardhat-upgrades'
-import '@openzeppelin/hardhat-defender'
 import '@nomicfoundation/hardhat-verify'
 
 import fs from 'fs'
@@ -101,12 +100,14 @@ type NetworkNames =
   | 'mainnet'
   | 'polygon'
   | 'arbitrum'
+  | 'base'
   | 'mantle'
   | 'sepolia'
   | 'mumbai'
   | 'goerli'
   | 'mantle-testnet'
   | 'tenderly'
+  | 'clarity'
 const networkUrls: Record<NetworkNames, string> = {
   // Main Networks
   mainnet:
@@ -124,6 +125,7 @@ const networkUrls: Record<NetworkNames, string> = {
     (ALCHEMY_API_KEY
       ? `https://arb-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
       : ''),
+  base: 'https://mainnet.base.org/',
   mantle: 'https://rpc.mantle.xyz',
 
   // Test Networks
@@ -143,6 +145,7 @@ const networkUrls: Record<NetworkNames, string> = {
       ? `https://eth-goerli.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
       : ''),
   'mantle-testnet': 'https://rpc.testnet.mantle.xyz',
+  'clarity': process.env.CLARITY_RPC_URL ?? '',  
   tenderly: process.env.TENDERLY_RPC_URL ?? '',
 }
 
@@ -192,7 +195,9 @@ export default <HardhatUserConfig>{
       mainnet: process.env.ETHERSCAN_VERIFY_API_KEY,
       polygon: process.env.POLYGONSCAN_VERIFY_API_KEY,
       arbitrumOne: process.env.ARBISCAN_VERIFY_API_KEY,
+      base: process.env.BASESCAN_VERIFY_API_KEY,
       mantle: process.env.MANTLE_VERIFY_API_KEY ?? 'xyz',
+      clarity: '', //none ? 
 
       // Test Networks
       sepolia: process.env.ETHERSCAN_VERIFY_API_KEY,
@@ -201,6 +206,22 @@ export default <HardhatUserConfig>{
       'mantle-testnet': process.env.MANTLE_VERIFY_API_KEY ?? 'xyz',
     },
     customChains: [
+      {
+        network: 'base',
+        chainId: 8453,
+        urls: {
+          apiURL: 'https://api.basescan.org/api',
+          browserURL: 'https://basescan.org',
+        },
+      },
+      {
+        network: 'clarity',
+        chainId: 66814,
+        urls: {
+          apiURL: 'https://api.basescan.org/api',
+          browserURL: 'https://basescan.org',
+        },
+      },
       {
         network: 'mantle',
         chainId: 5000,
@@ -262,6 +283,7 @@ export default <HardhatUserConfig>{
           },
         },
       },
+ 
     ],
   },
 
@@ -303,18 +325,22 @@ export default <HardhatUserConfig>{
     funder: 10,
     rando: 14,
     protocolOwnerSafe: {
-      default: 7,
+      31337: 7,
       1: '0x9E3bfee4C6b4D28b5113E4786A1D9812eB3D2Db6',
       5: '0x0061CA4F1EB8c3FF93Df074061844d3dd4dC0377',
       137: '0xFea0FB908E31567CaB641865212cF76BE824D848',
+      5000: '0x4496c03dA72386255Bf4af60b3CCe07787d3dCC2',
+      8453: '0x2f74c448CF6d613bEE183fE35dB0c9AC5084F66A',
       42161: '0xD9149bfBfB29cC175041937eF8161600b464051B',
       11155111: '0xb1ff461BB751B87f4F791201a29A8cFa9D30490c',
     },
     protocolTimelock: {
-      default: 8,
+      31337: 8,
       1: '0xe6774DAAEdf6e95b222CD3dE09456ec0a46672C4',
       5: '0x0e8A920f0338b94828aE84a7C227bC17F3a02f86',
       137: '0x6eB9b34913Bd96CA2695519eD0F8B8752d43FD2b',
+      5000: '0x6BBf498C429C51d05bcA3fC67D2C720B15FC73B8',
+      8453: '0x6BBf498C429C51d05bcA3fC67D2C720B15FC73B8',
       42161: '0x6BBf498C429C51d05bcA3fC67D2C720B15FC73B8',
       11155111: '0xFe5394B67196EA95301D6ECB5389E98A02984cC2',
     },
@@ -351,7 +377,7 @@ export default <HardhatUserConfig>{
       url: networkUrls.mainnet,
       chainId: 1,
       live: true,
-      gasPrice: Number(ethers.parseUnits('130', 'gwei')),
+      // gasPrice: Number(ethers.parseUnits('130', 'gwei')),
 
       verify: {
         etherscan: {
@@ -363,7 +389,8 @@ export default <HardhatUserConfig>{
       url: networkUrls.polygon,
       chainId: 137,
       live: true,
-      // gasPrice: ethers.utils.parseUnits('110', 'gwei').toNumber(),
+       
+       gasPrice: Number(ethers.parseUnits('350', 'gwei')),
 
       verify: {
         etherscan: {
@@ -383,11 +410,26 @@ export default <HardhatUserConfig>{
         },
       },
     }),
+    base: networkConfig({
+      url: networkUrls.base,
+      chainId: 8453,
+      live: true,
+      // gasPrice: ethers.utils.parseUnits('110', 'gwei').toNumber(),
+
+      verify: {
+        etherscan: {
+          apiKey: process.env.BASESCAN_VERIFY_API_KEY,
+        },
+      },
+    }),
+   
+    
     mantle: networkConfig({
       url: networkUrls.mantle,
       chainId: 5000,
       live: true,
-      // gasPrice: ethers.utils.parseUnits('110', 'gwei').toNumber(),
+      gas: 9_000_000,
+      gasPrice: Number(ethers.parseUnits('0.05', 'gwei')),
 
       // companionNetworks: {
       //   l1: 'mainnet',
@@ -396,6 +438,24 @@ export default <HardhatUserConfig>{
       verify: {
         etherscan: {
           apiKey: process.env.MANTLE_VERIFY_API_KEY,
+        },
+      },
+    }),
+
+    clarity: networkConfig({
+      url: networkUrls.clarity,
+      chainId: 66814,
+      live: true,
+      gas: 9_000_000,
+      gasPrice: Number(ethers.parseUnits('1.00', 'gwei')),
+
+      // companionNetworks: {
+      //   l1: 'mainnet',
+      // },
+
+      verify: {
+        etherscan: {
+          apiKey: process.env.CLARITY_VERIFY_API_KEY,
         },
       },
     }),

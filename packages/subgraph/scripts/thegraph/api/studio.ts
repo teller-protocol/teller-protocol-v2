@@ -2,42 +2,77 @@ import * as path from "path";
 
 import AppEth from "@ledgerhq/hw-app-eth";
 import Transport from "@ledgerhq/hw-transport-node-hid";
+import { Mutex } from "async-mutex";
 import axios from "axios";
 import { makeNodeDisklet } from "disklet";
 import { makeMemlet } from "memlet";
 
 import { Logger } from "../../utils/logger";
 import { SocketEmitter, SocketEvent } from "../../websocket/SocketEmitter";
+import { auth } from "../commands/auth";
 import * as websocket from "../ws";
 
-import { InnerAPI, SubgraphVersion, VersionUpdate } from "./index";
+import { IApiArgs, InnerAPI, SubgraphVersion, VersionUpdate } from "./index";
 
-interface IStudioConfig {
+
+const SAVE_LOAD_COOKIE = false;
+
+const mutex = new Mutex();
+
+interface INetworkConfig {
+  name: string;
+  network: string;
+  owner: {
+    address: string;
+    network: string;
+  };
   socketEmitter?: SocketEmitter;
   logger?: Logger;
 }
 
+const Network: Record<string, number> = {
+  mainnet: 1,
+  "arbitrum-one": 42161
+};
+
 export const makeStudio = async (
-  studioConfig?: IStudioConfig
+  networkConfig: INetworkConfig
 ): Promise<InnerAPI> => {
   const disklet = makeNodeDisklet(path.join(__dirname, "./config"));
   const memlet = makeMemlet(disklet);
 
   interface IConfig {
+    
+    networkWallets:{ [owner:string] : IDeployKeyConfig}
+    [owner: string]: IOwnerConfig | undefined;
+  }
+  interface IOwnerConfig {
     Cookie?: {
       value: string;
       expiration: string;
     };
+    deployKey?: string;
   }
-  const getConfig = async (): Promise<IConfig> => {
+  interface IDeployKeyConfig {
+    
+    deployKey: string;
+    network: string;
+  }
+
+
+
+
+  const getStudioConfig = async (): Promise<IConfig> => {
     return await memlet.getJson("studio.json").catch(() => ({}));
   };
-  let config = await getConfig();
+  let studioConfig = await getStudioConfig();
 
+  //deprecated -- dont use cookies 
+  /*
   const setConfig = async (_config: IConfig): Promise<void> => {
-    config = _config;
+    studioConfig = _config;
     await memlet.setJson("studio.json", _config);
-  };
+  };*/
 
   const api = axios.create({
     baseURL: "https://api.studio.thegraph.com/graphql",
@@ -55,12 +90,16 @@ export const makeStudio = async (
       if (data.errors) {
         const messages = data.errors.map(e => {
           if (e.extensions.code === "UNAUTHENTICATED") {
-            config.Cookie = undefined;
-            void setConfig(config);
+            const prev = studioConfig[networkConfig.owner.address] ?? {};
+            studioConfig[networkConfig.owner.address] = {
+              ...prev,
+              Cookie: undefined
+            };
+         //   void setConfig(studioConfig);
           }
           return `\t* ${e.message}`;
         });
-        console.error(`Studio API errors:\n${messages}`);
+        networkConfig.logger?.error(`Studio API errors:\n${messages}`);
         // throw new AggregateError(
         //   data.errors,
         //   `Studio API errors:\n${messages}`
@@ -73,8 +112,8 @@ export const makeStudio = async (
   const socket = await websocket.create(
     "wss://api.studio.thegraph.com/graphql",
     {
-      emitter: studioConfig?.socketEmitter,
-      logger: studioConfig?.logger
+      emitter: networkConfig.socketEmitter,
+      logger: networkConfig.logger
     }
   );
 
@@ -90,71 +129,107 @@ export const makeStudio = async (
     return res.data.data.currentUser;
   };
 
-  const login = async (reauth = false): Promise<void> => {
-    let cookie: string | null = null;
-    if (!reauth && config.Cookie) {
-      if (new Date(config.Cookie.expiration).getTime() > Date.now()) {
-        cookie = config.Cookie.value;
+  const login = async (): Promise<void> => {
+    await mutex.runExclusive(async () => {
+      if (!socket.isConnected()) await socket.connect();
+
+      let cookie: string | null = null;
+      const Cookie = studioConfig[networkConfig.owner.address]?.Cookie;
+      if (Cookie && SAVE_LOAD_COOKIE) {
+        if (new Date(Cookie.expiration).getTime() > Date.now()) {
+          cookie = Cookie.value;
+        } else {
+          networkConfig.logger?.log("Cookie expired, logging in again");
+        }
       } else {
-        console.log("Cookie expired, logging in again");
+        networkConfig.logger?.log(
+          "Not logged in, attempting to log in via ledger..."
+        );
       }
-    } else {
-      console.log("Not logged in, attempting to log in via ledger...");
-    }
 
-    if (!cookie) {
-      const transport = await Transport.open("");
-      const eth = new AppEth(transport);
+      if (!cookie) {
+        const transport = await Transport.open("");
+        const eth = new AppEth(transport);
+        
+        let knownAddress = "0xF3E864eAaFf9Cf2cD21A862d51D875093b4B5baA"
 
-      const path = "44'/60'/0'/0/0";
-      const { address } = await eth.getAddress(path);
+        let foundPath = undefined
+        let foundAddress = undefined
 
-      const message =
-        "Sign this message to prove you have access to this wallet in order to sign in to thegraph.com/studio.\n\n" +
-        "This won't cost you any Ether.\n\n" +
-        `Timestamp: ${Date.now()}`;
+        for( let i =0; i< 99 ; i++) {
 
-      const sig = await eth.signPersonalMessage(
-        path,
-        Buffer.from(message).toString("hex")
-      );
-      const signature = `0x${sig.r}${sig.s}${sig.v.toString(16)}`;
-
-      await transport.close();
-
-      const login = await api.post("", {
-        operationName: "login",
-        variables: {
-          ethAddress: "0x1a2baa2257343119fb03fd448622456a0c4f2190",
-          message,
-          signature,
-          multisigOwnerAddress: address,
-          networkId: 1
-        },
-        query:
-          "fragment AuthUserFragment on User { id } mutation login($ethAddress: String!, $message: String!, $signature: String!, $multisigOwnerAddress: String, $networkId: Int) { login(ethAddress: $ethAddress, message: $message, signature: $signature, multisigOwnerAddress: $multisigOwnerAddress, networkId: $networkId) { ...AuthUserFragment } }"
-      });
-
-      // extract cookie info
-      const cookieRegex = /^(SubgraphStudioAPI=[^\s]+;).*Expires=([^;]+);/;
-      const cookieRaw = login.headers["set-cookie"]?.find(cookie =>
-        cookieRegex.test(cookie)
-      );
-      if (cookieRaw) {
-        const [_, cookieValue, cookieExpiration] = cookieRaw.match(
-          cookieRegex
-        )!;
-        await setConfig({
-          Cookie: {
-            value: cookieValue,
-            expiration: cookieExpiration
+          const path = `44'/60'/0'/0/${i.toString()}`;
+          console.log("searching ", path)
+          const { address: addressAtPath } = await eth.getAddress(path);
+          
+          console.log({addressAtPath})
+          if(addressAtPath == knownAddress){
+            foundAddress = addressAtPath; 
+            foundPath = path;
+            break
           }
-        });
-        cookie = cookieValue;
-      }
-    }
+        }
 
-    api.defaults.headers.Cookie = cookie;
+        if( !foundPath || !foundAddress) {
+
+          throw new Error("Could not find path")
+        }
+
+       // const path = "44'/60'/0'/0/0";
+       // const { address } = await eth.getAddress(path);
+
+        const message =
+          "Sign this message to prove you have access to this wallet in order to sign in to thegraph.com/studio.\n\n" +
+          "This won't cost you any Ether.\n\n" +
+          `Timestamp: ${Date.now()}`;
+
+        const sig = await eth.signPersonalMessage(
+          foundPath,
+          Buffer.from(message).toString("hex")
+        );
+        const signature = `0x${sig.r}${sig.s}${sig.v.toString(16)}`;
+
+        await transport.close();
+
+        const login = await api.post("", {
+          operationName: "login",
+          variables: {
+            ethAddress: networkConfig.owner.address,
+            message,
+            signature,
+            multisigOwnerAddress: foundAddress,
+            networkId: Network[networkConfig.owner.network]
+          },
+          query:
+            "fragment AuthUserFragment on User { id } mutation login($ethAddress: String!, $message: String!, $signature: String!, $multisigOwnerAddress: String, $networkId: Int) { login(ethAddress: $ethAddress, message: $message, signature: $signature, multisigOwnerAddress: $multisigOwnerAddress, networkId: $networkId) { ...AuthUserFragment } }"
+        });
+
+        // extract cookie info
+        const cookieRegex = /^(SubgraphStudioAPI=[^\s]+;).*Expires=([^;]+);/;
+        const cookieRaw = login.headers["set-cookie"]?.find(cookie =>
+          cookieRegex.test(cookie)
+        );
+        if (cookieRaw) {
+          const [_, cookieValue, cookieExpiration] = cookieRaw.match(
+            cookieRegex
+          )!;
+          //store this in mem !? 
+         /* await setConfig({
+            ...studioConfig,
+            [networkConfig.owner.address]: {
+              ...studioConfig[networkConfig.owner.address],
+           //   Cookie: {
+           //   value: cookieValue,
+           //    expiration: cookieExpiration
+           //  }
+            }
+          });*/
+          cookie = cookieValue;
+        }
+      }
+
+      api.defaults.headers.Cookie = cookie;
+    });
   };
 
   interface StudioSubgraph {
@@ -187,6 +262,7 @@ export const makeStudio = async (
   interface StudioSubgraphVersion {
     id: number;
     label: string;
+    network: string;
     deploymentId: string;
     queryUrl: string;
     latestEthereumBlockNumber: number;
@@ -196,7 +272,6 @@ export const makeStudio = async (
     publishStatus: string;
   }
   const getLatestVersion = async (
-    name: string,
     index = 0
   ): Promise<SubgraphVersion | undefined> => {
     await login();
@@ -206,7 +281,7 @@ export const makeStudio = async (
     }>("", {
       operationName: "Subgraph",
       variables: {
-        name
+        name: networkConfig.name
       },
       query: `
       query Subgraph($name: String!) {
@@ -217,6 +292,7 @@ export const makeStudio = async (
           versions {
             id
             label
+            network
             deploymentId
             queryUrl
             latestEthereumBlockNumber
@@ -226,14 +302,13 @@ export const makeStudio = async (
             publishStatus
           }
         }
-        authUserSubgraphs {
-          name
-        }
       }
     `
     });
     const subgraph = response.data.data.subgraph;
-    const latest = subgraph?.versions?.sort((a, b) => b.id - a.id)?.[index];
+    const latest = subgraph?.versions
+      ?.filter(v => v.network === networkConfig.network && !v.failed)
+      ?.sort((a, b) => b.id - a.id)?.[index];
     if (latest) {
       return {
         id: latest.id,
@@ -248,15 +323,14 @@ export const makeStudio = async (
   };
 
   const watchVersionUpdate = (
-    name: string,
     versionId: number,
     cb: (
       version: VersionUpdate,
       unsubscribe: () => void
     ) => Promise<void> | void
   ): void => {
-    studioConfig?.socketEmitter?.on(SocketEvent.CONNECTION_CLOSE, () => {
-      watchVersionUpdate(name, versionId, cb);
+    networkConfig.socketEmitter?.on(SocketEvent.CONNECTION_CLOSE, () => {
+      watchVersionUpdate(versionId, cb);
     });
     return socket.subscribe({
       cb,
@@ -277,20 +351,36 @@ export const makeStudio = async (
     });
   };
 
+  const apiArgs: IApiArgs = {
+    ipfs() {
+      return ["--ipfs", "https://api.thegraph.com/ipfs/api/v0"];
+    },
+    node() {
+      return [];
+    },
+    product() {
+      return ["--studio"];
+    }
+  };
+
   return {
-    getSubgraphs,
     getLatestVersion,
     watchVersionUpdate,
-    args: {
-      ipfs(name: string) {
-        return ["--ipfs", "https://api.thegraph.com/ipfs/api/v0"];
-      },
-      node(name: string) {
-        return [];
-      },
-      product(name: string) {
-        return ["--product", "subgraph-studio"];
-      }
-    }
+    beforeDeploy: async () => {
+
+      console.log(studioConfig)
+
+      console.log(networkConfig.owner.address)
+
+      const deployKey = studioConfig["networkWallets"][networkConfig.owner.address]?.deployKey;
+      if (!deployKey) throw new Error("No deploy key found");
+
+      await auth({
+        apiArgs,
+        deployKey,
+        logger: networkConfig.logger
+      });
+    },
+    args: apiArgs
   };
 };

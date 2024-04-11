@@ -1,4 +1,9 @@
-import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigDecimal,
+  BigInt,
+  dataSource
+} from "@graphprotocol/graph-ts";
 
 import {
   Commitment,
@@ -6,19 +11,26 @@ import {
   MarketCommitmentStdDev
 } from "../../generated/schema";
 
+import { isRolloverable } from "./utils";
+
 /**
- * @param {string} commitmentId - ID of the commitment
+ * @param {BigInt} commitmentId - ID of the commitment
  * @returns {Commitment} The Commitment entity for the lender
- */
-export function loadCommitment(commitmentId: string): Commitment {
-  const idString = commitmentId;
+ .toString*/
+export function loadCommitment(commitmentId: BigInt): Commitment {
+  const idString = `${commitmentId.toString()}-${dataSource
+    .address()
+    .toHexString()}`;
   let commitment = Commitment.load(idString);
 
   if (!commitment) {
     commitment = new Commitment(idString);
+    commitment.commitmentId = commitmentId;
     commitment.createdAt = BigInt.zero();
     commitment.updatedAt = BigInt.zero();
     commitment.status = "";
+    commitment.forwarderAddress = dataSource.address();
+    commitment.rolloverable = isRolloverable();
 
     commitment.committedAmount = BigInt.zero();
     commitment.expirationTimestamp = BigInt.zero();
@@ -26,6 +38,8 @@ export function loadCommitment(commitmentId: string): Commitment {
     commitment.minAPY = BigInt.zero();
     commitment.lender = "";
     commitment.lenderAddress = Address.zero();
+    commitment.lenderPrincipalBalance = BigInt.fromU64(u64.MAX_VALUE); // default to max value - see `updaters.updateAvailableTokensFromCommitment`
+    commitment.lenderPrincipalAllowance = BigInt.fromU64(u64.MAX_VALUE); // default to max value - see `updaters.updateAvailableTokensFromCommitment`
     commitment.marketplace = "";
     commitment.marketplaceId = BigInt.zero();
     commitment.tokenVolume = "";
@@ -41,6 +55,8 @@ export function loadCommitment(commitmentId: string): Commitment {
 
     commitment.maxPrincipal = BigInt.zero();
     commitment.acceptedPrincipal = BigInt.zero();
+    commitment._oldAcceptedPrincipal = BigInt.zero();
+    commitment._newAcceptedPrincipal = BigInt.zero();
 
     commitment.save();
   }

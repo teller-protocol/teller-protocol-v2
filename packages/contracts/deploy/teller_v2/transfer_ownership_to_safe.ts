@@ -14,6 +14,7 @@ const deployFn: DeployFunction = async (hre) => {
 
   if (deployer === currentOwner) {
     const tx = await tellerV2.transferOwnership(protocolOwnerSafe)
+    await tx.wait(1) //wait one block
 
     hre.log(
       `  ✅  TellerV2 ownership transferred to Safe Multisig (${protocolOwnerSafe})`

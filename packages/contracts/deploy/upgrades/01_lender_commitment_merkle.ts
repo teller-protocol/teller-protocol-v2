@@ -3,7 +3,7 @@ import { DeployFunction } from 'hardhat-deploy/dist/types'
 const deployFn: DeployFunction = async (hre) => {
   hre.log('----------')
   hre.log('')
-  hre.log('LenderCommitmentForwarder: Proposing upgrade...')
+  hre.log('LenderCommitmentForwarder V1: Proposing upgrade...')
 
   const tellerV2 = await hre.contracts.get('TellerV2')
   const marketRegistry = await hre.contracts.get('MarketRegistry')
@@ -11,9 +11,9 @@ const deployFn: DeployFunction = async (hre) => {
     'LenderCommitmentForwarder'
   )
 
-  await hre.defender.proposeBatchTimelock(
-    'Lender Commitment Forwarder Merkle Upgrade',
-    ` 
+  await hre.upgrades.proposeBatchTimelock({
+    title: 'Lender Commitment Forwarder Merkle Upgrade',
+    description: ` 
 
 # LenderCommitmentForwarder
 
@@ -21,7 +21,7 @@ const deployFn: DeployFunction = async (hre) => {
 * Add a new function acceptCommitmentWithProof which is explicitly used with these new types.
 * Merkle proofs can be used to create commitments for a set of tokenIds for an ERC721 or ERC1155 collection.
 `,
-    [
+    _steps: [
       {
         proxy: lenderCommitmentForwarder,
         implFactory: await hre.ethers.getContractFactory(
@@ -36,8 +36,8 @@ const deployFn: DeployFunction = async (hre) => {
           ],
         },
       },
-    ]
-  )
+    ],
+  })
 
   hre.log('done.')
   hre.log('')

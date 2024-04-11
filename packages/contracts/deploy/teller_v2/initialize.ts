@@ -28,6 +28,7 @@ const deployFn: DeployFunction = async (hre) => {
     lenderManager,
     escrowVault
   )
+  await tx.wait(1) // wait one block
 
   hre.log('done.')
   await logTxLink(hre, tx.hash)

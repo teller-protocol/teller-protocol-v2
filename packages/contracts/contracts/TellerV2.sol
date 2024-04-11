@@ -156,7 +156,7 @@ contract TellerV2 is
 
     /** Constant Variables **/
 
-    uint8 public constant CURRENT_CODE_VERSION = 9;
+    uint8 public constant CURRENT_CODE_VERSION = 10;
 
     uint32 public constant LIQUIDATION_DELAY = 86400; //ONE DAY IN SECONDS
 
@@ -216,9 +216,10 @@ contract TellerV2 is
         _setEscrowVault(_escrowVault);
     }
 
-    function setEscrowVault(address _escrowVault) external reinitializer(9) {
+   /* function setEscrowVault(address _escrowVault) external reinitializer(9) {
         _setEscrowVault(_escrowVault);
     }
+    */
 
     function _setLenderManager(address _lenderManager)
         internal
@@ -989,8 +990,6 @@ contract TellerV2 is
         if (bid.state != BidState.ACCEPTED) return false;
 
         uint32 defaultDuration = bidDefaultDuration[_bidId];
-
-        if (defaultDuration == 0) return false;
 
         uint32 dueDate = calculateNextDueDate(_bidId);
 

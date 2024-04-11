@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
-import "../contracts/TellerV2MarketForwarder.sol";
+import "../contracts/TellerV2MarketForwarder_G1.sol";
 import { Testable } from "./Testable.sol";
 import { LenderManager } from "../contracts/LenderManager.sol";
 

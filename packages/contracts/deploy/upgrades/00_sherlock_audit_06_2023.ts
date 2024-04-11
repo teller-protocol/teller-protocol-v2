@@ -19,9 +19,9 @@ const deployFn: DeployFunction = async (hre) => {
     'LenderCommitmentForwarder'
   )
 
-  await hre.defender.proposeBatchTimelock(
-    'Sherlock Audit Upgrade',
-    `
+  await hre.upgrades.proposeBatchTimelock({
+    title: 'Sherlock Audit Upgrade',
+    description: `
 # MarketRegistry
 
 * Adds a new \`isMarketOpen\` function to check if a market is open.
@@ -58,7 +58,7 @@ const deployFn: DeployFunction = async (hre) => {
 * Removed \`updateCommitmentBorrowers\` function in favor of \`addCommitmentBorrowers\` and \`removeCommitmentBorrowers\` functions.
 * Add checks to ensure the maximum amount allocated to a commitment is not exceeded.
 `,
-    [
+    _steps: [
       {
         proxy: marketRegistry,
         implFactory: await hre.ethers.getContractFactory('MarketRegistry'),
@@ -77,11 +77,11 @@ const deployFn: DeployFunction = async (hre) => {
             'state-variable-immutable',
             'external-library-linking',
           ],
-          constructorArgs: [trustedForwarder],
+          constructorArgs: [await trustedForwarder.getAddress()],
 
           call: {
             fn: 'setEscrowVault',
-            args: [escrowVault],
+            args: [await escrowVault.getAddress()],
           },
         },
       },
@@ -116,8 +116,8 @@ const deployFn: DeployFunction = async (hre) => {
           ],
         },
       },
-    ]
-  )
+    ],
+  })
 
   hre.log('done.')
   hre.log('')

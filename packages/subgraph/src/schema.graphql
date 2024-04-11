@@ -4,7 +4,10 @@ type Protocol implements IHasLoans @entity {
   loans: LoanStatusCount! @derivedFrom(field: "_protocol")
   tokenVolumes: [TokenVolume!]! @derivedFrom(field: "protocol")
 
+  rolloverableLCF: Bytes
   activeCommitments: [Commitment!]!
+  inactiveCommitments: [Commitment!]
+
   activeRewards: [RewardAllocation!]!
 
   _durationTotal: BigInt!
@@ -349,9 +352,12 @@ type CommitmentZScore @entity {
 
 type Commitment @entity {
   id: ID!
+  commitmentId: BigInt!
   createdAt: BigInt!
   updatedAt: BigInt!
   status: String!
+  forwarderAddress: Bytes! # address of the LenderCommitmentForwarder contract
+  rolloverable: Boolean!
 
   # Offer
   committedAmount: BigInt! # Current committed amount
@@ -372,6 +378,8 @@ type Commitment @entity {
   # Lender
   lender: Lender!
   lenderAddress: Bytes!
+  lenderPrincipalBalance: BigInt!
+  lenderPrincipalAllowance: BigInt!
 
   # Market
   marketplace: MarketPlace!
@@ -382,7 +390,9 @@ type Commitment @entity {
 
   # Extra
   maxPrincipal: BigInt!
-  acceptedPrincipal: BigInt!
+  acceptedPrincipal: BigInt! # funds that were accepted (only tracking _newAcceptedPrincipal value for now)
+  _oldAcceptedPrincipal: BigInt! # funds that were accepted that was not previously tracked on-chain
+  _newAcceptedPrincipal: BigInt! # funds that were accepted AFTER commitmentPrincipalAccepted function was added on-chain
 
   commitmentRewards: [CommitmentReward!]! @derivedFrom(field: "commitment")
 }

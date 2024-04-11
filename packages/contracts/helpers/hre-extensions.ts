@@ -1,16 +1,16 @@
 import '@nomicfoundation/hardhat-ethers'
-import { ProposalResponse } from '@openzeppelin/defender-admin-client'
+import {
+  AdminClient,
+  ProposalResponse,
+} from '@openzeppelin/defender-admin-client/lib'
 import {
   PartialContract,
   ProposalFunctionInputs,
   ProposalStep,
   ProposalTargetFunction,
 } from '@openzeppelin/defender-admin-client/lib/models/proposal'
-import { HardhatDefender as OZHD } from '@openzeppelin/hardhat-defender'
-import {
-  getAdminClient,
-  getNetwork,
-} from '@openzeppelin/hardhat-defender/dist/utils'
+import { fromChainId, Network } from '@openzeppelin/defender-base-client'
+import { DefenderHardhatUpgrades } from '@openzeppelin/hardhat-upgrades'
 import {
   DeployBeaconOptions,
   DeployProxyOptions,
@@ -29,7 +29,12 @@ import {
 import { ERC20 } from 'generated/typechain'
 import 'hardhat-deploy'
 import { extendEnvironment } from 'hardhat/config'
-import { HardhatRuntimeEnvironment } from 'hardhat/types'
+import {
+  HardhatRuntimeEnvironment,
+  ProposeBeaconUpgradeStep,
+  ProposeProxyUpgradeStep,
+  VirtualExecutionPayload,
+} from 'hardhat/types'
 import moment from 'moment'
 
 import { getTokens } from '../config'
@@ -78,9 +83,19 @@ declare module 'hardhat/types/runtime' {
     implFactory: ContractFactory
     opts?: PrepareUpgradeOptions
   }
-  type ProposeUpgradeStep = ProposeProxyUpgradeStep | ProposeBeaconUpgradeStep
+  // type ProposeUpgradeStep = ProposeProxyUpgradeStep | ProposeBeaconUpgradeStep
 
-  interface HardhatDefender extends OZHD {
+  interface HardhatUpgrades extends DefenderHardhatUpgrades {
+    proposeCall: (
+      contractAddress: string,
+      contractImplementation: ContractFactory,
+      callFn: string,
+      callArgs: any[],
+
+      title: string,
+      description: string
+    ) => Promise<ProposalResponse>
+
     proposeUpgradeAndCall: (
       proxyAddress: string,
       implFactory: ContractFactory,
@@ -91,17 +106,86 @@ declare module 'hardhat/types/runtime' {
         callArgs: any[]
       }
     ) => Promise<ProposalResponse>
-    proposeBatchUpgrade: (
-      title: string,
-      description: string,
-      steps: ProposeUpgradeStep | ProposeUpgradeStep[]
-    ) => Promise<ProposalResponse>
-    proposeBatchTimelock: (
-      title: string,
-      description: string,
-      steps: ProposeUpgradeStep | ProposeUpgradeStep[]
-    ) => Promise<{ schedule: ProposalResponse; execute: ProposalResponse }>
+    proposeBatch: ({
+      title,
+      description,
+      _steps,
+    }: {
+      title: string
+      description: string
+      _steps: BatchProposalStep[]
+    }) => Promise<ProposalResponse>
+    proposeBatchTimelock: ({
+      title,
+      description,
+      _steps,
+    }: {
+      title: string
+      description: string
+      _steps: BatchProposalStep[]
+    }) => Promise<{
+      schedule: ProposalResponse
+      execute: ProposalResponse
+    }>
   }
+
+  interface VirtualExecutionPayload {
+    target: string
+    value: string
+    payload: string // this is just targetFunction and functionInputs encoded to bytes using the abi
+    targetFunction: ProposalTargetFunction
+    functionInputs: ProposalFunctionInputs
+  }
+} // end hre module
+
+interface ProposeCallStep {
+  contractAddress: string
+  contractImplementation: ContractFactory
+  callFn: string
+  callArgs: any[]
+}
+
+export type BatchProposalStep =
+  | ProposeCallStep
+  | ProposeProxyUpgradeStep
+  | ProposeBeaconUpgradeStep
+
+/*
+const getStepType = (step: BatchProposalStep): string => {
+  if (step.hasOwnProperty('callFn')) {
+    return 'call'
+  } else if (step.hasOwnProperty('proxy')) {
+    return 'upgradeProxy'
+  } else if (step.hasOwnProperty('beacon')) {
+    return 'upgradeBeacon'
+  } else {
+    throw new Error('invalid step - cannot ascertain step type')
+  }
+}*/
+
+function isCallStep(step: BatchProposalStep): step is ProposeCallStep {
+  return step.hasOwnProperty('callFn')
+}
+
+function isUpgradeProxyStep(
+  step: BatchProposalStep
+): step is ProposeProxyUpgradeStep {
+  return step.hasOwnProperty('proxy')
+}
+
+function isUpgradeBeaconStep(
+  step: BatchProposalStep
+): step is ProposeBeaconUpgradeStep {
+  return step.hasOwnProperty('beacon')
+}
+
+interface TimelockBatchArgs {
+  targets: string[]
+  values: string[]
+  payloads: string[]
+  predecessor: string
+  salt: string
+  delay: string
 }
 
 interface LogConfig extends FormatMsgConfig {
@@ -271,12 +355,14 @@ extendEnvironment((hre) => {
           `No deployment exists for ${name}. If expected, supply an address (config.at)`
         )
 
-      let signer: Signer | undefined
+      let signer: Signer
       if (config?.from) {
         signer =
           typeof config.from === 'string'
             ? await ethers.provider.getSigner(config.from)
             : config.from
+      } else {
+        signer = await hre.getNamedSigner('deployer')
       }
       const contract = await ethers.getContractAt(abi, address, signer)
 
@@ -316,7 +402,13 @@ extendEnvironment((hre) => {
 
   hre.getNamedSigner = async (name: string): Promise<Signer> => {
     const accounts = await hre.getNamedAccounts()
-    return await ethers.provider.getSigner(accounts[name])
+    const signer = await ethers.provider.getSigner(accounts[name])
+    // NOTE: This is a workaround for the gas estimation bug on Mantle RPC nodes
+    if (typeof hre.network.config.gas === 'number') {
+      signer.provider.estimateGas = () =>
+        Promise.resolve(BigInt(hre.network.config.gas))
+    }
+    return signer
   }
 
   hre.evm = {
@@ -424,7 +516,57 @@ extendEnvironment((hre) => {
     fn.write(formatMsg(msg, config))
   }
 
-  hre.defender.proposeUpgradeAndCall = async (
+  const defenderAdmin = new AdminClient({
+    apiKey: hre.config.defender!.apiKey,
+    apiSecret: hre.config.defender!.apiSecret,
+  })
+
+  hre.upgrades.proposeCall = async (
+    contractAddress,
+    contractImplementation,
+    callFn,
+    callArgs,
+    title,
+    description
+  ): Promise<ProposalResponse> => {
+    const functionInputsInterface = JSON.parse(
+      JSON.stringify(
+        contractImplementation.interface.getFunction(callFn)?.inputs
+      )
+    )
+
+    if (typeof functionInputsInterface == 'undefined') {
+      throw new Error('Function inputs undefined')
+    }
+
+    const { protocolOwnerSafe } = await hre.getNamedAccounts()
+    return await defenderAdmin.createProposal({
+      contract: {
+        address: contractAddress,
+        network: await getOZNetwork(hre),
+        abi: JSON.stringify(
+          contractImplementation.interface.fragments.map((fragment) =>
+            JSON.parse(fragment.format('json'))
+          )
+        ),
+      },
+      title: title,
+      description: description,
+      type: 'custom',
+
+      functionInterface: {
+        name: callFn,
+        inputs: functionInputsInterface,
+      },
+      functionInputs: callArgs,
+      viaType: 'Gnosis Safe',
+      via: protocolOwnerSafe,
+      // set simulate to true
+      // simulate: true,
+    })
+  }
+
+  hre.upgrades.proposeUpgradeAndCall = async (
     proxyAddress,
     implFactory,
     { title, description, callFn, callArgs, ...opts }
@@ -451,11 +593,10 @@ extendEnvironment((hre) => {
     const proxyAdmin = await hre.upgrades.admin.getInstance()
     const { protocolOwnerSafe } = await hre.getNamedAccounts()
 
-    const admin = getAdminClient(hre)
-    return await admin.createProposal({
+    return await defenderAdmin.createProposal({
       contract: {
         address: await proxyAdmin.getAddress(),
-        network: await getNetwork(hre),
+        network: await getOZNetwork(hre),
         abi: JSON.stringify(
           proxyAdmin.interface.fragments.map((fragment) =>
             JSON.parse(fragment.format('json'))
@@ -498,117 +639,37 @@ extendEnvironment((hre) => {
     })
   }
 
-  hre.defender.proposeBatchUpgrade = async (
+  hre.upgrades.proposeBatch = async ({
     title,
     description,
-    _steps
-  ): Promise<ProposalResponse> => {
-    const network = await getNetwork(hre)
-    const proxyAdmin = await hre.upgrades.admin.getInstance()
+    _steps,
+  }): Promise<ProposalResponse> => {
+    const network = await getOZNetwork(hre)
 
     const { protocolOwnerSafe } = await hre.getNamedAccounts()
 
-    const steps = Array.isArray(_steps) ? _steps : [_steps]
     const contracts: PartialContract[] = []
     const proposalSteps: ProposalStep[] = []
-    for (const step of steps) {
-      let toContractAddress: string
-      let refAddress: string
-      let call: { fn: string; args: any[] } | undefined
-      if ('proxy' in step) {
-        refAddress =
-          typeof step.proxy === 'string'
-            ? step.proxy
-            : await step.proxy.getAddress()
-        call = step.opts?.call
-      } else {
-        refAddress =
-          typeof step.beacon === 'string'
-            ? step.beacon
-            : await step.beacon.getAddress()
-      }
-      const newImpl = await hre.upgrades.prepareUpgrade(
-        refAddress,
-        step.implFactory,
-        step.opts
-      )
-      const newImplAddr =
-        typeof newImpl === 'string'
-          ? newImpl
-          : await newImpl.wait(1).then((r) => {
-              if (!r?.contractAddress) throw new Error('No contract address')
-              return r.contractAddress
-            })
+    for (const step of _steps) {
+      const virtualExecutionPayload: VirtualExecutionPayload =
+        await getVirtualExecutionPayloadForStep(step, hre)
 
-      let targetFunction: ProposalTargetFunction
-      let functionInputs: ProposalFunctionInputs
-      if ('proxy' in step) {
-        toContractAddress = await proxyAdmin.getAddress()
-
-        if (call) {
-          targetFunction = {
-            name: 'upgradeAndCall',
-            inputs: [
-              {
-                name: 'proxy',
-                type: 'address',
-              },
-              {
-                name: 'implementation',
-                type: 'address',
-              },
-              { name: 'data', type: 'bytes' },
-            ],
-          }
-          functionInputs = [
-            refAddress,
-            newImplAddr,
-            step.implFactory.interface.encodeFunctionData(call.fn, call.args),
-          ]
-        } else {
-          targetFunction = {
-            name: 'upgrade',
-            inputs: [
-              {
-                name: 'proxy',
-                type: 'address',
-              },
-              {
-                name: 'implementation',
-                type: 'address',
-              },
-            ],
-          }
-          functionInputs = [refAddress, newImplAddr]
-        }
-      } else {
-        toContractAddress = refAddress
-        targetFunction = {
-          name: 'upgradeTo',
-          inputs: [
-            {
-              name: 'newImplementation',
-              type: 'address',
-            },
-          ],
-        }
-        functionInputs = [newImplAddr]
-      }
+      const toContractAddress = virtualExecutionPayload.target
 
       contracts.push({
         address: toContractAddress,
+        // @ts-ignore
         network,
       })
       proposalSteps.push({
         contractId: `${network}-${toContractAddress}`,
         type: 'custom',
-        targetFunction,
-        functionInputs,
+        targetFunction: virtualExecutionPayload.targetFunction,
+        functionInputs: virtualExecutionPayload.functionInputs,
       })
-    }
+    } // end steps loop
 
-    const admin = getAdminClient(hre)
-    return await admin.createProposal({
+    return await defenderAdmin.createProposal({
       contract: contracts,
       title: title,
       description: description,
@@ -620,168 +681,400 @@ extendEnvironment((hre) => {
     })
   }
 
-  hre.defender.proposeBatchTimelock = async (
+  hre.upgrades.proposeBatchTimelock = async ({
     title,
     description,
-    _steps
-  ): Promise<{ schedule: ProposalResponse; execute: ProposalResponse }> => {
-    const network = await getNetwork(hre)
-    const proxyAdmin = await hre.upgrades.admin.getInstance()
+    _steps,
+  }): Promise<{
+    schedule: ProposalResponse
+    execute: ProposalResponse
+  }> => {
+    const delay = moment.duration(3, 'minutes').asSeconds().toString()
 
-    const { protocolOwnerSafe, protocolTimelock } = await hre.getNamedAccounts()
+    // build the timelock batch args from the steps
 
-    const timelockBatchArgs = {
-      targets: new Array<string>(),
-      values: new Array<string>(),
-      payloads: new Array<string>(),
-      predecessor: ethers.encodeBytes32String(''),
-      salt: ethers.encodeBytes32String(''),
-      delay: moment.duration(3, 'minutes').asSeconds().toString(),
-    }
+    const virtualExecutionPayloadArray: VirtualExecutionPayload[] = []
 
     const steps = Array.isArray(_steps) ? _steps : [_steps]
     for (const step of steps) {
-      let refAddress: string
-      let call: { fn: string; args: any[] } | undefined
-      if ('proxy' in step) {
-        refAddress =
-          typeof step.proxy === 'string'
-            ? step.proxy
-            : await step.proxy.getAddress()
-        call = step.opts?.call
-      } else {
-        refAddress =
-          typeof step.beacon === 'string'
-            ? step.beacon
-            : await step.beacon.getAddress()
-      }
+      const virtualExecutionPayload: VirtualExecutionPayload =
+        await getVirtualExecutionPayloadForStep(step, hre)
 
-      const newImpl = await hre.upgrades.prepareUpgrade(
-        refAddress,
-        step.implFactory,
-        step.opts
-      )
-      const newImplAddr =
-        typeof newImpl === 'string'
-          ? newImpl
-          : await newImpl.wait(1).then((r) => {
-              if (!r?.contractAddress) throw new Error('No contract address')
-              return r.contractAddress
-            })
+      virtualExecutionPayloadArray.push(virtualExecutionPayload)
+    } // end loop for steps
 
-      await updateDeploymentAbi({
-        hre,
-        address: refAddress,
-        abi: JSON.parse(step.implFactory.interface.formatJson()),
-      })
-
-      timelockBatchArgs.values.push('0')
-      if ('proxy' in step) {
-        timelockBatchArgs.targets.push(await proxyAdmin.getAddress())
-
-        if (call) {
-          timelockBatchArgs.payloads.push(
-            proxyAdmin.interface.encodeFunctionData('upgradeAndCall', [
-              refAddress,
-              newImplAddr,
-              step.implFactory.interface.encodeFunctionData(call.fn, call.args),
-            ])
-          )
-        } else {
-          timelockBatchArgs.payloads.push(
-            proxyAdmin.interface.encodeFunctionData('upgrade', [
-              refAddress,
-              newImplAddr,
-            ])
-          )
-        }
-      } else {
-        timelockBatchArgs.targets.push(refAddress)
-
-        const iface = new ethers.Interface([
-          ethers.FunctionFragment.from({
-            inputs: [
-              {
-                name: 'newImplementation',
-                type: 'address',
-              },
-            ],
-            name: 'upgradeTo',
-            stateMutability: 'nonpayable',
-            type: 'function',
-          }),
-        ])
-        timelockBatchArgs.payloads.push(
-          iface.encodeFunctionData('upgradeTo', [newImplAddr])
-        )
-      }
+    const timelockBatchArgs: TimelockBatchArgs = {
+      targets: virtualExecutionPayloadArray.map((x) => x.target),
+      values: virtualExecutionPayloadArray.map((x) => x.value),
+      payloads: virtualExecutionPayloadArray.map((x) => x.payload),
+      predecessor: ethers.encodeBytes32String(''),
+      salt: ethers.encodeBytes32String(''), // should this have a value ?
+      delay,
     }
 
-    const admin = getAdminClient(hre)
-    return {
-      schedule: await admin.createProposal({
-        title: `${title} (Schedule Timelock)`,
-        description: description,
-        type: 'custom',
-        viaType: 'Gnosis Safe',
-        via: protocolOwnerSafe,
-        contract: {
-          name: 'TellerV2 Protocol Timelock',
-          network,
-          address: protocolTimelock,
-        },
-        functionInterface: {
-          name: 'scheduleBatch',
-          inputs: [
-            { name: 'targets', type: 'address[]' },
-            { name: 'values', type: 'uint256[]' },
-            { name: 'payloads', type: 'bytes[]' },
-            { name: 'predecessor', type: 'bytes32' },
-            { name: 'salt', type: 'bytes32' },
-            { name: 'delay', type: 'uint256' },
-          ],
-        },
-        functionInputs: [
-          timelockBatchArgs.targets,
-          timelockBatchArgs.values,
-          timelockBatchArgs.payloads,
-          timelockBatchArgs.predecessor,
-          timelockBatchArgs.salt,
-          timelockBatchArgs.delay,
-        ],
-      }),
-      execute: await admin.createProposal({
-        title: `${title} (Execute Timelock)`,
-        description: description,
-        type: 'custom',
-        viaType: 'Gnosis Safe',
-        via: protocolOwnerSafe,
-        contract: {
-          name: 'TellerV2 Protocol Timelock',
-          network,
-          address: protocolTimelock,
-        },
-        functionInterface: {
-          name: 'executeBatch',
-          inputs: [
-            { name: 'targets', type: 'address[]' },
-            { name: 'values', type: 'uint256[]' },
-            { name: 'payloads', type: 'bytes[]' },
-            { name: 'predecessor', type: 'bytes32' },
-            { name: 'salt', type: 'bytes32' },
-          ],
-        },
-        functionInputs: [
-          timelockBatchArgs.targets,
-          timelockBatchArgs.values,
-          timelockBatchArgs.payloads,
-          timelockBatchArgs.predecessor,
-          timelockBatchArgs.salt,
-        ],
-      }),
-    }
+    // @ts-ignore
+    return await createScheduledBatchProposal(hre, {
+      title,
+      description,
+      timelockBatchArgs,
+    })
   }
 })
+
+async function getOZNetwork(hre: HardhatRuntimeEnvironment): Promise<Network> {
+  const chainId = await hre.getChainId()
+  const network = fromChainId(Number(chainId))
+  if (!network) throw new Error(`Unknown chain id ${chainId}`)
+  return network
+}
+
+const getVirtualExecutionPayloadForStep = async (
+  step: BatchProposalStep,
+  hre: HardhatRuntimeEnvironment
+): Promise<VirtualExecutionPayload> => {
+  if (isCallStep(step)) {
+    return await getVirtualPayloadForCall(step, hre)
+  } else if (isUpgradeProxyStep(step)) {
+    return await getVirtualPayloadForUpgradeProxy(step, hre)
+  } else if (isUpgradeBeaconStep(step)) {
+    return await getVirtualPayloadForUpgradeBeacon(step, hre)
+  } else {
+    throw new Error('Invalid step type - cannot add batch args')
+  }
+}
+
+const getVirtualPayloadForCall = async (
+  step: ProposeCallStep,
+
+  hre: HardhatRuntimeEnvironment
+): Promise<VirtualExecutionPayload> => {
+  const contractImpl = step.contractImplementation
+
+  const iface = contractImpl.interface
+
+  const functionInputsInterface = JSON.parse(
+    JSON.stringify(iface.getFunction(step.callFn)?.inputs)
+  )
+
+  const targetFunction: ProposalTargetFunction = {
+    name: step.callFn,
+    inputs: functionInputsInterface,
+  }
+
+  const functionInputs: ProposalFunctionInputs = step.callArgs
+
+  if (typeof targetFunction.name == 'undefined') {
+    throw new Error('Target function for call is missing name')
+  }
+
+  return {
+    value: '0',
+    target: step.contractAddress,
+
+    targetFunction,
+    functionInputs,
+
+    // is this right ?
+    payload: iface.encodeFunctionData(targetFunction.name, functionInputs),
+  }
+}
+
+const getVirtualPayloadForUpgradeProxy = async (
+  step: ProposeProxyUpgradeStep,
+
+  hre: HardhatRuntimeEnvironment
+): Promise<VirtualExecutionPayload> => {
+  const proxyAdmin = await hre.upgrades.admin.getInstance()
+
+  const refAddress =
+    typeof step.proxy === 'string' ? step.proxy : await step.proxy.getAddress()
+  const call = step.opts?.call
+
+  const newImpl = await hre.upgrades.prepareUpgrade(
+    refAddress,
+    step.implFactory,
+    step.opts
+  )
+  const newImplAddr =
+    typeof newImpl === 'string'
+      ? newImpl
+      : await newImpl.wait(1).then((r) => {
+          if (!r?.contractAddress) throw new Error('No contract address')
+          return r.contractAddress
+        })
+
+  await updateDeploymentAbi({
+    hre,
+    address: refAddress,
+    abi: JSON.parse(step.implFactory.interface.formatJson()),
+  })
+
+  // produce the timelock batch args
+  const value = '0'
+  // batchArgs.values.push('0')
+
+  // batchArgs.targets.push(await proxyAdmin.getAddress())
+  const target = await proxyAdmin.getAddress()
+
+  const targetFunction: ProposalTargetFunction = call
+    ? {
+        name: 'upgradeAndCall',
+        inputs: [
+          {
+            name: 'proxy',
+            type: 'address',
+          },
+          {
+            name: 'implementation',
+            type: 'address',
+          },
+          { name: 'data', type: 'bytes' },
+        ],
+      }
+    : {
+        name: 'upgrade',
+        inputs: [
+          {
+            name: 'proxy',
+            type: 'address',
+          },
+          {
+            name: 'implementation',
+            type: 'address',
+          },
+        ],
+      }
+  /*
+  console.log('creating function inputs ', {
+    call
+  })
+
+  for (let fragment of step.implFactory.interface.fragments) {
+    console.log(fragment)
+  }*/
+
+  const functionInputs: ProposalFunctionInputs = call
+    ? [
+        refAddress,
+        newImplAddr,
+        step.implFactory.interface.encodeFunctionData(call.fn, call.args),
+      ]
+    : [refAddress, newImplAddr]
+
+  if (typeof targetFunction.name === 'undefined') {
+    throw new Error('Missing target function name')
+  }
+
+  const iface = proxyAdmin.interface
+
+  const payload: string = iface.encodeFunctionData(
+    targetFunction.name,
+    functionInputs
+  )
+
+  return { value, target, payload, targetFunction, functionInputs }
+}
+
+const getVirtualPayloadForUpgradeBeacon = async (
+  step: ProposeBeaconUpgradeStep,
+
+  hre: HardhatRuntimeEnvironment
+): Promise<VirtualExecutionPayload> => {
+  const refAddress =
+    typeof step.beacon === 'string'
+      ? step.beacon
+      : await step.beacon.getAddress()
+
+  const newImpl = await hre.upgrades.prepareUpgrade(
+    refAddress,
+    step.implFactory,
+    step.opts
+  )
+  const newImplAddr =
+    typeof newImpl === 'string'
+      ? newImpl
+      : await newImpl.wait(1).then((r) => {
+          if (!r?.contractAddress) throw new Error('No contract address')
+          return r.contractAddress
+        })
+
+  await updateDeploymentAbi({
+    hre,
+    address: refAddress,
+    abi: JSON.parse(step.implFactory.interface.formatJson()),
+  })
+
+  const value = '0'
+  const target = refAddress
+  // produce the timelock batch args
+  // batchArgs.values.push('0')
+
+  // batchArgs.targets.push(refAddress)
+
+  const iface = new hre.ethers.Interface([
+    hre.ethers.FunctionFragment.from({
+      inputs: [
+        {
+          name: 'newImplementation',
+          type: 'address',
+        },
+      ],
+      name: 'upgradeTo',
+      stateMutability: 'nonpayable',
+      type: 'function',
+    }),
+  ])
+
+  const targetFunction: ProposalTargetFunction = {
+    name: 'upgradeTo',
+    inputs: [
+      {
+        name: 'newImplementation',
+        type: 'address',
+      },
+    ],
+  }
+
+  const functionInputs: ProposalFunctionInputs = [newImplAddr]
+
+  if (typeof targetFunction.name == 'undefined') {
+    throw new Error('Missing target function name')
+  }
+
+  const payload = iface.encodeFunctionData(targetFunction.name, functionInputs)
+  // batchArgs.payloads.push(iface.encodeFunctionData('upgradeTo', [newImplAddr]))
+
+  return { value, target, payload, targetFunction, functionInputs }
+}
+
+const PendingProposalsFile = 'pending-proposals.json'
+const storePendingProposal = async (
+  hre: HardhatRuntimeEnvironment,
+  {
+    title,
+    description,
+    timelockBatchArgs,
+  }: {
+    title: string
+    description: string
+    timelockBatchArgs: TimelockBatchArgs
+  }
+): Promise<void> => {
+  const proposals = await hre.deployments
+    .readDotFile(PendingProposalsFile)
+    .then<Record<string, TimelockBatchArgs | undefined>>((contents) =>
+      JSON.parse(contents)
+    )
+    .catch(() => undefined)
+    .then((contents) => contents ?? {})
+
+  const proposal: TimelockBatchArgs = proposals[title] ?? {
+    targets: [],
+    values: [],
+    payloads: [],
+    predecessor: '',
+    salt: '',
+    delay: '',
+  }
+  proposals[title] = proposal
+
+  if (
+    timelockBatchArgs.predecessor === proposal.predecessor &&
+    timelockBatchArgs.salt === proposal.salt
+  ) {
+    proposal.targets.push(...timelockBatchArgs.targets)
+    proposal.values.push(...timelockBatchArgs.values)
+    proposal.payloads.push(...timelockBatchArgs.payloads)
+  }
+  await hre.deployments.saveDotFile(
+    PendingProposalsFile,
+    JSON.stringify(proposal)
+  )
+}
+
+const createScheduledBatchProposal = async (
+  hre: HardhatRuntimeEnvironment,
+  {
+    title,
+    description,
+    timelockBatchArgs,
+  }: {
+    title: string
+    description: string
+    timelockBatchArgs: TimelockBatchArgs
+  }
+) => {
+  const network = await getOZNetwork(hre)
+  const defenderAdmin = new AdminClient({
+    apiKey: hre.config.defender!.apiKey,
+    apiSecret: hre.config.defender!.apiSecret,
+  })
+
+  const { protocolOwnerSafe, protocolTimelock } = await hre.getNamedAccounts()
+
+  return {
+    schedule: await defenderAdmin.createProposal({
+      title: `${title} (Schedule Timelock)`,
+      description: description,
+      type: 'custom',
+      viaType: 'Gnosis Safe',
+      via: protocolOwnerSafe,
+      contract: {
+        name: 'TellerV2 Protocol Timelock',
+        network,
+        address: protocolTimelock,
+      },
+      functionInterface: {
+        name: 'scheduleBatch',
+        inputs: [
+          { name: 'targets', type: 'address[]' },
+          { name: 'values', type: 'uint256[]' },
+          { name: 'payloads', type: 'bytes[]' },
+          { name: 'predecessor', type: 'bytes32' },
+          { name: 'salt', type: 'bytes32' },
+          { name: 'delay', type: 'uint256' },
+        ],
+      },
+      functionInputs: [
+        timelockBatchArgs.targets,
+        timelockBatchArgs.values,
+        timelockBatchArgs.payloads,
+        timelockBatchArgs.predecessor,
+        timelockBatchArgs.salt,
+        timelockBatchArgs.delay,
+      ],
+    }),
+    execute: await defenderAdmin.createProposal({
+      title: `${title} (Execute Timelock)`,
+      description: description,
+      type: 'custom',
+      viaType: 'Gnosis Safe',
+      via: protocolOwnerSafe,
+      contract: {
+        name: 'TellerV2 Protocol Timelock',
+        network,
+        address: protocolTimelock,
+      },
+      functionInterface: {
+        name: 'executeBatch',
+        inputs: [
+          { name: 'targets', type: 'address[]' },
+          { name: 'values', type: 'uint256[]' },
+          { name: 'payloads', type: 'bytes[]' },
+          { name: 'predecessor', type: 'bytes32' },
+          { name: 'salt', type: 'bytes32' },
+        ],
+      },
+      functionInputs: [
+        timelockBatchArgs.targets,
+        timelockBatchArgs.values,
+        timelockBatchArgs.payloads,
+        timelockBatchArgs.predecessor,
+        timelockBatchArgs.salt,
+      ],
+    }),
+  }
+}
 
 type OZDefenderDeployOpts = (DeployProxyOptions | DeployBeaconOptions) &
   DeployExtraOpts
@@ -830,8 +1123,10 @@ async function ozDefenderDeploy<C = BaseContract>(
   hre.log('')
 
   let proxy: BaseContract
+  const deployer = await hre.getNamedSigner('deployer')
   const implFactory = await hre.ethers.getContractFactory(contractName, {
     libraries: opts.libraries,
+    signer: deployer,
   })
   const existingDeployment = await hre.deployments.getOrNull(saveName)
   if (existingDeployment) {
@@ -841,7 +1136,8 @@ async function ozDefenderDeploy<C = BaseContract>(
 
     proxy = await hre.ethers.getContractAt(
       contractName,
-      existingDeployment.address
+      existingDeployment.address,
+      deployer
     )
   } else {
     hre.log(`${chalk.bold.green(`Deploying new ${deployType}...`)}`, {

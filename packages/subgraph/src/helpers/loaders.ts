@@ -34,6 +34,8 @@ export function loadProtocol(): Protocol {
     loadLoanStatusCount("protocol", protocol.id);
 
     protocol.activeCommitments = [];
+    protocol.inactiveCommitments = [];
+
     protocol.activeRewards = [];
 
     protocol._durationTotal = BigInt.zero();
@@ -377,7 +379,7 @@ export function loadLenderTokenVolume(
   return loadTokenVolumeWithValues(
     ["lender", lender.id, lender.marketplace],
     lendingTokenId,
-    ["marketplace", "lender"],
+    ["market", "lender"],
     [Value.fromString(lender.marketplace), Value.fromString(lender.id)]
   );
 }
@@ -394,7 +396,7 @@ export function loadBorrowerTokenVolume(
   return loadTokenVolumeWithValues(
     ["borrower", borrower.id, borrower.marketplace],
     lendingTokenId,
-    ["marketplace", "borrower"],
+    ["market", "borrower"],
     [Value.fromString(borrower.marketplace), Value.fromString(borrower.id)]
   );
 }

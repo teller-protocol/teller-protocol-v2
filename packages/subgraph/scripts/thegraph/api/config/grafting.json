@@ -1,0 +1,33 @@
+{
+
+    "networks": {
+
+        "arbitrum-one" : {
+            "graft": true,
+            "base":"QmYRVaPzBbj9UP7NkYaSFXfNmvBtGugJ74F8Tf7UAsg8jC",
+            "block":"192411000" 
+
+        },
+        "base" : {
+            "graft": true,
+            "base":"QmWTUNHe9uGGKq4Ud6vr6KSGBqqb7yHnwmtqeZgoQ4QyeD",
+            "block":"11680298" 
+
+        },
+        "mainnet" : {
+            "graft": true,
+            "base":"QmRu14wEAEA6Emq4NQeuP8LYVjVf47e43io9EbpFvfTNhh",
+            "block":"19483122" 
+
+        }
+
+
+
+    }
+
+
+
+
+
+
+}

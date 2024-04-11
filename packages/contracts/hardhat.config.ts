@@ -197,7 +197,7 @@ export default <HardhatUserConfig>{
       arbitrumOne: process.env.ARBISCAN_VERIFY_API_KEY,
       base: process.env.BASESCAN_VERIFY_API_KEY,
       mantle: process.env.MANTLE_VERIFY_API_KEY ?? 'xyz',
-      clarity: '', //none ? 
+      clarity: process.env.CLARITY_VERIFY_API_KEY, //none ? 
 
       // Test Networks
       sepolia: process.env.ETHERSCAN_VERIFY_API_KEY,
@@ -218,8 +218,8 @@ export default <HardhatUserConfig>{
         network: 'clarity',
         chainId: 66814,
         urls: {
-          apiURL: 'https://api.basescan.org/api',
-          browserURL: 'https://basescan.org',
+          apiURL: 'https://explorerl2new-jolly-turquoise-puma-ghjf0zpvst.t.conduit.xyz/api',
+          browserURL: 'https://explorerl2new-jolly-turquoise-puma-ghjf0zpvst.t.conduit.xyz/api',
         },
       },
       {

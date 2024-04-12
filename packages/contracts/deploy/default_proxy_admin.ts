@@ -51,4 +51,16 @@ deployFn.id = 'default-proxy-admin:transfer'
 deployFn.tags = ['default-proxy-admin', 'default-proxy-admin:transfer']
 deployFn.dependencies = ['teller-v2:deploy']
 deployFn.runAtTheEnd = true
+
+deployFn.skip = async (hre) => {
+  
+  return (
+    !hre.network.live ||
+    !['mainnet', 'polygon', 'arbitrum', 'goerli','base', 'sepolia'].includes(
+      hre.network.name
+    )
+  )
+}
+
+
 export default deployFn

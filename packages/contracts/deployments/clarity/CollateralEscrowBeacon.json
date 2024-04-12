@@ -324,6 +324,6 @@
     }
   ],
   "receipt": {},
-  "numDeployments": 1,
+  "numDeployments": 3,
   "implementation": "0x6b1eC259a35005b7562c92f42C490f39131fF1d8"
 }

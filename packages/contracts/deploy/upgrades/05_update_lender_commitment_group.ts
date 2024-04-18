@@ -102,6 +102,6 @@ deployFn.tags = [
 ]
 deployFn.dependencies = ['lender-commitment-group-smart:deploy']
 deployFn.skip = async (hre) => {
-  return !hre.network.live || !['sepolia'].includes(hre.network.name)
+  return !hre.network.live || !['goerli'].includes(hre.network.name)
 }
 export default deployFn

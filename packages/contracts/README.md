@@ -25,6 +25,15 @@ GOERLI_RPC_URL= ...
 
 
 
+## Export deployed contracts to npm 
+
+> npm login
+
+> cd packages/contracts 
+
+> npm publish --access public
+
+
 ## Forge docs 
 
  > forge doc --serve 

@@ -250,10 +250,8 @@ contract LenderCommitmentGroup_Smart is
     event DefaultedLoanLiquidated(
         uint256 indexed bidId,
         address indexed liquidator,
-        uint256 amountDue,
-        
-        int256 tokenAmountDifference,
-        uint256 principalTokensRepaid
+        uint256 amountDue, 
+        int256 tokenAmountDifference 
     );
 
 
@@ -593,44 +591,44 @@ contract LenderCommitmentGroup_Smart is
         );
 
 
-       uint256 principalTokensAmountTaken = 0;
-
+     
 
         if (_tokenAmountDifference > 0) {
             //this is used when the collateral value is higher than the principal (rare)
             //the loan will be completely made whole and our contract gets extra funds too
             uint256 tokensToTakeFromSender = abs(_tokenAmountDifference);
 
-            principalTokensAmountTaken = amountDue + tokensToTakeFromSender;
-
+          
             IERC20(principalToken).transferFrom(
                 msg.sender,
                 address(this),
-                principalTokensAmountTaken
+                amountDue + tokensToTakeFromSender
             );
 
+
+            //Why would totalPrincipalTokensRepaid include or not include tokensToTakeFromSender !? 
+
             tokenDifferenceFromLiquidations += int256(tokensToTakeFromSender);
-            totalPrincipalTokensRepaid += principalTokensAmountTaken;
+            totalPrincipalTokensRepaid += amountDue;
              
         } else {
             //the loan will be not be made whole and will be short
 
             uint256 tokensToGiveToSender = abs(_tokenAmountDifference);
 
-            principalTokensAmountTaken = amountDue - tokensToGiveToSender;
+           
              
             IERC20(principalToken).transferFrom(
                 msg.sender,
                 address(this),
-                principalTokensAmountTaken
+                amountDue - tokensToGiveToSender
             );
 
             tokenDifferenceFromLiquidations -= int256(tokensToGiveToSender);
-              totalPrincipalTokensRepaid += principalTokensAmountTaken;
+              totalPrincipalTokensRepaid += amountDue; //this is changed compared to audit !! 
            
         }
-
-       
+ 
 
         //this will give collateral to the caller
         ITellerV2(TELLER_V2).lenderCloseLoanWithRecipient(_bidId, msg.sender);
@@ -639,8 +637,7 @@ contract LenderCommitmentGroup_Smart is
             _bidId,
             msg.sender,
             amountDue, 
-            _tokenAmountDifference,
-            principalTokensAmountTaken
+            _tokenAmountDifference
         );
     }
 

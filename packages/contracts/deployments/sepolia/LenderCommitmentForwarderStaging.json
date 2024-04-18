@@ -1,6 +1,5 @@
 {
-  "address": "0xd23F21685955e2d2637eEAAF6e870d1DB65ac2b7",
-  "fqn": "contracts/LenderCommitmentForwarder/LenderCommitmentForwarderStaging.sol:LenderCommitmentForwarderStaging",
+  "address": "0x7c9CDF020E476704702A5c82E52c7539D26b0a94",
   "abi": [
     {
       "type": "constructor",
@@ -900,13 +899,13 @@
       "outputs": []
     }
   ],
-  "transactionHash": "0xd70e25caf91c16e0e12ae94507de50ac9006ca177f2146c457d7fe9aa92bf616",
+  "transactionHash": "0x44e485fbf06f4a9c2ec7e5be604015f4e793f9e891f701b775988641472b9d06",
   "receipt": {
     "to": null,
-    "from": "0x65B38b3Cd7eFe502DB579c16ECB5B49235d0DAd0",
+    "from": "0xD9B023522CeCe02251d877bb0EB4f06fDe6F98E6",
     "blockHash": null,
     "blockNumber": null
   },
   "numDeployments": 1,
-  "implementation": "0x69620F29484C60bbC05a1698Cc793DC35c9beeCc"
+  "implementation": "0x920F45C59334B3676976F0473C37c5e2368a148B"
 }

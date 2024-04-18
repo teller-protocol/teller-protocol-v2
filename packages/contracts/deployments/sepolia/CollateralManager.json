@@ -1,5 +1,5 @@
 {
-  "address": "0xC52A89eB4Ec84D777f9b6BcFd71F1C5Ce5033d08",
+  "address": "0xb7fAe1B38ac960706B5a636756bF7450F7a44339",
   "abi": [
     {
       "type": "event",
@@ -651,15 +651,40 @@
         }
       ],
       "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "withdrawDustTokens",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_bidId"
+        },
+        {
+          "type": "address",
+          "name": "_tokenAddress"
+        },
+        {
+          "type": "uint256",
+          "name": "_amount"
+        },
+        {
+          "type": "address",
+          "name": "_recipientAddress"
+        }
+      ],
+      "outputs": []
     }
   ],
-  "transactionHash": "0x853f40253a5eb105cda289791d4584ca27912948bebb99323fbb9bb607e1feda",
+  "transactionHash": "0x4d560f6ee8515cad15f615044f6d3944f6cdf7fdc6221f554a726eefa610c211",
   "receipt": {
     "to": null,
-    "from": "0x65B38b3Cd7eFe502DB579c16ECB5B49235d0DAd0",
+    "from": "0xD9B023522CeCe02251d877bb0EB4f06fDe6F98E6",
     "blockHash": null,
     "blockNumber": null
   },
   "numDeployments": 1,
-  "implementation": "0x9A14D039fd404B8D1B6D98A0056a3Ea23003F5B6"
+  "implementation": "0xa4A8c60Ac9E0c38f8B46316c6B3B508b3BA04415"
 }

@@ -1,5 +1,5 @@
 {
-  "address": "0xd8D2dFb514cd06456E79EF19F942499d35722b37",
+  "address": "0xc15141287164375341CDfE856861776f0b16cCBb",
   "abi": [
     {
       "type": "constructor",
@@ -9,10 +9,6 @@
         {
           "type": "address",
           "name": "_tellerV2"
-        },
-        {
-          "type": "address",
-          "name": "_lenderCommitmentForwarder"
         },
         {
           "type": "address",
@@ -50,20 +46,6 @@
     {
       "type": "function",
       "name": "ADDRESSES_PROVIDER",
-      "constant": true,
-      "stateMutability": "view",
-      "payable": false,
-      "inputs": [],
-      "outputs": [
-        {
-          "type": "address",
-          "name": ""
-        }
-      ]
-    },
-    {
-      "type": "function",
-      "name": "LENDER_COMMITMENT_FORWARDER",
       "constant": true,
       "stateMutability": "view",
       "payable": false,
@@ -125,6 +107,10 @@
       "payable": false,
       "inputs": [
         {
+          "type": "address",
+          "name": "_lenderCommitmentForwarder"
+        },
+        {
           "type": "uint256",
           "name": "_loanId"
         },
@@ -135,6 +121,10 @@
             {
               "type": "uint256",
               "name": "commitmentId"
+            },
+            {
+              "type": "address",
+              "name": "smartCommitmentAddress"
             },
             {
               "type": "uint256",
@@ -206,7 +196,7 @@
         },
         {
           "type": "address",
-          "name": "initiator"
+          "name": "_initiator"
         },
         {
           "type": "bytes",
@@ -227,6 +217,10 @@
       "payable": false,
       "inputs": [
         {
+          "type": "address",
+          "name": "_lenderCommitmentForwarder"
+        },
+        {
           "type": "uint256",
           "name": "_loanId"
         },
@@ -245,6 +239,10 @@
             {
               "type": "uint256",
               "name": "commitmentId"
+            },
+            {
+              "type": "address",
+              "name": "smartCommitmentAddress"
             },
             {
               "type": "uint256",
@@ -277,21 +275,16 @@
           ]
         }
       ],
-      "outputs": [
-        {
-          "type": "uint256",
-          "name": "newLoanId_"
-        }
-      ]
+      "outputs": []
     }
   ],
-  "transactionHash": "0x8369cdc36c96cb415bc2f0a40ef144e1b356fcfcbd9bfba6c8b789dd0345621c",
+  "transactionHash": "0x7686d7f4f233f89b4c7d01e7a71a7c8d8f36513bf1645cf7abd25ca18a92c859",
   "receipt": {
     "to": null,
-    "from": "0x65B38b3Cd7eFe502DB579c16ECB5B49235d0DAd0",
+    "from": "0xD9B023522CeCe02251d877bb0EB4f06fDe6F98E6",
     "blockHash": null,
     "blockNumber": null
   },
-  "numDeployments": 2,
-  "implementation": "0x28C9A7FA7AaAbe74EbD8a7AC484d8eDeD4D8B3CA"
+  "numDeployments": 1,
+  "implementation": "0xb8E8b0aa1F49dD5128941571802235457189538d"
 }

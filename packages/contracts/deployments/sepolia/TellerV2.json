@@ -1,5 +1,5 @@
 {
-  "address": "0x50AF6e0A54F663467F8e3B6e76Ae60329c4c26Ef",
+  "address": "0x688d3d7D900f38ce095914608AD069d5AA2331DB",
   "abi": [
     {
       "type": "constructor",
@@ -108,6 +108,18 @@
           "type": "uint8",
           "name": "version",
           "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "LoanClosed",
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "bidId",
+          "indexed": true
         }
       ]
     },
@@ -809,6 +821,25 @@
     },
     {
       "type": "function",
+      "name": "getLoanDefaultTimestamp",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_bidId"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
       "name": "getLoanLender",
       "constant": true,
       "stateMutability": "view",
@@ -927,6 +958,25 @@
         {
           "type": "string",
           "name": "metadataURI_"
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getRepaymentListenerForBid",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_bidId"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
         }
       ]
     },
@@ -1172,6 +1222,23 @@
     },
     {
       "type": "function",
+      "name": "lenderCloseLoanWithRecipient",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_bidId"
+        },
+        {
+          "type": "address",
+          "name": "_collateralRecipient"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
       "name": "lenderCommitmentForwarder",
       "constant": true,
       "stateMutability": "view",
@@ -1230,6 +1297,23 @@
         {
           "type": "uint256",
           "name": "_bidId"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "liquidateLoanFullWithRecipient",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_bidId"
+        },
+        {
+          "type": "address",
+          "name": "_recipient"
         }
       ],
       "outputs": []
@@ -1411,6 +1495,25 @@
     },
     {
       "type": "function",
+      "name": "repaymentListenerForBid",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
       "name": "reputationManager",
       "constant": true,
       "stateMutability": "view",
@@ -1425,19 +1528,6 @@
     },
     {
       "type": "function",
-      "name": "setEscrowVault",
-      "constant": false,
-      "payable": false,
-      "inputs": [
-        {
-          "type": "address",
-          "name": "_escrowVault"
-        }
-      ],
-      "outputs": []
-    },
-    {
-      "type": "function",
       "name": "setProtocolFee",
       "constant": false,
       "payable": false,
@@ -1445,6 +1535,23 @@
         {
           "type": "uint16",
           "name": "newFee"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "setRepaymentListenerForBid",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_bidId"
+        },
+        {
+          "type": "address",
+          "name": "_listener"
         }
       ],
       "outputs": []
@@ -1646,13 +1753,13 @@
       ]
     }
   ],
-  "transactionHash": "0x07f434b430882274852ba8ad9e9b41a50dd78d1cd381e4c063d1382ef28bc51c",
+  "transactionHash": "0x5449fc81b3f76b90668b17d3ab5e18fda524a81076b1c95a84a0905c1209a765",
   "receipt": {
     "to": null,
-    "from": "0x65B38b3Cd7eFe502DB579c16ECB5B49235d0DAd0",
+    "from": "0xD9B023522CeCe02251d877bb0EB4f06fDe6F98E6",
     "blockHash": null,
     "blockNumber": null
   },
-  "numDeployments": 2,
-  "implementation": "0x8127a64DAb886e7fB1eC34eFff5aA7435434ECD5"
+  "numDeployments": 1,
+  "implementation": "0x5896B1168C2558886Fa590a5F57667b88a012874"
 }

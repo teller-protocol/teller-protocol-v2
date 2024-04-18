@@ -598,26 +598,20 @@ contract LenderCommitmentGroup_Smart is
             //the loan will be completely made whole and our contract gets extra funds too
             uint256 tokensToTakeFromSender = abs(_tokenAmountDifference);
 
-          
             IERC20(principalToken).transferFrom(
                 msg.sender,
                 address(this),
                 amountDue + tokensToTakeFromSender
             );
 
-
-            //Why would totalPrincipalTokensRepaid include or not include tokensToTakeFromSender !? 
-
             tokenDifferenceFromLiquidations += int256(tokensToTakeFromSender);
+
             totalPrincipalTokensRepaid += amountDue;
-             
         } else {
             //the loan will be not be made whole and will be short
 
             uint256 tokensToGiveToSender = abs(_tokenAmountDifference);
 
-           
-             
             IERC20(principalToken).transferFrom(
                 msg.sender,
                 address(this),
@@ -625,8 +619,8 @@ contract LenderCommitmentGroup_Smart is
             );
 
             tokenDifferenceFromLiquidations -= int256(tokensToGiveToSender);
-              totalPrincipalTokensRepaid += amountDue; //this is changed compared to audit !! 
-           
+
+            totalPrincipalTokensRepaid += (amountDue - tokensToGiveToSender);
         }
  
 

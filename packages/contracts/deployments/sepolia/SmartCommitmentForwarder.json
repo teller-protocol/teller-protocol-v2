@@ -1,5 +1,5 @@
 {
-  "address": "0x0a356048b341560ac200275B6D82926568d1e48e",
+  "address": "0xe4eeEe76FA371ae6e94fcEd5a61f18A2D3585976",
   "abi": [
     {
       "type": "constructor",
@@ -190,7 +190,7 @@
       ]
     }
   ],
-  "transactionHash": "0x88a6faaed5a8f4c5884ea7af931a25c255e35045c0e58abb7f8924afa1249760",
+  "transactionHash": "0x89b4020bf9f6832fe9833bce2fd6651dc2159633e65b23b778d0ab59f1581459",
   "receipt": {
     "to": null,
     "from": "0xD9B023522CeCe02251d877bb0EB4f06fDe6F98E6",
@@ -198,5 +198,5 @@
     "blockNumber": null
   },
   "numDeployments": 1,
-  "implementation": "0x2Ec547Da3Bff965c84E4CC91dde9E3bA1E57C3DB"
+  "implementation": "0x10e835b79379797f324d397b32D9fF10bEc1755C"
 }

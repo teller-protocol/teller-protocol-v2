@@ -9,5 +9,13 @@
   "lender-commitment-forwarder:alpha:deploy": 1713464761,
   "lender-commitment-forwarder:staging:deploy": 1713464784,
   "lender-commitment-forwarder:extensions:flash-rollover:deploy": 1713464809,
-  "smart-commitment-forwarder:deploy": 1713464834
+  "smart-commitment-forwarder:deploy": 1713464834,
+  "lender-manager:deploy": 1713465949,
+  "reputation-manager:deploy": 1713465973,
+  "teller-v2:init": 1713465985,
+  "teller-v2:transfer-ownership-to-safe": 1713465997,
+  "lender-manager:transfer-ownership": 1713466009,
+  "liquidity-rewards:deploy": 1713466033,
+  "default-proxy-admin:transfer": 1713466033,
+  "lender-commitment-group-smart:deploy": 1713466369
 }

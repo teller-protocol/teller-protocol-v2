@@ -1,5 +1,5 @@
 {
-  "address": "0x0EfD3E33Ba2EdE028e50a3E7f81E084996d161aa",
+  "address": "0x37F483C895C66d3eDb14AE88ea9bA52F937Eb002",
   "abi": [
     {
       "type": "constructor",
@@ -23,11 +23,166 @@
     {
       "type": "event",
       "anonymous": false,
+      "name": "BorrowerAcceptedFunds",
+      "inputs": [
+        {
+          "type": "address",
+          "name": "borrower",
+          "indexed": true
+        },
+        {
+          "type": "uint256",
+          "name": "bidId",
+          "indexed": true
+        },
+        {
+          "type": "uint256",
+          "name": "principalAmount",
+          "indexed": false
+        },
+        {
+          "type": "uint256",
+          "name": "collateralAmount",
+          "indexed": false
+        },
+        {
+          "type": "uint32",
+          "name": "loanDuration",
+          "indexed": false
+        },
+        {
+          "type": "uint16",
+          "name": "interestRate",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "DefaultedLoanLiquidated",
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "bidId",
+          "indexed": true
+        },
+        {
+          "type": "address",
+          "name": "liquidator",
+          "indexed": true
+        },
+        {
+          "type": "uint256",
+          "name": "amountDue",
+          "indexed": false
+        },
+        {
+          "type": "int256",
+          "name": "tokenAmountDifference",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "EarningsWithdrawn",
+      "inputs": [
+        {
+          "type": "address",
+          "name": "lender",
+          "indexed": true
+        },
+        {
+          "type": "uint256",
+          "name": "amountPoolSharesTokens",
+          "indexed": false
+        },
+        {
+          "type": "uint256",
+          "name": "principalTokensWithdrawn",
+          "indexed": false
+        },
+        {
+          "type": "address",
+          "name": "recipient",
+          "indexed": true
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
       "name": "Initialized",
       "inputs": [
         {
           "type": "uint8",
           "name": "version",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "LenderAddedPrincipal",
+      "inputs": [
+        {
+          "type": "address",
+          "name": "lender",
+          "indexed": true
+        },
+        {
+          "type": "uint256",
+          "name": "amount",
+          "indexed": false
+        },
+        {
+          "type": "uint256",
+          "name": "sharesAmount",
+          "indexed": false
+        },
+        {
+          "type": "address",
+          "name": "sharesRecipient",
+          "indexed": true
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "LoanRepaid",
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "bidId",
+          "indexed": true
+        },
+        {
+          "type": "address",
+          "name": "repayer",
+          "indexed": true
+        },
+        {
+          "type": "uint256",
+          "name": "principalAmount",
+          "indexed": false
+        },
+        {
+          "type": "uint256",
+          "name": "interestAmount",
+          "indexed": false
+        },
+        {
+          "type": "uint256",
+          "name": "totalPrincipalRepaid",
+          "indexed": false
+        },
+        {
+          "type": "uint256",
+          "name": "totalInterestCollected",
           "indexed": false
         }
       ]
@@ -57,6 +212,68 @@
         {
           "type": "address",
           "name": "account",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "PoolInitialized",
+      "inputs": [
+        {
+          "type": "address",
+          "name": "principalTokenAddress",
+          "indexed": true
+        },
+        {
+          "type": "address",
+          "name": "collateralTokenAddress",
+          "indexed": true
+        },
+        {
+          "type": "uint256",
+          "name": "marketId",
+          "indexed": false
+        },
+        {
+          "type": "uint32",
+          "name": "maxLoanDuration",
+          "indexed": false
+        },
+        {
+          "type": "uint16",
+          "name": "interestRateLowerBound",
+          "indexed": false
+        },
+        {
+          "type": "uint16",
+          "name": "interestRateUpperBound",
+          "indexed": false
+        },
+        {
+          "type": "uint16",
+          "name": "liquidityThresholdPercent",
+          "indexed": false
+        },
+        {
+          "type": "uint16",
+          "name": "loanToValuePercent",
+          "indexed": false
+        },
+        {
+          "type": "uint24",
+          "name": "uniswapPoolFee",
+          "indexed": false
+        },
+        {
+          "type": "uint32",
+          "name": "twapInterval",
+          "indexed": false
+        },
+        {
+          "type": "address",
+          "name": "poolSharesToken",
           "indexed": false
         }
       ]
@@ -956,7 +1173,7 @@
       "outputs": []
     }
   ],
-  "transactionHash": "0x720bd1cad23ecd8720865cdf5099e98988ba04579e76ef6d99dbf2204f82952c",
+  "transactionHash": "0x3a2574fce8bdb8a839cdba5a7a669d8933b027005b7cccc31d9488d80d95ae56",
   "receipt": {
     "to": null,
     "from": "0xD9B023522CeCe02251d877bb0EB4f06fDe6F98E6",
@@ -964,5 +1181,5 @@
     "blockNumber": null
   },
   "numDeployments": 1,
-  "implementation": "0x437b82f48Cd7E60742C87f4DF45eCf13B6CA935c"
+  "implementation": "0xB8Ab54664ed8F9f298778E8aEAA748A5818cb8C8"
 }

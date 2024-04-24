@@ -242,10 +242,8 @@ contract LenderCommitmentGroup_Smart is
        */
 
         uint256 poolTotalEstimatedValue = getPoolTotalEstimatedValue();
-       // uint256 poolTotalEstimatedValuePlusInterest = poolTotalEstimatedValue +
-       //     totalInterestCollected;
 
-        if (poolTotalEstimatedValue == 0) {
+        if (poolSharesToken.totalSupply() == 0) {
             return EXCHANGE_RATE_EXPANSION_FACTOR; // 1 to 1 for first swap
         }
 

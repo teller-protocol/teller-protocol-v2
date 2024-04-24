@@ -213,7 +213,7 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
         uint256 sharesAmount_ = lenderCommitmentGroupSmart
             .addPrincipalToCommitmentGroup(1000000, address(borrower));
 
-        uint256 expectedSharesAmount = 500000;
+        uint256 expectedSharesAmount = 1000000;
 
         //use ttoken logic to make this better
         assertEq(
@@ -518,7 +518,7 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
             loanDefaultTimestamp
         );
 
-      int256 expectedMinAmount = 400; //based on loanDefaultTimestamp gap 
+      int256 expectedMinAmount = 4220; //based on loanDefaultTimestamp gap 
 
        assertEq(min_amount,expectedMinAmount,"min_amount unexpected");
 
@@ -566,7 +566,7 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
             loanDefaultTimestamp
         );
 
-      int256 expectedMinAmount = -500; //based on loanDefaultTimestamp gap 
+      int256 expectedMinAmount = 3220; //based on loanDefaultTimestamp gap 
 
        assertEq(min_amount,expectedMinAmount,"min_amount unexpected");
 

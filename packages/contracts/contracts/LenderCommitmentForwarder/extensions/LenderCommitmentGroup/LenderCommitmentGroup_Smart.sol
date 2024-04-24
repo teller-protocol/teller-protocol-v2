@@ -780,19 +780,14 @@ contract LenderCommitmentGroup_Smart is
         public
         view
         returns (uint256)
-    {    
+    {     
 
-          int256 poolTotalEstimatedValueSigned = int256(totalPrincipalTokensCommitted) 
-         + int256(totalInterestCollected)  + int256(tokenDifferenceFromLiquidations) 
-         - int256(totalPrincipalTokensWithdrawn);
-
-          int256 amountAvailable = int256(  ( uint256( poolTotalEstimatedValueSigned )).percent(liquidityThresholdPercent) -
-            getTotalPrincipalTokensOutstandingInActiveLoans() ) ;
-
-             return uint256(amountAvailable);
+            return  ( uint256( getPoolTotalEstimatedValue() )).percent(liquidityThresholdPercent) -
+            getTotalPrincipalTokensOutstandingInActiveLoans() ;
      
     }
 
+ 
     /**
      * @notice Lets the DAO/owner of the protocol implement an emergency stop mechanism.
      */

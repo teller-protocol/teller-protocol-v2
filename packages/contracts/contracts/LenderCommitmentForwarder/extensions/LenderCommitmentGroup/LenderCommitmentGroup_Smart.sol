@@ -782,11 +782,7 @@ contract LenderCommitmentGroup_Smart is
         returns (uint256)
     {    
 
-          int256 poolTotalEstimatedValueSigned = int256(totalPrincipalTokensCommitted) 
-         + int256(totalInterestCollected)  + int256(tokenDifferenceFromLiquidations) 
-         - int256(totalPrincipalTokensWithdrawn);
-
-          int256 amountAvailable = int256(  ( uint256( poolTotalEstimatedValueSigned )).percent(liquidityThresholdPercent) -
+          int256 amountAvailable = int256(  ( uint256( getPoolTotalEstimatedValue() )).percent(liquidityThresholdPercent) -
             getTotalPrincipalTokensOutstandingInActiveLoans() ) ;
 
              return uint256(amountAvailable);

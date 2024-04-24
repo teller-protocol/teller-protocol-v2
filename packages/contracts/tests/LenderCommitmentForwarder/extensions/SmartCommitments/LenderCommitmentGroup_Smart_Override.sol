@@ -75,16 +75,18 @@ contract LenderCommitmentGroup_Smart_Override is LenderCommitmentGroup_Smart {
         totalPrincipalTokensCommitted = _mockAmt;
     }
 
+      function set_totalPrincipalTokensWithdrawn(uint256 _mockAmt) public {
+        totalPrincipalTokensWithdrawn = _mockAmt;
+    }
+
     function set_totalInterestCollected(uint256 _mockAmt) public {
         totalInterestCollected = _mockAmt;
     }
 
-    function set_principalTokensCommittedByLender(
-        address lender,
-        uint256 _mockAmt
-    ) public {
-        principalTokensCommittedByLender[lender] = _mockAmt;
+      function set_tokenDifferenceFromLiquidations(int256 _mockAmt) public {
+        tokenDifferenceFromLiquidations = _mockAmt;
     }
+ 
 
     function mock_mintShares(address _sharesRecipient, uint256 _mockAmt)
         public

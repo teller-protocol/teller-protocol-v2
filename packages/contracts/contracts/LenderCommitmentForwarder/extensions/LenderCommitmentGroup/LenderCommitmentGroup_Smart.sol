@@ -107,7 +107,7 @@ contract LenderCommitmentGroup_Smart is
     uint16 public interestRateUpperBound;
 
 
-    mapping(address => uint256) public principalTokensCommittedByLender;
+    //mapping(address => uint256) public principalTokensCommittedByLender;
     mapping(uint256 => bool) public activeBids;
 
     //this excludes interest
@@ -260,9 +260,7 @@ contract LenderCommitmentGroup_Smart is
      */
 
     function sharesExchangeRate() public view virtual returns (uint256 rate_) {
-        /*
-        Should get slightly less shares than principal tokens put in !! diluted by ratio of pools actual equity 
-       */
+        
 
         uint256 poolTotalEstimatedValue = getPoolTotalEstimatedValue();
 
@@ -288,7 +286,7 @@ contract LenderCommitmentGroup_Smart is
     }
 
     function getPoolTotalEstimatedValue()
-        internal
+        public
         view
         returns (uint256 poolTotalEstimatedValue_)
     {
@@ -317,7 +315,7 @@ contract LenderCommitmentGroup_Smart is
         sharesAmount_ = _valueOfUnderlying(_amount, sharesExchangeRate());
 
         totalPrincipalTokensCommitted += _amount;
-        principalTokensCommittedByLender[msg.sender] += _amount;
+        //principalTokensCommittedByLender[msg.sender] += _amount;
 
         //mint shares equal to _amount and give them to the shares recipient !!!
         poolSharesToken.mint(_sharesRecipient, sharesAmount_);

@@ -775,7 +775,6 @@ contract LenderCommitmentGroup_Smart is
     }
 
    
-
     function getPrincipalAmountAvailableToBorrow()
         public
         view
@@ -786,6 +785,7 @@ contract LenderCommitmentGroup_Smart is
             getTotalPrincipalTokensOutstandingInActiveLoans() ;
      
     }
+
 
  
     /**

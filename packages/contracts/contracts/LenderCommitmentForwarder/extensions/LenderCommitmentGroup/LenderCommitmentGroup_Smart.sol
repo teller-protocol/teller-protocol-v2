@@ -87,13 +87,14 @@ contract LenderCommitmentGroup_Smart is
 
     uint256 marketId;
 
-    //this should be the net total principal tokens ,  lenderAdded - lenderWithdrawn
+ 
     uint256 public totalPrincipalTokensCommitted; 
+    uint256 public totalPrincipalTokensWithdrawn;
 
     uint256 public totalPrincipalTokensLended;
     uint256 public totalPrincipalTokensRepaid; //subtract this and the above to find total principal tokens outstanding for loans
 
-    uint256 public totalPrincipalTokensWithdrawn;
+    
  
     uint256 public totalInterestCollected;
 
@@ -211,7 +212,7 @@ contract LenderCommitmentGroup_Smart is
         poolSharesToken_ = _deployPoolSharesToken();
     }
 
-    function _deployPoolSharesToken()
+    function _deployPoolSharesToken(  )
         internal
         onlyInitializing
         returns (address poolSharesToken_)
@@ -222,13 +223,35 @@ contract LenderCommitmentGroup_Smart is
             "Pool shares already deployed"
         );
 
+
+        (string memory name, string memory symbol ) = _generateTokenNameAndSymbol(
+            address(principalToken),
+            address(collateralToken)
+        );
+
         poolSharesToken = new LenderCommitmentGroupShares(
-            "PoolShares",
-            "PSH",
+            name,
+            symbol,
             18  
         );
 
         return address(poolSharesToken);
+    }
+
+    function _generateTokenNameAndSymbol(address principalToken, address collateralToken) 
+    internal view 
+    returns (string memory name, string memory symbol) {
+        // Read the symbol of the principal token
+        string memory principalSymbol = ERC20(principalToken).symbol();
+        
+        // Read the symbol of the collateral token
+        string memory collateralSymbol = ERC20(collateralToken).symbol();
+        
+        // Combine the symbols to create the name
+        name = string(abi.encodePacked("GroupShares-", principalSymbol, "-", collateralSymbol));
+        
+        // Combine the symbols to create the symbol
+        symbol = string(abi.encodePacked("SHR-", principalSymbol, "-", collateralSymbol));
     }
 
     /**
@@ -735,11 +758,12 @@ contract LenderCommitmentGroup_Smart is
     //this is always between 0 and 10000
     function getPoolUtilizationRatio() public view returns (uint16) {
 
-        if (totalPrincipalTokensCommitted == 0) {
+        if (getPoolTotalEstimatedValue() == 0) {
             return 0;
         }
 
-        return uint16(  Math.min(   getTotalPrincipalTokensOutstandingInActiveLoans()  * 10000  / 
+        return uint16(  Math.min(   
+           getTotalPrincipalTokensOutstandingInActiveLoans()  * 10000  / 
            getPoolTotalEstimatedValue() , 10000  ));
     }   
 

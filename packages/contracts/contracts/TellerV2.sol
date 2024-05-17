@@ -886,7 +886,7 @@ contract TellerV2 is
             emit LoanRepayment(_bidId);
         }
 
-        _sendOrEscrowFunds(_bidId, paymentAmount); //send or escrow the funds
+        _sendOrEscrowFunds(_bidId, _payment); //send or escrow the funds
 
         // update our mappings
         bid.loanDetails.totalRepaid.principal += _payment.principal;
@@ -899,16 +899,17 @@ contract TellerV2 is
         }
     }
 
-    function _sendOrEscrowFunds(uint256 _bidId, uint256 _paymentAmount)
+
+    function _sendOrEscrowFunds(uint256 _bidId, Payment memory _payment)
         internal
     {
         Bid storage bid = bids[_bidId];
         address lender = getLoanLender(_bidId);
 
-        try
-            //first try to pay directly
-            //have to use transfer from  (not safe transfer from) for try/catch statement
-            //dont try to use any more than 100k gas for this xfer
+        uint256 _paymentAmount = _payment.principal + _payment.interest;
+
+        try 
+
             bid.loanDetails.lendingToken.transferFrom{ gas: 100000 }(
                 _msgSenderForMarket(bid.marketplaceId),
                 lender,
@@ -919,7 +920,7 @@ contract TellerV2 is
 
             uint256 balanceBefore = bid.loanDetails.lendingToken.balanceOf(
                 address(this)
-            );
+            ); 
 
             //if unable, pay to escrow
             bid.loanDetails.lendingToken.safeTransferFrom(
@@ -946,7 +947,26 @@ contract TellerV2 is
                 paymentAmountReceived
             );
         }
+
+        address loanRepaymentListener = repaymentListenerForBid[_bidId];
+
+        if (loanRepaymentListener != address(0)) {
+            try
+                ILoanRepaymentListener(loanRepaymentListener).repayLoanCallback{
+                    gas: 80000
+                }( //limit gas costs to prevent lender griefing repayments
+                    _bidId,
+                    _msgSenderForMarket(bid.marketplaceId),
+                    _payment.principal,
+                    _payment.interest
+                )
+            {} catch {}
+        }
     }
+
+
+
+
 
     /**
      * @notice Calculates the total amount owed for a loan bid at a specific timestamp.

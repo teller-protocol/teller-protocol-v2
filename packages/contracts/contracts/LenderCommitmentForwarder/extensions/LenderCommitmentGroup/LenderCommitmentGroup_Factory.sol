@@ -27,9 +27,11 @@ contract LenderCommitmentGroupFactory {
     /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
     address public immutable SMART_COMMITMENT_FORWARDER;
     address public immutable UNISWAP_V3_FACTORY;
+    
+    mapping(address => uint256) public deployedLenderGroupContracts;
 
-    //fix
-
+    event DeployedLenderGroupContract ( address indexed groupContract  );
+ 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor(address _tellerV2, address _smartCommitmentForwarder, address _uniswapV3Factory) {
         TELLER_V2 = ITellerV2(_tellerV2);
@@ -61,7 +63,7 @@ contract LenderCommitmentGroupFactory {
             )
         );
 
- 
+        emit DeployedLenderGroupContract( newGroupContract_ );
         
         /*
             The max principal should be a very high number! higher than usual

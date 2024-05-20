@@ -18,7 +18,7 @@ import { Collateral } from "./interfaces/escrow/ICollateralEscrowV1.sol";
 import "./interfaces/IEscrowVault.sol";
 
 import { ILoanRepaymentCallbacks } from "./interfaces/ILoanRepaymentCallbacks.sol";
-
+import { ILoanRepaymentListener } from "./interfaces/ILoanRepaymentListener.sol";
 // Libraries
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";

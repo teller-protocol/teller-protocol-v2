@@ -10,7 +10,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../../../interfaces/ITellerV2.sol";
 import "../../../interfaces/IProtocolFee.sol";
 import "../../../interfaces/ITellerV2Storage.sol";
-import "../../../interfaces/ILenderCommitmentForwarder.sol";
+//import "../../../interfaces/ILenderCommitmentForwarder.sol";
 import "../../../libraries/NumbersLib.sol";
 
 import "./LenderCommitmentGroup_Smart.sol";
@@ -47,8 +47,19 @@ contract LenderCommitmentGroupFactory {
         Shares will be distributed at a 1:1 ratio of the primary principal token so if 1e18 raw WETH are deposited, the depositor gets 1e18 shares for the group pool.
     */
     function deployLenderCommitmentGroupPool(
-        ILenderCommitmentForwarder.Commitment calldata _createCommitmentArgs,
+        //ILenderCommitmentForwarder.Commitment calldata _createCommitmentArgs,
+    
+
+       
         uint256 _initialPrincipalAmount,
+
+       address _principalTokenAddress,
+       address _collateralTokenAddress,
+       uint256 _marketId,
+       uint32 _maxLoanDuration,
+       uint16 _interestRateLowerBound,
+       uint16 _interestRateUpperBound,      
+       
         uint16 _liquidityThresholdPercent,
         uint16 _loanToValuePercent,
         uint24 _uniswapPoolFee,
@@ -70,11 +81,12 @@ contract LenderCommitmentGroupFactory {
             The expiration time should be far in the future!  farther than usual 
         */
         ILenderCommitmentGroup(newGroupContract_).initialize(
-            _createCommitmentArgs.principalTokenAddress,
-            _createCommitmentArgs.collateralTokenAddress,
-            _createCommitmentArgs.marketId,
-            _createCommitmentArgs.maxDuration,
-            _createCommitmentArgs.minInterestRate,
+            _principalTokenAddress,
+            _collateralTokenAddress,
+            _marketId,
+            _maxLoanDuration,
+            _interestRateLowerBound,
+            _interestRateUpperBound,
             _liquidityThresholdPercent,
             _loanToValuePercent,
             _uniswapPoolFee,
@@ -88,12 +100,12 @@ contract LenderCommitmentGroupFactory {
             //send the initial principal tokens to _newgroupcontract here !
             // so it will have them for addPrincipalToCommitmentGroup which will pull them from here
 
-            IERC20(_createCommitmentArgs.principalTokenAddress).transferFrom(
+            IERC20(_principalTokenAddress).transferFrom(
                 msg.sender,
                 address(this),
                 _initialPrincipalAmount
             );
-            IERC20(_createCommitmentArgs.principalTokenAddress).approve(
+            IERC20(_principalTokenAddress).approve(
                 address(newGroupContract_),
                 _initialPrincipalAmount
             );

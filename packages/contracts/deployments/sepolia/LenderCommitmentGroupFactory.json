@@ -1,0 +1,164 @@
+{
+  "address": "0x52b1D9b55A7e843849bC07F6d201e7CdF2BF0215",
+  "abi": [
+    {
+      "type": "constructor",
+      "stateMutability": "undefined",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "_tellerV2"
+        },
+        {
+          "type": "address",
+          "name": "_smartCommitmentForwarder"
+        },
+        {
+          "type": "address",
+          "name": "_uniswapV3Factory"
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "DeployedLenderGroupContract",
+      "inputs": [
+        {
+          "type": "address",
+          "name": "groupContract",
+          "indexed": true
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "SMART_COMMITMENT_FORWARDER",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "TELLER_V2",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "UNISWAP_V3_FACTORY",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "deployLenderCommitmentGroupPool",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_initialPrincipalAmount"
+        },
+        {
+          "type": "address",
+          "name": "_principalTokenAddress"
+        },
+        {
+          "type": "address",
+          "name": "_collateralTokenAddress"
+        },
+        {
+          "type": "uint256",
+          "name": "_marketId"
+        },
+        {
+          "type": "uint32",
+          "name": "_maxLoanDuration"
+        },
+        {
+          "type": "uint16",
+          "name": "_interestRateLowerBound"
+        },
+        {
+          "type": "uint16",
+          "name": "_interestRateUpperBound"
+        },
+        {
+          "type": "uint16",
+          "name": "_liquidityThresholdPercent"
+        },
+        {
+          "type": "uint16",
+          "name": "_loanToValuePercent"
+        },
+        {
+          "type": "uint24",
+          "name": "_uniswapPoolFee"
+        },
+        {
+          "type": "uint32",
+          "name": "_twapInterval"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "address",
+          "name": "newGroupContract_"
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "deployedLenderGroupContracts",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    }
+  ],
+  "transactionHash": "0xeea1922feacba37261463735f7a531902ac03be374bbf96fb3c762016571ccd1",
+  "receipt": {
+    "to": null,
+    "from": "0xD9B023522CeCe02251d877bb0EB4f06fDe6F98E6",
+    "blockHash": null,
+    "blockNumber": null
+  },
+  "numDeployments": 1,
+  "implementation": "0x37725D0ec727604B7B3b301B265E0688A8Eff927"
+}

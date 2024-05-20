@@ -35,7 +35,7 @@ const deployFn: DeployFunction = async (hre) => {
  
 
   const lenderGroupsFactory = await hre.deployProxy(
-    'LenderCommitmentGroup_Factory',
+    'LenderCommitmentGroupFactory',
     {
       unsafeAllow: ['constructor', 'state-variable-immutable'],
       constructorArgs: [

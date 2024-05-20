@@ -17,5 +17,6 @@
   "lender-manager:transfer-ownership": 1713466009,
   "liquidity-rewards:deploy": 1713466033,
   "default-proxy-admin:transfer": 1713466033,
-  "lender-commitment-group-smart:deploy": 1713466369
+  "lender-commitment-group-smart:deploy": 1713466369,
+  "lender-commitment-group-factory:deploy": 1716222589
 }

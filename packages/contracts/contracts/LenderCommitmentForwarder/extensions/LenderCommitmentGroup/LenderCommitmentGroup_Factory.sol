@@ -71,6 +71,7 @@ contract LenderCommitmentGroupFactory {
             )
         );
 
+        deployedLenderGroupContracts[newGroupContract_] = block.number; //consider changing this ?
         emit DeployedLenderGroupContract( newGroupContract_ );
         
         /*

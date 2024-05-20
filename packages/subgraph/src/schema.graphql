@@ -468,3 +468,19 @@ type BidReward @entity {
 
 
 
+
+type LenderGroupPool @entity {
+  id: ID!
+  createdAt: BigInt!
+  updatedAt: BigInt!
+
+  principalTokenAddress: Bytes!
+  collateralTokenAddress: Bytes!
+
+  marketplaceId: BigInt!
+
+  address: Bytes!   
+}
+
+
+ 

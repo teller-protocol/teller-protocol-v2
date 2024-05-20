@@ -1,0 +1,41 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "_acceptedTimestamp",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint32",
+        "name": "_paymentCycle",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint32",
+        "name": "_loanDuration",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint32",
+        "name": "_lastRepaidTimestamp",
+        "type": "uint32"
+      },
+      {
+        "internalType": "enum PaymentCycleType",
+        "name": "_bidPaymentCycleType",
+        "type": "PaymentCycleType"
+      }
+    ],
+    "name": "calculateNextDueDate",
+    "outputs": [
+      {
+        "internalType": "uint32",
+        "name": "dueDate_",
+        "type": "uint32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]

@@ -1,0 +1,15 @@
+{
+  "extends": "assemblyscript/std/assembly.json",
+  "include": [
+    "./src",
+    "./config",
+    "./tests"
+  ],
+  "exclude": [
+    "./build",
+    "./generated",
+    "./abis",
+    "**/node_modules",
+    "node_modules"
+  ]
+}

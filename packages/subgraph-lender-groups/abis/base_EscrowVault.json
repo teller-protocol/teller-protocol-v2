@@ -1,0 +1,89 @@
+[
+  {
+    "type": "constructor",
+    "stateMutability": "undefined",
+    "payable": false,
+    "inputs": []
+  },
+  {
+    "type": "event",
+    "anonymous": false,
+    "name": "Initialized",
+    "inputs": [
+      {
+        "type": "uint8",
+        "name": "version",
+        "indexed": false
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "balances",
+    "constant": true,
+    "stateMutability": "view",
+    "payable": false,
+    "inputs": [
+      {
+        "type": "address",
+        "name": ""
+      },
+      {
+        "type": "address",
+        "name": ""
+      }
+    ],
+    "outputs": [
+      {
+        "type": "uint256",
+        "name": ""
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "deposit",
+    "constant": false,
+    "payable": false,
+    "inputs": [
+      {
+        "type": "address",
+        "name": "account"
+      },
+      {
+        "type": "address",
+        "name": "token"
+      },
+      {
+        "type": "uint256",
+        "name": "amount"
+      }
+    ],
+    "outputs": []
+  },
+  {
+    "type": "function",
+    "name": "initialize",
+    "constant": false,
+    "payable": false,
+    "inputs": [],
+    "outputs": []
+  },
+  {
+    "type": "function",
+    "name": "withdraw",
+    "constant": false,
+    "payable": false,
+    "inputs": [
+      {
+        "type": "address",
+        "name": "token"
+      },
+      {
+        "type": "uint256",
+        "name": "amount"
+      }
+    ],
+    "outputs": []
+  }
+]

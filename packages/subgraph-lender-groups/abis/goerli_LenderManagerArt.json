@@ -1,0 +1,267 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "amount",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "symbol",
+        "type": "string"
+      }
+    ],
+    "name": "_generate_large_title",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "label",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "value",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "y_offset",
+        "type": "uint256"
+      }
+    ],
+    "name": "_generate_text_label",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "enum CollateralType",
+            "name": "_collateralType",
+            "type": "CollateralType"
+          },
+          {
+            "internalType": "uint256",
+            "name": "_amount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "_tokenId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "_collateralAddress",
+            "type": "address"
+          }
+        ],
+        "internalType": "struct Collateral",
+        "name": "collateral",
+        "type": "tuple"
+      }
+    ],
+    "name": "_get_collateral_label",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "sec",
+        "type": "uint32"
+      }
+    ],
+    "name": "_get_duration_formatted",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint16",
+        "name": "interestRate",
+        "type": "uint16"
+      }
+    ],
+    "name": "_get_interest_rate_formatted",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "decimals",
+        "type": "uint256"
+      }
+    ],
+    "name": "_get_token_amount_formatted",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      }
+    ],
+    "name": "_get_token_decimals",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "nftContract",
+        "type": "address"
+      },
+      {
+        "internalType": "string",
+        "name": "_fallback",
+        "type": "string"
+      }
+    ],
+    "name": "_get_token_symbol",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "bidId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "principalAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "principalTokenAddress",
+        "type": "address"
+      },
+      {
+        "components": [
+          {
+            "internalType": "enum CollateralType",
+            "name": "_collateralType",
+            "type": "CollateralType"
+          },
+          {
+            "internalType": "uint256",
+            "name": "_amount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "_tokenId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "_collateralAddress",
+            "type": "address"
+          }
+        ],
+        "internalType": "struct Collateral",
+        "name": "collateral",
+        "type": "tuple"
+      },
+      {
+        "internalType": "uint16",
+        "name": "interestRate",
+        "type": "uint16"
+      },
+      {
+        "internalType": "uint32",
+        "name": "loanDuration",
+        "type": "uint32"
+      }
+    ],
+    "name": "generateSVG",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]

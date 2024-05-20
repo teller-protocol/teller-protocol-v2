@@ -47,11 +47,8 @@ contract LenderCommitmentGroupFactory {
         Shares will be distributed at a 1:1 ratio of the primary principal token so if 1e18 raw WETH are deposited, the depositor gets 1e18 shares for the group pool.
     */
     function deployLenderCommitmentGroupPool(
-        //ILenderCommitmentForwarder.Commitment calldata _createCommitmentArgs,
-    
-
        
-        uint256 _initialPrincipalAmount,
+       uint256 _initialPrincipalAmount,
 
        address _principalTokenAddress,
        address _collateralTokenAddress,

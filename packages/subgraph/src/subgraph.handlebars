@@ -487,3 +487,14 @@ dataSources:
           handler: handleNewLenderSet
       file: ./src/mapping.ts
 {{/if}}
+  - kind: substreams
+    name: substream_lender_groups
+    network: {{network}}
+    source:
+      package:
+        moduleName: graph_out
+        file: substreams/lendergrouppolygon-v0.1.0.spkg
+    mapping:
+      kind: substreams/graph-entities
+      apiVersion: 0.0.5
+ 

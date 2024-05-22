@@ -79,6 +79,11 @@
       "address": "0x0EfD3E33Ba2EdE028e50a3E7f81E084996d161aa",
       "txHash": "0x720bd1cad23ecd8720865cdf5099e98988ba04579e76ef6d99dbf2204f82952c",
       "kind": "transparent"
+    },
+    {
+      "address": "0xE00384587DC733D1E201e1EAa5583645d351C01C",
+      "txHash": "0xf71a2dff37c92ae0a6c25dbfd9a980e54eab6daad2648d5052f205dfc1fc27e4",
+      "kind": "transparent"
     }
   ],
   "impls": {
@@ -7124,6 +7129,38 @@
           "t_uint8": {
             "label": "uint8",
             "numberOfBytes": "1"
+          }
+        },
+        "namespaces": {}
+      }
+    },
+    "8971e4f72a4fc2615e5773a4cf1f123be3278b9d928f54425d864ff8730f798c": {
+      "address": "0x0410535A1C3c59Ce477644f21662b5A96b4bA085",
+      "txHash": "0xf64703f264a0428d1a2c0cb55e307f095e24d98363e0003839272b6172c0f609",
+      "layout": {
+        "solcVersion": "0.8.9",
+        "storage": [
+          {
+            "label": "deployedLenderGroupContracts",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "LenderCommitmentGroupFactory",
+            "src": "contracts/LenderCommitmentForwarder/extensions/LenderCommitmentGroup/LenderCommitmentGroup_Factory.sol:31"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)",
+            "numberOfBytes": "32"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
           }
         },
         "namespaces": {}

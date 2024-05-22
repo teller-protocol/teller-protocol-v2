@@ -483,4 +483,106 @@ type LenderGroupPool @entity {
 }
 
 
- 
+
+  
+type fac_deployed_lender_group_contract @entity {
+    id: ID!
+    evt_tx_hash: String!
+    evt_index: BigInt!
+    evt_block_time: String!
+    evt_block_number: BigInt!
+    group_contract: String!
+} 
+
+type groupp_borrower_accepted_funds @entity {
+    id: ID!
+    evt_tx_hash: String!
+    evt_index: BigInt!
+    evt_block_time: String!
+    evt_block_number: BigInt!
+    evt_address: String!
+    bid_id: BigDecimal!
+    borrower: String!
+    collateral_amount: BigDecimal!
+    interest_rate: Int!
+    loan_duration: Int!
+    principal_amount: BigDecimal!
+}
+type groupp_defaulted_loan_liquidated @entity {
+    id: ID!
+    evt_tx_hash: String!
+    evt_index: BigInt!
+    evt_block_time: String!
+    evt_block_number: BigInt!
+    evt_address: String!
+    amount_due: BigDecimal!
+    bid_id: BigDecimal!
+    liquidator: String!
+    token_amount_difference: BigDecimal!
+}
+type groupp_earnings_withdrawn @entity {
+    id: ID!
+    evt_tx_hash: String!
+    evt_index: BigInt!
+    evt_block_time: String!
+    evt_block_number: BigInt!
+    evt_address: String!
+    amount_pool_shares_tokens: BigDecimal!
+    lender: String!
+    principal_tokens_withdrawn: BigDecimal!
+    recipient: String!
+}
+type groupp_initialized @entity {
+    id: ID!
+    evt_tx_hash: String!
+    evt_index: BigInt!
+    evt_block_time: String!
+    evt_block_number: BigInt!
+    evt_address: String!
+    version: Int!
+}
+type groupp_lender_added_principal @entity {
+    id: ID!
+    evt_tx_hash: String!
+    evt_index: BigInt!
+    evt_block_time: String!
+    evt_block_number: BigInt!
+    evt_address: String!
+    amount: BigDecimal!
+    lender: String!
+    shares_amount: BigDecimal!
+    shares_recipient: String!
+}
+type groupp_loan_repaid @entity {
+    id: ID!
+    evt_tx_hash: String!
+    evt_index: BigInt!
+    evt_block_time: String!
+    evt_block_number: BigInt!
+    evt_address: String!
+    bid_id: BigDecimal!
+    interest_amount: BigDecimal!
+    principal_amount: BigDecimal!
+    repayer: String!
+    total_interest_collected: BigDecimal!
+    total_principal_repaid: BigDecimal!
+} 
+type groupp_pool_initialized @entity {
+    id: ID!
+    evt_tx_hash: String!
+    evt_index: BigInt!
+    evt_block_time: String!
+    evt_block_number: BigInt!
+    evt_address: String!
+    collateral_token_address: String!
+    interest_rate_lower_bound: Int!
+    interest_rate_upper_bound: Int!
+    liquidity_threshold_percent: Int!
+    loan_to_value_percent: Int!
+    market_id: BigDecimal!
+    max_loan_duration: Int!
+    pool_shares_token: String!
+    principal_token_address: String!
+    twap_interval: Int!
+    uniswap_pool_fee: Int!
+} 

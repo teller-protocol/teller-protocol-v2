@@ -3,6 +3,7 @@
   "license": "UNLICENSED",
   "version": "0.4.21-15",
   "scripts": {
+    "build": "graph build",
     "deploy:prompt": "ts-node scripts/thegraph",
     "create-local": "graph create --node http://localhost:8020/ teller-v2",
     "remove-local": "graph remove --node http://localhost:8020/ teller-v2",

@@ -1,6 +1,6 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { log } from "@graphprotocol/graph-ts";
-import * as assembly from "./pb/assembly"; // 1.
+//  import * as assembly from "./pb/assembly"; //  NEEED TO GET THIS FROM PROTOBUF
 
 import { Transfer } from "../generated/LenderManager/LenderManager";
 import { Bid, FundedTx, Lender } from "../generated/schema";
@@ -275,9 +275,11 @@ export function handleNewLenderSets(events: Transfer[]): void {
 }
 
 
+ 
 // fix me ! s
 export function handleSubstreamGraphOutTrigger(bytes: Uint8Array): void {
-  let transactions = assembly.eth.transaction.v1.Transactions.decode(bytes.buffer).transactions;
+  
+ /*  let transactions = assembly.eth.transaction.v1.Transactions.decode(bytes.buffer).transactions;
   if (transactions.length == 0) {
       log.info("No transactions found", []);
       return;
@@ -290,5 +292,5 @@ export function handleSubstreamGraphOutTrigger(bytes: Uint8Array): void {
       entity.from = transaction.from;
       entity.to = transaction.to;
       entity.save();
-  }
+  } */
 }

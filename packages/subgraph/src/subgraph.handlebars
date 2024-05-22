@@ -491,10 +491,13 @@ dataSources:
     name: substream_lender_groups
     network: {{network}}
     source:
+      startBlock: {{block}}
       package:
-        moduleName: graph_out
-        file: substreams/lendergrouppolygon-v0.1.0.spkg
+        moduleName: graph_out # Module name
+        file: substreams/lendergrouppolygon-v0.1.0.spkg # Package
     mapping:
       kind: substreams/graph-entities
-      apiVersion: 0.0.5
- 
+      apiVersion: 0.0.7
+      file: ./src/mapping.ts
+      handler: handleSubstreamGraphOutTrigger
+  

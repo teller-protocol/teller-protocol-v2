@@ -1008,9 +1008,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@graphprotocol/graph-cli@npm:^0.58.0":
-  version: 0.58.0
-  resolution: "@graphprotocol/graph-cli@npm:0.58.0"
+"@graphprotocol/graph-cli@npm:^0.72.0":
+  version: 0.72.2
+  resolution: "@graphprotocol/graph-cli@npm:0.72.2"
   dependencies:
     "@float-capital/float-subgraph-uncrashable": ^0.0.0-alpha.4
     "@oclif/core": 2.8.6
@@ -1026,14 +1026,13 @@ __metadata:
     dockerode: 2.5.8
     fs-extra: 9.1.0
     glob: 9.3.5
-    gluegun: 5.1.2
+    gluegun: 5.1.6
     graphql: 15.5.0
     immutable: 4.2.1
     ipfs-http-client: 55.0.0
     jayson: 4.0.0
     js-yaml: 3.14.1
-    prettier: 1.19.1
-    request: 2.88.2
+    prettier: 3.0.3
     semver: 7.4.0
     sync-request: 6.1.0
     tmp-promise: 3.0.3
@@ -1042,7 +1041,7 @@ __metadata:
     yaml: 1.10.2
   bin:
     graph: bin/run
-  checksum: 66eb0e782f43a391050dbd287e0c0f0b9270cdeffdb3942707600224363f23aabcef97526fabc69e8df1a36b1b8b10b4088e529766d0acc4bb8041e6d5a939cf
+  checksum: 13fb7776c2836e76577aff4817e87b774cbf71bc30675087d818d3ac9471b110a16f550ed768343d577ff175983540f5943481efb1a7767f4d25b8de5d49b049
   languageName: node
   linkType: hard
 
@@ -1055,12 +1054,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@graphprotocol/graph-ts@npm:^0.31.0":
-  version: 0.31.0
-  resolution: "@graphprotocol/graph-ts@npm:0.31.0"
+"@graphprotocol/graph-ts@npm:^0.35.1":
+  version: 0.35.1
+  resolution: "@graphprotocol/graph-ts@npm:0.35.1"
   dependencies:
     assemblyscript: 0.19.10
-  checksum: 20394b17d3241a662f0b2efebdc02f44e4e0814fdbb09b4cac0c84b84a173798325840bc1daf1d11ebaf27b1b3e13ff6e2766567c755cb77c1321ba1462fbecc
+  checksum: 3f6aa6aa2edde80cea4f73b560367d440c206325d161e8c9fa35f18f4cd52db1ffd1f02410890e435122bcb2683cac719c928836d9f9a27e85f6fb65d98e8efd
   languageName: node
   linkType: hard
 
@@ -2319,12 +2318,53 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@teller-protocol/v2-subgraph-substreamed@workspace:packages/subgraph-substreamed":
+  version: 0.0.0-use.local
+  resolution: "@teller-protocol/v2-subgraph-substreamed@workspace:packages/subgraph-substreamed"
+  dependencies:
+    "@graphprotocol/graph-cli": ^0.72.0
+    "@graphprotocol/graph-ts": ^0.35.1
+    "@ledgerhq/hw-app-eth": ^6.34.0
+    "@ledgerhq/hw-transport-node-hid": ^6.27.19
+    "@types/node": ^20.4.5
+    "@types/prompts": ^2.4.4
+    "@types/semver": ^7.5.0
+    "@types/uuid": ^9.0.2
+    "@typescript-eslint/eslint-plugin": ^5.5.0
+    "@typescript-eslint/parser": ^5.5.0
+    assemblyscript: ^0.27.1
+    async-mutex: ^0.4.0
+    axios: ^1.4.0
+    cleaners: ^0.3.16
+    cli-progress: ^3.12.0
+    eslint: ^7.32.0
+    eslint-config-prettier: ^8.3.0
+    eslint-config-standard-kit: 0.15.1
+    eslint-plugin-import: ^2.25.2
+    eslint-plugin-node: ^11.1.0
+    eslint-plugin-prettier: ^4.0.0
+    eslint-plugin-simple-import-sort: ^7.0.0
+    eslint-plugin-unused-imports: ^2.0.0
+    hbs-cli: ^1.4.1
+    json: ^11.0.0
+    matchstick-as: ^0.4.0
+    memlet: ^0.1.7
+    mustache: ^4.2.0
+    prompts: ^2.4.2
+    semver: ^7.5.4
+    ts-node: ^10.9.1
+    typescript: ^4.9.4
+    uuid: ^9.0.0
+    ws: ^8.13.0
+  languageName: unknown
+  linkType: soft
+
 "@teller-protocol/v2-subgraph@workspace:packages/subgraph":
   version: 0.0.0-use.local
   resolution: "@teller-protocol/v2-subgraph@workspace:packages/subgraph"
   dependencies:
-    "@graphprotocol/graph-cli": ^0.58.0
-    "@graphprotocol/graph-ts": ^0.31.0
+    "@graphprotocol/graph-cli": ^0.72.0
+    "@graphprotocol/graph-ts": ^0.35.1
     "@ledgerhq/hw-app-eth": ^6.34.0
     "@ledgerhq/hw-transport-node-hid": ^6.27.19
     "@types/node": ^20.4.5
@@ -6740,14 +6780,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ejs@npm:3.1.6":
-  version: 3.1.6
-  resolution: "ejs@npm:3.1.6"
+"ejs@npm:3.1.8":
+  version: 3.1.8
+  resolution: "ejs@npm:3.1.8"
   dependencies:
-    jake: ^10.6.1
+    jake: ^10.8.5
   bin:
-    ejs: ./bin/cli.js
-  checksum: 81a9cdea0b4ded3b5a4b212b7c17e20bb07468f08394e2d519708d367957a70aef3d282a6d5d38bf6ad313ba25802b9193d4227f29b084d2ee0f28d115141d48
+    ejs: bin/cli.js
+  checksum: 1d40d198ad52e315ccf37e577bdec06e24eefdc4e3c27aafa47751a03a0c7f0ec4310254c9277a5f14763c3cd4bbacce27497332b2d87c74232b9b1defef8efc
   languageName: node
   linkType: hard
 
@@ -9549,9 +9589,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"gluegun@npm:5.1.2":
-  version: 5.1.2
-  resolution: "gluegun@npm:5.1.2"
+"gluegun@npm:5.1.6":
+  version: 5.1.6
+  resolution: "gluegun@npm:5.1.6"
   dependencies:
     apisauce: ^2.1.5
     app-module-path: ^2.2.0
@@ -9559,7 +9599,7 @@ __metadata:
     colors: 1.4.0
     cosmiconfig: 7.0.1
     cross-spawn: 7.0.3
-    ejs: 3.1.6
+    ejs: 3.1.8
     enquirer: 2.3.6
     execa: 5.1.1
     fs-jetpack: 4.3.1
@@ -9585,7 +9625,7 @@ __metadata:
     yargs-parser: ^21.0.0
   bin:
     gluegun: bin/gluegun
-  checksum: 2c91934b98022018a524a3be32efb3e4567905a618ccb4aca4f19207ff4b37262bc18264b306f1c82757eaab634bac6c06aacff16059b11a38deefd07b6293b6
+  checksum: 58e6d402030fec40068aea40f1fec08838fab3fbd5f811570b832e8da8028e100620cbb5c5444830dfa97a691849509bc6e64618ee74b454ba4073dc674c4042
   languageName: node
   linkType: hard
 
@@ -11309,7 +11349,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jake@npm:^10.6.1, jake@npm:^10.8.5":
+"jake@npm:^10.8.5":
   version: 10.8.7
   resolution: "jake@npm:10.8.7"
   dependencies:
@@ -14671,7 +14711,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier@npm:1.19.1, prettier@npm:^1.14.3":
+"prettier@npm:3.0.3":
+  version: 3.0.3
+  resolution: "prettier@npm:3.0.3"
+  bin:
+    prettier: bin/prettier.cjs
+  checksum: e10b9af02b281f6c617362ebd2571b1d7fc9fb8a3bd17e371754428cda992e5e8d8b7a046e8f7d3e2da1dcd21aa001e2e3c797402ebb6111b5cd19609dd228e0
+  languageName: node
+  linkType: hard
+
+"prettier@npm:^1.14.3":
   version: 1.19.1
   resolution: "prettier@npm:1.19.1"
   bin:
@@ -15477,7 +15526,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"request@npm:2.88.2, request@npm:^2.79.0, request@npm:^2.85.0, request@npm:^2.88.0, request@npm:^2.88.2":
+"request@npm:^2.79.0, request@npm:^2.85.0, request@npm:^2.88.0, request@npm:^2.88.2":
   version: 2.88.2
   resolution: "request@npm:2.88.2"
   dependencies:

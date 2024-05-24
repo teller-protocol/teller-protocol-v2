@@ -37,7 +37,8 @@ import semver from 'semver'
 // import { logger as tenderlyLogger } from 'tenderly/utils/logger'
 
 const NODE_VERSION = 'v16'
-if (!semver.satisfies(process.version, NODE_VERSION))
+const ALT_NODE_VERSION = 'v18'
+if (!semver.satisfies(process.version, NODE_VERSION) && !semver.satisfies(process.version, ALT_NODE_VERSION))
   throw new Error(
     `Incorrect NodeJS version being used (${process.version}). Expected: ${NODE_VERSION}`
   )

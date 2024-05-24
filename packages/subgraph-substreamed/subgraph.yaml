@@ -1,17 +1,12 @@
 specVersion: 1.0.0
 schema:
   file: ./src/schema.graphql
-#features:
-#  - grafting
-#graft:
-#  base: Qmb8GeAaiojpbkrxqJcvbS74dcosbhriuzKbqqboZeLKAu
-#  block: 192411000
 dataSources:
   - kind: substreams
     name: Event  # ????
-    network: polygon
+    network: matic
     source:
-      startBlock: 192411000
+      startBlock: 
       package:
         moduleName: map_events # Module name
         file: substreams/lendergrouppolygon-v0.1.0.spkg # Package
@@ -20,3 +15,4 @@ dataSources:
       apiVersion: 0.0.7
       file: ./src/mapping.ts
       handler: handleSubstreamGraphOutTrigger
+  

@@ -5,6 +5,7 @@
   "scripts": {
     "pb-generate": "buf generate --exclude-path=\"sf/substreams\" --type=\"contract.v1.Events\" substreams/lendergrouppolygon-v0.1.0.spkg#format=bin",
     "build": "graph build",
+    "codegen": "graph codegen",
     "deploy:prompt": "ts-node scripts/thegraph",
     "create-local": "graph create --node http://localhost:8020/ teller-v2",
     "remove-local": "graph remove --node http://localhost:8020/ teller-v2",

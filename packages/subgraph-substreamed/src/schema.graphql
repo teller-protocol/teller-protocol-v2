@@ -2,7 +2,7 @@ type fac_admin_changed @entity {
     id: ID!
     evt_tx_hash: String!
     evt_index: BigInt!
-    evt_block_time: String!
+   
     evt_block_number: BigInt!
     new_admin: String!
     previous_admin: String!
@@ -11,7 +11,7 @@ type fac_beacon_upgraded @entity {
     id: ID!
     evt_tx_hash: String!
     evt_index: BigInt!
-    evt_block_time: String!
+     
     evt_block_number: BigInt!
     beacon: String!
 }
@@ -19,7 +19,7 @@ type fac_deployed_lender_group_contract @entity {
     id: ID!
     evt_tx_hash: String!
     evt_index: BigInt!
-    evt_block_time: String!
+  
     evt_block_number: BigInt!
     group_contract: String!
 }
@@ -27,7 +27,7 @@ type fac_upgraded @entity {
     id: ID!
     evt_tx_hash: String!
     evt_index: BigInt!
-    evt_block_time: String!
+  
     evt_block_number: BigInt!
     implementation: String!
 }
@@ -36,7 +36,7 @@ type groupp_borrower_accepted_funds @entity {
     id: ID!
     evt_tx_hash: String!
     evt_index: BigInt!
-    evt_block_time: String!
+    
     evt_block_number: BigInt!
     evt_address: String!
     bid_id: BigDecimal!
@@ -50,7 +50,7 @@ type groupp_defaulted_loan_liquidated @entity {
     id: ID!
     evt_tx_hash: String!
     evt_index: BigInt!
-    evt_block_time: String!
+    
     evt_block_number: BigInt!
     evt_address: String!
     amount_due: BigDecimal!
@@ -62,7 +62,7 @@ type groupp_earnings_withdrawn @entity {
     id: ID!
     evt_tx_hash: String!
     evt_index: BigInt!
-    evt_block_time: String!
+   
     evt_block_number: BigInt!
     evt_address: String!
     amount_pool_shares_tokens: BigDecimal!
@@ -74,7 +74,7 @@ type groupp_initialized @entity {
     id: ID!
     evt_tx_hash: String!
     evt_index: BigInt!
-    evt_block_time: String!
+     
     evt_block_number: BigInt!
     evt_address: String!
     version: Int!
@@ -83,7 +83,7 @@ type groupp_lender_added_principal @entity {
     id: ID!
     evt_tx_hash: String!
     evt_index: BigInt!
-    evt_block_time: String!
+    
     evt_block_number: BigInt!
     evt_address: String!
     amount: BigDecimal!
@@ -95,7 +95,7 @@ type groupp_loan_repaid @entity {
     id: ID!
     evt_tx_hash: String!
     evt_index: BigInt!
-    evt_block_time: String!
+     
     evt_block_number: BigInt!
     evt_address: String!
     bid_id: BigDecimal!
@@ -109,7 +109,7 @@ type groupp_ownership_transferred @entity {
     id: ID!
     evt_tx_hash: String!
     evt_index: BigInt!
-    evt_block_time: String!
+    
     evt_block_number: BigInt!
     evt_address: String!
     new_owner: String!
@@ -119,7 +119,7 @@ type groupp_paused @entity {
     id: ID!
     evt_tx_hash: String!
     evt_index: BigInt!
-    evt_block_time: String!
+    
     evt_block_number: BigInt!
     evt_address: String!
     account: String!
@@ -128,7 +128,7 @@ type groupp_pool_initialized @entity {
     id: ID!
     evt_tx_hash: String!
     evt_index: BigInt!
-    evt_block_time: String!
+    
     evt_block_number: BigInt!
     evt_address: String!
     collateral_token_address: String!
@@ -147,7 +147,7 @@ type groupp_unpaused @entity {
     id: ID!
     evt_tx_hash: String!
     evt_index: BigInt!
-    evt_block_time: String!
+    
     evt_block_number: BigInt!
     evt_address: String!
     account: String!

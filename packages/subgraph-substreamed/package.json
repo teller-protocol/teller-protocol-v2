@@ -1,7 +1,7 @@
 {
   "name": "@teller-protocol/v2-subgraph-substreamed",
   "license": "UNLICENSED",
-  "version": "0.4.21-15",
+  "version": "0.4.21-16",
   "scripts": {
     "pb-generate": "buf generate --exclude-path=\"sf/substreams\" --type=\"contract.v1.Events\" substreams/lendergrouppolygon-v0.1.0.spkg#format=bin",
     "build": "graph build",

@@ -80,19 +80,6 @@ export class fac_admin_changed extends Entity {
     this.set("evt_index", Value.fromBigInt(value));
   }
 
-  get evt_block_time(): string {
-    let value = this.get("evt_block_time");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toString();
-    }
-  }
-
-  set evt_block_time(value: string) {
-    this.set("evt_block_time", Value.fromString(value));
-  }
-
   get evt_block_number(): BigInt {
     let value = this.get("evt_block_number");
     if (!value || value.kind == ValueKind.NULL) {
@@ -202,19 +189,6 @@ export class fac_beacon_upgraded extends Entity {
     this.set("evt_index", Value.fromBigInt(value));
   }
 
-  get evt_block_time(): string {
-    let value = this.get("evt_block_time");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toString();
-    }
-  }
-
-  set evt_block_time(value: string) {
-    this.set("evt_block_time", Value.fromString(value));
-  }
-
   get evt_block_number(): BigInt {
     let value = this.get("evt_block_number");
     if (!value || value.kind == ValueKind.NULL) {
@@ -314,19 +288,6 @@ export class fac_deployed_lender_group_contract extends Entity {
     this.set("evt_index", Value.fromBigInt(value));
   }
 
-  get evt_block_time(): string {
-    let value = this.get("evt_block_time");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toString();
-    }
-  }
-
-  set evt_block_time(value: string) {
-    this.set("evt_block_time", Value.fromString(value));
-  }
-
   get evt_block_number(): BigInt {
     let value = this.get("evt_block_number");
     if (!value || value.kind == ValueKind.NULL) {
@@ -419,19 +380,6 @@ export class fac_upgraded extends Entity {
 
   set evt_index(value: BigInt) {
     this.set("evt_index", Value.fromBigInt(value));
-  }
-
-  get evt_block_time(): string {
-    let value = this.get("evt_block_time");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toString();
-    }
-  }
-
-  set evt_block_time(value: string) {
-    this.set("evt_block_time", Value.fromString(value));
   }
 
   get evt_block_number(): BigInt {
@@ -531,19 +479,6 @@ export class groupp_borrower_accepted_funds extends Entity {
 
   set evt_index(value: BigInt) {
     this.set("evt_index", Value.fromBigInt(value));
-  }
-
-  get evt_block_time(): string {
-    let value = this.get("evt_block_time");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toString();
-    }
-  }
-
-  set evt_block_time(value: string) {
-    this.set("evt_block_time", Value.fromString(value));
   }
 
   get evt_block_number(): BigInt {
@@ -723,19 +658,6 @@ export class groupp_defaulted_loan_liquidated extends Entity {
     this.set("evt_index", Value.fromBigInt(value));
   }
 
-  get evt_block_time(): string {
-    let value = this.get("evt_block_time");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toString();
-    }
-  }
-
-  set evt_block_time(value: string) {
-    this.set("evt_block_time", Value.fromString(value));
-  }
-
   get evt_block_number(): BigInt {
     let value = this.get("evt_block_number");
     if (!value || value.kind == ValueKind.NULL) {
@@ -887,19 +809,6 @@ export class groupp_earnings_withdrawn extends Entity {
     this.set("evt_index", Value.fromBigInt(value));
   }
 
-  get evt_block_time(): string {
-    let value = this.get("evt_block_time");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toString();
-    }
-  }
-
-  set evt_block_time(value: string) {
-    this.set("evt_block_time", Value.fromString(value));
-  }
-
   get evt_block_number(): BigInt {
     let value = this.get("evt_block_number");
     if (!value || value.kind == ValueKind.NULL) {
@@ -1048,19 +957,6 @@ export class groupp_initialized extends Entity {
     this.set("evt_index", Value.fromBigInt(value));
   }
 
-  get evt_block_time(): string {
-    let value = this.get("evt_block_time");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toString();
-    }
-  }
-
-  set evt_block_time(value: string) {
-    this.set("evt_block_time", Value.fromString(value));
-  }
-
   get evt_block_number(): BigInt {
     let value = this.get("evt_block_number");
     if (!value || value.kind == ValueKind.NULL) {
@@ -1171,19 +1067,6 @@ export class groupp_lender_added_principal extends Entity {
 
   set evt_index(value: BigInt) {
     this.set("evt_index", Value.fromBigInt(value));
-  }
-
-  get evt_block_time(): string {
-    let value = this.get("evt_block_time");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toString();
-    }
-  }
-
-  set evt_block_time(value: string) {
-    this.set("evt_block_time", Value.fromString(value));
   }
 
   get evt_block_number(): BigInt {
@@ -1332,19 +1215,6 @@ export class groupp_loan_repaid extends Entity {
 
   set evt_index(value: BigInt) {
     this.set("evt_index", Value.fromBigInt(value));
-  }
-
-  get evt_block_time(): string {
-    let value = this.get("evt_block_time");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toString();
-    }
-  }
-
-  set evt_block_time(value: string) {
-    this.set("evt_block_time", Value.fromString(value));
   }
 
   get evt_block_number(): BigInt {
@@ -1524,19 +1394,6 @@ export class groupp_ownership_transferred extends Entity {
     this.set("evt_index", Value.fromBigInt(value));
   }
 
-  get evt_block_time(): string {
-    let value = this.get("evt_block_time");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toString();
-    }
-  }
-
-  set evt_block_time(value: string) {
-    this.set("evt_block_time", Value.fromString(value));
-  }
-
   get evt_block_number(): BigInt {
     let value = this.get("evt_block_number");
     if (!value || value.kind == ValueKind.NULL) {
@@ -1657,19 +1514,6 @@ export class groupp_paused extends Entity {
     this.set("evt_index", Value.fromBigInt(value));
   }
 
-  get evt_block_time(): string {
-    let value = this.get("evt_block_time");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toString();
-    }
-  }
-
-  set evt_block_time(value: string) {
-    this.set("evt_block_time", Value.fromString(value));
-  }
-
   get evt_block_number(): BigInt {
     let value = this.get("evt_block_number");
     if (!value || value.kind == ValueKind.NULL) {
@@ -1780,19 +1624,6 @@ export class groupp_pool_initialized extends Entity {
 
   set evt_index(value: BigInt) {
     this.set("evt_index", Value.fromBigInt(value));
-  }
-
-  get evt_block_time(): string {
-    let value = this.get("evt_block_time");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toString();
-    }
-  }
-
-  set evt_block_time(value: string) {
-    this.set("evt_block_time", Value.fromString(value));
   }
 
   get evt_block_number(): BigInt {
@@ -2030,19 +1861,6 @@ export class groupp_unpaused extends Entity {
 
   set evt_index(value: BigInt) {
     this.set("evt_index", Value.fromBigInt(value));
-  }
-
-  get evt_block_time(): string {
-    let value = this.get("evt_block_time");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toString();
-    }
-  }
-
-  set evt_block_time(value: string) {
-    this.set("evt_block_time", Value.fromString(value));
   }
 
   get evt_block_number(): BigInt {

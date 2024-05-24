@@ -21,6 +21,14 @@ binaries:
     file: ./target/wasm32-unknown-unknown/release/substreams.wasm
 
 modules:
+  - name: store_fac_groupp_created
+    kind: store
+    initialBlock: 57233385
+    updatePolicy: set
+    valueType: proto:dynamic_datasource
+    inputs:
+      - source: sf.ethereum.type.v2.Block
+
   - name: map_events
     kind: map
     initialBlock: 57233385
@@ -29,5 +37,21 @@ modules:
       - store: store_fac_groupp_created
     output:
       type: proto:contract.v1.Events
+
+  - name: db_out
+    kind: map
+    initialBlock: 57233385
+    inputs:
+      - map: map_events
+    output:
+      type: proto:sf.substreams.sink.database.v1.DatabaseChanges
+
+  - name: graph_out
+    kind: map
+    initialBlock: 57233385
+    inputs:
+      - map: map_events
+    output:
+      type: proto:sf.substreams.entity.v1.EntityChanges
 
 network: polygon

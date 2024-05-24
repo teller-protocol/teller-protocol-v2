@@ -260,8 +260,11 @@ contract V2Calculations_Test is Testable {
         __bid.loanDetails.acceptedTimestamp = 1646159355;
         __bid.paymentType = PaymentType.EMI;
 
-        (uint256 _owedPrincipal, uint256 _duePrincipal, uint256 _interest) = V2Calculations
-            .calculateAmountOwed(
+        (
+            uint256 _owedPrincipal,
+            uint256 _duePrincipal,
+            uint256 _interest
+        ) = V2Calculations.calculateAmountOwed(
                 __bid,
                 1658159355, // last repaid timestamp
                 1663189241, //timestamp
@@ -296,8 +299,11 @@ contract V2Calculations_Test is Testable {
         __bid.loanDetails.acceptedTimestamp = 2000000;
         __bid.paymentType = PaymentType.EMI;
 
-        (uint256 _owedPrincipal, uint256 _duePrincipal, uint256 _interest) = V2Calculations
-            .calculateAmountOwed(
+        (
+            uint256 _owedPrincipal,
+            uint256 _duePrincipal,
+            uint256 _interest
+        ) = V2Calculations.calculateAmountOwed(
                 __bid,
                 2000000 + 3000, //last repaid timestamp
                 2000000 + 5500, //timestamp
@@ -322,8 +328,11 @@ contract V2Calculations_Test is Testable {
         __bid.loanDetails.acceptedTimestamp = 2000000;
         __bid.paymentType = PaymentType.EMI;
 
-        (uint256 _owedPrincipal, uint256 _duePrincipal, uint256 _interest) = V2Calculations
-            .calculateAmountOwed(
+        (
+            uint256 _owedPrincipal,
+            uint256 _duePrincipal,
+            uint256 _interest
+        ) = V2Calculations.calculateAmountOwed(
                 __bid,
                 2000000 + 3000, //last repaid timestamp
                 2000000 + 7500, //timestamp
@@ -348,8 +357,11 @@ contract V2Calculations_Test is Testable {
         __bid.loanDetails.acceptedTimestamp = 2000000;
         __bid.paymentType = PaymentType.EMI;
 
-        (uint256 _owedPrincipal, uint256 _duePrincipal, uint256 _interest) = V2Calculations
-            .calculateAmountOwed(
+        (
+            uint256 _owedPrincipal,
+            uint256 _duePrincipal,
+            uint256 _interest
+        ) = V2Calculations.calculateAmountOwed(
                 __bid,
                 2000000 + 3000, //last repaid timestamp
                 2000000 + 19500, //timestamp

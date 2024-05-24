@@ -43,11 +43,9 @@ contract AavePoolAddressProviderMock is Ownable, IPoolAddressesProvider {
     }
 
     /// @inheritdoc IPoolAddressesProvider
-    function setMarketId(string memory newMarketId)
-        external
-        override
-        onlyOwner
-    {
+    function setMarketId(
+        string memory newMarketId
+    ) external override onlyOwner {
         _setMarketId(newMarketId);
     }
 
@@ -57,11 +55,10 @@ contract AavePoolAddressProviderMock is Ownable, IPoolAddressesProvider {
     }
 
     /// @inheritdoc IPoolAddressesProvider
-    function setAddress(bytes32 id, address newAddress)
-        external
-        override
-        onlyOwner
-    {
+    function setAddress(
+        bytes32 id,
+        address newAddress
+    ) external override onlyOwner {
         address oldAddress = _addresses[id];
         _addresses[id] = newAddress;
         emit AddressSet(id, oldAddress, newAddress);
@@ -83,11 +80,9 @@ contract AavePoolAddressProviderMock is Ownable, IPoolAddressesProvider {
     }
 
     /// @inheritdoc IPoolAddressesProvider
-    function setPriceOracle(address newPriceOracle)
-        external
-        override
-        onlyOwner
-    {
+    function setPriceOracle(
+        address newPriceOracle
+    ) external override onlyOwner {
         address oldPriceOracle = _addresses[PRICE_ORACLE];
         _addresses[PRICE_ORACLE] = newPriceOracle;
         emit PriceOracleUpdated(oldPriceOracle, newPriceOracle);
@@ -123,11 +118,9 @@ contract AavePoolAddressProviderMock is Ownable, IPoolAddressesProvider {
     }
 
     /// @inheritdoc IPoolAddressesProvider
-    function setPriceOracleSentinel(address newPriceOracleSentinel)
-        external
-        override
-        onlyOwner
-    {
+    function setPriceOracleSentinel(
+        address newPriceOracleSentinel
+    ) external override onlyOwner {
         address oldPriceOracleSentinel = _addresses[PRICE_ORACLE_SENTINEL];
         _addresses[PRICE_ORACLE_SENTINEL] = newPriceOracleSentinel;
         emit PriceOracleSentinelUpdated(
@@ -142,11 +135,9 @@ contract AavePoolAddressProviderMock is Ownable, IPoolAddressesProvider {
     }
 
     /// @inheritdoc IPoolAddressesProvider
-    function setPoolDataProvider(address newDataProvider)
-        external
-        override
-        onlyOwner
-    {
+    function setPoolDataProvider(
+        address newDataProvider
+    ) external override onlyOwner {
         address oldDataProvider = _addresses[DATA_PROVIDER];
         _addresses[DATA_PROVIDER] = newDataProvider;
         emit PoolDataProviderUpdated(oldDataProvider, newDataProvider);
@@ -163,13 +154,14 @@ contract AavePoolAddressProviderMock is Ownable, IPoolAddressesProvider {
     }
 
     //removed for the mock
-    function setAddressAsProxy(bytes32 id, address newImplementationAddress)
-        external
-    {}
+    function setAddressAsProxy(
+        bytes32 id,
+        address newImplementationAddress
+    ) external {}
 
-    function setPoolConfiguratorImpl(address newPoolConfiguratorImpl)
-        external
-    {}
+    function setPoolConfiguratorImpl(
+        address newPoolConfiguratorImpl
+    ) external {}
 
     function setPoolImpl(address newPoolImpl) external {}
 }

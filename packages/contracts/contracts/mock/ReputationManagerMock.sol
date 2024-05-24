@@ -9,32 +9,28 @@ contract ReputationManagerMock is IReputationManager {
 
     function initialize(address protocolAddress) external override {}
 
-    function getDelinquentLoanIds(address _account)
-        external
-        returns (uint256[] memory _loanIds)
-    {}
+    function getDelinquentLoanIds(
+        address _account
+    ) external returns (uint256[] memory _loanIds) {}
 
-    function getDefaultedLoanIds(address _account)
-        external
-        returns (uint256[] memory _loanIds)
-    {}
+    function getDefaultedLoanIds(
+        address _account
+    ) external returns (uint256[] memory _loanIds) {}
 
-    function getCurrentDelinquentLoanIds(address _account)
-        external
-        returns (uint256[] memory _loanIds)
-    {}
+    function getCurrentDelinquentLoanIds(
+        address _account
+    ) external returns (uint256[] memory _loanIds) {}
 
-    function getCurrentDefaultLoanIds(address _account)
-        external
-        returns (uint256[] memory _loanIds)
-    {}
+    function getCurrentDefaultLoanIds(
+        address _account
+    ) external returns (uint256[] memory _loanIds) {}
 
     function updateAccountReputation(address _account) external {}
 
-    function updateAccountReputation(address _account, uint256 _bidId)
-        external
-        returns (RepMark)
-    {
+    function updateAccountReputation(
+        address _account,
+        uint256 _bidId
+    ) external returns (RepMark) {
         return RepMark.Good;
     }
 }

@@ -200,11 +200,10 @@ contract TellerV2Autopay_Test is Testable, TellerV2Autopay {
         assertEq(borrowerBalanceDelta, 4002, "borrower did not autopay");
     }
 
-    function getEstimatedMinimumPayment(uint256 _bidId, uint256 _timestamp)
-        public
-        override
-        returns (uint256 _amount)
-    {
+    function getEstimatedMinimumPayment(
+        uint256 _bidId,
+        uint256 _timestamp
+    ) public override returns (uint256 _amount) {
         return 4000; //stub this for this test since there is not a good way to fast forward timestamp
     }
 }
@@ -214,8 +213,11 @@ contract User {
     address public immutable wethMock;
     address public immutable tellerV2Autopay;
 
-    constructor(address _tellerV2Autopay, address _tellerV2, address _wethMock)
-    {
+    constructor(
+        address _tellerV2Autopay,
+        address _tellerV2,
+        address _wethMock
+    ) {
         tellerV2Autopay = _tellerV2Autopay;
         tellerV2 = _tellerV2;
         wethMock = _wethMock;

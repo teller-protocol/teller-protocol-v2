@@ -11,10 +11,10 @@ contract TLR is ERC20Votes, Ownable {
      * @dev Sets the value of the `cap`. This value is immutable, it can only be
      * set once during construction.
      */
-    constructor(uint224 _supplyCap, address tokenOwner)
-        ERC20("Teller", "TLR")
-        ERC20Permit("Teller")
-    {
+    constructor(
+        uint224 _supplyCap,
+        address tokenOwner
+    ) ERC20("Teller", "TLR") ERC20Permit("Teller") {
         require(_supplyCap > 0, "ERC20Capped: cap is 0");
         MAX_SUPPLY = _supplyCap;
         _transferOwnership(tokenOwner);

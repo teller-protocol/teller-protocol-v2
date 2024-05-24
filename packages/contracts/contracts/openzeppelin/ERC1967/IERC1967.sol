@@ -2,7 +2,6 @@
 // OpenZeppelin Contracts (last updated v5.0.0) (interfaces/IERC1967.sol)
 pragma solidity ^0.8.0;
 
-
 /**
  * @dev ERC-1967: Proxy Storage Slots. This interface contains the events defined in the ERC.
  */

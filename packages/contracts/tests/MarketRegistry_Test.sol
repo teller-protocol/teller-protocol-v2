@@ -1098,19 +1098,15 @@ contract TellerV2Mock is TellerV2Context {
         marketRegistry = IMarketRegistry(_marketRegistry);
     }
 
-    function getSenderForMarket(uint256 _marketId)
-        external
-        view
-        returns (address)
-    {
+    function getSenderForMarket(
+        uint256 _marketId
+    ) external view returns (address) {
         return _msgSenderForMarket(_marketId);
     }
 
-    function getDataForMarket(uint256 _marketId)
-        external
-        view
-        returns (bytes calldata)
-    {
+    function getDataForMarket(
+        uint256 _marketId
+    ) external view returns (bytes calldata) {
         return _msgDataForMarket(_marketId);
     }
 
@@ -1118,7 +1114,9 @@ contract TellerV2Mock is TellerV2Context {
         mockBid = bid;
     }
 
-    function getLoanSummary(uint256 _bidId)
+    function getLoanSummary(
+        uint256 _bidId
+    )
         external
         view
         returns (

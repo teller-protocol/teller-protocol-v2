@@ -254,9 +254,11 @@ interface IPool {
      * @param fee The amount paid in fees
      * @return The backed amount
      */
-    function backUnbacked(address asset, uint256 amount, uint256 fee)
-        external
-        returns (uint256);
+    function backUnbacked(
+        address asset,
+        uint256 amount,
+        uint256 fee
+    ) external returns (uint256);
 
     /**
      * @notice Supplies an `amount` of underlying asset into the reserve, receiving in return overlying aTokens.
@@ -313,9 +315,11 @@ interface IPool {
      *   different wallet
      * @return The final amount withdrawn
      */
-    function withdraw(address asset, uint256 amount, address to)
-        external
-        returns (uint256);
+    function withdraw(
+        address asset,
+        uint256 amount,
+        address to
+    ) external returns (uint256);
 
     /**
      * @notice Allows users to borrow a specific `amount` of the reserve underlying asset, provided that the borrower
@@ -409,8 +413,10 @@ interface IPool {
      * @param asset The address of the underlying asset borrowed
      * @param interestRateMode The current interest rate mode of the position being swapped: 1 for Stable, 2 for Variable
      */
-    function swapBorrowRateMode(address asset, uint256 interestRateMode)
-        external;
+    function swapBorrowRateMode(
+        address asset,
+        uint256 interestRateMode
+    ) external;
 
     /**
      * @notice Rebalances the stable interest rate of a user to the current stable rate defined on the reserve.
@@ -428,8 +434,10 @@ interface IPool {
      * @param asset The address of the underlying asset supplied
      * @param useAsCollateral True if the user wants to use the supply as collateral, false otherwise
      */
-    function setUserUseReserveAsCollateral(address asset, bool useAsCollateral)
-        external;
+    function setUserUseReserveAsCollateral(
+        address asset,
+        bool useAsCollateral
+    ) external;
 
     /**
      * @notice Function to liquidate a non-healthy position collateral-wise, with Health Factor below 1
@@ -507,7 +515,9 @@ interface IPool {
      * @return ltv The loan to value of The user
      * @return healthFactor The current health factor of the user
      */
-    function getUserAccountData(address user)
+    function getUserAccountData(
+        address user
+    )
         external
         view
         returns (
@@ -571,30 +581,27 @@ interface IPool {
      * @param asset The address of the underlying asset of the reserve
      * @return The configuration of the reserve
      */
-    function getConfiguration(address asset)
-        external
-        view
-        returns (DataTypes.ReserveConfigurationMap memory);
+    function getConfiguration(
+        address asset
+    ) external view returns (DataTypes.ReserveConfigurationMap memory);
 
     /**
      * @notice Returns the configuration of the user across all the reserves
      * @param user The user address
      * @return The configuration of the user
      */
-    function getUserConfiguration(address user)
-        external
-        view
-        returns (DataTypes.UserConfigurationMap memory);
+    function getUserConfiguration(
+        address user
+    ) external view returns (DataTypes.UserConfigurationMap memory);
 
     /**
      * @notice Returns the normalized income of the reserve
      * @param asset The address of the underlying asset of the reserve
      * @return The reserve's normalized income
      */
-    function getReserveNormalizedIncome(address asset)
-        external
-        view
-        returns (uint256);
+    function getReserveNormalizedIncome(
+        address asset
+    ) external view returns (uint256);
 
     /**
      * @notice Returns the normalized variable debt per unit of asset
@@ -608,20 +615,18 @@ interface IPool {
      * @param asset The address of the underlying asset of the reserve
      * @return The reserve normalized variable debt
      */
-    function getReserveNormalizedVariableDebt(address asset)
-        external
-        view
-        returns (uint256);
+    function getReserveNormalizedVariableDebt(
+        address asset
+    ) external view returns (uint256);
 
     /**
      * @notice Returns the state and configuration of the reserve
      * @param asset The address of the underlying asset of the reserve
      * @return The state and configuration data of the reserve
      */
-    function getReserveData(address asset)
-        external
-        view
-        returns (DataTypes.ReserveData memory);
+    function getReserveData(
+        address asset
+    ) external view returns (DataTypes.ReserveData memory);
 
     /**
      * @notice Validates and finalizes an aToken transfer
@@ -703,10 +708,9 @@ interface IPool {
      * @param id The id of the category
      * @return The configuration data of the category
      */
-    function getEModeCategoryData(uint8 id)
-        external
-        view
-        returns (DataTypes.EModeCategory memory);
+    function getEModeCategoryData(
+        uint8 id
+    ) external view returns (DataTypes.EModeCategory memory);
 
     /**
      * @notice Allows a user to use the protocol in eMode

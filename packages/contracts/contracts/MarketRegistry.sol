@@ -257,12 +257,9 @@ contract MarketRegistry is
      * @notice Returns the status of a market existing and not being closed.
      * @param _marketId The market ID for the market to check.
      */
-    function isMarketOpen(uint256 _marketId)
-        public
-        view
-        override
-        returns (bool)
-    {
+    function isMarketOpen(
+        uint256 _marketId
+    ) public view override returns (bool) {
         return
             markets[_marketId].owner != address(0) &&
             !marketIsClosed[_marketId];
@@ -272,12 +269,9 @@ contract MarketRegistry is
      * @notice Returns the status of a market being open or closed for new bids. Does not indicate whether or not a market exists.
      * @param _marketId The market ID for the market to check.
      */
-    function isMarketClosed(uint256 _marketId)
-        public
-        view
-        override
-        returns (bool)
-    {
+    function isMarketClosed(
+        uint256 _marketId
+    ) public view override returns (bool) {
         return marketIsClosed[_marketId];
     }
 
@@ -398,9 +392,10 @@ contract MarketRegistry is
      * @notice Removes a borrower from an market.
      * @dev See {_revokeStakeholder}.
      */
-    function revokeBorrower(uint256 _marketId, address _borrowerAddress)
-        external
-    {
+    function revokeBorrower(
+        uint256 _marketId,
+        address _borrowerAddress
+    ) external {
         _revokeStakeholder(_marketId, _borrowerAddress, false);
     }
 
@@ -478,10 +473,10 @@ contract MarketRegistry is
      * Requirements:
      * - The caller must be the current owner.
      */
-    function transferMarketOwnership(uint256 _marketId, address _newOwner)
-        public
-        ownsMarket(_marketId)
-    {
+    function transferMarketOwnership(
+        uint256 _marketId,
+        address _newOwner
+    ) public ownsMarket(_marketId) {
         markets[_marketId].owner = _newOwner;
         emit SetMarketOwner(_marketId, _newOwner);
     }
@@ -533,10 +528,10 @@ contract MarketRegistry is
      * Requirements:
      * - The caller must be the current owner.
      */
-    function setMarketFeeRecipient(uint256 _marketId, address _recipient)
-        public
-        ownsMarket(_marketId)
-    {
+    function setMarketFeeRecipient(
+        uint256 _marketId,
+        address _recipient
+    ) public ownsMarket(_marketId) {
         markets[_marketId].feeRecipient = _recipient;
         emit SetMarketFeeRecipient(_marketId, _recipient);
     }
@@ -549,10 +544,10 @@ contract MarketRegistry is
      * Requirements:
      * - The caller must be the current owner.
      */
-    function setMarketURI(uint256 _marketId, string calldata _uri)
-        public
-        ownsMarket(_marketId)
-    {
+    function setMarketURI(
+        uint256 _marketId,
+        string calldata _uri
+    ) public ownsMarket(_marketId) {
         //We do string comparison by checking the hashes of the strings against one another
         if (
             keccak256(abi.encodePacked(_uri)) !=
@@ -603,10 +598,10 @@ contract MarketRegistry is
      * @param _marketId The ID of a market.
      * @param _duration Default duration for new loans
      */
-    function setPaymentDefaultDuration(uint256 _marketId, uint32 _duration)
-        public
-        ownsMarket(_marketId)
-    {
+    function setPaymentDefaultDuration(
+        uint256 _marketId,
+        uint32 _duration
+    ) public ownsMarket(_marketId) {
         if (_duration != markets[_marketId].paymentDefaultDuration) {
             markets[_marketId].paymentDefaultDuration = _duration;
 
@@ -614,10 +609,10 @@ contract MarketRegistry is
         }
     }
 
-    function setBidExpirationTime(uint256 _marketId, uint32 _duration)
-        public
-        ownsMarket(_marketId)
-    {
+    function setBidExpirationTime(
+        uint256 _marketId,
+        uint32 _duration
+    ) public ownsMarket(_marketId) {
         if (_duration != markets[_marketId].bidExpirationTime) {
             markets[_marketId].bidExpirationTime = _duration;
 
@@ -633,10 +628,10 @@ contract MarketRegistry is
      * Requirements:
      * - The caller must be the current owner.
      */
-    function setMarketFeePercent(uint256 _marketId, uint16 _newPercent)
-        public
-        ownsMarket(_marketId)
-    {
+    function setMarketFeePercent(
+        uint256 _marketId,
+        uint16 _newPercent
+    ) public ownsMarket(_marketId) {
         require(_newPercent >= 0 && _newPercent <= 10000, "invalid percent");
         if (_newPercent != markets[_marketId].marketplaceFeePercent) {
             markets[_marketId].marketplaceFeePercent = _newPercent;
@@ -667,10 +662,10 @@ contract MarketRegistry is
      * Requirements:
      * - The caller must be the current owner.
      */
-    function setLenderAttestationRequired(uint256 _marketId, bool _required)
-        public
-        ownsMarket(_marketId)
-    {
+    function setLenderAttestationRequired(
+        uint256 _marketId,
+        bool _required
+    ) public ownsMarket(_marketId) {
         if (_required != markets[_marketId].lenderAttestationRequired) {
             markets[_marketId].lenderAttestationRequired = _required;
             emit SetMarketLenderAttestation(_marketId, _required);
@@ -685,10 +680,10 @@ contract MarketRegistry is
      * Requirements:
      * - The caller must be the current owner.
      */
-    function setBorrowerAttestationRequired(uint256 _marketId, bool _required)
-        public
-        ownsMarket(_marketId)
-    {
+    function setBorrowerAttestationRequired(
+        uint256 _marketId,
+        bool _required
+    ) public ownsMarket(_marketId) {
         if (_required != markets[_marketId].borrowerAttestationRequired) {
             markets[_marketId].borrowerAttestationRequired = _required;
             emit SetMarketBorrowerAttestation(_marketId, _required);
@@ -699,7 +694,9 @@ contract MarketRegistry is
      * @notice Gets the data associated with a market.
      * @param _marketId The ID of a market.
      */
-    function getMarketData(uint256 _marketId)
+    function getMarketData(
+        uint256 _marketId
+    )
         public
         view
         returns (
@@ -727,7 +724,9 @@ contract MarketRegistry is
      * @notice Gets the attestation requirements for a given market.
      * @param _marketId The ID of the market.
      */
-    function getMarketAttestationRequirements(uint256 _marketId)
+    function getMarketAttestationRequirements(
+        uint256 _marketId
+    )
         public
         view
         returns (
@@ -746,13 +745,9 @@ contract MarketRegistry is
      * @param _marketId The ID of a market.
      * @return The address of a market's owner.
      */
-    function getMarketOwner(uint256 _marketId)
-        public
-        view
-        virtual
-        override
-        returns (address)
-    {
+    function getMarketOwner(
+        uint256 _marketId
+    ) public view virtual override returns (address) {
         return _getMarketOwner(_marketId);
     }
 
@@ -761,12 +756,9 @@ contract MarketRegistry is
      * @param _marketId The ID of a market.
      * @return The address of a market's owner.
      */
-    function _getMarketOwner(uint256 _marketId)
-        internal
-        view
-        virtual
-        returns (address)
-    {
+    function _getMarketOwner(
+        uint256 _marketId
+    ) internal view virtual returns (address) {
         return markets[_marketId].owner;
     }
 
@@ -775,12 +767,9 @@ contract MarketRegistry is
      * @param _marketId The ID of a market.
      * @return The address of a market's fee recipient.
      */
-    function getMarketFeeRecipient(uint256 _marketId)
-        public
-        view
-        override
-        returns (address)
-    {
+    function getMarketFeeRecipient(
+        uint256 _marketId
+    ) public view override returns (address) {
         address recipient = markets[_marketId].feeRecipient;
 
         if (recipient == address(0)) {
@@ -795,12 +784,9 @@ contract MarketRegistry is
      * @param _marketId The ID of a market.
      * @return URI of a market's metadata.
      */
-    function getMarketURI(uint256 _marketId)
-        public
-        view
-        override
-        returns (string memory)
-    {
+    function getMarketURI(
+        uint256 _marketId
+    ) public view override returns (string memory) {
         return markets[_marketId].metadataURI;
     }
 
@@ -810,12 +796,9 @@ contract MarketRegistry is
      * @return Duration of a loan until it is delinquent.
      * @return The type of payment cycle for loans in the market.
      */
-    function getPaymentCycle(uint256 _marketId)
-        public
-        view
-        override
-        returns (uint32, PaymentCycleType)
-    {
+    function getPaymentCycle(
+        uint256 _marketId
+    ) public view override returns (uint32, PaymentCycleType) {
         return (
             markets[_marketId].paymentCycleDuration,
             markets[_marketId].paymentCycleType
@@ -827,12 +810,9 @@ contract MarketRegistry is
      * @param _marketId The ID of a market.
      * @return Duration of a loan repayment interval until it is default.
      */
-    function getPaymentDefaultDuration(uint256 _marketId)
-        public
-        view
-        override
-        returns (uint32)
-    {
+    function getPaymentDefaultDuration(
+        uint256 _marketId
+    ) public view override returns (uint32) {
         return markets[_marketId].paymentDefaultDuration;
     }
 
@@ -841,21 +821,15 @@ contract MarketRegistry is
      * @param _marketId the ID of the market.
      * @return The type of payment for loans in the market.
      */
-    function getPaymentType(uint256 _marketId)
-        public
-        view
-        override
-        returns (PaymentType)
-    {
+    function getPaymentType(
+        uint256 _marketId
+    ) public view override returns (PaymentType) {
         return markets[_marketId].paymentType;
     }
 
-    function getBidExpirationTime(uint256 marketId)
-        public
-        view
-        override
-        returns (uint32)
-    {
+    function getBidExpirationTime(
+        uint256 marketId
+    ) public view override returns (uint32) {
         return markets[marketId].bidExpirationTime;
     }
 
@@ -864,12 +838,9 @@ contract MarketRegistry is
      * @param _marketId The ID of a market.
      * @return fee in basis points
      */
-    function getMarketplaceFee(uint256 _marketId)
-        public
-        view
-        override
-        returns (uint16 fee)
-    {
+    function getMarketplaceFee(
+        uint256 _marketId
+    ) public view override returns (uint16 fee) {
         return markets[_marketId].marketplaceFeePercent;
     }
 
@@ -880,12 +851,10 @@ contract MarketRegistry is
      * @return isVerified_ Boolean indicating if a lender has been added to a market.
      * @return uuid_ Bytes32 representing the UUID of the lender.
      */
-    function isVerifiedLender(uint256 _marketId, address _lenderAddress)
-        public
-        view
-        override
-        returns (bool isVerified_, bytes32 uuid_)
-    {
+    function isVerifiedLender(
+        uint256 _marketId,
+        address _lenderAddress
+    ) public view override returns (bool isVerified_, bytes32 uuid_) {
         return
             _isVerified(
                 _lenderAddress,
@@ -902,12 +871,10 @@ contract MarketRegistry is
      * @return isVerified_ Boolean indicating if a borrower has been added to a market.
      * @return uuid_ Bytes32 representing the UUID of the borrower.
      */
-    function isVerifiedBorrower(uint256 _marketId, address _borrowerAddress)
-        public
-        view
-        override
-        returns (bool isVerified_, bytes32 uuid_)
-    {
+    function isVerifiedBorrower(
+        uint256 _marketId,
+        address _borrowerAddress
+    ) public view override returns (bool isVerified_, bytes32 uuid_) {
         return
             _isVerified(
                 _borrowerAddress,

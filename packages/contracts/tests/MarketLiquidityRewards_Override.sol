@@ -125,10 +125,10 @@ contract MarketLiquidityRewards_Override is MarketLiquidityRewards {
         super.increaseAllocationAmount(_allocationId, _tokenAmount);
     }
 
-    function deallocateRewards(uint256 _allocationId, uint256 _tokenAmount)
-        public
-        override
-    {
+    function deallocateRewards(
+        uint256 _allocationId,
+        uint256 _tokenAmount
+    ) public override {
         super.deallocateRewards(_allocationId, _tokenAmount);
     }
 

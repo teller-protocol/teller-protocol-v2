@@ -163,7 +163,7 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
 
         bool zeroForOne = false; // ??
 
-        mockUniswapPool.set_mockSqrtPriceX96(1 * 2**96);
+        mockUniswapPool.set_mockSqrtPriceX96(1 * 2 ** 96);
 
         uint32 twapInterval = 0;
 
@@ -220,7 +220,7 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
         bool zeroForOne = false; // ??
 
         //i think this means the ratio is 100:1
-        mockUniswapPool.set_mockSqrtPriceX96(10 * 2**96);
+        mockUniswapPool.set_mockSqrtPriceX96(10 * 2 ** 96);
 
         uint32 twapInterval = 0;
 
@@ -273,7 +273,7 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
             collateralTokenDecimals
         );
 
-        mockUniswapPool.set_mockSqrtPriceX96(1 * 2**96);
+        mockUniswapPool.set_mockSqrtPriceX96(1 * 2 ** 96);
 
         uint32 twapInterval = 0;
 
@@ -305,9 +305,9 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
     }
 
     function test_getUniswapPriceRatioForPoolRoutes() public {
-        mockUniswapPool.set_mockSqrtPriceX96(1 * 2**96);
+        mockUniswapPool.set_mockSqrtPriceX96(1 * 2 ** 96);
 
-        mockUniswapPoolSecondary.set_mockSqrtPriceX96(1 * 2**96);
+        mockUniswapPoolSecondary.set_mockSqrtPriceX96(1 * 2 ** 96);
 
         uint32 twapInterval = 0; //for now
 
@@ -353,9 +353,9 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
     }
 
     function test_getUniswapPriceRatioForPoolRoutes_zeroforone() public {
-        mockUniswapPool.set_mockSqrtPriceX96(1 * 2**96);
+        mockUniswapPool.set_mockSqrtPriceX96(1 * 2 ** 96);
 
-        mockUniswapPoolSecondary.set_mockSqrtPriceX96(1 * 2**96);
+        mockUniswapPoolSecondary.set_mockSqrtPriceX96(1 * 2 ** 96);
 
         //collateralTokenDecimals = 6;
 
@@ -402,8 +402,7 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
         assertEq(requiredCollateral, 1000, "unexpected required collateral");
     }
 
-
- function test_getRequiredCollateral_NFT_scenario_A() public {
+    function test_getRequiredCollateral_NFT_scenario_A() public {
         bool zeroForOne = false;
 
         principalTokenDecimals = 18;
@@ -416,8 +415,6 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
             principalTokenDecimals
         );
 
-     
-
         uint256 principalAmount = 1000;
         maxPrincipalPerCollateralAmount = 5000;
 
@@ -428,7 +425,7 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
                 ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC721
             );
 
-        assertEq(requiredCollateral, 1  , "unexpected required collateral");
+        assertEq(requiredCollateral, 1, "unexpected required collateral");
     }
 
     function test_getRequiredCollateral_NFT_Scenario_B() public {
@@ -444,8 +441,6 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
             principalTokenDecimals
         );
 
-     
-
         uint256 principalAmount = 100000;
         maxPrincipalPerCollateralAmount = 5000;
 
@@ -456,9 +451,8 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
                 ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC1155
             );
 
-        assertEq(requiredCollateral, 20  , "unexpected required collateral");
+        assertEq(requiredCollateral, 20, "unexpected required collateral");
     }
-
 
     // why does this fail ?
     /* function test_getUniswapPriceRatioForPoolRoutes_decimal_scenario_A() public {
@@ -543,9 +537,9 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
     function test_getUniswapPriceRatioForPoolRoutes_decimal_scenario_A()
         public
     {
-        mockUniswapPool.set_mockSqrtPriceX96(1 * 2**96);
+        mockUniswapPool.set_mockSqrtPriceX96(1 * 2 ** 96);
 
-        mockUniswapPoolSecondary.set_mockSqrtPriceX96(1 * 2**96);
+        mockUniswapPoolSecondary.set_mockSqrtPriceX96(1 * 2 ** 96);
 
         uint32 twapInterval = 0; //for now
 
@@ -619,9 +613,9 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
     function test_getUniswapPriceRatioForPoolRoutes_decimal_scenario_A2()
         public
     {
-        mockUniswapPool.set_mockSqrtPriceX96(1 * 2**96);
+        mockUniswapPool.set_mockSqrtPriceX96(1 * 2 ** 96);
 
-        mockUniswapPoolSecondary.set_mockSqrtPriceX96(1 * 2**96);
+        mockUniswapPoolSecondary.set_mockSqrtPriceX96(1 * 2 ** 96);
 
         uint32 twapInterval = 0; //for now
 
@@ -693,9 +687,9 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
     function test_getUniswapPriceRatioForPoolRoutes_decimal_scenario_B()
         public
     {
-        mockUniswapPool.set_mockSqrtPriceX96(1 * 2**96);
+        mockUniswapPool.set_mockSqrtPriceX96(1 * 2 ** 96);
 
-        mockUniswapPoolSecondary.set_mockSqrtPriceX96(1 * 2**96);
+        mockUniswapPoolSecondary.set_mockSqrtPriceX96(1 * 2 ** 96);
 
         uint32 twapInterval = 0; //for now
 
@@ -769,9 +763,9 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
     function test_getUniswapPriceRatioForPoolRoutes_decimal_scenario_C()
         public
     {
-        mockUniswapPool.set_mockSqrtPriceX96(1 * 2**96);
+        mockUniswapPool.set_mockSqrtPriceX96(1 * 2 ** 96);
 
-        mockUniswapPoolSecondary.set_mockSqrtPriceX96(1 * 2**96);
+        mockUniswapPoolSecondary.set_mockSqrtPriceX96(1 * 2 ** 96);
 
         uint32 twapInterval = 0; //for now
 
@@ -845,9 +839,9 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
     }
 
     function test_getUniswapPriceRatioForPoolRoutes_price_scenario_A() public {
-        mockUniswapPool.set_mockSqrtPriceX96(10 * 2**96);
+        mockUniswapPool.set_mockSqrtPriceX96(10 * 2 ** 96);
 
-        uint160 priceTwo = uint160(1 * 2**96) / uint160(10);
+        uint160 priceTwo = uint160(1 * 2 ** 96) / uint160(10);
         mockUniswapPoolSecondary.set_mockSqrtPriceX96(priceTwo);
 
         uint32 twapInterval = 0; //for now
@@ -894,7 +888,7 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
     }
 
     function test_getUniswapPriceRatioForPoolRoutes_price_scenario_B() public {
-        mockUniswapPool.set_mockSqrtPriceX96(1 * 2**96);
+        mockUniswapPool.set_mockSqrtPriceX96(1 * 2 ** 96);
 
         uint32 twapInterval = 0; //for now
 
@@ -932,7 +926,7 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
     }
 
     function test_getUniswapPriceRatioForPoolRoutes_price_scenario_C() public {
-        mockUniswapPool.set_mockSqrtPriceX96(1 * 2**96);
+        mockUniswapPool.set_mockSqrtPriceX96(1 * 2 ** 96);
 
         uint32 twapInterval = 0; //for now
 
@@ -2233,8 +2227,6 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
 
     */
 
-
-
     function test_getEscrowCollateralType_erc20() public {
         CollateralType cType = lenderCommitmentForwarder
             ._getEscrowCollateralTypeSuper(
@@ -2283,16 +2275,15 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
 
         ///assertEq(uint16(cType), uint16(CollateralType.NONE), "unexpected collateral type");
     }
-
-
 }
 
 contract LenderCommitmentUser is User {
     LenderCommitmentForwarder_G2 public immutable commitmentForwarder;
 
-    constructor(address _tellerV2, address _commitmentForwarder)
-        User(_tellerV2)
-    {
+    constructor(
+        address _tellerV2,
+        address _commitmentForwarder
+    ) User(_tellerV2) {
         commitmentForwarder = LenderCommitmentForwarder_G2(
             _commitmentForwarder
         );
@@ -2343,19 +2334,15 @@ contract LenderCommitmentForwarderTest_TellerV2Mock is TellerV2Context {
         marketRegistry = IMarketRegistry(_marketRegistry);
     }
 
-    function getSenderForMarket(uint256 _marketId)
-        external
-        view
-        returns (address)
-    {
+    function getSenderForMarket(
+        uint256 _marketId
+    ) external view returns (address) {
         return _msgSenderForMarket(_marketId);
     }
 
-    function getDataForMarket(uint256 _marketId)
-        external
-        view
-        returns (bytes calldata)
-    {
+    function getDataForMarket(
+        uint256 _marketId
+    ) external view returns (bytes calldata) {
         return _msgDataForMarket(_marketId);
     }
 }

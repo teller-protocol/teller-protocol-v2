@@ -10,25 +10,26 @@ enum RepMark {
 interface IReputationManager {
     function initialize(address protocolAddress) external;
 
-    function getDelinquentLoanIds(address _account)
-        external
-        returns (uint256[] memory);
+    function getDelinquentLoanIds(
+        address _account
+    ) external returns (uint256[] memory);
 
-    function getDefaultedLoanIds(address _account)
-        external
-        returns (uint256[] memory);
+    function getDefaultedLoanIds(
+        address _account
+    ) external returns (uint256[] memory);
 
-    function getCurrentDelinquentLoanIds(address _account)
-        external
-        returns (uint256[] memory);
+    function getCurrentDelinquentLoanIds(
+        address _account
+    ) external returns (uint256[] memory);
 
-    function getCurrentDefaultLoanIds(address _account)
-        external
-        returns (uint256[] memory);
+    function getCurrentDefaultLoanIds(
+        address _account
+    ) external returns (uint256[] memory);
 
     function updateAccountReputation(address _account) external;
 
-    function updateAccountReputation(address _account, uint256 _bidId)
-        external
-        returns (RepMark);
+    function updateAccountReputation(
+        address _account,
+        uint256 _bidId
+    ) external returns (RepMark);
 }

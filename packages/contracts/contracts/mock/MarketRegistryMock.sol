@@ -19,11 +19,10 @@ contract MarketRegistryMock is IMarketRegistry {
 
     function initialize(TellerAS _tellerAS) external {}
 
-    function isVerifiedLender(uint256 _marketId, address _lenderAddress)
-        public
-        view
-        returns (bool isVerified_, bytes32 uuid_)
-    {
+    function isVerifiedLender(
+        uint256 _marketId,
+        address _lenderAddress
+    ) public view returns (bool isVerified_, bytes32 uuid_) {
         isVerified_ = globalLenderIsVerified;
     }
 
@@ -35,60 +34,46 @@ contract MarketRegistryMock is IMarketRegistry {
         return globalMarketsClosed;
     }
 
-    function isVerifiedBorrower(uint256 _marketId, address _borrower)
-        public
-        view
-        returns (bool isVerified_, bytes32 uuid_)
-    {
+    function isVerifiedBorrower(
+        uint256 _marketId,
+        address _borrower
+    ) public view returns (bool isVerified_, bytes32 uuid_) {
         isVerified_ = globalBorrowerIsVerified;
     }
 
-    function getMarketOwner(uint256 _marketId)
-        public
-        view
-        override
-        returns (address)
-    {
+    function getMarketOwner(
+        uint256 _marketId
+    ) public view override returns (address) {
         return address(globalMarketOwner);
     }
 
-    function getMarketFeeRecipient(uint256 _marketId)
-        public
-        view
-        returns (address)
-    {
+    function getMarketFeeRecipient(
+        uint256 _marketId
+    ) public view returns (address) {
         return address(globalMarketFeeRecipient);
     }
 
-    function getMarketURI(uint256 _marketId)
-        public
-        view
-        returns (string memory)
-    {
+    function getMarketURI(
+        uint256 _marketId
+    ) public view returns (string memory) {
         return "url://";
     }
 
-    function getPaymentCycle(uint256 _marketId)
-        public
-        view
-        returns (uint32, PaymentCycleType)
-    {
+    function getPaymentCycle(
+        uint256 _marketId
+    ) public view returns (uint32, PaymentCycleType) {
         return (1000, PaymentCycleType.Seconds);
     }
 
-    function getPaymentDefaultDuration(uint256 _marketId)
-        public
-        view
-        returns (uint32)
-    {
+    function getPaymentDefaultDuration(
+        uint256 _marketId
+    ) public view returns (uint32) {
         return 1000;
     }
 
-    function getBidExpirationTime(uint256 _marketId)
-        public
-        view
-        returns (uint32)
-    {
+    function getBidExpirationTime(
+        uint256 _marketId
+    ) public view returns (uint32) {
         return 1000;
     }
 
@@ -104,11 +89,9 @@ contract MarketRegistryMock is IMarketRegistry {
         globalMarketFeeRecipient = _feeRecipient;
     }
 
-    function getPaymentType(uint256 _marketId)
-        public
-        view
-        returns (PaymentType)
-    {}
+    function getPaymentType(
+        uint256 _marketId
+    ) public view returns (PaymentType) {}
 
     function createMarket(
         address _initialOwner,

@@ -38,38 +38,30 @@ contract ReputationManager is IReputationManager, Initializable {
         tellerV2 = ITellerV2(_tellerV2);
     }
 
-    function getDelinquentLoanIds(address _account)
-        public
-        override
-        returns (uint256[] memory)
-    {
+    function getDelinquentLoanIds(
+        address _account
+    ) public override returns (uint256[] memory) {
         updateAccountReputation(_account);
         return _delinquencies[_account].values();
     }
 
-    function getDefaultedLoanIds(address _account)
-        public
-        override
-        returns (uint256[] memory)
-    {
+    function getDefaultedLoanIds(
+        address _account
+    ) public override returns (uint256[] memory) {
         updateAccountReputation(_account);
         return _defaults[_account].values();
     }
 
-    function getCurrentDelinquentLoanIds(address _account)
-        public
-        override
-        returns (uint256[] memory)
-    {
+    function getCurrentDelinquentLoanIds(
+        address _account
+    ) public override returns (uint256[] memory) {
         updateAccountReputation(_account);
         return _currentDelinquencies[_account].values();
     }
 
-    function getCurrentDefaultLoanIds(address _account)
-        public
-        override
-        returns (uint256[] memory)
-    {
+    function getCurrentDefaultLoanIds(
+        address _account
+    ) public override returns (uint256[] memory) {
         updateAccountReputation(_account);
         return _currentDefaults[_account].values();
     }
@@ -83,18 +75,17 @@ contract ReputationManager is IReputationManager, Initializable {
         }
     }
 
-    function updateAccountReputation(address _account, uint256 _bidId)
-        public
-        override
-        returns (RepMark)
-    {
+    function updateAccountReputation(
+        address _account,
+        uint256 _bidId
+    ) public override returns (RepMark) {
         return _applyReputation(_account, _bidId);
     }
 
-    function _applyReputation(address _account, uint256 _bidId)
-        internal
-        returns (RepMark mark_)
-    {
+    function _applyReputation(
+        address _account,
+        uint256 _bidId
+    ) internal returns (RepMark mark_) {
         mark_ = RepMark.Good;
 
         if (tellerV2.isLoanDefaulted(_bidId)) {
@@ -112,9 +103,11 @@ contract ReputationManager is IReputationManager, Initializable {
         }
     }
 
-    function _addMark(address _account, uint256 _bidId, RepMark _mark)
-        internal
-    {
+    function _addMark(
+        address _account,
+        uint256 _bidId,
+        RepMark _mark
+    ) internal {
         if (_mark == RepMark.Delinquent) {
             _delinquencies[_account].add(_bidId);
             _currentDelinquencies[_account].add(_bidId);
@@ -126,9 +119,11 @@ contract ReputationManager is IReputationManager, Initializable {
         emit MarkAdded(_account, _mark, _bidId);
     }
 
-    function _removeMark(address _account, uint256 _bidId, RepMark _mark)
-        internal
-    {
+    function _removeMark(
+        address _account,
+        uint256 _bidId,
+        RepMark _mark
+    ) internal {
         if (_mark == RepMark.Delinquent) {
             _currentDelinquencies[_account].remove(_bidId);
         } else if (_mark == RepMark.Default) {

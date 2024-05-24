@@ -32,7 +32,6 @@ const deployFn: DeployFunction = async (hre) => {
   }
 
   const networkName = hre.network.name
- 
 
   const lenderGroupsFactory = await hre.deployProxy(
     'LenderCommitmentGroupFactory',
@@ -43,7 +42,6 @@ const deployFn: DeployFunction = async (hre) => {
         smartCommitmentForwarderAddress,
         uniswapV3FactoryAddress,
       ],
-      
     }
   )
 
@@ -60,6 +58,6 @@ deployFn.dependencies = [
 ]
 
 deployFn.skip = async (hre) => {
-  return !hre.network.live || ![ 'sepolia' , 'polygon'].includes(hre.network.name)
+  return !hre.network.live || !['sepolia', 'polygon'].includes(hre.network.name)
 }
 export default deployFn

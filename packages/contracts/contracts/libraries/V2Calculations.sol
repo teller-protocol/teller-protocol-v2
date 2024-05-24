@@ -25,11 +25,9 @@ library V2Calculations {
      * @notice Returns the timestamp of the last payment made for a loan.
      * @param _bid The loan bid struct to get the timestamp for.
      */
-    function lastRepaidTimestamp(Bid storage _bid)
-        internal
-        view
-        returns (uint32)
-    {
+    function lastRepaidTimestamp(
+        Bid storage _bid
+    ) internal view returns (uint32) {
         return
             _bid.loanDetails.lastRepaidTimestamp == 0
                 ? _bid.loanDetails.acceptedTimestamp

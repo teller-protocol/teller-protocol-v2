@@ -98,49 +98,47 @@ contract MarketRegistry_Override is MarketRegistry {
         markets[_marketId].verifiedLendersForMarket.add(guy);
     }
 
-    function forceVerifyBorrowerForMarket(uint256 _marketId, address guy)
-        public
-    {
+    function forceVerifyBorrowerForMarket(
+        uint256 _marketId,
+        address guy
+    ) public {
         markets[_marketId].verifiedBorrowersForMarket.add(guy);
     }
 
-    function marketVerifiedLendersContains(uint256 _marketId, address guy)
-        public
-        returns (bool)
-    {
+    function marketVerifiedLendersContains(
+        uint256 _marketId,
+        address guy
+    ) public returns (bool) {
         return markets[_marketId].verifiedLendersForMarket.contains(guy);
     }
 
-    function marketVerifiedBorrowersContains(uint256 _marketId, address guy)
-        public
-        returns (bool)
-    {
+    function marketVerifiedBorrowersContains(
+        uint256 _marketId,
+        address guy
+    ) public returns (bool) {
         return markets[_marketId].verifiedBorrowersForMarket.contains(guy);
     }
 
-    function getLenderAttestationId(uint256 _marketId, address guy)
-        public
-        returns (bytes32)
-    {
+    function getLenderAttestationId(
+        uint256 _marketId,
+        address guy
+    ) public returns (bytes32) {
         return markets[_marketId].lenderAttestationIds[guy];
     }
 
-    function getBorrowerAttestationId(uint256 _marketId, address guy)
-        public
-        returns (bytes32)
-    {
+    function getBorrowerAttestationId(
+        uint256 _marketId,
+        address guy
+    ) public returns (bytes32) {
         return markets[_marketId].borrowerAttestationIds[guy];
     }
 
     /*
     @notice returns the actual value in the markets storage mapping, not globalMarketOwner the override
     */
-    function getMarketOwner(uint256 marketId)
-        public
-        view
-        override
-        returns (address)
-    {
+    function getMarketOwner(
+        uint256 marketId
+    ) public view override returns (address) {
         return super._getMarketOwner(marketId);
     }
 
@@ -148,10 +146,10 @@ contract MarketRegistry_Override is MarketRegistry {
         markets[_marketId].feeRecipient = _feeRecipient;
     }
 
-    function isVerified(address _stakeholderAddress, uint256 _marketId)
-        public
-        returns (bool isVerified_, bytes32 uuid_)
-    {
+    function isVerified(
+        address _stakeholderAddress,
+        uint256 _marketId
+    ) public returns (bool isVerified_, bytes32 uuid_) {
         (isVerified_, uuid_) = super._isVerified(
             _stakeholderAddress,
             markets[_marketId].lenderAttestationRequired,
@@ -162,12 +160,9 @@ contract MarketRegistry_Override is MarketRegistry {
 
     //overrides
 
-    function _getMarketOwner(uint256 marketId)
-        internal
-        view
-        override
-        returns (address)
-    {
+    function _getMarketOwner(
+        uint256 marketId
+    ) internal view override returns (address) {
         return globalMarketOwner;
     }
 

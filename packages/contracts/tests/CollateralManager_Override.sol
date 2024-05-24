@@ -40,9 +40,10 @@ contract CollateralManager_Override is CollateralManager {
         super._commitCollateral(bidId, collateralInfo);
     }
 
-    function _depositSuper(uint256 _bidId, Collateral memory _collateralInfo)
-        public
-    {
+    function _depositSuper(
+        uint256 _bidId,
+        Collateral memory _collateralInfo
+    ) public {
         super._deposit(_bidId, _collateralInfo);
     }
 
@@ -85,10 +86,9 @@ contract CollateralManager_Override is CollateralManager {
         bidsCollateralBackedGlobally = _backed;
     }
 
-    function _deployEscrowSuper(uint256 _bidId)
-        public
-        returns (address proxyAddress_, address borrower_)
-    {
+    function _deployEscrowSuper(
+        uint256 _bidId
+    ) public returns (address proxyAddress_, address borrower_) {
         return super._deployEscrow(_bidId);
     }
 
@@ -104,11 +104,9 @@ contract CollateralManager_Override is CollateralManager {
         Overrides
     */
 
-    function isBidCollateralBacked(uint256 _bidId)
-        public
-        override
-        returns (bool)
-    {
+    function isBidCollateralBacked(
+        uint256 _bidId
+    ) public override returns (bool) {
         return bidsCollateralBackedGlobally;
     }
 
@@ -123,10 +121,10 @@ contract CollateralManager_Override is CollateralManager {
         checks_ = new bool[](0);
     }
 
-    function _deposit(uint256 _bidId, Collateral memory collateralInfo)
-        internal
-        override
-    {
+    function _deposit(
+        uint256 _bidId,
+        Collateral memory collateralInfo
+    ) internal override {
         depositInternalWasCalled = true;
     }
 
@@ -144,11 +142,9 @@ contract CollateralManager_Override is CollateralManager {
         globalEscrowProxyAddress = _address;
     }
 
-    function _deployEscrow(uint256 _bidId)
-        internal
-        override
-        returns (address proxyAddress_, address borrower_)
-    {
+    function _deployEscrow(
+        uint256 _bidId
+    ) internal override returns (address proxyAddress_, address borrower_) {
         proxyAddress_ = globalEscrowProxyAddress;
         borrower_ = tellerV2.getLoanBorrower(_bidId);
 

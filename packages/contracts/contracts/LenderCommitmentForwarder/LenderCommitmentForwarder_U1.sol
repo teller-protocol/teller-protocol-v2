@@ -33,8 +33,6 @@ import "./extensions/ExtensionsContextUpgradeable.sol";
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-
-
 /*
 
 Only do decimal expansion if it is an ERC20   not anything else !! 
@@ -202,14 +200,15 @@ contract LenderCommitmentForwarder_U1 is
 
         commitments[commitmentId_] = _commitment;
 
-        require(_poolRoutes.length == 0 || _commitment.collateralTokenType != CommitmentCollateralType.ERC20 , "can only use pool routes with ERC20 collateral");
-
+        require(
+            _poolRoutes.length == 0 ||
+                _commitment.collateralTokenType !=
+                CommitmentCollateralType.ERC20,
+            "can only use pool routes with ERC20 collateral"
+        );
 
         //routes length of 0 means ignore price oracle limits
         require(_poolRoutes.length <= 2, "invalid pool routes length");
-
-      
-       
 
         for (uint256 i = 0; i < _poolRoutes.length; i++) {
             commitmentUniswapPoolRoutes[commitmentId_].push(_poolRoutes[i]);
@@ -331,10 +330,9 @@ contract LenderCommitmentForwarder_U1 is
      * @notice Removes the commitment of a lender to a market.
      * @param _commitmentId The id of the commitment to delete.
      */
-    function deleteCommitment(uint256 _commitmentId)
-        public
-        commitmentLender(_commitmentId)
-    {
+    function deleteCommitment(
+        uint256 _commitmentId
+    ) public commitmentLender(_commitmentId) {
         delete commitments[_commitmentId];
         delete commitmentBorrowersList[_commitmentId];
         emit DeletedCommitment(_commitmentId);
@@ -663,25 +661,23 @@ contract LenderCommitmentForwarder_U1 is
         }
 
         if (_collateralTokenType == CommitmentCollateralType.ERC20) {
-             return
-            MathUpgradeable.mulDiv(
-                _principalAmount,
-                STANDARD_EXPANSION_FACTOR,
-                _maxPrincipalPerCollateralAmount,
-                MathUpgradeable.Rounding.Up
-            );
+            return
+                MathUpgradeable.mulDiv(
+                    _principalAmount,
+                    STANDARD_EXPANSION_FACTOR,
+                    _maxPrincipalPerCollateralAmount,
+                    MathUpgradeable.Rounding.Up
+                );
         }
 
-        //for NFTs, do not use the uniswap expansion factor 
-         return
+        //for NFTs, do not use the uniswap expansion factor
+        return
             MathUpgradeable.mulDiv(
                 _principalAmount,
                 1,
                 _maxPrincipalPerCollateralAmount,
                 MathUpgradeable.Rounding.Up
             );
-
-       
     }
 
     /**
@@ -690,11 +686,10 @@ contract LenderCommitmentForwarder_U1 is
      * @param index The index in the array of PoolRouteConfigs for the given commitmentId.
      * @return The PoolRouteConfig at the specified index.
      */
-    function getCommitmentUniswapPoolRoute(uint256 commitmentId, uint index)
-        public
-        view
-        returns (PoolRouteConfig memory)
-    {
+    function getCommitmentUniswapPoolRoute(
+        uint256 commitmentId,
+        uint index
+    ) public view returns (PoolRouteConfig memory) {
         require(
             index < commitmentUniswapPoolRoutes[commitmentId].length,
             "Index out of bounds"
@@ -707,11 +702,9 @@ contract LenderCommitmentForwarder_U1 is
      * @param commitmentId The commitmentId to access the mapping.
      * @return The entire array of PoolRouteConfigs for the specified commitmentId.
      */
-    function getAllCommitmentUniswapPoolRoutes(uint256 commitmentId)
-        public
-        view
-        returns (PoolRouteConfig[] memory)
-    {
+    function getAllCommitmentUniswapPoolRoutes(
+        uint256 commitmentId
+    ) public view returns (PoolRouteConfig[] memory) {
         return commitmentUniswapPoolRoutes[commitmentId];
     }
 
@@ -720,11 +713,9 @@ contract LenderCommitmentForwarder_U1 is
      * @param commitmentId The key to access the mapping.
      * @return The uint16 value for the specified commitmentId.
      */
-    function getCommitmentPoolOracleLtvRatio(uint256 commitmentId)
-        public
-        view
-        returns (uint16)
-    {
+    function getCommitmentPoolOracleLtvRatio(
+        uint256 commitmentId
+    ) public view returns (uint16) {
         return commitmentPoolOracleLtvRatio[commitmentId];
     }
 
@@ -791,7 +782,7 @@ contract LenderCommitmentForwarder_U1 is
         uint256 sqrtPrice = FullMath.mulDiv(
             sqrtPriceX96,
             STANDARD_EXPANSION_FACTOR,
-            2**96
+            2 ** 96
         );
 
         uint256 sqrtPriceInverse = (STANDARD_EXPANSION_FACTOR *
@@ -804,11 +795,10 @@ contract LenderCommitmentForwarder_U1 is
         return price / STANDARD_EXPANSION_FACTOR;
     }
 
-    function getSqrtTwapX96(address uniswapV3Pool, uint32 twapInterval)
-        internal
-        view
-        returns (uint160 sqrtPriceX96)
-    {
+    function getSqrtTwapX96(
+        address uniswapV3Pool,
+        uint32 twapInterval
+    ) internal view returns (uint160 sqrtPriceX96) {
         if (twapInterval == 0) {
             // return the current price if twapInterval == 0
             (sqrtPriceX96, , , , , , ) = IUniswapV3Pool(uniswapV3Pool).slot0();
@@ -830,11 +820,9 @@ contract LenderCommitmentForwarder_U1 is
         }
     }
 
-    function getPriceX96FromSqrtPriceX96(uint160 sqrtPriceX96)
-        internal
-        pure
-        returns (uint256 priceX96)
-    {
+    function getPriceX96FromSqrtPriceX96(
+        uint160 sqrtPriceX96
+    ) internal pure returns (uint256 priceX96) {
         return FullMath.mulDiv(sqrtPriceX96, sqrtPriceX96, FixedPoint96.Q96);
     }
 
@@ -845,11 +833,9 @@ contract LenderCommitmentForwarder_U1 is
      * @param _commitmentId The commitment id for the commitment to query.
      * @return borrowers_ An array of addresses restricted to accept the commitment. Empty array means unrestricted.
      */
-    function getCommitmentBorrowers(uint256 _commitmentId)
-        external
-        view
-        returns (address[] memory borrowers_)
-    {
+    function getCommitmentBorrowers(
+        uint256 _commitmentId
+    ) external view returns (address[] memory borrowers_) {
         borrowers_ = commitmentBorrowersList[_commitmentId].values();
     }
 
@@ -857,11 +843,9 @@ contract LenderCommitmentForwarder_U1 is
      * @notice Return the collateral type based on the commitmentcollateral type.  Collateral type is used in the base lending protocol.
      * @param _type The type of collateral to be used for the loan.
      */
-    function _getEscrowCollateralType(CommitmentCollateralType _type)
-        internal
-        pure
-        returns (CollateralType)
-    {
+    function _getEscrowCollateralType(
+        CommitmentCollateralType _type
+    ) internal pure returns (CollateralType) {
         if (_type == CommitmentCollateralType.ERC20) {
             return CollateralType.ERC20;
         }
@@ -883,35 +867,27 @@ contract LenderCommitmentForwarder_U1 is
         revert("Unknown Collateral Type");
     }
 
-    function getCommitmentMarketId(uint256 _commitmentId)
-        external
-        view
-        returns (uint256)
-    {
+    function getCommitmentMarketId(
+        uint256 _commitmentId
+    ) external view returns (uint256) {
         return commitments[_commitmentId].marketId;
     }
 
-    function getCommitmentLender(uint256 _commitmentId)
-        external
-        view
-        returns (address)
-    {
+    function getCommitmentLender(
+        uint256 _commitmentId
+    ) external view returns (address) {
         return commitments[_commitmentId].lender;
     }
 
-    function getCommitmentAcceptedPrincipal(uint256 _commitmentId)
-        external
-        view
-        returns (uint256)
-    {
+    function getCommitmentAcceptedPrincipal(
+        uint256 _commitmentId
+    ) external view returns (uint256) {
         return commitmentPrincipalAccepted[_commitmentId];
     }
 
-    function getCommitmentMaxPrincipal(uint256 _commitmentId)
-        external
-        view
-        returns (uint256)
-    {
+    function getCommitmentMaxPrincipal(
+        uint256 _commitmentId
+    ) external view returns (uint256) {
         return commitments[_commitmentId].maxPrincipal;
     }
 

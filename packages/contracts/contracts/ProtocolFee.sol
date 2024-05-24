@@ -23,10 +23,9 @@ contract ProtocolFee is OwnableUpgradeable {
         __ProtocolFee_init_unchained(initFee);
     }
 
-    function __ProtocolFee_init_unchained(uint16 initFee)
-        internal
-        onlyInitializing
-    {
+    function __ProtocolFee_init_unchained(
+        uint16 initFee
+    ) internal onlyInitializing {
         setProtocolFee(initFee);
     }
 

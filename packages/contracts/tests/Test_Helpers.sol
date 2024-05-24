@@ -127,18 +127,20 @@ contract User {
         return ITellerV2(tellerV2).repayLoanFull(_bidId);
     }
 
-    function setTrustedMarketForwarder(uint256 _marketId, address _forwarder)
-        external
-    {
+    function setTrustedMarketForwarder(
+        uint256 _marketId,
+        address _forwarder
+    ) external {
         ITellerV2Context(tellerV2).setTrustedMarketForwarder(
             _marketId,
             _forwarder
         );
     }
 
-    function approveMarketForwarder(uint256 _marketId, address _forwarder)
-        external
-    {
+    function approveMarketForwarder(
+        uint256 _marketId,
+        address _forwarder
+    ) external {
         ITellerV2Context(tellerV2).approveMarketForwarder(
             _marketId,
             _forwarder

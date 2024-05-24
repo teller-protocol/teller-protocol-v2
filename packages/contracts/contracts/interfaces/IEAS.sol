@@ -160,10 +160,9 @@ interface IEAS {
      *
      * @return The attestation data members.
      */
-    function getAttestation(bytes32 uuid)
-        external
-        view
-        returns (Attestation memory);
+    function getAttestation(
+        bytes32 uuid
+    ) external view returns (Attestation memory);
 
     /**
      * @dev Checks whether an attestation exists.
@@ -210,10 +209,10 @@ interface IEAS {
      *
      * @return The number of attestations.
      */
-    function getReceivedAttestationUUIDsCount(address recipient, bytes32 schema)
-        external
-        view
-        returns (uint256);
+    function getReceivedAttestationUUIDsCount(
+        address recipient,
+        bytes32 schema
+    ) external view returns (uint256);
 
     /**
      * @dev Returns all sent attestation UUIDs.
@@ -242,10 +241,10 @@ interface IEAS {
      *
      * @return The number of attestations.
      */
-    function getSentAttestationUUIDsCount(address recipient, bytes32 schema)
-        external
-        view
-        returns (uint256);
+    function getSentAttestationUUIDsCount(
+        address recipient,
+        bytes32 schema
+    ) external view returns (uint256);
 
     /**
      * @dev Returns all attestations related to a specific attestation.
@@ -271,10 +270,9 @@ interface IEAS {
      *
      * @return The number of related attestations.
      */
-    function getRelatedAttestationUUIDsCount(bytes32 uuid)
-        external
-        view
-        returns (uint256);
+    function getRelatedAttestationUUIDsCount(
+        bytes32 uuid
+    ) external view returns (uint256);
 
     /**
      * @dev Returns all per-schema attestation UUIDs.
@@ -300,8 +298,7 @@ interface IEAS {
      *
      * @return The number of attestations.
      */
-    function getSchemaAttestationUUIDsCount(bytes32 schema)
-        external
-        view
-        returns (uint256);
+    function getSchemaAttestationUUIDsCount(
+        bytes32 schema
+    ) external view returns (uint256);
 }

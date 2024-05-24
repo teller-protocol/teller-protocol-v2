@@ -22,9 +22,9 @@ interface IMarketLiquidityRewards {
         LENDER
     }
 
-    function allocateRewards(RewardAllocation calldata _allocation)
-        external
-        returns (uint256 allocationId_);
+    function allocateRewards(
+        RewardAllocation calldata _allocation
+    ) external returns (uint256 allocationId_);
 
     function increaseAllocationAmount(
         uint256 _allocationId,
@@ -35,15 +35,14 @@ interface IMarketLiquidityRewards {
 
     function claimRewards(uint256 _allocationId, uint256 _bidId) external;
 
-    function rewardClaimedForBid(uint256 _bidId, uint256 _allocationId)
-        external
-        view
-        returns (bool);
+    function rewardClaimedForBid(
+        uint256 _bidId,
+        uint256 _allocationId
+    ) external view returns (bool);
 
-    function getRewardTokenAmount(uint256 _allocationId)
-        external
-        view
-        returns (uint256);
+    function getRewardTokenAmount(
+        uint256 _allocationId
+    ) external view returns (uint256);
 
     function initialize() external;
 }

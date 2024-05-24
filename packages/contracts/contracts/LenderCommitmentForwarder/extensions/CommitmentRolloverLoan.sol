@@ -123,10 +123,9 @@ contract CommitmentRolloverLoan is ICommitmentRolloverLoan {
      * @param _commitmentArgs Arguments required to accept a commitment.
      * @return bidId_ The ID of the bid associated with the accepted commitment.
      */
-    function _acceptCommitment(AcceptCommitmentArgs calldata _commitmentArgs)
-        internal
-        returns (uint256 bidId_)
-    {
+    function _acceptCommitment(
+        AcceptCommitmentArgs calldata _commitmentArgs
+    ) internal returns (uint256 bidId_) {
         bytes memory responseData = address(LENDER_COMMITMENT_FORWARDER)
             .functionCall(
                 abi.encodePacked(
@@ -155,11 +154,9 @@ contract CommitmentRolloverLoan is ICommitmentRolloverLoan {
      * @param _commitmentId The ID of the commitment for which to fetch the market ID.
      * @return The ID of the market associated with the provided commitment.
      */
-    function _getMarketIdForCommitment(uint256 _commitmentId)
-        internal
-        view
-        returns (uint256)
-    {
+    function _getMarketIdForCommitment(
+        uint256 _commitmentId
+    ) internal view returns (uint256) {
         return LENDER_COMMITMENT_FORWARDER.getCommitmentMarketId(_commitmentId);
     }
 
@@ -168,11 +165,9 @@ contract CommitmentRolloverLoan is ICommitmentRolloverLoan {
      * @param _marketId The ID of the market for which to fetch the fee percentage.
      * @return The marketplace fee percentage for the provided market ID.
      */
-    function _getMarketFeePct(uint256 _marketId)
-        internal
-        view
-        returns (uint16)
-    {
+    function _getMarketFeePct(
+        uint256 _marketId
+    ) internal view returns (uint16) {
         address _marketRegistryAddress = ITellerV2Storage(address(TELLER_V2))
             .marketRegistry();
 

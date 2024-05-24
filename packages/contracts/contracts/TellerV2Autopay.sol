@@ -142,11 +142,10 @@ contract TellerV2Autopay is OwnableUpgradeable, ITellerV2Autopay {
         emit AutoPaidLoanMinimum(_bidId, msg.sender);
     }
 
-    function getEstimatedMinimumPayment(uint256 _bidId, uint256 _timestamp)
-        public
-        virtual
-        returns (uint256 _amount)
-    {
+    function getEstimatedMinimumPayment(
+        uint256 _bidId,
+        uint256 _timestamp
+    ) public virtual returns (uint256 _amount) {
         Payment memory estimatedPayment = tellerV2.calculateAmountDue(
             _bidId,
             _timestamp

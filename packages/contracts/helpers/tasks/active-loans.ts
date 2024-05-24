@@ -3,7 +3,7 @@ import { HardhatRuntimeEnvironment } from 'hardhat/types'
 import { TellerV2 } from 'types/typechain'
 
 export interface activeLoansReturn {
-  activeLoans: Array<bigint>
+  activeLoans: bigint[]
   activeLoanLenders: string[]
 }
 

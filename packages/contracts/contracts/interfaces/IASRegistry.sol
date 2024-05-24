@@ -46,9 +46,10 @@ interface IASRegistry {
      *
      * @return The UUID of the new AS.
      */
-    function register(bytes calldata schema, IASResolver resolver)
-        external
-        returns (bytes32);
+    function register(
+        bytes calldata schema,
+        IASResolver resolver
+    ) external returns (bytes32);
 
     /**
      * @dev Returns an existing AS by UUID

@@ -50,25 +50,21 @@ interface ILenderCommitmentForwarder_U1 {
 
     // mapping(uint256 => Commitment) public commitments;
 
-    function getCommitmentMarketId(uint256 _commitmentId)
-        external
-        view
-        returns (uint256);
+    function getCommitmentMarketId(
+        uint256 _commitmentId
+    ) external view returns (uint256);
 
-    function getCommitmentLender(uint256 _commitmentId)
-        external
-        view
-        returns (address);
+    function getCommitmentLender(
+        uint256 _commitmentId
+    ) external view returns (address);
 
-    function getCommitmentAcceptedPrincipal(uint256 _commitmentId)
-        external
-        view
-        returns (uint256);
+    function getCommitmentAcceptedPrincipal(
+        uint256 _commitmentId
+    ) external view returns (uint256);
 
-    function getCommitmentMaxPrincipal(uint256 _commitmentId)
-        external
-        view
-        returns (uint256);
+    function getCommitmentMaxPrincipal(
+        uint256 _commitmentId
+    ) external view returns (uint256);
 
     function createCommitmentWithUniswap(
         Commitment calldata _commitment,

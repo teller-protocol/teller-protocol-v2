@@ -382,10 +382,10 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
         super.increaseAllocationAmount(_allocationId, _tokenAmount);
     }
 
-    function deallocateRewards(uint256 _allocationId, uint256 _tokenAmount)
-        public
-        override
-    {
+    function deallocateRewards(
+        uint256 _allocationId,
+        uint256 _tokenAmount
+    ) public override {
         super.deallocateRewards(_allocationId, _tokenAmount);
     }
 
@@ -421,9 +421,10 @@ contract MarketLiquidityRewards_Test is Testable, MarketLiquidityRewards {
 contract MarketLiquidityUser is User {
     MarketLiquidityRewards public immutable liquidityRewards;
 
-    constructor(address _tellerV2, MarketLiquidityRewards _liquidityRewards)
-        User(_tellerV2)
-    {
+    constructor(
+        address _tellerV2,
+        MarketLiquidityRewards _liquidityRewards
+    ) User(_tellerV2) {
         liquidityRewards = _liquidityRewards;
     }
 
@@ -451,9 +452,11 @@ contract MarketLiquidityUser is User {
         return liquidityRewards.claimRewards(_allocationId, _bidId);
     }
 
-    function _approveERC20Token(address tokenAddress, address guy, uint256 wad)
-        public
-    {
+    function _approveERC20Token(
+        address tokenAddress,
+        address guy,
+        uint256 wad
+    ) public {
         IERC20Upgradeable(tokenAddress).approve(guy, wad);
     }
 }
@@ -467,19 +470,15 @@ contract TellerV2Mock is TellerV2Context {
         marketRegistry = IMarketRegistry(_marketRegistry);
     }
 
-    function getSenderForMarket(uint256 _marketId)
-        external
-        view
-        returns (address)
-    {
+    function getSenderForMarket(
+        uint256 _marketId
+    ) external view returns (address) {
         return _msgSenderForMarket(_marketId);
     }
 
-    function getDataForMarket(uint256 _marketId)
-        external
-        view
-        returns (bytes calldata)
-    {
+    function getDataForMarket(
+        uint256 _marketId
+    ) external view returns (bytes calldata) {
         return _msgDataForMarket(_marketId);
     }
 
@@ -487,7 +486,9 @@ contract TellerV2Mock is TellerV2Context {
         mockBid = bid;
     }
 
-    function getLoanSummary(uint256 _bidId)
+    function getLoanSummary(
+        uint256 _bidId
+    )
         external
         view
         returns (

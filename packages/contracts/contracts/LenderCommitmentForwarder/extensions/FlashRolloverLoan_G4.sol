@@ -19,14 +19,16 @@ import { IPool } from "../../interfaces/aave/IPool.sol";
 import { IFlashLoanSimpleReceiver } from "../../interfaces/aave/IFlashLoanSimpleReceiver.sol";
 import { IPoolAddressesProvider } from "../../interfaces/aave/IPoolAddressesProvider.sol";
 
-contract FlashRolloverLoan_G4 is IFlashLoanSimpleReceiver, IFlashRolloverLoan_G4 {
+contract FlashRolloverLoan_G4 is
+    IFlashLoanSimpleReceiver,
+    IFlashRolloverLoan_G4
+{
     using AddressUpgradeable for address;
     using NumbersLib for uint256;
 
     /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
     ITellerV2 public immutable TELLER_V2;
     /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
-    
 
     address public immutable POOL_ADDRESSES_PROVIDER;
 
@@ -59,10 +61,7 @@ contract FlashRolloverLoan_G4 is IFlashLoanSimpleReceiver, IFlashRolloverLoan_G4
      * @param _poolAddressesProvider The address of the PoolAddressesProvider.
      */
     /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor(
-        address _tellerV2,
-        address _poolAddressesProvider
-    ) {
+    constructor(address _tellerV2, address _poolAddressesProvider) {
         TELLER_V2 = ITellerV2(_tellerV2);
         POOL_ADDRESSES_PROVIDER = _poolAddressesProvider;
     }
@@ -122,7 +121,7 @@ contract FlashRolloverLoan_G4 is IFlashLoanSimpleReceiver, IFlashRolloverLoan_G4
             _flashLoanAmount,
             abi.encode(
                 RolloverCallbackArgs({
-                    lenderCommitmentForwarder :_lenderCommitmentForwarder,
+                    lenderCommitmentForwarder: _lenderCommitmentForwarder,
                     loanId: _loanId,
                     borrower: borrower,
                     borrowerAmount: _borrowerAmount,
@@ -362,7 +361,8 @@ contract FlashRolloverLoan_G4 is IFlashLoanSimpleReceiver, IFlashRolloverLoan_G4
             _timestamp
         );
 
-        uint256 _marketId = _getMarketIdForCommitment(_lenderCommitmentForwarder,
+        uint256 _marketId = _getMarketIdForCommitment(
+            _lenderCommitmentForwarder,
             _commitmentArgs.commitmentId
         );
         uint16 marketFeePct = _getMarketFeePct(_marketId);
@@ -398,12 +398,13 @@ contract FlashRolloverLoan_G4 is IFlashLoanSimpleReceiver, IFlashRolloverLoan_G4
      * @param _commitmentId The ID of the commitment for which to fetch the market ID.
      * @return The ID of the market associated with the provided commitment.
      */
-    function _getMarketIdForCommitment(address _lenderCommitmentForwarder, uint256 _commitmentId)
-        internal
-        view
-        returns (uint256)
-    {
-        return ILenderCommitmentForwarder(_lenderCommitmentForwarder).getCommitmentMarketId(_commitmentId);
+    function _getMarketIdForCommitment(
+        address _lenderCommitmentForwarder,
+        uint256 _commitmentId
+    ) internal view returns (uint256) {
+        return
+            ILenderCommitmentForwarder(_lenderCommitmentForwarder)
+                .getCommitmentMarketId(_commitmentId);
     }
 
     /**
@@ -411,11 +412,9 @@ contract FlashRolloverLoan_G4 is IFlashLoanSimpleReceiver, IFlashRolloverLoan_G4
      * @param _marketId The ID of the market for which to fetch the fee percentage.
      * @return The marketplace fee percentage for the provided market ID.
      */
-    function _getMarketFeePct(uint256 _marketId)
-        internal
-        view
-        returns (uint16)
-    {
+    function _getMarketFeePct(
+        uint256 _marketId
+    ) internal view returns (uint16) {
         address _marketRegistryAddress = ITellerV2Storage(address(TELLER_V2))
             .marketRegistry();
 
@@ -433,4 +432,3 @@ contract FlashRolloverLoan_G4 is IFlashLoanSimpleReceiver, IFlashRolloverLoan_G4
         return IProtocolFee(address(TELLER_V2)).protocolFee();
     }
 }
- 

@@ -102,23 +102,23 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
         emit CollateralWithdrawn(_collateralAddress, _amount, _recipient);
     }
 
-    function withdrawDustTokens(        
-        address tokenAddress, 
+    function withdrawDustTokens(
+        address tokenAddress,
         uint256 amount,
         address recipient
-    ) external virtual onlyOwner {  //the owner should be collateral manager 
-        
+    ) external virtual onlyOwner {
+        //the owner should be collateral manager
+
         require(tokenAddress != address(0), "Invalid token address");
 
         Collateral storage collateral = collateralBalances[tokenAddress];
         require(
             collateral._amount == 0,
             "Asset not allowed to be withdrawn as dust"
-        ); 
-     
-        IERC20Upgradeable(tokenAddress).transfer(recipient, amount);        
-    }
+        );
 
+        IERC20Upgradeable(tokenAddress).transfer(recipient, amount);
+    }
 
     /**
      * @notice Internal function for transferring collateral assets into this contract.
@@ -210,11 +210,12 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
 
     // On NFT Received handlers
 
-    function onERC721Received(address, address, uint256, bytes calldata)
-        external
-        pure
-        returns (bytes4)
-    {
+    function onERC721Received(
+        address,
+        address,
+        uint256,
+        bytes calldata
+    ) external pure returns (bytes4) {
         return
             bytes4(
                 keccak256("onERC721Received(address,address,uint256,bytes)")

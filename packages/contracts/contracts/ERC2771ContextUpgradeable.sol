@@ -22,12 +22,9 @@ abstract contract ERC2771ContextUpgradeable is
         _trustedForwarder = trustedForwarder;
     }
 
-    function isTrustedForwarder(address forwarder)
-        public
-        view
-        virtual
-        returns (bool)
-    {
+    function isTrustedForwarder(
+        address forwarder
+    ) public view virtual returns (bool) {
         return forwarder == _trustedForwarder;
     }
 

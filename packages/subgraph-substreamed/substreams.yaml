@@ -1,14 +1,17 @@
 specVersion: v0.1.0
 package:
-  name: 'substreams_test' # the name to be used in the .spkg
-  version: v1.0.1 # the version to use when creating the .spkg
+  name: lendergrouppolygon
+  version: v0.1.0
 
-imports: # dependencies
-  entity: https://github.com/streamingfast/substreams-entity-change/releases/download/v0.2.1/substreams-entity-change-v0.2.1.spkg
+imports:
+  sql: https://github.com/streamingfast/substreams-sink-sql/releases/download/protodefs-v1.0.7/substreams-sink-sql-protodefs-v1.0.7.spkg
+  graph: https://github.com/streamingfast/substreams-sink-subgraph/releases/download/v0.1.0/substreams-sink-subgraph-protodefs-v0.1.0.spkg
+  database_change: https://github.com/streamingfast/substreams-sink-database-changes/releases/download/v1.2.1/substreams-database-change-v1.2.1.spkg
+  entity: https://github.com/streamingfast/substreams-entity-change/releases/download/v1.1.0/substreams-entity-change-v1.1.0.spkg
 
-protobuf: # specifies custom types for use by Substreams modules
+protobuf:
   files:
-    - example.proto
+    - contract.proto
   importPaths:
     - ./proto
 
@@ -17,17 +20,38 @@ binaries:
     type: wasm/rust-v1
     file: ./target/wasm32-unknown-unknown/release/substreams.wasm
 
-modules: # specify modules with their inputs and outputs.
-  - name: map_contract
-    kind: map
+modules:
+  - name: store_fac_groupp_created
+    kind: store
+    initialBlock: 57233385
+    updatePolicy: set
+    valueType: proto:dynamic_datasource
     inputs:
       - source: sf.ethereum.type.v2.Block
+
+  - name: map_events
+    kind: map
+    initialBlock: 57233385
+    inputs:
+      - source: sf.ethereum.type.v2.Block
+      - store: store_fac_groupp_created
     output:
-      type: proto:test.Contracts
+      type: proto:contract.v1.Events
+
+  - name: db_out
+    kind: map
+    initialBlock: 57233385
+    inputs:
+      - map: map_events
+    output:
+      type: proto:sf.substreams.sink.database.v1.DatabaseChanges
 
   - name: graph_out
     kind: map
+    initialBlock: 57233385
     inputs:
-      - map: map_contract
+      - map: map_events
     output:
-      type: proto:substreams.entity.v1.EntityChanges # this type can be consumed by Graph Node
+      type: proto:sf.substreams.entity.v1.EntityChanges
+
+network: polygon

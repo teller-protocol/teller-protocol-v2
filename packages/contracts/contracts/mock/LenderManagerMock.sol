@@ -12,14 +12,16 @@ contract LenderManagerMock is ILenderManager, ERC721Upgradeable {
 
     constructor() {}
 
-    function registerLoan(uint256 _bidId, address _newLender)
-        external
-        override
-    {
+    function registerLoan(
+        uint256 _bidId,
+        address _newLender
+    ) external override {
         registeredLoan[_bidId] = _newLender;
     }
 
-    function ownerOf(uint256 _bidId)
+    function ownerOf(
+        uint256 _bidId
+    )
         public
         view
         override(ERC721Upgradeable, IERC721Upgradeable)

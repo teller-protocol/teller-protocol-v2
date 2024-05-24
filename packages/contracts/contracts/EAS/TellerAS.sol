@@ -173,37 +173,27 @@ contract TellerAS is IEAS {
     /**
      * @inheritdoc IEAS
      */
-    function getAttestation(bytes32 uuid)
-        external
-        view
-        override
-        returns (Attestation memory)
-    {
+    function getAttestation(
+        bytes32 uuid
+    ) external view override returns (Attestation memory) {
         return _db[uuid];
     }
 
     /**
      * @inheritdoc IEAS
      */
-    function isAttestationValid(bytes32 uuid)
-        public
-        view
-        override
-        returns (bool)
-    {
+    function isAttestationValid(
+        bytes32 uuid
+    ) public view override returns (bool) {
         return _db[uuid].uuid != 0;
     }
 
     /**
      * @inheritdoc IEAS
      */
-    function isAttestationActive(bytes32 uuid)
-        public
-        view
-        virtual
-        override
-        returns (bool)
-    {
+    function isAttestationActive(
+        bytes32 uuid
+    ) public view virtual override returns (bool) {
         return
             isAttestationValid(uuid) &&
             _db[uuid].expirationTime >= block.timestamp &&
@@ -232,12 +222,10 @@ contract TellerAS is IEAS {
     /**
      * @inheritdoc IEAS
      */
-    function getReceivedAttestationUUIDsCount(address recipient, bytes32 schema)
-        external
-        view
-        override
-        returns (uint256)
-    {
+    function getReceivedAttestationUUIDsCount(
+        address recipient,
+        bytes32 schema
+    ) external view override returns (uint256) {
         return _receivedAttestations[recipient][schema].length;
     }
 
@@ -263,12 +251,10 @@ contract TellerAS is IEAS {
     /**
      * @inheritdoc IEAS
      */
-    function getSentAttestationUUIDsCount(address recipient, bytes32 schema)
-        external
-        view
-        override
-        returns (uint256)
-    {
+    function getSentAttestationUUIDsCount(
+        address recipient,
+        bytes32 schema
+    ) external view override returns (uint256) {
         return _sentAttestations[recipient][schema].length;
     }
 
@@ -293,12 +279,9 @@ contract TellerAS is IEAS {
     /**
      * @inheritdoc IEAS
      */
-    function getRelatedAttestationUUIDsCount(bytes32 uuid)
-        external
-        view
-        override
-        returns (uint256)
-    {
+    function getRelatedAttestationUUIDsCount(
+        bytes32 uuid
+    ) external view override returns (uint256) {
         return _relatedAttestations[uuid].length;
     }
 
@@ -323,12 +306,9 @@ contract TellerAS is IEAS {
     /**
      * @inheritdoc IEAS
      */
-    function getSchemaAttestationUUIDsCount(bytes32 schema)
-        external
-        view
-        override
-        returns (uint256)
-    {
+    function getSchemaAttestationUUIDsCount(
+        bytes32 schema
+    ) external view override returns (uint256) {
         return _schemaAttestations[schema].length;
     }
 
@@ -451,11 +431,9 @@ contract TellerAS is IEAS {
      *
      * @return Attestation UUID.
      */
-    function _getUUID(Attestation memory attestation)
-        private
-        view
-        returns (bytes32)
-    {
+    function _getUUID(
+        Attestation memory attestation
+    ) private view returns (bytes32) {
         return
             keccak256(
                 abi.encodePacked(

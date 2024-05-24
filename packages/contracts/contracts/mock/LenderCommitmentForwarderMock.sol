@@ -42,41 +42,34 @@ contract LenderCommitmentForwarderMock is
         address[] calldata _borrowerAddressList
     ) external returns (uint256) {}
 
-    function setCommitment(uint256 _commitmentId, Commitment memory _commitment)
-        public
-    {
+    function setCommitment(
+        uint256 _commitmentId,
+        Commitment memory _commitment
+    ) public {
         commitments[_commitmentId] = _commitment;
     }
 
-    function getCommitmentLender(uint256 _commitmentId)
-        public
-        view
-        returns (address)
-    {
+    function getCommitmentLender(
+        uint256 _commitmentId
+    ) public view returns (address) {
         return commitments[_commitmentId].lender;
     }
 
-    function getCommitmentMarketId(uint256 _commitmentId)
-        public
-        view
-        returns (uint256)
-    {
+    function getCommitmentMarketId(
+        uint256 _commitmentId
+    ) public view returns (uint256) {
         return commitments[_commitmentId].marketId;
     }
 
-    function getCommitmentAcceptedPrincipal(uint256 _commitmentId)
-        public
-        view
-        returns (uint256)
-    {
+    function getCommitmentAcceptedPrincipal(
+        uint256 _commitmentId
+    ) public view returns (uint256) {
         return commitmentPrincipalAccepted[_commitmentId];
     }
 
-    function getCommitmentMaxPrincipal(uint256 _commitmentId)
-        public
-        view
-        returns (uint256)
-    {
+    function getCommitmentMaxPrincipal(
+        uint256 _commitmentId
+    ) public view returns (uint256) {
         return commitments[_commitmentId].maxPrincipal;
     }
 

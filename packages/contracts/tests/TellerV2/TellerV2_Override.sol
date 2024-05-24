@@ -66,15 +66,17 @@ contract TellerV2_Override is TellerV2 {
         bids[bidId].loanDetails.lastRepaidTimestamp = lastRepaidTimestamp;
     }
 
-    function mock_setBidDefaultDuration(uint256 bidId, uint32 defaultDuration)
-        public
-    {
+    function mock_setBidDefaultDuration(
+        uint256 bidId,
+        uint32 defaultDuration
+    ) public {
         bidDefaultDuration[bidId] = defaultDuration;
     }
 
-    function mock_setBidExpirationTime(uint256 bidId, uint32 expirationTime)
-        public
-    {
+    function mock_setBidExpirationTime(
+        uint256 bidId,
+        uint32 expirationTime
+    ) public {
         bidExpirationTime[bidId] = expirationTime;
     }
 
@@ -127,11 +129,10 @@ contract TellerV2_Override is TellerV2 {
         );
     }
 
-    function _canLiquidateLoanSuper(uint256 _bidId, uint32 _liquidationDelay)
-        public
-        view
-        returns (bool)
-    {
+    function _canLiquidateLoanSuper(
+        uint256 _bidId,
+        uint32 _liquidationDelay
+    ) public view returns (bool) {
         return _isLoanDefaulted(_bidId, _liquidationDelay);
     }
 
@@ -141,12 +142,9 @@ contract TellerV2_Override is TellerV2 {
 
     */
 
-    function _msgSenderForMarket(uint256 _marketId)
-        internal
-        view
-        override
-        returns (address)
-    {
+    function _msgSenderForMarket(
+        uint256 _marketId
+    ) internal view override returns (address) {
         if (mockMsgSenderForMarket != address(0)) {
             return mockMsgSenderForMarket;
         }

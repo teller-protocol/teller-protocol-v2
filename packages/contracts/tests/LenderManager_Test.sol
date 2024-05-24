@@ -218,19 +218,15 @@ contract LenderManagerUser is User {
 contract LenderCommitmentTester is TellerV2Context {
     constructor() TellerV2Context(address(0)) {}
 
-    function getSenderForMarket(uint256 _marketId)
-        external
-        view
-        returns (address)
-    {
+    function getSenderForMarket(
+        uint256 _marketId
+    ) external view returns (address) {
         return _msgSenderForMarket(_marketId);
     }
 
-    function getDataForMarket(uint256 _marketId)
-        external
-        view
-        returns (bytes calldata)
-    {
+    function getDataForMarket(
+        uint256 _marketId
+    ) external view returns (bytes calldata) {
         return _msgDataForMarket(_marketId);
     }
 }

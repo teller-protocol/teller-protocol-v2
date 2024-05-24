@@ -11,9 +11,10 @@ contract LenderCommitmentForwarder_G3 is
     ExtensionsContextUpgradeable
 {
     /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor(address _tellerV2, address _marketRegistry)
-        LenderCommitmentForwarder_G2(_tellerV2, _marketRegistry)
-    {}
+    constructor(
+        address _tellerV2,
+        address _marketRegistry
+    ) LenderCommitmentForwarder_G2(_tellerV2, _marketRegistry) {}
 
     function _msgSender()
         internal

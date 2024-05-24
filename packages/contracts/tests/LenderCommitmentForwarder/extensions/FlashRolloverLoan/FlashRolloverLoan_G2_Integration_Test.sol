@@ -179,17 +179,18 @@ contract FlashRolloverLoan_Integration_Test is Testable {
 
         //should get 0.45  weth   from accepting this commitment  during the rollover process
 
-        FlashRolloverLoan_G1.AcceptCommitmentArgs memory _acceptCommitmentArgs = FlashRolloverLoan_G1
-            .AcceptCommitmentArgs({
-                commitmentId: commitmentId,
-                principalAmount: commitmentPrincipalAmount,
-                collateralAmount: 0,
-                collateralTokenId: 0,
-                collateralTokenAddress: address(0),
-                interestRate: interestRate,
-                loanDuration: duration
-                // merkleProof: new bytes32[](0)
-            });
+        FlashRolloverLoan_G1.AcceptCommitmentArgs
+            memory _acceptCommitmentArgs = FlashRolloverLoan_G1
+                .AcceptCommitmentArgs({
+                    commitmentId: commitmentId,
+                    principalAmount: commitmentPrincipalAmount,
+                    collateralAmount: 0,
+                    collateralTokenId: 0,
+                    collateralTokenAddress: address(0),
+                    interestRate: interestRate,
+                    loanDuration: duration
+                    // merkleProof: new bytes32[](0)
+                });
 
         ///approve forwarders
 

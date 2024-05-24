@@ -60,10 +60,10 @@ abstract contract TellerV2MarketForwarder_G1 is
      * Requirements:
      *  - The {_msgSender} address must set an approval on TellerV2 for this forwarder contract __before__ making this call.
      */
-    function _forwardCall(bytes memory _data, address _msgSender)
-        internal
-        returns (bytes memory)
-    {
+    function _forwardCall(
+        bytes memory _data,
+        address _msgSender
+    ) internal returns (bytes memory) {
         return
             address(_tellerV2).functionCall(
                 abi.encodePacked(_data, _msgSender)
@@ -133,11 +133,10 @@ abstract contract TellerV2MarketForwarder_G1 is
      * @param _bidId The id of the new loan.
      * @param _lender The address of the lender who will provide funds for the new loan.
      */
-    function _acceptBid(uint256 _bidId, address _lender)
-        internal
-        virtual
-        returns (bool)
-    {
+    function _acceptBid(
+        uint256 _bidId,
+        address _lender
+    ) internal virtual returns (bool) {
         // Approve the borrower's loan
         _forwardCall(
             abi.encodeWithSelector(ITellerV2.lenderAcceptBid.selector, _bidId),

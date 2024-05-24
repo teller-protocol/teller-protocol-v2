@@ -7,10 +7,11 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract LenderCommitmentGroupShares is ERC20, Ownable {
     uint8 private immutable DECIMALS;
 
-    constructor(string memory _name, string memory _symbol, uint8 _decimals)
-        ERC20(_name, _symbol)
-        Ownable()
-    {
+    constructor(
+        string memory _name,
+        string memory _symbol,
+        uint8 _decimals
+    ) ERC20(_name, _symbol) Ownable() {
         DECIMALS = _decimals;
     }
 

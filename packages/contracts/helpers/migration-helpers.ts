@@ -1,7 +1,7 @@
 import path from 'path'
 
-import { DeployFunction } from 'hardhat-deploy/dist/types'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
+import { DeployFunction } from 'hardhat-deploy/dist/types'
 import moment from 'moment'
 
 import { getNetworkName } from '~~/config'

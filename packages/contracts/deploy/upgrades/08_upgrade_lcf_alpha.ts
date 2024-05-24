@@ -56,8 +56,6 @@ const deployFn: DeployFunction = async (hre) => {
     }
   )*/
 
-   
- 
   await hre.upgrades.proposeBatchTimelock({
     title: 'LenderCommitmentForwarderAlpha: Upgrade',
     description: ` 
@@ -97,7 +95,6 @@ const deployFn: DeployFunction = async (hre) => {
     }
   )
 */
-  
 
   hre.log('done.')
   hre.log('')
@@ -118,16 +115,9 @@ deployFn.dependencies = ['lender-commitment-forwarder:alpha:deploy']
 deployFn.skip = async (hre) => {
   return (
     !hre.network.live ||
-    ![
-      'localhost',
-      'polygon',
-      'arbitrum',
-      'base',
-      'mainnet',
-   
-      
-      
-    ].includes(hre.network.name)
+    !['localhost', 'polygon', 'arbitrum', 'base', 'mainnet'].includes(
+      hre.network.name
+    )
   )
 }
 export default deployFn

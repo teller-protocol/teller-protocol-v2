@@ -29,10 +29,11 @@ contract EscrowVault is Initializable, ContextUpgradeable, IEscrowVault {
      * @param account The id for the loan to set.
      * @param token The address of the new active lender.
      */
-    function deposit(address account, address token, uint256 amount)
-        public
-        override
-    {
+    function deposit(
+        address account,
+        address token,
+        uint256 amount
+    ) public override {
         uint256 balanceBefore = ERC20(token).balanceOf(address(this));
         ERC20(token).safeTransferFrom(_msgSender(), address(this), amount);
         uint256 balanceAfter = ERC20(token).balanceOf(address(this));

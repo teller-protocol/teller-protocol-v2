@@ -9,9 +9,10 @@ import { IMarketRegistry } from "../../contracts/interfaces/IMarketRegistry.sol"
 contract TellerV2Context_Override is TellerV2Context {
     using EnumerableSet for EnumerableSet.AddressSet;
 
-    constructor(address _marketRegistry, address _lenderCommitmentForwarder)
-        TellerV2Context(address(0))
-    {
+    constructor(
+        address _marketRegistry,
+        address _lenderCommitmentForwarder
+    ) TellerV2Context(address(0)) {
         marketRegistry = IMarketRegistry(_marketRegistry);
         lenderCommitmentForwarder = _lenderCommitmentForwarder;
     }
@@ -32,11 +33,9 @@ contract TellerV2Context_Override is TellerV2Context {
         _approvedForwarderSenders[_forwarder].add(_account);
     }
 
-    function external__msgSenderForMarket(uint256 _marketId)
-        public
-        view
-        returns (address)
-    {
+    function external__msgSenderForMarket(
+        uint256 _marketId
+    ) public view returns (address) {
         return _msgSenderForMarket(_marketId);
     }
 }

@@ -145,7 +145,7 @@ const networkUrls: Record<NetworkNames, string> = {
       ? `https://eth-goerli.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
       : ''),
   'mantle-testnet': 'https://rpc.testnet.mantle.xyz',
-  'clarity': process.env.CLARITY_RPC_URL ?? '',  
+  clarity: process.env.CLARITY_RPC_URL ?? '',
   tenderly: process.env.TENDERLY_RPC_URL ?? '',
 }
 
@@ -197,7 +197,7 @@ export default <HardhatUserConfig>{
       arbitrumOne: process.env.ARBISCAN_VERIFY_API_KEY,
       base: process.env.BASESCAN_VERIFY_API_KEY,
       mantle: process.env.MANTLE_VERIFY_API_KEY ?? 'xyz',
-      clarity: '', //none ? 
+      clarity: '', //none ?
 
       // Test Networks
       sepolia: process.env.ETHERSCAN_VERIFY_API_KEY,
@@ -283,7 +283,6 @@ export default <HardhatUserConfig>{
           },
         },
       },
- 
     ],
   },
 
@@ -389,8 +388,8 @@ export default <HardhatUserConfig>{
       url: networkUrls.polygon,
       chainId: 137,
       live: true,
-       
-       gasPrice: Number(ethers.parseUnits('350', 'gwei')),
+
+      gasPrice: Number(ethers.parseUnits('350', 'gwei')),
 
       verify: {
         etherscan: {
@@ -422,8 +421,7 @@ export default <HardhatUserConfig>{
         },
       },
     }),
-   
-    
+
     mantle: networkConfig({
       url: networkUrls.mantle,
       chainId: 5000,

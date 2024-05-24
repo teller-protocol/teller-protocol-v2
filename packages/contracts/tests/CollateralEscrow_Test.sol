@@ -641,20 +641,21 @@ contract User {
         ERC1155(tokenAddress).setApprovalForAll(address(escrow), true);
     }
 
-    function getBalance(address _collateralAddress)
-        public
-        returns (uint256 amount_)
-    {
+    function getBalance(
+        address _collateralAddress
+    ) public returns (uint256 amount_) {
         (, amount_, , ) = escrow.collateralBalances(_collateralAddress);
     }
 
     receive() external payable {}
 
     //receive 721
-    function onERC721Received(address, address, uint256, bytes calldata)
-        external
-        returns (bytes4)
-    {
+    function onERC721Received(
+        address,
+        address,
+        uint256,
+        bytes calldata
+    ) external returns (bytes4) {
         return this.onERC721Received.selector;
     }
 

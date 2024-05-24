@@ -9,7 +9,10 @@ import "./LenderCommitmentForwarder_G1.sol";
 
 import { CommitmentCollateralType, ISmartCommitment } from "../interfaces/ISmartCommitment.sol";
 
-contract SmartCommitmentForwarder is TellerV2MarketForwarder_G3, ISmartCommitmentForwarder {
+contract SmartCommitmentForwarder is
+    TellerV2MarketForwarder_G3,
+    ISmartCommitmentForwarder
+{
     event ExercisedSmartCommitment(
         address indexed smartCommitmentAddress,
         address borrower,
@@ -19,9 +22,10 @@ contract SmartCommitmentForwarder is TellerV2MarketForwarder_G3, ISmartCommitmen
 
     error InsufficientBorrowerCollateral(uint256 required, uint256 actual);
 
-    constructor(address _protocolAddress, address _marketRegistry)
-        TellerV2MarketForwarder_G3(_protocolAddress, _marketRegistry)
-    {}
+    constructor(
+        address _protocolAddress,
+        address _marketRegistry
+    ) TellerV2MarketForwarder_G3(_protocolAddress, _marketRegistry) {}
 
     /**
      * @notice Accept the commitment to submitBid and acceptBid using the funds
@@ -129,11 +133,9 @@ contract SmartCommitmentForwarder is TellerV2MarketForwarder_G3, ISmartCommitmen
      * @notice Return the collateral type based on the commitmentcollateral type.  Collateral type is used in the base lending protocol.
      * @param _type The type of collateral to be used for the loan.
      */
-    function _getEscrowCollateralType(CommitmentCollateralType _type)
-        internal
-        pure
-        returns (CollateralType)
-    {
+    function _getEscrowCollateralType(
+        CommitmentCollateralType _type
+    ) internal pure returns (CollateralType) {
         if (_type == CommitmentCollateralType.ERC20) {
             return CollateralType.ERC20;
         }

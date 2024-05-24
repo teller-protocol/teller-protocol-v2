@@ -16,10 +16,11 @@ contract TestERC1155Token is ERC1155 {
         return mint(recipient, amount, "0x");
     }
 
-    function mint(address recipient, uint256 amount, bytes memory data)
-        public
-        returns (uint256)
-    {
+    function mint(
+        address recipient,
+        uint256 amount,
+        bytes memory data
+    ) public returns (uint256) {
         uint256 tokenId = _totalSupply++;
         _mint(recipient, tokenId, amount, data);
         return tokenId;

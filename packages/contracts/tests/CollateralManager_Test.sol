@@ -1435,19 +1435,23 @@ contract CollateralManager_Test is Testable {
 contract User {
     constructor() {}
 
-    function approveERC20(address tokenAddress, address to, uint256 amount)
-        public
-    {
+    function approveERC20(
+        address tokenAddress,
+        address to,
+        uint256 amount
+    ) public {
         ERC20(tokenAddress).approve(address(to), amount);
     }
 
     receive() external payable {}
 
     //receive 721
-    function onERC721Received(address, address, uint256, bytes calldata)
-        external
-        returns (bytes4)
-    {
+    function onERC721Received(
+        address,
+        address,
+        uint256,
+        bytes calldata
+    ) external returns (bytes4) {
         return this.onERC721Received.selector;
     }
 
@@ -1503,39 +1507,27 @@ contract TellerV2_Mock is TellerV2SolMock {
         globalLender = lender;
     }
 
-    function getLoanBorrower(uint256 bidId)
-        public
-        view
-        override
-        returns (address)
-    {
+    function getLoanBorrower(
+        uint256 bidId
+    ) public view override returns (address) {
         return address(globalBorrower);
     }
 
-    function getLoanLender(uint256 bidId)
-        public
-        view
-        override
-        returns (address)
-    {
+    function getLoanLender(
+        uint256 bidId
+    ) public view override returns (address) {
         return address(globalLender);
     }
 
-    function isLoanDefaulted(uint256 _bidId)
-        public
-        view
-        override
-        returns (bool)
-    {
+    function isLoanDefaulted(
+        uint256 _bidId
+    ) public view override returns (bool) {
         return bidsDefaultedGlobally;
     }
 
-    function getBidState(uint256 _bidId)
-        public
-        view
-        override
-        returns (BidState)
-    {
+    function getBidState(
+        uint256 _bidId
+    ) public view override returns (BidState) {
         return globalBidState;
     }
 

@@ -22,11 +22,10 @@ contract TellerASRegistry is IASRegistry {
     /**
      * @inheritdoc IASRegistry
      */
-    function register(bytes calldata schema, IASResolver resolver)
-        external
-        override
-        returns (bytes32)
-    {
+    function register(
+        bytes calldata schema,
+        IASResolver resolver
+    ) external override returns (bytes32) {
         uint256 index = ++_asCount;
 
         ASRecord memory asRecord = ASRecord({
@@ -52,12 +51,9 @@ contract TellerASRegistry is IASRegistry {
     /**
      * @inheritdoc IASRegistry
      */
-    function getAS(bytes32 uuid)
-        external
-        view
-        override
-        returns (ASRecord memory)
-    {
+    function getAS(
+        bytes32 uuid
+    ) external view override returns (ASRecord memory) {
         return _registry[uuid];
     }
 

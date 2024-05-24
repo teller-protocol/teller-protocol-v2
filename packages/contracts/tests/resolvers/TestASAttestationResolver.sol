@@ -27,11 +27,10 @@ contract TestASAttestationResolver is TellerASResolver {
         return _eas.isAttestationValid(_toBytes32(data, 0));
     }
 
-    function _toBytes32(bytes memory data, uint256 start)
-        private
-        pure
-        returns (bytes32)
-    {
+    function _toBytes32(
+        bytes memory data,
+        uint256 start
+    ) private pure returns (bytes32) {
         if (start + 32 < start) {
             revert Overflow();
         }

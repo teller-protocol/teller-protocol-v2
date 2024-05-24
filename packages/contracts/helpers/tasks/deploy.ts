@@ -1,5 +1,5 @@
-import { TASK_DEPLOY_RUN_DEPLOY } from 'hardhat-deploy'
 import { subtask } from 'hardhat/config'
+import { TASK_DEPLOY_RUN_DEPLOY } from 'hardhat-deploy'
 
 /**
  * Override `hardhat-deploy` deploy subtask to do some magic after it runs.

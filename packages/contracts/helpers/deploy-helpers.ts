@@ -2,8 +2,8 @@ import chalk from 'chalk'
 import { makeNodeDisklet } from 'disklet'
 import { Contract } from 'ethers'
 import hre from 'hardhat'
-import { DeployOptions, DeployResult, Libraries } from 'hardhat-deploy/types'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
+import { DeployOptions, DeployResult, Libraries } from 'hardhat-deploy/types'
 
 interface CommonDeployArgs extends Omit<DeployOptions, 'from'> {
   hre: HardhatRuntimeEnvironment

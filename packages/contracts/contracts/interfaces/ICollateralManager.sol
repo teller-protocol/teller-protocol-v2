@@ -49,15 +49,14 @@ interface ICollateralManager {
      * @param _bidId The bidId to return the collateral info for.
      * @return The stored collateral info.
      */
-    function getCollateralInfo(uint256 _bidId)
-        external
-        view
-        returns (Collateral[] memory);
+    function getCollateralInfo(
+        uint256 _bidId
+    ) external view returns (Collateral[] memory);
 
-    function getCollateralAmount(uint256 _bidId, address collateralAssetAddress)
-        external
-        view
-        returns (uint256 _amount);
+    function getCollateralAmount(
+        uint256 _bidId,
+        address collateralAssetAddress
+    ) external view returns (uint256 _amount);
 
     /**
      * @notice Withdraws deposited collateral from the created escrow of a bid.
@@ -85,6 +84,8 @@ interface ICollateralManager {
      * @param _bidId The id of the liquidated bid.
      * @param _liquidatorAddress The address of the liquidator to send the collateral to.
      */
-    function liquidateCollateral(uint256 _bidId, address _liquidatorAddress)
-        external;
+    function liquidateCollateral(
+        uint256 _bidId,
+        address _liquidatorAddress
+    ) external;
 }

@@ -71,25 +71,23 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     }
 
     modifier onlyProtocolOwner() {
-
         address protocolOwner = OwnableUpgradeable(address(tellerV2)).owner();
 
         require(_msgSender() == protocolOwner, "Sender not authorized");
         _;
     }
 
-
-         /* External Functions */
+    /* External Functions */
 
     /**
      * @notice Initializes the collateral manager.
      * @param _collateralEscrowBeacon The address of the escrow implementation.
      * @param _tellerV2 The address of the protocol.
      */
-    function initialize(address _collateralEscrowBeacon, address _tellerV2)
-        external
-        initializer
-    {
+    function initialize(
+        address _collateralEscrowBeacon,
+        address _tellerV2
+    ) external initializer {
         collateralEscrowBeacon = _collateralEscrowBeacon;
         tellerV2 = ITellerV2(_tellerV2);
         __Ownable_init_unchained();
@@ -99,10 +97,9 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
      * @notice Sets the address of the Beacon contract used for the collateral escrow contracts.
      * @param _collateralEscrowBeacon The address of the Beacon contract.
      */
-    function setCollateralEscrowBeacon(address _collateralEscrowBeacon)
-        external
-        reinitializer(2)
-    {
+    function setCollateralEscrowBeacon(
+        address _collateralEscrowBeacon
+    ) external reinitializer(2) {
         collateralEscrowBeacon = _collateralEscrowBeacon;
     }
 
@@ -111,11 +108,9 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
      * @param _bidId The id of the bid to check.
      */
 
-    function isBidCollateralBacked(uint256 _bidId)
-        public
-        virtual
-        returns (bool)
-    {
+    function isBidCollateralBacked(
+        uint256 _bidId
+    ) public virtual returns (bool) {
         return _bidCollaterals[_bidId].collateralAddresses.length() > 0;
     }
 
@@ -165,10 +160,9 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
      * @param _bidId The id of the associated bid.
      * @return validation_ Boolean indicating if the collateral balance was validated.
      */
-    function revalidateCollateral(uint256 _bidId)
-        external
-        returns (bool validation_)
-    {
+    function revalidateCollateral(
+        uint256 _bidId
+    ) external returns (bool validation_) {
         Collateral[] memory collateralInfos = getCollateralInfo(_bidId);
         address borrower = tellerV2.getLoanBorrower(_bidId);
         (validation_, ) = _checkBalances(borrower, collateralInfos, true);
@@ -228,11 +222,9 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
      * @param _bidId The bidId to return the collateral info for.
      * @return infos_ The stored collateral info.
      */
-    function getCollateralInfo(uint256 _bidId)
-        public
-        view
-        returns (Collateral[] memory infos_)
-    {
+    function getCollateralInfo(
+        uint256 _bidId
+    ) public view returns (Collateral[] memory infos_) {
         CollateralInfo storage collateral = _bidCollaterals[_bidId];
         address[] memory collateralAddresses = collateral
             .collateralAddresses
@@ -249,11 +241,10 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
      * @param _collateralAddress An address used as collateral.
      * @return amount_ The amount of collateral of type _collateralAddress.
      */
-    function getCollateralAmount(uint256 _bidId, address _collateralAddress)
-        public
-        view
-        returns (uint256 amount_)
-    {
+    function getCollateralAmount(
+        uint256 _bidId,
+        address _collateralAddress
+    ) public view returns (uint256 amount_) {
         amount_ = _bidCollaterals[_bidId]
             .collateralInfo[_collateralAddress]
             ._amount;
@@ -274,17 +265,16 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     }
 
     function withdrawDustTokens(
-    uint256 _bidId,  
-    address _tokenAddress, 
-    uint256 _amount,
-    address _recipientAddress
+        uint256 _bidId,
+        address _tokenAddress,
+        uint256 _amount,
+        address _recipientAddress
     ) external onlyProtocolOwner {
-  
         ICollateralEscrowV1(_escrows[_bidId]).withdrawDustTokens(
-                _tokenAddress,
-                _amount,
-                _recipientAddress
-            );
+            _tokenAddress,
+            _amount,
+            _recipientAddress
+        );
     }
 
     /**
@@ -311,10 +301,10 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
      * @param _bidId The id of the liquidated bid.
      * @param _liquidatorAddress The address of the liquidator to send the collateral to.
      */
-    function liquidateCollateral(uint256 _bidId, address _liquidatorAddress)
-        external
-        onlyTellerV2
-    {
+    function liquidateCollateral(
+        uint256 _bidId,
+        address _liquidatorAddress
+    ) external onlyTellerV2 {
         if (isBidCollateralBacked(_bidId)) {
             BidState bidState = tellerV2.getBidState(_bidId);
             require(
@@ -331,11 +321,9 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
      * @notice Deploys a new collateral escrow.
      * @param _bidId The associated bidId of the collateral escrow.
      */
-    function _deployEscrow(uint256 _bidId)
-        internal
-        virtual
-        returns (address proxyAddress_, address borrower_)
-    {
+    function _deployEscrow(
+        uint256 _bidId
+    ) internal virtual returns (address proxyAddress_, address borrower_) {
         proxyAddress_ = _escrows[_bidId];
         // Get bid info
         borrower_ = tellerV2.getLoanBorrower(_bidId);
@@ -359,10 +347,10 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         * @param collateralInfo The collateral info to deposit.
 
     */
-    function _deposit(uint256 _bidId, Collateral memory collateralInfo)
-        internal
-        virtual
-    {
+    function _deposit(
+        uint256 _bidId,
+        Collateral memory collateralInfo
+    ) internal virtual {
         require(collateralInfo._amount > 0, "Collateral not validated");
         (address escrowAddress, address borrower) = _deployEscrow(_bidId);
         ICollateralEscrowV1 collateralEscrow = ICollateralEscrowV1(
@@ -565,11 +553,12 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
 
     // On NFT Received handlers
 
-    function onERC721Received(address, address, uint256, bytes calldata)
-        external
-        pure
-        returns (bytes4)
-    {
+    function onERC721Received(
+        address,
+        address,
+        uint256,
+        bytes calldata
+    ) external pure returns (bytes4) {
         return
             bytes4(
                 keccak256("onERC721Received(address,address,uint256,bytes)")

@@ -19,21 +19,19 @@ import { TellerV2Context } from "../contracts/TellerV2Context.sol";
 contract LenderManager_Override is LenderManager {
     bool mockedHasMarketVerification;
 
-    constructor(address marketRegistry)
-        LenderManager(MarketRegistryMock(marketRegistry))
-    {}
+    constructor(
+        address marketRegistry
+    ) LenderManager(MarketRegistryMock(marketRegistry)) {}
 
     function setHasMarketVerification(bool v) public {
         mockedHasMarketVerification = v;
     }
 
     //override
-    function _hasMarketVerification(address _lender, uint256 _bidId)
-        internal
-        view
-        override
-        returns (bool)
-    {
+    function _hasMarketVerification(
+        address _lender,
+        uint256 _bidId
+    ) internal view override returns (bool) {
         return mockedHasMarketVerification;
     }
 
@@ -45,19 +43,16 @@ contract LenderManager_Override is LenderManager {
         super._mint(to, tokenId);
     }
 
-    function _getLoanMarketIdSuper(uint256 _bidId)
-        public
-        view
-        returns (uint256)
-    {
+    function _getLoanMarketIdSuper(
+        uint256 _bidId
+    ) public view returns (uint256) {
         return super._getLoanMarketId(_bidId);
     }
 
-    function _hasMarketVerificationSuper(address _lender, uint256 _bidId)
-        public
-        view
-        returns (bool)
-    {
+    function _hasMarketVerificationSuper(
+        address _lender,
+        uint256 _bidId
+    ) public view returns (bool) {
         return super._hasMarketVerification(_lender, _bidId);
     }
 

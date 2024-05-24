@@ -30,9 +30,9 @@ abstract contract TellerV2Context is
         address sender
     );
 
-    constructor(address trustedForwarder)
-        ERC2771ContextUpgradeable(trustedForwarder)
-    {}
+    constructor(
+        address trustedForwarder
+    ) ERC2771ContextUpgradeable(trustedForwarder) {}
 
     /**
      * @notice Checks if an address is a trusted forwarder contract for a given market.
@@ -72,9 +72,10 @@ abstract contract TellerV2Context is
      * @param _marketId An ID for a lending market.
      * @param _forwarder A forwarder contract address.
      */
-    function setTrustedMarketForwarder(uint256 _marketId, address _forwarder)
-        external
-    {
+    function setTrustedMarketForwarder(
+        uint256 _marketId,
+        address _forwarder
+    ) external {
         require(
             marketRegistry.getMarketOwner(_marketId) == _msgSender(),
             "Caller must be the market owner"
@@ -89,9 +90,10 @@ abstract contract TellerV2Context is
      * @param _marketId An ID for a lending market.
      * @param _forwarder A forwarder contract address.
      */
-    function approveMarketForwarder(uint256 _marketId, address _forwarder)
-        external
-    {
+    function approveMarketForwarder(
+        uint256 _marketId,
+        address _forwarder
+    ) external {
         require(
             isTrustedMarketForwarder(_marketId, _forwarder),
             "Forwarder must be trusted by the market"
@@ -105,9 +107,10 @@ abstract contract TellerV2Context is
      * @param _marketId An ID for a lending market.
      * @param _forwarder A forwarder contract address.
      */
-    function renounceMarketForwarder(uint256 _marketId, address _forwarder)
-        external
-    {
+    function renounceMarketForwarder(
+        uint256 _marketId,
+        address _forwarder
+    ) external {
         if (_approvedForwarderSenders[_forwarder].contains(_msgSender())) {
             _approvedForwarderSenders[_forwarder].remove(_msgSender());
             emit MarketForwarderRenounced(_marketId, _forwarder, _msgSender());
@@ -119,12 +122,9 @@ abstract contract TellerV2Context is
      * @param _marketId An ID for a lending market.
      * @return sender The address to use as the function caller.
      */
-    function _msgSenderForMarket(uint256 _marketId)
-        internal
-        view
-        virtual
-        returns (address)
-    {
+    function _msgSenderForMarket(
+        uint256 _marketId
+    ) internal view virtual returns (address) {
         if (
             msg.data.length >= 20 &&
             isTrustedMarketForwarder(_marketId, _msgSender())
@@ -149,12 +149,9 @@ abstract contract TellerV2Context is
      * @param _marketId An ID for a lending market to verify if the caller is a trusted forwarder.
      * @return calldata The modified bytes array of the function calldata without the appended sender's address.
      */
-    function _msgDataForMarket(uint256 _marketId)
-        internal
-        view
-        virtual
-        returns (bytes calldata)
-    {
+    function _msgDataForMarket(
+        uint256 _marketId
+    ) internal view virtual returns (bytes calldata) {
         if (isTrustedMarketForwarder(_marketId, _msgSender())) {
             return msg.data[:msg.data.length - 20];
         } else {

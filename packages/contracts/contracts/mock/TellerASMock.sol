@@ -16,12 +16,9 @@ contract TellerASMock is TellerAS {
         )
     {}
 
-    function isAttestationActive(bytes32 uuid)
-        public
-        view
-        override
-        returns (bool)
-    {
+    function isAttestationActive(
+        bytes32 uuid
+    ) public view override returns (bool) {
         return true;
     }
 }

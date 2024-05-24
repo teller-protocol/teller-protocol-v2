@@ -83,11 +83,9 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
      * @param _allocation - The RewardAllocation struct data to create
      * @return allocationId_
      */
-    function allocateRewards(RewardAllocation calldata _allocation)
-        public
-        virtual
-        returns (uint256 allocationId_)
-    {
+    function allocateRewards(
+        RewardAllocation calldata _allocation
+    ) public virtual returns (uint256 allocationId_) {
         allocationId_ = allocationCount++;
 
         require(
@@ -167,10 +165,10 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
      * @param _allocationId - The id for the allocation
      * @param _tokenAmount - The amount of tokens to withdraw
      */
-    function deallocateRewards(uint256 _allocationId, uint256 _tokenAmount)
-        public
-        virtual
-    {
+    function deallocateRewards(
+        uint256 _allocationId,
+        uint256 _tokenAmount
+    ) public virtual {
         require(
             msg.sender == allocatedRewards[_allocationId].allocator,
             "Only the allocator can deallocate rewards."
@@ -208,10 +206,9 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
         BidState bidState;
     }
 
-    function _getLoanSummary(uint256 _bidId)
-        internal
-        returns (LoanSummary memory _summary)
-    {
+    function _getLoanSummary(
+        uint256 _bidId
+    ) internal returns (LoanSummary memory _summary) {
         (
             _summary.borrower,
             _summary.lender,
@@ -229,10 +226,10 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
      * @param _allocationId - The id for the reward allocation
      * @param _bidId - The id for the loan. Each loan only grants one reward per allocation.
      */
-    function claimRewards(uint256 _allocationId, uint256 _bidId)
-        external
-        virtual
-    {
+    function claimRewards(
+        uint256 _allocationId,
+        uint256 _bidId
+    ) external virtual {
         RewardAllocation storage allocatedReward = allocatedRewards[
             _allocationId
         ];
@@ -360,9 +357,10 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
      * @param _allocationId - The id for the allocation to decrement
      * @param _amount - The amount of ERC20 to decrement
      */
-    function _decrementAllocatedAmount(uint256 _allocationId, uint256 _amount)
-        internal
-    {
+    function _decrementAllocatedAmount(
+        uint256 _allocationId,
+        uint256 _amount
+    ) internal {
         allocatedRewards[_allocationId].rewardTokenAmount -= _amount;
     }
 
@@ -383,7 +381,7 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
         uint256 rewardPerYear = MathUpgradeable.mulDiv(
             _loanPrincipal,
             _rewardPerLoanPrincipalAmount, //expanded by principal token decimals
-            10**_principalTokenDecimals
+            10 ** _principalTokenDecimals
         );
 
         return MathUpgradeable.mulDiv(rewardPerYear, _loanDuration, 365 days);
@@ -442,7 +440,7 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
             MathUpgradeable.mulDiv(
                 _principalAmount,
                 _minimumCollateralPerPrincipalAmount, //expanded by principal token decimals and collateral token decimals
-                10**(_principalTokenDecimals + _collateralTokenDecimals)
+                10 ** (_principalTokenDecimals + _collateralTokenDecimals)
             );
     }
 
@@ -471,12 +469,9 @@ contract MarketLiquidityRewards is IMarketLiquidityRewards, Initializable {
      * @notice Returns the amount of reward tokens remaining in the allocation
      * @param _allocationId - The id for the allocation
      */
-    function getRewardTokenAmount(uint256 _allocationId)
-        public
-        view
-        override
-        returns (uint256)
-    {
+    function getRewardTokenAmount(
+        uint256 _allocationId
+    ) public view override returns (uint256) {
         return allocatedRewards[_allocationId].rewardTokenAmount;
     }
 }

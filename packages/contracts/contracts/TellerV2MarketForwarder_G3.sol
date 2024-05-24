@@ -21,9 +21,10 @@ import "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
  */
 abstract contract TellerV2MarketForwarder_G3 is TellerV2MarketForwarder_G2 {
     /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor(address _protocolAddress, address _marketRegistryAddress)
-        TellerV2MarketForwarder_G2(_protocolAddress, _marketRegistryAddress)
-    {}
+    constructor(
+        address _protocolAddress,
+        address _marketRegistryAddress
+    ) TellerV2MarketForwarder_G2(_protocolAddress, _marketRegistryAddress) {}
 
     /**
      * @notice Accepts a new loan using the TellerV2 lending protocol.

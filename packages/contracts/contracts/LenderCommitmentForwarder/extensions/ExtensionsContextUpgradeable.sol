@@ -14,11 +14,10 @@ abstract contract ExtensionsContextUpgradeable is IExtensionsContext {
     event ExtensionAdded(address extension, address sender);
     event ExtensionRevoked(address extension, address sender);
 
-    function hasExtension(address account, address extension)
-        public
-        view
-        returns (bool)
-    {
+    function hasExtension(
+        address account,
+        address extension
+    ) public view returns (bool) {
         return userExtensions[account][extension];
     }
 

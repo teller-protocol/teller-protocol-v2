@@ -115,7 +115,7 @@ contract FlashRolloverLoan_G3_Integration_Test is Testable {
         //  wethMock.transfer(address(flashLoanVault), 5e18);
 
         flashRolloverLoan = new FlashRolloverLoan_G4(
-            address(tellerV2), 
+            address(tellerV2),
             address(aavePoolAddressProvider)
         );
     }
@@ -233,8 +233,8 @@ contract FlashRolloverLoan_G3_Integration_Test is Testable {
             //borrower must approve the extension
             vm.prank(address(borrower));
             IExtensionsContext(address(lenderCommitmentForwarder)).addExtension(
-                    address(flashRolloverLoan)
-                );
+                address(flashRolloverLoan)
+            );
 
             address collateralManager = address(tellerV2.collateralManager());
 
@@ -242,7 +242,7 @@ contract FlashRolloverLoan_G3_Integration_Test is Testable {
             testNft.setApprovalForAll(address(collateralManager), true);
         }
         //how do we calc how much to flash ??
-      //  uint256 flashLoanAmount = 110 * 1e16;
+        //  uint256 flashLoanAmount = 110 * 1e16;
 
         // uint256 borrowerAmount = 0;
 
@@ -251,9 +251,9 @@ contract FlashRolloverLoan_G3_Integration_Test is Testable {
 
         vm.prank(address(borrower));
         flashRolloverLoan.rolloverLoanWithFlash(
-             address(lenderCommitmentForwarder),
+            address(lenderCommitmentForwarder),
             loanId,
-            110 * 1e16, // flash loan amt 
+            110 * 1e16, // flash loan amt
             0,
             _acceptCommitmentArgs
         );

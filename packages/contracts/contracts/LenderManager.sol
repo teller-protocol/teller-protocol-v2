@@ -37,11 +37,10 @@ contract LenderManager is
      * @param _bidId The id for the loan to set.
      * @param _newLender The address of the new active lender.
      */
-    function registerLoan(uint256 _bidId, address _newLender)
-        public
-        override
-        onlyOwner
-    {
+    function registerLoan(
+        uint256 _bidId,
+        address _newLender
+    ) public override onlyOwner {
         _safeMint(_newLender, _bidId, "");
     }
 
@@ -58,12 +57,10 @@ contract LenderManager is
      * @param _lender The address of the lender which should be verified by the market
      * @param _bidId The id of the bid of which to return the market id
      */
-    function _hasMarketVerification(address _lender, uint256 _bidId)
-        internal
-        view
-        virtual
-        returns (bool isVerified_)
-    {
+    function _hasMarketVerification(
+        address _lender,
+        uint256 _bidId
+    ) internal view virtual returns (bool isVerified_) {
         uint256 _marketId = _getLoanMarketId(_bidId);
 
         (isVerified_, ) = marketRegistry.isVerifiedLender(_marketId, _lender);
@@ -71,10 +68,12 @@ contract LenderManager is
 
     /**  ERC721 Functions **/
 
-    function _beforeTokenTransfer(address, address to, uint256 tokenId, uint256)
-        internal
-        override
-    {
+    function _beforeTokenTransfer(
+        address,
+        address to,
+        uint256 tokenId,
+        uint256
+    ) internal override {
         require(_hasMarketVerification(to, tokenId), "Not approved by market");
     }
 

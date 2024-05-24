@@ -170,9 +170,10 @@ contract LenderCommitmentForwarder_G1 is TellerV2MarketForwarder_G1 {
 
     /** External Functions **/
 
-    constructor(address _protocolAddress, address _marketRegistry)
-        TellerV2MarketForwarder_G1(_protocolAddress, _marketRegistry)
-    {}
+    constructor(
+        address _protocolAddress,
+        address _marketRegistry
+    ) TellerV2MarketForwarder_G1(_protocolAddress, _marketRegistry) {}
 
     /**
      * @notice Creates a loan commitment from a lender for a market.
@@ -307,10 +308,9 @@ contract LenderCommitmentForwarder_G1 is TellerV2MarketForwarder_G1 {
      * @notice Removes the commitment of a lender to a market.
      * @param _commitmentId The id of the commitment to delete.
      */
-    function deleteCommitment(uint256 _commitmentId)
-        public
-        commitmentLender(_commitmentId)
-    {
+    function deleteCommitment(
+        uint256 _commitmentId
+    ) public commitmentLender(_commitmentId) {
         delete commitments[_commitmentId];
         delete commitmentBorrowersList[_commitmentId];
         emit DeletedCommitment(_commitmentId);
@@ -583,7 +583,7 @@ contract LenderCommitmentForwarder_G1 is TellerV2MarketForwarder_G1 {
         return
             MathUpgradeable.mulDiv(
                 _principalAmount,
-                (10**(collateralDecimals + principalDecimals)),
+                (10 ** (collateralDecimals + principalDecimals)),
                 _maxPrincipalPerCollateralAmount,
                 MathUpgradeable.Rounding.Up
             );
@@ -594,11 +594,9 @@ contract LenderCommitmentForwarder_G1 is TellerV2MarketForwarder_G1 {
      * @param _commitmentId The commitment id for the commitment to query.
      * @return borrowers_ An array of addresses restricted to accept the commitment. Empty array means unrestricted.
      */
-    function getCommitmentBorrowers(uint256 _commitmentId)
-        external
-        view
-        returns (address[] memory borrowers_)
-    {
+    function getCommitmentBorrowers(
+        uint256 _commitmentId
+    ) external view returns (address[] memory borrowers_) {
         borrowers_ = commitmentBorrowersList[_commitmentId].values();
     }
 
@@ -656,11 +654,9 @@ contract LenderCommitmentForwarder_G1 is TellerV2MarketForwarder_G1 {
      * @notice Return the collateral type based on the commitmentcollateral type.  Collateral type is used in the base lending protocol.
      * @param _type The type of collateral to be used for the loan.
      */
-    function _getEscrowCollateralType(CommitmentCollateralType _type)
-        internal
-        pure
-        returns (CollateralType)
-    {
+    function _getEscrowCollateralType(
+        CommitmentCollateralType _type
+    ) internal pure returns (CollateralType) {
         if (_type == CommitmentCollateralType.ERC20) {
             return CollateralType.ERC20;
         }

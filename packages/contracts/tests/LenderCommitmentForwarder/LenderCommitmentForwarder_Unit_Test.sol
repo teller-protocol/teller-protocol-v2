@@ -1152,8 +1152,8 @@ contract LenderCommitmentForwarder_Test is Testable {
     }
 
     function test_acceptCommitment_invalid_721_collateral_amount() public {
-        ILenderCommitmentForwarder.Commitment memory c = ILenderCommitmentForwarder
-            .Commitment({
+        ILenderCommitmentForwarder.Commitment
+            memory c = ILenderCommitmentForwarder.Commitment({
                 maxPrincipal: 100,
                 expiration: expiration,
                 maxDuration: maxDuration,
@@ -1396,9 +1396,10 @@ contract LenderCommitmentForwarder_Test is Testable {
 contract LenderCommitmentUser is User {
     LenderCommitmentForwarder_G2 public immutable commitmentForwarder;
 
-    constructor(address _tellerV2, address _commitmentForwarder)
-        User(_tellerV2)
-    {
+    constructor(
+        address _tellerV2,
+        address _commitmentForwarder
+    ) User(_tellerV2) {
         commitmentForwarder = LenderCommitmentForwarder_G2(
             _commitmentForwarder
         );
@@ -1449,19 +1450,15 @@ contract LenderCommitmentForwarderTest_TellerV2Mock is TellerV2Context {
         marketRegistry = IMarketRegistry(_marketRegistry);
     }
 
-    function getSenderForMarket(uint256 _marketId)
-        external
-        view
-        returns (address)
-    {
+    function getSenderForMarket(
+        uint256 _marketId
+    ) external view returns (address) {
         return _msgSenderForMarket(_marketId);
     }
 
-    function getDataForMarket(uint256 _marketId)
-        external
-        view
-        returns (bytes calldata)
-    {
+    function getDataForMarket(
+        uint256 _marketId
+    ) external view returns (bytes calldata) {
         return _msgDataForMarket(_marketId);
     }
 }

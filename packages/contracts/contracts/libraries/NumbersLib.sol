@@ -20,7 +20,7 @@ library NumbersLib {
     uint16 internal constant PCT_100 = 10000;
 
     function percentFactor(uint256 decimals) internal pure returns (uint256) {
-        return 100 * (10**decimals);
+        return 100 * (10 ** decimals);
     }
 
     /**
@@ -28,11 +28,10 @@ library NumbersLib {
      * @param self The number to get a percentage of.
      * @param percentage The percentage value to calculate with 2 decimal places (10000 = 100%).
      */
-    function percent(uint256 self, uint16 percentage)
-        internal
-        pure
-        returns (uint256)
-    {
+    function percent(
+        uint256 self,
+        uint16 percentage
+    ) internal pure returns (uint256) {
         return percent(self, percentage, 2);
     }
 
@@ -42,11 +41,11 @@ library NumbersLib {
      * @param percentage The percentage value to calculate with.
      * @param decimals The number of decimals the percentage value is in.
      */
-    function percent(uint256 self, uint256 percentage, uint256 decimals)
-        internal
-        pure
-        returns (uint256)
-    {
+    function percent(
+        uint256 self,
+        uint256 percentage,
+        uint256 decimals
+    ) internal pure returns (uint256) {
         return (self * percentage) / percentFactor(decimals);
     }
 
@@ -66,11 +65,10 @@ library NumbersLib {
      * @param num2 The number used to get the ratio from.
      * @return Ratio percentage with 2 decimal places (10000 = 100%).
      */
-    function ratioOf(uint256 num1, uint256 num2)
-        internal
-        pure
-        returns (uint16)
-    {
+    function ratioOf(
+        uint256 num1,
+        uint256 num2
+    ) internal pure returns (uint16) {
         return SafeCast.toUint16(ratioOf(num1, num2, 2));
     }
 
@@ -81,11 +79,11 @@ library NumbersLib {
      * @param decimals The number of decimals the percentage value is returned in.
      * @return Ratio percentage value.
      */
-    function ratioOf(uint256 num1, uint256 num2, uint256 decimals)
-        internal
-        pure
-        returns (uint256)
-    {
+    function ratioOf(
+        uint256 num1,
+        uint256 num2,
+        uint256 decimals
+    ) internal pure returns (uint256) {
         if (num2 == 0) return 0;
         return (num1 * percentFactor(decimals)) / num2;
     }

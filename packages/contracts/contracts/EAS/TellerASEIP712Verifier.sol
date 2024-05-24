@@ -53,12 +53,9 @@ contract TellerASEIP712Verifier is IEASEIP712Verifier {
     /**
      * @inheritdoc IEASEIP712Verifier
      */
-    function getNonce(address account)
-        external
-        view
-        override
-        returns (uint256)
-    {
+    function getNonce(
+        address account
+    ) external view override returns (uint256) {
         return _nonces[account];
     }
 

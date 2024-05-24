@@ -1,10 +1,11 @@
 contract UniswapV3FactoryMock {
     address poolMock;
 
-    function getPool(address token0, address token1, uint24 fee)
-        public
-        returns (address)
-    {
+    function getPool(
+        address token0,
+        address token1,
+        uint24 fee
+    ) public returns (address) {
         return poolMock;
     }
 

@@ -29,16 +29,16 @@ contract LenderCommitmentForwarder_U1_Override is LenderCommitmentForwarder_U1 {
         LenderCommitmentForwarder_U1(tellerV2, marketRegistry, uniswapV3Factory)
     {}
 
-    function setCommitment(uint256 _commitmentId, Commitment memory _commitment)
-        public
-    {
+    function setCommitment(
+        uint256 _commitmentId,
+        Commitment memory _commitment
+    ) public {
         commitments[_commitmentId] = _commitment;
     }
 
-    function _getEscrowCollateralTypeSuper(CommitmentCollateralType _type)
-        public
-        returns (CollateralType)
-    {
+    function _getEscrowCollateralTypeSuper(
+        CommitmentCollateralType _type
+    ) public returns (CollateralType) {
         return super._getEscrowCollateralType(_type);
     }
 
@@ -50,11 +50,10 @@ contract LenderCommitmentForwarder_U1_Override is LenderCommitmentForwarder_U1 {
         Overrider methods 
     */
 
-    function _submitBidWithCollateral(CreateLoanArgs memory, address)
-        internal
-        override
-        returns (uint256 bidId)
-    {
+    function _submitBidWithCollateral(
+        CreateLoanArgs memory,
+        address
+    ) internal override returns (uint256 bidId) {
         submitBidWithCollateralWasCalled = true;
         return 1;
     }
@@ -69,19 +68,15 @@ contract LenderCommitmentForwarder_U1_Override is LenderCommitmentForwarder_U1 {
 contract LenderCommitmentForwarderTest_TellerV2Mock is TellerV2Context {
     constructor() TellerV2Context(address(0)) {}
 
-    function getSenderForMarket(uint256 _marketId)
-        external
-        view
-        returns (address)
-    {
+    function getSenderForMarket(
+        uint256 _marketId
+    ) external view returns (address) {
         return _msgSenderForMarket(_marketId);
     }
 
-    function getDataForMarket(uint256 _marketId)
-        external
-        view
-        returns (bytes calldata)
-    {
+    function getDataForMarket(
+        uint256 _marketId
+    ) external view returns (bytes calldata) {
         return _msgDataForMarket(_marketId);
     }
 }

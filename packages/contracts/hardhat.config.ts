@@ -38,7 +38,10 @@ import semver from 'semver'
 
 const NODE_VERSION = 'v16'
 const ALT_NODE_VERSION = 'v18'
-if (!semver.satisfies(process.version, NODE_VERSION) && !semver.satisfies(process.version, ALT_NODE_VERSION))
+if (
+  !semver.satisfies(process.version, NODE_VERSION) &&
+  !semver.satisfies(process.version, ALT_NODE_VERSION)
+)
   throw new Error(
     `Incorrect NodeJS version being used (${process.version}). Expected: ${NODE_VERSION}`
   )

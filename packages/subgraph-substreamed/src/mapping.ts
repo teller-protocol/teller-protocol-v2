@@ -5,7 +5,7 @@
  import { Protobuf } from 'as-proto/assembly';
 
 
- import { fac_deployed_lender_group_contract } from "../generated/schema";
+ import { factory_deployed_lender_group_contract } from "../generated/schema";
  
 export function handleSubstreamGraphOutTrigger(bytes: Uint8Array): void {
   
@@ -20,7 +20,7 @@ export function handleSubstreamGraphOutTrigger(bytes: Uint8Array): void {
     let event_id = deployedLenderGroupContractEvent.evtTxHash
     .concat( "_" )
     .concat( deployedLenderGroupContractEvent.evtIndex.toString() );   
-    let entity = new fac_deployed_lender_group_contract( event_id );
+    let entity = new factory_deployed_lender_group_contract( event_id );
 
     if (deployedLenderGroupContractEvent.evtBlockTime) {
 
@@ -28,6 +28,8 @@ export function handleSubstreamGraphOutTrigger(bytes: Uint8Array): void {
       entity.evt_block_number = BigInt.fromU64( deployedLenderGroupContractEvent.evtBlockNumber );
       
       entity.evt_index =  BigInt.fromI32(deployedLenderGroupContractEvent.evtIndex);
+
+      // need to parse this better ! 
       entity.group_contract = deployedLenderGroupContractEvent.groupContract.toString();  //address .. ? 
       
       entity.save();

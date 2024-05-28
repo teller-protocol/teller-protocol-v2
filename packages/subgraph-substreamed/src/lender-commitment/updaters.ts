@@ -25,13 +25,13 @@ import {
   loadProtocolTokenVolume,
   loadToken,
   TokenType
-} from "../helpers/loaders";
+} from "../helpers-old/loaders";
 import {
   addToArray,
   calcStdDevAndMeanFromEntities,
   calcWeightedDeviation,
   removeFromArray
-} from "../helpers/utils";
+} from "../helpers-old/utils";
 
 import {
   loadCommitment,

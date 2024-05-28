@@ -3,7 +3,7 @@ import { Address, BigInt, dataSource, ethereum } from "@graphprotocol/graph-ts";
 import { IERC20Metadata } from "../../generated/LenderCommitmentForwarder_ActiveCommitments/IERC20Metadata";
 import { LenderCommitmentForwarder } from "../../generated/LenderCommitmentForwarder_ActiveCommitments/LenderCommitmentForwarder"; 
 import { Commitment } from "../../generated/schema";
-import { loadProtocol } from "../helpers/loaders";
+import { loadProtocol } from "../helpers-old/loaders";
 
 import {
   updateAvailableTokensFromCommitment,

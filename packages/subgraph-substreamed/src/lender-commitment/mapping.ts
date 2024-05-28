@@ -10,7 +10,7 @@ import {
 } from "../../generated/LenderCommitmentForwarder/LenderCommitmentForwarder";
 
 import { Bid } from "../../generated/schema";
-import { loadBidById } from "../helpers/loaders";
+import { loadBidById } from "../helpers-old/loaders";
 import { linkCommitmentToRewards } from "../liquidity-rewards/updaters";
 
 import { loadCommitment } from "./loaders";

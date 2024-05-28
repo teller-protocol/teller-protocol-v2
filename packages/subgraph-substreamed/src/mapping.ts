@@ -5,6 +5,12 @@
  import { Protobuf } from 'as-proto/assembly';
 
 
+
+ //how can i get this in here !? 
+ // do i have to do this in a block handler ?
+ import { LenderGroupPool } from "../../generated/LenderGroupPool";
+
+
  import { 
   
   factory_deployed_lender_group_contract,
@@ -62,11 +68,21 @@ export function handleSubstreamGraphOutTrigger(bytes: Uint8Array): void {
 
     let initializedLenderGroupPool = events.grouppInitializeds[i];
 
-    let event_id = initializedLenderGroupPool.evtTxHash
-    .concat( "_" )
-    .concat( initializedLenderGroupPool.evtIndex.toString() );
+    let group_pool_address = initializedLenderGroupPool.evtAddress  ;
+
+    let event_id = group_pool_address.toString() ;
+
+
+
+
+
+    const groupPoolInstance = LenderGroupPool.bind( group_pool_address );
 
     let entity = new group_pool_metrics( event_id );
+    entity.group_pool_address =  Address.fromString( initializedLenderGroupPool.evtAddress );
+   
+   
+    entity.principal_token_address = groupPoolInstance.principal_token_address();
 
     ///fill in all the stuff we need 
 

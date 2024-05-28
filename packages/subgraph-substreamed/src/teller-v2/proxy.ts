@@ -1,7 +1,7 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 
 import { Upgraded } from "../../generated/TellerV2_Proxy/Proxy";
-import { getBid, loadBidById } from "../helpers/loaders";
+import { getBid, loadBidById } from "../helpers-old/loaders";
 
 export function handleTellerV2Upgraded(event: Upgraded): void {
   if (

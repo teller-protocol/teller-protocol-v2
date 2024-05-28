@@ -75,7 +75,7 @@ export function handleSubstreamGraphOutTrigger(bytes: Uint8Array): void {
 
 
 
-
+      //bind to the contract so we can call its methods 
     const groupPoolInstance = LenderGroupPool.bind( group_pool_address );
 
     let entity = new group_pool_metrics( event_id );

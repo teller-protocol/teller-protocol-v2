@@ -57,17 +57,17 @@ export class factory_admin_changed extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get evt_tx_hash(): string {
+  get evt_tx_hash(): Bytes {
     let value = this.get("evt_tx_hash");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toString();
+      return value.toBytes();
     }
   }
 
-  set evt_tx_hash(value: string) {
-    this.set("evt_tx_hash", Value.fromString(value));
+  set evt_tx_hash(value: Bytes) {
+    this.set("evt_tx_hash", Value.fromBytes(value));
   }
 
   get evt_index(): BigInt {
@@ -96,30 +96,30 @@ export class factory_admin_changed extends Entity {
     this.set("evt_block_number", Value.fromBigInt(value));
   }
 
-  get new_admin(): string {
+  get new_admin(): Bytes {
     let value = this.get("new_admin");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toString();
+      return value.toBytes();
     }
   }
 
-  set new_admin(value: string) {
-    this.set("new_admin", Value.fromString(value));
+  set new_admin(value: Bytes) {
+    this.set("new_admin", Value.fromBytes(value));
   }
 
-  get previous_admin(): string {
+  get previous_admin(): Bytes {
     let value = this.get("previous_admin");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toString();
+      return value.toBytes();
     }
   }
 
-  set previous_admin(value: string) {
-    this.set("previous_admin", Value.fromString(value));
+  set previous_admin(value: Bytes) {
+    this.set("previous_admin", Value.fromBytes(value));
   }
 }
 
@@ -169,17 +169,17 @@ export class factory_beacon_upgraded extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get evt_tx_hash(): string {
+  get evt_tx_hash(): Bytes {
     let value = this.get("evt_tx_hash");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toString();
+      return value.toBytes();
     }
   }
 
-  set evt_tx_hash(value: string) {
-    this.set("evt_tx_hash", Value.fromString(value));
+  set evt_tx_hash(value: Bytes) {
+    this.set("evt_tx_hash", Value.fromBytes(value));
   }
 
   get evt_index(): BigInt {
@@ -208,17 +208,17 @@ export class factory_beacon_upgraded extends Entity {
     this.set("evt_block_number", Value.fromBigInt(value));
   }
 
-  get beacon(): string {
+  get beacon(): Bytes {
     let value = this.get("beacon");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toString();
+      return value.toBytes();
     }
   }
 
-  set beacon(value: string) {
-    this.set("beacon", Value.fromString(value));
+  set beacon(value: Bytes) {
+    this.set("beacon", Value.fromBytes(value));
   }
 }
 
@@ -270,17 +270,17 @@ export class factory_deployed_lender_group_contract extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get evt_tx_hash(): string {
+  get evt_tx_hash(): Bytes {
     let value = this.get("evt_tx_hash");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toString();
+      return value.toBytes();
     }
   }
 
-  set evt_tx_hash(value: string) {
-    this.set("evt_tx_hash", Value.fromString(value));
+  set evt_tx_hash(value: Bytes) {
+    this.set("evt_tx_hash", Value.fromBytes(value));
   }
 
   get evt_index(): BigInt {
@@ -309,17 +309,17 @@ export class factory_deployed_lender_group_contract extends Entity {
     this.set("evt_block_number", Value.fromBigInt(value));
   }
 
-  get group_contract(): string {
+  get group_contract(): Bytes {
     let value = this.get("group_contract");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toString();
+      return value.toBytes();
     }
   }
 
-  set group_contract(value: string) {
-    this.set("group_contract", Value.fromString(value));
+  set group_contract(value: Bytes) {
+    this.set("group_contract", Value.fromBytes(value));
   }
 }
 
@@ -366,17 +366,17 @@ export class factory_upgraded extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get evt_tx_hash(): string {
+  get evt_tx_hash(): Bytes {
     let value = this.get("evt_tx_hash");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toString();
+      return value.toBytes();
     }
   }
 
-  set evt_tx_hash(value: string) {
-    this.set("evt_tx_hash", Value.fromString(value));
+  set evt_tx_hash(value: Bytes) {
+    this.set("evt_tx_hash", Value.fromBytes(value));
   }
 
   get evt_index(): BigInt {
@@ -405,17 +405,17 @@ export class factory_upgraded extends Entity {
     this.set("evt_block_number", Value.fromBigInt(value));
   }
 
-  get implementation(): string {
+  get implementation(): Bytes {
     let value = this.get("implementation");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toString();
+      return value.toBytes();
     }
   }
 
-  set implementation(value: string) {
-    this.set("implementation", Value.fromString(value));
+  set implementation(value: Bytes) {
+    this.set("implementation", Value.fromBytes(value));
   }
 }
 
@@ -465,17 +465,17 @@ export class group_borrower_accepted_funds extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get evt_tx_hash(): string {
+  get evt_tx_hash(): Bytes {
     let value = this.get("evt_tx_hash");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toString();
+      return value.toBytes();
     }
   }
 
-  set evt_tx_hash(value: string) {
-    this.set("evt_tx_hash", Value.fromString(value));
+  set evt_tx_hash(value: Bytes) {
+    this.set("evt_tx_hash", Value.fromBytes(value));
   }
 
   get evt_index(): BigInt {
@@ -504,17 +504,17 @@ export class group_borrower_accepted_funds extends Entity {
     this.set("evt_block_number", Value.fromBigInt(value));
   }
 
-  get group_pool_address(): string {
+  get group_pool_address(): Bytes {
     let value = this.get("group_pool_address");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toString();
+      return value.toBytes();
     }
   }
 
-  set group_pool_address(value: string) {
-    this.set("group_pool_address", Value.fromString(value));
+  set group_pool_address(value: Bytes) {
+    this.set("group_pool_address", Value.fromBytes(value));
   }
 
   get bid_id(): BigDecimal {
@@ -530,17 +530,17 @@ export class group_borrower_accepted_funds extends Entity {
     this.set("bid_id", Value.fromBigDecimal(value));
   }
 
-  get borrower(): string {
+  get borrower(): Bytes {
     let value = this.get("borrower");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toString();
+      return value.toBytes();
     }
   }
 
-  set borrower(value: string) {
-    this.set("borrower", Value.fromString(value));
+  set borrower(value: Bytes) {
+    this.set("borrower", Value.fromBytes(value));
   }
 
   get collateral_amount(): BigDecimal {
@@ -596,7 +596,7 @@ export class group_borrower_accepted_funds extends Entity {
   }
 }
 
-export class group_defaulted_loan_liquidated extends Entity {
+export class group_lender_added_principal extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
@@ -606,26 +606,26 @@ export class group_defaulted_loan_liquidated extends Entity {
     let id = this.get("id");
     assert(
       id != null,
-      "Cannot save group_defaulted_loan_liquidated entity without an ID",
+      "Cannot save group_lender_added_principal entity without an ID",
     );
     if (id) {
       assert(
         id.kind == ValueKind.STRING,
-        `Entities of type group_defaulted_loan_liquidated must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`,
+        `Entities of type group_lender_added_principal must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`,
       );
-      store.set("group_defaulted_loan_liquidated", id.toString(), this);
+      store.set("group_lender_added_principal", id.toString(), this);
     }
   }
 
-  static loadInBlock(id: string): group_defaulted_loan_liquidated | null {
-    return changetype<group_defaulted_loan_liquidated | null>(
-      store.get_in_block("group_defaulted_loan_liquidated", id),
+  static loadInBlock(id: string): group_lender_added_principal | null {
+    return changetype<group_lender_added_principal | null>(
+      store.get_in_block("group_lender_added_principal", id),
     );
   }
 
-  static load(id: string): group_defaulted_loan_liquidated | null {
-    return changetype<group_defaulted_loan_liquidated | null>(
-      store.get("group_defaulted_loan_liquidated", id),
+  static load(id: string): group_lender_added_principal | null {
+    return changetype<group_lender_added_principal | null>(
+      store.get("group_lender_added_principal", id),
     );
   }
 
@@ -642,17 +642,17 @@ export class group_defaulted_loan_liquidated extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get evt_tx_hash(): string {
+  get evt_tx_hash(): Bytes {
     let value = this.get("evt_tx_hash");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toString();
+      return value.toBytes();
     }
   }
 
-  set evt_tx_hash(value: string) {
-    this.set("evt_tx_hash", Value.fromString(value));
+  set evt_tx_hash(value: Bytes) {
+    this.set("evt_tx_hash", Value.fromBytes(value));
   }
 
   get evt_index(): BigInt {
@@ -681,21 +681,21 @@ export class group_defaulted_loan_liquidated extends Entity {
     this.set("evt_block_number", Value.fromBigInt(value));
   }
 
-  get group_pool_address(): string {
+  get group_pool_address(): Bytes {
     let value = this.get("group_pool_address");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toString();
+      return value.toBytes();
     }
   }
 
-  set group_pool_address(value: string) {
-    this.set("group_pool_address", Value.fromString(value));
+  set group_pool_address(value: Bytes) {
+    this.set("group_pool_address", Value.fromBytes(value));
   }
 
-  get amount_due(): BigDecimal {
-    let value = this.get("amount_due");
+  get amount(): BigDecimal {
+    let value = this.get("amount");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
@@ -703,12 +703,25 @@ export class group_defaulted_loan_liquidated extends Entity {
     }
   }
 
-  set amount_due(value: BigDecimal) {
-    this.set("amount_due", Value.fromBigDecimal(value));
+  set amount(value: BigDecimal) {
+    this.set("amount", Value.fromBigDecimal(value));
   }
 
-  get bid_id(): BigDecimal {
-    let value = this.get("bid_id");
+  get lender(): Bytes {
+    let value = this.get("lender");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set lender(value: Bytes) {
+    this.set("lender", Value.fromBytes(value));
+  }
+
+  get shares_amount(): BigDecimal {
+    let value = this.get("shares_amount");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
@@ -716,34 +729,21 @@ export class group_defaulted_loan_liquidated extends Entity {
     }
   }
 
-  set bid_id(value: BigDecimal) {
-    this.set("bid_id", Value.fromBigDecimal(value));
+  set shares_amount(value: BigDecimal) {
+    this.set("shares_amount", Value.fromBigDecimal(value));
   }
 
-  get liquidator(): string {
-    let value = this.get("liquidator");
+  get shares_recipient(): Bytes {
+    let value = this.get("shares_recipient");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toString();
+      return value.toBytes();
     }
   }
 
-  set liquidator(value: string) {
-    this.set("liquidator", Value.fromString(value));
-  }
-
-  get token_amount_difference(): BigDecimal {
-    let value = this.get("token_amount_difference");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toBigDecimal();
-    }
-  }
-
-  set token_amount_difference(value: BigDecimal) {
-    this.set("token_amount_difference", Value.fromBigDecimal(value));
+  set shares_recipient(value: Bytes) {
+    this.set("shares_recipient", Value.fromBytes(value));
   }
 }
 
@@ -793,17 +793,17 @@ export class group_earnings_withdrawn extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get evt_tx_hash(): string {
+  get evt_tx_hash(): Bytes {
     let value = this.get("evt_tx_hash");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toString();
+      return value.toBytes();
     }
   }
 
-  set evt_tx_hash(value: string) {
-    this.set("evt_tx_hash", Value.fromString(value));
+  set evt_tx_hash(value: Bytes) {
+    this.set("evt_tx_hash", Value.fromBytes(value));
   }
 
   get evt_index(): BigInt {
@@ -832,17 +832,17 @@ export class group_earnings_withdrawn extends Entity {
     this.set("evt_block_number", Value.fromBigInt(value));
   }
 
-  get group_pool_address(): string {
+  get group_pool_address(): Bytes {
     let value = this.get("group_pool_address");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toString();
+      return value.toBytes();
     }
   }
 
-  set group_pool_address(value: string) {
-    this.set("group_pool_address", Value.fromString(value));
+  set group_pool_address(value: Bytes) {
+    this.set("group_pool_address", Value.fromBytes(value));
   }
 
   get amount_pool_shares_tokens(): BigDecimal {
@@ -858,17 +858,17 @@ export class group_earnings_withdrawn extends Entity {
     this.set("amount_pool_shares_tokens", Value.fromBigDecimal(value));
   }
 
-  get lender(): string {
+  get lender(): Bytes {
     let value = this.get("lender");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toString();
+      return value.toBytes();
     }
   }
 
-  set lender(value: string) {
-    this.set("lender", Value.fromString(value));
+  set lender(value: Bytes) {
+    this.set("lender", Value.fromBytes(value));
   }
 
   get principal_tokens_withdrawn(): BigDecimal {
@@ -884,8 +884,55 @@ export class group_earnings_withdrawn extends Entity {
     this.set("principal_tokens_withdrawn", Value.fromBigDecimal(value));
   }
 
-  get recipient(): string {
+  get recipient(): Bytes {
     let value = this.get("recipient");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set recipient(value: Bytes) {
+    this.set("recipient", Value.fromBytes(value));
+  }
+}
+
+export class group_defaulted_loan_liquidated extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(
+      id != null,
+      "Cannot save group_defaulted_loan_liquidated entity without an ID",
+    );
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        `Entities of type group_defaulted_loan_liquidated must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`,
+      );
+      store.set("group_defaulted_loan_liquidated", id.toString(), this);
+    }
+  }
+
+  static loadInBlock(id: string): group_defaulted_loan_liquidated | null {
+    return changetype<group_defaulted_loan_liquidated | null>(
+      store.get_in_block("group_defaulted_loan_liquidated", id),
+    );
+  }
+
+  static load(id: string): group_defaulted_loan_liquidated | null {
+    return changetype<group_defaulted_loan_liquidated | null>(
+      store.get("group_defaulted_loan_liquidated", id),
+    );
+  }
+
+  get id(): string {
+    let value = this.get("id");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
@@ -893,8 +940,112 @@ export class group_earnings_withdrawn extends Entity {
     }
   }
 
-  set recipient(value: string) {
-    this.set("recipient", Value.fromString(value));
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get evt_tx_hash(): Bytes {
+    let value = this.get("evt_tx_hash");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set evt_tx_hash(value: Bytes) {
+    this.set("evt_tx_hash", Value.fromBytes(value));
+  }
+
+  get evt_index(): BigInt {
+    let value = this.get("evt_index");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set evt_index(value: BigInt) {
+    this.set("evt_index", Value.fromBigInt(value));
+  }
+
+  get evt_block_number(): BigInt {
+    let value = this.get("evt_block_number");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set evt_block_number(value: BigInt) {
+    this.set("evt_block_number", Value.fromBigInt(value));
+  }
+
+  get group_pool_address(): Bytes {
+    let value = this.get("group_pool_address");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set group_pool_address(value: Bytes) {
+    this.set("group_pool_address", Value.fromBytes(value));
+  }
+
+  get amount_due(): BigDecimal {
+    let value = this.get("amount_due");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigDecimal();
+    }
+  }
+
+  set amount_due(value: BigDecimal) {
+    this.set("amount_due", Value.fromBigDecimal(value));
+  }
+
+  get bid_id(): BigDecimal {
+    let value = this.get("bid_id");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigDecimal();
+    }
+  }
+
+  set bid_id(value: BigDecimal) {
+    this.set("bid_id", Value.fromBigDecimal(value));
+  }
+
+  get liquidator(): Bytes {
+    let value = this.get("liquidator");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set liquidator(value: Bytes) {
+    this.set("liquidator", Value.fromBytes(value));
+  }
+
+  get token_amount_difference(): BigDecimal {
+    let value = this.get("token_amount_difference");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigDecimal();
+    }
+  }
+
+  set token_amount_difference(value: BigDecimal) {
+    this.set("token_amount_difference", Value.fromBigDecimal(value));
   }
 }
 
@@ -941,17 +1092,17 @@ export class group_initialized extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get evt_tx_hash(): string {
+  get evt_tx_hash(): Bytes {
     let value = this.get("evt_tx_hash");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toString();
+      return value.toBytes();
     }
   }
 
-  set evt_tx_hash(value: string) {
-    this.set("evt_tx_hash", Value.fromString(value));
+  set evt_tx_hash(value: Bytes) {
+    this.set("evt_tx_hash", Value.fromBytes(value));
   }
 
   get evt_index(): BigInt {
@@ -980,17 +1131,17 @@ export class group_initialized extends Entity {
     this.set("evt_block_number", Value.fromBigInt(value));
   }
 
-  get group_pool_address(): string {
+  get group_pool_address(): Bytes {
     let value = this.get("group_pool_address");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toString();
+      return value.toBytes();
     }
   }
 
-  set group_pool_address(value: string) {
-    this.set("group_pool_address", Value.fromString(value));
+  set group_pool_address(value: Bytes) {
+    this.set("group_pool_address", Value.fromBytes(value));
   }
 
   get version(): i32 {
@@ -1004,157 +1155,6 @@ export class group_initialized extends Entity {
 
   set version(value: i32) {
     this.set("version", Value.fromI32(value));
-  }
-}
-
-export class group_lender_added_principal extends Entity {
-  constructor(id: string) {
-    super();
-    this.set("id", Value.fromString(id));
-  }
-
-  save(): void {
-    let id = this.get("id");
-    assert(
-      id != null,
-      "Cannot save group_lender_added_principal entity without an ID",
-    );
-    if (id) {
-      assert(
-        id.kind == ValueKind.STRING,
-        `Entities of type group_lender_added_principal must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`,
-      );
-      store.set("group_lender_added_principal", id.toString(), this);
-    }
-  }
-
-  static loadInBlock(id: string): group_lender_added_principal | null {
-    return changetype<group_lender_added_principal | null>(
-      store.get_in_block("group_lender_added_principal", id),
-    );
-  }
-
-  static load(id: string): group_lender_added_principal | null {
-    return changetype<group_lender_added_principal | null>(
-      store.get("group_lender_added_principal", id),
-    );
-  }
-
-  get id(): string {
-    let value = this.get("id");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toString();
-    }
-  }
-
-  set id(value: string) {
-    this.set("id", Value.fromString(value));
-  }
-
-  get evt_tx_hash(): string {
-    let value = this.get("evt_tx_hash");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toString();
-    }
-  }
-
-  set evt_tx_hash(value: string) {
-    this.set("evt_tx_hash", Value.fromString(value));
-  }
-
-  get evt_index(): BigInt {
-    let value = this.get("evt_index");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toBigInt();
-    }
-  }
-
-  set evt_index(value: BigInt) {
-    this.set("evt_index", Value.fromBigInt(value));
-  }
-
-  get evt_block_number(): BigInt {
-    let value = this.get("evt_block_number");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toBigInt();
-    }
-  }
-
-  set evt_block_number(value: BigInt) {
-    this.set("evt_block_number", Value.fromBigInt(value));
-  }
-
-  get group_pool_address(): string {
-    let value = this.get("group_pool_address");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toString();
-    }
-  }
-
-  set group_pool_address(value: string) {
-    this.set("group_pool_address", Value.fromString(value));
-  }
-
-  get amount(): BigDecimal {
-    let value = this.get("amount");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toBigDecimal();
-    }
-  }
-
-  set amount(value: BigDecimal) {
-    this.set("amount", Value.fromBigDecimal(value));
-  }
-
-  get lender(): string {
-    let value = this.get("lender");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toString();
-    }
-  }
-
-  set lender(value: string) {
-    this.set("lender", Value.fromString(value));
-  }
-
-  get shares_amount(): BigDecimal {
-    let value = this.get("shares_amount");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toBigDecimal();
-    }
-  }
-
-  set shares_amount(value: BigDecimal) {
-    this.set("shares_amount", Value.fromBigDecimal(value));
-  }
-
-  get shares_recipient(): string {
-    let value = this.get("shares_recipient");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toString();
-    }
-  }
-
-  set shares_recipient(value: string) {
-    this.set("shares_recipient", Value.fromString(value));
   }
 }
 
@@ -1201,17 +1201,17 @@ export class group_loan_repaid extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get evt_tx_hash(): string {
+  get evt_tx_hash(): Bytes {
     let value = this.get("evt_tx_hash");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toString();
+      return value.toBytes();
     }
   }
 
-  set evt_tx_hash(value: string) {
-    this.set("evt_tx_hash", Value.fromString(value));
+  set evt_tx_hash(value: Bytes) {
+    this.set("evt_tx_hash", Value.fromBytes(value));
   }
 
   get evt_index(): BigInt {
@@ -1240,17 +1240,17 @@ export class group_loan_repaid extends Entity {
     this.set("evt_block_number", Value.fromBigInt(value));
   }
 
-  get group_pool_address(): string {
+  get group_pool_address(): Bytes {
     let value = this.get("group_pool_address");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toString();
+      return value.toBytes();
     }
   }
 
-  set group_pool_address(value: string) {
-    this.set("group_pool_address", Value.fromString(value));
+  set group_pool_address(value: Bytes) {
+    this.set("group_pool_address", Value.fromBytes(value));
   }
 
   get bid_id(): BigDecimal {
@@ -1292,17 +1292,17 @@ export class group_loan_repaid extends Entity {
     this.set("principal_amount", Value.fromBigDecimal(value));
   }
 
-  get repayer(): string {
+  get repayer(): Bytes {
     let value = this.get("repayer");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toString();
+      return value.toBytes();
     }
   }
 
-  set repayer(value: string) {
-    this.set("repayer", Value.fromString(value));
+  set repayer(value: Bytes) {
+    this.set("repayer", Value.fromBytes(value));
   }
 
   get total_interest_collected(): BigDecimal {
@@ -1378,17 +1378,17 @@ export class group_ownership_transferred extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get evt_tx_hash(): string {
+  get evt_tx_hash(): Bytes {
     let value = this.get("evt_tx_hash");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toString();
+      return value.toBytes();
     }
   }
 
-  set evt_tx_hash(value: string) {
-    this.set("evt_tx_hash", Value.fromString(value));
+  set evt_tx_hash(value: Bytes) {
+    this.set("evt_tx_hash", Value.fromBytes(value));
   }
 
   get evt_index(): BigInt {
@@ -1417,43 +1417,43 @@ export class group_ownership_transferred extends Entity {
     this.set("evt_block_number", Value.fromBigInt(value));
   }
 
-  get group_pool_address(): string {
+  get group_pool_address(): Bytes {
     let value = this.get("group_pool_address");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toString();
+      return value.toBytes();
     }
   }
 
-  set group_pool_address(value: string) {
-    this.set("group_pool_address", Value.fromString(value));
+  set group_pool_address(value: Bytes) {
+    this.set("group_pool_address", Value.fromBytes(value));
   }
 
-  get new_owner(): string {
+  get new_owner(): Bytes {
     let value = this.get("new_owner");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toString();
+      return value.toBytes();
     }
   }
 
-  set new_owner(value: string) {
-    this.set("new_owner", Value.fromString(value));
+  set new_owner(value: Bytes) {
+    this.set("new_owner", Value.fromBytes(value));
   }
 
-  get previous_owner(): string {
+  get previous_owner(): Bytes {
     let value = this.get("previous_owner");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toString();
+      return value.toBytes();
     }
   }
 
-  set previous_owner(value: string) {
-    this.set("previous_owner", Value.fromString(value));
+  set previous_owner(value: Bytes) {
+    this.set("previous_owner", Value.fromBytes(value));
   }
 }
 
@@ -1498,17 +1498,17 @@ export class group_paused extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get evt_tx_hash(): string {
+  get evt_tx_hash(): Bytes {
     let value = this.get("evt_tx_hash");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toString();
+      return value.toBytes();
     }
   }
 
-  set evt_tx_hash(value: string) {
-    this.set("evt_tx_hash", Value.fromString(value));
+  set evt_tx_hash(value: Bytes) {
+    this.set("evt_tx_hash", Value.fromBytes(value));
   }
 
   get evt_index(): BigInt {
@@ -1537,30 +1537,30 @@ export class group_paused extends Entity {
     this.set("evt_block_number", Value.fromBigInt(value));
   }
 
-  get group_pool_address(): string {
+  get group_pool_address(): Bytes {
     let value = this.get("group_pool_address");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toString();
+      return value.toBytes();
     }
   }
 
-  set group_pool_address(value: string) {
-    this.set("group_pool_address", Value.fromString(value));
+  set group_pool_address(value: Bytes) {
+    this.set("group_pool_address", Value.fromBytes(value));
   }
 
-  get account(): string {
+  get account(): Bytes {
     let value = this.get("account");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toString();
+      return value.toBytes();
     }
   }
 
-  set account(value: string) {
-    this.set("account", Value.fromString(value));
+  set account(value: Bytes) {
+    this.set("account", Value.fromBytes(value));
   }
 }
 
@@ -1610,17 +1610,17 @@ export class group_pool_initialized extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get evt_tx_hash(): string {
+  get evt_tx_hash(): Bytes {
     let value = this.get("evt_tx_hash");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toString();
+      return value.toBytes();
     }
   }
 
-  set evt_tx_hash(value: string) {
-    this.set("evt_tx_hash", Value.fromString(value));
+  set evt_tx_hash(value: Bytes) {
+    this.set("evt_tx_hash", Value.fromBytes(value));
   }
 
   get evt_index(): BigInt {
@@ -1649,30 +1649,30 @@ export class group_pool_initialized extends Entity {
     this.set("evt_block_number", Value.fromBigInt(value));
   }
 
-  get group_pool_address(): string {
+  get group_pool_address(): Bytes {
     let value = this.get("group_pool_address");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toString();
+      return value.toBytes();
     }
   }
 
-  set group_pool_address(value: string) {
-    this.set("group_pool_address", Value.fromString(value));
+  set group_pool_address(value: Bytes) {
+    this.set("group_pool_address", Value.fromBytes(value));
   }
 
-  get collateral_token_address(): string {
+  get collateral_token_address(): Bytes {
     let value = this.get("collateral_token_address");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toString();
+      return value.toBytes();
     }
   }
 
-  set collateral_token_address(value: string) {
-    this.set("collateral_token_address", Value.fromString(value));
+  set collateral_token_address(value: Bytes) {
+    this.set("collateral_token_address", Value.fromBytes(value));
   }
 
   get interest_rate_lower_bound(): i32 {
@@ -1753,30 +1753,30 @@ export class group_pool_initialized extends Entity {
     this.set("max_loan_duration", Value.fromI32(value));
   }
 
-  get pool_shares_token(): string {
+  get pool_shares_token(): Bytes {
     let value = this.get("pool_shares_token");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toString();
+      return value.toBytes();
     }
   }
 
-  set pool_shares_token(value: string) {
-    this.set("pool_shares_token", Value.fromString(value));
+  set pool_shares_token(value: Bytes) {
+    this.set("pool_shares_token", Value.fromBytes(value));
   }
 
-  get principal_token_address(): string {
+  get principal_token_address(): Bytes {
     let value = this.get("principal_token_address");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toString();
+      return value.toBytes();
     }
   }
 
-  set principal_token_address(value: string) {
-    this.set("principal_token_address", Value.fromString(value));
+  set principal_token_address(value: Bytes) {
+    this.set("principal_token_address", Value.fromBytes(value));
   }
 
   get twap_interval(): i32 {
@@ -1847,17 +1847,17 @@ export class group_unpaused extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get evt_tx_hash(): string {
+  get evt_tx_hash(): Bytes {
     let value = this.get("evt_tx_hash");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toString();
+      return value.toBytes();
     }
   }
 
-  set evt_tx_hash(value: string) {
-    this.set("evt_tx_hash", Value.fromString(value));
+  set evt_tx_hash(value: Bytes) {
+    this.set("evt_tx_hash", Value.fromBytes(value));
   }
 
   get evt_index(): BigInt {
@@ -1886,30 +1886,30 @@ export class group_unpaused extends Entity {
     this.set("evt_block_number", Value.fromBigInt(value));
   }
 
-  get group_pool_address(): string {
+  get group_pool_address(): Bytes {
     let value = this.get("group_pool_address");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toString();
+      return value.toBytes();
     }
   }
 
-  set group_pool_address(value: string) {
-    this.set("group_pool_address", Value.fromString(value));
+  set group_pool_address(value: Bytes) {
+    this.set("group_pool_address", Value.fromBytes(value));
   }
 
-  get account(): string {
+  get account(): Bytes {
     let value = this.get("account");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toString();
+      return value.toBytes();
     }
   }
 
-  set account(value: string) {
-    this.set("account", Value.fromString(value));
+  set account(value: Bytes) {
+    this.set("account", Value.fromBytes(value));
   }
 }
 
@@ -1956,95 +1956,95 @@ export class group_pool_metrics extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get group_pool_address(): string {
+  get group_pool_address(): Bytes {
     let value = this.get("group_pool_address");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toString();
+      return value.toBytes();
     }
   }
 
-  set group_pool_address(value: string) {
-    this.set("group_pool_address", Value.fromString(value));
+  set group_pool_address(value: Bytes) {
+    this.set("group_pool_address", Value.fromBytes(value));
   }
 
-  get principal_token_address(): string {
+  get principal_token_address(): Bytes {
     let value = this.get("principal_token_address");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toString();
+      return value.toBytes();
     }
   }
 
-  set principal_token_address(value: string) {
-    this.set("principal_token_address", Value.fromString(value));
+  set principal_token_address(value: Bytes) {
+    this.set("principal_token_address", Value.fromBytes(value));
   }
 
-  get collateral_token_address(): string {
+  get collateral_token_address(): Bytes {
     let value = this.get("collateral_token_address");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toString();
+      return value.toBytes();
     }
   }
 
-  set collateral_token_address(value: string) {
-    this.set("collateral_token_address", Value.fromString(value));
+  set collateral_token_address(value: Bytes) {
+    this.set("collateral_token_address", Value.fromBytes(value));
   }
 
-  get shares_token_address(): string {
+  get shares_token_address(): Bytes {
     let value = this.get("shares_token_address");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toString();
+      return value.toBytes();
     }
   }
 
-  set shares_token_address(value: string) {
-    this.set("shares_token_address", Value.fromString(value));
+  set shares_token_address(value: Bytes) {
+    this.set("shares_token_address", Value.fromBytes(value));
   }
 
-  get uniswap_v3_pool_address(): string {
+  get uniswap_v3_pool_address(): Bytes {
     let value = this.get("uniswap_v3_pool_address");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toString();
+      return value.toBytes();
     }
   }
 
-  set uniswap_v3_pool_address(value: string) {
-    this.set("uniswap_v3_pool_address", Value.fromString(value));
+  set uniswap_v3_pool_address(value: Bytes) {
+    this.set("uniswap_v3_pool_address", Value.fromBytes(value));
   }
 
-  get teller_v2_address(): string {
+  get teller_v2_address(): Bytes {
     let value = this.get("teller_v2_address");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toString();
+      return value.toBytes();
     }
   }
 
-  set teller_v2_address(value: string) {
-    this.set("teller_v2_address", Value.fromString(value));
+  set teller_v2_address(value: Bytes) {
+    this.set("teller_v2_address", Value.fromBytes(value));
   }
 
-  get smart_commitment_forwarder_address(): string {
+  get smart_commitment_forwarder_address(): Bytes {
     let value = this.get("smart_commitment_forwarder_address");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toString();
+      return value.toBytes();
     }
   }
 
-  set smart_commitment_forwarder_address(value: string) {
-    this.set("smart_commitment_forwarder_address", Value.fromString(value));
+  set smart_commitment_forwarder_address(value: Bytes) {
+    this.set("smart_commitment_forwarder_address", Value.fromBytes(value));
   }
 
   get market_id(): i32 {
@@ -2058,6 +2058,19 @@ export class group_pool_metrics extends Entity {
 
   set market_id(value: i32) {
     this.set("market_id", Value.fromI32(value));
+  }
+
+  get uniswap_pool_fee(): i32 {
+    let value = this.get("uniswap_pool_fee");
+    if (!value || value.kind == ValueKind.NULL) {
+      return 0;
+    } else {
+      return value.toI32();
+    }
+  }
+
+  set uniswap_pool_fee(value: i32) {
+    this.set("uniswap_pool_fee", Value.fromI32(value));
   }
 
   get max_loan_duration(): i32 {
@@ -2260,30 +2273,30 @@ export class group_lender_metrics extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get user_lender_address(): string {
+  get user_lender_address(): Bytes {
     let value = this.get("user_lender_address");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toString();
+      return value.toBytes();
     }
   }
 
-  set user_lender_address(value: string) {
-    this.set("user_lender_address", Value.fromString(value));
+  set user_lender_address(value: Bytes) {
+    this.set("user_lender_address", Value.fromBytes(value));
   }
 
-  get group_pool_address(): string {
+  get group_pool_address(): Bytes {
     let value = this.get("group_pool_address");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toString();
+      return value.toBytes();
     }
   }
 
-  set group_pool_address(value: string) {
-    this.set("group_pool_address", Value.fromString(value));
+  set group_pool_address(value: Bytes) {
+    this.set("group_pool_address", Value.fromBytes(value));
   }
 
   get total_principal_tokens_committed(): i32 {

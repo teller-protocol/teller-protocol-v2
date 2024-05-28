@@ -5,7 +5,29 @@
  import { Protobuf } from 'as-proto/assembly';
 
 
- import { factory_deployed_lender_group_contract } from "../generated/schema";
+ import { 
+  
+  factory_deployed_lender_group_contract,
+
+  //group_initialized,
+  group_pool_metrics,
+  group_lender_metrics,
+
+
+  group_lender_added_principal,
+  group_earnings_withdrawn,
+
+  group_borrower_accepted_funds,
+  group_loan_repaid,
+  group_defaulted_loan_liquidated,
+  
+
+
+
+
+
+
+} from "../generated/schema";
  
 export function handleSubstreamGraphOutTrigger(bytes: Uint8Array): void {
   
@@ -29,9 +51,10 @@ export function handleSubstreamGraphOutTrigger(bytes: Uint8Array): void {
       
       entity.evt_index =  BigInt.fromI32(deployedLenderGroupContractEvent.evtIndex);
 
-      // need to parse this better ! 
-      entity.group_contract = deployedLenderGroupContractEvent.groupContract.toString();  //address .. ? 
+  
+      entity.group_contract = Address.fromString(deployedLenderGroupContractEvent.groupContract.toString());
       
+
       entity.save();
 
     }

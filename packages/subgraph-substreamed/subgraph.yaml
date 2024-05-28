@@ -5,6 +5,9 @@ dataSources:
   - kind: substreams
     name: Event  # ????
     network: matic
+    abis:
+        - name: LenderCommitmentGroup_Smart
+          file: ./abis/polygon_LenderCommitmentGroup_Smart.json
     source:
       startBlock: 
       package:

@@ -5,10 +5,7 @@
  import { Protobuf } from 'as-proto/assembly';
 
 
-
- //how can i get this in here !? 
- // do i have to do this in a block handler ?
- import { LenderGroupPool } from "../../generated/LenderGroupPool";
+ 
 
 
  import { 
@@ -41,10 +38,10 @@ export function handleSubstreamGraphOutTrigger(bytes: Uint8Array): void {
   for (let i = 0; i < events.facDeployedLenderGroupContracts.length; i++) {
     let deployedLenderGroupContractEvent = events.facDeployedLenderGroupContracts[i];
 
-    let event_id = deployedLenderGroupContractEvent.evtTxHash
+    let entity_id = deployedLenderGroupContractEvent.evtTxHash
     .concat( "_" )
     .concat( deployedLenderGroupContractEvent.evtIndex.toString() );   
-    let entity = new factory_deployed_lender_group_contract( event_id );
+    let entity = new factory_deployed_lender_group_contract( entity_id );
 
     if (deployedLenderGroupContractEvent.evtBlockTime) {
 
@@ -64,25 +61,21 @@ export function handleSubstreamGraphOutTrigger(bytes: Uint8Array): void {
   } 
 
   //group pool initialized events 
-  for (let i = 0; i < events.grouppInitializeds.length; i++) {
+  for (let i = 0; i < events.grouppPoolInitializeds.length; i++) {
 
-    let initializedLenderGroupPool = events.grouppInitializeds[i];
+    let initializedLenderGroupPool = events.grouppPoolInitializeds[i];
 
     let group_pool_address = initializedLenderGroupPool.evtAddress  ;
 
-    let event_id = group_pool_address.toString() ;
-
-
-
-
-      //bind to the contract so we can call its methods 
-    const groupPoolInstance = LenderGroupPool.bind( group_pool_address );
-
-    let entity = new group_pool_metrics( event_id );
+    let entity_id = group_pool_address.toString() ;
+ 
+    let entity = new group_pool_metrics( entity_id );
     entity.group_pool_address =  Address.fromString( initializedLenderGroupPool.evtAddress );
    
-   
-    entity.principal_token_address = groupPoolInstance.principal_token_address();
+    //cast to bytes ? 
+    entity.principal_token_address = initializedLenderGroupPool.principalTokenAddress.toString();
+    entity.collateral_token_address = initializedLenderGroupPool.collateralTokenAddress.toString();
+
 
     ///fill in all the stuff we need 
 

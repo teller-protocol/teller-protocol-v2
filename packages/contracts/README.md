@@ -34,6 +34,11 @@ GOERLI_RPC_URL= ...
 > npm publish --access public
 
 
+## Export contracts to subgraph  
+
+> yarn contracts export --network {NETWORK}
+
+
 ## Forge docs 
 
  > forge doc --serve 

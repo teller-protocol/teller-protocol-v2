@@ -53,7 +53,7 @@ export const build = async (args: BuildArgs): Promise<string | undefined> => {
   }
 
   await setNetworkConfig(subgraph.network, config);
-
+  //tell the contracts repo to export the contract artifacts into subgraph repo 
   await runCmd(
     "yarn",
     [

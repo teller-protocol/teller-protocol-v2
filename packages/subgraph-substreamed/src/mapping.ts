@@ -20,11 +20,7 @@
   group_borrower_accepted_funds,
   group_loan_repaid,
   group_defaulted_loan_liquidated,
-  
-
-
-
-
+   
 
 
 } from "../generated/schema";
@@ -35,7 +31,7 @@ export function handleSubstreamGraphOutTrigger(bytes: Uint8Array): void {
   
   log.info("Decoded an event from substream trigger" , []  );
   
- 
+  //group pool deployed events 
   for (let i = 0; i < events.facDeployedLenderGroupContracts.length; i++) {
     let deployedLenderGroupContractEvent = events.facDeployedLenderGroupContracts[i];
 
@@ -59,6 +55,71 @@ export function handleSubstreamGraphOutTrigger(bytes: Uint8Array): void {
 
     }
    
-} 
+  } 
+
+  //group pool initialized events 
+  for (let i = 0; i < events.grouppInitializeds.length; i++) {
+
+    let initializedLenderGroupPool = events.grouppInitializeds[i];
+
+    let event_id = initializedLenderGroupPool.evtTxHash
+    .concat( "_" )
+    .concat( initializedLenderGroupPool.evtIndex.toString() );
+
+    let entity = new group_pool_metrics( event_id );
+
+    ///fill in all the stuff we need 
+
+    entity.save();
+
+
+  }
+
+
+  for (let i = 0; i < events.grouppLenderAddedPrincipals.length; i++) {
+
+    let lenderAddPrincipal = events.grouppLenderAddedPrincipals[i];
+
+
+
+  }
+
+
+  for (let i = 0; i < events.grouppEarningsWithdrawns.length; i++) {
+
+    let lenderWithdrawEarnings = events.grouppEarningsWithdrawns[i];
+
+
+
+  }
+
+
+  for (let i = 0; i < events.grouppBorrowerAcceptedFunds.length; i++) {
+
+    let borrowerAcceptedFunds = events.grouppBorrowerAcceptedFunds[i];
+
+
+
+  }
+
+
+  for (let i = 0; i < events.grouppLoanRepaids.length; i++) {
+
+    let borrowerRepaidLoan = events.grouppLoanRepaids[i];
+
+
+
+
+  }
+
+
+  for (let i = 0; i < events.grouppDefaultedLoanLiquidateds.length; i++) {
+
+    let defaultedLoanLiquidation = events.grouppDefaultedLoanLiquidateds[i];
+
+
+
+
+  }
  
 }

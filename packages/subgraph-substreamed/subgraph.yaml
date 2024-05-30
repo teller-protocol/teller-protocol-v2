@@ -15,4 +15,5 @@ dataSources:
       apiVersion: 0.0.7
       file: ./src/mapping.ts
       handler: handleSubstreamGraphOutTrigger
+       
   

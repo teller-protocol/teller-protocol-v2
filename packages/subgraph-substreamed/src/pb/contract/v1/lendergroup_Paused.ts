@@ -5,8 +5,8 @@
 import { Writer, Reader } from "as-proto/assembly";
 import { Timestamp } from "../../google/protobuf/Timestamp";
 
-export class groupp_Paused {
-  static encode(message: groupp_Paused, writer: Writer): void {
+export class lendergroup_Paused {
+  static encode(message: lendergroup_Paused, writer: Writer): void {
     writer.uint32(10);
     writer.string(message.evtTxHash);
 
@@ -31,9 +31,9 @@ export class groupp_Paused {
     writer.bytes(message.account);
   }
 
-  static decode(reader: Reader, length: i32): groupp_Paused {
+  static decode(reader: Reader, length: i32): lendergroup_Paused {
     const end: usize = length < 0 ? reader.end : reader.ptr + length;
-    const message = new groupp_Paused();
+    const message = new lendergroup_Paused();
 
     while (reader.ptr < end) {
       const tag = reader.uint32();

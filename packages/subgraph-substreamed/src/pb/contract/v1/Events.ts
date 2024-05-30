@@ -3,149 +3,158 @@
 //   protoc-gen-as v1.3.0
 
 import { Writer, Reader } from "as-proto/assembly";
-import { fac_AdminChanged } from "./fac_AdminChanged";
-import { fac_BeaconUpgraded } from "./fac_BeaconUpgraded";
-import { fac_DeployedLenderGroupContract } from "./fac_DeployedLenderGroupContract";
-import { fac_Upgraded } from "./fac_Upgraded";
-import { groupp_BorrowerAcceptedFunds } from "./groupp_BorrowerAcceptedFunds";
-import { groupp_DefaultedLoanLiquidated } from "./groupp_DefaultedLoanLiquidated";
-import { groupp_EarningsWithdrawn } from "./groupp_EarningsWithdrawn";
-import { groupp_Initialized } from "./groupp_Initialized";
-import { groupp_LenderAddedPrincipal } from "./groupp_LenderAddedPrincipal";
-import { groupp_LoanRepaid } from "./groupp_LoanRepaid";
-import { groupp_OwnershipTransferred } from "./groupp_OwnershipTransferred";
-import { groupp_Paused } from "./groupp_Paused";
-import { groupp_PoolInitialized } from "./groupp_PoolInitialized";
-import { groupp_Unpaused } from "./groupp_Unpaused";
+import { factory_AdminChanged } from "./factory_AdminChanged";
+import { factory_BeaconUpgraded } from "./factory_BeaconUpgraded";
+import { factory_DeployedLenderGroupContract } from "./factory_DeployedLenderGroupContract";
+import { factory_Upgraded } from "./factory_Upgraded";
+import { lendergroup_BorrowerAcceptedFunds } from "./lendergroup_BorrowerAcceptedFunds";
+import { lendergroup_DefaultedLoanLiquidated } from "./lendergroup_DefaultedLoanLiquidated";
+import { lendergroup_EarningsWithdrawn } from "./lendergroup_EarningsWithdrawn";
+import { lendergroup_Initialized } from "./lendergroup_Initialized";
+import { lendergroup_LenderAddedPrincipal } from "./lendergroup_LenderAddedPrincipal";
+import { lendergroup_LoanRepaid } from "./lendergroup_LoanRepaid";
+import { lendergroup_OwnershipTransferred } from "./lendergroup_OwnershipTransferred";
+import { lendergroup_Paused } from "./lendergroup_Paused";
+import { lendergroup_PoolInitialized } from "./lendergroup_PoolInitialized";
+import { lendergroup_Unpaused } from "./lendergroup_Unpaused";
 
 export class Events {
   static encode(message: Events, writer: Writer): void {
-    const facAdminChangeds = message.facAdminChangeds;
-    for (let i: i32 = 0; i < facAdminChangeds.length; ++i) {
+    const factoryAdminChangeds = message.factoryAdminChangeds;
+    for (let i: i32 = 0; i < factoryAdminChangeds.length; ++i) {
       writer.uint32(10);
       writer.fork();
-      fac_AdminChanged.encode(facAdminChangeds[i], writer);
+      factory_AdminChanged.encode(factoryAdminChangeds[i], writer);
       writer.ldelim();
     }
 
-    const facBeaconUpgradeds = message.facBeaconUpgradeds;
-    for (let i: i32 = 0; i < facBeaconUpgradeds.length; ++i) {
+    const factoryBeaconUpgradeds = message.factoryBeaconUpgradeds;
+    for (let i: i32 = 0; i < factoryBeaconUpgradeds.length; ++i) {
       writer.uint32(18);
       writer.fork();
-      fac_BeaconUpgraded.encode(facBeaconUpgradeds[i], writer);
+      factory_BeaconUpgraded.encode(factoryBeaconUpgradeds[i], writer);
       writer.ldelim();
     }
 
-    const facDeployedLenderGroupContracts =
-      message.facDeployedLenderGroupContracts;
-    for (let i: i32 = 0; i < facDeployedLenderGroupContracts.length; ++i) {
+    const factoryDeployedLenderGroupContracts =
+      message.factoryDeployedLenderGroupContracts;
+    for (let i: i32 = 0; i < factoryDeployedLenderGroupContracts.length; ++i) {
       writer.uint32(26);
       writer.fork();
-      fac_DeployedLenderGroupContract.encode(
-        facDeployedLenderGroupContracts[i],
+      factory_DeployedLenderGroupContract.encode(
+        factoryDeployedLenderGroupContracts[i],
         writer
       );
       writer.ldelim();
     }
 
-    const facUpgradeds = message.facUpgradeds;
-    for (let i: i32 = 0; i < facUpgradeds.length; ++i) {
+    const factoryUpgradeds = message.factoryUpgradeds;
+    for (let i: i32 = 0; i < factoryUpgradeds.length; ++i) {
       writer.uint32(34);
       writer.fork();
-      fac_Upgraded.encode(facUpgradeds[i], writer);
+      factory_Upgraded.encode(factoryUpgradeds[i], writer);
       writer.ldelim();
     }
 
-    const grouppBorrowerAcceptedFunds = message.grouppBorrowerAcceptedFunds;
-    for (let i: i32 = 0; i < grouppBorrowerAcceptedFunds.length; ++i) {
+    const lendergroupBorrowerAcceptedFunds =
+      message.lendergroupBorrowerAcceptedFunds;
+    for (let i: i32 = 0; i < lendergroupBorrowerAcceptedFunds.length; ++i) {
       writer.uint32(42);
       writer.fork();
-      groupp_BorrowerAcceptedFunds.encode(
-        grouppBorrowerAcceptedFunds[i],
+      lendergroup_BorrowerAcceptedFunds.encode(
+        lendergroupBorrowerAcceptedFunds[i],
         writer
       );
       writer.ldelim();
     }
 
-    const grouppDefaultedLoanLiquidateds =
-      message.grouppDefaultedLoanLiquidateds;
-    for (let i: i32 = 0; i < grouppDefaultedLoanLiquidateds.length; ++i) {
+    const lendergroupDefaultedLoanLiquidateds =
+      message.lendergroupDefaultedLoanLiquidateds;
+    for (let i: i32 = 0; i < lendergroupDefaultedLoanLiquidateds.length; ++i) {
       writer.uint32(50);
       writer.fork();
-      groupp_DefaultedLoanLiquidated.encode(
-        grouppDefaultedLoanLiquidateds[i],
+      lendergroup_DefaultedLoanLiquidated.encode(
+        lendergroupDefaultedLoanLiquidateds[i],
         writer
       );
       writer.ldelim();
     }
 
-    const grouppEarningsWithdrawns = message.grouppEarningsWithdrawns;
-    for (let i: i32 = 0; i < grouppEarningsWithdrawns.length; ++i) {
+    const lendergroupEarningsWithdrawns = message.lendergroupEarningsWithdrawns;
+    for (let i: i32 = 0; i < lendergroupEarningsWithdrawns.length; ++i) {
       writer.uint32(58);
       writer.fork();
-      groupp_EarningsWithdrawn.encode(grouppEarningsWithdrawns[i], writer);
+      lendergroup_EarningsWithdrawn.encode(
+        lendergroupEarningsWithdrawns[i],
+        writer
+      );
       writer.ldelim();
     }
 
-    const grouppInitializeds = message.grouppInitializeds;
-    for (let i: i32 = 0; i < grouppInitializeds.length; ++i) {
+    const lendergroupInitializeds = message.lendergroupInitializeds;
+    for (let i: i32 = 0; i < lendergroupInitializeds.length; ++i) {
       writer.uint32(66);
       writer.fork();
-      groupp_Initialized.encode(grouppInitializeds[i], writer);
+      lendergroup_Initialized.encode(lendergroupInitializeds[i], writer);
       writer.ldelim();
     }
 
-    const grouppLenderAddedPrincipals = message.grouppLenderAddedPrincipals;
-    for (let i: i32 = 0; i < grouppLenderAddedPrincipals.length; ++i) {
+    const lendergroupLenderAddedPrincipals =
+      message.lendergroupLenderAddedPrincipals;
+    for (let i: i32 = 0; i < lendergroupLenderAddedPrincipals.length; ++i) {
       writer.uint32(74);
       writer.fork();
-      groupp_LenderAddedPrincipal.encode(
-        grouppLenderAddedPrincipals[i],
+      lendergroup_LenderAddedPrincipal.encode(
+        lendergroupLenderAddedPrincipals[i],
         writer
       );
       writer.ldelim();
     }
 
-    const grouppLoanRepaids = message.grouppLoanRepaids;
-    for (let i: i32 = 0; i < grouppLoanRepaids.length; ++i) {
+    const lendergroupLoanRepaids = message.lendergroupLoanRepaids;
+    for (let i: i32 = 0; i < lendergroupLoanRepaids.length; ++i) {
       writer.uint32(82);
       writer.fork();
-      groupp_LoanRepaid.encode(grouppLoanRepaids[i], writer);
+      lendergroup_LoanRepaid.encode(lendergroupLoanRepaids[i], writer);
       writer.ldelim();
     }
 
-    const grouppOwnershipTransferreds = message.grouppOwnershipTransferreds;
-    for (let i: i32 = 0; i < grouppOwnershipTransferreds.length; ++i) {
+    const lendergroupOwnershipTransferreds =
+      message.lendergroupOwnershipTransferreds;
+    for (let i: i32 = 0; i < lendergroupOwnershipTransferreds.length; ++i) {
       writer.uint32(90);
       writer.fork();
-      groupp_OwnershipTransferred.encode(
-        grouppOwnershipTransferreds[i],
+      lendergroup_OwnershipTransferred.encode(
+        lendergroupOwnershipTransferreds[i],
         writer
       );
       writer.ldelim();
     }
 
-    const grouppPauseds = message.grouppPauseds;
-    for (let i: i32 = 0; i < grouppPauseds.length; ++i) {
+    const lendergroupPauseds = message.lendergroupPauseds;
+    for (let i: i32 = 0; i < lendergroupPauseds.length; ++i) {
       writer.uint32(98);
       writer.fork();
-      groupp_Paused.encode(grouppPauseds[i], writer);
+      lendergroup_Paused.encode(lendergroupPauseds[i], writer);
       writer.ldelim();
     }
 
-    const grouppPoolInitializeds = message.grouppPoolInitializeds;
-    for (let i: i32 = 0; i < grouppPoolInitializeds.length; ++i) {
+    const lendergroupPoolInitializeds = message.lendergroupPoolInitializeds;
+    for (let i: i32 = 0; i < lendergroupPoolInitializeds.length; ++i) {
       writer.uint32(106);
       writer.fork();
-      groupp_PoolInitialized.encode(grouppPoolInitializeds[i], writer);
+      lendergroup_PoolInitialized.encode(
+        lendergroupPoolInitializeds[i],
+        writer
+      );
       writer.ldelim();
     }
 
-    const grouppUnpauseds = message.grouppUnpauseds;
-    for (let i: i32 = 0; i < grouppUnpauseds.length; ++i) {
+    const lendergroupUnpauseds = message.lendergroupUnpauseds;
+    for (let i: i32 = 0; i < lendergroupUnpauseds.length; ++i) {
       writer.uint32(114);
       writer.fork();
-      groupp_Unpaused.encode(grouppUnpauseds[i], writer);
+      lendergroup_Unpaused.encode(lendergroupUnpauseds[i], writer);
       writer.ldelim();
     }
   }
@@ -158,86 +167,86 @@ export class Events {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.facAdminChangeds.push(
-            fac_AdminChanged.decode(reader, reader.uint32())
+          message.factoryAdminChangeds.push(
+            factory_AdminChanged.decode(reader, reader.uint32())
           );
           break;
 
         case 2:
-          message.facBeaconUpgradeds.push(
-            fac_BeaconUpgraded.decode(reader, reader.uint32())
+          message.factoryBeaconUpgradeds.push(
+            factory_BeaconUpgraded.decode(reader, reader.uint32())
           );
           break;
 
         case 3:
-          message.facDeployedLenderGroupContracts.push(
-            fac_DeployedLenderGroupContract.decode(reader, reader.uint32())
+          message.factoryDeployedLenderGroupContracts.push(
+            factory_DeployedLenderGroupContract.decode(reader, reader.uint32())
           );
           break;
 
         case 4:
-          message.facUpgradeds.push(
-            fac_Upgraded.decode(reader, reader.uint32())
+          message.factoryUpgradeds.push(
+            factory_Upgraded.decode(reader, reader.uint32())
           );
           break;
 
         case 5:
-          message.grouppBorrowerAcceptedFunds.push(
-            groupp_BorrowerAcceptedFunds.decode(reader, reader.uint32())
+          message.lendergroupBorrowerAcceptedFunds.push(
+            lendergroup_BorrowerAcceptedFunds.decode(reader, reader.uint32())
           );
           break;
 
         case 6:
-          message.grouppDefaultedLoanLiquidateds.push(
-            groupp_DefaultedLoanLiquidated.decode(reader, reader.uint32())
+          message.lendergroupDefaultedLoanLiquidateds.push(
+            lendergroup_DefaultedLoanLiquidated.decode(reader, reader.uint32())
           );
           break;
 
         case 7:
-          message.grouppEarningsWithdrawns.push(
-            groupp_EarningsWithdrawn.decode(reader, reader.uint32())
+          message.lendergroupEarningsWithdrawns.push(
+            lendergroup_EarningsWithdrawn.decode(reader, reader.uint32())
           );
           break;
 
         case 8:
-          message.grouppInitializeds.push(
-            groupp_Initialized.decode(reader, reader.uint32())
+          message.lendergroupInitializeds.push(
+            lendergroup_Initialized.decode(reader, reader.uint32())
           );
           break;
 
         case 9:
-          message.grouppLenderAddedPrincipals.push(
-            groupp_LenderAddedPrincipal.decode(reader, reader.uint32())
+          message.lendergroupLenderAddedPrincipals.push(
+            lendergroup_LenderAddedPrincipal.decode(reader, reader.uint32())
           );
           break;
 
         case 10:
-          message.grouppLoanRepaids.push(
-            groupp_LoanRepaid.decode(reader, reader.uint32())
+          message.lendergroupLoanRepaids.push(
+            lendergroup_LoanRepaid.decode(reader, reader.uint32())
           );
           break;
 
         case 11:
-          message.grouppOwnershipTransferreds.push(
-            groupp_OwnershipTransferred.decode(reader, reader.uint32())
+          message.lendergroupOwnershipTransferreds.push(
+            lendergroup_OwnershipTransferred.decode(reader, reader.uint32())
           );
           break;
 
         case 12:
-          message.grouppPauseds.push(
-            groupp_Paused.decode(reader, reader.uint32())
+          message.lendergroupPauseds.push(
+            lendergroup_Paused.decode(reader, reader.uint32())
           );
           break;
 
         case 13:
-          message.grouppPoolInitializeds.push(
-            groupp_PoolInitialized.decode(reader, reader.uint32())
+          message.lendergroupPoolInitializeds.push(
+            lendergroup_PoolInitialized.decode(reader, reader.uint32())
           );
           break;
 
         case 14:
-          message.grouppUnpauseds.push(
-            groupp_Unpaused.decode(reader, reader.uint32())
+          message.lendergroupUnpauseds.push(
+            lendergroup_Unpaused.decode(reader, reader.uint32())
           );
           break;
 
@@ -250,50 +259,52 @@ export class Events {
     return message;
   }
 
-  facAdminChangeds: Array<fac_AdminChanged>;
-  facBeaconUpgradeds: Array<fac_BeaconUpgraded>;
-  facDeployedLenderGroupContracts: Array<fac_DeployedLenderGroupContract>;
-  facUpgradeds: Array<fac_Upgraded>;
-  grouppBorrowerAcceptedFunds: Array<groupp_BorrowerAcceptedFunds>;
-  grouppDefaultedLoanLiquidateds: Array<groupp_DefaultedLoanLiquidated>;
-  grouppEarningsWithdrawns: Array<groupp_EarningsWithdrawn>;
-  grouppInitializeds: Array<groupp_Initialized>;
-  grouppLenderAddedPrincipals: Array<groupp_LenderAddedPrincipal>;
-  grouppLoanRepaids: Array<groupp_LoanRepaid>;
-  grouppOwnershipTransferreds: Array<groupp_OwnershipTransferred>;
-  grouppPauseds: Array<groupp_Paused>;
-  grouppPoolInitializeds: Array<groupp_PoolInitialized>;
-  grouppUnpauseds: Array<groupp_Unpaused>;
+  factoryAdminChangeds: Array<factory_AdminChanged>;
+  factoryBeaconUpgradeds: Array<factory_BeaconUpgraded>;
+  factoryDeployedLenderGroupContracts: Array<factory_DeployedLenderGroupContract>;
+  factoryUpgradeds: Array<factory_Upgraded>;
+  lendergroupBorrowerAcceptedFunds: Array<lendergroup_BorrowerAcceptedFunds>;
+  lendergroupDefaultedLoanLiquidateds: Array<lendergroup_DefaultedLoanLiquidated>;
+  lendergroupEarningsWithdrawns: Array<lendergroup_EarningsWithdrawn>;
+  lendergroupInitializeds: Array<lendergroup_Initialized>;
+  lendergroupLenderAddedPrincipals: Array<lendergroup_LenderAddedPrincipal>;
+  lendergroupLoanRepaids: Array<lendergroup_LoanRepaid>;
+  lendergroupOwnershipTransferreds: Array<lendergroup_OwnershipTransferred>;
+  lendergroupPauseds: Array<lendergroup_Paused>;
+  lendergroupPoolInitializeds: Array<lendergroup_PoolInitialized>;
+  lendergroupUnpauseds: Array<lendergroup_Unpaused>;
 
   constructor(
-    facAdminChangeds: Array<fac_AdminChanged> = [],
-    facBeaconUpgradeds: Array<fac_BeaconUpgraded> = [],
-    facDeployedLenderGroupContracts: Array<fac_DeployedLenderGroupContract> = [],
-    facUpgradeds: Array<fac_Upgraded> = [],
-    grouppBorrowerAcceptedFunds: Array<groupp_BorrowerAcceptedFunds> = [],
-    grouppDefaultedLoanLiquidateds: Array<groupp_DefaultedLoanLiquidated> = [],
-    grouppEarningsWithdrawns: Array<groupp_EarningsWithdrawn> = [],
-    grouppInitializeds: Array<groupp_Initialized> = [],
-    grouppLenderAddedPrincipals: Array<groupp_LenderAddedPrincipal> = [],
-    grouppLoanRepaids: Array<groupp_LoanRepaid> = [],
-    grouppOwnershipTransferreds: Array<groupp_OwnershipTransferred> = [],
-    grouppPauseds: Array<groupp_Paused> = [],
-    grouppPoolInitializeds: Array<groupp_PoolInitialized> = [],
-    grouppUnpauseds: Array<groupp_Unpaused> = []
+    factoryAdminChangeds: Array<factory_AdminChanged> = [],
+    factoryBeaconUpgradeds: Array<factory_BeaconUpgraded> = [],
+    factoryDeployedLenderGroupContracts: Array<factory_DeployedLenderGroupContract> = [],
+    factoryUpgradeds: Array<factory_Upgraded> = [],
+    lendergroupBorrowerAcceptedFunds: Array<lendergroup_BorrowerAcceptedFunds> = [],
+    lendergroupDefaultedLoanLiquidateds: Array<lendergroup_DefaultedLoanLiquidated> = [],
+    lendergroupEarningsWithdrawns: Array<lendergroup_EarningsWithdrawn> = [],
+    lendergroupInitializeds: Array<lendergroup_Initialized> = [],
+    lendergroupLenderAddedPrincipals: Array<lendergroup_LenderAddedPrincipal> = [],
+    lendergroupLoanRepaids: Array<lendergroup_LoanRepaid> = [],
+    lendergroupOwnershipTransferreds: Array<lendergroup_OwnershipTransferred> = [],
+    lendergroupPauseds: Array<lendergroup_Paused> = [],
+    lendergroupPoolInitializeds: Array<lendergroup_PoolInitialized> = [],
+    lendergroupUnpauseds: Array<lendergroup_Unpaused> = []
   ) {
-    this.facAdminChangeds = facAdminChangeds;
-    this.facBeaconUpgradeds = facBeaconUpgradeds;
-    this.facDeployedLenderGroupContracts = facDeployedLenderGroupContracts;
-    this.facUpgradeds = facUpgradeds;
-    this.grouppBorrowerAcceptedFunds = grouppBorrowerAcceptedFunds;
-    this.grouppDefaultedLoanLiquidateds = grouppDefaultedLoanLiquidateds;
-    this.grouppEarningsWithdrawns = grouppEarningsWithdrawns;
-    this.grouppInitializeds = grouppInitializeds;
-    this.grouppLenderAddedPrincipals = grouppLenderAddedPrincipals;
-    this.grouppLoanRepaids = grouppLoanRepaids;
-    this.grouppOwnershipTransferreds = grouppOwnershipTransferreds;
-    this.grouppPauseds = grouppPauseds;
-    this.grouppPoolInitializeds = grouppPoolInitializeds;
-    this.grouppUnpauseds = grouppUnpauseds;
+    this.factoryAdminChangeds = factoryAdminChangeds;
+    this.factoryBeaconUpgradeds = factoryBeaconUpgradeds;
+    this.factoryDeployedLenderGroupContracts =
+      factoryDeployedLenderGroupContracts;
+    this.factoryUpgradeds = factoryUpgradeds;
+    this.lendergroupBorrowerAcceptedFunds = lendergroupBorrowerAcceptedFunds;
+    this.lendergroupDefaultedLoanLiquidateds =
+      lendergroupDefaultedLoanLiquidateds;
+    this.lendergroupEarningsWithdrawns = lendergroupEarningsWithdrawns;
+    this.lendergroupInitializeds = lendergroupInitializeds;
+    this.lendergroupLenderAddedPrincipals = lendergroupLenderAddedPrincipals;
+    this.lendergroupLoanRepaids = lendergroupLoanRepaids;
+    this.lendergroupOwnershipTransferreds = lendergroupOwnershipTransferreds;
+    this.lendergroupPauseds = lendergroupPauseds;
+    this.lendergroupPoolInitializeds = lendergroupPoolInitializeds;
+    this.lendergroupUnpauseds = lendergroupUnpauseds;
   }
 }

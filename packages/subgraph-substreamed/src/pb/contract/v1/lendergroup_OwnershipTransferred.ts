@@ -5,8 +5,11 @@
 import { Writer, Reader } from "as-proto/assembly";
 import { Timestamp } from "../../google/protobuf/Timestamp";
 
-export class groupp_LoanRepaid {
-  static encode(message: groupp_LoanRepaid, writer: Writer): void {
+export class lendergroup_OwnershipTransferred {
+  static encode(
+    message: lendergroup_OwnershipTransferred,
+    writer: Writer
+  ): void {
     writer.uint32(10);
     writer.string(message.evtTxHash);
 
@@ -28,27 +31,15 @@ export class groupp_LoanRepaid {
     writer.string(message.evtAddress);
 
     writer.uint32(50);
-    writer.string(message.bidId);
+    writer.bytes(message.previousOwner);
 
     writer.uint32(58);
-    writer.bytes(message.repayer);
-
-    writer.uint32(66);
-    writer.string(message.principalAmount);
-
-    writer.uint32(74);
-    writer.string(message.interestAmount);
-
-    writer.uint32(82);
-    writer.string(message.totalPrincipalRepaid);
-
-    writer.uint32(90);
-    writer.string(message.totalInterestCollected);
+    writer.bytes(message.newOwner);
   }
 
-  static decode(reader: Reader, length: i32): groupp_LoanRepaid {
+  static decode(reader: Reader, length: i32): lendergroup_OwnershipTransferred {
     const end: usize = length < 0 ? reader.end : reader.ptr + length;
-    const message = new groupp_LoanRepaid();
+    const message = new lendergroup_OwnershipTransferred();
 
     while (reader.ptr < end) {
       const tag = reader.uint32();
@@ -74,27 +65,11 @@ export class groupp_LoanRepaid {
           break;
 
         case 6:
-          message.bidId = reader.string();
+          message.previousOwner = reader.bytes();
           break;
 
         case 7:
-          message.repayer = reader.bytes();
-          break;
-
-        case 8:
-          message.principalAmount = reader.string();
-          break;
-
-        case 9:
-          message.interestAmount = reader.string();
-          break;
-
-        case 10:
-          message.totalPrincipalRepaid = reader.string();
-          break;
-
-        case 11:
-          message.totalInterestCollected = reader.string();
+          message.newOwner = reader.bytes();
           break;
 
         default:
@@ -111,12 +86,8 @@ export class groupp_LoanRepaid {
   evtBlockTime: Timestamp | null;
   evtBlockNumber: u64;
   evtAddress: string;
-  bidId: string;
-  repayer: Uint8Array;
-  principalAmount: string;
-  interestAmount: string;
-  totalPrincipalRepaid: string;
-  totalInterestCollected: string;
+  previousOwner: Uint8Array;
+  newOwner: Uint8Array;
 
   constructor(
     evtTxHash: string = "",
@@ -124,23 +95,15 @@ export class groupp_LoanRepaid {
     evtBlockTime: Timestamp | null = null,
     evtBlockNumber: u64 = 0,
     evtAddress: string = "",
-    bidId: string = "",
-    repayer: Uint8Array = new Uint8Array(0),
-    principalAmount: string = "",
-    interestAmount: string = "",
-    totalPrincipalRepaid: string = "",
-    totalInterestCollected: string = ""
+    previousOwner: Uint8Array = new Uint8Array(0),
+    newOwner: Uint8Array = new Uint8Array(0)
   ) {
     this.evtTxHash = evtTxHash;
     this.evtIndex = evtIndex;
     this.evtBlockTime = evtBlockTime;
     this.evtBlockNumber = evtBlockNumber;
     this.evtAddress = evtAddress;
-    this.bidId = bidId;
-    this.repayer = repayer;
-    this.principalAmount = principalAmount;
-    this.interestAmount = interestAmount;
-    this.totalPrincipalRepaid = totalPrincipalRepaid;
-    this.totalInterestCollected = totalInterestCollected;
+    this.previousOwner = previousOwner;
+    this.newOwner = newOwner;
   }
 }

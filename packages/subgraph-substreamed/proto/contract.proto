@@ -5,23 +5,23 @@ import "google/protobuf/timestamp.proto";
 package contract.v1;
 
 message Events {
-    repeated fac_AdminChanged fac_admin_changeds = 1;
-    repeated fac_BeaconUpgraded fac_beacon_upgradeds = 2;
-    repeated fac_DeployedLenderGroupContract fac_deployed_lender_group_contracts = 3;
-    repeated fac_Upgraded fac_upgradeds = 4;
-    repeated groupp_BorrowerAcceptedFunds groupp_borrower_accepted_funds = 5;
-    repeated groupp_DefaultedLoanLiquidated groupp_defaulted_loan_liquidateds = 6;
-    repeated groupp_EarningsWithdrawn groupp_earnings_withdrawns = 7;
-    repeated groupp_Initialized groupp_initializeds = 8;
-    repeated groupp_LenderAddedPrincipal groupp_lender_added_principals = 9;
-    repeated groupp_LoanRepaid groupp_loan_repaids = 10;
-    repeated groupp_OwnershipTransferred groupp_ownership_transferreds = 11;
-    repeated groupp_Paused groupp_pauseds = 12;
-    repeated groupp_PoolInitialized groupp_pool_initializeds = 13;
-    repeated groupp_Unpaused groupp_unpauseds = 14;
+    repeated factory_AdminChanged factory_admin_changeds = 1;
+    repeated factory_BeaconUpgraded factory_beacon_upgradeds = 2;
+    repeated factory_DeployedLenderGroupContract factory_deployed_lender_group_contracts = 3;
+    repeated factory_Upgraded factory_upgradeds = 4;
+    repeated lendergroup_BorrowerAcceptedFunds lendergroup_borrower_accepted_funds = 5;
+    repeated lendergroup_DefaultedLoanLiquidated lendergroup_defaulted_loan_liquidateds = 6;
+    repeated lendergroup_EarningsWithdrawn lendergroup_earnings_withdrawns = 7;
+    repeated lendergroup_Initialized lendergroup_initializeds = 8;
+    repeated lendergroup_LenderAddedPrincipal lendergroup_lender_added_principals = 9;
+    repeated lendergroup_LoanRepaid lendergroup_loan_repaids = 10;
+    repeated lendergroup_OwnershipTransferred lendergroup_ownership_transferreds = 11;
+    repeated lendergroup_Paused lendergroup_pauseds = 12;
+    repeated lendergroup_PoolInitialized lendergroup_pool_initializeds = 13;
+    repeated lendergroup_Unpaused lendergroup_unpauseds = 14;
 }
 
-message fac_AdminChanged {
+message factory_AdminChanged {
     string evt_tx_hash = 1;
     uint32 evt_index = 2;
     google.protobuf.Timestamp evt_block_time = 3;
@@ -30,7 +30,7 @@ message fac_AdminChanged {
     bytes new_admin = 6;
 }
 
-message fac_BeaconUpgraded {
+message factory_BeaconUpgraded {
     string evt_tx_hash = 1;
     uint32 evt_index = 2;
     google.protobuf.Timestamp evt_block_time = 3;
@@ -38,7 +38,7 @@ message fac_BeaconUpgraded {
     bytes beacon = 5;
 }
 
-message fac_DeployedLenderGroupContract {
+message factory_DeployedLenderGroupContract {
     string evt_tx_hash = 1;
     uint32 evt_index = 2;
     google.protobuf.Timestamp evt_block_time = 3;
@@ -46,7 +46,7 @@ message fac_DeployedLenderGroupContract {
     bytes group_contract = 5;
 }
 
-message fac_Upgraded {
+message factory_Upgraded {
     string evt_tx_hash = 1;
     uint32 evt_index = 2;
     google.protobuf.Timestamp evt_block_time = 3;
@@ -54,7 +54,7 @@ message fac_Upgraded {
     bytes implementation = 5;
 }
 
-message groupp_BorrowerAcceptedFunds {
+message lendergroup_BorrowerAcceptedFunds {
     string evt_tx_hash = 1;
     uint32 evt_index = 2;
     google.protobuf.Timestamp evt_block_time = 3;
@@ -68,7 +68,7 @@ message groupp_BorrowerAcceptedFunds {
     uint64 interest_rate = 11;
 }
 
-message groupp_DefaultedLoanLiquidated {
+message lendergroup_DefaultedLoanLiquidated {
     string evt_tx_hash = 1;
     uint32 evt_index = 2;
     google.protobuf.Timestamp evt_block_time = 3;
@@ -80,7 +80,7 @@ message groupp_DefaultedLoanLiquidated {
     string token_amount_difference = 9;
 }
 
-message groupp_EarningsWithdrawn {
+message lendergroup_EarningsWithdrawn {
     string evt_tx_hash = 1;
     uint32 evt_index = 2;
     google.protobuf.Timestamp evt_block_time = 3;
@@ -92,7 +92,7 @@ message groupp_EarningsWithdrawn {
     bytes recipient = 9;
 }
 
-message groupp_Initialized {
+message lendergroup_Initialized {
     string evt_tx_hash = 1;
     uint32 evt_index = 2;
     google.protobuf.Timestamp evt_block_time = 3;
@@ -101,7 +101,7 @@ message groupp_Initialized {
     uint64 version = 6;
 }
 
-message groupp_LenderAddedPrincipal {
+message lendergroup_LenderAddedPrincipal {
     string evt_tx_hash = 1;
     uint32 evt_index = 2;
     google.protobuf.Timestamp evt_block_time = 3;
@@ -113,7 +113,7 @@ message groupp_LenderAddedPrincipal {
     bytes shares_recipient = 9;
 }
 
-message groupp_LoanRepaid {
+message lendergroup_LoanRepaid {
     string evt_tx_hash = 1;
     uint32 evt_index = 2;
     google.protobuf.Timestamp evt_block_time = 3;
@@ -127,7 +127,7 @@ message groupp_LoanRepaid {
     string total_interest_collected = 11;
 }
 
-message groupp_OwnershipTransferred {
+message lendergroup_OwnershipTransferred {
     string evt_tx_hash = 1;
     uint32 evt_index = 2;
     google.protobuf.Timestamp evt_block_time = 3;
@@ -137,7 +137,7 @@ message groupp_OwnershipTransferred {
     bytes new_owner = 7;
 }
 
-message groupp_Paused {
+message lendergroup_Paused {
     string evt_tx_hash = 1;
     uint32 evt_index = 2;
     google.protobuf.Timestamp evt_block_time = 3;
@@ -146,7 +146,7 @@ message groupp_Paused {
     bytes account = 6;
 }
 
-message groupp_PoolInitialized {
+message lendergroup_PoolInitialized {
     string evt_tx_hash = 1;
     uint32 evt_index = 2;
     google.protobuf.Timestamp evt_block_time = 3;
@@ -165,7 +165,7 @@ message groupp_PoolInitialized {
     bytes pool_shares_token = 16;
 }
 
-message groupp_Unpaused {
+message lendergroup_Unpaused {
     string evt_tx_hash = 1;
     uint32 evt_index = 2;
     google.protobuf.Timestamp evt_block_time = 3;

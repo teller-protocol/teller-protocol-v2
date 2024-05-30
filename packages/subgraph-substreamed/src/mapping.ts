@@ -35,8 +35,8 @@ export function handleSubstreamGraphOutTrigger(bytes: Uint8Array): void {
   log.info("Decoded an event from substream trigger" , []  );
   
   //group pool deployed events 
-  for (let i = 0; i < events.facDeployedLenderGroupContracts.length; i++) {
-    let deployedLenderGroupContractEvent = events.facDeployedLenderGroupContracts[i];
+  for (let i = 0; i < events.factoryDeployedLenderGroupContracts.length; i++) {
+    let deployedLenderGroupContractEvent = events.factoryDeployedLenderGroupContracts[i];
 
     let entity_id = deployedLenderGroupContractEvent.evtTxHash
     .concat( "_" )
@@ -61,9 +61,9 @@ export function handleSubstreamGraphOutTrigger(bytes: Uint8Array): void {
   } 
 
   //group pool initialized events 
-  for (let i = 0; i < events.grouppPoolInitializeds.length; i++) {
+  for (let i = 0; i < events.lendergroupPoolInitializeds.length; i++) {
 
-    let initializedLenderGroupPool = events.grouppPoolInitializeds[i];
+    let initializedLenderGroupPool = events.lendergroupPoolInitializeds[i];
 
     let group_pool_address = initializedLenderGroupPool.evtAddress  ;
 
@@ -85,46 +85,46 @@ export function handleSubstreamGraphOutTrigger(bytes: Uint8Array): void {
   }
 
 
-  for (let i = 0; i < events.grouppLenderAddedPrincipals.length; i++) {
+  for (let i = 0; i < events.lendergroupLenderAddedPrincipals.length; i++) {
 
-    let lenderAddPrincipal = events.grouppLenderAddedPrincipals[i];
-
-
-
-  }
-
-
-  for (let i = 0; i < events.grouppEarningsWithdrawns.length; i++) {
-
-    let lenderWithdrawEarnings = events.grouppEarningsWithdrawns[i];
+    let lenderAddPrincipal = events.lendergroupLenderAddedPrincipals[i];
 
 
 
   }
 
 
-  for (let i = 0; i < events.grouppBorrowerAcceptedFunds.length; i++) {
+  for (let i = 0; i < events.lendergroupEarningsWithdrawns.length; i++) {
 
-    let borrowerAcceptedFunds = events.grouppBorrowerAcceptedFunds[i];
-
-
-
-  }
-
-
-  for (let i = 0; i < events.grouppLoanRepaids.length; i++) {
-
-    let borrowerRepaidLoan = events.grouppLoanRepaids[i];
-
+    let lenderWithdrawEarnings = events.lendergroupEarningsWithdrawns[i];
 
 
 
   }
 
 
-  for (let i = 0; i < events.grouppDefaultedLoanLiquidateds.length; i++) {
+  for (let i = 0; i < events.lendergroupBorrowerAcceptedFunds.length; i++) {
 
-    let defaultedLoanLiquidation = events.grouppDefaultedLoanLiquidateds[i];
+    let borrowerAcceptedFunds = events.lendergroupBorrowerAcceptedFunds[i];
+
+
+
+  }
+
+
+  for (let i = 0; i < events.lendergroupLoanRepaids.length; i++) {
+
+    let borrowerRepaidLoan = events.lendergroupLoanRepaids[i];
+
+
+
+
+  }
+
+
+  for (let i = 0; i < events.lendergroupDefaultedLoanLiquidateds.length; i++) {
+
+    let defaultedLoanLiquidation = events.lendergroupDefaultedLoanLiquidateds[i];
 
 
 

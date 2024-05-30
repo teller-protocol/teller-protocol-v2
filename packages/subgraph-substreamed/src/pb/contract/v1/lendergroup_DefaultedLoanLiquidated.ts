@@ -5,8 +5,11 @@
 import { Writer, Reader } from "as-proto/assembly";
 import { Timestamp } from "../../google/protobuf/Timestamp";
 
-export class groupp_Initialized {
-  static encode(message: groupp_Initialized, writer: Writer): void {
+export class lendergroup_DefaultedLoanLiquidated {
+  static encode(
+    message: lendergroup_DefaultedLoanLiquidated,
+    writer: Writer
+  ): void {
     writer.uint32(10);
     writer.string(message.evtTxHash);
 
@@ -27,13 +30,25 @@ export class groupp_Initialized {
     writer.uint32(42);
     writer.string(message.evtAddress);
 
-    writer.uint32(48);
-    writer.uint64(message.version);
+    writer.uint32(50);
+    writer.string(message.bidId);
+
+    writer.uint32(58);
+    writer.bytes(message.liquidator);
+
+    writer.uint32(66);
+    writer.string(message.amountDue);
+
+    writer.uint32(74);
+    writer.string(message.tokenAmountDifference);
   }
 
-  static decode(reader: Reader, length: i32): groupp_Initialized {
+  static decode(
+    reader: Reader,
+    length: i32
+  ): lendergroup_DefaultedLoanLiquidated {
     const end: usize = length < 0 ? reader.end : reader.ptr + length;
-    const message = new groupp_Initialized();
+    const message = new lendergroup_DefaultedLoanLiquidated();
 
     while (reader.ptr < end) {
       const tag = reader.uint32();
@@ -59,7 +74,19 @@ export class groupp_Initialized {
           break;
 
         case 6:
-          message.version = reader.uint64();
+          message.bidId = reader.string();
+          break;
+
+        case 7:
+          message.liquidator = reader.bytes();
+          break;
+
+        case 8:
+          message.amountDue = reader.string();
+          break;
+
+        case 9:
+          message.tokenAmountDifference = reader.string();
           break;
 
         default:
@@ -76,7 +103,10 @@ export class groupp_Initialized {
   evtBlockTime: Timestamp | null;
   evtBlockNumber: u64;
   evtAddress: string;
-  version: u64;
+  bidId: string;
+  liquidator: Uint8Array;
+  amountDue: string;
+  tokenAmountDifference: string;
 
   constructor(
     evtTxHash: string = "",
@@ -84,13 +114,19 @@ export class groupp_Initialized {
     evtBlockTime: Timestamp | null = null,
     evtBlockNumber: u64 = 0,
     evtAddress: string = "",
-    version: u64 = 0
+    bidId: string = "",
+    liquidator: Uint8Array = new Uint8Array(0),
+    amountDue: string = "",
+    tokenAmountDifference: string = ""
   ) {
     this.evtTxHash = evtTxHash;
     this.evtIndex = evtIndex;
     this.evtBlockTime = evtBlockTime;
     this.evtBlockNumber = evtBlockNumber;
     this.evtAddress = evtAddress;
-    this.version = version;
+    this.bidId = bidId;
+    this.liquidator = liquidator;
+    this.amountDue = amountDue;
+    this.tokenAmountDifference = tokenAmountDifference;
   }
 }

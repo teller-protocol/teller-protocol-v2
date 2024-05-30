@@ -5,8 +5,8 @@
 import { Writer, Reader } from "as-proto/assembly";
 import { Timestamp } from "../../google/protobuf/Timestamp";
 
-export class fac_Upgraded {
-  static encode(message: fac_Upgraded, writer: Writer): void {
+export class lendergroup_Initialized {
+  static encode(message: lendergroup_Initialized, writer: Writer): void {
     writer.uint32(10);
     writer.string(message.evtTxHash);
 
@@ -25,12 +25,15 @@ export class fac_Upgraded {
     writer.uint64(message.evtBlockNumber);
 
     writer.uint32(42);
-    writer.bytes(message.implementation);
+    writer.string(message.evtAddress);
+
+    writer.uint32(48);
+    writer.uint64(message.version);
   }
 
-  static decode(reader: Reader, length: i32): fac_Upgraded {
+  static decode(reader: Reader, length: i32): lendergroup_Initialized {
     const end: usize = length < 0 ? reader.end : reader.ptr + length;
-    const message = new fac_Upgraded();
+    const message = new lendergroup_Initialized();
 
     while (reader.ptr < end) {
       const tag = reader.uint32();
@@ -52,7 +55,11 @@ export class fac_Upgraded {
           break;
 
         case 5:
-          message.implementation = reader.bytes();
+          message.evtAddress = reader.string();
+          break;
+
+        case 6:
+          message.version = reader.uint64();
           break;
 
         default:
@@ -68,19 +75,22 @@ export class fac_Upgraded {
   evtIndex: u32;
   evtBlockTime: Timestamp | null;
   evtBlockNumber: u64;
-  implementation: Uint8Array;
+  evtAddress: string;
+  version: u64;
 
   constructor(
     evtTxHash: string = "",
     evtIndex: u32 = 0,
     evtBlockTime: Timestamp | null = null,
     evtBlockNumber: u64 = 0,
-    implementation: Uint8Array = new Uint8Array(0)
+    evtAddress: string = "",
+    version: u64 = 0
   ) {
     this.evtTxHash = evtTxHash;
     this.evtIndex = evtIndex;
     this.evtBlockTime = evtBlockTime;
     this.evtBlockNumber = evtBlockNumber;
-    this.implementation = implementation;
+    this.evtAddress = evtAddress;
+    this.version = version;
   }
 }

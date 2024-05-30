@@ -1648,24 +1648,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openzeppelin/defender-sdk-base-client@npm:^1.13.1, @openzeppelin/defender-sdk-base-client@npm:^1.8.0":
-  version: 1.13.1
-  resolution: "@openzeppelin/defender-sdk-base-client@npm:1.13.1"
+"@openzeppelin/defender-sdk-base-client@npm:^1.13.3, @openzeppelin/defender-sdk-base-client@npm:^1.8.0":
+  version: 1.13.3
+  resolution: "@openzeppelin/defender-sdk-base-client@npm:1.13.3"
   dependencies:
     amazon-cognito-identity-js: ^6.3.6
     async-retry: ^1.3.3
-  checksum: 7c106379b266b55ad41888502e511d5f8f9a9c004b114a4fa6fba740e306c6b547e20510a5cb1e862b6b348ff55acc1051520a8d0114a729c8757676943fee2c
+  checksum: 7498ed12801b4891fe27b5b97f5264ef9ae8cdad23d206cfce9129b4c92e8350bb184af65872a2919118fe3b9c256ba39c6e0d0621c01e3158ce855edee946f5
   languageName: node
   linkType: hard
 
 "@openzeppelin/defender-sdk-deploy-client@npm:^1.8.0":
-  version: 1.13.1
-  resolution: "@openzeppelin/defender-sdk-deploy-client@npm:1.13.1"
+  version: 1.13.3
+  resolution: "@openzeppelin/defender-sdk-deploy-client@npm:1.13.3"
   dependencies:
-    "@openzeppelin/defender-sdk-base-client": ^1.13.1
+    "@openzeppelin/defender-sdk-base-client": ^1.13.3
     axios: ^1.6.7
     lodash: ^4.17.21
-  checksum: 273b526c9502d84f6075a10fdc4606c55907247a68e5f4d6c8924dd3b246b86de711a801955fd89242d9b299eea545e01869cb03e4ca9ad977e11e732cbda043
+  checksum: 3a9d28d18f3596865017b13297cb8f599a23d2aecb02d80121728bec0111fb997657a7a3126cb07c1b4f1275f136b1c17943a40ef2faccf4c40eef61d8241830
   languageName: node
   linkType: hard
 
@@ -1736,15 +1736,15 @@ __metadata:
   linkType: hard
 
 "@peculiar/webcrypto@npm:^1.4.0":
-  version: 1.4.6
-  resolution: "@peculiar/webcrypto@npm:1.4.6"
+  version: 1.5.0
+  resolution: "@peculiar/webcrypto@npm:1.5.0"
   dependencies:
     "@peculiar/asn1-schema": ^2.3.8
     "@peculiar/json-schema": ^1.1.12
     pvtsutils: ^1.3.5
     tslib: ^2.6.2
-    webcrypto-core: ^1.7.9
-  checksum: 27201a9b8abf95ec70db151dc62548736e87fbacc5e534e972b1187d328826a13fd5fb1b02994dc46ab819667e5020e01893d6d143b937e6dbb99e81b3b87c90
+    webcrypto-core: ^1.8.0
+  checksum: 9022d7452d564a5a26fbacf477842be34736f2d9139f2f5026adc47fdeda7033193d727491503f2a829d35ab819bbfa61c82a785c49c999eac535ecd69a3a459
   languageName: node
   linkType: hard
 
@@ -2599,11 +2599,11 @@ __metadata:
   linkType: hard
 
 "@types/node@npm:*, @types/node@npm:>=13.7.0, @types/node@npm:^20.4.5":
-  version: 20.12.12
-  resolution: "@types/node@npm:20.12.12"
+  version: 20.12.13
+  resolution: "@types/node@npm:20.12.13"
   dependencies:
     undici-types: ~5.26.4
-  checksum: 5373983874b9af7c216e7ca5d26b32a8d9829c703a69f1e66f2113598b5be8582c0e009ca97369f1ec9a6282b3f92812208d06eb1e9fc3bd9b939b022303d042
+  checksum: 9ec8971a76b2435379c10689c639ba1bbf4451075709bdf4bf23b7972a63f7d966947914410f2d3711a315e1157d782b76cfadc32944e29db9dd444221aea699
   languageName: node
   linkType: hard
 
@@ -3157,14 +3157,14 @@ __metadata:
   linkType: hard
 
 "ajv@npm:^8.0.1":
-  version: 8.13.0
-  resolution: "ajv@npm:8.13.0"
+  version: 8.14.0
+  resolution: "ajv@npm:8.14.0"
   dependencies:
     fast-deep-equal: ^3.1.3
     json-schema-traverse: ^1.0.0
     require-from-string: ^2.0.2
     uri-js: ^4.4.1
-  checksum: 6de82d0b2073e645ca3300561356ddda0234f39b35d2125a8700b650509b296f41c00ab69f53178bbe25ad688bd6ac3747ab44101f2f4bd245952e8fd6ccc3c1
+  checksum: 83a933ee20ca25026236cd44634ab8b88d386be26f666e4bc8e34085bbe6775bdb52cb8e25afdaca20d90cb59828a4a168993e21dd2adad3612308f568b2320e
   languageName: node
   linkType: hard
 
@@ -5205,9 +5205,9 @@ __metadata:
   linkType: hard
 
 "caniuse-lite@npm:^1.0.30000844":
-  version: 1.0.30001621
-  resolution: "caniuse-lite@npm:1.0.30001621"
-  checksum: 0afb65bbf558faea769c16e831fbbd5600c684c0f6bb4ffbc0d38528671fb5cb5d88714804241a88c61872ce289f7c6333aef6cfdfb09277bda0dbdf0aab3459
+  version: 1.0.30001625
+  resolution: "caniuse-lite@npm:1.0.30001625"
+  checksum: e7f8b9e10c35a5d9a1d1db76be398cb1c592ee1bc905fabe6bd90313537099d29a65c49c85e6350132fa30ca20e8c0317ecfaa66d997f7fac21ff37ddaece2a9
   languageName: node
   linkType: hard
 
@@ -6736,9 +6736,9 @@ __metadata:
   linkType: hard
 
 "electron-to-chromium@npm:^1.3.47":
-  version: 1.4.782
-  resolution: "electron-to-chromium@npm:1.4.782"
-  checksum: 3f490715895721feff81702b39c684028451f5d43b5cb047f8c52f2abfcb8928c8b84dc08bc3107ff37050e29fae2ccab03e78a8e487998323b3b301bc1ff3a4
+  version: 1.4.786
+  resolution: "electron-to-chromium@npm:1.4.786"
+  checksum: a3d99f26c51120c08d2d14f2c63675e92e7edfee8458bd89f3f4aefa2b24104ad2c1eded19a8123a07a4172e889678356b0e953362f3e70519be3716d09d1910
   languageName: node
   linkType: hard
 
@@ -11515,7 +11515,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"keyv@npm:3.0.0":
+"keyv@npm:3.0.0, keyv@npm:^4.5.3":
   version: 3.0.0
   resolution: "keyv@npm:3.0.0"
   dependencies:
@@ -11533,7 +11533,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"keyv@npm:^4.0.0, keyv@npm:^4.5.3":
+"keyv@npm:^4.0.0":
   version: 4.5.4
   resolution: "keyv@npm:4.5.4"
   dependencies:
@@ -13225,11 +13225,11 @@ __metadata:
   linkType: hard
 
 "node-abi@npm:^3.3.0":
-  version: 3.62.0
-  resolution: "node-abi@npm:3.62.0"
+  version: 3.63.0
+  resolution: "node-abi@npm:3.63.0"
   dependencies:
     semver: ^7.3.5
-  checksum: f480d26b5c3f4c329f2e084fe55e8ed2ec898d48c0135192009fa27e8d5760d272d6566c2a8ba348ca4740dbf6191fe90296b9e90d0aa2942cfd87bd44f0e977
+  checksum: 70c47330f6174d2fae703a9ec42c51fd1cc3c068db674c7c58d47972a9e804b2edbc0d9607763a527ace42fc3567a9227211fd7e754841c351cff94780757d73
   languageName: node
   linkType: hard
 
@@ -19121,16 +19121,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webcrypto-core@npm:^1.7.9":
-  version: 1.7.9
-  resolution: "webcrypto-core@npm:1.7.9"
+"webcrypto-core@npm:^1.8.0":
+  version: 1.8.0
+  resolution: "webcrypto-core@npm:1.8.0"
   dependencies:
     "@peculiar/asn1-schema": ^2.3.8
     "@peculiar/json-schema": ^1.1.12
     asn1js: ^3.0.1
     pvtsutils: ^1.3.5
     tslib: ^2.6.2
-  checksum: 05aa125516bcd91372873c42b9121edd19c8de82f81db2acfba1168745fd4d06ad7d8001b706e4b92063da8a6f52f4e24fb29e7259cba72c0e70a126c22f4199
+  checksum: 4f128f5283b258eda34844ee804b7d4f102b151a7cb3ae5e722309ea7d37db704184c726afb67bf53cc9eb41279379b24626270b6f4ff08ec5be6b420ff70f18
   languageName: node
   linkType: hard
 

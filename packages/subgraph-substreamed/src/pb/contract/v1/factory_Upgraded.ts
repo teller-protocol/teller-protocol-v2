@@ -5,8 +5,8 @@
 import { Writer, Reader } from "as-proto/assembly";
 import { Timestamp } from "../../google/protobuf/Timestamp";
 
-export class groupp_DefaultedLoanLiquidated {
-  static encode(message: groupp_DefaultedLoanLiquidated, writer: Writer): void {
+export class factory_Upgraded {
+  static encode(message: factory_Upgraded, writer: Writer): void {
     writer.uint32(10);
     writer.string(message.evtTxHash);
 
@@ -25,24 +25,12 @@ export class groupp_DefaultedLoanLiquidated {
     writer.uint64(message.evtBlockNumber);
 
     writer.uint32(42);
-    writer.string(message.evtAddress);
-
-    writer.uint32(50);
-    writer.string(message.bidId);
-
-    writer.uint32(58);
-    writer.bytes(message.liquidator);
-
-    writer.uint32(66);
-    writer.string(message.amountDue);
-
-    writer.uint32(74);
-    writer.string(message.tokenAmountDifference);
+    writer.bytes(message.implementation);
   }
 
-  static decode(reader: Reader, length: i32): groupp_DefaultedLoanLiquidated {
+  static decode(reader: Reader, length: i32): factory_Upgraded {
     const end: usize = length < 0 ? reader.end : reader.ptr + length;
-    const message = new groupp_DefaultedLoanLiquidated();
+    const message = new factory_Upgraded();
 
     while (reader.ptr < end) {
       const tag = reader.uint32();
@@ -64,23 +52,7 @@ export class groupp_DefaultedLoanLiquidated {
           break;
 
         case 5:
-          message.evtAddress = reader.string();
-          break;
-
-        case 6:
-          message.bidId = reader.string();
-          break;
-
-        case 7:
-          message.liquidator = reader.bytes();
-          break;
-
-        case 8:
-          message.amountDue = reader.string();
-          break;
-
-        case 9:
-          message.tokenAmountDifference = reader.string();
+          message.implementation = reader.bytes();
           break;
 
         default:
@@ -96,31 +68,19 @@ export class groupp_DefaultedLoanLiquidated {
   evtIndex: u32;
   evtBlockTime: Timestamp | null;
   evtBlockNumber: u64;
-  evtAddress: string;
-  bidId: string;
-  liquidator: Uint8Array;
-  amountDue: string;
-  tokenAmountDifference: string;
+  implementation: Uint8Array;
 
   constructor(
     evtTxHash: string = "",
     evtIndex: u32 = 0,
     evtBlockTime: Timestamp | null = null,
     evtBlockNumber: u64 = 0,
-    evtAddress: string = "",
-    bidId: string = "",
-    liquidator: Uint8Array = new Uint8Array(0),
-    amountDue: string = "",
-    tokenAmountDifference: string = ""
+    implementation: Uint8Array = new Uint8Array(0)
   ) {
     this.evtTxHash = evtTxHash;
     this.evtIndex = evtIndex;
     this.evtBlockTime = evtBlockTime;
     this.evtBlockNumber = evtBlockNumber;
-    this.evtAddress = evtAddress;
-    this.bidId = bidId;
-    this.liquidator = liquidator;
-    this.amountDue = amountDue;
-    this.tokenAmountDifference = tokenAmountDifference;
+    this.implementation = implementation;
   }
 }

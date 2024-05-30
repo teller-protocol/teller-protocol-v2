@@ -5,8 +5,8 @@
 import { Writer, Reader } from "as-proto/assembly";
 import { Timestamp } from "../../google/protobuf/Timestamp";
 
-export class groupp_PoolInitialized {
-  static encode(message: groupp_PoolInitialized, writer: Writer): void {
+export class lendergroup_PoolInitialized {
+  static encode(message: lendergroup_PoolInitialized, writer: Writer): void {
     writer.uint32(10);
     writer.string(message.evtTxHash);
 
@@ -61,9 +61,9 @@ export class groupp_PoolInitialized {
     writer.bytes(message.poolSharesToken);
   }
 
-  static decode(reader: Reader, length: i32): groupp_PoolInitialized {
+  static decode(reader: Reader, length: i32): lendergroup_PoolInitialized {
     const end: usize = length < 0 ? reader.end : reader.ptr + length;
-    const message = new groupp_PoolInitialized();
+    const message = new lendergroup_PoolInitialized();
 
     while (reader.ptr < end) {
       const tag = reader.uint32();

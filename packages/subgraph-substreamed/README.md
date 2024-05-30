@@ -1,6 +1,33 @@
 
 
-# Teller Protocol Subgraph 
+# Teller Protocol Subgraph  Substreamed
+
+
+
+## Substream Setup
+
+
+> copy over the spkg 
+> copy over the substreams.yaml
+> update the subsgraph.yaml accordingly 
+
+
+> copy over contents of proto folder 
+
+
+```
+buf generate --exclude-path="sf/substreams" --type="contract.v1.Events" substreams/lender-group-substream-v0.1.0.spkg#format=bin
+
+
+OR
+
+yarn subgraph-substreamed pb-generate
+
+
+```
+
+
+
 
 # Setup commands
 

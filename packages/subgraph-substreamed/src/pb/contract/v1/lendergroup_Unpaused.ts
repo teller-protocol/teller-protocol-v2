@@ -5,8 +5,8 @@
 import { Writer, Reader } from "as-proto/assembly";
 import { Timestamp } from "../../google/protobuf/Timestamp";
 
-export class groupp_OwnershipTransferred {
-  static encode(message: groupp_OwnershipTransferred, writer: Writer): void {
+export class lendergroup_Unpaused {
+  static encode(message: lendergroup_Unpaused, writer: Writer): void {
     writer.uint32(10);
     writer.string(message.evtTxHash);
 
@@ -28,15 +28,12 @@ export class groupp_OwnershipTransferred {
     writer.string(message.evtAddress);
 
     writer.uint32(50);
-    writer.bytes(message.previousOwner);
-
-    writer.uint32(58);
-    writer.bytes(message.newOwner);
+    writer.bytes(message.account);
   }
 
-  static decode(reader: Reader, length: i32): groupp_OwnershipTransferred {
+  static decode(reader: Reader, length: i32): lendergroup_Unpaused {
     const end: usize = length < 0 ? reader.end : reader.ptr + length;
-    const message = new groupp_OwnershipTransferred();
+    const message = new lendergroup_Unpaused();
 
     while (reader.ptr < end) {
       const tag = reader.uint32();
@@ -62,11 +59,7 @@ export class groupp_OwnershipTransferred {
           break;
 
         case 6:
-          message.previousOwner = reader.bytes();
-          break;
-
-        case 7:
-          message.newOwner = reader.bytes();
+          message.account = reader.bytes();
           break;
 
         default:
@@ -83,8 +76,7 @@ export class groupp_OwnershipTransferred {
   evtBlockTime: Timestamp | null;
   evtBlockNumber: u64;
   evtAddress: string;
-  previousOwner: Uint8Array;
-  newOwner: Uint8Array;
+  account: Uint8Array;
 
   constructor(
     evtTxHash: string = "",
@@ -92,15 +84,13 @@ export class groupp_OwnershipTransferred {
     evtBlockTime: Timestamp | null = null,
     evtBlockNumber: u64 = 0,
     evtAddress: string = "",
-    previousOwner: Uint8Array = new Uint8Array(0),
-    newOwner: Uint8Array = new Uint8Array(0)
+    account: Uint8Array = new Uint8Array(0)
   ) {
     this.evtTxHash = evtTxHash;
     this.evtIndex = evtIndex;
     this.evtBlockTime = evtBlockTime;
     this.evtBlockNumber = evtBlockNumber;
     this.evtAddress = evtAddress;
-    this.previousOwner = previousOwner;
-    this.newOwner = newOwner;
+    this.account = account;
   }
 }

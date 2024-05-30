@@ -5,8 +5,8 @@
 import { Writer, Reader } from "as-proto/assembly";
 import { Timestamp } from "../../google/protobuf/Timestamp";
 
-export class groupp_Unpaused {
-  static encode(message: groupp_Unpaused, writer: Writer): void {
+export class factory_BeaconUpgraded {
+  static encode(message: factory_BeaconUpgraded, writer: Writer): void {
     writer.uint32(10);
     writer.string(message.evtTxHash);
 
@@ -25,15 +25,12 @@ export class groupp_Unpaused {
     writer.uint64(message.evtBlockNumber);
 
     writer.uint32(42);
-    writer.string(message.evtAddress);
-
-    writer.uint32(50);
-    writer.bytes(message.account);
+    writer.bytes(message.beacon);
   }
 
-  static decode(reader: Reader, length: i32): groupp_Unpaused {
+  static decode(reader: Reader, length: i32): factory_BeaconUpgraded {
     const end: usize = length < 0 ? reader.end : reader.ptr + length;
-    const message = new groupp_Unpaused();
+    const message = new factory_BeaconUpgraded();
 
     while (reader.ptr < end) {
       const tag = reader.uint32();
@@ -55,11 +52,7 @@ export class groupp_Unpaused {
           break;
 
         case 5:
-          message.evtAddress = reader.string();
-          break;
-
-        case 6:
-          message.account = reader.bytes();
+          message.beacon = reader.bytes();
           break;
 
         default:
@@ -75,22 +68,19 @@ export class groupp_Unpaused {
   evtIndex: u32;
   evtBlockTime: Timestamp | null;
   evtBlockNumber: u64;
-  evtAddress: string;
-  account: Uint8Array;
+  beacon: Uint8Array;
 
   constructor(
     evtTxHash: string = "",
     evtIndex: u32 = 0,
     evtBlockTime: Timestamp | null = null,
     evtBlockNumber: u64 = 0,
-    evtAddress: string = "",
-    account: Uint8Array = new Uint8Array(0)
+    beacon: Uint8Array = new Uint8Array(0)
   ) {
     this.evtTxHash = evtTxHash;
     this.evtIndex = evtIndex;
     this.evtBlockTime = evtBlockTime;
     this.evtBlockNumber = evtBlockNumber;
-    this.evtAddress = evtAddress;
-    this.account = account;
+    this.beacon = beacon;
   }
 }

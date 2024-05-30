@@ -5,8 +5,11 @@
 import { Writer, Reader } from "as-proto/assembly";
 import { Timestamp } from "../../google/protobuf/Timestamp";
 
-export class groupp_LenderAddedPrincipal {
-  static encode(message: groupp_LenderAddedPrincipal, writer: Writer): void {
+export class lendergroup_BorrowerAcceptedFunds {
+  static encode(
+    message: lendergroup_BorrowerAcceptedFunds,
+    writer: Writer
+  ): void {
     writer.uint32(10);
     writer.string(message.evtTxHash);
 
@@ -28,21 +31,30 @@ export class groupp_LenderAddedPrincipal {
     writer.string(message.evtAddress);
 
     writer.uint32(50);
-    writer.bytes(message.lender);
+    writer.bytes(message.borrower);
 
     writer.uint32(58);
-    writer.string(message.amount);
+    writer.string(message.bidId);
 
     writer.uint32(66);
-    writer.string(message.sharesAmount);
+    writer.string(message.principalAmount);
 
     writer.uint32(74);
-    writer.bytes(message.sharesRecipient);
+    writer.string(message.collateralAmount);
+
+    writer.uint32(80);
+    writer.uint64(message.loanDuration);
+
+    writer.uint32(88);
+    writer.uint64(message.interestRate);
   }
 
-  static decode(reader: Reader, length: i32): groupp_LenderAddedPrincipal {
+  static decode(
+    reader: Reader,
+    length: i32
+  ): lendergroup_BorrowerAcceptedFunds {
     const end: usize = length < 0 ? reader.end : reader.ptr + length;
-    const message = new groupp_LenderAddedPrincipal();
+    const message = new lendergroup_BorrowerAcceptedFunds();
 
     while (reader.ptr < end) {
       const tag = reader.uint32();
@@ -68,19 +80,27 @@ export class groupp_LenderAddedPrincipal {
           break;
 
         case 6:
-          message.lender = reader.bytes();
+          message.borrower = reader.bytes();
           break;
 
         case 7:
-          message.amount = reader.string();
+          message.bidId = reader.string();
           break;
 
         case 8:
-          message.sharesAmount = reader.string();
+          message.principalAmount = reader.string();
           break;
 
         case 9:
-          message.sharesRecipient = reader.bytes();
+          message.collateralAmount = reader.string();
+          break;
+
+        case 10:
+          message.loanDuration = reader.uint64();
+          break;
+
+        case 11:
+          message.interestRate = reader.uint64();
           break;
 
         default:
@@ -97,10 +117,12 @@ export class groupp_LenderAddedPrincipal {
   evtBlockTime: Timestamp | null;
   evtBlockNumber: u64;
   evtAddress: string;
-  lender: Uint8Array;
-  amount: string;
-  sharesAmount: string;
-  sharesRecipient: Uint8Array;
+  borrower: Uint8Array;
+  bidId: string;
+  principalAmount: string;
+  collateralAmount: string;
+  loanDuration: u64;
+  interestRate: u64;
 
   constructor(
     evtTxHash: string = "",
@@ -108,19 +130,23 @@ export class groupp_LenderAddedPrincipal {
     evtBlockTime: Timestamp | null = null,
     evtBlockNumber: u64 = 0,
     evtAddress: string = "",
-    lender: Uint8Array = new Uint8Array(0),
-    amount: string = "",
-    sharesAmount: string = "",
-    sharesRecipient: Uint8Array = new Uint8Array(0)
+    borrower: Uint8Array = new Uint8Array(0),
+    bidId: string = "",
+    principalAmount: string = "",
+    collateralAmount: string = "",
+    loanDuration: u64 = 0,
+    interestRate: u64 = 0
   ) {
     this.evtTxHash = evtTxHash;
     this.evtIndex = evtIndex;
     this.evtBlockTime = evtBlockTime;
     this.evtBlockNumber = evtBlockNumber;
     this.evtAddress = evtAddress;
-    this.lender = lender;
-    this.amount = amount;
-    this.sharesAmount = sharesAmount;
-    this.sharesRecipient = sharesRecipient;
+    this.borrower = borrower;
+    this.bidId = bidId;
+    this.principalAmount = principalAmount;
+    this.collateralAmount = collateralAmount;
+    this.loanDuration = loanDuration;
+    this.interestRate = interestRate;
   }
 }

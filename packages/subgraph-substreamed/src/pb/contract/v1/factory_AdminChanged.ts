@@ -5,8 +5,8 @@
 import { Writer, Reader } from "as-proto/assembly";
 import { Timestamp } from "../../google/protobuf/Timestamp";
 
-export class fac_BeaconUpgraded {
-  static encode(message: fac_BeaconUpgraded, writer: Writer): void {
+export class factory_AdminChanged {
+  static encode(message: factory_AdminChanged, writer: Writer): void {
     writer.uint32(10);
     writer.string(message.evtTxHash);
 
@@ -25,12 +25,15 @@ export class fac_BeaconUpgraded {
     writer.uint64(message.evtBlockNumber);
 
     writer.uint32(42);
-    writer.bytes(message.beacon);
+    writer.bytes(message.previousAdmin);
+
+    writer.uint32(50);
+    writer.bytes(message.newAdmin);
   }
 
-  static decode(reader: Reader, length: i32): fac_BeaconUpgraded {
+  static decode(reader: Reader, length: i32): factory_AdminChanged {
     const end: usize = length < 0 ? reader.end : reader.ptr + length;
-    const message = new fac_BeaconUpgraded();
+    const message = new factory_AdminChanged();
 
     while (reader.ptr < end) {
       const tag = reader.uint32();
@@ -52,7 +55,11 @@ export class fac_BeaconUpgraded {
           break;
 
         case 5:
-          message.beacon = reader.bytes();
+          message.previousAdmin = reader.bytes();
+          break;
+
+        case 6:
+          message.newAdmin = reader.bytes();
           break;
 
         default:
@@ -68,19 +75,22 @@ export class fac_BeaconUpgraded {
   evtIndex: u32;
   evtBlockTime: Timestamp | null;
   evtBlockNumber: u64;
-  beacon: Uint8Array;
+  previousAdmin: Uint8Array;
+  newAdmin: Uint8Array;
 
   constructor(
     evtTxHash: string = "",
     evtIndex: u32 = 0,
     evtBlockTime: Timestamp | null = null,
     evtBlockNumber: u64 = 0,
-    beacon: Uint8Array = new Uint8Array(0)
+    previousAdmin: Uint8Array = new Uint8Array(0),
+    newAdmin: Uint8Array = new Uint8Array(0)
   ) {
     this.evtTxHash = evtTxHash;
     this.evtIndex = evtIndex;
     this.evtBlockTime = evtBlockTime;
     this.evtBlockNumber = evtBlockNumber;
-    this.beacon = beacon;
+    this.previousAdmin = previousAdmin;
+    this.newAdmin = newAdmin;
   }
 }

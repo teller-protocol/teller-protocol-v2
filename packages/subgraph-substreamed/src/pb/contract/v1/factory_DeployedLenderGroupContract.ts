@@ -5,8 +5,11 @@
 import { Writer, Reader } from "as-proto/assembly";
 import { Timestamp } from "../../google/protobuf/Timestamp";
 
-export class fac_AdminChanged {
-  static encode(message: fac_AdminChanged, writer: Writer): void {
+export class factory_DeployedLenderGroupContract {
+  static encode(
+    message: factory_DeployedLenderGroupContract,
+    writer: Writer
+  ): void {
     writer.uint32(10);
     writer.string(message.evtTxHash);
 
@@ -25,15 +28,15 @@ export class fac_AdminChanged {
     writer.uint64(message.evtBlockNumber);
 
     writer.uint32(42);
-    writer.bytes(message.previousAdmin);
-
-    writer.uint32(50);
-    writer.bytes(message.newAdmin);
+    writer.bytes(message.groupContract);
   }
 
-  static decode(reader: Reader, length: i32): fac_AdminChanged {
+  static decode(
+    reader: Reader,
+    length: i32
+  ): factory_DeployedLenderGroupContract {
     const end: usize = length < 0 ? reader.end : reader.ptr + length;
-    const message = new fac_AdminChanged();
+    const message = new factory_DeployedLenderGroupContract();
 
     while (reader.ptr < end) {
       const tag = reader.uint32();
@@ -55,11 +58,7 @@ export class fac_AdminChanged {
           break;
 
         case 5:
-          message.previousAdmin = reader.bytes();
-          break;
-
-        case 6:
-          message.newAdmin = reader.bytes();
+          message.groupContract = reader.bytes();
           break;
 
         default:
@@ -75,22 +74,19 @@ export class fac_AdminChanged {
   evtIndex: u32;
   evtBlockTime: Timestamp | null;
   evtBlockNumber: u64;
-  previousAdmin: Uint8Array;
-  newAdmin: Uint8Array;
+  groupContract: Uint8Array;
 
   constructor(
     evtTxHash: string = "",
     evtIndex: u32 = 0,
     evtBlockTime: Timestamp | null = null,
     evtBlockNumber: u64 = 0,
-    previousAdmin: Uint8Array = new Uint8Array(0),
-    newAdmin: Uint8Array = new Uint8Array(0)
+    groupContract: Uint8Array = new Uint8Array(0)
   ) {
     this.evtTxHash = evtTxHash;
     this.evtIndex = evtIndex;
     this.evtBlockTime = evtBlockTime;
     this.evtBlockNumber = evtBlockNumber;
-    this.previousAdmin = previousAdmin;
-    this.newAdmin = newAdmin;
+    this.groupContract = groupContract;
   }
 }

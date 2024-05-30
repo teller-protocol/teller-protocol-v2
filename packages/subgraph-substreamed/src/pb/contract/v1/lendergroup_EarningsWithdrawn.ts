@@ -5,11 +5,8 @@
 import { Writer, Reader } from "as-proto/assembly";
 import { Timestamp } from "../../google/protobuf/Timestamp";
 
-export class fac_DeployedLenderGroupContract {
-  static encode(
-    message: fac_DeployedLenderGroupContract,
-    writer: Writer
-  ): void {
+export class lendergroup_EarningsWithdrawn {
+  static encode(message: lendergroup_EarningsWithdrawn, writer: Writer): void {
     writer.uint32(10);
     writer.string(message.evtTxHash);
 
@@ -28,12 +25,24 @@ export class fac_DeployedLenderGroupContract {
     writer.uint64(message.evtBlockNumber);
 
     writer.uint32(42);
-    writer.bytes(message.groupContract);
+    writer.string(message.evtAddress);
+
+    writer.uint32(50);
+    writer.bytes(message.lender);
+
+    writer.uint32(58);
+    writer.string(message.amountPoolSharesTokens);
+
+    writer.uint32(66);
+    writer.string(message.principalTokensWithdrawn);
+
+    writer.uint32(74);
+    writer.bytes(message.recipient);
   }
 
-  static decode(reader: Reader, length: i32): fac_DeployedLenderGroupContract {
+  static decode(reader: Reader, length: i32): lendergroup_EarningsWithdrawn {
     const end: usize = length < 0 ? reader.end : reader.ptr + length;
-    const message = new fac_DeployedLenderGroupContract();
+    const message = new lendergroup_EarningsWithdrawn();
 
     while (reader.ptr < end) {
       const tag = reader.uint32();
@@ -55,7 +64,23 @@ export class fac_DeployedLenderGroupContract {
           break;
 
         case 5:
-          message.groupContract = reader.bytes();
+          message.evtAddress = reader.string();
+          break;
+
+        case 6:
+          message.lender = reader.bytes();
+          break;
+
+        case 7:
+          message.amountPoolSharesTokens = reader.string();
+          break;
+
+        case 8:
+          message.principalTokensWithdrawn = reader.string();
+          break;
+
+        case 9:
+          message.recipient = reader.bytes();
           break;
 
         default:
@@ -71,19 +96,31 @@ export class fac_DeployedLenderGroupContract {
   evtIndex: u32;
   evtBlockTime: Timestamp | null;
   evtBlockNumber: u64;
-  groupContract: Uint8Array;
+  evtAddress: string;
+  lender: Uint8Array;
+  amountPoolSharesTokens: string;
+  principalTokensWithdrawn: string;
+  recipient: Uint8Array;
 
   constructor(
     evtTxHash: string = "",
     evtIndex: u32 = 0,
     evtBlockTime: Timestamp | null = null,
     evtBlockNumber: u64 = 0,
-    groupContract: Uint8Array = new Uint8Array(0)
+    evtAddress: string = "",
+    lender: Uint8Array = new Uint8Array(0),
+    amountPoolSharesTokens: string = "",
+    principalTokensWithdrawn: string = "",
+    recipient: Uint8Array = new Uint8Array(0)
   ) {
     this.evtTxHash = evtTxHash;
     this.evtIndex = evtIndex;
     this.evtBlockTime = evtBlockTime;
     this.evtBlockNumber = evtBlockNumber;
-    this.groupContract = groupContract;
+    this.evtAddress = evtAddress;
+    this.lender = lender;
+    this.amountPoolSharesTokens = amountPoolSharesTokens;
+    this.principalTokensWithdrawn = principalTokensWithdrawn;
+    this.recipient = recipient;
   }
 }

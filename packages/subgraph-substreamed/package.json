@@ -3,7 +3,7 @@
   "license": "UNLICENSED",
   "version": "0.4.21-18",
   "scripts": {
-    "pb-generate": "buf generate --exclude-path=\"sf/substreams\" --type=\"contract.v1.Events\" substreams/lendergrouppolygon-v0.1.0.spkg#format=bin",
+    "pb-generate": "buf generate --exclude-path=\"sf/substreams\" --type=\"contract.v1.Events\" substreams/lender-group-substream-v0.1.0.spkg#format=bin",
     "build": "graph build",
     "codegen": "graph codegen",
     "deploy:prompt": "ts-node scripts/thegraph",

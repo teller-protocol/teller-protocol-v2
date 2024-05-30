@@ -81,24 +81,33 @@ export function handleSubstreamGraphOutTrigger(bytes: Uint8Array): void {
     //cast to bytes ? 
     entity.principal_token_address = Address.fromString( initializedLenderGroupPool.principalTokenAddress.toString() );
     entity.collateral_token_address =  Address.fromString( initializedLenderGroupPool.collateralTokenAddress.toString() );
-
     entity.shares_token_address =  Address.fromString (initializedLenderGroupPool.poolSharesToken.toString() );
 
+    entity.uniswap_v3_pool_address = Address.fromString( initializedLenderGroupPool.uniswapV3PoolAddress.toString() );
+    entity.teller_v2_address = Address.fromString( initializedLenderGroupPool.tellerV2Address.toString()  );
+    entity.smart_commitment_forwarder_address = Address.fromString( initializedLenderGroupPool.smartCommitmentForwarderAddress.toString()  );
 
+
+    entity.market_id = BigInt.fromString( initializedLenderGroupPool.marketId ) ;
+    entity.uniswap_pool_fee = i32( initializedLenderGroupPool.uniswapPoolFee );
+    
+    entity.max_loan_duration = i32(initializedLenderGroupPool.maxLoanDuration ); 
+    entity.twap_interval = i32(initializedLenderGroupPool.twapInterval);
     entity.interest_rate_lower_bound = i32(initializedLenderGroupPool.interestRateLowerBound);
     entity.interest_rate_upper_bound = i32(initializedLenderGroupPool.interestRateUpperBound);
 
     entity.liquidity_threshold_percent = i32(initializedLenderGroupPool.liquidityThresholdPercent);
     entity.collateral_ratio = i32(initializedLenderGroupPool.loanToValuePercent);
 
-    entity.market_id = BigInt.fromString( initializedLenderGroupPool.marketId ) ;
+    entity.total_principal_tokens_committed = 0;
+    entity.total_principal_tokens_withdrawn = 0;
 
-    entity.max_loan_duration = i32(initializedLenderGroupPool.maxLoanDuration ); 
+    entity.total_principal_tokens_lended = 0;
+    entity.total_principal_tokens_repaid = 0;
+    entity.total_interest_collected = 0;
+
+    entity.token_difference_from_liquidations = 0;
  
-
-
-
-    ///fill in all the stuff we need 
 
     entity.save();
 

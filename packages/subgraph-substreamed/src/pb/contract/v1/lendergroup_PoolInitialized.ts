@@ -59,6 +59,15 @@ export class lendergroup_PoolInitialized {
 
     writer.uint32(130);
     writer.bytes(message.poolSharesToken);
+
+    writer.uint32(138);
+    writer.bytes(message.uniswapV3PoolAddress);
+
+    writer.uint32(146);
+    writer.bytes(message.tellerV2Address);
+
+    writer.uint32(154);
+    writer.bytes(message.smartCommitmentForwarderAddress);
   }
 
   static decode(reader: Reader, length: i32): lendergroup_PoolInitialized {
@@ -132,6 +141,18 @@ export class lendergroup_PoolInitialized {
           message.poolSharesToken = reader.bytes();
           break;
 
+        case 17:
+          message.uniswapV3PoolAddress = reader.bytes();
+          break;
+
+        case 18:
+          message.tellerV2Address = reader.bytes();
+          break;
+
+        case 19:
+          message.smartCommitmentForwarderAddress = reader.bytes();
+          break;
+
         default:
           reader.skipType(tag & 7);
           break;
@@ -157,6 +178,9 @@ export class lendergroup_PoolInitialized {
   uniswapPoolFee: u64;
   twapInterval: u64;
   poolSharesToken: Uint8Array;
+  uniswapV3PoolAddress: Uint8Array;
+  tellerV2Address: Uint8Array;
+  smartCommitmentForwarderAddress: Uint8Array;
 
   constructor(
     evtTxHash: string = "",
@@ -174,7 +198,10 @@ export class lendergroup_PoolInitialized {
     loanToValuePercent: u64 = 0,
     uniswapPoolFee: u64 = 0,
     twapInterval: u64 = 0,
-    poolSharesToken: Uint8Array = new Uint8Array(0)
+    poolSharesToken: Uint8Array = new Uint8Array(0),
+    uniswapV3PoolAddress: Uint8Array = new Uint8Array(0),
+    tellerV2Address: Uint8Array = new Uint8Array(0),
+    smartCommitmentForwarderAddress: Uint8Array = new Uint8Array(0)
   ) {
     this.evtTxHash = evtTxHash;
     this.evtIndex = evtIndex;
@@ -192,5 +219,8 @@ export class lendergroup_PoolInitialized {
     this.uniswapPoolFee = uniswapPoolFee;
     this.twapInterval = twapInterval;
     this.poolSharesToken = poolSharesToken;
+    this.uniswapV3PoolAddress = uniswapV3PoolAddress;
+    this.tellerV2Address = tellerV2Address;
+    this.smartCommitmentForwarderAddress = smartCommitmentForwarderAddress;
   }
 }

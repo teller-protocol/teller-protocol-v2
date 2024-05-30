@@ -171,13 +171,13 @@ type group_pool_metrics @entity {
     teller_v2_address: Bytes!
     smart_commitment_forwarder_address: Bytes! 
  
-    market_id: Int!
+    market_id: BigInt!
     uniswap_pool_fee: Int!
 
     max_loan_duration : Int!
     twap_interval : Int!
     interest_rate_upper_bound: Int!
-    interest_rate_lower_bount: Int!
+    interest_rate_lower_bound: Int!
     
 
     liquidity_threshold_percent: Int!

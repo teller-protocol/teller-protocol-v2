@@ -2047,17 +2047,17 @@ export class group_pool_metrics extends Entity {
     this.set("smart_commitment_forwarder_address", Value.fromBytes(value));
   }
 
-  get market_id(): i32 {
+  get market_id(): BigInt {
     let value = this.get("market_id");
     if (!value || value.kind == ValueKind.NULL) {
-      return 0;
+      throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toI32();
+      return value.toBigInt();
     }
   }
 
-  set market_id(value: i32) {
-    this.set("market_id", Value.fromI32(value));
+  set market_id(value: BigInt) {
+    this.set("market_id", Value.fromBigInt(value));
   }
 
   get uniswap_pool_fee(): i32 {
@@ -2112,8 +2112,8 @@ export class group_pool_metrics extends Entity {
     this.set("interest_rate_upper_bound", Value.fromI32(value));
   }
 
-  get interest_rate_lower_bount(): i32 {
-    let value = this.get("interest_rate_lower_bount");
+  get interest_rate_lower_bound(): i32 {
+    let value = this.get("interest_rate_lower_bound");
     if (!value || value.kind == ValueKind.NULL) {
       return 0;
     } else {
@@ -2121,8 +2121,8 @@ export class group_pool_metrics extends Entity {
     }
   }
 
-  set interest_rate_lower_bount(value: i32) {
-    this.set("interest_rate_lower_bount", Value.fromI32(value));
+  set interest_rate_lower_bound(value: i32) {
+    this.set("interest_rate_lower_bound", Value.fromI32(value));
   }
 
   get liquidity_threshold_percent(): i32 {

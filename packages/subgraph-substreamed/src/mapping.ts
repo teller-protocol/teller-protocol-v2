@@ -1,5 +1,5 @@
  
- import { log, Address, BigInt ,Timestamp , Bytes } from "@graphprotocol/graph-ts";
+ import { log, Address, BigInt ,Timestamp , Bytes, ByteArray } from "@graphprotocol/graph-ts";
  import { Events } from "./pb/contract/v1/Events";
 
  import { Protobuf } from 'as-proto/assembly';
@@ -28,6 +28,12 @@
 
 } from "../generated/schema";
  
+  
+function stringToBytes(str: string): Bytes {
+  let utf8Array = ByteArray.fromUTF8(str);
+  return Bytes.fromByteArray(utf8Array);
+}
+
 export function handleSubstreamGraphOutTrigger(bytes: Uint8Array): void {
   
   const events: Events = Protobuf.decode<Events>(bytes, Events.decode);
@@ -45,10 +51,10 @@ export function handleSubstreamGraphOutTrigger(bytes: Uint8Array): void {
 
     if (deployedLenderGroupContractEvent.evtBlockTime) {
 
-      entity.evt_tx_hash = deployedLenderGroupContractEvent.evtTxHash;
+      entity.evt_tx_hash = stringToBytes( deployedLenderGroupContractEvent.evtTxHash );
       entity.evt_block_number = BigInt.fromU64( deployedLenderGroupContractEvent.evtBlockNumber );
       
-      entity.evt_index =  BigInt.fromI32(deployedLenderGroupContractEvent.evtIndex);
+      entity.evt_index =  BigInt.fromU64(deployedLenderGroupContractEvent.evtIndex);
 
   
       entity.group_contract = Address.fromString(deployedLenderGroupContractEvent.groupContract.toString());
@@ -73,8 +79,23 @@ export function handleSubstreamGraphOutTrigger(bytes: Uint8Array): void {
     entity.group_pool_address =  Address.fromString( initializedLenderGroupPool.evtAddress );
    
     //cast to bytes ? 
-    entity.principal_token_address = initializedLenderGroupPool.principalTokenAddress.toString();
-    entity.collateral_token_address = initializedLenderGroupPool.collateralTokenAddress.toString();
+    entity.principal_token_address = Address.fromString( initializedLenderGroupPool.principalTokenAddress.toString() );
+    entity.collateral_token_address =  Address.fromString( initializedLenderGroupPool.collateralTokenAddress.toString() );
+
+    entity.shares_token_address =  Address.fromString (initializedLenderGroupPool.poolSharesToken.toString() );
+
+
+    entity.interest_rate_lower_bound = i32(initializedLenderGroupPool.interestRateLowerBound);
+    entity.interest_rate_upper_bound = i32(initializedLenderGroupPool.interestRateUpperBound);
+
+    entity.liquidity_threshold_percent = i32(initializedLenderGroupPool.liquidityThresholdPercent);
+    entity.collateral_ratio = i32(initializedLenderGroupPool.loanToValuePercent);
+
+    entity.market_id = BigInt.fromString( initializedLenderGroupPool.marketId ) ;
+
+    entity.max_loan_duration = i32(initializedLenderGroupPool.maxLoanDuration ); 
+ 
+
 
 
     ///fill in all the stuff we need 

@@ -185,14 +185,14 @@ type group_pool_metrics @entity {
     liquidity_threshold_percent: Int!
     collateral_ratio: Int!  #loan to value 
    
-    total_principal_tokens_committed: Int!
-    total_principal_tokens_withdrawn: Int!
+    total_principal_tokens_committed: BigInt!
+    total_principal_tokens_withdrawn: BigInt!
     
-    total_principal_tokens_lended: Int!
-    total_principal_tokens_repaid: Int!
-    total_interest_collected: Int!
+    total_principal_tokens_lended: BigInt!
+    total_principal_tokens_repaid: BigInt!
+    total_interest_collected: BigInt!
 
-    token_difference_from_liquidations: Int!
+    token_difference_from_liquidations: BigInt!
 
   
 }

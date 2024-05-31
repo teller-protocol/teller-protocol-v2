@@ -78,7 +78,7 @@ export function handleSubstreamGraphOutTrigger(bytes: Uint8Array): void {
     let entity = new group_pool_metrics( entity_id );
     entity.group_pool_address =  Address.fromString( initializedLenderGroupPool.evtAddress );
    
-    //cast to bytes ? 
+    
     entity.principal_token_address = Address.fromString( initializedLenderGroupPool.principalTokenAddress.toString() );
     entity.collateral_token_address =  Address.fromString( initializedLenderGroupPool.collateralTokenAddress.toString() );
     entity.shares_token_address =  Address.fromString (initializedLenderGroupPool.poolSharesToken.toString() );
@@ -99,14 +99,14 @@ export function handleSubstreamGraphOutTrigger(bytes: Uint8Array): void {
     entity.liquidity_threshold_percent = i32(initializedLenderGroupPool.liquidityThresholdPercent);
     entity.collateral_ratio = i32(initializedLenderGroupPool.loanToValuePercent);
 
-    entity.total_principal_tokens_committed = 0;
-    entity.total_principal_tokens_withdrawn = 0;
+    entity.total_principal_tokens_committed = BigInt.zero() ;
+    entity.total_principal_tokens_withdrawn = BigInt.zero() ;
 
-    entity.total_principal_tokens_lended = 0;
-    entity.total_principal_tokens_repaid = 0;
-    entity.total_interest_collected = 0;
+    entity.total_principal_tokens_lended = BigInt.zero() ;
+    entity.total_principal_tokens_repaid = BigInt.zero() ;
+    entity.total_interest_collected = BigInt.zero() ;
 
-    entity.token_difference_from_liquidations = 0;
+    entity.token_difference_from_liquidations = BigInt.zero() ;
  
 
     entity.save();
@@ -119,6 +119,18 @@ export function handleSubstreamGraphOutTrigger(bytes: Uint8Array): void {
 
     let lenderAddPrincipal = events.lendergroupLenderAddedPrincipals[i];
 
+    let group_pool_address = lenderAddPrincipal.evtAddress ;
+
+    // load the group pool metrics by id and modify it 
+
+    let addedPrincipalAmount = BigInt.fromString(lenderAddPrincipal.amount);
+
+    let group_pool_metrics_entity = group_pool_metrics.load(group_pool_address)!;
+ 
+    group_pool_metrics_entity.total_principal_tokens_committed = group_pool_metrics_entity.total_principal_tokens_committed.plus(addedPrincipalAmount) ;
+
+
+    group_pool_metrics_entity.save();
 
 
   }
@@ -128,6 +140,13 @@ export function handleSubstreamGraphOutTrigger(bytes: Uint8Array): void {
 
     let lenderWithdrawEarnings = events.lendergroupEarningsWithdrawns[i];
 
+    let group_pool_address = lenderWithdrawEarnings.evtAddress ;
+
+    let group_pool_metrics_entity = group_pool_metrics.load(group_pool_address)!;
+ 
+    
+
+    group_pool_metrics_entity.save();
 
 
   }
@@ -137,7 +156,21 @@ export function handleSubstreamGraphOutTrigger(bytes: Uint8Array): void {
 
     let borrowerAcceptedFunds = events.lendergroupBorrowerAcceptedFunds[i];
 
+    let group_pool_address = borrowerAcceptedFunds.evtAddress ;
 
+
+    let borrowAmount = BigInt.fromString(borrowerAcceptedFunds.principalAmount);
+
+
+    let group_pool_metrics_entity = group_pool_metrics.load(group_pool_address)!;
+ 
+    
+    group_pool_metrics_entity.total_principal_tokens_withdrawn = group_pool_metrics_entity.total_principal_tokens_withdrawn.plus(borrowAmount) ;
+  
+
+
+
+    group_pool_metrics_entity.save();
 
   }
 
@@ -146,7 +179,19 @@ export function handleSubstreamGraphOutTrigger(bytes: Uint8Array): void {
 
     let borrowerRepaidLoan = events.lendergroupLoanRepaids[i];
 
+    let group_pool_address = borrowerRepaidLoan.evtAddress ;
 
+    let repaidAmountPrincipal = BigInt.fromString(borrowerRepaidLoan.principalAmount);
+    let repaidAmountInterest = BigInt.fromString(borrowerRepaidLoan.interestAmount);
+
+
+    let group_pool_metrics_entity = group_pool_metrics.load(group_pool_address)!;
+ 
+    group_pool_metrics_entity.total_principal_tokens_repaid = group_pool_metrics_entity.total_principal_tokens_repaid.plus(repaidAmountPrincipal) ;
+    group_pool_metrics_entity.total_interest_collected = group_pool_metrics_entity.total_interest_collected.plus(repaidAmountInterest) ;
+
+
+    group_pool_metrics_entity.save();
 
 
   }
@@ -156,8 +201,21 @@ export function handleSubstreamGraphOutTrigger(bytes: Uint8Array): void {
 
     let defaultedLoanLiquidation = events.lendergroupDefaultedLoanLiquidateds[i];
 
+    let group_pool_address = defaultedLoanLiquidation.evtAddress ;
 
 
+    //big int can be negative - yes. So this should be OK
+    let differenceAmountPrincipal = BigInt.fromString(defaultedLoanLiquidation.tokenAmountDifference);
+
+
+
+    let group_pool_metrics_entity = group_pool_metrics.load(group_pool_address)!;
+ 
+    group_pool_metrics_entity.token_difference_from_liquidations = group_pool_metrics_entity.token_difference_from_liquidations.plus(differenceAmountPrincipal) ;
+
+
+
+    group_pool_metrics_entity.save();
 
   }
  

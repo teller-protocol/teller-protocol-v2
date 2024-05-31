@@ -2151,82 +2151,82 @@ export class group_pool_metrics extends Entity {
     this.set("collateral_ratio", Value.fromI32(value));
   }
 
-  get total_principal_tokens_committed(): i32 {
+  get total_principal_tokens_committed(): BigInt {
     let value = this.get("total_principal_tokens_committed");
     if (!value || value.kind == ValueKind.NULL) {
-      return 0;
+      throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toI32();
+      return value.toBigInt();
     }
   }
 
-  set total_principal_tokens_committed(value: i32) {
-    this.set("total_principal_tokens_committed", Value.fromI32(value));
+  set total_principal_tokens_committed(value: BigInt) {
+    this.set("total_principal_tokens_committed", Value.fromBigInt(value));
   }
 
-  get total_principal_tokens_withdrawn(): i32 {
+  get total_principal_tokens_withdrawn(): BigInt {
     let value = this.get("total_principal_tokens_withdrawn");
     if (!value || value.kind == ValueKind.NULL) {
-      return 0;
+      throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toI32();
+      return value.toBigInt();
     }
   }
 
-  set total_principal_tokens_withdrawn(value: i32) {
-    this.set("total_principal_tokens_withdrawn", Value.fromI32(value));
+  set total_principal_tokens_withdrawn(value: BigInt) {
+    this.set("total_principal_tokens_withdrawn", Value.fromBigInt(value));
   }
 
-  get total_principal_tokens_lended(): i32 {
+  get total_principal_tokens_lended(): BigInt {
     let value = this.get("total_principal_tokens_lended");
     if (!value || value.kind == ValueKind.NULL) {
-      return 0;
+      throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toI32();
+      return value.toBigInt();
     }
   }
 
-  set total_principal_tokens_lended(value: i32) {
-    this.set("total_principal_tokens_lended", Value.fromI32(value));
+  set total_principal_tokens_lended(value: BigInt) {
+    this.set("total_principal_tokens_lended", Value.fromBigInt(value));
   }
 
-  get total_principal_tokens_repaid(): i32 {
+  get total_principal_tokens_repaid(): BigInt {
     let value = this.get("total_principal_tokens_repaid");
     if (!value || value.kind == ValueKind.NULL) {
-      return 0;
+      throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toI32();
+      return value.toBigInt();
     }
   }
 
-  set total_principal_tokens_repaid(value: i32) {
-    this.set("total_principal_tokens_repaid", Value.fromI32(value));
+  set total_principal_tokens_repaid(value: BigInt) {
+    this.set("total_principal_tokens_repaid", Value.fromBigInt(value));
   }
 
-  get total_interest_collected(): i32 {
+  get total_interest_collected(): BigInt {
     let value = this.get("total_interest_collected");
     if (!value || value.kind == ValueKind.NULL) {
-      return 0;
+      throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toI32();
+      return value.toBigInt();
     }
   }
 
-  set total_interest_collected(value: i32) {
-    this.set("total_interest_collected", Value.fromI32(value));
+  set total_interest_collected(value: BigInt) {
+    this.set("total_interest_collected", Value.fromBigInt(value));
   }
 
-  get token_difference_from_liquidations(): i32 {
+  get token_difference_from_liquidations(): BigInt {
     let value = this.get("token_difference_from_liquidations");
     if (!value || value.kind == ValueKind.NULL) {
-      return 0;
+      throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toI32();
+      return value.toBigInt();
     }
   }
 
-  set token_difference_from_liquidations(value: i32) {
-    this.set("token_difference_from_liquidations", Value.fromI32(value));
+  set token_difference_from_liquidations(value: BigInt) {
+    this.set("token_difference_from_liquidations", Value.fromBigInt(value));
   }
 }
 

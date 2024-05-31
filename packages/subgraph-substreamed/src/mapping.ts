@@ -57,7 +57,7 @@ export function handleSubstreamGraphOutTrigger(bytes: Uint8Array): void {
       entity.evt_index =  BigInt.fromU64(deployedLenderGroupContractEvent.evtIndex);
 
   
-      entity.group_contract = Address.fromString(deployedLenderGroupContractEvent.groupContract.toString());
+      entity.group_contract = Bytes.fromUint8Array(deployedLenderGroupContractEvent.groupContract );
       
 
       entity.save();
@@ -79,13 +79,13 @@ export function handleSubstreamGraphOutTrigger(bytes: Uint8Array): void {
     entity.group_pool_address =  Address.fromString( initializedLenderGroupPool.evtAddress );
    
     
-    entity.principal_token_address = Address.fromString( initializedLenderGroupPool.principalTokenAddress.toString() );
-    entity.collateral_token_address =  Address.fromString( initializedLenderGroupPool.collateralTokenAddress.toString() );
-    entity.shares_token_address =  Address.fromString (initializedLenderGroupPool.poolSharesToken.toString() );
+    entity.principal_token_address = Bytes.fromUint8Array( initializedLenderGroupPool.principalTokenAddress  );
+    entity.collateral_token_address =  Bytes.fromUint8Array( initializedLenderGroupPool.collateralTokenAddress  );
+    entity.shares_token_address =  Bytes.fromUint8Array (initializedLenderGroupPool.poolSharesToken );
 
-    entity.uniswap_v3_pool_address = Address.fromString( initializedLenderGroupPool.uniswapV3PoolAddress.toString() );
-    entity.teller_v2_address = Address.fromString( initializedLenderGroupPool.tellerV2Address.toString()  );
-    entity.smart_commitment_forwarder_address = Address.fromString( initializedLenderGroupPool.smartCommitmentForwarderAddress.toString()  );
+    entity.uniswap_v3_pool_address = Bytes.fromUint8Array( initializedLenderGroupPool.uniswapV3PoolAddress );
+    entity.teller_v2_address = Bytes.fromUint8Array( initializedLenderGroupPool.tellerV2Address  );
+    entity.smart_commitment_forwarder_address = Bytes.fromUint8Array( initializedLenderGroupPool.smartCommitmentForwarderAddress  );
 
 
     entity.market_id = BigInt.fromString( initializedLenderGroupPool.marketId ) ;

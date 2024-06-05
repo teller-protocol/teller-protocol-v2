@@ -487,17 +487,3 @@ dataSources:
           handler: handleNewLenderSet
       file: ./src/mapping.ts
 {{/if}}
-  - kind: substreams
-    name: Event  # ????
-    network: {{network}}
-    source:
-      startBlock: {{block}}
-      package:
-        moduleName: map_events # Module name
-        file: substreams/lendergrouppolygon-v0.1.0.spkg # Package
-    mapping:
-      kind: substreams/graph-entities
-      apiVersion: 0.0.7
-      file: ./src/mapping.ts
-      handler: handleSubstreamGraphOutTrigger
-  

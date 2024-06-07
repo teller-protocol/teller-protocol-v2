@@ -335,13 +335,17 @@ export function updateAvailableTokensFromCommitment(
   const availableCommittedAmount = commitment.maxPrincipal.minus(
     commitment.acceptedPrincipal
   );
+
+  //This must be calculated wrong for USDC 
   const availableAmount = minBigInt([
     availableCommittedAmount,
     commitment.lenderPrincipalAllowance,
     commitment.lenderPrincipalBalance
   ]);
 
-  let committedAmountDiff: BigInt;
+
+ 
+  let committedAmountDiff: BigInt;   
   switch (commitmentStatusToEnum(commitment.status)) {
     case CommitmentStatus.Active:
       committedAmountDiff = availableAmount.minus(commitment.committedAmount);

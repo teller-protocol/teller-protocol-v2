@@ -9,7 +9,7 @@ dataSources:
       startBlock: 
       package:
         moduleName: map_events # Module name
-        file: substreams/lender-group-substream-v0.1.0.spkg # Package
+        file: substreams/lender-group-substream-v0.1.1.spkg # Package
     mapping:
       kind: substreams/graph-entities
       apiVersion: 0.0.7

@@ -275,7 +275,7 @@ function create_pool_metrics_data_point(
   data_point_entity.block_number = block_number;
 
    
-    data_point_entity.block_time = block_time ;
+  data_point_entity.block_time = block_time ;
    
  
 
@@ -287,7 +287,7 @@ function create_pool_metrics_data_point(
 
 
 
-  data_point_entity.save();
+  data_point_entity.save() ;
 
 
 }

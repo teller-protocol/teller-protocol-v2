@@ -29,6 +29,16 @@ yarn subgraph-substreamed pb-generate
 
 
 
+## Deployment 
+
+
+
+yarn subgraph-substreamed deploy:prompt
+
+
+
+
+
 # Setup commands
 
 **note: First make sure that docker is installed and running locally*

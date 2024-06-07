@@ -16,6 +16,8 @@
   group_pool_metrics,
   group_lender_metrics,
 
+  group_pool_metrics_data_point, 
+
 
   group_lender_added_principal,
   group_earnings_withdrawn,
@@ -112,6 +114,13 @@ export function handleSubstreamGraphOutTrigger(bytes: Uint8Array): void {
     entity.save();
 
 
+
+    let block_number = BigInt.fromU64( initializedLenderGroupPool.evtBlockNumber );
+    let block_time =  BigInt.fromU64( initializedLenderGroupPool.evtBlockTime );
+
+    create_pool_metrics_data_point(  entity.group_pool_address.toString() , block_number , block_time);
+
+
   }
 
 
@@ -133,6 +142,15 @@ export function handleSubstreamGraphOutTrigger(bytes: Uint8Array): void {
     group_pool_metrics_entity.save();
 
 
+
+
+    let block_number = BigInt.fromU64( lenderAddPrincipal.evtBlockNumber );
+    let block_time = BigInt.fromU64( lenderAddPrincipal.evtBlockTime );
+
+    create_pool_metrics_data_point(   group_pool_address, block_number , block_time);
+
+
+
   }
 
 
@@ -147,6 +165,12 @@ export function handleSubstreamGraphOutTrigger(bytes: Uint8Array): void {
     
 
     group_pool_metrics_entity.save();
+
+
+    let block_number = BigInt.fromU64( lenderWithdrawEarnings.evtBlockNumber );
+    let block_time =  BigInt.fromU64( lenderWithdrawEarnings.evtBlockTime );
+
+    create_pool_metrics_data_point(   group_pool_address, block_number , block_time);
 
 
   }
@@ -171,6 +195,14 @@ export function handleSubstreamGraphOutTrigger(bytes: Uint8Array): void {
 
 
     group_pool_metrics_entity.save();
+
+
+    let block_number = BigInt.fromU64( borrowerAcceptedFunds.evtBlockNumber );
+    let block_time = BigInt.fromU64( borrowerAcceptedFunds.evtBlockTime );
+
+    create_pool_metrics_data_point(   group_pool_address, block_number , block_time);
+
+
 
   }
 
@@ -219,4 +251,43 @@ export function handleSubstreamGraphOutTrigger(bytes: Uint8Array): void {
 
   }
  
+}
+
+
+
+function create_pool_metrics_data_point(
+
+  group_pool_address: string,
+  block_number: BigInt,
+  block_time: BigInt 
+
+) : void {
+
+
+  let entity_id = group_pool_address.toString() .concat( "_"  ).concat(block_number.toString()) ;
+  
+  let group_entity = group_pool_metrics.load(  group_pool_address   )!  ;
+
+  let data_point_entity = new group_pool_metrics_data_point( entity_id );
+
+
+  data_point_entity.group_pool_address = Address.fromString( group_pool_address ) ;
+  data_point_entity.block_number = block_number;
+
+   
+    data_point_entity.block_time = block_time ;
+   
+ 
+
+  data_point_entity.total_principal_tokens_committed = group_entity.total_principal_tokens_committed;
+  data_point_entity.total_principal_tokens_withdrawn = group_entity.total_principal_tokens_withdrawn;
+  data_point_entity.total_principal_tokens_lended = group_entity.total_principal_tokens_lended;
+  data_point_entity.total_principal_tokens_repaid = group_entity.total_principal_tokens_repaid;
+  data_point_entity.total_interest_collected = group_entity.total_interest_collected;
+
+
+
+  data_point_entity.save();
+
+
 }

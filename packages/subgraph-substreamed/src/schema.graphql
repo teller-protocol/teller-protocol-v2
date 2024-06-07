@@ -213,3 +213,23 @@ type group_lender_metrics @entity {
 }
 
 # also add borrower metrics  ?
+
+
+
+type group_pool_metrics_data_point @entity {
+    id: ID!    #will be based on group pool address 
+    group_pool_address: Bytes!
+
+    block_number: BigInt!
+    block_time: BigInt 
+       
+   
+    total_principal_tokens_committed: BigInt!
+    total_principal_tokens_withdrawn: BigInt!
+    
+    total_principal_tokens_lended: BigInt!
+    total_principal_tokens_repaid: BigInt!
+    total_interest_collected: BigInt!
+
+    
+}

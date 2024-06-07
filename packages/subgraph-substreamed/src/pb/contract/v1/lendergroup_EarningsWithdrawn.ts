@@ -3,7 +3,6 @@
 //   protoc-gen-as v1.3.0
 
 import { Writer, Reader } from "as-proto/assembly";
-import { Timestamp } from "../../google/protobuf/Timestamp";
 
 export class lendergroup_EarningsWithdrawn {
   static encode(message: lendergroup_EarningsWithdrawn, writer: Writer): void {
@@ -13,13 +12,8 @@ export class lendergroup_EarningsWithdrawn {
     writer.uint32(16);
     writer.uint32(message.evtIndex);
 
-    const evtBlockTime = message.evtBlockTime;
-    if (evtBlockTime !== null) {
-      writer.uint32(26);
-      writer.fork();
-      Timestamp.encode(evtBlockTime, writer);
-      writer.ldelim();
-    }
+    writer.uint32(24);
+    writer.uint64(message.evtBlockTime);
 
     writer.uint32(32);
     writer.uint64(message.evtBlockNumber);
@@ -56,7 +50,7 @@ export class lendergroup_EarningsWithdrawn {
           break;
 
         case 3:
-          message.evtBlockTime = Timestamp.decode(reader, reader.uint32());
+          message.evtBlockTime = reader.uint64();
           break;
 
         case 4:
@@ -94,7 +88,7 @@ export class lendergroup_EarningsWithdrawn {
 
   evtTxHash: string;
   evtIndex: u32;
-  evtBlockTime: Timestamp | null;
+  evtBlockTime: u64;
   evtBlockNumber: u64;
   evtAddress: string;
   lender: Uint8Array;
@@ -105,7 +99,7 @@ export class lendergroup_EarningsWithdrawn {
   constructor(
     evtTxHash: string = "",
     evtIndex: u32 = 0,
-    evtBlockTime: Timestamp | null = null,
+    evtBlockTime: u64 = 0,
     evtBlockNumber: u64 = 0,
     evtAddress: string = "",
     lender: Uint8Array = new Uint8Array(0),

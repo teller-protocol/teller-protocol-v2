@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-import "google/protobuf/timestamp.proto";
+ 
 
 package contract.v1;
 
@@ -24,7 +24,7 @@ message Events {
 message factory_AdminChanged {
     string evt_tx_hash = 1;
     uint32 evt_index = 2;
-    google.protobuf.Timestamp evt_block_time = 3;
+    uint64 evt_block_time = 3;
     uint64 evt_block_number = 4;
     bytes previous_admin = 5;
     bytes new_admin = 6;
@@ -33,7 +33,7 @@ message factory_AdminChanged {
 message factory_BeaconUpgraded {
     string evt_tx_hash = 1;
     uint32 evt_index = 2;
-    google.protobuf.Timestamp evt_block_time = 3;
+    uint64 evt_block_time = 3;
     uint64 evt_block_number = 4;
     bytes beacon = 5;
 }
@@ -41,7 +41,7 @@ message factory_BeaconUpgraded {
 message factory_DeployedLenderGroupContract {
     string evt_tx_hash = 1;
     uint32 evt_index = 2;
-    google.protobuf.Timestamp evt_block_time = 3;
+    uint64 evt_block_time = 3;
     uint64 evt_block_number = 4;
     bytes group_contract = 5;
 }
@@ -49,7 +49,7 @@ message factory_DeployedLenderGroupContract {
 message factory_Upgraded {
     string evt_tx_hash = 1;
     uint32 evt_index = 2;
-    google.protobuf.Timestamp evt_block_time = 3;
+    uint64 evt_block_time = 3;
     uint64 evt_block_number = 4;
     bytes implementation = 5;
 }
@@ -57,7 +57,7 @@ message factory_Upgraded {
 message lendergroup_BorrowerAcceptedFunds {
     string evt_tx_hash = 1;
     uint32 evt_index = 2;
-    google.protobuf.Timestamp evt_block_time = 3;
+    uint64 evt_block_time = 3;
     uint64 evt_block_number = 4;
     string evt_address = 5;
     bytes borrower = 6;
@@ -71,7 +71,7 @@ message lendergroup_BorrowerAcceptedFunds {
 message lendergroup_DefaultedLoanLiquidated {
     string evt_tx_hash = 1;
     uint32 evt_index = 2;
-    google.protobuf.Timestamp evt_block_time = 3;
+    uint64 evt_block_time = 3;
     uint64 evt_block_number = 4;
     string evt_address = 5;
     string bid_id = 6;
@@ -83,7 +83,7 @@ message lendergroup_DefaultedLoanLiquidated {
 message lendergroup_EarningsWithdrawn {
     string evt_tx_hash = 1;
     uint32 evt_index = 2;
-    google.protobuf.Timestamp evt_block_time = 3;
+    uint64 evt_block_time = 3;
     uint64 evt_block_number = 4;
     string evt_address = 5;
     bytes lender = 6;
@@ -95,7 +95,7 @@ message lendergroup_EarningsWithdrawn {
 message lendergroup_Initialized {
     string evt_tx_hash = 1;
     uint32 evt_index = 2;
-    google.protobuf.Timestamp evt_block_time = 3;
+   uint64 evt_block_time = 3;
     uint64 evt_block_number = 4;
     string evt_address = 5;
     uint64 version = 6;
@@ -104,7 +104,7 @@ message lendergroup_Initialized {
 message lendergroup_LenderAddedPrincipal {
     string evt_tx_hash = 1;
     uint32 evt_index = 2;
-    google.protobuf.Timestamp evt_block_time = 3;
+    uint64 evt_block_time = 3;
     uint64 evt_block_number = 4;
     string evt_address = 5;
     bytes lender = 6;
@@ -116,7 +116,7 @@ message lendergroup_LenderAddedPrincipal {
 message lendergroup_LoanRepaid {
     string evt_tx_hash = 1;
     uint32 evt_index = 2;
-    google.protobuf.Timestamp evt_block_time = 3;
+    uint64 evt_block_time = 3;
     uint64 evt_block_number = 4;
     string evt_address = 5;
     string bid_id = 6;
@@ -130,7 +130,7 @@ message lendergroup_LoanRepaid {
 message lendergroup_OwnershipTransferred {
     string evt_tx_hash = 1;
     uint32 evt_index = 2;
-    google.protobuf.Timestamp evt_block_time = 3;
+    uint64 evt_block_time = 3;
     uint64 evt_block_number = 4;
     string evt_address = 5;
     bytes previous_owner = 6;
@@ -140,7 +140,7 @@ message lendergroup_OwnershipTransferred {
 message lendergroup_Paused {
     string evt_tx_hash = 1;
     uint32 evt_index = 2;
-    google.protobuf.Timestamp evt_block_time = 3;
+    uint64 evt_block_time = 3;
     uint64 evt_block_number = 4;
     string evt_address = 5;
     bytes account = 6;
@@ -149,7 +149,7 @@ message lendergroup_Paused {
 message lendergroup_PoolInitialized {
     string evt_tx_hash = 1;
     uint32 evt_index = 2;
-    google.protobuf.Timestamp evt_block_time = 3;
+    uint64 evt_block_time = 3;
     uint64 evt_block_number = 4;
     string evt_address = 5;
     bytes principal_token_address = 6;
@@ -172,7 +172,7 @@ message lendergroup_PoolInitialized {
 message lendergroup_Unpaused {
     string evt_tx_hash = 1;
     uint32 evt_index = 2;
-    google.protobuf.Timestamp evt_block_time = 3;
+    uint64 evt_block_time = 3;
     uint64 evt_block_number = 4;
     string evt_address = 5;
     bytes account = 6;

@@ -2338,3 +2338,158 @@ export class group_lender_metrics extends Entity {
     this.set("shares_tokens_net", Value.fromI32(value));
   }
 }
+
+export class group_pool_metrics_data_point extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(
+      id != null,
+      "Cannot save group_pool_metrics_data_point entity without an ID",
+    );
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        `Entities of type group_pool_metrics_data_point must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`,
+      );
+      store.set("group_pool_metrics_data_point", id.toString(), this);
+    }
+  }
+
+  static loadInBlock(id: string): group_pool_metrics_data_point | null {
+    return changetype<group_pool_metrics_data_point | null>(
+      store.get_in_block("group_pool_metrics_data_point", id),
+    );
+  }
+
+  static load(id: string): group_pool_metrics_data_point | null {
+    return changetype<group_pool_metrics_data_point | null>(
+      store.get("group_pool_metrics_data_point", id),
+    );
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toString();
+    }
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get group_pool_address(): Bytes {
+    let value = this.get("group_pool_address");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set group_pool_address(value: Bytes) {
+    this.set("group_pool_address", Value.fromBytes(value));
+  }
+
+  get block_number(): BigInt {
+    let value = this.get("block_number");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set block_number(value: BigInt) {
+    this.set("block_number", Value.fromBigInt(value));
+  }
+
+  get block_time(): BigInt | null {
+    let value = this.get("block_time");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set block_time(value: BigInt | null) {
+    if (!value) {
+      this.unset("block_time");
+    } else {
+      this.set("block_time", Value.fromBigInt(<BigInt>value));
+    }
+  }
+
+  get total_principal_tokens_committed(): BigInt {
+    let value = this.get("total_principal_tokens_committed");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set total_principal_tokens_committed(value: BigInt) {
+    this.set("total_principal_tokens_committed", Value.fromBigInt(value));
+  }
+
+  get total_principal_tokens_withdrawn(): BigInt {
+    let value = this.get("total_principal_tokens_withdrawn");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set total_principal_tokens_withdrawn(value: BigInt) {
+    this.set("total_principal_tokens_withdrawn", Value.fromBigInt(value));
+  }
+
+  get total_principal_tokens_lended(): BigInt {
+    let value = this.get("total_principal_tokens_lended");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set total_principal_tokens_lended(value: BigInt) {
+    this.set("total_principal_tokens_lended", Value.fromBigInt(value));
+  }
+
+  get total_principal_tokens_repaid(): BigInt {
+    let value = this.get("total_principal_tokens_repaid");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set total_principal_tokens_repaid(value: BigInt) {
+    this.set("total_principal_tokens_repaid", Value.fromBigInt(value));
+  }
+
+  get total_interest_collected(): BigInt {
+    let value = this.get("total_interest_collected");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set total_interest_collected(value: BigInt) {
+    this.set("total_interest_collected", Value.fromBigInt(value));
+  }
+}

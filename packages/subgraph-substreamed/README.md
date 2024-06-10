@@ -22,8 +22,8 @@ buf generate --exclude-path="sf/substreams" --type="contract.v1.Events" substrea
 OR
 
 yarn subgraph-substreamed pb-generate
-
-
+yarn subgraph-substreamed codegen
+yarn subgraph-substreamed build
 ```
 
 

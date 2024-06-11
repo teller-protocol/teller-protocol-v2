@@ -1,3 +1,3 @@
 
-pub mod fac_contract;
-pub mod groupp_contract;
+pub mod factory_contract;
+pub mod lendergroup_contract;

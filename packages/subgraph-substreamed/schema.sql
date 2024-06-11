@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS fac_admin_changed (
+CREATE TABLE IF NOT EXISTS factory_admin_changed (
     "evt_tx_hash" VARCHAR(64),
     "evt_index" INT,
     "evt_block_time" TIMESTAMP,
@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS fac_admin_changed (
     "previous_admin" VARCHAR(40),
     PRIMARY KEY(evt_tx_hash,evt_index)
 );
-CREATE TABLE IF NOT EXISTS fac_beacon_upgraded (
+CREATE TABLE IF NOT EXISTS factory_beacon_upgraded (
     "evt_tx_hash" VARCHAR(64),
     "evt_index" INT,
     "evt_block_time" TIMESTAMP,
@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS fac_beacon_upgraded (
     "beacon" VARCHAR(40),
     PRIMARY KEY(evt_tx_hash,evt_index)
 );
-CREATE TABLE IF NOT EXISTS fac_deployed_lender_group_contract (
+CREATE TABLE IF NOT EXISTS factory_deployed_lender_group_contract (
     "evt_tx_hash" VARCHAR(64),
     "evt_index" INT,
     "evt_block_time" TIMESTAMP,
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS fac_deployed_lender_group_contract (
     "group_contract" VARCHAR(40),
     PRIMARY KEY(evt_tx_hash,evt_index)
 );
-CREATE TABLE IF NOT EXISTS fac_upgraded (
+CREATE TABLE IF NOT EXISTS factory_upgraded (
     "evt_tx_hash" VARCHAR(64),
     "evt_index" INT,
     "evt_block_time" TIMESTAMP,
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS fac_upgraded (
     PRIMARY KEY(evt_tx_hash,evt_index)
 );
 
-CREATE TABLE IF NOT EXISTS groupp_borrower_accepted_funds (
+CREATE TABLE IF NOT EXISTS lendergroup_borrower_accepted_funds (
     "evt_tx_hash" VARCHAR(64),
     "evt_index" INT,
     "evt_block_time" TIMESTAMP,
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS groupp_borrower_accepted_funds (
     "principal_amount" DECIMAL,
     PRIMARY KEY(evt_tx_hash,evt_index)
 );
-CREATE TABLE IF NOT EXISTS groupp_defaulted_loan_liquidated (
+CREATE TABLE IF NOT EXISTS lendergroup_defaulted_loan_liquidated (
     "evt_tx_hash" VARCHAR(64),
     "evt_index" INT,
     "evt_block_time" TIMESTAMP,
@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS groupp_defaulted_loan_liquidated (
     "token_amount_difference" DECIMAL,
     PRIMARY KEY(evt_tx_hash,evt_index)
 );
-CREATE TABLE IF NOT EXISTS groupp_earnings_withdrawn (
+CREATE TABLE IF NOT EXISTS lendergroup_earnings_withdrawn (
     "evt_tx_hash" VARCHAR(64),
     "evt_index" INT,
     "evt_block_time" TIMESTAMP,
@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS groupp_earnings_withdrawn (
     "recipient" VARCHAR(40),
     PRIMARY KEY(evt_tx_hash,evt_index)
 );
-CREATE TABLE IF NOT EXISTS groupp_initialized (
+CREATE TABLE IF NOT EXISTS lendergroup_initialized (
     "evt_tx_hash" VARCHAR(64),
     "evt_index" INT,
     "evt_block_time" TIMESTAMP,
@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS groupp_initialized (
     "version" INT,
     PRIMARY KEY(evt_tx_hash,evt_index)
 );
-CREATE TABLE IF NOT EXISTS groupp_lender_added_principal (
+CREATE TABLE IF NOT EXISTS lendergroup_lender_added_principal (
     "evt_tx_hash" VARCHAR(64),
     "evt_index" INT,
     "evt_block_time" TIMESTAMP,
@@ -91,7 +91,7 @@ CREATE TABLE IF NOT EXISTS groupp_lender_added_principal (
     "shares_recipient" VARCHAR(40),
     PRIMARY KEY(evt_tx_hash,evt_index)
 );
-CREATE TABLE IF NOT EXISTS groupp_loan_repaid (
+CREATE TABLE IF NOT EXISTS lendergroup_loan_repaid (
     "evt_tx_hash" VARCHAR(64),
     "evt_index" INT,
     "evt_block_time" TIMESTAMP,
@@ -105,7 +105,7 @@ CREATE TABLE IF NOT EXISTS groupp_loan_repaid (
     "total_principal_repaid" DECIMAL,
     PRIMARY KEY(evt_tx_hash,evt_index)
 );
-CREATE TABLE IF NOT EXISTS groupp_ownership_transferred (
+CREATE TABLE IF NOT EXISTS lendergroup_ownership_transferred (
     "evt_tx_hash" VARCHAR(64),
     "evt_index" INT,
     "evt_block_time" TIMESTAMP,
@@ -115,7 +115,7 @@ CREATE TABLE IF NOT EXISTS groupp_ownership_transferred (
     "previous_owner" VARCHAR(40),
     PRIMARY KEY(evt_tx_hash,evt_index)
 );
-CREATE TABLE IF NOT EXISTS groupp_paused (
+CREATE TABLE IF NOT EXISTS lendergroup_paused (
     "evt_tx_hash" VARCHAR(64),
     "evt_index" INT,
     "evt_block_time" TIMESTAMP,
@@ -124,7 +124,7 @@ CREATE TABLE IF NOT EXISTS groupp_paused (
     "account" VARCHAR(40),
     PRIMARY KEY(evt_tx_hash,evt_index)
 );
-CREATE TABLE IF NOT EXISTS groupp_pool_initialized (
+CREATE TABLE IF NOT EXISTS lendergroup_pool_initialized (
     "evt_tx_hash" VARCHAR(64),
     "evt_index" INT,
     "evt_block_time" TIMESTAMP,
@@ -143,7 +143,7 @@ CREATE TABLE IF NOT EXISTS groupp_pool_initialized (
     "uniswap_pool_fee" INT,
     PRIMARY KEY(evt_tx_hash,evt_index)
 );
-CREATE TABLE IF NOT EXISTS groupp_unpaused (
+CREATE TABLE IF NOT EXISTS lendergroup_unpaused (
     "evt_tx_hash" VARCHAR(64),
     "evt_index" INT,
     "evt_block_time" TIMESTAMP,

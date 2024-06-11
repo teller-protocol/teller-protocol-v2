@@ -11,7 +11,7 @@ dataSources:
     source:
       package:
         moduleName: graph_out
-        file: lendergrouppolygon-v0.1.0.spkg
+        file: lender-group-substream-v0.1.0.spkg
     mapping:
       kind: substreams/graph-entities
       apiVersion: 0.0.6

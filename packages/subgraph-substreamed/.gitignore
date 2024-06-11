@@ -1,0 +1,4 @@
+target
+node_modules
+scripts/thegraph/api/config/studio.json
+scripts/thegraph/api/config/cookies.json

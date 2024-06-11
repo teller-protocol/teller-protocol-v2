@@ -1,38 +1,17 @@
-{{#*inline "global_required_abis"}}
-        - name: TellerV2
-          file: ./abis/{{export_network_name}}_TellerV2.json
-        - name: TellerV0Storage
-          file: ../contracts/generated/artifacts/contracts/TellerV0Storage.sol/TellerV0Storage.json
-        - name: ERC165
-          file: ../contracts/generated/artifacts/@openzeppelin/contracts/utils/introspection/ERC165.sol/ERC165.json
-        - name: IERC20Metadata
-          file: ../contracts/generated/artifacts/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol/IERC20Metadata.json
-{{/inline}}
-specVersion: 1.0.0
+specVersion: 0.0.6
+description: lendergrouppolygon substreams based subgraph
+repository: # fill in with git remote url
 schema:
-  file: ./src/schema.graphql
-{{#if grafting.enabled}}
-features:
-  - grafting
-{{/if}}
-{{#if grafting.enabled}}
-graft:
-  base: {{grafting.base}}
-  block: {{grafting.block}}
-{{/if}}
+  file: ./schema.graphql
+
 dataSources:
   - kind: substreams
-    name: Event  # ????
-    network: {{network}}
+    name: lendergrouppolygon
+    network: matic
     source:
-      startBlock: {{block}}
       package:
-        moduleName: map_events # Module name
-        file: substreams/lender-group-substream-v0.1.0.spkg # Package
+        moduleName: graph_out
+        file: lendergrouppolygon-v0.1.0.spkg
     mapping:
       kind: substreams/graph-entities
-      apiVersion: 0.0.7
-      file: ./src/mapping.ts
-      handler: handleSubstreamGraphOutTrigger
-       
-  
+      apiVersion: 0.0.5

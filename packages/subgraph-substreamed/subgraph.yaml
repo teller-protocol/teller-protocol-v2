@@ -1,19 +1,17 @@
-specVersion: 1.0.0
+specVersion: 0.0.6
+description: lendergrouppolygon substreams based subgraph
+repository: # fill in with git remote url
 schema:
-  file: ./src/schema.graphql
+  file: ./schema.graphql
+
 dataSources:
   - kind: substreams
-    name: Event  # ????
+    name: lendergrouppolygon
     network: matic
     source:
-      startBlock: 
       package:
-        moduleName: map_events # Module name
-        file: substreams/lender-group-substream-v0.1.0.spkg # Package
+        moduleName: graph_out
+        file: lendergrouppolygon-v0.1.0.spkg
     mapping:
       kind: substreams/graph-entities
-      apiVersion: 0.0.7
-      file: ./src/mapping.ts
-      handler: handleSubstreamGraphOutTrigger
-       
-  
+      apiVersion: 0.0.6

@@ -1,6 +1,6 @@
 specVersion: v0.1.0
 package:
-  name: lendergrouppolygon
+  name: lender_group_substream
   version: v0.1.0
 
 imports:
@@ -21,7 +21,7 @@ binaries:
     file: ./target/wasm32-unknown-unknown/release/substreams.wasm
 
 modules:
-  - name: store_fac_groupp_created
+  - name: store_factory_lendergroup_created
     kind: store
     initialBlock: 57233385
     updatePolicy: set
@@ -34,7 +34,7 @@ modules:
     initialBlock: 57233385
     inputs:
       - source: sf.ethereum.type.v2.Block
-      - store: store_fac_groupp_created
+      - store: store_factory_lendergroup_created
     output:
       type: proto:contract.v1.Events
 

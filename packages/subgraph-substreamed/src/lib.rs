@@ -779,8 +779,11 @@ fn graph_lendergroup_out(events: &contract::Events, tables: &mut EntityChangesTa
             .set("total_principal_tokens_repaid",  BigDecimal::from_str("0").unwrap()) 
             .set("total_interest_collected",  BigDecimal::from_str("0").unwrap()) 
             .set("token_difference_from_liquidations",  BigDecimal::from_str("0").unwrap())  
+           // .set("ordinal",   evt.log.ordinal  )  //is this ok ?  
             ;
 
+
+   
 
 
         // read the data from the table   group_pool_metrics 
@@ -825,7 +828,16 @@ fn graph_lendergroup_out(events: &contract::Events, tables: &mut EntityChangesTa
             .set("group_pool_address", Hex::decode(&evt.evt_address).unwrap())
             .set("account", Hex(&evt.account).to_string());
     });
+    
+    
+    
+    
 }
+
+
+
+
+// THIS IS HOW WE ADD TO STORAGE 
 #[substreams::handlers::store]
 fn store_factory_lendergroup_created(blk: eth::Block, store: StoreSetInt64) {
     for rcpt in blk.receipts() {
@@ -842,8 +854,122 @@ fn store_factory_lendergroup_created(blk: eth::Block, store: StoreSetInt64) {
     }
 }
 
+
+
+
+
+
+#[substreams::handlers::store]
+pub fn store_lendergroup_pool_metrics(metrics_storages: LendergroupPoolMetrics , store: StoreSetProto<LendergroupPoolMetric>) {
+    for metric in metrics_storages.metrics  {
+        
+         let group_address = Address::from_slice(&metric.group_pool_address);
+         
+         
+        store.set(metric.ordinal, format!("lender_group_pool_metric:{group_address}"), &metric);
+    }
+}
+
+         
+         
+         
+         
+//  map_factory_events(blk: &eth::Block, events: &mut contract::Events) {
+         
 #[substreams::handlers::map]
-fn map_lendergroup_pools_created(
+pub fn map_lender_pools_initialized( blk:  &eth::Block ) -> Result<LendergroupPoolMetrics, Error> {
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+}
+
+/*
+#[substreams::handlers::map]
+pub fn map_pools_created(block: Block) -> Result<Pools, Error> {
+    use abi::factory::events::PoolCreated;
+
+    Ok(Pools {
+        pools: block
+            .events::<PoolCreated>(&[&UNISWAP_V3_FACTORY])
+            .filter_map(|(event, log)| {
+                log::info!("pool addr: {}", Hex(&event.pool));
+
+                if event.pool == ERROR_POOL {
+                    return None;
+                }
+
+                let token0_address = Hex(&event.token0).to_string();
+                let token1_address = Hex(&event.token1).to_string();
+
+                //todo: question regarding the ignore_pool line. In the
+                // uniswap-v3 subgraph, they seem to bail out when they
+                // match the addr, should we do the same ?
+                Some(Pool {
+                    address: Hex(&log.data()[44..64]).to_string(),
+                    transaction_id: Hex(&log.receipt.transaction.hash).to_string(),
+                    created_at_block_number: block.number,
+                    created_at_timestamp: block.timestamp_seconds(),
+                    fee_tier: event.fee.to_string(),
+                    tick_spacing: event.tick_spacing.into(),
+                    log_ordinal: log.ordinal(),
+                    ignore_pool: event.pool == ERROR_POOL,
+                    token0: Some(match rpc::create_uniswap_token(&token0_address) {
+                        Some(mut token) => {
+                            token.total_supply = rpc::token_total_supply_call(&token0_address)
+                                .unwrap_or(BigInt::zero())
+                                .to_string();
+                            token
+                        }
+                        None => {
+                            // We were unable to create the uniswap token, so we discard this event entirely
+                            log::info!("ignoring creating of pool addr: {}", Hex(&event.pool));
+                            return None;
+                        }
+                    }),
+                    token1: Some(match rpc::create_uniswap_token(&token1_address) {
+                        Some(mut token) => {
+                            token.total_supply = rpc::token_total_supply_call(&token1_address)
+                                .unwrap_or(BigInt::zero())
+                                .to_string();
+                            token
+                        }
+                        None => {
+                            // We were unable to create the uniswap token, so we discard this event entirely
+                            log::info!("ignoring creating of pool addr: {}", Hex(&event.pool));
+                            return None;
+                        }
+                    }),
+                    ..Default::default()
+                })
+            })
+            .collect(),
+    })
+}
+
+
+
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+#[substreams::handlers::map]
+fn map_events(
     blk: eth::Block,
     store_lendergroup: StoreGetInt64,
 ) -> Result<contract::Events, substreams::errors::Error> {
@@ -865,21 +991,6 @@ fn db_out(events: contract::Events) -> Result<DatabaseChanges, substreams::error
 
 
 
-
-#[substreams::handlers::store]
-pub fn store_lendergroup_pool_metrics(metrics_storages: LendergroupPoolMetrics , store: StoreSetProto<LendergroupPoolMetric>) {
-    for metric in metrics_storages.metrics  {
-        
-         let group_address = Address::from_slice(&metric.group_pool_address);
-         
-         
-        store.set(metric.ordinal, format!("lender_group_pool_metric:{group_address}"), &metric);
-    }
-}
-
-         
-    
-    
 
 //should be uusing store proto 
 //https://github.com/streamingfast/substreams-uniswap-v3/blob/bc2dc1d88d3e7297b15f67bb4cdb81702396f4f7/src/lib.rs#L1305

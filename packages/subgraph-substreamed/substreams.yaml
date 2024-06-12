@@ -28,6 +28,24 @@ modules:
     valueType: proto:dynamic_datasource
     inputs:
       - source: sf.ethereum.type.v2.Block
+      
+      
+  - name: map_lender_pools_initialized
+    kind: map
+    initialBlock: 57233385
+    inputs:
+      - source: sf.ethereum.type.v2.Block
+    output:
+      type: proto:contract.v1.Events.LendergroupPoolMetrics
+      
+  - name: store_lendergroup_pool_metrics
+    kind: store
+    updatePolicy: set
+    initialBlock: 57233385
+    valueType: proto:contract.v1.Events.LendergroupPoolMetric
+    inputs: 
+      - map: map_lender_pools_initialized 
+     
 
   - name: map_events
     kind: map
@@ -50,7 +68,7 @@ modules:
     kind: map
     initialBlock: 57233385
     inputs: 
-      - map: map_lendergroup_pools_created
+      - map: map_events
       - store: store_lendergroup_pool_metrics
         mode: deltas
     output:

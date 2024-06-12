@@ -316,3 +316,20 @@ pub struct LendergroupUnpaused {
     pub account: ::prost::alloc::vec::Vec<u8>,
 }
 // @@protoc_insertion_point(module)
+
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct LendergroupMetric {
+    #[prost(string, tag="1")]
+    pub evt_tx_hash: ::prost::alloc::string::String,
+    #[prost(uint32, tag="2")]
+    pub evt_index: u32,
+    #[prost(uint64, tag="3")]
+    pub evt_block_time: u64,
+    #[prost(uint64, tag="4")]
+    pub evt_block_number: u64,
+    #[prost(string, tag="5")]
+    pub evt_address: ::prost::alloc::string::String,
+    #[prost(bytes="vec", tag="6")]
+    pub account: ::prost::alloc::vec::Vec<u8>,
+}

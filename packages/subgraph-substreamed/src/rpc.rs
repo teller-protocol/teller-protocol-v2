@@ -24,27 +24,34 @@ pub struct LenderGroupPoolInitializationDataFromRpc {
 
 
 pub fn fetch_lender_group_pool_initialization_data_from_rpc(pool_contract_address: &String) -> Option<LenderGroupPoolInitializationDataFromRpc> {
-        
-    let pool_contract_address_decoded = hex::decode(pool_contract_address).unwrap(); 
+    
+    let pool_contract_address_hex = hex::encode(pool_contract_address); // Convert to hexadecimal if needed
+    let pool_contract_address_bytes = H160::from_slice(&pool_contract_address_hex.as_bytes());
+
+     
+    let pool_contract_address_vec = pool_contract_address_bytes.as_bytes().to_vec();
+
+
+   // let pool_contract_address_decoded = hex::decode(pool_contract_address).unwrap(); 
         
         
  
     
     let teller_v2_function = abi::lendergroup_contract::functions::TellerV2 {};
     let Some(teller_v2_address) = teller_v2_function.call(
-        pool_contract_address_decoded.clone()
+        pool_contract_address_vec.clone()
      ) else {return None};
     
         let uniswap_v3_pool_function = abi::lendergroup_contract::functions::UniswapV3Pool {};
         let Some(uniswap_v3_pool_address) = uniswap_v3_pool_function.call(
-            pool_contract_address_decoded.clone()
+            pool_contract_address_vec.clone()
         ) else {return None};
         
     
             
         let smart_commitment_forwarder_function = abi::lendergroup_contract::functions::SmartCommitmentForwarder {};
         let Some(smart_commitment_forwarder_address) = smart_commitment_forwarder_function.call(
-              pool_contract_address_decoded.clone()
+            pool_contract_address_vec.clone()
          ) else {return None};
             
             

@@ -15,7 +15,7 @@
 
 > Add it to contract proto ? 
 
-
+substreams protogen 
 
 
 

@@ -177,3 +177,35 @@ message lendergroup_Unpaused {
     string evt_address = 5;
     bytes account = 6;
 }
+
+message lendergroup_Metric {
+    
+    bytes group_pool_address = 1;
+    
+    bytes principal_token_address = 2;
+    bytes collateral_token_address = 3;
+    bytes shares_token_address = 4;
+    
+    bytes uniswap_v3_pool_address = 5;
+    bytes teller_v2_address = 6;
+    bytes smart_commitment_forwarder_address = 7;
+    string market_id = 8;
+    uint64 uniswap_pool_fee = 9;
+    uint64 max_loan_duration = 10;
+    uint64 twap_interval = 11;
+    uint64 interest_rate_upper_bound = 12;
+    uint64 interest_rate_lower_bound = 13;
+    uint64 liquidity_threshold_percent = 14;
+    uint64 collateral_ratio = 15;
+    
+    string total_principal_tokens_committed = 16;
+    string total_principal_tokens_withdrawn = 17;
+    string total_principal_tokens_lended = 18;
+    string total_principal_tokens_repaid = 19;
+    string total_interest_collected = 20;
+    string token_difference_from_liquidations = 21;
+}
+
+ 
+ 
+ 

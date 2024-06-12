@@ -18,6 +18,14 @@ use num_traits::cast::ToPrimitive;
 use std::str::FromStr;
 use substreams::scalar::BigDecimal;
 
+
+use substreams::store::{
+    DeltaArray, DeltaBigDecimal, DeltaBigInt, DeltaProto, StoreAddBigDecimal, StoreAddBigInt, StoreAppend,
+    StoreGetBigDecimal, StoreGetBigInt, StoreGetProto, StoreGetRaw, StoreSetBigDecimal, StoreSetBigInt, StoreSetProto,
+};
+
+
+
 substreams_ethereum::init!();
 
 const FACTORY_TRACKED_CONTRACT: [u8; 20] = hex!("e00384587dc733d1e201e1eaa5583645d351c01c");
@@ -522,11 +530,41 @@ fn db_lendergroup_out(events: &contract::Events, tables: &mut DatabaseChangeTabl
             .set("uniswap_pool_fee", evt.uniswap_pool_fee);
 
 
+            let lender_group_contract_address = Hex(&evt.evt_address).to_string();
+
+            let fetched_rpc_data = rpc::fetch_lender_group_pool_initialization_data_from_rpc(
+                &lender_group_contract_address
+                 ).unwrap();
+
+
 
         tables
             .create_row("group_pool_metrics", [ ("group_pool_address", evt.evt_address.to_string() ) ])
              
             .set("group_pool_address", Hex(&evt.evt_address).to_string() )
+            .set("principal_token_address", Hex(&evt.principal_token_address).to_string() )
+            .set("collateral_token_address", Hex(&evt.collateral_token_address).to_string() )
+            .set("shares_token_address", Hex(&evt.pool_shares_token).to_string() )
+            .set("uniswap_v3_pool_address", Hex(&fetched_rpc_data.uniswap_v3_pool_address).to_string() )
+            .set("teller_v2_address", Hex(&fetched_rpc_data.teller_v2_address).to_string() )
+            .set("smart_commitment_forwarder_address", Hex(&fetched_rpc_data.smart_commitment_forwarder_address).to_string() )
+            .set("market_id", BigDecimal::from_str(&evt.market_id).unwrap() )
+            .set("uniswap_pool_fee", evt.uniswap_pool_fee)
+            .set("max_loan_duration", evt.max_loan_duration)
+            .set("twap_interval", evt.twap_interval)
+            .set("interest_rate_upper_bound", evt.interest_rate_upper_bound)
+            .set("interest_rate_lower_bound", evt.interest_rate_lower_bound)
+            .set("liquidity_threshold_percent", evt.liquidity_threshold_percent)
+            .set("collateral_ratio", evt.loan_to_value_percent)  //rename me 
+ 
+            .set("total_principal_tokens_committed",  BigDecimal::from_str("0").unwrap()) 
+            .set("total_principal_tokens_withdrawn",  BigDecimal::from_str("0").unwrap()) 
+            .set("total_principal_tokens_lended",  BigDecimal::from_str("0").unwrap()) 
+            .set("total_principal_tokens_repaid",  BigDecimal::from_str("0").unwrap()) 
+            .set("total_interest_collected",  BigDecimal::from_str("0").unwrap()) 
+            .set("token_difference_from_liquidations",  BigDecimal::from_str("0").unwrap()) 
+
+            //total collateral !? 
             ;
     });
     events.lendergroup_unpauseds.iter().for_each(|evt| {
@@ -705,11 +743,77 @@ fn graph_lendergroup_out(events: &contract::Events, tables: &mut EntityChangesTa
             .set("twap_interval", evt.twap_interval);
             
 
+
+            let lender_group_contract_address = Hex(&evt.evt_address).to_string();
+
+            let fetched_rpc_data = rpc::fetch_lender_group_pool_initialization_data_from_rpc(
+                &lender_group_contract_address
+                 ).unwrap();
+
+
+
         tables
             .create_row("group_pool_metrics", format!("{}", evt.evt_address )  ) 
            
             .set("group_pool_address", Hex::decode(&evt.evt_address).unwrap() )
+            .set("principal_token_address", Hex(&evt.principal_token_address).to_string() )
+            .set("collateral_token_address", Hex(&evt.collateral_token_address).to_string() )
+            .set("shares_token_address", Hex(&evt.pool_shares_token).to_string() )
+            .set("uniswap_v3_pool_address", Hex(&fetched_rpc_data.uniswap_v3_pool_address).to_string() )
+            .set("teller_v2_address", Hex(&fetched_rpc_data.teller_v2_address).to_string() )
+            .set("smart_commitment_forwarder_address", Hex(&fetched_rpc_data.smart_commitment_forwarder_address).to_string() )
+            .set("market_id", BigDecimal::from_str(&evt.market_id).unwrap() )
+            .set("uniswap_pool_fee", evt.uniswap_pool_fee)
+            .set("max_loan_duration", evt.max_loan_duration)
+            .set("twap_interval", evt.twap_interval)
+            .set("interest_rate_upper_bound", evt.interest_rate_upper_bound)
+            .set("interest_rate_lower_bound", evt.interest_rate_lower_bound)
+            .set("liquidity_threshold_percent", evt.liquidity_threshold_percent)
+            .set("collateral_ratio", evt.loan_to_value_percent)  //rename me 
+ 
+            .set("total_principal_tokens_committed",  BigDecimal::from_str("0").unwrap()) 
+            .set("total_principal_tokens_withdrawn",  BigDecimal::from_str("0").unwrap()) 
+            .set("total_principal_tokens_lended",  BigDecimal::from_str("0").unwrap()) 
+            .set("total_principal_tokens_repaid",  BigDecimal::from_str("0").unwrap()) 
+            .set("total_interest_collected",  BigDecimal::from_str("0").unwrap()) 
+            .set("token_difference_from_liquidations",  BigDecimal::from_str("0").unwrap())  
             ;
+
+
+
+        // read the data from the table   group_pool_metrics 
+
+
+        //create a new row for the table "group_pool_metrics_data_points" based on that 
+
+        // Read data from group_pool_metrics table
+            let group_pool_metrics_table = tables.tables
+            .get("group_pool_metrics")
+            .unwrap();
+            
+            let pool_metrics_row = group_pool_metrics_table.pks.get( 
+                evt.evt_address.to_string()
+            ).unwrap();
+    
+        
+        /* tables
+        .update_row("Factory", "0x0000000")
+         .set("txCount", new_count);*/
+        
+        
+        // Create row in group_pool_metrics_data_point table
+           tables
+            .create_row("group_pool_metrics_data_point", format!("{}", evt.evt_address))
+            .set("group_pool_address", Hex::decode(&evt.evt_address).unwrap())
+            .set("block_number", evt.evt_block_number)
+            .set("block_time", evt.evt_block_time)
+            .set("total_principal_tokens_committed", pool_metrics_row.get_value_in_row("total_principal_tokens_committed").unwrap())
+            .set("total_principal_tokens_withdrawn", pool_metrics_row.get_value_in_row("total_principal_tokens_withdrawn").unwrap())
+            .set("total_principal_tokens_lended", pool_metrics_row.get_value_in_row("total_principal_tokens_lended").unwrap())
+            .set("total_principal_tokens_repaid", pool_metrics_row.get_value_in_row("total_principal_tokens_repaid").unwrap())
+            .set("total_interest_collected", pool_metrics_row.get_value_in_row("total_interest_collected").unwrap());
+
+
     });
     events.lendergroup_unpauseds.iter().for_each(|evt| {
         tables
@@ -759,12 +863,56 @@ fn db_out(events: contract::Events) -> Result<DatabaseChanges, substreams::error
 }
 
 
+
+
+
+#[substreams::handlers::store]
+pub fn store_pools(metrics_storages: LenderGroupPoolMetricsStorages, store: StoreSetProto<LenderGroupPoolMetricsStorage>) {
+    for metrics_storage in metrics_storages.metrics_storages {
+        let group_address = &metrics_storage.group_pool_address;
+        store.set(metrics_storage.log_ordinal, format!("lender_group_pool_metric:{group_address}"), &metrics_storage);
+    }
+}
+
+        
+    
+    
+    
+
+//should be uusing store proto 
+//https://github.com/streamingfast/substreams-uniswap-v3/blob/bc2dc1d88d3e7297b15f67bb4cdb81702396f4f7/src/lib.rs#L1305
+
 //this is the one that is used primarily !!   ?
 #[substreams::handlers::map]
-fn graph_out(events: contract::Events) -> Result<EntityChanges, substreams::errors::Error> {
+fn graph_out(
+    
+    events: contract::Events,
+    store: StoreSetProto<LenderGroupPoolMetricsStorage>
+
+
+    
+    ) -> Result<EntityChanges, substreams::errors::Error> {
     // Initialize Database Changes container
     let mut tables = EntityChangesTables::new();
     graph_factory_out(&events, &mut tables);
     graph_lendergroup_out(&events, &mut tables);
     Ok(tables.to_entity_changes())
+}
+
+pub trait GetRowValueExt {
+    
+    
+    pub fn get_value_in_row(&self,column_name: &String) -> Option<substreams_entity_change::pb::entity::Value> ;
+        
+         
+}
+
+impl GetRowValueExt for substreams_entity_change::tables::Row {
+    
+      pub fn get_value_in_row(&self,column_name: &String) -> Option<substreams_entity_change::pb::entity::Value> {
+        
+         self.columns.get(column_name).cloned()
+        
+    }
+    
 }

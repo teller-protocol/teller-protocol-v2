@@ -22,6 +22,13 @@
 ### Building 
 
 
+> Run makefile 
+
+```
+make 
+```
+
+
 > Create a substreams spkg 
 
 ```

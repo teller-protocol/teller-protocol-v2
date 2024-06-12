@@ -152,16 +152,16 @@ CREATE TABLE IF NOT EXISTS lendergroup_unpaused (
     "account" VARCHAR(40),
     PRIMARY KEY(evt_tx_hash,evt_index)
 );
-CREATE TABLE IF NOT EXISTS group_pool_metrics (
+CREATE TABLE IF NOT EXISTS group_pool_metric (
     "group_pool_address" VARCHAR(40),
     PRIMARY KEY(group_pool_address)
 );
-CREATE TABLE IF NOT EXISTS group_lender_metrics (
+CREATE TABLE IF NOT EXISTS group_lender_metric (
     
     "user_lender_address" VARCHAR(40),
     PRIMARY KEY(user_lender_address)
 );
-CREATE TABLE IF NOT EXISTS group_pool_metrics_data_point (
+CREATE TABLE IF NOT EXISTS group_pool_metric_data_point (
     "group_pool_address" VARCHAR(40),
     "block_number" DECIMAL,
     PRIMARY KEY(group_pool_address,block_number)

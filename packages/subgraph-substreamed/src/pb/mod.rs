@@ -5,4 +5,4 @@ pub mod contract {
         include!("contract.v1.rs");
         // @@protoc_insertion_point(contract.v1)
     }
-}
+} 

@@ -316,20 +316,59 @@ pub struct LendergroupUnpaused {
     pub account: ::prost::alloc::vec::Vec<u8>,
 }
 // @@protoc_insertion_point(module)
+ 
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct LendergroupPoolMetric {
+    #[prost(bytes="vec", tag="1")]
+    pub group_pool_address: Vec<u8>,
+    #[prost(bytes="vec", tag="2")]
+    pub principal_token_address: Vec<u8>,
+    #[prost(bytes="vec", tag="3")]
+    pub collateral_token_address: Vec<u8>,
+    #[prost(bytes="vec", tag="4")]
+    pub shares_token_address: Vec<u8>,
+    #[prost(bytes="vec", tag="5")]
+    pub uniswap_v3_pool_address: Vec<u8>,
+    #[prost(bytes="vec", tag="6")]
+    pub teller_v2_address: Vec<u8>,
+    #[prost(bytes="vec", tag="7")]
+    pub smart_commitment_forwarder_address: Vec<u8>,
+    #[prost(string, tag="8")]
+    pub market_id: String,
+    #[prost(uint64, tag="9")]
+    pub uniswap_pool_fee: u64,
+    #[prost(uint64, tag="10")]
+    pub max_loan_duration: u64,
+    #[prost(uint64, tag="11")]
+    pub twap_interval: u64,
+    #[prost(uint64, tag="12")]
+    pub interest_rate_upper_bound: u64,
+    #[prost(uint64, tag="13")]
+    pub interest_rate_lower_bound: u64,
+    #[prost(uint64, tag="14")]
+    pub liquidity_threshold_percent: u64,
+    #[prost(uint64, tag="15")]
+    pub collateral_ratio: u64,
+    #[prost(string, tag="16")]
+    pub total_principal_tokens_committed: String,
+    #[prost(string, tag="17")]
+    pub total_principal_tokens_withdrawn: String,
+    #[prost(string, tag="18")]
+    pub total_principal_tokens_lended: String,
+    #[prost(string, tag="19")]
+    pub total_principal_tokens_repaid: String,
+    #[prost(string, tag="20")]
+    pub total_interest_collected: String,
+    #[prost(string, tag="21")]
+    pub token_difference_from_liquidations: String,
+     #[prost(uint64, tag="22")]
+    pub ordinal: u64,
+}
 
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct LendergroupMetric {
-    #[prost(string, tag="1")]
-    pub evt_tx_hash: ::prost::alloc::string::String,
-    #[prost(uint32, tag="2")]
-    pub evt_index: u32,
-    #[prost(uint64, tag="3")]
-    pub evt_block_time: u64,
-    #[prost(uint64, tag="4")]
-    pub evt_block_number: u64,
-    #[prost(string, tag="5")]
-    pub evt_address: ::prost::alloc::string::String,
-    #[prost(bytes="vec", tag="6")]
-    pub account: ::prost::alloc::vec::Vec<u8>,
+pub struct LendergroupPoolMetrics {
+    #[prost(message, repeated, tag="1")]
+    pub metrics: ::prost::alloc::vec::Vec<LendergroupPoolMetric>,
 }

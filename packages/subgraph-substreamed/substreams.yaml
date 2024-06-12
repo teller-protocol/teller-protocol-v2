@@ -49,8 +49,10 @@ modules:
   - name: graph_out
     kind: map
     initialBlock: 57233385
-    inputs:
-      - map: map_events
+    inputs: 
+      - map: map_lendergroup_pools_created
+      - store: store_lendergroup_pool_metrics
+        mode: deltas
     output:
       type: proto:sf.substreams.entity.v1.EntityChanges
 

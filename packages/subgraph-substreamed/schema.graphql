@@ -161,7 +161,7 @@ type group_unpaused @entity {
 
 
 
-type group_pool_metrics @entity {
+type group_pool_metric @entity {
     id: ID!    #will be based on group pool address 
     group_pool_address: Bytes!
 
@@ -200,7 +200,7 @@ type group_pool_metrics @entity {
 }
 
 
-type group_lender_metrics @entity {
+type group_lender_metric @entity {
     id: ID!   #will be based on group pool address and user lender address 
     
     user_lender_address: Bytes!
@@ -218,7 +218,7 @@ type group_lender_metrics @entity {
 
 
 
-type group_pool_metrics_data_point @entity {
+type group_pool_metric_data_point @entity {
     id: ID!    #will be based on group pool address 
     group_pool_address: Bytes!
 

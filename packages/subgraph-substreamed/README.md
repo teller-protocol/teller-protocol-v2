@@ -34,3 +34,10 @@ make
 ```
 substreams pack ./substreams.yaml
 ```
+
+
+
+### Deploying 
+
+
+yarn deploy:prompt 

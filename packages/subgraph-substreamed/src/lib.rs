@@ -520,6 +520,14 @@ fn db_lendergroup_out(events: &contract::Events, tables: &mut DatabaseChangeTabl
             .set("principal_token_address", Hex(&evt.principal_token_address).to_string())
             .set("twap_interval", evt.twap_interval)
             .set("uniswap_pool_fee", evt.uniswap_pool_fee);
+
+
+
+        tables
+            .create_row("group_pool_metrics", [ ("group_pool_address", evt.evt_address.to_string() ) ])
+             
+            .set("group_pool_address", Hex(&evt.evt_address).to_string() )
+            ;
     });
     events.lendergroup_unpauseds.iter().for_each(|evt| {
         tables
@@ -694,8 +702,14 @@ fn graph_lendergroup_out(events: &contract::Events, tables: &mut EntityChangesTa
             .set("max_loan_duration", evt.max_loan_duration)
             .set("pool_shares_token", &evt.pool_shares_token)
             .set("principal_token_address", &evt.principal_token_address)
-            .set("twap_interval", evt.twap_interval)
-            .set("uniswap_pool_fee", evt.uniswap_pool_fee);
+            .set("twap_interval", evt.twap_interval);
+            
+
+        tables
+            .create_row("group_pool_metrics", format!("{}", evt.evt_address )  ) 
+           
+            .set("group_pool_address", Hex::decode(&evt.evt_address).unwrap() )
+            ;
     });
     events.lendergroup_unpauseds.iter().for_each(|evt| {
         tables
@@ -744,6 +758,8 @@ fn db_out(events: contract::Events) -> Result<DatabaseChanges, substreams::error
     Ok(tables.to_database_changes())
 }
 
+
+//this is the one that is used primarily !!   ?
 #[substreams::handlers::map]
 fn graph_out(events: contract::Events) -> Result<EntityChanges, substreams::errors::Error> {
     // Initialize Database Changes container

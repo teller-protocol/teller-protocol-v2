@@ -30,6 +30,8 @@ use substreams::store::{
 
 substreams_ethereum::init!();
 
+
+//make this not hardcoded !?  config ??? 
 const FACTORY_TRACKED_CONTRACT: [u8; 20] = hex!("e00384587dc733d1e201e1eaa5583645d351c01c");
 
 fn map_factory_events(blk: &eth::Block, events: &mut contract::Events) {
@@ -394,7 +396,7 @@ fn map_lendergroup_events(
         .collect());
 }
 
-
+/*
 fn db_factory_out(events: &contract::Events, tables: &mut DatabaseChangeTables) {
     // Loop over all the abis events to create table changes
     events.factory_admin_changeds.iter().for_each(|evt| {
@@ -578,9 +580,15 @@ fn db_lendergroup_out(events: &contract::Events, tables: &mut DatabaseChangeTabl
             .set("account", Hex(&evt.account).to_string());
     });
 }
+*/
 
-
-fn graph_factory_out(events: &contract::Events, tables: &mut EntityChangesTables) {
+fn graph_factory_out(
+    events: &contract::Events, 
+    tables: &mut EntityChangesTables,
+    
+    
+    
+    ) {
     // Loop over all the abis events to create table changes
     events.factory_admin_changeds.iter().for_each(|evt| {
         tables
@@ -620,7 +628,18 @@ fn graph_factory_out(events: &contract::Events, tables: &mut EntityChangesTables
             .set("implementation", &evt.implementation);
     });
 }
-fn graph_lendergroup_out(events: &contract::Events, tables: &mut EntityChangesTables, lendergroup_metrics_store: &StoreGetProto<LendergroupPoolMetric>) {
+
+
+
+fn graph_lendergroup_out(
+    events: &contract::Events, 
+    tables: &mut EntityChangesTables,
+    
+    deltas_lendergroup_pool_metrics: &Deltas<DeltaBigInt>
+     // big_int_store: &StoreGetProto<BigInt>
+      
+      
+      ) {
     // Loop over all the abis events to create table changes
     events.lendergroup_borrower_accepted_funds.iter().for_each(|evt| {
         tables
@@ -751,10 +770,9 @@ fn graph_lendergroup_out(events: &contract::Events, tables: &mut EntityChangesTa
             let fetched_rpc_data = rpc::fetch_lender_group_pool_initialization_data_from_rpc(
                 &lender_group_contract_address
                  ).unwrap();
-
-
-
-        tables
+    
+       //create group pool metric 
+       tables
             .create_row("group_pool_metric", format!("{}", evt.evt_address )  ) 
            
             .set("group_pool_address", Hex::decode(&evt.evt_address).unwrap() )
@@ -782,8 +800,28 @@ fn graph_lendergroup_out(events: &contract::Events, tables: &mut EntityChangesTa
            // .set("ordinal",   evt.log.ordinal  )  //is this ok ?  
             ;
 
+      
 
    
+    });
+    events.lendergroup_unpauseds.iter().for_each(|evt| {
+        tables
+            .create_row("group_unpaused", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
+            .set("evt_tx_hash", Hex::decode(&evt.evt_tx_hash).unwrap())
+            .set("evt_index", evt.evt_index)
+            .set("evt_block_time", evt.evt_block_time.to_string())
+            .set("evt_block_number", evt.evt_block_number)
+            .set("group_pool_address", Hex::decode(&evt.evt_address).unwrap())
+            .set("account", Hex(&evt.account).to_string());
+    });
+    
+    
+    
+    // -------------
+    
+    
+    
+
 
 
         // read the data from the table   group_pool_metrics 
@@ -791,10 +829,46 @@ fn graph_lendergroup_out(events: &contract::Events, tables: &mut EntityChangesTa
 
         //create a new row for the table "group_pool_metrics_data_points" based on that 
         
-        let group_address = Address::from_slice(  & Hex::decode(&evt.evt_address).unwrap() )    ; //evt.evt_address.clone();
-
+     //   let group_address = Address::from_slice(  & Hex::decode(&evt.evt_address).unwrap() )    ; //evt.evt_address.clone();
+    
+         for pool_metric_delta in   deltas_lendergroup_pool_metrics.deltas.into_iter(){
+             
+             
+                
+         let group_address = substreams::key::segment_at(pool_metric_delta.get_key(), 1);
+                
+        
+         let new_value = pool_metric_delta.new_value;
+                
+                
+          tables
+            .update_row("group_pool_metric", format!("{}", group_address)  ) 
+           
+           
+            .set("total_principal_tokens_committed",  BigDecimal::from_str("0").unwrap()) 
+            .set("total_principal_tokens_withdrawn",  BigDecimal::from_str("0").unwrap()) 
+            .set("total_principal_tokens_lended",  BigDecimal::from_str("0").unwrap()) 
+            .set("total_principal_tokens_repaid",  BigDecimal::from_str("0").unwrap()) 
+            .set("total_interest_collected",  BigDecimal::from_str("0").unwrap()) 
+            .set("token_difference_from_liquidations",  BigDecimal::from_str("0").unwrap())  
+           // .set("ordinal",   evt.log.ordinal  )  //is this ok ?  
+            ;
+    
+                
+                
+           tables
+            .create_row("group_pool_metric_data_point", format!("{}_{}", group_address, block_number )  ) 
+            
+            
+            ;
+           
+                
+                
+                                                
+         }
+         
         // Read data from group_pool_metrics table
-            let group_pool_metric:LendergroupPoolMetric   = lendergroup_metrics_store.get_last( format!("lender_group_pool_metric:{group_address}") ).unwrap();
+   //   let group_pool_metric:LendergroupPoolMetric = lendergroup_metrics_store.get_last( format!("lender_group_pool_metric:{group_address}") ).unwrap();
             
             //PUT ME IN A HELPER  IN DB ? 
         
@@ -817,19 +891,8 @@ fn graph_lendergroup_out(events: &contract::Events, tables: &mut EntityChangesTa
             .set("total_interest_collected", group_pool_metric.total_interest_collected );
 
 
-    });
-    events.lendergroup_unpauseds.iter().for_each(|evt| {
-        tables
-            .create_row("group_unpaused", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
-            .set("evt_tx_hash", Hex::decode(&evt.evt_tx_hash).unwrap())
-            .set("evt_index", evt.evt_index)
-            .set("evt_block_time", evt.evt_block_time.to_string())
-            .set("evt_block_number", evt.evt_block_number)
-            .set("group_pool_address", Hex::decode(&evt.evt_address).unwrap())
-            .set("account", Hex(&evt.account).to_string());
-    });
     
-    
+            
     
     
 }
@@ -838,6 +901,7 @@ fn graph_lendergroup_out(events: &contract::Events, tables: &mut EntityChangesTa
 
 
 // THIS IS HOW WE ADD TO STORAGE 
+// this is filtering for all 'DeployedLenderGroupContract' events and is setting a bit as a 1  in the store if it was emitted 
 #[substreams::handlers::store]
 fn store_factory_lendergroup_created(blk: eth::Block, store: StoreSetInt64) {
     for rcpt in blk.receipts() {
@@ -858,7 +922,35 @@ fn store_factory_lendergroup_created(blk: eth::Block, store: StoreSetInt64) {
 
 
 
+pub fn store_lendergroup_pool_metrics(  events: contract::Events,  store:  StoreAddBigInt ) {
+    
+    
+     events.lendergroup_borrower_accepted_funds.iter().for_each(|evt| {
+         
+         let lender_group_address = &evt.evt_address;
+         
+         let additional_principal_amt = &evt.principal_amount;
+         let additional_collateral_amt = &evt.collateral_amount;
+         
+         //in the protobuf , add the log_ordinal 
+         let ordinal = 0;  // ?? IS THIS RIGHT ??? WHAT IS ORDINAL ? 
+        
+         let store_lender_group_principal_amt_key = format!("lender_group_metrics_{}_borrower_funds_total",lender_group_address );
+         let store_lender_group_collateral_amt_key = format!("lender_group_metrics_{}_borrower_collateral_total",lender_group_address );
+     
+        
+         store.add(ordinal  as u64, store_lender_group_principal_amt_key, BigInt::from_str (  additional_principal_amt.as_str() ).unwrap() )  ;
+         store.add(ordinal  as u64, store_lender_group_collateral_amt_key, BigInt::from_str (  additional_collateral_amt.as_str() ).unwrap() )  ;
+         
+        
+      
+    });
+    
+    
+    
+}
 
+/*
 #[substreams::handlers::store]
 pub fn store_lendergroup_pool_metrics(metrics_storages: LendergroupPoolMetrics , store: StoreSetProto<LendergroupPoolMetric>) {
     for metric in metrics_storages.metrics  {
@@ -869,27 +961,11 @@ pub fn store_lendergroup_pool_metrics(metrics_storages: LendergroupPoolMetrics ,
         store.set(metric.ordinal, format!("lender_group_pool_metric:{group_address}"), &metric);
     }
 }
-
+*/
          
          
          
-         
-//  map_factory_events(blk: &eth::Block, events: &mut contract::Events) {
-         
-#[substreams::handlers::map]
-pub fn map_lender_pools_initialized( blk:  &eth::Block ) -> Result<LendergroupPoolMetrics, Error> {
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-}
-
+ 
 /*
 #[substreams::handlers::map]
 pub fn map_pools_created(block: Block) -> Result<Pools, Error> {
@@ -979,6 +1055,11 @@ fn map_events(
     Ok(events)
 }
 
+
+/*
+
+This is only if you want to write this directly to a living postgres !! 
+
 #[substreams::handlers::map]
 fn db_out(events: contract::Events) -> Result<DatabaseChanges, substreams::errors::Error> {
     // Initialize Database Changes container
@@ -989,7 +1070,7 @@ fn db_out(events: contract::Events) -> Result<DatabaseChanges, substreams::error
 }
 
 
-
+*/
 
 
 //should be uusing store proto 
@@ -1000,7 +1081,7 @@ fn db_out(events: contract::Events) -> Result<DatabaseChanges, substreams::error
 fn graph_out(
     
     events: contract::Events,
-    lendergroup_metrics_store: StoreGetProto<LendergroupPoolMetric>
+    deltas_lendergroup_pool_metrics: Deltas<DeltaBigInt>
     
     // pools_store: StoreGetProto<Pool>
 
@@ -1009,7 +1090,7 @@ fn graph_out(
     // Initialize Database Changes container
     let mut tables = EntityChangesTables::new();
     graph_factory_out(&events, &mut tables);
-    graph_lendergroup_out(&events, &mut tables, &lendergroup_metrics_store);
+    graph_lendergroup_out(&events, &mut tables, &deltas_lendergroup_pool_metrics);
     Ok(tables.to_entity_changes())
 }
 

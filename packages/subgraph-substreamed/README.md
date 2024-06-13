@@ -1,7 +1,9 @@
 ### Lender Groups Substreams
 
 
+https://www.google.com/search?client=ubuntu&channel=fs&q=substream+rust+docs
 
+https://docs.rs/substreams/latest/substreams/store/index.html
 
 - use map-events 
 

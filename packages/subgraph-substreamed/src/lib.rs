@@ -833,36 +833,44 @@ fn graph_lendergroup_out(
     
          for pool_metric_delta in   deltas_lendergroup_pool_metrics.deltas.into_iter(){
              
-             
+                    
+                        
+                let group_address = substreams::key::segment_at(pool_metric_delta.get_key(), 1);
+                        
+                let block_number = 0; // FOR NOW 
+                let new_value = pool_metric_delta.new_value ;
+                        
+                        
+                tables
+                    .update_row("group_pool_metric", format!("{}", group_address)  ) 
                 
-         let group_address = substreams::key::segment_at(pool_metric_delta.get_key(), 1);
                 
-        
-         let new_value = pool_metric_delta.new_value;
-                
-                
-          tables
-            .update_row("group_pool_metric", format!("{}", group_address)  ) 
-           
-           
-            .set("total_principal_tokens_committed",  BigDecimal::from_str("0").unwrap()) 
-            .set("total_principal_tokens_withdrawn",  BigDecimal::from_str("0").unwrap()) 
-            .set("total_principal_tokens_lended",  BigDecimal::from_str("0").unwrap()) 
-            .set("total_principal_tokens_repaid",  BigDecimal::from_str("0").unwrap()) 
-            .set("total_interest_collected",  BigDecimal::from_str("0").unwrap()) 
-            .set("token_difference_from_liquidations",  BigDecimal::from_str("0").unwrap())  
-           // .set("ordinal",   evt.log.ordinal  )  //is this ok ?  
-            ;
+                    .set("total_principal_tokens_committed",  BigDecimal::from_str("0").unwrap()) 
+                    .set("total_principal_tokens_withdrawn",  BigDecimal::from_str("0").unwrap()) 
+                    .set("total_principal_tokens_lended",  BigDecimal::from_str("0").unwrap()) 
+                    .set("total_principal_tokens_repaid",  BigDecimal::from_str("0").unwrap()) 
+                    .set("total_interest_collected",  BigDecimal::from_str("0").unwrap()) 
+                    .set("token_difference_from_liquidations",  BigDecimal::from_str("0").unwrap())  
+                // .set("ordinal",   evt.log.ordinal  )  //is this ok ?  
+                    ;
+            
+                        
+                             
+        // Create row in group_pool_metrics_data_point table
+          
     
-                
-                
-           tables
-            .create_row("group_pool_metric_data_point", format!("{}_{}", group_address, block_number )  ) 
-            
-            
-            ;
-           
-                
+                tables
+                    .create_row("group_pool_metric_data_point", format!("{}_{}", group_address, block_number )  ) 
+                    .set("group_pool_address", Hex::decode(&evt.evt_address).unwrap())
+                    .set("block_number", evt.evt_block_number)
+                    .set("block_time", evt.evt_block_time)
+                    .set("total_principal_tokens_committed", group_pool_metric.total_principal_tokens_committed )
+                    .set("total_principal_tokens_withdrawn", group_pool_metric.total_principal_tokens_withdrawn  )
+                    .set("total_principal_tokens_lended", group_pool_metric.total_principal_tokens_lended )
+                    .set("total_principal_tokens_repaid", group_pool_metric.total_principal_tokens_repaid  )
+                    .set("total_interest_collected", group_pool_metric.total_interest_collected );
+                            
+                   
                 
                                                 
          }
@@ -877,21 +885,7 @@ fn graph_lendergroup_out(
         .update_row("Factory", "0x0000000")
          .set("txCount", new_count);*/
         
-        
-        // Create row in group_pool_metrics_data_point table
-           tables
-            .create_row("group_pool_metric_data_point", format!("{}", evt.evt_address))
-            .set("group_pool_address", Hex::decode(&evt.evt_address).unwrap())
-            .set("block_number", evt.evt_block_number)
-            .set("block_time", evt.evt_block_time)
-            .set("total_principal_tokens_committed", group_pool_metric.total_principal_tokens_committed )
-            .set("total_principal_tokens_withdrawn", group_pool_metric.total_principal_tokens_withdrawn  )
-            .set("total_principal_tokens_lended", group_pool_metric.total_principal_tokens_lended )
-            .set("total_principal_tokens_repaid", group_pool_metric.total_principal_tokens_repaid  )
-            .set("total_interest_collected", group_pool_metric.total_interest_collected );
-
-
-    
+   
             
     
     

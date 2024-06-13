@@ -15,6 +15,21 @@ What is the best way to architect this ??
 
 
 
+  - When you use STORES, you want to use a DELTA type typically so you only pass along the   (key,value) pairs from THIS block to the next module(s)
+  - When you use STOERS you typically want to use a PRIMITIVE type as opposed to a Struct(protobuf) so that you can use an ADD type 
+  
+  - you have to do very special custom key mgmt kind of like workign with a REDIS store 
+  
+  - you dont need db_out at all , just use graph_out 
+  
+  
+  - the graph_out is ONLY able to output directives to the POSTGRES db, it cannot read from the POSTGRES db 
+   
+
+
+
+
+
 I want to: 
 
 

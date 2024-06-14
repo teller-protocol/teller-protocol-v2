@@ -4,6 +4,7 @@ mod rpc;
 use hex_literal::hex;
 use pb::contract::v1 as contract;
 use pb::contract::v1::LendergroupBorrowerAcceptedFunds;
+use pb::contract::v1::LendergroupEarningsWithdrawn;
 use pb::contract::v1::LendergroupLenderAddedPrincipal;
 use pb::contract::v1::LendergroupLoanRepaid;
 use substreams::prelude::*;
@@ -639,7 +640,9 @@ fn graph_lendergroup_out(
     events: &contract::Events, 
     tables: &mut EntityChangesTables,
     
-    deltas_lendergroup_pool_metrics: &Deltas<DeltaBigInt>
+    deltas_lendergroup_pool_metrics: &Deltas<DeltaBigInt>,
+    store_get_lendergroup_pool_metrics: &StoreGetBigInt, 
+    
      // big_int_store: &StoreGetProto<BigInt>
       
       
@@ -873,7 +876,7 @@ fn graph_lendergroup_out(
                     ;*/
             
                  match delta_prop_identifier  {
-                    "total_principals_committed" => {
+                    "total_principal_tokens_committed" => {
                         tables.update_row("group_pool_metric", &group_address)
                             .set("total_principal_tokens_committed", new_value );
                     },
@@ -898,21 +901,52 @@ fn graph_lendergroup_out(
          
          
          //need to use a non-delta store!?
-         for delta_pool_address in pool_metric_deltas_detected.iter() {
+         for group_pool_address in pool_metric_deltas_detected.iter() {
              
                 
-             
-              /*  tables
-                    .create_row("group_pool_metric_data_point", format!("{}_{}", group_address, block_number )  ) 
-                    .set("group_pool_address", Hex::decode(&evt.evt_address).unwrap())
-                    .set("block_number", evt.evt_block_number)
-                    .set("block_time", evt.evt_block_time)
-                    .set("total_principal_tokens_committed", group_pool_metric.total_principal_tokens_committed )
-                    .set("total_principal_tokens_withdrawn", group_pool_metric.total_principal_tokens_withdrawn  )
-                    .set("total_principal_tokens_lended", group_pool_metric.total_principal_tokens_lended )
-                    .set("total_principal_tokens_repaid", group_pool_metric.total_principal_tokens_repaid  )
-                    .set("total_interest_collected", group_pool_metric.total_interest_collected );
-                */ 
+            //get the data from store_get_lendergroup_pool_metrics
+               
+               
+            let ord = 0; // FOR NOW - CAN CAUSE ISSUES 
+               
+            let block_number = 0; // FOR NOW - get from store !?  
+            let block_time = 0;  // FOR NOW - get from store !?  
+               
+               
+               //turn this into an enum !?
+            let total_principal_committed = store_get_lendergroup_pool_metrics
+            .get_at(ord, format!("group_pool_metric:{}:total_principal_tokens_committed", group_pool_address  ))
+            .unwrap_or(BigInt::zero()) ;
+                
+            let total_principal_tokens_withdrawn = store_get_lendergroup_pool_metrics
+            .get_at(ord, format!("group_pool_metric:{}:total_principal_tokens_withdrawn", group_pool_address  ))
+            .unwrap_or(BigInt::zero()) ;
+                
+            let total_principal_tokens_lended = store_get_lendergroup_pool_metrics
+            .get_at(ord, format!("group_pool_metric:{}:total_principal_tokens_lended", group_pool_address  ))
+            .unwrap_or(BigInt::zero()) ;
+                
+            let total_principal_tokens_repaid = store_get_lendergroup_pool_metrics
+            .get_at(ord, format!("group_pool_metric:{}:total_principal_tokens_repaid", group_pool_address  ))
+            .unwrap_or(BigInt::zero()) ;
+                
+            let total_interest_collected = store_get_lendergroup_pool_metrics
+            .get_at(ord, format!("group_pool_metric:{}:total_interest_collected", group_pool_address  ))
+            .unwrap_or(BigInt::zero()) ;
+                 
+              
+            
+               tables
+                    .create_row("group_pool_metric_data_point", format!("{}_{}", group_pool_address, block_number )  ) 
+                    .set("group_pool_address", Hex::decode( group_pool_address ).unwrap())
+                    .set("block_number", block_number)
+                    .set("block_time", block_time)
+                    .set("total_principal_tokens_committed", total_principal_committed )
+                    .set("total_principal_tokens_withdrawn", total_principal_tokens_withdrawn  )
+                    .set("total_principal_tokens_lended", total_principal_tokens_lended )
+                    .set("total_principal_tokens_repaid", total_principal_tokens_repaid  )
+                    .set("total_interest_collected", total_interest_collected );
+                
              
          }
          
@@ -957,28 +991,118 @@ fn store_factory_lendergroup_created(blk: eth::Block, store: StoreSetInt64) {
 
 
 
-fn store_lendergroup_pool_metrics(events: &contract::Events, store: StoreAddBigInt) {
+fn store_lendergroup_pool_metrics_deltas(events: &contract::Events, store: StoreAddBigInt) {
     
     
     let ord = 0; // FOR NOW - CAN CAUSE ISSUES - GET FROM LOG AND STUFF INTO EVENT    
     
     
     events.lendergroup_lender_added_principals.iter().for_each(|evt: &LendergroupLenderAddedPrincipal| {
-        let store_key: String = format!("group_pool_metric:{}:total_principals_committed", evt.evt_address);
+        let store_key: String = format!("group_pool_metric:{}:total_principal_tokens_committed", evt.evt_address);
         store.add(ord,&store_key, BigInt::from_str(&evt.amount).unwrap_or(BigInt::zero()));
     });
 
     events.lendergroup_borrower_accepted_funds.iter().for_each(|evt: &LendergroupBorrowerAcceptedFunds| {
-        let store_key: String = format!("group_pool_metric:{}:total_principal_tokens_withdrawn", evt.evt_address);
+        
+        let store_key: String = format!("group_pool_metric:{}:total_principal_tokens_lended", evt.evt_address);
         store.add(ord,&store_key, BigInt::from_str(&evt.principal_amount).unwrap_or(BigInt::zero()));
+        
+        
+       
+        //add total collateral ! 
+        
+        //  evt.collateral_amount
     });
 
+    
+    events.lendergroup_earnings_withdrawns.iter().for_each(|evt: &LendergroupEarningsWithdrawn| {
+        let store_key: String = format!("group_pool_metric:{}:total_principal_tokens_withdrawn", evt.evt_address);
+        store.add(ord,&store_key, BigInt::from_str(&evt.principal_tokens_withdrawn).unwrap_or(BigInt::zero()));
+         
+        
+        //add total collateral ! 
+    });
+
+    
+            
     events.lendergroup_loan_repaids.iter().for_each(|evt: &LendergroupLoanRepaid| {
         let store_key_repaid: String = format!("group_pool_metric:{}:total_principal_tokens_repaid", evt.evt_address);
         let store_key_interest: String = format!("group_pool_metric:{}:total_interest_collected", evt.evt_address);
         store.add(ord,&store_key_repaid, BigInt::from_str(&evt.principal_amount).unwrap_or(BigInt::zero()));
         store.add(ord,&store_key_interest, BigInt::from_str(&evt.interest_amount).unwrap_or(BigInt::zero()));
     });
+}
+
+
+
+
+fn store_lendergroup_pool_metrics(
+     deltas_lendergroup_pool_metrics: Deltas<DeltaBigInt>,
+     store: StoreSetBigInt
+    ) {
+    
+    
+    let ord = 0; // FOR NOW - CAN CAUSE ISSUES - GET FROM LOG AND STUFF INTO EVENT    
+    
+      for pool_metric_delta in deltas_lendergroup_pool_metrics.deltas. iter(){
+             
+                    
+                        //this splits on ":"
+                let delta_root_identifier = substreams::key::segment_at(pool_metric_delta.get_key(), 0);
+            
+                if delta_root_identifier != "group_pool_metric" {continue};
+                
+                let group_address = substreams::key::segment_at(pool_metric_delta.get_key(), 1);
+                let delta_prop_identifier = substreams::key::segment_at(pool_metric_delta.get_key(), 2);
+                        
+                        
+                        
+                let block_number = 0; // FOR NOW 
+                let new_value = &pool_metric_delta.new_value ;
+                        
+                
+                        
+                        
+               match delta_prop_identifier {
+                   
+                   "total_principal_tokens_committed" => {
+                       let store_key: String = format!("group_pool_metric:{}:total_principal_tokens_committed", group_address);
+                       store.set(ord,&store_key,  new_value  );
+                   }
+                   
+                     
+                   "total_principal_tokens_withdrawn" => {
+                       let store_key: String = format!("group_pool_metric:{}:total_principal_tokens_withdrawn", group_address);
+                       store.set(ord,&store_key,  new_value  );
+                   }
+                   
+                   "total_principal_tokens_lended"=> {
+                       let store_key: String = format!("group_pool_metric:{}:total_principal_tokens_lended", group_address);
+                       store.set(ord,&store_key,  new_value  );
+                   }
+                   
+                      
+                   "total_principal_tokens_repaid" => {
+                       let store_key: String = format!("group_pool_metric:{}:total_principal_tokens_repaid", group_address);
+                       store.set(ord,&store_key,  new_value  );
+                   }
+                   
+                  "total_interest_collected" => {
+                       let store_key: String = format!("group_pool_metric:{}:total_interest_collected", group_address);
+                       store.set(ord,&store_key,  new_value  );
+                   }
+                   
+                   
+                   _ => {} 
+                   
+               }
+               
+                        
+                        
+      }
+    
+    
+   
 }
 
 /*
@@ -1142,7 +1266,8 @@ fn db_out(events: contract::Events) -> Result<DatabaseChanges, substreams::error
 fn graph_out(
     
     events: contract::Events,
-    deltas_lendergroup_pool_metrics: Deltas<DeltaBigInt>
+    deltas_lendergroup_pool_metrics: Deltas<DeltaBigInt>,
+    store_get_big_int: StoreGetBigInt, 
     
     // pools_store: StoreGetProto<Pool>
 
@@ -1151,7 +1276,7 @@ fn graph_out(
     // Initialize Database Changes container
     let mut tables = EntityChangesTables::new();
     graph_factory_out(&events, &mut tables);
-    graph_lendergroup_out(&events, &mut tables, &deltas_lendergroup_pool_metrics);
+    graph_lendergroup_out(&events, &mut tables, &deltas_lendergroup_pool_metrics, &store_get_big_int);
     Ok(tables.to_entity_changes())
 }
 

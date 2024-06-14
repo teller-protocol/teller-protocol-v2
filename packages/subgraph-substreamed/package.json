@@ -1,7 +1,7 @@
 {
   "name": "@teller-protocol/v2-subgraph-substreamed",
   "license": "UNLICENSED",
-  "version": "0.4.21-41",
+  "version": "0.4.21-43",
   "scripts": {
     "deploy:prompt": "ts-node scripts/thegraph",
     "build": "graph build",

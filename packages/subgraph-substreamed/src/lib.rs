@@ -3,6 +3,9 @@ mod pb;
 mod rpc;
 use hex_literal::hex;
 use pb::contract::v1 as contract;
+use pb::contract::v1::LendergroupBorrowerAcceptedFunds;
+use pb::contract::v1::LendergroupLenderAddedPrincipal;
+use pb::contract::v1::LendergroupLoanRepaid;
 use substreams::prelude::*;
 use substreams::store;
 use substreams::Hex;
@@ -831,17 +834,24 @@ fn graph_lendergroup_out(
         
      //   let group_address = Address::from_slice(  & Hex::decode(&evt.evt_address).unwrap() )    ; //evt.evt_address.clone();
     
-         for pool_metric_delta in   deltas_lendergroup_pool_metrics.deltas.into_iter(){
+         for pool_metric_delta in   deltas_lendergroup_pool_metrics.deltas. iter(){
              
                     
-                        
+                        //this splits on ":"
+                let delta_root_identifier = substreams::key::segment_at(pool_metric_delta.get_key(), 0);
+            
+                if delta_root_identifier != "group_pool_metric" {continue};
+                
                 let group_address = substreams::key::segment_at(pool_metric_delta.get_key(), 1);
+                let delta_prop_identifier = substreams::key::segment_at(pool_metric_delta.get_key(), 2);
+                        
+                        
                         
                 let block_number = 0; // FOR NOW 
-                let new_value = pool_metric_delta.new_value ;
+                let new_value = &pool_metric_delta.new_value ;
                         
                         
-                tables
+               /* tables
                     .update_row("group_pool_metric", format!("{}", group_address)  ) 
                 
                 
@@ -852,14 +862,27 @@ fn graph_lendergroup_out(
                     .set("total_interest_collected",  BigDecimal::from_str("0").unwrap()) 
                     .set("token_difference_from_liquidations",  BigDecimal::from_str("0").unwrap())  
                 // .set("ordinal",   evt.log.ordinal  )  //is this ok ?  
-                    ;
+                    ;*/
             
-                        
+                 match delta_prop_identifier  {
+                    "total_principals_committed" => {
+                        tables.update_row("group_pool_metric", &group_address)
+                            .set("total_principal_tokens_committed", new_value );
+                    },
+                    "total_principal_tokens_withdrawn" => {
+                        tables.update_row("group_pool_metric", &group_address)
+                            .set("total_principal_tokens_withdrawn", new_value );
+                    },
+                    // Add more cases as per your metric names
+                    _ => {}
+                };
+                             
+                                     
                              
         // Create row in group_pool_metrics_data_point table
           
     
-                tables
+              /*  tables
                     .create_row("group_pool_metric_data_point", format!("{}_{}", group_address, block_number )  ) 
                     .set("group_pool_address", Hex::decode(&evt.evt_address).unwrap())
                     .set("block_number", evt.evt_block_number)
@@ -869,7 +892,7 @@ fn graph_lendergroup_out(
                     .set("total_principal_tokens_lended", group_pool_metric.total_principal_tokens_lended )
                     .set("total_principal_tokens_repaid", group_pool_metric.total_principal_tokens_repaid  )
                     .set("total_interest_collected", group_pool_metric.total_interest_collected );
-                            
+                */ 
                    
                 
                                                 
@@ -916,6 +939,32 @@ fn store_factory_lendergroup_created(blk: eth::Block, store: StoreSetInt64) {
 
 
 
+fn store_lendergroup_pool_metrics(events: &contract::Events, store: StoreAddBigInt) {
+    
+    
+    let ord = 0; // FOR NOW - CAN CAUSE ISSUES - GET FROM LOG AND STUFF INTO EVENT    
+    
+    
+    events.lendergroup_lender_added_principals.iter().for_each(|evt: &LendergroupLenderAddedPrincipal| {
+        let store_key: String = format!("group_pool_metric:{}:total_principals_committed", evt.evt_address);
+        store.add(ord,&store_key, BigInt::from_str(&evt.amount).unwrap_or(BigInt::zero()));
+    });
+
+    events.lendergroup_borrower_accepted_funds.iter().for_each(|evt: &LendergroupBorrowerAcceptedFunds| {
+        let store_key: String = format!("group_pool_metric:{}:total_principal_tokens_withdrawn", evt.evt_address);
+        store.add(ord,&store_key, BigInt::from_str(&evt.principal_amount).unwrap_or(BigInt::zero()));
+    });
+
+    events.lendergroup_loan_repaids.iter().for_each(|evt: &LendergroupLoanRepaid| {
+        let store_key_repaid: String = format!("group_pool_metric:{}:total_principal_tokens_repaid", evt.evt_address);
+        let store_key_interest: String = format!("group_pool_metric:{}:total_interest_collected", evt.evt_address);
+        store.add(ord,&store_key_repaid, BigInt::from_str(&evt.principal_amount).unwrap_or(BigInt::zero()));
+        store.add(ord,&store_key_interest, BigInt::from_str(&evt.interest_amount).unwrap_or(BigInt::zero()));
+    });
+}
+
+/*
+
 pub fn store_lendergroup_pool_metrics(  events: contract::Events,  store:  StoreAddBigInt ) {
     
     
@@ -942,7 +991,7 @@ pub fn store_lendergroup_pool_metrics(  events: contract::Events,  store:  Store
     
     
     
-}
+}*/
 
 /*
 #[substreams::handlers::store]

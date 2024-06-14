@@ -18,6 +18,7 @@ use substreams_ethereum::Event;
 
 #[allow(unused_imports)]
 use num_traits::cast::ToPrimitive;
+use std::collections::HashSet;
 use std::str::FromStr;
 use substreams::scalar::BigDecimal;
 
@@ -833,8 +834,12 @@ fn graph_lendergroup_out(
         //create a new row for the table "group_pool_metrics_data_points" based on that 
         
      //   let group_address = Address::from_slice(  & Hex::decode(&evt.evt_address).unwrap() )    ; //evt.evt_address.clone();
-    
-         for pool_metric_delta in   deltas_lendergroup_pool_metrics.deltas. iter(){
+        
+         
+         let mut  pool_metric_deltas_detected = HashSet::new();
+         
+         
+         for pool_metric_delta in deltas_lendergroup_pool_metrics.deltas. iter(){
              
                     
                         //this splits on ":"
@@ -849,6 +854,9 @@ fn graph_lendergroup_out(
                         
                 let block_number = 0; // FOR NOW 
                 let new_value = &pool_metric_delta.new_value ;
+                        
+                        
+                pool_metric_deltas_detected.insert(group_address);
                         
                         
                /* tables
@@ -882,6 +890,18 @@ fn graph_lendergroup_out(
         // Create row in group_pool_metrics_data_point table
           
     
+                   
+                
+                                                
+         }
+         
+         
+         
+         //need to use a non-delta store!?
+         for delta_pool_address in pool_metric_deltas_detected.iter() {
+             
+                
+             
               /*  tables
                     .create_row("group_pool_metric_data_point", format!("{}_{}", group_address, block_number )  ) 
                     .set("group_pool_address", Hex::decode(&evt.evt_address).unwrap())
@@ -893,9 +913,7 @@ fn graph_lendergroup_out(
                     .set("total_principal_tokens_repaid", group_pool_metric.total_principal_tokens_repaid  )
                     .set("total_interest_collected", group_pool_metric.total_interest_collected );
                 */ 
-                   
-                
-                                                
+             
          }
          
         // Read data from group_pool_metrics table

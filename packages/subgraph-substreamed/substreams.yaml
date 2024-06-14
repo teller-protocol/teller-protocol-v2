@@ -29,10 +29,6 @@ modules:
     inputs:
       - source: sf.ethereum.type.v2.Block
       
- 
-      
- 
-
   - name: map_events
     kind: map
     initialBlock: 57233385
@@ -60,15 +56,7 @@ modules:
       - store: store_lendergroup_pool_metrics_deltas
         mode: deltas
       
-
-  - name: db_out
-    kind: map
-    initialBlock: 57233385
-    inputs:
-      - map: map_events
-    output:
-      type: proto:sf.substreams.sink.database.v1.DatabaseChanges
-
+ 
   - name: graph_out
     kind: map
     initialBlock: 57233385

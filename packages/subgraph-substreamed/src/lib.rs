@@ -990,8 +990,8 @@ fn store_factory_lendergroup_created(blk: eth::Block, store: StoreSetInt64) {
 
 
 
-
-fn store_lendergroup_pool_metrics_deltas(events: &contract::Events, store: StoreAddBigInt) {
+#[substreams::handlers::store]
+fn store_lendergroup_pool_metrics_deltas(events:  contract::Events, store: StoreAddBigInt) {
     
     
     let ord = 0; // FOR NOW - CAN CAUSE ISSUES - GET FROM LOG AND STUFF INTO EVENT    
@@ -1035,7 +1035,7 @@ fn store_lendergroup_pool_metrics_deltas(events: &contract::Events, store: Store
 
 
 
-
+#[substreams::handlers::store]
 fn store_lendergroup_pool_metrics(
      deltas_lendergroup_pool_metrics: Deltas<DeltaBigInt>,
      store: StoreSetBigInt

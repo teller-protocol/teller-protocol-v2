@@ -973,7 +973,8 @@ fn graph_lendergroup_out(
 // this is filtering for all 'DeployedLenderGroupContract' events and is setting a bit as a 1  in the store if it was emitted 
 #[substreams::handlers::store]
 fn store_factory_lendergroup_created(blk: eth::Block, store: StoreSetInt64) {
-    for rcpt in blk.receipts() {
+    //removed for now 
+  /*  for rcpt in blk.receipts() {
         for log in rcpt
             .receipt
             .logs
@@ -985,6 +986,7 @@ fn store_factory_lendergroup_created(blk: eth::Block, store: StoreSetInt64) {
             }
         }
     }
+        */
 }
 
 
@@ -1226,9 +1228,6 @@ pub fn map_pools_created(block: Block) -> Result<Pools, Error> {
 
 
 
-
-
-
 #[substreams::handlers::map]
 fn map_events(
     blk: eth::Block,
@@ -1239,8 +1238,6 @@ fn map_events(
     map_lendergroup_events(&blk, &store_lendergroup, &mut events);
     Ok(events)
 }
-
-
 /*
 
 This is only if you want to write this directly to a living postgres !! 

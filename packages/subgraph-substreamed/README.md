@@ -11,6 +11,10 @@ https://docs.rs/substreams/latest/substreams/store/index.html
 
 
 
+Example: https://github.com/Dirt-Nasty/lender-groups-subgraph-substream/blob/83120e376907a1c585d1dc216be8a4ef98675506/src/lib.rs
+
+
+
 What is the best way to architect this ??
 
 

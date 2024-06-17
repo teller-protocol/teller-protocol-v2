@@ -971,10 +971,11 @@ fn graph_lendergroup_out(
 
 // THIS IS HOW WE ADD TO STORAGE 
 // this is filtering for all 'DeployedLenderGroupContract' events and is setting a bit as a 1  in the store if it was emitted 
+// THIS IS CURRENTLY ERRORING 
 #[substreams::handlers::store]
 fn store_factory_lendergroup_created(blk: eth::Block, store: StoreSetInt64) {
-    //removed for now 
-  /*  for rcpt in blk.receipts() {
+   
+   for rcpt in blk.receipts() {
         for log in rcpt
             .receipt
             .logs
@@ -986,7 +987,7 @@ fn store_factory_lendergroup_created(blk: eth::Block, store: StoreSetInt64) {
             }
         }
     }
-        */
+    
 }
 
 

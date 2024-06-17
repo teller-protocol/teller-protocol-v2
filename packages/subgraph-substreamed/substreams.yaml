@@ -28,44 +28,6 @@ modules:
     valueType: proto:dynamic_datasource
     inputs:
       - source: sf.ethereum.type.v2.Block
-      
-  - name: map_events
-    kind: map
-    initialBlock: 57233385
-    inputs:
-      - source: sf.ethereum.type.v2.Block
-      - store: store_factory_lendergroup_created
-    output:
-      type: proto:contract.v1.Events
-      
-      
-  - name: store_lendergroup_pool_metrics_deltas
-    kind: store
-    initialBlock: 57233385
-    updatePolicy: set
-    valueType: proto:dynamic_datasource
-    inputs:
-      - map: map_events
-      
-  - name: store_lendergroup_pool_metrics
-    kind: store
-    initialBlock: 57233385
-    updatePolicy: set
-    valueType: proto:dynamic_datasource
-    inputs:
-      - store: store_lendergroup_pool_metrics_deltas
-        mode: deltas
-      
- 
-  - name: graph_out
-    kind: map
-    initialBlock: 57233385
-    inputs: 
-      - map: map_events
-      - store: store_lendergroup_pool_metrics_deltas
-        mode: deltas
-      - store: store_lendergroup_pool_metrics
-    output:
-      type: proto:sf.substreams.entity.v1.EntityChanges
+
 
 network: polygon

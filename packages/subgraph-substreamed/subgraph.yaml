@@ -7,7 +7,7 @@ schema:
 dataSources:
   - kind: substreams
     name: lender-group-substream
-    network: mainnet
+    network: matic
     source:
       package:
         moduleName: graph_out

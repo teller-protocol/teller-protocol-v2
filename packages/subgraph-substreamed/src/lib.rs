@@ -383,154 +383,7 @@ fn map_lendergroup_events(
         })
         .collect());
 }
-
-
-fn db_factory_out(events: &contract::Events, tables: &mut DatabaseChangeTables) {
-    // Loop over all the abis events to create table changes
-    events.factory_admin_changeds.iter().for_each(|evt| {
-        tables
-            .create_row("factory_admin_changed", [("evt_tx_hash", evt.evt_tx_hash.to_string()),("evt_index", evt.evt_index.to_string())])
-            .set("evt_block_time", evt.evt_block_time )
-            .set("evt_block_number", evt.evt_block_number)
-            .set("new_admin", Hex(&evt.new_admin).to_string())
-            .set("previous_admin", Hex(&evt.previous_admin).to_string());
-    });
-    events.factory_beacon_upgradeds.iter().for_each(|evt| {
-        tables
-            .create_row("factory_beacon_upgraded", [("evt_tx_hash", evt.evt_tx_hash.to_string()),("evt_index", evt.evt_index.to_string())])
-            .set("evt_block_time", evt.evt_block_time)
-            .set("evt_block_number", evt.evt_block_number)
-            .set("beacon", Hex(&evt.beacon).to_string());
-    });
-    events.factory_deployed_lender_group_contracts.iter().for_each(|evt| {
-        tables
-            .create_row("factory_deployed_lender_group_contract", [("evt_tx_hash", evt.evt_tx_hash.to_string()),("evt_index", evt.evt_index.to_string())])
-            .set("evt_block_time", evt.evt_block_time)
-            .set("evt_block_number", evt.evt_block_number)
-            .set("group_contract", Hex(&evt.group_contract).to_string());
-    });
-    events.factory_upgradeds.iter().for_each(|evt| {
-        tables
-            .create_row("factory_upgraded", [("evt_tx_hash", evt.evt_tx_hash.to_string()),("evt_index", evt.evt_index.to_string())])
-            .set("evt_block_time", evt.evt_block_time)
-            .set("evt_block_number", evt.evt_block_number)
-            .set("implementation", Hex(&evt.implementation).to_string());
-    });
-}
-fn db_lendergroup_out(events: &contract::Events, tables: &mut DatabaseChangeTables) {
-    // Loop over all the abis events to create table changes
-    events.lendergroup_borrower_accepted_funds.iter().for_each(|evt| {
-        tables
-            .create_row("lendergroup_borrower_accepted_funds", [("evt_tx_hash", evt.evt_tx_hash.to_string()),("evt_index", evt.evt_index.to_string())])
-            .set("evt_block_time", evt.evt_block_time)
-            .set("evt_block_number", evt.evt_block_number)
-            .set("evt_address", &evt.evt_address)
-            .set("bid_id", BigDecimal::from_str(&evt.bid_id).unwrap())
-            .set("borrower", Hex(&evt.borrower).to_string())
-            .set("collateral_amount", BigDecimal::from_str(&evt.collateral_amount).unwrap())
-            .set("interest_rate", evt.interest_rate)
-            .set("loan_duration", evt.loan_duration)
-            .set("principal_amount", BigDecimal::from_str(&evt.principal_amount).unwrap());
-    });
-    events.lendergroup_defaulted_loan_liquidateds.iter().for_each(|evt| {
-        tables
-            .create_row("lendergroup_defaulted_loan_liquidated", [("evt_tx_hash", evt.evt_tx_hash.to_string()),("evt_index", evt.evt_index.to_string())])
-            .set("evt_block_time", evt.evt_block_time)
-            .set("evt_block_number", evt.evt_block_number)
-            .set("evt_address", &evt.evt_address)
-            .set("amount_due", BigDecimal::from_str(&evt.amount_due).unwrap())
-            .set("bid_id", BigDecimal::from_str(&evt.bid_id).unwrap())
-            .set("liquidator", Hex(&evt.liquidator).to_string())
-            .set("token_amount_difference", BigDecimal::from_str(&evt.token_amount_difference).unwrap());
-    });
-    events.lendergroup_earnings_withdrawns.iter().for_each(|evt| {
-        tables
-            .create_row("lendergroup_earnings_withdrawn", [("evt_tx_hash", evt.evt_tx_hash.to_string()),("evt_index", evt.evt_index.to_string())])
-            .set("evt_block_time", evt.evt_block_time)
-            .set("evt_block_number", evt.evt_block_number)
-            .set("evt_address", &evt.evt_address)
-            .set("amount_pool_shares_tokens", BigDecimal::from_str(&evt.amount_pool_shares_tokens).unwrap())
-            .set("lender", Hex(&evt.lender).to_string())
-            .set("principal_tokens_withdrawn", BigDecimal::from_str(&evt.principal_tokens_withdrawn).unwrap())
-            .set("recipient", Hex(&evt.recipient).to_string());
-    });
-    events.lendergroup_initializeds.iter().for_each(|evt| {
-        tables
-            .create_row("lendergroup_initialized", [("evt_tx_hash", evt.evt_tx_hash.to_string()),("evt_index", evt.evt_index.to_string())])
-            .set("evt_block_time", evt.evt_block_time)
-            .set("evt_block_number", evt.evt_block_number)
-            .set("evt_address", &evt.evt_address)
-            .set("version", evt.version);
-    });
-    events.lendergroup_lender_added_principals.iter().for_each(|evt| {
-        tables
-            .create_row("lendergroup_lender_added_principal", [("evt_tx_hash", evt.evt_tx_hash.to_string()),("evt_index", evt.evt_index.to_string())])
-            .set("evt_block_time", evt.evt_block_time)
-            .set("evt_block_number", evt.evt_block_number)
-            .set("evt_address", &evt.evt_address)
-            .set("amount", BigDecimal::from_str(&evt.amount).unwrap())
-            .set("lender", Hex(&evt.lender).to_string())
-            .set("shares_amount", BigDecimal::from_str(&evt.shares_amount).unwrap())
-            .set("shares_recipient", Hex(&evt.shares_recipient).to_string());
-    });
-    events.lendergroup_loan_repaids.iter().for_each(|evt| {
-        tables
-            .create_row("lendergroup_loan_repaid", [("evt_tx_hash", evt.evt_tx_hash.to_string()),("evt_index", evt.evt_index.to_string())])
-            .set("evt_block_time", evt.evt_block_time)
-            .set("evt_block_number", evt.evt_block_number)
-            .set("evt_address", &evt.evt_address)
-            .set("bid_id", BigDecimal::from_str(&evt.bid_id).unwrap())
-            .set("interest_amount", BigDecimal::from_str(&evt.interest_amount).unwrap())
-            .set("principal_amount", BigDecimal::from_str(&evt.principal_amount).unwrap())
-            .set("repayer", Hex(&evt.repayer).to_string())
-            .set("total_interest_collected", BigDecimal::from_str(&evt.total_interest_collected).unwrap())
-            .set("total_principal_repaid", BigDecimal::from_str(&evt.total_principal_repaid).unwrap());
-    });
-    events.lendergroup_ownership_transferreds.iter().for_each(|evt| {
-        tables
-            .create_row("lendergroup_ownership_transferred", [("evt_tx_hash", evt.evt_tx_hash.to_string()),("evt_index", evt.evt_index.to_string())])
-            .set("evt_block_time", evt.evt_block_time)
-            .set("evt_block_number", evt.evt_block_number)
-            .set("evt_address", &evt.evt_address)
-            .set("new_owner", Hex(&evt.new_owner).to_string())
-            .set("previous_owner", Hex(&evt.previous_owner).to_string());
-    });
-    events.lendergroup_pauseds.iter().for_each(|evt| {
-        tables
-            .create_row("lendergroup_paused", [("evt_tx_hash", evt.evt_tx_hash.to_string()),("evt_index", evt.evt_index.to_string())])
-            .set("evt_block_time", evt.evt_block_time)
-            .set("evt_block_number", evt.evt_block_number)
-            .set("evt_address", &evt.evt_address)
-            .set("account", Hex(&evt.account).to_string());
-    });
-    events.lendergroup_pool_initializeds.iter().for_each(|evt| {
-        tables
-            .create_row("lendergroup_pool_initialized", [("evt_tx_hash", evt.evt_tx_hash.to_string()),("evt_index", evt.evt_index.to_string())])
-            .set("evt_block_time", evt.evt_block_time)
-            .set("evt_block_number", evt.evt_block_number)
-            .set("evt_address", &evt.evt_address)
-            .set("collateral_token_address", Hex(&evt.collateral_token_address).to_string())
-            .set("interest_rate_lower_bound", evt.interest_rate_lower_bound)
-            .set("interest_rate_upper_bound", evt.interest_rate_upper_bound)
-            .set("liquidity_threshold_percent", evt.liquidity_threshold_percent)
-            .set("loan_to_value_percent", evt.loan_to_value_percent)
-            .set("market_id", BigDecimal::from_str(&evt.market_id).unwrap())
-            .set("max_loan_duration", evt.max_loan_duration)
-            .set("pool_shares_token", Hex(&evt.pool_shares_token).to_string())
-            .set("principal_token_address", Hex(&evt.principal_token_address).to_string())
-            .set("twap_interval", evt.twap_interval)
-            .set("uniswap_pool_fee", evt.uniswap_pool_fee);
-    });
-    events.lendergroup_unpauseds.iter().for_each(|evt| {
-        tables
-            .create_row("lendergroup_unpaused", [("evt_tx_hash", evt.evt_tx_hash.to_string()),("evt_index", evt.evt_index.to_string())])
-            .set("evt_block_time", evt.evt_block_time)
-            .set("evt_block_number", evt.evt_block_number)
-            .set("evt_address", &evt.evt_address)
-            .set("account", Hex(&evt.account).to_string());
-    });
-}
-
+ 
 
 fn graph_factory_out(events: &contract::Events, tables: &mut EntityChangesTables) {
     // Loop over all the abis events to create table changes
@@ -721,6 +574,125 @@ fn store_factory_lendergroup_created(blk: eth::Block, store: StoreSetInt64) {
     }
 }
 
+
+
+
+#[substreams::handlers::store]
+fn store_lendergroup_pool_metrics_deltas(events:  contract::Events, store: StoreAddBigInt) {
+    
+    
+    let ord = 0; // FOR NOW - CAN CAUSE ISSUES - GET FROM LOG AND STUFF INTO EVENT    
+    
+    
+    events.lendergroup_lender_added_principals.iter().for_each(|evt: &LendergroupLenderAddedPrincipal| {
+        let store_key: String = format!("group_pool_metric:{}:total_principal_tokens_committed", evt.evt_address);
+        store.add(ord,&store_key, BigInt::from_str(&evt.amount).unwrap_or(BigInt::zero()));
+    });
+
+    events.lendergroup_borrower_accepted_funds.iter().for_each(|evt: &LendergroupBorrowerAcceptedFunds| {
+        
+        let store_key: String = format!("group_pool_metric:{}:total_principal_tokens_lended", evt.evt_address);
+        store.add(ord,&store_key, BigInt::from_str(&evt.principal_amount).unwrap_or(BigInt::zero()));
+        
+        
+       
+        //add total collateral ! 
+        
+        //  evt.collateral_amount
+    });
+
+    
+    events.lendergroup_earnings_withdrawns.iter().for_each(|evt: &LendergroupEarningsWithdrawn| {
+        let store_key: String = format!("group_pool_metric:{}:total_principal_tokens_withdrawn", evt.evt_address);
+        store.add(ord,&store_key, BigInt::from_str(&evt.principal_tokens_withdrawn).unwrap_or(BigInt::zero()));
+         
+        
+        //add total collateral ! 
+    });
+
+    
+            
+    events.lendergroup_loan_repaids.iter().for_each(|evt: &LendergroupLoanRepaid| {
+        let store_key_repaid: String = format!("group_pool_metric:{}:total_principal_tokens_repaid", evt.evt_address);
+        let store_key_interest: String = format!("group_pool_metric:{}:total_interest_collected", evt.evt_address);
+        store.add(ord,&store_key_repaid, BigInt::from_str(&evt.principal_amount).unwrap_or(BigInt::zero()));
+        store.add(ord,&store_key_interest, BigInt::from_str(&evt.interest_amount).unwrap_or(BigInt::zero()));
+    });
+}
+
+
+
+#[substreams::handlers::store]
+fn store_lendergroup_pool_metrics(
+     deltas_lendergroup_pool_metrics: Deltas<DeltaBigInt>,
+     store: StoreSetBigInt
+    ) {
+    
+    
+    let ord = 0; // FOR NOW - CAN CAUSE ISSUES - GET FROM LOG AND STUFF INTO EVENT    
+    
+      for pool_metric_delta in deltas_lendergroup_pool_metrics.deltas. iter(){
+             
+                    
+                        //this splits on ":"
+                let delta_root_identifier = substreams::key::segment_at(pool_metric_delta.get_key(), 0);
+            
+                if delta_root_identifier != "group_pool_metric" {continue};
+                
+                let group_address = substreams::key::segment_at(pool_metric_delta.get_key(), 1);
+                let delta_prop_identifier = substreams::key::segment_at(pool_metric_delta.get_key(), 2);
+                        
+                        
+                        
+                let block_number = 0; // FOR NOW 
+                let new_value = &pool_metric_delta.new_value ;
+                        
+                
+                //substreams::log::info();
+                        
+               match delta_prop_identifier {
+                   
+                   "total_principal_tokens_committed" => {
+                       let store_key: String = format!("group_pool_metric:{}:total_principal_tokens_committed", group_address);
+                       store.set(ord,&store_key,  new_value  );
+                   }
+                   
+                     
+                   "total_principal_tokens_withdrawn" => {
+                       let store_key: String = format!("group_pool_metric:{}:total_principal_tokens_withdrawn", group_address);
+                       store.set(ord,&store_key,  new_value  );
+                   }
+                   
+                   "total_principal_tokens_lended"=> {
+                       let store_key: String = format!("group_pool_metric:{}:total_principal_tokens_lended", group_address);
+                       store.set(ord,&store_key,  new_value  );
+                   }
+                   
+                      
+                   "total_principal_tokens_repaid" => {
+                       let store_key: String = format!("group_pool_metric:{}:total_principal_tokens_repaid", group_address);
+                       store.set(ord,&store_key,  new_value  );
+                   }
+                   
+                  "total_interest_collected" => {
+                       let store_key: String = format!("group_pool_metric:{}:total_interest_collected", group_address);
+                       store.set(ord,&store_key,  new_value  );
+                   }
+                   
+                   
+                   _ => {} 
+                   
+               }
+               
+                        
+                        
+      }
+    
+    
+   
+}
+
+
 #[substreams::handlers::map]
 fn map_events(
     blk: eth::Block,
@@ -731,16 +703,7 @@ fn map_events(
     map_lendergroup_events(&blk, &store_lendergroup, &mut events);
     Ok(events)
 }
-
-#[substreams::handlers::map]
-fn db_out(events: contract::Events) -> Result<DatabaseChanges, substreams::errors::Error> {
-    // Initialize Database Changes container
-    let mut tables = DatabaseChangeTables::new();
-    db_factory_out(&events, &mut tables);
-    db_lendergroup_out(&events, &mut tables);
-    Ok(tables.to_database_changes())
-}
-
+ 
 #[substreams::handlers::map]
 fn graph_out(events: contract::Events) -> Result<EntityChanges, substreams::errors::Error> {
     // Initialize Database Changes container

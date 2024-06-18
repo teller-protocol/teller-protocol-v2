@@ -38,14 +38,27 @@ modules:
     output:
       type: proto:contract.v1.Events
 
-  - name: db_out
-    kind: map
+
+
+  - name: store_lendergroup_pool_metrics_deltas
+    kind: store
     initialBlock: 57233385
+    updatePolicy: set
+    valueType: proto:dynamic_datasource
     inputs:
       - map: map_events
-    output:
-      type: proto:sf.substreams.sink.database.v1.DatabaseChanges
-
+      
+  - name: store_lendergroup_pool_metrics
+    kind: store
+    initialBlock: 57233385
+    updatePolicy: set
+    valueType: proto:dynamic_datasource
+    inputs:
+      - store: store_lendergroup_pool_metrics_deltas
+        mode: deltas
+      
+      
+ 
   - name: graph_out
     kind: map
     initialBlock: 57233385

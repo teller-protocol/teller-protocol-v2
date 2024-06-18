@@ -63,10 +63,7 @@ modules:
     kind: map
     initialBlock: 57233385
     inputs:
-      - map: map_events
-      - store: store_lendergroup_pool_metrics_deltas
-        mode: deltas
-      - store: store_lendergroup_pool_metrics
+      - map: map_events 
     output:
       type: proto:sf.substreams.entity.v1.EntityChanges
 

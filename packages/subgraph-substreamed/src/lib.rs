@@ -434,8 +434,8 @@ fn graph_lendergroup_out(
     tables: &mut EntityChangesTables,
     
       
-    deltas_lendergroup_pool_metrics: &Deltas<DeltaBigInt>,
-    store_get_lendergroup_pool_metrics: &StoreGetBigInt, 
+   // deltas_lendergroup_pool_metrics: &Deltas<DeltaBigInt>,
+   // store_get_lendergroup_pool_metrics: &StoreGetBigInt, 
    
    
    ) {
@@ -564,10 +564,19 @@ fn graph_lendergroup_out(
             
             
             let lender_group_contract_address = Hex(&evt.evt_address).to_string();
-
+    /*
             let fetched_rpc_data = rpc::fetch_lender_group_pool_initialization_data_from_rpc(
                 &lender_group_contract_address
                  ).unwrap();
+     */
+            
+            //JUST FOR NOW 
+         let uniswap_v3_pool_address = Hex(&evt.evt_address).to_string();
+          let teller_v2_address = Hex(&evt.evt_address).to_string();
+           let smart_commitment_forwarder_address = Hex(&evt.evt_address).to_string();
+       
+     
+     /*
     
        //create group pool metric 
        tables
@@ -577,9 +586,9 @@ fn graph_lendergroup_out(
             .set("principal_token_address", Hex(&evt.principal_token_address).to_string().into_bytes() )
             .set("collateral_token_address", Hex(&evt.collateral_token_address).to_string().into_bytes() )
             .set("shares_token_address", Hex(&evt.pool_shares_token).to_string().into_bytes() )
-            .set("uniswap_v3_pool_address", Hex(&fetched_rpc_data.uniswap_v3_pool_address).to_string().into_bytes() )
-            .set("teller_v2_address", Hex(&fetched_rpc_data.teller_v2_address).to_string().into_bytes() )
-            .set("smart_commitment_forwarder_address", Hex(&fetched_rpc_data.smart_commitment_forwarder_address).to_string().into_bytes() )
+            .set("uniswap_v3_pool_address", Hex(&uniswap_v3_pool_address).to_string().into_bytes() )
+            .set("teller_v2_address", Hex(&teller_v2_address).to_string().into_bytes() )
+            .set("smart_commitment_forwarder_address", Hex(&smart_commitment_forwarder_address).to_string().into_bytes() )
             .set("market_id", BigInt::from_str(&evt.market_id).unwrap() )
             .set("uniswap_pool_fee", evt.uniswap_pool_fee)
             .set("max_loan_duration", evt.max_loan_duration)
@@ -598,7 +607,7 @@ fn graph_lendergroup_out(
            // .set("ordinal",   evt.log.ordinal  )  //is this ok ?  
             ;
 
-            
+           */ 
                         
                                     
                                                             
@@ -637,10 +646,10 @@ fn graph_lendergroup_out(
         
      //   let group_address = Address::from_slice(  & Hex::decode(&evt.evt_address).unwrap() )    ; //evt.evt_address.clone();
         
-         
+             /*
          let mut  pool_metric_deltas_detected = HashSet::new();
          
-         
+     
          for pool_metric_delta in deltas_lendergroup_pool_metrics.deltas. iter(){
              
                     
@@ -660,20 +669,7 @@ fn graph_lendergroup_out(
                         
                 pool_metric_deltas_detected.insert(group_address);
                         
-                        
-               /* tables
-                    .update_row("group_pool_metric", format!("{}", group_address)  ) 
-                
-                
-                    .set("total_principal_tokens_committed",  BigDecimal::from_str("0").unwrap()) 
-                    .set("total_principal_tokens_withdrawn",  BigDecimal::from_str("0").unwrap()) 
-                    .set("total_principal_tokens_lended",  BigDecimal::from_str("0").unwrap()) 
-                    .set("total_principal_tokens_repaid",  BigDecimal::from_str("0").unwrap()) 
-                    .set("total_interest_collected",  BigDecimal::from_str("0").unwrap()) 
-                    .set("token_difference_from_liquidations",  BigDecimal::from_str("0").unwrap())  
-                // .set("ordinal",   evt.log.ordinal  )  //is this ok ?  
-                    ;*/
-            
+             
                  match delta_prop_identifier  {
                     "total_principal_tokens_committed" => {
                         tables.update_row("group_pool_metric", &group_address)
@@ -748,7 +744,7 @@ fn graph_lendergroup_out(
                 
              
          }
-         
+            */
          
 }
 #[substreams::handlers::store]
@@ -904,14 +900,14 @@ fn graph_out(
     events: contract::Events,
 
 
-    deltas_lendergroup_pool_metrics: Deltas<DeltaBigInt>,
-    store_get_big_int: StoreGetBigInt, 
+   // deltas_lendergroup_pool_metrics: Deltas<DeltaBigInt>,
+   // store_get_big_int: StoreGetBigInt, 
 
 
 ) -> Result<EntityChanges, substreams::errors::Error> {
     // Initialize Database Changes container
    let mut tables = EntityChangesTables::new();
     graph_factory_out(&events, &mut tables);
-    graph_lendergroup_out(&events, &mut tables, &deltas_lendergroup_pool_metrics, &store_get_big_int);
+    graph_lendergroup_out(&events, &mut tables );
     Ok(tables.to_entity_changes())
 }

@@ -390,12 +390,12 @@ fn graph_factory_out(events: &contract::Events, tables: &mut EntityChangesTables
     events.factory_admin_changeds.iter().for_each(|evt| {
         tables
             .create_row("factory_admin_changed", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
-            .set("evt_tx_hash", &evt.evt_tx_hash)
-            .set("evt_index", evt.evt_index)
-            .set("evt_block_time", evt.evt_block_time)
-            .set("evt_block_number", evt.evt_block_number)
-            .set("new_admin", Hex(&evt.new_admin).to_string())
-            .set("previous_admin", Hex(&evt.previous_admin).to_string());
+            .set("evt_tx_hash", evt.evt_tx_hash.clone().into_bytes())
+            .set("evt_index", BigInt::from( evt.evt_index)  )
+            .set("evt_block_time", BigInt::from ( evt.evt_block_time )) 
+            .set("evt_block_number", BigInt::from( evt.evt_block_number) )
+            .set("new_admin", Hex(&evt.new_admin).to_string().into_bytes())
+            .set("previous_admin", Hex(&evt.previous_admin).to_string().into_bytes() );
     });
     events.factory_beacon_upgradeds.iter().for_each(|evt| {
         tables

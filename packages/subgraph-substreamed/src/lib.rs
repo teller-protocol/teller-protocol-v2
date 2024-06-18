@@ -982,11 +982,12 @@ fn store_factory_lendergroup_created(blk: eth::Block, store: StoreSetInt64) {
             .iter()
             .filter(|log| log.address == FACTORY_TRACKED_CONTRACT)
         {
-            substreams::log::println("store_factory_lendergroup_created");
+            substreams::log::println(format!( "store_factory_lendergroup_created {:?}", log ));
 
-          //  if let Some(event) = abi::factory_contract::events::DeployedLenderGroupContract::match_and_decode(log) {
-          //      store.set(log.ordinal, Hex(event.group_contract).to_string(), &1);
-          //  }
+            if let Some(event) = abi::factory_contract::events::DeployedLenderGroupContract::match_and_decode(log) {
+                 substreams::log::println(format!( "store_factory_lendergroup_created 2  {:?}", log ));
+                 store.set(log.ordinal, Hex(event.group_contract).to_string(), &1);
+            }
         }
     }
     

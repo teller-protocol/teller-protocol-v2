@@ -18,9 +18,20 @@ const publishSubgraph = async (
   const deployments = await hre.deployments.all()
   for (const contractName in deployments) {
     const deployment = deployments[contractName]
-    await writeSubgraphContract(hre, '../subgraph',contractName, deployment, hre.network.name)
-    await writeSubgraphContract(hre, '../subgraph-substreamed',contractName, deployment, hre.network.name)
-  
+    await writeSubgraphContract(
+      hre,
+      '../subgraph',
+      contractName,
+      deployment,
+      hre.network.name
+    )
+    await writeSubgraphContract(
+      hre,
+      '../subgraph-substreamed',
+      contractName,
+      deployment,
+      hre.network.name
+    )
   }
   console.log('✅  Published contracts to the subgraph package.')
 }
@@ -28,7 +39,7 @@ const publishSubgraph = async (
 //const graphDir = '../subgraph'
 async function writeSubgraphContract(
   hre: HardhatRuntimeEnvironment,
-  graphDir: String,
+  graphDir: string,
   contractName: string,
   deployment: Deployment,
   networkName: string

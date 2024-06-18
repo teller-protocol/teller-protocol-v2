@@ -1,0 +1,235 @@
+type factory_admin_changed @entity {
+    id: ID!
+    evt_tx_hash: Bytes!
+    evt_index: BigInt!
+   
+    evt_block_number: BigInt!
+    new_admin: Bytes!
+    previous_admin: Bytes!
+}
+type factory_beacon_upgraded @entity {
+    id: ID!
+    evt_tx_hash: Bytes!
+    evt_index: BigInt!
+     
+    evt_block_number: BigInt!
+    beacon: Bytes!
+}
+type factory_deployed_lender_group_contract @entity {
+    id: ID!
+    evt_tx_hash: Bytes!
+    evt_index: BigInt!
+  
+    evt_block_number: BigInt!
+    group_contract: Bytes!
+}
+type factory_upgraded @entity {
+    id: ID!
+    evt_tx_hash: Bytes!
+    evt_index: BigInt!
+  
+    evt_block_number: BigInt!
+    implementation: Bytes!
+}
+
+type group_borrower_accepted_funds @entity {
+    id: ID!
+    evt_tx_hash: Bytes!
+    evt_index: BigInt!
+    
+    evt_block_number: BigInt!
+    group_pool_address: Bytes!
+    bid_id: BigDecimal!
+    borrower: Bytes!
+    collateral_amount: BigDecimal!
+    interest_rate: Int!
+    loan_duration: Int!
+    principal_amount: BigDecimal!
+}
+
+type group_lender_added_principal @entity {
+    id: ID!
+    evt_tx_hash: Bytes!
+    evt_index: BigInt!
+    
+    evt_block_number: BigInt!
+    group_pool_address: Bytes!
+    amount: BigDecimal!
+    lender: Bytes!
+    shares_amount: BigDecimal!
+    shares_recipient: Bytes!
+}
+type group_earnings_withdrawn @entity {
+    id: ID!
+    evt_tx_hash: Bytes!
+    evt_index: BigInt!
+   
+    evt_block_number: BigInt!
+    group_pool_address: Bytes!
+    amount_pool_shares_tokens: BigDecimal!
+    lender: Bytes!
+    principal_tokens_withdrawn: BigDecimal!
+    recipient: Bytes!
+}
+type group_defaulted_loan_liquidated @entity {
+    id: ID!
+    evt_tx_hash: Bytes!
+    evt_index: BigInt!
+    
+    evt_block_number: BigInt!
+    group_pool_address: Bytes!
+    amount_due: BigDecimal!
+    bid_id: BigDecimal!
+    liquidator: Bytes!
+    token_amount_difference: BigDecimal!
+}
+type group_initialized @entity {
+    id: ID!
+    evt_tx_hash: Bytes!
+    evt_index: BigInt!
+     
+    evt_block_number: BigInt!
+    group_pool_address: Bytes!
+    version: Int!
+}
+
+type group_loan_repaid @entity {
+    id: ID!
+    evt_tx_hash: Bytes!
+    evt_index: BigInt!
+     
+    evt_block_number: BigInt!
+    group_pool_address: Bytes!
+    bid_id: BigDecimal!
+    interest_amount: BigDecimal!
+    principal_amount: BigDecimal!
+    repayer: Bytes!
+    total_interest_collected: BigDecimal!
+    total_principal_repaid: BigDecimal!
+}
+type group_ownership_transferred @entity {
+    id: ID!
+    evt_tx_hash: Bytes!
+    evt_index: BigInt!
+    
+    evt_block_number: BigInt!
+    group_pool_address: Bytes!
+    new_owner: Bytes!
+    previous_owner: Bytes!
+}
+type group_paused @entity {
+    id: ID!
+    evt_tx_hash: Bytes!
+    evt_index: BigInt!
+    
+    evt_block_number: BigInt!
+    group_pool_address: Bytes!
+    account: Bytes!
+}
+
+# use group pool metrics instead 
+type group_pool_initialized @entity {
+    id: ID!
+    evt_tx_hash: Bytes!
+    evt_index: BigInt!
+    
+    evt_block_number: BigInt!
+    group_pool_address: Bytes!
+    collateral_token_address: Bytes!
+    interest_rate_lower_bound: Int!
+    interest_rate_upper_bound: Int!
+    liquidity_threshold_percent: Int!
+    loan_to_value_percent: Int!
+    market_id: BigDecimal!
+    max_loan_duration: Int!
+    pool_shares_token: Bytes!
+    principal_token_address: Bytes!
+    twap_interval: Int!
+    uniswap_pool_fee: Int!
+}
+type group_unpaused @entity {
+    id: ID!
+    evt_tx_hash: Bytes!
+    evt_index: BigInt!
+    
+    evt_block_number: BigInt!
+    group_pool_address: Bytes!
+    account: Bytes!
+}
+
+
+
+type group_pool_metrics @entity {
+    id: ID!    #will be based on group pool address 
+    group_pool_address: Bytes!
+
+    principal_token_address: Bytes!
+    collateral_token_address: Bytes!
+    shares_token_address: Bytes!
+
+    # get these from RPC calls 
+    uniswap_v3_pool_address: Bytes!
+    teller_v2_address: Bytes!
+    smart_commitment_forwarder_address: Bytes! 
+    # ---
+    
+    market_id: BigInt!
+    uniswap_pool_fee: Int!
+
+    max_loan_duration : Int!
+    twap_interval : Int!
+    interest_rate_upper_bound: Int!
+    interest_rate_lower_bound: Int!
+    
+
+    liquidity_threshold_percent: Int!
+    collateral_ratio: Int!  #loan to value 
+   
+    total_principal_tokens_committed: BigInt!
+    total_principal_tokens_withdrawn: BigInt!
+    
+    total_principal_tokens_lended: BigInt!
+    total_principal_tokens_repaid: BigInt!
+    total_interest_collected: BigInt!
+
+    token_difference_from_liquidations: BigInt!
+
+  
+}
+
+
+type group_lender_metrics @entity {
+    id: ID!   #will be based on group pool address and user lender address 
+    
+    user_lender_address: Bytes!
+    group_pool_address: Bytes!
+
+    total_principal_tokens_committed: Int!
+    total_principal_tokens_withdrawn: Int!
+
+    shares_tokens_net: Int! 
+
+    
+}
+
+# also add borrower metrics  ?
+
+
+
+type group_pool_metrics_data_point @entity {
+    id: ID!    #will be based on group pool address 
+    group_pool_address: Bytes!
+
+    block_number: BigInt!
+    block_time: BigInt 
+       
+   
+    total_principal_tokens_committed: BigInt!
+    total_principal_tokens_withdrawn: BigInt!
+    
+    total_principal_tokens_lended: BigInt!
+    total_principal_tokens_repaid: BigInt!
+    total_interest_collected: BigInt!
+
+    
+}

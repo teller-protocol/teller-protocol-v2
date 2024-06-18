@@ -490,7 +490,7 @@ fn graph_lendergroup_out(events: &contract::Events, tables: &mut EntityChangesTa
             .set("evt_block_number", BigInt::from(evt.evt_block_number))
             .set("group_pool_address", Hex(&evt.evt_address).to_string().into_bytes() )
             .set("amount", BigDecimal::from_str(&evt.amount).unwrap())
-            .set("lender", Hex(&evt.lender).to_string().to_bytes())
+            .set("lender", Hex(&evt.lender).to_string().into_bytes())
             .set("shares_amount", BigDecimal::from_str(&evt.shares_amount).unwrap())
             .set("shares_recipient", Hex(&evt.shares_recipient).to_string());
     });

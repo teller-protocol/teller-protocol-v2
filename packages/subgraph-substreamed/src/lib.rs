@@ -570,10 +570,10 @@ fn graph_lendergroup_out(
                  ).unwrap();
      */
             
-            //JUST FOR NOW 
-         let uniswap_v3_pool_address = Hex(&evt.evt_address).to_string();
-          let teller_v2_address = Hex(&evt.evt_address).to_string();
-           let smart_commitment_forwarder_address = Hex(&evt.evt_address).to_string();
+           
+         let uniswap_v3_pool_address = Hex(&evt.uniswap_v3_pool_address).to_string();
+          let teller_v2_address = Hex(&evt.teller_v2_address).to_string();
+           let smart_commitment_forwarder_address = Hex(&evt.smart_commitment_forwarder_address).to_string();
        
      
     

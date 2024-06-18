@@ -2,7 +2,7 @@ type factory_admin_changed @entity {
     id: ID!
     evt_tx_hash: Bytes!
     evt_index: BigInt!
-    evt_block_time: String!
+   
     evt_block_number: BigInt!
     new_admin: Bytes!
     previous_admin: Bytes!
@@ -11,7 +11,7 @@ type factory_beacon_upgraded @entity {
     id: ID!
     evt_tx_hash: Bytes!
     evt_index: BigInt!
-    evt_block_time: String!
+     
     evt_block_number: BigInt!
     beacon: Bytes!
 }
@@ -19,7 +19,7 @@ type factory_deployed_lender_group_contract @entity {
     id: ID!
     evt_tx_hash: Bytes!
     evt_index: BigInt!
-    evt_block_time: String!
+  
     evt_block_number: BigInt!
     group_contract: Bytes!
 }
@@ -27,7 +27,7 @@ type factory_upgraded @entity {
     id: ID!
     evt_tx_hash: Bytes!
     evt_index: BigInt!
-    evt_block_time: String!
+  
     evt_block_number: BigInt!
     implementation: Bytes!
 }
@@ -36,15 +36,14 @@ type group_borrower_accepted_funds @entity {
     id: ID!
     evt_tx_hash: Bytes!
     evt_index: BigInt!
-    evt_block_time: String!
+    
     evt_block_number: BigInt!
-    evt_address: String!
     group_pool_address: Bytes!
     bid_id: BigDecimal!
     borrower: Bytes!
     collateral_amount: BigDecimal!
-    interest_rate: BigInt!
-    loan_duration: BigInt!
+    interest_rate: Int!
+    loan_duration: Int!
     principal_amount: BigDecimal!
 }
 
@@ -52,7 +51,7 @@ type group_lender_added_principal @entity {
     id: ID!
     evt_tx_hash: Bytes!
     evt_index: BigInt!
-    evt_block_time: String!
+    
     evt_block_number: BigInt!
     group_pool_address: Bytes!
     amount: BigDecimal!
@@ -64,7 +63,7 @@ type group_earnings_withdrawn @entity {
     id: ID!
     evt_tx_hash: Bytes!
     evt_index: BigInt!
-    evt_block_time: String!
+   
     evt_block_number: BigInt!
     group_pool_address: Bytes!
     amount_pool_shares_tokens: BigDecimal!
@@ -76,9 +75,8 @@ type group_defaulted_loan_liquidated @entity {
     id: ID!
     evt_tx_hash: Bytes!
     evt_index: BigInt!
-    evt_block_time: String!
+    
     evt_block_number: BigInt!
-    evt_address: String!
     group_pool_address: Bytes!
     amount_due: BigDecimal!
     bid_id: BigDecimal!
@@ -89,17 +87,17 @@ type group_initialized @entity {
     id: ID!
     evt_tx_hash: Bytes!
     evt_index: BigInt!
-    evt_block_time: String! 
+     
     evt_block_number: BigInt!
     group_pool_address: Bytes!
-    version: BigInt!
+    version: Int!
 }
 
 type group_loan_repaid @entity {
     id: ID!
     evt_tx_hash: Bytes!
     evt_index: BigInt!
-    evt_block_time: String! 
+     
     evt_block_number: BigInt!
     group_pool_address: Bytes!
     bid_id: BigDecimal!
@@ -113,7 +111,7 @@ type group_ownership_transferred @entity {
     id: ID!
     evt_tx_hash: Bytes!
     evt_index: BigInt!
-    evt_block_time: String!
+    
     evt_block_number: BigInt!
     group_pool_address: Bytes!
     new_owner: Bytes!
@@ -123,7 +121,7 @@ type group_paused @entity {
     id: ID!
     evt_tx_hash: Bytes!
     evt_index: BigInt!
-    evt_block_time: String!
+    
     evt_block_number: BigInt!
     group_pool_address: Bytes!
     account: Bytes!
@@ -134,26 +132,26 @@ type group_pool_initialized @entity {
     id: ID!
     evt_tx_hash: Bytes!
     evt_index: BigInt!
-    evt_block_time: String!
+    
     evt_block_number: BigInt!
     group_pool_address: Bytes!
     collateral_token_address: Bytes!
-    interest_rate_lower_bound: BigInt!
-    interest_rate_upper_bound: BigInt!
-    liquidity_threshold_percent: BigInt!
-    loan_to_value_percent: BigInt!
+    interest_rate_lower_bound: Int!
+    interest_rate_upper_bound: Int!
+    liquidity_threshold_percent: Int!
+    loan_to_value_percent: Int!
     market_id: BigDecimal!
-    max_loan_duration: BigInt!
+    max_loan_duration: Int!
     pool_shares_token: Bytes!
     principal_token_address: Bytes!
-    twap_interval: BigInt!
-    uniswap_pool_fee: BigInt!
+    twap_interval: Int!
+    uniswap_pool_fee: Int!
 }
 type group_unpaused @entity {
     id: ID!
     evt_tx_hash: Bytes!
     evt_index: BigInt!
-    evt_block_time: String!
+    
     evt_block_number: BigInt!
     group_pool_address: Bytes!
     account: Bytes!
@@ -161,7 +159,7 @@ type group_unpaused @entity {
 
 
 
-type group_pool_metric @entity {
+type group_pool_metrics @entity {
     id: ID!    #will be based on group pool address 
     group_pool_address: Bytes!
 
@@ -200,7 +198,7 @@ type group_pool_metric @entity {
 }
 
 
-type group_lender_metric @entity {
+type group_lender_metrics @entity {
     id: ID!   #will be based on group pool address and user lender address 
     
     user_lender_address: Bytes!
@@ -218,7 +216,7 @@ type group_lender_metric @entity {
 
 
 
-type group_pool_metric_data_point @entity {
+type group_pool_metrics_data_point @entity {
     id: ID!    #will be based on group pool address 
     group_pool_address: Bytes!
 

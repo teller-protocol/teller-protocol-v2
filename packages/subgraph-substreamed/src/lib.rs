@@ -39,48 +39,37 @@ substreams_ethereum::init!();
 //make this not hardcoded !?  config ??? 
 const FACTORY_TRACKED_CONTRACT: [u8; 20] = hex!("e00384587dc733d1e201e1eaa5583645d351c01c");
 
+
+
+// THIS IS HOW WE ADD TO STORAGE 
+// this is filtering for all 'DeployedLenderGroupContract' events and is setting a bit as a 1  in the store if it was emitted 
+// THIS IS CURRENTLY ERRORING 
+#[substreams::handlers::store]
+fn store_factory_lendergroup_created(blk: eth::Block, store: StoreSetInt64) {
+   
+   for rcpt in blk.receipts() {
+        for log in rcpt
+            .receipt
+            .logs
+            .iter()
+            .filter(|log| log.address == FACTORY_TRACKED_CONTRACT)
+        {
+            substreams::log::info!(format!( "store_factory_lendergroup_created {:?}", log ));
+
+            if let Some(event) = abi::factory_contract::events::DeployedLenderGroupContract::match_and_decode(log) {
+                 substreams::log::info!(format!( "store_factory_lendergroup_created 2  {:?}", log ));
+                 store.set(log.ordinal, Hex(event.group_contract).to_string(), &1);
+            }
+        }
+    }
+    
+}
+
+
+
 fn map_factory_events(blk: &eth::Block, events: &mut contract::Events) {
-    events.factory_admin_changeds.append(&mut blk
-        .receipts()
-        .flat_map(|view| {
-            view.receipt.logs.iter()
-                .filter(|log| log.address == FACTORY_TRACKED_CONTRACT)
-                .filter_map(|log| {
-                    if let Some(event) = abi::factory_contract::events::AdminChanged::match_and_decode(log) {
-                        return Some(contract::FactoryAdminChanged {
-                            evt_tx_hash: Hex(&view.transaction.hash).to_string(),
-                            evt_index: log.block_index,
-                            evt_block_time: blk.timestamp_seconds(),
-                            evt_block_number: blk.number,
-                            new_admin: event.new_admin,
-                            previous_admin: event.previous_admin,
-                        });
-                    }
-
-                    None
-                })
-        })
-        .collect());
-    events.factory_beacon_upgradeds.append(&mut blk
-        .receipts()
-        .flat_map(|view| {
-            view.receipt.logs.iter()
-                .filter(|log| log.address == FACTORY_TRACKED_CONTRACT)
-                .filter_map(|log| {
-                    if let Some(event) = abi::factory_contract::events::BeaconUpgraded::match_and_decode(log) {
-                        return Some(contract::FactoryBeaconUpgraded {
-                            evt_tx_hash: Hex(&view.transaction.hash).to_string(),
-                            evt_index: log.block_index,
-                            evt_block_time: blk.timestamp_seconds(),
-                            evt_block_number: blk.number,
-                            beacon: event.beacon,
-                        });
-                    }
-
-                    None
-                })
-        })
-        .collect());
+    
+  
     events.factory_deployed_lender_group_contracts.append(&mut blk
         .receipts()
         .flat_map(|view| {
@@ -101,26 +90,7 @@ fn map_factory_events(blk: &eth::Block, events: &mut contract::Events) {
                 })
         })
         .collect());
-    events.factory_upgradeds.append(&mut blk
-        .receipts()
-        .flat_map(|view| {
-            view.receipt.logs.iter()
-                .filter(|log| log.address == FACTORY_TRACKED_CONTRACT)
-                .filter_map(|log| {
-                    if let Some(event) = abi::factory_contract::events::Upgraded::match_and_decode(log) {
-                        return Some(contract::FactoryUpgraded {
-                            evt_tx_hash: Hex(&view.transaction.hash).to_string(),
-                            evt_index: log.block_index,
-                            evt_block_time: blk.timestamp_seconds(),
-                            evt_block_number: blk.number,
-                            implementation: event.implementation,
-                        });
-                    }
-
-                    None
-                })
-        })
-        .collect());
+    
 }
 
 fn is_declared_dds_address(addr: &Vec<u8>, ordinal: u64, dds_store: &store::StoreGetInt64) -> bool {
@@ -968,30 +938,6 @@ fn graph_lendergroup_out(
 
 
 
-
-// THIS IS HOW WE ADD TO STORAGE 
-// this is filtering for all 'DeployedLenderGroupContract' events and is setting a bit as a 1  in the store if it was emitted 
-// THIS IS CURRENTLY ERRORING 
-#[substreams::handlers::store]
-fn store_factory_lendergroup_created(blk: eth::Block, store: StoreSetInt64) {
-   
-   for rcpt in blk.receipts() {
-        for log in rcpt
-            .receipt
-            .logs
-            .iter()
-            .filter(|log| log.address == FACTORY_TRACKED_CONTRACT)
-        {
-            substreams::log::println(format!( "store_factory_lendergroup_created {:?}", log ));
-
-            if let Some(event) = abi::factory_contract::events::DeployedLenderGroupContract::match_and_decode(log) {
-                 substreams::log::println(format!( "store_factory_lendergroup_created 2  {:?}", log ));
-                 store.set(log.ordinal, Hex(event.group_contract).to_string(), &1);
-            }
-        }
-    }
-    
-}
 
 
 

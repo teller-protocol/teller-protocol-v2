@@ -50,5 +50,7 @@ graph auth --studio
 
  ### HOW THINGS WORK UNDER THE HOOD
 
+ When testing a substream, use 'make gui' . This uses substream.yaml .  There is no sink so it will only read events and will not write them to the sql sink. it will not use schema.graphql.
+ 
  When deploying to a subgraph, the config file  substreams.subgraph.yaml is used.  
  When you are doing tables.create_row,  that data must match what it is in  schema.graphql ! 

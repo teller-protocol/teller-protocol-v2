@@ -159,7 +159,7 @@ type group_unpaused @entity {
 
 
 
-type group_pool_metrics @entity {
+type group_pool_metric @entity {
     id: ID!    #will be based on group pool address 
     group_pool_address: Bytes!
     
@@ -174,16 +174,16 @@ type group_pool_metrics @entity {
     # ---
     
     market_id: BigInt!
-    uniswap_pool_fee: Int!
+    uniswap_pool_fee: BigInt!
 
-    max_loan_duration : Int!
-    twap_interval : Int!
-    interest_rate_upper_bound: Int!
-    interest_rate_lower_bound: Int!
+    max_loan_duration : BigInt!
+    twap_interval : BigInt!
+    interest_rate_upper_bound: BigInt!
+    interest_rate_lower_bound: BigInt!
     
 
-    liquidity_threshold_percent: Int!
-    collateral_ratio: Int!  #loan to value 
+    liquidity_threshold_percent: BigInt!
+    collateral_ratio: BigInt!  #loan to value 
    
     total_principal_tokens_committed: BigInt!
     total_principal_tokens_withdrawn: BigInt!
@@ -198,16 +198,16 @@ type group_pool_metrics @entity {
 }
 
 
-type group_lender_metrics @entity {
+type group_lender_metric @entity {
     id: ID!   #will be based on group pool address and user lender address 
     
     user_lender_address: Bytes!
     group_pool_address: Bytes!
 
-    total_principal_tokens_committed: Int!
-    total_principal_tokens_withdrawn: Int!
+    total_principal_tokens_committed: BigInt!
+    total_principal_tokens_withdrawn: BigInt!
 
-    shares_tokens_net: Int! 
+    shares_tokens_net: BigInt! 
 
     
 }

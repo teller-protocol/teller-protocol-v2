@@ -584,12 +584,12 @@ fn store_lendergroup_pool_metrics_deltas(events:  contract::Events, store: Store
     let ord = 0; // FOR NOW - CAN CAUSE ISSUES - GET FROM LOG AND STUFF INTO EVENT    
     
     
-    events.lendergroup_lender_added_principals.iter().for_each(|evt: &LendergroupLenderAddedPrincipal| {
+    events.lendergroup_lender_added_principals.iter().for_each(|evt: &contract::LendergroupLenderAddedPrincipal| {
         let store_key: String = format!("group_pool_metric:{}:total_principal_tokens_committed", evt.evt_address);
         store.add(ord,&store_key, BigInt::from_str(&evt.amount).unwrap_or(BigInt::zero()));
     });
 
-    events.lendergroup_borrower_accepted_funds.iter().for_each(|evt: &LendergroupBorrowerAcceptedFunds| {
+    events.lendergroup_borrower_accepted_funds.iter().for_each(|evt: &contract::LendergroupBorrowerAcceptedFunds| {
         
         let store_key: String = format!("group_pool_metric:{}:total_principal_tokens_lended", evt.evt_address);
         store.add(ord,&store_key, BigInt::from_str(&evt.principal_amount).unwrap_or(BigInt::zero()));
@@ -602,7 +602,7 @@ fn store_lendergroup_pool_metrics_deltas(events:  contract::Events, store: Store
     });
 
     
-    events.lendergroup_earnings_withdrawns.iter().for_each(|evt: &LendergroupEarningsWithdrawn| {
+    events.lendergroup_earnings_withdrawns.iter().for_each(|evt: &contract::LendergroupEarningsWithdrawn| {
         let store_key: String = format!("group_pool_metric:{}:total_principal_tokens_withdrawn", evt.evt_address);
         store.add(ord,&store_key, BigInt::from_str(&evt.principal_tokens_withdrawn).unwrap_or(BigInt::zero()));
          
@@ -612,7 +612,7 @@ fn store_lendergroup_pool_metrics_deltas(events:  contract::Events, store: Store
 
     
             
-    events.lendergroup_loan_repaids.iter().for_each(|evt: &LendergroupLoanRepaid| {
+    events.lendergroup_loan_repaids.iter().for_each(|evt: &contract::LendergroupLoanRepaid| {
         let store_key_repaid: String = format!("group_pool_metric:{}:total_principal_tokens_repaid", evt.evt_address);
         let store_key_interest: String = format!("group_pool_metric:{}:total_interest_collected", evt.evt_address);
         store.add(ord,&store_key_repaid, BigInt::from_str(&evt.principal_amount).unwrap_or(BigInt::zero()));
@@ -704,8 +704,18 @@ fn map_events(
     Ok(events)
 }
  
+
+
 #[substreams::handlers::map]
-fn graph_out(events: contract::Events) -> Result<EntityChanges, substreams::errors::Error> {
+fn graph_out(
+    events: contract::Events,
+
+
+    deltas_lendergroup_pool_metrics: Deltas<DeltaBigInt>,
+    store_get_big_int: StoreGetBigInt, 
+
+
+) -> Result<EntityChanges, substreams::errors::Error> {
     // Initialize Database Changes container
     let mut tables = EntityChangesTables::new();
     graph_factory_out(&events, &mut tables);

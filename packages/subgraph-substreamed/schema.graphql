@@ -90,7 +90,7 @@ type group_initialized @entity {
     evt_block_time: BigInt!
     evt_block_number: BigInt!
     group_pool_address: Bytes!
-    version: Int!
+    version: BigInt!
 }
 
 type group_loan_repaid @entity {
@@ -136,16 +136,16 @@ type group_pool_initialized @entity {
     evt_block_number: BigInt!
     group_pool_address: Bytes!
     collateral_token_address: Bytes!
-    interest_rate_lower_bound: Int!
-    interest_rate_upper_bound: Int!
-    liquidity_threshold_percent: Int!
-    loan_to_value_percent: Int!
-    market_id: BigDecimal!
-    max_loan_duration: Int!
+    interest_rate_lower_bound: BigInt!
+    interest_rate_upper_bound: BigInt!
+    liquidity_threshold_percent: BigInt!
+    loan_to_value_percent: BigInt!
+    market_id: BigInt!
+    max_loan_duration: BigInt!
     pool_shares_token: Bytes!
     principal_token_address: Bytes!
-    twap_interval: Int!
-    uniswap_pool_fee: Int!
+    twap_interval: BigInt!
+    uniswap_pool_fee: BigInt!
 }
 type group_unpaused @entity {
     id: ID!

@@ -543,7 +543,7 @@ fn graph_lendergroup_out(events: &contract::Events, tables: &mut EntityChangesTa
             .set("interest_rate_upper_bound", evt.interest_rate_upper_bound)
             .set("liquidity_threshold_percent", evt.liquidity_threshold_percent)
             .set("loan_to_value_percent", evt.loan_to_value_percent)
-            .set("market_id", BigDecimal::from_str(&evt.market_id).unwrap())
+            .set("market_id", BigInt::from_str(&evt.market_id).unwrap())
             .set("max_loan_duration", evt.max_loan_duration)
             .set("pool_shares_token", Hex(&evt.pool_shares_token).to_string().into_bytes())
             .set("principal_token_address", Hex(&evt.principal_token_address).to_string().into_bytes())

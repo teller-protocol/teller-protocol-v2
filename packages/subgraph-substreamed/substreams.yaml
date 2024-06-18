@@ -71,3 +71,4 @@ modules:
       type: proto:sf.substreams.entity.v1.EntityChanges
 
 network: polygon
+

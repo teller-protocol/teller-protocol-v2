@@ -435,6 +435,7 @@ fn graph_lendergroup_out(
     events: &contract::Events,
      tables: &mut EntityChangesTables,
      deltas_lendergroup_pool_metrics: &Deltas<DeltaBigInt>,
+     store_get_lendergroup_pool_metrics: &StoreGetBigInt, 
     
     ) {
     // Loop over all the abis events to create table changes
@@ -685,7 +686,7 @@ fn graph_lendergroup_out(
                                       
          }
          
-          /*
+        
          
          //need to use a non-delta store!?
          for group_pool_address in pool_metric_deltas_detected.iter() {
@@ -736,7 +737,7 @@ fn graph_lendergroup_out(
                 
              
          }
-            */
+        
 
 
 
@@ -902,6 +903,6 @@ fn graph_out(
     // Initialize Database Changes container
     let mut tables = EntityChangesTables::new();
     graph_factory_out(&events, &mut tables);
-    graph_lendergroup_out(&events, &mut tables, &deltas_lendergroup_pool_metrics);
+    graph_lendergroup_out(&events, &mut tables, &deltas_lendergroup_pool_metrics, &store_get_big_int);
     Ok(tables.to_entity_changes())
 }

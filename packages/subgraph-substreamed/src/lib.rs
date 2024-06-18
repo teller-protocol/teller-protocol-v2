@@ -429,7 +429,7 @@ fn graph_lendergroup_out(events: &contract::Events, tables: &mut EntityChangesTa
     // Loop over all the abis events to create table changes
     events.lendergroup_borrower_accepted_funds.iter().for_each(|evt| {
         tables
-            .create_row("lendergroup_borrower_accepted_funds", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
+            .create_row("group_borrower_accepted_funds", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
             .set("evt_tx_hash", &evt.evt_tx_hash)
             .set("evt_index", evt.evt_index)
             .set("evt_block_time", evt.evt_block_time)
@@ -444,7 +444,7 @@ fn graph_lendergroup_out(events: &contract::Events, tables: &mut EntityChangesTa
     });
     events.lendergroup_defaulted_loan_liquidateds.iter().for_each(|evt| {
         tables
-            .create_row("lendergroup_defaulted_loan_liquidated", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
+            .create_row("group_defaulted_loan_liquidated", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
             .set("evt_tx_hash", &evt.evt_tx_hash)
             .set("evt_index", evt.evt_index)
             .set("evt_block_time", evt.evt_block_time)
@@ -457,7 +457,7 @@ fn graph_lendergroup_out(events: &contract::Events, tables: &mut EntityChangesTa
     });
     events.lendergroup_earnings_withdrawns.iter().for_each(|evt| {
         tables
-            .create_row("lendergroup_earnings_withdrawn", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
+            .create_row("group_earnings_withdrawn", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
             .set("evt_tx_hash", &evt.evt_tx_hash)
             .set("evt_index", evt.evt_index)
             .set("evt_block_time", evt.evt_block_time)
@@ -470,7 +470,7 @@ fn graph_lendergroup_out(events: &contract::Events, tables: &mut EntityChangesTa
     });
     events.lendergroup_initializeds.iter().for_each(|evt| {
         tables
-            .create_row("lendergroup_initialized", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
+            .create_row("group_initialized", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
             .set("evt_tx_hash", &evt.evt_tx_hash)
             .set("evt_index", evt.evt_index)
             .set("evt_block_time", evt.evt_block_time)
@@ -480,7 +480,7 @@ fn graph_lendergroup_out(events: &contract::Events, tables: &mut EntityChangesTa
     });
     events.lendergroup_lender_added_principals.iter().for_each(|evt| {
         tables
-            .create_row("lendergroup_lender_added_principal", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
+            .create_row("group_lender_added_principal", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
             .set("evt_tx_hash", &evt.evt_tx_hash)
             .set("evt_index", evt.evt_index)
             .set("evt_block_time", evt.evt_block_time)
@@ -493,7 +493,7 @@ fn graph_lendergroup_out(events: &contract::Events, tables: &mut EntityChangesTa
     });
     events.lendergroup_loan_repaids.iter().for_each(|evt| {
         tables
-            .create_row("lendergroup_loan_repaid", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
+            .create_row("group_loan_repaid", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
             .set("evt_tx_hash", &evt.evt_tx_hash)
             .set("evt_index", evt.evt_index)
             .set("evt_block_time", evt.evt_block_time)
@@ -508,7 +508,7 @@ fn graph_lendergroup_out(events: &contract::Events, tables: &mut EntityChangesTa
     });
     events.lendergroup_ownership_transferreds.iter().for_each(|evt| {
         tables
-            .create_row("lendergroup_ownership_transferred", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
+            .create_row("group_ownership_transferred", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
             .set("evt_tx_hash", &evt.evt_tx_hash)
             .set("evt_index", evt.evt_index)
             .set("evt_block_time", evt.evt_block_time)
@@ -519,7 +519,7 @@ fn graph_lendergroup_out(events: &contract::Events, tables: &mut EntityChangesTa
     });
     events.lendergroup_pauseds.iter().for_each(|evt| {
         tables
-            .create_row("lendergroup_paused", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
+            .create_row("group_paused", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
             .set("evt_tx_hash", &evt.evt_tx_hash)
             .set("evt_index", evt.evt_index)
             .set("evt_block_time", evt.evt_block_time)
@@ -529,7 +529,7 @@ fn graph_lendergroup_out(events: &contract::Events, tables: &mut EntityChangesTa
     });
     events.lendergroup_pool_initializeds.iter().for_each(|evt| {
         tables
-            .create_row("lendergroup_pool_initialized", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
+            .create_row("group_pool_initialized", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
             .set("evt_tx_hash", &evt.evt_tx_hash)
             .set("evt_index", evt.evt_index)
             .set("evt_block_time", evt.evt_block_time)
@@ -549,7 +549,7 @@ fn graph_lendergroup_out(events: &contract::Events, tables: &mut EntityChangesTa
     });
     events.lendergroup_unpauseds.iter().for_each(|evt| {
         tables
-            .create_row("lendergroup_unpaused", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
+            .create_row("group_unpaused", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
             .set("evt_tx_hash", &evt.evt_tx_hash)
             .set("evt_index", evt.evt_index)
             .set("evt_block_time", evt.evt_block_time)

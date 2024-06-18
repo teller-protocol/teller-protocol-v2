@@ -35,9 +35,12 @@ make && make pack
 
 
 ```
-substreams protogen 
+ make protogen 
 ```
 
+```
+ make gui  (visualize)  
+```
 
 
 > Create a substreams spkg 

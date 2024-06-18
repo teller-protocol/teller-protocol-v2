@@ -21,6 +21,16 @@ https://github.com/streamingfast/substreams-uniswap-v3/blob/develop/src/rpc.rs
 
 ### Building 
 
+
+```
+
+make && make pack
+
+```
+
+
+
+### Individual build commands 
 > run proto gen (to output RUST ) 
 
 
@@ -39,7 +49,7 @@ substreams pack ./substreams.yaml
 
 #### DEPLOYING 
 
-graph auth --studio  
+graph auth --studio  <KEY>
  graph deploy --studio tellerv2-lender-groups-polygon
  
  0.4.21.55

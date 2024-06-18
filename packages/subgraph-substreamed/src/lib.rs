@@ -455,7 +455,7 @@ fn graph_lendergroup_out(events: &contract::Events, tables: &mut EntityChangesTa
             .set("group_pool_address", Hex(&evt.evt_address).to_string().into_bytes() )
             .set("amount_due", BigDecimal::from_str(&evt.amount_due).unwrap())
             .set("bid_id", BigDecimal::from_str(&evt.bid_id).unwrap())
-            .set("liquidator", Hex(&evt.liquidator).to_string())
+            .set("liquidator", Hex(&evt.liquidator).to_string().into_bytes())
             .set("token_amount_difference", BigDecimal::from_str(&evt.token_amount_difference).unwrap());
     });
     events.lendergroup_earnings_withdrawns.iter().for_each(|evt| {
@@ -467,9 +467,9 @@ fn graph_lendergroup_out(events: &contract::Events, tables: &mut EntityChangesTa
             .set("evt_block_number", BigInt::from(evt.evt_block_number))
             .set("group_pool_address", Hex(&evt.evt_address).to_string().into_bytes() )
             .set("amount_pool_shares_tokens", BigDecimal::from_str(&evt.amount_pool_shares_tokens).unwrap())
-            .set("lender", Hex(&evt.lender).to_string())
+            .set("lender", Hex(&evt.lender).to_string().into_bytes())
             .set("principal_tokens_withdrawn", BigDecimal::from_str(&evt.principal_tokens_withdrawn).unwrap())
-            .set("recipient", Hex(&evt.recipient).to_string());
+            .set("recipient", Hex(&evt.recipient).to_string().into_bytes());
     });
     events.lendergroup_initializeds.iter().for_each(|evt| {
         tables
@@ -492,7 +492,7 @@ fn graph_lendergroup_out(events: &contract::Events, tables: &mut EntityChangesTa
             .set("amount", BigDecimal::from_str(&evt.amount).unwrap())
             .set("lender", Hex(&evt.lender).to_string().into_bytes())
             .set("shares_amount", BigDecimal::from_str(&evt.shares_amount).unwrap())
-            .set("shares_recipient", Hex(&evt.shares_recipient).to_string());
+            .set("shares_recipient", Hex(&evt.shares_recipient).to_string().into_bytes());
     });
     events.lendergroup_loan_repaids.iter().for_each(|evt| {
         tables
@@ -505,7 +505,7 @@ fn graph_lendergroup_out(events: &contract::Events, tables: &mut EntityChangesTa
             .set("bid_id", BigDecimal::from_str(&evt.bid_id).unwrap())
             .set("interest_amount", BigDecimal::from_str(&evt.interest_amount).unwrap())
             .set("principal_amount", BigDecimal::from_str(&evt.principal_amount).unwrap())
-            .set("repayer", Hex(&evt.repayer).to_string())
+            .set("repayer", Hex(&evt.repayer).to_string().into_bytes())
             .set("total_interest_collected", BigDecimal::from_str(&evt.total_interest_collected).unwrap())
             .set("total_principal_repaid", BigDecimal::from_str(&evt.total_principal_repaid).unwrap());
     });
@@ -517,8 +517,8 @@ fn graph_lendergroup_out(events: &contract::Events, tables: &mut EntityChangesTa
             .set("evt_block_time", BigInt::from(evt.evt_block_time))
             .set("evt_block_number", BigInt::from(evt.evt_block_number))
             .set("group_pool_address", Hex(&evt.evt_address).to_string().into_bytes() )
-            .set("new_owner", Hex(&evt.new_owner).to_string())
-            .set("previous_owner", Hex(&evt.previous_owner).to_string());
+            .set("new_owner", Hex(&evt.new_owner).to_string().into_bytes())
+            .set("previous_owner", Hex(&evt.previous_owner).to_string().into_bytes());
     });
     events.lendergroup_pauseds.iter().for_each(|evt| {
         tables
@@ -528,7 +528,7 @@ fn graph_lendergroup_out(events: &contract::Events, tables: &mut EntityChangesTa
             .set("evt_block_time", BigInt::from(evt.evt_block_time))
             .set("evt_block_number", BigInt::from(evt.evt_block_number))
             .set("group_pool_address", Hex(&evt.evt_address).to_string().into_bytes() )
-            .set("account", Hex(&evt.account).to_string());
+            .set("account", Hex(&evt.account).to_string().into_bytes());
     });
     events.lendergroup_pool_initializeds.iter().for_each(|evt| {
         tables
@@ -538,15 +538,15 @@ fn graph_lendergroup_out(events: &contract::Events, tables: &mut EntityChangesTa
             .set("evt_block_time", BigInt::from(evt.evt_block_time))
             .set("evt_block_number", BigInt::from(evt.evt_block_number))
             .set("group_pool_address", Hex(&evt.evt_address).to_string().into_bytes() )
-            .set("collateral_token_address", Hex(&evt.collateral_token_address).to_string())
+            .set("collateral_token_address", Hex(&evt.collateral_token_address).to_string().into_bytes())
             .set("interest_rate_lower_bound", evt.interest_rate_lower_bound)
             .set("interest_rate_upper_bound", evt.interest_rate_upper_bound)
             .set("liquidity_threshold_percent", evt.liquidity_threshold_percent)
             .set("loan_to_value_percent", evt.loan_to_value_percent)
             .set("market_id", BigDecimal::from_str(&evt.market_id).unwrap())
             .set("max_loan_duration", evt.max_loan_duration)
-            .set("pool_shares_token", Hex(&evt.pool_shares_token).to_string())
-            .set("principal_token_address", Hex(&evt.principal_token_address).to_string())
+            .set("pool_shares_token", Hex(&evt.pool_shares_token).to_string().into_bytes())
+            .set("principal_token_address", Hex(&evt.principal_token_address).to_string().into_bytes())
             .set("twap_interval", evt.twap_interval)
             .set("uniswap_pool_fee", evt.uniswap_pool_fee);
     });
@@ -558,7 +558,7 @@ fn graph_lendergroup_out(events: &contract::Events, tables: &mut EntityChangesTa
             .set("evt_block_time", BigInt::from(evt.evt_block_time))
             .set("evt_block_number", BigInt::from(evt.evt_block_number))
             .set("group_pool_address", Hex(&evt.evt_address).to_string().into_bytes() )
-            .set("account", Hex(&evt.account).to_string());
+            .set("account", Hex(&evt.account).to_string().into_bytes());
     });
 }
 #[substreams::handlers::store]

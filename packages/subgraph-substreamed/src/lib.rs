@@ -651,8 +651,10 @@ fn graph_lendergroup_out(
                     
                         //this splits on ":"
                 let delta_root_identifier = substreams::key::segment_at(pool_metric_delta.get_key(), 0);
-            
-                if delta_root_identifier != "group_pool_metric" {continue};
+
+
+                //maybe this is breaking things ?
+               if delta_root_identifier != "group_pool_metric" {continue};
                 
                 let group_address = substreams::key::segment_at(pool_metric_delta.get_key(), 1);
                 let delta_prop_identifier = substreams::key::segment_at(pool_metric_delta.get_key(), 2);
@@ -761,12 +763,50 @@ fn store_factory_lendergroup_created(blk: eth::Block, store: StoreSetInt64) {
 
 
 
+/*
+
+
+The block stream encountered a substreams fatal error and will not retry:
+ rpc error: code = InvalidArgument desc = step new irr: handler step new:
+  execute modules: applying executor results "store_lendergroup_pool_metrics_deltas"
+   on block 57615083: execute: store wasm call: block 57615083: module 
+   "store_lendergroup_pool_metrics_deltas":
+    general wasm execution failed: wasm execution 
+    failed deterministically: call: module
+     "store_lendergroup_pool_metrics_deltas": 
+     invalid store operation "add_bigint", only valid for stores with updatePolicy
+      == "add" and valueType == "bigint" (recovered by wazero) wasm stack trace:
+       state.add_bigint(i64,i32,i32,i32,i32) ._ZN90_$LT$substreams..store..
+       StoreAddBigInt$u20$as$u20$substreams..store..StoreAdd$LT$V$GT$$GT$3ad
+       d17h658373da49566eb1E(i32,i32,i32) .store_lendergroup_pool_metrics_deltas
+       (i32,i32)
+
+*/
 #[substreams::handlers::store]
 fn store_lendergroup_pool_metrics_deltas(events:  contract::Events, store: StoreAddBigInt) {
     
     
     let ord = 0; // FOR NOW - CAN CAUSE ISSUES - GET FROM LOG AND STUFF INTO EVENT    
     
+
+    events.lendergroup_pool_initializeds.iter().for_each(|evt: &contract::LendergroupPoolInitialized| {
+
+        let store_key: String = format!("group_pool_metric:{}:total_principal_tokens_committed", evt.evt_address);
+        store.add(ord,&store_key, BigInt::zero() );
+
+        let store_key: String = format!("group_pool_metric:{}:total_principal_tokens_lended", evt.evt_address);
+        store.add(ord,&store_key, BigInt::zero() );
+
+        let store_key: String = format!("group_pool_metric:{}:total_principal_tokens_withdrawn", evt.evt_address);
+        store.add(ord,&store_key, BigInt::zero() );
+
+        let store_key: String = format!("group_pool_metric:{}:total_principal_tokens_repaid", evt.evt_address);
+        store.add(ord,&store_key, BigInt::zero() );
+
+        let store_key: String = format!("group_pool_metric:{}:total_interest_collected", evt.evt_address);
+        store.add(ord,&store_key, BigInt::zero() );
+
+    });
     
     events.lendergroup_lender_added_principals.iter().for_each(|evt: &contract::LendergroupLenderAddedPrincipal| {
         let store_key: String = format!("group_pool_metric:{}:total_principal_tokens_committed", evt.evt_address);

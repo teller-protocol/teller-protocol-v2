@@ -448,7 +448,7 @@ fn graph_lendergroup_out(
             .set("evt_block_number", BigInt::from(evt.evt_block_number))
             .set("group_pool_address", Hex(&evt.evt_address).to_string().into_bytes() )
             .set("bid_id", BigDecimal::from_str(&evt.bid_id).unwrap())
-            .set("borrower", Hex(&evt.borrower).to_string())
+            .set("borrower", Hex(&evt.borrower).to_string().into_bytes())
             .set("collateral_amount", BigDecimal::from_str(&evt.collateral_amount).unwrap())
             .set("interest_rate", evt.interest_rate)
             .set("loan_duration", evt.loan_duration)

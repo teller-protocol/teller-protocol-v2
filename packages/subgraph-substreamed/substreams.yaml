@@ -38,7 +38,15 @@ modules:
     output:
       type: proto:contract.v1.Events
 
-
+      
+  - name: store_globals_from_events
+    kind: store
+    initialBlock: 57233385
+    updatePolicy: set
+    valueType: bigint
+    inputs:
+      - map: map_events
+      
 
   - name: store_lendergroup_pool_metrics_deltas
     kind: store
@@ -67,6 +75,7 @@ modules:
       - store: store_lendergroup_pool_metrics_deltas
         mode: deltas
       - store: store_lendergroup_pool_metrics
+      - store: store_globals_from_events
     output:
       type: proto:sf.substreams.entity.v1.EntityChanges
 

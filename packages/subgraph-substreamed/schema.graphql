@@ -42,8 +42,8 @@ type group_borrower_accepted_funds @entity {
     bid_id: BigDecimal!
     borrower: Bytes!
     collateral_amount: BigDecimal!
-    interest_rate: Int!
-    loan_duration: Int!
+    interest_rate: BigInt!
+    loan_duration: BigInt!
     principal_amount: BigDecimal!
 }
 

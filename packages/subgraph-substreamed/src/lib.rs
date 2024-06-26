@@ -661,7 +661,7 @@ fn graph_lendergroup_out(
                         
                         
                         
-                let block_number = BigInt::zero(); // FOR NOW 
+               // let block_number = BigInt::zero(); // FOR NOW 
                 let new_value = &pool_metric_delta.new_value ;
                         
                         
@@ -699,8 +699,12 @@ fn graph_lendergroup_out(
                
             let ord = 0; // FOR NOW - CAN CAUSE ISSUES 
                
-            let block_number = BigInt::zero(); // FOR NOW - get from store !?  
-            let block_time = BigInt::zero();  // FOR NOW - get from store !?  
+            let block_number = store_get_lendergroup_pool_metrics
+            .get_at(ord, format!("latest_block_number"   ))
+            .unwrap_or(BigInt::zero());  
+            let block_time = store_get_lendergroup_pool_metrics
+            .get_at(ord, format!("latest_block_time"   ))
+            .unwrap_or(BigInt::zero());   
                
                
                //turn this into an enum !?
@@ -739,11 +743,11 @@ fn graph_lendergroup_out(
                 
              
          }
-        
-
-
 
 }
+
+
+
 #[substreams::handlers::store]
 fn store_factory_lendergroup_created(blk: eth::Block, store: StoreSetInt64) {
     for rcpt in blk.receipts() {
@@ -759,9 +763,68 @@ fn store_factory_lendergroup_created(blk: eth::Block, store: StoreSetInt64) {
         }
     }
 }
+ 
 
 
 
+#[substreams::handlers::store]
+fn store_globals_from_events(
+    events:  contract::Events, 
+   
+    bigint_set_store: StoreSetBigInt //for block time and block number 
+) {
+
+
+    let ord = 0; // FOR NOW - CAN CAUSE ISSUES - GET FROM LOG AND STUFF INTO EVENT    
+    
+
+    events.lendergroup_pool_initializeds.iter().for_each(|evt: &contract::LendergroupPoolInitialized| {
+ 
+
+        bigint_set_store.set(ord,"latest_block_number", &BigInt::from( evt.evt_block_number ) );
+        bigint_set_store.set(ord,"latest_block_time", &BigInt::from(  evt.evt_block_time ) );
+
+    });
+    
+    events.lendergroup_lender_added_principals.iter().for_each(|evt: &contract::LendergroupLenderAddedPrincipal| {
+        
+       
+        bigint_set_store.set(ord,"latest_block_number", &BigInt::from( evt.evt_block_number ) );
+        bigint_set_store.set(ord,"latest_block_time", &BigInt::from(  evt.evt_block_time ) );
+
+    });
+
+    events.lendergroup_borrower_accepted_funds.iter().for_each(|evt: &contract::LendergroupBorrowerAcceptedFunds| {
+        
+        bigint_set_store.set(ord,"latest_block_number", &BigInt::from( evt.evt_block_number ) );
+        bigint_set_store.set(ord,"latest_block_time", &BigInt::from(  evt.evt_block_time ) );
+
+        //add total collateral ! 
+        
+        //  evt.collateral_amount
+    });
+
+    
+    events.lendergroup_earnings_withdrawns.iter().for_each(|evt: &contract::LendergroupEarningsWithdrawn| {
+     
+        bigint_set_store.set(ord,"latest_block_number", &BigInt::from( evt.evt_block_number ) );
+        bigint_set_store.set(ord,"latest_block_time", &BigInt::from(  evt.evt_block_time ) );
+
+        //add total collateral ! 
+    });
+
+    
+            
+    events.lendergroup_loan_repaids.iter().for_each(|evt: &contract::LendergroupLoanRepaid| {
+        
+        bigint_set_store.set(ord,"latest_block_number", &BigInt::from( evt.evt_block_number ) );
+        bigint_set_store.set(ord,"latest_block_time", &BigInt::from(  evt.evt_block_time ) );
+
+
+    });
+
+
+}
 
 /*
 
@@ -783,8 +846,11 @@ The block stream encountered a substreams fatal error and will not retry:
 
 */
 #[substreams::handlers::store]
-fn store_lendergroup_pool_metrics_deltas(events:  contract::Events, store: StoreAddBigInt) {
-    
+fn store_lendergroup_pool_metrics_deltas(
+    events:  contract::Events, 
+    bigint_add_store: StoreAddBigInt,
+ 
+) {
     
     let ord = 0; // FOR NOW - CAN CAUSE ISSUES - GET FROM LOG AND STUFF INTO EVENT    
     
@@ -792,34 +858,36 @@ fn store_lendergroup_pool_metrics_deltas(events:  contract::Events, store: Store
     events.lendergroup_pool_initializeds.iter().for_each(|evt: &contract::LendergroupPoolInitialized| {
 
         let store_key: String = format!("group_pool_metric:{}:total_principal_tokens_committed", evt.evt_address);
-        store.add(ord,&store_key, BigInt::zero() );
+        bigint_add_store.add(ord,&store_key, BigInt::zero() );
 
         let store_key: String = format!("group_pool_metric:{}:total_principal_tokens_lended", evt.evt_address);
-        store.add(ord,&store_key, BigInt::zero() );
+        bigint_add_store.add(ord,&store_key, BigInt::zero() );
 
         let store_key: String = format!("group_pool_metric:{}:total_principal_tokens_withdrawn", evt.evt_address);
-        store.add(ord,&store_key, BigInt::zero() );
+        bigint_add_store.add(ord,&store_key, BigInt::zero() );
 
         let store_key: String = format!("group_pool_metric:{}:total_principal_tokens_repaid", evt.evt_address);
-        store.add(ord,&store_key, BigInt::zero() );
+        bigint_add_store.add(ord,&store_key, BigInt::zero() );
 
         let store_key: String = format!("group_pool_metric:{}:total_interest_collected", evt.evt_address);
-        store.add(ord,&store_key, BigInt::zero() );
+        bigint_add_store.add(ord,&store_key, BigInt::zero() );
+
+ 
 
     });
     
     events.lendergroup_lender_added_principals.iter().for_each(|evt: &contract::LendergroupLenderAddedPrincipal| {
         let store_key: String = format!("group_pool_metric:{}:total_principal_tokens_committed", evt.evt_address);
-        store.add(ord,&store_key, BigInt::from_str(&evt.amount).unwrap_or(BigInt::zero()));
+        bigint_add_store.add(ord,&store_key, BigInt::from_str(&evt.amount).unwrap_or(BigInt::zero()));
+ 
     });
 
     events.lendergroup_borrower_accepted_funds.iter().for_each(|evt: &contract::LendergroupBorrowerAcceptedFunds| {
         
         let store_key: String = format!("group_pool_metric:{}:total_principal_tokens_lended", evt.evt_address);
-        store.add(ord,&store_key, BigInt::from_str(&evt.principal_amount).unwrap_or(BigInt::zero()));
+        bigint_add_store.add(ord,&store_key, BigInt::from_str(&evt.principal_amount).unwrap_or(BigInt::zero()));
         
-        
-       
+      
         //add total collateral ! 
         
         //  evt.collateral_amount
@@ -828,9 +896,9 @@ fn store_lendergroup_pool_metrics_deltas(events:  contract::Events, store: Store
     
     events.lendergroup_earnings_withdrawns.iter().for_each(|evt: &contract::LendergroupEarningsWithdrawn| {
         let store_key: String = format!("group_pool_metric:{}:total_principal_tokens_withdrawn", evt.evt_address);
-        store.add(ord,&store_key, BigInt::from_str(&evt.principal_tokens_withdrawn).unwrap_or(BigInt::zero()));
+        bigint_add_store.add(ord,&store_key, BigInt::from_str(&evt.principal_tokens_withdrawn).unwrap_or(BigInt::zero()));
          
-        
+      
         //add total collateral ! 
     });
 
@@ -839,8 +907,10 @@ fn store_lendergroup_pool_metrics_deltas(events:  contract::Events, store: Store
     events.lendergroup_loan_repaids.iter().for_each(|evt: &contract::LendergroupLoanRepaid| {
         let store_key_repaid: String = format!("group_pool_metric:{}:total_principal_tokens_repaid", evt.evt_address);
         let store_key_interest: String = format!("group_pool_metric:{}:total_interest_collected", evt.evt_address);
-        store.add(ord,&store_key_repaid, BigInt::from_str(&evt.principal_amount).unwrap_or(BigInt::zero()));
-        store.add(ord,&store_key_interest, BigInt::from_str(&evt.interest_amount).unwrap_or(BigInt::zero()));
+        bigint_add_store.add(ord,&store_key_repaid, BigInt::from_str(&evt.principal_amount).unwrap_or(BigInt::zero()));
+        bigint_add_store.add(ord,&store_key_interest, BigInt::from_str(&evt.interest_amount).unwrap_or(BigInt::zero()));
+        
+ 
     });
 }
 
@@ -868,17 +938,20 @@ fn store_lendergroup_pool_metrics(
                         
                         
                         
-                let block_number = 0; // FOR NOW 
+              //  let block_number = 0; // FOR NOW 
                 let new_value = &pool_metric_delta.new_value ;
                         
                 
                 //substreams::log::info();
+
+
                         
                match delta_prop_identifier {
                    
                    "total_principal_tokens_committed" => {
                        let store_key: String = format!("group_pool_metric:{}:total_principal_tokens_committed", group_address);
                        store.set(ord,&store_key,  new_value  );
+
                    }
                    
                      

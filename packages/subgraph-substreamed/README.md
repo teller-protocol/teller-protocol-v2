@@ -39,6 +39,9 @@ substreams pack ./substreams.yaml
 
 #### DEPLOYING 
 
+make && make build && make pack 
+
+
 graph auth --studio  
  graph deploy --studio tellerv2-lender-groups-polygon
  

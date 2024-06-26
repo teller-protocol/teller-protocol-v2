@@ -436,6 +436,7 @@ fn graph_lendergroup_out(
      tables: &mut EntityChangesTables,
      deltas_lendergroup_pool_metrics: &Deltas<DeltaBigInt>,
      store_get_lendergroup_pool_metrics: &StoreGetBigInt, 
+     store_get_globals: &StoreGetBigInt, 
     
     ) {
     // Loop over all the abis events to create table changes
@@ -699,10 +700,10 @@ fn graph_lendergroup_out(
                
             let ord = 0; // FOR NOW - CAN CAUSE ISSUES 
                
-            let block_number = store_get_lendergroup_pool_metrics
+            let block_number = store_get_globals
             .get_at(ord, format!("latest_block_number"   ))
             .unwrap_or(BigInt::zero());  
-            let block_time = store_get_lendergroup_pool_metrics
+            let block_time = store_get_globals
             .get_at(ord, format!("latest_block_time"   ))
             .unwrap_or(BigInt::zero());   
                
@@ -1009,13 +1010,14 @@ fn graph_out(
 
 
     deltas_lendergroup_pool_metrics: Deltas<DeltaBigInt>,
-    store_get_big_int: StoreGetBigInt, 
+    store_lendergroup_pool_metrics: StoreGetBigInt, 
+    store_globals: StoreGetBigInt, 
 
 
 ) -> Result<EntityChanges, substreams::errors::Error> {
     // Initialize Database Changes container
     let mut tables = EntityChangesTables::new();
     graph_factory_out(&events, &mut tables);
-    graph_lendergroup_out(&events, &mut tables, &deltas_lendergroup_pool_metrics, &store_get_big_int);
+    graph_lendergroup_out(&events, &mut tables, &deltas_lendergroup_pool_metrics, &store_lendergroup_pool_metrics, &store_globals);
     Ok(tables.to_entity_changes())
 }

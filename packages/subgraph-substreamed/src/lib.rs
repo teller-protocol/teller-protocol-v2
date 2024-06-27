@@ -603,7 +603,9 @@ fn graph_lendergroup_out(
             .set("liquidity_threshold_percent", evt.liquidity_threshold_percent)
             .set("collateral_ratio", evt.loan_to_value_percent)  //rename me 
  
+            
             .set("total_principal_tokens_committed",  BigInt::zero()) 
+            .set("total_collateral_tokens_escrowed",  BigInt::zero()) 
             .set("total_principal_tokens_withdrawn",  BigInt::zero()) 
             .set("total_principal_tokens_borrowed",  BigInt::zero()) 
             .set("total_principal_tokens_repaid",  BigInt::zero()) 
@@ -673,15 +675,32 @@ fn graph_lendergroup_out(
                         
                 pool_metric_deltas_detected.insert(group_address);
                         
-             
+
+                //add more here 
                  match delta_prop_identifier  {
                     "total_principal_tokens_committed" => {
                         tables.update_row("group_pool_metric", &group_address)
                             .set("total_principal_tokens_committed", new_value );
                     },
+                    "total_collateral_tokens_escrowed" => {
+                        tables.update_row("group_pool_metric", &group_address)
+                            .set("total_collateral_tokens_escrowed", new_value );
+                    },
                     "total_principal_tokens_withdrawn" => {
                         tables.update_row("group_pool_metric", &group_address)
                             .set("total_principal_tokens_withdrawn", new_value );
+                    },
+                    "total_principal_tokens_lended" => {
+                        tables.update_row("group_pool_metric", &group_address)
+                            .set("total_principal_tokens_lended", new_value );
+                    },
+                    "total_principal_tokens_repaid" => {
+                        tables.update_row("group_pool_metric", &group_address)
+                            .set("total_principal_tokens_repaid", new_value );
+                    },
+                    "total_interest_collected" => {
+                        tables.update_row("group_pool_metric", &group_address)
+                            .set("total_interest_collected", new_value );
                     },
                     // Add more cases as per your metric names
                     _ => {}
@@ -717,6 +736,9 @@ fn graph_lendergroup_out(
             let total_principal_committed = store_get_lendergroup_pool_metrics
             .get_at(ord, format!("group_pool_metric:{}:total_principal_tokens_committed", group_pool_address  ))
             .unwrap_or(BigInt::zero()) ;
+            let total_collateral_escrowed = store_get_lendergroup_pool_metrics
+            .get_at(ord, format!("group_pool_metric:{}:total_collateral_tokens_escrowed", group_pool_address  ))
+            .unwrap_or(BigInt::zero()) ;
                 
             let total_principal_tokens_withdrawn = store_get_lendergroup_pool_metrics
             .get_at(ord, format!("group_pool_metric:{}:total_principal_tokens_withdrawn", group_pool_address  ))
@@ -742,6 +764,7 @@ fn graph_lendergroup_out(
                     .set("block_number", block_number)
                     .set("block_time", block_time)
                     .set("total_principal_tokens_committed", total_principal_committed )
+                    .set("total_collateral_tokens_escrowed", total_collateral_escrowed )
                     .set("total_principal_tokens_withdrawn", total_principal_tokens_withdrawn  )
                     .set("total_principal_tokens_borrowed", total_principal_tokens_borrowed )
                     .set("total_principal_tokens_repaid", total_principal_tokens_repaid  )
@@ -749,6 +772,70 @@ fn graph_lendergroup_out(
                 
              
          }
+
+
+
+
+    // -- end group pool metrics 
+
+
+
+    // -- start user metrics 
+
+    let mut user_metric_deltas_detected = HashSet::new();
+         
+     
+    for user_metric_delta in deltas_lendergroup_user_metrics.deltas. iter(){
+    
+        
+        let delta_root_identifier = substreams::key::segment_at(user_metric_delta.get_key(), 0);
+        let ord = 0; // FOR NOW - CAN CAUSE ISSUES 
+          
+
+        //maybe this is breaking things ?
+       if delta_root_identifier != "group_user_metric" {continue};
+        
+        let group_address = substreams::key::segment_at(user_metric_delta.get_key(), 1);
+        let user_address = substreams::key::segment_at(user_metric_delta.get_key(), 2);
+        let delta_prop_identifier = substreams::key::segment_at(user_metric_delta.get_key(), 3);
+                
+                
+                
+       // let block_number = BigInt::zero(); // FOR NOW 
+        let new_value = &user_metric_delta.new_value ;
+        
+        user_metric_deltas_detected.insert(format!("{}:{}",group_address,user_address));
+
+        // if interaction count is 1, make a new row 
+    
+        let interaction_count =  store_get_lendergroup_user_metrics
+        .get_at(ord, format!("group_user_metric:{}:{}:total_principal_tokens_committed", group_address, user_address  ))
+        .unwrap_or(BigInt::zero()) ;
+
+        if interaction_count == BigInt::from(1) {
+
+
+            tables
+            .create_row("group_user_metric", format!("{}_{}", group_address, user_address )  ) 
+            .set("group_pool_address", Hex::decode( group_address ).unwrap())
+            .set("user_address", Hex::decode( user_address ).unwrap())
+  
+            .set("total_principal_tokens_committed", BigInt::zero() )
+            .set("total_collateral_tokens_escrowed", BigInt::zero() )
+            .set("total_principal_tokens_withdrawn", BigInt::zero() )
+            .set("total_principal_tokens_borrowed", BigInt::zero() );
+           
+
+        }
+    
+    }
+  
+
+
+    
+
+    // -- end user metrics 
+
 
 }
 
@@ -1036,6 +1123,10 @@ fn store_lendergroup_pool_metrics_deltas(
         let store_key: String = format!("group_pool_metric:{}:total_interest_collected", evt.evt_address);
         bigint_add_store.add(ord,&store_key, BigInt::zero() );
 
+
+        let store_key: String = format!("group_pool_metric:{}:total_collateral_tokens_escrowed", evt.evt_address);
+        bigint_add_store.add(ord,&store_key, BigInt::zero() );
+
  
 
     });
@@ -1126,7 +1217,7 @@ fn store_lendergroup_pool_metrics(
                     let store_key: String = format!("group_pool_metric:{}:total_collateral_tokens_escrowed", group_address);
                     store.set(ord,&store_key,  new_value  );
 
-                }
+                    }
                 
                      
                    "total_principal_tokens_withdrawn" => {

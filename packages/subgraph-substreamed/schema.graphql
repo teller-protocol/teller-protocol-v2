@@ -189,6 +189,7 @@ type group_pool_metric @entity {
     total_principal_tokens_withdrawn: BigInt!
     
     total_principal_tokens_lended: BigInt!
+    total_collateral_tokens_escrowed: BigInt!  #fix me by reductions 
     total_principal_tokens_repaid: BigInt!
     total_interest_collected: BigInt!
 
@@ -211,6 +212,7 @@ type group_pool_metric_data_point @entity {
    
     total_principal_tokens_committed: BigInt!
     total_principal_tokens_withdrawn: BigInt!
+    total_collateral_tokens_escrowed: BigInt!  #fix me by reductions 
     
     total_principal_tokens_borrowed: BigInt!
     total_principal_tokens_repaid: BigInt!
@@ -224,13 +226,15 @@ type group_pool_metric_data_point @entity {
 type group_user_metric @entity {
     id: ID!   #will be based on group pool address and user lender address 
     
-    user_lender_address: Bytes!
+    user_address: Bytes!
     group_pool_address: Bytes!
 
     total_principal_tokens_committed: BigInt!
     total_principal_tokens_withdrawn: BigInt! 
 
     total_principal_tokens_borrowed: BigInt! 
+    total_collateral_tokens_escrowed: BigInt!
+
 
 
     shares_tokens_balance: BigInt! # need to track from erc20 driver

@@ -89,10 +89,14 @@ modules:
     initialBlock: 57233385
     inputs:
       - map: map_events
+      - store: store_globals_from_events
       - store: store_lendergroup_pool_metrics_deltas
         mode: deltas
       - store: store_lendergroup_pool_metrics
-      - store: store_globals_from_events
+      - store: store_lendergroup_user_metrics_deltas
+        mode: deltas
+      - store: store_lendergroup_user_metrics
+
     output:
       type: proto:sf.substreams.entity.v1.EntityChanges
 

@@ -46,6 +46,23 @@ modules:
     valueType: bigint
     inputs:
       - map: map_events
+
+  - name: store_lendergroup_user_metrics_deltas
+    kind: store
+    initialBlock: 57233385
+    updatePolicy: add
+    valueType: bigint
+    inputs:
+      - map: map_events
+      
+  - name: store_lendergroup_user_metrics
+    kind: store
+    initialBlock: 57233385
+    updatePolicy: set
+    valueType: bigint
+    inputs:
+      - store: store_lendergroup_user_metrics_deltas
+        mode: deltas
       
 
   - name: store_lendergroup_pool_metrics_deltas

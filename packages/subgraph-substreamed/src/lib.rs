@@ -846,6 +846,164 @@ The block stream encountered a substreams fatal error and will not retry:
        (i32,i32)
 
 */
+
+
+#[substreams::handlers::store]
+fn store_lendergroup_user_metrics_deltas(
+    events:  contract::Events, 
+    bigint_add_store: StoreAddBigInt,
+ 
+) {
+    
+    let ord = 0; // FOR NOW - CAN CAUSE ISSUES - GET FROM LOG AND STUFF INTO EVENT    
+    
+
+    
+    events.lendergroup_lender_added_principals.iter().for_each(|evt: &contract::LendergroupLenderAddedPrincipal| {
+        
+        let user_store_key: String = format!("group_user_metric:{}:{}:interaction_count", evt.evt_address,Hex(&evt.lender).to_string());
+        bigint_add_store.add(ord,&user_store_key, BigInt::from( 1 ));
+
+
+        
+        let user_store_key: String = format!("group_user_metric:{}:{}:total_principal_tokens_committed", evt.evt_address,Hex(&evt.lender).to_string());
+        bigint_add_store.add(ord,&user_store_key, BigInt::from_str(&evt.amount).unwrap_or(BigInt::zero()));
+
+      // need to write a whole set of drivers to track   shares tokens !! 
+      // need ERC20 abi also 
+    });
+
+    events.lendergroup_borrower_accepted_funds.iter().for_each(|evt: &contract::LendergroupBorrowerAcceptedFunds| {
+       
+        let user_store_key: String = format!("group_user_metric:{}:{}:interaction_count", evt.evt_address,Hex(&evt.borrower).to_string());
+        bigint_add_store.add(ord,&user_store_key, BigInt::from( 1 ));
+
+        
+          
+        let user_store_key: String = format!("group_user_metric:{}:{}:total_principal_tokens_borrowed", evt.evt_address,Hex(&evt.borrower).to_string());
+        bigint_add_store.add(ord,&user_store_key, BigInt::from_str(&evt.principal_amount).unwrap_or(BigInt::zero()));
+        
+        let user_store_key: String = format!("group_user_metric:{}:{}:total_collateral_tokens_escrowed", evt.evt_address,Hex(&evt.borrower).to_string());
+        bigint_add_store.add(ord,&user_store_key, BigInt::from_str(&evt.collateral_amount).unwrap_or(BigInt::zero()));
+ 
+    });
+
+    
+    events.lendergroup_earnings_withdrawns.iter().for_each(|evt: &contract::LendergroupEarningsWithdrawn| {
+        
+        let user_store_key: String = format!("group_user_metric:{}:{}:interaction_count", evt.evt_address,Hex(&evt.lender).to_string());
+        bigint_add_store.add(ord,&user_store_key, BigInt::from( 1 ));
+
+        
+      
+        let user_store_key: String = format!("group_user_metric:{}:{}:total_principal_tokens_withdrawn", evt.evt_address,Hex(&evt.lender).to_string());
+        bigint_add_store.add(ord,&user_store_key, BigInt::from_str(&evt.principal_tokens_withdrawn).unwrap_or(BigInt::zero()));
+ 
+    });
+
+    
+            
+    events.lendergroup_loan_repaids.iter().for_each(|evt: &contract::LendergroupLoanRepaid| {
+
+        let user_store_key: String = format!("group_user_metric:{}:{}:interaction_count", evt.evt_address,Hex(&evt.repayer).to_string());
+        bigint_add_store.add(ord,&user_store_key, BigInt::from( 1 ));
+
+
+        let user_store_key: String = format!("group_user_metric:{}:{}:total_principal_tokens_repaid", evt.evt_address,Hex(&evt.repayer).to_string());
+        bigint_add_store.add(ord,&user_store_key, BigInt::from_str(&evt.principal_amount).unwrap_or(BigInt::zero()));
+ 
+        
+    });
+}
+
+
+#[substreams::handlers::store]
+fn store_lendergroup_user_metrics(
+     deltas_lendergroup_user_metrics: Deltas<DeltaBigInt>,
+     store: StoreSetBigInt
+    ) {
+    
+    
+    let ord = 0; // FOR NOW - CAN CAUSE ISSUES - GET FROM LOG AND STUFF INTO EVENT    
+    
+      for user_metric_delta in deltas_lendergroup_user_metrics.deltas. iter(){
+             
+                    
+                        //this splits on ":"
+                let delta_root_identifier = substreams::key::segment_at(user_metric_delta.get_key(), 0);
+            
+                if delta_root_identifier != "group_user_metric" {continue};
+                
+                let group_address = substreams::key::segment_at(user_metric_delta.get_key(), 1);
+                let user_address = substreams::key::segment_at(user_metric_delta.get_key(), 2);
+                let delta_prop_identifier = substreams::key::segment_at(user_metric_delta.get_key(), 3);
+                        
+                        
+                        
+              //  let block_number = 0; // FOR NOW 
+                let new_value = &user_metric_delta.new_value ;
+                        
+                
+                //substreams::log::info();
+
+
+                        
+               match delta_prop_identifier {
+                   
+                   "interaction_count" => {
+                       let store_key: String = format!("group_user_metric:{}:{}:interaction_count", group_address,user_address);
+                       store.set(ord,&store_key,  new_value  );
+
+                   }
+                   
+                   "total_principal_tokens_committed" => {
+                    let store_key: String = format!("group_user_metric:{}:{}:total_principal_tokens_committed", group_address,user_address);
+                    store.set(ord,&store_key,  new_value  );
+
+                }
+                
+
+
+                   "total_collateral_tokens_escrowed" => {
+                    let store_key: String = format!("group_user_metric:{}:{}:total_collateral_tokens_escrowed", group_address,user_address);
+                    store.set(ord,&store_key,  new_value  );
+
+                }
+                
+                     
+                   "total_principal_tokens_withdrawn" => {
+                       let store_key: String = format!("group_user_metric:{}:{}:total_principal_tokens_withdrawn", group_address,user_address);
+                       store.set(ord,&store_key,  new_value  );
+                   }
+                   
+                   "total_principal_tokens_borrowed"=> {
+                       let store_key: String = format!("group_user_metric:{}:{}:total_principal_tokens_borrowed", group_address,user_address);
+                       store.set(ord,&store_key,  new_value  );
+                   }
+                   
+                      
+                   "total_principal_tokens_repaid" => {
+                       let store_key: String = format!("group_user_metric:{}:{}:total_principal_tokens_repaid", group_address,user_address);
+                       store.set(ord,&store_key,  new_value  );
+                   }
+                   
+                
+                   
+                   
+                   _ => {} 
+                   
+               }
+               
+                        
+                        
+      }
+    
+    
+   
+}
+
+
+
 #[substreams::handlers::store]
 fn store_lendergroup_pool_metrics_deltas(
     events:  contract::Events, 
@@ -881,9 +1039,7 @@ fn store_lendergroup_pool_metrics_deltas(
         let group_store_key: String = format!("group_pool_metric:{}:total_principal_tokens_committed", evt.evt_address);
         bigint_add_store.add(ord,&group_store_key, BigInt::from_str(&evt.amount).unwrap_or(BigInt::zero()));
         
-        let user_store_key: String = format!("group_user_metric:{}:{}:total_principal_tokens_committed", evt.evt_address,Hex(&evt.lender).to_string());
-        bigint_add_store.add(ord,&user_store_key, BigInt::from_str(&evt.amount).unwrap_or(BigInt::zero()));
-
+        
       // need to write a whole set of drivers to track   shares tokens !! 
       // need ERC20 abi also 
     });
@@ -896,14 +1052,7 @@ fn store_lendergroup_pool_metrics_deltas(
         let group_store_key: String = format!("group_pool_metric:{}:total_collateral_tokens_escrowed", evt.evt_address);
         bigint_add_store.add(ord,&group_store_key, BigInt::from_str(&evt.collateral_amount).unwrap_or(BigInt::zero()));
         
-        
-          
-        let user_store_key: String = format!("group_user_metric:{}:{}:total_principal_tokens_borrowed", evt.evt_address,Hex(&evt.borrower).to_string());
-        bigint_add_store.add(ord,&user_store_key, BigInt::from_str(&evt.principal_amount).unwrap_or(BigInt::zero()));
-        
-        let user_store_key: String = format!("group_user_metric:{}:{}:total_collateral_tokens_escrowed", evt.evt_address,Hex(&evt.borrower).to_string());
-        bigint_add_store.add(ord,&user_store_key, BigInt::from_str(&evt.collateral_amount).unwrap_or(BigInt::zero()));
- 
+      
     });
 
     
@@ -912,9 +1061,7 @@ fn store_lendergroup_pool_metrics_deltas(
         bigint_add_store.add(ord,&group_store_key, BigInt::from_str(&evt.principal_tokens_withdrawn).unwrap_or(BigInt::zero()));
          
       
-        let user_store_key: String = format!("group_user_metric:{}:{}:total_principal_tokens_withdrawn", evt.evt_address,Hex(&evt.lender).to_string());
-        bigint_add_store.add(ord,&user_store_key, BigInt::from_str(&evt.principal_tokens_withdrawn).unwrap_or(BigInt::zero()));
- 
+    
     });
 
     
@@ -925,16 +1072,13 @@ fn store_lendergroup_pool_metrics_deltas(
 
         let group_store_key: String = format!("group_pool_metric:{}:total_interest_collected", evt.evt_address);
         bigint_add_store.add(ord,&group_store_key, BigInt::from_str(&evt.interest_amount).unwrap_or(BigInt::zero()));
-        
-        let user_store_key: String = format!("group_user_metric:{}:{}:total_principal_tokens_repaid", evt.evt_address,Hex(&evt.repayer).to_string());
-        bigint_add_store.add(ord,&user_store_key, BigInt::from_str(&evt.principal_amount).unwrap_or(BigInt::zero()));
- 
+    
         
     });
 }
 
 
-
+//we do this so we can output the pool metric data points ! gives us longer term memory for these variables 
 #[substreams::handlers::store]
 fn store_lendergroup_pool_metrics(
      deltas_lendergroup_pool_metrics: Deltas<DeltaBigInt>,
@@ -973,6 +1117,12 @@ fn store_lendergroup_pool_metrics(
 
                    }
                    
+                   "total_collateral_tokens_escrowed" => {
+                    let store_key: String = format!("group_pool_metric:{}:total_collateral_tokens_escrowed", group_address);
+                    store.set(ord,&store_key,  new_value  );
+
+                }
+                
                      
                    "total_principal_tokens_withdrawn" => {
                        let store_key: String = format!("group_pool_metric:{}:total_principal_tokens_withdrawn", group_address);

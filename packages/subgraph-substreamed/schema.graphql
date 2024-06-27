@@ -205,9 +205,12 @@ type group_lender_metric @entity {
     group_pool_address: Bytes!
 
     total_principal_tokens_committed: BigInt!
-    total_principal_tokens_withdrawn: BigInt!
+    total_principal_tokens_withdrawn: BigInt! 
 
-    shares_tokens_net: BigInt! 
+    shares_tokens_balance: BigInt! 
+
+    shares_balance_value: BigInt! # valued in principal tokens 
+    total_interest_earned: BigInt! # valued in principal tokens 
 
     
 }

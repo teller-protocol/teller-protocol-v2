@@ -440,7 +440,7 @@ fn graph_lendergroup_out(
      store_get_lendergroup_pool_metrics: &StoreGetBigInt, 
   
      deltas_lendergroup_user_metrics: &Deltas<DeltaBigInt>,
-     store_get_lendergroup_user_metrics: &StoreGetBigInt, 
+    // store_get_lendergroup_user_metrics: &StoreGetBigInt, not used 
   
     
     ) {
@@ -782,7 +782,7 @@ fn graph_lendergroup_out(
 
     // -- start user metrics 
 
-    let mut user_metric_deltas_detected = HashSet::new();
+   // let mut user_metric_deltas_detected = HashSet::new();
          
      
     for user_metric_delta in deltas_lendergroup_user_metrics.deltas. iter(){
@@ -802,36 +802,82 @@ fn graph_lendergroup_out(
                 
                 
        // let block_number = BigInt::zero(); // FOR NOW 
-        let new_value = &user_metric_delta.new_value ;
+       
         
-        user_metric_deltas_detected.insert(format!("{}:{}",group_address,user_address));
+      //  user_metric_deltas_detected.insert(format!("{}:{}",group_address,user_address));
 
         // if interaction count is 1, make a new row 
+
+        if delta_prop_identifier == "interaction_count"{
+
+            let interaction_count = &user_metric_delta.new_value ;
+
+            if interaction_count == & BigInt::from(1) {
+                tables
+                .create_row("group_user_metric", format!("{}_{}", group_address, user_address )  ) 
+                .set("group_pool_address", Hex::decode( group_address ).unwrap())
+                .set("user_address", Hex::decode( user_address ).unwrap())
+      
+                .set("total_principal_tokens_committed", BigInt::zero() )
+                .set("total_collateral_tokens_escrowed", BigInt::zero() )
+                .set("total_principal_tokens_withdrawn", BigInt::zero() )
+                .set("total_principal_tokens_borrowed", BigInt::zero() );
+            }
     
-        let interaction_count =  store_get_lendergroup_user_metrics
-        .get_at(ord, format!("group_user_metric:{}:{}:total_principal_tokens_committed", group_address, user_address  ))
-        .unwrap_or(BigInt::zero()) ;
-
-        if interaction_count == BigInt::from(1) {
-
-
-            tables
-            .create_row("group_user_metric", format!("{}_{}", group_address, user_address )  ) 
-            .set("group_pool_address", Hex::decode( group_address ).unwrap())
-            .set("user_address", Hex::decode( user_address ).unwrap())
-  
-            .set("total_principal_tokens_committed", BigInt::zero() )
-            .set("total_collateral_tokens_escrowed", BigInt::zero() )
-            .set("total_principal_tokens_withdrawn", BigInt::zero() )
-            .set("total_principal_tokens_borrowed", BigInt::zero() );
-           
-
+            
         }
     
+     
+
+       
     }
   
 
+    for user_metric_delta in deltas_lendergroup_user_metrics.deltas. iter(){
+    
+        
+        let delta_root_identifier = substreams::key::segment_at(user_metric_delta.get_key(), 0);
+        let ord = 0; // FOR NOW - CAN CAUSE ISSUES 
+          
 
+        //maybe this is breaking things ?
+       if delta_root_identifier != "group_user_metric" {continue};
+        
+        let group_address = substreams::key::segment_at(user_metric_delta.get_key(), 1);
+        let user_address = substreams::key::segment_at(user_metric_delta.get_key(), 2);
+        let delta_prop_identifier = substreams::key::segment_at(user_metric_delta.get_key(), 3);
+                
+        let new_value = &user_metric_delta.new_value ;
+                
+       // let block_number = BigInt::zero(); // FOR NOW 
+       
+        
+       match delta_prop_identifier  {
+        "total_principal_tokens_committed" => {
+            tables.update_row("group_user_metric", format!("{}_{}", group_address, user_address ))
+                .set("total_principal_tokens_committed", new_value );
+        },
+        "total_collateral_tokens_escrowed" => {
+            tables.update_row("group_user_metric", format!("{}_{}", group_address, user_address ))
+                .set("total_collateral_tokens_escrowed", new_value );
+        },
+        "total_principal_tokens_withdrawn" => {
+            tables.update_row("group_user_metric", format!("{}_{}", group_address, user_address ))
+                .set("total_principal_tokens_withdrawn", new_value );
+        },
+        "total_principal_tokens_lended" => {
+            tables.update_row("group_user_metric", format!("{}_{}", group_address, user_address ))
+                .set("total_principal_tokens_lended", new_value );
+        },
+        
+        // Add more cases as per your metric names
+        _ => {}
+    };
+     
+
+       
+    }
+        
     
 
     // -- end user metrics 
@@ -1008,7 +1054,7 @@ fn store_lendergroup_user_metrics_deltas(
     });
 }
 
-
+/*
 #[substreams::handlers::store]
 fn store_lendergroup_user_metrics(
      deltas_lendergroup_user_metrics: Deltas<DeltaBigInt>,
@@ -1093,7 +1139,7 @@ fn store_lendergroup_user_metrics(
     
    
 }
-
+*/
 
 
 #[substreams::handlers::store]
@@ -1277,7 +1323,7 @@ fn graph_out(
     store_lendergroup_pool_metrics: StoreGetBigInt, 
     
     deltas_lendergroup_user_metrics: Deltas<DeltaBigInt>,
-    store_lendergroup_user_metrics: StoreGetBigInt, 
+  //  store_lendergroup_user_metrics: StoreGetBigInt, 
 
 ) -> Result<EntityChanges, substreams::errors::Error> {
     // Initialize Database Changes container
@@ -1292,7 +1338,7 @@ fn graph_out(
         &store_lendergroup_pool_metrics,
 
         &deltas_lendergroup_user_metrics,
-        &store_lendergroup_user_metrics,
+      //  &store_lendergroup_user_metrics,
         );
     Ok(tables.to_entity_changes())
 }

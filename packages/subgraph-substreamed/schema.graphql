@@ -188,7 +188,7 @@ type group_pool_metric @entity {
     total_principal_tokens_committed: BigInt!
     total_principal_tokens_withdrawn: BigInt!
     
-    total_principal_tokens_lended: BigInt!
+    total_principal_tokens_borrowed: BigInt!
     total_collateral_tokens_escrowed: BigInt!  #fix me by reductions 
     total_principal_tokens_repaid: BigInt!
     total_interest_collected: BigInt!
@@ -237,7 +237,7 @@ type group_user_metric @entity {
 
 
 
-    shares_tokens_balance: BigInt! # need to track from erc20 driver
+   # shares_tokens_balance: BigInt! # need to track from erc20 driver
 
    # shares_balance_value: BigInt! # valued in principal tokens 
    # total_interest_earned: BigInt! # valued in principal tokens 

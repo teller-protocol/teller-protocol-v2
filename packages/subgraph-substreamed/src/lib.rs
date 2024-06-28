@@ -390,16 +390,17 @@ fn map_lendergroup_events(
 
 fn graph_factory_out(events: &contract::Events, tables: &mut EntityChangesTables) {
     // Loop over all the abis events to create table changes
-    events.factory_admin_changeds.iter().for_each(|evt| {
+   events.factory_admin_changeds.iter().for_each(|evt| {
         tables
             .create_row("factory_admin_changed", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
             .set("evt_tx_hash", evt.evt_tx_hash.clone().into_bytes())
             .set("evt_index", BigInt::from( evt.evt_index)  )
             .set("evt_block_time", BigInt::from ( evt.evt_block_time )) 
             .set("evt_block_number", BigInt::from( evt.evt_block_number) )
-            .set("new_admin", Hex::decode(&evt.new_admin).unwrap())
-            .set("previous_admin", Hex::decode(&evt.previous_admin).unwrap() );
+            .set("new_admin",  &evt.new_admin )  //throws an error ??
+            .set("previous_admin",  &evt.previous_admin  );
     });
+     
     events.factory_beacon_upgradeds.iter().for_each(|evt| {
         tables
             .create_row("factory_beacon_upgraded", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
@@ -416,7 +417,7 @@ fn graph_factory_out(events: &contract::Events, tables: &mut EntityChangesTables
             .set("evt_index", BigInt::from( evt.evt_index ))
             .set("evt_block_time", BigInt::from(evt.evt_block_time))
             .set("evt_block_number", BigInt::from(evt.evt_block_number))
-            .set("group_contract", Hex::decode(&evt.group_contract).unwrap());
+            .set("group_contract", &evt.group_contract );
     });
     events.factory_upgradeds.iter().for_each(|evt| {
         tables
@@ -425,7 +426,7 @@ fn graph_factory_out(events: &contract::Events, tables: &mut EntityChangesTables
             .set("evt_index", BigInt::from(evt.evt_index))
             .set("evt_block_time", BigInt::from(evt.evt_block_time))
             .set("evt_block_number", BigInt::from(evt.evt_block_number))
-            .set("implementation", Hex::decode(&evt.implementation).unwrap());
+            .set("implementation",  &evt.implementation  );
     });
 }
 
@@ -470,7 +471,7 @@ fn graph_lendergroup_out(
             .set("group_pool_address", Hex::decode(&evt.evt_address).unwrap() )
             .set("amount_due", BigDecimal::from_str(&evt.amount_due).unwrap())
             .set("bid_id", BigDecimal::from_str(&evt.bid_id).unwrap())
-            .set("liquidator", Hex::decode(&evt.liquidator).unwrap())
+            .set("liquidator", &evt.liquidator )
             .set("token_amount_difference", BigDecimal::from_str(&evt.token_amount_difference).unwrap());
     });
     events.lendergroup_earnings_withdrawns.iter().for_each(|evt| {
@@ -482,9 +483,9 @@ fn graph_lendergroup_out(
             .set("evt_block_number", BigInt::from(evt.evt_block_number))
             .set("group_pool_address", Hex::decode(&evt.evt_address).unwrap() )
             .set("amount_pool_shares_tokens", BigDecimal::from_str(&evt.amount_pool_shares_tokens).unwrap())
-            .set("lender", Hex::decode(&evt.lender).unwrap())
+            .set("lender", &evt.lender )
             .set("principal_tokens_withdrawn", BigDecimal::from_str(&evt.principal_tokens_withdrawn).unwrap())
-            .set("recipient", Hex::decode(&evt.recipient).unwrap());
+            .set("recipient",  &evt.recipient );
     });
     events.lendergroup_initializeds.iter().for_each(|evt| {
         tables
@@ -505,9 +506,9 @@ fn graph_lendergroup_out(
             .set("evt_block_number", BigInt::from(evt.evt_block_number))
             .set("group_pool_address", Hex::decode(&evt.evt_address).unwrap() )
             .set("amount", BigDecimal::from_str(&evt.amount).unwrap())
-            .set("lender", Hex::decode(&evt.lender).unwrap())
+            .set("lender",  &evt.lender )
             .set("shares_amount", BigDecimal::from_str(&evt.shares_amount).unwrap())
-            .set("shares_recipient", Hex::decode(&evt.shares_recipient).unwrap());
+            .set("shares_recipient",  &evt.shares_recipient );
     });
     events.lendergroup_loan_repaids.iter().for_each(|evt| {
         tables
@@ -520,7 +521,7 @@ fn graph_lendergroup_out(
             .set("bid_id", BigDecimal::from_str(&evt.bid_id).unwrap())
             .set("interest_amount", BigDecimal::from_str(&evt.interest_amount).unwrap())
             .set("principal_amount", BigDecimal::from_str(&evt.principal_amount).unwrap())
-            .set("repayer", Hex::decode(&evt.repayer).unwrap())
+            .set("repayer",  &evt.repayer )
             .set("total_interest_collected", BigDecimal::from_str(&evt.total_interest_collected).unwrap())
             .set("total_principal_repaid", BigDecimal::from_str(&evt.total_principal_repaid).unwrap());
     });
@@ -532,8 +533,8 @@ fn graph_lendergroup_out(
             .set("evt_block_time", BigInt::from(evt.evt_block_time))
             .set("evt_block_number", BigInt::from(evt.evt_block_number))
             .set("group_pool_address", Hex::decode(&evt.evt_address).unwrap() )
-            .set("new_owner", Hex::decode(&evt.new_owner).unwrap())
-            .set("previous_owner", Hex::decode(&evt.previous_owner).unwrap());
+            .set("new_owner",  &evt.new_owner )
+            .set("previous_owner",  &evt.previous_owner );
     });
     events.lendergroup_pauseds.iter().for_each(|evt| {
         tables
@@ -543,7 +544,7 @@ fn graph_lendergroup_out(
             .set("evt_block_time", BigInt::from(evt.evt_block_time))
             .set("evt_block_number", BigInt::from(evt.evt_block_number))
             .set("group_pool_address", Hex::decode(&evt.evt_address).unwrap() )
-            .set("account", Hex::decode(&evt.account).unwrap());
+            .set("account",  &evt.account );
     });
     events.lendergroup_pool_initializeds.iter().for_each(|evt| {
         tables
@@ -553,15 +554,15 @@ fn graph_lendergroup_out(
             .set("evt_block_time", BigInt::from(evt.evt_block_time))
             .set("evt_block_number", BigInt::from(evt.evt_block_number))
             .set("group_pool_address", Hex::decode(&evt.evt_address).unwrap() )
-            .set("collateral_token_address", Hex::decode(&evt.collateral_token_address).unwrap())
+            .set("collateral_token_address",  &evt.collateral_token_address )
             .set("interest_rate_lower_bound", evt.interest_rate_lower_bound)
             .set("interest_rate_upper_bound", evt.interest_rate_upper_bound)
             .set("liquidity_threshold_percent", evt.liquidity_threshold_percent)
             .set("loan_to_value_percent", evt.loan_to_value_percent)
             .set("market_id", BigInt::from_str(&evt.market_id).unwrap())
             .set("max_loan_duration", evt.max_loan_duration)
-            .set("pool_shares_token", Hex::decode(&evt.pool_shares_token).unwrap())
-            .set("principal_token_address", Hex::decode(&evt.principal_token_address).unwrap())
+            .set("pool_shares_token",  &evt.pool_shares_token )
+            .set("principal_token_address", &evt.principal_token_address )
             .set("twap_interval", evt.twap_interval)
             .set("uniswap_pool_fee", evt.uniswap_pool_fee);
 
@@ -577,23 +578,19 @@ fn graph_lendergroup_out(
      */
             
            
-         let uniswap_v3_pool_address = Hex(&evt.uniswap_v3_pool_address).to_string();
-          let teller_v2_address = Hex(&evt.teller_v2_address).to_string();
-           let smart_commitment_forwarder_address = Hex(&evt.smart_commitment_forwarder_address).to_string();
-       
-     
+         
     
        //create group pool metric 
        tables
             .create_row("group_pool_metric", format!("{}", evt.evt_address )  ) 
            
             .set("group_pool_address", Hex::decode(&evt.evt_address).unwrap() )
-            .set("principal_token_address", Hex::decode(&evt.principal_token_address).unwrap() )
-            .set("collateral_token_address", Hex::decode(&evt.collateral_token_address).unwrap() )
-            .set("shares_token_address", Hex::decode(&evt.pool_shares_token).unwrap() )
-            .set("uniswap_v3_pool_address", Hex::decode(&uniswap_v3_pool_address).unwrap() )
-            .set("teller_v2_address", Hex::decode(&teller_v2_address).unwrap() )
-            .set("smart_commitment_forwarder_address", Hex::decode(&smart_commitment_forwarder_address).unwrap() )
+            .set("principal_token_address",  &evt.principal_token_address  )
+            .set("collateral_token_address",  &evt.collateral_token_address  )
+            .set("shares_token_address",  &evt.pool_shares_token  )
+            .set("uniswap_v3_pool_address",  &evt.uniswap_v3_pool_address )
+            .set("teller_v2_address",  &evt.teller_v2_address  )
+            .set("smart_commitment_forwarder_address",  &evt.smart_commitment_forwarder_address  )
             .set("market_id", BigInt::from_str(&evt.market_id).unwrap() )
             .set("uniswap_pool_fee", evt.uniswap_pool_fee)
             .set("max_loan_duration", evt.max_loan_duration)
@@ -690,9 +687,9 @@ fn graph_lendergroup_out(
                         tables.update_row("group_pool_metric", &group_address)
                             .set("total_principal_tokens_withdrawn", new_value );
                     },
-                    "total_principal_tokens_lended" => {
+                    "total_principal_tokens_borrowed" => {
                         tables.update_row("group_pool_metric", &group_address)
-                            .set("total_principal_tokens_lended", new_value );
+                            .set("total_principal_tokens_borrowed", new_value );
                     },
                     "total_principal_tokens_repaid" => {
                         tables.update_row("group_pool_metric", &group_address)
@@ -865,9 +862,9 @@ fn graph_lendergroup_out(
             tables.update_row("group_user_metric", format!("{}_{}", group_address, user_address ))
                 .set("total_principal_tokens_withdrawn", new_value );
         },
-        "total_principal_tokens_lended" => {
+        "total_principal_tokens_borrowed" => {
             tables.update_row("group_user_metric", format!("{}_{}", group_address, user_address ))
-                .set("total_principal_tokens_lended", new_value );
+                .set("total_principal_tokens_borrowed", new_value );
         },
         
         // Add more cases as per your metric names

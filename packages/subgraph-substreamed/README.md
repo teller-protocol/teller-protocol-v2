@@ -45,7 +45,7 @@ make && make build && make pack
 graph auth --studio  
  graph deploy --studio tellerv2-lender-groups-polygon
  
- 0.4.21.83
+ 0.4.21.91
 
 
 

@@ -408,7 +408,7 @@ fn graph_factory_out(events: &contract::Events, tables: &mut EntityChangesTables
             .set("evt_index", BigInt::from(evt.evt_index))
             .set("evt_block_time", BigInt::from( evt.evt_block_time ))
             .set("evt_block_number", BigInt::from( evt.evt_block_number ))
-            .set("beacon", Hex::decode(&evt.beacon).unwrap());
+            .set("beacon",  &evt.beacon );
     });
     events.factory_deployed_lender_group_contracts.iter().for_each(|evt| {
         tables
@@ -455,7 +455,7 @@ fn graph_lendergroup_out(
             .set("evt_block_number", BigInt::from(evt.evt_block_number))
             .set("group_pool_address", Hex::decode(&evt.evt_address).unwrap() )
             .set("bid_id", BigDecimal::from_str(&evt.bid_id).unwrap())
-            .set("borrower", Hex::decode(&evt.borrower).unwrap())
+            .set("borrower",  &evt.borrower )
             .set("collateral_amount", BigDecimal::from_str(&evt.collateral_amount).unwrap())
             .set("interest_rate", evt.interest_rate)
             .set("loan_duration", evt.loan_duration)
@@ -625,7 +625,7 @@ fn graph_lendergroup_out(
             .set("evt_block_time", BigInt::from(evt.evt_block_time))
             .set("evt_block_number", BigInt::from(evt.evt_block_number))
             .set("group_pool_address", Hex::decode(&evt.evt_address).unwrap() )
-            .set("account", Hex::decode(&evt.account).unwrap());
+            .set("account",  &evt.account  );
     });
 
 

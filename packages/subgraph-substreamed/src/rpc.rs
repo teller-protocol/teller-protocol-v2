@@ -73,3 +73,22 @@ pub fn fetch_lender_group_pool_initialization_data_from_rpc(pool_contract_addres
  
  
 }
+
+
+pub fn fetch_min_interest_rate_from_rpc(pool_contract_address: &String) -> Option<BigInt> {
+        
+    let pool_contract_address_decoded = hex::decode(pool_contract_address).unwrap(); 
+        
+         
+    
+        let get_min_interest_rate_function = abi::lendergroup_contract::functions::GetMinInterestRate {};
+        let  min_interest_rate  = get_min_interest_rate_function.call(
+            pool_contract_address_decoded.clone()
+        )  ;
+        
+      
+    
+    return  min_interest_rate ; 
+ 
+ 
+}

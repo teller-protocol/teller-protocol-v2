@@ -576,7 +576,9 @@ fn graph_lendergroup_out(
                 &lender_group_contract_address
                  ).unwrap();
      */
-            
+           let fetched_min_interest_rate = rpc::fetch_min_interest_rate_from_rpc(
+                &lender_group_contract_address
+                 ).unwrap();
            
          
     
@@ -599,7 +601,7 @@ fn graph_lendergroup_out(
             .set("interest_rate_lower_bound", evt.interest_rate_lower_bound)
             .set("liquidity_threshold_percent", evt.liquidity_threshold_percent)
             .set("collateral_ratio", evt.loan_to_value_percent)  //rename me 
- 
+            .set("current_min_interest_rate",  fetched_min_interest_rate) 
             
             .set("total_principal_tokens_committed",  BigInt::zero()) 
             .set("total_collateral_tokens_escrowed",  BigInt::zero()) 
@@ -672,9 +674,12 @@ fn graph_lendergroup_out(
                         
                 pool_metric_deltas_detected.insert(group_address);
                         
+                        
+              
+                        
 
                 //add more here 
-                 match delta_prop_identifier  {
+                 match delta_prop_identifier  { 
                     "total_principal_tokens_committed" => {
                         tables.update_row("group_pool_metric", &group_address)
                             .set("total_principal_tokens_committed", new_value );
@@ -709,6 +714,22 @@ fn graph_lendergroup_out(
           
                                       
          }
+         
+         
+          for group_pool_address in pool_metric_deltas_detected.iter() {
+                       
+               let fetched_min_interest_rate = rpc::fetch_min_interest_rate_from_rpc(
+                     &group_pool_address.to_string()
+                    ).unwrap();
+                    
+            
+                    
+                tables.update_row("group_pool_metric", &group_pool_address)
+                            .set("current_min_interest_rate", fetched_min_interest_rate );
+                    
+          }
+            
+            
          
         
          

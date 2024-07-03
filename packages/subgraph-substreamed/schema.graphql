@@ -181,6 +181,8 @@ type group_pool_metric @entity {
     interest_rate_upper_bound: BigInt!
     interest_rate_lower_bound: BigInt!
     
+    current_min_interest_rate: BigInt!
+    
 
     liquidity_threshold_percent: BigInt!
     collateral_ratio: BigInt!  #loan to value 

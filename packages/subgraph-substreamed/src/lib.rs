@@ -1,6 +1,8 @@
 mod abi;
 mod pb;
 mod rpc;
+ 
+
 use hex_literal::hex;
 use pb::contract::v1 as contract;
 use substreams::prelude::*;
@@ -570,14 +572,10 @@ fn graph_lendergroup_out(
 
 
              
-            let lender_group_contract_address = Hex(&evt.evt_address).to_string();
-    /*
-            let fetched_rpc_data = rpc::fetch_lender_group_pool_initialization_data_from_rpc(
-                &lender_group_contract_address
-                 ).unwrap();
-     */
+          // let lender_group_contract_address = Hex::decode(&evt.evt_address).unwrap();
+   
            let fetched_min_interest_rate = rpc::fetch_min_interest_rate_from_rpc(
-                &lender_group_contract_address
+                &evt.evt_address
                  ).unwrap();
            
          
@@ -650,7 +648,7 @@ fn graph_lendergroup_out(
      //   let group_address = Address::from_slice(  & Hex::decode(&evt.evt_address).unwrap() )    ; //evt.evt_address.clone();
         
             
-         let mut  pool_metric_deltas_detected = HashSet::new();
+         let mut pool_metric_deltas_detected = HashSet::new();
          
      
          for pool_metric_delta in deltas_lendergroup_pool_metrics.deltas. iter(){
@@ -779,19 +777,56 @@ fn graph_lendergroup_out(
                tables
                     .create_row("group_pool_metric_data_point", format!("{}_{}", group_pool_address, block_number )  ) 
                     .set("group_pool_address", Hex::decode( group_pool_address ).unwrap())
-                    .set("block_number", block_number)
-                    .set("block_time", block_time)
-                    .set("total_principal_tokens_committed", total_principal_committed )
-                    .set("total_collateral_tokens_escrowed", total_collateral_escrowed )
-                    .set("total_principal_tokens_withdrawn", total_principal_tokens_withdrawn  )
-                    .set("total_principal_tokens_borrowed", total_principal_tokens_borrowed )
-                    .set("total_principal_tokens_repaid", total_principal_tokens_repaid  )
-                    .set("total_interest_collected", total_interest_collected );
+                    .set("block_number", &block_number )
+                    .set("block_time", &block_time)
+                    .set("total_principal_tokens_committed", &total_principal_committed )
+                    .set("total_collateral_tokens_escrowed", &total_collateral_escrowed )
+                    .set("total_principal_tokens_withdrawn", &total_principal_tokens_withdrawn  )
+                    .set("total_principal_tokens_borrowed", &total_principal_tokens_borrowed )
+                    .set("total_principal_tokens_repaid", &total_principal_tokens_repaid  )
+                    .set("total_interest_collected", &total_interest_collected );
+            
+                    
+            
+            let day_index = block_time.clone() / 86400;
+            
+                    
+                tables
+                    .create_row("group_pool_metric_data_point_daily", format!("{}_{}", group_pool_address, day_index )  ) 
+                    .set("group_pool_address", Hex::decode( group_pool_address ).unwrap())
+                     .set("block_number", &block_number )
+                    .set("block_time", &block_time)
+                    .set("total_principal_tokens_committed", &total_principal_committed )
+                    .set("total_collateral_tokens_escrowed", &total_collateral_escrowed )
+                    .set("total_principal_tokens_withdrawn", &total_principal_tokens_withdrawn  )
+                    .set("total_principal_tokens_borrowed", &total_principal_tokens_borrowed )
+                    .set("total_principal_tokens_repaid", &total_principal_tokens_repaid  )
+                    .set("total_interest_collected", &total_interest_collected );
+            
+                
+            
+            let week_index = block_time.clone() / 604800;
+            
+                      
+                tables
+                    .create_row("group_pool_metric_data_point_weekly", format!("{}_{}", group_pool_address, week_index )  ) 
+                    .set("group_pool_address", Hex::decode( group_pool_address ).unwrap())
+                    .set("block_number", &block_number )
+                    .set("block_time", &block_time)
+                    .set("total_principal_tokens_committed", &total_principal_committed )
+                    .set("total_collateral_tokens_escrowed", &total_collateral_escrowed )
+                    .set("total_principal_tokens_withdrawn", &total_principal_tokens_withdrawn  )
+                    .set("total_principal_tokens_borrowed", &total_principal_tokens_borrowed )
+                    .set("total_principal_tokens_repaid", &total_principal_tokens_repaid  )
+                    .set("total_interest_collected", &total_interest_collected );
                 
              
          }
-
-
+         
+         
+        
+          
+          
 
 
     // -- end group pool metrics 
@@ -1171,7 +1206,8 @@ fn store_lendergroup_pool_metrics_deltas(
     
 
     events.lendergroup_pool_initializeds.iter().for_each(|evt: &contract::LendergroupPoolInitialized| {
-
+        
+        
         let store_key: String = format!("group_pool_metric:{}:total_principal_tokens_committed", evt.evt_address);
         bigint_add_store.add(ord,&store_key, BigInt::zero() );
 
@@ -1242,7 +1278,9 @@ fn store_lendergroup_pool_metrics_deltas(
 #[substreams::handlers::store]
 fn store_lendergroup_pool_metrics(
      deltas_lendergroup_pool_metrics: Deltas<DeltaBigInt>,
-     store: StoreSetBigInt
+     globals_store: StoreGetBigInt, 
+     store: StoreSetBigInt,
+     
     ) {
     
     
@@ -1266,14 +1304,20 @@ fn store_lendergroup_pool_metrics(
                         
                 
                 //substreams::log::info();
+                
+               let current_block_time = globals_store.get_at(ord, "latest_block_time").unwrap_or(BigInt::zero());
 
-
+                    
+                    
+               let store_block_time_key: String = format!("group_pool_metric:{}:block_time", group_address);              
+               store.set(ord,&store_block_time_key, &current_block_time  );
                         
                match delta_prop_identifier {
                    
                    "total_principal_tokens_committed" => {
                        let store_key: String = format!("group_pool_metric:{}:total_principal_tokens_committed", group_address);
                        store.set(ord,&store_key,  new_value  );
+                      
 
                    }
                    
@@ -1358,5 +1402,28 @@ fn graph_out(
         &deltas_lendergroup_user_metrics,
       //  &store_lendergroup_user_metrics,
         );
+        
+        
+        
+  // Pool Day/Hour data:  //from uniswap repo 
+   /* db::pool_windows_create(&mut tables, &tx_count_deltas);
+    db::pool_windows_update(
+        &mut tables,
+        timestamp,
+        &tx_count_deltas,
+        &swaps_volume_deltas,
+        &events,
+        &pool_sqrt_price_store,
+        &pool_liquidities_store_deltas,
+        &price_deltas,
+        &store_prices,
+        &derived_tvl_deltas,
+        &min_windows_deltas,
+        &max_windows_deltas,
+    );*/
+
+    
+        
+                
     Ok(tables.to_entity_changes())
 }

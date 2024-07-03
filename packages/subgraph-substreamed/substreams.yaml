@@ -72,6 +72,7 @@ modules:
     inputs:
       - store: store_lendergroup_pool_metrics_deltas
         mode: deltas
+      - store: store_globals_from_events
       
 
  

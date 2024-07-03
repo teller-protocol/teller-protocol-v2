@@ -32,7 +32,7 @@ pub struct LenderGroupPoolInitializationDataFromRpc {
 
 pub fn fetch_lender_group_pool_initialization_data_from_rpc(pool_contract_address: &String) -> Option<LenderGroupPoolInitializationDataFromRpc> {
         
-    let pool_contract_address_decoded = hex::decode(pool_contract_address).unwrap(); 
+    let pool_contract_address_decoded = Hex::decode(pool_contract_address).unwrap(); 
         
         
  
@@ -77,7 +77,7 @@ pub fn fetch_lender_group_pool_initialization_data_from_rpc(pool_contract_addres
 
 pub fn fetch_min_interest_rate_from_rpc(pool_contract_address: &String) -> Option<BigInt> {
         
-    let pool_contract_address_decoded = hex::decode(pool_contract_address).unwrap(); 
+    let pool_contract_address_decoded = Hex::decode(pool_contract_address).unwrap(); 
         
          
     

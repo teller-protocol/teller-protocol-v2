@@ -211,7 +211,45 @@ type group_pool_metric_data_point @entity {
     block_number: BigInt!
     block_time: BigInt 
        
-   
+    
+    total_principal_tokens_committed: BigInt!
+    total_principal_tokens_withdrawn: BigInt!
+    total_collateral_tokens_escrowed: BigInt!  #fix me by reductions 
+    
+    total_principal_tokens_borrowed: BigInt!
+    total_principal_tokens_repaid: BigInt!
+    total_interest_collected: BigInt!
+
+    
+}
+
+type group_pool_metric_data_point_daily @entity {
+    id: ID!    #will be based on group pool address and day id 
+    group_pool_address: Bytes!
+
+    block_number: BigInt!
+    block_time: BigInt 
+       
+    
+    total_principal_tokens_committed: BigInt!
+    total_principal_tokens_withdrawn: BigInt!
+    total_collateral_tokens_escrowed: BigInt!  #fix me by reductions 
+    
+    total_principal_tokens_borrowed: BigInt!
+    total_principal_tokens_repaid: BigInt!
+    total_interest_collected: BigInt!
+
+    
+}
+
+type group_pool_metric_data_point_weekly @entity {
+    id: ID!    #will be based on group pool address and week id 
+    group_pool_address: Bytes!
+
+    block_number: BigInt!
+    block_time: BigInt 
+       
+    
     total_principal_tokens_committed: BigInt!
     total_principal_tokens_withdrawn: BigInt!
     total_collateral_tokens_escrowed: BigInt!  #fix me by reductions 

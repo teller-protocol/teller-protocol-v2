@@ -35,14 +35,23 @@ const deployFn: DeployFunction = async (hre) => {
 
   //created pool https://sepolia.etherscan.io/tx/0x8ea20095c821f6066252457d7f0438030bc65bb441e1bea56c6ae0efd63016f0
 
-  const principalTokenAddress = '0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359' //usdc
-  const collateralTokenAddress = '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619' //weth
-  const uniswapPoolFee = 500
+  //  for polygon  
+  const principalTokenAddress = '0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359' //0xbtc
+ const collateralTokenAddress = '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619' //weth
+  
+  //for sepolia 
+  //const collateralTokenAddress = '0x72292c8464a33f6b5f6efcc0213a89a98c68668b' //0xbtc
+ // const principalTokenAddress = '0xfff9976782d46cc05630d1f6ebab18b2324d6b14' //weth
+  
+  
+  const uniswapPoolFee = 3000
 
-  const marketId = 44 //for polygon
+  //use market id of 44 for polygon 
+  //use market id 1 for sepolia 
+  const marketId = 44  //for sepolia
   const minInterestRate = 400
   const maxInterestRate = 800
-  const maxLoanDuration = 10368000
+  const maxLoanDuration = 10368000 //careful w this wrt market init params 
   const liquidityThresholdPercent = 7500
   const loanToValuePercent = 12500 //make sure this functions as normal.  If under 100%, getting much better loan terms and i wont repay.  If it is over 100%, it will likely repay since overcollateralized.
   const twapInterval = 5
@@ -79,10 +88,11 @@ deployFn.id = 'lender-commitment-group-smart:deploy'
 deployFn.tags = ['lender-commitment-group-smart']
 deployFn.dependencies = [
   'teller-v2:deploy',
+  'teller-v2:init',
   'smart-commitment-forwarder:deploy',
 ]
 
 deployFn.skip = async (hre) => {
-  return !hre.network.live || !['sepolia', 'polygon'].includes(hre.network.name)
+  return !hre.network.live || ![ 'sepolia' , 'polygon'].includes(hre.network.name)
 }
 export default deployFn

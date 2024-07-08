@@ -124,7 +124,7 @@ deployFn.skip = async (hre) => {
       'arbitrum',
       'base',
       'mainnet',
-      'sepolia' 
+   
       
       
     ].includes(hre.network.name)

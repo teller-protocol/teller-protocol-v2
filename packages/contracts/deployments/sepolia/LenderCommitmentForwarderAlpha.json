@@ -1,5 +1,5 @@
 {
-  "address": "0xb0809780Baa3157345AeEb529aE88C81C51b9226",
+  "address": "0x72f136B0d905780d69EbdD71fb999BFB64B9e375",
   "abi": [
     {
       "type": "constructor",
@@ -13,6 +13,10 @@
         {
           "type": "address",
           "name": "_marketRegistry"
+        },
+        {
+          "type": "address",
+          "name": "_uniswapV3Factory"
         }
       ]
     },
@@ -111,6 +115,40 @@
         {
           "type": "uint256",
           "name": "bidId",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "ExtensionAdded",
+      "inputs": [
+        {
+          "type": "address",
+          "name": "extension",
+          "indexed": false
+        },
+        {
+          "type": "address",
+          "name": "sender",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "ExtensionRevoked",
+      "inputs": [
+        {
+          "type": "address",
+          "name": "extension",
+          "indexed": false
+        },
+        {
+          "type": "address",
+          "name": "sender",
           "indexed": false
         }
       ]
@@ -289,6 +327,102 @@
     },
     {
       "type": "function",
+      "name": "acceptCommitmentWithRecipient",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_commitmentId"
+        },
+        {
+          "type": "uint256",
+          "name": "_principalAmount"
+        },
+        {
+          "type": "uint256",
+          "name": "_collateralAmount"
+        },
+        {
+          "type": "uint256",
+          "name": "_collateralTokenId"
+        },
+        {
+          "type": "address",
+          "name": "_collateralTokenAddress"
+        },
+        {
+          "type": "address",
+          "name": "_recipient"
+        },
+        {
+          "type": "uint16",
+          "name": "_interestRate"
+        },
+        {
+          "type": "uint32",
+          "name": "_loanDuration"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": "bidId"
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "acceptCommitmentWithRecipientAndProof",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_commitmentId"
+        },
+        {
+          "type": "uint256",
+          "name": "_principalAmount"
+        },
+        {
+          "type": "uint256",
+          "name": "_collateralAmount"
+        },
+        {
+          "type": "uint256",
+          "name": "_collateralTokenId"
+        },
+        {
+          "type": "address",
+          "name": "_collateralTokenAddress"
+        },
+        {
+          "type": "address",
+          "name": "_recipient"
+        },
+        {
+          "type": "uint16",
+          "name": "_interestRate"
+        },
+        {
+          "type": "uint32",
+          "name": "_loanDuration"
+        },
+        {
+          "type": "bytes32[]",
+          "name": "_merkleProof"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": "bidId"
+        }
+      ]
+    },
+    {
+      "type": "function",
       "name": "addCommitmentBorrowers",
       "constant": false,
       "payable": false,
@@ -300,6 +434,19 @@
         {
           "type": "address[]",
           "name": "_borrowerAddressList"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "addExtension",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "extension"
         }
       ],
       "outputs": []
@@ -384,7 +531,7 @@
     },
     {
       "type": "function",
-      "name": "createCommitment",
+      "name": "createCommitmentWithUniswap",
       "constant": false,
       "payable": false,
       "inputs": [
@@ -441,6 +588,36 @@
         {
           "type": "address[]",
           "name": "_borrowerAddressList"
+        },
+        {
+          "type": "tuple[]",
+          "name": "_poolRoutes",
+          "components": [
+            {
+              "type": "address",
+              "name": "pool"
+            },
+            {
+              "type": "bool",
+              "name": "zeroForOne"
+            },
+            {
+              "type": "uint32",
+              "name": "twapInterval"
+            },
+            {
+              "type": "uint256",
+              "name": "token0Decimals"
+            },
+            {
+              "type": "uint256",
+              "name": "token1Decimals"
+            }
+          ]
+        },
+        {
+          "type": "uint16",
+          "name": "_poolOracleLtvRatio"
         }
       ],
       "outputs": [
@@ -465,6 +642,66 @@
     },
     {
       "type": "function",
+      "name": "getAllCommitmentUniswapPoolRoutes",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "commitmentId"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "tuple[]",
+          "name": "",
+          "components": [
+            {
+              "type": "address",
+              "name": "pool"
+            },
+            {
+              "type": "bool",
+              "name": "zeroForOne"
+            },
+            {
+              "type": "uint32",
+              "name": "twapInterval"
+            },
+            {
+              "type": "uint256",
+              "name": "token0Decimals"
+            },
+            {
+              "type": "uint256",
+              "name": "token1Decimals"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getCommitmentAcceptedPrincipal",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_commitmentId"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
       "name": "getCommitmentBorrowers",
       "constant": true,
       "stateMutability": "view",
@@ -479,6 +716,127 @@
         {
           "type": "address[]",
           "name": "borrowers_"
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getCommitmentLender",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_commitmentId"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getCommitmentMarketId",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_commitmentId"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getCommitmentMaxPrincipal",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_commitmentId"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getCommitmentPoolOracleLtvRatio",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "commitmentId"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint16",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getCommitmentUniswapPoolRoute",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "commitmentId"
+        },
+        {
+          "type": "uint256",
+          "name": "index"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "tuple",
+          "name": "",
+          "components": [
+            {
+              "type": "address",
+              "name": "pool"
+            },
+            {
+              "type": "bool",
+              "name": "zeroForOne"
+            },
+            {
+              "type": "uint32",
+              "name": "twapInterval"
+            },
+            {
+              "type": "uint256",
+              "name": "token0Decimals"
+            },
+            {
+              "type": "uint256",
+              "name": "token1Decimals"
+            }
+          ]
         }
       ]
     },
@@ -514,14 +872,6 @@
         {
           "type": "uint8",
           "name": "_collateralTokenType"
-        },
-        {
-          "type": "address",
-          "name": "_collateralTokenAddress"
-        },
-        {
-          "type": "address",
-          "name": "_principalTokenAddress"
         }
       ],
       "outputs": [
@@ -565,6 +915,138 @@
     },
     {
       "type": "function",
+      "name": "getUniswapPriceRatioForPool",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "tuple",
+          "name": "_poolRouteConfig",
+          "components": [
+            {
+              "type": "address",
+              "name": "pool"
+            },
+            {
+              "type": "bool",
+              "name": "zeroForOne"
+            },
+            {
+              "type": "uint32",
+              "name": "twapInterval"
+            },
+            {
+              "type": "uint256",
+              "name": "token0Decimals"
+            },
+            {
+              "type": "uint256",
+              "name": "token1Decimals"
+            }
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": "priceRatio"
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getUniswapPriceRatioForPoolRoutes",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "tuple[]",
+          "name": "poolRoutes",
+          "components": [
+            {
+              "type": "address",
+              "name": "pool"
+            },
+            {
+              "type": "bool",
+              "name": "zeroForOne"
+            },
+            {
+              "type": "uint32",
+              "name": "twapInterval"
+            },
+            {
+              "type": "uint256",
+              "name": "token0Decimals"
+            },
+            {
+              "type": "uint256",
+              "name": "token1Decimals"
+            }
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": "priceRatio"
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getUniswapV3PoolAddress",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "_principalTokenAddress"
+        },
+        {
+          "type": "address",
+          "name": "_collateralTokenAddress"
+        },
+        {
+          "type": "uint24",
+          "name": "_uniswapPoolFee"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "hasExtension",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "account"
+        },
+        {
+          "type": "address",
+          "name": "extension"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "bool",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
       "name": "removeCommitmentBorrowers",
       "constant": false,
       "payable": false,
@@ -576,6 +1058,19 @@
         {
           "type": "address[]",
           "name": "_borrowerAddressList"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "revokeExtension",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "extension"
         }
       ],
       "outputs": []
@@ -644,7 +1139,7 @@
       "outputs": []
     }
   ],
-  "transactionHash": "0xf54995a1272d4a61315d006210098e938e6d2bf80d42404505bf15e833c5057b",
+  "transactionHash": "0x7ba2359ecc09155399fd76c08d661ff07abdfc9d72e5151e4e90f1de501b8299",
   "receipt": {
     "to": null,
     "from": "0xD9B023522CeCe02251d877bb0EB4f06fDe6F98E6",
@@ -652,5 +1147,5 @@
     "blockNumber": null
   },
   "numDeployments": 1,
-  "implementation": "0xb9636C8b00a838B8b30502A2dD3bF18aa473AE0c"
+  "implementation": "0x81aeF9223Bb39DAA09E78Ec0832bB72549eE256f"
 }

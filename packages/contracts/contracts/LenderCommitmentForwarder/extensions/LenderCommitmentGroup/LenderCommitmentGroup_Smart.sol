@@ -207,6 +207,63 @@ contract LenderCommitmentGroup_Smart is
         _;
     }
 
+
+
+    event PoolInitialized(
+        address indexed principalTokenAddress,
+        address indexed collateralTokenAddress,
+        uint256 marketId,
+        uint32 maxLoanDuration,
+        uint16 interestRateLowerBound,
+        uint16 interestRateUpperBound,
+        uint16 liquidityThresholdPercent,
+        uint16 loanToValuePercent,
+        uint24 uniswapPoolFee,
+        uint32 twapInterval,
+        address poolSharesToken
+    );
+
+    event LenderAddedPrincipal(
+        address indexed lender,
+        uint256 amount,
+        uint256 sharesAmount,
+        address indexed sharesRecipient
+    );
+
+    event BorrowerAcceptedFunds(
+        address indexed borrower,
+        uint256 indexed bidId,
+        uint256 principalAmount,
+        uint256 collateralAmount,
+        uint32 loanDuration,
+        uint16 interestRate
+    );
+
+    event EarningsWithdrawn(
+        address indexed lender,
+        uint256 amountPoolSharesTokens,
+        uint256 principalTokensWithdrawn,
+        address indexed recipient
+    );
+
+
+    event DefaultedLoanLiquidated(
+        uint256 indexed bidId,
+        address indexed liquidator,
+        uint256 amountDue, 
+        int256 tokenAmountDifference 
+    );
+
+
+    event LoanRepaid(
+        uint256 indexed bidId,
+        address indexed repayer,
+        uint256 principalAmount,
+        uint256 interestAmount,
+        uint256 totalPrincipalRepaid,
+        uint256 totalInterestCollected
+    );
+
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor(
         address _tellerV2,
@@ -278,6 +335,21 @@ contract LenderCommitmentGroup_Smart is
 
         
         poolSharesToken_ = _deployPoolSharesToken();
+
+
+        emit PoolInitialized(
+            _principalTokenAddress,
+            _collateralTokenAddress,
+            _marketId,
+            _maxLoanDuration,
+            _interestRateLowerBound,
+            _interestRateUpperBound,
+            _liquidityThresholdPercent,
+            _loanToValuePercent,
+            _uniswapPoolFee,
+            _twapInterval,
+            poolSharesToken_
+        );
     }
 
     function _deployPoolSharesToken()
@@ -369,6 +441,15 @@ contract LenderCommitmentGroup_Smart is
 
         //mint shares equal to _amount and give them to the shares recipient !!!
         poolSharesToken.mint(_sharesRecipient, sharesAmount_);
+
+        emit LenderAddedPrincipal( 
+
+            msg.sender,
+            _amount,
+            sharesAmount_,
+            _sharesRecipient
+
+         );
     }
 
     function _valueOfUnderlying(uint256 amount, uint256 rate)
@@ -430,7 +511,19 @@ contract LenderCommitmentGroup_Smart is
         totalPrincipalTokensLended += _principalAmount;
 
         activeBids[_bidId] = true; //bool for now
+      
+      
         //emit event
+        //we know the principal token and collateral token addresses since they are hard set in this contract 
+ 
+        emit BorrowerAcceptedFunds(  
+            _borrower,
+            _bidId,
+            _principalAmount,
+            _collateralAmount, 
+            _loanDuration,
+            _interestRate 
+         );
     }
 
     function _acceptBidWithRepaymentListener(uint256 _bidId) internal {
@@ -463,6 +556,13 @@ contract LenderCommitmentGroup_Smart is
 
         principalToken.transfer(_recipient, principalTokenValueToWithdraw);
 
+        emit EarningsWithdrawn(
+            msg.sender,
+            _amountPoolSharesTokens,
+            principalTokenValueToWithdraw,
+            _recipient
+        );
+
         return principalTokenValueToWithdraw;
     }
 
@@ -489,6 +589,9 @@ contract LenderCommitmentGroup_Smart is
             _tokenAmountDifference >= minAmountDifference,
             "Insufficient tokenAmountDifference"
         );
+
+
+     
 
         if (_tokenAmountDifference > 0) {
             //this is used when the collateral value is higher than the principal (rare)
@@ -519,9 +622,17 @@ contract LenderCommitmentGroup_Smart is
 
             totalPrincipalTokensRepaid += (amountDue - tokensToGiveToSender);
         }
+ 
 
         //this will give collateral to the caller
         ITellerV2(TELLER_V2).lenderCloseLoanWithRecipient(_bidId, msg.sender);
+
+         emit DefaultedLoanLiquidated(
+            _bidId,
+            msg.sender,
+            amountDue, 
+            _tokenAmountDifference
+        );
     }
 
     function getAmountOwedForBid(uint256 _bidId, bool _includeInterest)
@@ -763,6 +874,16 @@ contract LenderCommitmentGroup_Smart is
         //can use principal amt to increment amt paid back!! nice for math .
         totalPrincipalTokensRepaid += principalAmount;
         totalInterestCollected += interestAmount;
+
+
+        emit LoanRepaid(
+            _bidId,
+            repayer,
+            principalAmount,
+            interestAmount,
+            totalPrincipalTokensRepaid,
+            totalInterestCollected
+        );
     }
 
     function getAverageWeightedPriceForCollateralTokensPerPrincipalTokens()

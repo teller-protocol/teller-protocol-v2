@@ -64,6 +64,6 @@ deployFn.tags = ['proposal', 'upgrade', 'smart-commitment-forwarder-upgrade']
 deployFn.dependencies = []
 deployFn.skip = async (hre) => {
   //  return true // ALWAYS SKIP FOR NOW
-  return !hre.network.live || !['sepolia'].includes(hre.network.name)
+  return !hre.network.live || !['goerli'].includes(hre.network.name)
 }
 export default deployFn

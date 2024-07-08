@@ -1,5 +1,5 @@
 {
-  "address": "0x2De80f4E9e1A1cc697f7b53DB6550be14B9388CA",
+  "address": "0x4B07570D370347490A19e34B9AdD32AF0aFE497c",
   "abi": [
     {
       "type": "event",
@@ -321,9 +321,30 @@
         }
       ],
       "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "withdrawDustTokens",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "tokenAddress"
+        },
+        {
+          "type": "uint256",
+          "name": "amount"
+        },
+        {
+          "type": "address",
+          "name": "recipient"
+        }
+      ],
+      "outputs": []
     }
   ],
   "receipt": {},
   "numDeployments": 1,
-  "implementation": "0x8b0b2A4c1f4d0f9B60C0815A31B3830E0C9E06a2"
+  "implementation": "0x905D0a6D78F1b517E3557C0ac536F45F417bD782"
 }

@@ -14,14 +14,13 @@
     "contracts": "yarn workspace @teller-protocol/v2-contracts",
     "services": "yarn workspace @scaffold-eth/services",
     "subgraph": "yarn workspace @teller-protocol/v2-subgraph",
-     
     "prepare": "husky install"
   },
   "workspaces": {
     "packages": [
       "packages/contracts",
       "packages/services",
-      "packages/subgraph",
+      "packages/subgraph" 
  
     ]
   },

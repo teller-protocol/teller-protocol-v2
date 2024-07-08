@@ -20,7 +20,8 @@
     "packages": [
       "packages/contracts",
       "packages/services",
-      "packages/subgraph"
+      "packages/subgraph" 
+ 
     ]
   },
   "packageManager": "yarn@3.6.1",

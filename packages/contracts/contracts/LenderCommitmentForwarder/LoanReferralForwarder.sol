@@ -7,18 +7,18 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 // Interfaces
-import "../../interfaces/ITellerV2.sol";
-import "../../interfaces/IProtocolFee.sol";
-import "../../interfaces/ITellerV2Storage.sol";
-import "../../interfaces/IMarketRegistry.sol";
-import "../../interfaces/ILenderCommitmentForwarder.sol";
-import "../../interfaces/ISmartCommitmentForwarder.sol";
-import "../../interfaces/IFlashRolloverLoan_G4.sol";
-import "../../libraries/NumbersLib.sol";
+import "../interfaces/ITellerV2.sol";
+import "../interfaces/IProtocolFee.sol";
+import "../interfaces/ITellerV2Storage.sol";
+import "../interfaces/IMarketRegistry.sol";
+import "../interfaces/ILenderCommitmentForwarder.sol";
+import "../interfaces/ISmartCommitmentForwarder.sol";
+import "../interfaces/IFlashRolloverLoan_G4.sol";
+import "../libraries/NumbersLib.sol";
 
-import { IPool } from "../../interfaces/aave/IPool.sol";
-import { IFlashLoanSimpleReceiver } from "../../interfaces/aave/IFlashLoanSimpleReceiver.sol";
-import { IPoolAddressesProvider } from "../../interfaces/aave/IPoolAddressesProvider.sol";
+import { IPool } from "../interfaces/aave/IPool.sol";
+import { IFlashLoanSimpleReceiver } from "../interfaces/aave/IFlashLoanSimpleReceiver.sol";
+import { IPoolAddressesProvider } from "../interfaces/aave/IPoolAddressesProvider.sol";
 
  
 
@@ -98,9 +98,7 @@ contract LoanReferralForwarder   {
      *      a callback is executed for further operations.
      *
      * @param _loanId Identifier of the existing loan to be rolled over.
-     * @param _flashLoanAmount Amount of flash loan to be borrowed for the rollover.
-     * @param _borrowerAmount Additional amount that the borrower may want to add during rollover.
-     * @param _acceptCommitmentArgs Commitment arguments that might be necessary for internal operations.
+       * @param _acceptCommitmentArgs Commitment arguments that might be necessary for internal operations.
      * 
      */
 
@@ -111,7 +109,7 @@ contract LoanReferralForwarder   {
         address _lenderCommitmentForwarder,
         uint256 _loanId,
       //  uint256 _flashLoanAmount,
-        uint256 _borrowerAmount, //an additional amount borrower may have to add
+      //  uint256 _borrowerAmount, //an additional amount borrower may have to add
         AcceptCommitmentArgs calldata _acceptCommitmentArgs
     ) external   {
         address borrower = TELLER_V2.getLoanBorrower(_loanId);
@@ -122,29 +120,32 @@ contract LoanReferralForwarder   {
         // Get lending token and balance before
         address lendingToken = TELLER_V2.getLoanLendingToken(_loanId);
 
-        if (_borrowerAmount > 0) {
+      /*  if (_borrowerAmount > 0) {
             IERC20(lendingToken).transferFrom(
                 borrower,
                 address(this),
                 _borrowerAmount
             );
-        }
+        } */
 
 
-
+        /*
           AcceptCommitmentArgs memory acceptCommitmentArgs = abi.decode(
             _rolloverArgs.acceptCommitmentArgs,
             (AcceptCommitmentArgs)
-        );
+        );*/
 
         // Accept commitment and receive funds to this contract
 
         (uint256 newLoanId, uint256 acceptCommitmentAmount) = _acceptCommitment(
-            _rolloverArgs.lenderCommitmentForwarder,
-            _rolloverArgs.borrower,
-            _flashToken,
-            acceptCommitmentArgs
+            _lenderCommitmentForwarder,
+            borrower,
+            lendingToken,
+            _acceptCommitmentArgs
         );
+
+
+        //at this point, this contract has received acceptCommitmentAmount tokens.  So the majority of them should be sent to the msg.sender (borrower) 
 
 
 
@@ -167,7 +168,7 @@ contract LoanReferralForwarder   {
      *
      * @return repayAmount_ The actual amount that was used for repayment.
      */
-    function _repayLoanFull(
+  /*  function _repayLoanFull(
         uint256 _bidId,
         address _principalToken,
         uint256 _repayAmount
@@ -185,7 +186,7 @@ contract LoanReferralForwarder   {
             .balanceOf(address(this));
 
         repayAmount_ = fundsBeforeRepayment - fundsAfterRepayment;
-    }
+    }*/
 
     /**
      *
@@ -297,15 +298,14 @@ contract LoanReferralForwarder   {
 
         uint256 fundsAfterAcceptCommitment = IERC20Upgradeable(principalToken)
             .balanceOf(address(this));
+
         acceptCommitmentAmount_ =
             fundsAfterAcceptCommitment -
             fundsBeforeAcceptCommitment;
     }
  
 
-    function POOL() public view returns (IPool) {
-        return IPool(ADDRESSES_PROVIDER().getPool());
-    }
+     
 
     /**
      * @notice Calculates the amount for loan rollover, determining if the borrower owes or receives funds.

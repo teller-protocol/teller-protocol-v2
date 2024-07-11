@@ -1,0 +1,160 @@
+type tellerv2_accepted_bid @entity {
+    id: ID!
+    evt_tx_hash: String!
+    evt_index: BigInt!
+    evt_block_time: String!
+    evt_block_number: BigInt!
+    bid_id: BigDecimal!
+    lender: String!
+}
+type tellerv2_admin_changed @entity {
+    id: ID!
+    evt_tx_hash: String!
+    evt_index: BigInt!
+    evt_block_time: String!
+    evt_block_number: BigInt!
+    new_admin: String!
+    previous_admin: String!
+}
+type tellerv2_cancelled_bid @entity {
+    id: ID!
+    evt_tx_hash: String!
+    evt_index: BigInt!
+    evt_block_time: String!
+    evt_block_number: BigInt!
+    bid_id: BigDecimal!
+}
+type tellerv2_fee_paid @entity {
+    id: ID!
+    evt_tx_hash: String!
+    evt_index: BigInt!
+    evt_block_time: String!
+    evt_block_number: BigInt!
+    amount: BigDecimal!
+    bid_id: BigDecimal!
+    fee_type: String!
+}
+type tellerv2_initialized @entity {
+    id: ID!
+    evt_tx_hash: String!
+    evt_index: BigInt!
+    evt_block_time: String!
+    evt_block_number: BigInt!
+    version: Int!
+}
+type tellerv2_loan_liquidated @entity {
+    id: ID!
+    evt_tx_hash: String!
+    evt_index: BigInt!
+    evt_block_time: String!
+    evt_block_number: BigInt!
+    bid_id: BigDecimal!
+    liquidator: String!
+}
+type tellerv2_loan_repaid @entity {
+    id: ID!
+    evt_tx_hash: String!
+    evt_index: BigInt!
+    evt_block_time: String!
+    evt_block_number: BigInt!
+    bid_id: BigDecimal!
+}
+type tellerv2_loan_repayment @entity {
+    id: ID!
+    evt_tx_hash: String!
+    evt_index: BigInt!
+    evt_block_time: String!
+    evt_block_number: BigInt!
+    bid_id: BigDecimal!
+}
+type tellerv2_market_forwarder_approved @entity {
+    id: ID!
+    evt_tx_hash: String!
+    evt_index: BigInt!
+    evt_block_time: String!
+    evt_block_number: BigInt!
+    forwarder: String!
+    market_id: BigDecimal!
+    sender: String!
+}
+type tellerv2_market_forwarder_renounced @entity {
+    id: ID!
+    evt_tx_hash: String!
+    evt_index: BigInt!
+    evt_block_time: String!
+    evt_block_number: BigInt!
+    forwarder: String!
+    market_id: BigDecimal!
+    sender: String!
+}
+type tellerv2_market_owner_cancelled_bid @entity {
+    id: ID!
+    evt_tx_hash: String!
+    evt_index: BigInt!
+    evt_block_time: String!
+    evt_block_number: BigInt!
+    bid_id: BigDecimal!
+}
+type tellerv2_ownership_transferred @entity {
+    id: ID!
+    evt_tx_hash: String!
+    evt_index: BigInt!
+    evt_block_time: String!
+    evt_block_number: BigInt!
+    new_owner: String!
+    previous_owner: String!
+}
+type tellerv2_paused @entity {
+    id: ID!
+    evt_tx_hash: String!
+    evt_index: BigInt!
+    evt_block_time: String!
+    evt_block_number: BigInt!
+    account: String!
+}
+type tellerv2_protocol_fee_set @entity {
+    id: ID!
+    evt_tx_hash: String!
+    evt_index: BigInt!
+    evt_block_time: String!
+    evt_block_number: BigInt!
+    new_fee: Int!
+    old_fee: Int!
+}
+type tellerv2_submitted_bid @entity {
+    id: ID!
+    evt_tx_hash: String!
+    evt_index: BigInt!
+    evt_block_time: String!
+    evt_block_number: BigInt!
+    bid_id: BigDecimal!
+    borrower: String!
+    metadata_uri: String!
+    receiver: String!
+}
+type tellerv2_trusted_market_forwarder_set @entity {
+    id: ID!
+    evt_tx_hash: String!
+    evt_index: BigInt!
+    evt_block_time: String!
+    evt_block_number: BigInt!
+    forwarder: String!
+    market_id: BigDecimal!
+    sender: String!
+}
+type tellerv2_unpaused @entity {
+    id: ID!
+    evt_tx_hash: String!
+    evt_index: BigInt!
+    evt_block_time: String!
+    evt_block_number: BigInt!
+    account: String!
+}
+type tellerv2_upgraded @entity {
+    id: ID!
+    evt_tx_hash: String!
+    evt_index: BigInt!
+    evt_block_time: String!
+    evt_block_number: BigInt!
+    implementation: String!
+}

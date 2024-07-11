@@ -1,0 +1,186 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+package contract.v1;
+
+message Events {
+    repeated tellerv2_AcceptedBid tellerv2_accepted_bids = 1;
+    repeated tellerv2_AdminChanged tellerv2_admin_changeds = 2;
+    repeated tellerv2_CancelledBid tellerv2_cancelled_bids = 3;
+    repeated tellerv2_FeePaid tellerv2_fee_paids = 4;
+    repeated tellerv2_Initialized tellerv2_initializeds = 5;
+    repeated tellerv2_LoanLiquidated tellerv2_loan_liquidateds = 6;
+    repeated tellerv2_LoanRepaid tellerv2_loan_repaids = 7;
+    repeated tellerv2_LoanRepayment tellerv2_loan_repayments = 8;
+    repeated tellerv2_MarketForwarderApproved tellerv2_market_forwarder_approveds = 9;
+    repeated tellerv2_MarketForwarderRenounced tellerv2_market_forwarder_renounceds = 10;
+    repeated tellerv2_MarketOwnerCancelledBid tellerv2_market_owner_cancelled_bids = 11;
+    repeated tellerv2_OwnershipTransferred tellerv2_ownership_transferreds = 12;
+    repeated tellerv2_Paused tellerv2_pauseds = 13;
+    repeated tellerv2_ProtocolFeeSet tellerv2_protocol_fee_sets = 14;
+    repeated tellerv2_SubmittedBid tellerv2_submitted_bids = 15;
+    repeated tellerv2_TrustedMarketForwarderSet tellerv2_trusted_market_forwarder_sets = 16;
+    repeated tellerv2_Unpaused tellerv2_unpauseds = 17;
+    repeated tellerv2_Upgraded tellerv2_upgradeds = 18;
+}
+
+message tellerv2_AcceptedBid {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    google.protobuf.Timestamp evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    string bid_id = 5;
+    bytes lender = 6;
+}
+
+message tellerv2_AdminChanged {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    google.protobuf.Timestamp evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    bytes previous_admin = 5;
+    bytes new_admin = 6;
+}
+
+message tellerv2_CancelledBid {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    google.protobuf.Timestamp evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    string bid_id = 5;
+}
+
+message tellerv2_FeePaid {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    google.protobuf.Timestamp evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    string bid_id = 5;
+    string fee_type = 6;
+    string amount = 7;
+}
+
+message tellerv2_Initialized {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    google.protobuf.Timestamp evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    uint64 version = 5;
+}
+
+message tellerv2_LoanLiquidated {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    google.protobuf.Timestamp evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    string bid_id = 5;
+    bytes liquidator = 6;
+}
+
+message tellerv2_LoanRepaid {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    google.protobuf.Timestamp evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    string bid_id = 5;
+}
+
+message tellerv2_LoanRepayment {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    google.protobuf.Timestamp evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    string bid_id = 5;
+}
+
+message tellerv2_MarketForwarderApproved {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    google.protobuf.Timestamp evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    string market_id = 5;
+    bytes forwarder = 6;
+    bytes sender = 7;
+}
+
+message tellerv2_MarketForwarderRenounced {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    google.protobuf.Timestamp evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    string market_id = 5;
+    bytes forwarder = 6;
+    bytes sender = 7;
+}
+
+message tellerv2_MarketOwnerCancelledBid {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    google.protobuf.Timestamp evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    string bid_id = 5;
+}
+
+message tellerv2_OwnershipTransferred {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    google.protobuf.Timestamp evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    bytes previous_owner = 5;
+    bytes new_owner = 6;
+}
+
+message tellerv2_Paused {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    google.protobuf.Timestamp evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    bytes account = 5;
+}
+
+message tellerv2_ProtocolFeeSet {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    google.protobuf.Timestamp evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    uint64 new_fee = 5;
+    uint64 old_fee = 6;
+}
+
+message tellerv2_SubmittedBid {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    google.protobuf.Timestamp evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    string bid_id = 5;
+    bytes borrower = 6;
+    bytes receiver = 7;
+    bytes metadata_uri = 8;
+}
+
+message tellerv2_TrustedMarketForwarderSet {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    google.protobuf.Timestamp evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    string market_id = 5;
+    bytes forwarder = 6;
+    bytes sender = 7;
+}
+
+message tellerv2_Unpaused {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    google.protobuf.Timestamp evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    bytes account = 5;
+}
+
+message tellerv2_Upgraded {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    google.protobuf.Timestamp evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    bytes implementation = 5;
+}

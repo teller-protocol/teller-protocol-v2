@@ -96,7 +96,7 @@ fn map_tellerv2_events(blk: &eth::Block, events: &mut contract::Events) {
                             evt_block_number: blk.number,
                             amount: event.amount.to_string(),
                             bid_id: event.bid_id.to_string(),
-                            fee_type: event.fee_type,
+                            fee_type: Hex(event.fee_type.hash).to_string(),  // ???
                         });
                     }
 

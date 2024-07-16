@@ -40,7 +40,7 @@ type tellerv2_initialized @entity {
     evt_index: BigInt!
     evt_block_time: String!
     evt_block_number: BigInt!
-    version: Int!
+    version: BigInt!
 }
 type tellerv2_loan_liquidated @entity {
     id: ID!
@@ -118,8 +118,8 @@ type tellerv2_protocol_fee_set @entity {
     evt_index: BigInt!
     evt_block_time: String!
     evt_block_number: BigInt!
-    new_fee: Int!
-    old_fee: Int!
+    new_fee: BigInt!
+    old_fee: BigInt!
 }
 type tellerv2_submitted_bid @entity {
     id: ID!

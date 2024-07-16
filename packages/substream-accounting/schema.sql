@@ -159,3 +159,12 @@ CREATE TABLE IF NOT EXISTS tellerv2_upgraded (
     PRIMARY KEY(evt_tx_hash,evt_index)
 );
 
+CREATE TABLE IF NOT EXISTS tellerv2_bid (
+    "evt_tx_hash" VARCHAR(64),
+    "evt_index" INT,
+    "evt_block_time" TIMESTAMP,
+    "evt_block_number" DECIMAL,
+    "implementation" VARCHAR(40),
+    PRIMARY KEY(evt_tx_hash,evt_index)
+);
+

@@ -1,5 +1,6 @@
 mod abi;
 mod pb;
+mod rpc;
 use hex_literal::hex;
 use pb::contract::v1 as contract;
 use substreams::Hex;
@@ -9,11 +10,12 @@ use substreams_entity_change::pb::entity::EntityChanges;
 use substreams_entity_change::tables::Tables as EntityChangesTables;
 use substreams_ethereum::pb::eth::v2 as eth;
 use substreams_ethereum::Event;
+use ethabi::{ethereum_types::H160, Address};
 
 #[allow(unused_imports)]
 use num_traits::cast::ToPrimitive;
 use std::str::FromStr;
-use substreams::scalar::BigDecimal;
+use substreams::scalar::{BigDecimal,BigInt};
 
 substreams_ethereum::init!();
 
@@ -398,6 +400,7 @@ fn map_tellerv2_events(blk: &eth::Block, events: &mut contract::Events) {
         .collect());
 }
 
+/*
 fn db_tellerv2_out(events: &contract::Events, tables: &mut DatabaseChangeTables) {
     // Loop over all the abis events to create table changes
     events.tellerv2_accepted_bids.iter().for_each(|evt| {
@@ -518,6 +521,45 @@ fn db_tellerv2_out(events: &contract::Events, tables: &mut DatabaseChangeTables)
             .set("borrower", Hex(&evt.borrower).to_string())
             .set("metadata_uri", Hex(&evt.metadata_uri).to_string())
             .set("receiver", Hex(&evt.receiver).to_string());
+            
+            
+        
+        let bid_id = BigInt::from_str(&evt.bid_id).unwrap();
+        let teller_v2_address = H160::from_slice( &TELLERV2_TRACKED_CONTRACT ) ;
+            
+        let submitted_bid_data = rpc::fetch_loan_summary_from_rpc(
+            
+            &teller_v2_address,
+            &bid_id
+            
+        );
+            
+            
+        if let Some(submitted_bid_data) = submitted_bid_data {
+            
+            let bid_id = submitted_bid_data.bid_id;
+            
+            tables
+            .create_row("tellerv2_bid",  bid_id.to_string() )
+            .set("bid_id",  &bid_id )
+            .set("borrower", Hex(&submitted_bid_data.borrower_address).to_string()) 
+            .set("lender", Hex(&submitted_bid_data.lender_address).to_string())
+            .set("receiver", Hex(&evt.receiver).to_string())
+            .set("principal_token_address", Hex(&submitted_bid_data.principal_token_address).to_string())
+            .set("principal_amount",  &submitted_bid_data.principal_amount)
+            
+            ;
+            
+            
+            
+        }
+            
+            
+            
+            
+            
+            
+            
     });
     events.tellerv2_trusted_market_forwarder_sets.iter().for_each(|evt| {
         tables
@@ -543,7 +585,7 @@ fn db_tellerv2_out(events: &contract::Events, tables: &mut DatabaseChangeTables)
             .set("implementation", Hex(&evt.implementation).to_string());
     });
 }
-
+*/
 
 fn graph_tellerv2_out(events: &contract::Events, tables: &mut EntityChangesTables) {
     // Loop over all the abis events to create table changes
@@ -695,6 +737,46 @@ fn graph_tellerv2_out(events: &contract::Events, tables: &mut EntityChangesTable
             .set("borrower", Hex(&evt.borrower).to_string())
             .set("metadata_uri", Hex(&evt.metadata_uri).to_string())
             .set("receiver", Hex(&evt.receiver).to_string());
+            
+            
+             let bid_id = BigInt::from_str(&evt.bid_id).unwrap();
+            let teller_v2_address = Address::from_slice(   &TELLERV2_TRACKED_CONTRACT   ) ;
+                
+            let submitted_bid_data = rpc::fetch_loan_summary_from_rpc(
+                
+                &teller_v2_address,
+                &bid_id
+                
+            ).unwrap();
+                
+                
+                /*
+                    
+                    
+                    The block stream encountered a substreams fatal error and will not retry: rpc error: code = InvalidArgument desc = step new irr: handler step new: execute modules: applying executor results "graph_out" on block 15096143: execute: maps wasm call: block 15096143: module "graph_out": general wasm execution panicked: wasm execution failed deterministically: panic in the wasm: "called `Option::unwrap()` on a `None` value" at src/lib.rs:750:15
+                    
+                */
+                
+                
+          //  if let Some(submitted_bid_data) = submitted_bid_data {
+                
+                let bid_id = submitted_bid_data.bid_id;
+                
+                tables
+                .create_row("tellerv2_bid",  bid_id.to_string() )
+                .set("bid_id",  &bid_id )
+                .set("borrower", Hex(&submitted_bid_data.borrower_address).to_string()) 
+                .set("lender", Hex(&submitted_bid_data.lender_address).to_string())
+                .set("receiver", Hex(&evt.receiver).to_string())
+                .set("principal_token_address", Hex(&submitted_bid_data.principal_token_address).to_string())
+                .set("principal_amount",  &submitted_bid_data.principal_amount)
+                
+                ;
+                
+                
+          
+           // }.unwrap()
+            
     });
     events.tellerv2_trusted_market_forwarder_sets.iter().for_each(|evt| {
         tables
@@ -734,6 +816,7 @@ fn map_events(blk: eth::Block) -> Result<contract::Events, substreams::errors::E
     Ok(events)
 }
 
+/*
 #[substreams::handlers::map]
 fn db_out(events: contract::Events) -> Result<DatabaseChanges, substreams::errors::Error> {
     // Initialize Database Changes container
@@ -741,6 +824,8 @@ fn db_out(events: contract::Events) -> Result<DatabaseChanges, substreams::error
     db_tellerv2_out(&events, &mut tables);
     Ok(tables.to_database_changes())
 }
+*/
+
 
 #[substreams::handlers::map]
 fn graph_out(events: contract::Events) -> Result<EntityChanges, substreams::errors::Error> {

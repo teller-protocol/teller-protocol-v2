@@ -158,3 +158,16 @@ type tellerv2_upgraded @entity {
     evt_block_number: BigInt!
     implementation: String!
 }
+
+
+
+type tellerv2_bid @entity {
+    id: ID!
+ 
+    bid_id: BigDecimal!
+    borrower: String!
+    receiver: String!
+    lender: String!
+    
+    principal_amount: BigInt! 
+}

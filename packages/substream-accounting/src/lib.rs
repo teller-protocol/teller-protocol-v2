@@ -29,7 +29,22 @@ fn map_tellerv2_events(blk: &eth::Block, events: &mut contract::Events) {
                 .filter(|log| log.address == TELLERV2_TRACKED_CONTRACT)
                 .filter_map(|log| {
                     if let Some(event) = abi::tellerv2_contract::events::AcceptedBid::match_and_decode(log) {
-                        return Some(contract::Tellerv2AcceptedBid {
+                        
+                        
+                               
+            let submitted_bid_data = rpc::fetch_loan_summary_from_rpc(
+                
+                & H160::from_slice( &TELLERV2_TRACKED_CONTRACT ) ,
+                & event.bid_id 
+                
+            ).unwrap(); // this is failing 
+            
+            
+            return Some(contract::Tellerv2AcceptedBid {
+
+
+
+
                             evt_tx_hash: Hex(&view.transaction.hash).to_string(),
                             evt_index: log.block_index,
                             evt_block_time: Some(blk.timestamp().to_owned()),
@@ -43,27 +58,7 @@ fn map_tellerv2_events(blk: &eth::Block, events: &mut contract::Events) {
                 })
         })
         .collect());
-    events.tellerv2_admin_changeds.append(&mut blk
-        .receipts()
-        .flat_map(|view| {
-            view.receipt.logs.iter()
-                .filter(|log| log.address == TELLERV2_TRACKED_CONTRACT)
-                .filter_map(|log| {
-                    if let Some(event) = abi::tellerv2_contract::events::AdminChanged::match_and_decode(log) {
-                        return Some(contract::Tellerv2AdminChanged {
-                            evt_tx_hash: Hex(&view.transaction.hash).to_string(),
-                            evt_index: log.block_index,
-                            evt_block_time: Some(blk.timestamp().to_owned()),
-                            evt_block_number: blk.number,
-                            new_admin: event.new_admin,
-                            previous_admin: event.previous_admin,
-                        });
-                    }
-
-                    None
-                })
-        })
-        .collect());
+    
     events.tellerv2_cancelled_bids.append(&mut blk
         .receipts()
         .flat_map(|view| {
@@ -378,26 +373,7 @@ fn map_tellerv2_events(blk: &eth::Block, events: &mut contract::Events) {
                 })
         })
         .collect());
-    events.tellerv2_upgradeds.append(&mut blk
-        .receipts()
-        .flat_map(|view| {
-            view.receipt.logs.iter()
-                .filter(|log| log.address == TELLERV2_TRACKED_CONTRACT)
-                .filter_map(|log| {
-                    if let Some(event) = abi::tellerv2_contract::events::Upgraded::match_and_decode(log) {
-                        return Some(contract::Tellerv2Upgraded {
-                            evt_tx_hash: Hex(&view.transaction.hash).to_string(),
-                            evt_index: log.block_index,
-                            evt_block_time: Some(blk.timestamp().to_owned()),
-                            evt_block_number: blk.number,
-                            implementation: event.implementation,
-                        });
-                    }
-
-                    None
-                })
-        })
-        .collect());
+    
 }
 
 /*
@@ -599,16 +575,7 @@ fn graph_tellerv2_out(events: &contract::Events, tables: &mut EntityChangesTable
             .set("bid_id", BigDecimal::from_str(&evt.bid_id).unwrap())
             .set("lender", Hex(&evt.lender).to_string());
     });
-    events.tellerv2_admin_changeds.iter().for_each(|evt| {
-        tables
-            .create_row("tellerv2_admin_changed", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
-            .set("evt_tx_hash", &evt.evt_tx_hash)
-            .set("evt_index", evt.evt_index)
-            .set("evt_block_time", evt.evt_block_time.as_ref().unwrap())
-            .set("evt_block_number", evt.evt_block_number)
-            .set("new_admin", Hex(&evt.new_admin).to_string())
-            .set("previous_admin", Hex(&evt.previous_admin).to_string());
-    });
+    
     events.tellerv2_cancelled_bids.iter().for_each(|evt| {
         tables
             .create_row("tellerv2_cancelled_bid", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
@@ -798,15 +765,7 @@ fn graph_tellerv2_out(events: &contract::Events, tables: &mut EntityChangesTable
             .set("evt_block_number", evt.evt_block_number)
             .set("account", Hex(&evt.account).to_string());
     });
-    events.tellerv2_upgradeds.iter().for_each(|evt| {
-        tables
-            .create_row("tellerv2_upgraded", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
-            .set("evt_tx_hash", &evt.evt_tx_hash)
-            .set("evt_index", evt.evt_index)
-            .set("evt_block_time", evt.evt_block_time.as_ref().unwrap())
-            .set("evt_block_number", evt.evt_block_number)
-            .set("implementation", Hex(&evt.implementation).to_string());
-    });
+ 
 }
 
 #[substreams::handlers::map]

@@ -7,15 +7,7 @@ type tellerv2_accepted_bid @entity {
     bid_id: BigDecimal!
     lender: String!
 }
-type tellerv2_admin_changed @entity {
-    id: ID!
-    evt_tx_hash: String!
-    evt_index: BigInt!
-    evt_block_time: String!
-    evt_block_number: BigInt!
-    new_admin: String!
-    previous_admin: String!
-}
+ 
 type tellerv2_cancelled_bid @entity {
     id: ID!
     evt_tx_hash: String!
@@ -150,16 +142,7 @@ type tellerv2_unpaused @entity {
     evt_block_number: BigInt!
     account: String!
 }
-type tellerv2_upgraded @entity {
-    id: ID!
-    evt_tx_hash: String!
-    evt_index: BigInt!
-    evt_block_time: String!
-    evt_block_number: BigInt!
-    implementation: String!
-}
-
-
+ 
 
 type tellerv2_bid @entity {
     id: ID!

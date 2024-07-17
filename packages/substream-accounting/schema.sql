@@ -7,15 +7,7 @@ CREATE TABLE IF NOT EXISTS tellerv2_accepted_bid (
     "lender" VARCHAR(40),
     PRIMARY KEY(evt_tx_hash,evt_index)
 );
-CREATE TABLE IF NOT EXISTS tellerv2_admin_changed (
-    "evt_tx_hash" VARCHAR(64),
-    "evt_index" INT,
-    "evt_block_time" TIMESTAMP,
-    "evt_block_number" DECIMAL,
-    "new_admin" VARCHAR(40),
-    "previous_admin" VARCHAR(40),
-    PRIMARY KEY(evt_tx_hash,evt_index)
-);
+ 
 CREATE TABLE IF NOT EXISTS tellerv2_cancelled_bid (
     "evt_tx_hash" VARCHAR(64),
     "evt_index" INT,
@@ -150,14 +142,7 @@ CREATE TABLE IF NOT EXISTS tellerv2_unpaused (
     "account" VARCHAR(40),
     PRIMARY KEY(evt_tx_hash,evt_index)
 );
-CREATE TABLE IF NOT EXISTS tellerv2_upgraded (
-    "evt_tx_hash" VARCHAR(64),
-    "evt_index" INT,
-    "evt_block_time" TIMESTAMP,
-    "evt_block_number" DECIMAL,
-    "implementation" VARCHAR(40),
-    PRIMARY KEY(evt_tx_hash,evt_index)
-);
+ 
 
 CREATE TABLE IF NOT EXISTS tellerv2_bid (
     "evt_tx_hash" VARCHAR(64),

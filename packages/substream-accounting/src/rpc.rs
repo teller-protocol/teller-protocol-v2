@@ -59,20 +59,29 @@ pub struct LoanSummaryData {
 
 
 
-const TELLERV2_TRACKED_CONTRACT: &str =  "0x00182fdb0b880ee24d428e3cc39383717677c37e" ;
+const TELLERV2_TRACKED_CONTRACT: &str =  "00182FdB0B880eE24D428e3Cc39383717677C37e" ;
 
 
 pub fn fetch_loan_summary_from_rpc(teller_v2_address: &Address, bid_id: &BigInt) -> Option<LoanSummaryData> {
             
-        
-    let bid_id = BigInt::from(0);
-      
-    //let teller_v2_address_decoded = Hex::decode(teller_v2_address).unwrap(); 
-         let teller_v2_address_decoded =   Hex::decode(TELLERV2_TRACKED_CONTRACT).unwrap(); 
-      //TELLERV2_TRACKED_CONTRACT .to_vec() ; // for now ? 
     
+    
+        //let  contract_address = Hex(& TELLERV2_TRACKED_CONTRACT ).to_string();
+                       
+                       
+    let teller_v2_address_decoded =   Hex::decode( TELLERV2_TRACKED_CONTRACT ).unwrap(); 
+       
     let loan_summary_function = abi::tellerv2_contract::functions::GetLoanSummary {u_bid_id: bid_id.clone()};
-    let Some((
+  
+    
+    
+    
+    call_custom(
+        teller_v2_address_decoded.clone(),
+        loan_summary_function.encode()
+    );
+
+      let (
         borrower_address,
         lender_address,
         market_id,
@@ -81,14 +90,9 @@ pub fn fetch_loan_summary_from_rpc(teller_v2_address: &Address, bid_id: &BigInt)
         accepted_timestamp,
         last_repaid_timestamp,
         bid_state
-        )) = loan_summary_function.call(
+        )  = loan_summary_function.call(
         teller_v2_address_decoded.clone()
-    ) else {
-        
-         return None
-         
-         
-    };
+    ) .unwrap();
       
     return Some(  
         LoanSummaryData{ 
@@ -108,3 +112,71 @@ pub fn fetch_loan_summary_from_rpc(teller_v2_address: &Address, bid_id: &BigInt)
  
  
 } 
+
+
+
+        /*let Some((
+        borrower_address,
+        lender_address,
+        market_id,
+        principal_token_address,
+        principal_amount,
+        accepted_timestamp,
+        last_repaid_timestamp,
+        bid_state
+        )) = loan_summary_function.call(
+        teller_v2_address_decoded.clone()
+    ) else {
+        
+         return None
+         
+         
+    };*/
+    
+    
+fn call_custom(
+    
+    
+    to_address: Vec<u8>,
+    raw_data: Vec<u8>, 
+){
+    
+                    use substreams_ethereum::pb::eth::rpc;
+                      let rpc_calls = rpc::RpcCalls {
+                    calls: vec![
+                        rpc::RpcCall { to_addr : to_address, data : raw_data, }
+                    ],
+                };
+                let responses = substreams_ethereum::rpc::eth_call(&rpc_calls).responses;
+                let response = responses
+                    .get(0)
+                    .expect("one response should have existed");
+               
+                
+               //   use substreams_ethereum::Function;
+                        substreams::log::info!(
+                            "Call output for function {} raw : {:?}   ",
+                               response.failed,
+                             response.raw,
+                             
+                        );
+                        
+                      
+                        
+                   /*       if response.failed {
+                    return None;
+                }
+                match Self::output(response.raw.as_ref()) {
+                    Ok(data) => Some(data),
+                    Err(err) => {
+                        use substreams_ethereum::Function;
+                        substreams::log::info!(
+                            "Call output for function `{}` failed to decode with error: {}",
+                            Self::NAME, err
+                        );
+                        None
+                    }
+                }*/
+                
+                
+}

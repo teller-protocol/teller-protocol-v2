@@ -747,7 +747,7 @@ fn graph_tellerv2_out(events: &contract::Events, tables: &mut EntityChangesTable
                 &teller_v2_address,
                 &bid_id
                 
-            ).unwrap();
+            ).unwrap(); // this is failing 
                 
                 
                 /*

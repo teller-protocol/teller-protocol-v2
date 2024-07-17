@@ -59,14 +59,17 @@ pub struct LoanSummaryData {
 
 
 
-const TELLERV2_TRACKED_CONTRACT: [u8; 20] = hex!("00182fdb0b880ee24d428e3cc39383717677c37e");
+const TELLERV2_TRACKED_CONTRACT: &str =  "0x00182fdb0b880ee24d428e3cc39383717677c37e" ;
 
 
 pub fn fetch_loan_summary_from_rpc(teller_v2_address: &Address, bid_id: &BigInt) -> Option<LoanSummaryData> {
+            
         
+    let bid_id = BigInt::from(0);
       
     //let teller_v2_address_decoded = Hex::decode(teller_v2_address).unwrap(); 
-         let teller_v2_address_decoded =TELLERV2_TRACKED_CONTRACT .to_vec() ; // for now ? 
+         let teller_v2_address_decoded =   Hex::decode(TELLERV2_TRACKED_CONTRACT).unwrap(); 
+      //TELLERV2_TRACKED_CONTRACT .to_vec() ; // for now ? 
     
     let loan_summary_function = abi::tellerv2_contract::functions::GetLoanSummary {u_bid_id: bid_id.clone()};
     let Some((
@@ -77,7 +80,8 @@ pub fn fetch_loan_summary_from_rpc(teller_v2_address: &Address, bid_id: &BigInt)
         principal_amount,
         accepted_timestamp,
         last_repaid_timestamp,
-        bid_state)) = loan_summary_function.call(
+        bid_state
+        )) = loan_summary_function.call(
         teller_v2_address_decoded.clone()
     ) else {
         

@@ -54,7 +54,7 @@ contract LenderCommitmentForwarder_UpgradeToG2 is Testable {
         // This should revert because the contract has not been upgraded yet with that function
 
         // Upgrade contract to V2
-        admin.upgrade(proxy, address(logicV2));
+        admin.upgrade(ITransparentUpgradeableProxy(address(proxy)), address(logicV2));
 
         // Verify the commitment principalTokenAddress is set to the correct address after the upgrade
         (

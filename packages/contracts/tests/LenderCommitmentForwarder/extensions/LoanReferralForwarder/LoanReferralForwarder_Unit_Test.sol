@@ -79,9 +79,9 @@ contract LoanReferralForwarder_Unit_Test is Testable {
         wethMock.deposit{ value: 100e18 }();
         wethMock.transfer(address(lender), 5e18);
         wethMock.transfer(address(borrower), 5e18);
-        wethMock.transfer(address(lenderCommitmentForwarder), 5e18);
+      //  wethMock.transfer(address(lenderCommitmentForwarder), 5e18);
 
-        wethMock.transfer(address(aavePoolMock), 5e18);
+      //  wethMock.transfer(address(aavePoolMock), 5e18);
 
         //marketRegistryMock = new MarketRegistryMock();
         loanReferralForwarder = new LoanReferralForwarderOverride(
@@ -100,7 +100,7 @@ contract LoanReferralForwarder_Unit_Test is Testable {
         uint32 duration = 10 days;
         uint16 interestRate = 100;
 
-        ILenderCommitmentForwarder.Commitment
+     /*    ILenderCommitmentForwarder.Commitment
             memory commitment = ILenderCommitmentForwarder.Commitment({
                 maxPrincipal: principalAmount,
                 expiration: uint32(block.timestamp + 1 days),
@@ -131,6 +131,8 @@ contract LoanReferralForwarder_Unit_Test is Testable {
                 loanDuration: duration,
                 merkleProof: new bytes32[](0)
             });
+      */
+
 
         vm.prank(address(borrower));
         uint256 loanId = tellerV2.submitBid(

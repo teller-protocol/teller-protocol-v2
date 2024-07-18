@@ -31,13 +31,7 @@ fn map_tellerv2_events(blk: &eth::Block, events: &mut contract::Events) {
                     if let Some(event) = abi::tellerv2_contract::events::AcceptedBid::match_and_decode(log) {
                         
                         
-                               
-            let submitted_bid_data = rpc::fetch_loan_summary_from_rpc(
-                
-                & H160::from_slice( &TELLERV2_TRACKED_CONTRACT ) ,
-                & event.bid_id 
-                
-            ).unwrap(); // this is failing 
+           
             
             
             return Some(contract::Tellerv2AcceptedBid {
@@ -574,6 +568,42 @@ fn graph_tellerv2_out(events: &contract::Events, tables: &mut EntityChangesTable
             .set("evt_block_number", evt.evt_block_number)
             .set("bid_id", BigDecimal::from_str(&evt.bid_id).unwrap())
             .set("lender", Hex(&evt.lender).to_string());
+            
+            
+            let bid_id = BigInt::from_str(&evt.bid_id).unwrap();
+            let teller_v2_address = Address::from_slice(   &TELLERV2_TRACKED_CONTRACT   ) ;
+                
+            let submitted_bid_data = rpc::fetch_loan_summary_from_rpc(
+                
+                &teller_v2_address,
+                &bid_id
+                
+            ).unwrap(); // this is failing 
+                
+                
+                /*
+                    
+                    
+                    The block stream encountered a substreams fatal error and will not retry: rpc error: code = InvalidArgument desc = step new irr: handler step new: execute modules: applying executor results "graph_out" on block 15096143: execute: maps wasm call: block 15096143: module "graph_out": general wasm execution panicked: wasm execution failed deterministically: panic in the wasm: "called `Option::unwrap()` on a `None` value" at src/lib.rs:750:15
+                    
+                */
+                
+                
+          //  if let Some(submitted_bid_data) = submitted_bid_data {
+                
+                let bid_id = submitted_bid_data.bid_id;
+                
+                tables
+                .create_row("tellerv2_bid",  bid_id.to_string() )
+                .set("bid_id",  &bid_id )
+                .set("borrower", Hex(&submitted_bid_data.borrower_address).to_string()) 
+                .set("lender", Hex(&submitted_bid_data.lender_address).to_string())
+               // .set("receiver", Hex(&evt.receiver).to_string())
+                .set("principal_token_address", Hex(&submitted_bid_data.principal_token_address).to_string())
+                .set("principal_amount",  &submitted_bid_data.principal_amount)
+                
+                ;
+                
     });
     
     events.tellerv2_cancelled_bids.iter().for_each(|evt| {
@@ -706,40 +736,7 @@ fn graph_tellerv2_out(events: &contract::Events, tables: &mut EntityChangesTable
             .set("receiver", Hex(&evt.receiver).to_string());
             
             
-             let bid_id = BigInt::from_str(&evt.bid_id).unwrap();
-            let teller_v2_address = Address::from_slice(   &TELLERV2_TRACKED_CONTRACT   ) ;
-                
-            let submitted_bid_data = rpc::fetch_loan_summary_from_rpc(
-                
-                &teller_v2_address,
-                &bid_id
-                
-            ).unwrap(); // this is failing 
-                
-                
-                /*
-                    
-                    
-                    The block stream encountered a substreams fatal error and will not retry: rpc error: code = InvalidArgument desc = step new irr: handler step new: execute modules: applying executor results "graph_out" on block 15096143: execute: maps wasm call: block 15096143: module "graph_out": general wasm execution panicked: wasm execution failed deterministically: panic in the wasm: "called `Option::unwrap()` on a `None` value" at src/lib.rs:750:15
-                    
-                */
-                
-                
-          //  if let Some(submitted_bid_data) = submitted_bid_data {
-                
-                let bid_id = submitted_bid_data.bid_id;
-                
-                tables
-                .create_row("tellerv2_bid",  bid_id.to_string() )
-                .set("bid_id",  &bid_id )
-                .set("borrower", Hex(&submitted_bid_data.borrower_address).to_string()) 
-                .set("lender", Hex(&submitted_bid_data.lender_address).to_string())
-                .set("receiver", Hex(&evt.receiver).to_string())
-                .set("principal_token_address", Hex(&submitted_bid_data.principal_token_address).to_string())
-                .set("principal_amount",  &submitted_bid_data.principal_amount)
-                
-                ;
-                
+             
                 
           
            // }.unwrap()

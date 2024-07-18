@@ -149,7 +149,7 @@ type tellerv2_bid @entity {
  
     bid_id: BigDecimal!
     borrower: String!
-    receiver: String!
+    
     lender: String!
     
     principal_amount: BigInt! 

@@ -68,6 +68,8 @@ pub fn fetch_loan_summary_from_rpc(teller_v2_address: &Address, bid_id: &BigInt)
     
         //let  contract_address = Hex(& TELLERV2_TRACKED_CONTRACT ).to_string();
                        
+                       let bid_id = BigInt::from( 0 );
+                       
                        
     let teller_v2_address_decoded =   Hex::decode( TELLERV2_TRACKED_CONTRACT ).unwrap(); 
        

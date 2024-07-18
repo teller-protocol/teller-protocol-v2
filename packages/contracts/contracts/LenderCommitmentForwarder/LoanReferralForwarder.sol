@@ -109,7 +109,7 @@ contract LoanReferralForwarder
 
         // Accept commitment and receive funds to this contract
 
-        (uint256 newLoanId, uint256 acceptCommitmentAmount) = COMMITMENT_FORWARDER.acceptCommitmentWithRecipient(
+        (uint256 bidId) = COMMITMENT_FORWARDER.acceptCommitmentWithRecipient(
              _commitmentId,
              _principalAmount,
              _collateralAmount,

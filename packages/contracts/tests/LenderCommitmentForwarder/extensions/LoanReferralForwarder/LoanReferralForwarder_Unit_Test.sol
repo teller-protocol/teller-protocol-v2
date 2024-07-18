@@ -23,11 +23,13 @@ import { LoanReferralForwarder } from "../../../../contracts/LenderCommitmentFor
 
 contract LoanReferralForwarderOverride is LoanReferralForwarder {
     constructor(
-        address _tellerV2
+        address _tellerV2,
+        address _commitmentForwarder
         
     )
         LoanReferralForwarder(
-            _tellerV2
+            _tellerV2,
+            _commitmentForwarder
             
         )
     {}
@@ -56,7 +58,7 @@ contract LoanReferralForwarder_Unit_Test is Testable {
     LoanReferralForwarderOverride loanReferralForwarder;
     TellerV2SolMock tellerV2;
     WethMock wethMock;
-   // LenderCommitmentForwarderMock lenderCommitmentForwarder;
+    LenderCommitmentForwarderMock lenderCommitmentForwarder;
     MarketRegistryMock marketRegistryMock;
 
     address smartCommitmentForwarderAddress;
@@ -74,19 +76,19 @@ contract LoanReferralForwarder_Unit_Test is Testable {
 
        
        
-
+        lenderCommitmentForwarder = new LenderCommitmentForwarderMock();
      
         wethMock.deposit{ value: 100e18 }();
         wethMock.transfer(address(lender), 5e18);
         wethMock.transfer(address(borrower), 5e18);
-      //  wethMock.transfer(address(lenderCommitmentForwarder), 5e18);
+        wethMock.transfer(address(lenderCommitmentForwarder), 5e18);
 
       //  wethMock.transfer(address(aavePoolMock), 5e18);
 
         //marketRegistryMock = new MarketRegistryMock();
         loanReferralForwarder = new LoanReferralForwarderOverride(
-            address(tellerV2)
-
+            address(tellerV2),
+            address(lenderCommitmentForwarder)
         );
  
 
@@ -97,14 +99,16 @@ contract LoanReferralForwarder_Unit_Test is Testable {
         address lendingToken = address(wethMock);
         uint256 marketId = 0;
         uint256 principalAmount = 500;
-        uint32 duration = 10 days;
+        uint32 loanDuration = 10 days;
         uint16 interestRate = 100;
 
-     /*    ILenderCommitmentForwarder.Commitment
+        uint256 commitmentId = 0;
+
+        ILenderCommitmentForwarder.Commitment
             memory commitment = ILenderCommitmentForwarder.Commitment({
                 maxPrincipal: principalAmount,
                 expiration: uint32(block.timestamp + 1 days),
-                maxDuration: duration,
+                maxDuration: loanDuration,
                 minInterestRate: interestRate,
                 collateralTokenAddress: address(0),
                 collateralTokenId: 0,
@@ -117,7 +121,9 @@ contract LoanReferralForwarder_Unit_Test is Testable {
                 principalTokenAddress: lendingToken
             });
 
-        lenderCommitmentForwarder.setCommitment(0, commitment);
+        lenderCommitmentForwarder.setCommitment(commitmentId, commitment);
+
+        /* 
 
         FlashRolloverLoan_G5.AcceptCommitmentArgs
             memory commitmentArgs = FlashRolloverLoan_G5.AcceptCommitmentArgs({
@@ -139,7 +145,7 @@ contract LoanReferralForwarder_Unit_Test is Testable {
             lendingToken,
             marketId,
             principalAmount,
-            duration,
+            loanDuration,
             interestRate,
             "",
             address(borrower)
@@ -149,23 +155,30 @@ contract LoanReferralForwarder_Unit_Test is Testable {
         uint256 borrowerAmount = 5; //have to pay the aave fee..
 
         vm.prank(address(borrower));
-        IERC20(lendingToken).approve(address(flashRolloverLoan), 1e18);
+        IERC20(lendingToken).approve(address(loanReferralForwarder), 1e18);
 
         vm.prank(address(borrower));
 
-        flashRolloverLoan.rolloverLoanWithFlash(
-            address(lenderCommitmentForwarder),
-            loanId,
-            flashAmount,
-            borrowerAmount,
-            commitmentArgs
+        loanReferralForwarder.acceptCommitmentWithReferral(
+          
+          
+
+             commitmentId,
+              principalAmount,
+              100,
+              0,
+              address(0),            
+              interestRate,
+              loanDuration
+
+
         );
 
-        bool flashLoanSimpleWasCalled = aavePoolMock.flashLoanSimpleWasCalled();
+       /* bool flashLoanSimpleWasCalled = aavePoolMock.flashLoanSimpleWasCalled();
         assertTrue(
             flashLoanSimpleWasCalled,
             "flashLoanSimpleWasCalled not called"
-        );
+        );*/
     }
 
 /*

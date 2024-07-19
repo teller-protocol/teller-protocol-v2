@@ -44,9 +44,7 @@ contract LoanReferralForwarder
     /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
     ITellerV2 public immutable TELLER_V2;
     /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
-    
-    ILenderCommitmentForwarder public immutable COMMITMENT_FORWARDER;
- 
+  
   
 
     /**

@@ -23,14 +23,12 @@ import { LoanReferralForwarder } from "../../../../contracts/LenderCommitmentFor
 
 contract LoanReferralForwarderOverride is LoanReferralForwarder {
     constructor(
-        address _tellerV2,
-        address _commitmentForwarder
+        address _tellerV2
         
     )
         LoanReferralForwarder(
-            _tellerV2,
-            _commitmentForwarder
-            
+            _tellerV2
+          
         )
     {}
 
@@ -87,8 +85,7 @@ contract LoanReferralForwarder_Unit_Test is Testable {
 
         //marketRegistryMock = new MarketRegistryMock();
         loanReferralForwarder = new LoanReferralForwarderOverride(
-            address(tellerV2),
-            address(lenderCommitmentForwarder)
+            address(tellerV2) 
         );
  
 
@@ -162,8 +159,8 @@ contract LoanReferralForwarder_Unit_Test is Testable {
         loanReferralForwarder.acceptCommitmentWithReferral(
           
           
-
-             commitmentId,
+              address(lenderCommitmentForwarder),
+              commitmentId,
               principalAmount,
               100,
               0,

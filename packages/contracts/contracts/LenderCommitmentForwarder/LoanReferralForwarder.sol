@@ -10,13 +10,12 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../interfaces/ITellerV2.sol";
 import "../interfaces/IProtocolFee.sol";
 import "../interfaces/ITellerV2Storage.sol";
-import "../interfaces/IMarketRegistry.sol";
-import "../interfaces/ILenderCommitmentForwarder.sol";
+import "../interfaces/IMarketRegistry.sol"; 
 import "../interfaces/ISmartCommitmentForwarder.sol";
 import "../interfaces/IFlashRolloverLoan_G4.sol";
 import "../libraries/NumbersLib.sol";
 
-import { ILenderCommitmentForwarder_U1 } from "../interfaces/ILenderCommitmentForwarder_U1.sol";
+import { ILenderCommitmentForwarder } from "../interfaces/ILenderCommitmentForwarder.sol";
  
 /*
 
@@ -46,22 +45,9 @@ contract LoanReferralForwarder
     ITellerV2 public immutable TELLER_V2;
     /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
     
-    ILenderCommitmentForwarder_U1 public immutable COMMITMENT_FORWARDER;
+    ILenderCommitmentForwarder public immutable COMMITMENT_FORWARDER;
  
- 
-/*
-    struct AcceptCommitmentArgs {
-        uint256 commitmentId;
-        address smartCommitmentAddress;  //if this is not address(0), we will use this ! leave empty if not used. 
-        uint256 principalAmount;
-        uint256 collateralAmount;
-        uint256 collateralTokenId;
-        address collateralTokenAddress;
-        uint16 interestRate;
-        uint32 loanDuration;
-        bytes32[] merkleProof; //empty array if not used
-    }
-*/
+  
 
     /**
      *
@@ -74,18 +60,17 @@ contract LoanReferralForwarder
      */
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor(
-        address _tellerV2,
-        address _commitmentForwarder
-        
+        address _tellerV2 
+     
     ) {
         TELLER_V2 = ITellerV2(_tellerV2);
-        COMMITMENT_FORWARDER = ILenderCommitmentForwarder_U1(_commitmentForwarder);
-         
+        
     }
 
      
     function acceptCommitmentWithReferral(
-       
+        address _commitmentForwarder,
+        
         uint256 _commitmentId,
         uint256 _principalAmount,
         uint256 _collateralAmount,
@@ -105,11 +90,11 @@ contract LoanReferralForwarder
 
         // Get lending token and balance before
         address lendingToken = TELLER_V2.getLoanLendingToken(_loanId);
-    */
+      */
 
         // Accept commitment and receive funds to this contract
 
-        (uint256 bidId) = COMMITMENT_FORWARDER.acceptCommitmentWithRecipient(
+        (uint256 bidId) = ILenderCommitmentForwarder(_commitmentForwarder).acceptCommitmentWithRecipient(
              _commitmentId,
              _principalAmount,
              _collateralAmount,

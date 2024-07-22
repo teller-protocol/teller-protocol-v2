@@ -573,12 +573,12 @@ fn graph_tellerv2_out(events: &contract::Events, tables: &mut EntityChangesTable
             let bid_id = BigInt::from_str(&evt.bid_id).unwrap();
             let teller_v2_address = Address::from_slice(   &TELLERV2_TRACKED_CONTRACT   ) ;
                 
-            let submitted_bid_data = rpc::fetch_loan_summary_from_rpc(
+            let submitted_bid_data_option = rpc::fetch_loan_summary_from_rpc(
                 
                 &teller_v2_address,
                 &bid_id
                 
-            ).unwrap(); // this is failing 
+            ) ; // this is failing 
                 
                 
                 /*
@@ -590,19 +590,22 @@ fn graph_tellerv2_out(events: &contract::Events, tables: &mut EntityChangesTable
                 
                 
           //  if let Some(submitted_bid_data) = submitted_bid_data {
+                if let Some(submitted_bid_data) = submitted_bid_data_option {
+                        let bid_id = submitted_bid_data.bid_id;
+                            
+                        tables
+                        .create_row("tellerv2_bid",  bid_id.to_string() )
+                        .set("bid_id",  &bid_id )
+                        .set("borrower", Hex(&submitted_bid_data.borrower_address).to_string()) 
+                        .set("lender", Hex(&submitted_bid_data.lender_address).to_string())
+                    // .set("receiver", Hex(&evt.receiver).to_string())
+                        .set("principal_token_address", Hex(&submitted_bid_data.principal_token_address).to_string())
+                        .set("principal_amount",  &submitted_bid_data.principal_amount)
+                        
+                        ;
+                    
+                }
                 
-                let bid_id = submitted_bid_data.bid_id;
-                
-                tables
-                .create_row("tellerv2_bid",  bid_id.to_string() )
-                .set("bid_id",  &bid_id )
-                .set("borrower", Hex(&submitted_bid_data.borrower_address).to_string()) 
-                .set("lender", Hex(&submitted_bid_data.lender_address).to_string())
-               // .set("receiver", Hex(&evt.receiver).to_string())
-                .set("principal_token_address", Hex(&submitted_bid_data.principal_token_address).to_string())
-                .set("principal_amount",  &submitted_bid_data.principal_amount)
-                
-                ;
                 
     });
     

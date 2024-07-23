@@ -1,0 +1,80 @@
+{
+  "address": "0xb7fAe1B38ac960706B5a636756bF7450F7a44339",
+  "abi": [
+    {
+      "type": "constructor",
+      "stateMutability": "undefined",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "_tellerV2"
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "TELLER_V2",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "acceptCommitmentWithReferral",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "_commitmentForwarder"
+        },
+        {
+          "type": "uint256",
+          "name": "_commitmentId"
+        },
+        {
+          "type": "uint256",
+          "name": "_principalAmount"
+        },
+        {
+          "type": "uint256",
+          "name": "_collateralAmount"
+        },
+        {
+          "type": "uint256",
+          "name": "_collateralTokenId"
+        },
+        {
+          "type": "address",
+          "name": "_collateralTokenAddress"
+        },
+        {
+          "type": "uint16",
+          "name": "_interestRate"
+        },
+        {
+          "type": "uint32",
+          "name": "_loanDuration"
+        }
+      ],
+      "outputs": []
+    }
+  ],
+  "transactionHash": "0xd3a7967ea956bc10f08eedf2a9b64475a10cd83a7a4fa9435be5f6720c1006fc",
+  "receipt": {
+    "to": null,
+    "from": "0xD9B023522CeCe02251d877bb0EB4f06fDe6F98E6",
+    "blockHash": null,
+    "blockNumber": null
+  },
+  "numDeployments": 1,
+  "implementation": "0xa4A8c60Ac9E0c38f8B46316c6B3B508b3BA04415"
+}

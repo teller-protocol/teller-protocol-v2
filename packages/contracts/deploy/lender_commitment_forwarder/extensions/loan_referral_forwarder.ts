@@ -15,6 +15,9 @@ const deployFn: DeployFunction = async (hre) => {
   const tellerV2 = await hre.contracts.get('TellerV2')
    
 
+  hre.log('Deploying Loan Referral Forwarder...')
+
+
   const networkName = hre.network.name
 
   const LoanReferralForwarder = await hre.deployProxy('LoanReferralForwarder', {

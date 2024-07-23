@@ -123,6 +123,10 @@
               "name": "commitmentId"
             },
             {
+              "type": "address",
+              "name": "smartCommitmentAddress"
+            },
+            {
               "type": "uint256",
               "name": "principalAmount"
             },
@@ -237,6 +241,10 @@
               "name": "commitmentId"
             },
             {
+              "type": "address",
+              "name": "smartCommitmentAddress"
+            },
+            {
               "type": "uint256",
               "name": "principalAmount"
             },
@@ -267,12 +275,7 @@
           ]
         }
       ],
-      "outputs": [
-        {
-          "type": "uint256",
-          "name": "newLoanId_"
-        }
-      ]
+      "outputs": []
     }
   ],
   "transactionHash": "0x11917ffe904a7081d3fc8d1c6e70ceff9170aac34806ce6a42e73231c144b00f",
@@ -282,6 +285,6 @@
     "blockHash": null,
     "blockNumber": null
   },
-  "numDeployments": 3,
+  "numDeployments": 4,
   "implementation": "0x8b0b2A4c1f4d0f9B60C0815A31B3830E0C9E06a2"
 }

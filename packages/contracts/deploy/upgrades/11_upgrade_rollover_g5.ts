@@ -39,7 +39,7 @@ const deployFn: DeployFunction = async (hre) => {
           unsafeAllow: ['constructor', 'state-variable-immutable'],
           constructorArgs: [
             await tellerV2.getAddress(),
-            await LenderCommitmentForwarderStaging.getAddress(),
+         //   await LenderCommitmentForwarderStaging.getAddress(),
             aavePoolAddressProvider[networkName],
           ],
         },

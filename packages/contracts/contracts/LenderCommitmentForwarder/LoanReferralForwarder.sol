@@ -11,13 +11,16 @@ import "../interfaces/ITellerV2.sol";
 import "../interfaces/IProtocolFee.sol";
 import "../interfaces/ITellerV2Storage.sol";
 import "../interfaces/IMarketRegistry.sol"; 
+import "../interfaces/ISmartCommitment.sol";
 import "../interfaces/ISmartCommitmentForwarder.sol";
 import "../interfaces/IFlashRolloverLoan_G4.sol";
 import "../libraries/NumbersLib.sol";
 
 import { ILenderCommitmentForwarder } from "../interfaces/ILenderCommitmentForwarder.sol";
  
- 
+import { ILenderCommitmentForwarder_U1 } from "../interfaces/ILenderCommitmentForwarder_U1.sol";
+
+
 
 
 contract LoanReferralForwarder  
@@ -73,28 +76,28 @@ contract LoanReferralForwarder
         uint32 _loanDuration,
 
         address _recipient,
-        uint256 _minAmountReceived,
+      //  uint256 _minAmountReceived,
 
         uint256 _reward,
         address _rewardRecipient
 
     ) external   {
 
-
-        /*
-            I need to somehow know the principal token address here ? 
-
-        Not sufficient to let the caller decide . 
-        */
-       
-       
-        // Accept commitment and receive funds to this contract
-        uint256 balanceBefore = IERC20(_principalToken).balanceOf(address(this));
-
+ 
+         address principalTokenAddress = address(0);
+         uint256 balanceBefore;
+         
         if (_smartCommitmentAddress != address(0)) {
+
+         
+                principalTokenAddress = ISmartCommitment(_smartCommitmentAddress).getPrincipalTokenAddress ();
         
-                (uint256 bidId) = ISmartCommitmentForwarder(_smartCommitmentAddress).acceptSmartCommitmentWithRecipient(
-                
+            // Accept commitment and receive funds to this contract
+                balanceBefore = IERC20(principalTokenAddress).balanceOf(address(this));
+
+        
+                (uint256 bidId) = ISmartCommitmentForwarder(_commitmentForwarder).acceptSmartCommitmentWithRecipient(
+                _smartCommitmentAddress,
                 _principalAmount,
                 _collateralAmount,
                 _collateralTokenId,
@@ -104,9 +107,12 @@ contract LoanReferralForwarder
                 _loanDuration
             );
         
-        }else{
-
-
+        }else{  
+              principalTokenAddress = ILenderCommitmentForwarder_U1(_smartCommitmentAddress).getCommitmentPrincipalTokenAddress (_commitmentId);
+        
+            // Accept commitment and receive funds to this contract
+              balanceBefore = IERC20(principalTokenAddress).balanceOf(address(this));
+ 
             (uint256 bidId) = ILenderCommitmentForwarder(_commitmentForwarder).acceptCommitmentWithRecipient(
                 _commitmentId,
                 _principalAmount,
@@ -122,21 +128,21 @@ contract LoanReferralForwarder
         //at this point, this contract has received acceptCommitmentAmount tokens.  So the majority of them should be sent to the msg.sender (borrower) 
 
 
-         uint256 balanceAfter = IERC20(_principalToken).balanceOf(address(this));
+         uint256 balanceAfter = IERC20(principalTokenAddress).balanceOf(address(this));
 
          uint256 fundsRemaining = balanceAfter - balanceBefore;
 
-         require(  fundsRemaining >= _minAmountReceived, "Insufficient funds received" );
+        // require(  fundsRemaining >= _minAmountReceived, "Insufficient funds received" );
 
          
-         IERC20Upgradeable(_principalToken).transfer(
+         IERC20Upgradeable(principalTokenAddress).transfer(
                 _rewardRecipient,
                 _reward
           );
 
-         IERC20Upgradeable(_principalToken).transfer(
+         IERC20Upgradeable(principalTokenAddress).transfer(
                 _recipient,
-                fundsRemaining - reward
+                fundsRemaining - _reward
           );
 
 

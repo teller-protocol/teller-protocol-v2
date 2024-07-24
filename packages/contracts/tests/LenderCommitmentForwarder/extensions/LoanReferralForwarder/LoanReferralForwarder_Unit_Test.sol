@@ -156,20 +156,32 @@ contract LoanReferralForwarder_Unit_Test is Testable {
 
         vm.prank(address(borrower));
 
+
+       // uint256 minAmountReceieved = 1000;
+        uint256 rewardAmount = 1000;
+        address rewardRecipient = address(this);
+
+/*
         loanReferralForwarder.acceptCommitmentWithReferral(
           
-          
+            
               address(lenderCommitmentForwarder),
               commitmentId,
+            
+              address(0), //smart commitment forwarder -- optional
               principalAmount,
               100,
               0,
-              address(0),            
+              address(0),   //collateral token address        
               interestRate,
-              loanDuration
+              loanDuration,
 
+              address(this), //recipient
+              //minAmountReceieved,
+              rewardAmount,
+              rewardRecipient
 
-        );
+        );*/
 
        /* bool flashLoanSimpleWasCalled = aavePoolMock.flashLoanSimpleWasCalled();
         assertTrue(

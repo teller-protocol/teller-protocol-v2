@@ -918,10 +918,19 @@ contract LenderCommitmentForwarder_U1 is
     function getCommitmentPrincipalTokenAddress(uint256 _commitmentId)
         external
         view
-        returns (uint256)
+        returns (address)
     {
-        return commitments[_commitmentId].principalToken;
+        return commitments[_commitmentId].principalTokenAddress;
     }
+
+    function getCommitmentCollateralTokenAddress(uint256 _commitmentId)
+        external
+        view
+        returns (address)
+    {
+        return commitments[_commitmentId].collateralTokenAddress;
+    }
+
 
 
     //Overrides

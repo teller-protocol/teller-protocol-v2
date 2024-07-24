@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
  
-import "./FlashRolloverLoan_G5.sol";
+import "./FlashRolloverLoan_G6.sol";
 
 contract FlashRolloverLoanWidget is FlashRolloverLoan_G6 {
     constructor(

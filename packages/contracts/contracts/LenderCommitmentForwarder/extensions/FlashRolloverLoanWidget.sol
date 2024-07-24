@@ -8,7 +8,7 @@ contract FlashRolloverLoanWidget is FlashRolloverLoan_G6 {
         address _tellerV2,
         address _poolAddressesProvider
     )
-        FlashRolloverLoan_G5(
+        FlashRolloverLoan_G6(
             _tellerV2,
             _poolAddressesProvider
         )

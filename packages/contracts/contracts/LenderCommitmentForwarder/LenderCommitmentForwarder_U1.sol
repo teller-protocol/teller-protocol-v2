@@ -915,6 +915,15 @@ contract LenderCommitmentForwarder_U1 is
         return commitments[_commitmentId].maxPrincipal;
     }
 
+    function getCommitmentPrincipalTokenAddress(uint256 _commitmentId)
+        external
+        view
+        returns (uint256)
+    {
+        return commitments[_commitmentId].principalToken;
+    }
+
+
     //Overrides
     function _msgSender()
         internal

@@ -50,6 +50,12 @@ contract LoanReferralForwarder
     }
 
      
+
+     /*
+
+            PROBLEM: how do i know the token ?
+
+     */
     function acceptCommitmentWithReferral(
         address _commitmentForwarder,
         uint256 _commitmentId,
@@ -57,7 +63,7 @@ contract LoanReferralForwarder
         address _smartCommitmentAddress,  //leave 0 if using a commitmentForwarder
         
 
-        address _principalToken,
+//     address _principalToken,
         uint256 _principalAmount,
         uint256 _collateralAmount,
         uint256 _collateralTokenId,
@@ -73,6 +79,13 @@ contract LoanReferralForwarder
         address _rewardRecipient
 
     ) external   {
+
+
+        /*
+            I need to somehow know the principal token address here ? 
+
+        Not sufficient to let the caller decide . 
+        */
        
        
         // Accept commitment and receive funds to this contract
@@ -90,8 +103,6 @@ contract LoanReferralForwarder
                 _interestRate,
                 _loanDuration
             );
-
-        
         
         }else{
 

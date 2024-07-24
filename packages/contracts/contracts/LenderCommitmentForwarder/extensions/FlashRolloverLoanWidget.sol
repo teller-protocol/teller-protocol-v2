@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
  
 import "./FlashRolloverLoan_G5.sol";
 
-contract FlashRolloverLoanWidget is FlashRolloverLoan_G5 {
+contract FlashRolloverLoanWidget is FlashRolloverLoan_G6 {
     constructor(
         address _tellerV2,
         address _poolAddressesProvider

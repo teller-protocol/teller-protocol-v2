@@ -17,23 +17,7 @@ import "../libraries/NumbersLib.sol";
 
 import { ILenderCommitmentForwarder } from "../interfaces/ILenderCommitmentForwarder.sol";
  
-/*
-
-
-GENERAL IDEA: 
-
-
-This will be on a similar level as FlashRolloverLoan
-
-
-This will call acceptCommitmentWithRecipient and this contract will be the recipient
-When the funds are received, it will distribute some of them to the referrer 
-
-
-
-*/
  
-
 
 
 contract LoanReferralForwarder  
@@ -68,43 +52,81 @@ contract LoanReferralForwarder
      
     function acceptCommitmentWithReferral(
         address _commitmentForwarder,
-        
         uint256 _commitmentId,
+
+        address _smartCommitmentAddress,  //leave 0 if using a commitmentForwarder
+        
+
+        address _principalToken,
         uint256 _principalAmount,
         uint256 _collateralAmount,
         uint256 _collateralTokenId,
         address _collateralTokenAddress,
         
         uint16 _interestRate,
-        uint32 _loanDuration
+        uint32 _loanDuration,
+
+        address _recipient,
+        uint256 _minAmountReceived,
+
+        uint256 _reward,
+        address _rewardRecipient
 
     ) external   {
        
        
-       /* address borrower = TELLER_V2.getLoanBorrower(_loanId);
-        require(borrower == msg.sender, "CommitmentRolloverLoan: not borrower");
-        // why is this needed ? 
-
-
-        // Get lending token and balance before
-        address lendingToken = TELLER_V2.getLoanLendingToken(_loanId);
-      */
-
         // Accept commitment and receive funds to this contract
+        uint256 balanceBefore = IERC20(_principalToken).balanceOf(address(this));
 
-        (uint256 bidId) = ILenderCommitmentForwarder(_commitmentForwarder).acceptCommitmentWithRecipient(
-             _commitmentId,
-             _principalAmount,
-             _collateralAmount,
-             _collateralTokenId,
-             _collateralTokenAddress,
-             address(this), //this contract is the recipient ,
-             _interestRate,
-             _loanDuration
-        );
+        if (_smartCommitmentAddress != address(0)) {
+        
+                (uint256 bidId) = ISmartCommitmentForwarder(_smartCommitmentAddress).acceptSmartCommitmentWithRecipient(
+                
+                _principalAmount,
+                _collateralAmount,
+                _collateralTokenId,
+                _collateralTokenAddress,
+                address(this), //this contract is the recipient ,
+                _interestRate,
+                _loanDuration
+            );
+
+        
+        
+        }else{
 
 
+            (uint256 bidId) = ILenderCommitmentForwarder(_commitmentForwarder).acceptCommitmentWithRecipient(
+                _commitmentId,
+                _principalAmount,
+                _collateralAmount,
+                _collateralTokenId,
+                _collateralTokenAddress,
+                address(this), //this contract is the recipient ,
+                _interestRate,
+                _loanDuration
+            );
+
+        }
         //at this point, this contract has received acceptCommitmentAmount tokens.  So the majority of them should be sent to the msg.sender (borrower) 
+
+
+         uint256 balanceAfter = IERC20(_principalToken).balanceOf(address(this));
+
+         uint256 fundsRemaining = balanceAfter - balanceBefore;
+
+         require(  fundsRemaining >= _minAmountReceived, "Insufficient funds received" );
+
+         
+         IERC20Upgradeable(_principalToken).transfer(
+                _rewardRecipient,
+                _reward
+          );
+
+         IERC20Upgradeable(_principalToken).transfer(
+                _recipient,
+                fundsRemaining - reward
+          );
 
 
 

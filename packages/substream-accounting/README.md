@@ -45,7 +45,7 @@ make && make build && make pack
 graph auth --studio  
  graph deploy --studio tellerv2-accounting
  
- 0.4.21.6
+ 0.4.21.16
 
 
 

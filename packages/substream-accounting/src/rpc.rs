@@ -79,7 +79,7 @@ pub fn fetch_loan_summary_from_rpc(teller_v2_address: &Address, bid_id: &BigInt)
     
      
 
-      let (
+     if let Some((
         borrower_address,
         lender_address,
         market_id,
@@ -88,9 +88,9 @@ pub fn fetch_loan_summary_from_rpc(teller_v2_address: &Address, bid_id: &BigInt)
         accepted_timestamp,
         last_repaid_timestamp,
         bid_state
-        )  = loan_summary_function.call(
+        ))  = loan_summary_function.call(
         teller_v2_address_decoded.clone()
-    ) .unwrap();
+    )  {
       
     return Some(  
         LoanSummaryData{ 
@@ -107,6 +107,10 @@ pub fn fetch_loan_summary_from_rpc(teller_v2_address: &Address, bid_id: &BigInt)
              
         }
     ); 
+    }
+    
+    
+    None
  
  
 } 

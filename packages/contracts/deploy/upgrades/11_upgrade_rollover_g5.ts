@@ -19,9 +19,7 @@ const deployFn: DeployFunction = async (hre) => {
 
   const flashRolloverLoan = await hre.contracts.get('FlashRolloverLoan')
   const tellerV2 = await hre.contracts.get('TellerV2')
-  const LenderCommitmentForwarderStaging = await hre.contracts.get(
-    'LenderCommitmentForwarderStaging'
-  )
+   
 
   await hre.upgrades.proposeBatchTimelock({
     title: 'Flash Rollover Loan Extension Upgrade',
@@ -39,7 +37,7 @@ const deployFn: DeployFunction = async (hre) => {
           unsafeAllow: ['constructor', 'state-variable-immutable'],
           constructorArgs: [
             await tellerV2.getAddress(),
-         //   await LenderCommitmentForwarderStaging.getAddress(),
+         
             aavePoolAddressProvider[networkName],
           ],
         },
@@ -72,7 +70,7 @@ deployFn.dependencies = [
 deployFn.skip = async (hre) => {
   return !(
     hre.network.live &&
-    ['mainnet', 'polygon', 'arbitrum', 'base', 'goerli', 'sepolia'].includes(
+    [ 'goerli', 'sepolia'].includes(
       hre.network.name
     )
   )

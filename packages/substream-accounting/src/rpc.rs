@@ -61,7 +61,10 @@ pub struct LoanSummaryData {
 
 const TELLERV2_TRACKED_CONTRACT: &str =  "00182FdB0B880eE24D428e3Cc39383717677C37e" ;
 
+/*
 
+This needs to be optional!!  The getLoanSummary method has not always existed on the contract. 
+*/
 pub fn fetch_loan_summary_from_rpc(teller_v2_address: &Address, bid_id: &BigInt) -> Option<LoanSummaryData> {
             
     

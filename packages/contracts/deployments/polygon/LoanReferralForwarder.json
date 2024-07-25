@@ -1,5 +1,5 @@
 {
-  "address": "0xb7fAe1B38ac960706B5a636756bF7450F7a44339",
+  "address": "0x48EA70BCe76FE2F0c79B29Bf852a1DCF957982aa",
   "abi": [
     {
       "type": "constructor",
@@ -41,6 +41,10 @@
           "name": "_commitmentId"
         },
         {
+          "type": "address",
+          "name": "_smartCommitmentAddress"
+        },
+        {
           "type": "uint256",
           "name": "_principalAmount"
         },
@@ -63,12 +67,24 @@
         {
           "type": "uint32",
           "name": "_loanDuration"
+        },
+        {
+          "type": "address",
+          "name": "_recipient"
+        },
+        {
+          "type": "uint256",
+          "name": "_reward"
+        },
+        {
+          "type": "address",
+          "name": "_rewardRecipient"
         }
       ],
       "outputs": []
     }
   ],
-  "transactionHash": "0xd3a7967ea956bc10f08eedf2a9b64475a10cd83a7a4fa9435be5f6720c1006fc",
+  "transactionHash": "0x54b1b5d4b9c01316987203019b7d3f068f1c2449c27f2df133048ff326d579b5",
   "receipt": {
     "to": null,
     "from": "0xD9B023522CeCe02251d877bb0EB4f06fDe6F98E6",
@@ -76,5 +92,5 @@
     "blockNumber": null
   },
   "numDeployments": 1,
-  "implementation": "0xa4A8c60Ac9E0c38f8B46316c6B3B508b3BA04415"
+  "implementation": "0xC764a44Faa62dB04310e0c8eA8d56FDC411e3e31"
 }

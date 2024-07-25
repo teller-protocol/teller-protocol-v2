@@ -147,10 +147,10 @@ type tellerv2_unpaused @entity {
 type tellerv2_bid @entity {
     id: ID!
  
-    bid_id: BigDecimal!
+    bid_id: BigInt!
     borrower: String!
     
     lender: String!
-    
+    principal_token_address: String! 
     principal_amount: BigInt! 
 }

@@ -1,6 +1,17 @@
 
 
 
+initial block WAS 
+
+15094701
+
+
+
+
+use this block for testing !!   it gets faster results for now 
+19094701
+
+
 ## Substreams Accounting 
 
 

@@ -47,13 +47,17 @@ impl ReservesData{
 
 // Function to fetch the reserves from a Uniswap V2 pair contract
 pub fn fetch_reserves_from_pair(pair_address: &Address) -> Option<ReservesData> {
-    let pair_address_decoded = Hex::decode( pair_address ).unwrap();
+    //let pair_address_decoded = Hex::decode( pair_address ).unwrap();
+    
+     let pair_address_bytes = pair_address.as_bytes().to_vec();
 
+   
+    
     // Define the getReserves function call
     let get_reserves_function = abi::uniswapv2_pair::functions::GetReserves {};
 
     // Call the getReserves function and fetch the reserves data
-    if let Some((reserve0, reserve1, block_timestamp_last)) = get_reserves_function.call(pair_address_decoded.clone()) {
+    if let Some((reserve0, reserve1, block_timestamp_last)) = get_reserves_function.call( pair_address_bytes.clone()) {
         return Some(ReservesData {
             reserve0: BigInt::from(reserve0),
             reserve1: BigInt::from(reserve1),

@@ -6,9 +6,13 @@ use std::fs;
 fn main() -> Result<(), anyhow::Error> {
     let file_names = [
         "abi/tellerv2_contract.abi.json",
+         "abi/uniswapv2_factory.abi.json",
+         "abi/uniswapv2_pair.abi.json",
     ];
     let file_output_names = [
         "src/abi/tellerv2_contract.rs",
+          "src/abi/uniswapv2_factory.rs",
+            "src/abi/uniswapv2_pair.rs",
     ];
 
     let mut i = 0;

@@ -578,7 +578,7 @@ fn graph_tellerv2_out(events: &contract::Events, tables: &mut EntityChangesTable
             let bid_id = BigInt::from_str(&evt.bid_id).unwrap();
             let teller_v2_address = Address::from_slice(   &TELLERV2_TRACKED_CONTRACT   ) ;
                 
-            let submitted_bid_data_option = rpc::fetch_loan_summary_from_rpc(
+            let submitted_bid_data_option = rpc::tellerv2::fetch_loan_summary_from_rpc(
                 
                 &teller_v2_address,
                 &bid_id

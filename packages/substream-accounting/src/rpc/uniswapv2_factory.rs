@@ -26,9 +26,9 @@ pub fn fetch_pair_from_factory(factory_address: &Address, token_a: &Address, tok
     let factory_address_decoded = Hex::decode( factory_address ).unwrap();   //is this ok ?
 
     // Define the getPair function call
-    let get_pair_function = abi::uniswap_v2_factory::functions::GetPair {
-        token_a: *token_a,
-        token_b: *token_b,
+    let get_pair_function = abi::uniswapv2_factory::functions::GetPair {
+        param0: *token_a,
+        param1: *token_b,
     };
 
     // Call the getPair function and fetch the pair address

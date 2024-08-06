@@ -23,8 +23,11 @@ use hex_literal::hex;
 
 // Function to fetch the pair address from Uniswap V2 Factory contract
 pub fn fetch_pair_from_factory(factory_address: &Address, token_a: &Address, token_b: &Address) -> Option<Address> {
-    let factory_address_decoded = Hex::decode( factory_address.to_string() ).unwrap();   //  invalid af ? 
+    //let factory_address_decoded = Hex::decode( factory_address ).unwrap();   //  invalid a
 
+ let factory_address_bytes = factory_address.as_bytes().to_vec();
+
+        
     // Define the getPair function call
     let get_pair_function = abi::uniswapv2_factory::functions::GetPair {
         param0: token_a.as_bytes().to_vec(),
@@ -32,7 +35,7 @@ pub fn fetch_pair_from_factory(factory_address: &Address, token_a: &Address, tok
     };
 
     // Call the getPair function and fetch the pair address
-    if let Some(pair_address) = get_pair_function.call(factory_address_decoded.clone()) {
+    if let Some(pair_address) = get_pair_function.call(factory_address_bytes.clone()) {
         return Some(  H160::from_slice(&pair_address)  );
     }
 

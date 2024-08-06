@@ -599,7 +599,7 @@ fn store_token_interaction_deltas(
         ) ; 
             
         if let Some(submitted_bid_data) = submitted_bid_data_option {   
-            let store_key: String = submitted_bid_data.principal_token_address.to_string();
+            let store_key: String = format!("{:x}", submitted_bid_data.principal_token_address)  ;
             token_address_delta_store.add(ord,&store_key, BigInt::one() );
             
             activity_occured = true ;
@@ -624,7 +624,7 @@ fn store_token_interaction_deltas(
         ) ; 
             
         if let Some(submitted_bid_data) = submitted_bid_data_option {   
-             let store_key: String = submitted_bid_data.principal_token_address.to_string();
+             let store_key: String = format!("{:x}", submitted_bid_data.principal_token_address)  ;
             token_address_delta_store.add(ord,&store_key, BigInt::one() );
             
             
@@ -649,7 +649,7 @@ fn store_token_interaction_deltas(
         ) ; 
             
         if let Some(submitted_bid_data) = submitted_bid_data_option {   
-             let store_key: String = submitted_bid_data.principal_token_address.to_string();
+             let store_key: String = format!("{:x}", submitted_bid_data.principal_token_address)  ;
             token_address_delta_store.add(ord,&store_key, BigInt::one() );
             
             
@@ -671,7 +671,7 @@ fn store_token_interaction_deltas(
         ) ; 
             
         if let Some(submitted_bid_data) = submitted_bid_data_option {   
-             let store_key: String = submitted_bid_data.principal_token_address.to_string();
+             let store_key: String =  format!("{:x}", submitted_bid_data.principal_token_address)  ;
             token_address_delta_store.add(ord,&store_key, BigInt::one() );
             
             
@@ -1019,7 +1019,7 @@ fn graph_tellerv2_out(
              
              
                   tables
-                        .create_row("token_price",  token_address.to_string() )
+                        .create_row("token_price",  token_address.clone() )
                         .set("base_token_address",  token_address )
                         .set("reference_token_address",  WETH_ADDRESS ) 
                         .set("price_ratio",  token_price.to_string() )

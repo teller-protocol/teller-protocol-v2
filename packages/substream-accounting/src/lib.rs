@@ -19,6 +19,9 @@ use substreams::scalar::{BigDecimal,BigInt};
 
 substreams_ethereum::init!();
 
+use substreams::prelude::*;
+
+
 
 //these are both mainet 
 const TELLERV2_TRACKED_CONTRACT: [u8; 20] = hex!("00182fdb0b880ee24d428e3cc39383717677c37e");
@@ -562,7 +565,211 @@ fn db_tellerv2_out(events: &contract::Events, tables: &mut DatabaseChangeTables)
 }
 */
 
+
+
+
+/*
+
+any block wiht any activity -- get price of ETH / USDC ? as multiplier.. 
+*/
+
+#[substreams::handlers::store]
+fn store_token_interaction_deltas(
+    events:  contract::Events, 
+   
+    token_address_delta_store: StoreAddBigInt //just use a flag..   key is address as string 
+) {
+    
+    
+     //FOR NOW .. CAN CAUSE ISSUES 
+    let ord = 0;
+    
+    let mut activity_occured = false ;
+    
+    events.tellerv2_submitted_bids.iter().for_each(|evt| {
+        
+        let bid_id = BigInt::from_str(&evt.bid_id).unwrap();
+        let teller_v2_address = Address::from_slice(   &TELLERV2_TRACKED_CONTRACT   ) ;
+                      
+                    // this fails for very old bids as this fn wasnt added until later 
+        let submitted_bid_data_option = rpc::tellerv2::fetch_loan_summary_from_rpc(
+                &teller_v2_address,
+                &bid_id
+                
+        ) ; 
+            
+        if let Some(submitted_bid_data) = submitted_bid_data_option {   
+            let store_key: String = format!("{}",submitted_bid_data.principal_token_address);
+            token_address_delta_store.add(ord,&store_key, BigInt::one() );
+            
+            activity_occured = true ;
+        }
+            
+          
+            
+    });
+    
+    // Loop over all the abis events to create table changes
+    events.tellerv2_accepted_bids.iter().for_each(|evt| {
+         
+              
+        let bid_id = BigInt::from_str(&evt.bid_id).unwrap();
+        let teller_v2_address = Address::from_slice(   &TELLERV2_TRACKED_CONTRACT   ) ;
+                      
+                    // this fails for very old bids as this fn wasnt added until later 
+        let submitted_bid_data_option = rpc::tellerv2::fetch_loan_summary_from_rpc(
+                &teller_v2_address,
+                &bid_id
+                
+        ) ; 
+            
+        if let Some(submitted_bid_data) = submitted_bid_data_option {   
+            let store_key: String = format!("{}",submitted_bid_data.principal_token_address);
+            token_address_delta_store.add(ord,&store_key, BigInt::one() );
+            
+            
+            
+            activity_occured = true ;
+        }
+                
+    });
+    
+    
+    
+    events.tellerv2_loan_liquidateds.iter().for_each(|evt| {
+       
+        let bid_id = BigInt::from_str(&evt.bid_id).unwrap();
+        let teller_v2_address = Address::from_slice(   &TELLERV2_TRACKED_CONTRACT   ) ;
+                      
+                    // this fails for very old bids as this fn wasnt added until later 
+        let submitted_bid_data_option = rpc::tellerv2::fetch_loan_summary_from_rpc(
+                &teller_v2_address,
+                &bid_id
+                
+        ) ; 
+            
+        if let Some(submitted_bid_data) = submitted_bid_data_option {   
+            let store_key: String = format!("{}",submitted_bid_data.principal_token_address);
+            token_address_delta_store.add(ord,&store_key, BigInt::one() );
+            
+            
+            activity_occured = true ;
+        }
+        
+    });
+    events.tellerv2_loan_repaids.iter().for_each(|evt| {
+       
+            
+        let bid_id = BigInt::from_str(&evt.bid_id).unwrap();
+        let teller_v2_address = Address::from_slice(   &TELLERV2_TRACKED_CONTRACT   ) ;
+                      
+                    // this fails for very old bids as this fn wasnt added until later 
+        let submitted_bid_data_option = rpc::tellerv2::fetch_loan_summary_from_rpc(
+                &teller_v2_address,
+                &bid_id
+                
+        ) ; 
+            
+        if let Some(submitted_bid_data) = submitted_bid_data_option {   
+            let store_key: String = format!("{}",submitted_bid_data.principal_token_address);
+            token_address_delta_store.add(ord,&store_key, BigInt::one() );
+            
+            
+            activity_occured = true ;
+        }
+        
+        
+    });
+    
+    
+    if activity_occured {
+        
+        
+        
+        let USDC_ADDRESS = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48";
+        
+        //add usdc as a delta ! 
+        
+          let store_key: String = format!("{}",USDC_ADDRESS );
+        
+         token_address_delta_store.add(ord,&store_key, BigInt::one() );
+            
+    }
+    
+    
+    
+    
+}
+
+
+
+ 
+    
+    
+
+
+#[substreams::handlers::store]
+fn store_uniswap_prices_for_tokens(   //uses rpc !! heavily 
+     
+    token_address_delta_store: Deltas<DeltaBigInt>,  //each key of the delta array represents a tokenAddress that we need to get price for ..
+   
+    bigint_set_store: StoreSetFloat64 //for block time and block number 
+) {
+    
+    
+    
+    let ord = 0; // FOR NOW - CAN CAUSE ISSUES - GET FROM LOG AND STUFF INTO EVENT    
+    
+        
+        //always compare to ETH ! 
+     for token_address_delta in token_address_delta_store.iter(){
+         
+         
+        let token_address = &token_address_delta.key;
+         
+         let mut price_ratio_to_base_currency:Option<f64> = None;
+         
+         
+            //do rpc calls 
+         
+         
+         if let Some( price_ratio_to_base_currency )= price_ratio_to_base_currency {
+             bigint_set_store.set(ord, token_address.clone(), &price_ratio_to_base_currency  )  ;
+         }
+         
+     }
+     
+     
+     
+     
+    
+ 
+    
+    
+}
+
 fn graph_tellerv2_out(events: &contract::Events, tables: &mut EntityChangesTables) {
+    
+    events.tellerv2_submitted_bids.iter().for_each(|evt| {
+        tables
+            .create_row("tellerv2_submitted_bid", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
+            .set("evt_tx_hash", &evt.evt_tx_hash)
+            .set("evt_index", evt.evt_index)
+            .set("evt_block_time", evt.evt_block_time.as_ref().unwrap())
+            .set("evt_block_number", evt.evt_block_number)
+            .set("bid_id", BigDecimal::from_str(&evt.bid_id).unwrap())
+            .set("borrower", Hex(&evt.borrower).to_string())
+            .set("metadata_uri", Hex(&evt.metadata_uri).to_string())
+            .set("receiver", Hex(&evt.receiver).to_string());
+            
+            
+             
+                
+          
+           // }.unwrap()
+            
+    });
+    
     // Loop over all the abis events to create table changes
     events.tellerv2_accepted_bids.iter().for_each(|evt| {
         tables
@@ -577,13 +784,15 @@ fn graph_tellerv2_out(events: &contract::Events, tables: &mut EntityChangesTable
             
             let bid_id = BigInt::from_str(&evt.bid_id).unwrap();
             let teller_v2_address = Address::from_slice(   &TELLERV2_TRACKED_CONTRACT   ) ;
-                
+                    
+                    
+                    // this fails for very old bids as this fn wasnt added until later 
             let submitted_bid_data_option = rpc::tellerv2::fetch_loan_summary_from_rpc(
                 
                 &teller_v2_address,
                 &bid_id
                 
-            ) ; // this is failing 
+            ) ; 
                 
                 
                 /*
@@ -731,25 +940,7 @@ fn graph_tellerv2_out(events: &contract::Events, tables: &mut EntityChangesTable
             .set("new_fee", evt.new_fee)
             .set("old_fee", evt.old_fee);
     });
-    events.tellerv2_submitted_bids.iter().for_each(|evt| {
-        tables
-            .create_row("tellerv2_submitted_bid", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
-            .set("evt_tx_hash", &evt.evt_tx_hash)
-            .set("evt_index", evt.evt_index)
-            .set("evt_block_time", evt.evt_block_time.as_ref().unwrap())
-            .set("evt_block_number", evt.evt_block_number)
-            .set("bid_id", BigDecimal::from_str(&evt.bid_id).unwrap())
-            .set("borrower", Hex(&evt.borrower).to_string())
-            .set("metadata_uri", Hex(&evt.metadata_uri).to_string())
-            .set("receiver", Hex(&evt.receiver).to_string());
-            
-            
-             
-                
-          
-           // }.unwrap()
-            
-    });
+
     events.tellerv2_trusted_market_forwarder_sets.iter().for_each(|evt| {
         tables
             .create_row("tellerv2_trusted_market_forwarder_set", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))

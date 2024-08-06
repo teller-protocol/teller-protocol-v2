@@ -28,7 +28,28 @@ modules:
       - source: sf.ethereum.type.v2.Block
     output:
       type: proto:contract.v1.Events
+    
+      
+  - name: store_token_interaction_deltas
+    kind: store
+    initialBlock: 15094701
+    updatePolicy: add
+    valueType: address
+    inputs:
+      - map: map_events
+      
+      
+      
+  - name: store_uniswap_prices_for_tokens
+    kind: store
+    initialBlock: 15094701
+    updatePolicy: set
+    valueType: float64
+    inputs: 
+      - store: store_token_interaction_deltas
+        mode: deltas
 
+  
  
   - name: graph_out
     kind: map

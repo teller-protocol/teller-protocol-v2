@@ -19,7 +19,7 @@ pub struct ReservesData {
 //const UNISWAP_V2_PAIR_ADDRESS: &str = "YOUR_UNISWAP_V2_PAIR_ADDRESS_HERE";
 
 // Function to fetch the reserves from a Uniswap V2 pair contract
-pub fn fetch_reserves_from_rpc(pair_address: &Address) -> Option<ReservesData> {
+pub fn fetch_reserves_from_pair(pair_address: &Address) -> Option<ReservesData> {
     let pair_address_decoded = Hex::decode( pair_address ).unwrap();
 
     // Define the getReserves function call

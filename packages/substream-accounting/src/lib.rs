@@ -720,6 +720,9 @@ fn store_uniswap_prices_for_tokens(   //uses rpc !! heavily
     
     let ord = 0; // FOR NOW - CAN CAUSE ISSUES - GET FROM LOG AND STUFF INTO EVENT    
     
+    
+    let WETH_ADDRESS = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2";
+    
         
         //always compare to ETH ! 
      for token_address_delta in token_address_delta_store.iter(){
@@ -729,6 +732,25 @@ fn store_uniswap_prices_for_tokens(   //uses rpc !! heavily
          
          let mut price_ratio_to_base_currency:Option<f64> = None;
          
+         
+            let pair_address_option = rpc::uniswapv2_factory::fetch_pair_from_factory(
+                UNISWAPV2_FACTORY_CONTRACT,
+                WETH_ADDRESS,
+                token_address                                
+            );
+            
+            if let Some(pair_address) = pair_address_option {
+                
+                let reserves_data_option = rpc::uniswapv2_pair::fetch_reserves_from_pair( pair_address   );
+                
+                if let Some(reserves_data) = reserves_data_option {
+                        
+                        //doesnt ordering matter?? have to figure this out 
+                    price_ratio_to_base_currency = reserves_data.get_price_ratio( ) ;
+                    
+                }
+                
+            }
          
             //do rpc calls 
          

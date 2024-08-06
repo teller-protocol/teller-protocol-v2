@@ -16,6 +16,29 @@ pub struct ReservesData {
     pub block_timestamp_last: BigInt,
 }
 
+
+/*
+
+Token Order: In the Uniswap V2 pair contract, the token addresses are stored in sorted order. Specifically, token0 and token1 are set such that token0 has a smaller address value than token1. This order is consistent and does not depend on the reserves or any other runtime state.
+
+Reserves Mapping: The reserve0 value always corresponds to token0, and reserve1 corresponds to token1. Thus, if you know the tokens in the pair, you can determine which reserve corresponds to which token.
+
+*/
+impl ReservesData{
+    
+    pub fn get_price_ratio(&self) -> f64 {
+        let reserve0:f64 = self.reserve0.into();
+        let reserve1:f64 = self.reserve1.into();
+        if reserve0 == 0.0 {
+            return 0.0; // Avoid division by zero
+        }
+        reserve1 / reserve0
+        
+        
+    }
+    
+}
+
 //const UNISWAP_V2_PAIR_ADDRESS: &str = "YOUR_UNISWAP_V2_PAIR_ADDRESS_HERE";
 
 // Function to fetch the reserves from a Uniswap V2 pair contract

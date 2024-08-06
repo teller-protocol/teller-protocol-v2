@@ -26,7 +26,7 @@ use substreams::prelude::*;
 //these are both mainet 
 const TELLERV2_TRACKED_CONTRACT: [u8; 20] = hex!("00182fdb0b880ee24d428e3cc39383717677c37e");
 
-const UNISWAPV2_FACTORY_CONTRACT: [u8; 20] = hex!("5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f");
+const UNISWAPV2_FACTORY_CONTRACT :&str = "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f";
 
 
 fn map_tellerv2_events(blk: &eth::Block, events: &mut contract::Events) {
@@ -734,9 +734,10 @@ fn store_uniswap_prices_for_tokens(   //uses rpc !! heavily
          
          
             let pair_address_option = rpc::uniswapv2_factory::fetch_pair_from_factory(
-                UNISWAPV2_FACTORY_CONTRACT,
-                WETH_ADDRESS,
-                token_address                                
+                &H160::from_str( UNISWAPV2_FACTORY_CONTRACT  ) .unwrap() ,
+                &H160::from_str( WETH_ADDRESS ).unwrap(),
+                &H160::from_str( token_address ).unwrap()
+                                                
             );
             
             if let Some(pair_address) = pair_address_option {
@@ -752,8 +753,7 @@ fn store_uniswap_prices_for_tokens(   //uses rpc !! heavily
                 
             }
          
-            //do rpc calls 
-         
+        
          
          if let Some( price_ratio_to_base_currency )= price_ratio_to_base_currency {
              bigint_set_store.set(ord, token_address.clone(), &price_ratio_to_base_currency  )  ;
@@ -770,7 +770,17 @@ fn store_uniswap_prices_for_tokens(   //uses rpc !! heavily
     
 }
 
-fn graph_tellerv2_out(events: &contract::Events, tables: &mut EntityChangesTables) {
+fn graph_tellerv2_out(
+    
+    events: &contract::Events, 
+    
+    token_address_delta_store: &Deltas<DeltaBigInt>,   
+   
+    token_prices: &StoreGetFloat64, 
+    
+    tables: &mut EntityChangesTables
+    
+    ) {
     
     events.tellerv2_submitted_bids.iter().for_each(|evt| {
         tables
@@ -983,6 +993,39 @@ fn graph_tellerv2_out(events: &contract::Events, tables: &mut EntityChangesTable
             .set("evt_block_number", evt.evt_block_number)
             .set("account", Hex(&evt.account).to_string());
     });
+    
+    
+    
+    
+     for token_address_delta in token_address_delta_store.iter(){
+         
+         let ord = 0; // FOR NOW 
+         
+         let token_address = &token_address_delta.key;
+         
+         let token_price_option = token_prices.get_at(ord, token_address);
+         
+         
+          let WETH_ADDRESS = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2";
+    
+         
+         
+         if let Some(token_price) = token_price_option{
+             
+             
+                  tables
+                        .create_row("token_price",  token_address.to_string() )
+                        .set("base_token_address",  token_address )
+                        .set("reference_token_address",  WETH_ADDRESS ) 
+                        .set("price_ratio",  token_price.to_string() )
+                       
+                        
+                        ;
+             
+         }
+         
+         
+     }
  
 }
 
@@ -1005,9 +1048,17 @@ fn db_out(events: contract::Events) -> Result<DatabaseChanges, substreams::error
 
 
 #[substreams::handlers::map]
-fn graph_out(events: contract::Events) -> Result<EntityChanges, substreams::errors::Error> {
+fn graph_out(
+    
+    events: contract::Events,
+    token_address_delta_store: Deltas<DeltaBigInt>,  //each key of the delta array represents a tokenAddress that we need to get price for ..
+   
+    token_prices: StoreGetFloat64, 
+    
+    
+    ) -> Result<EntityChanges, substreams::errors::Error> {
     // Initialize Database Changes container
     let mut tables = EntityChangesTables::new();
-    graph_tellerv2_out(&events, &mut tables);
+    graph_tellerv2_out(&events, &token_address_delta_store,&token_prices, &mut tables);
     Ok(tables.to_entity_changes())
 }

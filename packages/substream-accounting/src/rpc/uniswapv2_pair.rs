@@ -27,8 +27,8 @@ Reserves Mapping: The reserve0 value always corresponds to token0, and reserve1 
 impl ReservesData{
     
     pub fn get_price_ratio(&self) -> f64 {
-        let reserve0:f64 = self.reserve0.into();
-        let reserve1:f64 = self.reserve1.into();
+        let reserve0 = bigint_to_f64(&self.reserve0);
+        let reserve1 = bigint_to_f64(&self.reserve1);
         if reserve0 == 0.0 {
             return 0.0; // Avoid division by zero
         }
@@ -37,6 +37,10 @@ impl ReservesData{
         
     }
     
+}
+
+ fn bigint_to_f64( value: &BigInt ) -> f64 {
+        value.to_string().parse::<f64>().unwrap_or(0.0)
 }
 
 //const UNISWAP_V2_PAIR_ADDRESS: &str = "YOUR_UNISWAP_V2_PAIR_ADDRESS_HERE";

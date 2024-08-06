@@ -154,3 +154,16 @@ type tellerv2_bid @entity {
     principal_token_address: String! 
     principal_amount: BigInt! 
 }
+
+type token_price @entity {
+    id: ID!
+  
+    base_token_address: String!
+     reference_token_address: String!
+     price_ratio: String! 
+     
+     
+}
+
+
+ 

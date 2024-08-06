@@ -56,6 +56,10 @@ modules:
     initialBlock: 15094701
     inputs:
       - map: map_events
+      - store: store_token_interaction_deltas
+        mode: deltas
+      - store: store_uniswap_prices_for_tokens
+      
     output:
       type: proto:sf.substreams.entity.v1.EntityChanges
 

@@ -599,7 +599,7 @@ fn store_token_interaction_deltas(
         ) ; 
             
         if let Some(submitted_bid_data) = submitted_bid_data_option {   
-            let store_key: String = format!("{}",submitted_bid_data.principal_token_address);
+            let store_key: String = submitted_bid_data.principal_token_address.to_string();
             token_address_delta_store.add(ord,&store_key, BigInt::one() );
             
             activity_occured = true ;
@@ -624,7 +624,7 @@ fn store_token_interaction_deltas(
         ) ; 
             
         if let Some(submitted_bid_data) = submitted_bid_data_option {   
-            let store_key: String = format!("{}",submitted_bid_data.principal_token_address);
+             let store_key: String = submitted_bid_data.principal_token_address.to_string();
             token_address_delta_store.add(ord,&store_key, BigInt::one() );
             
             
@@ -649,7 +649,7 @@ fn store_token_interaction_deltas(
         ) ; 
             
         if let Some(submitted_bid_data) = submitted_bid_data_option {   
-            let store_key: String = format!("{}",submitted_bid_data.principal_token_address);
+             let store_key: String = submitted_bid_data.principal_token_address.to_string();
             token_address_delta_store.add(ord,&store_key, BigInt::one() );
             
             
@@ -671,7 +671,7 @@ fn store_token_interaction_deltas(
         ) ; 
             
         if let Some(submitted_bid_data) = submitted_bid_data_option {   
-            let store_key: String = format!("{}",submitted_bid_data.principal_token_address);
+             let store_key: String = submitted_bid_data.principal_token_address.to_string();
             token_address_delta_store.add(ord,&store_key, BigInt::one() );
             
             
@@ -733,10 +733,15 @@ fn store_uniswap_prices_for_tokens(   //uses rpc !! heavily
          let mut price_ratio_to_base_currency:Option<f64> = None;
          
          
+         
+            substreams::log::println( format!("token address {}", token_address)  );
+          
+         
+         
             let pair_address_option = rpc::uniswapv2_factory::fetch_pair_from_factory(
                 &H160::from_str( UNISWAPV2_FACTORY_CONTRACT  ) .unwrap() ,
                 &H160::from_str( WETH_ADDRESS ).unwrap(),
-                &H160::from_str( token_address ).unwrap()
+                &H160::from_str( token_address.as_str() ).unwrap() //bad character !? 
                                                 
             );
             

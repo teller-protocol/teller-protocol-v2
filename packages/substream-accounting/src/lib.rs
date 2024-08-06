@@ -741,12 +741,12 @@ fn store_uniswap_prices_for_tokens(   //uses rpc !! heavily
             
             if let Some(pair_address) = pair_address_option {
                 
-                let reserves_data_option = rpc::uniswapv2_pair::fetch_reserves_from_pair( pair_address   );
+                let reserves_data_option = rpc::uniswapv2_pair::fetch_reserves_from_pair( &pair_address   );
                 
                 if let Some(reserves_data) = reserves_data_option {
                         
                         //doesnt ordering matter?? have to figure this out 
-                    price_ratio_to_base_currency = reserves_data.get_price_ratio( ) ;
+                    price_ratio_to_base_currency = Some( reserves_data.get_price_ratio( ) ) ;
                     
                 }
                 

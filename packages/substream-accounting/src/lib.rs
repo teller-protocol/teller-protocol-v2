@@ -19,7 +19,12 @@ use substreams::scalar::{BigDecimal,BigInt};
 
 substreams_ethereum::init!();
 
+
+//these are both mainet 
 const TELLERV2_TRACKED_CONTRACT: [u8; 20] = hex!("00182fdb0b880ee24d428e3cc39383717677c37e");
+
+const UNISWAPV2_FACTORY_CONTRACT: [u8; 20] = hex!("5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f");
+
 
 fn map_tellerv2_events(blk: &eth::Block, events: &mut contract::Events) {
     events.tellerv2_accepted_bids.append(&mut blk

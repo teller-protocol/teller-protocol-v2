@@ -38,8 +38,17 @@ modules:
     inputs:
       - map: map_events
       
+       
       
-      
+  - name: store_decimals_for_tokens
+    kind: store
+    initialBlock: 19094701
+    updatePolicy: set
+    valueType: bigint
+    inputs: 
+      - store: store_token_interaction_deltas
+        mode: deltas
+         
   - name: store_uniswap_prices_for_tokens
     kind: store
     initialBlock: 19094701
@@ -59,6 +68,7 @@ modules:
       - store: store_token_interaction_deltas
         mode: deltas
       - store: store_uniswap_prices_for_tokens
+      - store: store_decimals_for_tokens
       
     output:
       type: proto:sf.substreams.entity.v1.EntityChanges

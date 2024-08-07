@@ -599,7 +599,7 @@ fn store_token_interaction_deltas(
         ) ; 
             
         if let Some(submitted_bid_data) = submitted_bid_data_option {   
-            let store_key: String = format!("{:x}", submitted_bid_data.principal_token_address)  ;
+            let store_key: String = address_to_string(&submitted_bid_data.principal_token_address ) ;
             token_address_delta_store.add(ord,&store_key, BigInt::one() );
             
             activity_occured = true ;
@@ -624,7 +624,7 @@ fn store_token_interaction_deltas(
         ) ; 
             
         if let Some(submitted_bid_data) = submitted_bid_data_option {   
-             let store_key: String = format!("{:x}", submitted_bid_data.principal_token_address)  ;
+             let store_key: String = address_to_string(&submitted_bid_data.principal_token_address ) ;
             token_address_delta_store.add(ord,&store_key, BigInt::one() );
             
             
@@ -649,7 +649,7 @@ fn store_token_interaction_deltas(
         ) ; 
             
         if let Some(submitted_bid_data) = submitted_bid_data_option {   
-             let store_key: String = format!("{:x}", submitted_bid_data.principal_token_address)  ;
+             let store_key: String = address_to_string(&submitted_bid_data.principal_token_address ) ;
             token_address_delta_store.add(ord,&store_key, BigInt::one() );
             
             
@@ -671,7 +671,7 @@ fn store_token_interaction_deltas(
         ) ; 
             
         if let Some(submitted_bid_data) = submitted_bid_data_option {   
-             let store_key: String =  format!("{:x}", submitted_bid_data.principal_token_address)  ;
+             let store_key: String = address_to_string(&submitted_bid_data.principal_token_address ) ;
             token_address_delta_store.add(ord,&store_key, BigInt::one() );
             
             
@@ -685,6 +685,7 @@ fn store_token_interaction_deltas(
     if activity_occured {
         
         
+        //always capture USDC / ETH price data ... so we can do lookups ..
         
         let USDC_ADDRESS = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48";
         
@@ -704,9 +705,64 @@ fn store_token_interaction_deltas(
 
 
  
-    
-    
 
+    
+    
+#[substreams::handlers::store]
+fn store_decimals_for_tokens(   //uses rpc !! heavily 
+     
+    token_address_delta_store: Deltas<DeltaBigInt>,  //each key of the delta array represents a tokenAddress that we need to get price for ..
+   
+    bigint_set_store: StoreSetBigInt //for block time and block number 
+) {
+    
+    
+    
+    let ord = 0; // FOR NOW - CAN CAUSE ISSUES - GET FROM LOG AND STUFF INTO EVENT    
+    
+    
+    
+    let mut tokens_to_fetch_decimals_array :Vec<String> = Vec::new();
+    
+     for token_address_delta in token_address_delta_store.iter(){
+         tokens_to_fetch_decimals_array.push( token_address_delta.key.clone() );
+     }
+        
+        
+        
+                      
+    let weth_address = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2".to_string() ;
+     
+     let usdc_address = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48".to_string() ;
+     
+     tokens_to_fetch_decimals_array.push(weth_address);
+     tokens_to_fetch_decimals_array.push(usdc_address);
+    
+      
+        //always compare to ETH ! 
+     for token_address  in tokens_to_fetch_decimals_array{
+          
+            let token_decimals_option = rpc::erc20::fetch_token_decimals(
+                &H160::from_str( token_address.as_str()  ) .unwrap() , 
+                                                
+            );
+            
+            if let Some( decimals )  = token_decimals_option {
+                
+                     
+                    bigint_set_store.set(ord, token_address.clone(), &decimals )  ;
+                    
+            }   
+         
+        
+         
+         //if let Some( token_decimals ) =  token_decimals {
+         //    bigint_set_store.set(ord, token_address.clone(), &token_decimals )  ;
+         //}
+         
+     }// iter 
+    
+}
 
 #[substreams::handlers::store]
 fn store_uniswap_prices_for_tokens(   //uses rpc !! heavily 
@@ -721,7 +777,7 @@ fn store_uniswap_prices_for_tokens(   //uses rpc !! heavily
     let ord = 0; // FOR NOW - CAN CAUSE ISSUES - GET FROM LOG AND STUFF INTO EVENT    
     
     
-    let WETH_ADDRESS = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2";
+    let WETH_ADDRESS = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
     
         
         //always compare to ETH ! 
@@ -783,6 +839,8 @@ fn graph_tellerv2_out(
    
     token_prices: &StoreGetFloat64, 
     
+    token_decimals: &StoreGetBigInt, 
+    
     tables: &mut EntityChangesTables
     
     ) {
@@ -843,6 +901,30 @@ fn graph_tellerv2_out(
           //  if let Some(submitted_bid_data) = submitted_bid_data {
                 if let Some(submitted_bid_data) = submitted_bid_data_option {
                         let bid_id = submitted_bid_data.bid_id;
+                        
+                            
+                            
+                        
+                       let weth_address =  H160::from_str( "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"  ) .unwrap() ;
+                       let usdc_address =  H160::from_str( "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"  ) .unwrap() ;
+                            
+                        let principal_token_address =  submitted_bid_data.principal_token_address.clone();
+                        let principal_amount = submitted_bid_data.principal_amount.clone();
+                   
+                       let principal_amount_usdc = calculate_principal_amount_usdc(
+                            principal_amount,
+                            principal_token_address,
+                            
+                            weth_address, 
+                            usdc_address,
+                            
+                            &token_prices,
+                            &token_decimals,
+                            
+                        );
+                            
+                       let principal_amount_usdc_big_decimal = f64_to_bigdecimal( principal_amount_usdc);
+                            
                             
                         tables
                         .create_row("tellerv2_bid",  bid_id.to_string() )
@@ -852,6 +934,7 @@ fn graph_tellerv2_out(
                     // .set("receiver", Hex(&evt.receiver).to_string())
                         .set("principal_token_address", Hex(&submitted_bid_data.principal_token_address).to_string())
                         .set("principal_amount",  &submitted_bid_data.principal_amount)
+                        .set( "principal_amount_usdc" , &principal_amount_usdc_big_decimal)
                         
                         ;
                     
@@ -1011,7 +1094,7 @@ fn graph_tellerv2_out(
          let token_price_option = token_prices.get_at(ord, token_address);
          
          
-          let WETH_ADDRESS = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2";
+          let WETH_ADDRESS = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
     
          
          
@@ -1059,11 +1142,90 @@ fn graph_out(
     token_address_delta_store: Deltas<DeltaBigInt>,  //each key of the delta array represents a tokenAddress that we need to get price for ..
    
     token_prices: StoreGetFloat64, 
+    token_decimals: StoreGetBigInt,
     
     
     ) -> Result<EntityChanges, substreams::errors::Error> {
     // Initialize Database Changes container
     let mut tables = EntityChangesTables::new();
-    graph_tellerv2_out(&events, &token_address_delta_store,&token_prices, &mut tables);
+    graph_tellerv2_out(&events, &token_address_delta_store,&token_prices, &token_decimals, &mut tables);
     Ok(tables.to_entity_changes())
+}
+
+
+
+
+fn calculate_principal_amount_usdc( 
+    input_token_amount: BigInt,
+    input_token_address: Address,
+     
+    reference_token_address: Address,  //WETH 
+    usdc_token_address: Address, 
+     
+    token_prices: &StoreGetFloat64, 
+    
+    token_decimals: &StoreGetBigInt, 
+    
+    
+) -> f64 {
+    let ord = 0; // FOR NOW 
+    
+    let mut input_token_price_to_reference = token_prices.get_at(ord, address_to_string( &input_token_address )).unwrap_or( 1.0 );
+    
+    let need_to_invert_input_token_price_ratio = input_token_address > reference_token_address;
+
+    
+    if need_to_invert_input_token_price_ratio {
+        input_token_price_to_reference = 1.0 / input_token_price_to_reference;
+    }
+        
+    
+    
+    
+    let input_token_decimals = token_decimals.get_at(ord, address_to_string( &input_token_address )).unwrap_or( BigInt::from_str("18" ).unwrap() ).to_u64();
+    let reference_token_decimals = token_decimals.get_at(ord, address_to_string( &reference_token_address )).unwrap_or( BigInt::from_str("18" ).unwrap() ).to_u64();
+    let usdc_token_decimals = token_decimals.get_at(ord, address_to_string( &usdc_token_address )).unwrap_or( BigInt::from_str("18" ).unwrap() ).to_u64();
+    
+    
+    let mut usdc_token_price_to_reference = token_prices.get_at(ord, address_to_string( &usdc_token_address )).unwrap_or( 1.0 );
+    
+    
+    let need_to_invert_usdc_token_price_ratio = usdc_token_address > reference_token_address;  //this is gonna be constant effectively.. 
+    
+    if need_to_invert_usdc_token_price_ratio {
+        usdc_token_price_to_reference = 1.0 / usdc_token_price_to_reference;
+    }
+    
+   
+    
+        //need to take input token amount and multiply it by the input token price to reference(weth) and then take that and multiply it by WETH-USDC to get the final price ratio of input  in USDC 
+      // Convert the input token amount to a float value
+    let input_token_amount_float = bigint_to_f64(&input_token_amount);
+
+    // Calculate the value in the reference token (WETH)
+    let value_in_reference_token = input_token_amount_float * input_token_price_to_reference / 10f64.powi(input_token_decimals as i32);
+
+    // Calculate the value in USDC
+    let final_amount = value_in_reference_token * usdc_token_price_to_reference * 10f64.powi(usdc_token_decimals as i32);
+    
+    
+    final_amount
+}
+
+
+
+pub fn address_to_string( address: &Address ) -> String {
+    
+    format!("0x{:x}", address)
+}
+
+ fn bigint_to_f64( value: &BigInt ) -> f64 {
+        value.to_string().parse::<f64>().unwrap_or(0.0)
+}
+
+fn f64_to_bigdecimal(value: f64) -> BigDecimal {
+    // Convert the f64 to a string
+    let value_str = value.to_string();
+    // Create a BigDecimal from the string
+    BigDecimal::from_str(&value_str).unwrap()
 }

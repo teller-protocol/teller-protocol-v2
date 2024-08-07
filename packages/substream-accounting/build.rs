@@ -8,11 +8,13 @@ fn main() -> Result<(), anyhow::Error> {
         "abi/tellerv2_contract.abi.json",
          "abi/uniswapv2_factory.abi.json",
          "abi/uniswapv2_pair.abi.json",
+         "abi/erc20.abi.json",
     ];
     let file_output_names = [
         "src/abi/tellerv2_contract.rs",
           "src/abi/uniswapv2_factory.rs",
             "src/abi/uniswapv2_pair.rs",
+             "src/abi/erc20.rs",
     ];
 
     let mut i = 0;

@@ -26,13 +26,29 @@ Reserves Mapping: The reserve0 value always corresponds to token0, and reserve1 
 */
 impl ReservesData{
     
+    //ASSUME we are going pepe   0x4dFae3690b93c47470b03036A17B23C1Be05127C
+    
+    
+    
+    //ASSUME we are doing usdc ...  usdc will be 0  and  weth will be 1 
+    
+    //ASSUME uninverted means that   reserve 0 is input token and  reserve 1  is reference ... usdc is uninverted 
+    
+    /*
+        
+        "id": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "base_token_address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "reference_token_address": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "price_ratio": "434359356.79825205"  ->   reserveWeth  /  reserveUSDC   need to mul by 10^6   
+    */
+    
     pub fn get_price_ratio(&self) -> f64 {
         let reserve0 = bigint_to_f64(&self.reserve0);
         let reserve1 = bigint_to_f64(&self.reserve1);
         if reserve0 == 0.0 {
             return 0.0; // Avoid division by zero
         }
-        reserve1 / reserve0
+        reserve0 / reserve1
         
         
     }

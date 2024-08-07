@@ -793,7 +793,9 @@ fn store_uniswap_prices_for_tokens(   //uses rpc !! heavily
             substreams::log::println( format!("token address {}", token_address)  );
           
          
-         
+         //we are inverting if the input is greater than the reference..
+            
+            
             let pair_address_option = rpc::uniswapv2_factory::fetch_pair_from_factory(
                 &H160::from_str( UNISWAPV2_FACTORY_CONTRACT  ) .unwrap() ,
                 &H160::from_str( WETH_ADDRESS ).unwrap(),
@@ -1154,6 +1156,8 @@ fn graph_out(
 
 
 
+// this is correct but stuff may be flipped 
+
 
 fn calculate_principal_amount_usdc( 
     input_token_amount: BigInt,
@@ -1172,14 +1176,14 @@ fn calculate_principal_amount_usdc(
     
     let mut input_token_price_to_reference = token_prices.get_at(ord, address_to_string( &input_token_address )).unwrap_or( 1.0 );
     
+    //usdc is not inverted 
     let need_to_invert_input_token_price_ratio = input_token_address > reference_token_address;
 
     
-    if need_to_invert_input_token_price_ratio {
+    if  need_to_invert_input_token_price_ratio {
         input_token_price_to_reference = 1.0 / input_token_price_to_reference;
     }
-        
-    
+         
     
     
     let input_token_decimals = token_decimals.get_at(ord, address_to_string( &input_token_address )).unwrap_or( BigInt::from_str("18" ).unwrap() ).to_u64();
@@ -1189,24 +1193,29 @@ fn calculate_principal_amount_usdc(
     
     let mut usdc_token_price_to_reference = token_prices.get_at(ord, address_to_string( &usdc_token_address )).unwrap_or( 1.0 );
     
+      //usdc is not inverted 
+    let need_to_invert_usdc_token_price_ratio = usdc_token_address > reference_token_address;  //this is gonna be constant effectively..  always false !! 
     
-    let need_to_invert_usdc_token_price_ratio = usdc_token_address > reference_token_address;  //this is gonna be constant effectively.. 
-    
-    if need_to_invert_usdc_token_price_ratio {
+    if  need_to_invert_usdc_token_price_ratio {
         usdc_token_price_to_reference = 1.0 / usdc_token_price_to_reference;
     }
     
-   
     
-        //need to take input token amount and multiply it by the input token price to reference(weth) and then take that and multiply it by WETH-USDC to get the final price ratio of input  in USDC 
-      // Convert the input token amount to a float value
+    
+     // Convert the input token amount to a float value
     let input_token_amount_float = bigint_to_f64(&input_token_amount);
-
-    // Calculate the value in the reference token (WETH)
-    let value_in_reference_token = input_token_amount_float * input_token_price_to_reference / 10f64.powi(input_token_decimals as i32);
-
+    
+    // Calculate the value in the reference token (WETH)  --this seems right 
+    let value_in_reference_token = match need_to_invert_input_token_price_ratio {
+        true => (input_token_amount_float * input_token_price_to_reference * 10f64.powi(reference_token_decimals as i32)) / 10f64.powi(input_token_decimals as i32),
+        false => (input_token_amount_float * input_token_price_to_reference * 10f64.powi(input_token_decimals  as i32)) / 10f64.powi(reference_token_decimals as i32)
+        
+    };
+    
     // Calculate the value in USDC
-    let final_amount = value_in_reference_token * usdc_token_price_to_reference * 10f64.powi(usdc_token_decimals as i32);
+    let final_amount = (value_in_reference_token * usdc_token_price_to_reference * 10f64.powi(usdc_token_decimals as i32)) / 10f64.powi(reference_token_decimals as i32);
+    
+    
     
     
     final_amount

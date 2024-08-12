@@ -48,7 +48,7 @@ impl ReservesData{
         if reserve0 == 0.0 {
             return 0.0; // Avoid division by zero
         }
-        reserve0 / reserve1
+        reserve1 / reserve0
         
         
     }

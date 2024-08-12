@@ -1236,6 +1236,7 @@ fn calculate_principal_amount_usdc_internal(
     let need_to_invert_input_token_price_ratio = input_token_address > reference_token_address;
 
         
+        // why are these flipped?  are my test assumptions wrong ?   maybe bc i have to divide by the usdc price ?
         
      let updated_input_token_price_to_reference = match need_to_invert_input_token_price_ratio {
         false => 1.0 / input_token_price_to_reference,

@@ -42,13 +42,28 @@ impl ReservesData{
         "price_ratio": "434359356.79825205"  ->   reserveWeth  /  reserveUSDC   need to mul by 10^6   
     */
     
+    //USDC pair is https://etherscan.io/address/0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc
+    /*
+        
+        token 0 is usdc 
+        token 1 is weth 
+        
+        USC reserves is 
+         _reserve0   uint112 :  45767116_830401
+         _reserve1   uint112 :  17131_199479732293475559
+    
+    */
+    
+    //this is always SMALLER if there are more reserves of the 'lower' alphanumeric token 
+    //this is always LARGER with more reserves of  'higher' alphanumeric token 
+    
     pub fn get_price_ratio(&self) -> f64 {
         let reserve0 = bigint_to_f64(&self.reserve0);
         let reserve1 = bigint_to_f64(&self.reserve1);
         if reserve0 == 0.0 {
             return 0.0; // Avoid division by zero
         }
-        reserve1 / reserve0
+        reserve0 / reserve1
         
         
     }

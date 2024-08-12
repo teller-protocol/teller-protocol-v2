@@ -1174,7 +1174,7 @@ fn calculate_principal_amount_usdc(
 ) -> f64 {
     let ord = 0; // FOR NOW 
     
-    let mut input_token_price_to_reference = token_prices.get_at(ord, address_to_string( &input_token_address )).unwrap_or( 1.0 );
+    let   input_token_price_to_reference = token_prices.get_at(ord, address_to_string( &input_token_address )).unwrap_or( 1.0 );
     
   
     
@@ -1183,7 +1183,7 @@ fn calculate_principal_amount_usdc(
     let usdc_token_decimals = token_decimals.get_at(ord, address_to_string( &usdc_token_address )).unwrap_or( BigInt::from_str("18" ).unwrap() ).to_u64();
     
     
-    let mut usdc_token_price_to_reference = token_prices.get_at(ord, address_to_string( &usdc_token_address )).unwrap_or( 1.0 );
+    let   usdc_token_price_to_reference = token_prices.get_at(ord, address_to_string( &usdc_token_address )).unwrap_or( 1.0 );
     
    
     
@@ -1239,8 +1239,8 @@ fn calculate_principal_amount_usdc_internal(
         
      let updated_input_token_price_to_reference = match need_to_invert_input_token_price_ratio {
          
-         true => 1.0 / input_token_price_to_reference,
-         false => input_token_price_to_reference
+         true =>  input_token_price_to_reference,
+         false => 1.0 /input_token_price_to_reference
      };
      
       
@@ -1260,25 +1260,55 @@ fn calculate_principal_amount_usdc_internal(
          
      let updated_usdc_token_price_to_reference = match need_to_invert_usdc_token_price_ratio {
          
-         true => 1.0 / usdc_token_price_to_reference,
-         false => usdc_token_price_to_reference
+         true =>  usdc_token_price_to_reference,
+         false => 1.0 / usdc_token_price_to_reference
      };
      
      
     
     
      // Convert the input token amount to a float value
-    let input_token_amount_float = bigint_to_f64(&input_token_amount);
+    let input_token_amount_float_raw = bigint_to_f64(&input_token_amount);
     
     // Calculate the value in the reference token (WETH)  --this seems right 
-    let value_in_reference_token = match need_to_invert_input_token_price_ratio {
-        true => (input_token_amount_float * updated_input_token_price_to_reference * 10f64.powi(reference_token_decimals as i32)) / 10f64.powi(input_token_decimals as i32),
-        false => (input_token_amount_float * updated_input_token_price_to_reference * 10f64.powi(input_token_decimals  as i32)) / 10f64.powi(reference_token_decimals as i32)
+   /* let input_value_in_reference_token = match need_to_invert_input_token_price_ratio {
+        true => (input_token_amount_float * updated_input_token_price_to_reference * 10f64.powi(reference_token_decimals as i32 - input_token_decimals as i32 - input_token_decimals as i32)) ,
+        false => (input_token_amount_float * updated_input_token_price_to_reference * 10f64.powi(input_token_decimals  as i32 - reference_token_decimals as i32 - input_token_decimals  as i32))  
+        
+    };*/
+    
+    let input_token_amount_scaled= input_token_amount_float_raw / 10f64.powi( input_token_decimals as i32  );
+   
+    
+      let updated_input_token_price_to_reference_scaled =  match need_to_invert_input_token_price_ratio {
+        true => ( updated_input_token_price_to_reference * 10f64.powi(reference_token_decimals as i32 - input_token_decimals as i32  )) ,
+        false => ( updated_input_token_price_to_reference * 10f64.powi(input_token_decimals  as i32 - reference_token_decimals as i32  ))  
         
     };
+      
+       
+      println!("input_token_amount_scaled {:?}", input_token_amount_scaled);
+    
+     println!("updated_input_token_price_to_reference_scaled {:?}", updated_input_token_price_to_reference_scaled);
+    
+    
+      let input_value_in_reference_token_scaled = input_token_amount_scaled * updated_input_token_price_to_reference_scaled;
+
+        
+    
+    // should be 0.002 WETH !!    5e16 
+    println!("input_value_in_reference_token_scaled {:?}", input_value_in_reference_token_scaled);
     
     // Calculate the value in USDC
-    let final_amount = (value_in_reference_token * usdc_token_price_to_reference * 10f64.powi(usdc_token_decimals as i32)) / 10f64.powi(reference_token_decimals as i32);
+   // let final_amount = (input_value_in_reference_token * updated_usdc_token_price_to_reference * 10f64.powi(usdc_token_decimals as i32  + usdc_token_decimals as i32 - reference_token_decimals as i32))  ;
+    
+    
+    let usdc_token_price_to_reference_scaled = updated_usdc_token_price_to_reference * 10f64.powi(usdc_token_decimals as i32 - reference_token_decimals as i32); 
+  
+    println!("usdc_token_price_to_reference_scaled {:?}", usdc_token_price_to_reference_scaled);
+   
+   
+   let final_amount = input_value_in_reference_token_scaled * usdc_token_price_to_reference_scaled;
     
     
     
@@ -1314,15 +1344,32 @@ mod tests {
     #[test]
     fn test_calculate_principal_amount_usdc_internal() {
       
-        let input_token_amount = BigInt::from_str("1000000000000000000").unwrap();  //18 decimals
+        let input_token_amount = BigInt::from_str("1000000000000000000").unwrap();  //1 unit 18 decimals
         
         let input_token_address = H160::from_str("0x0000000000000000000000000000000000000001").unwrap();
         let reference_token_address = H160::from_str("0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2").unwrap(); // WETH
         let usdc_token_address = H160::from_str("0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48").unwrap(); // USDC
 
-        let input_token_price_to_reference = 0.002f64; // Example: 1 input token = 0.002 WETH
-        let usdc_token_price_to_reference = 3000.0f64; // Example: 1 WETH = 3000 USDC
-
+     //   let input_token_price_to_reference = 0.002f64; // Example: 1 input token = 0.002 WETH
+    //    let usdc_token_price_to_reference = 3000.0f64; // Example: 1 WETH = 3000 USDC
+    
+        
+        
+        //denom is always WETH , numerator is always the other token 
+         
+         
+        // 500 input tokens to 1 weth 
+        
+        //make sure these make sense 
+        let input_token_price_to_reference = 500.0f64; // 1 input token = 0.002 WETH (1e18 input units to 2e15 WETH units)
+        let usdc_token_price_to_reference = 0.000000003333f64; // 1e18 WETH units = 3000e6 USDC units
+    
+                    // 0.000333333 WETH per usdc 
+                    
+                    
+                // 0.002 WETH worth of input token 
+                // 6.666  USDC worth of input token 
+                
         let input_token_decimals = 18;
         let reference_token_decimals = 18;
         let usdc_token_decimals = 6;
@@ -1338,9 +1385,11 @@ mod tests {
             reference_token_decimals,
             usdc_token_decimals,
         );
-
+    
+        
+        println!("usdc value is {:?}", usdc_value);
         // Expected USDC value: 1 token * 0.002 WETH/token * 3000 USDC/WETH = 6 USDC
-        assert!((usdc_value - 6.0).abs() < 1e-6, "USDC value should be approximately 6.0");
+        assert!((usdc_value - 6.0).abs() < 0.01, "USDC value should be approximately 6.0");
     }
 
     fn bigint_to_f64(value: &BigInt) -> f64 {

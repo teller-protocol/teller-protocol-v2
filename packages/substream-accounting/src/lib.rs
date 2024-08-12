@@ -1238,9 +1238,9 @@ fn calculate_principal_amount_usdc_internal(
         
         
      let updated_input_token_price_to_reference = match need_to_invert_input_token_price_ratio {
-         
+        false => 1.0 / input_token_price_to_reference,
          true =>  input_token_price_to_reference,
-         false => 1.0 /input_token_price_to_reference
+         
      };
      
       
@@ -1259,9 +1259,9 @@ fn calculate_principal_amount_usdc_internal(
   
          
      let updated_usdc_token_price_to_reference = match need_to_invert_usdc_token_price_ratio {
-         
-         true =>  usdc_token_price_to_reference,
-         false => 1.0 / usdc_token_price_to_reference
+             false =>  usdc_token_price_to_reference,
+         true =>  1.0 / usdc_token_price_to_reference,
+        
      };
      
      
@@ -1302,9 +1302,19 @@ fn calculate_principal_amount_usdc_internal(
     // Calculate the value in USDC
    // let final_amount = (input_value_in_reference_token * updated_usdc_token_price_to_reference * 10f64.powi(usdc_token_decimals as i32  + usdc_token_decimals as i32 - reference_token_decimals as i32))  ;
     
+        
+        
+     //   WETH  *   ( usdc   /  weth    ) 
+         
+         //this is 300m ?-- it is the amount of RAW weth      per raw usdc 
+         println!("updated_usdc_token_price_to_reference {:?}", updated_usdc_token_price_to_reference);
+   
+        
+    let usdc_token_price_to_reference_scaled = updated_usdc_token_price_to_reference * 10f64.powi( reference_token_decimals as i32  - usdc_token_decimals as i32   ); 
     
-    let usdc_token_price_to_reference_scaled = updated_usdc_token_price_to_reference * 10f64.powi(usdc_token_decimals as i32 - reference_token_decimals as i32); 
-  
+    
+    
+    // THIS SHOULD BE 3000  -> USDC per WETh 
     println!("usdc_token_price_to_reference_scaled {:?}", usdc_token_price_to_reference_scaled);
    
    
@@ -1362,9 +1372,16 @@ mod tests {
         
         //make sure these make sense 
         let input_token_price_to_reference = 500.0f64; // 1 input token = 0.002 WETH (1e18 input units to 2e15 WETH units)
-        let usdc_token_price_to_reference = 0.000000003333f64; // 1e18 WETH units = 3000e6 USDC units
-    
+        let usdc_token_price_to_reference = 0.0000000030f64; // 1e18 WETH units = 3000e6 USDC units
+            
+            // this is USDC PER WETH   RAW 
+            
+            
+                  //   reserve 0 is 3000_000000
+                    //reserve 1 is 1000000000000000000
                     // 0.000333333 WETH per usdc 
+                    
+                    // 3000 USDC per WETh 
                     
                     
                 // 0.002 WETH worth of input token 

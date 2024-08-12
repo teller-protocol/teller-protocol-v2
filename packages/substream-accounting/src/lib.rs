@@ -1231,8 +1231,8 @@ fn calculate_principal_amount_usdc_internal(
     let need_to_invert_usdc_token_price_ratio = usdc_token_address > reference_token_address; // is this ok ?
 
     let updated_usdc_token_price_to_reference = match need_to_invert_usdc_token_price_ratio {
-        false => usdc_token_price_to_reference,
-        true => 1.0 / usdc_token_price_to_reference,
+        false => 1.0 / usdc_token_price_to_reference,
+        true =>  usdc_token_price_to_reference,
     };
 
     // Convert the input token amount to a float value
@@ -1264,9 +1264,9 @@ fn calculate_principal_amount_usdc_internal(
     );
 
     let usdc_token_price_to_reference_scaled = updated_usdc_token_price_to_reference
-        * 10f64.powi(reference_token_decimals as i32 - usdc_token_decimals as i32);
+        * 10f64.powi(usdc_token_decimals as i32 - reference_token_decimals as i32);
 
-    let final_amount = input_value_in_reference_token_scaled * usdc_token_price_to_reference_scaled;
+    let final_amount = input_value_in_reference_token_scaled / usdc_token_price_to_reference_scaled;
 
     final_amount
 }

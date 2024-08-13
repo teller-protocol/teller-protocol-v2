@@ -26,6 +26,7 @@ packages/subgraph/abis/*
 
 # rust build artifacts 
 packages/substream-accounting/target/*
+packages/substream-accounting/build/*
 
 # dependencies
 /node_modules

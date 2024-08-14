@@ -55,12 +55,10 @@ contract LoanReferralForwarder
      
 
      /*
-
-            PROBLEM: how do i know the token ?
-
+ 
      */
     function acceptCommitmentWithReferral(
-        address _commitmentForwarder,
+        address _commitmentForwarder, //leave 0 if using smart commitment address
         uint256 _commitmentId,
 
         address _smartCommitmentAddress,  //leave 0 if using a commitmentForwarder
@@ -96,7 +94,7 @@ contract LoanReferralForwarder
                 balanceBefore = IERC20(principalTokenAddress).balanceOf(address(this));
 
         
-                (uint256 bidId) = ISmartCommitmentForwarder(_commitmentForwarder).acceptSmartCommitmentWithRecipient(
+                (uint256 bidId) = ISmartCommitmentForwarder(_smartCommitmentAddress).acceptSmartCommitmentWithRecipient(
                 _smartCommitmentAddress,
                 _principalAmount,
                 _collateralAmount,
@@ -108,7 +106,7 @@ contract LoanReferralForwarder
             );
         
         }else{  
-              principalTokenAddress = ILenderCommitmentForwarder_U1(_smartCommitmentAddress).getCommitmentPrincipalTokenAddress (_commitmentId);
+              principalTokenAddress = ILenderCommitmentForwarder_U1(_commitmentForwarder).getCommitmentPrincipalTokenAddress (_commitmentId);
         
             // Accept commitment and receive funds to this contract
               balanceBefore = IERC20(principalTokenAddress).balanceOf(address(this));

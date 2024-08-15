@@ -881,6 +881,7 @@ fn graph_tellerv2_out(
             tables
                 .create_row("tellerv2_bid", bid_id.to_string())
                 .set("bid_id", &bid_id)
+                .set("status", "accepted".to_string())
                 .set(
                     "borrower",
                     Hex(&submitted_bid_data.borrower_address).to_string(),
@@ -910,6 +911,15 @@ fn graph_tellerv2_out(
             .set("evt_block_time", evt.evt_block_time.as_ref().unwrap())
             .set("evt_block_number", evt.evt_block_number)
             .set("bid_id", BigDecimal::from_str(&evt.bid_id).unwrap());
+            
+            
+            
+             tables
+                .update_row("tellerv2_bid", bid_id.to_string())
+               
+                .set("status", "cancelled".to_string())
+               ;
+                
     });
     events.tellerv2_fee_paids.iter().for_each(|evt| {
         tables
@@ -949,6 +959,15 @@ fn graph_tellerv2_out(
             .set("evt_block_number", evt.evt_block_number)
             .set("bid_id", BigDecimal::from_str(&evt.bid_id).unwrap())
             .set("liquidator", Hex(&evt.liquidator).to_string());
+            
+            
+            
+            
+            
+                tables
+                .update_row("tellerv2_bid", bid_id.to_string())
+               
+                .set("status", "liquidated".to_string())
     });
     events.tellerv2_loan_repaids.iter().for_each(|evt| {
         tables
@@ -961,6 +980,15 @@ fn graph_tellerv2_out(
             .set("evt_block_time", evt.evt_block_time.as_ref().unwrap())
             .set("evt_block_number", evt.evt_block_number)
             .set("bid_id", BigDecimal::from_str(&evt.bid_id).unwrap());
+            
+            
+            
+            
+                tables
+                .update_row("tellerv2_bid", bid_id.to_string())
+               
+                .set("status", "repaid".to_string())
+               ;
     });
     events.tellerv2_loan_repayments.iter().for_each(|evt| {
         tables

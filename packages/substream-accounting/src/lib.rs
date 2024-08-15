@@ -829,6 +829,9 @@ fn graph_tellerv2_out(
 
     // Loop over all the abis events to create table changes
     events.tellerv2_accepted_bids.iter().for_each(|evt| {
+        
+        let event_block_time =  evt.evt_block_time.as_ref().unwrap().clone();
+        
         tables
             .create_row(
                 "tellerv2_accepted_bid",
@@ -875,6 +878,8 @@ fn graph_tellerv2_out(
                 &token_prices,
                 &token_decimals,
             );
+            
+            
 
             let principal_amount_usdc_big_decimal = f64_to_bigdecimal(principal_amount_usdc);
 
@@ -882,6 +887,7 @@ fn graph_tellerv2_out(
                 .create_row("tellerv2_bid", bid_id.to_string())
                 .set("bid_id", &bid_id)
                 .set("status", "accepted".to_string())
+                .set("accepted_at", event_block_time )
                 .set(
                     "borrower",
                     Hex(&submitted_bid_data.borrower_address).to_string(),
@@ -913,12 +919,22 @@ fn graph_tellerv2_out(
             .set("bid_id", BigDecimal::from_str(&evt.bid_id).unwrap());
             
             
-            
-             tables
+                let bid_id = BigInt::from_str(&evt.bid_id).unwrap();
+                    
+                let teller_v2_address = Address::from_slice(&TELLERV2_TRACKED_CONTRACT);
+
+                                        
+              let submitted_bid_data_option =
+            rpc::tellerv2::fetch_loan_summary_from_rpc(&teller_v2_address, &bid_id);
+                
+            if submitted_bid_data_option.is_some() {
+                      tables
                 .update_row("tellerv2_bid", bid_id.to_string())
                
                 .set("status", "cancelled".to_string())
                ;
+            }
+             
                 
     });
     events.tellerv2_fee_paids.iter().for_each(|evt| {
@@ -961,13 +977,23 @@ fn graph_tellerv2_out(
             .set("liquidator", Hex(&evt.liquidator).to_string());
             
             
+                    let bid_id = BigInt::from_str(&evt.bid_id).unwrap();
             
-            
-            
+                 let teller_v2_address = Address::from_slice(&TELLERV2_TRACKED_CONTRACT);
+
+                    
+                                                            
+                    let submitted_bid_data_option =
+            rpc::tellerv2::fetch_loan_summary_from_rpc(&teller_v2_address, &bid_id);
+                
+            if submitted_bid_data_option.is_some() {
+                
                 tables
                 .update_row("tellerv2_bid", bid_id.to_string())
                
-                .set("status", "liquidated".to_string())
+                .set("status", "liquidated".to_string()) ;
+                
+            }
     });
     events.tellerv2_loan_repaids.iter().for_each(|evt| {
         tables
@@ -982,13 +1008,22 @@ fn graph_tellerv2_out(
             .set("bid_id", BigDecimal::from_str(&evt.bid_id).unwrap());
             
             
-            
-            
+                let bid_id = BigInt::from_str(&evt.bid_id).unwrap();
+                let teller_v2_address = Address::from_slice(&TELLERV2_TRACKED_CONTRACT);
+                    
+                
+            let submitted_bid_data_option =
+            rpc::tellerv2::fetch_loan_summary_from_rpc(&teller_v2_address, &bid_id);
+                
+            if submitted_bid_data_option.is_some() {
+                
                 tables
                 .update_row("tellerv2_bid", bid_id.to_string())
                
                 .set("status", "repaid".to_string())
                ;
+               
+            }
     });
     events.tellerv2_loan_repayments.iter().for_each(|evt| {
         tables

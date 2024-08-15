@@ -150,6 +150,7 @@ type tellerv2_bid @entity {
     bid_id: BigInt!
     borrower: String!
     status: String! 
+    accepted_at: String!
     lender: String! 
     principal_token_address: String! 
     principal_amount: BigInt! 

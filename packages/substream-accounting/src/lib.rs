@@ -860,7 +860,7 @@ fn graph_tellerv2_out(
 
         //  if let Some(submitted_bid_data) = submitted_bid_data {
         if let Some(submitted_bid_data) = submitted_bid_data_option {
-            let bid_id = submitted_bid_data.bid_id;
+            let bid_id = bid_id.clone();
 
             let weth_address =
                 H160::from_str("0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2").unwrap();
@@ -930,7 +930,7 @@ fn graph_tellerv2_out(
             if submitted_bid_data_option.is_some() {
                       tables
                 .update_row("tellerv2_bid", bid_id.to_string())
-               
+                  .set("bid_id", &bid_id)
                 .set("status", "cancelled".to_string())
                ;
             }
@@ -990,7 +990,7 @@ fn graph_tellerv2_out(
                 
                 tables
                 .update_row("tellerv2_bid", bid_id.to_string())
-               
+                  .set("bid_id", &bid_id)
                 .set("status", "liquidated".to_string()) ;
                 
             }
@@ -1019,7 +1019,7 @@ fn graph_tellerv2_out(
                 
                 tables
                 .update_row("tellerv2_bid", bid_id.to_string())
-               
+                 .set("bid_id", &bid_id)
                 .set("status", "repaid".to_string())
                ;
                

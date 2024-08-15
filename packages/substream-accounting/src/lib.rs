@@ -987,19 +987,13 @@ fn graph_tellerv2_out(
             
                 let bid_id = BigInt::from_str(&evt.bid_id).unwrap();
                     
-                let teller_v2_address = Address::from_slice(&TELLERV2_TRACKED_CONTRACT);
-
-                                        
-              let submitted_bid_data_option =
-            rpc::tellerv2::fetch_loan_summary_from_rpc(&teller_v2_address, &bid_id);
                 
-            if submitted_bid_data_option.is_some() {
                       tables
                 .update_row("tellerv2_bid", bid_id.to_string())
                   
                 .set("status", "cancelled".to_string())
                ;
-            }
+             
              
                 
     });
@@ -1045,21 +1039,15 @@ fn graph_tellerv2_out(
             
                     let bid_id = BigInt::from_str(&evt.bid_id).unwrap();
             
-                 let teller_v2_address = Address::from_slice(&TELLERV2_TRACKED_CONTRACT);
-
-                    
                                                             
-                    let submitted_bid_data_option =
-            rpc::tellerv2::fetch_loan_summary_from_rpc(&teller_v2_address, &bid_id);
-                
-            if submitted_bid_data_option.is_some() {
+                  
                 
                 tables
                 .update_row("tellerv2_bid", bid_id.to_string())
                   
                 .set("status", "liquidated".to_string()) ;
                 
-            }
+            
     });
     events.tellerv2_loan_repaids.iter().for_each(|evt| {
         tables
@@ -1075,21 +1063,14 @@ fn graph_tellerv2_out(
             
             
                 let bid_id = BigInt::from_str(&evt.bid_id).unwrap();
-                let teller_v2_address = Address::from_slice(&TELLERV2_TRACKED_CONTRACT);
-                    
-                
-            let submitted_bid_data_option =
-            rpc::tellerv2::fetch_loan_summary_from_rpc(&teller_v2_address, &bid_id);
-                
-            if submitted_bid_data_option.is_some() {
+                 
                 
                 tables
                 .update_row("tellerv2_bid", bid_id.to_string())
                 
                 .set("status", "repaid".to_string())
                ;
-               
-            }
+            
     });
     events.tellerv2_loan_repayments.iter().for_each(|evt| {
         tables

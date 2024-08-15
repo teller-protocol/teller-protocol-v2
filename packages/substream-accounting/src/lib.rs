@@ -824,6 +824,72 @@ fn graph_tellerv2_out(
             .set("metadata_uri", Hex(&evt.metadata_uri).to_string())
             .set("receiver", Hex(&evt.receiver).to_string());
 
+        
+            
+            
+            
+            
+            
+            
+        let bid_id = BigInt::from_str(&evt.bid_id).unwrap();
+        let teller_v2_address = Address::from_slice(&TELLERV2_TRACKED_CONTRACT);
+    
+        
+        tables
+                .create_row("tellerv2_bid", bid_id.to_string())
+                .set("bid_id", &bid_id)
+                .set("status", "submitted".to_string())
+                
+                .set(
+                    "borrower",
+                    Hex(  &evt.borrower ) .to_string(),
+                )
+                
+                ;
+        // this fails for very old bids as this fn wasnt added until later
+        let submitted_bid_data_option =
+            rpc::tellerv2::fetch_loan_summary_from_rpc(&teller_v2_address, &bid_id);
+            
+      if let Some(submitted_bid_data) = submitted_bid_data_option {
+          
+          let bid_id = bid_id.clone();
+
+            let weth_address =
+                H160::from_str("0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2").unwrap();
+            let usdc_address =
+                H160::from_str("0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48").unwrap();
+
+            let principal_token_address = submitted_bid_data.principal_token_address.clone();
+            let principal_amount = submitted_bid_data.principal_amount.clone();
+
+            let principal_amount_usdc = calculate_principal_amount_usdc(
+                principal_amount,
+                principal_token_address,
+                weth_address,
+                usdc_address,
+                &token_prices,
+                &token_decimals,
+            );
+            
+            let principal_amount_usdc_big_decimal = f64_to_bigdecimal(principal_amount_usdc);
+            
+            
+            
+                 tables
+                .update_row("tellerv2_bid", bid_id.to_string())
+               
+                .set("status", "submitted".to_string())
+                 
+                // .set("receiver", Hex(&evt.receiver).to_string())
+                .set(
+                    "principal_token_address",
+                    Hex(&submitted_bid_data.principal_token_address).to_string(),
+                )
+                .set("principal_amount", &submitted_bid_data.principal_amount)
+                .set("principal_amount_usdc", &principal_amount_usdc_big_decimal);
+            
+         }
+            
         // }.unwrap()
     });
 
@@ -884,8 +950,8 @@ fn graph_tellerv2_out(
             let principal_amount_usdc_big_decimal = f64_to_bigdecimal(principal_amount_usdc);
 
             tables
-                .create_row("tellerv2_bid", bid_id.to_string())
-                .set("bid_id", &bid_id)
+                .update_row("tellerv2_bid", bid_id.to_string())
+               
                 .set("status", "accepted".to_string())
                 .set("accepted_at", event_block_time )
                 .set(
@@ -930,7 +996,7 @@ fn graph_tellerv2_out(
             if submitted_bid_data_option.is_some() {
                       tables
                 .update_row("tellerv2_bid", bid_id.to_string())
-                  .set("bid_id", &bid_id)
+                  
                 .set("status", "cancelled".to_string())
                ;
             }
@@ -990,7 +1056,7 @@ fn graph_tellerv2_out(
                 
                 tables
                 .update_row("tellerv2_bid", bid_id.to_string())
-                  .set("bid_id", &bid_id)
+                  
                 .set("status", "liquidated".to_string()) ;
                 
             }
@@ -1019,7 +1085,7 @@ fn graph_tellerv2_out(
                 
                 tables
                 .update_row("tellerv2_bid", bid_id.to_string())
-                 .set("bid_id", &bid_id)
+                
                 .set("status", "repaid".to_string())
                ;
                

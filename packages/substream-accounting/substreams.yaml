@@ -23,7 +23,7 @@ binaries:
 modules:
   - name: map_events
     kind: map
-    initialBlock: 19094701
+    initialBlock: 15094701
     inputs:
       - source: sf.ethereum.type.v2.Block
     output:
@@ -32,7 +32,7 @@ modules:
       
   - name: store_token_interaction_deltas
     kind: store
-    initialBlock: 19094701
+    initialBlock: 15094701
     updatePolicy: add
     valueType: bigint
     inputs:
@@ -42,7 +42,7 @@ modules:
       
   - name: store_decimals_for_tokens
     kind: store
-    initialBlock: 19094701
+    initialBlock: 15094701
     updatePolicy: set
     valueType: bigint
     inputs: 
@@ -51,7 +51,7 @@ modules:
          
   - name: store_uniswap_prices_for_tokens
     kind: store
-    initialBlock: 19094701
+    initialBlock: 15094701
     updatePolicy: set
     valueType: float64
     inputs: 
@@ -62,7 +62,7 @@ modules:
  
   - name: graph_out
     kind: map
-    initialBlock: 19094701
+    initialBlock: 15094701
     inputs:
       - map: map_events
       - store: store_token_interaction_deltas

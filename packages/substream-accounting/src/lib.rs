@@ -825,10 +825,7 @@ fn graph_tellerv2_out(
             .set("receiver", Hex(&evt.receiver).to_string());
 
         
-            
-            
-            
-            
+             
             
             
         let bid_id = BigInt::from_str(&evt.bid_id).unwrap();
@@ -988,7 +985,7 @@ fn graph_tellerv2_out(
                 let bid_id = BigInt::from_str(&evt.bid_id).unwrap();
                     
                 
-                      tables
+                  tables
                 .update_row("tellerv2_bid", bid_id.to_string())
                   
                 .set("status", "cancelled".to_string())

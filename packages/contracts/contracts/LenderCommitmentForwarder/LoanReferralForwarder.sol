@@ -76,7 +76,7 @@ contract LoanReferralForwarder
         address _recipient,
       //  uint256 _minAmountReceived,
 
-        uint256 _reward,
+        uint16 _reward,
         address _rewardRecipient
 
     ) external   {
@@ -130,17 +130,18 @@ contract LoanReferralForwarder
 
          uint256 fundsRemaining = balanceAfter - balanceBefore;
 
-        // require(  fundsRemaining >= _minAmountReceived, "Insufficient funds received" );
+         // require(  fundsRemaining >= _minAmountReceived, "Insufficient funds received" );
 
+         uint256 referralRewardAmount = _principalAmount.percent(_reward);
          
          IERC20Upgradeable(principalTokenAddress).transfer(
                 _rewardRecipient,
-                _reward
+                referralRewardAmount
           );
 
          IERC20Upgradeable(principalTokenAddress).transfer(
                 _recipient,
-                fundsRemaining - _reward
+                fundsRemaining - referralRewardAmount
           );
 
 

@@ -32,7 +32,20 @@ contract LoanReferralForwarder
     ITellerV2 public immutable TELLER_V2;
     /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
   
-  
+    
+
+      struct AcceptCommitmentArgs {
+        uint256 commitmentId;
+        address smartCommitmentAddress;  //if this is not address(0), we will use this ! leave empty if not used. 
+        uint256 principalAmount;
+        uint256 collateralAmount;
+        uint256 collateralTokenId;
+        address collateralTokenAddress;
+        uint16 interestRate;
+        uint32 loanDuration;
+        bytes32[] merkleProof; //empty array if not used
+    }
+
 
     /**
      *
@@ -59,12 +72,15 @@ contract LoanReferralForwarder
      */
     function acceptCommitmentWithReferral(
         address _commitmentForwarder, //leave 0 if using smart commitment address
-        uint256 _commitmentId,
+        
+        
+          AcceptCommitmentArgs calldata _acceptCommitmentArgs ,
+          
+        /*uint256 _commitmentId,
 
         address _smartCommitmentAddress,  //leave 0 if using a commitmentForwarder
         
-
-//     address _principalToken,
+ 
         uint256 _principalAmount,
         uint256 _collateralAmount,
         uint256 _collateralTokenId,
@@ -73,54 +89,56 @@ contract LoanReferralForwarder
         uint16 _interestRate,
         uint32 _loanDuration,
 
+       
+    */
         address _recipient,
-      //  uint256 _minAmountReceived,
-
         uint256 _reward,
         address _rewardRecipient
 
-    ) external   {
+    ) external  returns (uint256 bidId_) {
 
  
          address principalTokenAddress = address(0);
          uint256 balanceBefore;
-         
-        if (_smartCommitmentAddress != address(0)) {
+
+       //  address borrower = msg.sender; 
 
          
-                principalTokenAddress = ISmartCommitment(_smartCommitmentAddress).getPrincipalTokenAddress ();
+        if (_acceptCommitmentArgs.smartCommitmentAddress != address(0)) {
+
+         
+                principalTokenAddress = ISmartCommitment(_acceptCommitmentArgs.smartCommitmentAddress).getPrincipalTokenAddress ();
         
             // Accept commitment and receive funds to this contract
                 balanceBefore = IERC20(principalTokenAddress).balanceOf(address(this));
 
-        
-                (uint256 bidId) = ISmartCommitmentForwarder(_smartCommitmentAddress).acceptSmartCommitmentWithRecipient(
-                _smartCommitmentAddress,
-                _principalAmount,
-                _collateralAmount,
-                _collateralTokenId,
-                _collateralTokenAddress,
-                address(this), //this contract is the recipient ,
-                _interestRate,
-                _loanDuration
+         
+
+            bidId_ = _acceptSmartCommitmentWithRecipient(
+                _commitmentForwarder,
+                _acceptCommitmentArgs
+
             );
-        
+
+           
         }else{  
-              principalTokenAddress = ILenderCommitmentForwarder_U1(_commitmentForwarder).getCommitmentPrincipalTokenAddress (_commitmentId);
+              principalTokenAddress = ILenderCommitmentForwarder_U1(_commitmentForwarder)
+                  .getCommitmentPrincipalTokenAddress (_acceptCommitmentArgs.commitmentId);
         
             // Accept commitment and receive funds to this contract
               balanceBefore = IERC20(principalTokenAddress).balanceOf(address(this));
  
-            (uint256 bidId) = ILenderCommitmentForwarder(_commitmentForwarder).acceptCommitmentWithRecipient(
-                _commitmentId,
-                _principalAmount,
-                _collateralAmount,
-                _collateralTokenId,
-                _collateralTokenAddress,
-                address(this), //this contract is the recipient ,
-                _interestRate,
-                _loanDuration
+            
+
+            bidId_ = _acceptCommitmentWithRecipient(
+                _commitmentForwarder,
+                _acceptCommitmentArgs
+
             );
+
+            
+
+
 
         }
         //at this point, this contract has received acceptCommitmentAmount tokens.  So the majority of them should be sent to the msg.sender (borrower) 
@@ -149,8 +167,75 @@ contract LoanReferralForwarder
     }
 
 
-   
+    function _acceptSmartCommitmentWithRecipient( 
+        address _smartCommitmentForwarder,
+        AcceptCommitmentArgs calldata _acceptCommitmentArgs  
+         
 
+     ) internal returns (uint256 bidId_) {
+
+            bytes memory responseData = address(_smartCommitmentForwarder)
+                    .functionCall(
+                        abi.encodePacked(
+                            abi.encodeWithSelector(
+                                ISmartCommitmentForwarder
+                                    .acceptSmartCommitmentWithRecipient
+                                    .selector,
+                                _acceptCommitmentArgs.smartCommitmentAddress,
+                                _acceptCommitmentArgs.principalAmount,
+                                _acceptCommitmentArgs.collateralAmount,
+                                _acceptCommitmentArgs.collateralTokenId,
+                                _acceptCommitmentArgs.collateralTokenAddress,
+                                address(this),
+                                _acceptCommitmentArgs.interestRate,
+                                _acceptCommitmentArgs.loanDuration
+                            ),
+                            msg.sender // borrower 
+                        )
+                    );
+
+
+              (bidId_) = abi.decode(responseData, (uint256));
+
+
+
+    }
+
+
+
+    function _acceptCommitmentWithRecipient(
+        address _commitmentForwarder,
+        AcceptCommitmentArgs calldata _acceptCommitmentArgs  
+            
+
+    ) internal returns (uint256 bidId_) {
+
+        bytes memory responseData = address(_commitmentForwarder)
+                        .functionCall(
+                            abi.encodePacked(
+                                abi.encodeWithSelector(
+                                    ILenderCommitmentForwarder
+                                        .acceptCommitmentWithRecipient
+                                        .selector,
+                                    _acceptCommitmentArgs.commitmentId,
+                                    _acceptCommitmentArgs.principalAmount,
+                                    _acceptCommitmentArgs.collateralAmount,
+                                    _acceptCommitmentArgs.collateralTokenId,
+                                    _acceptCommitmentArgs.collateralTokenAddress,
+                                    address(this),
+                                    _acceptCommitmentArgs.interestRate,
+                                    _acceptCommitmentArgs.loanDuration
+                                ),
+                                msg.sender //borrower 
+                            )
+                        );
+
+                    (bidId_) = abi.decode(responseData, (uint256));
+
+
+    }
+
+    
     /**
      * @notice Fetches the protocol fee percentage from the Teller V2 protocol.
      * @return The protocol fee percentage as defined in the Teller V2 protocol.

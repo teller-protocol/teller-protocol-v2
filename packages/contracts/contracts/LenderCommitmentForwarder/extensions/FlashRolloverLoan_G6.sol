@@ -217,11 +217,12 @@ contract FlashRolloverLoan_G6 is IFlashLoanSimpleReceiver, IFlashRolloverLoan_G6
             if (_rolloverArgs.rewardAmount > 0){
 
                 //make sure reward amount isnt TOO much here ? 
+                uint256 referralRewardAmount = acceptCommitmentAmount.percent(rewardAmount);
 
-                fundsRemaining -= _rolloverArgs.rewardAmount;
+                fundsRemaining -= referralRewardAmount;
                 IERC20Upgradeable(_flashToken).transfer(
                     _rolloverArgs.rewardRecipient,
-                    _rolloverArgs.rewardAmount
+                    referralRewardAmount
                 );
 
             }
@@ -432,10 +433,14 @@ contract FlashRolloverLoan_G6 is IFlashLoanSimpleReceiver, IFlashRolloverLoan_G6
         uint256 amountToProtocol = commitmentPrincipalRequested.percent(
             protocolFeePct
         );
+        uint256 amountToReferral = commitmentPrincipalRequested.percent(
+            _rewardAmount
+        );
 
         uint256 commitmentPrincipalReceived = commitmentPrincipalRequested -
             amountToMarketplace -
-            amountToProtocol;
+            amountToProtocol -
+            amountToReferral;
 
         // by default, we will flash exactly what we need to do relayLoanFull
         uint256 repayFullAmount = repayAmountOwed.principal +
@@ -447,8 +452,7 @@ contract FlashRolloverLoan_G6 is IFlashLoanSimpleReceiver, IFlashRolloverLoan_G6
         _borrowerAmount =
             int256(commitmentPrincipalReceived) -
             int256(repayFullAmount) -
-            int256(_flashLoanFee) -
-            int256(_rewardAmount);
+            int256(_flashLoanFee);
     }
 
     /**

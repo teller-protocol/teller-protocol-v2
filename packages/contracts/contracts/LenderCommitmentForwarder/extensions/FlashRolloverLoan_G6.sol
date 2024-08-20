@@ -106,7 +106,7 @@ contract FlashRolloverLoan_G6 is IFlashLoanSimpleReceiver, IFlashRolloverLoan_G6
         uint256 _loanId,
         uint256 _flashLoanAmount,
         uint256 _borrowerAmount, //an additional amount borrower may have to add
-        uint256 _rewardAmount,
+        uint16 _rewardAmount,
         address _rewardRecipient,
         AcceptCommitmentArgs calldata _acceptCommitmentArgs
     ) external   {
@@ -217,7 +217,7 @@ contract FlashRolloverLoan_G6 is IFlashLoanSimpleReceiver, IFlashRolloverLoan_G6
             if (_rolloverArgs.rewardAmount > 0){
 
                 //make sure reward amount isnt TOO much here ? 
-                uint256 referralRewardAmount = acceptCommitmentAmount.percent(rewardAmount);
+                uint256 referralRewardAmount = acceptCommitmentAmount.percent(_rolloverArgs.rewardAmount);
 
                 fundsRemaining -= referralRewardAmount;
                 IERC20Upgradeable(_flashToken).transfer(
@@ -411,7 +411,7 @@ contract FlashRolloverLoan_G6 is IFlashLoanSimpleReceiver, IFlashRolloverLoan_G6
         address _lenderCommitmentForwarder,
         uint256 _loanId,
         AcceptCommitmentArgs calldata _commitmentArgs,
-        uint256 _rewardAmount, 
+        uint16 _rewardAmount, 
         uint16 _flashloanPremiumPct,
         uint256 _timestamp
     ) external view returns (uint256 _flashAmount, int256 _borrowerAmount) {

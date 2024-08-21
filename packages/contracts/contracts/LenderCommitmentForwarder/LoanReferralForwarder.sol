@@ -74,23 +74,9 @@ contract LoanReferralForwarder
         address _commitmentForwarder, //leave 0 if using smart commitment address
         
         
-          AcceptCommitmentArgs calldata _acceptCommitmentArgs ,
+        AcceptCommitmentArgs calldata _acceptCommitmentArgs ,
           
-        /*uint256 _commitmentId,
-
-        address _smartCommitmentAddress,  //leave 0 if using a commitmentForwarder
-        
- 
-        uint256 _principalAmount,
-        uint256 _collateralAmount,
-        uint256 _collateralTokenId,
-        address _collateralTokenAddress,
-        
-        uint16 _interestRate,
-        uint32 _loanDuration,
-
-       
-    */
+   
         address _recipient,
         uint256 _reward,
         address _rewardRecipient
@@ -101,9 +87,9 @@ contract LoanReferralForwarder
          address principalTokenAddress = address(0);
          uint256 balanceBefore;
 
-       //  address borrower = msg.sender; 
+    
+        require(_reward <= _acceptCommitmentArgs.principalAmount / 10, "Reward can be no more than 10% of principal");
 
-         
         if (_acceptCommitmentArgs.smartCommitmentAddress != address(0)) {
 
          
@@ -111,9 +97,7 @@ contract LoanReferralForwarder
         
             // Accept commitment and receive funds to this contract
                 balanceBefore = IERC20(principalTokenAddress).balanceOf(address(this));
-
-         
-
+ 
             bidId_ = _acceptSmartCommitmentWithRecipient(
                 _commitmentForwarder,
                 _acceptCommitmentArgs
@@ -127,23 +111,18 @@ contract LoanReferralForwarder
         
             // Accept commitment and receive funds to this contract
               balanceBefore = IERC20(principalTokenAddress).balanceOf(address(this));
- 
-            
+  
 
             bidId_ = _acceptCommitmentWithRecipient(
                 _commitmentForwarder,
                 _acceptCommitmentArgs
 
-            );
-
-            
+            ); 
 
 
 
         }
-        //at this point, this contract has received acceptCommitmentAmount tokens.  So the majority of them should be sent to the msg.sender (borrower) 
-
-
+        
          uint256 balanceAfter = IERC20(principalTokenAddress).balanceOf(address(this));
 
          uint256 fundsRemaining = balanceAfter - balanceBefore;

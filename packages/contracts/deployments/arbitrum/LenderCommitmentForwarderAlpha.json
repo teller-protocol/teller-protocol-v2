@@ -721,6 +721,25 @@
     },
     {
       "type": "function",
+      "name": "getCommitmentCollateralTokenAddress",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_commitmentId"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
       "name": "getCommitmentLender",
       "constant": true,
       "stateMutability": "view",
@@ -791,6 +810,25 @@
       "outputs": [
         {
           "type": "uint16",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getCommitmentPrincipalTokenAddress",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_commitmentId"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "address",
           "name": ""
         }
       ]
@@ -1146,6 +1184,6 @@
     "blockHash": null,
     "blockNumber": null
   },
-  "numDeployments": 3,
+  "numDeployments": 4,
   "implementation": "0x90D08f8Df66dFdE93801783FF7A36876453DAE75"
 }

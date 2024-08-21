@@ -116,6 +116,8 @@ contract FlashRolloverLoan_G6 is IFlashLoanSimpleReceiver, IFlashRolloverLoan_G6
         // Get lending token and balance before
         address lendingToken = TELLER_V2.getLoanLendingToken(_loanId);
 
+        require( _rewardAmount <= _flashLoanAmount/ 10, "Reward amount may only be up to 1/10 of flash loan amount" );
+
         if (_borrowerAmount > 0) {
             IERC20(lendingToken).transferFrom(
                 borrower,

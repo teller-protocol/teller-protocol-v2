@@ -1,5 +1,5 @@
 {
-  "address": "0x7E17aAa2f6f54d3FD81828fC6b0D8B6bD06eF91D",
+  "address": "0x5d3eCF8877eDAB28e14bD7d243fA8B0fE416E95E",
   "abi": [
     {
       "type": "constructor",
@@ -157,6 +157,10 @@
           ]
         },
         {
+          "type": "uint256",
+          "name": "_rewardAmount"
+        },
+        {
           "type": "uint16",
           "name": "_flashloanPremiumPct"
         },
@@ -233,6 +237,14 @@
           "name": "_borrowerAmount"
         },
         {
+          "type": "uint256",
+          "name": "_rewardAmount"
+        },
+        {
+          "type": "address",
+          "name": "_rewardRecipient"
+        },
+        {
           "type": "tuple",
           "name": "_acceptCommitmentArgs",
           "components": [
@@ -278,13 +290,13 @@
       "outputs": []
     }
   ],
-  "transactionHash": "0x11917ffe904a7081d3fc8d1c6e70ceff9170aac34806ce6a42e73231c144b00f",
+  "transactionHash": "0xca163455658de2c2ebf7ab1d244c48c8b71aea73bc7012947c53a2160104fc5c",
   "receipt": {
     "to": null,
-    "from": "0x5a5B978142C8F08Dd013901b50892baC49f3b700",
-    "blockHash": null,
-    "blockNumber": null
+    "from": "0xD9B023522CeCe02251d877bb0EB4f06fDe6F98E6",
+    "blockHash": "0xba6f8923ff82e7609db97fdd8397fb6bcc2ebcd383b561387c10460fbf619b83",
+    "blockNumber": 18778724
   },
-  "numDeployments": 5,
-  "implementation": "0x0848E884b2DBb63727aa3216b921C279f6DC9a91"
+  "numDeployments": 1,
+  "implementation": "0xe7768f28455eE81D7B415f4F5019A316c27AB445"
 }

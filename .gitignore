@@ -24,6 +24,12 @@ packages/subgraph/subgraph.yaml
 packages/subgraph/generated
 packages/subgraph/abis/*
 
+# rust build artifacts 
+packages/substream-accounting/target/*
+packages/substream-accounting/build/*
+packages/subgraph-substreamed/target/*
+packages/subgraph-substreamed/build/*
+
 # dependencies
 /node_modules
 /.pnp

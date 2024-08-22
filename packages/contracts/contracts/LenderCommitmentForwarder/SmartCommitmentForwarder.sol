@@ -9,7 +9,9 @@ import "./LenderCommitmentForwarder_G1.sol";
 
 import { CommitmentCollateralType, ISmartCommitment } from "../interfaces/ISmartCommitment.sol";
 
-contract SmartCommitmentForwarder is TellerV2MarketForwarder_G3, ISmartCommitmentForwarder {
+contract SmartCommitmentForwarder
+ is TellerV2MarketForwarder_G3,
+  ISmartCommitmentForwarder {
     event ExercisedSmartCommitment(
         address indexed smartCommitmentAddress,
         address borrower,

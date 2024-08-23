@@ -202,7 +202,7 @@ contract LenderCommitmentForwarder_U1 is
 
         commitments[commitmentId_] = _commitment;
 
-        require(_poolRoutes.length == 0 || _commitment.collateralTokenType != CommitmentCollateralType.ERC20 , "can only use pool routes with ERC20 collateral");
+        require(_poolRoutes.length == 0 || _commitment.collateralTokenType == CommitmentCollateralType.ERC20 , "can only use pool routes with ERC20 collateral");
 
 
         //routes length of 0 means ignore price oracle limits

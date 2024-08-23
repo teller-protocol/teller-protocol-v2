@@ -194,7 +194,7 @@ contract LenderCommitmentForwarder_U1 is
         uint16 _poolOracleLtvRatio //generally always between 0 and 100 % , 0 to 10000
     ) public returns (uint256 commitmentId_) {
         commitmentId_ = commitmentCount++;
-
+        
         require(
             _commitment.lender == _msgSender(),
             "unauthorized commitment creator"
@@ -202,7 +202,7 @@ contract LenderCommitmentForwarder_U1 is
 
         commitments[commitmentId_] = _commitment;
 
-        require(_poolRoutes.length == 0 || _commitment.collateralTokenType != CommitmentCollateralType.ERC20 , "can only use pool routes with ERC20 collateral");
+        require(_poolRoutes.length == 0 || _commitment.collateralTokenType == CommitmentCollateralType.ERC20 , "can only use pool routes with ERC20 collateral");
 
 
         //routes length of 0 means ignore price oracle limits

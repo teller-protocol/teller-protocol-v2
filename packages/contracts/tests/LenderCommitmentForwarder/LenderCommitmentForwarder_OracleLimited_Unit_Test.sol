@@ -42,6 +42,9 @@ import "forge-std/console.sol";
 
 */
 
+ 
+
+
 contract LenderCommitmentForwarder_U1_Test is Testable {
     LenderCommitmentForwarderTest_TellerV2Mock private tellerV2Mock;
     MarketRegistryMock mockMarketRegistry;
@@ -74,7 +77,7 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
     // address collateralTokenAddress;
     uint256 collateralTokenId;
     uint256 maxPrincipalPerCollateralAmount;
-    ILenderCommitmentForwarder.CommitmentCollateralType collateralTokenType;
+    ILenderCommitmentForwarder_U1.CommitmentCollateralType collateralTokenType;
 
     uint256 marketId;
 
@@ -1056,10 +1059,17 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
         //  assertEq( requiredCollateral, 1000, "unexpected required collateral" );
     }
 
-    /*
-    function test_createCommitment() public {
-        ILenderCommitmentForwarder.Commitment
-            memory c = ILenderCommitmentForwarder.Commitment({
+
+  function test_createCommitmentWithUniswap() public {
+
+
+
+
+         collateralTokenType = ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC20; 
+
+
+        ILenderCommitmentForwarder_U1.Commitment
+            memory _commitment = ILenderCommitmentForwarder_U1.Commitment({
                 maxPrincipal: maxPrincipal,
                 expiration: expiration,
                 maxDuration: maxDuration,
@@ -1073,15 +1083,154 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
                 principalTokenAddress: address(principalToken)
             });
 
-        uint256 c_id = lender._createCommitment(c, emptyArray);
+       // uint256 c_id = lender._createCommitment(c, emptyArray);
 
-        assertEq(
-            lenderCommitmentForwarder.getCommitmentLender(c_id),
-            address(lender),
-            "unexpected lender for created commitment"
-        );
+       address[] memory _borrowerAddressList ;
+        ILenderCommitmentForwarder_U1.PoolRouteConfig[] memory _poolRoutes ;
+
+      vm.prank(address(lender));
+       uint256 _commitmentId = lenderCommitmentForwarder
+            .createCommitmentWithUniswap(
+               _commitment,
+               _borrowerAddressList,
+               _poolRoutes,
+               10000
+            );
+            
+      
     }
 
+
+  function test_createCommitmentWithUniswap_two_routes() public {
+
+
+
+
+         collateralTokenType = ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC20; 
+
+
+        ILenderCommitmentForwarder_U1.Commitment
+            memory _commitment = ILenderCommitmentForwarder_U1.Commitment({
+                maxPrincipal: maxPrincipal,
+                expiration: expiration,
+                maxDuration: maxDuration,
+                minInterestRate: minInterestRate,
+                collateralTokenAddress: address(collateralToken),
+                collateralTokenId: collateralTokenId,
+                maxPrincipalPerCollateralAmount: maxPrincipalPerCollateralAmount,
+                collateralTokenType: collateralTokenType,
+                lender: address(lender),
+                marketId: marketId,
+                principalTokenAddress: address(principalToken)
+            });
+
+       // uint256 c_id = lender._createCommitment(c, emptyArray);
+
+       address[] memory _borrowerAddressList ;
+       
+        ILenderCommitmentForwarder_U1.PoolRouteConfig[]
+            memory _poolRoutes = new ILenderCommitmentForwarder_U1.PoolRouteConfig[](
+                2
+            );
+
+        bool zeroForOne = false;
+        uint32 twapInterval = 10;
+
+        _poolRoutes[0] = ILenderCommitmentForwarder_U1.PoolRouteConfig({
+            pool: address(mockUniswapPool),
+            zeroForOne: zeroForOne,
+            twapInterval: twapInterval,
+            token0Decimals: 18,
+            token1Decimals: 18
+        });
+
+        _poolRoutes[1] = ILenderCommitmentForwarder_U1.PoolRouteConfig({
+            pool: address(mockUniswapPoolSecondary),
+            zeroForOne: zeroForOne,
+            twapInterval: twapInterval,
+            token0Decimals: 18,
+            token1Decimals: 18
+        });
+
+      vm.prank(address(lender));
+       uint256 _commitmentId = lenderCommitmentForwarder
+            .createCommitmentWithUniswap(
+               _commitment,
+               _borrowerAddressList,
+               _poolRoutes,
+               10000
+            );
+            
+      
+    }
+
+
+  function test_createCommitmentWithUniswap_two_routes_invalid_type() public {
+
+
+
+
+         collateralTokenType = ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC721; 
+
+
+        ILenderCommitmentForwarder_U1.Commitment
+            memory _commitment = ILenderCommitmentForwarder_U1.Commitment({
+                maxPrincipal: maxPrincipal,
+                expiration: expiration,
+                maxDuration: maxDuration,
+                minInterestRate: minInterestRate,
+                collateralTokenAddress: address(collateralToken),
+                collateralTokenId: collateralTokenId,
+                maxPrincipalPerCollateralAmount: maxPrincipalPerCollateralAmount,
+                collateralTokenType: collateralTokenType,
+                lender: address(lender),
+                marketId: marketId,
+                principalTokenAddress: address(principalToken)
+            });
+
+       // uint256 c_id = lender._createCommitment(c, emptyArray);
+
+       address[] memory _borrowerAddressList ;
+       ILenderCommitmentForwarder_U1.PoolRouteConfig[]
+            memory _poolRoutes = new ILenderCommitmentForwarder_U1.PoolRouteConfig[](
+                2
+            );
+
+        bool zeroForOne = false;
+        uint32 twapInterval = 10;
+
+        _poolRoutes[0] = ILenderCommitmentForwarder_U1.PoolRouteConfig({
+            pool: address(mockUniswapPool),
+            zeroForOne: zeroForOne,
+            twapInterval: twapInterval,
+            token0Decimals: 18,
+            token1Decimals: 18
+        });
+
+        _poolRoutes[1] = ILenderCommitmentForwarder_U1.PoolRouteConfig({
+            pool: address(mockUniswapPoolSecondary),
+            zeroForOne: zeroForOne,
+            twapInterval: twapInterval,
+            token0Decimals: 18,
+            token1Decimals: 18
+        });
+
+
+      vm.prank(address(lender));
+       vm.expectRevert( "can only use pool routes with ERC20 collateral" ); 
+      
+       uint256 _commitmentId = lenderCommitmentForwarder
+            .createCommitmentWithUniswap(
+               _commitment,
+               _borrowerAddressList,
+               _poolRoutes,
+               10000
+            );
+    
+    }
+
+    /*
+   
     function test_createCommitment_invalid_lender() public {
         ILenderCommitmentForwarder.Commitment
             memory c = ILenderCommitmentForwarder.Commitment({

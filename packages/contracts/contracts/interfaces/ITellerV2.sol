@@ -51,9 +51,7 @@ interface ITellerV2 {
      * @notice Function for a lender to accept a proposed loan bid.
      * @param _bidId The id of the loan bid to accept.
      */
-    function lenderAcceptBid(
-        uint256 _bidId
-    )
+    function lenderAcceptBid(uint256 _bidId)
         external
         returns (
             uint256 amountToProtocol,
@@ -100,37 +98,39 @@ interface ITellerV2 {
 
     function getBidState(uint256 _bidId) external view returns (BidState);
 
-    function getBorrowerActiveLoanIds(
-        address _borrower
-    ) external view returns (uint256[] memory);
+    function getBorrowerActiveLoanIds(address _borrower)
+        external
+        view
+        returns (uint256[] memory);
 
     /**
      * @notice Returns the borrower address for a given bid.
      * @param _bidId The id of the bid/loan to get the borrower for.
      * @return borrower_ The address of the borrower associated with the bid.
      */
-    function getLoanBorrower(
-        uint256 _bidId
-    ) external view returns (address borrower_);
+    function getLoanBorrower(uint256 _bidId)
+        external
+        view
+        returns (address borrower_);
 
     /**
      * @notice Returns the lender address for a given bid.
      * @param _bidId The id of the bid/loan to get the lender for.
      * @return lender_ The address of the lender associated with the bid.
      */
-    function getLoanLender(
-        uint256 _bidId
-    ) external view returns (address lender_);
+    function getLoanLender(uint256 _bidId)
+        external
+        view
+        returns (address lender_);
 
-    function getLoanLendingToken(
-        uint256 _bidId
-    ) external view returns (address token_);
+    function getLoanLendingToken(uint256 _bidId)
+        external
+        view
+        returns (address token_);
 
     function getLoanMarketId(uint256 _bidId) external view returns (uint256);
 
-    function getLoanSummary(
-        uint256 _bidId
-    )
+    function getLoanSummary(uint256 _bidId)
         external
         view
         returns (
@@ -144,31 +144,31 @@ interface ITellerV2 {
             BidState bidState
         );
 
-    function calculateAmountOwed(
-        uint256 _bidId,
-        uint256 _timestamp
-    ) external view returns (Payment memory owed);
+    function calculateAmountOwed(uint256 _bidId, uint256 _timestamp)
+        external
+        view
+        returns (Payment memory owed);
 
-    function calculateAmountDue(
-        uint256 _bidId,
-        uint256 _timestamp
-    ) external view returns (Payment memory due);
+    function calculateAmountDue(uint256 _bidId, uint256 _timestamp)
+        external
+        view
+        returns (Payment memory due);
 
     function lenderCloseLoan(uint256 _bidId) external;
 
-    function lenderCloseLoanWithRecipient(
-        uint256 _bidId,
-        address _recipient
-    ) external;
+    function lenderCloseLoanWithRecipient(uint256 _bidId, address _recipient)
+        external;
 
     function liquidateLoanFull(uint256 _bidId) external;
 
-    function liquidateLoanFullWithRecipient(
-        uint256 _bidId,
-        address _recipient
-    ) external;
+    function liquidateLoanFullWithRecipient(uint256 _bidId, address _recipient)
+        external;
 
-    function getLoanDefaultTimestamp(
-        uint256 _bidId
-    ) external view returns (uint256);
+    function getLoanDefaultTimestamp(uint256 _bidId)
+        external
+        view
+        returns (uint256);
+
+
+    function getEscrowVault() external view returns(address);
 }

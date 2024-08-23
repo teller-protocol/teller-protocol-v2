@@ -44,9 +44,7 @@ contract LenderCommitmentGroupFactory {
     }
 
     /*
-
         This should deploy a new lender commitment group pool contract.
-
         It will use create commitment args in order to define the pool contracts parameters such as its primary principal token.  
         Shares will be distributed at a 1:1 ratio of the primary principal token so if 1e18 raw WETH are deposited, the depositor gets 1e18 shares for the group pool.
     */

@@ -26,7 +26,7 @@ contract TellerV2_pause_test is Testable {
     }
 
     function test_pauseProtocol_invalid_if_not_owner() public {
-        vm.expectRevert("Ownable: caller is not the owner");
+        vm.expectRevert("Requires role: Pauser");
 
         tellerV2.pauseProtocol();
     }

@@ -18,7 +18,7 @@ import { Collateral } from "./interfaces/escrow/ICollateralEscrowV1.sol";
 import "./interfaces/IEscrowVault.sol";
 
 import { ILoanRepaymentCallbacks } from "./interfaces/ILoanRepaymentCallbacks.sol";
-import { ILoanRepaymentListener } from "./interfaces/ILoanRepaymentListener.sol";
+import "./interfaces/ILoanRepaymentListener.sol";
 
 // Libraries
 import "@openzeppelin/contracts/utils/Address.sol";
@@ -164,6 +164,24 @@ contract TellerV2 is
         _;
     }
 
+
+     modifier onlyPauser() {
+
+        require( pauserRoleBearer[_msgSender()] ||  owner() == _msgSender(), "Requires role: Pauser");
+       
+
+        _;
+    }
+
+
+    modifier whenLiquidationsNotPaused() {
+        require(!liquidationsPaused, "Liquidations are paused");
+      
+        _;
+    }
+
+
+
     /** Constant Variables **/
 
     uint8 public constant CURRENT_CODE_VERSION = 10;
@@ -247,29 +265,7 @@ contract TellerV2 is
         escrowVault = IEscrowVault(_escrowVault);
     }
 
-    /**
-     * @notice Gets the metadataURI for a bidId.
-     * @param _bidId The id of the bid to return the metadataURI for
-     * @return metadataURI_ The metadataURI for the bid, as a string.
-     */
-    function getMetadataURI(uint256 _bidId)
-        public
-        view
-        returns (string memory metadataURI_)
-    {
-        // Check uri mapping first
-        metadataURI_ = uris[_bidId];
-        // If the URI is not present in the mapping
-        if (
-            keccak256(abi.encodePacked(metadataURI_)) ==
-            0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470 // hardcoded constant of keccak256('')
-        ) {
-            // Return deprecated bytes32 uri as a string
-            uint256 convertedURI = uint256(bids[_bidId]._metadataURI);
-            metadataURI_ = StringsUpgradeable.toHexString(convertedURI, 32);
-        }
-    }
-
+    
     /**
      * @notice Function for a borrower to create a bid for a loan without Collateral.
      * @param _lendingToken The lending token asset requested to be borrowed.
@@ -708,25 +704,57 @@ contract TellerV2 is
     }
 
     /**
-     * @notice Lets the DAO/owner of the protocol implement an emergency stop mechanism.
+     * @notice Lets a pauser of the protocol implement an emergency stop mechanism.
      */
-    function pauseProtocol() public virtual onlyOwner whenNotPaused {
+    function pauseProtocol() public virtual onlyPauser whenNotPaused {
         _pause();
     }
 
     /**
-     * @notice Lets the DAO/owner of the protocol undo a previously implemented emergency stop.
+     * @notice Lets a pauser of the protocol undo a previously implemented emergency stop.
      */
-    function unpauseProtocol() public virtual onlyOwner whenPaused {
+    function unpauseProtocol() public virtual onlyPauser whenPaused {
         _unpause();
     }
 
+
+     /**
+     * @notice Lets a pauser of the protocol implement an emergency stop mechanism.
+     */
+    function pauseLiquidations() public virtual onlyPauser {
+        liquidationsPaused = true;
+    }
+
+    /**
+     * @notice Lets a pauser of the protocol undo a previously implemented emergency stop.
+     */
+    function unpauseLiquidations() public virtual onlyPauser {
+         liquidationsPaused = false;
+    }
+
+
+
+    function addPauser(address _pauser) public virtual onlyOwner   {
+       pauserRoleBearer[_pauser] = true;
+    }
+
+
+    function removePauser(address _pauser) public virtual onlyOwner {
+        pauserRoleBearer[_pauser] = false;
+    }
+
+
+    function isPauser(address _account) public view returns(bool){
+        return pauserRoleBearer[_account] ;
+    }
+
+
     function lenderCloseLoan(uint256 _bidId)
-        external
+        external whenNotPaused whenLiquidationsNotPaused
         acceptedLoan(_bidId, "lenderClaimCollateral")
     {
         Bid storage bid = bids[_bidId];
-        address _collateralRecipient = bid.lender;
+        address _collateralRecipient = getLoanLender(_bidId);
 
         _lenderCloseLoanWithRecipient(_bidId, _collateralRecipient);
     }
@@ -738,7 +766,7 @@ contract TellerV2 is
     function lenderCloseLoanWithRecipient(
         uint256 _bidId,
         address _collateralRecipient
-    ) external {
+    ) external whenNotPaused whenLiquidationsNotPaused {
         _lenderCloseLoanWithRecipient(_bidId, _collateralRecipient);
     }
 
@@ -746,32 +774,16 @@ contract TellerV2 is
         uint256 _bidId,
         address _collateralRecipient
     ) internal acceptedLoan(_bidId, "lenderClaimCollateral") {
-
-        Bid storage bid = bids[_bidId];
-         
-        require(
-            _msgSenderForMarket(bid.marketplaceId) == bid.lender,
-            "only lender can close loan"
-        );
         require(isLoanDefaulted(_bidId), "Loan must be defaulted.");
 
-        bid.state = BidState.CLOSED; 
-     
-        /*
+        Bid storage bid = bids[_bidId];
+        bid.state = BidState.CLOSED;
 
+        address sender = _msgSenderForMarket(bid.marketplaceId);
+        require(sender == getLoanLender(_bidId), "only lender can close loan");
 
-          address collateralManagerForBid = address(_getCollateralManagerForBid(_bidId)); 
-
-          if( collateralManagerForBid == address(collateralManagerV2) ){
-             ICollateralManagerV2(collateralManagerForBid).lenderClaimCollateral(_bidId,_collateralRecipient);
-          }else{
-             require( _collateralRecipient == address(bid.lender));
-             ICollateralManager(collateralManagerForBid).lenderClaimCollateral(_bidId );
-          }
-          
-          */
-
-        collateralManager.lenderClaimCollateral(_bidId);
+      
+        collateralManager.lenderClaimCollateralWithRecipient(_bidId, _collateralRecipient);
 
         emit LoanClosed(_bidId);
     }
@@ -781,7 +793,7 @@ contract TellerV2 is
      * @param _bidId The id of the loan to make the payment towards.
      */
     function liquidateLoanFull(uint256 _bidId)
-        external
+        external whenNotPaused whenLiquidationsNotPaused
         acceptedLoan(_bidId, "liquidateLoan")
     {
         Bid storage bid = bids[_bidId];
@@ -793,7 +805,7 @@ contract TellerV2 is
     }
 
     function liquidateLoanFullWithRecipient(uint256 _bidId, address _recipient)
-        external
+        external whenNotPaused whenLiquidationsNotPaused
         acceptedLoan(_bidId, "liquidateLoan")
     {
         _liquidateLoanFull(_bidId, _recipient);
@@ -877,7 +889,8 @@ contract TellerV2 is
             _borrowerBidsActive[bid.borrower].remove(_bidId);
 
             // If loan is is being liquidated and backed by collateral, withdraw and send to borrower
-            if (_shouldWithdrawCollateral) {
+            if (_shouldWithdrawCollateral) { 
+               
                 //   _getCollateralManagerForBid(_bidId).withdraw(_bidId);
                 collateralManager.withdraw(_bidId);
             }
@@ -952,9 +965,10 @@ contract TellerV2 is
         address loanRepaymentListener = repaymentListenerForBid[_bidId];
 
         if (loanRepaymentListener != address(0)) {
+            require(gasleft() >= 40000, "Insufficient gas");  //fixes the 63/64 remaining issue
             try
                 ILoanRepaymentListener(loanRepaymentListener).repayLoanCallback{
-                    gas: 80000
+                    gas: 40000
                 }( //limit gas costs to prevent lender griefing repayments
                     _bidId,
                     _msgSenderForMarket(bid.marketplaceId),
@@ -964,7 +978,6 @@ contract TellerV2 is
             {} catch {}
         }
     }
-
 
 
 
@@ -1108,6 +1121,10 @@ contract TellerV2 is
             dueDate + defaultDuration + _additionalDelay;
     }
 
+    function getEscrowVault() external view returns(address){
+        return address(escrowVault);
+    }
+
     function getBidState(uint256 _bidId)
         external
         view
@@ -1248,19 +1265,25 @@ contract TellerV2 is
 
         return dueDate + defaultDuration;
     }
-
-    function setRepaymentListenerForBid(uint256 _bidId, address _listener)
-        external
-    {
+ 
+    function setRepaymentListenerForBid(uint256 _bidId, address _listener) external {
+        uint256 codeSize;
+        assembly {
+            codeSize := extcodesize(_listener) 
+        }
+        require(codeSize > 0, "Listener must be a contract");
         address sender = _msgSenderForMarket(bids[_bidId].marketplaceId);
 
         require(
-            sender == bids[_bidId].lender,
+            sender == getLoanLender(_bidId),
             "Only bid lender may set repayment listener"
         );
 
         repaymentListenerForBid[_bidId] = _listener;
-    }
+     }
+
+
+
 
     function getRepaymentListenerForBid(uint256 _bidId)
         external

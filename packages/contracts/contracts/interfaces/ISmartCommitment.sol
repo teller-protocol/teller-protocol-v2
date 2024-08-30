@@ -26,7 +26,7 @@ interface ISmartCommitment {
 
     function getCollateralTokenId() external view returns (uint256);
 
-    function getMinInterestRate() external view returns (uint16);
+    function getMinInterestRate(uint256 _delta) external view returns (uint16);
 
     function getMaxLoanDuration() external view returns (uint32);
 
@@ -40,8 +40,7 @@ interface ISmartCommitment {
         view
         returns (uint256);
 
-    function isAllowedToBorrow(address borrower) external view returns (bool);
-
+    
     function acceptFundsForAcceptBid(
         address _borrower,
         uint256 _bidId,

@@ -25,6 +25,7 @@ interface ILenderCommitmentGroup {
 
     function addPrincipalToCommitmentGroup(
         uint256 _amount,
-        address _sharesRecipient
+        address _sharesRecipient,
+        uint256 _minAmountOut
     ) external returns (uint256 sharesAmount_);
 }

@@ -19,6 +19,7 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage , ILoanRepa
     uint256 public amountOwedMockPrincipal;
     uint256 public amountOwedMockInterest;
       address public approvedForwarder;
+    bool public isPausedMock;
 
 
     PaymentCycleType globalBidPaymentCycleType = PaymentCycleType.Seconds;
@@ -39,6 +40,20 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage , ILoanRepa
         return 100;
     }
 
+
+    function getEscrowVault() external view returns(address){
+        return address(0);
+    }
+
+
+    function paused() external view returns(bool){
+        return isPausedMock;
+    }
+
+
+    function isPauser(address _account) public view returns(bool){
+        return false; //for now 
+    }
 
     function approveMarketForwarder(uint256 _marketId, address _forwarder)
         external

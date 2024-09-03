@@ -86,13 +86,18 @@ library V2Calculations {
             _bid.loanDetails.principal -
             _bid.loanDetails.totalRepaid.principal;
 
-        uint256 daysInYear = _paymentCycleType == PaymentCycleType.Monthly
+         uint256 owedTime = _timestamp - uint256(_lastRepaidTimestamp);
+
+        {
+         uint256 daysInYear = _paymentCycleType == PaymentCycleType.Monthly
             ? 360 days
             : 365 days;
 
-        uint256 interestOwedInAYear = owedPrincipal_.percent(_bid.terms.APR);
-        uint256 owedTime = _timestamp - uint256(_lastRepaidTimestamp);
-        interest_ = (interestOwedInAYear * owedTime) / daysInYear;
+         uint256 interestOwedInAYear = owedPrincipal_.percent(_bid.terms.APR);
+       
+         interest_ = (interestOwedInAYear * owedTime) / daysInYear;
+        }
+
 
         bool isLastPaymentCycle;
         {
@@ -121,10 +126,13 @@ library V2Calculations {
             // Max payable amount in a cycle
             // NOTE: the last cycle could have less than the calculated payment amount
 
+            //the amount owed for the cycle should never exceed the current payment cycle amount  so we use min here 
+            uint256 owedAmountForCycle = Math.min(  ((_bid.terms.paymentCycleAmount  * owedTime)  ) /
+                    _paymentCycleDuration , _bid.terms.paymentCycleAmount+interest_ ) ;
+
             uint256 owedAmount = isLastPaymentCycle
                 ? owedPrincipal_ + interest_
-                : (_bid.terms.paymentCycleAmount * owedTime) /
-                    _paymentCycleDuration;
+                : owedAmountForCycle  ;
 
             duePrincipal_ = Math.min(owedAmount - interest_, owedPrincipal_);
         }

@@ -1,5 +1,5 @@
 {
-  "address": "0x8AAdB10450dc7E9814AB77bdAD8A96f006AEBff0",
+  "address": "0xb0809780Baa3157345AeEb529aE88C81C51b9226",
   "abi": [
     {
       "type": "constructor",
@@ -60,11 +60,69 @@
     {
       "type": "event",
       "anonymous": false,
+      "name": "ExtensionAdded",
+      "inputs": [
+        {
+          "type": "address",
+          "name": "extension",
+          "indexed": false
+        },
+        {
+          "type": "address",
+          "name": "sender",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "ExtensionRevoked",
+      "inputs": [
+        {
+          "type": "address",
+          "name": "extension",
+          "indexed": false
+        },
+        {
+          "type": "address",
+          "name": "sender",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
       "name": "Initialized",
       "inputs": [
         {
           "type": "uint8",
           "name": "version",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "Paused",
+      "inputs": [
+        {
+          "type": "address",
+          "name": "account",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "Unpaused",
+      "inputs": [
+        {
+          "type": "address",
+          "name": "account",
           "indexed": false
         }
       ]
@@ -99,7 +157,7 @@
     },
     {
       "type": "function",
-      "name": "acceptCommitmentWithRecipient",
+      "name": "acceptSmartCommitmentWithRecipient",
       "constant": false,
       "payable": false,
       "inputs": [
@@ -142,6 +200,19 @@
           "name": "bidId"
         }
       ]
+    },
+    {
+      "type": "function",
+      "name": "addExtension",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "extension"
+        }
+      ],
+      "outputs": []
     },
     {
       "type": "function",
@@ -188,9 +259,83 @@
           "name": ""
         }
       ]
+    },
+    {
+      "type": "function",
+      "name": "hasExtension",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "account"
+        },
+        {
+          "type": "address",
+          "name": "extension"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "bool",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "initialize",
+      "constant": false,
+      "payable": false,
+      "inputs": [],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "pause",
+      "constant": false,
+      "payable": false,
+      "inputs": [],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "paused",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "bool",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "revokeExtension",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "extension"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "unpause",
+      "constant": false,
+      "payable": false,
+      "inputs": [],
+      "outputs": []
     }
   ],
-  "transactionHash": "0xc2f10b06ddfbbce5024203a10b54ac331c827927641803701c218044998c8fb6",
+  "transactionHash": "0x245985c457dbb80bc45f42f5b67713f8a2da7f98d509de5580f636566a560a34",
   "receipt": {
     "to": null,
     "from": "0xD9B023522CeCe02251d877bb0EB4f06fDe6F98E6",
@@ -198,5 +343,5 @@
     "blockNumber": null
   },
   "numDeployments": 1,
-  "implementation": "0xB7c92a2aB27884371E899A7094ABFf54B2675a54"
+  "implementation": "0xb9636C8b00a838B8b30502A2dD3bF18aa473AE0c"
 }

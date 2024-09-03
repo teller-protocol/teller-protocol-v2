@@ -265,7 +265,29 @@ contract TellerV2 is
         escrowVault = IEscrowVault(_escrowVault);
     }
 
-    
+    /**
+     * @notice Gets the metadataURI for a bidId.
+     * @param _bidId The id of the bid to return the metadataURI for
+     * @return metadataURI_ The metadataURI for the bid, as a string.
+     */
+    function getMetadataURI(uint256 _bidId)
+        public
+        view
+        returns (string memory metadataURI_)
+    {
+        // Check uri mapping first
+        metadataURI_ = uris[_bidId];
+        // If the URI is not present in the mapping
+        if (
+            keccak256(abi.encodePacked(metadataURI_)) ==
+            0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470 // hardcoded constant of keccak256('')
+        ) {
+            // Return deprecated bytes32 uri as a string
+            uint256 convertedURI = uint256(bids[_bidId]._metadataURI);
+            metadataURI_ = StringsUpgradeable.toHexString(convertedURI, 32);
+        }
+    }
+
     /**
      * @notice Function for a borrower to create a bid for a loan without Collateral.
      * @param _lendingToken The lending token asset requested to be borrowed.

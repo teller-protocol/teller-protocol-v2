@@ -39,7 +39,7 @@ const deployFn: DeployFunction = async (hre) => {
   const collateralTokenAddress = '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619' //weth
   const uniswapPoolFee = 500
 
-  const marketId = 44 //for polygon
+  const marketId = 46 //for polygon
   const minInterestRate = 400
   const maxInterestRate = 800
   const maxLoanDuration = 10368000

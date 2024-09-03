@@ -28,8 +28,8 @@ const deployFn: DeployFunction = async (hre) => {
   await hre.upgrades.proposeBatchTimelock({
     title: 'Smart Commitment Forwarder: Upgrade',
     description: ` 
-# Smart Commitment
-* Modifies Smart Commitment Forwarder.
+# Smart Commitment Forwarder
+* Modifies Smart Commitment Forwarder to add pausing controls.
 `,
     _steps: [
       {
@@ -59,11 +59,11 @@ const deployFn: DeployFunction = async (hre) => {
 }
 
 // tags and deployment
-deployFn.id = 'smart-commitment-forwarder:upgrade'
-deployFn.tags = ['proposal', 'upgrade', 'smart-commitment-forwarder-upgrade']
+deployFn.id = 'smart-commitment-forwarder:upgrade-pausing'
+deployFn.tags = ['proposal', 'upgrade', 'smart-commitment-forwarder-upgrade-pausing']
 deployFn.dependencies = ['smart-commitment-forwarder:deploy']
 deployFn.skip = async (hre) => {
   //  return true // ALWAYS SKIP FOR NOW
-  return !hre.network.live || !['sepolia'].includes(hre.network.name)
+  return !hre.network.live || !['sepolia','polygon'].includes(hre.network.name)
 }
 export default deployFn

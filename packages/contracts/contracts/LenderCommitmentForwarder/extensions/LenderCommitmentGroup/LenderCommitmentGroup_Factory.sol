@@ -13,7 +13,7 @@ import "../../../interfaces/ITellerV2Storage.sol";
 //import "../../../interfaces/ILenderCommitmentForwarder.sol";
 import "../../../libraries/NumbersLib.sol";
 
-import "./LenderCommitmentGroup_Smart.sol";
+import {LenderCommitmentGroup_Smart} from  "./LenderCommitmentGroup_Smart.sol";
 //import {CreateCommitmentArgs} from "../../interfaces/ILenderCommitmentGroup.sol";
 
 import { ILenderCommitmentGroup } from "../../../interfaces/ILenderCommitmentGroup.sol";

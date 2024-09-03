@@ -5,14 +5,17 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+
 
 // Interfaces
 import "../../../interfaces/ITellerV2Context.sol";
 import "../../../interfaces/IProtocolFee.sol";
-import "../../../interfaces/ITellerV2Storage.sol";
+ 
 import "../../../interfaces/ITellerV2.sol";
 
-import "../../../interfaces/IFlashRolloverLoan.sol";
+//import "../../../interfaces/IFlashRolloverLoan.sol";
 import "../../../libraries/NumbersLib.sol";
 
 import "../../../interfaces/uniswap/IUniswapV3Pool.sol";
@@ -23,7 +26,7 @@ import "../../../libraries/uniswap/TickMath.sol";
 import "../../../libraries/uniswap/FixedPoint96.sol";
 import "../../../libraries/uniswap/FullMath.sol";
 
-import "./LenderCommitmentGroupShares.sol";
+import {LenderCommitmentGroupShares} from "./LenderCommitmentGroupShares.sol";
 
 import { MathUpgradeable } from "@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20MetadataUpgradeable.sol";
@@ -807,7 +810,7 @@ contract LenderCommitmentGroup_Smart is
     //this is expanded by 10e18
     function _calculateCollateralTokensAmountEquivalentToPrincipalTokens(
         uint256 principalTokenAmountValue
-    ) internal view returns (uint256 collateralTokensAmountToMatchValue) {
+    ) public view returns (uint256 collateralTokensAmountToMatchValue) {
         //same concept as zeroforone
         (address token0, ) = _getPoolTokens();
 
@@ -834,7 +837,7 @@ contract LenderCommitmentGroup_Smart is
         uint256 pairPriceWithTwap,
         uint256 pairPriceImmediate,
         bool principalTokenIsToken0
-    ) internal pure returns (uint256 collateralTokensAmountToMatchValue) {
+    ) public pure returns (uint256 collateralTokensAmountToMatchValue) {
         if (principalTokenIsToken0) {
            
             uint256 worstCasePairPrice = Math.max(

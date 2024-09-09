@@ -191,6 +191,13 @@ contract LenderCommitmentGroup_Smart is
         uint256 totalInterestCollected
     );
 
+    event PoolSharesPrepared(
+        address lender,
+        uint256 sharesAmount,
+        uint256 preparedAt
+
+    );
+
 
     modifier onlySmartCommitmentForwarder() {
         require(
@@ -435,8 +442,8 @@ contract LenderCommitmentGroup_Smart is
         
 
         // prepare current balance 
-        uint256 sharesBalance = poolSharesToken.balanceOf(address(this));
-        _prepareSharesForWithdraw(sharesBalance); 
+        uint256 sharesBalance = poolSharesToken.balanceOf(address(_sharesRecipient));
+        _prepareSharesForWithdraw(_sharesRecipient,sharesBalance); 
 
 
         emit LenderAddedPrincipal( 
@@ -540,17 +547,28 @@ contract LenderCommitmentGroup_Smart is
     function prepareSharesForWithdraw(
         uint256 _amountPoolSharesTokens 
     ) external whenForwarderNotPaused returns (bool) {
-        return _prepareSharesForWithdraw(_amountPoolSharesTokens); 
+        
+        return _prepareSharesForWithdraw(msg.sender, _amountPoolSharesTokens); 
     }
 
      function _prepareSharesForWithdraw(
+        address _recipient,
         uint256 _amountPoolSharesTokens 
     ) internal returns (bool) {
    
-        require( poolSharesToken.balanceOf(msg.sender) >= _amountPoolSharesTokens  );
+        require( poolSharesToken.balanceOf(_recipient) >= _amountPoolSharesTokens  );
 
-        poolSharesPreparedToWithdrawForLender[msg.sender] = _amountPoolSharesTokens; 
-        poolSharesPreparedTimestamp[msg.sender] = block.timestamp; 
+        poolSharesPreparedToWithdrawForLender[_recipient] = _amountPoolSharesTokens; 
+        poolSharesPreparedTimestamp[_recipient] = block.timestamp; 
+
+
+        emit PoolSharesPrepared( 
+
+            _recipient,
+            _amountPoolSharesTokens,
+           block.timestamp
+
+         );
 
         return true; 
     }

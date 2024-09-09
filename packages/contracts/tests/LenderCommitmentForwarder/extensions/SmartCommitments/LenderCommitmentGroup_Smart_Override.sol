@@ -28,7 +28,7 @@ contract LenderCommitmentGroup_Smart_Override is LenderCommitmentGroup_Smart {
         mockSharesExchangeRate = _mockRate;
     }
 
-       function set_mockBidAsActiveForGroup(uint256 _bidId,bool _active) public {
+    function set_mockBidAsActiveForGroup(uint256 _bidId,bool _active) public {
         activeBids[_bidId] = _active;
     }
  

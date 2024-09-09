@@ -31,7 +31,7 @@ const deployFn: DeployFunction = async (hre) => {
       throw new Error('No swap factory address found for this network')
   }
 
-  const networkName = hre.network.name
+  //const networkName = hre.network.name
 
   //created pool https://sepolia.etherscan.io/tx/0x8ea20095c821f6066252457d7f0438030bc65bb441e1bea56c6ae0efd63016f0
 
@@ -47,6 +47,7 @@ const deployFn: DeployFunction = async (hre) => {
   const loanToValuePercent = 12500 //make sure this functions as normal.  If under 100%, getting much better loan terms and i wont repay.  If it is over 100%, it will likely repay since overcollateralized.
   const twapInterval = 5
 
+ 
   const lenderCommitmentGroupSmart = await hre.deployProxy(
     'LenderCommitmentGroup_Smart',
     {

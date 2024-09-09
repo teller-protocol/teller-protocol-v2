@@ -28,7 +28,6 @@
   "lender-commitment-forwarder:extensions:loan-referral-forwarder:deploy": 1724268455,
   "lender-commitment-forwarder:extensions:flash-rollover-widget:deploy": 1724268867,
   "lender-commitment-forwarder:alpha:upgrade_referrals": 1724423940,
-  "smart-commitment-forwarder:deploy": 1725390305,
-  "lender-commitment-group-smart:deploy": 1725390742,
+  "smart-commitment-forwarder:deploy": 1725390305, 
   "teller-v2:pausing-upgrade": 1725394687
 }

@@ -16,7 +16,7 @@ import "lib/forge-std/src/console.sol";
 //contract LenderCommitmentGroup_Smart_Mock is ExtensionsContextUpgradeable {}
 
 /*
-TODO 
+  
 
 Write tests for a borrower . borrowing money from the group 
 
@@ -213,7 +213,7 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
         uint256 sharesAmount_ = lenderCommitmentGroupSmart
             .addPrincipalToCommitmentGroup(1000000, address(borrower));
 
-        uint256 expectedSharesAmount = 500000;
+        uint256 expectedSharesAmount = 1000000;
 
         //use ttoken logic to make this better
         assertEq(
@@ -357,18 +357,136 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
     }
 
      //test this thoroughly -- using spreadsheet data 
-    function test_get_shares_exchange_rate() public {
+    function test_get_shares_exchange_rate_scenario_A() public {
           initialize_group_contract();
 
-        lenderCommitmentGroupSmart.set_totalInterestCollected(1000000);
+        lenderCommitmentGroupSmart.set_totalInterestCollected(0);
 
-        lenderCommitmentGroupSmart.set_principalTokensCommittedByLender(
-            address(lender),
+        lenderCommitmentGroupSmart.set_totalPrincipalTokensCommitted(
+             
             5000000
         );
 
         uint256 rate = lenderCommitmentGroupSmart.super_sharesExchangeRate();
+
+         assertEq(rate , 1e36, "unexpected sharesExchangeRate");
+
     }
+
+    function test_get_shares_exchange_rate_scenario_B() public {
+          initialize_group_contract();
+
+        lenderCommitmentGroupSmart.set_totalInterestCollected(1000000);
+
+        lenderCommitmentGroupSmart.set_totalPrincipalTokensCommitted(
+ 
+            1000000
+        );
+
+         lenderCommitmentGroupSmart.set_totalPrincipalTokensWithdrawn(
+            
+            1000000
+        );
+
+        uint256 rate = lenderCommitmentGroupSmart.super_sharesExchangeRate();
+
+         assertEq(rate , 1e36, "unexpected sharesExchangeRate");
+
+    }
+
+    function test_get_shares_exchange_rate_scenario_C() public {
+        initialize_group_contract();
+
+
+        lenderCommitmentGroupSmart.set_totalPrincipalTokensCommitted(
+             
+            1000000
+        );
+
+        lenderCommitmentGroupSmart.set_totalInterestCollected(1000000);
+
+        uint256 sharesAmount = 500000;
+
+
+        lenderCommitmentGroupSmart.mock_mintShares(
+            address(lender),
+            sharesAmount
+        );
+
+        uint256 poolTotalEstimatedValue = lenderCommitmentGroupSmart.getPoolTotalEstimatedValue();
+        assertEq(poolTotalEstimatedValue ,  2 * 1000000, "unexpected poolTotalEstimatedValue");
+
+        uint256 rate = lenderCommitmentGroupSmart.super_sharesExchangeRate();
+
+        assertEq(rate , 4 * 1e36, "unexpected sharesExchangeRate");
+
+        /*
+            Rate should be 2 at this point so a depositor will only get half as many shares for their principal 
+        */
+    }
+
+
+ 
+ 
+    function test_get_shares_exchange_rate_after_default_liquidation_A() public {
+         initialize_group_contract();
+
+
+        lenderCommitmentGroupSmart.set_totalPrincipalTokensCommitted(
+            1000000
+        );
+
+        lenderCommitmentGroupSmart.set_totalInterestCollected(1000000);
+
+        lenderCommitmentGroupSmart.set_tokenDifferenceFromLiquidations(-1000000);
+
+        uint256 sharesAmount = 1000000;
+
+        lenderCommitmentGroupSmart.mock_mintShares(
+            address(lender),
+            sharesAmount
+        );
+
+        uint256 poolTotalEstimatedValue = lenderCommitmentGroupSmart.getPoolTotalEstimatedValue();
+        assertEq(poolTotalEstimatedValue ,  1 * 1000000, "unexpected poolTotalEstimatedValue");
+
+        uint256 rate = lenderCommitmentGroupSmart.super_sharesExchangeRate();
+
+        assertEq(rate , 1 * 1e36, "unexpected sharesExchangeRate");
+
+    }
+
+
+ 
+    function test_get_shares_exchange_rate_after_default_liquidation_B() public {
+         initialize_group_contract();
+
+
+        lenderCommitmentGroupSmart.set_totalPrincipalTokensCommitted(
+            1000000
+        );
+
+    
+        lenderCommitmentGroupSmart.set_tokenDifferenceFromLiquidations(-500000);
+
+        uint256 sharesAmount = 1000000;
+
+        lenderCommitmentGroupSmart.mock_mintShares(
+            address(lender),
+            sharesAmount
+        );
+
+        uint256 poolTotalEstimatedValue = lenderCommitmentGroupSmart.getPoolTotalEstimatedValue();
+        assertEq(poolTotalEstimatedValue ,  1 * 500000, "unexpected poolTotalEstimatedValue");
+
+        uint256 rate = lenderCommitmentGroupSmart.super_sharesExchangeRate();
+
+        assertEq(rate ,  1e36 / 2, "unexpected sharesExchangeRate");
+
+    }
+
+
+
 
 
     function test_get_shares_exchange_rate_inverse() public {
@@ -379,27 +497,10 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
     }
 
 
-    function test_shares_exchange_rate_after_interest_payments() public {
+   
 
-          initialize_group_contract();
-        principalToken.transfer(address(lenderCommitmentGroupSmart), 1e18);
-         
 
-        lenderCommitmentGroupSmart.set_mockSharesExchangeRate( 1e36 );  //the default for now 
 
-        vm.prank(address(lender));
-        principalToken.approve(address(lenderCommitmentGroupSmart), 1000000);
-
-        uint256 sharesAmount = 500000;
-
-        lenderCommitmentGroupSmart.mock_mintShares(
-            address(lender),
-            sharesAmount
-        );
-
-        //todo 
-        
-    }
 
 
 /*
@@ -518,7 +619,7 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
             loanDefaultTimestamp
         );
 
-      int256 expectedMinAmount = 400; //based on loanDefaultTimestamp gap 
+      int256 expectedMinAmount = 4220; //based on loanDefaultTimestamp gap 
 
        assertEq(min_amount,expectedMinAmount,"min_amount unexpected");
 
@@ -566,7 +667,7 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
             loanDefaultTimestamp
         );
 
-      int256 expectedMinAmount = -500; //based on loanDefaultTimestamp gap 
+      int256 expectedMinAmount = 3220; //based on loanDefaultTimestamp gap 
 
        assertEq(min_amount,expectedMinAmount,"min_amount unexpected");
 

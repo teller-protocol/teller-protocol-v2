@@ -1,5 +1,15 @@
 import { DeployFunction } from 'hardhat-deploy/dist/types'
 
+
+/*
+
+This deploys a one-off test contract of the lender commitment group contract !
+
+This is not needed for production 
+
+*/
+
+
 const deployFn: DeployFunction = async (hre) => {
   const tellerV2 = await hre.contracts.get('TellerV2')
   const SmartCommitmentForwarder = await hre.contracts.get(

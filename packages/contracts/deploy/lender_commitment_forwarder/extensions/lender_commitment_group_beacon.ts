@@ -96,9 +96,10 @@ const deployFn: DeployFunction = async (hre) => {
 
 
   const commitmentGroupBeacon = await hre.deployBeacon<UpgradeableBeacon>(
-    'lenderCommitmentGroupSmart',
+    'LenderCommitmentGroup_Smart',
     {
       customName: 'LenderCommitmentGroupBeacon',
+      unsafeAllow: ['constructor', 'state-variable-immutable'],
       constructorArgs: [
         tellerV2Address,
         smartCommitmentForwarderAddress,

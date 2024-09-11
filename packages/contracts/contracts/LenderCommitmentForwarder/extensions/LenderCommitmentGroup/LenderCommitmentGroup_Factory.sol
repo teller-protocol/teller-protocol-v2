@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 // Contracts
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol"; 
 
 import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
@@ -103,6 +103,15 @@ contract LenderCommitmentGroupFactory is OwnableUpgradeable {
 
         deployedLenderGroupContracts[address(newGroupContract_)] = block.number; //consider changing this ?
         emit DeployedLenderGroupContract(address(newGroupContract_));
+
+
+
+        //transfer ownership to msg.sender 
+        OwnableUpgradeable(address(newGroupContract_))
+            .transferOwnership(msg.sender);
+
+
+
 
         /*
             The max principal should be a very high number! higher than usual

@@ -30,5 +30,7 @@
   "lender-commitment-forwarder:alpha:upgrade_referrals": 1724423940,
   "smart-commitment-forwarder:deploy": 1725390305,
   "teller-v2:pausing-upgrade": 1725394687,
-  "lender-commitment-group-smart:deploy": 1725891057
+  "lender-commitment-group-smart:deploy": 1725891057,
+  "lender-commitment-group-beacon:deploy": 1726068317,
+  "lender-commitment-group-factory:deploy": 1726068336
 }

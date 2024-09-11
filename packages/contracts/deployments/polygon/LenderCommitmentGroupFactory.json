@@ -1,0 +1,190 @@
+{
+  "address": "0x44Ce8fA66d6eDF0c5c668b818A922E772C72568B",
+  "abi": [
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "DeployedLenderGroupContract",
+      "inputs": [
+        {
+          "type": "address",
+          "name": "groupContract",
+          "indexed": true
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "Initialized",
+      "inputs": [
+        {
+          "type": "uint8",
+          "name": "version",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "OwnershipTransferred",
+      "inputs": [
+        {
+          "type": "address",
+          "name": "previousOwner",
+          "indexed": true
+        },
+        {
+          "type": "address",
+          "name": "newOwner",
+          "indexed": true
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "deployLenderCommitmentGroupPool",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "_principalTokenAddress"
+        },
+        {
+          "type": "address",
+          "name": "_collateralTokenAddress"
+        },
+        {
+          "type": "uint256",
+          "name": "_marketId"
+        },
+        {
+          "type": "uint32",
+          "name": "_maxLoanDuration"
+        },
+        {
+          "type": "uint16",
+          "name": "_interestRateLowerBound"
+        },
+        {
+          "type": "uint16",
+          "name": "_interestRateUpperBound"
+        },
+        {
+          "type": "uint16",
+          "name": "_liquidityThresholdPercent"
+        },
+        {
+          "type": "uint16",
+          "name": "_loanToValuePercent"
+        },
+        {
+          "type": "uint24",
+          "name": "_uniswapPoolFee"
+        },
+        {
+          "type": "uint32",
+          "name": "_twapInterval"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "address",
+          "name": "newGroupContract_"
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "deployedLenderGroupContracts",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "initialize",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "_lenderGroupBeacon"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "lenderGroupBeaconImplementation",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "owner",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "renounceOwnership",
+      "constant": false,
+      "payable": false,
+      "inputs": [],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "transferOwnership",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "newOwner"
+        }
+      ],
+      "outputs": []
+    }
+  ],
+  "transactionHash": "0x66b45be8df47ee9a106cd542aede6cfaf3fd84ccd89296ca0a6f1ed963aa1b33",
+  "receipt": {
+    "to": null,
+    "from": "0xD9B023522CeCe02251d877bb0EB4f06fDe6F98E6",
+    "blockHash": null,
+    "blockNumber": null
+  },
+  "numDeployments": 1,
+  "implementation": "0x0d05F9809b6eee3262e8a49Ca08c4De524b40F1B"
+}

@@ -25,10 +25,10 @@ use substreams::scalar::BigDecimal;
 
 substreams_ethereum::init!();
 
-const FACTORY_TRACKED_CONTRACT: [u8; 20] = hex!("e00384587dc733d1e201e1eaa5583645d351c01c");
+const FACTORY_TRACKED_CONTRACT: [u8; 20] = hex!("44Ce8fA66d6eDF0c5c668b818A922E772C72568B");
 
 fn map_factory_events(blk: &eth::Block, events: &mut contract::Events) {
-    events.factory_admin_changeds.append(&mut blk
+    /*events.factory_admin_changeds.append(&mut blk
         .receipts()
         .flat_map(|view| {
             view.receipt.logs.iter()
@@ -69,6 +69,31 @@ fn map_factory_events(blk: &eth::Block, events: &mut contract::Events) {
                 })
         })
         .collect());
+        
+        
+        events.factory_upgradeds.append(&mut blk
+        .receipts()
+        .flat_map(|view| {
+            view.receipt.logs.iter()
+                .filter(|log| log.address == FACTORY_TRACKED_CONTRACT)
+                .filter_map(|log| {
+                    if let Some(event) = abi::factory_contract::events::Upgraded::match_and_decode(log) {
+                        return Some(contract::FactoryUpgraded {
+                            evt_tx_hash: Hex(&view.transaction.hash).to_string(),
+                            evt_index: log.block_index,
+                            evt_block_time: blk.timestamp_seconds(),
+                            evt_block_number: blk.number,
+                            implementation: event.implementation,
+                        });
+                    }
+
+                    None
+                })
+        })
+        .collect());
+        
+        
+        */
     events.factory_deployed_lender_group_contracts.append(&mut blk
         .receipts()
         .flat_map(|view| {
@@ -89,26 +114,7 @@ fn map_factory_events(blk: &eth::Block, events: &mut contract::Events) {
                 })
         })
         .collect());
-    events.factory_upgradeds.append(&mut blk
-        .receipts()
-        .flat_map(|view| {
-            view.receipt.logs.iter()
-                .filter(|log| log.address == FACTORY_TRACKED_CONTRACT)
-                .filter_map(|log| {
-                    if let Some(event) = abi::factory_contract::events::Upgraded::match_and_decode(log) {
-                        return Some(contract::FactoryUpgraded {
-                            evt_tx_hash: Hex(&view.transaction.hash).to_string(),
-                            evt_index: log.block_index,
-                            evt_block_time: blk.timestamp_seconds(),
-                            evt_block_number: blk.number,
-                            implementation: event.implementation,
-                        });
-                    }
-
-                    None
-                })
-        })
-        .collect());
+  
 }
 
 fn is_declared_dds_address(addr: &Vec<u8>, ordinal: u64, dds_store: &store::StoreGetInt64) -> bool {
@@ -392,7 +398,7 @@ fn map_lendergroup_events(
 
 fn graph_factory_out(events: &contract::Events, tables: &mut EntityChangesTables) {
     // Loop over all the abis events to create table changes
-   events.factory_admin_changeds.iter().for_each(|evt| {
+   /*events.factory_admin_changeds.iter().for_each(|evt| {
         tables
             .create_row("factory_admin_changed", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
             .set("evt_tx_hash", evt.evt_tx_hash.clone().into_bytes())
@@ -402,8 +408,8 @@ fn graph_factory_out(events: &contract::Events, tables: &mut EntityChangesTables
             .set("new_admin",  &evt.new_admin )  //throws an error ??
             .set("previous_admin",  &evt.previous_admin  );
     });
-     
-    events.factory_beacon_upgradeds.iter().for_each(|evt| {
+    
+      events.factory_beacon_upgradeds.iter().for_each(|evt| {
         tables
             .create_row("factory_beacon_upgraded", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
             .set("evt_tx_hash", evt.evt_tx_hash.clone().into_bytes())
@@ -412,6 +418,19 @@ fn graph_factory_out(events: &contract::Events, tables: &mut EntityChangesTables
             .set("evt_block_number", BigInt::from( evt.evt_block_number ))
             .set("beacon",  &evt.beacon );
     });
+    
+     events.factory_upgradeds.iter().for_each(|evt| {
+        tables
+            .create_row("factory_upgraded", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
+            .set("evt_tx_hash", evt.evt_tx_hash.clone().into_bytes())
+            .set("evt_index", BigInt::from(evt.evt_index))
+            .set("evt_block_time", BigInt::from(evt.evt_block_time))
+            .set("evt_block_number", BigInt::from(evt.evt_block_number))
+            .set("implementation",  &evt.implementation  );
+    });
+    */
+     
+  
     events.factory_deployed_lender_group_contracts.iter().for_each(|evt| {
         tables
             .create_row("factory_deployed_lender_group_contract", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
@@ -421,15 +440,7 @@ fn graph_factory_out(events: &contract::Events, tables: &mut EntityChangesTables
             .set("evt_block_number", BigInt::from(evt.evt_block_number))
             .set("group_contract", &evt.group_contract );
     });
-    events.factory_upgradeds.iter().for_each(|evt| {
-        tables
-            .create_row("factory_upgraded", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
-            .set("evt_tx_hash", evt.evt_tx_hash.clone().into_bytes())
-            .set("evt_index", BigInt::from(evt.evt_index))
-            .set("evt_block_time", BigInt::from(evt.evt_block_time))
-            .set("evt_block_number", BigInt::from(evt.evt_block_number))
-            .set("implementation",  &evt.implementation  );
-    });
+   
 }
 
 
@@ -575,7 +586,8 @@ fn graph_lendergroup_out(
           // let lender_group_contract_address = Hex::decode(&evt.evt_address).unwrap();
    
            let fetched_min_interest_rate = rpc::fetch_min_interest_rate_from_rpc(
-                &evt.evt_address
+                &evt.evt_address,
+                 BigInt::zero() 
                  ).unwrap();
            
          
@@ -717,7 +729,8 @@ fn graph_lendergroup_out(
           for group_pool_address in pool_metric_deltas_detected.iter() {
                        
                let fetched_min_interest_rate = rpc::fetch_min_interest_rate_from_rpc(
-                     &group_pool_address.to_string()
+                     &group_pool_address.to_string(),
+                      BigInt::zero()
                     ).unwrap();
                     
             

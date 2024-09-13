@@ -1,7 +1,7 @@
 // SPDX-Licence-Identifier: MIT
 pragma solidity >=0.8.0 <0.9.0;
 
-interface ILenderCommitmentForwarder_U1 {
+interface IUniswapPricingLibrary {
     
 
     struct PoolRouteConfig {
@@ -11,5 +11,16 @@ interface ILenderCommitmentForwarder_U1 {
         uint256 token0Decimals;
         uint256 token1Decimals;
     } 
+
+
+
+     function getUniswapPriceRatioForPoolRoutes(
+        PoolRouteConfig[] memory poolRoutes
+    ) public view returns (uint256 priceRatio);
+
+
+     function getUniswapPriceRatioForPool(
+        PoolRouteConfig memory poolRoute
+    ) public view returns (uint256 priceRatio)
 
 }

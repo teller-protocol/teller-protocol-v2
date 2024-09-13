@@ -5,9 +5,9 @@ pragma solidity >=0.8.0 <0.9.0;
 import "../TellerV2MarketForwarder_G2.sol";
 
 // Interfaces
-import "../interfaces/ICollateralManager.sol";
-import "../interfaces/ILenderCommitmentForwarder_U1.sol";
- 
+import "../interfaces/ICollateralManager.sol"; 
+import "../interfaces/IUniswapPricingLibrary.sol";
+
 import "@openzeppelin/contracts/utils/math/Math.sol";
 
 import { Collateral, CollateralType } from "../interfaces/escrow/ICollateralEscrowV1.sol";
@@ -40,7 +40,8 @@ Only do decimal expansion if it is an ERC20   not anything else !!
 */
 
 contract UniswapPricingLibrary is
-    OwnableUpgradeable  
+    OwnableUpgradeable,
+    IUniswapPricingLibrary
   
 {
 

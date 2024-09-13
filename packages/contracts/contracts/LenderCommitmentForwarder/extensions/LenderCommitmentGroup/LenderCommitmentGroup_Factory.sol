@@ -12,27 +12,16 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../../../interfaces/ITellerV2.sol";
 import "../../../interfaces/IProtocolFee.sol";
 import "../../../interfaces/ITellerV2Storage.sol";
-//import "../../../interfaces/ILenderCommitmentForwarder.sol";
 import "../../../libraries/NumbersLib.sol";
 
 
 import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
-
-
-//import {LenderCommitmentGroup_Smart} from  "./LenderCommitmentGroup_Smart.sol";
-//import {CreateCommitmentArgs} from "../../interfaces/ILenderCommitmentGroup.sol";
-
+ 
 import { ILenderCommitmentGroup } from "../../../interfaces/ILenderCommitmentGroup.sol";
 
 contract LenderCommitmentGroupFactory is OwnableUpgradeable {
     using AddressUpgradeable for address;
     using NumbersLib for uint256;
-
-    /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
-    //ITellerV2 public immutable TELLER_V2;
-    /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
-    //address public immutable SMART_COMMITMENT_FORWARDER;
-    //address public immutable UNISWAP_V3_FACTORY;
 
  
     address public lenderGroupBeaconImplementation;
@@ -42,17 +31,7 @@ contract LenderCommitmentGroupFactory is OwnableUpgradeable {
 
     event DeployedLenderGroupContract(address indexed groupContract);
 
-    /// @custom:oz-upgrades-unsafe-allow constructor
-   /* constructor(
-        address _tellerV2,
-        address _smartCommitmentForwarder,
-        address _uniswapV3Factory
-    ) {
-        TELLER_V2 = ITellerV2(_tellerV2);
-        SMART_COMMITMENT_FORWARDER = _smartCommitmentForwarder;
-        UNISWAP_V3_FACTORY = _uniswapV3Factory;
-        
-    }*/
+ 
 
      function initialize(address _lenderGroupBeacon )
         external
@@ -77,7 +56,7 @@ contract LenderCommitmentGroupFactory is OwnableUpgradeable {
         uint16 _interestRateLowerBound,
         uint16 _interestRateUpperBound,
         uint16 _liquidityThresholdPercent,
-        uint16 _loanToValuePercent,
+        uint16 _collateralRatio,
         uint24 _uniswapPoolFee,
         uint32 _twapInterval
     ) external returns (address newGroupContract_) {
@@ -95,7 +74,7 @@ contract LenderCommitmentGroupFactory is OwnableUpgradeable {
                     _interestRateLowerBound,
                     _interestRateUpperBound,
                     _liquidityThresholdPercent,
-                    _loanToValuePercent,
+                    _collateralRatio,
                     _uniswapPoolFee,
                     _twapInterval
                 )

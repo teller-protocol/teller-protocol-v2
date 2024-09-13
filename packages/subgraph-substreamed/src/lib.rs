@@ -473,6 +473,17 @@ fn graph_lendergroup_out(
             .set("interest_rate", evt.interest_rate)
             .set("loan_duration", evt.loan_duration)
             .set("principal_amount", BigDecimal::from_str(&evt.principal_amount).unwrap());
+            
+            
+            
+            
+            /*            
+            
+            This occurs when someone takes out a loan with a lender group .
+            
+            This is only going to give us the BidId 
+            
+            */
     });
     events.lendergroup_defaulted_loan_liquidateds.iter().for_each(|evt| {
         tables

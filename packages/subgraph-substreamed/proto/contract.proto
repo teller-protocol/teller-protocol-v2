@@ -163,9 +163,6 @@ message lendergroup_PoolInitialized {
     uint64 uniswap_pool_fee = 14;
     uint64 twap_interval = 15;
     bytes pool_shares_token = 16;
-    bytes uniswap_v3_pool_address= 17;
-    bytes teller_v2_address=18;
-    bytes smart_commitment_forwarder_address=19; 
     
 }
 

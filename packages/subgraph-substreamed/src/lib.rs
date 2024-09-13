@@ -338,10 +338,10 @@ fn map_lendergroup_events(
                         
                        let lender_group_contract_address = Hex(&log.address).to_string();
 
-                        let fetched_rpc_data = rpc::fetch_lender_group_pool_initialization_data_from_rpc(
+                       /*  let fetched_rpc_data = rpc::fetch_lender_group_pool_initialization_data_from_rpc(
                             &lender_group_contract_address
                              ).unwrap();
-
+                            */
                         
                         return Some(contract::LendergroupPoolInitialized {
                             evt_tx_hash: Hex(&view.transaction.hash).to_string(),
@@ -361,9 +361,9 @@ fn map_lendergroup_events(
                             twap_interval: event.twap_interval.to_u64(),
                             uniswap_pool_fee: event.uniswap_pool_fee.to_u64(),
 
-                            teller_v2_address: fetched_rpc_data.teller_v2_address.to_fixed_bytes().to_vec(),
-                            uniswap_v3_pool_address: fetched_rpc_data.uniswap_v3_pool_address.to_fixed_bytes().to_vec(),
-                            smart_commitment_forwarder_address: fetched_rpc_data.smart_commitment_forwarder_address.to_fixed_bytes().to_vec(),
+                          //  teller_v2_address: fetched_rpc_data.teller_v2_address.to_fixed_bytes().to_vec(),
+                          //  uniswap_v3_pool_address: fetched_rpc_data.uniswap_v3_pool_address.to_fixed_bytes().to_vec(),
+                          //  smart_commitment_forwarder_address: fetched_rpc_data.smart_commitment_forwarder_address.to_fixed_bytes().to_vec(),
                         });
                     }
 
@@ -611,9 +611,9 @@ fn graph_lendergroup_out(
             .set("principal_token_address",  &evt.principal_token_address  )
             .set("collateral_token_address",  &evt.collateral_token_address  )
             .set("shares_token_address",  &evt.pool_shares_token  )
-            .set("uniswap_v3_pool_address",  &evt.uniswap_v3_pool_address )
-            .set("teller_v2_address",  &evt.teller_v2_address  )
-            .set("smart_commitment_forwarder_address",  &evt.smart_commitment_forwarder_address  )
+            //.set("uniswap_v3_pool_address",  &evt.uniswap_v3_pool_address )
+            //.set("teller_v2_address",  &evt.teller_v2_address  )
+            //.set("smart_commitment_forwarder_address",  &evt.smart_commitment_forwarder_address  )
             .set("market_id", BigInt::from_str(&evt.market_id).unwrap() )
             .set("uniswap_pool_fee", evt.uniswap_pool_fee)
             .set("max_loan_duration", evt.max_loan_duration)
@@ -1450,4 +1450,4 @@ fn graph_out(
         
                 
     Ok(tables.to_entity_changes())
-}
+    }

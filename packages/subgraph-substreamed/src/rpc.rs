@@ -30,6 +30,7 @@ pub struct LenderGroupPoolInitializationDataFromRpc {
 }
 
 
+//maybe this is broken ?
 pub fn fetch_lender_group_pool_initialization_data_from_rpc(pool_contract_address: &String) -> Option<LenderGroupPoolInitializationDataFromRpc> {
         
     let pool_contract_address_decoded = Hex::decode(pool_contract_address).unwrap(); 

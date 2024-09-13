@@ -127,7 +127,7 @@ fn is_declared_dds_address(addr: &Vec<u8>, ordinal: u64, dds_store: &store::Stor
 
 fn map_lendergroup_events(
     blk: &eth::Block,
-    dds_store: &store::StoreGetInt64,
+    dds_store: &store::StoreGetInt64,   //this is used to know abt lendergroup contract address
     events: &mut contract::Events,
 ) {
 

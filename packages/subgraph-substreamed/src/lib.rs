@@ -117,9 +117,31 @@ fn map_factory_events(blk: &eth::Block, events: &mut contract::Events) {
   
 }
 
+
+//is this bad? to use 0 for the log ordinal?  
+// if i  use the OG log ordinal, many of my events break for some reason.. maybe run CLI again ? 
+#[substreams::handlers::store]
+fn store_factory_lendergroup_created(blk: eth::Block, store: StoreSetInt64) {
+    for rcpt in blk.receipts() {
+        for log in rcpt
+            .receipt
+            .logs
+            .iter()
+            .filter(|log| log.address == FACTORY_TRACKED_CONTRACT)
+        {
+            if let Some(event) = abi::factory_contract::events::DeployedLenderGroupContract::match_and_decode(log) {
+                //log.ordinal
+                 store.set(0, Hex(event.group_contract).to_string(), &1);
+            }
+        }
+    }
+}
+ 
+ 
+ 
 fn is_declared_dds_address(addr: &Vec<u8>, ordinal: u64, dds_store: &store::StoreGetInt64) -> bool {
     //    substreams::log::info!("Checking if address {} is declared dds address", Hex(addr).to_string());
-    if dds_store.get_at(ordinal, Hex(addr).to_string()).is_some() {
+    if dds_store.get_at(0, Hex(addr).to_string()).is_some() {
         return true;
     }
     return false;
@@ -972,22 +994,6 @@ fn graph_lendergroup_out(
 
 
 
-#[substreams::handlers::store]
-fn store_factory_lendergroup_created(blk: eth::Block, store: StoreSetInt64) {
-    for rcpt in blk.receipts() {
-        for log in rcpt
-            .receipt
-            .logs
-            .iter()
-            .filter(|log| log.address == FACTORY_TRACKED_CONTRACT)
-        {
-            if let Some(event) = abi::factory_contract::events::DeployedLenderGroupContract::match_and_decode(log) {
-                store.set(log.ordinal, Hex(event.group_contract).to_string(), &1);
-            }
-        }
-    }
-}
- 
 
 
 

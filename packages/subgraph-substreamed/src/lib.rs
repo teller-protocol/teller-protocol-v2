@@ -331,11 +331,19 @@ fn map_lendergroup_events(
         .receipts()
         .flat_map(|view| {
             view.receipt.logs.iter()
-                .filter(|log| is_declared_dds_address(&log.address, log.ordinal, dds_store))
+                .filter(|log| 
+                    
+                    //is_declared_dds_address(&log.address, log.ordinal, dds_store)
+                    true
+                    
+                    )
                 .filter_map(|log| {
                     if let Some(event) = abi::lendergroup_contract::events::PoolInitialized::match_and_decode(log) {
                         
+                        substreams::log::info!("pool initialized evt found ");
                         
+                            
+                            
                        let lender_group_contract_address = Hex(&log.address).to_string();
 
                        /*  let fetched_rpc_data = rpc::fetch_lender_group_pool_initialization_data_from_rpc(
@@ -365,7 +373,7 @@ fn map_lendergroup_events(
                           //  uniswap_v3_pool_address: fetched_rpc_data.uniswap_v3_pool_address.to_fixed_bytes().to_vec(),
                           //  smart_commitment_forwarder_address: fetched_rpc_data.smart_commitment_forwarder_address.to_fixed_bytes().to_vec(),
                         });
-                    }
+                    } 
 
                     None
                 })

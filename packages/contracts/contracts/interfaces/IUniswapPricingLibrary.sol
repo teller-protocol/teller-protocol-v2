@@ -16,11 +16,11 @@ interface IUniswapPricingLibrary {
 
      function getUniswapPriceRatioForPoolRoutes(
         PoolRouteConfig[] memory poolRoutes
-    ) public view returns (uint256 priceRatio);
+    ) external view returns (uint256 priceRatio);
 
 
      function getUniswapPriceRatioForPool(
         PoolRouteConfig memory poolRoute
-    ) public view returns (uint256 priceRatio);
+    ) external view returns (uint256 priceRatio);
 
 }

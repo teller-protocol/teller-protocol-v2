@@ -6,7 +6,8 @@ import "../TellerV2MarketForwarder_G2.sol";
 
 // Interfaces
 import "../interfaces/ICollateralManager.sol"; 
-import "../interfaces/IUniswapPricingLibrary.sol";
+
+import {IUniswapPricingLibrary} from "../interfaces/IUniswapPricingLibrary.sol";
 
 import "@openzeppelin/contracts/utils/math/Math.sol";
 
@@ -39,17 +40,14 @@ Only do decimal expansion if it is an ERC20   not anything else !!
 
 */
 
-contract UniswapPricingLibrary is
-    OwnableUpgradeable,
-    IUniswapPricingLibrary
-  
+library UniswapPricingLibrary  
 {
-
+     using NumbersLib for uint256;
  
-    uint256 immutable STANDARD_EXPANSION_FACTOR = 1e18;
+    uint256 constant STANDARD_EXPANSION_FACTOR = 1e18;
 
     function getUniswapPriceRatioForPoolRoutes(
-        PoolRouteConfig[] memory poolRoutes
+        IUniswapPricingLibrary.PoolRouteConfig[] memory poolRoutes
     ) public view returns (uint256 priceRatio) {
         require(poolRoutes.length <= 2, "invalid pool routes length");
 
@@ -79,7 +77,7 @@ contract UniswapPricingLibrary is
         The resultant product is expanded by STANDARD_EXPANSION_FACTOR one time 
     */
     function getUniswapPriceRatioForPool(
-        PoolRouteConfig memory _poolRouteConfig
+        IUniswapPricingLibrary.PoolRouteConfig memory _poolRouteConfig
     ) public view returns (uint256 priceRatio) {
         uint160 sqrtPriceX96 = getSqrtTwapX96(
             _poolRouteConfig.pool,

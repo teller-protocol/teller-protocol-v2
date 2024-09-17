@@ -147,36 +147,36 @@ contract LenderCommitmentGroup_Smart_Override is LenderCommitmentGroup_Smart {
           mockToken1 = token1;
         
     }
-
+/*
     function _getPoolTokens() internal view override returns (address token0, address token1) {
 
         return (mockToken0,mockToken1); 
         
     }
-
+*/
     function super_getCollateralTokensAmountEquivalentToPrincipalTokens(
         uint256 principalTokenAmountValue,
-        uint256 pairPriceWithTwap,
-        uint256 pairPriceImmediate,  
-        bool principalTokenIsToken0
+        uint256 pairPriceWithTwap 
+     //   uint256 pairPriceImmediate,  
+      //  bool principalTokenIsToken0
     ) public view returns(uint256){
 
         return super._getCollateralTokensAmountEquivalentToPrincipalTokens(
             principalTokenAmountValue,
-            pairPriceWithTwap,
-            pairPriceImmediate,
-            principalTokenIsToken0
+            pairPriceWithTwap 
+            //pairPriceImmediate,
+           // principalTokenIsToken0
         );
 
     }
 
-
+/*
     function super_getPriceFromSqrtX96(uint160 _sqrtPriceX96) public pure returns (uint256 price_) {
 
         price_ =  super._getPriceFromSqrtX96(_sqrtPriceX96);
     }
 
-
+*/
 
 
 

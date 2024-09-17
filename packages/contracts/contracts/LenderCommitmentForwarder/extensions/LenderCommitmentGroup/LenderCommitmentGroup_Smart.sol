@@ -41,7 +41,7 @@ import { ILenderCommitmentGroup } from "../../../interfaces/ILenderCommitmentGro
 import { Payment } from "../../../TellerV2Storage.sol";
 
 import {IUniswapPricingLibrary} from "../../../interfaces/IUniswapPricingLibrary.sol";
-import "../../../libraries/UniswapPricingLibrary.sol";
+import {UniswapPricingLibrary} from "../../../libraries/UniswapPricingLibrary.sol";
 
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
@@ -509,7 +509,7 @@ contract LenderCommitmentGroup_Smart is
         );
  
  
-        uint256 requiredCollateral = getCollateralRequiredForPrincipalAmount(
+        uint256 requiredCollateral = getRequiredCollateral(
             _principalAmount
         );
 
@@ -743,7 +743,7 @@ contract LenderCommitmentGroup_Smart is
         return x >= 0 ? uint(x) : uint(-x);
     }
  
-    function getCollateralRequiredForPrincipalAmount(uint256 _principalAmount)
+    function getRequiredCollateral(uint256 _principalAmount)
         public
         view
         returns (uint256)

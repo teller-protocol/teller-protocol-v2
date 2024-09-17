@@ -309,7 +309,14 @@ contract LenderCommitmentGroup_Smart is
 
         require( liquidityThresholdPercent <= 10000, "invalid _liquidityThresholdPercent"); 
 
+         
 
+        for (uint256 i = 0; i < _poolOracleRoutes.length; i++) {
+            poolOracleRoutes.push(_poolOracleRoutes[i]);
+        }
+
+
+         require(poolOracleRoutes.length >= 1 && poolOracleRoutes.length <= 2, "invalid pool routes length");
         
         poolSharesToken_ = _deployPoolSharesToken();
 

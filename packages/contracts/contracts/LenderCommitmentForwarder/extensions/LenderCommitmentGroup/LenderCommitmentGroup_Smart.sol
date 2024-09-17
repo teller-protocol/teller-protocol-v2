@@ -40,6 +40,10 @@ import { IEscrowVault } from "../../../interfaces/IEscrowVault.sol";
 import { ILenderCommitmentGroup } from "../../../interfaces/ILenderCommitmentGroup.sol";
 import { Payment } from "../../../TellerV2Storage.sol";
 
+import {IUniswapPricingLibrary} from "../../../interfaces/IUniswapPricingLibrary.sol";
+import "../../../libraries/UniswapPricingLibrary.sol";
+
+
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
@@ -132,6 +136,8 @@ contract LenderCommitmentGroup_Smart is
 
     bool public firstDepositMade;
     uint256 public withdrawlDelayTimeSeconds; 
+
+    IUniswapPricingLibrary.PoolRouteConfig[]  public  poolOracleRoutes ;
 
 
    
@@ -751,7 +757,7 @@ contract LenderCommitmentGroup_Smart is
     }
 
     //this result is expanded by UNISWAP_EXPANSION_FACTOR
-    function _getUniswapV3TokenPairPrice(uint32 _twapInterval)
+   /* function _getUniswapV3TokenPairPrice(uint32 _twapInterval)
         internal
         view
         returns (uint256)
@@ -812,7 +818,8 @@ contract LenderCommitmentGroup_Smart is
 
         }
     }
-
+    
+    
     function _getPoolTokens()
         internal
         view
@@ -822,6 +829,10 @@ contract LenderCommitmentGroup_Smart is
         token0 = IUniswapV3Pool(UNISWAP_V3_POOL).token0();
         token1 = IUniswapV3Pool(UNISWAP_V3_POOL).token1();
     }
+    
+    
+    */
+
 
     // -----
 
@@ -830,19 +841,20 @@ contract LenderCommitmentGroup_Smart is
         uint256 principalTokenAmountValue
     ) public view returns (uint256 collateralTokensAmountToMatchValue) {
         //same concept as zeroforone
-        (address token0, ) = _getPoolTokens();
+       // (address token0, ) = _getPoolTokens();
 
-        bool principalTokenIsToken0 = (address(principalToken) == token0);
+        //bool principalTokenIsToken0 = (address(principalToken) == token0);
 
-        uint256 pairPriceWithTwap = _getUniswapV3TokenPairPrice(twapInterval);
-        uint256 pairPriceImmediate = _getUniswapV3TokenPairPrice(0);
+        uint256 pairPriceWithTwap = UniswapPricingLibrary
+            .getUniswapPriceRatioForPoolRoutes(poolOracleRoutes);
+        //uint256 pairPriceImmediate = _getUniswapV3TokenPairPrice(0);
 
         return
             _getCollateralTokensAmountEquivalentToPrincipalTokens(
                 principalTokenAmountValue,
-                pairPriceWithTwap,
-                pairPriceImmediate,
-                principalTokenIsToken0
+                pairPriceWithTwap  
+               // pairPriceImmediate,
+               // principalTokenIsToken0
             );
     }
 
@@ -852,33 +864,14 @@ contract LenderCommitmentGroup_Smart is
     */
     function _getCollateralTokensAmountEquivalentToPrincipalTokens(
         uint256 principalTokenAmountValue,
-        uint256 pairPriceWithTwap,
-        uint256 pairPriceImmediate,
-        bool principalTokenIsToken0
+        uint256 pairPrice 
+        //uint256 pairPriceImmediate,
+       // bool principalTokenIsToken0
     ) public pure returns (uint256 collateralTokensAmountToMatchValue) {
-        if (principalTokenIsToken0) {
-           
-            uint256 worstCasePairPrice = Math.max(
-                pairPriceWithTwap,
-                pairPriceImmediate
-            );
-
-            collateralTokensAmountToMatchValue = token1ToToken0(
+        collateralTokensAmountToMatchValue = token0ToToken1(
                 principalTokenAmountValue,
-                worstCasePairPrice //if this is lower, collateral tokens amt will be higher
+                pairPrice //if this is lower, collateral tokens amt will be higher
             );
-        } else {
-            
-            uint256 worstCasePairPrice = Math.min(
-                pairPriceWithTwap,
-                pairPriceImmediate
-            );
-
-            collateralTokensAmountToMatchValue = token0ToToken1(
-                principalTokenAmountValue,
-                worstCasePairPrice //if this is lower, collateral tokens amt will be higher
-            );
-        }
     }
 
     //note: the price is still expanded by UNISWAP_EXPANSION_FACTOR
@@ -978,9 +971,8 @@ contract LenderCommitmentGroup_Smart is
         return CommitmentCollateralType.ERC20;
     }
 
-    //this is expanded by 1e18
-    //this only exists to comply with the interface
-    function getRequiredCollateral(uint256 _principalAmount)
+    //this was a redundant function 
+   /* function getRequiredCollateral(uint256 _principalAmount)
         public
         view
         returns (uint256 requiredCollateral_)
@@ -988,7 +980,7 @@ contract LenderCommitmentGroup_Smart is
         requiredCollateral_ = getCollateralRequiredForPrincipalAmount(
             _principalAmount
         );
-    }
+    }*/
 
     function getMarketId() external view returns (uint256) {
         return marketId;

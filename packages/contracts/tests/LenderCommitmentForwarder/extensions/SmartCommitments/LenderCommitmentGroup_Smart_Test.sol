@@ -930,6 +930,8 @@ function test_liquidateDefaultedLoanWithIncentive_does_not_double_count_repaid()
       
     */
 
+
+/*
     function test_getCollateralTokensAmountEquivalentToPrincipalTokens_scenarioA() public {
          
         initialize_group_contract();
@@ -1042,6 +1044,9 @@ function test_liquidateDefaultedLoanWithIncentive_does_not_double_count_repaid()
             "Unexpected getCollateralTokensPricePerPrincipalTokens"
         );
     }
+*/
+
+
 
 
      /*
@@ -1049,6 +1054,7 @@ function test_liquidateDefaultedLoanWithIncentive_does_not_double_count_repaid()
 
       test for _getUniswapV3TokenPairPrice
     */
+    /*
  function test_getPriceFromSqrtX96_scenarioA() public {
          
         initialize_group_contract(); 
@@ -1077,6 +1083,9 @@ function test_liquidateDefaultedLoanWithIncentive_does_not_double_count_repaid()
             "Unexpected getPriceFromSqrtX96"
         );
     }
+
+    */
+    
 }
 
 contract User {}

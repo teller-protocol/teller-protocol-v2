@@ -629,6 +629,8 @@ contract LenderCommitmentGroup_Smart is
         //use original principal amount as amountDue
 
         uint256 amountDue = _getAmountOwedForBid(_bidId);
+
+        uint256 liquidationProtocolFee = 0;
        
 
         uint256 loanDefaultedTimeStamp = ITellerV2(TELLER_V2)
@@ -671,6 +673,18 @@ contract LenderCommitmentGroup_Smart is
             tokenDifferenceFromLiquidations -= int256(tokensToGiveToSender);
 
            
+        }
+
+
+        if (liquidationProtocolFee > 0){
+              address protocolOwner = Ownable(address(TELLER_V2)).owner();
+
+              IERC20(principalToken).safeTransferFrom(
+                msg.sender,
+                protocolOwner,
+                liquidationProtocolFee
+            );
+
         }
 
         //this will give collateral to the caller

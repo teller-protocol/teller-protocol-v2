@@ -260,36 +260,28 @@ contract LenderCommitmentGroup_Smart is
 
         
     */
-    function initialize(
-        address _principalTokenAddress,
-        address _collateralTokenAddress,
-        uint256 _marketId,
-        uint32 _maxLoanDuration,
-        uint16 _interestRateLowerBound,
-        uint16 _interestRateUpperBound,
-        uint16 _liquidityThresholdPercent, // When 100% , the entire pool can be drawn for lending.  When 80%, only 80% of the pool can be drawn for lending. 
-        uint16 _collateralRatio, //the required overcollateralization ratio.  10000 is 1:1 baseline , typically this is above 10000
-        uint24 _uniswapPoolFee,
-        uint32 _twapInterval
+   function initialize(
+       CommitmentGroupConfig calldata _commitmentGroupConfig,
+        IUniswapPricingLibrary.PoolRouteConfig[] calldata _poolOracleRoutes
     ) external initializer returns (address poolSharesToken_) {
        
         __Ownable_init();
         __Pausable_init();
 
-        principalToken = IERC20(_principalTokenAddress);
-        collateralToken = IERC20(_collateralTokenAddress);
-        uniswapPoolFee = _uniswapPoolFee;
+        principalToken = IERC20(_commitmentGroupConfig.principalTokenAddress);
+        collateralToken = IERC20(_commitmentGroupConfig.collateralTokenAddress);
+        uniswapPoolFee = _commitmentGroupConfig.uniswapPoolFee;
 
         UNISWAP_V3_POOL = IUniswapV3Factory(UNISWAP_V3_FACTORY).getPool(
-            _principalTokenAddress,
-            _collateralTokenAddress,
-            _uniswapPoolFee
+            _commitmentGroupConfig.principalTokenAddress,
+            _commitmentGroupConfig.collateralTokenAddress,
+            _commitmentGroupConfig.uniswapPoolFee
         );
 
-        require(_twapInterval >= MIN_TWAP_INTERVAL, "Invalid TWAP Interval");
+        require(_commitmentGroupConfig.twapInterval >= MIN_TWAP_INTERVAL, "Invalid TWAP Interval");
         require(UNISWAP_V3_POOL != address(0), "Invalid uniswap pool address");
 
-        marketId = _marketId;
+        marketId = _commitmentGroupConfig.marketId;
 
         withdrawlDelayTimeSeconds = DEFAULT_WITHDRAWL_DELAY_TIME_SECONDS;
 
@@ -297,43 +289,46 @@ contract LenderCommitmentGroup_Smart is
 
          
         ITellerV2Context(TELLER_V2).approveMarketForwarder(
-            _marketId,
+            _commitmentGroupConfig.marketId,
             SMART_COMMITMENT_FORWARDER
         );
 
-        maxLoanDuration = _maxLoanDuration;
-        interestRateLowerBound = _interestRateLowerBound;
-        interestRateUpperBound = _interestRateUpperBound;
+        maxLoanDuration = _commitmentGroupConfig.maxLoanDuration;
+        interestRateLowerBound = _commitmentGroupConfig.interestRateLowerBound;
+        interestRateUpperBound = _commitmentGroupConfig.interestRateUpperBound;
 
 
         
         
         require(interestRateLowerBound <= interestRateUpperBound, "invalid _interestRateLowerBound");
 
-        require(_liquidityThresholdPercent <= 10000, "invalid _liquidityThresholdPercent"); 
+       
+        liquidityThresholdPercent = _commitmentGroupConfig.liquidityThresholdPercent;
+        collateralRatio = _commitmentGroupConfig.collateralRatio;
+        twapInterval = _commitmentGroupConfig.twapInterval;
 
-        liquidityThresholdPercent = _liquidityThresholdPercent;
-        collateralRatio = _collateralRatio;
-        twapInterval = _twapInterval;
+        require( liquidityThresholdPercent <= 10000, "invalid _liquidityThresholdPercent"); 
+
 
         
         poolSharesToken_ = _deployPoolSharesToken();
 
 
         emit PoolInitialized(
-            _principalTokenAddress,
-            _collateralTokenAddress,
-            _marketId,
-            _maxLoanDuration,
-            _interestRateLowerBound,
-            _interestRateUpperBound,
-            _liquidityThresholdPercent,
-            _collateralRatio,
-            _uniswapPoolFee,
-            _twapInterval,
+            _commitmentGroupConfig.principalTokenAddress,
+            _commitmentGroupConfig.collateralTokenAddress,
+            _commitmentGroupConfig.marketId,
+            _commitmentGroupConfig.maxLoanDuration,
+            _commitmentGroupConfig.interestRateLowerBound,
+            _commitmentGroupConfig.interestRateUpperBound,
+            _commitmentGroupConfig.liquidityThresholdPercent,
+            _commitmentGroupConfig.collateralRatio,
+            _commitmentGroupConfig.uniswapPoolFee,
+            _commitmentGroupConfig.twapInterval,
             poolSharesToken_
         );
     }
+
 
 
     function setWithdrawlDelayTime(uint256 _seconds) 

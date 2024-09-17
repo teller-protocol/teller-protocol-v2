@@ -10,6 +10,10 @@ import {UniswapV3FactoryMock} from "../../../../contracts/mock/uniswap/UniswapV3
 import { PaymentType, PaymentCycleType } from "../../../../contracts/libraries/V2Calculations.sol";
 import { LoanDetails, Payment, BidState , Bid, Terms } from "../../../../contracts/TellerV2Storage.sol";
 
+import { ILenderCommitmentGroup } from "../../../../contracts/interfaces/ILenderCommitmentGroup.sol";
+import { IUniswapPricingLibrary } from "../../../../contracts/interfaces/IUniswapPricingLibrary.sol";
+
+
 
 import "lib/forge-std/src/console.sol";
 
@@ -64,7 +68,9 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
 
         _uniswapV3Factory = new UniswapV3FactoryMock();
         _uniswapV3Factory.setPoolMock(address(_uniswapV3Pool));
- 
+
+
+        
 
         principalToken = new TestERC20Token("wrappedETH", "WETH", 1e24, 18);
 
@@ -89,24 +95,51 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
         address _collateralTokenAddress = address(collateralToken);
         uint256 _marketId = 1;
         uint32 _maxLoanDuration = 5000000;
-        uint16 _minInterestRate = 0;
-        uint16 _maxInterestRate = 800;
+        uint16 _interestRateLowerBound = 0;
+        uint16 _interestRateUpperBound = 800;
         uint16 _liquidityThresholdPercent = 10000;
-        uint16 _loanToValuePercent = 10000;
+        uint16 _collateralRatio = 10000;
         uint24 _uniswapPoolFee = 3000;
         uint32 _twapInterval = 5;
 
+         ILenderCommitmentGroup.CommitmentGroupConfig memory groupConfig = ILenderCommitmentGroup.CommitmentGroupConfig({
+            principalTokenAddress: _principalTokenAddress,
+            collateralTokenAddress: _collateralTokenAddress,
+            marketId: _marketId,
+            maxLoanDuration: _maxLoanDuration,
+            interestRateLowerBound: _interestRateLowerBound,
+            interestRateUpperBound: _interestRateUpperBound,
+            liquidityThresholdPercent: _liquidityThresholdPercent,
+            collateralRatio: _collateralRatio,
+            uniswapPoolFee: _uniswapPoolFee,
+            twapInterval: _twapInterval
+        });
+
+          bool zeroForOne = false;
+          uint32 twapInterval = 0;
+
+
+          IUniswapPricingLibrary.PoolRouteConfig
+            memory routeConfig = IUniswapPricingLibrary.PoolRouteConfig({
+                pool: address(_uniswapV3Pool),
+                zeroForOne: zeroForOne,
+                twapInterval: twapInterval,
+                token0Decimals: 18,
+                token1Decimals: 18
+            });
+
+
+       IUniswapPricingLibrary.PoolRouteConfig[]
+            memory routesConfig = new IUniswapPricingLibrary.PoolRouteConfig[](
+                1
+            );
+
+        routesConfig[0] = routeConfig; 
+
+
         address _poolSharesToken = lenderCommitmentGroupSmart.initialize(
-            _principalTokenAddress,
-            _collateralTokenAddress,
-            _marketId,
-            _maxLoanDuration,
-            _minInterestRate,
-            _maxInterestRate,
-            _liquidityThresholdPercent,
-            _loanToValuePercent,
-            _uniswapPoolFee,
-            _twapInterval
+            groupConfig,
+            routesConfig
         );
 
         lenderCommitmentGroupSmart.mock_setFirstDepositMade(true);
@@ -117,24 +150,53 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
         address _collateralTokenAddress = address(collateralToken);
         uint256 _marketId = 1;
         uint32 _maxLoanDuration = 5000000;
-        uint16 _minInterestRate = 100;
-         uint16 _maxInterestRate = 800;
+        uint16 _interestRateLowerBound = 100;
+        uint16 _interestRateUpperBound = 800;
         uint16 _liquidityThresholdPercent = 10000;
-        uint16 _loanToValuePercent = 10000;
+        uint16 _collateralRatio = 10000;
         uint24 _uniswapPoolFee = 3000;
         uint32 _twapInterval = 5;
 
+
+      ILenderCommitmentGroup.CommitmentGroupConfig memory groupConfig = ILenderCommitmentGroup.CommitmentGroupConfig({
+            principalTokenAddress: _principalTokenAddress,
+            collateralTokenAddress: _collateralTokenAddress,
+            marketId: _marketId,
+            maxLoanDuration: _maxLoanDuration,
+            interestRateLowerBound: _interestRateLowerBound,
+            interestRateUpperBound: _interestRateUpperBound,
+            liquidityThresholdPercent: _liquidityThresholdPercent,
+            collateralRatio: _collateralRatio,
+            uniswapPoolFee: _uniswapPoolFee,
+            twapInterval: _twapInterval
+        });
+
+       bool zeroForOne = false;
+      uint32 twapInterval = 0;
+
+
+          IUniswapPricingLibrary.PoolRouteConfig
+            memory routeConfig = IUniswapPricingLibrary.PoolRouteConfig({
+                pool: address(_uniswapV3Pool),
+                zeroForOne: zeroForOne,
+                twapInterval: twapInterval,
+                token0Decimals: 18,
+                token1Decimals: 18
+            });
+
+
+
+       IUniswapPricingLibrary.PoolRouteConfig[]
+            memory routesConfig = new IUniswapPricingLibrary.PoolRouteConfig[](
+                1
+            );
+
+        routesConfig[0] = routeConfig; 
+
+
         address _poolSharesToken = lenderCommitmentGroupSmart.initialize(
-            _principalTokenAddress,
-            _collateralTokenAddress,
-            _marketId,
-            _maxLoanDuration,
-            _minInterestRate,
-            _maxInterestRate,
-            _liquidityThresholdPercent,
-            _loanToValuePercent,
-            _uniswapPoolFee,
-            _twapInterval
+             groupConfig,
+            routesConfig
         );
 
         // assertFalse(isTrustedBefore, "Should not be trusted forwarder before");
@@ -1085,7 +1147,7 @@ function test_liquidateDefaultedLoanWithIncentive_does_not_double_count_repaid()
     }
 
     */
-    
+
 }
 
 contract User {}

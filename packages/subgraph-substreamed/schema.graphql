@@ -157,7 +157,14 @@ type group_unpaused @entity {
     account: Bytes!
 }
 
-
+type group_pool_bid @entity {
+    id: ID! 
+    group_pool_address: Bytes!
+    bid_id: BigDecimal!
+    borrower: Bytes!
+    collateral_amount: BigDecimal! 
+    principal_amount: BigDecimal!
+}
 
 type group_pool_metric @entity {
     id: ID!    #will be based on group pool address 

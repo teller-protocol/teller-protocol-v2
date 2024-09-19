@@ -476,7 +476,7 @@ fn graph_factory_out(events: &contract::Events, tables: &mut EntityChangesTables
 
 //make sure these match schema.graphql ! 
 fn graph_lendergroup_out(
-    events: &contract::Events,
+     events: &contract::Events,
      tables: &mut EntityChangesTables,
      store_get_globals: &StoreGetBigInt, 
 
@@ -514,6 +514,17 @@ fn graph_lendergroup_out(
             This is only going to give us the BidId 
             
             */
+            
+              tables
+            .create_row("group_pool_bid", format!("{}", evt.evt_address )  ) 
+           
+            .set("group_pool_address", Hex::decode(&evt.evt_address).unwrap() )
+            .set("bid_id", BigDecimal::from_str(&evt.bid_id).unwrap() )
+            .set("borrower",  &evt.borrower )
+            .set("principal_amount", BigDecimal::from_str(&evt.principal_amount).unwrap())
+            .set("collateral_amount", BigDecimal::from_str(&evt.collateral_amount).unwrap())
+            
+            ;
     });
     events.lendergroup_defaulted_loan_liquidateds.iter().for_each(|evt| {
         tables

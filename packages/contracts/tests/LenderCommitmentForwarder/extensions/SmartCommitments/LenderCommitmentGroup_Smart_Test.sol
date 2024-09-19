@@ -562,7 +562,10 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
          vm.warp(1000);   //loanDefaultedTimeStamp ?
 
        lenderCommitmentGroupSmart.set_mockBidAsActiveForGroup(bidId,true); 
-      
+
+       //set itself as mock owner for now ..  used for protocol fee 
+        _tellerV2.setMockOwner( address(lenderCommitmentGroupSmart)  );
+
        vm.prank(address(liquidator));
        principalToken.approve(address(lenderCommitmentGroupSmart), 1e18);
 

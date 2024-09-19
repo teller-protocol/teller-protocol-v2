@@ -630,8 +630,7 @@ contract LenderCommitmentGroup_Smart is
 
         uint256 amountDue = _getAmountOwedForBid(_bidId);
 
-        uint256 liquidationProtocolFee = 0;
-       
+        
 
         uint256 loanDefaultedTimeStamp = ITellerV2(TELLER_V2)
             .getLoanDefaultTimestamp(_bidId);
@@ -646,28 +645,46 @@ contract LenderCommitmentGroup_Smart is
             "Insufficient tokenAmountDifference"
         );
 
+
         if (minAmountDifference > 0) {
             //this is used when the collateral value is higher than the principal (rare)
             //the loan will be completely made whole and our contract gets extra funds too
             uint256 tokensToTakeFromSender = abs(minAmountDifference);
 
+
+             uint256 liquidationProtocolFee = tokensToTakeFromSender / 4 ;
+           
+
             IERC20(principalToken).safeTransferFrom(
                 msg.sender,
                 address(this),
-                amountDue + tokensToTakeFromSender
+                amountDue + tokensToTakeFromSender - liquidationProtocolFee
             );
 
-            tokenDifferenceFromLiquidations += int256(tokensToTakeFromSender);
 
-           
+             
+            address protocolOwner = Ownable(address(TELLER_V2)).owner();
+
+              IERC20(principalToken).safeTransferFrom(
+                msg.sender,
+                address(protocolOwner),
+                 liquidationProtocolFee
+            );
+
+
+            tokenDifferenceFromLiquidations += int256(tokensToTakeFromSender - liquidationProtocolFee );
+
+
         } else {
+          
            
             uint256 tokensToGiveToSender = abs(minAmountDifference);
 
+           
             IERC20(principalToken).safeTransferFrom(
                 msg.sender,
                 address(this),
-                amountDue - tokensToGiveToSender
+                amountDue - tokensToGiveToSender  
             );
 
             tokenDifferenceFromLiquidations -= int256(tokensToGiveToSender);
@@ -675,17 +692,7 @@ contract LenderCommitmentGroup_Smart is
            
         }
 
-
-        if (liquidationProtocolFee > 0){
-              address protocolOwner = Ownable(address(TELLER_V2)).owner();
-
-              IERC20(principalToken).safeTransferFrom(
-                msg.sender,
-                protocolOwner,
-                liquidationProtocolFee
-            );
-
-        }
+ 
 
         //this will give collateral to the caller
         ITellerV2(TELLER_V2).lenderCloseLoanWithRecipient(_bidId, msg.sender);
@@ -734,7 +741,8 @@ contract LenderCommitmentGroup_Smart is
 
         uint256 secondsSinceDefaulted = block.timestamp -
             _loanDefaultedTimestamp;
- 
+
+        //this starts at 864% and falls to -100% 
         int256 incentiveMultiplier = int256(86400) -
             int256(secondsSinceDefaulted);
 

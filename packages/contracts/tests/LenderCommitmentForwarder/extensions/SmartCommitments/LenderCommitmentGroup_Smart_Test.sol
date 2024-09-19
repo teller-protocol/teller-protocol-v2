@@ -886,9 +886,18 @@ function test_liquidateDefaultedLoanWithIncentive_does_not_double_count_repaid()
 
 
     function test_acceptFundsForAcceptBid() public {
-        lenderCommitmentGroupSmart.set_mock_getMaxPrincipalPerCollateralAmount(
+
+
+        //this mock no longer helps ! 
+       /* lenderCommitmentGroupSmart.set_mock_getMaxPrincipalPerCollateralAmount(
             100 * 1e18
+        );*/
+
+        lenderCommitmentGroupSmart.set_mock_requiredCollateralAmount(
+            100  
         );
+
+        
 
         principalToken.transfer(address(lenderCommitmentGroupSmart), 1e18);
         collateralToken.transfer(address(lenderCommitmentGroupSmart), 1e18);
@@ -898,7 +907,7 @@ function test_liquidateDefaultedLoanWithIncentive_does_not_double_count_repaid()
         lenderCommitmentGroupSmart.set_totalPrincipalTokensCommitted(1000000);
 
         uint256 principalAmount = 50;
-        uint256 collateralAmount = 50 * 100;
+        uint256 collateralAmount =   100;
 
         address collateralTokenAddress = address(
             lenderCommitmentGroupSmart.collateralToken()
@@ -942,8 +951,12 @@ function test_liquidateDefaultedLoanWithIncentive_does_not_double_count_repaid()
     }
 
     function test_acceptFundsForAcceptBid_insufficientCollateral() public {
-        lenderCommitmentGroupSmart.set_mock_getMaxPrincipalPerCollateralAmount(
+        /*lenderCommitmentGroupSmart.set_mock_getMaxPrincipalPerCollateralAmount(
             100 * 1e18
+        );*/
+
+          lenderCommitmentGroupSmart.set_mock_requiredCollateralAmount(
+            100  
         );
 
         principalToken.transfer(address(lenderCommitmentGroupSmart), 1e18);

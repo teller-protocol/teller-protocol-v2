@@ -12,6 +12,7 @@ contract LenderCommitmentGroup_Smart_Override is LenderCommitmentGroup_Smart {
     //  bool public acceptBidWasCalled;
 
     uint256 mockMaxPrincipalPerCollateralAmount;
+    uint256 mockRequiredCollateralAmount;
     uint256 mockSharesExchangeRate;
     int256 mockMinimumAmountDifferenceToCloseDefaultedLoan;
 
@@ -111,6 +112,10 @@ contract LenderCommitmentGroup_Smart_Override is LenderCommitmentGroup_Smart {
         mockMaxPrincipalPerCollateralAmount = amt;
     }
 
+      function set_mock_requiredCollateralAmount(uint256 amt) public {
+        mockRequiredCollateralAmount = amt;
+    }
+
     function mock_setFirstDepositMade(bool made) public {
         firstDepositMade = made;
 
@@ -169,6 +174,29 @@ contract LenderCommitmentGroup_Smart_Override is LenderCommitmentGroup_Smart {
         );
 
     }
+
+
+    function getRequiredCollateral(
+       uint256 _principalAmount
+       
+    ) public view override returns (uint256 collateralTokensAmountToMatchValue) {
+ 
+        return  mockRequiredCollateralAmount  ;
+    }
+
+/*
+    function calculateCollateralTokensAmountEquivalentToPrincipalTokens(
+        uint256 principalTokenAmountValue
+    ) public view override returns (uint256 collateralTokensAmountToMatchValue) {
+
+            //this is not correct 
+        return
+            principalTokenAmountValue 
+            * mockMaxPrincipalPerCollateralAmount  ;
+    }*/
+
+
+
 
 /*
     function super_getPriceFromSqrtX96(uint160 _sqrtPriceX96) public pure returns (uint256 price_) {

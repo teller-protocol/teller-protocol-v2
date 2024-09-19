@@ -515,6 +515,8 @@ contract LenderCommitmentGroup_Smart is
             _principalAmount
         );
 
+
+
         require(    
              _collateralAmount   >=
                 requiredCollateral,
@@ -748,9 +750,10 @@ contract LenderCommitmentGroup_Smart is
     function getRequiredCollateral(uint256 _principalAmount)
         public
         view
+        virtual
         returns (uint256)
     {
-        uint256 baseAmount = _calculateCollateralTokensAmountEquivalentToPrincipalTokens(
+        uint256 baseAmount = calculateCollateralTokensAmountEquivalentToPrincipalTokens(
                 _principalAmount
             );
 
@@ -839,9 +842,9 @@ contract LenderCommitmentGroup_Smart is
     // -----
 
     //this is expanded by 10e18
-    function _calculateCollateralTokensAmountEquivalentToPrincipalTokens(
+    function calculateCollateralTokensAmountEquivalentToPrincipalTokens(
         uint256 principalTokenAmountValue
-    ) public view returns (uint256 collateralTokensAmountToMatchValue) {
+    ) public view virtual returns (uint256 collateralTokensAmountToMatchValue) {
         //same concept as zeroforone
        // (address token0, ) = _getPoolTokens();
 

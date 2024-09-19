@@ -742,8 +742,8 @@ contract LenderCommitmentGroup_Smart is
         uint256 secondsSinceDefaulted = block.timestamp -
             _loanDefaultedTimestamp;
 
-        //this starts at 864% and falls to -100% 
-        int256 incentiveMultiplier = int256(86400) -
+        //this starts at 764% and falls to -100% 
+        int256 incentiveMultiplier = int256(86400 - 10000) -
             int256(secondsSinceDefaulted);
 
         if (incentiveMultiplier < -10000) {

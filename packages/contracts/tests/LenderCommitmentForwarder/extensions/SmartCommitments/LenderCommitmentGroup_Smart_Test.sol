@@ -724,7 +724,7 @@ function test_liquidateDefaultedLoanWithIncentive_does_not_double_count_repaid()
             loanDefaultTimestamp
         );
 
-      int256 expectedMinAmount = 4220; //based on loanDefaultTimestamp gap 
+      int256 expectedMinAmount = 3720; //based on loanDefaultTimestamp gap 
 
        assertEq(min_amount,expectedMinAmount,"min_amount unexpected");
 
@@ -772,7 +772,7 @@ function test_liquidateDefaultedLoanWithIncentive_does_not_double_count_repaid()
             loanDefaultTimestamp
         );
 
-      int256 expectedMinAmount = 3220; //based on loanDefaultTimestamp gap 
+      int256 expectedMinAmount = 2720; //based on loanDefaultTimestamp gap 
 
        assertEq(min_amount,expectedMinAmount,"min_amount unexpected");
 

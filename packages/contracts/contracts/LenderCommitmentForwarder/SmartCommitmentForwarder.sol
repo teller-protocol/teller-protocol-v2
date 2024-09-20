@@ -7,6 +7,7 @@ import "../interfaces/ILenderCommitmentForwarder.sol";
 import "../interfaces/ISmartCommitmentForwarder.sol";
 import "./LenderCommitmentForwarder_G1.sol";
 
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 
 import { CommitmentCollateralType, ISmartCommitment } from "../interfaces/ISmartCommitment.sol";
@@ -35,6 +36,13 @@ contract SmartCommitmentForwarder is
     }
 
 
+    modifier onlyProtocolOwner() { 
+        require( Ownable( _tellerV2 ).owner() == _msgSender()  , "Sender not authorized");
+        _;
+    }
+
+    uint256 public liquidationProtocolFeePercent; 
+
 
     constructor(address _protocolAddress, address _marketRegistry)
         TellerV2MarketForwarder_G3(_protocolAddress, _marketRegistry)
@@ -44,6 +52,17 @@ contract SmartCommitmentForwarder is
         __Pausable_init();
     }
 
+    function setLiquidationProtocolFeePercent(uint256 _percent) 
+    public onlyProtocolOwner { 
+        //max is 100% 
+        require( _percent <= 10000 , "invalid fee percent" );
+        liquidationProtocolFeePercent = _percent;
+    }
+
+    function getLiquidationProtocolFeePercent() 
+    public view returns (uint256){       
+        return liquidationProtocolFeePercent ;
+    }
 
     /**
      * @notice Accept the commitment to submitBid and acceptBid using the funds

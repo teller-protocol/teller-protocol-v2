@@ -21,6 +21,7 @@ import "../../../libraries/NumbersLib.sol";
 import "../../../interfaces/uniswap/IUniswapV3Pool.sol";
 
 import "../../../interfaces/uniswap/IUniswapV3Factory.sol";
+import "../../../interfaces/ISmartCommitmentForwarder.sol";
 
 import "../../../libraries/uniswap/TickMath.sol";
 import "../../../libraries/uniswap/FixedPoint96.sol";
@@ -652,7 +653,10 @@ contract LenderCommitmentGroup_Smart is
             uint256 tokensToTakeFromSender = abs(minAmountDifference);
 
 
-             uint256 liquidationProtocolFee = tokensToTakeFromSender / 4 ;
+            uint256 liquidationProtocolFee = Math.mulDiv( 
+                tokensToTakeFromSender , 
+                ISmartCommitmentForwarder(SMART_COMMITMENT_FORWARDER).getLiquidationProtocolFeePercent(),
+                 10000)  ;
            
 
             IERC20(principalToken).safeTransferFrom(

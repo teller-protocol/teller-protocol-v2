@@ -159,7 +159,7 @@ contract LenderCommitmentGroup_Smart_Override is LenderCommitmentGroup_Smart {
         
     }
 */
-    function super_getCollateralTokensAmountEquivalentToPrincipalTokens(
+  /*  function super_getCollateralTokensAmountEquivalentToPrincipalTokens(
         uint256 principalTokenAmountValue,
         uint256 pairPriceWithTwap 
      //   uint256 pairPriceImmediate,  
@@ -175,9 +175,12 @@ contract LenderCommitmentGroup_Smart_Override is LenderCommitmentGroup_Smart {
 
     }
 
+*/
+
 
     function getRequiredCollateral(
-       uint256 _principalAmount
+       uint256 _principalAmount,
+       uint256 maxPrincipalPerCollateralAmount 
        
     ) public view override returns (uint256 collateralTokensAmountToMatchValue) {
  

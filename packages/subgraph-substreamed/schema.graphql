@@ -175,9 +175,9 @@ type group_pool_metric @entity {
     shares_token_address: Bytes!
 
     # get these from RPC calls 
-   # uniswap_v3_pool_address: Bytes!
-   # teller_v2_address: Bytes!
-   # smart_commitment_forwarder_address: Bytes! 
+    uniswap_v3_pool_address: Bytes!
+    teller_v2_address: Bytes!
+    smart_commitment_forwarder_address: Bytes! 
     # ---
     
     market_id: BigInt!

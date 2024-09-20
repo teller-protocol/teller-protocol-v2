@@ -292,6 +292,15 @@ pub struct LendergroupPoolInitialized {
     pub twap_interval: u64,
     #[prost(bytes="vec", tag="16")]
     pub pool_shares_token: ::prost::alloc::vec::Vec<u8>,
+    
+     #[prost(bytes="vec", tag="17")]
+    pub teller_v2_address: ::prost::alloc::vec::Vec<u8>,
+    
+     #[prost(bytes="vec", tag="18")]
+    pub uniswap_v3_pool_address: ::prost::alloc::vec::Vec<u8>,
+     #[prost(bytes="vec", tag="19")]
+    pub smart_commitment_forwarder_address: ::prost::alloc::vec::Vec<u8>,
+    
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]

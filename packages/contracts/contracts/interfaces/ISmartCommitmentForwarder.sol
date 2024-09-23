@@ -15,4 +15,13 @@ interface ISmartCommitmentForwarder {
         uint32 _loanDuration
     ) external  returns (uint256 bidId)  ;
 
+
+    function setLiquidationProtocolFeePercent(uint256 _percent) 
+    external;
+
+    function getLiquidationProtocolFeePercent() 
+    external view returns (uint256) ;
+
+
+
 }

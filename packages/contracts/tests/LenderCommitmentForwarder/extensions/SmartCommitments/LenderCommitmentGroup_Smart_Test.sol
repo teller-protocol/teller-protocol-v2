@@ -562,7 +562,10 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
          vm.warp(1000);   //loanDefaultedTimeStamp ?
 
        lenderCommitmentGroupSmart.set_mockBidAsActiveForGroup(bidId,true); 
-      
+
+       //set itself as mock owner for now ..  used for protocol fee 
+        _tellerV2.setMockOwner( address(lenderCommitmentGroupSmart)  );
+
        vm.prank(address(liquidator));
        principalToken.approve(address(lenderCommitmentGroupSmart), 1e18);
 
@@ -721,7 +724,7 @@ function test_liquidateDefaultedLoanWithIncentive_does_not_double_count_repaid()
             loanDefaultTimestamp
         );
 
-      int256 expectedMinAmount = 4220; //based on loanDefaultTimestamp gap 
+      int256 expectedMinAmount = 3720; //based on loanDefaultTimestamp gap 
 
        assertEq(min_amount,expectedMinAmount,"min_amount unexpected");
 
@@ -769,7 +772,7 @@ function test_liquidateDefaultedLoanWithIncentive_does_not_double_count_repaid()
             loanDefaultTimestamp
         );
 
-      int256 expectedMinAmount = 3220; //based on loanDefaultTimestamp gap 
+      int256 expectedMinAmount = 2720; //based on loanDefaultTimestamp gap 
 
        assertEq(min_amount,expectedMinAmount,"min_amount unexpected");
 

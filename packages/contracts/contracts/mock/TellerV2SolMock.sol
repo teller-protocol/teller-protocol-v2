@@ -18,8 +18,10 @@ This is only used for sol test so its named specifically to avoid being used for
 contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage , ILoanRepaymentCallbacks{
     uint256 public amountOwedMockPrincipal;
     uint256 public amountOwedMockInterest;
-      address public approvedForwarder;
+    address public approvedForwarder;
     bool public isPausedMock;
+
+    address public mockOwner;
 
 
     PaymentCycleType globalBidPaymentCycleType = PaymentCycleType.Seconds;
@@ -50,6 +52,13 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage , ILoanRepa
         return isPausedMock;
     }
 
+
+    function setMockOwner(address _newOwner) external {
+        mockOwner = _newOwner;
+    }
+    function owner() external view returns(address){
+        return mockOwner;
+    }
 
     function isPauser(address _account) public view returns(bool){
         return false; //for now 

@@ -4,6 +4,9 @@ import { LenderCommitmentGroup_Smart_Override } from "./LenderCommitmentGroup_Sm
 
 import {TestERC20Token} from "../../../tokens/TestERC20Token.sol";
 
+
+import {MarketRegistry} from "../../../../contracts/MarketRegistry.sol";
+import {SmartCommitmentForwarder} from "../../../../contracts/LenderCommitmentForwarder/SmartCommitmentForwarder.sol";
 import {TellerV2SolMock} from "../../../../contracts/mock/TellerV2SolMock.sol";
 import {UniswapV3PoolMock} from "../../../../contracts/mock/uniswap/UniswapV3PoolMock.sol";
 import {UniswapV3FactoryMock} from "../../../../contracts/mock/uniswap/UniswapV3FactoryMock.sol";
@@ -51,6 +54,7 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
 
     LenderCommitmentGroup_Smart_Override lenderCommitmentGroupSmart;
 
+    MarketRegistry _marketRegistry;
     TellerV2SolMock _tellerV2;
     SmartCommitmentForwarder _smartCommitmentForwarder;
     UniswapV3PoolMock _uniswapV3Pool;
@@ -62,7 +66,9 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
         liquidator = new User();
 
         _tellerV2 = new TellerV2SolMock();
-        _smartCommitmentForwarder = new SmartCommitmentForwarder();
+        _marketRegistry = new MarketRegistry();
+        _smartCommitmentForwarder = new SmartCommitmentForwarder(
+            address(_tellerV2),address(_marketRegistry));
          
         _uniswapV3Pool = new UniswapV3PoolMock();
 
@@ -624,7 +630,10 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
          vm.warp(1000);   //loanDefaultedTimeStamp ?
 
        lenderCommitmentGroupSmart.set_mockBidAsActiveForGroup(bidId,true); 
-      
+
+       //set itself as mock owner for now ..  used for protocol fee 
+        _tellerV2.setMockOwner( address(lenderCommitmentGroupSmart)  );
+
        vm.prank(address(liquidator));
        principalToken.approve(address(lenderCommitmentGroupSmart), 1e18);
 
@@ -783,7 +792,7 @@ function test_liquidateDefaultedLoanWithIncentive_does_not_double_count_repaid()
             loanDefaultTimestamp
         );
 
-      int256 expectedMinAmount = 4220; //based on loanDefaultTimestamp gap 
+      int256 expectedMinAmount = 3720; //based on loanDefaultTimestamp gap 
 
        assertEq(min_amount,expectedMinAmount,"min_amount unexpected");
 
@@ -831,7 +840,7 @@ function test_liquidateDefaultedLoanWithIncentive_does_not_double_count_repaid()
             loanDefaultTimestamp
         );
 
-      int256 expectedMinAmount = 3220; //based on loanDefaultTimestamp gap 
+      int256 expectedMinAmount = 2720; //based on loanDefaultTimestamp gap 
 
        assertEq(min_amount,expectedMinAmount,"min_amount unexpected");
 
@@ -1165,10 +1174,11 @@ function test_liquidateDefaultedLoanWithIncentive_does_not_double_count_repaid()
 
 contract User {}
 
+/*
 contract SmartCommitmentForwarder {
 
     function paused() external returns (bool){
         return false;
     }
 
-}
+}*/

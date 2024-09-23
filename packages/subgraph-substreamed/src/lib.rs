@@ -988,7 +988,16 @@ fn graph_lendergroup_out(
         "total_principal_tokens_borrowed" => {
             tables.update_row("group_user_metric", format!("{}_{}", group_address, user_address ))
                 .set("total_principal_tokens_borrowed", new_value );
+        },  
+        "total_principal_tokens_repaid" => {
+            tables.update_row("group_user_metric", format!("{}_{}", group_address, user_address ))
+                .set("total_principal_tokens_repaid", new_value );
+        },  
+        "total_interest_collected" => {
+            tables.update_row("group_user_metric", format!("{}_{}", group_address, user_address ))
+                .set("total_interest_collected", new_value );
         },
+        
         
         // Add more cases as per your metric names
         _ => {}
@@ -1153,7 +1162,10 @@ fn store_lendergroup_user_metrics_deltas(
 
         let user_store_key: String = format!("group_user_metric:{}:{}:total_principal_tokens_repaid", evt.evt_address,Hex(&evt.repayer).to_string());
         bigint_add_store.add(ord,&user_store_key, BigInt::from_str(&evt.principal_amount).unwrap_or(BigInt::zero()));
- 
+        
+        let user_store_key: String = format!("group_user_metric:{}:{}:total_interest_collected", evt.evt_address,Hex(&evt.repayer).to_string());
+        bigint_add_store.add(ord,&user_store_key, BigInt::from_str(&evt.interest_amount).unwrap_or(BigInt::zero()));
+         
         
     });
 }

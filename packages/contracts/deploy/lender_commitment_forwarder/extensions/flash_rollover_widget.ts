@@ -23,7 +23,7 @@ const deployFn: DeployFunction = async (hre) => {
     unsafeAllow: ['constructor', 'state-variable-immutable'],
     constructorArgs: [
       await tellerV2.getAddress(),
-      
+
       aavePoolAddressProvider[networkName],
     ],
   })
@@ -32,7 +32,8 @@ const deployFn: DeployFunction = async (hre) => {
 }
 
 // tags and deployment
-deployFn.id = 'lender-commitment-forwarder:extensions:flash-rollover-widget:deploy'
+deployFn.id =
+  'lender-commitment-forwarder:extensions:flash-rollover-widget:deploy'
 deployFn.tags = [
   'lender-commitment-forwarder',
   'lender-commitment-forwarder:extensions',

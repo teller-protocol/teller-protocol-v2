@@ -2,9 +2,8 @@
 // OpenZeppelin Contracts (last updated v5.0.0) (proxy/ERC1967/ERC1967Proxy.sol)
 pragma solidity ^0.8.0;
 
-
-import {Proxy} from "../Proxy.sol";
-import {ERC1967Utils} from "./ERC1967Utils.sol";
+import { Proxy } from "../Proxy.sol";
+import { ERC1967Utils } from "./ERC1967Utils.sol";
 
 /**
  * @dev This contract implements an upgradeable proxy. It is upgradeable because calls are delegated to an
@@ -34,7 +33,13 @@ contract ERC1967Proxy is Proxy {
      * the https://eth.wiki/json-rpc/API#eth_getstorageat[`eth_getStorageAt`] RPC call.
      * `0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc`
      */
-    function _implementation() internal view virtual override returns (address) {
+    function _implementation()
+        internal
+        view
+        virtual
+        override
+        returns (address)
+    {
         return ERC1967Utils.getImplementation();
     }
 }

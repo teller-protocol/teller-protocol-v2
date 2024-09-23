@@ -71,15 +71,13 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     }
 
     modifier onlyProtocolOwner() {
-
         address protocolOwner = OwnableUpgradeable(address(tellerV2)).owner();
 
         require(_msgSender() == protocolOwner, "Sender not authorized");
         _;
     }
 
-
-         /* External Functions */
+    /* External Functions */
 
     /**
      * @notice Initializes the collateral manager.
@@ -274,17 +272,16 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     }
 
     function withdrawDustTokens(
-    uint256 _bidId,  
-    address _tokenAddress, 
-    uint256 _amount,
-    address _recipientAddress
+        uint256 _bidId,
+        address _tokenAddress,
+        uint256 _amount,
+        address _recipientAddress
     ) external onlyProtocolOwner {
-  
         ICollateralEscrowV1(_escrows[_bidId]).withdrawDustTokens(
-                _tokenAddress,
-                _amount,
-                _recipientAddress
-            );
+            _tokenAddress,
+            _amount,
+            _recipientAddress
+        );
     }
 
     /**

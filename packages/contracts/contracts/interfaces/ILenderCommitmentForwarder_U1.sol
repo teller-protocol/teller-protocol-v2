@@ -100,7 +100,6 @@ interface ILenderCommitmentForwarder_U1 {
         bytes32[] calldata _merkleProof
     ) external returns (uint256 bidId_);
 
-
     function getCommitmentPrincipalTokenAddress(uint256 _commitmentId)
         external
         view
@@ -110,6 +109,4 @@ interface ILenderCommitmentForwarder_U1 {
         external
         view
         returns (address);
-
-
 }

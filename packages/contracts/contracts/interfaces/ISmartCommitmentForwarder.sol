@@ -1,9 +1,6 @@
-
-
 pragma solidity >=0.8.0 <0.9.0;
 
 interface ISmartCommitmentForwarder {
-     
     function acceptSmartCommitmentWithRecipient(
         address _smartCommitmentAddress,
         uint256 _principalAmount,
@@ -13,6 +10,5 @@ interface ISmartCommitmentForwarder {
         address _recipient,
         uint16 _interestRate,
         uint32 _loanDuration
-    ) external  returns (uint256 bidId)  ;
-
+    ) external returns (uint256 bidId);
 }

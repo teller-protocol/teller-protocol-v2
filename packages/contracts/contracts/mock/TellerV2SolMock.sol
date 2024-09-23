@@ -11,15 +11,18 @@ import { LoanDetails, Payment, BidState } from "../TellerV2Storage.sol";
 
 import { ILoanRepaymentCallbacks } from "../interfaces/ILoanRepaymentCallbacks.sol";
 
-
 /*
 This is only used for sol test so its named specifically to avoid being used for the typescript tests.
 */
-contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage , ILoanRepaymentCallbacks{
+contract TellerV2SolMock is
+    ITellerV2,
+    IProtocolFee,
+    TellerV2Storage,
+    ILoanRepaymentCallbacks
+{
     uint256 public amountOwedMockPrincipal;
     uint256 public amountOwedMockInterest;
-      address public approvedForwarder;
-
+    address public approvedForwarder;
 
     PaymentCycleType globalBidPaymentCycleType = PaymentCycleType.Seconds;
     uint32 globalBidPaymentCycleDuration = 3000;
@@ -39,13 +42,11 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage , ILoanRepa
         return 100;
     }
 
-
     function approveMarketForwarder(uint256 _marketId, address _forwarder)
         external
     {
         approvedForwarder = _forwarder;
     }
-
 
     function submitBid(
         address _lendingToken,
@@ -56,10 +57,7 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage , ILoanRepa
         string calldata,
         address _receiver
     ) public returns (uint256 bidId_) {
-        
-
-
-         bidId_ = bidId;
+        bidId_ = bidId;
 
         Bid storage bid = bids[bidId_];
         bid.borrower = msg.sender;
@@ -76,7 +74,6 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage , ILoanRepa
         bid.terms.APR = _APR;
 
         bidId++; //nextBidId
-
     }
 
     function submitBid(
@@ -324,15 +321,12 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage , ILoanRepa
         bids[_bidId].loanDetails.lastRepaidTimestamp = _timestamp;
     }
 
-
-
-    function mock_setLoanDefaultTimestamp(
-        uint256 _defaultedAt
-    ) external   returns (uint256){
-       mockLoanDefaultTimestamp = _defaultedAt;
-    } 
-
-
+    function mock_setLoanDefaultTimestamp(uint256 _defaultedAt)
+        external
+        returns (uint256)
+    {
+        mockLoanDefaultTimestamp = _defaultedAt;
+    }
 
     function getRepaymentListenerForBid(uint256 _bidId)
         public
@@ -343,7 +337,6 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage , ILoanRepa
     function setRepaymentListenerForBid(uint256 _bidId, address _listener)
         public
     {}
-
 
     function _getBidPaymentCycleType(uint256 _bidId)
         internal

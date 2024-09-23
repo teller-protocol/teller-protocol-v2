@@ -1,13 +1,9 @@
-
 contract UniswapV3PoolMock {
     //this represents an equal price ratio
-    uint160 mockSqrtPriceX96 = 2 ** 96;
+    uint160 mockSqrtPriceX96 = 2**96;
 
     address mockToken0;
     address mockToken1;
-
-
-    
 
     struct Slot0 {
         // the current price
@@ -35,7 +31,6 @@ contract UniswapV3PoolMock {
         mockToken0 = t0;
     }
 
-
     function set_mockToken1(address t1) public {
         mockToken1 = t1;
     }
@@ -47,7 +42,6 @@ contract UniswapV3PoolMock {
     function token1() public returns (address) {
         return mockToken1;
     }
-
 
     function slot0() public returns (Slot0 memory slot0) {
         return
@@ -62,11 +56,14 @@ contract UniswapV3PoolMock {
             });
     }
 
-    //mock fn 
-   function observe(uint32[] calldata secondsAgos)
+    //mock fn
+    function observe(uint32[] calldata secondsAgos)
         external
         view
-        returns (int56[] memory tickCumulatives, uint160[] memory secondsPerLiquidityCumulativeX128s)
+        returns (
+            int56[] memory tickCumulatives,
+            uint160[] memory secondsPerLiquidityCumulativeX128s
+        )
     {
         // Initialize the return arrays
         tickCumulatives = new int56[](secondsAgos.length);
@@ -82,7 +79,4 @@ contract UniswapV3PoolMock {
 
         return (tickCumulatives, secondsPerLiquidityCumulativeX128s);
     }
- 
-      
-
 }

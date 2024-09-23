@@ -2,8 +2,7 @@
 // OpenZeppelin Contracts (last updated v5.0.0) (access/Ownable.sol)
 pragma solidity ^0.8.0;
 
-
-import {Context} from "./utils/Context.sol";
+import { Context } from "./utils/Context.sol";
 
 /**
  * @dev Contract module which provides a basic access control mechanism, where
@@ -30,7 +29,10 @@ abstract contract Ownable is Context {
      */
     error OwnableInvalidOwner(address owner);
 
-    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+    event OwnershipTransferred(
+        address indexed previousOwner,
+        address indexed newOwner
+    );
 
     /**
      * @dev Initializes the contract setting the address provided by the deployer as the initial owner.

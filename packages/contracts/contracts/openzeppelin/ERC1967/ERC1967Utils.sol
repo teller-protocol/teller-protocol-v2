@@ -2,10 +2,9 @@
 // OpenZeppelin Contracts (last updated v5.0.0) (proxy/ERC1967/ERC1967Utils.sol)
 pragma solidity ^0.8.0;
 
-
-import {IBeacon} from "../beacon/IBeacon.sol";
-import {Address} from "../utils/Address.sol";
-import {StorageSlot} from "../utils/StorageSlot.sol";
+import { IBeacon } from "../beacon/IBeacon.sol";
+import { Address } from "../utils/Address.sol";
+import { StorageSlot } from "../utils/StorageSlot.sol";
 
 /**
  * @dev This abstract contract provides getters and event emitting update functions for
@@ -32,7 +31,8 @@ library ERC1967Utils {
      * This is the keccak-256 hash of "eip1967.proxy.implementation" subtracted by 1.
      */
     // solhint-disable-next-line private-vars-leading-underscore
-    bytes32 internal constant IMPLEMENTATION_SLOT = 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc;
+    bytes32 internal constant IMPLEMENTATION_SLOT =
+        0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc;
 
     /**
      * @dev The `implementation` of the proxy is invalid.
@@ -68,7 +68,9 @@ library ERC1967Utils {
         if (newImplementation.code.length == 0) {
             revert ERC1967InvalidImplementation(newImplementation);
         }
-        StorageSlot.getAddressSlot(IMPLEMENTATION_SLOT).value = newImplementation;
+        StorageSlot
+            .getAddressSlot(IMPLEMENTATION_SLOT)
+            .value = newImplementation;
     }
 
     /**
@@ -78,7 +80,9 @@ library ERC1967Utils {
      *
      * Emits an {IERC1967-Upgraded} event.
      */
-    function upgradeToAndCall(address newImplementation, bytes memory data) internal {
+    function upgradeToAndCall(address newImplementation, bytes memory data)
+        internal
+    {
         _setImplementation(newImplementation);
         emit Upgraded(newImplementation);
 
@@ -94,7 +98,8 @@ library ERC1967Utils {
      * This is the keccak-256 hash of "eip1967.proxy.admin" subtracted by 1.
      */
     // solhint-disable-next-line private-vars-leading-underscore
-    bytes32 internal constant ADMIN_SLOT = 0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103;
+    bytes32 internal constant ADMIN_SLOT =
+        0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103;
 
     /**
      * @dev Returns the current admin.
@@ -132,7 +137,8 @@ library ERC1967Utils {
      * This is the keccak-256 hash of "eip1967.proxy.beacon" subtracted by 1.
      */
     // solhint-disable-next-line private-vars-leading-underscore
-    bytes32 internal constant BEACON_SLOT = 0xa3f0ad74e5423aebfd80d3ef4346578335a9a72aeaee59ff6cb3582b35133d50;
+    bytes32 internal constant BEACON_SLOT =
+        0xa3f0ad74e5423aebfd80d3ef4346578335a9a72aeaee59ff6cb3582b35133d50;
 
     /**
      * @dev Returns the current beacon.
@@ -168,12 +174,17 @@ library ERC1967Utils {
      * it uses an immutable beacon without looking at the value of the ERC-1967 beacon slot for
      * efficiency.
      */
-    function upgradeBeaconToAndCall(address newBeacon, bytes memory data) internal {
+    function upgradeBeaconToAndCall(address newBeacon, bytes memory data)
+        internal
+    {
         _setBeacon(newBeacon);
         emit BeaconUpgraded(newBeacon);
 
         if (data.length > 0) {
-            Address.functionDelegateCall(IBeacon(newBeacon).implementation(), data);
+            Address.functionDelegateCall(
+                IBeacon(newBeacon).implementation(),
+                data
+            );
         } else {
             _checkNonPayable();
         }

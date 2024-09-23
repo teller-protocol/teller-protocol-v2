@@ -22,17 +22,9 @@ import { AavePoolMock } from "../../../../contracts/mock/aave/AavePoolMock.sol";
 import { LoanReferralForwarder } from "../../../../contracts/LenderCommitmentForwarder/LoanReferralForwarder.sol";
 
 contract LoanReferralForwarderOverride is LoanReferralForwarder {
-    constructor(
-        address _tellerV2
-        
-    )
-        LoanReferralForwarder(
-            _tellerV2
-          
-        )
-    {}
+    constructor(address _tellerV2) LoanReferralForwarder(_tellerV2) {}
 
-   /*
+    /*
     function acceptCommitment(
         address _lenderCommitmentForwarder,
         address borrower,
@@ -51,8 +43,8 @@ contract LoanReferralForwarder_Unit_Test is Testable {
     User private borrower;
     User private lender;
 
-   // AavePoolMock aavePoolMock;
-   // AavePoolAddressProviderMock aavePoolAddressProvider;
+    // AavePoolMock aavePoolMock;
+    // AavePoolAddressProviderMock aavePoolAddressProvider;
     LoanReferralForwarderOverride loanReferralForwarder;
     TellerV2SolMock tellerV2;
     WethMock wethMock;
@@ -72,22 +64,19 @@ contract LoanReferralForwarder_Unit_Test is Testable {
 
         tellerV2.setMarketRegistry(address(marketRegistryMock));
 
-       
-       
         lenderCommitmentForwarder = new LenderCommitmentForwarderMock();
-     
+
         wethMock.deposit{ value: 100e18 }();
         wethMock.transfer(address(lender), 5e18);
         wethMock.transfer(address(borrower), 5e18);
         wethMock.transfer(address(lenderCommitmentForwarder), 5e18);
 
-      //  wethMock.transfer(address(aavePoolMock), 5e18);
+        //  wethMock.transfer(address(aavePoolMock), 5e18);
 
         //marketRegistryMock = new MarketRegistryMock();
         loanReferralForwarder = new LoanReferralForwarderOverride(
-            address(tellerV2) 
+            address(tellerV2)
         );
- 
 
         IntegrationTestHelpers.deployIntegrationSuite();
     }
@@ -136,7 +125,6 @@ contract LoanReferralForwarder_Unit_Test is Testable {
             });
       */
 
-
         vm.prank(address(borrower));
         uint256 loanId = tellerV2.submitBid(
             lendingToken,
@@ -156,12 +144,11 @@ contract LoanReferralForwarder_Unit_Test is Testable {
 
         vm.prank(address(borrower));
 
-
-       // uint256 minAmountReceieved = 1000;
+        // uint256 minAmountReceieved = 1000;
         uint256 rewardAmount = 1000;
         address rewardRecipient = address(this);
 
-/*
+        /*
         loanReferralForwarder.acceptCommitmentWithReferral(
           
             
@@ -183,14 +170,14 @@ contract LoanReferralForwarder_Unit_Test is Testable {
 
         );*/
 
-       /* bool flashLoanSimpleWasCalled = aavePoolMock.flashLoanSimpleWasCalled();
+        /* bool flashLoanSimpleWasCalled = aavePoolMock.flashLoanSimpleWasCalled();
         assertTrue(
             flashLoanSimpleWasCalled,
             "flashLoanSimpleWasCalled not called"
         );*/
     }
 
-/*
+    /*
     function test_rolloverLoanWithFlashAndProof() public {
         address lendingToken = address(wethMock);
         uint256 marketId = 0;

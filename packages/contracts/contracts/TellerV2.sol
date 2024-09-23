@@ -746,17 +746,16 @@ contract TellerV2 is
         uint256 _bidId,
         address _collateralRecipient
     ) internal acceptedLoan(_bidId, "lenderClaimCollateral") {
-
         Bid storage bid = bids[_bidId];
-         
+
         require(
             _msgSenderForMarket(bid.marketplaceId) == bid.lender,
             "only lender can close loan"
         );
         require(isLoanDefaulted(_bidId), "Loan must be defaulted.");
 
-        bid.state = BidState.CLOSED; 
-     
+        bid.state = BidState.CLOSED;
+
         /*
 
 
@@ -900,7 +899,6 @@ contract TellerV2 is
         }
     }
 
-
     function _sendOrEscrowFunds(uint256 _bidId, Payment memory _payment)
         internal
     {
@@ -909,8 +907,7 @@ contract TellerV2 is
 
         uint256 _paymentAmount = _payment.principal + _payment.interest;
 
-        try 
-
+        try
             bid.loanDetails.lendingToken.transferFrom{ gas: 100000 }(
                 _msgSenderForMarket(bid.marketplaceId),
                 lender,
@@ -921,7 +918,7 @@ contract TellerV2 is
 
             uint256 balanceBefore = bid.loanDetails.lendingToken.balanceOf(
                 address(this)
-            ); 
+            );
 
             //if unable, pay to escrow
             bid.loanDetails.lendingToken.safeTransferFrom(
@@ -964,10 +961,6 @@ contract TellerV2 is
             {} catch {}
         }
     }
-
-
-
-
 
     /**
      * @notice Calculates the total amount owed for a loan bid at a specific timestamp.

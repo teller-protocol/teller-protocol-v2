@@ -26,12 +26,7 @@ contract FlashRolloverLoanOverride is FlashRolloverLoan_G4 {
         address _tellerV2,
         address _lenderCommitmentForwarder,
         address _aaveAddressProvider
-    )
-        FlashRolloverLoan_G4(
-            _tellerV2, 
-            _aaveAddressProvider
-        )
-    {}
+    ) FlashRolloverLoan_G4(_tellerV2, _aaveAddressProvider) {}
 
     function acceptCommitment(
         address _lenderCommitmentForwarder,
@@ -40,7 +35,12 @@ contract FlashRolloverLoanOverride is FlashRolloverLoan_G4 {
         FlashRolloverLoan_G4.AcceptCommitmentArgs calldata _commitmentArgs
     ) public returns (uint256 bidId_, uint256 acceptCommitmentAmount_) {
         return
-            super._acceptCommitment(_lenderCommitmentForwarder,borrower, principalToken, _commitmentArgs);
+            super._acceptCommitment(
+                _lenderCommitmentForwarder,
+                borrower,
+                principalToken,
+                _commitmentArgs
+            );
     }
 }
 
@@ -231,7 +231,7 @@ contract FlashRolloverLoan_G4_Unit_Test is Testable {
         vm.prank(address(borrower));
 
         flashRolloverLoan.rolloverLoanWithFlash(
-              address(lenderCommitmentForwarder),
+            address(lenderCommitmentForwarder),
             loanId,
             flashAmount,
             borrowerAmount,
@@ -399,7 +399,7 @@ contract FlashRolloverLoan_G4_Unit_Test is Testable {
 
         bytes memory flashData = abi.encode(
             IFlashRolloverLoan_G4.RolloverCallbackArgs({
-                    lenderCommitmentForwarder: address(lenderCommitmentForwarder),
+                lenderCommitmentForwarder: address(lenderCommitmentForwarder),
                 loanId: loanId,
                 borrower: address(borrower),
                 borrowerAmount: borrowerAmount,
@@ -485,7 +485,7 @@ contract FlashRolloverLoan_G4_Unit_Test is Testable {
 
         bytes memory flashData = abi.encode(
             IFlashRolloverLoan_G4.RolloverCallbackArgs({
-                    lenderCommitmentForwarder: address(lenderCommitmentForwarder),
+                lenderCommitmentForwarder: address(lenderCommitmentForwarder),
                 loanId: loanId,
                 borrower: address(borrower),
                 borrowerAmount: borrowerAmount,
@@ -566,7 +566,7 @@ contract FlashRolloverLoan_G4_Unit_Test is Testable {
 
         bytes memory flashData = abi.encode(
             IFlashRolloverLoan_G4.RolloverCallbackArgs({
-                    lenderCommitmentForwarder: address(lenderCommitmentForwarder),
+                lenderCommitmentForwarder: address(lenderCommitmentForwarder),
                 loanId: loanId,
                 borrower: address(borrower),
                 borrowerAmount: borrowerAmount,
@@ -642,7 +642,7 @@ contract FlashRolloverLoan_G4_Unit_Test is Testable {
         vm.expectRevert("CommitmentRolloverLoan: not borrower");
 
         flashRolloverLoan.rolloverLoanWithFlash(
-              address(lenderCommitmentForwarder),
+            address(lenderCommitmentForwarder),
             loanId,
             flashAmount,
             borrowerAmount,
@@ -724,7 +724,7 @@ contract FlashRolloverLoan_G4_Unit_Test is Testable {
         //making sure the flashloan premium logic works
         (uint256 flashAmount, int256 borrowerAmount) = flashRolloverLoan
             .calculateRolloverAmount(
-                  address(lenderCommitmentForwarder),
+                address(lenderCommitmentForwarder),
                 loanId,
                 commitmentArgs,
                 9,
@@ -736,7 +736,7 @@ contract FlashRolloverLoan_G4_Unit_Test is Testable {
 
         (flashAmount, borrowerAmount) = flashRolloverLoan
             .calculateRolloverAmount(
-                  address(lenderCommitmentForwarder),
+                address(lenderCommitmentForwarder),
                 loanId,
                 commitmentArgs,
                 0,

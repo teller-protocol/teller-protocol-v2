@@ -42,9 +42,6 @@ import "forge-std/console.sol";
 
 */
 
- 
-
-
 contract LenderCommitmentForwarder_U1_Test is Testable {
     LenderCommitmentForwarderTest_TellerV2Mock private tellerV2Mock;
     MarketRegistryMock mockMarketRegistry;
@@ -405,8 +402,7 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
         assertEq(requiredCollateral, 1000, "unexpected required collateral");
     }
 
-
- function test_getRequiredCollateral_NFT_scenario_A() public {
+    function test_getRequiredCollateral_NFT_scenario_A() public {
         bool zeroForOne = false;
 
         principalTokenDecimals = 18;
@@ -419,8 +415,6 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
             principalTokenDecimals
         );
 
-     
-
         uint256 principalAmount = 1000;
         maxPrincipalPerCollateralAmount = 5000;
 
@@ -431,7 +425,7 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
                 ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC721
             );
 
-        assertEq(requiredCollateral, 1  , "unexpected required collateral");
+        assertEq(requiredCollateral, 1, "unexpected required collateral");
     }
 
     function test_getRequiredCollateral_NFT_Scenario_B() public {
@@ -447,8 +441,6 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
             principalTokenDecimals
         );
 
-     
-
         uint256 principalAmount = 100000;
         maxPrincipalPerCollateralAmount = 5000;
 
@@ -459,9 +451,8 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
                 ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC1155
             );
 
-        assertEq(requiredCollateral, 20  , "unexpected required collateral");
+        assertEq(requiredCollateral, 20, "unexpected required collateral");
     }
-
 
     // why does this fail ?
     /* function test_getUniswapPriceRatioForPoolRoutes_decimal_scenario_A() public {
@@ -1059,14 +1050,10 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
         //  assertEq( requiredCollateral, 1000, "unexpected required collateral" );
     }
 
-
-  function test_createCommitmentWithUniswap() public {
-
-
-
-
-         collateralTokenType = ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC20; 
-
+    function test_createCommitmentWithUniswap() public {
+        collateralTokenType = ILenderCommitmentForwarder_U1
+            .CommitmentCollateralType
+            .ERC20;
 
         ILenderCommitmentForwarder_U1.Commitment
             memory _commitment = ILenderCommitmentForwarder_U1.Commitment({
@@ -1083,31 +1070,25 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
                 principalTokenAddress: address(principalToken)
             });
 
-       // uint256 c_id = lender._createCommitment(c, emptyArray);
+        // uint256 c_id = lender._createCommitment(c, emptyArray);
 
-       address[] memory _borrowerAddressList ;
-        ILenderCommitmentForwarder_U1.PoolRouteConfig[] memory _poolRoutes ;
+        address[] memory _borrowerAddressList;
+        ILenderCommitmentForwarder_U1.PoolRouteConfig[] memory _poolRoutes;
 
-      vm.prank(address(lender));
-       uint256 _commitmentId = lenderCommitmentForwarder
+        vm.prank(address(lender));
+        uint256 _commitmentId = lenderCommitmentForwarder
             .createCommitmentWithUniswap(
-               _commitment,
-               _borrowerAddressList,
-               _poolRoutes,
-               10000
+                _commitment,
+                _borrowerAddressList,
+                _poolRoutes,
+                10000
             );
-            
-      
     }
 
-
-  function test_createCommitmentWithUniswap_two_routes() public {
-
-
-
-
-         collateralTokenType = ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC20; 
-
+    function test_createCommitmentWithUniswap_two_routes() public {
+        collateralTokenType = ILenderCommitmentForwarder_U1
+            .CommitmentCollateralType
+            .ERC20;
 
         ILenderCommitmentForwarder_U1.Commitment
             memory _commitment = ILenderCommitmentForwarder_U1.Commitment({
@@ -1124,10 +1105,10 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
                 principalTokenAddress: address(principalToken)
             });
 
-       // uint256 c_id = lender._createCommitment(c, emptyArray);
+        // uint256 c_id = lender._createCommitment(c, emptyArray);
 
-       address[] memory _borrowerAddressList ;
-       
+        address[] memory _borrowerAddressList;
+
         ILenderCommitmentForwarder_U1.PoolRouteConfig[]
             memory _poolRoutes = new ILenderCommitmentForwarder_U1.PoolRouteConfig[](
                 2
@@ -1152,26 +1133,20 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
             token1Decimals: 18
         });
 
-      vm.prank(address(lender));
-       uint256 _commitmentId = lenderCommitmentForwarder
+        vm.prank(address(lender));
+        uint256 _commitmentId = lenderCommitmentForwarder
             .createCommitmentWithUniswap(
-               _commitment,
-               _borrowerAddressList,
-               _poolRoutes,
-               10000
+                _commitment,
+                _borrowerAddressList,
+                _poolRoutes,
+                10000
             );
-            
-      
     }
 
-
-  function test_createCommitmentWithUniswap_two_routes_invalid_type() public {
-
-
-
-
-         collateralTokenType = ILenderCommitmentForwarder_U1.CommitmentCollateralType.ERC721; 
-
+    function test_createCommitmentWithUniswap_two_routes_invalid_type() public {
+        collateralTokenType = ILenderCommitmentForwarder_U1
+            .CommitmentCollateralType
+            .ERC721;
 
         ILenderCommitmentForwarder_U1.Commitment
             memory _commitment = ILenderCommitmentForwarder_U1.Commitment({
@@ -1188,10 +1163,10 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
                 principalTokenAddress: address(principalToken)
             });
 
-       // uint256 c_id = lender._createCommitment(c, emptyArray);
+        // uint256 c_id = lender._createCommitment(c, emptyArray);
 
-       address[] memory _borrowerAddressList ;
-       ILenderCommitmentForwarder_U1.PoolRouteConfig[]
+        address[] memory _borrowerAddressList;
+        ILenderCommitmentForwarder_U1.PoolRouteConfig[]
             memory _poolRoutes = new ILenderCommitmentForwarder_U1.PoolRouteConfig[](
                 2
             );
@@ -1215,18 +1190,16 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
             token1Decimals: 18
         });
 
+        vm.prank(address(lender));
+        vm.expectRevert("can only use pool routes with ERC20 collateral");
 
-      vm.prank(address(lender));
-       vm.expectRevert( "can only use pool routes with ERC20 collateral" ); 
-      
-       uint256 _commitmentId = lenderCommitmentForwarder
+        uint256 _commitmentId = lenderCommitmentForwarder
             .createCommitmentWithUniswap(
-               _commitment,
-               _borrowerAddressList,
-               _poolRoutes,
-               10000
+                _commitment,
+                _borrowerAddressList,
+                _poolRoutes,
+                10000
             );
-    
     }
 
     /*
@@ -2382,8 +2355,6 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
 
     */
 
-
-
     function test_getEscrowCollateralType_erc20() public {
         CollateralType cType = lenderCommitmentForwarder
             ._getEscrowCollateralTypeSuper(
@@ -2432,8 +2403,6 @@ contract LenderCommitmentForwarder_U1_Test is Testable {
 
         ///assertEq(uint16(cType), uint16(CollateralType.NONE), "unexpected collateral type");
     }
-
-
 }
 
 contract LenderCommitmentUser is User {

@@ -13,27 +13,22 @@ const networksWithAave: string[] = Object.keys(aavePoolAddressProvider)
 
 const deployFn: DeployFunction = async (hre) => {
   const tellerV2 = await hre.contracts.get('TellerV2')
-   
 
   hre.log('Deploying Loan Referral Forwarder...')
-
 
   const networkName = hre.network.name
 
   const LoanReferralForwarder = await hre.deployProxy('LoanReferralForwarder', {
     unsafeAllow: ['constructor', 'state-variable-immutable'],
-    constructorArgs: [
-      await tellerV2.getAddress(),
-      
-      
-    ],
+    constructorArgs: [await tellerV2.getAddress()],
   })
 
   return true
 }
 
 // tags and deployment
-deployFn.id = 'lender-commitment-forwarder:extensions:loan-referral-forwarder:deploy'
+deployFn.id =
+  'lender-commitment-forwarder:extensions:loan-referral-forwarder:deploy'
 deployFn.tags = [
   'lender-commitment-forwarder',
   'lender-commitment-forwarder:extensions',

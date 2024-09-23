@@ -77,7 +77,6 @@ interface ILenderCommitmentForwarder {
         uint16 _interestRate,
         uint32 _loanDuration
     ) external returns (uint256 bidId_);
-    
 
     function acceptCommitmentWithRecipientAndProof(
         uint256 _commitmentId,

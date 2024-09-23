@@ -41,9 +41,7 @@ const deployFn: DeployFunction = async (hre) => {
 
   const LenderCommitmentForwarderAlphaImplementation =
     await hre.ethers.getContractFactory('LenderCommitmentForwarderAlpha')
- 
-   
- 
+
   await hre.upgrades.proposeBatchTimelock({
     title: 'LenderCommitmentForwarderAlpha: Upgrade',
     description: ` 
@@ -68,7 +66,6 @@ const deployFn: DeployFunction = async (hre) => {
       },
     ],
   })
- 
 
   hre.log('done.')
   hre.log('')
@@ -95,8 +92,7 @@ deployFn.skip = async (hre) => {
       'arbitrum',
       'base',
       'mainnet',
-      'sepolia'  
-      
+      'sepolia',
     ].includes(hre.network.name)
   )
 }

@@ -6,23 +6,18 @@ const deployFn: DeployFunction = async (hre) => {
   hre.log('LoanReferralForwarder: Proposing upgrade...')
 
   const chainId = await hre.getChainId()
- 
 
   const tellerV2 = await hre.contracts.get('TellerV2')
- 
-  const LoanReferralForwarder = await hre.contracts.get(
-    'LoanReferralForwarder'
-  )
+
+  const LoanReferralForwarder = await hre.contracts.get('LoanReferralForwarder')
 
   const tellerV2ProxyAddress = await tellerV2.getAddress()
- 
+
   const LoanReferralForwarderImplementation =
     await hre.ethers.getContractFactory('LoanReferralForwarder')
- 
-    const proxyAddress = await LoanReferralForwarder.getAddress()
- 
 
- 
+  const proxyAddress = await LoanReferralForwarder.getAddress()
+
   await hre.upgrades.proposeBatchTimelock({
     title: 'LoanReferralForwarder: Upgrade',
     description: ` 
@@ -38,14 +33,11 @@ const deployFn: DeployFunction = async (hre) => {
         opts: {
           unsafeAllow: ['constructor', 'state-variable-immutable'],
 
-          constructorArgs: [
-            tellerV2ProxyAddress 
-          ],
+          constructorArgs: [tellerV2ProxyAddress],
         },
       },
     ],
   })
- 
 
   hre.log('done.')
   hre.log('')
@@ -62,18 +54,19 @@ deployFn.tags = [
   'loan-referral-forwarder',
   'loan-referral-forwarder:upgrade_1',
 ]
-deployFn.dependencies = ['lender-commitment-forwarder:extensions:loan-referral-forwarder:deploy']
+deployFn.dependencies = [
+  'lender-commitment-forwarder:extensions:loan-referral-forwarder:deploy',
+]
 deployFn.skip = async (hre) => {
   return (
     !hre.network.live ||
     ![
       'localhost',
-   //   'polygon',
-     // 'arbitrum',
-     // 'base',
-     // 'mainnet',
-     // 'sepolia'  
-      
+      //   'polygon',
+      // 'arbitrum',
+      // 'base',
+      // 'mainnet',
+      // 'sepolia'
     ].includes(hre.network.name)
   )
 }

@@ -174,16 +174,12 @@ contract LenderCommitmentGroup_Smart is
     uint16 public interestRateLowerBound;
     uint16 public interestRateUpperBound;
 
-
     mapping(address => uint256) public principalTokensCommittedByLender;
     mapping(uint256 => bool) public activeBids;
 
     //this excludes interest
     // maybe it is possible to get rid of this storage slot and calculate it from totalPrincipalTokensRepaid, totalPrincipalTokensLended
     int256 tokenDifferenceFromLiquidations;
-
-
-   
 
     modifier onlySmartCommitmentForwarder() {
         require(
@@ -230,7 +226,7 @@ contract LenderCommitmentGroup_Smart is
         uint32 _maxLoanDuration,
         uint16 _interestRateLowerBound,
         uint16 _interestRateUpperBound,
-        uint16 _liquidityThresholdPercent, // When 100% , the entire pool can be drawn for lending.  When 80%, only 80% of the pool can be drawn for lending. 
+        uint16 _liquidityThresholdPercent, // When 100% , the entire pool can be drawn for lending.  When 80%, only 80% of the pool can be drawn for lending.
         uint16 _loanToValuePercent, //the required overcollateralization ratio.  10000 is 1:1 baseline , typically this is above 10000
         uint24 _uniswapPoolFee,
         uint32 _twapInterval
@@ -265,18 +261,24 @@ contract LenderCommitmentGroup_Smart is
         interestRateLowerBound = _interestRateLowerBound;
         interestRateUpperBound = _interestRateUpperBound;
 
+        require(
+            interestRateUpperBound <= 10000,
+            "invalid _interestRateUpperBound"
+        );
+        require(
+            interestRateLowerBound <= interestRateUpperBound,
+            "invalid _interestRateLowerBound"
+        );
 
-        
-        require(interestRateUpperBound <= 10000, "invalid _interestRateUpperBound");
-        require(interestRateLowerBound <= interestRateUpperBound, "invalid _interestRateLowerBound");
-
-        require(_liquidityThresholdPercent <= 10000, "invalid _liquidityThresholdPercent"); 
+        require(
+            _liquidityThresholdPercent <= 10000,
+            "invalid _liquidityThresholdPercent"
+        );
 
         liquidityThresholdPercent = _liquidityThresholdPercent;
         loanToValuePercent = _loanToValuePercent;
         twapInterval = _twapInterval;
 
-        
         poolSharesToken_ = _deployPoolSharesToken();
     }
 
@@ -345,7 +347,7 @@ contract LenderCommitmentGroup_Smart is
             totalPrincipalTokensCommitted
         ) + tokenDifferenceFromLiquidations;
 
-        //if the poolTotalEstimatedValue_ is less than 0, we treat it as 0.  
+        //if the poolTotalEstimatedValue_ is less than 0, we treat it as 0.
         poolTotalEstimatedValue_ = poolTotalEstimatedValueSigned > int256(0)
             ? uint256(poolTotalEstimatedValueSigned)
             : 0;
@@ -449,8 +451,6 @@ contract LenderCommitmentGroup_Smart is
         uint256 _amountPoolSharesTokens,
         address _recipient
     ) external returns (uint256) {
-       
-
         //this reduces total supply
         poolSharesToken.burn(msg.sender, _amountPoolSharesTokens);
 
@@ -824,17 +824,27 @@ contract LenderCommitmentGroup_Smart is
 
     //this is always between 0 and 10000
     function getPoolUtilizationRatio() public view returns (uint16) {
-
         if (totalPrincipalTokensCommitted == 0) {
             return 0;
         }
 
-        return uint16(  Math.min(  (totalPrincipalTokensLended - totalPrincipalTokensRepaid)  * 10000  /   totalPrincipalTokensCommitted , 10000  ));
-    }   
+        return
+            uint16(
+                Math.min(
+                    ((totalPrincipalTokensLended - totalPrincipalTokensRepaid) *
+                        10000) / totalPrincipalTokensCommitted,
+                    10000
+                )
+            );
+    }
 
- 
     function getMinInterestRate() public view returns (uint16) {
-        return interestRateLowerBound + uint16( uint256(interestRateUpperBound-interestRateLowerBound).percent(getPoolUtilizationRatio()) );
+        return
+            interestRateLowerBound +
+            uint16(
+                uint256(interestRateUpperBound - interestRateLowerBound)
+                    .percent(getPoolUtilizationRatio())
+            );
     }
 
     function getPrincipalTokenAddress() external view returns (address) {

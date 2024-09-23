@@ -652,10 +652,13 @@ contract LenderCommitmentGroup_Smart is
             //the loan will be completely made whole and our contract gets extra funds too
             uint256 tokensToTakeFromSender = abs(minAmountDifference);
 
-
-            uint256 liquidationProtocolFee = Math.mulDiv( 
+ 
+        
+        
+           uint256 liquidationProtocolFee = Math.mulDiv( 
                 tokensToTakeFromSender , 
-                ISmartCommitmentForwarder(SMART_COMMITMENT_FORWARDER).getLiquidationProtocolFeePercent(),
+                ISmartCommitmentForwarder(SMART_COMMITMENT_FORWARDER)
+                    .getLiquidationProtocolFeePercent(),
                  10000)  ;
            
 
@@ -663,9 +666,7 @@ contract LenderCommitmentGroup_Smart is
                 msg.sender,
                 address(this),
                 amountDue + tokensToTakeFromSender - liquidationProtocolFee
-            );
-
-
+            ); 
              
             address protocolOwner = Ownable(address(TELLER_V2)).owner();
 

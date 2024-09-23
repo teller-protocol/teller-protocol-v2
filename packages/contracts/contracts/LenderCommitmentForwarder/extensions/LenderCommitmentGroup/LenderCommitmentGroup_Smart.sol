@@ -347,6 +347,15 @@ contract LenderCommitmentGroup_Smart is
         withdrawlDelayTimeSeconds = _seconds;
     }
 
+
+
+    function setMaxPrincipalPerCollateralAmount(uint256 _maxPrincipalPerCollateralAmount) 
+    external 
+    onlyOwner {
+
+       maxPrincipalPerCollateralAmount = _maxPrincipalPerCollateralAmount;
+    }
+
     function _deployPoolSharesToken()
         internal
         onlyInitializing
@@ -812,7 +821,7 @@ contract LenderCommitmentGroup_Smart is
        //     ).percent(collateralRatio);
  
 
-        uint256 maxPrincipalPerCollateralAmount = maxPrincipalPerCollateralAmount == 0  
+        uint256 principalPerCollateralAmount = maxPrincipalPerCollateralAmount == 0  
                 ? pairPriceWithTwapFromOracle   
                 : Math.min(
                     pairPriceWithTwapFromOracle,
@@ -823,7 +832,7 @@ contract LenderCommitmentGroup_Smart is
         return
             getRequiredCollateral(
                 principalAmount,
-                maxPrincipalPerCollateralAmount   
+                principalPerCollateralAmount   
             );
     }
 

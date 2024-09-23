@@ -48,7 +48,7 @@ contract LenderCommitmentGroupFactory is OwnableUpgradeable {
         Shares will be distributed at a 1:1 ratio of the primary principal token so if 1e18 raw WETH are deposited, the depositor gets 1e18 shares for the group pool.
     */
     function deployLenderCommitmentGroupPool(
-       // uint256 _initialPrincipalAmount,
+        uint256 _initialPrincipalAmount,
         address _principalTokenAddress,
         address _collateralTokenAddress,
         uint256 _marketId,
@@ -62,11 +62,11 @@ contract LenderCommitmentGroupFactory is OwnableUpgradeable {
     ) external returns (address newGroupContract_) {
          
 
-
+      
         BeaconProxy newGroupContract_ = new BeaconProxy(
                 lenderGroupBeaconImplementation,
                 abi.encodeWithSelector(
-                    ILenderCommitmentGroup.initialize.selector, 
+                    ILenderCommitmentGroup.initialize.selector,    //this initializes 
                     _principalTokenAddress,
                     _collateralTokenAddress,
                     _marketId,
@@ -88,56 +88,55 @@ contract LenderCommitmentGroupFactory is OwnableUpgradeable {
         //transfer ownership to msg.sender 
         OwnableUpgradeable(address(newGroupContract_))
             .transferOwnership(msg.sender);
-
-
-
-
-        /*
-            The max principal should be a very high number! higher than usual
-            The expiration time should be far in the future!  farther than usual 
-        */
-       /* ILenderCommitmentGroup(newGroupContract_).initialize(
-            _principalTokenAddress,
-            _collateralTokenAddress,
-            _marketId,
-            _maxLoanDuration,
-            _interestRateLowerBound,
-            _interestRateUpperBound,
-            _liquidityThresholdPercent,
-            _loanToValuePercent,
-            _uniswapPoolFee,
-            _twapInterval
-        );*/
-
-
-
+ 
 
         //it is not absolutely necessary to have this call here but it allows the user to potentially save a tx step so it is nice to have .
-       /* if (_initialPrincipalAmount > 0) {
+         if (_initialPrincipalAmount > 0) {
             //should pull in the creators initial committed principal tokens .
 
             //send the initial principal tokens to _newgroupcontract here !
             // so it will have them for addPrincipalToCommitmentGroup which will pull them from here
 
-            IERC20(_principalTokenAddress).transferFrom(
+            _initializeCommitmentGroup(
+                address(newGroupContract_),
+                _initialPrincipalAmount,
+                _principalTokenAddress 
+                
+            );
+
+            
+        } 
+    }
+
+
+
+    function _initializeCommitmentGroup(
+        address _newGroupContract,
+        uint256 _initialPrincipalAmount,
+        address _principalTokenAddress
+    ) internal {
+
+
+        IERC20(_principalTokenAddress).transferFrom(
                 msg.sender,
                 address(this),
                 _initialPrincipalAmount
             );
             IERC20(_principalTokenAddress).approve(
-                address(newGroupContract_),
+                _newGroupContract,
                 _initialPrincipalAmount
             );
 
             address sharesRecipient = msg.sender; 
 
-            uint256 sharesAmount_ = ILenderCommitmentGroup(address(newGroupContract_))
+            uint256 sharesAmount_ = ILenderCommitmentGroup(address(_newGroupContract))
                 .addPrincipalToCommitmentGroup(
                     _initialPrincipalAmount,
                     sharesRecipient,
                     0 //_minShares
                 );
-        } */
+
+
     }
 
 }

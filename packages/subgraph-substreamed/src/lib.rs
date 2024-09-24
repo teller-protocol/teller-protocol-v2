@@ -1017,6 +1017,44 @@ fn graph_lendergroup_out(
 
 
 
+#[substreams::handlers::store]
+fn store_accepted_bids_data(
+    events:  contract::Events, 
+   
+    bigint_set_store: StoreSetBigInt //for block time and block number 
+) {
+
+    let ord = 0; 
+    
+    events.lendergroup_borrower_accepted_funds.iter().for_each(|evt: &contract::LendergroupBorrowerAcceptedFunds| {
+         
+        bigint_set_store.set(ord, evt.bid_id.clone() , &BigInt::from(  1 ) );
+ 
+    });
+    
+
+}
+
+
+#[substreams::handlers::map]
+fn map_tellerv2_events(
+    blk: eth::Block,
+    store_accepted_bids: StoreGetBigInt,
+) -> Result<contract::Events, substreams::errors::Error> {
+    let mut events = contract::Events::default();
+    
+    /* 
+    map_factory_events(&blk, &mut events);
+    map_lendergroup_events(&blk, &store_lendergroup, &mut events);
+  */
+    
+    
+    Ok(events)
+}
+ 
+ 
+ 
+
 
 
 #[substreams::handlers::store]

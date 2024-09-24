@@ -12,6 +12,7 @@ imports:
 protobuf:
   files:
     - contract.proto
+    - collateral.proto
   importPaths:
     - ./proto
 
@@ -92,4 +93,3 @@ modules:
       type: proto:sf.substreams.entity.v1.EntityChanges
 
 network: polygon
-

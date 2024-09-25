@@ -9,6 +9,28 @@ const deployFn: DeployFunction = async (hre) => {
   const trustedForwarder = await hre.contracts.get('MetaForwarder')
   const v2Calculations = await hre.deployments.get('V2Calculations')
 
+
+/*
+wont work due to arg ? 
+
+  let tellerV2LegacyAddress = "0xd177f4b8e348b4c56c2ac8e03b58e41b79351a7f";
+  let tellerV2LegacyImpl = await hre.ethers.getContractFactory('TellerV2Legacy',
+    {
+      libraries: {
+        V2Calculations: v2Calculations.address,
+      },
+    }
+  );
+
+  await hre.upgrades.forceImport(
+
+    tellerV2LegacyAddress,
+    tellerV2LegacyImpl,
+    
+  );
+*/
+
+
   await hre.upgrades.proposeBatchTimelock({
     title: 'TellerV2: Add Pause Controls',
     description: ` 
@@ -26,7 +48,7 @@ const deployFn: DeployFunction = async (hre) => {
         }),
 
         opts: {
-        
+          unsafeSkipStorageCheck: true, 
           unsafeAllow: [
             'constructor',
             'state-variable-immutable',

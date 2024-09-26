@@ -41,6 +41,10 @@ import { IEscrowVault } from "../../../interfaces/IEscrowVault.sol";
 import { ILenderCommitmentGroup } from "../../../interfaces/ILenderCommitmentGroup.sol";
 import { Payment } from "../../../TellerV2Storage.sol";
 
+import {IUniswapPricingLibrary} from "../../../interfaces/IUniswapPricingLibrary.sol";
+import {UniswapPricingLibrary} from "../../../libraries/UniswapPricingLibrary.sol";
+
+
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
@@ -134,7 +138,10 @@ contract LenderCommitmentGroup_Smart is
     bool public firstDepositMade;
     uint256 public withdrawlDelayTimeSeconds; 
 
+    IUniswapPricingLibrary.PoolRouteConfig[]  public  poolOracleRoutes ;
 
+    //configured by the owner. If 0 , not used. 
+    uint256 public maxPrincipalPerCollateralAmount; 
    
 
  event PoolInitialized(
@@ -255,36 +262,28 @@ contract LenderCommitmentGroup_Smart is
 
         
     */
-    function initialize(
-        address _principalTokenAddress,
-        address _collateralTokenAddress,
-        uint256 _marketId,
-        uint32 _maxLoanDuration,
-        uint16 _interestRateLowerBound,
-        uint16 _interestRateUpperBound,
-        uint16 _liquidityThresholdPercent, // When 100% , the entire pool can be drawn for lending.  When 80%, only 80% of the pool can be drawn for lending. 
-        uint16 _collateralRatio, //the required overcollateralization ratio.  10000 is 1:1 baseline , typically this is above 10000
-        uint24 _uniswapPoolFee,
-        uint32 _twapInterval
+   function initialize(
+       CommitmentGroupConfig calldata _commitmentGroupConfig,
+        IUniswapPricingLibrary.PoolRouteConfig[] calldata _poolOracleRoutes
     ) external initializer returns (address poolSharesToken_) {
        
         __Ownable_init();
         __Pausable_init();
 
-        principalToken = IERC20(_principalTokenAddress);
-        collateralToken = IERC20(_collateralTokenAddress);
-        uniswapPoolFee = _uniswapPoolFee;
+        principalToken = IERC20(_commitmentGroupConfig.principalTokenAddress);
+        collateralToken = IERC20(_commitmentGroupConfig.collateralTokenAddress);
+        uniswapPoolFee = _commitmentGroupConfig.uniswapPoolFee;
 
         UNISWAP_V3_POOL = IUniswapV3Factory(UNISWAP_V3_FACTORY).getPool(
-            _principalTokenAddress,
-            _collateralTokenAddress,
-            _uniswapPoolFee
+            _commitmentGroupConfig.principalTokenAddress,
+            _commitmentGroupConfig.collateralTokenAddress,
+            _commitmentGroupConfig.uniswapPoolFee
         );
 
-        require(_twapInterval >= MIN_TWAP_INTERVAL, "Invalid TWAP Interval");
+        require(_commitmentGroupConfig.twapInterval >= MIN_TWAP_INTERVAL, "Invalid TWAP Interval");
         require(UNISWAP_V3_POOL != address(0), "Invalid uniswap pool address");
 
-        marketId = _marketId;
+        marketId = _commitmentGroupConfig.marketId;
 
         withdrawlDelayTimeSeconds = DEFAULT_WITHDRAWL_DELAY_TIME_SECONDS;
 
@@ -292,43 +291,53 @@ contract LenderCommitmentGroup_Smart is
 
          
         ITellerV2Context(TELLER_V2).approveMarketForwarder(
-            _marketId,
+            _commitmentGroupConfig.marketId,
             SMART_COMMITMENT_FORWARDER
         );
 
-        maxLoanDuration = _maxLoanDuration;
-        interestRateLowerBound = _interestRateLowerBound;
-        interestRateUpperBound = _interestRateUpperBound;
+        maxLoanDuration = _commitmentGroupConfig.maxLoanDuration;
+        interestRateLowerBound = _commitmentGroupConfig.interestRateLowerBound;
+        interestRateUpperBound = _commitmentGroupConfig.interestRateUpperBound;
 
 
         
         
         require(interestRateLowerBound <= interestRateUpperBound, "invalid _interestRateLowerBound");
 
-        require(_liquidityThresholdPercent <= 10000, "invalid _liquidityThresholdPercent"); 
+       
+        liquidityThresholdPercent = _commitmentGroupConfig.liquidityThresholdPercent;
+        collateralRatio = _commitmentGroupConfig.collateralRatio;
+        twapInterval = _commitmentGroupConfig.twapInterval;
 
-        liquidityThresholdPercent = _liquidityThresholdPercent;
-        collateralRatio = _collateralRatio;
-        twapInterval = _twapInterval;
+        require( liquidityThresholdPercent <= 10000, "invalid _liquidityThresholdPercent"); 
 
+         
+
+        for (uint256 i = 0; i < _poolOracleRoutes.length; i++) {
+            poolOracleRoutes.push(_poolOracleRoutes[i]);
+        }
+
+
+         require(poolOracleRoutes.length >= 1 && poolOracleRoutes.length <= 2, "invalid pool routes length");
         
         poolSharesToken_ = _deployPoolSharesToken();
 
 
         emit PoolInitialized(
-            _principalTokenAddress,
-            _collateralTokenAddress,
-            _marketId,
-            _maxLoanDuration,
-            _interestRateLowerBound,
-            _interestRateUpperBound,
-            _liquidityThresholdPercent,
-            _collateralRatio,
-            _uniswapPoolFee,
-            _twapInterval,
+            _commitmentGroupConfig.principalTokenAddress,
+            _commitmentGroupConfig.collateralTokenAddress,
+            _commitmentGroupConfig.marketId,
+            _commitmentGroupConfig.maxLoanDuration,
+            _commitmentGroupConfig.interestRateLowerBound,
+            _commitmentGroupConfig.interestRateUpperBound,
+            _commitmentGroupConfig.liquidityThresholdPercent,
+            _commitmentGroupConfig.collateralRatio,
+            _commitmentGroupConfig.uniswapPoolFee,
+            _commitmentGroupConfig.twapInterval,
             poolSharesToken_
         );
     }
+
 
 
     function setWithdrawlDelayTime(uint256 _seconds) 
@@ -336,6 +345,15 @@ contract LenderCommitmentGroup_Smart is
     onlyProtocolOwner {
 
         withdrawlDelayTimeSeconds = _seconds;
+    }
+
+
+
+    function setMaxPrincipalPerCollateralAmount(uint256 _maxPrincipalPerCollateralAmount) 
+    external 
+    onlyOwner {
+
+       maxPrincipalPerCollateralAmount = _maxPrincipalPerCollateralAmount;
     }
 
     function _deployPoolSharesToken()
@@ -504,9 +522,11 @@ contract LenderCommitmentGroup_Smart is
         );
  
  
-        uint256 requiredCollateral = getCollateralRequiredForPrincipalAmount(
+        uint256 requiredCollateral = calculateCollateralRequiredToBorrowPrincipal(
             _principalAmount
         );
+
+
 
         require(    
              _collateralAmount   >=
@@ -763,22 +783,77 @@ contract LenderCommitmentGroup_Smart is
     function abs(int x) private pure returns (uint) {
         return x >= 0 ? uint(x) : uint(-x);
     }
- 
-    function getCollateralRequiredForPrincipalAmount(uint256 _principalAmount)
-        public
+
+
+    function calculateCollateralRequiredToBorrowPrincipal(  
+        uint256 _principalAmount
+    ) public
         view
-        returns (uint256)
-    {
-        uint256 baseAmount = _calculateCollateralTokensAmountEquivalentToPrincipalTokens(
+        virtual
+        returns (uint256) {
+
+        uint256 baseAmount = calculateCollateralTokensAmountEquivalentToPrincipalTokens(
                 _principalAmount
-            );
+        ); 
 
         //this is an amount of collateral
         return baseAmount.percent(collateralRatio);
     }
 
+
+    //this is expanded by 10e18
+    //this logic is very similar to that used in LCFA 
+    function calculateCollateralTokensAmountEquivalentToPrincipalTokens(
+        uint256 principalAmount 
+    ) public view virtual returns (uint256 collateralTokensAmountToMatchValue) {
+        //same concept as zeroforone
+       // (address token0, ) = _getPoolTokens();
+
+        //bool principalTokenIsToken0 = (address(principalToken) == token0);
+         //uint256 pairPriceImmediate = _getUniswapV3TokenPairPrice(0);
+
+        uint256 pairPriceWithTwapFromOracle = UniswapPricingLibrary
+            .getUniswapPriceRatioForPoolRoutes(poolOracleRoutes);
+       
+      
+       //uint256 scaledPoolOraclePrice = UniswapPricingLibrary.getUniswapPriceRatioForPoolRoutes(
+       //         poolOracleRoutes
+       //     ).percent(collateralRatio);
+ 
+
+        uint256 principalPerCollateralAmount = maxPrincipalPerCollateralAmount == 0  
+                ? pairPriceWithTwapFromOracle   
+                : Math.min(
+                    pairPriceWithTwapFromOracle,
+                    maxPrincipalPerCollateralAmount //this is expanded by uniswap exp factor  
+                ) ;
+
+
+        return
+            getRequiredCollateral(
+                principalAmount,
+                principalPerCollateralAmount   
+            );
+    }
+
+
+
+   function getRequiredCollateral(
+        uint256 _principalAmount,
+        uint256 _maxPrincipalPerCollateralAmount 
+        
+    ) public view virtual returns (uint256) {
+         
+         return
+            MathUpgradeable.mulDiv(
+                _principalAmount,
+                STANDARD_EXPANSION_FACTOR,
+                _maxPrincipalPerCollateralAmount,
+                MathUpgradeable.Rounding.Up
+            );  
+    }
     //this result is expanded by UNISWAP_EXPANSION_FACTOR
-    function _getUniswapV3TokenPairPrice(uint32 _twapInterval)
+   /* function _getUniswapV3TokenPairPrice(uint32 _twapInterval)
         internal
         view
         returns (uint256)
@@ -839,7 +914,8 @@ contract LenderCommitmentGroup_Smart is
 
         }
     }
-
+    
+    
     function _getPoolTokens()
         internal
         view
@@ -849,63 +925,28 @@ contract LenderCommitmentGroup_Smart is
         token0 = IUniswapV3Pool(UNISWAP_V3_POOL).token0();
         token1 = IUniswapV3Pool(UNISWAP_V3_POOL).token1();
     }
+    
+    
+    */
+
 
     // -----
 
-    //this is expanded by 10e18
-    function _calculateCollateralTokensAmountEquivalentToPrincipalTokens(
-        uint256 principalTokenAmountValue
-    ) public view returns (uint256 collateralTokensAmountToMatchValue) {
-        //same concept as zeroforone
-        (address token0, ) = _getPoolTokens();
-
-        bool principalTokenIsToken0 = (address(principalToken) == token0);
-
-        uint256 pairPriceWithTwap = _getUniswapV3TokenPairPrice(twapInterval);
-        uint256 pairPriceImmediate = _getUniswapV3TokenPairPrice(0);
-
-        return
-            _getCollateralTokensAmountEquivalentToPrincipalTokens(
-                principalTokenAmountValue,
-                pairPriceWithTwap,
-                pairPriceImmediate,
-                principalTokenIsToken0
-            );
-    }
-
+ 
     /*
         Dev Note: pairPriceWithTwap and pairPriceImmediate are expanded by UNISWAP_EXPANSION_FACTOR
 
     */
-    function _getCollateralTokensAmountEquivalentToPrincipalTokens(
+   /* function _getCollateralTokensAmountEquivalentToPrincipalTokens(
         uint256 principalTokenAmountValue,
-        uint256 pairPriceWithTwap,
-        uint256 pairPriceImmediate,
-        bool principalTokenIsToken0
+        uint256 pairPrice 
+        //uint256 pairPriceImmediate,
+       // bool principalTokenIsToken0
     ) public pure returns (uint256 collateralTokensAmountToMatchValue) {
-        if (principalTokenIsToken0) {
-           
-            uint256 worstCasePairPrice = Math.max(
-                pairPriceWithTwap,
-                pairPriceImmediate
-            );
-
-            collateralTokensAmountToMatchValue = token1ToToken0(
+        collateralTokensAmountToMatchValue = token0ToToken1(
                 principalTokenAmountValue,
-                worstCasePairPrice //if this is lower, collateral tokens amt will be higher
+                pairPrice //if this is lower, collateral tokens amt will be higher
             );
-        } else {
-            
-            uint256 worstCasePairPrice = Math.min(
-                pairPriceWithTwap,
-                pairPriceImmediate
-            );
-
-            collateralTokensAmountToMatchValue = token0ToToken1(
-                principalTokenAmountValue,
-                worstCasePairPrice //if this is lower, collateral tokens amt will be higher
-            );
-        }
     }
 
     //note: the price is still expanded by UNISWAP_EXPANSION_FACTOR
@@ -936,7 +977,7 @@ contract LenderCommitmentGroup_Smart is
                 UNISWAP_EXPANSION_FACTOR,
                 MathUpgradeable.Rounding.Up
             );
-    }
+    }*/
 
     /*
     This  callback occurs when a TellerV2 repayment happens or when a TellerV2 liquidate happens 
@@ -1005,9 +1046,8 @@ contract LenderCommitmentGroup_Smart is
         return CommitmentCollateralType.ERC20;
     }
 
-    //this is expanded by 1e18
-    //this only exists to comply with the interface
-    function getRequiredCollateral(uint256 _principalAmount)
+    //this was a redundant function 
+   /* function getRequiredCollateral(uint256 _principalAmount)
         public
         view
         returns (uint256 requiredCollateral_)
@@ -1015,7 +1055,7 @@ contract LenderCommitmentGroup_Smart is
         requiredCollateral_ = getCollateralRequiredForPrincipalAmount(
             _principalAmount
         );
-    }
+    }*/
 
     function getMarketId() external view returns (uint256) {
         return marketId;

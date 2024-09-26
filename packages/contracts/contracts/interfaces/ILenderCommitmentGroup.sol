@@ -1,18 +1,29 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+
+import {IUniswapPricingLibrary} from "../interfaces/IUniswapPricingLibrary.sol";
 interface ILenderCommitmentGroup {
+
+
+
+    struct CommitmentGroupConfig {
+        address principalTokenAddress;
+        address collateralTokenAddress;
+        uint256 marketId;
+        uint32 maxLoanDuration;
+        uint16 interestRateLowerBound;
+        uint16 interestRateUpperBound;
+        uint16 liquidityThresholdPercent;
+        uint16 collateralRatio; //essentially the overcollateralization ratio.  10000 is 1:1 baseline ?
+        uint24 uniswapPoolFee;
+        uint32 twapInterval;
+    }
+
+
     function initialize(
-        address _principalTokenAddress,
-        address _collateralTokenAddress,
-        uint256 _marketId,
-        uint32 _maxLoanDuration,
-        uint16 _interestRateLowerBound,
-        uint16 _interestRateUpperBound,
-        uint16 _liquidityThresholdPercent,
-        uint16 _loanToValuePercent, //essentially the overcollateralization ratio.  10000 is 1:1 baseline ?
-        uint24 _uniswapPoolFee,
-        uint32 _twapInterval
+        CommitmentGroupConfig calldata _commitmentGroupConfig,
+        IUniswapPricingLibrary.PoolRouteConfig[] calldata _poolOracleRoutes  
     )
         external
         returns (

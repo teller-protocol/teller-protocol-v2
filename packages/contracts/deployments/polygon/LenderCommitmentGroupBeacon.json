@@ -440,56 +440,6 @@
     },
     {
       "type": "function",
-      "name": "_calculateCollateralTokensAmountEquivalentToPrincipalTokens",
-      "constant": true,
-      "stateMutability": "view",
-      "payable": false,
-      "inputs": [
-        {
-          "type": "uint256",
-          "name": "principalTokenAmountValue"
-        }
-      ],
-      "outputs": [
-        {
-          "type": "uint256",
-          "name": "collateralTokensAmountToMatchValue"
-        }
-      ]
-    },
-    {
-      "type": "function",
-      "name": "_getCollateralTokensAmountEquivalentToPrincipalTokens",
-      "constant": true,
-      "stateMutability": "pure",
-      "payable": false,
-      "inputs": [
-        {
-          "type": "uint256",
-          "name": "principalTokenAmountValue"
-        },
-        {
-          "type": "uint256",
-          "name": "pairPriceWithTwap"
-        },
-        {
-          "type": "uint256",
-          "name": "pairPriceImmediate"
-        },
-        {
-          "type": "bool",
-          "name": "principalTokenIsToken0"
-        }
-      ],
-      "outputs": [
-        {
-          "type": "uint256",
-          "name": "collateralTokensAmountToMatchValue"
-        }
-      ]
-    },
-    {
-      "type": "function",
       "name": "acceptFundsForAcceptBid",
       "constant": false,
       "payable": false,
@@ -602,6 +552,44 @@
     },
     {
       "type": "function",
+      "name": "calculateCollateralRequiredToBorrowPrincipal",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_principalAmount"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "calculateCollateralTokensAmountEquivalentToPrincipalTokens",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "principalAmount"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": "collateralTokensAmountToMatchValue"
+        }
+      ]
+    },
+    {
+      "type": "function",
       "name": "collateralRatio",
       "constant": true,
       "stateMutability": "view",
@@ -638,25 +626,6 @@
       "outputs": [
         {
           "type": "bool",
-          "name": ""
-        }
-      ]
-    },
-    {
-      "type": "function",
-      "name": "getCollateralRequiredForPrincipalAmount",
-      "constant": true,
-      "stateMutability": "view",
-      "payable": false,
-      "inputs": [
-        {
-          "type": "uint256",
-          "name": "_principalAmount"
-        }
-      ],
-      "outputs": [
-        {
-          "type": "uint256",
           "name": ""
         }
       ]
@@ -844,31 +813,16 @@
         {
           "type": "uint256",
           "name": "_principalAmount"
+        },
+        {
+          "type": "uint256",
+          "name": "_maxPrincipalPerCollateralAmount"
         }
       ],
       "outputs": [
         {
           "type": "uint256",
-          "name": "requiredCollateral_"
-        }
-      ]
-    },
-    {
-      "type": "function",
-      "name": "getSqrtTwapX96",
-      "constant": true,
-      "stateMutability": "view",
-      "payable": false,
-      "inputs": [
-        {
-          "type": "uint32",
-          "name": "twapInterval"
-        }
-      ],
-      "outputs": [
-        {
-          "type": "uint160",
-          "name": "sqrtPriceX96"
+          "name": ""
         }
       ]
     },
@@ -893,44 +847,76 @@
       "payable": false,
       "inputs": [
         {
-          "type": "address",
-          "name": "_principalTokenAddress"
+          "type": "tuple",
+          "name": "_commitmentGroupConfig",
+          "components": [
+            {
+              "type": "address",
+              "name": "principalTokenAddress"
+            },
+            {
+              "type": "address",
+              "name": "collateralTokenAddress"
+            },
+            {
+              "type": "uint256",
+              "name": "marketId"
+            },
+            {
+              "type": "uint32",
+              "name": "maxLoanDuration"
+            },
+            {
+              "type": "uint16",
+              "name": "interestRateLowerBound"
+            },
+            {
+              "type": "uint16",
+              "name": "interestRateUpperBound"
+            },
+            {
+              "type": "uint16",
+              "name": "liquidityThresholdPercent"
+            },
+            {
+              "type": "uint16",
+              "name": "collateralRatio"
+            },
+            {
+              "type": "uint24",
+              "name": "uniswapPoolFee"
+            },
+            {
+              "type": "uint32",
+              "name": "twapInterval"
+            }
+          ]
         },
         {
-          "type": "address",
-          "name": "_collateralTokenAddress"
-        },
-        {
-          "type": "uint256",
-          "name": "_marketId"
-        },
-        {
-          "type": "uint32",
-          "name": "_maxLoanDuration"
-        },
-        {
-          "type": "uint16",
-          "name": "_interestRateLowerBound"
-        },
-        {
-          "type": "uint16",
-          "name": "_interestRateUpperBound"
-        },
-        {
-          "type": "uint16",
-          "name": "_liquidityThresholdPercent"
-        },
-        {
-          "type": "uint16",
-          "name": "_collateralRatio"
-        },
-        {
-          "type": "uint24",
-          "name": "_uniswapPoolFee"
-        },
-        {
-          "type": "uint32",
-          "name": "_twapInterval"
+          "type": "tuple[]",
+          "name": "_poolOracleRoutes",
+          "components": [
+            {
+              "type": "address",
+              "name": "pool"
+            },
+            {
+              "type": "bool",
+              "name": "zeroForOne"
+            },
+            {
+              "type": "uint32",
+              "name": "twapInterval"
+            },
+            {
+              "type": "uint256",
+              "name": "token0Decimals"
+            },
+            {
+              "type": "uint256",
+              "name": "token1Decimals"
+            }
+          ]
         }
       ],
       "outputs": [
@@ -1015,6 +1001,20 @@
     },
     {
       "type": "function",
+      "name": "maxPrincipalPerCollateralAmount",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
       "name": "owner",
       "constant": true,
       "stateMutability": "view",
@@ -1046,6 +1046,41 @@
         {
           "type": "bool",
           "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "poolOracleRoutes",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ],
+      "outputs": [
+        {
+          "type": "address",
+          "name": "pool"
+        },
+        {
+          "type": "bool",
+          "name": "zeroForOne"
+        },
+        {
+          "type": "uint32",
+          "name": "twapInterval"
+        },
+        {
+          "type": "uint256",
+          "name": "token0Decimals"
+        },
+        {
+          "type": "uint256",
+          "name": "token1Decimals"
         }
       ]
     },
@@ -1162,6 +1197,19 @@
         {
           "type": "uint256",
           "name": "interestAmount"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "setMaxPrincipalPerCollateralAmount",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_maxPrincipalPerCollateralAmount"
         }
       ],
       "outputs": []
@@ -1355,6 +1403,6 @@
     }
   ],
   "receipt": {},
-  "numDeployments": 1,
+  "numDeployments": 2,
   "implementation": "0x55Ef5d3700eEC151d4Feff74214E7C90daBDE12B"
 }

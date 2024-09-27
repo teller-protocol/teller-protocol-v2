@@ -14,6 +14,7 @@ import "../../../interfaces/IProtocolFee.sol";
 import "../../../interfaces/ITellerV2Storage.sol";
 import "../../../libraries/NumbersLib.sol";
 
+import {IUniswapPricingLibrary} from "../../../interfaces/IUniswapPricingLibrary.sol";
 
 import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
  
@@ -23,8 +24,9 @@ contract LenderCommitmentGroupFactory is OwnableUpgradeable {
     using AddressUpgradeable for address;
     using NumbersLib for uint256;
 
- 
-    address public lenderGroupBeaconImplementation;
+    
+    //this is the beacon proxy
+    address public lenderGroupBeacon;
 
 
     mapping(address => uint256) public deployedLenderGroupContracts;
@@ -37,7 +39,7 @@ contract LenderCommitmentGroupFactory is OwnableUpgradeable {
         external
         initializer
     {
-        lenderGroupBeaconImplementation = _lenderGroupBeacon; 
+        lenderGroupBeacon = _lenderGroupBeacon; 
         __Ownable_init_unchained();
     }
 
@@ -49,34 +51,19 @@ contract LenderCommitmentGroupFactory is OwnableUpgradeable {
     */
     function deployLenderCommitmentGroupPool(
         uint256 _initialPrincipalAmount,
-        address _principalTokenAddress,
-        address _collateralTokenAddress,
-        uint256 _marketId,
-        uint32 _maxLoanDuration,
-        uint16 _interestRateLowerBound,
-        uint16 _interestRateUpperBound,
-        uint16 _liquidityThresholdPercent,
-        uint16 _collateralRatio,
-        uint24 _uniswapPoolFee,
-        uint32 _twapInterval
+        ILenderCommitmentGroup.CommitmentGroupConfig calldata _commitmentGroupConfig,
+        IUniswapPricingLibrary.PoolRouteConfig[] calldata _poolOracleRoutes
     ) external returns (address newGroupContract_) {
          
 
       
         BeaconProxy newGroupContract_ = new BeaconProxy(
-                lenderGroupBeaconImplementation,
+                lenderGroupBeacon,
                 abi.encodeWithSelector(
                     ILenderCommitmentGroup.initialize.selector,    //this initializes 
-                    _principalTokenAddress,
-                    _collateralTokenAddress,
-                    _marketId,
-                    _maxLoanDuration,
-                    _interestRateLowerBound,
-                    _interestRateUpperBound,
-                    _liquidityThresholdPercent,
-                    _collateralRatio,
-                    _uniswapPoolFee,
-                    _twapInterval
+                    _commitmentGroupConfig,
+                    _poolOracleRoutes
+
                 )
             );
 
@@ -97,10 +84,10 @@ contract LenderCommitmentGroupFactory is OwnableUpgradeable {
             //send the initial principal tokens to _newgroupcontract here !
             // so it will have them for addPrincipalToCommitmentGroup which will pull them from here
 
-            _initializeCommitmentGroup(
+            _addPrincipalToCommitmentGroup(
                 address(newGroupContract_),
                 _initialPrincipalAmount,
-                _principalTokenAddress 
+                _commitmentGroupConfig.principalTokenAddress 
                 
             );
 
@@ -110,7 +97,7 @@ contract LenderCommitmentGroupFactory is OwnableUpgradeable {
 
 
 
-    function _initializeCommitmentGroup(
+    function _addPrincipalToCommitmentGroup(
         address _newGroupContract,
         uint256 _initialPrincipalAmount,
         address _principalTokenAddress

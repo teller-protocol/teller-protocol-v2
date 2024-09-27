@@ -264,7 +264,7 @@ contract LenderCommitmentGroup_Smart is
     */
    function initialize(
        CommitmentGroupConfig calldata _commitmentGroupConfig,
-        IUniswapPricingLibrary.PoolRouteConfig[] calldata _poolOracleRoutes
+       IUniswapPricingLibrary.PoolRouteConfig[] calldata _poolOracleRoutes
     ) external initializer returns (address poolSharesToken_) {
        
         __Ownable_init();

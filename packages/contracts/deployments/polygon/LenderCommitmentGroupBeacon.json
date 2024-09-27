@@ -262,16 +262,6 @@
           "indexed": false
         },
         {
-          "type": "uint24",
-          "name": "uniswapPoolFee",
-          "indexed": false
-        },
-        {
-          "type": "uint32",
-          "name": "twapInterval",
-          "indexed": false
-        },
-        {
           "type": "address",
           "name": "poolSharesToken",
           "indexed": false
@@ -329,6 +319,20 @@
     {
       "type": "function",
       "name": "EXCHANGE_RATE_EXPANSION_FACTOR",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "MAX_WITHDRAWL_DELAY_TIME",
       "constant": true,
       "stateMutability": "view",
       "payable": false,
@@ -413,20 +417,6 @@
     {
       "type": "function",
       "name": "UNISWAP_V3_FACTORY",
-      "constant": true,
-      "stateMutability": "view",
-      "payable": false,
-      "inputs": [],
-      "outputs": [
-        {
-          "type": "address",
-          "name": ""
-        }
-      ]
-    },
-    {
-      "type": "function",
-      "name": "UNISWAP_V3_POOL",
       "constant": true,
       "stateMutability": "view",
       "payable": false,
@@ -881,14 +871,6 @@
             {
               "type": "uint16",
               "name": "collateralRatio"
-            },
-            {
-              "type": "uint24",
-              "name": "uniswapPoolFee"
-            },
-            {
-              "type": "uint32",
-              "name": "twapInterval"
             }
           ]
         },
@@ -1340,34 +1322,6 @@
     },
     {
       "type": "function",
-      "name": "twapInterval",
-      "constant": true,
-      "stateMutability": "view",
-      "payable": false,
-      "inputs": [],
-      "outputs": [
-        {
-          "type": "uint32",
-          "name": ""
-        }
-      ]
-    },
-    {
-      "type": "function",
-      "name": "uniswapPoolFee",
-      "constant": true,
-      "stateMutability": "view",
-      "payable": false,
-      "inputs": [],
-      "outputs": [
-        {
-          "type": "uint24",
-          "name": ""
-        }
-      ]
-    },
-    {
-      "type": "function",
       "name": "unpauseBorrowing",
       "constant": false,
       "payable": false,
@@ -1403,6 +1357,6 @@
     }
   ],
   "receipt": {},
-  "numDeployments": 3,
+  "numDeployments": 4,
   "implementation": "0x55Ef5d3700eEC151d4Feff74214E7C90daBDE12B"
 }

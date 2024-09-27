@@ -87,14 +87,6 @@
             {
               "type": "uint16",
               "name": "collateralRatio"
-            },
-            {
-              "type": "uint24",
-              "name": "uniswapPoolFee"
-            },
-            {
-              "type": "uint32",
-              "name": "twapInterval"
             }
           ]
         },
@@ -221,6 +213,6 @@
     "blockHash": null,
     "blockNumber": null
   },
-  "numDeployments": 3,
+  "numDeployments": 4,
   "implementation": "0x0d05F9809b6eee3262e8a49Ca08c4De524b40F1B"
 }

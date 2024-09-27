@@ -144,8 +144,6 @@ type group_pool_initialized @entity {
     max_loan_duration: BigInt!
     pool_shares_token: Bytes!
     principal_token_address: Bytes!
-    twap_interval: BigInt!
-    uniswap_pool_fee: BigInt!
 }
 type group_unpaused @entity {
     id: ID!
@@ -181,10 +179,9 @@ type group_pool_metric @entity {
     # ---
     
     market_id: BigInt!
-    uniswap_pool_fee: BigInt!
-
+    
     max_loan_duration : BigInt!
-    twap_interval : BigInt!
+    
     interest_rate_upper_bound: BigInt!
     interest_rate_lower_bound: BigInt!
     

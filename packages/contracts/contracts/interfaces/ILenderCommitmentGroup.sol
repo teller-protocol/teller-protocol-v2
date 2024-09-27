@@ -16,8 +16,8 @@ interface ILenderCommitmentGroup {
         uint16 interestRateUpperBound;
         uint16 liquidityThresholdPercent;
         uint16 collateralRatio; //essentially the overcollateralization ratio.  10000 is 1:1 baseline ?
-        uint24 uniswapPoolFee;
-        uint32 twapInterval;
+       // uint24 uniswapPoolFee;
+       // uint32 twapInterval;
     }
 
 

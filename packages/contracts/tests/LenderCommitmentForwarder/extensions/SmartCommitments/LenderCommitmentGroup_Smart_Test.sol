@@ -105,8 +105,8 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
         uint16 _interestRateUpperBound = 800;
         uint16 _liquidityThresholdPercent = 10000;
         uint16 _collateralRatio = 10000;
-        uint24 _uniswapPoolFee = 3000;
-        uint32 _twapInterval = 5;
+       // uint24 _uniswapPoolFee = 3000;
+       // uint32 _twapInterval = 5;
 
          ILenderCommitmentGroup.CommitmentGroupConfig memory groupConfig = ILenderCommitmentGroup.CommitmentGroupConfig({
             principalTokenAddress: _principalTokenAddress,
@@ -116,9 +116,9 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
             interestRateLowerBound: _interestRateLowerBound,
             interestRateUpperBound: _interestRateUpperBound,
             liquidityThresholdPercent: _liquidityThresholdPercent,
-            collateralRatio: _collateralRatio,
-            uniswapPoolFee: _uniswapPoolFee,
-            twapInterval: _twapInterval
+            collateralRatio: _collateralRatio
+           // uniswapPoolFee: _uniswapPoolFee,
+           // twapInterval: _twapInterval
         });
 
           bool zeroForOne = false;
@@ -160,8 +160,8 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
         uint16 _interestRateUpperBound = 800;
         uint16 _liquidityThresholdPercent = 10000;
         uint16 _collateralRatio = 10000;
-        uint24 _uniswapPoolFee = 3000;
-        uint32 _twapInterval = 5;
+      //  uint24 _uniswapPoolFee = 3000;
+      //  uint32 _twapInterval = 5;
 
 
       ILenderCommitmentGroup.CommitmentGroupConfig memory groupConfig = ILenderCommitmentGroup.CommitmentGroupConfig({
@@ -172,9 +172,9 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
             interestRateLowerBound: _interestRateLowerBound,
             interestRateUpperBound: _interestRateUpperBound,
             liquidityThresholdPercent: _liquidityThresholdPercent,
-            collateralRatio: _collateralRatio,
-            uniswapPoolFee: _uniswapPoolFee,
-            twapInterval: _twapInterval
+            collateralRatio: _collateralRatio
+          //  uniswapPoolFee: _uniswapPoolFee,
+          //  twapInterval: _twapInterval
         });
 
        bool zeroForOne = false;

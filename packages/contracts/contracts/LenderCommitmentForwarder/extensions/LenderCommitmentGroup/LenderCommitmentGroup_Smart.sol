@@ -91,13 +91,13 @@ contract LenderCommitmentGroup_Smart is
     address public immutable TELLER_V2;
     address public immutable SMART_COMMITMENT_FORWARDER;
     address public immutable UNISWAP_V3_FACTORY;
-    address public UNISWAP_V3_POOL;
+    address private UNISWAP_V3_POOL; //deprecated
  
     LenderCommitmentGroupShares public poolSharesToken;
 
     IERC20 public principalToken;
     IERC20 public collateralToken;
-    uint24 public uniswapPoolFee;
+    uint24 private _uniswapPoolFee; //deprecated
 
     uint256 marketId;
 
@@ -115,7 +115,7 @@ contract LenderCommitmentGroup_Smart is
     uint16 public liquidityThresholdPercent; //5000 is 50 pct  // enforce max of 10000
     uint16 public collateralRatio; //the overcollateralization ratio, typically 80 pct
 
-    uint32 public twapInterval;
+    uint32 private _twapInterval; //deprecated
     uint32 public maxLoanDuration;
     uint16 public interestRateLowerBound;
     uint16 public interestRateUpperBound;
@@ -144,7 +144,7 @@ contract LenderCommitmentGroup_Smart is
     uint256 public maxPrincipalPerCollateralAmount; 
    
 
- event PoolInitialized(
+    event PoolInitialized(
         address indexed principalTokenAddress,
         address indexed collateralTokenAddress,
         uint256 marketId,
@@ -153,8 +153,8 @@ contract LenderCommitmentGroup_Smart is
         uint16 interestRateUpperBound,
         uint16 liquidityThresholdPercent,
         uint16 loanToValuePercent,
-        uint24 uniswapPoolFee,
-        uint32 twapInterval,
+      //  uint24 uniswapPoolFee,
+      //  uint32 twapInterval,
         address poolSharesToken
     );
 
@@ -272,16 +272,16 @@ contract LenderCommitmentGroup_Smart is
 
         principalToken = IERC20(_commitmentGroupConfig.principalTokenAddress);
         collateralToken = IERC20(_commitmentGroupConfig.collateralTokenAddress);
-        uniswapPoolFee = _commitmentGroupConfig.uniswapPoolFee;
+        /*uniswapPoolFee = _commitmentGroupConfig.uniswapPoolFee;
 
         UNISWAP_V3_POOL = IUniswapV3Factory(UNISWAP_V3_FACTORY).getPool(
             _commitmentGroupConfig.principalTokenAddress,
             _commitmentGroupConfig.collateralTokenAddress,
             _commitmentGroupConfig.uniswapPoolFee
-        );
+        );*/
 
-        require(_commitmentGroupConfig.twapInterval >= MIN_TWAP_INTERVAL, "Invalid TWAP Interval");
-        require(UNISWAP_V3_POOL != address(0), "Invalid uniswap pool address");
+        //require(_commitmentGroupConfig.twapInterval >= MIN_TWAP_INTERVAL, "Invalid TWAP Interval");
+        // require(UNISWAP_V3_POOL != address(0), "Invalid uniswap pool address");
 
         marketId = _commitmentGroupConfig.marketId;
 
@@ -307,7 +307,7 @@ contract LenderCommitmentGroup_Smart is
        
         liquidityThresholdPercent = _commitmentGroupConfig.liquidityThresholdPercent;
         collateralRatio = _commitmentGroupConfig.collateralRatio;
-        twapInterval = _commitmentGroupConfig.twapInterval;
+        //twapInterval = _commitmentGroupConfig.twapInterval;
 
         require( liquidityThresholdPercent <= 10000, "invalid _liquidityThresholdPercent"); 
 
@@ -332,8 +332,8 @@ contract LenderCommitmentGroup_Smart is
             _commitmentGroupConfig.interestRateUpperBound,
             _commitmentGroupConfig.liquidityThresholdPercent,
             _commitmentGroupConfig.collateralRatio,
-            _commitmentGroupConfig.uniswapPoolFee,
-            _commitmentGroupConfig.twapInterval,
+            //_commitmentGroupConfig.uniswapPoolFee,
+            //_commitmentGroupConfig.twapInterval,
             poolSharesToken_
         );
     }

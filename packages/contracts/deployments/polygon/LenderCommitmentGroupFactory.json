@@ -53,44 +53,76 @@
           "name": "_initialPrincipalAmount"
         },
         {
-          "type": "address",
-          "name": "_principalTokenAddress"
+          "type": "tuple",
+          "name": "_commitmentGroupConfig",
+          "components": [
+            {
+              "type": "address",
+              "name": "principalTokenAddress"
+            },
+            {
+              "type": "address",
+              "name": "collateralTokenAddress"
+            },
+            {
+              "type": "uint256",
+              "name": "marketId"
+            },
+            {
+              "type": "uint32",
+              "name": "maxLoanDuration"
+            },
+            {
+              "type": "uint16",
+              "name": "interestRateLowerBound"
+            },
+            {
+              "type": "uint16",
+              "name": "interestRateUpperBound"
+            },
+            {
+              "type": "uint16",
+              "name": "liquidityThresholdPercent"
+            },
+            {
+              "type": "uint16",
+              "name": "collateralRatio"
+            },
+            {
+              "type": "uint24",
+              "name": "uniswapPoolFee"
+            },
+            {
+              "type": "uint32",
+              "name": "twapInterval"
+            }
+          ]
         },
         {
-          "type": "address",
-          "name": "_collateralTokenAddress"
-        },
-        {
-          "type": "uint256",
-          "name": "_marketId"
-        },
-        {
-          "type": "uint32",
-          "name": "_maxLoanDuration"
-        },
-        {
-          "type": "uint16",
-          "name": "_interestRateLowerBound"
-        },
-        {
-          "type": "uint16",
-          "name": "_interestRateUpperBound"
-        },
-        {
-          "type": "uint16",
-          "name": "_liquidityThresholdPercent"
-        },
-        {
-          "type": "uint16",
-          "name": "_collateralRatio"
-        },
-        {
-          "type": "uint24",
-          "name": "_uniswapPoolFee"
-        },
-        {
-          "type": "uint32",
-          "name": "_twapInterval"
+          "type": "tuple[]",
+          "name": "_poolOracleRoutes",
+          "components": [
+            {
+              "type": "address",
+              "name": "pool"
+            },
+            {
+              "type": "bool",
+              "name": "zeroForOne"
+            },
+            {
+              "type": "uint32",
+              "name": "twapInterval"
+            },
+            {
+              "type": "uint256",
+              "name": "token0Decimals"
+            },
+            {
+              "type": "uint256",
+              "name": "token1Decimals"
+            }
+          ]
         }
       ],
       "outputs": [
@@ -134,7 +166,7 @@
     },
     {
       "type": "function",
-      "name": "lenderGroupBeaconImplementation",
+      "name": "lenderGroupBeacon",
       "constant": true,
       "stateMutability": "view",
       "payable": false,
@@ -189,6 +221,6 @@
     "blockHash": null,
     "blockNumber": null
   },
-  "numDeployments": 2,
+  "numDeployments": 3,
   "implementation": "0x0d05F9809b6eee3262e8a49Ca08c4De524b40F1B"
 }

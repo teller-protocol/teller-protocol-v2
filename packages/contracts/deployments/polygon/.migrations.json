@@ -33,6 +33,6 @@
   "lender-commitment-group-beacon:deploy": 1726068317,
   "lender-commitment-group-factory:deploy": 1726068336,
   "teller-v2:pausing-upgrade": 1727280937,
-  "lender-commitment-group-factory:upgrade-multihop": 1727461287,
-  "lender-commitment-group-beacon:upgrade-multihop": 1727461298
+  "lender-commitment-group-beacon:upgrade-multihop": 1727461298,
+  "lender-commitment-group-factory:upgrade-multihop": 1727465789
 }

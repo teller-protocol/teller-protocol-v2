@@ -72,11 +72,6 @@ contract LenderCommitmentGroupFactory is OwnableUpgradeable {
 
 
 
-        //transfer ownership to msg.sender 
-        OwnableUpgradeable(address(newGroupContract_))
-            .transferOwnership(msg.sender);
- 
-
         //it is not absolutely necessary to have this call here but it allows the user to potentially save a tx step so it is nice to have .
          if (_initialPrincipalAmount > 0) {
             //should pull in the creators initial committed principal tokens .
@@ -93,6 +88,11 @@ contract LenderCommitmentGroupFactory is OwnableUpgradeable {
 
             
         } 
+
+
+          //transfer ownership to msg.sender 
+        OwnableUpgradeable(address(newGroupContract_))
+            .transferOwnership(msg.sender);
     }
 
 
@@ -104,7 +104,7 @@ contract LenderCommitmentGroupFactory is OwnableUpgradeable {
     ) internal {
 
 
-        IERC20(_principalTokenAddress).transferFrom(
+            IERC20(_principalTokenAddress).transferFrom(
                 msg.sender,
                 address(this),
                 _initialPrincipalAmount

@@ -1,39 +1,11 @@
-/*import { DeployFunction } from 'hardhat-deploy/dist/types'
-import { UpgradeableBeacon } from 'types/typechain'
-
-const deployFn: DeployFunction = async (hre) => {
-  const collateralEscrowBeacon = await hre.deployBeacon<UpgradeableBeacon>(
-    'CollateralEscrowV1',
-    {
-      customName: 'CollateralEscrowBeacon',
-    }
-  )
-
-  const { protocolTimelock } = await hre.getNamedAccounts()
-  hre.log('Transferring ownership of CollateralEscrowBeacon to Gnosis Safe...')
-  await collateralEscrowBeacon.transferOwnership(protocolTimelock)
-  hre.log('done.')
-
-  return true
-}
-
-// tags and deployment
-deployFn.id = 'collateral:escrow-beacon:deploy'
-deployFn.tags = [
-  'collateral',
-  'collateral:escrow-beacon',
-  'collateral:escrow-beacon:deploy',
-]
-deployFn.dependencies = []
-export default deployFn
-
-*/
-
+ 
 
 
 import { DeployFunction } from 'hardhat-deploy/dist/types'
 
 import { UpgradeableBeacon } from 'types/typechain'
+
+
 /*
 
 This deploys a one-off test contract of the lender commitment group contract !
@@ -75,24 +47,7 @@ const deployFn: DeployFunction = async (hre) => {
       throw new Error('No swap factory address found for this network')
   }
 
-  //const networkName = hre.network.name
-
-  //created pool https://sepolia.etherscan.io/tx/0x8ea20095c821f6066252457d7f0438030bc65bb441e1bea56c6ae0efd63016f0
-
-  const principalTokenAddress = '0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359' //usdc
-  const collateralTokenAddress = '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619' //weth
-  const uniswapPoolFee = 500
-
-  const marketId = 46 //for polygon
-  const minInterestRate = 400
-  const maxInterestRate = 800
-  const maxLoanDuration = 10368000
-  const liquidityThresholdPercent = 7500
-  const loanToValuePercent = 12500 //make sure this functions as normal.  If under 100%, getting much better loan terms and i wont repay.  If it is over 100%, it will likely repay since overcollateralized.
-  const twapInterval = 5
-
  
-
 
 
   const commitmentGroupBeacon = await hre.deployBeacon<UpgradeableBeacon>(
@@ -109,33 +64,19 @@ const deployFn: DeployFunction = async (hre) => {
     }
   )
 
-  /*
-  const lenderCommitmentGroupSmart = await hre.deployProxy(
-    'LenderCommitmentGroup_Smart',
-    {
-      unsafeAllow: ['constructor', 'state-variable-immutable'],
-      constructorArgs: [
-        tellerV2Address,
-        smartCommitmentForwarderAddress,
-        uniswapV3FactoryAddress,
-      ],
-      initArgs: [
-        principalTokenAddress,
-        collateralTokenAddress,
-        marketId,
-        maxLoanDuration,
-        minInterestRate,
-        maxInterestRate,
-        liquidityThresholdPercent,
-        loanToValuePercent,
-        uniswapPoolFee,
-        twapInterval,
-      ],
-    }
-  )*/
+ 
+
+  const { protocolTimelock } = await hre.getNamedAccounts()
+  hre.log('Transferring ownership of CommitmentGroupBeacon to Gnosis Safe...')
+  await commitmentGroupBeacon.transferOwnership(protocolTimelock)
+  hre.log('done.')
 
   return true
 }
+
+ 
+
+ 
 
 // tags and deployment
 deployFn.id = 'lender-commitment-group-beacon:deploy'

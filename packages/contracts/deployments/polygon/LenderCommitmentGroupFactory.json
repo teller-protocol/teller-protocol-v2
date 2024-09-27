@@ -49,6 +49,10 @@
       "payable": false,
       "inputs": [
         {
+          "type": "uint256",
+          "name": "_initialPrincipalAmount"
+        },
+        {
           "type": "address",
           "name": "_principalTokenAddress"
         },
@@ -78,7 +82,7 @@
         },
         {
           "type": "uint16",
-          "name": "_loanToValuePercent"
+          "name": "_collateralRatio"
         },
         {
           "type": "uint24",
@@ -185,6 +189,6 @@
     "blockHash": null,
     "blockNumber": null
   },
-  "numDeployments": 1,
+  "numDeployments": 2,
   "implementation": "0x0d05F9809b6eee3262e8a49Ca08c4De524b40F1B"
 }

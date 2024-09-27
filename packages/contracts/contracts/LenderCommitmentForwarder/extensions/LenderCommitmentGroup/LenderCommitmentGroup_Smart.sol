@@ -126,7 +126,7 @@ contract LenderCommitmentGroup_Smart is
     mapping(address => uint256) public poolSharesPreparedToWithdrawForLender;
     mapping(address => uint256) public poolSharesPreparedTimestamp;
     uint256 immutable public DEFAULT_WITHDRAWL_DELAY_TIME_SECONDS = 300;
-
+    uint256 immutable public MAX_WITHDRAWL_DELAY_TIME = 86400;
 
     //mapping(address => uint256) public principalTokensCommittedByLender;
     mapping(uint256 => bool) public activeBids;
@@ -343,6 +343,8 @@ contract LenderCommitmentGroup_Smart is
     function setWithdrawlDelayTime(uint256 _seconds) 
     external 
     onlyProtocolOwner {
+
+        require( _seconds < MAX_WITHDRAWL_DELAY_TIME );
 
         withdrawlDelayTimeSeconds = _seconds;
     }

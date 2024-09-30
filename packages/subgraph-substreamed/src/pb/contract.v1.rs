@@ -286,18 +286,12 @@ pub struct LendergroupPoolInitialized {
     pub liquidity_threshold_percent: u64,
     #[prost(uint64, tag="13")]
     pub loan_to_value_percent: u64,
-
     #[prost(bytes="vec", tag="14")]
     pub pool_shares_token: ::prost::alloc::vec::Vec<u8>,
-    
-     #[prost(bytes="vec", tag="15")]
+    #[prost(bytes="vec", tag="15")]
     pub teller_v2_address: ::prost::alloc::vec::Vec<u8>,
-    
-     #[prost(bytes="vec", tag="16")]
-    pub uniswap_v3_pool_address: ::prost::alloc::vec::Vec<u8>,
-     #[prost(bytes="vec", tag="17")]
+    #[prost(bytes="vec", tag="16")]
     pub smart_commitment_forwarder_address: ::prost::alloc::vec::Vec<u8>,
-    
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]

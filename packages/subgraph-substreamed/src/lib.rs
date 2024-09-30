@@ -392,7 +392,7 @@ fn map_lendergroup_events(
                            // uniswap_pool_fee: event.uniswap_pool_fee.to_u64(),
 
                             teller_v2_address: fetched_rpc_data.teller_v2_address.to_fixed_bytes().to_vec(),
-                            uniswap_v3_pool_address: fetched_rpc_data.uniswap_v3_pool_address.to_fixed_bytes().to_vec(),
+                           // uniswap_v3_pool_address: fetched_rpc_data.uniswap_v3_pool_address.to_fixed_bytes().to_vec(),
                             smart_commitment_forwarder_address: fetched_rpc_data.smart_commitment_forwarder_address.to_fixed_bytes().to_vec(),
                         });
                     } 
@@ -653,7 +653,7 @@ fn graph_lendergroup_out(
             .set("principal_token_address",  &evt.principal_token_address  )
             .set("collateral_token_address",  &evt.collateral_token_address  )
             .set("shares_token_address",  &evt.pool_shares_token  )
-            .set("uniswap_v3_pool_address",  &evt.uniswap_v3_pool_address )
+          //  .set("uniswap_v3_pool_address",  &evt.uniswap_v3_pool_address )
             .set("teller_v2_address",  &evt.teller_v2_address  )
             .set("smart_commitment_forwarder_address",  &evt.smart_commitment_forwarder_address  )
             .set("market_id", BigInt::from_str(&evt.market_id).unwrap() )

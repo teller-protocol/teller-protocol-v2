@@ -23,7 +23,7 @@ pub struct LenderGroupPoolInitializationDataFromRpc {
         
     pub teller_v2_address: Address,
 
-    pub uniswap_v3_pool_address: Address ,
+    //pub uniswap_v3_pool_address: Address ,
 
     pub smart_commitment_forwarder_address: Address 
 
@@ -43,10 +43,10 @@ pub fn fetch_lender_group_pool_initialization_data_from_rpc(pool_contract_addres
         pool_contract_address_decoded.clone()
      ) else {return None};
     
-        let uniswap_v3_pool_function = abi::lendergroup_contract::functions::UniswapV3Pool {};
+       /*  let uniswap_v3_pool_function = abi::lendergroup_contract::functions::UniswapV3Pool {};
         let Some(uniswap_v3_pool_address) = uniswap_v3_pool_function.call(
             pool_contract_address_decoded.clone()
-        ) else {return None};
+        ) else {return None}; */
         
     
             
@@ -64,7 +64,7 @@ pub fn fetch_lender_group_pool_initialization_data_from_rpc(pool_contract_addres
               
               
             teller_v2_address: H160::from_slice(&teller_v2_address ) ,
-            uniswap_v3_pool_address: H160::from_slice(&uniswap_v3_pool_address ) ,
+            //uniswap_v3_pool_address: H160::from_slice(&uniswap_v3_pool_address ) ,
             smart_commitment_forwarder_address: H160::from_slice(&smart_commitment_forwarder_address ) ,
              
             

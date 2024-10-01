@@ -216,6 +216,20 @@
     },
     {
       "type": "function",
+      "name": "getLiquidationProtocolFeePercent",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
       "name": "getMarketRegistry",
       "constant": true,
       "stateMutability": "view",
@@ -293,6 +307,20 @@
     },
     {
       "type": "function",
+      "name": "liquidationProtocolFeePercent",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
       "name": "pause",
       "constant": false,
       "payable": false,
@@ -328,6 +356,19 @@
     },
     {
       "type": "function",
+      "name": "setLiquidationProtocolFeePercent",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_percent"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
       "name": "unpause",
       "constant": false,
       "payable": false,
@@ -342,6 +383,6 @@
     "blockHash": null,
     "blockNumber": null
   },
-  "numDeployments": 1,
+  "numDeployments": 2,
   "implementation": "0xb9636C8b00a838B8b30502A2dD3bF18aa473AE0c"
 }

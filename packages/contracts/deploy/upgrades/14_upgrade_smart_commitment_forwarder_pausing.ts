@@ -29,7 +29,7 @@ const deployFn: DeployFunction = async (hre) => {
     title: 'Smart Commitment Forwarder: Upgrade',
     description: ` 
 # Smart Commitment Forwarder
-* Modifies Smart Commitment Forwarder to add pausing controls.
+* Modifies Smart Commitment Forwarder to add pausing controls and liquidation fee amounts.
 `,
     _steps: [
       {
@@ -64,6 +64,6 @@ deployFn.tags = ['proposal', 'upgrade', 'smart-commitment-forwarder-upgrade-paus
 deployFn.dependencies = ['smart-commitment-forwarder:deploy']
 deployFn.skip = async (hre) => {
   //  return true // ALWAYS SKIP FOR NOW
-  return !hre.network.live || !['sepolia' ].includes(hre.network.name)
+  return !hre.network.live || !['sepolia','polygon' ].includes(hre.network.name)
 }
 export default deployFn

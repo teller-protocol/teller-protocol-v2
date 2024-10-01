@@ -5,19 +5,29 @@
         use super::INTERNAL_ERR;
         #[derive(Debug, Clone, PartialEq)]
         pub struct DeployLenderCommitmentGroupPool {
-            pub u_principal_token_address: Vec<u8>,
-            pub u_collateral_token_address: Vec<u8>,
-            pub u_market_id: substreams::scalar::BigInt,
-            pub u_max_loan_duration: substreams::scalar::BigInt,
-            pub u_interest_rate_lower_bound: substreams::scalar::BigInt,
-            pub u_interest_rate_upper_bound: substreams::scalar::BigInt,
-            pub u_liquidity_threshold_percent: substreams::scalar::BigInt,
-            pub u_loan_to_value_percent: substreams::scalar::BigInt,
-            pub u_uniswap_pool_fee: substreams::scalar::BigInt,
-            pub u_twap_interval: substreams::scalar::BigInt,
+            pub u_initial_principal_amount: substreams::scalar::BigInt,
+            pub u_commitment_group_config: (
+                Vec<u8>,
+                Vec<u8>,
+                substreams::scalar::BigInt,
+                substreams::scalar::BigInt,
+                substreams::scalar::BigInt,
+                substreams::scalar::BigInt,
+                substreams::scalar::BigInt,
+                substreams::scalar::BigInt,
+            ),
+            pub u_pool_oracle_routes: Vec<
+                (
+                    Vec<u8>,
+                    bool,
+                    substreams::scalar::BigInt,
+                    substreams::scalar::BigInt,
+                    substreams::scalar::BigInt,
+                ),
+            >,
         }
         impl DeployLenderCommitmentGroupPool {
-            const METHOD_ID: [u8; 4] = [151u8, 127u8, 4u8, 176u8];
+            const METHOD_ID: [u8; 4] = [31u8, 105u8, 237u8, 169u8];
             pub fn decode(
                 call: &substreams_ethereum::pb::eth::v2::Call,
             ) -> Result<Self, String> {
@@ -27,154 +37,178 @@
                 }
                 let mut values = ethabi::decode(
                         &[
-                            ethabi::ParamType::Address,
-                            ethabi::ParamType::Address,
                             ethabi::ParamType::Uint(256usize),
-                            ethabi::ParamType::Uint(32usize),
-                            ethabi::ParamType::Uint(16usize),
-                            ethabi::ParamType::Uint(16usize),
-                            ethabi::ParamType::Uint(16usize),
-                            ethabi::ParamType::Uint(16usize),
-                            ethabi::ParamType::Uint(24usize),
-                            ethabi::ParamType::Uint(32usize),
+                            ethabi::ParamType::Tuple(
+                                vec![
+                                    ethabi::ParamType::Address, ethabi::ParamType::Address,
+                                    ethabi::ParamType::Uint(256usize),
+                                    ethabi::ParamType::Uint(32usize),
+                                    ethabi::ParamType::Uint(16usize),
+                                    ethabi::ParamType::Uint(16usize),
+                                    ethabi::ParamType::Uint(16usize),
+                                    ethabi::ParamType::Uint(16usize)
+                                ],
+                            ),
+                            ethabi::ParamType::Array(
+                                Box::new(
+                                    ethabi::ParamType::Tuple(
+                                        vec![
+                                            ethabi::ParamType::Address, ethabi::ParamType::Bool,
+                                            ethabi::ParamType::Uint(32usize),
+                                            ethabi::ParamType::Uint(256usize),
+                                            ethabi::ParamType::Uint(256usize)
+                                        ],
+                                    ),
+                                ),
+                            ),
                         ],
                         maybe_data.unwrap(),
                     )
                     .map_err(|e| format!("unable to decode call.input: {:?}", e))?;
                 values.reverse();
                 Ok(Self {
-                    u_principal_token_address: values
+                    u_initial_principal_amount: {
+                        let mut v = [0 as u8; 32];
+                        values
+                            .pop()
+                            .expect(INTERNAL_ERR)
+                            .into_uint()
+                            .expect(INTERNAL_ERR)
+                            .to_big_endian(v.as_mut_slice());
+                        substreams::scalar::BigInt::from_unsigned_bytes_be(&v)
+                    },
+                    u_commitment_group_config: {
+                        let tuple_elements = values
+                            .pop()
+                            .expect(INTERNAL_ERR)
+                            .into_tuple()
+                            .expect(INTERNAL_ERR);
+                        (
+                            tuple_elements[0usize]
+                                .clone()
+                                .into_address()
+                                .expect(INTERNAL_ERR)
+                                .as_bytes()
+                                .to_vec(),
+                            tuple_elements[1usize]
+                                .clone()
+                                .into_address()
+                                .expect(INTERNAL_ERR)
+                                .as_bytes()
+                                .to_vec(),
+                            {
+                                let mut v = [0 as u8; 32];
+                                tuple_elements[2usize]
+                                    .clone()
+                                    .into_uint()
+                                    .expect(INTERNAL_ERR)
+                                    .to_big_endian(v.as_mut_slice());
+                                substreams::scalar::BigInt::from_unsigned_bytes_be(&v)
+                            },
+                            {
+                                let mut v = [0 as u8; 32];
+                                tuple_elements[3usize]
+                                    .clone()
+                                    .into_uint()
+                                    .expect(INTERNAL_ERR)
+                                    .to_big_endian(v.as_mut_slice());
+                                substreams::scalar::BigInt::from_unsigned_bytes_be(&v)
+                            },
+                            {
+                                let mut v = [0 as u8; 32];
+                                tuple_elements[4usize]
+                                    .clone()
+                                    .into_uint()
+                                    .expect(INTERNAL_ERR)
+                                    .to_big_endian(v.as_mut_slice());
+                                substreams::scalar::BigInt::from_unsigned_bytes_be(&v)
+                            },
+                            {
+                                let mut v = [0 as u8; 32];
+                                tuple_elements[5usize]
+                                    .clone()
+                                    .into_uint()
+                                    .expect(INTERNAL_ERR)
+                                    .to_big_endian(v.as_mut_slice());
+                                substreams::scalar::BigInt::from_unsigned_bytes_be(&v)
+                            },
+                            {
+                                let mut v = [0 as u8; 32];
+                                tuple_elements[6usize]
+                                    .clone()
+                                    .into_uint()
+                                    .expect(INTERNAL_ERR)
+                                    .to_big_endian(v.as_mut_slice());
+                                substreams::scalar::BigInt::from_unsigned_bytes_be(&v)
+                            },
+                            {
+                                let mut v = [0 as u8; 32];
+                                tuple_elements[7usize]
+                                    .clone()
+                                    .into_uint()
+                                    .expect(INTERNAL_ERR)
+                                    .to_big_endian(v.as_mut_slice());
+                                substreams::scalar::BigInt::from_unsigned_bytes_be(&v)
+                            },
+                        )
+                    },
+                    u_pool_oracle_routes: values
                         .pop()
                         .expect(INTERNAL_ERR)
-                        .into_address()
+                        .into_array()
                         .expect(INTERNAL_ERR)
-                        .as_bytes()
-                        .to_vec(),
-                    u_collateral_token_address: values
-                        .pop()
-                        .expect(INTERNAL_ERR)
-                        .into_address()
-                        .expect(INTERNAL_ERR)
-                        .as_bytes()
-                        .to_vec(),
-                    u_market_id: {
-                        let mut v = [0 as u8; 32];
-                        values
-                            .pop()
-                            .expect(INTERNAL_ERR)
-                            .into_uint()
-                            .expect(INTERNAL_ERR)
-                            .to_big_endian(v.as_mut_slice());
-                        substreams::scalar::BigInt::from_unsigned_bytes_be(&v)
-                    },
-                    u_max_loan_duration: {
-                        let mut v = [0 as u8; 32];
-                        values
-                            .pop()
-                            .expect(INTERNAL_ERR)
-                            .into_uint()
-                            .expect(INTERNAL_ERR)
-                            .to_big_endian(v.as_mut_slice());
-                        substreams::scalar::BigInt::from_unsigned_bytes_be(&v)
-                    },
-                    u_interest_rate_lower_bound: {
-                        let mut v = [0 as u8; 32];
-                        values
-                            .pop()
-                            .expect(INTERNAL_ERR)
-                            .into_uint()
-                            .expect(INTERNAL_ERR)
-                            .to_big_endian(v.as_mut_slice());
-                        substreams::scalar::BigInt::from_unsigned_bytes_be(&v)
-                    },
-                    u_interest_rate_upper_bound: {
-                        let mut v = [0 as u8; 32];
-                        values
-                            .pop()
-                            .expect(INTERNAL_ERR)
-                            .into_uint()
-                            .expect(INTERNAL_ERR)
-                            .to_big_endian(v.as_mut_slice());
-                        substreams::scalar::BigInt::from_unsigned_bytes_be(&v)
-                    },
-                    u_liquidity_threshold_percent: {
-                        let mut v = [0 as u8; 32];
-                        values
-                            .pop()
-                            .expect(INTERNAL_ERR)
-                            .into_uint()
-                            .expect(INTERNAL_ERR)
-                            .to_big_endian(v.as_mut_slice());
-                        substreams::scalar::BigInt::from_unsigned_bytes_be(&v)
-                    },
-                    u_loan_to_value_percent: {
-                        let mut v = [0 as u8; 32];
-                        values
-                            .pop()
-                            .expect(INTERNAL_ERR)
-                            .into_uint()
-                            .expect(INTERNAL_ERR)
-                            .to_big_endian(v.as_mut_slice());
-                        substreams::scalar::BigInt::from_unsigned_bytes_be(&v)
-                    },
-                    u_uniswap_pool_fee: {
-                        let mut v = [0 as u8; 32];
-                        values
-                            .pop()
-                            .expect(INTERNAL_ERR)
-                            .into_uint()
-                            .expect(INTERNAL_ERR)
-                            .to_big_endian(v.as_mut_slice());
-                        substreams::scalar::BigInt::from_unsigned_bytes_be(&v)
-                    },
-                    u_twap_interval: {
-                        let mut v = [0 as u8; 32];
-                        values
-                            .pop()
-                            .expect(INTERNAL_ERR)
-                            .into_uint()
-                            .expect(INTERNAL_ERR)
-                            .to_big_endian(v.as_mut_slice());
-                        substreams::scalar::BigInt::from_unsigned_bytes_be(&v)
-                    },
+                        .into_iter()
+                        .map(|inner| {
+                            let tuple_elements = inner.into_tuple().expect(INTERNAL_ERR);
+                            (
+                                tuple_elements[0usize]
+                                    .clone()
+                                    .into_address()
+                                    .expect(INTERNAL_ERR)
+                                    .as_bytes()
+                                    .to_vec(),
+                                tuple_elements[1usize]
+                                    .clone()
+                                    .into_bool()
+                                    .expect(INTERNAL_ERR),
+                                {
+                                    let mut v = [0 as u8; 32];
+                                    tuple_elements[2usize]
+                                        .clone()
+                                        .into_uint()
+                                        .expect(INTERNAL_ERR)
+                                        .to_big_endian(v.as_mut_slice());
+                                    substreams::scalar::BigInt::from_unsigned_bytes_be(&v)
+                                },
+                                {
+                                    let mut v = [0 as u8; 32];
+                                    tuple_elements[3usize]
+                                        .clone()
+                                        .into_uint()
+                                        .expect(INTERNAL_ERR)
+                                        .to_big_endian(v.as_mut_slice());
+                                    substreams::scalar::BigInt::from_unsigned_bytes_be(&v)
+                                },
+                                {
+                                    let mut v = [0 as u8; 32];
+                                    tuple_elements[4usize]
+                                        .clone()
+                                        .into_uint()
+                                        .expect(INTERNAL_ERR)
+                                        .to_big_endian(v.as_mut_slice());
+                                    substreams::scalar::BigInt::from_unsigned_bytes_be(&v)
+                                },
+                            )
+                        })
+                        .collect(),
                 })
             }
             pub fn encode(&self) -> Vec<u8> {
                 let data = ethabi::encode(
                     &[
-                        ethabi::Token::Address(
-                            ethabi::Address::from_slice(&self.u_principal_token_address),
-                        ),
-                        ethabi::Token::Address(
-                            ethabi::Address::from_slice(&self.u_collateral_token_address),
-                        ),
                         ethabi::Token::Uint(
                             ethabi::Uint::from_big_endian(
-                                match self.u_market_id.clone().to_bytes_be() {
-                                    (num_bigint::Sign::Plus, bytes) => bytes,
-                                    (num_bigint::Sign::NoSign, bytes) => bytes,
-                                    (num_bigint::Sign::Minus, _) => {
-                                        panic!("negative numbers are not supported")
-                                    }
-                                }
-                                    .as_slice(),
-                            ),
-                        ),
-                        ethabi::Token::Uint(
-                            ethabi::Uint::from_big_endian(
-                                match self.u_max_loan_duration.clone().to_bytes_be() {
-                                    (num_bigint::Sign::Plus, bytes) => bytes,
-                                    (num_bigint::Sign::NoSign, bytes) => bytes,
-                                    (num_bigint::Sign::Minus, _) => {
-                                        panic!("negative numbers are not supported")
-                                    }
-                                }
-                                    .as_slice(),
-                            ),
-                        ),
-                        ethabi::Token::Uint(
-                            ethabi::Uint::from_big_endian(
-                                match self.u_interest_rate_lower_bound.clone().to_bytes_be()
+                                match self.u_initial_principal_amount.clone().to_bytes_be()
                                 {
                                     (num_bigint::Sign::Plus, bytes) => bytes,
                                     (num_bigint::Sign::NoSign, bytes) => bytes,
@@ -185,71 +219,87 @@
                                     .as_slice(),
                             ),
                         ),
-                        ethabi::Token::Uint(
-                            ethabi::Uint::from_big_endian(
-                                match self.u_interest_rate_upper_bound.clone().to_bytes_be()
-                                {
-                                    (num_bigint::Sign::Plus, bytes) => bytes,
-                                    (num_bigint::Sign::NoSign, bytes) => bytes,
-                                    (num_bigint::Sign::Minus, _) => {
-                                        panic!("negative numbers are not supported")
-                                    }
-                                }
-                                    .as_slice(),
-                            ),
+                        ethabi::Token::Tuple(
+                            vec![
+                                ethabi::Token::Address(ethabi::Address::from_slice(& self
+                                .u_commitment_group_config.0)),
+                                ethabi::Token::Address(ethabi::Address::from_slice(& self
+                                .u_commitment_group_config.1)),
+                                ethabi::Token::Uint(ethabi::Uint::from_big_endian(match self
+                                .u_commitment_group_config.2.clone().to_bytes_be() {
+                                (num_bigint::Sign::Plus, bytes) => bytes,
+                                (num_bigint::Sign::NoSign, bytes) => bytes,
+                                (num_bigint::Sign::Minus, _) => {
+                                panic!("negative numbers are not supported") }, }
+                                .as_slice(),),),
+                                ethabi::Token::Uint(ethabi::Uint::from_big_endian(match self
+                                .u_commitment_group_config.3.clone().to_bytes_be() {
+                                (num_bigint::Sign::Plus, bytes) => bytes,
+                                (num_bigint::Sign::NoSign, bytes) => bytes,
+                                (num_bigint::Sign::Minus, _) => {
+                                panic!("negative numbers are not supported") }, }
+                                .as_slice(),),),
+                                ethabi::Token::Uint(ethabi::Uint::from_big_endian(match self
+                                .u_commitment_group_config.4.clone().to_bytes_be() {
+                                (num_bigint::Sign::Plus, bytes) => bytes,
+                                (num_bigint::Sign::NoSign, bytes) => bytes,
+                                (num_bigint::Sign::Minus, _) => {
+                                panic!("negative numbers are not supported") }, }
+                                .as_slice(),),),
+                                ethabi::Token::Uint(ethabi::Uint::from_big_endian(match self
+                                .u_commitment_group_config.5.clone().to_bytes_be() {
+                                (num_bigint::Sign::Plus, bytes) => bytes,
+                                (num_bigint::Sign::NoSign, bytes) => bytes,
+                                (num_bigint::Sign::Minus, _) => {
+                                panic!("negative numbers are not supported") }, }
+                                .as_slice(),),),
+                                ethabi::Token::Uint(ethabi::Uint::from_big_endian(match self
+                                .u_commitment_group_config.6.clone().to_bytes_be() {
+                                (num_bigint::Sign::Plus, bytes) => bytes,
+                                (num_bigint::Sign::NoSign, bytes) => bytes,
+                                (num_bigint::Sign::Minus, _) => {
+                                panic!("negative numbers are not supported") }, }
+                                .as_slice(),),),
+                                ethabi::Token::Uint(ethabi::Uint::from_big_endian(match self
+                                .u_commitment_group_config.7.clone().to_bytes_be() {
+                                (num_bigint::Sign::Plus, bytes) => bytes,
+                                (num_bigint::Sign::NoSign, bytes) => bytes,
+                                (num_bigint::Sign::Minus, _) => {
+                                panic!("negative numbers are not supported") }, }
+                                .as_slice(),),)
+                            ],
                         ),
-                        ethabi::Token::Uint(
-                            ethabi::Uint::from_big_endian(
-                                match self
-                                    .u_liquidity_threshold_percent
-                                    .clone()
-                                    .to_bytes_be()
-                                {
-                                    (num_bigint::Sign::Plus, bytes) => bytes,
-                                    (num_bigint::Sign::NoSign, bytes) => bytes,
-                                    (num_bigint::Sign::Minus, _) => {
-                                        panic!("negative numbers are not supported")
-                                    }
-                                }
-                                    .as_slice(),
-                            ),
-                        ),
-                        ethabi::Token::Uint(
-                            ethabi::Uint::from_big_endian(
-                                match self.u_loan_to_value_percent.clone().to_bytes_be() {
-                                    (num_bigint::Sign::Plus, bytes) => bytes,
-                                    (num_bigint::Sign::NoSign, bytes) => bytes,
-                                    (num_bigint::Sign::Minus, _) => {
-                                        panic!("negative numbers are not supported")
-                                    }
-                                }
-                                    .as_slice(),
-                            ),
-                        ),
-                        ethabi::Token::Uint(
-                            ethabi::Uint::from_big_endian(
-                                match self.u_uniswap_pool_fee.clone().to_bytes_be() {
-                                    (num_bigint::Sign::Plus, bytes) => bytes,
-                                    (num_bigint::Sign::NoSign, bytes) => bytes,
-                                    (num_bigint::Sign::Minus, _) => {
-                                        panic!("negative numbers are not supported")
-                                    }
-                                }
-                                    .as_slice(),
-                            ),
-                        ),
-                        ethabi::Token::Uint(
-                            ethabi::Uint::from_big_endian(
-                                match self.u_twap_interval.clone().to_bytes_be() {
-                                    (num_bigint::Sign::Plus, bytes) => bytes,
-                                    (num_bigint::Sign::NoSign, bytes) => bytes,
-                                    (num_bigint::Sign::Minus, _) => {
-                                        panic!("negative numbers are not supported")
-                                    }
-                                }
-                                    .as_slice(),
-                            ),
-                        ),
+                        {
+                            let v = self
+                                .u_pool_oracle_routes
+                                .iter()
+                                .map(|inner| ethabi::Token::Tuple(
+                                    vec![
+                                        ethabi::Token::Address(ethabi::Address::from_slice(& inner
+                                        .0)), ethabi::Token::Bool(inner.1.clone()),
+                                        ethabi::Token::Uint(ethabi::Uint::from_big_endian(match
+                                        inner.2.clone().to_bytes_be() { (num_bigint::Sign::Plus,
+                                        bytes) => bytes, (num_bigint::Sign::NoSign, bytes) => bytes,
+                                        (num_bigint::Sign::Minus, _) => {
+                                        panic!("negative numbers are not supported") }, }
+                                        .as_slice(),),),
+                                        ethabi::Token::Uint(ethabi::Uint::from_big_endian(match
+                                        inner.3.clone().to_bytes_be() { (num_bigint::Sign::Plus,
+                                        bytes) => bytes, (num_bigint::Sign::NoSign, bytes) => bytes,
+                                        (num_bigint::Sign::Minus, _) => {
+                                        panic!("negative numbers are not supported") }, }
+                                        .as_slice(),),),
+                                        ethabi::Token::Uint(ethabi::Uint::from_big_endian(match
+                                        inner.4.clone().to_bytes_be() { (num_bigint::Sign::Plus,
+                                        bytes) => bytes, (num_bigint::Sign::NoSign, bytes) => bytes,
+                                        (num_bigint::Sign::Minus, _) => {
+                                        panic!("negative numbers are not supported") }, }
+                                        .as_slice(),),)
+                                    ],
+                                ))
+                                .collect();
+                            ethabi::Token::Array(v)
+                        },
                     ],
                 );
                 let mut encoded = Vec::with_capacity(4 + data.len());
@@ -508,9 +558,9 @@
             }
         }
         #[derive(Debug, Clone, PartialEq)]
-        pub struct LenderGroupBeaconImplementation {}
-        impl LenderGroupBeaconImplementation {
-            const METHOD_ID: [u8; 4] = [220u8, 94u8, 75u8, 94u8];
+        pub struct LenderGroupBeacon {}
+        impl LenderGroupBeacon {
+            const METHOD_ID: [u8; 4] = [144u8, 158u8, 228u8, 96u8];
             pub fn decode(
                 call: &substreams_ethereum::pb::eth::v2::Call,
             ) -> Result<Self, String> {
@@ -577,8 +627,8 @@
                 }
             }
         }
-        impl substreams_ethereum::Function for LenderGroupBeaconImplementation {
-            const NAME: &'static str = "lenderGroupBeaconImplementation";
+        impl substreams_ethereum::Function for LenderGroupBeacon {
+            const NAME: &'static str = "lenderGroupBeacon";
             fn match_call(call: &substreams_ethereum::pb::eth::v2::Call) -> bool {
                 Self::match_call(call)
             }
@@ -591,8 +641,7 @@
                 self.encode()
             }
         }
-        impl substreams_ethereum::rpc::RPCDecodable<Vec<u8>>
-        for LenderGroupBeaconImplementation {
+        impl substreams_ethereum::rpc::RPCDecodable<Vec<u8>> for LenderGroupBeacon {
             fn output(data: &[u8]) -> Result<Vec<u8>, String> {
                 Self::output(data)
             }

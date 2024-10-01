@@ -388,11 +388,11 @@ fn map_lendergroup_events(
                             max_loan_duration: event.max_loan_duration.to_u64(),
                             pool_shares_token: event.pool_shares_token,
                             principal_token_address: event.principal_token_address,
-                            twap_interval: event.twap_interval.to_u64(),
-                            uniswap_pool_fee: event.uniswap_pool_fee.to_u64(),
+                           // twap_interval: event.twap_interval.to_u64(),
+                           // uniswap_pool_fee: event.uniswap_pool_fee.to_u64(),
 
                             teller_v2_address: fetched_rpc_data.teller_v2_address.to_fixed_bytes().to_vec(),
-                            uniswap_v3_pool_address: fetched_rpc_data.uniswap_v3_pool_address.to_fixed_bytes().to_vec(),
+                           // uniswap_v3_pool_address: fetched_rpc_data.uniswap_v3_pool_address.to_fixed_bytes().to_vec(),
                             smart_commitment_forwarder_address: fetched_rpc_data.smart_commitment_forwarder_address.to_fixed_bytes().to_vec(),
                         });
                     } 
@@ -628,8 +628,8 @@ fn graph_lendergroup_out(
             .set("max_loan_duration", evt.max_loan_duration)
             .set("pool_shares_token",  &evt.pool_shares_token )
             .set("principal_token_address", &evt.principal_token_address )
-            .set("twap_interval", evt.twap_interval)
-            .set("uniswap_pool_fee", evt.uniswap_pool_fee)
+           // .set("twap_interval", evt.twap_interval)
+            //.set("uniswap_pool_fee", evt.uniswap_pool_fee)
             ;
 
     
@@ -653,13 +653,13 @@ fn graph_lendergroup_out(
             .set("principal_token_address",  &evt.principal_token_address  )
             .set("collateral_token_address",  &evt.collateral_token_address  )
             .set("shares_token_address",  &evt.pool_shares_token  )
-            .set("uniswap_v3_pool_address",  &evt.uniswap_v3_pool_address )
+          //  .set("uniswap_v3_pool_address",  &evt.uniswap_v3_pool_address )
             .set("teller_v2_address",  &evt.teller_v2_address  )
             .set("smart_commitment_forwarder_address",  &evt.smart_commitment_forwarder_address  )
             .set("market_id", BigInt::from_str(&evt.market_id).unwrap() )
-            .set("uniswap_pool_fee", evt.uniswap_pool_fee)
+           // .set("uniswap_pool_fee", evt.uniswap_pool_fee)
             .set("max_loan_duration", evt.max_loan_duration)
-            .set("twap_interval", evt.twap_interval)
+           // .set("twap_interval", evt.twap_interval)
             .set("interest_rate_upper_bound", evt.interest_rate_upper_bound)
             .set("interest_rate_lower_bound", evt.interest_rate_lower_bound)
             .set("liquidity_threshold_percent", evt.liquidity_threshold_percent)

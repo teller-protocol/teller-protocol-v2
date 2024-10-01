@@ -45,7 +45,13 @@ make && make build && make pack
 graph auth --studio  
  graph deploy --studio tellerv2-lender-groups-polygon
  
- 0.4.21.97
+ 0.4.21.103
+
+
+
+ ### CHECK THE STATUS 
+
+ https://api.studio.thegraph.com/query/36377/tellerv2-lender-groups-polygon/0.4.21.103/graphql
 
 
 

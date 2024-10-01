@@ -5,6 +5,7 @@ mod rpc;
 
 use hex_literal::hex;
 use pb::contract::v1 as contract;
+use pb::collateral::v1 as collateral_contract;
 use substreams::prelude::*;
 use substreams::store;
 use substreams::Hex;
@@ -1048,8 +1049,8 @@ fn store_accepted_bids_data(
 fn map_collateralmanager_events(
     blk: eth::Block,
     store_collateral_withdrawn: StoreGetInt64,
-) -> Result<collateral::Events, substreams::errors::Error> {
-    let mut events = collateral::Events::default();
+) -> Result<collateral_contract::Events, substreams::errors::Error> {
+    let mut collateral_events = collateral_contract::Events::default();
     //map_factory_events(&blk, &mut events);
     //map_lendergroup_events(&blk, &store_lendergroup, &mut events);
 
@@ -1075,7 +1076,7 @@ fn map_collateralmanager_events(
                             
                         */
                         
-                        return Some(collateral::CollateralmanagerCollateralWithdrawn {
+                        return Some(collateral_contract::CollateralmanagerCollateralWithdrawn {
                             evt_tx_hash: Hex(&view.transaction.hash).to_string(),
                             evt_index: log.block_index,
                             evt_block_time: blk.timestamp_seconds(),
@@ -1100,6 +1101,37 @@ fn map_collateralmanager_events(
     Ok(collateral_events)
 }
  
+
+
+
+
+#[substreams::handlers::store]
+fn store_collateral_withdrawn_data(
+    events:  collateral_contract::Events,    
+    bigint_add_store: StoreAddBigInt //for block time and block number 
+) {
+
+
+     
+    let ord = 0; // FOR NOW - CAN CAUSE ISSUES - GET FROM LOG AND STUFF INTO EVENT    
+    
+
+    
+    events.collateral_manager_collateral_withdrawn.iter().for_each(|evt: &collateral_contract::CollateralmanagerCollateralWithdrawn| {
+        
+
+
+        let store_key: String = format!("collateral_amount_withdrawn:{}:{}", evt.bid_id,Hex(&evt.collateral_address).to_string());
+        bigint_add_store.add(ord,&store_key, BigInt::from_str(&evt.amount).unwrap_or(BigInt::zero()));
+
+ 
+      // need to write a whole set of drivers to track   shares tokens !! 
+      // need ERC20 abi also 
+    });
+
+}
+
+
 
 
 

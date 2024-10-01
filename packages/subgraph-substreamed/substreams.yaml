@@ -53,6 +53,14 @@ modules:
 
 
 
+  - name: store_collateral_withdrawn_data
+    kind: store
+    initialBlock: 62300000
+    updatePolicy: add
+    valueType: bigint
+    inputs:
+      - map: map_collateralmanager_events
+
 
       
   - name: store_globals_from_events

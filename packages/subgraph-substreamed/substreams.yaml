@@ -40,24 +40,18 @@ modules:
       type: proto:contract.v1.Events
 
 
-
-  - name: store_accepted_bids_data
-    kind: store
-    initialBlock: 61698000
-    updatePolicy: set
-    valueType: bigint
-    inputs:
-      - map: map_events
-
+ 
            
   - name: map_collateralmanager_events
     kind: map
-    initialBlock: 61698000
+    initialBlock: 62300000
     inputs:
       - source: sf.ethereum.type.v2.Block
       - store: store_accepted_bids_data
     output:
-      type: proto:contract.v1.Events
+      type: proto:collateral.v1.Events
+
+
 
 
       

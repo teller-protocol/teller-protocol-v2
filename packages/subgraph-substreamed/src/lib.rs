@@ -26,6 +26,7 @@ use substreams::scalar::BigDecimal;
 substreams_ethereum::init!();
 
 const FACTORY_TRACKED_CONTRACT: [u8; 20] = hex!("44Ce8fA66d6eDF0c5c668b818A922E772C72568B");
+const COLLATERAL_MANAGER_TRACKED_CONTRACT: [u8;20] = hex!("44Ce8fA66d6eDF0c5c668b818A922E772C72568B");
 
 fn map_factory_events(blk: &eth::Block, events: &mut contract::Events) {
     /*events.factory_admin_changeds.append(&mut blk
@@ -1016,7 +1017,13 @@ fn graph_lendergroup_out(
 
 
 
+/*
 
+    This creates a mapping that we use to help figure out which
+    collateralmanager events we care abt 
+
+*/
+/*
 #[substreams::handlers::store]
 fn store_accepted_bids_data(
     events:  contract::Events, 
@@ -1033,7 +1040,68 @@ fn store_accepted_bids_data(
     });
     
 
+}*/
+
+
+
+#[substreams::handlers::map]
+fn map_collateralmanager_events(
+    blk: eth::Block,
+    store_collateral_withdrawn: StoreGetInt64,
+) -> Result<collateral::Events, substreams::errors::Error> {
+    let mut events = collateral::Events::default();
+    //map_factory_events(&blk, &mut events);
+    //map_lendergroup_events(&blk, &store_lendergroup, &mut events);
+
+
+    collateral_events.collateral_manager_collateral_withdrawn.append(&mut blk
+        .receipts()
+        .flat_map(|view| {
+            view.receipt.logs.iter()
+                .filter(|log| log.address == COLLATERAL_MANAGER_TRACKED_CONTRACT)
+                .filter_map(|log| {
+                    if let Some(event) = abi::collateral_manager::events::CollateralWithdrawn::match_and_decode(log) {
+                        
+                        /*
+
+                            pub struct CollateralWithdrawn {
+                                pub u_bid_id: substreams::scalar::BigInt,
+                                pub u_type: substreams::scalar::BigInt,
+                                pub u_collateral_address: Vec<u8>,
+                                pub u_amount: substreams::scalar::BigInt,
+                                pub u_token_id: substreams::scalar::BigInt,
+                                pub u_recipient: Vec<u8>,
+                            }
+                            
+                        */
+                        
+                        return Some(collateral::CollateralmanagerCollateralWithdrawn {
+                            evt_tx_hash: Hex(&view.transaction.hash).to_string(),
+                            evt_index: log.block_index,
+                            evt_block_time: blk.timestamp_seconds(),
+                            evt_block_number: blk.number,
+                            bid_id: event.bid_id.clone(),
+                            collateral_type: event.collateral_type.clone(),
+                            collateral_address: event.collateral_address.clone(),
+                            amount: event.amount.clone(),
+                            token_id: event.token_id.clone(),
+                            recipient: event.recipient.clone(),
+
+                            //group_contract: event.group_contract,
+                        });
+                    }
+
+                    None
+                })
+        })
+        .collect());
+  
+    
+    Ok(collateral_events)
 }
+ 
+
+
 
 
 #[substreams::handlers::map]

@@ -678,7 +678,7 @@ fn graph_lendergroup_out(
             .set("total_principal_tokens_repaid",  BigInt::zero()) 
             .set("total_interest_collected",  BigInt::zero()) 
             .set("token_difference_from_liquidations",  BigInt::zero()) 
-             
+            .set("total_collateral_withdrawn",  BigInt::zero()) 
            // .set("ordinal",   evt.log.ordinal  )  //is this ok ?  
             ;
 
@@ -799,9 +799,24 @@ fn graph_lendergroup_out(
                     
           }
             
-            
-         
-        
+        //add total collateral withdrawn data 
+
+
+        for group_pool_address in pool_metric_deltas_detected.iter() {
+
+            let store_key = format!("total_collateral_amount_withdrawn:{}", group_pool_address);
+
+            let ord = 0; // for now 
+            if let Some( collateral_withdrawn_delta ) = store_collateral_withdrawn_data.get_at(ord, store_key){
+
+                tables.update_row("group_pool_metric", &group_pool_address)
+                .set("total_collateral_withdrawn", collateral_withdrawn_delta );
+                
+
+            }
+
+          
+        }
          
          //need to use a non-delta store!?
          for group_pool_address in pool_metric_deltas_detected.iter() {
@@ -1103,9 +1118,9 @@ fn map_collateralmanager_events(
 
 
 #[substreams::handlers::store]
-fn store_collateral_withdrawn_data(
+fn store_bid_collateral_withdrawn_data_deltas(
     events:  collateral_contract::Events,    
-    bigint_add_store: StoreAddBigInt //for block time and block number 
+    bigint_delta_store:  StoreAddBigInt //for block time and block number 
 ) {
 
 
@@ -1118,7 +1133,7 @@ fn store_collateral_withdrawn_data(
         
 
         let store_key: String = format!("collateral_amount_withdrawn:{}:{}", evt.bid_id,Hex(&evt.collateral_address).to_string());
-        bigint_add_store.add(ord,&store_key, BigInt::from_str(&evt.amount).unwrap_or(BigInt::zero()));
+        bigint_delta_store.add(ord,&store_key, BigInt::from_str(&evt.amount).unwrap_or(BigInt::zero()));
 
         substreams::log::info!(" Storing collateral amt withdrawn: {} {}",store_key, BigInt::from_str(&evt.amount).unwrap_or(BigInt::zero()) );
  
@@ -1126,6 +1141,68 @@ fn store_collateral_withdrawn_data(
       // need ERC20 abi also 
     });
 
+}
+
+#[substreams::handlers::store]
+fn store_pool_collateral_withdrawn_data(
+    bigint_delta_store: Deltas<DeltaBigInt> ,
+    string_get_store: StoreGetString, //for block time and block number 
+
+    output_store: StoreAddBigInt,
+) {
+
+
+     
+    let ord = 0; // FOR NOW - CAN CAUSE ISSUES - GET FROM LOG AND STUFF INTO EVENT    
+
+
+
+
+
+    /*  for each delta,it tells how much collateral was withdrawn for a bid 
+
+    We have to look up the pool address  using the bid id with string_get_store 
+
+    Then we have to store, in the output store, an addition 
+
+
+
+    */
+    for collateral_withdrawn_delta in bigint_delta_store.deltas.iter(){
+             
+                            
+                //this splits on ":"
+        let delta_root_identifier = substreams::key::segment_at(collateral_withdrawn_delta.get_key(), 0);
+
+        if delta_root_identifier != "collateral_amount_withdrawn" {continue};
+
+        let bid_id = substreams::key::segment_at(collateral_withdrawn_delta.get_key(), 1);
+        let collateral_address = substreams::key::segment_at(collateral_withdrawn_delta.get_key(), 2); //ignore for now 
+        
+                
+        //  let block_number = 0; // FOR NOW 
+      //  let new_value = &pool_metric_delta.new_value ;
+
+      let delta_value = collateral_withdrawn_delta.new_value.clone() - collateral_withdrawn_delta.old_value.clone();
+       // let delta_value = &collateral_withdrawn_delta.delta_value; // ??? 
+
+
+      
+
+         let string_store_key = format!("bid_originated_from_pool:{}", bid_id);
+         if let Some( group_pool_address ) = string_get_store.get_at(ord, string_store_key){
+
+            let output_store_key = format!("total_collateral_amount_withdrawn:{}", group_pool_address);
+
+            output_store.add(ord, &output_store_key, delta_value.clone() );
+
+
+         }
+                    
+
+      }
+
+     
 }
 
 

@@ -39,6 +39,8 @@ substreams pack ./substreams.yaml
 
 #### DEPLOYING 
 
+62350000
+
 make && make build && make pack 
 
 

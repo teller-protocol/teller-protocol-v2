@@ -17,7 +17,7 @@ message collateralmanager_CollateralEscrowDeployed {
     uint32 evt_index = 2;
     uint64 evt_block_time = 3;
     uint64 evt_block_number = 4;
-    uint64 bid_id = 5;
+    string bid_id = 5;
     bytes collateral_escrow = 6;
 }
 
@@ -26,11 +26,11 @@ message collateralmanager_CollateralDeposited {
     uint32 evt_index = 2;
     uint64 evt_block_time = 3;
     uint64 evt_block_number = 4;
-    uint64 bid_id = 5;
+    string bid_id = 5;
     uint32 collateral_type = 6;
     bytes collateral_address = 7;
-    uint64 amount = 8;    
-    uint64 token_id = 9;
+    string amount = 8;    
+    string token_id = 9;
 }
 
 message collateralmanager_CollateralWithdrawn {
@@ -38,11 +38,11 @@ message collateralmanager_CollateralWithdrawn {
     uint32 evt_index = 2;
     uint64 evt_block_time = 3;
     uint64 evt_block_number = 4;
-    uint64 bid_id = 5;
+    string bid_id = 5;
     uint32 collateral_type = 6;
     bytes collateral_address = 7;
-    uint64 amount = 8;
-    uint64 token_id = 9;
+    string amount = 8;
+    string token_id = 9;
     bytes recipient = 10;
 }
  

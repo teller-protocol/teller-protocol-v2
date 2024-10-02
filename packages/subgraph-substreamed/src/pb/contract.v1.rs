@@ -288,6 +288,7 @@ pub struct LendergroupPoolInitialized {
     pub loan_to_value_percent: u64,
     #[prost(bytes="vec", tag="14")]
     pub pool_shares_token: ::prost::alloc::vec::Vec<u8>,
+
     #[prost(bytes="vec", tag="15")]
     pub teller_v2_address: ::prost::alloc::vec::Vec<u8>,
     #[prost(bytes="vec", tag="16")]

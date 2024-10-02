@@ -20,8 +20,8 @@ pub struct CollateralmanagerCollateralEscrowDeployed {
     pub evt_block_time: u64,
     #[prost(uint64, tag="4")]
     pub evt_block_number: u64,
-    #[prost(uint64, tag="5")]
-    pub bid_id: u64,
+    #[prost(string, tag="5")]
+    pub bid_id: ::prost::alloc::string::String,
     #[prost(bytes="vec", tag="6")]
     pub collateral_escrow: ::prost::alloc::vec::Vec<u8>,
 }
@@ -36,16 +36,16 @@ pub struct CollateralmanagerCollateralDeposited {
     pub evt_block_time: u64,
     #[prost(uint64, tag="4")]
     pub evt_block_number: u64,
-    #[prost(uint64, tag="5")]
-    pub bid_id: u64,
+    #[prost(string, tag="5")]
+    pub bid_id: ::prost::alloc::string::String,
     #[prost(uint32, tag="6")]
     pub collateral_type: u32,
     #[prost(bytes="vec", tag="7")]
     pub collateral_address: ::prost::alloc::vec::Vec<u8>,
-    #[prost(uint64, tag="8")]
-    pub amount: u64,
-    #[prost(uint64, tag="9")]
-    pub token_id: u64,
+    #[prost(string, tag="8")]
+    pub amount: ::prost::alloc::string::String,
+    #[prost(string, tag="9")]
+    pub token_id: ::prost::alloc::string::String,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -58,16 +58,16 @@ pub struct CollateralmanagerCollateralWithdrawn {
     pub evt_block_time: u64,
     #[prost(uint64, tag="4")]
     pub evt_block_number: u64,
-    #[prost(uint64, tag="5")]
-    pub bid_id: u64,
+    #[prost(string, tag="5")]
+    pub bid_id: ::prost::alloc::string::String,
     #[prost(uint32, tag="6")]
     pub collateral_type: u32,
     #[prost(bytes="vec", tag="7")]
     pub collateral_address: ::prost::alloc::vec::Vec<u8>,
-    #[prost(uint64, tag="8")]
-    pub amount: u64,
-    #[prost(uint64, tag="9")]
-    pub token_id: u64,
+    #[prost(string, tag="8")]
+    pub amount: ::prost::alloc::string::String,
+    #[prost(string, tag="9")]
+    pub token_id: ::prost::alloc::string::String,
     #[prost(bytes="vec", tag="10")]
     pub recipient: ::prost::alloc::vec::Vec<u8>,
 }

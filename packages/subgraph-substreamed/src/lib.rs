@@ -5,6 +5,7 @@ mod rpc;
 
 use hex_literal::hex;
 use pb::contract::v1 as contract;
+use pb::collateral::v1 as collateral_contract;
 use substreams::prelude::*;
 use substreams::store;
 use substreams::Hex;
@@ -26,6 +27,7 @@ use substreams::scalar::BigDecimal;
 substreams_ethereum::init!();
 
 const FACTORY_TRACKED_CONTRACT: [u8; 20] = hex!("44Ce8fA66d6eDF0c5c668b818A922E772C72568B");
+const COLLATERAL_MANAGER_TRACKED_CONTRACT: [u8;20] = hex!("76888a882a4fF57455B5e74B791DD19DF3ba51Bb");
 
 fn map_factory_events(blk: &eth::Block, events: &mut contract::Events) {
     /*events.factory_admin_changeds.append(&mut blk
@@ -479,11 +481,14 @@ fn graph_lendergroup_out(
      events: &contract::Events,
      tables: &mut EntityChangesTables,
      store_get_globals: &StoreGetBigInt, 
+     store_bids_from_pools_data: &StoreGetString,
 
      deltas_lendergroup_pool_metrics: &Deltas<DeltaBigInt>,
      store_get_lendergroup_pool_metrics: &StoreGetBigInt, 
   
      deltas_lendergroup_user_metrics: &Deltas<DeltaBigInt>,
+
+     store_collateral_withdrawn_data: &StoreGetBigInt, 
     // store_get_lendergroup_user_metrics: &StoreGetBigInt, not used 
   
     
@@ -673,7 +678,7 @@ fn graph_lendergroup_out(
             .set("total_principal_tokens_repaid",  BigInt::zero()) 
             .set("total_interest_collected",  BigInt::zero()) 
             .set("token_difference_from_liquidations",  BigInt::zero()) 
-             
+            .set("total_collateral_withdrawn",  BigInt::zero()) 
            // .set("ordinal",   evt.log.ordinal  )  //is this ok ?  
             ;
 
@@ -794,9 +799,24 @@ fn graph_lendergroup_out(
                     
           }
             
-            
-         
-        
+        //add total collateral withdrawn data 
+
+
+        for group_pool_address in pool_metric_deltas_detected.iter() {
+
+            let store_key = format!("total_collateral_amount_withdrawn:{}", group_pool_address);
+
+            let ord = 0; // for now 
+            if let Some( collateral_withdrawn_delta ) = store_collateral_withdrawn_data.get_at(ord, store_key){
+
+                tables.update_row("group_pool_metric", &group_pool_address)
+                .set("total_collateral_withdrawn", collateral_withdrawn_delta );
+                
+
+            }
+
+          
+        }
          
          //need to use a non-delta store!?
          for group_pool_address in pool_metric_deltas_detected.iter() {
@@ -1016,6 +1036,180 @@ fn graph_lendergroup_out(
 
 
 
+/*
+
+    This creates a mapping that we use to help figure out which
+    collateralmanager events we care abt 
+
+*/
+/*
+#[substreams::handlers::store]
+fn store_accepted_bids_data(
+    events:  contract::Events, 
+   
+    bigint_set_store: StoreSetBigInt //for block time and block number 
+) {
+
+    let ord = 0; 
+    
+    events.lendergroup_borrower_accepted_funds.iter().for_each(|evt: &contract::LendergroupBorrowerAcceptedFunds| {
+         
+        bigint_set_store.set(ord, evt.bid_id.clone() , &BigInt::from(  1 ) );
+ 
+    });
+    
+
+}*/
+
+
+
+#[substreams::handlers::map]
+fn map_collateralmanager_events(
+    blk: eth::Block,
+    //store_collateral_withdrawn: StoreGetInt64,
+) -> Result<collateral_contract::Events, substreams::errors::Error> {
+    let mut collateral_events = collateral_contract::Events::default();
+    //map_factory_events(&blk, &mut events);
+    //map_lendergroup_events(&blk, &store_lendergroup, &mut events);
+
+
+    collateral_events.collateral_manager_collateral_withdrawn.append(&mut blk
+        .receipts()
+        .flat_map(|view| {
+            view.receipt.logs.iter()
+                .filter(|log| log.address == COLLATERAL_MANAGER_TRACKED_CONTRACT)
+                .filter_map(|log| {
+                    if let Some(event) = abi::collateral_manager::events::CollateralWithdrawn::match_and_decode(log) {
+                        
+
+                        substreams::log::info!("collateral withdrawn evt found ");
+                        
+                        
+                        return Some(collateral_contract::CollateralmanagerCollateralWithdrawn {
+                            evt_tx_hash: Hex(&view.transaction.hash).to_string(),
+                            evt_index: log.block_index,
+                            evt_block_time: blk.timestamp_seconds(),
+                            evt_block_number: blk.number,
+
+                            //why are these prefixed by u_ ??
+
+                            bid_id: event.u_bid_id.clone().to_string(),
+                            collateral_type: event.u_type.clone().to_string().parse().unwrap(), //coerce into a u32 ..
+                            collateral_address: event.u_collateral_address.clone(),
+                            amount: event.u_amount.clone().to_string(),
+                            token_id: event.u_token_id.clone().to_string(),
+                            recipient: event.u_recipient.clone(),
+
+                            //group_contract: event.group_contract,
+                        });
+                    }
+
+                    None
+                })
+        })
+        .collect());
+  
+    
+    Ok(collateral_events)
+}
+ 
+
+
+
+
+#[substreams::handlers::store]
+fn store_bid_collateral_withdrawn_data_deltas(
+    events:  collateral_contract::Events,    
+    bigint_delta_store:  StoreAddBigInt //for block time and block number 
+) {
+
+
+     
+    let ord = 0; // FOR NOW - CAN CAUSE ISSUES - GET FROM LOG AND STUFF INTO EVENT    
+    
+
+    
+    events.collateral_manager_collateral_withdrawn.iter().for_each(|evt: &collateral_contract::CollateralmanagerCollateralWithdrawn| {
+        
+
+        let store_key: String = format!("collateral_amount_withdrawn:{}:{}", evt.bid_id,Hex(&evt.collateral_address).to_string());
+        bigint_delta_store.add(ord,&store_key, BigInt::from_str(&evt.amount).unwrap_or(BigInt::zero()));
+
+        substreams::log::info!(" Storing collateral amt withdrawn: {} {}",store_key, BigInt::from_str(&evt.amount).unwrap_or(BigInt::zero()) );
+ 
+      // need to write a whole set of drivers to track   shares tokens !! 
+      // need ERC20 abi also 
+    });
+
+}
+
+#[substreams::handlers::store]
+fn store_pool_collateral_withdrawn_data(
+    bigint_delta_store: Deltas<DeltaBigInt> ,
+    string_get_store: StoreGetString, //for block time and block number 
+
+    output_store: StoreAddBigInt,
+) {
+
+
+     
+    let ord = 0; // FOR NOW - CAN CAUSE ISSUES - GET FROM LOG AND STUFF INTO EVENT    
+
+
+
+
+
+    /*  for each delta,it tells how much collateral was withdrawn for a bid 
+
+    We have to look up the pool address  using the bid id with string_get_store 
+
+    Then we have to store, in the output store, an addition 
+
+
+
+    */
+    for collateral_withdrawn_delta in bigint_delta_store.deltas.iter(){
+             
+                            
+                //this splits on ":"
+        let delta_root_identifier = substreams::key::segment_at(collateral_withdrawn_delta.get_key(), 0);
+
+        if delta_root_identifier != "collateral_amount_withdrawn" {continue};
+
+        let bid_id = substreams::key::segment_at(collateral_withdrawn_delta.get_key(), 1);
+        let collateral_address = substreams::key::segment_at(collateral_withdrawn_delta.get_key(), 2); //ignore for now 
+        
+                
+        //  let block_number = 0; // FOR NOW 
+      //  let new_value = &pool_metric_delta.new_value ;
+
+      let delta_value = collateral_withdrawn_delta.new_value.clone() - collateral_withdrawn_delta.old_value.clone();
+       // let delta_value = &collateral_withdrawn_delta.delta_value; // ??? 
+
+
+      
+
+         let string_store_key = format!("bid_originated_from_pool:{}", bid_id);
+         if let Some( group_pool_address ) = string_get_store.get_at(ord, string_store_key){
+
+            let output_store_key = format!("total_collateral_amount_withdrawn:{}", group_pool_address);
+
+            output_store.add(ord, &output_store_key, delta_value.clone() );
+
+
+         }
+                    
+
+      }
+
+     
+}
+
+
+
+
+ 
+ 
 
 
 
@@ -1051,6 +1245,8 @@ fn store_globals_from_events(
         bigint_set_store.set(ord,"latest_block_number", &BigInt::from( evt.evt_block_number ) );
         bigint_set_store.set(ord,"latest_block_time", &BigInt::from(  evt.evt_block_time ) );
 
+
+      
         //add total collateral ! 
         
         //  evt.collateral_amount
@@ -1075,6 +1271,32 @@ fn store_globals_from_events(
 
     });
 
+
+}
+
+
+
+#[substreams::handlers::store]
+fn store_bid_from_pool_data(
+    events:  contract::Events, 
+   
+    string_set_store: StoreSetString //for block time and block number 
+) {
+
+
+    let ord = 0; // FOR NOW - CAN CAUSE ISSUES - GET FROM LOG AND STUFF INTO EVENT    
+    
+ 
+    events.lendergroup_borrower_accepted_funds.iter().for_each(|evt: &contract::LendergroupBorrowerAcceptedFunds| {
+        
+        let bid_id = &evt.bid_id;
+        let group_pool_address = &evt.evt_address;
+
+        string_set_store.set(ord, format!("bid_originated_from_pool:{}", bid_id ), group_pool_address );
+
+      
+    });
+ 
 
 }
 
@@ -1443,11 +1665,14 @@ fn map_events(
 fn graph_out(
     events: contract::Events,
     store_globals: StoreGetBigInt, 
+    store_bids_from_pools_data: StoreGetString,
 
     deltas_lendergroup_pool_metrics: Deltas<DeltaBigInt>,
     store_lendergroup_pool_metrics: StoreGetBigInt, 
     
     deltas_lendergroup_user_metrics: Deltas<DeltaBigInt>,
+
+    store_collateral_withdrawn_data: StoreGetBigInt, 
   //  store_lendergroup_user_metrics: StoreGetBigInt, 
 
 ) -> Result<EntityChanges, substreams::errors::Error> {
@@ -1458,11 +1683,14 @@ fn graph_out(
         &events, 
         &mut tables, 
         &store_globals,
+        &store_bids_from_pools_data,
 
         &deltas_lendergroup_pool_metrics,
         &store_lendergroup_pool_metrics,
 
         &deltas_lendergroup_user_metrics,
+
+        &store_collateral_withdrawn_data
       //  &store_lendergroup_user_metrics,
         );
         

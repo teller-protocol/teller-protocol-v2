@@ -12,6 +12,7 @@ imports:
 protobuf:
   files:
     - contract.proto
+    - collateral.proto
   importPaths:
     - ./proto
 
@@ -23,7 +24,7 @@ binaries:
 modules:
   - name: store_factory_lendergroup_created
     kind: store
-    initialBlock: 62300000
+    initialBlock: 62350000
     updatePolicy: set
     valueType: proto:dynamic_datasource
     inputs:
@@ -31,25 +32,36 @@ modules:
 
   - name: map_events
     kind: map
-    initialBlock: 62300000
+    initialBlock: 62350000
     inputs:
       - source: sf.ethereum.type.v2.Block
       - store: store_factory_lendergroup_created
     output:
       type: proto:contract.v1.Events
 
+
+ 
       
   - name: store_globals_from_events
     kind: store
-    initialBlock: 62300000
+    initialBlock: 62350000
     updatePolicy: set
     valueType: bigint
     inputs:
       - map: map_events
 
+
+  - name: store_bid_from_pool_data
+    kind: store
+    initialBlock: 62350000
+    updatePolicy: set
+    valueType: string
+    inputs:
+      - map: map_events
+
   - name: store_lendergroup_user_metrics_deltas
     kind: store
-    initialBlock: 62300000
+    initialBlock: 62350000
     updatePolicy: add
     valueType: bigint
     inputs:
@@ -58,7 +70,7 @@ modules:
  
   - name: store_lendergroup_pool_metrics_deltas
     kind: store
-    initialBlock: 62300000
+    initialBlock: 62350000
     updatePolicy: add
     valueType: bigint
     inputs:
@@ -66,7 +78,7 @@ modules:
       
   - name: store_lendergroup_pool_metrics
     kind: store
-    initialBlock: 62300000
+    initialBlock: 62350000
     updatePolicy: set
     valueType: bigint
     inputs:
@@ -75,21 +87,61 @@ modules:
       - store: store_globals_from_events
       
 
+
+
+           
+  - name: map_collateralmanager_events
+    kind: map
+    initialBlock: 62350000
+    inputs:
+      - source: sf.ethereum.type.v2.Block
+    output:
+      type: proto:collateral.v1.Events
+
+
+
+  - name: store_bid_collateral_withdrawn_data_deltas
+    kind: store
+    initialBlock: 62300000
+    updatePolicy: add
+    valueType: bigint
+    inputs:
+      - map: map_collateralmanager_events
+
+
+
+  - name: store_pool_collateral_withdrawn_data
+    kind: store
+    initialBlock: 62300000
+    updatePolicy: add
+    valueType: bigint
+    inputs:
+      - store: store_bid_collateral_withdrawn_data_deltas
+        mode: deltas
+      - store: store_bid_from_pool_data
+
+
+
+
+
+
+
  
   - name: graph_out
     kind: map
-    initialBlock: 62300000
+    initialBlock: 62350000
     inputs:
       - map: map_events
       - store: store_globals_from_events
+      - store: store_bid_from_pool_data
       - store: store_lendergroup_pool_metrics_deltas
         mode: deltas
       - store: store_lendergroup_pool_metrics
       - store: store_lendergroup_user_metrics_deltas
         mode: deltas 
+      - store: store_pool_collateral_withdrawn_data
 
     output:
       type: proto:sf.substreams.entity.v1.EntityChanges
 
 network: polygon
-

@@ -647,7 +647,8 @@ fn graph_lendergroup_out(
                 &evt.evt_address,
                  BigInt::zero() 
                  ).unwrap();
-           
+            
+           let fetched_token_amount_difference = rpc::fetch_token_amount_difference_from_liquidations(&evt.evt_address).unwrap();
          
     
        //create group pool metric 
@@ -678,7 +679,7 @@ fn graph_lendergroup_out(
             .set("total_principal_tokens_borrowed",  BigInt::zero()) 
             .set("total_principal_tokens_repaid",  BigInt::zero()) 
             .set("total_interest_collected",  BigInt::zero()) 
-            .set("token_difference_from_liquidations",  BigInt::zero()) 
+            .set("token_difference_from_liquidations",  fetched_token_amount_difference) 
             .set("total_collateral_withdrawn",  BigInt::zero()) 
            // .set("ordinal",   evt.log.ordinal  )  //is this ok ?  
             ;
@@ -774,10 +775,7 @@ fn graph_lendergroup_out(
                         tables.update_row("group_pool_metric", &group_address)
                             .set("total_interest_collected", new_value );
                     },
-                    "token_difference_from_liquidations" => {
-                        tables.update_row("group_pool_metric", &group_address)
-                            .set("token_difference_from_liquidations", new_value );
-                    },
+                  
                     // Add more cases as per your metric names
                     _ => {}
                 };
@@ -801,6 +799,16 @@ fn graph_lendergroup_out(
                     
                 tables.update_row("group_pool_metric", &group_pool_address)
                             .set("current_min_interest_rate", fetched_min_interest_rate );
+
+
+
+                let fetched_token_amount_difference = rpc::fetch_token_amount_difference_from_liquidations(&evt.evt_address).unwrap();
+         
+                    
+            
+                    
+                tables.update_row("group_pool_metric", &group_pool_address)
+                            .set("token_difference_from_liquidations", fetched_token_amount_difference );
                     
           }
             
@@ -874,9 +882,13 @@ fn graph_lendergroup_out(
             .unwrap_or(BigInt::zero()) ;
 
 
-            let token_difference_from_liquidations = store_get_lendergroup_pool_metrics
+
+            let fetched_token_amount_difference = rpc::fetch_token_amount_difference_from_liquidations(&evt.evt_address).unwrap();
+         
+                
+            /* let token_difference_from_liquidations = store_get_lendergroup_pool_metrics
             .get_at(ord, format!("group_pool_metric:{}:token_difference_from_liquidations", group_pool_address  ))
-            .unwrap_or(BigInt::zero()) ;
+            .unwrap_or(BigInt::zero()) ;  */
                  
               
             
@@ -892,7 +904,7 @@ fn graph_lendergroup_out(
                     .set("total_principal_tokens_borrowed", &total_principal_tokens_borrowed )
                     .set("total_principal_tokens_repaid", &total_principal_tokens_repaid  )
                     .set("total_interest_collected", &total_interest_collected )
-                    .set("token_difference_from_liquidations",&token_difference_from_liquidations)
+                    .set("token_difference_from_liquidations",&fetched_token_amount_difference)
                     ;
             
                     
@@ -911,8 +923,8 @@ fn graph_lendergroup_out(
                     .set("total_principal_tokens_withdrawn", &total_principal_tokens_withdrawn  )
                     .set("total_principal_tokens_borrowed", &total_principal_tokens_borrowed )
                     .set("total_principal_tokens_repaid", &total_principal_tokens_repaid  )
-                    .set("total_interest_collected", &total_interest_collected ).set("token_difference_from_liquidations",&token_difference_from_liquidations)
-                    .set("token_difference_from_liquidations",&token_difference_from_liquidations)
+                    .set("total_interest_collected", &total_interest_collected ) 
+                    .set("token_difference_from_liquidations",&fetched_token_amount_difference)
                     ;
             
                 
@@ -932,7 +944,7 @@ fn graph_lendergroup_out(
                     .set("total_principal_tokens_borrowed", &total_principal_tokens_borrowed )
                     .set("total_principal_tokens_repaid", &total_principal_tokens_repaid  )
                     .set("total_interest_collected", &total_interest_collected )
-                    .set("token_difference_from_liquidations",&token_difference_from_liquidations)
+                    .set("token_difference_from_liquidations",&fetched_token_amount_difference)
                     ;
                 
              
@@ -1420,14 +1432,14 @@ fn store_lendergroup_user_metrics_deltas(
     });
 
 
-    events.lendergroup_defaulted_loan_liquidateds.iter().for_each(|evt: &contract::LendergroupDefaultedLoanLiquidated| {
+    /* events.lendergroup_defaulted_loan_liquidateds.iter().for_each(|evt: &contract::LendergroupDefaultedLoanLiquidated| {
  
  
         let user_store_key: String = format!("group_user_metric:{}:{}:token_difference_from_liquidations", evt.evt_address,Hex(&evt.liquidator).to_string());
         bigint_add_store.add(ord,&user_store_key, BigInt::from_str(&evt.token_amount_difference).unwrap_or(BigInt::zero()));
          
         
-    });
+    }); */
 }
 
 /*
@@ -1597,7 +1609,7 @@ fn store_lendergroup_pool_metrics_deltas(
     });
 
 
-    events.lendergroup_defaulted_loan_liquidateds.iter().for_each(|evt: &contract::LendergroupDefaultedLoanLiquidated| {
+  /*  events.lendergroup_defaulted_loan_liquidateds.iter().for_each(|evt: &contract::LendergroupDefaultedLoanLiquidated| {
  
  
          
@@ -1605,7 +1617,7 @@ fn store_lendergroup_pool_metrics_deltas(
         bigint_add_store.add(ord,&group_store_key, BigInt::from_str(&evt.token_amount_difference).unwrap_or(BigInt::zero()));
     
         
-    });
+    }); */
 
 }
 

@@ -93,3 +93,23 @@ pub fn fetch_min_interest_rate_from_rpc(pool_contract_address: &String, amount_d
  
  
 }
+
+
+
+
+
+pub fn fetch_token_amount_difference_from_liquidations(pool_contract_address: &String) -> Option<BigInt> {
+        
+    let pool_contract_address_decoded = Hex::decode(pool_contract_address).unwrap(); 
+        
+         
+    
+        let get_token_amount_difference_function = abi::lendergroup_contract::functions::TokenDifferenceFromLiquidations {    };
+        let  token_amount_difference  = get_token_amount_difference_function.call( )  ;
+        
+      
+    
+    return  token_amount_difference ; 
+ 
+ 
+}

@@ -818,6 +818,20 @@
     },
     {
       "type": "function",
+      "name": "getTokenDifferenceFromLiquidations",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "int256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
       "name": "getTotalPrincipalTokensOutstandingInActiveLoans",
       "constant": true,
       "stateMutability": "view",
@@ -1357,6 +1371,6 @@
     }
   ],
   "receipt": {},
-  "numDeployments": 4,
+  "numDeployments": 5,
   "implementation": "0x55Ef5d3700eEC151d4Feff74214E7C90daBDE12B"
 }

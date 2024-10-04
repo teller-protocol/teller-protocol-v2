@@ -16,8 +16,7 @@ interface ILenderCommitmentGroup {
         uint16 interestRateUpperBound;
         uint16 liquidityThresholdPercent;
         uint16 collateralRatio; //essentially the overcollateralization ratio.  10000 is 1:1 baseline ?
-       // uint24 uniswapPoolFee;
-       // uint32 twapInterval;
+        
     }
 
 
@@ -39,4 +38,8 @@ interface ILenderCommitmentGroup {
         address _sharesRecipient,
         uint256 _minAmountOut
     ) external returns (uint256 sharesAmount_);
+
+
+    function getTokenDifferenceFromLiquidations() external view returns (int256);
+
 }

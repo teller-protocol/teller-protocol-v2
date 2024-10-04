@@ -1550,7 +1550,8 @@ fn store_lendergroup_pool_metrics_deltas(
         let store_key: String = format!("group_pool_metric:{}:total_collateral_tokens_escrowed", evt.evt_address);
         bigint_add_store.add(ord,&store_key, BigInt::zero() );
 
- 
+        
+
 
     });
     
@@ -1594,6 +1595,18 @@ fn store_lendergroup_pool_metrics_deltas(
     
         
     });
+
+
+    events.lendergroup_defaulted_loan_liquidateds.iter().for_each(|evt: &contract::LendergroupDefaultedLoanLiquidated| {
+ 
+ 
+         
+        let group_store_key: String = format!("group_pool_metric:{}:token_difference_from_liquidations", evt.evt_address);
+        bigint_add_store.add(ord,&group_store_key, BigInt::from_str(&evt.token_amount_difference).unwrap_or(BigInt::zero()));
+    
+        
+    });
+
 }
 
 

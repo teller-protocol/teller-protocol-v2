@@ -746,6 +746,13 @@ contract LenderCommitmentGroup_Smart is
 
        
     }
+
+
+    function getTokenDifferenceFromLiquidations() public view returns (int256){
+
+        return tokenDifferenceFromLiquidations;
+
+    }
     
 
     /*

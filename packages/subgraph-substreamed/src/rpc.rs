@@ -105,7 +105,9 @@ pub fn fetch_token_amount_difference_from_liquidations(pool_contract_address: &S
          
     
         let get_token_amount_difference_function = abi::lendergroup_contract::functions::GetTokenDifferenceFromLiquidations {    };
-        let  token_amount_difference  = get_token_amount_difference_function.call( )  ;
+        let  token_amount_difference  = get_token_amount_difference_function.call(
+            pool_contract_address_decoded.clone()
+         )  ;
         
       
     

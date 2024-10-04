@@ -802,7 +802,7 @@ fn graph_lendergroup_out(
 
 
 
-                let fetched_token_amount_difference = rpc::fetch_token_amount_difference_from_liquidations(&evt.evt_address).unwrap();
+                let fetched_token_amount_difference = rpc::fetch_token_amount_difference_from_liquidations(&group_pool_address.to_string()).unwrap();
          
                     
             
@@ -883,7 +883,7 @@ fn graph_lendergroup_out(
 
 
 
-            let fetched_token_amount_difference = rpc::fetch_token_amount_difference_from_liquidations(&evt.evt_address).unwrap();
+            let fetched_token_amount_difference = rpc::fetch_token_amount_difference_from_liquidations(&group_pool_address.to_string()).unwrap();
          
                 
             /* let token_difference_from_liquidations = store_get_lendergroup_pool_metrics

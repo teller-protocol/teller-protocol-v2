@@ -698,7 +698,7 @@ contract LenderCommitmentGroup_Smart is
                  liquidationProtocolFee
             );
 
-
+            totalPrincipalTokensRepaid += amountDue;
             tokenDifferenceFromLiquidations += int256(tokensToTakeFromSender - liquidationProtocolFee );
 
 
@@ -714,6 +714,7 @@ contract LenderCommitmentGroup_Smart is
                 amountDue - tokensToGiveToSender  
             );
 
+            totalPrincipalTokensRepaid += amountDue;
             tokenDifferenceFromLiquidations -= int256(tokensToGiveToSender);
 
            

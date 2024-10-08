@@ -316,7 +316,7 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
      }
 
   
-function test_liquidateDefaultedLoanWithIncentive_increments_amount_repaid() public {
+function test_liquidateDefaultedLoanWithIncentive_increments_amount_repaid_A() public {
 
 
         initialize_group_contract();
@@ -341,7 +341,9 @@ function test_liquidateDefaultedLoanWithIncentive_increments_amount_repaid() pub
        vm.prank(address(liquidator));
        principalToken.approve(address(lenderCommitmentGroupSmart), 1e18);
 
+       uint256 poolTotalEstimatedValueBefore = lenderCommitmentGroupSmart.getPoolTotalEstimatedValue();
 
+        uint256 originalTotalPrincipalTokensRepaid = 2000;
         lenderCommitmentGroupSmart.set_totalPrincipalTokensRepaid(0);
 
        lenderCommitmentGroupSmart.mock_setMinimumAmountDifferenceToCloseDefaultedLoan(-500);
@@ -366,18 +368,76 @@ function test_liquidateDefaultedLoanWithIncentive_increments_amount_repaid() pub
         uint256 updatedBalance = principalToken.balanceOf(address(liquidator));
 
         uint256 totalPrincipalTokensRepaid = lenderCommitmentGroupSmart.totalPrincipalTokensRepaid();
+         uint256 poolTotalEstimatedValueAfter = lenderCommitmentGroupSmart.getPoolTotalEstimatedValue();
 
  
-        assertEq(totalPrincipalTokensRepaid, amountOwed, "unexpected totalPrincipalTokensRepaid");
+        assertEq(totalPrincipalTokensRepaid, originalTotalPrincipalTokensRepaid + amountOwed, "unexpected totalPrincipalTokensRepaid");
+        assertEq( poolTotalEstimatedValueBefore - poolTotalEstimatedValueAfter, 500, "unexpected poolTotalEstimatedValue");
 
 
       //make sure lenderCloseloan is called 
+      //how is this passing ? 
        assertEq( _tellerV2.lenderCloseLoanWasCalled(), true, "lender close loan not called");
      }
 
  
 
+ function test_liquidateDefaultedLoanWithIncentive_increments_amount_repaid_B() public {
+
+
+        initialize_group_contract();
+
+        principalToken.transfer(address(liquidator), 1e18);
+        uint256 originalBalance = principalToken.balanceOf(address(liquidator));
+
+        uint256 amountOwed = 1000;
+   
+        
+        uint256 bidId = 0;
+    
+
+       lenderCommitmentGroupSmart.set_mockAmountOwedForBid(amountOwed); 
+
+   
+        //time has advanced enough to now have a 50 percent discount s
+         vm.warp(1000);   //loanDefaultedTimeStamp ?
+
+       lenderCommitmentGroupSmart.set_mockBidAsActiveForGroup(bidId,true); 
+      
+       vm.prank(address(liquidator));
+       principalToken.approve(address(lenderCommitmentGroupSmart), 1e18);
+
+       uint256 poolTotalEstimatedValueBefore = lenderCommitmentGroupSmart.getPoolTotalEstimatedValue();
+
+        uint256 originalTotalPrincipalTokensRepaid = 2000;
+        lenderCommitmentGroupSmart.set_totalPrincipalTokensRepaid(0);
+
+       lenderCommitmentGroupSmart.mock_setMinimumAmountDifferenceToCloseDefaultedLoan(-500);
+
+        int256 tokenAmountDifference = 500;
+        vm.prank(address(liquidator));
+        lenderCommitmentGroupSmart.liquidateDefaultedLoanWithIncentive(
+           bidId, 
+           tokenAmountDifference           
+        );
+
+          
+
+        uint256 updatedBalance = principalToken.balanceOf(address(liquidator));
+
+        uint256 totalPrincipalTokensRepaid = lenderCommitmentGroupSmart.totalPrincipalTokensRepaid();
+         uint256 poolTotalEstimatedValueAfter = lenderCommitmentGroupSmart.getPoolTotalEstimatedValue();
+
  
+        assertEq(totalPrincipalTokensRepaid, originalTotalPrincipalTokensRepaid + amountOwed, "unexpected totalPrincipalTokensRepaid");
+        assertEq( poolTotalEstimatedValueAfter - poolTotalEstimatedValueBefore, 500, "unexpected poolTotalEstimatedValue");
+
+
+      //make sure lenderCloseloan is called 
+      //how is this passing ? 
+       assertEq( _tellerV2.lenderCloseLoanWasCalled(), true, "lender close loan not called");
+     }
+
 
 }
 

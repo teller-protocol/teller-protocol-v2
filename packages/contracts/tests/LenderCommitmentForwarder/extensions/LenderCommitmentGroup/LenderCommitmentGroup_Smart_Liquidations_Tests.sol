@@ -321,6 +321,9 @@ function test_liquidateDefaultedLoanWithIncentive_increments_amount_repaid_A() p
 
         initialize_group_contract();
 
+        _tellerV2.setMockOwner( address(lenderCommitmentGroupSmart)  );
+
+
         principalToken.transfer(address(liquidator), 1e18);
         uint256 originalBalance = principalToken.balanceOf(address(liquidator));
 
@@ -403,6 +406,7 @@ function test_liquidateDefaultedLoanWithIncentive_increments_amount_repaid_A() p
         
         uint256 bidId = 0;
     
+       _tellerV2.setMockOwner( address(lenderCommitmentGroupSmart)  );
 
        lenderCommitmentGroupSmart.set_mockAmountOwedForBid(amountOwed); 
 

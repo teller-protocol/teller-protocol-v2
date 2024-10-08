@@ -220,12 +220,15 @@ type group_pool_metric_data_point @entity {
     total_principal_tokens_committed: BigInt!
     total_principal_tokens_withdrawn: BigInt!
     total_collateral_tokens_escrowed: BigInt!  #fix me by reductions 
+
+          total_collateral_tokens_withdrawn: BigInt!
     
     total_principal_tokens_borrowed: BigInt!
     total_principal_tokens_repaid: BigInt!
     total_interest_collected: BigInt!
 
-    
+     token_difference_from_liquidations: BigInt!
+
 }
 
 type group_pool_metric_data_point_daily @entity {
@@ -239,10 +242,14 @@ type group_pool_metric_data_point_daily @entity {
     total_principal_tokens_committed: BigInt!
     total_principal_tokens_withdrawn: BigInt!
     total_collateral_tokens_escrowed: BigInt!  #fix me by reductions 
+    total_collateral_tokens_withdrawn: BigInt!
     
     total_principal_tokens_borrowed: BigInt!
     total_principal_tokens_repaid: BigInt!
     total_interest_collected: BigInt!
+
+
+    token_difference_from_liquidations: BigInt!
 
     
 }
@@ -258,12 +265,14 @@ type group_pool_metric_data_point_weekly @entity {
     total_principal_tokens_committed: BigInt!
     total_principal_tokens_withdrawn: BigInt!
     total_collateral_tokens_escrowed: BigInt!  #fix me by reductions 
-    
+    total_collateral_tokens_withdrawn: BigInt!
+
     total_principal_tokens_borrowed: BigInt!
     total_principal_tokens_repaid: BigInt!
     total_interest_collected: BigInt!
 
-   
+    token_difference_from_liquidations: BigInt!
+
     
 }
 

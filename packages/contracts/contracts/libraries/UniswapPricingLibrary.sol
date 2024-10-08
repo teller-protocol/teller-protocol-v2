@@ -1,18 +1,13 @@
 pragma solidity >=0.8.0 <0.9.0;
 // SPDX-License-Identifier: MIT
 
-// Contracts
-//import "../TellerV2MarketForwarder_G2.sol";
-
-// Interfaces
-//import "../interfaces/ICollateralManager.sol"; 
+ 
 
 import {IUniswapPricingLibrary} from "../interfaces/IUniswapPricingLibrary.sol";
 
 import "@openzeppelin/contracts/utils/math/Math.sol";
 
-//import { Collateral, CollateralType } from "../interfaces/escrow/ICollateralEscrowV1.sol";
-
+ 
 import "@openzeppelin/contracts-upgradeable/utils/structs/EnumerableSetUpgradeable.sol";
 
 // Libraries
@@ -20,14 +15,12 @@ import { MathUpgradeable } from "@openzeppelin/contracts-upgradeable/utils/math/
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20MetadataUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/cryptography/MerkleProofUpgradeable.sol";
 
-import "../interfaces/uniswap/IUniswapV3Pool.sol";
-//import "../interfaces/uniswap/IUniswapV3Factory.sol";
+import "../interfaces/uniswap/IUniswapV3Pool.sol"; 
 
 import "../libraries/uniswap/TickMath.sol";
 import "../libraries/uniswap/FixedPoint96.sol";
 import "../libraries/uniswap/FullMath.sol";
-
-//import "../libraries/NumbersLib.sol";
+ 
  
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
@@ -42,8 +35,7 @@ Only do decimal expansion if it is an ERC20   not anything else !!
 
 library UniswapPricingLibrary  
 {
-   //  using NumbersLib for uint256;
- 
+    
     uint256 constant STANDARD_EXPANSION_FACTOR = 1e18;
 
     function getUniswapPriceRatioForPoolRoutes(

@@ -328,7 +328,11 @@ function test_liquidateDefaultedLoanWithIncentive_increments_amount_repaid_A() p
    
         
         uint256 bidId = 0;
-    
+
+
+       uint256 originalTotalPrincipalTokensCommitted= 6000;
+      lenderCommitmentGroupSmart.set_totalPrincipalTokensCommitted(originalTotalPrincipalTokensCommitted);
+
 
        lenderCommitmentGroupSmart.set_mockAmountOwedForBid(amountOwed); 
 
@@ -344,7 +348,7 @@ function test_liquidateDefaultedLoanWithIncentive_increments_amount_repaid_A() p
        uint256 poolTotalEstimatedValueBefore = lenderCommitmentGroupSmart.getPoolTotalEstimatedValue();
 
         uint256 originalTotalPrincipalTokensRepaid = 2000;
-        lenderCommitmentGroupSmart.set_totalPrincipalTokensRepaid(0);
+        lenderCommitmentGroupSmart.set_totalPrincipalTokensRepaid(originalTotalPrincipalTokensRepaid);
 
        lenderCommitmentGroupSmart.mock_setMinimumAmountDifferenceToCloseDefaultedLoan(-500);
 
@@ -373,6 +377,10 @@ function test_liquidateDefaultedLoanWithIncentive_increments_amount_repaid_A() p
  
         assertEq(totalPrincipalTokensRepaid, originalTotalPrincipalTokensRepaid + amountOwed, "unexpected totalPrincipalTokensRepaid");
         assertEq( poolTotalEstimatedValueBefore - poolTotalEstimatedValueAfter, 500, "unexpected poolTotalEstimatedValue");
+
+
+        assertEq(  poolTotalEstimatedValueBefore, 6000, "unexpected poolTotalEstimatedValueBefore");
+         assertEq( poolTotalEstimatedValueAfter , 5500, "unexpected poolTotalEstimatedValueAfter");
 
 
       //make sure lenderCloseloan is called 
@@ -407,10 +415,15 @@ function test_liquidateDefaultedLoanWithIncentive_increments_amount_repaid_A() p
        vm.prank(address(liquidator));
        principalToken.approve(address(lenderCommitmentGroupSmart), 1e18);
 
+      uint256 originalTotalPrincipalTokensCommitted= 6000;
+      lenderCommitmentGroupSmart.set_totalPrincipalTokensCommitted(originalTotalPrincipalTokensCommitted);
+
+
+
        uint256 poolTotalEstimatedValueBefore = lenderCommitmentGroupSmart.getPoolTotalEstimatedValue();
 
         uint256 originalTotalPrincipalTokensRepaid = 2000;
-        lenderCommitmentGroupSmart.set_totalPrincipalTokensRepaid(0);
+        lenderCommitmentGroupSmart.set_totalPrincipalTokensRepaid(originalTotalPrincipalTokensRepaid);
 
        lenderCommitmentGroupSmart.mock_setMinimumAmountDifferenceToCloseDefaultedLoan(-500);
 
@@ -426,11 +439,17 @@ function test_liquidateDefaultedLoanWithIncentive_increments_amount_repaid_A() p
         uint256 updatedBalance = principalToken.balanceOf(address(liquidator));
 
         uint256 totalPrincipalTokensRepaid = lenderCommitmentGroupSmart.totalPrincipalTokensRepaid();
-         uint256 poolTotalEstimatedValueAfter = lenderCommitmentGroupSmart.getPoolTotalEstimatedValue();
+        uint256 poolTotalEstimatedValueAfter = lenderCommitmentGroupSmart.getPoolTotalEstimatedValue();
 
  
         assertEq(totalPrincipalTokensRepaid, originalTotalPrincipalTokensRepaid + amountOwed, "unexpected totalPrincipalTokensRepaid");
-        assertEq( poolTotalEstimatedValueAfter - poolTotalEstimatedValueBefore, 500, "unexpected poolTotalEstimatedValue");
+       
+       
+       
+         assertEq(  poolTotalEstimatedValueBefore, 6000, "unexpected poolTotalEstimatedValueBefore");
+         assertEq( poolTotalEstimatedValueAfter , 6500, "unexpected poolTotalEstimatedValueAfter");
+
+        // assertEq( poolTotalEstimatedValueAfter - poolTotalEstimatedValueBefore, 500, "unexpected poolTotalEstimatedValue");
 
 
       //make sure lenderCloseloan is called 

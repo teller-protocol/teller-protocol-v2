@@ -43,11 +43,11 @@ const deployFn: DeployFunction = async (hre) => {
 
 
   await hre.upgrades.proposeBatchTimelock({
-    title: 'LenderGroups: Add Multihop Support',
+    title: 'LenderGroups: Liquidation Repayment Accounting',
     description: ` 
 # LenderGroups
 
-* Adds support for multihop oracle.
+* A patch for liquidation repayment accounting.
 `,
     _steps: [
       {
@@ -84,7 +84,7 @@ const deployFn: DeployFunction = async (hre) => {
 }
 
 // tags and deployment
-deployFn.id = 'lender-commitment-group-beacon:upgrade-multihop'
+deployFn.id = 'lender-commitment-group-beacon:upgrade'
 deployFn.tags = ['lender-commitment-group-beacon']
 deployFn.dependencies = [
   'teller-v2:deploy',

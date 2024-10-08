@@ -425,7 +425,7 @@ function test_liquidateDefaultedLoanWithIncentive_increments_amount_repaid_A() p
         uint256 originalTotalPrincipalTokensRepaid = 2000;
         lenderCommitmentGroupSmart.set_totalPrincipalTokensRepaid(originalTotalPrincipalTokensRepaid);
 
-       lenderCommitmentGroupSmart.mock_setMinimumAmountDifferenceToCloseDefaultedLoan(-500);
+       lenderCommitmentGroupSmart.mock_setMinimumAmountDifferenceToCloseDefaultedLoan(500);
 
         int256 tokenAmountDifference = 500;
         vm.prank(address(liquidator));

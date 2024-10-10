@@ -75,7 +75,7 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
         _uniswapV3Factory = new UniswapV3FactoryMock();
         _uniswapV3Factory.setPoolMock(address(_uniswapV3Pool));
 
-
+        vm.warp(1_000_000);
         
 
         principalToken = new TestERC20Token("wrappedETH", "WETH", 1e24, 18);

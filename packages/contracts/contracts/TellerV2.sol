@@ -5,6 +5,7 @@ pragma solidity >=0.8.0 <0.9.0;
 import "./ProtocolFee.sol";
 import "./TellerV2Storage.sol";
 import "./TellerV2Context.sol";
+import "./pausing/HasProtocolPausingManager.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
@@ -50,7 +51,7 @@ contract TellerV2 is
     ILoanRepaymentCallbacks,
     OwnableUpgradeable,
     ProtocolFee,
-    PausableUpgradeable,
+    HasProtocolPausingManager,
     TellerV2Storage,
     TellerV2Context
 {
@@ -165,23 +166,6 @@ contract TellerV2 is
     }
 
 
-     modifier onlyPauser() {
-
-        require( pauserRoleBearer[_msgSender()] ||  owner() == _msgSender(), "Requires role: Pauser");
-       
-
-        _;
-    }
-
-
-    modifier whenLiquidationsNotPaused() {
-        require(!liquidationsPaused, "Liquidations are paused");
-      
-        _;
-    }
-
-
-
     /** Constant Variables **/
 
     uint8 public constant CURRENT_CODE_VERSION = 10;
@@ -202,6 +186,7 @@ contract TellerV2 is
      * @param _lenderCommitmentForwarder The address of the lender commitment forwarder contract.
      * @param _collateralManager The address of the collateral manager contracts.
      * @param _lenderManager The address of the lender manager contract for loans on the protocol.
+     * @param _protocolPausingManager The address of the pausing manager contract for the protocol.
      */
     function initialize(
         uint16 _protocolFee,
@@ -210,11 +195,12 @@ contract TellerV2 is
         address _lenderCommitmentForwarder,
         address _collateralManager,
         address _lenderManager,
-        address _escrowVault
+        address _escrowVault,
+        address _protocolPausingManager
     ) external initializer {
         __ProtocolFee_init(_protocolFee);
 
-        __Pausable_init();
+        //__Pausable_init();
 
         require(
             _lenderCommitmentForwarder.isContract(),
@@ -242,6 +228,7 @@ contract TellerV2 is
 
         _setLenderManager(_lenderManager);
         _setEscrowVault(_escrowVault);
+        __HasProtocolPausingManager_init(_protocolPausingManager, _msgSender());
     }
 
     /* function setEscrowVault(address _escrowVault) external reinitializer(9) {
@@ -703,50 +690,7 @@ contract TellerV2 is
         );
     }
 
-    /**
-     * @notice Lets a pauser of the protocol implement an emergency stop mechanism.
-     */
-    function pauseProtocol() public virtual onlyPauser whenNotPaused {
-        _pause();
-    }
-
-    /**
-     * @notice Lets a pauser of the protocol undo a previously implemented emergency stop.
-     */
-    function unpauseProtocol() public virtual onlyPauser whenPaused {
-        _unpause();
-    }
-
-
-     /**
-     * @notice Lets a pauser of the protocol implement an emergency stop mechanism.
-     */
-    function pauseLiquidations() public virtual onlyPauser {
-        liquidationsPaused = true;
-    }
-
-    /**
-     * @notice Lets a pauser of the protocol undo a previously implemented emergency stop.
-     */
-    function unpauseLiquidations() public virtual onlyPauser {
-         liquidationsPaused = false;
-    }
-
-
-
-    function addPauser(address _pauser) public virtual onlyOwner   {
-       pauserRoleBearer[_pauser] = true;
-    }
-
-
-    function removePauser(address _pauser) public virtual onlyOwner {
-        pauserRoleBearer[_pauser] = false;
-    }
-
-
-    function isPauser(address _account) public view returns(bool){
-        return pauserRoleBearer[_account] ;
-    }
+ 
 
 
     function lenderCloseLoan(uint256 _bidId)

@@ -7,6 +7,8 @@ import "../interfaces/ILenderCommitmentForwarder.sol";
 import "../interfaces/ISmartCommitmentForwarder.sol";
 import "./LenderCommitmentForwarder_G1.sol";
 
+import "../interfaces/IPausableTimestamp.sol";
+
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 
@@ -17,7 +19,8 @@ contract SmartCommitmentForwarder is
     ExtensionsContextUpgradeable, //this should always be first for upgradeability
     TellerV2MarketForwarder_G3,
     PausableUpgradeable,  //this does add some storage but AFTER all other storage
-    ISmartCommitmentForwarder
+    ISmartCommitmentForwarder,
+    IPausableTimestamp
      {
     event ExercisedSmartCommitment(
         address indexed smartCommitmentAddress,
@@ -209,7 +212,28 @@ contract SmartCommitmentForwarder is
      * @notice Lets the DAO/owner of the protocol undo a previously implemented emergency stop.
      */
     function unpause() public virtual onlyProtocolPauser whenPaused {
+        setLastUnpausedAt();
         _unpause();
+    }
+
+
+    function getLastUnpausedAt() 
+    public view 
+    returns (uint256) {
+
+
+        return Math.max(
+            lastUnpausedAt,
+            IPausableTimestamp(TELLER_V2).getLastUnpausedAt()
+        )
+        ;
+ 
+
+    }
+
+
+    function setLastUnpausedAt() internal {
+        lastUnpausedAt =  block.timestamp;
     }
 
 

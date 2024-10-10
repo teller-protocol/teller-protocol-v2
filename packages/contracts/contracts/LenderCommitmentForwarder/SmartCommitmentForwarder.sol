@@ -45,6 +45,7 @@ contract SmartCommitmentForwarder is
     }
 
     uint256 public liquidationProtocolFeePercent; 
+    uint256 internal lastUnpausedAt;
 
 
     constructor(address _protocolAddress, address _marketRegistry)
@@ -224,7 +225,7 @@ contract SmartCommitmentForwarder is
 
         return Math.max(
             lastUnpausedAt,
-            IPausableTimestamp(TELLER_V2).getLastUnpausedAt()
+            IPausableTimestamp(_tellerV2).getLastUnpausedAt()
         )
         ;
  

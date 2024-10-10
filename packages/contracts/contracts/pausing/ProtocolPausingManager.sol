@@ -11,7 +11,7 @@ import "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-import "./interfaces/IProtocolPausingManager.sol";
+import "../interfaces/IProtocolPausingManager.sol";
 
 /**
  
@@ -21,15 +21,21 @@ import "./interfaces/IProtocolPausingManager.sol";
 
 
  */
-contract ProtocolPausingManager is ContextUpgradeable, OwnableUpgradeable, IProtocolPausingManager {
+contract ProtocolPausingManager is ContextUpgradeable, OwnableUpgradeable, IProtocolPausingManager , IPausableTimestamp{
   
 
-   // bool private _protocolPaused; 
-    //bool private _liquidationsPaused; 
+    bool private _protocolPaused; 
+    bool private _liquidationsPaused; 
+    //bool private _liquidityPoolsPaused;    
 
-    u8 private _currentPauseState;  //use an enum !!! 
 
-     mapping(address => bool) public  pauserRoleBearer  ;
+    // u8 private _currentPauseState;  //use an enum !!! 
+
+    mapping(address => bool) public  pauserRoleBearer  ;
+
+
+    uint256 private lastPausedAt;
+    uint256 private lastUnpausedAt;
     
      
     /**
@@ -59,8 +65,8 @@ contract ProtocolPausingManager is ContextUpgradeable, OwnableUpgradeable, IProt
     /**
      * @dev Returns true if the contract is paused, and false otherwise.
      */
-    function paused() public view virtual returns (bool) {
-        return _paused;
+    function protocolPaused() public view virtual returns (bool) {
+        return _protocolPaused;
     }
 
     /**
@@ -77,28 +83,51 @@ contract ProtocolPausingManager is ContextUpgradeable, OwnableUpgradeable, IProt
         require(paused(), "Pausable: not paused");
     }
 
-    /**
-     * @dev Triggers stopped state.
-     *
-     * Requirements:
-     *
-     * - The contract must not be paused.
-     */
-    function _pause() internal virtual whenNotPaused {
-        _paused = true;
+   
+
+
+
+
+    function pauseProtocol() public virtual onlyPauser whenNotPaused {
+          _paused = true;
         emit Paused(_msgSender());
     }
 
-    /**
-     * @dev Returns to normal state.
-     *
-     * Requirements:
-     *
-     * - The contract must be paused.
-     */
-    function _unpause() internal virtual whenPaused {
-        _paused = false;
+     
+    function unpauseProtocol() public virtual onlyPauser whenPaused {
+       _paused = false;
         emit Unpaused(_msgSender());
+    }
+
+
+
+
+    function getLastUnpausedAt() 
+    external view 
+    returns (uint256) {
+
+        return lastUnpausedAt;
+
+    } 
+
+
+
+
+    // Role Management 
+
+
+    function addPauser(address _pauser) public virtual onlyOwner   {
+       pauserRoleBearer[_pauser] = true;
+    }
+
+
+    function removePauser(address _pauser) public virtual onlyOwner {
+        pauserRoleBearer[_pauser] = false;
+    }
+
+
+    function isPauser(address _account) public view returns(bool){
+        return pauserRoleBearer[_account] ;
     }
 
   

@@ -9,10 +9,15 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 import "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
-abstract contract HasProtocolPausingManager is Initializable, ContextUpgradeable {
+
+import "../interfaces/IHasProtocolPausingManager.sol";
+
+
+
+abstract contract HasProtocolPausingManager is Initializable, ContextUpgradeable, IHasProtocolPausingManager, IPausableTimestamp {
   
 
-    bool private _reserved0;// _paused.. Deprecated 
+    bool private _reserved0;// _paused.. Deprecated , handled by pausing manager 
 
     address private _protocolPausingManager;
  
@@ -57,6 +62,13 @@ abstract contract HasProtocolPausingManager is Initializable, ContextUpgradeable
         return _protocolPausingManager;
     }
 
+    function getLastUnpausedAt() 
+    external view 
+    returns (uint256) {
+
+        return IPausableTimestamp(_protocolPausingManager).getLastUnpausedAt();
+
+    } 
 
 
 
@@ -65,15 +77,6 @@ abstract contract HasProtocolPausingManager is Initializable, ContextUpgradeable
     /*
 
  
-    function pauseProtocol() public virtual onlyPauser whenNotPaused {
-        _pause();
-    }
-
-     
-    function unpauseProtocol() public virtual onlyPauser whenPaused {
-        _unpause();
-    }
-
 
     
     function pauseLiquidations() public virtual onlyPauser {
@@ -86,19 +89,6 @@ abstract contract HasProtocolPausingManager is Initializable, ContextUpgradeable
 
 
 
-    function addPauser(address _pauser) public virtual onlyOwner   {
-       pauserRoleBearer[_pauser] = true;
-    }
-
-
-    function removePauser(address _pauser) public virtual onlyOwner {
-        pauserRoleBearer[_pauser] = false;
-    }
-
-
-    function isPauser(address _account) public view returns(bool){
-        return pauserRoleBearer[_account] ;
-    }
 
     */
 

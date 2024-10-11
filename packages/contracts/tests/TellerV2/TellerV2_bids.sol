@@ -13,6 +13,9 @@ import { CollateralManagerMock } from "../../contracts/mock/CollateralManagerMoc
 import { LenderManagerMock } from "../../contracts/mock/LenderManagerMock.sol";
 import { MarketRegistryMock } from "../../contracts/mock/MarketRegistryMock.sol";
 
+import { ProtocolPausingManager } from "../../contracts/pausing/ProtocolPausingManager.sol";
+
+
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 import "../tokens/TestERC20Token.sol";
@@ -42,6 +45,8 @@ contract TellerV2_bids_test is Testable {
     CollateralManagerMock collateralManagerMock;
     LenderManagerMock lenderManagerMock;
 
+    ProtocolPausingManager protocolPausingManager;
+
     uint256 marketplaceId = 100;
 
     //have to copy and paste events in here to expectEmit
@@ -59,6 +64,7 @@ contract TellerV2_bids_test is Testable {
         reputationManagerMock = new ReputationManagerMock();
         collateralManagerMock = new CollateralManagerMock();
         lenderManagerMock = new LenderManagerMock();
+        protocolPausingManager = new ProtocolPausingManager();
 
         borrower = new User();
         lender = new User();
@@ -221,7 +227,8 @@ contract TellerV2_bids_test is Testable {
     }
 
     function test_submit_bid_reverts_when_protocol_IS_paused() public {
-        tellerV2.mock_pause(true);
+        tellerV2.setProtocolPausingManagerSuper(address(protocolPausingManager));
+        protocolPausingManager.pauseProtocol();
 
         vm.expectRevert("Pausable: paused");
         tellerV2.submitBid(
@@ -238,7 +245,8 @@ contract TellerV2_bids_test is Testable {
     function test_submit_bid_Reverts_when_protocol_IS_paused__with_collateral()
         public
     {
-        tellerV2.mock_pause(true);
+        tellerV2.setProtocolPausingManagerSuper(address(protocolPausingManager));
+        protocolPausingManager.pauseProtocol();
 
         Collateral[] memory collateral = new Collateral[](1);
 
@@ -430,7 +438,11 @@ contract TellerV2_bids_test is Testable {
 
         tellerV2.setCollateralManagerSuper(address(collateralManagerMock));
 
-        tellerV2.pauseProtocol();
+
+
+        tellerV2.setProtocolPausingManagerSuper(address(protocolPausingManager));
+        protocolPausingManager.pauseProtocol();
+        //tellerV2.pauseProtocol();
 
         vm.expectRevert("Pausable: paused");
 
@@ -844,7 +856,10 @@ contract TellerV2_bids_test is Testable {
         tellerV2.setMockMsgSenderForMarket(address(lender));
 
         tellerV2.mock_initialize();
-        tellerV2.pauseProtocol();
+        
+        tellerV2.setProtocolPausingManagerSuper(address(protocolPausingManager));
+        protocolPausingManager.pauseProtocol();
+       
 
         vm.expectRevert("Pausable: paused");
         vm.prank(address(lender));

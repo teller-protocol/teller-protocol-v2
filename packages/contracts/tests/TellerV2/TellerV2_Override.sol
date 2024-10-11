@@ -29,6 +29,12 @@ contract TellerV2_Override is TellerV2 {
         lenderManager = ILenderManager(_lenderManager);
     }
 
+
+     function setProtocolPausingManagerSuper(address _protocolPausingManager) public {
+         _setProtocolPausingManager(_protocolPausingManager);
+    }
+
+
     function setLenderManagerSuper(address _lenderManager) public initializer {
         lenderManager = ILenderManager(_lenderManager);
     }

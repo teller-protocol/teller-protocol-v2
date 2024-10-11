@@ -12,7 +12,7 @@ import "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
 
 import "../interfaces/IHasProtocolPausingManager.sol";
 
-
+import "../interfaces/IPausableTimestamp.sol";
 
 abstract contract HasProtocolPausingManager is Initializable, ContextUpgradeable, IHasProtocolPausingManager, IPausableTimestamp {
   

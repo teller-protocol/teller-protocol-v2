@@ -11,6 +11,12 @@ import "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
+
+
+import "@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol";
+
+
+
 import "../interfaces/IProtocolPausingManager.sol";
 
 /**
@@ -22,7 +28,7 @@ import "../interfaces/IProtocolPausingManager.sol";
 
  */
 contract ProtocolPausingManager is ContextUpgradeable, OwnableUpgradeable, IProtocolPausingManager , IPausableTimestamp{
-  
+    using MathUpgradeable for uint256;
 
     bool private _protocolPaused; 
     bool private _liquidationsPaused; 

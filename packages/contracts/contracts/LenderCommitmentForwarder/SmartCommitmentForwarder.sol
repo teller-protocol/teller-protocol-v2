@@ -12,6 +12,9 @@ import "../interfaces/IPausableTimestamp.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 
+import "@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol";
+
+
 import { CommitmentCollateralType, ISmartCommitment } from "../interfaces/ISmartCommitment.sol";
 
  
@@ -22,6 +25,9 @@ contract SmartCommitmentForwarder is
     ISmartCommitmentForwarder,
     IPausableTimestamp
      {
+
+    using MathUpgradeable for uint256;
+
     event ExercisedSmartCommitment(
         address indexed smartCommitmentAddress,
         address borrower,
@@ -223,7 +229,7 @@ contract SmartCommitmentForwarder is
     returns (uint256) {
 
 
-        return Math.max(
+        return MathUpgradeable.max(
             lastUnpausedAt,
             IPausableTimestamp(_tellerV2).getLastUnpausedAt()
         )

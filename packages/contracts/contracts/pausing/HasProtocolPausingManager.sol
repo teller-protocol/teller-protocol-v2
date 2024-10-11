@@ -11,14 +11,12 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "../interfaces/IHasProtocolPausingManager.sol";
 
 import "../interfaces/IProtocolPausingManager.sol";
-
-import "../interfaces/IPausableTimestamp.sol";
+ 
 
 abstract contract HasProtocolPausingManager 
     is  
-    IHasProtocolPausingManager 
-    // IPausableTimestamp 
-     {
+    IHasProtocolPausingManager    
+    {
   
 
     bool private _reserved0;// _paused.. Deprecated , handled by pausing manager 

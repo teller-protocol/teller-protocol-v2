@@ -61,7 +61,7 @@ contract TellerV2_initialize is Testable {
         escrowVault = new Contract();
         protocolPausingManager = new Contract();
 
-        vm.expectRevert("LenderCommitmentForwarder must be a contract");
+        vm.expectRevert("LCF_ic");
 
         tellerV2.initialize(
             protocolFee,
@@ -84,7 +84,7 @@ contract TellerV2_initialize is Testable {
         escrowVault = new Contract();
         protocolPausingManager = new Contract();
 
-        vm.expectRevert("MarketRegistry must be a contract");
+        vm.expectRevert("MR_ic");
 
         tellerV2.initialize(
             protocolFee,
@@ -107,7 +107,7 @@ contract TellerV2_initialize is Testable {
         escrowVault = new Contract();
         protocolPausingManager = new Contract();
 
-        vm.expectRevert("ReputationManager must be a contract");
+        vm.expectRevert("RM_ic");
 
         tellerV2.initialize(
             protocolFee,
@@ -130,7 +130,7 @@ contract TellerV2_initialize is Testable {
         escrowVault = new Contract();
         protocolPausingManager = new Contract();
 
-        vm.expectRevert("CollateralManager must be a contract");
+        vm.expectRevert("CM_ic");
 
         tellerV2.initialize(
             protocolFee,
@@ -153,7 +153,7 @@ contract TellerV2_initialize is Testable {
         escrowVault = new Contract();
         protocolPausingManager = new Contract();
 
-        vm.expectRevert("LenderManager must be a contract");
+        vm.expectRevert("LM_ic");
 
         tellerV2.initialize(
             protocolFee,

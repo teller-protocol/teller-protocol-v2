@@ -160,7 +160,7 @@ contract TellerV2_bids_test is Testable {
 
         marketRegistryMock.mock_setGlobalMarketsClosed(true);
 
-        vm.expectRevert("Market is not open");
+        vm.expectRevert("Mkt C");
 
         tellerV2._submitBidSuper(
             address(lendingToken), // lending token
@@ -180,7 +180,7 @@ contract TellerV2_bids_test is Testable {
 
         marketRegistryMock.mock_setBorrowerIsVerified(false);
 
-        vm.expectRevert("Not verified borrower");
+        vm.expectRevert("Borrower NV");
 
         tellerV2._submitBidSuper(
             address(lendingToken), // lending token
@@ -194,6 +194,8 @@ contract TellerV2_bids_test is Testable {
     }
 
     function test_submit_bid_without_collateral() public {
+         //tellerV2.setProtocolPausingManagerSuper(address(protocolPausingManager));
+       
         tellerV2.submitBid(
             address(1), // lending token
             1, // market ID
@@ -208,6 +210,8 @@ contract TellerV2_bids_test is Testable {
     }
 
     function test_submit_bid_with_collateral() public {
+        //  tellerV2.setProtocolPausingManagerSuper(address(protocolPausingManager));
+       
         tellerV2.setCollateralManagerSuper(address(collateralManagerMock));
 
         Collateral[] memory collateral = new Collateral[](1);
@@ -230,7 +234,7 @@ contract TellerV2_bids_test is Testable {
         tellerV2.setProtocolPausingManagerSuper(address(protocolPausingManager));
         protocolPausingManager.pauseProtocol();
 
-        vm.expectRevert("Pausable: paused");
+        vm.expectRevert("Protocol paused");
         tellerV2.submitBid(
             address(1), // lending token
             1, // market ID
@@ -250,7 +254,7 @@ contract TellerV2_bids_test is Testable {
 
         Collateral[] memory collateral = new Collateral[](1);
 
-        vm.expectRevert("Pausable: paused");
+        vm.expectRevert("Protocol paused");
         tellerV2.submitBid(
             address(1), // lending token
             1, // market ID

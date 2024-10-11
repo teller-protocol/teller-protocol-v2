@@ -235,9 +235,11 @@ contract SmartCommitmentForwarder is
     returns (uint256) {
 
 
+        address pausingManager = IHasProtocolPausingManager( _tellerV2 ).getProtocolPausingManager();
+       
         return MathUpgradeable.max(
             lastUnpausedAt,
-            IPausableTimestamp(_tellerV2).getLastUnpausedAt()
+            IPausableTimestamp(pausingManager).getLastUnpausedAt()
         )
         ;
  

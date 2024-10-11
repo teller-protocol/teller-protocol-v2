@@ -31,7 +31,7 @@ contract TellerV2_Override is TellerV2 {
 
 
      function setProtocolPausingManagerSuper(address _protocolPausingManager) public {
-         _setProtocolPausingManager(_protocolPausingManager);
+         super._setProtocolPausingManager(_protocolPausingManager);
     }
 
 

@@ -203,25 +203,25 @@ contract TellerV2 is
 
         require(
             _lenderCommitmentForwarder.isContract(),
-            "LenderCommitmentForwarder must be a contract"
+            "LCF_ic"
         );
         lenderCommitmentForwarder = _lenderCommitmentForwarder;
 
         require(
             _marketRegistry.isContract(),
-            "MarketRegistry must be a contract"
+            "MR_ic"
         );
         marketRegistry = IMarketRegistry(_marketRegistry);
 
         require(
             _reputationManager.isContract(),
-            "ReputationManager must be a contract"
+            "RM_ic"
         );
         reputationManager = IReputationManager(_reputationManager);
 
         require(
             _collateralManager.isContract(),
-            "CollateralManager must be a contract"
+            "CM_ic"
         );
         collateralManager = ICollateralManager(_collateralManager);
 
@@ -241,13 +241,13 @@ contract TellerV2 is
     {
         require(
             _lenderManager.isContract(),
-            "LenderManager must be a contract"
+            "LM_ic"
         );
         lenderManager = ILenderManager(_lenderManager);
     }
 
     function _setEscrowVault(address _escrowVault) internal onlyInitializing {
-        require(_escrowVault.isContract(), "EscrowVault must be a contract");
+        require(_escrowVault.isContract(), "EV_ic");
         escrowVault = IEscrowVault(_escrowVault);
     }
 
@@ -320,7 +320,7 @@ contract TellerV2 is
 
         require(
             validation == true,
-            "Collateral balance could not be validated"
+            "C bal NV"
         );
     }
 
@@ -340,11 +340,11 @@ contract TellerV2 is
             sender
         );
 
-        require(isVerified, "Not verified borrower");
+        require(isVerified, "Borrower NV");
 
         require(
             marketRegistry.isMarketOpen(_marketplaceId),
-            "Market is not open"
+            "Mkt C"
         );
 
         // Set response bid ID.
@@ -415,7 +415,7 @@ contract TellerV2 is
             revert ActionNotAllowed({
                 bidId: _bidId,
                 action: "cancelBid",
-                message: "Only the bid owner can cancel!"
+                message: "Only the bid owner can cancel!"  //this is a TON of storage space
             });
         }
         _cancelBid(_bidId);
@@ -433,7 +433,7 @@ contract TellerV2 is
             revert ActionNotAllowed({
                 bidId: _bidId,
                 action: "marketOwnerCancelBid",
-                message: "Only the market owner can cancel!"
+                message: "Only the market owner can cancel!" //this is a TON of storage space 
             });
         }
         _cancelBid(_bidId);
@@ -784,13 +784,6 @@ contract TellerV2 is
             owedPrincipal + interest,
             false
         );
-
-        /*
-         _getCollateralManagerForBid(_bidId).liquidateCollateral(
-            _bidId,
-            _recipient
-        ); 
-      */
 
         collateralManager.liquidateCollateral(_bidId, _recipient);
 
@@ -1243,10 +1236,7 @@ contract TellerV2 is
         view
         returns (PaymentCycleType)
     {
-        /* bytes32 bidTermsId = bidMarketTermsId[_bidId];
-        if (bidTermsId != bytes32(0)) {
-            return marketRegistry.getPaymentCycleTypeForTerms(bidTermsId);
-        }*/
+         
 
         return bidPaymentCycleType[_bidId];
     }
@@ -1256,11 +1246,7 @@ contract TellerV2 is
         view
         returns (uint32)
     {
-        /*bytes32 bidTermsId = bidMarketTermsId[_bidId];
-
-        if (bidTermsId != bytes32(0)) {
-            return marketRegistry.getPaymentCycleDurationForTerms(bidTermsId);
-        }*/
+        
 
         Bid storage bid = bids[_bidId];
 
@@ -1272,10 +1258,7 @@ contract TellerV2 is
         view
         returns (uint32)
     {
-        /* bytes32 bidTermsId = bidMarketTermsId[_bidId];
-        if (bidTermsId != bytes32(0)) {
-            return marketRegistry.getPaymentDefaultDurationForTerms(bidTermsId);
-        }*/
+       
 
         return bidDefaultDuration[_bidId];
     }

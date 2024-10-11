@@ -25,19 +25,20 @@ abstract contract HasProtocolPausingManager
   
 
     modifier whenLiquidationsNotPaused() {
-        require(! IProtocolPausingManager(_protocolPausingManager). liquidationsPaused(), "Liquidations are paused");
+        require(! IProtocolPausingManager(_protocolPausingManager). liquidationsPaused() );
       
         _;
     }
 
     //rename to when protocol not paused ?
     modifier whenProtocolNotPaused() {
-         require(! IProtocolPausingManager(_protocolPausingManager). protocolPaused(), "Liquidations are paused");
+         require(! IProtocolPausingManager(_protocolPausingManager). protocolPaused() );
       
         _;
     }
  
 
+        //onlyinitializing? 
     function _setProtocolPausingManager(address protocolPausingManager) internal {
         _protocolPausingManager == protocolPausingManager ;
     }

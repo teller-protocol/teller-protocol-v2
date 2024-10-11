@@ -145,7 +145,7 @@ contract TellerV2 is
      */
     modifier pendingBid(uint256 _bidId, string memory _action) {
         if (bids[_bidId].state != BidState.PENDING) {
-            revert ActionNotAllowed(_bidId, _action, "Bid must be pending");
+            revert ActionNotAllowed(_bidId, _action, "Bid not pending");
         }
 
         _;
@@ -158,7 +158,7 @@ contract TellerV2 is
      */
     modifier acceptedLoan(uint256 _bidId, string memory _action) {
         if (bids[_bidId].state != BidState.ACCEPTED) {
-            revert ActionNotAllowed(_bidId, _action, "Loan must be accepted");
+            revert ActionNotAllowed(_bidId, _action, "Loan not accepted");
         }
 
         _;
@@ -415,7 +415,7 @@ contract TellerV2 is
             revert ActionNotAllowed({
                 bidId: _bidId,
                 action: "cancelBid",
-                message: "Only the bid owner can cancel!"  //this is a TON of storage space
+                message: "Not bid owner"  //this is a TON of storage space
             });
         }
         _cancelBid(_bidId);
@@ -433,7 +433,7 @@ contract TellerV2 is
             revert ActionNotAllowed({
                 bidId: _bidId,
                 action: "marketOwnerCancelBid",
-                message: "Only the market owner can cancel!" //this is a TON of storage space 
+                message: "Not market owner" //this is a TON of storage space 
             });
         }
         _cancelBid(_bidId);

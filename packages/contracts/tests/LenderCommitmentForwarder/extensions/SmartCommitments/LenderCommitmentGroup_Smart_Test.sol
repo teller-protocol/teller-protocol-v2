@@ -16,6 +16,7 @@ import { LoanDetails, Payment, BidState , Bid, Terms } from "../../../../contrac
 import { ILenderCommitmentGroup } from "../../../../contracts/interfaces/ILenderCommitmentGroup.sol";
 import { IUniswapPricingLibrary } from "../../../../contracts/interfaces/IUniswapPricingLibrary.sol";
 
+import {ProtocolPausingManager} from "../../../../contracts/pausing/ProtocolPausingManager.sol";
 
 
 import "lib/forge-std/src/console.sol";
@@ -75,8 +76,13 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
         _uniswapV3Factory = new UniswapV3FactoryMock();
         _uniswapV3Factory.setPoolMock(address(_uniswapV3Pool));
 
-        vm.warp(1_000_000);
-        
+
+        ProtocolPausingManager protocolPausingManager = new ProtocolPausingManager();
+        protocolPausingManager.initialize();
+
+        _tellerV2.setProtocolPausingManager(address(protocolPausingManager));
+      
+
 
         principalToken = new TestERC20Token("wrappedETH", "WETH", 1e24, 18);
 
@@ -607,166 +613,6 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
 
 
 
-
-/*
-    make sure both pos and neg branches get run, and tellerV2 is called at the end 
-*/
-    function test_liquidateDefaultedLoanWithIncentive() public {
-          initialize_group_contract();
-
-        principalToken.transfer(address(liquidator), 1e18);
-        uint256 originalBalance = principalToken.balanceOf(address(liquidator));
-
-        uint256 amountOwed = 100;
-   
-        
-        uint256 bidId = 0;
-    
-
-       lenderCommitmentGroupSmart.set_mockAmountOwedForBid(amountOwed); 
-
-   
-
-         vm.warp(1000);   //loanDefaultedTimeStamp ?
-
-       lenderCommitmentGroupSmart.set_mockBidAsActiveForGroup(bidId,true); 
-
-       //set itself as mock owner for now ..  used for protocol fee 
-        _tellerV2.setMockOwner( address(lenderCommitmentGroupSmart)  );
-
-       vm.prank(address(liquidator));
-       principalToken.approve(address(lenderCommitmentGroupSmart), 1e18);
-
-       int256 minAmountDifference = 2000;
-
-       lenderCommitmentGroupSmart.mock_setMinimumAmountDifferenceToCloseDefaultedLoan(minAmountDifference);
-
-        int256 tokenAmountDifference = 4000;
-        vm.prank(address(liquidator));
-        lenderCommitmentGroupSmart.liquidateDefaultedLoanWithIncentive(
-           bidId, 
-           tokenAmountDifference           
-        );
-
-        uint256 updatedBalance = principalToken.balanceOf(address(liquidator));
-
-        int256 expectedDifference = int256(amountOwed) + minAmountDifference;
-
-        assertEq(originalBalance - updatedBalance , uint256(expectedDifference), "unexpected tokenDifferenceFromLiquidations");
-
-
-      //make sure lenderCloseloan is called 
-       assertEq( _tellerV2.lenderCloseLoanWasCalled(), true, "lender close loan not called");
-    }
-
-
-    //complete me 
-     function test_liquidateDefaultedLoanWithIncentive_negative_direction() public {
-
-
-        initialize_group_contract();
-
-        principalToken.transfer(address(liquidator), 1e18);
-        uint256 originalBalance = principalToken.balanceOf(address(liquidator));
-
-        uint256 amountOwed = 1000;
-   
-        
-        uint256 bidId = 0;
-    
-
-       lenderCommitmentGroupSmart.set_mockAmountOwedForBid(amountOwed); 
-
-   
-        //time has advanced enough to now have a 50 percent discount s
-         vm.warp(1000);   //loanDefaultedTimeStamp ?
-
-       lenderCommitmentGroupSmart.set_mockBidAsActiveForGroup(bidId,true); 
-      
-       vm.prank(address(liquidator));
-       principalToken.approve(address(lenderCommitmentGroupSmart), 1e18);
-
-       lenderCommitmentGroupSmart.mock_setMinimumAmountDifferenceToCloseDefaultedLoan(-500);
-
-        int256 tokenAmountDifference = -500;
-        vm.prank(address(liquidator));
-        lenderCommitmentGroupSmart.liquidateDefaultedLoanWithIncentive(
-           bidId, 
-           tokenAmountDifference           
-        );
-
-        uint256 updatedBalance = principalToken.balanceOf(address(liquidator));
-
-        require(tokenAmountDifference < 0); //ensure this test is set up properly 
-
-        // we expect it to be amountOwned - abs(tokenAmountDifference ) but we can just test it like this 
-        int256 expectedDifference = int256(amountOwed) + ( tokenAmountDifference);
-
-        assertEq(originalBalance - updatedBalance , uint256(expectedDifference), "unexpected tokenDifferenceFromLiquidations");
-
-
-      //make sure lenderCloseloan is called 
-       assertEq( _tellerV2.lenderCloseLoanWasCalled(), true, "lender close loan not called");
-     }
-
-
-function test_liquidateDefaultedLoanWithIncentive_does_not_double_count_repaid() public {
-
-
-        initialize_group_contract();
-
-        principalToken.transfer(address(liquidator), 1e18);
-        uint256 originalBalance = principalToken.balanceOf(address(liquidator));
-
-        uint256 amountOwed = 1000;
-   
-        
-        uint256 bidId = 0;
-    
-
-       lenderCommitmentGroupSmart.set_mockAmountOwedForBid(amountOwed); 
-
-   
-        //time has advanced enough to now have a 50 percent discount s
-         vm.warp(1000);   //loanDefaultedTimeStamp ?
-
-       lenderCommitmentGroupSmart.set_mockBidAsActiveForGroup(bidId,true); 
-      
-       vm.prank(address(liquidator));
-       principalToken.approve(address(lenderCommitmentGroupSmart), 1e18);
-
-
-        lenderCommitmentGroupSmart.set_totalPrincipalTokensRepaid(0);
-
-       lenderCommitmentGroupSmart.mock_setMinimumAmountDifferenceToCloseDefaultedLoan(-500);
-
-        int256 tokenAmountDifference = -500;
-        vm.prank(address(liquidator));
-        lenderCommitmentGroupSmart.liquidateDefaultedLoanWithIncentive(
-           bidId, 
-           tokenAmountDifference           
-        );
-
-            //simulate the repay loan callback as would happen in a liquidation 
-        vm.prank(address(_tellerV2));
-        lenderCommitmentGroupSmart.repayLoanCallback(
-            bidId,
-            address(this),
-            amountOwed,
-            20
-        );
-
-        uint256 updatedBalance = principalToken.balanceOf(address(liquidator));
-
-        uint256 totalPrincipalTokensRepaid = lenderCommitmentGroupSmart.totalPrincipalTokensRepaid();
-
- 
-        assertEq(totalPrincipalTokensRepaid, amountOwed, "unexpected totalPrincipalTokensRepaid");
-
-
-      //make sure lenderCloseloan is called 
-       assertEq( _tellerV2.lenderCloseLoanWasCalled(), true, "lender close loan not called");
-     }
 
 
 

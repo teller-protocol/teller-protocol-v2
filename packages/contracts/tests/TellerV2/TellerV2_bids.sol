@@ -65,6 +65,10 @@ contract TellerV2_bids_test is Testable {
         collateralManagerMock = new CollateralManagerMock();
         lenderManagerMock = new LenderManagerMock();
         protocolPausingManager = new ProtocolPausingManager();
+        protocolPausingManager.initialize();
+
+        tellerV2.setProtocolPausingManagerSuper(address(protocolPausingManager));
+      
 
         borrower = new User();
         lender = new User();
@@ -448,7 +452,7 @@ contract TellerV2_bids_test is Testable {
         protocolPausingManager.pauseProtocol();
         //tellerV2.pauseProtocol();
 
-        vm.expectRevert("Pausable: paused");
+        vm.expectRevert("Protocol paused");
 
         tellerV2.lenderAcceptBid(bidId);
     }
@@ -821,6 +825,8 @@ contract TellerV2_bids_test is Testable {
         uint256 bidId = 1;
         setMockBid(bidId);
 
+        tellerV2.setProtocolPausingManagerSuper(address(protocolPausingManager));
+
         tellerV2.setLenderManagerSuper(address(lenderManagerMock));
 
         tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
@@ -836,6 +842,9 @@ contract TellerV2_bids_test is Testable {
     function test_claim_loan_nft_invalid_as_borrower() public {
         uint256 bidId = 1;
         setMockBid(bidId);
+
+        tellerV2.setProtocolPausingManagerSuper(address(protocolPausingManager));
+       
 
         tellerV2.setLenderManagerSuper(address(lenderManagerMock));
 
@@ -865,7 +874,7 @@ contract TellerV2_bids_test is Testable {
         protocolPausingManager.pauseProtocol();
        
 
-        vm.expectRevert("Pausable: paused");
+        vm.expectRevert("Protocol paused");
         vm.prank(address(lender));
         tellerV2.claimLoanNFT(bidId);
     }

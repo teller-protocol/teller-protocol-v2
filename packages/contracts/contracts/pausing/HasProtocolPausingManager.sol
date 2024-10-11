@@ -16,8 +16,9 @@ import "../interfaces/IPausableTimestamp.sol";
 
 abstract contract HasProtocolPausingManager 
     is  
-    IHasProtocolPausingManager, 
-    IPausableTimestamp  {
+    IHasProtocolPausingManager 
+    // IPausableTimestamp 
+     {
   
 
     bool private _reserved0;// _paused.. Deprecated , handled by pausing manager 
@@ -49,8 +50,9 @@ abstract contract HasProtocolPausingManager
         return _protocolPausingManager;
     }
 
-  
-     function isPauser(address _address) public view returns (bool){
+    
+    /* 
+    function isPauser(address _address) public view returns (bool){
 
         return IProtocolPausingManager(_protocolPausingManager). isPauser(_address) ;
     }
@@ -62,6 +64,7 @@ abstract contract HasProtocolPausingManager
         return IPausableTimestamp(_protocolPausingManager).getLastUnpausedAt();
 
     } 
+    */
 
  
 

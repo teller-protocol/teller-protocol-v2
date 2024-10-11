@@ -19,6 +19,9 @@ import "@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol";
 
 import "../interfaces/IProtocolPausingManager.sol";
 
+
+import "../interfaces/IPausableTimestamp.sol";
+
 /**
  
  TODO:
@@ -42,31 +45,33 @@ contract ProtocolPausingManager is ContextUpgradeable, OwnableUpgradeable, IProt
 
     uint256 private lastPausedAt;
     uint256 private lastUnpausedAt;
+
+
+    // Events
+    event PausedProtocol(address indexed account);
+    event UnpausedProtocol(address indexed account);
+    event PausedLiquidations(address indexed account);
+    event UnpausedLiquidations(address indexed account);
+    event PauserAdded(address indexed account);
+    event PauserRemoved(address indexed account);
     
-     
-    /**
-     * @dev Modifier to make a function callable only when the contract is not paused.
-     *
-     * Requirements:
-     *
-     * - The contract must not be paused.
-     */
-    modifier whenNotPaused() {
-        _requireNotPaused();
+ 
+    modifier onlyPauser() {
+        require( isPauser( _msgSender()) );
         _;
     }
 
-    /**
-     * @dev Modifier to make a function callable only when the contract is paused.
-     *
-     * Requirements:
-     *
-     * - The contract must be paused.
-     */
-    modifier whenPaused() {
-        _requirePaused();
-        _;
+
+    //need to initialize so owner is owner (transfer ownership to safe)
+
+    function initialize(
+        
+    ) external initializer {
+
+        __Ownable_init();
+
     }
+ 
 
     /**
      * @dev Returns true if the contract is paused, and false otherwise.
@@ -75,37 +80,65 @@ contract ProtocolPausingManager is ContextUpgradeable, OwnableUpgradeable, IProt
         return _protocolPaused;
     }
 
-    /**
-     * @dev Throws if the contract is paused.
-     */
+
+      function liquidationsPaused() public view virtual returns (bool) {
+        return _liquidationsPaused;
+    }
+
+   
+   /*
     function _requireNotPaused() internal view virtual {
         require(!paused(), "Pausable: paused");
     }
 
-    /**
-     * @dev Throws if the contract is not paused.
-     */
-    function _requirePaused() internal view virtual {
+         function _requirePaused() internal view virtual {
         require(paused(), "Pausable: not paused");
     }
-
+    */
    
 
 
 
 
-    function pauseProtocol() public virtual onlyPauser whenNotPaused {
-          _paused = true;
-        emit Paused(_msgSender());
+    function pauseProtocol() public virtual onlyPauser {
+        require( _protocolPaused == false);
+          _protocolPaused = true;
+          lastPausedAt = block.timestamp;
+        emit PausedProtocol(_msgSender());
     }
 
      
-    function unpauseProtocol() public virtual onlyPauser whenPaused {
-       _paused = false;
-        emit Unpaused(_msgSender());
+    function unpauseProtocol() public virtual onlyPauser {
+       
+        require( _protocolPaused == true);
+        _protocolPaused = false;
+       lastUnpausedAt = block.timestamp;
+        emit UnpausedProtocol(_msgSender());
     }
 
+    function pauseLiquidations() public virtual onlyPauser  {
+         
+         require( _liquidationsPaused == false);
+          _liquidationsPaused = true;
+          lastPausedAt = block.timestamp;
+        emit PausedLiquidations(_msgSender());
+    }
 
+     
+    function unpauseLiquidations() public virtual onlyPauser  {
+        require( _liquidationsPaused == true);
+        _liquidationsPaused = false;
+       lastUnpausedAt = block.timestamp;
+        emit UnpausedLiquidations(_msgSender());
+    }
+
+    function getLastPausedAt() 
+    external view 
+    returns (uint256) {
+
+        return lastPausedAt;
+
+    } 
 
 
     function getLastUnpausedAt() 
@@ -124,16 +157,18 @@ contract ProtocolPausingManager is ContextUpgradeable, OwnableUpgradeable, IProt
 
     function addPauser(address _pauser) public virtual onlyOwner   {
        pauserRoleBearer[_pauser] = true;
+       emit PauserAdded(_pauser);
     }
 
 
     function removePauser(address _pauser) public virtual onlyOwner {
         pauserRoleBearer[_pauser] = false;
+        emit PauserRemoved(_pauser);
     }
 
 
     function isPauser(address _account) public view returns(bool){
-        return pauserRoleBearer[_account] ;
+        return pauserRoleBearer[_account] || _account == owner() ;
     }
 
   

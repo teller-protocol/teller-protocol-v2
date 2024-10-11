@@ -228,7 +228,7 @@ contract TellerV2 is
 
         _setLenderManager(_lenderManager);
         _setEscrowVault(_escrowVault);
-        __HasProtocolPausingManager_init(_protocolPausingManager, _msgSender());
+        __HasProtocolPausingManager_init(_protocolPausingManager);
     }
 
     /* function setEscrowVault(address _escrowVault) external reinitializer(9) {
@@ -271,7 +271,7 @@ contract TellerV2 is
         uint16 _APR,
         string calldata _metadataURI,
         address _receiver
-    ) public override whenNotPaused returns (uint256 bidId_) {
+    ) public override whenProtocolNotPaused returns (uint256 bidId_) {
         bidId_ = _submitBid(
             _lendingToken,
             _marketplaceId,
@@ -303,7 +303,7 @@ contract TellerV2 is
         string calldata _metadataURI,
         address _receiver,
         Collateral[] calldata _collateralInfo
-    ) public override whenNotPaused returns (uint256 bidId_) {
+    ) public override whenProtocolNotPaused returns (uint256 bidId_) {
         bidId_ = _submitBid(
             _lendingToken,
             _marketplaceId,
@@ -465,7 +465,7 @@ contract TellerV2 is
         external
         override
         pendingBid(_bidId, "lenderAcceptBid")
-        whenNotPaused
+        whenProtocolNotPaused
         returns (
             uint256 amountToProtocol,
             uint256 amountToMarketplace,
@@ -561,7 +561,7 @@ contract TellerV2 is
     function claimLoanNFT(uint256 _bidId)
         external
         acceptedLoan(_bidId, "claimLoanNFT")
-        whenNotPaused
+        whenProtocolNotPaused
     {
         // Retrieve bid
         Bid storage bid = bids[_bidId];
@@ -694,7 +694,7 @@ contract TellerV2 is
 
 
     function lenderCloseLoan(uint256 _bidId)
-        external whenNotPaused whenLiquidationsNotPaused
+        external whenProtocolNotPaused whenLiquidationsNotPaused
         acceptedLoan(_bidId, "lenderClaimCollateral")
     {
         Bid storage bid = bids[_bidId];
@@ -710,7 +710,7 @@ contract TellerV2 is
     function lenderCloseLoanWithRecipient(
         uint256 _bidId,
         address _collateralRecipient
-    ) external whenNotPaused whenLiquidationsNotPaused {
+    ) external whenProtocolNotPaused whenLiquidationsNotPaused {
         _lenderCloseLoanWithRecipient(_bidId, _collateralRecipient);
     }
 
@@ -737,7 +737,7 @@ contract TellerV2 is
      * @param _bidId The id of the loan to make the payment towards.
      */
     function liquidateLoanFull(uint256 _bidId)
-        external whenNotPaused whenLiquidationsNotPaused
+        external whenProtocolNotPaused whenLiquidationsNotPaused
         acceptedLoan(_bidId, "liquidateLoan")
     {
         Bid storage bid = bids[_bidId];
@@ -749,7 +749,7 @@ contract TellerV2 is
     }
 
     function liquidateLoanFullWithRecipient(uint256 _bidId, address _recipient)
-        external whenNotPaused whenLiquidationsNotPaused
+        external whenProtocolNotPaused whenLiquidationsNotPaused
         acceptedLoan(_bidId, "liquidateLoan")
     {
         _liquidateLoanFull(_bidId, _recipient);

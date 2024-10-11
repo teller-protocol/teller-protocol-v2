@@ -13,6 +13,7 @@ interface IHasProtocolPausingManager {
      
    function getProtocolPausingManager() external view returns (address); 
 
+   function isPauser(address _address) external view returns (bool); 
 
 
 }

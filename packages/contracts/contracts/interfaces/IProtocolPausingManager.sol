@@ -8,12 +8,12 @@ pragma solidity ^0.8.0;
 
 
 //records the unpause timestamp s
-interface IPausableTimestamp {
+interface IProtocolPausingManager {
     
-    
-    
-   // function setLastUnpausedAt() internal;
-
-
+   function isPauser(address _address) external view returns (bool);
+   function protocolPaused() external view returns (bool);
+   function liquidationsPaused() external view returns (bool);
+   
+ 
 
 }

@@ -9,6 +9,8 @@ import "./LenderCommitmentForwarder_G1.sol";
 
 import "../interfaces/IPausableTimestamp.sol";
 
+import "../interfaces/IHasProtocolPausingManager.sol";
+
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 
@@ -40,7 +42,7 @@ contract SmartCommitmentForwarder is
 
 
     modifier onlyProtocolPauser() { 
-        require( ITellerV2( _tellerV2 ).isPauser(_msgSender()) , "Sender not authorized");
+        require( IHasProtocolPausingManager( _tellerV2 ).isPauser(_msgSender()) , "Sender not authorized");
         _;
     }
 

@@ -42,6 +42,7 @@ contract TellerV2_Test is Testable {
     WethMock wethMock;
     TestERC20Token daiMock;
     CollateralManager collateralManager;
+    ProtocolPausingManager protocolPausingManager;
 
     uint256 marketId1;
     uint256 collateralAmount = 10;
@@ -81,7 +82,7 @@ contract TellerV2_Test is Testable {
         EscrowVault escrowVault = new EscrowVault();
         escrowVault.initialize();
 
-        ProtocolPausingManager protocolPausingManager = new ProtocolPausingManager();
+        protocolPausingManager = new ProtocolPausingManager();
         protocolPausingManager.initialize();
 
         // Deploy LenderCommitmentForwarder
@@ -171,6 +172,9 @@ contract TellerV2_Test is Testable {
     }
 
     function test_collateralEscrow() public {
+
+          
+
         // Submit bid as borrower
         uint256 bidId = submitCollateralBid();
         // Accept bid as lender

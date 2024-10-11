@@ -278,7 +278,7 @@ contract TellerV2_bids_test is Testable {
 
         collateralManagerMock.forceSetCommitCollateralValidation(false);
 
-        vm.expectRevert("Collateral balance could not be validated");
+        vm.expectRevert("C bal NV");
         tellerV2.submitBid(
             address(1), // lending token
             1, // market ID
@@ -321,7 +321,7 @@ contract TellerV2_bids_test is Testable {
                 ActionNotAllowed.selector,
                 bidId,
                 "cancelBid",
-                "Only the bid owner can cancel!"
+                "Not bid owner"
             )
         );
         tellerV2.cancelBid(bidId);
@@ -421,7 +421,7 @@ contract TellerV2_bids_test is Testable {
                 ActionNotAllowed.selector,
                 bidId,
                 "lenderAcceptBid",
-                "Bid must be pending"
+                "Bid not pending"
             )
         );
 
@@ -660,7 +660,7 @@ contract TellerV2_bids_test is Testable {
                 ActionNotAllowed.selector,
                 bidId,
                 "repayLoan",
-                "Loan must be accepted"
+                "Loan not accepted"
             )
         );
 
@@ -701,7 +701,7 @@ contract TellerV2_bids_test is Testable {
                 ActionNotAllowed.selector,
                 bidId,
                 "repayLoan",
-                "Loan must be accepted"
+                "Loan not accepted"
             )
         );
 
@@ -812,7 +812,7 @@ contract TellerV2_bids_test is Testable {
                 ActionNotAllowed.selector,
                 bidId,
                 "liquidateLoan",
-                "Loan must be accepted"
+                "Loan not accepted"
             )
         );
         tellerV2.liquidateLoanFull(bidId);

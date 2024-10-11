@@ -16,10 +16,7 @@ contract TellerV2_Override is TellerV2 {
 
     constructor() TellerV2(address(0)) {}
 
-    function mock_pause(bool _shouldPause) public {
-        _shouldPause ? _pause() : _unpause();
-    }
-
+  
     function mock_setBid(uint256 bidId, Bid memory bid) public {
         bids[bidId] = bid;
     }
@@ -81,7 +78,7 @@ contract TellerV2_Override is TellerV2 {
     function mock_initialize() public initializer {
         __ProtocolFee_init(0);
 
-        __Pausable_init();
+      //  __Pausable_init();
     }
 
     function setMockMsgSenderForMarket(address _sender) public {

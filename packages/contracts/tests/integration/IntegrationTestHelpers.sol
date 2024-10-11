@@ -11,6 +11,8 @@ import "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
 import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
 
 import { MarketRegistry } from "../../contracts/MarketRegistry.sol";
+
+import { ProtocolPausingManager } from "../../contracts/pausing/ProtocolPausingManager.sol";
 import { EscrowVault } from "../../contracts/EscrowVault.sol";
 import { LenderManager } from "../../contracts/LenderManager.sol";
 import { LenderCommitmentForwarder_G3 } from "../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarder_G3.sol";
@@ -57,7 +59,9 @@ library IntegrationTestHelpers {
             IMarketRegistry(_marketRegistry)
         );
         EscrowVault _escrowVault = new EscrowVault();
+        ProtocolPausingManager _protocolPausingManager = new ProtocolPausingManager();
 
+        _protocolPausingManager.initialize();  //need to xfer ownership ..?
         _collateralManager.initialize(address(escrowBeacon), address(tellerV2));
         _lenderManager.initialize();
         _reputationManager.initialize(address(tellerV2));
@@ -69,7 +73,8 @@ library IntegrationTestHelpers {
             address(_lenderCommitmentForwarder),
             address(_collateralManager),
             address(_lenderManager),
-            address(_escrowVault)
+            address(_escrowVault),
+            address(_protocolPausingManager)
         );
 
         return tellerV2;

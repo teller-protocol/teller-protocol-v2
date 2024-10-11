@@ -30,6 +30,7 @@ import { BidState, Payment } from "../../contracts/TellerV2Storage.sol";
 import "../../contracts/MetaForwarder.sol";
 import { LenderManager } from "../../contracts/LenderManager.sol";
 import { EscrowVault } from "../../contracts/EscrowVault.sol";
+import { ProtocolPausingManager } from "../../contracts/pausing/ProtocolPausingManager.sol";
 
 contract TellerV2_Test is Testable {
     TellerV2User private marketOwner;
@@ -80,6 +81,9 @@ contract TellerV2_Test is Testable {
         EscrowVault escrowVault = new EscrowVault();
         escrowVault.initialize();
 
+        ProtocolPausingManager protocolPausingManager = new ProtocolPausingManager();
+        protocolPausingManager.initialize();
+
         // Deploy LenderCommitmentForwarder
         LenderCommitmentForwarder_G1 lenderCommitmentForwarder = new LenderCommitmentForwarder_G1(
                 address(tellerV2),
@@ -94,7 +98,8 @@ contract TellerV2_Test is Testable {
             address(lenderCommitmentForwarder),
             address(collateralManager),
             address(lenderManager),
-            address(escrowVault)
+            address(escrowVault),
+            address(protocolPausingManager)
         );
 
         // Instantiate users & balances

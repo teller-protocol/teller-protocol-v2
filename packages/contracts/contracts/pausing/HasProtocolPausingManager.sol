@@ -5,14 +5,8 @@ pragma solidity ^0.8.0;
 
  
  
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-
-import "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
-
-import "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
-
+ 
 
 import "../interfaces/IHasProtocolPausingManager.sol";
 
@@ -20,24 +14,16 @@ import "../interfaces/IProtocolPausingManager.sol";
 
 import "../interfaces/IPausableTimestamp.sol";
 
-abstract contract HasProtocolPausingManager is Initializable, ContextUpgradeable, IHasProtocolPausingManager, IPausableTimestamp, OwnableUpgradeable {
+abstract contract HasProtocolPausingManager 
+    is  
+    IHasProtocolPausingManager, 
+    IPausableTimestamp  {
   
 
     bool private _reserved0;// _paused.. Deprecated , handled by pausing manager 
 
     address private _protocolPausingManager;
- 
-     
-
-
-     modifier onlyPauserRoleOrOwner() {
-
-        require(  IProtocolPausingManager(_protocolPausingManager). isPauser(_msgSender()) , "Requires role: Pauser");
-       
-
-        _;
-    }
-
+  
 
     modifier whenLiquidationsNotPaused() {
         require(! IProtocolPausingManager(_protocolPausingManager). liquidationsPaused(), "Liquidations are paused");
@@ -51,14 +37,10 @@ abstract contract HasProtocolPausingManager is Initializable, ContextUpgradeable
       
         _;
     }
+ 
 
-
-
-
-    function __HasProtocolPausingManager_init(address protocolPausingManager) internal onlyInitializing {
+    function _setProtocolPausingManager(address protocolPausingManager) internal {
         _protocolPausingManager == protocolPausingManager ;
-        //OwnableUpgradeable(_protocolPausingManager).__Ownable_init();
-        //OwnableUpgradeable(_protocolPausingManager).transferOwnership(newOwner); //effectively same as ownable init 
     }
 
 
@@ -81,12 +63,7 @@ abstract contract HasProtocolPausingManager is Initializable, ContextUpgradeable
 
     } 
 
-
-
  
-
-
-
 
     /**
      * @dev This empty reserved space is put in place to allow future versions to add new

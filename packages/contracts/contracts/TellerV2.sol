@@ -6,8 +6,7 @@ import "./ProtocolFee.sol";
 import "./TellerV2Storage.sol";
 import "./TellerV2Context.sol";
 import "./pausing/HasProtocolPausingManager.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol"; 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol";
 
@@ -228,7 +227,7 @@ contract TellerV2 is
 
         _setLenderManager(_lenderManager);
         _setEscrowVault(_escrowVault);
-        __HasProtocolPausingManager_init(_protocolPausingManager);
+        _setProtocolPausingManager(_protocolPausingManager);
     }
 
     /* function setEscrowVault(address _escrowVault) external reinitializer(9) {

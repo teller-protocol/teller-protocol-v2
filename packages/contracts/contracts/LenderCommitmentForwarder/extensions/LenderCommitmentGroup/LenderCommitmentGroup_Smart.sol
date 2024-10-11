@@ -726,6 +726,8 @@ contract LenderCommitmentGroup_Smart is
             );
 
             totalPrincipalTokensRepaid += amountDue;
+
+            //this will make tokenDifference go more negative
             tokenDifferenceFromLiquidations -= int256(tokensToGiveToSender);
 
            

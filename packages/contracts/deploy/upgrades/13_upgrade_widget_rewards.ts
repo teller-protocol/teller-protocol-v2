@@ -68,11 +68,11 @@ deployFn.skip = async (hre) => {
     !hre.network.live ||
     ![
       'localhost',
-   //   'polygon',
-     // 'arbitrum',
-     // 'base',
-     // 'mainnet',
-     // 'sepolia'  
+      'polygon',
+      'arbitrum',
+      'base',
+      'mainnet',
+      'sepolia'  
       
     ].includes(hre.network.name)
   )

@@ -19,25 +19,7 @@ const deployFn: DeployFunction = async (hre) => {
   const marketRegistry = await hre.contracts.get('MarketRegistry')
 
   const protocolPausingManager = await hre.contracts.get('ProtocolPausingManager')
-/*
-wont work due to arg ? 
-
-  let tellerV2LegacyAddress = "0xd177f4b8e348b4c56c2ac8e03b58e41b79351a7f";
-  let tellerV2LegacyImpl = await hre.ethers.getContractFactory('TellerV2Legacy',
-    {
-      libraries: {
-        V2Calculations: v2Calculations.address,
-      },
-    }
-  );
-
-  await hre.upgrades.forceImport(
-
-    tellerV2LegacyAddress,
-    tellerV2LegacyImpl,
-    
-  );
-*/
+ 
 
 
   await hre.upgrades.proposeBatchTimelock({
@@ -46,6 +28,8 @@ wont work due to arg ?
 # TellerV2
 
 * Adds pausing manager contract link.
+* Updates the collateral manager to be able to be paused 
+* Updates the SCF to be able to pause all lender pools 
 `,
     _steps: [
       {
@@ -95,6 +79,33 @@ wont work due to arg ?
           ],
         },
       },
+
+
+      //also need the latest code for lender pools ! 
+      /*
+      {
+        beacon: lenderCommitmentGroupBeaconProxy,
+        implFactory: await hre.ethers.getContractFactory('LenderCommitmentGroup_Smart', {
+          libraries: {
+            UniswapPricingLibrary: uniswapPricingLibrary.address,
+          },
+        }),
+
+        opts: {
+          unsafeSkipStorageCheck: true, 
+          unsafeAllow: [
+            'constructor',
+            'state-variable-immutable',
+            'external-library-linking',
+          ],
+          constructorArgs: [
+            tellerV2Address,
+            smartCommitmentForwarderAddress,
+            uniswapV3FactoryAddress,
+
+          ],
+        },
+      },*/
        
     ],
   })

@@ -225,32 +225,41 @@ contract TellerV2 is
         );
         collateralManager = ICollateralManager(_collateralManager);
 
-        _setLenderManager(_lenderManager);
-        _setEscrowVault(_escrowVault);
+       
+       
+        require(
+            _lenderManager.isContract(),
+            "LM_ic"
+        );
+        lenderManager = ILenderManager(_lenderManager);
+
+
+         
+
+         require(_escrowVault.isContract(), "EV_ic");
+        escrowVault = IEscrowVault(_escrowVault);
+
+
+
+
         _setProtocolPausingManager(_protocolPausingManager);
     }
+
 
     /* function setEscrowVault(address _escrowVault) external reinitializer(9) {
         _setEscrowVault(_escrowVault);
     }
     */
 
-    function _setLenderManager(address _lenderManager)
-        internal
-        onlyInitializing
-    {
-        require(
-            _lenderManager.isContract(),
-            "LM_ic"
-        );
-        lenderManager = ILenderManager(_lenderManager);
-    }
 
-    function _setEscrowVault(address _escrowVault) internal onlyInitializing {
-        require(_escrowVault.isContract(), "EV_ic");
-        escrowVault = IEscrowVault(_escrowVault);
-    }
+     function setProtocolPausingManager(         
+        address _protocolPausingManager
+    ) external onlyOwner reinitializer(10) {
 
+         _setProtocolPausingManager(_protocolPausingManager);
+
+    }
+ 
     
     /**
      * @notice Function for a borrower to create a bid for a loan without Collateral.
@@ -480,14 +489,14 @@ contract TellerV2 is
             bid.marketplaceId,
             sender
         );
-        require(isVerified, "Not verified lender");
+        require(isVerified, "NV");
 
         require(
             !marketRegistry.isMarketClosed(bid.marketplaceId),
             "Market is closed"
         );
 
-        require(!isLoanExpired(_bidId), "Bid has expired");
+        require(!isLoanExpired(_bidId), "BE");
 
         // Set timestamp
         bid.loanDetails.acceptedTimestamp = uint32(block.timestamp);
@@ -566,7 +575,7 @@ contract TellerV2 is
         Bid storage bid = bids[_bidId];
 
         address sender = _msgSenderForMarket(bid.marketplaceId);
-        require(sender == bid.lender, "only lender can claim NFT");
+        require(sender == bid.lender, "NV Lender");
 
         // set lender address to the lender manager so we know to check the owner of the NFT for the true lender
         bid.lender = address(USING_LENDER_MANAGER);
@@ -717,13 +726,13 @@ contract TellerV2 is
         uint256 _bidId,
         address _collateralRecipient
     ) internal acceptedLoan(_bidId, "lenderClaimCollateral") {
-        require(isLoanDefaulted(_bidId), "Loan must be defaulted.");
+        require(isLoanDefaulted(_bidId), "ND");
 
         Bid storage bid = bids[_bidId];
         bid.state = BidState.CLOSED;
 
         address sender = _msgSenderForMarket(bid.marketplaceId);
-        require(sender == getLoanLender(_bidId), "only lender can close loan");
+        require(sender == getLoanLender(_bidId), "NLL");
 
       
         collateralManager.lenderClaimCollateralWithRecipient(_bidId, _collateralRecipient);
@@ -762,7 +771,7 @@ contract TellerV2 is
         internal
         acceptedLoan(_bidId, "liquidateLoan")
     {
-        require(isLoanLiquidateable(_bidId), "Loan must be liquidateable.");
+        require(isLoanLiquidateable(_bidId), "NL");
 
         Bid storage bid = bids[_bidId];
 
@@ -901,7 +910,7 @@ contract TellerV2 is
         address loanRepaymentListener = repaymentListenerForBid[_bidId];
 
         if (loanRepaymentListener != address(0)) {
-            require(gasleft() >= 80000, "Insufficient gas");  //fixes the 63/64 remaining issue
+            require(gasleft() >= 80000, "NR gas");  //fixes the 63/64 remaining issue
             try
                 ILoanRepaymentListener(loanRepaymentListener).repayLoanCallback{
                     gas: 80000
@@ -1207,12 +1216,12 @@ contract TellerV2 is
         assembly {
             codeSize := extcodesize(_listener) 
         }
-        require(codeSize > 0, "Listener must be a contract");
+        require(codeSize > 0, "Not a contract");
         address sender = _msgSenderForMarket(bids[_bidId].marketplaceId);
 
         require(
             sender == getLoanLender(_bidId),
-            "Only bid lender may set repayment listener"
+            "Not lender"
         );
 
         repaymentListenerForBid[_bidId] = _listener;

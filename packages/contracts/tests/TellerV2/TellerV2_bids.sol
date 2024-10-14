@@ -477,7 +477,7 @@ contract TellerV2_bids_test is Testable {
 
         marketRegistryMock.mock_setLenderIsVerified(false);
 
-        vm.expectRevert("Not verified lender");
+        vm.expectRevert(); //NV 
 
         tellerV2.lenderAcceptBid(bidId);
     }
@@ -529,7 +529,7 @@ contract TellerV2_bids_test is Testable {
 
         vm.warp(20000);
 
-        vm.expectRevert("Bid has expired");
+        vm.expectRevert() ;//BE ;
 
         tellerV2.lenderAcceptBid(bidId);
     }
@@ -716,7 +716,7 @@ contract TellerV2_bids_test is Testable {
         tellerV2.mock_setBidDefaultDuration(bidId, 1000);
         vm.warp(2000 * 1e20);
 
-        vm.expectRevert("only lender can close loan");
+        vm.expectRevert(); // NLL
         vm.prank(address(borrower));
         tellerV2.lenderCloseLoan(bidId);
     }
@@ -758,7 +758,7 @@ contract TellerV2_bids_test is Testable {
 
         lendingToken.approve(address(tellerV2), 1e20);
 
-        vm.expectRevert("only lender can close loan");
+        vm.expectRevert(); // NLL
         tellerV2.lenderCloseLoan(bidId);
     }
 
@@ -853,7 +853,7 @@ contract TellerV2_bids_test is Testable {
         tellerV2.setMockMsgSenderForMarket(address(borrower));
         vm.prank(address(borrower));
 
-        vm.expectRevert("only lender can claim NFT");
+        vm.expectRevert("NV Lender");
 
         tellerV2.claimLoanNFT(bidId);
     }

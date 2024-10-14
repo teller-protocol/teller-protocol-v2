@@ -10,6 +10,7 @@ const deployFn: DeployFunction = async (hre) => {
   const v2Calculations = await hre.deployments.get('V2Calculations')
 
 
+  const protocolPausingManager = await hre.contracts.get('ProtocolPausingManager')
 /*
 wont work due to arg ? 
 
@@ -57,6 +58,17 @@ wont work due to arg ?
           constructorArgs: [await trustedForwarder.getAddress()],
         },
       },
+
+      {
+        contractAddress: await tellerV2.getAddress(),
+        contractImplementation: await hre.ethers.getContractFactory('TellerV2', {
+          libraries: {
+            V2Calculations: v2Calculations.address,
+          },
+        }),
+        callFn: "setProtocolPausingManager",
+        callArgs: [await protocolPausingManager.getAddress()]
+      }
     ],
   })
 
@@ -71,14 +83,14 @@ wont work due to arg ?
 }
 
 // tags and deployment
-deployFn.id = 'teller-v2:pausing-upgrade'
+deployFn.id = 'teller-v2:pausing-manager-upgrade'
 deployFn.tags = [
   'proposal',
   'upgrade',
   'teller-v2',
   'teller-v2:pausing-upgrade',
 ]
-deployFn.dependencies = ['teller-v2:deploy']
+deployFn.dependencies = ['teller-v2:deploy','protocol-pausing-manager:deploy']
 deployFn.skip = async (hre) => {
   return !hre.network.live || !['goerli', 'polygon'].includes(hre.network.name)
 }

@@ -17,10 +17,10 @@ const deployFn: DeployFunction = async (hre) => {
     }
   )
 
-    //is this correct ? 
-  const { protocolTimelock } = await hre.getNamedAccounts()
+  
+  const { protocolOwnerSafe } = await hre.getNamedAccounts()
   hre.log('Transferring ownership of ProtocolPausingManager to Gnosis Safe...')
-  await protocolPausingManager.transferOwnership(protocolTimelock)
+  await protocolPausingManager.transferOwnership(protocolOwnerSafe)
   hre.log('done.')
 
     

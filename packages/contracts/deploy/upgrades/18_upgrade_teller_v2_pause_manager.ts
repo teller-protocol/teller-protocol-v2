@@ -10,6 +10,14 @@ const deployFn: DeployFunction = async (hre) => {
   const v2Calculations = await hre.deployments.get('V2Calculations')
 
 
+
+  const smartCommitmentForwarder = await hre.contracts.get(
+    'SmartCommitmentForwarder'
+  )
+
+  const collateralManager = await hre.contracts.get('CollateralManager')
+  const marketRegistry = await hre.contracts.get('MarketRegistry')
+
   const protocolPausingManager = await hre.contracts.get('ProtocolPausingManager')
 /*
 wont work due to arg ? 
@@ -56,19 +64,38 @@ wont work due to arg ?
             'external-library-linking',
           ],
           constructorArgs: [await trustedForwarder.getAddress()],
+          call: {
+            fn: 'setProtocolPausingManager',
+            args: [await protocolPausingManager.getAddress()],
+          },
+       
+       
         },
       },
 
       {
-        contractAddress: await tellerV2.getAddress(),
-        contractImplementation: await hre.ethers.getContractFactory('TellerV2', {
-          libraries: {
-            V2Calculations: v2Calculations.address,
-          },
-        }),
-        callFn: "setProtocolPausingManager",
-        callArgs: [await protocolPausingManager.getAddress()]
-      }
+        proxy: collateralManager,
+        implFactory: await hre.ethers.getContractFactory('CollateralManager'),
+      },
+
+
+      {
+        proxy: smartCommitmentForwarder,
+        implFactory: await hre.ethers.getContractFactory(
+          'SmartCommitmentForwarder'
+        ),
+
+        opts: {
+          unsafeAllow: ['constructor', 'state-variable-immutable'],
+          unsafeAllowRenames: true,
+          // unsafeSkipStorageCheck: true, //caution !
+          constructorArgs: [
+            await tellerV2.getAddress(),
+            await marketRegistry.getAddress(),
+          ],
+        },
+      },
+       
     ],
   })
 

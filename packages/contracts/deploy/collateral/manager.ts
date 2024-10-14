@@ -13,6 +13,11 @@ const deployFn: DeployFunction = async (hre) => {
     ],
   })
 
+
+    //ultimately, the owner becomes tellerV2
+
+
+
   return true
 }
 

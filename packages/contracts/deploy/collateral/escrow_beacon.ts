@@ -9,10 +9,14 @@ const deployFn: DeployFunction = async (hre) => {
     }
   )
 
+    //is this necessary ? 
   const { protocolTimelock } = await hre.getNamedAccounts()
   hre.log('Transferring ownership of CollateralEscrowBeacon to Gnosis Safe...')
   await collateralEscrowBeacon.transferOwnership(protocolTimelock)
   hre.log('done.')
+
+  //ultimately, the owner becomes the collateral manager 
+  //isnt this just an implementation?
 
   return true
 }

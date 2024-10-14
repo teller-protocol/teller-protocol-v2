@@ -1305,9 +1305,14 @@ fn store_globals_from_events(
             
     events.lendergroup_loan_repaids.iter().for_each(|evt: &contract::LendergroupLoanRepaid| {
         
+       
+
+    });
+
+
+    events.lendergroup_defaulted_loan_liquidateds.iter().for_each(|evt: &contract::LendergroupDefaultedLoanLiquidated| {
         bigint_set_store.set(ord,"latest_block_number", &BigInt::from( evt.evt_block_number ) );
         bigint_set_store.set(ord,"latest_block_time", &BigInt::from(  evt.evt_block_time ) );
-
 
     });
 
@@ -1431,6 +1436,7 @@ fn store_lendergroup_user_metrics_deltas(
         
     });
 
+   
 
     /* events.lendergroup_defaulted_loan_liquidateds.iter().for_each(|evt: &contract::LendergroupDefaultedLoanLiquidated| {
  
@@ -1607,6 +1613,15 @@ fn store_lendergroup_pool_metrics_deltas(
     
         
     });
+
+    events.lendergroup_defaulted_loan_liquidateds.iter().for_each(|evt: &contract::LendergroupDefaultedLoanLiquidated| {
+
+        let group_store_key: String = format!("group_pool_metric:{}:total_principal_tokens_repaid", evt.evt_address);
+        bigint_add_store.add(ord,&group_store_key, BigInt::from_str(&evt.amount_due).unwrap_or(BigInt::zero()));
+
+
+    });
+
 
 
   /*  events.lendergroup_defaulted_loan_liquidateds.iter().for_each(|evt: &contract::LendergroupDefaultedLoanLiquidated| {

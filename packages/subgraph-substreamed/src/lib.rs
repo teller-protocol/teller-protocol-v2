@@ -1619,7 +1619,7 @@ fn store_lendergroup_pool_metrics_deltas(
         let group_store_key: String = format!("group_pool_metric:{}:total_principal_tokens_repaid", evt.evt_address);
         bigint_add_store.add(ord,&group_store_key, BigInt::from_str(&evt.amount_due).unwrap_or(BigInt::zero()));
 
-
+        //track token amt difference? 
     });
 
 

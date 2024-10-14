@@ -240,18 +240,6 @@
     {
       "type": "event",
       "anonymous": false,
-      "name": "Paused",
-      "inputs": [
-        {
-          "type": "address",
-          "name": "account",
-          "indexed": false
-        }
-      ]
-    },
-    {
-      "type": "event",
-      "anonymous": false,
       "name": "ProtocolFeeSet",
       "inputs": [
         {
@@ -316,18 +304,6 @@
       ]
     },
     {
-      "type": "event",
-      "anonymous": false,
-      "name": "Unpaused",
-      "inputs": [
-        {
-          "type": "address",
-          "name": "account",
-          "indexed": false
-        }
-      ]
-    },
-    {
       "type": "function",
       "name": "CURRENT_CODE_VERSION",
       "constant": true,
@@ -387,19 +363,6 @@
           "name": ""
         }
       ]
-    },
-    {
-      "type": "function",
-      "name": "addPauser",
-      "constant": false,
-      "payable": false,
-      "inputs": [
-        {
-          "type": "address",
-          "name": "_pauser"
-        }
-      ],
-      "outputs": []
     },
     {
       "type": "function",
@@ -971,6 +934,20 @@
     },
     {
       "type": "function",
+      "name": "getProtocolPausingManager",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
       "name": "getRepaymentListenerForBid",
       "constant": true,
       "stateMutability": "view",
@@ -1048,6 +1025,10 @@
         {
           "type": "address",
           "name": "_escrowVault"
+        },
+        {
+          "type": "address",
+          "name": "_protocolPausingManager"
         }
       ],
       "outputs": []
@@ -1100,25 +1081,6 @@
         {
           "type": "uint256",
           "name": "_bidId"
-        }
-      ],
-      "outputs": [
-        {
-          "type": "bool",
-          "name": ""
-        }
-      ]
-    },
-    {
-      "type": "function",
-      "name": "isPauser",
-      "constant": true,
-      "stateMutability": "view",
-      "payable": false,
-      "inputs": [
-        {
-          "type": "address",
-          "name": "_account"
         }
       ],
       "outputs": [
@@ -1347,20 +1309,6 @@
     },
     {
       "type": "function",
-      "name": "liquidationsPaused",
-      "constant": true,
-      "stateMutability": "view",
-      "payable": false,
-      "inputs": [],
-      "outputs": [
-        {
-          "type": "bool",
-          "name": ""
-        }
-      ]
-    },
-    {
-      "type": "function",
       "name": "marketOwnerCancelBid",
       "constant": false,
       "payable": false,
@@ -1402,55 +1350,6 @@
     },
     {
       "type": "function",
-      "name": "pauseLiquidations",
-      "constant": false,
-      "payable": false,
-      "inputs": [],
-      "outputs": []
-    },
-    {
-      "type": "function",
-      "name": "pauseProtocol",
-      "constant": false,
-      "payable": false,
-      "inputs": [],
-      "outputs": []
-    },
-    {
-      "type": "function",
-      "name": "paused",
-      "constant": true,
-      "stateMutability": "view",
-      "payable": false,
-      "inputs": [],
-      "outputs": [
-        {
-          "type": "bool",
-          "name": ""
-        }
-      ]
-    },
-    {
-      "type": "function",
-      "name": "pauserRoleBearer",
-      "constant": true,
-      "stateMutability": "view",
-      "payable": false,
-      "inputs": [
-        {
-          "type": "address",
-          "name": ""
-        }
-      ],
-      "outputs": [
-        {
-          "type": "bool",
-          "name": ""
-        }
-      ]
-    },
-    {
-      "type": "function",
       "name": "protocolFee",
       "constant": true,
       "stateMutability": "view",
@@ -1462,19 +1361,6 @@
           "name": ""
         }
       ]
-    },
-    {
-      "type": "function",
-      "name": "removePauser",
-      "constant": false,
-      "payable": false,
-      "inputs": [
-        {
-          "type": "address",
-          "name": "_pauser"
-        }
-      ],
-      "outputs": []
     },
     {
       "type": "function",
@@ -1616,6 +1502,19 @@
         {
           "type": "uint16",
           "name": "newFee"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "setProtocolPausingManager",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "_protocolPausingManager"
         }
       ],
       "outputs": []
@@ -1794,22 +1693,6 @@
     },
     {
       "type": "function",
-      "name": "unpauseLiquidations",
-      "constant": false,
-      "payable": false,
-      "inputs": [],
-      "outputs": []
-    },
-    {
-      "type": "function",
-      "name": "unpauseProtocol",
-      "constant": false,
-      "payable": false,
-      "inputs": [],
-      "outputs": []
-    },
-    {
-      "type": "function",
       "name": "uris",
       "constant": true,
       "stateMutability": "view",
@@ -1900,6 +1783,6 @@
     "status": 1,
     "byzantium": true
   },
-  "numDeployments": 14,
+  "numDeployments": 19,
   "implementation": "0xd177f4b8e348b4c56c2ac8e03b58e41b79351a7f"
 }

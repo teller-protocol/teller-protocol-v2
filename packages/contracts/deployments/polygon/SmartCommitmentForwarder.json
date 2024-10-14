@@ -216,6 +216,20 @@
     },
     {
       "type": "function",
+      "name": "getLastUnpausedAt",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
       "name": "getLiquidationProtocolFeePercent",
       "constant": true,
       "stateMutability": "view",
@@ -383,6 +397,6 @@
     "blockHash": null,
     "blockNumber": null
   },
-  "numDeployments": 2,
+  "numDeployments": 3,
   "implementation": "0xb9636C8b00a838B8b30502A2dD3bF18aa473AE0c"
 }

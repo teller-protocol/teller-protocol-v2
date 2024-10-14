@@ -2,715 +2,697 @@
   "address": "0x76888a882a4fF57455B5e74B791DD19DF3ba51Bb",
   "abi": [
     {
+      "type": "event",
       "anonymous": false,
-      "inputs": [
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "_bidId",
-          "type": "uint256"
-        }
-      ],
       "name": "CollateralClaimed",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
       "inputs": [
         {
-          "indexed": false,
-          "internalType": "uint256",
+          "type": "uint256",
           "name": "_bidId",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "enum CollateralType",
-          "name": "_type",
-          "type": "uint8"
-        },
-        {
-          "indexed": false,
-          "internalType": "address",
-          "name": "_collateralAddress",
-          "type": "address"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "_amount",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "_tokenId",
-          "type": "uint256"
+          "indexed": false
         }
-      ],
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
       "name": "CollateralCommitted",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
       "inputs": [
         {
-          "indexed": false,
-          "internalType": "uint256",
+          "type": "uint256",
           "name": "_bidId",
-          "type": "uint256"
+          "indexed": false
         },
         {
-          "indexed": false,
-          "internalType": "enum CollateralType",
+          "type": "uint8",
           "name": "_type",
-          "type": "uint8"
+          "indexed": false
         },
         {
-          "indexed": false,
-          "internalType": "address",
+          "type": "address",
           "name": "_collateralAddress",
-          "type": "address"
+          "indexed": false
         },
         {
-          "indexed": false,
-          "internalType": "uint256",
+          "type": "uint256",
           "name": "_amount",
-          "type": "uint256"
+          "indexed": false
         },
         {
-          "indexed": false,
-          "internalType": "uint256",
+          "type": "uint256",
           "name": "_tokenId",
-          "type": "uint256"
+          "indexed": false
         }
-      ],
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
       "name": "CollateralDeposited",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
       "inputs": [
         {
-          "indexed": false,
-          "internalType": "uint256",
+          "type": "uint256",
           "name": "_bidId",
-          "type": "uint256"
+          "indexed": false
         },
         {
-          "indexed": false,
-          "internalType": "address",
-          "name": "_collateralEscrow",
-          "type": "address"
-        }
-      ],
-      "name": "CollateralEscrowDeployed",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "_bidId",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "enum CollateralType",
+          "type": "uint8",
           "name": "_type",
-          "type": "uint8"
+          "indexed": false
         },
         {
-          "indexed": false,
-          "internalType": "address",
+          "type": "address",
           "name": "_collateralAddress",
-          "type": "address"
+          "indexed": false
         },
         {
-          "indexed": false,
-          "internalType": "uint256",
+          "type": "uint256",
           "name": "_amount",
-          "type": "uint256"
+          "indexed": false
         },
         {
-          "indexed": false,
-          "internalType": "uint256",
+          "type": "uint256",
           "name": "_tokenId",
-          "type": "uint256"
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "CollateralEscrowDeployed",
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_bidId",
+          "indexed": false
         },
         {
-          "indexed": false,
-          "internalType": "address",
-          "name": "_recipient",
-          "type": "address"
+          "type": "address",
+          "name": "_collateralEscrow",
+          "indexed": false
         }
-      ],
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
       "name": "CollateralWithdrawn",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
       "inputs": [
         {
-          "indexed": false,
-          "internalType": "uint8",
-          "name": "version",
-          "type": "uint8"
-        }
-      ],
-      "name": "Initialized",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "previousOwner",
-          "type": "address"
-        },
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "newOwner",
-          "type": "address"
-        }
-      ],
-      "name": "OwnershipTransferred",
-      "type": "event"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "name": "_escrows",
-      "outputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "_borrowerAddress",
-          "type": "address"
-        },
-        {
-          "components": [
-            {
-              "internalType": "enum CollateralType",
-              "name": "_collateralType",
-              "type": "uint8"
-            },
-            {
-              "internalType": "uint256",
-              "name": "_amount",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "_tokenId",
-              "type": "uint256"
-            },
-            {
-              "internalType": "address",
-              "name": "_collateralAddress",
-              "type": "address"
-            }
-          ],
-          "internalType": "struct Collateral[]",
-          "name": "_collateralInfo",
-          "type": "tuple[]"
-        }
-      ],
-      "name": "checkBalances",
-      "outputs": [
-        {
-          "internalType": "bool",
-          "name": "validated_",
-          "type": "bool"
-        },
-        {
-          "internalType": "bool[]",
-          "name": "checks_",
-          "type": "bool[]"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
+          "type": "uint256",
           "name": "_bidId",
-          "type": "uint256"
+          "indexed": false
         },
         {
-          "components": [
-            {
-              "internalType": "enum CollateralType",
-              "name": "_collateralType",
-              "type": "uint8"
-            },
-            {
-              "internalType": "uint256",
-              "name": "_amount",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "_tokenId",
-              "type": "uint256"
-            },
-            {
-              "internalType": "address",
-              "name": "_collateralAddress",
-              "type": "address"
-            }
-          ],
-          "internalType": "struct Collateral[]",
-          "name": "_collateralInfo",
-          "type": "tuple[]"
-        }
-      ],
-      "name": "commitCollateral",
-      "outputs": [
-        {
-          "internalType": "bool",
-          "name": "validation_",
-          "type": "bool"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_bidId",
-          "type": "uint256"
+          "type": "uint8",
+          "name": "_type",
+          "indexed": false
         },
         {
-          "components": [
-            {
-              "internalType": "enum CollateralType",
-              "name": "_collateralType",
-              "type": "uint8"
-            },
-            {
-              "internalType": "uint256",
-              "name": "_amount",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "_tokenId",
-              "type": "uint256"
-            },
-            {
-              "internalType": "address",
-              "name": "_collateralAddress",
-              "type": "address"
-            }
-          ],
-          "internalType": "struct Collateral",
-          "name": "_collateralInfo",
-          "type": "tuple"
-        }
-      ],
-      "name": "commitCollateral",
-      "outputs": [
-        {
-          "internalType": "bool",
-          "name": "validation_",
-          "type": "bool"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_bidId",
-          "type": "uint256"
-        }
-      ],
-      "name": "deployAndDeposit",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_bidId",
-          "type": "uint256"
-        },
-        {
-          "internalType": "address",
+          "type": "address",
           "name": "_collateralAddress",
-          "type": "address"
-        }
-      ],
-      "name": "getCollateralAmount",
-      "outputs": [
+          "indexed": false
+        },
         {
-          "internalType": "uint256",
-          "name": "amount_",
-          "type": "uint256"
+          "type": "uint256",
+          "name": "_amount",
+          "indexed": false
+        },
+        {
+          "type": "uint256",
+          "name": "_tokenId",
+          "indexed": false
+        },
+        {
+          "type": "address",
+          "name": "_recipient",
+          "indexed": false
         }
-      ],
-      "stateMutability": "view",
-      "type": "function"
+      ]
     },
     {
+      "type": "event",
+      "anonymous": false,
+      "name": "Initialized",
       "inputs": [
         {
-          "internalType": "uint256",
-          "name": "_bidId",
-          "type": "uint256"
+          "type": "uint8",
+          "name": "version",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "OwnershipTransferred",
+      "inputs": [
+        {
+          "type": "address",
+          "name": "previousOwner",
+          "indexed": true
+        },
+        {
+          "type": "address",
+          "name": "newOwner",
+          "indexed": true
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "_escrows",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": ""
         }
       ],
-      "name": "getCollateralInfo",
       "outputs": [
         {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "checkBalances",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "_borrowerAddress"
+        },
+        {
+          "type": "tuple[]",
+          "name": "_collateralInfo",
           "components": [
             {
-              "internalType": "enum CollateralType",
-              "name": "_collateralType",
-              "type": "uint8"
+              "type": "uint8",
+              "name": "_collateralType"
             },
             {
-              "internalType": "uint256",
-              "name": "_amount",
-              "type": "uint256"
+              "type": "uint256",
+              "name": "_amount"
             },
             {
-              "internalType": "uint256",
-              "name": "_tokenId",
-              "type": "uint256"
+              "type": "uint256",
+              "name": "_tokenId"
             },
             {
-              "internalType": "address",
-              "name": "_collateralAddress",
-              "type": "address"
+              "type": "address",
+              "name": "_collateralAddress"
             }
-          ],
-          "internalType": "struct Collateral[]",
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "type": "bool",
+          "name": "validated_"
+        },
+        {
+          "type": "bool[]",
+          "name": "checks_"
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "commitCollateral",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_bidId"
+        },
+        {
+          "type": "tuple[]",
+          "name": "_collateralInfo",
+          "components": [
+            {
+              "type": "uint8",
+              "name": "_collateralType"
+            },
+            {
+              "type": "uint256",
+              "name": "_amount"
+            },
+            {
+              "type": "uint256",
+              "name": "_tokenId"
+            },
+            {
+              "type": "address",
+              "name": "_collateralAddress"
+            }
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "type": "bool",
+          "name": "validation_"
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "commitCollateral",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_bidId"
+        },
+        {
+          "type": "tuple",
+          "name": "_collateralInfo",
+          "components": [
+            {
+              "type": "uint8",
+              "name": "_collateralType"
+            },
+            {
+              "type": "uint256",
+              "name": "_amount"
+            },
+            {
+              "type": "uint256",
+              "name": "_tokenId"
+            },
+            {
+              "type": "address",
+              "name": "_collateralAddress"
+            }
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "type": "bool",
+          "name": "validation_"
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "deployAndDeposit",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_bidId"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "getCollateralAmount",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_bidId"
+        },
+        {
+          "type": "address",
+          "name": "_collateralAddress"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": "amount_"
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getCollateralInfo",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_bidId"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "tuple[]",
           "name": "infos_",
-          "type": "tuple[]"
+          "components": [
+            {
+              "type": "uint8",
+              "name": "_collateralType"
+            },
+            {
+              "type": "uint256",
+              "name": "_amount"
+            },
+            {
+              "type": "uint256",
+              "name": "_tokenId"
+            },
+            {
+              "type": "address",
+              "name": "_collateralAddress"
+            }
+          ]
         }
-      ],
-      "stateMutability": "view",
-      "type": "function"
+      ]
     },
     {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_bidId",
-          "type": "uint256"
-        }
-      ],
+      "type": "function",
       "name": "getEscrow",
-      "outputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
+      "constant": true,
       "stateMutability": "view",
-      "type": "function"
-    },
-    {
+      "payable": false,
       "inputs": [
         {
-          "internalType": "address",
-          "name": "_collateralEscrowBeacon",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "_tellerV2",
-          "type": "address"
+          "type": "uint256",
+          "name": "_bidId"
         }
       ],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
       "name": "initialize",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
+      "constant": false,
+      "payable": false,
       "inputs": [
         {
-          "internalType": "uint256",
-          "name": "_bidId",
-          "type": "uint256"
+          "type": "address",
+          "name": "_collateralEscrowBeacon"
+        },
+        {
+          "type": "address",
+          "name": "_tellerV2"
         }
       ],
+      "outputs": []
+    },
+    {
+      "type": "function",
       "name": "isBidCollateralBacked",
-      "outputs": [
-        {
-          "internalType": "bool",
-          "name": "",
-          "type": "bool"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
+      "constant": false,
+      "payable": false,
       "inputs": [
         {
-          "internalType": "uint256",
-          "name": "_bidId",
-          "type": "uint256"
+          "type": "uint256",
+          "name": "_bidId"
         }
       ],
+      "outputs": [
+        {
+          "type": "bool",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
       "name": "lenderClaimCollateral",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
+      "constant": false,
+      "payable": false,
       "inputs": [
         {
-          "internalType": "uint256",
-          "name": "_bidId",
-          "type": "uint256"
-        },
-        {
-          "internalType": "address",
-          "name": "_liquidatorAddress",
-          "type": "address"
+          "type": "uint256",
+          "name": "_bidId"
         }
       ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "lenderClaimCollateralWithRecipient",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_bidId"
+        },
+        {
+          "type": "address",
+          "name": "_collateralRecipient"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
       "name": "liquidateCollateral",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
+      "constant": false,
+      "payable": false,
       "inputs": [
         {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
+          "type": "uint256",
+          "name": "_bidId"
         },
         {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256[]",
-          "name": "_ids",
-          "type": "uint256[]"
-        },
-        {
-          "internalType": "uint256[]",
-          "name": "_values",
-          "type": "uint256[]"
-        },
-        {
-          "internalType": "bytes",
-          "name": "",
-          "type": "bytes"
+          "type": "address",
+          "name": "_liquidatorAddress"
         }
       ],
+      "outputs": []
+    },
+    {
+      "type": "function",
       "name": "onERC1155BatchReceived",
-      "outputs": [
-        {
-          "internalType": "bytes4",
-          "name": "",
-          "type": "bytes4"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
+      "constant": false,
+      "payable": false,
       "inputs": [
         {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
+          "type": "address",
+          "name": ""
         },
         {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
+          "type": "address",
+          "name": ""
         },
         {
-          "internalType": "uint256",
-          "name": "id",
-          "type": "uint256"
+          "type": "uint256[]",
+          "name": "_ids"
         },
         {
-          "internalType": "uint256",
-          "name": "value",
-          "type": "uint256"
+          "type": "uint256[]",
+          "name": "_values"
         },
         {
-          "internalType": "bytes",
-          "name": "",
-          "type": "bytes"
+          "type": "bytes",
+          "name": ""
         }
       ],
+      "outputs": [
+        {
+          "type": "bytes4",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
       "name": "onERC1155Received",
-      "outputs": [
-        {
-          "internalType": "bytes4",
-          "name": "",
-          "type": "bytes4"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
+      "constant": false,
+      "payable": false,
       "inputs": [
         {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
+          "type": "address",
+          "name": ""
         },
         {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
+          "type": "address",
+          "name": ""
         },
         {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
+          "type": "uint256",
+          "name": "id"
         },
         {
-          "internalType": "bytes",
-          "name": "",
-          "type": "bytes"
+          "type": "uint256",
+          "name": "value"
+        },
+        {
+          "type": "bytes",
+          "name": ""
         }
       ],
+      "outputs": [
+        {
+          "type": "bytes4",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
       "name": "onERC721Received",
-      "outputs": [
-        {
-          "internalType": "bytes4",
-          "name": "",
-          "type": "bytes4"
-        }
-      ],
+      "constant": true,
       "stateMutability": "pure",
-      "type": "function"
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": ""
+        },
+        {
+          "type": "address",
+          "name": ""
+        },
+        {
+          "type": "uint256",
+          "name": ""
+        },
+        {
+          "type": "bytes",
+          "name": ""
+        }
+      ],
+      "outputs": [
+        {
+          "type": "bytes4",
+          "name": ""
+        }
+      ]
     },
     {
-      "inputs": [],
+      "type": "function",
       "name": "owner",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
       "outputs": [
         {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
+          "type": "address",
+          "name": ""
         }
-      ],
-      "stateMutability": "view",
-      "type": "function"
+      ]
     },
     {
-      "inputs": [],
+      "type": "function",
       "name": "renounceOwnership",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_bidId",
-          "type": "uint256"
-        }
-      ],
-      "name": "revalidateCollateral",
-      "outputs": [
-        {
-          "internalType": "bool",
-          "name": "validation_",
-          "type": "bool"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "_collateralEscrowBeacon",
-          "type": "address"
-        }
-      ],
-      "name": "setCollateralEscrowBeacon",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
+      "constant": false,
+      "payable": false,
       "inputs": [],
-      "name": "tellerV2",
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "revalidateCollateral",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_bidId"
+        }
+      ],
       "outputs": [
         {
-          "internalType": "contract ITellerV2",
-          "name": "",
-          "type": "address"
+          "type": "bool",
+          "name": "validation_"
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "setCollateralEscrowBeacon",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "_collateralEscrowBeacon"
         }
       ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "tellerV2",
+      "constant": true,
       "stateMutability": "view",
-      "type": "function"
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
     },
     {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "newOwner",
-          "type": "address"
-        }
-      ],
+      "type": "function",
       "name": "transferOwnership",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
+      "constant": false,
+      "payable": false,
       "inputs": [
         {
-          "internalType": "uint256",
-          "name": "_bidId",
-          "type": "uint256"
+          "type": "address",
+          "name": "newOwner"
         }
       ],
+      "outputs": []
+    },
+    {
+      "type": "function",
       "name": "withdraw",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_bidId"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "withdrawDustTokens",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_bidId"
+        },
+        {
+          "type": "address",
+          "name": "_tokenAddress"
+        },
+        {
+          "type": "uint256",
+          "name": "_amount"
+        },
+        {
+          "type": "address",
+          "name": "_recipientAddress"
+        }
+      ],
+      "outputs": []
     }
   ],
   "transactionHash": "0x0f0973b7c433a3935bb45e6ffc8becbb41cc3966d908048f8207af71b731c106",
@@ -796,6 +778,6 @@
     "status": 1,
     "byzantium": true
   },
-  "numDeployments": 8,
-  "implementation": "0xbDF19f0cbe53BCaC880C214411bC183d1cD8A9F8"
+  "numDeployments": 9,
+  "implementation": "0x48f4ddbc34a0df3b5ac2b13db4895fa980607aa9"
 }

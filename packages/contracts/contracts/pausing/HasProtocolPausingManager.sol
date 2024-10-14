@@ -19,9 +19,9 @@ abstract contract HasProtocolPausingManager
     {
   
 
-    bool private _reserved0;// _paused.. Deprecated , handled by pausing manager 
+    bool private __paused;// .. Deprecated , handled by pausing manager 
 
-    address private _protocolPausingManager;
+    address private _protocolPausingManager; // 20 bytes, gap will start at new slot 
   
 
     modifier whenLiquidationsNotPaused() {
@@ -49,21 +49,7 @@ abstract contract HasProtocolPausingManager
         return _protocolPausingManager;
     }
 
-    
-    /* 
-    function isPauser(address _address) public view returns (bool){
-
-        return IProtocolPausingManager(_protocolPausingManager). isPauser(_address) ;
-    }
-
-    function getLastUnpausedAt() 
-    external view 
-    returns (uint256) {
-
-        return IPausableTimestamp(_protocolPausingManager).getLastUnpausedAt();
-
-    } 
-    */
+     
 
  
 

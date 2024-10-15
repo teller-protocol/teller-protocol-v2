@@ -7907,6 +7907,16 @@
         },
         "namespaces": {}
       }
+    },
+    "33c24239caaac3fd3611b9deee3e2930bce76470c3edd1f73c25f36cbd55374c": {
+      "address": "0x98eEbd694eE24935615BF18bA1ae75B2E486487f",
+      "txHash": "0x80a9cdf4b47ba1eb757cab185f642294a4cf72f6884de435c7e989916df05c49",
+      "layout": {
+        "solcVersion": "0.8.9",
+        "storage": [],
+        "types": {},
+        "namespaces": {}
+      }
     }
   }
 }

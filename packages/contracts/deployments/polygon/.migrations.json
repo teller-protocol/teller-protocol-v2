@@ -36,6 +36,6 @@
   "lender-commitment-group-factory:upgrade-multihop": 1727465789,
   "smart-commitment-forwarder:upgrade-pausing": 1727811173,
   "protocol-pausing-manager:deploy": 1728941512,
-  "teller-v2:pausing-manager-upgrade": 1728942782,
-  "lender-commitment-group-beacon:upgrade": 1728942801
+  "lender-commitment-group-beacon:upgrade": 1728942801,
+  "teller-v2:pausing-manager-upgrade": 1729002281
 }

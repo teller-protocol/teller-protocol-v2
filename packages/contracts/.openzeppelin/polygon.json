@@ -11687,6 +11687,636 @@
         },
         "namespaces": {}
       }
+    },
+    "f65000183247be1ccbd3747e4fd5b3abb31d0aed7c721392f0a3c671219d86aa": {
+      "address": "0xF2F197D71Cd7C247af0d63F0b5c5D8745AA27Cdb",
+      "txHash": "0xc01081ec659ca0ed00a57a077a01dec1b61bdc6ccf67a2a0c97cb9862b636c33",
+      "layout": {
+        "solcVersion": "0.8.9",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:94"
+          },
+          {
+            "label": "_protocolFee",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_uint16",
+            "contract": "ProtocolFee",
+            "src": "contracts/ProtocolFee.sol:8"
+          },
+          {
+            "label": "__paused",
+            "offset": 2,
+            "slot": "101",
+            "type": "t_bool",
+            "contract": "HasProtocolPausingManager",
+            "src": "contracts/pausing/HasProtocolPausingManager.sol:22"
+          },
+          {
+            "label": "_protocolPausingManager",
+            "offset": 3,
+            "slot": "101",
+            "type": "t_address",
+            "contract": "HasProtocolPausingManager",
+            "src": "contracts/pausing/HasProtocolPausingManager.sol:24"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_array(t_uint256)48_storage",
+            "contract": "HasProtocolPausingManager",
+            "src": "contracts/pausing/HasProtocolPausingManager.sol:61"
+          },
+          {
+            "label": "bidId",
+            "offset": 0,
+            "slot": "150",
+            "type": "t_uint256",
+            "contract": "TellerV2Storage_G0",
+            "src": "contracts/TellerV2Storage.sol:92"
+          },
+          {
+            "label": "bids",
+            "offset": 0,
+            "slot": "151",
+            "type": "t_mapping(t_uint256,t_struct(Bid)9761_storage)",
+            "contract": "TellerV2Storage_G0",
+            "src": "contracts/TellerV2Storage.sol:95"
+          },
+          {
+            "label": "borrowerBids",
+            "offset": 0,
+            "slot": "152",
+            "type": "t_mapping(t_address,t_array(t_uint256)dyn_storage)",
+            "contract": "TellerV2Storage_G0",
+            "src": "contracts/TellerV2Storage.sol:98"
+          },
+          {
+            "label": "__lenderVolumeFilled",
+            "offset": 0,
+            "slot": "153",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "TellerV2Storage_G0",
+            "src": "contracts/TellerV2Storage.sol:101"
+          },
+          {
+            "label": "__totalVolumeFilled",
+            "offset": 0,
+            "slot": "154",
+            "type": "t_uint256",
+            "contract": "TellerV2Storage_G0",
+            "src": "contracts/TellerV2Storage.sol:104"
+          },
+          {
+            "label": "__lendingTokensSet",
+            "offset": 0,
+            "slot": "155",
+            "type": "t_struct(AddressSet)5563_storage",
+            "contract": "TellerV2Storage_G0",
+            "src": "contracts/TellerV2Storage.sol:107"
+          },
+          {
+            "label": "marketRegistry",
+            "offset": 0,
+            "slot": "157",
+            "type": "t_contract(IMarketRegistry)10634",
+            "contract": "TellerV2Storage_G0",
+            "src": "contracts/TellerV2Storage.sol:109"
+          },
+          {
+            "label": "reputationManager",
+            "offset": 0,
+            "slot": "158",
+            "type": "t_contract(IReputationManager)10721",
+            "contract": "TellerV2Storage_G0",
+            "src": "contracts/TellerV2Storage.sol:110"
+          },
+          {
+            "label": "_borrowerBidsActive",
+            "offset": 0,
+            "slot": "159",
+            "type": "t_mapping(t_address,t_struct(UintSet)5720_storage)",
+            "contract": "TellerV2Storage_G0",
+            "src": "contracts/TellerV2Storage.sol:113"
+          },
+          {
+            "label": "bidDefaultDuration",
+            "offset": 0,
+            "slot": "160",
+            "type": "t_mapping(t_uint256,t_uint32)",
+            "contract": "TellerV2Storage_G0",
+            "src": "contracts/TellerV2Storage.sol:115"
+          },
+          {
+            "label": "bidExpirationTime",
+            "offset": 0,
+            "slot": "161",
+            "type": "t_mapping(t_uint256,t_uint32)",
+            "contract": "TellerV2Storage_G0",
+            "src": "contracts/TellerV2Storage.sol:116"
+          },
+          {
+            "label": "lenderVolumeFilled",
+            "offset": 0,
+            "slot": "162",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_uint256))",
+            "contract": "TellerV2Storage_G0",
+            "src": "contracts/TellerV2Storage.sol:120"
+          },
+          {
+            "label": "totalVolumeFilled",
+            "offset": 0,
+            "slot": "163",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "TellerV2Storage_G0",
+            "src": "contracts/TellerV2Storage.sol:124"
+          },
+          {
+            "label": "version",
+            "offset": 0,
+            "slot": "164",
+            "type": "t_uint256",
+            "contract": "TellerV2Storage_G0",
+            "src": "contracts/TellerV2Storage.sol:126"
+          },
+          {
+            "label": "uris",
+            "offset": 0,
+            "slot": "165",
+            "type": "t_mapping(t_uint256,t_string_storage)",
+            "contract": "TellerV2Storage_G0",
+            "src": "contracts/TellerV2Storage.sol:130"
+          },
+          {
+            "label": "_trustedMarketForwarders",
+            "offset": 0,
+            "slot": "166",
+            "type": "t_mapping(t_uint256,t_address)",
+            "contract": "TellerV2Storage_G1",
+            "src": "contracts/TellerV2Storage.sol:135"
+          },
+          {
+            "label": "_approvedForwarderSenders",
+            "offset": 0,
+            "slot": "167",
+            "type": "t_mapping(t_address,t_struct(AddressSet)5563_storage)",
+            "contract": "TellerV2Storage_G1",
+            "src": "contracts/TellerV2Storage.sol:137"
+          },
+          {
+            "label": "lenderCommitmentForwarder",
+            "offset": 0,
+            "slot": "168",
+            "type": "t_address",
+            "contract": "TellerV2Storage_G2",
+            "src": "contracts/TellerV2Storage.sol:142"
+          },
+          {
+            "label": "collateralManager",
+            "offset": 0,
+            "slot": "169",
+            "type": "t_contract(ICollateralManager)10099",
+            "contract": "TellerV2Storage_G3",
+            "src": "contracts/TellerV2Storage.sol:146"
+          },
+          {
+            "label": "lenderManager",
+            "offset": 0,
+            "slot": "170",
+            "type": "t_contract(ILenderManager)10441",
+            "contract": "TellerV2Storage_G4",
+            "src": "contracts/TellerV2Storage.sol:151"
+          },
+          {
+            "label": "bidPaymentCycleType",
+            "offset": 0,
+            "slot": "171",
+            "type": "t_mapping(t_uint256,t_enum(PaymentCycleType)12765)",
+            "contract": "TellerV2Storage_G4",
+            "src": "contracts/TellerV2Storage.sol:153"
+          },
+          {
+            "label": "escrowVault",
+            "offset": 0,
+            "slot": "172",
+            "type": "t_contract(IEscrowVault)10419",
+            "contract": "TellerV2Storage_G5",
+            "src": "contracts/TellerV2Storage.sol:158"
+          },
+          {
+            "label": "repaymentListenerForBid",
+            "offset": 0,
+            "slot": "173",
+            "type": "t_mapping(t_uint256,t_address)",
+            "contract": "TellerV2Storage_G6",
+            "src": "contracts/TellerV2Storage.sol:162"
+          },
+          {
+            "label": "__pauserRoleBearer",
+            "offset": 0,
+            "slot": "174",
+            "type": "t_mapping(t_address,t_bool)",
+            "contract": "TellerV2Storage_G7",
+            "src": "contracts/TellerV2Storage.sol:166"
+          },
+          {
+            "label": "__liquidationsPaused",
+            "offset": 0,
+            "slot": "175",
+            "type": "t_bool",
+            "contract": "TellerV2Storage_G7",
+            "src": "contracts/TellerV2Storage.sol:167"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_bytes32)dyn_storage": {
+            "label": "bytes32[]",
+            "numberOfBytes": "32"
+          },
+          "t_array(t_uint256)48_storage": {
+            "label": "uint256[48]",
+            "numberOfBytes": "1536"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_array(t_uint256)dyn_storage": {
+            "label": "uint256[]",
+            "numberOfBytes": "32"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_bytes32": {
+            "label": "bytes32",
+            "numberOfBytes": "32"
+          },
+          "t_contract(ICollateralManager)10099": {
+            "label": "contract ICollateralManager",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IERC20)1872": {
+            "label": "contract IERC20",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IEscrowVault)10419": {
+            "label": "contract IEscrowVault",
+            "numberOfBytes": "20"
+          },
+          "t_contract(ILenderManager)10441": {
+            "label": "contract ILenderManager",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IMarketRegistry)10634": {
+            "label": "contract IMarketRegistry",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IReputationManager)10721": {
+            "label": "contract IReputationManager",
+            "numberOfBytes": "20"
+          },
+          "t_enum(BidState)9733": {
+            "label": "enum BidState",
+            "members": [
+              "NONEXISTENT",
+              "PENDING",
+              "CANCELLED",
+              "ACCEPTED",
+              "PAID",
+              "LIQUIDATED",
+              "CLOSED"
+            ],
+            "numberOfBytes": "1"
+          },
+          "t_enum(PaymentCycleType)12765": {
+            "label": "enum PaymentCycleType",
+            "members": [
+              "Seconds",
+              "Monthly"
+            ],
+            "numberOfBytes": "1"
+          },
+          "t_enum(PaymentType)12762": {
+            "label": "enum PaymentType",
+            "members": [
+              "EMI",
+              "Bullet"
+            ],
+            "numberOfBytes": "1"
+          },
+          "t_mapping(t_address,t_array(t_uint256)dyn_storage)": {
+            "label": "mapping(address => uint256[])",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_mapping(t_address,t_uint256))": {
+            "label": "mapping(address => mapping(address => uint256))",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_struct(AddressSet)5563_storage)": {
+            "label": "mapping(address => struct EnumerableSet.AddressSet)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_struct(UintSet)5720_storage)": {
+            "label": "mapping(address => struct EnumerableSet.UintSet)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_bytes32,t_uint256)": {
+            "label": "mapping(bytes32 => uint256)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_address)": {
+            "label": "mapping(uint256 => address)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_enum(PaymentCycleType)12765)": {
+            "label": "mapping(uint256 => enum PaymentCycleType)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_string_storage)": {
+            "label": "mapping(uint256 => string)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_struct(Bid)9761_storage)": {
+            "label": "mapping(uint256 => struct Bid)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_uint32)": {
+            "label": "mapping(uint256 => uint32)",
+            "numberOfBytes": "32"
+          },
+          "t_string_storage": {
+            "label": "string",
+            "numberOfBytes": "32"
+          },
+          "t_struct(AddressSet)5563_storage": {
+            "label": "struct EnumerableSet.AddressSet",
+            "members": [
+              {
+                "label": "_inner",
+                "type": "t_struct(Set)5248_storage",
+                "offset": 0,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "64"
+          },
+          "t_struct(Bid)9761_storage": {
+            "label": "struct Bid",
+            "members": [
+              {
+                "label": "borrower",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "receiver",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "lender",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "marketplaceId",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "3"
+              },
+              {
+                "label": "_metadataURI",
+                "type": "t_bytes32",
+                "offset": 0,
+                "slot": "4"
+              },
+              {
+                "label": "loanDetails",
+                "type": "t_struct(LoanDetails)9778_storage",
+                "offset": 0,
+                "slot": "5"
+              },
+              {
+                "label": "terms",
+                "type": "t_struct(Terms)9785_storage",
+                "offset": 0,
+                "slot": "10"
+              },
+              {
+                "label": "state",
+                "type": "t_enum(BidState)9733",
+                "offset": 0,
+                "slot": "12"
+              },
+              {
+                "label": "paymentType",
+                "type": "t_enum(PaymentType)12762",
+                "offset": 1,
+                "slot": "12"
+              }
+            ],
+            "numberOfBytes": "416"
+          },
+          "t_struct(LoanDetails)9778_storage": {
+            "label": "struct LoanDetails",
+            "members": [
+              {
+                "label": "lendingToken",
+                "type": "t_contract(IERC20)1872",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "principal",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "totalRepaid",
+                "type": "t_struct(Payment)9738_storage",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "timestamp",
+                "type": "t_uint32",
+                "offset": 0,
+                "slot": "4"
+              },
+              {
+                "label": "acceptedTimestamp",
+                "type": "t_uint32",
+                "offset": 4,
+                "slot": "4"
+              },
+              {
+                "label": "lastRepaidTimestamp",
+                "type": "t_uint32",
+                "offset": 8,
+                "slot": "4"
+              },
+              {
+                "label": "loanDuration",
+                "type": "t_uint32",
+                "offset": 12,
+                "slot": "4"
+              }
+            ],
+            "numberOfBytes": "160"
+          },
+          "t_struct(Payment)9738_storage": {
+            "label": "struct Payment",
+            "members": [
+              {
+                "label": "principal",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "interest",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              }
+            ],
+            "numberOfBytes": "64"
+          },
+          "t_struct(Set)5248_storage": {
+            "label": "struct EnumerableSet.Set",
+            "members": [
+              {
+                "label": "_values",
+                "type": "t_array(t_bytes32)dyn_storage",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "_indexes",
+                "type": "t_mapping(t_bytes32,t_uint256)",
+                "offset": 0,
+                "slot": "1"
+              }
+            ],
+            "numberOfBytes": "64"
+          },
+          "t_struct(Terms)9785_storage": {
+            "label": "struct Terms",
+            "members": [
+              {
+                "label": "paymentCycleAmount",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "paymentCycle",
+                "type": "t_uint32",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "APR",
+                "type": "t_uint16",
+                "offset": 4,
+                "slot": "1"
+              }
+            ],
+            "numberOfBytes": "64"
+          },
+          "t_struct(UintSet)5720_storage": {
+            "label": "struct EnumerableSet.UintSet",
+            "members": [
+              {
+                "label": "_inner",
+                "type": "t_struct(Set)5248_storage",
+                "offset": 0,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "64"
+          },
+          "t_uint16": {
+            "label": "uint16",
+            "numberOfBytes": "2"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint32": {
+            "label": "uint32",
+            "numberOfBytes": "4"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        },
+        "namespaces": {}
+      }
     }
   }
 }

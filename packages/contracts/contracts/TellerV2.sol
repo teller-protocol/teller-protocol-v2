@@ -251,10 +251,10 @@ contract TellerV2 is
     }
     */
 
-
+    
      function setProtocolPausingManager(         
         address _protocolPausingManager
-    ) external onlyOwner reinitializer(10) {
+    ) external reinitializer(10) {
 
          _setProtocolPausingManager(_protocolPausingManager);
 

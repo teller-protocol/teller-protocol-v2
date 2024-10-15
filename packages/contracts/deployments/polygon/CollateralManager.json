@@ -778,6 +778,6 @@
     "status": 1,
     "byzantium": true
   },
-  "numDeployments": 9,
+  "numDeployments": 10,
   "implementation": "0x48f4ddbc34a0df3b5ac2b13db4895fa980607aa9"
 }

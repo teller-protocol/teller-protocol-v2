@@ -19,6 +19,7 @@ abstract contract HasProtocolPausingManager
     {
   
 
+        //Both the bool and the address together take one storage slot 
     bool private __paused;// .. Deprecated , handled by pausing manager 
 
     address private _protocolPausingManager; // 20 bytes, gap will start at new slot 
@@ -58,5 +59,5 @@ abstract contract HasProtocolPausingManager
      * variables without shifting down storage in the inheritance chain.
      * See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps
      */
-    uint256[48] private __gap;
+    uint256[49] private __gap;
 }

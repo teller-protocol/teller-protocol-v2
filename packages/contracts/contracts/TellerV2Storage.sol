@@ -163,8 +163,8 @@ abstract contract TellerV2Storage_G6 is TellerV2Storage_G5 {
 }
 
 abstract contract TellerV2Storage_G7 is TellerV2Storage_G6 {
-    mapping(address => bool) public pauserRoleBearer;
-    bool public liquidationsPaused;
+    mapping(address => bool) private  __pauserRoleBearer ;//pauserRoleBearer;
+    bool private __liquidationsPaused; //liquidations paused
 }
 
 abstract contract TellerV2Storage is TellerV2Storage_G7 {}

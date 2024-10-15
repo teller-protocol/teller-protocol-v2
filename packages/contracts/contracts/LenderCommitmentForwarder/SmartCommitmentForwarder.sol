@@ -7,8 +7,17 @@ import "../interfaces/ILenderCommitmentForwarder.sol";
 import "../interfaces/ISmartCommitmentForwarder.sol";
 import "./LenderCommitmentForwarder_G1.sol";
 
+import "../interfaces/IPausableTimestamp.sol";
+
+import "../interfaces/IHasProtocolPausingManager.sol";
+
+import "../interfaces/IProtocolPausingManager.sol";
+
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+
+import "@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol";
+
 
 import { CommitmentCollateralType, ISmartCommitment } from "../interfaces/ISmartCommitment.sol";
 
@@ -17,8 +26,12 @@ contract SmartCommitmentForwarder is
     ExtensionsContextUpgradeable, //this should always be first for upgradeability
     TellerV2MarketForwarder_G3,
     PausableUpgradeable,  //this does add some storage but AFTER all other storage
-    ISmartCommitmentForwarder
+    ISmartCommitmentForwarder,
+    IPausableTimestamp
      {
+
+    using MathUpgradeable for uint256;
+
     event ExercisedSmartCommitment(
         address indexed smartCommitmentAddress,
         address borrower,
@@ -31,7 +44,9 @@ contract SmartCommitmentForwarder is
 
 
     modifier onlyProtocolPauser() { 
-        require( ITellerV2( _tellerV2 ).isPauser(_msgSender()) , "Sender not authorized");
+
+        address pausingManager = IHasProtocolPausingManager( _tellerV2 ).getProtocolPausingManager();
+        require( IProtocolPausingManager( pausingManager ).isPauser(_msgSender()) , "Sender not authorized");
         _;
     }
 
@@ -42,6 +57,7 @@ contract SmartCommitmentForwarder is
     }
 
     uint256 public liquidationProtocolFeePercent; 
+    uint256 internal lastUnpausedAt;
 
 
     constructor(address _protocolAddress, address _marketRegistry)
@@ -209,7 +225,30 @@ contract SmartCommitmentForwarder is
      * @notice Lets the DAO/owner of the protocol undo a previously implemented emergency stop.
      */
     function unpause() public virtual onlyProtocolPauser whenPaused {
+        setLastUnpausedAt();
         _unpause();
+    }
+
+
+    function getLastUnpausedAt() 
+    public view 
+    returns (uint256) {
+
+
+        address pausingManager = IHasProtocolPausingManager( _tellerV2 ).getProtocolPausingManager();
+       
+        return MathUpgradeable.max(
+            lastUnpausedAt,
+            IPausableTimestamp(pausingManager).getLastUnpausedAt()
+        )
+        ;
+ 
+
+    }
+
+
+    function setLastUnpausedAt() internal {
+        lastUnpausedAt =  block.timestamp;
     }
 
 

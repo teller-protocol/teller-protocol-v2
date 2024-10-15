@@ -65,6 +65,8 @@ const deployFn: DeployFunction = async (hre) => {
   )
 
  
+    //is this necessary ? 
+      //isnt this just an implementation?
 
   const { protocolTimelock } = await hre.getNamedAccounts()
   hre.log('Transferring ownership of CommitmentGroupBeacon to Gnosis Safe...')

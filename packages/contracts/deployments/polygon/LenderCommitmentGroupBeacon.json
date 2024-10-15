@@ -664,6 +664,20 @@
     },
     {
       "type": "function",
+      "name": "getLastUnpausedAt",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
       "name": "getMarketId",
       "constant": true,
       "stateMutability": "view",
@@ -952,6 +966,20 @@
     },
     {
       "type": "function",
+      "name": "lastUnpausedAt",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
       "name": "liquidateDefaultedLoanWithIncentive",
       "constant": false,
       "payable": false,
@@ -1025,7 +1053,7 @@
     },
     {
       "type": "function",
-      "name": "pauseBorrowing",
+      "name": "pauseLendingPool",
       "constant": false,
       "payable": false,
       "inputs": [],
@@ -1336,7 +1364,7 @@
     },
     {
       "type": "function",
-      "name": "unpauseBorrowing",
+      "name": "unpauseLendingPool",
       "constant": false,
       "payable": false,
       "inputs": [],
@@ -1371,6 +1399,6 @@
     }
   ],
   "receipt": {},
-  "numDeployments": 7,
+  "numDeployments": 8,
   "implementation": "0x55Ef5d3700eEC151d4Feff74214E7C90daBDE12B"
 }

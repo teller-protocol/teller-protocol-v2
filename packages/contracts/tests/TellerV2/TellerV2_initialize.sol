@@ -19,6 +19,7 @@ contract TellerV2_initialize is Testable {
     Contract collateralManager;
     Contract lenderManager;
     Contract escrowVault;
+    Contract protocolPausingManager;
 
     function setUp() public {
         tellerV2 = new TellerV2_Override();
@@ -33,6 +34,7 @@ contract TellerV2_initialize is Testable {
         collateralManager = new Contract();
         lenderManager = new Contract();
         escrowVault = new Contract();
+        protocolPausingManager = new Contract();
 
         tellerV2.initialize(
             protocolFee,
@@ -41,7 +43,8 @@ contract TellerV2_initialize is Testable {
             address(lenderCommitmentForwarder),
             address(collateralManager),
             address(lenderManager),
-            address(escrowVault)
+            address(escrowVault),
+            address(protocolPausingManager)
         );
 
         assertEq(address(tellerV2.marketRegistry()), address(marketRegistry));
@@ -56,8 +59,9 @@ contract TellerV2_initialize is Testable {
         collateralManager = new Contract();
         lenderManager = new Contract();
         escrowVault = new Contract();
+        protocolPausingManager = new Contract();
 
-        vm.expectRevert("LenderCommitmentForwarder must be a contract");
+        vm.expectRevert("LCF_ic");
 
         tellerV2.initialize(
             protocolFee,
@@ -66,7 +70,8 @@ contract TellerV2_initialize is Testable {
             address(lenderCommitmentForwarder),
             address(collateralManager),
             address(lenderManager),
-            address(escrowVault)
+            address(escrowVault),
+            address(protocolPausingManager)
         );
     }
 
@@ -77,8 +82,9 @@ contract TellerV2_initialize is Testable {
         collateralManager = new Contract();
         lenderManager = new Contract();
         escrowVault = new Contract();
+        protocolPausingManager = new Contract();
 
-        vm.expectRevert("MarketRegistry must be a contract");
+        vm.expectRevert("MR_ic");
 
         tellerV2.initialize(
             protocolFee,
@@ -87,7 +93,8 @@ contract TellerV2_initialize is Testable {
             address(lenderCommitmentForwarder),
             address(collateralManager),
             address(lenderManager),
-            address(escrowVault)
+            address(escrowVault),
+            address(protocolPausingManager)
         );
     }
 
@@ -98,8 +105,9 @@ contract TellerV2_initialize is Testable {
         collateralManager = new Contract();
         lenderManager = new Contract();
         escrowVault = new Contract();
+        protocolPausingManager = new Contract();
 
-        vm.expectRevert("ReputationManager must be a contract");
+        vm.expectRevert("RM_ic");
 
         tellerV2.initialize(
             protocolFee,
@@ -108,7 +116,8 @@ contract TellerV2_initialize is Testable {
             address(lenderCommitmentForwarder),
             address(collateralManager),
             address(lenderManager),
-            address(escrowVault)
+            address(escrowVault),
+            address(protocolPausingManager)
         );
     }
 
@@ -119,8 +128,9 @@ contract TellerV2_initialize is Testable {
         reputationManager = new Contract();
         lenderManager = new Contract();
         escrowVault = new Contract();
+        protocolPausingManager = new Contract();
 
-        vm.expectRevert("CollateralManager must be a contract");
+        vm.expectRevert("CM_ic");
 
         tellerV2.initialize(
             protocolFee,
@@ -129,7 +139,8 @@ contract TellerV2_initialize is Testable {
             address(lenderCommitmentForwarder),
             address(collateralManager),
             address(lenderManager),
-            address(escrowVault)
+            address(escrowVault),
+            address(protocolPausingManager)
         );
     }
 
@@ -140,8 +151,9 @@ contract TellerV2_initialize is Testable {
         reputationManager = new Contract();
         collateralManager = new Contract();
         escrowVault = new Contract();
+        protocolPausingManager = new Contract();
 
-        vm.expectRevert("LenderManager must be a contract");
+        vm.expectRevert("LM_ic");
 
         tellerV2.initialize(
             protocolFee,
@@ -150,7 +162,8 @@ contract TellerV2_initialize is Testable {
             address(lenderCommitmentForwarder),
             address(collateralManager),
             address(lenderManager),
-            address(escrowVault)
+            address(escrowVault),
+            address(protocolPausingManager)
         );
     }
 

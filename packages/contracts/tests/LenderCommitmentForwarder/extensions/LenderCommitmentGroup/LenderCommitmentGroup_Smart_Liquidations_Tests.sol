@@ -16,6 +16,7 @@ import { LoanDetails, Payment, BidState , Bid, Terms } from "../../../../contrac
 import { ILenderCommitmentGroup } from "../../../../contracts/interfaces/ILenderCommitmentGroup.sol";
 import { IUniswapPricingLibrary } from "../../../../contracts/interfaces/IUniswapPricingLibrary.sol";
 
+import {ProtocolPausingManager} from "../../../../contracts/pausing/ProtocolPausingManager.sol";
 
 
 import "lib/forge-std/src/console.sol";
@@ -77,6 +78,12 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
 
 
         
+        ProtocolPausingManager protocolPausingManager = new ProtocolPausingManager();
+        protocolPausingManager.initialize();
+
+        _tellerV2.setProtocolPausingManager(address(protocolPausingManager));
+      
+
 
         principalToken = new TestERC20Token("wrappedETH", "WETH", 1e24, 18);
 

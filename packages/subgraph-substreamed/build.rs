@@ -7,10 +7,12 @@ fn main() -> Result<(), anyhow::Error> {
     let file_names = [
         "abi/factory_contract.abi.json",
         "abi/lendergroup_contract.abi.json",
+        "abi/collateral_manager.abi.json",
     ];
     let file_output_names = [
         "src/abi/factory_contract.rs",
         "src/abi/lendergroup_contract.rs",
+        "src/abi/collateral_manager.rs",
     ];
 
     let mut i = 0;

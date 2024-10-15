@@ -39,13 +39,21 @@ substreams pack ./substreams.yaml
 
 #### DEPLOYING 
 
+62350000
+
 make && make build && make pack 
 
 
 graph auth --studio  
  graph deploy --studio tellerv2-lender-groups-polygon
  
- 0.4.21.91
+ 0.4.21.114
+
+
+
+ ### CHECK THE STATUS 
+
+ https://api.studio.thegraph.com/query/36377/tellerv2-lender-groups-polygon/0.4.21.103/graphql
 
 
 

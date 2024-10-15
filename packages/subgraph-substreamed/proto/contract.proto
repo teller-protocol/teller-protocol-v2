@@ -160,12 +160,7 @@ message lendergroup_PoolInitialized {
     uint64 interest_rate_upper_bound = 11;
     uint64 liquidity_threshold_percent = 12;
     uint64 loan_to_value_percent = 13;
-    uint64 uniswap_pool_fee = 14;
-    uint64 twap_interval = 15;
-    bytes pool_shares_token = 16;
-    bytes uniswap_v3_pool_address= 17;
-    bytes teller_v2_address=18;
-    bytes smart_commitment_forwarder_address=19; 
+    bytes pool_shares_token = 14;
     
 }
 

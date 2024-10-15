@@ -1,0 +1,76 @@
+specVersion: v0.1.0
+package:
+  name: teller_protocol_v2_accounting
+  version: v0.1.0
+
+imports:
+  sql: https://github.com/streamingfast/substreams-sink-sql/releases/download/protodefs-v1.0.7/substreams-sink-sql-protodefs-v1.0.7.spkg
+  graph: https://github.com/streamingfast/substreams-sink-subgraph/releases/download/v0.1.0/substreams-sink-subgraph-protodefs-v0.1.0.spkg
+  database_change: https://github.com/streamingfast/substreams-sink-database-changes/releases/download/v1.2.1/substreams-database-change-v1.2.1.spkg
+  entity: https://github.com/streamingfast/substreams-entity-change/releases/download/v1.1.0/substreams-entity-change-v1.1.0.spkg
+
+protobuf:
+  files:
+    - contract.proto
+  importPaths:
+    - ./proto
+
+binaries:
+  default:
+    type: wasm/rust-v1
+    file: ./target/wasm32-unknown-unknown/release/substreams.wasm
+
+modules:
+  - name: map_events
+    kind: map
+    initialBlock: 15094701
+    inputs:
+      - source: sf.ethereum.type.v2.Block
+    output:
+      type: proto:contract.v1.Events
+    
+      
+  - name: store_token_interaction_deltas
+    kind: store
+    initialBlock: 15094701
+    updatePolicy: add
+    valueType: bigint
+    inputs:
+      - map: map_events
+      
+       
+      
+  - name: store_decimals_for_tokens
+    kind: store
+    initialBlock: 15094701
+    updatePolicy: set
+    valueType: bigint
+    inputs: 
+      - store: store_token_interaction_deltas
+        mode: deltas
+         
+  - name: store_uniswap_prices_for_tokens
+    kind: store
+    initialBlock: 15094701
+    updatePolicy: set
+    valueType: float64
+    inputs: 
+      - store: store_token_interaction_deltas
+        mode: deltas
+
+  
+ 
+  - name: graph_out
+    kind: map
+    initialBlock: 15094701
+    inputs:
+      - map: map_events
+      - store: store_token_interaction_deltas
+        mode: deltas
+      - store: store_uniswap_prices_for_tokens
+      - store: store_decimals_for_tokens
+      
+    output:
+      type: proto:sf.substreams.entity.v1.EntityChanges
+
+network: mainnet

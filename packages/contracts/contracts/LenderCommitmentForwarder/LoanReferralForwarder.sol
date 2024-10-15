@@ -47,6 +47,14 @@ contract LoanReferralForwarder
     }
 
 
+    event CommitmentAcceptedWithReferral(
+        uint256 indexed bidId,
+        address indexed recipient,
+        uint256 fundsRemaining,
+        uint256 reward,
+        address rewardRecipient
+    );
+
     /**
      *
      * @notice Initializes the FlashRolloverLoan with necessary contract addresses.
@@ -141,7 +149,8 @@ contract LoanReferralForwarder
           );
 
 
-
+        emit CommitmentAcceptedWithReferral(bidId_, _recipient, fundsRemaining, _reward, _rewardRecipient);
+  
        
     }
 

@@ -20,6 +20,13 @@ import "../../../libraries/NumbersLib.sol";
 
 import "../../../interfaces/uniswap/IUniswapV3Pool.sol";
 
+
+import "../../../interfaces/IHasProtocolPausingManager.sol";
+
+import "../../../interfaces/IProtocolPausingManager.sol";
+
+
+
 import "../../../interfaces/uniswap/IUniswapV3Factory.sol";
 import "../../../interfaces/ISmartCommitmentForwarder.sol";
 
@@ -230,10 +237,22 @@ contract LenderCommitmentGroup_Smart is
     }
 
 
-     modifier onlyProtocolOwner() {
+    modifier onlyProtocolOwner() {
         require(
             msg.sender == Ownable(address(TELLER_V2)).owner(),
-            "Can only be called by TellerV2"
+            "Not Protocol Owner"
+        );
+        _;
+    }
+
+    modifier onlyOwnerOrProtocolPauser() {
+
+        address pausingManager = IHasProtocolPausingManager( address(TELLER_V2) ).getProtocolPausingManager();
+
+        require(
+           IProtocolPausingManager( pausingManager ).isPauser(_msgSender())
+            || msg.sender ==  owner() ,
+            "Not Owner or Protocol Owner"
         );
         _;
     }
@@ -1018,14 +1037,14 @@ contract LenderCommitmentGroup_Smart is
     /**
      * @notice Lets the DAO/owner of the protocol implement an emergency stop mechanism.
      */
-    function pauseLendingPool() public virtual onlyOwner whenNotPaused {
+    function pauseLendingPool() public virtual onlyOwnerOrProtocolPauser whenNotPaused {
         _pause();
     }
 
     /**
      * @notice Lets the DAO/owner of the protocol undo a previously implemented emergency stop.
      */
-    function unpauseLendingPool() public virtual onlyOwner whenPaused {
+    function unpauseLendingPool() public virtual onlyOwnerOrProtocolPauser whenPaused {
         setLastUnpausedAt();
         _unpause();
     }

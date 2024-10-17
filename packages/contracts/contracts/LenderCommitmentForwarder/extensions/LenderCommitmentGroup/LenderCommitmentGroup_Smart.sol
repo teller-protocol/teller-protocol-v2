@@ -245,13 +245,12 @@ contract LenderCommitmentGroup_Smart is
         _;
     }
 
-    modifier onlyOwnerOrProtocolPauser() {
+    modifier onlyProtocolPauser() {
 
         address pausingManager = IHasProtocolPausingManager( address(TELLER_V2) ).getProtocolPausingManager();
 
         require(
-           IProtocolPausingManager( pausingManager ).isPauser(msg.sender)
-            || msg.sender ==  owner() ,
+           IProtocolPausingManager( pausingManager ).isPauser(msg.sender)  ,
             "Not Owner or Protocol Owner"
         );
         _;
@@ -1037,14 +1036,14 @@ contract LenderCommitmentGroup_Smart is
     /**
      * @notice Lets the DAO/owner of the protocol implement an emergency stop mechanism.
      */
-    function pauseLendingPool() public virtual onlyOwnerOrProtocolPauser whenNotPaused {
+    function pauseLendingPool() public virtual onlyProtocolPauser whenNotPaused {
         _pause();
     }
 
     /**
      * @notice Lets the DAO/owner of the protocol undo a previously implemented emergency stop.
      */
-    function unpauseLendingPool() public virtual onlyOwnerOrProtocolPauser whenPaused {
+    function unpauseLendingPool() public virtual onlyProtocolPauser whenPaused {
         setLastUnpausedAt();
         _unpause();
     }

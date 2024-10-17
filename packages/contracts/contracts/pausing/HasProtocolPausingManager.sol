@@ -20,7 +20,7 @@ abstract contract HasProtocolPausingManager
   
 
         //Both the bool and the address together take one storage slot 
-    bool private __paused;// .. Deprecated , handled by pausing manager 
+    bool private __paused;// .. Deprecated , handled by pausing manager now
 
     address private _protocolPausingManager; // 20 bytes, gap will start at new slot 
   
@@ -31,7 +31,7 @@ abstract contract HasProtocolPausingManager
         _;
     }
 
-    //rename to when protocol not paused ?
+    
     modifier whenProtocolNotPaused() {
          require(! IProtocolPausingManager(_protocolPausingManager). protocolPaused(), "Protocol paused" );
       
@@ -39,7 +39,7 @@ abstract contract HasProtocolPausingManager
     }
  
 
-        //onlyinitializing? 
+        
     function _setProtocolPausingManager(address protocolPausingManager) internal {
         _protocolPausingManager = protocolPausingManager ;
     }

@@ -261,6 +261,7 @@ contract LenderCommitmentGroup_Smart is
 
         _;
     }
+ 
 
     modifier whenForwarderNotPaused() {
          require( PausableUpgradeable(address(SMART_COMMITMENT_FORWARDER)).paused() == false , "Smart Commitment Forwarder is paused");

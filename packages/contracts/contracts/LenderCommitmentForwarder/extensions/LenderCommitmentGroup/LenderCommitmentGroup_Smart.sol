@@ -250,7 +250,7 @@ contract LenderCommitmentGroup_Smart is
         address pausingManager = IHasProtocolPausingManager( address(TELLER_V2) ).getProtocolPausingManager();
 
         require(
-           IProtocolPausingManager( pausingManager ).isPauser(_msgSender())
+           IProtocolPausingManager( pausingManager ).isPauser(msg.sender)
             || msg.sender ==  owner() ,
             "Not Owner or Protocol Owner"
         );

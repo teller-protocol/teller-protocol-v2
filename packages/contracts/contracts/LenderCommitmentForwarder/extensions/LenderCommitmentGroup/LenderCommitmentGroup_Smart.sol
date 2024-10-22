@@ -20,6 +20,13 @@ import "../../../libraries/NumbersLib.sol";
 
 import "../../../interfaces/uniswap/IUniswapV3Pool.sol";
 
+
+import "../../../interfaces/IHasProtocolPausingManager.sol";
+
+import "../../../interfaces/IProtocolPausingManager.sol";
+
+
+
 import "../../../interfaces/uniswap/IUniswapV3Factory.sol";
 import "../../../interfaces/ISmartCommitmentForwarder.sol";
 
@@ -38,6 +45,8 @@ import { ILoanRepaymentListener } from "../../../interfaces/ILoanRepaymentListen
 import { ILoanRepaymentCallbacks } from "../../../interfaces/ILoanRepaymentCallbacks.sol";
 
 import { IEscrowVault } from "../../../interfaces/IEscrowVault.sol";
+
+import { IPausableTimestamp } from "../../../interfaces/IPausableTimestamp.sol";
 import { ILenderCommitmentGroup } from "../../../interfaces/ILenderCommitmentGroup.sol";
 import { Payment } from "../../../TellerV2Storage.sol";
 
@@ -70,6 +79,7 @@ contract LenderCommitmentGroup_Smart is
     ILenderCommitmentGroup,
     ISmartCommitment,
     ILoanRepaymentListener,
+    IPausableTimestamp,
     Initializable,
     OwnableUpgradeable,
     PausableUpgradeable
@@ -142,6 +152,9 @@ contract LenderCommitmentGroup_Smart is
 
     //configured by the owner. If 0 , not used. 
     uint256 public maxPrincipalPerCollateralAmount; 
+
+
+    uint256 public lastUnpausedAt;
    
 
     event PoolInitialized(
@@ -224,10 +237,21 @@ contract LenderCommitmentGroup_Smart is
     }
 
 
-     modifier onlyProtocolOwner() {
+    modifier onlyProtocolOwner() {
         require(
             msg.sender == Ownable(address(TELLER_V2)).owner(),
-            "Can only be called by TellerV2"
+            "Not Protocol Owner"
+        );
+        _;
+    }
+
+    modifier onlyProtocolPauser() {
+
+        address pausingManager = IHasProtocolPausingManager( address(TELLER_V2) ).getProtocolPausingManager();
+
+        require(
+           IProtocolPausingManager( pausingManager ).isPauser(msg.sender)  ,
+            "Not Owner or Protocol Owner"
         );
         _;
     }
@@ -237,9 +261,10 @@ contract LenderCommitmentGroup_Smart is
 
         _;
     }
+ 
 
     modifier whenForwarderNotPaused() {
-         require( PausableUpgradeable(address(SMART_COMMITMENT_FORWARDER)).paused() == false , "Protocol is paused");
+         require( PausableUpgradeable(address(SMART_COMMITMENT_FORWARDER)).paused() == false , "Smart Commitment Forwarder is paused");
         _;
     }
 
@@ -433,7 +458,7 @@ contract LenderCommitmentGroup_Smart is
         uint256 _amount,
         address _sharesRecipient,
         uint256 _minSharesAmountOut
-    ) external whenForwarderNotPaused returns (uint256 sharesAmount_) {
+    ) external whenForwarderNotPaused whenNotPaused returns (uint256 sharesAmount_) {
         //transfers the primary principal token from msg.sender into this contract escrow
 
        
@@ -507,7 +532,7 @@ contract LenderCommitmentGroup_Smart is
         uint256 _collateralTokenId, 
         uint32 _loanDuration,
         uint16 _interestRate
-    ) external onlySmartCommitmentForwarder whenForwarderNotPaused {
+    ) external onlySmartCommitmentForwarder whenForwarderNotPaused whenNotPaused {
         
         require(
             _collateralTokenAddress == address(collateralToken),
@@ -569,7 +594,7 @@ contract LenderCommitmentGroup_Smart is
 
     function prepareSharesForWithdraw(
         uint256 _amountPoolSharesTokens 
-    ) external whenForwarderNotPaused returns (bool) {
+    ) external whenForwarderNotPaused whenNotPaused returns (bool) {
         
         return _prepareSharesForWithdraw(msg.sender, _amountPoolSharesTokens); 
     }
@@ -604,7 +629,7 @@ contract LenderCommitmentGroup_Smart is
         uint256 _amountPoolSharesTokens,
         address _recipient,
         uint256 _minAmountOut
-    ) external whenForwarderNotPaused returns (uint256) {
+    ) external whenForwarderNotPaused whenNotPaused returns (uint256) {
        
         require(poolSharesPreparedToWithdrawForLender[msg.sender] >= _amountPoolSharesTokens,"Shares not prepared for withdraw");
         require(poolSharesPreparedTimestamp[msg.sender] <= block.timestamp - withdrawlDelayTimeSeconds,"Shares not prepared for withdraw");
@@ -647,7 +672,7 @@ contract LenderCommitmentGroup_Smart is
     function liquidateDefaultedLoanWithIncentive(
         uint256 _bidId,
         int256 _tokenAmountDifference
-    ) public whenForwarderNotPaused bidIsActiveForGroup(_bidId) {
+    ) public whenForwarderNotPaused whenNotPaused bidIsActiveForGroup(_bidId) {
         
         //use original principal amount as amountDue
 
@@ -658,9 +683,14 @@ contract LenderCommitmentGroup_Smart is
         uint256 loanDefaultedTimeStamp = ITellerV2(TELLER_V2)
             .getLoanDefaultTimestamp(_bidId);
 
+        uint256 loanDefaultedOrUnpausedAtTimeStamp = Math.max(
+            loanDefaultedTimeStamp,
+            getLastUnpausedAt()
+        );
+
         int256 minAmountDifference = getMinimumAmountDifferenceToCloseDefaultedLoan(
                 amountDue,
-                loanDefaultedTimeStamp
+                loanDefaultedOrUnpausedAtTimeStamp
             );
 
         require(
@@ -734,6 +764,26 @@ contract LenderCommitmentGroup_Smart is
             amountDue, 
             _tokenAmountDifference
         );
+    }
+
+
+    function getLastUnpausedAt() 
+    public view 
+    returns (uint256) {
+
+
+        return Math.max(
+            lastUnpausedAt,
+            IPausableTimestamp(SMART_COMMITMENT_FORWARDER).getLastUnpausedAt() //this counts tellerV2 pausing
+            )
+        ;
+ 
+
+    }
+
+
+    function setLastUnpausedAt() internal {
+        lastUnpausedAt =  block.timestamp;
     }
 
     
@@ -818,21 +868,11 @@ contract LenderCommitmentGroup_Smart is
     function calculateCollateralTokensAmountEquivalentToPrincipalTokens(
         uint256 principalAmount 
     ) public view virtual returns (uint256 collateralTokensAmountToMatchValue) {
-        //same concept as zeroforone
-       // (address token0, ) = _getPoolTokens();
-
-        //bool principalTokenIsToken0 = (address(principalToken) == token0);
-         //uint256 pairPriceImmediate = _getUniswapV3TokenPairPrice(0);
-
+   
         uint256 pairPriceWithTwapFromOracle = UniswapPricingLibrary
             .getUniswapPriceRatioForPoolRoutes(poolOracleRoutes);
        
-      
-       //uint256 scaledPoolOraclePrice = UniswapPricingLibrary.getUniswapPriceRatioForPoolRoutes(
-       //         poolOracleRoutes
-       //     ).percent(collateralRatio);
- 
-
+       
         uint256 principalPerCollateralAmount = maxPrincipalPerCollateralAmount == 0  
                 ? pairPriceWithTwapFromOracle   
                 : Math.min(
@@ -864,132 +904,7 @@ contract LenderCommitmentGroup_Smart is
                 MathUpgradeable.Rounding.Up
             );  
     }
-    //this result is expanded by UNISWAP_EXPANSION_FACTOR
-   /* function _getUniswapV3TokenPairPrice(uint32 _twapInterval)
-        internal
-        view
-        returns (uint256)
-    {
-        // represents the square root of the price of token1 in terms of token0
-
-        uint160 sqrtPriceX96 = getSqrtTwapX96(_twapInterval);
-
-        //this output is the price ratio expanded by 1e18
-        return _getPriceFromSqrtX96(sqrtPriceX96);
-    }
-
-    //this result is expanded by UNISWAP_EXPANSION_FACTOR
-    function _getPriceFromSqrtX96(uint160 _sqrtPriceX96)
-        internal
-        pure
-        returns (uint256 price_)
-    {
-       
-         
-
-        uint256 priceX96 = FullMath.mulDiv(uint256(_sqrtPriceX96), uint256(_sqrtPriceX96), (2**96) );
-
-        // sqrtPrice is in X96 format so we scale it down to get the price
-        // Also note that this price is a relative price between the two tokens in the pool
-        // It's not a USD price
-        price_ = priceX96;
-    }
-
-    // ---- TWAP
-
-    function getSqrtTwapX96(uint32 twapInterval)
-        public
-        view
-        returns (uint160 sqrtPriceX96)
-    {
-        if (twapInterval == 0) {
-            // return the current price if twapInterval == 0
-            (sqrtPriceX96, , , , , , ) = IUniswapV3Pool(UNISWAP_V3_POOL)
-                .slot0();
-        } else {
-            uint32[] memory secondsAgos = new uint32[](2);
-            secondsAgos[0] = twapInterval+1; // from (before)
-            secondsAgos[1] = 1; // to (now)
-
-            (int56[] memory tickCumulatives, ) = IUniswapV3Pool(UNISWAP_V3_POOL)
-                .observe(secondsAgos);
-
-        
-
-              int56 tickCumulativesDelta = tickCumulatives[1] - tickCumulatives[0];
-              int24 arithmeticMeanTick = int24(tickCumulativesDelta / int32(twapInterval));
-               //// Always round to negative infinity
-              if (tickCumulativesDelta < 0 && (tickCumulativesDelta % int32(twapInterval) != 0)) arithmeticMeanTick--;
-             
-               sqrtPriceX96 = TickMath.getSqrtRatioAtTick(arithmeticMeanTick);
-
-
-        }
-    }
-    
-    
-    function _getPoolTokens()
-        internal
-        view
-        virtual
-        returns (address token0, address token1)
-    {
-        token0 = IUniswapV3Pool(UNISWAP_V3_POOL).token0();
-        token1 = IUniswapV3Pool(UNISWAP_V3_POOL).token1();
-    }
-    
-    
-    */
-
-
-    // -----
-
  
-    /*
-        Dev Note: pairPriceWithTwap and pairPriceImmediate are expanded by UNISWAP_EXPANSION_FACTOR
-
-    */
-   /* function _getCollateralTokensAmountEquivalentToPrincipalTokens(
-        uint256 principalTokenAmountValue,
-        uint256 pairPrice 
-        //uint256 pairPriceImmediate,
-       // bool principalTokenIsToken0
-    ) public pure returns (uint256 collateralTokensAmountToMatchValue) {
-        collateralTokensAmountToMatchValue = token0ToToken1(
-                principalTokenAmountValue,
-                pairPrice //if this is lower, collateral tokens amt will be higher
-            );
-    }
-
-    //note: the price is still expanded by UNISWAP_EXPANSION_FACTOR
-    function token0ToToken1(uint256 amountToken0, uint256 priceToken1PerToken0)
-        internal
-        pure
-        returns (uint256)
-    {
-        return
-            MathUpgradeable.mulDiv(
-                amountToken0,
-                UNISWAP_EXPANSION_FACTOR,
-                priceToken1PerToken0,
-                MathUpgradeable.Rounding.Up
-            );
-    }
-
-    //note: the price is still expanded by UNISWAP_EXPANSION_FACTOR
-    function token1ToToken0(uint256 amountToken1, uint256 priceToken1PerToken0)
-        internal
-        pure
-        returns (uint256)
-    {
-        return
-            MathUpgradeable.mulDiv(
-                amountToken1,
-                priceToken1PerToken0,
-                UNISWAP_EXPANSION_FACTOR,
-                MathUpgradeable.Rounding.Up
-            );
-    }*/
 
     /*
     This  callback occurs when a TellerV2 repayment happens or when a TellerV2 liquidate happens 
@@ -1001,7 +916,7 @@ contract LenderCommitmentGroup_Smart is
         address repayer,
         uint256 principalAmount,
         uint256 interestAmount
-    ) external onlyTellerV2 whenForwarderNotPaused {
+    ) external onlyTellerV2 whenForwarderNotPaused whenNotPaused {
         //can use principal amt to increment amt paid back!! nice for math .
         totalPrincipalTokensRepaid += principalAmount;
         totalInterestCollected += interestAmount;
@@ -1021,7 +936,7 @@ contract LenderCommitmentGroup_Smart is
         If principaltokens get stuck in the escrow vault for any reason, anyone may
         call this function to move them from that vault in to this contract 
     */
-    function withdrawFromEscrowVault ( uint256 _amount ) public whenForwarderNotPaused  {
+    function withdrawFromEscrowVault ( uint256 _amount ) public whenForwarderNotPaused whenNotPaused {
 
 
         address _escrowVault = ITellerV2(TELLER_V2).getEscrowVault();
@@ -1122,14 +1037,15 @@ contract LenderCommitmentGroup_Smart is
     /**
      * @notice Lets the DAO/owner of the protocol implement an emergency stop mechanism.
      */
-    function pauseBorrowing() public virtual onlyOwner whenNotPaused {
+    function pauseLendingPool() public virtual onlyProtocolPauser whenNotPaused {
         _pause();
     }
 
     /**
      * @notice Lets the DAO/owner of the protocol undo a previously implemented emergency stop.
      */
-    function unpauseBorrowing() public virtual onlyOwner whenPaused {
+    function unpauseLendingPool() public virtual onlyProtocolPauser whenPaused {
+        setLastUnpausedAt();
         _unpause();
     }
 }

@@ -166,5 +166,7 @@ abstract contract TellerV2Storage_G7 is TellerV2Storage_G6 {
     mapping(address => bool) private  __pauserRoleBearer ;//pauserRoleBearer;
     bool private __liquidationsPaused; //liquidations paused
 }
-
-abstract contract TellerV2Storage is TellerV2Storage_G7 {}
+abstract contract TellerV2Storage_G8 is TellerV2Storage_G7 {
+   address public interactAllowManager; 
+}
+abstract contract TellerV2Storage is TellerV2Storage_G8 {}

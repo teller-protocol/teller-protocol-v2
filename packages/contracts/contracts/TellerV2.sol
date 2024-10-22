@@ -20,6 +20,9 @@ import "./interfaces/IEscrowVault.sol";
 import { ILoanRepaymentCallbacks } from "./interfaces/ILoanRepaymentCallbacks.sol";
 import "./interfaces/ILoanRepaymentListener.sol";
 
+import "./interfaces/IInteractAllowManager.sol";
+
+
 // Libraries
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
@@ -162,6 +165,13 @@ contract TellerV2 is
         }
 
         _;
+    }
+
+    modifier senderInteractionAllowed(){
+        require( IInteractAllowManager( address(interactAllowManager) ) .interactionAllowedFrom( _msgSender() )    );
+
+        _;
+
     }
 
 
@@ -474,6 +484,7 @@ contract TellerV2 is
         override
         pendingBid(_bidId, "lenderAcceptBid")
         whenProtocolNotPaused
+        senderInteractionAllowed
         returns (
             uint256 amountToProtocol,
             uint256 amountToMarketplace,

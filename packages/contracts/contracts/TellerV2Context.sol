@@ -77,7 +77,7 @@ abstract contract TellerV2Context is
     {
         require(
             marketRegistry.getMarketOwner(_marketId) == _msgSender(),
-            "Caller must be the market owner"
+            "Not market owner"
         );
         _trustedMarketForwarders[_marketId] = _forwarder;
         emit TrustedMarketForwarderSet(_marketId, _forwarder, _msgSender());
@@ -94,7 +94,7 @@ abstract contract TellerV2Context is
     {
         require(
             isTrustedMarketForwarder(_marketId, _forwarder),
-            "Forwarder must be trusted by the market"
+            "Forwarder: TM"
         );
         _approvedForwarderSenders[_forwarder].add(_msgSender());
         emit MarketForwarderApproved(_marketId, _forwarder, _msgSender());
@@ -136,7 +136,7 @@ abstract contract TellerV2Context is
             // Ensure the appended sender address approved the forwarder
             require(
                 _approvedForwarderSenders[_msgSender()].contains(sender),
-                "Sender must approve market forwarder"
+                "SAMF"
             );
             return sender;
         }
@@ -160,5 +160,5 @@ abstract contract TellerV2Context is
         } else {
             return _msgData();
         }
-    }
+    } 
 }

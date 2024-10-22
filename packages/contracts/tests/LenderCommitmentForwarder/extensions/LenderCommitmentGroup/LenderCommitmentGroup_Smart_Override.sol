@@ -12,6 +12,7 @@ contract LenderCommitmentGroup_Smart_Override is LenderCommitmentGroup_Smart {
     //  bool public acceptBidWasCalled;
 
     uint256 mockMaxPrincipalPerCollateralAmount;
+    uint256 mockRequiredCollateralAmount;
     uint256 mockSharesExchangeRate;
     int256 mockMinimumAmountDifferenceToCloseDefaultedLoan;
 
@@ -28,7 +29,7 @@ contract LenderCommitmentGroup_Smart_Override is LenderCommitmentGroup_Smart {
         mockSharesExchangeRate = _mockRate;
     }
 
-       function set_mockBidAsActiveForGroup(uint256 _bidId,bool _active) public {
+    function set_mockBidAsActiveForGroup(uint256 _bidId,bool _active) public {
         activeBids[_bidId] = _active;
     }
  
@@ -38,6 +39,16 @@ contract LenderCommitmentGroup_Smart_Override is LenderCommitmentGroup_Smart {
         int256 _amt
     ) external   returns (uint256){
        mockMinimumAmountDifferenceToCloseDefaultedLoan = _amt;
+    } 
+
+
+
+  function mock_prepareSharesForWithdraw(
+        uint256 _amountPoolSharesTokens
+    ) external   {
+        poolSharesPreparedToWithdrawForLender[msg.sender] = _amountPoolSharesTokens; 
+        poolSharesPreparedTimestamp[msg.sender] = block.timestamp;
+       
     } 
 
 
@@ -59,8 +70,8 @@ contract LenderCommitmentGroup_Smart_Override is LenderCommitmentGroup_Smart {
         return super.getMinimumAmountDifferenceToCloseDefaultedLoan(_amountOwed,_loanDefaultedTimestamp);
     }
 
-    function getAmountOwedForBid(uint256 _bidId, bool _includeInterest)
-     public override view returns (uint256){
+    function _getAmountOwedForBid(uint256 _bidId )
+     internal override view returns (uint256){
         return mockAmountOwed;
 
      }
@@ -70,21 +81,26 @@ contract LenderCommitmentGroup_Smart_Override is LenderCommitmentGroup_Smart {
     }
 
 
+    function set_totalPrincipalTokensRepaid(uint256 _mockAmt) public {
+        totalPrincipalTokensRepaid = _mockAmt;
+    }
 
     function set_totalPrincipalTokensCommitted(uint256 _mockAmt) public {
         totalPrincipalTokensCommitted = _mockAmt;
+    }
+
+      function set_totalPrincipalTokensWithdrawn(uint256 _mockAmt) public {
+        totalPrincipalTokensWithdrawn = _mockAmt;
     }
 
     function set_totalInterestCollected(uint256 _mockAmt) public {
         totalInterestCollected = _mockAmt;
     }
 
-    function set_principalTokensCommittedByLender(
-        address lender,
-        uint256 _mockAmt
-    ) public {
-        principalTokensCommittedByLender[lender] = _mockAmt;
+      function set_tokenDifferenceFromLiquidations(int256 _mockAmt) public {
+        tokenDifferenceFromLiquidations = _mockAmt;
     }
+ 
 
     function mock_mintShares(address _sharesRecipient, uint256 _mockAmt)
         public
@@ -96,7 +112,14 @@ contract LenderCommitmentGroup_Smart_Override is LenderCommitmentGroup_Smart {
         mockMaxPrincipalPerCollateralAmount = amt;
     }
 
+      function set_mock_requiredCollateralAmount(uint256 amt) public {
+        mockRequiredCollateralAmount = amt;
+    }
 
+    function mock_setFirstDepositMade(bool made) public {
+        firstDepositMade = made;
+
+    }
 
     function sharesExchangeRate() public override view returns (uint256 rate_) {
         
@@ -129,36 +152,62 @@ contract LenderCommitmentGroup_Smart_Override is LenderCommitmentGroup_Smart {
           mockToken1 = token1;
         
     }
-
+/*
     function _getPoolTokens() internal view override returns (address token0, address token1) {
 
         return (mockToken0,mockToken1); 
         
     }
-
-    function super_getCollateralTokensAmountEquivalentToPrincipalTokens(
+*/
+  /*  function super_getCollateralTokensAmountEquivalentToPrincipalTokens(
         uint256 principalTokenAmountValue,
-        uint256 pairPriceWithTwap,
-        uint256 pairPriceImmediate,  
-        bool principalTokenIsToken0
+        uint256 pairPriceWithTwap 
+     //   uint256 pairPriceImmediate,  
+      //  bool principalTokenIsToken0
     ) public view returns(uint256){
 
         return super._getCollateralTokensAmountEquivalentToPrincipalTokens(
             principalTokenAmountValue,
-            pairPriceWithTwap,
-            pairPriceImmediate,
-            principalTokenIsToken0
+            pairPriceWithTwap 
+            //pairPriceImmediate,
+           // principalTokenIsToken0
         );
 
     }
 
+*/
 
+
+    function getRequiredCollateral(
+       uint256 _principalAmount,
+       uint256 maxPrincipalPerCollateralAmount 
+       
+    ) public view override returns (uint256 collateralTokensAmountToMatchValue) {
+ 
+        return  mockRequiredCollateralAmount  ;
+    }
+
+/*
+    function calculateCollateralTokensAmountEquivalentToPrincipalTokens(
+        uint256 principalTokenAmountValue
+    ) public view override returns (uint256 collateralTokensAmountToMatchValue) {
+
+            //this is not correct 
+        return
+            principalTokenAmountValue 
+            * mockMaxPrincipalPerCollateralAmount  ;
+    }*/
+
+
+
+
+/*
     function super_getPriceFromSqrtX96(uint160 _sqrtPriceX96) public pure returns (uint256 price_) {
 
         price_ =  super._getPriceFromSqrtX96(_sqrtPriceX96);
     }
 
-
+*/
 
 
 

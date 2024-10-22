@@ -240,18 +240,6 @@
     {
       "type": "event",
       "anonymous": false,
-      "name": "Paused",
-      "inputs": [
-        {
-          "type": "address",
-          "name": "account",
-          "indexed": false
-        }
-      ]
-    },
-    {
-      "type": "event",
-      "anonymous": false,
       "name": "ProtocolFeeSet",
       "inputs": [
         {
@@ -311,18 +299,6 @@
         {
           "type": "address",
           "name": "sender",
-          "indexed": false
-        }
-      ]
-    },
-    {
-      "type": "event",
-      "anonymous": false,
-      "name": "Unpaused",
-      "inputs": [
-        {
-          "type": "address",
-          "name": "account",
           "indexed": false
         }
       ]
@@ -802,6 +778,20 @@
     },
     {
       "type": "function",
+      "name": "getEscrowVault",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
       "name": "getLoanBorrower",
       "constant": true,
       "stateMutability": "view",
@@ -944,20 +934,15 @@
     },
     {
       "type": "function",
-      "name": "getMetadataURI",
+      "name": "getProtocolPausingManager",
       "constant": true,
       "stateMutability": "view",
       "payable": false,
-      "inputs": [
-        {
-          "type": "uint256",
-          "name": "_bidId"
-        }
-      ],
+      "inputs": [],
       "outputs": [
         {
-          "type": "string",
-          "name": "metadataURI_"
+          "type": "address",
+          "name": ""
         }
       ]
     },
@@ -1040,6 +1025,10 @@
         {
           "type": "address",
           "name": "_escrowVault"
+        },
+        {
+          "type": "address",
+          "name": "_protocolPausingManager"
         }
       ],
       "outputs": []
@@ -1361,28 +1350,6 @@
     },
     {
       "type": "function",
-      "name": "pauseProtocol",
-      "constant": false,
-      "payable": false,
-      "inputs": [],
-      "outputs": []
-    },
-    {
-      "type": "function",
-      "name": "paused",
-      "constant": true,
-      "stateMutability": "view",
-      "payable": false,
-      "inputs": [],
-      "outputs": [
-        {
-          "type": "bool",
-          "name": ""
-        }
-      ]
-    },
-    {
-      "type": "function",
       "name": "protocolFee",
       "constant": true,
       "stateMutability": "view",
@@ -1535,6 +1502,19 @@
         {
           "type": "uint16",
           "name": "newFee"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "setProtocolPausingManager",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "_protocolPausingManager"
         }
       ],
       "outputs": []
@@ -1713,14 +1693,6 @@
     },
     {
       "type": "function",
-      "name": "unpauseProtocol",
-      "constant": false,
-      "payable": false,
-      "inputs": [],
-      "outputs": []
-    },
-    {
-      "type": "function",
       "name": "uris",
       "constant": true,
       "stateMutability": "view",
@@ -1811,6 +1783,6 @@
     "status": 1,
     "byzantium": true
   },
-  "numDeployments": 12,
-  "implementation": "0x86D540Ca6de284c18BeED0F6f154499CF9b61322"
+  "numDeployments": 22,
+  "implementation": "0xd177f4b8e348b4c56c2ac8e03b58e41b79351a7f"
 }

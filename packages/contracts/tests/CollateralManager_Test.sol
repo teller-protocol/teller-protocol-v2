@@ -16,7 +16,7 @@ import "./tokens/TestERC1155Token.sol";
 
 import "../contracts/mock/TellerV2SolMock.sol";
 import "../contracts/CollateralManager.sol";
-
+import "../contracts/pausing/ProtocolPausingManager.sol";
 import "./CollateralManager_Override.sol";
 
 contract CollateralManager_Test is Testable {
@@ -73,6 +73,11 @@ contract CollateralManager_Test is Testable {
         lender = new User();
         liquidator = new User();
 
+        ProtocolPausingManager protocolPausingManager = new ProtocolPausingManager();
+        protocolPausingManager.initialize();
+
+        tellerV2Mock.setProtocolPausingManager(address(protocolPausingManager));
+      
         //  uint256 borrowerBalance = 50000;
         //   payable(address(borrower)).transfer(borrowerBalance);
 

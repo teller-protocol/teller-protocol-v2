@@ -2,16 +2,36 @@
 pragma solidity ^0.8.0;
 
 import "../TellerV2MarketForwarder_G3.sol";
-
+import "./extensions/ExtensionsContextUpgradeable.sol";
 import "../interfaces/ILenderCommitmentForwarder.sol";
 import "../interfaces/ISmartCommitmentForwarder.sol";
 import "./LenderCommitmentForwarder_G1.sol";
 
+import "../interfaces/IPausableTimestamp.sol";
+
+import "../interfaces/IHasProtocolPausingManager.sol";
+
+import "../interfaces/IProtocolPausingManager.sol";
+
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+
+import "@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol";
+
+
 import { CommitmentCollateralType, ISmartCommitment } from "../interfaces/ISmartCommitment.sol";
 
-contract SmartCommitmentForwarder
- is TellerV2MarketForwarder_G3,
-  ISmartCommitmentForwarder {
+ 
+contract SmartCommitmentForwarder is
+    ExtensionsContextUpgradeable, //this should always be first for upgradeability
+    TellerV2MarketForwarder_G3,
+    PausableUpgradeable,  //this does add some storage but AFTER all other storage
+    ISmartCommitmentForwarder,
+    IPausableTimestamp
+     {
+
+    using MathUpgradeable for uint256;
+
     event ExercisedSmartCommitment(
         address indexed smartCommitmentAddress,
         address borrower,
@@ -21,9 +41,44 @@ contract SmartCommitmentForwarder
 
     error InsufficientBorrowerCollateral(uint256 required, uint256 actual);
 
+
+
+    modifier onlyProtocolPauser() { 
+
+        address pausingManager = IHasProtocolPausingManager( _tellerV2 ).getProtocolPausingManager();
+        require( IProtocolPausingManager( pausingManager ).isPauser(_msgSender()) , "Sender not authorized");
+        _;
+    }
+
+
+    modifier onlyProtocolOwner() { 
+        require( Ownable( _tellerV2 ).owner() == _msgSender()  , "Sender not authorized");
+        _;
+    }
+
+    uint256 public liquidationProtocolFeePercent; 
+    uint256 internal lastUnpausedAt;
+
+
     constructor(address _protocolAddress, address _marketRegistry)
         TellerV2MarketForwarder_G3(_protocolAddress, _marketRegistry)
-    {}
+    {  }
+
+    function initialize() public initializer {       
+        __Pausable_init();
+    }
+
+    function setLiquidationProtocolFeePercent(uint256 _percent) 
+    public onlyProtocolOwner { 
+        //max is 100% 
+        require( _percent <= 10000 , "invalid fee percent" );
+        liquidationProtocolFeePercent = _percent;
+    }
+
+    function getLiquidationProtocolFeePercent() 
+    public view returns (uint256){       
+        return liquidationProtocolFeePercent ;
+    }
 
     /**
      * @notice Accept the commitment to submitBid and acceptBid using the funds
@@ -47,7 +102,7 @@ contract SmartCommitmentForwarder
         address _recipient,
         uint16 _interestRate,
         uint32 _loanDuration
-    ) public returns (uint256 bidId) {
+    ) public whenNotPaused returns (uint256 bidId) {
         require(
             ISmartCommitment(_smartCommitmentAddress)
                 .getCollateralTokenType() <=
@@ -156,4 +211,58 @@ contract SmartCommitmentForwarder
 
         revert("Unknown Collateral Type");
     }
+
+
+
+    /**
+     * @notice Lets the DAO/owner of the protocol implement an emergency stop mechanism.
+     */
+    function pause() public virtual onlyProtocolPauser whenNotPaused {
+        _pause();
+    }
+
+    /**
+     * @notice Lets the DAO/owner of the protocol undo a previously implemented emergency stop.
+     */
+    function unpause() public virtual onlyProtocolPauser whenPaused {
+        setLastUnpausedAt();
+        _unpause();
+    }
+
+
+    function getLastUnpausedAt() 
+    public view 
+    returns (uint256) {
+
+
+        address pausingManager = IHasProtocolPausingManager( _tellerV2 ).getProtocolPausingManager();
+       
+        return MathUpgradeable.max(
+            lastUnpausedAt,
+            IPausableTimestamp(pausingManager).getLastUnpausedAt()
+        )
+        ;
+ 
+
+    }
+
+
+    function setLastUnpausedAt() internal {
+        lastUnpausedAt =  block.timestamp;
+    }
+
+
+    // -----
+
+        //Overrides
+    function _msgSender()
+        internal
+        view
+        virtual
+        override(ContextUpgradeable, ExtensionsContextUpgradeable)
+        returns (address sender)
+    {
+        return ExtensionsContextUpgradeable._msgSender();
+    }
+    
 }

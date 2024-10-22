@@ -7,7 +7,7 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 // Libraries
 import "@openzeppelin/contracts-upgradeable/utils/structs/EnumerableSetUpgradeable.sol";
-
+import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 // Interfaces
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol";
@@ -16,7 +16,8 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradea
 import "./interfaces/ICollateralManager.sol";
 import { Collateral, CollateralType, ICollateralEscrowV1 } from "./interfaces/escrow/ICollateralEscrowV1.sol";
 import "./interfaces/ITellerV2.sol";
-
+import "./interfaces/IProtocolPausingManager.sol";
+import "./interfaces/IHasProtocolPausingManager.sol";
 contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     /* Storage */
     using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
@@ -78,8 +79,14 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         _;
     }
 
+    modifier whenProtocolNotPaused() {   
+        address pausingManager = IHasProtocolPausingManager( address(tellerV2) ).getProtocolPausingManager();
 
-         /* External Functions */
+        require( IProtocolPausingManager(address(pausingManager)).protocolPaused() == false , "Protocol is paused");
+        _;
+    }
+
+    /* External Functions */
 
     /**
      * @notice Initializes the collateral manager.
@@ -263,7 +270,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
      * @notice Withdraws deposited collateral from the created escrow of a bid that has been successfully repaid.
      * @param _bidId The id of the bid to withdraw collateral for.
      */
-    function withdraw(uint256 _bidId) external {
+    function withdraw(uint256 _bidId) external whenProtocolNotPaused {
         BidState bidState = tellerV2.getBidState(_bidId);
 
         require(bidState == BidState.PAID, "collateral cannot be withdrawn");
@@ -273,25 +280,25 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         emit CollateralClaimed(_bidId);
     }
 
-    function withdrawDustTokens(
-    uint256 _bidId,  
-    address _tokenAddress, 
-    uint256 _amount,
-    address _recipientAddress
-    ) external onlyProtocolOwner {
-  
-        ICollateralEscrowV1(_escrows[_bidId]).withdrawDustTokens(
-                _tokenAddress,
-                _amount,
-                _recipientAddress
-            );
-    }
+     function withdrawDustTokens(
+        uint256 _bidId,  
+        address _tokenAddress, 
+        uint256 _amount,
+        address _recipientAddress
+        ) external onlyProtocolOwner whenProtocolNotPaused {
+
+            ICollateralEscrowV1(_escrows[_bidId]).withdrawDustTokens(
+                    _tokenAddress,
+                    _amount,
+                    _recipientAddress
+                );
+        }
 
     /**
      * @notice Withdraws deposited collateral from the created escrow of a bid that has been CLOSED after being defaulted.
      * @param _bidId The id of the bid to withdraw collateral for.
      */
-    function lenderClaimCollateral(uint256 _bidId) external onlyTellerV2 {
+    function lenderClaimCollateral(uint256 _bidId) external onlyTellerV2 whenProtocolNotPaused {
         if (isBidCollateralBacked(_bidId)) {
             BidState bidState = tellerV2.getBidState(_bidId);
 
@@ -305,6 +312,24 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         }
     }
 
+        /**
+     * @notice Withdraws deposited collateral from the created escrow of a bid that has been CLOSED after being defaulted.
+     * @param _bidId The id of the bid to withdraw collateral for.
+     */
+      function lenderClaimCollateralWithRecipient(uint256 _bidId, address _collateralRecipient) external onlyTellerV2  whenProtocolNotPaused {
+        if (isBidCollateralBacked(_bidId)) {
+            BidState bidState = tellerV2.getBidState(_bidId);
+
+            require(
+                bidState == BidState.CLOSED,
+                "Loan has not been liquidated"
+            );
+
+            _withdraw(_bidId, _collateralRecipient);
+            emit CollateralClaimed(_bidId);
+        }
+    }
+
     /**
      * @notice Sends the deposited collateral to a liquidator of a bid.
      * @notice Can only be called by the protocol.
@@ -314,6 +339,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     function liquidateCollateral(uint256 _bidId, address _liquidatorAddress)
         external
         onlyTellerV2
+        whenProtocolNotPaused
     {
         if (isBidCollateralBacked(_bidId)) {
             BidState bidState = tellerV2.getBidState(_bidId);

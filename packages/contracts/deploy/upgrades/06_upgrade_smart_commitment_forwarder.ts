@@ -61,7 +61,7 @@ const deployFn: DeployFunction = async (hre) => {
 // tags and deployment
 deployFn.id = 'smart-commitment-forwarder:upgrade'
 deployFn.tags = ['proposal', 'upgrade', 'smart-commitment-forwarder-upgrade']
-deployFn.dependencies = []
+deployFn.dependencies = ['smart-commitment-forwarder:deploy']
 deployFn.skip = async (hre) => {
   //  return true // ALWAYS SKIP FOR NOW
   return !hre.network.live || !['sepolia'].includes(hre.network.name)

@@ -30,6 +30,7 @@ import { BidState, Payment } from "../../contracts/TellerV2Storage.sol";
 import "../../contracts/MetaForwarder.sol";
 import { LenderManager } from "../../contracts/LenderManager.sol";
 import { EscrowVault } from "../../contracts/EscrowVault.sol";
+import { ProtocolPausingManager } from "../../contracts/pausing/ProtocolPausingManager.sol";
 
 contract TellerV2_Test is Testable {
     TellerV2User private marketOwner;
@@ -41,6 +42,7 @@ contract TellerV2_Test is Testable {
     WethMock wethMock;
     TestERC20Token daiMock;
     CollateralManager collateralManager;
+    ProtocolPausingManager protocolPausingManager;
 
     uint256 marketId1;
     uint256 collateralAmount = 10;
@@ -80,6 +82,9 @@ contract TellerV2_Test is Testable {
         EscrowVault escrowVault = new EscrowVault();
         escrowVault.initialize();
 
+        protocolPausingManager = new ProtocolPausingManager();
+        protocolPausingManager.initialize();
+
         // Deploy LenderCommitmentForwarder
         LenderCommitmentForwarder_G1 lenderCommitmentForwarder = new LenderCommitmentForwarder_G1(
                 address(tellerV2),
@@ -94,7 +99,8 @@ contract TellerV2_Test is Testable {
             address(lenderCommitmentForwarder),
             address(collateralManager),
             address(lenderManager),
-            address(escrowVault)
+            address(escrowVault),
+            address(protocolPausingManager)
         );
 
         // Instantiate users & balances
@@ -166,6 +172,9 @@ contract TellerV2_Test is Testable {
     }
 
     function test_collateralEscrow() public {
+
+          
+
         // Submit bid as borrower
         uint256 bidId = submitCollateralBid();
         // Accept bid as lender

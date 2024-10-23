@@ -24,5 +24,6 @@
   "lender-commitment-forwarder:alpha:upgrade": 1710880450,
   "lender-commitment-forwarder:extensions:flash-rollover-widget:deploy": 1724269527,
   "lender-commitment-forwarder:extensions:loan-referral-forwarder:deploy": 1724269536,
-  "lender-commitment-forwarder:alpha:upgrade_referrals": 1724423905
+  "lender-commitment-forwarder:alpha:upgrade_referrals": 1724423905,
+  "loan-referral-forwarder:upgrade_1": 1729703402
 }

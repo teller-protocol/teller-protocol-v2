@@ -28,7 +28,7 @@ const deployFn: DeployFunction = async (hre) => {
     description: ` 
 # LoanReferralForwarder
 
-* Upgrade to add max reward requirement.
+* Upgrade to add event emits.
 `,
     _steps: [
       {

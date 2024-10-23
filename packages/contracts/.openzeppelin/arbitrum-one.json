@@ -5025,6 +5025,16 @@
         },
         "namespaces": {}
       }
+    },
+    "4ba47e8d72b06c99e7c2970dec06daf1cb3f1222bdf84432e5ad07990d1c9232": {
+      "address": "0x645b73AF74D14B488EC296a5C0D00270DDd17Cd6",
+      "txHash": "0x2d74b473d7db89258b243859fde1d53581afa0aa05990cf9edb2c6c3b3d92a81",
+      "layout": {
+        "solcVersion": "0.8.9",
+        "storage": [],
+        "types": {},
+        "namespaces": {}
+      }
     }
   }
 }

@@ -13,6 +13,38 @@
       ]
     },
     {
+      "type": "event",
+      "anonymous": false,
+      "name": "CommitmentAcceptedWithReferral",
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "bidId",
+          "indexed": true
+        },
+        {
+          "type": "address",
+          "name": "recipient",
+          "indexed": true
+        },
+        {
+          "type": "uint256",
+          "name": "fundsRemaining",
+          "indexed": false
+        },
+        {
+          "type": "uint256",
+          "name": "reward",
+          "indexed": false
+        },
+        {
+          "type": "address",
+          "name": "rewardRecipient",
+          "indexed": false
+        }
+      ]
+    },
+    {
       "type": "function",
       "name": "TELLER_V2",
       "constant": true,
@@ -106,6 +138,6 @@
     "blockHash": "0x7cdda45ce28345c792ca10dbc40cdc914ec711de6e0378269093efa3abfbbd95",
     "blockNumber": 18778729
   },
-  "numDeployments": 1,
+  "numDeployments": 2,
   "implementation": "0xE11884953B18F8ddC55875CBDAb71b624779D3bB"
 }

@@ -6568,6 +6568,16 @@
         },
         "namespaces": {}
       }
+    },
+    "a023240d775d20e6c99ba769b675509b6767436b263a107bf5d195125e088bf7": {
+      "address": "0x7f43c21D4FE1807BF2CF25e6F048A03b57226e03",
+      "txHash": "0x40e7bbfda3d38386260b83feda835d594fba7531c5be76a9f6b87b86546dfb5b",
+      "layout": {
+        "solcVersion": "0.8.9",
+        "storage": [],
+        "types": {},
+        "namespaces": {}
+      }
     }
   }
 }

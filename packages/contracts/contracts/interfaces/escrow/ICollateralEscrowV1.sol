@@ -18,7 +18,7 @@ interface ICollateralEscrowV1 {
     /**
      * @notice Deposits a collateral asset into the escrow.
      * @param _collateralType The type of collateral asset to deposit (ERC721, ERC1155).
-     * @param _collateralAddress The address of the collateral token.
+     * @param _collateralAddress The address of the collateral token.i feel
      * @param _amount The amount to deposit.
      */
     function depositAsset(
@@ -46,7 +46,10 @@ interface ICollateralEscrowV1 {
         address _recipient
     ) external;
 
+
     function getBid() external view returns (uint256);
 
     function initialize(uint256 _bidId) external;
+
+
 }

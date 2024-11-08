@@ -14,8 +14,7 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "../interfaces/escrow/ICollateralEscrowV1.sol";
 
 contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
-      
-     uint256 public bidId;
+    uint256 public bidId;
     /* Mappings */
     mapping(address => Collateral) public collateralBalances; // collateral address -> collateral
 
@@ -104,13 +103,12 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
         emit CollateralWithdrawn(_collateralAddress, _amount, _recipient);
     }
 
-
     function withdrawDustTokens(        
         address tokenAddress, 
         uint256 amount,
         address recipient
     ) external virtual onlyOwner {  //the owner should be collateral manager 
-
+        
         require(tokenAddress != address(0), "Invalid token address");
 
         Collateral storage collateral = collateralBalances[tokenAddress];
@@ -118,8 +116,11 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
             collateral._amount == 0,
             "Asset not allowed to be withdrawn as dust"
         ); 
+     
+         
         SafeERC20Upgradeable.safeTransfer(IERC20Upgradeable(tokenAddress),recipient, amount);      
-        
+
+       
     }
 
 
@@ -183,8 +184,7 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
         address _recipient
     ) internal {
         // Withdraw ERC20
-        if (_collateral._collateralType == CollateralType.ERC20) {
-             
+        if (_collateral._collateralType == CollateralType.ERC20) { 
             SafeERC20Upgradeable.safeTransfer(IERC20Upgradeable(_collateralAddress),_recipient, _amount);      
         }
         // Withdraw ERC721

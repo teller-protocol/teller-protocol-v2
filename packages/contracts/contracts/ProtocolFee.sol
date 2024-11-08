@@ -7,6 +7,7 @@ contract ProtocolFee is OwnableUpgradeable {
     // Protocol fee set for loan processing.
     uint16 private _protocolFee;
 
+     
     /**
      * @notice This event is emitted when the protocol fee has been updated.
      * @param newFee The new protocol fee set.

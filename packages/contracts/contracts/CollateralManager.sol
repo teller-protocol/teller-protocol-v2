@@ -16,7 +16,8 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradea
 import "./interfaces/ICollateralManager.sol";
 import { Collateral, CollateralType, ICollateralEscrowV1 } from "./interfaces/escrow/ICollateralEscrowV1.sol";
 import "./interfaces/ITellerV2.sol";
-
+import "./interfaces/IProtocolPausingManager.sol";
+import "./interfaces/IHasProtocolPausingManager.sol";
 contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     /* Storage */
     using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
@@ -78,8 +79,10 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         _;
     }
 
-    modifier whenProtocolNotPaused() {        
-        require( PausableUpgradeable(address(tellerV2)).paused() == false , "Protocol is paused");
+    modifier whenProtocolNotPaused() {   
+        address pausingManager = IHasProtocolPausingManager( address(tellerV2) ).getProtocolPausingManager();
+
+        require( IProtocolPausingManager(address(pausingManager)).protocolPaused() == false , "Protocol is paused");
         _;
     }
 

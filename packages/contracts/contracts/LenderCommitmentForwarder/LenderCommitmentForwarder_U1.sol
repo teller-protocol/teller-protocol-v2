@@ -33,6 +33,14 @@ import "./extensions/ExtensionsContextUpgradeable.sol";
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
+
+
+/*
+
+Only do decimal expansion if it is an ERC20   not anything else !! 
+
+*/
+
 contract LenderCommitmentForwarder_U1 is
     ExtensionsContextUpgradeable, //this should always be first for upgradeability
     TellerV2MarketForwarder_G2,
@@ -186,7 +194,7 @@ contract LenderCommitmentForwarder_U1 is
         uint16 _poolOracleLtvRatio //generally always between 0 and 100 % , 0 to 10000
     ) public returns (uint256 commitmentId_) {
         commitmentId_ = commitmentCount++;
-
+        
         require(
             _commitment.lender == _msgSender(),
             "unauthorized commitment creator"
@@ -194,8 +202,14 @@ contract LenderCommitmentForwarder_U1 is
 
         commitments[commitmentId_] = _commitment;
 
+        require(_poolRoutes.length == 0 || _commitment.collateralTokenType == CommitmentCollateralType.ERC20 , "can only use pool routes with ERC20 collateral");
+
+
         //routes length of 0 means ignore price oracle limits
         require(_poolRoutes.length <= 2, "invalid pool routes length");
+
+      
+       
 
         for (uint256 i = 0; i < _poolRoutes.length; i++) {
             commitmentUniswapPoolRoutes[commitmentId_].push(_poolRoutes[i]);
@@ -648,13 +662,26 @@ contract LenderCommitmentForwarder_U1 is
             return 0;
         }
 
-        return
+        if (_collateralTokenType == CommitmentCollateralType.ERC20) {
+             return
             MathUpgradeable.mulDiv(
                 _principalAmount,
                 STANDARD_EXPANSION_FACTOR,
                 _maxPrincipalPerCollateralAmount,
                 MathUpgradeable.Rounding.Up
             );
+        }
+
+        //for NFTs, do not use the uniswap expansion factor 
+         return
+            MathUpgradeable.mulDiv(
+                _principalAmount,
+                1,
+                _maxPrincipalPerCollateralAmount,
+                MathUpgradeable.Rounding.Up
+            );
+
+       
     }
 
     /**
@@ -787,8 +814,8 @@ contract LenderCommitmentForwarder_U1 is
             (sqrtPriceX96, , , , , , ) = IUniswapV3Pool(uniswapV3Pool).slot0();
         } else {
             uint32[] memory secondsAgos = new uint32[](2);
-            secondsAgos[0] = twapInterval; // from (before)
-            secondsAgos[1] = 0; // to (now)
+            secondsAgos[0] = twapInterval + 1; // from (before)
+            secondsAgos[1] = 1; // one block prior
 
             (int56[] memory tickCumulatives, ) = IUniswapV3Pool(uniswapV3Pool)
                 .observe(secondsAgos);
@@ -887,6 +914,24 @@ contract LenderCommitmentForwarder_U1 is
     {
         return commitments[_commitmentId].maxPrincipal;
     }
+
+    function getCommitmentPrincipalTokenAddress(uint256 _commitmentId)
+        external
+        view
+        returns (address)
+    {
+        return commitments[_commitmentId].principalTokenAddress;
+    }
+
+    function getCommitmentCollateralTokenAddress(uint256 _commitmentId)
+        external
+        view
+        returns (address)
+    {
+        return commitments[_commitmentId].collateralTokenAddress;
+    }
+
+
 
     //Overrides
     function _msgSender()

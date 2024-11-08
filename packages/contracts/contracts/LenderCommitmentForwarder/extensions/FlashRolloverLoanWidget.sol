@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
  
-import "./FlashRolloverLoan_G5.sol";
+import "./FlashRolloverLoan_G6.sol";
 
-contract FlashRolloverLoan is FlashRolloverLoan_G5 {
+contract FlashRolloverLoanWidget is FlashRolloverLoan_G6 {
     constructor(
         address _tellerV2,
         address _poolAddressesProvider
     )
-        FlashRolloverLoan_G5(
+        FlashRolloverLoan_G6(
             _tellerV2,
             _poolAddressesProvider
         )

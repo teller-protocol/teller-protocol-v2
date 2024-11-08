@@ -6,6 +6,7 @@ import "../TellerV2.sol";
 import "../interfaces/ITellerV2.sol";
 import "../interfaces/IProtocolFee.sol";
 import "../TellerV2Context.sol";
+import "../pausing/HasProtocolPausingManager.sol";
 import { Collateral } from "../interfaces/escrow/ICollateralEscrowV1.sol";
 import { LoanDetails, Payment, BidState } from "../TellerV2Storage.sol";
 
@@ -15,11 +16,19 @@ import { ILoanRepaymentCallbacks } from "../interfaces/ILoanRepaymentCallbacks.s
 /*
 This is only used for sol test so its named specifically to avoid being used for the typescript tests.
 */
-contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage , ILoanRepaymentCallbacks{
+contract TellerV2SolMock is 
+ITellerV2,
+IProtocolFee, 
+TellerV2Storage , 
+HasProtocolPausingManager,
+ILoanRepaymentCallbacks
+{
     uint256 public amountOwedMockPrincipal;
     uint256 public amountOwedMockInterest;
-      address public approvedForwarder;
+    address public approvedForwarder;
     bool public isPausedMock;
+
+    address public mockOwner;
 
 
     PaymentCycleType globalBidPaymentCycleType = PaymentCycleType.Seconds;
@@ -30,6 +39,10 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage , ILoanRepa
 
     function setMarketRegistry(address _marketRegistry) public {
         marketRegistry = IMarketRegistry(_marketRegistry);
+    }
+
+     function setProtocolPausingManager(address _protocolPausingManager) public {
+         _setProtocolPausingManager(_protocolPausingManager);
     }
 
     function getMarketRegistry() external view returns (IMarketRegistry) {
@@ -50,6 +63,13 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage , ILoanRepa
         return isPausedMock;
     }
 
+
+    function setMockOwner(address _newOwner) external {
+        mockOwner = _newOwner;
+    }
+    function owner() external view returns(address){
+        return mockOwner;
+    }
 
     function isPauser(address _account) public view returns(bool){
         return false; //for now 
@@ -358,6 +378,11 @@ contract TellerV2SolMock is ITellerV2, IProtocolFee, TellerV2Storage , ILoanRepa
     function setRepaymentListenerForBid(uint256 _bidId, address _listener)
         public
     {}
+
+
+    function getProtocolFeeRecipient () public view returns(address){
+        
+    }
 
 
     function _getBidPaymentCycleType(uint256 _bidId)

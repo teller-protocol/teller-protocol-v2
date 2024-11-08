@@ -13,17 +13,21 @@ import "../../interfaces/ITellerV2Storage.sol";
 import "../../interfaces/IMarketRegistry.sol";
 import "../../interfaces/ILenderCommitmentForwarder.sol";
 import "../../interfaces/ISmartCommitmentForwarder.sol";
-import "../../interfaces/IFlashRolloverLoan_G4.sol";
+import "../../interfaces/IFlashRolloverLoan_G6.sol";
 import "../../libraries/NumbersLib.sol";
 
 import { IPool } from "../../interfaces/aave/IPool.sol";
 import { IFlashLoanSimpleReceiver } from "../../interfaces/aave/IFlashLoanSimpleReceiver.sol";
 import { IPoolAddressesProvider } from "../../interfaces/aave/IPoolAddressesProvider.sol";
 
+
+
 /*
-Adds smart commitment args 
+    G6:  Additionally incorporates referral rewards 
 */
-contract FlashRolloverLoan_G5 is IFlashLoanSimpleReceiver, IFlashRolloverLoan_G4 {
+
+
+contract FlashRolloverLoan_G6 is IFlashLoanSimpleReceiver, IFlashRolloverLoan_G6 {
     using AddressUpgradeable for address;
     using NumbersLib for uint256;
 
@@ -102,6 +106,8 @@ contract FlashRolloverLoan_G5 is IFlashLoanSimpleReceiver, IFlashRolloverLoan_G4
         uint256 _loanId,
         uint256 _flashLoanAmount,
         uint256 _borrowerAmount, //an additional amount borrower may have to add
+        uint256 _rewardAmount,
+        address _rewardRecipient,
         AcceptCommitmentArgs calldata _acceptCommitmentArgs
     ) external   {
         address borrower = TELLER_V2.getLoanBorrower(_loanId);
@@ -109,6 +115,8 @@ contract FlashRolloverLoan_G5 is IFlashLoanSimpleReceiver, IFlashRolloverLoan_G4
 
         // Get lending token and balance before
         address lendingToken = TELLER_V2.getLoanLendingToken(_loanId);
+
+        require( _rewardAmount <= _flashLoanAmount/ 10, "Reward amount may only be up to 1/10 of flash loan amount" );
 
         if (_borrowerAmount > 0) {
             IERC20(lendingToken).transferFrom(
@@ -130,6 +138,8 @@ contract FlashRolloverLoan_G5 is IFlashLoanSimpleReceiver, IFlashRolloverLoan_G4
                     loanId: _loanId,
                     borrower: borrower,
                     borrowerAmount: _borrowerAmount,
+                    rewardRecipient: _rewardRecipient,
+                    rewardAmount: _rewardAmount,
                     acceptCommitmentArgs: abi.encode(_acceptCommitmentArgs)
                 })
             ),
@@ -205,6 +215,19 @@ contract FlashRolloverLoan_G5 is IFlashLoanSimpleReceiver, IFlashRolloverLoan_G4
             _flashFees;
 
         if (fundsRemaining > 0) {
+
+            if (_rolloverArgs.rewardAmount > 0){
+
+                //make sure reward amount isnt TOO much here ? 
+
+                fundsRemaining -= _rolloverArgs.rewardAmount;
+                IERC20Upgradeable(_flashToken).transfer(
+                    _rolloverArgs.rewardRecipient,
+                    _rolloverArgs.rewardAmount
+                );
+
+            }
+
             IERC20Upgradeable(_flashToken).transfer(
                 _rolloverArgs.borrower,
                 fundsRemaining
@@ -389,6 +412,7 @@ contract FlashRolloverLoan_G5 is IFlashLoanSimpleReceiver, IFlashRolloverLoan_G4
         address _lenderCommitmentForwarder,
         uint256 _loanId,
         AcceptCommitmentArgs calldata _commitmentArgs,
+        uint256 _rewardAmount, 
         uint16 _flashloanPremiumPct,
         uint256 _timestamp
     ) external view returns (uint256 _flashAmount, int256 _borrowerAmount) {
@@ -425,7 +449,8 @@ contract FlashRolloverLoan_G5 is IFlashLoanSimpleReceiver, IFlashRolloverLoan_G4
         _borrowerAmount =
             int256(commitmentPrincipalReceived) -
             int256(repayFullAmount) -
-            int256(_flashLoanFee);
+            int256(_flashLoanFee) -
+            int256(_rewardAmount);
     }
 
     /**

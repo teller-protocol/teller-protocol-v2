@@ -48,7 +48,7 @@ library V2Calculations {
         PaymentCycleType _paymentCycleType,
         uint32 _paymentCycleDuration
     )
-        public
+        internal
         view
         returns (
             uint256 owedPrincipal_,
@@ -74,7 +74,7 @@ library V2Calculations {
         PaymentCycleType _paymentCycleType,
         uint32 _paymentCycleDuration
     )
-        public
+        internal
         view
         returns (
             uint256 owedPrincipal_,
@@ -93,7 +93,7 @@ library V2Calculations {
             ? 360 days
             : 365 days;
 
-         uint256 interestOwedInAYear = owedPrincipal_.percent(_bid.terms.APR, 2);
+         uint256 interestOwedInAYear = owedPrincipal_.percent(_bid.terms.APR);
        
          interest_ = (interestOwedInAYear * owedTime) / daysInYear;
         }
@@ -154,7 +154,7 @@ library V2Calculations {
         uint32 _duration,
         uint32 _paymentCycle,
         uint16 _apr
-    ) public view returns (uint256) {
+    ) internal returns (uint256) {
         uint256 daysInYear = _cycleType == PaymentCycleType.Monthly
             ? 360 days
             : 365 days;

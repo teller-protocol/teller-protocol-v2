@@ -115,6 +115,7 @@ contract FlashRolloverLoan_G5 is IFlashLoanSimpleReceiver, IFlashRolloverLoan_G4
             );
         }
 
+
         // Call 'Flash' on the vault to borrow funds and call tellerV2FlashCallback
         // This ultimately calls executeOperation
         IPool(POOL()).flashLoanSimple(
@@ -132,6 +133,14 @@ contract FlashRolloverLoan_G5 is IFlashLoanSimpleReceiver, IFlashRolloverLoan_G4
             ),
             0 //referral code
         );
+
+
+        ///have to set approval to zero AFTER we repay the flash loan to aave 
+        IERC20Upgradeable(lendingToken).approve(
+            address(POOL()),
+            0
+        );
+
     }
 
     /**
@@ -245,6 +254,11 @@ contract FlashRolloverLoan_G5 is IFlashLoanSimpleReceiver, IFlashRolloverLoan_G4
             _repayAmount
         );
         TELLER_V2.repayLoanFull(_bidId);
+
+        IERC20Upgradeable(_principalToken).approve(
+            address(TELLER_V2),
+            0
+        );
 
         uint256 fundsAfterRepayment = IERC20Upgradeable(_principalToken)
             .balanceOf(address(this));

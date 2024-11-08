@@ -477,7 +477,7 @@ contract LenderCommitmentForwarder_G2 is
         );
 
         require(
-            commitmentPrincipalAccepted[bidId] <= commitment.maxPrincipal,
+            commitmentPrincipalAccepted[_commitmentId] <= commitment.maxPrincipal,
             "Invalid loan max principal"
         );
 

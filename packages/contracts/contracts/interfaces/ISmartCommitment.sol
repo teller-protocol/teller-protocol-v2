@@ -39,9 +39,7 @@ interface ISmartCommitment {
         external
         view
         returns (uint256);
-
-    function isAllowedToBorrow(address borrower) external view returns (bool);
-
+     
     function acceptFundsForAcceptBid(
         address _borrower,
         uint256 _bidId,

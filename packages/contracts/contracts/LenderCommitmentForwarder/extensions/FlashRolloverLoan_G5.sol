@@ -20,6 +20,9 @@ import { IPool } from "../../interfaces/aave/IPool.sol";
 import { IFlashLoanSimpleReceiver } from "../../interfaces/aave/IFlashLoanSimpleReceiver.sol";
 import { IPoolAddressesProvider } from "../../interfaces/aave/IPoolAddressesProvider.sol";
 
+/*
+Adds smart commitment args 
+*/
 contract FlashRolloverLoan_G5 is IFlashLoanSimpleReceiver, IFlashRolloverLoan_G4 {
     using AddressUpgradeable for address;
     using NumbersLib for uint256;

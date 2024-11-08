@@ -2,13 +2,62 @@
 pragma solidity ^0.8.0;
 
 import "../TellerV2MarketForwarder_G3.sol";
-
+import "./extensions/ExtensionsContextUpgradeable.sol";
 import "../interfaces/ILenderCommitmentForwarder.sol";
+import "../interfaces/ISmartCommitmentForwarder.sol";
 import "./LenderCommitmentForwarder_G1.sol";
 
-import { CommitmentCollateralType, ISmartCommitment } from "../interfaces/ISmartCommitment.sol";
+import "../interfaces/IPausableTimestamp.sol";
 
-contract SmartCommitmentForwarder is TellerV2MarketForwarder_G3 {
+import "../interfaces/IHasProtocolPausingManager.sol";
+
+import "../interfaces/IProtocolPausingManager.sol";
+
+import "../oracleprotection/OracleProtectionManager.sol";
+
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+
+import "@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol";
+
+
+import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+
+import { CommitmentCollateralType, ISmartCommitment } from "../interfaces/ISmartCommitment.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+
+
+/*  
+The smart commitment forwarder is the central hub for activity related to Lender Group Pools, also knnown as SmartCommitments.
+
+Users of teller protocol can set this contract as a TrustedForwarder to allow it to conduct lending activity on their behalf.
+
+Users can also approve Extensions, such as Rollover, which will allow the extension to conduct loans on the users behalf through this forwarder by way of overrides to _msgSender() using the last 20 bytes of delegatecall. 
+
+
+ROLES 
+
+   
+    The protocol owner can modify the liquidation fee percent , call setOracle and setIsStrictMode
+
+    Any protocol pauser can pause and unpause this contract 
+
+    Anyone can call  registerOracle  to register a contract for use (firewall access)
+*/
+ 
+contract SmartCommitmentForwarder is
+    ExtensionsContextUpgradeable, //this should always be first for upgradeability
+    TellerV2MarketForwarder_G3,
+    PausableUpgradeable,  //this does add some storage but AFTER all other storage
+    ReentrancyGuardUpgradeable,  //adds many storage slots so breaks upgradeability 
+    OwnableUpgradeable, //deprecated
+    OracleProtectionManager,  //uses deterministic  storage slots 
+    ISmartCommitmentForwarder,
+    IPausableTimestamp
+     {
+
+    using MathUpgradeable for uint256;
+
     event ExercisedSmartCommitment(
         address indexed smartCommitmentAddress,
         address borrower,
@@ -18,9 +67,46 @@ contract SmartCommitmentForwarder is TellerV2MarketForwarder_G3 {
 
     error InsufficientBorrowerCollateral(uint256 required, uint256 actual);
 
+
+
+    modifier onlyProtocolPauser() { 
+
+        address pausingManager = IHasProtocolPausingManager( _tellerV2 ).getProtocolPausingManager();
+        require( IProtocolPausingManager( pausingManager ).isPauser(_msgSender()) , "Sender not authorized");
+        _;
+    }
+
+
+    modifier onlyProtocolOwner() { 
+        require( Ownable( _tellerV2 ).owner() == _msgSender()  , "Sender not authorized");
+        _;
+    }
+
+    uint256 public liquidationProtocolFeePercent; 
+    uint256 internal lastUnpausedAt;
+
+
     constructor(address _protocolAddress, address _marketRegistry)
         TellerV2MarketForwarder_G3(_protocolAddress, _marketRegistry)
-    {}
+    {  }
+
+    function initialize() public initializer {       
+        __Pausable_init();
+        __Ownable_init_unchained();
+    }
+ 
+
+    function setLiquidationProtocolFeePercent(uint256 _percent) 
+    public onlyProtocolOwner { 
+        //max is 100% 
+        require( _percent <= 10000 , "invalid fee percent" );
+        liquidationProtocolFeePercent = _percent;
+    }
+
+    function getLiquidationProtocolFeePercent() 
+    public view returns (uint256){       
+        return liquidationProtocolFeePercent ;
+    }
 
     /**
      * @notice Accept the commitment to submitBid and acceptBid using the funds
@@ -35,7 +121,7 @@ contract SmartCommitmentForwarder is TellerV2MarketForwarder_G3 {
      * @param _loanDuration The overall duration for the loan.  Must be longer than market payment cycle duration.
      * @return bidId The ID of the loan that was created on TellerV2
      */
-    function acceptCommitmentWithRecipient(
+    function acceptSmartCommitmentWithRecipient(
         address _smartCommitmentAddress,
         uint256 _principalAmount,
         uint256 _collateralAmount,
@@ -44,7 +130,7 @@ contract SmartCommitmentForwarder is TellerV2MarketForwarder_G3 {
         address _recipient,
         uint16 _interestRate,
         uint32 _loanDuration
-    ) public returns (uint256 bidId) {
+    ) public whenNotPaused nonReentrant returns (uint256 bidId) {
         require(
             ISmartCommitment(_smartCommitmentAddress)
                 .getCollateralTokenType() <=
@@ -153,4 +239,67 @@ contract SmartCommitmentForwarder is TellerV2MarketForwarder_G3 {
 
         revert("Unknown Collateral Type");
     }
+
+
+
+    /**
+     * @notice Lets the DAO/owner of the protocol implement an emergency stop mechanism.
+     */
+    function pause() public virtual onlyProtocolPauser whenNotPaused {
+        _pause();
+    }
+
+    /**
+     * @notice Lets the DAO/owner of the protocol undo a previously implemented emergency stop.
+     */
+    function unpause() public virtual onlyProtocolPauser whenPaused {
+        setLastUnpausedAt();
+        _unpause();
+    }
+
+
+    function getLastUnpausedAt() 
+    public view 
+    returns (uint256) {
+
+
+        address pausingManager = IHasProtocolPausingManager( _tellerV2 ).getProtocolPausingManager();
+       
+        return MathUpgradeable.max(
+            lastUnpausedAt,
+            IPausableTimestamp(pausingManager).getLastUnpausedAt()
+        )
+        ;
+ 
+
+    }
+
+
+    function setLastUnpausedAt() internal {
+        lastUnpausedAt =  block.timestamp;
+    }
+
+
+     function setOracle(address _oracle) external onlyProtocolOwner {
+         _setOracle(_oracle);
+     } 
+
+     function setIsStrictMode(bool _mode) external onlyProtocolOwner {
+         _setIsStrictMode(_mode);
+     } 
+
+
+    // -----
+
+        //Overrides
+    function _msgSender()
+        internal
+        view
+        virtual
+        override(ContextUpgradeable, ExtensionsContextUpgradeable)
+        returns (address sender)
+    {
+        return ExtensionsContextUpgradeable._msgSender();
+    }
+    
 }

@@ -99,4 +99,17 @@ interface ILenderCommitmentForwarder_U1 {
         uint32 _loanDuration,
         bytes32[] calldata _merkleProof
     ) external returns (uint256 bidId_);
+
+
+    function getCommitmentPrincipalTokenAddress(uint256 _commitmentId)
+        external
+        view
+        returns (address);
+
+    function getCommitmentCollateralTokenAddress(uint256 _commitmentId)
+        external
+        view
+        returns (address);
+
+
 }

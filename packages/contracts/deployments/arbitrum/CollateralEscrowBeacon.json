@@ -2,349 +2,346 @@
   "address": "0x86D540Ca6de284c18BeED0F6f154499CF9b61322",
   "abi": [
     {
+      "type": "event",
       "anonymous": false,
-      "inputs": [
-        {
-          "indexed": false,
-          "internalType": "address",
-          "name": "_collateralAddress",
-          "type": "address"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "_amount",
-          "type": "uint256"
-        }
-      ],
       "name": "CollateralDeposited",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
       "inputs": [
         {
-          "indexed": false,
-          "internalType": "address",
+          "type": "address",
           "name": "_collateralAddress",
-          "type": "address"
+          "indexed": false
         },
         {
-          "indexed": false,
-          "internalType": "uint256",
+          "type": "uint256",
           "name": "_amount",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "address",
-          "name": "_recipient",
-          "type": "address"
+          "indexed": false
         }
-      ],
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
       "name": "CollateralWithdrawn",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
       "inputs": [
         {
-          "indexed": false,
-          "internalType": "uint8",
-          "name": "version",
-          "type": "uint8"
-        }
-      ],
-      "name": "Initialized",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "previousOwner",
-          "type": "address"
-        },
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "newOwner",
-          "type": "address"
-        }
-      ],
-      "name": "OwnershipTransferred",
-      "type": "event"
-    },
-    {
-      "inputs": [],
-      "name": "bidId",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "name": "collateralBalances",
-      "outputs": [
-        {
-          "internalType": "enum CollateralType",
-          "name": "_collateralType",
-          "type": "uint8"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_amount",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_tokenId",
-          "type": "uint256"
-        },
-        {
-          "internalType": "address",
+          "type": "address",
           "name": "_collateralAddress",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "enum CollateralType",
-          "name": "_collateralType",
-          "type": "uint8"
+          "indexed": false
         },
         {
-          "internalType": "address",
-          "name": "_collateralAddress",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
+          "type": "uint256",
           "name": "_amount",
-          "type": "uint256"
+          "indexed": false
         },
         {
-          "internalType": "uint256",
-          "name": "_tokenId",
-          "type": "uint256"
-        }
-      ],
-      "name": "depositAsset",
-      "outputs": [],
-      "stateMutability": "payable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "getBid",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_bidId",
-          "type": "uint256"
-        }
-      ],
-      "name": "initialize",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256[]",
-          "name": "_ids",
-          "type": "uint256[]"
-        },
-        {
-          "internalType": "uint256[]",
-          "name": "_values",
-          "type": "uint256[]"
-        },
-        {
-          "internalType": "bytes",
-          "name": "",
-          "type": "bytes"
-        }
-      ],
-      "name": "onERC1155BatchReceived",
-      "outputs": [
-        {
-          "internalType": "bytes4",
-          "name": "",
-          "type": "bytes4"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "id",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "value",
-          "type": "uint256"
-        },
-        {
-          "internalType": "bytes",
-          "name": "",
-          "type": "bytes"
-        }
-      ],
-      "name": "onERC1155Received",
-      "outputs": [
-        {
-          "internalType": "bytes4",
-          "name": "",
-          "type": "bytes4"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        },
-        {
-          "internalType": "bytes",
-          "name": "",
-          "type": "bytes"
-        }
-      ],
-      "name": "onERC721Received",
-      "outputs": [
-        {
-          "internalType": "bytes4",
-          "name": "",
-          "type": "bytes4"
-        }
-      ],
-      "stateMutability": "pure",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "owner",
-      "outputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "renounceOwnership",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "newOwner",
-          "type": "address"
-        }
-      ],
-      "name": "transferOwnership",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "_collateralAddress",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_amount",
-          "type": "uint256"
-        },
-        {
-          "internalType": "address",
+          "type": "address",
           "name": "_recipient",
-          "type": "address"
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "Initialized",
+      "inputs": [
+        {
+          "type": "uint8",
+          "name": "version",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "OwnershipTransferred",
+      "inputs": [
+        {
+          "type": "address",
+          "name": "previousOwner",
+          "indexed": true
+        },
+        {
+          "type": "address",
+          "name": "newOwner",
+          "indexed": true
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "bidId",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "collateralBalances",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": ""
         }
       ],
+      "outputs": [
+        {
+          "type": "uint8",
+          "name": "_collateralType"
+        },
+        {
+          "type": "uint256",
+          "name": "_amount"
+        },
+        {
+          "type": "uint256",
+          "name": "_tokenId"
+        },
+        {
+          "type": "address",
+          "name": "_collateralAddress"
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "depositAsset",
+      "constant": false,
+      "stateMutability": "payable",
+      "payable": true,
+      "inputs": [
+        {
+          "type": "uint8",
+          "name": "_collateralType"
+        },
+        {
+          "type": "address",
+          "name": "_collateralAddress"
+        },
+        {
+          "type": "uint256",
+          "name": "_amount"
+        },
+        {
+          "type": "uint256",
+          "name": "_tokenId"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "getBid",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "initialize",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_bidId"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "onERC1155BatchReceived",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": ""
+        },
+        {
+          "type": "address",
+          "name": ""
+        },
+        {
+          "type": "uint256[]",
+          "name": "_ids"
+        },
+        {
+          "type": "uint256[]",
+          "name": "_values"
+        },
+        {
+          "type": "bytes",
+          "name": ""
+        }
+      ],
+      "outputs": [
+        {
+          "type": "bytes4",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "onERC1155Received",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": ""
+        },
+        {
+          "type": "address",
+          "name": ""
+        },
+        {
+          "type": "uint256",
+          "name": "id"
+        },
+        {
+          "type": "uint256",
+          "name": "value"
+        },
+        {
+          "type": "bytes",
+          "name": ""
+        }
+      ],
+      "outputs": [
+        {
+          "type": "bytes4",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "onERC721Received",
+      "constant": true,
+      "stateMutability": "pure",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": ""
+        },
+        {
+          "type": "address",
+          "name": ""
+        },
+        {
+          "type": "uint256",
+          "name": ""
+        },
+        {
+          "type": "bytes",
+          "name": ""
+        }
+      ],
+      "outputs": [
+        {
+          "type": "bytes4",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "owner",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "renounceOwnership",
+      "constant": false,
+      "payable": false,
+      "inputs": [],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "transferOwnership",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "newOwner"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
       "name": "withdraw",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "_collateralAddress"
+        },
+        {
+          "type": "uint256",
+          "name": "_amount"
+        },
+        {
+          "type": "address",
+          "name": "_recipient"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "withdrawDustTokens",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "tokenAddress"
+        },
+        {
+          "type": "uint256",
+          "name": "amount"
+        },
+        {
+          "type": "address",
+          "name": "recipient"
+        }
+      ],
+      "outputs": []
     }
   ],
   "transactionHash": "0x308d0f105e7d24712d317666793456d13e3be51df4653b77a6c6e05d9e79d17b",
@@ -400,6 +397,6 @@
     "status": 1,
     "byzantium": true
   },
-  "numDeployments": 2,
+  "numDeployments": 3,
   "implementation": "0xfF5c6530d761aB1Fa5E78e70C791A260Cfe85FbC"
 }

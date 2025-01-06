@@ -1,0 +1,1485 @@
+{
+  "address": "0x7Ff158DcD62C4E112f374F14fF25C735E8E4684D",
+  "abi": [
+    {
+      "type": "constructor",
+      "stateMutability": "undefined",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "_tellerV2"
+        },
+        {
+          "type": "address",
+          "name": "_smartCommitmentForwarder"
+        },
+        {
+          "type": "address",
+          "name": "_uniswapV3Factory"
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "BorrowerAcceptedFunds",
+      "inputs": [
+        {
+          "type": "address",
+          "name": "borrower",
+          "indexed": true
+        },
+        {
+          "type": "uint256",
+          "name": "bidId",
+          "indexed": true
+        },
+        {
+          "type": "uint256",
+          "name": "principalAmount",
+          "indexed": false
+        },
+        {
+          "type": "uint256",
+          "name": "collateralAmount",
+          "indexed": false
+        },
+        {
+          "type": "uint32",
+          "name": "loanDuration",
+          "indexed": false
+        },
+        {
+          "type": "uint16",
+          "name": "interestRate",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "DefaultedLoanLiquidated",
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "bidId",
+          "indexed": true
+        },
+        {
+          "type": "address",
+          "name": "liquidator",
+          "indexed": true
+        },
+        {
+          "type": "uint256",
+          "name": "amountDue",
+          "indexed": false
+        },
+        {
+          "type": "int256",
+          "name": "tokenAmountDifference",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "EarningsWithdrawn",
+      "inputs": [
+        {
+          "type": "address",
+          "name": "lender",
+          "indexed": true
+        },
+        {
+          "type": "uint256",
+          "name": "amountPoolSharesTokens",
+          "indexed": false
+        },
+        {
+          "type": "uint256",
+          "name": "principalTokensWithdrawn",
+          "indexed": false
+        },
+        {
+          "type": "address",
+          "name": "recipient",
+          "indexed": true
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "Initialized",
+      "inputs": [
+        {
+          "type": "uint8",
+          "name": "version",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "LenderAddedPrincipal",
+      "inputs": [
+        {
+          "type": "address",
+          "name": "lender",
+          "indexed": true
+        },
+        {
+          "type": "uint256",
+          "name": "amount",
+          "indexed": false
+        },
+        {
+          "type": "uint256",
+          "name": "sharesAmount",
+          "indexed": false
+        },
+        {
+          "type": "address",
+          "name": "sharesRecipient",
+          "indexed": true
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "LoanRepaid",
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "bidId",
+          "indexed": true
+        },
+        {
+          "type": "address",
+          "name": "repayer",
+          "indexed": true
+        },
+        {
+          "type": "uint256",
+          "name": "principalAmount",
+          "indexed": false
+        },
+        {
+          "type": "uint256",
+          "name": "interestAmount",
+          "indexed": false
+        },
+        {
+          "type": "uint256",
+          "name": "totalPrincipalRepaid",
+          "indexed": false
+        },
+        {
+          "type": "uint256",
+          "name": "totalInterestCollected",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "OwnershipTransferred",
+      "inputs": [
+        {
+          "type": "address",
+          "name": "previousOwner",
+          "indexed": true
+        },
+        {
+          "type": "address",
+          "name": "newOwner",
+          "indexed": true
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "Paused",
+      "inputs": [
+        {
+          "type": "address",
+          "name": "account",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "PoolInitialized",
+      "inputs": [
+        {
+          "type": "address",
+          "name": "principalTokenAddress",
+          "indexed": true
+        },
+        {
+          "type": "address",
+          "name": "collateralTokenAddress",
+          "indexed": true
+        },
+        {
+          "type": "uint256",
+          "name": "marketId",
+          "indexed": false
+        },
+        {
+          "type": "uint32",
+          "name": "maxLoanDuration",
+          "indexed": false
+        },
+        {
+          "type": "uint16",
+          "name": "interestRateLowerBound",
+          "indexed": false
+        },
+        {
+          "type": "uint16",
+          "name": "interestRateUpperBound",
+          "indexed": false
+        },
+        {
+          "type": "uint16",
+          "name": "liquidityThresholdPercent",
+          "indexed": false
+        },
+        {
+          "type": "uint16",
+          "name": "loanToValuePercent",
+          "indexed": false
+        },
+        {
+          "type": "address",
+          "name": "poolSharesToken",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "Unpaused",
+      "inputs": [
+        {
+          "type": "address",
+          "name": "account",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "WithdrawFromEscrow",
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "amount",
+          "indexed": true
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "DEFAULT_WITHDRAW_DELAY_TIME_SECONDS",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "EXCHANGE_RATE_EXPANSION_FACTOR",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "MAX_WITHDRAW_DELAY_TIME",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "MIN_TWAP_INTERVAL",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "ORACLE_MANAGER",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "SMART_COMMITMENT_FORWARDER",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "STANDARD_EXPANSION_FACTOR",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "TELLER_V2",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "UNISWAP_EXPANSION_FACTOR",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "UNISWAP_V3_FACTORY",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "acceptFundsForAcceptBid",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "_borrower"
+        },
+        {
+          "type": "uint256",
+          "name": "_bidId"
+        },
+        {
+          "type": "uint256",
+          "name": "_principalAmount"
+        },
+        {
+          "type": "uint256",
+          "name": "_collateralAmount"
+        },
+        {
+          "type": "address",
+          "name": "_collateralTokenAddress"
+        },
+        {
+          "type": "uint256",
+          "name": "_collateralTokenId"
+        },
+        {
+          "type": "uint32",
+          "name": "_loanDuration"
+        },
+        {
+          "type": "uint16",
+          "name": "_interestRate"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "activeBids",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ],
+      "outputs": [
+        {
+          "type": "bool",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "activeBidsAmountDueRemaining",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "addPrincipalToCommitmentGroup",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_amount"
+        },
+        {
+          "type": "address",
+          "name": "_sharesRecipient"
+        },
+        {
+          "type": "uint256",
+          "name": "_minSharesAmountOut"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": "sharesAmount_"
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "burnSharesToWithdrawEarnings",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_amountPoolSharesTokens"
+        },
+        {
+          "type": "address",
+          "name": "_recipient"
+        },
+        {
+          "type": "uint256",
+          "name": "_minAmountOut"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "calculateCollateralRequiredToBorrowPrincipal",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_principalAmount"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "calculateCollateralTokensAmountEquivalentToPrincipalTokens",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "principalAmount"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": "collateralTokensAmountToMatchValue"
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "collateralRatio",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint16",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "collateralToken",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "excessivePrincipalTokensRepaid",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "firstDepositMade",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "bool",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getCollateralTokenAddress",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getCollateralTokenId",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getCollateralTokenType",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint8",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getLastUnpausedAt",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getMarketId",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getMaxLoanDuration",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint32",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getMinInterestRate",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "amountDelta"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint16",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getMinimumAmountDifferenceToCloseDefaultedLoan",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_amountOwed"
+        },
+        {
+          "type": "uint256",
+          "name": "_loanDefaultedTimestamp"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "int256",
+          "name": "amountDifference_"
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getPoolTotalEstimatedValue",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": "poolTotalEstimatedValue_"
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getPoolUtilizationRatio",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "activeLoansAmountDelta"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint16",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getPrincipalAmountAvailableToBorrow",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getPrincipalForCollateralForPoolRoutes",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "tuple[]",
+          "name": "poolOracleRoutes",
+          "components": [
+            {
+              "type": "address",
+              "name": "pool"
+            },
+            {
+              "type": "bool",
+              "name": "zeroForOne"
+            },
+            {
+              "type": "uint32",
+              "name": "twapInterval"
+            },
+            {
+              "type": "uint256",
+              "name": "token0Decimals"
+            },
+            {
+              "type": "uint256",
+              "name": "token1Decimals"
+            }
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getPrincipalTokenAddress",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getRequiredCollateral",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_principalAmount"
+        },
+        {
+          "type": "uint256",
+          "name": "_maxPrincipalPerCollateralAmount"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getTokenDifferenceFromLiquidations",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "int256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getTotalPrincipalTokensOutstandingInActiveLoans",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getUniswapPriceRatioForPoolRoutes",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "tuple[]",
+          "name": "poolOracleRoutes",
+          "components": [
+            {
+              "type": "address",
+              "name": "pool"
+            },
+            {
+              "type": "bool",
+              "name": "zeroForOne"
+            },
+            {
+              "type": "uint32",
+              "name": "twapInterval"
+            },
+            {
+              "type": "uint256",
+              "name": "token0Decimals"
+            },
+            {
+              "type": "uint256",
+              "name": "token1Decimals"
+            }
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "initialize",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "tuple",
+          "name": "_commitmentGroupConfig",
+          "components": [
+            {
+              "type": "address",
+              "name": "principalTokenAddress"
+            },
+            {
+              "type": "address",
+              "name": "collateralTokenAddress"
+            },
+            {
+              "type": "uint256",
+              "name": "marketId"
+            },
+            {
+              "type": "uint32",
+              "name": "maxLoanDuration"
+            },
+            {
+              "type": "uint16",
+              "name": "interestRateLowerBound"
+            },
+            {
+              "type": "uint16",
+              "name": "interestRateUpperBound"
+            },
+            {
+              "type": "uint16",
+              "name": "liquidityThresholdPercent"
+            },
+            {
+              "type": "uint16",
+              "name": "collateralRatio"
+            }
+          ]
+        },
+        {
+          "type": "tuple[]",
+          "name": "_poolOracleRoutes",
+          "components": [
+            {
+              "type": "address",
+              "name": "pool"
+            },
+            {
+              "type": "bool",
+              "name": "zeroForOne"
+            },
+            {
+              "type": "uint32",
+              "name": "twapInterval"
+            },
+            {
+              "type": "uint256",
+              "name": "token0Decimals"
+            },
+            {
+              "type": "uint256",
+              "name": "token1Decimals"
+            }
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "type": "address",
+          "name": "poolSharesToken_"
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "interestRateLowerBound",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint16",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "interestRateUpperBound",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint16",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "lastUnpausedAt",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "liquidateDefaultedLoanWithIncentive",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_bidId"
+        },
+        {
+          "type": "int256",
+          "name": "_tokenAmountDifference"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "liquidityThresholdPercent",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint16",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "maxLoanDuration",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint32",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "maxPrincipalPerCollateralAmount",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "owner",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "pauseLendingPool",
+      "constant": false,
+      "payable": false,
+      "inputs": [],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "paused",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "bool",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "poolOracleRoutes",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ],
+      "outputs": [
+        {
+          "type": "address",
+          "name": "pool"
+        },
+        {
+          "type": "bool",
+          "name": "zeroForOne"
+        },
+        {
+          "type": "uint32",
+          "name": "twapInterval"
+        },
+        {
+          "type": "uint256",
+          "name": "token0Decimals"
+        },
+        {
+          "type": "uint256",
+          "name": "token1Decimals"
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "poolSharesToken",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "prepareSharesForBurn",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_amountPoolSharesTokens"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "bool",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "principalToken",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "renounceOwnership",
+      "constant": false,
+      "payable": false,
+      "inputs": [],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "repayLoanCallback",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_bidId"
+        },
+        {
+          "type": "address",
+          "name": "repayer"
+        },
+        {
+          "type": "uint256",
+          "name": "principalAmount"
+        },
+        {
+          "type": "uint256",
+          "name": "interestAmount"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "setMaxPrincipalPerCollateralAmount",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_maxPrincipalPerCollateralAmount"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "setWithdrawDelayTime",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_seconds"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "sharesExchangeRate",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": "rate_"
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "sharesExchangeRateInverse",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": "rate_"
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "totalInterestCollected",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "totalPrincipalTokensCommitted",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "totalPrincipalTokensLended",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "totalPrincipalTokensRepaid",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "totalPrincipalTokensWithdrawn",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "transferOwnership",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "newOwner"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "unpauseLendingPool",
+      "constant": false,
+      "payable": false,
+      "inputs": [],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "withdrawDelayTimeSeconds",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "withdrawFromEscrowVault",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_amount"
+        }
+      ],
+      "outputs": []
+    }
+  ],
+  "receipt": {},
+  "numDeployments": 1,
+  "implementation": "0x5360af9B95701504F783d8654bA02B0AF5155f64"
+}

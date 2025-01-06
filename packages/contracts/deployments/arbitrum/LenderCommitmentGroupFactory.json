@@ -1,0 +1,218 @@
+{
+  "address": "0xC2a093B641496Ac8AA9d6a17f216ADF4a42FC9B6",
+  "abi": [
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "DeployedLenderGroupContract",
+      "inputs": [
+        {
+          "type": "address",
+          "name": "groupContract",
+          "indexed": true
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "Initialized",
+      "inputs": [
+        {
+          "type": "uint8",
+          "name": "version",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "OwnershipTransferred",
+      "inputs": [
+        {
+          "type": "address",
+          "name": "previousOwner",
+          "indexed": true
+        },
+        {
+          "type": "address",
+          "name": "newOwner",
+          "indexed": true
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "deployLenderCommitmentGroupPool",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_initialPrincipalAmount"
+        },
+        {
+          "type": "tuple",
+          "name": "_commitmentGroupConfig",
+          "components": [
+            {
+              "type": "address",
+              "name": "principalTokenAddress"
+            },
+            {
+              "type": "address",
+              "name": "collateralTokenAddress"
+            },
+            {
+              "type": "uint256",
+              "name": "marketId"
+            },
+            {
+              "type": "uint32",
+              "name": "maxLoanDuration"
+            },
+            {
+              "type": "uint16",
+              "name": "interestRateLowerBound"
+            },
+            {
+              "type": "uint16",
+              "name": "interestRateUpperBound"
+            },
+            {
+              "type": "uint16",
+              "name": "liquidityThresholdPercent"
+            },
+            {
+              "type": "uint16",
+              "name": "collateralRatio"
+            }
+          ]
+        },
+        {
+          "type": "tuple[]",
+          "name": "_poolOracleRoutes",
+          "components": [
+            {
+              "type": "address",
+              "name": "pool"
+            },
+            {
+              "type": "bool",
+              "name": "zeroForOne"
+            },
+            {
+              "type": "uint32",
+              "name": "twapInterval"
+            },
+            {
+              "type": "uint256",
+              "name": "token0Decimals"
+            },
+            {
+              "type": "uint256",
+              "name": "token1Decimals"
+            }
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "deployedLenderGroupContracts",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "initialize",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "_lenderGroupBeacon"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "lenderGroupBeacon",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "owner",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "renounceOwnership",
+      "constant": false,
+      "payable": false,
+      "inputs": [],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "transferOwnership",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "newOwner"
+        }
+      ],
+      "outputs": []
+    }
+  ],
+  "transactionHash": "0x79ebc804332183b5e31af691eba00406877b898e167ec163727e927bc161ddda",
+  "receipt": {
+    "to": "0x0000000000000000000000000000000000000000",
+    "from": "0xD9B023522CeCe02251d877bb0EB4f06fDe6F98E6",
+    "blockHash": "0xc9b3a71d888d8473d6a7d6e4739a3620c28de57893dacc98364cae9513cec6eb",
+    "blockNumber": 292705690
+  },
+  "numDeployments": 1,
+  "implementation": "0x6578dA23E0A7D9d13d4B32aA1cF310760218eebf"
+}

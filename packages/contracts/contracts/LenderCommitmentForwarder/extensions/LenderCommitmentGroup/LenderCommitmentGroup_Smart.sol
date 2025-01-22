@@ -1088,10 +1088,18 @@ contract LenderCommitmentGroup_Smart is
         public
         view
         returns (uint256)
-    {     
+    {   
 
-        return  ( uint256( getPoolTotalEstimatedValue() )).percent(liquidityThresholdPercent) -
-        getTotalPrincipalTokensOutstandingInActiveLoans();
+        uint256 poolEstValueNet = ( uint256( getPoolTotalEstimatedValue() )).percent(liquidityThresholdPercent);
+
+        uint256 amountOutstanding = getTotalPrincipalTokensOutstandingInActiveLoans();
+
+        if (poolEstValueNet <  amountOutstanding) {
+                return 0;
+        }else {
+
+            return poolEstValueNet - amountOutstanding; 
+        }
      
     }
 

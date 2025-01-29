@@ -65,6 +65,7 @@ abstract contract LenderPoolPauseableUpgradeable is Initializable, ContextUpgrad
         _poolPaused = false;
         _borrowingPaused = false;
         _stakingPaused = false;
+        _liquidationPaused = false;
     }
 
     
@@ -206,7 +207,7 @@ abstract contract LenderPoolPauseableUpgradeable is Initializable, ContextUpgrad
     }
 
 
-    
+
     /**
      * @dev This empty reserved space is put in place to allow future versions to add new
      * variables without shifting down storage in the inheritance chain.

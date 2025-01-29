@@ -29,7 +29,7 @@ library IntegrationTestHelpers {
         TellerAS tellerAS = new TellerAS((iasRegistry), (ieaseip712verifier));
         MarketRegistry marketRegistry = new MarketRegistry();
 
-        marketRegistry.initialize(tellerAS);
+        marketRegistry.initialize( );
 
         return address(marketRegistry);
     }

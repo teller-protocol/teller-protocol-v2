@@ -1147,14 +1147,14 @@ contract LenderCommitmentGroup_Smart is
     /**
      * @notice Lets the DAO/owner of the protocol implement an emergency stop mechanism.
      */
-    function pauseLiquidation() public virtual onlyProtocolPauser whenPoolNotPaused {
+    function pauseLiquidation() public virtual onlyProtocolPauser whenLiquidationNotPaused {
         _pauseLiquidation();
     }
 
     /**
      * @notice Lets the DAO/owner of the protocol undo a previously implemented emergency stop.
      */
-    function unpauseLiquidation() public virtual onlyProtocolPauser whenPoolPaused {
+    function unpauseLiquidation() public virtual onlyProtocolPauser whenLiquidationPaused {
         setLastUnpausedAt();
         _unpauseLiquidation();
     }

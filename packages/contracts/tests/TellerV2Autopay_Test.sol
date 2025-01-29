@@ -14,7 +14,7 @@ import "../contracts/TellerV2Storage.sol";
 import "../contracts/interfaces/IMarketRegistry.sol";
 import "../contracts/interfaces/IReputationManager.sol";
 
-import "../contracts/EAS/TellerAS.sol";
+//import "../contracts/EAS/TellerAS.sol";
 
 import "../contracts/mock/WethMock.sol";
 

@@ -61,7 +61,7 @@ contract MarketRegistry is
 
     mapping(uint256 => bool) private marketIsClosed;
 
-    TellerAS private _tellerAS; //DEPRECATED
+    address private _tellerAS; //DEPRECATED
 
     /* Modifiers */
 

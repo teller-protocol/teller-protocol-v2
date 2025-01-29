@@ -3,9 +3,11 @@ pragma solidity >=0.8.0 <0.9.0;
 
 import { TellerV2 } from "../../contracts/TellerV2.sol";
 
+/*
 import "../../contracts/EAS/TellerAS.sol";
 import "../../contracts/EAS/TellerASEIP712Verifier.sol";
 import "../../contracts/EAS/TellerASRegistry.sol";
+*/
 
 import "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
 import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
@@ -23,10 +25,10 @@ import { IMarketRegistry } from "../../contracts/interfaces/IMarketRegistry.sol"
 
 library IntegrationTestHelpers {
     function deployMarketRegistry() public returns (address) {
-        IASRegistry iasRegistry = new TellerASRegistry();
-        IEASEIP712Verifier ieaseip712verifier = new TellerASEIP712Verifier();
+       // IASRegistry iasRegistry = new TellerASRegistry();
+      //  IEASEIP712Verifier ieaseip712verifier = new TellerASEIP712Verifier();
 
-        TellerAS tellerAS = new TellerAS((iasRegistry), (ieaseip712verifier));
+     //   TellerAS tellerAS = new TellerAS((iasRegistry), (ieaseip712verifier));
         MarketRegistry marketRegistry = new MarketRegistry();
 
         marketRegistry.initialize( );

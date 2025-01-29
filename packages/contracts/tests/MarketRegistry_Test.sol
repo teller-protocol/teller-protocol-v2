@@ -12,7 +12,7 @@ import "../contracts/TellerV2Storage.sol";
 
 import "../contracts/interfaces/IMarketRegistry.sol";
 
-import "../contracts/EAS/TellerAS.sol";
+//import "../contracts/EAS/TellerAS.sol";
 
 import "../contracts/mock/WethMock.sol";
 import "../contracts/interfaces/IWETH.sol";

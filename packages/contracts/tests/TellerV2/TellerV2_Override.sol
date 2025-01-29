@@ -14,7 +14,7 @@ contract TellerV2_Override is TellerV2 {
     bool public repayLoanWasCalled;
     address public mockMsgSenderForMarket;
 
-    constructor() TellerV2(address(0)) {}
+    constructor() TellerV2( ) {}
 
   
     function mock_setBid(uint256 bidId, Bid memory bid) public {

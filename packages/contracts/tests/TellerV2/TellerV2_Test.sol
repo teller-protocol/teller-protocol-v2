@@ -27,7 +27,7 @@ import { Collateral } from "../../contracts/interfaces/escrow/ICollateralEscrowV
 import { PaymentType } from "../../contracts/libraries/V2Calculations.sol";
 import { BidState, Payment } from "../../contracts/TellerV2Storage.sol";
 
-import "../../contracts/MetaForwarder.sol";
+ 
 import { LenderManager } from "../../contracts/LenderManager.sol";
 import { EscrowVault } from "../../contracts/EscrowVault.sol";
 import { ProtocolPausingManager } from "../../contracts/pausing/ProtocolPausingManager.sol";
@@ -59,7 +59,7 @@ contract TellerV2_Test is Testable {
         );
 
         // Deploy protocol
-        tellerV2 = new TellerV2(address(0));
+        tellerV2 = new TellerV2( );
 
         // Deploy MarketRegistry & ReputationManager
         IMarketRegistry marketRegistry = IMarketRegistry(new MarketRegistry());
@@ -73,8 +73,8 @@ contract TellerV2_Test is Testable {
         collateralManager.initialize(address(escrowBeacon), address(tellerV2));
 
         // Deploy Lender manager
-        MetaForwarder metaforwarder = new MetaForwarder();
-        metaforwarder.initialize();
+      //  MetaForwarder metaforwarder = new MetaForwarder();
+       // metaforwarder.initialize();
         LenderManager lenderManager = new LenderManager((marketRegistry));
         lenderManager.initialize();
         lenderManager.transferOwnership(address(tellerV2));

@@ -174,7 +174,7 @@ contract TellerV2 is
 
     /** Constructor **/
 
-    constructor(address trustedForwarder) TellerV2Context(trustedForwarder) {}
+    constructor( ) TellerV2Context( ) {}
 
     /** External Functions **/
 

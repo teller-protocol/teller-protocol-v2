@@ -10,7 +10,7 @@ contract TellerV2Context_Override is TellerV2Context {
     using EnumerableSet for EnumerableSet.AddressSet;
 
     constructor(address _marketRegistry, address _lenderCommitmentForwarder)
-        TellerV2Context(address(0))
+        TellerV2Context( )
     {
         marketRegistry = IMarketRegistry(_marketRegistry);
         lenderCommitmentForwarder = _lenderCommitmentForwarder;

@@ -30,8 +30,8 @@ abstract contract TellerV2Context is
         address sender
     );
 
-    constructor(address trustedForwarder)
-        ERC2771ContextUpgradeable(trustedForwarder)
+    constructor( )
+        ERC2771ContextUpgradeable( address(0) )  //we use custom forwarders, not one specific 
     {}
 
     /**

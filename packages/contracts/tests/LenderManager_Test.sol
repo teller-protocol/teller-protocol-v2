@@ -216,7 +216,7 @@ contract LenderManagerUser is User {
 
 //Move to a helper  or change it
 contract LenderCommitmentTester is TellerV2Context {
-    constructor() TellerV2Context(address(0)) {}
+    constructor() TellerV2Context( ) {}
 
     function getSenderForMarket(uint256 _marketId)
         external

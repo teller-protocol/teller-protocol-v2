@@ -1094,7 +1094,7 @@ contract MarketRegistryUser is User {
 contract TellerV2Mock is TellerV2Context {
     Bid mockBid;
 
-    constructor() TellerV2Context(address(0)) {}
+    constructor() TellerV2Context( ) {}
 
     function setMarketRegistry(address _marketRegistry) external {
         marketRegistry = IMarketRegistry(_marketRegistry);

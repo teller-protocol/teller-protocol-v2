@@ -147,7 +147,7 @@ contract MarketForwarderUser is User {
 }
 
 contract MarketForwarderTellerV2Mock is TellerV2Context {
-    constructor() TellerV2Context(address(0)) {}
+    constructor() TellerV2Context( ) {}
 
     function setMarketRegistry(address _marketRegistry) external {
         marketRegistry = IMarketRegistry(_marketRegistry);

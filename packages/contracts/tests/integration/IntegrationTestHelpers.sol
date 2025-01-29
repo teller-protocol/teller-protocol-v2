@@ -36,8 +36,8 @@ library IntegrationTestHelpers {
     }
 
     function deployIntegrationSuite() public returns (TellerV2 tellerV2_) {
-        address trustedForwarder = address(0);
-        TellerV2 tellerV2 = new TellerV2(trustedForwarder);
+        
+        TellerV2 tellerV2 = new TellerV2( );
 
         uint16 _protocolFee = 100;
         address _marketRegistry = deployMarketRegistry();

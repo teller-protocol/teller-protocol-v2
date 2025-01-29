@@ -4,8 +4,7 @@ pragma solidity ^0.8.0;
 import { Testable } from "../Testable.sol";
 
 import { TellerV2 } from "../../contracts/TellerV2.sol";
-import { MarketRegistry } from "../../contracts/MarketRegistry.sol";
-import { ReputationManager } from "../../contracts/ReputationManager.sol";
+import { MarketRegistry } from "../../contracts/MarketRegistry.sol"; 
 
 import "../../contracts/interfaces/IMarketRegistry.sol";
 import "../../contracts/interfaces/IReputationManager.sol";
@@ -63,10 +62,7 @@ contract TellerV2_Test is Testable {
 
         // Deploy MarketRegistry & ReputationManager
         IMarketRegistry marketRegistry = IMarketRegistry(new MarketRegistry());
-        IReputationManager reputationManager = IReputationManager(
-            new ReputationManager()
-        );
-        reputationManager.initialize(address(tellerV2));
+        
 
         // Deploy Collateral manager
         collateralManager = new CollateralManager();
@@ -95,7 +91,7 @@ contract TellerV2_Test is Testable {
         tellerV2.initialize(
             50,
             address(marketRegistry),
-            address(reputationManager),
+           
             address(lenderCommitmentForwarder),
             address(collateralManager),
             address(lenderManager),

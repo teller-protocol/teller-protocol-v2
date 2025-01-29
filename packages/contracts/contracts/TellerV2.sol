@@ -182,7 +182,7 @@ contract TellerV2 is
      * @notice Initializes the proxy.
      * @param _protocolFee The fee collected by the protocol for loan processing.
      * @param _marketRegistry The address of the market registry contract for the protocol.
-     * @param _reputationManager The address of the reputation manager contract.
+     
      * @param _lenderCommitmentForwarder The address of the lender commitment forwarder contract.
      * @param _collateralManager The address of the collateral manager contracts.
      * @param _lenderManager The address of the lender manager contract for loans on the protocol.
@@ -191,7 +191,7 @@ contract TellerV2 is
     function initialize(
         uint16 _protocolFee,
         address _marketRegistry,
-        address _reputationManager,
+      //  address _reputationManager,
         address _lenderCommitmentForwarder,
         address _collateralManager,
         address _lenderManager,
@@ -213,12 +213,7 @@ contract TellerV2 is
             "MR_ic"
         );
         marketRegistry = IMarketRegistry(_marketRegistry);
-
-        require(
-            _reputationManager.isContract(),
-            "RM_ic"
-        );
-        reputationManager = IReputationManager(_reputationManager);
+ 
 
         require(
             _collateralManager.isContract(),
@@ -834,10 +829,10 @@ contract TellerV2 is
         Bid storage bid = bids[_bidId];
         uint256 paymentAmount = _payment.principal + _payment.interest;
 
-        RepMark mark = reputationManager.updateAccountReputation(
+      /*  RepMark mark = reputationManager.updateAccountReputation(
             bid.borrower,
             _bidId
-        );
+        );*/
 
         // Check if we are sending a payment or amount remaining
         if (paymentAmount >= _owedAmount) {
@@ -873,9 +868,9 @@ contract TellerV2 is
         _sendOrEscrowFunds(_bidId, _payment); //send or escrow the funds
 
         // If the loan is paid in full and has a mark, we should update the current reputation
-        if (mark != RepMark.Good) {
+       /* if (mark != RepMark.Good) {
             reputationManager.updateAccountReputation(bid.borrower, _bidId);
-        }
+        } */
     }
 
 

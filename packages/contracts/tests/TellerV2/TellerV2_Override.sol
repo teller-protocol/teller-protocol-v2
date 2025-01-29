@@ -47,9 +47,7 @@ contract TellerV2_Override is TellerV2 {
         collateralManager = ICollateralManager(_collateralManager);
     }
 
-    function setReputationManagerSuper(address _reputationManager) public {
-        reputationManager = IReputationManager(_reputationManager);
-    }
+ 
 
     function mock_setBidState(uint256 bidId, BidState state) public {
         bids[bidId].state = state;

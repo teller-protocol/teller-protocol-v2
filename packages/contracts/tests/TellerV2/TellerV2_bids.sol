@@ -7,8 +7,7 @@ import { TellerV2_Override } from "./TellerV2_Override.sol";
 
 import { Bid, BidState, Collateral, Payment, LoanDetails, Terms, ActionNotAllowed } from "../../contracts/TellerV2.sol";
 import { PaymentType, PaymentCycleType } from "../../contracts/libraries/V2Calculations.sol";
-
-import { ReputationManagerMock } from "../../contracts/mock/ReputationManagerMock.sol";
+ 
 import { CollateralManagerMock } from "../../contracts/mock/CollateralManagerMock.sol";
 import { LenderManagerMock } from "../../contracts/mock/LenderManagerMock.sol";
 import { MarketRegistryMock } from "../../contracts/mock/MarketRegistryMock.sol";
@@ -40,8 +39,7 @@ contract TellerV2_bids_test is Testable {
     User feeRecipient;
 
     MarketRegistryMock marketRegistryMock;
-
-    ReputationManagerMock reputationManagerMock;
+ 
     CollateralManagerMock collateralManagerMock;
     LenderManagerMock lenderManagerMock;
 
@@ -61,7 +59,7 @@ contract TellerV2_bids_test is Testable {
         tellerV2 = new TellerV2_Override();
 
         marketRegistryMock = new MarketRegistryMock();
-        reputationManagerMock = new ReputationManagerMock();
+       
         collateralManagerMock = new CollateralManagerMock();
         lenderManagerMock = new LenderManagerMock();
         protocolPausingManager = new ProtocolPausingManager();
@@ -541,7 +539,7 @@ contract TellerV2_bids_test is Testable {
         //set address(this) as the account that will be paying off the loan
         tellerV2.setMockMsgSenderForMarket(address(this));
 
-        tellerV2.setReputationManagerSuper(address(reputationManagerMock));
+       
 
         tellerV2.mock_setBidState(bidId, BidState.ACCEPTED);
         vm.warp(2000);
@@ -564,7 +562,7 @@ contract TellerV2_bids_test is Testable {
         //set address(this) as the account that will be paying off the loan
         tellerV2.setMockMsgSenderForMarket(address(this));
 
-        tellerV2.setReputationManagerSuper(address(reputationManagerMock));
+       
 
         tellerV2.mock_setBidState(bidId, BidState.LIQUIDATED);
         vm.warp(2000);

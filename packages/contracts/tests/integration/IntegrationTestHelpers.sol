@@ -18,8 +18,7 @@ import { LenderManager } from "../../contracts/LenderManager.sol";
 import { LenderCommitmentForwarder_G3 } from "../../contracts/LenderCommitmentForwarder/LenderCommitmentForwarder_G3.sol";
 import { CollateralManager } from "../../contracts/CollateralManager.sol";
 import { CollateralEscrowV1 } from "../../contracts/escrow/CollateralEscrowV1.sol";
-
-import { ReputationManager } from "../../contracts/ReputationManager.sol";
+ 
 import { IMarketRegistry } from "../../contracts/interfaces/IMarketRegistry.sol";
 
 library IntegrationTestHelpers {
@@ -41,7 +40,7 @@ library IntegrationTestHelpers {
 
         uint16 _protocolFee = 100;
         address _marketRegistry = deployMarketRegistry();
-        ReputationManager _reputationManager = new ReputationManager();
+        
 
         LenderCommitmentForwarder_G3 _lenderCommitmentForwarder = new LenderCommitmentForwarder_G3(
                 address(tellerV2),
@@ -64,12 +63,11 @@ library IntegrationTestHelpers {
         _protocolPausingManager.initialize();  //need to xfer ownership ..?
         _collateralManager.initialize(address(escrowBeacon), address(tellerV2));
         _lenderManager.initialize();
-        _reputationManager.initialize(address(tellerV2));
-
+     
         tellerV2.initialize(
             _protocolFee,
             address(_marketRegistry),
-            address(_reputationManager),
+            
             address(_lenderCommitmentForwarder),
             address(_collateralManager),
             address(_lenderManager),

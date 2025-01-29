@@ -5,7 +5,7 @@ import { Testable } from "./Testable.sol";
 
 import { TellerV2Autopay } from "../contracts/TellerV2Autopay.sol";
 import { MarketRegistry } from "../contracts/MarketRegistry.sol";
-import { ReputationManager } from "../contracts/ReputationManager.sol";
+ 
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 

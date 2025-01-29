@@ -459,7 +459,7 @@ contract LenderCommitmentGroup_Smart is
         uint256 _amount,
         address _sharesRecipient,
         uint256 _minSharesAmountOut
-    ) external whenForwarderNotPaused whenPoolNotPaused nonReentrant onlyOracleApprovedAllowEOA 
+    ) external whenForwarderNotPaused whenPoolNotPaused whenStakingNotPaused nonReentrant onlyOracleApprovedAllowEOA 
     returns (uint256 sharesAmount_) {
        
         uint256 principalTokenBalanceBefore = principalToken.balanceOf(address(this));
@@ -529,7 +529,7 @@ contract LenderCommitmentGroup_Smart is
         uint256 _collateralTokenId, 
         uint32 _loanDuration,
         uint16 _interestRate
-    ) external onlySmartCommitmentForwarder whenForwarderNotPaused whenPoolNotPaused {
+    ) external onlySmartCommitmentForwarder whenForwarderNotPaused whenPoolNotPaused whenBorrowingNotPaused {
         
         require(
             _collateralTokenAddress == address(collateralToken),
@@ -619,7 +619,7 @@ contract LenderCommitmentGroup_Smart is
         uint256 _amountPoolSharesTokens,
         address _recipient,
         uint256 _minAmountOut
-    ) external whenForwarderNotPaused whenPoolNotPaused  nonReentrant onlyOracleApprovedAllowEOA 
+    ) external whenForwarderNotPaused whenPoolNotPaused whenStakingNotPaused nonReentrant onlyOracleApprovedAllowEOA 
     returns (uint256) {
        
           
@@ -661,7 +661,7 @@ contract LenderCommitmentGroup_Smart is
     function liquidateDefaultedLoanWithIncentive(
         uint256 _bidId,
         int256 _tokenAmountDifference
-    ) external whenForwarderNotPaused whenPoolNotPaused bidIsActiveForGroup(_bidId) nonReentrant onlyOracleApprovedAllowEOA {
+    ) external whenForwarderNotPaused whenPoolNotPaused whenLiquidationNotPaused bidIsActiveForGroup(_bidId) nonReentrant onlyOracleApprovedAllowEOA {
         
 
 
@@ -1111,5 +1111,51 @@ contract LenderCommitmentGroup_Smart is
     function unpauseLendingPool() public virtual onlyProtocolPauser whenPoolPaused {
         setLastUnpausedAt();
         _unpausePool();
+    }
+
+
+   /**
+     * @notice Lets the DAO/owner of the protocol implement an emergency stop mechanism.
+     */
+    function pauseBorrowing() public virtual onlyProtocolPauser whenBorrowingNotPaused {
+        _pauseBorrowing();
+    }
+
+    /**
+     * @notice Lets the DAO/owner of the protocol undo a previously implemented emergency stop.
+     */
+    function unpauseBorrowing() public virtual onlyProtocolPauser whenBorrowingPaused {
+        _unpauseBorrowing();
+    }
+
+
+    /**
+     * @notice Lets the DAO/owner of the protocol implement an emergency stop mechanism.
+     */
+    function pauseStaking() public virtual onlyProtocolPauser whenStakingNotPaused {
+        _pauseStaking();
+    }
+
+    /**
+     * @notice Lets the DAO/owner of the protocol undo a previously implemented emergency stop.
+     */
+    function unpauseStaking() public virtual onlyProtocolPauser whenStakingPaused {
+        _unpauseStaking();
+    }
+
+
+    /**
+     * @notice Lets the DAO/owner of the protocol implement an emergency stop mechanism.
+     */
+    function pauseLiquidation() public virtual onlyProtocolPauser whenPoolNotPaused {
+        _pauseLiquidation();
+    }
+
+    /**
+     * @notice Lets the DAO/owner of the protocol undo a previously implemented emergency stop.
+     */
+    function unpauseLiquidation() public virtual onlyProtocolPauser whenPoolPaused {
+        setLastUnpausedAt();
+        _unpauseLiquidation();
     }
 }

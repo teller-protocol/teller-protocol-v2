@@ -17,6 +17,7 @@ const deployFn: DeployFunction = async (hre) => {
   const collateralManager = await hre.contracts.get('CollateralManager')
   const lenderManager = await hre.contracts.get('LenderManager')
   const escrowVault = await hre.contracts.get('EscrowVault')
+   const protocolPausingManager = await hre.contracts.get('ProtocolPausingManager')
 
   const tellerV2 = await hre.contracts.get<TellerV2>('TellerV2')
   const tx = await tellerV2.initialize(
@@ -26,7 +27,8 @@ const deployFn: DeployFunction = async (hre) => {
     lenderCommitmentForwarder,
     collateralManager,
     lenderManager,
-    escrowVault
+    escrowVault,
+    protocolPausingManager
   )
   await tx.wait(1) // wait one block
 

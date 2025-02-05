@@ -80,7 +80,7 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 */
 
-contract LenderCommitmentGroup_Smart_R2 is
+contract LenderCommitmentGroup_Smart_R1 is
     ILenderCommitmentGroup,
     ISmartCommitment,
     ILoanRepaymentListener,
@@ -157,10 +157,7 @@ contract LenderCommitmentGroup_Smart_R2 is
     uint256 public lastUnpausedAt;
 
 
-
-    // if false, this lender has disabled their stake from being loaned, effectively reducing the lenderLoanThreshold
-    mapping(address => bool) public lenderStakeDisabled;
-    uint16 public lenderThresholdPercent;
+    
    
 
     event PoolInitialized(
@@ -350,10 +347,6 @@ contract LenderCommitmentGroup_Smart_R2 is
     }
 
 
-
-
-
-
     /**
      * @notice Sets the delay time for withdrawing funds. Only Protocol Owner.
      * @param _seconds Delay time in seconds.
@@ -365,9 +358,6 @@ contract LenderCommitmentGroup_Smart_R2 is
 
         withdrawDelayTimeSeconds = _seconds;
     }
-
-
-
 
 
     /**
@@ -419,10 +409,12 @@ contract LenderCommitmentGroup_Smart_R2 is
             return EXCHANGE_RATE_EXPANSION_FACTOR; // 1 to 1 for first swap
         }
 
+        let poolSharesAvailable = poolSharesToken.totalSupply() - getPoolSharesPreparedToWithdraw();
+
         rate_ =
             MathUpgradeable.mulDiv(poolTotalEstimatedValue , 
                 EXCHANGE_RATE_EXPANSION_FACTOR ,
-                  poolSharesToken.totalSupply() );
+                  poolSharesAvailable );
     }
 
     function sharesExchangeRateInverse()
@@ -434,6 +426,12 @@ contract LenderCommitmentGroup_Smart_R2 is
         return
             (EXCHANGE_RATE_EXPANSION_FACTOR * EXCHANGE_RATE_EXPANSION_FACTOR) /
             sharesExchangeRate();
+    }
+
+    function getPoolSharesPreparedToWithdraw() internal returns (uint256){
+
+
+        return IERC20(poolSharesToken).getPoolSharesPreparedToWithdrawTotal();
     }
 
     function getPoolTotalEstimatedValue()
@@ -457,62 +455,6 @@ contract LenderCommitmentGroup_Smart_R2 is
             ? uint256(poolTotalEstimatedValueSigned)
             : 0;
     }
-
-
-
-/*
-
-
-   
-        // for each lender who has a stake, do a loop iteration 
-          //find their amount that is staked 
-          //need to know the total shares that exist  too
-
-          //if they do NOT have lender stake disabled, we will add their percent of shares to the new threshold percent 
-
-
-          // FOR EXAMPLE if they have 40% of all stake (share tokens)  and they lenderstakedisabled is FALSE,  we will add 4000  to the _newThresholdPercent 
-
-
-        //... loop through these 
-        //mapping(address => bool) public lenderStakeDisabled;
-        
-
-*/
-    function _recalculateLenderThresholdPercent() internal {    
- 
-
-           uint16 _newThresholdPercent = 0; // Base value (100%)
-
-            uint256 totalShares = poolSharesToken.totalSupply();
-            if (totalShares == 0) {
-                lenderThresholdPercent = 10000;
-                return;
-            }
-
-            address[] memory lenders = poolSharesToken.getAllHolders(); // Assuming this function exists
-            for (uint256 i = 0; i < lenders.length; i++) {
-                address lender = lenders[i];
-
-                if (!lenderStakeDisabled[lender]) {
-                    uint256 lenderShares = poolSharesToken.balanceOf(lender);
-                    uint256 lenderSharePercent = (lenderShares * 10000) / totalShares;
-                    _newThresholdPercent +=  uint16(lenderSharePercent);
-                }
-            }
-
-          lenderThresholdPercent = _newThresholdPercent;
-  
-    }
-
-
-
-
-
-
-
-
-
 
     /**
      * @notice Adds principal to the lending pool in exchange for shares.
@@ -1158,6 +1100,8 @@ contract LenderCommitmentGroup_Smart_R2 is
         view
         returns (uint256)
     {     
+
+        //if LT 0 , return 0 
 
         return  ( uint256( getPoolTotalEstimatedValue() )).percent(liquidityThresholdPercent) -
         getTotalPrincipalTokensOutstandingInActiveLoans();

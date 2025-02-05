@@ -4,13 +4,9 @@ pragma solidity >=0.8.0 <0.9.0;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-import "@openzeppelin/contracts-upgradeable/utils/structs/EnumerableSetUpgradeable.sol";
+ 
 
 contract LenderCommitmentGroupShares is ERC20, Ownable {
-
-    using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
-
-
     uint8 private immutable DECIMALS;
 
 
@@ -18,8 +14,10 @@ contract LenderCommitmentGroupShares is ERC20, Ownable {
     mapping(address => uint256) public poolSharesPreparedTimestamp;
 
 
-       // Using EnumerableSet to track unique holders
-    EnumerableSetUpgradeable.AddressSet private holders;
+
+    // use this to determine threshold? 
+    uint256 public poolSharesPreparedToWithdrawTotal;
+
 
     event SharesPrepared(
         address recipient,
@@ -39,7 +37,6 @@ contract LenderCommitmentGroupShares is ERC20, Ownable {
 
     function mint(address _recipient, uint256 _amount) external onlyOwner {
         _mint(_recipient, _amount);
-          holders.add(_recipient);
     }
 
     function burn(address _burner, uint256 _amount, uint256 withdrawDelayTimeSeconds) external onlyOwner {
@@ -49,6 +46,8 @@ contract LenderCommitmentGroupShares is ERC20, Ownable {
         require(poolSharesPreparedToWithdrawForLender[_burner] >= _amount,"Shares not prepared for withdraw");
         require(poolSharesPreparedTimestamp[_burner] <= block.timestamp - withdrawDelayTimeSeconds,"Shares not prepared for withdraw");
         
+
+        poolSharesPreparedToWithdrawTotal -= poolSharesPreparedToWithdrawForLender[_burner];
  
         //reset prepared   
         poolSharesPreparedToWithdrawForLender[_burner] = 0;
@@ -56,39 +55,36 @@ contract LenderCommitmentGroupShares is ERC20, Ownable {
   
 
         _burn(_burner, _amount);
-        _removeHolderIfEmpty(_burner);
     }
 
     function decimals() public view virtual override returns (uint8) {
         return DECIMALS;
     }
 
+    function getPoolSharesPreparedToWithdrawTotal public view virtual returns (uint256){
+
+        return poolSharesPreparedToWithdrawTotal;
+    }
 
     // ---- 
 
-    function _afterTokenTransfer(
+     function _afterTokenTransfer(
         address from,
         address to,
         uint256 amount
     ) internal override {
-        super._afterTokenTransfer(from, to, amount);
 
         if (amount > 0) {
+
+             poolSharesPreparedToWithdrawTotal -= poolSharesPreparedToWithdrawForLender[_burner];
+ 
+               //reset prepared   
             poolSharesPreparedToWithdrawForLender[from] = 0;
-            poolSharesPreparedTimestamp[from] = block.timestamp;
-
-
-                 if (from != address(0)) {
-                _removeHolderIfEmpty(from);
-                }
-
-                if (to != address(0)) {
-                    holders.add(to);
-                }
+            poolSharesPreparedTimestamp[from] =  block.timestamp;
 
         }
 
-       
+      
     }
 
 
@@ -124,6 +120,10 @@ contract LenderCommitmentGroupShares is ERC20, Ownable {
    
         require(  balanceOf(_recipient) >= _amountPoolSharesTokens  );
 
+
+        poolSharesPreparedToWithdrawTotal = poolSharesPreparedToWithdrawTotal +  _amountPoolSharesTokens - poolSharesPreparedToWithdrawForLender[_recipient];
+    
+
         poolSharesPreparedToWithdrawForLender[_recipient] = _amountPoolSharesTokens; 
         poolSharesPreparedTimestamp[_recipient] = block.timestamp; 
 
@@ -138,22 +138,7 @@ contract LenderCommitmentGroupShares is ERC20, Ownable {
         return true; 
     }
 
-     /**
-     * @notice Returns the list of all token holders.
-     */
-    function getAllHolders() external view returns (address[] memory) {
-        return holders.values();
-    }
 
-    /**
-     * @notice Removes a holder if their balance reaches zero.
-     * @param account The address to check and remove.
-     */
-    function _removeHolderIfEmpty(address account) internal {
-        if (balanceOf(account) == 0) {
-            holders.remove(account);
-        }
-    }
 
 
 

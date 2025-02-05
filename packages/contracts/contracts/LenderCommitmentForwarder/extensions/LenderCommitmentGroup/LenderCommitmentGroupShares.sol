@@ -61,7 +61,7 @@ contract LenderCommitmentGroupShares is ERC20, Ownable {
         return DECIMALS;
     }
 
-    function getPoolSharesPreparedToWithdrawTotal public view virtual returns (uint256){
+    function getPoolSharesPreparedToWithdrawTotal() public view virtual returns (uint256){
 
         return poolSharesPreparedToWithdrawTotal;
     }
@@ -76,7 +76,7 @@ contract LenderCommitmentGroupShares is ERC20, Ownable {
 
         if (amount > 0) {
 
-             poolSharesPreparedToWithdrawTotal -= poolSharesPreparedToWithdrawForLender[_burner];
+             poolSharesPreparedToWithdrawTotal -= poolSharesPreparedToWithdrawForLender[from];
  
                //reset prepared   
             poolSharesPreparedToWithdrawForLender[from] = 0;

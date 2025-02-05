@@ -80,7 +80,7 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 */
 
-contract LenderCommitmentGroup_Smart_R1 is
+contract LenderCommitmentGroup_Smart_R2 is
     ILenderCommitmentGroup,
     ISmartCommitment,
     ILoanRepaymentListener,
@@ -111,6 +111,7 @@ contract LenderCommitmentGroup_Smart_R1 is
     
  
     LenderCommitmentGroupShares public poolSharesToken;
+    LenderCommitmentGroupShares public poolInterestToken;
 
     IERC20 public principalToken;
     IERC20 public collateralToken;
@@ -291,7 +292,7 @@ contract LenderCommitmentGroup_Smart_R1 is
    function initialize(
        CommitmentGroupConfig calldata _commitmentGroupConfig,
        IUniswapPricingLibrary.PoolRouteConfig[] calldata _poolOracleRoutes
-    ) external initializer returns (address poolSharesToken_) {
+    ) external initializer returns (address poolSharesToken_, address poolInterestToken_) {
        
         __Ownable_init();
         __Pausable_init();
@@ -329,6 +330,7 @@ contract LenderCommitmentGroup_Smart_R1 is
          require(poolOracleRoutes.length >= 1 && poolOracleRoutes.length <= 2, "invalid pool routes length");
         
         poolSharesToken_ = _deployPoolSharesToken();
+        poolInterestToken_ = _deployPoolSharesToken();
 
 
         emit PoolInitialized(
@@ -403,13 +405,13 @@ contract LenderCommitmentGroup_Smart_R1 is
     function sharesExchangeRate() public view virtual returns (uint256 rate_) {
         
 
-        uint256 poolTotalEstimatedValue = getPoolTotalEstimatedValue();
+        uint256 poolTotalEstimatedValue = getPoolBaseEstimatedValue();
 
         if (poolSharesToken.totalSupply() == 0) {
             return EXCHANGE_RATE_EXPANSION_FACTOR; // 1 to 1 for first swap
         }
 
-        let poolSharesAvailable = poolSharesToken.totalSupply() - getPoolSharesPreparedToWithdraw();
+        uint256 poolSharesAvailable = poolSharesToken.totalSupply() - getPoolSharesPreparedToWithdraw();
 
         rate_ =
             MathUpgradeable.mulDiv(poolTotalEstimatedValue , 
@@ -428,13 +430,39 @@ contract LenderCommitmentGroup_Smart_R1 is
             sharesExchangeRate();
     }
 
-    function getPoolSharesPreparedToWithdraw() internal returns (uint256){
+    function interestSharesExchangeRate() public view virtual returns (uint256 rate_) {
+        
 
+        uint256 poolTotalEstimatedValue = getPoolInterestEstimatedValue();
 
-        return IERC20(poolSharesToken).getPoolSharesPreparedToWithdrawTotal();
+        if (poolSharesToken.totalSupply() == 0) {
+            return EXCHANGE_RATE_EXPANSION_FACTOR; // 1 to 1 for first swap
+        }
+ 
+      uint256 poolSharesAvailable = interestSharesToken.totalSupply()  ;
+
+        rate_ =
+            MathUpgradeable.mulDiv(poolTotalEstimatedValue , 
+                EXCHANGE_RATE_EXPANSION_FACTOR ,
+                  poolSharesAvailable );
     }
 
-    function getPoolTotalEstimatedValue()
+    function interestSharesExchangeRateInverse()
+        public
+        view
+        virtual
+        returns (uint256 rate_)
+    {
+        return
+            (EXCHANGE_RATE_EXPANSION_FACTOR * EXCHANGE_RATE_EXPANSION_FACTOR) /
+            interestSharesExchangeRate();
+    }
+
+
+
+ 
+
+    function getPoolBaseEstimatedValue()
         public
         view
         returns (uint256 poolTotalEstimatedValue_)
@@ -442,7 +470,7 @@ contract LenderCommitmentGroup_Smart_R1 is
        
          int256 poolTotalEstimatedValueSigned = int256(totalPrincipalTokensCommitted) 
                   
-         + int256(totalInterestCollected)  + int256(tokenDifferenceFromLiquidations) 
+       /*  + int256(totalInterestCollected) */ + int256(tokenDifferenceFromLiquidations) 
          + int256( excessivePrincipalTokensRepaid )
          - int256( totalPrincipalTokensWithdrawn )
          
@@ -454,6 +482,17 @@ contract LenderCommitmentGroup_Smart_R1 is
         poolTotalEstimatedValue_ = poolTotalEstimatedValueSigned > int256(0)
             ? uint256(poolTotalEstimatedValueSigned)
             : 0;
+    }
+
+
+
+    function getPoolInterestEstimatedValue()
+        public
+        view
+        returns (uint256 poolTotalEstimatedValue_)
+    {
+       
+        return totalInterestCollected; 
     }
 
     /**
@@ -604,15 +643,54 @@ contract LenderCommitmentGroup_Smart_R1 is
     }
 
     
-     function prepareSharesForBurn(
+    /* function prepareSharesForBurn(
         uint256 _amountPoolSharesTokens 
     ) external whenForwarderNotPaused whenNotPaused nonReentrant
      returns (bool) {
+
+
         
         return poolSharesToken.prepareSharesForBurn(msg.sender, _amountPoolSharesTokens); 
+    } */
+
+        
+        //new form of preparing base shares for burn 
+
+    function burnInterestSharesToWithdraw(
+        uint256 _amount,
+        address _recipient,
+        uint256 _minAmountOut
+    ) external whenForwarderNotPaused whenNotPaused  nonReentrant onlyOracleApprovedAllowEOA 
+    returns (uint256) {
+       
+          
+       
+        uint256 principalTokenValueToWithdraw = _valueOfUnderlying(
+            _amount,
+            interestSharesExchangeRateInverse()
+        );
+
+        poolInterestToken.burn(msg.sender, _amount, withdrawDelayTimeSeconds);
+
+        totalPrincipalTokensWithdrawn += principalTokenValueToWithdraw;
+
+        principalToken.safeTransfer(_recipient, principalTokenValueToWithdraw);
+
+
+        emit EarningsWithdrawn(
+            msg.sender,
+            _amount,
+            principalTokenValueToWithdraw,
+            _recipient
+        );
+        
+        require( principalTokenValueToWithdraw >=  _minAmountOut ,"Invalid: Min Amount Out");
+
+        // in order to prepare base shares for burn, you must have burned interest shares before -> no longer can earn interest 
+        require ( poolSharesToken.prepareSharesForBurn(msg.sender, _amount ) ) ;
+
+        return principalTokenValueToWithdraw;
     }
-
-
 
 
    /**
@@ -1067,7 +1145,8 @@ contract LenderCommitmentGroup_Smart_R1 is
 
     function getPoolUtilizationRatio(uint256 activeLoansAmountDelta ) public view returns (uint16) {
 
-        if (getPoolTotalEstimatedValue() == 0) {
+
+        if (getPoolBaseEstimatedValue() == 0) {
             return 0;
         }
 
@@ -1075,7 +1154,7 @@ contract LenderCommitmentGroup_Smart_R1 is
                             MathUpgradeable.mulDiv( 
                                 (getTotalPrincipalTokensOutstandingInActiveLoans() + activeLoansAmountDelta), 
                                 10000  ,
-                                getPoolTotalEstimatedValue() ) , 
+                                getPoolBaseEstimatedValue() ) , 
                         10000  ));
 
     }
@@ -1101,9 +1180,11 @@ contract LenderCommitmentGroup_Smart_R1 is
         returns (uint256)
     {     
 
+        //this may need to incorporate logic related to interest tokens burned ?
+
         //if LT 0 , return 0 
 
-        return  ( uint256( getPoolTotalEstimatedValue() )).percent(liquidityThresholdPercent) -
+        return  ( uint256( getPoolBaseEstimatedValue() )).percent(liquidityThresholdPercent) -
         getTotalPrincipalTokensOutstandingInActiveLoans();
      
     }

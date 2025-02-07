@@ -110,8 +110,8 @@ contract LenderCommitmentGroup_Smart_R2 is
     address public immutable UNISWAP_V3_FACTORY;
     
  
-    LenderCommitmentGroupShares public poolSharesToken;
-    LenderCommitmentGroupShares public poolInterestToken;
+    LenderCommitmentGroupShares public principalSharesToken;
+    LenderCommitmentGroupShares public interestSharesToken;
 
     IERC20 public principalToken;
     IERC20 public collateralToken;
@@ -292,7 +292,7 @@ contract LenderCommitmentGroup_Smart_R2 is
    function initialize(
        CommitmentGroupConfig calldata _commitmentGroupConfig,
        IUniswapPricingLibrary.PoolRouteConfig[] calldata _poolOracleRoutes
-    ) external initializer returns (address poolSharesToken_, address poolInterestToken_) {
+    ) external initializer returns (address principalSharesToken_, address interestSharesToken_) {
        
         __Ownable_init();
         __Pausable_init();
@@ -329,8 +329,8 @@ contract LenderCommitmentGroup_Smart_R2 is
 
          require(poolOracleRoutes.length >= 1 && poolOracleRoutes.length <= 2, "invalid pool routes length");
         
-        poolSharesToken_ = _deployPoolSharesToken();
-        poolInterestToken_ = _deployPoolSharesToken();
+        principalSharesToken_ = _deployPrincipalSharesToken();
+        interestSharesToken_ = _deployInterestSharesToken();
 
 
         emit PoolInitialized(
@@ -342,9 +342,8 @@ contract LenderCommitmentGroup_Smart_R2 is
             _commitmentGroupConfig.interestRateUpperBound,
             _commitmentGroupConfig.liquidityThresholdPercent,
             _commitmentGroupConfig.collateralRatio,
-            //_commitmentGroupConfig.uniswapPoolFee,
-            //_commitmentGroupConfig.twapInterval,
-            poolSharesToken_
+            
+            principalSharesToken_
         );
     }
 
@@ -377,23 +376,42 @@ contract LenderCommitmentGroup_Smart_R2 is
      * @dev This function can only be called during initialization.
      * @return poolSharesToken_ Address of the deployed pool shares token.
      */
-    function _deployPoolSharesToken()
+    function _deployPrincipalSharesToken()
         internal
         onlyInitializing
-        returns (address poolSharesToken_)
+        returns (address principalSharesToken_)
     {      
         require(
-            address(poolSharesToken) == address(0),
+            address(principalSharesToken) == address(0),
             "Pool shares already deployed"
         );
  
-        poolSharesToken = new LenderCommitmentGroupShares(
-            "LenderGroupShares",
+        principalSharesToken = new LenderCommitmentGroupShares(
+            "PoolPrincipalShares",
             "SHR",
             18  
         );
 
-        return address(poolSharesToken);
+        return address(principalSharesToken);
+    } 
+
+    function _deployInterestSharesToken()
+        internal
+        onlyInitializing
+        returns (address interestSharesToken_)
+    {      
+        require(
+            address(interestSharesToken) == address(0),
+            "Interest shares already deployed"
+        );
+ 
+        interestSharesToken = new LenderCommitmentGroupShares(
+            "PoolInterestShares",
+            "SHR",
+            18  
+        );
+
+        return address(interestSharesToken);
     } 
 
 
@@ -407,11 +425,11 @@ contract LenderCommitmentGroup_Smart_R2 is
 
         uint256 poolTotalEstimatedValue = getPoolBaseEstimatedValue();
 
-        if (poolSharesToken.totalSupply() == 0) {
+        if (principalSharesToken.totalSupply() == 0) {
             return EXCHANGE_RATE_EXPANSION_FACTOR; // 1 to 1 for first swap
         }
 
-        uint256 poolSharesAvailable = poolSharesToken.totalSupply() - getPoolSharesPreparedToWithdraw();
+        uint256 poolSharesAvailable = principalSharesToken.totalActiveSupply();
 
         rate_ =
             MathUpgradeable.mulDiv(poolTotalEstimatedValue , 
@@ -430,21 +448,24 @@ contract LenderCommitmentGroup_Smart_R2 is
             sharesExchangeRate();
     }
 
+
+
+
     function interestSharesExchangeRate() public view virtual returns (uint256 rate_) {
         
 
         uint256 poolTotalEstimatedValue = getPoolInterestEstimatedValue();
 
-        if (poolSharesToken.totalSupply() == 0) {
+        if (interestSharesToken.totalSupply() == 0) {
             return EXCHANGE_RATE_EXPANSION_FACTOR; // 1 to 1 for first swap
         }
  
-      uint256 poolSharesAvailable = interestSharesToken.totalSupply()  ;
+      uint256 sharesAvailable = interestSharesToken.totalSupply()  ;
 
         rate_ =
             MathUpgradeable.mulDiv(poolTotalEstimatedValue , 
                 EXCHANGE_RATE_EXPANSION_FACTOR ,
-                  poolSharesAvailable );
+                  sharesAvailable );
     }
 
     function interestSharesExchangeRateInverse()
@@ -522,7 +543,9 @@ contract LenderCommitmentGroup_Smart_R2 is
         totalPrincipalTokensCommitted += _amount;
          
         //mint shares equal to _amount and give them to the shares recipient 
-        poolSharesToken.mint(_sharesRecipient, sharesAmount_);
+        principalSharesToken.mint(_sharesRecipient, sharesAmount_);
+        //also mint interest shares !? 
+        interestSharesToken.mint(_sharesRecipient, sharesAmount_);
    
         emit LenderAddedPrincipal( 
 
@@ -670,7 +693,7 @@ contract LenderCommitmentGroup_Smart_R2 is
             interestSharesExchangeRateInverse()
         );
 
-        poolInterestToken.burn(msg.sender, _amount, withdrawDelayTimeSeconds);
+        interestSharesToken.burn(msg.sender, _amount, withdrawDelayTimeSeconds);
 
         totalPrincipalTokensWithdrawn += principalTokenValueToWithdraw;
 
@@ -687,7 +710,7 @@ contract LenderCommitmentGroup_Smart_R2 is
         require( principalTokenValueToWithdraw >=  _minAmountOut ,"Invalid: Min Amount Out");
 
         // in order to prepare base shares for burn, you must have burned interest shares before -> no longer can earn interest 
-        require ( poolSharesToken.prepareSharesForBurn(msg.sender, _amount ) ) ;
+        require ( principalSharesToken.prepareSharesForBurn(msg.sender, _amount ) ) ;
 
         return principalTokenValueToWithdraw;
     }
@@ -696,13 +719,13 @@ contract LenderCommitmentGroup_Smart_R2 is
    /**
     * @notice Burns shares to withdraw an equivalent amount of principal tokens.
     * @dev Requires shares to have been prepared for withdrawal in advance.
-    * @param _amountPoolSharesTokens Amount of pool shares to burn.
+    * @param _amountPrincipalSharesTokens Amount of pool shares to burn.
     * @param _recipient Address receiving the withdrawn principal tokens.
     * @param _minAmountOut Minimum amount of principal tokens expected to be withdrawn.
     * @return principalTokenValueToWithdraw Amount of principal tokens withdrawn.
     */
     function burnSharesToWithdrawEarnings(
-        uint256 _amountPoolSharesTokens,
+        uint256 _amountPrincipalSharesTokens,
         address _recipient,
         uint256 _minAmountOut
     ) external whenForwarderNotPaused whenNotPaused  nonReentrant onlyOracleApprovedAllowEOA 
@@ -712,11 +735,11 @@ contract LenderCommitmentGroup_Smart_R2 is
        
         //this should compute BEFORE shares burn 
         uint256 principalTokenValueToWithdraw = _valueOfUnderlying(
-            _amountPoolSharesTokens,
+            _amountPrincipalSharesTokens,
             sharesExchangeRateInverse()
         );
 
-        poolSharesToken.burn(msg.sender, _amountPoolSharesTokens, withdrawDelayTimeSeconds);
+        principalSharesToken.burn(msg.sender, _amountPrincipalSharesTokens, withdrawDelayTimeSeconds);
 
         totalPrincipalTokensWithdrawn += principalTokenValueToWithdraw;
 
@@ -725,7 +748,7 @@ contract LenderCommitmentGroup_Smart_R2 is
 
         emit EarningsWithdrawn(
             msg.sender,
-            _amountPoolSharesTokens,
+            _amountPrincipalSharesTokens,
             principalTokenValueToWithdraw,
             _recipient
         );

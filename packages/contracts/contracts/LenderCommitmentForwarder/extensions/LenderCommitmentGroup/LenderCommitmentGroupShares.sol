@@ -66,6 +66,11 @@ contract LenderCommitmentGroupShares is ERC20, Ownable {
         return poolSharesPreparedToWithdrawTotal;
     }
 
+    function totalActiveSupply() public view virtual returns (uint256){
+
+        return totalSupply() - poolSharesPreparedToWithdrawTotal;
+    }
+
     // ---- 
 
      function _afterTokenTransfer(

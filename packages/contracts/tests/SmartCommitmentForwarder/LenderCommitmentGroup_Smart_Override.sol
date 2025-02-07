@@ -130,7 +130,7 @@ contract LenderCommitmentGroup_Smart_Override is LenderCommitmentGroup_Smart {
     function mock_mintShares(address _sharesRecipient, uint256 _mockAmt)
         public
     {
-        poolSharesToken.mint(_sharesRecipient, _mockAmt);
+        principalSharesToken.mint(_sharesRecipient, _mockAmt);
     }
 
     function set_mock_getMaxPrincipalPerCollateralAmount(uint256 amt) public {

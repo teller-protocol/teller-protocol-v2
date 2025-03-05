@@ -125,17 +125,14 @@ contract BorrowSwap_G1 is PeripheryPayments, IUniswapV3SwapCallback  {
      
     }
  
-
-
-
+ 
 
     /**
     
      */
     function borrowSwap(
         address _lenderCommitmentForwarder,
-      //  uint256 _loanId, 
-        
+       
         address _principalToken ,
         uint256 _additionalInputAmount, //an additional amount  
        
@@ -144,19 +141,11 @@ contract BorrowSwap_G1 is PeripheryPayments, IUniswapV3SwapCallback  {
         AcceptCommitmentArgs calldata _acceptCommitmentArgs
 
     ) external   {
-        //address borrower = TELLER_V2.getLoanBorrower(_loanId);
-       // require(borrower == msg.sender, "Must be borrower");
-
+        
        address borrower = msg.sender ;
 
 
-       // {
-            // Get lending token and balance before
-        //    address lendingToken = TELLER_V2.getLoanLendingToken(_loanId);
-
-          
-      //  }
-
+       
     
         if (_additionalInputAmount > 0) {
             TransferHelper.safeTransferFrom(_principalToken, borrower, address(this), _additionalInputAmount);              
@@ -174,10 +163,10 @@ contract BorrowSwap_G1 is PeripheryPayments, IUniswapV3SwapCallback  {
 
 
         bool zeroForOne = _swapArgs.token0 == _principalToken ;
+
+
       
-        // swap principal For Collateral ! 
-
-
+        // swap principal For Collateral   
         // do a single sided swap using uniswap - swap the principal we just got for collateral 
 
         ( int256 amount0, int256 amount1 ) = IUniswapV3Pool( 

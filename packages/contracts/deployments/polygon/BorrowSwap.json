@@ -1,5 +1,5 @@
 {
-  "address": "0x8Bae586f7899df13d6bce0831971B82b53Af974f",
+  "address": "0x2FaC3e258c5c4c24BCc013B1fee1e82Ee49413c2",
   "abi": [
     {
       "type": "constructor",
@@ -172,6 +172,41 @@
     },
     {
       "type": "function",
+      "name": "calculateSqrtPriceLimitX96",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "token0"
+        },
+        {
+          "type": "address",
+          "name": "token1"
+        },
+        {
+          "type": "uint24",
+          "name": "fee"
+        },
+        {
+          "type": "bool",
+          "name": "zeroForOne"
+        },
+        {
+          "type": "uint16",
+          "name": "bufferBps"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint160",
+          "name": "sqrtPriceLimitX96"
+        }
+      ]
+    },
+    {
+      "type": "function",
       "name": "factory",
       "constant": true,
       "stateMutability": "view",
@@ -328,7 +363,7 @@
       "stateMutability": "payable"
     }
   ],
-  "transactionHash": "0xbc3af5c871b972006d93d74353f2af2313a3e12f130f3eed24769e710c6f34c5",
+  "transactionHash": "0x7d642566e6b8aaa4fc569f2dfd66e7003355500b736017a0759eda44deff3bdd",
   "receipt": {
     "to": null,
     "from": "0xD9B023522CeCe02251d877bb0EB4f06fDe6F98E6",
@@ -336,5 +371,5 @@
     "blockNumber": null
   },
   "numDeployments": 1,
-  "implementation": "0xfCe82A33d53bA469E8E05d373cFD5eb926F5BB7f"
+  "implementation": "0xeFCeC53708e787597134f2e3F24cc66bBFe42C7A"
 }

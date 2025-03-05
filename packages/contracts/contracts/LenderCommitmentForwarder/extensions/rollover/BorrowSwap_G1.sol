@@ -34,9 +34,7 @@ import '../../../libraries/uniswap/core/interfaces/callback/IUniswapV3SwapCallba
 
  /*
 
-    A workflow where a loan is borrowed (for example PEPE as principal token) 
-    and then the borrowed funds are immediately sold on uniswap  (for the collateral token) so we are 'in debt' 
-    the principal token
+    A one-tx strategy to borrow funds and then immediately swap them using uniswap 
 
  */
 
@@ -240,8 +238,8 @@ contract BorrowSwap_G1 is PeripheryPayments, IUniswapV3SwapCallback  {
 
         // Validate that the msg.sender is a valid pool
         address pool = getUniswapPoolAddress(
-            _swapArgs.token0,  // You'll need to store these values
-            _swapArgs.token1,  // in storage or pass them in data
+            _swapArgs.token0,   
+            _swapArgs.token1,   
             _swapArgs.fee
         );
         require(msg.sender == pool, "Invalid pool callback");
@@ -256,9 +254,7 @@ contract BorrowSwap_G1 is PeripheryPayments, IUniswapV3SwapCallback  {
         }
 
 
-
-        
-        // Note: If both deltas are <= 0, we don't need to send anything
+ 
     }
    
  

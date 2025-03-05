@@ -51,5 +51,5 @@
   "lender-commitment-forwarder:alpha:upgrade_max_principal": 1736275629,
   "lender-commitment-forwarder:extensions:flash-swap-rollover:deploy": 1738183011,
   "lender-commitment-forwarder:extensions:loan-referral-forwarder-v2:deploy": 1738183025,
-  "lender-commitment-forwarder:extensions:borrow-swap:deploy": 1741191170
+  "lender-commitment-forwarder:extensions:borrow-swap:deploy": 1741196266
 }

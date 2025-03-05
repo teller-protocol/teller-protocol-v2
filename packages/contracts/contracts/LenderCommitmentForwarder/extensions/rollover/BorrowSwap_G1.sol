@@ -390,55 +390,64 @@ contract BorrowSwap_G1 is PeripheryPayments, IUniswapV3SwapCallback  {
             fundsBeforeAcceptCommitment;
     }
 
-   
-
+       
     /**
-     maybe rebuild this 
-    
+     * @notice Calculates an appropriate sqrtPriceLimitX96 value for a swap based on current pool price
+     * @dev Returns a price limit that is a certain percentage away from the current price
+     * @param token0 The first token in the pair
+     * @param token1 The second token in the pair
+     * @param fee The fee tier of the pool
+     * @param zeroForOne The direction of the swap (true = token0 to token1, false = token1 to token0)
+     * @param bufferBps Buffer in basis points (1/10000) away from current price (e.g. 50 = 0.5%)
+     * @return sqrtPriceLimitX96 The calculated price limit
      */
- /*   function calculateSwapAmount(
-        uint16 marketFeePct,
-        uint16 protocolFeePct, 
-        uint256 _loanId,      
-        uint256 principalAmount,
-        uint256 _rewardAmount, 
-        uint16 _poolFeePct,  // 3000 means 0.3%  in uniswap terms
-        uint256 _timestamp
-    ) external view returns (uint256 _flashAmount, int256 _borrowerAmount) {
+    function calculateSqrtPriceLimitX96(
+        address token0,
+        address token1,
+        uint24 fee,
+        bool zeroForOne,
+        uint16 bufferBps
+    ) public view returns (uint160 sqrtPriceLimitX96) {
+        // Constants from Uniswap
+        uint160 MIN_SQRT_RATIO = 4295128739;
+        uint160 MAX_SQRT_RATIO = 1461446703485210103287273052203988822378723970342;
         
-
-        Payment memory repayAmountOwed = TELLER_V2.calculateAmountOwed(
-            _loanId,
-            _timestamp
-        );
-
-        uint256 commitmentPrincipalRequested = principalAmount; // _commitmentArgs.principalAmount;
-        uint256 amountToMarketplace = commitmentPrincipalRequested.percent(
-            marketFeePct
-        );
-        uint256 amountToProtocol = commitmentPrincipalRequested.percent(
-            protocolFeePct
-        );
-
-        uint256 commitmentPrincipalReceived = commitmentPrincipalRequested -
-            amountToMarketplace -
-            amountToProtocol;
-
-        // by default, we will flash exactly what we need to do relayLoanFull
-        uint256 repayFullAmount = repayAmountOwed.principal +
-            repayAmountOwed.interest;
-
-        _flashAmount = repayFullAmount;
-        uint256 _flashLoanFee = _flashAmount.percent(_poolFeePct, 4 );
-
-        _borrowerAmount =
-            int256(commitmentPrincipalReceived) -
-            int256(repayFullAmount) -
-            int256(_flashLoanFee) -
-            int256(_rewardAmount);
-
+        // Get the pool address
+        address poolAddress = getUniswapPoolAddress(token0, token1, fee);
+        require(poolAddress != address(0), "Pool does not exist");
+        
+        // Get the current price from the pool
+        (uint160 currentSqrtRatioX96,,,,,,) = IUniswapV3Pool(poolAddress).slot0();
+        
+        // Calculate price limit based on direction and buffer
+        if (zeroForOne) {
+            // When swapping from token0 to token1, price decreases
+            // So we set a lower bound that's bufferBps% below current price
             
-    }*/
+            // Calculate the buffer amount (currentPrice * bufferBps / 10000)
+            uint160 buffer = uint160((uint256(currentSqrtRatioX96) * bufferBps) / 10000);
+            
+            // Subtract buffer from current price, but ensure we don't go below MIN_SQRT_RATIO
+            if (currentSqrtRatioX96 <= MIN_SQRT_RATIO + buffer) {
+                return MIN_SQRT_RATIO + 1;
+            } else {
+                return currentSqrtRatioX96 - buffer;
+            }
+        } else {
+            // When swapping from token1 to token0, price increases
+            // So we set an upper bound that's bufferBps% above current price
+            
+            // Calculate the buffer amount (currentPrice * bufferBps / 10000)
+            uint160 buffer = uint160((uint256(currentSqrtRatioX96) * bufferBps) / 10000);
+            
+            // Add buffer to current price, but ensure we don't go above MAX_SQRT_RATIO
+            if (MAX_SQRT_RATIO - buffer <= currentSqrtRatioX96) {
+                return MAX_SQRT_RATIO - 1;
+            } else {
+                return currentSqrtRatioX96 + buffer;
+            }
+        }
+    }
 
 
      function getMarketIdForCommitment(

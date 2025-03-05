@@ -1,0 +1,344 @@
+{
+  "address": "0x25741bc3B6E5c27e2984f26aA292b9D0160666F3",
+  "abi": [
+    {
+      "type": "constructor",
+      "stateMutability": "undefined",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "_tellerV2"
+        },
+        {
+          "type": "address",
+          "name": "_factory"
+        },
+        {
+          "type": "address",
+          "name": "_WETH9"
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "BorrowSwapComplete",
+      "inputs": [
+        {
+          "type": "address",
+          "name": "borrower",
+          "indexed": false
+        },
+        {
+          "type": "uint256",
+          "name": "loanId",
+          "indexed": false
+        },
+        {
+          "type": "address",
+          "name": "token0",
+          "indexed": false
+        },
+        {
+          "type": "address",
+          "name": "token1",
+          "indexed": false
+        },
+        {
+          "type": "int256",
+          "name": "amount0",
+          "indexed": false
+        },
+        {
+          "type": "int256",
+          "name": "amount1",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "TELLER_V2",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "WETH9",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "borrowSwap",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "_lenderCommitmentForwarder"
+        },
+        {
+          "type": "uint256",
+          "name": "_loanId"
+        },
+        {
+          "type": "address",
+          "name": "_principalToken"
+        },
+        {
+          "type": "uint256",
+          "name": "_additionalInputAmount"
+        },
+        {
+          "type": "tuple",
+          "name": "_swapArgs",
+          "components": [
+            {
+              "type": "address",
+              "name": "token0"
+            },
+            {
+              "type": "address",
+              "name": "token1"
+            },
+            {
+              "type": "uint24",
+              "name": "fee"
+            },
+            {
+              "type": "uint160",
+              "name": "sqrtPriceLimitX96"
+            }
+          ]
+        },
+        {
+          "type": "tuple",
+          "name": "_acceptCommitmentArgs",
+          "components": [
+            {
+              "type": "uint256",
+              "name": "commitmentId"
+            },
+            {
+              "type": "address",
+              "name": "smartCommitmentAddress"
+            },
+            {
+              "type": "uint256",
+              "name": "principalAmount"
+            },
+            {
+              "type": "uint256",
+              "name": "collateralAmount"
+            },
+            {
+              "type": "uint256",
+              "name": "collateralTokenId"
+            },
+            {
+              "type": "address",
+              "name": "collateralTokenAddress"
+            },
+            {
+              "type": "uint16",
+              "name": "interestRate"
+            },
+            {
+              "type": "uint32",
+              "name": "loanDuration"
+            },
+            {
+              "type": "bytes32[]",
+              "name": "merkleProof"
+            }
+          ]
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "factory",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getMarketFeePct",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_marketId"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint16",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getMarketIdForCommitment",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "_lenderCommitmentForwarder"
+        },
+        {
+          "type": "uint256",
+          "name": "_commitmentId"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getUniswapPoolAddress",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "token0"
+        },
+        {
+          "type": "address",
+          "name": "token1"
+        },
+        {
+          "type": "uint24",
+          "name": "fee"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "refundETH",
+      "constant": false,
+      "stateMutability": "payable",
+      "payable": true,
+      "inputs": [],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "sweepToken",
+      "constant": false,
+      "stateMutability": "payable",
+      "payable": true,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "token"
+        },
+        {
+          "type": "uint256",
+          "name": "amountMinimum"
+        },
+        {
+          "type": "address",
+          "name": "recipient"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "uniswapV3SwapCallback",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "int256",
+          "name": "amount0Delta"
+        },
+        {
+          "type": "int256",
+          "name": "amount1Delta"
+        },
+        {
+          "type": "bytes",
+          "name": "data"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "unwrapWETH9",
+      "constant": false,
+      "stateMutability": "payable",
+      "payable": true,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "amountMinimum"
+        },
+        {
+          "type": "address",
+          "name": "recipient"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "receive",
+      "stateMutability": "payable"
+    }
+  ],
+  "transactionHash": "0x5f0efd100a4ac813bc07d93e934f9c395af92eaf5b5d3c17e6481b7819a52d7a",
+  "receipt": {
+    "to": null,
+    "from": "0xD9B023522CeCe02251d877bb0EB4f06fDe6F98E6",
+    "blockHash": null,
+    "blockNumber": null
+  },
+  "numDeployments": 1,
+  "implementation": "0xd76B06b776D9E136D9f376120ec1f02868186280"
+}

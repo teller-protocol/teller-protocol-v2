@@ -204,7 +204,7 @@ type group_pool_metric @entity {
     token_difference_from_liquidations: BigInt!
     total_collateral_withdrawn: BigInt!
 
-  
+    excessive_principal_tokens_repaid: BigInt! 
 }
 
 

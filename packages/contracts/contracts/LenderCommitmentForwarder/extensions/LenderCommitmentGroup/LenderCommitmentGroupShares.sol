@@ -77,7 +77,7 @@ contract LenderCommitmentGroupShares is ERC20, Ownable {
     // ---- 
 
 
-      /**
+    /**
     * @notice Prepares shares for withdrawal, allowing the user to burn them later for principal tokens + accrued interest.
     * @param _amountPoolSharesTokens Amount of pool shares to prepare for withdrawal.
     * @return True if the preparation is successful.

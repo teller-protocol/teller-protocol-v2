@@ -15,7 +15,7 @@ interface ILenderCommitmentGroup_V2 {
         uint16 interestRateLowerBound;
         uint16 interestRateUpperBound;
         uint16 liquidityThresholdPercent;
-        uint16 collateralRatio; //essentially the overcollateralization ratio.  10000 is 1:1 baseline ?
+        uint16 collateralRatio;  
         
     }
 
@@ -28,11 +28,7 @@ interface ILenderCommitmentGroup_V2 {
         address sharesToken 
     )
         external
-        returns (
-            //uint256 _maxPrincipalPerCollateralAmount //use oracle instead
-
-            //ILenderCommitmentForwarder.Commitment calldata _createCommitmentArgs
-
+        returns ( 
             address poolSharesToken
         );
 

@@ -1,9 +1,11 @@
 pragma solidity >=0.8.0 <0.9.0;
 // SPDX-License-Identifier: MIT
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
 
+import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol"; 
+
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
  
 
  /*
@@ -18,9 +20,9 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
  */
 
-contract LenderCommitmentGroupShares_V2 is ERC20, Ownable {
-    uint8 private immutable DECIMALS;
-
+contract LenderCommitmentGroupShares_V2 is Initializable, ERC20Upgradeable,  OwnableUpgradeable {
+    //uint8 private immutable DECIMALS;
+     uint8 private constant DECIMALS  = 18;
 
    
     mapping(address => uint256) public poolSharesLastTransferredAt;
@@ -34,12 +36,20 @@ contract LenderCommitmentGroupShares_V2 is ERC20, Ownable {
 
 
 
-    constructor(string memory _name, string memory _symbol, uint8 _decimals)
-        ERC20(_name, _symbol)
-        Ownable()
+    constructor()  
     {
-        DECIMALS = _decimals;
+          _disableInitializers();
     }
+
+
+
+    function initialize( )  external initializer {
+
+
+        __ERC20_init("LenderPoolShares", "LPS");
+        __Ownable_init();
+    }    
+
 
     function mint(address _recipient, uint256 _amount) external onlyOwner {
         _mint(_recipient, _amount);
@@ -97,3 +107,50 @@ contract LenderCommitmentGroupShares_V2 is ERC20, Ownable {
 
 
 }
+
+
+
+/*
+
+
+
+
+TypeError: Derived contract must override function "_msgData". Two or more base classes define function with same name and parameter types.
+  --> contracts/LenderCommitmentForwarder/extensions/LenderCommitmentGroup/LenderCommitmentGroupShares_V2.sol:22:1:
+   |
+22 | contract LenderCommitmentGroupShares_V2 is ERC20, OwnableUpgradeable {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: Definition in "ContextUpgradeable": 
+  --> @openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:27:5:
+   |
+27 |     function _msgData() internal view virtual returns (bytes calldata) {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+Note: Definition in "Context": 
+  --> @openzeppelin/contracts/utils/Context.sol:21:5:
+   |
+21 |     function _msgData() internal view virtual returns (bytes calldata) {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+
+TypeError: Derived contract must override function "_msgSender". Two or more base classes define function with same name and parameter types.
+  --> contracts/LenderCommitmentForwarder/extensions/LenderCommitmentGroup/LenderCommitmentGroupShares_V2.sol:22:1:
+   |
+22 | contract LenderCommitmentGroupShares_V2 is ERC20, OwnableUpgradeable {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: Definition in "ContextUpgradeable": 
+  --> @openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:23:5:
+   |
+23 |     function _msgSender() internal view virtual returns (address) {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+Note: Definition in "Context": 
+  --> @openzeppelin/contracts/utils/Context.sol:17:5:
+   |
+17 |     function _msgSender() internal view virtual returns (address) {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+
+Error HH600: Compilation failed
+
+For more info go to https://hardhat.org/HH600 or run Hardhat with --show-stack-traces
+
+*/

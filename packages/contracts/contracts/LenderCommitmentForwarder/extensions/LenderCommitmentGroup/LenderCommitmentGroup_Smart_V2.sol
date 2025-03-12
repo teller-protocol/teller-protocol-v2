@@ -34,8 +34,9 @@ import "../../../libraries/uniswap/TickMath.sol";
 import "../../../libraries/uniswap/FixedPoint96.sol";
 import "../../../libraries/uniswap/FullMath.sol";
 
-import {LenderCommitmentGroupShares_V2} from "./LenderCommitmentGroupShares_V2.sol";
+//import {LenderCommitmentGroupShares_V2} from "./LenderCommitmentGroupShares_V2.sol";
 
+import { ILenderCommitmentGroupShares_V2 } from "../../../interfaces/ILenderCommitmentGroupShares_V2.sol";
 
 import {OracleProtectedChild} from "../../../oracleprotection/OracleProtectedChild.sol";
 
@@ -133,7 +134,7 @@ contract LenderCommitmentGroup_Smart_V2 is
     address public immutable UNISWAP_V3_FACTORY;
     
  
-    LenderCommitmentGroupShares_V2 public poolSharesToken;
+    ILenderCommitmentGroupShares_V2 public poolSharesToken;
 
     IERC20 public principalToken;
     IERC20 public collateralToken;
@@ -310,7 +311,9 @@ contract LenderCommitmentGroup_Smart_V2 is
      */
    function initialize(
        CommitmentGroupConfig calldata _commitmentGroupConfig,
-       IUniswapPricingLibrary.PoolRouteConfig[] calldata _poolOracleRoutes
+     
+       IUniswapPricingLibrary.PoolRouteConfig[] calldata _poolOracleRoutes ,
+         address _poolSharesToken
     ) external initializer returns (address poolSharesToken_) {
        
         __Ownable_init();
@@ -348,7 +351,7 @@ contract LenderCommitmentGroup_Smart_V2 is
 
          require(poolOracleRoutes.length >= 1 && poolOracleRoutes.length <= 2, "PRL");
         
-        poolSharesToken_ = _deployPoolSharesToken();
+        poolSharesToken_ =   _poolSharesToken ;
 
 
         emit PoolInitialized(
@@ -395,7 +398,7 @@ contract LenderCommitmentGroup_Smart_V2 is
      * @dev This function can only be called during initialization.
      * @return poolSharesToken_ Address of the deployed pool shares token.
      */
-    function _deployPoolSharesToken()
+  /*  function _deployPoolSharesToken()
         internal
         onlyInitializing
         returns (address poolSharesToken_)
@@ -411,7 +414,7 @@ contract LenderCommitmentGroup_Smart_V2 is
         );
 
         return address(poolSharesToken);
-    } 
+    } */
 
 
     /**
@@ -1205,11 +1208,11 @@ contract LenderCommitmentGroup_Smart_V2 is
         require(shares > 0, "S");
         
         // Ensure caller has permission
-        if (msg.sender != owner) {
+       /* if (msg.sender != owner) {
             uint256 allowed = poolSharesToken.allowance(owner, msg.sender);
             require(allowed >= shares, "IA");
             poolSharesToken.decreaseAllowance(owner, shares);
-        }
+        } */
         
         // Check withdrawal delay
         uint256 sharesLastTransferredAt = poolSharesToken.getLastTransferredAt(owner);
@@ -1240,11 +1243,11 @@ contract LenderCommitmentGroup_Smart_V2 is
         assets = _valueOfUnderlying(shares, sharesExchangeRateInverse());
         
         // Ensure caller has permission
-        if (msg.sender != owner) {
+     /*   if (msg.sender != owner) {
             uint256 allowed = poolSharesToken.allowance(owner, msg.sender);
             require(allowed >= shares, "IA");
             poolSharesToken.decreaseAllowance(owner, shares);
-        }
+        }*/
         
         // Check withdrawal delay
         uint256 sharesLastTransferredAt = poolSharesToken.getLastTransferredAt(owner);

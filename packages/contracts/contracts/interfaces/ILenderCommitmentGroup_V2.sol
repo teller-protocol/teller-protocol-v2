@@ -22,7 +22,10 @@ interface ILenderCommitmentGroup_V2 {
 
     function initialize(
         CommitmentGroupConfig calldata _commitmentGroupConfig,
-        IUniswapPricingLibrary.PoolRouteConfig[] calldata _poolOracleRoutes  
+
+        IUniswapPricingLibrary.PoolRouteConfig[] calldata _poolOracleRoutes  ,
+
+        address sharesToken 
     )
         external
         returns (

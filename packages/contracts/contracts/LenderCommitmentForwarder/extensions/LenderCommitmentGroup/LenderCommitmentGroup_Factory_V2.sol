@@ -36,7 +36,7 @@ contract LenderCommitmentGroupFactory_V2 is OwnableUpgradeable {
 
     mapping(address => uint256) public deployedLenderGroupContracts;
 
-    event DeployedLenderGroupContract(address indexed groupContract);
+    event DeployedLenderGroupContract(address indexed groupContract, address sharesContract);
 
  
 
@@ -93,8 +93,11 @@ contract LenderCommitmentGroupFactory_V2 is OwnableUpgradeable {
                 )
             );
 
-        deployedLenderGroupContracts[address(newGroupPoolContract_)] = block.number; //consider changing this ?
-        emit DeployedLenderGroupContract(address(newGroupPoolContract_));
+
+
+        deployedLenderGroupContracts[address(newGroupPoolContract_)] = block.number;  
+     
+        emit DeployedLenderGroupContract(address(newGroupPoolContract_), address(newGroupSharesContract_));
 
 
 
@@ -149,8 +152,7 @@ contract LenderCommitmentGroupFactory_V2 is OwnableUpgradeable {
             uint256 sharesAmount_ = IERC4626( address(_newGroupContract) )
                 .deposit(
                     _initialPrincipalAmount,
-                    sharesRecipient 
-                  //  0 //_minShares
+                    sharesRecipient  
                 );
 
         return sharesAmount_;

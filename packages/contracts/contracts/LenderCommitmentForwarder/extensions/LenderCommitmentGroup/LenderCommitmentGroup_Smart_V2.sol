@@ -79,7 +79,7 @@ V2 Design Goals:
 
         c. no need  to request withdraw (make it intrinsic) 
 
-2.  ability to WRAP the yield token ? ? 
+2.  ability to WRAP the yield token ( still a no ) 
 
 
 
@@ -363,8 +363,7 @@ contract LenderCommitmentGroup_Smart_V2 is
             _commitmentGroupConfig.interestRateUpperBound,
             _commitmentGroupConfig.liquidityThresholdPercent,
             _commitmentGroupConfig.collateralRatio,
-            //_commitmentGroupConfig.uniswapPoolFee,
-            //_commitmentGroupConfig.twapInterval,
+          
             poolSharesToken_
         );
     }
@@ -1136,7 +1135,7 @@ contract LenderCommitmentGroup_Smart_V2 is
 
     // ------------------------   ERC4626  functions ------------ 
 
-/*//////////////////////////////////////////////////////////////
+    /*//////////////////////////////////////////////////////////////
                         DEPOSIT/WITHDRAWAL LOGIC
     //////////////////////////////////////////////////////////////*/
 
@@ -1144,14 +1143,18 @@ contract LenderCommitmentGroup_Smart_V2 is
         // Similar to addPrincipalToCommitmentGroup but following ERC4626 standard
         require(assets > 0 );
         
-        // Calculate shares before transfer
-        shares = _valueOfUnderlying(assets, sharesExchangeRate());
+       
         
         // Transfer assets from sender to vault
         uint256 principalTokenBalanceBefore = principalToken.balanceOf(address(this));
         principalToken.safeTransferFrom(msg.sender, address(this), assets);
         uint256 principalTokenBalanceAfter = principalToken.balanceOf(address(this));
         require(principalTokenBalanceAfter == principalTokenBalanceBefore + assets, "TB");
+
+
+         // Calculate shares after transfer
+        shares = _valueOfUnderlying(assets, sharesExchangeRate());
+
         
         // Update totals
         totalPrincipalTokensCommitted += assets;
@@ -1206,13 +1209,7 @@ contract LenderCommitmentGroup_Smart_V2 is
         // Calculate shares required for desired assets
         shares = previewWithdraw(assets);
         require(shares > 0, "S");
-        
-        // Ensure caller has permission
-       /* if (msg.sender != owner) {
-            uint256 allowed = poolSharesToken.allowance(owner, msg.sender);
-            require(allowed >= shares, "IA");
-            poolSharesToken.decreaseAllowance(owner, shares);
-        } */
+         
         
         // Check withdrawal delay
         uint256 sharesLastTransferredAt = poolSharesToken.getLastTransferredAt(owner);
@@ -1241,13 +1238,7 @@ contract LenderCommitmentGroup_Smart_V2 is
         
         // Calculate assets to receive
         assets = _valueOfUnderlying(shares, sharesExchangeRateInverse());
-        
-        // Ensure caller has permission
-     /*   if (msg.sender != owner) {
-            uint256 allowed = poolSharesToken.allowance(owner, msg.sender);
-            require(allowed >= shares, "IA");
-            poolSharesToken.decreaseAllowance(owner, shares);
-        }*/
+     
         
         // Check withdrawal delay
         uint256 sharesLastTransferredAt = poolSharesToken.getLastTransferredAt(owner);

@@ -106,7 +106,7 @@ V2 Design Goals:
 contract LenderCommitmentGroup_Smart_V2 is
     ILenderCommitmentGroup_V2,
     IERC4626,
- //   ISmartCommitment,
+    //   ISmartCommitment,
     ILoanRepaymentListener,
     IPausableTimestamp,
     Initializable,

@@ -12,6 +12,10 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
     This can help mitigate sandwich attacking and flash loan attacking 
 
+
+
+    Ideally , deploy this as a beacon proxy that is upgradeable 
+
  */
 
 contract LenderCommitmentGroupShares_V2 is ERC20, Ownable {
@@ -42,17 +46,10 @@ contract LenderCommitmentGroupShares_V2 is ERC20, Ownable {
     }
 
     function burn(address _burner, uint256 _amount ) external onlyOwner {
-
-
-        //  do this on the upper level ! 
-       // require(poolSharesPreparedToWithdrawForLender[_burner] >= _amount,"Shares not prepared for withdraw");
-       // require(poolSharesPreparedTimestamp[_burner] <= block.timestamp - withdrawDelayTimeSeconds,"Shares not prepared for withdraw");
-        
  
-        //reset prepared   
+          
    
-        poolSharesLastTransferredAt[_burner] = block.timestamp;
-        
+        poolSharesLastTransferredAt[_burner] = block.timestamp;        
         emit SharesLastTransferredAt(_burner, block.timestamp);
 
         _burn(_burner, _amount);
@@ -83,7 +80,7 @@ contract LenderCommitmentGroupShares_V2 is ERC20, Ownable {
 
 
     function getLastTransferredAt(
-        address holder        
+        address owner        
     )  external view returns (uint256)  {
 
         return poolSharesLastTransferredAt[holder];

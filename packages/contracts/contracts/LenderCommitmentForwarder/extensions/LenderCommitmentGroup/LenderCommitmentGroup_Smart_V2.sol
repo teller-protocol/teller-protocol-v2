@@ -647,9 +647,8 @@ contract LenderCommitmentGroup_Smart is
         );  
 
  
-        uint256 sharesLastTransferredAt =  poolSharesToken.getLastTransferredAt( msg.sender); // withdrawDelayTimeSeconds    ;
-
-        require( block.timestamp  >  sharesLastTransferredAt + withdrawDelayTimeSeconds, "shares not ready for burn" );
+        uint256 sharesLastTransferredAt =  poolSharesToken.getLastTransferredAt( msg.sender); 
+        require( block.timestamp  >  sharesLastTransferredAt + withdrawDelayTimeSeconds, "shares not yet  for burn" );
 
         poolSharesToken.burn( msg.sender, _amountPoolSharesTokens  );
 
@@ -1133,4 +1132,18 @@ contract LenderCommitmentGroup_Smart is
         setLastUnpausedAt();
         _unpause();
     }
+
+
+
+    // ------------------------   ERC4626  functions ------------ 
+
+
+
+
+
+
+
+
+
+
 }

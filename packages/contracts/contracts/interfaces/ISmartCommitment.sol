@@ -35,14 +35,7 @@ interface ISmartCommitment {
         view
         returns (uint256);
 
-    function getRequiredCollateral(
-        uint256 _principalAmount,
-        uint256 _maxPrincipalPerCollateralAmount
-        
-        )
-        external
-        view
-        returns (uint256);
+    
 
     
     function acceptFundsForAcceptBid(

@@ -33,20 +33,7 @@ interface ILenderCommitmentGroup_V2 {
             address poolSharesToken
         );
 
-    function addPrincipalToCommitmentGroup(
-        uint256 _amount,
-        address _sharesRecipient,
-        uint256 _minAmountOut
-    ) external returns (uint256 sharesAmount_);
-
-
- 
-     function  burnSharesToWithdrawEarnings(
-        uint256 _amountPoolSharesTokens,
-        address _recipient,
-        uint256 _minAmountOut
-    ) external returns (uint256);
-
+   
 
      function liquidateDefaultedLoanWithIncentive(
         uint256 _bidId,

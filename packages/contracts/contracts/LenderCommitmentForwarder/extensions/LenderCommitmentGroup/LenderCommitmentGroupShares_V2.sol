@@ -62,6 +62,7 @@ contract LenderCommitmentGroupShares_V2 is ERC20, Ownable {
 
     // ---- 
 
+    // this occurs after mint and transfer 
     function _afterTokenTransfer(
         address from,
         address to,
@@ -83,7 +84,7 @@ contract LenderCommitmentGroupShares_V2 is ERC20, Ownable {
         address owner        
     )  external view returns (uint256)  {
 
-        return poolSharesLastTransferredAt[holder];
+        return poolSharesLastTransferredAt[owner];
       
     }
 

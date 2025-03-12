@@ -42,6 +42,9 @@ import {OracleProtectedChild} from "../../../oracleprotection/OracleProtectedChi
 import { MathUpgradeable } from "@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20MetadataUpgradeable.sol";
 
+
+import { IERC4626  } from "../../../interfaces/IERC4626.sol";
+
 import { CommitmentCollateralType, ISmartCommitment } from "../../../interfaces/ISmartCommitment.sol";
 import { ILoanRepaymentListener } from "../../../interfaces/ILoanRepaymentListener.sol";
 
@@ -99,9 +102,10 @@ V2 Design Goals:
 
 */
 
-contract LenderCommitmentGroup_Smart is
+contract LenderCommitmentGroup_Smart_V2 is
     ILenderCommitmentGroup_V2,
-    ISmartCommitment,
+    IERC4626,
+ //   ISmartCommitment,
     ILoanRepaymentListener,
     IPausableTimestamp,
     Initializable,
@@ -240,7 +244,7 @@ contract LenderCommitmentGroup_Smart is
     modifier onlySmartCommitmentForwarder() {
         require(
             msg.sender == address(SMART_COMMITMENT_FORWARDER),
-            "Can only be called by Smart Commitment Forwarder"
+            "OSCF"
         );
         _;
     }
@@ -248,7 +252,7 @@ contract LenderCommitmentGroup_Smart is
     modifier onlyTellerV2() {
         require(
             msg.sender == address(TELLER_V2),
-            "Can only be called by TellerV2"
+            "OTV2"
         );
         _;
     }
@@ -257,7 +261,7 @@ contract LenderCommitmentGroup_Smart is
     modifier onlyProtocolOwner() {
         require(
             msg.sender == Ownable(address(TELLER_V2)).owner(),
-            "Not Protocol Owner"
+            "OO"
         );
         _;
     }
@@ -268,20 +272,20 @@ contract LenderCommitmentGroup_Smart is
 
         require(
            IProtocolPausingManager( pausingManager ).isPauser(msg.sender)  ,
-            "Not Owner or Protocol Owner"
+            "OP"
         );
         _;
     }
 
     modifier bidIsActiveForGroup(uint256 _bidId) {
-        require(activeBids[_bidId] == true, "Bid is not active for group");
+        require(activeBids[_bidId] == true, "BNA");
 
         _;
     }
  
 
     modifier whenForwarderNotPaused() {
-         require( PausableUpgradeable(address(SMART_COMMITMENT_FORWARDER)).paused() == false , "Smart Commitment Forwarder is paused");
+         require( PausableUpgradeable(address(SMART_COMMITMENT_FORWARDER)).paused() == false , "SCF_P");
         _;
     }
 
@@ -329,20 +333,20 @@ contract LenderCommitmentGroup_Smart is
         interestRateLowerBound = _commitmentGroupConfig.interestRateLowerBound;
         interestRateUpperBound = _commitmentGroupConfig.interestRateUpperBound;
 
-        require(interestRateLowerBound <= interestRateUpperBound, "invalid _interestRateLowerBound");
+        require(interestRateLowerBound <= interestRateUpperBound, "IRLB");
 
        
         liquidityThresholdPercent = _commitmentGroupConfig.liquidityThresholdPercent;
         collateralRatio = _commitmentGroupConfig.collateralRatio;
       
-        require( liquidityThresholdPercent <= 10000, "invalid _liquidityThresholdPercent"); 
+        require( liquidityThresholdPercent <= 10000, "ILTP"); 
 
         for (uint256 i = 0; i < _poolOracleRoutes.length; i++) {
             poolOracleRoutes.push(_poolOracleRoutes[i]);
         }
 
 
-         require(poolOracleRoutes.length >= 1 && poolOracleRoutes.length <= 2, "invalid pool routes length");
+         require(poolOracleRoutes.length >= 1 && poolOracleRoutes.length <= 2, "PRL");
         
         poolSharesToken_ = _deployPoolSharesToken();
 
@@ -397,8 +401,7 @@ contract LenderCommitmentGroup_Smart is
         returns (address poolSharesToken_)
     {      
         require(
-            address(poolSharesToken) == address(0),
-            "Pool shares already deployed"
+            address(poolSharesToken) == address(0) 
         );
  
         poolSharesToken = new LenderCommitmentGroupShares_V2(
@@ -416,7 +419,7 @@ contract LenderCommitmentGroup_Smart is
      * @return rate_ The current exchange rate, scaled by the EXCHANGE_RATE_FACTOR.
      */
 
-    function sharesExchangeRate() public view virtual returns (uint256 rate_) {
+    function sharesExchangeRate() internal view virtual returns (uint256 rate_) {
         
 
         uint256 poolTotalEstimatedValue = getPoolTotalEstimatedValue();
@@ -432,7 +435,7 @@ contract LenderCommitmentGroup_Smart is
     }
 
     function sharesExchangeRateInverse()
-        public
+        internal
         view
         virtual
         returns (uint256 rate_)
@@ -443,7 +446,7 @@ contract LenderCommitmentGroup_Smart is
     }
 
     function getPoolTotalEstimatedValue()
-        public
+        internal 
         view
         returns (uint256 poolTotalEstimatedValue_)
     {
@@ -464,14 +467,8 @@ contract LenderCommitmentGroup_Smart is
             : 0;
     }
 
-    /**
-     * @notice Adds principal to the lending pool in exchange for shares.
-     * @param _amount Amount of principal tokens to deposit.
-     * @param _sharesRecipient Address receiving the shares.
-     * @param _minSharesAmountOut Minimum amount of shares expected.
-     * @return sharesAmount_ Amount of shares minted.
-     */
-    function addPrincipalToCommitmentGroup(
+  
+ /*   function addPrincipalToCommitmentGroup(
         uint256 _amount,
         address _sharesRecipient,
         uint256 _minSharesAmountOut
@@ -510,7 +507,7 @@ contract LenderCommitmentGroup_Smart is
 
             firstDepositMade = true;
         }
-    }
+    }*/
 
     function _valueOfUnderlying(uint256 amount, uint256 rate)
         internal
@@ -549,16 +546,16 @@ contract LenderCommitmentGroup_Smart is
         
         require(
             _collateralTokenAddress == address(collateralToken),
-            "Mismatching collateral token"
+            "MMCT"
         );
         //the interest rate must be at least as high has the commitment demands. The borrower can use a higher interest rate although that would not be beneficial to the borrower.
-        require(_interestRate >= getMinInterestRate(_principalAmount), "Invalid interest rate");
+        require(_interestRate >= getMinInterestRate(_principalAmount), "IIR");
         //the loan duration must be less than the commitment max loan duration. The lender who made the commitment expects the money to be returned before this window.
-        require(_loanDuration <= maxLoanDuration, "Invalid loan max duration");
+        require(_loanDuration <= maxLoanDuration, "LMD");
 
         require(
             getPrincipalAmountAvailableToBorrow() >= _principalAmount,
-            "Invalid loan max principal"
+            "LMP"
         );
  
  
@@ -571,7 +568,7 @@ contract LenderCommitmentGroup_Smart is
         require(    
              _collateralAmount   >=
                 requiredCollateral,
-            "Insufficient Borrower Collateral"
+            "C"
         );
  
         principalToken.safeApprove(address(TELLER_V2), _principalAmount);
@@ -622,16 +619,8 @@ contract LenderCommitmentGroup_Smart is
     */
 
 
-
-   /**
-    * @notice Burns shares to withdraw an equivalent amount of principal tokens.
-    * @dev Requires shares to have been prepared for withdrawal in advance.
-    * @param _amountPoolSharesTokens Amount of pool shares to burn.
-    * @param _recipient Address receiving the withdrawn principal tokens.
-    * @param _minAmountOut Minimum amount of principal tokens expected to be withdrawn.
-    * @return principalTokenValueToWithdraw Amount of principal tokens withdrawn.
-    */
-    function burnSharesToWithdrawEarnings(
+ 
+   /* function burnSharesToWithdrawEarnings(
         uint256 _amountPoolSharesTokens,
         address _recipient,
         uint256 _minAmountOut
@@ -667,7 +656,7 @@ contract LenderCommitmentGroup_Smart is
         require( principalTokenValueToWithdraw >=  _minAmountOut ,"Invalid: Min Amount Out");
 
         return principalTokenValueToWithdraw;
-    }
+    }*/
 
 /**
  * @notice Liquidates a defaulted loan using a reverse auction that starts high and falls to zero.
@@ -706,7 +695,7 @@ contract LenderCommitmentGroup_Smart is
  
         require(
             _tokenAmountDifference >= minAmountDifference,
-            "Insufficient tokenAmountDifference"
+            "TAD"
         );
 
 
@@ -854,13 +843,10 @@ contract LenderCommitmentGroup_Smart is
         uint256 _amountOwed,
         uint256 _loanDefaultedTimestamp
     ) public view virtual returns (int256 amountDifference_) {
+        
         require(
-            _loanDefaultedTimestamp > 0,
-            "Loan defaulted timestamp must be greater than zero"
-        );
-        require(
-            block.timestamp > _loanDefaultedTimestamp,
-            "Loan defaulted timestamp must be in the past"
+           _loanDefaultedTimestamp > 0 &&  block.timestamp > _loanDefaultedTimestamp,
+            "LDT"
         );
 
         uint256 secondsSinceDefaulted = block.timestamp -
@@ -927,9 +913,10 @@ contract LenderCommitmentGroup_Smart is
     }
 
 
+            // put this in a helper lib ??? 
      function getUniswapPriceRatioForPoolRoutes(
        IUniswapPricingLibrary.PoolRouteConfig[] memory poolOracleRoutes
-    ) external view virtual returns (uint256 ) {
+    ) internal  view virtual returns (uint256 ) {
    
         uint256 pairPriceWithTwapFromOracle = UniswapPricingLibrary
             .getUniswapPriceRatioForPoolRoutes(poolOracleRoutes);
@@ -938,7 +925,7 @@ contract LenderCommitmentGroup_Smart is
         return pairPriceWithTwapFromOracle;
     }
 
-      function getPrincipalForCollateralForPoolRoutes(
+     /*function getPrincipalForCollateralForPoolRoutes(
         IUniswapPricingLibrary.PoolRouteConfig[] memory poolOracleRoutes
     ) external view virtual returns (uint256 ) {
    
@@ -955,14 +942,14 @@ contract LenderCommitmentGroup_Smart is
 
 
         return principalPerCollateralAmount;
-    }
+    }*/
 
 
    function getRequiredCollateral(
         uint256 _principalAmount,
         uint256 _maxPrincipalPerCollateralAmount 
         
-    ) public view virtual returns (uint256) {
+    ) internal  view virtual returns (uint256) {
          
          return
             MathUpgradeable.mulDiv(
@@ -1037,7 +1024,7 @@ contract LenderCommitmentGroup_Smart is
  
   
     function getTotalPrincipalTokensOutstandingInActiveLoans()
-        public
+        internal 
         view
         returns (uint256)
     {   
@@ -1113,6 +1100,15 @@ contract LenderCommitmentGroup_Smart is
         returns (uint256)
     {     
 
+      if (
+            uint256( getPoolTotalEstimatedValue() ).percent(liquidityThresholdPercent) 
+               < getTotalPrincipalTokensOutstandingInActiveLoans()
+
+          ){
+            return 0;
+           }
+
+
         return  ( uint256( getPoolTotalEstimatedValue() )).percent(liquidityThresholdPercent) -
         getTotalPrincipalTokensOutstandingInActiveLoans();
      
@@ -1137,7 +1133,232 @@ contract LenderCommitmentGroup_Smart is
 
     // ------------------------   ERC4626  functions ------------ 
 
+/*//////////////////////////////////////////////////////////////
+                        DEPOSIT/WITHDRAWAL LOGIC
+    //////////////////////////////////////////////////////////////*/
 
+    function deposit(uint256 assets, address receiver) public virtual returns (uint256 shares) {
+        // Similar to addPrincipalToCommitmentGroup but following ERC4626 standard
+        require(assets > 0 );
+        
+        // Calculate shares before transfer
+        shares = _valueOfUnderlying(assets, sharesExchangeRate());
+        
+        // Transfer assets from sender to vault
+        uint256 principalTokenBalanceBefore = principalToken.balanceOf(address(this));
+        principalToken.safeTransferFrom(msg.sender, address(this), assets);
+        uint256 principalTokenBalanceAfter = principalToken.balanceOf(address(this));
+        require(principalTokenBalanceAfter == principalTokenBalanceBefore + assets, "TB");
+        
+        // Update totals
+        totalPrincipalTokensCommitted += assets;
+        
+        // Mint shares to receiver
+        poolSharesToken.mint(receiver, shares);
+        
+        // Check first deposit conditions
+        if(!firstDepositMade){
+            require(msg.sender == owner(), "FDM");
+            require(shares >= 1e6, "IS");
+            firstDepositMade = true;
+        }
+        
+        emit LenderAddedPrincipal(msg.sender, assets, shares, receiver);
+        return shares;
+    }
+
+    function mint(uint256 shares, address receiver) public virtual returns (uint256 assets) {
+        // Calculate assets needed for desired shares
+        assets = previewMint(shares);
+        require(assets > 0 );
+        
+        // Transfer assets from sender to vault
+        uint256 principalTokenBalanceBefore = principalToken.balanceOf(address(this));
+        principalToken.safeTransferFrom(msg.sender, address(this), assets);
+        uint256 principalTokenBalanceAfter = principalToken.balanceOf(address(this));
+        require(principalTokenBalanceAfter == principalTokenBalanceBefore + assets, "TB");
+        
+        // Update totals
+        totalPrincipalTokensCommitted += assets;
+        
+        // Mint shares to receiver
+        poolSharesToken.mint(receiver, shares);
+        
+        // Check first deposit conditions
+        if(!firstDepositMade){
+            require(msg.sender == owner(), "IC");
+            require(shares >= 1e6, "IS");
+            firstDepositMade = true;
+        }
+        
+        emit LenderAddedPrincipal(msg.sender, assets, shares, receiver);
+        return assets;
+    }
+
+    function withdraw(
+        uint256 assets,
+        address receiver,
+        address owner
+    ) public virtual returns (uint256 shares) {
+        // Calculate shares required for desired assets
+        shares = previewWithdraw(assets);
+        require(shares > 0, "S");
+        
+        // Ensure caller has permission
+        if (msg.sender != owner) {
+            uint256 allowed = poolSharesToken.allowance(owner, msg.sender);
+            require(allowed >= shares, "IA");
+            poolSharesToken.decreaseAllowance(owner, shares);
+        }
+        
+        // Check withdrawal delay
+        uint256 sharesLastTransferredAt = poolSharesToken.getLastTransferredAt(owner);
+        require(block.timestamp > sharesLastTransferredAt + withdrawDelayTimeSeconds, "SW");
+        
+        // Burn shares from owner
+        poolSharesToken.burn(owner, shares);
+        
+        // Update totals
+        totalPrincipalTokensWithdrawn += assets;
+        
+        // Transfer assets to receiver
+        principalToken.safeTransfer(receiver, assets);
+        
+        emit EarningsWithdrawn(owner, shares, assets, receiver);
+        return shares;
+    }
+
+    function redeem(
+        uint256 shares,
+        address receiver,
+        address owner
+    ) public virtual returns (uint256 assets) {
+        // Similar to burnSharesToWithdrawEarnings but following ERC4626 standard
+        require(shares > 0, "S");
+        
+        // Calculate assets to receive
+        assets = _valueOfUnderlying(shares, sharesExchangeRateInverse());
+        
+        // Ensure caller has permission
+        if (msg.sender != owner) {
+            uint256 allowed = poolSharesToken.allowance(owner, msg.sender);
+            require(allowed >= shares, "IA");
+            poolSharesToken.decreaseAllowance(owner, shares);
+        }
+        
+        // Check withdrawal delay
+        uint256 sharesLastTransferredAt = poolSharesToken.getLastTransferredAt(owner);
+        require(block.timestamp > sharesLastTransferredAt + withdrawDelayTimeSeconds, "SR");
+        
+        // Burn shares from owner
+        poolSharesToken.burn(owner, shares);
+        
+        // Update totals
+        totalPrincipalTokensWithdrawn += assets;
+        
+        // Transfer assets to receiver
+        principalToken.safeTransfer(receiver, assets);
+        
+        emit EarningsWithdrawn(owner, shares, assets, receiver);
+        return assets;
+    }
+
+    /*//////////////////////////////////////////////////////////////
+                            ACCOUNTING LOGIC
+    //////////////////////////////////////////////////////////////*/
+
+    function totalAssets() public view virtual returns (uint256) {
+        return getPoolTotalEstimatedValue();
+    }
+
+    function convertToShares(uint256 assets) public view virtual returns (uint256) {
+        return _valueOfUnderlying(assets, sharesExchangeRate());
+    }
+
+    function convertToAssets(uint256 shares) public view virtual returns (uint256) {
+        return _valueOfUnderlying(shares, sharesExchangeRateInverse());
+    }
+
+    function previewDeposit(uint256 assets) public view virtual returns (uint256) {
+        return convertToShares(assets);
+    }
+
+    function previewMint(uint256 shares) public view virtual returns (uint256) {
+        if (poolSharesToken.totalSupply() == 0 || totalAssets() == 0) {
+            return shares; // Initial 1:1 ratio for first deposit
+        }
+        
+        return MathUpgradeable.mulDiv(
+            shares,
+            sharesExchangeRate(),
+            EXCHANGE_RATE_EXPANSION_FACTOR,
+            MathUpgradeable.Rounding.Up
+        );
+    }
+
+    function previewWithdraw(uint256 assets) public view virtual returns (uint256) {
+        if (totalAssets() == 0) {
+            return 0;
+        }
+        
+        return MathUpgradeable.mulDiv(
+            assets,
+            sharesExchangeRate(),
+            EXCHANGE_RATE_EXPANSION_FACTOR,
+            MathUpgradeable.Rounding.Up
+        );
+    }
+
+    function previewRedeem(uint256 shares) public view virtual returns (uint256) {
+        return convertToAssets(shares);
+    }
+
+    /*//////////////////////////////////////////////////////////////
+                     DEPOSIT/WITHDRAWAL LIMIT LOGIC
+    //////////////////////////////////////////////////////////////*/
+
+    function maxDeposit(address) public view virtual returns (uint256) {
+        if (paused()) {
+            return 0;
+        }
+        return type(uint256).max;
+    }
+
+    function maxMint(address) public view virtual returns (uint256) {
+        if (paused()) {
+            return 0;
+        }
+        return type(uint256).max;
+    }
+
+    function maxWithdraw(address owner) public view virtual returns (uint256) {
+        if (paused()) {
+            return 0;
+        }
+        
+        uint256 ownerAssets = convertToAssets(poolSharesToken.balanceOf(owner));
+        uint256 availableLiquidity = principalToken.balanceOf(address(this));
+        
+        return Math.min(ownerAssets, availableLiquidity);
+    }
+
+    function maxRedeem(address owner) public view virtual returns (uint256) {
+        if (paused()) {
+            return 0;
+        }
+        
+        uint256 availableShares = poolSharesToken.balanceOf(owner);
+        uint256 sharesLastTransferredAt = poolSharesToken.getLastTransferredAt(owner);
+        
+        if (block.timestamp <= sharesLastTransferredAt + withdrawDelayTimeSeconds) {
+            return 0;
+        }
+        
+        uint256 availableLiquidity = principalToken.balanceOf(address(this));
+        uint256 maxSharesBasedOnLiquidity = convertToShares(availableLiquidity);
+        
+        return Math.min(availableShares, maxSharesBasedOnLiquidity);
+    }
 
 
 

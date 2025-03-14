@@ -115,6 +115,8 @@ contract LenderCommitmentGroup_Smart_V2_Override is LenderCommitmentGroup_Smart_
         firstDepositMade = made;
     }
 
+    
+
     function sharesExchangeRate() internal view override returns (uint256 rate_) {
         if (mockSharesExchangeRate > 0) {
             return mockSharesExchangeRate;

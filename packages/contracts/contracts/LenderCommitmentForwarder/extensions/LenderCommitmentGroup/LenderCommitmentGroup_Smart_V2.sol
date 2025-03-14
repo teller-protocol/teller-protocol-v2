@@ -1176,6 +1176,8 @@ contract LenderCommitmentGroup_Smart_V2 is
         // Calculate assets needed for desired shares
         assets = previewMint(shares);
         require(assets > 0 );
+
+        
         
         // Transfer assets from sender to vault
         uint256 principalTokenBalanceBefore = principalToken.balanceOf(address(this));
@@ -1213,6 +1215,8 @@ contract LenderCommitmentGroup_Smart_V2 is
         // Check withdrawal delay
         uint256 sharesLastTransferredAt = poolSharesToken.getLastTransferredAt(owner);
         require(block.timestamp > sharesLastTransferredAt + withdrawDelayTimeSeconds, "SW");
+
+        require(msg.sender == owner, "not authorized");
         
         // Burn shares from owner
         poolSharesToken.burn(owner, shares);
@@ -1238,7 +1242,8 @@ contract LenderCommitmentGroup_Smart_V2 is
         // Calculate assets to receive
         assets = _valueOfUnderlying(shares, sharesExchangeRateInverse());
      
-        
+        require(msg.sender == owner, "not authorized");
+
         // Check withdrawal delay
         uint256 sharesLastTransferredAt = poolSharesToken.getLastTransferredAt(owner);
         require(block.timestamp > sharesLastTransferredAt + withdrawDelayTimeSeconds, "SR");
@@ -1277,7 +1282,17 @@ contract LenderCommitmentGroup_Smart_V2 is
     }
 
     function previewMint(uint256 shares) public view virtual returns (uint256) {
-        if (poolSharesToken.totalSupply() == 0 || totalAssets() == 0) {
+         if (poolSharesToken.totalSupply() == 0 || totalAssets() == 0) {
+          return shares; // Initial 1:1 ratio for first deposit
+       }
+
+      return convertToAssets(shares); // Use the existing conversion function
+     
+     /*
+
+        was 
+
+         if (poolSharesToken.totalSupply() == 0 || totalAssets() == 0) {
             return shares; // Initial 1:1 ratio for first deposit
         }
         
@@ -1287,19 +1302,17 @@ contract LenderCommitmentGroup_Smart_V2 is
             EXCHANGE_RATE_EXPANSION_FACTOR,
             MathUpgradeable.Rounding.Up
         );
+    
+     */
     }
 
     function previewWithdraw(uint256 assets) public view virtual returns (uint256) {
-        if (totalAssets() == 0) {
-            return 0;
-        }
-        
-        return MathUpgradeable.mulDiv(
-            assets,
-            sharesExchangeRate(),
-            EXCHANGE_RATE_EXPANSION_FACTOR,
-            MathUpgradeable.Rounding.Up
-        );
+         if (totalAssets() == 0) {
+          return 0;
+          }
+
+          return convertToShares(assets); // Use the existing conversion function
+
     }
 
     function previewRedeem(uint256 shares) public view virtual returns (uint256) {

@@ -99,9 +99,9 @@ contract LenderCommitmentGroup_Smart_V2_Override is LenderCommitmentGroup_Smart_
         tokenDifferenceFromLiquidations = _mockAmt;
     }
 
-    function mock_mintShares(address _sharesRecipient, uint256 _mockAmt) public {
-        poolSharesToken.mint(_sharesRecipient, _mockAmt);
-    }
+    //function mock_mintShares(address _sharesRecipient, uint256 _mockAmt) public {
+    //    poolSharesToken.mint(_sharesRecipient, _mockAmt);
+    //}
 
     function set_mock_getMaxPrincipalPerCollateralAmount(uint256 amt) public {
         mockMaxPrincipalPerCollateralAmount = amt;

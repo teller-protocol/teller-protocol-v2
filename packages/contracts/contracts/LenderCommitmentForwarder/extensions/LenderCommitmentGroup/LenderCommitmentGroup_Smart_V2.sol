@@ -307,14 +307,14 @@ contract LenderCommitmentGroup_Smart_V2 is
      * @notice Initializes the LenderCommitmentGroup_Smart contract.
      * @param _commitmentGroupConfig Configuration for the commitment group (lending pool).
      * @param _poolOracleRoutes Route configuration for the principal/collateral oracle.
-     * @return poolSharesToken_ Address of the deployed pool shares token.
+     * @param  _poolSharesToken The ERC20 token used to account for shares 
      */
    function initialize(
        CommitmentGroupConfig calldata _commitmentGroupConfig,
      
        IUniswapPricingLibrary.PoolRouteConfig[] calldata _poolOracleRoutes ,
          address _poolSharesToken
-    ) external initializer returns (address poolSharesToken_) {
+    ) external initializer   {
        
         __Ownable_init();
         __Pausable_init();
@@ -351,8 +351,7 @@ contract LenderCommitmentGroup_Smart_V2 is
 
          require(poolOracleRoutes.length >= 1 && poolOracleRoutes.length <= 2, "PRL");
         
-        poolSharesToken_ =   _poolSharesToken ;
-
+        poolSharesToken = ILenderCommitmentGroupShares_V2 ( _poolSharesToken );
 
         emit PoolInitialized(
             _commitmentGroupConfig.principalTokenAddress,
@@ -364,7 +363,7 @@ contract LenderCommitmentGroup_Smart_V2 is
             _commitmentGroupConfig.liquidityThresholdPercent,
             _commitmentGroupConfig.collateralRatio,
           
-            poolSharesToken_
+            _poolSharesToken
         );
     }
 

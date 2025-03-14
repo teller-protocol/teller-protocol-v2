@@ -28,9 +28,7 @@ interface ILenderCommitmentGroup_V2 {
         address sharesToken 
     )
         external
-        returns ( 
-            address poolSharesToken
-        );
+         ;
 
    
 

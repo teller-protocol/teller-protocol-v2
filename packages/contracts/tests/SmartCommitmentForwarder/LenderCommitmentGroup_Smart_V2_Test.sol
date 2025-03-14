@@ -37,6 +37,7 @@ contract LenderCommitmentGroup_Smart_V2_Test is Testable {
     TestERC20Token collateralToken;
 
      LenderCommitmentGroup_Smart_V2_Override lenderCommitmentGroupSmartV2;
+      LenderCommitmentGroupShares_V2 newSharesToken;
 
     MarketRegistry _marketRegistry;
     TellerV2SolMock _tellerV2;
@@ -131,13 +132,13 @@ contract LenderCommitmentGroup_Smart_V2_Test is Testable {
 
 
 
-         LenderCommitmentGroupShares_V2 newSharesToken = new LenderCommitmentGroupShares_V2();
+           newSharesToken = new LenderCommitmentGroupShares_V2();
         newSharesToken.initialize();
         newSharesToken.transferOwnership(address(lenderCommitmentGroupSmartV2));
 
 
-        
-        address _poolSharesToken = lenderCommitmentGroupSmartV2.initialize(
+
+         lenderCommitmentGroupSmartV2.initialize(
             groupConfig,
             routesConfig,
             address(newSharesToken)
@@ -193,7 +194,7 @@ contract LenderCommitmentGroup_Smart_V2_Test is Testable {
         newSharesToken.initialize();
         newSharesToken.transferOwnership(address(lenderCommitmentGroupSmartV2));
 
-        address _poolSharesToken = lenderCommitmentGroupSmartV2.initialize(
+        lenderCommitmentGroupSmartV2.initialize(
             groupConfig,
             routesConfig,
             address(newSharesToken)
@@ -245,10 +246,17 @@ contract LenderCommitmentGroup_Smart_V2_Test is Testable {
         
         lenderCommitmentGroupSmartV2.set_totalPrincipalTokensCommitted(1000000);
         
+         vm.warp( 1e6 );
+
         // Mint shares to lender
         uint256 sharesAmount = 1000000;
-        lenderCommitmentGroupSmartV2.mock_mintShares(address(lender), sharesAmount);
-        
+        vm.prank(address(lenderCommitmentGroupSmartV2));
+        newSharesToken.mint(address(lender), sharesAmount);
+            
+
+        vm.warp( 1e7 );
+
+
         vm.prank(address(lender));
         uint256 assetsReceived = lenderCommitmentGroupSmartV2.redeem(
             sharesAmount,
@@ -271,10 +279,15 @@ contract LenderCommitmentGroup_Smart_V2_Test is Testable {
         lenderCommitmentGroupSmartV2.set_mockSharesExchangeRate(1e36);
         
         lenderCommitmentGroupSmartV2.set_totalPrincipalTokensCommitted(1000000);
-        
+            
+        vm.warp(1e6);
+
         // Mint shares to lender
         uint256 sharesAmount = 1000000;
-        lenderCommitmentGroupSmartV2.mock_mintShares(address(lender), sharesAmount);
+         vm.prank(address(lenderCommitmentGroupSmartV2));
+        newSharesToken.mint(address(lender), sharesAmount);
+
+        vm.warp(1e7);
         
         vm.prank(address(lender));
         uint256 sharesRedeemedAmount = lenderCommitmentGroupSmartV2.withdraw(
@@ -616,10 +629,10 @@ contract LenderCommitmentGroup_Smart_V2_Test is Testable {
         lenderCommitmentGroupSmartV2.set_totalInterestCollected(1000000);
 
         uint256 sharesAmount = 500000;
-        lenderCommitmentGroupSmartV2.mock_mintShares(
-            address(lender),
-            sharesAmount
-        );
+        
+         vm.prank(address(lenderCommitmentGroupSmartV2));
+        newSharesToken.mint(address(lender), sharesAmount);
+
 
         uint256 poolTotalEstimatedValue = lenderCommitmentGroupSmartV2.public_getPoolTotalEstimatedValue();
         assertEq(poolTotalEstimatedValue, 2 * 1000000, "unexpected poolTotalEstimatedValue");
@@ -636,10 +649,10 @@ contract LenderCommitmentGroup_Smart_V2_Test is Testable {
         lenderCommitmentGroupSmartV2.set_tokenDifferenceFromLiquidations(-1000000);
 
         uint256 sharesAmount = 1000000;
-        lenderCommitmentGroupSmartV2.mock_mintShares(
-            address(lender),
-            sharesAmount
-        );
+    
+         vm.prank(address(lenderCommitmentGroupSmartV2));
+        newSharesToken.mint(address(lender), sharesAmount);
+
 
         uint256 poolTotalEstimatedValue = lenderCommitmentGroupSmartV2.public_getPoolTotalEstimatedValue();
         assertEq(poolTotalEstimatedValue, 1 * 1000000, "unexpected poolTotalEstimatedValue");
@@ -655,10 +668,10 @@ contract LenderCommitmentGroup_Smart_V2_Test is Testable {
         lenderCommitmentGroupSmartV2.set_tokenDifferenceFromLiquidations(-500000);
 
         uint256 sharesAmount = 1000000;
-        lenderCommitmentGroupSmartV2.mock_mintShares(
-            address(lender),
-            sharesAmount
-        );
+ 
+         vm.prank(address(lenderCommitmentGroupSmartV2));
+        newSharesToken.mint(address(lender), sharesAmount);
+
 
         uint256 poolTotalEstimatedValue = lenderCommitmentGroupSmartV2.public_getPoolTotalEstimatedValue();
         assertEq(poolTotalEstimatedValue, 1 * 500000, "unexpected poolTotalEstimatedValue");
@@ -680,8 +693,10 @@ contract LenderCommitmentGroup_Smart_V2_Test is Testable {
         
         // Mint shares to lender
         uint256 sharesAmount = 1000000;
-        lenderCommitmentGroupSmartV2.mock_mintShares(address(lender), sharesAmount);
-        
+ 
+         vm.prank(address(lenderCommitmentGroupSmartV2));
+        newSharesToken.mint(address(lender), sharesAmount);
+
         // Test maxWithdraw and maxRedeem
         principalToken.transfer(address(lenderCommitmentGroupSmartV2), 800000);
         lenderCommitmentGroupSmartV2.set_mockSharesExchangeRate(1e36);

@@ -60,6 +60,7 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
     SmartCommitmentForwarder _smartCommitmentForwarder;
     UniswapV3PoolMock _uniswapV3Pool;
     UniswapV3FactoryMock _uniswapV3Factory;
+    ProtocolPausingManager protocolPausingManager;
 
     function setUp() public {
         borrower = new User();
@@ -77,7 +78,7 @@ contract LenderCommitmentGroup_Smart_Test is Testable {
         _uniswapV3Factory.setPoolMock(address(_uniswapV3Pool));
 
 
-        ProtocolPausingManager protocolPausingManager = new ProtocolPausingManager();
+          protocolPausingManager = new ProtocolPausingManager();
         protocolPausingManager.initialize();
 
         _tellerV2.setProtocolPausingManager(address(protocolPausingManager));

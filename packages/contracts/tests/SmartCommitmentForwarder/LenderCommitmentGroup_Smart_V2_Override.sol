@@ -117,7 +117,7 @@ contract LenderCommitmentGroup_Smart_V2_Override is LenderCommitmentGroup_Smart_
 
     
 
-    function sharesExchangeRate() internal view override returns (uint256 rate_) {
+    function sharesExchangeRate() public view override returns (uint256 rate_) {
         if (mockSharesExchangeRate > 0) {
             return mockSharesExchangeRate;
         }

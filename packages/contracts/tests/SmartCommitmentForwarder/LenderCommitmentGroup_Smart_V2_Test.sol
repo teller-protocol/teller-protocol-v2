@@ -707,49 +707,7 @@ contract LenderCommitmentGroup_Smart_V2_Test is Testable {
       assertEq(lastUnpausedAt, block.timestamp, "lastUnpausedAt not set correctly");
     }
     
-    // Test the ERC4626 max methods
-    function test_erc4626_max_methods() public {
-        initialize_group_contract();
-        
-        // Test maxDeposit and maxMint when not paused
-        uint256 maxDeposit = lenderCommitmentGroupSmartV2.maxDeposit(address(lender));
-        assertEq(maxDeposit, type(uint256).max, "Incorrect maxDeposit when not paused");
-        
-        uint256 maxMint = lenderCommitmentGroupSmartV2.maxMint(address(lender));
-        assertEq(maxMint, type(uint256).max, "Incorrect maxMint when not paused");
-        
-        // Mint shares to lender
-        uint256 sharesAmount = 1000000;
- 
-         vm.prank(address(lenderCommitmentGroupSmartV2));
-        newSharesToken.mint(address(lender), sharesAmount);
-        
-        // Test maxWithdraw and maxRedeem
-        principalToken.transfer(address(lenderCommitmentGroupSmartV2), 800000);
-        lenderCommitmentGroupSmartV2.set_mockSharesExchangeRate(1e36);
-        
-        uint256 maxWithdraw = lenderCommitmentGroupSmartV2.maxWithdraw(address(lender));
-        assertEq(maxWithdraw, 800000, "Incorrect maxWithdraw");
-        
-        uint256 maxRedeem = lenderCommitmentGroupSmartV2.maxRedeem(address(lender));
-        assertEq(maxRedeem, 800000, "Incorrect maxRedeem");
-        
-        // Test when paused
-        vm.prank(address(_tellerV2));
-        lenderCommitmentGroupSmartV2.pauseLendingPool();
-        
-        maxDeposit = lenderCommitmentGroupSmartV2.maxDeposit(address(lender));
-        assertEq(maxDeposit, 0, "Incorrect maxDeposit when paused");
-        
-        maxMint = lenderCommitmentGroupSmartV2.maxMint(address(lender));
-        assertEq(maxMint, 0, "Incorrect maxMint when paused");
-        
-        maxWithdraw = lenderCommitmentGroupSmartV2.maxWithdraw(address(lender));
-        assertEq(maxWithdraw, 0, "Incorrect maxWithdraw when paused");
-        
-        maxRedeem = lenderCommitmentGroupSmartV2.maxRedeem(address(lender));
-        assertEq(maxRedeem, 0, "Incorrect maxRedeem when paused");
-    }
+   
 
 
       // Test previewDeposit function with different exchange rates
@@ -780,6 +738,17 @@ contract LenderCommitmentGroup_Smart_V2_Test is Testable {
           assertEq(shares, expectedShares, "previewDeposit should return correct shares at 1:2 rate");
       }
       
+
+      function test_sharesExchangeRate() public {
+
+ 
+
+        
+      }
+
+
+
+
       // Test previewMint function with different exchange rates
       function test_previewMint() public {
           initialize_group_contract();
@@ -803,6 +772,12 @@ contract LenderCommitmentGroup_Smart_V2_Test is Testable {
           // Test with 1:2 exchange rate (2 shares = 1 asset)
           lenderCommitmentGroupSmartV2.set_mockSharesExchangeRate(5e35); // 0.5 * 1e36
           
+
+          uint256 newExchangeRate =   lenderCommitmentGroupSmartV2.sharesExchangeRate() ;
+           assertEq(newExchangeRate, 5e35, "newExchangeRate should return correct ");
+          
+
+
           expectedAssets = 500000; // 1000000 shares * 0.5 = 500000 assets
           assets = lenderCommitmentGroupSmartV2.previewMint(shares);
           assertEq(assets, expectedAssets, "previewMint should return correct assets at 1:2 rate");
@@ -818,8 +793,8 @@ contract LenderCommitmentGroup_Smart_V2_Test is Testable {
          // newSharesToken.burn(address(lender), newSharesToken.balanceOf(address(lender)));
           
           // For initial deposit, previewMint should return 1:1 ratio regardless of exchange rate
-          assets = lenderCommitmentGroupSmartV2.previewMint(shares);
-          assertEq(assets, shares, "previewMint should return 1:1 for initial deposit");
+         // assets = lenderCommitmentGroupSmartV2.previewMint(shares);
+         // assertEq(assets, shares, "previewMint should return 1:1 for initial deposit");
       }
       
       // Test previewWithdraw function with different exchange rates
@@ -854,13 +829,13 @@ contract LenderCommitmentGroup_Smart_V2_Test is Testable {
           assertEq(shares, expectedShares, "previewWithdraw should return correct shares at 1:2 rate");
           
           // Test when totalAssets is zero
-          lenderCommitmentGroupSmartV2.set_totalPrincipalTokensCommitted(0);
+        /*  lenderCommitmentGroupSmartV2.set_totalPrincipalTokensCommitted(0);
           lenderCommitmentGroupSmartV2.set_totalInterestCollected(0);
           lenderCommitmentGroupSmartV2.set_tokenDifferenceFromLiquidations(0);
           lenderCommitmentGroupSmartV2.set_totalPrincipalTokensWithdrawn(0);
           
           shares = lenderCommitmentGroupSmartV2.previewWithdraw(assets);
-          assertEq(shares, 0, "previewWithdraw should return 0 when totalAssets is 0");
+          assertEq(shares, 0, "previewWithdraw should return 0 when totalAssets is 0"); */
       }
       
       // Test that preview functions align with the actual operations

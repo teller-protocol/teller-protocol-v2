@@ -420,7 +420,7 @@ contract LenderCommitmentGroup_Smart_V2 is
      * @return rate_ The current exchange rate, scaled by the EXCHANGE_RATE_FACTOR.
      */
 
-    function sharesExchangeRate() internal view virtual returns (uint256 rate_) {
+    function sharesExchangeRate() public view virtual returns (uint256 rate_) {
         
 
         uint256 poolTotalEstimatedValue = getPoolTotalEstimatedValue();
@@ -436,7 +436,7 @@ contract LenderCommitmentGroup_Smart_V2 is
     }
 
     function sharesExchangeRateInverse()
-        internal
+        public
         view
         virtual
         returns (uint256 rate_)
@@ -1177,7 +1177,7 @@ contract LenderCommitmentGroup_Smart_V2 is
         assets = previewMint(shares);
         require(assets > 0 );
 
-        
+
         
         // Transfer assets from sender to vault
         uint256 principalTokenBalanceBefore = principalToken.balanceOf(address(this));
@@ -1269,6 +1269,7 @@ contract LenderCommitmentGroup_Smart_V2 is
         return getPoolTotalEstimatedValue();
     }
 
+    //   sharesAmount_ = _valueOfUnderlying(_principalamount, sharesExchangeRate());  
     function convertToShares(uint256 assets) public view virtual returns (uint256) {
         return _valueOfUnderlying(assets, sharesExchangeRate());
     }
@@ -1282,9 +1283,9 @@ contract LenderCommitmentGroup_Smart_V2 is
     }
 
     function previewMint(uint256 shares) public view virtual returns (uint256) {
-         if (poolSharesToken.totalSupply() == 0 || totalAssets() == 0) {
+       /* if (poolSharesToken.totalSupply() == 0 || totalAssets() == 0) {
           return shares; // Initial 1:1 ratio for first deposit
-       }
+       }*/
 
       return convertToAssets(shares); // Use the existing conversion function
      
@@ -1307,9 +1308,9 @@ contract LenderCommitmentGroup_Smart_V2 is
     }
 
     function previewWithdraw(uint256 assets) public view virtual returns (uint256) {
-         if (totalAssets() == 0) {
+        /* if (totalAssets() == 0) {
           return 0;
-          }
+          }*/
 
           return convertToShares(assets); // Use the existing conversion function
 

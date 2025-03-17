@@ -4,17 +4,15 @@ pragma solidity >=0.8.0 <0.9.0;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol"; 
-
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
   
 
  /*
 
-    This token keeps track of the last time it was transferred and provides that information
+    This ERC20 token keeps track of the last time it was transferred and provides that information
 
-    This can help mitigate sandwich attacking and flash loan attacking 
- 
-
+    This can help mitigate sandwich attacking and flash loan attacking if additional external logic is used for that purpose 
+   
     Ideally , deploy this as a beacon proxy that is upgradeable 
 
  */
@@ -33,38 +31,29 @@ abstract contract LenderCommitmentGroupSharesIntegrated is
         uint256 transferredAt 
     );
 
-
-
-    constructor()   {  }
+ 
+    constructor()   {}
 
 
     function __Shares_init( ) internal onlyInitializing {
         __ERC20_init("LenderPoolShares", "LPS");
     }
-
-   
+  
 
     function mintShares(address _recipient, uint256 _amount) internal {  // only wrapper contract can call 
-        _mint(_recipient, _amount);
+        _mint(_recipient, _amount);   //triggers _afterTokenTransfer
     }
 
     function burnShares(address _burner, uint256 _amount ) internal { // only wrapper contract can call 
-  
-   
-        poolSharesLastTransferredAt[_burner] = block.timestamp;        
-        emit SharesLastTransferredAt(_burner, block.timestamp);
-
-        _burn(_burner, _amount);
-
+        _burn(_burner, _amount);  //triggers _afterTokenTransfer
     }
 
     function decimals() public view virtual override returns (uint8) {
         return DECIMALS;
     }
+ 
 
-
-
-    // this occurs after mint and transfer 
+    // this occurs after mint, burn and transfer 
     function _afterTokenTransfer(
         address from,
         address to,
@@ -76,8 +65,7 @@ abstract contract LenderCommitmentGroupSharesIntegrated is
             poolSharesLastTransferredAt[from] =  block.timestamp;
             emit SharesLastTransferredAt(from, block.timestamp);
 
-        }
-
+        } 
       
     }
 

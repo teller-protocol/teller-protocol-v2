@@ -33,15 +33,14 @@ import "../../../interfaces/ISmartCommitmentForwarder.sol";
 import "../../../libraries/uniswap/TickMath.sol";
 import "../../../libraries/uniswap/FixedPoint96.sol";
 import "../../../libraries/uniswap/FullMath.sol";
-
-//import {LenderCommitmentGroupShares_V2} from "./LenderCommitmentGroupShares_V2.sol";
+ 
 
 import { LenderCommitmentGroupSharesIntegrated } from "./LenderCommitmentGroupSharesIntegrated.sol";
 
 import {OracleProtectedChild} from "../../../oracleprotection/OracleProtectedChild.sol";
 
 import { MathUpgradeable } from "@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20MetadataUpgradeable.sol";
+
 
 
 import { IERC4626  } from "../../../interfaces/IERC4626.sol";
@@ -86,8 +85,8 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 contract LenderCommitmentGroup_Smart_V2 is
     ILenderCommitmentGroup_V2,
-    IERC4626,
-    //   ISmartCommitment,
+    IERC4626, // interface functions for lenders 
+    ISmartCommitment, // interface functions for borrowers (teller protocol) 
     ILoanRepaymentListener,
     IPausableTimestamp,
     Initializable,
@@ -287,7 +286,7 @@ contract LenderCommitmentGroup_Smart_V2 is
        
         __Ownable_init();
         __Pausable_init();
-        __Shares_init( ); //initialized the integrated shares 
+        __Shares_init(); //initialize the integrated shares 
 
         principalToken = IERC20(_commitmentGroupConfig.principalTokenAddress);
         collateralToken = IERC20(_commitmentGroupConfig.collateralTokenAddress);
@@ -319,7 +318,7 @@ contract LenderCommitmentGroup_Smart_V2 is
         }
 
 
-         require(poolOracleRoutes.length >= 1 && poolOracleRoutes.length <= 2, "PRL");
+        require(poolOracleRoutes.length >= 1 && poolOracleRoutes.length <= 2, "PRL");
         
        
         emit PoolInitialized(
@@ -330,133 +329,11 @@ contract LenderCommitmentGroup_Smart_V2 is
             _commitmentGroupConfig.interestRateLowerBound,
             _commitmentGroupConfig.interestRateUpperBound,
             _commitmentGroupConfig.liquidityThresholdPercent,
-            _commitmentGroupConfig.collateralRatio 
-          
-           
+            _commitmentGroupConfig.collateralRatio
         );
     }
 
 
-    /**
-     * @notice Sets the delay time for withdrawing funds. Only Protocol Owner.
-     * @param _seconds Delay time in seconds.
-     */
-    function setWithdrawDelayTime(uint256 _seconds) 
-    external 
-    onlyProtocolOwner {
-        require( _seconds < MAX_WITHDRAW_DELAY_TIME );
-
-        withdrawDelayTimeSeconds = _seconds;
-    }
-
-
-    /**
-     * @notice Sets an optional manual ratio for principal/collateral ratio for borrowers. Only Pool Owner.
-     * @param _maxPrincipalPerCollateralAmount Price ratio, expanded to support sub-one ratios.
-     */
-    function setMaxPrincipalPerCollateralAmount(uint256 _maxPrincipalPerCollateralAmount) 
-    external 
-    onlyOwner {
-       maxPrincipalPerCollateralAmount = _maxPrincipalPerCollateralAmount;
-    }
-
-  
-
-
-    /**
-     * @notice This determines the number of shares you get for depositing principal tokens and the number of principal tokens you receive for burning shares
-     * @return rate_ The current exchange rate, scaled by the EXCHANGE_RATE_FACTOR.
-     */
-
-    function sharesExchangeRate() public view virtual returns (uint256 rate_) {
-        
-
-        uint256 poolTotalEstimatedValue = getPoolTotalEstimatedValue();
-
-        if (totalSupply() == 0) {
-            return EXCHANGE_RATE_EXPANSION_FACTOR; // 1 to 1 for first swap
-        }
-
-        rate_ =
-            MathUpgradeable.mulDiv(poolTotalEstimatedValue , 
-                EXCHANGE_RATE_EXPANSION_FACTOR ,
-                  totalSupply() );
-    }
-
-    function sharesExchangeRateInverse()
-        public
-        view
-        virtual
-        returns (uint256 rate_)
-    {
-        return
-            (EXCHANGE_RATE_EXPANSION_FACTOR * EXCHANGE_RATE_EXPANSION_FACTOR) /
-            sharesExchangeRate();
-    }
-
-    function getPoolTotalEstimatedValue()
-        internal 
-        view
-        returns (uint256 poolTotalEstimatedValue_)
-    {
-       
-         int256 poolTotalEstimatedValueSigned = int256(totalPrincipalTokensCommitted) 
-                  
-         + int256(totalInterestCollected)  + int256(tokenDifferenceFromLiquidations) 
-         + int256( excessivePrincipalTokensRepaid )
-         - int256( totalPrincipalTokensWithdrawn )
-         
-         ;
-
-
-
-        //if the poolTotalEstimatedValue_ is less than 0, we treat it as 0.  
-        poolTotalEstimatedValue_ = poolTotalEstimatedValueSigned > int256(0)
-            ? uint256(poolTotalEstimatedValueSigned)
-            : 0;
-    }
-
-   
-    function _valueOfUnderlying(uint256 amount, uint256 rate)
-        internal
-        pure
-        returns (uint256 value_)
-    {
-        if (rate == 0) {
-            return 0;
-        }
-
-         // value_ = MathUpgradeable.mulDiv(amount ,  EXCHANGE_RATE_EXPANSION_FACTOR   ,  rate );
-
-         value_ = MathUpgradeable.mulDiv(
-                amount, 
-                EXCHANGE_RATE_EXPANSION_FACTOR, 
-                rate,
-                MathUpgradeable.Rounding.Down  // Explicitly round down
-            );
-
-
-    }
-
-
-    function _valueOfUnderlyingRoundUpwards(uint256 amount, uint256 rate)
-        internal
-        pure
-        returns (uint256 value_)
-    {
-        if (rate == 0) {
-            return 0;
-        }
-
-     
-         value_ = MathUpgradeable.mulDiv(
-                amount, 
-                EXCHANGE_RATE_EXPANSION_FACTOR, 
-                rate,
-                MathUpgradeable.Rounding.Up  // Explicitly round down
-            ); 
-
-    }
 
     /**
      * @notice Validates loan parameters and starts the TellerV2 Loan where this contract as the lender.
@@ -535,6 +412,7 @@ contract LenderCommitmentGroup_Smart_V2 is
     * @param _bidId Identifier for the loan bid being accepted.
     */
     function _acceptBidWithRepaymentListener(uint256 _bidId) internal {
+
         ITellerV2(TELLER_V2).lenderAcceptBid(_bidId); //this gives out the funds to the borrower
 
         ILoanRepaymentCallbacks(TELLER_V2).setRepaymentListenerForBid(
@@ -907,6 +785,121 @@ contract LenderCommitmentGroup_Smart_V2 is
 
     }
  
+
+
+
+
+    /**
+     * @notice Sets an optional manual ratio for principal/collateral ratio for borrowers. Only Pool Owner.
+     * @param _maxPrincipalPerCollateralAmount Price ratio, expanded to support sub-one ratios.
+     */
+    function setMaxPrincipalPerCollateralAmount(uint256 _maxPrincipalPerCollateralAmount) 
+    external 
+    onlyOwner {
+       maxPrincipalPerCollateralAmount = _maxPrincipalPerCollateralAmount;
+    }
+
+  
+
+
+    /**
+     * @notice This determines the number of shares you get for depositing principal tokens and the number of principal tokens you receive for burning shares
+     * @return rate_ The current exchange rate, scaled by the EXCHANGE_RATE_FACTOR.
+     */
+
+    function sharesExchangeRate() public view virtual returns (uint256 rate_) {
+        
+
+        uint256 poolTotalEstimatedValue = getPoolTotalEstimatedValue();
+
+        if (totalSupply() == 0) {
+            return EXCHANGE_RATE_EXPANSION_FACTOR; // 1 to 1 for first swap
+        }
+
+        rate_ =
+            MathUpgradeable.mulDiv(poolTotalEstimatedValue , 
+                EXCHANGE_RATE_EXPANSION_FACTOR ,
+                  totalSupply() );
+    }
+
+    function sharesExchangeRateInverse()
+        public
+        view
+        virtual
+        returns (uint256 rate_)
+    {
+        return
+            (EXCHANGE_RATE_EXPANSION_FACTOR * EXCHANGE_RATE_EXPANSION_FACTOR) /
+            sharesExchangeRate();
+    }
+
+    function getPoolTotalEstimatedValue()
+        internal 
+        view
+        returns (uint256 poolTotalEstimatedValue_)
+    {
+       
+         int256 poolTotalEstimatedValueSigned = int256(totalPrincipalTokensCommitted) 
+                  
+         + int256(totalInterestCollected)  + int256(tokenDifferenceFromLiquidations) 
+         + int256( excessivePrincipalTokensRepaid )
+         - int256( totalPrincipalTokensWithdrawn )
+         
+         ;
+
+
+
+        //if the poolTotalEstimatedValue_ is less than 0, we treat it as 0.  
+        poolTotalEstimatedValue_ = poolTotalEstimatedValueSigned > int256(0)
+            ? uint256(poolTotalEstimatedValueSigned)
+            : 0;
+    }
+
+   
+    function _valueOfUnderlying(uint256 amount, uint256 rate)
+        internal
+        pure
+        returns (uint256 value_)
+    {
+        if (rate == 0) {
+            return 0;
+        }
+
+         // value_ = MathUpgradeable.mulDiv(amount ,  EXCHANGE_RATE_EXPANSION_FACTOR   ,  rate );
+
+         value_ = MathUpgradeable.mulDiv(
+                amount, 
+                EXCHANGE_RATE_EXPANSION_FACTOR, 
+                rate,
+                MathUpgradeable.Rounding.Down  // Explicitly round down
+            );
+
+
+    }
+
+
+    function _valueOfUnderlyingRoundUpwards(uint256 amount, uint256 rate)
+        internal
+        pure
+        returns (uint256 value_)
+    {
+        if (rate == 0) {
+            return 0;
+        }
+
+     
+         value_ = MathUpgradeable.mulDiv(
+                amount, 
+                EXCHANGE_RATE_EXPANSION_FACTOR, 
+                rate,
+                MathUpgradeable.Rounding.Up  // Explicitly round down
+            ); 
+
+    }
+
+
+
+
   
     function getTotalPrincipalTokensOutstandingInActiveLoans()
         internal 
@@ -986,22 +979,36 @@ contract LenderCommitmentGroup_Smart_V2 is
     {     
 
 
-             // Calculate the threshold value once to avoid duplicate calculations
-            uint256 poolValueThreshold = uint256(getPoolTotalEstimatedValue()).percent(liquidityThresholdPercent);
-            
-            // Get the outstanding loan amount
-            uint256 outstandingLoans = getTotalPrincipalTokensOutstandingInActiveLoans();
-            
-            // If outstanding loans exceed or equal the threshold, return 0
-            if (poolValueThreshold <= outstandingLoans) {
-                return 0;
-            }
+         // Calculate the threshold value once to avoid duplicate calculations
+        uint256 poolValueThreshold = uint256(getPoolTotalEstimatedValue()).percent(liquidityThresholdPercent);
+        
+        // Get the outstanding loan amount
+        uint256 outstandingLoans = getTotalPrincipalTokensOutstandingInActiveLoans();
+        
+        // If outstanding loans exceed or equal the threshold, return 0
+        if (poolValueThreshold <= outstandingLoans) {
+            return 0;
+        }
             
             // Return the difference between threshold and outstanding loans
             return poolValueThreshold - outstandingLoans;
 
       
      
+    }
+
+
+
+    /**
+     * @notice Sets the delay time for withdrawing shares. Only Protocol Owner.
+     * @param _seconds Delay time in seconds.
+     */
+    function setWithdrawDelayTime(uint256 _seconds) 
+    external 
+    onlyProtocolOwner {
+        require( _seconds < MAX_WITHDRAW_DELAY_TIME );
+
+        withdrawDelayTimeSeconds = _seconds;
     }
 
 

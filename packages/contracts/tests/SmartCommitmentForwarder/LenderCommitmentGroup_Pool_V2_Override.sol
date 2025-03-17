@@ -4,9 +4,9 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
-import { LenderCommitmentGroup_Smart_V2 } from "../../contracts/LenderCommitmentForwarder/extensions/LenderCommitmentGroup/LenderCommitmentGroup_Smart_V2.sol";
+import { LenderCommitmentGroup_Pool_V2 } from "../../contracts/LenderCommitmentForwarder/extensions/LenderCommitmentGroup/LenderCommitmentGroup_Pool_V2.sol";
 
-contract LenderCommitmentGroup_Smart_V2_Override is LenderCommitmentGroup_Smart_V2 {
+contract LenderCommitmentGroup_Pool_V2_Override is LenderCommitmentGroup_Pool_V2 {
     uint256 mockMaxPrincipalPerCollateralAmount;
     uint256 mockRequiredCollateralAmount;
     uint256 mockSharesExchangeRate;
@@ -21,7 +21,7 @@ contract LenderCommitmentGroup_Smart_V2_Override is LenderCommitmentGroup_Smart_
     address mockToken1;
 
     constructor(address _tellerV2, address _smartCommitmentForwarder, address _uniswapV3Factory)
-        LenderCommitmentGroup_Smart_V2(_tellerV2, _smartCommitmentForwarder, _uniswapV3Factory)
+        LenderCommitmentGroup_Pool_V2(_tellerV2, _smartCommitmentForwarder, _uniswapV3Factory)
     {}
 
     function set_mockSharesExchangeRate(uint256 _mockRate) public {

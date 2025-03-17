@@ -83,7 +83,7 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 */
 
-contract LenderCommitmentGroup_Smart_V2 is
+contract LenderCommitmentGroup_Pool_V2 is
     ILenderCommitmentGroup_V2,
     IERC4626, // interface functions for lenders 
     ISmartCommitment, // interface functions for borrowers (teller protocol) 

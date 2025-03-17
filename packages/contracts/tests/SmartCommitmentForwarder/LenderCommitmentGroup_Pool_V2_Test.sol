@@ -1,6 +1,6 @@
 import { Testable } from "../Testable.sol";
 
-import { LenderCommitmentGroup_Smart_V2_Override } from "./LenderCommitmentGroup_Smart_V2_Override.sol";
+import { LenderCommitmentGroup_Pool_V2_Override } from "./LenderCommitmentGroup_Pool_V2_Override.sol";
 
 import {TestERC20Token} from "../tokens/TestERC20Token.sol";
 
@@ -23,7 +23,7 @@ import "lib/forge-std/src/Vm.sol";
 // Helper contract to simulate a user
 contract User {}
 
-contract LenderCommitmentGroup_Smart_V2_Test is Testable {
+contract LenderCommitmentGroup_Pool_V2_Test is Testable {
     constructor() {}
 
     User private extensionContract;
@@ -35,7 +35,7 @@ contract LenderCommitmentGroup_Smart_V2_Test is Testable {
     TestERC20Token principalToken;
     TestERC20Token collateralToken;
 
-     LenderCommitmentGroup_Smart_V2_Override lenderCommitmentGroupSmartV2;
+     LenderCommitmentGroup_Pool_V2_Override lenderCommitmentGroupSmartV2;
      
 
     MarketRegistry _marketRegistry;
@@ -76,7 +76,7 @@ contract LenderCommitmentGroup_Smart_V2_Test is Testable {
         _uniswapV3Pool.set_mockToken0(address(principalToken));
         _uniswapV3Pool.set_mockToken1(address(collateralToken));
 
-          lenderCommitmentGroupSmartV2 = new LenderCommitmentGroup_Smart_V2_Override(
+          lenderCommitmentGroupSmartV2 = new LenderCommitmentGroup_Pool_V2_Override(
             address(_tellerV2),
             address(_smartCommitmentForwarder),
             address(_uniswapV3Factory)

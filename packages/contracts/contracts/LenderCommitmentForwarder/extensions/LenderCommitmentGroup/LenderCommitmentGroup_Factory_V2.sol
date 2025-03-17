@@ -53,7 +53,7 @@ contract LenderCommitmentGroupFactory_V2 is OwnableUpgradeable {
     }
 
 
- /**
+    /**
      * @notice Deploys a new lender commitment group pool contract.
      * @dev The function initializes the deployed contract and optionally adds an initial principal amount.
      * @param _initialPrincipalAmount The initial principal amount to be deposited into the group contract.
@@ -67,11 +67,7 @@ contract LenderCommitmentGroupFactory_V2 is OwnableUpgradeable {
         IUniswapPricingLibrary.PoolRouteConfig[] calldata _poolOracleRoutes
     ) external returns ( address ) {
          
- 
-
-      
-
-      
+  
         BeaconProxy newGroupContract_ = new BeaconProxy(
                 lenderGroupBeacon,
                 abi.encodeWithSelector(
@@ -85,10 +81,7 @@ contract LenderCommitmentGroupFactory_V2 is OwnableUpgradeable {
         deployedLenderGroupContracts[address(newGroupContract_)] = block.number; //consider changing this ?
         emit DeployedLenderGroupContract(address(newGroupContract_));
 
-
-
-
-
+ 
 
         //it is not absolutely necessary to have this call here but it allows the user to potentially save a tx step so it is nice to have .
          if (_initialPrincipalAmount > 0) {
@@ -123,23 +116,23 @@ contract LenderCommitmentGroupFactory_V2 is OwnableUpgradeable {
     ) internal returns (uint256) {
 
 
-            IERC20(_principalTokenAddress).transferFrom(
-                msg.sender,
-                address(this),
-                _initialPrincipalAmount
-            );
-            IERC20(_principalTokenAddress).approve(
-                _newGroupContract,
-                _initialPrincipalAmount
-            );
+        IERC20(_principalTokenAddress).transferFrom(
+            msg.sender,
+            address(this),
+            _initialPrincipalAmount
+        );
+        IERC20(_principalTokenAddress).approve(
+            _newGroupContract,
+            _initialPrincipalAmount
+        );
 
-            address sharesRecipient = msg.sender; 
+        address sharesRecipient = msg.sender; 
 
-            uint256 sharesAmount_ = IERC4626( address(_newGroupContract) )
-                .deposit(
-                    _initialPrincipalAmount,
-                    sharesRecipient  
-                );
+        uint256 sharesAmount_ = IERC4626( address(_newGroupContract) )
+            .deposit(
+                _initialPrincipalAmount,
+                sharesRecipient  
+            );
 
         return sharesAmount_;
     }

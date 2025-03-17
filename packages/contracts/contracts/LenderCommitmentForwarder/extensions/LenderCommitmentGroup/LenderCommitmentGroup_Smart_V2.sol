@@ -36,7 +36,7 @@ import "../../../libraries/uniswap/FullMath.sol";
 
 //import {LenderCommitmentGroupShares_V2} from "./LenderCommitmentGroupShares_V2.sol";
 
-import { ILenderCommitmentGroupShares_V2 } from "../../../interfaces/ILenderCommitmentGroupShares_V2.sol";
+import { LenderCommitmentGroupSharesIntegrated } from "./LenderCommitmentGroupSharesIntegrated.sol";
 
 import {OracleProtectedChild} from "../../../oracleprotection/OracleProtectedChild.sol";
 
@@ -113,7 +113,8 @@ contract LenderCommitmentGroup_Smart_V2 is
     OracleProtectedChild,
     OwnableUpgradeable,
     PausableUpgradeable,
-    ReentrancyGuardUpgradeable 
+    ReentrancyGuardUpgradeable,
+    LenderCommitmentGroupSharesIntegrated
 {
     using AddressUpgradeable for address;
     using NumbersLib for uint256;
@@ -134,7 +135,7 @@ contract LenderCommitmentGroup_Smart_V2 is
     address public immutable UNISWAP_V3_FACTORY;
     
  
-    ILenderCommitmentGroupShares_V2 public poolSharesToken;
+  //  ILenderCommitmentGroupShares_V2 public poolSharesToken;
 
     IERC20 public principalToken;
     IERC20 public collateralToken;
@@ -189,8 +190,7 @@ contract LenderCommitmentGroup_Smart_V2 is
         uint16 interestRateLowerBound,
         uint16 interestRateUpperBound,
         uint16 liquidityThresholdPercent,
-        uint16 loanToValuePercent,
-        address poolSharesToken
+        uint16 loanToValuePercent 
     );
 
    /* event LenderAddedPrincipal(
@@ -312,17 +312,18 @@ contract LenderCommitmentGroup_Smart_V2 is
      * @notice Initializes the LenderCommitmentGroup_Smart contract.
      * @param _commitmentGroupConfig Configuration for the commitment group (lending pool).
      * @param _poolOracleRoutes Route configuration for the principal/collateral oracle.
-     * @param  _poolSharesToken The ERC20 token used to account for shares 
+
      */
    function initialize(
        CommitmentGroupConfig calldata _commitmentGroupConfig,
      
-       IUniswapPricingLibrary.PoolRouteConfig[] calldata _poolOracleRoutes ,
-         address _poolSharesToken
+       IUniswapPricingLibrary.PoolRouteConfig[] calldata _poolOracleRoutes 
+         
     ) external initializer   {
        
         __Ownable_init();
         __Pausable_init();
+        __Shares_init( ); //initialized the integrated shares 
 
         principalToken = IERC20(_commitmentGroupConfig.principalTokenAddress);
         collateralToken = IERC20(_commitmentGroupConfig.collateralTokenAddress);
@@ -356,7 +357,7 @@ contract LenderCommitmentGroup_Smart_V2 is
 
          require(poolOracleRoutes.length >= 1 && poolOracleRoutes.length <= 2, "PRL");
         
-        poolSharesToken = ILenderCommitmentGroupShares_V2 ( _poolSharesToken );
+       // poolSharesToken = ILenderCommitmentGroupShares_V2 ( _poolSharesToken );
 
         emit PoolInitialized(
             _commitmentGroupConfig.principalTokenAddress,
@@ -366,9 +367,9 @@ contract LenderCommitmentGroup_Smart_V2 is
             _commitmentGroupConfig.interestRateLowerBound,
             _commitmentGroupConfig.interestRateUpperBound,
             _commitmentGroupConfig.liquidityThresholdPercent,
-            _commitmentGroupConfig.collateralRatio,
+            _commitmentGroupConfig.collateralRatio 
           
-            _poolSharesToken
+            //_poolSharesToken
         );
     }
 
@@ -430,14 +431,14 @@ contract LenderCommitmentGroup_Smart_V2 is
 
         uint256 poolTotalEstimatedValue = getPoolTotalEstimatedValue();
 
-        if (poolSharesToken.totalSupply() == 0) {
+        if (totalSupply() == 0) {
             return EXCHANGE_RATE_EXPANSION_FACTOR; // 1 to 1 for first swap
         }
 
         rate_ =
             MathUpgradeable.mulDiv(poolTotalEstimatedValue , 
                 EXCHANGE_RATE_EXPANSION_FACTOR ,
-                  poolSharesToken.totalSupply() );
+                  totalSupply() );
     }
 
     function sharesExchangeRateInverse()
@@ -494,7 +495,7 @@ contract LenderCommitmentGroup_Smart_V2 is
         totalPrincipalTokensCommitted += _amount;
          
         //mint shares equal to _amount and give them to the shares recipient 
-        poolSharesToken.mint(_sharesRecipient, sharesAmount_);
+        mint(_sharesRecipient, sharesAmount_);
    
         emit LenderAddedPrincipal( 
 
@@ -1172,25 +1173,7 @@ contract LenderCommitmentGroup_Smart_V2 is
 
 
 
-    //// EVENTS 
-
-    // MUST be emitted when tokens are deposited into the vault via the mint and deposit methods.
-    event Deposit(
-        address indexed sender,
-        address indexed owner,
-        uint256 assets,
-        uint256 shares
-    );
-
-    // MUST be emitted when shares are withdrawn from the vault by a depositor in the redeem or withdraw methods.
-    event Withdraw(
-        address indexed sender,
-        address indexed receiver,
-        address indexed owner,
-        uint256 assets,
-        uint256 shares
-    );
-
+ 
 
 
 
@@ -1220,7 +1203,7 @@ contract LenderCommitmentGroup_Smart_V2 is
         totalPrincipalTokensCommitted += assets;
         
         // Mint shares to receiver
-        poolSharesToken.mint(receiver, shares);
+        mintShares(receiver, shares);
         
         // Check first deposit conditions
         if(!firstDepositMade){
@@ -1253,7 +1236,7 @@ contract LenderCommitmentGroup_Smart_V2 is
         totalPrincipalTokensCommitted += assets;
         
         // Mint shares to receiver
-        poolSharesToken.mint(receiver, shares);
+        mintShares(receiver, shares);
         
         // Check first deposit conditions
         if(!firstDepositMade){
@@ -1279,13 +1262,13 @@ contract LenderCommitmentGroup_Smart_V2 is
          
         
         // Check withdrawal delay
-        uint256 sharesLastTransferredAt = poolSharesToken.getLastTransferredAt(owner);
-        require(block.timestamp > sharesLastTransferredAt + withdrawDelayTimeSeconds, "SW");
+        uint256 sharesLastTransferredAt = getLastTransferredAt(owner);
+        require(block.timestamp >= sharesLastTransferredAt + withdrawDelayTimeSeconds, "SW");
 
         require(msg.sender == owner, "not authorized");
         
         // Burn shares from owner
-        poolSharesToken.burn(owner, shares);
+        burnShares(owner, shares);
         
         // Update totals
         totalPrincipalTokensWithdrawn += assets;
@@ -1321,11 +1304,11 @@ contract LenderCommitmentGroup_Smart_V2 is
         require(msg.sender == owner, "not authorized");
 
         // Check withdrawal delay
-        uint256 sharesLastTransferredAt = poolSharesToken.getLastTransferredAt(owner);
-        require(block.timestamp > sharesLastTransferredAt + withdrawDelayTimeSeconds, "SR");
+        uint256 sharesLastTransferredAt = getLastTransferredAt(owner);
+        require(block.timestamp >= sharesLastTransferredAt + withdrawDelayTimeSeconds, "SR");
         
         // Burn shares from owner
-        poolSharesToken.burn(owner, shares);
+        burnShares(owner, shares);
         
         // Update totals
         totalPrincipalTokensWithdrawn += assets;
@@ -1340,7 +1323,7 @@ contract LenderCommitmentGroup_Smart_V2 is
                 assets,
                 shares
             );
-         
+
         return assets;
     }
 
@@ -1441,7 +1424,7 @@ contract LenderCommitmentGroup_Smart_V2 is
             return 0;
         }
         
-        uint256 ownerAssets = convertToAssets(poolSharesToken.balanceOf(owner));
+        uint256 ownerAssets = convertToAssets(balanceOf(owner));
         uint256 availableLiquidity = principalToken.balanceOf(address(this));
         
         return Math.min(ownerAssets, availableLiquidity);
@@ -1456,8 +1439,8 @@ contract LenderCommitmentGroup_Smart_V2 is
             return 0;
         }
         
-        uint256 availableShares = poolSharesToken.balanceOf(owner);
-        uint256 sharesLastTransferredAt = poolSharesToken.getLastTransferredAt(owner);
+        uint256 availableShares = balanceOf(owner);
+        uint256 sharesLastTransferredAt = getLastTransferredAt(owner);
         
         if (block.timestamp <= sharesLastTransferredAt + withdrawDelayTimeSeconds) {
             return 0;
@@ -1469,10 +1452,10 @@ contract LenderCommitmentGroup_Smart_V2 is
         return Math.min(availableShares, maxSharesBasedOnLiquidity);
     }
 
-    // yes this is correct 
+ 
      function asset() public view returns (address assetTokenAddress) {
 
-        return address(poolSharesToken) ; 
+        return address(principalToken) ; 
     }
 
 

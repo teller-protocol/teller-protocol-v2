@@ -21,8 +21,7 @@ import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
  import { IERC4626 } from  "../../../interfaces/IERC4626.sol";
 
 import { ILenderCommitmentGroup_V2 } from "../../../interfaces/ILenderCommitmentGroup_V2.sol";
-
-import { ILenderCommitmentGroupShares_V2 } from "../../../interfaces/ILenderCommitmentGroupShares_V2.sol";
+ 
 
 contract LenderCommitmentGroupFactory_V2 is OwnableUpgradeable {
     using AddressUpgradeable for address;
@@ -31,12 +30,12 @@ contract LenderCommitmentGroupFactory_V2 is OwnableUpgradeable {
     
     //this is the beacon proxy
     address public lenderGroupBeacon;
-    address public lenderSharesBeacon;
+  
 
 
     mapping(address => uint256) public deployedLenderGroupContracts;
 
-    event DeployedLenderGroupContract(address indexed groupContract, address sharesContract);
+    event DeployedLenderGroupContract(address indexed groupContract);
 
  
 
@@ -44,12 +43,12 @@ contract LenderCommitmentGroupFactory_V2 is OwnableUpgradeable {
      * @notice Initializes the factory contract.
      * @param _lenderGroupBeacon The address of the beacon proxy used for deploying group contracts.
      */
-     function initialize(address _lenderGroupBeacon, address _lenderSharesBeacon )
+     function initialize(address _lenderGroupBeacon  )
         external
         initializer
     {
         lenderGroupBeacon = _lenderGroupBeacon; 
-        lenderSharesBeacon = _lenderSharesBeacon; 
+      
         __Ownable_init_unchained();
     }
 
@@ -68,43 +67,33 @@ contract LenderCommitmentGroupFactory_V2 is OwnableUpgradeable {
         IUniswapPricingLibrary.PoolRouteConfig[] calldata _poolOracleRoutes
     ) external returns ( address ) {
          
-
-
-         BeaconProxy newGroupSharesContract_ = new BeaconProxy(
-                lenderSharesBeacon ,
-
-                
-               abi.encodeWithSelector(
-                    ILenderCommitmentGroupShares_V2.initialize.selector 
-
-                )
-            );
+ 
 
       
-        BeaconProxy newGroupPoolContract_ = new BeaconProxy(
+
+      
+        BeaconProxy newGroupContract_ = new BeaconProxy(
                 lenderGroupBeacon,
                 abi.encodeWithSelector(
                     ILenderCommitmentGroup_V2.initialize.selector,    //this initializes 
-                  
-                    _commitmentGroupConfig, 
-                    _poolOracleRoutes,
-                      address(newGroupSharesContract_)  
+                    _commitmentGroupConfig,
+                    _poolOracleRoutes
 
                 )
             );
 
+        deployedLenderGroupContracts[address(newGroupContract_)] = block.number; //consider changing this ?
+        emit DeployedLenderGroupContract(address(newGroupContract_));
 
 
-        deployedLenderGroupContracts[address(newGroupPoolContract_)] = block.number;  
-     
-        emit DeployedLenderGroupContract(address(newGroupPoolContract_), address(newGroupSharesContract_));
+
 
 
 
         //it is not absolutely necessary to have this call here but it allows the user to potentially save a tx step so it is nice to have .
          if (_initialPrincipalAmount > 0) {
                 _depositPrincipal(
-                address(newGroupPoolContract_),
+                address(newGroupContract_),
                 _initialPrincipalAmount,
                 _commitmentGroupConfig.principalTokenAddress 
                 
@@ -113,14 +102,11 @@ contract LenderCommitmentGroupFactory_V2 is OwnableUpgradeable {
 
 
           //transfer ownership to msg.sender 
-        OwnableUpgradeable(address(newGroupPoolContract_))
+        OwnableUpgradeable(address(newGroupContract_))
             .transferOwnership(msg.sender);
 
-
-          OwnableUpgradeable(address(newGroupSharesContract_))
-            .transferOwnership(address(newGroupPoolContract_));
-
-        return address(newGroupPoolContract_) ;
+ 
+        return address(newGroupContract_) ;
     }
 
 

@@ -117,6 +117,12 @@ contract LenderCommitmentGroup_Smart_V2_Override is LenderCommitmentGroup_Smart_
 
     
 
+      function force_mint_shares( address guy, uint256 wad ) public  {
+        return super.mintShares( guy, wad );
+    }
+
+
+
     function sharesExchangeRate() public view override returns (uint256 rate_) {
         if (mockSharesExchangeRate > 0) {
             return mockSharesExchangeRate;

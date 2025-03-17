@@ -14,8 +14,7 @@ import { LoanDetails, Payment, BidState , Bid, Terms } from "../../contracts/Tel
 
 import { ILenderCommitmentGroup_V2 } from "../../contracts/interfaces/ILenderCommitmentGroup_V2.sol";
 import { IUniswapPricingLibrary } from "../../contracts/interfaces/IUniswapPricingLibrary.sol";
-import { LenderCommitmentGroupShares_V2 } from "../../contracts/LenderCommitmentForwarder/extensions/LenderCommitmentGroup/LenderCommitmentGroupShares_V2.sol";
-
+ 
 import {ProtocolPausingManager} from "../../contracts/pausing/ProtocolPausingManager.sol";
 
 import "lib/forge-std/src/console.sol";

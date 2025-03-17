@@ -74,10 +74,8 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 V2 Design Goals:
 
 1. try to be compatible with ERC4626 
-        a. this means a single yield token (?) 
-        b. immediate withdraw  (if liq available) 
-
-        c. no need  to request withdraw (make it intrinsic) 
+        a. this means a single yield token (?)  
+        b. no need  to request withdraw (make it intrinsic) 
 
 2.  ability to WRAP the yield token ( still a no ) 
 

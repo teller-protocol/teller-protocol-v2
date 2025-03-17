@@ -10,15 +10,11 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
  /*
 
-    This token keeps track of the last time it was transferred and provides that information
-
-    This can help mitigate sandwich attacking and flash loan attacking 
- 
-
-    Ideally , deploy this as a beacon proxy that is upgradeable 
+    DEPRECATED 
 
  */
 
+/*
 contract LenderCommitmentGroupShares_V2 is Initializable, ERC20Upgradeable,  OwnableUpgradeable {
   
     uint8 private constant DECIMALS  = 18;
@@ -101,3 +97,4 @@ contract LenderCommitmentGroupShares_V2 is Initializable, ERC20Upgradeable,  Own
 
 
 
+*/

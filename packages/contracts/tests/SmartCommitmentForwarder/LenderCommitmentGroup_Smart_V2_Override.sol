@@ -116,8 +116,8 @@ contract LenderCommitmentGroup_Smart_V2_Override is LenderCommitmentGroup_Smart_
     }
 
     
-
-      function force_mint_shares( address guy, uint256 wad ) public  {
+    // allow tests to drill in and call this internal fn for convenience 
+    function force_mint_shares( address guy, uint256 wad ) public  {
         return super.mintShares( guy, wad );
     }
 

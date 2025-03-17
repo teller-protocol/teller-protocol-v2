@@ -1045,7 +1045,12 @@ contract LenderCommitmentGroup_Smart_V2 is
     //////////////////////////////////////////////////////////////*/
 
     //Round DOWN for shares output - This prevents the vault from giving away more shares than assets should entitle.
-    function deposit(uint256 assets, address receiver) public virtual returns (uint256 shares) {
+    function deposit(uint256 assets, address receiver) 
+    public 
+    whenForwarderNotPaused whenNotPaused nonReentrant onlyOracleApprovedAllowEOA 
+    virtual 
+    returns (uint256 shares) {
+
         // Similar to addPrincipalToCommitmentGroup but following ERC4626 standard
         require(assets > 0 );
         
@@ -1082,7 +1087,12 @@ contract LenderCommitmentGroup_Smart_V2 is
     }
 
     // Round UP for assets input - This ensures users provide enough assets to receive their requested shares.
-    function mint(uint256 shares, address receiver) public virtual returns (uint256 assets) {
+    function mint(uint256 shares, address receiver) 
+    public 
+    whenForwarderNotPaused whenNotPaused nonReentrant onlyOracleApprovedAllowEOA 
+    virtual 
+    returns (uint256 assets) {
+
         // Calculate assets needed for desired shares
         assets = previewMint(shares);
         require(assets > 0 );
@@ -1118,7 +1128,11 @@ contract LenderCommitmentGroup_Smart_V2 is
         uint256 assets,
         address receiver,
         address owner
-    ) public virtual returns (uint256 shares) {
+    ) public 
+    whenForwarderNotPaused whenNotPaused  nonReentrant onlyOracleApprovedAllowEOA 
+    virtual 
+    returns (uint256 shares) {
+        
         // Calculate shares required for desired assets
         shares = previewWithdraw(assets);
         require(shares > 0, "S");
@@ -1156,7 +1170,11 @@ contract LenderCommitmentGroup_Smart_V2 is
         uint256 shares,
         address receiver,
         address owner
-    ) public virtual returns (uint256 assets) {
+    ) public 
+    whenForwarderNotPaused whenNotPaused  nonReentrant onlyOracleApprovedAllowEOA 
+    virtual 
+    returns (uint256 assets) {
+
         // Similar to burnSharesToWithdrawEarnings but following ERC4626 standard
         require(shares > 0, "S");
         

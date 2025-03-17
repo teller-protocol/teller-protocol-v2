@@ -67,24 +67,7 @@ import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
-
-/*
-
-
-V2 Design Goals:
-
-1. try to be compatible with ERC4626 
-        a. this means a single yield token (?)  
-        b. no need  to request withdraw (make it intrinsic) 
-
-2.  ability to WRAP the yield token ( still a no ) 
-
-
-
-
-*/
-
-
+ 
 
 /*
  
@@ -132,8 +115,7 @@ contract LenderCommitmentGroup_Smart_V2 is
     address public immutable SMART_COMMITMENT_FORWARDER;
     address public immutable UNISWAP_V3_FACTORY;
     
- 
-  //  ILenderCommitmentGroupShares_V2 public poolSharesToken;
+  
 
     IERC20 public principalToken;
     IERC20 public collateralToken;
@@ -190,23 +172,7 @@ contract LenderCommitmentGroup_Smart_V2 is
         uint16 liquidityThresholdPercent,
         uint16 loanToValuePercent 
     );
-
-   /* event LenderAddedPrincipal(
-        address indexed lender,
-        uint256 amount,
-        uint256 sharesAmount,
-        address indexed sharesRecipient
-    );
-
-
-     event EarningsWithdrawn(
-        address indexed lender,
-        uint256 amountPoolSharesTokens,
-        uint256 principalTokensWithdrawn,
-        address indexed recipient
-    );
-
-    */
+ 
 
 
     event BorrowerAcceptedFunds(
@@ -355,8 +321,7 @@ contract LenderCommitmentGroup_Smart_V2 is
 
          require(poolOracleRoutes.length >= 1 && poolOracleRoutes.length <= 2, "PRL");
         
-       // poolSharesToken = ILenderCommitmentGroupShares_V2 ( _poolSharesToken );
-
+       
         emit PoolInitialized(
             _commitmentGroupConfig.principalTokenAddress,
             _commitmentGroupConfig.collateralTokenAddress,
@@ -367,7 +332,7 @@ contract LenderCommitmentGroup_Smart_V2 is
             _commitmentGroupConfig.liquidityThresholdPercent,
             _commitmentGroupConfig.collateralRatio 
           
-            //_poolSharesToken
+           
         );
     }
 
@@ -395,28 +360,7 @@ contract LenderCommitmentGroup_Smart_V2 is
        maxPrincipalPerCollateralAmount = _maxPrincipalPerCollateralAmount;
     }
 
-     /**
-     * @notice Deploys the pool shares token for the lending pool.
-     * @dev This function can only be called during initialization.
-     * @return poolSharesToken_ Address of the deployed pool shares token.
-     */
-  /*  function _deployPoolSharesToken()
-        internal
-        onlyInitializing
-        returns (address poolSharesToken_)
-    {      
-        require(
-            address(poolSharesToken) == address(0) 
-        );
- 
-        poolSharesToken = new LenderCommitmentGroupShares_V2(
-            "LenderGroupShares",
-            "SHR",
-            18  
-        );
-
-        return address(poolSharesToken);
-    } */
+  
 
 
     /**
@@ -472,48 +416,7 @@ contract LenderCommitmentGroup_Smart_V2 is
             : 0;
     }
 
-  
- /*   function addPrincipalToCommitmentGroup(
-        uint256 _amount,
-        address _sharesRecipient,
-        uint256 _minSharesAmountOut
-    ) external whenForwarderNotPaused whenNotPaused nonReentrant onlyOracleApprovedAllowEOA 
-    returns (uint256 sharesAmount_) {
-       
-        uint256 principalTokenBalanceBefore = principalToken.balanceOf(address(this));
-
-        principalToken.safeTransferFrom(msg.sender, address(this), _amount);
- 
-        uint256 principalTokenBalanceAfter = principalToken.balanceOf(address(this));
- 
-        require( principalTokenBalanceAfter == principalTokenBalanceBefore + _amount, "Token balance was not added properly" );
-
-        sharesAmount_ = _valueOfUnderlying(_amount, sharesExchangeRate());
- 
-        totalPrincipalTokensCommitted += _amount;
-         
-        //mint shares equal to _amount and give them to the shares recipient 
-        mint(_sharesRecipient, sharesAmount_);
    
-        emit LenderAddedPrincipal( 
-
-            msg.sender,
-            _amount,
-            sharesAmount_,
-            _sharesRecipient
-
-         );
-
-        require( sharesAmount_ >= _minSharesAmountOut, "Invalid: Min Shares AmountOut" );
- 
-         if(!firstDepositMade){
-            require(msg.sender == owner(), "Owner must initialize the pool with a deposit first.");
-            require( sharesAmount_>= 1e6, "Initial shares amount must be atleast 1e6" );
-
-            firstDepositMade = true;
-        }
-    }*/
-
     function _valueOfUnderlying(uint256 amount, uint256 rate)
         internal
         pure
@@ -536,7 +439,7 @@ contract LenderCommitmentGroup_Smart_V2 is
     }
 
 
-     function _valueOfUnderlyingRoundUpwards(uint256 amount, uint256 rate)
+    function _valueOfUnderlyingRoundUpwards(uint256 amount, uint256 rate)
         internal
         pure
         returns (uint256 value_)
@@ -545,30 +448,28 @@ contract LenderCommitmentGroup_Smart_V2 is
             return 0;
         }
 
-         // value_ = MathUpgradeable.mulDiv(amount ,  EXCHANGE_RATE_EXPANSION_FACTOR   ,  rate );
-
+     
          value_ = MathUpgradeable.mulDiv(
                 amount, 
                 EXCHANGE_RATE_EXPANSION_FACTOR, 
                 rate,
                 MathUpgradeable.Rounding.Up  // Explicitly round down
-            );
-
+            ); 
 
     }
 
     /**
- * @notice Validates loan parameters and starts the TellerV2 Loan where this contract as the lender.
- * @dev Must be called via the Smart Commitment Forwarder 
- * @param _borrower Address of the borrower accepting the loan.
- * @param _bidId Identifier for the loan bid.
- * @param _principalAmount Amount of principal being lent.
- * @param _collateralAmount Amount of collateral provided by the borrower.
- * @param _collateralTokenAddress Address of the collateral token contract.
- * @param _collateralTokenId Token ID of the collateral (if applicable).
- * @param _loanDuration Duration of the loan in seconds.
- * @param _interestRate Interest rate for the loan, scaled by 100 (e.g., 500 = 5%).
- */
+     * @notice Validates loan parameters and starts the TellerV2 Loan where this contract as the lender.
+     * @dev Must be called via the Smart Commitment Forwarder 
+     * @param _borrower Address of the borrower accepting the loan.
+     * @param _bidId Identifier for the loan bid.
+     * @param _principalAmount Amount of principal being lent.
+     * @param _collateralAmount Amount of collateral provided by the borrower.
+     * @param _collateralTokenAddress Address of the collateral token contract.
+     * @param _collateralTokenId Token ID of the collateral (if applicable).
+     * @param _loanDuration Duration of the loan in seconds.
+     * @param _interestRate Interest rate for the loan, scaled by 100 (e.g., 500 = 5%).
+     */
     function acceptFundsForAcceptBid(
         address _borrower,
         uint256 _bidId,
@@ -643,66 +544,14 @@ contract LenderCommitmentGroup_Smart_V2 is
 
         
     }
-
-    
-   /*  function prepareSharesForBurn(
-        uint256 _amountPoolSharesTokens 
-    ) external whenForwarderNotPaused whenNotPaused nonReentrant
-     returns (bool) {
-        
-        return poolSharesToken.prepareSharesForBurn(msg.sender, _amountPoolSharesTokens); 
-    }
-    */
-
-
  
-   /* function burnSharesToWithdrawEarnings(
-        uint256 _amountPoolSharesTokens,
-        address _recipient,
-        uint256 _minAmountOut
-    ) external whenForwarderNotPaused whenNotPaused  nonReentrant onlyOracleApprovedAllowEOA 
-    returns (uint256) {
-       
-          
-       
-        //this should compute BEFORE shares burn 
-        uint256 principalTokenValueToWithdraw = _valueOfUnderlying(
-            _amountPoolSharesTokens,
-            sharesExchangeRateInverse()
-        );  
-
- 
-        uint256 sharesLastTransferredAt =  poolSharesToken.getLastTransferredAt( msg.sender); 
-        require( block.timestamp  >  sharesLastTransferredAt + withdrawDelayTimeSeconds, "shares not yet  for burn" );
-
-        poolSharesToken.burn( msg.sender, _amountPoolSharesTokens  );
-
-        totalPrincipalTokensWithdrawn += principalTokenValueToWithdraw;
-
-        principalToken.safeTransfer(_recipient, principalTokenValueToWithdraw);
-
-
-        emit EarningsWithdrawn(
-            msg.sender,
-            _amountPoolSharesTokens,
-            principalTokenValueToWithdraw,
-            _recipient
-        );
-        
-        require( principalTokenValueToWithdraw >=  _minAmountOut ,"Invalid: Min Amount Out");
-
-        return principalTokenValueToWithdraw;
-    }*/
-
-/**
- * @notice Liquidates a defaulted loan using a reverse auction that starts high and falls to zero.
- * @dev The amount of tokens withdrawn from the liquidator is always the sum of _tokenAmountDifference + amountDue .
- * @dev Handles the liquidation process for a defaulted loan bid, ensuring all conditions for liquidation are met.
- * @param _bidId Identifier for the defaulted loan bid.
- * @param _tokenAmountDifference The incentive difference in tokens required for liquidation. Positive values indicate extra tokens to take, and negative values indicate extra tokens to give.
- */
-
-
+    /**
+     * @notice Liquidates a defaulted loan using a reverse auction that starts high and falls to zero.
+     * @dev The amount of tokens withdrawn from the liquidator is always the sum of _tokenAmountDifference + amountDue .
+     * @dev Handles the liquidation process for a defaulted loan bid, ensuring all conditions for liquidation are met.
+     * @param _bidId Identifier for the defaulted loan bid.
+     * @param _tokenAmountDifference The incentive difference in tokens required for liquidation. Positive values indicate extra tokens to take, and negative values indicate extra tokens to give.
+     */
     function liquidateDefaultedLoanWithIncentive(
         uint256 _bidId,
         int256 _tokenAmountDifference
@@ -871,7 +720,7 @@ contract LenderCommitmentGroup_Smart_V2 is
 
     /*
        * @dev This function will calculate the incentive amount (using a uniswap bonus plus a timer)
-        of principal tokens that will be given to incentivize liquidating a loan 
+             of principal tokens that will be given to incentivize liquidating a loan 
 
        * @dev As time approaches infinite, the output approaches -1 * AmountDue .  
     */
@@ -950,7 +799,7 @@ contract LenderCommitmentGroup_Smart_V2 is
 
 
             // put this in a helper lib ??? 
-     function getUniswapPriceRatioForPoolRoutes(
+    function getUniswapPriceRatioForPoolRoutes(
        IUniswapPricingLibrary.PoolRouteConfig[] memory poolOracleRoutes
     ) internal  view virtual returns (uint256 ) {
    
@@ -961,7 +810,7 @@ contract LenderCommitmentGroup_Smart_V2 is
         return pairPriceWithTwapFromOracle;
     }
 
-     /*function getPrincipalForCollateralForPoolRoutes(
+    function getPrincipalForCollateralForPoolRoutes(
         IUniswapPricingLibrary.PoolRouteConfig[] memory poolOracleRoutes
     ) external view virtual returns (uint256 ) {
    
@@ -978,7 +827,7 @@ contract LenderCommitmentGroup_Smart_V2 is
 
 
         return principalPerCollateralAmount;
-    }*/
+    } 
 
 
    function getRequiredCollateral(
@@ -998,10 +847,10 @@ contract LenderCommitmentGroup_Smart_V2 is
  
 
     /*
-    @dev This callback occurs when a TellerV2 repayment happens or when a TellerV2 liquidate happens 
-    @dev lenderCloseLoan does not trigger a repayLoanCallback 
-    @dev It is important that only teller loans for this specific pool can call this
-    @dev It is important that this function does not revert even if paused since repayments can occur in this case
+        @dev This callback occurs when a TellerV2 repayment happens or when a TellerV2 liquidate happens 
+        @dev lenderCloseLoan does not trigger a repayLoanCallback 
+        @dev It is important that only teller loans for this specific pool can call this
+        @dev It is important that this function does not revert even if paused since repayments can occur in this case
     */
     function repayLoanCallback(
         uint256 _bidId,
@@ -1136,19 +985,28 @@ contract LenderCommitmentGroup_Smart_V2 is
         returns (uint256)
     {     
 
-      if (
-            uint256( getPoolTotalEstimatedValue() ).percent(liquidityThresholdPercent) 
-               < getTotalPrincipalTokensOutstandingInActiveLoans()
 
-          ){
-            return 0;
-           }
+             // Calculate the threshold value once to avoid duplicate calculations
+            uint256 poolValueThreshold = uint256(getPoolTotalEstimatedValue()).percent(liquidityThresholdPercent);
+            
+            // Get the outstanding loan amount
+            uint256 outstandingLoans = getTotalPrincipalTokensOutstandingInActiveLoans();
+            
+            // If outstanding loans exceed or equal the threshold, return 0
+            if (poolValueThreshold <= outstandingLoans) {
+                return 0;
+            }
+            
+            // Return the difference between threshold and outstanding loans
+            return poolValueThreshold - outstandingLoans;
 
-
-        return  ( uint256( getPoolTotalEstimatedValue() )).percent(liquidityThresholdPercent) -
-        getTotalPrincipalTokensOutstandingInActiveLoans();
+      
      
     }
+
+
+
+    // ------------------------   Pausing functions  ------------ 
 
     /**
      * @notice Lets the DAO/owner of the protocol implement an emergency stop mechanism.
@@ -1167,7 +1025,7 @@ contract LenderCommitmentGroup_Smart_V2 is
 
 
 
-    // ------------------------   ERC4626  functions ------------ 
+    // ------------------------   ERC4626  functions  ------------ 
 
 
 
@@ -1260,10 +1118,10 @@ contract LenderCommitmentGroup_Smart_V2 is
          
         
         // Check withdrawal delay
-        uint256 sharesLastTransferredAt = getLastTransferredAt(owner);
+        uint256 sharesLastTransferredAt = getSharesLastTransferredAt(owner);
         require(block.timestamp >= sharesLastTransferredAt + withdrawDelayTimeSeconds, "SW");
 
-        require(msg.sender == owner, "not authorized");
+        require(msg.sender == owner, "UA");
         
         // Burn shares from owner
         burnShares(owner, shares);
@@ -1287,7 +1145,6 @@ contract LenderCommitmentGroup_Smart_V2 is
     }   
 
     //Round DOWN for assets output - This prevents the vault from giving away more assets than shares should entitle.
-
     function redeem(
         uint256 shares,
         address receiver,
@@ -1299,10 +1156,10 @@ contract LenderCommitmentGroup_Smart_V2 is
         // Calculate assets to receive
         assets = _valueOfUnderlying(shares, sharesExchangeRateInverse());
      
-        require(msg.sender == owner, "not authorized");
+        require(msg.sender == owner, "UA");
 
         // Check withdrawal delay
-        uint256 sharesLastTransferredAt = getLastTransferredAt(owner);
+        uint256 sharesLastTransferredAt = getSharesLastTransferredAt(owner);
         require(block.timestamp >= sharesLastTransferredAt + withdrawDelayTimeSeconds, "SR");
         
         // Burn shares from owner
@@ -1314,7 +1171,7 @@ contract LenderCommitmentGroup_Smart_V2 is
         // Transfer assets to receiver
         principalToken.safeTransfer(receiver, assets);
         
-         emit Withdraw(
+        emit Withdraw(
                 owner,
                 receiver,
                 owner,
@@ -1333,67 +1190,45 @@ contract LenderCommitmentGroup_Smart_V2 is
         return getPoolTotalEstimatedValue();
     }
 
-
+ 
+ 
    
-
-
-    //   sharesAmount_ = _valueOfUnderlying(_principalamount, sharesExchangeRate());  
-
-
-        /*
-
-        VERIFY:  
-        1. This rounds   DOWN 
-    
-    */
-
     function convertToShares(uint256 assets) public view virtual returns (uint256) {
         return _valueOfUnderlying(assets, sharesExchangeRate());
-    }
-
-       /*
-
-        VERIFY:  
-        1. This rounds   DOWN 
-    
-    */
+    } 
 
     function convertToAssets(uint256 shares) public view virtual returns (uint256) {
         return _valueOfUnderlying(shares, sharesExchangeRateInverse());
     }
 
-    // Round DOWN - Should match the actual behavior of deposit.
+     
     function previewDeposit(uint256 assets) public view virtual returns (uint256) {
         // return convertToShares(assets);
          return _valueOfUnderlying(assets, sharesExchangeRate());
     }
 
-
-    /*
-     Round UP - Should match the actual behavior of mint.
-      
-
-    */
-
+ 
     function previewMint(uint256 shares) public view virtual returns (uint256) {
-     
+        
+          //  return convertToAssets(shares); // Use the existing conversion function
          return _valueOfUnderlyingRoundUpwards(shares, sharesExchangeRateInverse());
-        //  return convertToAssets(shares); // Use the existing conversion function
+      
      
     }
 
-    // Round UP - Should match the actual behavior of withdraw.
+  
     function previewWithdraw(uint256 assets) public view virtual returns (uint256) {
-             
+        
+          //  return convertToShares(assets); // Use the existing conversion function
          return _valueOfUnderlyingRoundUpwards( assets, sharesExchangeRate() ) ;
-       //  return convertToShares(assets); // Use the existing conversion function
-
+      
     }
 
     // Round DOWN - Should match the actual behavior of redeem.
     function previewRedeem(uint256 shares) public view virtual returns (uint256) {
+         //return convertToAssets(shares);
          return _valueOfUnderlying(shares, sharesExchangeRateInverse());    
-        //return convertToAssets(shares);
+       
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -1414,9 +1249,7 @@ contract LenderCommitmentGroup_Smart_V2 is
         return type(uint256).max;
     }
 
-    /*
-        VERIFY :  Never reverts 
-    */
+    
     function maxWithdraw(address owner) public view virtual returns (uint256) {
         if (paused()) {
             return 0;
@@ -1428,17 +1261,14 @@ contract LenderCommitmentGroup_Smart_V2 is
         return Math.min(ownerAssets, availableLiquidity);
     }
 
-     /*
-        VERIFY :  Never reverts  
-
-    */
+     
     function maxRedeem(address owner) public view virtual returns (uint256) {
         if (paused()) {
             return 0;
         }
         
         uint256 availableShares = balanceOf(owner);
-        uint256 sharesLastTransferredAt = getLastTransferredAt(owner);
+        uint256 sharesLastTransferredAt = getSharesLastTransferredAt(owner);
         
         if (block.timestamp <= sharesLastTransferredAt + withdrawDelayTimeSeconds) {
             return 0;
@@ -1459,25 +1289,4 @@ contract LenderCommitmentGroup_Smart_V2 is
 
 
 
-}
-
-/*
-        Verify that fees are being considered properly 
-
-
-
-
-For example, if calling deposit(100, receiver), the caller should deposit exactly 100 underlying tokens, including fees, and the receiver should receive a number of shares that matches the value returned by previewDeposit(100). Similarly, previewMint should account for the fees that the user will have to pay on top of share’s cost.
-
-As for the Deposit event, while this is less clear in the EIP spec itself, there seems to be consensus that it should include the number of assets paid for by the user, including the fees.
-
-On the other hand, when withdrawing assets, the number given by the user should correspond to what he receives. Any fees should be added to the quote (in shares) performed by previewWithdraw.
-
-The Withdraw event should include the number of shares the user burns (including fees) and the number of assets the user actually receives (after fees are deducted).
-
-The consequence of this design is that both the Deposit and Withdraw events will describe two exchange rates. The spread between the "Buy-in" and the "Exit" prices correspond to the fees taken by the vault.
-
-*/
-
-
-// https://docs.openzeppelin.com/contracts/4.x/erc4626#fees 
+} 

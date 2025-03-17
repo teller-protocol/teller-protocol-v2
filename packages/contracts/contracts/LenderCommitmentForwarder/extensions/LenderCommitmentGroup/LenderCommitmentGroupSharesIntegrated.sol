@@ -20,20 +20,16 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
  */
 
 abstract contract LenderCommitmentGroupSharesIntegrated is
-
     Initializable, 
     ERC20Upgradeable
 {
   
     uint8 private constant DECIMALS  = 18;
-
    
     mapping(address => uint256) private poolSharesLastTransferredAt;
 
-
     event SharesLastTransferredAt(
-        address recipient,
-         
+        address indexed recipient,         
         uint256 transferredAt 
     );
 
@@ -88,7 +84,7 @@ abstract contract LenderCommitmentGroupSharesIntegrated is
     /*
         Get the last timestamp pool shares have been transferred for this account 
     */
-    function getLastTransferredAt(
+    function getSharesLastTransferredAt(
         address owner        
     )  public view returns (uint256)  {
 

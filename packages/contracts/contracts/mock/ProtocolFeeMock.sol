@@ -1,7 +1,7 @@
 pragma solidity >=0.8.0 <0.9.0;
 // SPDX-License-Identifier: MIT
 
-import "./ProtocolFee.sol";
+import "../ProtocolFee.sol";
 
 contract ProtocolFeeMock is ProtocolFee {
     bool public setProtocolFeeCalled;

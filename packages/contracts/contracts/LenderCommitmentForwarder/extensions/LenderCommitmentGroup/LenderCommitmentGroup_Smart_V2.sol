@@ -193,12 +193,23 @@ contract LenderCommitmentGroup_Smart_V2 is
         address poolSharesToken
     );
 
-    event LenderAddedPrincipal(
+   /* event LenderAddedPrincipal(
         address indexed lender,
         uint256 amount,
         uint256 sharesAmount,
         address indexed sharesRecipient
     );
+
+
+     event EarningsWithdrawn(
+        address indexed lender,
+        uint256 amountPoolSharesTokens,
+        uint256 principalTokensWithdrawn,
+        address indexed recipient
+    );
+
+    */
+
 
     event BorrowerAcceptedFunds(
         address indexed borrower,
@@ -209,13 +220,7 @@ contract LenderCommitmentGroup_Smart_V2 is
         uint16 interestRate
     );
 
-    event EarningsWithdrawn(
-        address indexed lender,
-        uint256 amountPoolSharesTokens,
-        uint256 principalTokensWithdrawn,
-        address indexed recipient
-    );
-
+   
 
     event DefaultedLoanLiquidated(
         uint256 indexed bidId,
@@ -519,7 +524,38 @@ contract LenderCommitmentGroup_Smart_V2 is
             return 0;
         }
 
-        value_ = MathUpgradeable.mulDiv(amount ,  EXCHANGE_RATE_EXPANSION_FACTOR   ,  rate );
+         // value_ = MathUpgradeable.mulDiv(amount ,  EXCHANGE_RATE_EXPANSION_FACTOR   ,  rate );
+
+         value_ = MathUpgradeable.mulDiv(
+                amount, 
+                EXCHANGE_RATE_EXPANSION_FACTOR, 
+                rate,
+                MathUpgradeable.Rounding.Down  // Explicitly round down
+            );
+
+
+    }
+
+
+     function _valueOfUnderlyingRoundUpwards(uint256 amount, uint256 rate)
+        internal
+        pure
+        returns (uint256 value_)
+    {
+        if (rate == 0) {
+            return 0;
+        }
+
+         // value_ = MathUpgradeable.mulDiv(amount ,  EXCHANGE_RATE_EXPANSION_FACTOR   ,  rate );
+
+         value_ = MathUpgradeable.mulDiv(
+                amount, 
+                EXCHANGE_RATE_EXPANSION_FACTOR, 
+                rate,
+                MathUpgradeable.Rounding.Up  // Explicitly round down
+            );
+
+
     }
 
     /**
@@ -1134,10 +1170,35 @@ contract LenderCommitmentGroup_Smart_V2 is
 
     // ------------------------   ERC4626  functions ------------ 
 
+
+
+    //// EVENTS 
+
+    // MUST be emitted when tokens are deposited into the vault via the mint and deposit methods.
+    event Deposit(
+        address indexed sender,
+        address indexed owner,
+        uint256 assets,
+        uint256 shares
+    );
+
+    // MUST be emitted when shares are withdrawn from the vault by a depositor in the redeem or withdraw methods.
+    event Withdraw(
+        address indexed sender,
+        address indexed receiver,
+        address indexed owner,
+        uint256 assets,
+        uint256 shares
+    );
+
+
+
+
     /*//////////////////////////////////////////////////////////////
                         DEPOSIT/WITHDRAWAL LOGIC
     //////////////////////////////////////////////////////////////*/
 
+    //Round DOWN for shares output - This prevents the vault from giving away more shares than assets should entitle.
     function deposit(uint256 assets, address receiver) public virtual returns (uint256 shares) {
         // Similar to addPrincipalToCommitmentGroup but following ERC4626 standard
         require(assets > 0 );
@@ -1168,10 +1229,13 @@ contract LenderCommitmentGroup_Smart_V2 is
             firstDepositMade = true;
         }
         
-        emit LenderAddedPrincipal(msg.sender, assets, shares, receiver);
+       // emit LenderAddedPrincipal(msg.sender, assets, shares, receiver);
+        emit Deposit( msg.sender,receiver, assets, shares );
+
         return shares;
     }
 
+    // Round UP for assets input - This ensures users provide enough assets to receive their requested shares.
     function mint(uint256 shares, address receiver) public virtual returns (uint256 assets) {
         // Calculate assets needed for desired shares
         assets = previewMint(shares);
@@ -1198,10 +1262,12 @@ contract LenderCommitmentGroup_Smart_V2 is
             firstDepositMade = true;
         }
         
-        emit LenderAddedPrincipal(msg.sender, assets, shares, receiver);
+       // emit LenderAddedPrincipal(msg.sender, assets, shares, receiver);
+        emit Deposit( msg.sender,receiver, assets, shares );
         return assets;
     }
 
+    //Round UP for shares burned - This ensures users burn enough shares to receive their requested assets.
     function withdraw(
         uint256 assets,
         address receiver,
@@ -1227,9 +1293,19 @@ contract LenderCommitmentGroup_Smart_V2 is
         // Transfer assets to receiver
         principalToken.safeTransfer(receiver, assets);
         
-        emit EarningsWithdrawn(owner, shares, assets, receiver);
+        
+        emit Withdraw(
+                owner,
+                receiver,
+                owner,
+                assets,
+                shares
+            );
+
         return shares;
-    }
+    }   
+
+    //Round DOWN for assets output - This prevents the vault from giving away more assets than shares should entitle.
 
     function redeem(
         uint256 shares,
@@ -1257,7 +1333,14 @@ contract LenderCommitmentGroup_Smart_V2 is
         // Transfer assets to receiver
         principalToken.safeTransfer(receiver, assets);
         
-        emit EarningsWithdrawn(owner, shares, assets, receiver);
+         emit Withdraw(
+                owner,
+                receiver,
+                owner,
+                assets,
+                shares
+            );
+         
         return assets;
     }
 
@@ -1269,55 +1352,67 @@ contract LenderCommitmentGroup_Smart_V2 is
         return getPoolTotalEstimatedValue();
     }
 
+
+   
+
+
     //   sharesAmount_ = _valueOfUnderlying(_principalamount, sharesExchangeRate());  
+
+
+        /*
+
+        VERIFY:  
+        1. This rounds   DOWN 
+    
+    */
+
     function convertToShares(uint256 assets) public view virtual returns (uint256) {
         return _valueOfUnderlying(assets, sharesExchangeRate());
     }
+
+       /*
+
+        VERIFY:  
+        1. This rounds   DOWN 
+    
+    */
 
     function convertToAssets(uint256 shares) public view virtual returns (uint256) {
         return _valueOfUnderlying(shares, sharesExchangeRateInverse());
     }
 
+    // Round DOWN - Should match the actual behavior of deposit.
     function previewDeposit(uint256 assets) public view virtual returns (uint256) {
-        return convertToShares(assets);
+        // return convertToShares(assets);
+         return _valueOfUnderlying(assets, sharesExchangeRate());
     }
+
+
+    /*
+     Round UP - Should match the actual behavior of mint.
+      
+
+    */
 
     function previewMint(uint256 shares) public view virtual returns (uint256) {
-       /* if (poolSharesToken.totalSupply() == 0 || totalAssets() == 0) {
-          return shares; // Initial 1:1 ratio for first deposit
-       }*/
-
-      return convertToAssets(shares); // Use the existing conversion function
      
-     /*
-
-        was 
-
-         if (poolSharesToken.totalSupply() == 0 || totalAssets() == 0) {
-            return shares; // Initial 1:1 ratio for first deposit
-        }
-        
-        return MathUpgradeable.mulDiv(
-            shares,
-            sharesExchangeRate(),
-            EXCHANGE_RATE_EXPANSION_FACTOR,
-            MathUpgradeable.Rounding.Up
-        );
-    
-     */
+         return _valueOfUnderlyingRoundUpwards(shares, sharesExchangeRateInverse());
+        //  return convertToAssets(shares); // Use the existing conversion function
+     
     }
 
+    // Round UP - Should match the actual behavior of withdraw.
     function previewWithdraw(uint256 assets) public view virtual returns (uint256) {
-        /* if (totalAssets() == 0) {
-          return 0;
-          }*/
-
-          return convertToShares(assets); // Use the existing conversion function
+             
+         return _valueOfUnderlyingRoundUpwards( assets, sharesExchangeRate() ) ;
+       //  return convertToShares(assets); // Use the existing conversion function
 
     }
 
+    // Round DOWN - Should match the actual behavior of redeem.
     function previewRedeem(uint256 shares) public view virtual returns (uint256) {
-        return convertToAssets(shares);
+         return _valueOfUnderlying(shares, sharesExchangeRateInverse());    
+        //return convertToAssets(shares);
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -1338,6 +1433,9 @@ contract LenderCommitmentGroup_Smart_V2 is
         return type(uint256).max;
     }
 
+    /*
+        VERIFY :  Never reverts 
+    */
     function maxWithdraw(address owner) public view virtual returns (uint256) {
         if (paused()) {
             return 0;
@@ -1349,6 +1447,10 @@ contract LenderCommitmentGroup_Smart_V2 is
         return Math.min(ownerAssets, availableLiquidity);
     }
 
+     /*
+        VERIFY :  Never reverts  
+
+    */
     function maxRedeem(address owner) public view virtual returns (uint256) {
         if (paused()) {
             return 0;
@@ -1367,11 +1469,34 @@ contract LenderCommitmentGroup_Smart_V2 is
         return Math.min(availableShares, maxSharesBasedOnLiquidity);
     }
 
+    // yes this is correct 
+     function asset() public view returns (address assetTokenAddress) {
 
-
-
+        return address(poolSharesToken) ; 
+    }
 
 
 
 
 }
+
+/*
+        Verify that fees are being considered properly 
+
+
+
+
+For example, if calling deposit(100, receiver), the caller should deposit exactly 100 underlying tokens, including fees, and the receiver should receive a number of shares that matches the value returned by previewDeposit(100). Similarly, previewMint should account for the fees that the user will have to pay on top of share’s cost.
+
+As for the Deposit event, while this is less clear in the EIP spec itself, there seems to be consensus that it should include the number of assets paid for by the user, including the fees.
+
+On the other hand, when withdrawing assets, the number given by the user should correspond to what he receives. Any fees should be added to the quote (in shares) performed by previewWithdraw.
+
+The Withdraw event should include the number of shares the user burns (including fees) and the number of assets the user actually receives (after fees are deducted).
+
+The consequence of this design is that both the Deposit and Withdraw events will describe two exchange rates. The spread between the "Buy-in" and the "Exit" prices correspond to the fees taken by the vault.
+
+*/
+
+
+// https://docs.openzeppelin.com/contracts/4.x/erc4626#fees 

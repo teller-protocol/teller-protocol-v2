@@ -35,10 +35,7 @@ contract LenderCommitmentGroupShares_V2 is Initializable, ERC20Upgradeable,  Own
 
 
 
-    constructor()  
-    {
-         // _disableInitializers();
-    }
+    constructor()   {  }
 
 
 

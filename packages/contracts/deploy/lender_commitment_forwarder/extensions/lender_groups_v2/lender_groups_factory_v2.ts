@@ -14,8 +14,7 @@ const deployFn: DeployFunction = async (hre) => {
   const LenderGroupsBeaconAddress =
   await LenderGroupsBeacon.getAddress()
 
- 
-  //const networkName = hre.network.name
+  
 
   const lenderGroupsFactory = await hre.deployProxy(
     'LenderCommitmentGroupFactory_V2',
@@ -39,7 +38,7 @@ deployFn.dependencies = [
   'teller-v2:deploy',
   'teller-v2:init',
   'smart-commitment-forwarder:deploy',
-  'lender-commitment-group-beacon:deploy'
+  'lender-commitment-group-beacon-v2:deploy'
 ]
 
 deployFn.skip = async (hre) => {

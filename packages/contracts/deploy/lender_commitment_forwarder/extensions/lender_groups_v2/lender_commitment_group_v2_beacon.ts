@@ -77,6 +77,7 @@ const deployFn: DeployFunction = async (hre) => {
  
   //is this necessary ? 
   //isnt this just an implementation?
+   // this is necessary so only the protocol timelock can upgrade the beacon proxy 
   
   const { protocolTimelock , protocolOwnerSafe } = await hre.getNamedAccounts()
   hre.log('Transferring ownership of CommitmentGroupBeacon to Gnosis Safe...')

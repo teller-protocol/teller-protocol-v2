@@ -47,28 +47,28 @@ type group_borrower_accepted_funds @entity {
     principal_amount: BigDecimal!
 }
 
-type group_lender_added_principal @entity {
+type group_lender_deposit @entity {
     id: ID!
     evt_tx_hash: Bytes!
     evt_index: BigInt!
     evt_block_time: BigInt!
     evt_block_number: BigInt!
     group_pool_address: Bytes!
-    amount: BigDecimal!
+    assets: BigDecimal!
     lender: Bytes!
-    shares_amount: BigDecimal!
-    shares_recipient: Bytes!
+    shares: BigDecimal!
+     
 }
-type group_earnings_withdrawn @entity {
+type group_lender_withdraw @entity {
     id: ID!
     evt_tx_hash: Bytes!
     evt_index: BigInt!
     evt_block_time: BigInt!
     evt_block_number: BigInt!
     group_pool_address: Bytes!
-    amount_pool_shares_tokens: BigDecimal!
+    shares: BigDecimal!
     lender: Bytes!
-    principal_tokens_withdrawn: BigDecimal!
+    assets: BigDecimal!
     recipient: Bytes!
 }
 type group_defaulted_loan_liquidated @entity {
@@ -142,7 +142,7 @@ type group_pool_initialized @entity {
     loan_to_value_percent: BigInt!
     market_id: BigInt!
     max_loan_duration: BigInt!
-    pool_shares_token: Bytes!
+    
     principal_token_address: Bytes!
 }
 type group_unpaused @entity {
@@ -172,7 +172,7 @@ type group_pool_metric @entity {
     
     principal_token_address: Bytes!
     collateral_token_address: Bytes!
-    shares_token_address: Bytes!
+    
 
     # get these from RPC calls 
    

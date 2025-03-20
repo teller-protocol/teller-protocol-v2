@@ -151,11 +151,11 @@ pub struct LendergroupWithdraw {
     #[prost(string, tag="5")]
     pub evt_address: ::prost::alloc::string::String,
     #[prost(bytes="vec", tag="6")]
-    pub lender: ::prost::alloc::vec::Vec<u8>,
+    pub owner: ::prost::alloc::vec::Vec<u8>,
     #[prost(string, tag="7")]
-    pub amount_pool_shares_tokens: ::prost::alloc::string::String,
+    pub shares: ::prost::alloc::string::String,
     #[prost(string, tag="8")]
-    pub principal_tokens_withdrawn: ::prost::alloc::string::String,
+    pub assets: ::prost::alloc::string::String,
     #[prost(bytes="vec", tag="9")]
     pub recipient: ::prost::alloc::vec::Vec<u8>,
 }
@@ -189,13 +189,11 @@ pub struct LendergroupDeposit {
     #[prost(string, tag="5")]
     pub evt_address: ::prost::alloc::string::String,
     #[prost(bytes="vec", tag="6")]
-    pub lender: ::prost::alloc::vec::Vec<u8>,
+    pub owner: ::prost::alloc::vec::Vec<u8>,
     #[prost(string, tag="7")]
-    pub amount: ::prost::alloc::string::String,
+    pub assets: ::prost::alloc::string::String,
     #[prost(string, tag="8")]
-    pub shares_amount: ::prost::alloc::string::String,
-    #[prost(bytes="vec", tag="9")]
-    pub shares_recipient: ::prost::alloc::vec::Vec<u8>,
+    pub shares: ::prost::alloc::string::String,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]

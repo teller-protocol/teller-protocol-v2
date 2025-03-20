@@ -86,9 +86,9 @@ message lendergroup_Withdraw {
     uint64 evt_block_time = 3;
     uint64 evt_block_number = 4;
     string evt_address = 5;
-    bytes lender = 6;
-    string amount_pool_shares_tokens = 7;
-    string principal_tokens_withdrawn = 8;
+    bytes owner = 6;
+    string shares = 7;
+    string assets = 8;
     bytes recipient = 9;
 }
 
@@ -107,10 +107,10 @@ message lendergroup_Deposit {
     uint64 evt_block_time = 3;
     uint64 evt_block_number = 4;
     string evt_address = 5;
-    bytes lender = 6;
-    string amount = 7;
-    string shares_amount = 8;
-    bytes shares_recipient = 9;
+    bytes owner = 6;
+    string assets = 7;
+    string shares = 8;
+     
 }
 
 message lendergroup_LoanRepaid {

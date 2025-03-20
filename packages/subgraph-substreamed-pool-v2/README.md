@@ -14,13 +14,13 @@ https://github.com/streamingfast/substreams-uniswap-v3/blob/develop/src/rpc.rs
 ### recompile from contracts 
 
 
--  how ???
+- how ???
 
 - need to run buf.gen.yaml ? 
 
-1. manually  regen  the /proto folder 
+1. manually  rewrite   the /proto folder 
 
-2. substreams protogen 
+2. substreams protogen   -> build rust code from it 
 
 cargo run --bin rebuild_abi
 

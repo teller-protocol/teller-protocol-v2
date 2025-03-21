@@ -284,7 +284,7 @@ fn map_lendergroup_events(
         })
         .collect());
 
-    events.lendergroup_lender_added_principals.append(&mut blk
+    events.lendergroup_deposits.append(&mut blk
         .receipts()
         .flat_map(|view| {
             view.receipt.logs.iter()
@@ -402,6 +402,11 @@ fn map_lendergroup_events(
                             
                        let lender_group_contract_address = Hex(&log.address).to_string();
 
+
+                         let fetched_rpc_data = rpc::fetch_lender_group_pool_initialization_data_from_rpc(
+                            &lender_group_contract_address
+                             ).unwrap();
+
                         
                         return Some(contract::LendergroupPoolInitialized {
                             evt_tx_hash: Hex(&view.transaction.hash).to_string(),
@@ -421,10 +426,10 @@ fn map_lendergroup_events(
                            // twap_interval: event.twap_interval.to_u64(),
                            // uniswap_pool_fee: event.uniswap_pool_fee.to_u64(),
 
-                           //why are these injected here !? 
-                         //   teller_v2_address: fetched_rpc_data.teller_v2_address.to_fixed_bytes().to_vec(),
+                           //why are these injected here !?  convenience 
+                            teller_v2_address: fetched_rpc_data.teller_v2_address.to_fixed_bytes().to_vec(),
                            
-                         //   smart_commitment_forwarder_address: fetched_rpc_data.smart_commitment_forwarder_address.to_fixed_bytes().to_vec(),
+                            smart_commitment_forwarder_address: fetched_rpc_data.smart_commitment_forwarder_address.to_fixed_bytes().to_vec(),
                         });
                     } 
 
@@ -688,6 +693,9 @@ fn graph_lendergroup_out(
              let fetched_rpc_data = rpc::fetch_lender_group_pool_initialization_data_from_rpc(
                             &lender_group_contract_address
                              ).unwrap();
+
+             let teller_v2_address = fetched_rpc_data.teller_v2_address.clone() ; 
+             let smart_commitment_forwarder_address =  fetched_rpc_data.smart_commitment_forwarder_address.clone() ;
                              
     
        //create group pool metric 
@@ -701,8 +709,14 @@ fn graph_lendergroup_out(
             .set("collateral_token_address",  &evt.collateral_token_address  )
          //   .set("shares_token_address",  &evt.pool_shares_token  )
           //  .set("uniswap_v3_pool_address",  &evt.uniswap_v3_pool_address )
-            .set("teller_v2_address",  &fetched_rpc_data.teller_v2_address  )
-            .set("smart_commitment_forwarder_address",  &fetched_rpc_data.smart_commitment_forwarder_address  )
+      
+      //      .set("teller_v2_address",  Hex::decode( teller_v2_address  ).unwrap()  )
+      //      .set("smart_commitment_forwarder_address",   Hex::decode( smart_commitment_forwarder_address ) .unwrap ()  )
+            
+             .set("teller_v2_address",  &evt.teller_v2_address  )
+            .set("smart_commitment_forwarder_address",  &evt.smart_commitment_forwarder_address  )
+
+
             .set("market_id", BigInt::from_str(&evt.market_id).unwrap() )
            // .set("uniswap_pool_fee", evt.uniswap_pool_fee)
             .set("max_loan_duration", evt.max_loan_duration)

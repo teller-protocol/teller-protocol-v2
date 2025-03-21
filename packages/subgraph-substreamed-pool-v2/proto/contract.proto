@@ -161,6 +161,9 @@ message lendergroup_PoolInitialized {
     uint64 liquidity_threshold_percent = 12;
     uint64 loan_to_value_percent = 13;
 
+    bytes teller_v2_address = 14;
+    bytes smart_commitment_forwarder_address = 15;
+
     
 }
 

@@ -20,7 +20,7 @@ https://github.com/streamingfast/substreams-uniswap-v3/blob/develop/src/rpc.rs
 
 1. manually  rewrite   the /proto folder 
 
-2. substreams protogen   -> build rust code from it 
+2. make  protogen   -> build rust code from it 
 
 cargo run --bin rebuild_abi
 

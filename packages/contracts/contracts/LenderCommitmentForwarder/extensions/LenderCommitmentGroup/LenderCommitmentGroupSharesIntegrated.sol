@@ -35,18 +35,21 @@ abstract contract LenderCommitmentGroupSharesIntegrated is
  
     constructor()   {}
 
+    /*
+        The two tokens MUST implement IERC20Metadata or else this will fail.
 
+    */
     function __Shares_init(
         address principalTokenAddress,
-        address colateralTokenAddress
+        address collateralTokenAddress
     ) internal onlyInitializing {
 
         string memory principalTokenSymbol = IERC20Metadata(principalTokenAddress).symbol();
-        string memory collateralTokenSymbol = IERC20Metadata(colateralTokenAddress).symbol();
+        string memory collateralTokenSymbol = IERC20Metadata(collateralTokenAddress).symbol();
         
         // Create combined name and symbol
         string memory combinedName = string(abi.encodePacked(
-            principalTokenSymbol, "-", collateralTokenSymbol, " Shares"
+            principalTokenSymbol, "-", collateralTokenSymbol, " shares"
         ));
         string memory combinedSymbol = string(abi.encodePacked(
             principalTokenSymbol, "-", collateralTokenSymbol

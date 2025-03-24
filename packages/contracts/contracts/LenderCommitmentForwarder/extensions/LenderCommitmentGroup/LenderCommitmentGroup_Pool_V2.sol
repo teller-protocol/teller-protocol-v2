@@ -278,6 +278,7 @@ contract LenderCommitmentGroup_Pool_V2 is
 
      */
    function initialize(
+
        CommitmentGroupConfig calldata _commitmentGroupConfig,
      
        IUniswapPricingLibrary.PoolRouteConfig[] calldata _poolOracleRoutes 
@@ -286,7 +287,10 @@ contract LenderCommitmentGroup_Pool_V2 is
        
         __Ownable_init();
         __Pausable_init();
-        __Shares_init(); //initialize the integrated shares 
+        __Shares_init(
+            _commitmentGroupConfig.principalTokenAddress,
+            _commitmentGroupConfig.collateralTokenAddress
+        ); //initialize the integrated shares 
 
         principalToken = IERC20(_commitmentGroupConfig.principalTokenAddress);
         collateralToken = IERC20(_commitmentGroupConfig.collateralTokenAddress);

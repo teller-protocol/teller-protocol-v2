@@ -6,6 +6,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol"; 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
   
+import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 
  /*
 
@@ -35,8 +36,25 @@ abstract contract LenderCommitmentGroupSharesIntegrated is
     constructor()   {}
 
 
-    function __Shares_init( ) internal onlyInitializing {
-        __ERC20_init("LenderPoolShares", "LPS");
+    function __Shares_init(
+        address principalTokenAddress,
+        address colateralTokenAddress
+    ) internal onlyInitializing {
+
+        string memory principalTokenSymbol = IERC20Metadata(principalTokenAddress).symbol();
+        string memory collateralTokenSymbol = IERC20Metadata(colateralTokenAddress).symbol();
+        
+        // Create combined name and symbol
+        string memory combinedName = string(abi.encodePacked(
+            principalTokenSymbol, "-", collateralTokenSymbol, " Shares"
+        ));
+        string memory combinedSymbol = string(abi.encodePacked(
+            principalTokenSymbol, "-", collateralTokenSymbol
+        ));
+        
+        // Initialize with the dynamic name and symbol
+        __ERC20_init(combinedName, combinedSymbol);       
+
     }
   
 

@@ -11,7 +11,7 @@ https://github.com/streamingfast/substreams-uniswap-v3/blob/develop/src/rpc.rs
 
 
 
-### recompile from contracts 
+### recompile from contracts  / Adding a new custom output type 
 
 
 - how ???
@@ -30,23 +30,18 @@ make protogen   ???
 ```
 
 
-
-
-### Adding a new custom output type 
-
-> Add it to contract proto ? 
-
+ 
 
 
 
 
 ### Building 
 
-> run proto gen (to output RUST ) 
+> run proto gen (to output RUST from protos ) 
 
 
 ```
-substreams protogen 
+make protogen 
 ```
 
 
@@ -71,9 +66,8 @@ substreams pack ./substreams.yaml
 
 
 5. graph auth   (optional) 
-6. graph deploy   tellerv2-lender-groups-mainnet --version-label 0.4.21.120
+6. graph deploy   tellerv2-lender-groups-v2-polygon --version-label 0.4.21.1
  
- 0.4.21.120 
 
 
 (  use graph deploy --studio    with old version of graph cli ) 
@@ -81,10 +75,10 @@ substreams pack ./substreams.yaml
 
 ### graph names 
 
-tellerv2-lender-groups-polygon  *
-tellerv2-lender-groups-arbitrum *
-tellerv2-lender-groups-base  * 
-tellerv2-lender-groups-mainnet *
+tellerv2-lender-groups-v2-polygon  *
+tellerv2-lender-groups-v2-arbitrum *
+tellerv2-lender-groups-v2-base  * 
+tellerv2-lender-groups-v2-mainnet *
 
 
 

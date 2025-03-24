@@ -1,6 +1,6 @@
 specVersion: v0.1.0
 package:
-  name: lender_group_substream
+  name: tellerv2_substream
   version: v0.1.0
 
 imports:
@@ -12,7 +12,6 @@ imports:
 protobuf:
   files:
     - contract.proto
-    - collateral.proto
   importPaths:
     - ./proto
 

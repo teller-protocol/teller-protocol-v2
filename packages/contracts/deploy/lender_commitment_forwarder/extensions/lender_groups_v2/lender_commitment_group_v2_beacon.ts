@@ -25,7 +25,7 @@ const deployFn: DeployFunction = async (hre) => {
   const tellerV2Address = await tellerV2.getAddress()
 
 
-  const uniswapPricingLibrary = await hre.contracts.get('UniswapPricingLibrary')
+  const uniswapPricingLibraryV2 = await hre.contracts.get('UniswapPricingLibraryV2')
 
  
 
@@ -68,7 +68,7 @@ const deployFn: DeployFunction = async (hre) => {
       ],
       libraries: {
         
-        UniswapPricingLibrary: await uniswapPricingLibrary.getAddress(),
+        uniswapPricingLibraryV2: await uniswapPricingLibraryV2.getAddress(),
       },
       
     }

@@ -33,5 +33,6 @@
   "lender-commitment-forwarder:alpha:upgrade_max_principal": 1736266028,
   "lender-groups:upgrade": 1736266039,
   "validate-deployments": 1736279726,
-  "lender-commitment-forwarder:extensions:flash-rollover-widget:deploy": 1736288990
+  "lender-commitment-forwarder:extensions:flash-rollover-widget:deploy": 1736288990,
+  "lender-commitment-forwarder:extensions:flash-swap-rollover:deploy": 1741031133
 }

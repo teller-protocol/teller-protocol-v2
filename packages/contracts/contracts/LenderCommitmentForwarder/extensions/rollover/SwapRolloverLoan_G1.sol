@@ -328,8 +328,8 @@ contract SwapRolloverLoan_G1 is IUniswapV3FlashCallback, PeripheryPayments  {
        
         uint256 amountOwedToPool = LowGasSafeMath.add(flashSwapArgs.flashAmount, flashFee) ; 
  
-
-        TransferHelper.safeApprove(flashToken, address(this), amountOwedToPool);
+        // what is the point of this ?? 
+        // TransferHelper.safeApprove(flashToken, address(this), amountOwedToPool);
       
         //  msg.sender is the uniswap pool  
         if (amountOwedToPool > 0) pay(flashToken, address(this), msg.sender, amountOwedToPool);

@@ -1,0 +1,157 @@
+{
+  "address": "0x37F483C895C66d3eDb14AE88ea9bA52F937Eb002",
+  "abi": [
+    {
+      "type": "constructor",
+      "stateMutability": "undefined",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "_tellerV2"
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "CommitmentAcceptedWithReward",
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "bidId",
+          "indexed": true
+        },
+        {
+          "type": "address",
+          "name": "recipient",
+          "indexed": true
+        },
+        {
+          "type": "address",
+          "name": "principalTokenAddress",
+          "indexed": false
+        },
+        {
+          "type": "uint256",
+          "name": "fundsRemaining",
+          "indexed": false
+        },
+        {
+          "type": "uint256",
+          "name": "reward",
+          "indexed": false
+        },
+        {
+          "type": "address",
+          "name": "rewardRecipient",
+          "indexed": false
+        },
+        {
+          "type": "uint256",
+          "name": "atmId",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "TELLER_V2",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "acceptCommitmentWithReferral",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "_commitmentForwarder"
+        },
+        {
+          "type": "tuple",
+          "name": "_acceptCommitmentArgs",
+          "components": [
+            {
+              "type": "uint256",
+              "name": "commitmentId"
+            },
+            {
+              "type": "address",
+              "name": "smartCommitmentAddress"
+            },
+            {
+              "type": "uint256",
+              "name": "principalAmount"
+            },
+            {
+              "type": "uint256",
+              "name": "collateralAmount"
+            },
+            {
+              "type": "uint256",
+              "name": "collateralTokenId"
+            },
+            {
+              "type": "address",
+              "name": "collateralTokenAddress"
+            },
+            {
+              "type": "uint16",
+              "name": "interestRate"
+            },
+            {
+              "type": "uint32",
+              "name": "loanDuration"
+            },
+            {
+              "type": "bytes32[]",
+              "name": "merkleProof"
+            }
+          ]
+        },
+        {
+          "type": "uint256",
+          "name": "_atmId"
+        },
+        {
+          "type": "address",
+          "name": "_recipient"
+        },
+        {
+          "type": "uint256",
+          "name": "_reward"
+        },
+        {
+          "type": "address",
+          "name": "_rewardRecipient"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": "bidId_"
+        }
+      ]
+    }
+  ],
+  "transactionHash": "0xbbdec7f18fc607bd332f03a843e732c1cfeb3933e378e8d8c8eb1e600ded6b3e",
+  "receipt": {
+    "to": null,
+    "from": "0xD9B023522CeCe02251d877bb0EB4f06fDe6F98E6",
+    "blockHash": "0xd29374c2757da2c4c14c0ada1d2f4c790969290cf24c4b0d77c3c216ab97d49e",
+    "blockNumber": 27120620
+  },
+  "numDeployments": 1,
+  "implementation": "0xB8Ab54664ed8F9f298778E8aEAA748A5818cb8C8"
+}

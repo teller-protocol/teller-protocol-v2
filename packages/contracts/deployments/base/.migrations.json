@@ -30,5 +30,7 @@
   "protocol-pausing-manager:deploy": 1736438247,
   "hypernative-oracle-mock:deploy": 1736438252,
   "lender-groups:upgrade": 1736438327,
-  "validate-deployments": 1736441311
+  "validate-deployments": 1736441311,
+  "lender-commitment-forwarder:extensions:flash-swap-rollover:deploy": 1741030578,
+  "lender-commitment-forwarder:extensions:loan-referral-forwarder-v2:deploy": 1741030588
 }

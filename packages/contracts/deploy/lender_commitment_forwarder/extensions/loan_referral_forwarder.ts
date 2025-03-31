@@ -46,6 +46,7 @@ deployFn.dependencies = [
 ]
 
 deployFn.skip = async (hre) => {
-  return !hre.network.live || !networksWithUniswap.includes(hre.network.name)
+  return true ; 
+  //return !hre.network.live || !networksWithUniswap.includes(hre.network.name)
 }
 export default deployFn

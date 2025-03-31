@@ -54,7 +54,7 @@ import { ILenderCommitmentGroup } from "../../../interfaces/ILenderCommitmentGro
 import { Payment } from "../../../TellerV2Storage.sol";
 
 import {IUniswapPricingLibrary} from "../../../interfaces/IUniswapPricingLibrary.sol";
-import {UniswapPricingLibrary} from "../../../libraries/UniswapPricingLibrary.sol";
+import {UniswapPricingLibraryV2} from "../../../libraries/UniswapPricingLibraryV2.sol";
 
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
@@ -884,7 +884,7 @@ contract LenderCommitmentGroup_Smart is
         uint256 principalAmount 
     ) public view virtual returns (uint256 collateralTokensAmountToMatchValue) {
    
-        uint256 pairPriceWithTwapFromOracle = UniswapPricingLibrary
+        uint256 pairPriceWithTwapFromOracle = UniswapPricingLibraryV2
             .getUniswapPriceRatioForPoolRoutes(poolOracleRoutes);
        
        
@@ -908,7 +908,7 @@ contract LenderCommitmentGroup_Smart is
        IUniswapPricingLibrary.PoolRouteConfig[] memory poolOracleRoutes
     ) external view virtual returns (uint256 ) {
    
-        uint256 pairPriceWithTwapFromOracle = UniswapPricingLibrary
+        uint256 pairPriceWithTwapFromOracle = UniswapPricingLibraryV2
             .getUniswapPriceRatioForPoolRoutes(poolOracleRoutes);
        
 
@@ -919,7 +919,7 @@ contract LenderCommitmentGroup_Smart is
         IUniswapPricingLibrary.PoolRouteConfig[] memory poolOracleRoutes
     ) external view virtual returns (uint256 ) {
    
-        uint256 pairPriceWithTwapFromOracle = UniswapPricingLibrary
+        uint256 pairPriceWithTwapFromOracle = UniswapPricingLibraryV2
             .getUniswapPriceRatioForPoolRoutes(poolOracleRoutes);
        
        

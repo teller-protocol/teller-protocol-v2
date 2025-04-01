@@ -56,7 +56,7 @@ contract BorrowSwap_G1 is PeripheryPayments, IUniswapV3SwapCallback  {
 
     /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
     ITellerV2 public immutable TELLER_V2;
-  
+    ISwapRouter public immutable UNISWAP_SWAP_ROUTER; 
      
 
     event BorrowSwapComplete(
@@ -69,6 +69,30 @@ contract BorrowSwap_G1 is PeripheryPayments, IUniswapV3SwapCallback  {
         int256 amount1 
  
     );
+
+
+
+/*
+    struct SwapRouteConfig {  // use this as an array 
+      //  address pool;
+        bool zeroForOne;   //need this ? 
+       // uint32 twapInterval;
+
+        address token0;
+        address token1;
+
+        uint24 fee;
+        uint160 sqrtPriceLimitX96; 
+
+
+        uint256 token0Decimals;
+        uint256 token1Decimals;
+    } 
+
+*/
+
+
+
 
      
     // we take out a new loan with these args 
@@ -91,7 +115,7 @@ contract BorrowSwap_G1 is PeripheryPayments, IUniswapV3SwapCallback  {
         uint24 fee;
         uint160 sqrtPriceLimitX96;  // optional, protects again sandwich atk
 
-
+         bool zeroForOne;
        // uint256 flashAmount;
       //  bool borrowToken1; // if false, borrow token 0 
        
@@ -122,10 +146,11 @@ contract BorrowSwap_G1 is PeripheryPayments, IUniswapV3SwapCallback  {
     constructor(
         address _tellerV2, 
         address _factory,
+        address _swapRouter,
         address _WETH9
     ) PeripheryImmutableState(_factory, _WETH9)  {
         TELLER_V2 = ITellerV2(_tellerV2);
-     
+        UNISWAP_SWAP_ROUTER = ISwapRouter( _swapRouter );
     }
  
  
@@ -139,7 +164,7 @@ contract BorrowSwap_G1 is PeripheryPayments, IUniswapV3SwapCallback  {
         address _principalToken ,
         uint256 _additionalInputAmount, //an additional amount  
        
-        SwapArgs calldata _swapArgs, 
+        SwapArgs[] calldata _swapArgs, 
 
         AcceptCommitmentArgs calldata _acceptCommitmentArgs
 
@@ -165,34 +190,63 @@ contract BorrowSwap_G1 is PeripheryPayments, IUniswapV3SwapCallback  {
         );
 
 
-        bool zeroForOne = _swapArgs.token0 == _principalToken ;
+       // bool zeroForOne = _swapArgs.zeroForOne;
 
 
       
         // swap principal For Collateral   
         // do a single sided swap using uniswap - swap the principal we just got for collateral 
 
-        ( int256 amount0, int256 amount1 ) = IUniswapV3Pool( 
-            getUniswapPoolAddress (
-                _swapArgs.token0,
-                _swapArgs.token1,
-                _swapArgs.fee
-            )
-        ).swap(  
-            address(this),   
-            zeroForOne,
+         require(_swapArgs.length == 1 || _swapArgs.length == 2, "Invalid swap args length");
 
-            int256( _additionalInputAmount + acceptCommitmentAmount ) ,
-            _swapArgs.sqrtPriceLimitX96, 
-           abi.encode(
-                SwapCallbackData({
-                    token0: _swapArgs.token0,
-                    token1: _swapArgs.token1,
-                    fee: _swapArgs.fee
-                })
-            )  
 
-        );  
+        
+        // Perform swaps
+        for (uint256 i = 0; i < _swapArgs.length; i++) {
+            SwapArgs memory swapArg = _swapArgs[i];
+            
+          /*  address pool = getUniswapPoolAddress(
+                swapArg.token0,
+                swapArg.token1,
+                swapArg.fee
+            );
+            
+            (int256 _amount0, int256 _amount1) = IUniswapV3Pool(pool).swap(
+                address(this),
+                swapArg.zeroForOne,
+                int256(_additionalInputAmount + acceptCommitmentAmount),
+                swapArg.sqrtPriceLimitX96,
+                abi.encode(
+                    SwapCallbackData({
+                        token0: swapArg.token0,
+                        token1: swapArg.token1,
+                        fee: swapArg.fee
+                    })
+                )
+            );*/
+
+          ISwapRouter.ExactInputSingleParams memory params =
+            ISwapRouter.ExactInputSingleParams({
+                tokenIn: DAI,
+                tokenOut: WETH9,
+                fee: poolFee,
+                recipient: msg.sender,
+                deadline: block.timestamp,
+                amountIn: amountIn,
+                amountOutMinimum: 0,
+                sqrtPriceLimitX96: 0
+            });
+
+
+
+
+            uint256 amountOut = UNISWAP_SWAP_ROUTER.exactInputSingle(params);
+
+            
+            
+        }
+
+ 
 
 
 

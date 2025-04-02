@@ -44,7 +44,7 @@ import '../../../libraries/uniswap/core/interfaces/callback/IUniswapV3SwapCallba
  */
 
 
-contract BorrowSwap_G2 is PeripheryPayments  {
+contract BorrowSwap_G2    {
     using AddressUpgradeable for address;
     using NumbersLib for uint256;
 
@@ -62,16 +62,11 @@ contract BorrowSwap_G2 is PeripheryPayments  {
     event BorrowSwapComplete(
         address borrower,
         uint256 loanId,
-
-        address token0  
- 
+        address token0   
     );
 
 
  
-
-
-     
     // we take out a new loan with these args 
     struct AcceptCommitmentArgs {
         uint256 commitmentId;
@@ -87,10 +82,8 @@ contract BorrowSwap_G2 is PeripheryPayments  {
 
     struct SwapArgs {
 
-        bytes path; 
-        
-        uint160 amountOutMinimum;   
- 
+        bytes path;         
+        uint160 amountOutMinimum;    
         uint160 deadline;     
 
     } 
@@ -104,10 +97,9 @@ contract BorrowSwap_G2 is PeripheryPayments  {
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor(
         address _tellerV2, 
-        address _factory,
-        address _swapRouter,
-        address _WETH9
-    ) PeripheryImmutableState(_factory, _WETH9)  {
+      
+        address _swapRouter 
+    )  {
         TELLER_V2 = ITellerV2(_tellerV2);
         UNISWAP_SWAP_ROUTER = ISwapRouter( _swapRouter );
     }
@@ -253,7 +245,7 @@ function _extractFirstToken(bytes calldata path) internal pure returns (address 
     }*/
    
  
-
+/*
     function getUniswapPoolAddress(  
         address token0,
         address token1,
@@ -263,7 +255,7 @@ function _extractFirstToken(bytes calldata path) internal pure returns (address 
         return IUniswapV3Factory(factory).getPool(token0,token1,fee);
 
     }
-
+*/
 
     
     /**

@@ -181,19 +181,15 @@ contract BorrowSwap_G2 is PeripheryPayments, IUniswapV3SwapCallback  {
             _acceptCommitmentArgs
         );
 
+    
 
-       // bool zeroForOne = _swapArgs.zeroForOne;
 
 
+    // Verify first token in path matches principal token
+    address firstToken = _extractFirstToken(_swapArgs.path);
+    require(firstToken == _principalToken, "Path token mismatch");
+    
       
-        // swap principal For Collateral   
-        // do a single sided swap using uniswap - swap the principal we just got for collateral 
-
-        
-
-
-
-
 
          
 
@@ -234,6 +230,25 @@ contract BorrowSwap_G2 is PeripheryPayments, IUniswapV3SwapCallback  {
 
         
     }
+
+
+
+
+/**
+ * @notice Extracts the first token address from a Uniswap V3 path
+ * @param path The encoded swap path
+ * @return token The address of the first token in the path
+ */
+function _extractFirstToken(bytes calldata path) internal pure returns (address token) {
+    require(path.length >= 20, "Path too short");
+    
+    // Extract first token from the path (first 20 bytes)
+    assembly {
+        token := shr(96, calldataload(path.offset))
+    }
+    
+    return token;
+}
 
 
 /*
@@ -430,64 +445,25 @@ contract BorrowSwap_G2 is PeripheryPayments, IUniswapV3SwapCallback  {
             fundsBeforeAcceptCommitment;
     }
 
-       
-    /**
-     * @notice Calculates an appropriate sqrtPriceLimitX96 value for a swap based on current pool price
-     * @dev Returns a price limit that is a certain percentage away from the current price
-     * @param token0 The first token in the pair
-     * @param token1 The second token in the pair
-     * @param fee The fee tier of the pool
-     * @param zeroForOne The direction of the swap (true = token0 to token1, false = token1 to token0)
-     * @param bufferBps Buffer in basis points (1/10000) away from current price (e.g. 50 = 0.5%)
-     * @return sqrtPriceLimitX96 The calculated price limit
-     */
-    function calculateSqrtPriceLimitX96(
-        address token0,
-        address token1,
-        uint24 fee,
-        bool zeroForOne,
-        uint16 bufferBps
-    ) public view returns (uint160 sqrtPriceLimitX96) {
-        // Constants from Uniswap
-        uint160 MIN_SQRT_RATIO = 4295128739;
-        uint160 MAX_SQRT_RATIO = 1461446703485210103287273052203988822378723970342;
-        
-        // Get the pool address
-        address poolAddress = getUniswapPoolAddress(token0, token1, fee);
-        require(poolAddress != address(0), "Pool does not exist");
-        
-        // Get the current price from the pool
-        (uint160 currentSqrtRatioX96,,,,,,) = IUniswapV3Pool(poolAddress).slot0();
-        
-        // Calculate price limit based on direction and buffer
-        if (zeroForOne) {
-            // When swapping from token0 to token1, price decreases
-            // So we set a lower bound that's bufferBps% below current price
-            
-            // Calculate the buffer amount (currentPrice * bufferBps / 10000)
-            uint160 buffer = uint160((uint256(currentSqrtRatioX96) * bufferBps) / 10000);
-            
-            // Subtract buffer from current price, but ensure we don't go below MIN_SQRT_RATIO
-            if (currentSqrtRatioX96 <= MIN_SQRT_RATIO + buffer) {
-                return MIN_SQRT_RATIO + 1;
-            } else {
-                return currentSqrtRatioX96 - buffer;
-            }
-        } else {
-            // When swapping from token1 to token0, price increases
-            // So we set an upper bound that's bufferBps% above current price
-            
-            // Calculate the buffer amount (currentPrice * bufferBps / 10000)
-            uint160 buffer = uint160((uint256(currentSqrtRatioX96) * bufferBps) / 10000);
-            
-            // Add buffer to current price, but ensure we don't go above MAX_SQRT_RATIO
-            if (MAX_SQRT_RATIO - buffer <= currentSqrtRatioX96) {
-                return MAX_SQRT_RATIO - 1;
-            } else {
-                return currentSqrtRatioX96 + buffer;
-            }
-        }
-    }
+      
+
+
+
+
+   /*
+
+    
+    use Uniswap IQuoter 
+
+              function quoteExactInput(
+                bytes path,
+                uint256 amountIn
+              ) external returns (uint256 amountOut)
+
+
+    
+   */
+
 
 
      function getMarketIdForCommitment(

@@ -116,7 +116,6 @@ contract BorrowSwap_G2    {
         uint256 _additionalInputAmount, //an additional amount  
        
         SwapArgs  calldata _swapArgs, 
-
         AcceptCommitmentArgs calldata _acceptCommitmentArgs
 
     ) external   {
@@ -140,16 +139,16 @@ contract BorrowSwap_G2    {
             _acceptCommitmentArgs
         );
 
-    
+        
 
-     uint256 totalInputAmount = acceptCommitmentAmount + _additionalInputAmount ;
+         uint256 totalInputAmount = acceptCommitmentAmount + _additionalInputAmount ;
 
 
 
-    // Verify first token in path matches principal token
-    address firstToken = _extractFirstToken(_swapArgs.path);
-    require(firstToken == _principalToken, "Path token mismatch");
-    
+        // Verify first token in path matches principal token
+        address firstToken = _extractFirstToken(_swapArgs.path);
+        require(firstToken == _principalToken, "Path token mismatch");
+        
       
 
          
@@ -169,22 +168,18 @@ contract BorrowSwap_G2    {
                 amountOutMinimum:  _swapArgs.amountOutMinimum    //can be 0 for testing -- get from IQuoter 
             });
 
-        // Executes the swap.
+            // Executes the swap.
         uint256 swapAmountOut = UNISWAP_SWAP_ROUTER.exactInput( swapParams );
 
+ 
 
-
-
-
-
-
-            emit BorrowSwapComplete(
-                borrower, 
-                newLoanId,
-                
-                _principalToken 
-                 // swapAmountOut  , 
-            );
+        emit BorrowSwapComplete(
+            borrower, 
+            newLoanId,
+            
+            _principalToken 
+             // swapAmountOut  , 
+        );
 
    
      

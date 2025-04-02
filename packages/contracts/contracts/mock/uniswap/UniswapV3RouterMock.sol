@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-contract MockSwapRouter {
+contract UniswapV3RouterMock {
     event SwapExecuted(address tokenIn, address tokenOut, uint256 amountIn, uint256 amountOut);
 
     function exactInputSingle(

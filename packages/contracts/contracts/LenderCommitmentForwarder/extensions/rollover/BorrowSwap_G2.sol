@@ -44,7 +44,7 @@ import '../../../libraries/uniswap/core/interfaces/callback/IUniswapV3SwapCallba
  */
 
 
-contract BorrowSwap_G2 is PeripheryPayments, IUniswapV3SwapCallback  {
+contract BorrowSwap_G2 is PeripheryPayments  {
     using AddressUpgradeable for address;
     using NumbersLib for uint256;
 
@@ -68,27 +68,7 @@ contract BorrowSwap_G2 is PeripheryPayments, IUniswapV3SwapCallback  {
     );
 
 
-
-/*
-    struct SwapRouteConfig {  // use this as an array 
-      //  address pool;
-        bool zeroForOne;   //need this ? 
-       // uint32 twapInterval;
-
-        address token0;
-        address token1;
-
-        uint24 fee;
-        uint160 sqrtPriceLimitX96; 
-
-
-        uint256 token0Decimals;
-        uint256 token1Decimals;
-    } 
-
-*/
-
-
+ 
 
 
      
@@ -105,31 +85,18 @@ contract BorrowSwap_G2 is PeripheryPayments, IUniswapV3SwapCallback  {
         bytes32[] merkleProof; //empty array if not used
     }
 
-    struct  SwapArgs {
+    struct SwapArgs {
 
-          bytes  path; 
+        bytes path; 
         
         uint160 amountOutMinimum;   
  
-          uint160 deadline;     
+        uint160 deadline;     
 
     } 
-
-      // 2. Add a struct for the callback data
-    struct SwapCallbackData {
-        address token0;
-        address token1;
-        uint24 fee;
-    }
-
-
+ 
 
     /**
-     *
-     * @notice Initializes the FlashRolloverLoan with necessary contract addresses.
-     *
-     * @dev Using a custom OpenZeppelin upgrades tag. Ensure the constructor logic is safe for upgrades.
-     *
      * @param _tellerV2 The address of the TellerV2 contract.
      * @param _factory The address of the UniswapV3 Factory contract to help with callback validation.
      * @param _WETH9 The address of the WETH Contract as this is instrumental to core uniswap logic.
@@ -252,43 +219,10 @@ function _extractFirstToken(bytes calldata path) internal pure returns (address 
     return token;
 }
 
+ 
 
-/*
-  function swapExactInputMultihop(uint256 amountIn) external returns (uint256 amountOut) {
-        // Transfer `amountIn` of DAI to this contract.
-        TransferHelper.safeTransferFrom(DAI, msg.sender, address(this), amountIn);
-
-        // Approve the router to spend DAI.
-        TransferHelper.safeApprove(DAI, address(swapRouter), amountIn);
-
-        // Multiple pool swaps are encoded through bytes called a `path`. A path is a sequence of token addresses and poolFees that define the pools used in the swaps.
-        // The format for pool encoding is (tokenIn, fee, tokenOut/tokenIn, fee, tokenOut) where tokenIn/tokenOut parameter is the shared token across the pools.
-        // Since we are swapping DAI to USDC and then USDC to WETH9 the path encoding is (DAI, 0.3%, USDC, 0.3%, WETH9).
-        ISwapRouter.ExactInputParams memory params =
-            ISwapRouter.ExactInputParams({
-                path: abi.encodePacked(DAI, poolFee, USDC, poolFee, WETH9),
-                recipient: msg.sender,
-                deadline: block.timestamp,
-                amountIn: amountIn,
-                amountOutMinimum: 0
-            });
-
-        // Executes the swap.
-        amountOut = swapRouter.exactInput(params);
-    }
-*/
-
-
-
-
-    /**
-     * @notice Uniswap V3 callback for flash swaps
-     * @dev The pool calls this function after executing a swap
-     * @param amount0Delta The change in token0 balance that occurred during the swap
-     * @param amount1Delta The change in token1 balance that occurred during the swap
-     * @param data Extra data passed to the pool during the swap call
-     */
-    function uniswapV3SwapCallback(
+ 
+  /*  function uniswapV3SwapCallback(
         int256 amount0Delta,
         int256 amount1Delta,
         bytes calldata data
@@ -316,7 +250,7 @@ function _extractFirstToken(bytes calldata path) internal pure returns (address 
 
 
  
-    }
+    }*/
    
  
 

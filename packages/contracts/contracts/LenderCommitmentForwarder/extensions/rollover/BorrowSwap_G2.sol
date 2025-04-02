@@ -44,7 +44,7 @@ import '../../../libraries/uniswap/core/interfaces/callback/IUniswapV3SwapCallba
  */
 
 
-contract BorrowSwap_G1 is PeripheryPayments, IUniswapV3SwapCallback  {
+contract BorrowSwap_G2 is PeripheryPayments, IUniswapV3SwapCallback  {
     using AddressUpgradeable for address;
     using NumbersLib for uint256;
 
@@ -63,10 +63,7 @@ contract BorrowSwap_G1 is PeripheryPayments, IUniswapV3SwapCallback  {
         address borrower,
         uint256 loanId,
 
-        address token0,
-        address token1,
-        int256 amount0,
-        int256 amount1 
+        address token0  
  
     );
 
@@ -110,16 +107,11 @@ contract BorrowSwap_G1 is PeripheryPayments, IUniswapV3SwapCallback  {
 
     struct  SwapArgs {
 
-        address token0;
-        address token1;
-        uint24 fee;
-        uint160 sqrtPriceLimitX96;  // optional, protects again sandwich atk
-
-         bool zeroForOne;
-       // uint256 flashAmount;
-      //  bool borrowToken1; // if false, borrow token 0 
-       
+          bytes  path; 
         
+        uint160 amountOutMinimum;   
+ 
+          uint160 deadline;     
 
     } 
 
@@ -164,7 +156,7 @@ contract BorrowSwap_G1 is PeripheryPayments, IUniswapV3SwapCallback  {
         address _principalToken ,
         uint256 _additionalInputAmount, //an additional amount  
        
-        SwapArgs[] calldata _swapArgs, 
+        SwapArgs  calldata _swapArgs, 
 
         AcceptCommitmentArgs calldata _acceptCommitmentArgs
 
@@ -197,78 +189,44 @@ contract BorrowSwap_G1 is PeripheryPayments, IUniswapV3SwapCallback  {
         // swap principal For Collateral   
         // do a single sided swap using uniswap - swap the principal we just got for collateral 
 
-         require(_swapArgs.length == 1 || _swapArgs.length == 2, "Invalid swap args length");
-
-
         
-        // Perform swaps
-        for (uint256 i = 0; i < _swapArgs.length; i++) {
-            SwapArgs memory swapArg = _swapArgs[i];
-            
-          /*  address pool = getUniswapPoolAddress(
-                swapArg.token0,
-                swapArg.token1,
-                swapArg.fee
-            );
-            
-            (int256 _amount0, int256 _amount1) = IUniswapV3Pool(pool).swap(
-                address(this),
-                swapArg.zeroForOne,
-                int256(_additionalInputAmount + acceptCommitmentAmount),
-                swapArg.sqrtPriceLimitX96,
-                abi.encode(
-                    SwapCallbackData({
-                        token0: swapArg.token0,
-                        token1: swapArg.token1,
-                        fee: swapArg.fee
-                    })
-                )
-            );*/
 
-          ISwapRouter.ExactInputSingleParams memory params =
-            ISwapRouter.ExactInputSingleParams({
-                tokenIn: DAI,
-                tokenOut: WETH9,
-                fee: poolFee,
-                recipient: msg.sender,
-                deadline: block.timestamp,
-                amountIn: amountIn,
-                amountOutMinimum: 0,
-                sqrtPriceLimitX96: 0
+
+
+
+
+         
+
+        // Approve the router to spend DAI.
+        TransferHelper.safeApprove( _principalToken , address(UNISWAP_SWAP_ROUTER), acceptCommitmentAmount);
+
+        // Multiple pool swaps are encoded through bytes called a `path`. A path is a sequence of token addresses and poolFees that define the pools used in the swaps.
+        // The format for pool encoding is (tokenIn, fee, tokenOut/tokenIn, fee, tokenOut) where tokenIn/tokenOut parameter is the shared token across the pools.
+        // Since we are swapping DAI to USDC and then USDC to WETH9 the path encoding is (DAI, 0.3%, USDC, 0.3%, WETH9).
+        ISwapRouter.ExactInputParams memory swapParams =
+            ISwapRouter.ExactInputParams({
+                path:  _swapArgs.path ,//path: abi.encodePacked(DAI, poolFee, USDC, poolFee, WETH9),
+                recipient: address(  borrower  ) ,
+                deadline: _swapArgs.deadline,
+                amountIn:  acceptCommitmentAmount ,
+                amountOutMinimum:  _swapArgs.amountOutMinimum    //can be 0 for testing 
             });
 
+        // Executes the swap.
+        uint256 swapAmountOut = UNISWAP_SWAP_ROUTER.exactInput( swapParams );
 
 
 
-            uint256 amountOut = UNISWAP_SWAP_ROUTER.exactInputSingle(params);
-
-            
-            
-        }
-
- 
 
 
 
-        // Transfer tokens to the borrower if amounts are negative
-        // In Uniswap, negative amounts mean the pool sends those tokens to the specified recipient
-        if (amount0 < 0) {
-            // Use uint256(-amount0) to get the absolute value
-            TransferHelper.safeTransfer(_swapArgs.token0, borrower, uint256(-amount0));
-        }
-        if (amount1 < 0) {
-            // Use uint256(-amount1) to get the absolute value
-            TransferHelper.safeTransfer(_swapArgs.token1, borrower, uint256(-amount1));
-        }
 
             emit BorrowSwapComplete(
                 borrower, 
                 newLoanId,
                 
-                _swapArgs.token0,
-                _swapArgs.token1,
-                  amount0  ,
-                  amount1  
+                _principalToken 
+                 // swapAmountOut  , 
             );
 
    
@@ -276,6 +234,33 @@ contract BorrowSwap_G1 is PeripheryPayments, IUniswapV3SwapCallback  {
 
         
     }
+
+
+/*
+  function swapExactInputMultihop(uint256 amountIn) external returns (uint256 amountOut) {
+        // Transfer `amountIn` of DAI to this contract.
+        TransferHelper.safeTransferFrom(DAI, msg.sender, address(this), amountIn);
+
+        // Approve the router to spend DAI.
+        TransferHelper.safeApprove(DAI, address(swapRouter), amountIn);
+
+        // Multiple pool swaps are encoded through bytes called a `path`. A path is a sequence of token addresses and poolFees that define the pools used in the swaps.
+        // The format for pool encoding is (tokenIn, fee, tokenOut/tokenIn, fee, tokenOut) where tokenIn/tokenOut parameter is the shared token across the pools.
+        // Since we are swapping DAI to USDC and then USDC to WETH9 the path encoding is (DAI, 0.3%, USDC, 0.3%, WETH9).
+        ISwapRouter.ExactInputParams memory params =
+            ISwapRouter.ExactInputParams({
+                path: abi.encodePacked(DAI, poolFee, USDC, poolFee, WETH9),
+                recipient: msg.sender,
+                deadline: block.timestamp,
+                amountIn: amountIn,
+                amountOutMinimum: 0
+            });
+
+        // Executes the swap.
+        amountOut = swapRouter.exactInput(params);
+    }
+*/
+
 
 
 

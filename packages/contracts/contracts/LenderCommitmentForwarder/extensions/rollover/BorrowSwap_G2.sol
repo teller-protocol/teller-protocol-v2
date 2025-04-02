@@ -183,6 +183,8 @@ contract BorrowSwap_G2 is PeripheryPayments, IUniswapV3SwapCallback  {
 
     
 
+     uint256 totalInputAmount = acceptCommitmentAmount + _additionalInputAmount ;
+
 
 
     // Verify first token in path matches principal token
@@ -194,7 +196,7 @@ contract BorrowSwap_G2 is PeripheryPayments, IUniswapV3SwapCallback  {
          
 
         // Approve the router to spend DAI.
-        TransferHelper.safeApprove( _principalToken , address(UNISWAP_SWAP_ROUTER), acceptCommitmentAmount);
+        TransferHelper.safeApprove( _principalToken , address(UNISWAP_SWAP_ROUTER),  totalInputAmount);
 
         // Multiple pool swaps are encoded through bytes called a `path`. A path is a sequence of token addresses and poolFees that define the pools used in the swaps.
         // The format for pool encoding is (tokenIn, fee, tokenOut/tokenIn, fee, tokenOut) where tokenIn/tokenOut parameter is the shared token across the pools.
@@ -204,8 +206,8 @@ contract BorrowSwap_G2 is PeripheryPayments, IUniswapV3SwapCallback  {
                 path:  _swapArgs.path ,//path: abi.encodePacked(DAI, poolFee, USDC, poolFee, WETH9),
                 recipient: address(  borrower  ) ,
                 deadline: _swapArgs.deadline,
-                amountIn:  acceptCommitmentAmount ,
-                amountOutMinimum:  _swapArgs.amountOutMinimum    //can be 0 for testing 
+                amountIn:  totalInputAmount ,
+                amountOutMinimum:  _swapArgs.amountOutMinimum    //can be 0 for testing -- get from IQuoter 
             });
 
         // Executes the swap.

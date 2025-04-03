@@ -35,5 +35,6 @@
   "hypernative-oracle-mock:deploy": 1736787881,
   "lender-groups:upgrade": 1736788617,
   "validate-deployments": 1736794521,
-  "lender-commitment-forwarder:extensions:flash-swap-rollover:deploy": 1741031281
+  "lender-commitment-forwarder:extensions:flash-swap-rollover:deploy": 1741031281,
+  "lender-commitment-forwarder:v2:deploy": 1743709093
 }

@@ -7,6 +7,12 @@ const deployFn: DeployFunction = async (hre) => {
   })
 }
 
+
+
+
+  hre.log('Deploying uniswapPricingLibraryV2...')
+
+
 // tags and deployment
 deployFn.id = 'teller-v2:uniswap-pricing-library-v2'
 deployFn.tags = ['teller-v2', 'teller-v2:uniswap-pricing-library-v2']

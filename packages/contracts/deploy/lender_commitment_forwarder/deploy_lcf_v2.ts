@@ -33,7 +33,7 @@ const deployFn: DeployFunction = async (hre) => {
   const lenderCommitmentForwarderAlpha = await hre.deployProxy(
     'LenderCommitmentForwarderV2',
     {
-      unsafeAllow: ['constructor', 'state-variable-immutable'],
+      unsafeAllow: ['constructor', 'state-variable-immutable','external-library-linking'],
       constructorArgs: [
         await tellerV2.getAddress(),
         await marketRegistry.getAddress(),
@@ -50,11 +50,11 @@ const deployFn: DeployFunction = async (hre) => {
 }
 
 // tags and deployment
-deployFn.id = 'lender-commitment-forwarder:alpha:deploy'
+deployFn.id = 'lender-commitment-forwarder:v2:deploy'
 deployFn.tags = [
   'lender-commitment-forwarder',
-  'lender-commitment-forwarder:alpha',
-  'lender-commitment-forwarder:alpha:deploy',
+  'lender-commitment-forwarder:v2',
+  'lender-commitment-forwarder:v2:deploy',
 ]
 deployFn.dependencies = ['teller-v2:deploy', 'market-registry:deploy','teller-v2:uniswap-pricing-library-v2']
 export default deployFn

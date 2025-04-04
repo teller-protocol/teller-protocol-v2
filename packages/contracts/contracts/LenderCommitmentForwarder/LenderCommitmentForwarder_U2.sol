@@ -669,6 +669,13 @@ contract LenderCommitmentForwarder_U2 is
             return 0;
         }
 
+
+        //if we would divide by zero, return infinite 
+        if (_maxPrincipalPerCollateralAmount == 0 ){
+            return type(uint256).max;
+        }
+
+
         if (_collateralTokenType == CommitmentCollateralType.ERC20) {
              return
             MathUpgradeable.mulDiv(

@@ -3,7 +3,7 @@ pragma solidity >=0.8.0 <0.9.0;
 
  
 
-import {IUniswapPricingLibrary} from "../interfaces/IUniswapPricingLibrary.sol";
+import {IUniswapPricingLibraryV2} from "../interfaces/IUniswapPricingLibraryV2.sol";
 
 import "@openzeppelin/contracts/utils/math/Math.sol";
 
@@ -40,7 +40,7 @@ library UniswapPricingLibraryV2
 
   
     function getUniswapPriceRatioForPoolRoutes(
-        IUniswapPricingLibrary.PoolRouteConfig[] memory poolRoutes
+        IUniswapPricingLibraryV2.PoolRouteConfig[] memory poolRoutes
     ) public view returns (uint256 priceRatio) {
         require(poolRoutes.length <= 2, "invalid pool routes length");
 
@@ -70,7 +70,7 @@ library UniswapPricingLibraryV2
         The resultant product is expanded by STANDARD_EXPANSION_FACTOR one time 
     */
     function getUniswapPriceRatioForPool(
-        IUniswapPricingLibrary.PoolRouteConfig memory _poolRouteConfig
+        IUniswapPricingLibraryV2.PoolRouteConfig memory _poolRouteConfig
     ) public view returns (uint256 priceRatio) {
 
         
@@ -86,6 +86,29 @@ library UniswapPricingLibraryV2
 
          //this output will be expanded by 1e18 
         return getQuoteFromSqrtRatioX96( sqrtPriceX96 , uint128( STANDARD_EXPANSION_FACTOR ), invert) ;
+
+
+        
+    }
+
+
+     function getUniswapPriceRatioForPool(
+        IUniswapPricingLibraryV2.PoolRouteConfig memory _poolRouteConfig,
+        uint128 expansion_factor 
+    ) public view returns (uint256 priceRatio) { 
+        
+
+           // this is expanded by 2**96 or   1e28 
+        uint160 sqrtPriceX96 = getSqrtTwapX96(
+            _poolRouteConfig.pool,
+            _poolRouteConfig.twapInterval
+        );
+
+
+        bool invert =  ! _poolRouteConfig.zeroForOne; 
+
+         //this output will be expanded by expansion_factor
+        return getQuoteFromSqrtRatioX96( sqrtPriceX96 ,  expansion_factor  , invert) ;
 
 
         
@@ -154,14 +177,5 @@ library UniswapPricingLibraryV2
         }
     }
 
-    function getPriceX96FromSqrtPriceX96(uint160 sqrtPriceX96)
-        internal
-        pure
-        returns (uint256 priceX96)
-    {   
-
-        
-        return FullMath.mulDiv(sqrtPriceX96, sqrtPriceX96, FixedPoint96.Q96);
-    }
-
+ 
 }

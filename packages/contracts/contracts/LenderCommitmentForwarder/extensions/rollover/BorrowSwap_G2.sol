@@ -41,6 +41,18 @@ import '../../../libraries/uniswap/core/interfaces/callback/IUniswapV3SwapCallba
     1. add multihop support 
     2. add a helper fn to calculate:  how much out per how much in 
 
+
+
+
+    To estimate minAmountOut, use  
+
+        Uniswap IQuoter .quoteExactInput ( bytes path, amountIn ) 
+                  function quoteExactInput(
+                            bytes path,
+                            uint256 amountIn
+                          ) external returns (uint256 amountOut)
+
+
  */
 
 
@@ -62,7 +74,11 @@ contract BorrowSwap_G2    {
     event BorrowSwapComplete(
         address borrower,
         uint256 loanId,
-        address token0   
+        address token0 ,
+
+        uint256 amountIn,
+        uint256 amountOut  
+
     );
 
 
@@ -82,7 +98,8 @@ contract BorrowSwap_G2    {
 
     struct SwapArgs {
 
-        bytes path;         
+        TokenSwapPath[] swapPaths ; //used to build the bytes path 
+        
         uint160 amountOutMinimum;    
         uint160 deadline;     
 
@@ -120,38 +137,26 @@ contract BorrowSwap_G2    {
 
     ) external   {
         
-       address borrower = msg.sender ;
-
-
-       
+        address borrower = msg.sender ;
+ 
     
         if (_additionalInputAmount > 0) {
             TransferHelper.safeTransferFrom(_principalToken, borrower, address(this), _additionalInputAmount);              
         }
-
-    
-        //lock up our collateral , get principal 
-        // Accept commitment and receive funds to this contract -- the principal 
+ 
+      
+        // Accept commitment, lock up collateral, receive funds to this contract -- the principal 
         (uint256 newLoanId, uint256 acceptCommitmentAmount) = _acceptCommitment(
              _lenderCommitmentForwarder,
             borrower,
             _principalToken,  
             _acceptCommitmentArgs
         );
+ 
 
-        
+        uint256 totalInputAmount = acceptCommitmentAmount + _additionalInputAmount ;
 
-         uint256 totalInputAmount = acceptCommitmentAmount + _additionalInputAmount ;
-
-
-
-        // Verify first token in path matches principal token
-        address firstToken = _extractFirstToken(_swapArgs.path);
-        require(firstToken == _principalToken, "Path token mismatch");
-        
-      
-
-         
+ 
 
         // Approve the router to spend DAI.
         TransferHelper.safeApprove( _principalToken , address(UNISWAP_SWAP_ROUTER),  totalInputAmount);
@@ -161,84 +166,56 @@ contract BorrowSwap_G2    {
         // Since we are swapping DAI to USDC and then USDC to WETH9 the path encoding is (DAI, 0.3%, USDC, 0.3%, WETH9).
         ISwapRouter.ExactInputParams memory swapParams =
             ISwapRouter.ExactInputParams({
-                path:  _swapArgs.path ,//path: abi.encodePacked(DAI, poolFee, USDC, poolFee, WETH9),
+                path:  generateSwapPath( _principalToken, _swapArgs.swapPaths  ) ,//path: abi.encodePacked(DAI, poolFee, USDC, poolFee, WETH9),
                 recipient: address(  borrower  ) ,
                 deadline: _swapArgs.deadline,
                 amountIn:  totalInputAmount ,
                 amountOutMinimum:  _swapArgs.amountOutMinimum    //can be 0 for testing -- get from IQuoter 
             });
 
-            // Executes the swap.
+        // Executes the swap.
         uint256 swapAmountOut = UNISWAP_SWAP_ROUTER.exactInput( swapParams );
 
- 
 
         emit BorrowSwapComplete(
             borrower, 
             newLoanId,
             
-            _principalToken 
-             // swapAmountOut  , 
+            _principalToken ,
+            totalInputAmount ,
+            swapAmountOut   
         );
 
-   
-     
-
-        
+    
     }
 
 
 
+ 
 
-/**
- * @notice Extracts the first token address from a Uniswap V3 path
- * @param path The encoded swap path
- * @return token The address of the first token in the path
- */
-function _extractFirstToken(bytes calldata path) internal pure returns (address token) {
-    require(path.length >= 20, "Path too short");
-    
-    // Extract first token from the path (first 20 bytes)
-    assembly {
-        token := shr(96, calldataload(path.offset))
+
+ struct TokenSwapPath {
+    uint24 poolFee ;
+    address tokenOut ;
+ }
+
+function generateSwapPath(
+    address inputToken, 
+    TokenSwapPath[] calldata swapPaths
+) public view returns (bytes memory)  {
+
+    if (swapPaths.length == 1 ){
+        return  abi.encodePacked(inputToken, swapPaths[0].poolFee, swapPaths[0].tokenOut )  ;
+    }else if (swapPaths.length == 2 ){
+        return  abi.encodePacked(inputToken, swapPaths[0].poolFee, swapPaths[0].tokenOut, swapPaths[1].poolFee, swapPaths[1].tokenOut )  ;
+    }else {
+
+        revert("invalid swap path length");
     }
-    
-    return token;
+
 }
-
  
-
  
-  /*  function uniswapV3SwapCallback(
-        int256 amount0Delta,
-        int256 amount1Delta,
-        bytes calldata data
-    ) external override {
-
-        SwapCallbackData memory _swapArgs = abi.decode(data, (SwapCallbackData));
-      
-
-        // Validate that the msg.sender is a valid pool
-        address pool = getUniswapPoolAddress(
-            _swapArgs.token0,   
-            _swapArgs.token1,   
-            _swapArgs.fee
-        );
-        require(msg.sender == pool, "Invalid pool callback");
-
-        // Determine which token we need to pay to the pool
-        // If amount0Delta > 0, we need to pay token0 to the pool
-        // If amount1Delta > 0, we need to pay token1 to the pool
-        if (amount0Delta > 0) {
-            TransferHelper.safeTransfer(_swapArgs.token0, msg.sender, uint256(amount0Delta));
-        } else if (amount1Delta > 0) {
-            TransferHelper.safeTransfer(_swapArgs.token1, msg.sender, uint256(amount1Delta));
-        }
-
-
- 
-    }*/
-   
  
 /*
     function getUniswapPoolAddress(  
@@ -371,23 +348,7 @@ function _extractFirstToken(bytes calldata path) internal pure returns (address 
       
 
 
-
-
-   /*
-
-    
-    use Uniswap IQuoter 
-
-              function quoteExactInput(
-                bytes path,
-                uint256 amountIn
-              ) external returns (uint256 amountOut)
-
-
-    
-   */
-
-
+ 
 
      function getMarketIdForCommitment(
        address _lenderCommitmentForwarder, 

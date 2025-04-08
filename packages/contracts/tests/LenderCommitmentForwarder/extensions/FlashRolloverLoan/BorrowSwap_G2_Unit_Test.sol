@@ -76,16 +76,16 @@ contract BorrowSwap_G2_Unit_Test is Testable {
 
         lenderCommitmentForwarder = new LenderCommitmentForwarderMock();
 
-       
-        uniswapRouterMock = new UniswapV3RouterMock(); 
-        
 
         wethMock.deposit{ value: 100e18 }();
         wethMock.transfer(address(lender), 5e18);
         wethMock.transfer(address(borrower), 5e18);
         wethMock.transfer(address(lenderCommitmentForwarder), 5e18);
 
-          
+            
+       
+        uniswapRouterMock = new UniswapV3RouterMock(); 
+        wethMock.transfer(address(uniswapRouterMock), 5e18);
 
         borrowSwap = new BorrowSwapG2Override(
             address(tellerV2),
@@ -110,6 +110,19 @@ contract BorrowSwap_G2_Unit_Test is Testable {
         address rewardRecipient = address(0);
         uint256 rewardAmount = 0; 
 
+
+{
+        uint256 loanId = tellerV2.submitBid(
+            lendingToken,
+            0, //marketId,
+            principalAmount,
+            duration,
+            interestRate,
+            "",
+            address(borrower)
+        );
+}
+     
 
 
         ILenderCommitmentForwarder.Commitment
@@ -145,12 +158,22 @@ contract BorrowSwap_G2_Unit_Test is Testable {
             });
 
 
+      
+        BorrowSwap_G2.TokenSwapPath[] memory swapPaths = new BorrowSwap_G2.TokenSwapPath[](1);
+
+ 
+        swapPaths[0] = BorrowSwap_G2.TokenSwapPath({
+            poolFee: 3000,
+            tokenOut: address(collateralToken) 
+        });
+
+
         bytes memory path = abi.encodePacked( address(wethMock), uint24(3000), address(collateralToken))  ;
 
             BorrowSwap_G2.SwapArgs
             memory swapArgs = BorrowSwap_G2.SwapArgs({
 
-                path: path,
+                swapPaths: swapPaths,
                 amountOutMinimum: 0,
                 deadline: uint160( block.timestamp ) + uint160 (1e8 )  
  
@@ -158,23 +181,12 @@ contract BorrowSwap_G2_Unit_Test is Testable {
             });
 
        
-        uint256 loanId = tellerV2.submitBid(
-            lendingToken,
-            0, //marketId,
-            principalAmount,
-            duration,
-            interestRate,
-            "",
-            address(borrower)
-        );
-
      
         
         vm.prank(address(borrower));
         IERC20(lendingToken).approve(address(borrowSwap), 1e18);
 
         vm.prank(address(borrower));
-
         borrowSwap.borrowSwap( 
             address(lenderCommitmentForwarder),
            

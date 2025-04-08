@@ -16,7 +16,7 @@ import { TellerV2SolMock } from "../../../../contracts/mock/TellerV2SolMock.sol"
 import { LenderCommitmentForwarderMock } from "../../../../contracts/mock/LenderCommitmentForwarderMock.sol";
 import { MarketRegistryMock } from "../../../../contracts/mock/MarketRegistryMock.sol";
 
-import { UniswapV3RouterMock } from "../../../../contracts/mock/uniswap/UniswapV3RouterMock.sol";
+import { UniswapV3Router02Mock } from "../../../../contracts/mock/uniswap/UniswapV3Router02Mock.sol";
  
 import {PoolAddress} from '../../../../contracts/libraries/uniswap/periphery/libraries/PoolAddress.sol';
 
@@ -50,7 +50,7 @@ contract BorrowSwap_G2_Unit_Test is Testable {
     User private borrower;
     User private lender;
 
-    UniswapV3RouterMock uniswapRouterMock; 
+    UniswapV3Router02Mock uniswapRouterMock; 
 
     BorrowSwapG2Override borrowSwap;
 
@@ -84,7 +84,7 @@ contract BorrowSwap_G2_Unit_Test is Testable {
 
             
        
-        uniswapRouterMock = new UniswapV3RouterMock(); 
+        uniswapRouterMock = new UniswapV3Router02Mock(); 
         wethMock.transfer(address(uniswapRouterMock), 5e18);
 
         borrowSwap = new BorrowSwapG2Override(
@@ -174,8 +174,8 @@ contract BorrowSwap_G2_Unit_Test is Testable {
             memory swapArgs = BorrowSwap_G2.SwapArgs({
 
                 swapPaths: swapPaths,
-                amountOutMinimum: 0,
-                deadline: uint160( block.timestamp ) + uint160 (1e8 )  
+                amountOutMinimum: 0 
+              //  deadline: uint160( block.timestamp ) + uint160 (1e8 )  
  
            
             });

@@ -22,7 +22,7 @@ import '../../../libraries/uniswap/periphery/base/PeripheryImmutableState.sol';
 import '../../../libraries/uniswap/periphery/libraries/PoolAddress.sol';
 import '../../../libraries/uniswap/periphery/libraries/CallbackValidation.sol';
 import '../../../libraries/uniswap/periphery/libraries/TransferHelper.sol';
-import '../../../libraries/uniswap/periphery/interfaces/ISwapRouter.sol';
+import '../../../libraries/uniswap/periphery/interfaces/ISwapRouter02.sol';
 
 import '../../../libraries/uniswap/core/interfaces/IUniswapV3Factory.sol';
 
@@ -36,12 +36,7 @@ import '../../../libraries/uniswap/core/interfaces/callback/IUniswapV3SwapCallba
 
     A one-tx strategy to borrow funds and then immediately swap them using uniswap 
 
-
-    TODO:  
-    1. add multihop support 
-    2. add a helper fn to calculate:  how much out per how much in 
-
-
+ 
 
 
     To estimate minAmountOut, use  
@@ -68,7 +63,7 @@ contract BorrowSwap_G2    {
 
     /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
     ITellerV2 public immutable TELLER_V2;
-    ISwapRouter public immutable UNISWAP_SWAP_ROUTER; 
+    ISwapRouter02 public immutable UNISWAP_SWAP_ROUTER; 
      
 
     event BorrowSwapComplete(
@@ -101,7 +96,7 @@ contract BorrowSwap_G2    {
         TokenSwapPath[] swapPaths ; //used to build the bytes path 
         
         uint160 amountOutMinimum;    
-        uint160 deadline;     
+     //   uint160 deadline;     
 
     } 
  
@@ -118,7 +113,7 @@ contract BorrowSwap_G2    {
         address _swapRouter 
     )  {
         TELLER_V2 = ITellerV2(_tellerV2);
-        UNISWAP_SWAP_ROUTER = ISwapRouter( _swapRouter );
+        UNISWAP_SWAP_ROUTER = ISwapRouter02( _swapRouter );
     }
  
  
@@ -164,11 +159,11 @@ contract BorrowSwap_G2    {
         // Multiple pool swaps are encoded through bytes called a `path`. A path is a sequence of token addresses and poolFees that define the pools used in the swaps.
         // The format for pool encoding is (tokenIn, fee, tokenOut/tokenIn, fee, tokenOut) where tokenIn/tokenOut parameter is the shared token across the pools.
         // Since we are swapping DAI to USDC and then USDC to WETH9 the path encoding is (DAI, 0.3%, USDC, 0.3%, WETH9).
-        ISwapRouter.ExactInputParams memory swapParams =
-            ISwapRouter.ExactInputParams({
+        ISwapRouter02.ExactInputParams memory swapParams =
+            ISwapRouter02.ExactInputParams({
                 path:  generateSwapPath( _principalToken, _swapArgs.swapPaths  ) ,//path: abi.encodePacked(DAI, poolFee, USDC, poolFee, WETH9),
                 recipient: address(  borrower  ) ,
-                deadline: _swapArgs.deadline,
+             //   deadline: _swapArgs.deadline,
                 amountIn:  totalInputAmount ,
                 amountOutMinimum:  _swapArgs.amountOutMinimum    //can be 0 for testing -- get from IQuoter 
             });

@@ -23,7 +23,7 @@ import '../../../libraries/uniswap/periphery/libraries/PoolAddress.sol';
 import '../../../libraries/uniswap/periphery/libraries/CallbackValidation.sol';
 import '../../../libraries/uniswap/periphery/libraries/TransferHelper.sol';
 import '../../../libraries/uniswap/periphery/interfaces/ISwapRouter02.sol';
-import '../../../libraries/uniswap/periphery/interfaces/IQuoterV2.sol';
+import '../../../libraries/uniswap/periphery/interfaces/IQuoter.sol';
 
 
 import '../../../libraries/uniswap/core/interfaces/IUniswapV3Factory.sol';
@@ -66,7 +66,7 @@ contract BorrowSwap_G2    {
     /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
     ITellerV2 public immutable TELLER_V2;
     ISwapRouter02 public immutable UNISWAP_SWAP_ROUTER; 
-    IQuoterV2 public immutable UNISWAP_QUOTER; 
+    IQuoter public immutable UNISWAP_QUOTER; 
 
     event BorrowSwapComplete(
         address borrower,
@@ -115,7 +115,7 @@ contract BorrowSwap_G2    {
     /**
      * @param _tellerV2 The address of the TellerV2 contract.
      * @param _swapRouter The address of the UniswapV3 SwapRouter_02 
-     * @param quoter The address of the UniswapV2 QuoterV2 
+     * @param quoter The address of the UniswapV3 Quoter 
      */
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor(
@@ -123,11 +123,11 @@ contract BorrowSwap_G2    {
       
         address _swapRouter, //swapRouter02 
 
-        address _quoter //quoterV2 
+        address _quoter //quoter 
     )  {
         TELLER_V2 = ITellerV2(_tellerV2);
         UNISWAP_SWAP_ROUTER = ISwapRouter02( _swapRouter );
-        UNISWAP_QUOTER = IQuoterV2( _quoter );
+        UNISWAP_QUOTER = IQuoter( _quoter );
     }
  
  
@@ -227,7 +227,7 @@ contract BorrowSwap_G2    {
         TokenSwapPath[] calldata swapPaths 
          
 
-    ) external returns (uint256 amountOut) {
+    ) external view returns (uint256 amountOut) {
 
         (amountOut, , , ) = UNISWAP_QUOTER.quoteExactInput(
             generateSwapPath(inputToken,swapPaths),

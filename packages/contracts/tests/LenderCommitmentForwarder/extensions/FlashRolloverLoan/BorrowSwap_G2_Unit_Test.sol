@@ -17,7 +17,7 @@ import { LenderCommitmentForwarderMock } from "../../../../contracts/mock/Lender
 import { MarketRegistryMock } from "../../../../contracts/mock/MarketRegistryMock.sol";
 
 import { UniswapV3Router02Mock } from "../../../../contracts/mock/uniswap/UniswapV3Router02Mock.sol";
-import {UniswapV3QuoterV2Mock} from "../../../../contracts/mock/uniswap/UniswapV3QuoterV2Mock.sol";
+import {UniswapV3QuoterMock} from "../../../../contracts/mock/uniswap/UniswapV3QuoterMock.sol";
 import {PoolAddress} from '../../../../contracts/libraries/uniswap/periphery/libraries/PoolAddress.sol';
 
 
@@ -50,7 +50,7 @@ contract BorrowSwap_G2_Unit_Test is Testable {
     User private lender;
 
     UniswapV3Router02Mock uniswapRouterMock; 
-    UniswapV3QuoterV2Mock uniswapQuoterMock; 
+    UniswapV3QuoterMock uniswapQuoterMock; 
 
     BorrowSwapG2Override borrowSwap;
 
@@ -82,7 +82,7 @@ contract BorrowSwap_G2_Unit_Test is Testable {
         wethMock.transfer(address(borrower), 5e18);
         wethMock.transfer(address(lenderCommitmentForwarder), 5e18);
 
-        uniswapQuoterMock = new UniswapV3QuoterV2Mock(); 
+        uniswapQuoterMock = new UniswapV3QuoterMock(); 
        
         uniswapRouterMock = new UniswapV3Router02Mock(); 
         wethMock.transfer(address(uniswapRouterMock), 5e18);

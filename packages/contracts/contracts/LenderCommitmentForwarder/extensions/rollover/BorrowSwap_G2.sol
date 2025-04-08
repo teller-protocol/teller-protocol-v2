@@ -23,6 +23,8 @@ import '../../../libraries/uniswap/periphery/libraries/PoolAddress.sol';
 import '../../../libraries/uniswap/periphery/libraries/CallbackValidation.sol';
 import '../../../libraries/uniswap/periphery/libraries/TransferHelper.sol';
 import '../../../libraries/uniswap/periphery/interfaces/ISwapRouter02.sol';
+import '../../../libraries/uniswap/periphery/interfaces/IQuoterV2.sol';
+
 
 import '../../../libraries/uniswap/core/interfaces/IUniswapV3Factory.sol';
 
@@ -64,7 +66,7 @@ contract BorrowSwap_G2    {
     /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
     ITellerV2 public immutable TELLER_V2;
     ISwapRouter02 public immutable UNISWAP_SWAP_ROUTER; 
-     
+    IQuoterV2 public immutable UNISWAP_QUOTER; 
 
     event BorrowSwapComplete(
         address borrower,
@@ -91,6 +93,13 @@ contract BorrowSwap_G2    {
         bytes32[] merkleProof; //empty array if not used
     }
 
+
+
+     struct TokenSwapPath {
+        uint24 poolFee ;
+        address tokenOut ;
+     }
+
     struct SwapArgs {
 
         TokenSwapPath[] swapPaths ; //used to build the bytes path 
@@ -99,21 +108,26 @@ contract BorrowSwap_G2    {
      //   uint160 deadline;     
 
     } 
+
+
  
 
     /**
      * @param _tellerV2 The address of the TellerV2 contract.
-     * @param _factory The address of the UniswapV3 Factory contract to help with callback validation.
-     * @param _WETH9 The address of the WETH Contract as this is instrumental to core uniswap logic.
+     * @param _swapRouter The address of the UniswapV3 SwapRouter_02 
+     * @param quoter The address of the UniswapV2 QuoterV2 
      */
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor(
         address _tellerV2, 
       
-        address _swapRouter 
+        address _swapRouter, //swapRouter02 
+
+        address _quoter //quoterV2 
     )  {
         TELLER_V2 = ITellerV2(_tellerV2);
         UNISWAP_SWAP_ROUTER = ISwapRouter02( _swapRouter );
+        UNISWAP_QUOTER = IQuoterV2( _quoter );
     }
  
  
@@ -186,32 +200,43 @@ contract BorrowSwap_G2    {
 
 
 
- 
+  
 
+    function generateSwapPath(
+        address inputToken, 
+        TokenSwapPath[] calldata swapPaths
+    ) public view returns (bytes memory)  {
 
- struct TokenSwapPath {
-    uint24 poolFee ;
-    address tokenOut ;
- }
+        if (swapPaths.length == 1 ){
+            return  abi.encodePacked(inputToken, swapPaths[0].poolFee, swapPaths[0].tokenOut )  ;
+        }else if (swapPaths.length == 2 ){
+            return  abi.encodePacked(inputToken, swapPaths[0].poolFee, swapPaths[0].tokenOut, swapPaths[1].poolFee, swapPaths[1].tokenOut )  ;
+        }else {
 
-function generateSwapPath(
-    address inputToken, 
-    TokenSwapPath[] calldata swapPaths
-) public view returns (bytes memory)  {
+            revert("invalid swap path length");
+        }
 
-    if (swapPaths.length == 1 ){
-        return  abi.encodePacked(inputToken, swapPaths[0].poolFee, swapPaths[0].tokenOut )  ;
-    }else if (swapPaths.length == 2 ){
-        return  abi.encodePacked(inputToken, swapPaths[0].poolFee, swapPaths[0].tokenOut, swapPaths[1].poolFee, swapPaths[1].tokenOut )  ;
-    }else {
-
-        revert("invalid swap path length");
     }
+     
 
-}
- 
- 
- 
+
+    function quoteExactInput (
+
+        address inputToken,
+        uint256 amountIn,
+        TokenSwapPath[] calldata swapPaths 
+         
+
+    ) external returns (uint256 amountOut) {
+
+        (amountOut, , , ) = UNISWAP_QUOTER.quoteExactInput(
+            generateSwapPath(inputToken,swapPaths),
+            amountIn
+        );
+
+    }
+     
+     
 /*
     function getUniswapPoolAddress(  
         address token0,

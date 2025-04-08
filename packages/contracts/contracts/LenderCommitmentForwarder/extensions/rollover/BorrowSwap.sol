@@ -5,14 +5,14 @@ import "./BorrowSwap_G2.sol";
 
 contract BorrowSwap is BorrowSwap_G2 {
     constructor(
-        address _tellerV2, 
-        
-        address _swapRouter 
+        address _tellerV2,         
+        address _swapRouter,
+        address _quoter
     )
         BorrowSwap_G2(
-            _tellerV2,
-         
-            _swapRouter 
+            _tellerV2,         
+            _swapRouter,
+            _quoter 
         )
     {}
 }

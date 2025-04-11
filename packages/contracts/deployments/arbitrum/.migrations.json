@@ -34,5 +34,6 @@
   "lender-groups:upgrade": 1736266039,
   "validate-deployments": 1736279726,
   "lender-commitment-forwarder:extensions:flash-rollover-widget:deploy": 1736288990,
-  "lender-commitment-forwarder:extensions:flash-swap-rollover:deploy": 1741031133
+  "lender-commitment-forwarder:extensions:flash-swap-rollover:deploy": 1741031133,
+  "lender-commitment-forwarder:extensions:borrow-swap:deploy": 1744388962
 }

@@ -38,17 +38,7 @@ import '../../../libraries/uniswap/core/interfaces/callback/IUniswapV3SwapCallba
 
     A one-tx strategy to borrow funds and then immediately swap them using uniswap 
 
- 
-
-
-    To estimate minAmountOut, use  
-
-        Uniswap IQuoter .quoteExactInput ( bytes path, amountIn ) 
-                  function quoteExactInput(
-                            bytes path,
-                            uint256 amountIn
-                          ) external returns (uint256 amountOut)
-
+   
 
  */
 
@@ -236,19 +226,7 @@ contract BorrowSwap_G2    {
 
     }
      
-     
-/*
-    function getUniswapPoolAddress(  
-        address token0,
-        address token1,
-        uint24 fee
-     ) public view virtual returns (address) {
-
-        return IUniswapV3Factory(factory).getPool(token0,token1,fee);
-
-    }
-*/
-
+      
     
     /**
      *

@@ -14,6 +14,8 @@ import { LoanDetails, Payment, BidState , Bid, Terms } from "../../contracts/Tel
 
 import { ILenderCommitmentGroup_V2 } from "../../contracts/interfaces/ILenderCommitmentGroup_V2.sol";
 import { IUniswapPricingLibrary } from "../../contracts/interfaces/IUniswapPricingLibrary.sol";
+
+import {ILenderCommitmentGroupSharesIntegrated} from "../../contracts/interfaces/ILenderCommitmentGroupSharesIntegrated.sol";
  
 import {ProtocolPausingManager} from "../../contracts/pausing/ProtocolPausingManager.sol";
 
@@ -293,6 +295,46 @@ contract LenderCommitmentGroup_Pool_V2_Test is Testable {
             "Burned an unexpected amount of shares"
         );
     }
+
+
+     function test_erc4626_withdraw_fails_without_warp() public {
+        principalToken.transfer(address(lenderCommitmentGroupSmartV2), 1e18);
+        
+        initialize_group_contract();
+        lenderCommitmentGroupSmartV2.set_mockSharesExchangeRate(1e36);
+        
+        lenderCommitmentGroupSmartV2.set_totalPrincipalTokensCommitted(1000000);
+            
+        vm.warp(1e6);
+
+        // Mint shares to lender
+        uint256 sharesAmount = 1000000;
+         vm.prank(address(lenderCommitmentGroupSmartV2));
+        lenderCommitmentGroupSmartV2.force_mint_shares(address(lender), sharesAmount);
+
+       // vm.warp(1e7);
+
+       uint256 sharesLastTransferredAt = ILenderCommitmentGroupSharesIntegrated(address(lenderCommitmentGroupSmartV2)).getSharesLastTransferredAt( address(lender) );
+        assertEq(
+            sharesLastTransferredAt,
+            1e6,
+            "unexpected sharesLastTransferredAt"
+        );
+
+
+        lenderCommitmentGroupSmartV2. force_set_withdraw_delay (9000); 
+
+        vm.expectRevert(); 
+        vm.prank(address(lender));
+        uint256 sharesRedeemedAmount = lenderCommitmentGroupSmartV2.withdraw(
+            1000000,
+            address(lender),
+            address(lender)
+        );
+        
+        
+    }
+
 
     function test_erc4626_accounting() public {
         initialize_group_contract();

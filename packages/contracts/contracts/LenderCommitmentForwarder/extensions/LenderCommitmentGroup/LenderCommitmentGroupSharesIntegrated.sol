@@ -8,6 +8,8 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
   
 import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 
+// import "../../../interfaces/ILenderCommitmentGroupSharesIntegrated.sol";
+
  /*
 
     This ERC20 token keeps track of the last time it was transferred and provides that information
@@ -20,7 +22,8 @@ import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 
 abstract contract LenderCommitmentGroupSharesIntegrated is
     Initializable, 
-    ERC20Upgradeable
+    ERC20Upgradeable 
+   // ILenderCommitmentGroupSharesIntegrated
 {
   
     uint8 private constant DECIMALS  = 18;
@@ -63,10 +66,20 @@ abstract contract LenderCommitmentGroupSharesIntegrated is
 
     function mintShares(address _recipient, uint256 _amount) internal {  // only wrapper contract can call 
         _mint(_recipient, _amount);   //triggers _afterTokenTransfer
+
+
+        if (_amount > 0) {
+            _setPoolSharesLastTransferredAt(_recipient);
+        } 
     }
 
     function burnShares(address _burner, uint256 _amount ) internal { // only wrapper contract can call 
         _burn(_burner, _amount);  //triggers _afterTokenTransfer
+
+        
+        if (_amount > 0) {
+            _setPoolSharesLastTransferredAt(_burner);
+        } 
     }
 
     function decimals() public view virtual override returns (uint8) {
@@ -82,12 +95,17 @@ abstract contract LenderCommitmentGroupSharesIntegrated is
     ) internal override {
 
         if (amount > 0) {
-
-            poolSharesLastTransferredAt[from] =  block.timestamp;
-            emit SharesLastTransferredAt(from, block.timestamp);
-
+            _setPoolSharesLastTransferredAt(from);
         } 
       
+    }
+
+
+    function _setPoolSharesLastTransferredAt( address from ) internal {
+
+        poolSharesLastTransferredAt[from] =  block.timestamp;
+        emit SharesLastTransferredAt(from, block.timestamp); 
+
     }
 
     /*

@@ -121,6 +121,9 @@ contract LenderCommitmentGroup_Pool_V2_Override is LenderCommitmentGroup_Pool_V2
         return super.mintShares( guy, wad );
     }
 
+    function force_set_withdraw_delay(uint256 _delay) public {
+        withdrawDelayTimeSeconds = _delay;
+    }
 
 
     function sharesExchangeRate() public view override returns (uint256 rate_) {

@@ -22,10 +22,9 @@ https://github.com/streamingfast/substreams-uniswap-v3/blob/develop/src/rpc.rs
 ### Building 
 > cargo run --bin rebuild_abi    ( rebuilds src/abi...  from abi  )
 
+> cargo b 
 
 > run proto gen (to output RUST ) 
-
-
 ```
 substreams protogen   OR  make protogen   (  builds src/pb/... from proto )
 ```

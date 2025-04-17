@@ -1,6 +1,6 @@
 mod abi;
 mod pb;
-mod rpc;
+// mod rpc;
  
 
 use hex_literal::hex;
@@ -130,9 +130,10 @@ fn map_tellerv2_events(blk: &eth::Block, events: &mut contract::Events) {
 
 
                             bid_id: event.bid_id.to_string(), 
-                            metadata_uri: event.metadata_uri.to_vec(), 
-                            borrower: event.borrower , 
-                            receiver: event.receiver, 
+                            lender:  event.lender ,  // Hex(& event.lender ).to_string() , 
+                        //    metadata_uri: event.metadata_uri.to_vec(), 
+                          //  borrower: event.borrower , 
+                         //   receiver: event.receiver, 
 
                          
                         });
@@ -186,12 +187,12 @@ fn graph_tellerv2_out_simple(
   
     events.teller_submitted_bids.iter().for_each(|evt| {
         tables
-            .create_row("factory_deployed_lender_group_contract", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
+            .create_row("teller_submitted_bids", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
             .set("evt_tx_hash", evt.evt_tx_hash.clone().into_bytes())
             .set("evt_index", BigInt::from( evt.evt_index ))
             .set("evt_block_time", BigInt::from(evt.evt_block_time))
             .set("evt_block_number", BigInt::from(evt.evt_block_number))
-            .set("group_contract", &evt.group_contract );
+            .set("bid_id", &evt.bid_id );
     });
    
 }

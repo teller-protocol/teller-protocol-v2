@@ -1,4 +1,4 @@
-use crate::abi::lendergroup_contract::functions;
+// use crate::abi::lendergroup_contract::functions;
 use crate::{abi, eth };
 use ethabi::Address;
 use ethabi::ethereum_types::H160;
@@ -18,6 +18,10 @@ https://github.com/streamingfast/substreams-uniswap-v3/blob/develop/src/rpc.rs
 
 
 */
+
+
+/*
+
 
 pub struct LenderGroupPoolInitializationDataFromRpc {
         
@@ -115,3 +119,5 @@ pub fn fetch_token_amount_difference_from_liquidations(pool_contract_address: &S
  
  
 }
+
+*/

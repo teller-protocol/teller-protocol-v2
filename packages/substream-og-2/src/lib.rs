@@ -187,12 +187,12 @@ fn graph_tellerv2_out_simple(
   
     events.teller_submitted_bids.iter().for_each(|evt| {
         tables
-            .create_row("teller_submitted_bids", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
-            .set("evt_tx_hash", evt.evt_tx_hash.clone().into_bytes())
-            .set("evt_index", BigInt::from( evt.evt_index ))
-            .set("evt_block_time", BigInt::from(evt.evt_block_time))
-            .set("evt_block_number", BigInt::from(evt.evt_block_number))
-            .set("bid_id", &evt.bid_id );
+            .create_row("bids", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
+          //  .set("evt_tx_hash", evt.evt_tx_hash.clone().into_bytes())
+          //  .set("evt_index", BigInt::from( evt.evt_index ))
+          //  .set("evt_block_time", BigInt::from(evt.evt_block_time))
+          //  .set("evt_block_number", BigInt::from(evt.evt_block_number))
+            .set("bidId", &evt.bid_id );
     });
    
 }

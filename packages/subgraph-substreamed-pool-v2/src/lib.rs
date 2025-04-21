@@ -68,7 +68,7 @@ fn map_factory_events(blk: &eth::Block, events: &mut contract::Events) {
                 .filter_map(|log| {
                     if let Some(event) = abi::factory_contract::events::AdminChanged::match_and_decode(log) {
                         return Some(contract::FactoryAdminChanged {
-                            evt_tx_hash: Hex(&view.transaction.hash).to_string(),
+                            evt_tx_hash: format!("0x{}", hex::encode(&view.transaction.hash)),,
                             evt_index: log.block_index,
                             evt_block_time: blk.timestamp_seconds(),
                             evt_block_number: blk.number,
@@ -89,7 +89,7 @@ fn map_factory_events(blk: &eth::Block, events: &mut contract::Events) {
                 .filter_map(|log| {
                     if let Some(event) = abi::factory_contract::events::BeaconUpgraded::match_and_decode(log) {
                         return Some(contract::FactoryBeaconUpgraded {
-                            evt_tx_hash: Hex(&view.transaction.hash).to_string(),
+                            evt_tx_hash: format!("0x{}", hex::encode(&view.transaction.hash)),,
                             evt_index: log.block_index,
                             evt_block_time: blk.timestamp_seconds(),
                             evt_block_number: blk.number,
@@ -111,7 +111,7 @@ fn map_factory_events(blk: &eth::Block, events: &mut contract::Events) {
                 .filter_map(|log| {
                     if let Some(event) = abi::factory_contract::events::Upgraded::match_and_decode(log) {
                         return Some(contract::FactoryUpgraded {
-                            evt_tx_hash: Hex(&view.transaction.hash).to_string(),
+                            evt_tx_hash: format!("0x{}", hex::encode(&view.transaction.hash)),,
                             evt_index: log.block_index,
                             evt_block_time: blk.timestamp_seconds(),
                             evt_block_number: blk.number,
@@ -134,7 +134,7 @@ fn map_factory_events(blk: &eth::Block, events: &mut contract::Events) {
                 .filter_map(|log| {
                     if let Some(event) = abi::factory_contract::events::DeployedLenderGroupContract::match_and_decode(log) {
                         return Some(contract::FactoryDeployedLenderGroupContract {
-                            evt_tx_hash: Hex(&view.transaction.hash).to_string(),
+                            evt_tx_hash: format!("0x{}", hex::encode(&view.transaction.hash)),
                             evt_index: log.block_index,
                             evt_block_time: blk.timestamp_seconds(),
                             evt_block_number: blk.number,
@@ -193,7 +193,7 @@ fn map_lendergroup_events(
                 .filter_map(|log| {
                     if let Some(event) = abi::lendergroup_contract::events::BorrowerAcceptedFunds::match_and_decode(log) {
                         return Some(contract::LendergroupBorrowerAcceptedFunds {
-                            evt_tx_hash: Hex(&view.transaction.hash).to_string(),
+                            evt_tx_hash: format!("0x{}", hex::encode(&view.transaction.hash)),
                             evt_index: log.block_index,
                             evt_block_time: blk.timestamp_seconds(),
                             evt_block_number: blk.number,
@@ -220,7 +220,7 @@ fn map_lendergroup_events(
                 .filter_map(|log| {
                     if let Some(event) = abi::lendergroup_contract::events::DefaultedLoanLiquidated::match_and_decode(log) {
                         return Some(contract::LendergroupDefaultedLoanLiquidated {
-                            evt_tx_hash: Hex(&view.transaction.hash).to_string(),
+                            evt_tx_hash: format!("0x{}", hex::encode(&view.transaction.hash)),
                             evt_index: log.block_index,
                             evt_block_time: blk.timestamp_seconds(),
                             evt_block_number: blk.number,
@@ -245,7 +245,7 @@ fn map_lendergroup_events(
                 .filter_map(|log| {
                     if let Some(event) = abi::lendergroup_contract::events::Withdraw::match_and_decode(log) {
                         return Some(contract::LendergroupWithdraw {
-                            evt_tx_hash: Hex(&view.transaction.hash).to_string(),
+                            evt_tx_hash: format!("0x{}", hex::encode(&view.transaction.hash)),
                             evt_index: log.block_index,
                             evt_block_time: blk.timestamp_seconds(),
                             evt_block_number: blk.number,
@@ -270,7 +270,7 @@ fn map_lendergroup_events(
                 .filter_map(|log| {
                     if let Some(event) = abi::lendergroup_contract::events::Initialized::match_and_decode(log) {
                         return Some(contract::LendergroupInitialized {
-                            evt_tx_hash: Hex(&view.transaction.hash).to_string(),
+                            evt_tx_hash: format!("0x{}", hex::encode(&view.transaction.hash)),
                             evt_index: log.block_index,
                             evt_block_time: blk.timestamp_seconds(),
                             evt_block_number: blk.number,
@@ -292,7 +292,7 @@ fn map_lendergroup_events(
                 .filter_map(|log| {
                     if let Some(event) = abi::lendergroup_contract::events::Deposit::match_and_decode(log) {
                         return Some(contract::LendergroupDeposit {
-                            evt_tx_hash: Hex(&view.transaction.hash).to_string(),
+                            evt_tx_hash: format!("0x{}", hex::encode(&view.transaction.hash)),
                             evt_index: log.block_index,
                             evt_block_time: blk.timestamp_seconds(),
                             evt_block_number: blk.number,
@@ -317,7 +317,7 @@ fn map_lendergroup_events(
                 .filter_map(|log| {
                     if let Some(event) = abi::lendergroup_contract::events::LoanRepaid::match_and_decode(log) {
                         return Some(contract::LendergroupLoanRepaid {
-                            evt_tx_hash: Hex(&view.transaction.hash).to_string(),
+                            evt_tx_hash: format!("0x{}", hex::encode(&view.transaction.hash)),
                             evt_index: log.block_index,
                             evt_block_time: blk.timestamp_seconds(),
                             evt_block_number: blk.number,
@@ -344,7 +344,7 @@ fn map_lendergroup_events(
                 .filter_map(|log| {
                     if let Some(event) = abi::lendergroup_contract::events::OwnershipTransferred::match_and_decode(log) {
                         return Some(contract::LendergroupOwnershipTransferred {
-                            evt_tx_hash: Hex(&view.transaction.hash).to_string(),
+                            evt_tx_hash: format!("0x{}", hex::encode(&view.transaction.hash)), 
                             evt_index: log.block_index,
                             evt_block_time: blk.timestamp_seconds(),
                             evt_block_number: blk.number,
@@ -367,7 +367,7 @@ fn map_lendergroup_events(
                 .filter_map(|log| {
                     if let Some(event) = abi::lendergroup_contract::events::Paused::match_and_decode(log) {
                         return Some(contract::LendergroupPaused {
-                            evt_tx_hash: Hex(&view.transaction.hash).to_string(),
+                            evt_tx_hash: format!("0x{}", hex::encode(&view.transaction.hash)),
                             evt_index: log.block_index,
                             evt_block_time: blk.timestamp_seconds(),
                             evt_block_number: blk.number,
@@ -409,7 +409,7 @@ fn map_lendergroup_events(
 
                         
                         return Some(contract::LendergroupPoolInitialized {
-                            evt_tx_hash: Hex(&view.transaction.hash).to_string(),
+                            evt_tx_hash: format!("0x{}", hex::encode(&view.transaction.hash)),
                             evt_index: log.block_index,
                             evt_block_time: blk.timestamp_seconds(),
                             evt_block_number: blk.number,
@@ -446,7 +446,7 @@ fn map_lendergroup_events(
                 .filter_map(|log| {
                     if let Some(event) = abi::lendergroup_contract::events::Unpaused::match_and_decode(log) {
                         return Some(contract::LendergroupUnpaused {
-                            evt_tx_hash: Hex(&view.transaction.hash).to_string(),
+                            evt_tx_hash: format!("0x{}", hex::encode(&view.transaction.hash)),
                             evt_index: log.block_index,
                             evt_block_time: blk.timestamp_seconds(),
                             evt_block_number: blk.number,
@@ -1181,7 +1181,7 @@ fn map_collateralmanager_events(
                         
                         
                         return Some(collateral_contract::CollateralmanagerCollateralWithdrawn {
-                            evt_tx_hash: Hex(&view.transaction.hash).to_string(),
+                            evt_tx_hash: format!("0x{}", hex::encode(&view.transaction.hash)),
                             evt_index: log.block_index,
                             evt_block_time: blk.timestamp_seconds(),
                             evt_block_number: blk.number,

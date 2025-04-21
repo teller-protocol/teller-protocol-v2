@@ -4,60 +4,68 @@ use serde::Serialize;
 use std::collections::HashMap;
 use std::fs::{self, File};
 use std::io::{self, Read, Write};
+ 
+
+
+    //configure me ! 
+    const NETWORK_NAME:&str = "arbitrum" ;
+
+
 
 #[derive(Serialize)]
-struct Data {
+struct NetworkData {
     graph_network: String,
     chain_network: String ,
     start_block: u32 ,
    
 }
+ 
+impl NetworkData {
 
-/*
+     fn from_network( network_name: &str ) -> Option< Self  > {
 
-Polygon
-            {
+        match network_name {
+
+            "polygon" => Some(Self{
                 graph_network: "polygon".to_string(),  
-                chain_network: "matic".to_string(),    
-                start_block:    66108200 on polygon 
-          }
+                chain_network: "matic".to_string(),   
+                start_block:  66108200    
 
+            }),
 
-Arbitrum 
-        { 
+            "base" => Some(Self{
+                graph_network: "base".to_string(),  
+                chain_network: "base".to_string(),   
+                start_block:  24824400  
 
-          graph_network: "arbitrum-one".to_string(),  
-            chain_network: "arbitrum-one".to_string(),   
-            start_block:  292978933     
+            }),
 
-        }
+            "arbitrum" => Some(Self{
+                graph_network: "arbitrum-one".to_string(),  
+                chain_network: "arbitrum-one".to_string(),   
+                start_block:  292978933    
 
+            }),
+            "mainnet" => Some(Self{
+                graph_network: "mainnet".to_string(),  
+                chain_network: "mainnet".to_string(),   
+                start_block:  21616780  
 
+            }),
 
-Base 
-        { 
+ 
 
-            graph_network: "base".to_string(),  
-            chain_network: "base".to_string(),   
-            start_block:  24824400    
-
-        }
-
-
-
-
-Mainnet 
-        { 
-
-            graph_network: "mainnet".to_string(),  
-            chain_network: "mainnet".to_string(),   
-            start_block:  21616780    
+            _ => None 
 
         }
 
 
-*/
+    }
 
+} 
+ 
+ 
+/*
 impl Default for Data {
 
 	fn default() -> Self {
@@ -70,7 +78,7 @@ impl Default for Data {
 
 	}
 
-}
+}*/
 
 
 // Function to load the template file content
@@ -82,14 +90,14 @@ fn load_template(file_path: &str) -> io::Result<String> {
 }
 
 // Function to process the template and data
-fn process_template(template: &str, data: &Data) -> String {
+fn process_template(template: &str, data: &NetworkData) -> String {
     let mut handlebars = Handlebars::new();
     let rendered = handlebars.render_template(template, &data).unwrap();
     rendered
 }
 
 // Function to process a single file and write output to the output folder
-fn process_file(input_file: &str, output_file: &str, data: &Data) -> io::Result<()> {
+fn process_file(input_file: &str, output_file: &str, data: &NetworkData) -> io::Result<()> {
     let template = load_template(input_file)?;
     let updated_content = process_template(&template, &data);
 
@@ -103,7 +111,9 @@ fn process_file(input_file: &str, output_file: &str, data: &Data) -> io::Result<
 
 fn main() -> io::Result<()> {
     // Define the data to be injected into the template
-    let data = Data::default();
+     let data = NetworkData::from_network( NETWORK_NAME ).unwrap () ;
+
+
 
 
     let input_folder = "./config/build_inputs";
@@ -134,7 +144,7 @@ fn main() -> io::Result<()> {
 
 
 
-fn process_files_in_directory(input_dir: &str, output_dir: &str, data: &Data) -> io::Result<()> {
+fn process_files_in_directory(input_dir: &str, output_dir: &str, data: &NetworkData) -> io::Result<()> {
     // Read all files from the input directory
     let entries = fs::read_dir(input_dir)?;
 

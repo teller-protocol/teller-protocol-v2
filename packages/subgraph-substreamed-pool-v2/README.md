@@ -66,7 +66,7 @@ substreams pack ./substreams.yaml
 
 
 5. graph auth   (optional) 
-6. graph deploy   tellerv2-lender-groups-v2-polygon --version-label 0.4.21.1
+6. graph deploy   tellerv2-lender-groups-v2-polygon --version-label 0.4.21.2
  
 
 

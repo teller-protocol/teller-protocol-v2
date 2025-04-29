@@ -8,7 +8,7 @@ use std::io::{self, Read, Write};
 
 
     //configure me ! 
-    const NETWORK_NAME:&str = "polygon" ;
+    const NETWORK_NAME:&str = "base" ;
 
 
 

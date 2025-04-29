@@ -1,7 +1,7 @@
 specVersion: v0.1.0
 package:
-  name: lender_group_substream
-  version: v0.1.0
+  name: tellerv2_pools_{{graph_network}}
+  version: v0.2.0
 
 imports:
   sql: https://github.com/streamingfast/substreams-sink-sql/releases/download/protodefs-v1.0.7/substreams-sink-sql-protodefs-v1.0.7.spkg

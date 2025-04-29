@@ -23,7 +23,7 @@ binaries:
 modules:
   - name: store_factory_lendergroup_created
     kind: store
-    initialBlock: 66108200
+    initialBlock: 24824400
     updatePolicy: set
     valueType: proto:dynamic_datasource
     inputs:
@@ -31,7 +31,7 @@ modules:
 
   - name: map_events
     kind: map
-    initialBlock: 66108200
+    initialBlock: 24824400
     inputs:
       - source: sf.ethereum.type.v2.Block
       - store: store_factory_lendergroup_created
@@ -41,7 +41,7 @@ modules:
 
   - name: store_lendergroup_pool_metrics_deltas
     kind: store
-    initialBlock: 66108200
+    initialBlock: 24824400
     updatePolicy: set
     valueType: proto:dynamic_datasource
     inputs:
@@ -49,7 +49,7 @@ modules:
       
   - name: store_lendergroup_pool_metrics
     kind: store
-    initialBlock: 66108200
+    initialBlock: 24824400
     updatePolicy: set
     valueType: proto:dynamic_datasource
     inputs:
@@ -59,7 +59,7 @@ modules:
 
   - name: graph_out
     kind: map
-    initialBlock:  66108200
+    initialBlock:  24824400
     inputs:
       - map: map_events
       - store: store_lendergroup_pool_metrics_deltas
@@ -69,7 +69,7 @@ modules:
       type: proto:sf.substreams.entity.v1.EntityChanges
 
 
-network: polygon
+network: base
 
 sink:
   module: db_out

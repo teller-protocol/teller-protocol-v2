@@ -1,7 +1,7 @@
 specVersion: v0.1.0
 package:
-  name: lender_group_substream
-  version: v0.1.0
+  name: tellerv2_pools_base
+  version: v0.2.0
 
 imports:
   sql: https://github.com/streamingfast/substreams-sink-sql/releases/download/protodefs-v1.0.7/substreams-sink-sql-protodefs-v1.0.7.spkg
@@ -24,7 +24,7 @@ binaries:
 modules:
   - name: store_factory_lendergroup_created
     kind: store
-    initialBlock: 66108200
+    initialBlock: 24824400
     updatePolicy: set
     valueType: proto:dynamic_datasource
     inputs:
@@ -32,7 +32,7 @@ modules:
 
   - name: map_events
     kind: map
-    initialBlock: 66108200
+    initialBlock: 24824400
     inputs:
       - source: sf.ethereum.type.v2.Block
       - store: store_factory_lendergroup_created
@@ -42,7 +42,7 @@ modules:
       
   - name: store_globals_from_events
     kind: store
-    initialBlock: 66108200
+    initialBlock: 24824400
     updatePolicy: set
     valueType: bigint
     inputs:
@@ -51,7 +51,7 @@ modules:
 
   - name: store_bid_from_pool_data
     kind: store
-    initialBlock: 66108200
+    initialBlock: 24824400
     updatePolicy: set
     valueType: string
     inputs:
@@ -59,7 +59,7 @@ modules:
 
   - name: store_lendergroup_user_metrics_deltas
     kind: store
-    initialBlock: 66108200
+    initialBlock: 24824400
     updatePolicy: add
     valueType: bigint
     inputs:
@@ -68,7 +68,7 @@ modules:
  
   - name: store_lendergroup_pool_metrics_deltas
     kind: store
-    initialBlock: 66108200
+    initialBlock: 24824400
     updatePolicy: add
     valueType: bigint
     inputs:
@@ -76,7 +76,7 @@ modules:
       
   - name: store_lendergroup_pool_metrics
     kind: store
-    initialBlock: 66108200
+    initialBlock: 24824400
     updatePolicy: set
     valueType: bigint
     inputs:
@@ -89,7 +89,7 @@ modules:
            
   - name: map_collateralmanager_events
     kind: map
-    initialBlock: 66108200
+    initialBlock: 24824400
     inputs:
       - source: sf.ethereum.type.v2.Block
     output:
@@ -99,7 +99,7 @@ modules:
 
   - name: store_bid_collateral_withdrawn_data_deltas
     kind: store
-    initialBlock: 66108200
+    initialBlock: 24824400
     updatePolicy: add
     valueType: bigint
     inputs:
@@ -109,7 +109,7 @@ modules:
 
   - name: store_pool_collateral_withdrawn_data
     kind: store
-    initialBlock: 66108200
+    initialBlock: 24824400
     updatePolicy: add
     valueType: bigint
     inputs:
@@ -122,7 +122,7 @@ modules:
  
   - name: graph_out
     kind: map
-    initialBlock: 66108200
+    initialBlock: 24824400
     inputs:
       - map: map_events
       - store: store_globals_from_events
@@ -137,4 +137,4 @@ modules:
     output:
       type: proto:sf.substreams.entity.v1.EntityChanges
 
-network: polygon
+network: base

@@ -49,14 +49,19 @@ substreams pack ./substreams.yaml
 4. make && make build && make pack 
 
 
+  --- OLD WAY  -----------------------------------
 5. graph auth   (optional) 
 6. graph deploy   tellerv2-lender-groups-mainnet --version-label 0.4.21.122
-ORR  graph deploy tellerv2-pools-mainnet --version-label 0.4.21.112 
+ORR  graph deploy tellerv2-pools-base --version-label 0.4.21.113 
  
  0.4.21.122
+  ---  -----------------------------------------------------
 
 
-(  use graph deploy --studio    with old version of graph cli ) 
+ 
+
+
+7.  substreams publish  
 
 
 ### graph names 

@@ -55,8 +55,8 @@ const COLLATERAL_MANAGER_TRACKED_CONTRACT: [u8;20] = hex!("2551A099129ad9b0b1FEc
 
 
 
-const FACTORY_TRACKED_CONTRACT: [u8; 20] = hex!("C2a093B641496Ac8AA9d6a17f216ADF4a42FC9B6");
-const COLLATERAL_MANAGER_TRACKED_CONTRACT: [u8;20] = hex!("71B04a8569914bCb99D5F95644CF6b089c826024");
+const FACTORY_TRACKED_CONTRACT: [u8; 20] = hex!("0848E884b2DBb63727aa3216b921C279f6DC9a91");
+const COLLATERAL_MANAGER_TRACKED_CONTRACT: [u8;20] = hex!("2551A099129ad9b0b1FEc16f34D9CB73c237be8b");
 
 
 fn map_factory_events(blk: &eth::Block, events: &mut contract::Events) {
@@ -134,7 +134,7 @@ fn map_factory_events(blk: &eth::Block, events: &mut contract::Events) {
                 .filter_map(|log| {
                     if let Some(event) = abi::factory_contract::events::DeployedLenderGroupContract::match_and_decode(log) {
                         return Some(contract::FactoryDeployedLenderGroupContract {
-                            evt_tx_hash: format!("0x{}", hex::encode(&view.transaction.hash)),
+                            evt_tx_hash:  format_tx_hash( &view.transaction.hash ) ,
                             evt_index: log.block_index,
                             evt_block_time: blk.timestamp_seconds(),
                             evt_block_number: blk.number,
@@ -193,7 +193,7 @@ fn map_lendergroup_events(
                 .filter_map(|log| {
                     if let Some(event) = abi::lendergroup_contract::events::BorrowerAcceptedFunds::match_and_decode(log) {
                         return Some(contract::LendergroupBorrowerAcceptedFunds {
-                            evt_tx_hash: format!("0x{}", hex::encode(&view.transaction.hash)),
+                            evt_tx_hash:  format_tx_hash( &view.transaction.hash ) ,
                             evt_index: log.block_index,
                             evt_block_time: blk.timestamp_seconds(),
                             evt_block_number: blk.number,
@@ -220,7 +220,7 @@ fn map_lendergroup_events(
                 .filter_map(|log| {
                     if let Some(event) = abi::lendergroup_contract::events::DefaultedLoanLiquidated::match_and_decode(log) {
                         return Some(contract::LendergroupDefaultedLoanLiquidated {
-                            evt_tx_hash: format!("0x{}", hex::encode(&view.transaction.hash)),
+                            evt_tx_hash:  format_tx_hash( &view.transaction.hash ) ,
                             evt_index: log.block_index,
                             evt_block_time: blk.timestamp_seconds(),
                             evt_block_number: blk.number,
@@ -245,7 +245,7 @@ fn map_lendergroup_events(
                 .filter_map(|log| {
                     if let Some(event) = abi::lendergroup_contract::events::EarningsWithdrawn::match_and_decode(log) {
                         return Some(contract::LendergroupEarningsWithdrawn {
-                            evt_tx_hash: format!("0x{}", hex::encode(&view.transaction.hash)),
+                            evt_tx_hash:  format_tx_hash( &view.transaction.hash ) ,
                             evt_index: log.block_index,
                             evt_block_time: blk.timestamp_seconds(),
                             evt_block_number: blk.number,
@@ -270,7 +270,7 @@ fn map_lendergroup_events(
                 .filter_map(|log| {
                     if let Some(event) = abi::lendergroup_contract::events::Initialized::match_and_decode(log) {
                         return Some(contract::LendergroupInitialized {
-                            evt_tx_hash: format!("0x{}", hex::encode(&view.transaction.hash)),
+                            evt_tx_hash:  format_tx_hash( &view.transaction.hash ) ,
                             evt_index: log.block_index,
                             evt_block_time: blk.timestamp_seconds(),
                             evt_block_number: blk.number,
@@ -292,7 +292,7 @@ fn map_lendergroup_events(
                 .filter_map(|log| {
                     if let Some(event) = abi::lendergroup_contract::events::LenderAddedPrincipal::match_and_decode(log) {
                         return Some(contract::LendergroupLenderAddedPrincipal {
-                            evt_tx_hash: format!("0x{}", hex::encode(&view.transaction.hash)),
+                            evt_tx_hash:  format_tx_hash( &view.transaction.hash ) ,
                             evt_index: log.block_index,
                             evt_block_time: blk.timestamp_seconds(),
                             evt_block_number: blk.number,
@@ -317,7 +317,7 @@ fn map_lendergroup_events(
                 .filter_map(|log| {
                     if let Some(event) = abi::lendergroup_contract::events::LoanRepaid::match_and_decode(log) {
                         return Some(contract::LendergroupLoanRepaid {
-                            evt_tx_hash: format!("0x{}", hex::encode(&view.transaction.hash)),
+                            evt_tx_hash:  format_tx_hash( &view.transaction.hash ) ,
                             evt_index: log.block_index,
                             evt_block_time: blk.timestamp_seconds(),
                             evt_block_number: blk.number,
@@ -344,7 +344,7 @@ fn map_lendergroup_events(
                 .filter_map(|log| {
                     if let Some(event) = abi::lendergroup_contract::events::OwnershipTransferred::match_and_decode(log) {
                         return Some(contract::LendergroupOwnershipTransferred {
-                            evt_tx_hash: format!("0x{}", hex::encode(&view.transaction.hash)),
+                            evt_tx_hash:  format_tx_hash( &view.transaction.hash ) ,
                             evt_index: log.block_index,
                             evt_block_time: blk.timestamp_seconds(),
                             evt_block_number: blk.number,
@@ -367,7 +367,7 @@ fn map_lendergroup_events(
                 .filter_map(|log| {
                     if let Some(event) = abi::lendergroup_contract::events::Paused::match_and_decode(log) {
                         return Some(contract::LendergroupPaused {
-                            evt_tx_hash: format!("0x{}", hex::encode(&view.transaction.hash)),
+                            evt_tx_hash:  format_tx_hash( &view.transaction.hash ) ,
                             evt_index: log.block_index,
                             evt_block_time: blk.timestamp_seconds(),
                             evt_block_number: blk.number,
@@ -408,7 +408,7 @@ fn map_lendergroup_events(
                              
                         
                         return Some(contract::LendergroupPoolInitialized {
-                            evt_tx_hash: format!("0x{}", hex::encode(&view.transaction.hash)),
+                            evt_tx_hash:  format_tx_hash( &view.transaction.hash ) ,
                             evt_index: log.block_index,
                             evt_block_time: blk.timestamp_seconds(),
                             evt_block_number: blk.number,
@@ -444,7 +444,7 @@ fn map_lendergroup_events(
                 .filter_map(|log| {
                     if let Some(event) = abi::lendergroup_contract::events::Unpaused::match_and_decode(log) {
                         return Some(contract::LendergroupUnpaused {
-                            evt_tx_hash: format!("0x{}", hex::encode(&view.transaction.hash)),
+                            evt_tx_hash:  format_tx_hash( &view.transaction.hash ) ,
                             evt_index: log.block_index,
                             evt_block_time: blk.timestamp_seconds(),
                             evt_block_number: blk.number,
@@ -498,7 +498,7 @@ fn graph_factory_out(events: &contract::Events, tables: &mut EntityChangesTables
     events.factory_deployed_lender_group_contracts.iter().for_each(|evt| {
         tables
             .create_row("factory_deployed_lender_group_contract", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
-            .set("evt_tx_hash", evt.evt_tx_hash.clone().into_bytes())
+            .set("evt_tx_hash", parse_tx_hash( &evt.evt_tx_hash ) )
             .set("evt_index", BigInt::from( evt.evt_index ))
             .set("evt_block_time", BigInt::from(evt.evt_block_time))
             .set("evt_block_number", BigInt::from(evt.evt_block_number))
@@ -529,7 +529,7 @@ fn graph_lendergroup_out(
     events.lendergroup_borrower_accepted_funds.iter().for_each(|evt| {
         tables
             .create_row("group_borrower_accepted_funds", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
-            .set("evt_tx_hash", evt.evt_tx_hash.clone().into_bytes())  //maybe do hex to string first ? 
+            .set("evt_tx_hash", parse_tx_hash( &evt.evt_tx_hash ))  //maybe do hex to string first ? 
             .set("evt_index", BigInt::from(evt.evt_index))
             .set("evt_block_time", BigInt::from(evt.evt_block_time))
             .set("evt_block_number", BigInt::from(evt.evt_block_number))
@@ -566,7 +566,7 @@ fn graph_lendergroup_out(
     events.lendergroup_defaulted_loan_liquidateds.iter().for_each(|evt| {
         tables
             .create_row("group_defaulted_loan_liquidated", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
-            .set("evt_tx_hash", evt.evt_tx_hash.clone().into_bytes())
+            .set("evt_tx_hash",  parse_tx_hash( &evt.evt_tx_hash ) )
             .set("evt_index", BigInt::from(evt.evt_index))
             .set("evt_block_time", BigInt::from(evt.evt_block_time))
             .set("evt_block_number", BigInt::from(evt.evt_block_number))
@@ -579,7 +579,7 @@ fn graph_lendergroup_out(
     events.lendergroup_earnings_withdrawns.iter().for_each(|evt| {
         tables
             .create_row("group_earnings_withdrawn", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
-            .set("evt_tx_hash", evt.evt_tx_hash.clone().into_bytes())
+            .set("evt_tx_hash", parse_tx_hash( &evt.evt_tx_hash ) )
             .set("evt_index", BigInt::from(evt.evt_index))
             .set("evt_block_time", BigInt::from(evt.evt_block_time))
             .set("evt_block_number", BigInt::from(evt.evt_block_number))
@@ -592,7 +592,7 @@ fn graph_lendergroup_out(
     events.lendergroup_initializeds.iter().for_each(|evt| {
         tables
             .create_row("group_initialized", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
-            .set("evt_tx_hash", evt.evt_tx_hash.clone().into_bytes())
+            .set("evt_tx_hash", parse_tx_hash( &evt.evt_tx_hash ) )
             .set("evt_index", BigInt::from(evt.evt_index))
             .set("evt_block_time", BigInt::from(evt.evt_block_time))
             .set("evt_block_number", BigInt::from(evt.evt_block_number))
@@ -602,7 +602,7 @@ fn graph_lendergroup_out(
     events.lendergroup_lender_added_principals.iter().for_each(|evt| {
         tables
             .create_row("group_lender_added_principal", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
-            .set("evt_tx_hash", evt.evt_tx_hash.clone().into_bytes())
+            .set("evt_tx_hash", parse_tx_hash( &evt.evt_tx_hash ) )
             .set("evt_index", BigInt::from(evt.evt_index))
             .set("evt_block_time", BigInt::from(evt.evt_block_time))
             .set("evt_block_number", BigInt::from(evt.evt_block_number))
@@ -615,7 +615,7 @@ fn graph_lendergroup_out(
     events.lendergroup_loan_repaids.iter().for_each(|evt| {
         tables
             .create_row("group_loan_repaid", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
-            .set("evt_tx_hash", evt.evt_tx_hash.clone().into_bytes())
+            .set("evt_tx_hash", parse_tx_hash( &evt.evt_tx_hash ) )
             .set("evt_index", BigInt::from(evt.evt_index))
             .set("evt_block_time", BigInt::from(evt.evt_block_time))
             .set("evt_block_number", BigInt::from(evt.evt_block_number))
@@ -630,7 +630,7 @@ fn graph_lendergroup_out(
     events.lendergroup_ownership_transferreds.iter().for_each(|evt| {
         tables
             .create_row("group_ownership_transferred", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
-            .set("evt_tx_hash", evt.evt_tx_hash.clone().into_bytes())
+            .set("evt_tx_hash", parse_tx_hash( &evt.evt_tx_hash ) )
             .set("evt_index", BigInt::from(evt.evt_index))
             .set("evt_block_time", BigInt::from(evt.evt_block_time))
             .set("evt_block_number", BigInt::from(evt.evt_block_number))
@@ -641,7 +641,7 @@ fn graph_lendergroup_out(
     events.lendergroup_pauseds.iter().for_each(|evt| {
         tables
             .create_row("group_paused", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
-            .set("evt_tx_hash", evt.evt_tx_hash.clone().into_bytes())
+            .set("evt_tx_hash", parse_tx_hash( &evt.evt_tx_hash ) )
             .set("evt_index", BigInt::from(evt.evt_index))
             .set("evt_block_time", BigInt::from(evt.evt_block_time))
             .set("evt_block_number", BigInt::from(evt.evt_block_number))
@@ -651,7 +651,7 @@ fn graph_lendergroup_out(
     events.lendergroup_pool_initializeds.iter().for_each(|evt| {
         tables
             .create_row("group_pool_initialized", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
-            .set("evt_tx_hash", evt.evt_tx_hash.clone().into_bytes())
+            .set("evt_tx_hash", parse_tx_hash( &evt.evt_tx_hash ) )
             .set("evt_index", BigInt::from(evt.evt_index))
             .set("evt_block_time", BigInt::from(evt.evt_block_time))
             .set("evt_block_number", BigInt::from(evt.evt_block_number))
@@ -727,7 +727,7 @@ fn graph_lendergroup_out(
     events.lendergroup_unpauseds.iter().for_each(|evt| {
         tables
             .create_row("group_unpaused", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
-            .set("evt_tx_hash", evt.evt_tx_hash.clone().into_bytes())
+            .set("evt_tx_hash", parse_tx_hash( &evt.evt_tx_hash ) )
             .set("evt_index", BigInt::from(evt.evt_index))
             .set("evt_block_time", BigInt::from(evt.evt_block_time))
             .set("evt_block_number", BigInt::from(evt.evt_block_number))
@@ -1830,3 +1830,85 @@ fn graph_out(
                 
     Ok(tables.to_entity_changes())
     }
+
+
+
+
+
+
+    fn format_tx_hash( tx_hash : &Vec<u8>  ) -> String {
+
+        //format!("0x{}", hex::encode(&tx_hash))
+       // Hex( tx_hash ).to_string()
+        format!("0x{}", hex::encode(&tx_hash))
+    }
+
+  fn parse_tx_hash( tx_hash : &str  ) -> Vec<u8> {
+                hex::decode(&tx_hash[2..]).unwrap()
+    }
+
+
+
+   #[cfg(test)]
+mod tests {
+    use super::*;
+    
+    #[test]
+    fn test_format_tx_hash() {
+        // Create a sample transaction hash as a Vec<u8>
+        let sample_tx_hash = hex!("1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b");
+        let tx_hash_vec = sample_tx_hash.to_vec();
+        
+        // Expected result should be the hex representation with "0x" prefix
+        let expected_result = "0x1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b";
+        
+        // Call the function
+        let actual_result = format_tx_hash(&tx_hash_vec);
+        
+        // Assert that the actual result matches the expected result
+        assert_eq!(actual_result, expected_result);
+        
+        // Test with an empty vector
+        let empty_tx_hash = Vec::new();
+        assert_eq!(format_tx_hash(&empty_tx_hash), "0x");
+    }
+
+
+     #[test]
+     fn test_format_tx_hash_bytes() {
+    
+
+            // evt.evt_tx_hash.clone().into_bytes())
+
+
+        // Create a sample transaction hash as a Vec<u8>
+        let sample_tx_hash = hex!("1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b");
+        let tx_hash_vec = sample_tx_hash.to_vec();
+        
+        // Expected result should be the hex representation with "0x" prefix
+        let expected_result = "0x1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b";
+        
+        // Call the function
+        let actual_result = format_tx_hash(&tx_hash_vec);
+        
+        // Assert that the actual result matches the expected result
+        assert_eq!(actual_result, expected_result);
+        
+        // Test with an empty vector
+        let empty_tx_hash = Vec::new();
+        assert_eq!(format_tx_hash(&empty_tx_hash), "0x");
+
+
+
+        // Remove "0x" prefix and decode hex
+         let actual_bytes = parse_tx_hash( & actual_result  ) ;
+            assert_eq!(actual_bytes, tx_hash_vec);
+        //let  actual_result_bytes = actual_result.into_bytes(); 
+
+
+           assert_eq!(actual_bytes,  tx_hash_vec );
+
+
+
+    }
+}

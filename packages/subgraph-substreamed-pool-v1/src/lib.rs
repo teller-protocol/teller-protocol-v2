@@ -460,7 +460,7 @@ fn map_lendergroup_events(
 }
  
 
-fn graph_factory_out(events: &contract::Events, tables: &mut EntityChangesTables) {
+fn db_factory_out(events: &contract::Events, tables: &mut DatabaseChangeTables) {
     // Loop over all the abis events to create table changes
    /*events.factory_admin_changeds.iter().for_each(|evt| {
         tables
@@ -509,9 +509,9 @@ fn graph_factory_out(events: &contract::Events, tables: &mut EntityChangesTables
 
 
 //make sure these match schema.graphql ! 
-fn graph_lendergroup_out(
+fn db_lendergroup_out(
      events: &contract::Events,
-     tables: &mut EntityChangesTables,
+     tables: &mut DatabaseChangeTables,
      store_get_globals: &StoreGetBigInt, 
      store_bids_from_pools_data: &StoreGetString,
 
@@ -1772,6 +1772,7 @@ fn map_events(
 }
  
 
+/* 
 
 #[substreams::handlers::map]
 fn graph_out(
@@ -1806,32 +1807,52 @@ fn graph_out(
       //  &store_lendergroup_user_metrics,
         );
         
-        
-        
-  // Pool Day/Hour data:  //from uniswap repo 
-   /* db::pool_windows_create(&mut tables, &tx_count_deltas);
-    db::pool_windows_update(
-        &mut tables,
-        timestamp,
-        &tx_count_deltas,
-        &swaps_volume_deltas,
-        &events,
-        &pool_sqrt_price_store,
-        &pool_liquidities_store_deltas,
-        &price_deltas,
-        &store_prices,
-        &derived_tvl_deltas,
-        &min_windows_deltas,
-        &max_windows_deltas,
-    );*/
-
-    
-        
+ 
                 
     Ok(tables.to_entity_changes())
     }
 
+*/
 
+#[substreams::handlers::map]
+fn db_out( 
+
+   events: contract::Events,
+    store_globals: StoreGetBigInt, 
+    store_bids_from_pools_data: StoreGetString,
+
+    deltas_lendergroup_pool_metrics: Deltas<DeltaBigInt>,
+    store_lendergroup_pool_metrics: StoreGetBigInt, 
+    
+    deltas_lendergroup_user_metrics: Deltas<DeltaBigInt>,
+
+    store_collateral_withdrawn_data: StoreGetBigInt, 
+     //  store_lendergroup_user_metrics: StoreGetBigInt, 
+
+   ) -> Result<DatabaseChanges, substreams::errors::Error> {
+
+        let mut tables = DatabaseChangeTables::new();
+
+        db_factory_out(&events, &mut tables);
+        db_lendergroup_out(
+            &events, 
+            &mut tables, 
+            &store_globals,
+            &store_bids_from_pools_data,
+
+            &deltas_lendergroup_pool_metrics,
+            &store_lendergroup_pool_metrics,
+
+            &deltas_lendergroup_user_metrics,
+
+            &store_collateral_withdrawn_data
+          //  &store_lendergroup_user_metrics,
+            );
+            
+
+
+      Ok(tables.to_database_changes())
+}
 
 
 

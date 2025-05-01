@@ -63,7 +63,7 @@ ORR  graph deploy tellerv2-pools-base --version-label 0.4.21.113
  
 
 
-7.  substreams publish  
+5.  substreams publish  
 
 ```
  substreams-sink-sql setup $DSN substreams.yaml

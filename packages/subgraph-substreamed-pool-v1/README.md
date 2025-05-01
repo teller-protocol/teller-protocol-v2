@@ -49,12 +49,14 @@ substreams pack ./substreams.yaml
 4. make && make build && make pack 
 
 
-  --- OLD WAY  -----------------------------------
+  --- OLD WAY with subgraph  -----------------------------------
+  ```
 5. graph auth   (optional) 
 6. graph deploy   tellerv2-lender-groups-mainnet --version-label 0.4.21.122
 ORR  graph deploy tellerv2-pools-base --version-label 0.4.21.113 
  
  0.4.21.122
+ ```
   ---  -----------------------------------------------------
 
 
@@ -62,6 +64,12 @@ ORR  graph deploy tellerv2-pools-base --version-label 0.4.21.113
 
 
 7.  substreams publish  
+
+```
+ substreams-sink-sql setup $DSN substreams.yaml
+
+```
+
 
 
 ### graph names 

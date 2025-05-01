@@ -10,8 +10,12 @@ dataSources:
     network: {{chain_network}}
     source:
       package:
-        moduleName: graph_out
+        moduleName: db_out
         file: lender-group-substream-v0.1.0.spkg
     mapping:
       kind: substreams/graph-entities
       apiVersion: 0.0.5
+
+
+
+

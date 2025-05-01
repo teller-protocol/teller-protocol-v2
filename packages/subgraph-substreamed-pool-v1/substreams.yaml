@@ -9,6 +9,13 @@ imports:
   database_change: https://github.com/streamingfast/substreams-sink-database-changes/releases/download/v1.2.1/substreams-database-change-v1.2.1.spkg
   entity: https://github.com/streamingfast/substreams-entity-change/releases/download/v1.1.0/substreams-entity-change-v1.1.0.spkg
 
+
+sink:
+  module: db_out
+  type: sf.substreams.sink.sql.v1.Service
+  config:
+    schema: "./schema.sql"
+
 protobuf:
   files:
     - contract.proto
@@ -120,7 +127,7 @@ modules:
 
 
  
-  - name: graph_out
+  - name: db_out
     kind: map
     initialBlock: 24824400
     inputs:

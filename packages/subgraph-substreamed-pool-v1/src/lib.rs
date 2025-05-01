@@ -786,27 +786,27 @@ fn db_lendergroup_out(
                 //add more here 
                  match delta_prop_identifier  { 
                     "total_principal_tokens_committed" => {
-                        tables.update_row("group_pool_metric", &group_address)
+                        tables.update_row("group_pool_metric", group_address)
                             .set("total_principal_tokens_committed", new_value );
                     },
                     "total_collateral_tokens_escrowed" => {
-                        tables.update_row("group_pool_metric", &group_address)
+                        tables.update_row("group_pool_metric", group_address)
                             .set("total_collateral_tokens_escrowed", new_value );
                     },
                     "total_principal_tokens_withdrawn" => {
-                        tables.update_row("group_pool_metric", &group_address)
+                        tables.update_row("group_pool_metric", group_address)
                             .set("total_principal_tokens_withdrawn", new_value );
                     },
                     "total_principal_tokens_borrowed" => {
-                        tables.update_row("group_pool_metric", &group_address)
+                        tables.update_row("group_pool_metric", group_address)
                             .set("total_principal_tokens_borrowed", new_value );
                     },
                     "total_principal_tokens_repaid" => {
-                        tables.update_row("group_pool_metric", &group_address)
+                        tables.update_row("group_pool_metric", group_address)
                             .set("total_principal_tokens_repaid", new_value );
                     },
                     "total_interest_collected" => {
-                        tables.update_row("group_pool_metric", &group_address)
+                        tables.update_row("group_pool_metric", group_address)
                             .set("total_interest_collected", new_value );
                     },
                   
@@ -831,7 +831,7 @@ fn db_lendergroup_out(
                     
             
                     
-                tables.update_row("group_pool_metric", &group_pool_address)
+                tables.update_row("group_pool_metric", *group_pool_address)
                             .set("current_min_interest_rate", fetched_min_interest_rate );
 
 
@@ -841,7 +841,7 @@ fn db_lendergroup_out(
                     
             
                     
-                tables.update_row("group_pool_metric", &group_pool_address)
+                tables.update_row("group_pool_metric", *group_pool_address)
                             .set("token_difference_from_liquidations", fetched_token_amount_difference );
                     
           }
@@ -858,7 +858,7 @@ fn db_lendergroup_out(
             let ord = 0; // for now 
             if let Some( collateral_withdrawn_delta ) = store_collateral_withdrawn_data.get_at(ord, store_key){
 
-                tables.update_row("group_pool_metric", &group_pool_address)
+                tables.update_row("group_pool_metric", *group_pool_address)
                 .set("total_collateral_withdrawn", collateral_withdrawn_delta );
                 
 

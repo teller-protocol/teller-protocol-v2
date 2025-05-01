@@ -142,6 +142,6 @@ modules:
       - store: store_pool_collateral_withdrawn_data
 
     output:
-      type: proto:sf.substreams.entity.v1.EntityChanges
+      type: proto:sf.substreams.database.v1.DatabaseChanges
 
 network: base

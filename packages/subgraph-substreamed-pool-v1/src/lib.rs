@@ -867,6 +867,11 @@ fn db_lendergroup_out(
           
         }
          
+
+        let mut inserting_keys_map = HashSet::new(); 
+
+
+
          //need to use a non-delta store!?
          for group_pool_address in pool_metric_deltas_detected.iter() {
              
@@ -944,8 +949,9 @@ fn db_lendergroup_out(
                     
             
             let day_index = block_time.clone() / 86400;
-            
-                    
+
+            if !inserting_keys_map.contains( & format!("{}_{}", group_pool_address, day_index )){
+                       
                 tables
                     .create_row("group_pool_metric_data_point_daily", format!("{}_{}", group_pool_address, day_index )  ) 
                     .set("group_pool_address", Hex::decode( group_pool_address ).unwrap())
@@ -961,7 +967,8 @@ fn db_lendergroup_out(
                     .set("token_difference_from_liquidations",&fetched_token_amount_difference)
                     ;
             
-                
+                 inserting_keys_map.insert( format!("{}_{}", group_pool_address, day_index ) );
+            }
             
             let week_index = block_time.clone() / 604800;
             

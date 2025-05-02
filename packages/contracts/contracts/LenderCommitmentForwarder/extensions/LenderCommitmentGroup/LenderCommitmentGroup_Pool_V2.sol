@@ -361,7 +361,7 @@ contract LenderCommitmentGroup_Pool_V2 is
         uint256 _collateralTokenId, 
         uint32 _loanDuration,
         uint16 _interestRate
-    ) external onlySmartCommitmentForwarder whenForwarderNotPaused whenNotPaused {
+    ) external onlySmartCommitmentForwarder whenForwarderNotPaused whenNotPaused whenBorrowingNotPaused {
         
         require(
             _collateralTokenAddress == address(collateralToken),
@@ -1084,7 +1084,7 @@ contract LenderCommitmentGroup_Pool_V2 is
      * @notice Lets the DAO/owner of the protocol unpause borrowing
      */
     function unpauseBorrowing() public virtual onlyProtocolPauser whenBorrowingPaused {
-        setLastUnpausedAt();
+        //setLastUnpausedAt();  // dont need this, can still liq when borrowing is paused 
         _unpauseBorrowing();
     }
 

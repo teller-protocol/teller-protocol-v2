@@ -1041,8 +1041,12 @@ fn db_lendergroup_out(
             let interaction_count = &user_metric_delta.new_value ;
 
             if interaction_count == & BigInt::from(1) {
+
+
+
+        /* DISABLE FOR NOW 
                 tables
-                .create_row("group_user_metric", format!("{}_{}", group_address, user_address )  ) 
+                .create_or_update_row("group_user_metric", format!("{}_{}", group_address, user_address )  ) 
                 .set("group_pool_address", Hex::decode( group_address ).unwrap())
                 .set("user_address", Hex::decode( user_address ).unwrap())
       
@@ -1050,6 +1054,9 @@ fn db_lendergroup_out(
                 .set("total_collateral_tokens_escrowed", BigInt::zero() )
                 .set("total_principal_tokens_withdrawn", BigInt::zero() )
                 .set("total_principal_tokens_borrowed", BigInt::zero() );
+
+                */ 
+
             }
     
             

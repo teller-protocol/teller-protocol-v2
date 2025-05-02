@@ -929,9 +929,17 @@ fn db_lendergroup_out(
             .unwrap_or(BigInt::zero()) ;  */
                  
               
+
+
+
+
+
+        // DISABLED FOR NOW   UNTIL  create_or_update_row
+
+              /* 
             
                tables
-                    .create_row("group_pool_metric_data_point", format!("{}_{}", group_pool_address, block_number )  ) 
+                    .create_or_update_row("group_pool_metric_data_point", format!("{}", group_pool_address )  ) 
                     .set("group_pool_address", Hex::decode( group_pool_address ).unwrap())
                     .set("block_number", &block_number )
                     .set("block_time", &block_time)
@@ -951,7 +959,7 @@ fn db_lendergroup_out(
 
               
                 tables
-                    .create_row("group_pool_metric_data_point_daily", format!("{}_{}", group_pool_address, block_number )  ) 
+                    .create_or_update_row("group_pool_metric_data_point_daily", format!("{}_{}", group_pool_address, day_index )  ) 
                     .set("day_index", day_index ) 
                     .set("group_pool_address", Hex::decode( group_pool_address ).unwrap())
                      .set("block_number", &block_number )
@@ -972,7 +980,7 @@ fn db_lendergroup_out(
             
                       
                 tables
-                    .create_row("group_pool_metric_data_point_weekly", format!("{}_{}", group_pool_address, block_number )  ) 
+                    .create_or_update_row("group_pool_metric_data_point_weekly", format!("{}_{}", group_pool_address, block_number )  ) 
                       .set("week_index", week_index ) 
                       .set("group_pool_address", Hex::decode( group_pool_address ).unwrap())
                     .set("block_number", &block_number )
@@ -988,11 +996,11 @@ fn db_lendergroup_out(
                     ;
                 
              
-         }
          
          
+            */  
         
-          
+          }
           
 
 

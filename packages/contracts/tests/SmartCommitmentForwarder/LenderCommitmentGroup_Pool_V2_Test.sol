@@ -727,11 +727,11 @@ contract LenderCommitmentGroup_Pool_V2_Test is Testable {
 
       // Now test pause/unpause
       vm.prank(address(_tellerV2));
-      lenderCommitmentGroupSmartV2.pauseLendingPool();
+      lenderCommitmentGroupSmartV2.pausePool();
       assertTrue(lenderCommitmentGroupSmartV2.paused(), "Contract should be paused");
 
       vm.prank(address(_tellerV2));
-      lenderCommitmentGroupSmartV2.unpauseLendingPool();
+      lenderCommitmentGroupSmartV2.unpausePool();
       assertFalse(lenderCommitmentGroupSmartV2.paused(), "Contract should be unpaused");
 
       // Verify lastUnpausedAt was set

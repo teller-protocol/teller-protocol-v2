@@ -91,8 +91,7 @@ contract LenderCommitmentGroup_Pool_V2 is
     IPausableTimestamp,
     Initializable,
     OracleProtectedChild,
-    OwnableUpgradeable,
-    PausableUpgradeable,
+    OwnableUpgradeable,    
     ReentrancyGuardUpgradeable,
     LenderCommitmentGroupSharesIntegrated
 {
@@ -159,6 +158,8 @@ contract LenderCommitmentGroup_Pool_V2 is
 
 
     uint256 public lastUnpausedAt;
+    bool public paused;
+    bool public borrowingPaused;
    
 
     event PoolInitialized(
@@ -286,7 +287,7 @@ contract LenderCommitmentGroup_Pool_V2 is
     ) external initializer   {
        
         __Ownable_init();
-        __Pausable_init();
+    
         __Shares_init(
             _commitmentGroupConfig.principalTokenAddress,
             _commitmentGroupConfig.collateralTokenAddress
@@ -1019,20 +1020,90 @@ contract LenderCommitmentGroup_Pool_V2 is
 
     // ------------------------   Pausing functions  ------------ 
 
+
+
+    event Paused(address account);
+    event Unpaused(address account);
+
+    event PausedBorrowing(address account);
+    event UnpausedBorrowing(address account);
+
+    modifier whenPaused() {
+        require(paused, "Must be paused");
+        _;
+    }
+    modifier whenNotPaused() {
+        require(!paused, "Must not be paused");
+        _;
+    }
+
+     modifier whenBorrowingPaused() {
+        require(borrowingPaused, "Must be paused");
+        _;
+    }
+    modifier whenBorrowingNotPaused() {
+        require(!borrowingPaused, "Must not be paused");
+        _;
+    }
+
+
+
+
+    function _pause() internal {
+        paused = true;
+        emit Paused(_msgSender());
+    }
+
+    function _unpause() internal {
+        paused = false;
+        emit Unpaused(_msgSender());
+    }
+
+
+     function _pauseBorrowing() internal {
+        borrowingPaused = true;
+        emit PausedBorrowing(_msgSender());
+    }
+
+    function _unpauseBorrowing() internal {
+        borrowingPaused = false;
+        emit UnpausedBorrowing(_msgSender());
+    }
+
+
+
+
     /**
+     * @notice Lets the DAO/owner of the protocol paused borrowing
+     */
+    function pauseBorrowing() public virtual onlyProtocolPauser whenBorrowingNotPaused {
+        _pauseBorrowing();
+    }
+
+    /**
+     * @notice Lets the DAO/owner of the protocol unpause borrowing
+     */
+    function unpauseBorrowing() public virtual onlyProtocolPauser whenBorrowingPaused {
+        setLastUnpausedAt();
+        _unpauseBorrowing();
+    }
+
+
+        /**
      * @notice Lets the DAO/owner of the protocol implement an emergency stop mechanism.
      */
-    function pauseLendingPool() public virtual onlyProtocolPauser whenNotPaused {
+    function pausePool() public virtual onlyProtocolPauser whenNotPaused {
         _pause();
     }
 
     /**
      * @notice Lets the DAO/owner of the protocol undo a previously implemented emergency stop.
      */
-    function unpauseLendingPool() public virtual onlyProtocolPauser whenPaused {
+    function unpausePool() public virtual onlyProtocolPauser whenPaused {
         setLastUnpausedAt();
         _unpause();
     }
+
 
 
 
@@ -1265,14 +1336,14 @@ contract LenderCommitmentGroup_Pool_V2 is
     //////////////////////////////////////////////////////////////*/
 
     function maxDeposit(address) public view virtual returns (uint256) {
-        if (paused()) {
+        if (paused) {
             return 0;
         }
         return type(uint256).max;
     }
 
     function maxMint(address) public view virtual returns (uint256) {
-        if (paused()) {
+        if (paused) {
             return 0;
         }
         return type(uint256).max;
@@ -1280,7 +1351,7 @@ contract LenderCommitmentGroup_Pool_V2 is
 
     
     function maxWithdraw(address owner) public view virtual returns (uint256) {
-        if (paused()) {
+        if (paused) {
             return 0;
         }
         
@@ -1292,7 +1363,7 @@ contract LenderCommitmentGroup_Pool_V2 is
 
      
     function maxRedeem(address owner) public view virtual returns (uint256) {
-        if (paused()) {
+        if (paused) {
             return 0;
         }
         

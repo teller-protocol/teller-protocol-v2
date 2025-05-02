@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS group_borrower_accepted_funds (
     "evt_index" INT,
     "evt_block_time" TIMESTAMP,
     "evt_block_number" DECIMAL,
-    "evt_address" VARCHAR(40),
+    "group_pool_address" VARCHAR(40),
     "bid_id" DECIMAL,
     "borrower" VARCHAR(40),
     "collateral_amount" DECIMAL,
@@ -75,7 +75,7 @@ CREATE TABLE IF NOT EXISTS group_defaulted_loan_liquidated (
     "evt_index" INT,
     "evt_block_time" TIMESTAMP,
     "evt_block_number" DECIMAL,
-    "evt_address" VARCHAR(40),
+    "group_pool_address" VARCHAR(40),
     "amount_due" DECIMAL,
     "bid_id" DECIMAL,
     "liquidator" VARCHAR(40),
@@ -87,7 +87,7 @@ CREATE TABLE IF NOT EXISTS group_earnings_withdrawn (
     "evt_index" INT,
     "evt_block_time" TIMESTAMP,
     "evt_block_number" DECIMAL,
-    "evt_address" VARCHAR(40),
+    "group_pool_address" VARCHAR(40),
     "amount_pool_shares_tokens" DECIMAL,
     "lender" VARCHAR(40),
     "principal_tokens_withdrawn" DECIMAL,
@@ -99,7 +99,7 @@ CREATE TABLE IF NOT EXISTS group_initialized (
     "evt_index" INT,
     "evt_block_time" TIMESTAMP,
     "evt_block_number" DECIMAL,
-    "evt_address" VARCHAR(40),
+    "group_pool_address" VARCHAR(40),
     "version" INT 
 );
 CREATE TABLE IF NOT EXISTS group_lender_added_principal (
@@ -108,7 +108,7 @@ CREATE TABLE IF NOT EXISTS group_lender_added_principal (
     "evt_index" INT,
     "evt_block_time" TIMESTAMP,
     "evt_block_number" DECIMAL,
-    "evt_address" VARCHAR(40),
+    "group_pool_address" VARCHAR(40),
     "amount" DECIMAL,
     "lender" VARCHAR(40),
     "shares_amount" DECIMAL,
@@ -120,7 +120,7 @@ CREATE TABLE IF NOT EXISTS group_loan_repaid (
     "evt_index" INT,
     "evt_block_time" TIMESTAMP,
     "evt_block_number" DECIMAL,
-    "evt_address" VARCHAR(40),
+    "group_pool_address" VARCHAR(40),
     "bid_id" DECIMAL,
     "interest_amount" DECIMAL,
     "principal_amount" DECIMAL,
@@ -134,7 +134,7 @@ CREATE TABLE IF NOT EXISTS group_ownership_transferred (
     "evt_index" INT,
     "evt_block_time" TIMESTAMP,
     "evt_block_number" DECIMAL,
-    "evt_address" VARCHAR(40),
+    "group_pool_address" VARCHAR(40),
     "new_owner" VARCHAR(40),
     "previous_owner" VARCHAR(40)
    
@@ -145,7 +145,7 @@ CREATE TABLE IF NOT EXISTS group_paused (
     "evt_index" INT,
     "evt_block_time" TIMESTAMP,
     "evt_block_number" DECIMAL,
-    "evt_address" VARCHAR(40),
+    "group_pool_address" VARCHAR(40),
     "account" VARCHAR(40)
    
 );
@@ -155,7 +155,7 @@ CREATE TABLE IF NOT EXISTS group_pool_initialized (
     "evt_index" INT,
     "evt_block_time" TIMESTAMP,
     "evt_block_number" DECIMAL,
-    "evt_address" VARCHAR(40),
+    "group_pool_address" VARCHAR(40),
     "collateral_token_address" VARCHAR(40),
     "interest_rate_lower_bound" INT,
     "interest_rate_upper_bound" INT,
@@ -175,7 +175,7 @@ CREATE TABLE IF NOT EXISTS group_unpaused (
     "evt_index" INT,
     "evt_block_time" TIMESTAMP,
     "evt_block_number" DECIMAL,
-    "evt_address" VARCHAR(40),
+    "group_pool_address" VARCHAR(40),
     "account" VARCHAR(40)
     
 );

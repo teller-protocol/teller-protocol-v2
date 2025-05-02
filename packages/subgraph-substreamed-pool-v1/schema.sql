@@ -18,6 +18,8 @@ DROP TABLE IF EXISTS group_pool_metric_data_point CASCADE;
 DROP TABLE IF EXISTS group_pool_metric_data_point_daily CASCADE;
 DROP TABLE IF EXISTS group_pool_metric_data_point_weekly CASCADE;
 DROP TABLE IF EXISTS group_user_metric CASCADE;
+DROP TABLE IF EXISTS group_pool_bid CASCADE;
+
 
 CREATE TABLE IF NOT EXISTS factory_admin_changed (
      "id" VARCHAR PRIMARY KEY, 
@@ -219,7 +221,8 @@ CREATE TABLE IF NOT EXISTS group_pool_metric_data_point (
 );
 
 CREATE TABLE IF NOT EXISTS group_pool_metric_data_point_daily (
-     "id" VARCHAR PRIMARY KEY, 
+    "id" VARCHAR PRIMARY KEY,   
+    "day_index" NUMERIC,
     "group_pool_address" VARCHAR(40),
     "block_number" NUMERIC,
     "block_time" NUMERIC,
@@ -235,6 +238,7 @@ CREATE TABLE IF NOT EXISTS group_pool_metric_data_point_daily (
 
 CREATE TABLE IF NOT EXISTS group_pool_metric_data_point_weekly (
      "id" VARCHAR PRIMARY KEY, 
+      "week_index" NUMERIC,
     "group_pool_address" VARCHAR(40),
     "block_number" NUMERIC,
     "block_time" NUMERIC,
@@ -260,4 +264,15 @@ CREATE TABLE IF NOT EXISTS group_user_metric (
    
     "total_principal_tokens_withdrawn" NUMERIC,
     "total_principal_tokens_borrowed" NUMERIC
+);
+
+
+CREATE TABLE IF NOT EXISTS group_pool_bid (
+     "id" VARCHAR PRIMARY KEY, 
+    "group_pool_address" VARCHAR(40),
+    "bid_id" NUMERIC,
+    "borrower" VARCHAR(40),   
+    "principal_amount" NUMERIC,
+    "collateral_amount" NUMERIC
+    
 );

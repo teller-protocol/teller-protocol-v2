@@ -553,7 +553,7 @@ fn db_lendergroup_out(
             */
             
               tables
-            .create_row("group_pool_bid", format!("{}", evt.evt_address )  ) 
+            .create_row("group_pool_bid", format!("{}-{}", evt.evt_address, evt.bid_id )  ) 
            
             .set("group_pool_address", Hex::decode(&evt.evt_address).unwrap() )
             .set("bid_id", BigDecimal::from_str(&evt.bid_id).unwrap() )
@@ -868,8 +868,7 @@ fn db_lendergroup_out(
         }
          
 
-        let mut inserting_keys_map = HashSet::new(); 
-
+ 
 
 
          //need to use a non-delta store!?
@@ -950,10 +949,10 @@ fn db_lendergroup_out(
             
             let day_index = block_time.clone() / 86400;
 
-            if !inserting_keys_map.contains( & format!("{}_{}", group_pool_address, day_index )){
-                       
+              
                 tables
-                    .create_row("group_pool_metric_data_point_daily", format!("{}_{}", group_pool_address, day_index )  ) 
+                    .create_row("group_pool_metric_data_point_daily", format!("{}_{}", group_pool_address, block_number )  ) 
+                    .set("day_index", day_index ) 
                     .set("group_pool_address", Hex::decode( group_pool_address ).unwrap())
                      .set("block_number", &block_number )
                     .set("block_time", &block_time)
@@ -967,15 +966,15 @@ fn db_lendergroup_out(
                     .set("token_difference_from_liquidations",&fetched_token_amount_difference)
                     ;
             
-                 inserting_keys_map.insert( format!("{}_{}", group_pool_address, day_index ) );
-            }
+            
             
             let week_index = block_time.clone() / 604800;
             
                       
                 tables
-                    .create_row("group_pool_metric_data_point_weekly", format!("{}_{}", group_pool_address, week_index )  ) 
-                    .set("group_pool_address", Hex::decode( group_pool_address ).unwrap())
+                    .create_row("group_pool_metric_data_point_weekly", format!("{}_{}", group_pool_address, block_number )  ) 
+                      .set("week_index", week_index ) 
+                      .set("group_pool_address", Hex::decode( group_pool_address ).unwrap())
                     .set("block_number", &block_number )
                     .set("block_time", &block_time)
                     .set("total_principal_tokens_committed", &total_principal_committed )

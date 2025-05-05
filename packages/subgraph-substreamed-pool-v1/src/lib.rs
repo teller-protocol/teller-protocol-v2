@@ -3,7 +3,9 @@ mod pb;
 mod rpc;
  
 
- use rand::{Rng, SeedableRng};
+ use std::time::UNIX_EPOCH;
+use std::time::SystemTime;
+use rand::{Rng, SeedableRng};
 use rand::rngs::SmallRng;
   
 
@@ -978,8 +980,10 @@ fn db_lendergroup_out(
             .get_at(ord, format!("group_pool_metric:{}:token_difference_from_liquidations", group_pool_address  ))
             .unwrap_or(BigInt::zero()) ;  */
 
+            let system_time = SystemTime::now() .duration_since(UNIX_EPOCH) .unwrap().subsec_nanos() as u64 ;
 
-            let random_uuid = gen_random_uuid(block_number.to_u64(), block_time.to_u64());
+
+            let random_uuid = gen_random_uuid(block_number.to_u64(), system_time);
                   
                   
 
@@ -1114,9 +1118,10 @@ fn db_lendergroup_out(
                     let fetched_token_amount_difference = rpc::fetch_token_amount_difference_from_liquidations(&group_pool_address.to_string()).unwrap_or_default();
                  
 
-                     
+                let system_time = SystemTime::now() .duration_since(UNIX_EPOCH) .unwrap().subsec_nanos() as u64 ;
+     
 
-                let random_uuid = gen_random_uuid(block_number.to_u64(), block_time.to_u64());
+                let random_uuid = gen_random_uuid(block_number.to_u64(), system_time);
             
                  
               
@@ -1191,8 +1196,9 @@ fn db_lendergroup_out(
                  
 
                      
-
-                   let random_uuid = gen_random_uuid(block_number.to_u64(), block_time.to_u64());
+                       let system_time = SystemTime::now() .duration_since(UNIX_EPOCH) .unwrap().subsec_nanos() as u64 ;
+     
+                   let random_uuid = gen_random_uuid(block_number.to_u64(), system_time);
             
                  
 
@@ -1281,8 +1287,9 @@ fn db_lendergroup_out(
                        
                        
                
-
-                    let random_uuid = gen_random_uuid(block_number.to_u64(), block_time.to_u64());
+                        let system_time = SystemTime::now() .duration_since(UNIX_EPOCH) .unwrap().subsec_nanos() as u64 ;
+     
+                    let random_uuid = gen_random_uuid(block_number.to_u64(), system_time);
             
                  
 

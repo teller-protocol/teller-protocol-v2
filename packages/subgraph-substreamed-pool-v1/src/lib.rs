@@ -3,6 +3,7 @@ mod pb;
 mod rpc;
  
 
+use std::collections::HashMap;
 use hex_literal::hex;
 use pb::contract::v1 as contract;
 use pb::collateral::v1 as collateral_contract;
@@ -517,6 +518,13 @@ fn db_lendergroup_out(
 
      deltas_lendergroup_pool_metrics: &Deltas<DeltaBigInt>,
      store_get_lendergroup_pool_metrics: &StoreGetBigInt, 
+
+
+
+     store_get_lendergroup_pool_metric_data_points: StoreGetString, 
+     store_get_lendergroup_pool_metric_daily_data_points: StoreGetString, 
+     store_get_lendergroup_pool_metric_weekly_data_points: StoreGetString, 
+
   
      deltas_lendergroup_user_metrics: &Deltas<DeltaBigInt>,
 
@@ -756,6 +764,8 @@ fn db_lendergroup_out(
         
             
          let mut pool_metric_deltas_detected = HashSet::new();
+
+        
          
      
          for pool_metric_delta in deltas_lendergroup_pool_metrics.deltas. iter(){
@@ -775,11 +785,16 @@ fn db_lendergroup_out(
                         
                // let block_number = BigInt::zero(); // FOR NOW 
                 let new_value = &pool_metric_delta.new_value ;
-                        
-                        
+
+
+
+
+
+      
                 pool_metric_deltas_detected.insert(group_address);
                         
-                        
+                
+
               
                         
 
@@ -868,7 +883,12 @@ fn db_lendergroup_out(
         }
          
 
- 
+    
+
+        // day index,  pool address 
+         let mut pool_metric_delta_daily_detected : HashMap<i32  ,String> = HashMap::new();
+         let mut pool_metric_delta_weekly_detected : HashMap<i32,String> = HashMap::new();
+
 
 
          //need to use a non-delta store!?
@@ -928,18 +948,11 @@ fn db_lendergroup_out(
             .get_at(ord, format!("group_pool_metric:{}:token_difference_from_liquidations", group_pool_address  ))
             .unwrap_or(BigInt::zero()) ;  */
                  
-              
+                  
 
-
-
-
-
-        // DISABLED FOR NOW   UNTIL  create_or_update_row
-
-              /* 
-            
-               tables
-                    .create_or_update_row("group_pool_metric_data_point", format!("{}", group_pool_address )  ) 
+                        //why is this failing due to a multiple insert!? 
+              tables
+                    .create_row("group_pool_metric_data_point", format!("{}", group_pool_address )  ) 
                     .set("group_pool_address", Hex::decode( group_pool_address ).unwrap())
                     .set("block_number", &block_number )
                     .set("block_time", &block_time)
@@ -952,11 +965,27 @@ fn db_lendergroup_out(
                     .set("total_interest_collected", &total_interest_collected )
                     .set("token_difference_from_liquidations",&fetched_token_amount_difference)
                     ;
+
+
+
+
+        // DISABLED FOR NOW   UNTIL  create_or_update_row
+
+
+            
+            let day_index : BigInt = block_time.clone() / 86400;
+            pool_metric_delta_daily_detected.insert(day_index .to_i32()  , group_pool_address.to_string() ) ;
+
+
+            let week_index : BigInt = block_time.clone() / 604800;
+            pool_metric_delta_weekly_detected.insert(week_index .to_i32()  , group_pool_address.to_string() ) ;
+
+
+              /* 
+            
+             
             
                     
-            
-            let day_index = block_time.clone() / 86400;
-
               
                 tables
                     .create_or_update_row("group_pool_metric_data_point_daily", format!("{}_{}", group_pool_address, day_index )  ) 
@@ -1001,7 +1030,149 @@ fn db_lendergroup_out(
             */  
         
           }
-          
+
+
+          for (day_index, group_pool_address) in pool_metric_delta_daily_detected.iter(){
+
+
+                    let ord = 0; // FOR NOW - CAN CAUSE ISSUES 
+               
+                    let block_number = store_get_globals
+                    .get_at(ord, format!("latest_block_number"   ))
+                    .unwrap_or(BigInt::zero());  
+                    let block_time = store_get_globals
+                    .get_at(ord, format!("latest_block_time"   ))
+                    .unwrap_or(BigInt::zero());   
+                       
+                       
+                       //turn this into an enum !?
+                    let total_principal_committed = store_get_lendergroup_pool_metrics
+                    .get_at(ord, format!("group_pool_metric:{}:total_principal_tokens_committed", group_pool_address  ))
+                    .unwrap_or(BigInt::zero()) ;
+                   
+                    let total_collateral_escrowed = store_get_lendergroup_pool_metrics
+                    .get_at(ord, format!("group_pool_metric:{}:total_collateral_tokens_escrowed", group_pool_address  ))
+                    .unwrap_or(BigInt::zero()) ;
+                    
+
+                    //this comes from a special source !! since it comes from CollateralManager contract 
+                    let total_collateral_withdrawn = store_collateral_withdrawn_data
+                    .get_at(ord, format!("total_collateral_amount_withdrawn:{}", group_pool_address) )
+                    .unwrap_or(BigInt::zero()) ;
+                        
+                    let total_principal_tokens_withdrawn = store_get_lendergroup_pool_metrics
+                    .get_at(ord, format!("group_pool_metric:{}:total_principal_tokens_withdrawn", group_pool_address  ))
+                    .unwrap_or(BigInt::zero()) ;
+                        
+                    let total_principal_tokens_borrowed = store_get_lendergroup_pool_metrics
+                    .get_at(ord, format!("group_pool_metric:{}:total_principal_tokens_borrowed", group_pool_address  ))
+                    .unwrap_or(BigInt::zero()) ;
+                        
+                    let total_principal_tokens_repaid = store_get_lendergroup_pool_metrics
+                    .get_at(ord, format!("group_pool_metric:{}:total_principal_tokens_repaid", group_pool_address  ))
+                    .unwrap_or(BigInt::zero()) ;
+                        
+                    let total_interest_collected = store_get_lendergroup_pool_metrics
+                    .get_at(ord, format!("group_pool_metric:{}:total_interest_collected", group_pool_address  ))
+                    .unwrap_or(BigInt::zero()) ;
+
+
+
+                    let fetched_token_amount_difference = rpc::fetch_token_amount_difference_from_liquidations(&group_pool_address.to_string()).unwrap_or_default();
+                 
+
+              
+                tables
+                    .create_row("group_pool_metric_data_point_daily", format!("{}_{}", group_pool_address, day_index )  ) 
+                    .set("day_index", *day_index ) 
+                    .set("group_pool_address", Hex::decode( group_pool_address ).unwrap())
+                     .set("block_number", &block_number )
+                    .set("block_time", &block_time)
+                    .set("total_principal_tokens_committed", &total_principal_committed )
+                    .set("total_collateral_tokens_withdrawn", &total_collateral_withdrawn )
+                    .set("total_collateral_tokens_escrowed", &total_collateral_escrowed )
+                    .set("total_principal_tokens_withdrawn", &total_principal_tokens_withdrawn  )
+                    .set("total_principal_tokens_borrowed", &total_principal_tokens_borrowed )
+                    .set("total_principal_tokens_repaid", &total_principal_tokens_repaid  )
+                    .set("total_interest_collected", &total_interest_collected ) 
+                    .set("token_difference_from_liquidations",&fetched_token_amount_difference)
+                    ;
+            
+
+
+          }
+
+
+          for (week_index, group_pool_address) in pool_metric_delta_daily_detected.iter(){
+
+
+                  let ord = 0; // FOR NOW - CAN CAUSE ISSUES 
+               
+                    let block_number = store_get_globals
+                    .get_at(ord, format!("latest_block_number"   ))
+                    .unwrap_or(BigInt::zero());  
+                    let block_time = store_get_globals
+                    .get_at(ord, format!("latest_block_time"   ))
+                    .unwrap_or(BigInt::zero());   
+                       
+                       
+                       //turn this into an enum !?
+                    let total_principal_committed = store_get_lendergroup_pool_metrics
+                    .get_at(ord, format!("group_pool_metric:{}:total_principal_tokens_committed", group_pool_address  ))
+                    .unwrap_or(BigInt::zero()) ;
+                   
+                    let total_collateral_escrowed = store_get_lendergroup_pool_metrics
+                    .get_at(ord, format!("group_pool_metric:{}:total_collateral_tokens_escrowed", group_pool_address  ))
+                    .unwrap_or(BigInt::zero()) ;
+                    
+
+                    //this comes from a special source !! since it comes from CollateralManager contract 
+                    let total_collateral_withdrawn = store_collateral_withdrawn_data
+                    .get_at(ord, format!("total_collateral_amount_withdrawn:{}", group_pool_address) )
+                    .unwrap_or(BigInt::zero()) ;
+                        
+                    let total_principal_tokens_withdrawn = store_get_lendergroup_pool_metrics
+                    .get_at(ord, format!("group_pool_metric:{}:total_principal_tokens_withdrawn", group_pool_address  ))
+                    .unwrap_or(BigInt::zero()) ;
+                        
+                    let total_principal_tokens_borrowed = store_get_lendergroup_pool_metrics
+                    .get_at(ord, format!("group_pool_metric:{}:total_principal_tokens_borrowed", group_pool_address  ))
+                    .unwrap_or(BigInt::zero()) ;
+                        
+                    let total_principal_tokens_repaid = store_get_lendergroup_pool_metrics
+                    .get_at(ord, format!("group_pool_metric:{}:total_principal_tokens_repaid", group_pool_address  ))
+                    .unwrap_or(BigInt::zero()) ;
+                        
+                    let total_interest_collected = store_get_lendergroup_pool_metrics
+                    .get_at(ord, format!("group_pool_metric:{}:total_interest_collected", group_pool_address  ))
+                    .unwrap_or(BigInt::zero()) ;
+
+
+
+                    let fetched_token_amount_difference = rpc::fetch_token_amount_difference_from_liquidations(&group_pool_address.to_string()).unwrap_or_default();
+                 
+
+                     tables
+                    .create_row("group_pool_metric_data_point_weekly", format!("{}_{}", group_pool_address, block_number )  ) 
+                      .set("week_index", *week_index ) 
+                      .set("group_pool_address", Hex::decode( group_pool_address ).unwrap())
+                    .set("block_number", &block_number )
+                    .set("block_time", &block_time)
+                    .set("total_principal_tokens_committed", &total_principal_committed )
+                    .set("total_collateral_tokens_escrowed", &total_collateral_escrowed )
+                    .set("total_collateral_tokens_withdrawn", &total_collateral_withdrawn )
+                    .set("total_principal_tokens_withdrawn", &total_principal_tokens_withdrawn  )
+                    .set("total_principal_tokens_borrowed", &total_principal_tokens_borrowed )
+                    .set("total_principal_tokens_repaid", &total_principal_tokens_repaid  )
+                    .set("total_interest_collected", &total_interest_collected )
+                    .set("token_difference_from_liquidations",&fetched_token_amount_difference)
+                    ;
+                
+             
+
+
+            
+          }
 
 
     // -- end group pool metrics 
@@ -1781,6 +1952,99 @@ fn store_lendergroup_pool_metrics(
 }
 
 
+
+
+#[substreams::handlers::store]
+fn store_lendergroup_pool_metric_data_points(
+     deltas_lendergroup_pool_metrics: Deltas<DeltaBigInt>,
+
+     globals_store: StoreGetBigInt, 
+
+     store: StoreSetBigInt,
+     
+) {
+    
+    
+    let ord = 0; // FOR NOW - CAN CAUSE ISSUES - GET FROM LOG AND STUFF INTO EVENT    
+    
+      for pool_metric_delta in deltas_lendergroup_pool_metrics.deltas. iter(){
+             
+                    
+                        //this splits on ":"
+                let delta_root_identifier = substreams::key::segment_at(pool_metric_delta.get_key(), 0);
+            
+                if delta_root_identifier != "group_pool_metric" {continue};
+                
+                let group_address = substreams::key::segment_at(pool_metric_delta.get_key(), 1);
+                let delta_prop_identifier = substreams::key::segment_at(pool_metric_delta.get_key(), 2);
+                        
+                        
+                        
+              //  let block_number = 0; // FOR NOW 
+                let new_value = &pool_metric_delta.new_value ;
+                        
+                
+                //substreams::log::info();
+                
+               let current_block_time = globals_store.get_at(ord, "latest_block_time").unwrap_or(BigInt::zero());
+
+                    
+                    
+               let store_block_time_key: String = format!("group_pool_metric:{}:block_time", group_address);              
+               store.set(ord,&store_block_time_key, &current_block_time  );
+                        
+               match delta_prop_identifier {
+                   
+                   "total_principal_tokens_committed" => {
+                       let store_key: String = format!("group_pool_metric:{}:total_principal_tokens_committed", group_address);
+                       store.set(ord,&store_key,  new_value  );
+                      
+
+                   }
+                   
+                   "total_collateral_tokens_escrowed" => {
+                    let store_key: String = format!("group_pool_metric:{}:total_collateral_tokens_escrowed", group_address);
+                    store.set(ord,&store_key,  new_value  );
+
+                    }
+                
+                     
+                   "total_principal_tokens_withdrawn" => {
+                       let store_key: String = format!("group_pool_metric:{}:total_principal_tokens_withdrawn", group_address);
+                       store.set(ord,&store_key,  new_value  );
+                   }
+                   
+                   "total_principal_tokens_borrowed"=> {
+                       let store_key: String = format!("group_pool_metric:{}:total_principal_tokens_borrowed", group_address);
+                       store.set(ord,&store_key,  new_value  );
+                   }
+                   
+                      
+                   "total_principal_tokens_repaid" => {
+                       let store_key: String = format!("group_pool_metric:{}:total_principal_tokens_repaid", group_address);
+                       store.set(ord,&store_key,  new_value  );
+                   }
+                   
+                  "total_interest_collected" => {
+                       let store_key: String = format!("group_pool_metric:{}:total_interest_collected", group_address);
+                       store.set(ord,&store_key,  new_value  );
+                   }
+                   
+                   
+                   _ => {} 
+                   
+               }
+               
+                        
+                        
+      }
+    
+    
+   
+}
+
+
+
 #[substreams::handlers::map]
 fn map_events(
     blk: eth::Block,
@@ -1844,6 +2108,12 @@ fn db_out(
 
     deltas_lendergroup_pool_metrics: Deltas<DeltaBigInt>,
     store_lendergroup_pool_metrics: StoreGetBigInt, 
+
+
+
+
+
+
     
     deltas_lendergroup_user_metrics: Deltas<DeltaBigInt>,
 

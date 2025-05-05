@@ -19,6 +19,7 @@ substreams-ethereum = "0.9"
 substreams-database-change = "1"
 substreams-entity-change = "1"
 hex = "0.4.3"
+uuid = { version = "1.4", features = ["v4"] }
 
 # required for custom config export 
 handlebars = "4.1"

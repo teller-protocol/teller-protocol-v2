@@ -28,6 +28,15 @@ use substreams::scalar::BigDecimal;
 substreams_ethereum::init!();
 
 
+
+/*
+
+TODO:   add this  Add excess principal tokens repaid to Pools substream and then to defillama
+
+
+*/
+
+
 //make a better config for this ? 
 /*
 
@@ -521,9 +530,9 @@ fn db_lendergroup_out(
 
 
 
-     store_get_lendergroup_pool_metric_data_points: StoreGetString, 
-     store_get_lendergroup_pool_metric_daily_data_points: StoreGetString, 
-     store_get_lendergroup_pool_metric_weekly_data_points: StoreGetString, 
+ //   store_get_lendergroup_pool_metric_data_points: StoreGetString, 
+  //   store_get_lendergroup_pool_metric_daily_data_points: StoreGetString, 
+     // store_get_lendergroup_pool_metric_weekly_data_points: StoreGetString, 
 
   
      deltas_lendergroup_user_metrics: &Deltas<DeltaBigInt>,
@@ -763,7 +772,7 @@ fn db_lendergroup_out(
      //   let group_address = Address::from_slice(  & Hex::decode(&evt.evt_address).unwrap() )    ; //evt.evt_address.clone();
         
             
-         let mut pool_metric_deltas_detected = HashSet::new();
+       //  let mut pool_metric_deltas_detected = HashSet::new();
 
         
          
@@ -773,7 +782,7 @@ fn db_lendergroup_out(
                     
                         //this splits on ":"
                 let delta_root_identifier = substreams::key::segment_at(pool_metric_delta.get_key(), 0);
-
+                
 
                 //maybe this is breaking things ?
                if delta_root_identifier != "group_pool_metric" {continue};
@@ -791,7 +800,7 @@ fn db_lendergroup_out(
 
 
       
-                pool_metric_deltas_detected.insert(group_address);
+             //   pool_metric_deltas_detected.insert(group_address);
                         
                 
 
@@ -837,8 +846,13 @@ fn db_lendergroup_out(
          }
          
          
-          for group_pool_address in pool_metric_deltas_detected.iter() {
-                       
+         
+         for pool_metric_delta in deltas_lendergroup_pool_metrics.deltas. iter(){
+       
+              
+              let group_pool_address = substreams::key::segment_at(pool_metric_delta.get_key(), 1);
+             
+
                let fetched_min_interest_rate = rpc::fetch_min_interest_rate_from_rpc(
                      &group_pool_address.to_string(),
                       BigInt::zero()
@@ -846,7 +860,7 @@ fn db_lendergroup_out(
                     
             
                     
-                tables.update_row("group_pool_metric", *group_pool_address)
+                tables.update_row("group_pool_metric",  group_pool_address)
                             .set("current_min_interest_rate", fetched_min_interest_rate );
 
 
@@ -856,7 +870,7 @@ fn db_lendergroup_out(
                     
             
                     
-                tables.update_row("group_pool_metric", *group_pool_address)
+                tables.update_row("group_pool_metric",  group_pool_address)
                             .set("token_difference_from_liquidations", fetched_token_amount_difference );
                     
           }
@@ -864,16 +878,21 @@ fn db_lendergroup_out(
         //add total collateral withdrawn data 
 
 
-        for group_pool_address in pool_metric_deltas_detected.iter() {
+          
+         for pool_metric_delta in deltas_lendergroup_pool_metrics.deltas. iter(){
+       
+              
+              let group_pool_address = substreams::key::segment_at(pool_metric_delta.get_key(), 1);
+          
 
-            let store_key = format!("total_collateral_amount_withdrawn:{}", group_pool_address);
+              let store_key = format!("total_collateral_amount_withdrawn:{}", group_pool_address);
 
 
             //change this source !? 
             let ord = 0; // for now 
             if let Some( collateral_withdrawn_delta ) = store_collateral_withdrawn_data.get_at(ord, store_key){
 
-                tables.update_row("group_pool_metric", *group_pool_address)
+                tables.update_row("group_pool_metric",  group_pool_address)
                 .set("total_collateral_withdrawn", collateral_withdrawn_delta );
                 
 
@@ -886,13 +905,20 @@ fn db_lendergroup_out(
     
 
         // day index,  pool address 
-         let mut pool_metric_delta_daily_detected : HashMap<i32  ,String> = HashMap::new();
+          let mut pool_metric_delta_daily_detected : HashMap<i32  ,String> = HashMap::new();
          let mut pool_metric_delta_weekly_detected : HashMap<i32,String> = HashMap::new();
 
 
 
          //need to use a non-delta store!?
-         for group_pool_address in pool_metric_deltas_detected.iter() {
+           
+         for pool_metric_delta in deltas_lendergroup_pool_metrics.deltas. iter(){
+       
+            
+             
+              let group_pool_address = substreams::key::segment_at(pool_metric_delta.get_key(), 1);
+                      
+             
              
                 
             //get the data from store_get_lendergroup_pool_metrics
@@ -947,12 +973,15 @@ fn db_lendergroup_out(
             /* let token_difference_from_liquidations = store_get_lendergroup_pool_metrics
             .get_at(ord, format!("group_pool_metric:{}:token_difference_from_liquidations", group_pool_address  ))
             .unwrap_or(BigInt::zero()) ;  */
+
+
+             let random_uuid = Uuid::new_v4();
                  
                   
 
                         //why is this failing due to a multiple insert!? 
               tables
-                    .create_row("group_pool_metric_data_point", format!("{}", group_pool_address )  ) 
+                    .create_row("group_pool_metric_data_point", format!("{}", random_uuid.to_string()   )  ) 
                     .set("group_pool_address", Hex::decode( group_pool_address ).unwrap())
                     .set("block_number", &block_number )
                     .set("block_time", &block_time)
@@ -972,7 +1001,7 @@ fn db_lendergroup_out(
         // DISABLED FOR NOW   UNTIL  create_or_update_row
 
 
-            
+              
             let day_index : BigInt = block_time.clone() / 86400;
             pool_metric_delta_daily_detected.insert(day_index .to_i32()  , group_pool_address.to_string() ) ;
 
@@ -980,15 +1009,11 @@ fn db_lendergroup_out(
             let week_index : BigInt = block_time.clone() / 604800;
             pool_metric_delta_weekly_detected.insert(week_index .to_i32()  , group_pool_address.to_string() ) ;
 
-
-              /* 
-            
-             
-            
+ 
                     
-              
+              /*
                 tables
-                    .create_or_update_row("group_pool_metric_data_point_daily", format!("{}_{}", group_pool_address, day_index )  ) 
+                    .create_or_update_row("group_pool_metric_data_point_daily", format!("{}", random_uuid.to_string()   )   ) 
                     .set("day_index", day_index ) 
                     .set("group_pool_address", Hex::decode( group_pool_address ).unwrap())
                      .set("block_number", &block_number )
@@ -1009,7 +1034,7 @@ fn db_lendergroup_out(
             
                       
                 tables
-                    .create_or_update_row("group_pool_metric_data_point_weekly", format!("{}_{}", group_pool_address, block_number )  ) 
+                    .create_or_update_row("group_pool_metric_data_point_weekly", format!("{}", random_uuid.to_string()   )   ) 
                       .set("week_index", week_index ) 
                       .set("group_pool_address", Hex::decode( group_pool_address ).unwrap())
                     .set("block_number", &block_number )
@@ -1024,14 +1049,18 @@ fn db_lendergroup_out(
                     .set("token_difference_from_liquidations",&fetched_token_amount_difference)
                     ;
                 
-             
+             */
          
          
-            */  
+           
         
           }
 
 
+
+
+
+ 
           for (day_index, group_pool_address) in pool_metric_delta_daily_detected.iter(){
 
 
@@ -1081,9 +1110,11 @@ fn db_lendergroup_out(
                     let fetched_token_amount_difference = rpc::fetch_token_amount_difference_from_liquidations(&group_pool_address.to_string()).unwrap_or_default();
                  
 
+                      let random_uuid = Uuid::new_v4();
+                 
               
                 tables
-                    .create_row("group_pool_metric_data_point_daily", format!("{}_{}", group_pool_address, day_index )  ) 
+                    .create_row("group_pool_metric_data_point_daily", format!("{}", random_uuid.to_string()   )  ) 
                     .set("day_index", *day_index ) 
                     .set("group_pool_address", Hex::decode( group_pool_address ).unwrap())
                      .set("block_number", &block_number )
@@ -1103,7 +1134,7 @@ fn db_lendergroup_out(
           }
 
 
-          for (week_index, group_pool_address) in pool_metric_delta_daily_detected.iter(){
+          for (week_index, group_pool_address) in pool_metric_delta_weekly_detected.iter(){
 
 
                   let ord = 0; // FOR NOW - CAN CAUSE ISSUES 
@@ -1152,8 +1183,11 @@ fn db_lendergroup_out(
                     let fetched_token_amount_difference = rpc::fetch_token_amount_difference_from_liquidations(&group_pool_address.to_string()).unwrap_or_default();
                  
 
+                      let random_uuid = Uuid::new_v4();
+                 
+
                      tables
-                    .create_row("group_pool_metric_data_point_weekly", format!("{}_{}", group_pool_address, block_number )  ) 
+                    .create_row("group_pool_metric_data_point_weekly", format!("{}", random_uuid.to_string()   )  ) 
                       .set("week_index", *week_index ) 
                       .set("group_pool_address", Hex::decode( group_pool_address ).unwrap())
                     .set("block_number", &block_number )
@@ -1173,6 +1207,17 @@ fn db_lendergroup_out(
 
             
           }
+
+
+ 
+
+
+
+
+
+
+
+
 
 
     // -- end group pool metrics 
@@ -1215,9 +1260,13 @@ fn db_lendergroup_out(
 
 
 
-        /* DISABLE FOR NOW 
+               let random_uuid = Uuid::new_v4();
+                 
+
+ 
+        
                 tables
-                .create_or_update_row("group_user_metric", format!("{}_{}", group_address, user_address )  ) 
+                .create_or_update_row("group_user_metric",  format!("{}", random_uuid.to_string()   )  ) 
                 .set("group_pool_address", Hex::decode( group_address ).unwrap())
                 .set("user_address", Hex::decode( user_address ).unwrap())
       
@@ -1225,8 +1274,7 @@ fn db_lendergroup_out(
                 .set("total_collateral_tokens_escrowed", BigInt::zero() )
                 .set("total_principal_tokens_withdrawn", BigInt::zero() )
                 .set("total_principal_tokens_borrowed", BigInt::zero() );
-
-                */ 
+ 
 
             }
     
@@ -1953,7 +2001,7 @@ fn store_lendergroup_pool_metrics(
 
 
 
-
+/*
 #[substreams::handlers::store]
 fn store_lendergroup_pool_metric_data_points(
      deltas_lendergroup_pool_metrics: Deltas<DeltaBigInt>,
@@ -2043,7 +2091,7 @@ fn store_lendergroup_pool_metric_data_points(
    
 }
 
-
+*/ 
 
 #[substreams::handlers::map]
 fn map_events(

@@ -2,9 +2,7 @@ mod abi;
 mod pb;
 mod rpc;
  
-
- use std::time::UNIX_EPOCH;
-use std::time::SystemTime;
+ 
 use rand::{Rng, SeedableRng};
 use rand::rngs::SmallRng;
   
@@ -32,6 +30,15 @@ use std::str::FromStr;
 use substreams::scalar::BigDecimal;
 
 substreams_ethereum::init!();
+
+
+
+// Add this at the module level
+use std::sync::atomic::{AtomicU64, Ordering};
+
+// Static counter to ensure uniqueness within blocks
+static COUNTER: AtomicU64 = AtomicU64::new(0);
+
 
 
 
@@ -979,17 +986,15 @@ fn db_lendergroup_out(
             /* let token_difference_from_liquidations = store_get_lendergroup_pool_metrics
             .get_at(ord, format!("group_pool_metric:{}:token_difference_from_liquidations", group_pool_address  ))
             .unwrap_or(BigInt::zero()) ;  */
+ 
 
-            let system_time = SystemTime::now() .duration_since(UNIX_EPOCH) .unwrap().subsec_nanos() as u64 ;
-
-
-            let random_uuid = gen_random_uuid(block_number.to_u64(), system_time);
+ 
                   
                   
 
                         //why is this failing due to a multiple insert!? 
               tables
-                    .create_row("group_pool_metric_data_point", format!("{}", random_uuid.to_string()   )  ) 
+                    .create_row( "group_pool_metric_data_point"     ) 
                     .set("group_pool_address", Hex::decode( group_pool_address ).unwrap())
                     .set("block_number", &block_number )
                     .set("block_time", &block_time)
@@ -1117,11 +1122,10 @@ fn db_lendergroup_out(
 
                     let fetched_token_amount_difference = rpc::fetch_token_amount_difference_from_liquidations(&group_pool_address.to_string()).unwrap_or_default();
                  
-
-                let system_time = SystemTime::now() .duration_since(UNIX_EPOCH) .unwrap().subsec_nanos() as u64 ;
+ 
      
 
-                let random_uuid = gen_random_uuid(block_number.to_u64(), system_time);
+                let random_uuid = gen_random_uuid( );
             
                  
               
@@ -1196,9 +1200,9 @@ fn db_lendergroup_out(
                  
 
                      
-                       let system_time = SystemTime::now() .duration_since(UNIX_EPOCH) .unwrap().subsec_nanos() as u64 ;
+                  
      
-                   let random_uuid = gen_random_uuid(block_number.to_u64(), system_time);
+                   let random_uuid = gen_random_uuid();
             
                  
 
@@ -1286,10 +1290,9 @@ fn db_lendergroup_out(
                     .unwrap_or(BigInt::zero());   
                        
                        
-               
-                        let system_time = SystemTime::now() .duration_since(UNIX_EPOCH) .unwrap().subsec_nanos() as u64 ;
+                
      
-                    let random_uuid = gen_random_uuid(block_number.to_u64(), system_time);
+                    let random_uuid = gen_random_uuid();
             
                  
 
@@ -2310,11 +2313,13 @@ mod tests {
 
 
 
+/*
+fn gen_random_uuid(  ) -> String {
+     
+ 
 
-fn gen_random_uuid( block_number: u64, timestamp: u64 ) -> String {
-    // Create a deterministic seed from block data or other deterministic source
-  
-    let seed = block_number ^ (timestamp << 32);
+
+    let seed =  COUNTER.fetch_add(1, Ordering::SeqCst) ;
     
     // Initialize SmallRng with a seed
     let mut rng = SmallRng::seed_from_u64(seed);
@@ -2337,4 +2342,4 @@ fn gen_random_uuid( block_number: u64, timestamp: u64 ) -> String {
         uuid[8], uuid[9],
         uuid[10], uuid[11], uuid[12], uuid[13], uuid[14], uuid[15]
     )
-}
+}*/

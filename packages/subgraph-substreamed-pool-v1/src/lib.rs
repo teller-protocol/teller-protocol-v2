@@ -2,7 +2,9 @@ mod abi;
 mod pb;
 mod rpc;
  
-
+ 
+ use rand::Rng;
+ 
 use std::collections::HashMap;
 use hex_literal::hex;
 use pb::contract::v1 as contract;
@@ -975,7 +977,7 @@ fn db_lendergroup_out(
             .unwrap_or(BigInt::zero()) ;  */
 
 
-             let random_uuid = Uuid::new_v4();
+             let random_uuid = gen_random_uuid();
                  
                   
 
@@ -1110,7 +1112,9 @@ fn db_lendergroup_out(
                     let fetched_token_amount_difference = rpc::fetch_token_amount_difference_from_liquidations(&group_pool_address.to_string()).unwrap_or_default();
                  
 
-                      let random_uuid = Uuid::new_v4();
+                     
+
+                 let random_uuid = gen_random_uuid();
                  
               
                 tables
@@ -1183,7 +1187,9 @@ fn db_lendergroup_out(
                     let fetched_token_amount_difference = rpc::fetch_token_amount_difference_from_liquidations(&group_pool_address.to_string()).unwrap_or_default();
                  
 
-                      let random_uuid = Uuid::new_v4();
+                     
+
+                   let random_uuid = gen_random_uuid();
                  
 
                      tables
@@ -1260,13 +1266,15 @@ fn db_lendergroup_out(
 
 
 
-               let random_uuid = Uuid::new_v4();
+               
+
+             let random_uuid = gen_random_uuid();
                  
 
  
         
                 tables
-                .create_or_update_row("group_user_metric",  format!("{}", random_uuid.to_string()   )  ) 
+                .create_row("group_user_metric",  format!("{}", random_uuid.to_string()   )  ) 
                 .set("group_pool_address", Hex::decode( group_address ).unwrap())
                 .set("user_address", Hex::decode( user_address ).unwrap())
       
@@ -2271,4 +2279,27 @@ mod tests {
 
 
     }
+}
+
+
+fn gen_random_uuid() -> String {
+    let mut rng = rand::thread_rng();
+    let mut uuid = [0u8; 16];
+    
+    // Fill with random bytes
+    rng.fill(&mut uuid);
+    
+    // Set UUID version (v4) and variant bits
+    uuid[6] = (uuid[6] & 0x0F) | 0x40; // Version 4
+    uuid[8] = (uuid[8] & 0x3F) | 0x80; // Variant 1
+    
+    // Format according to UUID standard
+    format!(
+        "{:02x}{:02x}{:02x}{:02x}-{:02x}{:02x}-{:02x}{:02x}-{:02x}{:02x}-{:02x}{:02x}{:02x}{:02x}{:02x}{:02x}",
+        uuid[0], uuid[1], uuid[2], uuid[3],
+        uuid[4], uuid[5],
+        uuid[6], uuid[7],
+        uuid[8], uuid[9],
+        uuid[10], uuid[11], uuid[12], uuid[13], uuid[14], uuid[15]
+    )
 }

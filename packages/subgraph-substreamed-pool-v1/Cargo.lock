@@ -394,6 +394,7 @@ dependencies = [
  "num-traits",
  "prost",
  "prost-types",
+ "rand",
  "regex",
  "serde",
  "serde_json",

@@ -19,14 +19,13 @@ substreams-ethereum = "0.9"
 substreams-database-change = "1"
 substreams-entity-change = "1"
 hex = "0.4.3"
-uuid = { version = "1.4", features = ["v4"] }
+ rand = "0.8.5"
 
 # required for custom config export 
 handlebars = "4.1"
 serde = "1.0"
-serde_json = "1.0"
-
-
+serde_json = "1.0" 
+ 
 
 # Required so that ethabi > ethereum-types build correctly under wasm32-unknown-unknown
 [target.wasm32-unknown-unknown.dependencies]

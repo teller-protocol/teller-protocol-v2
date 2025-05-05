@@ -19,7 +19,7 @@ substreams-ethereum = "0.9"
 substreams-database-change = "1"
 substreams-entity-change = "1"
 hex = "0.4.3"
- rand = "0.8.5"
+ rand = {version = "0.8.5", features = ["small_rng"] }
 
 # required for custom config export 
 handlebars = "4.1"

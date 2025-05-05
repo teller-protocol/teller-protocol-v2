@@ -2,9 +2,11 @@ mod abi;
 mod pb;
 mod rpc;
  
- 
- use rand::Rng;
- 
+
+ use rand::{Rng, SeedableRng};
+use rand::rngs::SmallRng;
+  
+
 use std::collections::HashMap;
 use hex_literal::hex;
 use pb::contract::v1 as contract;
@@ -977,8 +979,8 @@ fn db_lendergroup_out(
             .unwrap_or(BigInt::zero()) ;  */
 
 
-             let random_uuid = gen_random_uuid();
-                 
+            let random_uuid = gen_random_uuid(block_number.to_u64(), block_time.to_u64());
+                  
                   
 
                         //why is this failing due to a multiple insert!? 
@@ -1114,7 +1116,8 @@ fn db_lendergroup_out(
 
                      
 
-                 let random_uuid = gen_random_uuid();
+                let random_uuid = gen_random_uuid(block_number.to_u64(), block_time.to_u64());
+            
                  
               
                 tables
@@ -1189,7 +1192,8 @@ fn db_lendergroup_out(
 
                      
 
-                   let random_uuid = gen_random_uuid();
+                   let random_uuid = gen_random_uuid(block_number.to_u64(), block_time.to_u64());
+            
                  
 
                      tables
@@ -1266,9 +1270,20 @@ fn db_lendergroup_out(
 
 
 
+
+
+                   let block_number = store_get_globals
+                    .get_at(ord, format!("latest_block_number"   ))
+                    .unwrap_or(BigInt::zero());  
+                    let block_time = store_get_globals
+                    .get_at(ord, format!("latest_block_time"   ))
+                    .unwrap_or(BigInt::zero());   
+                       
+                       
                
 
-             let random_uuid = gen_random_uuid();
+                    let random_uuid = gen_random_uuid(block_number.to_u64(), block_time.to_u64());
+            
                  
 
  
@@ -2282,18 +2297,31 @@ mod tests {
 }
 
 
-fn gen_random_uuid() -> String {
-    let mut rng = rand::thread_rng();
+
+
+
+
+
+
+
+fn gen_random_uuid( block_number: u64, timestamp: u64 ) -> String {
+    // Create a deterministic seed from block data or other deterministic source
+  
+    let seed = block_number ^ (timestamp << 32);
+    
+    // Initialize SmallRng with a seed
+    let mut rng = SmallRng::seed_from_u64(seed);
+    
     let mut uuid = [0u8; 16];
     
     // Fill with random bytes
     rng.fill(&mut uuid);
     
-    // Set UUID version (v4) and variant bits
+    // Set version (4) and variant bits
     uuid[6] = (uuid[6] & 0x0F) | 0x40; // Version 4
     uuid[8] = (uuid[8] & 0x3F) | 0x80; // Variant 1
     
-    // Format according to UUID standard
+    // Format as UUID string
     format!(
         "{:02x}{:02x}{:02x}{:02x}-{:02x}{:02x}-{:02x}{:02x}-{:02x}{:02x}-{:02x}{:02x}{:02x}{:02x}{:02x}{:02x}",
         uuid[0], uuid[1], uuid[2], uuid[3],

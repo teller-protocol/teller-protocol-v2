@@ -550,7 +550,10 @@ fn db_lendergroup_out(
   
      deltas_lendergroup_user_metrics: &Deltas<DeltaBigInt>,
 
-     store_collateral_withdrawn_data: &StoreGetBigInt, 
+     store_collateral_withdrawn_data: &StoreGetBigInt,
+
+      store_lendergroup_pool_markers: &StoreGetBigInt, 
+
     // store_get_lendergroup_user_metrics: &StoreGetBigInt, not used 
   
     
@@ -988,13 +991,31 @@ fn db_lendergroup_out(
             .unwrap_or(BigInt::zero()) ;  */
  
 
- 
-                  
+    
+            for i in 0..store_lendergroup_pool_markers.length()  {
+
+
+                   let mark = store_lendergroup_pool_markers.get( i ); 
+
+
+
+
+
+
+
+
+            }
+
+
+            
+         
+
+
                   
 
                         //why is this failing due to a multiple insert!? 
               tables
-                    .create_row( "group_pool_metric_data_point"     ) 
+                    .create_row( "group_pool_metric_data_point"  , group_pool_address.to_string()   ) 
                     .set("group_pool_address", Hex::decode( group_pool_address ).unwrap())
                     .set("block_number", &block_number )
                     .set("block_time", &block_time)
@@ -1125,7 +1146,7 @@ fn db_lendergroup_out(
  
      
 
-                let random_uuid = gen_random_uuid( );
+                
             
                  
               
@@ -1202,7 +1223,7 @@ fn db_lendergroup_out(
                      
                   
      
-                   let random_uuid = gen_random_uuid();
+            
             
                  
 
@@ -1843,6 +1864,209 @@ fn store_lendergroup_user_metrics(
 */
 
 
+
+
+#[substreams::handlers::store]
+fn store_lendergroup_pool_metrics_delta_markers(
+    events:  contract::Events, 
+   // bigint_add_store: StoreAddBigInt,
+    
+    bigint_set_store: StoreSetBigInt,
+) {
+    
+    let ord = 0; // FOR NOW - CAN CAUSE ISSUES - GET FROM LOG AND STUFF INTO EVENT    
+    
+
+
+
+     let mut pool_metric_data_points = HashSet::new(); 
+
+     let mut pool_metric_delta_daily_detected = HashMap::new(); 
+     
+     let mut pool_metric_delta_weekly_detected = HashMap::new(); 
+
+
+
+
+    events.lendergroup_pool_initializeds.iter().for_each(|evt: &contract::LendergroupPoolInitialized| {
+
+            let group_pool_address = evt.evt_address.clone(); 
+
+            let block_time =  BigInt::from( evt.evt_block_time.clone() ) ; 
+
+            pool_metric_data_points.insert(group_pool_address.clone());
+            
+                
+
+             let day_index : BigInt = block_time.clone() / 86400;
+            pool_metric_delta_daily_detected.insert(day_index .to_i32()  , group_pool_address.to_string() ) ;
+
+
+            let week_index : BigInt = block_time.clone() / 604800;
+            pool_metric_delta_weekly_detected.insert(week_index .to_i32()  , group_pool_address.to_string() ) ;
+ 
+
+    });
+    
+    events.lendergroup_lender_added_principals.iter().for_each(|evt: &contract::LendergroupLenderAddedPrincipal| {
+
+
+         let group_pool_address = evt.evt_address.clone(); 
+
+            let block_time =  BigInt::from( evt.evt_block_time.clone() ) ; 
+
+            pool_metric_data_points.insert(group_pool_address.clone());
+            
+                
+
+             let day_index : BigInt = block_time.clone() / 86400;
+            pool_metric_delta_daily_detected.insert(day_index .to_i32()  , group_pool_address.to_string() ) ;
+
+
+            let week_index : BigInt = block_time.clone() / 604800;
+            pool_metric_delta_weekly_detected.insert(week_index .to_i32()  , group_pool_address.to_string() ) ;
+ 
+
+ 
+    });
+
+    events.lendergroup_borrower_accepted_funds.iter().for_each(|evt: &contract::LendergroupBorrowerAcceptedFunds| {
+
+
+
+        let group_pool_address = evt.evt_address.clone(); 
+
+            let block_time =  BigInt::from( evt.evt_block_time.clone() ) ; 
+
+            pool_metric_data_points.insert(group_pool_address.clone());
+            
+                
+
+             let day_index : BigInt = block_time.clone() / 86400;
+            pool_metric_delta_daily_detected.insert(day_index .to_i32()  , group_pool_address.to_string() ) ;
+
+
+            let week_index : BigInt = block_time.clone() / 604800;
+            pool_metric_delta_weekly_detected.insert(week_index .to_i32()  , group_pool_address.to_string() ) ;
+ 
+    });
+
+    
+    events.lendergroup_earnings_withdrawns.iter().for_each(|evt: &contract::LendergroupEarningsWithdrawn| {
+
+
+        let group_pool_address = evt.evt_address.clone(); 
+
+            let block_time =  BigInt::from( evt.evt_block_time.clone() ) ; 
+
+            pool_metric_data_points.insert(group_pool_address.clone());
+            
+                
+
+             let day_index : BigInt = block_time.clone() / 86400;
+            pool_metric_delta_daily_detected.insert(day_index .to_i32()  , group_pool_address.to_string() ) ;
+
+
+            let week_index : BigInt = block_time.clone() / 604800;
+            pool_metric_delta_weekly_detected.insert(week_index .to_i32()  , group_pool_address.to_string() ) ;
+ 
+    
+    });
+
+    
+            
+    events.lendergroup_loan_repaids.iter().for_each(|evt: &contract::LendergroupLoanRepaid| {
+
+            let group_pool_address = evt.evt_address.clone(); 
+
+            let block_time =  BigInt::from( evt.evt_block_time.clone() ) ; 
+
+            pool_metric_data_points.insert(group_pool_address.clone());
+            
+                
+
+             let day_index : BigInt = block_time.clone() / 86400;
+            pool_metric_delta_daily_detected.insert(day_index .to_i32()  , group_pool_address.to_string() ) ;
+
+
+            let week_index : BigInt = block_time.clone() / 604800;
+            pool_metric_delta_weekly_detected.insert(week_index .to_i32()  , group_pool_address.to_string() ) ;
+ 
+ 
+    });
+
+    events.lendergroup_defaulted_loan_liquidateds.iter().for_each(|evt: &contract::LendergroupDefaultedLoanLiquidated| {
+
+
+           let group_pool_address = evt.evt_address.clone(); 
+
+            let block_time =  BigInt::from( evt.evt_block_time.clone() ) ; 
+
+            pool_metric_data_points.insert(group_pool_address.clone());
+            
+                
+
+             let day_index : BigInt = block_time.clone() / 86400;
+            pool_metric_delta_daily_detected.insert(day_index .to_i32()  , group_pool_address.to_string() ) ;
+
+
+            let week_index : BigInt = block_time.clone() / 604800;
+            pool_metric_delta_weekly_detected.insert(week_index .to_i32()  , group_pool_address.to_string() ) ;
+ 
+
+        
+    });
+
+
+
+    /*
+
+    The presence of these storage slots means that we need to make a data point here ! 
+    */
+        for pool_address in pool_metric_data_points.iter() {
+
+           
+              let store_key: String = format!("pool_metric_data_point_marker:{}", pool_address );
+              bigint_set_store.set(ord, &store_key, &BigInt::zero() );
+
+        }
+
+
+        for (day_index, pool_address) in pool_metric_delta_daily_detected.iter() {
+
+           
+              let store_key: String = format!("pool_metric_data_point_daily_marker:{}:{}", pool_address, day_index );
+              bigint_set_store.set(ord, &store_key, &BigInt::zero() );
+
+        }
+
+
+
+         for (week_index, pool_address) in pool_metric_delta_weekly_detected.iter() {
+
+              let store_key: String = format!("pool_metric_data_point_weekly_marker:{}:{}", pool_address, week_index );
+              bigint_set_store.set(ord, &store_key, &BigInt::zero() );
+
+        }
+
+
+      
+
+  /*  events.lendergroup_defaulted_loan_liquidateds.iter().for_each(|evt: &contract::LendergroupDefaultedLoanLiquidated| {
+ 
+ 
+         
+        let group_store_key: String = format!("group_pool_metric:{}:token_difference_from_liquidations", evt.evt_address);
+        bigint_add_store.add(ord,&group_store_key, BigInt::from_str(&evt.token_amount_difference).unwrap_or(BigInt::zero()));
+    
+        
+    }); */
+
+}
+
+
+
+
 #[substreams::handlers::store]
 fn store_lendergroup_pool_metrics_deltas(
     events:  contract::Events, 
@@ -1854,17 +2078,12 @@ fn store_lendergroup_pool_metrics_deltas(
     
 
 
-
-     let mut pool_metric_data_points = HashSet::new(); 
-
-     let mut pool_metric_data_point_dailies = HashSet::new(); 
-      let mut pool_metric_data_point_weeklies = HashSet::new(); 
-
-
+ 
 
 
     events.lendergroup_pool_initializeds.iter().for_each(|evt: &contract::LendergroupPoolInitialized| {
-        
+
+ 
         
         let store_key: String = format!("group_pool_metric:{}:total_principal_tokens_committed", evt.evt_address);
         bigint_add_store.add(ord,&store_key, BigInt::zero() );
@@ -1891,6 +2110,9 @@ fn store_lendergroup_pool_metrics_deltas(
     });
     
     events.lendergroup_lender_added_principals.iter().for_each(|evt: &contract::LendergroupLenderAddedPrincipal| {
+ 
+
+
         let group_store_key: String = format!("group_pool_metric:{}:total_principal_tokens_committed", evt.evt_address);
         bigint_add_store.add(ord,&group_store_key, BigInt::from_str(&evt.amount).unwrap_or(BigInt::zero()));
         
@@ -1900,6 +2122,8 @@ fn store_lendergroup_pool_metrics_deltas(
     });
 
     events.lendergroup_borrower_accepted_funds.iter().for_each(|evt: &contract::LendergroupBorrowerAcceptedFunds| {
+
+ 
         
         let group_store_key: String = format!("group_pool_metric:{}:total_principal_tokens_borrowed", evt.evt_address);
         bigint_add_store.add(ord,&group_store_key, BigInt::from_str(&evt.principal_amount).unwrap_or(BigInt::zero()));
@@ -1912,6 +2136,8 @@ fn store_lendergroup_pool_metrics_deltas(
 
     
     events.lendergroup_earnings_withdrawns.iter().for_each(|evt: &contract::LendergroupEarningsWithdrawn| {
+
+ 
         let group_store_key: String = format!("group_pool_metric:{}:total_principal_tokens_withdrawn", evt.evt_address);
         bigint_add_store.add(ord,&group_store_key, BigInt::from_str(&evt.principal_tokens_withdrawn).unwrap_or(BigInt::zero()));
          
@@ -1922,6 +2148,9 @@ fn store_lendergroup_pool_metrics_deltas(
     
             
     events.lendergroup_loan_repaids.iter().for_each(|evt: &contract::LendergroupLoanRepaid| {
+
+ 
+
         let group_store_key: String = format!("group_pool_metric:{}:total_principal_tokens_repaid", evt.evt_address);
         bigint_add_store.add(ord,&group_store_key, BigInt::from_str(&evt.principal_amount).unwrap_or(BigInt::zero()));
 
@@ -1933,6 +2162,8 @@ fn store_lendergroup_pool_metrics_deltas(
 
     events.lendergroup_defaulted_loan_liquidateds.iter().for_each(|evt: &contract::LendergroupDefaultedLoanLiquidated| {
 
+
+     
         let group_store_key: String = format!("group_pool_metric:{}:total_principal_tokens_repaid", evt.evt_address);
         bigint_add_store.add(ord,&group_store_key, BigInt::from_str(&evt.amount_due).unwrap_or(BigInt::zero()));
 
@@ -2209,6 +2440,8 @@ fn db_out(
     deltas_lendergroup_user_metrics: Deltas<DeltaBigInt>,
 
     store_collateral_withdrawn_data: StoreGetBigInt, 
+
+     store_pool_metric_markers: StoreGetBigInt, 
      //  store_lendergroup_user_metrics: StoreGetBigInt, 
 
    ) -> Result<DatabaseChanges, substreams::errors::Error> {
@@ -2227,7 +2460,9 @@ fn db_out(
 
             &deltas_lendergroup_user_metrics,
 
-            &store_collateral_withdrawn_data
+            &store_collateral_withdrawn_data,
+
+            &store_pool_metric_markers , 
           //  &store_lendergroup_user_metrics,
             );
             

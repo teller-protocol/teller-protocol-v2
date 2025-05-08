@@ -64,6 +64,16 @@ modules:
     inputs:
       - map: map_events
 
+
+ 
+  - name: store_lendergroup_pool_metrics_delta_markers
+    kind: store
+    initialBlock: 24824400
+    updatePolicy: set
+    valueType: bigint
+    inputs:
+      - map: map_events
+
   - name: store_lendergroup_user_metrics_deltas
     kind: store
     initialBlock: 24824400
@@ -140,6 +150,7 @@ modules:
       - store: store_lendergroup_user_metrics_deltas
         mode: deltas 
       - store: store_pool_collateral_withdrawn_data
+      - store: store_lendergroup_pool_metrics_delta_markers
 
     output:
       type: proto:sf.substreams.database.v1.DatabaseChanges

@@ -160,6 +160,7 @@ contract LenderCommitmentGroup_Pool_V2 is
     uint256 public lastUnpausedAt;
     bool public paused;
     bool public borrowingPaused;
+    bool public liquidationAuctionPaused;
    
 
     event PoolInitialized(
@@ -438,7 +439,7 @@ contract LenderCommitmentGroup_Pool_V2 is
     function liquidateDefaultedLoanWithIncentive(
         uint256 _bidId,
         int256 _tokenAmountDifference
-    ) external whenForwarderNotPaused whenNotPaused bidIsActiveForGroup(_bidId) nonReentrant onlyOracleApprovedAllowEOA {
+    ) external whenForwarderNotPaused whenLiquidationAuctionNotPaused whenNotPaused bidIsActiveForGroup(_bidId) nonReentrant onlyOracleApprovedAllowEOA {
         
 
 
@@ -1028,6 +1029,10 @@ contract LenderCommitmentGroup_Pool_V2 is
     event PausedBorrowing(address account);
     event UnpausedBorrowing(address account);
 
+    event PausedLiquidationAuction(address account);
+    event UnpausedLiquidationAuction(address account);
+
+
     modifier whenPaused() {
         require(paused, "Must be paused");
         _;
@@ -1037,7 +1042,7 @@ contract LenderCommitmentGroup_Pool_V2 is
         _;
     }
 
-     modifier whenBorrowingPaused() {
+    modifier whenBorrowingPaused() {
         require(borrowingPaused, "Must be paused");
         _;
     }
@@ -1046,6 +1051,14 @@ contract LenderCommitmentGroup_Pool_V2 is
         _;
     }
 
+    modifier whenLiquidationAuctionPaused() {
+        require(liquidationAuctionPaused, "Must be paused");
+        _;
+    }
+    modifier whenLiquidationAuctionNotPaused() {
+        require(!liquidationAuctionPaused, "Must not be paused");
+        _;
+    }
 
 
 
@@ -1060,7 +1073,7 @@ contract LenderCommitmentGroup_Pool_V2 is
     }
 
 
-     function _pauseBorrowing() internal {
+    function _pauseBorrowing() internal {
         borrowingPaused = true;
         emit PausedBorrowing(_msgSender());
     }
@@ -1071,10 +1084,21 @@ contract LenderCommitmentGroup_Pool_V2 is
     }
 
 
+    function _pauseLiquidationAuction() internal {
+        liquidationAuctionPaused = true;
+        emit PausedLiquidationAuction(_msgSender());
+    }
+
+    function _unpauseLiquidationAuction() internal {
+        liquidationAuctionPaused = false;
+        emit UnpausedLiquidationAuction(_msgSender());
+    }
+
+
 
 
     /**
-     * @notice Lets the DAO/owner of the protocol paused borrowing
+     * @notice Lets the DAO/owner of the protocol pause borrowing
      */
     function pauseBorrowing() public virtual onlyProtocolPauser whenBorrowingNotPaused {
         _pauseBorrowing();
@@ -1087,6 +1111,22 @@ contract LenderCommitmentGroup_Pool_V2 is
         //setLastUnpausedAt();  // dont need this, can still liq when borrowing is paused 
         _unpauseBorrowing();
     }
+
+    /**
+     * @notice Lets the DAO/owner of the protocol pause liquidation auctions
+     */
+    function pauseLiquidationAuction() public virtual onlyProtocolPauser whenLiquidationAuctionNotPaused {
+        _pauseLiquidationAuction();
+    }
+
+    /**
+     * @notice Lets the DAO/owner of the protocol unpause liquidation auctions
+     */
+    function unpauseLiquidationAuction() public virtual onlyProtocolPauser whenLiquidationAuctionPaused {
+        setLastUnpausedAt();   
+        _unpauseLiquidationAuction();
+    }
+
 
 
         /**

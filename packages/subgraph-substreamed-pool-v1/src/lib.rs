@@ -1853,6 +1853,16 @@ fn store_lendergroup_pool_metrics_deltas(
     let ord = 0; // FOR NOW - CAN CAUSE ISSUES - GET FROM LOG AND STUFF INTO EVENT    
     
 
+
+
+     let mut pool_metric_data_points = HashSet::new(); 
+
+     let mut pool_metric_data_point_dailies = HashSet::new(); 
+      let mut pool_metric_data_point_weeklies = HashSet::new(); 
+
+
+
+
     events.lendergroup_pool_initializeds.iter().for_each(|evt: &contract::LendergroupPoolInitialized| {
         
         

@@ -50,8 +50,5 @@
   "validate-deployments": 1736184844,
   "lender-commitment-forwarder:alpha:upgrade_max_principal": 1736275629,
   "lender-commitment-forwarder:extensions:flash-swap-rollover:deploy": 1738183011,
-  "lender-commitment-forwarder:extensions:loan-referral-forwarder-v2:deploy": 1738183025,
-  "lender-commitment-group-beacon-v2:deploy": 1742245215,
-  "lender-commitment-group-factory-v2:deploy": 1742245300,
-  "lender-commitment-group-beacon-v2:upgrade-redeem-delay": 1744735133
+  "lender-commitment-forwarder:extensions:loan-referral-forwarder-v2:deploy": 1738183025
 }

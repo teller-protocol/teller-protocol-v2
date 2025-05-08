@@ -1,5 +1,5 @@
 {
-  "address": "0x7be71eB95Bb9ee8C5F1AbfdF4C63413170D7d326",
+  "address": "0xA9f9161863fd8457200b486C09187FbFF6Da0B35",
   "abi": [
     {
       "type": "constructor",
@@ -214,6 +214,30 @@
     {
       "type": "event",
       "anonymous": false,
+      "name": "PausedBorrowing",
+      "inputs": [
+        {
+          "type": "address",
+          "name": "account",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "PausedLiquidationAuction",
+      "inputs": [
+        {
+          "type": "address",
+          "name": "account",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
       "name": "PoolInitialized",
       "inputs": [
         {
@@ -301,6 +325,30 @@
       "type": "event",
       "anonymous": false,
       "name": "Unpaused",
+      "inputs": [
+        {
+          "type": "address",
+          "name": "account",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "UnpausedBorrowing",
+      "inputs": [
+        {
+          "type": "address",
+          "name": "account",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "UnpausedLiquidationAuction",
       "inputs": [
         {
           "type": "address",
@@ -646,6 +694,20 @@
       "outputs": [
         {
           "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "borrowingPaused",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "bool",
           "name": ""
         }
       ]
@@ -1243,6 +1305,20 @@
     },
     {
       "type": "function",
+      "name": "liquidationAuctionPaused",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "bool",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
       "name": "liquidityThresholdPercent",
       "constant": true,
       "stateMutability": "view",
@@ -1411,7 +1487,23 @@
     },
     {
       "type": "function",
-      "name": "pauseLendingPool",
+      "name": "pauseBorrowing",
+      "constant": false,
+      "payable": false,
+      "inputs": [],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "pauseLiquidationAuction",
+      "constant": false,
+      "payable": false,
+      "inputs": [],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "pausePool",
       "constant": false,
       "payable": false,
       "inputs": [],
@@ -1844,7 +1936,23 @@
     },
     {
       "type": "function",
-      "name": "unpauseLendingPool",
+      "name": "unpauseBorrowing",
+      "constant": false,
+      "payable": false,
+      "inputs": [],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "unpauseLiquidationAuction",
+      "constant": false,
+      "payable": false,
+      "inputs": [],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "unpausePool",
       "constant": false,
       "payable": false,
       "inputs": [],
@@ -1905,6 +2013,6 @@
     }
   ],
   "receipt": {},
-  "numDeployments": 2,
-  "implementation": "0x71A32b8cEf9782db6DCa4aC835b2c203eEA00449"
+  "numDeployments": 1,
+  "implementation": "0xef3FB45A4326C51757BDAc2F4a80499a9955E144"
 }

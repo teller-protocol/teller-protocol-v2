@@ -67,8 +67,8 @@ const deployFn: DeployFunction = async (hre) => {
         uniswapV3FactoryAddress,
       ],
       libraries: {
-        
-        uniswapPricingLibraryV2: await uniswapPricingLibraryV2.getAddress(),
+         
+        UniswapPricingLibraryV2: await uniswapPricingLibraryV2.getAddress(),
       },
       
     }

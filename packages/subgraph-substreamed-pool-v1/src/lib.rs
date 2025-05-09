@@ -2601,7 +2601,7 @@ fn graph_out(
 #[substreams::handlers::map]
 fn db_out( 
 
-   events: contract::Events,
+    events: contract::Events,
     store_globals: StoreGetBigInt, 
     store_bids_from_pools_data: StoreGetString,
 
@@ -2609,16 +2609,12 @@ fn db_out(
     store_lendergroup_pool_metrics: StoreGetBigInt, 
 
 
-
-
-
-
-    
     deltas_lendergroup_user_metrics: Deltas<DeltaBigInt>,
 
     store_collateral_withdrawn_data: StoreGetBigInt, 
 
-     store_pool_metric_markers: Deltas<DeltaBigInt>, 
+    store_pool_metric_markers: Deltas<DeltaBigInt>, 
+
      //  store_lendergroup_user_metrics: StoreGetBigInt, 
 
    ) -> Result<DatabaseChanges, substreams::errors::Error> {

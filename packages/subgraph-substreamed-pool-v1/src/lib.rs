@@ -555,6 +555,8 @@ fn db_lendergroup_out(
 
 
       store_lendergroup_pool_markers: &Deltas<DeltaBigInt>, 
+       store_lendergroup_pool_metric_daily_markers: &Deltas<DeltaBigInt>, 
+       store_lendergroup_pool_metric_weekly_markers: &Deltas<DeltaBigInt>, 
 
     // store_get_lendergroup_user_metrics: &StoreGetBigInt, not used 
   
@@ -923,12 +925,11 @@ fn db_lendergroup_out(
     
 
         // day index,  pool address 
-          let mut pool_metric_delta_daily_detected : HashMap<i32  ,String> = HashMap::new();
-         let mut pool_metric_delta_weekly_detected : HashMap<i32,String> = HashMap::new();
+        //  let mut pool_metric_delta_daily_detected : HashMap<i32  ,String> = HashMap::new();
+       //  let mut pool_metric_delta_weekly_detected : HashMap<i32,String> = HashMap::new();
 
 
-
-         //need to use a non-delta store!?
+ 
            
        //  for pool_metric_delta in deltas_lendergroup_pool_metrics.deltas. iter(){
           for pool_metric_delta in  store_lendergroup_pool_markers.deltas.iter()   {
@@ -937,7 +938,9 @@ fn db_lendergroup_out(
               let group_pool_address = substreams::key::segment_at(pool_metric_delta.get_key(), 1);
                       
              
-             
+                      let evt_tx_hash = substreams::key::segment_at(pool_metric_delta.get_key(), 2);
+                      let evt_index = substreams::key::segment_at(pool_metric_delta.get_key(), 3);
+    
                 
             //get the data from store_get_lendergroup_pool_metrics
                
@@ -991,12 +994,13 @@ fn db_lendergroup_out(
             /* let token_difference_from_liquidations = store_get_lendergroup_pool_metrics
             .get_at(ord, format!("group_pool_metric:{}:token_difference_from_liquidations", group_pool_address  ))
             .unwrap_or(BigInt::zero()) ;  */
- 
-  
+    
+            
+            let unique_row_id = format!("{}_{}_{}",  group_pool_address.to_string(), evt_tx_hash, evt_index  );
 
                         //why is this failing due to a multiple insert!? 
               tables
-                    .create_row( "group_pool_metric_data_point"  , group_pool_address.to_string()   ) 
+                    .create_row( "group_pool_metric_data_point"  , unique_row_id.to_string()   ) 
                     .set("group_pool_address", Hex::decode( group_pool_address ).unwrap())
                     .set("block_number", &block_number )
                     .set("block_time", &block_time)
@@ -1015,15 +1019,15 @@ fn db_lendergroup_out(
 
         // DISABLED FOR NOW   UNTIL  create_or_update_row
 
-
-              
+            // DO THIS IN AN EARLIER PIPELINE STEP 
+          /*    
             let day_index : BigInt = block_time.clone() / 86400;
             pool_metric_delta_daily_detected.insert(day_index .to_i32()  , group_pool_address.to_string() ) ;
 
 
             let week_index : BigInt = block_time.clone() / 604800;
             pool_metric_delta_weekly_detected.insert(week_index .to_i32()  , group_pool_address.to_string() ) ;
-
+                */
  
                     
               /*
@@ -1074,12 +1078,20 @@ fn db_lendergroup_out(
 
 
 
-
+            // d o this in the similar way ... 
  
-          for (day_index, group_pool_address) in pool_metric_delta_daily_detected.iter(){
+          for pool_metric_delta_daily in store_lendergroup_pool_metric_daily_markers.iter(){
 
 
                     let ord = 0; // FOR NOW - CAN CAUSE ISSUES 
+
+
+                      let group_pool_address = substreams::key::segment_at(pool_metric_delta_daily.get_key(), 1);
+                      let day_index =   substreams::key::segment_at(pool_metric_delta_daily.get_key(), 2);
+                      let evt_tx_hash = substreams::key::segment_at(pool_metric_delta_daily.get_key(), 3);
+                      let evt_index = substreams::key::segment_at(pool_metric_delta_daily.get_key(), 4);
+    
+
                
                     let block_number = store_get_globals
                     .get_at(ord, format!("latest_block_number"   ))
@@ -1127,13 +1139,14 @@ fn db_lendergroup_out(
  
      
 
-                
-            
-                 /*
+                      
+               let unique_row_id = format!("{}_{}_{}_{}",  group_pool_address.to_string(), day_index.to_string(), evt_tx_hash, evt_index  );
+
+             
               
                 tables
-                    .create_row("group_pool_metric_data_point_daily", format!("{}", random_uuid.to_string()   )  ) 
-                    .set("day_index", *day_index ) 
+                    .create_row("group_pool_metric_data_point_daily", format!("{}", unique_row_id.to_string()   )  ) 
+                    .set("day_index",  day_index ) 
                     .set("group_pool_address", Hex::decode( group_pool_address ).unwrap())
                      .set("block_number", &block_number )
                     .set("block_time", &block_time)
@@ -1146,17 +1159,25 @@ fn db_lendergroup_out(
                     .set("total_interest_collected", &total_interest_collected ) 
                     .set("token_difference_from_liquidations",&fetched_token_amount_difference)
                     ;
-             */
+              
 
 
           }
 
 
-          for (week_index, group_pool_address) in pool_metric_delta_weekly_detected.iter(){
+          for pool_metric_delta_weekly in store_lendergroup_pool_metric_weekly_markers.iter(){
 
 
                   let ord = 0; // FOR NOW - CAN CAUSE ISSUES 
-               
+                
+                     let group_pool_address = substreams::key::segment_at(pool_metric_delta_weekly.get_key(), 1);
+                      let week_index = substreams::key::segment_at(pool_metric_delta_weekly.get_key(), 2);
+                       
+                      let evt_tx_hash = substreams::key::segment_at(pool_metric_delta_weekly.get_key(), 3);
+                      let evt_index = substreams::key::segment_at(pool_metric_delta_weekly.get_key(), 4);
+    
+
+
                     let block_number = store_get_globals
                     .get_at(ord, format!("latest_block_number"   ))
                     .unwrap_or(BigInt::zero());  
@@ -1202,15 +1223,15 @@ fn db_lendergroup_out(
                  
 
                      
-                  
+                      
+              let unique_row_id = format!("{}_{}_{}_{}",  group_pool_address.to_string(), week_index.to_string(), evt_tx_hash, evt_index  );
+
      
-            
-            
-                 /*
+             
 
                      tables
-                    .create_row("group_pool_metric_data_point_weekly", format!("{}", random_uuid.to_string()   )  ) 
-                      .set("week_index", *week_index ) 
+                    .create_row("group_pool_metric_data_point_weekly", format!("{}", unique_row_id.to_string()   )  ) 
+                      .set("week_index", week_index ) 
                       .set("group_pool_address", Hex::decode( group_pool_address ).unwrap())
                     .set("block_number", &block_number )
                     .set("block_time", &block_time)
@@ -1224,9 +1245,7 @@ fn db_lendergroup_out(
                     .set("token_difference_from_liquidations",&fetched_token_amount_difference)
                     ;
                 
-             
-                */
-
+              
             
           }
 
@@ -1353,14 +1372,18 @@ fn db_lendergroup_out(
             tables.update_row("group_user_metric", format!("{}_{}", group_address, user_address ))
                 .set("total_principal_tokens_borrowed", new_value );
         },  
-        "total_principal_tokens_repaid" => {
+
+
+        // add me back in later? 
+        /* "total_principal_tokens_repaid" => {
             tables.update_row("group_user_metric", format!("{}_{}", group_address, user_address ))
                 .set("total_principal_tokens_repaid", new_value );
         },  
-        "total_interest_collected" => {
+
+       "total_interest_collected" => {
             tables.update_row("group_user_metric", format!("{}_{}", group_address, user_address ))
                 .set("total_interest_collected", new_value );
-        },
+        }, */ 
         
         
         // Add more cases as per your metric names
@@ -1855,7 +1878,7 @@ fn store_lendergroup_pool_metrics_delta_markers(
 
 
 
-     let mut pool_metric_data_points = HashSet::new(); 
+     let mut pool_metric_data_points = HashMap::new(); 
 
     
 
@@ -1866,7 +1889,9 @@ fn store_lendergroup_pool_metrics_delta_markers(
 
             let block_time =  BigInt::from( evt.evt_block_time.clone() ) ; 
 
-            pool_metric_data_points.insert(group_pool_address.clone());
+            let unique_event_identifier = format!("{}:{}", evt.evt_tx_hash, evt. evt_index   );
+
+            pool_metric_data_points.insert(group_pool_address.clone(), unique_event_identifier );
             
                 
  
@@ -1879,7 +1904,10 @@ fn store_lendergroup_pool_metrics_delta_markers(
 
             let block_time =  BigInt::from( evt.evt_block_time.clone() ) ; 
 
-            pool_metric_data_points.insert(group_pool_address.clone());
+            let unique_event_identifier = format!("{}:{}", evt.evt_tx_hash, evt. evt_index   );
+
+            pool_metric_data_points.insert(group_pool_address.clone(), unique_event_identifier );
+            
             
          
 
@@ -1894,7 +1922,10 @@ fn store_lendergroup_pool_metrics_delta_markers(
 
             let block_time =  BigInt::from( evt.evt_block_time.clone() ) ; 
 
-            pool_metric_data_points.insert(group_pool_address.clone());
+            let unique_event_identifier = format!("{}:{}", evt.evt_tx_hash, evt. evt_index   );
+
+            pool_metric_data_points.insert(group_pool_address.clone(), unique_event_identifier );
+            
             
                 
 
@@ -1909,7 +1940,10 @@ fn store_lendergroup_pool_metrics_delta_markers(
 
             let block_time =  BigInt::from( evt.evt_block_time.clone() ) ; 
 
-            pool_metric_data_points.insert(group_pool_address.clone());
+            let unique_event_identifier = format!("{}:{}", evt.evt_tx_hash, evt. evt_index   );
+
+            pool_metric_data_points.insert(group_pool_address.clone(), unique_event_identifier );
+            
             
                 
  
@@ -1924,7 +1958,10 @@ fn store_lendergroup_pool_metrics_delta_markers(
 
             let block_time =  BigInt::from( evt.evt_block_time.clone() ) ; 
 
-            pool_metric_data_points.insert(group_pool_address.clone());
+            let unique_event_identifier = format!("{}:{}", evt.evt_tx_hash, evt. evt_index   );
+
+            pool_metric_data_points.insert(group_pool_address.clone(), unique_event_identifier );
+            
             
                 
 
@@ -1939,7 +1976,10 @@ fn store_lendergroup_pool_metrics_delta_markers(
 
             let block_time =  BigInt::from( evt.evt_block_time.clone() ) ; 
 
-            pool_metric_data_points.insert(group_pool_address.clone());
+            let unique_event_identifier = format!("{}:{}", evt.evt_tx_hash, evt. evt_index   );
+
+            pool_metric_data_points.insert(group_pool_address.clone(), unique_event_identifier );
+            
             
                 
 
@@ -1954,10 +1994,10 @@ fn store_lendergroup_pool_metrics_delta_markers(
 
     The presence of these storage slots means that we need to make a data point here ! 
     */
-        for pool_address in pool_metric_data_points.iter() {
+        for (pool_address ,unique_identifier) in pool_metric_data_points.iter() {
 
            
-              let store_key: String = format!("pool_metric_data_point_marker:{}", pool_address );
+              let store_key: String = format!("pool_metric_data_point_marker:{}:{}", pool_address , unique_identifier );
               bigint_set_store.set(ord, &store_key, &BigInt::zero() );
 
         }
@@ -1972,7 +2012,7 @@ fn store_lendergroup_pool_metrics_delta_markers(
 
 
 #[substreams::handlers::store]
-fn store_lendergroup_pool_metrics_delta_weekly_markers(
+fn store_lendergroup_pool_metrics_weekly_markers(
     events:  contract::Events, 
    // bigint_add_store: StoreAddBigInt,
     
@@ -1999,8 +2039,14 @@ fn store_lendergroup_pool_metrics_delta_weekly_markers(
             
 
             let week_index : BigInt = block_time.clone() / 604800;
-            pool_metric_delta_weekly_detected.insert(week_index .to_i32()  , group_pool_address.to_string() ) ;
- 
+
+              let unique_event_identifier = format!("{}:{}", evt.evt_tx_hash, evt. evt_index   );
+
+
+
+           
+            pool_metric_delta_weekly_detected.insert( format!("{}:{}", group_pool_address.to_string() , week_index .to_i32()  )   , unique_event_identifier  ) ;
+   
 
     });
     
@@ -2013,7 +2059,15 @@ fn store_lendergroup_pool_metrics_delta_weekly_markers(
  
 
             let week_index : BigInt = block_time.clone() / 604800;
-            pool_metric_delta_weekly_detected.insert(week_index .to_i32()  , group_pool_address.to_string() ) ;
+
+               let unique_event_identifier = format!("{}:{}", evt.evt_tx_hash, evt. evt_index   );
+
+
+
+           
+            pool_metric_delta_weekly_detected.insert( format!("{}:{}", group_pool_address.to_string() , week_index .to_i32()  )   , unique_event_identifier  ) ;
+ 
+
  
 
  
@@ -2030,7 +2084,13 @@ fn store_lendergroup_pool_metrics_delta_weekly_markers(
            
 
             let week_index : BigInt = block_time.clone() / 604800;
-            pool_metric_delta_weekly_detected.insert(week_index .to_i32()  , group_pool_address.to_string() ) ;
+              let unique_event_identifier = format!("{}:{}", evt.evt_tx_hash, evt. evt_index   );
+
+
+
+            
+            pool_metric_delta_weekly_detected.insert( format!("{}:{}", group_pool_address.to_string() , week_index .to_i32()  )   , unique_event_identifier  ) ;
+ 
  
     });
 
@@ -2045,7 +2105,13 @@ fn store_lendergroup_pool_metrics_delta_weekly_markers(
            
 
             let week_index : BigInt = block_time.clone() / 604800;
-            pool_metric_delta_weekly_detected.insert(week_index .to_i32()  , group_pool_address.to_string() ) ;
+             let unique_event_identifier = format!("{}:{}", evt.evt_tx_hash, evt. evt_index   );
+
+
+
+           
+            pool_metric_delta_weekly_detected.insert( format!("{}:{}", group_pool_address.to_string() , week_index .to_i32()  )   , unique_event_identifier  ) ;
+ 
  
     
     });
@@ -2061,7 +2127,12 @@ fn store_lendergroup_pool_metrics_delta_weekly_markers(
             
 
             let week_index : BigInt = block_time.clone() / 604800;
-            pool_metric_delta_weekly_detected.insert(week_index .to_i32()  , group_pool_address.to_string() ) ;
+             let unique_event_identifier = format!("{}:{}", evt.evt_tx_hash, evt. evt_index   );
+
+
+
+            pool_metric_delta_weekly_detected.insert( format!("{}:{}", group_pool_address.to_string() , week_index .to_i32()  )   , unique_event_identifier  ) ;
+ 
  
  
     });
@@ -2074,7 +2145,13 @@ fn store_lendergroup_pool_metrics_delta_weekly_markers(
             let block_time =  BigInt::from( evt.evt_block_time.clone() ) ; 
  
             let week_index : BigInt = block_time.clone() / 604800;
-            pool_metric_delta_weekly_detected.insert(week_index .to_i32()  , group_pool_address.to_string() ) ;
+             let unique_event_identifier = format!("{}:{}", evt.evt_tx_hash, evt. evt_index   );
+
+
+
+          
+            pool_metric_delta_weekly_detected.insert( format!("{}:{}", group_pool_address.to_string() , week_index .to_i32()  )   , unique_event_identifier  ) ;
+ 
  
 
         
@@ -2088,9 +2165,9 @@ fn store_lendergroup_pool_metrics_delta_weekly_markers(
     */ 
 
 
-         for (week_index, pool_address) in pool_metric_delta_weekly_detected.iter() {
+         for (root_identifier, event_identifier) in pool_metric_delta_weekly_detected.iter() {
 
-              let store_key: String = format!("pool_metric_data_point_weekly_marker:{}:{}", pool_address, week_index );
+              let store_key: String = format!("pool_metric_data_point_weekly_marker:{}:{}", root_identifier, event_identifier );
               bigint_set_store.set(ord, &store_key, &BigInt::zero() );
 
         }
@@ -2103,7 +2180,7 @@ fn store_lendergroup_pool_metrics_delta_weekly_markers(
 
 
 #[substreams::handlers::store]
-fn store_lendergroup_pool_metrics_daily_delta_markers(
+fn store_lendergroup_pool_metrics_daily_markers(
     events:  contract::Events, 
    // bigint_add_store: StoreAddBigInt,
     
@@ -2122,16 +2199,20 @@ fn store_lendergroup_pool_metrics_daily_delta_markers(
 
     events.lendergroup_pool_initializeds.iter().for_each(|evt: &contract::LendergroupPoolInitialized| {
 
+           
             let group_pool_address = evt.evt_address.clone(); 
 
             let block_time =  BigInt::from( evt.evt_block_time.clone() ) ; 
 
-             
-                
+            
 
-             let day_index : BigInt = block_time.clone() / 86400;
-            pool_metric_delta_daily_detected.insert(day_index .to_i32()  , group_pool_address.to_string() ) ;
+            let day_index : BigInt = block_time.clone() / 86400;
 
+              let unique_event_identifier = format!("{}:{}", evt.evt_tx_hash, evt. evt_index   );
+
+
+
+            pool_metric_delta_daily_detected.insert( format!("{}:{}", group_pool_address.to_string(), day_index .to_i32() )   , unique_event_identifier  ) ;
  
 
     });
@@ -2145,8 +2226,14 @@ fn store_lendergroup_pool_metrics_daily_delta_markers(
 
                 
 
-             let day_index : BigInt = block_time.clone() / 86400;
-            pool_metric_delta_daily_detected.insert(day_index .to_i32()  , group_pool_address.to_string() ) ;
+            let day_index : BigInt = block_time.clone() / 86400;
+
+              let unique_event_identifier = format!("{}:{}", evt.evt_tx_hash, evt. evt_index   );
+
+
+
+            pool_metric_delta_daily_detected.insert( format!("{}:{}", group_pool_address.to_string(), day_index .to_i32() )   , unique_event_identifier  ) ;
+ 
  
 
  
@@ -2162,8 +2249,14 @@ fn store_lendergroup_pool_metrics_daily_delta_markers(
 
                  
 
-             let day_index : BigInt = block_time.clone() / 86400;
-            pool_metric_delta_daily_detected.insert(day_index .to_i32()  , group_pool_address.to_string() ) ;
+            let day_index : BigInt = block_time.clone() / 86400;
+
+              let unique_event_identifier = format!("{}:{}", evt.evt_tx_hash, evt. evt_index   );
+
+
+
+             pool_metric_delta_daily_detected.insert( format!("{}:{}", group_pool_address.to_string(), day_index .to_i32() )   , unique_event_identifier  ) ;
+ 
  
     });
 
@@ -2176,9 +2269,14 @@ fn store_lendergroup_pool_metrics_daily_delta_markers(
             let block_time =  BigInt::from( evt.evt_block_time.clone() ) ; 
  
                 
+            let day_index : BigInt = block_time.clone() / 86400;
 
-             let day_index : BigInt = block_time.clone() / 86400;
-            pool_metric_delta_daily_detected.insert(day_index .to_i32()  , group_pool_address.to_string() ) ;
+              let unique_event_identifier = format!("{}:{}", evt.evt_tx_hash, evt. evt_index   );
+
+
+
+          pool_metric_delta_daily_detected.insert( format!("{}:{}", group_pool_address.to_string(), day_index .to_i32() )   , unique_event_identifier  ) ;
+ 
 
  
     });
@@ -2192,8 +2290,14 @@ fn store_lendergroup_pool_metrics_daily_delta_markers(
             let block_time =  BigInt::from( evt.evt_block_time.clone() ) ; 
      
 
-             let day_index : BigInt = block_time.clone() / 86400;
-            pool_metric_delta_daily_detected.insert(day_index .to_i32()  , group_pool_address.to_string() ) ;
+            let day_index : BigInt = block_time.clone() / 86400;
+
+              let unique_event_identifier = format!("{}:{}", evt.evt_tx_hash, evt. evt_index   );
+
+
+
+            pool_metric_delta_daily_detected.insert( format!("{}:{}", group_pool_address.to_string(), day_index .to_i32() )   , unique_event_identifier  ) ;
+ 
  
  
     });
@@ -2207,8 +2311,14 @@ fn store_lendergroup_pool_metrics_daily_delta_markers(
 
                  
 
-             let day_index : BigInt = block_time.clone() / 86400;
-            pool_metric_delta_daily_detected.insert(day_index .to_i32()  , group_pool_address.to_string() ) ;
+            let day_index : BigInt = block_time.clone() / 86400;
+
+              let unique_event_identifier = format!("{}:{}", evt.evt_tx_hash, evt. evt_index   );
+
+
+
+            pool_metric_delta_daily_detected.insert( format!("{}:{}", group_pool_address.to_string(), day_index .to_i32() )   , unique_event_identifier  ) ;
+ 
 
  
 
@@ -2223,10 +2333,10 @@ fn store_lendergroup_pool_metrics_daily_delta_markers(
     */
       
 
-        for (day_index, pool_address) in pool_metric_delta_daily_detected.iter() {
+        for (root_identifier, event_identifier) in pool_metric_delta_daily_detected.iter() {
 
            
-              let store_key: String = format!("pool_metric_data_point_daily_marker:{}:{}", pool_address, day_index );
+              let store_key: String = format!("pool_metric_data_point_daily_marker:{}:{}", root_identifier, event_identifier );
               bigint_set_store.set(ord, &store_key, &BigInt::zero() );
 
         }
@@ -2615,6 +2725,9 @@ fn db_out(
 
     store_pool_metric_markers: Deltas<DeltaBigInt>, 
 
+     store_pool_metric_daily_markers: Deltas<DeltaBigInt>, 
+      store_pool_metric_weekly_markers: Deltas<DeltaBigInt>, 
+
      //  store_lendergroup_user_metrics: StoreGetBigInt, 
 
    ) -> Result<DatabaseChanges, substreams::errors::Error> {
@@ -2636,6 +2749,9 @@ fn db_out(
             &store_collateral_withdrawn_data,
 
             &store_pool_metric_markers , 
+
+            &store_pool_metric_daily_markers,
+            &store_pool_metric_weekly_markers,
           //  &store_lendergroup_user_metrics,
             );
             

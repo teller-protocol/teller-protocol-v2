@@ -74,6 +74,22 @@ modules:
     inputs:
       - map: map_events
 
+  - name: store_lendergroup_pool_metrics_daily_markers
+    kind: store
+    initialBlock: 24824400
+    updatePolicy: set
+    valueType: bigint
+    inputs:
+      - map: map_events
+
+  - name: store_lendergroup_pool_metrics_weekly_markers
+    kind: store
+    initialBlock: 24824400
+    updatePolicy: set
+    valueType: bigint
+    inputs:
+      - map: map_events
+
   - name: store_lendergroup_user_metrics_deltas
     kind: store
     initialBlock: 24824400
@@ -151,6 +167,10 @@ modules:
         mode: deltas 
       - store: store_pool_collateral_withdrawn_data
       - store: store_lendergroup_pool_metrics_delta_markers
+        mode: deltas 
+      - store: store_lendergroup_pool_metrics_daily_markers
+        mode: deltas 
+      - store: store_lendergroup_pool_metrics_weekly_markers
         mode: deltas 
 
     output:

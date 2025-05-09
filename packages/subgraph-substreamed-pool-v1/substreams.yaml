@@ -151,6 +151,7 @@ modules:
         mode: deltas 
       - store: store_pool_collateral_withdrawn_data
       - store: store_lendergroup_pool_metrics_delta_markers
+        mode: deltas 
 
     output:
       type: proto:sf.substreams.database.v1.DatabaseChanges

@@ -418,12 +418,12 @@ dependencies = [
  "hex-literal",
  "num-bigint",
  "num-traits",
- "prost 0.11.9",
- "prost-types 0.11.9",
+ "prost 0.13.5",
+ "prost-types 0.13.5",
  "regex",
  "serde",
  "serde_json",
- "substreams 0.5.22",
+ "substreams",
  "substreams-database-change",
  "substreams-entity-change",
  "substreams-ethereum",
@@ -952,29 +952,6 @@ checksum = "a2eb9349b6444b326872e140eb1cf5e7c522154d69e7a0ffb0fb81c06b37543f"
 
 [[package]]
 name = "substreams"
-version = "0.5.22"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "92e47e531af83a3cbb78c627ee8232a0ac86604f11c89e34bd4b721ec41e03e5"
-dependencies = [
- "anyhow",
- "bigdecimal",
- "hex",
- "hex-literal",
- "num-bigint",
- "num-integer",
- "num-traits",
- "pad",
- "pest",
- "pest_derive",
- "prost 0.11.9",
- "prost-build 0.11.9",
- "prost-types 0.11.9",
- "substreams-macro 0.5.22",
- "thiserror 1.0.69",
-]
-
-[[package]]
-name = "substreams"
 version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fdd15565feda31101521b96860e1bd4e6b549348e8d34a385cc46de7a04f61bb"
@@ -992,7 +969,7 @@ dependencies = [
  "prost 0.13.5",
  "prost-build 0.13.5",
  "prost-types 0.13.5",
- "substreams-macro 0.6.1",
+ "substreams-macro",
  "thiserror 1.0.69",
 ]
 
@@ -1003,30 +980,30 @@ source = "git+https://github.com/streamingfast/substreams-sink-database-changes.
 dependencies = [
  "prost 0.13.5",
  "prost-types 0.13.5",
- "substreams 0.6.1",
+ "substreams",
 ]
 
 [[package]]
 name = "substreams-entity-change"
-version = "1.3.2"
+version = "2.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e2c7fca123abff659d15ed30da5b605fa954a29e912c94260c488d0d18f9107d"
+checksum = "0587b8d5dd7bffb0415d544c31e742c4cabdb81bbe9a3abfffff125185e4e9e8"
 dependencies = [
  "base64",
- "prost 0.11.9",
- "prost-types 0.11.9",
- "substreams 0.5.22",
+ "prost 0.13.5",
+ "prost-types 0.13.5",
+ "substreams",
 ]
 
 [[package]]
 name = "substreams-ethereum"
-version = "0.9.13"
+version = "0.10.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3d033738be190ad9c9a63712cf121e4f33ae9c57845c64021e421c45aac688b5"
+checksum = "8cbebe786a62068f91593c89038fbe5ec70c9b784df716e450c52aa01b231f11"
 dependencies = [
  "getrandom 0.2.16",
  "num-bigint",
- "substreams 0.5.22",
+ "substreams",
  "substreams-ethereum-abigen",
  "substreams-ethereum-core",
  "substreams-ethereum-derive",
@@ -1034,9 +1011,9 @@ dependencies = [
 
 [[package]]
 name = "substreams-ethereum-abigen"
-version = "0.9.13"
+version = "0.10.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "27ef0adda971fbbd085545e73ccd7efbc12e31139cd301252f478e6b9743ff65"
+checksum = "1abdb13d5c4336d9d16ec31fbf8b4b41edde5f33b489186d7673a1017421b387"
 dependencies = [
  "anyhow",
  "ethabi",
@@ -1051,25 +1028,25 @@ dependencies = [
 
 [[package]]
 name = "substreams-ethereum-core"
-version = "0.9.13"
+version = "0.10.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0a38e740018de8c2453f08621bab84ac55b0f1bfd42d56cf8b43ad340e670862"
+checksum = "2bd3dbe2597daba8db0ae15b9a9cb4284236d0f39b4a5ba79c7c14978639613c"
 dependencies = [
  "bigdecimal",
  "ethabi",
  "getrandom 0.2.16",
  "num-bigint",
- "prost 0.11.9",
+ "prost 0.13.5",
  "prost-build 0.11.9",
- "prost-types 0.11.9",
- "substreams 0.5.22",
+ "prost-types 0.13.5",
+ "substreams",
 ]
 
 [[package]]
 name = "substreams-ethereum-derive"
-version = "0.9.13"
+version = "0.10.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "55c934c70e6ab1fe11a89f401f36e7d9be3fe087687395767a4c13ab3d6bd055"
+checksum = "322330809d485b2926b65136b4b4eb1a9069c0a60275464f8a3c1f35a77f7c77"
 dependencies = [
  "ethabi",
  "heck",
@@ -1079,18 +1056,6 @@ dependencies = [
  "quote",
  "substreams-ethereum-abigen",
  "syn 1.0.109",
-]
-
-[[package]]
-name = "substreams-macro"
-version = "0.5.22"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a4ac77f08d723dace35739d65df8ed122f6d04e2a3e47929831d4021e3339240"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 1.0.109",
- "thiserror 1.0.69",
 ]
 
 [[package]]

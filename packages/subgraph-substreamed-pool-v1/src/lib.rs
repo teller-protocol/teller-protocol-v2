@@ -685,7 +685,7 @@ fn db_lendergroup_out(
     
        //create group pool metric 
        tables
-            .create_row("group_pool_metric", format!("{}", evt.evt_address )  ) 
+            .upsert_row("group_pool_metric", format!("{}", evt.evt_address )  ) 
 
             .set("created_at", BigInt::from(evt.evt_block_time))
            
@@ -927,7 +927,7 @@ fn db_lendergroup_out(
               
             
                tables
-                    .create_row("group_pool_metric_data_point", format!("{}_{}", group_pool_address, block_number )  ) 
+                    .upsert_row("group_pool_metric_data_point", format!("{}_{}", group_pool_address, block_number )  ) 
                     .set("group_pool_address", Hex::decode( group_pool_address ).unwrap())
                     .set("block_number", &block_number )
                     .set("block_time", &block_time)
@@ -947,7 +947,7 @@ fn db_lendergroup_out(
             
                     
                 tables
-                    .create_row("group_pool_metric_data_point_daily", format!("{}_{}", group_pool_address, day_index )  ) 
+                    .upsert_row("group_pool_metric_data_point_daily", format!("{}_{}", group_pool_address, day_index )  ) 
                     .set("group_pool_address", Hex::decode( group_pool_address ).unwrap())
                      .set("block_number", &block_number )
                     .set("block_time", &block_time)
@@ -967,7 +967,7 @@ fn db_lendergroup_out(
             
                       
                 tables
-                    .create_row("group_pool_metric_data_point_weekly", format!("{}_{}", group_pool_address, week_index )  ) 
+                    .upsert_row("group_pool_metric_data_point_weekly", format!("{}_{}", group_pool_address, week_index )  ) 
                     .set("group_pool_address", Hex::decode( group_pool_address ).unwrap())
                     .set("block_number", &block_number )
                     .set("block_time", &block_time)
@@ -1028,7 +1028,7 @@ fn db_lendergroup_out(
 
             if interaction_count == & BigInt::from(1) {
                 tables
-                .create_row("group_user_metric", format!("{}_{}", group_address, user_address )  ) 
+                .upsert_row("group_user_metric", format!("{}_{}", group_address, user_address )  ) 
                 .set("group_pool_address", Hex::decode( group_address ).unwrap())
                 .set("user_address", Hex::decode( user_address ).unwrap())
       

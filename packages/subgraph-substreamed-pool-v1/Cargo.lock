@@ -1186,3 +1186,8 @@ checksum = "05f360fc0b24296329c78fda852a1e9ae82de9cf7b27dae4b7f62f118f77b9ed"
 dependencies = [
  "tap",
 ]
+
+[[patch.unused]]
+name = "substreams-database-change"
+version = "2.0.0"
+source = "git+https://github.com/streamingfast/substreams-sink-database-changes.git?branch=feature/upsert#cb64cdbfea72dd8cbf885c6fa2f3b564524db37e"

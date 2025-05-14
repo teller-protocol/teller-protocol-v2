@@ -601,7 +601,7 @@ fn db_lendergroup_out(
     });
     events.lendergroup_lender_added_principals.iter().for_each(|evt| {
         tables
-            .create_row("group_lender_added_principal", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
+            .upsert_row("group_lender_added_principal", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
             .set("evt_tx_hash", parse_tx_hash( &evt.evt_tx_hash ) )
             .set("evt_index", BigInt::from(evt.evt_index))
             .set("evt_block_time", BigInt::from(evt.evt_block_time))

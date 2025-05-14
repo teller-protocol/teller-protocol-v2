@@ -221,3 +221,21 @@ CREATE TABLE IF NOT EXISTS group_pool_metric_data_point_weekly (
     "token_difference_from_liquidations" NUMERIC,
     PRIMARY KEY(group_pool_address, block_number)
 );
+
+
+CREATE TABLE IF NOT EXISTS group_user_metric (
+     "id" VARCHAR PRIMARY KEY, 
+    "group_pool_address" VARCHAR(40),
+    "user_address" VARCHAR(40),
+    "block_number" NUMERIC,
+    "block_time" NUMERIC,
+    "total_principal_tokens_committed" NUMERIC,
+    "total_collateral_tokens_escrowed" NUMERIC,
+
+    "total_interest_collected" NUMERIC,
+
+    
+   
+    "total_principal_tokens_withdrawn" NUMERIC,
+    "total_principal_tokens_borrowed" NUMERIC
+);

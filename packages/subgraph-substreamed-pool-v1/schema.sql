@@ -233,6 +233,7 @@ CREATE TABLE IF NOT EXISTS group_user_metric (
     "total_collateral_tokens_escrowed" NUMERIC,
 
     "total_interest_collected" NUMERIC,
+        "total_principal_tokens_repaid" NUMERIC,
 
     
    

@@ -497,7 +497,7 @@ fn db_factory_out(events: &contract::Events, tables: &mut DatabaseChangeTables) 
   
     events.factory_deployed_lender_group_contracts.iter().for_each(|evt| {
         tables
-            .create_row("factory_deployed_lender_group_contract", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
+            .upsert_row("factory_deployed_lender_group_contract", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
             .set("evt_tx_hash", parse_tx_hash( &evt.evt_tx_hash ) )
             .set("evt_index", BigInt::from( evt.evt_index ))
             .set("evt_block_time", BigInt::from(evt.evt_block_time))

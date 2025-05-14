@@ -553,7 +553,7 @@ fn db_lendergroup_out(
             */
             
               tables
-            .create_row("group_pool_bid", format!("{}", evt.evt_address )  ) 
+            .upsert_row("group_pool_bid", format!("{}", evt.evt_address )  ) 
            
             .set("group_pool_address", Hex::decode(&evt.evt_address).unwrap() )
             .set("bid_id", BigDecimal::from_str(&evt.bid_id).unwrap() )

@@ -565,7 +565,7 @@ fn db_lendergroup_out(
     });
     events.lendergroup_defaulted_loan_liquidateds.iter().for_each(|evt| {
         tables
-            .create_row("group_defaulted_loan_liquidated", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
+            .upsert_row("group_defaulted_loan_liquidated", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
             .set("evt_tx_hash",  parse_tx_hash( &evt.evt_tx_hash ) )
             .set("evt_index", BigInt::from(evt.evt_index))
             .set("evt_block_time", BigInt::from(evt.evt_block_time))
@@ -578,7 +578,7 @@ fn db_lendergroup_out(
     });
     events.lendergroup_earnings_withdrawns.iter().for_each(|evt| {
         tables
-            .create_row("group_earnings_withdrawn", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
+            .upsert_row("group_earnings_withdrawn", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
             .set("evt_tx_hash", parse_tx_hash( &evt.evt_tx_hash ) )
             .set("evt_index", BigInt::from(evt.evt_index))
             .set("evt_block_time", BigInt::from(evt.evt_block_time))
@@ -591,7 +591,7 @@ fn db_lendergroup_out(
     });
     events.lendergroup_initializeds.iter().for_each(|evt| {
         tables
-            .create_row("group_initialized", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
+            .upsert_row("group_initialized", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
             .set("evt_tx_hash", parse_tx_hash( &evt.evt_tx_hash ) )
             .set("evt_index", BigInt::from(evt.evt_index))
             .set("evt_block_time", BigInt::from(evt.evt_block_time))
@@ -614,7 +614,7 @@ fn db_lendergroup_out(
     });
     events.lendergroup_loan_repaids.iter().for_each(|evt| {
         tables
-            .create_row("group_loan_repaid", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
+            .upsert_row("group_loan_repaid", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
             .set("evt_tx_hash", parse_tx_hash( &evt.evt_tx_hash ) )
             .set("evt_index", BigInt::from(evt.evt_index))
             .set("evt_block_time", BigInt::from(evt.evt_block_time))
@@ -629,7 +629,7 @@ fn db_lendergroup_out(
     });
     events.lendergroup_ownership_transferreds.iter().for_each(|evt| {
         tables
-            .create_row("group_ownership_transferred", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
+            .upsert_row("group_ownership_transferred", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
             .set("evt_tx_hash", parse_tx_hash( &evt.evt_tx_hash ) )
             .set("evt_index", BigInt::from(evt.evt_index))
             .set("evt_block_time", BigInt::from(evt.evt_block_time))
@@ -640,7 +640,7 @@ fn db_lendergroup_out(
     });
     events.lendergroup_pauseds.iter().for_each(|evt| {
         tables
-            .create_row("group_paused", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
+            .upsert_row("group_paused", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
             .set("evt_tx_hash", parse_tx_hash( &evt.evt_tx_hash ) )
             .set("evt_index", BigInt::from(evt.evt_index))
             .set("evt_block_time", BigInt::from(evt.evt_block_time))
@@ -650,7 +650,7 @@ fn db_lendergroup_out(
     });
     events.lendergroup_pool_initializeds.iter().for_each(|evt| {
         tables
-            .create_row("group_pool_initialized", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
+            .upsert_row("group_pool_initialized", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
             .set("evt_tx_hash", parse_tx_hash( &evt.evt_tx_hash ) )
             .set("evt_index", BigInt::from(evt.evt_index))
             .set("evt_block_time", BigInt::from(evt.evt_block_time))
@@ -726,7 +726,7 @@ fn db_lendergroup_out(
     });
     events.lendergroup_unpauseds.iter().for_each(|evt| {
         tables
-            .create_row("group_unpaused", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
+            .upsert_row("group_unpaused", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
             .set("evt_tx_hash", parse_tx_hash( &evt.evt_tx_hash ) )
             .set("evt_index", BigInt::from(evt.evt_index))
             .set("evt_block_time", BigInt::from(evt.evt_block_time))

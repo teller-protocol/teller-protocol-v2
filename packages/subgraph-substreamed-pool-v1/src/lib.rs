@@ -528,7 +528,7 @@ fn db_lendergroup_out(
     // Loop over all the abis events to create table changes
     events.lendergroup_borrower_accepted_funds.iter().for_each(|evt| {
         tables
-            .create_row("group_borrower_accepted_funds", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
+            .upsert_row("group_borrower_accepted_funds", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
             .set("evt_tx_hash", parse_tx_hash( &evt.evt_tx_hash ))  //maybe do hex to string first ? 
             .set("evt_index", BigInt::from(evt.evt_index))
             .set("evt_block_time", BigInt::from(evt.evt_block_time))

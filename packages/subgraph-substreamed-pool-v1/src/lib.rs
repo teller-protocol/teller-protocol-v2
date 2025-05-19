@@ -949,8 +949,9 @@ fn db_lendergroup_out(
                 tables
                     .upsert_row("group_pool_metric_data_point_daily", format!("{}_{}", group_pool_address, day_index )  ) 
                     .set("group_pool_address", Hex::decode( group_pool_address ).unwrap())
-                     .set("block_number", &block_number )
+                    .set("block_number", &block_number )
                     .set("block_time", &block_time)
+                    .set("day_index", &day_index)
                     .set("total_principal_tokens_committed", &total_principal_committed )
                     .set("total_collateral_tokens_withdrawn", &total_collateral_withdrawn )
                     .set("total_collateral_tokens_escrowed", &total_collateral_escrowed )
@@ -971,6 +972,7 @@ fn db_lendergroup_out(
                     .set("group_pool_address", Hex::decode( group_pool_address ).unwrap())
                     .set("block_number", &block_number )
                     .set("block_time", &block_time)
+                    .set("week_index", &week_index)
                     .set("total_principal_tokens_committed", &total_principal_committed )
                     .set("total_collateral_tokens_escrowed", &total_collateral_escrowed )
                     .set("total_collateral_tokens_withdrawn", &total_collateral_withdrawn )

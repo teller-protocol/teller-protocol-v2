@@ -87,11 +87,10 @@ library UniswapPricingLibraryV2
         
     }
 
-
-    //taken directly from uniswap oracle lib 
+ 
     /**
      * @dev Calculates the amount of quote token received for a given amount of base token
-     * based on the square root of the price ratio (sqrtRatioX96).
+     * based on the square root of the price ratio (sqrtRatioX96). Taken directly from uniswap oracle lib 
      *
      * @param sqrtRatioX96 The square root of the price ratio(in terms of token1/token0) between two tokens, encoded as a Q64.96 value.
      * @param baseAmount The amount of the base token for which the quote is to be calculated. Specify 1e18 for a price(quoteAmount) with 18 decimals of precision.

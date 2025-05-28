@@ -87,7 +87,7 @@ IOracleProtectionManager, OwnableUpgradeable
         }
         
         //smart contracts (delegate calls) are blocked if they havent registered and waited
-        if (  _sender != tx.origin  && !oracle.isTimeExceeded(_sender)) {
+        if (  _sender != tx.origin && msg.sender.code.length != 0 && !oracle.isTimeExceeded(_sender)) {
             return false;
         }
 

@@ -548,8 +548,13 @@ contract LenderCommitmentGroup_Pool_V2 is
         );
     }
 
-   
-
+       
+    /**
+     * @notice Returns the timestamp when the contract was last unpaused
+     * @dev Compares the internal lastUnpausedAt timestamp with the timestamp from the SmartCommitmentForwarder
+     * @dev This accounts for pauses from both this contract and the forwarder
+     * @return The maximum timestamp between the contract's last unpause and the forwarder's last unpause
+     */
     function getLastUnpausedAt() 
     public view 
     returns (uint256) {
@@ -565,10 +570,22 @@ contract LenderCommitmentGroup_Pool_V2 is
     }
 
 
+    /**
+     * @notice Sets the lastUnpausedAt timestamp to the current block timestamp
+     * @dev Called internally when the contract is unpaused
+     * @dev This timestamp is used to calculate valid liquidation windows after unpausing
+     */
     function setLastUnpausedAt() internal {
         lastUnpausedAt =  block.timestamp;
     }
 
+
+    /**
+     * @notice Gets the total principal amount of a loan
+     * @dev Retrieves loan details from the TellerV2 contract
+     * @param _bidId The unique identifier of the loan bid
+     * @return principalAmount The total principal amount of the loan
+     */
      function _getLoanTotalPrincipalAmount(uint256 _bidId )
         internal
         view
@@ -581,8 +598,16 @@ contract LenderCommitmentGroup_Pool_V2 is
        
     }
 
-    
+        
 
+    /**
+     * @notice Calculates the amount currently owed for a specific bid
+     * @dev Calls the TellerV2 contract to calculate the principal and interest due
+     * @dev Uses the current block.timestamp to calculate up-to-date amounts
+     * @param _bidId The unique identifier of the loan bid
+     * @return principal The principal amount currently owed
+     * @return interest The interest amount currently owed
+     */
     function _getAmountOwedForBid(uint256 _bidId )
         internal
         view
@@ -595,6 +620,13 @@ contract LenderCommitmentGroup_Pool_V2 is
     }
 
 
+    /**
+     * @notice Returns the cumulative token difference from all liquidations
+     * @dev This represents the net gain or loss of principal tokens from liquidation events
+     * @dev Positive values indicate the pool has gained tokens from liquidations
+     * @dev Negative values indicate the pool has given out tokens as liquidation incentives
+     * @return The current token difference from all liquidations as a signed integer
+     */
     function getTokenDifferenceFromLiquidations() public view returns (int256){
 
         return tokenDifferenceFromLiquidations;
@@ -634,6 +666,12 @@ contract LenderCommitmentGroup_Pool_V2 is
             int256(10000);
     }
 
+    /**
+     * @notice Calculates the absolute value of an integer
+     * @dev Utility function to convert a signed integer to its unsigned absolute value
+     * @param x The signed integer input
+     * @return The absolute value of x as an unsigned integer
+     */
     function abs(int x) private pure returns (uint) {
         return x >= 0 ? uint(x) : uint(-x);
     }
@@ -682,7 +720,13 @@ contract LenderCommitmentGroup_Pool_V2 is
     }
 
 
-            // put this in a helper lib ??? 
+   /**
+     * @notice Retrieves the price ratio from Uniswap for the given pool routes
+     * @dev Calls the UniswapPricingLibraryV2 to get TWAP (Time-Weighted Average Price) for the specified routes
+     * @dev This is a low-level internal function that handles direct Uniswap oracle interaction
+     * @param poolOracleRoutes Array of pool route configurations to use for price calculation
+     * @return The Uniswap price ratio expanded by the Uniswap expansion factor (2^96)
+     */
     function getUniswapPriceRatioForPoolRoutes(
        IUniswapPricingLibrary.PoolRouteConfig[] memory poolOracleRoutes
     ) internal  view virtual returns (uint256 ) {
@@ -694,6 +738,13 @@ contract LenderCommitmentGroup_Pool_V2 is
         return pairPriceWithTwapFromOracle;
     }
 
+    /**
+     * @notice Calculates the principal token amount per collateral token based on Uniswap oracle prices
+     * @dev Uses Uniswap TWAP and applies any configured maximum limits
+     * @dev Returns the lesser of the oracle price or the configured maximum (if set)
+     * @param poolOracleRoutes Array of pool route configurations to use for price calculation
+     * @return The principal per collateral ratio, expanded by the Uniswap expansion factor
+     */
     function getPrincipalForCollateralForPoolRoutes(
         IUniswapPricingLibrary.PoolRouteConfig[] memory poolOracleRoutes
     ) external view virtual returns (uint256 ) {
@@ -714,6 +765,14 @@ contract LenderCommitmentGroup_Pool_V2 is
     } 
 
 
+    /**
+     * @notice Calculates the amount of collateral tokens required for a given principal amount
+     * @dev Converts principal amount to equivalent collateral based on current price ratio
+     * @dev Uses the Math.mulDiv function with rounding up to ensure sufficient collateral
+     * @param _principalAmount The amount of principal tokens to be borrowed
+     * @param _maxPrincipalPerCollateralAmount The exchange rate between principal and collateral (expanded by STANDARD_EXPANSION_FACTOR)
+     * @return The required amount of collateral tokens, rounded up to ensure sufficient collateralization
+     */
    function getRequiredCollateral(
         uint256 _principalAmount,
         uint256 _maxPrincipalPerCollateralAmount 
@@ -775,12 +834,14 @@ contract LenderCommitmentGroup_Pool_V2 is
     }
 
 
-    /*
-        If principal get stuck in the escrow vault for any reason, anyone may
-        call this function to move them from that vault in to this contract 
+ 
 
-        @dev there is no need to increment totalPrincipalTokensRepaid here as that is accomplished by the repayLoanCallback
-    */
+
+    /**
+     * @notice If principal get stuck in the escrow vault for any reason, anyone may
+     *   call this function to move them from that vault in to this contract 
+     * @param _amount  Amount of tokens to withdraw
+     */
     function withdrawFromEscrowVault ( uint256 _amount ) external whenForwarderNotPaused whenNotPaused {
 
         address _escrowVault = ITellerV2(TELLER_V2).getEscrowVault();
@@ -861,7 +922,14 @@ contract LenderCommitmentGroup_Pool_V2 is
             : 0;
     }
 
-   
+    /**
+     * @notice Converts an amount to its underlying value using a given exchange rate with rounding down
+     * @dev Uses MathUpgradeable.mulDiv with explicit rounding down to prevent favorable rounding for users
+     * @dev This function is used for conversions where rounding down protects the protocol (e.g., calculating shares to mint)
+     * @param amount The amount to convert (in the source unit)
+     * @param rate The exchange rate to apply, expanded by EXCHANGE_RATE_EXPANSION_FACTOR
+     * @return value_ The converted value in the target unit, rounded down
+     */
     function _valueOfUnderlying(uint256 amount, uint256 rate)
         internal
         pure
@@ -884,6 +952,14 @@ contract LenderCommitmentGroup_Pool_V2 is
     }
 
 
+    /**
+     * @notice Converts an amount to its underlying value using a given exchange rate with rounding up
+     * @dev Uses MathUpgradeable.mulDiv with explicit rounding up to ensure protocol safety
+     * @dev This function is used for conversions where rounding up protects the protocol (e.g., calculating assets needed for shares)
+     * @param amount The amount to convert (in the source unit)
+     * @param rate The exchange rate to apply, expanded by EXCHANGE_RATE_EXPANSION_FACTOR
+     * @return value_ The converted value in the target unit, rounded up
+     */
     function _valueOfUnderlyingRoundUpwards(uint256 amount, uint256 rate)
         internal
         pure
@@ -906,7 +982,12 @@ contract LenderCommitmentGroup_Pool_V2 is
 
 
 
-  
+    /**
+     * @notice Calculates the total amount of principal tokens currently lent out in active loans
+     * @dev Subtracts the total repaid principal from the total lent principal
+     * @dev Returns 0 if repayments exceed lending (which should not happen in normal operation)
+     * @return The net amount of principal tokens currently outstanding in active loans
+     */
     function getTotalPrincipalTokensOutstandingInActiveLoans()
         internal 
         view
@@ -921,15 +1002,34 @@ contract LenderCommitmentGroup_Pool_V2 is
 
 
 
-
+    /**
+     * @notice Returns the address of the collateral token accepted by this pool
+     * @dev Implements the ISmartCommitment interface requirement
+     * @dev This is used by the SmartCommitmentForwarder to verify collateral compatibility
+     * @return The address of the ERC20 token used as collateral in this pool
+     */
     function getCollateralTokenAddress() external view returns (address) {
         return address(collateralToken);
-    }
+    }   
 
+
+
+    /**
+     * @notice Returns the token ID for ERC721/ERC1155 collateral
+     * @dev Always returns 0 for this implementation as it only supports ERC20 tokens
+     * @dev Implements the ISmartCommitment interface requirement
+     * @return Always returns 0, as ERC20 tokens don't have token IDs
+     */
     function getCollateralTokenId() external view returns (uint256) {
         return 0;
     }
 
+    /**
+     * @notice Returns the type of collateral token supported by this pool
+     * @dev Implements the ISmartCommitment interface requirement
+     * @dev This pool only supports ERC20 tokens as collateral
+     * @return The collateral token type (ERC20) from the CommitmentCollateralType enum
+     */
     function getCollateralTokenType()
         external
         view
@@ -938,16 +1038,35 @@ contract LenderCommitmentGroup_Pool_V2 is
         return CommitmentCollateralType.ERC20;
     }
  
-
+    /**
+     * @notice Returns the Teller V2 market ID associated with this lending pool
+     * @dev Implements the ISmartCommitment interface requirement
+     * @dev The market ID is set during contract initialization and cannot be changed
+     * @return The unique market ID within the Teller V2 protocol
+     */
     function getMarketId() external view returns (uint256) {
         return marketId;
     }
 
+    /**
+     * @notice Returns the maximum allowed duration for loans in this pool
+     * @dev Implements the ISmartCommitment interface requirement
+     * @dev This value is set during contract initialization and represents seconds
+     * @dev Borrowers cannot request loans with durations exceeding this value
+     * @return The maximum loan duration in seconds
+     */
     function getMaxLoanDuration() external view returns (uint32) {
         return maxLoanDuration;
     }
 
-
+    /**
+     * @notice Calculates the current utilization ratio of the pool
+     * @dev The utilization ratio is the percentage of committed funds currently out on loans
+     * @dev Formula: (outstandingLoans + activeLoansAmountDelta) / poolTotalEstimatedValue * 10000
+     * @dev Result is capped at 10000 (100%)
+     * @param activeLoansAmountDelta Additional loan amount to consider for utilization calculation
+     * @return The utilization ratio as a percentage with 2 decimal precision (e.g., 7500 = 75.00%)
+     */
     function getPoolUtilizationRatio(uint256 activeLoansAmountDelta ) public view returns (uint16) {
 
         if (getPoolTotalEstimatedValue() == 0) {
@@ -962,7 +1081,14 @@ contract LenderCommitmentGroup_Pool_V2 is
                         10000  ));
 
     }
-
+    /**
+     * @notice Calculates the minimum interest rate based on current pool utilization
+     * @dev The interest rate scales linearly between lower and upper bounds based on utilization
+     * @dev Formula: lowerBound + (upperBound - lowerBound) * utilizationRatio
+     * @dev Higher utilization results in higher interest rates to incentivize repayments
+     * @param amountDelta Additional amount to consider when calculating utilization for this rate
+     * @return The minimum interest rate as a percentage with 2 decimal precision (e.g., 500 = 5.00%)
+     */
     function getMinInterestRate(uint256 amountDelta) public view returns (uint16) {
         return interestRateLowerBound + 
         uint16( uint256(interestRateUpperBound-interestRateLowerBound)
@@ -972,12 +1098,24 @@ contract LenderCommitmentGroup_Pool_V2 is
     } 
     
 
+    /**
+     * @notice Returns the address of the principal token used by this pool
+     * @dev Implements the ISmartCommitment interface requirement
+     * @dev The principal token is the asset that lenders deposit and borrowers borrow
+     * @return The address of the ERC20 token used as principal in this pool
+     */
     function getPrincipalTokenAddress() external view returns (address) {
         return address(principalToken);
     }
 
    
-
+    /**
+     * @notice Calculates the amount of principal tokens available for new loans
+     * @dev The available amount is limited by the liquidity threshold percentage of the pool
+     * @dev Formula: min(poolValueThreshold - outstandingLoans, 0)
+     * @dev The pool won't allow borrowing beyond the configured threshold to maintain liquidity for withdrawals
+     * @return The amount of principal tokens available for new loans, returns 0 if threshold is reached
+     */
     function getPrincipalAmountAvailableToBorrow()
         public
         view
@@ -1012,7 +1150,7 @@ contract LenderCommitmentGroup_Pool_V2 is
     function setWithdrawDelayTime(uint256 _seconds) 
     external 
     onlyProtocolOwner {
-        require( _seconds < MAX_WITHDRAW_DELAY_TIME );
+        require( _seconds < MAX_WITHDRAW_DELAY_TIME , "min withdraw delay");
 
         withdrawDelayTimeSeconds = _seconds;
     }
@@ -1129,7 +1267,7 @@ contract LenderCommitmentGroup_Pool_V2 is
 
 
 
-        /**
+    /**
      * @notice Lets the DAO/owner of the protocol implement an emergency stop mechanism.
      */
     function pausePool() public virtual onlyProtocolPauser whenNotPaused {
@@ -1159,7 +1297,7 @@ contract LenderCommitmentGroup_Pool_V2 is
                         DEPOSIT/WITHDRAWAL LOGIC
     //////////////////////////////////////////////////////////////*/
 
-    //Round DOWN for shares output - This prevents the vault from giving away more shares than assets should entitle.
+    
     function deposit(uint256 assets, address receiver) 
     public 
     whenForwarderNotPaused whenNotPaused nonReentrant onlyOracleApprovedAllowEOA 
@@ -1167,7 +1305,7 @@ contract LenderCommitmentGroup_Pool_V2 is
     returns (uint256 shares) {
 
         // Similar to addPrincipalToCommitmentGroup but following ERC4626 standard
-        require(assets > 0 );
+        require(assets > 0, "no assets" );
         
        
         
@@ -1201,7 +1339,7 @@ contract LenderCommitmentGroup_Pool_V2 is
         return shares;
     }
 
-    // Round UP for assets input - This ensures users provide enough assets to receive their requested shares.
+    
     function mint(uint256 shares, address receiver) 
     public 
     whenForwarderNotPaused whenNotPaused nonReentrant onlyOracleApprovedAllowEOA 
@@ -1210,7 +1348,7 @@ contract LenderCommitmentGroup_Pool_V2 is
 
         // Calculate assets needed for desired shares
         assets = previewMint(shares);
-        require(assets > 0 );
+        require(assets > 0 , "no assets");
 
 
         
@@ -1233,12 +1371,12 @@ contract LenderCommitmentGroup_Pool_V2 is
             firstDepositMade = true;
         }
         
-       // emit LenderAddedPrincipal(msg.sender, assets, shares, receiver);
+       
         emit Deposit( msg.sender,receiver, assets, shares );
         return assets;
     }
 
-    //Round UP for shares burned - This ensures users burn enough shares to receive their requested assets.
+   
     function withdraw(
         uint256 assets,
         address receiver,
@@ -1280,7 +1418,7 @@ contract LenderCommitmentGroup_Pool_V2 is
         return shares;
     }   
 
-    //Round DOWN for assets output - This prevents the vault from giving away more assets than shares should entitle.
+    
     function redeem(
         uint256 shares,
         address receiver,
@@ -1343,14 +1481,14 @@ contract LenderCommitmentGroup_Pool_V2 is
 
      
     function previewDeposit(uint256 assets) public view virtual returns (uint256) {
-        // return convertToShares(assets);
+      
          return _valueOfUnderlying(assets, sharesExchangeRate());
     }
 
  
     function previewMint(uint256 shares) public view virtual returns (uint256) {
         
-          //  return convertToAssets(shares); // Use the existing conversion function
+        
          return _valueOfUnderlyingRoundUpwards(shares, sharesExchangeRateInverse());
       
      
@@ -1359,14 +1497,14 @@ contract LenderCommitmentGroup_Pool_V2 is
   
     function previewWithdraw(uint256 assets) public view virtual returns (uint256) {
         
-          //  return convertToShares(assets); // Use the existing conversion function
+          
          return _valueOfUnderlyingRoundUpwards( assets, sharesExchangeRate() ) ;
       
     }
 
-    // Round DOWN - Should match the actual behavior of redeem.
+ 
     function previewRedeem(uint256 shares) public view virtual returns (uint256) {
-         //return convertToAssets(shares);
+          
          return _valueOfUnderlying(shares, sharesExchangeRateInverse());    
        
     }
@@ -1379,6 +1517,12 @@ contract LenderCommitmentGroup_Pool_V2 is
         if (paused) {
             return 0;
         }
+
+        if(!firstDepositMade && msg.sender != owner()){
+           return 0;
+        }
+
+
         return type(uint256).max;
     }
 
@@ -1386,6 +1530,11 @@ contract LenderCommitmentGroup_Pool_V2 is
         if (paused) {
             return 0;
         }
+
+        if(!firstDepositMade && msg.sender != owner()){
+           return 0;
+        }
+        
         return type(uint256).max;
     }
 

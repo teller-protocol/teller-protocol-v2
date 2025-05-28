@@ -166,8 +166,8 @@
       "kind": "transparent"
     },
     {
-      "address": "0xaFd871E685428AbF4D9C7Cd2ACA0390B35a1d1bD",
-      "txHash": "0x8361df25959aa3f941ea1167d5216609f36a3fc139ee95dc74ed428e2a7a5ff5",
+      "address": "0x5903feC126aF19dB87a40A8E6c49E84DBeA7Ccc4",
+      "txHash": "0xa0dc1a827318de5a071ad58ee056f5a3742d8fd0d138ff73784920ad9a5d3dcf",
       "kind": "transparent"
     }
   ],
@@ -21030,9 +21030,9 @@
         "namespaces": {}
       }
     },
-    "f8105e920eec7f31ff434df2b8c71b28263d06551887939826fa171a0e2d13cb": {
-      "address": "0xe8dF4cA441AD897a3ede5a404D697a00e350C489",
-      "txHash": "0x1ee67b12880c44a376e0e5052b2f47d29bda23c6297211b7c400302025431c91",
+    "a562873724fc29cea647dac8945f6a0c947197918eec4c857f7f494f06486636": {
+      "address": "0x3299de2E1BE08Cce84Ee37B57ade573D562C6D73",
+      "txHash": "0xf9afddabe25a4f9550e17d6ceb48b9692dd4d97f3b8427bb7fdb6eabf03dd7d8",
       "layout": {
         "solcVersion": "0.8.11",
         "storage": [
@@ -21161,7 +21161,7 @@
             "label": "principalToken",
             "offset": 0,
             "slot": "252",
-            "type": "t_contract(IERC20)5051",
+            "type": "t_contract(IERC20)8314",
             "contract": "LenderCommitmentGroup_Pool_V2",
             "src": "contracts/LenderCommitmentForwarder/extensions/LenderCommitmentGroup/LenderCommitmentGroup_Pool_V2.sol:118"
           },
@@ -21169,7 +21169,7 @@
             "label": "collateralToken",
             "offset": 0,
             "slot": "253",
-            "type": "t_contract(IERC20)5051",
+            "type": "t_contract(IERC20)8314",
             "contract": "LenderCommitmentGroup_Pool_V2",
             "src": "contracts/LenderCommitmentForwarder/extensions/LenderCommitmentGroup/LenderCommitmentGroup_Pool_V2.sol:119"
           },
@@ -21313,7 +21313,7 @@
             "label": "poolOracleRoutes",
             "offset": 0,
             "slot": "267",
-            "type": "t_array(t_struct(PoolRouteConfig)22120_storage)dyn_storage",
+            "type": "t_array(t_struct(PoolRouteConfig)43471_storage)dyn_storage",
             "contract": "LenderCommitmentGroup_Pool_V2",
             "src": "contracts/LenderCommitmentForwarder/extensions/LenderCommitmentGroup/LenderCommitmentGroup_Pool_V2.sol:154"
           },
@@ -21363,7 +21363,7 @@
             "label": "address",
             "numberOfBytes": "20"
           },
-          "t_array(t_struct(PoolRouteConfig)22120_storage)dyn_storage": {
+          "t_array(t_struct(PoolRouteConfig)43471_storage)dyn_storage": {
             "label": "struct IUniswapPricingLibrary.PoolRouteConfig[]",
             "numberOfBytes": "32"
           },
@@ -21383,7 +21383,7 @@
             "label": "bool",
             "numberOfBytes": "1"
           },
-          "t_contract(IERC20)5051": {
+          "t_contract(IERC20)8314": {
             "label": "contract IERC20",
             "numberOfBytes": "20"
           },
@@ -21411,7 +21411,7 @@
             "label": "string",
             "numberOfBytes": "32"
           },
-          "t_struct(PoolRouteConfig)22120_storage": {
+          "t_struct(PoolRouteConfig)43471_storage": {
             "label": "struct IUniswapPricingLibrary.PoolRouteConfig",
             "members": [
               {
@@ -21458,171 +21458,6 @@
           "t_uint32": {
             "label": "uint32",
             "numberOfBytes": "4"
-          },
-          "t_uint8": {
-            "label": "uint8",
-            "numberOfBytes": "1"
-          }
-        },
-        "namespaces": {}
-      }
-    },
-    "3bedabe4ac9928f7bd522d2f66b723d26b8c9f94e8c1870d84d31922d967be75": {
-      "address": "0x0593834a68cc5b4D76f7019B88Ab878321E98ce9",
-      "txHash": "0x853d5eed910c0ae6a938cb21c62d7d0d6a8ea9ccb949728e087bca27627dc945",
-      "layout": {
-        "solcVersion": "0.8.11",
-        "storage": [
-          {
-            "label": "userExtensions",
-            "offset": 0,
-            "slot": "0",
-            "type": "t_mapping(t_address,t_mapping(t_address,t_bool))",
-            "contract": "ExtensionsContextUpgradeable",
-            "src": "contracts/LenderCommitmentForwarder/extensions/ExtensionsContextUpgradeable.sol:12"
-          },
-          {
-            "label": "__gap",
-            "offset": 0,
-            "slot": "1",
-            "type": "t_array(t_uint256)49_storage",
-            "contract": "ExtensionsContextUpgradeable",
-            "src": "contracts/LenderCommitmentForwarder/extensions/ExtensionsContextUpgradeable.sol:61"
-          },
-          {
-            "label": "_initialized",
-            "offset": 0,
-            "slot": "50",
-            "type": "t_uint8",
-            "contract": "Initializable",
-            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
-            "retypedFrom": "bool"
-          },
-          {
-            "label": "_initializing",
-            "offset": 1,
-            "slot": "50",
-            "type": "t_bool",
-            "contract": "Initializable",
-            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
-          },
-          {
-            "label": "__gap",
-            "offset": 0,
-            "slot": "51",
-            "type": "t_array(t_uint256)50_storage",
-            "contract": "ContextUpgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
-          },
-          {
-            "label": "__gap",
-            "offset": 0,
-            "slot": "101",
-            "type": "t_array(t_uint256)50_storage",
-            "contract": "TellerV2MarketForwarder_G2",
-            "src": "contracts/TellerV2MarketForwarder_G2.sol:149"
-          },
-          {
-            "label": "__gap",
-            "offset": 0,
-            "slot": "151",
-            "type": "t_array(t_uint256)50_storage",
-            "contract": "TellerV2MarketForwarder_G3",
-            "src": "contracts/TellerV2MarketForwarder_G3.sol:59"
-          },
-          {
-            "label": "_paused",
-            "offset": 0,
-            "slot": "201",
-            "type": "t_bool",
-            "contract": "PausableUpgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol:29"
-          },
-          {
-            "label": "__gap",
-            "offset": 0,
-            "slot": "202",
-            "type": "t_array(t_uint256)49_storage",
-            "contract": "PausableUpgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol:116"
-          },
-          {
-            "label": "_status",
-            "offset": 0,
-            "slot": "251",
-            "type": "t_uint256",
-            "contract": "ReentrancyGuardUpgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:38"
-          },
-          {
-            "label": "__gap",
-            "offset": 0,
-            "slot": "252",
-            "type": "t_array(t_uint256)49_storage",
-            "contract": "ReentrancyGuardUpgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:80"
-          },
-          {
-            "label": "_owner",
-            "offset": 0,
-            "slot": "301",
-            "type": "t_address",
-            "contract": "OwnableUpgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
-          },
-          {
-            "label": "__gap",
-            "offset": 0,
-            "slot": "302",
-            "type": "t_array(t_uint256)49_storage",
-            "contract": "OwnableUpgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:94"
-          },
-          {
-            "label": "liquidationProtocolFeePercent",
-            "offset": 0,
-            "slot": "351",
-            "type": "t_uint256",
-            "contract": "SmartCommitmentForwarder",
-            "src": "contracts/LenderCommitmentForwarder/SmartCommitmentForwarder.sol:88"
-          },
-          {
-            "label": "lastUnpausedAt",
-            "offset": 0,
-            "slot": "352",
-            "type": "t_uint256",
-            "contract": "SmartCommitmentForwarder",
-            "src": "contracts/LenderCommitmentForwarder/SmartCommitmentForwarder.sol:89"
-          }
-        ],
-        "types": {
-          "t_address": {
-            "label": "address",
-            "numberOfBytes": "20"
-          },
-          "t_array(t_uint256)49_storage": {
-            "label": "uint256[49]",
-            "numberOfBytes": "1568"
-          },
-          "t_array(t_uint256)50_storage": {
-            "label": "uint256[50]",
-            "numberOfBytes": "1600"
-          },
-          "t_bool": {
-            "label": "bool",
-            "numberOfBytes": "1"
-          },
-          "t_mapping(t_address,t_bool)": {
-            "label": "mapping(address => bool)",
-            "numberOfBytes": "32"
-          },
-          "t_mapping(t_address,t_mapping(t_address,t_bool))": {
-            "label": "mapping(address => mapping(address => bool))",
-            "numberOfBytes": "32"
-          },
-          "t_uint256": {
-            "label": "uint256",
-            "numberOfBytes": "32"
           },
           "t_uint8": {
             "label": "uint8",

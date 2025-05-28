@@ -1011,18 +1011,7 @@ contract LenderCommitmentGroup_Pool_V2 is
     function getCollateralTokenAddress() external view returns (address) {
         return address(collateralToken);
     }   
-
-
-
-    /**
-     * @notice Returns the token ID for ERC721/ERC1155 collateral
-     * @dev Always returns 0 for this implementation as it only supports ERC20 tokens
-     * @dev Implements the ISmartCommitment interface requirement
-     * @return Always returns 0, as ERC20 tokens don't have token IDs
-     */
-    function getCollateralTokenId() external view returns (uint256) {
-        return 0;
-    }
+ 
 
     /**
      * @notice Returns the type of collateral token supported by this pool
@@ -1150,7 +1139,7 @@ contract LenderCommitmentGroup_Pool_V2 is
     function setWithdrawDelayTime(uint256 _seconds) 
     external 
     onlyProtocolOwner {
-        require( _seconds < MAX_WITHDRAW_DELAY_TIME , "min withdraw delay");
+        require( _seconds < MAX_WITHDRAW_DELAY_TIME , "WD");
 
         withdrawDelayTimeSeconds = _seconds;
     }
@@ -1172,29 +1161,29 @@ contract LenderCommitmentGroup_Pool_V2 is
 
 
     modifier whenPaused() {
-        require(paused, "Must be paused");
+        require(paused, "P");
         _;
     }
     modifier whenNotPaused() {
-        require(!paused, "Must not be paused");
+        require(!paused, "P");
         _;
     }
 
     modifier whenBorrowingPaused() {
-        require(borrowingPaused, "Must be paused");
+        require(borrowingPaused, "P");
         _;
     }
     modifier whenBorrowingNotPaused() {
-        require(!borrowingPaused, "Must not be paused");
+        require(!borrowingPaused, "P");
         _;
     }
 
     modifier whenLiquidationAuctionPaused() {
-        require(liquidationAuctionPaused, "Must be paused");
+        require(liquidationAuctionPaused, "P");
         _;
     }
     modifier whenLiquidationAuctionNotPaused() {
-        require(!liquidationAuctionPaused, "Must not be paused");
+        require(!liquidationAuctionPaused, "P");
         _;
     }
 
@@ -1305,7 +1294,7 @@ contract LenderCommitmentGroup_Pool_V2 is
     returns (uint256 shares) {
 
         // Similar to addPrincipalToCommitmentGroup but following ERC4626 standard
-        require(assets > 0, "no assets" );
+        require(assets > 0 );
         
        
         
@@ -1348,7 +1337,7 @@ contract LenderCommitmentGroup_Pool_V2 is
 
         // Calculate assets needed for desired shares
         assets = previewMint(shares);
-        require(assets > 0 , "no assets");
+        require(assets > 0);
 
 
         
@@ -1388,7 +1377,7 @@ contract LenderCommitmentGroup_Pool_V2 is
         
         // Calculate shares required for desired assets
         shares = previewWithdraw(assets);
-        require(shares > 0, "S");
+        require(shares > 0);
          
         
         // Check withdrawal delay
@@ -1429,7 +1418,7 @@ contract LenderCommitmentGroup_Pool_V2 is
     returns (uint256 assets) {
 
         // Similar to burnSharesToWithdrawEarnings but following ERC4626 standard
-        require(shares > 0, "S");
+        require(shares > 0);
         
         // Calculate assets to receive
         assets = _valueOfUnderlying(shares, sharesExchangeRateInverse());

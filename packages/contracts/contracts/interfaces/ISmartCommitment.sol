@@ -24,7 +24,7 @@ interface ISmartCommitment {
         view
         returns (CommitmentCollateralType);
 
-    function getCollateralTokenId() external view returns (uint256);
+   // function getCollateralTokenId() external view returns (uint256);
 
     function getMinInterestRate(uint256 _delta) external view returns (uint16);
 

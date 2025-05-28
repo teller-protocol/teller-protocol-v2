@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+package collateral.v1;
+
+ 
+message Events {
+    repeated collateralmanager_CollateralEscrowDeployed collateral_manager_collateral_escrow_deployeds = 1;
+    repeated collateralmanager_CollateralDeposited collateral_manager_collateral_deposited = 2;
+    repeated collateralmanager_CollateralWithdrawn collateral_manager_collateral_withdrawn = 3;
+    
+}
+
+message collateralmanager_CollateralEscrowDeployed {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    uint64 evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    string bid_id = 5;
+    bytes collateral_escrow = 6;
+}
+
+message collateralmanager_CollateralDeposited {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    uint64 evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    string bid_id = 5;
+    uint32 collateral_type = 6;
+    bytes collateral_address = 7;
+    string amount = 8;    
+    string token_id = 9;
+}
+
+message collateralmanager_CollateralWithdrawn {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    uint64 evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    string bid_id = 5;
+    uint32 collateral_type = 6;
+    bytes collateral_address = 7;
+    string amount = 8;
+    string token_id = 9;
+    bytes recipient = 10;
+}
+ 
+  

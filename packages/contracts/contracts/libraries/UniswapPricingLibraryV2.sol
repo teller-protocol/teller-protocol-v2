@@ -5,13 +5,9 @@ pragma solidity >=0.8.0 <0.9.0;
 
 import {IUniswapPricingLibrary} from "../interfaces/IUniswapPricingLibrary.sol";
 
-import "@openzeppelin/contracts/utils/math/Math.sol";
-
  
-import "@openzeppelin/contracts-upgradeable/utils/structs/EnumerableSetUpgradeable.sol";
-
-// Libraries
-import { MathUpgradeable } from "@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol";
+  
+// Libraries 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20MetadataUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/cryptography/MerkleProofUpgradeable.sol";
 

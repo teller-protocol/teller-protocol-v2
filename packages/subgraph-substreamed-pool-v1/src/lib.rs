@@ -537,7 +537,7 @@ fn db_lendergroup_out(
 
         tables
             .upsert_row("group_borrower_accepted_funds", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
-            .set("evt_tx_hash", parse_tx_hash( &evt.evt_tx_hash ))  //maybe do hex to string first ? 
+            .set("evt_tx_hash",  &evt.evt_tx_hash  )  //maybe do hex to string first ? 
             .set("evt_index", BigInt::from(evt.evt_index))
             .set("evt_block_time", BigInt::from(evt.evt_block_time))
             .set("evt_block_number", BigInt::from(evt.evt_block_number))
@@ -574,7 +574,7 @@ fn db_lendergroup_out(
     events.lendergroup_defaulted_loan_liquidateds.iter().for_each(|evt| {
         tables
             .upsert_row("group_defaulted_loan_liquidated", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
-            .set("evt_tx_hash",  parse_tx_hash( &evt.evt_tx_hash ) )
+            .set("evt_tx_hash",    &evt.evt_tx_hash   )
             .set("evt_index", BigInt::from(evt.evt_index))
             .set("evt_block_time", BigInt::from(evt.evt_block_time))
             .set("evt_block_number", BigInt::from(evt.evt_block_number))
@@ -587,7 +587,7 @@ fn db_lendergroup_out(
     events.lendergroup_earnings_withdrawns.iter().for_each(|evt| {
         tables
             .upsert_row("group_earnings_withdrawn", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
-            .set("evt_tx_hash", parse_tx_hash( &evt.evt_tx_hash ) )
+            .set("evt_tx_hash",   &evt.evt_tx_hash   )
             .set("evt_index", BigInt::from(evt.evt_index))
             .set("evt_block_time", BigInt::from(evt.evt_block_time))
             .set("evt_block_number", BigInt::from(evt.evt_block_number))
@@ -600,7 +600,7 @@ fn db_lendergroup_out(
     events.lendergroup_initializeds.iter().for_each(|evt| {
         tables
             .upsert_row("group_initialized", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
-            .set("evt_tx_hash", parse_tx_hash( &evt.evt_tx_hash ) )
+            .set("evt_tx_hash",   &evt.evt_tx_hash  )
             .set("evt_index", BigInt::from(evt.evt_index))
             .set("evt_block_time", BigInt::from(evt.evt_block_time))
             .set("evt_block_number", BigInt::from(evt.evt_block_number))
@@ -610,7 +610,7 @@ fn db_lendergroup_out(
     events.lendergroup_lender_added_principals.iter().for_each(|evt| {
         tables
             .upsert_row("group_lender_added_principal", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
-            .set("evt_tx_hash", parse_tx_hash( &evt.evt_tx_hash ) )
+            .set("evt_tx_hash",  &evt.evt_tx_hash   )
             .set("evt_index", BigInt::from(evt.evt_index))
             .set("evt_block_time", BigInt::from(evt.evt_block_time))
             .set("evt_block_number", BigInt::from(evt.evt_block_number))
@@ -623,7 +623,7 @@ fn db_lendergroup_out(
     events.lendergroup_loan_repaids.iter().for_each(|evt| {
         tables
             .upsert_row("group_loan_repaid", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
-            .set("evt_tx_hash", parse_tx_hash( &evt.evt_tx_hash ) )
+            .set("evt_tx_hash",  &evt.evt_tx_hash   )
             .set("evt_index", BigInt::from(evt.evt_index))
             .set("evt_block_time", BigInt::from(evt.evt_block_time))
             .set("evt_block_number", BigInt::from(evt.evt_block_number))
@@ -638,7 +638,7 @@ fn db_lendergroup_out(
     events.lendergroup_ownership_transferreds.iter().for_each(|evt| {
         tables
             .upsert_row("group_ownership_transferred", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
-            .set("evt_tx_hash", parse_tx_hash( &evt.evt_tx_hash ) )
+            .set("evt_tx_hash",   &evt.evt_tx_hash   )
             .set("evt_index", BigInt::from(evt.evt_index))
             .set("evt_block_time", BigInt::from(evt.evt_block_time))
             .set("evt_block_number", BigInt::from(evt.evt_block_number))
@@ -649,7 +649,7 @@ fn db_lendergroup_out(
     events.lendergroup_pauseds.iter().for_each(|evt| {
         tables
             .upsert_row("group_paused", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
-            .set("evt_tx_hash", parse_tx_hash( &evt.evt_tx_hash ) )
+            .set("evt_tx_hash",  &evt.evt_tx_hash  )
             .set("evt_index", BigInt::from(evt.evt_index))
             .set("evt_block_time", BigInt::from(evt.evt_block_time))
             .set("evt_block_number", BigInt::from(evt.evt_block_number))
@@ -659,7 +659,7 @@ fn db_lendergroup_out(
     events.lendergroup_pool_initializeds.iter().for_each(|evt| {
         tables
             .upsert_row("group_pool_initialized", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
-            .set("evt_tx_hash", parse_tx_hash( &evt.evt_tx_hash ) )
+            .set("evt_tx_hash",   &evt.evt_tx_hash   )
             .set("evt_index", BigInt::from(evt.evt_index))
             .set("evt_block_time", BigInt::from(evt.evt_block_time))
             .set("evt_block_number", BigInt::from(evt.evt_block_number))
@@ -739,7 +739,7 @@ fn db_lendergroup_out(
 
         tables
             .upsert_row("group_unpaused", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
-            .set("evt_tx_hash", parse_tx_hash( &evt.evt_tx_hash ) )
+            .set("evt_tx_hash",  &evt.evt_tx_hash   )
             .set("evt_index", BigInt::from(evt.evt_index))
             .set("evt_block_time", BigInt::from(evt.evt_block_time))
             .set("evt_block_number", BigInt::from(evt.evt_block_number))
@@ -1448,15 +1448,17 @@ fn store_lendergroup_user_metrics_deltas(
 
         let evt_address =   format!("0x{}", evt.evt_address )  ;
 
-        let user_store_key: String = format!("group_user_metric:{}:{}:interaction_count", evt_address,Hex(&evt.borrower).to_string());
+        let borrower_address = format!("0x{}", Hex(&evt.borrower).to_string() );
+
+        let user_store_key: String = format!("group_user_metric:{}:{}:interaction_count", evt_address,  borrower_address );
         bigint_add_store.add(ord,&user_store_key, BigInt::from( 1 ));
 
         
           
-        let user_store_key: String = format!("group_user_metric:{}:{}:total_principal_tokens_borrowed", evt_address,Hex(&evt.borrower).to_string());
+        let user_store_key: String = format!("group_user_metric:{}:{}:total_principal_tokens_borrowed", evt_address, borrower_address);
         bigint_add_store.add(ord,&user_store_key, BigInt::from_str(&evt.principal_amount).unwrap_or(BigInt::zero()));
         
-        let user_store_key: String = format!("group_user_metric:{}:{}:total_collateral_tokens_escrowed", evt_address,Hex(&evt.borrower).to_string());
+        let user_store_key: String = format!("group_user_metric:{}:{}:total_collateral_tokens_escrowed", evt_address, borrower_address);
         bigint_add_store.add(ord,&user_store_key, BigInt::from_str(&evt.collateral_amount).unwrap_or(BigInt::zero()));
  
     });
@@ -1468,12 +1470,15 @@ fn store_lendergroup_user_metrics_deltas(
 
         let evt_address =   format!("0x{}", evt.evt_address )  ;
 
-        let user_store_key: String = format!("group_user_metric:{}:{}:interaction_count", evt_address,Hex(&evt.lender).to_string());
+        let lender_address = format!("0x{}", Hex(&evt.lender).to_string() );
+
+
+        let user_store_key: String = format!("group_user_metric:{}:{}:interaction_count", evt_address,lender_address);
         bigint_add_store.add(ord,&user_store_key, BigInt::from( 1 ));
 
         
       
-        let user_store_key: String = format!("group_user_metric:{}:{}:total_principal_tokens_withdrawn", evt_address,Hex(&evt.lender).to_string());
+        let user_store_key: String = format!("group_user_metric:{}:{}:total_principal_tokens_withdrawn", evt_address, lender_address);
         bigint_add_store.add(ord,&user_store_key, BigInt::from_str(&evt.principal_tokens_withdrawn).unwrap_or(BigInt::zero()));
  
     });
@@ -1486,14 +1491,17 @@ fn store_lendergroup_user_metrics_deltas(
 
         let evt_address =   format!("0x{}", evt.evt_address )  ;
 
-        let user_store_key: String = format!("group_user_metric:{}:{}:interaction_count", evt_address,Hex(&evt.repayer).to_string());
+        let repayer_address = format!("0x{}", Hex(&evt.repayer).to_string() );
+
+
+        let user_store_key: String = format!("group_user_metric:{}:{}:interaction_count", evt_address, repayer_address);
         bigint_add_store.add(ord,&user_store_key, BigInt::from( 1 ));
 
 
-        let user_store_key: String = format!("group_user_metric:{}:{}:total_principal_tokens_repaid", evt_address,Hex(&evt.repayer).to_string());
+        let user_store_key: String = format!("group_user_metric:{}:{}:total_principal_tokens_repaid", evt_address, repayer_address);
         bigint_add_store.add(ord,&user_store_key, BigInt::from_str(&evt.principal_amount).unwrap_or(BigInt::zero()));
         
-        let user_store_key: String = format!("group_user_metric:{}:{}:total_interest_collected", evt_address,Hex(&evt.repayer).to_string());
+        let user_store_key: String = format!("group_user_metric:{}:{}:total_interest_collected", evt_address, repayer_address);
         bigint_add_store.add(ord,&user_store_key, BigInt::from_str(&evt.interest_amount).unwrap_or(BigInt::zero()));
          
         
@@ -1925,7 +1933,7 @@ fn db_out(
         format!("0x{}", hex::encode(&tx_hash))
     }
 
-  fn parse_tx_hash( tx_hash : &str  ) -> Vec<u8> {
+    fn parse_tx_hash( tx_hash : &str  ) -> Vec<u8> {
                 hex::decode(&tx_hash[2..]).unwrap()
     }
 

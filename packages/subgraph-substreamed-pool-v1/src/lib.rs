@@ -565,7 +565,7 @@ fn db_lendergroup_out(
            
             .set("group_pool_address", format_eth_address( &Address::from_str( &evt_address ).unwrap() ))  
             .set("bid_id", BigDecimal::from_str(&evt.bid_id).unwrap() )
-            .set("borrower",  &evt.borrower )
+            .set("borrower", format_eth_address( &Address::from_slice( &evt.borrower )  ))
             .set("principal_amount", BigDecimal::from_str(&evt.principal_amount).unwrap())
             .set("collateral_amount", BigDecimal::from_str(&evt.collateral_amount).unwrap())
             
@@ -593,9 +593,9 @@ fn db_lendergroup_out(
             .set("evt_block_number", BigInt::from(evt.evt_block_number))
             .set("group_pool_address", format_eth_address( &Address::from_str( &evt.evt_address ).unwrap() ))  
             .set("amount_pool_shares_tokens", BigDecimal::from_str(&evt.amount_pool_shares_tokens).unwrap())
-            .set("lender", &evt.lender )
+            .set("lender", format_eth_address( &Address::from_slice( &evt.lender )  ) )
             .set("principal_tokens_withdrawn", BigDecimal::from_str(&evt.principal_tokens_withdrawn).unwrap())
-            .set("recipient",  &evt.recipient );
+            .set("recipient", format_eth_address( &Address::from_slice( &evt.recipient )  ) );
     });
     events.lendergroup_initializeds.iter().for_each(|evt| {
         tables

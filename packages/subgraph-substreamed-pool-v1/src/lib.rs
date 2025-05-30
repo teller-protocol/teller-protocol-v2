@@ -616,9 +616,9 @@ fn db_lendergroup_out(
             .set("evt_block_number", BigInt::from(evt.evt_block_number))
             .set("group_pool_address", format_eth_address( &Address::from_str( &evt.evt_address ).unwrap() ))  
             .set("amount", BigDecimal::from_str(&evt.amount).unwrap())
-            .set("lender",  &evt.lender )
+            .set("lender",  format_eth_address( &Address::from_slice( &evt.lender )  ))  
             .set("shares_amount", BigDecimal::from_str(&evt.shares_amount).unwrap())
-            .set("shares_recipient",  &evt.shares_recipient );
+            .set("shares_recipient", format_eth_address( &Address::from_slice( &evt.shares_recipient )  ));
     });
     events.lendergroup_loan_repaids.iter().for_each(|evt| {
         tables
@@ -631,7 +631,7 @@ fn db_lendergroup_out(
             .set("bid_id", BigDecimal::from_str(&evt.bid_id).unwrap())
             .set("interest_amount", BigDecimal::from_str(&evt.interest_amount).unwrap())
             .set("principal_amount", BigDecimal::from_str(&evt.principal_amount).unwrap())
-            .set("repayer",  &evt.repayer )
+            .set("repayer", format_eth_address( &Address::from_slice( &evt.repayer )  ) )
             .set("total_interest_collected", BigDecimal::from_str(&evt.total_interest_collected).unwrap())
             .set("total_principal_repaid", BigDecimal::from_str(&evt.total_principal_repaid).unwrap());
     });
@@ -671,8 +671,8 @@ fn db_lendergroup_out(
             .set("loan_to_value_percent", evt.loan_to_value_percent)
             .set("market_id", BigInt::from_str(&evt.market_id).unwrap())
             .set("max_loan_duration", evt.max_loan_duration)
-            .set("pool_shares_token",  &evt.pool_shares_token )
-            .set("principal_token_address", &evt.principal_token_address )
+            .set("pool_shares_token",format_eth_address( &Address::from_slice( &evt.pool_shares_token )  )  )
+            .set("principal_token_address", format_eth_address( &Address::from_slice( &evt.principal_token_address )  ) )
            // .set("twap_interval", evt.twap_interval)
             //.set("uniswap_pool_fee", evt.uniswap_pool_fee)
             ;
@@ -699,12 +699,12 @@ fn db_lendergroup_out(
             .set("created_at", BigInt::from(evt.evt_block_time))
            
             .set("group_pool_address",format_eth_address( &Address::from_str( &evt_address ).unwrap() ))  
-            .set("principal_token_address",  &evt.principal_token_address  )
-            .set("collateral_token_address",  &evt.collateral_token_address  )
-            .set("shares_token_address",  &evt.pool_shares_token  )
+            .set("principal_token_address", format_eth_address( &Address::from_slice( &evt.principal_token_address )  )  )
+            .set("collateral_token_address",   format_eth_address( &Address::from_slice( &evt.collateral_token_address )  ) )
+            .set("shares_token_address", format_eth_address( &Address::from_slice( &evt.pool_shares_token )  )  )
           //  .set("uniswap_v3_pool_address",  &evt.uniswap_v3_pool_address )
-            .set("teller_v2_address",  &evt.teller_v2_address  )
-            .set("smart_commitment_forwarder_address",  &evt.smart_commitment_forwarder_address  )
+            .set("teller_v2_address", format_eth_address( &Address::from_slice( &evt.teller_v2_address )  )   )
+            .set("smart_commitment_forwarder_address", format_eth_address( &Address::from_slice( &evt.smart_commitment_forwarder_address )  ) )
             .set("market_id", BigInt::from_str(&evt.market_id).unwrap() )
            // .set("uniswap_pool_fee", evt.uniswap_pool_fee)
             .set("max_loan_duration", evt.max_loan_duration)

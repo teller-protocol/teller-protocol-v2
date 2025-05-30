@@ -3,6 +3,7 @@ mod pb;
 mod rpc;
  
 
+use ethabi::Address;
 use hex_literal::hex;
 use pb::contract::v1 as contract;
 use pb::collateral::v1 as collateral_contract;
@@ -527,13 +528,20 @@ fn db_lendergroup_out(
     ) {
     // Loop over all the abis events to create table changes
     events.lendergroup_borrower_accepted_funds.iter().for_each(|evt| {
+
+
+
+
+        let evt_address =   format!("0x{}", evt.evt_address )  ;
+
+
         tables
             .upsert_row("group_borrower_accepted_funds", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
             .set("evt_tx_hash", parse_tx_hash( &evt.evt_tx_hash ))  //maybe do hex to string first ? 
             .set("evt_index", BigInt::from(evt.evt_index))
             .set("evt_block_time", BigInt::from(evt.evt_block_time))
             .set("evt_block_number", BigInt::from(evt.evt_block_number))
-            .set("group_pool_address", Hex::decode(&evt.evt_address).unwrap() )
+            .set("group_pool_address", format_eth_address( &Address::from_str( &evt_address ).unwrap() ))  
             .set("bid_id", BigDecimal::from_str(&evt.bid_id).unwrap())
             .set("borrower",  &evt.borrower )
             .set("collateral_amount", BigDecimal::from_str(&evt.collateral_amount).unwrap())
@@ -555,7 +563,7 @@ fn db_lendergroup_out(
               tables
             .upsert_row("group_pool_bid", format!("{}", evt.evt_address )  ) 
            
-            .set("group_pool_address", Hex::decode(&evt.evt_address).unwrap() )
+            .set("group_pool_address", format_eth_address( &Address::from_str( &evt_address ).unwrap() ))  
             .set("bid_id", BigDecimal::from_str(&evt.bid_id).unwrap() )
             .set("borrower",  &evt.borrower )
             .set("principal_amount", BigDecimal::from_str(&evt.principal_amount).unwrap())
@@ -570,7 +578,7 @@ fn db_lendergroup_out(
             .set("evt_index", BigInt::from(evt.evt_index))
             .set("evt_block_time", BigInt::from(evt.evt_block_time))
             .set("evt_block_number", BigInt::from(evt.evt_block_number))
-            .set("group_pool_address", Hex::decode(&evt.evt_address).unwrap() )
+            .set("group_pool_address",format_eth_address( &Address::from_str( &evt.evt_address ).unwrap() ))  
             .set("amount_due", BigDecimal::from_str(&evt.amount_due).unwrap())
             .set("bid_id", BigDecimal::from_str(&evt.bid_id).unwrap())
             .set("liquidator", &evt.liquidator )
@@ -583,7 +591,7 @@ fn db_lendergroup_out(
             .set("evt_index", BigInt::from(evt.evt_index))
             .set("evt_block_time", BigInt::from(evt.evt_block_time))
             .set("evt_block_number", BigInt::from(evt.evt_block_number))
-            .set("group_pool_address", Hex::decode(&evt.evt_address).unwrap() )
+            .set("group_pool_address", format_eth_address( &Address::from_str( &evt.evt_address ).unwrap() ))  
             .set("amount_pool_shares_tokens", BigDecimal::from_str(&evt.amount_pool_shares_tokens).unwrap())
             .set("lender", &evt.lender )
             .set("principal_tokens_withdrawn", BigDecimal::from_str(&evt.principal_tokens_withdrawn).unwrap())
@@ -596,7 +604,7 @@ fn db_lendergroup_out(
             .set("evt_index", BigInt::from(evt.evt_index))
             .set("evt_block_time", BigInt::from(evt.evt_block_time))
             .set("evt_block_number", BigInt::from(evt.evt_block_number))
-            .set("group_pool_address", Hex::decode(&evt.evt_address).unwrap() )
+            .set("group_pool_address",format_eth_address( &Address::from_str( &evt.evt_address ).unwrap() ))  
             .set("version", evt.version);
     });
     events.lendergroup_lender_added_principals.iter().for_each(|evt| {
@@ -606,7 +614,7 @@ fn db_lendergroup_out(
             .set("evt_index", BigInt::from(evt.evt_index))
             .set("evt_block_time", BigInt::from(evt.evt_block_time))
             .set("evt_block_number", BigInt::from(evt.evt_block_number))
-            .set("group_pool_address", Hex::decode(&evt.evt_address).unwrap() )
+            .set("group_pool_address", format_eth_address( &Address::from_str( &evt.evt_address ).unwrap() ))  
             .set("amount", BigDecimal::from_str(&evt.amount).unwrap())
             .set("lender",  &evt.lender )
             .set("shares_amount", BigDecimal::from_str(&evt.shares_amount).unwrap())
@@ -619,7 +627,7 @@ fn db_lendergroup_out(
             .set("evt_index", BigInt::from(evt.evt_index))
             .set("evt_block_time", BigInt::from(evt.evt_block_time))
             .set("evt_block_number", BigInt::from(evt.evt_block_number))
-            .set("group_pool_address", Hex::decode(&evt.evt_address).unwrap() )
+            .set("group_pool_address",format_eth_address( &Address::from_str( &evt.evt_address ).unwrap() ))  
             .set("bid_id", BigDecimal::from_str(&evt.bid_id).unwrap())
             .set("interest_amount", BigDecimal::from_str(&evt.interest_amount).unwrap())
             .set("principal_amount", BigDecimal::from_str(&evt.principal_amount).unwrap())
@@ -634,7 +642,7 @@ fn db_lendergroup_out(
             .set("evt_index", BigInt::from(evt.evt_index))
             .set("evt_block_time", BigInt::from(evt.evt_block_time))
             .set("evt_block_number", BigInt::from(evt.evt_block_number))
-            .set("group_pool_address", Hex::decode(&evt.evt_address).unwrap() )
+            .set("group_pool_address",format_eth_address( &Address::from_str( &evt.evt_address ).unwrap() ))  
             .set("new_owner",  &evt.new_owner )
             .set("previous_owner",  &evt.previous_owner );
     });
@@ -645,7 +653,7 @@ fn db_lendergroup_out(
             .set("evt_index", BigInt::from(evt.evt_index))
             .set("evt_block_time", BigInt::from(evt.evt_block_time))
             .set("evt_block_number", BigInt::from(evt.evt_block_number))
-            .set("group_pool_address", Hex::decode(&evt.evt_address).unwrap() )
+            .set("group_pool_address", format_eth_address( &Address::from_str( &evt.evt_address ).unwrap() ))  
             .set("account",  &evt.account );
     });
     events.lendergroup_pool_initializeds.iter().for_each(|evt| {
@@ -655,7 +663,7 @@ fn db_lendergroup_out(
             .set("evt_index", BigInt::from(evt.evt_index))
             .set("evt_block_time", BigInt::from(evt.evt_block_time))
             .set("evt_block_number", BigInt::from(evt.evt_block_number))
-            .set("group_pool_address", Hex::decode(&evt.evt_address).unwrap() )
+            .set("group_pool_address", format_eth_address( &Address::from_str( &evt.evt_address ).unwrap() ))  
             .set("collateral_token_address",  &evt.collateral_token_address )
             .set("interest_rate_lower_bound", evt.interest_rate_lower_bound)
             .set("interest_rate_upper_bound", evt.interest_rate_upper_bound)
@@ -682,14 +690,15 @@ fn db_lendergroup_out(
             
            let fetched_token_amount_difference = rpc::fetch_token_amount_difference_from_liquidations(&evt.evt_address).unwrap_or_default();
          
-    
+            
+            let evt_address = &evt.evt_address;
        //create group pool metric 
        tables
             .upsert_row("group_pool_metric", format!("{}", evt.evt_address )  ) 
 
             .set("created_at", BigInt::from(evt.evt_block_time))
            
-            .set("group_pool_address", Hex::decode(&evt.evt_address).unwrap() )
+            .set("group_pool_address",format_eth_address( &Address::from_str( &evt_address ).unwrap() ))  
             .set("principal_token_address",  &evt.principal_token_address  )
             .set("collateral_token_address",  &evt.collateral_token_address  )
             .set("shares_token_address",  &evt.pool_shares_token  )
@@ -725,13 +734,16 @@ fn db_lendergroup_out(
 
     });
     events.lendergroup_unpauseds.iter().for_each(|evt| {
+
+            let evt_address = &evt.evt_address;
+
         tables
             .upsert_row("group_unpaused", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
             .set("evt_tx_hash", parse_tx_hash( &evt.evt_tx_hash ) )
             .set("evt_index", BigInt::from(evt.evt_index))
             .set("evt_block_time", BigInt::from(evt.evt_block_time))
             .set("evt_block_number", BigInt::from(evt.evt_block_number))
-            .set("group_pool_address", Hex::decode(&evt.evt_address).unwrap() )
+            .set("group_pool_address", format_eth_address( &Address::from_str( &evt_address ).unwrap() ))   
             .set("account",  &evt.account  );
     });
 
@@ -925,10 +937,11 @@ fn db_lendergroup_out(
             .unwrap_or(BigInt::zero()) ;  */
                  
               
-            
+                let evt_address = &group_pool_address; 
+
                tables
                     .upsert_row("group_pool_metric_data_point", format!("{}_{}", group_pool_address, block_number )  ) 
-                    .set("group_pool_address", Hex::decode( group_pool_address ).unwrap())
+                    .set("group_pool_address", format_eth_address( &Address::from_str( &evt_address ).unwrap() ))   
                     .set("block_number", &block_number )
                     .set("block_time", &block_time)
                     .set("total_principal_tokens_committed", &total_principal_committed )
@@ -948,7 +961,7 @@ fn db_lendergroup_out(
                     
                 tables
                     .upsert_row("group_pool_metric_data_point_daily", format!("{}_{}", group_pool_address, day_index )  ) 
-                    .set("group_pool_address", Hex::decode( group_pool_address ).unwrap())
+                      .set("group_pool_address", format_eth_address( &Address::from_str( &evt_address ).unwrap() ))   
                     .set("block_number", &block_number )
                     .set("block_time", &block_time)
                     .set("day_index", &day_index)
@@ -969,7 +982,7 @@ fn db_lendergroup_out(
                       
                 tables
                     .upsert_row("group_pool_metric_data_point_weekly", format!("{}_{}", group_pool_address, week_index )  ) 
-                    .set("group_pool_address", Hex::decode( group_pool_address ).unwrap())
+                    .set("group_pool_address", format_eth_address( &Address::from_str( &evt_address ).unwrap() ))   
                     .set("block_number", &block_number )
                     .set("block_time", &block_time)
                     .set("week_index", &week_index)
@@ -1031,7 +1044,7 @@ fn db_lendergroup_out(
             if interaction_count == & BigInt::from(1) {
                 tables
                 .upsert_row("group_user_metric", format!("{}_{}", group_address, user_address )  ) 
-                .set("group_pool_address", Hex::decode( group_address ).unwrap())
+                 .set("group_pool_address", format_eth_address( &Address::from_str( &group_address ).unwrap() ))   
                 .set("user_address", Hex::decode( user_address ).unwrap())
       
                 .set("total_principal_tokens_committed", BigInt::zero() )
@@ -1414,13 +1427,16 @@ fn store_lendergroup_user_metrics_deltas(
 
     
     events.lendergroup_lender_added_principals.iter().for_each(|evt: &contract::LendergroupLenderAddedPrincipal| {
+
+
+        let evt_address =   format!("0x{}", evt.evt_address )  ;
         
-        let user_store_key: String = format!("group_user_metric:{}:{}:interaction_count", evt.evt_address,Hex(&evt.lender).to_string());
+        let user_store_key: String = format!("group_user_metric:{}:{}:interaction_count",  evt_address,Hex(&evt.lender).to_string());
         bigint_add_store.add(ord,&user_store_key, BigInt::from( 1 ));
 
 
         
-        let user_store_key: String = format!("group_user_metric:{}:{}:total_principal_tokens_committed", evt.evt_address,Hex(&evt.lender).to_string());
+        let user_store_key: String = format!("group_user_metric:{}:{}:total_principal_tokens_committed", evt_address ,Hex(&evt.lender).to_string());
         bigint_add_store.add(ord,&user_store_key, BigInt::from_str(&evt.amount).unwrap_or(BigInt::zero()));
 
       // need to write a whole set of drivers to track   shares tokens !! 
@@ -1428,29 +1444,36 @@ fn store_lendergroup_user_metrics_deltas(
     });
 
     events.lendergroup_borrower_accepted_funds.iter().for_each(|evt: &contract::LendergroupBorrowerAcceptedFunds| {
-       
-        let user_store_key: String = format!("group_user_metric:{}:{}:interaction_count", evt.evt_address,Hex(&evt.borrower).to_string());
+        
+
+        let evt_address =   format!("0x{}", evt.evt_address )  ;
+
+        let user_store_key: String = format!("group_user_metric:{}:{}:interaction_count", evt_address,Hex(&evt.borrower).to_string());
         bigint_add_store.add(ord,&user_store_key, BigInt::from( 1 ));
 
         
           
-        let user_store_key: String = format!("group_user_metric:{}:{}:total_principal_tokens_borrowed", evt.evt_address,Hex(&evt.borrower).to_string());
+        let user_store_key: String = format!("group_user_metric:{}:{}:total_principal_tokens_borrowed", evt_address,Hex(&evt.borrower).to_string());
         bigint_add_store.add(ord,&user_store_key, BigInt::from_str(&evt.principal_amount).unwrap_or(BigInt::zero()));
         
-        let user_store_key: String = format!("group_user_metric:{}:{}:total_collateral_tokens_escrowed", evt.evt_address,Hex(&evt.borrower).to_string());
+        let user_store_key: String = format!("group_user_metric:{}:{}:total_collateral_tokens_escrowed", evt_address,Hex(&evt.borrower).to_string());
         bigint_add_store.add(ord,&user_store_key, BigInt::from_str(&evt.collateral_amount).unwrap_or(BigInt::zero()));
  
     });
 
     
     events.lendergroup_earnings_withdrawns.iter().for_each(|evt: &contract::LendergroupEarningsWithdrawn| {
-        
-        let user_store_key: String = format!("group_user_metric:{}:{}:interaction_count", evt.evt_address,Hex(&evt.lender).to_string());
+                
+
+
+        let evt_address =   format!("0x{}", evt.evt_address )  ;
+
+        let user_store_key: String = format!("group_user_metric:{}:{}:interaction_count", evt_address,Hex(&evt.lender).to_string());
         bigint_add_store.add(ord,&user_store_key, BigInt::from( 1 ));
 
         
       
-        let user_store_key: String = format!("group_user_metric:{}:{}:total_principal_tokens_withdrawn", evt.evt_address,Hex(&evt.lender).to_string());
+        let user_store_key: String = format!("group_user_metric:{}:{}:total_principal_tokens_withdrawn", evt_address,Hex(&evt.lender).to_string());
         bigint_add_store.add(ord,&user_store_key, BigInt::from_str(&evt.principal_tokens_withdrawn).unwrap_or(BigInt::zero()));
  
     });
@@ -1459,14 +1482,18 @@ fn store_lendergroup_user_metrics_deltas(
             
     events.lendergroup_loan_repaids.iter().for_each(|evt: &contract::LendergroupLoanRepaid| {
 
-        let user_store_key: String = format!("group_user_metric:{}:{}:interaction_count", evt.evt_address,Hex(&evt.repayer).to_string());
+
+
+        let evt_address =   format!("0x{}", evt.evt_address )  ;
+
+        let user_store_key: String = format!("group_user_metric:{}:{}:interaction_count", evt_address,Hex(&evt.repayer).to_string());
         bigint_add_store.add(ord,&user_store_key, BigInt::from( 1 ));
 
 
-        let user_store_key: String = format!("group_user_metric:{}:{}:total_principal_tokens_repaid", evt.evt_address,Hex(&evt.repayer).to_string());
+        let user_store_key: String = format!("group_user_metric:{}:{}:total_principal_tokens_repaid", evt_address,Hex(&evt.repayer).to_string());
         bigint_add_store.add(ord,&user_store_key, BigInt::from_str(&evt.principal_amount).unwrap_or(BigInt::zero()));
         
-        let user_store_key: String = format!("group_user_metric:{}:{}:total_interest_collected", evt.evt_address,Hex(&evt.repayer).to_string());
+        let user_store_key: String = format!("group_user_metric:{}:{}:total_interest_collected", evt_address,Hex(&evt.repayer).to_string());
         bigint_add_store.add(ord,&user_store_key, BigInt::from_str(&evt.interest_amount).unwrap_or(BigInt::zero()));
          
         
@@ -1583,25 +1610,29 @@ fn store_lendergroup_pool_metrics_deltas(
     
 
     events.lendergroup_pool_initializeds.iter().for_each(|evt: &contract::LendergroupPoolInitialized| {
+            
+
+
+        let evt_address =   format!("0x{}", evt.evt_address )  ;
+
         
-        
-        let store_key: String = format!("group_pool_metric:{}:total_principal_tokens_committed", evt.evt_address);
+        let store_key: String = format!("group_pool_metric:{}:total_principal_tokens_committed", evt_address);
         bigint_add_store.add(ord,&store_key, BigInt::zero() );
 
-        let store_key: String = format!("group_pool_metric:{}:total_principal_tokens_borrowed", evt.evt_address);
+        let store_key: String = format!("group_pool_metric:{}:total_principal_tokens_borrowed", evt_address);
         bigint_add_store.add(ord,&store_key, BigInt::zero() );
 
-        let store_key: String = format!("group_pool_metric:{}:total_principal_tokens_withdrawn", evt.evt_address);
+        let store_key: String = format!("group_pool_metric:{}:total_principal_tokens_withdrawn", evt_address);
         bigint_add_store.add(ord,&store_key, BigInt::zero() );
 
-        let store_key: String = format!("group_pool_metric:{}:total_principal_tokens_repaid", evt.evt_address);
+        let store_key: String = format!("group_pool_metric:{}:total_principal_tokens_repaid", evt_address);
         bigint_add_store.add(ord,&store_key, BigInt::zero() );
 
-        let store_key: String = format!("group_pool_metric:{}:total_interest_collected", evt.evt_address);
+        let store_key: String = format!("group_pool_metric:{}:total_interest_collected", evt_address);
         bigint_add_store.add(ord,&store_key, BigInt::zero() );
 
 
-        let store_key: String = format!("group_pool_metric:{}:total_collateral_tokens_escrowed", evt.evt_address);
+        let store_key: String = format!("group_pool_metric:{}:total_collateral_tokens_escrowed", evt_address);
         bigint_add_store.add(ord,&store_key, BigInt::zero() );
 
         
@@ -1610,7 +1641,12 @@ fn store_lendergroup_pool_metrics_deltas(
     });
     
     events.lendergroup_lender_added_principals.iter().for_each(|evt: &contract::LendergroupLenderAddedPrincipal| {
-        let group_store_key: String = format!("group_pool_metric:{}:total_principal_tokens_committed", evt.evt_address);
+
+
+
+        let evt_address =   format!("0x{}", evt.evt_address )  ;
+
+        let group_store_key: String = format!("group_pool_metric:{}:total_principal_tokens_committed", evt_address);
         bigint_add_store.add(ord,&group_store_key, BigInt::from_str(&evt.amount).unwrap_or(BigInt::zero()));
         
         
@@ -1619,11 +1655,16 @@ fn store_lendergroup_pool_metrics_deltas(
     });
 
     events.lendergroup_borrower_accepted_funds.iter().for_each(|evt: &contract::LendergroupBorrowerAcceptedFunds| {
+
+
+
+        let evt_address =   format!("0x{}", evt.evt_address )  ;
+
         
-        let group_store_key: String = format!("group_pool_metric:{}:total_principal_tokens_borrowed", evt.evt_address);
+        let group_store_key: String = format!("group_pool_metric:{}:total_principal_tokens_borrowed", evt_address);
         bigint_add_store.add(ord,&group_store_key, BigInt::from_str(&evt.principal_amount).unwrap_or(BigInt::zero()));
         
-        let group_store_key: String = format!("group_pool_metric:{}:total_collateral_tokens_escrowed", evt.evt_address);
+        let group_store_key: String = format!("group_pool_metric:{}:total_collateral_tokens_escrowed", evt_address);
         bigint_add_store.add(ord,&group_store_key, BigInt::from_str(&evt.collateral_amount).unwrap_or(BigInt::zero()));
         
       
@@ -1631,7 +1672,11 @@ fn store_lendergroup_pool_metrics_deltas(
 
     
     events.lendergroup_earnings_withdrawns.iter().for_each(|evt: &contract::LendergroupEarningsWithdrawn| {
-        let group_store_key: String = format!("group_pool_metric:{}:total_principal_tokens_withdrawn", evt.evt_address);
+
+
+        let evt_address =   format!("0x{}", evt.evt_address )  ;
+
+        let group_store_key: String = format!("group_pool_metric:{}:total_principal_tokens_withdrawn", evt_address);
         bigint_add_store.add(ord,&group_store_key, BigInt::from_str(&evt.principal_tokens_withdrawn).unwrap_or(BigInt::zero()));
          
       
@@ -1641,10 +1686,15 @@ fn store_lendergroup_pool_metrics_deltas(
     
             
     events.lendergroup_loan_repaids.iter().for_each(|evt: &contract::LendergroupLoanRepaid| {
-        let group_store_key: String = format!("group_pool_metric:{}:total_principal_tokens_repaid", evt.evt_address);
+
+
+
+        let evt_address =   format!("0x{}", evt.evt_address )  ;
+
+        let group_store_key: String = format!("group_pool_metric:{}:total_principal_tokens_repaid", evt_address);
         bigint_add_store.add(ord,&group_store_key, BigInt::from_str(&evt.principal_amount).unwrap_or(BigInt::zero()));
 
-        let group_store_key: String = format!("group_pool_metric:{}:total_interest_collected", evt.evt_address);
+        let group_store_key: String = format!("group_pool_metric:{}:total_interest_collected", evt_address);
         bigint_add_store.add(ord,&group_store_key, BigInt::from_str(&evt.interest_amount).unwrap_or(BigInt::zero()));
     
         
@@ -1652,7 +1702,11 @@ fn store_lendergroup_pool_metrics_deltas(
 
     events.lendergroup_defaulted_loan_liquidateds.iter().for_each(|evt: &contract::LendergroupDefaultedLoanLiquidated| {
 
-        let group_store_key: String = format!("group_pool_metric:{}:total_principal_tokens_repaid", evt.evt_address);
+
+
+        let evt_address =   format!("0x{}", evt.evt_address )  ;
+
+        let group_store_key: String = format!("group_pool_metric:{}:total_principal_tokens_repaid", evt_address);
         bigint_add_store.add(ord,&group_store_key, BigInt::from_str(&evt.amount_due).unwrap_or(BigInt::zero()));
 
         //track token amt difference? 
@@ -1858,6 +1912,11 @@ fn db_out(
 
 
 
+
+    fn format_eth_address( address : &Address  ) -> String {
+  
+        format!("{:?}", address )
+    }
 
     fn format_tx_hash( tx_hash : &Vec<u8>  ) -> String {
 

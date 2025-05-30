@@ -1045,7 +1045,7 @@ fn db_lendergroup_out(
                 tables
                 .upsert_row("group_user_metric", format!("{}_{}", group_address, user_address )  ) 
                  .set("group_pool_address", format_eth_address( &Address::from_str( &group_address ).unwrap() ))   
-                .set("user_address", Hex::decode( user_address ).unwrap())
+                .set("user_address", format_eth_address( &Address::from_str( &user_address ).unwrap() ))   
       
                 .set("total_principal_tokens_committed", BigInt::zero() )
                 .set("total_collateral_tokens_escrowed", BigInt::zero() )

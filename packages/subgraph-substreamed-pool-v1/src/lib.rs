@@ -63,7 +63,10 @@ const COLLATERAL_MANAGER_TRACKED_CONTRACT: [u8;20] = hex!("2551A099129ad9b0b1FEc
 
 fn get_factory_tracked_contract_address() -> [u8; 20] {
 
-     let evm_network_name =   &std::env::var("EVM_NETWORK_NAME").unwrap() ;
+   //  let evm_network_name =   &std::env::var("EVM_NETWORK_NAME").unwrap() ;
+
+     let evm_network_name = env!("EVM_NETWORK_NAME", "EVM NETWORK_NAME environment variable must be set at compile time");
+    
 
      match evm_network_name.as_str() {
 
@@ -85,9 +88,9 @@ fn get_factory_tracked_contract_address() -> [u8; 20] {
 
 fn get_collateral_manager_tracked_contract_address() -> [u8; 20] {
 
-     let evm_network_name =   &std::env::var("EVM_NETWORK_NAME").unwrap() ;
-
-
+     
+        let evm_network_name = env!("EVM_NETWORK_NAME", "EVM NETWORK_NAME environment variable must be set at compile time");
+    
 
        match evm_network_name.as_str() {
 

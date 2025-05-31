@@ -690,8 +690,9 @@ fn db_lendergroup_out(
             
            let fetched_token_amount_difference = rpc::fetch_token_amount_difference_from_liquidations(&evt.evt_address).unwrap_or_default();
          
-            
-            let evt_address = &evt.evt_address;
+                    
+                    // add the 0x to it and use that for the ID 
+            let evt_address = format_eth_address( &Address::from_str( &evt.evt_address ).unwrap() )   ; 
        //create group pool metric 
        tables
             .upsert_row("group_pool_metric", format!("{}", evt.evt_address )  ) 

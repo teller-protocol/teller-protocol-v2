@@ -743,7 +743,7 @@ fn db_lendergroup_out(
             let evt_address = format_eth_address( &Address::from_str( &evt.evt_address ).unwrap() )   ; 
        //create group pool metric 
        tables
-            .upsert_row("group_pool_metric", format!("{}", evt.evt_address )  ) 
+            .upsert_row("group_pool_metric", format!("{}", evt_address )  ) 
 
             .set("created_at", BigInt::from(evt.evt_block_time))
            

@@ -68,7 +68,7 @@ fn get_factory_tracked_contract_address() -> [u8; 20] {
      let evm_network_name = env!("EVM_NETWORK_NAME", "EVM NETWORK_NAME environment variable must be set at compile time");
     
 
-     match evm_network_name.as_str() {
+     match evm_network_name  {
 
         "polygon" => hex!("2fF5ea5CF5061EB0fcfB7A2AafB8CCC79f3F73ea"),
         "arbitrum" => hex!("C2a093B641496Ac8AA9d6a17f216ADF4a42FC9B6"),
@@ -92,7 +92,7 @@ fn get_collateral_manager_tracked_contract_address() -> [u8; 20] {
         let evm_network_name = env!("EVM_NETWORK_NAME", "EVM NETWORK_NAME environment variable must be set at compile time");
     
 
-       match evm_network_name.as_str() {
+       match evm_network_name {
 
         "polygon" => hex!("76888a882a4fF57455B5e74B791DD19DF3ba51Bb"),
         "arbitrum" => hex!("71B04a8569914bCb99D5F95644CF6b089c826024"),

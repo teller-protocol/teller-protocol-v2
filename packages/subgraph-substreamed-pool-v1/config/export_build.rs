@@ -6,9 +6,11 @@ use std::fs::{self, File};
 use std::io::{self, Read, Write};
  
 
+use std::env;
 
-    //configure me ! 
-    const NETWORK_NAME:&str = "base" ;
+
+ 
+ 
 
 
 
@@ -110,8 +112,12 @@ fn process_file(input_file: &str, output_file: &str, data: &NetworkData) -> io::
 
 
 fn main() -> io::Result<()> {
+
+       let evm_network_name =   &env::var("EVM_NETWORK_NAME").unwrap() ;
+
+
     // Define the data to be injected into the template
-     let data = NetworkData::from_network( NETWORK_NAME ).unwrap () ;
+     let data = NetworkData::from_network( evm_network_name ).unwrap () ;
 
 
 

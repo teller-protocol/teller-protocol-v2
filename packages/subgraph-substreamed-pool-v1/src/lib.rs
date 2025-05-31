@@ -56,8 +56,56 @@ const COLLATERAL_MANAGER_TRACKED_CONTRACT: [u8;20] = hex!("2551A099129ad9b0b1FEc
 
 
 
-const FACTORY_TRACKED_CONTRACT: [u8; 20] = hex!("7FBCefE4aE4c0C9E70427D0B9F1504Ed39d141BC");
-const COLLATERAL_MANAGER_TRACKED_CONTRACT: [u8;20] = hex!("71B04a8569914bCb99D5F95644CF6b089c826024");
+//const FACTORY_TRACKED_CONTRACT: [u8; 20] = hex!("7FBCefE4aE4c0C9E70427D0B9F1504Ed39d141BC");
+//const COLLATERAL_MANAGER_TRACKED_CONTRACT: [u8;20] = hex!("71B04a8569914bCb99D5F95644CF6b089c826024");
+
+
+
+fn get_factory_tracked_contract_address() -> [u8; 20] {
+
+     let evm_network_name =   &std::env::var("EVM_NETWORK_NAME").unwrap() ;
+
+     match evm_network_name.as_str() {
+
+        "polygon" => hex!("2fF5ea5CF5061EB0fcfB7A2AafB8CCC79f3F73ea"),
+        "arbitrum" => hex!("C2a093B641496Ac8AA9d6a17f216ADF4a42FC9B6"),
+        "base" => hex!("7FBCefE4aE4c0C9E70427D0B9F1504Ed39d141BC"),
+         "mainnet" => hex!("0848E884b2DBb63727aa3216b921C279f6DC9a91"),
+
+
+        _ => panic!("unknown evm network "),
+
+
+     }
+
+
+   // env::var("NETWORK_NAME").unwrap_or_else(|_| "base".to_string())
+}
+
+
+fn get_collateral_manager_tracked_contract_address() -> [u8; 20] {
+
+     let evm_network_name =   &std::env::var("EVM_NETWORK_NAME").unwrap() ;
+
+
+
+       match evm_network_name.as_str() {
+
+        "polygon" => hex!("76888a882a4fF57455B5e74B791DD19DF3ba51Bb"),
+        "arbitrum" => hex!("71B04a8569914bCb99D5F95644CF6b089c826024"),
+        "base" => hex!("71B04a8569914bCb99D5F95644CF6b089c826024"),
+         "mainnet" => hex!("2551A099129ad9b0b1FEc16f34D9CB73c237be8b"),
+
+
+        _ => panic!("unknown evm network "),
+
+
+     }
+
+   // env::var("NETWORK_NAME").unwrap_or_else(|_| "base".to_string())
+}
+
+
 
 
 fn map_factory_events(blk: &eth::Block, events: &mut contract::Events) {
@@ -131,7 +179,7 @@ fn map_factory_events(blk: &eth::Block, events: &mut contract::Events) {
         .receipts()
         .flat_map(|view| {
             view.receipt.logs.iter()
-                .filter(|log| log.address == FACTORY_TRACKED_CONTRACT)
+                .filter(|log| log.address == get_factory_tracked_contract_address() )
                 .filter_map(|log| {
                     if let Some(event) = abi::factory_contract::events::DeployedLenderGroupContract::match_and_decode(log) {
                         return Some(contract::FactoryDeployedLenderGroupContract {
@@ -160,7 +208,7 @@ fn store_factory_lendergroup_created(blk: eth::Block, store: StoreSetInt64) {
             .receipt
             .logs
             .iter()
-            .filter(|log| log.address == FACTORY_TRACKED_CONTRACT)
+            .filter(|log| log.address == get_factory_tracked_contract_address() )
         {
             if let Some(event) = abi::factory_contract::events::DeployedLenderGroupContract::match_and_decode(log) {
                 //log.ordinal
@@ -1167,7 +1215,7 @@ fn map_collateralmanager_events(
         .receipts()
         .flat_map(|view| {
             view.receipt.logs.iter()
-                .filter(|log| log.address == COLLATERAL_MANAGER_TRACKED_CONTRACT)
+                .filter(|log| log.address == get_collateral_manager_tracked_contract_address())
                 .filter_map(|log| {
                     if let Some(event) = abi::collateral_manager::events::CollateralWithdrawn::match_and_decode(log) {
                         

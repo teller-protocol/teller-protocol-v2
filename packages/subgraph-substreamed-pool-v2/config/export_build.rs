@@ -31,7 +31,7 @@ impl NetworkData {
             "polygon" => Some(Self{
                 graph_network: "polygon".to_string(),  
                 chain_network: "matic".to_string(),   
-                start_block:  66108200    
+                start_block:  72074312    
 
             }),
 

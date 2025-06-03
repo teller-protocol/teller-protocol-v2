@@ -289,7 +289,7 @@ fn map_lendergroup_events(
         })
         .collect());
 
-    events.lendergroup_earnings_withdrawns.append(&mut blk
+    events.lendergroup_withdraws.append(&mut blk
         .receipts()
         .flat_map(|view| {
             view.receipt.logs.iter()
@@ -336,7 +336,7 @@ fn map_lendergroup_events(
         })
         .collect());
 
-    events.lendergroup_lender_added_principals.append(&mut blk
+    events.lendergroup_deposits.append(&mut blk
         .receipts()
         .flat_map(|view| {
             view.receipt.logs.iter()
@@ -350,9 +350,9 @@ fn map_lendergroup_events(
                             evt_block_number: blk.number,
                             evt_address: Hex(&log.address).to_string(),
                             amount: event.assets.to_string(),
-                            lender: event.owner,
+                            lender: event.owner.clone(),
                             shares_amount: event.shares.to_string(),
-                            shares_recipient: event.owner,
+                            shares_recipient: event.owner.clone(),
                         });
                     }
 
@@ -472,7 +472,7 @@ fn map_lendergroup_events(
                             loan_to_value_percent: event.loan_to_value_percent.to_u64(),
                             market_id: event.market_id.to_string(),
                             max_loan_duration: event.max_loan_duration.to_u64(),
-                            pool_shares_token: event.pool_shares_token,
+ 
                             principal_token_address: event.principal_token_address,
                            // twap_interval: event.twap_interval.to_u64(),
                            // uniswap_pool_fee: event.uniswap_pool_fee.to_u64(),
@@ -635,7 +635,7 @@ fn db_lendergroup_out(
             .set("liquidator", &evt.liquidator )
             .set("token_amount_difference", BigDecimal::from_str(&evt.token_amount_difference).unwrap());
     });
-    events.lendergroup_earnings_withdrawns.iter().for_each(|evt| {
+    events.lendergroup_withdraws.iter().for_each(|evt| {
         tables
             .upsert_row("group_earnings_withdrawn", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
             .set("evt_tx_hash",   &evt.evt_tx_hash   )
@@ -658,7 +658,7 @@ fn db_lendergroup_out(
             .set("group_pool_address",format_eth_address( &Address::from_str( &evt.evt_address ).unwrap() ))  
             .set("version", evt.version);
     });
-    events.lendergroup_lender_added_principals.iter().for_each(|evt| {
+    events.lendergroup_deposits.iter().for_each(|evt| {
         tables
             .upsert_row("group_lender_added_principal", format!("{}-{}", evt.evt_tx_hash, evt.evt_index))
             .set("evt_tx_hash",  &evt.evt_tx_hash   )
@@ -722,7 +722,7 @@ fn db_lendergroup_out(
             .set("loan_to_value_percent", evt.loan_to_value_percent)
             .set("market_id", BigInt::from_str(&evt.market_id).unwrap())
             .set("max_loan_duration", evt.max_loan_duration)
-            .set("pool_shares_token",format_eth_address( &Address::from_slice( &evt.pool_shares_token )  )  )
+          //  .set("pool_shares_token",format_eth_address( &Address::from_slice( &evt.pool_shares_token )  )  )
             .set("principal_token_address", format_eth_address( &Address::from_slice( &evt.principal_token_address )  ) )
            // .set("twap_interval", evt.twap_interval)
             //.set("uniswap_pool_fee", evt.uniswap_pool_fee)
@@ -753,7 +753,7 @@ fn db_lendergroup_out(
             .set("group_pool_address",format_eth_address( &Address::from_str( &evt_address ).unwrap() ))  
             .set("principal_token_address", format_eth_address( &Address::from_slice( &evt.principal_token_address )  )  )
             .set("collateral_token_address",   format_eth_address( &Address::from_slice( &evt.collateral_token_address )  ) )
-            .set("shares_token_address", format_eth_address( &Address::from_slice( &evt.pool_shares_token )  )  )
+           // .set("shares_token_address", format_eth_address( &Address::from_slice( &evt.pool_shares_token )  )  )
           //  .set("uniswap_v3_pool_address",  &evt.uniswap_v3_pool_address )
             .set("teller_v2_address", format_eth_address( &Address::from_slice( &evt.teller_v2_address )  )   )
             .set("smart_commitment_forwarder_address", format_eth_address( &Address::from_slice( &evt.smart_commitment_forwarder_address )  ) )
@@ -1373,7 +1373,7 @@ fn store_globals_from_events(
 
     });
     
-    events.lendergroup_lender_added_principals.iter().for_each(|evt: &contract::LendergroupLenderAddedPrincipal| {
+    events.lendergroup_deposits.iter().for_each(|evt: &contract::LendergroupDeposit| {
         
        
         bigint_set_store.set(ord,"latest_block_number", &BigInt::from( evt.evt_block_number ) );
@@ -1394,7 +1394,7 @@ fn store_globals_from_events(
     });
 
     
-    events.lendergroup_earnings_withdrawns.iter().for_each(|evt: &contract::LendergroupEarningsWithdrawn| {
+    events.lendergroup_withdraws.iter().for_each(|evt: &contract::LendergroupWithdraw| {
      
         bigint_set_store.set(ord,"latest_block_number", &BigInt::from( evt.evt_block_number ) );
         bigint_set_store.set(ord,"latest_block_time", &BigInt::from(  evt.evt_block_time ) );
@@ -1478,7 +1478,7 @@ fn store_lendergroup_user_metrics_deltas(
     
 
     
-    events.lendergroup_lender_added_principals.iter().for_each(|evt: &contract::LendergroupLenderAddedPrincipal| {
+    events.lendergroup_deposits.iter().for_each(|evt: &contract::LendergroupDeposit| {
 
 
         let evt_address =   format!("0x{}", evt.evt_address )  ;
@@ -1516,7 +1516,7 @@ fn store_lendergroup_user_metrics_deltas(
     });
 
     
-    events.lendergroup_earnings_withdrawns.iter().for_each(|evt: &contract::LendergroupEarningsWithdrawn| {
+    events.lendergroup_withdraws.iter().for_each(|evt: &contract::LendergroupWithdraw| {
                 
 
 
@@ -1700,7 +1700,7 @@ fn store_lendergroup_pool_metrics_deltas(
 
     });
     
-    events.lendergroup_lender_added_principals.iter().for_each(|evt: &contract::LendergroupLenderAddedPrincipal| {
+    events.lendergroup_deposits.iter().for_each(|evt: &contract::LendergroupDeposit| {
 
 
 
@@ -1731,7 +1731,7 @@ fn store_lendergroup_pool_metrics_deltas(
     });
 
     
-    events.lendergroup_earnings_withdrawns.iter().for_each(|evt: &contract::LendergroupEarningsWithdrawn| {
+    events.lendergroup_withdraws.iter().for_each(|evt: &contract::LendergroupWithdraw| {
 
 
         let evt_address =   format!("0x{}", evt.evt_address )  ;

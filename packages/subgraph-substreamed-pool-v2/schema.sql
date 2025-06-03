@@ -137,8 +137,7 @@ CREATE TABLE IF NOT EXISTS group_pool_initialized (
     "liquidity_threshold_percent" INT,
     "loan_to_value_percent" INT,
     "market_id" DECIMAL,
-    "max_loan_duration" INT,
-    "pool_shares_token" VARCHAR(42),
+    "max_loan_duration" INT, 
     "principal_token_address" VARCHAR(42),
     "twap_interval" INT,
     "uniswap_pool_fee" INT 
@@ -171,7 +170,7 @@ CREATE TABLE IF NOT EXISTS group_pool_metric (
     "group_pool_address" VARCHAR(42)  ,
     "principal_token_address" VARCHAR(42),
     "collateral_token_address" VARCHAR(42),
-    "shares_token_address" VARCHAR(42),
+     
     "teller_v2_address" VARCHAR(42),
     "smart_commitment_forwarder_address" VARCHAR(42),
     "market_id" NUMERIC,

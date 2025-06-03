@@ -11,9 +11,9 @@ message Events {
     repeated factory_Upgraded factory_upgradeds = 4;
     repeated lendergroup_BorrowerAcceptedFunds lendergroup_borrower_accepted_funds = 5;
     repeated lendergroup_DefaultedLoanLiquidated lendergroup_defaulted_loan_liquidateds = 6;
-    repeated lendergroup_EarningsWithdrawn lendergroup_earnings_withdrawns = 7;
+    repeated lendergroup_Withdraw lendergroup_withdraws = 7;
     repeated lendergroup_Initialized lendergroup_initializeds = 8;
-    repeated lendergroup_LenderAddedPrincipal lendergroup_lender_added_principals = 9;
+    repeated lendergroup_Deposit lendergroup_deposits = 9;
     repeated lendergroup_LoanRepaid lendergroup_loan_repaids = 10;
     repeated lendergroup_OwnershipTransferred lendergroup_ownership_transferreds = 11;
     repeated lendergroup_Paused lendergroup_pauseds = 12;
@@ -80,7 +80,7 @@ message lendergroup_DefaultedLoanLiquidated {
     string token_amount_difference = 9;
 }
 
-message lendergroup_EarningsWithdrawn {
+message lendergroup_Withdraw {
     string evt_tx_hash = 1;
     uint32 evt_index = 2;
     uint64 evt_block_time = 3;
@@ -101,7 +101,7 @@ message lendergroup_Initialized {
     uint64 version = 6;
 }
 
-message lendergroup_LenderAddedPrincipal {
+message lendergroup_Deposit {
     string evt_tx_hash = 1;
     uint32 evt_index = 2;
     uint64 evt_block_time = 3;
@@ -159,10 +159,9 @@ message lendergroup_PoolInitialized {
     uint64 interest_rate_lower_bound = 10;
     uint64 interest_rate_upper_bound = 11;
     uint64 liquidity_threshold_percent = 12;
-    uint64 loan_to_value_percent = 13;
-    bytes pool_shares_token = 14;
-    bytes teller_v2_address = 15;
-    bytes smart_commitment_forwarder_address = 16;
+    uint64 loan_to_value_percent = 13;  
+    bytes teller_v2_address = 14;
+    bytes smart_commitment_forwarder_address = 15;
 }
 
 message lendergroup_Unpaused {

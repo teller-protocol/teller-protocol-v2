@@ -16,11 +16,11 @@ pub struct Events {
     #[prost(message, repeated, tag="6")]
     pub lendergroup_defaulted_loan_liquidateds: ::prost::alloc::vec::Vec<LendergroupDefaultedLoanLiquidated>,
     #[prost(message, repeated, tag="7")]
-    pub lendergroup_earnings_withdrawns: ::prost::alloc::vec::Vec<LendergroupEarningsWithdrawn>,
+    pub lendergroup_withdraws: ::prost::alloc::vec::Vec<LendergroupWithdraw>,
     #[prost(message, repeated, tag="8")]
     pub lendergroup_initializeds: ::prost::alloc::vec::Vec<LendergroupInitialized>,
     #[prost(message, repeated, tag="9")]
-    pub lendergroup_lender_added_principals: ::prost::alloc::vec::Vec<LendergroupLenderAddedPrincipal>,
+    pub lendergroup_deposits: ::prost::alloc::vec::Vec<LendergroupDeposit>,
     #[prost(message, repeated, tag="10")]
     pub lendergroup_loan_repaids: ::prost::alloc::vec::Vec<LendergroupLoanRepaid>,
     #[prost(message, repeated, tag="11")]
@@ -140,7 +140,7 @@ pub struct LendergroupDefaultedLoanLiquidated {
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct LendergroupEarningsWithdrawn {
+pub struct LendergroupWithdraw {
     #[prost(string, tag="1")]
     pub evt_tx_hash: ::prost::alloc::string::String,
     #[prost(uint32, tag="2")]
@@ -178,7 +178,7 @@ pub struct LendergroupInitialized {
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct LendergroupLenderAddedPrincipal {
+pub struct LendergroupDeposit {
     #[prost(string, tag="1")]
     pub evt_tx_hash: ::prost::alloc::string::String,
     #[prost(uint32, tag="2")]
@@ -288,10 +288,8 @@ pub struct LendergroupPoolInitialized {
     #[prost(uint64, tag="13")]
     pub loan_to_value_percent: u64,
     #[prost(bytes="vec", tag="14")]
-    pub pool_shares_token: ::prost::alloc::vec::Vec<u8>,
-    #[prost(bytes="vec", tag="15")]
     pub teller_v2_address: ::prost::alloc::vec::Vec<u8>,
-    #[prost(bytes="vec", tag="16")]
+    #[prost(bytes="vec", tag="15")]
     pub smart_commitment_forwarder_address: ::prost::alloc::vec::Vec<u8>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]

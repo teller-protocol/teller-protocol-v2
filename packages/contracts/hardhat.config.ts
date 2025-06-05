@@ -143,7 +143,7 @@ const networkUrls: Record<NetworkNames, string> = {
     optimism:
   process.env.OPTIMISM_RPC_URL ??
   (ALCHEMY_API_KEY
-    ? `https://optimism-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
+    ? `https://opt-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
     : ''),
 
 

@@ -348,7 +348,7 @@ export function updateAvailableTokensFromCommitment(
       break;
     default:
     //  committedAmountDiff = commitment.committedAmount.neg();
-      committedAmountDiff = BigDecimal.zero();
+      committedAmountDiff = BigInt.zero();
       break;
   }
 

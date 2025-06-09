@@ -1273,7 +1273,9 @@ fn store_bid_collateral_withdrawn_data_deltas(
     events.collateral_manager_collateral_withdrawn.iter().for_each(|evt: &collateral_contract::CollateralmanagerCollateralWithdrawn| {
         
 
-        let store_key: String = format!("collateral_amount_withdrawn:{}:{}", evt.bid_id,Hex(&evt.collateral_address).to_string());
+        let collateral_address = format_eth_address( &Address::from_slice( &evt.collateral_address )  ) ; 
+
+        let store_key: String = format!("collateral_amount_withdrawn:{}:{}", evt.bid_id, collateral_address   );
         bigint_delta_store.add(ord,&store_key, BigInt::from_str(&evt.amount).unwrap_or(BigInt::zero()));
 
         substreams::log::info!(" Storing collateral amt withdrawn: {} {}",store_key, BigInt::from_str(&evt.amount).unwrap_or(BigInt::zero()) );
@@ -1318,6 +1320,7 @@ fn store_pool_collateral_withdrawn_data(
         if delta_root_identifier != "collateral_amount_withdrawn" {continue};
 
         let bid_id = substreams::key::segment_at(collateral_withdrawn_delta.get_key(), 1);
+
         let collateral_address = substreams::key::segment_at(collateral_withdrawn_delta.get_key(), 2); //ignore for now 
         
                 
@@ -1327,8 +1330,7 @@ fn store_pool_collateral_withdrawn_data(
       let delta_value = collateral_withdrawn_delta.new_value.clone() - collateral_withdrawn_delta.old_value.clone();
        // let delta_value = &collateral_withdrawn_delta.delta_value; // ??? 
 
-
-      
+ 
 
          let string_store_key = format!("bid_originated_from_pool:{}", bid_id);
          if let Some( group_pool_address ) = string_get_store.get_at(ord, string_store_key){
@@ -1436,9 +1438,9 @@ fn store_bid_from_pool_data(
     events.lendergroup_borrower_accepted_funds.iter().for_each(|evt: &contract::LendergroupBorrowerAcceptedFunds| {
         
         let bid_id = &evt.bid_id;
-        let group_pool_address = &evt.evt_address;
+        let group_pool_address =  format_eth_address ( &Address::from_str(  &evt.evt_address ).unwrap()  ) ;   
 
-        string_set_store.set(ord, format!("bid_originated_from_pool:{}", bid_id ), group_pool_address );
+        string_set_store.set(ord, format!("bid_originated_from_pool:{}", bid_id ), &group_pool_address );
 
       
     });

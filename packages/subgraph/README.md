@@ -44,6 +44,7 @@ yarn build
 
 4.1.  ( make sure graft base is OK -- in subgraph / config {{ networkname.json }} )
 
+ 
 
 
 5. auth 
@@ -54,6 +55,7 @@ graph auth
 
 6. deploy ! 
 
+ graph deploy   tellerv2-base --version-label 0.4.21-14
 
  graph deploy   tellerv2-arbitrum --version-label 0.4.17
 

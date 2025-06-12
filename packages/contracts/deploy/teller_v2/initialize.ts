@@ -18,6 +18,8 @@ const deployFn: DeployFunction = async (hre) => {
   const lenderManager = await hre.contracts.get('LenderManager')
   const escrowVault = await hre.contracts.get('EscrowVault')
 
+  const protocolPausingManager = await hre.contracts.get('ProtocolPausingManager')
+
   const tellerV2 = await hre.contracts.get<TellerV2>('TellerV2')
   const tx = await tellerV2.initialize(
     protocolFee,
@@ -26,7 +28,8 @@ const deployFn: DeployFunction = async (hre) => {
     lenderCommitmentForwarder,
     collateralManager,
     lenderManager,
-    escrowVault
+    escrowVault,
+    protocolPausingManager
   )
   await tx.wait(1) // wait one block
 
@@ -49,5 +52,6 @@ deployFn.dependencies = [
   'collateral:manager:deploy',
   'lender-manager:deploy',
   'escrow-vault:deploy',
+  'protocol-pausing-manager:deploy'
 ]
 export default deployFn

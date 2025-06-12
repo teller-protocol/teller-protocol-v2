@@ -1,0 +1,13 @@
+{
+  "collateral:escrow-beacon:deploy": 1749758615,
+  "meta-forwarder:deploy": 1749758622,
+  "teller-v2:deploy": 1749758632,
+  "collateral:manager:deploy": 1749758639,
+  "escrow-vault:deploy": 1749758646,
+  "market-registry:deploy": 1749758663,
+  "lender-commitment-forwarder:deploy": 1749758670,
+  "lender-commitment-forwarder:alpha:deploy": 1749758677,
+  "lender-commitment-forwarder:staging:deploy": 1749758684,
+  "reputation-manager:deploy": 1749758694,
+  "lender-manager:deploy": 1749758701
+}

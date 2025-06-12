@@ -97,9 +97,10 @@ deployFn.dependencies = [
   'teller-v2:deploy',
   'smart-commitment-forwarder:deploy',
   'teller-v2:uniswap-pricing-library', 
+  'teller-v2:uniswap-pricing-library-v2'
 ]
 
 deployFn.skip = async (hre) => {
-   return !hre.network.live || !['sepolia'  ].includes(hre.network.name)
+   return !hre.network.live || !['sepolia'   ].includes(hre.network.name)
 }
 export default deployFn

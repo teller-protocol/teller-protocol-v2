@@ -199,8 +199,9 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
      */
     function deployAndDeposit(uint256 _bidId) external onlyTellerV2 {
         if (isBidCollateralBacked(_bidId)) {
-            //attempt deploy a new collateral escrow contract if there is not already one. Otherwise fetch it.
-            (address proxyAddress, ) = _deployEscrow(_bidId);
+            //attempt deploy a new collateral escrow contract for this bid if there is not already one. Otherwise fetch it.
+            (address proxyAddress, address borrower) = _deployEscrow(_bidId);
+
             _escrows[_bidId] = proxyAddress;
 
             //for each bid collateral associated with this loan, deposit the collateral into escrow
@@ -213,7 +214,9 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
                     _bidId,
                     _bidCollaterals[_bidId].collateralInfo[
                         _bidCollaterals[_bidId].collateralAddresses.at(i)
-                    ]
+                    ],
+                    proxyAddress,
+                    borrower 
                 );
             }
 
@@ -385,12 +388,12 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         * @param collateralInfo The collateral info to deposit.
 
     */
-    function _deposit(uint256 _bidId, Collateral memory collateralInfo)
+    function _deposit(uint256 _bidId, Collateral memory collateralInfo, address escrowAddress, address borrower  )
         internal
         virtual
     {
         require(collateralInfo._amount > 0, "Collateral not validated");
-        (address escrowAddress, address borrower) = _deployEscrow(_bidId);
+     
         ICollateralEscrowV1 collateralEscrow = ICollateralEscrowV1(
             escrowAddress
         );

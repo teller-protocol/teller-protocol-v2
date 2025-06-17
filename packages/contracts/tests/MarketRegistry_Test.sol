@@ -367,22 +367,7 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
 
     function test_attestLender_expired() public {}
 
-    function test_attestLenderDelegated() public {
-        marketRegistry.attestLender(
-            marketId,
-            address(lender),
-            expirationTime,
-            v,
-            r,
-            s
-        );
-
-        assertEq(
-            marketRegistry.attestStakeholderViaDelegationWasCalled(),
-            true,
-            "Attest stakeholder via delegation was not called"
-        );
-    }
+  
 
     function test_attestBorrower() public {
         marketRegistry.attestBorrower(
@@ -398,22 +383,7 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
         );
     }
 
-    function test_attestBorrowerDelegated() public {
-        marketRegistry.attestBorrower(
-            marketId,
-            address(lender),
-            expirationTime,
-            v,
-            r,
-            s
-        );
-
-        assertEq(
-            marketRegistry.attestStakeholderViaDelegationWasCalled(),
-            true,
-            "Attest stakeholder via delegation was not called"
-        );
-    }
+     
 
     function test_revokeLender() public {
         marketRegistry.revokeLender(marketId, address(lender));

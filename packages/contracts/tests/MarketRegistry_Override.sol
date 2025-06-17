@@ -188,18 +188,7 @@ contract MarketRegistry_Override is MarketRegistry {
     ) internal override {
         attestStakeholderVerificationWasCalled = true;
     }
-
-    function _attestStakeholderViaDelegation(
-        uint256 _marketId,
-        address _stakeholderAddress,
-        uint256 _expirationTime,
-        bool _isLender,
-        uint8 _v,
-        bytes32 _r,
-        bytes32 _s
-    ) internal override {
-        attestStakeholderViaDelegationWasCalled = true;
-    }
+ 
 
     function _revokeStakeholder(
         uint256 _marketId,

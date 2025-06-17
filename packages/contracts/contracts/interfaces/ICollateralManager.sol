@@ -15,17 +15,7 @@ interface ICollateralManager {
         Collateral[] calldata _collateralInfo
     ) external returns (bool validation_);
 
-    /**
-     * @notice Checks the validity of a borrower's collateral balance and commits it to a bid.
-     * @param _bidId The id of the associated bid.
-     * @param _collateralInfo Additional information about the collateral asset.
-     * @return validation_ Boolean indicating if the collateral balance was validated.
-     */
-    function commitCollateral(
-        uint256 _bidId,
-        Collateral calldata _collateralInfo
-    ) external returns (bool validation_);
-
+    
     function checkBalances(
         address _borrowerAddress,
         Collateral[] calldata _collateralInfo
@@ -72,14 +62,7 @@ interface ICollateralManager {
      */
     function revalidateCollateral(uint256 _bidId) external returns (bool);
 
-    /**
-     * @notice Sends the deposited collateral to a lender of a bid.
-     * @notice Can only be called by the protocol.
-     * @param _bidId The id of the liquidated bid.
-     */
-    function lenderClaimCollateral(uint256 _bidId) external;
-
-
+     
 
     /**
      * @notice Sends the deposited collateral to a lender of a bid.

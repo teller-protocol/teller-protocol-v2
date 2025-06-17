@@ -16,7 +16,7 @@ import "./tokens/TestERC721Token.sol";
 import "./tokens/TestERC1155Token.sol";
 
 import "../contracts/mock/TellerV2SolMock.sol";
-import "../contracts/CollateralManager.sol";
+import {CollateralManager} from "../contracts/CollateralManager.sol";
 
 contract CollateralManager_Override is CollateralManager {
     bool public checkBalancesWasCalled;

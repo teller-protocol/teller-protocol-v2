@@ -18,7 +18,16 @@ import { Collateral, CollateralType, ICollateralEscrowV1 } from "./interfaces/es
 import "./interfaces/ITellerV2.sol";
 import "./interfaces/IProtocolPausingManager.sol";
 import "./interfaces/IHasProtocolPausingManager.sol";
+
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+
+
+
 contract CollateralManager is OwnableUpgradeable, ICollateralManager {
+
+    using SafeERC20 for ERC20;
+
     /* Storage */
     using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
     ITellerV2 public tellerV2;
@@ -396,7 +405,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         );
         // Pull collateral from borrower & deposit into escrow
         if (collateralInfo._collateralType == CollateralType.ERC20) {
-            IERC20Upgradeable(collateralInfo._collateralAddress).transferFrom(
+            ERC20(collateralInfo._collateralAddress).safeTransferFrom(
                 borrower,
                 address(this),
                 collateralInfo._amount

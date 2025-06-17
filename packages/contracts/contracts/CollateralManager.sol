@@ -138,7 +138,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     ) public onlyTellerV2 returns (bool validation_) {
         address borrower = tellerV2.getLoanBorrower(_bidId);
         require(borrower != address(0), "Loan has no borrower");
-        (validation_, ) = checkBalances(borrower, _collateralInfo);
+        (validation_, ) = _checkBalances(borrower, _collateralInfo, false);
 
         //if the collateral info is valid, call commitCollateral for each one
         if (validation_) {

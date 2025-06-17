@@ -325,27 +325,7 @@ contract MarketRegistry is
         _revokeStakeholder(_marketId, _lenderAddress, true);
     }
 
-    /**
-     * @notice Removes a borrower from a market via delegated revocation.
-     * @dev See {_revokeStakeholderViaDelegation}.
-     */
-   /* function revokeLender(
-        uint256 _marketId,
-        address _lenderAddress,
-        uint8 _v,
-        bytes32 _r,
-        bytes32 _s
-    ) external {
-        _revokeStakeholderViaDelegation(
-            _marketId,
-            _lenderAddress,
-            true,
-            _v,
-            _r,
-            _s
-        );
-    } */
-
+   
     /**
      * @notice Allows a lender to voluntarily leave a market.
      * @param _marketId The market ID to leave.
@@ -405,27 +385,7 @@ contract MarketRegistry is
         _revokeStakeholder(_marketId, _borrowerAddress, false);
     }
 
-    /**
-     * @notice Removes a borrower from a market via delegated revocation.
-     * @dev See {_revokeStakeholderViaDelegation}.
-     */
-   /* function revokeBorrower(
-        uint256 _marketId,
-        address _borrowerAddress,
-        uint8 _v,
-        bytes32 _r,
-        bytes32 _s
-    ) external {
-        _revokeStakeholderViaDelegation(
-            _marketId,
-            _borrowerAddress,
-            false,
-            _v,
-            _r,
-            _s
-        );
-    }*/
-
+    
     /**
      * @notice Allows a borrower to voluntarily leave a market.
      * @param _marketId The market ID to leave.
@@ -1181,24 +1141,7 @@ contract MarketRegistry is
     }
 
      
-   /* function _revokeStakeholderViaDelegation(
-        uint256 _marketId,
-        address _stakeholderAddress,
-        bool _isLender,
-        uint8 _v,
-        bytes32 _r,
-        bytes32 _s
-    ) internal {
-        bytes32 uuid = _revokeStakeholderVerification(
-            _marketId,
-            _stakeholderAddress,
-            _isLender
-        );
-        // NOTE: Disabling the call to revoke the attestation on EAS contracts
-        //        address attestor = markets[_marketId].owner;
-        //        tellerAS.revokeByDelegation(uuid, attestor, _v, _r, _s);
-    } */
-
+    
     /**
      * @notice Removes a stakeholder (borrower/lender) from a market.
      * @param _marketId The market ID to remove the lender from.

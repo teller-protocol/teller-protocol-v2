@@ -1244,9 +1244,11 @@ fn store_bid_collateral_withdrawn_data_deltas(
 
     
     events.collateral_manager_collateral_withdrawn.iter().for_each(|evt: &collateral_contract::CollateralmanagerCollateralWithdrawn| {
-        
+            
+        let collateral_address = format_eth_address( &Address::from_slice( &evt.collateral_address )  ) ; 
 
-        let store_key: String = format!("collateral_amount_withdrawn:{}:{}", evt.bid_id,Hex(&evt.collateral_address).to_string());
+
+        let store_key: String = format!("collateral_amount_withdrawn:{}:{}", evt.bid_id, collateral_address );
         bigint_delta_store.add(ord,&store_key, BigInt::from_str(&evt.amount).unwrap_or(BigInt::zero()));
 
         substreams::log::info!(" Storing collateral amt withdrawn: {} {}",store_key, BigInt::from_str(&evt.amount).unwrap_or(BigInt::zero()) );
@@ -1409,9 +1411,12 @@ fn store_bid_from_pool_data(
     events.lendergroup_borrower_accepted_funds.iter().for_each(|evt: &contract::LendergroupBorrowerAcceptedFunds| {
         
         let bid_id = &evt.bid_id;
-        let group_pool_address = &evt.evt_address;
+       // let group_pool_address = &evt.evt_address;
 
-        string_set_store.set(ord, format!("bid_originated_from_pool:{}", bid_id ), group_pool_address );
+
+         let group_pool_address =  format_eth_address ( &Address::from_str(  &evt.evt_address ).unwrap()  ) ;  
+
+        string_set_store.set(ord, format!("bid_originated_from_pool:{}", bid_id ), &group_pool_address );
 
       
     });

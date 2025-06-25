@@ -19,5 +19,6 @@
   "lender-manager:transfer-ownership": 1749762344,
   "liquidity-rewards:deploy": 1749762363,
   "validate-deployments": 1749762364,
-  "default-proxy-admin:transfer": 1749762371
+  "default-proxy-admin:transfer": 1749762371,
+  "smart-commitment-forwarder:upgrade-oracle": 1750870333
 }

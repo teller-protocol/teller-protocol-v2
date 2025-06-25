@@ -4,6 +4,8 @@ const deployFn: DeployFunction = async (hre) => {
   const tellerV2 = await hre.contracts.get('TellerV2')
   const marketRegistry = await hre.contracts.get('MarketRegistry')
 
+
+
   const smartCommitmentForwarder = await hre.deployProxy(
     'SmartCommitmentForwarder',
     {

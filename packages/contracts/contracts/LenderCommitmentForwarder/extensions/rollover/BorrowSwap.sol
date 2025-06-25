@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
  
-import "./BorrowSwap_G2.sol";
+import "./BorrowSwap_G3.sol";
 
-contract BorrowSwap is BorrowSwap_G2 {
+contract BorrowSwap is BorrowSwap_G3 {
     constructor(
         address _tellerV2,         
         address _swapRouter,

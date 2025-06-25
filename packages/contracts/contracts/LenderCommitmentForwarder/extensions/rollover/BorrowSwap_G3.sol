@@ -1,0 +1,422 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+// Contracts
+import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
+// Interfaces
+import "../../../interfaces/ITellerV2.sol"; 
+import "../../../interfaces/ITellerV2Storage.sol";
+import "../../../interfaces/IMarketRegistry.sol";
+import "../../../interfaces/ILenderCommitmentForwarder.sol";
+import "../../../interfaces/ISmartCommitmentForwarder.sol";  
+
+   
+import '../../../libraries/uniswap/periphery/libraries/TransferHelper.sol';
+import '../../../libraries/uniswap/periphery/interfaces/ISwapRouter02.sol';
+import '../../../libraries/uniswap/periphery/interfaces/IQuoter.sol';
+
+ 
+ 
+ 
+ 
+
+ /*
+
+    A one-tx strategy to borrow funds and then immediately swap them using uniswap 
+
+   
+
+ */
+
+
+contract BorrowSwap_G2    {
+    using AddressUpgradeable for address;
+    
+ 
+   
+
+    /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
+    ITellerV2 public immutable TELLER_V2;
+    ISwapRouter02 public immutable UNISWAP_SWAP_ROUTER; 
+    IQuoter public immutable UNISWAP_QUOTER; 
+
+    event BorrowSwapComplete(
+        address borrower,
+        uint256 loanId,
+        address token0 ,
+
+        uint256 amountIn,
+        uint256 amountOut  
+
+    );
+
+
+  
+    struct AcceptCommitmentArgs {
+        uint256 commitmentId;
+        address smartCommitmentAddress;  //if this is not address(0), we will use this ! leave empty if not used. 
+        uint256 principalAmount;
+        uint256 collateralAmount;
+        uint256 collateralTokenId;
+        address collateralTokenAddress;
+        uint16 interestRate;
+        uint32 loanDuration;
+        bytes32[] merkleProof; //empty array if not used
+    }
+
+
+
+     struct TokenSwapPath {
+        uint24 poolFee ;
+        address tokenOut ;
+     }
+
+    struct SwapArgs {
+
+        TokenSwapPath[] swapPaths ; //used to build the bytes path 
+        
+        uint160 amountOutMinimum;    
+ 
+    } 
+
+
+ 
+
+    /**
+     * @param _tellerV2 The address of the TellerV2 contract.
+     * @param _swapRouter The address of the UniswapV3 SwapRouter_02 
+     * @param quoter The address of the UniswapV3 Quoter 
+     */
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor(
+        address _tellerV2, 
+      
+        address _swapRouter, //swapRouter02 
+
+        address _quoter //quoter 
+    )  {
+        TELLER_V2 = ITellerV2(_tellerV2);
+        UNISWAP_SWAP_ROUTER = ISwapRouter02( _swapRouter );
+        UNISWAP_QUOTER = IQuoter( _quoter );
+    }
+ 
+ 
+
+ 
+
+    /**
+     * @notice Borrows funds from a lender commitment and immediately swaps them through Uniswap V3.
+     * @dev This function accepts a loan commitment, receives principal tokens, and swaps them 
+     *      for another token using Uniswap V3. The swapped tokens are sent to the borrower.
+     *      Additional input tokens can be provided to increase the swap amount.
+     * 
+     * @param _lenderCommitmentForwarder The address of the lender commitment forwarder contract
+     * @param _principalToken The address of the token being borrowed (input token for swap)
+     * @param _additionalInputAmount Additional amount of principal token to add to the swap
+     * @param _swapArgs Struct containing swap parameters including paths and minimum output
+     * @param _acceptCommitmentArgs Struct containing loan commitment acceptance parameters
+     * 
+     * @dev Emits BorrowSwapComplete event upon successful execution
+     * @dev Requires borrower to have approved this contract for _additionalInputAmount if > 0
+     */
+    function borrowSwap(
+        address _lenderCommitmentForwarder,
+       
+        address _principalToken ,
+        uint256 _additionalInputAmount, //an additional amount  
+       
+        SwapArgs  calldata _swapArgs, 
+        AcceptCommitmentArgs calldata _acceptCommitmentArgs
+
+    ) external   {
+        
+        address borrower = msg.sender ;
+ 
+    
+        if (_additionalInputAmount > 0) {
+            TransferHelper.safeTransferFrom(_principalToken, borrower, address(this), _additionalInputAmount);              
+        }
+ 
+      
+        // Accept commitment, lock up collateral, receive funds to this contract -- the principal 
+        (uint256 newLoanId, uint256 acceptCommitmentAmount) = _acceptCommitment(
+             _lenderCommitmentForwarder,
+            borrower,
+            _principalToken,  
+            _acceptCommitmentArgs
+        );
+ 
+
+        uint256 totalInputAmount = acceptCommitmentAmount + _additionalInputAmount ;
+
+ 
+
+        // Approve the router to spend DAI.
+        TransferHelper.safeApprove( _principalToken , address(UNISWAP_SWAP_ROUTER),  totalInputAmount);
+
+        // Multiple pool swaps are encoded through bytes called a `path`. A path is a sequence of token addresses and poolFees that define the pools used in the swaps.
+        // The format for pool encoding is (tokenIn, fee, tokenOut/tokenIn, fee, tokenOut) where tokenIn/tokenOut parameter is the shared token across the pools.
+        // Since we are swapping DAI to USDC and then USDC to WETH9 the path encoding is (DAI, 0.3%, USDC, 0.3%, WETH9).
+        ISwapRouter02.ExactInputParams memory swapParams =
+            ISwapRouter02.ExactInputParams({
+                path:  generateSwapPath( _principalToken, _swapArgs.swapPaths  ) ,//path: abi.encodePacked(DAI, poolFee, USDC, poolFee, WETH9),
+                recipient: address(  borrower  ) ,
+             //   deadline: _swapArgs.deadline,
+                amountIn:  totalInputAmount ,
+                amountOutMinimum:  _swapArgs.amountOutMinimum    //can be 0 for testing -- get from IQuoter 
+            });
+
+        // Executes the swap.
+        uint256 swapAmountOut = UNISWAP_SWAP_ROUTER.exactInput( swapParams );
+
+
+        emit BorrowSwapComplete(
+            borrower, 
+            newLoanId,
+            
+            _principalToken ,
+            totalInputAmount ,
+            swapAmountOut   
+        );
+
+    
+    }
+
+
+
+  
+    /**
+     * @notice Generates a Uniswap V3 swap path from input token and swap path array.
+     * @dev Encodes token addresses and pool fees into bytes format required by Uniswap V3.
+     *      Supports single-hop (1 path) and double-hop (2 paths) swaps only.
+     * 
+     * @param inputToken The address of the input token (starting token of the swap)
+     * @param swapPaths Array of TokenSwapPath structs containing tokenOut and poolFee for each hop
+     * 
+     * @return bytes The encoded swap path compatible with Uniswap V3 router
+     * 
+     * @dev Reverts with "invalid swap path length" if swapPaths length is not 1 or 2
+     * @dev For single hop: encodes (inputToken, poolFee, tokenOut)
+     * @dev For double hop: encodes (inputToken, poolFee1, tokenOut1, poolFee2, tokenOut2)
+     */
+    function generateSwapPath(
+        address inputToken, 
+        TokenSwapPath[] calldata swapPaths
+    ) public view returns (bytes memory)  {
+
+        if (swapPaths.length == 1 ){
+            return  abi.encodePacked(inputToken, swapPaths[0].poolFee, swapPaths[0].tokenOut )  ;
+        }else if (swapPaths.length == 2 ){
+            return  abi.encodePacked(inputToken, swapPaths[0].poolFee, swapPaths[0].tokenOut, swapPaths[1].poolFee, swapPaths[1].tokenOut )  ;
+        }else {
+
+            revert("invalid swap path length");
+        }
+
+    }
+     
+
+
+    /**
+     * @notice Quotes the expected output amount for an exact input swap through Uniswap V3.
+     * @dev Uses Uniswap V3 Quoter to simulate a swap and return expected output without executing.
+     *      This is a view function that doesn't modify state or execute any swaps.
+     * 
+     * @param inputToken The address of the input token
+     * @param amountIn The exact amount of input tokens to be swapped
+     * @param swapPaths Array of TokenSwapPath structs defining the swap route
+     * 
+     * @return amountOut The expected amount of output tokens from the swap
+     * 
+     * @dev Uses generateSwapPath internally to create the swap path
+     * @dev Returns only the amountOut from the quoter, ignoring other returned values
+     */
+    function quoteExactInput (
+
+        address inputToken,
+        uint256 amountIn,
+        TokenSwapPath[] calldata swapPaths 
+         
+
+    ) external view returns (uint256 amountOut) {
+
+        (amountOut, , , ) = UNISWAP_QUOTER.quoteExactInput(
+            generateSwapPath(inputToken,swapPaths),
+            amountIn
+        );
+
+    }
+     
+      
+    
+    /**
+     *
+     *
+     * @notice Accepts a loan commitment using either a Merkle proof or standard method.
+     *
+     * @dev The function first checks if a Merkle proof is provided, based on which it calls the relevant
+     *      `acceptCommitment` function in the LenderCommitmentForwarder contract.
+     *
+     * @param borrower The address of the borrower for whom the commitment is being accepted.
+     * @param principalToken The token in which the loan is being accepted.
+     * @param _commitmentArgs The arguments necessary for accepting the commitment.
+     *
+     * @return bidId_ Identifier of the accepted loan.
+     * @return acceptCommitmentAmount_ The amount received from accepting the commitment.
+     */
+    function _acceptCommitment(
+        address lenderCommitmentForwarder,
+        address borrower,
+        address principalToken,
+        AcceptCommitmentArgs memory _commitmentArgs
+    )
+        internal
+        virtual
+        returns (uint256 bidId_, uint256 acceptCommitmentAmount_)
+    {
+        uint256 fundsBeforeAcceptCommitment = IERC20Upgradeable(principalToken)
+            .balanceOf(address(this));
+
+
+
+        if (_commitmentArgs.smartCommitmentAddress != address(0)) {
+
+             bytes memory responseData = address(lenderCommitmentForwarder)
+                    .functionCall(
+                        abi.encodePacked(
+                            abi.encodeWithSelector(
+                                ISmartCommitmentForwarder
+                                    .acceptSmartCommitmentWithRecipient
+                                    .selector,
+                                _commitmentArgs.smartCommitmentAddress,
+                                _commitmentArgs.principalAmount,
+                                _commitmentArgs.collateralAmount,
+                                _commitmentArgs.collateralTokenId,
+                                _commitmentArgs.collateralTokenAddress,
+                                address(this),
+                                _commitmentArgs.interestRate,
+                                _commitmentArgs.loanDuration
+                            ),
+                            borrower //cant be msg.sender because of the flash flow
+                        )
+                    );
+
+                (bidId_) = abi.decode(responseData, (uint256));
+
+
+        }else { 
+
+            bool usingMerkleProof = _commitmentArgs.merkleProof.length > 0;
+
+            if (usingMerkleProof) {
+                bytes memory responseData = address(lenderCommitmentForwarder)
+                    .functionCall(
+                        abi.encodePacked(
+                            abi.encodeWithSelector(
+                                ILenderCommitmentForwarder
+                                    .acceptCommitmentWithRecipientAndProof
+                                    .selector,
+                                _commitmentArgs.commitmentId,
+                                _commitmentArgs.principalAmount,
+                                _commitmentArgs.collateralAmount,
+                                _commitmentArgs.collateralTokenId,
+                                _commitmentArgs.collateralTokenAddress,
+                                address(this),
+                                _commitmentArgs.interestRate,
+                                _commitmentArgs.loanDuration,
+                                _commitmentArgs.merkleProof
+                            ),
+                            borrower //cant be msg.sender because of the flash flow
+                        )
+                    );
+
+                (bidId_) = abi.decode(responseData, (uint256));
+            } else {
+                bytes memory responseData = address(lenderCommitmentForwarder)
+                    .functionCall(
+                        abi.encodePacked(
+                            abi.encodeWithSelector(
+                                ILenderCommitmentForwarder
+                                    .acceptCommitmentWithRecipient
+                                    .selector,
+                                _commitmentArgs.commitmentId,
+                                _commitmentArgs.principalAmount,
+                                _commitmentArgs.collateralAmount,
+                                _commitmentArgs.collateralTokenId,
+                                _commitmentArgs.collateralTokenAddress,
+                                address(this),
+                                _commitmentArgs.interestRate,
+                                _commitmentArgs.loanDuration
+                            ),
+                            borrower //cant be msg.sender because of the flash flow
+                        )
+                    );
+
+                (bidId_) = abi.decode(responseData, (uint256));
+            }
+
+        }
+
+        uint256 fundsAfterAcceptCommitment = IERC20Upgradeable(principalToken)
+            .balanceOf(address(this));
+        acceptCommitmentAmount_ =
+            fundsAfterAcceptCommitment -
+            fundsBeforeAcceptCommitment;
+    }
+
+      
+
+
+ 
+
+     function getMarketIdForCommitment(
+       address _lenderCommitmentForwarder, 
+       uint256 _commitmentId
+    ) external view returns (uint256) {
+        return _getMarketIdForCommitment(_lenderCommitmentForwarder, _commitmentId);  
+    }
+
+    function getMarketFeePct(
+       uint256 _marketId
+    ) external view returns (uint16) {
+        return _getMarketFeePct(_marketId);  
+    }
+   
+
+    /**
+     * @notice Retrieves the market ID associated with a given commitment.
+     * @param _commitmentId The ID of the commitment for which to fetch the market ID.
+     * @return The ID of the market associated with the provided commitment.
+     */
+    function _getMarketIdForCommitment(address _lenderCommitmentForwarder, uint256 _commitmentId)
+        internal
+        view
+        returns (uint256)
+    {
+        return ILenderCommitmentForwarder(_lenderCommitmentForwarder).getCommitmentMarketId(_commitmentId);
+    }
+
+    /**
+     * @notice Fetches the marketplace fee percentage for a given market ID.
+     * @param _marketId The ID of the market for which to fetch the fee percentage.
+     * @return The marketplace fee percentage for the provided market ID.
+     */
+    function _getMarketFeePct(uint256 _marketId)
+        internal
+        view
+        returns (uint16)
+    {
+        address _marketRegistryAddress = ITellerV2Storage(address(TELLER_V2))
+            .marketRegistry();
+
+        return
+            IMarketRegistry(_marketRegistryAddress).getMarketplaceFee(
+                _marketId
+            );
+    }
+
+  
+}

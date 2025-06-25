@@ -2,8 +2,9 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import '../../libraries/uniswap/periphery/interfaces/ISwapRouter.sol';
 
-contract MockSwapRouter {
+contract UniswapV3RouterMock {
     event SwapExecuted(address tokenIn, address tokenOut, uint256 amountIn, uint256 amountOut);
 
     function exactInputSingle(
@@ -23,4 +24,12 @@ contract MockSwapRouter {
         IERC20(tokenOut).transfer(recipient, amountOut);
         emit SwapExecuted(tokenIn, tokenOut, amountIn, amountOut);
     }
+
+
+    function exactInput(
+        ISwapRouter.ExactInputParams memory swapParams 
+    ) external payable returns (uint256 amountOut) {
+         // decodes the path and performs the swaps 
+    }
+
 }

@@ -44,9 +44,9 @@ fn get_factory_tracked_contract_address() -> [u8; 20] {
      match evm_network_name  {
 
         "polygon" => hex!("a7faf9435810fb571f61e1e116b3f18de0b3583a"),
-        "arbitrum" => hex!("5903feC126aF19dB87a40A8E6c49E84DBeA7Ccc4"),  //fix ! 
-        "base" => hex!("5903feC126aF19dB87a40A8E6c49E84DBeA7Ccc4"), //fix ! 
-         "mainnet" => hex!("5903feC126aF19dB87a40A8E6c49E84DBeA7Ccc4"), //fix ! 
+        "arbitrum" => hex!("E9D02C0e0449A396A09A42fE03Ff06300C972Db5"),  //fix ! 
+        "base" => hex!("48EA70BCe76FE2F0c79B29Bf852a1DCF957982aa"), //fix ! 
+         "mainnet" => hex!("21499A1Fd9f36ce527CB4A9032072ef1bb7a22F6"), //fix ! 
 
 
         _ => panic!("unknown evm network "),

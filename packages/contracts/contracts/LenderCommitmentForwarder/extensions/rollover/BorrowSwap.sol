@@ -9,7 +9,7 @@ contract BorrowSwap is BorrowSwap_G3 {
         address _swapRouter,
         address _quoter
     )
-        BorrowSwap_G2(
+        BorrowSwap_G3(
             _tellerV2,         
             _swapRouter,
             _quoter 

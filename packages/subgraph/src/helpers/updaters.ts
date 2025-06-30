@@ -41,6 +41,10 @@ import {
 } from "./loaders";
 import { addToArray, camelize, removeFromArray, safeDiv } from "./utils";
 
+
+
+import { log } from '@graphprotocol/graph-ts'
+
 /**
  * Updates the status of a bid. Returns the previous status.
  * @param bid {Bid} - The bid to update
@@ -162,23 +166,30 @@ function updateLoanStatusCountsFromBid(
   for (let i = 0; i < loanStatusCountIds.length; i++) {
     const countId = loanStatusCountIds[i];
     const loanStatusCount = LoanStatusCount.load(countId);
-    if (!loanStatusCount)
-      throw new Error(`Loan status count not found: ${countId}`);
+    if (loanStatusCount){
+      //throw new Error(`Loan status count not found: ${countId}`);
 
-    // Decrement the previous status count before incrementing the new status count
-    // This is to prevent the count from being decremented if the status is the same
-    updateLoanStatusCount(
-      loanStatusCount,
-      bid.id,
-      prevStatus,
-      ArrayUpdaterFn.DELETE
-    );
-    updateLoanStatusCount(
-      loanStatusCount,
-      bid.id,
-      bid.status,
-      ArrayUpdaterFn.ADD
-    );
+      // Decrement the previous status count before incrementing the new status count
+      // This is to prevent the count from being decremented if the status is the same
+      updateLoanStatusCount(
+        loanStatusCount,
+        bid.id,
+        prevStatus,
+        ArrayUpdaterFn.DELETE
+      );
+      updateLoanStatusCount(
+        loanStatusCount,
+        bid.id,
+        bid.status,
+        ArrayUpdaterFn.ADD
+      );
+    }else{
+
+
+      log.info("Could not load loanStatusCount", [ countId.toString() ])
+
+
+    }
   }
 }
 

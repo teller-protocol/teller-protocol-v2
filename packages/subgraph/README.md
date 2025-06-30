@@ -38,6 +38,9 @@ yarn build
  
   yarn hbs -D ./config/base.json ./src/subgraph.handlebars -o . -e yaml
 
+   yarn hbs -D ./config/polygon.json ./src/subgraph.handlebars -o . -e yaml
+
+
 ```
  
 
@@ -55,9 +58,12 @@ graph auth
 
 6. deploy ! 
 
- graph deploy   tellerv2-base --version-label 0.4.21-14
+ graph deploy   tellerv2-base --version-label 0.4.21-18
 
- graph deploy   tellerv2-arbitrum --version-label 0.4.17
+ graph deploy   tellerv2-arbitrum --version-label 0.4.21-18
+
+
+ graph deploy   tellerv2-polygon --version-label 0.4.21-18
 
 
 

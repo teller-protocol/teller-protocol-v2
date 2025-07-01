@@ -16,7 +16,7 @@ const deployFn: DeployFunction = async (hre) => {
 
  
 
- let scfLegacyAddress = "0x0AeeeD450EcCaFaA140222De43963B179B514540";
+  let scfLegacyAddress = "0x0AeeeD450EcCaFaA140222De43963B179B514540";
   let scfLegacyImpl = await hre.ethers.getContractFactory('SmartCommitmentForwarder', {}  );
 
   const constructorArgs = [
@@ -73,7 +73,7 @@ deployFn.dependencies = ['smart-commitment-forwarder:deploy']
 deployFn.skip = async (hre) => {
   
   //only had to do this on polygon once 
-  return !hre.network.live || !['sepolia' , 'polygon','optimism'].includes(hre.network.name)
+  return !hre.network.live || !['sepolia' , 'polygon' /*,'optimism'*/ ].includes(hre.network.name)
 }
 export default deployFn
 

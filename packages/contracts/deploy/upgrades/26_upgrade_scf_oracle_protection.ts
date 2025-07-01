@@ -14,7 +14,7 @@ const deployFn: DeployFunction = async (hre) => {
     'SmartCommitmentForwarder'
   )
 
-/* 
+ 
 
  let scfLegacyAddress = "0x0AeeeD450EcCaFaA140222De43963B179B514540";
   let scfLegacyImpl = await hre.ethers.getContractFactory('SmartCommitmentForwarder', {}  );
@@ -26,7 +26,7 @@ const deployFn: DeployFunction = async (hre) => {
 
 
  let force_import =   await hre.upgrades.forceImport( scfLegacyAddress, scfLegacyImpl, { constructorArgs } );
- */ 
+ 
  
 
   await hre.upgrades.proposeBatchTimelock({

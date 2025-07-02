@@ -527,10 +527,9 @@ export function loadCollateral(
     collateral.bid = bidId;
     collateral.save();
 
-    const bid = Bid.load(bidId);
+    const bid = Bid.load(bidId)!;
 
-    if(bid){
-
+     
       let bidCollaterals = bid.collateral;
       if (!bidCollaterals) {
         bidCollaterals = [collateral.id];
@@ -540,12 +539,7 @@ export function loadCollateral(
       bid.collateral = bidCollaterals;
       bid.save();
 
-    }else{
-
-
-      log.info("Could not load bid during loadCollateral", [ bidId.toString() ])
-
-    }
+    
   }
   return collateral;
 }

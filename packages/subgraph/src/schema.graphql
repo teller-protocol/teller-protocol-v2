@@ -1,4 +1,4 @@
-type Protocol implements IHasLoans @entity {
+type Protocol implements IHasLoans @entity(immutable: true) {
   id: ID!
 
   loans: LoanStatusCount! @derivedFrom(field: "_protocol")
@@ -14,13 +14,13 @@ type Protocol implements IHasLoans @entity {
   durationAverage: BigInt!
 }
 
-type ProtocolCollateral @entity {
+type ProtocolCollateral @entity(immutable: true) {
   id: ID!
   collateralToken: Token
   tokenVolumesByLendingToken: [TokenVolume!]! @derivedFrom(field: "_protocolCollateral")
 }
 
-type MarketPlace implements IHasLoans @entity {
+type MarketPlace implements IHasLoans @entity(immutable: true) {
   id: ID!
   marketplaceId: BigInt!
 
@@ -51,7 +51,7 @@ type MarketPlace implements IHasLoans @entity {
   commitments: [Commitment!]! @derivedFrom(field: "marketplace")
 }
 
-type Bid @entity {
+type Bid @entity(immutable: true) {
   id: ID!
   bidId: BigInt!
   createdAt: BigInt!
@@ -101,7 +101,7 @@ type Bid @entity {
   collateral: [BidCollateral!]
 }
 
-type BidCollateral @entity {
+type BidCollateral @entity(immutable: true) {
   id: ID!
   amount: BigInt!
   tokenId: BigInt
@@ -113,7 +113,7 @@ type BidCollateral @entity {
   receiver: Bytes
 }
 
-type Token @entity {
+type Token @entity(immutable: true) {
   id: ID!
   address: Bytes!
   type: String
@@ -123,13 +123,13 @@ type Token @entity {
   decimals: BigInt
 }
 
-type FundedTx @entity {
+type FundedTx @entity(immutable: true) {
   id: ID!
   bid: Bid!
   timestamp: BigInt!
 }
 
-type Payment @entity {
+type Payment @entity(immutable: true) {
   id: ID!
   bid: Bid!
   principal: BigInt!
@@ -139,7 +139,7 @@ type Payment @entity {
   status: String!
 }
 
-type User @entity {
+type User @entity(immutable: true) {
   id: ID!
   firstInteractionDate: BigInt!
   lenders: [Lender!]! @derivedFrom(field: "user")
@@ -147,7 +147,7 @@ type User @entity {
   bidRewards: [BidReward!]! @derivedFrom(field: "user")
 }
 
-type Lender implements IHasLoans @entity {
+type Lender implements IHasLoans @entity(immutable: true) {
   id: ID!
   marketplaceId: BigInt!
   lenderAddress: Bytes!
@@ -166,7 +166,7 @@ type Lender implements IHasLoans @entity {
   commitments: [Commitment!]! @derivedFrom(field: "lender")
 }
 
-type Borrower implements IHasLoans @entity {
+type Borrower implements IHasLoans @entity(immutable: true) {
   id: ID!
   marketplaceId: BigInt!
   borrowerAddress: Bytes!
@@ -229,7 +229,7 @@ interface ILoanStatusCount {
   liquidatedCount: BigInt!
 }
 
-type LoanStatusCount implements ILoanStatusCount @entity {
+type LoanStatusCount implements ILoanStatusCount @entity(immutable: true) {
   id: ID!
 
   all: [Bid!]!
@@ -271,7 +271,7 @@ type LoanStatusCount implements ILoanStatusCount @entity {
   ## end Entity Relationships ##
 }
 
-type TokenVolume implements IDurationAverage @entity {
+type TokenVolume implements IDurationAverage @entity(immutable: true) {
   id: ID!
 
   ## Entity Relationships ##
@@ -324,7 +324,7 @@ type TokenVolume implements IDurationAverage @entity {
   ## end TokenStats ##
 }
 
-type MarketCommitmentStdDev @entity {
+type MarketCommitmentStdDev @entity(immutable: true) {
   id: ID!
 
   market: MarketPlace!
@@ -344,13 +344,13 @@ type MarketCommitmentStdDev @entity {
   maxDurationMean: BigDecimal!
 }
 
-type CommitmentZScore @entity {
+type CommitmentZScore @entity(immutable: true) {
   id: ID!
   commitment: Commitment!
   zScore: BigDecimal!
 }
 
-type Commitment @entity {
+type Commitment @entity(immutable: true) {
   id: ID!
   commitmentId: BigInt!
   createdAt: BigInt!
@@ -399,7 +399,7 @@ type Commitment @entity {
 
 
 # Association between RewardAllocations and Commitments
-type CommitmentReward @entity {
+type CommitmentReward @entity(immutable: true) {
   id: ID!
   createdAt: BigInt!
   updatedAt: BigInt!
@@ -414,7 +414,7 @@ type CommitmentReward @entity {
 
 
 
-type RewardAllocation @entity {
+type RewardAllocation @entity(immutable: true) {
   id: ID!
   createdAt: BigInt!
   updatedAt: BigInt!
@@ -454,7 +454,7 @@ type RewardAllocation @entity {
 }
 
 
-type BidReward @entity {
+type BidReward @entity(immutable: true) {
   id: ID!
   createdAt: BigInt!
   updatedAt: BigInt!

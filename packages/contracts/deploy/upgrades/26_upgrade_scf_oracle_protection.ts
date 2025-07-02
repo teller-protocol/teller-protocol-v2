@@ -1,4 +1,4 @@
-import { DeployFunction } from 'hardhat-deploy/dist/types'
+import { DeployFunction  } from 'hardhat-deploy/dist/types'
 
 const deployFn: DeployFunction = async (hre) => {
   hre.log('----------')
@@ -13,6 +13,20 @@ const deployFn: DeployFunction = async (hre) => {
   const smartCommitmentForwarder = await hre.contracts.get(
     'SmartCommitmentForwarder'
   )
+
+ 
+
+  let scfLegacyAddress = "0x0AeeeD450EcCaFaA140222De43963B179B514540";
+  let scfLegacyImpl = await hre.ethers.getContractFactory('SmartCommitmentForwarder', {}  );
+
+  const constructorArgs = [
+            await tellerV2.getAddress(),
+            await marketRegistry.getAddress(),
+          ]; 
+
+
+ let force_import =   await hre.upgrades.forceImport( scfLegacyAddress, scfLegacyImpl, { constructorArgs } );
+ 
  
 
   await hre.upgrades.proposeBatchTimelock({
@@ -59,7 +73,7 @@ deployFn.dependencies = ['smart-commitment-forwarder:deploy']
 deployFn.skip = async (hre) => {
   
   //only had to do this on polygon once 
-  return !hre.network.live || !['sepolia' , 'polygon'].includes(hre.network.name)
+  return !hre.network.live || !['sepolia' , 'polygon','optimism'].includes(hre.network.name)
 }
 export default deployFn
 

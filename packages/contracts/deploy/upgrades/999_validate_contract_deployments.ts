@@ -23,12 +23,12 @@ const deployFn: DeployFunction = async (hre) => {
   )
   
   const lenderGroupsFactory = await hre.contracts.get(
-    'LenderCommitmentGroupFactory'
+    'LenderCommitmentGroupFactory_V2'
   )
 
 
   const lenderGroupsBeacon = await hre.contracts.get(
-    'LenderCommitmentGroupBeacon'
+    'LenderCommitmentGroupBeaconV2'
   )
 
   const smartCommitmentForwarder = await hre.contracts.get(

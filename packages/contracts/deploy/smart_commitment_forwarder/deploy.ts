@@ -4,6 +4,8 @@ const deployFn: DeployFunction = async (hre) => {
   const tellerV2 = await hre.contracts.get('TellerV2')
   const marketRegistry = await hre.contracts.get('MarketRegistry')
 
+
+
   const smartCommitmentForwarder = await hre.deployProxy(
     'SmartCommitmentForwarder',
     {
@@ -30,7 +32,7 @@ deployFn.dependencies = ['teller-v2:deploy', 'market-registry:deploy']
 
 deployFn.skip = async (hre) => {
   return (
-    !hre.network.live || !['localhost', 'polygon', 'mainnet','mainnet_live_fork','arbitrum','base'].includes(hre.network.name)
+    !hre.network.live || !['localhost', 'polygon', 'mainnet','mainnet_live_fork','arbitrum','base','optimism'].includes(hre.network.name)
   )
 }
 export default deployFn

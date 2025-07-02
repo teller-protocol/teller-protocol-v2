@@ -41,6 +41,8 @@ yarn build
    yarn hbs -D ./config/polygon.json ./src/subgraph.handlebars -o . -e yaml
 
 
+   yarn hbs -D ./config/optimism.json ./src/subgraph.handlebars -o . -e yaml
+
 ```
  
 

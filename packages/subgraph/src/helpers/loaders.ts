@@ -24,10 +24,6 @@ import {
   TellerV2__bidsResultTermsStruct
 } from "../../generated/TellerV2/TellerV2";
 
-
-
-import { log } from '@graphprotocol/graph-ts'
-
 import { initTokenVolume } from "./intializers";
 
 export function loadProtocol(): Protocol {
@@ -155,8 +151,7 @@ export function loadLoanStatusCount(
   entityId: string
 ): LoanStatusCount {
   const id = `${entityType}-${entityId}`;
- 
- let loans = LoanStatusCount.load(id);
+  let loans = LoanStatusCount.load(id);
 
   if (!loans) {
     loans = new LoanStatusCount(id);
@@ -197,10 +192,8 @@ export function loadLoanStatusCount(
   }
 
   return loans;
-
 }
 
- 
 export function loadMarketById(id: string): MarketPlace {
   let marketPlace: MarketPlace | null = MarketPlace.load(id);
 
@@ -528,18 +521,14 @@ export function loadCollateral(
     collateral.save();
 
     const bid = Bid.load(bidId)!;
-
-     
-      let bidCollaterals = bid.collateral;
-      if (!bidCollaterals) {
-        bidCollaterals = [collateral.id];
-      } else {
-        bidCollaterals.push(collateral.id);
-      }
-      bid.collateral = bidCollaterals;
-      bid.save();
-
-    
+    let bidCollaterals = bid.collateral;
+    if (!bidCollaterals) {
+      bidCollaterals = [collateral.id];
+    } else {
+      bidCollaterals.push(collateral.id);
+    }
+    bid.collateral = bidCollaterals;
+    bid.save();
   }
   return collateral;
 }

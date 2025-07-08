@@ -44,9 +44,10 @@ fn get_factory_tracked_contract_address() -> [u8; 20] {
      match evm_network_name  {
 
         "polygon" => hex!("a7faf9435810fb571f61e1e116b3f18de0b3583a"),
-        "arbitrum" => hex!("E9D02C0e0449A396A09A42fE03Ff06300C972Db5"),  //fix ! 
-        "base" => hex!("48EA70BCe76FE2F0c79B29Bf852a1DCF957982aa"), //fix ! 
-         "mainnet" => hex!("21499A1Fd9f36ce527CB4A9032072ef1bb7a22F6"), //fix ! 
+        "arbitrum" => hex!("E9D02C0e0449A396A09A42fE03Ff06300C972Db5"),   
+        "base" => hex!("48EA70BCe76FE2F0c79B29Bf852a1DCF957982aa"),  
+         "mainnet" => hex!("21499A1Fd9f36ce527CB4A9032072ef1bb7a22F6"),  
+          "optimism" => hex!("72f136B0d905780d69EbdD71fb999BFB64B9e375"),  
 
 
         _ => panic!("unknown evm network "),
@@ -71,6 +72,7 @@ fn get_collateral_manager_tracked_contract_address() -> [u8; 20] {
         "arbitrum" => hex!("71B04a8569914bCb99D5F95644CF6b089c826024"),
         "base" => hex!("71B04a8569914bCb99D5F95644CF6b089c826024"),
          "mainnet" => hex!("2551A099129ad9b0b1FEc16f34D9CB73c237be8b"),
+          "optimism" => hex!("b8E8b0aa1F49dD5128941571802235457189538d"),
 
 
         _ => panic!("unknown evm network "),

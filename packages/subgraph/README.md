@@ -60,9 +60,9 @@ graph auth
 
 6. deploy ! 
 
- graph deploy   tellerv2-base --version-label 0.4.21-18
+ graph deploy   tellerv2-base --version-label 0.4.21-19
 
- graph deploy   tellerv2-arbitrum --version-label 0.4.21-20
+ graph deploy   tellerv2-arbitrum --version-label 0.4.21-22
 
 
  graph deploy   tellerv2-polygon --version-label 0.4.21-18

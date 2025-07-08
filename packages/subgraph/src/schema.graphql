@@ -1,4 +1,4 @@
-type Protocol implements IHasLoans @entity(immutable: true) {
+type Protocol implements IHasLoans @entity(immutable: false) {
   id: ID!
 
   loans: LoanStatusCount! @derivedFrom(field: "_protocol")
@@ -14,13 +14,13 @@ type Protocol implements IHasLoans @entity(immutable: true) {
   durationAverage: BigInt!
 }
 
-type ProtocolCollateral @entity(immutable: true) {
+type ProtocolCollateral @entity(immutable: false) {
   id: ID!
   collateralToken: Token
   tokenVolumesByLendingToken: [TokenVolume!]! @derivedFrom(field: "_protocolCollateral")
 }
 
-type MarketPlace implements IHasLoans @entity(immutable: true) {
+type MarketPlace implements IHasLoans @entity(immutable: false) {
   id: ID!
   marketplaceId: BigInt!
 
@@ -51,7 +51,7 @@ type MarketPlace implements IHasLoans @entity(immutable: true) {
   commitments: [Commitment!]! @derivedFrom(field: "marketplace")
 }
 
-type Bid @entity(immutable: true) {
+type Bid @entity(immutable: false) {
   id: ID!
   bidId: BigInt!
   createdAt: BigInt!
@@ -101,7 +101,7 @@ type Bid @entity(immutable: true) {
   collateral: [BidCollateral!]
 }
 
-type BidCollateral @entity(immutable: true) {
+type BidCollateral @entity(immutable: false) {
   id: ID!
   amount: BigInt!
   tokenId: BigInt
@@ -113,7 +113,7 @@ type BidCollateral @entity(immutable: true) {
   receiver: Bytes
 }
 
-type Token @entity(immutable: true) {
+type Token @entity(immutable: false) {
   id: ID!
   address: Bytes!
   type: String
@@ -123,13 +123,13 @@ type Token @entity(immutable: true) {
   decimals: BigInt
 }
 
-type FundedTx @entity(immutable: true) {
+type FundedTx @entity(immutable: false) {
   id: ID!
   bid: Bid!
   timestamp: BigInt!
 }
 
-type Payment @entity(immutable: true) {
+type Payment @entity(immutable: false) {
   id: ID!
   bid: Bid!
   principal: BigInt!
@@ -139,7 +139,7 @@ type Payment @entity(immutable: true) {
   status: String!
 }
 
-type User @entity(immutable: true) {
+type User @entity(immutable: false) {
   id: ID!
   firstInteractionDate: BigInt!
   lenders: [Lender!]! @derivedFrom(field: "user")
@@ -147,7 +147,7 @@ type User @entity(immutable: true) {
   bidRewards: [BidReward!]! @derivedFrom(field: "user")
 }
 
-type Lender implements IHasLoans @entity(immutable: true) {
+type Lender implements IHasLoans @entity(immutable: false) {
   id: ID!
   marketplaceId: BigInt!
   lenderAddress: Bytes!
@@ -166,7 +166,7 @@ type Lender implements IHasLoans @entity(immutable: true) {
   commitments: [Commitment!]! @derivedFrom(field: "lender")
 }
 
-type Borrower implements IHasLoans @entity(immutable: true) {
+type Borrower implements IHasLoans @entity(immutable: false) {
   id: ID!
   marketplaceId: BigInt!
   borrowerAddress: Bytes!
@@ -229,7 +229,7 @@ interface ILoanStatusCount {
   liquidatedCount: BigInt!
 }
 
-type LoanStatusCount implements ILoanStatusCount @entity(immutable: true) {
+type LoanStatusCount implements ILoanStatusCount @entity(immutable: false) {
   id: ID!
 
   all: [Bid!]!
@@ -271,7 +271,7 @@ type LoanStatusCount implements ILoanStatusCount @entity(immutable: true) {
   ## end Entity Relationships ##
 }
 
-type TokenVolume implements IDurationAverage @entity(immutable: true) {
+type TokenVolume implements IDurationAverage @entity(immutable: false) {
   id: ID!
 
   ## Entity Relationships ##
@@ -324,7 +324,7 @@ type TokenVolume implements IDurationAverage @entity(immutable: true) {
   ## end TokenStats ##
 }
 
-type MarketCommitmentStdDev @entity(immutable: true) {
+type MarketCommitmentStdDev @entity(immutable: false) {
   id: ID!
 
   market: MarketPlace!
@@ -344,13 +344,13 @@ type MarketCommitmentStdDev @entity(immutable: true) {
   maxDurationMean: BigDecimal!
 }
 
-type CommitmentZScore @entity(immutable: true) {
+type CommitmentZScore @entity(immutable: false) {
   id: ID!
   commitment: Commitment!
   zScore: BigDecimal!
 }
 
-type Commitment @entity(immutable: true) {
+type Commitment @entity(immutable: false) {
   id: ID!
   commitmentId: BigInt!
   createdAt: BigInt!
@@ -399,7 +399,7 @@ type Commitment @entity(immutable: true) {
 
 
 # Association between RewardAllocations and Commitments
-type CommitmentReward @entity(immutable: true) {
+type CommitmentReward @entity(immutable: false) {
   id: ID!
   createdAt: BigInt!
   updatedAt: BigInt!
@@ -414,7 +414,7 @@ type CommitmentReward @entity(immutable: true) {
 
 
 
-type RewardAllocation @entity(immutable: true) {
+type RewardAllocation @entity(immutable: false) {
   id: ID!
   createdAt: BigInt!
   updatedAt: BigInt!
@@ -454,7 +454,7 @@ type RewardAllocation @entity(immutable: true) {
 }
 
 
-type BidReward @entity(immutable: true) {
+type BidReward @entity(immutable: false) {
   id: ID!
   createdAt: BigInt!
   updatedAt: BigInt!

@@ -7,7 +7,7 @@ schema:
 dataSources:
   - kind: substreams
     name: lender-group-substream
-    network: matic
+    network: op-mainnet
     source:
       package:
         moduleName: db_out

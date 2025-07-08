@@ -57,7 +57,7 @@ impl NetworkData {
 
             "optimism" => Some(Self{
                 graph_network: "optimism".to_string(),  
-                chain_network: "optimism".to_string(),   
+                chain_network: "op-mainnet".to_string(),   
                 start_block:  137896000  
 
             }),

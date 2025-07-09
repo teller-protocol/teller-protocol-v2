@@ -64,24 +64,28 @@ const nonDeployedContracts = {
  "1" : [
   "LenderCommitmentForwarder/extensions/LenderCommitmentGroup/LenderCommitmentGroupShares.sol/LenderCommitmentGroupShares.json",
   "LenderCommitmentForwarder/extensions/LenderCommitmentGroup/LenderCommitmentGroup_Smart.sol/LenderCommitmentGroup_Smart.json",
+   "LenderCommitmentForwarder/extensions/LenderCommitmentGroup/LenderCommitmentGroup_Smart.sol/LenderCommitmentGroup_Pool_V2.json",
 ] ,
  
 
  "137" : [
   "LenderCommitmentForwarder/extensions/LenderCommitmentGroup/LenderCommitmentGroupShares.sol/LenderCommitmentGroupShares.json",
   "LenderCommitmentForwarder/extensions/LenderCommitmentGroup/LenderCommitmentGroup_Smart.sol/LenderCommitmentGroup_Smart.json",
+  "LenderCommitmentForwarder/extensions/LenderCommitmentGroup/LenderCommitmentGroup_Smart.sol/LenderCommitmentGroup_Pool_V2.json",
 ] ,
 
 
  "42161" : [
   "LenderCommitmentForwarder/extensions/LenderCommitmentGroup/LenderCommitmentGroupShares.sol/LenderCommitmentGroupShares.json",
   "LenderCommitmentForwarder/extensions/LenderCommitmentGroup/LenderCommitmentGroup_Smart.sol/LenderCommitmentGroup_Smart.json",
+  "LenderCommitmentForwarder/extensions/LenderCommitmentGroup/LenderCommitmentGroup_Smart.sol/LenderCommitmentGroup_Pool_V2.json",
 ] ,
 
 
   "8453" : [
      "LenderCommitmentForwarder/extensions/LenderCommitmentGroup/LenderCommitmentGroupShares.sol/LenderCommitmentGroupShares.json",
-  "LenderCommitmentForwarder/extensions/LenderCommitmentGroup/LenderCommitmentGroup_Smart.sol/LenderCommitmentGroup_Smart.json",
+     "LenderCommitmentForwarder/extensions/LenderCommitmentGroup/LenderCommitmentGroup_Smart.sol/LenderCommitmentGroup_Smart.json",
+     "LenderCommitmentForwarder/extensions/LenderCommitmentGroup/LenderCommitmentGroup_Smart.sol/LenderCommitmentGroup_Pool_V2.json",
     ]
 };
 

@@ -163,7 +163,7 @@ contract CollateralManager_Test is Testable {
             collateral._amount,
             collateral._tokenId
         );
-        collateralManager._depositSuper(bidId, collateral);
+        collateralManager._depositSuper(bidId, collateral,address(escrowImplementation),address(borrower));
     }
 
     function test_deposit_collateral_erc20_not_validated() public {
@@ -191,7 +191,7 @@ contract CollateralManager_Test is Testable {
         );
 
         vm.expectRevert("Collateral not validated");
-        collateralManager._depositSuper(bidId, collateral);
+        collateralManager._depositSuper(bidId, collateral,address(escrowImplementation),address(borrower));
     }
 
     function test_deposit_erc20() public {
@@ -227,7 +227,7 @@ contract CollateralManager_Test is Testable {
             collateral._tokenId
         );
         vm.prank(address(borrower));
-        collateralManager._depositSuper(bidId, collateral);
+        collateralManager._depositSuper(bidId, collateral,address(escrowImplementation),address(borrower));
 
         assertEq(
             escrowImplementation.depositAssetWasCalled(),
@@ -267,7 +267,7 @@ contract CollateralManager_Test is Testable {
             collateral._tokenId
         );
         vm.prank(address(borrower));
-        collateralManager._depositSuper(bidId, collateral);
+        collateralManager._depositSuper(bidId, collateral,address(escrowImplementation),address(borrower));
 
         assertEq(
             escrowImplementation.depositAssetWasCalled(),
@@ -300,7 +300,7 @@ contract CollateralManager_Test is Testable {
 
         vm.expectRevert("Collateral not validated");
         vm.prank(address(borrower));
-        collateralManager._depositSuper(bidId, collateral);
+        collateralManager._depositSuper(bidId, collateral,address(escrowImplementation),address(borrower));
     }
 
     function test_deposit_erc1155() public {
@@ -334,7 +334,7 @@ contract CollateralManager_Test is Testable {
             collateral._tokenId
         );
         vm.prank(address(borrower));
-        collateralManager._depositSuper(bidId, collateral);
+        collateralManager._depositSuper(bidId, collateral,address(escrowImplementation),address(borrower));
 
         assertEq(
             escrowImplementation.depositAssetWasCalled(),
@@ -365,7 +365,7 @@ contract CollateralManager_Test is Testable {
 
         vm.expectRevert("Collateral not validated");
         vm.prank(address(borrower));
-        collateralManager._depositSuper(bidId, collateral);
+        collateralManager._depositSuper(bidId, collateral,address(escrowImplementation),address(borrower));
     }
 
     /*function test_deposit_invalid_bid() public  {

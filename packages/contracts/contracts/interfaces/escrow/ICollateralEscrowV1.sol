@@ -26,7 +26,7 @@ interface ICollateralEscrowV1 {
         address _collateralAddress,
         uint256 _amount,
         uint256 _tokenId
-    ) external payable;
+    ) external;
 
     /**
      * @notice Withdraws a collateral asset from the escrow.

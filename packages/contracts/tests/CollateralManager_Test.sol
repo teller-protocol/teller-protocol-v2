@@ -1479,7 +1479,7 @@ contract CollateralEscrowV1_Mock is CollateralEscrowV1 {
         address _collateralAddress,
         uint256 _amount,
         uint256 _tokenId
-    ) external payable override {
+    ) external override {
         depositAssetWasCalled = true;
     }
 

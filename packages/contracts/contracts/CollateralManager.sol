@@ -18,7 +18,16 @@ import { Collateral, CollateralType, ICollateralEscrowV1 } from "./interfaces/es
 import "./interfaces/ITellerV2.sol";
 import "./interfaces/IProtocolPausingManager.sol";
 import "./interfaces/IHasProtocolPausingManager.sol";
+
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+
+
+
 contract CollateralManager is OwnableUpgradeable, ICollateralManager {
+
+    using SafeERC20 for ERC20;
+
     /* Storage */
     using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
     ITellerV2 public tellerV2;
@@ -138,7 +147,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
     ) public onlyTellerV2 returns (bool validation_) {
         address borrower = tellerV2.getLoanBorrower(_bidId);
         require(borrower != address(0), "Loan has no borrower");
-        (validation_, ) = checkBalances(borrower, _collateralInfo);
+        (validation_, ) = _checkBalances(borrower, _collateralInfo, false);
 
         //if the collateral info is valid, call commitCollateral for each one
         if (validation_) {
@@ -149,24 +158,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         }
     }
 
-    /**
-     * @notice Checks the validity of a borrower's collateral balance and commits it to a bid.
-     * @param _bidId The id of the associated bid.
-     * @param _collateralInfo Additional information about the collateral asset.
-     * @return validation_ Boolean indicating if the collateral balance was validated.
-     */
-    function commitCollateral(
-        uint256 _bidId,
-        Collateral calldata _collateralInfo
-    ) public onlyTellerV2 returns (bool validation_) {
-        address borrower = tellerV2.getLoanBorrower(_bidId);
-        require(borrower != address(0), "Loan has no borrower");
-        validation_ = _checkBalance(borrower, _collateralInfo);
-        if (validation_) {
-            _commitCollateral(_bidId, _collateralInfo);
-        }
-    }
-
+   
     /**
      * @notice Re-checks the validity of a borrower's collateral balance committed to a bid.
      * @param _bidId The id of the associated bid.
@@ -199,8 +191,9 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
      */
     function deployAndDeposit(uint256 _bidId) external onlyTellerV2 {
         if (isBidCollateralBacked(_bidId)) {
-            //attempt deploy a new collateral escrow contract if there is not already one. Otherwise fetch it.
-            (address proxyAddress, ) = _deployEscrow(_bidId);
+            //attempt deploy a new collateral escrow contract for this bid if there is not already one. Otherwise fetch it.
+            (address proxyAddress, address borrower) = _deployEscrow(_bidId);
+
             _escrows[_bidId] = proxyAddress;
 
             //for each bid collateral associated with this loan, deposit the collateral into escrow
@@ -213,7 +206,9 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
                     _bidId,
                     _bidCollaterals[_bidId].collateralInfo[
                         _bidCollaterals[_bidId].collateralAddresses.at(i)
-                    ]
+                    ],
+                    proxyAddress,
+                    borrower 
                 );
             }
 
@@ -294,23 +289,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
                 );
         }
 
-    /**
-     * @notice Withdraws deposited collateral from the created escrow of a bid that has been CLOSED after being defaulted.
-     * @param _bidId The id of the bid to withdraw collateral for.
-     */
-    function lenderClaimCollateral(uint256 _bidId) external onlyTellerV2 whenProtocolNotPaused {
-        if (isBidCollateralBacked(_bidId)) {
-            BidState bidState = tellerV2.getBidState(_bidId);
-
-            require(
-                bidState == BidState.CLOSED,
-                "Loan has not been liquidated"
-            );
-
-            _withdraw(_bidId, tellerV2.getLoanLender(_bidId));
-            emit CollateralClaimed(_bidId);
-        }
-    }
+    
 
         /**
      * @notice Withdraws deposited collateral from the created escrow of a bid that has been CLOSED after being defaulted.
@@ -385,18 +364,18 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         * @param collateralInfo The collateral info to deposit.
 
     */
-    function _deposit(uint256 _bidId, Collateral memory collateralInfo)
+    function _deposit(uint256 _bidId, Collateral memory collateralInfo, address escrowAddress, address borrower  )
         internal
         virtual
     {
         require(collateralInfo._amount > 0, "Collateral not validated");
-        (address escrowAddress, address borrower) = _deployEscrow(_bidId);
+     
         ICollateralEscrowV1 collateralEscrow = ICollateralEscrowV1(
             escrowAddress
         );
         // Pull collateral from borrower & deposit into escrow
         if (collateralInfo._collateralType == CollateralType.ERC20) {
-            IERC20Upgradeable(collateralInfo._collateralAddress).transferFrom(
+            ERC20(collateralInfo._collateralAddress).safeTransferFrom(
                 borrower,
                 address(this),
                 collateralInfo._amount

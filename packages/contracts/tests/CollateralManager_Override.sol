@@ -16,7 +16,7 @@ import "./tokens/TestERC721Token.sol";
 import "./tokens/TestERC1155Token.sol";
 
 import "../contracts/mock/TellerV2SolMock.sol";
-import "../contracts/CollateralManager.sol";
+import {CollateralManager} from "../contracts/CollateralManager.sol";
 
 contract CollateralManager_Override is CollateralManager {
     bool public checkBalancesWasCalled;
@@ -40,10 +40,10 @@ contract CollateralManager_Override is CollateralManager {
         super._commitCollateral(bidId, collateralInfo);
     }
 
-    function _depositSuper(uint256 _bidId, Collateral memory _collateralInfo)
+    function _depositSuper(uint256 _bidId, Collateral memory _collateralInfo, address _escrow, address _borrower )
         public
     {
-        super._deposit(_bidId, _collateralInfo);
+        super._deposit(_bidId, _collateralInfo, _escrow, _borrower);
     }
 
     function _withdrawSuper(uint256 _bidId, address _receiver) public {
@@ -123,7 +123,7 @@ contract CollateralManager_Override is CollateralManager {
         checks_ = new bool[](0);
     }
 
-    function _deposit(uint256 _bidId, Collateral memory collateralInfo)
+    function _deposit(uint256 _bidId, Collateral memory collateralInfo, address escrow, address borrower )
         internal
         override
     {

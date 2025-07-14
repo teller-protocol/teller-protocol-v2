@@ -15,7 +15,7 @@ import "./tokens/TestERC721Token.sol";
 import "./tokens/TestERC1155Token.sol";
 
 import "../contracts/mock/TellerV2SolMock.sol";
-import "../contracts/CollateralManager.sol";
+import {CollateralManager,CollateralType} from "../contracts/CollateralManager.sol";
 import "../contracts/pausing/ProtocolPausingManager.sol";
 import "./CollateralManager_Override.sol";
 
@@ -163,7 +163,7 @@ contract CollateralManager_Test is Testable {
             collateral._amount,
             collateral._tokenId
         );
-        collateralManager._depositSuper(bidId, collateral);
+        collateralManager._depositSuper(bidId, collateral,address(escrowImplementation),address(borrower));
     }
 
     function test_deposit_collateral_erc20_not_validated() public {
@@ -191,7 +191,7 @@ contract CollateralManager_Test is Testable {
         );
 
         vm.expectRevert("Collateral not validated");
-        collateralManager._depositSuper(bidId, collateral);
+        collateralManager._depositSuper(bidId, collateral,address(escrowImplementation),address(borrower));
     }
 
     function test_deposit_erc20() public {
@@ -227,7 +227,7 @@ contract CollateralManager_Test is Testable {
             collateral._tokenId
         );
         vm.prank(address(borrower));
-        collateralManager._depositSuper(bidId, collateral);
+        collateralManager._depositSuper(bidId, collateral,address(escrowImplementation),address(borrower));
 
         assertEq(
             escrowImplementation.depositAssetWasCalled(),
@@ -267,7 +267,7 @@ contract CollateralManager_Test is Testable {
             collateral._tokenId
         );
         vm.prank(address(borrower));
-        collateralManager._depositSuper(bidId, collateral);
+        collateralManager._depositSuper(bidId, collateral,address(escrowImplementation),address(borrower));
 
         assertEq(
             escrowImplementation.depositAssetWasCalled(),
@@ -300,7 +300,7 @@ contract CollateralManager_Test is Testable {
 
         vm.expectRevert("Collateral not validated");
         vm.prank(address(borrower));
-        collateralManager._depositSuper(bidId, collateral);
+        collateralManager._depositSuper(bidId, collateral,address(escrowImplementation),address(borrower));
     }
 
     function test_deposit_erc1155() public {
@@ -334,7 +334,7 @@ contract CollateralManager_Test is Testable {
             collateral._tokenId
         );
         vm.prank(address(borrower));
-        collateralManager._depositSuper(bidId, collateral);
+        collateralManager._depositSuper(bidId, collateral,address(escrowImplementation),address(borrower));
 
         assertEq(
             escrowImplementation.depositAssetWasCalled(),
@@ -365,7 +365,7 @@ contract CollateralManager_Test is Testable {
 
         vm.expectRevert("Collateral not validated");
         vm.prank(address(borrower));
-        collateralManager._depositSuper(bidId, collateral);
+        collateralManager._depositSuper(bidId, collateral,address(escrowImplementation),address(borrower));
     }
 
     /*function test_deposit_invalid_bid() public  {
@@ -534,7 +534,7 @@ contract CollateralManager_Test is Testable {
         tellerV2Mock.setGlobalBidState(BidState.CLOSED);
 
         vm.expectRevert("Sender not authorized");
-        collateralManager.lenderClaimCollateral(bidId);
+        collateralManager.lenderClaimCollateralWithRecipient(bidId,address(lender));
     }
 
     function test_lenderClaimCollateral() public {
@@ -548,7 +548,7 @@ contract CollateralManager_Test is Testable {
         vm.expectEmit(true, false, false, false);
         emit CollateralClaimed(bidId);
         vm.prank(address(tellerV2Mock));
-        collateralManager.lenderClaimCollateral(bidId);
+        collateralManager.lenderClaimCollateralWithRecipient(bidId,address(lender));
 
         assertEq(
             collateralManager.withdrawInternalWasCalledToRecipient(),
@@ -1259,18 +1259,21 @@ contract CollateralManager_Test is Testable {
     function test_commit_collateral_single() public {
         uint256 bidId = 0;
 
-        Collateral memory collateral = Collateral({
+         Collateral[] memory collateralArray = new Collateral[](1);
+
+        collateralArray[0] = Collateral({
             _collateralType: CollateralType.ERC20,
             _amount: 1000,
             _tokenId: 0,
             _collateralAddress: address(wethMock)
         });
 
+
         tellerV2Mock.setBorrower(address(borrower));
 
         collateralManager.setCheckBalanceGlobalValid(true);
         vm.prank(address(tellerV2Mock));
-        collateralManager.commitCollateral(bidId, collateral);
+        collateralManager.commitCollateral(bidId, collateralArray);
 
         assertTrue(
             collateralManager.commitCollateralInternalWasCalled(),
@@ -1281,51 +1284,60 @@ contract CollateralManager_Test is Testable {
     function test_commit_collateral_single_invalid_bid() public {
         uint256 bidId = 0;
 
-        Collateral memory collateral = Collateral({
+        Collateral[] memory collateralArray = new Collateral[](1);
+
+        collateralArray[0] = Collateral({
             _collateralType: CollateralType.ERC20,
             _amount: 1000,
             _tokenId: 0,
             _collateralAddress: address(wethMock)
         });
 
+
         collateralManager.setCheckBalanceGlobalValid(true);
         vm.prank(address(tellerV2Mock));
         vm.expectRevert("Loan has no borrower");
-        collateralManager.commitCollateral(bidId, collateral);
+        collateralManager.commitCollateral(bidId, collateralArray);
     }
 
     function test_commit_collateral_single_not_teller() public {
         uint256 bidId = 0;
 
-        Collateral memory collateral = Collateral({
+        Collateral[] memory collateralArray = new Collateral[](1);
+
+        collateralArray[0] = Collateral({
             _collateralType: CollateralType.ERC20,
             _amount: 1000,
             _tokenId: 0,
             _collateralAddress: address(wethMock)
         });
+
 
         tellerV2Mock.setBorrower(address(borrower));
 
         collateralManager.setCheckBalanceGlobalValid(true);
         vm.expectRevert("Sender not authorized");
-        collateralManager.commitCollateral(bidId, collateral);
+        collateralManager.commitCollateral(bidId, collateralArray);
     }
 
     function test_commit_collateral_single_invalid() public {
         uint256 bidId = 0;
 
-        Collateral memory collateral = Collateral({
+         Collateral[] memory collateralArray = new Collateral[](1);
+
+        collateralArray[0] = Collateral({
             _collateralType: CollateralType.ERC20,
             _amount: 1000,
             _tokenId: 0,
             _collateralAddress: address(wethMock)
         });
 
+
         tellerV2Mock.setBorrower(address(borrower));
 
         collateralManager.setCheckBalanceGlobalValid(false);
         vm.prank(address(tellerV2Mock));
-        collateralManager.commitCollateral(bidId, collateral);
+        collateralManager.commitCollateral(bidId, collateralArray);
 
         assertFalse(
             collateralManager.commitCollateralInternalWasCalled(),
@@ -1479,7 +1491,7 @@ contract CollateralEscrowV1_Mock is CollateralEscrowV1 {
         address _collateralAddress,
         uint256 _amount,
         uint256 _tokenId
-    ) external payable override {
+    ) external override {
         depositAssetWasCalled = true;
     }
 

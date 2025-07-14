@@ -54,7 +54,7 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
         address _collateralAddress,
         uint256 _amount,
         uint256 _tokenId
-    ) external payable virtual onlyOwner {
+    ) external virtual onlyOwner {
         require(_amount > 0, "Deposit amount cannot be zero");
         _depositCollateral(
             _collateralType,
@@ -93,13 +93,17 @@ contract CollateralEscrowV1 is OwnableUpgradeable, ICollateralEscrowV1 {
             collateral._amount >= _amount,
             "No collateral balance for asset"
         );
+
+        //this comes first to mitigate re-entrancy via checks-effects-interact pattern
+        collateral._amount -= _amount;
+
         _withdrawCollateral(
             collateral,
             _collateralAddress,
             _amount,
             _recipient
         );
-        collateral._amount -= _amount;
+        
         emit CollateralWithdrawn(_collateralAddress, _amount, _recipient);
     }
 

@@ -217,7 +217,7 @@ export default <HardhatUserConfig>{
       polygon: process.env.POLYGONSCAN_VERIFY_API_KEY,
       arbitrumOne: process.env.ARBISCAN_VERIFY_API_KEY,
       base: process.env.BASESCAN_VERIFY_API_KEY,
-      optimism: process.env.OPTIMISMSCAN_VERIFY_API_KEY,
+      optimism: process.env.ETHERSCANV2_VERIFY_API_KEY,  //using the v2 api 
       mantle: process.env.MANTLE_VERIFY_API_KEY ?? 'xyz',
       clarity: '', //none ? 
 
@@ -241,7 +241,7 @@ export default <HardhatUserConfig>{
         network: 'optimism',
         chainId: 10,
         urls: {
-          apiURL: 'https://api-optimistic.etherscan.io/api',
+          apiURL: 'https://api.etherscan.io/v2/api?chainid=10',
           browserURL: 'https://optimistic.etherscan.io',
         },
       },

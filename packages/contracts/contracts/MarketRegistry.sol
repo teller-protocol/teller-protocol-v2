@@ -303,9 +303,7 @@ contract MarketRegistry is
     function revokeLender(uint256 _marketId, address _lenderAddress) external {
         _revokeStakeholder(_marketId, _lenderAddress, true);
     }
-
-    
-
+ 
     /**
      * @notice Allows a lender to voluntarily leave a market.
      * @param _marketId The market ID to leave.
@@ -344,9 +342,7 @@ contract MarketRegistry is
         _revokeStakeholder(_marketId, _borrowerAddress, false);
     }
 
-   
-
-    /**
+    /*
      * @notice Allows a borrower to voluntarily leave a market.
      * @param _marketId The market ID to leave.
      */
@@ -1049,8 +1045,7 @@ contract MarketRegistry is
         //        tellerAS.revoke(uuid);
     }
 
-   
-
+ 
     /**
      * @notice Removes a stakeholder (borrower/lender) from a market.
      * @param _marketId The market ID to remove the lender from.

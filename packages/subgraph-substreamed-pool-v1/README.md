@@ -46,7 +46,7 @@ substreams pack ./substreams.yaml
 
 
 3. cargo run --bin exportbuild   //regenerate yaml files 
-4. make && make build && make pack 
+4. make && make build && make protogen && make pack 
 
 
   --- OLD WAY with subgraph  -----------------------------------

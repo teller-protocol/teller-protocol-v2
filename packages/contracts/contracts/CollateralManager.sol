@@ -158,24 +158,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         }
     }
 
-    /**
-     * @notice Checks the validity of a borrower's collateral balance and commits it to a bid.
-     * @param _bidId The id of the associated bid.
-     * @param _collateralInfo Additional information about the collateral asset.
-     * @return validation_ Boolean indicating if the collateral balance was validated.
-     */
-    function commitCollateral(
-        uint256 _bidId,
-        Collateral calldata _collateralInfo
-    ) public onlyTellerV2 returns (bool validation_) {
-        address borrower = tellerV2.getLoanBorrower(_bidId);
-        require(borrower != address(0), "Loan has no borrower");
-        validation_ = _checkBalance(borrower, _collateralInfo);
-        if (validation_) {
-            _commitCollateral(_bidId, _collateralInfo);
-        }
-    }
-
+   
     /**
      * @notice Re-checks the validity of a borrower's collateral balance committed to a bid.
      * @param _bidId The id of the associated bid.
@@ -306,23 +289,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
                 );
         }
 
-    /**
-     * @notice Withdraws deposited collateral from the created escrow of a bid that has been CLOSED after being defaulted.
-     * @param _bidId The id of the bid to withdraw collateral for.
-     */
-    function lenderClaimCollateral(uint256 _bidId) external onlyTellerV2 whenProtocolNotPaused {
-        if (isBidCollateralBacked(_bidId)) {
-            BidState bidState = tellerV2.getBidState(_bidId);
-
-            require(
-                bidState == BidState.CLOSED,
-                "Loan has not been liquidated"
-            );
-
-            _withdraw(_bidId, tellerV2.getLoanLender(_bidId));
-            emit CollateralClaimed(_bidId);
-        }
-    }
+    
 
         /**
      * @notice Withdraws deposited collateral from the created escrow of a bid that has been CLOSED after being defaulted.

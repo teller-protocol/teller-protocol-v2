@@ -20,7 +20,7 @@ protobuf:
   files:
     - contract.proto
     - collateral.proto
-    - database.proto
+    - sf/substreams/database/v1/database.proto
   importPaths:
     - ./proto
 
@@ -143,6 +143,6 @@ modules:
       - store: store_pool_collateral_withdrawn_data
 
     output:
-      type: proto:sf.substreams.database.v1.DatabaseChanges
+      type: proto:sf.substreams.sink.database.v1.DatabaseChanges
 
 network: base

@@ -357,6 +357,10 @@ export class GnosisSafeAdminClient {
 
   https://safe-transaction-mainnet.safe.global/api/v1/safes/0xcd2E72aEBe2A203b84f46DEEC948E6465dB51c75/
   
+  
+
+  Need to be VERY careful with this bc it  doesnt properly work in rapid succession  rn 
+
   */
   private async getNextNonce(safeAddress: string, network: string, offset: number = 0): Promise<number> {
     const getNetwork = this.getNetworkPath([{network} as any])

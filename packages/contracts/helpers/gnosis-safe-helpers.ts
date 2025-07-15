@@ -1,11 +1,15 @@
+import { ProposalResponse } from '@openzeppelin/defender-admin-client/lib'
+import { PartialContract, ProposalStep } from '@openzeppelin/defender-admin-client/lib/models/proposal'
+import { Network } from '@openzeppelin/defender-base-client'
+
 
 
 /*
 
 
-	how to propose a tx  to gnosis safe 
+  how to propose a tx  to gnosis safe 
 
-	curl -X 'POST' \
+  curl -X 'POST' \
 'https://api.safe.global/tx-service/sep/api/v1/safes/0xc62C5cbB964ffffffffff82f78A4d30713174b2E/multisig-transactions/' \
 -H 'accept: application/json' \
 -H 'Content-Type: application/json' \
@@ -32,3 +36,327 @@
 
 
 */
+
+
+interface CreateProposalRequest {
+  contract: PartialContract | PartialContract[]
+  title: string
+  description: string
+  type: 'custom' | 'batch'
+  viaType: 'Gnosis Safe'
+  via: string
+  functionInterface?: any
+  functionInputs?: any[]
+  metadata?: any
+  steps?: ProposalStep[]
+}
+
+interface SafeTransactionRequest {
+  safe: string
+  to: string
+  value: string
+  data: string
+  operation: number
+  gasToken: string
+  safeTxGas: number
+  baseGas: number
+  gasPrice: number
+  refundReceiver: string
+  nonce: number
+  contractTransactionHash: string
+  sender: string
+  signature: string
+}
+
+export class GnosisSafeAdminClient {
+  private apiKey: string
+  private baseUrl: string = 'https://api.safe.global'
+
+  constructor(config: { apiKey: string }) {
+    this.apiKey = config.apiKey
+  }
+
+  async createProposal(request: CreateProposalRequest): Promise<ProposalResponse> {
+    const safeAddress = request.via
+    const network = this.getNetworkPath(request.contract)
+    
+    if (request.type === 'batch') {
+      return await this.createBatchProposal(request, safeAddress, network)
+    } else {
+      return await this.createSingleProposal(request, safeAddress, network)
+    }
+  }
+
+  private async createSingleProposal(
+    request: CreateProposalRequest,
+    safeAddress: string,
+    network: string
+  ): Promise<ProposalResponse> {
+    const contract = Array.isArray(request.contract) ? request.contract[0] : request.contract
+    const contractAddress = contract.address
+    
+    const encodedData = this.encodeTransactionData(
+      request.functionInterface,
+      request.functionInputs
+    )
+
+    const transactionRequest: SafeTransactionRequest = {
+      safe: safeAddress,
+      to: contractAddress,
+      value: '0',
+      data: encodedData,
+      operation: 0,
+      gasToken: '0x0000000000000000000000000000000000000000',
+      safeTxGas: 0,
+      baseGas: 0,
+      gasPrice: 0,
+      refundReceiver: '0x0000000000000000000000000000000000000000',
+      nonce: await this.getNextNonce(safeAddress, network),
+      contractTransactionHash: await this.generateTransactionHash(safeAddress, contractAddress, encodedData),
+      sender: safeAddress,
+      signature: '0x'
+    }
+
+    const response = await this.submitTransaction(transactionRequest, network)
+    
+    return {
+      proposalId: response.safeTxHash || 'unknown',
+      url: `${this.baseUrl}/app/transactions/queue?safe=${safeAddress}`,
+      transaction: {
+        hash: response.safeTxHash
+      }
+    }
+  }
+
+  private async createBatchProposal(
+    request: CreateProposalRequest,
+    safeAddress: string,
+    network: string
+  ): Promise<ProposalResponse> {
+    if (!request.steps) {
+      throw new Error('Batch proposal requires steps')
+    }
+
+    const transactions = request.steps.map(step => {
+      const contract = Array.isArray(request.contract) 
+        ? request.contract.find(c => c.address === step.contractId?.split('-')[1])
+        : request.contract
+
+      if (!contract) {
+        throw new Error(`Contract not found for step ${step.contractId}`)
+      }
+
+      const encodedData = this.encodeTransactionData(
+        step.targetFunction,
+        step.functionInputs
+      )
+
+      return {
+        to: contract.address,
+        value: '0',
+        data: encodedData,
+        operation: 0
+      }
+    })
+
+    const multiSendData = this.encodeMultiSendData(transactions)
+    const multiSendAddress = this.getMultiSendAddress(network)
+
+    const transactionRequest: SafeTransactionRequest = {
+      safe: safeAddress,
+      to: multiSendAddress,
+      value: '0',
+      data: multiSendData,
+      operation: 1,
+      gasToken: '0x0000000000000000000000000000000000000000',
+      safeTxGas: 0,
+      baseGas: 0,
+      gasPrice: 0,
+      refundReceiver: '0x0000000000000000000000000000000000000000',
+      nonce: await this.getNextNonce(safeAddress, network),
+      contractTransactionHash: await this.generateTransactionHash(safeAddress, multiSendAddress, multiSendData),
+      sender: safeAddress,
+      signature: '0x'
+    }
+
+    const response = await this.submitTransaction(transactionRequest, network)
+    
+    return {
+      proposalId: response.safeTxHash || 'unknown',
+      url: `${this.baseUrl}/app/transactions/queue?safe=${safeAddress}`,
+      transaction: {
+        hash: response.safeTxHash
+      }
+    }
+  }
+
+  private async submitTransaction(
+    transaction: SafeTransactionRequest,
+    network: string
+  ): Promise<{ safeTxHash: string }> {
+    const getNetwork = this.getNetworkPathShorthand([{network} as any])
+    const url = `https://safe-transaction-${getNetwork}.safe.global/api/v1/safes/${transaction.safe}/multisig-transactions/`
+    
+    const headers: Record<string, string> = {
+      'accept': 'application/json',
+      'content-type': 'application/json'
+    }
+    
+    // Add Authorization header if API key is provided
+    if (this.apiKey) {
+      headers['Authorization'] = `Bearer ${this.apiKey}`
+    }
+    
+    const response = await fetch(url, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(transaction)
+    })
+
+    if (!response.ok) {
+      const error = await response.text()
+      throw new Error(`Failed to submit transaction to Safe: ${response.status} ${error}`)
+    }
+
+    return await response.json()
+  }
+
+  private encodeTransactionData(functionInterface: any, functionInputs: any[]): string {
+    if (!functionInterface || !functionInputs) {
+      return '0x'
+    }
+
+    const { ethers } = require('ethers')
+    
+    const types = functionInterface.inputs.map((input: any) => input.type)
+    const fragment = ethers.FunctionFragment.from({
+      name: functionInterface.name,
+      type: 'function',
+      inputs: functionInterface.inputs
+    })
+    
+    const iface = new ethers.Interface([fragment])
+    return iface.encodeFunctionData(functionInterface.name, functionInputs)
+  }
+
+  private encodeMultiSendData(transactions: Array<{to: string, value: string, data: string, operation: number}>): string {
+    const { ethers } = require('ethers')
+    
+    let data = '0x'
+    for (const tx of transactions) {
+      const encoded = ethers.solidityPacked(
+        ['uint8', 'address', 'uint256', 'uint256', 'bytes'],
+        [tx.operation, tx.to, tx.value, ethers.dataLength(tx.data), tx.data]
+      )
+      data += encoded.slice(2)
+    }
+    
+    const multiSendInterface = new ethers.Interface([
+      'function multiSend(bytes transactions)'
+    ])
+    
+    return multiSendInterface.encodeFunctionData('multiSend', [data])
+  }
+
+  /*
+
+  ex 
+
+  https://safe-transaction-mainnet.safe.global/api/v1/safes/0xcd2E72aEBe2A203b84f46DEEC948E6465dB51c75/
+  
+  */
+  private async getNextNonce(safeAddress: string, network: string): Promise<number> {
+    const getNetwork = this.getNetworkPath([{network} as any])
+    const url = `https://safe-transaction-${getNetwork}.safe.global/api/v1/safes/${safeAddress}/`
+    
+    const response = await fetch(url, {
+      headers: {
+        'accept': 'application/json',
+        'content-type': 'application/json'
+      }
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      if (response.status === 404) {
+        console.warn(`Safe not found, using nonce 0. This might be a new Safe or incorrect network.`)
+        return 0
+      }
+      throw new Error(`Failed to get Safe info: ${response.status} - ${errorText}`)
+    }
+
+    const safeInfo = await response.json()
+    return safeInfo.nonce
+  }
+
+  private async generateTransactionHash(safeAddress: string, to: string, data: string): Promise<string> {
+    const { ethers } = require('ethers')
+    return ethers.keccak256(
+      ethers.solidityPacked(
+        ['address', 'address', 'bytes'],
+        [safeAddress, to, data]
+      )
+    )
+  }
+
+  private getNetworkPathShorthand(contract: PartialContract | PartialContract[]): string {
+    const firstContract = Array.isArray(contract) ? contract[0] : contract
+    const network = firstContract.network
+    
+    // For POST requests to api.safe.global/tx-service/{network}/
+    const networkMap: Record<string, string> = {
+      'mainnet': 'eth',
+      'sepolia': 'sep',
+      'goerli': 'gor',
+      'polygon': 'matic',
+      'arbitrum': 'arb1',
+      'optimism': 'oeth',
+      'base': 'base',
+      'gnosis': 'gno',
+      'avalanche': 'avax',
+      'bsc': 'bnb'
+    }
+    
+    return networkMap[network as string] || 'eth'
+  }
+
+  private getNetworkPath(contract: PartialContract | PartialContract[]): string { 
+    const firstContract = Array.isArray(contract) ? contract[0] : contract
+    const network = firstContract.network
+    
+    // For GET requests to safe-transaction-{network}.safe.global/
+    const networkMap: Record<string, string> = {
+      'mainnet': 'mainnet',
+      'sepolia': 'sepolia',
+      'goerli': 'goerli',
+      'polygon': 'polygon',
+      'arbitrum': 'arbitrum',
+      'optimism': 'optimism',
+      'base': 'base',
+      'gnosis': 'gnosis',
+      'avalanche': 'avalanche',
+      'bsc': 'bsc'
+    }
+    
+    return networkMap[network as string] || 'mainnet'
+  }
+
+/*
+The MultiSend contract address 0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761 is the canonical MultiSend contract deployed on most
+  networks by Gnosis Safe. This is a well-known, audited contract that:
+
+  - Takes an encoded bytes array containing multiple transaction data
+  - Executes each transaction in sequence
+  - Ensures all transactions succeed or the entire batch fails (atomic execution)
+
+  
+  In the code at /home/andy/teller/teller-protocol-v2/packages/contracts/helpers/gnosis-safe-helpers.ts:266-268, the
+  getMultiSendAddress() method returns this standard address. For batch proposals, the operation field is set to 1 (DELEGATECALL)
+  instead of 0 (CALL), which tells the Safe to delegate the execution to the MultiSend contract.
+
+
+*/
+  private getMultiSendAddress(network: string): string {
+    return '0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761'
+  }
+}

@@ -53,7 +53,7 @@ const {
   SKIP_SIZER,
   TESTING,
   ALCHEMY_API_KEY,
-  
+
   SAFE_GLOBAL_API_KEY,
 
    // DEPRECATED 
@@ -284,7 +284,7 @@ export default <HardhatUserConfig>{
   safe_api: {
     apiKey: SAFE_GLOBAL_API_KEY
 
-  }
+  },
 
   tenderly: {
     username: 'teller',

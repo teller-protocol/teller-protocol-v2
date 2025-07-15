@@ -20,6 +20,7 @@ protobuf:
   files:
     - contract.proto
     - collateral.proto
+    - sf/substreams/database/v1/database.proto
   importPaths:
     - ./proto
 

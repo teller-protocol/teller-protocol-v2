@@ -53,6 +53,10 @@ const {
   SKIP_SIZER,
   TESTING,
   ALCHEMY_API_KEY,
+  
+  SAFE_GLOBAL_API_KEY,
+
+   // DEPRECATED 
   DEFENDER_API_KEY,
   DEFENDER_API_SECRET,
 } = process.env
@@ -275,7 +279,12 @@ export default <HardhatUserConfig>{
   defender: {
     apiKey: DEFENDER_API_KEY,
     apiSecret: DEFENDER_API_SECRET,
-  },
+  }, 
+
+  safe_api: {
+    apiKey: SAFE_GLOBAL_API_KEY
+
+  }
 
   tenderly: {
     username: 'teller',

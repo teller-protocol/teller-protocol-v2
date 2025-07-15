@@ -1,6 +1,6 @@
 import '@nomicfoundation/hardhat-ethers'
 import {
-  AdminClient,
+ // AdminClient,
   ProposalResponse,
 } from '@openzeppelin/defender-admin-client/lib'
 import {
@@ -36,6 +36,8 @@ import {
   VirtualExecutionPayload,
 } from 'hardhat/types'
 import moment from 'moment'
+
+import { GnosisSafeAdminClient } from './gnosis-safe-helpers'
 
 import { getTokens } from '../config'
 
@@ -516,9 +518,8 @@ extendEnvironment((hre) => {
     fn.write(formatMsg(msg, config))
   }
 
-  const defenderAdmin = new AdminClient({
-    apiKey: hre.config.defender!.apiKey,
-    apiSecret: hre.config.defender!.apiSecret,
+  const upgradeProposalAdmin = new GnosisSafeAdminClient({
+    apiKey: hre.config.safe_api!.apiKey, 
   })
 
   hre.upgrades.proposeCall = async (
@@ -540,7 +541,7 @@ extendEnvironment((hre) => {
     }
 
     const { protocolOwnerSafe } = await hre.getNamedAccounts()
-    return await defenderAdmin.createProposal({
+    return await upgradeProposalAdmin.createProposal({
       contract: {
         address: contractAddress,
         network: await getOZNetwork(hre),
@@ -593,7 +594,7 @@ extendEnvironment((hre) => {
     const proxyAdmin = await hre.upgrades.admin.getInstance()
     const { protocolOwnerSafe } = await hre.getNamedAccounts()
 
-    return await defenderAdmin.createProposal({
+    return await upgradeProposalAdmin.createProposal({
       contract: {
         address: await proxyAdmin.getAddress(),
         network: await getOZNetwork(hre),
@@ -669,7 +670,7 @@ extendEnvironment((hre) => {
       })
     } // end steps loop
 
-    return await defenderAdmin.createProposal({
+    return await upgradeProposalAdmin.createProposal({
       contract: contracts,
       title: title,
       description: description,
@@ -1017,16 +1018,20 @@ const createScheduledBatchProposal = async (
     timelockBatchArgs: TimelockBatchArgs
   }
 ) => {
+
+
   const network = await getOZNetwork(hre)
-  const defenderAdmin = new AdminClient({
-    apiKey: hre.config.defender!.apiKey,
-    apiSecret: hre.config.defender!.apiSecret,
+
+  const upgradeProposalAdmin = new GnosisSafeAdminClient({
+    apiKey: hre.config.safe_api!.apiKey, 
   })
+
+ 
 
   const { protocolOwnerSafe, protocolTimelock } = await hre.getNamedAccounts()
 
   return {
-    schedule: await defenderAdmin.createProposal({
+    schedule: await upgradeProposalAdmin.createProposal({
       title: `${title} (Schedule Timelock)`,
       description: description,
       type: 'custom',
@@ -1057,7 +1062,7 @@ const createScheduledBatchProposal = async (
         timelockBatchArgs.delay,
       ],
     }),
-    execute: await defenderAdmin.createProposal({
+    execute: await upgradeProposalAdmin.createProposal({
       title: `${title} (Execute Timelock)`,
       description: description,
       type: 'custom',

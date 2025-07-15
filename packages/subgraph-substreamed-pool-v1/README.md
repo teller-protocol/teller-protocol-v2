@@ -37,6 +37,16 @@ substreams pack ./substreams.yaml
 ```
 
 
+## PROTO WARNING 
+
+this proto buf 
+
+: proto:sf.substreams.database.v1.DatabaseChanges
+
+comes from global folders so if you are trying to build this pack from within docker, you have to be extra careful **  about how this is stored and retrieved   [please add more info here when discoverd] 
+
+
+
 #### DEPLOYING 
 
 

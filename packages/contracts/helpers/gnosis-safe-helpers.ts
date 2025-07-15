@@ -1,6 +1,7 @@
 import { ProposalResponse } from '@openzeppelin/defender-admin-client/lib'
 import { PartialContract, ProposalStep } from '@openzeppelin/defender-admin-client/lib/models/proposal'
 import { Network } from '@openzeppelin/defender-base-client'
+import { generateLedgerSignature } from './ledger-nano-helper'
 
 
 
@@ -108,6 +109,15 @@ export class GnosisSafeAdminClient {
       request.functionInputs
     )
 
+    const nonce = await this.getNextNonce(safeAddress, network)
+    const signature = await generateLedgerSignature({
+      to: contractAddress,
+      data: encodedData,
+      value: '0',
+      safeAddress,
+      nonce
+    })
+
     const transactionRequest: SafeTransactionRequest = {
       safe: safeAddress,
       to: contractAddress,
@@ -119,10 +129,23 @@ export class GnosisSafeAdminClient {
       baseGas: 0,
       gasPrice: 0,
       refundReceiver: '0x0000000000000000000000000000000000000000',
-      nonce: await this.getNextNonce(safeAddress, network),
-      contractTransactionHash: await this.generateTransactionHash(safeAddress, contractAddress, encodedData),
+      nonce,
+      contractTransactionHash: await this.generateTransactionHash(
+        safeAddress,
+        contractAddress,
+        encodedData,
+        '0',
+        0,
+        0,
+        0,
+        0,
+        '0x0000000000000000000000000000000000000000',
+        '0x0000000000000000000000000000000000000000',
+        nonce,
+        network
+      ),
       sender: safeAddress,
-      signature: '0x'
+      signature
     }
 
     const response = await this.submitTransaction(transactionRequest, network)
@@ -170,6 +193,15 @@ export class GnosisSafeAdminClient {
     const multiSendData = this.encodeMultiSendData(transactions)
     const multiSendAddress = this.getMultiSendAddress(network)
 
+    const nonce = await this.getNextNonce(safeAddress, network)
+    const signature = await generateLedgerSignature({
+      to: multiSendAddress,
+      data: multiSendData,
+      value: '0',
+      safeAddress,
+      nonce
+    })
+
     const transactionRequest: SafeTransactionRequest = {
       safe: safeAddress,
       to: multiSendAddress,
@@ -181,10 +213,23 @@ export class GnosisSafeAdminClient {
       baseGas: 0,
       gasPrice: 0,
       refundReceiver: '0x0000000000000000000000000000000000000000',
-      nonce: await this.getNextNonce(safeAddress, network),
-      contractTransactionHash: await this.generateTransactionHash(safeAddress, multiSendAddress, multiSendData),
+      nonce,
+      contractTransactionHash: await this.generateTransactionHash(
+        safeAddress,
+        multiSendAddress,
+        multiSendData,
+        '0',
+        1,
+        0,
+        0,
+        0,
+        '0x0000000000000000000000000000000000000000',
+        '0x0000000000000000000000000000000000000000',
+        nonce,
+        network
+      ),
       sender: safeAddress,
-      signature: '0x'
+      signature
     }
 
     const response = await this.submitTransaction(transactionRequest, network)
@@ -305,14 +350,73 @@ export class GnosisSafeAdminClient {
     return safeInfo.nonce
   }
 
-  private async generateTransactionHash(safeAddress: string, to: string, data: string): Promise<string> {
+  private getChainId(network: string): number {
+    const chainIds: Record<string, number> = {
+      'mainnet': 1,
+      'sepolia': 11155111,
+      'goerli': 5,
+      'polygon': 137,
+      'arbitrum': 42161,
+      'optimism': 10,
+      'base': 8453,
+      'gnosis': 100,
+      'avalanche': 43114,
+      'bsc': 56
+    }
+    return chainIds[network] || 1
+  }
+
+  private async generateTransactionHash(
+    safeAddress: string, 
+    to: string, 
+    data: string,
+    value: string = '0',
+    operation: number = 0,
+    safeTxGas: number = 0,
+    baseGas: number = 0,
+    gasPrice: number = 0,
+    gasToken: string = '0x0000000000000000000000000000000000000000',
+    refundReceiver: string = '0x0000000000000000000000000000000000000000',
+    nonce: number,
+    network: string = 'mainnet'
+  ): Promise<string> {
     const { ethers } = require('ethers')
-    return ethers.keccak256(
-      ethers.solidityPacked(
-        ['address', 'address', 'bytes'],
-        [safeAddress, to, data]
-      )
-    )
+    
+    // Gnosis Safe transaction hash format using EIP-712
+    const domain = {
+      chainId: this.getChainId(network),
+      verifyingContract: safeAddress
+    }
+    
+    const types = {
+      SafeTx: [
+        { type: 'address', name: 'to' },
+        { type: 'uint256', name: 'value' },
+        { type: 'bytes', name: 'data' },
+        { type: 'uint8', name: 'operation' },
+        { type: 'uint256', name: 'safeTxGas' },
+        { type: 'uint256', name: 'baseGas' },
+        { type: 'uint256', name: 'gasPrice' },
+        { type: 'address', name: 'gasToken' },
+        { type: 'address', name: 'refundReceiver' },
+        { type: 'uint256', name: 'nonce' }
+      ]
+    }
+    
+    const message = {
+      to,
+      value,
+      data,
+      operation,
+      safeTxGas,
+      baseGas,
+      gasPrice,
+      gasToken,
+      refundReceiver,
+      nonce
+    }
+    
+    return ethers.TypedDataEncoder.hash(domain, types, message)
   }
 
 /*

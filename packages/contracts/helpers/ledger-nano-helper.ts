@@ -6,9 +6,10 @@ interface LedgerSignatureRequest {
   value?: string
   safeAddress: string
   nonce: number
+  txHash?: string  // Allow passing the transaction hash directly
 }
 
-export async function generateLedgerSignature(request: LedgerSignatureRequest): Promise<string> {
+export async function generateLedgerSignature(request: LedgerSignatureRequest): Promise<{signature: string, signerAddress: string}> {
   try {
     const TransportNodeHid = require('@ledgerhq/hw-transport-node-hid').default
     const AppEth = require('@ledgerhq/hw-app-eth').default
@@ -16,28 +17,95 @@ export async function generateLedgerSignature(request: LedgerSignatureRequest): 
     const transport = await TransportNodeHid.create()
     const eth = new AppEth(transport)
 
-    const txHash = ethers.keccak256(
-      ethers.solidityPacked(
-        ['address', 'address', 'uint256', 'bytes', 'uint256'],
-        [request.safeAddress, request.to, request.value || '0', request.data, request.nonce]
-      )
-    )
+    // Create EIP-712 hash for Gnosis Safe (same as in generateTransactionHash)
+    const domain = {
+      chainId: 1, // You may want to make this dynamic based on network
+      verifyingContract: request.safeAddress
+    }
+    
+    const types = {
+      SafeTx: [
+        { type: 'address', name: 'to' },
+        { type: 'uint256', name: 'value' },
+        { type: 'bytes', name: 'data' },
+        { type: 'uint8', name: 'operation' },
+        { type: 'uint256', name: 'safeTxGas' },
+        { type: 'uint256', name: 'baseGas' },
+        { type: 'uint256', name: 'gasPrice' },
+        { type: 'address', name: 'gasToken' },
+        { type: 'address', name: 'refundReceiver' },
+        { type: 'uint256', name: 'nonce' }
+      ]
+    }
+    
+    const message = {
+      to: request.to,
+      value: request.value || '0',
+      data: request.data,
+      operation: 0,
+      safeTxGas: 0,
+      baseGas: 0,
+      gasPrice: 0,
+      gasToken: '0x0000000000000000000000000000000000000000',
+      refundReceiver: '0x0000000000000000000000000000000000000000',
+      nonce: request.nonce
+    }
+
+    // Use provided transaction hash or generate EIP-712 hash
+    const txHash = request.txHash || ethers.TypedDataEncoder.hash(domain, types, message)
 
     //change me to the correct one for YOU 
-    let ledger_account_id = 10;
+    let ledger_account_id = 9;  // this is X-1  where X is teh number that appears on chrome metamask connection 
+    const derivationPath = "44'/60'/0'/0/".concat(ledger_account_id.toString());
 
+    // Get the address for this derivation path
+    const addressResult = await eth.getAddress(derivationPath)
+    const signerAddress = addressResult.address
+
+    console.log("REQUESTING LEDGER SIGNATURE ", signerAddress );
+    
+    // Validate that this address is one of the expected Safe owners
+    const expectedOwners = [
+      '0xF3E864eAaFf9Cf2cD21A862d51D875093b4B5baA',
+      '0x14A20b4B762b8d297859cf0477D86324d66aF69f', 
+      '0xc4437A559E672a6e7F982bdD82a1Da204068E5b1',
+      '0xDECE128DD53fE69E6aF68bF0B2fef78a23F56D7b',
+      '0xd0f036b8CC46ab00A380bbc35cA5713f0cdeE37D'
+    ]
+    
+    if (!expectedOwners.includes(signerAddress)) {
+      console.warn(`WARNING: Ledger address ${signerAddress} is not in the expected owners list!`)
+      console.warn(`Expected owners: ${expectedOwners.join(', ')}`)
+    }
+
+    // Sign the EIP-712 hash as a personal message (Ledger fallback)
     const signature = await eth.signPersonalMessage(
-      "44'/60'/0'/0/".concat(ledger_account_id.toString()),
+      derivationPath,
       txHash.slice(2)
     )
 
     await transport.close()
 
-    const v = signature.v
+    // For Gnosis Safe compatibility, we need to format the signature correctly
+    // The Safe service expects to recover the signer from the signature
+    let v = signature.v
+    
+    // Ensure v is in the correct range (27 or 28)
+    if (v < 27) {
+      v += 27
+    }
+    
     const r = '0x' + signature.r
     const s = '0x' + signature.s
 
-    return ethers.solidityPacked(['uint8', 'bytes32', 'bytes32'], [v, r, s])
+    // For personal message signatures, Gnosis Safe expects the raw r, s, v format
+    // but adjusted to indicate it's a personal message signature
+    const signatureString = r + s.slice(2) + (v + 4).toString(16).padStart(2, '0')
+    
+    return {
+      signature: signatureString,
+      signerAddress: signerAddress
+    }
   } catch (error) {
     console.error('Failed to generate Ledger signature:', error)
     throw new Error(`Ledger signature generation failed: ${error.message}`)

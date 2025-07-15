@@ -1061,6 +1061,7 @@ const createScheduledBatchProposal = async (
         timelockBatchArgs.salt,
         timelockBatchArgs.delay,
       ],
+      nonceOffset: 0,
     }),
     execute: await upgradeProposalAdmin.createProposal({
       title: `${title} (Execute Timelock)`,
@@ -1090,6 +1091,7 @@ const createScheduledBatchProposal = async (
         timelockBatchArgs.predecessor,
         timelockBatchArgs.salt,
       ],
+      nonceOffset: 1,
     }),
   }
 }

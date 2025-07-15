@@ -3,8 +3,9 @@ import { PartialContract, ProposalStep } from '@openzeppelin/defender-admin-clie
 import { Network } from '@openzeppelin/defender-base-client'
 import { generateLedgerSignature } from './ledger-nano-helper'
 
-
-
+import {Safe} from '@safe-global/protocol-kit' 
+ 
+    
 /*
 
 
@@ -50,6 +51,7 @@ interface CreateProposalRequest {
   functionInputs?: any[]
   metadata?: any
   steps?: ProposalStep[]
+  nonceOffset?: number
 }
 
 interface SafeTransactionRequest {
@@ -109,13 +111,31 @@ export class GnosisSafeAdminClient {
       request.functionInputs
     )
 
-    const nonce = await this.getNextNonce(safeAddress, network)
-    const signature = await generateLedgerSignature({
+    const nonce = await this.getNextNonce(safeAddress, network, request.nonceOffset || 0)
+    
+    // Generate transaction hash first
+    const txHash = await this.generateTransactionHash(
+      safeAddress,
+      contractAddress,
+      encodedData,
+      '0',
+      0,
+      0,
+      0,
+      0,
+      '0x0000000000000000000000000000000000000000',
+      '0x0000000000000000000000000000000000000000',
+      nonce,
+      network
+    )
+    
+    const ledgerSignatureResult = await generateLedgerSignature({
       to: contractAddress,
       data: encodedData,
       value: '0',
       safeAddress,
-      nonce
+      nonce,
+      txHash
     })
 
     const transactionRequest: SafeTransactionRequest = {
@@ -130,23 +150,13 @@ export class GnosisSafeAdminClient {
       gasPrice: 0,
       refundReceiver: '0x0000000000000000000000000000000000000000',
       nonce,
-      contractTransactionHash: await this.generateTransactionHash(
-        safeAddress,
-        contractAddress,
-        encodedData,
-        '0',
-        0,
-        0,
-        0,
-        0,
-        '0x0000000000000000000000000000000000000000',
-        '0x0000000000000000000000000000000000000000',
-        nonce,
-        network
-      ),
-      sender: safeAddress,
-      signature
+      contractTransactionHash: txHash,
+      sender: ledgerSignatureResult.signerAddress,
+      signature: ledgerSignatureResult.signature
     }
+    console.log( ledgerSignatureResult )
+
+    console.log( transactionRequest )
 
     const response = await this.submitTransaction(transactionRequest, network)
     
@@ -193,8 +203,8 @@ export class GnosisSafeAdminClient {
     const multiSendData = this.encodeMultiSendData(transactions)
     const multiSendAddress = this.getMultiSendAddress(network)
 
-    const nonce = await this.getNextNonce(safeAddress, network)
-    const signature = await generateLedgerSignature({
+    const nonce = await this.getNextNonce(safeAddress, network, request.nonceOffset || 0)
+    const ledgerSignatureResult = await generateLedgerSignature({
       to: multiSendAddress,
       data: multiSendData,
       value: '0',
@@ -228,8 +238,8 @@ export class GnosisSafeAdminClient {
         nonce,
         network
       ),
-      sender: safeAddress,
-      signature
+      sender: ledgerSignatureResult.signerAddress,
+      signature: ledgerSignatureResult.signature
     }
 
     const response = await this.submitTransaction(transactionRequest, network)
@@ -252,6 +262,7 @@ export class GnosisSafeAdminClient {
       
 
       console.log(`submitTransaction ${url }`)
+      console.log('Transaction payload:', JSON.stringify(transaction, null, 2))
 
 
     const headers: Record<string, string> = {
@@ -262,20 +273,45 @@ export class GnosisSafeAdminClient {
     // Add Authorization header if API key is provided
     if (this.apiKey) {
       headers['Authorization'] = `Bearer ${this.apiKey}`
+      console.log('Using API key for authentication')
+    } else {
+      console.log('No API key provided')
     }
+    
+    console.log('Request headers:', headers)
     
     const response = await fetch(url, {
       method: 'POST',
       headers,
       body: JSON.stringify(transaction)
     })
+    
+    console.log('Response status:', response.status)
+    console.log('Response headers:', Object.fromEntries(response.headers.entries()))
 
     if (!response.ok) {
       const error = await response.text()
       throw new Error(`Failed to submit transaction to Safe: ${response.status} ${error}`)
     }
 
-    return await response.json()
+    const responseText = await response.text()
+    console.log('Safe API response:', responseText)
+    
+    // Safe API returns 201 with empty body on successful submission
+    if (response.status === 201 && !responseText) {
+      console.log('Transaction successfully submitted to Safe (201 with empty response)')
+      return { success: true, safeTxHash: transaction.contractTransactionHash }
+    }
+    
+    if (!responseText) {
+      throw new Error('Empty response from Safe API')
+    }
+    
+    try {
+      return JSON.parse(responseText)
+    } catch (parseError) {
+      throw new Error(`Failed to parse Safe API response: ${parseError.message}. Response: ${responseText}`)
+    }
   }
 
   private encodeTransactionData(functionInterface: any, functionInputs: any[]): string {
@@ -322,7 +358,7 @@ export class GnosisSafeAdminClient {
   https://safe-transaction-mainnet.safe.global/api/v1/safes/0xcd2E72aEBe2A203b84f46DEEC948E6465dB51c75/
   
   */
-  private async getNextNonce(safeAddress: string, network: string): Promise<number> {
+  private async getNextNonce(safeAddress: string, network: string, offset: number = 0): Promise<number> {
     const getNetwork = this.getNetworkPath([{network} as any])
     const url = `https://safe-transaction-${getNetwork}.safe.global/api/v1/safes/${safeAddress}/`
       
@@ -347,7 +383,7 @@ export class GnosisSafeAdminClient {
     }
 
     const safeInfo = await response.json()
-    return safeInfo.nonce
+    return parseInt(safeInfo.nonce) + parseInt(offset)
   }
 
   private getChainId(network: string): number {
@@ -367,18 +403,18 @@ export class GnosisSafeAdminClient {
   }
 
   private async generateTransactionHash(
-    safeAddress: string, 
-    to: string, 
+    safeAddress: string,
+    to: string,
     data: string,
-    value: string = '0',
-    operation: number = 0,
-    safeTxGas: number = 0,
-    baseGas: number = 0,
-    gasPrice: number = 0,
-    gasToken: string = '0x0000000000000000000000000000000000000000',
-    refundReceiver: string = '0x0000000000000000000000000000000000000000',
+    value: string,
+    operation: number,
+    safeTxGas: number,
+    baseGas: number,
+    gasPrice: number,
+    gasToken: string,
+    refundReceiver: string,
     nonce: number,
-    network: string = 'mainnet'
+    network: string
   ): Promise<string> {
     const { ethers } = require('ethers')
     
@@ -416,7 +452,9 @@ export class GnosisSafeAdminClient {
       nonce
     }
     
-    return ethers.TypedDataEncoder.hash(domain, types, message)
+    const safeTxHash = ethers.TypedDataEncoder.hash(domain, types, message)
+    console.log(`tx hash is ${safeTxHash}`);
+    return safeTxHash
   }
 
 /*

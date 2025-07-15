@@ -78,8 +78,16 @@ export class GnosisSafeAdminClient {
 
   async createProposal(request: CreateProposalRequest): Promise<ProposalResponse> {
     const safeAddress = request.via
-    const network = this.getNetworkPath(request.contract)
-    
+
+    var network = request.contract.network;
+
+    //hack ..
+    if (network == 'matic') {
+      network = 'polygon'
+    }
+
+    console.log( `network: ${network }`  )
+
     if (request.type === 'batch') {
       return await this.createBatchProposal(request, safeAddress, network)
     } else {
@@ -194,9 +202,13 @@ export class GnosisSafeAdminClient {
     transaction: SafeTransactionRequest,
     network: string
   ): Promise<{ safeTxHash: string }> {
-    const getNetwork = this.getNetworkPathShorthand([{network} as any])
-    const url = `https://safe-transaction-${getNetwork}.safe.global/api/v1/safes/${transaction.safe}/multisig-transactions/`
-    
+    const getNetwork = this.getNetworkPath([{network} as any])
+    const url = `https://safe-transaction-${getNetwork}.safe.global/api/v2/safes/${transaction.safe}/multisig-transactions/`
+      
+
+      console.log(`submitTransaction ${url }`)
+
+
     const headers: Record<string, string> = {
       'accept': 'application/json',
       'content-type': 'application/json'
@@ -268,7 +280,10 @@ export class GnosisSafeAdminClient {
   private async getNextNonce(safeAddress: string, network: string): Promise<number> {
     const getNetwork = this.getNetworkPath([{network} as any])
     const url = `https://safe-transaction-${getNetwork}.safe.global/api/v1/safes/${safeAddress}/`
-    
+      
+      console.log(`getNextNonce ${url }`)
+
+
     const response = await fetch(url, {
       headers: {
         'accept': 'application/json',
@@ -276,6 +291,7 @@ export class GnosisSafeAdminClient {
       }
     })
 
+    
     if (!response.ok) {
       const errorText = await response.text()
       if (response.status === 404) {
@@ -299,6 +315,7 @@ export class GnosisSafeAdminClient {
     )
   }
 
+/*
   private getNetworkPathShorthand(contract: PartialContract | PartialContract[]): string {
     const firstContract = Array.isArray(contract) ? contract[0] : contract
     const network = firstContract.network
@@ -318,7 +335,7 @@ export class GnosisSafeAdminClient {
     }
     
     return networkMap[network as string] || 'eth'
-  }
+  }*/
 
   private getNetworkPath(contract: PartialContract | PartialContract[]): string { 
     const firstContract = Array.isArray(contract) ? contract[0] : contract

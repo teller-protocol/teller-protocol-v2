@@ -47,4 +47,9 @@ deployFn.tags = [
   'lender-commitment-forwarder:alpha:deploy',
 ]
 deployFn.dependencies = ['teller-v2:deploy', 'market-registry:deploy']
+
+deployFn.skip = async (hre) => {
+  return !hre.network.live || !['sepolia','polygon','mainnet','mainnet_live_fork','arbitrum','base','optimism' ].includes(hre.network.name)
+}
+
 export default deployFn

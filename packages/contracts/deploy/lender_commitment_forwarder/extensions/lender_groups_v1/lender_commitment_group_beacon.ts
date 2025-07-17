@@ -6,6 +6,7 @@ import { DeployFunction } from 'hardhat-deploy/dist/types'
 import { UpgradeableBeacon } from 'types/typechain'
 
 
+import { get_ecosystem_contract_address } from "../../../../helpers/ecosystem-contracts-lookup" 
 /*
 
 This deploys a one-off test contract of the lender commitment group contract !
@@ -32,27 +33,7 @@ const deployFn: DeployFunction = async (hre) => {
   const smartCommitmentForwarderAddress =
     await SmartCommitmentForwarder.getAddress()
 
-  let uniswapV3FactoryAddress: string
-  switch (hre.network.name) {
-    case 'mainnet':
-    case 'mainnet_live_fork':
-    case 'goerli':
-    case 'arbitrum':
-    case 'optimism':
-    case 'polygon':
-    case 'localhost':
-      uniswapV3FactoryAddress = '0x1F98431c8aD98523631AE4a59f267346ea31F984'
-      break
-    case 'base':
-      uniswapV3FactoryAddress = '0x33128a8fC17869897dcE68Ed026d694621f6FDfD'
-      break
-    case 'sepolia':
-      uniswapV3FactoryAddress = '0x0227628f3F023bb0B980b67D528571c95c6DaC1c'
-      break
-    default:
-      throw new Error('No swap factory address found for this network')
-  }
-
+let uniswapV3FactoryAddress: string =  get_ecosystem_contract_address( hre.network.name, "uniswapV3Factory" ) ;
  
 
 

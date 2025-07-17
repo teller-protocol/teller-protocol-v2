@@ -108,6 +108,7 @@ type NetworkNames =
   | 'base'
   | 'mantle'
   | 'optimism'
+  | 'katana'
   | 'sepolia'
   | 'mumbai'
   | 'goerli'
@@ -149,6 +150,9 @@ const networkUrls: Record<NetworkNames, string> = {
   (ALCHEMY_API_KEY
     ? `https://opt-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
     : ''),
+
+
+      katana:  'https://rpc.katana.network/', 
 
 
   mantle: 'https://rpc.mantle.xyz',
@@ -222,6 +226,7 @@ export default <HardhatUserConfig>{
       arbitrumOne: process.env.ARBISCAN_VERIFY_API_KEY,
       base: process.env.BASESCAN_VERIFY_API_KEY,
       optimism: process.env.ETHERSCANV2_VERIFY_API_KEY,  //using the v2 api 
+      katana: process.env.ETHERSCANV2_VERIFY_API_KEY,  //using the v2 api 
       mantle: process.env.MANTLE_VERIFY_API_KEY ?? 'xyz',
       clarity: '', //none ? 
 
@@ -247,6 +252,14 @@ export default <HardhatUserConfig>{
         urls: {
           apiURL: 'https://api.etherscan.io/v2/api?chainid=10',
           browserURL: 'https://optimistic.etherscan.io',
+        },
+      },
+             {
+        network: 'katana',
+        chainId: 747474,
+        urls: {
+          apiURL: 'https://api.etherscan.io/v2/api?chainid=747474',
+          browserURL: 'https://explorer.katanarpc.com/',
         },
       },
       {
@@ -370,6 +383,7 @@ export default <HardhatUserConfig>{
       100000001: '0x9E3bfee4C6b4D28b5113E4786A1D9812eB3D2Db6',
       100000002: '0x9E3bfee4C6b4D28b5113E4786A1D9812eB3D2Db6',
       10: '0xE50A07B402AdC5A22E03E58148Dec4A18F018B1E', //optimism
+      747474: ''
       5: '0x0061CA4F1EB8c3FF93Df074061844d3dd4dC0377',
       137: '0xFea0FB908E31567CaB641865212cF76BE824D848',
       5000: '0x4496c03dA72386255Bf4af60b3CCe07787d3dCC2',
@@ -383,6 +397,7 @@ export default <HardhatUserConfig>{
       100000001: '0xe6774DAAEdf6e95b222CD3dE09456ec0a46672C4',
       100000002: '0xe6774DAAEdf6e95b222CD3dE09456ec0a46672C4',
        10: '0x6b1ec259a35005b7562c92f42c490f39131ff1d8', //optimism
+       747474: '0xfA87381128aAF95fB637BbA0B760bA2f9970c2b5'
       5: '0x0e8A920f0338b94828aE84a7C227bC17F3a02f86',
       137: '0x6eB9b34913Bd96CA2695519eD0F8B8752d43FD2b',
       5000: '0x6BBf498C429C51d05bcA3fC67D2C720B15FC73B8',
@@ -517,7 +532,22 @@ export default <HardhatUserConfig>{
 
       verify: {
         etherscan: {
-          apiKey: process.env.OPTIMISMSCAN_VERIFY_API_KEY,
+          apiKey: process.env.ETHERSCANV2_VERIFY_API_KEY,
+        },
+      },
+    }),
+
+
+
+     katana: networkConfig({
+      url: networkUrls.katana,
+      chainId: 747474,
+      live: true,
+      // gasPrice: ethers.utils.parseUnits('110', 'gwei').toNumber(),
+
+      verify: {
+        etherscan: {
+          apiKey: process.env.ETHERSCANV2_VERIFY_API_KEY,
         },
       },
     }),

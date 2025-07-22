@@ -67,7 +67,7 @@ graph auth
 
  graph deploy   tellerv2-polygon --version-label 0.4.21-18
 
-graph deploy   teller-v-2-optimism --version-label 0.4.21-18
+graph deploy   teller-v-2-optimism --version-label 0.4.21-19
 
 
  

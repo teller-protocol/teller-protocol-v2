@@ -54,5 +54,5 @@
   "lender-commitment-group-beacon-v2:deploy": 1750698126,
   "lender-commitment-group-factory-v2:deploy": 1750698146,
   "lender-commitment-forwarder:extensions:borrow-swap:deploy": 1752601699,
-  "smart-commitment-forwarder:upgrade-oracle": 1752608405
+  "smart-commitment-forwarder:upgrade-oracle": 1753216825
 }

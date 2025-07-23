@@ -1,0 +1,218 @@
+{
+  "address": "0xfDDcEc68cfa40c38Faf05F918484fC416a221BFF",
+  "abi": [
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "Initialized",
+      "inputs": [
+        {
+          "type": "uint8",
+          "name": "version",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "MarkAdded",
+      "inputs": [
+        {
+          "type": "address",
+          "name": "account",
+          "indexed": true
+        },
+        {
+          "type": "uint8",
+          "name": "repMark",
+          "indexed": true
+        },
+        {
+          "type": "uint256",
+          "name": "bidId",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "MarkRemoved",
+      "inputs": [
+        {
+          "type": "address",
+          "name": "account",
+          "indexed": true
+        },
+        {
+          "type": "uint8",
+          "name": "repMark",
+          "indexed": true
+        },
+        {
+          "type": "uint256",
+          "name": "bidId",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "CONTROLLER",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "bytes32",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getCurrentDefaultLoanIds",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "_account"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256[]",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getCurrentDelinquentLoanIds",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "_account"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256[]",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getDefaultedLoanIds",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "_account"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256[]",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getDelinquentLoanIds",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "_account"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256[]",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "initialize",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "_tellerV2"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "tellerV2",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "updateAccountReputation",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "_account"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "updateAccountReputation",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "_account"
+        },
+        {
+          "type": "uint256",
+          "name": "_bidId"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint8",
+          "name": ""
+        }
+      ]
+    }
+  ],
+  "transactionHash": "0xf71f7be5ed4a17f0fac30dcc9e062030240ad778f094fccde1f956fb0548f6b7",
+  "receipt": {
+    "to": null,
+    "from": "0xD9B023522CeCe02251d877bb0EB4f06fDe6F98E6",
+    "blockHash": "0xb3620c3dcbebf0b1f770e8f6284874ec7a40c44b8da9743f6a74e50171730827",
+    "blockNumber": 6536692
+  },
+  "numDeployments": 1,
+  "implementation": "0x7f43c21D4FE1807BF2CF25e6F048A03b57226e03"
+}

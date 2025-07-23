@@ -1,28 +1,17 @@
 import { DeployFunction } from 'hardhat-deploy/dist/types'
 
+
+import { get_ecosystem_contract_address } from "../../helpers/ecosystem-contracts-lookup" 
+
+
 const deployFn: DeployFunction = async (hre) => {
   const tellerV2 = await hre.contracts.get('TellerV2')
   const marketRegistry = await hre.contracts.get('MarketRegistry')
 
-  let uniswapFactoryAddress: string
-  switch (hre.network.name) {
-    case 'mainnet':
-    case 'goerli':
-    case 'arbitrum':
-    case 'optimism':
-    case 'polygon':
-    case 'localhost':
-      uniswapFactoryAddress = '0x1F98431c8aD98523631AE4a59f267346ea31F984'
-      break
-    case 'base':
-      uniswapFactoryAddress = '0x33128a8fC17869897dcE68Ed026d694621f6FDfD'
-      break
-    case 'sepolia':
-      uniswapFactoryAddress = '0x0227628f3F023bb0B980b67D528571c95c6DaC1c'
-      break
-    default:
-      throw new Error('No swap factory address found for this network')
-  }
+
+ let uniswapV3FactoryAddress: string =  get_ecosystem_contract_address( hre.network.name, "uniswapV3Factory" ) ;
+   
+    
 
   const lenderCommitmentForwarderAlpha = await hre.deployProxy(
     'LenderCommitmentForwarderAlpha',
@@ -31,7 +20,7 @@ const deployFn: DeployFunction = async (hre) => {
       constructorArgs: [
         await tellerV2.getAddress(),
         await marketRegistry.getAddress(),
-        uniswapFactoryAddress,
+        uniswapV3FactoryAddress,
       ],
     }
   )

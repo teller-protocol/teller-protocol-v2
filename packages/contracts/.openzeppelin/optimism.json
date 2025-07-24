@@ -6212,6 +6212,16 @@
         "types": {},
         "namespaces": {}
       }
+    },
+    "8a91fd71317f6d594bad114c98de5c9458772f1dae58916597886f3a3b2ea998": {
+      "address": "0x6f31d15396F5ca68db7D5D4ab0Af45B920272aA8",
+      "txHash": "0x2cf57748ebc8565779a48f1b67ebafe3f26e8532a8c268a5a00536e66074a0b3",
+      "layout": {
+        "solcVersion": "0.8.11",
+        "storage": [],
+        "types": {},
+        "namespaces": {}
+      }
     }
   }
 }

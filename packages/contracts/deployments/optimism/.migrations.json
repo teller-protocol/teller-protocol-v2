@@ -22,5 +22,6 @@
   "default-proxy-admin:transfer": 1751392586,
   "smart-commitment-forwarder:upgrade-oracle": 1751392609,
   "lender-commitment-forwarder:extensions:flash-swap-rollover:deploy": 1753367388,
-  "lender-commitment-forwarder:extensions:loan-referral-forwarder-v2:deploy": 1753367443
+  "lender-commitment-forwarder:extensions:loan-referral-forwarder-v2:deploy": 1753367443,
+  "lender-commitment-forwarder-v2:upgrade-transfer": 1753386968
 }

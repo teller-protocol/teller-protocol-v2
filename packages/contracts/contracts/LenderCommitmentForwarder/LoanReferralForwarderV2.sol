@@ -126,16 +126,16 @@ contract LoanReferralForwarderV2
          uint256 balanceAfter = IERC20(principalTokenAddress).balanceOf(address(this));
 
          uint256 fundsRemaining = balanceAfter - balanceBefore;
- 
+    
+         require(fundsRemaining >= _reward, "Insufficient funds for reward");
 
          if (_reward > 0) {
-             TransferHelper.safeTransferFrom(principalTokenAddress,  address(this), _rewardRecipient, _reward);
-           
+             TransferHelper.safeTransfer(principalTokenAddress,    _rewardRecipient, _reward);
          }
 
-         //check for 0 here ? 
-         TransferHelper.safeTransferFrom(principalTokenAddress,  address(this), _recipient,   fundsRemaining - _reward);       
- 
+         if (fundsRemaining - _reward > 0) {
+              TransferHelper.safeTransfer(principalTokenAddress,    _recipient,   fundsRemaining - _reward);       
+        }
 
         emit CommitmentAcceptedWithReward( bidId_, _recipient, principalTokenAddress, fundsRemaining, _reward, _rewardRecipient , _atmId);
   

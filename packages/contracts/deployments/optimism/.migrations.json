@@ -20,5 +20,7 @@
   "liquidity-rewards:deploy": 1751392585,
   "validate-deployments": 1751392586,
   "default-proxy-admin:transfer": 1751392586,
-  "smart-commitment-forwarder:upgrade-oracle": 1751392609
+  "smart-commitment-forwarder:upgrade-oracle": 1751392609,
+  "lender-commitment-forwarder:extensions:flash-swap-rollover:deploy": 1753367388,
+  "lender-commitment-forwarder:extensions:loan-referral-forwarder-v2:deploy": 1753367443
 }

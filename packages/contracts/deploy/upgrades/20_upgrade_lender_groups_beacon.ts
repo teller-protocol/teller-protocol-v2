@@ -23,7 +23,7 @@ const deployFn: DeployFunction = async (hre) => {
   const smartCommitmentForwarderAddress =
     await SmartCommitmentForwarder.getAddress()
 
- let uniswapV3FactoryAddress: string =  get_ecosystem_contract_address( hre.network.name, "uniswapV3Factory" ) ;
+   let uniswapV3FactoryAddress  =  get_ecosystem_contract_address( hre.network.name, "uniswapV3Factory" ) ;
    
 
   const uniswapPricingLibrary = await hre.deployments.get('UniswapPricingLibrary')

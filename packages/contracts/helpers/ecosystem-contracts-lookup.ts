@@ -5,13 +5,13 @@
 
 export function get_ecosystem_contract_address(
 	networkName: string, contractName: string 
-): string {
+): string | undefined {
 
 
 	if (contractName === "uniswapV3Factory") {
 
 
-	  let uniswapV3FactoryAddress: string
+	  let uniswapV3FactoryAddress: string | undefined  = undefined 
 	  switch (networkName) {  //hre.network.name
 	    case 'mainnet':
 	    case 'mainnet_live_fork':
@@ -32,7 +32,7 @@ export function get_ecosystem_contract_address(
 	      uniswapV3FactoryAddress = '0x203e8740894c8955cB8950759876d7E7E45E04c1'
 	      break
 	    default:
-	      throw new Error('No swap factory address found for this network')
+	      return undefined 
 	  }
 
 	  return uniswapV3FactoryAddress; 
@@ -40,6 +40,39 @@ export function get_ecosystem_contract_address(
 
 	}
 
+	if (contractName === "weth9") {
+
+
+		let weth9Address: string | undefined  = undefined 
+		  switch (networkName) {  //hre.network.name
+		    case 'mainnet':		   
+		    case 'mainnet_live_fork':
+		      weth9Address = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
+		      break
+		    case 'base':
+		      weth9Address = '0x4200000000000000000000000000000000000006'
+		      break
+		    case 'polygon':
+		      weth9Address = '0x7ceb23fd6bc0add59e62ac25578270cff1b9f619'
+		      break
+		    case 'arbitrum':
+		      weth9Address = '0x82af49447d8a07e3bd95bd0d56f35241523fbab1'
+		      break
+		     case 'optimism':
+		      weth9Address = '0x4200000000000000000000000000000000000006'
+		      break
+		     case 'katana':
+		       weth9Address = '0xEE7D8BCFb72bC1880D0Cf19822eB0A2e6577aB62'
+		       break 
+		    default:
+		    	return undefined 
+		      //throw new Error('No swap factory address found for this network')
+		  }
+
+	  return weth9Address; 
+	}
+
+	 
 	 
 
 

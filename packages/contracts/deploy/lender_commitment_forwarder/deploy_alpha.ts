@@ -9,9 +9,9 @@ const deployFn: DeployFunction = async (hre) => {
   const marketRegistry = await hre.contracts.get('MarketRegistry')
 
 
- let uniswapV3FactoryAddress: string =  get_ecosystem_contract_address( hre.network.name, "uniswapV3Factory" ) ;
+ let uniswapV3FactoryAddress  =  get_ecosystem_contract_address( hre.network.name, "uniswapV3Factory" ) ;
    
-    
+
 
   const lenderCommitmentForwarderAlpha = await hre.deployProxy(
     'LenderCommitmentForwarderAlpha',

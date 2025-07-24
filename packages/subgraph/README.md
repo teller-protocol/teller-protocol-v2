@@ -43,6 +43,9 @@ yarn build
 
    yarn hbs -D ./config/optimism.json ./src/subgraph.handlebars -o . -e yaml
 
+
+   yarn hbs -D ./config/katana.json ./src/subgraph.handlebars -o . -e yaml
+
 ```
  
 
@@ -60,12 +63,13 @@ graph auth
 
 6. deploy ! 
 
- graph deploy   tellerv2-base --version-label 0.4.21-19
+ graph deploy   teller-v-2-base --version-label 0.4.21-22
 
  graph deploy   tellerv2-arbitrum --version-label 0.4.21-22
 
 
- graph deploy   tellerv2-polygon --version-label 0.4.21-18
+ graph deploy   teller-v-2-katana --version-label 0.4.21-22
+ graph deploy   teller-v-2-polygon --version-label 0.4.21-22
 
 graph deploy   teller-v-2-optimism --version-label 0.4.21-19
 

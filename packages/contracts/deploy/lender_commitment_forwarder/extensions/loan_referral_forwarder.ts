@@ -6,7 +6,9 @@ import { get_ecosystem_contract_address } from "../../../helpers/ecosystem-contr
 
 
 const deployFn: DeployFunction = async (hre) => {
+  hre.log('Getting TellerV2 contract...')
   const tellerV2 = await hre.contracts.get('TellerV2')
+  hre.log('TellerV2 contract retrieved:', !!tellerV2)
    
 
 
@@ -30,18 +32,27 @@ const uniswapV3Factory: { [networkName: string]: string } = {
 
   let uniswapV3FactoryAddress =  get_ecosystem_contract_address( hre.network.name, "uniswapV3Factory" ) ;
    
-      
- 
+      const deployer = await hre.getNamedSigner('deployer')
+
 
   hre.log('Deploying Loan Referral Forwarder V2...')
+  hre.log('Network name:' )
+    hre.log(  hre.network.name)
 
+   hre.log('Deployer:' )
+          
+      hre.log(  deployer.address  )
+
+      hre.log('TellerV2 address:' )
+          
+        let tellerV2Address = await tellerV2.getAddress(); 
+      
+      hre.log( tellerV2Address  )
 
   const LoanReferralForwarder = await hre.deployProxy('LoanReferralForwarderV2', {
     unsafeAllow: ['constructor', 'state-variable-immutable'],
     constructorArgs: [
-      await tellerV2.getAddress(),
-      
-      
+      tellerV2Address  
     ],
   })
 
@@ -61,15 +72,11 @@ deployFn.dependencies = [
   'teller-v2:deploy',
   'lender-commitment-forwarder:deploy',
 ]
-
-deployFn.skip = async (hre) => {
-
  
- let uniswapV3FactoryAddress: string|undefined =  get_ecosystem_contract_address( hre.network.name, "uniswapV3Factory" ) ;
-   
-       
-
- // return true ; 
-  return !hre.network.live || !uniswapV3FactoryAddress
+deployFn.skip = async (hre) => {
+  
+ 
+  return !hre.network.live || !['sepolia' ,   'mainnet', 'arbitrum' ].includes(hre.network.name)
 }
+
 export default deployFn

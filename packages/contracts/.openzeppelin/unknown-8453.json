@@ -6855,6 +6855,16 @@
         },
         "namespaces": {}
       }
+    },
+    "d28f103516b18c192468c845128f88c37bf51eb6fb6c0830042c187d805a56e4": {
+      "address": "0xE9D02C0e0449A396A09A42fE03Ff06300C972Db5",
+      "txHash": "0x471525f0e3842796a3df64c89dc25ceae34e098ee1797a5f9f73c1bd6ec1c190",
+      "layout": {
+        "solcVersion": "0.8.11",
+        "storage": [],
+        "types": {},
+        "namespaces": {}
+      }
     }
   }
 }

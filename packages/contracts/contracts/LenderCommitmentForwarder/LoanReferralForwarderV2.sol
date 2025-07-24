@@ -129,12 +129,13 @@ contract LoanReferralForwarderV2
  
 
          if (_reward > 0) {
-             TransferHelper.safeTransferFrom(principalTokenAddress,  address(this), _rewardRecipient, _reward);           
+             TransferHelper.safeTransferFrom(principalTokenAddress,  address(this), _rewardRecipient, _reward);
+           
          }
 
-         if (fundsRemaining - _reward > 0){
-             TransferHelper.safeTransferFrom(principalTokenAddress,  address(this), _recipient,   fundsRemaining - _reward);       
-         }
+         //check for 0 here ? 
+         TransferHelper.safeTransferFrom(principalTokenAddress,  address(this), _recipient,   fundsRemaining - _reward);       
+ 
 
         emit CommitmentAcceptedWithReward( bidId_, _recipient, principalTokenAddress, fundsRemaining, _reward, _rewardRecipient , _atmId);
   

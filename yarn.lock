@@ -1749,16 +1749,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nomicfoundation/hardhat-ethers@npm:^3.0.3":
-  version: 3.0.3
-  resolution: "@nomicfoundation/hardhat-ethers@npm:3.0.3"
+"@nomicfoundation/hardhat-ethers@npm:^3.1.0":
+  version: 3.1.0
+  resolution: "@nomicfoundation/hardhat-ethers@npm:3.1.0"
   dependencies:
     debug: ^4.1.1
     lodash.isequal: ^4.5.0
   peerDependencies:
-    ethers: ^6.1.0
-    hardhat: ^2.0.0
-  checksum: 24d202fde42c697f3ca2ab91ea37664b109acfe1b1c0ef39f19e0510f5cddcaf6cf19cbfa84a7a8b93581daa99b302035495cb4760e92c24de3128dce5c76e26
+    ethers: ^6.14.0
+    hardhat: ^2.26.0
+  checksum: 19ca32a71eef0f54081f8b839c71a90d2033674d607c5b89c83800a76c2b9943fbf06c43126b0e1f95da6f47897e09250c973b71a32eff977562d3ea1cd0aa04
   languageName: node
   linkType: hard
 
@@ -2532,7 +2532,7 @@ __metadata:
     "@ethereumjs/vm": ^5.5.3
     "@ledgerhq/hw-app-eth": 6.45.10
     "@ledgerhq/hw-transport-node-hid": 6.29.8
-    "@nomicfoundation/hardhat-ethers": ^3.0.3
+    "@nomicfoundation/hardhat-ethers": ^3.1.0
     "@nomicfoundation/hardhat-verify": ^1.1.1
     "@openzeppelin/contracts": ^4.8.0
     "@openzeppelin/contracts-upgradeable": ^4.8.0

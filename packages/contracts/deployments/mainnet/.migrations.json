@@ -37,5 +37,7 @@
   "lender-commitment-forwarder:extensions:flash-swap-rollover:deploy": 1741031281,
   "lender-commitment-forwarder:extensions:borrow-swap:deploy": 1744389314,
   "lender-commitment-group-beacon-v2:deploy": 1750875302,
-  "lender-commitment-group-factory-v2:deploy": 1750875325
+  "lender-commitment-group-factory-v2:deploy": 1750875325,
+  "lender-commitment-forwarder:extensions:loan-referral-forwarder-v2:deploy": 1753457726,
+  "validate-deployments": 1753457726
 }

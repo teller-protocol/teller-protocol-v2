@@ -1194,6 +1194,10 @@ async function ozDefenderDeploy<C = BaseContract>(
 
   const abi = JSON.parse(implFactory.interface.formatJson())
   const deployTx = proxy.deploymentTransaction()
+  // Fix 'to' field to be undefined instead of empty string for contract deployment
+  if (deployTx && deployTx.to === '') {
+    deployTx.to = undefined
+  }
   const transactionHash = deployTx?.hash ?? existingDeployment?.transactionHash
   const receipt = Object.assign({}, deployTx, existingDeployment?.receipt)
   await hre.deployments.save(saveName, {

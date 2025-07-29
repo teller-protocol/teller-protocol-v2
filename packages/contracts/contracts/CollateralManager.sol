@@ -280,19 +280,26 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
         emit CollateralClaimed(_bidId);
     }
 
-     function withdrawDustTokens(
+    function withdrawDustTokens(
         uint256 _bidId,  
         address _tokenAddress, 
         uint256 _amount,
         address _recipientAddress
-        ) external onlyProtocolOwner whenProtocolNotPaused {
+     ) external onlyProtocolOwner whenProtocolNotPaused {
 
             ICollateralEscrowV1(_escrows[_bidId]).withdrawDustTokens(
                     _tokenAddress,
                     _amount,
                     _recipientAddress
                 );
-        }
+    }
+
+
+    function getCollateralEscrowBeacon() external view returns (address) {
+
+        return collateralEscrowBeacon;
+
+    }
 
     /**
      * @notice Withdraws deposited collateral from the created escrow of a bid that has been CLOSED after being defaulted.

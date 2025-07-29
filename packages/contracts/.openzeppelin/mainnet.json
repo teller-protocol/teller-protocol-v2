@@ -8926,7 +8926,7 @@
             "label": "collateralBalances",
             "offset": 0,
             "slot": "102",
-            "type": "t_mapping(t_address,t_struct(Collateral)39931_storage)",
+            "type": "t_mapping(t_address,t_struct(Collateral)47874_storage)",
             "contract": "CollateralEscrowV1",
             "src": "contracts/escrow/CollateralEscrowV1.sol:19"
           }
@@ -8948,7 +8948,7 @@
             "label": "bool",
             "numberOfBytes": "1"
           },
-          "t_enum(CollateralType)39921": {
+          "t_enum(CollateralType)47864": {
             "label": "enum CollateralType",
             "members": [
               "ERC20",
@@ -8957,16 +8957,16 @@
             ],
             "numberOfBytes": "1"
           },
-          "t_mapping(t_address,t_struct(Collateral)39931_storage)": {
+          "t_mapping(t_address,t_struct(Collateral)47874_storage)": {
             "label": "mapping(address => struct Collateral)",
             "numberOfBytes": "32"
           },
-          "t_struct(Collateral)39931_storage": {
+          "t_struct(Collateral)47874_storage": {
             "label": "struct Collateral",
             "members": [
               {
                 "label": "_collateralType",
-                "type": "t_enum(CollateralType)39921",
+                "type": "t_enum(CollateralType)47864",
                 "offset": 0,
                 "slot": "0"
               },
@@ -9001,7 +9001,11 @@
           }
         },
         "namespaces": {}
-      }
+      },
+      "allAddresses": [
+        "0x0410535A1C3c59Ce477644f21662b5A96b4bA085",
+        "0x27f57e6E919EB8fa8EA8f64a45dD425C70d3Ad44"
+      ]
     },
     "2ed752e6898deb61f2edbb2801df52db4a9e499dfc25b12b751bc21a4ff19ed4": {
       "address": "0x26E2BD4F67136a7929DFE82BD6392633eb5610C2",

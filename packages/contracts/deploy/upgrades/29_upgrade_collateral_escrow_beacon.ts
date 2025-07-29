@@ -11,7 +11,16 @@ const deployFn: DeployFunction = async (hre) => {
     'CollateralManager'
   )
 
-  
+  /*
+   let collateralEscrowLegacyAddress = "0x27f57e6E919EB8fa8EA8f64a45dD425C70d3Ad44";
+  let collateralEscrowLegacyImpl = await hre.ethers.getContractFactory('CollateralEscrowV1', {}  );
+
+  const constructorArgs = [   ]; 
+
+
+ let force_import =   await hre.upgrades.forceImport( collateralEscrowLegacyAddress, collateralEscrowLegacyImpl, { constructorArgs } );
+ */
+
   const collateralEscrowBeaconProxy = await hre.contracts.get('CollateralEscrowBeacon')
 
 
@@ -25,7 +34,7 @@ const deployFn: DeployFunction = async (hre) => {
     _steps: [
       {
         beacon: collateralEscrowBeaconProxy,
-        implFactory: await hre.ethers.getContractFactory('CollateralEscrowBeacon' ),
+        implFactory: await hre.ethers.getContractFactory('CollateralEscrowV1' ),
 
         opts: {
           unsafeSkipStorageCheck: true, 

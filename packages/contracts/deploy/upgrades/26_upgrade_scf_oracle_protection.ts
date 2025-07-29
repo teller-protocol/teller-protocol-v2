@@ -15,7 +15,7 @@ const deployFn: DeployFunction = async (hre) => {
   )
 
  
- 
+ /*
   let scfLegacyAddress = "0x2e917438fdb3969c5ebf63df71712d10c9ecd89d";
   let scfLegacyImpl = await hre.ethers.getContractFactory('SmartCommitmentForwarder', {}  );
 
@@ -26,7 +26,7 @@ const deployFn: DeployFunction = async (hre) => {
 
 
  let force_import =   await hre.upgrades.forceImport( scfLegacyAddress, scfLegacyImpl, { constructorArgs } );
- 
+ */
  
 
   await hre.upgrades.proposeBatchTimelock({
@@ -44,8 +44,11 @@ const deployFn: DeployFunction = async (hre) => {
 
         opts: {
           unsafeAllow: ['constructor', 'state-variable-immutable'],
-          // unsafeAllowRenames: true,
-          // unsafeSkipStorageCheck: true, //caution !
+           unsafeAllowRenames: true,
+          unsafeSkipStorageCheck: true, //caution !
+           redeployImplementation: 'always',
+
+
           constructorArgs: [
             await tellerV2.getAddress(),
             await marketRegistry.getAddress(),

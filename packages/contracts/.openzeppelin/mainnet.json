@@ -8694,7 +8694,7 @@
             "label": "tellerV2",
             "offset": 0,
             "slot": "101",
-            "type": "t_contract(ITellerV2)38227",
+            "type": "t_contract(ITellerV2)46170",
             "contract": "CollateralManager",
             "src": "contracts/CollateralManager.sol:24"
           },
@@ -8718,7 +8718,7 @@
             "label": "_bidCollaterals",
             "offset": 0,
             "slot": "104",
-            "type": "t_mapping(t_uint256,t_struct(CollateralInfo)13720_storage)",
+            "type": "t_mapping(t_uint256,t_struct(CollateralInfo)14335_storage)",
             "contract": "CollateralManager",
             "src": "contracts/CollateralManager.sol:30"
           }
@@ -8748,11 +8748,11 @@
             "label": "bytes32",
             "numberOfBytes": "32"
           },
-          "t_contract(ITellerV2)38227": {
+          "t_contract(ITellerV2)46170": {
             "label": "contract ITellerV2",
             "numberOfBytes": "20"
           },
-          "t_enum(CollateralType)39921": {
+          "t_enum(CollateralType)47864": {
             "label": "enum CollateralType",
             "members": [
               "ERC20",
@@ -8761,7 +8761,7 @@
             ],
             "numberOfBytes": "1"
           },
-          "t_mapping(t_address,t_struct(Collateral)39931_storage)": {
+          "t_mapping(t_address,t_struct(Collateral)47874_storage)": {
             "label": "mapping(address => struct Collateral)",
             "numberOfBytes": "32"
           },
@@ -8773,28 +8773,28 @@
             "label": "mapping(uint256 => address)",
             "numberOfBytes": "32"
           },
-          "t_mapping(t_uint256,t_struct(CollateralInfo)13720_storage)": {
+          "t_mapping(t_uint256,t_struct(CollateralInfo)14335_storage)": {
             "label": "mapping(uint256 => struct CollateralManager.CollateralInfo)",
             "numberOfBytes": "32"
           },
-          "t_struct(AddressSet)5209_storage": {
+          "t_struct(AddressSet)5821_storage": {
             "label": "struct EnumerableSetUpgradeable.AddressSet",
             "members": [
               {
                 "label": "_inner",
-                "type": "t_struct(Set)4894_storage",
+                "type": "t_struct(Set)5506_storage",
                 "offset": 0,
                 "slot": "0"
               }
             ],
             "numberOfBytes": "64"
           },
-          "t_struct(Collateral)39931_storage": {
+          "t_struct(Collateral)47874_storage": {
             "label": "struct Collateral",
             "members": [
               {
                 "label": "_collateralType",
-                "type": "t_enum(CollateralType)39921",
+                "type": "t_enum(CollateralType)47864",
                 "offset": 0,
                 "slot": "0"
               },
@@ -8819,25 +8819,25 @@
             ],
             "numberOfBytes": "128"
           },
-          "t_struct(CollateralInfo)13720_storage": {
+          "t_struct(CollateralInfo)14335_storage": {
             "label": "struct CollateralManager.CollateralInfo",
             "members": [
               {
                 "label": "collateralAddresses",
-                "type": "t_struct(AddressSet)5209_storage",
+                "type": "t_struct(AddressSet)5821_storage",
                 "offset": 0,
                 "slot": "0"
               },
               {
                 "label": "collateralInfo",
-                "type": "t_mapping(t_address,t_struct(Collateral)39931_storage)",
+                "type": "t_mapping(t_address,t_struct(Collateral)47874_storage)",
                 "offset": 0,
                 "slot": "2"
               }
             ],
             "numberOfBytes": "96"
           },
-          "t_struct(Set)4894_storage": {
+          "t_struct(Set)5506_storage": {
             "label": "struct EnumerableSetUpgradeable.Set",
             "members": [
               {
@@ -9564,6 +9564,230 @@
         "solcVersion": "0.8.11",
         "storage": [],
         "types": {},
+        "namespaces": {}
+      }
+    },
+    "0d4a31f6f624b9c75868f8aea57e4c032618e937096f23cbd615456f3839a1e1": {
+      "address": "0x067f931431bffbB01e11BaB835273bf97DC71b98",
+      "txHash": "0x41f51c36c2a7c05f7241d9b09dbde885a6fadca51fdcf607b049a94a60e1d4af",
+      "layout": {
+        "solcVersion": "0.8.11",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:94"
+          },
+          {
+            "label": "tellerV2",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_contract(ITellerV2)13614",
+            "contract": "CollateralManager",
+            "src": "contracts/CollateralManager.sol:24"
+          },
+          {
+            "label": "collateralEscrowBeacon",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_address",
+            "contract": "CollateralManager",
+            "src": "contracts/CollateralManager.sol:25"
+          },
+          {
+            "label": "_escrows",
+            "offset": 0,
+            "slot": "103",
+            "type": "t_mapping(t_uint256,t_address)",
+            "contract": "CollateralManager",
+            "src": "contracts/CollateralManager.sol:28"
+          },
+          {
+            "label": "_bidCollaterals",
+            "offset": 0,
+            "slot": "104",
+            "type": "t_mapping(t_uint256,t_struct(CollateralInfo)7056_storage)",
+            "contract": "CollateralManager",
+            "src": "contracts/CollateralManager.sol:30"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_bytes32)dyn_storage": {
+            "label": "bytes32[]",
+            "numberOfBytes": "32"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_bytes32": {
+            "label": "bytes32",
+            "numberOfBytes": "32"
+          },
+          "t_contract(ITellerV2)13614": {
+            "label": "contract ITellerV2",
+            "numberOfBytes": "20"
+          },
+          "t_enum(CollateralType)13620": {
+            "label": "enum CollateralType",
+            "members": [
+              "ERC20",
+              "ERC721",
+              "ERC1155"
+            ],
+            "numberOfBytes": "1"
+          },
+          "t_mapping(t_address,t_struct(Collateral)13630_storage)": {
+            "label": "mapping(address => struct Collateral)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_bytes32,t_uint256)": {
+            "label": "mapping(bytes32 => uint256)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_address)": {
+            "label": "mapping(uint256 => address)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_struct(CollateralInfo)7056_storage)": {
+            "label": "mapping(uint256 => struct CollateralManager.CollateralInfo)",
+            "numberOfBytes": "32"
+          },
+          "t_struct(AddressSet)2465_storage": {
+            "label": "struct EnumerableSetUpgradeable.AddressSet",
+            "members": [
+              {
+                "label": "_inner",
+                "type": "t_struct(Set)2150_storage",
+                "offset": 0,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "64"
+          },
+          "t_struct(Collateral)13630_storage": {
+            "label": "struct Collateral",
+            "members": [
+              {
+                "label": "_collateralType",
+                "type": "t_enum(CollateralType)13620",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "_amount",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "_tokenId",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "_collateralAddress",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "3"
+              }
+            ],
+            "numberOfBytes": "128"
+          },
+          "t_struct(CollateralInfo)7056_storage": {
+            "label": "struct CollateralManager.CollateralInfo",
+            "members": [
+              {
+                "label": "collateralAddresses",
+                "type": "t_struct(AddressSet)2465_storage",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "collateralInfo",
+                "type": "t_mapping(t_address,t_struct(Collateral)13630_storage)",
+                "offset": 0,
+                "slot": "2"
+              }
+            ],
+            "numberOfBytes": "96"
+          },
+          "t_struct(Set)2150_storage": {
+            "label": "struct EnumerableSetUpgradeable.Set",
+            "members": [
+              {
+                "label": "_values",
+                "type": "t_array(t_bytes32)dyn_storage",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "_indexes",
+                "type": "t_mapping(t_bytes32,t_uint256)",
+                "offset": 0,
+                "slot": "1"
+              }
+            ],
+            "numberOfBytes": "64"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        },
         "namespaces": {}
       }
     }

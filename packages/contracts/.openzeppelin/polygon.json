@@ -20843,6 +20843,20 @@
           }
         },
         "namespaces": {}
+      },
+      "allAddresses": [
+        "0x0AeeeD450EcCaFaA140222De43963B179B514540",
+        "0x2e917438fdb3969c5ebf63df71712d10c9ecd89d"
+      ]
+    },
+    "549bf3c18bbc9d7aa301b8758dc197bd4d07b07a47d837ff282c1c32ad1f0f9f": {
+      "address": "0x026B3B8D983e0f43d06FEAB9d8e6FDf9b7c4737C",
+      "txHash": "0xb32c1fc22dbb47655c7307e4a11e253028a40b90d36a4f4700cabc1bec7ce44e",
+      "layout": {
+        "solcVersion": "0.8.11",
+        "storage": [],
+        "types": {},
+        "namespaces": {}
       }
     }
   }

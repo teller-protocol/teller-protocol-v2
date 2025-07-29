@@ -15,10 +15,10 @@ const deployFn: DeployFunction = async (hre) => {
     'CollateralEscrowBeacon'
   )
   const lenderManager = await hre.contracts.get('LenderManager')
-  const lenderCommitmentForwarder = await hre.contracts.get(
+ /* const lenderCommitmentForwarder = await hre.contracts.get(
     'LenderCommitmentForwarder'
   )
-
+*/
 
   const protocolPausingManager = await hre.contracts.get('ProtocolPausingManager')
   

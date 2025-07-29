@@ -24,6 +24,7 @@ contract CollateralManager_Test is Testable {
     User private borrower;
     User private lender;
     User private liquidator;
+    User private protocolOwner; 
 
     TestERC20Token wethMock;
     TestERC721Token erc721Mock;
@@ -72,11 +73,13 @@ contract CollateralManager_Test is Testable {
         borrower = new User();
         lender = new User();
         liquidator = new User();
+        protocolOwner = new User();
 
         ProtocolPausingManager protocolPausingManager = new ProtocolPausingManager();
         protocolPausingManager.initialize();
 
         tellerV2Mock.setProtocolPausingManager(address(protocolPausingManager));
+        tellerV2Mock.setMockOwner( address(protocolOwner) );
       
         //  uint256 borrowerBalance = 50000;
         //   payable(address(borrower)).transfer(borrowerBalance);
@@ -113,6 +116,8 @@ contract CollateralManager_Test is Testable {
             address(escrowImplementation)
         );
 
+         vm.prank(address(protocolOwner));
+
         collateralManager.setCollateralEscrowBeacon(address(escrowBeacon));
 
         //how to test ?
@@ -124,9 +129,9 @@ contract CollateralManager_Test is Testable {
         UpgradeableBeacon escrowBeacon = new UpgradeableBeacon(
             address(escrowImplementation)
         );
-        collateralManager.setCollateralEscrowBeacon(address(escrowBeacon));
+      //  collateralManager.setCollateralEscrowBeacon(address(escrowBeacon));
 
-        vm.expectRevert("Initializable: contract is already initialized");
+        vm.expectRevert("Sender not authorized");
         collateralManager.setCollateralEscrowBeacon(address(escrowBeacon));
         //
     }

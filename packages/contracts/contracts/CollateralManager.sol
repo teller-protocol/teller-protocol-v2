@@ -108,7 +108,7 @@ contract CollateralManager is OwnableUpgradeable, ICollateralManager {
      */
     function setCollateralEscrowBeacon(address _collateralEscrowBeacon)
         external
-        reinitializer(2)
+        onlyProtocolOwner
     {
         collateralEscrowBeacon = _collateralEscrowBeacon;
     }

@@ -48,6 +48,7 @@ fn get_factory_tracked_contract_address() -> [u8; 20] {
         "base" => hex!("48EA70BCe76FE2F0c79B29Bf852a1DCF957982aa"),  
          "mainnet" => hex!("21499A1Fd9f36ce527CB4A9032072ef1bb7a22F6"),  
           "optimism" => hex!("72f136B0d905780d69EbdD71fb999BFB64B9e375"),  
+          "katana" => hex!("3D495036Dfeb1bBfCCabAC74e90e01cDD5C8E578"),  
 
 
         _ => panic!("unknown evm network "),
@@ -73,6 +74,7 @@ fn get_collateral_manager_tracked_contract_address() -> [u8; 20] {
         "base" => hex!("71B04a8569914bCb99D5F95644CF6b089c826024"),
          "mainnet" => hex!("2551A099129ad9b0b1FEc16f34D9CB73c237be8b"),
           "optimism" => hex!("b8E8b0aa1F49dD5128941571802235457189538d"),
+            "katana" => hex!("6455F2E1CCb14bd0b675A309276FB5333Dec524f"),  
 
 
         _ => panic!("unknown evm network "),

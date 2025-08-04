@@ -13,10 +13,9 @@ const aavePoolAddressProvider: { [networkName: string]: string } = {
 const networksWithAave: string[] = Object.keys(aavePoolAddressProvider)
 
 const deployFn: DeployFunction = async (hre) => {
-  const tellerV2 = await hre.contracts.get('TellerV2')
-  const LenderCommitmentForwarderStaging = await hre.contracts.get(
-    'LenderCommitmentForwarderStaging'
-  )
+ 
+   const tellerV2 = await hre.contracts.get('TellerV2')
+ 
 
   const networkName = hre.network.name
 

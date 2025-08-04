@@ -3405,6 +3405,16 @@
         },
         "namespaces": {}
       }
+    },
+    "4e953bf2c8dae3a08cc5d61dce4b3d6c91eacfca9b1ca1d308aaabd3a4a38461": {
+      "address": "0xa77517dA5986793C9FAd1638212DbE05E9f5f0c5",
+      "txHash": "0xab83aaf7fa493458c37ea4e1646ae677d742bcaa87d22b8b8b76efbac0c1a479",
+      "layout": {
+        "solcVersion": "0.8.11",
+        "storage": [],
+        "types": {},
+        "namespaces": {}
+      }
     }
   }
 }

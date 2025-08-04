@@ -148,7 +148,7 @@ contract LenderCommitmentGroup_Pool_V2 is
 
     int256 tokenDifferenceFromLiquidations;
 
-    bool public firstDepositMade;
+    bool private firstDepositMade_deprecated;  // no longer used
     uint256 public withdrawDelayTimeSeconds; 
 
     IUniswapPricingLibrary.PoolRouteConfig[]  public  poolOracleRoutes;
@@ -1296,7 +1296,8 @@ contract LenderCommitmentGroup_Pool_V2 is
         // Similar to addPrincipalToCommitmentGroup but following ERC4626 standard
         require(assets > 0 );
         
-       
+         bool poolWasActivated = poolIsActivated();
+        
         
         // Transfer assets from sender to vault
         uint256 principalTokenBalanceBefore = principalToken.balanceOf(address(this));
@@ -1316,16 +1317,21 @@ contract LenderCommitmentGroup_Pool_V2 is
         mintShares(receiver, shares);
         
         // Check first deposit conditions
-        if(!firstDepositMade){
-            require(msg.sender == owner(), "FDM");
-            require(shares >= 1e6, "IS");
-            firstDepositMade = true;
+        // if IS FIRST DEPOSIT then ONLY THE OWNER CAN DEPOSIT 
+        if(!poolWasActivated){
+            require(msg.sender == owner(), "FD");
+            require(poolIsActivated(), "IS"); 
         }
         
        // emit LenderAddedPrincipal(msg.sender, assets, shares, receiver);
         emit Deposit( msg.sender,receiver, assets, shares );
 
         return shares;
+    }
+
+
+    function poolIsActivated() public view returns (bool){
+        return totalSupply() >= 1e6; 
     }
 
     
@@ -1340,6 +1346,7 @@ contract LenderCommitmentGroup_Pool_V2 is
         require(assets > 0);
 
 
+        bool poolWasActivated = poolIsActivated();
         
         // Transfer assets from sender to vault
         uint256 principalTokenBalanceBefore = principalToken.balanceOf(address(this));
@@ -1354,10 +1361,9 @@ contract LenderCommitmentGroup_Pool_V2 is
         mintShares(receiver, shares);
         
         // Check first deposit conditions
-        if(!firstDepositMade){
-            require(msg.sender == owner(), "IC");
-            require(shares >= 1e6, "IS");
-            firstDepositMade = true;
+        if(!poolWasActivated){
+            require(msg.sender == owner(), "FD");
+            require(poolIsActivated(), "IS"); 
         }
         
        
@@ -1507,7 +1513,7 @@ contract LenderCommitmentGroup_Pool_V2 is
             return 0;
         }
 
-        if(!firstDepositMade && msg.sender != owner()){
+        if(!poolIsActivated() && msg.sender != owner()){
            return 0;
         }
 
@@ -1520,7 +1526,7 @@ contract LenderCommitmentGroup_Pool_V2 is
             return 0;
         }
 
-        if(!firstDepositMade && msg.sender != owner()){
+        if(!poolIsActivated() && msg.sender != owner()){
            return 0;
         }
         

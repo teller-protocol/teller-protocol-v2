@@ -20,6 +20,8 @@ contract LenderCommitmentGroup_Pool_V2_Override is LenderCommitmentGroup_Pool_V2
     address mockToken0;
     address mockToken1;
 
+    bool mockPoolIsActivated;
+
     constructor(address _tellerV2, address _smartCommitmentForwarder, address _uniswapV3Factory)
         LenderCommitmentGroup_Pool_V2(_tellerV2, _smartCommitmentForwarder, _uniswapV3Factory)
     {}
@@ -66,6 +68,10 @@ contract LenderCommitmentGroup_Pool_V2_Override is LenderCommitmentGroup_Pool_V2
         internal view override returns (uint256) {
         return mockLoanTotalPrincipalAmount;
     }
+
+    function set_mockPoolIsActivated(bool _activated) public {
+        mockPoolIsActivated = _activated;
+    }   
     
     function set_mockLoanTotalPrincipalAmount(uint256 _principal) public {
         mockLoanTotalPrincipalAmount = _principal;
@@ -110,11 +116,6 @@ contract LenderCommitmentGroup_Pool_V2_Override is LenderCommitmentGroup_Pool_V2
     function set_mock_requiredCollateralAmount(uint256 amt) public {
         mockRequiredCollateralAmount = amt;
     }
-
-    function mock_setFirstDepositMade(bool made) public {
-        firstDepositMade = made;
-    }
-
     
     // allow tests to drill in and call this internal fn for convenience 
     function force_mint_shares( address guy, uint256 wad ) public  {
@@ -161,4 +162,10 @@ contract LenderCommitmentGroup_Pool_V2_Override is LenderCommitmentGroup_Pool_V2
     function public_getPoolTotalEstimatedValue() public view returns (uint256) {
         return getPoolTotalEstimatedValue();
     }
+
+    function poolIsActivated() public view virtual override returns (bool){
+        return totalSupply() >= 1e6 || mockPoolIsActivated ; 
+    }
+
+
 }

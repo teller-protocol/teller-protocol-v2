@@ -1330,7 +1330,7 @@ contract LenderCommitmentGroup_Pool_V2 is
     }
 
 
-    function poolIsActivated() public view returns (bool){
+    function poolIsActivated() public view virtual returns (bool){
         return totalSupply() >= 1e6; 
     }
 

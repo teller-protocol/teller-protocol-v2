@@ -139,7 +139,7 @@ contract LenderCommitmentGroup_Pool_V2_Test is Testable {
            
         );  
 
-        lenderCommitmentGroupSmartV2.mock_setFirstDepositMade(true);
+        
     }
 
 
@@ -193,10 +193,28 @@ contract LenderCommitmentGroup_Pool_V2_Test is Testable {
         );
     }
 
+    function test_erc4626_deposit_when_inactive() public {
+        initialize_group_contract();
+        lenderCommitmentGroupSmartV2.set_mockSharesExchangeRate(1e36);
+
+        vm.prank(address(lender));
+        principalToken.approve(address(lenderCommitmentGroupSmartV2), 1000000);
+
+        vm.prank(address(lender));
+        vm.expectRevert(); 
+        uint256 sharesAmount = lenderCommitmentGroupSmartV2.deposit(1000000, address(lender));
+
+        uint256 expectedSharesAmount = 1000000;
+         
+    }
+
+
     // ERC4626 Vault Tests
     function test_erc4626_deposit() public {
         initialize_group_contract();
         lenderCommitmentGroupSmartV2.set_mockSharesExchangeRate(1e36);
+
+        lenderCommitmentGroupSmartV2.set_mockPoolIsActivated(true);
 
         vm.prank(address(lender));
         principalToken.approve(address(lenderCommitmentGroupSmartV2), 1000000);
@@ -215,6 +233,8 @@ contract LenderCommitmentGroup_Pool_V2_Test is Testable {
     function test_erc4626_mint() public {
         initialize_group_contract();
         lenderCommitmentGroupSmartV2.set_mockSharesExchangeRate(1e36);
+
+        lenderCommitmentGroupSmartV2.set_mockPoolIsActivated(true);
 
         vm.prank(address(lender));
         principalToken.approve(address(lenderCommitmentGroupSmartV2), 1000000);
@@ -874,6 +894,8 @@ contract LenderCommitmentGroup_Pool_V2_Test is Testable {
       function test_preview_functions_match_actual_operations() public {
           initialize_group_contract();
           lenderCommitmentGroupSmartV2.set_mockSharesExchangeRate(1e36);
+
+          lenderCommitmentGroupSmartV2.set_mockPoolIsActivated(true);
           
           // Test deposit preview matches actual deposit
           uint256 depositAmount = 1000000;

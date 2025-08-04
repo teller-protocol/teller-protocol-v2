@@ -890,20 +890,6 @@
     },
     {
       "type": "function",
-      "name": "firstDepositMade",
-      "constant": true,
-      "stateMutability": "view",
-      "payable": false,
-      "inputs": [],
-      "outputs": [
-        {
-          "type": "bool",
-          "name": ""
-        }
-      ]
-    },
-    {
-      "type": "function",
       "name": "getCollateralTokenAddress",
       "constant": true,
       "stateMutability": "view",
@@ -1511,6 +1497,20 @@
     },
     {
       "type": "function",
+      "name": "poolIsActivated",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "bool",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
       "name": "poolOracleRoutes",
       "constant": true,
       "stateMutability": "view",
@@ -1999,6 +1999,6 @@
     }
   ],
   "receipt": {},
-  "numDeployments": 1,
+  "numDeployments": 2,
   "implementation": "0xdf8Ae678746AF412429E5E50B4abf1632d17B003"
 }

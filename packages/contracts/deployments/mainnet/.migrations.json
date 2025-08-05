@@ -41,5 +41,7 @@
   "lender-commitment-forwarder:extensions:loan-referral-forwarder-v2:deploy": 1753457726,
   "validate-deployments": 1753457726,
   "collateral-manager:upgrade-read-fn": 1753808085,
-  "collateral-escrow:upgrade-beacon-dust": 1753814886
+  "collateral-escrow:upgrade-beacon-dust": 1753814886,
+  "smart-commitment-forwarder:upgrade-oracle": 1754325654,
+  "lender-commitment-group-beacon-v2:upgrade-first-deposit": 1754403884
 }

@@ -72,8 +72,74 @@ export function get_ecosystem_contract_address(
 	  return weth9Address; 
 	}
 
+	if (contractName === "uniswapV3SwapRouter") {
+
+		let swapRouterAddress: string | undefined  = undefined 
+		  switch (networkName) {  //hre.network.name
+		    case 'mainnet':		   
+		    case 'mainnet_live_fork':
+		      swapRouterAddress = '0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45'
+		      break
+		    case 'base':
+		      swapRouterAddress = '0x2626664c2603336E57B271c5C0b26F421741e481'
+		      break
+		    case 'polygon':
+		      swapRouterAddress = '0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45'
+		      break
+		    case 'arbitrum':
+		      swapRouterAddress = '0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45'
+		      break
+		     //case 'optimism':
+		   //   swapRouterAddress = '0x0000000000000000000000000000000000000006'
+		    //  break
+		     case 'katana':
+		       swapRouterAddress = '0x4e1d81A3E627b9294532e990109e4c21d217376C'
+		       break 
+		    default:
+		    	return undefined 
+		      //throw new Error('No swap factory address found for this network')
+		  }
+
+	  return swapRouterAddress; 
+
+
+	}
+
 	 
-	 
+	
+	if (contractName === "uniswapV3Quoter") {
+
+			let quoterAddress: string | undefined  = undefined 
+			  switch (networkName) {  //hre.network.name
+			    case 'mainnet':		   
+			    case 'mainnet_live_fork':
+			      quoterAddress = '0x5e55c9e631fae526cd4b0526c4818d6e0a9ef0e3'
+			      break
+			    case 'base':
+			      quoterAddress = '0x222ca98f00ed15b1fae10b61c277703a194cf5d2'
+			      break
+			    case 'polygon':
+			      quoterAddress = '0x5e55c9e631fae526cd4b0526c4818d6e0a9ef0e3'
+			      break
+			    case 'arbitrum':
+			      quoterAddress = '0x5e55c9e631fae526cd4b0526c4818d6e0a9ef0e3'
+			      break
+			  //   case 'optimism':
+			  //    quoterAddress = '0x0000000000000000000000000000000000000006'
+			  //    break
+			     case 'katana':
+			       quoterAddress = '0x92dea23ED1C683940fF1a2f8fE23FE98C5d3041c'
+			       break 
+			    default:
+			    	return undefined 
+			      //throw new Error('No swap factory address found for this network')
+			  }
+
+		  return quoterAddress; 
+
+
+		
+	}
 
 
 

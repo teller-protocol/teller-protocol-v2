@@ -401,7 +401,8 @@ export class GnosisSafeAdminClient {
       'base': 8453,
       'gnosis': 100,
       'avalanche': 43114,
-      'bsc': 56
+      'bsc': 56,
+      'katana':747474
     }
     return chainIds[network] || 1
   }
@@ -498,7 +499,8 @@ export class GnosisSafeAdminClient {
       'base': 'base',
       'gnosis': 'gnosis',
       'avalanche': 'avalanche',
-      'bsc': 'bsc'
+      'bsc': 'bsc',
+      'katana': 'katana',
     }
     
     return networkMap[network as string] || 'mainnet'

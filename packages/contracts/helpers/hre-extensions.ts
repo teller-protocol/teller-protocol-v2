@@ -728,6 +728,10 @@ async function getOZNetwork(hre: HardhatRuntimeEnvironment): Promise<Network> {
 
   // network is just a string like 'mainnet' 
 
+   if (chainId == '747474' ){ 
+    return 'katana'   
+  }
+
   if (chainId == '100000001' ){
     console.log("detected custom  fork network ", "lg-fork-deploy-3")
     return 'lg-fork-deploy-3'  //the name of the fork network in OZ Defender 

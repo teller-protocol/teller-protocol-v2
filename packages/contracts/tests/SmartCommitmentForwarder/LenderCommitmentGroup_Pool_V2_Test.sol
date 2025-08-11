@@ -14,6 +14,8 @@ import { LoanDetails, Payment, BidState , Bid, Terms } from "../../contracts/Tel
 
 import { ILenderCommitmentGroup_V2 } from "../../contracts/interfaces/ILenderCommitmentGroup_V2.sol";
 import { IUniswapPricingLibrary } from "../../contracts/interfaces/IUniswapPricingLibrary.sol";
+import { UniswapPricingHelper } from "../../contracts/price_oracles/UniswapPricingHelper.sol";
+
 
 import {ILenderCommitmentGroupSharesIntegrated} from "../../contracts/interfaces/ILenderCommitmentGroupSharesIntegrated.sol";
  
@@ -45,6 +47,8 @@ contract LenderCommitmentGroup_Pool_V2_Test is Testable {
     SmartCommitmentForwarder _smartCommitmentForwarder;
     UniswapV3PoolMock _uniswapV3Pool;
     UniswapV3FactoryMock _uniswapV3Factory;
+     UniswapPricingHelper _uniswapPricingHelper;
+     
     
     ProtocolPausingManager _protocolPausingManager;
 
@@ -58,6 +62,9 @@ contract LenderCommitmentGroup_Pool_V2_Test is Testable {
         _smartCommitmentForwarder = new SmartCommitmentForwarder(
             address(_tellerV2), address(_marketRegistry));
          
+          _uniswapPricingHelper = new UniswapPricingHelper();
+         
+
         _uniswapV3Pool = new UniswapV3PoolMock();
 
         _uniswapV3Factory = new UniswapV3FactoryMock();
@@ -81,7 +88,8 @@ contract LenderCommitmentGroup_Pool_V2_Test is Testable {
           lenderCommitmentGroupSmartV2 = new LenderCommitmentGroup_Pool_V2_Override(
             address(_tellerV2),
             address(_smartCommitmentForwarder),
-            address(_uniswapV3Factory)
+            address(_uniswapV3Factory),
+            address(_uniswapPricingHelper)
         );
     }
 

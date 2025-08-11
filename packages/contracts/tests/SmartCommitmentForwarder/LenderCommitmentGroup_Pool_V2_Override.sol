@@ -22,8 +22,8 @@ contract LenderCommitmentGroup_Pool_V2_Override is LenderCommitmentGroup_Pool_V2
 
     bool mockPoolIsActivated;
 
-    constructor(address _tellerV2, address _smartCommitmentForwarder, address _uniswapV3Factory)
-        LenderCommitmentGroup_Pool_V2(_tellerV2, _smartCommitmentForwarder, _uniswapV3Factory)
+    constructor(address _tellerV2, address _smartCommitmentForwarder, address _uniswapV3Factory, address _uniswapPricingHelper)
+        LenderCommitmentGroup_Pool_V2(_tellerV2, _smartCommitmentForwarder, _uniswapV3Factory,_uniswapPricingHelper )
     {}
 
     function set_mockSharesExchangeRate(uint256 _mockRate) public {

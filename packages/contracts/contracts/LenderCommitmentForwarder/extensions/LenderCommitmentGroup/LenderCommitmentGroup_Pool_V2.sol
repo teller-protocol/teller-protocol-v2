@@ -57,7 +57,7 @@ import { ILenderCommitmentGroup_V2 } from "../../../interfaces/ILenderCommitment
 import { Payment } from "../../../TellerV2Storage.sol";
 
 import {IUniswapPricingLibrary} from "../../../interfaces/IUniswapPricingLibrary.sol";
-import {UniswapPricingLibraryV2} from "../../../libraries/UniswapPricingLibraryV2.sol";
+import {UniswapPricingHelper} from "../../../price_oracles/UniswapPricingHelper.sol";
 
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
@@ -112,7 +112,8 @@ contract LenderCommitmentGroup_Pool_V2 is
     address public immutable TELLER_V2;
     address public immutable SMART_COMMITMENT_FORWARDER;
     address public immutable UNISWAP_V3_FACTORY;
-    
+        
+    address public immutable UNISWAP_PRICING_HELPER;
   
 
     IERC20 public principalToken;
@@ -266,11 +267,13 @@ contract LenderCommitmentGroup_Pool_V2 is
     constructor(
         address _tellerV2,
         address _smartCommitmentForwarder,
-        address _uniswapV3Factory
+        address _uniswapV3Factory,
+        address _uniswapPricingHelper 
     ) OracleProtectedChild(_smartCommitmentForwarder) {
         TELLER_V2 = _tellerV2;
         SMART_COMMITMENT_FORWARDER = _smartCommitmentForwarder;
         UNISWAP_V3_FACTORY = _uniswapV3Factory;
+        UNISWAP_PRICING_HELPER = _uniswapPricingHelper; 
     }
 
     /**
@@ -700,7 +703,7 @@ contract LenderCommitmentGroup_Pool_V2 is
         uint256 principalAmount 
     ) public view virtual returns (uint256 collateralTokensAmountToMatchValue) {
    
-        uint256 pairPriceWithTwapFromOracle = UniswapPricingLibraryV2
+        uint256 pairPriceWithTwapFromOracle = IUniswapPricingLibrary(UNISWAP_PRICING_HELPER)
             .getUniswapPriceRatioForPoolRoutes(poolOracleRoutes);
        
        
@@ -722,7 +725,7 @@ contract LenderCommitmentGroup_Pool_V2 is
 
    /**
      * @notice Retrieves the price ratio from Uniswap for the given pool routes
-     * @dev Calls the UniswapPricingLibraryV2 to get TWAP (Time-Weighted Average Price) for the specified routes
+     * @dev Calls the UniswapPricingLibrary to get TWAP (Time-Weighted Average Price) for the specified routes
      * @dev This is a low-level internal function that handles direct Uniswap oracle interaction
      * @param poolOracleRoutes Array of pool route configurations to use for price calculation
      * @return The Uniswap price ratio expanded by the Uniswap expansion factor (2^96)
@@ -731,7 +734,7 @@ contract LenderCommitmentGroup_Pool_V2 is
        IUniswapPricingLibrary.PoolRouteConfig[] memory poolOracleRoutes
     ) internal  view virtual returns (uint256 ) {
    
-        uint256 pairPriceWithTwapFromOracle = UniswapPricingLibraryV2
+        uint256 pairPriceWithTwapFromOracle = IUniswapPricingLibrary(UNISWAP_PRICING_HELPER)
             .getUniswapPriceRatioForPoolRoutes(poolOracleRoutes);
        
 
@@ -749,7 +752,7 @@ contract LenderCommitmentGroup_Pool_V2 is
         IUniswapPricingLibrary.PoolRouteConfig[] memory poolOracleRoutes
     ) external view virtual returns (uint256 ) {
    
-        uint256 pairPriceWithTwapFromOracle = UniswapPricingLibraryV2
+        uint256 pairPriceWithTwapFromOracle = IUniswapPricingLibrary(UNISWAP_PRICING_HELPER)
             .getUniswapPriceRatioForPoolRoutes(poolOracleRoutes);
        
        

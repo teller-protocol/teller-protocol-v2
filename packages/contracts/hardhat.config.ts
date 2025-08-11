@@ -543,7 +543,8 @@ export default <HardhatUserConfig>{
       url: networkUrls.katana,
       chainId: 747474,
       live: true,
-      // gasPrice: ethers.utils.parseUnits('110', 'gwei').toNumber(),
+        gasPrice: Number(ethers.parseUnits('1', 'gwei')),
+        
 
       verify: {
         etherscan: {

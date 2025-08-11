@@ -26,7 +26,7 @@ const deployFn: DeployFunction = async (hre) => {
 let uniswapV3FactoryAddress: string =  get_ecosystem_contract_address( hre.network.name, "uniswapV3Factory" ) ;
 
 
-  const uniswapPricingHelper = await hre.deployments.get('UniswapPricingHelper')
+  const uniswapPricingHelper = await hre.contracts.get('UniswapPricingHelper')
     const uniswapPricingHelperAddress = await uniswapPricingHelper.getAddress()
 
  

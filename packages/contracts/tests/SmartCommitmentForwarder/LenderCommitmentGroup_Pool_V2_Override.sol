@@ -154,7 +154,7 @@ contract LenderCommitmentGroup_Pool_V2_Override is LenderCommitmentGroup_Pool_V2
     function getRequiredCollateral(
         uint256 _principalAmount,
         uint256 maxPrincipalPerCollateralAmount
-    ) internal view override returns (uint256 collateralTokensAmountToMatchValue) {
+    ) public view override returns (uint256 collateralTokensAmountToMatchValue) {
         return mockRequiredCollateralAmount;
     }
     

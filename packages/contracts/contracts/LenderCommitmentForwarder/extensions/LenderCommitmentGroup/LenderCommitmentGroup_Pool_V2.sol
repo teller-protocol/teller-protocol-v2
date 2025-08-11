@@ -724,12 +724,13 @@ contract LenderCommitmentGroup_Pool_V2 is
      * @notice Retrieves the price ratio from Uniswap for the given pool routes
      * @dev Calls the UniswapPricingLibraryV2 to get TWAP (Time-Weighted Average Price) for the specified routes
      * @dev This is a low-level internal function that handles direct Uniswap oracle interaction
+     * @dev The frontend uses this because they cannot call it directly on the library
      * @param poolOracleRoutes Array of pool route configurations to use for price calculation
      * @return The Uniswap price ratio expanded by the Uniswap expansion factor (2^96)
      */
     function getUniswapPriceRatioForPoolRoutes(
        IUniswapPricingLibrary.PoolRouteConfig[] memory poolOracleRoutes
-    ) internal  view virtual returns (uint256 ) {
+    ) external  view virtual returns (uint256 ) {
    
         uint256 pairPriceWithTwapFromOracle = UniswapPricingLibraryV2
             .getUniswapPriceRatioForPoolRoutes(poolOracleRoutes);
@@ -769,6 +770,7 @@ contract LenderCommitmentGroup_Pool_V2 is
      * @notice Calculates the amount of collateral tokens required for a given principal amount
      * @dev Converts principal amount to equivalent collateral based on current price ratio
      * @dev Uses the Math.mulDiv function with rounding up to ensure sufficient collateral
+     * @dev The frontend uses this for rollover calculations 
      * @param _principalAmount The amount of principal tokens to be borrowed
      * @param _maxPrincipalPerCollateralAmount The exchange rate between principal and collateral (expanded by STANDARD_EXPANSION_FACTOR)
      * @return The required amount of collateral tokens, rounded up to ensure sufficient collateralization
@@ -777,7 +779,7 @@ contract LenderCommitmentGroup_Pool_V2 is
         uint256 _principalAmount,
         uint256 _maxPrincipalPerCollateralAmount 
         
-    ) internal  view virtual returns (uint256) {
+    ) public view virtual returns (uint256) {
          
          return
             MathUpgradeable.mulDiv(

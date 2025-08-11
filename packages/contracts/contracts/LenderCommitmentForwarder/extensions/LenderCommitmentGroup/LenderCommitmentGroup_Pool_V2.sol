@@ -779,7 +779,7 @@ contract LenderCommitmentGroup_Pool_V2 is
         uint256 _principalAmount,
         uint256 _maxPrincipalPerCollateralAmount 
         
-    ) public view virtual returns (uint256) {
+    ) internal view virtual returns (uint256) {
          
          return
             MathUpgradeable.mulDiv(

@@ -10,14 +10,14 @@ abstract contract OracleProtectedChild {
     modifier onlyOracleApproved() {
         
         IOracleProtectionManager oracleManager = IOracleProtectionManager(ORACLE_MANAGER);
-        require( oracleManager .isOracleApproved(msg.sender ) , "Oracle: Not Approved");
+        require( oracleManager .isOracleApproved(msg.sender ) , "O_NA");
         _;
     }
 
     modifier onlyOracleApprovedAllowEOA() {
       
         IOracleProtectionManager oracleManager = IOracleProtectionManager(ORACLE_MANAGER);
-        require( oracleManager .isOracleApprovedAllowEOA(msg.sender ) , "Oracle: Not Approved");
+        require( oracleManager .isOracleApprovedAllowEOA(msg.sender ) , "O_NA");
         _;
     }
     

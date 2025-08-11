@@ -33,11 +33,11 @@ let uniswapV3FactoryAddress: string =  get_ecosystem_contract_address( hre.netwo
 //this is why the owner of the beacon should be timelock controller ! 
 // so we can upgrade it like this . Using a proposal.  This actually goes AROUND the proxy admin, interestingly. 
   await hre.upgrades.proposeBatchTimelock({
-    title: 'Lender Pools V2: Upgrade First Deposit',
+    title: 'Lender Pools V2: Upgrade Rollover Fns',
     description: ` 
 # Lender Pools V2
 
-* A patch to fix first deposit logic.
+* A patch to add readonly fns for rollover.
 `,
     _steps: [
       {
@@ -74,7 +74,7 @@ let uniswapV3FactoryAddress: string =  get_ecosystem_contract_address( hre.netwo
 }
 
 // tags and deployment
-deployFn.id = 'lender-commitment-group-beacon-v2:upgrade-first-deposit'
+deployFn.id = 'lender-commitment-group-beacon-v2:upgrade-readonly-fns'
 deployFn.tags = ['lender-commitment-group-beacon-v2']
 deployFn.dependencies = [
   'teller-v2:deploy',
@@ -85,6 +85,6 @@ deployFn.dependencies = [
 ]
 
 deployFn.skip = async (hre) => {
-  return !hre.network.live || !['sepolia','polygon','base','mainnet','arbitrum'].includes(hre.network.name)
+  return !hre.network.live || !['sepolia','polygon','base','mainnet','arbitrum','katana','optimism'].includes(hre.network.name)
 }
 export default deployFn

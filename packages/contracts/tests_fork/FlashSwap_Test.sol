@@ -12,13 +12,14 @@ import { TellerV2 } from "../contracts/TellerV2.sol";
 import { SwapRolloverLoan } from "../contracts/LenderCommitmentForwarder/extensions/rollover/SwapRolloverLoan.sol";
 import { SwapRolloverLoan_G1 } from "../contracts/LenderCommitmentForwarder/extensions/rollover/SwapRolloverLoan_G1.sol";
 
+import {  MockSwapRolloverLoan } from "../contracts/mock/SwapRolloverLoanMock.sol";
 
 contract SwapRollover_Fork_Test is Test {
 
     string constant NETWORK_NAME = "katana";
     
     SwapRolloverLoan swapRolloverLoan;
-    address constant DEPLOYED_SWAP_ROLLOVER_LOAN = 0xa4A8c60Ac9E0c38f8B46316c6B3B508b3BA04415; // Replace with actual deployed address
+   // address constant DEPLOYED_SWAP_ROLLOVER_LOAN = 0xa4A8c60Ac9E0c38f8B46316c6B3B508b3BA04415; // Replace with actual deployed address
         
 
        using stdJson for string;
@@ -38,7 +39,32 @@ contract SwapRollover_Fork_Test is Test {
       }
 
 
+      function etch_SwapRolloverWithMock() public {
+
+            //all specific to katana ! 
+          address tellerV2Address = 0xf7B14778035fEAF44540A0bC1D4ED859bCB28229;
+          address uniswapFactoryAddress = 0x203e8740894c8955cB8950759876d7E7E45E04c1 ; 
+          address weth9Address = 0xEE7D8BCFb72bC1880D0Cf19822eB0A2e6577aB62 ; 
+
+            // Create a mock contract first
+          MockSwapRolloverLoan mockSwapRolloverLoan = new MockSwapRolloverLoan(
+
+                tellerV2Address,
+                uniswapFactoryAddress,
+                weth9Address
+
+            );
+          // Then replace the code at the deployed address
+          vm.etch( address(swapRolloverLoan) , address(mockSwapRolloverLoan).code );
+
+
+      }
+
+
  function test_SwapRollover() public   {
+
+    etch_SwapRolloverWithMock();
+
     // Define test parameters
     address smartCommitmentForwarderAddress = getDeployedAddress("SmartCommitmentForwarder");
     uint256 bidId = 4; // Example loan ID - replace with actual loan ID

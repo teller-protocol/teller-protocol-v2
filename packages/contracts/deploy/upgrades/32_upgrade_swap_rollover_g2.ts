@@ -29,7 +29,7 @@ const deployFn: DeployFunction = async (hre) => {
 `,
     _steps: [
       {
-        proxy: flashRolloverLoan,
+        proxy: swapRolloverLoan,
         implFactory: await hre.ethers.getContractFactory('SwapRolloverLoan'),
 
         opts: {

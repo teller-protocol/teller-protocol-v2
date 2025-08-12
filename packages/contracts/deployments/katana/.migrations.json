@@ -21,5 +21,6 @@
   "default-proxy-admin:transfer": 1753284307,
   "lender-commitment-forwarder:extensions:flash-swap-rollover:deploy": 1754412623,
   "lender-commitment-forwarder:extensions:borrow-swap:deploy": 1754414186,
-  "lender-commitment-group-beacon-v2:pricing-helper": 1754936477
+  "lender-commitment-group-beacon-v2:pricing-helper": 1754936477,
+  "lender-commitment-forwarder:extensions:flash-swap-rollover:g2-upgrade": 1755025963
 }

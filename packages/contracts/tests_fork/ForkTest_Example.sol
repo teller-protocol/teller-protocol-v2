@@ -19,7 +19,7 @@ contract ForkTest_Example is Test {
         console.log("Block number:", block.number);
     }
     
-    function testForkNetwork() public view {
+    function test_ForkNetwork() public   {
         // Basic test to verify we're on the fork
         console.log("Current block timestamp:", block.timestamp);
         console.log("Current block number:", block.number);
@@ -28,7 +28,7 @@ contract ForkTest_Example is Test {
         assertTrue(block.number > 0, "Should have valid block number");
     }
     
-    function testExistingContract() public {
+    function test_ExistingContract() public {
         // Example: Test interaction with an existing token contract
         // Replace with actual contract addresses from Katana network
         address tokenAddress = 0x1234567890123456789012345678901234567890; // Replace with real address
@@ -46,7 +46,7 @@ contract ForkTest_Example is Test {
         }
     }
     
-    function testWithSpecificAddress() public {
+    function test_WithSpecificAddress() public {
         // Test interactions with specific addresses that exist on the fork
         address targetAddress = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266; // Replace with actual address
         

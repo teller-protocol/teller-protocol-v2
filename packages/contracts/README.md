@@ -38,3 +38,19 @@ Some deployment files are stored using LFS.  To fetch these, use the command
  git lfs fetch --all
 
 ```
+
+
+
+### Running tests 
+
+``` yarn contracts test ```
+
+
+``` 
+
+anvil --fork-url https://rpc.katana.network 
+
+
+yarn contracts test_forked 
+
+``` 

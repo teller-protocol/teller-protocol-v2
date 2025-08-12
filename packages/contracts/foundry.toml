@@ -11,7 +11,8 @@ out = 'generated/artifacts_forge'
 libs = ['node_modules', 'lib']
 test = 'tests_fork'
 cache_path  = 'generated/cache_forge'
-fork_url = "http://127.0.0.1:8545"
+fs_permissions = [{ access = "read", path = "./deployments" }]
+ 
 
 [doc]
 homepage= "HOME.md"

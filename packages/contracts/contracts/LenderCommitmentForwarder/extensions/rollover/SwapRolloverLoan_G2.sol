@@ -7,32 +7,33 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 // Interfaces
-import "../interfaces/ITellerV2.sol";
-import "../interfaces/IProtocolFee.sol";
-import "../interfaces/ITellerV2Storage.sol";
-import "../interfaces/IMarketRegistry.sol";
-import "../interfaces/ILenderCommitmentForwarder.sol";
-import "../interfaces/ISmartCommitmentForwarder.sol";
-import "../interfaces/ISwapRolloverLoan.sol";
-import "../libraries/NumbersLib.sol";
+import "../../../interfaces/ITellerV2.sol";
+import "../../../interfaces/IProtocolFee.sol";
+import "../../../interfaces/ITellerV2Storage.sol";
+import "../../../interfaces/IMarketRegistry.sol";
+import "../../../interfaces/ILenderCommitmentForwarder.sol";
+import "../../../interfaces/ISmartCommitmentForwarder.sol";
+import "../../../interfaces/ISwapRolloverLoan.sol";
+import "../../../libraries/NumbersLib.sol";
 
  
-import '../libraries/uniswap/periphery/base/PeripheryPayments.sol';
-import '../libraries/uniswap/periphery/base/PeripheryImmutableState.sol';
-import '../libraries/uniswap/periphery/libraries/PoolAddress.sol';
-import '../libraries/uniswap/periphery/libraries/CallbackValidation.sol';
-import '../libraries/uniswap/periphery/libraries/TransferHelper.sol';
-import '../libraries/uniswap/periphery/interfaces/ISwapRouter.sol';
+import '../../../libraries/uniswap/periphery/base/PeripheryPayments.sol';
+import '../../../libraries/uniswap/periphery/base/PeripheryImmutableState.sol';
+import '../../../libraries/uniswap/periphery/libraries/PoolAddress.sol';
+import '../../../libraries/uniswap/periphery/libraries/CallbackValidation.sol';
+import '../../../libraries/uniswap/periphery/libraries/TransferHelper.sol';
+import '../../../libraries/uniswap/periphery/interfaces/ISwapRouter.sol';
 
-import '../libraries/uniswap/core/interfaces/IUniswapV3Factory.sol';
+import '../../../libraries/uniswap/core/interfaces/IUniswapV3Factory.sol';
 
-import '../libraries/uniswap/core/libraries/LowGasSafeMath.sol';
+import '../../../libraries/uniswap/core/libraries/LowGasSafeMath.sol';
 
-import '../libraries/uniswap/core/interfaces/callback/IUniswapV3FlashCallback.sol';
+import '../../../libraries/uniswap/core/interfaces/callback/IUniswapV3FlashCallback.sol';
  
-  
+ 
 
-contract MockSwapRolloverLoan is IUniswapV3FlashCallback, PeripheryPayments  {
+
+contract SwapRolloverLoan_G2 is IUniswapV3FlashCallback, PeripheryPayments  {
     using AddressUpgradeable for address;
     using NumbersLib for uint256;
 
@@ -278,12 +279,10 @@ contract MockSwapRolloverLoan is IUniswapV3FlashCallback, PeripheryPayments  {
         uint256 fee1,
         bytes calldata data
     ) external override {
-
-       
         RolloverCallbackArgs memory _rolloverArgs = abi.decode(data, (RolloverCallbackArgs));
       
 
-        
+
 
         AcceptCommitmentArgs memory acceptCommitmentArgs = abi.decode(
             _rolloverArgs.acceptCommitmentArgs,
@@ -297,6 +296,7 @@ contract MockSwapRolloverLoan is IUniswapV3FlashCallback, PeripheryPayments  {
 
         );
 
+    
        
         _verifyFlashCallback(  
             flashSwapArgs.token0,
@@ -304,8 +304,6 @@ contract MockSwapRolloverLoan is IUniswapV3FlashCallback, PeripheryPayments  {
             flashSwapArgs.fee,
             msg.sender 
          );
-       
-             
 
         address flashToken = flashSwapArgs.borrowToken1 ? flashSwapArgs.token1: flashSwapArgs.token0  ; 
         uint256 flashFee =  flashSwapArgs.borrowToken1 ? fee1: fee0 ;
@@ -377,6 +375,8 @@ contract MockSwapRolloverLoan is IUniswapV3FlashCallback, PeripheryPayments  {
     }
 
 
+    
+  
     /*
         Verify the flash callback with a remote call to the factory 
         @dev This allows better compatibility with factories that have different 'init hashes' such as forks like sushi 

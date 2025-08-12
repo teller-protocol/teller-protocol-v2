@@ -10,6 +10,8 @@ import "forge-std/console.sol";
 // Import your actual contracts
 import { TellerV2 } from "../contracts/TellerV2.sol";
 import { SwapRolloverLoan } from "../contracts/LenderCommitmentForwarder/extensions/rollover/SwapRolloverLoan.sol";
+import { SwapRolloverLoan_G1 } from "../contracts/LenderCommitmentForwarder/extensions/rollover/SwapRolloverLoan_G1.sol";
+
 
 contract SwapRollover_Fork_Test is Test {
 
@@ -37,8 +39,44 @@ contract SwapRollover_Fork_Test is Test {
 
 
  function test_SwapRollover() public   {
-
-
+    // Define test parameters
+    address smartCommitmentForwarderAddress = getDeployedAddress("SmartCommitmentForwarder");
+    uint256 bidId = 4; // Example loan ID - replace with actual loan ID
+    uint256 borrowerAmount = 0; // Additional amount borrower adds
+    
+    // Flash swap parameters
+    SwapRolloverLoan_G1.FlashSwapArgs memory flashSwapArgs = SwapRolloverLoan_G1.FlashSwapArgs({
+        token0: address(0x1e5eFCA3D0dB2c6d5C67a4491845c43253eB9e4e),  
+        token1: address(0x203A662b0BD271A6ed5a60EdFbd04bFce608FD36), 
+        fee: 3000, // 0.3% fee tier
+        flashAmount: 1000, // 1000 tokens
+        borrowToken1: false // Borrow token0 (DAI)
+    });
+    
+    // Accept commitment parameters
+    SwapRolloverLoan_G1.AcceptCommitmentArgs memory acceptCommitmentArgs = SwapRolloverLoan_G1.AcceptCommitmentArgs({
+        commitmentId: 1,
+        smartCommitmentAddress: address(0), // Not using smart commitment
+        principalAmount: 1000,
+        collateralAmount: 1200,
+        collateralTokenId: 0,
+        collateralTokenAddress: address(0x1e5eFCA3D0dB2c6d5C67a4491845c43253eB9e4e), 
+        interestRate: 100, // 10% APR
+        loanDuration: 15000,
+        merkleProof: new bytes32[](0) // No merkle proof
+    });
+    
+    vm.prank(0xbc1d2Ed14128Cd7Af450319b642Fd43d65E495dc);
+    swapRolloverLoan.rolloverLoanWithFlashSwap(
+        smartCommitmentForwarderAddress, 
+        bidId,
+        borrowerAmount,
+        flashSwapArgs,
+        acceptCommitmentArgs 
+    );
+    
+    // Add assertions to verify the rollover worked
+    // assertTrue(someCondition, "Rollover should succeed");
  }
     
     /*

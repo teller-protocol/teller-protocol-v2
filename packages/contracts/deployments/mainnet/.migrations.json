@@ -43,5 +43,7 @@
   "collateral-manager:upgrade-read-fn": 1753808085,
   "collateral-escrow:upgrade-beacon-dust": 1753814886,
   "smart-commitment-forwarder:upgrade-oracle": 1754325654,
-  "lender-commitment-group-beacon-v2:upgrade-first-deposit": 1754403884
+  "lender-commitment-group-beacon-v2:upgrade-first-deposit": 1754403884,
+  "uniswap-pricing-helper:deploy": 1754403885,
+  "lender-commitment-group-beacon-v2:pricing-helper": 1755203064
 }

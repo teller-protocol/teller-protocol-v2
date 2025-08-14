@@ -17,6 +17,10 @@
         {
           "type": "address",
           "name": "_uniswapV3Factory"
+        },
+        {
+          "type": "address",
+          "name": "_uniswapPricingHelper"
         }
       ]
     },
@@ -523,6 +527,20 @@
       "outputs": [
         {
           "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "UNISWAP_PRICING_HELPER",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "address",
           "name": ""
         }
       ]
@@ -1999,6 +2017,6 @@
     }
   ],
   "receipt": {},
-  "numDeployments": 2,
+  "numDeployments": 3,
   "implementation": "0x905D0a6D78F1b517E3557C0ac536F45F417bD782"
 }

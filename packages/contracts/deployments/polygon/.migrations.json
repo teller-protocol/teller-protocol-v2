@@ -56,5 +56,6 @@
   "lender-commitment-forwarder:extensions:borrow-swap:deploy": 1752601699,
   "lender-commitment-forwarder-v2:upgrade-transfer": 1753813328,
   "smart-commitment-forwarder:upgrade-oracle": 1753816748,
-  "lender-commitment-group-beacon-v2:upgrade-first-deposit": 1754323999
+  "lender-commitment-group-beacon-v2:upgrade-first-deposit": 1754323999,
+  "lender-commitment-group-beacon-v2:pricing-helper": 1755271511
 }

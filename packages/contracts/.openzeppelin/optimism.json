@@ -6674,6 +6674,16 @@
         },
         "namespaces": {}
       }
+    },
+    "b6bc38607109449b76d92080e4b01b63dc57f2d8037c69d1e9845b84f1022013": {
+      "address": "0x4d949322CeBc63ec0e39910Bcb37dDcf98D7bD09",
+      "txHash": "0xf1eead00ada9ce80831ef8957784fee8e90030d19ba0fb1e7bc994301ec5425c",
+      "layout": {
+        "solcVersion": "0.8.11",
+        "storage": [],
+        "types": {},
+        "namespaces": {}
+      }
     }
   }
 }

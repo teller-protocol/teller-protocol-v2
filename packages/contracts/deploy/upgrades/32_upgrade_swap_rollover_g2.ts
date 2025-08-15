@@ -71,7 +71,7 @@ deployFn.dependencies = [
 deployFn.skip = async (hre) => {
   return !(
     hre.network.live &&
-    [ 'goerli', 'sepolia', 'katana', 'optimism', 'base','polygon','mainnet','arbitrum'].includes(
+    [ 'goerli', 'sepolia', 'katana', 'optimism', 'base', 'mainnet','arbitrum'].includes(
       hre.network.name
     )
   )

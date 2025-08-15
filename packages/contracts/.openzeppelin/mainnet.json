@@ -10833,6 +10833,16 @@
         },
         "namespaces": {}
       }
+    },
+    "428fd7daa1464034cd8cc567f0572ba952bbe42367418488d691f19f7a227fb4": {
+      "address": "0x3cd0BB0D282F44D46EeD4de1A107CA075AAD0E7e",
+      "txHash": "0x685b6fb238124b53bf46d471e578ea83c8e276085722980f8da561f2638ea156",
+      "layout": {
+        "solcVersion": "0.8.11",
+        "storage": [],
+        "types": {},
+        "namespaces": {}
+      }
     }
   }
 }

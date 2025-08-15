@@ -9052,6 +9052,16 @@
         },
         "namespaces": {}
       }
+    },
+    "bfeec8b0637325dece3501f5db006a67260e3f7cdff452828f383c95d4923efa": {
+      "address": "0xb0809780Baa3157345AeEb529aE88C81C51b9226",
+      "txHash": "0x2966115d014ad6a7d3719c903243a337e4b66256acc9f0cbdbf2c35b3195a4fe",
+      "layout": {
+        "solcVersion": "0.8.11",
+        "storage": [],
+        "types": {},
+        "namespaces": {}
+      }
     }
   }
 }

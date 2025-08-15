@@ -39,5 +39,7 @@
   "lender-commitment-forwarder-v2:upgrade-transfer": 1753389228,
   "smart-commitment-forwarder:upgrade-oracle": 1754325125,
   "lender-commitment-group-beacon-v2:upgrade-first-deposit": 1754403565,
-  "lender-commitment-group-beacon-v2:pricing-helper": 1755183533
+  "uniswap-pricing-helper:deploy": 1755183533,
+  "lender-commitment-group-beacon-v2:pricing-helper": 1755183533,
+  "lender-commitment-forwarder:extensions:flash-swap-rollover:g2-upgrade": 1755270789
 }

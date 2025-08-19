@@ -9,11 +9,11 @@ features:
 dataSources:
   - kind: ethereum/contract
     name: Factory
-    network: {{ network }}
+    network: mainnet
     source:
       abi: Factory
-      address: "{{lenderCommitmentGroupFactory}}"
-      startBlock: {{ startblock }}
+      address: "0x00182FdB0B880eE24D428e3Cc39383717677C37e"
+      startBlock: 15094705
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -30,7 +30,7 @@ dataSources:
 templates:
   - kind: ethereum/contract
     name: Pool
-    network: {{ network }}
+    network: mainnet
     source:
       abi: Pool
     mapping:

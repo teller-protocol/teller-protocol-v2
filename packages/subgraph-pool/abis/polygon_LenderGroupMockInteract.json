@@ -1,0 +1,129 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_target",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_principalToken",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_sharesToken",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_sharesRecipient",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_minSharesAmountOut",
+        "type": "uint256"
+      }
+    ],
+    "name": "addPrincipalToCommitmentGroup",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_target",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_principalToken",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_poolSharesToken",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_amountPoolSharesTokens",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_recipient",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_minAmountOut",
+        "type": "uint256"
+      }
+    ],
+    "name": "burnSharesToWithdrawEarnings",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_target",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_principalToken",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_bidId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "int256",
+        "name": "_tokenAmountDifference",
+        "type": "int256"
+      },
+      {
+        "internalType": "int256",
+        "name": "loanAmount",
+        "type": "int256"
+      }
+    ],
+    "name": "liquidateDefaultedLoanWithIncentive",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_target",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_amountPoolSharesTokens",
+        "type": "uint256"
+      }
+    ],
+    "name": "prepareSharesForWithdraw",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

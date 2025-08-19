@@ -1,0 +1,557 @@
+[
+  {
+    "type": "event",
+    "anonymous": false,
+    "name": "CollateralCommitted",
+    "inputs": [
+      {
+        "type": "uint256",
+        "name": "_bidId",
+        "indexed": false
+      },
+      {
+        "type": "uint8",
+        "name": "_type",
+        "indexed": false
+      },
+      {
+        "type": "address",
+        "name": "_collateralAddress",
+        "indexed": false
+      },
+      {
+        "type": "uint256",
+        "name": "_amount",
+        "indexed": false
+      },
+      {
+        "type": "uint256",
+        "name": "_tokenId",
+        "indexed": false
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "anonymous": false,
+    "name": "CollateralDeposited",
+    "inputs": [
+      {
+        "type": "uint256",
+        "name": "_bidId",
+        "indexed": false
+      },
+      {
+        "type": "uint8",
+        "name": "_type",
+        "indexed": false
+      },
+      {
+        "type": "address",
+        "name": "_collateralAddress",
+        "indexed": false
+      },
+      {
+        "type": "uint256",
+        "name": "_amount",
+        "indexed": false
+      },
+      {
+        "type": "uint256",
+        "name": "_tokenId",
+        "indexed": false
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "anonymous": false,
+    "name": "CollateralWithdrawn",
+    "inputs": [
+      {
+        "type": "uint256",
+        "name": "_bidId",
+        "indexed": false
+      },
+      {
+        "type": "uint8",
+        "name": "_type",
+        "indexed": false
+      },
+      {
+        "type": "address",
+        "name": "_collateralAddress",
+        "indexed": false
+      },
+      {
+        "type": "uint256",
+        "name": "_amount",
+        "indexed": false
+      },
+      {
+        "type": "uint256",
+        "name": "_tokenId",
+        "indexed": false
+      },
+      {
+        "type": "address",
+        "name": "_recipient",
+        "indexed": false
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "anonymous": false,
+    "name": "Initialized",
+    "inputs": [
+      {
+        "type": "uint8",
+        "name": "version",
+        "indexed": false
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "checkBalances",
+    "constant": true,
+    "stateMutability": "view",
+    "payable": false,
+    "inputs": [
+      {
+        "type": "address",
+        "name": "_borrowerAddress"
+      },
+      {
+        "type": "tuple[]",
+        "name": "_collateralInfo",
+        "components": [
+          {
+            "type": "uint8",
+            "name": "_collateralType"
+          },
+          {
+            "type": "uint256",
+            "name": "_amount"
+          },
+          {
+            "type": "uint256",
+            "name": "_tokenId"
+          },
+          {
+            "type": "address",
+            "name": "_collateralAddress"
+          }
+        ]
+      }
+    ],
+    "outputs": [
+      {
+        "type": "bool",
+        "name": "validated_"
+      },
+      {
+        "type": "bool[]",
+        "name": "checks_"
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "commitCollateral",
+    "constant": false,
+    "payable": false,
+    "inputs": [
+      {
+        "type": "uint256",
+        "name": "_bidId"
+      },
+      {
+        "type": "tuple[]",
+        "name": "_collateralInfo",
+        "components": [
+          {
+            "type": "uint8",
+            "name": "_collateralType"
+          },
+          {
+            "type": "uint256",
+            "name": "_amount"
+          },
+          {
+            "type": "uint256",
+            "name": "_tokenId"
+          },
+          {
+            "type": "address",
+            "name": "_collateralAddress"
+          }
+        ]
+      }
+    ],
+    "outputs": [
+      {
+        "type": "bool",
+        "name": "validation_"
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "depositCollateral",
+    "constant": false,
+    "payable": false,
+    "inputs": [
+      {
+        "type": "uint256",
+        "name": "_bidId"
+      }
+    ],
+    "outputs": []
+  },
+  {
+    "type": "function",
+    "name": "getCollateralAmount",
+    "constant": true,
+    "stateMutability": "view",
+    "payable": false,
+    "inputs": [
+      {
+        "type": "uint256",
+        "name": "_bidId"
+      },
+      {
+        "type": "address",
+        "name": "_collateralAddress"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "uint256",
+        "name": "amount_"
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "getCollateralInfo",
+    "constant": true,
+    "stateMutability": "view",
+    "payable": false,
+    "inputs": [
+      {
+        "type": "uint256",
+        "name": "_bidId"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "tuple[]",
+        "name": "infos_",
+        "components": [
+          {
+            "type": "uint8",
+            "name": "_collateralType"
+          },
+          {
+            "type": "uint256",
+            "name": "_amount"
+          },
+          {
+            "type": "uint256",
+            "name": "_tokenId"
+          },
+          {
+            "type": "address",
+            "name": "_collateralAddress"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "getTokenCountOfBundle",
+    "constant": true,
+    "stateMutability": "view",
+    "payable": false,
+    "inputs": [
+      {
+        "type": "uint256",
+        "name": "_bundleId"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "uint256",
+        "name": ""
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "getTokenOfBundle",
+    "constant": true,
+    "stateMutability": "view",
+    "payable": false,
+    "inputs": [
+      {
+        "type": "uint256",
+        "name": "_bundleId"
+      },
+      {
+        "type": "uint256",
+        "name": "index"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "tuple",
+        "name": "",
+        "components": [
+          {
+            "type": "uint8",
+            "name": "_collateralType"
+          },
+          {
+            "type": "uint256",
+            "name": "_amount"
+          },
+          {
+            "type": "uint256",
+            "name": "_tokenId"
+          },
+          {
+            "type": "address",
+            "name": "_collateralAddress"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "initialize",
+    "constant": false,
+    "payable": false,
+    "inputs": [
+      {
+        "type": "address",
+        "name": "_tellerV2"
+      }
+    ],
+    "outputs": []
+  },
+  {
+    "type": "function",
+    "name": "isBidCollateralBacked",
+    "constant": true,
+    "stateMutability": "view",
+    "payable": false,
+    "inputs": [
+      {
+        "type": "uint256",
+        "name": "_bidId"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "bool",
+        "name": ""
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "lenderClaimCollateral",
+    "constant": false,
+    "payable": false,
+    "inputs": [
+      {
+        "type": "uint256",
+        "name": "_bidId"
+      }
+    ],
+    "outputs": []
+  },
+  {
+    "type": "function",
+    "name": "liquidateCollateral",
+    "constant": false,
+    "payable": false,
+    "inputs": [
+      {
+        "type": "uint256",
+        "name": "_bidId"
+      },
+      {
+        "type": "address",
+        "name": "_liquidatorAddress"
+      }
+    ],
+    "outputs": []
+  },
+  {
+    "type": "function",
+    "name": "onERC1155BatchReceived",
+    "constant": false,
+    "payable": false,
+    "inputs": [
+      {
+        "type": "address",
+        "name": ""
+      },
+      {
+        "type": "address",
+        "name": ""
+      },
+      {
+        "type": "uint256[]",
+        "name": "_ids"
+      },
+      {
+        "type": "uint256[]",
+        "name": "_values"
+      },
+      {
+        "type": "bytes",
+        "name": ""
+      }
+    ],
+    "outputs": [
+      {
+        "type": "bytes4",
+        "name": ""
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "onERC1155Received",
+    "constant": false,
+    "payable": false,
+    "inputs": [
+      {
+        "type": "address",
+        "name": ""
+      },
+      {
+        "type": "address",
+        "name": ""
+      },
+      {
+        "type": "uint256",
+        "name": "id"
+      },
+      {
+        "type": "uint256",
+        "name": "value"
+      },
+      {
+        "type": "bytes",
+        "name": ""
+      }
+    ],
+    "outputs": [
+      {
+        "type": "bytes4",
+        "name": ""
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "onERC721Received",
+    "constant": true,
+    "stateMutability": "pure",
+    "payable": false,
+    "inputs": [
+      {
+        "type": "address",
+        "name": ""
+      },
+      {
+        "type": "address",
+        "name": ""
+      },
+      {
+        "type": "uint256",
+        "name": ""
+      },
+      {
+        "type": "bytes",
+        "name": ""
+      }
+    ],
+    "outputs": [
+      {
+        "type": "bytes4",
+        "name": ""
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "supportsInterface",
+    "constant": true,
+    "stateMutability": "view",
+    "payable": false,
+    "inputs": [
+      {
+        "type": "bytes4",
+        "name": "interfaceId"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "bool",
+        "name": ""
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "tellerV2",
+    "constant": true,
+    "stateMutability": "view",
+    "payable": false,
+    "inputs": [],
+    "outputs": [
+      {
+        "type": "address",
+        "name": ""
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "withdraw",
+    "constant": false,
+    "payable": false,
+    "inputs": [
+      {
+        "type": "uint256",
+        "name": "_bidId"
+      }
+    ],
+    "outputs": []
+  },
+  {
+    "type": "function",
+    "name": "withdrawForRecipient",
+    "constant": false,
+    "payable": false,
+    "inputs": [
+      {
+        "type": "uint256",
+        "name": "_bidId"
+      },
+      {
+        "type": "address",
+        "name": "_recipient"
+      }
+    ],
+    "outputs": []
+  }
+]

@@ -1,0 +1,50 @@
+specVersion: 0.0.4
+description: Teller Protocol is a decentralized lending framework for Ethereum.
+repository: https://github.com/teller-protocol/teller-protocol-v2
+schema:
+  file: ./src/schema.graphql
+features:
+  - nonFatalErrors
+  - grafting
+dataSources:
+  - kind: ethereum/contract
+    name: Factory
+    network: {{ network }}
+    source:
+      abi: Factory
+      address: "{{lenderCommitmentGroupFactory}}"
+      startBlock: {{ startblock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/mappings/factory.ts
+      entities:
+        - Pool
+      abis:
+        - name: Factory
+          file: ./abis/mainnet_LenderCommitmentGroupFactory.json
+      eventHandlers:
+        - event: LenderGroupDeployed(indexed address)
+          handler: handleLenderGroupDeployed
+templates:
+  - kind: ethereum/contract
+    name: Pool
+    network: {{ network }}
+    source:
+      abi: Pool
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/mappings/core.ts
+      entities:
+        - Pool
+      abis:
+        - name: Pool
+          file: ./abis/mainnet_LenderCommitmentGroupBeacon.json
+        - name: Factory
+          file: ./abis/mainnet_LenderCommitmentGroupFactory.json
+      eventHandlers:
+        - event: Deposit()
+          handler: handleDeposit

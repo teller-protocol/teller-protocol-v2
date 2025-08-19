@@ -1,0 +1,99 @@
+[
+  {
+    "type": "constructor",
+    "stateMutability": "undefined",
+    "payable": false,
+    "inputs": [
+      {
+        "type": "address",
+        "name": "_tellerV2"
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "TELLER_V2",
+    "constant": true,
+    "stateMutability": "view",
+    "payable": false,
+    "inputs": [],
+    "outputs": [
+      {
+        "type": "address",
+        "name": ""
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "acceptCommitmentWithReferral",
+    "constant": false,
+    "payable": false,
+    "inputs": [
+      {
+        "type": "address",
+        "name": "_commitmentForwarder"
+      },
+      {
+        "type": "tuple",
+        "name": "_acceptCommitmentArgs",
+        "components": [
+          {
+            "type": "uint256",
+            "name": "commitmentId"
+          },
+          {
+            "type": "address",
+            "name": "smartCommitmentAddress"
+          },
+          {
+            "type": "uint256",
+            "name": "principalAmount"
+          },
+          {
+            "type": "uint256",
+            "name": "collateralAmount"
+          },
+          {
+            "type": "uint256",
+            "name": "collateralTokenId"
+          },
+          {
+            "type": "address",
+            "name": "collateralTokenAddress"
+          },
+          {
+            "type": "uint16",
+            "name": "interestRate"
+          },
+          {
+            "type": "uint32",
+            "name": "loanDuration"
+          },
+          {
+            "type": "bytes32[]",
+            "name": "merkleProof"
+          }
+        ]
+      },
+      {
+        "type": "address",
+        "name": "_recipient"
+      },
+      {
+        "type": "uint256",
+        "name": "_reward"
+      },
+      {
+        "type": "address",
+        "name": "_rewardRecipient"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "uint256",
+        "name": "bidId_"
+      }
+    ]
+  }
+]

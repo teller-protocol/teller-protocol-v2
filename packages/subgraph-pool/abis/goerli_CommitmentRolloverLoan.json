@@ -1,0 +1,156 @@
+[
+  {
+    "type": "constructor",
+    "stateMutability": "undefined",
+    "payable": false,
+    "inputs": [
+      {
+        "type": "address",
+        "name": "_tellerV2"
+      },
+      {
+        "type": "address",
+        "name": "_lenderCommitmentForwarder"
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "LENDER_COMMITMENT_FORWARDER",
+    "constant": true,
+    "stateMutability": "view",
+    "payable": false,
+    "inputs": [],
+    "outputs": [
+      {
+        "type": "address"
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "TELLER_V2",
+    "constant": true,
+    "stateMutability": "view",
+    "payable": false,
+    "inputs": [],
+    "outputs": [
+      {
+        "type": "address"
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "calculateRolloverAmount",
+    "constant": true,
+    "stateMutability": "view",
+    "payable": false,
+    "inputs": [
+      {
+        "type": "uint256",
+        "name": "_loanId"
+      },
+      {
+        "type": "tuple",
+        "name": "_commitmentArgs",
+        "components": [
+          {
+            "type": "uint256",
+            "name": "commitmentId"
+          },
+          {
+            "type": "uint256",
+            "name": "principalAmount"
+          },
+          {
+            "type": "uint256",
+            "name": "collateralAmount"
+          },
+          {
+            "type": "uint256",
+            "name": "collateralTokenId"
+          },
+          {
+            "type": "address",
+            "name": "collateralTokenAddress"
+          },
+          {
+            "type": "uint16",
+            "name": "interestRate"
+          },
+          {
+            "type": "uint32",
+            "name": "loanDuration"
+          }
+        ]
+      },
+      {
+        "type": "uint256",
+        "name": "_timestamp"
+      }
+    ],
+    "outputs": [
+      {
+        "type": "int256",
+        "name": "_amount"
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "rolloverLoan",
+    "constant": false,
+    "payable": false,
+    "inputs": [
+      {
+        "type": "uint256",
+        "name": "_loanId"
+      },
+      {
+        "type": "uint256",
+        "name": "_rolloverAmount"
+      },
+      {
+        "type": "tuple",
+        "name": "_commitmentArgs",
+        "components": [
+          {
+            "type": "uint256",
+            "name": "commitmentId"
+          },
+          {
+            "type": "uint256",
+            "name": "principalAmount"
+          },
+          {
+            "type": "uint256",
+            "name": "collateralAmount"
+          },
+          {
+            "type": "uint256",
+            "name": "collateralTokenId"
+          },
+          {
+            "type": "address",
+            "name": "collateralTokenAddress"
+          },
+          {
+            "type": "uint16",
+            "name": "interestRate"
+          },
+          {
+            "type": "uint32",
+            "name": "loanDuration"
+          }
+        ]
+      }
+    ],
+    "outputs": [
+      {
+        "type": "uint256",
+        "name": "newLoanId_"
+      }
+    ]
+  }
+]

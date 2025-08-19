@@ -1,4 +1,4 @@
-type factory_admin_changed @entity {
+type factory_admin_changed @entity(immutable: true) {
     id: ID!
     evt_tx_hash: Bytes!
     evt_index: BigInt!
@@ -7,7 +7,7 @@ type factory_admin_changed @entity {
     new_admin: Bytes!
     previous_admin: Bytes!
 }
-type factory_beacon_upgraded @entity {
+type factory_beacon_upgraded @entity(immutable: true) {
     id: ID!
     evt_tx_hash: Bytes!
     evt_index: BigInt!
@@ -15,7 +15,7 @@ type factory_beacon_upgraded @entity {
     evt_block_number: BigInt!
     beacon: Bytes!
 }
-type factory_deployed_lender_group_contract @entity {
+type factory_deployed_lender_group_contract @entity(immutable: true) {
     id: ID!
     evt_tx_hash: Bytes!
     evt_index: BigInt!
@@ -23,7 +23,7 @@ type factory_deployed_lender_group_contract @entity {
     evt_block_number: BigInt!
     group_contract: Bytes!
 }
-type factory_upgraded @entity {
+type factory_upgraded @entity(immutable: true) {
     id: ID!
     evt_tx_hash: Bytes!
     evt_index: BigInt!
@@ -32,7 +32,7 @@ type factory_upgraded @entity {
     implementation: Bytes!
 }
 
-type group_borrower_accepted_funds @entity {
+type group_borrower_accepted_funds @entity(immutable: true) {
     id: ID!
     evt_tx_hash: Bytes!
     evt_index: BigInt!
@@ -47,7 +47,7 @@ type group_borrower_accepted_funds @entity {
     principal_amount: BigDecimal!
 }
 
-type group_lender_added_principal @entity {
+type group_lender_added_principal @entity(immutable: true) {
     id: ID!
     evt_tx_hash: Bytes!
     evt_index: BigInt!
@@ -59,7 +59,7 @@ type group_lender_added_principal @entity {
     shares_amount: BigDecimal!
     shares_recipient: Bytes!
 }
-type group_earnings_withdrawn @entity {
+type group_earnings_withdrawn @entity(immutable: true) {
     id: ID!
     evt_tx_hash: Bytes!
     evt_index: BigInt!
@@ -71,7 +71,7 @@ type group_earnings_withdrawn @entity {
     principal_tokens_withdrawn: BigDecimal!
     recipient: Bytes!
 }
-type group_defaulted_loan_liquidated @entity {
+type group_defaulted_loan_liquidated @entity(immutable: true) {
     id: ID!
     evt_tx_hash: Bytes!
     evt_index: BigInt!
@@ -83,7 +83,7 @@ type group_defaulted_loan_liquidated @entity {
     liquidator: Bytes!
     token_amount_difference: BigDecimal!
 }
-type group_initialized @entity {
+type group_initialized @entity(immutable: true) {
     id: ID!
     evt_tx_hash: Bytes!
     evt_index: BigInt!
@@ -93,7 +93,7 @@ type group_initialized @entity {
     version: BigInt!
 }
 
-type group_loan_repaid @entity {
+type group_loan_repaid @entity(immutable: true) {
     id: ID!
     evt_tx_hash: Bytes!
     evt_index: BigInt!
@@ -107,7 +107,7 @@ type group_loan_repaid @entity {
     total_interest_collected: BigDecimal!
     total_principal_repaid: BigDecimal!
 }
-type group_ownership_transferred @entity {
+type group_ownership_transferred @entity(immutable: true) {
     id: ID!
     evt_tx_hash: Bytes!
     evt_index: BigInt!
@@ -117,7 +117,7 @@ type group_ownership_transferred @entity {
     new_owner: Bytes!
     previous_owner: Bytes!
 }
-type group_paused @entity {
+type group_paused @entity(immutable: true) {
     id: ID!
     evt_tx_hash: Bytes!
     evt_index: BigInt!
@@ -128,7 +128,7 @@ type group_paused @entity {
 }
 
 # use group pool metrics instead 
-type group_pool_initialized @entity {
+type group_pool_initialized @entity(immutable: true) {
     id: ID!
     evt_tx_hash: Bytes!
     evt_index: BigInt!
@@ -145,7 +145,7 @@ type group_pool_initialized @entity {
     pool_shares_token: Bytes!
     principal_token_address: Bytes!
 }
-type group_unpaused @entity {
+type group_unpaused @entity(immutable: true) {
     id: ID!
     evt_tx_hash: Bytes!
     evt_index: BigInt!
@@ -155,7 +155,7 @@ type group_unpaused @entity {
     account: Bytes!
 }
 
-type group_pool_bid @entity {
+type group_pool_bid @entity(immutable: true) {
     id: ID! 
     group_pool_address: Bytes!
     bid_id: BigDecimal!
@@ -164,7 +164,7 @@ type group_pool_bid @entity {
     principal_amount: BigDecimal!
 }
 
-type group_pool_metric @entity {
+type group_pool_metric @entity(immutable: false) {
     id: ID!    #will be based on group pool address 
     group_pool_address: Bytes!
 
@@ -211,7 +211,7 @@ type group_pool_metric @entity {
 
 
 
-type group_pool_metric_data_point @entity {
+type group_pool_metric_data_point @entity(immutable: false) {
     id: ID!    #will be based on group pool address 
     group_pool_address: Bytes!
 
@@ -233,7 +233,7 @@ type group_pool_metric_data_point @entity {
 
 }
 
-type group_pool_metric_data_point_daily @entity {
+type group_pool_metric_data_point_daily @entity(immutable: false) {
     id: ID!    #will be based on group pool address and day id 
     group_pool_address: Bytes!
 
@@ -256,7 +256,7 @@ type group_pool_metric_data_point_daily @entity {
     
 }
 
-type group_pool_metric_data_point_weekly @entity {
+type group_pool_metric_data_point_weekly @entity(immutable: false) {
     id: ID!    #will be based on group pool address and week id 
     group_pool_address: Bytes!
 
@@ -280,7 +280,7 @@ type group_pool_metric_data_point_weekly @entity {
 
 
 
-type group_user_metric @entity {
+type group_user_metric @entity(immutable: false) {
     id: ID!   #will be based on group pool address and user lender address 
     
     user_address: Bytes!

@@ -19,48 +19,21 @@ Have to use data source templates to achieve the factory pattern !
 
  ```
 
-yarn build 
+npm run codegen && npm run build 
  ```
 
 
-
-2. set network config ????
-
-```
- await setNetworkConfig(subgraph.network, config);
-
-```
-
-3.  make sure code is copied over 
-
-```
- yarn contracts export --network base
-```
-
  
- 4. run handlebars which will build the final  subgraph.yaml file ! 
-
-```
- yarn hbs -D ./config/${subgraph.network}.json ./src/subgraph.handlebars -o . -e yaml
  
- yarn hbs -D ./config/arbitrum-one.json ./src/subgraph.handlebars -o . -e yaml
- 
-  yarn hbs -D ./config/base.json ./src/subgraph.handlebars -o . -e yaml
-
-   yarn hbs -D ./config/polygon.json ./src/subgraph.handlebars -o . -e yaml
-
-
-   yarn hbs -D ./config/optimism.json ./src/subgraph.handlebars -o . -e yaml
-
-
-   yarn hbs -D ./config/katana.json ./src/subgraph.handlebars -o . -e yaml
+2. run handlebars which will build the final  subgraph.yaml file ! 
 
 ```
  
+npm run generate mainnet
 
 
-4.1.  ( make sure graft base is OK -- in subgraph / config {{ networkname.json }} )
-
+```
+ 
  
 
 
@@ -72,16 +45,8 @@ graph auth
 
 6. deploy ! 
 
- graph deploy   teller-v-2-base --version-label 0.4.21-22
-
- graph deploy   tellerv2-arbitrum --version-label 0.4.21-22
-
-
- graph deploy   teller-v-2-katana --version-label 0.4.21-22
- graph deploy   teller-v-2-polygon --version-label 0.4.21-22
-
-graph deploy   teller-v-2-optimism --version-label 0.4.21-19
-
+ graph deploy   teller-pools-mainnet --version-label 0.4.21-1
+ 
 
  
 

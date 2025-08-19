@@ -3,4 +3,5 @@
 TODO
 
 
-1. devise a way to build our subgraph code using handlebars and the graph cli 
+1. be able to compile subgraph.template.yaml to subgraph.yaml using handlebars 
+

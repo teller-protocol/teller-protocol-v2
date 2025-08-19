@@ -1,470 +1,306 @@
-type Protocol implements IHasLoans @entity(immutable: false) {
-  id: ID!
-
-  loans: LoanStatusCount! @derivedFrom(field: "_protocol")
-  tokenVolumes: [TokenVolume!]! @derivedFrom(field: "protocol")
-
-  rolloverableLCF: Bytes
-  activeCommitments: [Commitment!]!
-  inactiveCommitments: [Commitment!]
-
-  activeRewards: [RewardAllocation!]!
-
-  _durationTotal: BigInt!
-  durationAverage: BigInt!
+type factory_admin_changed @entity {
+    id: ID!
+    evt_tx_hash: Bytes!
+    evt_index: BigInt!
+    evt_block_time: BigInt!
+    evt_block_number: BigInt!
+    new_admin: Bytes!
+    previous_admin: Bytes!
+}
+type factory_beacon_upgraded @entity {
+    id: ID!
+    evt_tx_hash: Bytes!
+    evt_index: BigInt!
+    evt_block_time: BigInt!
+    evt_block_number: BigInt!
+    beacon: Bytes!
+}
+type factory_deployed_lender_group_contract @entity {
+    id: ID!
+    evt_tx_hash: Bytes!
+    evt_index: BigInt!
+    evt_block_time: BigInt!
+    evt_block_number: BigInt!
+    group_contract: Bytes!
+}
+type factory_upgraded @entity {
+    id: ID!
+    evt_tx_hash: Bytes!
+    evt_index: BigInt!
+    evt_block_time: BigInt!
+    evt_block_number: BigInt!
+    implementation: Bytes!
 }
 
-type ProtocolCollateral @entity(immutable: false) {
-  id: ID!
-  collateralToken: Token
-  tokenVolumesByLendingToken: [TokenVolume!]! @derivedFrom(field: "_protocolCollateral")
+type group_borrower_accepted_funds @entity {
+    id: ID!
+    evt_tx_hash: Bytes!
+    evt_index: BigInt!
+    evt_block_time: BigInt!
+    evt_block_number: BigInt!
+    group_pool_address: Bytes!
+    bid_id: BigDecimal!
+    borrower: Bytes!
+    collateral_amount: BigDecimal!
+    interest_rate: BigInt!
+    loan_duration: BigInt!
+    principal_amount: BigDecimal!
 }
 
-type MarketPlace implements IHasLoans @entity(immutable: false) {
-  id: ID!
-  marketplaceId: BigInt!
-
-  owner: Bytes
-  feeRecipient: Bytes
-  metadataURI: String
-  isMarketOpen: Boolean!
-  paymentDefaultDuration: BigInt!
-  paymentCycleDuration: BigInt!
-  paymentCycleType: String!
-  paymentType: String!
-  bidExpirationTime: BigInt!
-  borrowerAttestationRequired: Boolean!
-  lenderAttestationRequired: Boolean!
-  marketplaceFeePercent: BigInt!
-
-  loans: LoanStatusCount! @derivedFrom(field: "_market")
-  tokenVolumes: [TokenVolume!]! @derivedFrom(field: "market")
-
-  _durationTotal: BigInt!
-  durationAverage: BigInt!
-
-  totalNumberOfLenders: BigInt!
-  lenders: [Lender!]! @derivedFrom(field: "marketplace")
-
-  borrowers: [Borrower!]! @derivedFrom(field: "marketplace")
-
-  commitments: [Commitment!]! @derivedFrom(field: "marketplace")
+type group_lender_added_principal @entity {
+    id: ID!
+    evt_tx_hash: Bytes!
+    evt_index: BigInt!
+    evt_block_time: BigInt!
+    evt_block_number: BigInt!
+    group_pool_address: Bytes!
+    amount: BigDecimal!
+    lender: Bytes!
+    shares_amount: BigDecimal!
+    shares_recipient: Bytes!
+}
+type group_earnings_withdrawn @entity {
+    id: ID!
+    evt_tx_hash: Bytes!
+    evt_index: BigInt!
+    evt_block_time: BigInt!
+    evt_block_number: BigInt!
+    group_pool_address: Bytes!
+    amount_pool_shares_tokens: BigDecimal!
+    lender: Bytes!
+    principal_tokens_withdrawn: BigDecimal!
+    recipient: Bytes!
+}
+type group_defaulted_loan_liquidated @entity {
+    id: ID!
+    evt_tx_hash: Bytes!
+    evt_index: BigInt!
+    evt_block_time: BigInt!
+    evt_block_number: BigInt!
+    group_pool_address: Bytes!
+    amount_due: BigDecimal!
+    bid_id: BigDecimal!
+    liquidator: Bytes!
+    token_amount_difference: BigDecimal!
+}
+type group_initialized @entity {
+    id: ID!
+    evt_tx_hash: Bytes!
+    evt_index: BigInt!
+    evt_block_time: BigInt!
+    evt_block_number: BigInt!
+    group_pool_address: Bytes!
+    version: BigInt!
 }
 
-type Bid @entity(immutable: false) {
-  id: ID!
-  bidId: BigInt!
-  createdAt: BigInt!
-  expiresAt: BigInt!
-  updatedAt: BigInt
-  transactionHash: String!
-  fundedTx: FundedTx @derivedFrom(field: "bid")
-
-  borrowerAddress: Bytes!
-  borrower: Borrower!
-
-  receiverAddress: Bytes!
-
-  liquidatorAddress: Bytes
-
-  lenderAddress: Bytes
-  lender: Lender
-
-  lendingToken: Token!
-  lendingTokenAddress: Bytes!
-
-  bidRewards: [BidReward!]! @derivedFrom(field: "bid")
-
-  marketplaceId: BigInt!
-  metadataURI: String!
-  status: String!
-  principal: BigInt!
-  acceptedTimestamp: BigInt!
-  lastRepaidTimestamp: BigInt!
-  loanDuration: BigInt!
-  paymentCycle: BigInt!
-  paymentCycleAmount: BigInt!
-  apr: BigInt!
-  endDate: BigInt
-  nextDueDate: BigInt
-  marketplace: MarketPlace!
-  commitment: Commitment
-  commitmentId: String
-
-  payments: [Payment!]! @derivedFrom(field: "bid")
-  totalRepaidPrincipal: BigInt!
-  totalRepaidInterest: BigInt!
-  _lastTotalRepaidAmount: BigInt!
-  _lastTotalRepaidInterestAmount: BigInt!
-  paymentDefaultDuration: BigInt!
-  collateralEscrow: Bytes
-  collateral: [BidCollateral!]
+type group_loan_repaid @entity {
+    id: ID!
+    evt_tx_hash: Bytes!
+    evt_index: BigInt!
+    evt_block_time: BigInt!
+    evt_block_number: BigInt!
+    group_pool_address: Bytes!
+    bid_id: BigDecimal!
+    interest_amount: BigDecimal!
+    principal_amount: BigDecimal!
+    repayer: Bytes!
+    total_interest_collected: BigDecimal!
+    total_principal_repaid: BigDecimal!
+}
+type group_ownership_transferred @entity {
+    id: ID!
+    evt_tx_hash: Bytes!
+    evt_index: BigInt!
+    evt_block_time: BigInt!
+    evt_block_number: BigInt!
+    group_pool_address: Bytes!
+    new_owner: Bytes!
+    previous_owner: Bytes!
+}
+type group_paused @entity {
+    id: ID!
+    evt_tx_hash: Bytes!
+    evt_index: BigInt!
+    evt_block_time: BigInt!
+    evt_block_number: BigInt!
+    group_pool_address: Bytes!
+    account: Bytes!
 }
 
-type BidCollateral @entity(immutable: false) {
-  id: ID!
-  amount: BigInt!
-  tokenId: BigInt
-  type: String
-  collateralAddress: Bytes!
-  token: Token!
-  bid: Bid!
-  status: String
-  receiver: Bytes
+# use group pool metrics instead 
+type group_pool_initialized @entity {
+    id: ID!
+    evt_tx_hash: Bytes!
+    evt_index: BigInt!
+    evt_block_time: BigInt!
+    evt_block_number: BigInt!
+    group_pool_address: Bytes!
+    collateral_token_address: Bytes!
+    interest_rate_lower_bound: BigInt!
+    interest_rate_upper_bound: BigInt!
+    liquidity_threshold_percent: BigInt!
+    loan_to_value_percent: BigInt!
+    market_id: BigInt!
+    max_loan_duration: BigInt!
+    pool_shares_token: Bytes!
+    principal_token_address: Bytes!
+}
+type group_unpaused @entity {
+    id: ID!
+    evt_tx_hash: Bytes!
+    evt_index: BigInt!
+    evt_block_time: BigInt!
+    evt_block_number: BigInt!
+    group_pool_address: Bytes!
+    account: Bytes!
 }
 
-type Token @entity(immutable: false) {
-  id: ID!
-  address: Bytes!
-  type: String
-  nftId: BigInt
-  name: String
-  symbol: String
-  decimals: BigInt
+type group_pool_bid @entity {
+    id: ID! 
+    group_pool_address: Bytes!
+    bid_id: BigDecimal!
+    borrower: Bytes!
+    collateral_amount: BigDecimal! 
+    principal_amount: BigDecimal!
 }
 
-type FundedTx @entity(immutable: false) {
-  id: ID!
-  bid: Bid!
-  timestamp: BigInt!
-}
-
-type Payment @entity(immutable: false) {
-  id: ID!
-  bid: Bid!
-  principal: BigInt!
-  interest: BigInt!
-  paymentDate: BigInt!
-  outstandingCapital: BigInt!
-  status: String!
-}
-
-type User @entity(immutable: false) {
-  id: ID!
-  firstInteractionDate: BigInt!
-  lenders: [Lender!]! @derivedFrom(field: "user")
-  borrowers: [Borrower!]! @derivedFrom(field: "user")
-  bidRewards: [BidReward!]! @derivedFrom(field: "user")
-}
-
-type Lender implements IHasLoans @entity(immutable: false) {
-  id: ID!
-  marketplaceId: BigInt!
-  lenderAddress: Bytes!
-  firstInteractionDate: BigInt!
-  attestedTimestamp: BigInt
-  isAttested: Boolean!
-
-  loans: LoanStatusCount! @derivedFrom(field: "_lender")
-  tokenVolumes: [TokenVolume!]! @derivedFrom(field: "lender")
-
-  _durationTotal: BigInt!
-  durationAverage: BigInt!
-
-  marketplace: MarketPlace!
-  user: User!
-  commitments: [Commitment!]! @derivedFrom(field: "lender")
-}
-
-type Borrower implements IHasLoans @entity(immutable: false) {
-  id: ID!
-  marketplaceId: BigInt!
-  borrowerAddress: Bytes!
-  firstInteractionDate: BigInt!
-  attestedTimestamp: BigInt
-  isAttested: Boolean!
-
-  loans: LoanStatusCount! @derivedFrom(field: "_borrower")
-  tokenVolumes: [TokenVolume!]! @derivedFrom(field: "borrower")
-
-  _durationTotal: BigInt!
-  durationAverage: BigInt!
-
-  marketplace: MarketPlace!
-  user: User!
-}
-
-interface IHasLoans implements IDurationAverage {
-  loans: LoanStatusCount!
-  tokenVolumes: [TokenVolume!]!
-
-  _durationTotal: BigInt!
-  durationAverage: BigInt!
-}
-
-interface IDurationAverage {
-  _durationTotal: BigInt!
-  durationAverage: BigInt!
-}
-
-interface ILoanStatusCount {
-  all: [Bid!]!
-  totalCount: BigInt!
-
-  submitted: [Bid!]!
-  submittedCount: BigInt!
-
-  expired: [Bid!]!
-  expiredCount: BigInt!
-
-  cancelled: [Bid!]!
-  cancelledCount: BigInt!
-
-  accepted: [Bid!]!
-  acceptedCount: BigInt!
-
-  dueSoon: [Bid!]!
-  dueSoonCount: BigInt!
-
-  late: [Bid!]!
-  lateCount: BigInt!
-
-  defaulted: [Bid!]!
-  defaultedCount: BigInt!
-
-  repaid: [Bid!]!
-  repaidCount: BigInt!
-
-  liquidated: [Bid!]!
-  liquidatedCount: BigInt!
-}
-
-type LoanStatusCount implements ILoanStatusCount @entity(immutable: false) {
-  id: ID!
-
-  all: [Bid!]!
-  totalCount: BigInt!
-
-  submitted: [Bid!]!
-  submittedCount: BigInt!
-
-  expired: [Bid!]!
-  expiredCount: BigInt!
-
-  cancelled: [Bid!]!
-  cancelledCount: BigInt!
-
-  accepted: [Bid!]!
-  acceptedCount: BigInt!
-
-  dueSoon: [Bid!]!
-  dueSoonCount: BigInt!
-
-  late: [Bid!]!
-  lateCount: BigInt!
-
-  defaulted: [Bid!]!
-  defaultedCount: BigInt!
-
-  repaid: [Bid!]!
-  repaidCount: BigInt!
-
-  liquidated: [Bid!]!
-  liquidatedCount: BigInt!
-
-  ## Entity Relationships ##
-  _protocol: Protocol
-  _market: MarketPlace
-  _lender: Lender
-  _borrower: Borrower
-  _tokenVolume: TokenVolume
-  ## end Entity Relationships ##
-}
-
-type TokenVolume implements IDurationAverage @entity(immutable: false) {
-  id: ID!
-
-  ## Entity Relationships ##
-  protocol: Protocol
-  market: MarketPlace
-  lender: Lender
-  borrower: Borrower
-
-  allocatedRewards: [RewardAllocation!]! @derivedFrom(field: "tokenVolume")
-
-  # used to group token volumes with collateral by lending token
-  _protocolCollateral: ProtocolCollateral
-
-  _linkedParentTokenVolume: TokenVolume
-  tokenVolumeByCollateral: [TokenVolume!]! @derivedFrom(field: "_linkedParentTokenVolume")
-  ## end Entity Relationships ##
-
-  ## TokenStats ##
-  token: Token!
-  collateralToken: Token # if null, then theres no collateral
-  lendingTokenAddress: Bytes!
-
-  loans: LoanStatusCount! @derivedFrom(field: "_tokenVolume")
-
-  outstandingCapital: BigInt!
-  totalAvailable: BigInt! # available for lending via commitments
-  totalLoaned: BigInt!
-  totalActive: BigInt!
-  totalAccepted: BigInt!
-  totalDueSoon: BigInt!
-  totalLate: BigInt!
-  totalDefaulted: BigInt!
-  totalRepaid: BigInt!
-  totalLiquidated: BigInt!
-
-  _loanAcceptedCount: BigInt!
-  loanAverage: BigInt!
-
-  commissionEarned: BigInt!
-  totalRepaidInterest: BigInt!
-
-  _aprWeightedTotal: BigInt!
-  aprAverage: BigInt!
-  _aprActiveWeightedTotal: BigInt!
-  aprActiveAverage: BigInt!
-
-  _durationTotal: BigInt!
-  durationAverage: BigInt!
-
-  ## end TokenStats ##
-}
-
-type MarketCommitmentStdDev @entity(immutable: false) {
-  id: ID!
-
-  market: MarketPlace!
-
-  lendingToken: Token!
-  collateralToken: Token
-
-  commitmentZScores: [CommitmentZScore!]!
-
-  maxPrincipalPerCollateralStdDev: BigDecimal!
-  maxPrincipalPerCollateralMean: BigDecimal!
-
-  minApyStdDev: BigDecimal!
-  minApyMean: BigDecimal!
-
-  maxDurationStdDev: BigDecimal!
-  maxDurationMean: BigDecimal!
-}
-
-type CommitmentZScore @entity(immutable: false) {
-  id: ID!
-  commitment: Commitment!
-  zScore: BigDecimal!
-}
-
-type Commitment @entity(immutable: false) {
-  id: ID!
-  commitmentId: BigInt!
-  createdAt: BigInt!
-  updatedAt: BigInt!
-  status: String!
-  forwarderAddress: Bytes! # address of the LenderCommitmentForwarder contract
-  rolloverable: Boolean!
-
-  # Offer
-  committedAmount: BigInt! # Current committed amount
-  expirationTimestamp: BigInt!
-  maxDuration: BigInt!
-  minAPY: BigInt!
-  principalToken: Token!
-  principalTokenAddress: Bytes!
-
-  # Required Collateral
-  collateralToken: Token
-  collateralTokenAddress: Bytes
-  collateralTokenType: BigInt!
-  maxPrincipalPerCollateralAmount: BigInt
-
-  commitmentBorrowers: [Bytes!]!
-
-  # Lender
-  lender: Lender!
-  lenderAddress: Bytes!
-  lenderPrincipalBalance: BigInt!
-  lenderPrincipalAllowance: BigInt!
-
-  # Market
-  marketplace: MarketPlace!
-  marketplaceId: BigInt!
-
-  # TokenStats
-  tokenVolume: TokenVolume!
-
-  # Extra
-  maxPrincipal: BigInt!
-  acceptedPrincipal: BigInt! # funds that were accepted (only tracking _newAcceptedPrincipal value for now)
-  _oldAcceptedPrincipal: BigInt! # funds that were accepted that was not previously tracked on-chain
-  _newAcceptedPrincipal: BigInt! # funds that were accepted AFTER commitmentPrincipalAccepted function was added on-chain
-
-  commitmentRewards: [CommitmentReward!]! @derivedFrom(field: "commitment")
-}
-
-
-# Association between RewardAllocations and Commitments
-type CommitmentReward @entity(immutable: false) {
-  id: ID!
-  createdAt: BigInt!
-  updatedAt: BigInt!
-
-  reward: RewardAllocation!
-  commitment: Commitment!
-
-  roi: BigInt!
-  apy: BigInt!
+type group_pool_metric @entity {
+    id: ID!    #will be based on group pool address 
+    group_pool_address: Bytes!
+
+    created_at: BigInt!
+    
+    principal_token_address: Bytes!
+    collateral_token_address: Bytes!
+    shares_token_address: Bytes!
+
+    # get these from RPC calls 
+   
+    teller_v2_address: Bytes!
+    smart_commitment_forwarder_address: Bytes! 
+    # ---
+    
+    market_id: BigInt!
+    
+    max_loan_duration : BigInt!
+    
+    interest_rate_upper_bound: BigInt!
+    interest_rate_lower_bound: BigInt!
+    
+    current_min_interest_rate: BigInt!
+    
+
+    liquidity_threshold_percent: BigInt!
+    collateral_ratio: BigInt!  #loan to value 
+   
+    total_principal_tokens_committed: BigInt!
+    total_principal_tokens_withdrawn: BigInt!
+    
+    total_principal_tokens_borrowed: BigInt!
+    total_collateral_tokens_escrowed: BigInt!  #fix me by reductions 
+    total_principal_tokens_repaid: BigInt!
+    total_interest_collected: BigInt!
+
+    token_difference_from_liquidations: BigInt!
+    total_collateral_withdrawn: BigInt!
+
+  
 }
 
 
 
 
-type RewardAllocation @entity(immutable: false) {
-  id: ID!
-  createdAt: BigInt!
-  updatedAt: BigInt!
 
-  status: String!
+type group_pool_metric_data_point @entity {
+    id: ID!    #will be based on group pool address 
+    group_pool_address: Bytes!
 
-  allocator: User!
-  allocatorAddress: Bytes!
+    block_number: BigInt!
+    block_time: BigInt 
+       
+    
+    total_principal_tokens_committed: BigInt!
+    total_principal_tokens_withdrawn: BigInt!
+    total_collateral_tokens_escrowed: BigInt!  #fix me by reductions 
 
-  # Market
-  marketplace: MarketPlace!
-  marketplaceId: BigInt!
+          total_collateral_tokens_withdrawn: BigInt!
+    
+    total_principal_tokens_borrowed: BigInt!
+    total_principal_tokens_repaid: BigInt!
+    total_interest_collected: BigInt!
 
-  # TokenStats
-  tokenVolume: TokenVolume
-
-  rewardToken: Token!
-  rewardTokenAddress: Bytes!
-  rewardTokenAmountInitial: BigInt!
-  rewardTokenAmountRemaining: BigInt!
-
-  requiredPrincipalTokenAddress: Bytes!
-  requiredCollateralTokenAddress: Bytes!
-
-  minimumCollateralPerPrincipalAmount: BigInt!
-  rewardPerLoanPrincipalAmount: BigInt!
-
-  bidStartTimeMin: BigInt!
-  bidStartTimeMax: BigInt!
-
-  allocationStrategy: String!
-
-  bidRewards: [BidReward!]!
-
-  commitmentRewards: [CommitmentReward!]! @derivedFrom(field: "reward")
+     token_difference_from_liquidations: BigInt!
 
 }
 
+type group_pool_metric_data_point_daily @entity {
+    id: ID!    #will be based on group pool address and day id 
+    group_pool_address: Bytes!
 
-type BidReward @entity(immutable: false) {
-  id: ID!
-  createdAt: BigInt!
-  updatedAt: BigInt!
+    block_number: BigInt!
+    block_time: BigInt 
+       
+    
+    total_principal_tokens_committed: BigInt!
+    total_principal_tokens_withdrawn: BigInt!
+    total_collateral_tokens_escrowed: BigInt!  #fix me by reductions 
+    total_collateral_tokens_withdrawn: BigInt!
+    
+    total_principal_tokens_borrowed: BigInt!
+    total_principal_tokens_repaid: BigInt!
+    total_interest_collected: BigInt!
 
-  reward: RewardAllocation!
-  bid: Bid!
-  user: User!
 
-  claimed: Boolean!
+    token_difference_from_liquidations: BigInt!
+
+    
+}
+
+type group_pool_metric_data_point_weekly @entity {
+    id: ID!    #will be based on group pool address and week id 
+    group_pool_address: Bytes!
+
+    block_number: BigInt!
+    block_time: BigInt 
+       
+    
+    total_principal_tokens_committed: BigInt!
+    total_principal_tokens_withdrawn: BigInt!
+    total_collateral_tokens_escrowed: BigInt!  #fix me by reductions 
+    total_collateral_tokens_withdrawn: BigInt!
+
+    total_principal_tokens_borrowed: BigInt!
+    total_principal_tokens_repaid: BigInt!
+    total_interest_collected: BigInt!
+
+    token_difference_from_liquidations: BigInt!
+
+    
 }
 
 
+
+type group_user_metric @entity {
+    id: ID!   #will be based on group pool address and user lender address 
+    
+    user_address: Bytes!
+    group_pool_address: Bytes!
+
+    total_principal_tokens_committed: BigInt!
+    total_principal_tokens_withdrawn: BigInt! 
+
+    total_principal_tokens_borrowed: BigInt! 
+    total_collateral_tokens_escrowed: BigInt!
+
+
+
+   # shares_tokens_balance: BigInt! # need to track from erc20 driver
+
+   # shares_balance_value: BigInt! # valued in principal tokens 
+   # total_interest_earned: BigInt! # valued in principal tokens 
+
+    
+}
+
+# also add borrower metrics  ?
 

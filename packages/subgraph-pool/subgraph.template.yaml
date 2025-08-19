@@ -23,9 +23,9 @@ dataSources:
         - Pool
       abis:
         - name: Factory
-          file: ./abis/mainnet_LenderCommitmentGroupFactory.json
+          file: ./abis/Factory.json
       eventHandlers:
-        - event: LenderGroupDeployed(indexed address)
+        - event: DeployedLenderGroupContract(indexed address)
           handler: handleLenderGroupDeployed
 templates:
   - kind: ethereum/contract
@@ -42,9 +42,17 @@ templates:
         - Pool
       abis:
         - name: Pool
-          file: ./abis/mainnet_LenderCommitmentGroupBeacon.json
+          file: ./abis/PoolV1.json
         - name: Factory
-          file: ./abis/mainnet_LenderCommitmentGroupFactory.json
+          file: ./abis/Factory.json
       eventHandlers:
-        - event: Deposit()
-          handler: handleDeposit
+        - event: BorrowerAcceptedFunds(indexed address, indexed uint256, uint256, uint256, uint32, uint16)
+          handler: handleBorrowerAcceptedFunds
+        - event: EarningsWithdrawn(indexed address, uint256, uint256, indexed address)
+          handler: handleEarningsWithdrawn
+        - event: LenderAddedPrincipal(indexed address, uint256, uint256, indexed address)
+          handler: handleLenderAddedPrincipal
+        - event: LoanRepaid(indexed uint256, indexed address, uint256, uint256, uint256, uint256)
+          handler: handleLoanRepaid
+        - event: DefaultedLoanLiquidated(indexed uint256, indexed address, uint256, int256)
+          handler: handleLoanLiquidated

@@ -3,7 +3,8 @@ import {
   EarningsWithdrawn,
   LenderAddedPrincipal,
   LoanRepaid,
-  DefaultedLoanLiquidated
+  DefaultedLoanLiquidated,
+  PoolInitialized
 } from "../../generated/templates/Pool/Pool"
 import {
   group_borrower_accepted_funds,
@@ -13,9 +14,99 @@ import {
   group_defaulted_loan_liquidated,
   group_pool_metric,
   group_user_metric,
-  group_pool_bid
+  group_pool_bid,
+  group_pool_metric_data_point_daily,
+  group_pool_metric_data_point_weekly
 } from "../../generated/schema"
 import { BigInt, Address, BigDecimal } from "@graphprotocol/graph-ts"
+
+// Constants for time calculations
+const SECONDS_IN_DAY = BigInt.fromI32(86400)  // 24 * 60 * 60
+const SECONDS_IN_WEEK = BigInt.fromI32(604800)  // 7 * 24 * 60 * 60
+
+function getDayIndex(timestamp: BigInt): BigInt {
+  return timestamp.div(SECONDS_IN_DAY)
+}
+
+function getWeekIndex(timestamp: BigInt): BigInt {
+  return timestamp.div(SECONDS_IN_WEEK)
+}
+
+function updateOrCreateDailyDataPoint(poolAddress: Address, blockNumber: BigInt, timestamp: BigInt): void {
+  let dayIndex = getDayIndex(timestamp)
+  let dailyId = poolAddress.toHexString() + "-" + dayIndex.toString()
+  
+  let dailyDataPoint = group_pool_metric_data_point_daily.load(dailyId)
+  if (dailyDataPoint == null) {
+    dailyDataPoint = new group_pool_metric_data_point_daily(dailyId)
+    dailyDataPoint.group_pool_address = poolAddress
+    dailyDataPoint.total_principal_tokens_committed = BigInt.fromI32(0)
+    dailyDataPoint.total_principal_tokens_withdrawn = BigInt.fromI32(0)
+    dailyDataPoint.total_collateral_tokens_escrowed = BigInt.fromI32(0)
+    dailyDataPoint.total_collateral_tokens_withdrawn = BigInt.fromI32(0)
+    dailyDataPoint.total_principal_tokens_borrowed = BigInt.fromI32(0)
+    dailyDataPoint.total_principal_tokens_repaid = BigInt.fromI32(0)
+    dailyDataPoint.total_interest_collected = BigInt.fromI32(0)
+    dailyDataPoint.token_difference_from_liquidations = BigInt.fromI32(0)
+  }
+  
+  // Update with latest block info and current pool metric values
+  dailyDataPoint.block_number = blockNumber
+  dailyDataPoint.block_time = timestamp
+  
+  // Load current pool metric to get latest values
+  let poolMetric = group_pool_metric.load(poolAddress.toHexString())
+  if (poolMetric != null) {
+    dailyDataPoint.total_principal_tokens_committed = poolMetric.total_principal_tokens_committed
+    dailyDataPoint.total_principal_tokens_withdrawn = poolMetric.total_principal_tokens_withdrawn
+    dailyDataPoint.total_collateral_tokens_escrowed = poolMetric.total_collateral_tokens_escrowed
+    dailyDataPoint.total_collateral_tokens_withdrawn = poolMetric.total_collateral_withdrawn
+    dailyDataPoint.total_principal_tokens_borrowed = poolMetric.total_principal_tokens_borrowed
+    dailyDataPoint.total_principal_tokens_repaid = poolMetric.total_principal_tokens_repaid
+    dailyDataPoint.total_interest_collected = poolMetric.total_interest_collected
+    dailyDataPoint.token_difference_from_liquidations = poolMetric.token_difference_from_liquidations
+  }
+  
+  dailyDataPoint.save()
+}
+
+function updateOrCreateWeeklyDataPoint(poolAddress: Address, blockNumber: BigInt, timestamp: BigInt): void {
+  let weekIndex = getWeekIndex(timestamp)
+  let weeklyId = poolAddress.toHexString() + "-" + weekIndex.toString()
+  
+  let weeklyDataPoint = group_pool_metric_data_point_weekly.load(weeklyId)
+  if (weeklyDataPoint == null) {
+    weeklyDataPoint = new group_pool_metric_data_point_weekly(weeklyId)
+    weeklyDataPoint.group_pool_address = poolAddress
+    weeklyDataPoint.total_principal_tokens_committed = BigInt.fromI32(0)
+    weeklyDataPoint.total_principal_tokens_withdrawn = BigInt.fromI32(0)
+    weeklyDataPoint.total_collateral_tokens_escrowed = BigInt.fromI32(0)
+    weeklyDataPoint.total_collateral_tokens_withdrawn = BigInt.fromI32(0)
+    weeklyDataPoint.total_principal_tokens_borrowed = BigInt.fromI32(0)
+    weeklyDataPoint.total_principal_tokens_repaid = BigInt.fromI32(0)
+    weeklyDataPoint.total_interest_collected = BigInt.fromI32(0)
+    weeklyDataPoint.token_difference_from_liquidations = BigInt.fromI32(0)
+  }
+  
+  // Update with latest block info and current pool metric values
+  weeklyDataPoint.block_number = blockNumber
+  weeklyDataPoint.block_time = timestamp
+  
+  // Load current pool metric to get latest values
+  let poolMetric = group_pool_metric.load(poolAddress.toHexString())
+  if (poolMetric != null) {
+    weeklyDataPoint.total_principal_tokens_committed = poolMetric.total_principal_tokens_committed
+    weeklyDataPoint.total_principal_tokens_withdrawn = poolMetric.total_principal_tokens_withdrawn
+    weeklyDataPoint.total_collateral_tokens_escrowed = poolMetric.total_collateral_tokens_escrowed
+    weeklyDataPoint.total_collateral_tokens_withdrawn = poolMetric.total_collateral_withdrawn
+    weeklyDataPoint.total_principal_tokens_borrowed = poolMetric.total_principal_tokens_borrowed
+    weeklyDataPoint.total_principal_tokens_repaid = poolMetric.total_principal_tokens_repaid
+    weeklyDataPoint.total_interest_collected = poolMetric.total_interest_collected
+    weeklyDataPoint.token_difference_from_liquidations = poolMetric.token_difference_from_liquidations
+  }
+  
+  weeklyDataPoint.save()
+}
 
 function getOrCreateUserMetric(userAddress: Address, poolAddress: Address): group_user_metric {
   let id = poolAddress.toHexString() + "-" + userAddress.toHexString()
@@ -83,6 +174,10 @@ export function handleBorrowerAcceptedFunds(event: BorrowerAcceptedFunds): void 
   userMetric.total_principal_tokens_borrowed = userMetric.total_principal_tokens_borrowed.plus(principalAmount)
   userMetric.total_collateral_tokens_escrowed = userMetric.total_collateral_tokens_escrowed.plus(collateralAmount)
   userMetric.save()
+
+  // Update daily and weekly data points
+  updateOrCreateDailyDataPoint(poolAddress, event.block.number, event.block.timestamp)
+  updateOrCreateWeeklyDataPoint(poolAddress, event.block.number, event.block.timestamp)
 }
 
 export function handleEarningsWithdrawn(event: EarningsWithdrawn): void {
@@ -118,6 +213,10 @@ export function handleEarningsWithdrawn(event: EarningsWithdrawn): void {
   let userMetric = getOrCreateUserMetric(lender, poolAddress)
   userMetric.total_principal_tokens_withdrawn = userMetric.total_principal_tokens_withdrawn.plus(principalTokensWithdrawn)
   userMetric.save()
+
+  // Update daily and weekly data points
+  updateOrCreateDailyDataPoint(poolAddress, event.block.number, event.block.timestamp)
+  updateOrCreateWeeklyDataPoint(poolAddress, event.block.number, event.block.timestamp)
 }
 
 export function handleLenderAddedPrincipal(event: LenderAddedPrincipal): void {
@@ -153,6 +252,10 @@ export function handleLenderAddedPrincipal(event: LenderAddedPrincipal): void {
   let userMetric = getOrCreateUserMetric(lender, poolAddress)
   userMetric.total_principal_tokens_committed = userMetric.total_principal_tokens_committed.plus(amount)
   userMetric.save()
+
+  // Update daily and weekly data points
+  updateOrCreateDailyDataPoint(poolAddress, event.block.number, event.block.timestamp)
+  updateOrCreateWeeklyDataPoint(poolAddress, event.block.number, event.block.timestamp)
 }
 
 export function handleLoanRepaid(event: LoanRepaid): void {
@@ -188,6 +291,10 @@ export function handleLoanRepaid(event: LoanRepaid): void {
     poolMetric.total_interest_collected = poolMetric.total_interest_collected.plus(interestAmount)
     poolMetric.save()
   }
+
+  // Update daily and weekly data points
+  updateOrCreateDailyDataPoint(poolAddress, event.block.number, event.block.timestamp)
+  updateOrCreateWeeklyDataPoint(poolAddress, event.block.number, event.block.timestamp)
 }
 
 export function handleLoanLiquidated(event: DefaultedLoanLiquidated): void {
@@ -218,4 +325,60 @@ export function handleLoanLiquidated(event: DefaultedLoanLiquidated): void {
     poolMetric.token_difference_from_liquidations = poolMetric.token_difference_from_liquidations.plus(tokenAmountDifference)
     poolMetric.save()
   }
+
+  // Update daily and weekly data points
+  updateOrCreateDailyDataPoint(poolAddress, event.block.number, event.block.timestamp)
+  updateOrCreateWeeklyDataPoint(poolAddress, event.block.number, event.block.timestamp)
+}
+
+export function handlePoolInitialized(event: PoolInitialized): void {
+  let poolAddress = event.address
+  let principalTokenAddress = event.params.principalTokenAddress
+  let collateralTokenAddress = event.params.collateralTokenAddress
+  let marketId = event.params.marketId
+  let maxLoanDuration = event.params.maxLoanDuration
+  let interestRateLowerBound = event.params.interestRateLowerBound
+  let interestRateUpperBound = event.params.interestRateUpperBound
+  let liquidityThresholdPercent = event.params.liquidityThresholdPercent
+  let loanToValuePercent = event.params.loanToValuePercent
+  let poolSharesToken = event.params.poolSharesToken
+
+  // Create or update pool metric with all initialization parameters
+  let poolMetric = group_pool_metric.load(poolAddress.toHexString())
+  if (poolMetric == null) {
+    poolMetric = new group_pool_metric(poolAddress.toHexString())
+    poolMetric.group_pool_address = poolAddress
+    poolMetric.created_at = event.block.timestamp
+    
+    // Initialize counters to zero
+    poolMetric.total_principal_tokens_committed = BigInt.fromI32(0)
+    poolMetric.total_principal_tokens_withdrawn = BigInt.fromI32(0)
+    poolMetric.total_principal_tokens_borrowed = BigInt.fromI32(0)
+    poolMetric.total_collateral_tokens_escrowed = BigInt.fromI32(0)
+    poolMetric.total_principal_tokens_repaid = BigInt.fromI32(0)
+    poolMetric.total_interest_collected = BigInt.fromI32(0)
+    poolMetric.token_difference_from_liquidations = BigInt.fromI32(0)
+    poolMetric.total_collateral_withdrawn = BigInt.fromI32(0)
+    
+    // Set placeholder values for RPC fields - these will need to be filled from contract calls
+    poolMetric.teller_v2_address = Address.zero()
+    poolMetric.smart_commitment_forwarder_address = Address.zero()
+    poolMetric.current_min_interest_rate = BigInt.fromI32(0)
+  }
+  
+  // Set all parameters from PoolInitialized event
+  poolMetric.principal_token_address = principalTokenAddress
+  poolMetric.collateral_token_address = collateralTokenAddress
+  poolMetric.shares_token_address = poolSharesToken
+  poolMetric.market_id = marketId
+  poolMetric.max_loan_duration = maxLoanDuration
+  poolMetric.interest_rate_lower_bound = BigInt.fromI32(interestRateLowerBound)
+  poolMetric.interest_rate_upper_bound = BigInt.fromI32(interestRateUpperBound)
+  poolMetric.liquidity_threshold_percent = BigInt.fromI32(liquidityThresholdPercent)
+  poolMetric.collateral_ratio = BigInt.fromI32(loanToValuePercent)
+  poolMetric.save()
+
+  // Update daily and weekly data points
+  updateOrCreateDailyDataPoint(poolAddress, event.block.number, event.block.timestamp)
+  updateOrCreateWeeklyDataPoint(poolAddress, event.block.number, event.block.timestamp)
 }

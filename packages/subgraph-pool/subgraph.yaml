@@ -12,8 +12,8 @@ dataSources:
     network: mainnet
     source:
       abi: Factory
-      address: "0x00182FdB0B880eE24D428e3Cc39383717677C37e"
-      startBlock: 15094705
+      address: "0x0848E884b2DBb63727aa3216b921C279f6DC9a91"
+      startBlock: 21616926
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7

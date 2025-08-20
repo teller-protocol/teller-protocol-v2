@@ -56,3 +56,6 @@ templates:
           handler: handleLoanRepaid
         - event: DefaultedLoanLiquidated(indexed uint256,indexed address,uint256,int256)
           handler: handleLoanLiquidated
+        - event: PoolInitialized(indexed address,indexed address,uint256,uint32,uint16,uint16,uint16,uint16,address)
+          handler: handlePoolInitialized
+

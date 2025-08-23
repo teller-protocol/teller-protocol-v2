@@ -141,8 +141,8 @@ contract LenderCommitmentGroup_Pool_V2 is
 
 
 
-    uint256 immutable public DEFAULT_WITHDRAW_DELAY_TIME_SECONDS = 300;
-    uint256 immutable public MAX_WITHDRAW_DELAY_TIME = 86400;
+   // uint256 immutable public DEFAULT_WITHDRAW_DELAY_TIME_SECONDS = 300;
+   // uint256 immutable public MAX_WITHDRAW_DELAY_TIME = 86400;
 
     mapping(uint256 => bool) public activeBids;
     mapping(uint256 => uint256) public activeBidsAmountDueRemaining;
@@ -150,7 +150,7 @@ contract LenderCommitmentGroup_Pool_V2 is
     int256 tokenDifferenceFromLiquidations;
 
     bool private firstDepositMade_deprecated;  // no longer used
-    uint256 public withdrawDelayTimeSeconds; 
+    uint256 public withdrawDelayTimeSeconds; // immutable for now - use withdrawDelayBypassForAccount
 
     IUniswapPricingLibrary.PoolRouteConfig[]  public  poolOracleRoutes;
 
@@ -162,7 +162,8 @@ contract LenderCommitmentGroup_Pool_V2 is
     bool public paused;
     bool public borrowingPaused;
     bool public liquidationAuctionPaused;
-   
+ 
+    mapping(address => bool) public withdrawDelayBypassForAccount;
 
     event PoolInitialized(
         address indexed principalTokenAddress,
@@ -302,7 +303,7 @@ contract LenderCommitmentGroup_Pool_V2 is
          
         marketId = _commitmentGroupConfig.marketId;
 
-        withdrawDelayTimeSeconds = DEFAULT_WITHDRAW_DELAY_TIME_SECONDS;
+        withdrawDelayTimeSeconds = 300;
 
         //in order for this to succeed, first, the SmartCommitmentForwarder needs to be a trusted forwarder for the market         
         ITellerV2Context(TELLER_V2).approveMarketForwarder(
@@ -1136,17 +1137,19 @@ contract LenderCommitmentGroup_Pool_V2 is
 
 
     /**
-     * @notice Sets the delay time for withdrawing shares. Only Protocol Owner.
-     * @param _seconds Delay time in seconds.
+     * @notice Allows accounts such as Yearn Vaults to bypass withdraw delay. 
+     * @dev This should ONLY be enabled for smart contracts that separately implement MEV/spam protection.
+     * @param _addr  The account that will have the bypass.
+     * @param _bypass Whether or not bypass is enabled
      */
-    function setWithdrawDelayTime(uint256 _seconds) 
+    function setWithdrawDelayBypassForAccount(address _addr, bool _bypass ) 
     external 
     onlyProtocolOwner {
-        require( _seconds < MAX_WITHDRAW_DELAY_TIME , "WD");
-
-        withdrawDelayTimeSeconds = _seconds;
+        
+        withdrawDelayBypassForAccount[_addr] = _bypass;
+       
     }
-
+    
 
 
     // ------------------------   Pausing functions  ------------ 
@@ -1391,7 +1394,12 @@ contract LenderCommitmentGroup_Pool_V2 is
         
         // Check withdrawal delay
         uint256 sharesLastTransferredAt = getSharesLastTransferredAt(owner);
-        require(block.timestamp >= sharesLastTransferredAt + withdrawDelayTimeSeconds, "SW");
+
+
+        require(  
+            withdrawDelayBypassForAccount[msg.sender] || 
+            block.timestamp >= sharesLastTransferredAt + withdrawDelayTimeSeconds, "SW"
+            );
 
         require(msg.sender == owner, "UA");
         
@@ -1436,7 +1444,10 @@ contract LenderCommitmentGroup_Pool_V2 is
 
         // Check withdrawal delay
         uint256 sharesLastTransferredAt = getSharesLastTransferredAt(owner);
-        require(block.timestamp >= sharesLastTransferredAt + withdrawDelayTimeSeconds, "SR");
+        require(
+             withdrawDelayBypassForAccount[msg.sender] ||  
+            block.timestamp >= sharesLastTransferredAt + withdrawDelayTimeSeconds, "SR"
+         );
         
         // Burn shares from owner
         burnShares(owner, shares);
@@ -1557,7 +1568,7 @@ contract LenderCommitmentGroup_Pool_V2 is
         uint256 availableShares = balanceOf(owner);
         uint256 sharesLastTransferredAt = getSharesLastTransferredAt(owner);
         
-        if (block.timestamp <= sharesLastTransferredAt + withdrawDelayTimeSeconds) {
+        if ( !withdrawDelayBypassForAccount[msg.sender] && block.timestamp <= sharesLastTransferredAt + withdrawDelayTimeSeconds) {
             return 0;
         }
         

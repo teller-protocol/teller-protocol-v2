@@ -962,6 +962,307 @@ contract LenderCommitmentGroup_Pool_V2_Test is Testable {
           
           assertEq(actualRedeemAssets, expectedRedeemAssets, "Actual redeem assets should match preview");
       }
+
+    // Tests for withdrawDelayBypassForAccount functionality
+    function test_setWithdrawDelayBypassForAccount_success() public {
+        initialize_group_contract();
+        
+        address testAccount = address(0x123);
+        
+        // Get the protocol owner (TellerV2 owner)
+        address protocolOwner = lenderCommitmentGroupSmartV2.owner();
+        
+        // Mock TellerV2 owner
+        vm.mockCall(
+            address(_tellerV2),
+            abi.encodeWithSignature("owner()"),
+            abi.encode(protocolOwner)
+        );
+        
+        // Set bypass to true
+        vm.prank(protocolOwner);
+        lenderCommitmentGroupSmartV2.setWithdrawDelayBypassForAccount(testAccount, true);
+        
+        bool isBypassed = lenderCommitmentGroupSmartV2.withdrawDelayBypassForAccount(testAccount);
+        assertTrue(isBypassed, "Account should have withdraw delay bypass enabled");
+        
+        // Set bypass to false
+        vm.prank(protocolOwner);
+        lenderCommitmentGroupSmartV2.setWithdrawDelayBypassForAccount(testAccount, false);
+        
+        isBypassed = lenderCommitmentGroupSmartV2.withdrawDelayBypassForAccount(testAccount);
+        assertFalse(isBypassed, "Account should have withdraw delay bypass disabled");
+    }
+
+    function test_setWithdrawDelayBypassForAccount_onlyProtocolOwner() public {
+        initialize_group_contract();
+        
+        address testAccount = address(0x123);
+        address notOwner = address(0x456);
+        
+        // Mock TellerV2 owner to be different from notOwner
+        address protocolOwner = address(0x789);
+        vm.mockCall(
+            address(_tellerV2),
+            abi.encodeWithSignature("owner()"),
+            abi.encode(protocolOwner)
+        );
+        
+        // Should revert when called by non-owner
+        vm.prank(notOwner);
+        vm.expectRevert(bytes("OO")); // OnlyOwner error
+        lenderCommitmentGroupSmartV2.setWithdrawDelayBypassForAccount(testAccount, true);
+    }
+
+    function test_withdraw_with_bypass_success() public {
+        initialize_group_contract();
+        lenderCommitmentGroupSmartV2.set_mockSharesExchangeRate(1e36);
+        lenderCommitmentGroupSmartV2.set_totalPrincipalTokensCommitted(1000000);
+        
+        // Fund the contract
+        principalToken.transfer(address(lenderCommitmentGroupSmartV2), 1e18);
+        
+        // Mint shares to lender at specific timestamp
+        uint256 sharesAmount = 1000000;
+        vm.warp(1e6);
+        vm.prank(address(lenderCommitmentGroupSmartV2));
+        lenderCommitmentGroupSmartV2.force_mint_shares(address(lender), sharesAmount);
+        
+        // Set withdraw delay to a high value
+        lenderCommitmentGroupSmartV2.force_set_withdraw_delay(9000);
+        
+        // Enable bypass for the lender
+        address protocolOwner = lenderCommitmentGroupSmartV2.owner();
+        vm.mockCall(
+            address(_tellerV2),
+            abi.encodeWithSignature("owner()"),
+            abi.encode(protocolOwner)
+        );
+        vm.prank(protocolOwner);
+        lenderCommitmentGroupSmartV2.setWithdrawDelayBypassForAccount(address(lender), true);
+        
+        // Should be able to withdraw immediately without waiting
+        vm.prank(address(lender));
+        uint256 sharesRedeemed = lenderCommitmentGroupSmartV2.withdraw(
+            500000,
+            address(lender),
+            address(lender)
+        );
+        
+        assertGt(sharesRedeemed, 0, "Should successfully withdraw with bypass");
+    }
+
+    function test_withdraw_without_bypass_fails_immediately() public {
+        initialize_group_contract();
+        lenderCommitmentGroupSmartV2.set_mockSharesExchangeRate(1e36);
+        lenderCommitmentGroupSmartV2.set_totalPrincipalTokensCommitted(1000000);
+        
+        // Fund the contract
+        principalToken.transfer(address(lenderCommitmentGroupSmartV2), 1e18);
+        
+        // Mint shares to lender at specific timestamp
+        uint256 sharesAmount = 1000000;
+        vm.warp(1e6);
+        vm.prank(address(lenderCommitmentGroupSmartV2));
+        lenderCommitmentGroupSmartV2.force_mint_shares(address(lender), sharesAmount);
+        
+        // Set withdraw delay to a high value
+        lenderCommitmentGroupSmartV2.force_set_withdraw_delay(9000);
+        
+        // Do NOT enable bypass - should fail immediately
+        vm.prank(address(lender));
+        vm.expectRevert(bytes("SW")); // Should revert with "SW" (withdrawal delay error)
+        lenderCommitmentGroupSmartV2.withdraw(
+            500000,
+            address(lender),
+            address(lender)
+        );
+    }
+
+    function test_redeem_with_bypass_success() public {
+        initialize_group_contract();
+        lenderCommitmentGroupSmartV2.set_mockSharesExchangeRate(1e36);
+        lenderCommitmentGroupSmartV2.set_totalPrincipalTokensCommitted(1000000);
+        
+        // Fund the contract
+        principalToken.transfer(address(lenderCommitmentGroupSmartV2), 1e18);
+        
+        // Mint shares to lender at specific timestamp
+        uint256 sharesAmount = 1000000;
+        vm.warp(1e6);
+        vm.prank(address(lenderCommitmentGroupSmartV2));
+        lenderCommitmentGroupSmartV2.force_mint_shares(address(lender), sharesAmount);
+        
+        // Set withdraw delay to a high value
+        lenderCommitmentGroupSmartV2.force_set_withdraw_delay(9000);
+        
+        // Enable bypass for the lender
+        address protocolOwner = lenderCommitmentGroupSmartV2.owner();
+        vm.mockCall(
+            address(_tellerV2),
+            abi.encodeWithSignature("owner()"),
+            abi.encode(protocolOwner)
+        );
+        vm.prank(protocolOwner);
+        lenderCommitmentGroupSmartV2.setWithdrawDelayBypassForAccount(address(lender), true);
+        
+        // Should be able to redeem immediately without waiting
+        vm.prank(address(lender));
+        uint256 assetsReceived = lenderCommitmentGroupSmartV2.redeem(
+            500000,
+            address(lender),
+            address(lender)
+        );
+        
+        assertGt(assetsReceived, 0, "Should successfully redeem with bypass");
+    }
+
+    function test_redeem_without_bypass_fails_immediately() public {
+        initialize_group_contract();
+        lenderCommitmentGroupSmartV2.set_mockSharesExchangeRate(1e36);
+        lenderCommitmentGroupSmartV2.set_totalPrincipalTokensCommitted(1000000);
+        
+        // Fund the contract
+        principalToken.transfer(address(lenderCommitmentGroupSmartV2), 1e18);
+        
+        // Mint shares to lender at specific timestamp
+        uint256 sharesAmount = 1000000;
+        vm.warp(1e6);
+        vm.prank(address(lenderCommitmentGroupSmartV2));
+        lenderCommitmentGroupSmartV2.force_mint_shares(address(lender), sharesAmount);
+        
+        // Set withdraw delay to a high value
+        lenderCommitmentGroupSmartV2.force_set_withdraw_delay(9000);
+        
+        // Do NOT enable bypass - should fail immediately
+        vm.prank(address(lender));
+        vm.expectRevert(bytes("SR")); // Should revert with "SR" (redeem delay error)
+        lenderCommitmentGroupSmartV2.redeem(
+            500000,
+            address(lender),
+            address(lender)
+        );
+    }
+
+    function test_maxRedeem_with_bypass() public {
+        initialize_group_contract();
+        lenderCommitmentGroupSmartV2.set_mockSharesExchangeRate(1e36);
+        lenderCommitmentGroupSmartV2.set_totalPrincipalTokensCommitted(1000000);
+        
+        // Fund the contract with liquidity
+        principalToken.transfer(address(lenderCommitmentGroupSmartV2), 1e18);
+        
+        // Mint shares to lender
+        uint256 sharesAmount = 1000000;
+        vm.warp(1e6);
+        vm.prank(address(lenderCommitmentGroupSmartV2));
+        lenderCommitmentGroupSmartV2.force_mint_shares(address(lender), sharesAmount);
+        
+        // Set withdraw delay
+        lenderCommitmentGroupSmartV2.force_set_withdraw_delay(9000);
+        
+        // Without bypass - should return 0 due to delay (call from lender's perspective)
+        vm.prank(address(lender));
+        uint256 maxWithoutBypass = lenderCommitmentGroupSmartV2.maxRedeem(address(lender));
+        assertEq(maxWithoutBypass, 0, "maxRedeem should return 0 without bypass during delay period");
+        
+        // Enable bypass for the lender
+        address protocolOwner = lenderCommitmentGroupSmartV2.owner();
+        vm.mockCall(
+            address(_tellerV2),
+            abi.encodeWithSignature("owner()"),
+            abi.encode(protocolOwner)
+        );
+        vm.prank(protocolOwner);
+        lenderCommitmentGroupSmartV2.setWithdrawDelayBypassForAccount(address(lender), true);
+        
+        // With bypass - should return full balance (call from lender's perspective)
+        vm.prank(address(lender));
+        uint256 maxWithBypass = lenderCommitmentGroupSmartV2.maxRedeem(address(lender));
+        assertGt(maxWithBypass, 0, "maxRedeem should return > 0 with bypass");
+    }
+
+    function test_maxRedeem_bypass_limited_by_liquidity() public {
+        initialize_group_contract();
+        lenderCommitmentGroupSmartV2.set_mockSharesExchangeRate(1e36);
+        lenderCommitmentGroupSmartV2.set_totalPrincipalTokensCommitted(1000000);
+        
+        // Fund the contract with limited liquidity (less than user balance)
+        uint256 limitedLiquidity = 100000;
+        principalToken.transfer(address(lenderCommitmentGroupSmartV2), limitedLiquidity);
+        
+        // Mint more shares than available liquidity
+        uint256 sharesAmount = 1000000;
+        vm.warp(1e6);
+        vm.prank(address(lenderCommitmentGroupSmartV2));
+        lenderCommitmentGroupSmartV2.force_mint_shares(address(lender), sharesAmount);
+        
+        // Enable bypass
+        address protocolOwner = lenderCommitmentGroupSmartV2.owner();
+        vm.mockCall(
+            address(_tellerV2),
+            abi.encodeWithSignature("owner()"),
+            abi.encode(protocolOwner)
+        );
+        vm.prank(protocolOwner);
+        lenderCommitmentGroupSmartV2.setWithdrawDelayBypassForAccount(address(lender), true);
+        
+        // maxRedeem should be limited by available liquidity even with bypass (call from lender's perspective)
+        vm.prank(address(lender));
+        uint256 maxRedeemable = lenderCommitmentGroupSmartV2.maxRedeem(address(lender));
+        uint256 expectedMaxShares = lenderCommitmentGroupSmartV2.convertToShares(limitedLiquidity);
+        
+        assertEq(maxRedeemable, expectedMaxShares, "maxRedeem should be limited by available liquidity");
+    }
+
+    function test_bypass_flag_defaults_to_false() public {
+        initialize_group_contract();
+        
+        address randomAccount = address(0x999);
+        
+        bool isBypassed = lenderCommitmentGroupSmartV2.withdrawDelayBypassForAccount(randomAccount);
+        assertFalse(isBypassed, "Bypass flag should default to false for new accounts");
+    }
+
+    function test_bypass_works_for_different_msg_sender() public {
+        initialize_group_contract();
+        lenderCommitmentGroupSmartV2.set_mockSharesExchangeRate(1e36);
+        lenderCommitmentGroupSmartV2.set_totalPrincipalTokensCommitted(1000000);
+        
+        // Fund the contract
+        principalToken.transfer(address(lenderCommitmentGroupSmartV2), 1e18);
+        
+        address shareOwner = address(lender);
+       
+        // Mint shares to shareOwner
+        uint256 sharesAmount = 1000000;
+        vm.warp(1e6);
+        vm.prank(address(lenderCommitmentGroupSmartV2));
+        lenderCommitmentGroupSmartV2.force_mint_shares(shareOwner, sharesAmount);
+        
+        // Set high withdrawal delay
+        lenderCommitmentGroupSmartV2.force_set_withdraw_delay(9000);
+        
+        // Enable bypass for the withdrawCaller (msg.sender), not shareOwner
+        address protocolOwner = lenderCommitmentGroupSmartV2.owner();
+        vm.mockCall(
+            address(_tellerV2),
+            abi.encodeWithSignature("owner()"),
+            abi.encode(protocolOwner)
+        );
+        vm.prank(protocolOwner);
+        lenderCommitmentGroupSmartV2.setWithdrawDelayBypassForAccount(shareOwner, true);
+        
+        // withdrawCaller should be able to withdraw from shareOwner's account with bypass
+        vm.prank(shareOwner);
+        uint256 sharesRedeemed = lenderCommitmentGroupSmartV2.withdraw(
+            500000,
+            shareOwner, // receiver
+            shareOwner      // owner
+        );
+        
+        assertGt(sharesRedeemed, 0, "Should successfully withdraw with msg.sender bypass");
+    }
             
 
 }

@@ -88,6 +88,8 @@ dataSources:
           handler: handleCancelledBid
         - event: LoanLiquidated(indexed uint256,indexed address)
           handler: handleLoanLiquidated
+        - event: LoanClosed(indexed uint256)
+          handler: handleLoanClosed
         - event: LoanRepayment(indexed uint256)
           handler: handleLoanRepayment
         - event: LoanRepaid(indexed uint256)

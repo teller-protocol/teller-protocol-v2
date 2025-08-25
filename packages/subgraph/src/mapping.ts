@@ -7,6 +7,7 @@ import {
   CancelledBid,
   FeePaid,
   LoanLiquidated,
+  LoanClosed,
   LoanRepaid,
   LoanRepayment,
   SubmittedBid,
@@ -179,6 +180,24 @@ export function handleLoanRepayments(events: LoanRepayment[]): void {
     handleLoanRepayment(event);
   });
 }
+
+
+export function handleLoanClosed(event: LoanClosed): void {
+  const bid: Bid = loadBidById(event.params.bidId);
+
+  bid.updatedAt = event.block.timestamp;
+  bid.transactionHash = event.transaction.hash.toHex();
+  bid.save();
+
+   updateBidStatus(bid, BidStatus.Closed);
+}
+
+export function handleLoanCloseds(events: LoanClosed[]): void {
+  events.forEach(event => {
+    handleLoanClosed(event);
+  });
+}
+
 
 export function handleLoanRepaid(event: LoanRepaid): void {
   const bid: Bid = loadBidById(event.params.bidId);

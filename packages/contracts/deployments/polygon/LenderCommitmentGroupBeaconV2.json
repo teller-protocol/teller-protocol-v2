@@ -407,35 +407,7 @@
     },
     {
       "type": "function",
-      "name": "DEFAULT_WITHDRAW_DELAY_TIME_SECONDS",
-      "constant": true,
-      "stateMutability": "view",
-      "payable": false,
-      "inputs": [],
-      "outputs": [
-        {
-          "type": "uint256",
-          "name": ""
-        }
-      ]
-    },
-    {
-      "type": "function",
       "name": "EXCHANGE_RATE_EXPANSION_FACTOR",
-      "constant": true,
-      "stateMutability": "view",
-      "payable": false,
-      "inputs": [],
-      "outputs": [
-        {
-          "type": "uint256",
-          "name": ""
-        }
-      ]
-    },
-    {
-      "type": "function",
-      "name": "MAX_WITHDRAW_DELAY_TIME",
       "constant": true,
       "stateMutability": "view",
       "payable": false,
@@ -1726,13 +1698,17 @@
     },
     {
       "type": "function",
-      "name": "setWithdrawDelayTime",
+      "name": "setWithdrawDelayBypassForAccount",
       "constant": false,
       "payable": false,
       "inputs": [
         {
-          "type": "uint256",
-          "name": "_seconds"
+          "type": "address",
+          "name": "_addr"
+        },
+        {
+          "type": "bool",
+          "name": "_bypass"
         }
       ],
       "outputs": []
@@ -1990,6 +1966,25 @@
     },
     {
       "type": "function",
+      "name": "withdrawDelayBypassForAccount",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ],
+      "outputs": [
+        {
+          "type": "bool",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
       "name": "withdrawDelayTimeSeconds",
       "constant": true,
       "stateMutability": "view",
@@ -2017,6 +2012,6 @@
     }
   ],
   "receipt": {},
-  "numDeployments": 3,
+  "numDeployments": 5,
   "implementation": "0xdf8Ae678746AF412429E5E50B4abf1632d17B003"
 }

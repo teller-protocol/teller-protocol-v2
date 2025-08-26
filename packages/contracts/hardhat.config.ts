@@ -109,6 +109,7 @@ type NetworkNames =
   | 'mantle'
   | 'optimism'
   | 'katana'
+  | 'hyperevm'
   | 'sepolia'
   | 'mumbai'
   | 'goerli'
@@ -153,6 +154,8 @@ const networkUrls: Record<NetworkNames, string> = {
 
 
       katana: process.env.KATANA_RPC_URL ?? 'https://rpc.katana.network/', 
+
+      hyperevm: process.env.HYPEREVM_RPC_URL ?? 'https://rpc.hyperliquid.xyz/evm', 
 
 
   mantle: 'https://rpc.mantle.xyz',
@@ -227,6 +230,8 @@ export default <HardhatUserConfig>{
       base: process.env.BASESCAN_VERIFY_API_KEY,
       optimism: process.env.ETHERSCANV2_VERIFY_API_KEY,  //using the v2 api 
       katana: process.env.ETHERSCANV2_VERIFY_API_KEY,  //using the v2 api 
+      hyperevm: process.env.ETHERSCANV2_VERIFY_API_KEY,
+
       mantle: process.env.MANTLE_VERIFY_API_KEY ?? 'xyz',
       clarity: '', //none ? 
 
@@ -254,7 +259,16 @@ export default <HardhatUserConfig>{
           browserURL: 'https://optimistic.etherscan.io',
         },
       },
-             {
+      {
+        network: 'hyperevm',
+        chainId: 999,
+        urls: {
+          apiURL: 'https://api.hyperevmscan.io/v2/api?chainid=747474',
+          browserURL: 'https://hyperevmscan.io/',
+        },
+      },
+
+        {
         network: 'katana',
         chainId: 747474,
         urls: {
@@ -262,6 +276,7 @@ export default <HardhatUserConfig>{
           browserURL: 'https://explorer.katanarpc.com/',
         },
       },
+
       {
         network: 'clarity',
         chainId: 66814,
@@ -552,6 +567,23 @@ export default <HardhatUserConfig>{
         },
       },
     }),
+
+
+
+     hyperevm: networkConfig({
+      url: networkUrls.hyperevm,
+      chainId: 999,
+      live: true,
+        gasPrice: Number(ethers.parseUnits('1', 'gwei')),
+        
+
+      verify: {
+        etherscan: {
+          apiKey: process.env.ETHERSCANV2_VERIFY_API_KEY,
+        },
+      },
+    }),
+   
    
     
     mantle: networkConfig({

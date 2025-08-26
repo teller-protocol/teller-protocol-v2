@@ -68,10 +68,10 @@ export function get_ecosystem_contract_address(
 		       weth9Address = '0xEE7D8BCFb72bC1880D0Cf19822eB0A2e6577aB62'
 		       break 
 
-		      case 'hyperevm'
+		      case 'hyperevm':
 		      weth9Address = '0x1fbccdc677c10671ee50b46c61f0f7d135112450'
 		      break
-		      
+
 		    default:
 		    	return undefined 
 		      //throw new Error('No swap factory address found for this network')
@@ -104,7 +104,7 @@ export function get_ecosystem_contract_address(
 		       swapRouterAddress = '0x4e1d81A3E627b9294532e990109e4c21d217376C'
 		       break 
 
-		     case 'hyperevm';
+		     case 'hyperevm':
 		       swapRouterAddress = '0x1EbDFC75FfE3ba3de61E7138a3E8706aC841Af9B'
 		       break
 		    default:

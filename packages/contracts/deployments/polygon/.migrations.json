@@ -59,5 +59,6 @@
   "lender-commitment-group-beacon-v2:upgrade-first-deposit": 1754323999,
   "lender-commitment-group-beacon-v2:pricing-helper": 1755271511,
   "lender-commitment-group-beacon-v2:upgrade-vault-bypass": 1755704143,
-  "lender-commitment-forwarder:extensions:flash-swap-rollover:g2-upgrade": 1755791508
+  "lender-commitment-forwarder:extensions:flash-swap-rollover:g2-upgrade": 1755791508,
+  "timelock-controller:update-delay-7200": 1756480970
 }

@@ -73,3 +73,5 @@ yalc.lock
 .bin
 
 .yarn/versions/
+
+.yarn/cache/*

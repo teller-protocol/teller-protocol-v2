@@ -81,10 +81,24 @@ graph deploy   teller-v-2-optimism --version-label 0.4.21-19
 
 
 
+1222222222111111
 
 
 
+### Deploy to Alchemy 
 
+
+
+```
+
+
+graph deploy tellerv2-polygon \
+  --version-label 0.4.21 \
+  --node https://subgraphs.alchemy.com/api/subgraphs/deploy \
+  --deploy-key ${ALCHEMY_SUBGRAPH_DEPLOY_KEY} \
+  --ipfs https://ipfs.satsuma.xyz
+
+```
 
 
 

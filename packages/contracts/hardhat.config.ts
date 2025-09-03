@@ -575,7 +575,7 @@ export default <HardhatUserConfig>{
       url: networkUrls.hyperevm,
       chainId: 999,
       live: true,
-        gasPrice: Number(ethers.parseUnits('1', 'gwei')),
+        gasPrice: Number(ethers.parseUnits('10', 'gwei')),
         
 
       verify: {

@@ -1,3 +1,5 @@
 {
-  "timelock-controller:deploy": 1756917636
+  "timelock-controller:deploy": 1756917636,
+  "collateral:escrow-beacon:deploy": 1756920825,
+  "meta-forwarder:deploy": 1756920833
 }

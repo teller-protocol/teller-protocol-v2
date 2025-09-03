@@ -1,6 +1,13 @@
 import { DeployFunction } from 'hardhat-deploy/dist/types'
 import { deploy } from 'helpers/deploy-helpers'
 
+/*
+
+ yarn contracts deploy --network hyperevm --tags timelock-controller 
+
+
+*/
+
 const deployFn: DeployFunction = async (hre) => {
 
 
@@ -13,6 +20,13 @@ const deployFn: DeployFunction = async (hre) => {
 	  let proposers = [ protocolOwnerSafeAddress ];
 	  let executors = [  protocolOwnerSafeAddress  ];
 	  let admin = protocolOwnerSafeAddress ; 
+
+
+   hre.log('----------')
+  hre.log('')
+  hre.log('Deploying Timelock Controller ...')
+
+  
 
 
 

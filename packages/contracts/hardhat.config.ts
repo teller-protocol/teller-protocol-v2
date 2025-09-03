@@ -263,7 +263,7 @@ export default <HardhatUserConfig>{
         network: 'hyperevm',
         chainId: 999,
         urls: {
-          apiURL: 'https://api.hyperevmscan.io/v2/api?chainid=747474',
+          apiURL: 'https://api.etherscan.io/v2/api?chainid=999',
           browserURL: 'https://hyperevmscan.io/',
         },
       },

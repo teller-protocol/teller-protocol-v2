@@ -78,7 +78,7 @@ deployFn.tags = ['lender-commitment-group-beacon-v2']
 deployFn.dependencies = [
   'teller-v2:deploy',
   'smart-commitment-forwarder:deploy',
-  'teller-v2:uniswap-pricing-library-v2', 
+  'uniswap-pricing-helper:deploy'
   'lender-commitment-group-beacon-v2:deploy'
 ]
 

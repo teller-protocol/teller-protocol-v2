@@ -1,0 +1,1 @@
+{"enabled":true,"name":"tellerv2-poolsv2-hyperevm","network":"hyperevm","export_network_name":"hyperevm","product":"studio","studio":{"owner":"0x1A2bAA2257343119FB03FD448622456a0c4f2190","network":"mainnet"},"grafting":{"enabled":false },"contracts":{"factory":{"enabled":true,"address":"0x5360af9B95701504F783d8654bA02B0AF5155f64","block":"13051385"} }}

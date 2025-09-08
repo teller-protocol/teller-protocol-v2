@@ -185,8 +185,8 @@ export function handleWithdraw(event: Withdraw): void {
   let lender = event.params.caller 
   let recipient = event.params.receiver 
   let owner = event.params.owner 
-  let amountPoolSharesTokens = event.params.amountPoolSharesTokens
-  let principalTokensWithdrawn = event.params.principalTokensWithdrawn
+  let amountPoolSharesTokens = event.params.shares
+  let principalTokensWithdrawn = event.params.assets
  
 
   // Create earnings withdrawn event entity
@@ -227,7 +227,7 @@ export function handleDeposit(event: Deposit): void {
   let owner = event.params.owner   //not used for now 
   let amount = event.params.assets
   let sharesAmount = event.params.shares
-  let sharesRecipient = event.params.sharesRecipient
+  let sharesRecipient = event.params.caller
 
   // Create lender added principal event entity
   let eventEntity = new group_lender_added_principal(

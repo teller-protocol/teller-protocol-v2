@@ -9,11 +9,11 @@ features:
 dataSources:
   - kind: ethereum/contract
     name: Factory
-    network: matic
+    network: {{ network }}
     source:
       abi: Factory
-      address: "0x2fF5ea5CF5061EB0fcfB7A2AafB8CCC79f3F73ea"
-      startBlock: 66265322
+      address: "{{lenderCommitmentGroupFactory}}"
+      startBlock: {{ startblock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -30,7 +30,7 @@ dataSources:
 templates:
   - kind: ethereum/contract
     name: Pool
-    network: matic
+    network: {{ network }}
     source:
       abi: Pool
     mapping:
@@ -48,10 +48,10 @@ templates:
       eventHandlers:
         - event: BorrowerAcceptedFunds(indexed address,indexed uint256,uint256,uint256,uint32,uint16)
           handler: handleBorrowerAcceptedFunds
-        - event: EarningsWithdrawn(indexed address,uint256,uint256,indexed address)
-          handler: handleEarningsWithdrawn
-        - event: LenderAddedPrincipal(indexed address,uint256,uint256,indexed address)
-          handler: handleLenderAddedPrincipal
+        - event: Withdraw(indexed address,indexed address,indexed address,uint256,uint256)
+          handler: handleWithdraw
+        - event: Deposit(indexed address,indexed address,uint256,uint256)
+          handler: handleDeposit
         - event: LoanRepaid(indexed uint256,indexed address,uint256,uint256,uint256,uint256)
           handler: handleLoanRepaid
         - event: DefaultedLoanLiquidated(indexed uint256,indexed address,uint256,int256)

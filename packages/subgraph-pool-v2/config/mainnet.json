@@ -1,0 +1,1 @@
+{"enabled":true,"name":"tellerv2-pools-mainnet","network":"mainnet","export_network_name":"mainnet","product":"studio","studio":{"owner":"0x1a76339211668a6939e1d6D13AB902bBef5D9ebc","network":"arbitrum-one"},"grafting":{"enabled":false},"contracts":{"factory":{"enabled":true,"address":"0x0848E884b2DBb63727aa3216b921C279f6DC9a91","block":"21616926"} } }

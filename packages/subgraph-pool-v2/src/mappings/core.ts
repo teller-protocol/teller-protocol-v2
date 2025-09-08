@@ -1,7 +1,7 @@
 import {
   BorrowerAcceptedFunds,
-  EarningsWithdrawn,
-  LenderAddedPrincipal,
+  Withdraw,
+  Deposit,
   LoanRepaid,
   DefaultedLoanLiquidated,
   PoolInitialized
@@ -182,10 +182,12 @@ export function handleBorrowerAcceptedFunds(event: BorrowerAcceptedFunds): void 
 
 export function handleWithdraw(event: Withdraw): void {
   let poolAddress = event.address
-  let lender = event.params.lender
+  let lender = event.params.caller 
+  let recipient = event.params.receiver 
+  let owner = event.params.owner 
   let amountPoolSharesTokens = event.params.amountPoolSharesTokens
   let principalTokensWithdrawn = event.params.principalTokensWithdrawn
-  let recipient = event.params.recipient
+ 
 
   // Create earnings withdrawn event entity
   let eventEntity = new group_earnings_withdrawn(
@@ -221,9 +223,10 @@ export function handleWithdraw(event: Withdraw): void {
 
 export function handleDeposit(event: Deposit): void {
   let poolAddress = event.address
-  let lender = event.params.lender
-  let amount = event.params.amount
-  let sharesAmount = event.params.sharesAmount
+  let lender = event.params.caller
+  let owner = event.params.owner   //not used for now 
+  let amount = event.params.assets
+  let sharesAmount = event.params.shares
   let sharesRecipient = event.params.sharesRecipient
 
   // Create lender added principal event entity
@@ -341,7 +344,7 @@ export function handlePoolInitialized(event: PoolInitialized): void {
   let interestRateUpperBound = event.params.interestRateUpperBound
   let liquidityThresholdPercent = event.params.liquidityThresholdPercent
   let loanToValuePercent = event.params.loanToValuePercent
-  let poolSharesToken = event.params.poolSharesToken
+  let poolSharesToken = event.address
 
   // Create or update pool metric with all initialization parameters
   let poolMetric = group_pool_metric.load(poolAddress.toHexString())

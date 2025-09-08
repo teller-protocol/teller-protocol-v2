@@ -42,7 +42,7 @@ templates:
         - Pool
       abis:
         - name: Pool
-          file: ./abis/PoolV1.json
+          file: ./abis/PoolV2.json
         - name: Factory
           file: ./abis/Factory.json
       eventHandlers:
@@ -56,6 +56,6 @@ templates:
           handler: handleLoanRepaid
         - event: DefaultedLoanLiquidated(indexed uint256,indexed address,uint256,int256)
           handler: handleLoanLiquidated
-        - event: PoolInitialized(indexed address,indexed address,uint256,uint32,uint16,uint16,uint16,uint16,address)
+        - event: PoolInitialized(indexed address,indexed address,uint256,uint32,uint16,uint16,uint16,uint16)
           handler: handlePoolInitialized
 

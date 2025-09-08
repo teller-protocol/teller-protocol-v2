@@ -9,11 +9,11 @@ features:
 dataSources:
   - kind: ethereum/contract
     name: Factory
-    network: matic
+    network: mainnet
     source:
       abi: Factory
-      address: "0x2fF5ea5CF5061EB0fcfB7A2AafB8CCC79f3F73ea"
-      startBlock: 66265322
+      address: "0x21499A1Fd9f36ce527CB4A9032072ef1bb7a22F6"
+      startBlock: 22783178
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -30,7 +30,7 @@ dataSources:
 templates:
   - kind: ethereum/contract
     name: Pool
-    network: matic
+    network: mainnet
     source:
       abi: Pool
     mapping:
@@ -42,20 +42,20 @@ templates:
         - Pool
       abis:
         - name: Pool
-          file: ./abis/PoolV1.json
+          file: ./abis/PoolV2.json
         - name: Factory
           file: ./abis/Factory.json
       eventHandlers:
         - event: BorrowerAcceptedFunds(indexed address,indexed uint256,uint256,uint256,uint32,uint16)
           handler: handleBorrowerAcceptedFunds
-        - event: EarningsWithdrawn(indexed address,uint256,uint256,indexed address)
-          handler: handleEarningsWithdrawn
-        - event: LenderAddedPrincipal(indexed address,uint256,uint256,indexed address)
-          handler: handleLenderAddedPrincipal
+        - event: Withdraw(indexed address,indexed address,indexed address,uint256,uint256)
+          handler: handleWithdraw
+        - event: Deposit(indexed address,indexed address,uint256,uint256)
+          handler: handleDeposit
         - event: LoanRepaid(indexed uint256,indexed address,uint256,uint256,uint256,uint256)
           handler: handleLoanRepaid
         - event: DefaultedLoanLiquidated(indexed uint256,indexed address,uint256,int256)
           handler: handleLoanLiquidated
-        - event: PoolInitialized(indexed address,indexed address,uint256,uint32,uint16,uint16,uint16,uint16,address)
+        - event: PoolInitialized(indexed address,indexed address,uint256,uint32,uint16,uint16,uint16,uint16)
           handler: handlePoolInitialized
 

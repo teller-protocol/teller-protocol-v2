@@ -25,9 +25,11 @@ const deployFn: DeployFunction = async (hre) => {
   const tellerV2Address = await tellerV2.getAddress()
 
 
-  const uniswapPricingLibraryV2 = await hre.contracts.get('UniswapPricingLibraryV2')
+ // const uniswapPricingLibraryV2 = await hre.contracts.get('UniswapPricingLibraryV2')
 
- 
+   const uniswapPricingHelper = await hre.contracts.get('UniswapPricingHelper')
+    const uniswapPricingHelperAddress = await uniswapPricingHelper.getAddress()
+
 
   const smartCommitmentForwarderAddress =
     await SmartCommitmentForwarder.getAddress()
@@ -44,11 +46,9 @@ const deployFn: DeployFunction = async (hre) => {
         tellerV2Address,
         smartCommitmentForwarderAddress,
         uniswapV3FactoryAddress,
+        uniswapPricingHelperAddress,
       ],
-      libraries: {
-         
-        UniswapPricingLibraryV2: await uniswapPricingLibraryV2.getAddress(),
-      },
+       
       
     }
   )
@@ -76,10 +76,10 @@ deployFn.tags = ['lender-commitment-group-beacon-v2']
 deployFn.dependencies = [
   'teller-v2:deploy',
   'smart-commitment-forwarder:deploy', 
-  'teller-v2:uniswap-pricing-library-v2'
+   'uniswap-pricing-helper:deploy'
 ]
 
 deployFn.skip = async (hre) => {
-  return !hre.network.live || !['sepolia', 'polygon' , 'mainnet','mainnet_live_fork','arbitrum','base','optimism','katana'].includes(hre.network.name)
+  return !hre.network.live || !['sepolia', 'polygon' , 'mainnet','mainnet_live_fork','arbitrum','base','optimism','katana','hyperevm'].includes(hre.network.name)
 }
 export default deployFn

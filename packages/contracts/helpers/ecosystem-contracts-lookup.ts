@@ -31,6 +31,9 @@ export function get_ecosystem_contract_address(
 	    case 'katana':
 	      uniswapV3FactoryAddress = '0x203e8740894c8955cB8950759876d7E7E45E04c1'
 	      break
+	    case 'hyperevm':
+	     	uniswapV3FactoryAddress = '0xFf7B3e8C00e57ea31477c32A5B52a58Eea47b072'
+	     	break
 	    default:
 	      return undefined 
 	  }
@@ -64,6 +67,11 @@ export function get_ecosystem_contract_address(
 		     case 'katana':
 		       weth9Address = '0xEE7D8BCFb72bC1880D0Cf19822eB0A2e6577aB62'
 		       break 
+
+		      case 'hyperevm':
+		      weth9Address = '0x1fbccdc677c10671ee50b46c61f0f7d135112450'
+		      break
+
 		    default:
 		    	return undefined 
 		      //throw new Error('No swap factory address found for this network')
@@ -95,6 +103,10 @@ export function get_ecosystem_contract_address(
 		     case 'katana':
 		       swapRouterAddress = '0x4e1d81A3E627b9294532e990109e4c21d217376C'
 		       break 
+
+		     case 'hyperevm':
+		       swapRouterAddress = '0x1EbDFC75FfE3ba3de61E7138a3E8706aC841Af9B'
+		       break
 		    default:
 		    	return undefined 
 		      //throw new Error('No swap factory address found for this network')
@@ -130,6 +142,9 @@ export function get_ecosystem_contract_address(
 			     case 'katana':
 			       quoterAddress = '0x92dea23ED1C683940fF1a2f8fE23FE98C5d3041c'
 			       break 
+			     case 'hyperevm':
+			     	quoterAddress = '0x239F11a7A3E08f2B8110D4CA9F6B95d4c8865258'
+			     	break 
 			    default:
 			    	return undefined 
 			      //throw new Error('No swap factory address found for this network')

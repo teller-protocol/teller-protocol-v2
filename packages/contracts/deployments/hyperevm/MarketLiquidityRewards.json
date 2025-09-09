@@ -1,0 +1,405 @@
+{
+  "address": "0xC2a093B641496Ac8AA9d6a17f216ADF4a42FC9B6",
+  "abi": [
+    {
+      "type": "constructor",
+      "stateMutability": "undefined",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "_tellerV2"
+        },
+        {
+          "type": "address",
+          "name": "_marketRegistry"
+        },
+        {
+          "type": "address",
+          "name": "_collateralManager"
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "ClaimedRewards",
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "allocationId",
+          "indexed": false
+        },
+        {
+          "type": "uint256",
+          "name": "bidId",
+          "indexed": false
+        },
+        {
+          "type": "address",
+          "name": "recipient",
+          "indexed": false
+        },
+        {
+          "type": "uint256",
+          "name": "amount",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "CreatedAllocation",
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "allocationId",
+          "indexed": false
+        },
+        {
+          "type": "address",
+          "name": "allocator",
+          "indexed": false
+        },
+        {
+          "type": "uint256",
+          "name": "marketId",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "DecreasedAllocation",
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "allocationId",
+          "indexed": false
+        },
+        {
+          "type": "uint256",
+          "name": "amount",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "DeletedAllocation",
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "allocationId",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "IncreasedAllocation",
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "allocationId",
+          "indexed": false
+        },
+        {
+          "type": "uint256",
+          "name": "amount",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "Initialized",
+      "inputs": [
+        {
+          "type": "uint8",
+          "name": "version",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "UpdatedAllocation",
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "allocationId",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "allocateRewards",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "tuple",
+          "name": "_allocation",
+          "components": [
+            {
+              "type": "address",
+              "name": "allocator"
+            },
+            {
+              "type": "address",
+              "name": "rewardTokenAddress"
+            },
+            {
+              "type": "uint256",
+              "name": "rewardTokenAmount"
+            },
+            {
+              "type": "uint256",
+              "name": "marketId"
+            },
+            {
+              "type": "address",
+              "name": "requiredPrincipalTokenAddress"
+            },
+            {
+              "type": "address",
+              "name": "requiredCollateralTokenAddress"
+            },
+            {
+              "type": "uint256",
+              "name": "minimumCollateralPerPrincipalAmount"
+            },
+            {
+              "type": "uint256",
+              "name": "rewardPerLoanPrincipalAmount"
+            },
+            {
+              "type": "uint32",
+              "name": "bidStartTimeMin"
+            },
+            {
+              "type": "uint32",
+              "name": "bidStartTimeMax"
+            },
+            {
+              "type": "uint8",
+              "name": "allocationStrategy"
+            }
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": "allocationId_"
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "allocatedRewards",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ],
+      "outputs": [
+        {
+          "type": "address",
+          "name": "allocator"
+        },
+        {
+          "type": "address",
+          "name": "rewardTokenAddress"
+        },
+        {
+          "type": "uint256",
+          "name": "rewardTokenAmount"
+        },
+        {
+          "type": "uint256",
+          "name": "marketId"
+        },
+        {
+          "type": "address",
+          "name": "requiredPrincipalTokenAddress"
+        },
+        {
+          "type": "address",
+          "name": "requiredCollateralTokenAddress"
+        },
+        {
+          "type": "uint256",
+          "name": "minimumCollateralPerPrincipalAmount"
+        },
+        {
+          "type": "uint256",
+          "name": "rewardPerLoanPrincipalAmount"
+        },
+        {
+          "type": "uint32",
+          "name": "bidStartTimeMin"
+        },
+        {
+          "type": "uint32",
+          "name": "bidStartTimeMax"
+        },
+        {
+          "type": "uint8",
+          "name": "allocationStrategy"
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "claimRewards",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_allocationId"
+        },
+        {
+          "type": "uint256",
+          "name": "_bidId"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "deallocateRewards",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_allocationId"
+        },
+        {
+          "type": "uint256",
+          "name": "_tokenAmount"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "getRewardTokenAmount",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_allocationId"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "increaseAllocationAmount",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_allocationId"
+        },
+        {
+          "type": "uint256",
+          "name": "_tokenAmount"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "initialize",
+      "constant": false,
+      "payable": false,
+      "inputs": [],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "rewardClaimedForBid",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        },
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ],
+      "outputs": [
+        {
+          "type": "bool",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "updateAllocation",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_allocationId"
+        },
+        {
+          "type": "uint256",
+          "name": "_minimumCollateralPerPrincipalAmount"
+        },
+        {
+          "type": "uint256",
+          "name": "_rewardPerLoanPrincipalAmount"
+        },
+        {
+          "type": "uint32",
+          "name": "_bidStartTimeMin"
+        },
+        {
+          "type": "uint32",
+          "name": "_bidStartTimeMax"
+        }
+      ],
+      "outputs": []
+    }
+  ],
+  "transactionHash": "0x8c57e6a9a8e75494e5af0d268351c6df1e3a7a051f09225d051b8c71f82f3ad6",
+  "receipt": {
+    "to": null,
+    "from": "0xD9B023522CeCe02251d877bb0EB4f06fDe6F98E6",
+    "blockHash": "0x496f2faff1a4c81aca219f0ee10472831cfbaf11887e8925a45b54e24f4fa492",
+    "blockNumber": 13051629
+  },
+  "numDeployments": 1,
+  "implementation": "0x6578dA23E0A7D9d13d4B32aA1cF310760218eebf"
+}

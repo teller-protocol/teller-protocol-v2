@@ -1,0 +1,11 @@
+{
+  "../services/graph-node": {
+    "rev": "3e733e3dd69e6317ac0a6a49942f08330788cc6e"
+  },
+  "lib/forge-std": {
+    "rev": "2f6762e4f73f3d835457c220b5f62dfeeb6f6341"
+  },
+  "teller-math-lib": {
+    "rev": "1dd27b8a176b5fddd917ad1f752421b4b54a5204"
+  }
+}

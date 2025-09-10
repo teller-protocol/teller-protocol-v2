@@ -107,8 +107,10 @@ graph deploy tellerv2-polygon \
 
 
 ```
+graph build     (builds the yaml file in  /build/   ?  not in root  ) 
 
-goldsky subgraph deploy teller-v2-hyperevm/0.4.21.2
+
+goldsky subgraph deploy teller-v2-hyperevm/0.4.21.5
 
 
 

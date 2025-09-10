@@ -69,6 +69,15 @@ graph deploy tellerv2-poolsv2-mainnet \
 
 
 
+``` 
+
+deploy to goldsky 
+
+
+goldsky subgraph deploy teller-pools-v2-hyperevm/0.4.21.2
+
+
+```
 
 
 

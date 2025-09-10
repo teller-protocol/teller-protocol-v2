@@ -20,7 +20,9 @@
     "packages": [
       "packages/contracts",
       "packages/services",
-      "packages/subgraph"
+      "packages/subgraph",
+      "packages/subgraph-pool",
+      "packages/subgraph-pool-v2"
     ]
   },
   "packageManager": "yarn@3.6.1",

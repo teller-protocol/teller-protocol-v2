@@ -78,11 +78,11 @@ deployFn.tags = ['lender-commitment-group-beacon-v2']
 deployFn.dependencies = [
   'teller-v2:deploy',
   'smart-commitment-forwarder:deploy',
-  'uniswap-pricing-helper:deploy'
+  'uniswap-pricing-helper:deploy',
   'lender-commitment-group-beacon-v2:deploy'
 ]
 
 deployFn.skip = async (hre) => {
-  return !hre.network.live || !['sepolia','polygon','base','mainnet','arbitrum'].includes(hre.network.name)
+  return !hre.network.live || !['sepolia','polygon'].includes(hre.network.name)
 }
 export default deployFn

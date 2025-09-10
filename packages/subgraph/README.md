@@ -46,6 +46,9 @@ yarn build
 
    yarn hbs -D ./config/katana.json ./src/subgraph.handlebars -o . -e yaml
 
+ yarn hbs -D ./config/hyperevm.json ./src/subgraph.handlebars -o . -e yaml
+ 
+
 ```
  
 
@@ -78,11 +81,7 @@ graph deploy   teller-v-2-optimism --version-label 0.4.21-19
 
 
 
-
-
-
-1222222222111111
-
+ 
 
 
 ### Deploy to Alchemy 
@@ -104,7 +103,16 @@ graph deploy tellerv2-polygon \
 
 
 
+### Deploy to Goldsky 
 
+
+```
+
+goldsky subgraph deploy teller-v2-hyperevm/0.4.21.2
+
+
+
+```
 
 
 

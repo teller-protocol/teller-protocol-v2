@@ -59,6 +59,7 @@ import { Payment } from "../../../TellerV2Storage.sol";
 import {IUniswapPricingLibrary} from "../../../interfaces/IUniswapPricingLibrary.sol";
 import {UniswapPricingHelper} from "../../../price_oracles/UniswapPricingHelper.sol";
 
+import {PoolLogicLibrary} from "../../../libraries/PoolLogicLibrary.sol";
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
@@ -150,7 +151,7 @@ contract LenderCommitmentGroup_Pool_V2 is
     int256 tokenDifferenceFromLiquidations;
 
     bool private firstDepositMade_deprecated;  // no longer used
-    uint256 public withdrawDelayTimeSeconds; // immutable for now - use withdrawDelayBypassForAccount
+    uint256 public withdrawDelayTimeSeconds;  
 
     IUniswapPricingLibrary.PoolRouteConfig[]  public  poolOracleRoutes;
 
@@ -552,6 +553,17 @@ contract LenderCommitmentGroup_Pool_V2 is
         );
     }
 
+
+     /**
+     * @notice Calculates the absolute value of an integer
+     * @dev Utility function to convert a signed integer to its unsigned absolute value
+     * @param x The signed integer input
+     * @return The absolute value of x as an unsigned integer
+     */
+    function abs(int x) private pure returns (uint) {
+        return x >= 0 ? uint(x) : uint(-x);
+    }
+
        
     /**
      * @notice Returns the timestamp when the contract was last unpaused
@@ -668,16 +680,6 @@ contract LenderCommitmentGroup_Pool_V2 is
         amountDifference_ =
             (int256(_amountOwed) * incentiveMultiplier) /
             int256(10000);
-    }
-
-    /**
-     * @notice Calculates the absolute value of an integer
-     * @dev Utility function to convert a signed integer to its unsigned absolute value
-     * @param x The signed integer input
-     * @return The absolute value of x as an unsigned integer
-     */
-    function abs(int x) private pure returns (uint) {
-        return x >= 0 ? uint(x) : uint(-x);
     }
 
 
@@ -926,63 +928,7 @@ contract LenderCommitmentGroup_Pool_V2 is
             : 0;
     }
 
-    /**
-     * @notice Converts an amount to its underlying value using a given exchange rate with rounding down
-     * @dev Uses MathUpgradeable.mulDiv with explicit rounding down to prevent favorable rounding for users
-     * @dev This function is used for conversions where rounding down protects the protocol (e.g., calculating shares to mint)
-     * @param amount The amount to convert (in the source unit)
-     * @param rate The exchange rate to apply, expanded by EXCHANGE_RATE_EXPANSION_FACTOR
-     * @return value_ The converted value in the target unit, rounded down
-     */
-    function _valueOfUnderlying(uint256 amount, uint256 rate)
-        internal
-        pure
-        returns (uint256 value_)
-    {
-        if (rate == 0) {
-            return 0;
-        }
-
-         // value_ = MathUpgradeable.mulDiv(amount ,  EXCHANGE_RATE_EXPANSION_FACTOR   ,  rate );
-
-         value_ = MathUpgradeable.mulDiv(
-                amount, 
-                EXCHANGE_RATE_EXPANSION_FACTOR, 
-                rate,
-                MathUpgradeable.Rounding.Down  // Explicitly round down
-            );
-
-
-    }
-
-
-    /**
-     * @notice Converts an amount to its underlying value using a given exchange rate with rounding up
-     * @dev Uses MathUpgradeable.mulDiv with explicit rounding up to ensure protocol safety
-     * @dev This function is used for conversions where rounding up protects the protocol (e.g., calculating assets needed for shares)
-     * @param amount The amount to convert (in the source unit)
-     * @param rate The exchange rate to apply, expanded by EXCHANGE_RATE_EXPANSION_FACTOR
-     * @return value_ The converted value in the target unit, rounded up
-     */
-    function _valueOfUnderlyingRoundUpwards(uint256 amount, uint256 rate)
-        internal
-        pure
-        returns (uint256 value_)
-    {
-        if (rate == 0) {
-            return 0;
-        }
-
-     
-         value_ = MathUpgradeable.mulDiv(
-                amount, 
-                EXCHANGE_RATE_EXPANSION_FACTOR, 
-                rate,
-                MathUpgradeable.Rounding.Up  // Explicitly round down
-            ); 
-
-    }
-
+   
 
 
 
@@ -1152,6 +1098,13 @@ contract LenderCommitmentGroup_Pool_V2 is
     
 
 
+    function setWithdrawDelay( uint256 _t   ) external onlyProtocolOwner {
+
+       withdrawDelayTimeSeconds = _t ;
+       
+    }
+
+
     // ------------------------   Pausing functions  ------------ 
 
 
@@ -1313,7 +1266,7 @@ contract LenderCommitmentGroup_Pool_V2 is
 
 
          // Calculate shares after transfer
-        shares = _valueOfUnderlying(assets, sharesExchangeRate());
+        shares = PoolLogicLibrary.valueOfUnderlying(assets, sharesExchangeRate());
 
         
         // Update totals
@@ -1438,7 +1391,7 @@ contract LenderCommitmentGroup_Pool_V2 is
         require(shares > 0);
         
         // Calculate assets to receive
-        assets = _valueOfUnderlying(shares, sharesExchangeRateInverse());
+        assets = PoolLogicLibrary.valueOfUnderlying(shares, sharesExchangeRateInverse());
      
         require(msg.sender == owner, "UA");
 
@@ -1481,24 +1434,24 @@ contract LenderCommitmentGroup_Pool_V2 is
  
    
     function convertToShares(uint256 assets) public view virtual returns (uint256) {
-        return _valueOfUnderlying(assets, sharesExchangeRate());
+        return PoolLogicLibrary.valueOfUnderlying(assets, sharesExchangeRate());
     } 
 
     function convertToAssets(uint256 shares) public view virtual returns (uint256) {
-        return _valueOfUnderlying(shares, sharesExchangeRateInverse());
+        return PoolLogicLibrary.valueOfUnderlying(shares, sharesExchangeRateInverse());
     }
 
      
     function previewDeposit(uint256 assets) public view virtual returns (uint256) {
       
-         return _valueOfUnderlying(assets, sharesExchangeRate());
+         return PoolLogicLibrary.valueOfUnderlying(assets, sharesExchangeRate());
     }
 
  
     function previewMint(uint256 shares) public view virtual returns (uint256) {
         
         
-         return _valueOfUnderlyingRoundUpwards(shares, sharesExchangeRateInverse());
+         return PoolLogicLibrary.valueOfUnderlyingRoundUpwards(shares, sharesExchangeRateInverse());
       
      
     }
@@ -1507,14 +1460,14 @@ contract LenderCommitmentGroup_Pool_V2 is
     function previewWithdraw(uint256 assets) public view virtual returns (uint256) {
         
           
-         return _valueOfUnderlyingRoundUpwards( assets, sharesExchangeRate() ) ;
+         return PoolLogicLibrary.valueOfUnderlyingRoundUpwards( assets, sharesExchangeRate() ) ;
       
     }
 
  
     function previewRedeem(uint256 shares) public view virtual returns (uint256) {
           
-         return _valueOfUnderlying(shares, sharesExchangeRateInverse());    
+         return PoolLogicLibrary.valueOfUnderlying(shares, sharesExchangeRateInverse());    
        
     }
 

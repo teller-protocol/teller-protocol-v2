@@ -165,4 +165,4 @@ fs.writeFileSync(contractsExportFile, JSON.stringify(exportData, null, 2), "utf-
 // ----- 
 
 // Step 5: Compile math library helpers
-// shell.exec("yarn tsc -p teller-math-lib/tsconfig.json --outDir build/math");
+ shell.exec("yarn tsc -p teller-math-lib/tsconfig.json --outDir build/math");

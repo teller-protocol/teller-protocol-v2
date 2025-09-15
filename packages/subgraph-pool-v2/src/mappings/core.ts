@@ -22,6 +22,9 @@ import { BigInt, Address, BigDecimal } from "@graphprotocol/graph-ts"
 
 // Constants for time calculations
 const SECONDS_IN_DAY = BigInt.fromI32(86400)  // 24 * 60 * 60
+
+const SECONDS_IN_DAY_TWO = BigInt.fromI32(86400)
+
 const SECONDS_IN_WEEK = BigInt.fromI32(604800)  // 7 * 24 * 60 * 60
 
 function getDayIndex(timestamp: BigInt): BigInt {

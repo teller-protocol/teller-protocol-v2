@@ -76,6 +76,8 @@ deploy to goldsky
 
 goldsky subgraph deploy teller-pools-v2-hyperevm/0.4.21.2
 
+goldsky subgraph deploy teller-pools-v2-katana/0.4.21.2
+
 
 ```
 

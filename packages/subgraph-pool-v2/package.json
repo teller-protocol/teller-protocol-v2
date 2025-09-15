@@ -1,7 +1,7 @@
 {
-  "name": "@teller-protocol/v2-subgraph-pool-v2",
+  "name": "@teller-protocol/subgraph-pool-v2",
   "license": "UNLICENSED",
-  "version": "0.4.21-18",
+  "version": "0.4.21-19",
   "scripts": {
     "generate": "node scripts/generate-subgraph.js",
     "codegen": "npm run generate && graph codegen",

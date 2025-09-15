@@ -9,11 +9,11 @@ features:
 dataSources:
   - kind: ethereum/contract
     name: Factory
-    network: hyperevm
+    network: katana
     source:
       abi: Factory
-      address: "0x5360af9B95701504F783d8654bA02B0AF5155f64"
-      startBlock: 13051385
+      address: "0x3D495036Dfeb1bBfCCabAC74e90e01cDD5C8E578"
+      startBlock: 6541463
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -30,7 +30,7 @@ dataSources:
 templates:
   - kind: ethereum/contract
     name: Pool
-    network: hyperevm
+    network: katana
     source:
       abi: Pool
     mapping:

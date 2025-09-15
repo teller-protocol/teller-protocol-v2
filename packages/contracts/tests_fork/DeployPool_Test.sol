@@ -15,9 +15,9 @@ import { SwapRolloverLoan_G2 } from "../contracts/LenderCommitmentForwarder/exte
 
 import {  MockSwapRolloverLoan } from "../contracts/mock/SwapRolloverLoanMock.sol";
 
-contract SwapRollover_Fork_Test is Test {
+contract DeployPool_Fork_Test is Test {
 
-    string constant NETWORK_NAME = "base";
+    string constant NETWORK_NAME = "hyperevm";
     
     SwapRolloverLoan swapRolloverLoan;
    // address constant DEPLOYED_SWAP_ROLLOVER_LOAN = 0xa4A8c60Ac9E0c38f8B46316c6B3B508b3BA04415; // Replace with actual deployed address

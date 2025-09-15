@@ -14,12 +14,30 @@ import { SwapRolloverLoan_G1 } from "../contracts/LenderCommitmentForwarder/exte
 import { SwapRolloverLoan_G2 } from "../contracts/LenderCommitmentForwarder/extensions/rollover/SwapRolloverLoan_G2.sol";
 
 import {  MockSwapRolloverLoan } from "../contracts/mock/SwapRolloverLoanMock.sol";
+import { LenderCommitmentGroupFactory_V2 } from "../contracts/LenderCommitmentForwarder/extensions/LenderCommitmentGroup/LenderCommitmentGroup_Factory_V2.sol";
+import { ILenderCommitmentGroup_V2 } from "../contracts/interfaces/ILenderCommitmentGroup_V2.sol";
+import { IUniswapPricingLibrary } from "../contracts/interfaces/IUniswapPricingLibrary.sol";
+
+
+/*
+
+
+    Deploy a pool on v2 factory 
+
+
+    initialPrincipalAmount: 1000000
+config: [“0xb8ce59fc3717ada4c02eadf9682a9e934f625ebb”, “0x5555555555555555555555555555555555555555", “1”, 604800, 6000, 11000, 8000, 40000]
+routes: [“0xbe352daf66af94ccf2012a154a67daef95facb91", true, 5, 18, 18] [“0x5d5bd83d0951a99036cdb986da8840acdf9e6085”, false, 5, 6, 18]
+2:38
+the pair is USDT0 <> WHYPE
+
+*/
 
 contract DeployPool_Fork_Test is Test {
 
     string constant NETWORK_NAME = "hyperevm";
     
-    SwapRolloverLoan swapRolloverLoan;
+    LenderCommitmentGroupFactory_V2 factoryv2;
    // address constant DEPLOYED_SWAP_ROLLOVER_LOAN = 0xa4A8c60Ac9E0c38f8B46316c6B3B508b3BA04415; // Replace with actual deployed address
         
 
@@ -33,14 +51,14 @@ contract DeployPool_Fork_Test is Test {
       }
 
       function setUp() public {
-          address payable swapRolloverAddr = payable(getDeployedAddress(  "SwapRolloverLoan"));
-          swapRolloverLoan = SwapRolloverLoan(swapRolloverAddr);
+          address payable factoryAddr = payable(getDeployedAddress(  "LenderCommitmentGroupFactory_V2" ));
+          factoryv2 = LenderCommitmentGroupFactory_V2(factoryAddr);
 
-          assertTrue(swapRolloverAddr.code.length > 0, "could not connect to swap rollover loan contract ") ;
+          assertTrue(factoryAddr.code.length > 0, "could not connect to factory contract ") ;
       }
 
 
-      function etch_SwapRolloverWithMock() public {
+ /*     function etch_SwapRolloverWithMock() public {
 
             //all specific to katana ! 
           address tellerV2Address = 0xf7B14778035fEAF44540A0bC1D4ED859bCB28229;
@@ -59,7 +77,7 @@ contract DeployPool_Fork_Test is Test {
           vm.etch( address(swapRolloverLoan) , address(mockSwapRolloverLoan).code );
 
 
-      }
+      }*/
 
 /*
      function test_SwapRollover() public   {
@@ -111,48 +129,49 @@ contract DeployPool_Fork_Test is Test {
     
  
 
-     function dont_test_SwapRollover_base() public   {
+     function test_pool_deployment() public   {
 
-       // etch_SwapRolloverWithMock();
+        // Define commitment group configuration
+        ILenderCommitmentGroup_V2.CommitmentGroupConfig memory config = ILenderCommitmentGroup_V2.CommitmentGroupConfig({
+            principalTokenAddress: 0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb,
+            collateralTokenAddress: 0x5555555555555555555555555555555555555555,
+            marketId: 1,
+            maxLoanDuration: 604800,
+            interestRateLowerBound: 6000,
+            interestRateUpperBound: 11000,
+            liquidityThresholdPercent: 8000,
+            collateralRatio: 40000
+        });
 
-        // Define test parameters
-        address smartCommitmentForwarderAddress = getDeployedAddress("SmartCommitmentForwarder");
-        uint256 bidId = 1312; // Example loan ID - replace with actual loan ID
-        uint256 borrowerAmount = 437109700492800; // Additional amount borrower adds
-        
-        // Flash swap parameters
-        SwapRolloverLoan_G2.FlashSwapArgs memory flashSwapArgs = SwapRolloverLoan_G2.FlashSwapArgs({
-            token0: address(0x1bc0c42215582d5A085795f4baDbaC3ff36d1Bcb),  
-            token1: address(0x4200000000000000000000000000000000000006), 
-            fee: 10000, //  
-            flashAmount: 16865234336302306,  
-            borrowToken1: false // Borrow token0 (DAI)
+        // Define pool oracle routes
+        IUniswapPricingLibrary.PoolRouteConfig[] memory routes = new IUniswapPricingLibrary.PoolRouteConfig[](2);
+
+        routes[0] = IUniswapPricingLibrary.PoolRouteConfig({
+            pool: 0xbe352daF66af94ccF2012a154a67DAEF95FAcB91,
+            zeroForOne: true,
+            twapInterval: 5,
+            token0Decimals: 18,
+            token1Decimals: 18
         });
-        
-        // Accept commitment parameters
-        SwapRolloverLoan_G2.AcceptCommitmentArgs memory acceptCommitmentArgs = SwapRolloverLoan_G2.AcceptCommitmentArgs({
-            commitmentId: 0,
-            smartCommitmentAddress: address(0xa42922b1d5bd7f72337eBC4f39Ff4E1302ec8D53),  
-            principalAmount: 16806947581558203,
-            collateralAmount: 996554071232877,
-            collateralTokenId: 0,
-            collateralTokenAddress: address(0x4200000000000000000000000000000000000006), 
-            interestRate: 3481, 
-            loanDuration: 604800,
-            merkleProof: new bytes32[](0) // No merkle proof
+
+        routes[1] = IUniswapPricingLibrary.PoolRouteConfig({
+            pool: 0x5d5BD83D0951A99036CDB986da8840ACdf9E6085,
+            zeroForOne: false,
+            twapInterval: 5,
+            token0Decimals: 6,
+            token1Decimals: 18
         });
-        
-        vm.prank(0xbc1d2Ed14128Cd7Af450319b642Fd43d65E495dc);  //andres wallet 
-        swapRolloverLoan.rolloverLoanWithFlashSwap(
-            smartCommitmentForwarderAddress, 
-            bidId,
-            borrowerAmount,
-            flashSwapArgs,
-            acceptCommitmentArgs 
+
+        vm.prank(0xbc1d2Ed14128Cd7Af450319b642Fd43d65E495dc);  //andres wallet
+        address deployedPool = factoryv2.deployLenderCommitmentGroupPool(
+            1000000, // initialPrincipalAmount
+            config,
+            routes
         );
-        
-        // Add assertions to verify the rollover worked
-        // assertTrue(someCondition, "Rollover should succeed");
+
+        // Add assertions to verify the deployment worked
+        assertTrue(deployedPool != address(0), "Pool should be deployed");
+        assertTrue(deployedPool.code.length > 0, "Deployed pool should have code");
      }
 
 

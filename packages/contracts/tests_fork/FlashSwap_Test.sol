@@ -156,6 +156,7 @@ contract SwapRollover_Fork_Test is Test {
         }
     }*/
 
+/*
     function test_replayTransaction() public {
       
 
@@ -208,16 +209,74 @@ contract SwapRollover_Fork_Test is Test {
 
         console.log(" Transaction replayed successfully with decoded params!");
     }
+ */
 
-    function test_decodeRolloverCall() public view {
-        // You can decode the function selector and parameters
-        // rolloverLoanWithFlashSwap has selector: 0x????????
+ //  cast tx 0x6495cc312a71a06f0e7cc7f928819c14e5ed388d2a7b5a196962b9a89069bb9f --rpc-url https://rpc.hyperliquid.xyz/evm
 
-        // Use cast to decode the calldata:
-        // cast 4byte-decode <calldata>
 
-        // Or manually decode if you know the ABI
-        console.log("Use 'cast 4byte-decode <calldata>' to decode the function call");
-        console.log("Then extract parameters and replay the call");
+ //  cast tx 0xc7621a27aeefd48f37c2bfe03c9bfce21ab01d86eaae66e073e4f1b78a8c3f4b --rpc-url https://rpc.hyperliquid.xyz/evm
+
+
+  function test_replayTransaction() public {
+      
+
+        address smartCommitmentForwarderAddress = getDeployedAddress("SmartCommitmentForwarder");
+
+        bytes memory tx_calldata = hex"0f29fee200000000000000000000000048ee9c344d5c6d202f4b3225a694957a3412008d000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000055c70000000000000000000000005555555555555555555555555555555555555555000000000000000000000000b8ce59fc3717ada4c02eadf9682a9e934f625ebb00000000000000000000000000000000000000000000000000000000000001f400000000000000000000000000000000000000000000000000000000001de1bd000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000001200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000d1174957123b9645d7e95d5e0b93ebeb729ff67f00000000000000000000000000000000000000000000000000000000001de436000000000000000000000000000000000000000000000000014612bc113177b3000000000000000000000000000000000000000000000000000000000000000000000000000000000000000055555555555555555555555555555555555555550000000000000000000000000000000000000000000000000000000000001fbd0000000000000000000000000000000000000000000000000000000000093a8000000000000000000000000000000000000000000000000000000000000001200000000000000000000000000000000000000000000000000000000000000000";
+
+        // Decode the calldata (skip first 4 bytes which is the function selector)
+        bytes memory params = new bytes(tx_calldata.length - 4);
+        for (uint i = 4; i < tx_calldata.length; i++) {
+            params[i - 4] = tx_calldata[i];
+        }
+
+        // Decode parameters using abi.decode
+        (
+            address decoded_smartCommitmentForwarderAddress,
+            uint256 decoded_bidId,
+            uint256 decoded_borrowerAmount,
+            SwapRolloverLoan_G2.FlashSwapArgs memory decoded_flashSwapArgs,
+            SwapRolloverLoan_G2.AcceptCommitmentArgs memory decoded_acceptCommitmentArgs
+        ) = abi.decode(params, (
+            address,
+            uint256,
+            uint256,
+            SwapRolloverLoan_G2.FlashSwapArgs,
+            SwapRolloverLoan_G2.AcceptCommitmentArgs
+        ));
+
+        console.log("=== Decoded Parameters ===");
+        console.log("Smart Commitment Forwarder:", decoded_smartCommitmentForwarderAddress);
+        console.log("Bid ID:", decoded_bidId);
+        console.log("Borrower Amount:", decoded_borrowerAmount);
+        console.log("Flash Swap token0:", decoded_flashSwapArgs.token0);
+        console.log("Flash Swap token1:", decoded_flashSwapArgs.token1);
+        console.log("Flash Swap fee:", decoded_flashSwapArgs.fee);
+        console.log("Flash Amount:", decoded_flashSwapArgs.flashAmount);
+        console.log("Borrow Token1:", decoded_flashSwapArgs.borrowToken1);
+
+        // Impersonate the original caller
+        vm.prank(0x7133c664AF6763ab9aeEB095D3c114a750d8DfDC);
+
+        // Replay with decoded parameters
+        swapRolloverLoan.rolloverLoanWithFlashSwap(
+            decoded_smartCommitmentForwarderAddress,
+            decoded_bidId,
+            decoded_borrowerAmount,
+            decoded_flashSwapArgs,
+            decoded_acceptCommitmentArgs
+        );
+
+        console.log(" Transaction replayed successfully with decoded params!");
     }
+ 
+
+
+
+
+
+
+
+
+
 }

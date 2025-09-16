@@ -3,8 +3,9 @@ pragma solidity ^0.8.0;
 
 import { Test } from "../tests/util/FoundryTest.sol";
 import "forge-std/console.sol";
-
-  import "forge-std/StdJson.sol";
+import "forge-std/StdJson.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "forge-std/Vm.sol";
 
 
 // Import your actual contracts
@@ -17,7 +18,7 @@ import {  MockSwapRolloverLoan } from "../contracts/mock/SwapRolloverLoanMock.so
 
 contract SwapRollover_Fork_Test is Test {
 
-    string constant NETWORK_NAME = "base";
+    string constant NETWORK_NAME = "hyperevm";
     
     SwapRolloverLoan swapRolloverLoan;
    // address constant DEPLOYED_SWAP_ROLLOVER_LOAN = 0xa4A8c60Ac9E0c38f8B46316c6B3B508b3BA04415; // Replace with actual deployed address
@@ -40,12 +41,12 @@ contract SwapRollover_Fork_Test is Test {
       }
 
 
-      function etch_SwapRolloverWithMock() public {
+   /*   function etch_SwapRolloverWithMock() public {
 
-            //all specific to katana ! 
-          address tellerV2Address = 0xf7B14778035fEAF44540A0bC1D4ED859bCB28229;
-          address uniswapFactoryAddress = 0x203e8740894c8955cB8950759876d7E7E45E04c1 ; 
-          address weth9Address = 0xEE7D8BCFb72bC1880D0Cf19822eB0A2e6577aB62 ; 
+            //all specific to hyperevm ! 
+          address tellerV2Address = 0x90D08f8Df66dFdE93801783FF7A36876453DAE75;
+          address uniswapFactoryAddress = 0xFf7B3e8C00e57ea31477c32A5B52a58Eea47b072 ; 
+          address weth9Address = 0x1fbcCdc677c10671eE50b46C61F0f7d135112450 ; 
 
             // Create a mock contract first
           MockSwapRolloverLoan mockSwapRolloverLoan = new MockSwapRolloverLoan(
@@ -59,90 +60,52 @@ contract SwapRollover_Fork_Test is Test {
           vm.etch( address(swapRolloverLoan) , address(mockSwapRolloverLoan).code );
 
 
-      }
-
-/*
-     function test_SwapRollover() public   {
-
-        etch_SwapRolloverWithMock();
-
-        // Define test parameters
-        address smartCommitmentForwarderAddress = getDeployedAddress("SmartCommitmentForwarder");
-        uint256 bidId = 4; // Example loan ID - replace with actual loan ID
-        uint256 borrowerAmount = 0; // Additional amount borrower adds
-        
-        // Flash swap parameters
-        SwapRolloverLoan_G1.FlashSwapArgs memory flashSwapArgs = SwapRolloverLoan_G1.FlashSwapArgs({
-            token0: address(0x1e5eFCA3D0dB2c6d5C67a4491845c43253eB9e4e),  
-            token1: address(0x203A662b0BD271A6ed5a60EdFbd04bFce608FD36), 
-            fee: 3000, // 0.3% fee tier
-            flashAmount: 1000, // 1000 tokens
-            borrowToken1: false // Borrow token0 (DAI)
-        });
-        
-        // Accept commitment parameters
-        SwapRolloverLoan_G1.AcceptCommitmentArgs memory acceptCommitmentArgs = SwapRolloverLoan_G1.AcceptCommitmentArgs({
-            commitmentId: 1,
-            smartCommitmentAddress: address(0), // Not using smart commitment
-            principalAmount: 1000,
-            collateralAmount: 1200,
-            collateralTokenId: 0,
-            collateralTokenAddress: address(0x1e5eFCA3D0dB2c6d5C67a4491845c43253eB9e4e), 
-            interestRate: 100, // 10% APR
-            loanDuration: 15000,
-            merkleProof: new bytes32[](0) // No merkle proof
-        });
-        
-        vm.prank(0xbc1d2Ed14128Cd7Af450319b642Fd43d65E495dc);
-        swapRolloverLoan.rolloverLoanWithFlashSwap(
-            smartCommitmentForwarderAddress, 
-            bidId,
-            borrowerAmount,
-            flashSwapArgs,
-            acceptCommitmentArgs 
-        );
-        
-        // Add assertions to verify the rollover worked
-        // assertTrue(someCondition, "Rollover should succeed");
-     }
-
-*/
-
-    
+      }*/
+ 
  
 
-     function dont_test_SwapRollover_base() public   {
+     function test_SwapRollover_forked() public   {
 
        // etch_SwapRolloverWithMock();
 
         // Define test parameters
         address smartCommitmentForwarderAddress = getDeployedAddress("SmartCommitmentForwarder");
-        uint256 bidId = 1312; // Example loan ID - replace with actual loan ID
-        uint256 borrowerAmount = 437109700492800; // Additional amount borrower adds
+        uint256 bidId = 0; // Example loan ID - replace with actual loan ID
+        uint256 borrowerAmount = 4581; // Additional amount borrower adds
         
         // Flash swap parameters
         SwapRolloverLoan_G2.FlashSwapArgs memory flashSwapArgs = SwapRolloverLoan_G2.FlashSwapArgs({
-            token0: address(0x1bc0c42215582d5A085795f4baDbaC3ff36d1Bcb),  
-            token1: address(0x4200000000000000000000000000000000000006), 
-            fee: 10000, //  
-            flashAmount: 16865234336302306,  
-            borrowToken1: false // Borrow token0 (DAI)
+            token0: address(0x5555555555555555555555555555555555555555),  
+            token1: address(0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb), 
+            fee: 500, //  
+            flashAmount: 422068,  
+            borrowToken1: true // Borrow token0 (DAI)
         });
         
         // Accept commitment parameters
         SwapRolloverLoan_G2.AcceptCommitmentArgs memory acceptCommitmentArgs = SwapRolloverLoan_G2.AcceptCommitmentArgs({
             commitmentId: 0,
-            smartCommitmentAddress: address(0xa42922b1d5bd7f72337eBC4f39Ff4E1302ec8D53),  
-            principalAmount: 16806947581558203,
-            collateralAmount: 996554071232877,
+            smartCommitmentAddress: address(0xd1174957123B9645d7E95d5e0b93ebeb729Ff67f),  
+            principalAmount: 422350,
+            collateralAmount: 19893118616829598,
             collateralTokenId: 0,
-            collateralTokenAddress: address(0x4200000000000000000000000000000000000006), 
-            interestRate: 3481, 
+            collateralTokenAddress: address(0x5555555555555555555555555555555555555555), 
+            interestRate: 6319, 
             loanDuration: 604800,
             merkleProof: new bytes32[](0) // No merkle proof
         });
         
-        vm.prank(0xbc1d2Ed14128Cd7Af450319b642Fd43d65E495dc);  //andres wallet 
+        // Get Andre's wallet address
+        address andresWallet = 0xbc1d2Ed14128Cd7Af450319b642Fd43d65E495dc;
+
+        // Get the principal token (token1)
+        IERC20 principalToken = IERC20(0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb);
+
+        // Log balance before rollover
+        uint256 balanceBefore = principalToken.balanceOf(andresWallet);
+        console.log("Principal token balance BEFORE rollover:", balanceBefore);
+
+        vm.prank(andresWallet);  //andres wallet
         swapRolloverLoan.rolloverLoanWithFlashSwap(
             smartCommitmentForwarderAddress, 
             bidId,
@@ -150,7 +113,20 @@ contract SwapRollover_Fork_Test is Test {
             flashSwapArgs,
             acceptCommitmentArgs 
         );
-        
+
+        // Log balance after rollover
+        uint256 balanceAfter = principalToken.balanceOf(andresWallet);
+        console.log("Principal token balance AFTER rollover:", balanceAfter);
+
+        // Log the difference
+        if (balanceAfter > balanceBefore) {
+            console.log("Principal token GAINED:", balanceAfter - balanceBefore);
+        } else if (balanceBefore > balanceAfter) {
+            console.log("Principal token SPENT:", balanceBefore - balanceAfter);
+        } else {
+            console.log("Principal token balance UNCHANGED");
+        }
+
         // Add assertions to verify the rollover worked
         // assertTrue(someCondition, "Rollover should succeed");
      }
@@ -179,4 +155,69 @@ contract SwapRollover_Fork_Test is Test {
             // For example, check if certain markets exist, etc.
         }
     }*/
+
+    function test_replayTransaction() public {
+      
+
+        address smartCommitmentForwarderAddress = getDeployedAddress("SmartCommitmentForwarder");
+
+          bytes memory tx_calldata = hex"0f29fee20000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000011f70000000000000000000000005555555555555555555555555555555555555555000000000000000000000000b8ce59fc3717ada4c02eadf9682a9e934f625ebb00000000000000000000000000000000000000000000000000000000000001f400000000000000000000000000000000000000000000000000000000000670c5000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000001200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000d1174957123b9645d7e95d5e0b93ebeb729ff67f00000000000000000000000000000000000000000000000000000000000671ce00000000000000000000000000000000000000000000000000465440a530220a0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000555555555555555555555555555555555555555500000000000000000000000000000000000000000000000000000000000018af0000000000000000000000000000000000000000000000000000000000093a8000000000000000000000000000000000000000000000000000000000000001200000000000000000000000000000000000000000000000000000000000000000";
+
+        // Decode the calldata (skip first 4 bytes which is the function selector)
+        bytes memory params = new bytes(tx_calldata.length - 4);
+        for (uint i = 4; i < tx_calldata.length; i++) {
+            params[i - 4] = tx_calldata[i];
+        }
+
+        // Decode parameters using abi.decode
+        (
+            address decoded_smartCommitmentForwarderAddress,
+            uint256 decoded_bidId,
+            uint256 decoded_borrowerAmount,
+            SwapRolloverLoan_G2.FlashSwapArgs memory decoded_flashSwapArgs,
+            SwapRolloverLoan_G2.AcceptCommitmentArgs memory decoded_acceptCommitmentArgs
+        ) = abi.decode(params, (
+            address,
+            uint256,
+            uint256,
+            SwapRolloverLoan_G2.FlashSwapArgs,
+            SwapRolloverLoan_G2.AcceptCommitmentArgs
+        ));
+
+        console.log("=== Decoded Parameters ===");
+        console.log("Smart Commitment Forwarder:", decoded_smartCommitmentForwarderAddress);
+        console.log("Bid ID:", decoded_bidId);
+        console.log("Borrower Amount:", decoded_borrowerAmount);
+        console.log("Flash Swap token0:", decoded_flashSwapArgs.token0);
+        console.log("Flash Swap token1:", decoded_flashSwapArgs.token1);
+        console.log("Flash Swap fee:", decoded_flashSwapArgs.fee);
+        console.log("Flash Amount:", decoded_flashSwapArgs.flashAmount);
+        console.log("Borrow Token1:", decoded_flashSwapArgs.borrowToken1);
+
+        // Impersonate the original caller
+        vm.prank(0xbc1d2Ed14128Cd7Af450319b642Fd43d65E495dc);
+
+        // Replay with decoded parameters
+        swapRolloverLoan.rolloverLoanWithFlashSwap(
+            decoded_smartCommitmentForwarderAddress,
+            decoded_bidId,
+            decoded_borrowerAmount,
+            decoded_flashSwapArgs,
+            decoded_acceptCommitmentArgs
+        );
+
+        console.log(" Transaction replayed successfully with decoded params!");
+    }
+
+    function test_decodeRolloverCall() public view {
+        // You can decode the function selector and parameters
+        // rolloverLoanWithFlashSwap has selector: 0x????????
+
+        // Use cast to decode the calldata:
+        // cast 4byte-decode <calldata>
+
+        // Or manually decode if you know the ABI
+        console.log("Use 'cast 4byte-decode <calldata>' to decode the function call");
+        console.log("Then extract parameters and replay the call");
+    }
 }

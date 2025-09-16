@@ -50,6 +50,10 @@ Some deployment files are stored using LFS.  To fetch these, use the command
 
 anvil --fork-url https://rpc.katana.network 
 
+anvil --fork-url https://rpc.hyperliquid.xyz/evm 
+
+
+
 
 yarn contracts test_forked 
 

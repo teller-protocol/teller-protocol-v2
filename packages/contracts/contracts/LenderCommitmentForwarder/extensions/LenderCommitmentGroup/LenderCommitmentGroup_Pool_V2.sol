@@ -3,22 +3,18 @@ pragma solidity ^0.8.0;
 
   
 // Contracts
-import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+ 
+ 
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";  
 
 
 // Interfaces
-import "../../../interfaces/ITellerV2Context.sol";
-import "../../../interfaces/IProtocolFee.sol";
+import "../../../interfaces/ITellerV2Context.sol"; 
  
 import "../../../interfaces/ITellerV2.sol";
 
 import "../../../libraries/NumbersLib.sol";
-
-import "../../../interfaces/uniswap/IUniswapV3Pool.sol";
+ 
 
 
 import "../../../interfaces/IHasProtocolPausingManager.sol";
@@ -29,10 +25,7 @@ import "../../../interfaces/IProtocolPausingManager.sol";
 
 import "../../../interfaces/uniswap/IUniswapV3Factory.sol";
 import "../../../interfaces/ISmartCommitmentForwarder.sol";
-
-import "../../../libraries/uniswap/TickMath.sol";
-import "../../../libraries/uniswap/FixedPoint96.sol";
-import "../../../libraries/uniswap/FullMath.sol";
+   
  
 
 import { LenderCommitmentGroupSharesIntegrated } from "./LenderCommitmentGroupSharesIntegrated.sol";
@@ -57,7 +50,7 @@ import { ILenderCommitmentGroup_V2 } from "../../../interfaces/ILenderCommitment
 import { Payment } from "../../../TellerV2Storage.sol";
 
 import {IUniswapPricingLibrary} from "../../../interfaces/IUniswapPricingLibrary.sol";
-import {UniswapPricingHelper} from "../../../price_oracles/UniswapPricingHelper.sol";
+//import {UniswapPricingHelper} from "../../../price_oracles/UniswapPricingHelper.sol";
 
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
@@ -95,7 +88,7 @@ contract LenderCommitmentGroup_Pool_V2 is
     ReentrancyGuardUpgradeable,
     LenderCommitmentGroupSharesIntegrated
 {
-    using AddressUpgradeable for address;
+   
     using NumbersLib for uint256;
 
     uint256 public immutable STANDARD_EXPANSION_FACTOR = 1e18;
@@ -233,7 +226,7 @@ contract LenderCommitmentGroup_Pool_V2 is
 
     modifier onlyProtocolOwner() {
         require(
-            msg.sender == Ownable(address(TELLER_V2)).owner(),
+            msg.sender == OwnableUpgradeable(address(TELLER_V2)).owner(),
             "OO"
         );
         _;

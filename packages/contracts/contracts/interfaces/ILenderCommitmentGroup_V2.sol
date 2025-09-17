@@ -37,6 +37,6 @@ interface ILenderCommitmentGroup_V2 {
     function getTokenDifferenceFromLiquidations() external view returns (int256);
 
 
-    function getMaxPrincipalPerCollateralAmount() external view returns (uint256);
+   // function getMaxPrincipalPerCollateralAmount() external view returns (uint256);
 
 }

@@ -180,7 +180,7 @@ contract UniswapPricingHelper
         uint256 pairPriceWithTwapFromOracle = getUniswapPriceRatioForPoolRoutes(poolOracleRoutes);
 
 
-        uint256 maxPrincipalPerCollateralAmount =  0 ;
+        uint256 maxPrincipalPerCollateralAmount =  ILenderCommitmentGroup_V2( pool ).getMaxPrincipalPerCollateralAmount() ;
 
         uint256 principalPerCollateralAmount = maxPrincipalPerCollateralAmount == 0  
                 ? pairPriceWithTwapFromOracle   
@@ -192,6 +192,6 @@ contract UniswapPricingHelper
 
         return principalPerCollateralAmount;
     } 
-    
+
 
 }

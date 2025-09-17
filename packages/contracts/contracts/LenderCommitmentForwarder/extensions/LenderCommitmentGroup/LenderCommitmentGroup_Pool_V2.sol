@@ -845,6 +845,13 @@ contract LenderCommitmentGroup_Pool_V2 is
        maxPrincipalPerCollateralAmount = _maxPrincipalPerCollateralAmount;
     }
 
+
+
+     function getMaxPrincipalPerCollateralAmount() external view returns (uint256) {
+
+        return maxPrincipalPerCollateralAmount;
+     }
+
   
 
 

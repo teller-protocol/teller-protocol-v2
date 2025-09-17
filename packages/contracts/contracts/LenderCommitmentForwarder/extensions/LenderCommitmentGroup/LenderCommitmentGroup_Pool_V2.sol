@@ -142,7 +142,7 @@ contract LenderCommitmentGroup_Pool_V2 is
 
 
    // uint256 immutable public DEFAULT_WITHDRAW_DELAY_TIME_SECONDS = 300;
-   // uint256 immutable public MAX_WITHDRAW_DELAY_TIME = 86400;
+     uint256 immutable public MAX_WITHDRAW_DELAY_TIME = 86400;
 
     mapping(uint256 => bool) public activeBids;
     mapping(uint256 => uint256) public activeBidsAmountDueRemaining;
@@ -150,12 +150,12 @@ contract LenderCommitmentGroup_Pool_V2 is
     int256 tokenDifferenceFromLiquidations;
 
     bool private firstDepositMade_deprecated;  // no longer used
-    uint256 public withdrawDelayTimeSeconds; // immutable for now - use withdrawDelayBypassForAccount
+    uint256 public withdrawDelayTimeSeconds;  
 
     IUniswapPricingLibrary.PoolRouteConfig[]  public  poolOracleRoutes;
 
     //configured by the owner. If 0 , not used. 
-    uint256 public maxPrincipalPerCollateralAmount; 
+    uint256 private maxPrincipalPerCollateralAmount; 
 
 
     uint256 public lastUnpausedAt;
@@ -277,12 +277,7 @@ contract LenderCommitmentGroup_Pool_V2 is
         UNISWAP_PRICING_HELPER = _uniswapPricingHelper; 
     }
 
-    /**
-     * @notice Initializes the LenderCommitmentGroup_Smart contract.
-     * @param _commitmentGroupConfig Configuration for the commitment group (lending pool).
-     * @param _poolOracleRoutes Route configuration for the principal/collateral oracle.
-
-     */
+     
    function initialize(
 
        CommitmentGroupConfig calldata _commitmentGroupConfig,
@@ -742,6 +737,13 @@ contract LenderCommitmentGroup_Pool_V2 is
         return pairPriceWithTwapFromOracle;
     }
 
+
+    function getMaxPrincipalPerCollateralAmount() public view returns (uint256) {
+
+
+        return maxPrincipalPerCollateralAmount;
+    }
+
     /**
      * @notice Calculates the principal token amount per collateral token based on Uniswap oracle prices
      * @dev Uses Uniswap TWAP and applies any configured maximum limits
@@ -749,7 +751,7 @@ contract LenderCommitmentGroup_Pool_V2 is
      * @param poolOracleRoutes Array of pool route configurations to use for price calculation
      * @return The principal per collateral ratio, expanded by the Uniswap expansion factor
      */
-    function getPrincipalForCollateralForPoolRoutes(
+  /*  function getPrincipalForCollateralForPoolRoutes(
         IUniswapPricingLibrary.PoolRouteConfig[] memory poolOracleRoutes
     ) external view virtual returns (uint256 ) {
    
@@ -766,7 +768,7 @@ contract LenderCommitmentGroup_Pool_V2 is
 
 
         return principalPerCollateralAmount;
-    } 
+    } */
 
 
     /**
@@ -1148,6 +1150,20 @@ contract LenderCommitmentGroup_Pool_V2 is
         
         withdrawDelayBypassForAccount[_addr] = _bypass;
        
+    }
+
+
+
+    /**
+     * @notice Sets the delay time for withdrawing shares. Only Protocol Owner.
+     * @param _seconds Delay time in seconds.
+     */
+    function setWithdrawDelayTime(uint256 _seconds) 
+    external 
+    onlyProtocolOwner {
+        require( _seconds < MAX_WITHDRAW_DELAY_TIME , "WD");
+
+        withdrawDelayTimeSeconds = _seconds;
     }
     
 

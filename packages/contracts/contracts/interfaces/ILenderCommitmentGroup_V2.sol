@@ -25,9 +25,7 @@ interface ILenderCommitmentGroup_V2 {
 
         IUniswapPricingLibrary.PoolRouteConfig[] calldata _poolOracleRoutes  
  
-    )
-        external
-         ;
+    )  external   ;
 
    
 
@@ -37,5 +35,8 @@ interface ILenderCommitmentGroup_V2 {
     ) external ;
 
     function getTokenDifferenceFromLiquidations() external view returns (int256);
+
+
+    function getMaxPrincipalPerCollateralAmount() external view returns (uint256);
 
 }

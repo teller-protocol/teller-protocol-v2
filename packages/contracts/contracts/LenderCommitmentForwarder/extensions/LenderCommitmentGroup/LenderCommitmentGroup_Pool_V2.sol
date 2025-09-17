@@ -142,7 +142,7 @@ contract LenderCommitmentGroup_Pool_V2 is
 
 
    // uint256 immutable public DEFAULT_WITHDRAW_DELAY_TIME_SECONDS = 300;
-   // uint256 immutable public MAX_WITHDRAW_DELAY_TIME = 86400;
+    uint256 immutable public MAX_WITHDRAW_DELAY_TIME = 86400;
 
     mapping(uint256 => bool) public activeBids;
     mapping(uint256 => uint256) public activeBidsAmountDueRemaining;
@@ -742,32 +742,7 @@ contract LenderCommitmentGroup_Pool_V2 is
         return pairPriceWithTwapFromOracle;
     }
 
-    /**
-     * @notice Calculates the principal token amount per collateral token based on Uniswap oracle prices
-     * @dev Uses Uniswap TWAP and applies any configured maximum limits
-     * @dev Returns the lesser of the oracle price or the configured maximum (if set)
-     * @param poolOracleRoutes Array of pool route configurations to use for price calculation
-     * @return The principal per collateral ratio, expanded by the Uniswap expansion factor
-     */
-    function getPrincipalForCollateralForPoolRoutes(
-        IUniswapPricingLibrary.PoolRouteConfig[] memory poolOracleRoutes
-    ) external view virtual returns (uint256 ) {
-   
-        uint256 pairPriceWithTwapFromOracle = IUniswapPricingLibrary(UNISWAP_PRICING_HELPER)
-            .getUniswapPriceRatioForPoolRoutes(poolOracleRoutes);
-       
-       
-        uint256 principalPerCollateralAmount = maxPrincipalPerCollateralAmount == 0  
-                ? pairPriceWithTwapFromOracle   
-                : Math.min(
-                    pairPriceWithTwapFromOracle,
-                    maxPrincipalPerCollateralAmount //this is expanded by uniswap exp factor  
-                );
-
-
-        return principalPerCollateralAmount;
-    } 
-
+ 
 
     /**
      * @notice Calculates the amount of collateral tokens required for a given principal amount
@@ -1150,6 +1125,19 @@ contract LenderCommitmentGroup_Pool_V2 is
        
     }
     
+
+
+    /**
+     * @notice Sets the delay time for withdrawing shares. Only Protocol Owner.
+     * @param _seconds Delay time in seconds.
+     */
+    function setWithdrawDelayTime(uint256 _seconds) 
+    external 
+    onlyProtocolOwner {
+        require( _seconds < MAX_WITHDRAW_DELAY_TIME , "WD");
+
+        withdrawDelayTimeSeconds = _seconds;
+    }
 
 
     // ------------------------   Pausing functions  ------------ 

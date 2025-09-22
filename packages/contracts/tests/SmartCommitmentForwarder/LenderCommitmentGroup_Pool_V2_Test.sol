@@ -365,7 +365,38 @@ contract LenderCommitmentGroup_Pool_V2_Test is Testable {
 
 
 
+     function test_erc4626_deposit_requires_msg_sender_receiver() public {
+        initialize_group_contract();
+        lenderCommitmentGroupSmartV2.set_mockSharesExchangeRate(1e36);
 
+        lenderCommitmentGroupSmartV2.set_mockPoolIsActivated(true);
+
+        vm.prank(address(lender));
+        principalToken.approve(address(lenderCommitmentGroupSmartV2), 1000000);
+
+
+
+         uint256 originalTime = block.timestamp;  
+        vm.warp( originalTime + 5000000);
+
+
+
+
+        address recipient  = address(liquidator);
+
+
+        vm.expectRevert(); 
+
+        vm.prank(address(lender));
+        uint256 sharesAmount = lenderCommitmentGroupSmartV2.deposit(1000000, address(recipient));
+
+       
+
+       
+
+
+
+    }
 
 
         // ERC4626 Vault Tests

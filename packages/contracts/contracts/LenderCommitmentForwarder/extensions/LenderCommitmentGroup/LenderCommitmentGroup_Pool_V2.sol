@@ -1301,7 +1301,7 @@ contract LenderCommitmentGroup_Pool_V2 is
 
         // Similar to addPrincipalToCommitmentGroup but following ERC4626 standard
         require(assets > 0 );
-        require( msg.sender == receiver );
+        require( msg.sender == receiver);
         
          bool poolWasActivated = poolIsActivated();
         

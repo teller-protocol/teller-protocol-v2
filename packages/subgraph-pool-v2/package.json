@@ -4,8 +4,8 @@
   "version": "0.4.21-19",
   "scripts": {
     "generate": "node scripts/generate-subgraph.js",
-    "codegen": "npm run generate && graph codegen",
-    "build": "npm run codegen && graph build",
+    "codegen": " graph codegen",
+    "build": "  graph build",
     "deploy:prompt": "ts-node scripts/thegraph",
     "create-local": "graph create --node http://localhost:8020/ teller-v2",
     "remove-local": "graph remove --node http://localhost:8020/ teller-v2",

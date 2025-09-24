@@ -23,21 +23,6 @@ import {QuoterMath} from '../../../../libraries/uniswap/QuoterMath.sol';
 
 // ---
 
-/*
-import {IUniswapV3Pool} from "v3-core/contracts/interfaces/IUniswapV3Pool.sol";
-import {SwapMath} from "v3-core/contracts/libraries/SwapMath.sol";
-import {FullMath} from "v3-core/contracts/libraries/FullMath.sol";
-import {TickMath} from "v3-core/contracts/libraries/TickMath.sol";
-import "v3-core/contracts/libraries/LowGasSafeMath.sol";
-import "v3-core/contracts/libraries/SafeCast.sol";
-import "v3-periphery/contracts/libraries/Path.sol";
-import {SqrtPriceMath} from "v3-core/contracts/libraries/SqrtPriceMath.sol";
-import {LiquidityMath} from "v3-core/contracts/libraries/LiquidityMath.sol";
-import {PoolTickBitmap} from "./libraries/PoolTickBitmap.sol";
-import {IQuoter} from "./interfaces/IQuoter.sol";
-import {PoolAddress} from "./libraries/PoolAddress.sol";
-import {QuoterMath} from "./libraries/QuoterMath.sol";
-*/
 
 
 contract Quoter is IQuoter {

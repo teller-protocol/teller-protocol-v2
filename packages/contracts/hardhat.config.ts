@@ -224,10 +224,10 @@ export default <HardhatUserConfig>{
   etherscan: {
     apiKey: {
       // Main Networks
-      mainnet: process.env.ETHERSCAN_VERIFY_API_KEY,
-      polygon: process.env.POLYGONSCAN_VERIFY_API_KEY,
-      arbitrumOne: process.env.ARBISCAN_VERIFY_API_KEY,
-      base: process.env.BASESCAN_VERIFY_API_KEY,
+      mainnet: process.env.ETHERSCANV2_VERIFY_API_KEY,
+      polygon: process.env.ETHERSCANV2_VERIFY_API_KEY,
+      arbitrumOne: process.env.ETHERSCANV2_VERIFY_API_KEY,
+      base: process.env.ETHERSCANV2_VERIFY_API_KEY,
       optimism: process.env.ETHERSCANV2_VERIFY_API_KEY,  //using the v2 api 
       katana: process.env.ETHERSCANV2_VERIFY_API_KEY,  //using the v2 api 
       hyperevm: process.env.ETHERSCANV2_VERIFY_API_KEY,
@@ -244,10 +244,18 @@ export default <HardhatUserConfig>{
     },
     customChains: [
       {
+        network: 'polygon',
+        chainId: 137,
+        urls: {
+          apiURL: 'https://api.etherscan.io/v2/api?chainid=137',
+          browserURL: 'https://polygonscan.com',
+        },
+      },
+      {
         network: 'base',
         chainId: 8453,
         urls: {
-          apiURL: 'https://api.basescan.org/api',
+          apiURL: 'https://api.etherscan.io/v2/api?chainid=8453',
           browserURL: 'https://basescan.org',
         },
       },
@@ -459,7 +467,7 @@ export default <HardhatUserConfig>{
 
       verify: {
         etherscan: {
-          apiKey: process.env.ETHERSCAN_VERIFY_API_KEY,
+          apiKey: process.env.ETHERSCANV2_VERIFY_API_KEY,
         },
       },
     }),
@@ -512,7 +520,7 @@ export default <HardhatUserConfig>{
 
       verify: {
         etherscan: {
-          apiKey: process.env.POLYGONSCAN_VERIFY_API_KEY,
+          apiKey: process.env.ETHERSCANV2_VERIFY_API_KEY,
         },
       },
     }),
@@ -524,7 +532,7 @@ export default <HardhatUserConfig>{
 
       verify: {
         etherscan: {
-          apiKey: process.env.ARBISCAN_VERIFY_API_KEY,
+          apiKey: process.env.ETHERSCANV2_VERIFY_API_KEY,
         },
       },
     }),
@@ -536,7 +544,7 @@ export default <HardhatUserConfig>{
 
       verify: {
         etherscan: {
-          apiKey: process.env.BASESCAN_VERIFY_API_KEY,
+          apiKey: process.env.ETHERSCANV2_VERIFY_API_KEY,
         },
       },
     }),

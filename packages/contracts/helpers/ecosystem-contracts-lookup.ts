@@ -140,10 +140,10 @@ export function get_ecosystem_contract_address(
 			  //    quoterAddress = '0x0000000000000000000000000000000000000006'
 			  //    break
 			     case 'katana':
-			       quoterAddress = '0x92dea23ED1C683940fF1a2f8fE23FE98C5d3041c'
+			       quoterAddress = '0x7744dc954117540240232867584065CC317a9877' //'0x92dea23ED1C683940fF1a2f8fE23FE98C5d3041c'
 			       break 
 			     case 'hyperevm':
-			     	quoterAddress = '0x239F11a7A3E08f2B8110D4CA9F6B95d4c8865258'
+			     	quoterAddress = '0xb7fAe1B38ac960706B5a636756bF7450F7a44339' //'0x239F11a7A3E08f2B8110D4CA9F6B95d4c8865258'
 			     	break 
 			    default:
 			    	return undefined 

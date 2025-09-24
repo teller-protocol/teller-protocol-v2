@@ -11,7 +11,7 @@ const deployFn: DeployFunction = async (hre) => {
     const deployerAddress = await deployer.getAddress()
 
 
-    
+
     let uniswapV3FactoryAddress =  get_ecosystem_contract_address( hre.network.name, "uniswapV3Factory" ) ;
    
 
@@ -31,6 +31,6 @@ deployFn.id = 'uniswapv3-quoter:deploy'
 deployFn.tags = ['uniswapv3-quoter:deploy']
 deployFn.dependencies = []
 deployFn.skip = async (hre) => {
-    return !hre.network.live || ![  'polygon' ].includes(hre.network.name)
+    return !hre.network.live || ![  'polygon', 'katana', 'hyperevm' ].includes(hre.network.name)
   }
 export default deployFn

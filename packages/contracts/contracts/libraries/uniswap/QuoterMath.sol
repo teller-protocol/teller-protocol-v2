@@ -2,18 +2,20 @@
 pragma solidity ^0.8.0;
 pragma abicoder v2;
 
-import {IUniswapV3Pool} from "v3-core/contracts/interfaces/IUniswapV3Pool.sol";
-import {IQuoter} from "../interfaces/IQuoter.sol";
-import {SwapMath} from "v3-core/contracts/libraries/SwapMath.sol";
-import {FullMath} from "v3-core/contracts/libraries/FullMath.sol";
-import {TickMath} from "v3-core/contracts/libraries/TickMath.sol";
-import "v3-core/contracts/libraries/LowGasSafeMath.sol";
-import "v3-core/contracts/libraries/SafeCast.sol";
-import "v3-periphery/contracts/libraries/Path.sol";
-import {SqrtPriceMath} from "v3-core/contracts/libraries/SqrtPriceMath.sol";
-import {LiquidityMath} from "v3-core/contracts/libraries/LiquidityMath.sol";
+import {IUniswapV3Pool} from "./core/interfaces/IUniswapV3Pool.sol";
+import {IQuoter} from "./periphery/interfaces/IQuoter.sol";
+
+import {SwapMath} from "./SwapMath.sol";
+import {FullMath} from "./FullMath.sol";
+import {TickMath} from "./TickMath.sol";
+
+import "./core/libraries/LowGasSafeMath.sol";
+import "./core/libraries/SafeCast.sol";
+import "./periphery/libraries/Path.sol";
+import {SqrtPriceMath} from "./SqrtPriceMath.sol";
+import {LiquidityMath} from "./LiquidityMath.sol";
 import {PoolTickBitmap} from "./PoolTickBitmap.sol";
-import {PoolAddress} from "./PoolAddress.sol";
+import {PoolAddress} from "./periphery/libraries/PoolAddress.sol";
 
 library QuoterMath {
     using LowGasSafeMath for uint256;

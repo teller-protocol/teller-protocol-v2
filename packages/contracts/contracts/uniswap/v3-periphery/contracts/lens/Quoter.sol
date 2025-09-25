@@ -4,6 +4,7 @@ pragma abicoder v2;
  
 // ----
 
+import {IUniswapV3Factory} from '../../../../libraries/uniswap/core/interfaces/IUniswapV3Factory.sol';
 import {IUniswapV3Pool} from '../../../../libraries/uniswap/core/interfaces/IUniswapV3Pool.sol';
 import {SwapMath} from '../../../../libraries/uniswap/SwapMath.sol';
 import {FullMath} from '../../../../libraries/uniswap/FullMath.sol';
@@ -41,7 +42,11 @@ contract Quoter is IQuoter {
     }
 
     function getPool(address tokenA, address tokenB, uint24 fee) private view returns (address pool) {
-        pool = PoolAddress.computeAddress(factory, PoolAddress.getPoolKey(tokenA, tokenB, fee));
+       // pool = PoolAddress.computeAddress(factory, PoolAddress.getPoolKey(tokenA, tokenB, fee));
+
+       pool = IUniswapV3Factory(  factory  )
+            .getPool( tokenA, tokenB, fee  );
+
     }
 
     /// @inheritdoc IQuoter

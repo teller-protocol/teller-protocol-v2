@@ -56,7 +56,7 @@ graph auth
 Deploy to alchemy 
 
 graph deploy tellerv2-poolsv2-mainnet \
-  --version-label 0.4.21.2 \
+  --version-label 0.4.21.4 \
   --node https://subgraphs.alchemy.com/api/subgraphs/deploy \
   --deploy-key xxxxxx \
   --ipfs https://ipfs.satsuma.xyz
@@ -74,9 +74,13 @@ graph deploy tellerv2-poolsv2-mainnet \
 deploy to goldsky 
 
 
+npm run generate katana
+
+npm run generate hyperevm
+
 goldsky subgraph deploy teller-pools-v2-hyperevm/0.4.21.2
 
-goldsky subgraph deploy teller-pools-v2-katana/0.4.21.2
+goldsky subgraph deploy teller-pools-v2-katana/0.4.21.9
 
 
 ```

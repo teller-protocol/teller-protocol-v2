@@ -56,7 +56,7 @@ graph auth
 Deploy to alchemy 
 
 graph deploy tellerv2-pools-mainnet \
-  --version-label 0.4.21 \
+  --version-label 0.4.21.4 \
   --node https://subgraphs.alchemy.com/api/subgraphs/deploy \
   --deploy-key xxxxxx \
   --ipfs https://ipfs.satsuma.xyz

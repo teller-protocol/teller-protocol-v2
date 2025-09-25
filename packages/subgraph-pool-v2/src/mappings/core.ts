@@ -129,6 +129,50 @@ function getOrCreateUserMetric(userAddress: Address, poolAddress: Address): grou
   return userMetric
 }
 
+
+
+function updatePoolMetric(poolAddress: Address, blockNumber: BigInt, timestamp: BigInt): void {
+
+  let poolMetric = group_pool_metric.load(poolAddress.toHexString())
+
+  if (poolMetric == null) {
+    return
+  }
+
+  // compute getPoolTotalEstimatedValue using existing data
+  let totalEstimatedValue = poolMetric.total_principal_tokens_committed
+    .minus(poolMetric.total_principal_tokens_withdrawn)
+    .plus(poolMetric.total_interest_collected)
+
+  //compute getTotalPrincipalTokensOutstandingInActiveLoans using existing data
+  let totalOutstandingLoans = poolMetric.total_principal_tokens_borrowed
+    .minus(poolMetric.total_principal_tokens_repaid)
+
+  //compute getPoolUtilizationRatio using existing data
+  let utilizationRatio = BigInt.fromI32(0)
+  if (totalEstimatedValue.gt(BigInt.fromI32(0))) {
+    utilizationRatio = totalOutstandingLoans
+      .times(BigInt.fromI32(10000))
+      .div(totalEstimatedValue)
+  }
+
+  //compute getMinInterestRate using utilization ratio and existing bounds
+  let interestRateRange = poolMetric.interest_rate_upper_bound.minus(poolMetric.interest_rate_lower_bound)
+  let minInterestRate = poolMetric.interest_rate_lower_bound
+    .plus(interestRateRange.times(utilizationRatio).div(BigInt.fromI32(10000)))
+
+  poolMetric.current_min_interest_rate = minInterestRate
+
+  poolMetric.save()
+
+
+
+
+
+}
+
+
+
 export function handleBorrowerAcceptedFunds(event: BorrowerAcceptedFunds): void {
   let poolAddress = event.address
   let borrower = event.params.borrower
@@ -170,6 +214,9 @@ export function handleBorrowerAcceptedFunds(event: BorrowerAcceptedFunds): void 
     poolMetric.total_principal_tokens_borrowed = poolMetric.total_principal_tokens_borrowed.plus(principalAmount)
     poolMetric.total_collateral_tokens_escrowed = poolMetric.total_collateral_tokens_escrowed.plus(collateralAmount)
     poolMetric.save()
+
+
+     updatePoolMetric( poolAddress, event.block.number, event.block.timestamp  );
   }
 
   // Update user metrics
@@ -212,6 +259,9 @@ export function handleWithdraw(event: Withdraw): void {
   if (poolMetric != null) {
     poolMetric.total_principal_tokens_withdrawn = poolMetric.total_principal_tokens_withdrawn.plus(principalTokensWithdrawn)
     poolMetric.save()
+
+     updatePoolMetric( poolAddress, event.block.number, event.block.timestamp  );
+
   }
 
   // Update user metrics
@@ -252,6 +302,8 @@ export function handleDeposit(event: Deposit): void {
   if (poolMetric != null) {
     poolMetric.total_principal_tokens_committed = poolMetric.total_principal_tokens_committed.plus(amount)
     poolMetric.save()
+
+     updatePoolMetric( poolAddress, event.block.number, event.block.timestamp  );
   }
 
   // Update user metrics
@@ -296,6 +348,8 @@ export function handleLoanRepaid(event: LoanRepaid): void {
     poolMetric.total_principal_tokens_repaid = poolMetric.total_principal_tokens_repaid.plus(principalAmount)
     poolMetric.total_interest_collected = poolMetric.total_interest_collected.plus(interestAmount)
     poolMetric.save()
+
+     updatePoolMetric( poolAddress, event.block.number, event.block.timestamp  );
   }
 
   // Update daily and weekly data points
@@ -330,6 +384,8 @@ export function handleLoanLiquidated(event: DefaultedLoanLiquidated): void {
   if (poolMetric != null) {
     poolMetric.token_difference_from_liquidations = poolMetric.token_difference_from_liquidations.plus(tokenAmountDifference)
     poolMetric.save()
+
+     updatePoolMetric( poolAddress, event.block.number, event.block.timestamp  );
   }
 
   // Update daily and weekly data points
@@ -383,6 +439,8 @@ export function handlePoolInitialized(event: PoolInitialized): void {
   poolMetric.liquidity_threshold_percent = BigInt.fromI32(liquidityThresholdPercent)
   poolMetric.collateral_ratio = BigInt.fromI32(loanToValuePercent)
   poolMetric.save()
+
+   updatePoolMetric( poolAddress, event.block.number, event.block.timestamp  );
 
   // Update daily and weekly data points
   updateOrCreateDailyDataPoint(poolAddress, event.block.number, event.block.timestamp)

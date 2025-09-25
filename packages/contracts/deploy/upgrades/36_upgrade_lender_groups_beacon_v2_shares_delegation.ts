@@ -33,11 +33,11 @@ let uniswapV3FactoryAddress: string =  get_ecosystem_contract_address( hre.netwo
 //this is why the owner of the beacon should be timelock controller ! 
 // so we can upgrade it like this . Using a proposal.  This actually goes AROUND the proxy admin, interestingly. 
   await hre.upgrades.proposeBatchTimelock({
-    title: 'Lender Pools V2: Upgrade Shares Time Delay',
+    title: 'Lender Pools V2: Upgrade Shares Delegation',
     description: ` 
 # Lender Pools V2
 
-* A patch to allow bypassing withdraw delay.
+* A patch to allow setting per-pool withdraw delay and adding shares withdraw/deposit delegation .
 `,
     _steps: [
       {
@@ -73,7 +73,7 @@ let uniswapV3FactoryAddress: string =  get_ecosystem_contract_address( hre.netwo
 }
 
 // tags and deployment
-deployFn.id = 'lender-commitment-group-beacon-v2:upgrade-vault-bypass'
+deployFn.id = 'lender-commitment-group-beacon-v2:upgrade-shares-delegation'
 deployFn.tags = ['lender-commitment-group-beacon-v2']
 deployFn.dependencies = [
   'teller-v2:deploy',
@@ -83,6 +83,6 @@ deployFn.dependencies = [
 ]
 
 deployFn.skip = async (hre) => {
-  return !hre.network.live || !['sepolia','polygon'].includes(hre.network.name)
+  return !hre.network.live || !['sepolia' , 'polygon' ].includes(hre.network.name)
 }
 export default deployFn

@@ -421,6 +421,20 @@
     },
     {
       "type": "function",
+      "name": "MAX_WITHDRAW_DELAY_TIME",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
       "name": "MIN_TWAP_INTERVAL",
       "constant": true,
       "stateMutability": "view",
@@ -950,6 +964,20 @@
     },
     {
       "type": "function",
+      "name": "getMaxPrincipalPerCollateralAmount",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
       "name": "getMinInterestRate",
       "constant": true,
       "stateMutability": "view",
@@ -1016,47 +1044,6 @@
       "stateMutability": "view",
       "payable": false,
       "inputs": [],
-      "outputs": [
-        {
-          "type": "uint256",
-          "name": ""
-        }
-      ]
-    },
-    {
-      "type": "function",
-      "name": "getPrincipalForCollateralForPoolRoutes",
-      "constant": true,
-      "stateMutability": "view",
-      "payable": false,
-      "inputs": [
-        {
-          "type": "tuple[]",
-          "name": "poolOracleRoutes",
-          "components": [
-            {
-              "type": "address",
-              "name": "pool"
-            },
-            {
-              "type": "bool",
-              "name": "zeroForOne"
-            },
-            {
-              "type": "uint32",
-              "name": "twapInterval"
-            },
-            {
-              "type": "uint256",
-              "name": "token0Decimals"
-            },
-            {
-              "type": "uint256",
-              "name": "token1Decimals"
-            }
-          ]
-        }
-      ],
       "outputs": [
         {
           "type": "uint256",
@@ -1230,6 +1217,28 @@
       "outputs": [
         {
           "type": "uint16",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "isSharesDelegate",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "owner"
+        },
+        {
+          "type": "address",
+          "name": "delegate"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "bool",
           "name": ""
         }
       ]
@@ -1698,6 +1707,23 @@
     },
     {
       "type": "function",
+      "name": "setSharesDelegate",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "delegate"
+        },
+        {
+          "type": "bool",
+          "name": "approved"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
       "name": "setWithdrawDelayBypassForAccount",
       "constant": false,
       "payable": false,
@@ -1709,6 +1735,19 @@
         {
           "type": "bool",
           "name": "_bypass"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "setWithdrawDelayTime",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_seconds"
         }
       ],
       "outputs": []
@@ -2012,6 +2051,6 @@
     }
   ],
   "receipt": {},
-  "numDeployments": 5,
+  "numDeployments": 6,
   "implementation": "0xdf8Ae678746AF412429E5E50B4abf1632d17B003"
 }

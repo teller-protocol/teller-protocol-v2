@@ -256,7 +256,7 @@ contract SwapRollover_Fork_Test is Test {
         console.log("Borrow Token1:", decoded_flashSwapArgs.borrowToken1);
 
         // Impersonate the original caller
-        vm.prank(0x7133c664af6763ab9aeeb095d3c114a750d8dfdc);
+        vm.prank(0x7133c664AF6763ab9aeEB095D3c114a750d8DfDC);
 
         // Replay with decoded parameters
         swapRolloverLoan.rolloverLoanWithFlashSwap(

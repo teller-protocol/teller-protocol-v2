@@ -62,9 +62,9 @@ contract Quoter_Fork_Test is Test {
      function test_quote() public   {
 
 
-        address inputToken = 0x203a662b0bd271a6ed5a60edfbd04bfce608fd36;
+        address inputToken = 0x203A662b0BD271A6ed5a60EdFbd04bFce608FD36;
         uint256 amountIn = 698130000;
-        address outputToken = 0xee7d8bcfb72bc1880d0cf19822eb0a2e6577ab62;
+        address outputToken = 0xEE7D8BCFb72bC1880D0Cf19822eB0A2e6577aB62;
         uint24 poolFee = 500;
 
         // Encode the swap path: inputToken -> outputToken with poolFee

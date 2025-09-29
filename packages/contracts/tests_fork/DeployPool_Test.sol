@@ -35,7 +35,7 @@ the pair is USDT0 <> WHYPE
 
 contract DeployPool_Fork_Test is Test {
 
-    string constant NETWORK_NAME = "hyperevm";
+    string constant NETWORK_NAME = "polygon";
     
     LenderCommitmentGroupFactory_V2 factoryv2;
    // address constant DEPLOYED_SWAP_ROLLOVER_LOAN = 0xa4A8c60Ac9E0c38f8B46316c6B3B508b3BA04415; // Replace with actual deployed address

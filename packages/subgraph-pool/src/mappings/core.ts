@@ -271,12 +271,12 @@ export function handleBorrowerAcceptedFunds(event: BorrowerAcceptedFunds): void 
   bidEntity.save()
 
    let tellerBidEntity = new teller_bid(  bidId.toString() )
-  bidEntity.group_pool_address = poolAddress
-  bidEntity.bid_id = bidId.toBigDecimal()
-  bidEntity.borrower = borrower
-  bidEntity.collateral_amount = collateralAmount.toBigDecimal()
-  bidEntity.principal_amount = principalAmount.toBigDecimal()
-  bidEntity.save()
+  tellerBidEntity.group_pool_address = poolAddress
+  tellerBidEntity.bid_id = bidId.toBigDecimal()
+  tellerBidEntity.borrower = borrower
+  tellerBidEntity.collateral_amount = collateralAmount.toBigDecimal()
+  tellerBidEntity.principal_amount = principalAmount.toBigDecimal()
+  tellerBidEntity.save()
 
 
   // Update pool metrics

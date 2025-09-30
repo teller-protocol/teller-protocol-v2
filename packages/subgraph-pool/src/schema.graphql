@@ -212,12 +212,15 @@ type group_pool_metric @entity(immutable: false) {
     total_principal_tokens_withdrawn: BigInt!
     
     total_principal_tokens_borrowed: BigInt!
-    total_collateral_tokens_escrowed: BigInt!  #fix me by reductions 
+    
+    total_collateral_tokens_deposited: BigInt! 
+    total_collateral_tokens_withdrawn: BigInt! 
+
     total_principal_tokens_repaid: BigInt!
+     total_principal_tokens_repaid_by_liquidation_auction: BigInt!
     total_interest_collected: BigInt!
 
-    token_difference_from_liquidations: BigInt!
-    total_collateral_withdrawn: BigInt!
+    token_difference_from_liquidations: BigInt! 
 
   
 }
@@ -236,12 +239,12 @@ type group_pool_metric_data_point @entity(immutable: false) {
     
     total_principal_tokens_committed: BigInt!
     total_principal_tokens_withdrawn: BigInt!
-    total_collateral_tokens_escrowed: BigInt!  #fix me by reductions 
-
-          total_collateral_tokens_withdrawn: BigInt!
+   
+    total_collateral_tokens_deposited: BigInt!  
+    total_collateral_tokens_withdrawn: BigInt!
     
     total_principal_tokens_borrowed: BigInt!
-    total_principal_tokens_repaid: BigInt!
+    total_principal_tokens_repaid: BigInt! 
     total_interest_collected: BigInt!
 
      token_difference_from_liquidations: BigInt!
@@ -258,7 +261,7 @@ type group_pool_metric_data_point_daily @entity(immutable: false) {
     
     total_principal_tokens_committed: BigInt!
     total_principal_tokens_withdrawn: BigInt!
-    total_collateral_tokens_escrowed: BigInt!  #fix me by reductions 
+    total_collateral_tokens_deposited: BigInt!   
     total_collateral_tokens_withdrawn: BigInt!
     
     total_principal_tokens_borrowed: BigInt!
@@ -281,7 +284,8 @@ type group_pool_metric_data_point_weekly @entity(immutable: false) {
     
     total_principal_tokens_committed: BigInt!
     total_principal_tokens_withdrawn: BigInt!
-    total_collateral_tokens_escrowed: BigInt!  #fix me by reductions 
+     
+    total_collateral_tokens_deposited: BigInt!  
     total_collateral_tokens_withdrawn: BigInt!
 
     total_principal_tokens_borrowed: BigInt!
@@ -305,8 +309,8 @@ type group_user_metric @entity(immutable: false) {
     total_principal_tokens_withdrawn: BigInt! 
 
     total_principal_tokens_borrowed: BigInt! 
-    total_collateral_tokens_escrowed: BigInt!
-
+    # total_collateral_tokens_escrowed: BigInt!
+    total_collateral_tokens_deposited: BigInt!  
 
 
    # shares_tokens_balance: BigInt! # need to track from erc20 driver

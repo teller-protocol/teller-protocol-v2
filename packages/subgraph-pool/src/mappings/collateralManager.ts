@@ -39,15 +39,15 @@ export function handleCollateralWithdrawn(event: CollateralWithdrawn): void {
   }
 
   // Update the total collateral withdrawn for this pool
-  poolMetric.total_collateral_withdrawn = poolMetric.total_collateral_withdrawn.plus(amount)
+  poolMetric.total_collateral_tokens_withdrawn = poolMetric.total_collateral_tokens_withdrawn.plus(amount)
 
   // Also reduce the total collateral escrowed since it's being withdrawn
-  poolMetric.total_collateral_tokens_escrowed = poolMetric.total_collateral_tokens_escrowed.minus(amount)
+  //poolMetric.total_collateral_tokens_escrowed = poolMetric.total_collateral_tokens_escrowed.minus(amount)
 
   poolMetric.save()
 
   log.info("Updated pool {} - total_collateral_withdrawn: {}", [
     poolAddress.toHexString(),
-    poolMetric.total_collateral_withdrawn.toString()
+    poolMetric.total_collateral_tokens_withdrawn.toString()
   ])
 }

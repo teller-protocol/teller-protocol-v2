@@ -32,6 +32,9 @@ type factory_upgraded @entity(immutable: true) {
     implementation: Bytes!
 }
 
+ 
+
+
 type group_borrower_accepted_funds @entity(immutable: true) {
     id: ID!
     evt_tx_hash: Bytes!
@@ -163,6 +166,18 @@ type group_pool_bid @entity(immutable: true) {
     collateral_amount: BigDecimal! 
     principal_amount: BigDecimal!
 }
+
+
+
+type teller_bid @entity(immutable: true) {
+    id: ID! 
+    group_pool_address: Bytes!
+    bid_id: BigDecimal!
+    borrower: Bytes!
+    collateral_amount: BigDecimal! 
+    principal_amount: BigDecimal!
+}
+
 
 type group_pool_metric @entity(immutable: false) {
     id: ID!    #will be based on group pool address 

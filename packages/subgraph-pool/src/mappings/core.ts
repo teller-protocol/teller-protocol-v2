@@ -15,6 +15,7 @@ import {
   group_pool_metric,
   group_user_metric,
   group_pool_bid,
+  teller_bid,
   group_pool_metric_data_point_daily,
   group_pool_metric_data_point_weekly
 } from "../../generated/schema"
@@ -268,6 +269,15 @@ export function handleBorrowerAcceptedFunds(event: BorrowerAcceptedFunds): void 
   bidEntity.collateral_amount = collateralAmount.toBigDecimal()
   bidEntity.principal_amount = principalAmount.toBigDecimal()
   bidEntity.save()
+
+   let tellerBidEntity = new teller_bid(  bidId.toString() )
+  bidEntity.group_pool_address = poolAddress
+  bidEntity.bid_id = bidId.toBigDecimal()
+  bidEntity.borrower = borrower
+  bidEntity.collateral_amount = collateralAmount.toBigDecimal()
+  bidEntity.principal_amount = principalAmount.toBigDecimal()
+  bidEntity.save()
+
 
   // Update pool metrics
   let poolMetric = group_pool_metric.load(poolAddress.toHexString())

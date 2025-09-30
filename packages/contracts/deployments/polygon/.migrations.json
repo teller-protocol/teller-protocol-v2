@@ -62,5 +62,7 @@
   "lender-commitment-forwarder:extensions:flash-swap-rollover:g2-upgrade": 1755791508,
   "timelock-controller:update-delay-7200": 1756480970,
   "uniswapv3-quoter:deploy": 1758734011,
-  "lender-commitment-group-beacon-v2:upgrade-shares-delegation": 1758828286
+  "uniswap-pricing-helper:deploy": 1758734011,
+  "lender-commitment-group-beacon-v2:upgrade-shares-delegation": 1758828286,
+  "lender-commitment-group-factory:deposit-transfer": 1759169120
 }

@@ -9,11 +9,11 @@ features:
 dataSources:
   - kind: ethereum/contract
     name: Factory
-    network: arbitrum-one
+    network: hyperevm
     source:
       abi: Factory
-      address: "0xE9D02C0e0449A396A09A42fE03Ff06300C972Db5"
-      startBlock: 351135517
+      address: "0x5360af9B95701504F783d8654bA02B0AF5155f64"
+      startBlock: 13051385
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -29,11 +29,11 @@ dataSources:
           handler: handleLenderGroupDeployed
   - kind: ethereum/contract
     name: CollateralManager
-    network: arbitrum-one
+    network: hyperevm
     source:
       abi: CollateralManager
-      address: "0x71B04a8569914bCb99D5F95644CF6b089c826024"
-      startBlock: 351135517
+      address: "0x9D55Cf23D26a8C17670bb8Ee25D58481ff7aD295"
+      startBlock: 13051385
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -51,7 +51,7 @@ dataSources:
 templates:
   - kind: ethereum/contract
     name: Pool
-    network: arbitrum-one
+    network: hyperevm
     source:
       abi: Pool
     mapping:

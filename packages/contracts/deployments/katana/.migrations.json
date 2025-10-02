@@ -22,6 +22,5 @@
   "lender-commitment-forwarder:extensions:flash-swap-rollover:deploy": 1754412623,
   "lender-commitment-group-beacon-v2:pricing-helper": 1754936477,
   "lender-commitment-forwarder:extensions:flash-swap-rollover:g2-upgrade": 1755025963,
-  "uniswapv3-quoter:deploy": 1758814985,
-  "lender-commitment-forwarder:extensions:borrow-swap:deploy": 1758815613
+  "uniswapv3-quoter:deploy": 1759422252
 }

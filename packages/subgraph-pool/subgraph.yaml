@@ -27,6 +27,27 @@ dataSources:
       eventHandlers:
         - event: DeployedLenderGroupContract(indexed address)
           handler: handleLenderGroupDeployed
+  - kind: ethereum/contract
+    name: CollateralManager
+    network: matic
+    source:
+      abi: CollateralManager
+      address: "0x76888a882a4fF57455B5e74B791DD19DF3ba51Bb"
+      startBlock: 66265322
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/mappings/collateralManager.ts
+      entities:
+        - TellerBid
+        - GroupPoolMetric
+      abis:
+        - name: CollateralManager
+          file: ./abis/CollateralManager.json
+      eventHandlers:
+        - event: CollateralWithdrawn(uint256,uint8,address,uint256,uint256,address)
+          handler: handleCollateralWithdrawn
 templates:
   - kind: ethereum/contract
     name: Pool

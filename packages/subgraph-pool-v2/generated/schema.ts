@@ -2176,6 +2176,111 @@ export class group_pool_bid extends Entity {
   }
 }
 
+export class teller_bid extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save teller_bid entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        `Entities of type teller_bid must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`
+      );
+      store.set("teller_bid", id.toString(), this);
+    }
+  }
+
+  static loadInBlock(id: string): teller_bid | null {
+    return changetype<teller_bid | null>(store.get_in_block("teller_bid", id));
+  }
+
+  static load(id: string): teller_bid | null {
+    return changetype<teller_bid | null>(store.get("teller_bid", id));
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toString();
+    }
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get group_pool_address(): Bytes {
+    let value = this.get("group_pool_address");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set group_pool_address(value: Bytes) {
+    this.set("group_pool_address", Value.fromBytes(value));
+  }
+
+  get bid_id(): BigDecimal {
+    let value = this.get("bid_id");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigDecimal();
+    }
+  }
+
+  set bid_id(value: BigDecimal) {
+    this.set("bid_id", Value.fromBigDecimal(value));
+  }
+
+  get borrower(): Bytes {
+    let value = this.get("borrower");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set borrower(value: Bytes) {
+    this.set("borrower", Value.fromBytes(value));
+  }
+
+  get collateral_amount(): BigDecimal {
+    let value = this.get("collateral_amount");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigDecimal();
+    }
+  }
+
+  set collateral_amount(value: BigDecimal) {
+    this.set("collateral_amount", Value.fromBigDecimal(value));
+  }
+
+  get principal_amount(): BigDecimal {
+    let value = this.get("principal_amount");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigDecimal();
+    }
+  }
+
+  set principal_amount(value: BigDecimal) {
+    this.set("principal_amount", Value.fromBigDecimal(value));
+  }
+}
+
 export class group_pool_metric extends Entity {
   constructor(id: string) {
     super();
@@ -2440,8 +2545,8 @@ export class group_pool_metric extends Entity {
     this.set("total_principal_tokens_borrowed", Value.fromBigInt(value));
   }
 
-  get total_collateral_tokens_escrowed(): BigInt {
-    let value = this.get("total_collateral_tokens_escrowed");
+  get total_collateral_tokens_deposited(): BigInt {
+    let value = this.get("total_collateral_tokens_deposited");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
@@ -2449,8 +2554,21 @@ export class group_pool_metric extends Entity {
     }
   }
 
-  set total_collateral_tokens_escrowed(value: BigInt) {
-    this.set("total_collateral_tokens_escrowed", Value.fromBigInt(value));
+  set total_collateral_tokens_deposited(value: BigInt) {
+    this.set("total_collateral_tokens_deposited", Value.fromBigInt(value));
+  }
+
+  get total_collateral_tokens_withdrawn(): BigInt {
+    let value = this.get("total_collateral_tokens_withdrawn");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set total_collateral_tokens_withdrawn(value: BigInt) {
+    this.set("total_collateral_tokens_withdrawn", Value.fromBigInt(value));
   }
 
   get total_principal_tokens_repaid(): BigInt {
@@ -2464,6 +2582,24 @@ export class group_pool_metric extends Entity {
 
   set total_principal_tokens_repaid(value: BigInt) {
     this.set("total_principal_tokens_repaid", Value.fromBigInt(value));
+  }
+
+  get total_principal_tokens_repaid_by_liquidation_auction(): BigInt {
+    let value = this.get(
+      "total_principal_tokens_repaid_by_liquidation_auction"
+    );
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set total_principal_tokens_repaid_by_liquidation_auction(value: BigInt) {
+    this.set(
+      "total_principal_tokens_repaid_by_liquidation_auction",
+      Value.fromBigInt(value)
+    );
   }
 
   get total_interest_collected(): BigInt {
@@ -2490,19 +2626,6 @@ export class group_pool_metric extends Entity {
 
   set token_difference_from_liquidations(value: BigInt) {
     this.set("token_difference_from_liquidations", Value.fromBigInt(value));
-  }
-
-  get total_collateral_withdrawn(): BigInt {
-    let value = this.get("total_collateral_withdrawn");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toBigInt();
-    }
-  }
-
-  set total_collateral_withdrawn(value: BigInt) {
-    this.set("total_collateral_withdrawn", Value.fromBigInt(value));
   }
 }
 
@@ -2621,8 +2744,8 @@ export class group_pool_metric_data_point extends Entity {
     this.set("total_principal_tokens_withdrawn", Value.fromBigInt(value));
   }
 
-  get total_collateral_tokens_escrowed(): BigInt {
-    let value = this.get("total_collateral_tokens_escrowed");
+  get total_collateral_tokens_deposited(): BigInt {
+    let value = this.get("total_collateral_tokens_deposited");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
@@ -2630,8 +2753,8 @@ export class group_pool_metric_data_point extends Entity {
     }
   }
 
-  set total_collateral_tokens_escrowed(value: BigInt) {
-    this.set("total_collateral_tokens_escrowed", Value.fromBigInt(value));
+  set total_collateral_tokens_deposited(value: BigInt) {
+    this.set("total_collateral_tokens_deposited", Value.fromBigInt(value));
   }
 
   get total_collateral_tokens_withdrawn(): BigInt {
@@ -2815,8 +2938,8 @@ export class group_pool_metric_data_point_daily extends Entity {
     this.set("total_principal_tokens_withdrawn", Value.fromBigInt(value));
   }
 
-  get total_collateral_tokens_escrowed(): BigInt {
-    let value = this.get("total_collateral_tokens_escrowed");
+  get total_collateral_tokens_deposited(): BigInt {
+    let value = this.get("total_collateral_tokens_deposited");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
@@ -2824,8 +2947,8 @@ export class group_pool_metric_data_point_daily extends Entity {
     }
   }
 
-  set total_collateral_tokens_escrowed(value: BigInt) {
-    this.set("total_collateral_tokens_escrowed", Value.fromBigInt(value));
+  set total_collateral_tokens_deposited(value: BigInt) {
+    this.set("total_collateral_tokens_deposited", Value.fromBigInt(value));
   }
 
   get total_collateral_tokens_withdrawn(): BigInt {
@@ -3009,8 +3132,8 @@ export class group_pool_metric_data_point_weekly extends Entity {
     this.set("total_principal_tokens_withdrawn", Value.fromBigInt(value));
   }
 
-  get total_collateral_tokens_escrowed(): BigInt {
-    let value = this.get("total_collateral_tokens_escrowed");
+  get total_collateral_tokens_deposited(): BigInt {
+    let value = this.get("total_collateral_tokens_deposited");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
@@ -3018,8 +3141,8 @@ export class group_pool_metric_data_point_weekly extends Entity {
     }
   }
 
-  set total_collateral_tokens_escrowed(value: BigInt) {
-    this.set("total_collateral_tokens_escrowed", Value.fromBigInt(value));
+  set total_collateral_tokens_deposited(value: BigInt) {
+    this.set("total_collateral_tokens_deposited", Value.fromBigInt(value));
   }
 
   get total_collateral_tokens_withdrawn(): BigInt {
@@ -3196,8 +3319,8 @@ export class group_user_metric extends Entity {
     this.set("total_principal_tokens_borrowed", Value.fromBigInt(value));
   }
 
-  get total_collateral_tokens_escrowed(): BigInt {
-    let value = this.get("total_collateral_tokens_escrowed");
+  get total_collateral_tokens_deposited(): BigInt {
+    let value = this.get("total_collateral_tokens_deposited");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
@@ -3205,7 +3328,7 @@ export class group_user_metric extends Entity {
     }
   }
 
-  set total_collateral_tokens_escrowed(value: BigInt) {
-    this.set("total_collateral_tokens_escrowed", Value.fromBigInt(value));
+  set total_collateral_tokens_deposited(value: BigInt) {
+    this.set("total_collateral_tokens_deposited", Value.fromBigInt(value));
   }
 }

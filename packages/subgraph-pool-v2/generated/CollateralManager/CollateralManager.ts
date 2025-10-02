@@ -470,6 +470,29 @@ export class CollateralManager extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
+  getCollateralEscrowBeacon(): Address {
+    let result = super.call(
+      "getCollateralEscrowBeacon",
+      "getCollateralEscrowBeacon():(address)",
+      []
+    );
+
+    return result[0].toAddress();
+  }
+
+  try_getCollateralEscrowBeacon(): ethereum.CallResult<Address> {
+    let result = super.tryCall(
+      "getCollateralEscrowBeacon",
+      "getCollateralEscrowBeacon():(address)",
+      []
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
   getCollateralInfo(
     _bidId: BigInt
   ): Array<CollateralManager__getCollateralInfoResultInfos_Struct> {

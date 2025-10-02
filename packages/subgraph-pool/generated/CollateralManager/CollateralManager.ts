@@ -7,7 +7,7 @@ import {
   Entity,
   Bytes,
   Address,
-  BigInt
+  BigInt,
 } from "@graphprotocol/graph-ts";
 
 export class CollateralClaimed extends ethereum.Event {
@@ -300,7 +300,7 @@ export class CollateralManager extends ethereum.SmartContract {
 
   _escrows(param0: BigInt): Address {
     let result = super.call("_escrows", "_escrows(uint256):(address)", [
-      ethereum.Value.fromUnsignedBigInt(param0)
+      ethereum.Value.fromUnsignedBigInt(param0),
     ]);
 
     return result[0].toAddress();
@@ -308,7 +308,7 @@ export class CollateralManager extends ethereum.SmartContract {
 
   try__escrows(param0: BigInt): ethereum.CallResult<Address> {
     let result = super.tryCall("_escrows", "_escrows(uint256):(address)", [
-      ethereum.Value.fromUnsignedBigInt(param0)
+      ethereum.Value.fromUnsignedBigInt(param0),
     ]);
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -319,38 +319,34 @@ export class CollateralManager extends ethereum.SmartContract {
 
   checkBalances(
     _borrowerAddress: Address,
-    _collateralInfo: Array<
-      CollateralManager__checkBalancesInput_collateralInfoStruct
-    >
+    _collateralInfo: Array<CollateralManager__checkBalancesInput_collateralInfoStruct>,
   ): CollateralManager__checkBalancesResult {
     let result = super.call(
       "checkBalances",
       "checkBalances(address,(uint8,uint256,uint256,address)[]):(bool,bool[])",
       [
         ethereum.Value.fromAddress(_borrowerAddress),
-        ethereum.Value.fromTupleArray(_collateralInfo)
-      ]
+        ethereum.Value.fromTupleArray(_collateralInfo),
+      ],
     );
 
     return new CollateralManager__checkBalancesResult(
       result[0].toBoolean(),
-      result[1].toBooleanArray()
+      result[1].toBooleanArray(),
     );
   }
 
   try_checkBalances(
     _borrowerAddress: Address,
-    _collateralInfo: Array<
-      CollateralManager__checkBalancesInput_collateralInfoStruct
-    >
+    _collateralInfo: Array<CollateralManager__checkBalancesInput_collateralInfoStruct>,
   ): ethereum.CallResult<CollateralManager__checkBalancesResult> {
     let result = super.tryCall(
       "checkBalances",
       "checkBalances(address,(uint8,uint256,uint256,address)[]):(bool,bool[])",
       [
         ethereum.Value.fromAddress(_borrowerAddress),
-        ethereum.Value.fromTupleArray(_collateralInfo)
-      ]
+        ethereum.Value.fromTupleArray(_collateralInfo),
+      ],
     );
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -359,24 +355,22 @@ export class CollateralManager extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(
       new CollateralManager__checkBalancesResult(
         value[0].toBoolean(),
-        value[1].toBooleanArray()
-      )
+        value[1].toBooleanArray(),
+      ),
     );
   }
 
   commitCollateral(
     _bidId: BigInt,
-    _collateralInfo: Array<
-      CollateralManager__commitCollateralInput_collateralInfoStruct
-    >
+    _collateralInfo: Array<CollateralManager__commitCollateralInput_collateralInfoStruct>,
   ): boolean {
     let result = super.call(
       "commitCollateral",
       "commitCollateral(uint256,(uint8,uint256,uint256,address)[]):(bool)",
       [
         ethereum.Value.fromUnsignedBigInt(_bidId),
-        ethereum.Value.fromTupleArray(_collateralInfo)
-      ]
+        ethereum.Value.fromTupleArray(_collateralInfo),
+      ],
     );
 
     return result[0].toBoolean();
@@ -384,17 +378,15 @@ export class CollateralManager extends ethereum.SmartContract {
 
   try_commitCollateral(
     _bidId: BigInt,
-    _collateralInfo: Array<
-      CollateralManager__commitCollateralInput_collateralInfoStruct
-    >
+    _collateralInfo: Array<CollateralManager__commitCollateralInput_collateralInfoStruct>,
   ): ethereum.CallResult<boolean> {
     let result = super.tryCall(
       "commitCollateral",
       "commitCollateral(uint256,(uint8,uint256,uint256,address)[]):(bool)",
       [
         ethereum.Value.fromUnsignedBigInt(_bidId),
-        ethereum.Value.fromTupleArray(_collateralInfo)
-      ]
+        ethereum.Value.fromTupleArray(_collateralInfo),
+      ],
     );
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -405,15 +397,15 @@ export class CollateralManager extends ethereum.SmartContract {
 
   commitCollateral1(
     _bidId: BigInt,
-    _collateralInfo: CollateralManager__commitCollateral1Input_collateralInfoStruct
+    _collateralInfo: CollateralManager__commitCollateral1Input_collateralInfoStruct,
   ): boolean {
     let result = super.call(
       "commitCollateral",
       "commitCollateral(uint256,(uint8,uint256,uint256,address)):(bool)",
       [
         ethereum.Value.fromUnsignedBigInt(_bidId),
-        ethereum.Value.fromTuple(_collateralInfo)
-      ]
+        ethereum.Value.fromTuple(_collateralInfo),
+      ],
     );
 
     return result[0].toBoolean();
@@ -421,15 +413,15 @@ export class CollateralManager extends ethereum.SmartContract {
 
   try_commitCollateral1(
     _bidId: BigInt,
-    _collateralInfo: CollateralManager__commitCollateral1Input_collateralInfoStruct
+    _collateralInfo: CollateralManager__commitCollateral1Input_collateralInfoStruct,
   ): ethereum.CallResult<boolean> {
     let result = super.tryCall(
       "commitCollateral",
       "commitCollateral(uint256,(uint8,uint256,uint256,address)):(bool)",
       [
         ethereum.Value.fromUnsignedBigInt(_bidId),
-        ethereum.Value.fromTuple(_collateralInfo)
-      ]
+        ethereum.Value.fromTuple(_collateralInfo),
+      ],
     );
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -444,8 +436,8 @@ export class CollateralManager extends ethereum.SmartContract {
       "getCollateralAmount(uint256,address):(uint256)",
       [
         ethereum.Value.fromUnsignedBigInt(_bidId),
-        ethereum.Value.fromAddress(_collateralAddress)
-      ]
+        ethereum.Value.fromAddress(_collateralAddress),
+      ],
     );
 
     return result[0].toBigInt();
@@ -453,15 +445,15 @@ export class CollateralManager extends ethereum.SmartContract {
 
   try_getCollateralAmount(
     _bidId: BigInt,
-    _collateralAddress: Address
+    _collateralAddress: Address,
   ): ethereum.CallResult<BigInt> {
     let result = super.tryCall(
       "getCollateralAmount",
       "getCollateralAmount(uint256,address):(uint256)",
       [
         ethereum.Value.fromUnsignedBigInt(_bidId),
-        ethereum.Value.fromAddress(_collateralAddress)
-      ]
+        ethereum.Value.fromAddress(_collateralAddress),
+      ],
     );
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -470,44 +462,63 @@ export class CollateralManager extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
+  getCollateralEscrowBeacon(): Address {
+    let result = super.call(
+      "getCollateralEscrowBeacon",
+      "getCollateralEscrowBeacon():(address)",
+      [],
+    );
+
+    return result[0].toAddress();
+  }
+
+  try_getCollateralEscrowBeacon(): ethereum.CallResult<Address> {
+    let result = super.tryCall(
+      "getCollateralEscrowBeacon",
+      "getCollateralEscrowBeacon():(address)",
+      [],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
   getCollateralInfo(
-    _bidId: BigInt
+    _bidId: BigInt,
   ): Array<CollateralManager__getCollateralInfoResultInfos_Struct> {
     let result = super.call(
       "getCollateralInfo",
       "getCollateralInfo(uint256):((uint8,uint256,uint256,address)[])",
-      [ethereum.Value.fromUnsignedBigInt(_bidId)]
+      [ethereum.Value.fromUnsignedBigInt(_bidId)],
     );
 
-    return result[0].toTupleArray<
-      CollateralManager__getCollateralInfoResultInfos_Struct
-    >();
+    return result[0].toTupleArray<CollateralManager__getCollateralInfoResultInfos_Struct>();
   }
 
   try_getCollateralInfo(
-    _bidId: BigInt
+    _bidId: BigInt,
   ): ethereum.CallResult<
     Array<CollateralManager__getCollateralInfoResultInfos_Struct>
   > {
     let result = super.tryCall(
       "getCollateralInfo",
       "getCollateralInfo(uint256):((uint8,uint256,uint256,address)[])",
-      [ethereum.Value.fromUnsignedBigInt(_bidId)]
+      [ethereum.Value.fromUnsignedBigInt(_bidId)],
     );
     if (result.reverted) {
       return new ethereum.CallResult();
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      value[0].toTupleArray<
-        CollateralManager__getCollateralInfoResultInfos_Struct
-      >()
+      value[0].toTupleArray<CollateralManager__getCollateralInfoResultInfos_Struct>(),
     );
   }
 
   getEscrow(_bidId: BigInt): Address {
     let result = super.call("getEscrow", "getEscrow(uint256):(address)", [
-      ethereum.Value.fromUnsignedBigInt(_bidId)
+      ethereum.Value.fromUnsignedBigInt(_bidId),
     ]);
 
     return result[0].toAddress();
@@ -515,7 +526,7 @@ export class CollateralManager extends ethereum.SmartContract {
 
   try_getEscrow(_bidId: BigInt): ethereum.CallResult<Address> {
     let result = super.tryCall("getEscrow", "getEscrow(uint256):(address)", [
-      ethereum.Value.fromUnsignedBigInt(_bidId)
+      ethereum.Value.fromUnsignedBigInt(_bidId),
     ]);
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -528,7 +539,7 @@ export class CollateralManager extends ethereum.SmartContract {
     let result = super.call(
       "isBidCollateralBacked",
       "isBidCollateralBacked(uint256):(bool)",
-      [ethereum.Value.fromUnsignedBigInt(_bidId)]
+      [ethereum.Value.fromUnsignedBigInt(_bidId)],
     );
 
     return result[0].toBoolean();
@@ -538,7 +549,7 @@ export class CollateralManager extends ethereum.SmartContract {
     let result = super.tryCall(
       "isBidCollateralBacked",
       "isBidCollateralBacked(uint256):(bool)",
-      [ethereum.Value.fromUnsignedBigInt(_bidId)]
+      [ethereum.Value.fromUnsignedBigInt(_bidId)],
     );
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -552,7 +563,7 @@ export class CollateralManager extends ethereum.SmartContract {
     param1: Address,
     _ids: Array<BigInt>,
     _values: Array<BigInt>,
-    param4: Bytes
+    param4: Bytes,
   ): Bytes {
     let result = super.call(
       "onERC1155BatchReceived",
@@ -562,8 +573,8 @@ export class CollateralManager extends ethereum.SmartContract {
         ethereum.Value.fromAddress(param1),
         ethereum.Value.fromUnsignedBigIntArray(_ids),
         ethereum.Value.fromUnsignedBigIntArray(_values),
-        ethereum.Value.fromBytes(param4)
-      ]
+        ethereum.Value.fromBytes(param4),
+      ],
     );
 
     return result[0].toBytes();
@@ -574,7 +585,7 @@ export class CollateralManager extends ethereum.SmartContract {
     param1: Address,
     _ids: Array<BigInt>,
     _values: Array<BigInt>,
-    param4: Bytes
+    param4: Bytes,
   ): ethereum.CallResult<Bytes> {
     let result = super.tryCall(
       "onERC1155BatchReceived",
@@ -584,8 +595,8 @@ export class CollateralManager extends ethereum.SmartContract {
         ethereum.Value.fromAddress(param1),
         ethereum.Value.fromUnsignedBigIntArray(_ids),
         ethereum.Value.fromUnsignedBigIntArray(_values),
-        ethereum.Value.fromBytes(param4)
-      ]
+        ethereum.Value.fromBytes(param4),
+      ],
     );
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -599,7 +610,7 @@ export class CollateralManager extends ethereum.SmartContract {
     param1: Address,
     id: BigInt,
     value: BigInt,
-    param4: Bytes
+    param4: Bytes,
   ): Bytes {
     let result = super.call(
       "onERC1155Received",
@@ -609,8 +620,8 @@ export class CollateralManager extends ethereum.SmartContract {
         ethereum.Value.fromAddress(param1),
         ethereum.Value.fromUnsignedBigInt(id),
         ethereum.Value.fromUnsignedBigInt(value),
-        ethereum.Value.fromBytes(param4)
-      ]
+        ethereum.Value.fromBytes(param4),
+      ],
     );
 
     return result[0].toBytes();
@@ -621,7 +632,7 @@ export class CollateralManager extends ethereum.SmartContract {
     param1: Address,
     id: BigInt,
     value: BigInt,
-    param4: Bytes
+    param4: Bytes,
   ): ethereum.CallResult<Bytes> {
     let result = super.tryCall(
       "onERC1155Received",
@@ -631,8 +642,8 @@ export class CollateralManager extends ethereum.SmartContract {
         ethereum.Value.fromAddress(param1),
         ethereum.Value.fromUnsignedBigInt(id),
         ethereum.Value.fromUnsignedBigInt(value),
-        ethereum.Value.fromBytes(param4)
-      ]
+        ethereum.Value.fromBytes(param4),
+      ],
     );
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -645,7 +656,7 @@ export class CollateralManager extends ethereum.SmartContract {
     param0: Address,
     param1: Address,
     param2: BigInt,
-    param3: Bytes
+    param3: Bytes,
   ): Bytes {
     let result = super.call(
       "onERC721Received",
@@ -654,8 +665,8 @@ export class CollateralManager extends ethereum.SmartContract {
         ethereum.Value.fromAddress(param0),
         ethereum.Value.fromAddress(param1),
         ethereum.Value.fromUnsignedBigInt(param2),
-        ethereum.Value.fromBytes(param3)
-      ]
+        ethereum.Value.fromBytes(param3),
+      ],
     );
 
     return result[0].toBytes();
@@ -665,7 +676,7 @@ export class CollateralManager extends ethereum.SmartContract {
     param0: Address,
     param1: Address,
     param2: BigInt,
-    param3: Bytes
+    param3: Bytes,
   ): ethereum.CallResult<Bytes> {
     let result = super.tryCall(
       "onERC721Received",
@@ -674,8 +685,8 @@ export class CollateralManager extends ethereum.SmartContract {
         ethereum.Value.fromAddress(param0),
         ethereum.Value.fromAddress(param1),
         ethereum.Value.fromUnsignedBigInt(param2),
-        ethereum.Value.fromBytes(param3)
-      ]
+        ethereum.Value.fromBytes(param3),
+      ],
     );
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -703,7 +714,7 @@ export class CollateralManager extends ethereum.SmartContract {
     let result = super.call(
       "revalidateCollateral",
       "revalidateCollateral(uint256):(bool)",
-      [ethereum.Value.fromUnsignedBigInt(_bidId)]
+      [ethereum.Value.fromUnsignedBigInt(_bidId)],
     );
 
     return result[0].toBoolean();
@@ -713,7 +724,7 @@ export class CollateralManager extends ethereum.SmartContract {
     let result = super.tryCall(
       "revalidateCollateral",
       "revalidateCollateral(uint256):(bool)",
-      [ethereum.Value.fromUnsignedBigInt(_bidId)]
+      [ethereum.Value.fromUnsignedBigInt(_bidId)],
     );
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -760,9 +771,7 @@ export class CheckBalancesCall__Inputs {
   }
 
   get _collateralInfo(): Array<CheckBalancesCall_collateralInfoStruct> {
-    return this._call.inputValues[1].value.toTupleArray<
-      CheckBalancesCall_collateralInfoStruct
-    >();
+    return this._call.inputValues[1].value.toTupleArray<CheckBalancesCall_collateralInfoStruct>();
   }
 }
 
@@ -822,9 +831,7 @@ export class CommitCollateralCall__Inputs {
   }
 
   get _collateralInfo(): Array<CommitCollateralCall_collateralInfoStruct> {
-    return this._call.inputValues[1].value.toTupleArray<
-      CommitCollateralCall_collateralInfoStruct
-    >();
+    return this._call.inputValues[1].value.toTupleArray<CommitCollateralCall_collateralInfoStruct>();
   }
 }
 
@@ -881,7 +888,7 @@ export class CommitCollateral1Call__Inputs {
 
   get _collateralInfo(): CommitCollateral1Call_collateralInfoStruct {
     return changetype<CommitCollateral1Call_collateralInfoStruct>(
-      this._call.inputValues[1].value.toTuple()
+      this._call.inputValues[1].value.toTuple(),
     );
   }
 }

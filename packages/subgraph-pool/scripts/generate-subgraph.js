@@ -25,7 +25,8 @@ const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
 const templateVars = {
   network: config.network || network,
   startblock: config.contracts?.factory?.block || 0,
-  lenderCommitmentGroupFactory: config.contracts?.factory?.address || '0x0000000000000000000000000000000000000000'
+  lenderCommitmentGroupFactory: config.contracts?.factory?.address || '0x0000000000000000000000000000000000000000',
+  collateralManager: config.contracts?.collateralManager?.address || '0x0000000000000000000000000000000000000000'
 };
 
 console.log('Template variables:', templateVars);

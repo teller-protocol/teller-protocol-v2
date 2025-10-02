@@ -7,7 +7,7 @@ import {
   Entity,
   Bytes,
   Address,
-  BigInt
+  BigInt,
 } from "@graphprotocol/graph-ts";
 
 export class DeployedLenderGroupContract extends ethereum.Event {
@@ -132,9 +132,7 @@ export class Factory extends ethereum.SmartContract {
   deployLenderCommitmentGroupPool(
     _initialPrincipalAmount: BigInt,
     _commitmentGroupConfig: Factory__deployLenderCommitmentGroupPoolInput_commitmentGroupConfigStruct,
-    _poolOracleRoutes: Array<
-      Factory__deployLenderCommitmentGroupPoolInput_poolOracleRoutesStruct
-    >
+    _poolOracleRoutes: Array<Factory__deployLenderCommitmentGroupPoolInput_poolOracleRoutesStruct>,
   ): Address {
     let result = super.call(
       "deployLenderCommitmentGroupPool",
@@ -142,8 +140,8 @@ export class Factory extends ethereum.SmartContract {
       [
         ethereum.Value.fromUnsignedBigInt(_initialPrincipalAmount),
         ethereum.Value.fromTuple(_commitmentGroupConfig),
-        ethereum.Value.fromTupleArray(_poolOracleRoutes)
-      ]
+        ethereum.Value.fromTupleArray(_poolOracleRoutes),
+      ],
     );
 
     return result[0].toAddress();
@@ -152,9 +150,7 @@ export class Factory extends ethereum.SmartContract {
   try_deployLenderCommitmentGroupPool(
     _initialPrincipalAmount: BigInt,
     _commitmentGroupConfig: Factory__deployLenderCommitmentGroupPoolInput_commitmentGroupConfigStruct,
-    _poolOracleRoutes: Array<
-      Factory__deployLenderCommitmentGroupPoolInput_poolOracleRoutesStruct
-    >
+    _poolOracleRoutes: Array<Factory__deployLenderCommitmentGroupPoolInput_poolOracleRoutesStruct>,
   ): ethereum.CallResult<Address> {
     let result = super.tryCall(
       "deployLenderCommitmentGroupPool",
@@ -162,8 +158,8 @@ export class Factory extends ethereum.SmartContract {
       [
         ethereum.Value.fromUnsignedBigInt(_initialPrincipalAmount),
         ethereum.Value.fromTuple(_commitmentGroupConfig),
-        ethereum.Value.fromTupleArray(_poolOracleRoutes)
-      ]
+        ethereum.Value.fromTupleArray(_poolOracleRoutes),
+      ],
     );
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -176,19 +172,19 @@ export class Factory extends ethereum.SmartContract {
     let result = super.call(
       "deployedLenderGroupContracts",
       "deployedLenderGroupContracts(address):(uint256)",
-      [ethereum.Value.fromAddress(param0)]
+      [ethereum.Value.fromAddress(param0)],
     );
 
     return result[0].toBigInt();
   }
 
   try_deployedLenderGroupContracts(
-    param0: Address
+    param0: Address,
   ): ethereum.CallResult<BigInt> {
     let result = super.tryCall(
       "deployedLenderGroupContracts",
       "deployedLenderGroupContracts(address):(uint256)",
-      [ethereum.Value.fromAddress(param0)]
+      [ethereum.Value.fromAddress(param0)],
     );
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -201,7 +197,7 @@ export class Factory extends ethereum.SmartContract {
     let result = super.call(
       "lenderGroupBeacon",
       "lenderGroupBeacon():(address)",
-      []
+      [],
     );
 
     return result[0].toAddress();
@@ -211,7 +207,7 @@ export class Factory extends ethereum.SmartContract {
     let result = super.tryCall(
       "lenderGroupBeacon",
       "lenderGroupBeacon():(address)",
-      []
+      [],
     );
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -258,17 +254,13 @@ export class DeployLenderCommitmentGroupPoolCall__Inputs {
   }
 
   get _commitmentGroupConfig(): DeployLenderCommitmentGroupPoolCall_commitmentGroupConfigStruct {
-    return changetype<
-      DeployLenderCommitmentGroupPoolCall_commitmentGroupConfigStruct
-    >(this._call.inputValues[1].value.toTuple());
+    return changetype<DeployLenderCommitmentGroupPoolCall_commitmentGroupConfigStruct>(
+      this._call.inputValues[1].value.toTuple(),
+    );
   }
 
-  get _poolOracleRoutes(): Array<
-    DeployLenderCommitmentGroupPoolCall_poolOracleRoutesStruct
-  > {
-    return this._call.inputValues[2].value.toTupleArray<
-      DeployLenderCommitmentGroupPoolCall_poolOracleRoutesStruct
-    >();
+  get _poolOracleRoutes(): Array<DeployLenderCommitmentGroupPoolCall_poolOracleRoutesStruct> {
+    return this._call.inputValues[2].value.toTupleArray<DeployLenderCommitmentGroupPoolCall_poolOracleRoutesStruct>();
   }
 }
 

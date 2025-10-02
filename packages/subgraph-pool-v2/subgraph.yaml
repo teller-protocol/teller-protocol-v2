@@ -9,11 +9,11 @@ features:
 dataSources:
   - kind: ethereum/contract
     name: Factory
-    network: katana
+    network: hyperevm
     source:
       abi: Factory
-      address: "0x3D495036Dfeb1bBfCCabAC74e90e01cDD5C8E578"
-      startBlock: 6541463
+      address: "0x5360af9B95701504F783d8654bA02B0AF5155f64"
+      startBlock: 13051385
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -27,10 +27,31 @@ dataSources:
       eventHandlers:
         - event: DeployedLenderGroupContract(indexed address)
           handler: handleLenderGroupDeployed
+  - kind: ethereum/contract
+    name: CollateralManager
+    network: hyperevm
+    source:
+      abi: CollateralManager
+      address: "0x9D55Cf23D26a8C17670bb8Ee25D58481ff7aD295"
+      startBlock: 13051385
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/mappings/collateralManager.ts
+      entities:
+        - TellerBid
+        - GroupPoolMetric
+      abis:
+        - name: CollateralManager
+          file: ./abis/CollateralManager.json
+      eventHandlers:
+        - event: CollateralWithdrawn(uint256,uint8,address,uint256,uint256,address)
+          handler: handleCollateralWithdrawn
 templates:
   - kind: ethereum/contract
     name: Pool
-    network: katana
+    network: hyperevm
     source:
       abi: Pool
     mapping:

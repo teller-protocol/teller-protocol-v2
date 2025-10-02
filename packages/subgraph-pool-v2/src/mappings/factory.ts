@@ -33,11 +33,13 @@ export function handleLenderGroupDeployed(event: DeployedLenderGroupContract): v
   poolMetric.total_principal_tokens_committed = BigInt.fromI32(0)
   poolMetric.total_principal_tokens_withdrawn = BigInt.fromI32(0)
   poolMetric.total_principal_tokens_borrowed = BigInt.fromI32(0)
-  poolMetric.total_collateral_tokens_escrowed = BigInt.fromI32(0)
+  poolMetric.total_collateral_tokens_deposited = BigInt.fromI32(0)
+  poolMetric.total_collateral_tokens_withdrawn = BigInt.fromI32(0)
   poolMetric.total_principal_tokens_repaid = BigInt.fromI32(0)
+  poolMetric.total_principal_tokens_repaid_by_liquidation_auction = BigInt.fromI32(0)
   poolMetric.total_interest_collected = BigInt.fromI32(0)
   poolMetric.token_difference_from_liquidations = BigInt.fromI32(0)
-  poolMetric.total_collateral_withdrawn = BigInt.fromI32(0)
+  
   
   // Initialize address fields to zero address (will be populated by pool events)
   poolMetric.principal_token_address = Address.zero()

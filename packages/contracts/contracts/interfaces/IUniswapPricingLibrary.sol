@@ -16,7 +16,7 @@ interface IUniswapPricingLibrary {
 
      function getUniswapPriceRatioForPoolRoutes(
         PoolRouteConfig[] memory poolRoutes
-    ) external view returns (uint256 priceRatio);
+    ) external view returns (uint256 priceRatio, uint256 exp_factor);
 
 
      function getUniswapPriceRatioForPool(

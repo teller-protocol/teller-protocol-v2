@@ -1,8 +1,6 @@
 pragma solidity >=0.8.0 <0.9.0;
 // SPDX-License-Identifier: MIT
 
-
-import "forge-std/console.sol";
  
 
 import {IUniswapPricingLibrary} from "../interfaces/IUniswapPricingLibrary.sol";
@@ -31,15 +29,13 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 contract UniswapPricingHelper
 {
-
-
-    // use uniswap exp helper instead ? 
+    
     uint256 constant STANDARD_EXPANSION_FACTOR = 1e18;
 
-  
+        // no longer dividing by EXP_FACTOR here - just leave it 
     function getUniswapPriceRatioForPoolRoutes(
         IUniswapPricingLibrary.PoolRouteConfig[] memory poolRoutes
-    ) public view returns (uint256 priceRatio) {
+    ) public view returns (uint256 priceRatio, uint256 exp_factor) {
         require(poolRoutes.length <= 2, "invalid pool routes length");
 
         if (poolRoutes.length == 2) {
@@ -51,19 +47,14 @@ contract UniswapPricingHelper
                 poolRoutes[1]
             );
 
-
-            console.log("ratio");
-            console.logUint(pool0PriceRatio);
-            console.logUint(pool1PriceRatio);
-
             return
-                FullMath.mulDiv(
+                ( FullMath.mulDiv(
                     pool0PriceRatio,
                     pool1PriceRatio,
-                    STANDARD_EXPANSION_FACTOR
-                );
+                    1
+                   )  , 1e36 );
         } else if (poolRoutes.length == 1) {
-            return getUniswapPriceRatioForPool(poolRoutes[0]);
+            return ( getUniswapPriceRatioForPool(poolRoutes[0]) , 1e18 );
         }
 
         //else return 0
@@ -78,7 +69,7 @@ contract UniswapPricingHelper
 
         
 
-           // this is expanded by 2**96 or   1e28 
+           // this is expanded by 2**96 or  ~ 1e28 
       uint160 sqrtPriceX96 = getSqrtTwapX96(
             _poolRouteConfig.pool,
             _poolRouteConfig.twapInterval

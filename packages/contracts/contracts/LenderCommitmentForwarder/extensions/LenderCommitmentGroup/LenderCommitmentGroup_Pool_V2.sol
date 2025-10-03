@@ -704,7 +704,7 @@ contract LenderCommitmentGroup_Pool_V2 is
         uint256 principalAmount 
     ) public view virtual returns (uint256 collateralTokensAmountToMatchValue) {
    
-        uint256 pairPriceWithTwapFromOracle = IUniswapPricingLibrary(UNISWAP_PRICING_HELPER)
+        ( uint256 pairPriceWithTwapFromOracle, uint256 oracle_exp_factor )  = IUniswapPricingLibrary(UNISWAP_PRICING_HELPER)
             .getUniswapPriceRatioForPoolRoutes(poolOracleRoutes);
        
        
@@ -716,10 +716,19 @@ contract LenderCommitmentGroup_Pool_V2 is
                 );
 
 
+        uint256 exp_factor = 1e18;
+
+
+        if ( maxPrincipalPerCollateralAmount == 0 || pairPriceWithTwapFromOracle < maxPrincipalPerCollateralAmount ) {
+
+            exp_factor = oracle_exp_factor ; 
+        }
+
         return
             getRequiredCollateral(
                 principalAmount,
-                principalPerCollateralAmount   
+                principalPerCollateralAmount ,
+                exp_factor // for principalPerCollateralAmount 
             );
     }
 
@@ -729,44 +738,20 @@ contract LenderCommitmentGroup_Pool_V2 is
      * @dev Calls the UniswapPricingLibrary to get TWAP (Time-Weighted Average Price) for the specified routes
      * @dev This is a low-level internal function that handles direct Uniswap oracle interaction
      * @param poolOracleRoutes Array of pool route configurations to use for price calculation
-     * @return The Uniswap price ratio expanded by the Uniswap expansion factor (2^96)
+     * @return The Uniswap price ratio expanded
      */
     function getUniswapPriceRatioForPoolRoutes(
        IUniswapPricingLibrary.PoolRouteConfig[] memory poolOracleRoutes
-    ) internal  view virtual returns (uint256 ) {
+    ) internal  view virtual returns (uint256, uint256 ) {
    
-        uint256 pairPriceWithTwapFromOracle = IUniswapPricingLibrary(UNISWAP_PRICING_HELPER)
+        (uint256 pairPriceWithTwapFromOracle , uint256 exp_factor) = IUniswapPricingLibrary(UNISWAP_PRICING_HELPER)
             .getUniswapPriceRatioForPoolRoutes(poolOracleRoutes);
        
 
-        return pairPriceWithTwapFromOracle;
+        return (pairPriceWithTwapFromOracle, exp_factor) ;
     }
 
-    /**
-     * @notice Calculates the principal token amount per collateral token based on Uniswap oracle prices
-     * @dev Uses Uniswap TWAP and applies any configured maximum limits
-     * @dev Returns the lesser of the oracle price or the configured maximum (if set)
-     * @param poolOracleRoutes Array of pool route configurations to use for price calculation
-     * @return The principal per collateral ratio, expanded by the Uniswap expansion factor
-     */
-    function getPrincipalForCollateralForPoolRoutes(
-        IUniswapPricingLibrary.PoolRouteConfig[] memory poolOracleRoutes
-    ) external view virtual returns (uint256 ) {
-   
-        uint256 pairPriceWithTwapFromOracle = IUniswapPricingLibrary(UNISWAP_PRICING_HELPER)
-            .getUniswapPriceRatioForPoolRoutes(poolOracleRoutes);
-       
-       
-        uint256 principalPerCollateralAmount = maxPrincipalPerCollateralAmount == 0  
-                ? pairPriceWithTwapFromOracle   
-                : Math.min(
-                    pairPriceWithTwapFromOracle,
-                    maxPrincipalPerCollateralAmount //this is expanded by uniswap exp factor  
-                );
-
-
-        return principalPerCollateralAmount;
-    } 
+    
 
 
     /**
@@ -774,19 +759,21 @@ contract LenderCommitmentGroup_Pool_V2 is
      * @dev Converts principal amount to equivalent collateral based on current price ratio
      * @dev Uses the Math.mulDiv function with rounding up to ensure sufficient collateral
      * @param _principalAmount The amount of principal tokens to be borrowed
-     * @param _maxPrincipalPerCollateralAmount The exchange rate between principal and collateral (expanded by STANDARD_EXPANSION_FACTOR)
+     * @param _maxPrincipalPerCollateralAmount The exchange rate between principal and collateral (expanded by _maxPrincipalPerCollateralAmountExpFactor)
      * @return The required amount of collateral tokens, rounded up to ensure sufficient collateralization
      */
    function getRequiredCollateral(
         uint256 _principalAmount,
-        uint256 _maxPrincipalPerCollateralAmount 
+        uint256 _maxPrincipalPerCollateralAmount ,
+
+        uint256 _maxPrincipalPerCollateralAmountExpFactor
         
     ) internal  view virtual returns (uint256) {
          
          return
             MathUpgradeable.mulDiv(
                 _principalAmount,
-                STANDARD_EXPANSION_FACTOR,
+                _maxPrincipalPerCollateralAmountExpFactor,
                 _maxPrincipalPerCollateralAmount,
                 MathUpgradeable.Rounding.Up
             );  

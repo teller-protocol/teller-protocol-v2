@@ -132,10 +132,58 @@ contract BorrowSwap_Fork_Test is Test {
        // assertTrue(deployedPool.code.length > 0, "Deployed pool should have code");
      }
 
+/* 
+   function etch_tellerV2() public {
+
+
+            address metaForwarder = 0x5d3eCF8877eDAB28e14bD7d243fA8B0fE416E95E;
+
+             
+          address tellerV2Address = 0xf7B14778035fEAF44540A0bC1D4ED859bCB28229;
+        
+           
+          TellerV2 newTellerV2 = new TellerV2( 
+                 metaForwarder
+            );
+
+          // Then replace the code at the deployed address
+          vm.etch( address(tellerV2Address) , address(newTellerV2).code );
+
+
+      }  */ 
+
+
+
 
  function test_borrowswap_quote_two() public   {
 
-        address borrowerAddress = 0xbc1d2Ed14128Cd7Af450319b642Fd43d65E495dc;
+          //  etch_tellerV2(); 
+
+
+        /*
+            Approve scf as trusted market forwarder for market 2 
+
+        */  
+
+            address borrowerAddress = 0xbc1d2Ed14128Cd7Af450319b642Fd43d65E495dc;
+
+
+
+        /* 
+        vm.prank(0x73393b8a593a9659c6AD6afF156800FD9e5470c6); 
+        TellerV2(address (0xf7B14778035fEAF44540A0bC1D4ED859bCB28229) ).setTrustedMarketForwarder( 2 , 0x9Fa5A22A3c0b8030147d363f68A763DEB9f00acB);  
+ 
+        */ 
+
+
+        SmartCommitmentForwarder smartCommitmentForwarder = SmartCommitmentForwarder(0x9Fa5A22A3c0b8030147d363f68A763DEB9f00acB);
+
+        // !!!! NEEDED !!!!!!!!!!! 
+        vm.prank(borrowerAddress);
+        smartCommitmentForwarder.addExtension( address(borrowSwap) );
+
+
+
 
 
         address inputToken = 0x203A662b0BD271A6ed5a60EdFbd04bFce608FD36;

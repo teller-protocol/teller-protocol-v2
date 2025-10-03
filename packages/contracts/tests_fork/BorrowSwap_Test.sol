@@ -91,7 +91,7 @@ contract BorrowSwap_Fork_Test is Test {
         address inputToken = 0x203A662b0BD271A6ed5a60EdFbd04bFce608FD36; // Example token address
         uint256 amountIn = 1000;
 
-        BorrowSwap.TokenSwapPath[] memory swapPaths = new BorrowSwap.TokenSwapPath[](1);
+        BorrowSwap_G3.TokenSwapPath[] memory swapPaths = new BorrowSwap_G3.TokenSwapPath[](1);
         swapPaths[0] = BorrowSwap_G3.TokenSwapPath({
             poolFee: 500, // 0.3% fee
             tokenOut: 0x0913DA6Da4b42f538B445599b46Bb4622342Cf52 // Example output token
@@ -130,6 +130,67 @@ contract BorrowSwap_Fork_Test is Test {
         // Add assertions to verify the deployment worked
       //  assertTrue(deployedPool != address(0), "Pool should be deployed");
        // assertTrue(deployedPool.code.length > 0, "Deployed pool should have code");
+     }
+
+
+ function test_borrowswap_quote_two() public   {
+
+        address borrowerAddress = 0xbc1d2Ed14128Cd7Af450319b642Fd43d65E495dc;
+
+
+        address inputToken = 0x203A662b0BD271A6ed5a60EdFbd04bFce608FD36;
+        uint256 amountIn = 0;
+
+
+        address lenderCommitmentForwarder = 0x9Fa5A22A3c0b8030147d363f68A763DEB9f00acB;
+
+
+
+        // Setup swap paths
+        BorrowSwap_G3.TokenSwapPath[] memory swapPaths = new BorrowSwap_G3.TokenSwapPath[](2);
+        swapPaths[0] = BorrowSwap_G3.TokenSwapPath({
+            poolFee: 500,
+            tokenOut: 0xEE7D8BCFb72bC1880D0Cf19822eB0A2e6577aB62
+        });
+        swapPaths[1] = BorrowSwap_G3.TokenSwapPath({
+            poolFee: 500,
+            tokenOut: 0x17BFF452dae47e07CeA877Ff0E1aba17eB62b0aB
+        });
+
+        // Setup swap args
+        BorrowSwap_G3.SwapArgs memory swapArgs = BorrowSwap_G3.SwapArgs({
+            amountOutMinimum: 103008674744076537,
+            swapPaths: swapPaths
+        });
+
+
+
+
+        // Setup accept commitment args
+        bytes32[] memory emptyProof = new bytes32[](0);
+        BorrowSwap_G3.AcceptCommitmentArgs memory acceptCommitmentArgs = BorrowSwap_G3.AcceptCommitmentArgs({
+            smartCommitmentAddress: 0x57041602534466802be86D3D66A5AA2cEacb8663,
+            principalAmount: 77698,
+            collateralAmount: 548884820906494937,
+            collateralTokenId: 0,
+            collateralTokenAddress: 0x17BFF452dae47e07CeA877Ff0E1aba17eB62b0aB,
+            commitmentId: 0, 
+            interestRate: 101,
+            loanDuration: 2592000,
+            merkleProof: emptyProof
+
+        });
+
+        vm.prank(borrowerAddress);
+        borrowSwap.borrowSwap(
+            lenderCommitmentForwarder,
+            inputToken,
+            amountIn,
+            swapArgs,
+            acceptCommitmentArgs
+        );
+
+       
      }
 
 

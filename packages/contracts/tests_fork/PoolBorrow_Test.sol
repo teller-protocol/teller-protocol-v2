@@ -15,6 +15,11 @@ import { SwapRolloverLoan_G2 } from "../contracts/LenderCommitmentForwarder/exte
 import {  MockSwapRolloverLoan } from "../contracts/mock/SwapRolloverLoanMock.sol";
 import { LenderCommitmentGroupFactory_V2 } from "../contracts/LenderCommitmentForwarder/extensions/LenderCommitmentGroup/LenderCommitmentGroup_Factory_V2.sol";
 import { ILenderCommitmentGroup_V2 } from "../contracts/interfaces/ILenderCommitmentGroup_V2.sol";
+
+ 
+
+import { UniswapPricingHelper } from "../contracts/price_oracles/UniswapPricingHelper.sol";
+
 import { IUniswapPricingLibrary } from "../contracts/interfaces/IUniswapPricingLibrary.sol";
 
 import { LenderCommitmentGroup_Pool_V2 } from "../contracts/LenderCommitmentForwarder/extensions/LenderCommitmentGroup/LenderCommitmentGroup_Pool_V2.sol";
@@ -56,7 +61,7 @@ contract DeployPool_Fork_Test is Test {
       }
 
 
-
+/*
       function setUp() public {
          address payable scfAddr = payable( getDeployedAddress("SmartCommitmentForwarder") );
          scf = SmartCommitmentForwarder( scfAddr );
@@ -69,7 +74,7 @@ contract DeployPool_Fork_Test is Test {
 
           assertTrue(poolAddr.code.length > 0, "could not connect to pool contract ") ;
       }
- 
+ */
  
 
      function test_pool_borrow() public   {
@@ -101,6 +106,49 @@ contract DeployPool_Fork_Test is Test {
      }
 
 
+
+
+     function etch_uniswap_pricing_helper() public {
+
+
+           
+             
+          address pricingHelperAddress = 0x6B38aD36f17dd55bE44217d184DB8A01536aa104;
+        
+           
+          UniswapPricingHelper newPricingHelper = new UniswapPricingHelper( );
+
+          // Then replace the code at the deployed address
+          vm.etch( address(pricingHelperAddress) , address(newPricingHelper).code );
+
+
+      } 
+
+
+
+
+
+      function test_pool_collateral_calc() public   {
+
+
+           etch_uniswap_pricing_helper(); 
+
+
+
+
+      address mog_pool_address = 0x5F610ca9Ff0a0Ad9FbF91B8EB85A892fb0eBC620;
+
+
+        uint256 amt = LenderCommitmentGroup_Pool_V2( mog_pool_address ).
+            calculateCollateralRequiredToBorrowPrincipal(
+
+                    1000000
+            );
+
+
+
+
+      }
 
 
 

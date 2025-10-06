@@ -179,8 +179,8 @@ contract BorrowSwap_Fork_Test is Test {
         SmartCommitmentForwarder smartCommitmentForwarder = SmartCommitmentForwarder(0x9Fa5A22A3c0b8030147d363f68A763DEB9f00acB);
 
         // !!!! NEEDED !!!!!!!!!!! 
-        vm.prank(borrowerAddress);
-        smartCommitmentForwarder.addExtension( address(borrowSwap) );
+       // vm.prank(borrowerAddress);
+     //   smartCommitmentForwarder.addExtension( address(borrowSwap) );
 
 
 

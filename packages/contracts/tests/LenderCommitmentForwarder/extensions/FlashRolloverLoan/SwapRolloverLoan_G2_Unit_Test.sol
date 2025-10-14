@@ -161,6 +161,9 @@ contract SwapRolloverLoan_Unit_Test is Testable {
 
 
 
+        collateralToken.deposit{ value: 100e18 }();
+        collateralToken.transfer( address(borrower ), 5e18 ); 
+
         ILenderCommitmentGroup_V2.CommitmentGroupConfig memory commitmentGroupConfig = ILenderCommitmentGroup_V2.CommitmentGroupConfig({
             principalTokenAddress: address(wethMock) ,
             collateralTokenAddress: address(collateralToken),
@@ -350,7 +353,7 @@ contract SwapRolloverLoan_Unit_Test is Testable {
                 commitmentId: 0,
                 smartCommitmentAddress: address(  tellerPool   ),
                 principalAmount: principalAmount,
-                collateralAmount: 100,
+                collateralAmount: 100000000000,
                 collateralTokenId: 0,
                 collateralTokenAddress: address( collateralToken  ),
                 interestRate: interestRate,
@@ -368,6 +371,10 @@ contract SwapRolloverLoan_Unit_Test is Testable {
                 borrowToken1: false 
              //   poolAddress: address( uniswapPoolMock )
             });
+
+
+
+        // give borrow lots of collateralToken
 
         vm.prank(address(borrower));
         uint256 loanId = tellerV2.submitBid(
@@ -392,8 +399,7 @@ contract SwapRolloverLoan_Unit_Test is Testable {
             address( smartCommitmentForwarder  ),
             loanId, 
             borrowerAmount,
-           // rewardAmount,
-        //    rewardRecipient, 
+            
 
             flashSwapArgs,
             commitmentArgs

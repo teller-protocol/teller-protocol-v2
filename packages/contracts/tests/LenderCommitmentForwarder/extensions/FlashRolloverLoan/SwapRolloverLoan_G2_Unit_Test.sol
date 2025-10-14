@@ -29,7 +29,7 @@ import { UniswapV3PoolMock } from "../../../../contracts/mock/uniswap/UniswapV3P
 
 import {PoolAddress} from '../../../../contracts/libraries/uniswap/periphery/libraries/PoolAddress.sol';
 
-import { UniswapPricingHelper } from "../../../../contracts/price_oracles/UniswapPricingHelper.sol";
+import { UniswapPricingHelperMock } from "../../../../contracts/mock/UniswapPricingHelperMock.sol";
 import { SmartCommitmentForwarder } from "../../../../contracts/LenderCommitmentForwarder/SmartCommitmentForwarder.sol";
 
 
@@ -104,7 +104,7 @@ contract SwapRolloverLoan_Unit_Test is Testable {
 
     SmartCommitmentForwarder smartCommitmentForwarder;
 
-    UniswapPricingHelper uniswapPricingHelper; 
+    UniswapPricingHelperMock uniswapPricingHelper; 
 
 
     LenderCommitmentGroup_Pool_V2 tellerPool; 
@@ -134,7 +134,7 @@ contract SwapRolloverLoan_Unit_Test is Testable {
          
         uniswapFactoryMock = new UniswapV3FactoryMock();
 
-        uniswapPricingHelper = new UniswapPricingHelper();
+        uniswapPricingHelper = new UniswapPricingHelperMock();
 
         smartCommitmentForwarder = new SmartCommitmentForwarder( 
              address(tellerV2),
@@ -151,7 +151,7 @@ contract SwapRolloverLoan_Unit_Test is Testable {
 
         wethMock.transfer(address(uniswapPoolMock), 5e18);
 
- 
+        vm.prank(address(lender));
         tellerPool = new LenderCommitmentGroup_Pool_V2(
             address(tellerV2),
             address(smartCommitmentForwarder),
@@ -308,6 +308,21 @@ contract SwapRolloverLoan_Unit_Test is Testable {
 
         address rewardRecipient = address(0);
         uint256 rewardAmount = 0; 
+
+
+        // ----
+
+        // deposit principal   
+
+        vm.prank(address(lender));
+        wethMock.approve(  address(tellerPool), 1000000 );
+
+
+        vm.prank(address(lender));
+        tellerPool.deposit( 1000000 , address(lender)); 
+
+
+        // -----
 
 
 

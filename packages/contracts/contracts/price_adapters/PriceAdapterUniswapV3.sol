@@ -28,7 +28,7 @@ contract PriceAdapterUniswapV3 is
  
  
     function registerPriceRoute(
-       bytes[] route
+       bytes calldata route
     ) external returns (bytes32 hash) {
         
 
@@ -46,7 +46,7 @@ contract PriceAdapterUniswapV3 is
      
     function getPrice(
         bytes32 route , uint256 inAmount
-    ) external returns (uint256 marketId_) {
+    ) external returns (uint256 outAmount_) {
         
 
     	// lookup the route from the mapping 

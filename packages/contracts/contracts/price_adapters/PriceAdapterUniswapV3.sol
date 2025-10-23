@@ -4,11 +4,14 @@ pragma solidity ^0.8.0;
  
 
 // Interfaces
-import "./interfaces/IPriceAdapter.sol";
+import "../interfaces/IPriceAdapter.sol";
+
+import {FixedPointQ96} from "../libraries/FixedPointQ96.sol";
+
 
  
 contract PriceAdapterUniswapV3 is
-    IPriceAdapter,
+    IPriceAdapter 
      
 {
      
@@ -43,16 +46,20 @@ contract PriceAdapterUniswapV3 is
 
     }
 
-     
-    function getPrice(
-        bytes32 route , uint256 inAmount
-    ) external returns (uint256 outAmount_) {
+  
+
+
+    // can we compress this price ratio?  lets compress it with Q96 ! 
+
+     function getPriceRatioQ96(
+        bytes32 route 
+    ) external returns ( uint256 priceRatioQ96  ) {
         
 
-    	// lookup the route from the mapping 
+        // lookup the route from the mapping 
 
 
-    	// use the route to query uniswapV3 for the price  using inAmount 
+        // use the route to query uniswapV3 for the price  using inAmount 
 
 
 

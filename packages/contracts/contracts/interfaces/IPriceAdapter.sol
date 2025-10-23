@@ -5,5 +5,5 @@ interface IPriceAdapter {
     
     function registerPriceRoute(bytes[] route) external returns (bytes32);
 
-    function getPrice(bytes32 route, uint256 inAmount) external ;
+    function getPriceRatioQ96(bytes32 route, uint256 inAmount) external returns( uint256 );
 }

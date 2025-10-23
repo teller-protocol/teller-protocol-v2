@@ -26,8 +26,13 @@ import "../../../interfaces/IHasProtocolPausingManager.sol";
 import "../../../interfaces/IProtocolPausingManager.sol";
 
 
- 
+ import "../../../interfaces/IPriceAdapter.sol";
+
 import "../../../interfaces/ISmartCommitmentForwarder.sol";
+
+import {FixedPointQ96} from "../../../libraries/FixedPointQ96.sol";
+
+
 
 import "../../../libraries/uniswap/TickMath.sol";
 import "../../../libraries/uniswap/FixedPoint96.sol";
@@ -55,8 +60,8 @@ import { IPausableTimestamp } from "../../../interfaces/IPausableTimestamp.sol";
 import { ILenderCommitmentGroup_V2 } from "../../../interfaces/ILenderCommitmentGroup_V2.sol";
 import { Payment } from "../../../TellerV2Storage.sol";
 
-import {IUniswapPricingLibrary} from "../../../interfaces/IUniswapPricingLibrary.sol";
-import {UniswapPricingLibraryV2} from "../../../libraries/UniswapPricingLibraryV2.sol";
+//import {IUniswapPricingLibrary} from "../../../interfaces/IUniswapPricingLibrary.sol";
+//import {UniswapPricingLibraryV2} from "../../../libraries/UniswapPricingLibraryV2.sol";
 
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
@@ -150,10 +155,13 @@ contract LenderCommitmentGroup_Pool_V2 is
     bool public firstDepositMade;
     uint256 public withdrawDelayTimeSeconds; 
 
-    IUniswapPricingLibrary.PoolRouteConfig[]  public  poolOracleRoutes;
+  //  IUniswapPricingLibrary.PoolRouteConfig[]  public  poolOracleRoutes;
+
+    bytes32 public priceRouteHash;
+   
 
     //configured by the owner. If 0 , not used. 
-    uint256 public maxPrincipalPerCollateralAmount; 
+    uint256 public maxPrincipalPerCollateralAmount;   // DEPRECATED FOR NOW 
 
 
     uint256 public lastUnpausedAt;
@@ -162,7 +170,6 @@ contract LenderCommitmentGroup_Pool_V2 is
     bool public liquidationAuctionPaused;
 
 
-    bytes32 public priceRouteHash;
    
 
     event PoolInitialized(
@@ -280,17 +287,16 @@ contract LenderCommitmentGroup_Pool_V2 is
     /**
      * @notice Initializes the LenderCommitmentGroup_Smart contract.
      * @param _commitmentGroupConfig Configuration for the commitment group (lending pool).
-     * @param _poolOracleRoutes Route configuration for the principal/collateral oracle.
+     * @param _priceAdapterRoute Route configuration for the principal/collateral oracle.
 
      */
    function initialize(
 
        CommitmentGroupConfig calldata _commitmentGroupConfig,
          
-        bytes calldata _priceAdapterRoute, 
+        bytes calldata _priceAdapterRoute
 
-       //IUniswapPricingLibrary.PoolRouteConfig[] calldata _poolOracleRoutes 
-         
+        
     ) external initializer   {
        
         __Ownable_init();
@@ -325,16 +331,12 @@ contract LenderCommitmentGroup_Pool_V2 is
       
         require( liquidityThresholdPercent <= 10000, "ILTP"); 
 
-        for (uint256 i = 0; i < _poolOracleRoutes.length; i++) {
-            poolOracleRoutes.push(_poolOracleRoutes[i]);
-        }
+       
 
-
-      //  require(poolOracleRoutes.length >= 1 && poolOracleRoutes.length <= 2, "PRL");
-        
-
+      
+            //internally this does checks and might revert 
         // we register the price route with the adapter and save it locally 
-          priceRouteHash = IPriceAdapter( _priceAdapter ).registerPriceRoute(
+          priceRouteHash = IPriceAdapter( PRICE_ADAPTER ).registerPriceRoute(
            _priceAdapterRoute
         );
 
@@ -712,23 +714,26 @@ contract LenderCommitmentGroup_Pool_V2 is
     function calculateCollateralTokensAmountEquivalentToPrincipalTokens(
         uint256 principalAmount 
     ) public view virtual returns (uint256 collateralTokensAmountToMatchValue) {
-   
-        uint256 pairPriceWithTwapFromOracle = UniswapPricingLibraryV2
-            .getUniswapPriceRatioForPoolRoutes(poolOracleRoutes);
+
+
+ 
+            // principalPerCollateralAmount
+        uint256 priceRatioQ96 = IPriceAdapter(  PRICE_ADAPTER  )
+            .getPriceRatioQ96(priceRouteHash);
        
        
-        uint256 principalPerCollateralAmount = maxPrincipalPerCollateralAmount == 0  
+     /*    uint256 principalPerCollateralAmount = maxPrincipalPerCollateralAmount == 0  
                 ? pairPriceWithTwapFromOracle   
                 : Math.min(
                     pairPriceWithTwapFromOracle,
                     maxPrincipalPerCollateralAmount //this is expanded by uniswap exp factor  
-                );
+                );  */ 
 
 
         return
             getRequiredCollateral(
                 principalAmount,
-                principalPerCollateralAmount   
+                priceRatioQ96       // principalPerCollateralAmount 
             );
     }
 
@@ -740,7 +745,7 @@ contract LenderCommitmentGroup_Pool_V2 is
      * @param poolOracleRoutes Array of pool route configurations to use for price calculation
      * @return The Uniswap price ratio expanded by the Uniswap expansion factor (2^96)
      */
-    function getUniswapPriceRatioForPoolRoutes(
+   /*  function getUniswapPriceRatioForPoolRoutes(
        IUniswapPricingLibrary.PoolRouteConfig[] memory poolOracleRoutes
     ) internal  view virtual returns (uint256 ) {
    
@@ -749,7 +754,7 @@ contract LenderCommitmentGroup_Pool_V2 is
        
 
         return pairPriceWithTwapFromOracle;
-    }
+    } */ 
 
     /**
      * @notice Calculates the principal token amount per collateral token based on Uniswap oracle prices
@@ -758,8 +763,10 @@ contract LenderCommitmentGroup_Pool_V2 is
      * @param poolOracleRoutes Array of pool route configurations to use for price calculation
      * @return The principal per collateral ratio, expanded by the Uniswap expansion factor
      */
+   /*   // make the price adapter serve this.. ? 
+
     function getPrincipalForCollateralForPoolRoutes(
-        IUniswapPricingLibrary.PoolRouteConfig[] memory poolOracleRoutes
+
     ) external view virtual returns (uint256 ) {
    
         uint256 pairPriceWithTwapFromOracle = UniswapPricingLibraryV2
@@ -771,11 +778,10 @@ contract LenderCommitmentGroup_Pool_V2 is
                 : Math.min(
                     pairPriceWithTwapFromOracle,
                     maxPrincipalPerCollateralAmount //this is expanded by uniswap exp factor  
-                );
-
+                );    
 
         return principalPerCollateralAmount;
-    } 
+    }  */ 
 
 
     /**
@@ -783,19 +789,19 @@ contract LenderCommitmentGroup_Pool_V2 is
      * @dev Converts principal amount to equivalent collateral based on current price ratio
      * @dev Uses the Math.mulDiv function with rounding up to ensure sufficient collateral
      * @param _principalAmount The amount of principal tokens to be borrowed
-     * @param _maxPrincipalPerCollateralAmount The exchange rate between principal and collateral (expanded by STANDARD_EXPANSION_FACTOR)
+     * @param _maxPrincipalPerCollateralAmountQ96 The exchange rate between principal and collateral (expanded by STANDARD_EXPANSION_FACTOR)
      * @return The required amount of collateral tokens, rounded up to ensure sufficient collateralization
      */
    function getRequiredCollateral(
         uint256 _principalAmount,
-        uint256 _maxPrincipalPerCollateralAmount 
+        uint256 _maxPrincipalPerCollateralAmountQ96
         
     ) internal  view virtual returns (uint256) {
          
          return
             MathUpgradeable.mulDiv(
                 _principalAmount,
-                STANDARD_EXPANSION_FACTOR,
+                 FixedPointQ96.Q96,
                 _maxPrincipalPerCollateralAmount,
                 MathUpgradeable.Rounding.Up
             );  
@@ -873,13 +879,13 @@ contract LenderCommitmentGroup_Pool_V2 is
      * @notice Sets an optional manual ratio for principal/collateral ratio for borrowers. Only Pool Owner.
      * @param _maxPrincipalPerCollateralAmount Price ratio, expanded to support sub-one ratios.
      */
-    function setMaxPrincipalPerCollateralAmount(uint256 _maxPrincipalPerCollateralAmount) 
+   /*  function setMaxPrincipalPerCollateralAmount(uint256 _maxPrincipalPerCollateralAmount) 
     external 
     onlyOwner {
        maxPrincipalPerCollateralAmount = _maxPrincipalPerCollateralAmount;
     }
 
-  
+  */  
 
 
     /**

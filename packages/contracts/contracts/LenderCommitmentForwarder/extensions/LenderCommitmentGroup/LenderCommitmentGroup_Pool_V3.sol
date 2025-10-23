@@ -57,12 +57,10 @@ import { ILoanRepaymentCallbacks } from "../../../interfaces/ILoanRepaymentCallb
 import { IEscrowVault } from "../../../interfaces/IEscrowVault.sol";
 
 import { IPausableTimestamp } from "../../../interfaces/IPausableTimestamp.sol";
-import { ILenderCommitmentGroup_V2 } from "../../../interfaces/ILenderCommitmentGroup_V2.sol";
+import { ILenderCommitmentGroup_V3 } from "../../../interfaces/ILenderCommitmentGroup_V3.sol";
 import { Payment } from "../../../TellerV2Storage.sol";
 
-//import {IUniswapPricingLibrary} from "../../../interfaces/IUniswapPricingLibrary.sol";
-//import {UniswapPricingLibraryV2} from "../../../libraries/UniswapPricingLibraryV2.sol";
-
+ 
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
@@ -87,8 +85,8 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 */
 
-contract LenderCommitmentGroup_Pool_V2 is
-    ILenderCommitmentGroup_V2,
+contract LenderCommitmentGroup_Pool_V3 is
+    ILenderCommitmentGroup_V3,
     IERC4626, // interface functions for lenders 
     ISmartCommitment, // interface functions for borrowers (teller protocol) 
     ILoanRepaymentListener,
@@ -794,7 +792,7 @@ contract LenderCommitmentGroup_Pool_V2 is
      */
    function getRequiredCollateral(
         uint256 _principalAmount,
-        uint256 _maxPrincipalPerCollateralAmountQ96
+        uint256 _maxPrincipalPerCollateralAmountQ96  //price ratio Q96 
         
     ) internal  view virtual returns (uint256) {
          
@@ -802,7 +800,7 @@ contract LenderCommitmentGroup_Pool_V2 is
             MathUpgradeable.mulDiv(
                 _principalAmount,
                  FixedPointQ96.Q96,
-                _maxPrincipalPerCollateralAmount,
+                _maxPrincipalPerCollateralAmountQ96,
                 MathUpgradeable.Rounding.Up
             );  
     }

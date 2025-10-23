@@ -53,7 +53,7 @@ contract PriceAdapterUniswapV3 is
 
      function getPriceRatioQ96(
         bytes32 route 
-    ) external returns ( uint256 priceRatioQ96  ) {
+    ) external  view returns ( uint256 priceRatioQ96  ) {
         
 
         // lookup the route from the mapping 

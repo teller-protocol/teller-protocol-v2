@@ -104,12 +104,14 @@ contract PriceAdapterUniswapV3 is
     }
 
 
-    // validate the route for length, other restrictions 
-    //must be length 1 or 2 
+    // validate the route for length, other restrictions
+    //must be length 1 or 2
 
     function decodePoolRoutes( bytes memory data ) public pure returns ( PoolRoute[] memory route_array )  {
 
         route_array = abi.decode(data, (PoolRoute[]));
+
+        require(route_array.length == 1 || route_array.length == 2, "Route must have 1 or 2 pools");
 
     }
 

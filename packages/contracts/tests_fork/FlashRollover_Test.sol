@@ -41,11 +41,13 @@ contract FlashRollover_Fork_Test is Test {
 
      function test_FlashRollover_forked() public   {
 
-       // etch_FlashRolloverWithMock();
+       // NOTE: This test is designed to work with fork tests on Base network
+       // You need to replace bidId with an actual existing loan ID from Base network
+       // and ensure the caller is the actual borrower of that loan
 
         // Define test parameters
         address lenderCommitmentForwarder = 0x0708480670BdE591e275B06Cd19EcaDFC93A1f16;
-        uint256 bidId = 1815; // Example loan ID - replace with actual loan ID
+        uint256 bidId = 1815; // TODO: Replace with actual loan ID from Base network
         uint256 flashLoanAmount = 15986;
         uint256 borrowerAmount = 0; // Additional amount borrower adds
         uint256 rewardAmount = 0;
@@ -70,9 +72,15 @@ contract FlashRollover_Fork_Test is Test {
         // Get the principal token (token1)
         IERC20 principalToken = IERC20(0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913);
 
+        // Verify the loan exists and caller is the borrower
+    //    address loanBorrower = TELLER_V2(getDeployedAddress("TellerV2")).getLoanBorrower(bidId);
+     //   console.log("Loan borrower:", loanBorrower);
+        console.log("Test caller:", andresWallet);
+      //  require(loanBorrower == andresWallet, "Caller is not the loan borrower");
+
         // Log balance before rollover
         uint256 balanceBefore = principalToken.balanceOf(andresWallet);
-       // console.log("Principal token balance BEFORE rollover:", balanceBefore);
+        console.log("Principal token balance BEFORE rollover:", balanceBefore);
 
         vm.prank(andresWallet);  //andres wallet
         flashRolloverLoan.rolloverLoanWithFlash (
@@ -88,10 +96,16 @@ contract FlashRollover_Fork_Test is Test {
 
         // Log balance after rollover
         uint256 balanceAfter = principalToken.balanceOf(andresWallet);
-      //  console.log("Principal token balance AFTER rollover:", balanceAfter);
+        console.log("Principal token balance AFTER rollover:", balanceAfter);
 
         // Log the difference
-        
+        if (balanceAfter > balanceBefore) {
+            console.log("Principal token GAINED:", balanceAfter - balanceBefore);
+        } else if (balanceBefore > balanceAfter) {
+            console.log("Principal token SPENT:", balanceBefore - balanceAfter);
+        } else {
+            console.log("Principal token balance UNCHANGED");
+        }
 
         // Add assertions to verify the rollover worked
         // assertTrue(someCondition, "Rollover should succeed");
@@ -133,19 +147,9 @@ contract FlashRollover_Fork_Test is Test {
             FlashRolloverLoan_G7.AcceptCommitmentArgs
         ));
 
-        console.log("=== Decoded Parameters ===");
-        console.log("Lender Commitment Forwarder:", decoded_lenderCommitmentForwarder);
-        console.log("Bid ID:", decoded_bidId);
-        console.log("Flash Loan Amount:", decoded_flashLoanAmount);
-        console.log("Borrower Amount:", decoded_borrowerAmount);
-        console.log("Reward Amount:", decoded_rewardAmount);
-        console.log("Reward Recipient:", decoded_rewardRecipient);
-        console.log("Smart Commitment Address:", decoded_acceptCommitmentArgs.smartCommitmentAddress);
-        console.log("Principal Amount:", decoded_acceptCommitmentArgs.principalAmount);
-        console.log("Collateral Amount:", decoded_acceptCommitmentArgs.collateralAmount);
-
+       
         // Impersonate the original caller
-        vm.prank(0xbc1d2Ed14128Cd7Af450319b642Fd43d65E495dc);
+        vm.prank(0x471801AB22320F594318cECA39d0946FA6Dc4Ef9);
 
         // Replay with decoded parameters
         flashRolloverLoan.rolloverLoanWithFlash (

@@ -1,25 +1,28 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+/*
+
+    see https://docs.uniswap.org/contracts/v4/deployments 
+*/
  
 
 // Interfaces
-import "../interfaces/IPriceAdapter.sol";
-import "../interfaces/uniswap/IUniswapV3Pool.sol";
+import "../interfaces/IPriceAdapter.sol"; 
+
+import {IStateView} from "../interfaces/uniswapv4/IStateView.sol";
 
 import {FixedPointQ96} from "../libraries/FixedPointQ96.sol";
 import {FullMath} from "../libraries/uniswap/FullMath.sol";
 import {TickMath} from "../libraries/uniswap/TickMath.sol";
 
 
-contract PriceAdapterUniswapV3 is
+contract PriceAdapterUniswapV4 is
     IPriceAdapter
 
-{
-        
-
-
-
+{ 
+        // 0x7ffe42c4a5deea5b0fec41c94c136cf115597227 on mainnet  
+  address immutable UNISWAP_V4_STATE_VIEW; 
 
     struct PoolRoute {
         address pool;
@@ -29,7 +32,14 @@ contract PriceAdapterUniswapV3 is
         uint256 token1Decimals;
     } 
 
+    
 
+    constructor (address _uniswapStateView ) {
+
+
+        UNISWAP_V4_STATE_VIEW = _uniswapStateView; 
+
+    }
 
 
 
@@ -143,14 +153,17 @@ contract PriceAdapterUniswapV3 is
       }
     }
 
-    function getSqrtTwapX96(address uniswapV3Pool, uint32 twapInterval)
+    function getSqrtTwapX96(PoolId poolId, uint32 twapInterval)
         internal
         view
         returns (uint160 sqrtPriceX96)
     {
+
+
+        
         if (twapInterval == 0) {
             // return the current price if twapInterval == 0
-            (sqrtPriceX96, , , , , , ) = IUniswapV3Pool(uniswapV3Pool).slot0();
+            (sqrtPriceX96, , , , , , ) = IStateView(poolId).getSlot0();
         } else {
             uint32[] memory secondsAgos = new uint32[](2);
             secondsAgos[0] = twapInterval + 1; // from (before)

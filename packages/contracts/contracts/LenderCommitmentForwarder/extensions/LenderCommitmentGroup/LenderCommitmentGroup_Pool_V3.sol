@@ -100,8 +100,7 @@ contract LenderCommitmentGroup_Pool_V3 is
     using AddressUpgradeable for address;
     using NumbersLib for uint256;
 
-    uint256 public immutable STANDARD_EXPANSION_FACTOR = 1e18;
-
+    
     uint256 public immutable MIN_TWAP_INTERVAL = 3;
 
     uint256 public immutable UNISWAP_EXPANSION_FACTOR = 2**96;
@@ -787,7 +786,7 @@ contract LenderCommitmentGroup_Pool_V3 is
      * @dev Converts principal amount to equivalent collateral based on current price ratio
      * @dev Uses the Math.mulDiv function with rounding up to ensure sufficient collateral
      * @param _principalAmount The amount of principal tokens to be borrowed
-     * @param _maxPrincipalPerCollateralAmountQ96 The exchange rate between principal and collateral (expanded by STANDARD_EXPANSION_FACTOR)
+     * @param _maxPrincipalPerCollateralAmountQ96 The exchange rate between principal and collateral (expanded by Q96)
      * @return The required amount of collateral tokens, rounded up to ensure sufficient collateralization
      */
    function getRequiredCollateral(

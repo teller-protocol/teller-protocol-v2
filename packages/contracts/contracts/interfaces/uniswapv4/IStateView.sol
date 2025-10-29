@@ -5,7 +5,7 @@ import {StateLibrary} from "@uniswap/v4-core/src/libraries/StateLibrary.sol";
 import {PoolId} from "@uniswap/v4-core/src/types/PoolId.sol";
 import {IPoolManager} from "@uniswap/v4-core/src/interfaces/IPoolManager.sol";
 import {Position} from "@uniswap/v4-core/src/libraries/Position.sol";
-import {IImmutableState} from "../interfaces/IImmutableState.sol";
+import {IImmutableState} from "./IImmutableState.sol";
 
 /// @title IStateView
 /// @notice Interface for the StateView contract

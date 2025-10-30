@@ -8,9 +8,10 @@ pragma solidity ^0.8.0;
  
 
 // Interfaces
-import "../interfaces/IPriceAdapter.sol"; 
+import "../interfaces/IPriceAdapter.sol";
 
 import {IStateView} from "../interfaces/uniswapv4/IStateView.sol";
+import {PoolId} from "@uniswap/v4-core/src/types/PoolId.sol";
 
 import {FixedPointQ96} from "../libraries/FixedPointQ96.sol";
 import {FullMath} from "../libraries/uniswap/FullMath.sol";
@@ -25,7 +26,7 @@ contract PriceAdapterUniswapV4 is
   address immutable UNISWAP_V4_STATE_VIEW; 
 
     struct PoolRoute {
-        address pool;
+        PoolId pool;
         bool zeroForOne;
         uint32 twapInterval;
         uint256 token0Decimals;
@@ -163,9 +164,13 @@ contract PriceAdapterUniswapV4 is
         
         if (twapInterval == 0) {
             // return the current price if twapInterval == 0
-            (sqrtPriceX96, , , , , , ) = IStateView(poolId).getSlot0();
+            (sqrtPriceX96, , , ) = IStateView(UNISWAP_V4_STATE_VIEW).getSlot0(poolId);
         } else {
-            uint32[] memory secondsAgos = new uint32[](2);
+
+        revert("twap price not impl ");
+
+        
+           /*  uint32[] memory secondsAgos = new uint32[](2);
             secondsAgos[0] = twapInterval + 1; // from (before)
             secondsAgos[1] = 1; // one block prior
 
@@ -178,7 +183,7 @@ contract PriceAdapterUniswapV4 is
                     (tickCumulatives[1] - tickCumulatives[0]) /
                         int32(twapInterval)
                 )
-            );
+            ); */
         }
     }
 

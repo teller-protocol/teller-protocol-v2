@@ -4,6 +4,12 @@ pragma solidity ^0.8.0;
 /*
 
     see https://docs.uniswap.org/contracts/v4/deployments 
+
+
+    https://docs.uniswap.org/contracts/v4/guides/read-pool-state
+
+
+
 */
  
 
@@ -11,19 +17,38 @@ pragma solidity ^0.8.0;
 import "../interfaces/IPriceAdapter.sol";
 
 import {IStateView} from "../interfaces/uniswapv4/IStateView.sol";
-import {PoolId} from "@uniswap/v4-core/src/types/PoolId.sol";
-
+ 
 import {FixedPointQ96} from "../libraries/FixedPointQ96.sol";
 import {FullMath} from "../libraries/uniswap/FullMath.sol";
 import {TickMath} from "../libraries/uniswap/TickMath.sol";
+
+import {StateLibrary} from "v4-core/libraries/StateLibrary.sol";
+
+import {IPoolManager} from "v4-core/interfaces/IPoolManager.sol";
+import {PoolKey} from "v4-core/types/PoolKey.sol";
+import {PoolId, PoolIdLibrary} from "v4-core/types/PoolId.sol";
+
+
 
 
 contract PriceAdapterUniswapV4 is
     IPriceAdapter
 
 { 
+
+    
+
+    using PoolIdLibrary for PoolKey;
+
+    IPoolManager public immutable poolManager;
+
+
+    using StateLibrary for IPoolManager;
+   // address immutable POOL_MANAGER_V4; 
+
+
         // 0x7ffe42c4a5deea5b0fec41c94c136cf115597227 on mainnet  
-  address immutable UNISWAP_V4_STATE_VIEW; 
+    //address immutable UNISWAP_V4_STATE_VIEW; 
 
     struct PoolRoute {
         PoolId pool;
@@ -35,12 +60,10 @@ contract PriceAdapterUniswapV4 is
 
     
 
-    constructor (address _uniswapStateView ) {
-
-
-        UNISWAP_V4_STATE_VIEW = _uniswapStateView; 
-
+  constructor(IPoolManager _poolManager) {
+        poolManager = _poolManager;
     }
+
 
 
 
@@ -130,6 +153,17 @@ contract PriceAdapterUniswapV4 is
 
     // -------
 
+    function getPoolState(PoolId poolId) internal view returns (
+        uint160 sqrtPriceX96,
+        int24 tick,
+        uint24 protocolFee,
+        uint24 lpFee
+    ) {
+        return poolManager.getSlot0(poolId);
+    }
+
+
+
 
 
    function getUniswapPriceRatioForPool(
@@ -161,10 +195,10 @@ contract PriceAdapterUniswapV4 is
     {
 
 
-        
+
         if (twapInterval == 0) {
             // return the current price if twapInterval == 0
-            (sqrtPriceX96, , , ) = IStateView(UNISWAP_V4_STATE_VIEW).getSlot0(poolId);
+            (sqrtPriceX96, , , ) = getPoolState(poolId);
         } else {
 
         revert("twap price not impl ");

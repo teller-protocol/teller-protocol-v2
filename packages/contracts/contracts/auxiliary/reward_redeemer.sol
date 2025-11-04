@@ -13,9 +13,10 @@ To combine the two, there could be another function for claimAllAndAutoCompound 
 */
 
 import "../interfaces/auxiliary/IStaking20Upgradeable.sol";
-import "@openzeppelin/contracts/utils/Address.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 interface ILenderCommitmentGroupPool {
     function deposit(uint256 assets, address receiver) external returns (uint256 shares);
@@ -25,15 +26,15 @@ interface ILenderCommitmentGroupPool {
 	This contract needs to be set as a trusted forwarder as per EIP2771
 	during init
 */
-contract RewardRedeemer is Initializable {
+contract RewardRedeemer is Initializable, OwnableUpgradeable {
 
-	using Address for address;
+	using AddressUpgradeable for address;
 
 	/**
 	 * @notice Initializes the RewardRedeemer contract
 	 */
 	function initialize() public initializer {
-		// Initialization logic if needed  
+		__Ownable_init();
 	}
 
 	// Events
@@ -95,7 +96,7 @@ contract RewardRedeemer is Initializable {
 			stakingContracts[i] = row.stakingContract;
 			tellerPools[i] = row.tellerPool;
 
-			IERC20 rewardToken = IERC20(row.rewardToken);
+			IERC20Upgradeable rewardToken = IERC20Upgradeable(row.rewardToken);
 
 			// Step 1: Check balance before claiming
 			uint256 balanceBefore = rewardToken.balanceOf(stakerAddress);

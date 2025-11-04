@@ -15,6 +15,7 @@ To combine the two, there could be another function for claimAllAndAutoCompound 
 import "../interfaces/auxiliary/IStaking20Upgradeable.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 interface ILenderCommitmentGroupPool {
     function deposit(uint256 assets, address receiver) external returns (uint256 shares);
@@ -22,11 +23,18 @@ interface ILenderCommitmentGroupPool {
 
 /*
 	This contract needs to be set as a trusted forwarder as per EIP2771
-	likely with GrantRole
+	during init
 */
-contract RewardRedeemer {
+contract RewardRedeemer is Initializable {
 
 	using Address for address;
+
+	/**
+	 * @notice Initializes the RewardRedeemer contract
+	 */
+	function initialize() public initializer {
+		// Initialization logic if needed  
+	}
 
 	// Events
 	event RewardsClaimed(address indexed user, address[] stakingContracts);

@@ -38,5 +38,11 @@
   "lender-commitment-forwarder:extensions:borrow-swap:deploy": 1744388962,
   "lender-commitment-group-beacon-v2:deploy": 1750875085,
   "lender-commitment-group-factory-v2:deploy": 1750875089,
-  "lender-commitment-forwarder:extensions:loan-referral-forwarder-v2:deploy": 1753389337
+  "lender-commitment-forwarder:extensions:loan-referral-forwarder-v2:deploy": 1753389337,
+  "smart-commitment-forwarder:upgrade-oracle": 1754325427,
+  "lender-commitment-group-beacon-v2:upgrade-first-deposit": 1754403830,
+  "uniswap-pricing-helper:deploy": 1755184796,
+  "lender-commitment-group-beacon-v2:pricing-helper": 1755184797,
+  "lender-commitment-forwarder:extensions:flash-swap-rollover:g2-upgrade": 1755271066,
+  "timelock-controller:update-delay-7200": 1757524290
 }

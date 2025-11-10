@@ -1,0 +1,1 @@
+{"enabled":true,"name":"tellerv2-poolsv2-optimism","network":"optimism","export_network_name":"optimism","product":"studio","studio":{"owner":"0x1a76339211668a6939e1d6D13AB902bBef5D9ebc","network":"arbitrum-one"},"grafting":{"enabled":false},"contracts":{"factory":{"enabled":true,"address":"0x72f136B0d905780d69EbdD71fb999BFB64B9e375","block":"137896891"} } }

@@ -46,6 +46,9 @@ yarn build
 
    yarn hbs -D ./config/katana.json ./src/subgraph.handlebars -o . -e yaml
 
+ yarn hbs -D ./config/hyperevm.json ./src/subgraph.handlebars -o . -e yaml
+ 
+
 ```
  
 
@@ -69,7 +72,7 @@ graph auth
 
 
  graph deploy   teller-v-2-katana --version-label 0.4.21-22
- graph deploy   teller-v-2-polygon --version-label 0.4.21-22
+ graph deploy   teller-v-2-polygon --version-label 0.4.21-25
 
 graph deploy   teller-v-2-optimism --version-label 0.4.21-19
 
@@ -78,19 +81,40 @@ graph deploy   teller-v-2-optimism --version-label 0.4.21-19
 
 
 
+ 
+
+
+### Deploy to Alchemy 
+
+
+
+```
+
+
+graph deploy tellerv2-polygon \
+  --version-label 0.4.21 \
+  --node https://subgraphs.alchemy.com/api/subgraphs/deploy \
+  --deploy-key ${ALCHEMY_SUBGRAPH_DEPLOY_KEY} \
+  --ipfs https://ipfs.satsuma.xyz
+
+```
 
 
 
 
 
+### Deploy to Goldsky 
+
+
+```
+graph build     (builds the yaml file in  /build/   ?  not in root  ) 
+
+
+goldsky subgraph deploy teller-v2-hyperevm/0.4.21.5
 
 
 
-
-
-
-
-
+```
 
 
 

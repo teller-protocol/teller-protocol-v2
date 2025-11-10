@@ -109,6 +109,7 @@ type NetworkNames =
   | 'mantle'
   | 'optimism'
   | 'katana'
+  | 'hyperevm'
   | 'sepolia'
   | 'mumbai'
   | 'goerli'
@@ -153,6 +154,8 @@ const networkUrls: Record<NetworkNames, string> = {
 
 
       katana: process.env.KATANA_RPC_URL ?? 'https://rpc.katana.network/', 
+
+      hyperevm: process.env.HYPEREVM_RPC_URL ?? 'https://rpc.hyperliquid.xyz/evm', 
 
 
   mantle: 'https://rpc.mantle.xyz',
@@ -221,12 +224,14 @@ export default <HardhatUserConfig>{
   etherscan: {
     apiKey: {
       // Main Networks
-      mainnet: process.env.ETHERSCAN_VERIFY_API_KEY,
-      polygon: process.env.POLYGONSCAN_VERIFY_API_KEY,
-      arbitrumOne: process.env.ARBISCAN_VERIFY_API_KEY,
-      base: process.env.BASESCAN_VERIFY_API_KEY,
+      mainnet: process.env.ETHERSCANV2_VERIFY_API_KEY,
+      polygon: process.env.ETHERSCANV2_VERIFY_API_KEY,
+      arbitrumOne: process.env.ETHERSCANV2_VERIFY_API_KEY,
+      base: process.env.ETHERSCANV2_VERIFY_API_KEY,
       optimism: process.env.ETHERSCANV2_VERIFY_API_KEY,  //using the v2 api 
       katana: process.env.ETHERSCANV2_VERIFY_API_KEY,  //using the v2 api 
+      hyperevm: process.env.ETHERSCANV2_VERIFY_API_KEY,
+
       mantle: process.env.MANTLE_VERIFY_API_KEY ?? 'xyz',
       clarity: '', //none ? 
 
@@ -239,10 +244,18 @@ export default <HardhatUserConfig>{
     },
     customChains: [
       {
+        network: 'polygon',
+        chainId: 137,
+        urls: {
+          apiURL: 'https://api.etherscan.io/v2/api?chainid=137',
+          browserURL: 'https://polygonscan.com',
+        },
+      },
+      {
         network: 'base',
         chainId: 8453,
         urls: {
-          apiURL: 'https://api.basescan.org/api',
+          apiURL: 'https://api.etherscan.io/v2/api?chainid=8453',
           browserURL: 'https://basescan.org',
         },
       },
@@ -254,7 +267,16 @@ export default <HardhatUserConfig>{
           browserURL: 'https://optimistic.etherscan.io',
         },
       },
-             {
+      {
+        network: 'hyperevm',
+        chainId: 999,
+        urls: {
+          apiURL: 'https://api.etherscan.io/v2/api?chainid=999',
+          browserURL: 'https://hyperevmscan.io/',
+        },
+      },
+
+        {
         network: 'katana',
         chainId: 747474,
         urls: {
@@ -262,6 +284,7 @@ export default <HardhatUserConfig>{
           browserURL: 'https://explorer.katanarpc.com/',
         },
       },
+
       {
         network: 'clarity',
         chainId: 66814,
@@ -390,6 +413,7 @@ export default <HardhatUserConfig>{
       8453: '0x2f74c448CF6d613bEE183fE35dB0c9AC5084F66A',
       42161: '0xD9149bfBfB29cC175041937eF8161600b464051B',
       11155111: '0xb1ff461BB751B87f4F791201a29A8cFa9D30490c',
+      999:'0x004573E17574634A48CA808CF1df75f01e906E43'
     },
     protocolTimelock: {
       31337: 8,
@@ -404,6 +428,7 @@ export default <HardhatUserConfig>{
       8453: '0x6BBf498C429C51d05bcA3fC67D2C720B15FC73B8',
       42161: '0x6BBf498C429C51d05bcA3fC67D2C720B15FC73B8',
       11155111: '0xFe5394B67196EA95301D6ECB5389E98A02984cC2',
+      999: '0xBf4E3fEA276057D0b26f52141557C835a7E2d534'
     },
   },
 
@@ -442,7 +467,7 @@ export default <HardhatUserConfig>{
 
       verify: {
         etherscan: {
-          apiKey: process.env.ETHERSCAN_VERIFY_API_KEY,
+          apiKey: process.env.ETHERSCANV2_VERIFY_API_KEY,
         },
       },
     }),
@@ -495,7 +520,7 @@ export default <HardhatUserConfig>{
 
       verify: {
         etherscan: {
-          apiKey: process.env.POLYGONSCAN_VERIFY_API_KEY,
+          apiKey: process.env.ETHERSCANV2_VERIFY_API_KEY,
         },
       },
     }),
@@ -507,7 +532,7 @@ export default <HardhatUserConfig>{
 
       verify: {
         etherscan: {
-          apiKey: process.env.ARBISCAN_VERIFY_API_KEY,
+          apiKey: process.env.ETHERSCANV2_VERIFY_API_KEY,
         },
       },
     }),
@@ -519,7 +544,7 @@ export default <HardhatUserConfig>{
 
       verify: {
         etherscan: {
-          apiKey: process.env.BASESCAN_VERIFY_API_KEY,
+          apiKey: process.env.ETHERSCANV2_VERIFY_API_KEY,
         },
       },
     }),
@@ -543,7 +568,8 @@ export default <HardhatUserConfig>{
       url: networkUrls.katana,
       chainId: 747474,
       live: true,
-      // gasPrice: ethers.utils.parseUnits('110', 'gwei').toNumber(),
+        gasPrice: Number(ethers.parseUnits('1', 'gwei')),
+        
 
       verify: {
         etherscan: {
@@ -551,6 +577,23 @@ export default <HardhatUserConfig>{
         },
       },
     }),
+
+
+
+     hyperevm: networkConfig({
+      url: networkUrls.hyperevm,
+      chainId: 999,
+      live: true,
+        gasPrice: Number(ethers.parseUnits('10', 'gwei')),
+        
+
+      verify: {
+        etherscan: {
+          apiKey: process.env.ETHERSCANV2_VERIFY_API_KEY,
+        },
+      },
+    }),
+   
    
     
     mantle: networkConfig({

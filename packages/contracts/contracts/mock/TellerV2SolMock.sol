@@ -126,7 +126,7 @@ ILoanRepaymentCallbacks
         address _receiver,
         Collateral[] calldata _collateralInfo
     ) public returns (uint256 bidId_) {
-        submitBid(
+        return submitBid(
             _lendingToken,
             _marketplaceId,
             _principal,

@@ -24,5 +24,8 @@
   "lender-commitment-forwarder:extensions:flash-swap-rollover:deploy": 1753367388,
   "lender-commitment-forwarder:extensions:loan-referral-forwarder-v2:deploy": 1753367443,
   "lender-commitment-forwarder-v2:upgrade-transfer": 1753386968,
-  "lender-commitment-forwarder:extensions:flash-rollover-widget:deploy": 1753391237
+  "lender-commitment-forwarder:extensions:flash-rollover-widget:deploy": 1753391237,
+  "uniswap-pricing-helper:deploy": 1755197460,
+  "lender-commitment-group-beacon-v2:pricing-helper": 1755197460,
+  "lender-commitment-forwarder:extensions:flash-swap-rollover:g2-upgrade": 1755271409
 }

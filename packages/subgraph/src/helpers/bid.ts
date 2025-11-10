@@ -13,7 +13,9 @@ export enum BidStatus {
   Expired,
   DueSoon,
   Late,
-  Defaulted
+  Defaulted,
+
+  Closed
 }
 
 export const BidStatusValues = new Array<string>(10);

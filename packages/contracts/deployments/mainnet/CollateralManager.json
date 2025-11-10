@@ -341,6 +341,20 @@
     },
     {
       "type": "function",
+      "name": "getCollateralEscrowBeacon",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
       "name": "getCollateralInfo",
       "constant": true,
       "stateMutability": "view",
@@ -763,6 +777,6 @@
     "status": 1,
     "byzantium": true
   },
-  "numDeployments": 15,
+  "numDeployments": 16,
   "implementation": "0xB914032Fe28Bce8921aC6AEcD88F6B03234DE32B"
 }

@@ -17,6 +17,10 @@
         {
           "type": "address",
           "name": "_uniswapV3Factory"
+        },
+        {
+          "type": "address",
+          "name": "_uniswapPricingHelper"
         }
       ]
     },
@@ -529,6 +533,20 @@
     },
     {
       "type": "function",
+      "name": "UNISWAP_PRICING_HELPER",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
       "name": "UNISWAP_V3_FACTORY",
       "constant": true,
       "stateMutability": "view",
@@ -884,20 +902,6 @@
       "outputs": [
         {
           "type": "uint256",
-          "name": ""
-        }
-      ]
-    },
-    {
-      "type": "function",
-      "name": "firstDepositMade",
-      "constant": true,
-      "stateMutability": "view",
-      "payable": false,
-      "inputs": [],
-      "outputs": [
-        {
-          "type": "bool",
           "name": ""
         }
       ]
@@ -1511,6 +1515,20 @@
     },
     {
       "type": "function",
+      "name": "poolIsActivated",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "bool",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
       "name": "poolOracleRoutes",
       "constant": true,
       "stateMutability": "view",
@@ -1999,6 +2017,6 @@
     }
   ],
   "receipt": {},
-  "numDeployments": 1,
+  "numDeployments": 6,
   "implementation": "0x80314D77E86d70A67126DA86EC823F5fc018c010"
 }

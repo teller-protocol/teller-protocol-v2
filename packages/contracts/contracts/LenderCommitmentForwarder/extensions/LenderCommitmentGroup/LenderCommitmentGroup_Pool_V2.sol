@@ -57,7 +57,7 @@ import { ILenderCommitmentGroup_V2 } from "../../../interfaces/ILenderCommitment
 import { Payment } from "../../../TellerV2Storage.sol";
 
 import {IUniswapPricingLibrary} from "../../../interfaces/IUniswapPricingLibrary.sol";
-import {UniswapPricingLibraryV2} from "../../../libraries/UniswapPricingLibraryV2.sol";
+import {UniswapPricingHelper} from "../../../price_oracles/UniswapPricingHelper.sol";
 
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
@@ -112,7 +112,8 @@ contract LenderCommitmentGroup_Pool_V2 is
     address public immutable TELLER_V2;
     address public immutable SMART_COMMITMENT_FORWARDER;
     address public immutable UNISWAP_V3_FACTORY;
-    
+        
+    address public immutable UNISWAP_PRICING_HELPER;
   
 
     IERC20 public principalToken;
@@ -140,16 +141,16 @@ contract LenderCommitmentGroup_Pool_V2 is
 
 
 
-    uint256 immutable public DEFAULT_WITHDRAW_DELAY_TIME_SECONDS = 300;
-    uint256 immutable public MAX_WITHDRAW_DELAY_TIME = 86400;
+   // uint256 immutable public DEFAULT_WITHDRAW_DELAY_TIME_SECONDS = 300;
+   // uint256 immutable public MAX_WITHDRAW_DELAY_TIME = 86400;
 
     mapping(uint256 => bool) public activeBids;
     mapping(uint256 => uint256) public activeBidsAmountDueRemaining;
 
     int256 tokenDifferenceFromLiquidations;
 
-    bool public firstDepositMade;
-    uint256 public withdrawDelayTimeSeconds; 
+    bool private firstDepositMade_deprecated;  // no longer used
+    uint256 public withdrawDelayTimeSeconds; // immutable for now - use withdrawDelayBypassForAccount
 
     IUniswapPricingLibrary.PoolRouteConfig[]  public  poolOracleRoutes;
 
@@ -161,7 +162,8 @@ contract LenderCommitmentGroup_Pool_V2 is
     bool public paused;
     bool public borrowingPaused;
     bool public liquidationAuctionPaused;
-   
+ 
+    mapping(address => bool) public withdrawDelayBypassForAccount;
 
     event PoolInitialized(
         address indexed principalTokenAddress,
@@ -266,11 +268,13 @@ contract LenderCommitmentGroup_Pool_V2 is
     constructor(
         address _tellerV2,
         address _smartCommitmentForwarder,
-        address _uniswapV3Factory
+        address _uniswapV3Factory,
+        address _uniswapPricingHelper 
     ) OracleProtectedChild(_smartCommitmentForwarder) {
         TELLER_V2 = _tellerV2;
         SMART_COMMITMENT_FORWARDER = _smartCommitmentForwarder;
         UNISWAP_V3_FACTORY = _uniswapV3Factory;
+        UNISWAP_PRICING_HELPER = _uniswapPricingHelper; 
     }
 
     /**
@@ -299,7 +303,7 @@ contract LenderCommitmentGroup_Pool_V2 is
          
         marketId = _commitmentGroupConfig.marketId;
 
-        withdrawDelayTimeSeconds = DEFAULT_WITHDRAW_DELAY_TIME_SECONDS;
+        withdrawDelayTimeSeconds = 300;
 
         //in order for this to succeed, first, the SmartCommitmentForwarder needs to be a trusted forwarder for the market         
         ITellerV2Context(TELLER_V2).approveMarketForwarder(
@@ -700,7 +704,7 @@ contract LenderCommitmentGroup_Pool_V2 is
         uint256 principalAmount 
     ) public view virtual returns (uint256 collateralTokensAmountToMatchValue) {
    
-        uint256 pairPriceWithTwapFromOracle = UniswapPricingLibraryV2
+        uint256 pairPriceWithTwapFromOracle = IUniswapPricingLibrary(UNISWAP_PRICING_HELPER)
             .getUniswapPriceRatioForPoolRoutes(poolOracleRoutes);
        
        
@@ -722,7 +726,7 @@ contract LenderCommitmentGroup_Pool_V2 is
 
    /**
      * @notice Retrieves the price ratio from Uniswap for the given pool routes
-     * @dev Calls the UniswapPricingLibraryV2 to get TWAP (Time-Weighted Average Price) for the specified routes
+     * @dev Calls the UniswapPricingLibrary to get TWAP (Time-Weighted Average Price) for the specified routes
      * @dev This is a low-level internal function that handles direct Uniswap oracle interaction
      * @param poolOracleRoutes Array of pool route configurations to use for price calculation
      * @return The Uniswap price ratio expanded by the Uniswap expansion factor (2^96)
@@ -731,7 +735,7 @@ contract LenderCommitmentGroup_Pool_V2 is
        IUniswapPricingLibrary.PoolRouteConfig[] memory poolOracleRoutes
     ) internal  view virtual returns (uint256 ) {
    
-        uint256 pairPriceWithTwapFromOracle = UniswapPricingLibraryV2
+        uint256 pairPriceWithTwapFromOracle = IUniswapPricingLibrary(UNISWAP_PRICING_HELPER)
             .getUniswapPriceRatioForPoolRoutes(poolOracleRoutes);
        
 
@@ -749,7 +753,7 @@ contract LenderCommitmentGroup_Pool_V2 is
         IUniswapPricingLibrary.PoolRouteConfig[] memory poolOracleRoutes
     ) external view virtual returns (uint256 ) {
    
-        uint256 pairPriceWithTwapFromOracle = UniswapPricingLibraryV2
+        uint256 pairPriceWithTwapFromOracle = IUniswapPricingLibrary(UNISWAP_PRICING_HELPER)
             .getUniswapPriceRatioForPoolRoutes(poolOracleRoutes);
        
        
@@ -1133,17 +1137,19 @@ contract LenderCommitmentGroup_Pool_V2 is
 
 
     /**
-     * @notice Sets the delay time for withdrawing shares. Only Protocol Owner.
-     * @param _seconds Delay time in seconds.
+     * @notice Allows accounts such as Yearn Vaults to bypass withdraw delay. 
+     * @dev This should ONLY be enabled for smart contracts that separately implement MEV/spam protection.
+     * @param _addr  The account that will have the bypass.
+     * @param _bypass Whether or not bypass is enabled
      */
-    function setWithdrawDelayTime(uint256 _seconds) 
+    function setWithdrawDelayBypassForAccount(address _addr, bool _bypass ) 
     external 
     onlyProtocolOwner {
-        require( _seconds < MAX_WITHDRAW_DELAY_TIME , "WD");
-
-        withdrawDelayTimeSeconds = _seconds;
+        
+        withdrawDelayBypassForAccount[_addr] = _bypass;
+       
     }
-
+    
 
 
     // ------------------------   Pausing functions  ------------ 
@@ -1296,7 +1302,8 @@ contract LenderCommitmentGroup_Pool_V2 is
         // Similar to addPrincipalToCommitmentGroup but following ERC4626 standard
         require(assets > 0 );
         
-       
+         bool poolWasActivated = poolIsActivated();
+        
         
         // Transfer assets from sender to vault
         uint256 principalTokenBalanceBefore = principalToken.balanceOf(address(this));
@@ -1316,16 +1323,21 @@ contract LenderCommitmentGroup_Pool_V2 is
         mintShares(receiver, shares);
         
         // Check first deposit conditions
-        if(!firstDepositMade){
-            require(msg.sender == owner(), "FDM");
-            require(shares >= 1e6, "IS");
-            firstDepositMade = true;
+        // if IS FIRST DEPOSIT then ONLY THE OWNER CAN DEPOSIT 
+        if(!poolWasActivated){
+            require(msg.sender == owner(), "FD");
+            require(poolIsActivated(), "IS"); 
         }
         
        // emit LenderAddedPrincipal(msg.sender, assets, shares, receiver);
         emit Deposit( msg.sender,receiver, assets, shares );
 
         return shares;
+    }
+
+
+    function poolIsActivated() public view virtual returns (bool){
+        return totalSupply() >= 1e6; 
     }
 
     
@@ -1340,6 +1352,7 @@ contract LenderCommitmentGroup_Pool_V2 is
         require(assets > 0);
 
 
+        bool poolWasActivated = poolIsActivated();
         
         // Transfer assets from sender to vault
         uint256 principalTokenBalanceBefore = principalToken.balanceOf(address(this));
@@ -1354,10 +1367,9 @@ contract LenderCommitmentGroup_Pool_V2 is
         mintShares(receiver, shares);
         
         // Check first deposit conditions
-        if(!firstDepositMade){
-            require(msg.sender == owner(), "IC");
-            require(shares >= 1e6, "IS");
-            firstDepositMade = true;
+        if(!poolWasActivated){
+            require(msg.sender == owner(), "FD");
+            require(poolIsActivated(), "IS"); 
         }
         
        
@@ -1382,7 +1394,12 @@ contract LenderCommitmentGroup_Pool_V2 is
         
         // Check withdrawal delay
         uint256 sharesLastTransferredAt = getSharesLastTransferredAt(owner);
-        require(block.timestamp >= sharesLastTransferredAt + withdrawDelayTimeSeconds, "SW");
+
+
+        require(  
+            withdrawDelayBypassForAccount[msg.sender] || 
+            block.timestamp >= sharesLastTransferredAt + withdrawDelayTimeSeconds, "SW"
+            );
 
         require(msg.sender == owner, "UA");
         
@@ -1427,7 +1444,10 @@ contract LenderCommitmentGroup_Pool_V2 is
 
         // Check withdrawal delay
         uint256 sharesLastTransferredAt = getSharesLastTransferredAt(owner);
-        require(block.timestamp >= sharesLastTransferredAt + withdrawDelayTimeSeconds, "SR");
+        require(
+             withdrawDelayBypassForAccount[msg.sender] ||  
+            block.timestamp >= sharesLastTransferredAt + withdrawDelayTimeSeconds, "SR"
+         );
         
         // Burn shares from owner
         burnShares(owner, shares);
@@ -1507,7 +1527,7 @@ contract LenderCommitmentGroup_Pool_V2 is
             return 0;
         }
 
-        if(!firstDepositMade && msg.sender != owner()){
+        if(!poolIsActivated() && msg.sender != owner()){
            return 0;
         }
 
@@ -1520,7 +1540,7 @@ contract LenderCommitmentGroup_Pool_V2 is
             return 0;
         }
 
-        if(!firstDepositMade && msg.sender != owner()){
+        if(!poolIsActivated() && msg.sender != owner()){
            return 0;
         }
         
@@ -1548,7 +1568,7 @@ contract LenderCommitmentGroup_Pool_V2 is
         uint256 availableShares = balanceOf(owner);
         uint256 sharesLastTransferredAt = getSharesLastTransferredAt(owner);
         
-        if (block.timestamp <= sharesLastTransferredAt + withdrawDelayTimeSeconds) {
+        if ( !withdrawDelayBypassForAccount[msg.sender] && block.timestamp <= sharesLastTransferredAt + withdrawDelayTimeSeconds) {
             return 0;
         }
         

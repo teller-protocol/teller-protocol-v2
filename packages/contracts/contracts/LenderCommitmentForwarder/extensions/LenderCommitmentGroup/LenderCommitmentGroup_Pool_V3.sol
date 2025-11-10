@@ -1551,7 +1551,8 @@ contract LenderCommitmentGroup_Pool_V3 is
         
         uint256 ownerAssets = convertToAssets(balanceOf(owner));
         uint256 availableLiquidity = principalToken.balanceOf(address(this));
-        
+            
+        uint256 sharesLastTransferredAt = getSharesLastTransferredAt(owner);
         if (block.timestamp <= sharesLastTransferredAt + withdrawDelayTimeSeconds) {
             return 0;
         }

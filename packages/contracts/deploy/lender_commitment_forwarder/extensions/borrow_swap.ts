@@ -1,6 +1,8 @@
 import { DeployFunction } from 'hardhat-deploy/dist/types'
 
+import { get_ecosystem_contract_address } from "../../../helpers/ecosystem-contracts-lookup" 
 
+/*
 // this is the swapRouter02 
 const uniswapV3SwapRouter: { [networkName: string]: string } = {
   mainnet: '0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45',
@@ -16,11 +18,15 @@ const uniswapV3Quoter: { [networkName: string]: string } = {
   arbitrum: '0x5e55c9e631fae526cd4b0526c4818d6e0a9ef0e3',
   base: '0x222ca98f00ed15b1fae10b61c277703a194cf5d2',
 }
+*/
 
-
+  let uniswapV3SwapRouter =  get_ecosystem_contract_address( hre.network.name, "uniswapV3SwapRouter" ) ;
+  let uniswapV3Quoter =  get_ecosystem_contract_address( hre.network.name, "uniswapV3Quoter" ) ;
+  
  
+//const networksWithUniswapRouter: string[] = Object.keys(uniswapV3SwapRouter)
 
-const networksWithUniswap: string[] = Object.keys(uniswapV3SwapRouter)
+//const networksWithUniswapQuoter: string[] = Object.keys(uniswapV3Quoter)
 
 const deployFn: DeployFunction = async (hre) => {
   const tellerV2 = await hre.contracts.get('TellerV2')
@@ -32,8 +38,8 @@ const deployFn: DeployFunction = async (hre) => {
     unsafeAllow: ['constructor', 'state-variable-immutable'],
     constructorArgs: [
       await tellerV2.getAddress(),      
-      uniswapV3SwapRouter[networkName],
-      uniswapV3Quoter[networkName]
+      uniswapV3SwapRouter ,
+      uniswapV3Quoter 
       
     ],
   })
@@ -56,6 +62,6 @@ deployFn.dependencies = [
 ]
 
 deployFn.skip = async (hre) => {
-  return !hre.network.live || !networksWithUniswap.includes(hre.network.name)
+  return !hre.network.live || !uniswapV3SwapRouter || !uniswapV3Quoter
 }
 export default deployFn

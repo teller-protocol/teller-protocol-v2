@@ -62,7 +62,13 @@ impl NetworkData {
 
             }),
 
- 
+         "katana" => Some(Self{
+                graph_network: "katana".to_string(),  
+                chain_network: "katana".to_string(),   
+                start_block:  6541000  
+
+            }),
+
 
             _ => None 
 

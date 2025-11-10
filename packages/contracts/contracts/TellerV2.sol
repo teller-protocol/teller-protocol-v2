@@ -246,20 +246,8 @@ contract TellerV2 is
         _setProtocolPausingManager(_protocolPausingManager);
     }
 
-
-    /* function setEscrowVault(address _escrowVault) external reinitializer(9) {
-        _setEscrowVault(_escrowVault);
-    }
-    */
-
-    
-     function setProtocolPausingManager(         
-        address _protocolPausingManager
-    ) external reinitializer(10) {
-
-         _setProtocolPausingManager(_protocolPausingManager);
-
-    }
+ 
+ 
  
     
     /**

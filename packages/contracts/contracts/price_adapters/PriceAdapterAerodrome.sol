@@ -5,11 +5,13 @@ pragma solidity ^0.8.0;
 
 // Interfaces
 import "../interfaces/IPriceAdapter.sol";
-import "../interfaces/uniswap/IUniswapV3Pool.sol";
+import "../interfaces/defi/IAerodromePool.sol";
 
 import {FixedPointQ96} from "../libraries/FixedPointQ96.sol";
 import {FullMath} from "../libraries/uniswap/FullMath.sol";
 import {TickMath} from "../libraries/uniswap/TickMath.sol";
+  import {FixedPointMathLib} from "../libraries/erc4626/utils/FixedPointMathLib.sol";
+
 
 
 contract PriceAdapterAerodrome is
@@ -143,31 +145,65 @@ contract PriceAdapterAerodrome is
       }
     }
 
-    function getSqrtTwapX96(address uniswapV3Pool, uint32 twapInterval)
+    function getSqrtTwapX96(address poolAddress, uint32 twapInterval)
         internal
         view
         returns (uint160 sqrtPriceX96)
     {
-        if (twapInterval == 0) {
-            // return the current price if twapInterval == 0
-            (sqrtPriceX96, , , , , , ) = IUniswapV3Pool(uniswapV3Pool).slot0();
-        } else {
-            uint32[] memory secondsAgos = new uint32[](2);
-            secondsAgos[0] = twapInterval + 1; // from (before)
-            secondsAgos[1] = 1; // one block prior
 
-            (int56[] memory tickCumulatives, ) = IUniswapV3Pool(uniswapV3Pool)
-                .observe(secondsAgos);
+       
+         // Get two observations: current and one from twapInterval seconds ago
+          uint32[] memory secondsAgos = new uint32[](2);
+          secondsAgos[0] = twapInterval + 1 ;  // oldest
+          secondsAgos[1] = 0;              // current
 
-            // tick(imprecise as it's an integer) to price
-            sqrtPriceX96 = TickMath.getSqrtRatioAtTick(
-                int24(
-                    (tickCumulatives[1] - tickCumulatives[0]) /
-                        int32(twapInterval)
-                )
-            );
-        }
+          // Fetch observations
+          (uint256 timestamp0, uint256 reserve0Cumulative0, uint256 reserve1Cumulative0) =
+              IAerodromePool(poolAddress).observations(secondsAgos[0]);
+
+          (uint256 timestamp1, uint256 reserve0Cumulative1, uint256 reserve1Cumulative1) =
+              IAerodromePool(poolAddress).observations(secondsAgos[1]);
+
+          // Calculate time-weighted average reserves
+          uint256 timeElapsed = timestamp1 - timestamp0;
+          require(timeElapsed > 0, "Invalid time elapsed");
+
+          // Average reserves over the interval
+          uint256 avgReserve0 = (reserve0Cumulative1 - reserve0Cumulative0) / timeElapsed;
+          uint256 avgReserve1 = (reserve1Cumulative1 - reserve1Cumulative0) / timeElapsed;
+
+          // Calculate price ratio: token1/token0
+          // price = avgReserve1 / avgReserve0
+          // sqrtPrice = sqrt(price) = sqrt(avgReserve1 / avgReserve0)
+          // sqrtPriceX96 = sqrtPrice * 2^96
+
+          // To avoid precision loss, calculate: sqrt(reserve1) / sqrt(reserve0) * 2^96
+          
+          sqrtPriceX96 =  getSqrtPriceQ96FromReserves ( avgReserve0,  avgReserve1  )  ;
+
+
+
+
     }
+
+
+
+    function getSqrtPriceQ96FromReserves(uint256 reserve0, uint256 reserve1)
+        internal
+        pure
+        returns (uint160 sqrtPriceX96)
+    {
+
+          uint256 sqrtReserve1 = FixedPointMathLib.sqrt(reserve1);
+          uint256 sqrtReserve0 = FixedPointMathLib.sqrt(reserve0);
+
+          sqrtPriceX96 = uint160(
+              FullMath.mulDiv(sqrtReserve1, FixedPointQ96.Q96, sqrtReserve0)
+          );
+
+    }
+
+
 
     function getPriceQ96FromSqrtPriceX96(uint160 sqrtPriceX96)
         internal

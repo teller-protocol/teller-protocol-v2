@@ -6,7 +6,7 @@ import "forge-std/console.sol";
 
 // Import the PriceAdapterAerodrome contract
 import { PriceAdapterAerodrome } from "../contracts/price_adapters/PriceAdapterAerodrome.sol";
-import { IUniswapV3Pool } from "../contracts/interfaces/uniswap/IUniswapV3Pool.sol";
+import { IAerodromePool } from "../contracts/interfaces/defi/IAerodromePool.sol";
 
 /**
  * @title PoolsV3_Aerodrome_Fork_Test
@@ -21,7 +21,7 @@ contract PoolsV3_Aerodrome_Fork_Test is Test {
     address constant AERODROME_POOL = 0x6cDcb1C4A4D1C3C6d054b27AC5B77e89eAFb971d;
 
     PriceAdapterAerodrome public priceAdapter;
-    IUniswapV3Pool public pool;
+    IAerodromePool public pool;
 
     // Variables to store pool info
     address token0;
@@ -38,7 +38,7 @@ contract PoolsV3_Aerodrome_Fork_Test is Test {
         priceAdapter = new PriceAdapterAerodrome();
 
         // Connect to the pool
-        pool = IUniswapV3Pool(AERODROME_POOL);
+        pool = IAerodromePool(AERODROME_POOL);
 
         // Verify the pool has code
         assertTrue(AERODROME_POOL.code.length > 0, "Pool should have code");
@@ -58,44 +58,35 @@ contract PoolsV3_Aerodrome_Fork_Test is Test {
     }
 
     /**
-     * @notice Test that the pool supports slot0() function
-     * @dev This is required for getting current price without TWAP
+     * @notice Test that the pool has observations data
+     * @dev This verifies the pool supports observations() for TWAP calculations
      */
-    function test_pool_has_slot0() public   {
-        (
-            uint160 sqrtPriceX96,
-            int24 tick,
-            uint16 observationIndex,
-            uint16 observationCardinality,
-            uint16 observationCardinalityNext,
-            uint8 feeProtocol,
-            bool unlocked
-        ) = pool.slot0();
+    function test_pool_has_observations() public {
+        // Try to get observation at index 0 (most recent)
+        (uint256 timestamp0, uint256 reserve0Cumulative0, uint256 reserve1Cumulative0) =
+            pool.observations(0);
 
-        assertTrue(sqrtPriceX96 > 0, "sqrtPriceX96 should be greater than 0");
-        console.log("Current sqrtPriceX96:", sqrtPriceX96);
-        console.log("Current tick:", uint256(int256(tick)));
-        console.log("Observation cardinality:", observationCardinality);
+        // Verify we got valid data
+        assertTrue(timestamp0 > 0, "Timestamp should be greater than 0");
+        console.log("Observation 0 - Timestamp:", timestamp0);
+        console.log("Observation 0 - Reserve0 Cumulative:", reserve0Cumulative0);
+        console.log("Observation 0 - Reserve1 Cumulative:", reserve1Cumulative0);
+
+        // Try to get observation at index 1
+        (uint256 timestamp1, uint256 reserve0Cumulative1, uint256 reserve1Cumulative1) =
+            pool.observations(1);
+
+        console.log("Observation 1 - Timestamp:", timestamp1);
+        console.log("Observation 1 - Reserve0 Cumulative:", reserve0Cumulative1);
+        console.log("Observation 1 - Reserve1 Cumulative:", reserve1Cumulative1);
+
+        // The cumulative reserves should increase over time, so observation 0 (newer)
+        // should have higher or equal cumulative values than observation 1 (older)
+        assertTrue(reserve0Cumulative0 >= reserve0Cumulative1, "Reserve0 cumulative should increase over time");
+        assertTrue(reserve1Cumulative0 >= reserve1Cumulative1, "Reserve1 cumulative should increase over time");
     }
 
-    /**
-     * @notice Test that the pool supports observe() function
-     * @dev This is required for TWAP price calculations
-     */
-    function test_pool_has_observe() public   {
-        uint32[] memory secondsAgos = new uint32[](2);
-        secondsAgos[0] = 3600; // 1 hour ago
-        secondsAgos[1] = 0;    // now
-
-        (int56[] memory tickCumulatives, uint160[] memory secondsPerLiquidityCumulativeX128s) = pool.observe(secondsAgos);
-
-        assertEq(tickCumulatives.length, 2, "Should return 2 tick cumulatives");
-        assertEq(secondsPerLiquidityCumulativeX128s.length, 2, "Should return 2 liquidity cumulatives");
-
-        console.log("Tick cumulative (1h ago):", uint256(int256(tickCumulatives[0])));
-        console.log("Tick cumulative (now):", uint256(int256(tickCumulatives[1])));
-    }
-
+   
     /**
      * @notice Test registering a price route with the Aerodrome pool
      */

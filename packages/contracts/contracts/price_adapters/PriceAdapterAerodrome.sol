@@ -11,14 +11,8 @@ import {FixedPointQ96} from "../libraries/FixedPointQ96.sol";
 import {FullMath} from "../libraries/uniswap/FullMath.sol";
 import {TickMath} from "../libraries/uniswap/TickMath.sol";
 
-/*
 
-    This is (typically) compatible with Sushiswap and Aerodrome 
-
-*/
-
-
-contract PriceAdapterUniswapV3 is
+contract PriceAdapterAerodrome is
     IPriceAdapter
 
 {
@@ -59,10 +53,10 @@ contract PriceAdapterUniswapV3 is
 
              PoolRoute[] memory route_array = decodePoolRoutes( route );
 
-    		// hash the route with keccak256
+            // hash the route with keccak256
             bytes32 poolRouteHash = keccak256(route);
 
-    		// store the route by its hash in the priceRoutes mapping
+            // store the route by its hash in the priceRoutes mapping
             priceRoutes[poolRouteHash] = route;
 
             emit RouteRegistered(poolRouteHash, route);

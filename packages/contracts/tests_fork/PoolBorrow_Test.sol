@@ -125,12 +125,36 @@ contract DeployPool_Fork_Test is Test {
       } 
 
 
+        function etch_mog_pool() public {
+
+            address tellerV2Address = 0x00182FdB0B880eE24D428e3Cc39383717677C37e;
+            address scfAddress = 0x80314D77E86d70A67126DA86EC823F5fc018c010;
+            address uniswapV3Factory = 0x1F98431c8aD98523631AE4a59f267346ea31F984 ;
+            address uniswapPricingHelper = 0x6B38aD36f17dd55bE44217d184DB8A01536aa104;
+            
+             
+          address poolAddress = 0x5F610ca9Ff0a0Ad9FbF91B8EB85A892fb0eBC620;
+        
+           
+          LenderCommitmentGroup_Pool_V2 newPool = new LenderCommitmentGroup_Pool_V2(
+            tellerV2Address,
+            scfAddress,
+            uniswapV3Factory,
+            uniswapPricingHelper
+          );
+
+          // Then replace the code at the deployed address
+          vm.etch( address(poolAddress) , address(newPool).code );
+
+
+      } 
+
 
 
 
       function test_pool_collateral_calc() public   {
 
-
+             etch_mog_pool();
            etch_uniswap_pricing_helper(); 
 
 

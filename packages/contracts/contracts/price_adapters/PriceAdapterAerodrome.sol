@@ -156,9 +156,6 @@ contract PriceAdapterAerodrome is
 
 
           if (twapInterval == 0 ){
-
-            //return something different.. 
-
  
 
              (uint256 timestamp0, uint256 reserve0Cumulative, uint256 reserve1Cumulative) =
@@ -195,14 +192,9 @@ contract PriceAdapterAerodrome is
           // Average reserves over the interval   -- divisor isnt exactly right ? 
           uint256 avgReserve0 = (reserve0Cumulative0 - reserve0Cumulative1) / latestObservationTick;
           uint256 avgReserve1 = (reserve1Cumulative0 - reserve1Cumulative1) / latestObservationTick;
-
-          // Calculate price ratio: token1/token0
-          // price = avgReserve1 / avgReserve0
-          // sqrtPrice = sqrt(price) = sqrt(avgReserve1 / avgReserve0)
-          // sqrtPriceX96 = sqrtPrice * 2^96
-
-          // To avoid precision loss, calculate: sqrt(reserve1) / sqrt(reserve0) * 2^96
-          
+    
+    
+          // To avoid precision loss, calculate: sqrt(reserve1) / sqrt(reserve0) * 2^96 
           sqrtPriceX96 =  getSqrtPriceQ96FromReserves ( avgReserve0,  avgReserve1  )  ;
 
 

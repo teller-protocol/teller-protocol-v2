@@ -151,26 +151,50 @@ contract PriceAdapterAerodrome is
         returns (uint160 sqrtPriceX96)
     {
 
+
+          uint256 latestObservationTick   =  IAerodromePool(poolAddress).observationLength() -1; 
+
+
+          if (twapInterval == 0 ){
+
+            //return something different.. 
+
+ 
+
+             (uint256 timestamp0, uint256 reserve0Cumulative, uint256 reserve1Cumulative) =
+              IAerodromePool(poolAddress).observations( latestObservationTick -1  );
+
+                   // Average reserves over the interval   -- divisor isnt exactly right ? 
+              uint256 avgReserve0 = (reserve0Cumulative ) / latestObservationTick;
+              uint256 avgReserve1 = (reserve1Cumulative ) / latestObservationTick;
+
+             return getSqrtPriceQ96FromReserves ( avgReserve0,  avgReserve1  )  ; 
+          }
+
+
        
          // Get two observations: current and one from twapInterval seconds ago
           uint32[] memory secondsAgos = new uint32[](2);
-          secondsAgos[0] = twapInterval + 1 ;  // oldest
-          secondsAgos[1] = 0;              // current
+           secondsAgos[0] = 0;              // current
+           secondsAgos[1] = twapInterval + 0 ;  // oldest
+       
 
           // Fetch observations
+          
+
           (uint256 timestamp0, uint256 reserve0Cumulative0, uint256 reserve1Cumulative0) =
-              IAerodromePool(poolAddress).observations(secondsAgos[0]);
+              IAerodromePool(poolAddress).observations(latestObservationTick - secondsAgos[0]);
 
           (uint256 timestamp1, uint256 reserve0Cumulative1, uint256 reserve1Cumulative1) =
-              IAerodromePool(poolAddress).observations(secondsAgos[1]);
+              IAerodromePool(poolAddress).observations(latestObservationTick - secondsAgos[1]);
 
           // Calculate time-weighted average reserves
-          uint256 timeElapsed = timestamp1 - timestamp0;
+          uint256 timeElapsed = timestamp0 - timestamp1  ;
           require(timeElapsed > 0, "Invalid time elapsed");
 
-          // Average reserves over the interval
-          uint256 avgReserve0 = (reserve0Cumulative1 - reserve0Cumulative0) / timeElapsed;
-          uint256 avgReserve1 = (reserve1Cumulative1 - reserve1Cumulative0) / timeElapsed;
+          // Average reserves over the interval   -- divisor isnt exactly right ? 
+          uint256 avgReserve0 = (reserve0Cumulative0 - reserve0Cumulative1) / latestObservationTick;
+          uint256 avgReserve1 = (reserve1Cumulative0 - reserve1Cumulative1) / latestObservationTick;
 
           // Calculate price ratio: token1/token0
           // price = avgReserve1 / avgReserve0

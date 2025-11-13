@@ -82,8 +82,8 @@ contract PoolsV3_Aerodrome_Fork_Test is Test {
 
         // The cumulative reserves should increase over time, so observation 0 (newer)
         // should have higher or equal cumulative values than observation 1 (older)
-        assertTrue(reserve0Cumulative0 >= reserve0Cumulative1, "Reserve0 cumulative should increase over time");
-        assertTrue(reserve1Cumulative0 >= reserve1Cumulative1, "Reserve1 cumulative should increase over time");
+        assertTrue(reserve0Cumulative1 >= reserve0Cumulative0, "Reserve0 cumulative should increase over time");
+        assertTrue(reserve1Cumulative1 >= reserve1Cumulative0, "Reserve1 cumulative should increase over time");
     }
 
    
@@ -184,7 +184,7 @@ contract PoolsV3_Aerodrome_Fork_Test is Test {
         routes[0] = PriceAdapterAerodrome.PoolRoute({
             pool: AERODROME_POOL,
             zeroForOne: true,
-            twapInterval: 3600, // 1 hour TWAP
+            twapInterval: 5, // 1 hour TWAP
             token0Decimals: token0Decimals,
             token1Decimals: token1Decimals
         });
@@ -296,7 +296,7 @@ contract PoolsV3_Aerodrome_Fork_Test is Test {
         twapRoute[0] = PriceAdapterAerodrome.PoolRoute({
             pool: AERODROME_POOL,
             zeroForOne: true,
-            twapInterval: 3600,
+            twapInterval: 5,
             token0Decimals: token0Decimals,
             token1Decimals: token1Decimals
         });

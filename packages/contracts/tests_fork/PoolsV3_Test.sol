@@ -18,10 +18,9 @@ import { ILenderCommitmentGroup_V2 } from "../contracts/interfaces/ILenderCommit
 
  
 
-import { UniswapPricingHelper } from "../contracts/price_oracles/UniswapPricingHelper.sol";
+import { PriceAdapterUniswapV3 } from "../contracts/price_adapters/PriceAdapterUniswapV3.sol";
 
-import { IUniswapPricingLibrary } from "../contracts/interfaces/IUniswapPricingLibrary.sol";
-
+ 
 import { LenderCommitmentGroup_Pool_V3 } from "../contracts/LenderCommitmentForwarder/extensions/LenderCommitmentGroup/LenderCommitmentGroup_Pool_V3.sol";
 import { SmartCommitmentForwarder } from "../contracts/LenderCommitmentForwarder/SmartCommitmentForwarder.sol";
 
@@ -100,19 +99,34 @@ contract DeployPool_Fork_Test is Test {
 
      function test_pool_v3_price_routes () public   {
 
+        address MOG_POOL = 0x5F610ca9Ff0a0Ad9FbF91B8EB85A892fb0eBC620;
+        uint256 token0Decimals = 18;
+        uint256 token1Decimals = 6; 
+
 
         // register the route 
 
+       PriceAdapterUniswapV3.PoolRoute[] memory routes = new PriceAdapterUniswapV3.PoolRoute[](1);
+        routes[0] = PriceAdapterUniswapV3.PoolRoute({
+            pool: MOG_POOL,
+            zeroForOne: true,
+            twapInterval: 0,
+            token0Decimals: token0Decimals,
+            token1Decimals: token1Decimals
+        });
+
+        bytes memory encodedRoute = price_adapter.encodePoolRoutes(routes);
+
         bytes32 routeHash = price_adapter.registerPriceRoute (
 
-                price_route_bytes 
+                encodedRoute 
 
             );
 
 
         uint256 priceRatioQ96 = price_adapter.getPriceRatioQ96(routeHash) ;
 
-        
+
 
 
         // query the route 
@@ -145,7 +159,7 @@ contract DeployPool_Fork_Test is Test {
 
 
 
-     function etch_uniswap_pricing_helper() public {
+   /*  function etch_uniswap_pricing_helper() public {
 
 
            
@@ -159,54 +173,10 @@ contract DeployPool_Fork_Test is Test {
           vm.etch( address(pricingHelperAddress) , address(newPricingHelper).code );
 
 
-      } 
+      } */
 
 
 
 
-
-      function test_pool_collateral_calc() public   {
-
-
-           etch_uniswap_pricing_helper(); 
-
-
-
-
-      address mog_pool_address = 0x5F610ca9Ff0a0Ad9FbF91B8EB85A892fb0eBC620;
-
-
-        uint256 amt = LenderCommitmentGroup_Pool_V2( mog_pool_address ).
-            calculateCollateralRequiredToBorrowPrincipal(
-
-                    1000000
-            );
-
-
-
-
-      }
-
-
-
-    
-    /*
-    function test_TellerV2State() public   {
-        if (address(tellerV2) != address(0)) {
-            // Test reading state from deployed contract
-            try tellerV2.protocolFee() returns (uint16 fee) {
-                console.log("Protocol fee:", fee);
-                assertTrue(fee >= 0, "Fee should be non-negative");
-            } catch {
-                console.log("Failed to read protocol fee");
-            }
-        }
-    }
-    
-    function test_TellerV2Interactions() public {
-        if (address(tellerV2) != address(0)) {
-            // You can test interactions with existing state
-            // For example, check if certain markets exist, etc.
-        }
-    }*/
+ 
 }

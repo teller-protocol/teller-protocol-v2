@@ -132,31 +132,7 @@ contract DeployPool_Fork_Test is Test {
 
 
 
-
-        // query the route 
-
-
-
-       /*
-       uint256 principalAmount = 967446;
-       uint256 collateralAmount = 45700000000000001;
-        address collateralTokenAddress = 0x5555555555555555555555555555555555555555;
-       address recipient = 0xbc1d2Ed14128Cd7Af450319b642Fd43d65E495dc;
-       uint16 interestRate = 6511;
-       uint32 loanDuration = 604800;
-
-
-        vm.prank(0xbc1d2Ed14128Cd7Af450319b642Fd43d65E495dc);  //andres wallet
-        uint256 res = scf.acceptSmartCommitmentWithRecipient(
-            address(pool),
-            principalAmount,
-            collateralAmount,
-            0, //collateral token id 
-            collateralTokenAddress,
-            recipient,
-            interestRate,
-            loanDuration 
-        ); */ 
+ 
  
      }
 

@@ -99,9 +99,13 @@ contract DeployPool_Fork_Test is Test {
 
      function test_pool_v3_price_routes () public   {
 
-        address MOG_POOL = 0x5F610ca9Ff0a0Ad9FbF91B8EB85A892fb0eBC620;
-        uint256 token0Decimals = 18;
-        uint256 token1Decimals = 6; 
+
+        // principal token is USDC
+        //collateral is MOG 
+
+        address MOG_POOL = 0xE7f05308e67C33D1041438aDCbBb4405e6430E62;
+        uint256 token0Decimals = 6;
+        uint256 token1Decimals = 18; 
 
 
         // register the route 
@@ -109,7 +113,7 @@ contract DeployPool_Fork_Test is Test {
        PriceAdapterUniswapV3.PoolRoute[] memory routes = new PriceAdapterUniswapV3.PoolRoute[](1);
         routes[0] = PriceAdapterUniswapV3.PoolRoute({
             pool: MOG_POOL,
-            zeroForOne: true,
+            zeroForOne: false,
             twapInterval: 0,
             token0Decimals: token0Decimals,
             token1Decimals: token1Decimals

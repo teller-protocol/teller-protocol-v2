@@ -27,7 +27,7 @@ const deployFn: DeployFunction = async (hre) => {
 
  // const uniswapPricingLibraryV2 = await hre.contracts.get('UniswapPricingLibraryV2')
 
-   const priceAdapterAddress = await hre.contracts.get('PriceAdapterAerodrome')
+  // const priceAdapterAddress = await hre.contracts.get('PriceAdapterAerodrome')
   
 
   const smartCommitmentForwarderAddress =
@@ -44,7 +44,7 @@ const deployFn: DeployFunction = async (hre) => {
       constructorArgs: [
         tellerV2Address,
         smartCommitmentForwarderAddress,
-        priceAdapterAddress, 
+     //   priceAdapterAddress, 
       ],
        
       
@@ -73,7 +73,8 @@ deployFn.id = 'lender-commitment-group-beacon-v3:deploy'
 deployFn.tags = ['lender-commitment-group-beacon-v3']
 deployFn.dependencies = [
   'teller-v2:deploy',
-  'smart-commitment-forwarder:deploy' 
+  'smart-commitment-forwarder:deploy' ,
+//  'price-adapter-aerodrome:deploy',
    
 ]
 

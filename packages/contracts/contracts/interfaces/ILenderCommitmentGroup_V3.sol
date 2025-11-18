@@ -22,7 +22,7 @@ interface ILenderCommitmentGroup_V3 {
 
     function initialize(
         CommitmentGroupConfig calldata _commitmentGroupConfig,
-
+         address _priceAdapterAddress, 
          bytes calldata _priceAdapterRoute
 
     )

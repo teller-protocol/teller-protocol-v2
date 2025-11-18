@@ -112,7 +112,7 @@ contract LenderCommitmentGroup_Pool_V3 is
     /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
     address public immutable TELLER_V2;
     address public immutable SMART_COMMITMENT_FORWARDER;
-    address public immutable PRICE_ADAPTER;
+    address public priceAdapter;
     
   
 
@@ -271,14 +271,12 @@ contract LenderCommitmentGroup_Pool_V3 is
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor(
         address _tellerV2,
-        address _smartCommitmentForwarder,
-
-        address _priceAdapter
+        address _smartCommitmentForwarder 
     ) OracleProtectedChild(_smartCommitmentForwarder) {
         TELLER_V2 = _tellerV2;
         SMART_COMMITMENT_FORWARDER = _smartCommitmentForwarder;
 
-        PRICE_ADAPTER = _priceAdapter;
+       
     }
 
     /**
@@ -290,6 +288,8 @@ contract LenderCommitmentGroup_Pool_V3 is
    function initialize(
 
        CommitmentGroupConfig calldata _commitmentGroupConfig,
+
+        address _priceAdapter, 
          
         bytes calldata _priceAdapterRoute
 
@@ -329,11 +329,11 @@ contract LenderCommitmentGroup_Pool_V3 is
         require( liquidityThresholdPercent <= 10000, "ILTP"); 
 
        
-
-      
+        priceAdapter = _priceAdapter ;
+        
             //internally this does checks and might revert 
         // we register the price route with the adapter and save it locally 
-          priceRouteHash = IPriceAdapter( PRICE_ADAPTER ).registerPriceRoute(
+          priceRouteHash = IPriceAdapter( priceAdapter ).registerPriceRoute(
            _priceAdapterRoute
         );
 
@@ -715,17 +715,11 @@ contract LenderCommitmentGroup_Pool_V3 is
 
  
             // principalPerCollateralAmount
-        uint256 priceRatioQ96 = IPriceAdapter(  PRICE_ADAPTER  )
+        uint256 priceRatioQ96 = IPriceAdapter(  priceAdapter  )
             .getPriceRatioQ96(priceRouteHash);
        
-       
-     /*    uint256 principalPerCollateralAmount = maxPrincipalPerCollateralAmount == 0  
-                ? pairPriceWithTwapFromOracle   
-                : Math.min(
-                    pairPriceWithTwapFromOracle,
-                    maxPrincipalPerCollateralAmount //this is expanded by uniswap exp factor  
-                );  */ 
-
+    
+    
 
         return
             getRequiredCollateral(

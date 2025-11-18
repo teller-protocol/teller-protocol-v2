@@ -2,14 +2,26 @@ import { DeployFunction } from 'hardhat-deploy/dist/types'
 
 const deployFn: DeployFunction = async (hre) => {
 
-    
+
 
   const { deployer } = await hre.getNamedAccounts()
-  const PriceAdapterAerodrome = await hre.deployments.deploy('PriceAdapterAerodrome', {
+
+  // Deploy FixedPointQ96 library first
+  const FixedPointQ96 = await hre.deployments.deploy('FixedPointQ96', {
     from: deployer,
   })
 
-  hre.log('Deploying PriceAdapterAerodrome')
+  hre.log('FixedPointQ96 library deployed at:', FixedPointQ96.address)
+
+  // Deploy PriceAdapterAerodrome with linked library
+  const PriceAdapterAerodrome = await hre.deployments.deploy('PriceAdapterAerodrome', {
+    from: deployer,
+    libraries: {
+      FixedPointQ96: FixedPointQ96.address,
+    },
+  })
+
+  hre.log('PriceAdapterAerodrome deployed at:', PriceAdapterAerodrome.address)
 
 
 }

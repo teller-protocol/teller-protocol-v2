@@ -14,6 +14,13 @@ const deployFn: DeployFunction = async (hre) => {
   hre.log('FixedPointQ96 library deployed at:' )
   hre.log( FixedPointQ96.address)
 
+
+
+  // need to add a delay , wait here ! 
+    await tx.wait(1) // wait one block
+
+
+
   // Deploy PriceAdapterAerodrome with linked library
   const PriceAdapterAerodrome = await hre.deployments.deploy('PriceAdapterAerodrome', {
     from: deployer,

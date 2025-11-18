@@ -11,7 +11,8 @@ const deployFn: DeployFunction = async (hre) => {
     from: deployer,
   })
 
-  hre.log('FixedPointQ96 library deployed at:', FixedPointQ96.address)
+  hre.log('FixedPointQ96 library deployed at:' )
+  hre.log( FixedPointQ96.address)
 
   // Deploy PriceAdapterAerodrome with linked library
   const PriceAdapterAerodrome = await hre.deployments.deploy('PriceAdapterAerodrome', {
@@ -21,7 +22,8 @@ const deployFn: DeployFunction = async (hre) => {
     },
   })
 
-  hre.log('PriceAdapterAerodrome deployed at:', PriceAdapterAerodrome.address)
+  hre.log('PriceAdapterAerodrome deployed at:' )
+    hre.log( PriceAdapterAerodrome.address)
 
 
 }
@@ -29,7 +31,7 @@ const deployFn: DeployFunction = async (hre) => {
 // tags and deployment
 deployFn.id = 'price-adapter-aerodrome:deploy'
 deployFn.tags = ['teller-v2', 'price-adapter-aerodrome:deploy']
-deployFn.dependencies = ['']
+deployFn.dependencies = []
 
 deployFn.skip = async (hre) => {
     return !hre.network.live || ![  'base', ].includes(hre.network.name)

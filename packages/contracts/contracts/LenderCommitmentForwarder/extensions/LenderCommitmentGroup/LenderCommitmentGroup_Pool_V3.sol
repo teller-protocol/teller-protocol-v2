@@ -734,52 +734,8 @@ contract LenderCommitmentGroup_Pool_V3 is
             );
     }
 
-
-   /**
-     * @notice Retrieves the price ratio from Uniswap for the given pool routes
-     * @dev Calls the UniswapPricingLibraryV2 to get TWAP (Time-Weighted Average Price) for the specified routes
-     * @dev This is a low-level internal function that handles direct Uniswap oracle interaction
-     * @param poolOracleRoutes Array of pool route configurations to use for price calculation
-     * @return The Uniswap price ratio expanded by the Uniswap expansion factor (2^96)
-     */
-   /*  function getUniswapPriceRatioForPoolRoutes(
-       IUniswapPricingLibrary.PoolRouteConfig[] memory poolOracleRoutes
-    ) internal  view virtual returns (uint256 ) {
-   
-        uint256 pairPriceWithTwapFromOracle = UniswapPricingLibraryV2
-            .getUniswapPriceRatioForPoolRoutes(poolOracleRoutes);
-       
-
-        return pairPriceWithTwapFromOracle;
-    } */ 
-
-    /**
-     * @notice Calculates the principal token amount per collateral token based on Uniswap oracle prices
-     * @dev Uses Uniswap TWAP and applies any configured maximum limits
-     * @dev Returns the lesser of the oracle price or the configured maximum (if set)
-     * @param poolOracleRoutes Array of pool route configurations to use for price calculation
-     * @return The principal per collateral ratio, expanded by the Uniswap expansion factor
-     */
-   /*   // make the price adapter serve this.. ? 
-
-    function getPrincipalForCollateralForPoolRoutes(
-
-    ) external view virtual returns (uint256 ) {
-   
-        uint256 pairPriceWithTwapFromOracle = UniswapPricingLibraryV2
-            .getUniswapPriceRatioForPoolRoutes(poolOracleRoutes);
-       
-       
-        uint256 principalPerCollateralAmount = maxPrincipalPerCollateralAmount == 0  
-                ? pairPriceWithTwapFromOracle   
-                : Math.min(
-                    pairPriceWithTwapFromOracle,
-                    maxPrincipalPerCollateralAmount //this is expanded by uniswap exp factor  
-                );    
-
-        return principalPerCollateralAmount;
-    }  */ 
-
+ 
+ 
 
     /**
      * @notice Calculates the amount of collateral tokens required for a given principal amount
@@ -869,20 +825,7 @@ contract LenderCommitmentGroup_Pool_V3 is
     }
  
 
-
-
-
-    /**
-     * @notice Sets an optional manual ratio for principal/collateral ratio for borrowers. Only Pool Owner.
-     * @param _maxPrincipalPerCollateralAmount Price ratio, expanded to support sub-one ratios.
-     */
-   /*  function setMaxPrincipalPerCollateralAmount(uint256 _maxPrincipalPerCollateralAmount) 
-    external 
-    onlyOwner {
-       maxPrincipalPerCollateralAmount = _maxPrincipalPerCollateralAmount;
-    }
-
-  */  
+ 
 
 
     /**

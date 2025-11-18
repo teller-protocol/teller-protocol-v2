@@ -24,6 +24,8 @@ const deployFn: DeployFunction = async (hre) => {
       initArgs: [
         LenderGroupsBeaconAddress
       ],
+
+      
       
     }
   )

@@ -46,7 +46,8 @@ const deployFn: DeployFunction = async (hre) => {
         smartCommitmentForwarderAddress,
      //   priceAdapterAddress, 
       ],
-       
+        redeployImplementation: 'always',
+
       
     }
   )

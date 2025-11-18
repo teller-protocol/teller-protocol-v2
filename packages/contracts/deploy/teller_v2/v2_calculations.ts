@@ -4,6 +4,7 @@ const deployFn: DeployFunction = async (hre) => {
   const { deployer } = await hre.getNamedAccounts()
   const v2Calculations = await hre.deployments.deploy('V2Calculations', {
     from: deployer,
+    skipIfAlreadyDeployed: true,
   })
 }
 

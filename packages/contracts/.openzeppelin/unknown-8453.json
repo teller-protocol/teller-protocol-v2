@@ -14,6 +14,11 @@
       "address": "0x9B39b1dF550Db040cd67F52EEE927ab4cd42513b",
       "txHash": "0x186bf874a4fafa3be5c28fac20f23248f0dc4fe545b72da2952e8826a6edfebf",
       "kind": "transparent"
+    },
+    {
+      "address": "0xD8D67872904Ee0778dFf44f05e6F2A7a246db10b",
+      "txHash": "0x6ec3f26b0bf4105a80bbe01a7e3d42bf4594237e9521f93a52ba40113f054309",
+      "kind": "transparent"
     }
   ],
   "impls": {
@@ -521,7 +526,11 @@
           }
         },
         "namespaces": {}
-      }
+      },
+      "allAddresses": [
+        "0x1c644A1bCB658b718e76051cDE6A22cdb235a4fD",
+        "0x70136E7EE8423336D3063427f43ac425408ef6e1"
+      ]
     },
     "72849f8392a9e31ccd1fedb257f9a29aee0264b78017fa77eebd44ee6e559469": {
       "address": "0x45F8eF370e6E3b83e2b592c149b7aB8a0c479A74",

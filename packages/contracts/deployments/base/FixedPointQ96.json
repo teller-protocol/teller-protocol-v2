@@ -1,0 +1,134 @@
+{
+  "address": "0xEA2CC36731704Cb7B98C7CA9F891Ca42405a0619",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "fixedPointA",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "fixedPointB",
+          "type": "uint256"
+        }
+      ],
+      "name": "divideFixedPoint96",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "q96Value",
+          "type": "uint256"
+        }
+      ],
+      "name": "fromFixedPoint96",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "fixedPointA",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "fixedPointB",
+          "type": "uint256"
+        }
+      ],
+      "name": "multiplyFixedPoint96",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "numerator",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "denominator",
+          "type": "uint256"
+        }
+      ],
+      "name": "toFixedPoint96",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    }
+  ],
+  "transactionHash": "0xdb8542eec47eb8899f5a234be9e4f19139a037a16b0bb13357d5b73fa8cdc574",
+  "receipt": {
+    "to": null,
+    "from": "0xD9B023522CeCe02251d877bb0EB4f06fDe6F98E6",
+    "contractAddress": "0xEA2CC36731704Cb7B98C7CA9F891Ca42405a0619",
+    "transactionIndex": 200,
+    "gasUsed": "141837",
+    "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "blockHash": "0xa09a1ee73575ad06429068b22af5bf78f0cdea85552a4177d3345d35d0d7e67a",
+    "transactionHash": "0xdb8542eec47eb8899f5a234be9e4f19139a037a16b0bb13357d5b73fa8cdc574",
+    "logs": [],
+    "blockNumber": 38438797,
+    "cumulativeGasUsed": "34802686",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": [],
+  "numDeployments": 1,
+  "solcInputHash": "d2a445878acc07141df9a184837e8d0b",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.24+commit.e11b9ed9\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"fixedPointA\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"fixedPointB\",\"type\":\"uint256\"}],\"name\":\"divideFixedPoint96\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"q96Value\",\"type\":\"uint256\"}],\"name\":\"fromFixedPoint96\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"fixedPointA\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"fixedPointB\",\"type\":\"uint256\"}],\"name\":\"multiplyFixedPoint96\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"numerator\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"denominator\",\"type\":\"uint256\"}],\"name\":\"toFixedPoint96\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"pure\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"title\":\"FixedPoint96\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"notice\":\"A library for handling binary fixed point numbers, see https://en.wikipedia.org/wiki/Q_(number_format) \",\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/libraries/FixedPointQ96.sol\":\"FixedPointQ96\"},\"evmVersion\":\"shanghai\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"contracts/libraries/FixedPointQ96.sol\":{\"content\":\"\\n\\n\\n\\n//use mul div and make sure we  round the proper way ! \\n\\n\\n\\n/// @title FixedPoint96\\n/// @notice A library for handling binary fixed point numbers, see https://en.wikipedia.org/wiki/Q_(number_format) \\nlibrary FixedPointQ96 {\\n    uint8 constant RESOLUTION = 96;\\n    uint256 constant Q96 = 0x1000000000000000000000000;\\n\\n\\n\\n    // Example: Convert a decimal number (like 0.5) into FixedPoint96 format\\n    function toFixedPoint96(uint256 numerator, uint256 denominator) public pure returns (uint256) {\\n        // The number is scaled by Q96 to convert into fixed point format\\n        return (numerator * Q96) / denominator;\\n    }\\n\\n    // Example: Multiply two fixed-point numbers\\n    function multiplyFixedPoint96(uint256 fixedPointA, uint256 fixedPointB) public pure returns (uint256) {\\n        // Multiply the two fixed-point numbers and scale back by Q96 to maintain precision\\n        return (fixedPointA * fixedPointB) / Q96;\\n    }\\n\\n    // Example: Divide two fixed-point numbers\\n    function divideFixedPoint96(uint256 fixedPointA, uint256 fixedPointB) public pure returns (uint256) {\\n        // Divide the two fixed-point numbers and scale back by Q96 to maintain precision\\n        return (fixedPointA * Q96) / fixedPointB;\\n    }\\n\\n\\n     function fromFixedPoint96(uint256 q96Value) public pure returns (uint256) {\\n        // To convert from Q96 back to normal (human-readable) value, divide by Q96\\n        return q96Value / Q96;\\n    }\\n\\n}\\n\",\"keccak256\":\"0x83be4025348bc6a4164c7ce3a54f55629da64952b561dd238081d49716061ad1\"}},\"version\":1}",
+  "bytecode": "0x610199610035600b8282823980515f1a60731461002957634e487b7160e01b5f525f60045260245ffd5b305f52607381538281f3fe7300000000000000000000000000000000000000003014608060405260043610610055575f3560e01c80630f55b8251461005957806312b28bda1461007e5780637038961414610091578063c9bcd4f41461007e575b5f80fd5b61006c6100673660046100ea565b6100a4565b60405190815260200160405180910390f35b61006c61008c366004610101565b6100b9565b61006c61009f366004610101565b6100da565b5f6100b3600160601b83610121565b92915050565b5f816100c9600160601b85610140565b6100d39190610121565b9392505050565b5f600160601b6100c98385610140565b5f602082840312156100fa575f80fd5b5035919050565b5f8060408385031215610112575f80fd5b50508035926020909101359150565b5f8261013b57634e487b7160e01b5f52601260045260245ffd5b500490565b80820281158282048414176100b357634e487b7160e01b5f52601160045260245ffdfea2646970667358221220679c3bef9df8de48cf332d15e25a2762189a9ceb0a255109fe3884b5387cd8ea64736f6c63430008180033",
+  "deployedBytecode": "0x7300000000000000000000000000000000000000003014608060405260043610610055575f3560e01c80630f55b8251461005957806312b28bda1461007e5780637038961414610091578063c9bcd4f41461007e575b5f80fd5b61006c6100673660046100ea565b6100a4565b60405190815260200160405180910390f35b61006c61008c366004610101565b6100b9565b61006c61009f366004610101565b6100da565b5f6100b3600160601b83610121565b92915050565b5f816100c9600160601b85610140565b6100d39190610121565b9392505050565b5f600160601b6100c98385610140565b5f602082840312156100fa575f80fd5b5035919050565b5f8060408385031215610112575f80fd5b50508035926020909101359150565b5f8261013b57634e487b7160e01b5f52601260045260245ffd5b500490565b80820281158282048414176100b357634e487b7160e01b5f52601160045260245ffdfea2646970667358221220679c3bef9df8de48cf332d15e25a2762189a9ceb0a255109fe3884b5387cd8ea64736f6c63430008180033",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {},
+    "title": "FixedPoint96",
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "notice": "A library for handling binary fixed point numbers, see https://en.wikipedia.org/wiki/Q_(number_format) ",
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [],
+    "types": null
+  }
+}

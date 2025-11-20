@@ -30,12 +30,9 @@ import "../../../interfaces/IProtocolPausingManager.sol";
 
 import "../../../interfaces/ISmartCommitmentForwarder.sol";
 
-import {FixedPointQ96} from "../../../libraries/FixedPointQ96.sol";
+ 
 
-
-
-import "../../../libraries/uniswap/TickMath.sol";
-import "../../../libraries/uniswap/FixedPoint96.sol";
+import "../../../libraries/uniswap/TickMath.sol"; 
 import "../../../libraries/uniswap/FullMath.sol";
  
 
@@ -99,6 +96,10 @@ contract LenderCommitmentGroup_Pool_V3 is
 {
     using AddressUpgradeable for address;
     using NumbersLib for uint256;
+
+
+    uint256 constant Q96 = 0x1000000000000000000000000;
+
 
     
     uint256 public immutable MIN_TWAP_INTERVAL = 3;
@@ -748,7 +749,7 @@ contract LenderCommitmentGroup_Pool_V3 is
          return
             MathUpgradeable.mulDiv(
                 _principalAmount,
-                 FixedPointQ96.Q96,
+                 Q96,
                 _maxPrincipalPerCollateralAmountQ96,
                 MathUpgradeable.Rounding.Up
             );  

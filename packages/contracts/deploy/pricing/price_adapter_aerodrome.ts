@@ -17,7 +17,7 @@ const deployFn: DeployFunction = async (hre) => {
 
 
   // need to add a delay , wait here ! 
-    await tx.wait(1) // wait one block
+   // await tx.wait(1) // wait one block
 
 
 

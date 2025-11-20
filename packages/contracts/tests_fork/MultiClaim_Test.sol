@@ -73,6 +73,33 @@ contract MultiClaim_Fork_Test is Test {
      }
 
 
+
+
+     function test_compound_multi() public   {
+
+        rewardRedeemer = RewardRedeemer( getDeployedAddress( "RewardRedeemer", "base" ) );
+
+        // Create AutoCompoundInputRow array
+        RewardRedeemer.AutoCompoundInputRow[] memory autoCompoundInputRows =
+            new RewardRedeemer.AutoCompoundInputRow[](1);
+
+        // Configure the compound instruction
+        // Staking contract: ThirdWeb staking contract
+        // Teller pool: Compound pool (USDC) 
+        autoCompoundInputRows[0] = RewardRedeemer.AutoCompoundInputRow(
+            0xE9A11045dB982fc0975123Fa09c59BBb48ac2374,  // stakingContract
+            0x32a2019490E14677b9260Ebe00a6A6E0C3582F93,  // tellerPool (Compound pool)
+            0x1111111111166b7FE7bd91427724B487980aFc69   // rewardToken (Zora on Base)
+        );
+
+        vm.prank(0xD9B023522CeCe02251d877bb0EB4f06fDe6F98E6);  //andres wallet
+          rewardRedeemer.compound_multi(
+              autoCompoundInputRows
+        );
+
+     }
+
+
  
  
 }

@@ -110,6 +110,8 @@ contract RewardRedeemer is Initializable, OwnableUpgradeable {
 				stakerAddress
 			);
 
+
+/* 
 			// Step 3: Check balance after claiming to determine amount received
 			uint256 balanceAfter = rewardToken.balanceOf(stakerAddress);
 			uint256 claimedAmount = balanceAfter - balanceBefore;
@@ -129,6 +131,10 @@ contract RewardRedeemer is Initializable, OwnableUpgradeable {
 					stakerAddress
 				);
 			}
+
+			*/ 
+
+			
 		}
 
 		emit RewardsCompounded(stakerAddress, stakingContracts, tellerPools, depositedAmounts);

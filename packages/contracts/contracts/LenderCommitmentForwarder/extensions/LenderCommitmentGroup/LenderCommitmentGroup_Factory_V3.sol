@@ -58,13 +58,15 @@ contract LenderCommitmentGroupFactory_V3 is OwnableUpgradeable {
      * @dev The function initializes the deployed contract and optionally adds an initial principal amount.
      * @param _initialPrincipalAmount The initial principal amount to be deposited into the group contract.
      * @param _commitmentGroupConfig Configuration parameters for the lender commitment group.
-     * @param _poolOracleRoutes Array of pool route configurations for the Uniswap pricing library.
+     * @param _priceAdapterAddress Address for the pool price adapter
+     * @param _priceAdapterRoute Encoded roue for the price adapter 
      * @return newGroupContract_ Address of the newly deployed group contract.
      */
     function deployLenderCommitmentGroupPool(
         uint256 _initialPrincipalAmount,
         ILenderCommitmentGroup_V3.CommitmentGroupConfig calldata _commitmentGroupConfig,
-        IUniswapPricingLibrary.PoolRouteConfig[] calldata _poolOracleRoutes
+         address _priceAdapterAddress, 
+         bytes calldata _priceAdapterRoute
     ) external returns ( address ) {
          
   
@@ -73,7 +75,8 @@ contract LenderCommitmentGroupFactory_V3 is OwnableUpgradeable {
                 abi.encodeWithSelector(
                     ILenderCommitmentGroup_V3.initialize.selector,    //this initializes 
                     _commitmentGroupConfig,
-                    _poolOracleRoutes
+                    _priceAdapterAddress,
+                    _priceAdapterRoute
 
                 )
             );
@@ -85,7 +88,7 @@ contract LenderCommitmentGroupFactory_V3 is OwnableUpgradeable {
 
         //it is not absolutely necessary to have this call here but it allows the user to potentially save a tx step so it is nice to have .
          if (_initialPrincipalAmount > 0) {
-                _depositPrincipal(
+            _depositPrincipal(
                 address(newGroupContract_),
                 _initialPrincipalAmount,
                 _commitmentGroupConfig.principalTokenAddress 

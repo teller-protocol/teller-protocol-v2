@@ -16,33 +16,26 @@ const deployFn: DeployFunction = async (hre) => {
 
 
 
-   hre.log('FixedPointQ96 library deployed at:' )
-  hre.log(FixedPointQ96.address)
+  // need to add a delay , wait here ! 
+   // await tx.wait(1) // wait one block
 
-  // Wait for one block confirmation
-  if (FixedPointQ96.receipt) {
-    await hre.ethers.provider.waitForTransaction(FixedPointQ96.receipt.transactionHash, 1)
-  }
-
-
-
-  // Deploy PriceAdapterAerodrome with linked library
-  const PriceAdapterAerodrome = await hre.deployments.deploy('PriceAdapterAerodrome', {
+ 
+  const PriceAdapterUniswapV2 = await hre.deployments.deploy('PriceAdapterUniswapV2', {
     from: deployer,
     libraries: {
       FixedPointQ96: FixedPointQ96.address,
     },
   })
 
-  hre.log('PriceAdapterAerodrome deployed at:' )
-    hre.log( PriceAdapterAerodrome.address)
+  hre.log('PriceAdapterUniswapV2 deployed at:' )
+    hre.log( PriceAdapterUniswapV2.address)
 
 
 }
 
 // tags and deployment
-deployFn.id = 'price-adapter-aerodrome:deploy'
-deployFn.tags = ['teller-v2', 'price-adapter-aerodrome:deploy']
+deployFn.id = 'price-adapter-uniswap-v2:deploy'
+deployFn.tags = ['teller-v2', 'price-adapter-uniswap-v2:deploy']
 deployFn.dependencies = []
 
 deployFn.skip = async (hre) => {

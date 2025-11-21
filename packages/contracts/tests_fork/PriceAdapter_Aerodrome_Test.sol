@@ -241,6 +241,41 @@ contract PoolsV3_Aerodrome_Fork_Test is Test {
         console.log("Expected ~1e18 (should be close)");
     }
 
+      function test_two_hop_route_twap() public {
+        // Create a two-hop route using the same pool twice (just for testing)
+        PriceAdapterAerodrome.PoolRoute[] memory routes = new PriceAdapterAerodrome.PoolRoute[](2);
+        routes[0] = PriceAdapterAerodrome.PoolRoute({
+            pool: AERODROME_POOL,
+            zeroForOne: true,
+            twapInterval: 5,
+            token0Decimals: token0Decimals,
+            token1Decimals: token1Decimals
+        });
+        routes[1] = PriceAdapterAerodrome.PoolRoute({
+            pool: AERODROME_POOL,
+            zeroForOne: false, // Go back
+            twapInterval: 5,
+            token0Decimals: token0Decimals,
+            token1Decimals: token1Decimals
+        });
+
+        bytes memory encodedRoute = priceAdapter.encodePoolRoutes(routes);
+        bytes32 routeHash = priceAdapter.registerPriceRoute(encodedRoute);
+
+        uint256 priceRatioQ96 = priceAdapter.getPriceRatioQ96(routeHash);
+
+        assertTrue(priceRatioQ96 > 0, "Two-hop price should be greater than 0");
+
+        // This should be close to 2^96 (1.0) since we go there and back
+        uint256 priceQ96Divisor = 2 ** 96;
+        uint256 priceScaled = (priceRatioQ96 * 1e18) / priceQ96Divisor;
+
+        console.log("Two-hop Price Q96:", priceRatioQ96);
+        console.log("Two-hop Price (scaled by 1e18):", priceScaled);
+        console.log("Expected ~1e18 (should be close)");
+    }
+
+
     /**
      * @notice Test that decoding validates route length
      */

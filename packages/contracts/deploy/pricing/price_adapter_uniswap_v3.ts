@@ -16,8 +16,11 @@ const deployFn: DeployFunction = async (hre) => {
 
 
 
-  // need to add a delay , wait here ! 
-   // await tx.wait(1) // wait one block
+
+  // Wait for one block confirmation
+  if (FixedPointQ96.receipt) {
+    await hre.ethers.provider.waitForTransaction(FixedPointQ96.receipt.transactionHash, 1)
+  }
 
 
 

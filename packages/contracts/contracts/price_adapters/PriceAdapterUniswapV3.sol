@@ -59,6 +59,9 @@ contract PriceAdapterUniswapV3 is
 
              PoolRoute[] memory route_array = decodePoolRoutes( route );
 
+
+             require( route_array.length ==1 || route_array.length ==2, "invalid route length" );
+
     		// hash the route with keccak256
             bytes32 poolRouteHash = keccak256(route);
 

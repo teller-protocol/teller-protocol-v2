@@ -14,10 +14,7 @@ const deployFn: DeployFunction = async (hre) => {
   hre.log('FixedPointQ96 library deployed at:' )
   hre.log( FixedPointQ96.address)
 
-
-
-   hre.log('FixedPointQ96 library deployed at:' )
-  hre.log(FixedPointQ96.address)
+ 
 
   // Wait for one block confirmation
   if (FixedPointQ96.receipt) {

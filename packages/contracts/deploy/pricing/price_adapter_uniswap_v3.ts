@@ -16,13 +16,7 @@ const deployFn: DeployFunction = async (hre) => {
 
 
 
-
-  // Wait for one block confirmation
-  if (FixedPointQ96.receipt) {
-    await hre.ethers.provider.waitForTransaction(FixedPointQ96.receipt.transactionHash, 1)
-  }
-
-
+ 
 
   // Deploy PriceAdapterAerodrome with linked library
   const PriceAdapterUniswapV3 = await hre.deployments.deploy('PriceAdapterUniswapV3', {

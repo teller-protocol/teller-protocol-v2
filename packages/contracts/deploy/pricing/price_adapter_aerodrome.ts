@@ -14,13 +14,7 @@ const deployFn: DeployFunction = async (hre) => {
   hre.log('FixedPointQ96 library deployed at:' )
   hre.log( FixedPointQ96.address)
 
- 
-
-  // Wait for one block confirmation
-  if (FixedPointQ96.receipt) {
-    await hre.ethers.provider.waitForTransaction(FixedPointQ96.receipt.transactionHash, 1)
-  }
-
+  
 
 
   // Deploy PriceAdapterAerodrome with linked library

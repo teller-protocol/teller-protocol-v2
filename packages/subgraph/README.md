@@ -34,6 +34,8 @@ yarn build
 ```
  yarn hbs -D ./config/${subgraph.network}.json ./src/subgraph.handlebars -o . -e yaml
  
+  yarn hbs -D ./config/mainnet.json ./src/subgraph.handlebars -o . -e yaml
+
  yarn hbs -D ./config/arbitrum-one.json ./src/subgraph.handlebars -o . -e yaml
  
   yarn hbs -D ./config/base.json ./src/subgraph.handlebars -o . -e yaml
@@ -61,6 +63,8 @@ yarn build
 5. auth 
 
 graph auth 
+
+graph codegen && graph build
 
 
 

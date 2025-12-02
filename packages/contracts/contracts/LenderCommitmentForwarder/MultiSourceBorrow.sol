@@ -47,7 +47,7 @@ contract MultiSourceBorrow
     }
 
 
-    event CommitmentAcceptedWithReward(
+   /*  event CommitmentAcceptedWithReward(
         uint256 indexed bidId,
         address indexed recipient,
         address principalTokenAddress, 
@@ -55,7 +55,7 @@ contract MultiSourceBorrow
         uint256 reward,
         address rewardRecipient,
         uint256 atmId 
-    );
+    ); */ 
 
     
     constructor(
@@ -90,7 +90,18 @@ contract MultiSourceBorrow
 
 
 
+         if poolAddress != address(0) {
 
+
+
+         }
+
+         
+         if stakingContractAddress != address(0) {
+
+
+            
+         }
 
 
 
@@ -158,7 +169,7 @@ contract MultiSourceBorrow
               TransferHelper.safeTransfer(principalTokenAddress,    _recipient,   fundsRemaining - _reward);       
         }
 
-        emit CommitmentAcceptedWithReward( bidId_, _recipient, principalTokenAddress, fundsRemaining, _reward, _rewardRecipient , _atmId);
+      //  emit CommitmentAcceptedWithReward( bidId_, _recipient, principalTokenAddress, fundsRemaining, _reward, _rewardRecipient , _atmId);
   
        
     }

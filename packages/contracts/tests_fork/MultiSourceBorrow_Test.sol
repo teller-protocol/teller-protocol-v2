@@ -69,11 +69,11 @@ contract MultiSourceBorrow_Fork_Test is Test {
         // Accept commitment parameters
         MultiSourceBorrow.AcceptCommitmentArgs memory acceptCommitmentArgs = MultiSourceBorrow.AcceptCommitmentArgs({
             commitmentId: 0,
-            smartCommitmentAddress: address(0), // Use standard LCF in this test
+            smartCommitmentAddress: address(0x78A7b6Ec7a50Afc544374c4760Df285ACE715bfc), 
             principalAmount: 422350,
             collateralAmount: 19893118616829598,
             collateralTokenId: 0,
-            collateralTokenAddress: address(0x5555555555555555555555555555555555555555),
+            collateralTokenAddress: address(0x22aF33FE49fD1Fa80c7149773dDe5890D3c76F3b),
             interestRate: 6319,
             loanDuration: 604800,
             merkleProof: new bytes32[](0)
@@ -81,10 +81,10 @@ contract MultiSourceBorrow_Fork_Test is Test {
 
         // Borrower's wallet address
         address borrower = address(0xbc1d2Ed14128Cd7Af450319b642Fd43d65E495dc);
-        address recipient = address(0xABCD000000000000000000000000000000000001);
+        address recipient = address(0xbc1d2Ed14128Cd7Af450319b642Fd43d65E495dc);
 
         // Get the principal token
-        IERC20 principalToken = IERC20(0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb);
+        IERC20 principalToken = IERC20(0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913);
 
         // Log balance before
         uint256 balanceBefore = principalToken.balanceOf(recipient);

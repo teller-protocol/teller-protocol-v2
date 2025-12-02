@@ -72,101 +72,78 @@ contract MultiSourceBorrow
  
      */
     function acceptCommitmentWithMultiSource(
-        address _commitmentForwarder,  
-        
-        AcceptCommitmentArgs calldata _acceptCommitmentArgs ,
-          
-        address poolAddress, 
+        address _commitmentForwarder,
+        AcceptCommitmentArgs calldata _acceptCommitmentArgs,
+        address poolAddress,
         uint256 poolWithdrawAmount,
-
         address stakingContractAddress,
-        uint256 stakingWithdrawAmount
-
-    ) external  returns (uint256 bidId_) {
-
- 
-         address principalTokenAddress = address(0);
-         uint256 balanceBefore;
+        uint256 stakingWithdrawAmount,
+        address recipient 
+       // address rewardRecipient,
+       // uint256 rewardAmount
+    ) external returns (uint256 bidId_) {
 
 
+        address principalTokenAddress = address(0);
+        uint256 balanceBefore;
 
-         if poolAddress != address(0) {
-
-
-
-         }
-
-         
-         if stakingContractAddress != address(0) {
-
-
-            
-         }
-
-
-
-         // need to transfer the collateral needed INTO this contract 
-
-
-
-         // is that possible ? can the collateral come from NOT the borrower ? 
-
-
-         // ----- 
-
-
-
-    
-      
+        // Get principal token address first
         if (_acceptCommitmentArgs.smartCommitmentAddress != address(0)) {
-                // borrow using the smart commitment forwarder 
-         
-                principalTokenAddress = ISmartCommitment(_acceptCommitmentArgs.smartCommitmentAddress).getPrincipalTokenAddress ();
-        
-            // Accept commitment and receive funds to this contract
-                balanceBefore = IERC20(principalTokenAddress).balanceOf(address(this));
- 
+            principalTokenAddress = ISmartCommitment(_acceptCommitmentArgs.smartCommitmentAddress).getPrincipalTokenAddress();
+        } else {
+            principalTokenAddress = ILenderCommitmentForwarder_U1(_commitmentForwarder)
+                .getCommitmentPrincipalTokenAddress(_acceptCommitmentArgs.commitmentId);
+        }
+
+        // Transfer collateral from borrower into this contract
+        if (_acceptCommitmentArgs.collateralAmount > 0) {
+            TransferHelper.safeTransferFrom(
+                _acceptCommitmentArgs.collateralTokenAddress,
+                msg.sender,
+                address(this),
+                _acceptCommitmentArgs.collateralAmount
+            );
+        }
+
+        // Withdraw from pool if specified
+        if (poolAddress != address(0) && poolWithdrawAmount > 0) {
+            (bool success, ) = poolAddress.call(
+                abi.encodeWithSignature("withdraw(uint256)", poolWithdrawAmount)
+            );
+            require(success, "Pool withdrawal failed");
+        }
+
+        // Withdraw from staking contract if specified
+        if (stakingContractAddress != address(0) && stakingWithdrawAmount > 0) {
+            (bool success, ) = stakingContractAddress.call(
+                abi.encodeWithSignature("withdraw(uint256)", stakingWithdrawAmount)
+            );
+            require(success, "Staking withdrawal failed");
+        }
+
+        balanceBefore = IERC20(principalTokenAddress).balanceOf(address(this));
+
+        // Accept commitment based on type
+        if (_acceptCommitmentArgs.smartCommitmentAddress != address(0)) {
+            // Borrow using the smart commitment forwarder
             bidId_ = _acceptSmartCommitmentWithRecipient(
                 _commitmentForwarder,
                 _acceptCommitmentArgs
-
             );
-
-           
-        }else{  
-
-            //borrow using the LCFa
-
-
-              principalTokenAddress = ILenderCommitmentForwarder_U1(_commitmentForwarder)
-                  .getCommitmentPrincipalTokenAddress (_acceptCommitmentArgs.commitmentId);
-        
-            // Accept commitment and receive funds to this contract
-              balanceBefore = IERC20(principalTokenAddress).balanceOf(address(this));
-  
-
+        } else {
+            // Borrow using the LenderCommitmentForwarder
             bidId_ = _acceptCommitmentWithRecipient(
                 _commitmentForwarder,
                 _acceptCommitmentArgs
-
-            ); 
-
-
-
+            );
         }
-        
-         uint256 balanceAfter = IERC20(principalTokenAddress).balanceOf(address(this));
 
-         uint256 fundsRemaining = balanceAfter - balanceBefore;
-    
-         require(fundsRemaining >= _reward, "Insufficient funds for reward");
+        uint256 balanceAfter = IERC20(principalTokenAddress).balanceOf(address(this));
+        uint256 fundsRemaining = balanceAfter - balanceBefore;
 
-         if (_reward > 0) {
-             TransferHelper.safeTransfer(principalTokenAddress,    _rewardRecipient, _reward);
-         }
-
-         if (fundsRemaining - _reward > 0) {
-              TransferHelper.safeTransfer(principalTokenAddress,    _recipient,   fundsRemaining - _reward);       
+        // Transfer remaining funds to recipient
+        if (fundsRemaining > 0) {
+            TransferHelper.safeTransfer(principalTokenAddress, recipient, fundsRemaining);
         }
 
       //  emit CommitmentAcceptedWithReward( bidId_, _recipient, principalTokenAddress, fundsRemaining, _reward, _rewardRecipient , _atmId);

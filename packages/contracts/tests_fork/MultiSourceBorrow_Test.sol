@@ -7,9 +7,9 @@ import "forge-std/StdJson.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "forge-std/Vm.sol";
 
-
 // Import your actual contracts
 import { TellerV2 } from "../contracts/TellerV2.sol";
+import { MultiSourceBorrow } from "../contracts/LenderCommitmentForwarder/MultiSourceBorrow.sol";
 import { SwapRolloverLoan } from "../contracts/LenderCommitmentForwarder/extensions/rollover/SwapRolloverLoan.sol";
 import { SwapRolloverLoan_G1 } from "../contracts/LenderCommitmentForwarder/extensions/rollover/SwapRolloverLoan_G1.sol";
 import { SwapRolloverLoan_G2 } from "../contracts/LenderCommitmentForwarder/extensions/rollover/SwapRolloverLoan_G2.sol";
@@ -33,17 +33,8 @@ contract MultiSourceBorrow_Fork_Test is Test {
       }
 
       function setUp() public {
-
-
-         multiSourceBorrow = new MultiSourceBorrow( tellerV2Address ) ;
-
-
-         /*  address payable swapRolloverAddr = payable(getDeployedAddress(  "SwapRolloverLoan"));
-          swapRolloverLoan = SwapRolloverLoan(swapRolloverAddr);
-
-          assertTrue(swapRolloverAddr.code.length > 0, "could not connect to swap rollover loan contract ") ;
-
-          */
+          address tellerV2Address = getDeployedAddress("TellerV2");
+          multiSourceBorrow = new MultiSourceBorrow(tellerV2Address);
       }
 
 
@@ -70,75 +61,62 @@ contract MultiSourceBorrow_Fork_Test is Test {
  
  
 
-     function test_MultiSourceBorrow_forked() public   {
-        
-        /* 
-
-
+     function test_MultiSourceBorrow_forked() public {
         // Define test parameters
+        address commitmentForwarderAddress = getDeployedAddress("LenderCommitmentForwarder");
         address smartCommitmentForwarderAddress = getDeployedAddress("SmartCommitmentForwarder");
-        uint256 bidId = 0; // Example loan ID - replace with actual loan ID
-        uint256 borrowerAmount = 4581; // Additional amount borrower adds
-        
-        // Flash swap parameters
-        SwapRolloverLoan_G2.FlashSwapArgs memory flashSwapArgs = SwapRolloverLoan_G2.FlashSwapArgs({
-            token0: address(0x5555555555555555555555555555555555555555),  
-            token1: address(0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb), 
-            fee: 500, //  
-            flashAmount: 422068,  
-            borrowToken1: true // Borrow token0 (DAI)
-        });
-        
+
         // Accept commitment parameters
-        SwapRolloverLoan_G2.AcceptCommitmentArgs memory acceptCommitmentArgs = SwapRolloverLoan_G2.AcceptCommitmentArgs({
+        MultiSourceBorrow.AcceptCommitmentArgs memory acceptCommitmentArgs = MultiSourceBorrow.AcceptCommitmentArgs({
             commitmentId: 0,
-            smartCommitmentAddress: address(0xd1174957123B9645d7E95d5e0b93ebeb729Ff67f),  
+            smartCommitmentAddress: address(0), // Use standard LCF in this test
             principalAmount: 422350,
             collateralAmount: 19893118616829598,
             collateralTokenId: 0,
-            collateralTokenAddress: address(0x5555555555555555555555555555555555555555), 
-            interestRate: 6319, 
+            collateralTokenAddress: address(0x5555555555555555555555555555555555555555),
+            interestRate: 6319,
             loanDuration: 604800,
-            merkleProof: new bytes32[](0) // No merkle proof
+            merkleProof: new bytes32[](0)
         });
-        
-        // Get Andre's wallet address
-        address andresWallet = 0xbc1d2Ed14128Cd7Af450319b642Fd43d65E495dc;
 
-        // Get the principal token (token1)
+        // Borrower's wallet address
+        address borrower = address(0xbc1d2Ed14128Cd7Af450319b642Fd43d65E495dc);
+        address recipient = address(0xABCD000000000000000000000000000000000001);
+
+        // Get the principal token
         IERC20 principalToken = IERC20(0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb);
 
-        // Log balance before rollover
-        uint256 balanceBefore = principalToken.balanceOf(andresWallet);
-        console.log("Principal token balance BEFORE rollover:", balanceBefore);
+        // Log balance before
+        uint256 balanceBefore = principalToken.balanceOf(recipient);
+        console.log("Recipient balance BEFORE acceptCommitment:", balanceBefore);
 
-        vm.prank(andresWallet);  //andres wallet
-        swapRolloverLoan.rolloverLoanWithFlashSwap(
-            smartCommitmentForwarderAddress, 
-            bidId,
-            borrowerAmount,
-            flashSwapArgs,
-            acceptCommitmentArgs 
+        vm.prank(borrower);
+        uint256 bidId = multiSourceBorrow.acceptCommitmentWithMultiSource(
+            commitmentForwarderAddress,
+            acceptCommitmentArgs,
+            address(0), // No pool withdrawal
+            0,
+            address(0), // No staking withdrawal
+            0,
+            recipient
         );
 
-        // Log balance after rollover
-        uint256 balanceAfter = principalToken.balanceOf(andresWallet);
-        console.log("Principal token balance AFTER rollover:", balanceAfter);
+        // Log balance after
+        uint256 balanceAfter = principalToken.balanceOf(recipient);
+        console.log("Recipient balance AFTER acceptCommitment:", balanceAfter);
+        console.log("Bid ID created:", bidId);
 
         // Log the difference
         if (balanceAfter > balanceBefore) {
-            console.log("Principal token GAINED:", balanceAfter - balanceBefore);
+            console.log("Recipient token GAINED:", balanceAfter - balanceBefore);
         } else if (balanceBefore > balanceAfter) {
-            console.log("Principal token SPENT:", balanceBefore - balanceAfter);
+            console.log("Recipient token SPENT:", balanceBefore - balanceAfter);
         } else {
-            console.log("Principal token balance UNCHANGED");
+            console.log("Recipient token balance UNCHANGED");
         }
 
-        // Add assertions to verify the rollover worked
-        // assertTrue(someCondition, "Rollover should succeed");
-
-
-        */ 
+        // Add assertions
+        assertTrue(bidId > 0, "Bid ID should be created");
      }
 
 

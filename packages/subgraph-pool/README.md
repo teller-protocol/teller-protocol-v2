@@ -31,6 +31,8 @@ npm run codegen && npm run build
  
 npm run generate mainnet
 
+npm run generate base 
+
 
 ```
  
@@ -45,7 +47,15 @@ graph auth
 
 6. deploy ! 
 
- graph deploy   teller-pools-mainnet --version-label 0.4.21.4
+ graph deploy   teller-pools-mainnet --version-label 0.4.21.2
+
+ graph deploy   teller-pools-base --version-label 0.4.21.2
+
+ graph deploy   teller-pools-polygon --version-label 0.4.21.2
+
+
+graph deploy   teller-pools-arbitrum --version-label 0.4.21.2
+
 
  graph deploy teller-pools-mainnet --version-label 0.4.21.1
 

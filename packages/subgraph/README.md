@@ -70,9 +70,9 @@ graph codegen && graph build
 
 6. deploy ! 
 
- graph deploy   teller-v-2-base --version-label 0.4.21-22
+ graph deploy   teller-pools-base --version-label 0.4.21.1
 
- graph deploy   tellerv2-arbitrum --version-label 0.4.21-22
+ graph deploy   teller-pools-arbitrum --version-label 0.4.21.1
 
 
  graph deploy   teller-v-2-katana --version-label 0.4.21-22

@@ -86,9 +86,24 @@ contract MultiSourceBorrow_Fork_Test is Test {
         // Get the principal token
         IERC20 principalToken = IERC20(0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913);
 
+
+
+         // Deal collateral tokens to borrower
+          vm.deal(acceptCommitmentArgs.collateralTokenAddress, borrower,
+          acceptCommitmentArgs.collateralAmount);
+
+
+
+
         // Log balance before
         uint256 balanceBefore = principalToken.balanceOf(recipient);
         console.log("Recipient balance BEFORE acceptCommitment:", balanceBefore);
+
+        // Approve collateral token transfer
+        IERC20 collateralToken = IERC20(acceptCommitmentArgs.collateralTokenAddress);
+        vm.prank(borrower);
+        collateralToken.approve(address(multiSourceBorrow), acceptCommitmentArgs.collateralAmount);
+        vm.stopPrank();
 
         vm.prank(borrower);
         uint256 bidId = multiSourceBorrow.acceptCommitmentWithMultiSource(

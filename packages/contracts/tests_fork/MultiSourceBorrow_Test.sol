@@ -88,9 +88,12 @@ contract MultiSourceBorrow_Fork_Test is Test {
 
 
 
-         // Deal collateral tokens to borrower
-          vm.deal(acceptCommitmentArgs.collateralTokenAddress, borrower,
-          acceptCommitmentArgs.collateralAmount);
+         // Deal collateral tokens to borrower  --- this works ! 
+           deal( 
+            address( acceptCommitmentArgs.collateralTokenAddress ),
+            address( borrower ),
+            uint256( acceptCommitmentArgs.collateralAmount ) 
+          );
 
 
 

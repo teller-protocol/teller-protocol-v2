@@ -9,6 +9,7 @@ import "forge-std/Vm.sol";
 
 // Import your actual contracts
 import { TellerV2 } from "../contracts/TellerV2.sol";
+import { TellerV2Context } from "../contracts/TellerV2Context.sol";
 import { MultiSourceBorrow } from "../contracts/LenderCommitmentForwarder/MultiSourceBorrow.sol";
 import { SwapRolloverLoan } from "../contracts/LenderCommitmentForwarder/extensions/rollover/SwapRolloverLoan.sol";
 import { SwapRolloverLoan_G1 } from "../contracts/LenderCommitmentForwarder/extensions/rollover/SwapRolloverLoan_G1.sol";
@@ -65,11 +66,32 @@ contract MultiSourceBorrow_Fork_Test is Test {
         // Define test parameters
         address commitmentForwarderAddress = getDeployedAddress("LenderCommitmentForwarder");
         address smartCommitmentForwarderAddress = getDeployedAddress("SmartCommitmentForwarder");
+        address hypernativeOracle = getDeployedAddress("HypernativeOracle");
+
+        // Mock the Hypernative oracle to allow our newly deployed MultiSourceBorrow contract
+        // isTimeExceeded should return true (time has passed since registration)
+        vm.mockCall(
+            hypernativeOracle,
+            abi.encodeWithSignature("isTimeExceeded(address)", address(multiSourceBorrow)),
+            abi.encode(true)
+        );
+
+        // Borrower's wallet address
+        address borrower = address(0xbc1d2Ed14128Cd7Af450319b642Fd43d65E495dc);
+        address recipient = address(0xbc1d2Ed14128Cd7Af450319b642Fd43d65E495dc);
+
+        // Borrower needs to approve the SmartCommitmentForwarder as a market forwarder
+        address tellerV2Address = getDeployedAddress("TellerV2");
+        uint256 marketId = 13; // From the trace
+
+        vm.prank(borrower);
+        TellerV2Context(tellerV2Address).approveMarketForwarder(marketId, smartCommitmentForwarderAddress);
+        vm.stopPrank();
 
         // Accept commitment parameters
         MultiSourceBorrow.AcceptCommitmentArgs memory acceptCommitmentArgs = MultiSourceBorrow.AcceptCommitmentArgs({
             commitmentId: 0,
-            smartCommitmentAddress: address(0x78A7b6Ec7a50Afc544374c4760Df285ACE715bfc), 
+            smartCommitmentAddress: address(0x78A7b6Ec7a50Afc544374c4760Df285ACE715bfc),
             principalAmount: 422350,
             collateralAmount: 19893118616829598,
             collateralTokenId: 0,
@@ -78,10 +100,6 @@ contract MultiSourceBorrow_Fork_Test is Test {
             loanDuration: 604800,
             merkleProof: new bytes32[](0)
         });
-
-        // Borrower's wallet address
-        address borrower = address(0xbc1d2Ed14128Cd7Af450319b642Fd43d65E495dc);
-        address recipient = address(0xbc1d2Ed14128Cd7Af450319b642Fd43d65E495dc);
 
         // Get the principal token
         IERC20 principalToken = IERC20(0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913);

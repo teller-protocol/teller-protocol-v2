@@ -95,6 +95,11 @@ contract MultiSourceBorrow
                 .getCommitmentPrincipalTokenAddress(_acceptCommitmentArgs.commitmentId);
         }
 
+
+
+
+        // The collateral all needs to go in to the borrowers wallet -- ? 
+
         // Transfer collateral from borrower into this contract
         if (_acceptCommitmentArgs.collateralAmount > 0) {
             TransferHelper.safeTransferFrom(
@@ -120,6 +125,13 @@ contract MultiSourceBorrow
             );
             require(success, "Staking withdrawal failed");
         }
+
+
+
+
+
+
+
 
         balanceBefore = IERC20(principalTokenAddress).balanceOf(address(this));
 

@@ -11,6 +11,7 @@ import "forge-std/Vm.sol";
 import { TellerV2 } from "../contracts/TellerV2.sol";
 import { TellerV2Context } from "../contracts/TellerV2Context.sol";
 import { MultiSourceBorrow } from "../contracts/LenderCommitmentForwarder/MultiSourceBorrow.sol";
+import { SmartCommitmentForwarder } from "../contracts/LenderCommitmentForwarder/SmartCommitmentForwarder.sol";
 import { SwapRolloverLoan } from "../contracts/LenderCommitmentForwarder/extensions/rollover/SwapRolloverLoan.sol";
 import { SwapRolloverLoan_G1 } from "../contracts/LenderCommitmentForwarder/extensions/rollover/SwapRolloverLoan_G1.sol";
 import { SwapRolloverLoan_G2 } from "../contracts/LenderCommitmentForwarder/extensions/rollover/SwapRolloverLoan_G2.sol";
@@ -84,8 +85,15 @@ contract MultiSourceBorrow_Fork_Test is Test {
         address tellerV2Address = getDeployedAddress("TellerV2");
         uint256 marketId = 13; // From the trace
 
-        vm.prank(borrower);
+        vm.startPrank(borrower);
+
+        // Approve SmartCommitmentForwarder as a market forwarder on TellerV2
         TellerV2Context(tellerV2Address).approveMarketForwarder(marketId, smartCommitmentForwarderAddress);
+
+        // Approve MultiSourceBorrow as an extension on SmartCommitmentForwarder
+        // This allows SmartCommitmentForwarder to extract borrower address from calldata
+        SmartCommitmentForwarder(smartCommitmentForwarderAddress).addExtension(address(multiSourceBorrow));
+
         vm.stopPrank();
 
         // Accept commitment parameters

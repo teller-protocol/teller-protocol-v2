@@ -110,7 +110,7 @@ contract MultiSourceBorrow
             );
         }
 
-        // Withdraw from pool if specified
+        // Withdraw from pool if specified (need to be approved)
         if (poolAddress != address(0) && poolWithdrawAmount > 0) {
             (bool success, ) = poolAddress.call(
                 abi.encodeWithSignature("withdraw(uint256)", poolWithdrawAmount)
@@ -118,7 +118,7 @@ contract MultiSourceBorrow
             require(success, "Pool withdrawal failed");
         }
 
-        // Withdraw from staking contract if specified
+        // Withdraw from staking contract if specified (need to be approved) 
         if (stakingContractAddress != address(0) && stakingWithdrawAmount > 0) {
             (bool success, ) = stakingContractAddress.call(
                 abi.encodeWithSignature("withdraw(uint256)", stakingWithdrawAmount)
@@ -126,6 +126,15 @@ contract MultiSourceBorrow
             require(success, "Staking withdrawal failed");
         }
 
+
+
+        //transfer all of the collateral to the borrower 
+
+         TransferHelper.safeTransfer (
+                _acceptCommitmentArgs.collateralTokenAddress,
+                msg.sender, 
+                _acceptCommitmentArgs.collateralAmount + poolWithdrawAmount  + stakingWithdrawAmount 
+            );
 
 
 

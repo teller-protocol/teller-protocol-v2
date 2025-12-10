@@ -110,7 +110,7 @@ contract MultiSourceBorrow_Fork_Test is Test {
 
         vm.prank(borrower);
         uint256 bidId = multiSourceBorrow.acceptCommitmentWithMultiSource(
-            commitmentForwarderAddress,
+            smartCommitmentForwarderAddress,
             acceptCommitmentArgs,
             address(0), // No pool withdrawal
             0,

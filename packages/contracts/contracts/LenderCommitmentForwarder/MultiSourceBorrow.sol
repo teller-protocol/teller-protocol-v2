@@ -61,7 +61,7 @@ contract MultiSourceBorrow
     function acceptCommitmentWithMultiSource(
         address _commitmentForwarder,
         AcceptCommitmentArgs calldata _acceptCommitmentArgs,
-        address poolAddress,
+        address poolAddress, //works with teller PoolV2 
         uint256 poolWithdrawAmount,
         address stakingContractAddress,
         uint256 stakingWithdrawAmount,
@@ -98,7 +98,12 @@ contract MultiSourceBorrow
         // Withdraw from pool if specified (need to be approved)
         if (poolAddress != address(0) && poolWithdrawAmount > 0) {
             (bool success, ) = poolAddress.call(
-                abi.encodeWithSignature("withdraw(uint256)", poolWithdrawAmount)
+                abi.encodeWithSignature(
+                    "withdraw(uint256,address,address)",
+                    poolWithdrawAmount,
+                    address(this),  // receiver - MultiSourceBorrow receives the collateral
+                    msg.sender      // owner - the user who owns the pool shares
+                )
             );
             require(success, "Pool withdrawal failed");
         }

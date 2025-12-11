@@ -1,20 +1,27 @@
 import { DeployFunction } from 'hardhat-deploy/dist/types'
 
 const deployFn: DeployFunction = async (hre) => {
-  const { deployer } = await hre.getNamedAccounts()
+  const deployer = await hre.getNamedSigner('deployer')
 
   const tellerV2 = await hre.contracts.get('TellerV2')
 
-  const multiSourceBorrow = await hre.deploy('MultiSourceBorrow', {
-    from: deployer,
-    args: [
-      await tellerV2.getAddress(),
-    ],
-    log: true,
-    skipIfAlreadyDeployed: true,
-  })
+  hre.log('Deploying MultiSourceBorrow...')
+  hre.log('Network name:')
+  hre.log(hre.network.name)
 
-  console.log('MultiSourceBorrow deployed at:', multiSourceBorrow.address)
+  hre.log('Deployer:')
+  hre.log(deployer.address)
+
+  hre.log('TellerV2 address:')
+  let tellerV2Address = await tellerV2.getAddress()
+  hre.log(tellerV2Address)
+
+  const multiSourceBorrow = await hre.deployProxy('MultiSourceBorrow', {
+    initializer: 'initialize',
+    constructorArgs: [],
+  }, [tellerV2Address])
+
+  hre.log('MultiSourceBorrow deployed at:', await multiSourceBorrow.getAddress())
 
   return true
 }

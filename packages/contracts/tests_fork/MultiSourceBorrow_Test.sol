@@ -51,7 +51,8 @@ contract MultiSourceBorrow_Fork_Test is Test {
 
       function setUp() public {
           address tellerV2Address = getDeployedAddress("TellerV2");
-          multiSourceBorrow = new MultiSourceBorrow(tellerV2Address);
+          multiSourceBorrow = new MultiSourceBorrow();
+          multiSourceBorrow.initialize(tellerV2Address);
       }
 
 

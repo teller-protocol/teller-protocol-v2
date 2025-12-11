@@ -16,10 +16,16 @@ const deployFn: DeployFunction = async (hre) => {
   let tellerV2Address = await tellerV2.getAddress()
   hre.log(tellerV2Address)
 
+ 
   const multiSourceBorrow = await hre.deployProxy('MultiSourceBorrow', {
-    initializer: 'initialize',
-    constructorArgs: [],
-  }, [tellerV2Address])
+    unsafeAllow: ['constructor', 'state-variable-immutable'],
+    constructorArgs: [
+      tellerV2Address,
+      
+    ],
+  })
+
+
 
   hre.log('MultiSourceBorrow deployed at:', await multiSourceBorrow.getAddress())
 

@@ -5,34 +5,38 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 // Interfaces
 import "../interfaces/ITellerV2.sol";
 import "../interfaces/IProtocolFee.sol";
 import "../interfaces/ITellerV2Storage.sol";
-import "../interfaces/IMarketRegistry.sol";
+import "../interfaces/IMarketRegistry.sol"; 
 import "../interfaces/ISmartCommitment.sol";
 import "../interfaces/ISmartCommitmentForwarder.sol";
 import "../interfaces/IFlashRolloverLoan_G4.sol";
 import "../libraries/NumbersLib.sol";
 
 import { ILenderCommitmentForwarder } from "../interfaces/ILenderCommitmentForwarder.sol";
-
+ 
 import { ILenderCommitmentForwarder_U1 } from "../interfaces/ILenderCommitmentForwarder_U1.sol";
 
 import '../libraries/uniswap/periphery/libraries/TransferHelper.sol';
 
 
-contract MultiSourceBorrow is Initializable {
+contract MultiSourceBorrow 
+  {
     using AddressUpgradeable for address;
     using NumbersLib for uint256;
 
-    ITellerV2 public TELLER_V2;
+    /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
+    ITellerV2 public immutable TELLER_V2;
+    /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
+  
+    
 
-    struct AcceptCommitmentArgs {
+      struct AcceptCommitmentArgs {
         uint256 commitmentId;
-        address smartCommitmentAddress;  //if this is not address(0), we will use this ! leave empty if not used.
+        address smartCommitmentAddress;  //if this is not address(0), we will use this ! leave empty if not used. 
         uint256 principalAmount;
         uint256 collateralAmount;
         uint256 collateralTokenId;
@@ -41,18 +45,11 @@ contract MultiSourceBorrow is Initializable {
         uint32 loanDuration;
         bytes32[] merkleProof; //empty array if not used
     }
-
-    /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor() {
-        _disableInitializers();
-    }
-
-    /**
-     * @notice Initializes the MultiSourceBorrow contract
-     * @param _tellerV2 Address of the TellerV2 contract
-     */
-    function initialize(address _tellerV2) external initializer {
-        require(_tellerV2 != address(0), "TellerV2 address cannot be zero");
+ 
+    
+    constructor(
+        address _tellerV2      
+    ) {
         TELLER_V2 = ITellerV2(_tellerV2);
     }
 

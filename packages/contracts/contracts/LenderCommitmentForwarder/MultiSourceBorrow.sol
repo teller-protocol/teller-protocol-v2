@@ -45,25 +45,12 @@ contract MultiSourceBorrow
         uint32 loanDuration;
         bytes32[] merkleProof; //empty array if not used
     }
-
-
-   /*  event CommitmentAcceptedWithReward(
-        uint256 indexed bidId,
-        address indexed recipient,
-        address principalTokenAddress, 
-        uint256 fundsRemaining,
-        uint256 reward,
-        address rewardRecipient,
-        uint256 atmId 
-    ); */ 
-
+ 
     
     constructor(
-        address _tellerV2 
-     
+        address _tellerV2      
     ) {
         TELLER_V2 = ITellerV2(_tellerV2);
-        
     }
 
      
@@ -79,8 +66,7 @@ contract MultiSourceBorrow
         address stakingContractAddress,
         uint256 stakingWithdrawAmount,
         address recipient 
-       // address rewardRecipient,
-       // uint256 rewardAmount
+      
     ) external returns (uint256 bidId_) {
 
 
@@ -98,8 +84,7 @@ contract MultiSourceBorrow
 
 
 
-        // The collateral all needs to go in to the borrowers wallet -- ? 
-
+        // The collateral all needs to go in to the borrowers wallet 
         // Transfer collateral from borrower into this contract
         if (_acceptCommitmentArgs.collateralAmount > 0) {
             TransferHelper.safeTransferFrom(
@@ -128,17 +113,12 @@ contract MultiSourceBorrow
 
 
 
-        //transfer all of the collateral to the borrower 
-
+        //transfer all of the collateral to the borrower before the loan is accepted on their behalf 
          TransferHelper.safeTransfer (
                 _acceptCommitmentArgs.collateralTokenAddress,
                 msg.sender, 
                 _acceptCommitmentArgs.collateralAmount + poolWithdrawAmount  + stakingWithdrawAmount 
             );
-
-
-
-
 
 
 

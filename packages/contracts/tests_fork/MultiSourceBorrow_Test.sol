@@ -18,6 +18,21 @@ import { SwapRolloverLoan_G2 } from "../contracts/LenderCommitmentForwarder/exte
 
 import {  MockSwapRolloverLoan } from "../contracts/mock/SwapRolloverLoanMock.sol";
 
+
+
+
+/*
+
+
+    ├─ [0] console::log("Required collateral:", 216805353265663 [2.168e14]) [staticcall]
+    │   └─ ← [Revert] unknown selector `0x9710a9d0` for ConsoleCalls
+    ├─ [0] console::log("Provided collateral:", 200000000000000000000 [2e20]) [staticcall]
+    │   └─ ← [Revert] unknown selector `0x9710a9d0` for ConsoleCalls
+    ├─ [0] VM::prank(0xbc1d2Ed14128Cd7Af450319b642Fd43d65E495dc)
+
+
+*/
+
 contract MultiSourceBorrow_Fork_Test is Test {
 
     string constant NETWORK_NAME = "base";
@@ -103,7 +118,7 @@ contract MultiSourceBorrow_Fork_Test is Test {
             commitmentId: 0,
             smartCommitmentAddress: address(0x1191354f5796C03F194CA94f6d6736176fCFAC89),  // pool address
             principalAmount: 42,
-            collateralAmount: 200000000000000000000,  // Increased to ~200e18 to account for pricing bug
+            collateralAmount: 216805353265663,   
             collateralTokenId: 0,
             collateralTokenAddress: address(0x940181a94A35A4569E4529A3CDfB74e38FD98631),
             interestRate: 6319,

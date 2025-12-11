@@ -101,11 +101,11 @@ contract MultiSourceBorrow_Fork_Test is Test {
         // Accept commitment parameters
         MultiSourceBorrow.AcceptCommitmentArgs memory acceptCommitmentArgs = MultiSourceBorrow.AcceptCommitmentArgs({
             commitmentId: 0,
-            smartCommitmentAddress: address(0x78A7b6Ec7a50Afc544374c4760Df285ACE715bfc),
+            smartCommitmentAddress: address(0x1191354f5796C03F194CA94f6d6736176fCFAC89),  // pool address
             principalAmount: 42,
             collateralAmount: 200000000000000000000,  // Increased to ~200e18 to account for pricing bug
             collateralTokenId: 0,
-            collateralTokenAddress: address(0x22aF33FE49fD1Fa80c7149773dDe5890D3c76F3b),
+            collateralTokenAddress: address(0x940181a94A35A4569E4529A3CDfB74e38FD98631),
             interestRate: 6319,
             loanDuration: 604800,
             merkleProof: new bytes32[](0)

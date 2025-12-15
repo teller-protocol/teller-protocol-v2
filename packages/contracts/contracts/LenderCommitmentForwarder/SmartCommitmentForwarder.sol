@@ -96,6 +96,8 @@ contract SmartCommitmentForwarder is
     function initialize() public initializer {       
         __Pausable_init();
         __Ownable_init_unchained();
+
+        __initExtensionsModule( _tellerV2 ); 
     }
  
 

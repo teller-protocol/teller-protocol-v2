@@ -139,7 +139,7 @@ abstract contract TellerV2Storage_G1 is TellerV2Storage_G0 {
 }
 
 abstract contract TellerV2Storage_G2 is TellerV2Storage_G1 {
-    address public lenderCommitmentForwarder;
+    address public lenderCommitmentForwarder; // deprecated 
 }
 
 abstract contract TellerV2Storage_G3 is TellerV2Storage_G2 {

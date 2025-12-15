@@ -45,8 +45,7 @@ abstract contract TellerV2Context is
         address _trustedMarketForwarder
     ) public view returns (bool) {
         return
-            _trustedMarketForwarders[_marketId] == _trustedMarketForwarder ||
-            lenderCommitmentForwarder == _trustedMarketForwarder;
+            _trustedMarketForwarders[_marketId] == _trustedMarketForwarder  ;
     }
 
     /**
@@ -62,7 +61,7 @@ abstract contract TellerV2Context is
         address _account
     ) public view returns (bool) {
         return
-            isTrustedMarketForwarder(_marketId, _forwarder) &&
+            isTrustedMarketForwarder(_marketId, _forwarder) ||
             _approvedForwarderSenders[_forwarder].contains(_account);
     }
 

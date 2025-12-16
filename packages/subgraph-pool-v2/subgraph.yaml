@@ -9,11 +9,11 @@ features:
 dataSources:
   - kind: ethereum/contract
     name: Factory
-    network: hyperevm
+    network: matic
     source:
       abi: Factory
-      address: "0x5360af9B95701504F783d8654bA02B0AF5155f64"
-      startBlock: 13051385
+      address: "0xA7faf9435810fB571f61e1e116b3F18DE0B3583A"
+      startBlock: 73129776
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -29,11 +29,11 @@ dataSources:
           handler: handleLenderGroupDeployed
   - kind: ethereum/contract
     name: CollateralManager
-    network: hyperevm
+    network: matic
     source:
       abi: CollateralManager
-      address: "0x9D55Cf23D26a8C17670bb8Ee25D58481ff7aD295"
-      startBlock: 13051385
+      address: "0x76888a882a4fF57455B5e74B791DD19DF3ba51Bb"
+      startBlock: 73129776
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -51,7 +51,7 @@ dataSources:
 templates:
   - kind: ethereum/contract
     name: Pool
-    network: hyperevm
+    network: matic
     source:
       abi: Pool
     mapping:

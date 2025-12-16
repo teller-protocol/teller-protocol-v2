@@ -45,7 +45,7 @@ graph auth
 
 6. deploy ! 
 
- graph deploy   teller-pools-mainnet --version-label 0.4.21-6
+ graph deploy   teller-pools-mainnet --version-label 0.4.21.2
  
 
  

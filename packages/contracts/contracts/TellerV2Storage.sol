@@ -171,4 +171,8 @@ abstract contract TellerV2Storage_G8 is TellerV2Storage_G7 {
     address  protocolFeeRecipient;  
 }
 
-abstract contract TellerV2Storage is TellerV2Storage_G8 {}
+abstract contract TellerV2Storage_G9 is TellerV2Storage_G8 {
+     mapping(address => bool) public _protocolTrustedForwarders;}
+
+
+abstract contract TellerV2Storage is TellerV2Storage_G9 {}

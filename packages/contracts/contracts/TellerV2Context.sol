@@ -3,13 +3,20 @@ pragma solidity >=0.8.0 <0.9.0;
 
 import "./TellerV2Storage.sol";
 import "./ERC2771ContextUpgradeable.sol";
+ 
+import "./interfaces/IOwnable.sol";
+ 
+
+
 
 /**
  * @dev This contract should not use any storage
+ * 
+ * @dev for OnlyProtocolOwner to work, the wrapping contract must implement owner() [ OZ Ownable ]
  */
 
 abstract contract TellerV2Context is
-    ERC2771ContextUpgradeable,
+    ERC2771ContextUpgradeable, 
     TellerV2Storage
 {
     using EnumerableSet for EnumerableSet.AddressSet;
@@ -19,6 +26,14 @@ abstract contract TellerV2Context is
         address forwarder,
         address sender
     );
+
+     event ProtocolTrustedForwarderSet(
+        
+        address forwarder,
+        address sender,
+        bool trusted 
+    );
+
     event MarketForwarderApproved(
         uint256 indexed marketId,
         address indexed forwarder,
@@ -34,6 +49,22 @@ abstract contract TellerV2Context is
         ERC2771ContextUpgradeable(trustedForwarder)
     {}
 
+
+
+    modifier onlyProtocolOwner() { 
+        require(  _owner() == _msgSender()  , "Sender not authorized");
+        _;
+    }   
+
+
+    function _owner() internal returns (address) {
+
+        return IOwnable( address(this) ) .owner()  ;
+    }
+
+
+
+
     /**
      * @notice Checks if an address is a trusted forwarder contract for a given market.
      * @param _marketId An ID for a lending market.
@@ -48,6 +79,16 @@ abstract contract TellerV2Context is
             _trustedMarketForwarders[_marketId] == _trustedMarketForwarder  ;
     }
 
+
+    function _isProtocolTrustedForwarder( 
+        address _forwarder
+    ) public view returns (bool) {
+        return
+            _protocolTrustedForwarders[_forwarder] == true  ;
+    }
+
+
+
     /**
      * @notice Checks if an account has approved a forwarder for a market.
      * @param _marketId An ID for a lending market.
@@ -61,9 +102,22 @@ abstract contract TellerV2Context is
         address _account
     ) public view returns (bool) {
         return
-            isTrustedMarketForwarder(_marketId, _forwarder) ||
-            _approvedForwarderSenders[_forwarder].contains(_account);
+           ( isTrustedMarketForwarder(_marketId, _forwarder) &&
+            _approvedForwarderSenders[_forwarder].contains(_account) )
+
+           ||  _isProtocolTrustedForwarder( _forwarder )
+            ;   
     }
+
+    function setProtocolTrustedForwarder( address _forwarder, bool _trusted)
+        external onlyProtocolOwner
+    {
+         
+        _protocolTrustedForwarders[_forwarder] = _trusted;
+        emit ProtocolTrustedForwarderSet(  _forwarder, _msgSender(), _trusted);
+    }
+
+ 
 
     /**
      * @notice Sets a trusted forwarder for a lending market.
@@ -160,4 +214,10 @@ abstract contract TellerV2Context is
             return _msgData();
         }
     }
+
+
+
+    
+
+    
 }

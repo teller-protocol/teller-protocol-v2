@@ -2,7 +2,7 @@ pragma solidity >=0.8.0 <0.9.0;
 // SPDX-License-Identifier: MIT
 
 
-import "forge-std/console.sol";
+// import "forge-std/console.sol";
  
 
 import {IUniswapPricingLibrary} from "../interfaces/IUniswapPricingLibrary.sol";
@@ -51,10 +51,6 @@ contract UniswapPricingHelper
                 poolRoutes[1]
             );
 
-
-            console.log("ratio");
-            console.logUint(pool0PriceRatio);
-            console.logUint(pool1PriceRatio);
 
             return
                 FullMath.mulDiv(

@@ -80,7 +80,7 @@ abstract contract TellerV2Context is
     }
 
 
-    function _isProtocolTrustedForwarder( 
+    function isProtocolTrustedForwarder( 
         address _forwarder
     ) public view returns (bool) {
         return
@@ -105,8 +105,8 @@ abstract contract TellerV2Context is
            ( isTrustedMarketForwarder(_marketId, _forwarder) &&
             _approvedForwarderSenders[_forwarder].contains(_account) )
 
-           ||  _isProtocolTrustedForwarder( _forwarder )
-            ;   
+           ||  isProtocolTrustedForwarder( _forwarder )
+            ;
     }
 
     function setProtocolTrustedForwarder( address _forwarder, bool _trusted)

@@ -11,7 +11,10 @@ contract ExtensionsContextMock is ExtensionsContextUpgradeable {
 
     constructor(address _tellerV2) {
         mockTellerV2 = _tellerV2;
-        __initExtensionsModule(_tellerV2);
+    }
+
+    function _getTellerV2() internal view override returns (address) {
+        return mockTellerV2;
     }
 }
 

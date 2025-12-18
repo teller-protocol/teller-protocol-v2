@@ -15,6 +15,15 @@ contract LenderCommitmentForwarder_G3 is
         LenderCommitmentForwarder_G2(_tellerV2, _marketRegistry)
     {}
 
+    /**
+     * @notice Returns the TellerV2 address for protocol owner checks.
+     * @dev Implements the abstract function from ExtensionsContextUpgradeable.
+     * @dev Uses the immutable _tellerV2 from TellerV2MarketForwarder_G2 parent contract.
+     */
+    function _getTellerV2() internal view override returns (address) {
+        return _tellerV2;
+    }
+
     function _msgSender()
         internal
         view

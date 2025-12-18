@@ -96,18 +96,25 @@ contract SmartCommitmentForwarder is
     function initialize() public initializer {
         __Pausable_init();
         __Ownable_init_unchained();
-
-        __initExtensionsModule( _tellerV2 );
     }
 
     /**
      * @notice Reinitializer function to upgrade the extensions module context.
      * @dev This can be called during an upgrade to reinitialize the ExtensionsContextUpgradeable module.
+     * @dev No longer needed since _getTellerV2() uses the immutable _tellerV2 from parent contract.
      */
     function reinitialize() public reinitializer(2) {
-        __initExtensionsModule( _tellerV2 );
+        // No initialization needed - _getTellerV2() uses immutable _tellerV2
     }
- 
+
+    /**
+     * @notice Returns the TellerV2 address for protocol owner checks.
+     * @dev Implements the abstract function from ExtensionsContextUpgradeable.
+     * @dev Uses the immutable _tellerV2 from TellerV2MarketForwarder_G2 parent contract.
+     */
+    function _getTellerV2() internal view override returns (address) {
+        return _tellerV2;
+    }
 
     function setLiquidationProtocolFeePercent(uint256 _percent) 
     public onlyProtocolOwner { 

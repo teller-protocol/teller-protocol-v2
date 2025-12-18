@@ -183,6 +183,15 @@ contract LenderCommitmentForwarder_U1 is
     }
 
     /**
+     * @notice Returns the TellerV2 address for protocol owner checks.
+     * @dev Implements the abstract function from ExtensionsContextUpgradeable.
+     * @dev Uses the immutable _tellerV2 from TellerV2MarketForwarder_G2 parent contract.
+     */
+    function _getTellerV2() internal view override returns (address) {
+        return _tellerV2;
+    }
+
+    /**
      * @notice Creates a loan commitment from a lender for a market.
      * @param _commitment The new commitment data expressed as a struct
      * @param _borrowerAddressList The array of borrowers that are allowed to accept loans using this commitment

@@ -12,10 +12,8 @@ abstract contract ExtensionsContextUpgradeable is IExtensionsContext {
 
     // Mapping from owner to operator approvals
     mapping(address => mapping(address => bool)) private userExtensions;
-  
-    mapping(address => bool) private globalExtensions;
 
-    address private _TellerV2; 
+    mapping(address => bool) private globalExtensions;
 
 
 
@@ -25,20 +23,15 @@ abstract contract ExtensionsContextUpgradeable is IExtensionsContext {
     event GlobalExtensionAdded(address extension, address sender);
     event GlobalExtensionRevoked(address extension, address sender);
 
+    /**
+     * @notice Returns the TellerV2 address used for protocol owner checks.
+     * @dev Must be implemented by inheriting contracts.
+     */
+    function _getTellerV2() internal view virtual returns (address);
 
-
-    modifier onlyExtensionsProtocolOwner() { 
-        require( Ownable( _TellerV2 ).owner() == _msgSender()  , "Sender not authorized");
+    modifier onlyExtensionsProtocolOwner() {
+        require( Ownable( _getTellerV2() ).owner() == _msgSender()  , "Sender not authorized");
         _;
-    }
-
-
-
-    function __initExtensionsModule(address tellerV2 )
-        internal
-        
-    {
-        _TellerV2 = tellerV2;
     }
 
 
@@ -105,5 +98,5 @@ abstract contract ExtensionsContextUpgradeable is IExtensionsContext {
      * variables without shifting down storage in the inheritance chain.
      * See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps
      */
-    uint256[47] private __gap;
+    uint256[48] private __gap;
 }

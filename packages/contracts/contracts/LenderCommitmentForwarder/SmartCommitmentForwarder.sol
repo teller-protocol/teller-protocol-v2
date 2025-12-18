@@ -93,11 +93,19 @@ contract SmartCommitmentForwarder is
         TellerV2MarketForwarder_G3(_protocolAddress, _marketRegistry)
     {  }
 
-    function initialize() public initializer {       
+    function initialize() public initializer {
         __Pausable_init();
         __Ownable_init_unchained();
 
-        __initExtensionsModule( _tellerV2 ); 
+        __initExtensionsModule( _tellerV2 );
+    }
+
+    /**
+     * @notice Reinitializer function to upgrade the extensions module context.
+     * @dev This can be called during an upgrade to reinitialize the ExtensionsContextUpgradeable module.
+     */
+    function reinitialize() public reinitializer(2) {
+        __initExtensionsModule( _tellerV2 );
     }
  
 

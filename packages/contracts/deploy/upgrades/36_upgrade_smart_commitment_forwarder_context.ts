@@ -35,7 +35,7 @@ const deployFn: DeployFunction = async (hre) => {
             await tellerV2.getAddress(),
             await marketRegistry.getAddress(),
           ],
-           initializer : "initialize"   //will this run on the new upgrade ? 
+          call: { fn: 'reinitialize', args: [] }
         },
       },
     ],

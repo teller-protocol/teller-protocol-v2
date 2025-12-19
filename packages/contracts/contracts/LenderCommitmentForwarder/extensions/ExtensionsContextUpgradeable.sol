@@ -5,22 +5,46 @@ import "../../interfaces/IExtensionsContext.sol";
 import "@openzeppelin/contracts-upgradeable/metatx/ERC2771ContextUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/structs/EnumerableSetUpgradeable.sol";
 
+import "@openzeppelin/contracts/access/Ownable.sol";
+
 abstract contract ExtensionsContextUpgradeable is IExtensionsContext {
     using EnumerableSetUpgradeable for EnumerableSetUpgradeable.AddressSet;
 
     // Mapping from owner to operator approvals
     mapping(address => mapping(address => bool)) private userExtensions;
 
+    mapping(address => bool) private globalExtensions;
+
+
+
     event ExtensionAdded(address extension, address sender);
     event ExtensionRevoked(address extension, address sender);
+
+    event GlobalExtensionAdded(address extension, address sender);
+    event GlobalExtensionRevoked(address extension, address sender);
+
+    /**
+     * @notice Returns the TellerV2 address used for protocol owner checks.
+     * @dev Must be implemented by inheriting contracts.
+     */
+    function _getTellerV2() internal view virtual returns (address);
+
+    modifier onlyExtensionsProtocolOwner() {
+        require( Ownable( _getTellerV2() ).owner() == _msgSender()  , "Sender not authorized");
+        _;
+    }
+
+
 
     function hasExtension(address account, address extension)
         public
         view
         returns (bool)
     {
-        return userExtensions[account][extension];
+        return userExtensions[account][extension] || globalExtensions[extension] ;
     }
+
+    // -----
 
     function addExtension(address extension) external {
         require(
@@ -36,6 +60,22 @@ abstract contract ExtensionsContextUpgradeable is IExtensionsContext {
         userExtensions[_msgSender()][extension] = false;
         emit ExtensionRevoked(extension, _msgSender());
     }
+
+
+    // ------
+
+    function addGlobalExtension(address extension) external onlyExtensionsProtocolOwner {
+        
+        globalExtensions [extension] = true;
+        emit GlobalExtensionAdded(extension, _msgSender());
+    }
+
+    function revokeGlobalExtension(address extension) external onlyExtensionsProtocolOwner {
+        globalExtensions[extension] = false;
+        emit GlobalExtensionRevoked(extension, _msgSender());
+    }
+
+    // ------
 
     function _msgSender() internal view virtual returns (address sender) {
         address sender;
@@ -58,5 +98,5 @@ abstract contract ExtensionsContextUpgradeable is IExtensionsContext {
      * variables without shifting down storage in the inheritance chain.
      * See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps
      */
-    uint256[49] private __gap;
+    uint256[48] private __gap;
 }

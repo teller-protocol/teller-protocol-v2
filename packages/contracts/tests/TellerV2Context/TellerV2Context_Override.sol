@@ -9,11 +9,14 @@ import { IMarketRegistry } from "../../contracts/interfaces/IMarketRegistry.sol"
 contract TellerV2Context_Override is TellerV2Context {
     using EnumerableSet for EnumerableSet.AddressSet;
 
+    address private _mockOwner;
+
     constructor(address _marketRegistry, address _lenderCommitmentForwarder)
         TellerV2Context(address(0))
     {
         marketRegistry = IMarketRegistry(_marketRegistry);
         lenderCommitmentForwarder = _lenderCommitmentForwarder;
+        _mockOwner = msg.sender; // Set deployer as default owner
     }
 
     function mock_setTrustedMarketForwarder(
@@ -30,6 +33,21 @@ contract TellerV2Context_Override is TellerV2Context {
         bool _approved
     ) public {
         _approvedForwarderSenders[_forwarder].add(_account);
+    }
+
+    function mock_setProtocolTrustedForwarder(
+        address _forwarder,
+        bool _trusted
+    ) public {
+        _protocolTrustedForwarders[_forwarder] = _trusted;
+    }
+
+    function mock_setOwner(address _newOwner) public {
+        _mockOwner = _newOwner;
+    }
+
+    function owner() public view returns (address) {
+        return _mockOwner;
     }
 
     function external__msgSenderForMarket(uint256 _marketId)

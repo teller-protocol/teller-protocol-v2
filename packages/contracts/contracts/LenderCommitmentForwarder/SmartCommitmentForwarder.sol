@@ -93,11 +93,19 @@ contract SmartCommitmentForwarder is
         TellerV2MarketForwarder_G3(_protocolAddress, _marketRegistry)
     {  }
 
-    function initialize() public initializer {       
+    function initialize() public initializer {
         __Pausable_init();
         __Ownable_init_unchained();
     }
  
+    /**
+     * @notice Returns the TellerV2 address for protocol owner checks.
+     * @dev Implements the abstract function from ExtensionsContextUpgradeable.
+     * @dev Uses the immutable _tellerV2 from TellerV2MarketForwarder_G2 parent contract.
+     */
+    function _getTellerV2() internal view override returns (address) {
+        return _tellerV2;
+    }
 
     function setLiquidationProtocolFeePercent(uint256 _percent) 
     public onlyProtocolOwner { 

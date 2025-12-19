@@ -97,16 +97,7 @@ contract SmartCommitmentForwarder is
         __Pausable_init();
         __Ownable_init_unchained();
     }
-
-    /**
-     * @notice Reinitializer function to upgrade the extensions module context.
-     * @dev This can be called during an upgrade to reinitialize the ExtensionsContextUpgradeable module.
-     * @dev No longer needed since _getTellerV2() uses the immutable _tellerV2 from parent contract.
-     */
-    function reinitialize() public reinitializer(2) {
-        // No initialization needed - _getTellerV2() uses immutable _tellerV2
-    }
-
+ 
     /**
      * @notice Returns the TellerV2 address for protocol owner checks.
      * @dev Implements the abstract function from ExtensionsContextUpgradeable.

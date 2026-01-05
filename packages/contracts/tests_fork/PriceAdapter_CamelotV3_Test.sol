@@ -5,8 +5,8 @@ import { Test } from "../tests/util/FoundryTest.sol";
 import "forge-std/console.sol";
 
 // Import the PriceAdapterAerodrome contract
-import { PriceAdapterCamelotV2 } from "../contracts/price_adapters/PriceAdapterCamelotV2.sol";
-import { IUniswapV2Pair } from "../contracts/interfaces/uniswap/IUniswapV2Pair.sol";
+import { PriceAdapterCamelotV3 } from "../contracts/price_adapters/PriceAdapterCamelotV3.sol";
+import { IUniswapV3Pool } from "../contracts/interfaces/uniswap/IUniswapV3Pool.sol";
 
 /**
  * @title PoolsV3_Aerodrome_Fork_Test
@@ -18,9 +18,9 @@ contract CamelotPriceAdapter_Fork_Test is Test {
     string constant NETWORK_NAME = "arbitrum";
 
     // Aerodrome pool address on Base with .observe and .slot0 support
-    address constant CAMELOT_V2_POOL = 0xBfCa4230115DE8341F3A3d5e8845fFb3337B2Be3;
+    address constant CAMELOT_V3_POOL = 0xB1026b8e7276e7AC75410F1fcbbe21796e8f7526;
 
-    PriceAdapterCamelotV2 public priceAdapter;
+    PriceAdapterCamelotV3 public priceAdapter;
     IAerodromePool public pool;
 
     // Variables to store pool info
@@ -35,19 +35,19 @@ contract CamelotPriceAdapter_Fork_Test is Test {
      //   vm.createSelectFork(baseRpcUrl);
 
         // Deploy the PriceAdapterAerodrome contract
-        priceAdapter = new PriceAdapterCamelotV2();
+        priceAdapter = new PriceAdapterCamelotV3();
 
         // Connect to the pool
-        pool = IUniswapV2Pair(CAMELOT_V2_POOL);
+        pool = IUniswapV3Pool(CAMELOT_V3_POOL);
 
         // Verify the pool has code
-        assertTrue(CAMELOT_V2_POOL.code.length > 0, "Pool should have code");
+        assertTrue(CAMELOT_V3_POOL.code.length > 0, "Pool should have code");
 
         // Get token addresses from the pool
         token0 = pool.token0();
         token1 = pool.token1();
 
-        console.log("Pool address:", CAMELOT_V2_POOL);
+        console.log("Pool address:", CAMELOT_V3_POOL);
         console.log("Token0:", token0);
         console.log("Token1:", token1);
 
@@ -92,9 +92,9 @@ contract CamelotPriceAdapter_Fork_Test is Test {
      */
     function test_register_price_route() public {
         // Create a single-hop route (token0 -> token1)
-        PriceAdapterCamelotV2.PoolRoute[] memory routes = new PriceAdapterCamelotV2.PoolRoute[](1);
-        routes[0] = PriceAdapterCamelotV2.PoolRoute({
-            pool: CAMELOT_V2_POOL,
+        PriceAdapterCamelotV3.PoolRoute[] memory routes = new PriceAdapterCamelotV3.PoolRoute[](1);
+        routes[0] = PriceAdapterCamelotV3.PoolRoute({
+            pool: CAMELOT_V3_POOL,
             zeroForOne: true,
             twapInterval: 0,
             token0Decimals: token0Decimals,
@@ -121,9 +121,9 @@ contract CamelotPriceAdapter_Fork_Test is Test {
      */
     function test_get_current_price_token0_to_token1() public {
         // Create route for token0 -> token1
-        PriceAdapterCamelotV2.PoolRoute[] memory routes = new PriceAdapterCamelotV2.PoolRoute[](1);
-        routes[0] = PriceAdapterCamelotV2.PoolRoute({
-            pool: CAMELOT_V2_POOL,
+        PriceAdapterCamelotV3.PoolRoute[] memory routes = new PriceAdapterCamelotV3.PoolRoute[](1);
+        routes[0] = PriceAdapterCamelotV3.PoolRoute({
+            pool: CAMELOT_V3_POOL,
             zeroForOne: true,
             twapInterval: 0, // Use current price via slot0
             token0Decimals: token0Decimals,
@@ -151,9 +151,9 @@ contract CamelotPriceAdapter_Fork_Test is Test {
      */
     function test_get_current_price_token1_to_token0() public {
         // Create route for token1 -> token0 (inverse)
-        PriceAdapterCamelotV2.PoolRoute[] memory routes = new PriceAdapterCamelotV2.PoolRoute[](1);
-        routes[0] = PriceAdapterCamelotV2.PoolRoute({
-            pool: CAMELOT_V2_POOL,
+        PriceAdapterCamelotV3.PoolRoute[] memory routes = new PriceAdapterCamelotV3.PoolRoute[](1);
+        routes[0] = PriceAdapterCamelotV3.PoolRoute({
+            pool: CAMELOT_V3_POOL,
             zeroForOne: false, // Inverse direction
             twapInterval: 0,
             token0Decimals: token0Decimals,
@@ -180,9 +180,9 @@ contract CamelotPriceAdapter_Fork_Test is Test {
      */
     function test_get_twap_price() public {
         // Create route with 1 hour TWAP
-        PriceAdapterCamelotV2.PoolRoute[] memory routes = new PriceAdapterCamelotV2.PoolRoute[](1);
-        routes[0] = PriceAdapterCamelotV2.PoolRoute({
-            pool: CAMELOT_V2_POOL,
+        PriceAdapterCamelotV3.PoolRoute[] memory routes = new PriceAdapterCamelotV3.PoolRoute[](1);
+        routes[0] = PriceAdapterCamelotV3.PoolRoute({
+            pool: CAMELOT_V3_POOL,
             zeroForOne: true,
             twapInterval: 5, // 1 hour TWAP
             token0Decimals: token0Decimals,

@@ -6,7 +6,7 @@ import "forge-std/console.sol";
 
 // Import the PriceAdapterAerodrome contract
 import { PriceAdapterCamelotV3 } from "../contracts/price_adapters/PriceAdapterCamelotV3.sol";
-import { IUniswapV3Pool } from "../contracts/interfaces/uniswap/IUniswapV3Pool.sol";
+import { ICamelotV3Pool } from "../contracts/interfaces/defi/ICamelotV3Pool.sol";
 
 /**
  * @title PoolsV3_Aerodrome_Fork_Test
@@ -21,7 +21,7 @@ contract CamelotPriceAdapter_Fork_Test is Test {
     address constant CAMELOT_V3_POOL = 0xB1026b8e7276e7AC75410F1fcbbe21796e8f7526;
 
     PriceAdapterCamelotV3 public priceAdapter;
-    IAerodromePool public pool;
+    ICamelotV3Pool public pool;
 
     // Variables to store pool info
     address token0;
@@ -38,7 +38,7 @@ contract CamelotPriceAdapter_Fork_Test is Test {
         priceAdapter = new PriceAdapterCamelotV3();
 
         // Connect to the pool
-        pool = IUniswapV3Pool(CAMELOT_V3_POOL);
+        pool = ICamelotV3Pool(CAMELOT_V3_POOL);
 
         // Verify the pool has code
         assertTrue(CAMELOT_V3_POOL.code.length > 0, "Pool should have code");
@@ -125,6 +125,63 @@ contract CamelotPriceAdapter_Fork_Test is Test {
         routes[0] = PriceAdapterCamelotV3.PoolRoute({
             pool: CAMELOT_V3_POOL,
             zeroForOne: true,
+            twapInterval: 1, // Use current price via slot0
+            token0Decimals: token0Decimals,
+            token1Decimals: token1Decimals
+        });
+
+        bytes memory encodedRoute = priceAdapter.encodePoolRoutes(routes);
+        bytes32 routeHash = priceAdapter.registerPriceRoute(encodedRoute);
+
+        // Get the price
+        uint256 priceRatioQ96 = priceAdapter.getPriceRatioQ96(routeHash);
+
+        assertTrue(priceRatioQ96 > 0, "Price should be greater than 0");
+
+        // Convert Q96 to human readable (divide by 2^96)
+        uint256 priceQ96Divisor = 2 ** 96;
+        uint256 priceScaled = (priceRatioQ96 * 1e18) / priceQ96Divisor;
+
+        
+    }
+
+    /**
+     * @notice Test getting current price in reverse direction (token1 -> token0)
+     */
+    function test_get_current_price_token1_to_token0() public {
+        // Create route for token1 -> token0 (inverse)
+        PriceAdapterCamelotV3.PoolRoute[] memory routes = new PriceAdapterCamelotV3.PoolRoute[](1);
+        routes[0] = PriceAdapterCamelotV3.PoolRoute({
+            pool: CAMELOT_V3_POOL,
+            zeroForOne: false, // Inverse direction
+            twapInterval: 1,
+            token0Decimals: token0Decimals,
+            token1Decimals: token1Decimals
+        });
+
+        bytes memory encodedRoute = priceAdapter.encodePoolRoutes(routes);
+        bytes32 routeHash = priceAdapter.registerPriceRoute(encodedRoute);
+
+        uint256 priceRatioQ96 = priceAdapter.getPriceRatioQ96(routeHash);
+
+        assertTrue(priceRatioQ96 > 0, "Price should be greater than 0");
+
+        uint256 priceQ96Divisor = 2 ** 96;
+        uint256 priceScaled = (priceRatioQ96 * 1e18) / priceQ96Divisor;
+
+       
+    }
+
+    /**
+     * @notice Test getting current price (slot0, no TWAP)
+     * @dev Tests with twapInterval = 0 which uses slot0()
+     */
+    function test_get_current_price_token0_to_token1_zero_twap() public {
+        // Create route for token0 -> token1
+        PriceAdapterCamelotV3.PoolRoute[] memory routes = new PriceAdapterCamelotV3.PoolRoute[](1);
+        routes[0] = PriceAdapterCamelotV3.PoolRoute({
+            pool: CAMELOT_V3_POOL,
+            zeroForOne: true,
             twapInterval: 0, // Use current price via slot0
             token0Decimals: token0Decimals,
             token1Decimals: token1Decimals
@@ -142,37 +199,10 @@ contract CamelotPriceAdapter_Fork_Test is Test {
         uint256 priceQ96Divisor = 2 ** 96;
         uint256 priceScaled = (priceRatioQ96 * 1e18) / priceQ96Divisor;
 
-        console.log("Price (token0/token1) Q96:", priceRatioQ96);
-        console.log("Price (scaled by 1e18):", priceScaled);
+        
     }
 
-    /**
-     * @notice Test getting current price in reverse direction (token1 -> token0)
-     */
-    function test_get_current_price_token1_to_token0() public {
-        // Create route for token1 -> token0 (inverse)
-        PriceAdapterCamelotV3.PoolRoute[] memory routes = new PriceAdapterCamelotV3.PoolRoute[](1);
-        routes[0] = PriceAdapterCamelotV3.PoolRoute({
-            pool: CAMELOT_V3_POOL,
-            zeroForOne: false, // Inverse direction
-            twapInterval: 0,
-            token0Decimals: token0Decimals,
-            token1Decimals: token1Decimals
-        });
 
-        bytes memory encodedRoute = priceAdapter.encodePoolRoutes(routes);
-        bytes32 routeHash = priceAdapter.registerPriceRoute(encodedRoute);
-
-        uint256 priceRatioQ96 = priceAdapter.getPriceRatioQ96(routeHash);
-
-        assertTrue(priceRatioQ96 > 0, "Price should be greater than 0");
-
-        uint256 priceQ96Divisor = 2 ** 96;
-        uint256 priceScaled = (priceRatioQ96 * 1e18) / priceQ96Divisor;
-
-        console.log("Price (token1/token0) Q96:", priceRatioQ96);
-        console.log("Price (scaled by 1e18):", priceScaled);
-    }
 
     /**
      * @notice Test getting TWAP price

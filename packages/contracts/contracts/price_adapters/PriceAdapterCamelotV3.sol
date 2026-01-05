@@ -152,20 +152,20 @@ contract PriceAdapterCamelotV3 is
       }
     }
 
-    function getSqrtTwapX96(address uniswapV3Pool, uint32 twapInterval)
+    function getSqrtTwapX96(address poolAddress, uint32 twapInterval)
         internal
         view
         returns (uint160 sqrtPriceX96)
     {
         if (twapInterval == 0) {
             // return the current price if twapInterval == 0
-            (sqrtPriceX96, , , , , , ) = ICamelotV3Pool(uniswapV3Pool).globalState();
+            (sqrtPriceX96, , , , , , ,  ) = ICamelotV3Pool(poolAddress).globalState();
         } else {
             uint32[] memory secondsAgos = new uint32[](2);
             secondsAgos[0] = twapInterval + 1; // from (before)
             secondsAgos[1] = 1; // one block prior
 
-            (int56[] memory tickCumulatives, , , ) = ICamelotV3Pool(uniswapV3Pool)
+            (int56[] memory tickCumulatives, , , ) = ICamelotV3Pool(poolAddress)
                 .getTimepoints(secondsAgos);
 
             // tick(imprecise as it's an integer) to price

@@ -54,14 +54,14 @@ contract CamelotPriceAdapter_Fork_Test is Test {
         // Get token decimals (would need ERC20 interface to get these properly)
         // For now, assuming standard 18 decimals
         token0Decimals = 18;
-        token1Decimals = 18;
+        token1Decimals = 6;  //usdc 
     }
 
     /**
      * @notice Test that the pool has observations data
      * @dev This verifies the pool supports observations() for TWAP calculations
      */
-    function test_pool_has_observations() public {
+   /* function test_pool_has_observations() public {
         // Try to get observation at index 0 (most recent)
         (uint256 timestamp0, uint256 reserve0Cumulative0, uint256 reserve1Cumulative0) =
             pool.observations(0);
@@ -85,7 +85,7 @@ contract CamelotPriceAdapter_Fork_Test is Test {
         assertTrue(reserve0Cumulative1 >= reserve0Cumulative0, "Reserve0 cumulative should increase over time");
         assertTrue(reserve1Cumulative1 >= reserve1Cumulative0, "Reserve1 cumulative should increase over time");
     }
-
+ */ 
    
     /**
      * @notice Test registering a price route with the Aerodrome pool

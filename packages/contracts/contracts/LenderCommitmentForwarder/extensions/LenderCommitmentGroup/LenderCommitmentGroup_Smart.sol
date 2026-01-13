@@ -155,6 +155,8 @@ contract LenderCommitmentGroup_Smart is
 
 
     uint256 public lastUnpausedAt;
+
+    bool public liquidationsPaused; 
    
 
     event PoolInitialized(
@@ -660,6 +662,7 @@ contract LenderCommitmentGroup_Smart is
         int256 _tokenAmountDifference
     ) external whenForwarderNotPaused whenNotPaused bidIsActiveForGroup(_bidId) nonReentrant onlyOracleApprovedAllowEOA {
         
+         require(!liquidationsPaused, "P");
 
 
         uint256 loanTotalPrincipalAmount = _getLoanTotalPrincipalAmount(_bidId);  //only used for the auction delta amount 
@@ -1109,4 +1112,26 @@ contract LenderCommitmentGroup_Smart is
         setLastUnpausedAt();
         _unpause();
     }
+
+
+
+        /**
+     * @notice Lets the DAO/owner of the protocol implement an emergency stop mechanism.
+     */
+    function pauseLiquidations() public virtual onlyProtocolPauser {
+         require(!liquidationsPaused);
+         liquidationsPaused = true;
+    }
+
+    /**
+     * @notice Lets the DAO/owner of the protocol undo a previously implemented emergency stop.
+     */
+    function unpauseLiquidations() public virtual onlyProtocolPauser {
+
+        require(liquidationsPaused);
+
+        setLastUnpausedAt();
+        liquidationsPaused = false;
+    }
+
 }

@@ -223,7 +223,7 @@ contract LenderCommitmentGroup_Smart is
     modifier onlySmartCommitmentForwarder() {
         require(
             msg.sender == address(SMART_COMMITMENT_FORWARDER),
-            "Can only be called by Smart Commitment Forwarder"
+            "oSCF"
         );
         _;
     }
@@ -312,20 +312,20 @@ contract LenderCommitmentGroup_Smart is
         interestRateLowerBound = _commitmentGroupConfig.interestRateLowerBound;
         interestRateUpperBound = _commitmentGroupConfig.interestRateUpperBound;
 
-        require(interestRateLowerBound <= interestRateUpperBound, "invalid _interestRateLowerBound");
+        require(interestRateLowerBound <= interestRateUpperBound, "IRL");
 
        
         liquidityThresholdPercent = _commitmentGroupConfig.liquidityThresholdPercent;
         collateralRatio = _commitmentGroupConfig.collateralRatio;
       
-        require( liquidityThresholdPercent <= 10000, "invalid _liquidityThresholdPercent"); 
+        require( liquidityThresholdPercent <= 10000, "LTP"); 
 
         for (uint256 i = 0; i < _poolOracleRoutes.length; i++) {
             poolOracleRoutes.push(_poolOracleRoutes[i]);
         }
 
 
-         require(poolOracleRoutes.length >= 1 && poolOracleRoutes.length <= 2, "invalid pool routes length");
+         require(poolOracleRoutes.length >= 1 && poolOracleRoutes.length <= 2, "PRL");
         
         poolSharesToken_ = _deployPoolSharesToken();
 
@@ -381,7 +381,7 @@ contract LenderCommitmentGroup_Smart is
     {      
         require(
             address(poolSharesToken) == address(0),
-            "Pool shares already deployed"
+            "ST"
         );
  
         poolSharesToken = new LenderCommitmentGroupShares(
@@ -467,7 +467,7 @@ contract LenderCommitmentGroup_Smart is
  
         uint256 principalTokenBalanceAfter = principalToken.balanceOf(address(this));
  
-        require( principalTokenBalanceAfter == principalTokenBalanceBefore + _amount, "Token balance was not added properly" );
+        require( principalTokenBalanceAfter == principalTokenBalanceBefore + _amount, "B" );
 
         sharesAmount_ = _valueOfUnderlying(_amount, sharesExchangeRate());
  
@@ -485,11 +485,11 @@ contract LenderCommitmentGroup_Smart is
 
          );
 
-        require( sharesAmount_ >= _minSharesAmountOut, "Invalid: Min Shares AmountOut" );
+        require( sharesAmount_ >= _minSharesAmountOut, "SM" );
  
          if(!firstDepositMade){
-            require(msg.sender == owner(), "Owner must initialize the pool with a deposit first.");
-            require( sharesAmount_>= 1e6, "Initial shares amount must be atleast 1e6" );
+            require(msg.sender == owner(), "F.");
+            require( sharesAmount_>= 1e6, "SA" );
 
             firstDepositMade = true;
         }
@@ -532,7 +532,7 @@ contract LenderCommitmentGroup_Smart is
         
         require(
             _collateralTokenAddress == address(collateralToken),
-            "Mismatching collateral token"
+            "CT"
         );
         //the interest rate must be at least as high has the commitment demands. The borrower can use a higher interest rate although that would not be beneficial to the borrower.
         require(_interestRate >= getMinInterestRate(_principalAmount), "Invalid interest rate");
@@ -541,7 +541,7 @@ contract LenderCommitmentGroup_Smart is
 
         require(
             getPrincipalAmountAvailableToBorrow() >= _principalAmount,
-            "Invalid loan max principal"
+            "LMP"
         );
  
  
@@ -554,7 +554,7 @@ contract LenderCommitmentGroup_Smart is
         require(    
              _collateralAmount   >=
                 requiredCollateral,
-            "Insufficient Borrower Collateral"
+            "BC"
         );
  
         principalToken.safeApprove(address(TELLER_V2), _principalAmount);
@@ -643,7 +643,7 @@ contract LenderCommitmentGroup_Smart is
             _recipient
         );
         
-        require( principalTokenValueToWithdraw >=  _minAmountOut ,"Invalid: Min Amount Out");
+        require( principalTokenValueToWithdraw >=  _minAmountOut ,"W");
 
         return principalTokenValueToWithdraw;
     }
@@ -662,7 +662,7 @@ contract LenderCommitmentGroup_Smart is
         int256 _tokenAmountDifference
     ) external whenForwarderNotPaused whenNotPaused bidIsActiveForGroup(_bidId) nonReentrant onlyOracleApprovedAllowEOA {
         
-         require(!liquidationsPaused, "P");
+         require(!liquidationsPaused );
 
 
         uint256 loanTotalPrincipalAmount = _getLoanTotalPrincipalAmount(_bidId);  //only used for the auction delta amount 
@@ -685,8 +685,7 @@ contract LenderCommitmentGroup_Smart is
  
  
         require(
-            _tokenAmountDifference >= minAmountDifference,
-            "Insufficient tokenAmountDifference"
+            _tokenAmountDifference >= minAmountDifference 
         );
 
 
@@ -817,7 +816,7 @@ contract LenderCommitmentGroup_Smart is
     }
 
 
-    function getTokenDifferenceFromLiquidations() public view returns (int256){
+    function getTokenDifferenceFromLiquidations() external view returns (int256){
 
         return tokenDifferenceFromLiquidations;
 
@@ -836,11 +835,11 @@ contract LenderCommitmentGroup_Smart is
     ) public view virtual returns (int256 amountDifference_) {
         require(
             _loanDefaultedTimestamp > 0,
-            "Loan defaulted timestamp must be greater than zero"
+            "Ldt"
         );
         require(
             block.timestamp > _loanDefaultedTimestamp,
-            "Loan defaulted timestamp must be in the past"
+            "Ldp"
         );
 
         uint256 secondsSinceDefaulted = block.timestamp -

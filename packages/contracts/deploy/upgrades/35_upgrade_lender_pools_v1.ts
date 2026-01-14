@@ -24,15 +24,15 @@ const deployFn: DeployFunction = async (hre) => {
 
 
 let uniswapV3FactoryAddress: string =  get_ecosystem_contract_address( hre.network.name, "uniswapV3Factory" ) ;
-  const uniswapPricingLibrary = await hre.deployments.get('UniswapPricingLibrary')
+  const uniswapPricingLibraryV2 = await hre.deployments.get('UniswapPricingLibraryV2')
 
- 
 
-//this is why the owner of the beacon should be timelock controller ! 
-// so we can upgrade it like this . Using a proposal.  This actually goes AROUND the proxy admin, interestingly. 
+
+//this is why the owner of the beacon should be timelock controller !
+// so we can upgrade it like this . Using a proposal.  This actually goes AROUND the proxy admin, interestingly.
   await hre.upgrades.proposeBatchTimelock({
     title: 'LenderGroups: Liq Pause',
-    description: ` 
+    description: `
 # LenderGroups
 
 * A patch to add pausing of liquidations.
@@ -42,7 +42,7 @@ let uniswapV3FactoryAddress: string =  get_ecosystem_contract_address( hre.netwo
         beacon: lenderCommitmentGroupBeaconProxy,
         implFactory: await hre.ethers.getContractFactory('LenderCommitmentGroup_Smart', {
           libraries: {
-            UniswapPricingLibrary: uniswapPricingLibrary.address,
+            UniswapPricingLibraryV2: uniswapPricingLibraryV2.address,
           },
         }),
 
@@ -77,7 +77,7 @@ deployFn.tags = ['lender-commitment-group-beacon']
 deployFn.dependencies = [
   'teller-v2:deploy',
   'smart-commitment-forwarder:deploy',
-  'teller-v2:uniswap-pricing-library',
+  'teller-v2:uniswap-pricing-library-v2',
   'lender-commitment-group-beacon:deploy'
 ]
 

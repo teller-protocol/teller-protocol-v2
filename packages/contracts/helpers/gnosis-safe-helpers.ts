@@ -76,6 +76,9 @@ export class GnosisSafeAdminClient {
   private baseUrl: string = 'https://api.safe.global'
 
   constructor(config: { apiKey: string }) {
+    if (!config.apiKey) {
+      throw new Error('SAFE_GLOBAL_API_KEY is required. Get your API key at: https://app.safe.global/settings/setup')
+    }
     this.apiKey = config.apiKey
   }
 
@@ -257,8 +260,8 @@ export class GnosisSafeAdminClient {
     transaction: SafeTransactionRequest,
     network: string
   ): Promise<{ safeTxHash: string }> {
-    const getNetwork = this.getNetworkPath([{network} as any])
-    const url = `https://safe-transaction-${getNetwork}.safe.global/api/v2/safes/${transaction.safe}/multisig-transactions/`
+    const chainName = this.getNetworkPath([{network} as any])
+    const url = `https://api.safe.global/tx-service/${chainName}/api/v2/safes/${transaction.safe}/multisig-transactions/`
       
 
       console.log(`submitTransaction ${url }`)
@@ -267,17 +270,10 @@ export class GnosisSafeAdminClient {
 
     const headers: Record<string, string> = {
       'accept': 'application/json',
-      'content-type': 'application/json'
+      'content-type': 'application/json',
+      'Authorization': `Bearer ${this.apiKey}`
     }
-    
-    // Add Authorization header if API key is provided
-    if (this.apiKey) {
-      headers['Authorization'] = `Bearer ${this.apiKey}`
-      console.log('Using API key for authentication')
-    } else {
-      console.log('No API key provided')
-    }
-    
+
     console.log('Request headers:', headers)
     
     const response = await fetch(url, {
@@ -352,39 +348,38 @@ export class GnosisSafeAdminClient {
   }
 
   /*
+  Fetches the next nonce for a Safe using the new Safe API format with authentication.
 
-  ex 
+  Example endpoint:
+  https://api.safe.global/tx-service/eth/api/v2/safes/0xcd2E72aEBe2A203b84f46DEEC948E6465dB51c75/
 
-  https://safe-transaction-mainnet.safe.global/api/v1/safes/0xcd2E72aEBe2A203b84f46DEEC948E6465dB51c75/
-  
-  
-
-  Need to be VERY careful with this bc it  doesnt properly work in rapid succession  rn 
-
+  Requires API key authentication (get from https://app.safe.global/settings/setup)
   */
   private async getNextNonce(safeAddress: string, network: string, offset: number = 0): Promise<number> {
-    const getNetwork = this.getNetworkPath([{network} as any])
-    const url = `https://safe-transaction-${getNetwork}.safe.global/api/v1/safes/${safeAddress}/`
-      
-      console.log(`getNextNonce ${url }`)
+    const chainName = this.getNetworkPath([{network} as any])
+    const url = `https://api.safe.global/tx-service/${chainName}/api/v2/safes/${safeAddress}/`
 
+      console.log(`getNextNonce ${url}`)
+
+    const headers: Record<string, string> = {
+      'accept': 'application/json',
+      'content-type': 'application/json',
+      'Authorization': `Bearer ${this.apiKey}`
+    }
 
     const response = await fetch(url, {
-      headers: {
-        'accept': 'application/json',
-        'content-type': 'application/json'
-      }
+      headers
     })
 
     
     if (!response.ok) {
       const errorText = await response.text()
       if (response.status === 404) {
-        console.warn(`Safe not found, using nonce 0. This might be a new Safe or incorrect network.`)
-        return 0
+       // console.warn(`Safe not found, using nonce 0. This might be a new Safe or incorrect network.`)
+       // return 0
       }
 
-     // return 71 + offset  // hack for now 
+      return 71 + offset  // hack for now 
 
       throw new Error(`Failed to get Safe info: ${response.status} - ${errorText}`)
     }
@@ -465,12 +460,12 @@ export class GnosisSafeAdminClient {
     return safeTxHash
   }
 
-/*
-  private getNetworkPathShorthand(contract: PartialContract | PartialContract[]): string {
+  private getNetworkPath(contract: PartialContract | PartialContract[]): string {
     const firstContract = Array.isArray(contract) ? contract[0] : contract
     const network = firstContract.network
-    
-    // For POST requests to api.safe.global/tx-service/{network}/
+
+    // Maps Hardhat network names to Safe API EIP3770 chain names
+    // Format: https://api.safe.global/tx-service/{chain}/api/v2/...
     const networkMap: Record<string, string> = {
       'mainnet': 'eth',
       'sepolia': 'sep',
@@ -481,32 +476,11 @@ export class GnosisSafeAdminClient {
       'base': 'base',
       'gnosis': 'gno',
       'avalanche': 'avax',
-      'bsc': 'bnb'
-    }
-    
-    return networkMap[network as string] || 'eth'
-  }*/
-
-  private getNetworkPath(contract: PartialContract | PartialContract[]): string { 
-    const firstContract = Array.isArray(contract) ? contract[0] : contract
-    const network = firstContract.network
-    
-    // For GET requests to safe-transaction-{network}.safe.global/
-    const networkMap: Record<string, string> = {
-      'mainnet': 'mainnet',
-      'sepolia': 'sepolia',
-      'goerli': 'goerli',
-      'polygon': 'polygon',
-      'arbitrum': 'arbitrum',
-      'optimism': 'optimism',
-      'base': 'base',
-      'gnosis': 'gnosis',
-      'avalanche': 'avalanche',
-      'bsc': 'bsc',
+      'bsc': 'bnb',
       'katana': 'katana',
     }
-    
-    return networkMap[network as string] || 'mainnet'
+
+    return networkMap[network as string] || 'eth'
   }
 
 /*

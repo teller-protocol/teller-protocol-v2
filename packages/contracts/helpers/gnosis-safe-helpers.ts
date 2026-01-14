@@ -383,6 +383,9 @@ export class GnosisSafeAdminClient {
         console.warn(`Safe not found, using nonce 0. This might be a new Safe or incorrect network.`)
         return 0
       }
+
+     // return 71 + offset  // hack for now 
+
       throw new Error(`Failed to get Safe info: ${response.status} - ${errorText}`)
     }
 

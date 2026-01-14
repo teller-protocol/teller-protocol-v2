@@ -379,7 +379,13 @@ export class GnosisSafeAdminClient {
        // return 0
       }
 
-      return 71 + offset  // hack for now 
+
+
+      //try to get getNextNonceV1 and return that ..  ? 
+       
+
+
+      // return 71 + offset  // hack for now    use this if needed x.x 
 
       throw new Error(`Failed to get Safe info: ${response.status} - ${errorText}`)
     }
@@ -387,6 +393,42 @@ export class GnosisSafeAdminClient {
     const safeInfo = await response.json()
     return parseInt(safeInfo.nonce) + parseInt(offset)
   }
+
+
+  private async getNextNonceV1(safeAddress: string, network: string, offset: number = 0): Promise<number> {
+    const chainName = this.getNetworkPath([{network} as any])
+     let backup_url = `https://api.safe.global/tx-service/${chainName}/api/v1/safes/${safeAddress}/`;
+    
+      console.log(`getNextNonce ${url}`)
+
+    const headers: Record<string, string> = {
+      'accept': 'application/json',
+      'content-type': 'application/json' 
+       
+    }
+
+    const response = await fetch(backup_url, {
+      headers
+    })
+
+    
+    if (!response.ok) {
+      const errorText = await response.text()
+      if (response.status === 404) {
+       // console.warn(`Safe not found, using nonce 0. This might be a new Safe or incorrect network.`)
+       // return 0
+      } 
+
+      // return 71 + offset  // hack for now    use this if needed x.x 
+
+      throw new Error(`Failed to get Safe info: ${response.status} - ${errorText}`)
+    }
+
+    const safeInfo = await response.json()
+    return parseInt(safeInfo.nonce) + parseInt(offset)
+  }
+
+
 
   private getChainId(network: string): number {
     const chainIds: Record<string, number> = {

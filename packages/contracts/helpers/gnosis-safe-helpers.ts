@@ -396,6 +396,12 @@ export class GnosisSafeAdminClient {
 
 
   private async getNextNonceV1(safeAddress: string, network: string, offset: number = 0): Promise<number> {
+      
+      // https://api.safe.global/tx-service/eth/api/v1/safes/0x9E3bfee4C6b4D28b5113E4786A1D9812eB3D2Db6/ 
+
+      // this works , oddly enough 
+
+
     const chainName = this.getNetworkPath([{network} as any])
      let backup_url = `https://api.safe.global/tx-service/${chainName}/api/v1/safes/${safeAddress}/`;
     

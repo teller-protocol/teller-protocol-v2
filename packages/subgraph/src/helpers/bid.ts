@@ -19,7 +19,7 @@ export enum BidStatus {
   Claimed
 }
 
-export const BidStatusValues = new Array<string>(13);
+export const BidStatusValues = new Array<string>(12);
 BidStatusValues[BidStatus.None] = "";
 BidStatusValues[BidStatus.Submitted] = "Submitted";
 BidStatusValues[BidStatus.Cancelled] = "Cancelled";

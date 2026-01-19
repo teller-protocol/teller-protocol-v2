@@ -261,6 +261,12 @@ interface ILoanStatusCount {
 
   liquidated: [Bid!]!
   liquidatedCount: BigInt!
+
+  closed: [Bid!]!
+  closedCount: BigInt!
+
+  claimed: [Bid!]!
+  claimedCount: BigInt!
 }
 
 type LoanStatusCount implements ILoanStatusCount @entity(immutable: false) {
@@ -295,6 +301,12 @@ type LoanStatusCount implements ILoanStatusCount @entity(immutable: false) {
 
   liquidated: [Bid!]!
   liquidatedCount: BigInt!
+
+  closed: [Bid!]!
+  closedCount: BigInt!
+
+  claimed: [Bid!]!
+  claimedCount: BigInt!
 
   ## Entity Relationships ##
   _protocol: Protocol

@@ -107,7 +107,7 @@ export function handleCollateralWithdrawns(
 }
 
 /**
- * Sets the bid status to `Liquidated` when the collateral is claimed from a defaulted loan.
+ * Sets the bid status to `Claimed` when the collateral is claimed from a defaulted loan.
  * @param event
  */
 export function handleCollateralClaimed(event: CollateralClaimed): void {
@@ -116,10 +116,10 @@ export function handleCollateralClaimed(event: CollateralClaimed): void {
   const collateralManager = CollateralManager.bind(event.address);
   const tellerV2 = TellerV2.bind(collateralManager.tellerV2());
 
-  // If the bid is not Repaid, then it means the lender has liquidated the loan
-  // without making a payment. In this case, we set the bid status to `Liquidated`.
+  // If the bid is not Repaid, then it means the lender has claimed collateral
+  // without making a payment. In this case, we set the bid status to `Claimed`.
   if (tellerV2.getBidState(bid.bidId) !== BidStatus.Repaid) {
-    updateBidStatus(bid, BidStatus.Liquidated);
+    updateBidStatus(bid, BidStatus.Claimed);
   }
 }
 

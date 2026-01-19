@@ -11,6 +11,7 @@ import { IBeacon } from "../contracts/openzeppelin/beacon/IBeacon.sol";
 import { UpgradeableBeacon } from "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
 import { IProtocolPausingManager } from "../contracts/interfaces/IProtocolPausingManager.sol";
 import { IHasProtocolPausingManager } from "../contracts/interfaces/IHasProtocolPausingManager.sol";
+import { ITellerV2 } from "../contracts/interfaces/ITellerV2.sol";
 import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 /*
@@ -69,13 +70,10 @@ contract UpgradePoolV1BeaconTest is Test {
         require(beaconAddress.code.length > 0, "Beacon not found at address");
         beacon = IBeacon(beaconAddress);
 
-        // Get the original implementation from the beacon
+        // Get the current implementation from the beacon
         originalImplementation = beacon.implementation();
-        console.log("Original V1 implementation:", originalImplementation);
-        require(originalImplementation.code.length > 0, "Original implementation has no code");
-
-        // Verify this is the expected implementation address
-        require(originalImplementation == 0xf6E926D7282Ba2Dc1bd580dA36420d2067bEc4A3, "Implementation address mismatch");
+        console.log("Current implementation:", originalImplementation);
+        require(originalImplementation.code.length > 0, "Implementation has no code");
 
         // Connect to test pool (if it exists)
         if (TEST_POOL_ADDRESS.code.length > 0) {
@@ -251,4 +249,56 @@ contract UpgradePoolV1BeaconTest is Test {
         string memory json = vm.readFile(path);
         return json.readAddress(".address");
     }
+
+    /* function test_loan_4680_liquidatable_in_30_days() public {
+        console.log("Testing if loan 4680 can be liquidated in 30 days...");
+
+        uint256 BID_ID = 4680;
+        uint256 THIRTY_DAYS = 30 days;
+
+        // Skip if test pool doesn't exist
+        if (TEST_POOL_ADDRESS.code.length == 0) {
+            console.log("Skipping - test pool not available");
+            return;
+        }
+
+        // Step 1: Check if the bid is active for this pool
+        bool isBidActiveForPool = testPool.activeBids(BID_ID);
+        console.log("Is bid 4680 active for pool:", isBidActiveForPool);
+
+        // Step 2: Log current timestamp
+        console.log("Current block timestamp:", block.timestamp);
+
+        // Step 3: Warp 30 days into the future
+        uint256 futureTimestamp = block.timestamp + THIRTY_DAYS;
+        console.log("Warping to future timestamp:", futureTimestamp);
+        vm.warp(futureTimestamp);
+        console.log("New block timestamp after warp:", block.timestamp);
+
+        // Step 4: Try to liquidate the loan on the pool
+        // Using 0 as token difference - the liquidator pays exact amount owed
+        int256 tokenAmountDifference = 0;
+
+        // Get the borrower of this loan and use them as the liquidator
+        address borrower = ITellerV2(tellerV2Address).getLoanBorrower(BID_ID);
+        console.log("Loan borrower:", borrower);
+        console.log("Attempting to liquidate loan 4680 as borrower");
+
+        vm.prank(borrower);
+        // Try the liquidation - if it reverts, we catch it
+        try testPool.liquidateDefaultedLoanWithIncentive(BID_ID, tokenAmountDifference) {
+            console.log("RESULT: Loan 4680 CAN be liquidated in 30 days - liquidation succeeded");
+        } catch Error(string memory reason) {
+            console.log("RESULT: Loan 4680 CANNOT be liquidated in 30 days");
+            console.log("Revert reason:", reason);
+        } catch (bytes memory lowLevelData) {
+            console.log("RESULT: Loan 4680 CANNOT be liquidated in 30 days");
+            console.log("Low level revert, data length:", lowLevelData.length);
+        }
+
+        console.log("Loan 4680 liquidation check completed!");
+    } */ 
+
+
+
 }

@@ -19,7 +19,7 @@ import {
   group_pool_metric_data_point_daily,
   group_pool_metric_data_point_weekly
 } from "../../generated/schema"
-import { BigInt, Address, BigDecimal } from "@graphprotocol/graph-ts"
+import { BigInt, Address, BigDecimal, Bytes } from "@graphprotocol/graph-ts"
 
 // Constants for time calculations
 const SECONDS_IN_DAY = BigInt.fromI32(86400)  // 24 * 60 * 60
@@ -431,7 +431,11 @@ export function handleLoanLiquidated(event: DefaultedLoanLiquidated): void {
   let bidId = event.params.bidId
   let liquidator = event.params.liquidator
   let amountDue = event.params.amountDue
-  let tokenAmountDifference = event.params.tokenAmountDifference
+
+  // Properly decode int256 as signed - toBigInt() treats it as unsigned
+  // We need to get raw bytes and use fromSignedBytes (which expects little-endian)
+  let tokenAmountDifferenceBytes = event.parameters[3].value.toBytes()
+  let tokenAmountDifference = BigInt.fromSignedBytes(Bytes.fromUint8Array(tokenAmountDifferenceBytes.reverse()))
 
   // Create defaulted loan liquidated event entity
   let eventEntity = new group_defaulted_loan_liquidated(

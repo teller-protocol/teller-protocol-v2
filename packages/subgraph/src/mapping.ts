@@ -1,7 +1,7 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 
 import { Transfer } from "../generated/LenderManager/LenderManager";
-import { Bid, FundedTx, Lender } from "../generated/schema";
+import { Bid, FundedTx, Lender, Liquidation } from "../generated/schema";
 import {
   AcceptedBid,
   CancelledBid,
@@ -226,6 +226,15 @@ export function handleLoanLiquidated(event: LoanLiquidated): void {
   bid.save();
 
   updateBidOnPayment(bid, event, PaymentEventType.Liquidated);
+
+  // Create Liquidation entity
+  const liquidationId = event.transaction.hash.toHex() + "-" + event.logIndex.toString();
+  const liquidation = new Liquidation(liquidationId);
+  liquidation.bid = event.params.bidId.toString();
+  liquidation.liquidator = event.params.liquidator;
+  liquidation.timestamp = event.block.timestamp;
+  liquidation.transactionHash = event.transaction.hash.toHex();
+  liquidation.save();
 }
 
 export function handleLoanLiquidateds(events: LoanLiquidated[]): void {

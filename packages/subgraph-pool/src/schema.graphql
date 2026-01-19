@@ -42,12 +42,12 @@ type group_borrower_accepted_funds @entity(immutable: true) {
     evt_block_time: BigInt!
     evt_block_number: BigInt!
     group_pool_address: Bytes!
-    bid_id: BigDecimal!
+    bid_id: BigInt!
     borrower: Bytes!
-    collateral_amount: BigDecimal!
+    collateral_amount: BigInt!
     interest_rate: BigInt!
     loan_duration: BigInt!
-    principal_amount: BigDecimal!
+    principal_amount: BigInt!
 }
 
 type group_lender_added_principal @entity(immutable: true) {
@@ -57,9 +57,9 @@ type group_lender_added_principal @entity(immutable: true) {
     evt_block_time: BigInt!
     evt_block_number: BigInt!
     group_pool_address: Bytes!
-    amount: BigDecimal!
+    amount: BigInt!
     lender: Bytes!
-    shares_amount: BigDecimal!
+    shares_amount: BigInt!
     shares_recipient: Bytes!
 }
 type group_earnings_withdrawn @entity(immutable: true) {
@@ -69,9 +69,9 @@ type group_earnings_withdrawn @entity(immutable: true) {
     evt_block_time: BigInt!
     evt_block_number: BigInt!
     group_pool_address: Bytes!
-    amount_pool_shares_tokens: BigDecimal!
+    amount_pool_shares_tokens: BigInt!
     lender: Bytes!
-    principal_tokens_withdrawn: BigDecimal!
+    principal_tokens_withdrawn: BigInt!
     recipient: Bytes!
 }
 type group_defaulted_loan_liquidated @entity(immutable: true) {
@@ -81,10 +81,10 @@ type group_defaulted_loan_liquidated @entity(immutable: true) {
     evt_block_time: BigInt!
     evt_block_number: BigInt!
     group_pool_address: Bytes!
-    amount_due: BigDecimal!
-    bid_id: BigDecimal!
+    amount_due: BigInt!
+    bid_id: BigInt!
     liquidator: Bytes!
-    token_amount_difference: BigDecimal!
+    token_amount_difference: BigInt!
 }
 type group_initialized @entity(immutable: true) {
     id: ID!
@@ -103,12 +103,12 @@ type group_loan_repaid @entity(immutable: true) {
     evt_block_time: BigInt!
     evt_block_number: BigInt!
     group_pool_address: Bytes!
-    bid_id: BigDecimal!
-    interest_amount: BigDecimal!
-    principal_amount: BigDecimal!
+    bid_id: BigInt!
+    interest_amount: BigInt!
+    principal_amount: BigInt!
     repayer: Bytes!
-    total_interest_collected: BigDecimal!
-    total_principal_repaid: BigDecimal!
+    total_interest_collected: BigInt!
+    total_principal_repaid: BigInt!
 }
 type group_ownership_transferred @entity(immutable: true) {
     id: ID!
@@ -161,10 +161,10 @@ type group_unpaused @entity(immutable: true) {
 type group_pool_bid @entity(immutable: true) {
     id: ID! 
     group_pool_address: Bytes!
-    bid_id: BigDecimal!
+    bid_id: BigInt!
     borrower: Bytes!
-    collateral_amount: BigDecimal! 
-    principal_amount: BigDecimal!
+    collateral_amount: BigInt! 
+    principal_amount: BigInt!
 }
 
 
@@ -172,10 +172,10 @@ type group_pool_bid @entity(immutable: true) {
 type teller_bid @entity(immutable: true) {
     id: ID! 
     group_pool_address: Bytes!
-    bid_id: BigDecimal!
+    bid_id: BigInt!
     borrower: Bytes!
-    collateral_amount: BigDecimal! 
-    principal_amount: BigDecimal!
+    collateral_amount: BigInt! 
+    principal_amount: BigInt!
 }
 
 

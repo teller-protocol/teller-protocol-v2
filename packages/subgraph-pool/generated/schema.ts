@@ -582,17 +582,17 @@ export class group_borrower_accepted_funds extends Entity {
     this.set("group_pool_address", Value.fromBytes(value));
   }
 
-  get bid_id(): BigDecimal {
+  get bid_id(): BigInt {
     let value = this.get("bid_id");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toBigDecimal();
+      return value.toBigInt();
     }
   }
 
-  set bid_id(value: BigDecimal) {
-    this.set("bid_id", Value.fromBigDecimal(value));
+  set bid_id(value: BigInt) {
+    this.set("bid_id", Value.fromBigInt(value));
   }
 
   get borrower(): Bytes {
@@ -608,17 +608,17 @@ export class group_borrower_accepted_funds extends Entity {
     this.set("borrower", Value.fromBytes(value));
   }
 
-  get collateral_amount(): BigDecimal {
+  get collateral_amount(): BigInt {
     let value = this.get("collateral_amount");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toBigDecimal();
+      return value.toBigInt();
     }
   }
 
-  set collateral_amount(value: BigDecimal) {
-    this.set("collateral_amount", Value.fromBigDecimal(value));
+  set collateral_amount(value: BigInt) {
+    this.set("collateral_amount", Value.fromBigInt(value));
   }
 
   get interest_rate(): BigInt {
@@ -647,17 +647,17 @@ export class group_borrower_accepted_funds extends Entity {
     this.set("loan_duration", Value.fromBigInt(value));
   }
 
-  get principal_amount(): BigDecimal {
+  get principal_amount(): BigInt {
     let value = this.get("principal_amount");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toBigDecimal();
+      return value.toBigInt();
     }
   }
 
-  set principal_amount(value: BigDecimal) {
-    this.set("principal_amount", Value.fromBigDecimal(value));
+  set principal_amount(value: BigInt) {
+    this.set("principal_amount", Value.fromBigInt(value));
   }
 }
 
@@ -772,17 +772,17 @@ export class group_lender_added_principal extends Entity {
     this.set("group_pool_address", Value.fromBytes(value));
   }
 
-  get amount(): BigDecimal {
+  get amount(): BigInt {
     let value = this.get("amount");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toBigDecimal();
+      return value.toBigInt();
     }
   }
 
-  set amount(value: BigDecimal) {
-    this.set("amount", Value.fromBigDecimal(value));
+  set amount(value: BigInt) {
+    this.set("amount", Value.fromBigInt(value));
   }
 
   get lender(): Bytes {
@@ -798,17 +798,17 @@ export class group_lender_added_principal extends Entity {
     this.set("lender", Value.fromBytes(value));
   }
 
-  get shares_amount(): BigDecimal {
+  get shares_amount(): BigInt {
     let value = this.get("shares_amount");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toBigDecimal();
+      return value.toBigInt();
     }
   }
 
-  set shares_amount(value: BigDecimal) {
-    this.set("shares_amount", Value.fromBigDecimal(value));
+  set shares_amount(value: BigInt) {
+    this.set("shares_amount", Value.fromBigInt(value));
   }
 
   get shares_recipient(): Bytes {
@@ -936,17 +936,17 @@ export class group_earnings_withdrawn extends Entity {
     this.set("group_pool_address", Value.fromBytes(value));
   }
 
-  get amount_pool_shares_tokens(): BigDecimal {
+  get amount_pool_shares_tokens(): BigInt {
     let value = this.get("amount_pool_shares_tokens");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toBigDecimal();
+      return value.toBigInt();
     }
   }
 
-  set amount_pool_shares_tokens(value: BigDecimal) {
-    this.set("amount_pool_shares_tokens", Value.fromBigDecimal(value));
+  set amount_pool_shares_tokens(value: BigInt) {
+    this.set("amount_pool_shares_tokens", Value.fromBigInt(value));
   }
 
   get lender(): Bytes {
@@ -962,17 +962,17 @@ export class group_earnings_withdrawn extends Entity {
     this.set("lender", Value.fromBytes(value));
   }
 
-  get principal_tokens_withdrawn(): BigDecimal {
+  get principal_tokens_withdrawn(): BigInt {
     let value = this.get("principal_tokens_withdrawn");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toBigDecimal();
+      return value.toBigInt();
     }
   }
 
-  set principal_tokens_withdrawn(value: BigDecimal) {
-    this.set("principal_tokens_withdrawn", Value.fromBigDecimal(value));
+  set principal_tokens_withdrawn(value: BigInt) {
+    this.set("principal_tokens_withdrawn", Value.fromBigInt(value));
   }
 
   get recipient(): Bytes {
@@ -1100,30 +1100,30 @@ export class group_defaulted_loan_liquidated extends Entity {
     this.set("group_pool_address", Value.fromBytes(value));
   }
 
-  get amount_due(): BigDecimal {
+  get amount_due(): BigInt {
     let value = this.get("amount_due");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toBigDecimal();
+      return value.toBigInt();
     }
   }
 
-  set amount_due(value: BigDecimal) {
-    this.set("amount_due", Value.fromBigDecimal(value));
+  set amount_due(value: BigInt) {
+    this.set("amount_due", Value.fromBigInt(value));
   }
 
-  get bid_id(): BigDecimal {
+  get bid_id(): BigInt {
     let value = this.get("bid_id");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toBigDecimal();
+      return value.toBigInt();
     }
   }
 
-  set bid_id(value: BigDecimal) {
-    this.set("bid_id", Value.fromBigDecimal(value));
+  set bid_id(value: BigInt) {
+    this.set("bid_id", Value.fromBigInt(value));
   }
 
   get liquidator(): Bytes {
@@ -1139,17 +1139,17 @@ export class group_defaulted_loan_liquidated extends Entity {
     this.set("liquidator", Value.fromBytes(value));
   }
 
-  get token_amount_difference(): BigDecimal {
+  get token_amount_difference(): BigInt {
     let value = this.get("token_amount_difference");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toBigDecimal();
+      return value.toBigInt();
     }
   }
 
-  set token_amount_difference(value: BigDecimal) {
-    this.set("token_amount_difference", Value.fromBigDecimal(value));
+  set token_amount_difference(value: BigInt) {
+    this.set("token_amount_difference", Value.fromBigInt(value));
   }
 }
 
@@ -1383,43 +1383,43 @@ export class group_loan_repaid extends Entity {
     this.set("group_pool_address", Value.fromBytes(value));
   }
 
-  get bid_id(): BigDecimal {
+  get bid_id(): BigInt {
     let value = this.get("bid_id");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toBigDecimal();
+      return value.toBigInt();
     }
   }
 
-  set bid_id(value: BigDecimal) {
-    this.set("bid_id", Value.fromBigDecimal(value));
+  set bid_id(value: BigInt) {
+    this.set("bid_id", Value.fromBigInt(value));
   }
 
-  get interest_amount(): BigDecimal {
+  get interest_amount(): BigInt {
     let value = this.get("interest_amount");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toBigDecimal();
+      return value.toBigInt();
     }
   }
 
-  set interest_amount(value: BigDecimal) {
-    this.set("interest_amount", Value.fromBigDecimal(value));
+  set interest_amount(value: BigInt) {
+    this.set("interest_amount", Value.fromBigInt(value));
   }
 
-  get principal_amount(): BigDecimal {
+  get principal_amount(): BigInt {
     let value = this.get("principal_amount");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toBigDecimal();
+      return value.toBigInt();
     }
   }
 
-  set principal_amount(value: BigDecimal) {
-    this.set("principal_amount", Value.fromBigDecimal(value));
+  set principal_amount(value: BigInt) {
+    this.set("principal_amount", Value.fromBigInt(value));
   }
 
   get repayer(): Bytes {
@@ -1435,30 +1435,30 @@ export class group_loan_repaid extends Entity {
     this.set("repayer", Value.fromBytes(value));
   }
 
-  get total_interest_collected(): BigDecimal {
+  get total_interest_collected(): BigInt {
     let value = this.get("total_interest_collected");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toBigDecimal();
+      return value.toBigInt();
     }
   }
 
-  set total_interest_collected(value: BigDecimal) {
-    this.set("total_interest_collected", Value.fromBigDecimal(value));
+  set total_interest_collected(value: BigInt) {
+    this.set("total_interest_collected", Value.fromBigInt(value));
   }
 
-  get total_principal_repaid(): BigDecimal {
+  get total_principal_repaid(): BigInt {
     let value = this.get("total_principal_repaid");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toBigDecimal();
+      return value.toBigInt();
     }
   }
 
-  set total_principal_repaid(value: BigDecimal) {
-    this.set("total_principal_repaid", Value.fromBigDecimal(value));
+  set total_principal_repaid(value: BigInt) {
+    this.set("total_principal_repaid", Value.fromBigInt(value));
   }
 }
 
@@ -2123,17 +2123,17 @@ export class group_pool_bid extends Entity {
     this.set("group_pool_address", Value.fromBytes(value));
   }
 
-  get bid_id(): BigDecimal {
+  get bid_id(): BigInt {
     let value = this.get("bid_id");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toBigDecimal();
+      return value.toBigInt();
     }
   }
 
-  set bid_id(value: BigDecimal) {
-    this.set("bid_id", Value.fromBigDecimal(value));
+  set bid_id(value: BigInt) {
+    this.set("bid_id", Value.fromBigInt(value));
   }
 
   get borrower(): Bytes {
@@ -2149,30 +2149,30 @@ export class group_pool_bid extends Entity {
     this.set("borrower", Value.fromBytes(value));
   }
 
-  get collateral_amount(): BigDecimal {
+  get collateral_amount(): BigInt {
     let value = this.get("collateral_amount");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toBigDecimal();
+      return value.toBigInt();
     }
   }
 
-  set collateral_amount(value: BigDecimal) {
-    this.set("collateral_amount", Value.fromBigDecimal(value));
+  set collateral_amount(value: BigInt) {
+    this.set("collateral_amount", Value.fromBigInt(value));
   }
 
-  get principal_amount(): BigDecimal {
+  get principal_amount(): BigInt {
     let value = this.get("principal_amount");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toBigDecimal();
+      return value.toBigInt();
     }
   }
 
-  set principal_amount(value: BigDecimal) {
-    this.set("principal_amount", Value.fromBigDecimal(value));
+  set principal_amount(value: BigInt) {
+    this.set("principal_amount", Value.fromBigInt(value));
   }
 }
 
@@ -2228,17 +2228,17 @@ export class teller_bid extends Entity {
     this.set("group_pool_address", Value.fromBytes(value));
   }
 
-  get bid_id(): BigDecimal {
+  get bid_id(): BigInt {
     let value = this.get("bid_id");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toBigDecimal();
+      return value.toBigInt();
     }
   }
 
-  set bid_id(value: BigDecimal) {
-    this.set("bid_id", Value.fromBigDecimal(value));
+  set bid_id(value: BigInt) {
+    this.set("bid_id", Value.fromBigInt(value));
   }
 
   get borrower(): Bytes {
@@ -2254,30 +2254,30 @@ export class teller_bid extends Entity {
     this.set("borrower", Value.fromBytes(value));
   }
 
-  get collateral_amount(): BigDecimal {
+  get collateral_amount(): BigInt {
     let value = this.get("collateral_amount");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toBigDecimal();
+      return value.toBigInt();
     }
   }
 
-  set collateral_amount(value: BigDecimal) {
-    this.set("collateral_amount", Value.fromBigDecimal(value));
+  set collateral_amount(value: BigInt) {
+    this.set("collateral_amount", Value.fromBigInt(value));
   }
 
-  get principal_amount(): BigDecimal {
+  get principal_amount(): BigInt {
     let value = this.get("principal_amount");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toBigDecimal();
+      return value.toBigInt();
     }
   }
 
-  set principal_amount(value: BigDecimal) {
-    this.set("principal_amount", Value.fromBigDecimal(value));
+  set principal_amount(value: BigInt) {
+    this.set("principal_amount", Value.fromBigInt(value));
   }
 }
 

@@ -378,11 +378,7 @@ export function handleLoanLiquidated(event: DefaultedLoanLiquidated): void {
   let bidId = event.params.bidId
   let liquidator = event.params.liquidator
   let amountDue = event.params.amountDue
-
-  // Properly decode int256 as signed - toBigInt() treats it as unsigned
-  // We need to get raw bytes and use fromSignedBytes (which expects little-endian)
-  let tokenAmountDifferenceBytes = event.parameters[3].value.toBytes()
-  let tokenAmountDifference = BigInt.fromSignedBytes(Bytes.fromUint8Array(tokenAmountDifferenceBytes.reverse()))
+  let tokenAmountDifference = event.params.tokenAmountDifference
 
   // Create defaulted loan liquidated event entity
   let eventEntity = new group_defaulted_loan_liquidated(

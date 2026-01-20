@@ -70,7 +70,7 @@ graph codegen && graph build
 
 6. deploy ! 
 
- graph deploy   teller-v-2-base --version-label 0.4.21-22
+ graph deploy   teller-v-2-base --version-label 0.4.21-25
 
  graph deploy   tellerv2-arbitrum --version-label 0.4.21-22
 

@@ -7,7 +7,7 @@ import {
   CollateralWithdrawn
 } from "../../generated/CollateralManager/CollateralManager";
 import { TellerV2 } from "../../generated/CollateralManager/TellerV2";
-import { Bid } from "../../generated/schema";
+import { Bid, CollateralDeposit, CollateralWithdrawal } from "../../generated/schema";
 import { updateCollateral } from "../collateral-manager/updaters";
 import { BidStatus, bidStatusToEnum, isBidDefaulted } from "../helpers/bid";
 import { loadBidById, loadCollateral } from "../helpers/loaders";
@@ -60,6 +60,18 @@ export function handleCollateralDeposited(event: CollateralDeposited): void {
   updateCollateral(collateral, event);
   collateral.status = "Deposited";
   collateral.save();
+
+  // Create CollateralDeposit entity
+  const depositId = event.transaction.hash.toHex() + "-" + event.logIndex.toString();
+  const deposit = new CollateralDeposit(depositId);
+  deposit.bid = event.params._bidId.toString();
+  deposit.collateralAddress = event.params._collateralAddress;
+  deposit.amount = event.params._amount;
+  deposit.tokenId = event.params._tokenId;
+  deposit.collateralType = collateralTypeToString(event.params._type);
+  deposit.timestamp = event.block.timestamp;
+  deposit.transactionHash = event.transaction.hash.toHex();
+  deposit.save();
 }
 
 export function handleCollateralDepositeds(
@@ -81,6 +93,19 @@ export function handleCollateralWithdrawn(event: CollateralWithdrawn): void {
   collateral.receiver = event.params._recipient;
   collateral.status = "Withdrawn";
   collateral.save();
+
+  // Create CollateralWithdrawal entity
+  const withdrawalId = event.transaction.hash.toHex() + "-" + event.logIndex.toString();
+  const withdrawal = new CollateralWithdrawal(withdrawalId);
+  withdrawal.bid = event.params._bidId.toString();
+  withdrawal.collateralAddress = event.params._collateralAddress;
+  withdrawal.amount = event.params._amount;
+  withdrawal.tokenId = event.params._tokenId;
+  withdrawal.collateralType = collateralTypeToString(event.params._type);
+  withdrawal.recipient = event.params._recipient;
+  withdrawal.timestamp = event.block.timestamp;
+  withdrawal.transactionHash = event.transaction.hash.toHex();
+  withdrawal.save();
 }
 
 /**
@@ -98,6 +123,17 @@ function collateralTypeToTokenType(type: i32): i32 {
   return i32.add(type, 1);
 }
 
+/**
+ * Converts the collateral type enum to a string representation.
+ * @param type
+ */
+function collateralTypeToString(type: i32): string {
+  if (type == 0) return "ERC20";
+  if (type == 1) return "ERC721";
+  if (type == 2) return "ERC1155";
+  return "UNKNOWN";
+}
+
 export function handleCollateralWithdrawns(
   events: CollateralWithdrawn[]
 ): void {
@@ -107,7 +143,7 @@ export function handleCollateralWithdrawns(
 }
 
 /**
- * Sets the bid status to `Liquidated` when the collateral is claimed from a defaulted loan.
+ * Sets the bid status to `Claimed` when the collateral is claimed from a defaulted loan.
  * @param event
  */
 export function handleCollateralClaimed(event: CollateralClaimed): void {
@@ -116,10 +152,10 @@ export function handleCollateralClaimed(event: CollateralClaimed): void {
   const collateralManager = CollateralManager.bind(event.address);
   const tellerV2 = TellerV2.bind(collateralManager.tellerV2());
 
-  // If the bid is not Repaid, then it means the lender has liquidated the loan
-  // without making a payment. In this case, we set the bid status to `Liquidated`.
+  // If the bid is not Repaid, then it means the lender has claimed collateral
+  // without making a payment. In this case, we set the bid status to `Claimed`.
   if (tellerV2.getBidState(bid.bidId) !== BidStatus.Repaid) {
-    updateBidStatus(bid, BidStatus.Liquidated);
+    updateBidStatus(bid, BidStatus.Claimed);
   }
 }
 

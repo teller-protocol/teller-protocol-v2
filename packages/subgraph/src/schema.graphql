@@ -92,6 +92,9 @@ type Bid @entity(immutable: false) {
   commitmentId: String
 
   payments: [Payment!]! @derivedFrom(field: "bid")
+  collateralDeposits: [CollateralDeposit!]! @derivedFrom(field: "bid")
+  collateralWithdrawals: [CollateralWithdrawal!]! @derivedFrom(field: "bid")
+  liquidations: [Liquidation!]! @derivedFrom(field: "bid")
   totalRepaidPrincipal: BigInt!
   totalRepaidInterest: BigInt!
   _lastTotalRepaidAmount: BigInt!
@@ -137,6 +140,37 @@ type Payment @entity(immutable: false) {
   paymentDate: BigInt!
   outstandingCapital: BigInt!
   status: String!
+}
+
+type CollateralDeposit @entity(immutable: false) {
+  id: ID!
+  bid: Bid!
+  collateralAddress: Bytes!
+  amount: BigInt!
+  tokenId: BigInt!
+  collateralType: String!
+  timestamp: BigInt!
+  transactionHash: String!
+}
+
+type CollateralWithdrawal @entity(immutable: false) {
+  id: ID!
+  bid: Bid!
+  collateralAddress: Bytes!
+  amount: BigInt!
+  tokenId: BigInt!
+  collateralType: String!
+  recipient: Bytes!
+  timestamp: BigInt!
+  transactionHash: String!
+}
+
+type Liquidation @entity(immutable: false) {
+  id: ID!
+  bid: Bid!
+  liquidator: Bytes!
+  timestamp: BigInt!
+  transactionHash: String!
 }
 
 type User @entity(immutable: false) {
@@ -227,6 +261,12 @@ interface ILoanStatusCount {
 
   liquidated: [Bid!]!
   liquidatedCount: BigInt!
+
+  closed: [Bid!]!
+  closedCount: BigInt!
+
+  claimed: [Bid!]!
+  claimedCount: BigInt!
 }
 
 type LoanStatusCount implements ILoanStatusCount @entity(immutable: false) {
@@ -261,6 +301,12 @@ type LoanStatusCount implements ILoanStatusCount @entity(immutable: false) {
 
   liquidated: [Bid!]!
   liquidatedCount: BigInt!
+
+  closed: [Bid!]!
+  closedCount: BigInt!
+
+  claimed: [Bid!]!
+  claimedCount: BigInt!
 
   ## Entity Relationships ##
   _protocol: Protocol

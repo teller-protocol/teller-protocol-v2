@@ -15,10 +15,11 @@ export enum BidStatus {
   Late,
   Defaulted,
 
-  Closed
+  Closed,
+  Claimed
 }
 
-export const BidStatusValues = new Array<string>(10);
+export const BidStatusValues = new Array<string>(12);
 BidStatusValues[BidStatus.None] = "";
 BidStatusValues[BidStatus.Submitted] = "Submitted";
 BidStatusValues[BidStatus.Cancelled] = "Cancelled";
@@ -30,6 +31,9 @@ BidStatusValues[BidStatus.Expired] = "Expired";
 BidStatusValues[BidStatus.DueSoon] = "Due Soon";
 BidStatusValues[BidStatus.Late] = "Late";
 BidStatusValues[BidStatus.Defaulted] = "Defaulted";
+
+BidStatusValues[BidStatus.Closed] = "Closed";
+BidStatusValues[BidStatus.Claimed] = "Claimed";
 
 export function bidStatusToEnum(status: string): BidStatus {
   return BidStatusValues.indexOf(status);

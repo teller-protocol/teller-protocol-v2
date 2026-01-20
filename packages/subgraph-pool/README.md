@@ -34,27 +34,29 @@ npm run generate mainnet
 
 ```
  
+
+
+
  
+ ```
 
+Deploy to THE GRAPH 
 
-5. auth 
 
 graph auth 
 
 
-
-6. deploy ! 
-
  graph deploy   teller-pools-mainnet --version-label 0.4.21.4
 
- graph deploy teller-pools-mainnet --version-label 0.4.21.1
+
+ ```
 
  
 
 
 ```
 
-Deploy to alchemy 
+# Deploy to alchemy 
 
 graph deploy tellerv2-pools-mainnet \
   --version-label 0.4.21.4 \
@@ -64,7 +66,11 @@ graph deploy tellerv2-pools-mainnet \
 
 
 
-Deploy to ormi migrations  
+ # Deploy to ormi migrations 
+ 
+
+ yarn deploy_ormi teller-pools-mainnet 
+
 
 
 

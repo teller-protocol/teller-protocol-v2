@@ -37,23 +37,27 @@ npm run generate mainnet
  
 
 
-5. auth 
+
+ 
+ ```
+
+Deploy to THE GRAPH 
+
 
 graph auth 
 
 
+ graph deploy   teller-pools-v2-mainnet --version-label 0.4.21.4
 
-6. deploy ! 
 
- graph deploy   teller-pools-mainnet --version-label 0.4.21-6
+ ```
+
+
  
-
- 
-
 
 ```
 
-Deploy to alchemy 
+## Deploy to alchemy 
 
 graph deploy tellerv2-poolsv2-mainnet \
   --version-label 0.4.21.4 \
@@ -61,6 +65,21 @@ graph deploy tellerv2-poolsv2-mainnet \
   --deploy-key xxxxxx \
   --ipfs https://ipfs.satsuma.xyz
 
+
+
+```
+
+
+```
+
+## Deploy to ormi labs 
+
+npm run generate arbitrum
+
+npm run codegen && npm run build 
+
+ yarn deploy_ormi teller-pools-v2-mainnet 
+ yarn deploy_ormi teller-pools-v2-base 
 
 
 ```

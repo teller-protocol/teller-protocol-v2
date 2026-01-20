@@ -19,7 +19,7 @@ import {
   group_pool_metric_data_point_daily,
   group_pool_metric_data_point_weekly
 } from "../../generated/schema"
-import { BigInt, Address, BigDecimal } from "@graphprotocol/graph-ts"
+import { BigInt, Address, Bytes } from "@graphprotocol/graph-ts"
 
 // Constants for time calculations
 const SECONDS_IN_DAY = BigInt.fromI32(86400)  // 24 * 60 * 60
@@ -195,29 +195,29 @@ export function handleBorrowerAcceptedFunds(event: BorrowerAcceptedFunds): void 
   eventEntity.evt_block_time = event.block.timestamp
   eventEntity.evt_block_number = event.block.number
   eventEntity.group_pool_address = poolAddress
-  eventEntity.bid_id = bidId.toBigDecimal()
+  eventEntity.bid_id = bidId
   eventEntity.borrower = borrower
-  eventEntity.collateral_amount = collateralAmount.toBigDecimal()
+  eventEntity.collateral_amount = collateralAmount
   eventEntity.interest_rate = BigInt.fromI32(interestRate)
   eventEntity.loan_duration = loanDuration
-  eventEntity.principal_amount = principalAmount.toBigDecimal()
+  eventEntity.principal_amount = principalAmount
   eventEntity.save()
 
   // Create or update pool bid entity
   let bidEntity = new group_pool_bid(poolAddress.toHexString() + "-" + bidId.toString())
   bidEntity.group_pool_address = poolAddress
-  bidEntity.bid_id = bidId.toBigDecimal()
+  bidEntity.bid_id = bidId
   bidEntity.borrower = borrower
-  bidEntity.collateral_amount = collateralAmount.toBigDecimal()
-  bidEntity.principal_amount = principalAmount.toBigDecimal()
+  bidEntity.collateral_amount = collateralAmount
+  bidEntity.principal_amount = principalAmount
   bidEntity.save()
 
    let tellerBidEntity = new teller_bid(  bidId.toString() )
   tellerBidEntity.group_pool_address = poolAddress
-  tellerBidEntity.bid_id = bidId.toBigDecimal()
+  tellerBidEntity.bid_id = bidId
   tellerBidEntity.borrower = borrower
-  tellerBidEntity.collateral_amount = collateralAmount.toBigDecimal()
-  tellerBidEntity.principal_amount = principalAmount.toBigDecimal()
+  tellerBidEntity.collateral_amount = collateralAmount
+  tellerBidEntity.principal_amount = principalAmount
   tellerBidEntity.save()
 
 
@@ -264,9 +264,9 @@ export function handleWithdraw(event: Withdraw): void {
   eventEntity.evt_block_time = event.block.timestamp
   eventEntity.evt_block_number = event.block.number
   eventEntity.group_pool_address = poolAddress
-  eventEntity.amount_pool_shares_tokens = amountPoolSharesTokens.toBigDecimal()
+  eventEntity.amount_pool_shares_tokens = amountPoolSharesTokens
   eventEntity.lender = lender
-  eventEntity.principal_tokens_withdrawn = principalTokensWithdrawn.toBigDecimal()
+  eventEntity.principal_tokens_withdrawn = principalTokensWithdrawn
   eventEntity.recipient = recipient
   eventEntity.save()
 
@@ -307,9 +307,9 @@ export function handleDeposit(event: Deposit): void {
   eventEntity.evt_block_time = event.block.timestamp
   eventEntity.evt_block_number = event.block.number
   eventEntity.group_pool_address = poolAddress
-  eventEntity.amount = amount.toBigDecimal()
+  eventEntity.amount = amount
   eventEntity.lender = lender
-  eventEntity.shares_amount = sharesAmount.toBigDecimal()
+  eventEntity.shares_amount = sharesAmount
   eventEntity.shares_recipient = sharesRecipient
   eventEntity.save()
 
@@ -350,12 +350,12 @@ export function handleLoanRepaid(event: LoanRepaid): void {
   eventEntity.evt_block_time = event.block.timestamp
   eventEntity.evt_block_number = event.block.number
   eventEntity.group_pool_address = poolAddress
-  eventEntity.bid_id = bidId.toBigDecimal()
-  eventEntity.interest_amount = interestAmount.toBigDecimal()
-  eventEntity.principal_amount = principalAmount.toBigDecimal()
+  eventEntity.bid_id = bidId
+  eventEntity.interest_amount = interestAmount
+  eventEntity.principal_amount = principalAmount
   eventEntity.repayer = repayer
-  eventEntity.total_interest_collected = totalInterestCollected.toBigDecimal()
-  eventEntity.total_principal_repaid = totalPrincipalRepaid.toBigDecimal()
+  eventEntity.total_interest_collected = totalInterestCollected
+  eventEntity.total_principal_repaid = totalPrincipalRepaid
   eventEntity.save()
 
   // Update pool metrics
@@ -389,10 +389,10 @@ export function handleLoanLiquidated(event: DefaultedLoanLiquidated): void {
   eventEntity.evt_block_time = event.block.timestamp
   eventEntity.evt_block_number = event.block.number
   eventEntity.group_pool_address = poolAddress
-  eventEntity.amount_due = amountDue.toBigDecimal()
-  eventEntity.bid_id = bidId.toBigDecimal()
+  eventEntity.amount_due = amountDue
+  eventEntity.bid_id = bidId
   eventEntity.liquidator = liquidator
-  eventEntity.token_amount_difference = tokenAmountDifference.toBigDecimal()
+  eventEntity.token_amount_difference = tokenAmountDifference
   eventEntity.save()
 
   // Update pool metrics

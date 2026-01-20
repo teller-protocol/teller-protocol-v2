@@ -60,19 +60,29 @@ yarn build
  
 
 
-5. auth 
+5. PREP  
+
+
+```
+yarn handlebars mainnet / polygon / arbitrum / base 
 
 graph auth 
 
 graph codegen && graph build
 
+```
 
 
 6. deploy ! 
 
- graph deploy   teller-v-2-base --version-label 0.4.21-25
 
- graph deploy   tellerv2-arbitrum --version-label 0.4.21-22
+
+  graph deploy tellerv2-mainnet --version-label 0.4.21-24
+
+
+ graph deploy   teller-v-2-base --version-label 0.4.21-26
+
+ graph deploy   tellerv2-arbitrum --version-label 0.4.21-24
 
 
  graph deploy   teller-v-2-katana --version-label 0.4.21-22

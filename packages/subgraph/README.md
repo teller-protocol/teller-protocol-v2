@@ -28,31 +28,6 @@ yarn build
  yarn contracts export --network base
 ```
 
- 
- 4. run handlebars which will build the final  subgraph.yaml file ! 
-
-```
- yarn hbs -D ./config/${subgraph.network}.json ./src/subgraph.handlebars -o . -e yaml
- 
-  yarn hbs -D ./config/mainnet.json ./src/subgraph.handlebars -o . -e yaml
-
- yarn hbs -D ./config/arbitrum-one.json ./src/subgraph.handlebars -o . -e yaml
- 
-  yarn hbs -D ./config/base.json ./src/subgraph.handlebars -o . -e yaml
-
-   yarn hbs -D ./config/polygon.json ./src/subgraph.handlebars -o . -e yaml
-
-
-   yarn hbs -D ./config/optimism.json ./src/subgraph.handlebars -o . -e yaml
-
-
-   yarn hbs -D ./config/katana.json ./src/subgraph.handlebars -o . -e yaml
-
- yarn hbs -D ./config/hyperevm.json ./src/subgraph.handlebars -o . -e yaml
- 
-
-```
- 
 
 
 4.1.  ( make sure graft base is OK -- in subgraph / config {{ networkname.json }} )
@@ -66,14 +41,19 @@ yarn build
 ```
 yarn handlebars mainnet / polygon / arbitrum / base 
 
+
+
+yarn build    -- (graph codegen && graph build)
+
+
+
 graph auth 
 
-graph codegen && graph build
 
 ```
 
 
-6. deploy ! 
+6. Deploy ! 
 
 
 
@@ -86,7 +66,7 @@ graph codegen && graph build
 
 
  graph deploy   teller-v-2-katana --version-label 0.4.21-22
- graph deploy   teller-v-2-polygon --version-label 0.4.21-25
+ graph deploy   teller-v-2-polygon --version-label 0.4.21-26
 
 graph deploy   teller-v-2-optimism --version-label 0.4.21-19
 
@@ -203,3 +183,31 @@ yarn subgraph deploy-local:polygon
 1. Build:  yarn subgraph build goerli
 
 2. Deploy: yarn subgraph build:deploy goerli 
+
+
+
+
+ 
+ 4. manually run handlebars which will build the final  subgraph.yaml file ! 
+
+```
+ yarn hbs -D ./config/${subgraph.network}.json ./src/subgraph.handlebars -o . -e yaml
+ 
+  yarn hbs -D ./config/mainnet.json ./src/subgraph.handlebars -o . -e yaml
+
+ yarn hbs -D ./config/arbitrum-one.json ./src/subgraph.handlebars -o . -e yaml
+ 
+  yarn hbs -D ./config/base.json ./src/subgraph.handlebars -o . -e yaml
+
+   yarn hbs -D ./config/polygon.json ./src/subgraph.handlebars -o . -e yaml
+
+
+   yarn hbs -D ./config/optimism.json ./src/subgraph.handlebars -o . -e yaml
+
+
+   yarn hbs -D ./config/katana.json ./src/subgraph.handlebars -o . -e yaml
+
+ yarn hbs -D ./config/hyperevm.json ./src/subgraph.handlebars -o . -e yaml
+ 
+
+```

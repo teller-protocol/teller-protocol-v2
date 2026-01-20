@@ -287,7 +287,7 @@ export function updateBidOnPayment(
 ): void {
   if (paymentEventType == PaymentEventType.Liquidated) {
     updateBidStatus(bid, BidStatus.Liquidated);
-  } else if (bidStatusToEnum(bid.status) != BidStatus.Liquidated) {
+  } else if (bidStatusToEnum(bid.status) != BidStatus.Liquidated && bidStatusToEnum(bid.status) != BidStatus.Claimed) {
     if (paymentEventType == PaymentEventType.Repayment) {
       updateBidStatus(bid, BidStatus.Accepted);
     } else if (paymentEventType == PaymentEventType.Repaid) {

@@ -188,6 +188,12 @@ export function loadLoanStatusCount(
     loans.liquidated = [];
     loans.liquidatedCount = BigInt.zero();
 
+    loans.closed = [];
+    loans.closedCount = BigInt.zero();
+
+    loans.claimed = [];
+    loans.claimedCount = BigInt.zero();
+
     loans.save();
   }
 

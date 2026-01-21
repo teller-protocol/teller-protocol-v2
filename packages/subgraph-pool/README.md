@@ -69,6 +69,10 @@ graph deploy tellerv2-pools-mainnet \
  # Deploy to ormi migrations 
  
 
+npm run codegen && npm run build 
+npm run generate mainnet
+
+
  yarn deploy_ormi teller-pools-mainnet 
 
 

@@ -4,7 +4,8 @@ import {
   LenderAddedPrincipal,
   LoanRepaid,
   DefaultedLoanLiquidated,
-  PoolInitialized
+  PoolInitialized,
+  Pool
 } from "../../generated/templates/Pool/Pool"
 import {
   group_borrower_accepted_funds,
@@ -431,7 +432,15 @@ export function handleLoanLiquidated(event: DefaultedLoanLiquidated): void {
   let bidId = event.params.bidId
   let liquidator = event.params.liquidator
   let amountDue = event.params.amountDue
-  let tokenAmountDifference = event.params.tokenAmountDifference
+
+  // Fetch tokenDifferenceFromLiquidations from contract (event value is incorrect)
+  let poolContract = Pool.bind(poolAddress)
+  let tokenDifferenceResult = poolContract.try_getTokenDifferenceFromLiquidations()
+
+  let tokenDifferenceFromContract = BigInt.fromI32(0)
+  if (!tokenDifferenceResult.reverted) {
+    tokenDifferenceFromContract = tokenDifferenceResult.value
+  }
 
   // Create defaulted loan liquidated event entity
   let eventEntity = new group_defaulted_loan_liquidated(
@@ -445,7 +454,7 @@ export function handleLoanLiquidated(event: DefaultedLoanLiquidated): void {
   eventEntity.amount_due = amountDue
   eventEntity.bid_id = bidId
   eventEntity.liquidator = liquidator
-  eventEntity.token_amount_difference = tokenAmountDifference
+  eventEntity.token_amount_difference = tokenDifferenceFromContract
   eventEntity.save()
 
   // Update pool metrics
@@ -455,7 +464,8 @@ export function handleLoanLiquidated(event: DefaultedLoanLiquidated): void {
     poolMetric.total_principal_tokens_repaid = poolMetric.total_principal_tokens_repaid.plus(amountDue)
     poolMetric.total_principal_tokens_repaid_by_liquidation_auction = poolMetric.total_principal_tokens_repaid_by_liquidation_auction.plus(amountDue)
 
-    poolMetric.token_difference_from_liquidations = poolMetric.token_difference_from_liquidations.plus(tokenAmountDifference)
+    // Use the total tokenDifferenceFromLiquidations from the contract directly
+    poolMetric.token_difference_from_liquidations = tokenDifferenceFromContract
     poolMetric.save()
 
     updatePoolMetric( poolAddress, event.block.number, event.block.timestamp  );

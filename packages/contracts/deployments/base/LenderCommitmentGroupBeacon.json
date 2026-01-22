@@ -1116,6 +1116,20 @@
     },
     {
       "type": "function",
+      "name": "liquidationsPaused",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "bool",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
       "name": "liquidityThresholdPercent",
       "constant": true,
       "stateMutability": "view",
@@ -1173,6 +1187,14 @@
     {
       "type": "function",
       "name": "pauseLendingPool",
+      "constant": false,
+      "payable": false,
+      "inputs": [],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "pauseLiquidations",
       "constant": false,
       "payable": false,
       "inputs": [],
@@ -1453,6 +1475,14 @@
     },
     {
       "type": "function",
+      "name": "unpauseLiquidations",
+      "constant": false,
+      "payable": false,
+      "inputs": [],
+      "outputs": []
+    },
+    {
+      "type": "function",
       "name": "withdrawDelayTimeSeconds",
       "constant": true,
       "stateMutability": "view",
@@ -1480,6 +1510,6 @@
     }
   ],
   "receipt": {},
-  "numDeployments": 1,
+  "numDeployments": 2,
   "implementation": "0xdb2Ba4a2b90c6670f240D59AfcBeb35cd9Edd515"
 }

@@ -270,6 +270,19 @@ export default <HardhatUserConfig>{
           browserURL: 'https://basescan.org',
         },
       },
+
+
+
+      {
+        network: 'arbitrum',
+        chainId: 42161 ,
+        urls: {
+          apiURL: 'https://api.etherscan.io/v2/api?chainid=42161 ',
+          browserURL: 'https://arbiscan.io',
+        },
+      },
+
+
        {
         network: 'optimism',
         chainId: 10,

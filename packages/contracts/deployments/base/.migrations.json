@@ -42,5 +42,6 @@
   "uniswap-pricing-helper:deploy": 1755183533,
   "lender-commitment-group-beacon-v2:pricing-helper": 1755183533,
   "lender-commitment-forwarder:extensions:flash-swap-rollover:g2-upgrade": 1755270789,
-  "timelock-controller:update-delay-7200": 1757524216
+  "timelock-controller:update-delay-7200": 1757524216,
+  "lender-commitment-group-beacon:upgrade-liq-pause": 1769124831
 }

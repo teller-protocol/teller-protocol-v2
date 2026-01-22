@@ -260,8 +260,9 @@ export class GnosisSafeAdminClient {
     transaction: SafeTransactionRequest,
     network: string
   ): Promise<{ safeTxHash: string }> {
-    const chainName = this.getNetworkPath([{network} as any])
-    const url = `https://api.safe.global/tx-service/${chainName}/api/v2/safes/${transaction.safe}/multisig-transactions/`
+    const txServiceHost = this.getTxServiceHost(network)
+    // Safe Global moved to network-specific subdomains
+    const url = `${txServiceHost}/api/v1/safes/${transaction.safe}/multisig-transactions/`
       
 
       console.log(`submitTransaction ${url }`)
@@ -356,15 +357,15 @@ export class GnosisSafeAdminClient {
   Requires API key authentication (get from https://app.safe.global/settings/setup)
   */
   private async getNextNonce(safeAddress: string, network: string, offset: number = 0): Promise<number> {
-    const chainName = this.getNetworkPath([{network} as any])
-    const url = `https://api.safe.global/tx-service/${chainName}/api/v2/safes/${safeAddress}/`
+    const txServiceHost = this.getTxServiceHost(network)
+    // Safe Global moved to network-specific subdomains
+    const url = `${txServiceHost}/api/v1/safes/${safeAddress}/`
 
-      console.log(`getNextNonce ${url}`)
+    console.log(`getNextNonce ${url}`)
 
     const headers: Record<string, string> = {
       'accept': 'application/json',
-      'content-type': 'application/json',
-      'Authorization': `Bearer ${this.apiKey}`
+      'content-type': 'application/json'
     }
 
     const response = await fetch(url, {
@@ -529,6 +530,24 @@ export class GnosisSafeAdminClient {
     }
 
     return networkMap[network as string] || 'eth'
+  }
+
+  // Returns the Safe Transaction Service host URL for the given network
+  // Safe Global now uses network-specific subdomains: https://safe-transaction-{network}.safe.global
+  private getTxServiceHost(network: string): string {
+    const networkMap: Record<string, string> = {
+      'mainnet': 'https://safe-transaction-mainnet.safe.global',
+      'sepolia': 'https://safe-transaction-sepolia.safe.global',
+      'goerli': 'https://safe-transaction-goerli.safe.global',
+      'polygon': 'https://safe-transaction-polygon.safe.global',
+      'arbitrum': 'https://safe-transaction-arbitrum.safe.global',
+      'optimism': 'https://safe-transaction-optimism.safe.global',
+      'base': 'https://safe-transaction-base.safe.global',
+      'gnosis': 'https://safe-transaction-gnosis-chain.safe.global',
+      'avalanche': 'https://safe-transaction-avalanche.safe.global',
+      'bsc': 'https://safe-transaction-bsc.safe.global',
+    }
+    return networkMap[network] || 'https://safe-transaction-mainnet.safe.global'
   }
 
 /*

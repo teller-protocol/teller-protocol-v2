@@ -142,7 +142,7 @@ contract LenderCommitmentGroup_Pool_V2 is
 
 
    // uint256 immutable public DEFAULT_WITHDRAW_DELAY_TIME_SECONDS = 300;
-   // uint256 immutable public MAX_WITHDRAW_DELAY_TIME = 86400;
+    uint256 immutable public MAX_WITHDRAW_DELAY_TIME = 86400;
 
     mapping(uint256 => bool) public activeBids;
     mapping(uint256 => uint256) public activeBidsAmountDueRemaining;
@@ -164,6 +164,8 @@ contract LenderCommitmentGroup_Pool_V2 is
     bool public liquidationAuctionPaused;
  
     mapping(address => bool) public withdrawDelayBypassForAccount;
+
+    mapping(address => mapping(address => bool )) private sharesDelegate; 
 
     event PoolInitialized(
         address indexed principalTokenAddress,
@@ -742,32 +744,7 @@ contract LenderCommitmentGroup_Pool_V2 is
         return pairPriceWithTwapFromOracle;
     }
 
-    /**
-     * @notice Calculates the principal token amount per collateral token based on Uniswap oracle prices
-     * @dev Uses Uniswap TWAP and applies any configured maximum limits
-     * @dev Returns the lesser of the oracle price or the configured maximum (if set)
-     * @param poolOracleRoutes Array of pool route configurations to use for price calculation
-     * @return The principal per collateral ratio, expanded by the Uniswap expansion factor
-     */
-    function getPrincipalForCollateralForPoolRoutes(
-        IUniswapPricingLibrary.PoolRouteConfig[] memory poolOracleRoutes
-    ) external view virtual returns (uint256 ) {
-   
-        uint256 pairPriceWithTwapFromOracle = IUniswapPricingLibrary(UNISWAP_PRICING_HELPER)
-            .getUniswapPriceRatioForPoolRoutes(poolOracleRoutes);
-       
-       
-        uint256 principalPerCollateralAmount = maxPrincipalPerCollateralAmount == 0  
-                ? pairPriceWithTwapFromOracle   
-                : Math.min(
-                    pairPriceWithTwapFromOracle,
-                    maxPrincipalPerCollateralAmount //this is expanded by uniswap exp factor  
-                );
-
-
-        return principalPerCollateralAmount;
-    } 
-
+ 
 
     /**
      * @notice Calculates the amount of collateral tokens required for a given principal amount
@@ -869,6 +846,13 @@ contract LenderCommitmentGroup_Pool_V2 is
     onlyOwner {
        maxPrincipalPerCollateralAmount = _maxPrincipalPerCollateralAmount;
     }
+
+
+
+     function getMaxPrincipalPerCollateralAmount() external view returns (uint256) {
+
+        return maxPrincipalPerCollateralAmount;
+     }
 
   
 
@@ -1152,6 +1136,33 @@ contract LenderCommitmentGroup_Pool_V2 is
     
 
 
+    /**
+     * @notice Sets the delay time for withdrawing shares. Only Protocol Owner.
+     * @param _seconds Delay time in seconds.
+     */
+    function setWithdrawDelayTime(uint256 _seconds) 
+    external 
+    onlyProtocolOwner {
+        require( _seconds < MAX_WITHDRAW_DELAY_TIME , "WD");
+
+        withdrawDelayTimeSeconds = _seconds;
+    }
+
+
+
+    function setSharesDelegate( address delegate, bool approved ) external {
+
+        sharesDelegate[ msg.sender ][delegate] = approved;
+
+    } 
+
+    function isSharesDelegate( address owner  ,  address delegate ) public returns (bool) {
+
+        return  owner == delegate || sharesDelegate[owner][delegate]; 
+    }
+
+
+
     // ------------------------   Pausing functions  ------------ 
 
 
@@ -1280,6 +1291,9 @@ contract LenderCommitmentGroup_Pool_V2 is
 
 
 
+
+
+
     // ------------------------   ERC4626  functions  ------------ 
 
 
@@ -1302,8 +1316,10 @@ contract LenderCommitmentGroup_Pool_V2 is
         // Similar to addPrincipalToCommitmentGroup but following ERC4626 standard
         require(assets > 0 );
         
-         bool poolWasActivated = poolIsActivated();
+        bool poolWasActivated = poolIsActivated();
+        require( isSharesDelegate( receiver, msg.sender ) , "UA");
         
+
         
         // Transfer assets from sender to vault
         uint256 principalTokenBalanceBefore = principalToken.balanceOf(address(this));
@@ -1351,6 +1367,8 @@ contract LenderCommitmentGroup_Pool_V2 is
         assets = previewMint(shares);
         require(assets > 0);
 
+        require( isSharesDelegate( receiver, msg.sender ) , "UA");
+
 
         bool poolWasActivated = poolIsActivated();
         
@@ -1397,11 +1415,11 @@ contract LenderCommitmentGroup_Pool_V2 is
 
 
         require(  
-            withdrawDelayBypassForAccount[msg.sender] || 
+            withdrawDelayBypassForAccount[ owner ] || 
             block.timestamp >= sharesLastTransferredAt + withdrawDelayTimeSeconds, "SW"
             );
 
-        require(msg.sender == owner, "UA");
+        require(isSharesDelegate( owner, msg.sender ) , "UA");
         
         // Burn shares from owner
         burnShares(owner, shares);
@@ -1440,12 +1458,14 @@ contract LenderCommitmentGroup_Pool_V2 is
         // Calculate assets to receive
         assets = _valueOfUnderlying(shares, sharesExchangeRateInverse());
      
-        require(msg.sender == owner, "UA");
+         
+        require(isSharesDelegate( owner, msg.sender )    , "UA");
+        
 
         // Check withdrawal delay
         uint256 sharesLastTransferredAt = getSharesLastTransferredAt(owner);
         require(
-             withdrawDelayBypassForAccount[msg.sender] ||  
+             withdrawDelayBypassForAccount[ owner ] ||  
             block.timestamp >= sharesLastTransferredAt + withdrawDelayTimeSeconds, "SR"
          );
         

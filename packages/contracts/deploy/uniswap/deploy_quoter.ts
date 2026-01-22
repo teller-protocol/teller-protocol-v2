@@ -14,14 +14,13 @@ const deployFn: DeployFunction = async (hre) => {
 
     let uniswapV3FactoryAddress =  get_ecosystem_contract_address( hre.network.name, "uniswapV3Factory" ) ;
    
-
-
-  const quoter = await  deploy({
-    contract: 'Quoter',
-    args: [ uniswapV3FactoryAddress ] ,
-    skipIfAlreadyDeployed: true,
-    hre,
-  })
+ 
+      const quoter = await  deploy({
+        contract: 'Quoter',
+        args: [ uniswapV3FactoryAddress ] ,
+        skipIfAlreadyDeployed: true,
+        hre,
+      })
 
   return true
 }

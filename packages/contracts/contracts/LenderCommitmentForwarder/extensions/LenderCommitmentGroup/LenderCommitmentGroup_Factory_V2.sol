@@ -128,10 +128,16 @@ contract LenderCommitmentGroupFactory_V2 is OwnableUpgradeable {
 
         address sharesRecipient = msg.sender; 
 
+        //first the shares enter the factory
         uint256 sharesAmount_ = IERC4626( address(_newGroupContract) )
             .deposit(
                 _initialPrincipalAmount,
-                sharesRecipient  
+                address(this)  
+            );
+
+        //then they are sent to the caller 
+        IERC20( address(_newGroupContract) ).transfer(
+               sharesRecipient,  sharesAmount_
             );
 
         return sharesAmount_;

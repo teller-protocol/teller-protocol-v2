@@ -5,9 +5,21 @@ const deployFn: DeployFunction = async (hre) => {
     
 
   const { deployer } = await hre.getNamedAccounts()
-  const UniswapPricingHelper = await hre.deployments.deploy('UniswapPricingHelper', {
-    from: deployer,
-  })
+ // const UniswapPricingHelper = await hre.deployments.deploy('UniswapPricingHelper', {
+ //   from: deployer,
+ // })
+
+
+
+  const UniswapPricingHelper = await hre.deployProxy(
+    'UniswapPricingHelper',
+    {
+      unsafeAllow: ['constructor', 'state-variable-immutable'],
+       
+    }
+  )
+
+
 
   hre.log('Deploying UniswapPricingHelper')
 

@@ -24,6 +24,11 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
+import { Math  } from "@openzeppelin/contracts/utils/math/Math.sol";
+
+import {ILenderCommitmentGroup_V2} from "../interfaces/ILenderCommitmentGroup_V2.sol";
+
+
 
 /*
  
@@ -161,5 +166,37 @@ contract UniswapPricingHelper
         
         return FullMath.mulDiv(sqrtPriceX96, sqrtPriceX96, FixedPoint96.Q96);
     }
+
+
+
+    /**
+     * @notice Calculates the principal token amount per collateral token based on Uniswap oracle prices
+     * @dev Uses Uniswap TWAP and applies any configured maximum limits
+     * @dev Returns the lesser of the oracle price or the configured maximum (if set)
+     * @param poolOracleRoutes Array of pool route configurations to use for price calculation
+     * @param pool th address of the pool 
+     * @return The principal per collateral ratio, expanded by the Uniswap expansion factor
+     */
+    function getPrincipalForCollateralForPoolRoutes(
+        IUniswapPricingLibrary.PoolRouteConfig[] memory poolOracleRoutes,
+        address pool
+    ) external view virtual returns (uint256 ) {
+
+        uint256 pairPriceWithTwapFromOracle = getUniswapPriceRatioForPoolRoutes(poolOracleRoutes);
+
+
+        uint256 maxPrincipalPerCollateralAmount =  ILenderCommitmentGroup_V2( pool ).getMaxPrincipalPerCollateralAmount() ;
+
+        uint256 principalPerCollateralAmount = maxPrincipalPerCollateralAmount == 0  
+                ? pairPriceWithTwapFromOracle   
+                : Math.min(
+                    pairPriceWithTwapFromOracle,
+                    maxPrincipalPerCollateralAmount //this is expanded by uniswap exp factor  
+                );
+
+
+        return principalPerCollateralAmount;
+    } 
+
 
 }

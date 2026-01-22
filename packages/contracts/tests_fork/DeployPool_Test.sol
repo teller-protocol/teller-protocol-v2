@@ -35,7 +35,7 @@ the pair is USDT0 <> WHYPE
 
 contract DeployPool_Fork_Test is Test {
 
-    string constant NETWORK_NAME = "hyperevm";
+    string constant NETWORK_NAME = "polygon";
     
     LenderCommitmentGroupFactory_V2 factoryv2;
    // address constant DEPLOYED_SWAP_ROLLOVER_LOAN = 0xa4A8c60Ac9E0c38f8B46316c6B3B508b3BA04415; // Replace with actual deployed address
@@ -133,9 +133,9 @@ contract DeployPool_Fork_Test is Test {
 
         // Define commitment group configuration
         ILenderCommitmentGroup_V2.CommitmentGroupConfig memory config = ILenderCommitmentGroup_V2.CommitmentGroupConfig({
-            principalTokenAddress: 0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb,
-            collateralTokenAddress: 0x5555555555555555555555555555555555555555,
-            marketId: 1,
+            principalTokenAddress: 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174,
+            collateralTokenAddress: 0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270,
+            marketId: 49,
             maxLoanDuration: 604800,
             interestRateLowerBound: 6000,
             interestRateUpperBound: 11000,

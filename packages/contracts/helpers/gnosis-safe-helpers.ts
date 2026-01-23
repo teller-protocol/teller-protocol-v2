@@ -115,7 +115,9 @@ export class GnosisSafeAdminClient {
     )
 
     const nonce = await this.getNextNonce(safeAddress, network, request.nonceOffset || 0)
-    
+      
+    console.log({nonce});
+
     // Generate transaction hash first
     const txHash = await this.generateTransactionHash(
       safeAddress,
@@ -207,6 +209,9 @@ export class GnosisSafeAdminClient {
     const multiSendAddress = this.getMultiSendAddress(network)
 
     const nonce = await this.getNextNonce(safeAddress, network, request.nonceOffset || 0)
+
+      console.log({nonce});
+      
     const ledgerSignatureResult = await generateLedgerSignature({
       to: multiSendAddress,
       data: multiSendData,
@@ -357,6 +362,11 @@ export class GnosisSafeAdminClient {
   Requires API key authentication (get from https://app.safe.global/settings/setup)
   */
   private async getNextNonce(safeAddress: string, network: string, offset: number = 0): Promise<number> {
+   
+      //force a particular nonce 
+   // return 155 + offset; 
+
+
     const txServiceHost = this.getTxServiceHost(network)
     // Safe Global moved to network-specific subdomains
     const url = `${txServiceHost}/api/v1/safes/${safeAddress}/`
@@ -396,7 +406,7 @@ export class GnosisSafeAdminClient {
   }
 
 
-  private async getNextNonceV1(safeAddress: string, network: string, offset: number = 0): Promise<number> {
+  /*private async getNextNonceV1(safeAddress: string, network: string, offset: number = 0): Promise<number> {
       
       // https://api.safe.global/tx-service/eth/api/v1/safes/0x9E3bfee4C6b4D28b5113E4786A1D9812eB3D2Db6/ 
 
@@ -433,7 +443,7 @@ export class GnosisSafeAdminClient {
 
     const safeInfo = await response.json()
     return parseInt(safeInfo.nonce) + parseInt(offset)
-  }
+  }*/
 
 
 

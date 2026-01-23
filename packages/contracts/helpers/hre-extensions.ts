@@ -690,7 +690,7 @@ extendEnvironment((hre) => {
     schedule: ProposalResponse
     execute: ProposalResponse
   }> => {
-    const delay = moment.duration(3, 'minutes').asSeconds().toString()
+    const delay = moment.duration(120, 'minutes').asSeconds().toString()
 
     // build the timelock batch args from the steps
 

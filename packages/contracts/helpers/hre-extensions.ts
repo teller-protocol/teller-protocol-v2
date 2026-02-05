@@ -691,7 +691,52 @@ extendEnvironment((hre) => {
     execute: ProposalResponse
   }> => {
 
-    //delay of 7200 
+    // Networks with Safe Transaction Service support
+    const safeApiSupportedNetworks = [
+      'mainnet', 'sepolia', 'goerli', 'polygon', 'arbitrum',
+      'optimism', 'base', 'gnosis', 'avalanche', 'bsc'
+    ]
+
+    const networkName = hre.network.name
+
+    // If network doesn't have Safe API support, perform direct upgrades
+    if (!safeApiSupportedNetworks.includes(networkName)) {
+      console.log(`Network ${networkName} does not have Safe API support. Performing direct upgrades...`)
+
+      const steps = Array.isArray(_steps) ? _steps : [_steps]
+      for (const step of steps) {
+        if (isUpgradeProxyStep(step)) {
+          const proxyAddress = typeof step.proxy === 'string'
+            ? step.proxy
+            : await step.proxy.getAddress()
+
+          console.log(`Upgrading proxy at ${proxyAddress}...`)
+          await hre.upgrades.upgradeProxy(proxyAddress, step.implFactory, step.opts)
+          console.log(`Proxy upgraded successfully.`)
+        } else if (isUpgradeBeaconStep(step)) {
+          const beaconAddress = typeof step.beacon === 'string'
+            ? step.beacon
+            : await step.beacon.getAddress()
+
+          console.log(`Upgrading beacon at ${beaconAddress}...`)
+          await hre.upgrades.upgradeBeacon(beaconAddress, step.implFactory, step.opts)
+          console.log(`Beacon upgraded successfully.`)
+        } else if (isCallStep(step)) {
+          console.log(`Executing call to ${step.contractAddress}...`)
+          const tx = await step.contractImplementation[step.callFn](...step.callArgs)
+          await tx.wait()
+          console.log(`Call executed successfully.`)
+        }
+      }
+
+      // Return a dummy response for direct upgrades
+      return {
+        schedule: { proposalId: 'direct-upgrade', url: '' } as ProposalResponse,
+        execute: { proposalId: 'direct-upgrade', url: '' } as ProposalResponse,
+      }
+    }
+
+    //delay of 7200
     const delay = moment.duration(120, 'minutes').asSeconds().toString()
 
 
@@ -733,8 +778,12 @@ async function getOZNetwork(hre: HardhatRuntimeEnvironment): Promise<Network> {
 
   // network is just a string like 'mainnet' 
 
-   if (chainId == '747474' ){ 
-    return 'katana'   
+   if (chainId == '747474' ){
+    return 'katana'
+  }
+
+  if (chainId == '999' ){
+    return 'hyperevm'
   }
 
   if (chainId == '100000001' ){

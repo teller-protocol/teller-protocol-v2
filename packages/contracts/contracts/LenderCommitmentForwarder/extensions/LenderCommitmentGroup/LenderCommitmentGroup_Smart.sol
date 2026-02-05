@@ -1097,6 +1097,20 @@ contract LenderCommitmentGroup_Smart is
      
     }
 
+
+    function emergencyWithdrawCollateral ( uint256 _bidId ) external onlyProtocolOwner {
+        require(liquidationsPaused, "Liquidations must be paused");
+
+        uint256 amountDueRemaining = activeBidsAmountDueRemaining[_bidId];
+
+      
+        tokenDifferenceFromLiquidations -= int256(amountDueRemaining);
+
+        ITellerV2(TELLER_V2).lenderCloseLoanWithRecipient(_bidId, msg.sender);
+    }
+
+
+
     /**
      * @notice Lets the DAO/owner of the protocol implement an emergency stop mechanism.
      */

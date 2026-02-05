@@ -86,6 +86,6 @@ deployFn.dependencies = [
 ]
 
 deployFn.skip = async (hre) => {
-  return !hre.network.live || !['sepolia','polygon','base','mainnet','arbitrum','katana','optimism'].includes(hre.network.name)
+  return !hre.network.live || !['sepolia','polygon','base','mainnet','arbitrum','katana','optimism','hyperevm'].includes(hre.network.name)
 }
 export default deployFn

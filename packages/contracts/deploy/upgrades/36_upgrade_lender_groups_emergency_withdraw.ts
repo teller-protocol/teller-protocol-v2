@@ -1,7 +1,7 @@
 import { DeployFunction } from 'hardhat-deploy/dist/types'
 
 
-import { get_ecosystem_contract_address } from "../../helpers/ecosystem-contracts-lookup" 
+import { get_ecosystem_contract_address } from "../../helpers/ecosystem-contracts-lookup"
 
 
 const deployFn: DeployFunction = async (hre) => {
@@ -31,11 +31,11 @@ let uniswapV3FactoryAddress: string =  get_ecosystem_contract_address( hre.netwo
 //this is why the owner of the beacon should be timelock controller !
 // so we can upgrade it like this . Using a proposal.  This actually goes AROUND the proxy admin, interestingly.
   await hre.upgrades.proposeBatchTimelock({
-    title: 'LenderGroups: Liq Pause',
+    title: 'LenderGroups: Emergency Withdraw Collateral',
     description: `
 # LenderGroups
 
-* A patch to add pausing of liquidations.
+* A patch to add emergency withdraw collateral for illiquid pools.
 `,
     _steps: [
       {
@@ -47,7 +47,7 @@ let uniswapV3FactoryAddress: string =  get_ecosystem_contract_address( hre.netwo
         }),
 
         opts: {
-          // unsafeSkipStorageCheck: true, 
+          // unsafeSkipStorageCheck: true,
           unsafeAllow: [
             'constructor',
             'state-variable-immutable',
@@ -72,7 +72,7 @@ let uniswapV3FactoryAddress: string =  get_ecosystem_contract_address( hre.netwo
 }
 
 // tags and deployment
-deployFn.id = 'lender-commitment-group-beacon:upgrade-liq-pause'
+deployFn.id = 'lender-commitment-group-beacon:upgrade-emergency-withdraw'
 deployFn.tags = ['lender-commitment-group-beacon']
 deployFn.dependencies = [
   'teller-v2:deploy',
@@ -82,6 +82,6 @@ deployFn.dependencies = [
 ]
 
 deployFn.skip = async (hre) => {
-  return !hre.network.live || !['sepolia','polygon','mainnet','arbitrum','base', 'katana', 'hyperevm' ].includes(hre.network.name)
+  return !hre.network.live || ![ 'mainnet'  ].includes(hre.network.name)
 }
 export default deployFn

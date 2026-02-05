@@ -573,6 +573,6 @@
     "blockHash": "0x52282e9c4d713f296a57bc01532f7d43ee4637ea98578b7127aa9bd0fd234819",
     "blockNumber": 13050348
   },
-  "numDeployments": 1,
+  "numDeployments": 4,
   "implementation": "0x7292385522F11390B2A7dd4677528fFce03b80db"
 }

@@ -231,7 +231,7 @@ contract LenderCommitmentGroup_Smart is
     modifier onlyTellerV2() {
         require(
             msg.sender == address(TELLER_V2),
-            "Can only be called by TellerV2"
+            "ot"
         );
         _;
     }
@@ -240,7 +240,7 @@ contract LenderCommitmentGroup_Smart is
     modifier onlyProtocolOwner() {
         require(
             msg.sender == Ownable(address(TELLER_V2)).owner(),
-            "Not Protocol Owner"
+            "np"
         );
         _;
     }
@@ -251,20 +251,20 @@ contract LenderCommitmentGroup_Smart is
 
         require(
            IProtocolPausingManager( pausingManager ).isPauser(msg.sender)  ,
-            "Not Owner or Protocol Owner"
+            "np"
         );
         _;
     }
 
     modifier bidIsActiveForGroup(uint256 _bidId) {
-        require(activeBids[_bidId] == true, "Bid is not active for group");
+        require(activeBids[_bidId] == true, "ba");
 
         _;
     }
  
 
     modifier whenForwarderNotPaused() {
-         require( PausableUpgradeable(address(SMART_COMMITMENT_FORWARDER)).paused() == false , "Smart Commitment Forwarder is paused");
+         require( PausableUpgradeable(address(SMART_COMMITMENT_FORWARDER)).paused() == false , "sp");
         _;
     }
 
@@ -535,9 +535,9 @@ contract LenderCommitmentGroup_Smart is
             "CT"
         );
         //the interest rate must be at least as high has the commitment demands. The borrower can use a higher interest rate although that would not be beneficial to the borrower.
-        require(_interestRate >= getMinInterestRate(_principalAmount), "Invalid interest rate");
+        require(_interestRate >= getMinInterestRate(_principalAmount), "ID");
         //the loan duration must be less than the commitment max loan duration. The lender who made the commitment expects the money to be returned before this window.
-        require(_loanDuration <= maxLoanDuration, "Invalid loan max duration");
+        require(_loanDuration <= maxLoanDuration, "LMD");
 
         require(
             getPrincipalAmountAvailableToBorrow() >= _principalAmount,
@@ -1034,10 +1034,7 @@ contract LenderCommitmentGroup_Smart is
         return address(collateralToken);
     }
 
-    function getCollateralTokenId() external view returns (uint256) {
-        return 0;
-    }
-
+     
     function getCollateralTokenType()
         external
         view
@@ -1099,7 +1096,7 @@ contract LenderCommitmentGroup_Smart is
 
 
     function emergencyWithdrawCollateral ( uint256 _bidId ) external onlyProtocolOwner {
-        require(liquidationsPaused, "Liquidations must be paused");
+        require(liquidationsPaused );
 
         uint256 amountDueRemaining = activeBidsAmountDueRemaining[_bidId];
 

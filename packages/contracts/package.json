@@ -38,7 +38,8 @@
     "prepack": "node ./scripts/prepack.js",
     "docs:build": "forge doc --out docs/",
     "docs:serve": "forge doc --serve --port 3000",
-    "submodules:init": "git submodule update --init --recursive"
+    "submodules:init": "git submodule update --init --recursive",
+    "postinstall": "./scripts/patch-ethers.sh"
   },
   "repository": {
     "type": "git",

@@ -364,7 +364,7 @@ export class GnosisSafeAdminClient {
   private async getNextNonce(safeAddress: string, network: string, offset: number = 0): Promise<number> {
    
       //force a particular nonce 
-   // return 155 + offset; 
+      return 75 + offset; 
 
 
     const txServiceHost = this.getTxServiceHost(network)

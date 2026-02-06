@@ -71,14 +71,33 @@ interface SafeTransactionRequest {
   signature: string
 }
 
+async function fetchWithRetry(
+  url: string,
+  options: RequestInit,
+  maxRetries: number = 5,
+  baseDelayMs: number = 3000
+): Promise<Response> {
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    const response = await fetch(url, options)
+    if (response.status === 429 && attempt < maxRetries) {
+      const retryAfter = response.headers.get('retry-after')
+      const delayMs = retryAfter
+        ? parseInt(retryAfter) * 1000
+        : baseDelayMs * Math.pow(2, attempt)
+      console.log(`Rate limited (429). Retrying in ${delayMs / 1000}s... (attempt ${attempt + 1}/${maxRetries})`)
+      await new Promise(resolve => setTimeout(resolve, delayMs))
+      continue
+    }
+    return response
+  }
+  throw new Error('Unreachable')
+}
+
 export class GnosisSafeAdminClient {
   private apiKey: string
   private baseUrl: string = 'https://api.safe.global'
 
   constructor(config: { apiKey: string }) {
-    if (!config.apiKey) {
-      throw new Error('SAFE_GLOBAL_API_KEY is required. Get your API key at: https://app.safe.global/settings/setup')
-    }
     this.apiKey = config.apiKey
   }
 
@@ -115,8 +134,6 @@ export class GnosisSafeAdminClient {
     )
 
     const nonce = await this.getNextNonce(safeAddress, network, request.nonceOffset || 0)
-      
-    console.log({nonce});
 
     // Generate transaction hash first
     const txHash = await this.generateTransactionHash(
@@ -209,9 +226,6 @@ export class GnosisSafeAdminClient {
     const multiSendAddress = this.getMultiSendAddress(network)
 
     const nonce = await this.getNextNonce(safeAddress, network, request.nonceOffset || 0)
-
-      console.log({nonce});
-      
     const ledgerSignatureResult = await generateLedgerSignature({
       to: multiSendAddress,
       data: multiSendData,
@@ -265,10 +279,9 @@ export class GnosisSafeAdminClient {
     transaction: SafeTransactionRequest,
     network: string
   ): Promise<{ safeTxHash: string }> {
-    const txServiceHost = this.getTxServiceHost(network)
-    // Safe Global moved to network-specific subdomains
-    const url = `${txServiceHost}/api/v1/safes/${transaction.safe}/multisig-transactions/`
-      
+    const chainPrefix = this.getChainPrefix(network)
+    const url = `https://api.safe.global/tx-service/${chainPrefix}/api/v2/safes/${transaction.safe}/multisig-transactions/`
+
 
       console.log(`submitTransaction ${url }`)
       console.log('Transaction payload:', JSON.stringify(transaction, null, 2))
@@ -276,18 +289,25 @@ export class GnosisSafeAdminClient {
 
     const headers: Record<string, string> = {
       'accept': 'application/json',
-      'content-type': 'application/json',
-      'Authorization': `Bearer ${this.apiKey}`
+      'content-type': 'application/json'
+    }
+
+    // Add Authorization header if API key is provided
+    if (this.apiKey) {
+      headers['Authorization'] = `Bearer ${this.apiKey}`
+      console.log('Using API key for authentication')
+    } else {
+      console.log('No API key provided')
     }
 
     console.log('Request headers:', headers)
-    
-    const response = await fetch(url, {
+
+    const response = await fetchWithRetry(url, {
       method: 'POST',
       headers,
       body: JSON.stringify(transaction)
     })
-    
+
     console.log('Response status:', response.status)
     console.log('Response headers:', Object.fromEntries(response.headers.entries()))
 
@@ -354,96 +374,36 @@ export class GnosisSafeAdminClient {
   }
 
   /*
-  Fetches the next nonce for a Safe using the new Safe API format with authentication.
+  ex
+  https://safe-transaction-mainnet.safe.global/api/v1/safes/0xcd2E72aEBe2A203b84f46DEEC948E6465dB51c75/
 
-  Example endpoint:
-  https://api.safe.global/tx-service/eth/api/v2/safes/0xcd2E72aEBe2A203b84f46DEEC948E6465dB51c75/
-
-  Requires API key authentication (get from https://app.safe.global/settings/setup)
+  Need to be VERY careful with this bc it doesnt properly work in rapid succession rn
   */
   private async getNextNonce(safeAddress: string, network: string, offset: number = 0): Promise<number> {
-   
-      //force a particular nonce 
-   // return 155 + offset; 
-
-
-    const txServiceHost = this.getTxServiceHost(network)
-    // Safe Global moved to network-specific subdomains
-    const url = `${txServiceHost}/api/v1/safes/${safeAddress}/`
+    const chainPrefix = this.getChainPrefix(network)
+    const url = `https://api.safe.global/tx-service/${chainPrefix}/api/v1/safes/${safeAddress}/`
 
     console.log(`getNextNonce ${url}`)
 
-    const headers: Record<string, string> = {
-      'accept': 'application/json',
-      'content-type': 'application/json'
-    }
-
-    const response = await fetch(url, {
-      headers
+    const response = await fetchWithRetry(url, {
+      headers: {
+        'accept': 'application/json',
+        'content-type': 'application/json'
+      }
     })
 
-    
     if (!response.ok) {
       const errorText = await response.text()
       if (response.status === 404) {
-       // console.warn(`Safe not found, using nonce 0. This might be a new Safe or incorrect network.`)
-       // return 0
+        console.warn(`Safe not found, using nonce 0. This might be a new Safe or incorrect network.`)
+        return 0
       }
-
-
-
-      //try to get getNextNonceV1 and return that ..  ? 
-       
-
-
-      // return 71 + offset  // hack for now    use this if needed x.x 
-
       throw new Error(`Failed to get Safe info: ${response.status} - ${errorText}`)
     }
 
     const safeInfo = await response.json()
     return parseInt(safeInfo.nonce) + parseInt(offset)
   }
-
-
-  /*private async getNextNonceV1(safeAddress: string, network: string, offset: number = 0): Promise<number> {
-      
-      // https://api.safe.global/tx-service/eth/api/v1/safes/0x9E3bfee4C6b4D28b5113E4786A1D9812eB3D2Db6/ 
-
-      // this works , oddly enough 
-
-
-    const chainName = this.getNetworkPath([{network} as any])
-     let backup_url = `https://api.safe.global/tx-service/${chainName}/api/v1/safes/${safeAddress}/`;
-    
-      console.log(`getNextNonce ${url}`)
-
-    const headers: Record<string, string> = {
-      'accept': 'application/json',
-      'content-type': 'application/json' 
-       
-    }
-
-    const response = await fetch(backup_url, {
-      headers
-    })
-
-    
-    if (!response.ok) {
-      const errorText = await response.text()
-      if (response.status === 404) {
-       // console.warn(`Safe not found, using nonce 0. This might be a new Safe or incorrect network.`)
-       // return 0
-      } 
-
-      // return 71 + offset  // hack for now    use this if needed x.x 
-
-      throw new Error(`Failed to get Safe info: ${response.status} - ${errorText}`)
-    }
-
-    const safeInfo = await response.json()
-    return parseInt(safeInfo.nonce) + parseInt(offset)
-  }*/
 
 
 
@@ -458,8 +418,7 @@ export class GnosisSafeAdminClient {
       'base': 8453,
       'gnosis': 100,
       'avalanche': 43114,
-      'bsc': 56,
-      'katana':747474
+      'bsc': 56
     }
     return chainIds[network] || 1
   }
@@ -519,12 +478,8 @@ export class GnosisSafeAdminClient {
     return safeTxHash
   }
 
-  private getNetworkPath(contract: PartialContract | PartialContract[]): string {
-    const firstContract = Array.isArray(contract) ? contract[0] : contract
-    const network = firstContract.network
-
-    // Maps Hardhat network names to Safe API EIP3770 chain names
-    // Format: https://api.safe.global/tx-service/{chain}/api/v2/...
+  // EIP-3770 chain prefixes for api.safe.global/tx-service/{chain}/
+  private getChainPrefix(network: string): string {
     const networkMap: Record<string, string> = {
       'mainnet': 'eth',
       'sepolia': 'sep',
@@ -535,29 +490,9 @@ export class GnosisSafeAdminClient {
       'base': 'base',
       'gnosis': 'gno',
       'avalanche': 'avax',
-      'bsc': 'bnb',
-      'katana': 'katana',
+      'bsc': 'bnb'
     }
-
-    return networkMap[network as string] || 'eth'
-  }
-
-  // Returns the Safe Transaction Service host URL for the given network
-  // Safe Global now uses network-specific subdomains: https://safe-transaction-{network}.safe.global
-  private getTxServiceHost(network: string): string {
-    const networkMap: Record<string, string> = {
-      'mainnet': 'https://safe-transaction-mainnet.safe.global',
-      'sepolia': 'https://safe-transaction-sepolia.safe.global',
-      'goerli': 'https://safe-transaction-goerli.safe.global',
-      'polygon': 'https://safe-transaction-polygon.safe.global',
-      'arbitrum': 'https://safe-transaction-arbitrum.safe.global',
-      'optimism': 'https://safe-transaction-optimism.safe.global',
-      'base': 'https://safe-transaction-base.safe.global',
-      'gnosis': 'https://safe-transaction-gnosis-chain.safe.global',
-      'avalanche': 'https://safe-transaction-avalanche.safe.global',
-      'bsc': 'https://safe-transaction-bsc.safe.global',
-    }
-    return networkMap[network] || 'https://safe-transaction-mainnet.safe.global'
+    return networkMap[network] || 'eth'
   }
 
 /*

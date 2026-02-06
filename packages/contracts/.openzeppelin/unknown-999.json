@@ -2314,7 +2314,13 @@
           }
         },
         "namespaces": {}
-      }
+      },
+      "allAddresses": [
+        "0x7292385522F11390B2A7dd4677528fFce03b80db",
+        "0x62C4D65a8240785b7240bf5A8e21E16474D757F1",
+        "0x7848585b707F54CcF7044F8C82CF53F43100dc83",
+        "0x26E2BD4F67136a7929DFE82BD6392633eb5610C2"
+      ]
     },
     "59da181c273f4bd03bec57e2a33af721cf9fc478e2768226374c7b64bc04676a": {
       "address": "0x0AeeeD450EcCaFaA140222De43963B179B514540",

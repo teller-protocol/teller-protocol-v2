@@ -59,7 +59,7 @@ deployFn.skip = async (hre) => {
   // return true;   //for now 
   return !(
     hre.network.live &&
-    [ 'hyperevm' ].includes(
+    [ 'hyperevm', 'bsc' ].includes(
       hre.network.name
     )
   ) 

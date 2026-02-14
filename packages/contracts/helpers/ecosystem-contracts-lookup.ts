@@ -34,6 +34,9 @@ export function get_ecosystem_contract_address(
 	    case 'hyperevm':
 	     	uniswapV3FactoryAddress = '0xFf7B3e8C00e57ea31477c32A5B52a58Eea47b072'
 	     	break
+	    case 'bsc':
+	      uniswapV3FactoryAddress = '0x0BFbCF9fa4f9C56B0F40a671Ad40E0805A091865' // PancakeSwap V3
+	      break
 	    default:
 	      return undefined 
 	  }
@@ -70,6 +73,9 @@ export function get_ecosystem_contract_address(
 
 		      case 'hyperevm':
 		      weth9Address = '0x1fbccdc677c10671ee50b46c61f0f7d135112450'
+		      break
+		    case 'bsc':
+		      weth9Address = '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c' // WBNB
 		      break
 
 		    default:

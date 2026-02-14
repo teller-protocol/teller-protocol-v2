@@ -11,9 +11,16 @@ const deployFn: DeployFunction = async (hre) => {
 
   const marketRegistry = await hre.contracts.get('MarketRegistry')
   const reputationManager = await hre.contracts.get('ReputationManager')
-  const lenderCommitmentForwarder = await hre.contracts.get(
-    'LenderCommitmentForwarder'
-  )
+  let lenderCommitmentForwarder
+  try {
+    lenderCommitmentForwarder = await hre.contracts.get(
+      'LenderCommitmentForwarder'
+    )
+  } catch {
+    lenderCommitmentForwarder = await hre.contracts.get(
+      'LenderCommitmentForwarderAlpha'
+    )
+  }
   const collateralManager = await hre.contracts.get('CollateralManager')
   const lenderManager = await hre.contracts.get('LenderManager')
   const escrowVault = await hre.contracts.get('EscrowVault')

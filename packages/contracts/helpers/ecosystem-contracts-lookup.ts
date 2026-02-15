@@ -113,6 +113,9 @@ export function get_ecosystem_contract_address(
 		     case 'hyperevm':
 		       swapRouterAddress = '0x1EbDFC75FfE3ba3de61E7138a3E8706aC841Af9B'
 		       break
+		    case 'bsc':
+		      swapRouterAddress = '0x1b81D678ffb9C0263b24A97847620C99d213eB14' // PancakeSwap V3
+		      break
 		    default:
 		    	return undefined 
 		      //throw new Error('No swap factory address found for this network')
@@ -150,7 +153,10 @@ export function get_ecosystem_contract_address(
 			       break 
 			     case 'hyperevm':
 			     	quoterAddress = ' ' //'0x239F11a7A3E08f2B8110D4CA9F6B95d4c8865258'
-			     	break 
+			     	break
+			    case 'bsc':
+			      quoterAddress = '0xB048Bbc1Ee6b733FFfCFb9e9CeF7375518e25997' // PancakeSwap V3
+			      break
 			    default:
 			    	return undefined 
 			      //throw new Error('No swap factory address found for this network')

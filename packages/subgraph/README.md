@@ -39,7 +39,7 @@ yarn build
 
 
 ```
-yarn handlebars mainnet / polygon / arbitrum / base 
+yarn handlebars mainnet / polygon / arbitrum / base / katana / hyperevm 
 
 
 
@@ -65,7 +65,7 @@ graph auth
  graph deploy   tellerv2-arbitrum --version-label 0.4.21-24
 
 
- graph deploy   teller-v-2-katana --version-label 0.4.21-22
+ graph deploy   teller-v-2-katana --version-label 0.4.21.6
  graph deploy   teller-v-2-polygon --version-label 0.4.21-26
 
 graph deploy   teller-v-2-optimism --version-label 0.4.21-19
@@ -104,7 +104,9 @@ graph deploy tellerv2-polygon \
 graph build     (builds the yaml file in  /build/   ?  not in root  ) 
 
 
-goldsky subgraph deploy teller-v2-hyperevm/0.4.21.5
+goldsky subgraph deploy teller-v2-hyperevm/0.4.21.6
+
+goldsky subgraph deploy teller-v2-katana/0.4.21.6
 
 
 

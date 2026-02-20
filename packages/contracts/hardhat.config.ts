@@ -111,6 +111,7 @@ type NetworkNames =
   | 'optimism'
   | 'katana'
   | 'hyperevm'
+  | 'apechain'
   | 'sepolia'
   | 'mumbai'
   | 'goerli'
@@ -158,8 +159,9 @@ const networkUrls: Record<NetworkNames, string> = {
 
       katana: process.env.KATANA_RPC_URL ?? 'https://rpc.katana.network/', 
 
-      hyperevm: process.env.HYPEREVM_RPC_URL ?? 'https://rpc.hyperliquid.xyz/evm', 
+      hyperevm: process.env.HYPEREVM_RPC_URL ?? 'https://rpc.hyperliquid.xyz/evm',
 
+      apechain: process.env.APECHAIN_RPC_URL ?? 'https://rpc.apechain.com',
 
   mantle: 'https://rpc.mantle.xyz',
 
@@ -235,6 +237,7 @@ export default <HardhatUserConfig>{
       optimism: process.env.ETHERSCANV2_VERIFY_API_KEY,  //using the v2 api 
       katana: process.env.ETHERSCANV2_VERIFY_API_KEY,  //using the v2 api 
       hyperevm: process.env.ETHERSCANV2_VERIFY_API_KEY,
+      apechain: process.env.ETHERSCANV2_VERIFY_API_KEY,
 
       mantle: process.env.MANTLE_VERIFY_API_KEY ?? 'xyz',
       clarity: '', //none ? 
@@ -321,6 +324,14 @@ export default <HardhatUserConfig>{
         },
       },
 
+      {
+        network: 'apechain',
+        chainId: 33139,
+        urls: {
+          apiURL: 'https://api.etherscan.io/v2/api?chainid=33139',
+          browserURL: 'https://apescan.io',
+        },
+      },
       {
         network: 'clarity',
         chainId: 66814,
@@ -446,7 +457,8 @@ export default <HardhatUserConfig>{
       42161: '0xD9149bfBfB29cC175041937eF8161600b464051B',
       56: '0x058057c8A9Eb3B93d9F3638d047C98034F45f95E',
       11155111: '0xb1ff461BB751B87f4F791201a29A8cFa9D30490c',
-      999:'0x004573E17574634A48CA808CF1df75f01e906E43'
+      999:'0x004573E17574634A48CA808CF1df75f01e906E43',
+      33139: '0x2BbD69C72b6689F31dd12b93fF59E62632E0eF41'  // apechain
     },
     protocolTimelock: {
       31337: 8,
@@ -462,7 +474,8 @@ export default <HardhatUserConfig>{
       42161: '0x6BBf498C429C51d05bcA3fC67D2C720B15FC73B8',
       56: '0xBf4E3fEA276057D0b26f52141557C835a7E2d534',
       11155111: '0xFe5394B67196EA95301D6ECB5389E98A02984cC2',
-      999: '0xBf4E3fEA276057D0b26f52141557C835a7E2d534'
+      999: '0xBf4E3fEA276057D0b26f52141557C835a7E2d534',
+      33139: 0  // apechain - TBD after deployment
     },
   },
 
@@ -655,6 +668,18 @@ export default <HardhatUserConfig>{
       verify: {
         etherscan: {
           apiKey: process.env.MANTLE_VERIFY_API_KEY,
+        },
+      },
+    }),
+
+    apechain: networkConfig({
+      url: networkUrls.apechain,
+      chainId: 33139,
+      live: true,
+
+      verify: {
+        etherscan: {
+          apiKey: process.env.ETHERSCANV2_VERIFY_API_KEY,
         },
       },
     }),

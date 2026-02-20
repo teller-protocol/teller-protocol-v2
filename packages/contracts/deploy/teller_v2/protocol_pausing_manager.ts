@@ -47,7 +47,7 @@ deployFn.dependencies = ['teller-v2:deploy' ]
 
 deployFn.skip = async (hre) => {
   return (
-    !hre.network.live || !['localhost', 'polygon', 'mainnet','mainnet_live_fork','arbitrum','base','optimism','katana','hyperevm','bsc'].includes(hre.network.name)
+    !hre.network.live || !['localhost', 'polygon', 'mainnet','mainnet_live_fork','arbitrum','base','optimism','katana','hyperevm','bsc','apechain'].includes(hre.network.name)
   )
 }
 export default deployFn

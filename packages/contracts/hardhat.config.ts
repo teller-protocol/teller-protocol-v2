@@ -475,7 +475,7 @@ export default <HardhatUserConfig>{
       56: '0xBf4E3fEA276057D0b26f52141557C835a7E2d534',
       11155111: '0xFe5394B67196EA95301D6ECB5389E98A02984cC2',
       999: '0xBf4E3fEA276057D0b26f52141557C835a7E2d534',
-      33139: 0  // apechain - TBD after deployment
+      33139: '0x6b1eC259a35005b7562c92f42C490f39131fF1d8'  // apechain
     },
   },
 

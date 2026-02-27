@@ -1,0 +1,200 @@
+{
+  "address": "0x26E2BD4F67136a7929DFE82BD6392633eb5610C2",
+  "abi": [
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "DeployedLenderGroupContract",
+      "inputs": [
+        {
+          "type": "address",
+          "name": "groupContract",
+          "indexed": true
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "Initialized",
+      "inputs": [
+        {
+          "type": "uint8",
+          "name": "version",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "OwnershipTransferred",
+      "inputs": [
+        {
+          "type": "address",
+          "name": "previousOwner",
+          "indexed": true
+        },
+        {
+          "type": "address",
+          "name": "newOwner",
+          "indexed": true
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "deployLenderCommitmentGroupPool",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_initialPrincipalAmount"
+        },
+        {
+          "type": "tuple",
+          "name": "_commitmentGroupConfig",
+          "components": [
+            {
+              "type": "address",
+              "name": "principalTokenAddress"
+            },
+            {
+              "type": "address",
+              "name": "collateralTokenAddress"
+            },
+            {
+              "type": "uint256",
+              "name": "marketId"
+            },
+            {
+              "type": "uint32",
+              "name": "maxLoanDuration"
+            },
+            {
+              "type": "uint16",
+              "name": "interestRateLowerBound"
+            },
+            {
+              "type": "uint16",
+              "name": "interestRateUpperBound"
+            },
+            {
+              "type": "uint16",
+              "name": "liquidityThresholdPercent"
+            },
+            {
+              "type": "uint16",
+              "name": "collateralRatio"
+            }
+          ]
+        },
+        {
+          "type": "address",
+          "name": "_priceAdapterAddress"
+        },
+        {
+          "type": "bytes",
+          "name": "_priceAdapterRoute"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "deployedLenderGroupContracts",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "initialize",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "_lenderGroupBeacon"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "lenderGroupBeacon",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "owner",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "renounceOwnership",
+      "constant": false,
+      "payable": false,
+      "inputs": [],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "transferOwnership",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "newOwner"
+        }
+      ],
+      "outputs": []
+    }
+  ],
+  "transactionHash": "0x2d54c82c51dad7665114f75baf01956cdcb78f73c1e1c5bdaaf8ba592f57cc43",
+  "receipt": {
+    "to": null,
+    "from": "0xD9B023522CeCe02251d877bb0EB4f06fDe6F98E6",
+    "blockHash": "0xb9b67dcb3425aa6aad3f919593b6bd96bebeda05a8b5c4e2e8cc3535d116a265",
+    "blockNumber": 34211523
+  },
+  "numDeployments": 1,
+  "implementation": "0xbD9B31A1a52340813F0191b869C8CC919990613E"
+}

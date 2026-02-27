@@ -406,6 +406,16 @@ export default <HardhatUserConfig>{
           },
         },
       },
+
+          {
+        version: '0.8.24',
+        settings: {
+          optimizer: {
+            enabled: true, // !isTesting, //need this for now due to large size of tellerV2.test
+            runs: 200,
+          },
+        },
+      },
  
     ],
   },

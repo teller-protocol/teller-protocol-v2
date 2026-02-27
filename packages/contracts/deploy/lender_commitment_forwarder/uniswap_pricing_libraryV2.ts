@@ -4,6 +4,7 @@ const deployFn: DeployFunction = async (hre) => {
   const { deployer } = await hre.getNamedAccounts()
   const uniswapPricingLibraryV2 = await hre.deployments.deploy('UniswapPricingLibraryV2', {
     from: deployer,
+        skipIfAlreadyDeployed: true,
   })
 }
 

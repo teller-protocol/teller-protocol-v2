@@ -2592,6 +2592,7 @@ __metadata:
     "@types/semver": ^7.3.9
     "@typescript-eslint/eslint-plugin": ^5.5.0
     "@typescript-eslint/parser": ^5.5.0
+    "@uniswap/v4-core": 1.0.2
     chai: ^4.3.4
     chai-as-promised: ^7.1.1
     chalk: ^4.1.1
@@ -3317,6 +3318,13 @@ __metadata:
   version: 1.1.2
   resolution: "@ungap/promise-all-settled@npm:1.1.2"
   checksum: 08d37fdfa23a6fe8139f1305313562ebad973f3fac01bcce2773b2bda5bcb0146dfdcf3cb6a722cf0a5f2ca0bc56a827eac8f1e7b3beddc548f654addf1fc34c
+  languageName: node
+  linkType: hard
+
+"@uniswap/v4-core@npm:1.0.2":
+  version: 1.0.2
+  resolution: "@uniswap/v4-core@npm:1.0.2"
+  checksum: 9dfb3849d7160e94a0ed25025fe51e3b08f9a86361cf322c90003330f8127403021258dc0241a86ceb111e3fd3c2a60290a14ac262310de6360ce30125db4de4
   languageName: node
   linkType: hard
 

@@ -13,6 +13,7 @@
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 teller-v2",
     "test": "yarn graph test",
     "deploy_ormi": "bash -c 'source .env && graph deploy \"$0\" --node https://api.subgraph.migration.ormilabs.com/deploy --ipfs https://api.subgraph.migration.ormilabs.com/ipfs --deploy-key \"$ORMI_LABS_DEPLOY_KEY\"'",
+    "deploy_ormi_apechain": "bash -c 'source .env && graph deploy \"$0\" --node https://api.subgraph.apechain.ormilabs.com/deploy --ipfs https://api.subgraph.apechain.ormilabs.com/ipfs --deploy-key \"$ORMI_LABS_APECHAIN_DEPLOY_KEY\"'",
     "format": "eslint './src/**/*.ts' --fix",
     "ts-node": "ts-node --project ./scripts/tsconfig.json"
   },

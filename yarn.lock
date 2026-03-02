@@ -2527,6 +2527,47 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@teller-protocol/subgraph-pool-v3@workspace:packages/subgraph-pool-v3":
+  version: 0.0.0-use.local
+  resolution: "@teller-protocol/subgraph-pool-v3@workspace:packages/subgraph-pool-v3"
+  dependencies:
+    "@graphprotocol/graph-cli": ^0.58.0
+    "@graphprotocol/graph-ts": ^0.31.0
+    "@ledgerhq/hw-app-eth": ^6.34.0
+    "@ledgerhq/hw-transport-node-hid": ^6.27.19
+    "@types/node": ^20.4.5
+    "@types/prompts": ^2.4.4
+    "@types/semver": ^7.5.0
+    "@types/uuid": ^9.0.2
+    "@typescript-eslint/eslint-plugin": ^7.0.0
+    "@typescript-eslint/parser": ^7.0.0
+    assemblyscript: ^0.27.1
+    async-mutex: ^0.4.0
+    axios: ^1.4.0
+    cleaners: ^0.3.16
+    cli-progress: ^3.12.0
+    eslint: ^8.56.0
+    eslint-config-prettier: ^8.3.0
+    eslint-config-standard-kit: 0.15.1
+    eslint-plugin-import: ^2.25.2
+    eslint-plugin-node: ^11.1.0
+    eslint-plugin-prettier: ^5.0.0
+    eslint-plugin-simple-import-sort: ^7.0.0
+    eslint-plugin-unused-imports: ^3.0.0
+    hbs-cli: ^1.4.1
+    json: ^11.0.0
+    matchstick-as: ^0.4.0
+    memlet: ^0.1.7
+    mustache: ^4.2.0
+    prompts: ^2.4.2
+    semver: ^7.5.4
+    ts-node: ^10.9.1
+    typescript: ^5.4.0
+    uuid: ^9.0.0
+    ws: ^8.13.0
+  languageName: unknown
+  linkType: soft
+
 "@teller-protocol/v2-contracts@workspace:packages/contracts":
   version: 0.0.0-use.local
   resolution: "@teller-protocol/v2-contracts@workspace:packages/contracts"

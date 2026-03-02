@@ -1,5 +1,5 @@
 specVersion: 0.0.4
-description: Teller Protocol is a decentralized lending framework for Ethereum.
+description: Teller Protocol V3 Pools - Agnostic Oracle lending pools.
 repository: https://github.com/teller-protocol/teller-protocol-v2
 schema:
   file: ./src/schema.graphql
@@ -9,11 +9,11 @@ features:
 dataSources:
   - kind: ethereum/contract
     name: Factory
-    network: bsc
+    network: apechain
     source:
       abi: Factory
-      address: "0x0EfD3E33Ba2EdE028e50a3E7f81E084996d161aa"
-      startBlock: 81088797
+      address: "0x26E2BD4F67136a7929DFE82BD6392633eb5610C2"
+      startBlock: 34211523
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -29,11 +29,11 @@ dataSources:
           handler: handleLenderGroupDeployed
   - kind: ethereum/contract
     name: CollateralManager
-    network: bsc
+    network: apechain
     source:
       abi: CollateralManager
-      address: "0x9D55Cf23D26a8C17670bb8Ee25D58481ff7aD295"
-      startBlock: 81088797
+      address: "0x90D08f8Df66dFdE93801783FF7A36876453DAE75"
+      startBlock: 34211523
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -51,7 +51,7 @@ dataSources:
 templates:
   - kind: ethereum/contract
     name: Pool
-    network: bsc
+    network: apechain
     source:
       abi: Pool
     mapping:
@@ -63,7 +63,7 @@ templates:
         - Pool
       abis:
         - name: Pool
-          file: ./abis/PoolV2.json
+          file: ./abis/PoolV3.json
         - name: Factory
           file: ./abis/Factory.json
       eventHandlers:
@@ -79,4 +79,3 @@ templates:
           handler: handleLoanLiquidated
         - event: PoolInitialized(indexed address,indexed address,uint256,uint32,uint16,uint16,uint16,uint16)
           handler: handlePoolInitialized
-

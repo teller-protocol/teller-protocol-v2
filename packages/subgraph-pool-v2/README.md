@@ -80,7 +80,7 @@ npm run codegen && npm run build
 
  yarn deploy_ormi teller-pools-v2-mainnet 
  yarn deploy_ormi teller-pools-v2-base 
-
+  yarn deploy_ormi teller-pools-v2-apechain 
 
 ```
 

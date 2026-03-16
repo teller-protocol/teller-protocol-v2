@@ -12,7 +12,7 @@ import "../contracts/TellerV2Storage.sol";
 
 import "../contracts/interfaces/IMarketRegistry.sol";
 
-import "../contracts/EAS/TellerAS.sol";
+//import "../contracts/EAS/TellerAS.sol";
 
 import "../contracts/mock/WethMock.sol";
 import "../contracts/interfaces/IWETH.sol";
@@ -26,11 +26,11 @@ contract MarketRegistry_Override is MarketRegistry {
     address globalMarketOwner;
     address globalFeeRecipient;
 
-    bool public attestStakeholderWasCalled;
+     bool public attestStakeholderWasCalled;
     bool public attestStakeholderVerificationWasCalled;
-    bool public attestStakeholderViaDelegationWasCalled;
+   // bool public attestStakeholderViaDelegationWasCalled;
     bool public revokeStakeholderWasCalled;
-    bool public revokeStakeholderVerificationWasCalled;
+    bool public revokeStakeholderVerificationWasCalled; 
 
     constructor() MarketRegistry() {}
 
@@ -71,13 +71,13 @@ contract MarketRegistry_Override is MarketRegistry {
     function attestStakeholderVerification(
         uint256 _marketId,
         address _stakeholderAddress,
-        bytes32 _uuid,
+      //  bytes32 _uuid,
         bool _isLender
     ) public {
         super._attestStakeholderVerification(
             _marketId,
             _stakeholderAddress,
-            _uuid,
+          //  _uuid,
             _isLender
         );
     }
@@ -118,7 +118,7 @@ contract MarketRegistry_Override is MarketRegistry {
         return markets[_marketId].verifiedBorrowersForMarket.contains(guy);
     }
 
-    function getLenderAttestationId(uint256 _marketId, address guy)
+/*    function getLenderAttestationId(uint256 _marketId, address guy)
         public
         returns (bytes32)
     {
@@ -130,8 +130,8 @@ contract MarketRegistry_Override is MarketRegistry {
         returns (bytes32)
     {
         return markets[_marketId].borrowerAttestationIds[guy];
-    }
-
+    }  */
+ 
     /*
     @notice returns the actual value in the markets storage mapping, not globalMarketOwner the override
     */
@@ -183,23 +183,12 @@ contract MarketRegistry_Override is MarketRegistry {
     function _attestStakeholderVerification(
         uint256 _marketId,
         address _stakeholderAddress,
-        bytes32 _uuid,
+      
         bool _isLender
     ) internal override {
         attestStakeholderVerificationWasCalled = true;
     }
-
-    function _attestStakeholderViaDelegation(
-        uint256 _marketId,
-        address _stakeholderAddress,
-        uint256 _expirationTime,
-        bool _isLender,
-        uint8 _v,
-        bytes32 _r,
-        bytes32 _s
-    ) internal override {
-        attestStakeholderViaDelegationWasCalled = true;
-    }
+ 
 
     function _revokeStakeholder(
         uint256 _marketId,
@@ -213,7 +202,7 @@ contract MarketRegistry_Override is MarketRegistry {
         uint256 _marketId,
         address _stakeholderAddress,
         bool _isLender
-    ) internal override returns (bytes32 uuid_) {
+    ) internal override   {
         revokeStakeholderVerificationWasCalled = true;
     }
 

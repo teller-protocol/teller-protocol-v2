@@ -9,7 +9,7 @@ import "../contracts/TellerV2.sol";
 contract PMT_Test is Testable, TellerV2 {
     Bid __bid;
 
-    constructor() TellerV2(address(0)) {}
+    constructor() TellerV2( ) {}
 
     function test_01_pmt() public {
         __bid.loanDetails.principal = 10000e6; // 10k USDC

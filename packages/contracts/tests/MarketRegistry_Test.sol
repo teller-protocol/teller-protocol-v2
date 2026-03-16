@@ -12,7 +12,7 @@ import "../contracts/TellerV2Storage.sol";
 
 import "../contracts/interfaces/IMarketRegistry.sol";
 
-import "../contracts/EAS/TellerAS.sol";
+//import "../contracts/EAS/TellerAS.sol";
 
 import "../contracts/mock/WethMock.sol";
 import "../contracts/interfaces/IWETH.sol";
@@ -22,7 +22,7 @@ import { PaymentType, PaymentCycleType } from "../contracts/libraries/V2Calculat
 
 import { MarketRegistry_Override } from "./MarketRegistry_Override.sol";
 
-import { TellerASMock } from "../contracts/mock/TellerASMock.sol";
+// import { TellerASMock } from "../contracts/mock/TellerASMock.sol";
 
 contract MarketRegistry_Test is Testable {
     MarketRegistryUser private marketOwner;
@@ -36,7 +36,7 @@ contract MarketRegistry_Test is Testable {
     TellerV2Mock tellerV2;
     MarketRegistry_Override marketRegistry;
 
-    TellerASMock tellerASMock;
+   // TellerASMock tellerASMock;
 
     uint32 expirationTime = 5000;
     uint256 marketId = 2;
@@ -53,9 +53,9 @@ contract MarketRegistry_Test is Testable {
         tellerV2 = new TellerV2Mock();
         marketRegistry = new MarketRegistry_Override();
 
-        tellerASMock = new TellerASMock();
+        //tellerASMock = new TellerASMock();
 
-        marketRegistry.initialize(tellerASMock);
+        marketRegistry.initialize( );
 
         marketOwner = new MarketRegistryUser(
             address(tellerV2),
@@ -302,7 +302,7 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
         marketRegistry.attestStakeholderVerification(
             marketId,
             address(lender),
-            uuid,
+          //  uuid,
             isLender
         );
 
@@ -317,11 +317,11 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
             "Did not add lender to verified set"
         );
 
-        assertEq(
+      /*  assertEq(
             marketRegistry.getLenderAttestationId(marketId, address(lender)),
             uuid,
             "Did not set market attestation Id"
-        );
+        ); */
     }
 
     function test_attestStakeholderVerification_borrower() public {
@@ -330,7 +330,7 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
         marketRegistry.attestStakeholderVerification(
             marketId,
             address(borrower),
-            uuid,
+          //  uuid,
             isLender
         );
 
@@ -345,14 +345,14 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
             "Did not add lender to verified set"
         );
 
-        assertEq(
+       /* assertEq(
             marketRegistry.getBorrowerAttestationId(
                 marketId,
                 address(borrower)
             ),
             uuid,
             "Did not set market attestation Id"
-        );
+        ); */
     }
 
     function test_attestLender() public {
@@ -367,7 +367,7 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
 
     function test_attestLender_expired() public {}
 
-    function test_attestLenderDelegated() public {
+  /*  function test_attestLenderDelegated() public {
         marketRegistry.attestLender(
             marketId,
             address(lender),
@@ -382,7 +382,7 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
             true,
             "Attest stakeholder via delegation was not called"
         );
-    }
+    } */
 
     function test_attestBorrower() public {
         marketRegistry.attestBorrower(
@@ -398,7 +398,7 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
         );
     }
 
-    function test_attestBorrowerDelegated() public {
+   /* function test_attestBorrowerDelegated() public {
         marketRegistry.attestBorrower(
             marketId,
             address(lender),
@@ -413,7 +413,7 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
             true,
             "Attest stakeholder via delegation was not called"
         );
-    }
+    } */
 
     function test_revokeLender() public {
         marketRegistry.revokeLender(marketId, address(lender));
@@ -946,7 +946,7 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
         marketRegistry.attestStakeholderVerification(
             marketId,
             address(lender),
-            uuid,
+           // uuid,
             true
         );
 
@@ -998,7 +998,7 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
         marketRegistry.attestStakeholderVerification(
             marketId,
             address(borrower),
-            uuid,
+            // uuid,
             isLender
         );
 
@@ -1028,7 +1028,7 @@ FNDA:0,MarketRegistry._attestStakeholderViaDelegation
         marketRegistry.attestStakeholderVerification(
             marketId,
             address(lender),
-            uuid,
+           // uuid,
             isLender
         );
 
@@ -1094,7 +1094,7 @@ contract MarketRegistryUser is User {
 contract TellerV2Mock is TellerV2Context {
     Bid mockBid;
 
-    constructor() TellerV2Context(address(0)) {}
+    constructor() TellerV2Context( ) {}
 
     function setMarketRegistry(address _marketRegistry) external {
         marketRegistry = IMarketRegistry(_marketRegistry);

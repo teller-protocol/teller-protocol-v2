@@ -10,7 +10,7 @@ const deployFn: DeployFunction = async (hre) => {
   const protocolFee = 5 // 0.05%
 
   const marketRegistry = await hre.contracts.get('MarketRegistry')
-  const reputationManager = await hre.contracts.get('ReputationManager')
+  //const reputationManager = await hre.contracts.get('ReputationManager')
   const lenderCommitmentForwarder = await hre.contracts.get(
     'LenderCommitmentForwarder'
   )
@@ -24,7 +24,7 @@ const deployFn: DeployFunction = async (hre) => {
   const tx = await tellerV2.initialize(
     protocolFee,
     marketRegistry,
-    reputationManager,
+    
     lenderCommitmentForwarder,
     collateralManager,
     lenderManager,

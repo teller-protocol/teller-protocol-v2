@@ -5,7 +5,7 @@ import "./Testable.sol";
 import "../contracts/TellerV2.sol";
 
 contract GetMetaDataURI_Test is Testable, TellerV2 {
-    constructor() TellerV2(address(0)) {}
+    constructor() TellerV2( ) {}
 
     function setUp() public {
         // Old depreciated _metadataURI on bid struct

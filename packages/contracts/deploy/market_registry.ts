@@ -2,7 +2,7 @@ import { DeployFunction } from 'hardhat-deploy/dist/types'
 import { deploy } from 'helpers/deploy-helpers'
 
 const deployFn: DeployFunction = async (hre) => {
-  const registry = await deploy({
+ /* const registry = await deploy({
     contract: 'TellerASRegistry',
     skipIfAlreadyDeployed: true,
     hre,
@@ -17,10 +17,10 @@ const deployFn: DeployFunction = async (hre) => {
     args: [await registry.getAddress(), await verifier.getAddress()],
     skipIfAlreadyDeployed: true,
     hre,
-  })
+  }) */
 
   const marketRegistry = await hre.deployProxy('MarketRegistry', {
-    initArgs: [await tellerAS.getAddress()],
+    initArgs: [ ],
   })
 
   return true

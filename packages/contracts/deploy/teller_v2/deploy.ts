@@ -1,7 +1,7 @@
 import { DeployFunction } from 'hardhat-deploy/dist/types'
 
 const deployFn: DeployFunction = async (hre) => {
-  const trustedForwarder = await hre.contracts.get('MetaForwarder')
+ 
   const v2Calculations = await hre.deployments.get('V2Calculations')
 
   const tellerV2 = await hre.deployProxy('TellerV2', {
@@ -10,7 +10,7 @@ const deployFn: DeployFunction = async (hre) => {
       'state-variable-immutable',
       'external-library-linking',
     ],
-    constructorArgs: [await trustedForwarder.getAddress()],
+    constructorArgs: [ ],
     initializer: false,
     libraries: {
       V2Calculations: v2Calculations.address,

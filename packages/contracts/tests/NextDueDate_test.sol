@@ -8,7 +8,7 @@ import { BokkyPooBahsDateTimeLibrary as BPBDTL } from "../contracts/libraries/Da
 contract NextDueDate_Test is Testable, TellerV2 {
     Bid __bid;
 
-    constructor() TellerV2(address(0)) {
+    constructor() TellerV2() {
         __bid.loanDetails.principal = 10000e6; // 10k USDC
         __bid.loanDetails.loanDuration = 365 days * 2; // 2 years
         __bid.terms.paymentCycle = 30 days; // 1 month

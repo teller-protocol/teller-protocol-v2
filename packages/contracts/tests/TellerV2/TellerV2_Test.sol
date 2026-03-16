@@ -4,13 +4,12 @@ pragma solidity ^0.8.0;
 import { Testable } from "../Testable.sol";
 
 import { TellerV2 } from "../../contracts/TellerV2.sol";
-import { MarketRegistry } from "../../contracts/MarketRegistry.sol";
-import { ReputationManager } from "../../contracts/ReputationManager.sol";
+import { MarketRegistry } from "../../contracts/MarketRegistry.sol"; 
 
 import "../../contracts/interfaces/IMarketRegistry.sol";
 import "../../contracts/interfaces/IReputationManager.sol";
 
-import "../../contracts/EAS/TellerAS.sol";
+//import "../../contracts/EAS/TellerAS.sol";
 
 import "../../contracts/mock/WethMock.sol";
 import "../../contracts/interfaces/IWETH.sol";
@@ -27,7 +26,7 @@ import { Collateral } from "../../contracts/interfaces/escrow/ICollateralEscrowV
 import { PaymentType } from "../../contracts/libraries/V2Calculations.sol";
 import { BidState, Payment } from "../../contracts/TellerV2Storage.sol";
 
-import "../../contracts/MetaForwarder.sol";
+ 
 import { LenderManager } from "../../contracts/LenderManager.sol";
 import { EscrowVault } from "../../contracts/EscrowVault.sol";
 import { ProtocolPausingManager } from "../../contracts/pausing/ProtocolPausingManager.sol";
@@ -59,22 +58,19 @@ contract TellerV2_Test is Testable {
         );
 
         // Deploy protocol
-        tellerV2 = new TellerV2(address(0));
+        tellerV2 = new TellerV2( );
 
         // Deploy MarketRegistry & ReputationManager
         IMarketRegistry marketRegistry = IMarketRegistry(new MarketRegistry());
-        IReputationManager reputationManager = IReputationManager(
-            new ReputationManager()
-        );
-        reputationManager.initialize(address(tellerV2));
+        
 
         // Deploy Collateral manager
         collateralManager = new CollateralManager();
         collateralManager.initialize(address(escrowBeacon), address(tellerV2));
 
         // Deploy Lender manager
-        MetaForwarder metaforwarder = new MetaForwarder();
-        metaforwarder.initialize();
+      //  MetaForwarder metaforwarder = new MetaForwarder();
+       // metaforwarder.initialize();
         LenderManager lenderManager = new LenderManager((marketRegistry));
         lenderManager.initialize();
         lenderManager.transferOwnership(address(tellerV2));
@@ -95,7 +91,7 @@ contract TellerV2_Test is Testable {
         tellerV2.initialize(
             50,
             address(marketRegistry),
-            address(reputationManager),
+           
             address(lenderCommitmentForwarder),
             address(collateralManager),
             address(lenderManager),

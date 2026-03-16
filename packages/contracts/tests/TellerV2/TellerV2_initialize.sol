@@ -14,7 +14,7 @@ contract TellerV2_initialize is Testable {
     uint16 protocolFee = 5;
 
     Contract marketRegistry;
-    Contract reputationManager;
+ 
     Contract lenderCommitmentForwarder;
     Contract collateralManager;
     Contract lenderManager;
@@ -29,7 +29,7 @@ contract TellerV2_initialize is Testable {
 
     function test_initialize() public {
         marketRegistry = new Contract();
-        reputationManager = new Contract();
+         
         lenderCommitmentForwarder = new Contract();
         collateralManager = new Contract();
         lenderManager = new Contract();
@@ -39,7 +39,7 @@ contract TellerV2_initialize is Testable {
         tellerV2.initialize(
             protocolFee,
             address(marketRegistry),
-            address(reputationManager),
+            
             address(lenderCommitmentForwarder),
             address(collateralManager),
             address(lenderManager),
@@ -54,7 +54,7 @@ contract TellerV2_initialize is Testable {
 
     function test_initialize_lender_commitment_forwarder_not_contract() public {
         marketRegistry = new Contract();
-        reputationManager = new Contract();
+     
 
         collateralManager = new Contract();
         lenderManager = new Contract();
@@ -66,7 +66,7 @@ contract TellerV2_initialize is Testable {
         tellerV2.initialize(
             protocolFee,
             address(marketRegistry),
-            address(reputationManager),
+          
             address(lenderCommitmentForwarder),
             address(collateralManager),
             address(lenderManager),
@@ -76,7 +76,7 @@ contract TellerV2_initialize is Testable {
     }
 
     function test_initialize_market_registry_not_contract() public {
-        reputationManager = new Contract();
+       
 
         lenderCommitmentForwarder = new Contract();
         collateralManager = new Contract();
@@ -89,7 +89,7 @@ contract TellerV2_initialize is Testable {
         tellerV2.initialize(
             protocolFee,
             address(marketRegistry),
-            address(reputationManager),
+             
             address(lenderCommitmentForwarder),
             address(collateralManager),
             address(lenderManager),
@@ -98,34 +98,13 @@ contract TellerV2_initialize is Testable {
         );
     }
 
-    function test_initialize_reputation_manager_not_contract() public {
-        marketRegistry = new Contract();
-
-        lenderCommitmentForwarder = new Contract();
-        collateralManager = new Contract();
-        lenderManager = new Contract();
-        escrowVault = new Contract();
-        protocolPausingManager = new Contract();
-
-        vm.expectRevert("RM_ic");
-
-        tellerV2.initialize(
-            protocolFee,
-            address(marketRegistry),
-            address(reputationManager),
-            address(lenderCommitmentForwarder),
-            address(collateralManager),
-            address(lenderManager),
-            address(escrowVault),
-            address(protocolPausingManager)
-        );
-    }
+   
 
     function test_initialize_collateral_manager_not_contract() public {
         marketRegistry = new Contract();
 
         lenderCommitmentForwarder = new Contract();
-        reputationManager = new Contract();
+       
         lenderManager = new Contract();
         escrowVault = new Contract();
         protocolPausingManager = new Contract();
@@ -135,7 +114,7 @@ contract TellerV2_initialize is Testable {
         tellerV2.initialize(
             protocolFee,
             address(marketRegistry),
-            address(reputationManager),
+           
             address(lenderCommitmentForwarder),
             address(collateralManager),
             address(lenderManager),
@@ -148,7 +127,7 @@ contract TellerV2_initialize is Testable {
         marketRegistry = new Contract();
 
         lenderCommitmentForwarder = new Contract();
-        reputationManager = new Contract();
+       
         collateralManager = new Contract();
         escrowVault = new Contract();
         protocolPausingManager = new Contract();
@@ -158,7 +137,7 @@ contract TellerV2_initialize is Testable {
         tellerV2.initialize(
             protocolFee,
             address(marketRegistry),
-            address(reputationManager),
+           
             address(lenderCommitmentForwarder),
             address(collateralManager),
             address(lenderManager),
@@ -171,11 +150,7 @@ contract TellerV2_initialize is Testable {
         //how to mock self as the owner ?
         //tellerV2.setLenderManager(address(lenderManager));
     }
-
-    function test_setReputationManager_external() public {
-        //how to mock self as the owner ?
-        //tellerV2.setReputationManager(address(reputationManager));
-    }
+ 
 
     function test_setLenderManager_internal() public {
         lenderManager = new Contract();

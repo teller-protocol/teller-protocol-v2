@@ -107,7 +107,7 @@ abstract contract TellerV2Storage_G0 {
     EnumerableSet.AddressSet internal __lendingTokensSet; // DEPRECATED
 
     IMarketRegistry public marketRegistry;
-    IReputationManager public reputationManager;
+    IReputationManager private _reputationManager;
 
     // Mapping of borrowers to borrower requests.
     mapping(address => EnumerableSet.UintSet) internal _borrowerBidsActive;

@@ -2,8 +2,8 @@
 pragma solidity ^0.8.0;
 
 // Contracts
-import "./EAS/TellerAS.sol";
-import "./EAS/TellerASResolver.sol";
+//import "./EAS/TellerAS.sol";
+ 
 
 //must continue to use this so storage slots are not broken
 import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
@@ -19,8 +19,8 @@ import { PaymentType } from "./libraries/V2Calculations.sol";
 contract MarketRegistry is
     IMarketRegistry,
     Initializable,
-    Context,
-    TellerASResolver
+    Context 
+ 
 {
     using EnumerableSet for EnumerableSet.AddressSet;
 
@@ -49,19 +49,19 @@ contract MarketRegistry is
         PaymentCycleType paymentCycleType;
     }
 
-    bytes32 public lenderAttestationSchemaId;
+    bytes32 private _lenderAttestationSchemaId;  //DEPRECATED
 
     mapping(uint256 => Marketplace) internal markets;
     mapping(bytes32 => uint256) internal __uriToId; //DEPRECATED
     uint256 public marketCount;
     bytes32 private _attestingSchemaId;
-    bytes32 public borrowerAttestationSchemaId;
+    bytes32 private _borrowerAttestationSchemaId;  //DEPRECATED
 
     uint256 public version;
 
     mapping(uint256 => bool) private marketIsClosed;
 
-    TellerAS public tellerAS;
+    address private _tellerAS; //DEPRECATED
 
     /* Modifiers */
 
@@ -70,11 +70,11 @@ contract MarketRegistry is
         _;
     }
 
-    modifier withAttestingSchema(bytes32 schemaId) {
+ /*   modifier withAttestingSchema(bytes32 schemaId) {
         _attestingSchemaId = schemaId;
         _;
         _attestingSchemaId = bytes32(0);
-    }
+    } */
 
     /* Events */
 
@@ -104,17 +104,17 @@ contract MarketRegistry is
 
     /* External Functions */
 
-    function initialize(TellerAS _tellerAS) external initializer {
-        tellerAS = _tellerAS;
+    function initialize( ) external initializer {
+       // tellerAS = _tellerAS;
 
-        lenderAttestationSchemaId = tellerAS.getASRegistry().register(
+     /*   lenderAttestationSchemaId = tellerAS.getASRegistry().register(
             "(uint256 marketId, address lenderAddress)",
-            this
+           IASResolver(  address(this) )
         );
         borrowerAttestationSchemaId = tellerAS.getASRegistry().register(
             "(uint256 marketId, address borrowerAddress)",
-            this
-        );
+            IASResolver( address(this) )
+        );  */
     }
 
     /**
@@ -294,28 +294,7 @@ contract MarketRegistry is
         _attestStakeholder(_marketId, _lenderAddress, _expirationTime, true);
     }
 
-    /**
-     * @notice Adds a lender to a market via delegated attestation.
-     * @dev See {_attestStakeholderViaDelegation}.
-     */
-    function attestLender(
-        uint256 _marketId,
-        address _lenderAddress,
-        uint256 _expirationTime,
-        uint8 _v,
-        bytes32 _r,
-        bytes32 _s
-    ) external {
-        _attestStakeholderViaDelegation(
-            _marketId,
-            _lenderAddress,
-            _expirationTime,
-            true,
-            _v,
-            _r,
-            _s
-        );
-    }
+   
 
     /**
      * @notice Removes a lender from an market.
@@ -325,27 +304,7 @@ contract MarketRegistry is
         _revokeStakeholder(_marketId, _lenderAddress, true);
     }
 
-    /**
-     * @notice Removes a borrower from a market via delegated revocation.
-     * @dev See {_revokeStakeholderViaDelegation}.
-     */
-   /* function revokeLender(
-        uint256 _marketId,
-        address _lenderAddress,
-        uint8 _v,
-        bytes32 _r,
-        bytes32 _s
-    ) external {
-        _revokeStakeholderViaDelegation(
-            _marketId,
-            _lenderAddress,
-            true,
-            _v,
-            _r,
-            _s
-        );
-    } */
-
+   
     /**
      * @notice Allows a lender to voluntarily leave a market.
      * @param _marketId The market ID to leave.
@@ -372,28 +331,7 @@ contract MarketRegistry is
         _attestStakeholder(_marketId, _borrowerAddress, _expirationTime, false);
     }
 
-    /**
-     * @notice Adds a borrower to a market via delegated attestation.
-     * @dev See {_attestStakeholderViaDelegation}.
-     */
-    function attestBorrower(
-        uint256 _marketId,
-        address _borrowerAddress,
-        uint256 _expirationTime,
-        uint8 _v,
-        bytes32 _r,
-        bytes32 _s
-    ) external {
-        _attestStakeholderViaDelegation(
-            _marketId,
-            _borrowerAddress,
-            _expirationTime,
-            false,
-            _v,
-            _r,
-            _s
-        );
-    }
+ 
 
     /**
      * @notice Removes a borrower from an market.
@@ -405,27 +343,7 @@ contract MarketRegistry is
         _revokeStakeholder(_marketId, _borrowerAddress, false);
     }
 
-    /**
-     * @notice Removes a borrower from a market via delegated revocation.
-     * @dev See {_revokeStakeholderViaDelegation}.
-     */
-   /* function revokeBorrower(
-        uint256 _marketId,
-        address _borrowerAddress,
-        uint8 _v,
-        bytes32 _r,
-        bytes32 _s
-    ) external {
-        _revokeStakeholderViaDelegation(
-            _marketId,
-            _borrowerAddress,
-            false,
-            _v,
-            _r,
-            _s
-        );
-    }*/
-
+   
     /**
      * @notice Allows a borrower to voluntarily leave a market.
      * @param _marketId The market ID to leave.
@@ -456,7 +374,7 @@ contract MarketRegistry is
         bytes calldata data,
         uint256 /* expirationTime */,
         address attestor
-    ) external payable override returns (bool) {
+    ) external payable   returns (bool) {
         bytes32 attestationSchemaId = keccak256(
             abi.encodePacked(schema, address(this))
         );
@@ -992,6 +910,144 @@ contract MarketRegistry is
         setPaymentCycle(_marketId, _paymentCycleType, _paymentCycleDuration);
     }
 
+
+  /**
+     * @notice Adds a stakeholder (lender or borrower) to a market.
+     * @param _marketId The market ID to add a borrower to.
+     * @param _stakeholderAddress The address of the stakeholder to add to the market.
+     * @param _expirationTime The expiration time of the attestation.
+     * @param _expirationTime The expiration time of the attestation.
+     * @param _isLender Boolean indicating if the stakeholder is a lender. Otherwise it is a borrower.
+     */
+    function _attestStakeholder(
+        uint256 _marketId,
+        address _stakeholderAddress,
+        uint256 _expirationTime,
+        bool _isLender
+    )
+        internal
+        virtual
+      /*  withAttestingSchema(
+            _isLender ? lenderAttestationSchemaId : borrowerAttestationSchemaId
+        ) */
+    {
+        require(
+            _msgSender() == _getMarketOwner(_marketId),
+            "Not the market owner"
+        );
+
+        // Submit attestation for borrower to join a market
+       /* bytes32 uuid = tellerAS.attest(
+            _stakeholderAddress,
+            _attestingSchemaId, // set by the modifier
+            _expirationTime,
+            0,
+            abi.encode(_marketId, _stakeholderAddress)
+        ); */
+        _attestStakeholderVerification(
+            _marketId,
+            _stakeholderAddress,
+         //   uuid,
+            _isLender
+        );
+    }
+
+  
+
+
+ /**
+     * @notice Adds a stakeholder (borrower/lender) to a market.
+     * @param _marketId The market ID to add a stakeholder to.
+     * @param _stakeholderAddress The address of the stakeholder to add to the market.
+      
+     * @param _isLender Boolean indicating if the stakeholder is a lender. Otherwise it is a borrower.
+     */
+    function _attestStakeholderVerification(
+        uint256 _marketId,
+        address _stakeholderAddress,
+       // bytes32 _uuid,
+        bool _isLender
+    ) internal virtual {
+        if (_isLender) {
+            // Store the lender attestation ID for the market ID
+          /*  markets[_marketId].lenderAttestationIds[
+                _stakeholderAddress
+            ] = _uuid; */
+            // Add lender address to market set
+            markets[_marketId].verifiedLendersForMarket.add(
+                _stakeholderAddress
+            );
+
+            emit LenderAttestation(_marketId, _stakeholderAddress);
+        } else {
+            // Store the lender attestation ID for the market ID
+          /*   markets[_marketId].borrowerAttestationIds[
+                _stakeholderAddress
+            ] = _uuid; */
+            // Add lender address to market set
+            markets[_marketId].verifiedBorrowersForMarket.add(
+                _stakeholderAddress
+            );
+
+            emit BorrowerAttestation(_marketId, _stakeholderAddress);
+        }
+    }   
+
+
+       /**
+     * @notice Removes a stakeholder from an market.
+     * @dev The caller must be the market owner.
+     * @param _marketId The market ID to remove the borrower from.
+     * @param _stakeholderAddress The address of the borrower to remove from the market.
+     * @param _isLender Boolean indicating if the stakeholder is a lender. Otherwise it is a borrower.
+     */
+    function _revokeStakeholder(
+        uint256 _marketId,
+        address _stakeholderAddress,
+        bool _isLender
+    ) internal virtual {
+        require(
+            _msgSender() == _getMarketOwner(_marketId),
+            "Not the market owner"
+        );
+
+         _revokeStakeholderVerification(
+            _marketId,
+            _stakeholderAddress,
+            _isLender
+        );
+        // NOTE: Disabling the call to revoke the attestation on EAS contracts
+        //        tellerAS.revoke(uuid);
+    }
+
+
+
+     function _revokeStakeholderVerification(
+        uint256 _marketId,
+        address _stakeholderAddress,
+        bool _isLender
+    ) internal virtual  {
+        if (_isLender) {
+           
+            // Remove lender address from market set
+            markets[_marketId].verifiedLendersForMarket.remove(
+                _stakeholderAddress
+            );
+
+            emit LenderRevocation(_marketId, _stakeholderAddress);
+        } else {
+           
+            // Remove borrower address from market set
+            markets[_marketId].verifiedBorrowersForMarket.remove(
+                _stakeholderAddress
+            );
+
+            emit BorrowerRevocation(_marketId, _stakeholderAddress);
+        }
+    }
+
+
+
     /**
      * @notice Gets addresses of all attested relevant stakeholders.
      * @param _set The stored set of stakeholders to index from.
@@ -1023,216 +1079,9 @@ contract MarketRegistry is
 
     /* Internal Functions */
 
-    /**
-     * @notice Adds a stakeholder (lender or borrower) to a market.
-     * @param _marketId The market ID to add a borrower to.
-     * @param _stakeholderAddress The address of the stakeholder to add to the market.
-     * @param _expirationTime The expiration time of the attestation.
-     * @param _expirationTime The expiration time of the attestation.
-     * @param _isLender Boolean indicating if the stakeholder is a lender. Otherwise it is a borrower.
-     */
-    function _attestStakeholder(
-        uint256 _marketId,
-        address _stakeholderAddress,
-        uint256 _expirationTime,
-        bool _isLender
-    )
-        internal
-        virtual
-        withAttestingSchema(
-            _isLender ? lenderAttestationSchemaId : borrowerAttestationSchemaId
-        )
-    {
-        require(
-            _msgSender() == _getMarketOwner(_marketId),
-            "Not the market owner"
-        );
+  
 
-        // Submit attestation for borrower to join a market
-        bytes32 uuid = tellerAS.attest(
-            _stakeholderAddress,
-            _attestingSchemaId, // set by the modifier
-            _expirationTime,
-            0,
-            abi.encode(_marketId, _stakeholderAddress)
-        );
-        _attestStakeholderVerification(
-            _marketId,
-            _stakeholderAddress,
-            uuid,
-            _isLender
-        );
-    }
-
-    /**
-     * @notice Adds a stakeholder (lender or borrower) to a market via delegated attestation.
-     * @dev The signature must match that of the market owner.
-     * @param _marketId The market ID to add a lender to.
-     * @param _stakeholderAddress The address of the lender to add to the market.
-     * @param _expirationTime The expiration time of the attestation.
-     * @param _isLender Boolean indicating if the stakeholder is a lender. Otherwise it is a borrower.
-     * @param _v Signature value
-     * @param _r Signature value
-     * @param _s Signature value
-     */
-    function _attestStakeholderViaDelegation(
-        uint256 _marketId,
-        address _stakeholderAddress,
-        uint256 _expirationTime,
-        bool _isLender,
-        uint8 _v,
-        bytes32 _r,
-        bytes32 _s
-    )
-        internal
-        virtual
-        withAttestingSchema(
-            _isLender ? lenderAttestationSchemaId : borrowerAttestationSchemaId
-        )
-    {
-        // NOTE: block scope to prevent stack too deep!
-        bytes32 uuid;
-        {
-            bytes memory data = abi.encode(_marketId, _stakeholderAddress);
-            address attestor = _getMarketOwner(_marketId);
-            // Submit attestation for stakeholder to join a market (attestation must be signed by market owner)
-            uuid = tellerAS.attestByDelegation(
-                _stakeholderAddress,
-                _attestingSchemaId, // set by the modifier
-                _expirationTime,
-                0,
-                data,
-                attestor,
-                _v,
-                _r,
-                _s
-            );
-        }
-        _attestStakeholderVerification(
-            _marketId,
-            _stakeholderAddress,
-            uuid,
-            _isLender
-        );
-    }
-
-    /**
-     * @notice Adds a stakeholder (borrower/lender) to a market.
-     * @param _marketId The market ID to add a stakeholder to.
-     * @param _stakeholderAddress The address of the stakeholder to add to the market.
-     * @param _uuid The UUID of the attestation created.
-     * @param _isLender Boolean indicating if the stakeholder is a lender. Otherwise it is a borrower.
-     */
-    function _attestStakeholderVerification(
-        uint256 _marketId,
-        address _stakeholderAddress,
-        bytes32 _uuid,
-        bool _isLender
-    ) internal virtual {
-        if (_isLender) {
-            // Store the lender attestation ID for the market ID
-            markets[_marketId].lenderAttestationIds[
-                _stakeholderAddress
-            ] = _uuid;
-            // Add lender address to market set
-            markets[_marketId].verifiedLendersForMarket.add(
-                _stakeholderAddress
-            );
-
-            emit LenderAttestation(_marketId, _stakeholderAddress);
-        } else {
-            // Store the lender attestation ID for the market ID
-            markets[_marketId].borrowerAttestationIds[
-                _stakeholderAddress
-            ] = _uuid;
-            // Add lender address to market set
-            markets[_marketId].verifiedBorrowersForMarket.add(
-                _stakeholderAddress
-            );
-
-            emit BorrowerAttestation(_marketId, _stakeholderAddress);
-        }
-    }
-
-    /**
-     * @notice Removes a stakeholder from an market.
-     * @dev The caller must be the market owner.
-     * @param _marketId The market ID to remove the borrower from.
-     * @param _stakeholderAddress The address of the borrower to remove from the market.
-     * @param _isLender Boolean indicating if the stakeholder is a lender. Otherwise it is a borrower.
-     */
-    function _revokeStakeholder(
-        uint256 _marketId,
-        address _stakeholderAddress,
-        bool _isLender
-    ) internal virtual {
-        require(
-            _msgSender() == _getMarketOwner(_marketId),
-            "Not the market owner"
-        );
-
-        bytes32 uuid = _revokeStakeholderVerification(
-            _marketId,
-            _stakeholderAddress,
-            _isLender
-        );
-        // NOTE: Disabling the call to revoke the attestation on EAS contracts
-        //        tellerAS.revoke(uuid);
-    }
-
-     
-   /* function _revokeStakeholderViaDelegation(
-        uint256 _marketId,
-        address _stakeholderAddress,
-        bool _isLender,
-        uint8 _v,
-        bytes32 _r,
-        bytes32 _s
-    ) internal {
-        bytes32 uuid = _revokeStakeholderVerification(
-            _marketId,
-            _stakeholderAddress,
-            _isLender
-        );
-        // NOTE: Disabling the call to revoke the attestation on EAS contracts
-        //        address attestor = markets[_marketId].owner;
-        //        tellerAS.revokeByDelegation(uuid, attestor, _v, _r, _s);
-    } */
-
-    /**
-     * @notice Removes a stakeholder (borrower/lender) from a market.
-     * @param _marketId The market ID to remove the lender from.
-     * @param _stakeholderAddress The address of the stakeholder to remove from the market.
-     * @param _isLender Boolean indicating if the stakeholder is a lender. Otherwise it is a borrower.
-     * @return uuid_ The ID of the previously verified attestation.
-     */
-    function _revokeStakeholderVerification(
-        uint256 _marketId,
-        address _stakeholderAddress,
-        bool _isLender
-    ) internal virtual returns (bytes32 uuid_) {
-        if (_isLender) {
-            uuid_ = markets[_marketId].lenderAttestationIds[
-                _stakeholderAddress
-            ];
-            // Remove lender address from market set
-            markets[_marketId].verifiedLendersForMarket.remove(
-                _stakeholderAddress
-            );
-
-            emit LenderRevocation(_marketId, _stakeholderAddress);
-        } else {
-            uuid_ = markets[_marketId].borrowerAttestationIds[
-                _stakeholderAddress
-            ];
-            // Remove borrower address from market set
-            markets[_marketId].verifiedBorrowersForMarket.remove(
-                _stakeholderAddress
-            );
-
-            emit BorrowerRevocation(_marketId, _stakeholderAddress);
-        }
-    }
+    
 
     /**
      * @notice Checks if a stakeholder has been attested and added to a market.
@@ -1248,13 +1097,13 @@ contract MarketRegistry is
     ) internal view virtual returns (bool isVerified_, bytes32 uuid_) {
         if (_attestationRequired) {
             isVerified_ =
-                _verifiedStakeholderForMarket.contains(_stakeholderAddress) &&
-                tellerAS.isAttestationActive(
-                    _stakeholderAttestationIds[_stakeholderAddress]
-                );
-            uuid_ = _stakeholderAttestationIds[_stakeholderAddress];
+                _verifiedStakeholderForMarket.contains(_stakeholderAddress)  ;
+            uuid_ = _stakeholderAttestationIds[_stakeholderAddress];  //deprecated 
         } else {
             isVerified_ = true;
         }
     }
+
+
+ 
 }

@@ -286,7 +286,7 @@ contract LenderCommitmentGroupFactory_Test is Testable {
  
 //Move to a helper file !
 contract LenderCommitmentForwarderTest_TellerV2Mock is TellerV2Context {
-    constructor() TellerV2Context(address(0)) {}
+    constructor() TellerV2Context( ) {}
 
     function __setMarketRegistry(address _marketRegistry) external {
         marketRegistry = IMarketRegistry(_marketRegistry);

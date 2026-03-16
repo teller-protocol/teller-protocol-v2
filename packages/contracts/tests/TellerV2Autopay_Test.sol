@@ -5,7 +5,7 @@ import { Testable } from "./Testable.sol";
 
 import { TellerV2Autopay } from "../contracts/TellerV2Autopay.sol";
 import { MarketRegistry } from "../contracts/MarketRegistry.sol";
-import { ReputationManager } from "../contracts/ReputationManager.sol";
+ 
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
@@ -14,7 +14,7 @@ import "../contracts/TellerV2Storage.sol";
 import "../contracts/interfaces/IMarketRegistry.sol";
 import "../contracts/interfaces/IReputationManager.sol";
 
-import "../contracts/EAS/TellerAS.sol";
+//import "../contracts/EAS/TellerAS.sol";
 
 import "../contracts/mock/WethMock.sol";
 

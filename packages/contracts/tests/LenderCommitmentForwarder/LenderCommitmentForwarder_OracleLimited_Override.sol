@@ -67,7 +67,7 @@ contract LenderCommitmentForwarder_U1_Override is LenderCommitmentForwarder_U1 {
 }
 
 contract LenderCommitmentForwarderTest_TellerV2Mock is TellerV2Context {
-    constructor() TellerV2Context(address(0)) {}
+    constructor() TellerV2Context( ) {}
 
     function getSenderForMarket(uint256 _marketId)
         external

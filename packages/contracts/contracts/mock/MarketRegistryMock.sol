@@ -17,7 +17,7 @@ contract MarketRegistryMock is IMarketRegistry {
 
     constructor() {}
 
-    function initialize(TellerAS _tellerAS) external {}
+    function initialize( ) external {}
 
     function isVerifiedLender(uint256 _marketId, address _lenderAddress)
         public

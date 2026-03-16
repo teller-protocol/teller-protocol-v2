@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "../EAS/TellerAS.sol";
+//import "../EAS/TellerAS.sol";
 import { PaymentType, PaymentCycleType } from "../libraries/V2Calculations.sol";
 
 interface IMarketRegistry {
-    function initialize(TellerAS tellerAs) external;
+    function initialize( ) external;
 
     function isVerifiedLender(uint256 _marketId, address _lender)
         external

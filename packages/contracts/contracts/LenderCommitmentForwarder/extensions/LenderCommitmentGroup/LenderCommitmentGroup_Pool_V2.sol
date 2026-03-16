@@ -1301,6 +1301,7 @@ contract LenderCommitmentGroup_Pool_V2 is
 
         // Similar to addPrincipalToCommitmentGroup but following ERC4626 standard
         require(assets > 0 );
+        require( msg.sender == receiver);
         
          bool poolWasActivated = poolIsActivated();
         
@@ -1350,6 +1351,8 @@ contract LenderCommitmentGroup_Pool_V2 is
         // Calculate assets needed for desired shares
         assets = previewMint(shares);
         require(assets > 0);
+
+        require( msg.sender == receiver );
 
 
         bool poolWasActivated = poolIsActivated();

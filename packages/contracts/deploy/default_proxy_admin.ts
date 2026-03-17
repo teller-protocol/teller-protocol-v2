@@ -14,6 +14,14 @@ const deployFn: DeployFunction = async (hre) => {
 
   const namedAccounts = await hre.getNamedAccounts()
   const expectedOwner = namedAccounts.protocolTimelock
+
+  if (expectedOwner === '0x0000000000000000000000000000000000000000') {
+    hre.log('⚠️  protocolTimelock is zero address — skipping proxy admin ownership transfer. Run deploy again after setting protocolTimelock.')
+    hre.log('')
+    hre.log('=================================================================')
+    return true
+  }
+
   const isOwner = currentOwner === expectedOwner
 
   hre.log(`   Current admin owner: ${currentOwner}`)

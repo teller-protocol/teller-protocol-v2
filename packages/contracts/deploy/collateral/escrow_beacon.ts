@@ -11,9 +11,13 @@ const deployFn: DeployFunction = async (hre) => {
 
     //is this necessary ? 
   const { protocolTimelock } = await hre.getNamedAccounts()
-  hre.log('Transferring ownership of CollateralEscrowBeacon to Protocol Timelock...')
-  await collateralEscrowBeacon.transferOwnership(protocolTimelock)
-  hre.log('done.')
+  if (protocolTimelock === '0x0000000000000000000000000000000000000000') {
+    hre.log('⚠️  protocolTimelock is zero address — skipping escrow beacon ownership transfer. Run deploy again after setting protocolTimelock.')
+  } else {
+    hre.log('Transferring ownership of CollateralEscrowBeacon to Protocol Timelock...')
+    await collateralEscrowBeacon.transferOwnership(protocolTimelock)
+    hre.log('done.')
+  }
 
   //ultimately, the owner becomes the collateral manager 
   //isnt this just an implementation?

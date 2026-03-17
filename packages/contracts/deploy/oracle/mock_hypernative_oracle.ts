@@ -24,6 +24,6 @@ deployFn.id = 'hypernative-oracle-mock:deploy'
 deployFn.tags = ['hypernative-oracle-mock:deploy']
 deployFn.dependencies = []
 deployFn.skip = async (hre) => {
-    return !hre.network.live || !['polygon', 'arbitrum','base','mainnet','bsc','apechain'].includes(hre.network.name)
+    return !hre.network.live || !['polygon', 'arbitrum','base','mainnet','bsc','apechain','xdc'].includes(hre.network.name)
   }
 export default deployFn

@@ -1,0 +1,306 @@
+{
+  "address": "0x912C09846b46a746DcbF5Ff2aDDA609A73ef6e9A",
+  "abi": [
+    {
+      "type": "constructor",
+      "stateMutability": "undefined",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "_tellerV2"
+        },
+        {
+          "type": "address",
+          "name": "_swapRouter"
+        },
+        {
+          "type": "address",
+          "name": "_quoter"
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "BorrowSwapComplete",
+      "inputs": [
+        {
+          "type": "address",
+          "name": "borrower",
+          "indexed": false
+        },
+        {
+          "type": "uint256",
+          "name": "loanId",
+          "indexed": false
+        },
+        {
+          "type": "address",
+          "name": "token0",
+          "indexed": false
+        },
+        {
+          "type": "uint256",
+          "name": "amountIn",
+          "indexed": false
+        },
+        {
+          "type": "uint256",
+          "name": "amountOut",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "TELLER_V2",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "UNISWAP_QUOTER",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "UNISWAP_SWAP_ROUTER",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "borrowSwap",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "_lenderCommitmentForwarder"
+        },
+        {
+          "type": "address",
+          "name": "_principalToken"
+        },
+        {
+          "type": "uint256",
+          "name": "_additionalInputAmount"
+        },
+        {
+          "type": "tuple",
+          "name": "_swapArgs",
+          "components": [
+            {
+              "type": "tuple[]",
+              "name": "swapPaths",
+              "components": [
+                {
+                  "type": "uint24",
+                  "name": "poolFee"
+                },
+                {
+                  "type": "address",
+                  "name": "tokenOut"
+                }
+              ]
+            },
+            {
+              "type": "uint160",
+              "name": "amountOutMinimum"
+            }
+          ]
+        },
+        {
+          "type": "tuple",
+          "name": "_acceptCommitmentArgs",
+          "components": [
+            {
+              "type": "uint256",
+              "name": "commitmentId"
+            },
+            {
+              "type": "address",
+              "name": "smartCommitmentAddress"
+            },
+            {
+              "type": "uint256",
+              "name": "principalAmount"
+            },
+            {
+              "type": "uint256",
+              "name": "collateralAmount"
+            },
+            {
+              "type": "uint256",
+              "name": "collateralTokenId"
+            },
+            {
+              "type": "address",
+              "name": "collateralTokenAddress"
+            },
+            {
+              "type": "uint16",
+              "name": "interestRate"
+            },
+            {
+              "type": "uint32",
+              "name": "loanDuration"
+            },
+            {
+              "type": "bytes32[]",
+              "name": "merkleProof"
+            }
+          ]
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "generateSwapPath",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "inputToken"
+        },
+        {
+          "type": "tuple[]",
+          "name": "swapPaths",
+          "components": [
+            {
+              "type": "uint24",
+              "name": "poolFee"
+            },
+            {
+              "type": "address",
+              "name": "tokenOut"
+            }
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "type": "bytes",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getMarketFeePct",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_marketId"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint16",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getMarketIdForCommitment",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "_lenderCommitmentForwarder"
+        },
+        {
+          "type": "uint256",
+          "name": "_commitmentId"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "quoteExactInput",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "inputToken"
+        },
+        {
+          "type": "uint256",
+          "name": "amountIn"
+        },
+        {
+          "type": "tuple[]",
+          "name": "swapPaths",
+          "components": [
+            {
+              "type": "uint24",
+              "name": "poolFee"
+            },
+            {
+              "type": "address",
+              "name": "tokenOut"
+            }
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": "amountOut"
+        }
+      ]
+    }
+  ],
+  "transactionHash": "0x79d99b2372991277fe345288d3ff93eee5008529cb360a30fbce286b351c44c6",
+  "receipt": {
+    "to": null,
+    "from": "0xD9B023522CeCe02251d877bb0EB4f06fDe6F98E6",
+    "blockHash": null,
+    "blockNumber": null
+  },
+  "numDeployments": 1,
+  "implementation": "0x37F483C895C66d3eDb14AE88ea9bA52F937Eb002"
+}

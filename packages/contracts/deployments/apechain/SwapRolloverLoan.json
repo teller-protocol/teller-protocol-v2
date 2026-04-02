@@ -109,6 +109,27 @@
     },
     {
       "type": "function",
+      "name": "algebraFlashCallback",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "fee0"
+        },
+        {
+          "type": "uint256",
+          "name": "fee1"
+        },
+        {
+          "type": "bytes",
+          "name": "data"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
       "name": "calculateRolloverAmount",
       "constant": true,
       "stateMutability": "view",
@@ -236,6 +257,27 @@
           "name": ""
         }
       ]
+    },
+    {
+      "type": "function",
+      "name": "pancakeV3FlashCallback",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "fee0"
+        },
+        {
+          "type": "uint256",
+          "name": "fee1"
+        },
+        {
+          "type": "bytes",
+          "name": "data"
+        }
+      ],
+      "outputs": []
     },
     {
       "type": "function",
@@ -509,6 +551,6 @@
     "blockHash": "0x9709ef2ae36dc72125076300574b78133a78e0290d15cdbf6a3b5b4f6d02cb2e",
     "blockNumber": 33944597
   },
-  "numDeployments": 1,
+  "numDeployments": 7,
   "implementation": "0xfCd6Aa92D399260E8309800316CEc9b1F123621e"
 }

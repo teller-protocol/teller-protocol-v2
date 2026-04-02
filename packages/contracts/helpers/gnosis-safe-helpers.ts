@@ -560,7 +560,7 @@ export class GnosisSafeAdminClient {
       'gnosis': 'https://safe-transaction-gnosis-chain.safe.global',
       'avalanche': 'https://safe-transaction-avalanche.safe.global',
       'bsc': 'https://safe-transaction-bsc.safe.global',
-      'apechain': 'https://safe-transaction-apechain.safe.global',
+      'apechain': 'https://safe-transaction-apechain.safe.onchainden.com',
       'xdc': 'https://safe-transaction-xdc.safe.global',
     }
     return networkMap[network] || 'https://safe-transaction-mainnet.safe.global'

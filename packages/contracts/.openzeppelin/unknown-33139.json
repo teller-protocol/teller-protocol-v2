@@ -3708,6 +3708,16 @@
         },
         "namespaces": {}
       }
+    },
+    "48523054e85097e805ccf9b69fe484badaa1fcf3bd71244dc9b366f0f83f3d5c": {
+      "address": "0x48EA70BCe76FE2F0c79B29Bf852a1DCF957982aa",
+      "txHash": "0x3682bad04a67c4363ff8c9962f48795a18b0d7302b2f7816e72993fcceb52f75",
+      "layout": {
+        "solcVersion": "0.8.11",
+        "storage": [],
+        "types": {},
+        "namespaces": {}
+      }
     }
   }
 }

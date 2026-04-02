@@ -239,6 +239,27 @@
     },
     {
       "type": "function",
+      "name": "pancakeV3FlashCallback",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "fee0"
+        },
+        {
+          "type": "uint256",
+          "name": "fee1"
+        },
+        {
+          "type": "bytes",
+          "name": "data"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
       "name": "refundETH",
       "constant": false,
       "stateMutability": "payable",
@@ -509,6 +530,6 @@
     "blockHash": null,
     "blockNumber": null
   },
-  "numDeployments": 1,
+  "numDeployments": 2,
   "implementation": "0x203ee2F172826Fa46A175230DF260188fE0C96Fc"
 }

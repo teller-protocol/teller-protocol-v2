@@ -1,0 +1,81 @@
+specVersion: 0.0.4
+description: Teller Protocol V3 Pools - Agnostic Oracle lending pools.
+repository: https://github.com/teller-protocol/teller-protocol-v2
+schema:
+  file: ./src/schema.graphql
+features:
+  - nonFatalErrors
+  - grafting
+dataSources:
+  - kind: ethereum/contract
+    name: Factory
+    network: {{ network }}
+    source:
+      abi: Factory
+      address: "{{lenderCommitmentGroupFactory}}"
+      startBlock: {{ startblock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/mappings/factory.ts
+      entities:
+        - Pool
+      abis:
+        - name: Factory
+          file: ./abis/Factory.json
+      eventHandlers:
+        - event: DeployedLenderGroupContract(indexed address)
+          handler: handleLenderGroupDeployed
+  - kind: ethereum/contract
+    name: CollateralManager
+    network: {{ network }}
+    source:
+      abi: CollateralManager
+      address: "{{collateralManager}}"
+      startBlock: {{ startblock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/mappings/collateralManager.ts
+      entities:
+        - TellerBid
+        - GroupPoolMetric
+      abis:
+        - name: CollateralManager
+          file: ./abis/CollateralManager.json
+      eventHandlers:
+        - event: CollateralWithdrawn(uint256,uint8,address,uint256,uint256,address)
+          handler: handleCollateralWithdrawn
+templates:
+  - kind: ethereum/contract
+    name: Pool
+    network: {{ network }}
+    source:
+      abi: Pool
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/mappings/core.ts
+      entities:
+        - Pool
+      abis:
+        - name: Pool
+          file: ./abis/PoolV3.json
+        - name: Factory
+          file: ./abis/Factory.json
+      eventHandlers:
+        - event: BorrowerAcceptedFunds(indexed address,indexed uint256,uint256,uint256,uint32,uint16)
+          handler: handleBorrowerAcceptedFunds
+        - event: Withdraw(indexed address,indexed address,indexed address,uint256,uint256)
+          handler: handleWithdraw
+        - event: Deposit(indexed address,indexed address,uint256,uint256)
+          handler: handleDeposit
+        - event: LoanRepaid(indexed uint256,indexed address,uint256,uint256,uint256,uint256)
+          handler: handleLoanRepaid
+        - event: DefaultedLoanLiquidated(indexed uint256,indexed address,uint256,int256)
+          handler: handleLoanLiquidated
+        - event: PoolInitialized(indexed address,indexed address,uint256,uint32,uint16,uint16,uint16,uint16)
+          handler: handlePoolInitialized

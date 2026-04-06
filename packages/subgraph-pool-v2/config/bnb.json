@@ -1,0 +1,26 @@
+{
+  "enabled": true,
+  "name": "tellerv2-poolsv2-bnb",
+  "network": "bsc",
+  "export_network_name": "bnb",
+  "product": "studio",
+  "studio": {
+    "owner": "0x1a76339211668a6939e1d6D13AB902bBef5D9ebc",
+    "network": "arbitrum-one"
+  },
+  "grafting": {
+    "enabled": false
+  },
+  "contracts": {
+    "factory": {
+      "enabled": true,
+      "address": "0x0EfD3E33Ba2EdE028e50a3E7f81E084996d161aa",
+      "block": "81088797"
+    },
+    "collateralManager": {
+      "enabled": true,
+      "address": "0x9D55Cf23D26a8C17670bb8Ee25D58481ff7aD295",
+      "block": "81088797"
+    }
+  }
+}

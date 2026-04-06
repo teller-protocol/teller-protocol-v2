@@ -1,0 +1,18 @@
+schema: schema.introspection.graphql
+extensions:
+  endpoints:
+    Base:
+      url: https://api.studio.thegraph.com/query/36377/tellerv2-poolsv3-base/version/latest
+      headers:
+        user-agent: JS GraphQL
+      introspect: true
+    ApeChain:
+      url: https://api.studio.thegraph.com/query/36377/tellerv2-poolsv3-apechain/version/latest
+      headers:
+        user-agent: JS GraphQL
+      introspect: true
+    Local GraphQL Endpoint:
+      url: http://localhost:8080/graphql
+      headers:
+        user-agent: JS GraphQL
+      introspect: true

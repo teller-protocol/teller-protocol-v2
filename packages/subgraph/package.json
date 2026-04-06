@@ -4,9 +4,7 @@
   "version": "0.4.21-18",
   "scripts": {
     "build": "graph codegen && graph build && graph codegen",
-    "handlebars": "bash -c 'yarn hbs -D ./config/$1.json ./src/subgraph.handlebars -o . -e yaml' _"    ,
-
-    
+    "handlebars": "bash -c 'yarn hbs -D ./config/$1.json ./src/subgraph.handlebars -o . -e yaml' _",
     "deploy:prompt": "ts-node scripts/thegraph",
     "create-local": "graph create --node http://localhost:8020/ teller-v2",
     "remove-local": "graph remove --node http://localhost:8020/ teller-v2",

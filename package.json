@@ -22,7 +22,8 @@
       "packages/services",
       "packages/subgraph",
       "packages/subgraph-pool",
-      "packages/subgraph-pool-v2"
+      "packages/subgraph-pool-v2",
+      "packages/subgraph-pool-v3"
     ]
   },
   "packageManager": "yarn@3.6.1",

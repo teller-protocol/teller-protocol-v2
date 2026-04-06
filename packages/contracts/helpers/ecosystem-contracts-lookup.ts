@@ -37,6 +37,9 @@ export function get_ecosystem_contract_address(
 	    case 'bsc':
 	      uniswapV3FactoryAddress = '0x0BFbCF9fa4f9C56B0F40a671Ad40E0805A091865' // PancakeSwap V3
 	      break
+	    case 'apechain':
+	      uniswapV3FactoryAddress = '0x10aA510d94E094Bd643677bd2964c3EE085Daffc' // Camelot V3 (Algebra)
+	      break
 	    default:
 	      return undefined 
 	  }
@@ -77,6 +80,9 @@ export function get_ecosystem_contract_address(
 		    case 'bsc':
 		      weth9Address = '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c' // WBNB
 		      break
+		    case 'apechain':
+		      weth9Address = '0x48b62137EdfA95a428D35C09E44256a739F6B557' // WAPE
+		      break
 
 		    default:
 		    	return undefined 
@@ -115,6 +121,9 @@ export function get_ecosystem_contract_address(
 		       break
 		    case 'bsc':
 		      swapRouterAddress = '0x1b81D678ffb9C0263b24A97847620C99d213eB14' // PancakeSwap V3
+		      break
+		    case 'apechain':
+		      swapRouterAddress = '0xC69Dc28924930583024E067b2B3d773018F4EB52' // Camelot V3
 		      break
 		    default:
 		    	return undefined 
@@ -156,6 +165,9 @@ export function get_ecosystem_contract_address(
 			     	break
 			    case 'bsc':
 			      quoterAddress = '0xB048Bbc1Ee6b733FFfCFb9e9CeF7375518e25997' // PancakeSwap V3
+			      break
+			    case 'apechain':
+			      quoterAddress = '0x60A186019F81bFD04aFc16c9C01804a04E79e68B' // Camelot V3
 			      break
 			    default:
 			    	return undefined 

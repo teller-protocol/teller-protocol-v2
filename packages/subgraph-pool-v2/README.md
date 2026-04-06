@@ -80,7 +80,7 @@ npm run codegen && npm run build
 
  yarn deploy_ormi teller-pools-v2-mainnet 
  yarn deploy_ormi teller-pools-v2-base 
-
+  yarn deploy_ormi teller-pools-v2-apechain 
 
 ```
 
@@ -95,11 +95,16 @@ deploy to goldsky
 
 npm run generate katana
 
+
+
+npm run codegen && npm run build 
+
+
 npm run generate hyperevm
 
 goldsky subgraph deploy teller-pools-v2-hyperevm/0.4.21.2
 
-goldsky subgraph deploy teller-pools-v2-katana/0.4.21.9
+goldsky subgraph deploy teller-pools-v2-katana/0.4.21.13
 
 
 ```

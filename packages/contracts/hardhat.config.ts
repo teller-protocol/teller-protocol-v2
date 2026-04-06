@@ -235,7 +235,7 @@ export default <HardhatUserConfig>{
       mainnet: process.env.ETHERSCANV2_VERIFY_API_KEY,
       polygon: process.env.ETHERSCANV2_VERIFY_API_KEY,
       arbitrumOne: process.env.ETHERSCANV2_VERIFY_API_KEY,
-      bsc: process.env.BSCSCAN_VERIFY_API_KEY,
+      bsc: process.env.ETHERSCANV2_VERIFY_API_KEY,
       base: process.env.ETHERSCANV2_VERIFY_API_KEY,
       optimism: process.env.ETHERSCANV2_VERIFY_API_KEY,  //using the v2 api 
       katana: process.env.ETHERSCANV2_VERIFY_API_KEY,  //using the v2 api 
@@ -296,7 +296,7 @@ export default <HardhatUserConfig>{
         network: 'bsc',
         chainId: 56,
         urls: {
-          apiURL: 'https://api.bscscan.com/api',
+          apiURL: 'https://api.etherscan.io/v2/api?chainid=56',
           browserURL: 'https://bscscan.com',
         },
       },
@@ -431,6 +431,26 @@ export default <HardhatUserConfig>{
       },
  
     ],
+    overrides: {
+      "contracts/LenderCommitmentForwarder/extensions/rollover/SwapRolloverLoan.sol": {
+        version: '0.8.11',
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200,
+          },
+        },
+      },
+      "contracts/LenderCommitmentForwarder/extensions/rollover/SwapRolloverLoan_G2.sol": {
+        version: '0.8.11',
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200,
+          },
+        },
+      },
+    },
   },
 
   contractSizer: {
@@ -615,7 +635,7 @@ export default <HardhatUserConfig>{
 
       verify: {
         etherscan: {
-          apiKey: process.env.BSCSCAN_VERIFY_API_KEY,
+          apiKey: process.env.ETHERSCANV2_VERIFY_API_KEY,
         },
       },
     }),

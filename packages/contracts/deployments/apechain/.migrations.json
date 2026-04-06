@@ -25,5 +25,6 @@
   "default-proxy-admin:transfer": 1771555560,
   "apechain:transfer-timelock-ownership": 1771556073,
   "lender-commitment-group-beacon-v3:deploy": 1772162877,
-  "lender-commitment-group-factory-v3:deploy": 1772162931
+  "lender-commitment-group-factory-v3:deploy": 1772162931,
+  "lender-commitment-forwarder:extensions:flash-swap-rollover:g4-upgrade-apechain": 1775158842
 }

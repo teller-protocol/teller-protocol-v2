@@ -278,7 +278,7 @@ contract SwapRolloverLoan_G2 is IUniswapV3FlashCallback, PeripheryPayments  {
         uint256 fee0,
         uint256 fee1,
         bytes calldata data
-    ) external override {
+    ) external virtual override {
         RolloverCallbackArgs memory _rolloverArgs = abi.decode(data, (RolloverCallbackArgs));
       
 

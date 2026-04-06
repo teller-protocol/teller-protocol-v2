@@ -101,7 +101,17 @@ const nonDeployedContracts = {
 
 
      "999" : [
-    
+
+     "LenderCommitmentForwarder/extensions/LenderCommitmentGroup/LenderCommitmentGroup_Pool_V2.sol/LenderCommitmentGroup_Pool_V2.json",
+    ],
+
+     "33139" : [
+
+     "LenderCommitmentForwarder/extensions/LenderCommitmentGroup/LenderCommitmentGroup_Pool_V2.sol/LenderCommitmentGroup_Pool_V2.json",
+    ],
+
+     "50" : [
+
      "LenderCommitmentForwarder/extensions/LenderCommitmentGroup/LenderCommitmentGroup_Pool_V2.sol/LenderCommitmentGroup_Pool_V2.json",
     ]
 };
@@ -113,7 +123,7 @@ const contractsExportFile = path.join(hardhatDir, "contracts.json");
 ensureDirExists(hardhatDir);
 
 fs.writeFileSync(contractsExportFile, JSON.stringify({}, null, 2), "utf-8");
-shell.exec(`yarn hardhat export --export-all ${contractsExportFile}`);
+shell.exec(`npx hardhat export --export-all ${contractsExportFile}`);
 
 // Modify exported JSON
 const exportData = JSON.parse(fs.readFileSync(contractsExportFile, "utf-8"));
@@ -165,4 +175,4 @@ fs.writeFileSync(contractsExportFile, JSON.stringify(exportData, null, 2), "utf-
 // ----- 
 
 // Step 5: Compile math library helpers
-shell.exec("yarn tsc -p teller-math-lib/tsconfig.json --outDir build/math");
+shell.exec("./node_modules/.bin/tsc -p teller-math-lib/tsconfig.json --outDir build/math");

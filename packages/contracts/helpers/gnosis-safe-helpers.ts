@@ -460,7 +460,8 @@ export class GnosisSafeAdminClient {
       'avalanche': 43114,
       'bsc': 56,
       'katana':747474,
-      'apechain': 33139
+      'apechain': 33139,
+      'xdc': 50
     }
     return chainIds[network] || 1
   }
@@ -539,6 +540,7 @@ export class GnosisSafeAdminClient {
       'bsc': 'bnb',
       'katana': 'katana',
       'apechain': 'apechain',
+      'xdc': 'xdc',
     }
 
     return networkMap[network as string] || 'eth'
@@ -559,6 +561,7 @@ export class GnosisSafeAdminClient {
       'avalanche': 'https://safe-transaction-avalanche.safe.global',
       'bsc': 'https://safe-transaction-bsc.safe.global',
       'apechain': 'https://safe-transaction-apechain.safe.global',
+      'xdc': 'https://safe-transaction-xdc.safe.global',
     }
     return networkMap[network] || 'https://safe-transaction-mainnet.safe.global'
   }

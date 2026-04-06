@@ -59,9 +59,13 @@ const deployFn: DeployFunction = async (hre) => {
    // this is necessary so only the protocol timelock can upgrade the beacon proxy 
   
   const { protocolTimelock , protocolOwnerSafe } = await hre.getNamedAccounts()
-  hre.log('Transferring ownership of CommitmentGroupBeacon to Gnosis Safe...')
-  await commitmentGroupBeacon.transferOwnership(protocolTimelock)
-  hre.log('done.')
+  if (protocolTimelock === '0x0000000000000000000000000000000000000000') {
+    hre.log('⚠️  protocolTimelock is zero address — skipping beacon ownership transfer. Run deploy again after setting protocolTimelock.')
+  } else {
+    hre.log('Transferring ownership of CommitmentGroupBeacon to Gnosis Safe...')
+    await commitmentGroupBeacon.transferOwnership(protocolTimelock)
+    hre.log('done.')
+  }
 
   return true
 }
@@ -80,6 +84,6 @@ deployFn.dependencies = [
 ]
 
 deployFn.skip = async (hre) => {
-  return !hre.network.live || !['sepolia', 'polygon' , 'mainnet','mainnet_live_fork','arbitrum','base','optimism','katana','hyperevm','bsc','apechain'].includes(hre.network.name)
+  return !hre.network.live || !['sepolia', 'polygon' , 'mainnet','mainnet_live_fork','arbitrum','base','optimism','katana','hyperevm','bsc','apechain','xdc'].includes(hre.network.name)
 }
 export default deployFn

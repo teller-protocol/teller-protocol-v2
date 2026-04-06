@@ -38,7 +38,7 @@ deployFn.tags = ['teller-v2', 'price-adapter-uniswap-v3:deploy']
 deployFn.dependencies = []
 
 deployFn.skip = async (hre) => {
-    return !hre.network.live || ![  'base', ].includes(hre.network.name)
+    return !hre.network.live || ![  'base', 'xdc' ].includes(hre.network.name)
   }
 
 export default deployFn

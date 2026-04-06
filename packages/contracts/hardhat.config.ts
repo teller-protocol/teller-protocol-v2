@@ -112,6 +112,7 @@ type NetworkNames =
   | 'katana'
   | 'hyperevm'
   | 'apechain'
+  | 'xdc'
   | 'sepolia'
   | 'mumbai'
   | 'goerli'
@@ -162,6 +163,8 @@ const networkUrls: Record<NetworkNames, string> = {
       hyperevm: process.env.HYPEREVM_RPC_URL ?? 'https://rpc.hyperliquid.xyz/evm',
 
       apechain: process.env.APECHAIN_RPC_URL ?? 'https://rpc.apechain.com',
+
+      xdc: process.env.XDC_RPC_URL ?? 'https://rpc.xdc.org',
 
   mantle: 'https://rpc.mantle.xyz',
 
@@ -238,6 +241,7 @@ export default <HardhatUserConfig>{
       katana: process.env.ETHERSCANV2_VERIFY_API_KEY,  //using the v2 api 
       hyperevm: process.env.ETHERSCANV2_VERIFY_API_KEY,
       apechain: process.env.ETHERSCANV2_VERIFY_API_KEY,
+      xdc: process.env.ETHERSCANV2_VERIFY_API_KEY,
 
       mantle: process.env.MANTLE_VERIFY_API_KEY ?? 'xyz',
       clarity: '', //none ? 
@@ -333,6 +337,14 @@ export default <HardhatUserConfig>{
         },
       },
       {
+        network: 'xdc',
+        chainId: 50,
+        urls: {
+          apiURL: 'https://api.etherscan.io/v2/api?chainid=50',
+          browserURL: 'https://xdcscan.io/',
+        },
+      },
+      {
         network: 'clarity',
         chainId: 66814,
         urls: {
@@ -410,6 +422,7 @@ export default <HardhatUserConfig>{
           {
         version: '0.8.24',
         settings: {
+          evmVersion: 'paris',
           optimizer: {
             enabled: true, // !isTesting, //need this for now due to large size of tellerV2.test
             runs: 200,
@@ -468,7 +481,8 @@ export default <HardhatUserConfig>{
       56: '0x058057c8A9Eb3B93d9F3638d047C98034F45f95E',
       11155111: '0xb1ff461BB751B87f4F791201a29A8cFa9D30490c',
       999:'0x004573E17574634A48CA808CF1df75f01e906E43',
-      33139: '0x2BbD69C72b6689F31dd12b93fF59E62632E0eF41'  // apechain
+      33139: '0x2BbD69C72b6689F31dd12b93fF59E62632E0eF41',  // apechain
+      50: '0x55c12dF12e8D1094f387D77F445a8F1bE61C17BE'  // xdc
     },
     protocolTimelock: {
       31337: 8,
@@ -485,7 +499,8 @@ export default <HardhatUserConfig>{
       56: '0xBf4E3fEA276057D0b26f52141557C835a7E2d534',
       11155111: '0xFe5394B67196EA95301D6ECB5389E98A02984cC2',
       999: '0xBf4E3fEA276057D0b26f52141557C835a7E2d534',
-      33139: '0x6b1eC259a35005b7562c92f42C490f39131fF1d8'  // apechain
+      33139: '0x6b1eC259a35005b7562c92f42C490f39131fF1d8',  // apechain
+      50: '0xfA87381128aAF95fB637BbA0B760bA2f9970c2b5'  // xdc
     },
   },
 
@@ -685,6 +700,18 @@ export default <HardhatUserConfig>{
     apechain: networkConfig({
       url: networkUrls.apechain,
       chainId: 33139,
+      live: true,
+
+      verify: {
+        etherscan: {
+          apiKey: process.env.ETHERSCANV2_VERIFY_API_KEY,
+        },
+      },
+    }),
+
+    xdc: networkConfig({
+      url: networkUrls.xdc,
+      chainId: 50,
       live: true,
 
       verify: {

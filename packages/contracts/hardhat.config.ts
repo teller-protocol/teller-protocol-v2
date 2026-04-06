@@ -36,7 +36,7 @@ import rrequire from 'helpers/rrequire'
 import semver from 'semver'
 // import { logger as tenderlyLogger } from 'tenderly/utils/logger'
 
-const NODE_VERSION = 'v16'
+const NODE_VERSION = '>=20'
 if (!semver.satisfies(process.version, NODE_VERSION))
   throw new Error(
     `Incorrect NodeJS version being used (${process.version}). Expected: ${NODE_VERSION}`
@@ -105,6 +105,7 @@ type NetworkNames =
   | 'mainnet-live-fork'
   | 'polygon'
   | 'arbitrum'
+  | 'bsc'
   | 'base'
   | 'mantle'
   | 'optimism'
@@ -138,7 +139,9 @@ const networkUrls: Record<NetworkNames, string> = {
     (ALCHEMY_API_KEY
       ? `https://arb-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
       : ''),
-  
+  bsc:
+    process.env.BSC_RPC_URL ?? 'https://bsc-dataseed1.binance.org',
+
   base:
   process.env.BASE_RPC_URL ??
   (ALCHEMY_API_KEY
@@ -227,6 +230,7 @@ export default <HardhatUserConfig>{
       mainnet: process.env.ETHERSCANV2_VERIFY_API_KEY,
       polygon: process.env.ETHERSCANV2_VERIFY_API_KEY,
       arbitrumOne: process.env.ETHERSCANV2_VERIFY_API_KEY,
+      bsc: process.env.BSCSCAN_VERIFY_API_KEY,
       base: process.env.ETHERSCANV2_VERIFY_API_KEY,
       optimism: process.env.ETHERSCANV2_VERIFY_API_KEY,  //using the v2 api 
       katana: process.env.ETHERSCANV2_VERIFY_API_KEY,  //using the v2 api 
@@ -279,6 +283,14 @@ export default <HardhatUserConfig>{
         urls: {
           apiURL: 'https://api.etherscan.io/v2/api?chainid=42161 ',
           browserURL: 'https://arbiscan.io',
+        },
+      },
+      {
+        network: 'bsc',
+        chainId: 56,
+        urls: {
+          apiURL: 'https://api.bscscan.com/api',
+          browserURL: 'https://bscscan.com',
         },
       },
 
@@ -387,10 +399,6 @@ export default <HardhatUserConfig>{
     ],
   },
 
-  ovm: {
-    solcVersion: '0.8.4',
-  },
-
   contractSizer: {
     runOnCompile: !skipContractSizer,
     alphaSort: false,
@@ -436,6 +444,7 @@ export default <HardhatUserConfig>{
       5000: '0x4496c03dA72386255Bf4af60b3CCe07787d3dCC2',
       8453: '0x2f74c448CF6d613bEE183fE35dB0c9AC5084F66A',
       42161: '0xD9149bfBfB29cC175041937eF8161600b464051B',
+      56: '0x058057c8A9Eb3B93d9F3638d047C98034F45f95E',
       11155111: '0xb1ff461BB751B87f4F791201a29A8cFa9D30490c',
       999:'0x004573E17574634A48CA808CF1df75f01e906E43'
     },
@@ -451,6 +460,7 @@ export default <HardhatUserConfig>{
       5000: '0x6BBf498C429C51d05bcA3fC67D2C720B15FC73B8',
       8453: '0x6BBf498C429C51d05bcA3fC67D2C720B15FC73B8',
       42161: '0x6BBf498C429C51d05bcA3fC67D2C720B15FC73B8',
+      56: '0xBf4E3fEA276057D0b26f52141557C835a7E2d534',
       11155111: '0xFe5394B67196EA95301D6ECB5389E98A02984cC2',
       999: '0xBf4E3fEA276057D0b26f52141557C835a7E2d534'
     },
@@ -557,6 +567,17 @@ export default <HardhatUserConfig>{
       verify: {
         etherscan: {
           apiKey: process.env.ETHERSCANV2_VERIFY_API_KEY,
+        },
+      },
+    }),
+    bsc: networkConfig({
+      url: networkUrls.bsc,
+      chainId: 56,
+      live: true,
+
+      verify: {
+        etherscan: {
+          apiKey: process.env.BSCSCAN_VERIFY_API_KEY,
         },
       },
     }),

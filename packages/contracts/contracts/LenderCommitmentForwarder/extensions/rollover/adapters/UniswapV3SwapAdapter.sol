@@ -2,25 +2,38 @@
 pragma solidity ^0.8.0;
 
 import "../../../../interfaces/ISwapAdapter.sol";
-import "../../../../libraries/uniswap/periphery/interfaces/ISwapRouter02.sol";
-import "../../../../libraries/uniswap/periphery/interfaces/IQuoter.sol";
+import "../../../../libraries/uniswap/periphery/interfaces/IQuoterV4.sol";
 import "../../../../libraries/uniswap/periphery/libraries/TransferHelper.sol";
 
+/// @notice V3-compatible swap router interface with deadline field.
+///         Works with both Uniswap V3 SwapRouter and PancakeSwap V3 SmartRouter.
+interface ISwapRouterV3 {
+    struct ExactInputParams {
+        bytes path;
+        address recipient;
+        uint256 deadline;
+        uint256 amountIn;
+        uint256 amountOutMinimum;
+    }
+
+    function exactInput(ExactInputParams calldata params) external payable returns (uint256 amountOut);
+}
+
 /// @title UniswapV3SwapAdapter
-/// @notice ISwapAdapter implementation for Uniswap V3 (and compatible forks like SushiSwap V3).
+/// @notice ISwapAdapter implementation for Uniswap V3 (and compatible forks like PancakeSwap V3).
 ///         Handles Uniswap V3 path encoding: (tokenIn ++ fee ++ tokenOut) with 3-byte fee per hop.
 contract UniswapV3SwapAdapter is ISwapAdapter {
 
-    ISwapRouter02 public immutable SWAP_ROUTER;
-    IQuoter public immutable QUOTER;
+    ISwapRouterV3 public immutable SWAP_ROUTER;
+    IQuoterV4 public immutable QUOTER;
     uint24 public immutable DEFAULT_POOL_FEE;
 
-    /// @param _swapRouter Uniswap V3 SwapRouter02 address
-    /// @param _quoter Uniswap V3 Quoter (view-only) address
+    /// @param _swapRouter Uniswap V3 / PancakeSwap V3 swap router address
+    /// @param _quoter QuoterV2 address
     /// @param _defaultPoolFee Default pool fee in hundredths of a bip (e.g. 500 = 0.05%, 3000 = 0.3%)
     constructor(address _swapRouter, address _quoter, uint24 _defaultPoolFee) {
-        SWAP_ROUTER = ISwapRouter02(_swapRouter);
-        QUOTER = IQuoter(_quoter);
+        SWAP_ROUTER = ISwapRouterV3(_swapRouter);
+        QUOTER = IQuoterV4(_quoter);
         DEFAULT_POOL_FEE = _defaultPoolFee;
     }
 
@@ -38,9 +51,10 @@ contract UniswapV3SwapAdapter is ISwapAdapter {
 
         bytes memory path = _buildPath(tokenIn, tokenOut, intermediateTokens);
 
-        ISwapRouter02.ExactInputParams memory params = ISwapRouter02.ExactInputParams({
+        ISwapRouterV3.ExactInputParams memory params = ISwapRouterV3.ExactInputParams({
             path: path,
             recipient: recipient,
+            deadline: block.timestamp,
             amountIn: amountIn,
             amountOutMinimum: amountOutMinimum
         });

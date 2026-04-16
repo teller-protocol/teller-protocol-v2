@@ -3207,6 +3207,16 @@
         "types": {},
         "namespaces": {}
       }
+    },
+    "a90f76e2f25b5ad575c7f97f22eb3150a8ab109392b5b76c2ea15aa771948143": {
+      "address": "0x5896B1168C2558886Fa590a5F57667b88a012874",
+      "txHash": "0xbf5c444627d7e0487a8e7fdd843ac8140a302044efb3690121c56c3ea0ce7c20",
+      "layout": {
+        "solcVersion": "0.8.24",
+        "storage": [],
+        "types": {},
+        "namespaces": {}
+      }
     }
   }
 }

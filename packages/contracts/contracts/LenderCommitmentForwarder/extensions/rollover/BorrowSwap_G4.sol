@@ -18,6 +18,8 @@ import "../../../libraries/uniswap/periphery/libraries/TransferHelper.sol";
 /// @notice Borrow from a lending pool and immediately swap the proceeds via a DEX.
 ///         Uses the ISwapAdapter pattern to support multiple DEX backends
 ///         (Uniswap V3, Algebra/Camelot V3, etc.) without changing this contract.
+///         Swap paths are passed as arbitrary `bytes`, consistent with how
+///         IPriceAdapter handles oracle routes in PoolsV3.
 contract BorrowSwap_G4 {
     using AddressUpgradeable for address;
 
@@ -46,8 +48,7 @@ contract BorrowSwap_G4 {
     }
 
     struct SwapArgs {
-        address tokenOut;
-        address[] intermediateTokens; // empty for single-hop, 1 element for double-hop
+        bytes path; // DEX-encoded swap path (e.g. tokenIn ++ fee ++ tokenOut for Uniswap V3)
         uint160 amountOutMinimum;
     }
 
@@ -63,7 +64,7 @@ contract BorrowSwap_G4 {
     /// @param _lenderCommitmentForwarder The commitment forwarder contract
     /// @param _principalToken The token being borrowed (input to the swap)
     /// @param _additionalInputAmount Extra principal tokens the borrower adds to the swap
-    /// @param _swapArgs Swap parameters (output token, intermediates, slippage)
+    /// @param _swapArgs Swap parameters (DEX-encoded path, slippage)
     /// @param _acceptCommitmentArgs Loan commitment parameters
     function borrowSwap(
         address _lenderCommitmentForwarder,
@@ -94,9 +95,7 @@ contract BorrowSwap_G4 {
         TransferHelper.safeApprove(_principalToken, address(SWAP_ADAPTER), totalInputAmount);
 
         uint256 swapAmountOut = SWAP_ADAPTER.swap(
-            _principalToken,
-            _swapArgs.tokenOut,
-            _swapArgs.intermediateTokens,
+            _swapArgs.path,
             totalInputAmount,
             _swapArgs.amountOutMinimum,
             borrower
@@ -113,13 +112,13 @@ contract BorrowSwap_G4 {
 
     /// @notice Quote the expected output for an exact-input swap.
     /// @dev Not view — DEX quoters use state-reverting simulation internally.
+    /// @param path DEX-encoded swap path
+    /// @param amountIn Amount of input token to quote
     function quoteExactInput(
-        address inputToken,
-        address tokenOut,
-        address[] calldata intermediateTokens,
+        bytes calldata path,
         uint256 amountIn
     ) external returns (uint256 amountOut) {
-        return SWAP_ADAPTER.quote(inputToken, tokenOut, intermediateTokens, amountIn);
+        return SWAP_ADAPTER.quote(path, amountIn);
     }
 
     // =========================================================================

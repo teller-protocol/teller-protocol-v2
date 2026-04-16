@@ -8,7 +8,6 @@ import "forge-std/StdJson.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 import { SmartCommitmentForwarder } from "../contracts/LenderCommitmentForwarder/SmartCommitmentForwarder.sol";
-import { BorrowSwap } from "../contracts/LenderCommitmentForwarder/extensions/rollover/BorrowSwap.sol";
 import { BorrowSwap_G3 } from "../contracts/LenderCommitmentForwarder/extensions/rollover/BorrowSwap_G3.sol";
 import { BorrowSwap_G4 } from "../contracts/LenderCommitmentForwarder/extensions/rollover/BorrowSwap_G4.sol";
 import { AlgebraSwapAdapter } from "../contracts/LenderCommitmentForwarder/extensions/rollover/adapters/AlgebraSwapAdapter.sol";
@@ -36,7 +35,7 @@ contract ApeChain_BorrowSwap_Test is Test {
     address constant CAMELOT_QUOTER      = 0x60A186019F81bFD04aFc16c9C01804a04E79e68B;
 
     SmartCommitmentForwarder scf;
-    BorrowSwap borrowSwap; // existing G3-based deployment
+    BorrowSwap_G3 borrowSwap; // existing G3-based deployment
 
     // G4 + adapter (deployed in setUp)
     AlgebraSwapAdapter algebraAdapter;
@@ -61,7 +60,7 @@ contract ApeChain_BorrowSwap_Test is Test {
         assertTrue(scfAddr.code.length > 0, "SmartCommitmentForwarder not deployed on ApeChain");
 
         address payable borrowSwapAddr = payable(getDeployedAddress("BorrowSwap"));
-        borrowSwap = BorrowSwap(borrowSwapAddr);
+        borrowSwap = BorrowSwap_G3(borrowSwapAddr);
         assertTrue(borrowSwapAddr.code.length > 0, "BorrowSwap not deployed on ApeChain");
 
         // Deploy G4 + AlgebraSwapAdapter locally in the fork
@@ -142,7 +141,7 @@ contract ApeChain_BorrowSwap_Test is Test {
         );
     }
 
-    /// @notice G4 + AlgebraSwapAdapter correctly routes to quoteExactInputSingle,
+    /// @notice G4 + AlgebraSwapAdapter correctly routes to the quoter,
     ///         finds the right pool, and simulates the swap. However, ApeChain's WAPE
     ///         token uses a native precompile (0x6b: getSharePrice) for transfer() that
     ///         Forge's EVM cannot simulate. The swap simulation reaches the transfer step
@@ -153,22 +152,23 @@ contract ApeChain_BorrowSwap_Test is Test {
     ///             <ApeUSD> <WAPE> 100e18 0 --rpc-url https://rpc.apechain.com
     ///         Returns: 1153180603317078310201 WAPE (~1153 WAPE), fee=3645 bps
     function test_G4_quote_ApeUSD_to_WAPE_reverts_due_to_forge_precompile_limit() public {
-        address[] memory intermediates = new address[](0);
+        // Algebra path: tokenIn ++ tokenOut (no fee bytes)
+        bytes memory path = abi.encodePacked(ApeUSD, WAPE);
 
         // Reverts because Forge can't simulate ApeChain's 0x6b precompile (getSharePrice)
         // The adapter + quoter path is correct — this is a Forge fork testing limitation
         vm.expectRevert();
-        borrowSwapG4.quoteExactInput(ApeUSD, WAPE, intermediates, 100 * 1e18);
+        borrowSwapG4.quoteExactInput(path, 100 * 1e18);
 
         console.log("G4 adapter works (correct pool found), but Forge can't simulate WAPE precompile");
     }
 
     /// @notice Same Forge precompile limitation in reverse direction
     function test_G4_quote_WAPE_to_ApeUSD_reverts_due_to_forge_precompile_limit() public {
-        address[] memory intermediates = new address[](0);
+        bytes memory path = abi.encodePacked(WAPE, ApeUSD);
 
         vm.expectRevert();
-        borrowSwapG4.quoteExactInput(WAPE, ApeUSD, intermediates, 1 ether);
+        borrowSwapG4.quoteExactInput(path, 1 ether);
 
         console.log("G4 adapter works (reverse), Forge precompile limit");
     }

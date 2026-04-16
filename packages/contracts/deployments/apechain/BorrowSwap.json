@@ -12,11 +12,7 @@
         },
         {
           "type": "address",
-          "name": "_swapRouter"
-        },
-        {
-          "type": "address",
-          "name": "_quoter"
+          "name": "_swapAdapter"
         }
       ]
     },
@@ -54,35 +50,21 @@
     },
     {
       "type": "function",
+      "name": "SWAP_ADAPTER",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
       "name": "TELLER_V2",
-      "constant": true,
-      "stateMutability": "view",
-      "payable": false,
-      "inputs": [],
-      "outputs": [
-        {
-          "type": "address",
-          "name": ""
-        }
-      ]
-    },
-    {
-      "type": "function",
-      "name": "UNISWAP_QUOTER",
-      "constant": true,
-      "stateMutability": "view",
-      "payable": false,
-      "inputs": [],
-      "outputs": [
-        {
-          "type": "address",
-          "name": ""
-        }
-      ]
-    },
-    {
-      "type": "function",
-      "name": "UNISWAP_SWAP_ROUTER",
       "constant": true,
       "stateMutability": "view",
       "payable": false,
@@ -117,18 +99,8 @@
           "name": "_swapArgs",
           "components": [
             {
-              "type": "tuple[]",
-              "name": "swapPaths",
-              "components": [
-                {
-                  "type": "uint24",
-                  "name": "poolFee"
-                },
-                {
-                  "type": "address",
-                  "name": "tokenOut"
-                }
-              ]
+              "type": "bytes",
+              "name": "path"
             },
             {
               "type": "uint160",
@@ -183,39 +155,6 @@
     },
     {
       "type": "function",
-      "name": "generateSwapPath",
-      "constant": true,
-      "stateMutability": "view",
-      "payable": false,
-      "inputs": [
-        {
-          "type": "address",
-          "name": "inputToken"
-        },
-        {
-          "type": "tuple[]",
-          "name": "swapPaths",
-          "components": [
-            {
-              "type": "uint24",
-              "name": "poolFee"
-            },
-            {
-              "type": "address",
-              "name": "tokenOut"
-            }
-          ]
-        }
-      ],
-      "outputs": [
-        {
-          "type": "bytes",
-          "name": ""
-        }
-      ]
-    },
-    {
-      "type": "function",
       "name": "getMarketFeePct",
       "constant": true,
       "stateMutability": "view",
@@ -259,31 +198,16 @@
     {
       "type": "function",
       "name": "quoteExactInput",
-      "constant": true,
-      "stateMutability": "view",
+      "constant": false,
       "payable": false,
       "inputs": [
         {
-          "type": "address",
-          "name": "inputToken"
+          "type": "bytes",
+          "name": "path"
         },
         {
           "type": "uint256",
           "name": "amountIn"
-        },
-        {
-          "type": "tuple[]",
-          "name": "swapPaths",
-          "components": [
-            {
-              "type": "uint24",
-              "name": "poolFee"
-            },
-            {
-              "type": "address",
-              "name": "tokenOut"
-            }
-          ]
         }
       ],
       "outputs": [
@@ -301,6 +225,6 @@
     "blockHash": "0xd2ddb1644575616747f6dbd26c2b2d30b7f1c164c805d6f9ffd5ca044f528a3d",
     "blockNumber": 33944595
   },
-  "numDeployments": 1,
+  "numDeployments": 3,
   "implementation": "0x0b65C94CfF84afa6D9CE3D287b1227D9Cc7CdfB7"
 }

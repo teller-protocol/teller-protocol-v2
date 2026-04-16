@@ -17,6 +17,7 @@ interface IUniswapV3Factory_BSC {
 /**
  * @title BSC BorrowSwap Fork Test
  * @notice Tests BorrowSwap_G4 + UniswapV3SwapAdapter on BNB Chain with PancakeSwap V3.
+ *         Swap paths are passed as pre-encoded bytes, consistent with IPriceAdapter pattern.
  *
  * Run with:
  *   FOUNDRY_PROFILE=fork forge test --match-contract BSC_BorrowSwap_Test -vvvv \
@@ -65,8 +66,7 @@ contract BSC_BorrowSwap_Test is Test {
         // Deploy UniswapV3SwapAdapter configured for PancakeSwap V3
         pancakeAdapter = new UniswapV3SwapAdapter(
             PANCAKE_SWAP_ROUTER,
-            PANCAKE_QUOTER_V2,
-            POOL_FEE_2500 // PancakeSwap commonly uses 0.25% for major pairs
+            PANCAKE_QUOTER_V2
         );
 
         // Deploy BorrowSwap_G4 with the PancakeSwap adapter
@@ -75,6 +75,22 @@ contract BSC_BorrowSwap_Test is Test {
         console.log("TellerV2:", tellerV2);
         console.log("UniswapV3SwapAdapter (PancakeSwap):", address(pancakeAdapter));
         console.log("BorrowSwap_G4:", address(borrowSwapG4));
+    }
+
+    // =========================================================================
+    //  Helper: build Uniswap V3 encoded paths
+    // =========================================================================
+
+    function _singleHopPath(address tokenIn, uint24 fee, address tokenOut)
+        internal pure returns (bytes memory)
+    {
+        return abi.encodePacked(tokenIn, fee, tokenOut);
+    }
+
+    function _multiHopPath(address tokenIn, uint24 fee0, address intermediate, uint24 fee1, address tokenOut)
+        internal pure returns (bytes memory)
+    {
+        return abi.encodePacked(tokenIn, fee0, intermediate, fee1, tokenOut);
     }
 
     // =========================================================================
@@ -93,7 +109,6 @@ contract BSC_BorrowSwap_Test is Test {
     function test_adapter_immutables() public {
         assertEq(address(pancakeAdapter.SWAP_ROUTER()), PANCAKE_SWAP_ROUTER, "Adapter swap router");
         assertEq(address(pancakeAdapter.QUOTER()), PANCAKE_QUOTER_V2, "Adapter quoter");
-        assertEq(pancakeAdapter.DEFAULT_POOL_FEE(), POOL_FEE_2500, "Adapter default fee");
     }
 
     // =========================================================================
@@ -116,49 +131,45 @@ contract BSC_BorrowSwap_Test is Test {
     }
 
     // =========================================================================
-    //  G4 quote tests — through BorrowSwap_G4 -> UniswapV3SwapAdapter -> QuoterV2
-    //
-    //  Uses IQuoterV4 (non-view) so the adapter emits a regular CALL to the
-    //  PancakeSwap QuoterV2, allowing its state-reverting simulation to work.
+    //  G4 quote tests — bytes path through BorrowSwap_G4 -> adapter -> QuoterV2
     // =========================================================================
 
     function test_G4_quote_USDT_to_WBNB() public {
-        address[] memory intermediates = new address[](0);
-        uint256 amountIn = 100 * 1e18; // 100 USDT (18 decimals on BSC)
+        bytes memory path = _singleHopPath(USDT, POOL_FEE_2500, WBNB);
+        uint256 amountIn = 100 * 1e18;
 
-        uint256 amountOut = borrowSwapG4.quoteExactInput(USDT, WBNB, intermediates, amountIn);
+        uint256 amountOut = borrowSwapG4.quoteExactInput(path, amountIn);
 
         console.log("Quote 100 USDT -> WBNB:", amountOut);
         assertTrue(amountOut > 0, "Quote should return non-zero WBNB amount");
     }
 
     function test_G4_quote_WBNB_to_USDT() public {
-        address[] memory intermediates = new address[](0);
-        uint256 amountIn = 1 ether; // 1 WBNB
+        bytes memory path = _singleHopPath(WBNB, POOL_FEE_2500, USDT);
+        uint256 amountIn = 1 ether;
 
-        uint256 amountOut = borrowSwapG4.quoteExactInput(WBNB, USDT, intermediates, amountIn);
+        uint256 amountOut = borrowSwapG4.quoteExactInput(path, amountIn);
 
         console.log("Quote 1 WBNB -> USDT:", amountOut);
         assertTrue(amountOut > 0, "Quote should return non-zero USDT amount");
     }
 
-    function test_G4_quote_USDC_to_WBNB() public {
-        address[] memory intermediates = new address[](0);
-        uint256 amountIn = 100 * 1e18; // 100 USDC (18 decimals on BSC)
+    function test_G4_quote_USDT_to_WBNB_different_fee() public {
+        // Caller can pick any fee tier — no DEFAULT_POOL_FEE constraint
+        bytes memory path = _singleHopPath(USDT, POOL_FEE_500, WBNB);
+        uint256 amountIn = 100 * 1e18;
 
-        uint256 amountOut = borrowSwapG4.quoteExactInput(USDC, WBNB, intermediates, amountIn);
+        uint256 amountOut = borrowSwapG4.quoteExactInput(path, amountIn);
 
-        console.log("Quote 100 USDC -> WBNB:", amountOut);
-        assertTrue(amountOut > 0, "Quote should return non-zero WBNB amount");
+        console.log("Quote 100 USDT -> WBNB (0.05% fee):", amountOut);
+        assertTrue(amountOut > 0, "Quote should return non-zero WBNB amount at 0.05% fee");
     }
 
     function test_G4_quote_multihop_USDC_to_USDT_via_WBNB() public {
-        address[] memory intermediates = new address[](1);
-        intermediates[0] = WBNB;
+        bytes memory path = _multiHopPath(USDC, POOL_FEE_2500, WBNB, POOL_FEE_2500, USDT);
+        uint256 amountIn = 100 * 1e18;
 
-        uint256 amountIn = 100 * 1e18; // 100 USDC
-
-        uint256 amountOut = borrowSwapG4.quoteExactInput(USDC, USDT, intermediates, amountIn);
+        uint256 amountOut = borrowSwapG4.quoteExactInput(path, amountIn);
 
         console.log("Quote 100 USDC -> WBNB -> USDT:", amountOut);
         assertTrue(amountOut > 0, "Multi-hop quote should return non-zero USDT amount");
@@ -169,13 +180,13 @@ contract BSC_BorrowSwap_Test is Test {
     // =========================================================================
 
     function test_swap_USDT_to_WBNB() public {
-        uint256 amountIn = 100 * 1e18; // 100 USDT
+        uint256 amountIn = 100 * 1e18;
         deal(USDT, address(this), amountIn);
 
-        address[] memory intermediates = new address[](0);
+        bytes memory path = _singleHopPath(USDT, POOL_FEE_2500, WBNB);
 
         // Quote first via G4
-        uint256 expectedOut = borrowSwapG4.quoteExactInput(USDT, WBNB, intermediates, amountIn);
+        uint256 expectedOut = borrowSwapG4.quoteExactInput(path, amountIn);
         console.log("Expected WBNB out:", expectedOut);
         assertTrue(expectedOut > 0, "Quote must be non-zero before swap");
 
@@ -185,9 +196,7 @@ contract BSC_BorrowSwap_Test is Test {
         uint256 wbnbBefore = IERC20(WBNB).balanceOf(address(this));
 
         uint256 amountOut = pancakeAdapter.swap(
-            USDT,
-            WBNB,
-            intermediates,
+            path,
             amountIn,
             1, // amountOutMinimum
             address(this)
@@ -204,13 +213,13 @@ contract BSC_BorrowSwap_Test is Test {
     }
 
     function test_swap_WBNB_to_USDT() public {
-        uint256 amountIn = 1 ether; // 1 WBNB
+        uint256 amountIn = 1 ether;
         deal(WBNB, address(this), amountIn);
 
-        address[] memory intermediates = new address[](0);
+        bytes memory path = _singleHopPath(WBNB, POOL_FEE_2500, USDT);
 
         // Quote first
-        uint256 expectedOut = borrowSwapG4.quoteExactInput(WBNB, USDT, intermediates, amountIn);
+        uint256 expectedOut = borrowSwapG4.quoteExactInput(path, amountIn);
         console.log("Expected USDT out:", expectedOut);
 
         IERC20(WBNB).approve(address(pancakeAdapter), amountIn);
@@ -218,9 +227,7 @@ contract BSC_BorrowSwap_Test is Test {
         uint256 usdtBefore = IERC20(USDT).balanceOf(address(this));
 
         uint256 amountOut = pancakeAdapter.swap(
-            WBNB,
-            USDT,
-            intermediates,
+            path,
             amountIn,
             1,
             address(this)
@@ -234,20 +241,17 @@ contract BSC_BorrowSwap_Test is Test {
     }
 
     function test_swap_multihop_USDC_to_USDT_via_WBNB() public {
-        uint256 amountIn = 100 * 1e18; // 100 USDC
+        uint256 amountIn = 100 * 1e18;
         deal(USDC, address(this), amountIn);
 
-        address[] memory intermediates = new address[](1);
-        intermediates[0] = WBNB;
+        bytes memory path = _multiHopPath(USDC, POOL_FEE_2500, WBNB, POOL_FEE_2500, USDT);
 
         IERC20(USDC).approve(address(pancakeAdapter), amountIn);
 
         uint256 usdtBefore = IERC20(USDT).balanceOf(address(this));
 
         uint256 amountOut = pancakeAdapter.swap(
-            USDC,
-            USDT,
-            intermediates,
+            path,
             amountIn,
             1,
             address(this)

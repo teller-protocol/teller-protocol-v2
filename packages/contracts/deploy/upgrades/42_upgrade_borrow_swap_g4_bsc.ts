@@ -22,7 +22,7 @@ const deployFn: DeployFunction = async (hre) => {
   const uniswapV3SwapAdapter = await hre.deployments.deploy('UniswapV3SwapAdapter', {
     from: (await hre.getNamedAccounts()).deployer,
     contract: 'UniswapV3SwapAdapter',
-    args: [uniswapV3SwapRouter, uniswapV3Quoter, 2500], // 0.25% default fee for PancakeSwap
+    args: [uniswapV3SwapRouter, uniswapV3Quoter],
     log: true,
   })
 
@@ -43,7 +43,7 @@ const deployFn: DeployFunction = async (hre) => {
     _steps: [
       {
         proxy: borrowSwap,
-        implFactory: await hre.ethers.getContractFactory('BorrowSwap_G4'),
+        implFactory: await hre.ethers.getContractFactory('BorrowSwap'),
 
         opts: {
           unsafeAllow: ['constructor', 'state-variable-immutable'],

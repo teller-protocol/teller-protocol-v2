@@ -35,8 +35,7 @@ interface IAlgebraQuoter {
 
 /// @title AlgebraSwapAdapter
 /// @notice ISwapAdapter implementation for Algebra-based DEXes (Camelot V3, etc.).
-///         Handles Algebra path encoding: (tokenIn ++ tokenOut) with NO fee bytes.
-///         Algebra pools have dynamic fees — no fee tiers in path or pool lookup.
+///         Caller provides a pre-encoded Algebra path: (tokenIn ++ tokenOut) per hop (no fee bytes).
 contract AlgebraSwapAdapter is ISwapAdapter {
 
     IAlgebraSwapRouter public immutable SWAP_ROUTER;
@@ -51,17 +50,17 @@ contract AlgebraSwapAdapter is ISwapAdapter {
 
     /// @inheritdoc ISwapAdapter
     function swap(
-        address tokenIn,
-        address tokenOut,
-        address[] calldata intermediateTokens,
+        bytes calldata path,
         uint256 amountIn,
         uint256 amountOutMinimum,
         address recipient
     ) external override returns (uint256 amountOut) {
+        // Extract tokenIn from the first 20 bytes of the path
+        address tokenIn;
+        assembly { tokenIn := shr(96, calldataload(path.offset)) }
+
         TransferHelper.safeTransferFrom(tokenIn, msg.sender, address(this), amountIn);
         TransferHelper.safeApprove(tokenIn, address(SWAP_ROUTER), amountIn);
-
-        bytes memory path = _buildPath(tokenIn, tokenOut, intermediateTokens);
 
         IAlgebraSwapRouter.ExactInputParams memory params = IAlgebraSwapRouter.ExactInputParams({
             path: path,
@@ -76,33 +75,9 @@ contract AlgebraSwapAdapter is ISwapAdapter {
 
     /// @inheritdoc ISwapAdapter
     function quote(
-        address tokenIn,
-        address tokenOut,
-        address[] calldata intermediateTokens,
+        bytes calldata path,
         uint256 amountIn
     ) external override returns (uint256 amountOut) {
-        if (intermediateTokens.length == 0) {
-            // Single-hop: use quoteExactInputSingle (more gas efficient, no path encoding)
-            (amountOut, ) = QUOTER.quoteExactInputSingle(tokenIn, tokenOut, amountIn, 0);
-        } else {
-            // Multi-hop: build fee-less path
-            bytes memory path = _buildPath(tokenIn, tokenOut, intermediateTokens);
-            (amountOut, ) = QUOTER.quoteExactInput(path, amountIn);
-        }
-    }
-
-    /// @dev Builds an Algebra path: tokenIn ++ [intermediate ++]* tokenOut (no fee bytes)
-    function _buildPath(
-        address tokenIn,
-        address tokenOut,
-        address[] calldata intermediateTokens
-    ) internal pure returns (bytes memory path) {
-        if (intermediateTokens.length == 0) {
-            path = abi.encodePacked(tokenIn, tokenOut);
-        } else if (intermediateTokens.length == 1) {
-            path = abi.encodePacked(tokenIn, intermediateTokens[0], tokenOut);
-        } else {
-            revert("AlgebraSwapAdapter: max 2 hops");
-        }
+        (amountOut, ) = QUOTER.quoteExactInput(path, amountIn);
     }
 }

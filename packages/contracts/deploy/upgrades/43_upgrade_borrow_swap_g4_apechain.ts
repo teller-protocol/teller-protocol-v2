@@ -42,7 +42,7 @@ const deployFn: DeployFunction = async (hre) => {
     _steps: [
       {
         proxy: borrowSwap,
-        implFactory: await hre.ethers.getContractFactory('BorrowSwap_G4'),
+        implFactory: await hre.ethers.getContractFactory('BorrowSwap'),
 
         opts: {
           unsafeAllow: ['constructor', 'state-variable-immutable'],

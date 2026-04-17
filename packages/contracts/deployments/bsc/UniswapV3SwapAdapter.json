@@ -1,0 +1,182 @@
+{
+  "address": "0xE00384587DC733D1E201e1EAa5583645d351C01C",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_swapRouter",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_quoter",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [],
+      "name": "QUOTER",
+      "outputs": [
+        {
+          "internalType": "contract IQuoterV4",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "SWAP_ROUTER",
+      "outputs": [
+        {
+          "internalType": "contract ISwapRouterV3",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes",
+          "name": "path",
+          "type": "bytes"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amountIn",
+          "type": "uint256"
+        }
+      ],
+      "name": "quote",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "amountOut",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes",
+          "name": "path",
+          "type": "bytes"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amountIn",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amountOutMinimum",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "recipient",
+          "type": "address"
+        }
+      ],
+      "name": "swap",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "amountOut",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "transactionHash": "0xabcaaabc23d97f77e32688e62b813a95c4a51733f5c9168e2d0c8436ba7511dc",
+  "receipt": {
+    "to": null,
+    "from": "0xD9B023522CeCe02251d877bb0EB4f06fDe6F98E6",
+    "contractAddress": "0xE00384587DC733D1E201e1EAa5583645d351C01C",
+    "transactionIndex": 38,
+    "gasUsed": "558927",
+    "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "blockHash": "0x58dd328d69b8855bb24ba7307c36a6ce61790929315dfbe35f9a618f84d1c2c0",
+    "transactionHash": "0xabcaaabc23d97f77e32688e62b813a95c4a51733f5c9168e2d0c8436ba7511dc",
+    "logs": [],
+    "blockNumber": 92717696,
+    "cumulativeGasUsed": "7094849",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": [
+    "0x1b81D678ffb9C0263b24A97847620C99d213eB14",
+    "0xB048Bbc1Ee6b733FFfCFb9e9CeF7375518e25997"
+  ],
+  "numDeployments": 1,
+  "solcInputHash": "3e2c97c3c3866f3c0334aad7d2737288",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.24+commit.e11b9ed9\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_swapRouter\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_quoter\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[],\"name\":\"QUOTER\",\"outputs\":[{\"internalType\":\"contract IQuoterV4\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"SWAP_ROUTER\",\"outputs\":[{\"internalType\":\"contract ISwapRouterV3\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"path\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"amountIn\",\"type\":\"uint256\"}],\"name\":\"quote\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"amountOut\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"path\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"amountIn\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"amountOutMinimum\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"recipient\",\"type\":\"address\"}],\"name\":\"swap\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"amountOut\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"constructor\":{\"params\":{\"_quoter\":\"QuoterV2 address\",\"_swapRouter\":\"Uniswap V3 / PancakeSwap V3 swap router address\"}},\"quote(bytes,uint256)\":{\"details\":\"Not marked `view` because many DEX quoters use state-reverting simulation.\",\"params\":{\"amountIn\":\"Amount of input token to quote\",\"path\":\"DEX-encoded swap path\"},\"returns\":{\"amountOut\":\"Expected amount of output token\"}},\"swap(bytes,uint256,uint256,address)\":{\"details\":\"Caller must have approved this adapter for `amountIn` of the input token.      The adapter transfers tokens from caller, approves the DEX router,      and routes output tokens to `recipient`.\",\"params\":{\"amountIn\":\"Exact amount of input token to swap\",\"amountOutMinimum\":\"Minimum acceptable output (slippage protection)\",\"path\":\"DEX-encoded swap path (token addresses + fees as needed)\",\"recipient\":\"Address that receives the output tokens\"},\"returns\":{\"amountOut\":\"Actual amount of output token received\"}}},\"title\":\"UniswapV3SwapAdapter\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{\"quote(bytes,uint256)\":{\"notice\":\"Quote the expected output for an exact-input swap without executing.\"},\"swap(bytes,uint256,uint256,address)\":{\"notice\":\"Execute an exact-input swap.\"}},\"notice\":\"ISwapAdapter implementation for Uniswap V3 (and compatible forks like PancakeSwap V3).         Caller provides a pre-encoded Uniswap V3 path: (tokenIn ++ fee ++ tokenOut) per hop.\",\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/LenderCommitmentForwarder/extensions/rollover/adapters/UniswapV3SwapAdapter.sol\":\"UniswapV3SwapAdapter\"},\"evmVersion\":\"paris\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"@openzeppelin/contracts/token/ERC20/IERC20.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts (last updated v4.6.0) (token/ERC20/IERC20.sol)\\n\\npragma solidity ^0.8.0;\\n\\n/**\\n * @dev Interface of the ERC20 standard as defined in the EIP.\\n */\\ninterface IERC20 {\\n    /**\\n     * @dev Emitted when `value` tokens are moved from one account (`from`) to\\n     * another (`to`).\\n     *\\n     * Note that `value` may be zero.\\n     */\\n    event Transfer(address indexed from, address indexed to, uint256 value);\\n\\n    /**\\n     * @dev Emitted when the allowance of a `spender` for an `owner` is set by\\n     * a call to {approve}. `value` is the new allowance.\\n     */\\n    event Approval(address indexed owner, address indexed spender, uint256 value);\\n\\n    /**\\n     * @dev Returns the amount of tokens in existence.\\n     */\\n    function totalSupply() external view returns (uint256);\\n\\n    /**\\n     * @dev Returns the amount of tokens owned by `account`.\\n     */\\n    function balanceOf(address account) external view returns (uint256);\\n\\n    /**\\n     * @dev Moves `amount` tokens from the caller's account to `to`.\\n     *\\n     * Returns a boolean value indicating whether the operation succeeded.\\n     *\\n     * Emits a {Transfer} event.\\n     */\\n    function transfer(address to, uint256 amount) external returns (bool);\\n\\n    /**\\n     * @dev Returns the remaining number of tokens that `spender` will be\\n     * allowed to spend on behalf of `owner` through {transferFrom}. This is\\n     * zero by default.\\n     *\\n     * This value changes when {approve} or {transferFrom} are called.\\n     */\\n    function allowance(address owner, address spender) external view returns (uint256);\\n\\n    /**\\n     * @dev Sets `amount` as the allowance of `spender` over the caller's tokens.\\n     *\\n     * Returns a boolean value indicating whether the operation succeeded.\\n     *\\n     * IMPORTANT: Beware that changing an allowance with this method brings the risk\\n     * that someone may use both the old and the new allowance by unfortunate\\n     * transaction ordering. One possible solution to mitigate this race\\n     * condition is to first reduce the spender's allowance to 0 and set the\\n     * desired value afterwards:\\n     * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729\\n     *\\n     * Emits an {Approval} event.\\n     */\\n    function approve(address spender, uint256 amount) external returns (bool);\\n\\n    /**\\n     * @dev Moves `amount` tokens from `from` to `to` using the\\n     * allowance mechanism. `amount` is then deducted from the caller's\\n     * allowance.\\n     *\\n     * Returns a boolean value indicating whether the operation succeeded.\\n     *\\n     * Emits a {Transfer} event.\\n     */\\n    function transferFrom(\\n        address from,\\n        address to,\\n        uint256 amount\\n    ) external returns (bool);\\n}\\n\",\"keccak256\":\"0x9750c6b834f7b43000631af5cc30001c5f547b3ceb3635488f140f60e897ea6b\",\"license\":\"MIT\"},\"contracts/LenderCommitmentForwarder/extensions/rollover/adapters/UniswapV3SwapAdapter.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.0;\\n\\nimport \\\"../../../../interfaces/ISwapAdapter.sol\\\";\\nimport \\\"../../../../libraries/uniswap/periphery/interfaces/IQuoterV4.sol\\\";\\nimport \\\"../../../../libraries/uniswap/periphery/libraries/TransferHelper.sol\\\";\\n\\n/// @notice V3-compatible swap router interface with deadline field.\\n///         Works with both Uniswap V3 SwapRouter and PancakeSwap V3 SmartRouter.\\ninterface ISwapRouterV3 {\\n    struct ExactInputParams {\\n        bytes path;\\n        address recipient;\\n        uint256 deadline;\\n        uint256 amountIn;\\n        uint256 amountOutMinimum;\\n    }\\n\\n    function exactInput(ExactInputParams calldata params) external payable returns (uint256 amountOut);\\n}\\n\\n/// @title UniswapV3SwapAdapter\\n/// @notice ISwapAdapter implementation for Uniswap V3 (and compatible forks like PancakeSwap V3).\\n///         Caller provides a pre-encoded Uniswap V3 path: (tokenIn ++ fee ++ tokenOut) per hop.\\ncontract UniswapV3SwapAdapter is ISwapAdapter {\\n\\n    ISwapRouterV3 public immutable SWAP_ROUTER;\\n    IQuoterV4 public immutable QUOTER;\\n\\n    /// @param _swapRouter Uniswap V3 / PancakeSwap V3 swap router address\\n    /// @param _quoter QuoterV2 address\\n    constructor(address _swapRouter, address _quoter) {\\n        SWAP_ROUTER = ISwapRouterV3(_swapRouter);\\n        QUOTER = IQuoterV4(_quoter);\\n    }\\n\\n    /// @inheritdoc ISwapAdapter\\n    function swap(\\n        bytes calldata path,\\n        uint256 amountIn,\\n        uint256 amountOutMinimum,\\n        address recipient\\n    ) external override returns (uint256 amountOut) {\\n        // Extract tokenIn from the first 20 bytes of the path\\n        address tokenIn;\\n        assembly { tokenIn := shr(96, calldataload(path.offset)) }\\n\\n        TransferHelper.safeTransferFrom(tokenIn, msg.sender, address(this), amountIn);\\n        TransferHelper.safeApprove(tokenIn, address(SWAP_ROUTER), amountIn);\\n\\n        ISwapRouterV3.ExactInputParams memory params = ISwapRouterV3.ExactInputParams({\\n            path: path,\\n            recipient: recipient,\\n            deadline: block.timestamp,\\n            amountIn: amountIn,\\n            amountOutMinimum: amountOutMinimum\\n        });\\n\\n        amountOut = SWAP_ROUTER.exactInput(params);\\n    }\\n\\n    /// @inheritdoc ISwapAdapter\\n    function quote(\\n        bytes calldata path,\\n        uint256 amountIn\\n    ) external override returns (uint256 amountOut) {\\n        (amountOut, , , ) = QUOTER.quoteExactInput(path, amountIn);\\n    }\\n}\\n\",\"keccak256\":\"0x1d9a2fccefabf00889a683936ae24521006fb4bb5a3d0b08e07c1d19f247471d\",\"license\":\"MIT\"},\"contracts/interfaces/ISwapAdapter.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.0;\\n\\n/// @title ISwapAdapter\\n/// @notice Abstraction over DEX-specific swap and quote logic.\\n///         Callers provide a pre-encoded `path` in the format expected by\\n///         the target DEX (e.g. Uniswap V3: tokenIn ++ fee ++ tokenOut,\\n///         Algebra: tokenIn ++ tokenOut). This is consistent with how\\n///         IPriceAdapter handles arbitrary oracle routes via `bytes`.\\ninterface ISwapAdapter {\\n\\n    /// @notice Execute an exact-input swap.\\n    /// @dev Caller must have approved this adapter for `amountIn` of the input token.\\n    ///      The adapter transfers tokens from caller, approves the DEX router,\\n    ///      and routes output tokens to `recipient`.\\n    /// @param path DEX-encoded swap path (token addresses + fees as needed)\\n    /// @param amountIn Exact amount of input token to swap\\n    /// @param amountOutMinimum Minimum acceptable output (slippage protection)\\n    /// @param recipient Address that receives the output tokens\\n    /// @return amountOut Actual amount of output token received\\n    function swap(\\n        bytes calldata path,\\n        uint256 amountIn,\\n        uint256 amountOutMinimum,\\n        address recipient\\n    ) external returns (uint256 amountOut);\\n\\n    /// @notice Quote the expected output for an exact-input swap without executing.\\n    /// @dev Not marked `view` because many DEX quoters use state-reverting simulation.\\n    /// @param path DEX-encoded swap path\\n    /// @param amountIn Amount of input token to quote\\n    /// @return amountOut Expected amount of output token\\n    function quote(\\n        bytes calldata path,\\n        uint256 amountIn\\n    ) external returns (uint256 amountOut);\\n}\\n\",\"keccak256\":\"0xeca9f5355ffbdf388d31aab81c108ed11ee52cd1572da540961bea57bbbb28c5\",\"license\":\"MIT\"},\"contracts/libraries/uniswap/periphery/interfaces/IQuoterV4.sol\":{\"content\":\"// SPDX-License-Identifier: GPL-2.0-or-later\\npragma solidity >=0.7.5;\\npragma abicoder v2;\\n\\n/// @title IQuoterV4\\n/// @notice Non-view version of the Uniswap V3 Quoter interface.\\n/// @dev QuoterV2 contracts (Uniswap, PancakeSwap, etc.) use state-reverting simulation\\n///      internally (try a swap, revert, decode the output). The canonical IQuoter marks\\n///      these functions as `view`, which causes Solidity to emit STATICCALL. This fails\\n///      in Forge fork tests (and some on-chain contexts) because the simulated swap\\n///      attempts state modifications inside a static context.\\n///\\n///      This interface removes the `view` modifier so Solidity emits a regular CALL,\\n///      allowing the quoter's internal simulation to work correctly.\\ninterface IQuoterV4 {\\n    function quoteExactInput(bytes memory path, uint256 amountIn)\\n        external\\n        returns (\\n            uint256 amountOut,\\n            uint160[] memory sqrtPriceX96AfterList,\\n            uint32[] memory initializedTicksCrossedList,\\n            uint256 gasEstimate\\n        );\\n}\\n\",\"keccak256\":\"0xc4a3f70e31ef832ee542b49333911adfcb98fcf20f349323acddd8a45f77a9d6\",\"license\":\"GPL-2.0-or-later\"},\"contracts/libraries/uniswap/periphery/libraries/TransferHelper.sol\":{\"content\":\"// SPDX-License-Identifier: GPL-2.0-or-later\\npragma solidity >=0.6.0;\\n\\nimport '@openzeppelin/contracts/token/ERC20/IERC20.sol';\\n\\nlibrary TransferHelper {\\n    /// @notice Transfers tokens from the targeted address to the given destination\\n    /// @notice Errors with 'STF' if transfer fails\\n    /// @param token The contract address of the token to be transferred\\n    /// @param from The originating address from which the tokens will be transferred\\n    /// @param to The destination address of the transfer\\n    /// @param value The amount to be transferred\\n    function safeTransferFrom(\\n        address token,\\n        address from,\\n        address to,\\n        uint256 value\\n    ) internal {\\n        (bool success, bytes memory data) =\\n            token.call(abi.encodeWithSelector(IERC20.transferFrom.selector, from, to, value));\\n        require(success && (data.length == 0 || abi.decode(data, (bool))), 'STF');\\n    }\\n\\n    /// @notice Transfers tokens from msg.sender to a recipient\\n    /// @dev Errors with ST if transfer fails\\n    /// @param token The contract address of the token which will be transferred\\n    /// @param to The recipient of the transfer\\n    /// @param value The value of the transfer\\n    function safeTransfer(\\n        address token,\\n        address to,\\n        uint256 value\\n    ) internal {\\n        (bool success, bytes memory data) = token.call(abi.encodeWithSelector(IERC20.transfer.selector, to, value));\\n        require(success && (data.length == 0 || abi.decode(data, (bool))), 'ST');\\n    }\\n\\n    /// @notice Approves the stipulated contract to spend the given allowance in the given token\\n    /// @dev Errors with 'SA' if transfer fails\\n    /// @param token The contract address of the token to be approved\\n    /// @param to The target of the approval\\n    /// @param value The amount of the given token the target will be allowed to spend\\n    function safeApprove(\\n        address token,\\n        address to,\\n        uint256 value\\n    ) internal {\\n        (bool success, bytes memory data) = token.call(abi.encodeWithSelector(IERC20.approve.selector, to, value));\\n        require(success && (data.length == 0 || abi.decode(data, (bool))), 'SA');\\n    }\\n\\n    /// @notice Transfers ETH to the recipient address\\n    /// @dev Fails with `STE`\\n    /// @param to The destination of the transfer\\n    /// @param value The value to be transferred\\n    function safeTransferETH(address to, uint256 value) internal {\\n        (bool success, ) = to.call{value: value}(new bytes(0));\\n        require(success, 'STE');\\n    }\\n}\\n\",\"keccak256\":\"0x9af98b0908c96320ca6d08b22f0efca864742f6adbe5794cafe2d1d2e808b0cd\",\"license\":\"GPL-2.0-or-later\"}},\"version\":1}",
+  "bytecode": "0x60c060405234801561001057600080fd5b506040516109ea3803806109ea83398101604081905261002f91610062565b6001600160a01b039182166080521660a052610095565b80516001600160a01b038116811461005d57600080fd5b919050565b6000806040838503121561007557600080fd5b61007e83610046565b915061008c60208401610046565b90509250929050565b60805160a05161091d6100cd60003960008181607c015261010a01526000818160ce015281816101af015261024f015261091d6000f3fe608060405234801561001057600080fd5b506004361061004c5760003560e01c806333224ae1146100515780638dae88c214610077578063b484642f146100b6578063c6005893146100c9575b600080fd5b61006461005f36600461052b565b6100f0565b6040519081526020015b60405180910390f35b61009e7f000000000000000000000000000000000000000000000000000000000000000081565b6040516001600160a01b03909116815260200161006e565b6100646100c436600461058f565b610196565b61009e7f000000000000000000000000000000000000000000000000000000000000000081565b60405163cdca175360e01b81526000906001600160a01b037f0000000000000000000000000000000000000000000000000000000000000000169063cdca175390610143908790879087906004016105fa565b6000604051808303816000875af1158015610162573d6000803e3d6000fd5b505050506040513d6000823e601f3d908101601f1916820160405261018a9190810190610720565b50919695505050505050565b6000853560601c6101a9813330886102d3565b6101d4817f0000000000000000000000000000000000000000000000000000000000000000876103e2565b6040805160c06020601f8a01819004028201810190925260a081018881526000928291908b908b90819085018382808284376000920191909152505050908252506001600160a01b03808716602083015242604080840191909152606083018a90526080909201889052905163c04b8d5960e01b81529192507f0000000000000000000000000000000000000000000000000000000000000000169063c04b8d599061028490849060040161081a565b6020604051808303816000875af11580156102a3573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906102c79190610889565b98975050505050505050565b604080516001600160a01b0385811660248301528481166044830152606480830185905283518084039091018152608490920183526020820180516001600160e01b03166323b872dd60e01b179052915160009283929088169161033791906108a2565b6000604051808303816000865af19150503d8060008114610374576040519150601f19603f3d011682016040523d82523d6000602084013e610379565b606091505b50915091508180156103a35750805115806103a35750808060200190518101906103a391906108be565b6103da5760405162461bcd60e51b815260206004820152600360248201526229aa2360e91b60448201526064015b60405180910390fd5b505050505050565b604080516001600160a01b038481166024830152604480830185905283518084039091018152606490920183526020820180516001600160e01b031663095ea7b360e01b179052915160009283929087169161043e91906108a2565b6000604051808303816000865af19150503d806000811461047b576040519150601f19603f3d011682016040523d82523d6000602084013e610480565b606091505b50915091508180156104aa5750805115806104aa5750808060200190518101906104aa91906108be565b6104db5760405162461bcd60e51b8152602060048201526002602482015261534160f01b60448201526064016103d1565b5050505050565b60008083601f8401126104f457600080fd5b50813567ffffffffffffffff81111561050c57600080fd5b60208301915083602082850101111561052457600080fd5b9250929050565b60008060006040848603121561054057600080fd5b833567ffffffffffffffff81111561055757600080fd5b610563868287016104e2565b909790965060209590950135949350505050565b6001600160a01b038116811461058c57600080fd5b50565b6000806000806000608086880312156105a757600080fd5b853567ffffffffffffffff8111156105be57600080fd5b6105ca888289016104e2565b909650945050602086013592506040860135915060608601356105ec81610577565b809150509295509295909350565b604081528260408201528284606083013760006060848301015260006060601f19601f8601168301019050826020830152949350505050565b634e487b7160e01b600052604160045260246000fd5b604051601f8201601f1916810167ffffffffffffffff8111828210171561067257610672610633565b604052919050565b600067ffffffffffffffff82111561069457610694610633565b5060051b60200190565b600082601f8301126106af57600080fd5b815160206106c46106bf8361067a565b610649565b8083825260208201915060208460051b8701019350868411156106e657600080fd5b602086015b8481101561071557805163ffffffff811681146107085760008081fd5b83529183019183016106eb565b509695505050505050565b6000806000806080858703121561073657600080fd5b8451935060208086015167ffffffffffffffff8082111561075657600080fd5b818801915088601f83011261076a57600080fd5b81516107786106bf8261067a565b81815260059190911b8301840190848101908b83111561079757600080fd5b938501935b828510156107be5784516107af81610577565b8252938501939085019061079c565b60408b015190985094505050808311156107d757600080fd5b50506107e58782880161069e565b606096909601519497939650505050565b60005b838110156108115781810151838201526020016107f9565b50506000910152565b602081526000825160a0602084015280518060c08501526108428160e08601602085016107f6565b60018060a01b0360208601511660408501526040850151606085015260608501516080850152608085015160a085015260e0601f19601f8301168501019250505092915050565b60006020828403121561089b57600080fd5b5051919050565b600082516108b48184602087016107f6565b9190910192915050565b6000602082840312156108d057600080fd5b815180151581146108e057600080fd5b939250505056fea264697066735822122018a29d33a2fe49f0a11ef7740938df037a400cec389d2db2298b7fed4520b06d64736f6c63430008180033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b506004361061004c5760003560e01c806333224ae1146100515780638dae88c214610077578063b484642f146100b6578063c6005893146100c9575b600080fd5b61006461005f36600461052b565b6100f0565b6040519081526020015b60405180910390f35b61009e7f000000000000000000000000000000000000000000000000000000000000000081565b6040516001600160a01b03909116815260200161006e565b6100646100c436600461058f565b610196565b61009e7f000000000000000000000000000000000000000000000000000000000000000081565b60405163cdca175360e01b81526000906001600160a01b037f0000000000000000000000000000000000000000000000000000000000000000169063cdca175390610143908790879087906004016105fa565b6000604051808303816000875af1158015610162573d6000803e3d6000fd5b505050506040513d6000823e601f3d908101601f1916820160405261018a9190810190610720565b50919695505050505050565b6000853560601c6101a9813330886102d3565b6101d4817f0000000000000000000000000000000000000000000000000000000000000000876103e2565b6040805160c06020601f8a01819004028201810190925260a081018881526000928291908b908b90819085018382808284376000920191909152505050908252506001600160a01b03808716602083015242604080840191909152606083018a90526080909201889052905163c04b8d5960e01b81529192507f0000000000000000000000000000000000000000000000000000000000000000169063c04b8d599061028490849060040161081a565b6020604051808303816000875af11580156102a3573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906102c79190610889565b98975050505050505050565b604080516001600160a01b0385811660248301528481166044830152606480830185905283518084039091018152608490920183526020820180516001600160e01b03166323b872dd60e01b179052915160009283929088169161033791906108a2565b6000604051808303816000865af19150503d8060008114610374576040519150601f19603f3d011682016040523d82523d6000602084013e610379565b606091505b50915091508180156103a35750805115806103a35750808060200190518101906103a391906108be565b6103da5760405162461bcd60e51b815260206004820152600360248201526229aa2360e91b60448201526064015b60405180910390fd5b505050505050565b604080516001600160a01b038481166024830152604480830185905283518084039091018152606490920183526020820180516001600160e01b031663095ea7b360e01b179052915160009283929087169161043e91906108a2565b6000604051808303816000865af19150503d806000811461047b576040519150601f19603f3d011682016040523d82523d6000602084013e610480565b606091505b50915091508180156104aa5750805115806104aa5750808060200190518101906104aa91906108be565b6104db5760405162461bcd60e51b8152602060048201526002602482015261534160f01b60448201526064016103d1565b5050505050565b60008083601f8401126104f457600080fd5b50813567ffffffffffffffff81111561050c57600080fd5b60208301915083602082850101111561052457600080fd5b9250929050565b60008060006040848603121561054057600080fd5b833567ffffffffffffffff81111561055757600080fd5b610563868287016104e2565b909790965060209590950135949350505050565b6001600160a01b038116811461058c57600080fd5b50565b6000806000806000608086880312156105a757600080fd5b853567ffffffffffffffff8111156105be57600080fd5b6105ca888289016104e2565b909650945050602086013592506040860135915060608601356105ec81610577565b809150509295509295909350565b604081528260408201528284606083013760006060848301015260006060601f19601f8601168301019050826020830152949350505050565b634e487b7160e01b600052604160045260246000fd5b604051601f8201601f1916810167ffffffffffffffff8111828210171561067257610672610633565b604052919050565b600067ffffffffffffffff82111561069457610694610633565b5060051b60200190565b600082601f8301126106af57600080fd5b815160206106c46106bf8361067a565b610649565b8083825260208201915060208460051b8701019350868411156106e657600080fd5b602086015b8481101561071557805163ffffffff811681146107085760008081fd5b83529183019183016106eb565b509695505050505050565b6000806000806080858703121561073657600080fd5b8451935060208086015167ffffffffffffffff8082111561075657600080fd5b818801915088601f83011261076a57600080fd5b81516107786106bf8261067a565b81815260059190911b8301840190848101908b83111561079757600080fd5b938501935b828510156107be5784516107af81610577565b8252938501939085019061079c565b60408b015190985094505050808311156107d757600080fd5b50506107e58782880161069e565b606096909601519497939650505050565b60005b838110156108115781810151838201526020016107f9565b50506000910152565b602081526000825160a0602084015280518060c08501526108428160e08601602085016107f6565b60018060a01b0360208601511660408501526040850151606085015260608501516080850152608085015160a085015260e0601f19601f8301168501019250505092915050565b60006020828403121561089b57600080fd5b5051919050565b600082516108b48184602087016107f6565b9190910192915050565b6000602082840312156108d057600080fd5b815180151581146108e057600080fd5b939250505056fea264697066735822122018a29d33a2fe49f0a11ef7740938df037a400cec389d2db2298b7fed4520b06d64736f6c63430008180033",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {
+      "constructor": {
+        "params": {
+          "_quoter": "QuoterV2 address",
+          "_swapRouter": "Uniswap V3 / PancakeSwap V3 swap router address"
+        }
+      },
+      "quote(bytes,uint256)": {
+        "details": "Not marked `view` because many DEX quoters use state-reverting simulation.",
+        "params": {
+          "amountIn": "Amount of input token to quote",
+          "path": "DEX-encoded swap path"
+        },
+        "returns": {
+          "amountOut": "Expected amount of output token"
+        }
+      },
+      "swap(bytes,uint256,uint256,address)": {
+        "details": "Caller must have approved this adapter for `amountIn` of the input token.      The adapter transfers tokens from caller, approves the DEX router,      and routes output tokens to `recipient`.",
+        "params": {
+          "amountIn": "Exact amount of input token to swap",
+          "amountOutMinimum": "Minimum acceptable output (slippage protection)",
+          "path": "DEX-encoded swap path (token addresses + fees as needed)",
+          "recipient": "Address that receives the output tokens"
+        },
+        "returns": {
+          "amountOut": "Actual amount of output token received"
+        }
+      }
+    },
+    "title": "UniswapV3SwapAdapter",
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {
+      "quote(bytes,uint256)": {
+        "notice": "Quote the expected output for an exact-input swap without executing."
+      },
+      "swap(bytes,uint256,uint256,address)": {
+        "notice": "Execute an exact-input swap."
+      }
+    },
+    "notice": "ISwapAdapter implementation for Uniswap V3 (and compatible forks like PancakeSwap V3).         Caller provides a pre-encoded Uniswap V3 path: (tokenIn ++ fee ++ tokenOut) per hop.",
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [],
+    "types": null
+  }
+}

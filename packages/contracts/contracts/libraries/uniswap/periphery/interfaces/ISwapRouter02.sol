@@ -26,7 +26,7 @@ interface ISwapRouter02 is IUniswapV3SwapCallback {
     struct ExactInputParams {
         bytes path;
         address recipient;
-       
+
         uint256 amountIn;
         uint256 amountOutMinimum;
     }
@@ -41,7 +41,7 @@ interface ISwapRouter02 is IUniswapV3SwapCallback {
         address tokenOut;
         uint24 fee;
         address recipient;
-       
+
         uint256 amountOut;
         uint256 amountInMaximum;
         uint160 sqrtPriceLimitX96;
@@ -55,7 +55,7 @@ interface ISwapRouter02 is IUniswapV3SwapCallback {
     struct ExactOutputParams {
         bytes path;
         address recipient;
-      
+
         uint256 amountOut;
         uint256 amountInMaximum;
     }

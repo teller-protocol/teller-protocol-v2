@@ -3718,6 +3718,16 @@
         "types": {},
         "namespaces": {}
       }
+    },
+    "a4bb7e99ebb0c50f0e36888069796552f90b193dc781b84ac7ef730098ad4122": {
+      "address": "0x838F8e08C723CA4323cacD07D57777B27eAB3bD4",
+      "txHash": "0x6368dded337ddd035e61c76b40e6404f62dbeff01144fcd54ef8a8c3589700f8",
+      "layout": {
+        "solcVersion": "0.8.24",
+        "storage": [],
+        "types": {},
+        "namespaces": {}
+      }
     }
   }
 }

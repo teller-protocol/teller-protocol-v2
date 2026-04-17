@@ -19,7 +19,8 @@ import { IUniswapPricingLibrary } from "../contracts/interfaces/IUniswapPricingL
 
 import { LenderCommitmentGroup_Pool_V2 } from "../contracts/LenderCommitmentForwarder/extensions/LenderCommitmentGroup/LenderCommitmentGroup_Pool_V2.sol";
 import { SmartCommitmentForwarder } from "../contracts/LenderCommitmentForwarder/SmartCommitmentForwarder.sol";
-import { BorrowSwap } from "../contracts/LenderCommitmentForwarder/extensions/rollover/BorrowSwap.sol";
+// BorrowSwap now inherits G4; cast deployed proxy as G3 for legacy tests
+
 import { BorrowSwap_G3 } from "../contracts/LenderCommitmentForwarder/extensions/rollover/BorrowSwap_G3.sol";
 
 /*
@@ -46,7 +47,7 @@ contract BorrowSwap_Fork_Test is Test {
 
     LenderCommitmentGroup_Pool_V2 pool;
 
-     BorrowSwap borrowSwap;
+     BorrowSwap_G3 borrowSwap;
 
    // address constant DEPLOYED_SWAP_ROLLOVER_LOAN = 0xa4A8c60Ac9E0c38f8B46316c6B3B508b3BA04415; // Replace with actual deployed address
         
@@ -76,7 +77,7 @@ contract BorrowSwap_Fork_Test is Test {
 
 
           address payable  borrowSwapAddr = payable( getDeployedAddress("BorrowSwap") );
-          borrowSwap = BorrowSwap( borrowSwapAddr );
+          borrowSwap = BorrowSwap_G3( borrowSwapAddr );
 
           assertTrue(borrowSwapAddr.code.length > 0, "could not connect to borrowSwap contract ") ;
 

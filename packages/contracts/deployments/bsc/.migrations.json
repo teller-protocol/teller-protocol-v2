@@ -22,5 +22,6 @@
   "validate-deployments": 1771035670,
   "default-proxy-admin:transfer": 1771035671,
   "lender-commitment-forwarder:extensions:borrow-swap:deploy": 1774975256,
-  "lender-commitment-forwarder:extensions:flash-swap-rollover:g3-upgrade-bsc": 1775155386
+  "lender-commitment-forwarder:extensions:flash-swap-rollover:g3-upgrade-bsc": 1775155386,
+  "lender-commitment-forwarder:extensions:borrow-swap:g4-upgrade-bsc": 1776273914
 }

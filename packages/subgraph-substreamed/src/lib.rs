@@ -682,7 +682,8 @@ fn graph_lendergroup_out(
             
            let fetched_token_amount_difference = rpc::fetch_token_amount_difference_from_liquidations(&evt.evt_address).unwrap_or_default();
          
-    
+           let fetched_excessive_principal_tokens_repaid = rpc::fetch_excessive_principal_tokens_repaid(&evt.evt_address).unwrap_or_default();
+         
        //create group pool metric 
        tables
             .create_row("group_pool_metric", format!("{}", evt.evt_address )  ) 
@@ -715,6 +716,7 @@ fn graph_lendergroup_out(
             .set("total_interest_collected",  BigInt::zero()) 
             .set("token_difference_from_liquidations",  fetched_token_amount_difference) 
             .set("total_collateral_withdrawn",  BigInt::zero()) 
+            .set("excessive_principal_tokens_repaid",  fetched_excessive_principal_tokens_repaid ) 
            // .set("ordinal",   evt.log.ordinal  )  //is this ok ?  
             ;
 
@@ -837,12 +839,18 @@ fn graph_lendergroup_out(
 
 
                 let fetched_token_amount_difference = rpc::fetch_token_amount_difference_from_liquidations(&group_pool_address.to_string()).unwrap_or_default();
-         
-                    
-            
-                    
+          
                 tables.update_row("group_pool_metric", &group_pool_address)
                             .set("token_difference_from_liquidations", fetched_token_amount_difference );
+
+
+
+                            
+               let fetched_excessive_principal_tokens_repaid = rpc::fetch_excessive_principal_tokens_repaid(&group_pool_address.to_string()).unwrap_or_default();
+          
+                tables.update_row("group_pool_metric", &group_pool_address)
+                            .set("excessive_principal_tokens_repaid", fetched_excessive_principal_tokens_repaid );
+
                     
           }
             

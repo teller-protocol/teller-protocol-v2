@@ -1,0 +1,137 @@
+type Bid @entity {
+  id: ID!
+  bidId: BigInt!
+  createdAt: BigInt!
+  expiresAt: BigInt!
+  updatedAt: BigInt
+  transactionHash: String!
+  fundedTx: FundedTx @derivedFrom(field: "bid")
+
+  borrowerAddress: Bytes!
+  borrower: Borrower!
+
+  receiverAddress: Bytes!
+
+  liquidatorAddress: Bytes
+
+  lenderAddress: Bytes
+  lender: Lender
+
+  lendingToken: Token!
+  lendingTokenAddress: Bytes!
+
+  bidRewards: [BidReward!]! @derivedFrom(field: "bid")
+
+  marketplaceId: BigInt!
+
+
+  status: String!
+  principal: BigInt!
+  acceptedTimestamp: BigInt!
+  lastRepaidTimestamp: BigInt!
+  loanDuration: BigInt!
+  paymentCycle: BigInt!
+  paymentCycleAmount: BigInt!
+  apr: BigInt!
+  endDate: BigInt
+  nextDueDate: BigInt
+  marketplace: MarketPlace!
+  commitment: Commitment
+  commitmentId: String
+
+  payments: [Payment!]! @derivedFrom(field: "bid")
+  totalRepaidPrincipal: BigInt!
+  totalRepaidInterest: BigInt!
+
+
+  paymentDefaultDuration: BigInt!
+  collateralEscrow: Bytes
+  collateral: [BidCollateral!]
+}
+
+
+
+type BidCollateral @entity {
+  id: ID!
+  amount: BigInt!
+  tokenId: BigInt
+  type: String
+  collateralAddress: Bytes!
+  token: Token!
+  bid: Bid!
+  status: String
+  receiver: Bytes
+}
+
+type Token @entity {
+  id: ID!
+  address: Bytes!
+  type: String
+  nftId: BigInt
+  name: String
+  symbol: String
+  decimals: BigInt
+}
+
+
+type FundedTx @entity {
+  id: ID!
+  bid: Bid!
+  timestamp: BigInt!
+}
+
+type Payment @entity {
+  id: ID!
+  bid: Bid!
+  principal: BigInt!
+  interest: BigInt!
+  paymentDate: BigInt!
+  outstandingCapital: BigInt!
+  status: String!
+}
+
+type User @entity {
+  id: ID!
+  firstInteractionDate: BigInt!
+  lenders: [Lender!]! @derivedFrom(field: "user")
+  borrowers: [Borrower!]! @derivedFrom(field: "user")
+  bidRewards: [BidReward!]! @derivedFrom(field: "user")
+}
+
+
+type Lender implements IHasLoans @entity {
+  id: ID!
+  marketplaceId: BigInt!
+  lenderAddress: Bytes!
+  firstInteractionDate: BigInt!
+  attestedTimestamp: BigInt
+  isAttested: Boolean!
+
+  loans: LoanStatusCount! @derivedFrom(field: "_lender")
+  tokenVolumes: [TokenVolume!]! @derivedFrom(field: "lender")
+
+  _durationTotal: BigInt!
+  durationAverage: BigInt!
+
+  marketplace: MarketPlace!
+  user: User!
+  commitments: [Commitment!]! @derivedFrom(field: "lender")
+}
+
+type Borrower implements IHasLoans @entity {
+  id: ID!
+  marketplaceId: BigInt!
+  borrowerAddress: Bytes!
+  firstInteractionDate: BigInt!
+  attestedTimestamp: BigInt
+  isAttested: Boolean!
+
+  loans: LoanStatusCount! @derivedFrom(field: "_borrower")
+  tokenVolumes: [TokenVolume!]! @derivedFrom(field: "borrower")
+
+  _durationTotal: BigInt!
+  durationAverage: BigInt!
+
+  marketplace: MarketPlace!
+  user: User!
+}

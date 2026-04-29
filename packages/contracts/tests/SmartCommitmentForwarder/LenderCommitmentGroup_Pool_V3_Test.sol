@@ -46,8 +46,10 @@ contract LenderCommitmentGroup_Pool_V3_Test is Testable {
 
     ProtocolPausingManager _protocolPausingManager;
 
-    // Q96 = 2^96, used for price ratio
+    // Q96 = 2^96, used for price ratio from adapter
     uint256 constant Q96 = 0x1000000000000000000000000;
+    // STANDARD_EXPANSION_FACTOR used for maxPrincipalPerCollateralAmount
+    uint256 constant STANDARD_EXPANSION_FACTOR = 1e18;
 
     function setUp() public {
         borrower = new User();
@@ -1331,11 +1333,11 @@ contract LenderCommitmentGroup_Pool_V3_Test is Testable {
         // Non-owner should revert
         vm.prank(address(borrower));
         vm.expectRevert("Ownable: caller is not the owner");
-        lenderCommitmentGroupV3.setMaxPrincipalPerCollateralAmount(Q96);
+        lenderCommitmentGroupV3.setMaxPrincipalPerCollateralAmount(STANDARD_EXPANSION_FACTOR);
 
         // Owner should succeed
-        lenderCommitmentGroupV3.setMaxPrincipalPerCollateralAmount(Q96);
-        assertEq(lenderCommitmentGroupV3.maxPrincipalPerCollateralAmount(), Q96);
+        lenderCommitmentGroupV3.setMaxPrincipalPerCollateralAmount(STANDARD_EXPANSION_FACTOR);
+        assertEq(lenderCommitmentGroupV3.maxPrincipalPerCollateralAmount(), STANDARD_EXPANSION_FACTOR);
     }
 
     function test_setMaxPrincipalPerCollateralAmount_zero_uses_oracle_only() public {
@@ -1361,9 +1363,9 @@ contract LenderCommitmentGroup_Pool_V3_Test is Testable {
         uint256 withoutCap = lenderCommitmentGroupV3.calculateCollateralTokensAmountEquivalentToPrincipalTokens(1000);
         assertEq(withoutCap, 250, "Without cap: 4:1 price means 250 collateral");
 
-        // Set cap to 2:1 (Q96 * 2) — lower than oracle's 4:1
-        // min(4*Q96, 2*Q96) = 2*Q96, so borrower needs MORE collateral
-        lenderCommitmentGroupV3.setMaxPrincipalPerCollateralAmount(Q96 * 2);
+        // Set cap to 2:1 (1e18 * 2) — lower than oracle's 4:1
+        // min(4*1e18, 2*1e18) = 2*1e18, so borrower needs MORE collateral
+        lenderCommitmentGroupV3.setMaxPrincipalPerCollateralAmount(STANDARD_EXPANSION_FACTOR * 2);
 
         uint256 withCap = lenderCommitmentGroupV3.calculateCollateralTokensAmountEquivalentToPrincipalTokens(1000);
         assertEq(withCap, 500, "Cap at 2:1 should require 500 collateral");
@@ -1376,9 +1378,9 @@ contract LenderCommitmentGroup_Pool_V3_Test is Testable {
         // Oracle says 1 collateral = 2 principal (Q96 * 2)
         _mockPriceAdapter.setMockPriceRatioQ96(Q96 * 2);
 
-        // Set cap to 4:1 (Q96 * 4) — higher than oracle's 2:1
-        // min(2*Q96, 4*Q96) = 2*Q96, so cap has no effect
-        lenderCommitmentGroupV3.setMaxPrincipalPerCollateralAmount(Q96 * 4);
+        // Set cap to 4:1 (1e18 * 4) — higher than oracle's 2:1
+        // min(2*1e18, 4*1e18) = 2*1e18, so cap has no effect
+        lenderCommitmentGroupV3.setMaxPrincipalPerCollateralAmount(STANDARD_EXPANSION_FACTOR * 4);
 
         uint256 collateralNeeded = lenderCommitmentGroupV3.calculateCollateralTokensAmountEquivalentToPrincipalTokens(1000);
         assertEq(collateralNeeded, 500, "Cap higher than oracle should have no effect");
@@ -1391,7 +1393,7 @@ contract LenderCommitmentGroup_Pool_V3_Test is Testable {
         _mockPriceAdapter.setMockPriceRatioQ96(Q96 * 4);
 
         // Set cap, then clear it
-        lenderCommitmentGroupV3.setMaxPrincipalPerCollateralAmount(Q96 * 2);
+        lenderCommitmentGroupV3.setMaxPrincipalPerCollateralAmount(STANDARD_EXPANSION_FACTOR * 2);
         uint256 withCap = lenderCommitmentGroupV3.calculateCollateralTokensAmountEquivalentToPrincipalTokens(1000);
         assertEq(withCap, 500, "With cap should need 500");
 
@@ -1410,9 +1412,9 @@ contract LenderCommitmentGroup_Pool_V3_Test is Testable {
         uint256 required = lenderCommitmentGroupV3.calculateCollateralRequiredToBorrowPrincipal(1000);
         assertEq(required, 1000, "Baseline: 1:1 price, 100% ratio = 1000");
 
-        // Cap at 0.5:1 (half Q96) — means 1 collateral = 0.5 principal
+        // Cap at 0.5:1 (half 1e18) — means 1 collateral = 0.5 principal
         // So 1000 principal needs 2000 collateral base, * 100% ratio = 2000
-        lenderCommitmentGroupV3.setMaxPrincipalPerCollateralAmount(Q96 / 2);
+        lenderCommitmentGroupV3.setMaxPrincipalPerCollateralAmount(STANDARD_EXPANSION_FACTOR / 2);
 
         required = lenderCommitmentGroupV3.calculateCollateralRequiredToBorrowPrincipal(1000);
         assertEq(required, 2000, "Cap at 0.5:1 should double required collateral");

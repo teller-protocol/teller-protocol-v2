@@ -159,7 +159,7 @@ contract LenderCommitmentGroup_Pool_V3 is
    
 
     //configured by the owner. If 0 , not used. 
-    uint256 public maxPrincipalPerCollateralAmount;   // DEPRECATED FOR NOW 
+    uint256 public maxPrincipalPerCollateralAmount;
 
 
     uint256 public lastUnpausedAt;
@@ -718,14 +718,18 @@ contract LenderCommitmentGroup_Pool_V3 is
             // principalPerCollateralAmount
         uint256 priceRatioQ96 = IPriceAdapter(  priceAdapter  )
             .getPriceRatioQ96(priceRouteHash);
-       
-    
-    
+
+        uint256 principalPerCollateralAmount = maxPrincipalPerCollateralAmount == 0
+            ? priceRatioQ96
+            : MathUpgradeable.min(
+                priceRatioQ96,
+                maxPrincipalPerCollateralAmount
+            );
 
         return
             getRequiredCollateral(
                 principalAmount,
-                priceRatioQ96       // principalPerCollateralAmount 
+                principalPerCollateralAmount
             );
     }
 
@@ -1100,7 +1104,17 @@ contract LenderCommitmentGroup_Pool_V3 is
 
 
 
-    // ------------------------   Pausing functions  ------------ 
+    /**
+     * @notice Sets an optional manual cap for principal/collateral price ratio. Only Pool Owner.
+     * @param _maxPrincipalPerCollateralAmount Price ratio expanded by Q96. If 0, only oracle price is used.
+     */
+    function setMaxPrincipalPerCollateralAmount(uint256 _maxPrincipalPerCollateralAmount)
+    external
+    onlyOwner {
+       maxPrincipalPerCollateralAmount = _maxPrincipalPerCollateralAmount;
+    }
+
+    // ------------------------   Pausing functions  ------------
 
 
 

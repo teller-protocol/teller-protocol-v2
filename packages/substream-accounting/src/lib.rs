@@ -743,16 +743,21 @@ fn store_decimals_for_tokens(
 
     //always compare to ETH !
     for token_address in tokens_to_fetch_decimals_array {
-        let token_decimals_option =
-            rpc::erc20::fetch_token_decimals(&H160::from_str(token_address.as_str()).unwrap());
+        let token_h160 = match H160::from_str(token_address.as_str()) {
+            Ok(addr) => addr,
+            Err(_) => {
+                substreams::log::println(format!(
+                    "store_decimals_for_tokens: skip invalid token address {}",
+                    token_address
+                ));
+                continue;
+            }
+        };
+        let token_decimals_option = rpc::erc20::fetch_token_decimals(&token_h160);
 
         if let Some(decimals) = token_decimals_option {
             bigint_set_store.set(ord, token_address.clone(), &decimals);
         }
-
-        //if let Some( token_decimals ) =  token_decimals {
-        //    bigint_set_store.set(ord, token_address.clone(), &token_decimals )  ;
-        //}
     } // iter
 }
 
@@ -771,6 +776,17 @@ fn store_uniswap_prices_for_tokens(
     for token_address_delta in token_address_delta_store.iter() {
         let token_address = &token_address_delta.key;
 
+        let token_h160 = match H160::from_str(token_address.as_str()) {
+            Ok(addr) => addr,
+            Err(_) => {
+                substreams::log::println(format!(
+                    "store_uniswap_prices_for_tokens: skip invalid token address {}",
+                    token_address
+                ));
+                continue;
+            }
+        };
+
         let mut price_ratio_to_base_currency: Option<f64> = None;
 
         substreams::log::println(format!("token address {}", token_address));
@@ -780,7 +796,7 @@ fn store_uniswap_prices_for_tokens(
         let pair_address_option = rpc::uniswapv2_factory::fetch_pair_from_factory(
             &H160::from_str(UNISWAPV2_FACTORY_CONTRACT).unwrap(),
             &H160::from_str(WETH_ADDRESS).unwrap(),
-            &H160::from_str(token_address.as_str()).unwrap(), //bad character !?
+            &token_h160,
         );
 
         if let Some(pair_address) = pair_address_option {
@@ -914,14 +930,6 @@ fn graph_tellerv2_out(
         let submitted_bid_data_option =
             rpc::tellerv2::fetch_loan_summary_from_rpc(&teller_v2_address, &bid_id);
 
-        /*
-
-
-            The block stream encountered a substreams fatal error and will not retry: rpc error: code = InvalidArgument desc = step new irr: handler step new: execute modules: applying executor results "graph_out" on block 15096143: execute: maps wasm call: block 15096143: module "graph_out": general wasm execution panicked: wasm execution failed deterministically: panic in the wasm: "called `Option::unwrap()` on a `None` value" at src/lib.rs:750:15
-
-        */
-
-        //  if let Some(submitted_bid_data) = submitted_bid_data {
         if let Some(submitted_bid_data) = submitted_bid_data_option {
             let bid_id = bid_id.clone();
 
@@ -1387,10 +1395,11 @@ fn bigint_to_f64(value: &BigInt) -> f64 {
 }
 
 fn f64_to_bigdecimal(value: f64) -> BigDecimal {
-    // Convert the f64 to a string
+    if !value.is_finite() {
+        return BigDecimal::from_str("0").unwrap();
+    }
     let value_str = value.to_string();
-    // Create a BigDecimal from the string
-    BigDecimal::from_str(&value_str).unwrap()
+    BigDecimal::from_str(&value_str).unwrap_or_else(|_| BigDecimal::from_str("0").unwrap())
 }
 
 #[cfg(test)]

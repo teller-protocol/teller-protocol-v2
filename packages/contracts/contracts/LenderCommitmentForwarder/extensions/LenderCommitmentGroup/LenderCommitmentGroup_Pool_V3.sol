@@ -296,7 +296,8 @@ contract LenderCommitmentGroup_Pool_V3 is
     ) external initializer   {
        
         __Ownable_init();
-    
+        __ReentrancyGuard_init();
+
         __Shares_init(
             _commitmentGroupConfig.principalTokenAddress,
             _commitmentGroupConfig.collateralTokenAddress

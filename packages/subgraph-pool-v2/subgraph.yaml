@@ -9,11 +9,11 @@ features:
 dataSources:
   - kind: ethereum/contract
     name: Factory
-    network: xdc
+    network: bsc
     source:
       abi: Factory
-      address: "0x0848E884b2DBb63727aa3216b921C279f6DC9a91"
-      startBlock: 100427353
+      address: "0x0EfD3E33Ba2EdE028e50a3E7f81E084996d161aa"
+      startBlock: 81088797
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -29,11 +29,11 @@ dataSources:
           handler: handleLenderGroupDeployed
   - kind: ethereum/contract
     name: CollateralManager
-    network: xdc
+    network: bsc
     source:
       abi: CollateralManager
-      address: "0x6455F2E1CCb14bd0b675A309276FB5333Dec524f"
-      startBlock: 100427353
+      address: "0x9D55Cf23D26a8C17670bb8Ee25D58481ff7aD295"
+      startBlock: 81088797
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -51,7 +51,7 @@ dataSources:
 templates:
   - kind: ethereum/contract
     name: Pool
-    network: xdc
+    network: bsc
     source:
       abi: Pool
     mapping:

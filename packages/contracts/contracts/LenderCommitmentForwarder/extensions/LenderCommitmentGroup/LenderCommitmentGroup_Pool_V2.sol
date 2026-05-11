@@ -343,11 +343,13 @@ contract LenderCommitmentGroup_Pool_V2 is
         );
     }
 
-
+    function initializeReentrancyGuard() external reinitializer(2) {
+        __ReentrancyGuard_init();
+    }
 
     /**
      * @notice Validates loan parameters and starts the TellerV2 Loan where this contract as the lender.
-     * @dev Must be called via the Smart Commitment Forwarder 
+     * @dev Must be called via the Smart Commitment Forwarder
      * @param _borrower Address of the borrower accepting the loan.
      * @param _bidId Identifier for the loan bid.
      * @param _principalAmount Amount of principal being lent.

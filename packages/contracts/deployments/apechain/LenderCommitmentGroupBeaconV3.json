@@ -483,6 +483,20 @@
     },
     {
       "type": "function",
+      "name": "STANDARD_EXPANSION_FACTOR",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
       "name": "TELLER_V2",
       "constant": true,
       "stateMutability": "view",
@@ -491,20 +505,6 @@
       "outputs": [
         {
           "type": "address",
-          "name": ""
-        }
-      ]
-    },
-    {
-      "type": "function",
-      "name": "UNISWAP_EXPANSION_FACTOR",
-      "constant": true,
-      "stateMutability": "view",
-      "payable": false,
-      "inputs": [],
-      "outputs": [
-        {
-          "type": "uint256",
           "name": ""
         }
       ]
@@ -1004,6 +1004,20 @@
     {
       "type": "function",
       "name": "getPrincipalAmountAvailableToBorrow",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getPrincipalPerCollateralAmount",
       "constant": true,
       "stateMutability": "view",
       "payable": false,
@@ -1597,6 +1611,19 @@
     },
     {
       "type": "function",
+      "name": "setMaxPrincipalPerCollateralAmount",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_maxPrincipalPerCollateralAmount"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
       "name": "setWithdrawDelayTime",
       "constant": false,
       "payable": false,
@@ -1888,6 +1915,6 @@
     }
   ],
   "receipt": {},
-  "numDeployments": 1,
+  "numDeployments": 2,
   "implementation": "0x688d3d7D900f38ce095914608AD069d5AA2331DB"
 }

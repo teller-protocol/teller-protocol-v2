@@ -100,11 +100,9 @@ contract LenderCommitmentGroup_Pool_V3 is
 
     uint256 constant Q96 = 0x1000000000000000000000000;
 
+    uint256 public immutable STANDARD_EXPANSION_FACTOR = 1e18;
 
-    
     uint256 public immutable MIN_TWAP_INTERVAL = 3;
-
-    uint256 public immutable UNISWAP_EXPANSION_FACTOR = 2**96;
 
     uint256 public immutable EXCHANGE_RATE_EXPANSION_FACTOR = 1e36;  
 
@@ -159,7 +157,7 @@ contract LenderCommitmentGroup_Pool_V3 is
    
 
     //configured by the owner. If 0 , not used. 
-    uint256 public maxPrincipalPerCollateralAmount;   // DEPRECATED FOR NOW 
+    uint256 public maxPrincipalPerCollateralAmount;
 
 
     uint256 public lastUnpausedAt;
@@ -298,7 +296,8 @@ contract LenderCommitmentGroup_Pool_V3 is
     ) external initializer   {
        
         __Ownable_init();
-    
+        __ReentrancyGuard_init();
+
         __Shares_init(
             _commitmentGroupConfig.principalTokenAddress,
             _commitmentGroupConfig.collateralTokenAddress
@@ -705,27 +704,35 @@ contract LenderCommitmentGroup_Pool_V3 is
         return baseAmount.percent(collateralRatio);
     }
 
-    /* 
-    * @dev this is expanded by 10e18
-    * @dev this logic is very similar to that used in LCFA 
+    /*
+    * @dev this is expanded by STANDARD_EXPANSION_FACTOR (1e18)
+    * @dev this logic is very similar to that used in LCFA
     */
     function calculateCollateralTokensAmountEquivalentToPrincipalTokens(
-        uint256 principalAmount 
+        uint256 principalAmount
     ) public view virtual returns (uint256 collateralTokensAmountToMatchValue) {
 
-
- 
-            // principalPerCollateralAmount
-        uint256 priceRatioQ96 = IPriceAdapter(  priceAdapter  )
+            // Convert Q96 oracle price to 1e18 expansion
+        uint256 priceRatioQ96 = IPriceAdapter(priceAdapter)
             .getPriceRatioQ96(priceRouteHash);
-       
-    
-    
+
+        uint256 pricRatio1e18 = MathUpgradeable.mulDiv(
+            priceRatioQ96,
+            STANDARD_EXPANSION_FACTOR,
+            Q96
+        );
+
+        uint256 principalPerCollateralAmount = maxPrincipalPerCollateralAmount == 0
+            ? pricRatio1e18
+            : MathUpgradeable.min(
+                pricRatio1e18,
+                maxPrincipalPerCollateralAmount
+            );
 
         return
             getRequiredCollateral(
                 principalAmount,
-                priceRatioQ96       // principalPerCollateralAmount 
+                principalPerCollateralAmount
             );
     }
 
@@ -733,26 +740,49 @@ contract LenderCommitmentGroup_Pool_V3 is
  
 
     /**
+     * @notice Returns the effective principal-per-collateral price ratio (capped by maxPrincipalPerCollateralAmount if set)
+     * @dev Mirrors the V2 getPrincipalForCollateralForPoolRoutes ABI for compatibility
+     * @return The principal per collateral ratio, expanded by STANDARD_EXPANSION_FACTOR (1e18)
+     */
+    function getPrincipalPerCollateralAmount() external view virtual returns (uint256) {
+        uint256 priceRatioQ96 = IPriceAdapter(priceAdapter)
+            .getPriceRatioQ96(priceRouteHash);
+
+        uint256 priceRatio1e18 = MathUpgradeable.mulDiv(
+            priceRatioQ96,
+            STANDARD_EXPANSION_FACTOR,
+            Q96
+        );
+
+        return maxPrincipalPerCollateralAmount == 0
+            ? priceRatio1e18
+            : MathUpgradeable.min(
+                priceRatio1e18,
+                maxPrincipalPerCollateralAmount
+            );
+    }
+
+    /**
      * @notice Calculates the amount of collateral tokens required for a given principal amount
      * @dev Converts principal amount to equivalent collateral based on current price ratio
      * @dev Uses the Math.mulDiv function with rounding up to ensure sufficient collateral
      * @param _principalAmount The amount of principal tokens to be borrowed
-     * @param _maxPrincipalPerCollateralAmountQ96 The exchange rate between principal and collateral (expanded by Q96)
+     * @param _maxPrincipalPerCollateralAmount The exchange rate between principal and collateral (expanded by STANDARD_EXPANSION_FACTOR)
      * @return The required amount of collateral tokens, rounded up to ensure sufficient collateralization
      */
    function getRequiredCollateral(
         uint256 _principalAmount,
-        uint256 _maxPrincipalPerCollateralAmountQ96  //price ratio Q96 
-        
+        uint256 _maxPrincipalPerCollateralAmount
+
     ) internal  view virtual returns (uint256) {
-         
+
          return
             MathUpgradeable.mulDiv(
                 _principalAmount,
-                 Q96,
-                _maxPrincipalPerCollateralAmountQ96,
+                 STANDARD_EXPANSION_FACTOR,
+                _maxPrincipalPerCollateralAmount,
                 MathUpgradeable.Rounding.Up
-            );  
+            );
     }
  
 
@@ -1100,7 +1130,17 @@ contract LenderCommitmentGroup_Pool_V3 is
 
 
 
-    // ------------------------   Pausing functions  ------------ 
+    /**
+     * @notice Sets an optional manual cap for principal/collateral price ratio. Only Pool Owner.
+     * @param _maxPrincipalPerCollateralAmount Price ratio expanded by STANDARD_EXPANSION_FACTOR (1e18). If 0, only oracle price is used.
+     */
+    function setMaxPrincipalPerCollateralAmount(uint256 _maxPrincipalPerCollateralAmount)
+    external
+    onlyOwner {
+       maxPrincipalPerCollateralAmount = _maxPrincipalPerCollateralAmount;
+    }
+
+    // ------------------------   Pausing functions  ------------
 
 
 

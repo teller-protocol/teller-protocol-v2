@@ -58,6 +58,7 @@ graph auth
 
 
   graph deploy tellerv2-mainnet --version-label 0.4.21-24
+ 
 
 
  graph deploy   teller-v-2-base --version-label 0.4.21-26

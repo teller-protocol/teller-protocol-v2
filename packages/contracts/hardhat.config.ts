@@ -94,11 +94,25 @@ export const getMnemonic = (): string => {
   return ''
 }
 
-const accounts: HardhatNetworkHDAccountsUserConfig = {
+// HD-wallet accounts (required by the in-memory `hardhat` network, which only
+// accepts a mnemonic object or {privateKey,balance}[] — not a plain string[]).
+const hdAccounts: HardhatNetworkHDAccountsUserConfig = {
   mnemonic: getMnemonic(),
   count: 15,
   accountsBalance: parseEther('100000000').toString(),
 }
+
+// If DEPLOYER_PRIVATE_KEY is set, live networks use it directly for the
+// deployer (index 0). Otherwise fall back to the mnemonic.secret HD wallet.
+const deployerPrivateKey = process.env.DEPLOYER_PRIVATE_KEY?.trim()
+
+const accounts: HardhatNetworkHDAccountsUserConfig | string[] = deployerPrivateKey
+  ? [
+      deployerPrivateKey.startsWith('0x')
+        ? deployerPrivateKey
+        : `0x${deployerPrivateKey}`,
+    ]
+  : hdAccounts
 
 type NetworkNames =
   | 'mainnet'
@@ -212,8 +226,8 @@ const getLatestDeploymentBlock = (networkName: string): number | undefined => {
 const networkConfig = (config: NetworkUserConfig): NetworkUserConfig => ({
   live: false,
   // gas: 'auto',
-  ...config,
   accounts,
+  ...config,
 })
 
 /*
@@ -535,6 +549,7 @@ export default <HardhatUserConfig>{
     // Local Networks
     hardhat: networkConfig({
       chainId: 31337,
+      accounts: hdAccounts,
       allowUnlimitedContractSize: true,
       saveDeployments: !isTesting,
       forking:

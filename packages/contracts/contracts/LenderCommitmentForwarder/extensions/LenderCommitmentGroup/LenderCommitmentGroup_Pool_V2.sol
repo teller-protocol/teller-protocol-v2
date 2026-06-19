@@ -290,9 +290,10 @@ contract LenderCommitmentGroup_Pool_V2 is
        IUniswapPricingLibrary.PoolRouteConfig[] calldata _poolOracleRoutes 
          
     ) external initializer   {
-       
+
         __Ownable_init();
-    
+        __ReentrancyGuard_init();
+
         __Shares_init(
             _commitmentGroupConfig.principalTokenAddress,
             _commitmentGroupConfig.collateralTokenAddress
@@ -341,6 +342,17 @@ contract LenderCommitmentGroup_Pool_V2 is
             _commitmentGroupConfig.liquidityThresholdPercent,
             _commitmentGroupConfig.collateralRatio
         );
+    }
+
+    /**
+     * @notice One-time backfill of the reentrancy guard for pools that were
+     *         deployed before __ReentrancyGuard_init() was wired into initialize().
+     * @dev Permissionless and idempotent: callable once per instance (reinitializer 2).
+     *      The nonReentrant modifier prevents it from running while a guarded call is
+     *      already in progress, so it cannot be abused to unlock an active guard.
+     */
+    function reinitReentrancyGuard() external reinitializer(2) nonReentrant {
+        __ReentrancyGuard_init();
     }
 
 

@@ -93,11 +93,23 @@ contract SmartCommitmentForwarder is
         TellerV2MarketForwarder_G3(_protocolAddress, _marketRegistry)
     {  }
 
-    function initialize() public initializer {       
+    function initialize() public initializer {
         __Pausable_init();
         __Ownable_init_unchained();
+        __ReentrancyGuard_init();
     }
- 
+
+    /**
+     * @notice One-time backfill of the reentrancy guard for instances that were
+     *         deployed before __ReentrancyGuard_init() was wired into initialize().
+     * @dev Permissionless and idempotent: callable once per instance (reinitializer 2).
+     *      The nonReentrant modifier prevents it from running while a guarded call is
+     *      already in progress, so it cannot be abused to unlock an active guard.
+     */
+    function reinitReentrancyGuard() external reinitializer(2) nonReentrant {
+        __ReentrancyGuard_init();
+    }
+
 
     function setLiquidationProtocolFeePercent(uint256 _percent) 
     public onlyProtocolOwner { 

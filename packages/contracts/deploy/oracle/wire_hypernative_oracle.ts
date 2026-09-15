@@ -125,6 +125,34 @@ const deployFn: DeployFunction = async (hre) => {
 
   // setOracle is onlyProtocolOwner and the forwarder is Safe-owned by now, so
   // this is a proposal rather than a transaction.
+  // The pause path, which is what Hypernative's automated response actually
+  // uses. Their notification channels call ProtocolPausingManager.pauseProtocol
+  // and SmartCommitmentForwarder.pause, and both check the pauser role — so
+  // without this the response fires and reverts, which looks like protection
+  // right up until the moment it matters.
+  //
+  // addPauser is onlyOwner and the manager is Safe-owned, so it is proposed.
+  if (operator !== undefined && operator !== '' && operator !== ZERO) {
+    const pausingManager = await hre.contracts.get('ProtocolPausingManager')
+    const pausingManagerAddress = await pausingManager.getAddress()
+    if (await pausingManager.isPauser(operator)) {
+      hre.log(`  ✅  ${operator} is already a pauser`)
+    } else {
+      hre.log(`  Proposing addPauser(${operator}) on the Safe...`)
+      await hre.upgrades.proposeCall(
+        pausingManagerAddress,
+        pausingManager,
+        'addPauser',
+        [operator],
+        "Let Hypernative's automated response pause the protocol",
+        `Grants the pauser role to ${operator}, Hypernative's response wallet on ` +
+          `${hre.network.name}. Their pause channels call pauseProtocol() here and ` +
+          'pause() on SmartCommitmentForwarder; both revert without it.'
+      )
+      hre.log('  ✅  Proposed.')
+    }
+  }
+
   hre.log('')
   hre.log(`  Proposing setOracle(${oracleAddress}) on the Safe...`)
   await hre.upgrades.proposeCall(
@@ -150,6 +178,7 @@ deployFn.tags = ['hypernative-oracle:wire']
 deployFn.dependencies = [
   'hypernative-oracle-mock:deploy',
   'smart-commitment-forwarder:deploy',
+  'protocol-pausing-manager:deploy',
 ]
 deployFn.skip = async (hre) =>
   !hre.network.live ||

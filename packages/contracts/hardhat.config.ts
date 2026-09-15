@@ -113,6 +113,7 @@ type NetworkNames =
   | 'hyperevm'
   | 'apechain'
   | 'xdc'
+  | 'robinhood'
   | 'sepolia'
   | 'mumbai'
   | 'goerli'
@@ -165,6 +166,10 @@ const networkUrls: Record<NetworkNames, string> = {
       apechain: process.env.APECHAIN_RPC_URL ?? 'https://rpc.apechain.com',
 
       xdc: process.env.XDC_RPC_URL ?? 'https://rpc.xdc.org',
+
+      robinhood:
+        process.env.ROBINHOOD_RPC_URL ??
+        'https://rpc.mainnet.chain.robinhood.com',
 
   mantle: 'https://rpc.mantle.xyz',
 
@@ -242,6 +247,11 @@ export default <HardhatUserConfig>{
       hyperevm: process.env.ETHERSCANV2_VERIFY_API_KEY,
       apechain: process.env.ETHERSCANV2_VERIFY_API_KEY,
       xdc: process.env.ETHERSCANV2_VERIFY_API_KEY,
+      // Blockscout needs no key; any non-empty string works if
+      // ROBINHOOD_VERIFY_API_URL is pointed at it instead of Etherscan V2.
+      robinhood:
+        process.env.ROBINHOOD_VERIFY_API_KEY ??
+        process.env.ETHERSCANV2_VERIFY_API_KEY,
 
       mantle: process.env.MANTLE_VERIFY_API_KEY ?? 'xyz',
       clarity: '', //none ? 
@@ -342,6 +352,22 @@ export default <HardhatUserConfig>{
         urls: {
           apiURL: 'https://api.etherscan.io/v2/api?chainid=50',
           browserURL: 'https://xdcscan.io/',
+        },
+      },
+      {
+        // Etherscan V2 coverage for 4663 is unconfirmed. If `yarn contracts
+        // verify --network robinhood` fails, switch to Blockscout with:
+        //   ROBINHOOD_VERIFY_API_URL=https://robinhoodchain.blockscout.com/api
+        //   ROBINHOOD_EXPLORER_URL=https://robinhoodchain.blockscout.com
+        //   ROBINHOOD_VERIFY_API_KEY=abc
+        network: 'robinhood',
+        chainId: 4663,
+        urls: {
+          apiURL:
+            process.env.ROBINHOOD_VERIFY_API_URL ??
+            'https://api.etherscan.io/v2/api?chainid=4663',
+          browserURL:
+            process.env.ROBINHOOD_EXPLORER_URL ?? 'https://robinscan.io',
         },
       },
       {
@@ -502,7 +528,10 @@ export default <HardhatUserConfig>{
       11155111: '0xb1ff461BB751B87f4F791201a29A8cFa9D30490c',
       999:'0x004573E17574634A48CA808CF1df75f01e906E43',
       33139: '0x2BbD69C72b6689F31dd12b93fF59E62632E0eF41',  // apechain
-      50: '0x55c12dF12e8D1094f387D77F445a8F1bE61C17BE'  // xdc
+      50: '0x55c12dF12e8D1094f387D77F445a8F1bE61C17BE',  // xdc
+      // Robinhood Chain. Create the Safe at app.safe.global (chain 4663) and
+      // put its address in ROBINHOOD_SAFE_ADDRESS before deploying.
+      4663: process.env.ROBINHOOD_SAFE_ADDRESS ?? '0x0000000000000000000000000000000000000000',
     },
     protocolTimelock: {
       31337: 8,
@@ -520,7 +549,12 @@ export default <HardhatUserConfig>{
       11155111: '0xFe5394B67196EA95301D6ECB5389E98A02984cC2',
       999: '0xBf4E3fEA276057D0b26f52141557C835a7E2d534',
       33139: '0x6b1eC259a35005b7562c92f42C490f39131fF1d8',  // apechain
-      50: '0xfA87381128aAF95fB637BbA0B760bA2f9970c2b5'  // xdc
+      50: '0xfA87381128aAF95fB637BbA0B760bA2f9970c2b5',  // xdc
+      // Robinhood Chain. Left as the zero address for deploy pass 1 (the
+      // ownership-transfer scripts detect it and skip). After pass 1, copy the
+      // address from deployments/robinhood/TimelockController.json into
+      // ROBINHOOD_TIMELOCK_ADDRESS and run pass 2.
+      4663: process.env.ROBINHOOD_TIMELOCK_ADDRESS ?? '0x0000000000000000000000000000000000000000',
     },
   },
 
@@ -737,6 +771,20 @@ export default <HardhatUserConfig>{
       verify: {
         etherscan: {
           apiKey: process.env.ETHERSCANV2_VERIFY_API_KEY,
+        },
+      },
+    }),
+
+    robinhood: networkConfig({
+      url: networkUrls.robinhood,
+      chainId: 4663,
+      live: true,
+
+      verify: {
+        etherscan: {
+          apiKey:
+            process.env.ROBINHOOD_VERIFY_API_KEY ??
+            process.env.ETHERSCANV2_VERIFY_API_KEY,
         },
       },
     }),

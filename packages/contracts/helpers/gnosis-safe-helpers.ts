@@ -461,7 +461,8 @@ export class GnosisSafeAdminClient {
       'bsc': 56,
       'katana':747474,
       'apechain': 33139,
-      'xdc': 50
+      'xdc': 50,
+      'robinhood': 4663
     }
     return chainIds[network] || 1
   }
@@ -541,6 +542,7 @@ export class GnosisSafeAdminClient {
       'katana': 'katana',
       'apechain': 'apechain',
       'xdc': 'xdc',
+      'robinhood': 'robinhood',
     }
 
     return networkMap[network as string] || 'eth'
@@ -562,6 +564,11 @@ export class GnosisSafeAdminClient {
       'bsc': 'https://safe-transaction-bsc.safe.global',
       'apechain': 'https://safe-transaction-apechain.safe.onchainden.com',
       'xdc': 'https://safe-transaction-xdc.safe.global',
+      // Verify at app.safe.global before the first Safe proposal on 4663;
+      // ApeChain needed a third-party host rather than *.safe.global.
+      'robinhood':
+        process.env.ROBINHOOD_SAFE_TX_SERVICE ??
+        'https://safe-transaction-robinhood.safe.global',
     }
     return networkMap[network] || 'https://safe-transaction-mainnet.safe.global'
   }

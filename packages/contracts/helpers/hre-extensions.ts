@@ -751,6 +751,13 @@ async function getOZNetwork(hre: HardhatRuntimeEnvironment): Promise<Network> {
     return 'apechain'
   }
 
+  // fromChainId() has no entry for 4663, so without this the Safe proposal
+  // paths below throw on Robinhood Chain. Same shape as the katana/apechain
+  // cases above. (Note: 50/XDC and 999/HyperEVM have the same gap.)
+  if (chainId == '4663' ){
+    return 'robinhood'
+  }
+
   if (!network) throw new Error(`Unknown chain id ${chainId}`)
   return network
 }

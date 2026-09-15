@@ -43,6 +43,11 @@ export function get_ecosystem_contract_address(
 	    case 'xdc':
 	      uniswapV3FactoryAddress = '0xcb2436774C3e191c85056d248EF4260ce5f27A9D'
 	      break
+	    case 'robinhood':
+	      // Canonical Uniswap V3 (Uniswap Labs). Copy from the Uniswap deployments
+	      // page for chain 4663 into .env — see .env.robinhood.example.
+	      uniswapV3FactoryAddress = process.env.ROBINHOOD_UNISWAP_V3_FACTORY
+	      break
 	    default:
 	      return undefined 
 	  }
@@ -89,6 +94,9 @@ export function get_ecosystem_contract_address(
 		    case 'xdc':
 		      weth9Address = '0x951857744785e80e2de051c32ee7b25f9c458c42' // WXDC
 		      break
+		    case 'robinhood':
+		      weth9Address = process.env.ROBINHOOD_WETH9 // WETH on Robinhood Chain
+		      break
 
 		    default:
 		    	return undefined 
@@ -133,6 +141,9 @@ export function get_ecosystem_contract_address(
 		      break
 		    case 'xdc':
 		      swapRouterAddress = '0xaa52bB8110fE38D0d2d2AF0B85C3A3eE622CA455'
+		      break
+		    case 'robinhood':
+		      swapRouterAddress = process.env.ROBINHOOD_UNISWAP_V3_SWAP_ROUTER
 		      break
 		    default:
 		    	return undefined 
@@ -180,6 +191,9 @@ export function get_ecosystem_contract_address(
 			      break
 			    case 'xdc':
 			      quoterAddress = '0x5911cB3633e764939edc2d92b7e1ad375Bb57649'
+			      break
+			    case 'robinhood':
+			      quoterAddress = process.env.ROBINHOOD_UNISWAP_V3_QUOTER
 			      break
 			    default:
 			    	return undefined 

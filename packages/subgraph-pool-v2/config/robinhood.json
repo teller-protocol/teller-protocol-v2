@@ -1,0 +1,26 @@
+{
+  "enabled": true,
+  "name": "tellerv2-poolsv2-robinhood",
+  "network": "robinhood",
+  "export_network_name": "robinhood",
+  "product": "selfhosted",
+  "studio": {
+    "owner": "0x1a76339211668a6939e1d6D13AB902bBef5D9ebc",
+    "network": "arbitrum-one"
+  },
+  "grafting": {
+    "enabled": false
+  },
+  "contracts": {
+    "factory": {
+      "enabled": true,
+      "address": "LENDER_COMMITMENT_GROUP_FACTORY_V2_ADDRESS",
+      "block": "DEPLOY_BLOCK"
+    },
+    "collateralManager": {
+      "enabled": true,
+      "address": "COLLATERAL_MANAGER_ADDRESS",
+      "block": "DEPLOY_BLOCK"
+    }
+  }
+}

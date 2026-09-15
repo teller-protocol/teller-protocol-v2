@@ -167,9 +167,15 @@ const networkUrls: Record<NetworkNames, string> = {
 
       xdc: process.env.XDC_RPC_URL ?? 'https://rpc.xdc.org',
 
+      // Alchemy serves Robinhood Chain; robinhood-mainnet.g.alchemy.com resolves
+      // and answers, and follows the same slug shape as the chains above. The
+      // public endpoint is the last resort rather than '' — unlike the other
+      // chains here, a keyless checkout still gets a working RPC.
       robinhood:
         process.env.ROBINHOOD_RPC_URL ??
-        'https://rpc.mainnet.chain.robinhood.com',
+        (ALCHEMY_API_KEY
+          ? `https://robinhood-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
+          : 'https://rpc.mainnet.chain.robinhood.com'),
 
   mantle: 'https://rpc.mantle.xyz',
 

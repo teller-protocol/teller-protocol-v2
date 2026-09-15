@@ -27,6 +27,7 @@
 # Optional:
 #   PUSH_ARTIFACTS=true     commit deployments/<network>/ back to the branch
 #   ARTIFACT_BRANCH=<name>  branch to push to (default: current)
+#   GITHUB_TOKEN=<token>    push credential, needed on a host with no git auth
 #   SKIP_BALANCE_CHECK=true skip the pre-deploy balance read
 #
 # On an ephemeral host, keep a copy of DEPLOYER_MNEMONIC somewhere durable
@@ -129,6 +130,12 @@ BLOCK_FILE="deployments/$NETWORK/.latestDeploymentBlock"
 if [ "${PUSH_ARTIFACTS:-}" = "true" ]; then
   log "Committing artifacts back to the branch"
   BRANCH="${ARTIFACT_BRANCH:-$(git rev-parse --abbrev-ref HEAD)}"
+  # A container clone has no push credential. Inject one for this run only,
+  # and keep it out of `git remote -v` and the process list where possible.
+  if [ -n "${GITHUB_TOKEN:-}" ]; then
+    REPO_PATH="$(git remote get-url origin | sed -E 's#^https://[^/]+/##; s#^git@[^:]+:##; s#\.git$##')"
+    git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${REPO_PATH}.git"
+  fi
   git add "deployments/$NETWORK" \
     ../subgraph/config/"$NETWORK".json \
     ../subgraph-pool-v2/config/"$NETWORK".json \

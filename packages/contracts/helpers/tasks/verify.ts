@@ -19,7 +19,7 @@ task(
   const fqns = await hre.artifacts.getAllFullyQualifiedNames()
 
   const deployments = await hre.deployments.all()
-  for (const [name, { address, abi }] of Object.entries(deployments)) {
+  for (const [name, { address, abi, args }] of Object.entries(deployments)) {
     const fqn = fqns.find((fqn) => fqn.endsWith(`${name}.sol:${name}`))
 
     const implementation = await hre.upgrades.erc1967
@@ -48,6 +48,19 @@ task(
       } catch {
         continue
       }
+    } else if (args !== undefined && args.length > 0) {
+      // A plain deployment with a constructor. The branch above only recovers
+      // arguments for proxies and beacons, so every directly deployed contract
+      // taking constructor arguments was verified with none and rejected:
+      //
+      //   ABIArgumentLengthError: The constructor for
+      //   contracts/admin/TimelockController.sol:TimelockController
+      //   has 4 parameters
+      //
+      // hardhat-deploy already recorded them, so there is nothing to recover
+      // from the chain. On Robinhood this was the whole of the gap: 23 of 26
+      // verified, and the 3 that did not were exactly the 3 with constructors.
+      constructorArgs = args as Result
     }
 
     await hre

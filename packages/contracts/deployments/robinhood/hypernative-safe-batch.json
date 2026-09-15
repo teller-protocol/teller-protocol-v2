@@ -1,0 +1,19 @@
+{
+  "version": "1.0",
+  "chainId": "4663",
+  "createdAt": 1789507493954,
+  "meta": {
+    "name": "Enable Hypernative on robinhood",
+    "description": "Grants the pauser role to the Hypernative response wallet, and points SmartCommitmentForwarder at the HypernativeOracle.",
+    "txBuilderVersion": "1.16.5"
+  },
+  "transactions": [
+    {
+      "to": "0xC0aDf3FeD5aB7318BE5eb3Ef1d553B0F80d2c98F",
+      "value": "0",
+      "data": "0x7adbf97300000000000000000000000050a9cd8556ac104915b69d00883b7b2f1c37ab4e",
+      "contractMethod": null,
+      "contractInputsValues": null
+    }
+  ]
+}

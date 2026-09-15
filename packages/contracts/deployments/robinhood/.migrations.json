@@ -21,5 +21,6 @@
   "hypernative-oracle-mock:deploy": 1789464118,
   "robinhood:transfer-ownership-to-safe": 1789464120,
   "validate-deployments": 1789464120,
-  "default-proxy-admin:transfer": 1789464120
+  "default-proxy-admin:transfer": 1789464120,
+  "hypernative-oracle:wire": 1789507493
 }

@@ -66,8 +66,11 @@ push_artifacts() {
     git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${REPO_PATH}.git"
     REMOTE_AUTHED=1
   fi
-  # The image clones at depth 1; unshallow so the push has history to build on.
-  git fetch -q --unshallow origin 2>/dev/null || true
+  # No --unshallow. git pushes from a depth-1 clone perfectly well — the commit
+  # sits on a parent the remote already has, so it sends a thin pack. Fetching
+  # the full history of this repo instead took the job from "about to push" to
+  # blocked on network I/O with nothing on stdout, which reads exactly like a
+  # finished run and is how the second Robinhood deploy was lost.
   # .openzeppelin lives beside deployments/ in packages/contracts, not at the
   # repo root. It held ../../ for long enough to matter: git add fails on a
   # pathspec that matches nothing and stages *none* of the other paths with
@@ -79,16 +82,25 @@ push_artifacts() {
     [ -e "$p" ] && git add "$p"
   done
   if git diff --cached --quiet; then
-    echo "Nothing new to commit."
+    echo "Nothing staged — nothing new to commit."
     return 0
   fi
+  echo "Staging $(git diff --cached --name-only | wc -l) file(s):"
+  git diff --cached --name-only | sed 's/^/    /' | head -20
   git -c user.name="teller-deploy" -c user.email="deploy@teller.org" \
     commit -q -m "$1
 
 Written by scripts/deploy-chain.sh. Timelock: ${TIMELOCK_ADDRESS:-not yet deployed}"
-  git push origin "$ARTIFACT_REFSPEC" || fail \
-    "Could not push the artifacts to $ARTIFACT_BRANCH. They exist only in this container — copy the address table above before it exits."
-  echo "Pushed to $ARTIFACT_BRANCH."
+  # Retry: a transient network failure here costs the whole deploy record.
+  for attempt in 1 2 3; do
+    if git push origin "$ARTIFACT_REFSPEC"; then
+      echo "Pushed to $ARTIFACT_BRANCH."
+      return 0
+    fi
+    echo "Push attempt $attempt failed; retrying."
+    sleep $((attempt * 5))
+  done
+  fail "Could not push the artifacts to $ARTIFACT_BRANCH after 3 attempts. They exist only in this container — copy the address table above before it exits."
 }
 
 # --- preflight -------------------------------------------------------------
@@ -187,6 +199,11 @@ export "$TIMELOCK_VAR=$TIMELOCK_ADDRESS"
 # --- pass 2 ----------------------------------------------------------------
 # Picks up the scripts that skipped in pass 1 because the timelock was still
 # the zero address: the ProxyAdmin and beacon ownership transfers.
+# Cheap insurance: the addresses exist now, so bank them before pass 2. The
+# second call re-stages and says "nothing new" if pass 2 changes nothing.
+log "Committing artifacts to $ARTIFACT_BRANCH (pass 1 complete)"
+push_artifacts "Add $NETWORK deployment artifacts (pass 1)"
+
 log "Deploy pass 2 — $NETWORK (ownership transfers)"
 yarn hh deploy --network "$NETWORK"
 
@@ -199,9 +216,19 @@ push_artifacts "Add $NETWORK deployment artifacts"
 # --- verify ----------------------------------------------------------------
 # Never fatal: unverified contracts are a cosmetic problem, and on a new chain
 # the explorer's API is the least reliable part of the stack.
-log "Verify on $NETWORK"
-yarn hh verify-all --network "$NETWORK" || \
-  echo "!! Verification failed. Contracts are deployed and fine; re-run verify later (try the Blockscout vars)."
+if [ "${SKIP_VERIFY:-}" = "true" ]; then
+  log "Skipping verification on $NETWORK (SKIP_VERIFY=true)"
+else
+  log "Verify on $NETWORK"
+  yarn hh verify-all --network "$NETWORK" || \
+    echo "!! Verification failed. Contracts are deployed and fine; re-run verify later."
+  # hardhat-verify 1.x predates Etherscan V2 and drops the chainid param when
+  # polling for a result, so it reports failures on submissions the API
+  # accepted. Ask the API directly rather than believing either one.
+  log "What is actually verified on $NETWORK"
+  yarn hh run --no-compile scripts/check-verification.ts --network "$NETWORK" || \
+    echo "!! Some contracts are not verified. Re-run verify-all; the deploy itself is fine."
+fi
 
 # --- validate --------------------------------------------------------------
 log "Validate deployment"

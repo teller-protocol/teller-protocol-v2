@@ -1,0 +1,31 @@
+{
+  "version": "1.0",
+  "chainId": "4663",
+  "createdAt": 1789507516214,
+  "meta": {
+    "name": "Protocol fee settings for robinhood",
+    "description": "Sets the TellerV2 protocol fee and fee recipient. Both are owner gated.",
+    "txBuilderVersion": "1.16.5"
+  },
+  "transactions": [
+    {
+      "to": "0x8Ca0de7d034ca7Eec2f014985e7AFBbD9b541FC9",
+      "value": "0",
+      "data": null,
+      "contractMethod": {
+        "name": "setProtocolFeeRecipient",
+        "payable": false,
+        "inputs": [
+          {
+            "name": "_recipient",
+            "type": "address",
+            "internalType": "address"
+          }
+        ]
+      },
+      "contractInputsValues": {
+        "_recipient": "0x9ce73b7e864C60B9B1e2f32853264e1a5e5ecEe5"
+      }
+    }
+  ]
+}

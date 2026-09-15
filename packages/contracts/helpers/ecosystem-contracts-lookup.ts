@@ -43,6 +43,12 @@ export function get_ecosystem_contract_address(
 	    case 'xdc':
 	      uniswapV3FactoryAddress = '0xcb2436774C3e191c85056d248EF4260ce5f27A9D'
 	      break
+	    case 'robinhood':
+	      // Canonical Uniswap V3. Read off chain 4663: a live v3 pool reports this
+	      // as its factory(), and the address answers as a verified
+	      // UniswapV3Factory (getPool/createPool/feeAmountTickSpacing/owner).
+	      uniswapV3FactoryAddress = '0x1f7d7550B1b028f7571E69A784071F0205FD2EfA'
+	      break
 	    default:
 	      return undefined 
 	  }
@@ -89,6 +95,9 @@ export function get_ecosystem_contract_address(
 		    case 'xdc':
 		      weth9Address = '0x951857744785e80e2de051c32ee7b25f9c458c42' // WXDC
 		      break
+		    case 'robinhood':
+		      weth9Address = '0x0bd7d308f8e1639fab988df18a8011f41eacad73' // WETH (18 dec)
+		      break
 
 		    default:
 		    	return undefined 
@@ -133,6 +142,11 @@ export function get_ecosystem_contract_address(
 		      break
 		    case 'xdc':
 		      swapRouterAddress = '0xaa52bB8110fE38D0d2d2AF0B85C3A3eE622CA455'
+		      break
+		    case 'robinhood':
+		      // Only read by borrow_swap.ts, which is not enabled for robinhood.
+		      // Set ROBINHOOD_UNISWAP_V3_SWAP_ROUTER if BorrowSwap is turned on.
+		      swapRouterAddress = process.env.ROBINHOOD_UNISWAP_V3_SWAP_ROUTER
 		      break
 		    default:
 		    	return undefined 
@@ -180,6 +194,10 @@ export function get_ecosystem_contract_address(
 			      break
 			    case 'xdc':
 			      quoterAddress = '0x5911cB3633e764939edc2d92b7e1ad375Bb57649'
+			      break
+			    case 'robinhood':
+			      // Only read by borrow_swap.ts, which is not enabled for robinhood.
+			      quoterAddress = process.env.ROBINHOOD_UNISWAP_V3_QUOTER
 			      break
 			    default:
 			    	return undefined 

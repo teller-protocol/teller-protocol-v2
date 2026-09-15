@@ -1,0 +1,60 @@
+{
+  "enabled": true,
+  "name": "teller-v2-robinhood",
+  "network": "robinhood",
+  "export_network_name": "robinhood",
+  "product": "selfhosted",
+  "studio": {
+    "owner": "0x1A2bAA2257343119FB03FD448622456a0c4f2190",
+    "network": "mainnet"
+  },
+  "grafting": {
+    "enabled": false
+  },
+  "block_handler": {
+    "enabled": false,
+    "block": "DEPLOY_BLOCK"
+  },
+  "contracts": {
+    "teller_v2": {
+      "enabled": true,
+      "address": "TELLER_V2_ADDRESS",
+      "block": "DEPLOY_BLOCK"
+    },
+    "market_registry": {
+      "enabled": true,
+      "address": "MARKET_REGISTRY_ADDRESS",
+      "block": "DEPLOY_BLOCK"
+    },
+    "lender_commitment": {
+      "enabled": false,
+      "address": "0x0000000000000000000000000000000000000000",
+      "block": "0"
+    },
+    "lender_commitment_staging": {
+      "enabled": false,
+      "address": "0x0000000000000000000000000000000000000000",
+      "block": "0"
+    },
+    "lender_commitment_alpha": {
+      "enabled": true,
+      "address": "LENDER_COMMITMENT_FORWARDER_ALPHA_ADDRESS",
+      "block": "DEPLOY_BLOCK"
+    },
+    "collateral_manager": {
+      "enabled": true,
+      "address": "COLLATERAL_MANAGER_ADDRESS",
+      "block": "DEPLOY_BLOCK"
+    },
+    "lender_manager": {
+      "enabled": true,
+      "address": "LENDER_MANAGER_ADDRESS",
+      "block": "DEPLOY_BLOCK"
+    },
+    "market_liquidity_rewards": {
+      "enabled": true,
+      "address": "MARKET_LIQUIDITY_REWARDS_ADDRESS",
+      "block": "DEPLOY_BLOCK"
+    }
+  }
+}

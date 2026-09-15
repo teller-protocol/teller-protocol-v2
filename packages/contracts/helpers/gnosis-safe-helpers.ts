@@ -564,11 +564,18 @@ export class GnosisSafeAdminClient {
       'bsc': 'https://safe-transaction-bsc.safe.global',
       'apechain': 'https://safe-transaction-apechain.safe.onchainden.com',
       'xdc': 'https://safe-transaction-xdc.safe.global',
-      // Verify at app.safe.global before the first Safe proposal on 4663;
-      // ApeChain needed a third-party host rather than *.safe.global.
+      // Safe lists 4663 as "Robinhood Chain" in its own chain config, and
+      // names this host: safe-config.safe.global/api/v1/chains reports
+      // transactionService = https://api.safe.global/tx-service/robinhood,
+      // which answers 200 at /api/v1/about/.
+      //
+      // The safe-transaction-<chain>.safe.global form guessed here first does
+      // not resolve for robinhood at all. It still resolves for the chains
+      // above, but only as a 308 to this same api.safe.global host — Safe has
+      // moved, and those entries are living on a redirect.
       'robinhood':
         process.env.ROBINHOOD_SAFE_TX_SERVICE ??
-        'https://safe-transaction-robinhood.safe.global',
+        'https://api.safe.global/tx-service/robinhood',
     }
     return networkMap[network] || 'https://safe-transaction-mainnet.safe.global'
   }

@@ -119,6 +119,13 @@ Written by scripts/deploy-chain.sh. Timelock: ${TIMELOCK_ADDRESS:-not yet deploy
 if [ "${VERIFY_ONLY:-}" = "true" ]; then
   [ -d "deployments/$NETWORK" ] || fail \
     "VERIFY_ONLY needs deployments/$NETWORK, which is not in this checkout. Pin the image to a ref that has the artifacts."
+  # hardhat builds its accounts config at startup and throws "Invalid mnemonic"
+  # without this file, so verify-all cannot even start. Verification signs
+  # nothing, so this is the public hardhat test mnemonic rather than the real
+  # key: a verify run has no business holding the thing that can deploy.
+  printf '%s' 'test test test test test test test test test test test junk' > mnemonic.secret
+  chmod 600 mnemonic.secret
+  trap 'rm -f mnemonic.secret' EXIT
   log "Verify on $NETWORK (VERIFY_ONLY — nothing will be deployed)"
   yarn hh verify-all --network "$NETWORK" || \
     echo "!! verify-all reported errors. The check below is what actually counts."

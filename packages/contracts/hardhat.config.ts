@@ -1017,9 +1017,10 @@ task(
 
       const qrcode = require('qrcode-terminal')
       qrcode.generate(wallet.address)
-      console.log(
-        `‍📬 Deployer Account is ${wallet.address} - ${wallet.privateKey}`
-      )
+      // The private key is already printed above under DEBUG. Printing it
+      // here too meant any non-interactive run of this task — CI, a Railway
+      // job — wrote the deploy key into a log store that outlives the run.
+      console.log(`‍📬 Deployer Account is ${wallet.address}`)
       for (const networkName in config.networks) {
         const network = config.networks[networkName]
         if (!('url' in network)) continue

@@ -28,7 +28,8 @@
 #   PUSH_ARTIFACTS=true     commit deployments/<network>/ back to the branch
 #   ARTIFACT_BRANCH=<name>  branch to push to (default: current)
 #   GITHUB_TOKEN=<token>    push credential, needed on a host with no git auth
-#   SKIP_BALANCE_CHECK=true skip the pre-deploy balance read
+#   SKIP_BALANCE_CHECK=true    deploy even if the deployer looks underfunded
+#   MIN_DEPLOYER_BALANCE=<eth> balance the preflight insists on (default 0.02)
 #
 # On an ephemeral host, keep a copy of DEPLOYER_MNEMONIC somewhere durable
 # before funding it. If the host dies between pass 1 and the ownership
@@ -58,13 +59,15 @@ chmod 600 mnemonic.secret
 # Do not leave a key on disk if the container is reused or an image is cached.
 trap 'rm -f mnemonic.secret' EXIT
 
-log "Deployer account"
-yarn hh account || fail "Could not derive the deployer account — is DEPLOYER_MNEMONIC a valid mnemonic?"
+# Not `yarn hh account`: that task prints the deployer's private key, and on a
+# CI or Railway job stdout is a log store that outlives the run. This prints
+# the address and the balance, checks the mnemonic parses, and refuses to go
+# on with a deployer that cannot pay for the deploy.
+[ "${SKIP_BALANCE_CHECK:-}" != "true" ] || export MIN_DEPLOYER_BALANCE=0
 
-if [ "${SKIP_BALANCE_CHECK:-}" != "true" ]; then
-  log "Deployer balance on $NETWORK"
-  yarn hh balance --network "$NETWORK" || fail "Could not read the deployer balance. Check the RPC URL."
-fi
+log "Deployer preflight on $NETWORK"
+yarn hh run --no-compile scripts/preflight-deployer.ts --network "$NETWORK" \
+  || fail "Deployer preflight failed — see the error above. A bad mnemonic, an unreachable RPC and an unfunded deployer all land here."
 
 # --- pass 1 ----------------------------------------------------------------
 log "Deploy pass 1 — $NETWORK"

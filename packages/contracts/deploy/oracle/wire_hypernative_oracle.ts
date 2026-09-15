@@ -25,6 +25,14 @@ import { logTxLink } from 'helpers/logTxLink'
  * admin moves to the Safe — but only after confirming the Safe actually holds
  * it, because renouncing first would leave the oracle permanently unadministered.
  */
+/**
+ * Hypernative's response wallet per chain — the address their monitoring
+ * signs blacklist/whitelist transactions from. It needs gas on that chain.
+ */
+const HYPERNATIVE_OPERATORS: Record<string, string> = {
+  robinhood: '0xa6af91a354e5acc23e0de58500828f40803c60aa',
+}
+
 const deployFn: DeployFunction = async (hre) => {
   hre.log('----------')
   hre.log('')
@@ -62,10 +70,20 @@ const deployFn: DeployFunction = async (hre) => {
   // Hypernative's own address: the one that calls blacklist()/whitelist() as
   // their monitoring decides. Without it the oracle is wired but nobody can
   // ever mark an account risky, which is protection in name only.
-  const operator = process.env.HYPERNATIVE_OPERATOR_ADDRESS
+  //
+  // Per chain, because Hypernative issues a separate response wallet for each.
+  // Recorded here rather than left to an environment variable so that wiring a
+  // chain does not depend on someone remembering to set one — a missing
+  // operator produces a firewall that looks installed and blocks nobody.
+  const operator =
+    process.env.HYPERNATIVE_OPERATOR_ADDRESS ??
+    HYPERNATIVE_OPERATORS[hre.network.name]
   if (operator !== undefined && operator !== '' && operator !== ZERO) {
     if (!(await oracle.hasRole(OPERATOR_ROLE, operator))) {
       hre.log(`  Granting OPERATOR_ROLE to ${operator}...`)
+      hre.log(
+        '  (it signs its own blacklist calls, so it needs gas on this chain)'
+      )
       const tx = await oracle.grantRole(OPERATOR_ROLE, operator)
       await tx.wait(1)
       await logTxLink(hre, tx.hash)
@@ -74,9 +92,12 @@ const deployFn: DeployFunction = async (hre) => {
     }
   } else {
     hre.log(
-      '  ⚠️  HYPERNATIVE_OPERATOR_ADDRESS is unset, so no operator can mark accounts risky.'
+      `  ⚠️  No Hypernative operator known for ${hre.network.name}, so no one can mark accounts risky.`
     )
-    hre.log('      The oracle will be wired but will never block anyone.')
+    hre.log(
+      '      The oracle would be wired and block nobody. Add the chain to'
+    )
+    hre.log('      HYPERNATIVE_OPERATORS, or set HYPERNATIVE_OPERATOR_ADDRESS.')
   }
 
   // Admin to the Safe, then off the deployer — in that order.

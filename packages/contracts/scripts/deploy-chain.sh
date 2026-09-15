@@ -72,6 +72,18 @@ if [ "${PUSH_ARTIFACTS:-}" = "true" ]; then
     [ -n "${GITHUB_TOKEN:-}" ] || fail \
       "PUSH_ARTIFACTS is set but this clone has no push credential and GITHUB_TOKEN is unset."
   fi
+  # Presence is not access. A token that is expired, scoped to the wrong repo
+  # or missing contents:write otherwise gets discovered at the push, which is
+  # after the deploy — exactly the failure this whole block exists to prevent.
+  # --dry-run runs the real authenticated negotiation and creates nothing, and
+  # works from the depth-1 clone the image makes.
+  if [ -n "${GITHUB_TOKEN:-}" ]; then
+    REPO_PATH="$(git remote get-url origin | sed -E 's#^https://[^/]+/##; s#^git@[^:]+:##; s#\.git$##')"
+    git push --dry-run -q \
+      "https://x-access-token:${GITHUB_TOKEN}@github.com/${REPO_PATH}.git" \
+      "HEAD:refs/heads/$ARTIFACT_BRANCH" >/dev/null 2>&1 || fail \
+      "GITHUB_TOKEN cannot push $REPO_PATH. Expired, scoped to another repo, or missing contents:write."
+  fi
 elif [ "${ALLOW_EPHEMERAL_ARTIFACTS:-}" != "true" ]; then
   fail "PUSH_ARTIFACTS is not \"true\", so the deployment artifacts would exist only on this host.
    If that is a container they are gone the moment it exits, and the next run

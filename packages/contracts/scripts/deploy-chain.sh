@@ -44,11 +44,52 @@ set -euo pipefail
 NETWORK="${NETWORK:?NETWORK is required (e.g. robinhood)}"
 # The env var name hardhat.config.ts reads for this chain's timelock.
 TIMELOCK_VAR="$(echo "$NETWORK" | tr '[:lower:]-' '[:upper:]_')_TIMELOCK_ADDRESS"
+# Same shape: ROBINHOOD_VERIFY_API_KEY, BASE_VERIFY_API_KEY, ...
+VERIFY_KEY_VAR="$(echo "$NETWORK" | tr '[:lower:]-' '[:upper:]_')_VERIFY_API_KEY"
 
 cd "$(dirname "$0")/.."   # packages/contracts
 
 log() { printf '\n\033[1m==> %s\033[0m\n' "$*"; }
 fail() { printf '\n\033[1;31m!! %s\033[0m\n' "$*" >&2; exit 1; }
+
+# Commit whatever artifacts exist right now. Called twice on purpose: once the
+# moment the deploy is done, and again at the end once verify and the subgraph
+# configs have had their turn. The first call is the one that matters — it is
+# what stops a crash in an optional later step taking the only record of a
+# finished deploy down with the container. $1 is the commit subject.
+push_artifacts() {
+  [ "${PUSH_ARTIFACTS:-}" = "true" ] || return 0
+  # A container clone has no push credential. Inject one for this run only,
+  # and keep it out of `git remote -v` and the process list where possible.
+  if [ -n "${GITHUB_TOKEN:-}" ] && [ -z "${REMOTE_AUTHED:-}" ]; then
+    REPO_PATH="$(git remote get-url origin | sed -E 's#^https://[^/]+/##; s#^git@[^:]+:##; s#\.git$##')"
+    git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${REPO_PATH}.git"
+    REMOTE_AUTHED=1
+  fi
+  # The image clones at depth 1; unshallow so the push has history to build on.
+  git fetch -q --unshallow origin 2>/dev/null || true
+  # .openzeppelin lives beside deployments/ in packages/contracts, not at the
+  # repo root. It held ../../ for long enough to matter: git add fails on a
+  # pathspec that matches nothing and stages *none* of the other paths with
+  # it, so PUSH_ARTIFACTS committed nothing at all.
+  for p in "deployments/$NETWORK" \
+           .openzeppelin \
+           ../subgraph/config/"$NETWORK".json \
+           ../subgraph-pool-v2/config/"$NETWORK".json; do
+    [ -e "$p" ] && git add "$p"
+  done
+  if git diff --cached --quiet; then
+    echo "Nothing new to commit."
+    return 0
+  fi
+  git -c user.name="teller-deploy" -c user.email="deploy@teller.org" \
+    commit -q -m "$1
+
+Written by scripts/deploy-chain.sh. Timelock: ${TIMELOCK_ADDRESS:-not yet deployed}"
+  git push origin "$ARTIFACT_REFSPEC" || fail \
+    "Could not push the artifacts to $ARTIFACT_BRANCH. They exist only in this container — copy the address table above before it exits."
+  echo "Pushed to $ARTIFACT_BRANCH."
+}
 
 # --- preflight -------------------------------------------------------------
 # Fail on missing inputs now, with a readable message, rather than 40 contracts
@@ -66,6 +107,12 @@ if [ "${PUSH_ARTIFACTS:-}" = "true" ]; then
   ARTIFACT_BRANCH="${ARTIFACT_BRANCH:-$(git rev-parse --abbrev-ref HEAD)}"
   [ "$ARTIFACT_BRANCH" != "HEAD" ] || fail \
     "PUSH_ARTIFACTS is set but HEAD is detached, so there is no branch to push to. Set ARTIFACT_BRANCH."
+  # Spelled once. `HEAD:<branch>` is rejected outright when <branch> does not
+  # exist on the remote — git cannot tell whether you meant a branch or a tag
+  # and refuses to guess. The probe and the push must use the *same* refspec:
+  # when they did not, the probe passed, the push failed, and a finished
+  # mainnet deploy went into a container that then exited.
+  ARTIFACT_REFSPEC="HEAD:refs/heads/$ARTIFACT_BRANCH"
   # A container clone has no credential helper and no keys. Find out now, not
   # after a successful deploy with nowhere to put the result.
   if ! git config --get-regexp '^credential\.' >/dev/null 2>&1; then
@@ -81,7 +128,7 @@ if [ "${PUSH_ARTIFACTS:-}" = "true" ]; then
     REPO_PATH="$(git remote get-url origin | sed -E 's#^https://[^/]+/##; s#^git@[^:]+:##; s#\.git$##')"
     git push --dry-run -q \
       "https://x-access-token:${GITHUB_TOKEN}@github.com/${REPO_PATH}.git" \
-      "HEAD:refs/heads/$ARTIFACT_BRANCH" >/dev/null 2>&1 || fail \
+      "$ARTIFACT_REFSPEC" >/dev/null 2>&1 || fail \
       "GITHUB_TOKEN cannot push $REPO_PATH. Expired, scoped to another repo, or missing contents:write."
   fi
 elif [ "${ALLOW_EPHEMERAL_ARTIFACTS:-}" != "true" ]; then
@@ -90,6 +137,17 @@ elif [ "${ALLOW_EPHEMERAL_ARTIFACTS:-}" != "true" ]; then
    redeploys everything instead of resuming. Set PUSH_ARTIFACTS=true (with
    GITHUB_TOKEN and ARTIFACT_BRANCH), or ALLOW_EPHEMERAL_ARTIFACTS=true if you
    really are deploying somewhere the files survive."
+fi
+
+# Verification needs its key up front too. Etherscan V2 covers chain 4663 and
+# every other network here off one key, so this is nearly always just
+# ETHERSCANV2_VERIFY_API_KEY — but an unverified lending protocol is not
+# something to discover after the fact, when re-verifying means having kept
+# the artifacts and running the whole thing again.
+if [ "${SKIP_VERIFY:-}" != "true" ]; then
+  eval "NETWORK_VERIFY_KEY=\${${VERIFY_KEY_VAR}:-}"
+  [ -n "${NETWORK_VERIFY_KEY}${ETHERSCANV2_VERIFY_API_KEY:-}" ] || fail \
+    "No verification key: set ETHERSCANV2_VERIFY_API_KEY (Etherscan V2, one key for every chain it lists) or $VERIFY_KEY_VAR, or SKIP_VERIFY=true to deploy unverified."
 fi
 
 # hardhat reads the deploy key from this file, not the environment.
@@ -132,6 +190,12 @@ export "$TIMELOCK_VAR=$TIMELOCK_ADDRESS"
 log "Deploy pass 2 — $NETWORK (ownership transfers)"
 yarn hh deploy --network "$NETWORK"
 
+# The chain is now deployed. Get the record out before doing anything that can
+# fail — verify talks to an explorer API, and on a new chain that is the least
+# reliable thing in the stack.
+log "Committing artifacts to $ARTIFACT_BRANCH (deploy complete)"
+push_artifacts "Add $NETWORK deployment artifacts"
+
 # --- verify ----------------------------------------------------------------
 # Never fatal: unverified contracts are a cosmetic problem, and on a new chain
 # the explorer's API is the least reliable part of the stack.
@@ -166,39 +230,11 @@ for (const [n, a] of rows) console.log(n.padEnd(w) + "  " + a);
 BLOCK_FILE="deployments/$NETWORK/.latestDeploymentBlock"
 [ -f "$BLOCK_FILE" ] && log "Start block: $(cat "$BLOCK_FILE")"
 
-# On an ephemeral host the artifacts die with the container, and they are the
-# only record of where anything landed — the subgraph configs, the frontend and
-# the published manifest all read them. Commit them back when asked to.
+# Second pass at the artifacts: the subgraph configs did not exist at the first
+# call, and verify may have written to .openzeppelin.
 if [ "${PUSH_ARTIFACTS:-}" = "true" ]; then
-  log "Committing artifacts back to $ARTIFACT_BRANCH"
-  # A container clone has no push credential. Inject one for this run only,
-  # and keep it out of `git remote -v` and the process list where possible.
-  if [ -n "${GITHUB_TOKEN:-}" ]; then
-    REPO_PATH="$(git remote get-url origin | sed -E 's#^https://[^/]+/##; s#^git@[^:]+:##; s#\.git$##')"
-    git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${REPO_PATH}.git"
-  fi
-  # The image clones at depth 1, and git will not push from a shallow repo.
-  git fetch -q --unshallow origin 2>/dev/null || true
-  # .openzeppelin lives beside deployments/ in packages/contracts, not at the
-  # repo root. It held ../../ for long enough to matter: git add fails on a
-  # pathspec that matches nothing and stages *none* of the other paths with
-  # it, so PUSH_ARTIFACTS committed nothing at all.
-  for p in "deployments/$NETWORK" \
-           .openzeppelin \
-           ../subgraph/config/"$NETWORK".json \
-           ../subgraph-pool-v2/config/"$NETWORK".json; do
-    [ -e "$p" ] && git add "$p"
-  done
-  if git diff --cached --quiet; then
-    echo "Nothing new to commit."
-  else
-    git -c user.name="teller-deploy" -c user.email="deploy@teller.org" \
-      commit -q -m "Add $NETWORK deployment artifacts
-
-Written by scripts/deploy-chain.sh. Timelock: $TIMELOCK_ADDRESS"
-    git push origin "HEAD:$ARTIFACT_BRANCH"
-    echo "Pushed to $ARTIFACT_BRANCH."
-  fi
+  log "Committing subgraph configs to $ARTIFACT_BRANCH"
+  push_artifacts "Add $NETWORK subgraph configs"
 else
   cat <<EOF
 

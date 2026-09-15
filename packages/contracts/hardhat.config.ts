@@ -361,11 +361,16 @@ export default <HardhatUserConfig>{
         },
       },
       {
-        // Etherscan V2 coverage for 4663 is unconfirmed. If `yarn contracts
-        // verify --network robinhood` fails, switch to Blockscout with:
-        //   ROBINHOOD_VERIFY_API_URL=https://robinhoodchain.blockscout.com/api
-        //   ROBINHOOD_EXPLORER_URL=https://robinhoodchain.blockscout.com
-        //   ROBINHOOD_VERIFY_API_KEY=abc
+        // Etherscan V2 covers 4663: api.etherscan.io/v2/chainlist lists it as
+        // "Robinhood Chain", status 1, explorer robin.etherscan.io. So one
+        // ETHERSCANV2_VERIFY_API_KEY verifies here the same as on base or
+        // optimism, and there is nothing chain-specific to configure.
+        //
+        // robinscan.io is a *different* explorer — a Blockscout — so it does
+        // not pair with the Etherscan V2 apiURL below. To use it instead:
+        //   ROBINHOOD_VERIFY_API_URL=https://robinscan.io/api
+        //   ROBINHOOD_EXPLORER_URL=https://robinscan.io
+        //   ROBINHOOD_VERIFY_API_KEY=abc   (Blockscout ignores the value)
         network: 'robinhood',
         chainId: 4663,
         urls: {
@@ -373,7 +378,7 @@ export default <HardhatUserConfig>{
             process.env.ROBINHOOD_VERIFY_API_URL ??
             'https://api.etherscan.io/v2/api?chainid=4663',
           browserURL:
-            process.env.ROBINHOOD_EXPLORER_URL ?? 'https://robinscan.io',
+            process.env.ROBINHOOD_EXPLORER_URL ?? 'https://robin.etherscan.io',
         },
       },
       {

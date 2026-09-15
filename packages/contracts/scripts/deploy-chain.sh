@@ -29,6 +29,9 @@
 #   ARTIFACT_BRANCH=<name>  branch to push to (default: current; required when
 #                           HEAD is detached, as it is in the deploy image)
 #   GITHUB_TOKEN=<token>    push credential, needed on a host with no git auth
+#   PUBLISH_PACKAGE=true    publish @teller-protocol/v2-contracts when done,
+#                           patch-bumped from whatever npm currently has
+#   NPM_TOKEN=<token>       npm credential, required by PUBLISH_PACKAGE
 #   ALLOW_EPHEMERAL_ARTIFACTS=true
 #                           deploy without preserving the artifacts anywhere.
 #                           Only for a host where the files actually survive.
@@ -108,6 +111,13 @@ Written by scripts/deploy-chain.sh. Timelock: ${TIMELOCK_ADDRESS:-not yet deploy
 # deep with a stack trace.
 
 [ -n "${SAFE_GLOBAL_API_KEY:-}" ] || fail "SAFE_GLOBAL_API_KEY is not set (hardhat refuses to start without it)."
+
+# Publishing is how the frontends find out a chain exists at all, so the
+# credential for it is a preflight concern like any other.
+if [ "${PUBLISH_PACKAGE:-}" = "true" ]; then
+  [ -n "${NPM_TOKEN:-}" ] || fail \
+    "PUBLISH_PACKAGE is set but NPM_TOKEN is not. The package cannot be published without it."
+fi
 
 # Verification alone, against deployment artifacts already in the repo.
 #
@@ -295,6 +305,66 @@ else
   PUSH_ARTIFACTS is not "true", so deployments/$NETWORK/ exists only on this
   host. If that is a container, the table above is the only record — copy it.
   Set PUSH_ARTIFACTS=true to have the run commit the artifacts to the branch.
+EOF
+fi
+
+# --- publish ---------------------------------------------------------------
+# @teller-protocol/v2-contracts is how every frontend learns a chain exists:
+# the network switcher keys off contracts.json carrying that chain's TellerV2
+# address, and useContracts reads the same file. A chain that is deployed,
+# verified and indexed but never published is still invisible in the app.
+#
+# Runs last on purpose. Publishing is the one step here that cannot be undone
+# — npm forbids re-using a version number — so it goes after everything that
+# might still fail.
+if [ "${PUBLISH_PACKAGE:-}" = "true" ]; then
+  log "Publish @teller-protocol/v2-contracts"
+  PKG="$(node -p "require('./package.json').name")"
+  CHAIN_ID="$(cat "deployments/$NETWORK/.chainId")"
+
+  # The version field in the tree has drifted well behind the registry (3.1.51
+  # committed against 3.1.61 published), so npm is the only trustworthy base.
+  LATEST="$(npm view "$PKG" version 2>/dev/null || true)"
+  [ -n "$LATEST" ] || fail "Could not read the published version of $PKG from npm."
+  NEXT="$(node -e 'const [a,b,c] = process.argv[1].split(".").map(Number); console.log([a, b, c + 1].join("."))' "$LATEST")"
+  log "npm has $LATEST — publishing $NEXT"
+  node -e 'const fs = require("fs"); const j = JSON.parse(fs.readFileSync("./package.json", "utf8")); j.version = process.argv[1]; fs.writeFileSync("./package.json", JSON.stringify(j, null, 2) + "\n")' "$NEXT"
+
+  # prepack compiles and regenerates build/hardhat/contracts.json, and `yarn
+  # npm publish` would run it anyway. Running it here first means the tarball
+  # can be inspected before it is public: a published package that does not
+  # carry the chain just deployed is worse than no package, because every
+  # frontend will believe it.
+  node ./scripts/prepack.js
+  node -e '
+    const j = require("./build/hardhat/contracts.json");
+    const id = process.argv[1];
+    const addr = j[id] && j[id].contracts && j[id].contracts.TellerV2 && j[id].contracts.TellerV2.address;
+    if (!addr) { console.error("contracts.json has no TellerV2 for chain " + id); process.exit(1); }
+    console.log("contracts.json carries chain " + id + " -> " + addr);
+  ' "$CHAIN_ID" || fail \
+    "The package would not carry $NETWORK (chain $CHAIN_ID). Refusing to publish."
+
+  YARN_NPM_AUTH_TOKEN="$NPM_TOKEN" yarn npm publish --access public \
+    || fail "npm publish failed. Nothing was published; the version bump is uncommitted."
+  echo "Published $PKG@$NEXT"
+
+  # Record the version that went out, so the tree stops drifting from npm.
+  if [ "${PUSH_ARTIFACTS:-}" = "true" ]; then
+    git add package.json
+    if ! git diff --cached --quiet; then
+      git -c user.name="teller-deploy" -c user.email="deploy@teller.org" \
+        commit -q -m "Publish $PKG@$NEXT with $NETWORK"
+      git push origin "$ARTIFACT_REFSPEC" || \
+        echo "!! Published $NEXT but could not push the version bump."
+    fi
+  fi
+else
+  cat <<EOF
+
+  PUBLISH_PACKAGE is not "true", so $NETWORK is deployed but not published.
+  The frontends read @teller-protocol/v2-contracts and will not show this
+  chain until a release carries it.
 EOF
 fi
 

@@ -1,0 +1,82 @@
+{
+  "chainId": 4663,
+  "principal": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+  "markets": {
+    "short": {
+      "marketId": "3",
+      "owner": "0x8cfd836B4FCD05414f63523BC02f24bda992aa20",
+      "txHash": "0x8bdc42f52384f98390acc751024c353f96ce461f49e9354a046808a01e05d56a"
+    },
+    "long": {
+      "marketId": "4",
+      "owner": "0x8cfd836B4FCD05414f63523BC02f24bda992aa20",
+      "txHash": "0x2a20e287ead87f40c47bd705a3ac96b7deeac732998d9df20c12a8980429e3c7"
+    }
+  },
+  "pools": {
+    "short:SGOV": {
+      "address": "0xb7e61f197077e1eb58713994d9122672026b31c3",
+      "txHash": "0x1a026ff246cc45785292c3071523d15328632b1bd8e00d0a95030cec6c5eaeb1"
+    },
+    "short:GLD": {
+      "address": "0x9efbd4d34af7f45c1f6e9c9d7ae0434553779e54",
+      "txHash": "0x67f7b0ef2172ba1124a95701e10ed551209d475fe495858e21f1986e0708dc7a"
+    },
+    "short:QQQ": {
+      "address": "0x413ce7640d1c0437afb0d3277b458ae2f7ff4c15",
+      "txHash": "0xc7368b1f0c31bc6fc281b43ec518004d3e3d2d4a8aab9c96438d789cd0d9f80a"
+    },
+    "short:WETH": {
+      "address": "0xb2cdd569dfacec4cba6089a8644c9e960244d710",
+      "txHash": "0x3ec513b865d0bd51847cea3d918564621a5bd7a373694da8338573f32adcf5c8"
+    },
+    "short:NVDA": {
+      "address": "0xb99dce81c308316a489412dbfe1dda05cf80afea",
+      "txHash": "0x64ca30a5014142281d78cd4eed607f1a95c0a6add33111aca031bac6b6ad9b50"
+    },
+    "short:GOOGL": {
+      "address": "0x9719574da3dc173afc8667e9cbb20001adac71fb",
+      "txHash": "0x4cbe9c7f21fbecc59a28478fbe3b97d7de7b126b6454e4c58e60061deb2502ab"
+    },
+    "short:AMZN": {
+      "address": "0xcab943aa7e12779fdd103d8c90ccbce3fdb7d8d7",
+      "txHash": "0xbab69948f0d1234c88e11a2a419be2634668579a6dc6b7c1d72d03ac616dd6e6"
+    },
+    "short:TSLA": {
+      "address": "0xd2932288cdd4ffa76f28a4a933bee092fb834acb",
+      "txHash": "0x6ba335bef8bc53cee8d8d49c657235038512a933d52f47752250af8f0d657994"
+    },
+    "long:SGOV": {
+      "address": "0x02a7b8c40d32fe0d59c256a8a18c13b8cdb903a8",
+      "txHash": "0xb66c892860e53c45bd23861c7a6f7c0f6f03fb4bd2d743c386114f647064f316"
+    },
+    "long:GLD": {
+      "address": "0x21649a825fe341a26b152d2d8d954e4658baaf7a",
+      "txHash": "0xf0b4cd9b5e342cef7a3005e1fbf22c82b4d4d378973d6a5719107c1942d76f62"
+    },
+    "long:QQQ": {
+      "address": "0x2164eaf107f4a2092da474e45702f8913c74286d",
+      "txHash": "0xf0be8551832d0444bfa1a6bf5411fd82376d127b9341a2289218b7c33c7aaf12"
+    },
+    "long:WETH": {
+      "address": "0xe1827a75cdc43584bb0ff9ab4839d074c5ae6bd7",
+      "txHash": "0xb5492fb1856b83f4bbdcbe085dd8e693d832759bea4abe0b4b684bfc2da69165"
+    },
+    "long:NVDA": {
+      "address": "0xfb59df4f7bc962d2fce24850912718c2df976a23",
+      "txHash": "0x3a804d36823d9c8cd868425781aaf6815874c439806e0349fd1f7c8143933c30"
+    },
+    "long:GOOGL": {
+      "address": "0xe86c7bfc794cc254878eac1ed6659ef7d99a53b7",
+      "txHash": "0xece506a7d52ca04bd96bae570b93cf0a15f9f11feb6ec861e8f2e15c32af4a41"
+    },
+    "long:AMZN": {
+      "address": "0x0eb465dc7ee6205357dc224027907642b94cc65a",
+      "txHash": "0xc638d072dc80260e8d3fcffa28dd81cd86520f4d4e9fa872852cb1a0ac5abfd8"
+    },
+    "long:TSLA": {
+      "address": "0x2f960341d614fcc34392b3cb2442ba4f8d8a44f6",
+      "txHash": "0xccde20666fa8a5d2cd610206e272a6dac017709037f36ae9e930d1a05b9a715f"
+    }
+  }
+}

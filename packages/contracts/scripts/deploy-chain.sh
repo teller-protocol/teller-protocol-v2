@@ -67,6 +67,47 @@ fail() { printf '\n\033[1;31m!! %s\033[0m\n' "$*" >&2; exit 1; }
 # configs have had their turn. The first call is the one that matters — it is
 # what stops a crash in an optional later step taking the only record of a
 # finished deploy down with the container. $1 is the commit subject.
+# Where the artifacts are going, decided before the work rather than after it.
+# deployments/<network>/ and .openzeppelin/ are the only record of where
+# anything landed and which implementation is behind which proxy; on an
+# ephemeral host they die with the container, and a re-run without them
+# redeploys the whole protocol from scratch rather than resuming.
+#
+# A function because the early-exit modes need it too. BOOTSTRAP_MARKETS
+# called push_artifacts while this was still inline below them, so
+# ARTIFACT_REFSPEC was unset and the run died on `unbound variable` — after
+# creating two markets and sixteen pools whose addresses then went nowhere.
+prepare_artifact_push() {
+  [ "${PUSH_ARTIFACTS:-}" = "true" ] || return 0
+  ARTIFACT_BRANCH="${ARTIFACT_BRANCH:-$(git rev-parse --abbrev-ref HEAD)}"
+  [ "$ARTIFACT_BRANCH" != "HEAD" ] || fail \
+    "PUSH_ARTIFACTS is set but HEAD is detached, so there is no branch to push to. Set ARTIFACT_BRANCH."
+  # Spelled once. `HEAD:<branch>` is rejected outright when <branch> does not
+  # exist on the remote — git cannot tell whether you meant a branch or a tag
+  # and refuses to guess. The probe and the push must use the *same* refspec:
+  # when they did not, the probe passed, the push failed, and a finished
+  # mainnet deploy went into a container that then exited.
+  ARTIFACT_REFSPEC="HEAD:refs/heads/$ARTIFACT_BRANCH"
+  # A container clone has no credential helper and no keys. Find out now, not
+  # after a successful deploy with nowhere to put the result.
+  if ! git config --get-regexp '^credential\.' >/dev/null 2>&1; then
+    [ -n "${GITHUB_TOKEN:-}" ] || fail \
+      "PUSH_ARTIFACTS is set but this clone has no push credential and GITHUB_TOKEN is unset."
+  fi
+  # Presence is not access. A token that is expired, scoped to the wrong repo
+  # or missing contents:write otherwise gets discovered at the push, which is
+  # after the deploy — exactly the failure this whole block exists to prevent.
+  # --dry-run runs the real authenticated negotiation and creates nothing, and
+  # works from the depth-1 clone the image makes.
+  if [ -n "${GITHUB_TOKEN:-}" ]; then
+    REPO_PATH="$(git remote get-url origin | sed -E 's#^https://[^/]+/##; s#^git@[^:]+:##; s#\.git$##')"
+    git push --dry-run -q \
+      "https://x-access-token:${GITHUB_TOKEN}@github.com/${REPO_PATH}.git" \
+      "$ARTIFACT_REFSPEC" >/dev/null 2>&1 || fail \
+      "GITHUB_TOKEN cannot push $REPO_PATH. Expired, scoped to another repo, or missing contents:write."
+  fi
+}
+
 push_artifacts() {
   [ "${PUSH_ARTIFACTS:-}" = "true" ] || return 0
   # A container clone has no push credential. Inject one for this run only,
@@ -172,6 +213,11 @@ if [ "${BOOTSTRAP_MARKETS:-}" = "true" ]; then
   chmod 600 mnemonic.secret
   trap 'rm -f mnemonic.secret' EXIT
 
+  # Before the first transaction, not after the last one. The receipt is the
+  # only thing that stops a re-run creating a second set of markets, so a run
+  # that cannot push it is worse than one that never started.
+  prepare_artifact_push
+
   log "Deployer preflight on $NETWORK"
   yarn hh run --no-compile scripts/preflight-deployer.ts --network "$NETWORK" \
     || fail "Deployer preflight failed."
@@ -224,40 +270,8 @@ fi
 
 [ -n "${DEPLOYER_MNEMONIC:-}" ] || fail "DEPLOYER_MNEMONIC is not set."
 
-# Where the artifacts are going, decided before the deploy rather than after
-# it. deployments/<network>/ and .openzeppelin/ are the only record of where
-# anything landed and which implementation is behind which proxy; on an
-# ephemeral host they die with the container, and a re-run without them
-# redeploys the whole protocol from scratch rather than resuming.
-if [ "${PUSH_ARTIFACTS:-}" = "true" ]; then
-  ARTIFACT_BRANCH="${ARTIFACT_BRANCH:-$(git rev-parse --abbrev-ref HEAD)}"
-  [ "$ARTIFACT_BRANCH" != "HEAD" ] || fail \
-    "PUSH_ARTIFACTS is set but HEAD is detached, so there is no branch to push to. Set ARTIFACT_BRANCH."
-  # Spelled once. `HEAD:<branch>` is rejected outright when <branch> does not
-  # exist on the remote — git cannot tell whether you meant a branch or a tag
-  # and refuses to guess. The probe and the push must use the *same* refspec:
-  # when they did not, the probe passed, the push failed, and a finished
-  # mainnet deploy went into a container that then exited.
-  ARTIFACT_REFSPEC="HEAD:refs/heads/$ARTIFACT_BRANCH"
-  # A container clone has no credential helper and no keys. Find out now, not
-  # after a successful deploy with nowhere to put the result.
-  if ! git config --get-regexp '^credential\.' >/dev/null 2>&1; then
-    [ -n "${GITHUB_TOKEN:-}" ] || fail \
-      "PUSH_ARTIFACTS is set but this clone has no push credential and GITHUB_TOKEN is unset."
-  fi
-  # Presence is not access. A token that is expired, scoped to the wrong repo
-  # or missing contents:write otherwise gets discovered at the push, which is
-  # after the deploy — exactly the failure this whole block exists to prevent.
-  # --dry-run runs the real authenticated negotiation and creates nothing, and
-  # works from the depth-1 clone the image makes.
-  if [ -n "${GITHUB_TOKEN:-}" ]; then
-    REPO_PATH="$(git remote get-url origin | sed -E 's#^https://[^/]+/##; s#^git@[^:]+:##; s#\.git$##')"
-    git push --dry-run -q \
-      "https://x-access-token:${GITHUB_TOKEN}@github.com/${REPO_PATH}.git" \
-      "$ARTIFACT_REFSPEC" >/dev/null 2>&1 || fail \
-      "GITHUB_TOKEN cannot push $REPO_PATH. Expired, scoped to another repo, or missing contents:write."
-  fi
-elif [ "${ALLOW_EPHEMERAL_ARTIFACTS:-}" != "true" ]; then
+prepare_artifact_push
+if [ "${PUSH_ARTIFACTS:-}" != "true" ] && [ "${ALLOW_EPHEMERAL_ARTIFACTS:-}" != "true" ]; then
   fail "PUSH_ARTIFACTS is not \"true\", so the deployment artifacts would exist only on this host.
    If that is a container they are gone the moment it exits, and the next run
    redeploys everything instead of resuming. Set PUSH_ARTIFACTS=true (with

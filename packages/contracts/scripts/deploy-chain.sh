@@ -34,6 +34,11 @@
 #   NPM_TOKEN=<token>       npm credential, required by PUBLISH_PACKAGE
 #   RUN_TAGS=<tags>         run only these deploy tags and stop. For wiring an
 #                           already-deployed chain without a full run.
+#   BOOTSTRAP_MARKETS=true  create the markets and lender pools for an already
+#                           deployed chain and stop. A full run does this on
+#                           its own; this is for re-running it alone.
+#   BOOTSTRAP_DRY_RUN=true  with BOOTSTRAP_MARKETS, print the plan and send
+#                           nothing.
 #   ALLOW_EPHEMERAL_ARTIFACTS=true
 #                           deploy without preserving the artifacts anywhere.
 #                           Only for a host where the files actually survive.
@@ -148,6 +153,38 @@ if [ -n "${RUN_TAGS:-}" ]; then
   log "Running tags [$RUN_TAGS] on $NETWORK"
   yarn hh deploy --network "$NETWORK" --tags "$RUN_TAGS"
   log "Done — $NETWORK (tags: $RUN_TAGS)"
+  exit 0
+fi
+
+# Markets and lender pools, against a protocol that is already deployed.
+#
+# Separated from the deploy for the same reason as RUN_TAGS: creating markets
+# is cheap and idempotent, but reaching it through a full run on a chain whose
+# artifacts went missing would mint a second protocol. The task itself skips
+# anything already recorded in market-bootstrap.json, so re-running is safe.
+if [ "${BOOTSTRAP_MARKETS:-}" = "true" ]; then
+  [ -d "deployments/$NETWORK" ] || fail \
+    "BOOTSTRAP_MARKETS needs deployments/$NETWORK in this checkout."
+  [ -f "config/chain-bootstrap/$NETWORK.ts" ] || fail \
+    "No config/chain-bootstrap/$NETWORK.ts. Add one before bootstrapping $NETWORK."
+  [ -n "${DEPLOYER_MNEMONIC:-}" ] || fail "DEPLOYER_MNEMONIC is not set."
+  printf '%s' "$DEPLOYER_MNEMONIC" > mnemonic.secret
+  chmod 600 mnemonic.secret
+  trap 'rm -f mnemonic.secret' EXIT
+
+  log "Deployer preflight on $NETWORK"
+  yarn hh run --no-compile scripts/preflight-deployer.ts --network "$NETWORK" \
+    || fail "Deployer preflight failed."
+
+  log "Bootstrap markets and pools on $NETWORK"
+  yarn hh bootstrap-markets --network "$NETWORK" ${BOOTSTRAP_DRY_RUN:+--dry-run true}
+
+  if [ "${PUSH_ARTIFACTS:-}" = "true" ] && [ "${BOOTSTRAP_DRY_RUN:-}" != "true" ]; then
+    log "Committing bootstrap receipt to $ARTIFACT_BRANCH"
+    push_artifacts "Add $NETWORK markets and lender pools"
+  fi
+
+  log "Done — $NETWORK (markets and pools)"
   exit 0
 fi
 
@@ -306,6 +343,19 @@ yarn hh deploy --network "$NETWORK" --tags validate-deployments
 # --- subgraph configs ------------------------------------------------------
 log "Fill subgraph configs from the artifacts"
 node scripts/fill-subgraph-config.js "$NETWORK"
+
+# --- markets and pools -----------------------------------------------------
+# A chain with contracts but no markets has nothing for a borrower to bid into
+# and nothing for a lender to deposit against, so every new chain gets the
+# standard set. Chains without a config/chain-bootstrap entry are skipped
+# rather than failed: the protocol is still correctly deployed without it.
+if [ -f "config/chain-bootstrap/$NETWORK.ts" ]; then
+  log "Bootstrap markets and pools on $NETWORK"
+  yarn hh bootstrap-markets --network "$NETWORK" \
+    || echo "!! bootstrap-markets failed. The protocol is deployed; re-run with BOOTSTRAP_MARKETS=true."
+else
+  log "No config/chain-bootstrap/$NETWORK.ts — skipping markets and pools"
+fi
 
 # --- report ----------------------------------------------------------------
 # The container is ephemeral, so the addresses have to leave in the logs at

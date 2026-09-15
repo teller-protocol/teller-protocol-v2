@@ -13,18 +13,18 @@
   },
   "block_handler": {
     "enabled": false,
-    "block": "DEPLOY_BLOCK"
+    "block": "63548250"
   },
   "contracts": {
     "teller_v2": {
       "enabled": true,
-      "address": "TELLER_V2_ADDRESS",
-      "block": "DEPLOY_BLOCK"
+      "address": "0x8Ca0de7d034ca7Eec2f014985e7AFBbD9b541FC9",
+      "block": "63548250"
     },
     "market_registry": {
       "enabled": true,
-      "address": "MARKET_REGISTRY_ADDRESS",
-      "block": "DEPLOY_BLOCK"
+      "address": "0x97bd588aBDF5c80A5b2390201f87DAc9aF1D5FA8",
+      "block": "63548250"
     },
     "lender_commitment": {
       "enabled": false,
@@ -38,23 +38,23 @@
     },
     "lender_commitment_alpha": {
       "enabled": true,
-      "address": "LENDER_COMMITMENT_FORWARDER_ALPHA_ADDRESS",
-      "block": "DEPLOY_BLOCK"
+      "address": "0xA4BEE25b19c3C635505475A1761f867e2019765b",
+      "block": "63548250"
     },
     "collateral_manager": {
       "enabled": true,
-      "address": "COLLATERAL_MANAGER_ADDRESS",
-      "block": "DEPLOY_BLOCK"
+      "address": "0xcA02ccF87B8A1C7141420a5Bd057836884bD232e",
+      "block": "63548250"
     },
     "lender_manager": {
       "enabled": true,
-      "address": "LENDER_MANAGER_ADDRESS",
-      "block": "DEPLOY_BLOCK"
+      "address": "0x5f0629D20dc80Ea2b45A619F313d2d4F39cf4543",
+      "block": "63548250"
     },
     "market_liquidity_rewards": {
       "enabled": true,
-      "address": "MARKET_LIQUIDITY_REWARDS_ADDRESS",
-      "block": "DEPLOY_BLOCK"
+      "address": "0x8cFd0937fbe22fcaA5dc9b75A8d35d063BfCC24A",
+      "block": "63548250"
     }
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "@teller-protocol/v2-contracts",
-  "version": "3.1.51",
+  "version": "3.1.61",
   "license": "MIT",
   "scripts": {
     "forge": "forge",
@@ -32,7 +32,6 @@
     "format:sol": "prettier --config .prettierrc.yml --resolve-plugins-relative-to . --write --loglevel error '{contracts,tests}/**/*.sol'",
     "git:future": "./scripts/git/future.sh",
     "git:portal": "./scripts/git/portal.sh",
-    "publish": "yarn npm publish",
     "clean": "yarn hh clean && ./scripts/clean.sh",
     "prepacklegacy": "./scripts/prepack.sh",
     "prepack": "node ./scripts/prepack.js",

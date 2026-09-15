@@ -8,6 +8,7 @@ import { LenderCommitmentGroup_Pool_V3 } from "../../contracts/LenderCommitmentF
 
 contract LenderCommitmentGroup_Pool_V3_Override is LenderCommitmentGroup_Pool_V3 {
     uint256 mockRequiredCollateralAmount;
+    bool useRealGetRequiredCollateral;
     uint256 mockSharesExchangeRate;
     int256 mockMinimumAmountDifferenceToCloseDefaultedLoan;
 
@@ -101,6 +102,10 @@ contract LenderCommitmentGroup_Pool_V3_Override is LenderCommitmentGroup_Pool_V3
         mockRequiredCollateralAmount = amt;
     }
 
+    function set_useRealGetRequiredCollateral(bool _use) public {
+        useRealGetRequiredCollateral = _use;
+    }
+
     function force_mint_shares(address guy, uint256 wad) public {
         return super.mintShares(guy, wad);
     }
@@ -134,8 +139,11 @@ contract LenderCommitmentGroup_Pool_V3_Override is LenderCommitmentGroup_Pool_V3
 
     function getRequiredCollateral(
         uint256 _principalAmount,
-        uint256 maxPrincipalPerCollateralAmount
+        uint256 _maxPrincipalPerCollateralAmountQ96
     ) internal view override returns (uint256) {
+        if (useRealGetRequiredCollateral) {
+            return super.getRequiredCollateral(_principalAmount, _maxPrincipalPerCollateralAmountQ96);
+        }
         return mockRequiredCollateralAmount;
     }
 

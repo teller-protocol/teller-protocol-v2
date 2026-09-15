@@ -176,8 +176,16 @@ if [ "${BOOTSTRAP_MARKETS:-}" = "true" ]; then
   yarn hh run --no-compile scripts/preflight-deployer.ts --network "$NETWORK" \
     || fail "Deployer preflight failed."
 
-  log "Bootstrap markets and pools on $NETWORK"
-  yarn hh bootstrap-markets --network "$NETWORK" ${BOOTSTRAP_DRY_RUN:+--dry-run true}
+  # Compare against "true" rather than using ${VAR:+...}, which expands on any
+  # non-empty value — including the string "false", which would silently turn
+  # a real run into a dry one.
+  if [ "${BOOTSTRAP_DRY_RUN:-}" = "true" ]; then
+    log "Bootstrap markets and pools on $NETWORK (dry run — nothing will be sent)"
+    yarn hh bootstrap-markets --network "$NETWORK" --dry-run true
+  else
+    log "Bootstrap markets and pools on $NETWORK"
+    yarn hh bootstrap-markets --network "$NETWORK"
+  fi
 
   if [ "${PUSH_ARTIFACTS:-}" = "true" ] && [ "${BOOTSTRAP_DRY_RUN:-}" != "true" ]; then
     log "Committing bootstrap receipt to $ARTIFACT_BRANCH"

@@ -32,6 +32,8 @@
 #   PUBLISH_PACKAGE=true    publish @teller-protocol/v2-contracts when done,
 #                           patch-bumped from whatever npm currently has
 #   NPM_TOKEN=<token>       npm credential, required by PUBLISH_PACKAGE
+#   RUN_TAGS=<tags>         run only these deploy tags and stop. For wiring an
+#                           already-deployed chain without a full run.
 #   ALLOW_EPHEMERAL_ARTIFACTS=true
 #                           deploy without preserving the artifacts anywhere.
 #                           Only for a host where the files actually survive.
@@ -117,6 +119,36 @@ Written by scripts/deploy-chain.sh. Timelock: ${TIMELOCK_ADDRESS:-not yet deploy
 if [ "${PUBLISH_PACKAGE:-}" = "true" ]; then
   [ -n "${NPM_TOKEN:-}" ] || fail \
     "PUBLISH_PACKAGE is set but NPM_TOKEN is not. The package cannot be published without it."
+fi
+
+# A single deploy tag, against a chain that is already deployed.
+#
+# Wiring steps — granting a role, pointing the forwarder at an oracle — are
+# ordinary deploy scripts, but reaching them through a full run means paying
+# for two passes and a verification sweep to execute one of them. Worse, on a
+# chain whose artifacts went missing it would deploy a second protocol. This
+# runs the named tags and stops.
+#
+# hardhat-deploy still resolves each tag's dependencies, and skips any script
+# whose id is already recorded in deployments/<network>/.migrations.json — so
+# the dependencies resolve to no-ops on a chain that is already deployed, and
+# fail loudly rather than silently redeploying if the artifacts are absent.
+if [ -n "${RUN_TAGS:-}" ]; then
+  [ -d "deployments/$NETWORK" ] || fail \
+    "RUN_TAGS needs deployments/$NETWORK in this checkout, or its dependencies would deploy a second protocol."
+  [ -n "${DEPLOYER_MNEMONIC:-}" ] || fail "DEPLOYER_MNEMONIC is not set."
+  printf '%s' "$DEPLOYER_MNEMONIC" > mnemonic.secret
+  chmod 600 mnemonic.secret
+  trap 'rm -f mnemonic.secret' EXIT
+
+  log "Deployer preflight on $NETWORK"
+  yarn hh run --no-compile scripts/preflight-deployer.ts --network "$NETWORK" \
+    || fail "Deployer preflight failed."
+
+  log "Running tags [$RUN_TAGS] on $NETWORK"
+  yarn hh deploy --network "$NETWORK" --tags "$RUN_TAGS"
+  log "Done — $NETWORK (tags: $RUN_TAGS)"
+  exit 0
 fi
 
 # Verification alone, against deployment artifacts already in the repo.

@@ -26,8 +26,12 @@
 #
 # Optional:
 #   PUSH_ARTIFACTS=true     commit deployments/<network>/ back to the branch
-#   ARTIFACT_BRANCH=<name>  branch to push to (default: current)
+#   ARTIFACT_BRANCH=<name>  branch to push to (default: current; required when
+#                           HEAD is detached, as it is in the deploy image)
 #   GITHUB_TOKEN=<token>    push credential, needed on a host with no git auth
+#   ALLOW_EPHEMERAL_ARTIFACTS=true
+#                           deploy without preserving the artifacts anywhere.
+#                           Only for a host where the files actually survive.
 #   SKIP_BALANCE_CHECK=true    deploy even if the deployer looks underfunded
 #   MIN_DEPLOYER_BALANCE=<eth> balance the preflight insists on (default 0.02)
 #
@@ -52,6 +56,29 @@ fail() { printf '\n\033[1;31m!! %s\033[0m\n' "$*" >&2; exit 1; }
 
 [ -n "${DEPLOYER_MNEMONIC:-}" ] || fail "DEPLOYER_MNEMONIC is not set."
 [ -n "${SAFE_GLOBAL_API_KEY:-}" ] || fail "SAFE_GLOBAL_API_KEY is not set (hardhat refuses to start without it)."
+
+# Where the artifacts are going, decided before the deploy rather than after
+# it. deployments/<network>/ and .openzeppelin/ are the only record of where
+# anything landed and which implementation is behind which proxy; on an
+# ephemeral host they die with the container, and a re-run without them
+# redeploys the whole protocol from scratch rather than resuming.
+if [ "${PUSH_ARTIFACTS:-}" = "true" ]; then
+  ARTIFACT_BRANCH="${ARTIFACT_BRANCH:-$(git rev-parse --abbrev-ref HEAD)}"
+  [ "$ARTIFACT_BRANCH" != "HEAD" ] || fail \
+    "PUSH_ARTIFACTS is set but HEAD is detached, so there is no branch to push to. Set ARTIFACT_BRANCH."
+  # A container clone has no credential helper and no keys. Find out now, not
+  # after a successful deploy with nowhere to put the result.
+  if ! git config --get-regexp '^credential\.' >/dev/null 2>&1; then
+    [ -n "${GITHUB_TOKEN:-}" ] || fail \
+      "PUSH_ARTIFACTS is set but this clone has no push credential and GITHUB_TOKEN is unset."
+  fi
+elif [ "${ALLOW_EPHEMERAL_ARTIFACTS:-}" != "true" ]; then
+  fail "PUSH_ARTIFACTS is not \"true\", so the deployment artifacts would exist only on this host.
+   If that is a container they are gone the moment it exits, and the next run
+   redeploys everything instead of resuming. Set PUSH_ARTIFACTS=true (with
+   GITHUB_TOKEN and ARTIFACT_BRANCH), or ALLOW_EPHEMERAL_ARTIFACTS=true if you
+   really are deploying somewhere the files survive."
+fi
 
 # hardhat reads the deploy key from this file, not the environment.
 printf '%s' "$DEPLOYER_MNEMONIC" > mnemonic.secret
@@ -131,18 +158,25 @@ BLOCK_FILE="deployments/$NETWORK/.latestDeploymentBlock"
 # only record of where anything landed — the subgraph configs, the frontend and
 # the published manifest all read them. Commit them back when asked to.
 if [ "${PUSH_ARTIFACTS:-}" = "true" ]; then
-  log "Committing artifacts back to the branch"
-  BRANCH="${ARTIFACT_BRANCH:-$(git rev-parse --abbrev-ref HEAD)}"
+  log "Committing artifacts back to $ARTIFACT_BRANCH"
   # A container clone has no push credential. Inject one for this run only,
   # and keep it out of `git remote -v` and the process list where possible.
   if [ -n "${GITHUB_TOKEN:-}" ]; then
     REPO_PATH="$(git remote get-url origin | sed -E 's#^https://[^/]+/##; s#^git@[^:]+:##; s#\.git$##')"
     git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${REPO_PATH}.git"
   fi
-  git add "deployments/$NETWORK" \
-    ../subgraph/config/"$NETWORK".json \
-    ../subgraph-pool-v2/config/"$NETWORK".json \
-    ../../.openzeppelin 2>/dev/null || true
+  # The image clones at depth 1, and git will not push from a shallow repo.
+  git fetch -q --unshallow origin 2>/dev/null || true
+  # .openzeppelin lives beside deployments/ in packages/contracts, not at the
+  # repo root. It held ../../ for long enough to matter: git add fails on a
+  # pathspec that matches nothing and stages *none* of the other paths with
+  # it, so PUSH_ARTIFACTS committed nothing at all.
+  for p in "deployments/$NETWORK" \
+           .openzeppelin \
+           ../subgraph/config/"$NETWORK".json \
+           ../subgraph-pool-v2/config/"$NETWORK".json; do
+    [ -e "$p" ] && git add "$p"
+  done
   if git diff --cached --quiet; then
     echo "Nothing new to commit."
   else
@@ -150,8 +184,8 @@ if [ "${PUSH_ARTIFACTS:-}" = "true" ]; then
       commit -q -m "Add $NETWORK deployment artifacts
 
 Written by scripts/deploy-chain.sh. Timelock: $TIMELOCK_ADDRESS"
-    git push origin "HEAD:$BRANCH"
-    echo "Pushed to $BRANCH."
+    git push origin "HEAD:$ARTIFACT_BRANCH"
+    echo "Pushed to $ARTIFACT_BRANCH."
   fi
 else
   cat <<EOF

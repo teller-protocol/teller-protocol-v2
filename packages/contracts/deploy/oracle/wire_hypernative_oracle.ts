@@ -1,3 +1,6 @@
+import fs from 'fs'
+import path from 'path'
+
 import { DeployFunction } from 'hardhat-deploy/dist/types'
 import { logTxLink } from 'helpers/logTxLink'
 
@@ -41,6 +44,16 @@ const deployFn: DeployFunction = async (hre) => {
 
   const { deployer, protocolOwnerSafe } = await hre.getNamedAccounts()
   const ZERO = '0x0000000000000000000000000000000000000000'
+
+  // Calls the Safe has to make itself, collected as a Transaction Builder
+  // batch. Everything above this point the deployer can do on its own.
+  const safeBatch: Array<{
+    to: string
+    value: string
+    data: string
+    contractMethod: null
+    contractInputsValues: null
+  }> = []
 
   if (protocolOwnerSafe === ZERO) {
     hre.log('  ⚠️  protocolOwnerSafe is unset. Skipping.')
@@ -138,33 +151,72 @@ const deployFn: DeployFunction = async (hre) => {
     if (await pausingManager.isPauser(operator)) {
       hre.log(`  ✅  ${operator} is already a pauser`)
     } else {
-      hre.log(`  Proposing addPauser(${operator}) on the Safe...`)
-      await hre.upgrades.proposeCall(
-        pausingManagerAddress,
-        pausingManager,
-        'addPauser',
-        [operator],
-        "Let Hypernative's automated response pause the protocol",
-        `Grants the pauser role to ${operator}, Hypernative's response wallet on ` +
-          `${hre.network.name}. Their pause channels call pauseProtocol() here and ` +
-          'pause() on SmartCommitmentForwarder; both revert without it.'
-      )
-      hre.log('  ✅  Proposed.')
+      hre.log(`  Queueing addPauser(${operator}) for the Safe...`)
+      safeBatch.push({
+        to: pausingManagerAddress,
+        value: '0',
+        data: pausingManager.interface.encodeFunctionData('addPauser', [
+          operator,
+        ]),
+        contractMethod: null,
+        contractInputsValues: null,
+      })
     }
   }
 
   hre.log('')
-  hre.log(`  Proposing setOracle(${oracleAddress}) on the Safe...`)
-  await hre.upgrades.proposeCall(
-    forwarderAddress,
-    forwarder,
-    'setOracle',
-    [oracleAddress],
-    'Enable the Hypernative firewall',
-    `Points SmartCommitmentForwarder at HypernativeOracle ${oracleAddress}. ` +
-      'Until this executes the oracle check fails open and every caller is approved.'
+  hre.log(`  Queueing setOracle(${oracleAddress}) for the Safe...`)
+  safeBatch.push({
+    to: forwarderAddress,
+    value: '0',
+    data: forwarder.interface.encodeFunctionData('setOracle', [oracleAddress]),
+    contractMethod: null,
+    contractInputsValues: null,
+  })
+
+  // Written out rather than proposed to the Safe Transaction Service.
+  //
+  // That service only accepts a proposal signed by an owner or a registered
+  // delegate, and the deployer is neither — on Robinhood the Safe has five
+  // owners, none of them the deploy key, and no delegates. So proposeCall
+  // could never have worked here however it was configured: it had nothing
+  // to sign with. A file an owner imports needs no key at all.
+  //
+  // Registering the deployer as a delegate would restore the automated path,
+  // and needs one signature from an owner.
+  const outPath = path.join(
+    'deployments',
+    hre.network.name,
+    'hypernative-safe-batch.json'
   )
-  hre.log('  ✅  Proposed. It takes effect once the Safe signers execute it.')
+  fs.writeFileSync(
+    outPath,
+    `${JSON.stringify(
+      {
+        version: '1.0',
+        chainId: String(hre.network.config.chainId),
+        createdAt: Date.now(),
+        meta: {
+          name: `Enable Hypernative on ${hre.network.name}`,
+          description:
+            'Grants the pauser role to the Hypernative response wallet, and points SmartCommitmentForwarder at the HypernativeOracle.',
+          txBuilderVersion: '1.16.5',
+        },
+        transactions: safeBatch,
+      },
+      null,
+      2
+    )}\n`
+  )
+  hre.log('')
+  hre.log(`  ✅  Safe batch written to ${outPath}`)
+  hre.log(
+    '      Import it in the Safe UI: Apps -> Transaction Builder -> Load.'
+  )
+  hre.log('      Nothing takes effect until the signers execute it.')
+  for (const tx of safeBatch) {
+    hre.log(`        to ${tx.to}  data ${tx.data}`)
+  }
 
   hre.log('')
   hre.log('done.')

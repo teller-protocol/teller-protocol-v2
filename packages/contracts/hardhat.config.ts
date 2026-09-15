@@ -529,9 +529,8 @@ export default <HardhatUserConfig>{
       999:'0x004573E17574634A48CA808CF1df75f01e906E43',
       33139: '0x2BbD69C72b6689F31dd12b93fF59E62632E0eF41',  // apechain
       50: '0x55c12dF12e8D1094f387D77F445a8F1bE61C17BE',  // xdc
-      // Robinhood Chain. Create the Safe at app.safe.global (chain 4663) and
-      // put its address in ROBINHOOD_SAFE_ADDRESS before deploying.
-      4663: process.env.ROBINHOOD_SAFE_ADDRESS ?? '0x0000000000000000000000000000000000000000',
+      // robinhood. Safe v1.4.1, 2-of-5, verified on chain 4663.
+      4663: '0x654Dc22CC48Ca029A0EAD3Bf66e73BF2db71eA28',
     },
     protocolTimelock: {
       31337: 8,

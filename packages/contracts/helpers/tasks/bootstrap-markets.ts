@@ -46,6 +46,14 @@ interface MarketRegistryLike {
 
 interface TellerV2Like {
   owner: () => Promise<string>
+  isTrustedMarketForwarder: (
+    marketId: string,
+    forwarder: string
+  ) => Promise<boolean>
+  setTrustedMarketForwarder: (
+    marketId: string,
+    forwarder: string
+  ) => Promise<ContractTransactionResponse>
   protocolFee: () => Promise<bigint>
   getProtocolFeeRecipient: () => Promise<string>
   getAddress: () => Promise<string>
@@ -149,6 +157,9 @@ task(
     const factory = (await hre.contracts.get(
       'LenderCommitmentGroupFactory_V2'
     )) as unknown as PoolFactoryLike
+    const forwarder = await (
+      await hre.contracts.get('SmartCommitmentForwarder')
+    ).getAddress()
 
     const protocolOwner: string = await tellerV2.owner()
     console.log(`  protocol owner   ${protocolOwner}`)
@@ -227,6 +238,31 @@ task(
       // the parameters every pool will be built from, and skipping the whole
       // section leaves the riskiest half of the config unprinted.
       const marketId = created?.marketId ?? '<pending>'
+
+      // A pool's initialize() calls approveMarketForwarder on TellerV2, which
+      // reverts with "Forwarder must be trusted by the market" unless the
+      // market already trusts the SmartCommitmentForwarder. Only the market
+      // owner can grant that, and creating a market does not grant it, so
+      // every pool deploy fails until this runs. Checked rather than assumed,
+      // so a market created by an earlier run is repaired rather than skipped.
+      if (created) {
+        const trusted = await tellerV2.isTrustedMarketForwarder(
+          created.marketId,
+          forwarder
+        )
+        if (!trusted) {
+          console.log(
+            `\n  trusting the forwarder for market ${created.marketId}`
+          )
+          console.log(`    forwarder        ${forwarder}`)
+          const trustTx = await tellerV2.setTrustedMarketForwarder(
+            created.marketId,
+            forwarder
+          )
+          const trustRcpt = await trustTx.wait()
+          console.log(`    -> ${trustRcpt?.hash ?? trustTx.hash}`)
+        }
+      }
 
       for (const collateral of config.collateral) {
         const key = `${market.key}:${collateral.symbol}`

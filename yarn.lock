@@ -1743,7 +1743,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nomicfoundation/hardhat-verify@npm:^1.1.1":
+"@nomicfoundation/hardhat-verify@npm:1.1.1":
   version: 1.1.1
   resolution: "@nomicfoundation/hardhat-verify@npm:1.1.1"
   dependencies:
@@ -1759,6 +1759,25 @@ __metadata:
   peerDependencies:
     hardhat: ^2.0.4
   checksum: 2d83d32d6833f23fb62c30c68c9a2ab3956098030edcf459e69639960f059c72572d203bcf92f191c69c9cb0fbbf011a1113bacde1e3cbb28d5e812334f04f32
+  languageName: node
+  linkType: hard
+
+"@nomicfoundation/hardhat-verify@patch:@nomicfoundation/hardhat-verify@npm%3A1.1.1#./.yarn/patches/@nomicfoundation-hardhat-verify-npm-1.1.1-b69f49e442.patch::locator=%40scaffold-eth%2Ftypescript%40workspace%3A.":
+  version: 1.1.1
+  resolution: "@nomicfoundation/hardhat-verify@patch:@nomicfoundation/hardhat-verify@npm%3A1.1.1#./.yarn/patches/@nomicfoundation-hardhat-verify-npm-1.1.1-b69f49e442.patch::version=1.1.1&hash=80ff83&locator=%40scaffold-eth%2Ftypescript%40workspace%3A."
+  dependencies:
+    "@ethersproject/abi": ^5.1.2
+    "@ethersproject/address": ^5.0.2
+    cbor: ^8.1.0
+    chalk: ^2.4.2
+    debug: ^4.1.1
+    lodash.clonedeep: ^4.5.0
+    semver: ^6.3.0
+    table: ^6.8.0
+    undici: ^5.14.0
+  peerDependencies:
+    hardhat: ^2.0.4
+  checksum: 74ebc2f39ec5924023eb9b22440714476b17cf5c35b7876a4937638521c8d57794a090c06f18163c8df8aad3055c8e788856c5994e0f79ba24831a0f4396abe5
   languageName: node
   linkType: hard
 

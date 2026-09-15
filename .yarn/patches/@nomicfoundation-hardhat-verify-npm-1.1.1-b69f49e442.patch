@@ -1,0 +1,34 @@
+diff --git a/internal/etherscan.js b/internal/etherscan.js
+index fec30d98f8a21579f07128938250c00546425bc9..5aa981da4ac3ef2750a03a19375bb9f48c1afb6c 100644
+--- a/internal/etherscan.js
++++ b/internal/etherscan.js
+@@ -60,7 +60,13 @@ class Etherscan {
+             address,
+         });
+         const url = new URL(this.apiUrl);
+-        url.search = parameters.toString();
++        // Append rather than assign. `url.search = ...` discards any query the
++        // apiUrl already carries, and Etherscan V2 puts the chain there:
++        // https://api.etherscan.io/v2/api?chainid=4663. Dropping it makes every
++        // GET fail with "Missing chainid parameter (required for v2 api)" while
++        // the POST path -- which sends its parameters in the body and leaves the
++        // URL alone -- succeeds, so contracts verify and then report as failed.
++        parameters.forEach((value, key) => url.searchParams.append(key, value));
+         const response = await (0, undici_1.sendGetRequest)(url);
+         const json = await response.body.json();
+         if (json.message !== "OK") {
+@@ -134,7 +140,13 @@ class Etherscan {
+             guid,
+         });
+         const url = new URL(this.apiUrl);
+-        url.search = parameters.toString();
++        // Append rather than assign. `url.search = ...` discards any query the
++        // apiUrl already carries, and Etherscan V2 puts the chain there:
++        // https://api.etherscan.io/v2/api?chainid=4663. Dropping it makes every
++        // GET fail with "Missing chainid parameter (required for v2 api)" while
++        // the POST path -- which sends its parameters in the body and leaves the
++        // URL alone -- succeeds, so contracts verify and then report as failed.
++        parameters.forEach((value, key) => url.searchParams.append(key, value));
+         let response;
+         try {
+             response = await (0, undici_1.sendGetRequest)(url);

@@ -107,8 +107,28 @@ Written by scripts/deploy-chain.sh. Timelock: ${TIMELOCK_ADDRESS:-not yet deploy
 # Fail on missing inputs now, with a readable message, rather than 40 contracts
 # deep with a stack trace.
 
-[ -n "${DEPLOYER_MNEMONIC:-}" ] || fail "DEPLOYER_MNEMONIC is not set."
 [ -n "${SAFE_GLOBAL_API_KEY:-}" ] || fail "SAFE_GLOBAL_API_KEY is not set (hardhat refuses to start without it)."
+
+# Verification alone, against deployment artifacts already in the repo.
+#
+# It exists because verification and deployment fail for unrelated reasons, and
+# without it the only way to retry a verify is to re-run the deploy — which on
+# a chain whose artifacts are missing mints a second set of contracts. It sends
+# no transaction, needs no deployer key, and skips the artifact gate because it
+# produces no artifacts.
+if [ "${VERIFY_ONLY:-}" = "true" ]; then
+  [ -d "deployments/$NETWORK" ] || fail \
+    "VERIFY_ONLY needs deployments/$NETWORK, which is not in this checkout. Pin the image to a ref that has the artifacts."
+  log "Verify on $NETWORK (VERIFY_ONLY — nothing will be deployed)"
+  yarn hh verify-all --network "$NETWORK" || \
+    echo "!! verify-all reported errors. The check below is what actually counts."
+  log "What is actually verified on $NETWORK"
+  yarn hh run --no-compile scripts/check-verification.ts --network "$NETWORK"
+  log "Done — $NETWORK (verification only)"
+  exit 0
+fi
+
+[ -n "${DEPLOYER_MNEMONIC:-}" ] || fail "DEPLOYER_MNEMONIC is not set."
 
 # Where the artifacts are going, decided before the deploy rather than after
 # it. deployments/<network>/ and .openzeppelin/ are the only record of where

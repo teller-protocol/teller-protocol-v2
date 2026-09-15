@@ -218,10 +218,15 @@ task(
     // collateral are two separate pools.
     for (const market of config.markets) {
       const created = receipt.markets[market.key]
-      if (!created) {
+      if (!created && !args.dryRun) {
         console.log(`\n  skipping pools for ${market.key}: market not created`)
         continue
       }
+      // A dry run creates no markets, so there is no id to pin a pool to. Keep
+      // going anyway with a placeholder: the point of a dry run is to review
+      // the parameters every pool will be built from, and skipping the whole
+      // section leaves the riskiest half of the config unprinted.
+      const marketId = created?.marketId ?? '<pending>'
 
       for (const collateral of config.collateral) {
         const key = `${market.key}:${collateral.symbol}`
@@ -235,7 +240,7 @@ task(
         console.log(
           `\n  deploying pool ${key} (${config.principal.symbol} / ${collateral.symbol})`
         )
-        console.log(`    market id        ${created.marketId}`)
+        console.log(`    market id        ${marketId}`)
         console.log(`    max duration     ${market.durationSeconds}s`)
         console.log(
           `    collateral ratio ${collateral.collateralRatio} (${(
@@ -251,7 +256,7 @@ task(
         const groupConfig = {
           principalTokenAddress: config.principal.address,
           collateralTokenAddress: collateral.token,
-          marketId: created.marketId,
+          marketId,
           maxLoanDuration: market.durationSeconds,
           interestRateLowerBound: config.interestRateLowerBound,
           interestRateUpperBound: config.interestRateUpperBound,

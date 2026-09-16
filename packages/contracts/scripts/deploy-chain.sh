@@ -31,7 +31,11 @@
 #   GITHUB_TOKEN=<token>    push credential, needed on a host with no git auth
 #   PUBLISH_PACKAGE=true    publish @teller-protocol/v2-contracts when done,
 #                           patch-bumped from whatever npm currently has
-#   NPM_TOKEN=<token>       npm credential, required by PUBLISH_PACKAGE
+#   NPM_TOKEN=<token>       npm credential, required by PUBLISH_PACKAGE. Must be
+#                           an npm *automation* token: a classic token against
+#                           an account with 2FA required cannot publish
+#                           unattended, and yarn falls back to asking for a
+#                           security key that nobody is there to press.
 #   RUN_TAGS=<tags>         run only these deploy tags and stop. For wiring an
 #                           already-deployed chain without a full run.
 #   BOOTSTRAP_MARKETS=true  create the markets and lender pools for an already
@@ -107,8 +111,21 @@ publish_package() {
   ' "$CHAIN_ID" || fail \
     "The package would not carry $NETWORK (chain $CHAIN_ID). Refusing to publish."
 
-  YARN_NPM_AUTH_TOKEN="$NPM_TOKEN" yarn npm publish --access public \
+  # CI=true stops yarn falling back to a browser login. Without it, a token
+  # npm will not accept for publishing (a classic token against an account with
+  # 2FA required, rather than an automation token) makes yarn print a
+  # npmjs.com/login URL and wait for a security key — in a container with no
+  # one at the keyboard. It then exited 0, so `|| fail` never fired and the run
+  # reported success having published nothing.
+  CI=true YARN_NPM_AUTH_TOKEN="$NPM_TOKEN" yarn npm publish --access public \
     || fail "npm publish failed. Nothing was published; the version bump is uncommitted."
+
+  # Ask the registry rather than trusting the exit code, for the same reason:
+  # this step is the whole point of the run, and every frontend keys off its
+  # result, so "probably published" is not good enough.
+  PUBLISHED="$(npm view "$PKG@$NEXT" version 2>/dev/null || true)"
+  [ "$PUBLISHED" = "$NEXT" ] || fail \
+    "yarn reported success but npm has no $PKG@$NEXT. Nothing shipped. If the log shows a npmjs.com/login URL, NPM_TOKEN is not an automation token and 2FA blocked the publish."
   echo "Published $PKG@$NEXT"
 
   # Record the version that went out, so the tree stops drifting from npm.

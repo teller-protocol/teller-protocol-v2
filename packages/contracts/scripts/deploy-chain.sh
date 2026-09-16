@@ -101,7 +101,24 @@ publish_package() {
   # can be inspected before it is public: a published package that does not
   # carry the chain just deployed is worse than no package, because every
   # frontend will believe it.
-  node ./scripts/prepack.js
+  # teller-math-lib is a private git submodule and the deploy image clones with
+  # a depth-1 fetch that does not recurse, so build/math cannot compile without
+  # this. It runs here rather than in the Dockerfile on purpose: a build arg
+  # would bake the credential into the image history, while a runtime env var
+  # does not survive the container.
+  if [ ! -f teller-math-lib/tsconfig.json ]; then
+    [ -n "${GITHUB_TOKEN:-}" ] || fail \
+      "teller-math-lib is not checked out and GITHUB_TOKEN is unset, so build/math cannot be compiled. Publishing without it ships a package every frontend fails to bundle."
+    log "Fetching the teller-math-lib submodule"
+    git -c "url.https://x-access-token:${GITHUB_TOKEN}@github.com/.insteadOf=git@github.com:" \
+        -c "url.https://x-access-token:${GITHUB_TOKEN}@github.com/.insteadOf=https://github.com/" \
+        submodule update --init --depth 1 teller-math-lib >/dev/null 2>&1 || true
+    [ -f teller-math-lib/tsconfig.json ] || fail \
+      "Could not fetch the teller-math-lib submodule. GITHUB_TOKEN needs read access to teller-protocol/teller-math-lib, which is private."
+  fi
+
+  node ./scripts/prepack.js || fail \
+    "prepack failed. Nothing was published."
   node -e '
     const j = require("./build/hardhat/contracts.json");
     const id = process.argv[1];

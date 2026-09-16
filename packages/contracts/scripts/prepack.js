@@ -180,4 +180,41 @@ fs.writeFileSync(contractsExportFile, JSON.stringify(exportData, null, 2), "utf-
 // ----- 
 
 // Step 5: Compile math library helpers
-shell.exec("./node_modules/.bin/tsc -p teller-math-lib/tsconfig.json --outDir build/math");
+//
+// teller-math-lib is a git submodule, so a clone that did not recurse leaves
+// the directory empty and tsc exits with TS5058. shell.exec does not check the
+// exit code, so that failure used to pass straight through and publish a
+// package with no build/math in it -- which is not a broken build but a broken
+// *release*: `import from "@teller-protocol/v2-contracts/build/math"` then
+// fails at bundle time in every frontend, and only after the version is
+// public and immutable. 3.1.62 shipped that way.
+const mathResult = shell.exec(
+  "./node_modules/.bin/tsc -p teller-math-lib/tsconfig.json --outDir build/math"
+);
+if (mathResult.code !== 0) {
+  console.error(
+    "\nprepack: failed to compile teller-math-lib (tsc exit " +
+      mathResult.code +
+      ")."
+  );
+  if (!fs.existsSync("teller-math-lib/tsconfig.json")) {
+    console.error(
+      "teller-math-lib/tsconfig.json is missing. It is a git submodule -- run\n" +
+        "  git submodule update --init packages/contracts/teller-math-lib"
+    );
+  }
+  process.exit(1);
+}
+
+// Prove the output exists rather than trusting the exit code. This is the
+// entry point the frontends import, so an empty build/math is worth failing
+// the pack over.
+const mathEntry = "build/math/index.js";
+if (!fs.existsSync(mathEntry)) {
+  console.error(
+    "\nprepack: tsc succeeded but " +
+      mathEntry +
+      " was not produced. Refusing to pack a package without build/math."
+  );
+  process.exit(1);
+}

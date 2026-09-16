@@ -111,6 +111,15 @@ publish_package() {
   ' "$CHAIN_ID" || fail \
     "The package would not carry $NETWORK (chain $CHAIN_ID). Refusing to publish."
 
+  # The chain being present is not the same as the package being whole. 3.1.62
+  # carried chain 4663 correctly and still broke every frontend, because
+  # build/math was silently absent and that is what useCreateCommitment
+  # imports. Check the entry points a consumer actually resolves.
+  for required in build/math/index.js build/hardhat/contracts.json; do
+    [ -f "$required" ] || fail \
+      "prepack produced no $required. Refusing to publish an incomplete package. If it is build/math, teller-math-lib is a submodule and this checkout did not fetch it."
+  done
+
   # CI=true stops yarn falling back to a browser login. Without it, a token
   # npm will not accept for publishing (a classic token against an account with
   # 2FA required, rather than an automation token) makes yarn print a

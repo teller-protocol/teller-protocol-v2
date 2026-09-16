@@ -149,9 +149,22 @@ publish_package() {
   # Ask the registry rather than trusting the exit code, for the same reason:
   # this step is the whole point of the run, and every frontend keys off its
   # result, so "probably published" is not good enough.
-  PUBLISHED="$(npm view "$PKG@$NEXT" version 2>/dev/null || true)"
+  #
+  # Retried, because a fresh version takes a little while to become visible and
+  # a single immediate check reports a good publish as a failure.
+  PUBLISHED=""
+  for attempt in 1 2 3 4 5 6; do
+    PUBLISHED="$(npm view "$PKG@$NEXT" version 2>/dev/null || true)"
+    [ "$PUBLISHED" = "$NEXT" ] && break
+    sleep $((attempt * 15))
+  done
   [ "$PUBLISHED" = "$NEXT" ] || fail \
-    "yarn reported success but npm has no $PKG@$NEXT. Nothing shipped. If the log shows a npmjs.com/login URL, NPM_TOKEN is not an automation token and 2FA blocked the publish."
+    "yarn said \"Package archive published\" but npm still has no $PKG@$NEXT after 90s, so nothing shipped.
+   Most likely it went to npm's staging area: check Staged Packages on npmjs.com
+   and release it there, and check NPM_TOKEN grants \"Read and write (publish and
+   stage)\" rather than \"stage only\".
+   If the log instead shows a npmjs.com/login URL, the token is not an automation
+   token and 2FA blocked the publish."
   echo "Published $PKG@$NEXT"
 
   # Record the version that went out, so the tree stops drifting from npm.

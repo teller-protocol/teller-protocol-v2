@@ -43,6 +43,12 @@
 #                           its own; this is for re-running it alone.
 #   BOOTSTRAP_DRY_RUN=true  with BOOTSTRAP_MARKETS, print the plan and send
 #                           nothing.
+#   SET_PRICE_CAPS=true     cap every pool in the bootstrap receipt at the
+#                           price its own oracle quotes right now.
+#   PRICE_CAPS_DRY_RUN=true with SET_PRICE_CAPS, print the caps without
+#                           sending anything.
+#   PRICE_CAP_BUFFER_BPS    headroom above the current reading, in bps.
+#   PRICE_CAP_ONLY          only pools whose receipt key contains this.
 #   PUBLISH_ONLY=true       publish the package from artifacts already in the
 #                           repo and stop. Needs PUBLISH_PACKAGE=true and
 #                           NPM_TOKEN. Sends no transaction. For a chain that
@@ -300,6 +306,7 @@ if [ "${DEPLOY_PROTOCOL:-}" != "true" ]; then
   This service runs one job and exits. Pick one:
 
     BOOTSTRAP_MARKETS=true   create this chain's markets and lender pools
+    SET_PRICE_CAPS=true      cap existing pools at their current oracle price
     RUN_TAGS=<tags>          run named deploy tags against a deployed chain
     VERIFY_ONLY=true         verify already-deployed contracts
     PUBLISH_ONLY=true        publish the package (with PUBLISH_PACKAGE=true)
@@ -384,6 +391,44 @@ if [ "${BOOTSTRAP_MARKETS:-}" = "true" ]; then
   fi
 
   log "Done — $NETWORK (markets and pools)"
+  exit 0
+fi
+
+# Price caps on pools that already exist.
+#
+# Separate from BOOTSTRAP_MARKETS because it is a recurring job, not a launch
+# step: the cap is only worth having while it sits near the real price, so this
+# is meant to be re-run. It reads each pool's own oracle and writes the result
+# back as a ceiling, so it needs the bootstrap receipt to know which pools
+# exist and the deployer key to sign as their owner.
+if [ "${SET_PRICE_CAPS:-}" = "true" ]; then
+  [ -d "deployments/$NETWORK" ] || fail \
+    "SET_PRICE_CAPS needs deployments/$NETWORK in this checkout."
+  [ -f "deployments/$NETWORK/market-bootstrap.json" ] || fail \
+    "No deployments/$NETWORK/market-bootstrap.json. Run BOOTSTRAP_MARKETS first."
+  [ -n "${DEPLOYER_MNEMONIC:-}" ] || fail "DEPLOYER_MNEMONIC is not set."
+  printf '%s' "$DEPLOYER_MNEMONIC" > mnemonic.secret
+  chmod 600 mnemonic.secret
+  trap 'rm -f mnemonic.secret' EXIT
+
+  CAP_ARGS=""
+  [ -n "${PRICE_CAP_BUFFER_BPS:-}" ] && CAP_ARGS="--buffer-bps ${PRICE_CAP_BUFFER_BPS}"
+  [ -n "${PRICE_CAP_ONLY:-}" ] && CAP_ARGS="$CAP_ARGS --only ${PRICE_CAP_ONLY}"
+
+  # Same "true" comparison as the bootstrap dry run, and for the same reason:
+  # ${VAR:+...} expands on the string "false" and would send a run meant to be
+  # a rehearsal.
+  if [ "${PRICE_CAPS_DRY_RUN:-}" = "true" ]; then
+    log "Set pool price caps on $NETWORK (dry run — nothing will be sent)"
+    # shellcheck disable=SC2086
+    yarn hh set-pool-price-caps --network "$NETWORK" --dry-run true $CAP_ARGS
+  else
+    log "Set pool price caps on $NETWORK"
+    # shellcheck disable=SC2086
+    yarn hh set-pool-price-caps --network "$NETWORK" $CAP_ARGS
+  fi
+
+  log "Done — $NETWORK (price caps)"
   exit 0
 fi
 

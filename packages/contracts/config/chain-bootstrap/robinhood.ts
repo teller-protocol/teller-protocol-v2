@@ -183,6 +183,123 @@ const config: ChainBootstrapConfig = {
       note: 'Single-name equity, leveraged bitcoin proxy. Thinnest pool here and short-market only.',
     },
   ],
+
+  // Inverse pools: USDG is posted, the asset is drawn. See InversePoolConfig.
+  //
+  // Same Uniswap pools as above, read in the opposite direction, so the
+  // liquidity and cardinality checks that qualified them still hold. Every
+  // ratio is one tier tighter than the same asset on the long side, because a
+  // loan of an asset is exposed to that asset rising and nothing bounds that.
+  //
+  // MSTR is absent: its long-side pool does not exist on chain yet, and a
+  // leveraged bitcoin proxy is the last thing to lend out before the ordinary
+  // direction has been proven.
+  inverse: [
+    {
+      symbol: 'SGOV',
+      token: '0x92FD66527192E3e61d4DDd13322Aa222DE86F9B5',
+      pool: '0xfAb520051f96F4D2a32c22B6a3dD7fFfdf231bFe',
+      poolFee: 3000,
+      token0Decimals: 6,
+      token1Decimals: 18,
+      // Negated from this asset's entry above: SGOV is the principal here,
+      // and the route must still read principal per collateral.
+      zeroForOne: true,
+      collateralRatio: 16700, // 59.9% LTV, vs 80.0% on the long side
+      note: 'Shorting a T-bill ETF has almost no thesis, but it is the steadiest asset here, so it is the cheapest one to lend.',
+    },
+    {
+      symbol: 'GLD',
+      token: '0xC9a981FEE1F9DEc688bb123ccDeCc63D0deBFC4e',
+      pool: '0x7A6A053eCCf1446A2633E05aA6D40D09381997ec',
+      poolFee: 3000,
+      token0Decimals: 6,
+      token1Decimals: 18,
+      // Negated from this asset's entry above: GLD is the principal here,
+      // and the route must still read principal per collateral.
+      zeroForOne: true,
+      collateralRatio: 20000, // 50.0% LTV, vs 59.9% on the long side
+      note: 'Gold. Uncorrelated with the equities here, so a short on it is not a duplicate of the others.',
+    },
+    {
+      symbol: 'QQQ',
+      token: '0xD5f3879160bc7c32ebb4dC785F8a4F505888de68',
+      pool: '0xD60A5d14dB690B7Afad71F76B108071D7175597d',
+      poolFee: 500,
+      token0Decimals: 6,
+      token1Decimals: 18,
+      // Negated from this asset's entry above: QQQ is the principal here,
+      // and the route must still read principal per collateral.
+      zeroForOne: true,
+      collateralRatio: 20000, // 50.0% LTV, vs 59.9% on the long side
+      note: 'Index short. Diversified, so it gaps less than any single name in it.',
+    },
+    {
+      symbol: 'WETH',
+      token: '0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73',
+      pool: '0x52e65B17fB6E5BA00Ed806f37Afcd2DaA50271Ca',
+      poolFee: 100,
+      token0Decimals: 18,
+      token1Decimals: 6,
+      // Negated from this asset's entry above: WETH is the principal here,
+      // and the route must still read principal per collateral.
+      zeroForOne: false,
+      collateralRatio: 25000, // 40.0% LTV, vs 50.0% on the long side
+      note: 'The one asset here that trades continuously, so it cannot gap across a closed market - but it is crypto-volatile.',
+    },
+    {
+      symbol: 'NVDA',
+      token: '0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC',
+      pool: '0xd4EB21209C4D6093f80B5b84f5C45cc093EA14a3',
+      poolFee: 500,
+      token0Decimals: 6,
+      token1Decimals: 18,
+      // Negated from this asset's entry above: NVDA is the principal here,
+      // and the route must still read principal per collateral.
+      zeroForOne: true,
+      collateralRatio: 30000, // 33.3% LTV, vs 40.0% on the long side
+      note: 'Single name. Can gap hard on earnings, and on the short side that gap is the direction that hurts.',
+    },
+    {
+      symbol: 'GOOGL',
+      token: '0x2e0847E8910a9732eB3fb1bb4b70a580ADAD4FE3',
+      pool: '0x34D0dC122CF9A8Eb296fC5e0D3A233625D7d19b7',
+      poolFee: 500,
+      token0Decimals: 18,
+      token1Decimals: 6,
+      // Negated from this asset's entry above: GOOGL is the principal here,
+      // and the route must still read principal per collateral.
+      zeroForOne: false,
+      collateralRatio: 30000, // 33.3% LTV, vs 40.0% on the long side
+      note: 'Single name. Same earnings-gap exposure as the rest.',
+    },
+    {
+      symbol: 'AMZN',
+      token: '0x12f190a9F9d7D37a250758b26824B97CE941bF54',
+      pool: '0x8AC92DA74AB5F3b1d024Dc1943Ad7e15Dc4179Ef',
+      poolFee: 3000,
+      token0Decimals: 18,
+      token1Decimals: 6,
+      // Negated from this asset's entry above: AMZN is the principal here,
+      // and the route must still read principal per collateral.
+      zeroForOne: false,
+      collateralRatio: 30000, // 33.3% LTV, vs 40.0% on the long side
+      note: 'Single name. Same earnings-gap exposure as the rest.',
+    },
+    {
+      symbol: 'TSLA',
+      token: '0x322F0929c4625eD5bAd873c95208D54E1c003b2d',
+      pool: '0xf4ACdAEEB7022862A763C9B1B885e11191c889E3',
+      poolFee: 3000,
+      token0Decimals: 18,
+      token1Decimals: 6,
+      // Negated from this asset's entry above: TSLA is the principal here,
+      // and the route must still read principal per collateral.
+      zeroForOne: false,
+      collateralRatio: 30000, // 33.3% LTV, vs 40.0% on the long side
+      note: 'Single name, and the most volatile of them. Tightest ratio in this list alongside the other single names.',
+    },
+  ],
 }
 
 export default config

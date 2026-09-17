@@ -145,8 +145,12 @@ publish_package() {
     console.log("contracts.json carries chain " + id + " -> " + addr);
 
     const dir = path.join("deployments", network);
+    // Not everything in deployments/ is a contract. hardhat-deploy keeps its
+    // own bookkeeping there as dotfiles (.migrations.json, .chainId), and this
+    // repo writes market-bootstrap.json alongside them. Only named artifacts
+    // become manifest entries, so only they can be missing from it.
     const onDisk = fs.readdirSync(dir)
-      .filter((f) => f.endsWith(".json") && f !== "market-bootstrap.json")
+      .filter((f) => f.endsWith(".json") && !f.startsWith(".") && f !== "market-bootstrap.json")
       .map((f) => f.slice(0, -5));
     const inManifest = new Set(Object.keys(j[id].contracts || {}));
     const missing = onDisk.filter((name) => !inManifest.has(name));

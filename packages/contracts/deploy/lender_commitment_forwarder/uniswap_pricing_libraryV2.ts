@@ -1,3 +1,4 @@
+import { skipUnlessChainSupports } from '../../config/chains/features'
 import { DeployFunction } from 'hardhat-deploy/dist/types'
 
 const deployFn: DeployFunction = async (hre) => {
@@ -14,7 +15,5 @@ deployFn.tags = ['teller-v2', 'teller-v2:uniswap-pricing-library-v2']
 deployFn.dependencies = ['']
 
 
-deployFn.skip = async (hre) => {
-  return !hre.network.live || !['sepolia', 'polygon' , 'base','arbitrum','mainnet','mainnet_live_fork','optimism','katana','bsc','apechain','xdc','robinhood'].includes(hre.network.name)
-}
+deployFn.skip = skipUnlessChainSupports('uniswapPricingLibraryV2')
 export default deployFn

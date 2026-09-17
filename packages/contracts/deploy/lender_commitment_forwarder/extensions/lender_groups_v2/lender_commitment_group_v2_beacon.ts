@@ -1,3 +1,4 @@
+import { skipUnlessChainSupports } from '../../../../config/chains/features'
  
 
 
@@ -83,7 +84,5 @@ deployFn.dependencies = [
    'uniswap-pricing-helper:deploy'
 ]
 
-deployFn.skip = async (hre) => {
-  return !hre.network.live || !['sepolia', 'polygon' , 'mainnet','mainnet_live_fork','arbitrum','base','optimism','katana','hyperevm','bsc','apechain','xdc','robinhood'].includes(hre.network.name)
-}
+deployFn.skip = skipUnlessChainSupports('lenderGroupsV2')
 export default deployFn

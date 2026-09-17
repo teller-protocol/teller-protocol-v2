@@ -1,3 +1,4 @@
+import { getGlobalCommitmentForwarderName } from '../../config/global-commitment-forwarder'
 import { DeployFunction } from 'hardhat-deploy/dist/types'
 import { logTxLink } from 'helpers/logTxLink'
 import { TellerV2 } from 'types/typechain'
@@ -11,14 +12,27 @@ const deployFn: DeployFunction = async (hre) => {
 
   const marketRegistry = await hre.contracts.get('MarketRegistry')
   const reputationManager = await hre.contracts.get('ReputationManager')
+  // This writes TellerV2's global forwarder slot, which has no setter and is
+  // only ever written here. Whichever forwarder lands in it is trusted on every
+  // market forever - including markets whose own single slot is already spent
+  // on the SmartCommitmentForwarder for pools.
+  //
+  // This used to fall back to Alpha whenever LenderCommitmentForwarder was
+  // absent. A silent catch is the wrong shape for a permanent decision: on
+  // Robinhood the forwarder was merely missing from a deploy allowlist, and the
+  // fallback quietly made Alpha global for good. Fail instead, and let a chain
+  // that genuinely wants Alpha say so in the overrides.
+  const forwarderName = getGlobalCommitmentForwarderName(hre.network)
   let lenderCommitmentForwarder
   try {
-    lenderCommitmentForwarder = await hre.contracts.get(
-      'LenderCommitmentForwarder'
-    )
+    lenderCommitmentForwarder = await hre.contracts.get(forwarderName)
   } catch {
-    lenderCommitmentForwarder = await hre.contracts.get(
-      'LenderCommitmentForwarderAlpha'
+    throw new Error(
+      `TellerV2.initialize needs ${forwarderName} for the global forwarder ` +
+        `slot on ${hre.network.name}, and it is not deployed.\n` +
+        `The slot is permanent - there is no setter - so this will not be ` +
+        `fixable after the fact. Deploy ${forwarderName} first, or record an ` +
+        `explicit choice in config/global-commitment-forwarder.ts.`
     )
   }
   const collateralManager = await hre.contracts.get('CollateralManager')

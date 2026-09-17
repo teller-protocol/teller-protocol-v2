@@ -1,3 +1,4 @@
+import { skipUnlessChainSupports } from '../../../../config/chains/features'
  
 
 
@@ -81,7 +82,5 @@ deployFn.dependencies = [
   'teller-v2:uniswap-pricing-library-v2'
 ]
 
-deployFn.skip = async (hre) => {
-   return !hre.network.live || !['sepolia'   ].includes(hre.network.name)
-}
+deployFn.skip = skipUnlessChainSupports('lenderGroupsV1')
 export default deployFn

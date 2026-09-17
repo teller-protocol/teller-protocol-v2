@@ -161,6 +161,27 @@ const config: ChainBootstrapConfig = {
       collateralRatio: 25000,
       note: 'Single-name equity: gaps across market closures, so held to a 40% LTV.',
     },
+    {
+      symbol: 'MSTR',
+      token: '0xec262a75e413fAfD0dF80480274532C79D42da09',
+      pool: '0x17578C0e0D15da44f31677263114F71aE76653EA',
+      poolFee: 10000,
+      token0Decimals: 6,
+      token1Decimals: 18,
+      // USDG is token0 of this pool, so the route is read
+      // token0-per-token1 to yield principal per collateral.
+      zeroForOne: false,
+      collateralRatio: 40000,
+      // Short market only. MSTR is a leveraged bitcoin proxy wrapped in a
+      // tokenized equity, so it carries crypto volatility *and* a closed
+      // market to gap across, and its USDG pool holds ~$440k against the
+      // ~$1.1M the rest of this list clears. Lending against it for a month
+      // is a materially worse risk than lending for a week, so it is offered
+      // for a week. 25% LTV rather than the 40% the other single names get,
+      // for the same reasons.
+      markets: ['short'],
+      note: 'Single-name equity, leveraged bitcoin proxy. Thinnest pool here and short-market only.',
+    },
   ],
 }
 

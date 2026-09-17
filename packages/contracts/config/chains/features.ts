@@ -36,6 +36,10 @@ export type ChainFeature =
   | 'uniswapPricingHelper'
   | 'hypernativeOracle'
   | 'protocolPausingManager'
+  // Not a Teller contract: the Uniswap view-quoter this repo vendors, for
+  // chains whose own deployment we cannot point at. It is here because it was
+  // gated by exactly the kind of hand-written allowlist this table replaces.
+  | 'uniswapV3Quoter'
 
 export const CHAIN_FEATURES: Record<string, ChainFeature[]> = {
   mainnet: [
@@ -67,6 +71,7 @@ export const CHAIN_FEATURES: Record<string, ChainFeature[]> = {
     'uniswapPricingHelper',
     'hypernativeOracle',
     'protocolPausingManager',
+    'uniswapV3Quoter',
   ],
   arbitrum: [
     'lenderCommitmentForwarderAlpha',
@@ -132,6 +137,7 @@ export const CHAIN_FEATURES: Record<string, ChainFeature[]> = {
     'uniswapPricingLibrary',
     'uniswapPricingLibraryV2',
     'protocolPausingManager',
+    'uniswapV3Quoter',
   ],
   hyperevm: [
     'lenderCommitmentForwarder',
@@ -140,6 +146,7 @@ export const CHAIN_FEATURES: Record<string, ChainFeature[]> = {
     'lenderGroupsV2',
     'lenderGroupsV3',
     'protocolPausingManager',
+    'uniswapV3Quoter',
   ],
   robinhood: [
     'lenderCommitmentForwarder',
@@ -150,6 +157,7 @@ export const CHAIN_FEATURES: Record<string, ChainFeature[]> = {
     'uniswapPricingHelper',
     'hypernativeOracle',
     'protocolPausingManager',
+    'uniswapV3Quoter',
   ],
   sepolia: [
     'lenderCommitmentForwarder',

@@ -22,11 +22,20 @@ import { ChainBootstrapConfig } from '../../config/chain-bootstrap/types'
  * too high is one that borrows more than it is worth.
  *
  * The value written is the pool's own current reading, taken through the pool's
- * own oracle routes, not a price recomputed here. Reading it back from the
- * contract keeps the units exactly what the comparison expects - expanded by
- * STANDARD_EXPANSION_FACTOR, in whichever direction that pool's route runs -
- * rather than depending on this task to rebuild that arithmetic correctly for
- * pools whose principal and collateral are the other way round.
+ * own oracle routes and its own pricing library, not a price recomputed here.
+ * Reading it back from the contract keeps the units exactly what the comparison
+ * expects - expanded by STANDARD_EXPANSION_FACTOR, in whichever direction that
+ * pool's route runs - rather than depending on this task to rebuild that
+ * arithmetic correctly for pools whose principal and collateral are the other
+ * way round.
+ *
+ * The read goes to UNISWAP_PRICING_HELPER rather than to the pool. The pool
+ * declares `getUniswapPriceRatioForPoolRoutes` `internal`, so there is no such
+ * selector on it and the call reverts with empty data. Its external sibling
+ * `getPrincipalForCollateralForPoolRoutes` does answer, but it returns
+ * min(oracle, cap) - which is the cap itself once one is set, so a second run
+ * would re-cap at the old ceiling and could never raise it. The library gives
+ * the unclamped oracle, which is what a cap should be measured against.
  *
  * Setting the cap at spot means an honest rally grants no extra borrowing
  * power until someone re-runs this. That is the deliberate cost: the cap only
@@ -61,8 +70,12 @@ const POOL_ABI = [
   'function collateralRatio() view returns (uint16)',
   'function maxPrincipalPerCollateralAmount() view returns (uint256)',
   'function poolOracleRoutes(uint256) view returns (address pool, bool zeroForOne, uint32 twapInterval, uint256 token0Decimals, uint256 token1Decimals)',
-  'function getUniswapPriceRatioForPoolRoutes((address,bool,uint32,uint256,uint256)[] poolOracleRoutes) view returns (uint256)',
+  'function UNISWAP_PRICING_HELPER() view returns (address)',
   'function setMaxPrincipalPerCollateralAmount(uint256 _maxPrincipalPerCollateralAmount)',
+]
+
+const PRICING_LIBRARY_ABI = [
+  'function getUniswapPriceRatioForPoolRoutes((address,bool,uint32,uint256,uint256)[] poolRoutes) view returns (uint256)',
 ]
 
 task(
@@ -149,8 +162,14 @@ task(
         continue
       }
 
+      const helperAddress: string = await pool.UNISWAP_PRICING_HELPER()
+      const library = new ethers.Contract(
+        helperAddress,
+        PRICING_LIBRARY_ABI,
+        signer
+      )
       const current: bigint =
-        await pool.getUniswapPriceRatioForPoolRoutes(routes)
+        await library.getUniswapPriceRatioForPoolRoutes(routes)
       if (current === 0n) {
         console.log(`\n  ${key}: oracle reads zero - skipping rather than
           writing a cap that would halt the pool`)

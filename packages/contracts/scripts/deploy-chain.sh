@@ -125,14 +125,39 @@ publish_package() {
 
   node ./scripts/prepack.js || fail \
     "prepack failed. Nothing was published."
+  # TellerV2 present is necessary, not sufficient. Robinhood published with
+  # every contract it had and still had no BorrowSwap, because the deploy that
+  # created BorrowSwap died before writing its artifact - so deployments/ was
+  # the thing missing it, and a check that only looks for TellerV2 sails past
+  # that. The marketplace reads this manifest to decide whether Loop exists,
+  # and the absence of one entry is invisible until a user clicks the tab.
+  #
+  # So compare the two: every artifact in deployments/<network>/ should have
+  # become an entry in the manifest.
   node -e '
+    const fs = require("fs");
+    const path = require("path");
     const j = require("./build/hardhat/contracts.json");
-    const id = process.argv[1];
+    const [id, network] = process.argv.slice(1);
+
     const addr = j[id] && j[id].contracts && j[id].contracts.TellerV2 && j[id].contracts.TellerV2.address;
     if (!addr) { console.error("contracts.json has no TellerV2 for chain " + id); process.exit(1); }
     console.log("contracts.json carries chain " + id + " -> " + addr);
-  ' "$CHAIN_ID" || fail \
-    "The package would not carry $NETWORK (chain $CHAIN_ID). Refusing to publish."
+
+    const dir = path.join("deployments", network);
+    const onDisk = fs.readdirSync(dir)
+      .filter((f) => f.endsWith(".json") && f !== "market-bootstrap.json")
+      .map((f) => f.slice(0, -5));
+    const inManifest = new Set(Object.keys(j[id].contracts || {}));
+    const missing = onDisk.filter((name) => !inManifest.has(name));
+    if (missing.length) {
+      console.error("contracts.json is missing " + missing.length + " of " + onDisk.length +
+                    " deployed contract(s) for " + network + ": " + missing.join(", "));
+      process.exit(1);
+    }
+    console.log("contracts.json carries all " + onDisk.length + " deployed contracts for " + network);
+  ' "$CHAIN_ID" "$NETWORK" || fail \
+    "The package would not carry $NETWORK (chain $CHAIN_ID) completely. Refusing to publish."
 
   # The chain being present is not the same as the package being whole. 3.1.62
   # carried chain 4663 correctly and still broke every frontend, because

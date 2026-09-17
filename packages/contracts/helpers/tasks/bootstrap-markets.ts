@@ -265,6 +265,12 @@ task(
       }
 
       for (const collateral of config.collateral) {
+        if (collateral.markets && !collateral.markets.includes(market.key)) {
+          console.log(
+            `\n  skipping ${collateral.symbol} on ${market.key}: not in its markets list`
+          )
+          continue
+        }
         const key = `${market.key}:${collateral.symbol}`
         if (receipt.pools[key]) {
           console.log(

@@ -53,6 +53,12 @@ export interface CollateralConfig {
    * must post twice the value they draw (a 50% LTV).
    */
   collateralRatio: number
+  /**
+   * Market keys this collateral gets a pool on. Omitted means every market,
+   * which is the usual case. Naming a subset is for an asset thin or volatile
+   * enough that a long loan against it is a worse risk than a short one.
+   */
+  markets?: string[]
   /** Free-text note on why this asset sits in the tier it does. */
   note?: string
 }

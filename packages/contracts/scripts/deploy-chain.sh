@@ -285,40 +285,6 @@ if [ "${PUBLISH_PACKAGE:-}" = "true" ]; then
     "PUBLISH_PACKAGE is set but NPM_TOKEN is not. The package cannot be published without it."
 fi
 
-# Deploying a whole protocol is the fall-through, and that is the wrong
-# default for a service that anything can redeploy.
-#
-# Every mode above exits on its own, so a run with no mode set lands here and
-# starts a two-pass deployment of the entire protocol. On a chain that is
-# already live, whether that mints a second protocol or no-ops depends entirely
-# on whether deployments/<network>/ happens to be in the image — which is a
-# property of the pinned ref, not of anyone's intent. A redeploy button, a
-# variable edit or a merge to main is enough to trigger it.
-#
-# So the big one asks to be named. DEPLOY_PROTOCOL=true is the only way to
-# reach it, and without it the run lists what it could have done and exits
-# clean rather than either deploying or crash-looping.
-if [ "${DEPLOY_PROTOCOL:-}" != "true" ]; then
-  cat <<EOF
-
-  Nothing to do: no mode is set, and a full protocol deploy is not the default.
-
-  This service runs one job and exits. Pick one:
-
-    BOOTSTRAP_MARKETS=true   create this chain's markets and lender pools
-    SET_PRICE_CAPS=true      cap existing pools at their current oracle price
-    RUN_TAGS=<tags>          run named deploy tags against a deployed chain
-    VERIFY_ONLY=true         verify already-deployed contracts
-    PUBLISH_ONLY=true        publish the package (with PUBLISH_PACKAGE=true)
-    DEPLOY_PROTOCOL=true     deploy the entire protocol to $NETWORK from scratch
-
-  DEPLOY_PROTOCOL is deliberately not the default. Reaching it by accident on a
-  chain that is already live can deploy a second protocol, and the deployed
-  addresses of the first one are then only in this container's logs.
-EOF
-  exit 0
-fi
-
 # A single deploy tag, against a chain that is already deployed.
 #
 # Wiring steps — granting a role, pointing the forwarder at an oracle — are
@@ -480,6 +446,40 @@ if [ "${VERIFY_ONLY:-}" = "true" ]; then
   log "What is actually verified on $NETWORK"
   yarn hh run --no-compile scripts/check-verification.ts --network "$NETWORK"
   log "Done — $NETWORK (verification only)"
+  exit 0
+fi
+
+# Deploying a whole protocol is the fall-through, and that is the wrong
+# default for a service that anything can redeploy.
+#
+# Every mode above exits on its own, so a run with no mode set lands here and
+# starts a two-pass deployment of the entire protocol. On a chain that is
+# already live, whether that mints a second protocol or no-ops depends entirely
+# on whether deployments/<network>/ happens to be in the image — which is a
+# property of the pinned ref, not of anyone's intent. A redeploy button, a
+# variable edit or a merge to main is enough to trigger it.
+#
+# So the big one asks to be named. DEPLOY_PROTOCOL=true is the only way to
+# reach it, and without it the run lists what it could have done and exits
+# clean rather than either deploying or crash-looping.
+if [ "${DEPLOY_PROTOCOL:-}" != "true" ]; then
+  cat <<EOF
+
+  Nothing to do: no mode is set, and a full protocol deploy is not the default.
+
+  This service runs one job and exits. Pick one:
+
+    BOOTSTRAP_MARKETS=true   create this chain's markets and lender pools
+    SET_PRICE_CAPS=true      cap existing pools at their current oracle price
+    RUN_TAGS=<tags>          run named deploy tags against a deployed chain
+    VERIFY_ONLY=true         verify already-deployed contracts
+    PUBLISH_ONLY=true        publish the package (with PUBLISH_PACKAGE=true)
+    DEPLOY_PROTOCOL=true     deploy the entire protocol to $NETWORK from scratch
+
+  DEPLOY_PROTOCOL is deliberately not the default. Reaching it by accident on a
+  chain that is already live can deploy a second protocol, and the deployed
+  addresses of the first one are then only in this container's logs.
+EOF
   exit 0
 fi
 

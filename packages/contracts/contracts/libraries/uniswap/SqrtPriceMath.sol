@@ -35,9 +35,20 @@ library SqrtPriceMath {
         if (amount == 0) return sqrtPX96;
         uint256 numerator1 = uint256(liquidity) << FixedPoint96.RESOLUTION;
 
+        // `amount * sqrtPX96` is meant to wrap here. The round-trip division
+        // on the next line is how the overflow gets *detected*, and each
+        // branch has a correct answer for the overflowing case - the doc
+        // comment above spells it out. Under 0.8's checked arithmetic the
+        // multiplication reverts before the detection can run, which makes
+        // both fallbacks unreachable and turns an overflow the algorithm
+        // handles into a failed quote.
+        uint256 product;
+        unchecked {
+            product = amount * sqrtPX96;
+        }
+
         if (add) {
-            uint256 product;
-            if ((product = amount * sqrtPX96) / amount == sqrtPX96) {
+            if (product / amount == sqrtPX96) {
                 uint256 denominator = numerator1 + product;
                 if (denominator >= numerator1)
                     // always fits in 160 bits
@@ -46,10 +57,9 @@ library SqrtPriceMath {
 
             return uint160(UnsafeMath.divRoundingUp(numerator1, (numerator1 / sqrtPX96).add(amount)));
         } else {
-            uint256 product;
             // if the product overflows, we know the denominator underflows
             // in addition, we must check that the denominator does not underflow
-            require((product = amount * sqrtPX96) / amount == sqrtPX96 && numerator1 > product);
+            require(product / amount == sqrtPX96 && numerator1 > product);
             uint256 denominator = numerator1 - product;
             return FullMath.mulDivRoundingUp(numerator1, sqrtPX96, denominator).toUint160();
         }

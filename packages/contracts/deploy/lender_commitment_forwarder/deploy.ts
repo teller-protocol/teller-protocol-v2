@@ -1,3 +1,4 @@
+import { skipUnlessChainSupports } from '../../config/chains/features'
 import { DeployFunction } from 'hardhat-deploy/dist/types'
 
 const deployFn: DeployFunction = async (hre) => {
@@ -32,15 +33,11 @@ deployFn.dependencies = ['teller-v2:deploy', 'market-registry:deploy']
 // contracts, markets and sixteen pools live, and "Lending offers need Teller's
 // commitment forwarder, and it is not deployed on Robinhood Chain".
 //
-// Note this list is narrower than the set of chains that actually carry the
-// contract: Base, Arbitrum, Polygon and others were deployed before it was
-// added, so their artifacts exist while their names are absent here. Adding a
-// name is what lets a *new* chain get one.
-deployFn.skip = async (hre) => {
-  return (
-    !hre.network.live ||
-    !['sepolia', 'katana', 'hyperevm', 'robinhood'].includes(hre.network.name)
-  )
-}
+// Note the table's set is narrower than the set of chains that actually carry
+// the contract: Base, Arbitrum, Polygon and others were deployed before it was
+// added, so their artifacts exist while the feature is absent for them. Adding
+// the feature to a chain in config/chains/features.ts is what lets a *new*
+// chain get one.
+deployFn.skip = skipUnlessChainSupports('lenderCommitmentForwarder')
 
 export default deployFn

@@ -1,3 +1,4 @@
+import { skipUnlessChainSupports } from '../../config/chains/features'
 import { DeployFunction } from 'hardhat-deploy/dist/types'
 import { deploy } from 'helpers/deploy-helpers'
 
@@ -23,7 +24,5 @@ const deployFn: DeployFunction = async (hre) => {
 deployFn.id = 'hypernative-oracle-mock:deploy'
 deployFn.tags = ['hypernative-oracle-mock:deploy']
 deployFn.dependencies = []
-deployFn.skip = async (hre) => {
-    return !hre.network.live || !['polygon', 'arbitrum','base','mainnet','bsc','apechain','xdc','robinhood'].includes(hre.network.name)
-  }
+deployFn.skip = skipUnlessChainSupports('hypernativeOracle')
 export default deployFn

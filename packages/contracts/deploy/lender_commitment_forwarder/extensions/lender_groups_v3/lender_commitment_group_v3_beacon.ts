@@ -1,3 +1,4 @@
+import { skipUnlessChainSupports } from '../../../../config/chains/features'
  
 
 
@@ -79,7 +80,5 @@ deployFn.dependencies = [
    
 ]
 
-deployFn.skip = async (hre) => {
-  return !hre.network.live || !['sepolia', 'polygon' , 'mainnet','mainnet_live_fork','arbitrum','base','optimism','katana','hyperevm','apechain'].includes(hre.network.name)
-}
+deployFn.skip = skipUnlessChainSupports('lenderGroupsV3')
 export default deployFn

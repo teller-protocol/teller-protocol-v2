@@ -1,3 +1,4 @@
+import { skipUnlessChainSupports } from '../../config/chains/features'
 import { DeployFunction } from 'hardhat-deploy/dist/types'
 
 const deployFn: DeployFunction = async (hre) => {
@@ -27,8 +28,6 @@ deployFn.tags = [
 ]
 deployFn.dependencies = ['teller-v2:deploy', 'market-registry:deploy']
 
-deployFn.skip = async (hre) => {
-   return !hre.network.live || !['sepolia'   ].includes(hre.network.name)
-}
+deployFn.skip = skipUnlessChainSupports('lenderCommitmentForwarderStaging')
 
 export default deployFn

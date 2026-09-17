@@ -1,3 +1,4 @@
+import { skipUnlessChainSupports } from '../../../../config/chains/features'
 import { DeployFunction } from 'hardhat-deploy/dist/types'
 
 const deployFn: DeployFunction = async (hre) => {
@@ -41,7 +42,5 @@ deployFn.dependencies = [
   'lender-commitment-group-beacon-v2:deploy'
 ]
 
-deployFn.skip = async (hre) => {
-  return !hre.network.live || !['sepolia','polygon','mainnet','mainnet_live_fork','arbitrum','base','optimism','katana','hyperevm','bsc','apechain','xdc','robinhood'].includes(hre.network.name)
-}
+deployFn.skip = skipUnlessChainSupports('lenderGroupsV2')
 export default deployFn

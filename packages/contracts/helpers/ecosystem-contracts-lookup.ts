@@ -144,9 +144,13 @@ export function get_ecosystem_contract_address(
 		      swapRouterAddress = '0xaa52bB8110fE38D0d2d2AF0B85C3A3eE622CA455'
 		      break
 		    case 'robinhood':
-		      // Only read by borrow_swap.ts, which is not enabled for robinhood.
-		      // Set ROBINHOOD_UNISWAP_V3_SWAP_ROUTER if BorrowSwap is turned on.
-		      swapRouterAddress = process.env.ROBINHOOD_UNISWAP_V3_SWAP_ROUTER
+		      // SwapRouter02, read off chain rather than assumed: it is not at any
+		      // canonical address on 4663. Found as the sender of Swap events on
+		      // the chain's own v3 pools, then confirmed - factory() returns the
+		      // v3 factory above, WETH9() returns the WETH in this file, and it
+		      // answers positionManager() and factoryV2(), which SwapRouter01
+		      // does not.
+		      swapRouterAddress = '0xcaf681a66d020601342297493863e78c959e5cb2'
 		      break
 		    default:
 		    	return undefined 
@@ -196,8 +200,13 @@ export function get_ecosystem_contract_address(
 			      quoterAddress = '0x5911cB3633e764939edc2d92b7e1ad375Bb57649'
 			      break
 			    case 'robinhood':
-			      // Only read by borrow_swap.ts, which is not enabled for robinhood.
-			      quoterAddress = process.env.ROBINHOOD_UNISWAP_V3_QUOTER
+			      // Deployed by us. 4663 has no quoter we can point at - it is a
+			      // view contract, so it never appears in a transaction and cannot
+			      // be found the way the router was - so deploy_quoter.ts puts this
+			      // repo's vendored view-quoter on the chain against the factory
+			      // above, and borrow_swap.ts reads it back from the deployment.
+			      // Nothing to hardcode here.
+			      quoterAddress = undefined
 			      break
 			    default:
 			    	return undefined 

@@ -1,6 +1,7 @@
 import { DeployFunction } from 'hardhat-deploy/dist/types'
 import { deploy } from 'helpers/deploy-helpers'
 import { get_ecosystem_contract_address } from "../../helpers/ecosystem-contracts-lookup" 
+import { skipUnlessChainSupports } from '../../config/chains/features'
 
 
 
@@ -30,7 +31,5 @@ const deployFn: DeployFunction = async (hre) => {
 deployFn.id = 'uniswapv3-quoter:deploy'
 deployFn.tags = ['uniswapv3-quoter:deploy']
 deployFn.dependencies = []
-deployFn.skip = async (hre) => {
-    return !hre.network.live || ![  'polygon', 'katana', 'hyperevm' ].includes(hre.network.name)
-  }
+deployFn.skip = skipUnlessChainSupports('uniswapV3Quoter')
 export default deployFn

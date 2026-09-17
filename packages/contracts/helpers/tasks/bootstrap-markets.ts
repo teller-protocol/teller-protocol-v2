@@ -264,14 +264,47 @@ task(
         }
       }
 
-      for (const collateral of config.collateral) {
-        if (collateral.markets && !collateral.markets.includes(market.key)) {
+      // Both directions in one list. An ordinary pool lends the chain's
+      // principal against an asset; an inverse pool lends the asset against the
+      // principal. Everything after this point is identical for the two, so
+      // they differ here and nowhere else.
+      const specs = [
+        ...config.collateral.map((c) => ({
+          key: `${market.key}:${c.symbol}`,
+          label: `${config.principal.symbol} / ${c.symbol}`,
+          principalToken: config.principal.address,
+          collateralToken: c.token,
+          collateralRatio: c.collateralRatio,
+          pool: c.pool,
+          zeroForOne: c.zeroForOne,
+          token0Decimals: c.token0Decimals,
+          token1Decimals: c.token1Decimals,
+          markets: c.markets,
+          symbol: c.symbol,
+        })),
+        ...(config.inverse ?? []).map((i) => ({
+          key: `${market.key}:inverse:${i.symbol}`,
+          label: `${i.symbol} / ${config.principal.symbol}`,
+          principalToken: i.token,
+          collateralToken: config.principal.address,
+          collateralRatio: i.collateralRatio,
+          pool: i.pool,
+          zeroForOne: i.zeroForOne,
+          token0Decimals: i.token0Decimals,
+          token1Decimals: i.token1Decimals,
+          markets: i.markets,
+          symbol: i.symbol,
+        })),
+      ]
+
+      for (const spec of specs) {
+        if (spec.markets && !spec.markets.includes(market.key)) {
           console.log(
-            `\n  skipping ${collateral.symbol} on ${market.key}: not in its markets list`
+            `\n  skipping ${spec.label} on ${market.key}: not in its markets list`
           )
           continue
         }
-        const key = `${market.key}:${collateral.symbol}`
+        const key = spec.key
         if (receipt.pools[key]) {
           console.log(
             `\n  pool ${key} already deployed: ${receipt.pools[key].address}`
@@ -279,40 +312,39 @@ task(
           continue
         }
 
-        console.log(
-          `\n  deploying pool ${key} (${config.principal.symbol} / ${collateral.symbol})`
-        )
+        console.log(`\n  deploying pool ${key} (${spec.label})`)
         console.log(`    market id        ${marketId}`)
         console.log(`    max duration     ${market.durationSeconds}s`)
         console.log(
-          `    collateral ratio ${collateral.collateralRatio} (${(
-            (10000 / collateral.collateralRatio) *
+          `    collateral ratio ${spec.collateralRatio} (${(
+            (10000 / spec.collateralRatio) *
             100
           ).toFixed(1)}% LTV)`
         )
-        console.log(`    oracle pool      ${collateral.pool}`)
+        console.log(`    oracle pool      ${spec.pool}`)
+        console.log(`    zeroForOne       ${spec.zeroForOne}`)
         console.log(`    twap interval    ${config.twapInterval}s`)
 
         if (args.dryRun) continue
 
         const groupConfig = {
-          principalTokenAddress: config.principal.address,
-          collateralTokenAddress: collateral.token,
+          principalTokenAddress: spec.principalToken,
+          collateralTokenAddress: spec.collateralToken,
           marketId,
           maxLoanDuration: market.durationSeconds,
           interestRateLowerBound: config.interestRateLowerBound,
           interestRateUpperBound: config.interestRateUpperBound,
           liquidityThresholdPercent: config.liquidityThresholdPercent,
-          collateralRatio: collateral.collateralRatio,
+          collateralRatio: spec.collateralRatio,
         }
 
         const routes = [
           {
-            pool: collateral.pool,
-            zeroForOne: collateral.zeroForOne,
+            pool: spec.pool,
+            zeroForOne: spec.zeroForOne,
             twapInterval: config.twapInterval,
-            token0Decimals: collateral.token0Decimals,
-            token1Decimals: collateral.token1Decimals,
+            token0Decimals: spec.token0Decimals,
+            token1Decimals: spec.token1Decimals,
           },
         ]
 

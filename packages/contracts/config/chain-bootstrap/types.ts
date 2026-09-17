@@ -63,6 +63,43 @@ export interface CollateralConfig {
   note?: string
 }
 
+/**
+ * A pool that lends a volatile asset against the chain's stablecoin - the
+ * inverse of every entry in `collateral`.
+ *
+ * The ordinary pools let someone post an equity and draw USDG. These let
+ * someone post USDG and draw the equity, which is what a short is: borrow the
+ * asset, sell it, buy it back cheaper. Same Uniswap pool backs the oracle,
+ * read in the opposite direction.
+ *
+ * Ratios here are deliberately a tier tighter than the same asset's ratio on
+ * the long side. A loan against an equity is exposed to that equity falling,
+ * which stops at zero; a loan *of* an equity is exposed to it rising, which
+ * does not stop anywhere.
+ */
+export interface InversePoolConfig {
+  /** Symbol of the asset being lent. It is the principal here, not collateral. */
+  symbol: string
+  /** Address of the asset being lent. */
+  token: string
+  /** Uniswap V3 pool quoting this asset against the chain's principal. */
+  pool: string
+  poolFee: number
+  token0Decimals: number
+  token1Decimals: number
+  /**
+   * True when the route must be read token1-per-token0. This is the opposite
+   * of the same asset's `zeroForOne` in `collateral`: the oracle has to yield
+   * principal per collateral, and principal and collateral have swapped.
+   */
+  zeroForOne: boolean
+  /** Over-collateralization ratio. 10000 == 100%. */
+  collateralRatio: number
+  /** Market keys this asset gets an inverse pool on. Omitted means every market. */
+  markets?: string[]
+  note?: string
+}
+
 export interface ChainBootstrapConfig {
   /** hardhat network name this config applies to. */
   network: string
@@ -80,4 +117,6 @@ export interface ChainBootstrapConfig {
   liquidityThresholdPercent: number
   markets: MarketConfig[]
   collateral: CollateralConfig[]
+  /** Pools that lend the asset against the chain's principal. Optional. */
+  inverse?: InversePoolConfig[]
 }

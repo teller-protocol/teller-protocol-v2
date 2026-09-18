@@ -1,0 +1,22 @@
+{
+  "chainId": 5042,
+  "principal": "0x3600000000000000000000000000000000000000",
+  "markets": {
+    "short": {
+      "marketId": "1",
+      "owner": "0x8cfd836B4FCD05414f63523BC02f24bda992aa20",
+      "txHash": "0x6262de5a4aaf308ee19cad4dcc7c6b69bafe270f85d81e80eb328df24df377e9"
+    },
+    "long": {
+      "marketId": "2",
+      "owner": "0x8cfd836B4FCD05414f63523BC02f24bda992aa20",
+      "txHash": "0xbe9d7077e1f8516b491c34c7819b8fc9a7c656db91630c482de9d4ca506e61a3"
+    }
+  },
+  "pools": {
+    "short:ARGUS": {
+      "address": "0xC0DD4A4B094F9527f240165567E383804Dfbf8D6",
+      "txHash": "0x747fcd742bad4deacc69dbd51ddb90ce2a55a0ca654d35474e2a885fe89bc33b"
+    }
+  }
+}

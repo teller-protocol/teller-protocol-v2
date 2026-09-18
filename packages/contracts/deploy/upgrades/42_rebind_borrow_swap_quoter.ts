@@ -65,9 +65,23 @@ const deployFn: DeployFunction = async (hre) => {
   // only as long as the run, so this happens every time; it is idempotent, and
   // it is not a way around the layout check - upgradeProxy still performs it
   // against the imported layout.
+  //
+  // The constructor args here have to be the ones the *current* implementation
+  // was built with, read off the contract itself. Importing it under the args
+  // we are upgrading *to* records an implementation that answers to those args
+  // already, and upgradeProxy then reuses it and changes nothing: the run
+  // reports success, the proxy still points at the old implementation, and the
+  // old quoter is still bound.
+  const live = borrowSwap as any
+  const currentArgs = [
+    await live.TELLER_V2(),
+    await live.UNISWAP_SWAP_ROUTER(),
+    await live.UNISWAP_QUOTER(),
+  ]
   await hre.upgrades.forceImport(proxyAddress, implFactory, {
     kind: 'transparent',
-    constructorArgs: [await tellerV2.getAddress(), swapRouter, quoter],
+    constructorArgs: currentArgs,
+    unsafeAllow: ['constructor', 'state-variable-immutable'],
   } as any)
 
   const upgraded = await hre.upgrades.upgradeProxy(proxyAddress, implFactory, {
@@ -82,6 +96,19 @@ const deployFn: DeployFunction = async (hre) => {
   hre.log(`BorrowSwap:     ${proxyAddress}`, { star: false })
   hre.log(`Implementation: ${implementation}`, { star: false })
   hre.log(`Quoter:         ${quoter}`, { star: false })
+
+  // Assert the thing this script exists to do. upgradeProxy reports success
+  // whether or not it replaced anything - reusing a matching implementation is
+  // a legitimate outcome for it - so without this the only signal that the
+  // rebind did nothing is an address in a log line that nobody reads.
+  const boundAfter: string = await live.UNISWAP_QUOTER()
+  if (boundAfter.toLowerCase() !== quoter.toLowerCase()) {
+    throw new Error(
+      `BorrowSwap rebind on ${hre.network.name} changed nothing: still bound to ` +
+        `${boundAfter}, expected ${quoter}. The proxy is at ${proxyAddress}, ` +
+        `implementation ${implementation}.`
+    )
+  }
 
   // Keep the artifact honest about which implementation is live, so the next
   // run's idempotency check and every consumer of the deployment read the

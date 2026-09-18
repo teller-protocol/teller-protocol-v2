@@ -555,7 +555,18 @@ log "Deploy pass 1 — $NETWORK"
 yarn hh deploy --network "$NETWORK"
 
 TIMELOCK_FILE="deployments/$NETWORK/TimelockController.json"
-[ -f "$TIMELOCK_FILE" ] || fail "Pass 1 finished but $TIMELOCK_FILE does not exist. Nothing to hand to pass 2."
+if [ ! -f "$TIMELOCK_FILE" ]; then
+  # Keep what pass 1 built before giving up. Without this the artifacts die
+  # with the container and the next run deploys the whole protocol again from
+  # scratch - which on Arc it did three times, ~89 transactions apiece, leaving
+  # three orphaned copies and no record of any of them. A pass 1 that finished
+  # is worth preserving even when the hand-off to pass 2 cannot happen.
+  push_artifacts "Add $NETWORK deployment artifacts (pass 1, no timelock)"
+  fail "Pass 1 finished but $TIMELOCK_FILE does not exist. Nothing to hand to pass 2.
+     The artifacts from pass 1 have been pushed, so re-running resumes rather
+     than redeploying. A chain missing from the allowlist in
+     deploy/admin/timelock_controller.ts is the usual cause."
+fi
 
 TIMELOCK_ADDRESS="$(node -e "process.stdout.write(require('./$TIMELOCK_FILE').address)")"
 case "$TIMELOCK_ADDRESS" in

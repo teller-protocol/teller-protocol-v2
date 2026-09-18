@@ -44,14 +44,22 @@ const config: ChainBootstrapConfig = {
       key: 'short',
       label: '7 Day',
       durationSeconds: 7 * 24 * 60 * 60,
-      paymentDefaultDuration: 3 * 24 * 60 * 60,
+      // 5 minutes. Deliberately tight: the grace period is snapshotted into
+      // each bid when it is submitted, so this governs new loans only, and a
+      // short grace is what makes a delinquent loan actionable on a chain
+      // whose collateral can gap while the underlying market is shut.
+      paymentDefaultDuration: 5 * 60,
       bidExpirationTime: 24 * 60 * 60,
     },
     {
       key: 'long',
       label: '30 Day',
       durationSeconds: 30 * 24 * 60 * 60,
-      paymentDefaultDuration: 7 * 24 * 60 * 60,
+      // 5 minutes. Deliberately tight: the grace period is snapshotted into
+      // each bid when it is submitted, so this governs new loans only, and a
+      // short grace is what makes a delinquent loan actionable on a chain
+      // whose collateral can gap while the underlying market is shut.
+      paymentDefaultDuration: 5 * 60,
       bidExpirationTime: 24 * 60 * 60,
     },
   ],

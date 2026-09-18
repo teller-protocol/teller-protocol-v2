@@ -396,11 +396,12 @@ export default <HardhatUserConfig>{
         },
       },
       {
-        // Arc. Circle had not published an official explorer at mainnet launch,
-        // and arc-scan.org is independent infrastructure rather than Circle's.
-        // Etherscan V2 is assumed here and both halves are overridable, the
-        // same way Robinhood's are, because this is the one input most likely
-        // to be wrong on a two-day-old chain.
+        // Arc. At mainnet launch the only explorer was arc-scan.org, which is
+        // independent infrastructure rather than Circle's, and this entry
+        // pointed at it. Etherscan V2's chainlist now carries 5042 as "Arc
+        // Mainnet" with arc.etherscan.io as its explorer, so the browser URL
+        // moves there — same as Robinhood above, and it is the one the
+        // verification API actually writes to. Both halves stay overridable.
         network: 'arc',
         chainId: 5042,
         urls: {
@@ -408,7 +409,7 @@ export default <HardhatUserConfig>{
             process.env.ARC_VERIFY_API_URL ??
             'https://api.etherscan.io/v2/api?chainid=5042',
           browserURL:
-            process.env.ARC_EXPLORER_URL ?? 'https://arc-scan.org',
+            process.env.ARC_EXPLORER_URL ?? 'https://arc.etherscan.io',
         },
       },
       {

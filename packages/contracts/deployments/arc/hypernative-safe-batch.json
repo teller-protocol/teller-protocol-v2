@@ -1,0 +1,26 @@
+{
+  "version": "1.0",
+  "chainId": "5042",
+  "createdAt": 1789747798436,
+  "meta": {
+    "name": "Enable Hypernative on arc",
+    "description": "Grants the pauser role to the Hypernative response wallet, and points SmartCommitmentForwarder at the HypernativeOracle.",
+    "txBuilderVersion": "1.16.5"
+  },
+  "transactions": [
+    {
+      "to": "0x6373E9D49087672a2b90b4901C52705391D6FF3f",
+      "value": "0",
+      "data": "0x82dc1ec4000000000000000000000000a6af91a354e5acc23e0de58500828f40803c60aa",
+      "contractMethod": null,
+      "contractInputsValues": null
+    },
+    {
+      "to": "0xADD559C0204ed54b1288eEaF4736edAe6A0E0fab",
+      "value": "0",
+      "data": "0x7adbf97300000000000000000000000026a752cffa6e42fe1d76263020c5ee669a0b2979",
+      "contractMethod": null,
+      "contractInputsValues": null
+    }
+  ]
+}

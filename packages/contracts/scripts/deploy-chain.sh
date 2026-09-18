@@ -37,7 +37,9 @@
 #                           unattended, and yarn falls back to asking for a
 #                           security key that nobody is there to press.
 #   RUN_TAGS=<tags>         run only these deploy tags and stop. For wiring an
-#                           already-deployed chain without a full run.
+#                           already-deployed chain without a full run. Honours
+#                           PUSH_ARTIFACTS, which the oracle wiring needs: it
+#                           writes the Safe batch that switches the firewall on.
 #   BOOTSTRAP_MARKETS=true  create the markets and lender pools for an already
 #                           deployed chain and stop. A full run does this on
 #                           its own; this is for re-running it alone.
@@ -334,12 +336,27 @@ if [ -n "${RUN_TAGS:-}" ]; then
   chmod 600 mnemonic.secret
   trap 'rm -f mnemonic.secret' EXIT
 
+  # Tags write artifacts too, and some of them are the only copy of something
+  # nobody can reconstruct from the chain. hypernative-oracle:wire ends by
+  # writing hypernative-safe-batch.json — the setOracle and addPauser calls a
+  # signer has to import to switch the firewall on — and without this that file
+  # exists only inside a container that is about to exit. The .migrations.json
+  # entries matter less (the scripts are idempotent) but losing them means
+  # every re-run re-derives work that was already done.
+  prepare_artifact_push
+
   log "Deployer preflight on $NETWORK"
   yarn hh run --no-compile scripts/preflight-deployer.ts --network "$NETWORK" \
     || fail "Deployer preflight failed."
 
   log "Running tags [$RUN_TAGS] on $NETWORK"
   yarn hh deploy --network "$NETWORK" --tags "$RUN_TAGS"
+
+  if [ "${PUSH_ARTIFACTS:-}" = "true" ]; then
+    log "Committing artifacts to $ARTIFACT_BRANCH"
+    push_artifacts "Run tags [$RUN_TAGS] on $NETWORK"
+  fi
+
   log "Done — $NETWORK (tags: $RUN_TAGS)"
   exit 0
 fi

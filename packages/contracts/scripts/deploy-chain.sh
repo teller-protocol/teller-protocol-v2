@@ -51,6 +51,17 @@
 #                           sending anything.
 #   PRICE_CAP_BUFFER_BPS    headroom above the current reading, in bps.
 #   PRICE_CAP_ONLY          only pools whose receipt key contains this.
+#   SET_PAYMENT_DEFAULT=true
+#                           set paymentDefaultDuration on markets that already
+#                           exist. Needs PAYMENT_DEFAULT_SECONDS.
+#   PAYMENT_DEFAULT_SECONDS=<n>
+#                           the new grace period, in seconds.
+#   PAYMENT_DEFAULT_MARKETS=<ids>
+#                           comma-separated market ids, e.g. 1,2,3,4. Omitted
+#                           means every market on the registry.
+#   PAYMENT_DEFAULT_DRY_RUN=true
+#                           with SET_PAYMENT_DEFAULT, print before/after and
+#                           send nothing.
 #   PUBLISH_ONLY=true       publish the package from artifacts already in the
 #                           repo and stop. Needs PUBLISH_PACKAGE=true and
 #                           NPM_TOKEN. Sends no transaction. For a chain that
@@ -466,6 +477,48 @@ if [ "${SET_PRICE_CAPS:-}" = "true" ]; then
   fi
 
   log "Done — $NETWORK (price caps)"
+  exit 0
+fi
+
+# Payment default duration, on markets that already exist.
+#
+# BOOTSTRAP_MARKETS cannot reconcile this. It skips any market already in
+# market-bootstrap.json, so it only ever writes this value at creation time -
+# and the receipt is an incomplete census anyway, because markets created
+# before it existed appear nowhere in it. So this mode takes market ids
+# directly (or enumerates the registry) and needs neither the receipt nor a
+# config/chain-bootstrap entry, which is what lets it run on any chain rather
+# than only the ones bootstrapped through that task.
+if [ "${SET_PAYMENT_DEFAULT:-}" = "true" ]; then
+  [ -d "deployments/$NETWORK" ] || fail \
+    "SET_PAYMENT_DEFAULT needs deployments/$NETWORK in this checkout."
+  [ -n "${PAYMENT_DEFAULT_SECONDS:-}" ] || fail \
+    "SET_PAYMENT_DEFAULT is set but PAYMENT_DEFAULT_SECONDS is not. Refusing to guess a grace period."
+  [ -n "${DEPLOYER_MNEMONIC:-}" ] || fail "DEPLOYER_MNEMONIC is not set."
+  printf '%s' "$DEPLOYER_MNEMONIC" > mnemonic.secret
+  chmod 600 mnemonic.secret
+  trap 'rm -f mnemonic.secret' EXIT
+
+  PAYMENT_DEFAULT_ARGS=""
+  [ -n "${PAYMENT_DEFAULT_MARKETS:-}" ] && \
+    PAYMENT_DEFAULT_ARGS="--markets ${PAYMENT_DEFAULT_MARKETS}"
+
+  # Same "true" comparison as the bootstrap and price-cap dry runs, and for the
+  # same reason: ${VAR:+...} expands on the string "false" and would send a run
+  # meant to be a rehearsal.
+  if [ "${PAYMENT_DEFAULT_DRY_RUN:-}" = "true" ]; then
+    log "Set payment default duration on $NETWORK to ${PAYMENT_DEFAULT_SECONDS}s (dry run — nothing will be sent)"
+    # shellcheck disable=SC2086
+    yarn hh set-market-payment-default --network "$NETWORK" \
+      --seconds "$PAYMENT_DEFAULT_SECONDS" --dry-run true $PAYMENT_DEFAULT_ARGS
+  else
+    log "Set payment default duration on $NETWORK to ${PAYMENT_DEFAULT_SECONDS}s"
+    # shellcheck disable=SC2086
+    yarn hh set-market-payment-default --network "$NETWORK" \
+      --seconds "$PAYMENT_DEFAULT_SECONDS" $PAYMENT_DEFAULT_ARGS
+  fi
+
+  log "Done — $NETWORK (payment default duration)"
   exit 0
 fi
 

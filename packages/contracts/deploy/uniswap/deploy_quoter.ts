@@ -20,12 +20,36 @@ const deployFn: DeployFunction = async (hre) => {
   // Not skipIfAlreadyDeployed. The quoter is a stateless view contract - it
   // holds no funds, no positions and no storage anyone else points at - so
   // there is nothing to preserve by pinning a chain to the bytecode it
-  // happened to get first. Skipping did preserve exactly that: the quoter
-  // deployed before FullMath's 512-bit path was fixed reverted on any pool
-  // priced high enough to need it, and no redeploy could replace it.
+  // happened to get first.
   //
-  // hardhat-deploy still no-ops when the bytecode and args are unchanged, so
-  // this redeploys on a real change and stays quiet otherwise.
+  // That alone does not get a chain off a bad quoter, though. `deploy` only
+  // redeploys when hardhat-deploy reports the deployment as different, and it
+  // works that out from the bytecode or the deploy transaction recorded in
+  // deployments/<network>/Quoter.json. The artifacts this repo saves carry
+  // neither - address, abi, args and numDeployments, nothing else - so there
+  // is nothing to compare, every build looks identical to the last, and the
+  // existing address is reused however much the source changed. That is why
+  // the first attempt at replacing the pre-fix quoter logged
+  // "reusing 0x8B7b8490..." and deployed nothing.
+  //
+  // REDEPLOY_QUOTER drops the record so the next deploy is a fresh one. It is
+  // opt-in rather than automatic because the alternative - treating "cannot
+  // prove it is the same" as "redeploy" - would hand every chain a new quoter
+  // on every run, and rebind BorrowSwap to it each time.
+  //
+  // Anything pointing at the old address keeps pointing at it until it is
+  // rebound; on this protocol that is BorrowSwap's immutable, which
+  // 42_rebind_borrow_swap_quoter handles.
+  if (process.env.REDEPLOY_QUOTER === 'true') {
+    const existing = await hre.deployments.getOrNull('Quoter')
+    if (existing) {
+      hre.log(
+        `REDEPLOY_QUOTER: discarding the Quoter record at ${existing.address} so this build deploys a new one`
+      )
+      await hre.deployments.delete('Quoter')
+    }
+  }
+
   const quoter = await  deploy({
     contract: 'Quoter',
     args: [ uniswapV3FactoryAddress ] ,

@@ -80,6 +80,11 @@ const config: ChainBootstrapConfig = {
     },
   ],
 
+  // ARGUS is only listed on the seven-day market, so that is the one whose
+  // pool needs the owner's first deposit. The default here is `['long']`,
+  // which on Arc would open nothing at all.
+  activateMarkets: ['short'],
+
   collateral: [
     {
       symbol: 'ARGUS',

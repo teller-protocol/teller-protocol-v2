@@ -119,4 +119,18 @@ export interface ChainBootstrapConfig {
   collateral: CollateralConfig[]
   /** Pools that lend the asset against the chain's principal. Optional. */
   inverse?: InversePoolConfig[]
+  /**
+   * Market keys whose pools get the owner's first deposit.
+   *
+   * A LenderCommitmentGroup pool rejects every deposit until its first one,
+   * and that first one has to come from the owner - so a pool nobody has
+   * opened is a pool the front end lists and no lender can use. Activating
+   * costs real principal, so only the markets a chain actually surfaces are
+   * worth opening.
+   *
+   * Omitted means `['long']`, which is what every chain that lists its
+   * thirty-day market and hides its seven-day one wants. A chain that
+   * launches on the short market names it here instead.
+   */
+  activateMarkets?: string[]
 }

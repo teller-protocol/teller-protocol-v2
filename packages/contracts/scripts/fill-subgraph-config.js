@@ -12,6 +12,12 @@
  * indexes the wrong address looks healthy and returns nothing, which is a slow
  * and confusing failure; and a start block of 0 on a fast chain costs days of
  * backfill.
+ *
+ * A chain with no config yet gets one from `_template.json` in the same
+ * directory. It used to print "skip (no config)" and exit 0 instead, which on
+ * a brand new chain is every target — so the launch reported success, wrote
+ * nothing, and the gap surfaced days later as a chain with no data. Creating
+ * the file is the whole of what a person did at that point anyway.
  */
 
 const fs = require('fs')
@@ -73,10 +79,24 @@ let missing = []
 
 for (const target of targets) {
   if (!fs.existsSync(target)) {
-    console.log(`skip (no config): ${target}`)
-    continue
+    const template = path.join(path.dirname(target), '_template.json')
+    if (!fs.existsSync(template)) {
+      console.log(`skip (no config and no template): ${target}`)
+      continue
+    }
+    // The template carries the placeholders the loop below resolves, plus
+    // NETWORK_NAME, which is the one thing it cannot read out of an artifact.
+    fs.writeFileSync(
+      target,
+      fs.readFileSync(template, 'utf-8').split('NETWORK_NAME').join(network),
+      'utf-8'
+    )
+    console.log(`created from _template.json: ${target}`)
   }
   let raw = fs.readFileSync(target, 'utf-8')
+
+  // The comment is for whoever opens the template, not for graph-cli.
+  raw = raw.replace(/^\s*"_comment": .*\n/m, '')
 
   for (const [placeholder, contract] of Object.entries(SUBSTITUTIONS)) {
     if (!raw.includes(placeholder)) continue

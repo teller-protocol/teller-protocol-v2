@@ -1,0 +1,26 @@
+{
+  "enabled": true,
+  "name": "tellerv2-poolsv2-arc",
+  "network": "arc",
+  "export_network_name": "arc",
+  "product": "selfhosted",
+  "studio": {
+    "owner": "0x1a76339211668a6939e1d6D13AB902bBef5D9ebc",
+    "network": "arbitrum-one"
+  },
+  "grafting": {
+    "enabled": false
+  },
+  "contracts": {
+    "factory": {
+      "enabled": true,
+      "address": "0x2d50615e9eE615Cffa1B29547CC2Dd520362Bb42",
+      "block": "21498593"
+    },
+    "collateralManager": {
+      "enabled": true,
+      "address": "0x08bC35e4232b7d705C13BE2d5648c760671F3902",
+      "block": "21498593"
+    }
+  }
+}

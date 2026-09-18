@@ -1,0 +1,60 @@
+{
+  "enabled": true,
+  "name": "teller-v2-arc",
+  "network": "arc",
+  "export_network_name": "arc",
+  "product": "selfhosted",
+  "studio": {
+    "owner": "0x1A2bAA2257343119FB03FD448622456a0c4f2190",
+    "network": "mainnet"
+  },
+  "grafting": {
+    "enabled": false
+  },
+  "block_handler": {
+    "enabled": false,
+    "block": "21498593"
+  },
+  "contracts": {
+    "teller_v2": {
+      "enabled": true,
+      "address": "0x21f27D9C397376e6F94583D65d4e3ED0DB8bfd33",
+      "block": "21498593"
+    },
+    "market_registry": {
+      "enabled": true,
+      "address": "0x8Ca0de7d034ca7Eec2f014985e7AFBbD9b541FC9",
+      "block": "21498593"
+    },
+    "lender_commitment": {
+      "enabled": false,
+      "address": "0x0000000000000000000000000000000000000000",
+      "block": "0"
+    },
+    "lender_commitment_staging": {
+      "enabled": false,
+      "address": "0x0000000000000000000000000000000000000000",
+      "block": "0"
+    },
+    "lender_commitment_alpha": {
+      "enabled": true,
+      "address": "0x2ac0Cb7b93E9E8c205Ee51552298BB4249CD4136",
+      "block": "21498593"
+    },
+    "collateral_manager": {
+      "enabled": true,
+      "address": "0x08bC35e4232b7d705C13BE2d5648c760671F3902",
+      "block": "21498593"
+    },
+    "lender_manager": {
+      "enabled": true,
+      "address": "0x284A87A6465A875a5c2706940a30De0776faA386",
+      "block": "21498593"
+    },
+    "market_liquidity_rewards": {
+      "enabled": true,
+      "address": "0x68Da9eB9935BB87F4b7C3e92726Bff07f7c8142c",
+      "block": "21498593"
+    }
+  }
+}

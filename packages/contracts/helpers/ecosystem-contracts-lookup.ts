@@ -49,6 +49,12 @@ export function get_ecosystem_contract_address(
 	      // UniswapV3Factory (getPool/createPool/feeAmountTickSpacing/owner).
 	      uniswapV3FactoryAddress = '0x1f7d7550B1b028f7571E69A784071F0205FD2EfA'
 	      break
+	    case 'arc':
+	      // Verified both directions on 5042: the ARGUS/USDC pool reports this as
+	      // its factory(), and this factory's getPool(USDC, ARGUS, 10000) returns
+	      // that same pool.
+	      uniswapV3FactoryAddress = '0xf0db7b58379503491d857db50aC9eCe64c653918'
+	      break
 	    default:
 	      return undefined 
 	  }
@@ -97,6 +103,24 @@ export function get_ecosystem_contract_address(
 		      break
 		    case 'robinhood':
 		      weth9Address = '0x0bd7d308f8e1639fab988df18a8011f41eacad73' // WETH (18 dec)
+		      break
+
+		    case 'arc':
+		      // Arc has no WETH and no wrapped native, because it does not need
+		      // one: the native gas asset is USDC, and it is already an ERC-20 at
+		      // this address. Uniswap's own SDK does the same thing - WETH[ARC]
+		      // points here.
+		      //
+		      // Not the address Uniswap's router reports from WETH9(). That is
+		      // 0x8bceaa40b9acdfaedf85adf4ff01f5ad6517937f, which holds 52 bytes
+		      // of code and answers neither symbol(), name(), decimals() nor
+		      // totalSupply() - a placeholder the router never has to use, since
+		      // there is nothing to wrap. Writing it here would put an address
+		      // nothing can transfer into every swap path.
+		      //
+		      // Mind the decimals: this interface is 6, while the same balance
+		      // seen natively is 18.
+		      weth9Address = '0x3600000000000000000000000000000000000000'
 		      break
 
 		    default:
@@ -152,6 +176,11 @@ export function get_ecosystem_contract_address(
 		      // does not.
 		      swapRouterAddress = '0xcaf681a66d020601342297493863e78c959e5cb2'
 		      break
+		    case 'arc':
+		      // Uniswap's own deployment on 5042. factory() returns the v3
+		      // factory above, checked on chain.
+		      swapRouterAddress = '0x53bf6b0684ec7EF91e1387DA3D1a1769Bc5a6F77'
+		      break
 		    default:
 		    	return undefined 
 		      //throw new Error('No swap factory address found for this network')
@@ -198,6 +227,11 @@ export function get_ecosystem_contract_address(
 			      break
 			    case 'xdc':
 			      quoterAddress = '0x5911cB3633e764939edc2d92b7e1ad375Bb57649'
+			      break
+			    case 'arc':
+			      // Uniswap ships a Quoter on 5042, so there is nothing to vendor
+			      // here. factory() returns the v3 factory above, checked on chain.
+			      quoterAddress = '0x7dFD4f31be6814d2906BdE155c3E1b146eAC1468'
 			      break
 			    case 'robinhood':
 			      // Deployed by us. 4663 has no quoter we can point at - it is a

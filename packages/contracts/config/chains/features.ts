@@ -162,12 +162,10 @@ export const CHAIN_FEATURES: Record<string, ChainFeature[]> = {
     'uniswapPricingHelper',
     'hypernativeOracle',
     'protocolPausingManager',
-    // Arc has Uniswap's own Quoter at 0x7dfd4f31be6814d2906bde155c3e1b146eac1468.
-    // The vendored one is deployed anyway, for now, because it is the path the
-    // BorrowSwap bind is tested against end to end and the FullMath fix that
-    // broke Loop on Robinhood is in it. Pointing at Uniswap's is a later
-    // simplification, not a launch-day unknown.
-    'uniswapV3Quoter',
+    // No vendored quoter: Uniswap ships one on Arc, and it answers factory()
+    // with the chain's v3 factory. The vendored copy exists for chains with
+    // none to point at, and deploying it here would be a second quoter to keep
+    // in step with the first.
   ],
   robinhood: [
     'lenderCommitmentForwarder',

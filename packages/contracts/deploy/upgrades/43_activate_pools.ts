@@ -3,8 +3,10 @@ import { HardhatRuntimeEnvironment } from 'hardhat/types'
 import fs from 'fs'
 import path from 'path'
 
+import { ChainBootstrapConfig } from '../../config/chain-bootstrap/types'
+
 /**
- * Make the Robinhood pools depositable.
+ * Make a chain's pools depositable.
  *
  * A LenderCommitmentGroup pool rejects every deposit until its first one, and
  * that first one has to come from the pool's owner:
@@ -22,10 +24,15 @@ import path from 'path'
  * totalSupply 0 and answered "FD" to anyone who tried, which is what a lender
  * saw as a failed deposit with no explanation.
  *
+ * Which pools get opened comes from the chain's own bootstrap config -
+ * `activateMarkets`, defaulting to the thirty-day market. Opening a pool costs
+ * real principal, so a market the front end does not list is not worth the
+ * deposit.
+ *
  * Shares are 1:1 with assets on the first deposit (sharesExchangeRate returns
  * the expansion factor while totalSupply is 0), and poolIsActivated wants
  * totalSupply >= 1e6, so the floor is 1e6 of the principal's own units: one
- * whole USDG at six decimals, and a millionth of a millionth of a token at
+ * whole dollar at six decimals, and a millionth of a millionth of a token at
  * eighteen. The amounts below clear that by a wide margin in the first case
  * and enormously in the second.
  */
@@ -34,7 +41,10 @@ const MIN_SHARES = 10n ** 6n
 
 // One whole unit is the floor for a six-decimal principal, so two is the
 // smallest amount that is not sitting on the boundary.
-const USDG_DEPOSIT = 2_000_000n
+const STABLE_DEPOSIT = 2_000_000n
+
+/** Markets whose pools get opened when the chain's config does not say. */
+const DEFAULT_ACTIVATE_MARKETS = ['long']
 
 const POOL_ABI = [
   'function principalToken() view returns (address)',
@@ -50,8 +60,23 @@ const ERC20_ABI = [
   'function decimals() view returns (uint8)',
 ]
 
+/** Markets this chain wants opened, from its bootstrap config. */
+const activateMarkets = async (network: string): Promise<string[]> => {
+  try {
+    const mod = await import(`../../config/chain-bootstrap/${network}`)
+    const config = (mod.default ?? mod) as ChainBootstrapConfig
+    return config.activateMarkets ?? DEFAULT_ACTIVATE_MARKETS
+  } catch {
+    // A chain with no bootstrap config has no pools of ours to open either,
+    // and `listedPools` will come back empty regardless.
+    return DEFAULT_ACTIVATE_MARKETS
+  }
+}
+
 /** The pools this chain lists, read from the bootstrap receipt. */
-const listedPools = (hre: HardhatRuntimeEnvironment): [string, string][] => {
+const listedPools = async (
+  hre: HardhatRuntimeEnvironment
+): Promise<[string, string][]> => {
   // Resolved against the project root rather than the working directory, so
   // it does not depend on where the deploy was invoked from.
   const receiptPath = path.join(
@@ -63,11 +88,12 @@ const listedPools = (hre: HardhatRuntimeEnvironment): [string, string][] => {
   if (!fs.existsSync(receiptPath)) return []
   const receipt = JSON.parse(fs.readFileSync(receiptPath, 'utf8'))
 
-  // `long` is the thirty-day market, the one Earn and Borrow list. The
-  // seven-day pools are still on chain and still borrowable; they are not
-  // shown, so activating them is not this script's business.
+  // Receipt keys are `<market>:<symbol>`. Pools on a market this chain does
+  // not surface are still on chain and still borrowable against; they are not
+  // shown, so opening them is not this script's business.
+  const markets = await activateMarkets(hre.network.name)
   return Object.entries(receipt?.pools ?? {})
-    .filter(([key]) => key.startsWith('long:'))
+    .filter(([key]) => markets.includes(key.split(':')[0]))
     .map(([key, pool]) => [key, (pool as { address: string }).address])
 }
 
@@ -82,7 +108,7 @@ const deployFn: DeployFunction = async (hre) => {
   const activated: string[] = []
   const skipped: string[] = []
 
-  for (const [key, address] of listedPools(hre)) {
+  for (const [key, address] of await listedPools(hre)) {
     const pool = await hre.ethers.getContractAt(POOL_ABI, address, deployer)
 
     if ((await pool.totalSupply()) >= MIN_SHARES) {
@@ -114,7 +140,7 @@ const deployFn: DeployFunction = async (hre) => {
     // lending it, so it takes a fixed amount. Anything else is an asset that
     // is the principal of exactly one listed pool, so that pool takes the
     // whole balance - there is nothing else here to spend it on.
-    const amount = decimals === 6n ? USDG_DEPOSIT : balance
+    const amount = decimals === 6n ? STABLE_DEPOSIT : balance
 
     if (amount === 0n || balance < amount) {
       skipped.push(
@@ -155,7 +181,7 @@ deployFn.tags = ['activate-pools']
 deployFn.dependencies = []
 deployFn.skip = async (hre) => {
   if (!hre.network.live) return true
-  return listedPools(hre).length === 0
+  return (await listedPools(hre)).length === 0
 }
 
 export default deployFn

@@ -35,6 +35,7 @@ import { logTxLink } from 'helpers/logTxLink'
  */
 const HYPERNATIVE_OPERATORS: Record<string, string> = {
   robinhood: '0xa6af91a354e5acc23e0de58500828f40803c60aa',
+  arc: '0xa6af91a354e5acc23e0de58500828f40803c60aa',
 }
 
 /**
@@ -392,6 +393,12 @@ deployFn.dependencies = [
   'smart-commitment-forwarder:deploy',
   'protocol-pausing-manager:deploy',
 ]
+// A chain missing from this list is not one that opts out of the firewall, it
+// is one where the firewall was never switched on: the oracle deploys, the
+// forwarder's oracle slot stays zero, and OracleProtectionManager's fail-open
+// branch waves every caller through. Nothing logs and nothing reverts, so the
+// chain looks protected from every angle except the one that counts. Arc was
+// in that state between its launch and this line.
 deployFn.skip = async (hre) =>
   !hre.network.live ||
   ![
@@ -403,6 +410,7 @@ deployFn.skip = async (hre) =>
     'apechain',
     'xdc',
     'robinhood',
+    'arc',
   ].includes(hre.network.name)
 
 export default deployFn

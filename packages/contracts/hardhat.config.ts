@@ -114,6 +114,7 @@ type NetworkNames =
   | 'apechain'
   | 'xdc'
   | 'robinhood'
+  | 'arc'
   | 'sepolia'
   | 'mumbai'
   | 'goerli'
@@ -176,6 +177,15 @@ const networkUrls: Record<NetworkNames, string> = {
         (ALCHEMY_API_KEY
           ? `https://robinhood-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
           : 'https://rpc.mainnet.chain.robinhood.com'),
+
+      // Arc, Circle's L1. Alchemy is an announced infrastructure partner and
+      // serves arc-mainnet on the usual slug; arc.drpc.org is the keyless
+      // fallback. Note that gas here is USDC, not ETH.
+      arc:
+        process.env.ARC_RPC_URL ??
+        (ALCHEMY_API_KEY
+          ? `https://arc-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
+          : 'https://arc.drpc.org'),
 
   mantle: 'https://rpc.mantle.xyz',
 
@@ -257,6 +267,10 @@ export default <HardhatUserConfig>{
       // ROBINHOOD_VERIFY_API_URL is pointed at it instead of Etherscan V2.
       robinhood:
         process.env.ROBINHOOD_VERIFY_API_KEY ??
+        process.env.ETHERSCANV2_VERIFY_API_KEY,
+
+      arc:
+        process.env.ARC_VERIFY_API_KEY ??
         process.env.ETHERSCANV2_VERIFY_API_KEY,
 
       mantle: process.env.MANTLE_VERIFY_API_KEY ?? 'xyz',
@@ -379,6 +393,22 @@ export default <HardhatUserConfig>{
             'https://api.etherscan.io/v2/api?chainid=4663',
           browserURL:
             process.env.ROBINHOOD_EXPLORER_URL ?? 'https://robin.etherscan.io',
+        },
+      },
+      {
+        // Arc. Circle had not published an official explorer at mainnet launch,
+        // and arc-scan.org is independent infrastructure rather than Circle's.
+        // Etherscan V2 is assumed here and both halves are overridable, the
+        // same way Robinhood's are, because this is the one input most likely
+        // to be wrong on a two-day-old chain.
+        network: 'arc',
+        chainId: 5042,
+        urls: {
+          apiURL:
+            process.env.ARC_VERIFY_API_URL ??
+            'https://api.etherscan.io/v2/api?chainid=5042',
+          browserURL:
+            process.env.ARC_EXPLORER_URL ?? 'https://arc-scan.org',
         },
       },
       {
@@ -542,6 +572,14 @@ export default <HardhatUserConfig>{
       50: '0x55c12dF12e8D1094f387D77F445a8F1bE61C17BE',  // xdc
       // robinhood. Safe v1.4.1, 2-of-5, verified on chain 4663.
       4663: '0x654Dc22CC48Ca029A0EAD3Bf66e73BF2db71eA28',
+      // Arc. No Safe exists on this chain yet. Left as the zero address so
+      // pass 1 runs and the ownership-transfer scripts skip, exactly as
+      // Robinhood's timelock did - deploy a Safe, set ARC_PROTOCOL_OWNER_SAFE,
+      // and re-run. Leaving it zero permanently means the deploy key owns the
+      // protocol on Arc, which is not a launch state.
+      5042:
+        process.env.ARC_PROTOCOL_OWNER_SAFE ??
+        '0x0000000000000000000000000000000000000000',
     },
     protocolTimelock: {
       31337: 8,
@@ -565,6 +603,9 @@ export default <HardhatUserConfig>{
       // address from deployments/robinhood/TimelockController.json into
       // ROBINHOOD_TIMELOCK_ADDRESS and run pass 2.
       4663: process.env.ROBINHOOD_TIMELOCK_ADDRESS ?? '0x0000000000000000000000000000000000000000',
+      // Arc. Same two-pass hand-off: pass 1 deploys the timelock, pass 2
+      // consumes it from ARC_TIMELOCK_ADDRESS.
+      5042: process.env.ARC_TIMELOCK_ADDRESS ?? '0x0000000000000000000000000000000000000000',
     },
   },
 
@@ -794,6 +835,20 @@ export default <HardhatUserConfig>{
         etherscan: {
           apiKey:
             process.env.ROBINHOOD_VERIFY_API_KEY ??
+            process.env.ETHERSCANV2_VERIFY_API_KEY,
+        },
+      },
+    }),
+
+    arc: networkConfig({
+      url: networkUrls.arc,
+      chainId: 5042,
+      live: true,
+
+      verify: {
+        etherscan: {
+          apiKey:
+            process.env.ARC_VERIFY_API_KEY ??
             process.env.ETHERSCANV2_VERIFY_API_KEY,
         },
       },

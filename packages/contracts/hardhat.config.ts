@@ -572,14 +572,14 @@ export default <HardhatUserConfig>{
       50: '0x55c12dF12e8D1094f387D77F445a8F1bE61C17BE',  // xdc
       // robinhood. Safe v1.4.1, 2-of-5, verified on chain 4663.
       4663: '0x654Dc22CC48Ca029A0EAD3Bf66e73BF2db71eA28',
-      // Arc. No Safe exists on this chain yet. Left as the zero address so
-      // pass 1 runs and the ownership-transfer scripts skip, exactly as
-      // Robinhood's timelock did - deploy a Safe, set ARC_PROTOCOL_OWNER_SAFE,
-      // and re-run. Leaving it zero permanently means the deploy key owns the
-      // protocol on Arc, which is not a launch state.
-      5042:
-        process.env.ARC_PROTOCOL_OWNER_SAFE ??
-        '0x0000000000000000000000000000000000000000',
+      // Arc. The same address as Robinhood's, which is not a copy-paste error:
+      // Safe's proxy factory is CREATE2, so one deployed with the same setup
+      // lands on the same address on every chain. Verified on 4663 rather than
+      // assumed, because handing the protocol to an address with no code
+      // behind it would be unrecoverable - `eth_getCode` returns a 344-byte
+      // proxy, `getThreshold()` returns 2, and `getOwners()` returns the same
+      // five owners as Robinhood's.
+      5042: '0x654Dc22CC48Ca029A0EAD3Bf66e73BF2db71eA28',
     },
     protocolTimelock: {
       31337: 8,

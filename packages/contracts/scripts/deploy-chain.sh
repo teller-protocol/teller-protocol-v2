@@ -149,10 +149,27 @@ publish_package() {
     const dir = path.join("deployments", network);
     // Not everything in deployments/ is a contract. hardhat-deploy keeps its
     // own bookkeeping there as dotfiles (.migrations.json, .chainId), and this
-    // repo writes market-bootstrap.json alongside them. Only named artifacts
-    // become manifest entries, so only they can be missing from it.
+    // repo writes receipts and Safe batches alongside them -
+    // market-bootstrap.json, protocol-fee-safe-batch.json,
+    // hypernative-safe-batch.json. Only named artifacts become manifest
+    // entries, so only they can be missing from it.
+    //
+    // Recognised by shape rather than by a list of filenames. A list is a
+    // thing someone has to remember to extend, and the failure when they do
+    // not is this check refusing to publish a chain that is perfectly
+    // complete - which reads exactly like the real thing it is here to catch.
+    // A hardhat-deploy artifact has an address and an abi; nothing else here
+    // has both.
     const onDisk = fs.readdirSync(dir)
-      .filter((f) => f.endsWith(".json") && !f.startsWith(".") && f !== "market-bootstrap.json")
+      .filter((f) => f.endsWith(".json") && !f.startsWith("."))
+      .filter((f) => {
+        try {
+          const a = JSON.parse(fs.readFileSync(path.join(dir, f), "utf8"));
+          return typeof a.address === "string" && Array.isArray(a.abi);
+        } catch {
+          return false;
+        }
+      })
       .map((f) => f.slice(0, -5));
     const inManifest = new Set(Object.keys(j[id].contracts || {}));
     const missing = onDisk.filter((name) => !inManifest.has(name));

@@ -1,0 +1,27 @@
+{
+  "_comment": "Template for a new chain. scripts/fill-subgraph-config.js copies this to <network>.json and substitutes NETWORK_NAME, the *_ADDRESS placeholders and DEPLOY_BLOCK from deployments/<network>/. Not a network config itself; the leading underscore keeps it out of the chain list.",
+  "enabled": true,
+  "name": "tellerv2-poolsv2-NETWORK_NAME",
+  "network": "NETWORK_NAME",
+  "export_network_name": "NETWORK_NAME",
+  "product": "selfhosted",
+  "studio": {
+    "owner": "0x1a76339211668a6939e1d6D13AB902bBef5D9ebc",
+    "network": "arbitrum-one"
+  },
+  "grafting": {
+    "enabled": false
+  },
+  "contracts": {
+    "factory": {
+      "enabled": true,
+      "address": "LENDER_COMMITMENT_GROUP_FACTORY_V2_ADDRESS",
+      "block": "DEPLOY_BLOCK"
+    },
+    "collateralManager": {
+      "enabled": true,
+      "address": "COLLATERAL_MANAGER_ADDRESS",
+      "block": "DEPLOY_BLOCK"
+    }
+  }
+}

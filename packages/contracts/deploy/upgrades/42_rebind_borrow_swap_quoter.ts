@@ -54,6 +54,22 @@ const deployFn: DeployFunction = async (hre) => {
   const proxyAddress = await borrowSwap.getAddress()
   const implFactory = await hre.ethers.getContractFactory('BorrowSwap')
 
+  // upgradeProxy validates the new storage layout against the old one, and it
+  // reads the old one out of OpenZeppelin's per-network manifest - the
+  // .openzeppelin/*.json this repo does not keep. Without it the upgrade stops
+  // at "Deployment at address 0x... is not registered", which is a missing
+  // record rather than anything wrong with the proxy.
+  //
+  // forceImport writes that record from the implementation the proxy is
+  // actually running, so the comparison has both sides. The manifest lives
+  // only as long as the run, so this happens every time; it is idempotent, and
+  // it is not a way around the layout check - upgradeProxy still performs it
+  // against the imported layout.
+  await hre.upgrades.forceImport(proxyAddress, implFactory, {
+    kind: 'transparent',
+    constructorArgs: [await tellerV2.getAddress(), swapRouter, quoter],
+  } as any)
+
   const upgraded = await hre.upgrades.upgradeProxy(proxyAddress, implFactory, {
     unsafeAllow: ['constructor', 'state-variable-immutable'],
     constructorArgs: [await tellerV2.getAddress(), swapRouter, quoter],

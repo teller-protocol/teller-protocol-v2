@@ -56,6 +56,7 @@ if (!/^\d+$/.test(deployBlock) || deployBlock === '0') {
 const SUBSTITUTIONS = {
   TELLER_V2_ADDRESS: 'TellerV2',
   MARKET_REGISTRY_ADDRESS: 'MarketRegistry',
+  LENDER_COMMITMENT_FORWARDER_ADDRESS: 'LenderCommitmentForwarder',
   LENDER_COMMITMENT_FORWARDER_ALPHA_ADDRESS: 'LenderCommitmentForwarderAlpha',
   COLLATERAL_MANAGER_ADDRESS: 'CollateralManager',
   LENDER_MANAGER_ADDRESS: 'LenderManager',

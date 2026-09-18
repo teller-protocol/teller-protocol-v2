@@ -1,0 +1,161 @@
+import { DeployFunction } from 'hardhat-deploy/dist/types'
+import { HardhatRuntimeEnvironment } from 'hardhat/types'
+import fs from 'fs'
+import path from 'path'
+
+/**
+ * Make the Robinhood pools depositable.
+ *
+ * A LenderCommitmentGroup pool rejects every deposit until its first one, and
+ * that first one has to come from the pool's owner:
+ *
+ *     if (!poolWasActivated) {
+ *         require(msg.sender == owner(), "FD");
+ *         require(poolIsActivated(), "IS");
+ *     }
+ *
+ * That is the ERC4626 first-depositor guard - the owner sets the share price
+ * before anyone else can, so nobody can open a pool with one wei and inflate
+ * the rate against the next lender. It also means launching a pool is two
+ * steps, not one: creating it leaves something no one can use, including the
+ * lenders the front end is showing it to. Every Robinhood pool sat at
+ * totalSupply 0 and answered "FD" to anyone who tried, which is what a lender
+ * saw as a failed deposit with no explanation.
+ *
+ * Shares are 1:1 with assets on the first deposit (sharesExchangeRate returns
+ * the expansion factor while totalSupply is 0), and poolIsActivated wants
+ * totalSupply >= 1e6, so the floor is 1e6 of the principal's own units: one
+ * whole USDG at six decimals, and a millionth of a millionth of a token at
+ * eighteen. The amounts below clear that by a wide margin in the first case
+ * and enormously in the second.
+ */
+
+const MIN_SHARES = 10n ** 6n
+
+// One whole unit is the floor for a six-decimal principal, so two is the
+// smallest amount that is not sitting on the boundary.
+const USDG_DEPOSIT = 2_000_000n
+
+const POOL_ABI = [
+  'function principalToken() view returns (address)',
+  'function totalSupply() view returns (uint256)',
+  'function owner() view returns (address)',
+  'function deposit(uint256 assets, address receiver) returns (uint256)',
+]
+const ERC20_ABI = [
+  'function balanceOf(address) view returns (uint256)',
+  'function allowance(address,address) view returns (uint256)',
+  'function approve(address,uint256) returns (bool)',
+  'function symbol() view returns (string)',
+  'function decimals() view returns (uint8)',
+]
+
+/** The pools this chain lists, read from the bootstrap receipt. */
+const listedPools = (hre: HardhatRuntimeEnvironment): [string, string][] => {
+  // Resolved against the project root rather than the working directory, so
+  // it does not depend on where the deploy was invoked from.
+  const receiptPath = path.join(
+    (hre.config.paths as { deployments?: string }).deployments ??
+      path.join(hre.config.paths.root, 'deployments'),
+    hre.network.name,
+    'market-bootstrap.json'
+  )
+  if (!fs.existsSync(receiptPath)) return []
+  const receipt = JSON.parse(fs.readFileSync(receiptPath, 'utf8'))
+
+  // `long` is the thirty-day market, the one Earn and Borrow list. The
+  // seven-day pools are still on chain and still borrowable; they are not
+  // shown, so activating them is not this script's business.
+  return Object.entries(receipt?.pools ?? {})
+    .filter(([key]) => key.startsWith('long:'))
+    .map(([key, pool]) => [key, (pool as { address: string }).address])
+}
+
+const deployFn: DeployFunction = async (hre) => {
+  const deployer = await hre.getNamedSigner('deployer')
+  const deployerAddress = await deployer.getAddress()
+
+  hre.log('----------')
+  hre.log('')
+  hre.log(`Activating ${hre.network.name} pools as ${deployerAddress}`)
+
+  const activated: string[] = []
+  const skipped: string[] = []
+
+  for (const [key, address] of listedPools(hre)) {
+    const pool = await hre.ethers.getContractAt(POOL_ABI, address, deployer)
+
+    if ((await pool.totalSupply()) >= MIN_SHARES) {
+      skipped.push(`${key} (already activated)`)
+      continue
+    }
+
+    const owner: string = await pool.owner()
+    if (owner.toLowerCase() !== deployerAddress.toLowerCase()) {
+      // Only the owner can open a pool, so say whose job it is rather than
+      // sending a transaction that reverts with "FD".
+      skipped.push(`${key} (owned by ${owner})`)
+      continue
+    }
+
+    const principalAddress: string = await pool.principalToken()
+    const principal = await hre.ethers.getContractAt(
+      ERC20_ABI,
+      principalAddress,
+      deployer
+    )
+    const [symbol, decimals, balance] = await Promise.all([
+      principal.symbol() as Promise<string>,
+      principal.decimals() as Promise<bigint>,
+      principal.balanceOf(deployerAddress) as Promise<bigint>,
+    ])
+
+    // A six-decimal principal is the chain's dollar, shared by every pool
+    // lending it, so it takes a fixed amount. Anything else is an asset that
+    // is the principal of exactly one listed pool, so that pool takes the
+    // whole balance - there is nothing else here to spend it on.
+    const amount = decimals === 6n ? USDG_DEPOSIT : balance
+
+    if (amount === 0n || balance < amount) {
+      skipped.push(
+        `${key} (needs ${amount} ${symbol}, deployer holds ${balance})`
+      )
+      continue
+    }
+    if (amount < MIN_SHARES) {
+      skipped.push(`${key} (${amount} ${symbol} mints fewer than ${MIN_SHARES} shares)`)
+      continue
+    }
+
+    if ((await principal.allowance(deployerAddress, address)) < amount) {
+      await (await principal.approve(address, amount)).wait()
+    }
+    await (await pool.deposit(amount, deployerAddress)).wait()
+
+    const supply: bigint = await pool.totalSupply()
+    if (supply < MIN_SHARES) {
+      throw new Error(
+        `${key} (${address}) is still not activated after depositing ${amount} ${symbol}: totalSupply ${supply}`
+      )
+    }
+    activated.push(`${key} <- ${amount} ${symbol}`)
+    hre.log(`  activated ${key.padEnd(22)} ${amount} ${symbol}`, { star: false })
+  }
+
+  for (const line of skipped) hre.log(`  skipped   ${line}`, { star: false })
+  hre.log('')
+  hre.log(`${activated.length} activated, ${skipped.length} skipped`)
+  hre.log('----------')
+
+  return true
+}
+
+deployFn.id = 'activate-pools'
+deployFn.tags = ['activate-pools']
+deployFn.dependencies = []
+deployFn.skip = async (hre) => {
+  if (!hre.network.live) return true
+  return listedPools(hre).length === 0
+}
+
+export default deployFn

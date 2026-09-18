@@ -53,7 +53,7 @@ export function get_ecosystem_contract_address(
 	      // Verified both directions on 5042: the ARGUS/USDC pool reports this as
 	      // its factory(), and this factory's getPool(USDC, ARGUS, 10000) returns
 	      // that same pool.
-	      uniswapV3FactoryAddress = '0xf0db7b58379503491d857db50aC9eCe64c653918'
+	      uniswapV3FactoryAddress = '0xf0db7b58379503491d857dB50AC9ece64c653918'
 	      break
 	    default:
 	      return undefined 
@@ -179,7 +179,7 @@ export function get_ecosystem_contract_address(
 		    case 'arc':
 		      // Uniswap's own deployment on 5042. factory() returns the v3
 		      // factory above, checked on chain.
-		      swapRouterAddress = '0x53bf6b0684ec7EF91e1387DA3D1a1769Bc5a6F77'
+		      swapRouterAddress = '0x53BF6B0684Ec7eF91e1387Da3D1a1769bC5A6F77'
 		      break
 		    default:
 		    	return undefined 
@@ -231,7 +231,7 @@ export function get_ecosystem_contract_address(
 			    case 'arc':
 			      // Uniswap ships a Quoter on 5042, so there is nothing to vendor
 			      // here. factory() returns the v3 factory above, checked on chain.
-			      quoterAddress = '0x7dFD4f31be6814d2906BdE155c3E1b146eAC1468'
+			      quoterAddress = '0x7DfD4F31be6814D2906BDE155c3e1B146EAc1468'
 			      break
 			    case 'robinhood':
 			      // Deployed by us. 4663 has no quoter we can point at - it is a

@@ -2,6 +2,7 @@ import fs from 'fs'
 import path from 'path'
 
 import { DeployFunction } from 'hardhat-deploy/dist/types'
+import { HardhatRuntimeEnvironment } from 'hardhat/types'
 import { logTxLink } from 'helpers/logTxLink'
 
 /**
@@ -78,6 +79,43 @@ const ORACLE_PROTECTED_CALLERS = [
   'FlashRolloverLoan',
 ]
 
+/**
+ * Whether the oracle has ever seen this account.
+ *
+ * `isTimeExceeded` is onlyConsumer and has three outcomes, which a try/catch
+ * around a contract call flattens into two:
+ *
+ *   returns true/false                -> registered (false just means waiting)
+ *   reverts "Account not registered"  -> never registered
+ *   reverts "consumer required"       -> we asked as the wrong account
+ *
+ * The third is a bug in the question, not an answer about the account, and
+ * treating it as "no" is how a re-run tries to register something twice.
+ */
+const isAlreadyRegistered = async (
+  hre: HardhatRuntimeEnvironment,
+  oracleAddress: string,
+  forwarderAddress: string,
+  account: string
+): Promise<'yes' | 'no' | 'unknown'> => {
+  // isTimeExceeded(address)
+  const data = `0x6cffbed3${account.toLowerCase().replace(/^0x/, '').padStart(64, '0')}`
+  try {
+    await hre.ethers.provider.call({
+      to: oracleAddress,
+      from: forwarderAddress,
+      data,
+    })
+    return 'yes'
+  } catch (err) {
+    const message = `${(err as Error)?.message ?? ''} ${
+      (err as { data?: unknown })?.data ?? ''
+    }`
+    if (/not registered/i.test(message)) return 'no'
+    return 'unknown'
+  }
+}
+
 const deployFn: DeployFunction = async (hre) => {
   hre.log('----------')
   hre.log('')
@@ -147,28 +185,55 @@ const deployFn: DeployFunction = async (hre) => {
       if (!contract) continue
       const address = contract.address
 
-      // isTimeExceeded is onlyConsumer, so ask it as the forwarder. It answers
-      // true or false for an account it knows and reverts for one it does not,
-      // which is exactly the question being asked.
-      let registered: boolean
-      try {
-        await oracle.isTimeExceeded.staticCall(address, {
-          from: forwarderAddress,
-        })
-        registered = true
-      } catch {
-        registered = false
-      }
+      // isTimeExceeded is onlyConsumer, so the question has to be asked AS the
+      // forwarder. Through a contract handle it is not: hardhat-ethers fills
+      // `from` with the connected signer and ignores the override, so the call
+      // arrives from the deployer and reverts with "consumer required". A
+      // blanket catch then reads that as "not registered" and tries to
+      // register an account that already is - which is what crashed this
+      // script the first time it ran against a chain it had already wired.
+      //
+      // So: a raw provider call, which does honour `from`, and the revert
+      // reason is read rather than discarded. The three answers are different
+      // things and only one of them means "register it".
+      const registered = await isAlreadyRegistered(
+        hre,
+        oracleAddress,
+        forwarderAddress,
+        address
+      )
 
-      if (registered) {
+      if (registered === 'yes') {
         hre.log(`  ✅  ${name} is already registered`, { star: false })
         continue
       }
+      if (registered === 'unknown') {
+        hre.log(
+          `  ⚠️  ${name}: could not read registration state, skipping`,
+          { star: false }
+        )
+        continue
+      }
 
-      const tx = await forwarder.oracleRegister(address)
-      await tx.wait(1)
-      await logTxLink(hre, tx.hash)
-      hre.log(`  Registered ${name} at ${address}`, { star: false })
+      try {
+        const tx = await forwarder.oracleRegister(address)
+        await tx.wait(1)
+        await logTxLink(hre, tx.hash)
+        hre.log(`  Registered ${name} at ${address}`, { star: false })
+      } catch (err) {
+        // Belt to the probe's braces. Registering twice is the one failure
+        // this loop can cause, it is harmless on chain, and it should never
+        // take a deploy down - the state it was trying to reach is the state
+        // that already holds.
+        if (/already registered/i.test((err as Error)?.message ?? '')) {
+          hre.log(
+            `  ✅  ${name} was already registered (the oracle said so)`,
+            { star: false }
+          )
+        } else {
+          throw err
+        }
+      }
     }
     hre.log(
       '      They are approved once the oracle threshold has passed - two minutes by default.'

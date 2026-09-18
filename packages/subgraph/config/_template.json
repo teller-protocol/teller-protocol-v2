@@ -1,5 +1,5 @@
 {
-  "_comment": "Template for a new chain. scripts/fill-subgraph-config.js copies this to <network>.json and substitutes NETWORK_NAME, the *_ADDRESS placeholders and DEPLOY_BLOCK from deployments/<network>/. Not a network config itself; the leading underscore keeps it out of the chain list.",
+  "_comment": "Template for a new chain. scripts/fill-subgraph-config.js copies this to <network>.json and substitutes NETWORK_NAME, the *_ADDRESS placeholders and DEPLOY_BLOCK from deployments/<network>/. Not a network config itself; the leading underscore keeps it out of the chain list. lender_commitment is enabled here because packages/subgraph cannot build without it: src/lender-commitment/mapping.ts imports generated/LenderCommitmentForwarder, which codegen only emits when that data source exists, and the same mapping file is used by the always-on Alpha data source. A chain with no plain LenderCommitmentForwarder makes fill-subgraph-config fail loudly on the missing artifact, which is the cue to disable it deliberately rather than discover it at graph build.",
   "enabled": true,
   "name": "teller-v2-NETWORK_NAME",
   "network": "NETWORK_NAME",
@@ -28,9 +28,9 @@
       "block": "DEPLOY_BLOCK"
     },
     "lender_commitment": {
-      "enabled": false,
-      "address": "0x0000000000000000000000000000000000000000",
-      "block": "0"
+      "enabled": true,
+      "address": "LENDER_COMMITMENT_FORWARDER_ADDRESS",
+      "block": "DEPLOY_BLOCK"
     },
     "lender_commitment_staging": {
       "enabled": false,

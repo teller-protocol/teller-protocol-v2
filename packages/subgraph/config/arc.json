@@ -27,9 +27,9 @@
       "block": "21498593"
     },
     "lender_commitment": {
-      "enabled": false,
-      "address": "0x0000000000000000000000000000000000000000",
-      "block": "0"
+      "enabled": true,
+      "address": "0xcA02ccF87B8A1C7141420a5Bd057836884bD232e",
+      "block": "21498593"
     },
     "lender_commitment_staging": {
       "enabled": false,

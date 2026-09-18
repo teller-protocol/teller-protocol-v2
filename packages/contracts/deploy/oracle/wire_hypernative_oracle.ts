@@ -36,6 +36,48 @@ const HYPERNATIVE_OPERATORS: Record<string, string> = {
   robinhood: '0xa6af91a354e5acc23e0de58500828f40803c60aa',
 }
 
+/**
+ * Where OracleProtectionManager keeps the oracle address:
+ * `keccak256("eip1967.hypernative.oracle") - 1`. There is no getter for it,
+ * and the difference matters here - with the slot at zero the manager fails
+ * open and `oracleRegister` reverts on a call into address(0), so the
+ * registrations below are worth attempting only once setOracle has run.
+ */
+const ORACLE_SLOT =
+  '0xfa373e1ee49299afe249e16436ea939a0edb26953bec7179d544957654b3ba1f'
+
+/**
+ * Protocol contracts that call an oracle-protected function for a borrower,
+ * and therefore have to be registered with the oracle themselves.
+ *
+ * `isOracleApprovedAllowEOA` waves a borrower through when they are the
+ * transaction's origin, which is why a plain wallet never needs any of this.
+ * Loop, Short and rollover do not work that way: the borrower calls BorrowSwap
+ * or SwapRolloverLoan, and *that* contract calls the forwarder. The check then
+ * sees a sender that is not tx.origin and has code, so it asks the oracle how
+ * long that sender has been registered - and `isTimeExceeded` does not return
+ * false for an account it has never seen, it reverts with "Account not
+ * registered".
+ *
+ * So an unregistered BorrowSwap is not a contract that gets refused, it is
+ * every Loop and every Short on the chain reverting, with an error that reads
+ * as though the borrower's own wallet were the problem. Base registered these
+ * at some point and has worked ever since; Robinhood launched without them and
+ * nothing in the bootstrap would have caught it, because the failure only
+ * appears once the oracle is wired, which happens at the very end.
+ *
+ * Registering a contract records a timestamp and nothing else. It grants no
+ * role and no exemption: the contract still has to clear the same threshold
+ * every registered account does, and Hypernative can still blacklist it.
+ */
+const ORACLE_PROTECTED_CALLERS = [
+  'BorrowSwap',
+  'SwapRolloverLoan',
+  'LoanReferralForwarder',
+  'LoanReferralForwarderV2',
+  'FlashRolloverLoan',
+]
+
 const deployFn: DeployFunction = async (hre) => {
   hre.log('----------')
   hre.log('')
@@ -78,6 +120,59 @@ const deployFn: DeployFunction = async (hre) => {
     await logTxLink(hre, tx.hash)
   } else {
     hre.log('  ✅  SmartCommitmentForwarder already holds CONSUMER_ROLE')
+  }
+
+  // Register the protocol's own contracts, now that the forwarder can.
+  //
+  // Only worth trying once the oracle is actually wired: before that
+  // `oracleRegister` calls into address(0) and reverts, and on a first deploy
+  // setOracle is still sitting in the Safe batch this script writes at the
+  // end. Re-running afterwards picks them up.
+  const wiredOracle = `0x${(
+    await hre.ethers.provider.getStorage(forwarderAddress, ORACLE_SLOT)
+  ).slice(-40)}`
+  if (wiredOracle === ZERO) {
+    hre.log('')
+    hre.log(
+      '  ⚠️  No oracle set on the forwarder yet, so protocol contracts cannot be'
+    )
+    hre.log(
+      '      registered. Execute the Safe batch below, then run this again.'
+    )
+  } else {
+    hre.log('')
+    hre.log('  Registering the protocol contracts that borrow on a user\'s behalf')
+    for (const name of ORACLE_PROTECTED_CALLERS) {
+      const contract = await hre.deployments.getOrNull(name)
+      if (!contract) continue
+      const address = contract.address
+
+      // isTimeExceeded is onlyConsumer, so ask it as the forwarder. It answers
+      // true or false for an account it knows and reverts for one it does not,
+      // which is exactly the question being asked.
+      let registered: boolean
+      try {
+        await oracle.isTimeExceeded.staticCall(address, {
+          from: forwarderAddress,
+        })
+        registered = true
+      } catch {
+        registered = false
+      }
+
+      if (registered) {
+        hre.log(`  ✅  ${name} is already registered`, { star: false })
+        continue
+      }
+
+      const tx = await forwarder.oracleRegister(address)
+      await tx.wait(1)
+      await logTxLink(hre, tx.hash)
+      hre.log(`  Registered ${name} at ${address}`, { star: false })
+    }
+    hre.log(
+      '      They are approved once the oracle threshold has passed - two minutes by default.'
+    )
   }
 
   // Hypernative's own address: the one that calls blacklist()/whitelist() as

@@ -148,6 +148,27 @@ export const CHAIN_FEATURES: Record<string, ChainFeature[]> = {
     'protocolPausingManager',
     'uniswapV3Quoter',
   ],
+  // Arc gets plain LenderCommitmentForwarder, unlike Robinhood. Omitting it
+  // there is what left TellerV2.initialize falling through to Alpha for the
+  // permanent global forwarder slot, which has no setter - so every lending
+  // offer on that chain has to route through Alpha forever. One line here is
+  // the whole difference.
+  arc: [
+    'lenderCommitmentForwarder',
+    'lenderCommitmentForwarderAlpha',
+    'smartCommitmentForwarder',
+    'lenderGroupsV2',
+    'uniswapPricingLibraryV2',
+    'uniswapPricingHelper',
+    'hypernativeOracle',
+    'protocolPausingManager',
+    // Arc has Uniswap's own Quoter at 0x7dfd4f31be6814d2906bde155c3e1b146eac1468.
+    // The vendored one is deployed anyway, for now, because it is the path the
+    // BorrowSwap bind is tested against end to end and the FullMath fix that
+    // broke Loop on Robinhood is in it. Pointing at Uniswap's is a later
+    // simplification, not a launch-day unknown.
+    'uniswapV3Quoter',
+  ],
   robinhood: [
     'lenderCommitmentForwarder',
     'lenderCommitmentForwarderAlpha',

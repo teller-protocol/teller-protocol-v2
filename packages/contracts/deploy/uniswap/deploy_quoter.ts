@@ -17,10 +17,18 @@ const deployFn: DeployFunction = async (hre) => {
    
 
 
+  // Not skipIfAlreadyDeployed. The quoter is a stateless view contract - it
+  // holds no funds, no positions and no storage anyone else points at - so
+  // there is nothing to preserve by pinning a chain to the bytecode it
+  // happened to get first. Skipping did preserve exactly that: the quoter
+  // deployed before FullMath's 512-bit path was fixed reverted on any pool
+  // priced high enough to need it, and no redeploy could replace it.
+  //
+  // hardhat-deploy still no-ops when the bytecode and args are unchanged, so
+  // this redeploys on a real change and stays quiet otherwise.
   const quoter = await  deploy({
     contract: 'Quoter',
     args: [ uniswapV3FactoryAddress ] ,
-    skipIfAlreadyDeployed: true,
     hre,
   })
 

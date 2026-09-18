@@ -138,7 +138,7 @@ const deployFn: DeployFunction = async (hre) => {
 
   if (protocolOwnerSafe === ZERO) {
     hre.log('  ⚠️  protocolOwnerSafe is unset. Skipping.')
-    return true
+    return
   }
 
   const oracle = await hre.contracts.get('HypernativeOracle')
@@ -383,7 +383,23 @@ const deployFn: DeployFunction = async (hre) => {
   hre.log('done.')
   hre.log('----------')
 
-  return true
+  // Deliberately not `return true`.
+  //
+  // Returning true records this script's id in .migrations.json and
+  // hardhat-deploy then skips it forever — which makes the re-run this script
+  // tells you to do impossible. The sequence is: first pass grants the roles
+  // and writes the Safe batch, a signer executes setOracle, and only then can
+  // the protocol contracts be registered, because before that `oracleRegister`
+  // calls into address(0).
+  //
+  // On Arc the first pass recorded the id, the signers executed the batch, and
+  // the re-run was skipped silently — reporting success while BorrowSwap and
+  // SwapRolloverLoan stayed unregistered, which is every Loop and every Short
+  // on the chain reverting with "Account not registered".
+  //
+  // Every step above is guarded by its own on-chain check (hasRole, the
+  // registration probe, the pauser check), so running it on each deploy costs
+  // a handful of reads and no transactions once the chain is wired.
 }
 
 deployFn.id = 'hypernative-oracle:wire'

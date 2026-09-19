@@ -45,6 +45,31 @@
 #                           its own; this is for re-running it alone.
 #   BOOTSTRAP_DRY_RUN=true  with BOOTSTRAP_MARKETS, print the plan and send
 #                           nothing.
+#   REPLACE_POOLS=<keys>    with BOOTSTRAP_MARKETS, comma-separated receipt keys
+#                           to deploy a replacement pool for, e.g.
+#                           "short:ARGUS". The existing pool keeps working and
+#                           moves to retiredPools in the receipt; the key comes
+#                           to name the new one, so everything that reads the
+#                           receipt follows. This is the only way to change a
+#                           parameter written in the pool's `initialize` - the
+#                           interest rate band has no setter on any
+#                           implementation.
+#   FORCE_REPLACE_POOLS=true
+#                           replace even a pool with loans outstanding.
+#                           Delisting one hides a position someone still has to
+#                           repay or liquidate, so it is refused by default.
+#   REDEEM_POOL=true        redeem the deployer's own shares out of a pool and
+#                           stop. The counterpart of activate-pools, for
+#                           collecting the deposit that opened a pool which has
+#                           since been replaced. Needs REDEEM_POOL_KEY or
+#                           REDEEM_POOL_ADDRESS.
+#   REDEEM_POOL_KEY=<key>   receipt key, e.g. "short:ARGUS". Looked up in
+#                           retiredPools as well as pools.
+#   REDEEM_POOL_ADDRESS=<a> pool address, instead of a key.
+#   REDEEM_POOL_SHARES=<n>  shares to redeem, raw units. Omitted means the
+#                           deployer's whole balance.
+#   REDEEM_POOL_DRY_RUN=true
+#                           with REDEEM_POOL, print and send nothing.
 #   SET_PRICE_CAPS=true     cap every pool in the bootstrap receipt at the
 #                           price its own oracle quotes right now.
 #   PRICE_CAPS_DRY_RUN=true with SET_PRICE_CAPS, print the caps without
@@ -442,12 +467,23 @@ if [ "${BOOTSTRAP_MARKETS:-}" = "true" ]; then
   # Compare against "true" rather than using ${VAR:+...}, which expands on any
   # non-empty value — including the string "false", which would silently turn
   # a real run into a dry one.
+  # Replacing a pool is how a parameter written in `initialize` gets changed -
+  # the interest rate band above all, which no pool implementation exposes a
+  # setter for. It is opt-in per key and never inferred, because deploying a
+  # pool spends principal and splits liquidity across two addresses.
+  BOOTSTRAP_ARGS=""
+  [ -n "${REPLACE_POOLS:-}" ] && BOOTSTRAP_ARGS="--replace ${REPLACE_POOLS}"
+  [ "${FORCE_REPLACE_POOLS:-}" = "true" ] && \
+    BOOTSTRAP_ARGS="$BOOTSTRAP_ARGS --force-replace true"
+
   if [ "${BOOTSTRAP_DRY_RUN:-}" = "true" ]; then
     log "Bootstrap markets and pools on $NETWORK (dry run — nothing will be sent)"
-    yarn hh bootstrap-markets --network "$NETWORK" --dry-run true
+    # shellcheck disable=SC2086
+    yarn hh bootstrap-markets --network "$NETWORK" --dry-run true $BOOTSTRAP_ARGS
   else
     log "Bootstrap markets and pools on $NETWORK"
-    yarn hh bootstrap-markets --network "$NETWORK"
+    # shellcheck disable=SC2086
+    yarn hh bootstrap-markets --network "$NETWORK" $BOOTSTRAP_ARGS
   fi
 
   if [ "${PUSH_ARTIFACTS:-}" = "true" ] && [ "${BOOTSTRAP_DRY_RUN:-}" != "true" ]; then
@@ -536,6 +572,47 @@ if [ "${SET_PAYMENT_DEFAULT:-}" = "true" ]; then
   fi
 
   log "Done — $NETWORK (payment default duration)"
+  exit 0
+fi
+
+# Take the deployer's own deposit back out of a pool.
+#
+# The counterpart of activate-pools, which puts the owner's first deposit into
+# every listed pool and never had a way to collect it. That did not matter until
+# a pool had to be replaced: repricing one means deploying another, and the
+# deposit that opened the old one is then sitting in a pool nothing lists.
+#
+# The task only ever redeems the deployer's own shares - redeeming is
+# `msg.sender == owner` on the pool - so this cannot reach a lender's position.
+if [ "${REDEEM_POOL:-}" = "true" ]; then
+  [ -d "deployments/$NETWORK" ] || fail \
+    "REDEEM_POOL needs deployments/$NETWORK in this checkout to look a pool key up in."
+  [ -n "${REDEEM_POOL_KEY:-}${REDEEM_POOL_ADDRESS:-}" ] || fail \
+    "REDEEM_POOL is set but neither REDEEM_POOL_KEY nor REDEEM_POOL_ADDRESS is."
+  [ -n "${DEPLOYER_MNEMONIC:-}" ] || fail "DEPLOYER_MNEMONIC is not set."
+  printf '%s' "$DEPLOYER_MNEMONIC" > mnemonic.secret
+  chmod 600 mnemonic.secret
+  trap 'rm -f mnemonic.secret' EXIT
+
+  REDEEM_ARGS=""
+  [ -n "${REDEEM_POOL_KEY:-}" ] && REDEEM_ARGS="--key ${REDEEM_POOL_KEY}"
+  [ -n "${REDEEM_POOL_ADDRESS:-}" ] && \
+    REDEEM_ARGS="$REDEEM_ARGS --address ${REDEEM_POOL_ADDRESS}"
+  [ -n "${REDEEM_POOL_SHARES:-}" ] && \
+    REDEEM_ARGS="$REDEEM_ARGS --shares ${REDEEM_POOL_SHARES}"
+
+  # Same "true" comparison as every other dry run here.
+  if [ "${REDEEM_POOL_DRY_RUN:-}" = "true" ]; then
+    log "Redeem deployer shares on $NETWORK (dry run — nothing will be sent)"
+    # shellcheck disable=SC2086
+    yarn hh redeem-pool-shares --network "$NETWORK" --dry-run true $REDEEM_ARGS
+  else
+    log "Redeem deployer shares on $NETWORK"
+    # shellcheck disable=SC2086
+    yarn hh redeem-pool-shares --network "$NETWORK" $REDEEM_ARGS
+  fi
+
+  log "Done — $NETWORK (redeem)"
   exit 0
 fi
 
@@ -666,6 +743,7 @@ if [ "${DEPLOY_PROTOCOL:-}" != "true" ]; then
     SET_PRICE_CAPS=true      cap existing pools at their current oracle price
     RUN_TAGS=<tags>          run named deploy tags against a deployed chain
     VERIFY_ONLY=true         verify already-deployed contracts
+    REDEEM_POOL=true         take the deployer's own deposit back out of a pool
     SWAP_VIA_LIFI=true       swap one ERC-20 for another from the deployer
     PUBLISH_ONLY=true        publish the package (with PUBLISH_PACKAGE=true)
     DEPLOY_PROTOCOL=true     deploy the entire protocol to $NETWORK from scratch

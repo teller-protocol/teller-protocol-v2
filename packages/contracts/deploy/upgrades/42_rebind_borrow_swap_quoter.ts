@@ -107,6 +107,36 @@ const deployFn: DeployFunction = async (hre) => {
   }
   await upgraded.waitForDeployment()
 
+  // Assert the thing this script exists to do. upgradeProxy reports success
+  // whether or not it replaced anything - reusing a matching implementation is
+  // a legitimate outcome for it - so without this the only signal that the
+  // rebind did nothing is an address in a log line that nobody reads.
+  //
+  // Polled rather than read once, because the read and the write do not have to
+  // reach the same machine. The RPC endpoints this deploys through are load
+  // balancers over several backends, and `waitForDeployment` resolves on the
+  // implementation's own deploy, not on the admin's upgrade being visible to
+  // whichever backend answers next. Arc failed exactly here: the upgrade landed
+  // in block 21643658 and succeeded, the check ran 900ms later against a
+  // backend that had not caught up, and a rebind that had worked reported
+  // itself as "changed nothing" - taking the artifacts down with it, since a
+  // crashed run pushes none.
+  //
+  // So a stale answer is retried and only a settled one is believed. This
+  // weakens nothing: the assertion still fails, and fails loudly, for a rebind
+  // that genuinely did not happen - it just waits long enough to tell the two
+  // apart.
+  const settledQuoter = async (): Promise<string> => {
+    let bound = ''
+    for (let attempt = 0; attempt < 20; attempt++) {
+      bound = (await live.UNISWAP_QUOTER()) as string
+      if (bound.toLowerCase() === quoter.toLowerCase()) return bound
+      await new Promise((resolve) => setTimeout(resolve, 1500))
+    }
+    return bound
+  }
+
+  const boundAfter = await settledQuoter()
   const implementation = await hre.upgrades.erc1967.getImplementationAddress(
     proxyAddress
   )
@@ -114,16 +144,11 @@ const deployFn: DeployFunction = async (hre) => {
   hre.log(`Implementation: ${implementation}`, { star: false })
   hre.log(`Quoter:         ${quoter}`, { star: false })
 
-  // Assert the thing this script exists to do. upgradeProxy reports success
-  // whether or not it replaced anything - reusing a matching implementation is
-  // a legitimate outcome for it - so without this the only signal that the
-  // rebind did nothing is an address in a log line that nobody reads.
-  const boundAfter: string = await live.UNISWAP_QUOTER()
   if (boundAfter.toLowerCase() !== quoter.toLowerCase()) {
     throw new Error(
       `BorrowSwap rebind on ${hre.network.name} changed nothing: still bound to ` +
-        `${boundAfter}, expected ${quoter}. The proxy is at ${proxyAddress}, ` +
-        `implementation ${implementation}.`
+        `${boundAfter}, expected ${quoter}, after 30s of polling. The proxy is ` +
+        `at ${proxyAddress}, implementation ${implementation}.`
     )
   }
 

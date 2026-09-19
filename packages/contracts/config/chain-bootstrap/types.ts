@@ -54,6 +54,24 @@ export interface CollateralConfig {
    */
   collateralRatio: number
   /**
+   * Interest rate floor and ceiling in bps for this pool alone, overriding the
+   * chain's. Omitted means the chain's, which is the usual case.
+   *
+   * These are set in the pool's `initialize` and there is no setter for either
+   * on any pool implementation, so the only way to reprice a pool that exists
+   * is to retire it and deploy another. Getting this right at creation is
+   * therefore worth more than it looks.
+   *
+   * The reason to diverge from the chain's is the collateral. A chain-wide
+   * band is priced for the assets that chain mostly lends against; an asset
+   * far riskier than those needs a band of its own, because the rate is what
+   * pays lenders for holding that risk. Arc's ARGUS is the case - a memecoin
+   * days old backing the chain's only USDC pool, at 30-60% against the chain's
+   * 3-18%.
+   */
+  interestRateLowerBound?: number
+  interestRateUpperBound?: number
+  /**
    * Market keys this collateral gets a pool on. Omitted means every market,
    * which is the usual case. Naming a subset is for an asset thin or volatile
    * enough that a long loan against it is a worse risk than a short one.
@@ -95,6 +113,24 @@ export interface InversePoolConfig {
   zeroForOne: boolean
   /** Over-collateralization ratio. 10000 == 100%. */
   collateralRatio: number
+  /**
+   * Interest rate floor and ceiling in bps for this pool alone, overriding the
+   * chain's. Omitted means the chain's, which is the usual case.
+   *
+   * These are set in the pool's `initialize` and there is no setter for either
+   * on any pool implementation, so the only way to reprice a pool that exists
+   * is to retire it and deploy another. Getting this right at creation is
+   * therefore worth more than it looks.
+   *
+   * The reason to diverge from the chain's is the collateral. A chain-wide
+   * band is priced for the assets that chain mostly lends against; an asset
+   * far riskier than those needs a band of its own, because the rate is what
+   * pays lenders for holding that risk. Arc's ARGUS is the case - a memecoin
+   * days old backing the chain's only USDC pool, at 30-60% against the chain's
+   * 3-18%.
+   */
+  interestRateLowerBound?: number
+  interestRateUpperBound?: number
   /** Market keys this asset gets an inverse pool on. Omitted means every market. */
   markets?: string[]
   note?: string
@@ -110,7 +146,12 @@ export interface ChainBootstrapConfig {
   protocolFeeRecipient: string
   /** TWAP window, in seconds, used for every pool oracle route. */
   twapInterval: number
-  /** Interest rate floor and ceiling in bps, interpolated by utilization. */
+  /**
+   * Interest rate floor and ceiling in bps, interpolated by utilization.
+   *
+   * The chain's default. A pool whose collateral is riskier than the chain's
+   * norm can override both on its own entry.
+   */
   interestRateLowerBound: number
   interestRateUpperBound: number
   /** Max share of pool value that may be lent out at once. 10000 == 100%. */

@@ -58,6 +58,9 @@ const config: ChainBootstrapConfig = {
   // to spare. At 0.507s blocks that is ~3,550 blocks of history.
   twapInterval: 1800,
 
+  // The chain's default band, which a pool may override on its own entry.
+  // This one is priced for lending USDC against ordinary collateral; the ARGUS
+  // pool below overrides it, because its collateral is not ordinary.
   interestRateLowerBound: 300, // 3% at zero utilization
   interestRateUpperBound: 1800, // 18% at the liquidity threshold
 
@@ -113,6 +116,28 @@ const config: ChainBootstrapConfig = {
       // with $394k of USDC-side depth and nothing to reconcile its price
       // against.
       collateralRatio: 50000,
+      // 30% at zero utilization, 60% at the liquidity threshold, against the
+      // chain default of 3-18%.
+      //
+      // The chain default is a stablecoin rate: it is what a lender needs to
+      // be paid for USDC that is idle most of the time and lent against
+      // ordinary collateral. Nothing about it is priced for this. ARGUS is a
+      // memecoin days old with $394k of USDC-side depth, and the 20% LTV
+      // above is the *only* other risk control on the pool. A lender here is
+      // underwriting a gap risk that a 3% floor does not pay for, and a
+      // borrower paying 3% to short-finance a memecoin is being handed an
+      // option cheaper than the risk they are passing on.
+      //
+      // 30-60% is the band the pool is actually worth to both sides. The floor
+      // matters more than the ceiling: utilization on a pool this small sits
+      // near zero most of the time, so the floor is the rate almost every loan
+      // actually pays.
+      //
+      // This is a per-pool override rather than a change to the chain's
+      // default because the default is right for the USDC the chain lends
+      // generally, and wrong only where the collateral is this.
+      interestRateLowerBound: 3000,
+      interestRateUpperBound: 6000,
       // Seven days only. A thirty-day loan against an asset this young is a
       // bet on it still existing at maturity.
       markets: ['short'],
@@ -157,6 +182,18 @@ const config: ChainBootstrapConfig = {
       // 600% collateralisation: a ~16.7% LTV. One tier tighter than the long
       // side, because the exposure is unbounded in the direction that hurts.
       collateralRatio: 60000,
+      // Deliberately left on the chain's 3-18% rather than the 30-60% the long
+      // side takes, and this pool is already live at those bounds.
+      //
+      // The two pools are not symmetric. On the long side the lender supplies
+      // USDC and the rate is what pays them for memecoin gap risk. Here the
+      // lender supplies ARGUS, and the return they care about is ARGUS itself
+      // - a rate on top of that is the smaller term. The borrower, meanwhile,
+      // is paying it in ARGUS, so a 30% floor on a token that can move 30% in
+      // a day is not the control it looks like; the 600% collateralisation is.
+      //
+      // Stated rather than omitted, so the next reader does not take the
+      // difference from the long side for an oversight.
       // Seven days only, matching the long side. There is no pool on the
       // thirty-day market in either direction.
       markets: ['short'],

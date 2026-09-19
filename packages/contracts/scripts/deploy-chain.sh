@@ -62,6 +62,23 @@
 #   PAYMENT_DEFAULT_DRY_RUN=true
 #                           with SET_PAYMENT_DEFAULT, print before/after and
 #                           send nothing.
+#   SWAP_VIA_LIFI=true      swap one ERC-20 for another from the deployer,
+#                           routed by LI.FI, and stop. Needs SWAP_FROM, SWAP_TO
+#                           and SWAP_AMOUNT. For funding a pool whose principal
+#                           the deployer has no other way to acquire.
+#   SWAP_FROM=<address>     token to sell.
+#   SWAP_TO=<address>       token to buy.
+#   SWAP_AMOUNT=<raw>       how much to sell, in the sold token's raw units.
+#   SWAP_SLIPPAGE=<frac>    fractional tolerance, e.g. 0.03. Default 0.03.
+#   SWAP_MIN_NATIVE_LEFT=<n>
+#                           refuse to run if the wallet would be left with less
+#                           than this much gas, in whole units. Default 5. On a
+#                           chain whose gas token is the token being sold - Arc
+#                           sells USDC and pays gas in it - this is the only
+#                           thing standing between a swap and a stranded
+#                           deployer.
+#   SWAP_DRY_RUN=true       with SWAP_VIA_LIFI, print the route and send
+#                           nothing.
 #   PUBLISH_ONLY=true       publish the package from artifacts already in the
 #                           repo and stop. Needs PUBLISH_PACKAGE=true and
 #                           NPM_TOKEN. Sends no transaction. For a chain that
@@ -522,6 +539,51 @@ if [ "${SET_PAYMENT_DEFAULT:-}" = "true" ]; then
   exit 0
 fi
 
+# One swap, from the deployer wallet, routed by LI.FI.
+#
+# Not part of any deploy. It exists because activating a LenderCommitmentGroup
+# pool needs the owner's first deposit in that pool's *principal*, and an
+# inverse pool's principal is the volatile asset - on Arc, ARGUS, which the
+# deployer holds none of and has no other way to get. Every other funding route
+# in this repo assumes a human at a bridge UI.
+#
+# Sends a transaction and touches no deployment, so it needs the key but not
+# deployments/$NETWORK.
+if [ "${SWAP_VIA_LIFI:-}" = "true" ]; then
+  [ -n "${SWAP_FROM:-}" ] || fail "SWAP_VIA_LIFI is set but SWAP_FROM is not."
+  [ -n "${SWAP_TO:-}" ] || fail "SWAP_VIA_LIFI is set but SWAP_TO is not."
+  [ -n "${SWAP_AMOUNT:-}" ] || fail \
+    "SWAP_VIA_LIFI is set but SWAP_AMOUNT is not. Refusing to guess a trade size."
+  [ -n "${DEPLOYER_MNEMONIC:-}" ] || fail "DEPLOYER_MNEMONIC is not set."
+  printf '%s' "$DEPLOYER_MNEMONIC" > mnemonic.secret
+  chmod 600 mnemonic.secret
+  trap 'rm -f mnemonic.secret' EXIT
+
+  SWAP_ARGS=""
+  [ -n "${SWAP_SLIPPAGE:-}" ] && SWAP_ARGS="--slippage ${SWAP_SLIPPAGE}"
+  [ -n "${SWAP_MIN_NATIVE_LEFT:-}" ] && \
+    SWAP_ARGS="$SWAP_ARGS --min-native-left ${SWAP_MIN_NATIVE_LEFT}"
+
+  # Same "true" comparison as every other dry run here, and for the same
+  # reason: ${VAR:+...} expands on the string "false" and would send a run
+  # meant to be a rehearsal.
+  if [ "${SWAP_DRY_RUN:-}" = "true" ]; then
+    log "Swap $SWAP_AMOUNT of $SWAP_FROM for $SWAP_TO on $NETWORK (dry run — nothing will be sent)"
+    # shellcheck disable=SC2086
+    yarn hh swap-via-lifi --network "$NETWORK" \
+      --from "$SWAP_FROM" --to "$SWAP_TO" --amount "$SWAP_AMOUNT" \
+      --dry-run true $SWAP_ARGS
+  else
+    log "Swap $SWAP_AMOUNT of $SWAP_FROM for $SWAP_TO on $NETWORK"
+    # shellcheck disable=SC2086
+    yarn hh swap-via-lifi --network "$NETWORK" \
+      --from "$SWAP_FROM" --to "$SWAP_TO" --amount "$SWAP_AMOUNT" $SWAP_ARGS
+  fi
+
+  log "Done — $NETWORK (swap)"
+  exit 0
+fi
+
 # Publishing alone, from deployment artifacts already in the repo.
 #
 # A chain is invisible to every frontend until @teller-protocol/v2-contracts
@@ -604,6 +666,7 @@ if [ "${DEPLOY_PROTOCOL:-}" != "true" ]; then
     SET_PRICE_CAPS=true      cap existing pools at their current oracle price
     RUN_TAGS=<tags>          run named deploy tags against a deployed chain
     VERIFY_ONLY=true         verify already-deployed contracts
+    SWAP_VIA_LIFI=true       swap one ERC-20 for another from the deployer
     PUBLISH_ONLY=true        publish the package (with PUBLISH_PACKAGE=true)
     DEPLOY_PROTOCOL=true     deploy the entire protocol to $NETWORK from scratch
 

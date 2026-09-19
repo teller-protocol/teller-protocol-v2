@@ -175,9 +175,32 @@ task('swap-via-lifi', 'Swaps one ERC-20 for another from the deployer, routed by
     // On a chain whose gas token is also the token being sold - Arc's USDC has
     // an 18-decimal native view and a 6-decimal ERC-20 view of one balance -
     // this is the check that stops a swap from stranding the deployer.
+    //
+    // Whether they are one balance is asked of the balances rather than kept in
+    // a per-chain list, because the answer is observable: scale the native
+    // balance down to the sold token's decimals and see whether it is the sold
+    // balance. A 1-unit tolerance covers which way the ERC-20 view rounds.
+    //
+    // The scaling is the point. `amount` is in the sold token's units, and
+    // subtracting it from a wei balance unscaled compares 6 decimals against
+    // 18: on Arc that took 0.000000000006 off a 16.8 balance, so the floor this
+    // guard exists to enforce passed every amount, including ones that would
+    // have spent the gas.
     const nativeBefore = await ethers.provider.getBalance(sender)
     const minNativeLeft = ethers.parseEther(String(args.minNativeLeft))
-    const nativeAfterWorstCase = nativeBefore > amount ? nativeBefore - amount : 0n
+
+    const scale = BigInt(10) ** BigInt(18 - Number(sellDecimals))
+    const sellIsGasToken =
+      Number(sellDecimals) <= 18 &&
+      (nativeBefore / scale - sellBalance <= 1n) &&
+      (sellBalance - nativeBefore / scale <= 1n)
+
+    const spentFromNative = sellIsGasToken ? amount * scale : BigInt(0)
+    const nativeAfterWorstCase =
+      nativeBefore > spentFromNative ? nativeBefore - spentFromNative : BigInt(0)
+    if (sellIsGasToken) {
+      hre.log(`  gas token  ${sellSymbol} is this chain's gas; the swap spends it`)
+    }
     if (nativeAfterWorstCase < minNativeLeft) {
       throw new Error(
         `refusing: wallet holds ${ethers.formatEther(nativeBefore)} native and the swap could leave ` +

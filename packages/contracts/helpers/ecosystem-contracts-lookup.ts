@@ -229,9 +229,34 @@ export function get_ecosystem_contract_address(
 			      quoterAddress = '0x5911cB3633e764939edc2d92b7e1ad375Bb57649'
 			      break
 			    case 'arc':
-			      // Uniswap ships a Quoter on 5042, so there is nothing to vendor
-			      // here. factory() returns the v3 factory above, checked on chain.
-			      quoterAddress = '0x7DfD4F31be6814D2906BDE155c3e1B146EAc1468'
+			      // Uniswap does ship a Quoter on 5042 and it is the wrong kind.
+			      //
+			      // BorrowSwap declares `IQuoter.quoteExactInput` as `view`, so
+			      // solc emits a STATICCALL. Uniswap's QuoterV2 is deliberately
+			      // NOT view: it works by calling `pool.swap` and reading the
+			      // answer out of the revert. Under a staticcall that inner call
+			      // cannot write, so it reverts with nothing, QuoterV2's
+			      // `handleRevert` gets data it does not recognise, and the whole
+			      // read comes back `execution reverted: Unexpected error`.
+			      //
+			      // Which is what shipped. Measured on 5042 against
+			      // 0x7DfD4F31be6814D2906BDE155c3e1B146EAc1468, the address that
+			      // used to be here: BorrowSwap.quoteExactInput reverted in both
+			      // directions, while the same quoter answered a top-level
+			      // eth_call of QuoterV2's own `quoteExactInputSingle` correctly
+			      // (0.2827 USDC -> 21.32 ARGUS). The venue was always fine. Loop
+			      // and Short read "Receive 0.00" because the frontend's quote
+			      // reverted, not because there was nothing to quote.
+			      //
+			      // So Arc joins Robinhood in deploying this repo's vendored
+			      // view-quoter, which is genuinely `view` and survives the
+			      // staticcall. Nothing to hardcode.
+			      //
+			      // The general rule, since "the chain has a Quoter" is not the
+			      // question: a hardcoded quoter address is only correct if that
+			      // contract's `quoteExactInput` is `view`. Uniswap's own is not,
+			      // on any chain.
+			      quoterAddress = undefined
 			      break
 			    case 'robinhood':
 			      // Deployed by us. 4663 has no quoter we can point at - it is a

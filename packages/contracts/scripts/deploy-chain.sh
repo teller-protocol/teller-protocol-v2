@@ -83,7 +83,13 @@
 #                           an incident.
 #   AUDIT_DRIFT_PCT=<n>     flag a cap further than this percentage from the
 #                           live oracle reading. Default 25.
-#   AUDIT_FROM_BLOCK=<n>    first block to scan the factory from. Default 0.
+#   AUDIT_FROM_BLOCK=<n>    first block to scan the factory from. Defaults to
+#                           the factory's own deployment block.
+#   AUDIT_CHUNK=<n>         largest block window to ask for logs over, halved
+#                           automatically when a provider refuses the range.
+#                           hyperliquid's public RPC caps eth_getLogs at 1000
+#                           blocks and says so only by failing.
+#   AUDIT_POOLS=<addrs>     comma-separated pools to audit instead of scanning.
 #   AUDIT_JSON=true         emit JSON instead of a table, for an alerting hook.
 #   SET_PRICE_CAPS=true     cap every pool in the bootstrap receipt at the
 #                           price its own oracle quotes right now.
@@ -616,6 +622,8 @@ if [ "${AUDIT_POOL_CAPS:-}" = "true" ]; then
   [ -n "${AUDIT_MIN_AVAILABLE:-}" ] && AUDIT_ARGS="--min-available ${AUDIT_MIN_AVAILABLE}"
   [ -n "${AUDIT_DRIFT_PCT:-}" ] && AUDIT_ARGS="$AUDIT_ARGS --drift-pct ${AUDIT_DRIFT_PCT}"
   [ -n "${AUDIT_FROM_BLOCK:-}" ] && AUDIT_ARGS="$AUDIT_ARGS --from-block ${AUDIT_FROM_BLOCK}"
+  [ -n "${AUDIT_CHUNK:-}" ] && AUDIT_ARGS="$AUDIT_ARGS --chunk ${AUDIT_CHUNK}"
+  [ -n "${AUDIT_POOLS:-}" ] && AUDIT_ARGS="$AUDIT_ARGS --pools ${AUDIT_POOLS}"
   [ "${AUDIT_JSON:-}" = "true" ] && AUDIT_ARGS="$AUDIT_ARGS --json true"
 
   log "Auditing pool price caps on $NETWORK"

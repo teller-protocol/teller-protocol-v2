@@ -162,10 +162,21 @@ export const CHAIN_FEATURES: Record<string, ChainFeature[]> = {
     'uniswapPricingHelper',
     'hypernativeOracle',
     'protocolPausingManager',
-    // No vendored quoter: Uniswap ships one on Arc, and it answers factory()
-    // with the chain's v3 factory. The vendored copy exists for chains with
-    // none to point at, and deploying it here would be a second quoter to keep
-    // in step with the first.
+    // Arc does need the vendored quoter, and the reason it was left out is
+    // worth keeping because it sounds right: Uniswap ships a Quoter on Arc and
+    // it answers factory() with the chain's v3 factory.
+    //
+    // It is the wrong kind. BorrowSwap declares IQuoter.quoteExactInput as
+    // `view`, so it STATICCALLs, and Uniswap's QuoterV2 is deliberately not
+    // view - it calls pool.swap and reads the answer out of the revert, which
+    // a staticcall cannot do. Every quote came back "execution reverted:
+    // Unexpected error", and Loop and Short read "Receive 0.00" on a venue
+    // that was quoting perfectly well.
+    //
+    // The vendored copy is genuinely view, which is the whole property that
+    // matters. See ecosystem-contracts-lookup.ts, which stops handing out
+    // Uniswap's address for the same reason.
+    'uniswapV3Quoter',
   ],
   robinhood: [
     'lenderCommitmentForwarder',

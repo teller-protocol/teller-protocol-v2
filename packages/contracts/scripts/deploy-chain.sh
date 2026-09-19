@@ -171,6 +171,12 @@
 
 set -euo pipefail
 
+# A sweep names the chains it visits, so requiring one more would be asking for
+# a value nothing reads. Defaulted rather than made optional, because everything
+# below this line assumes NETWORK is set.
+if [ -n "${AUDIT_NETWORKS:-}" ]; then
+  NETWORK="${NETWORK:-$(echo "$AUDIT_NETWORKS" | cut -d, -f1)}"
+fi
 NETWORK="${NETWORK:?NETWORK is required (e.g. robinhood)}"
 # The env var name hardhat.config.ts reads for this chain's timelock.
 TIMELOCK_VAR="$(echo "$NETWORK" | tr '[:lower:]-' '[:upper:]_')_TIMELOCK_ADDRESS"
@@ -701,8 +707,18 @@ if [ "${AUDIT_POOL_CAPS:-}" = "true" ] && [ -n "${AUDIT_NETWORKS:-}" ]; then
   SWEEP_SKIPPED=""
 
   for AUDIT_NET in $(echo "$AUDIT_NETWORKS" | tr ',' ' '); do
+    # Both checks, and the second is the one that matters: the audit throws when
+    # a chain has no LenderCommitmentGroupFactory_V2, and this loop reads a
+    # non-zero exit as "critical findings". Without this, every chain that
+    # simply has no pools would page somebody - and an alert that cries wolf on
+    # a schedule is worse than no alert, because it teaches people to close it.
     if [ ! -d "deployments/$AUDIT_NET" ]; then
       log "Skipping $AUDIT_NET: no deployments/$AUDIT_NET in this checkout"
+      SWEEP_SKIPPED="$SWEEP_SKIPPED $AUDIT_NET"
+      continue
+    fi
+    if [ ! -f "deployments/$AUDIT_NET/LenderCommitmentGroupFactory_V2.json" ]; then
+      log "Skipping $AUDIT_NET: no LenderCommitmentGroupFactory_V2, so no pools to audit"
       SWEEP_SKIPPED="$SWEEP_SKIPPED $AUDIT_NET"
       continue
     fi

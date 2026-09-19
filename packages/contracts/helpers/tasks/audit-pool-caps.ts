@@ -1,5 +1,7 @@
 import { task, types } from 'hardhat/config'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
+import fs from 'fs'
+import path from 'path'
 
 /**
  * Report every lender pool on a chain that can be over-borrowed against.
@@ -34,9 +36,46 @@ import { HardhatRuntimeEnvironment } from 'hardhat/types'
  * is `ok`. The task exits non-zero when anything is critical, so a scheduler
  * can treat the exit code as the alert.
  *
+ * WHEN THE CHAIN WILL NOT BE ENUMERATED. HyperEVM's providers cap eth_getLogs
+ * at 1000 blocks with no tier that lifts it, and its head is past 46 million:
+ * the scan is tens of thousands of requests and the first attempt died of a
+ * timeout. So the scan runs on a request budget, and a chain that blows it (or
+ * fails outright) falls back to a checked-in list at
+ * config/pool-census/<network>.json.
+ *
+ * That fallback is a weaker guarantee and the report says so on every run. A
+ * log scan is complete by construction; a census is complete only while
+ * somebody maintains it, and a pool missing from it is a pool nothing watches.
+ *
  *   yarn hh audit-pool-caps --network hyperevm
  *   yarn hh audit-pool-caps --network arc --json true
  */
+
+interface Census {
+  pools?: Array<{ address?: string } | string>
+}
+
+/**
+ * The checked-in pool list for a chain, if there is one.
+ *
+ * Resolved from this file rather than from the working directory, so it does
+ * not depend on where hardhat was invoked from.
+ */
+const readCensus = (network: string): string[] => {
+  const file = path.join(
+    __dirname,
+    '..',
+    '..',
+    'config',
+    'pool-census',
+    `${network}.json`
+  )
+  if (!fs.existsSync(file)) return []
+  const parsed = JSON.parse(fs.readFileSync(file, 'utf8')) as Census
+  return (parsed.pools ?? [])
+    .map((entry) => (typeof entry === 'string' ? entry : entry.address))
+    .filter((a): a is string => Boolean(a))
+}
 
 const POOL_ABI = [
   'function principalToken() view returns (address)',
@@ -120,6 +159,14 @@ task(
     types.string
   )
   .addOptionalParam(
+    'maxRequests',
+    'Give up on scanning the factory log after this many requests and fall back ' +
+      'to config/pool-census/<network>.json. A range-capable endpoint finishes ' +
+      'in a handful; a 1000-block cap on a 46M-block chain never finishes at all.',
+    500,
+    types.int
+  )
+  .addOptionalParam(
     'json',
     'Emit machine-readable JSON instead of a table',
     false,
@@ -154,6 +201,9 @@ task(
       .map((p) => ethers.getAddress(p))
 
     let pools: string[] = explicit
+    // Set when the pool list did not come from the factory's own log, which is
+    // a fact about how much this report is worth and travels with it.
+    let degraded = ''
 
     if (explicit.length === 0) {
       // Start where the factory started. Nothing before its deployment block can
@@ -179,35 +229,66 @@ task(
       let logCount = 0
       const seen = new Set<string>()
       let cursor = from
-      while (cursor <= latest) {
-        const to = Math.min(cursor + window - 1, latest)
-        try {
-          const found = await ethers.provider.getLogs({
-            address: factory.address,
-            topics: [topic],
-            fromBlock: cursor,
-            toBlock: to,
-          })
-          requests++
-          logCount += found.length
-          for (const l of found) {
-            seen.add(ethers.getAddress('0x' + l.topics[1].slice(26)))
+      const budget = Math.max(1, args.maxRequests as number)
+      try {
+        while (cursor <= latest) {
+          const to = Math.min(cursor + window - 1, latest)
+          try {
+            const found = await ethers.provider.getLogs({
+              address: factory.address,
+              topics: [topic],
+              fromBlock: cursor,
+              toBlock: to,
+            })
+            requests++
+            logCount += found.length
+            for (const l of found) {
+              seen.add(ethers.getAddress('0x' + l.topics[1].slice(26)))
+            }
+            cursor = to + 1
+          } catch (err) {
+            if (!isRangeError(err) || window === 1) throw err
+            window = Math.max(1, Math.floor(window / 2))
           }
-          cursor = to + 1
-        } catch (err) {
-          if (!isRangeError(err) || window === 1) throw err
-          window = Math.max(1, Math.floor(window / 2))
+          // Checked after the window has settled, so a chain whose provider
+          // caps the range shows what the cap costs rather than dying of it.
+          if (requests >= budget && cursor <= latest) {
+            throw new Error(
+              `scan budget spent: ${requests} request(s) covered ${cursor - from} of ` +
+                `${latest - from} blocks at window ${window}`
+            )
+          }
         }
+        pools = [...seen]
+      } catch (err) {
+        // The census is the fallback, never the preference. A scan is complete
+        // by construction; a checked-in list is complete only while somebody
+        // maintains it, so this path says loudly what it is and what it costs.
+        const census = readCensus(hre.network.name)
+        if (census.length === 0) throw err
+        pools = census.map((p) => ethers.getAddress(p))
+        degraded = `factory scan failed (${(err as Error).message.slice(0, 120)})`
       }
-      pools = [...seen]
 
       if (!args.json) {
         hre.log(`Pool cap audit on ${hre.network.name}`, { star: true })
         hre.log(`  factory ${factory.address}`)
-        hre.log(
-          `  scanned ${from}..${latest} in ${requests} request(s), window ${window}`
-        )
-        hre.log(`  pools   ${pools.length} (from ${logCount} deployment logs)`)
+        if (degraded) {
+          hre.log(`  !! ${degraded}`)
+          hre.log(
+            `  !! falling back to config/pool-census/${hre.network.name}.json: ${pools.length} pool(s).`
+          )
+          hre.log(
+            '  !! a pool on this chain that is not in that file is not being watched.'
+          )
+        } else {
+          hre.log(
+            `  scanned ${from}..${latest} in ${requests} request(s), window ${window}`
+          )
+          hre.log(
+            `  pools   ${pools.length} (from ${logCount} deployment logs)`
+          )
+        }
         hre.log('')
       }
     } else if (!args.json) {
@@ -360,7 +441,20 @@ task(
     if (args.json === true) {
       console.log(
         JSON.stringify(
-          { network: hre.network.name, factory: factory.address, findings },
+          {
+            network: hre.network.name,
+            factory: factory.address,
+            // Carried into the JSON as well as the table: a sweep that posts
+            // these to Slack has to be able to say "and this chain's list was
+            // checked in, not scanned".
+            source: degraded
+              ? 'census'
+              : explicit.length
+                ? 'explicit'
+                : 'factory-log',
+            degraded: degraded || null,
+            findings,
+          },
           null,
           2
         )

@@ -70,6 +70,21 @@
 #                           deployer's whole balance.
 #   REDEEM_POOL_DRY_RUN=true
 #                           with REDEEM_POOL, print and send nothing.
+#   AUDIT_POOL_CAPS=true    report every lender pool on this chain whose
+#                           maxPrincipalPerCollateralAmount leaves it open to
+#                           an inflated oracle, and stop. Read-only: it signs
+#                           nothing and needs no deployer key, which is what
+#                           makes it safe to run on a schedule. Exits non-zero
+#                           when a pool holds borrowable principal with no cap,
+#                           so the exit code is the alert.
+#   AUDIT_MIN_AVAILABLE=<n> ignore pools with less than this much principal
+#                           borrowable, in whole units. Default 1 - a dust pool
+#                           with no cap is untidy, one with real principal is
+#                           an incident.
+#   AUDIT_DRIFT_PCT=<n>     flag a cap further than this percentage from the
+#                           live oracle reading. Default 25.
+#   AUDIT_FROM_BLOCK=<n>    first block to scan the factory from. Default 0.
+#   AUDIT_JSON=true         emit JSON instead of a table, for an alerting hook.
 #   SET_PRICE_CAPS=true     cap every pool in the bootstrap receipt at the
 #                           price its own oracle quotes right now.
 #   PRICE_CAPS_DRY_RUN=true with SET_PRICE_CAPS, print the caps without
@@ -575,6 +590,44 @@ if [ "${SET_PAYMENT_DEFAULT:-}" = "true" ]; then
   exit 0
 fi
 
+# Which pools can be over-borrowed against.
+#
+# A pool with maxPrincipalPerCollateralAmount == 0 believes its Uniswap TWAP
+# without limit, and the direction an attacker pushes a TWAP is up, because
+# collateral quoted too high borrows more than it is worth. So an uncapped pool
+# holding real principal is the shape of the loss.
+#
+# Signs nothing and needs no deployer key - it runs on the public hardhat test
+# mnemonic, because hardhat builds its accounts config at startup whether or
+# not a task sends anything. That is what makes this safe to schedule.
+#
+# It enumerates from the factory's deployment log rather than from
+# market-bootstrap.json, so it sees pools this repo did not create - hyperevm
+# has fourteen live pools and no receipt at all, which is exactly the blind
+# spot a monitor must not inherit.
+if [ "${AUDIT_POOL_CAPS:-}" = "true" ]; then
+  [ -d "deployments/$NETWORK" ] || fail \
+    "AUDIT_POOL_CAPS needs deployments/$NETWORK in this checkout to find the pool factory."
+  printf '%s' 'test test test test test test test test test test test junk' > mnemonic.secret
+  chmod 600 mnemonic.secret
+  trap 'rm -f mnemonic.secret' EXIT
+
+  AUDIT_ARGS=""
+  [ -n "${AUDIT_MIN_AVAILABLE:-}" ] && AUDIT_ARGS="--min-available ${AUDIT_MIN_AVAILABLE}"
+  [ -n "${AUDIT_DRIFT_PCT:-}" ] && AUDIT_ARGS="$AUDIT_ARGS --drift-pct ${AUDIT_DRIFT_PCT}"
+  [ -n "${AUDIT_FROM_BLOCK:-}" ] && AUDIT_ARGS="$AUDIT_ARGS --from-block ${AUDIT_FROM_BLOCK}"
+  [ "${AUDIT_JSON:-}" = "true" ] && AUDIT_ARGS="$AUDIT_ARGS --json true"
+
+  log "Auditing pool price caps on $NETWORK"
+  # No `|| fail` wrapper: the task's own non-zero exit is the alert, and its
+  # message already names the pools and the owners who must act.
+  # shellcheck disable=SC2086
+  yarn hh audit-pool-caps --network "$NETWORK" $AUDIT_ARGS
+
+  log "Done — $NETWORK (pool cap audit)"
+  exit 0
+fi
+
 # Take the deployer's own deposit back out of a pool.
 #
 # The counterpart of activate-pools, which puts the owner's first deposit into
@@ -744,6 +797,7 @@ if [ "${DEPLOY_PROTOCOL:-}" != "true" ]; then
     RUN_TAGS=<tags>          run named deploy tags against a deployed chain
     VERIFY_ONLY=true         verify already-deployed contracts
     REDEEM_POOL=true         take the deployer's own deposit back out of a pool
+    AUDIT_POOL_CAPS=true     report pools with no price cap (read-only, no key)
     SWAP_VIA_LIFI=true       swap one ERC-20 for another from the deployer
     PUBLISH_ONLY=true        publish the package (with PUBLISH_PACKAGE=true)
     DEPLOY_PROTOCOL=true     deploy the entire protocol to $NETWORK from scratch

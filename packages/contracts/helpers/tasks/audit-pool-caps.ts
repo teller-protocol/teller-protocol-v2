@@ -101,9 +101,23 @@ task(
   )
   .addOptionalParam(
     'fromBlock',
-    'First block to scan the factory from',
+    "First block to scan the factory from. Defaults to the factory's own " +
+      'deployment block, the first block that could carry one of its logs.',
     0,
     types.int
+  )
+  .addOptionalParam(
+    'chunk',
+    'Largest block window to request logs for. Halved automatically when a ' +
+      'provider refuses the range, so it is a starting guess rather than a limit.',
+    500000,
+    types.int
+  )
+  .addOptionalParam(
+    'pools',
+    'Comma-separated pool addresses to audit instead of scanning for them.',
+    '',
+    types.string
   )
   .addOptionalParam(
     'json',
@@ -124,28 +138,82 @@ task(
     }
 
     // Every pool the factory ever made, which is the only list that is complete
-    // by construction - a receipt only knows the pools its own task created.
+    // by construction. A receipt only knows the pools its own task created, and
+    // the factory's own `deployedLenderGroupContracts` is a mapping - it can say
+    // whether an address is one of its pools but cannot list them.
     const iface = new ethers.Interface([
       'event DeployedLenderGroupContract(address indexed groupContract)',
     ])
     const topic = iface.getEvent('DeployedLenderGroupContract')!.topicHash
     const latest = await ethers.provider.getBlockNumber()
-    const logs = await ethers.provider.getLogs({
-      address: factory.address,
-      topics: [topic],
-      fromBlock: args.fromBlock as number,
-      toBlock: latest,
-    })
-    const pools = [
-      ...new Set(
-        logs.map((l) => ethers.getAddress('0x' + l.topics[1].slice(26)))
-      ),
-    ]
 
-    if (!args.json) {
+    const explicit = String(args.pools ?? '')
+      .split(',')
+      .map((p) => p.trim())
+      .filter(Boolean)
+      .map((p) => ethers.getAddress(p))
+
+    let pools: string[] = explicit
+
+    if (explicit.length === 0) {
+      // Start where the factory started. Nothing before its deployment block can
+      // carry one of its logs, and on a chain whose head is tens of millions of
+      // blocks up that is most of the range gone for nothing.
+      const deployedAt = (factory as { receipt?: { blockNumber?: number } })
+        .receipt?.blockNumber
+      const from = (args.fromBlock as number) || deployedAt || 0
+
+      // Providers cap eth_getLogs differently and rarely advertise it -
+      // hyperliquid's public RPC refuses anything over 1000 blocks, which is how
+      // the first run of this died with "query exceeds max block range 1000".
+      // Rather than carry a limit per chain, start wide and halve on refusal,
+      // keeping whatever window works: a range-capable endpoint finishes in a
+      // handful of requests, a strict one still finishes.
+      const isRangeError = (err: unknown): boolean =>
+        /range|too many blocks|block range|limit exceeded|more than/i.test(
+          (err as Error)?.message ?? ''
+        )
+
+      let window = Math.max(1, args.chunk as number)
+      let requests = 0
+      let logCount = 0
+      const seen = new Set<string>()
+      let cursor = from
+      while (cursor <= latest) {
+        const to = Math.min(cursor + window - 1, latest)
+        try {
+          const found = await ethers.provider.getLogs({
+            address: factory.address,
+            topics: [topic],
+            fromBlock: cursor,
+            toBlock: to,
+          })
+          requests++
+          logCount += found.length
+          for (const l of found) {
+            seen.add(ethers.getAddress('0x' + l.topics[1].slice(26)))
+          }
+          cursor = to + 1
+        } catch (err) {
+          if (!isRangeError(err) || window === 1) throw err
+          window = Math.max(1, Math.floor(window / 2))
+        }
+      }
+      pools = [...seen]
+
+      if (!args.json) {
+        hre.log(`Pool cap audit on ${hre.network.name}`, { star: true })
+        hre.log(`  factory ${factory.address}`)
+        hre.log(
+          `  scanned ${from}..${latest} in ${requests} request(s), window ${window}`
+        )
+        hre.log(`  pools   ${pools.length} (from ${logCount} deployment logs)`)
+        hre.log('')
+      }
+    } else if (!args.json) {
       hre.log(`Pool cap audit on ${hre.network.name}`, { star: true })
       hre.log(`  factory ${factory.address}`)
-      hre.log(`  pools   ${pools.length} (from ${logs.length} deployment logs)`)
+      hre.log(`  pools   ${pools.length} (given explicitly, no scan)`)
       hre.log('')
     }
 

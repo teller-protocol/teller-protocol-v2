@@ -91,6 +91,17 @@
 #                           blocks and says so only by failing.
 #   AUDIT_POOLS=<addrs>     comma-separated pools to audit instead of scanning.
 #   AUDIT_JSON=true         emit JSON instead of a table, for an alerting hook.
+#   GROW_ORACLE=true        grow a Uniswap V3 pool's observation buffer so a
+#                           TWAP can be read from it, and stop. Permissionless -
+#                           increaseObservationCardinalityNext is callable by
+#                           anyone - so this needs gas but no ownership. Needs
+#                           GROW_ORACLE_POOL.
+#   GROW_ORACLE_POOL=<addr> the Uniswap V3 pool whose buffer to grow.
+#   GROW_ORACLE_TARGET=<n>  slots to allocate. Default 300. Only ever grows.
+#   GROW_ORACLE_PROBE=true  report which TWAP windows the pool answers today
+#                           and send nothing. Run this before pointing a pool
+#                           config at a window: one the oracle cannot answer is
+#                           a pool that cannot lend.
 #   SET_PRICE_CAPS=true     cap every pool in the bootstrap receipt at the
 #                           price its own oracle quotes right now.
 #   PRICE_CAPS_DRY_RUN=true with SET_PRICE_CAPS, print the caps without
@@ -596,6 +607,40 @@ if [ "${SET_PAYMENT_DEFAULT:-}" = "true" ]; then
   exit 0
 fi
 
+# Make a Uniswap V3 pool's TWAP readable.
+#
+# A pool priced off a TWAP needs its oracle pool to hold observations spanning
+# the window asked for. A fresh pool ships with observationCardinality == 1, and
+# one observation is not a history: observe([n,0]) succeeds only while that
+# single observation happens to be older than n, so any swap makes the oracle
+# unreadable for the next n seconds - and a pool whose oracle intermittently
+# reverts is worse than one with a short window, because every borrow against it
+# reverts too.
+#
+# Permissionless: increaseObservationCardinalityNext is callable by anyone, so
+# this needs gas but not ownership of the pool. That is what lets Teller price
+# against a market someone else made rather than seeding its own.
+if [ "${GROW_ORACLE:-}" = "true" ]; then
+  [ -n "${GROW_ORACLE_POOL:-}" ] || fail \
+    "GROW_ORACLE is set but GROW_ORACLE_POOL is not."
+  [ -n "${DEPLOYER_MNEMONIC:-}" ] || fail "DEPLOYER_MNEMONIC is not set."
+  printf '%s' "$DEPLOYER_MNEMONIC" > mnemonic.secret
+  chmod 600 mnemonic.secret
+  trap 'rm -f mnemonic.secret' EXIT
+
+  GROW_ARGS="--pool ${GROW_ORACLE_POOL}"
+  [ -n "${GROW_ORACLE_TARGET:-}" ] && GROW_ARGS="$GROW_ARGS --target ${GROW_ORACLE_TARGET}"
+  # Same "true" comparison as every other rehearsal flag here.
+  [ "${GROW_ORACLE_PROBE:-}" = "true" ] && GROW_ARGS="$GROW_ARGS --probe true"
+
+  log "Growing the oracle buffer on ${GROW_ORACLE_POOL} ($NETWORK)"
+  # shellcheck disable=SC2086
+  yarn hh grow-oracle-cardinality --network "$NETWORK" $GROW_ARGS
+
+  log "Done — $NETWORK (oracle buffer)"
+  exit 0
+fi
+
 # Which pools can be over-borrowed against.
 #
 # A pool with maxPrincipalPerCollateralAmount == 0 believes its Uniswap TWAP
@@ -806,6 +851,7 @@ if [ "${DEPLOY_PROTOCOL:-}" != "true" ]; then
     VERIFY_ONLY=true         verify already-deployed contracts
     REDEEM_POOL=true         take the deployer's own deposit back out of a pool
     AUDIT_POOL_CAPS=true     report pools with no price cap (read-only, no key)
+    GROW_ORACLE=true         grow a Uniswap V3 pool's TWAP observation buffer
     SWAP_VIA_LIFI=true       swap one ERC-20 for another from the deployer
     PUBLISH_ONLY=true        publish the package (with PUBLISH_PACKAGE=true)
     DEPLOY_PROTOCOL=true     deploy the entire protocol to $NETWORK from scratch

@@ -172,16 +172,37 @@ const deployFn: DeployFunction = async (hre) => {
   hre.log('')
   hre.log(`${activated.length} activated, ${skipped.length} skipped`)
   hre.log('----------')
-
-  return true
 }
 
-deployFn.id = 'activate-pools'
+// Deliberately no `deployFn.id`, and deliberately no `return true` above.
+//
+// An id plus a truthy return is how hardhat-deploy records a script as done,
+// and this script must not be: the set of pools it opens is not fixed at the
+// first run. A chain that adds a pool later has no way to open it, because the
+// one script that can is skipped on a record written before that pool existed.
+// Arc hit this - `activate-pools` ran on 2026-09-19 and opened the ARGUS pool,
+// then #322 added the inverse pool, and the re-run that would have opened it
+// was skipped silently against a receipt that lists it.
+//
+// Nothing is lost by re-running. The body already treats each pool
+// independently and skips any whose totalSupply clears MIN_SHARES, so a second
+// run over an open pool sends nothing, and skip() below stops the script before
+// it needs a signer when every listed pool is open.
 deployFn.tags = ['activate-pools']
 deployFn.dependencies = []
 deployFn.skip = async (hre) => {
   if (!hre.network.live) return true
-  return (await listedPools(hre)).length === 0
+
+  const pools = await listedPools(hre)
+  if (pools.length === 0) return true
+
+  // Reading totalSupply here rather than trusting a migration record: the
+  // question is whether any listed pool is still shut, and the pools answer it.
+  for (const [, address] of pools) {
+    const pool = await hre.ethers.getContractAt(POOL_ABI, address)
+    if ((await pool.totalSupply()) < MIN_SHARES) return false
+  }
+  return true
 }
 
 export default deployFn

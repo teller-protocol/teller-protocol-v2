@@ -15,12 +15,21 @@
   },
   "pools": {
     "short:ARGUS": {
-      "address": "0xC0DD4A4B094F9527f240165567E383804Dfbf8D6",
-      "txHash": "0x747fcd742bad4deacc69dbd51ddb90ce2a55a0ca654d35474e2a885fe89bc33b"
+      "address": "0x08cD1325eB01Abc232e62239A4E40d34cF2F84F8",
+      "txHash": "0x0435cc37de60f5c36f4936f70a43bc651ea89c35406d25d1efb8db412dff902e"
     },
     "short:inverse:ARGUS": {
       "address": "0x2131c0a66339E7dCc5aFa3628Ac79c1803566619",
       "txHash": "0x4cb460ffe5cc9370ce6eade639a170f0483bee481bee4bc8db856b586b64ca0e"
     }
+  },
+  "retiredPools": {
+    "short:ARGUS": [
+      {
+        "address": "0xC0DD4A4B094F9527f240165567E383804Dfbf8D6",
+        "txHash": "0x747fcd742bad4deacc69dbd51ddb90ce2a55a0ca654d35474e2a885fe89bc33b",
+        "retiredAt": "2026-09-19T09:31:59.311Z"
+      }
+    ]
   }
 }

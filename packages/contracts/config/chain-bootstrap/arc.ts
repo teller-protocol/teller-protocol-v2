@@ -120,11 +120,49 @@ const config: ChainBootstrapConfig = {
     },
   ],
 
-  // `inverse` is deliberately omitted. An inverse pool lends the collateral and
-  // takes the principal - it is what makes an asset shortable - and lending out
-  // a memecoin is a different risk from lending against one: the exposure is to
-  // it rising, which does not stop anywhere. Short will be empty on Arc, which
-  // is the correct thing for it to be.
+  // The long-tail side: lend ARGUS, take USDC as collateral.
+  //
+  // This was deliberately omitted at launch and is being added deliberately
+  // now, so the reason it was left out is worth keeping rather than deleting.
+  // Lending out a memecoin is not the same risk as lending against one. A loan
+  // *against* ARGUS is exposed to ARGUS falling, which stops at zero. A loan
+  // *of* ARGUS is exposed to ARGUS rising, which does not stop anywhere - and
+  // this is a token days old with $394k of USDC-side depth, so the move that
+  // would hurt is one a single buyer can cause.
+  //
+  // Two things bound it. The ratio is 600% - one tier tighter than the 500% on
+  // the long side, following the same step every other chain's inverse pools
+  // take (12500->16700, 16700->20000, 20000->25000, 25000->30000), and already
+  // the most punitive number in the protocol. And the pool holds only what is
+  // deposited into it: nothing here obliges anyone to fund it past activation.
+  //
+  // What it buys is the half of the marketplace that cannot exist without it.
+  // Short is exactly the rows whose collateral is the chain's principal, and
+  // ARGUS's Earn row has no supply side until a pool lends it - which is why
+  // Arc shows a dash where a yield belongs.
+  inverse: [
+    {
+      symbol: 'ARGUS',
+      token: '0xeCe5cA8bf9220718E5727754026757512212cb3c',
+      // Same Uniswap V3 pool as the long side, read in the other direction.
+      pool: '0x6A3bAcAa6493734c1Ac221EBF42CF530A96C1e02',
+      poolFee: 10000,
+      // Unchanged: these describe the Uniswap pool, not the loan. token0 is
+      // USDC at 6 decimals, token1 is ARGUS at 18.
+      token0Decimals: 6,
+      token1Decimals: 18,
+      // Negated from the entry above. ARGUS is the principal here and it is
+      // token1, and the route must still read principal per collateral.
+      zeroForOne: true,
+      // 600% collateralisation: a ~16.7% LTV. One tier tighter than the long
+      // side, because the exposure is unbounded in the direction that hurts.
+      collateralRatio: 60000,
+      // Seven days only, matching the long side. There is no pool on the
+      // thirty-day market in either direction.
+      markets: ['short'],
+      note: 'Long-tail lending pool: lends ARGUS against USDC. Deliberately tighter than the long side - a loan of a memecoin is exposed to it rising, which is unbounded.',
+    },
+  ],
 }
 
 export default config

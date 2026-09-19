@@ -1,0 +1,12 @@
+{
+  "chainId": 999,
+  "principal": "0xb88339CB7199b77E23DB6E890353E22632Ba630f",
+  "markets": {
+    "long": {
+      "marketId": "2",
+      "owner": "0x9ce73b7e864C60B9B1e2f32853264e1a5e5ecEe5",
+      "txHash": "pre-existing: market 2 was created before this repo's bootstrap task existed"
+    }
+  },
+  "pools": {}
+}

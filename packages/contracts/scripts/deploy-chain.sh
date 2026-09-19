@@ -100,9 +100,10 @@
 #   GROW_ORACLE_TARGET=<n>  slots to allocate. Default 300. Only ever grows.
 #   GROW_ORACLE_STEP=<n>    slots per transaction. Default 0, which measures it
 #                           against the chain's block gas limit. A slot costs an
-#                           SSTORE from zero, so 300 of them is ~6M gas and does
-#                           not fit HyperEVM's 2M blocks - the run splits itself
-#                           rather than asking for a transaction no block takes.
+#                           SSTORE from zero, so 300 of them is ~6.7M gas and
+#                           does not fit HyperEVM's 3M blocks - the run splits
+#                           itself rather than asking for a transaction no block
+#                           takes. It took five there, 74 slots at a time.
 #   GROW_ORACLE_PROBE=true  report which TWAP windows the pool answers today
 #                           and send nothing. Run this before pointing a pool
 #                           config at a window: one the oracle cannot answer is
@@ -128,7 +129,10 @@
 #                           routed by LI.FI, and stop. Needs SWAP_FROM, SWAP_TO
 #                           and SWAP_AMOUNT. For funding a pool whose principal
 #                           the deployer has no other way to acquire.
-#   SWAP_FROM=<address>     token to sell.
+#   SWAP_FROM=<address>     token to sell. May be the native sentinel
+#                           (0x0000...0000), which is how a wallet holding only
+#                           gas buys its first token on a chain - HyperEVM's
+#                           deployer arrived with 0.25 HYPE and nothing else.
 #   SWAP_TO=<address>       token to buy.
 #   SWAP_AMOUNT=<raw>       how much to sell, in the sold token's raw units.
 #   SWAP_SLIPPAGE=<frac>    fractional tolerance, e.g. 0.03. Default 0.03.

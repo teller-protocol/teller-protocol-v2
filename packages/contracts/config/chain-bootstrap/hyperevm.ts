@@ -62,7 +62,13 @@ const config: ChainBootstrapConfig = {
     decimals: 6,
   },
 
-  protocolFeeRecipient: '0x9ce73b7e864C60B9B1e2f32853264e1a5e5ecEe5',
+  // The recipient this chain already has, not one we would prefer. Every other
+  // file here names a recipient for a protocol being deployed; naming a
+  // different one on a chain that has been live for months makes the bootstrap
+  // write an owner-gated Safe call proposing to move an existing chain's fees,
+  // which nobody asked for and which reads as a decision rather than as the
+  // artefact of a default. It is the protocol owner's own address.
+  protocolFeeRecipient: '0x004573E17574634A48CA808CF1df75f01e906E43',
 
   // 300s, against the 5s every existing pool on this chain uses.
   //

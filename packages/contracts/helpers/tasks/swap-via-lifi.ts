@@ -31,11 +31,40 @@ import { HardhatRuntimeEnvironment } from 'hardhat/types'
  * a task that ignored that could strand the deployer. `--min-native-left`
  * is checked before anything is sent.
  *
+ * SELLING THE GAS TOKEN ITSELF. `--from` may be the native sentinel
+ * (0x0 or LI.FI's 0xEeee...), which is how a wallet holding nothing but gas
+ * buys its first token on a chain - the case every new chain starts in, and the
+ * one Arc's dual-view USDC hid, because there the gas token also had an ERC-20
+ * address to name. HyperEVM's does not: the deployer arrived holding 0.25 HYPE
+ * and no token contract to sell it through. Native has no `symbol()`,
+ * `balanceOf()` or `approve()`, so those come from the chain and the quote, and
+ * the approval is skipped rather than sent to whatever address a native route
+ * leaves in `approvalAddress`.
+ *
+ * `--to` must still be an ERC-20. Selling a token for gas is a different job -
+ * nothing here needs it, and a task that claims to do it should be one that
+ * has been run.
+ *
  *   yarn hh swap-via-lifi --network arc \
  *     --from 0x3600000000000000000000000000000000000000 \
  *     --to 0xeCe5cA8bf9220718E5727754026757512212cb3c \
  *     --amount 2000000 --dry-run true
+ *
+ *   yarn hh swap-via-lifi --network hyperevm \
+ *     --from 0x0000000000000000000000000000000000000000 \
+ *     --to 0xb88339CB7199b77E23DB6E890353E22632Ba630f \
+ *     --amount 40000000000000000 --min-native-left 0.1
  */
+
+/**
+ * What LI.FI accepts in place of a token address to mean the chain's own gas.
+ * Both are in circulation; which one a caller reaches for is not worth being
+ * strict about.
+ */
+const NATIVE_SENTINELS = new Set([
+  '0x0000000000000000000000000000000000000000',
+  '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+])
 
 const LIFI_QUOTE_URL = 'https://li.quest/v1/quote'
 
@@ -49,7 +78,11 @@ const ERC20_ABI = [
 
 interface LifiQuote {
   tool?: string
-  action?: { fromChainId?: number; toChainId?: number }
+  action?: {
+    fromChainId?: number
+    toChainId?: number
+    fromToken?: { symbol?: string; decimals?: number }
+  }
   estimate?: {
     fromAmount?: string
     toAmount?: string
@@ -75,19 +108,42 @@ const units = (raw: bigint, decimals: number): string => {
   return frac ? `${whole}.${frac}` : `${whole}`
 }
 
-task('swap-via-lifi', 'Swaps one ERC-20 for another from the deployer, routed by LI.FI')
+task(
+  'swap-via-lifi',
+  'Swaps one ERC-20 for another from the deployer, routed by LI.FI'
+)
   .addParam('from', 'Address of the token to sell', undefined, types.string)
   .addParam('to', 'Address of the token to buy', undefined, types.string)
-  .addParam('amount', 'Amount to sell, in the sold token\'s raw units', undefined, types.string)
-  .addOptionalParam('slippage', 'Fractional slippage tolerance, e.g. 0.03 for 3%', 0.03, types.float)
+  .addParam(
+    'amount',
+    "Amount to sell, in the sold token's raw units",
+    undefined,
+    types.string
+  )
+  .addOptionalParam(
+    'slippage',
+    'Fractional slippage tolerance, e.g. 0.03 for 3%',
+    0.03,
+    types.float
+  )
   .addOptionalParam(
     'minNativeLeft',
     'Refuse to run if the wallet would be left with less than this much native gas, in whole units',
     5,
     types.float
   )
-  .addOptionalParam('integrator', 'LI.FI integrator string', 'teller', types.string)
-  .addOptionalParam('dryRun', 'Fetch and print the route without sending anything', false, types.boolean)
+  .addOptionalParam(
+    'integrator',
+    'LI.FI integrator string',
+    'teller',
+    types.string
+  )
+  .addOptionalParam(
+    'dryRun',
+    'Fetch and print the route without sending anything',
+    false,
+    types.boolean
+  )
   .setAction(async (args, hre: HardhatRuntimeEnvironment): Promise<void> => {
     const { ethers, network } = hre
     const chainId = Number((await ethers.provider.getNetwork()).chainId)
@@ -95,12 +151,24 @@ task('swap-via-lifi', 'Swaps one ERC-20 for another from the deployer, routed by
     const [signer] = await ethers.getSigners()
     const sender = await signer.getAddress()
 
-    const sell = new ethers.Contract(args.from as string, ERC20_ABI, signer)
+    const sellIsNative = NATIVE_SENTINELS.has(
+      (args.from as string).toLowerCase()
+    )
+    // Null rather than a contract at a non-contract address, so every use of it
+    // below has to say what it does when the thing being sold is gas.
+    const sell = sellIsNative
+      ? null
+      : new ethers.Contract(args.from as string, ERC20_ABI, signer)
     const buy = new ethers.Contract(args.to as string, ERC20_ABI, signer)
 
-    const [sellSymbol, sellDecimals, buySymbol, buyDecimals] = await Promise.all([
-      sell.symbol() as Promise<string>,
-      sell.decimals() as Promise<bigint>,
+    // Every native token EVM tooling deals with is 18 decimals, and a chain
+    // where that is false would break far more than this task.
+    let sellSymbol = 'native'
+    const sellDecimals = sellIsNative
+      ? BigInt(18)
+      : ((await sell!.decimals()) as bigint)
+    if (!sellIsNative) sellSymbol = (await sell!.symbol()) as string
+    const [buySymbol, buyDecimals] = await Promise.all([
       buy.symbol() as Promise<string>,
       buy.decimals() as Promise<bigint>,
     ])
@@ -108,7 +176,11 @@ task('swap-via-lifi', 'Swaps one ERC-20 for another from the deployer, routed by
     const amount = BigInt(args.amount as string)
     if (amount <= 0n) throw new Error('--amount must be positive')
 
-    const sellBalance = (await sell.balanceOf(sender)) as bigint
+    const balanceOfSold = async (): Promise<bigint> =>
+      sellIsNative
+        ? await ethers.provider.getBalance(sender)
+        : ((await sell!.balanceOf(sender)) as bigint)
+    const sellBalance = await balanceOfSold()
     if (sellBalance < amount) {
       throw new Error(
         `deployer holds ${units(sellBalance, Number(sellDecimals))} ${sellSymbol}, ` +
@@ -161,15 +233,33 @@ task('swap-via-lifi', 'Swaps one ERC-20 for another from the deployer, routed by
 
     const toAmount = BigInt(quote.estimate.toAmount ?? '0')
     const toAmountMin = BigInt(quote.estimate.toAmountMin ?? '0')
-    if (toAmountMin <= 0n) throw new Error('LI.FI returned a route with no minimum output')
+    if (toAmountMin <= 0n)
+      throw new Error('LI.FI returned a route with no minimum output')
 
-    const spender = quote.estimate.approvalAddress
-    if (!spender) throw new Error('LI.FI returned a route with no approval address')
+    // The quote is the first thing that names the gas token, so the logs below
+    // say HYPE rather than "native" from here on.
+    if (sellIsNative && quote.action?.fromToken?.symbol) {
+      sellSymbol = quote.action.fromToken.symbol
+    }
 
-    hre.log(`  route      ${quote.tool ?? 'unknown'} via ${(quote.includedSteps ?? []).map((s) => s.tool).join(' -> ')}`)
+    // A native route has nothing to approve, and some come back with an
+    // `approvalAddress` anyway. Approving a token nobody holds to an address
+    // nobody checked is not harmless, so the field is only read when it is
+    // going to be used.
+    const spender = sellIsNative ? undefined : quote.estimate.approvalAddress
+    if (!sellIsNative && !spender)
+      throw new Error('LI.FI returned a route with no approval address')
+
+    hre.log(
+      `  route      ${quote.tool ?? 'unknown'} via ${(quote.includedSteps ?? []).map((s) => s.tool).join(' -> ')}`
+    )
     hre.log(`  expecting  ${units(toAmount, Number(buyDecimals))} ${buySymbol}`)
-    hre.log(`  minimum    ${units(toAmountMin, Number(buyDecimals))} ${buySymbol} at ${Number(args.slippage) * 100}% slippage`)
-    hre.log(`  spender    ${spender}`)
+    hre.log(
+      `  minimum    ${units(toAmountMin, Number(buyDecimals))} ${buySymbol} at ${Number(args.slippage) * 100}% slippage`
+    )
+    hre.log(
+      `  spender    ${spender ?? 'none — native route, nothing to approve'}`
+    )
     hre.log(`  target     ${quote.transactionRequest.to}`)
 
     // On a chain whose gas token is also the token being sold - Arc's USDC has
@@ -192,14 +282,18 @@ task('swap-via-lifi', 'Swaps one ERC-20 for another from the deployer, routed by
     const scale = BigInt(10) ** BigInt(18 - Number(sellDecimals))
     const sellIsGasToken =
       Number(sellDecimals) <= 18 &&
-      (nativeBefore / scale - sellBalance <= 1n) &&
-      (sellBalance - nativeBefore / scale <= 1n)
+      nativeBefore / scale - sellBalance <= 1n &&
+      sellBalance - nativeBefore / scale <= 1n
 
     const spentFromNative = sellIsGasToken ? amount * scale : BigInt(0)
     const nativeAfterWorstCase =
-      nativeBefore > spentFromNative ? nativeBefore - spentFromNative : BigInt(0)
+      nativeBefore > spentFromNative
+        ? nativeBefore - spentFromNative
+        : BigInt(0)
     if (sellIsGasToken) {
-      hre.log(`  gas token  ${sellSymbol} is this chain's gas; the swap spends it`)
+      hre.log(
+        `  gas token  ${sellSymbol} is this chain's gas; the swap spends it`
+      )
     }
     if (nativeAfterWorstCase < minNativeLeft) {
       throw new Error(
@@ -214,13 +308,17 @@ task('swap-via-lifi', 'Swaps one ERC-20 for another from the deployer, routed by
       return
     }
 
-    const allowance = (await sell.allowance(sender, spender)) as bigint
-    if (allowance < amount) {
-      hre.log(`  approving  ${units(amount, Number(sellDecimals))} ${sellSymbol} to ${spender}`)
-      // Some tokens refuse a non-zero-to-non-zero approval. Clearing first is
-      // cheap and works on the ones that do not care.
-      if (allowance > 0n) await (await sell.approve(spender, 0n)).wait()
-      await (await sell.approve(spender, amount)).wait()
+    if (!sellIsNative) {
+      const allowance = (await sell!.allowance(sender, spender)) as bigint
+      if (allowance < amount) {
+        hre.log(
+          `  approving  ${units(amount, Number(sellDecimals))} ${sellSymbol} to ${spender}`
+        )
+        // Some tokens refuse a non-zero-to-non-zero approval. Clearing first is
+        // cheap and works on the ones that do not care.
+        if (allowance > 0n) await (await sell!.approve(spender, 0n)).wait()
+        await (await sell!.approve(spender, amount)).wait()
+      }
     }
 
     const buyBefore = (await buy.balanceOf(sender)) as bigint
@@ -228,6 +326,8 @@ task('swap-via-lifi', 'Swaps one ERC-20 for another from the deployer, routed by
     const sent = await signer.sendTransaction({
       to: quote.transactionRequest.to,
       data: quote.transactionRequest.data,
+      // A native route carries the amount in `value`, so this is the whole of
+      // the payment rather than a fee riding alongside an ERC-20 transfer.
       value: quote.transactionRequest.value ?? '0x0',
       ...(quote.transactionRequest.gasLimit
         ? { gasLimit: (BigInt(quote.transactionRequest.gasLimit) * 12n) / 10n }
@@ -252,7 +352,7 @@ task('swap-via-lifi', 'Swaps one ERC-20 for another from the deployer, routed by
       )
     }
 
-    const sellAfter = (await sell.balanceOf(sender)) as bigint
+    const sellAfter = await balanceOfSold()
     hre.log(`  ${sellSymbol} left    ${units(sellAfter, Number(sellDecimals))}`)
     hre.log(`  ${buySymbol} held   ${units(buyAfter, Number(buyDecimals))}`)
     hre.log(`Done — swapped on ${network.name}`, { star: true })

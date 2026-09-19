@@ -131,10 +131,11 @@ task(
     //
     // Allocating a slot writes a zeroed observation, so the cost is an SSTORE
     // from nothing times however many slots were asked for - 299 of them is
-    // ~6M gas. HyperEVM's ordinary blocks cap at 2M, so the RPC would not even
-    // estimate the single call: it answers `exceeds block gas limit`, which
-    // reads as a broken pool rather than as a transaction that needs
-    // splitting. Every chain caps this differently and none of them publish
+    // ~6.7M gas by the estimator's own reckoning. HyperEVM's ordinary blocks
+    // cap at 3M, so the RPC would not even estimate the single call: it answers
+    // `exceeds block gas limit`, which reads as a broken pool rather than as a
+    // transaction that needs splitting. In the event it took five: 74 slots a
+    // time, at ~1.6M gas each. Every chain caps this differently and none of them publish
     // the per-slot cost, so the step is measured against the estimator rather
     // than assumed, and halved until it fits.
     const latest = await ethers.provider.getBlock('latest')

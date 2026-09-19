@@ -8,5 +8,14 @@
       "txHash": "pre-existing: market 2 was created before this repo's bootstrap task existed"
     }
   },
-  "pools": {}
+  "pools": {
+    "long:hyperRAM": {
+      "address": "0xc98A77393B89afFF34403fCA09F2dCaFd1669fae",
+      "txHash": "0x0ba46fa27c6d7193ba2b1ae7fd89d69dfcfc146f0e1e7d960e4bb25b8fad5f11"
+    },
+    "long:inverse:hyperRAM": {
+      "address": "0xD0700B1c35FcF90BAD23d718aC247fAfd284b510",
+      "txHash": "0xb9370c7c9d98a661fe4416852662106d978328299d93c65b8573918c1d76b501"
+    }
+  }
 }

@@ -96,6 +96,10 @@
 #                           one container, every chain, one verdict. A chain with
 #                           no deployments/ directory here is skipped by name
 #                           rather than silently.
+#   AUDIT_PAUSE_MS=<n>      milliseconds between pools. A public endpoint that
+#                           throttles a burst serves the same calls spread out,
+#                           and hyperevm's does exactly that - the first sweep
+#                           read one pool of sixteen.
 #   AUDIT_SLACK_WEBHOOK=<url>
 #                           with AUDIT_NETWORKS, post to Slack when a sweep finds
 #                           anything critical. Silent otherwise: a monitor that
@@ -701,6 +705,7 @@ if [ "${AUDIT_POOL_CAPS:-}" = "true" ] && [ -n "${AUDIT_NETWORKS:-}" ]; then
   [ -n "${AUDIT_DRIFT_PCT:-}" ] && SWEEP_ARGS="$SWEEP_ARGS --drift-pct ${AUDIT_DRIFT_PCT}"
   [ -n "${AUDIT_CHUNK:-}" ] && SWEEP_ARGS="$SWEEP_ARGS --chunk ${AUDIT_CHUNK}"
   [ -n "${AUDIT_MAX_REQUESTS:-}" ] && SWEEP_ARGS="$SWEEP_ARGS --max-requests ${AUDIT_MAX_REQUESTS}"
+  [ -n "${AUDIT_PAUSE_MS:-}" ] && SWEEP_ARGS="$SWEEP_ARGS --pause ${AUDIT_PAUSE_MS}"
 
   SWEEP_DIR="$(mktemp -d)"
   SWEEP_BAD=""
@@ -791,6 +796,7 @@ if [ "${AUDIT_POOL_CAPS:-}" = "true" ]; then
   [ -n "${AUDIT_FROM_BLOCK:-}" ] && AUDIT_ARGS="$AUDIT_ARGS --from-block ${AUDIT_FROM_BLOCK}"
   [ -n "${AUDIT_CHUNK:-}" ] && AUDIT_ARGS="$AUDIT_ARGS --chunk ${AUDIT_CHUNK}"
   [ -n "${AUDIT_MAX_REQUESTS:-}" ] && AUDIT_ARGS="$AUDIT_ARGS --max-requests ${AUDIT_MAX_REQUESTS}"
+  [ -n "${AUDIT_PAUSE_MS:-}" ] && AUDIT_ARGS="$AUDIT_ARGS --pause ${AUDIT_PAUSE_MS}"
   [ -n "${AUDIT_POOLS:-}" ] && AUDIT_ARGS="$AUDIT_ARGS --pools ${AUDIT_POOLS}"
   [ "${AUDIT_JSON:-}" = "true" ] && AUDIT_ARGS="$AUDIT_ARGS --json true"
 

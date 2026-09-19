@@ -113,6 +113,43 @@ interface Finding {
   capOverOracle: number | null
   severity: Severity
   note: string
+  /**
+   * True when the pool could not be read at all. Kept apart from severity
+   * because "I could not look" is not a finding about the pool - it is a
+   * finding about the report.
+   */
+  unreadable?: boolean
+}
+
+/**
+ * A transport failure, as opposed to the chain saying no.
+ *
+ * The distinction is the whole of this file's honesty. A revert is an answer -
+ * the array ended, the oracle cannot price - and a rate limit is not an answer
+ * at all. Reading the second as the first is how a monitor reports a healthy
+ * chain it never managed to look at, and it is not hypothetical: the first
+ * scheduled sweep of hyperevm came back "0 critical, 16 warn" where fifteen of
+ * those warns were "rate limited" and the sixteenth said a capped pool had no
+ * oracle routes - which it has, but the call asking for them was throttled.
+ */
+const isTransient = (err: unknown): boolean =>
+  /rate.?limit|429|too many requests|timeout|timed out|ECONNRESET|ETIMEDOUT|socket hang up|SERVER_ERROR|bad response|network error|fetch failed/i.test(
+    String((err as Error)?.message ?? err ?? '')
+  )
+
+/** Retry only what is worth retrying, with a widening gap. */
+const withRetry = async <T>(fn: () => Promise<T>, attempts = 5): Promise<T> => {
+  let last: unknown
+  for (let attempt = 0; attempt < attempts; attempt++) {
+    try {
+      return await fn()
+    } catch (err) {
+      last = err
+      if (!isTransient(err)) throw err
+      await new Promise((resolve) => setTimeout(resolve, 300 * 2 ** attempt))
+    }
+  }
+  throw last
 }
 
 const units = (raw: bigint, decimals: number): string => {
@@ -157,6 +194,14 @@ task(
     'Comma-separated pool addresses to audit instead of scanning for them.',
     '',
     types.string
+  )
+  .addOptionalParam(
+    'pause',
+    'Milliseconds to wait between pools. A public endpoint that throttles a ' +
+      'burst will serve the same calls spread out, and this run is never in a ' +
+      'hurry.',
+    0,
+    types.int
   )
   .addOptionalParam(
     'maxRequests',
@@ -308,7 +353,11 @@ task(
     }
 
     const findings: Finding[] = []
-    for (const address of pools) {
+    const pause = Math.max(0, args.pause as number)
+    for (const [index, address] of pools.entries()) {
+      if (pause > 0 && index > 0) {
+        await new Promise((resolve) => setTimeout(resolve, pause))
+      }
       const pool = await ethers.getContractAt(POOL_ABI, address)
       let principal: string
       let collateral: string
@@ -316,13 +365,15 @@ task(
       let cap: bigint
       let available: bigint
       try {
-        ;[principal, collateral, owner, cap, available] = await Promise.all([
-          pool.principalToken() as Promise<string>,
-          pool.collateralToken() as Promise<string>,
-          pool.owner() as Promise<string>,
-          pool.maxPrincipalPerCollateralAmount() as Promise<bigint>,
-          pool.getPrincipalAmountAvailableToBorrow() as Promise<bigint>,
-        ])
+        ;[principal, collateral, owner, cap, available] = await withRetry(() =>
+          Promise.all([
+            pool.principalToken() as Promise<string>,
+            pool.collateralToken() as Promise<string>,
+            pool.owner() as Promise<string>,
+            pool.maxPrincipalPerCollateralAmount() as Promise<bigint>,
+            pool.getPrincipalAmountAvailableToBorrow() as Promise<bigint>,
+          ])
+        )
       } catch (err) {
         // A pool that cannot answer these is not a pool this audit understands;
         // say so rather than dropping it silently from a security report.
@@ -338,6 +389,7 @@ task(
           capOverOracle: null,
           severity: 'warn',
           note: `could not read pool state: ${(err as Error).message.slice(0, 80)}`,
+          unreadable: true,
         })
         continue
       }
@@ -364,9 +416,14 @@ task(
         const routes: Array<[string, boolean, number, bigint, bigint]> = []
         for (let i = 0; ; i++) {
           try {
-            const r = await pool.poolOracleRoutes(i)
+            const r = await withRetry(() => pool.poolOracleRoutes(i))
             routes.push([r[0], r[1], Number(r[2]), r[3], r[4]])
-          } catch {
+          } catch (err) {
+            // Only a revert ends the array. A throttled or dropped request is
+            // not the chain saying "no more routes", and treating it as one
+            // truncates the list silently - which is how a pool with a working
+            // oracle gets reported as having none.
+            if (isTransient(err)) throw err
             break
           }
         }
@@ -383,7 +440,9 @@ task(
         }
       } catch (err) {
         oracle = null
-        oracleNote = (err as Error)?.message?.slice(0, 70) ?? 'unknown'
+        oracleNote = isTransient(err)
+          ? `could not reach the chain: ${(err as Error)?.message?.slice(0, 50) ?? 'unknown'}`
+          : ((err as Error)?.message?.slice(0, 70) ?? 'unknown')
       }
 
       const availableUnits = Number(units(available, pd))
@@ -437,6 +496,13 @@ task(
     findings.sort((a, b) => rank[a.severity] - rank[b.severity])
 
     const critical = findings.filter((f) => f.severity === 'critical')
+    const unreadable = findings.filter((f) => f.unreadable === true)
+    // A quarter. One pool that would not answer is a bad moment on a public
+    // endpoint; a quarter of them is a chain this run did not see, and a
+    // monitor that reports "0 critical" for a chain it could not read has told
+    // you the opposite of what it knows.
+    const blind =
+      unreadable.length > 0 && unreadable.length * 4 >= findings.length
 
     if (args.json === true) {
       console.log(
@@ -453,6 +519,8 @@ task(
                 ? 'explicit'
                 : 'factory-log',
             degraded: degraded || null,
+            unreadable: unreadable.length,
+            blind,
             findings,
           },
           null,
@@ -477,7 +545,19 @@ task(
       hre.log('')
       hre.log(
         `${critical.length} critical, ${findings.filter((f) => f.severity === 'warn').length} warn, ` +
-          `${findings.filter((f) => f.severity === 'ok').length} ok`
+          `${findings.filter((f) => f.severity === 'ok').length} ok` +
+          (unreadable.length > 0 ? ` (${unreadable.length} unreadable)` : '')
+      )
+    }
+
+    if (blind) {
+      // Before the critical check, deliberately: a run that could not read a
+      // quarter of the chain has no business reporting on the rest of it as if
+      // the silence meant something.
+      throw new Error(
+        `could not read ${unreadable.length} of ${findings.length} pool(s) on ${hre.network.name} - ` +
+          `${unreadable[0]?.note ?? 'no reason given'}. This run cannot say whether the chain is capped; ` +
+          `point ${hre.network.name.toUpperCase()}_RPC_URL at an endpoint that will answer.`
       )
     }
 

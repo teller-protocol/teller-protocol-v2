@@ -32,6 +32,19 @@ interface BootstrapReceipt {
   principal: string
   markets: Record<string, { marketId: string; owner: string; txHash: string }>
   pools: Record<string, { address: string; txHash: string }>
+  /**
+   * Pools that held a key and no longer do, newest last.
+   *
+   * A replaced pool is not destroyed and does not stop working - its lenders
+   * can still redeem, and anything holding its address keeps functioning. It
+   * is only no longer the pool this key names. Keeping the address here is
+   * what lets that redemption be found later, and what stops a replacement
+   * from reading as an unexplained change of address in the diff.
+   */
+  retiredPools?: Record<
+    string,
+    Array<{ address: string; txHash: string; retiredAt: string }>
+  >
 }
 
 /**
@@ -121,6 +134,20 @@ task(
     false,
     types.boolean
   )
+  .addOptionalParam(
+    'replace',
+    'Comma-separated receipt keys to deploy a replacement pool for, e.g. "short:ARGUS". ' +
+      'The existing pool keeps working and moves to retiredPools; the key points at the new one.',
+    '',
+    types.string
+  )
+  .addOptionalParam(
+    'forceReplace',
+    'Replace even a pool with loans outstanding. Delisting one strands a position ' +
+      'someone still has to repay or liquidate, so this is never the default.',
+    false,
+    types.boolean
+  )
   .setAction(async (args, hre): Promise<void> => {
     const { network, ethers } = hre
 
@@ -130,6 +157,17 @@ task(
         `No bootstrap config for network "${network.name}". Add packages/contracts/config/chain-bootstrap/${network.name}.ts`
       )
     }
+
+    // Replacement is opt-in per key and never inferred from config drift:
+    // deploying a pool spends principal and splits liquidity across two
+    // addresses, which is not something an edit to a config file should cause
+    // as a side effect.
+    const replaceKeys = new Set(
+      String(args.replace ?? '')
+        .split(',')
+        .map((k) => k.trim())
+        .filter(Boolean)
+    )
 
     const chainId = Number((await ethers.provider.getNetwork()).chainId)
     if (chainId !== config.chainId) {
@@ -165,6 +203,19 @@ task(
     console.log(`  protocol owner   ${protocolOwner}`)
 
     const receipt = readReceipt(hre, config)
+
+    // A --replace key that names no pool would otherwise pass silently: the
+    // key is simply created as if new, and the pool it was meant to replace
+    // stays listed. That reads as a no-op run rather than a typo.
+    const unknownReplaceKeys = [...replaceKeys].filter((k) => !receipt.pools[k])
+    if (unknownReplaceKeys.length > 0) {
+      throw new Error(
+        `--replace names ${unknownReplaceKeys.join(', ')}, which ${
+          unknownReplaceKeys.length === 1 ? 'is not a pool' : 'are not pools'
+        } in deployments/${hre.network.name}/market-bootstrap.json. ` +
+          `Known keys: ${Object.keys(receipt.pools).join(', ') || '(none)'}`
+      )
+    }
 
     // ---- Markets -----------------------------------------------------------
     //
@@ -281,6 +332,8 @@ task(
           token1Decimals: c.token1Decimals,
           markets: c.markets,
           symbol: c.symbol,
+          interestRateLowerBound: c.interestRateLowerBound,
+          interestRateUpperBound: c.interestRateUpperBound,
         })),
         ...(config.inverse ?? []).map((i) => ({
           key: `${market.key}:inverse:${i.symbol}`,
@@ -294,6 +347,8 @@ task(
           token1Decimals: i.token1Decimals,
           markets: i.markets,
           symbol: i.symbol,
+          interestRateLowerBound: i.interestRateLowerBound,
+          interestRateUpperBound: i.interestRateUpperBound,
         })),
       ]
 
@@ -305,11 +360,56 @@ task(
           continue
         }
         const key = spec.key
-        if (receipt.pools[key]) {
-          console.log(
-            `\n  pool ${key} already deployed: ${receipt.pools[key].address}`
-          )
+        const existing = receipt.pools[key]
+        if (existing && !replaceKeys.has(key)) {
+          console.log(`\n  pool ${key} already deployed: ${existing.address}`)
           continue
+        }
+
+        if (existing) {
+          // Replacing is for the parameters that cannot be changed on a live
+          // pool - the rate band above all, which `initialize` writes and no
+          // implementation exposes a setter for. The pool being replaced is
+          // not destroyed: it keeps working and its lenders keep their claim.
+          // What changes is which pool this key names, and therefore what the
+          // front ends list.
+          //
+          // The one case that is not safe is a pool with loans outstanding.
+          // Delisting that hides a position someone still has to repay or
+          // liquidate, and the borrower does not stop owing it because a
+          // config file moved on. So it is refused unless asked for twice.
+          const pool = await ethers.getContractAt(
+            [
+              'function totalPrincipalTokensLended() view returns (uint256)',
+              'function totalPrincipalTokensRepaid() view returns (uint256)',
+              'function totalSupply() view returns (uint256)',
+            ],
+            existing.address
+          )
+          const [lended, repaid, shares] = await Promise.all([
+            pool.totalPrincipalTokensLended() as Promise<bigint>,
+            pool.totalPrincipalTokensRepaid() as Promise<bigint>,
+            pool.totalSupply() as Promise<bigint>,
+          ])
+          const outstanding = lended > repaid ? lended - repaid : BigInt(0)
+
+          console.log(`\n  replacing pool ${key}: ${existing.address}`)
+          console.log(`    shares outstanding   ${shares}`)
+          console.log(`    principal on loan    ${outstanding}`)
+
+          if (outstanding > BigInt(0) && args.forceReplace !== true) {
+            throw new Error(
+              `Refusing to replace ${key} (${existing.address}): ${outstanding} principal is still out on loan. ` +
+                `Retiring it delists a position that still has to be repaid or liquidated. ` +
+                `Wait for those loans to close, or pass --force-replace if you have a reason.`
+            )
+          }
+          if (shares > BigInt(0)) {
+            console.log(
+              `    note: lenders still hold shares here and can redeem them at ${existing.address} ` +
+                `after it stops being listed.`
+            )
+          }
         }
 
         console.log(`\n  deploying pool ${key} (${spec.label})`)
@@ -325,6 +425,28 @@ task(
         console.log(`    zeroForOne       ${spec.zeroForOne}`)
         console.log(`    twap interval    ${config.twapInterval}s`)
 
+        // A pool's rate band is written in its `initialize` and has no setter
+        // on any implementation, so this is the only moment it can be chosen.
+        const rateLowerBound =
+          spec.interestRateLowerBound ?? config.interestRateLowerBound
+        const rateUpperBound =
+          spec.interestRateUpperBound ?? config.interestRateUpperBound
+        if (rateLowerBound > rateUpperBound) {
+          throw new Error(
+            `Pool ${key}: interestRateLowerBound ${rateLowerBound} is above interestRateUpperBound ${rateUpperBound}`
+          )
+        }
+        const rateSource =
+          spec.interestRateLowerBound !== undefined ||
+          spec.interestRateUpperBound !== undefined
+            ? 'this pool'
+            : `the chain`
+        console.log(
+          `    interest rate    ${(rateLowerBound / 100).toFixed(2)}% - ${(
+            rateUpperBound / 100
+          ).toFixed(2)}% (from ${rateSource})`
+        )
+
         if (args.dryRun) continue
 
         const groupConfig = {
@@ -332,8 +454,8 @@ task(
           collateralTokenAddress: spec.collateralToken,
           marketId,
           maxLoanDuration: market.durationSeconds,
-          interestRateLowerBound: config.interestRateLowerBound,
-          interestRateUpperBound: config.interestRateUpperBound,
+          interestRateLowerBound: rateLowerBound,
+          interestRateUpperBound: rateUpperBound,
           liquidityThresholdPercent: config.liquidityThresholdPercent,
           collateralRatio: spec.collateralRatio,
         }
@@ -376,6 +498,13 @@ task(
           )
         }
 
+        if (existing) {
+          receipt.retiredPools = receipt.retiredPools ?? {}
+          receipt.retiredPools[key] = [
+            ...(receipt.retiredPools[key] ?? []),
+            { ...existing, retiredAt: new Date().toISOString() },
+          ]
+        }
         receipt.pools[key] = { address, txHash: rcpt?.hash ?? tx.hash }
         writeReceipt(hre, receipt)
         console.log(`    -> ${address} (${rcpt?.hash ?? tx.hash})`)

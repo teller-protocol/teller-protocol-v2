@@ -98,6 +98,11 @@
 #                           GROW_ORACLE_POOL.
 #   GROW_ORACLE_POOL=<addr> the Uniswap V3 pool whose buffer to grow.
 #   GROW_ORACLE_TARGET=<n>  slots to allocate. Default 300. Only ever grows.
+#   GROW_ORACLE_STEP=<n>    slots per transaction. Default 0, which measures it
+#                           against the chain's block gas limit. A slot costs an
+#                           SSTORE from zero, so 300 of them is ~6M gas and does
+#                           not fit HyperEVM's 2M blocks - the run splits itself
+#                           rather than asking for a transaction no block takes.
 #   GROW_ORACLE_PROBE=true  report which TWAP windows the pool answers today
 #                           and send nothing. Run this before pointing a pool
 #                           config at a window: one the oracle cannot answer is
@@ -630,6 +635,7 @@ if [ "${GROW_ORACLE:-}" = "true" ]; then
 
   GROW_ARGS="--pool ${GROW_ORACLE_POOL}"
   [ -n "${GROW_ORACLE_TARGET:-}" ] && GROW_ARGS="$GROW_ARGS --target ${GROW_ORACLE_TARGET}"
+  [ -n "${GROW_ORACLE_STEP:-}" ] && GROW_ARGS="$GROW_ARGS --step ${GROW_ORACLE_STEP}"
   # Same "true" comparison as every other rehearsal flag here.
   [ "${GROW_ORACLE_PROBE:-}" = "true" ] && GROW_ARGS="$GROW_ARGS --probe true"
 

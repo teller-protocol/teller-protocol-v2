@@ -53,6 +53,13 @@ task(
     types.int
   )
   .addOptionalParam(
+    'step',
+    "Slots to allocate per transaction. 0 measures it against the chain's " +
+      'block gas limit, which is what you want unless a chain lies about that.',
+    0,
+    types.int
+  )
+  .addOptionalParam(
     'probe',
     'Report which TWAP windows the pool can answer today and send nothing',
     false,
@@ -119,19 +126,100 @@ task(
       return
     }
 
+    // Grown in as few transactions as the chain's blocks allow, rather than in
+    // one.
+    //
+    // Allocating a slot writes a zeroed observation, so the cost is an SSTORE
+    // from nothing times however many slots were asked for - 299 of them is
+    // ~6M gas. HyperEVM's ordinary blocks cap at 2M, so the RPC would not even
+    // estimate the single call: it answers `exceeds block gas limit`, which
+    // reads as a broken pool rather than as a transaction that needs
+    // splitting. Every chain caps this differently and none of them publish
+    // the per-slot cost, so the step is measured against the estimator rather
+    // than assumed, and halved until it fits.
+    const latest = await ethers.provider.getBlock('latest')
+    const blockGasLimit = latest?.gasLimit ?? BigInt(0)
+    // 80% of the limit. The estimate covers this call alone, and a block it
+    // shares with anything else has less room than its limit suggests.
+    const budget = (blockGasLimit * BigInt(80)) / BigInt(100)
+    hre.log(`  block gas limit    ${blockGasLimit}`)
     hre.log(`  growing            ${next} -> ${target}`)
-    const tx = await (pool as any).increaseObservationCardinalityNext(target)
-    hre.log(`  sent               ${tx.hash}`)
-    const receipt = await tx.wait()
-    if (!receipt || receipt.status !== 1) {
-      throw new Error(`increaseObservationCardinalityNext reverted: ${tx.hash}`)
+
+    const increase = (pool as any).increaseObservationCardinalityNext
+    let current = next
+    // Asked for in one go where the limit is known - the estimator then says
+    // whether it fits and the loop below halves until it does. Where the node
+    // would not say (`getBlock` can come back without one), start small
+    // instead: an estimate that quietly succeeds against a limit nobody
+    // checked is how you mine a transaction no block will take.
+    let step =
+      (args.step as number) > 0
+        ? (args.step as number)
+        : budget > BigInt(0)
+          ? target - current
+          : Math.min(60, target - current)
+    // A chain that cannot fit even one slot per transaction would otherwise
+    // spend gas forever; this is well past what any real split needs.
+    const MAX_SENDS = 40
+    let sends = 0
+
+    while (current < target) {
+      const ask = Math.min(target, current + step)
+      let gas: bigint | undefined
+      try {
+        gas = (await increase.estimateGas(ask)) as bigint
+      } catch {
+        // Treated as "too big" rather than raised: on HyperEVM this is exactly
+        // how an oversized allocation presents, and a genuinely reverting call
+        // still fails below once the step can shrink no further.
+        gas = undefined
+      }
+
+      const fits = gas !== undefined && (budget === BigInt(0) || gas <= budget)
+      if (!fits && ask - current > 1) {
+        step = Math.max(1, Math.floor(step / 2))
+        hre.log(
+          `  ${ask} slots will not fit a block${
+            gas === undefined ? '' : ` (${gas} gas)`
+          } — trying ${Math.min(target, current + step) - current} at a time`
+        )
+        continue
+      }
+
+      if (sends >= MAX_SENDS) {
+        throw new Error(
+          `stopped after ${MAX_SENDS} transactions with ${current} of ${target} slots allocated - ` +
+            `this chain fits ${step} slots per block, so ${target} is not reachable this way`
+        )
+      }
+
+      const tx = await increase(ask)
+      sends += 1
+      hre.log(`  ${current} -> ${ask}        ${tx.hash}`)
+      const receipt = await tx.wait()
+      if (!receipt || receipt.status !== 1) {
+        throw new Error(
+          `increaseObservationCardinalityNext reverted: ${tx.hash}`
+        )
+      }
+
+      const slot0After = await pool.slot0()
+      const reported = Number(slot0After[4])
+      if (reported <= current) {
+        throw new Error(
+          `asked for ${ask} slots, pool still reports ${reported} - the write did not take`
+        )
+      }
+      current = reported
     }
 
     const after = await pool.slot0()
-    hre.log(`  cardinalityNext    ${Number(after[4])}`)
+    hre.log(`  cardinalityNext    ${Number(after[4])} (${sends} tx)`)
     if (Number(after[4]) < target) {
       throw new Error(
-        `asked for ${target} slots, pool reports ${Number(after[4])} - the write did not take`
+        `asked for ${target} slots, pool reports ${Number(
+          after[4]
+        )} - the write did not take`
       )
     }
 

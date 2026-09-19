@@ -91,6 +91,15 @@
 #                           blocks and says so only by failing.
 #   AUDIT_POOLS=<addrs>     comma-separated pools to audit instead of scanning.
 #   AUDIT_JSON=true         emit JSON instead of a table, for an alerting hook.
+#   AUDIT_NETWORKS=<names>  comma-separated networks to sweep instead of the one
+#                           NETWORK. This is the scheduled shape of the audit:
+#                           one container, every chain, one verdict. A chain with
+#                           no deployments/ directory here is skipped by name
+#                           rather than silently.
+#   AUDIT_SLACK_WEBHOOK=<url>
+#                           with AUDIT_NETWORKS, post to Slack when a sweep finds
+#                           anything critical. Silent otherwise: a monitor that
+#                           speaks every run is one nobody reads.
 #   GROW_ORACLE=true        grow a Uniswap V3 pool's observation buffer so a
 #                           TWAP can be read from it, and stop. Permissionless -
 #                           increaseObservationCardinalityNext is callable by
@@ -666,6 +675,93 @@ fi
 # market-bootstrap.json, so it sees pools this repo did not create - hyperevm
 # has fourteen live pools and no receipt at all, which is exactly the blind
 # spot a monitor must not inherit.
+if [ "${AUDIT_POOL_CAPS:-}" = "true" ] && [ -n "${AUDIT_NETWORKS:-}" ]; then
+  # Every chain in one run.
+  #
+  # The single-network form below is for looking at one chain on purpose. This
+  # is the scheduled form, and the difference that matters is the verdict: a
+  # sweep that stopped at the first chain with a problem would report the
+  # alphabetically-earliest incident and hide the rest, so each chain runs to
+  # completion and the exit code is the union.
+  printf '%s' 'test test test test test test test test test test test junk' > mnemonic.secret
+  chmod 600 mnemonic.secret
+  # SWEEP_DIR is expanded when the trap runs, not now, so one trap covers the
+  # directory created below however the sweep ends - including the `fail` at the
+  # bottom, which is the path that matters.
+  trap 'rm -f mnemonic.secret; rm -rf "${SWEEP_DIR:-}"' EXIT
+
+  SWEEP_ARGS=""
+  [ -n "${AUDIT_MIN_AVAILABLE:-}" ] && SWEEP_ARGS="--min-available ${AUDIT_MIN_AVAILABLE}"
+  [ -n "${AUDIT_DRIFT_PCT:-}" ] && SWEEP_ARGS="$SWEEP_ARGS --drift-pct ${AUDIT_DRIFT_PCT}"
+  [ -n "${AUDIT_CHUNK:-}" ] && SWEEP_ARGS="$SWEEP_ARGS --chunk ${AUDIT_CHUNK}"
+  [ -n "${AUDIT_MAX_REQUESTS:-}" ] && SWEEP_ARGS="$SWEEP_ARGS --max-requests ${AUDIT_MAX_REQUESTS}"
+
+  SWEEP_DIR="$(mktemp -d)"
+  SWEEP_BAD=""
+  SWEEP_SKIPPED=""
+
+  for AUDIT_NET in $(echo "$AUDIT_NETWORKS" | tr ',' ' '); do
+    if [ ! -d "deployments/$AUDIT_NET" ]; then
+      log "Skipping $AUDIT_NET: no deployments/$AUDIT_NET in this checkout"
+      SWEEP_SKIPPED="$SWEEP_SKIPPED $AUDIT_NET"
+      continue
+    fi
+    log "Auditing pool price caps on $AUDIT_NET"
+    # Written to a file and then printed, rather than piped through tee: a
+    # pipeline's status is its last command's unless pipefail is set, and this
+    # loop's whole purpose is to read the audit's exit code. Getting that wrong
+    # would make the sweep report every chain clean for ever.
+    # shellcheck disable=SC2086
+    if yarn hh audit-pool-caps --network "$AUDIT_NET" $SWEEP_ARGS \
+      > "$SWEEP_DIR/$AUDIT_NET.log" 2>&1; then
+      :
+    else
+      SWEEP_BAD="$SWEEP_BAD $AUDIT_NET"
+    fi
+    cat "$SWEEP_DIR/$AUDIT_NET.log"
+  done
+
+  echo
+  log "Sweep complete"
+  [ -n "$SWEEP_SKIPPED" ] && echo "   not deployed here:$SWEEP_SKIPPED"
+
+  if [ -z "$SWEEP_BAD" ]; then
+    echo "   every audited chain clean"
+    rm -rf "$SWEEP_DIR"
+    log "Done — pool cap sweep"
+    exit 0
+  fi
+
+  echo "   chains with critical findings:$SWEEP_BAD"
+
+  if [ -n "${AUDIT_SLACK_WEBHOOK:-}" ]; then
+    # The CRITICAL lines themselves, not a count. An alert that says "3 pools"
+    # and nothing else is one somebody has to come here to act on, and the
+    # addresses and owners are the whole of the action.
+    SWEEP_TEXT="$(printf 'Pool cap audit: critical findings on%s\n' "$SWEEP_BAD")"
+    for AUDIT_NET in $SWEEP_BAD; do
+      SWEEP_TEXT="$SWEEP_TEXT
+*$AUDIT_NET*
+$(grep -E 'CRITICAL|Owners who must set it' "$SWEEP_DIR/$AUDIT_NET.log" | head -20)"
+    done
+    # Built by jq so a pool address or an owner can never break the JSON.
+    if command -v jq >/dev/null 2>&1; then
+      jq -n --arg text "$SWEEP_TEXT" '{text: $text}' > "$SWEEP_DIR/slack.json"
+      curl -sS -X POST -H 'Content-Type: application/json' \
+        --data @"$SWEEP_DIR/slack.json" "$AUDIT_SLACK_WEBHOOK" >/dev/null \
+        && echo "   posted to Slack" \
+        || echo "!! could not post to Slack; the findings are above"
+    else
+      echo "!! jq is not installed, so the Slack post was skipped; the findings are above"
+    fi
+  fi
+
+  rm -rf "$SWEEP_DIR"
+  # Non-zero: the scheduler's own failure notification is the second alert, and
+  # the one that still arrives if the webhook is wrong.
+  fail "pool cap audit found critical findings on$SWEEP_BAD"
+fi
+
 if [ "${AUDIT_POOL_CAPS:-}" = "true" ]; then
   [ -d "deployments/$NETWORK" ] || fail \
     "AUDIT_POOL_CAPS needs deployments/$NETWORK in this checkout to find the pool factory."
@@ -678,6 +774,7 @@ if [ "${AUDIT_POOL_CAPS:-}" = "true" ]; then
   [ -n "${AUDIT_DRIFT_PCT:-}" ] && AUDIT_ARGS="$AUDIT_ARGS --drift-pct ${AUDIT_DRIFT_PCT}"
   [ -n "${AUDIT_FROM_BLOCK:-}" ] && AUDIT_ARGS="$AUDIT_ARGS --from-block ${AUDIT_FROM_BLOCK}"
   [ -n "${AUDIT_CHUNK:-}" ] && AUDIT_ARGS="$AUDIT_ARGS --chunk ${AUDIT_CHUNK}"
+  [ -n "${AUDIT_MAX_REQUESTS:-}" ] && AUDIT_ARGS="$AUDIT_ARGS --max-requests ${AUDIT_MAX_REQUESTS}"
   [ -n "${AUDIT_POOLS:-}" ] && AUDIT_ARGS="$AUDIT_ARGS --pools ${AUDIT_POOLS}"
   [ "${AUDIT_JSON:-}" = "true" ] && AUDIT_ARGS="$AUDIT_ARGS --json true"
 
@@ -861,6 +958,7 @@ if [ "${DEPLOY_PROTOCOL:-}" != "true" ]; then
     VERIFY_ONLY=true         verify already-deployed contracts
     REDEEM_POOL=true         take the deployer's own deposit back out of a pool
     AUDIT_POOL_CAPS=true     report pools with no price cap (read-only, no key)
+    AUDIT_NETWORKS=<names>   sweep several chains in one run, for a schedule
     GROW_ORACLE=true         grow a Uniswap V3 pool's TWAP observation buffer
     SWAP_VIA_LIFI=true       swap one ERC-20 for another from the deployer
     PUBLISH_ONLY=true        publish the package (with PUBLISH_PACKAGE=true)

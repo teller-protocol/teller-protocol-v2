@@ -1,0 +1,43 @@
+{
+  "network": "hyperevm",
+  "chainId": 999,
+  "why": [
+    "HyperEVM's providers cap eth_getLogs at 1000 blocks and offer no tier that",
+    "lifts it, and the chain's head is past 46 million. A full-history scan of",
+    "the factory's deployment log is therefore tens of thousands of requests -",
+    "the first attempt died with HeadersTimeoutError rather than a wrong answer.",
+    "",
+    "So this chain is the one place the audit cannot enumerate for itself, and a",
+    "list has to be checked in. Read it as what it is: a weaker guarantee than",
+    "the log scan every other chain gets. The scan is complete by construction;",
+    "this is complete only while somebody maintains it.",
+    "",
+    "A POOL CREATED ON THIS CHAIN AND NOT ADDED HERE IS NOT MONITORED. That is",
+    "the failure mode to design against - the audit prints it on every run, and",
+    "a new pool belongs here in the same change that creates it."
+  ],
+  "sources": [
+    "The fourteen partner pools: the borrow_multi_coins rows for chain 999 in",
+    "the earn-single-token middleware config store, which is what the front",
+    "ends list and therefore what anyone can actually borrow from.",
+    "The two hyperRAM pools: deployments/hyperevm/market-bootstrap.json."
+  ],
+  "pools": [
+    { "address": "0xa6a50c0eaa21901428829dbe01d2915d141a71f8", "pair": "USD₮0 / WHYPE" },
+    { "address": "0x8838b0be899278074f0d39feb4e70cc5376a7c48", "pair": "WHYPE / USD₮0" },
+    { "address": "0xd363f7a3ff17652bbbc0c4bbb0d39de61abbd543", "pair": "APE / USD₮0" },
+    { "address": "0x9ca8d45ebafef34102af89e861bb20516849c51d", "pair": "USD₮0 / APE" },
+    { "address": "0x9e1042e0d69532c3665cfb94e50a04517bf62786", "pair": "PURR / USD₮0" },
+    { "address": "0xc4c2045db90b3e67d0ec4ce4def6c72c9c7fe6b0", "pair": "USD₮0 / PURR" },
+    { "address": "0x034c2e8ecae4798b79ad4bbc0f974fe3d2fcf2cb", "pair": "UPUMP / USD₮0" },
+    { "address": "0x35f44318cc3e8cb2c52861dea89f6958b152dcf4", "pair": "USD₮0 / UPUMP" },
+    { "address": "0x694c3e4e9ed93ad6a78e125149ffc5ef50e4433f", "pair": "UXPL / USD₮0" },
+    { "address": "0x7c72d29d468baf31bf816e3e81d668c619286452", "pair": "USD₮0 / UXPL" },
+    { "address": "0x4ae8f39050a269810a57f2a14db9ff180f358563", "pair": "USDC / USD₮0" },
+    { "address": "0x2b96674b7372d53fa13e531b306e2c1b2b4f7789", "pair": "USD₮0 / USDC" },
+    { "address": "0x73e5a0db4bdabf61d7fb7fd9ff044adab059788f", "pair": "xHYPE / USDC" },
+    { "address": "0xbf197294e17b04eba80105fef5ef350fa12acdf5", "pair": "USDC / xHYPE" },
+    { "address": "0xc98a77393b89afff34403fca09f2dcafd1669fae", "pair": "USDC / hyperRAM" },
+    { "address": "0xd0700b1c35fcf90bad23d718ac247fafd284b510", "pair": "hyperRAM / USDC" }
+  ]
+}

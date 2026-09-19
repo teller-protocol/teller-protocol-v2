@@ -54,40 +54,57 @@ const deployFn: DeployFunction = async (hre) => {
   const proxyAddress = await borrowSwap.getAddress()
   const implFactory = await hre.ethers.getContractFactory('BorrowSwap')
 
-  // upgradeProxy validates the new storage layout against the old one, and it
-  // reads the old one out of OpenZeppelin's per-network manifest - the
-  // .openzeppelin/*.json this repo does not keep. Without it the upgrade stops
-  // at "Deployment at address 0x... is not registered", which is a missing
-  // record rather than anything wrong with the proxy.
-  //
-  // forceImport writes that record from the implementation the proxy is
-  // actually running, so the comparison has both sides. The manifest lives
-  // only as long as the run, so this happens every time; it is idempotent, and
-  // it is not a way around the layout check - upgradeProxy still performs it
-  // against the imported layout.
-  //
-  // The constructor args here have to be the ones the *current* implementation
-  // was built with, read off the contract itself. Importing it under the args
-  // we are upgrading *to* records an implementation that answers to those args
-  // already, and upgradeProxy then reuses it and changes nothing: the run
-  // reports success, the proxy still points at the old implementation, and the
-  // old quoter is still bound.
   const live = borrowSwap as any
-  const currentArgs = [
-    await live.TELLER_V2(),
-    await live.UNISWAP_SWAP_ROUTER(),
-    await live.UNISWAP_QUOTER(),
-  ]
-  await hre.upgrades.forceImport(proxyAddress, implFactory, {
-    kind: 'transparent',
-    constructorArgs: currentArgs,
-    unsafeAllow: ['constructor', 'state-variable-immutable'],
-  } as any)
 
-  const upgraded = await hre.upgrades.upgradeProxy(proxyAddress, implFactory, {
-    unsafeAllow: ['constructor', 'state-variable-immutable'],
-    constructorArgs: [await tellerV2.getAddress(), swapRouter, quoter],
-  })
+  // upgradeProxy validates the new storage layout against the old one, and it
+  // reads the old one out of OpenZeppelin's per-network manifest, keyed by the
+  // address the proxy currently points at. Where that record is missing the
+  // upgrade stops at "Deployment at address 0x... is not registered", which is
+  // a missing record rather than anything wrong with the proxy, and
+  // forceImport writes it from the implementation the proxy is running.
+  //
+  // So try the upgrade first and only import when it says the record is
+  // absent. Importing unconditionally breaks the chains that need this most:
+  // this repo *does* commit .openzeppelin/*.json, so on a chain whose manifest
+  // is already there, forceImport recomputes the version hash from the
+  // constructor args it is handed, finds nothing under that new key, and files
+  // the already-recorded implementation address a second time - which
+  // OpenZeppelin refuses as "The following deployment clashes with an existing
+  // one at 0x...". Arc failed exactly there, with a manifest that had the
+  // proxy and its implementation recorded correctly all along.
+  //
+  // When the import is needed, its constructor args have to be the ones the
+  // *current* implementation was built with, read off the contract itself.
+  // Importing it under the args we are upgrading *to* records an
+  // implementation that answers to those args already, and upgradeProxy then
+  // reuses it and changes nothing: the run reports success, the proxy still
+  // points at the old implementation, and the old quoter is still bound.
+  const upgrade = async () =>
+    hre.upgrades.upgradeProxy(proxyAddress, implFactory, {
+      unsafeAllow: ['constructor', 'state-variable-immutable'],
+      constructorArgs: [await tellerV2.getAddress(), swapRouter, quoter],
+    })
+
+  let upgraded
+  try {
+    upgraded = await upgrade()
+  } catch (err) {
+    if (!/is not registered/.test((err as Error)?.message ?? '')) throw err
+
+    hre.log(
+      'BorrowSwap: no manifest record for the live implementation, importing it...'
+    )
+    await hre.upgrades.forceImport(proxyAddress, implFactory, {
+      kind: 'transparent',
+      constructorArgs: [
+        await live.TELLER_V2(),
+        await live.UNISWAP_SWAP_ROUTER(),
+        await live.UNISWAP_QUOTER(),
+      ],
+      unsafeAllow: ['constructor', 'state-variable-immutable'],
+    } as any)
+    upgraded = await upgrade()
+  }
   await upgraded.waitForDeployment()
 
   const implementation = await hre.upgrades.erc1967.getImplementationAddress(

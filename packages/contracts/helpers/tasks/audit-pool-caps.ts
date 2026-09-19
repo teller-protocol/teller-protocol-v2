@@ -267,18 +267,42 @@ task(
       // The unclamped reading, from the pricing library rather than the pool.
       // The pool's own getter returns min(oracle, cap), which once a cap is set
       // is the cap - so measuring drift against it would always read zero.
+      //
+      // `poolOracleRoutes` is a public array: the generated getter answers one
+      // entry at a time and reverts past the end, and there is no whole-array
+      // getter. Reading them one by one is what set-pool-price-caps does, and
+      // getting it wrong is not a quiet failure - an earlier draft called a
+      // `getPoolRoutes()` that does not exist, so every pool on hyperevm came
+      // back "oracle did not answer". That reads as fourteen broken oracles
+      // rather than as one broken audit, which is the worse way for a security
+      // report to be wrong. The reason is carried into the note now, so the
+      // next such failure names itself.
       let oracle: bigint | null = null
+      let oracleNote = ''
       try {
-        const helper = await ethers.getContractAt(
-          PRICING_ABI,
-          (await pool.UNISWAP_PRICING_HELPER()) as string
-        )
-        const routes = await pool.getPoolRoutes()
-        oracle = (await helper.getUniswapPriceRatioForPoolRoutes(
-          routes
-        )) as bigint
-      } catch {
+        const routes: Array<[string, boolean, number, bigint, bigint]> = []
+        for (let i = 0; ; i++) {
+          try {
+            const r = await pool.poolOracleRoutes(i)
+            routes.push([r[0], r[1], Number(r[2]), r[3], r[4]])
+          } catch {
+            break
+          }
+        }
+        if (routes.length === 0) {
+          oracleNote = 'pool has no oracle routes'
+        } else {
+          const helper = await ethers.getContractAt(
+            PRICING_ABI,
+            (await pool.UNISWAP_PRICING_HELPER()) as string
+          )
+          oracle = (await helper.getUniswapPriceRatioForPoolRoutes(
+            routes
+          )) as bigint
+        }
+      } catch (err) {
         oracle = null
+        oracleNote = (err as Error)?.message?.slice(0, 70) ?? 'unknown'
       }
 
       const availableUnits = Number(units(available, pd))
@@ -299,8 +323,7 @@ task(
         }
       } else if (oracle === null) {
         severity = 'warn'
-        note =
-          'capped, but its oracle did not answer - the TWAP may be unreadable'
+        note = `capped, but its oracle did not answer (${oracleNote}) - the TWAP may be unreadable`
       } else if (ratio !== null) {
         const drift = Math.abs(ratio - 1) * 100
         if (drift > (args.driftPct as number)) {

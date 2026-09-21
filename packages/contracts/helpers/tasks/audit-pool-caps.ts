@@ -331,8 +331,37 @@ task(
       // Start where the factory started. Nothing before its deployment block can
       // carry one of its logs, and on a chain whose head is tens of millions of
       // blocks up that is most of the range gone for nothing.
-      const deployedAt = (factory as { receipt?: { blockNumber?: number } })
-        .receipt?.blockNumber
+      //
+      // Some artifacts carry a receipt with a null blockNumber - xdc's does -
+      // and falling back to 0 there is not a slow start, it is the difference
+      // between finishing and not: 7.07M blocks from the factory is ~354
+      // requests at xdc's 20k window, and 107.5M from zero is ~5,375, well past
+      // any sane budget. The scan then "fails", falls back to a census that
+      // does not exist for that chain, and the sweep reports the chain
+      // unreadable - which reads as an RPC problem and is not one.
+      //
+      // The hash is in the same artifact, so ask the chain what block it landed
+      // in rather than starting from the beginning of time.
+      const record = factory as {
+        receipt?: { blockNumber?: number | null }
+        transactionHash?: string
+      }
+      let deployedAt = record.receipt?.blockNumber ?? null
+      if (deployedAt == null && record.transactionHash) {
+        try {
+          const receipt = await withRetry<{ blockNumber?: number } | null>(() =>
+            ethers.provider.getTransactionReceipt(
+              record.transactionHash as string
+            ) as Promise<{ blockNumber?: number } | null>
+          )
+          deployedAt = receipt?.blockNumber ?? null
+        } catch {
+          // Left null on purpose. A scan from zero is worse than one from the
+          // factory but it is still a scan; refusing to look at all because one
+          // lookup failed would be the bigger loss.
+          deployedAt = null
+        }
+      }
       const from = (args.fromBlock as number) || deployedAt || 0
 
       // Providers cap eth_getLogs differently and rarely advertise it -

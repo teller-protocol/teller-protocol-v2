@@ -360,6 +360,36 @@ const config: ChainBootstrapConfig = {
       collateralRatio: 30000, // 33.3% LTV, vs 40.0% on the long side
       note: 'Single name, and the most volatile of them. Tightest ratio in this list alongside the other single names.',
     },
+    {
+      symbol: 'STRATEGY',
+      token: '0x168661C52E5922288dFb2b3f323b6Cf90eb21e18',
+      // Same pool as the long side, read the other way, and now seeded: it
+      // holds ~1,706 STRATEGY / 8.84 USDG rather than the $1.62 it held when
+      // the long entry above was written, and its observation buffer opened
+      // from 1 to 300 when that liquidity was minted. Still a $16 pool. The
+      // depth caveat on the long entry applies here word for word.
+      pool: '0x565c8e3a69b5aB39e2C15A1De90164123702a89f',
+      poolFee: 3000,
+      token0Decimals: 18,
+      token1Decimals: 6,
+      // Negated from this asset's entry above: STRATEGY is the principal here,
+      // and the route must still read principal per collateral, so it is read
+      // token0-per-token1 - STRATEGY per USDG.
+      zeroForOne: false,
+      // 600% collateralisation: a 16.7% LTV, one tier tighter than the 20% on
+      // the long side. Standard for this list, and worth more than usual here:
+      // a loan *of* STRATEGY is exposed to STRATEGY rising, and nothing bounds
+      // that the way the collateral's own floor bounds the other direction.
+      collateralRatio: 60000,
+      // Matched to the long side rather than to the chain, for the same reason
+      // it was set there: the chain's 3-18% is priced for lending against
+      // million-dollar equity pools, and this is neither.
+      interestRateLowerBound: 3000,
+      interestRateUpperBound: 6000,
+      // Seven days only, like the long side.
+      markets: ['short'],
+      note: 'Requested reverse pool: lend STRATEGY, post USDG. 16.7% LTV, 7-day only, 30-60%.',
+    },
   ],
 }
 

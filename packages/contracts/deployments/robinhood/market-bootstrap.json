@@ -145,6 +145,10 @@
     "long:inverse:TSLA": {
       "address": "0xa72dddb6c6649ba5aeaecbd45bd6029dcd03dcc9",
       "txHash": "0xa533cbdfe18024eb162d721c3d9277d777cc2b89917366852bfe6e523edd9b31"
+    },
+    "short:STRATEGY": {
+      "address": "0x82dbcd32989f68130e95b0841c6efdc7c4b7ca64",
+      "txHash": "0xffd0bd7839e457a91499f05bd3f819fc605724d85a4fa2202e0fbe7f44a80257"
     }
   }
 }

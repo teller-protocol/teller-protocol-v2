@@ -114,6 +114,15 @@
 #                           throttles a burst serves the same calls spread out,
 #                           and hyperevm's does exactly that - the first sweep
 #                           read one pool of sixteen.
+#   AUDIT_OWNED_BY=<addr,...>
+#                           addresses whose pools this sweep answers for.
+#                           setMaxPrincipalPerCollateralAmount is onlyOwner, so
+#                           an uncapped pool belonging to anyone else is still
+#                           enumerated, printed with its owner and posted to
+#                           Slack - but it does not fail the run, because there
+#                           is no action on this side to fail at. Unset means
+#                           every pool counts, which is how this behaved before
+#                           the option existed.
 #   AUDIT_SLACK_WEBHOOK=<url>
 #                           with AUDIT_NETWORKS, post to Slack when a sweep finds
 #                           anything critical. Silent otherwise: a monitor that
@@ -810,9 +819,16 @@ if [ "${AUDIT_POOL_CAPS:-}" = "true" ] && [ -n "${AUDIT_NETWORKS:-}" ]; then
   [ -n "${AUDIT_CHUNK:-}" ] && SWEEP_ARGS="$SWEEP_ARGS --chunk ${AUDIT_CHUNK}"
   [ -n "${AUDIT_MAX_REQUESTS:-}" ] && SWEEP_ARGS="$SWEEP_ARGS --max-requests ${AUDIT_MAX_REQUESTS}"
   [ -n "${AUDIT_PAUSE_MS:-}" ] && SWEEP_ARGS="$SWEEP_ARGS --pause ${AUDIT_PAUSE_MS}"
+  [ -n "${AUDIT_OWNED_BY:-}" ] && SWEEP_ARGS="$SWEEP_ARGS --owned-by ${AUDIT_OWNED_BY}"
 
   SWEEP_DIR="$(mktemp -d)"
   SWEEP_BAD=""
+  # Chains whose only uncapped pools belong to someone else. Reported and
+  # posted exactly like the rest, but they do not fail the run: nobody here can
+  # sign setMaxPrincipalPerCollateralAmount on a pool they do not own, and a
+  # scheduled job that is red for ever over somebody else's pool stops being
+  # read at all.
+  SWEEP_EXTERNAL=""
   SWEEP_SKIPPED=""
   # Chains the audit could not read, kept apart from the ones it read and found
   # wanting. Both are non-zero exits and both belong in the alert, but calling
@@ -844,7 +860,14 @@ if [ "${AUDIT_POOL_CAPS:-}" = "true" ] && [ -n "${AUDIT_NETWORKS:-}" ]; then
     # shellcheck disable=SC2086
     if yarn hh audit-pool-caps --network "$AUDIT_NET" $SWEEP_ARGS \
       > "$SWEEP_DIR/$AUDIT_NET.log" 2>&1; then
-      :
+      # A clean exit is no longer only "clean". With --owned-by set, a chain
+      # whose uncapped pools are all somebody else's exits zero and says so on
+      # its verdict line, and the sweep still has to carry those findings into
+      # the report - silence here would be the sweep hiding what the audit
+      # deliberately printed.
+      case "$(sed -n 's/^audit-verdict: //p' "$SWEEP_DIR/$AUDIT_NET.log" | tail -1)" in
+        external*) SWEEP_EXTERNAL="$SWEEP_EXTERNAL $AUDIT_NET" ;;
+      esac
     else
       # The audit's last line says which kind of non-zero this is. A run that
       # died before printing one - a 502 from the RPC, a scan that blew its
@@ -862,7 +885,7 @@ if [ "${AUDIT_POOL_CAPS:-}" = "true" ] && [ -n "${AUDIT_NETWORKS:-}" ]; then
   log "Sweep complete"
   [ -n "$SWEEP_SKIPPED" ] && echo "   not deployed here:$SWEEP_SKIPPED"
 
-  if [ -z "$SWEEP_BAD" ] && [ -z "$SWEEP_BLIND" ]; then
+  if [ -z "$SWEEP_BAD" ] && [ -z "$SWEEP_BLIND" ] && [ -z "$SWEEP_EXTERNAL" ]; then
     echo "   every audited chain clean"
     rm -rf "$SWEEP_DIR"
     log "Done — pool cap sweep"
@@ -870,6 +893,8 @@ if [ "${AUDIT_POOL_CAPS:-}" = "true" ] && [ -n "${AUDIT_NETWORKS:-}" ]; then
   fi
 
   [ -n "$SWEEP_BAD" ] && echo "   chains with critical findings:$SWEEP_BAD"
+  [ -n "$SWEEP_EXTERNAL" ] && \
+    echo "   chains with uncapped pools owned by others:$SWEEP_EXTERNAL"
   if [ -n "$SWEEP_BLIND" ]; then
     echo "   chains this run could NOT audit:$SWEEP_BLIND"
     echo "   (no verdict from those - they are unwatched, not clean; see their output above)"
@@ -881,14 +906,30 @@ if [ "${AUDIT_POOL_CAPS:-}" = "true" ] && [ -n "${AUDIT_NETWORKS:-}" ]; then
     # addresses and owners are the whole of the action.
     if [ -n "$SWEEP_BAD" ]; then
       SWEEP_TEXT="$(printf 'Pool cap audit: critical findings on%s\n' "$SWEEP_BAD")"
-    else
+    elif [ -n "$SWEEP_BLIND" ]; then
       SWEEP_TEXT="$(printf 'Pool cap audit: no critical findings, but some chains could not be read\n')"
+    else
+      SWEEP_TEXT="$(printf 'Pool cap audit: nothing of ours uncapped\n')"
     fi
     for AUDIT_NET in $SWEEP_BAD; do
       SWEEP_TEXT="$SWEEP_TEXT
 *$AUDIT_NET*
 $(grep -E 'CRITICAL|Owners who must set it' "$SWEEP_DIR/$AUDIT_NET.log" | head -20)"
     done
+    # Other people's uncapped pools, under their own heading. The money in them
+    # is real and the addresses are the whole of the action for whoever owns
+    # them, so they go in the post - just not as something we failed to do.
+    if [ -n "$SWEEP_EXTERNAL" ]; then
+      SWEEP_TEXT="$SWEEP_TEXT
+
+:information_source: *uncapped, owned by others:*$SWEEP_EXTERNAL
+Not ours to sign; listed so the owners can be told."
+      for AUDIT_NET in $SWEEP_EXTERNAL; do
+        SWEEP_TEXT="$SWEEP_TEXT
+*$AUDIT_NET*
+$(grep -E 'belong to someone else' "$SWEEP_DIR/$AUDIT_NET.log" | head -3)"
+      done
+    fi
     # Named, with the reason, and never folded in with the findings. A chain
     # that could not be read is the one thing this report cannot reassure
     # anybody about, so it says so in its own words rather than borrowing the
@@ -924,9 +965,14 @@ These chains are unwatched this run, not clean."
     fail "pool cap audit found critical findings on$SWEEP_BAD; could not audit$SWEEP_BLIND"
   elif [ -n "$SWEEP_BAD" ]; then
     fail "pool cap audit found critical findings on$SWEEP_BAD"
-  else
+  elif [ -n "$SWEEP_BLIND" ]; then
     fail "pool cap audit could not audit$SWEEP_BLIND"
   fi
+
+  # Only other people's uncapped pools left. Reported above and posted to
+  # Slack, but a zero exit: there is no action on this side to fail at.
+  log "Done — pool cap sweep (nothing of ours uncapped)"
+  exit 0
 fi
 
 if [ "${AUDIT_POOL_CAPS:-}" = "true" ]; then

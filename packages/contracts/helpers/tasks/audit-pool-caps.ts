@@ -30,6 +30,17 @@ import path from 'path'
  * belongs to a partner. An alert that says "uncapped" without saying whose job
  * it is to fix is an alert nobody acts on.
  *
+ * WHOSE FAILURE IT IS. Reporting an uncapped pool and exiting non-zero for it
+ * are different jobs. Most pools on these chains belong to other people, and
+ * `setMaxPrincipalPerCollateralAmount` is onlyOwner, so a sweep that pages on
+ * every uncapped pool anywhere raises an incident this side cannot close - 40
+ * of them across six chains, every six hours, for ever. That is not a strict
+ * reading of the risk, it is the end of the alert: a monitor that is always red
+ * is one people stop opening, and then the finding that IS ours goes past
+ * unread too. `--owned-by` names the addresses this run answers for. Everything
+ * else is still enumerated, still printed with its owner, still posted to
+ * Slack, and still called uncapped - it just does not set the exit code.
+ *
  * SEVERITY. `critical` is a pool with principal available to borrow and no cap.
  * `warn` is a cap far enough from the live oracle to be worth a look - too high
  * to bind, or so low it is quietly refusing honest borrowers. Everything else
@@ -266,6 +277,16 @@ task(
       'in a handful; a 1000-block cap on a 46M-block chain never finishes at all.',
     500,
     types.int
+  )
+  .addOptionalParam(
+    'ownedBy',
+    'Comma-separated addresses whose pools this run is responsible for. ' +
+      'Uncapped pools belonging to anyone else are still reported in full, ' +
+      'but they do not set the exit code, because setMaxPrincipalPerCollateralAmount ' +
+      'is onlyOwner and we cannot sign theirs. Empty means every pool is ours, ' +
+      'which is the behaviour this task had before the option existed.',
+    '',
+    types.string
   )
   .addOptionalParam(
     'json',
@@ -579,6 +600,27 @@ task(
     findings.sort((a, b) => rank[a.severity] - rank[b.severity])
 
     const critical = findings.filter((f) => f.severity === 'critical')
+
+    // Whose uncapped pools this run can actually do something about.
+    //
+    // setMaxPrincipalPerCollateralAmount is onlyOwner. Most of the pools on
+    // these chains belong to other people, so a sweep that exits non-zero for
+    // every uncapped pool anywhere reports a permanent incident nobody on this
+    // side can close - which ends with the alert being ignored, and that is a
+    // worse security outcome than the finding it was raised for. The finding
+    // is still printed, still posted, still names the owner; it just stops
+    // pretending we are the ones failing to act on it.
+    const owned = new Set(
+      String(args.ownedBy ?? '')
+        .split(',')
+        .map((a) => a.trim().toLowerCase())
+        .filter(Boolean)
+    )
+    const isOurs = (f: Finding): boolean =>
+      owned.size === 0 || owned.has(f.owner.toLowerCase())
+    const ours = critical.filter(isOurs)
+    const external = critical.filter((f) => !isOurs(f))
+
     const unreadable = findings.filter((f) => f.unreadable === true)
     // A quarter. One pool that would not answer is a bad moment on a public
     // endpoint; a quarter of them is a chain this run did not see, and a
@@ -604,14 +646,20 @@ task(
             degraded: degraded || null,
             unreadable: unreadable.length,
             blind,
+            // Split so a caller can tell "we have uncapped pools" from "other
+            // people do". Both are in `findings` either way.
+            criticalOurs: ours.length,
+            criticalExternal: external.length,
             // The same fact the table's `audit-verdict:` line carries, so a
             // caller reading either form can tell an uncapped pool from a
             // chain nobody could read without re-deriving it from severities.
             verdict: blind
               ? 'unreadable'
-              : critical.length > 0
+              : ours.length > 0
                 ? 'critical'
-                : 'clean',
+                : external.length > 0
+                  ? 'external'
+                  : 'clean',
             findings,
           },
           null,
@@ -653,9 +701,15 @@ task(
       hre.log(
         blind
           ? `audit-verdict: unreadable ${unreadable.length}/${findings.length}`
-          : critical.length > 0
-            ? `audit-verdict: critical ${critical.length}`
-            : 'audit-verdict: clean',
+          : ours.length > 0
+            ? `audit-verdict: critical ${ours.length}` +
+              (external.length > 0 ? ` external ${external.length}` : '')
+            : external.length > 0
+              ? // Its own token, not a flavour of critical: the sweep keys the
+                // exit code off this line, and a chain whose only uncapped
+                // pools are other people's is not an incident we can close.
+                `audit-verdict: external ${external.length}`
+              : 'audit-verdict: clean',
         { star: false }
       )
     }
@@ -671,14 +725,27 @@ task(
       )
     }
 
-    if (critical.length > 0) {
+    if (external.length > 0 && args.json !== true) {
+      // Said loudly on the way past, even though it does not set the exit code.
+      // The pools are uncapped and the money in them is real; the only thing
+      // --owned-by changes is who is being paged about it.
+      const owners = [...new Set(external.map((f) => f.owner))]
+      hre.log(
+        `${external.length} uncapped pool(s) on ${hre.network.name} belong to someone else - ` +
+          `not this signer's to cap, and not counted against the exit code. ` +
+          `Owners who must set it: ${owners.join(', ')}`,
+        { star: false }
+      )
+    }
+
+    if (ours.length > 0) {
       // Non-zero so a scheduler treats this as the alert. The message names the
       // owners, because the fix is theirs to sign and an alert that does not say
       // whose job it is gets read and dropped.
-      const owners = [...new Set(critical.map((f) => f.owner))]
+      const owners = [...new Set(ours.map((f) => f.owner))]
       throw new Error(
-        `${critical.length} pool(s) on ${hre.network.name} hold borrowable principal with no ` +
-          `maxPrincipalPerCollateralAmount: ${critical.map((f) => `${f.pool} (${f.pair})`).join(', ')}. ` +
+        `${ours.length} pool(s) on ${hre.network.name} hold borrowable principal with no ` +
+          `maxPrincipalPerCollateralAmount: ${ours.map((f) => `${f.pool} (${f.pair})`).join(', ')}. ` +
           `Owners who must set it: ${owners.join(', ')}`
       )
     }

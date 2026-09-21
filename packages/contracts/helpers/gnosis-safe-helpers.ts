@@ -462,7 +462,8 @@ export class GnosisSafeAdminClient {
       'katana':747474,
       'apechain': 33139,
       'xdc': 50,
-      'robinhood': 4663
+      'robinhood': 4663,
+      'arc': 5042
     }
     return chainIds[network] || 1
   }
@@ -543,6 +544,7 @@ export class GnosisSafeAdminClient {
       'apechain': 'apechain',
       'xdc': 'xdc',
       'robinhood': 'robinhood',
+      'arc': 'arc',
     }
 
     return networkMap[network as string] || 'eth'
@@ -576,6 +578,14 @@ export class GnosisSafeAdminClient {
       'robinhood':
         process.env.ROBINHOOD_SAFE_TX_SERVICE ??
         'https://api.safe.global/tx-service/robinhood',
+      // Arc, on the same api.safe.global host and for the same reason: the
+      // safe-transaction-arc.safe.global form does not resolve at all.
+      // Checked rather than guessed - /api/v1/about/ returns Safe Transaction
+      // Service 6.10.1, and it already has the protocol owner Safe indexed
+      // (threshold 2, five owners, 1.4.1+L2).
+      'arc':
+        process.env.ARC_SAFE_TX_SERVICE ??
+        'https://api.safe.global/tx-service/arc',
     }
     return networkMap[network] || 'https://safe-transaction-mainnet.safe.global'
   }

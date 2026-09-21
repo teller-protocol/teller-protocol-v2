@@ -22,10 +22,10 @@
   "liquidity-rewards:deploy": 1789734779,
   "hypernative-oracle-mock:deploy": 1789734780,
   "validate-deployments": 1789734780,
-  "default-proxy-admin:transfer": 1789734780,
   "activate-pools": 1789747800,
   "uniswapv3-quoter:deploy": 1789811378,
   "lender-commitment-forwarder:extensions:borrow-swap:rebind-quoter": 1789811385,
   "lender-commitment-forwarder:extensions:loan-referral-forwarder-v2:deploy": 1789989318,
-  "lender-commitment-forwarder:extensions:flash-swap-rollover:weth9-upgrade-arc": 1790007076
+  "lender-commitment-forwarder:extensions:flash-swap-rollover:weth9-upgrade-arc": 1790007076,
+  "default-proxy-admin:transfer": 1790010192
 }

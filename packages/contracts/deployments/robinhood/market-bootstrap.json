@@ -154,5 +154,15 @@
       "address": "0xC827A2522e6b8cB79A525ff78Fc8fEcCEeD13F85",
       "txHash": "0xec4b4e784425a06b8744a7044c749c0e65b3381bc7a97a3c469a6dfd2ab70dc0"
     }
+  },
+  "retiredPools": {
+    "short:STRATEGY": [
+      {
+        "address": "0xfcfbf20a9e603c34e7cdc70f99d18f4687acb5b5",
+        "txHash": "0x52d18beb44bb72e0f4f940a215b291d14663b6ec17a91aa26472b6774921f53b",
+        "retiredAt": "2026-09-21T06:18:00.000Z",
+        "note": "Never live. A duplicate of short:STRATEGY, created when a deploy re-ran BOOTSTRAP_MARKETS against a checkout pinned to a commit that did not yet carry this receipt entry. Identical parameters to the live pool (USDG/STRATEGY, 50000, 3000-6000). totalSupply 0 and no owner deposit, so it rejects every deposit and cannot be funded by anyone but its owner - leave it closed. Recorded here so it is not mistaken for an unexplained pool on the factory, and so nothing activates or caps it: activate-pools and set-pool-price-caps read `pools`, not this list."
+      }
+    ]
   }
 }

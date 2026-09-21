@@ -61,7 +61,12 @@ const deployFn: DeployFunction = async (hre) => {
   
   const { protocolTimelock , protocolOwnerSafe } = await hre.getNamedAccounts()
   if (protocolTimelock === '0x0000000000000000000000000000000000000000') {
-    hre.log('⚠️  protocolTimelock is zero address — skipping beacon ownership transfer. Run deploy again after setting protocolTimelock.')
+    // Same trap as the escrow beacon: this script's id is recorded whether or
+    // not the transfer ran, so "run deploy again" is not something anyone can
+    // actually do. The transfer lives in
+    // deploy/upgrades/46_transfer_timelock_ownership.ts, which has its own id
+    // and is not blocked by this one.
+    hre.log('⚠️  protocolTimelock is zero address — skipping beacon ownership transfer. Run the `protocol:transfer-timelock-ownership` tag once the timelock is set.')
   } else {
     hre.log('Transferring ownership of CommitmentGroupBeacon to Gnosis Safe...')
     await commitmentGroupBeacon.transferOwnership(protocolTimelock)

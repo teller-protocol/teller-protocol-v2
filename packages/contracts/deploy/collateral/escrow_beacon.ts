@@ -12,7 +12,13 @@ const deployFn: DeployFunction = async (hre) => {
     //is this necessary ? 
   const { protocolTimelock } = await hre.getNamedAccounts()
   if (protocolTimelock === '0x0000000000000000000000000000000000000000') {
-    hre.log('⚠️  protocolTimelock is zero address — skipping escrow beacon ownership transfer. Run deploy again after setting protocolTimelock.')
+    // Do not tell anyone to "run deploy again" here: this script records its
+    // id whether or not the transfer happened, and a recorded id never runs
+    // again, so a second pass cannot pick it up. That is how Arc and Robinhood
+    // both left this beacon on the deployer EOA. The transfer now has its own
+    // script, which is not blocked by this record:
+    // deploy/upgrades/46_transfer_timelock_ownership.ts
+    hre.log('⚠️  protocolTimelock is zero address — skipping escrow beacon ownership transfer. Run the `protocol:transfer-timelock-ownership` tag once the timelock is set.')
   } else {
     hre.log('Transferring ownership of CollateralEscrowBeacon to Protocol Timelock...')
     await collateralEscrowBeacon.transferOwnership(protocolTimelock)

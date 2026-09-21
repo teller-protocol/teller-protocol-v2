@@ -40,6 +40,13 @@
 #                           already-deployed chain without a full run. Honours
 #                           PUSH_ARTIFACTS, which the oracle wiring needs: it
 #                           writes the Safe batch that switches the firewall on.
+#   ACTIVATE_ONLY=<substr>  with RUN_TAGS=activate-pools, open only the pools
+#                           whose receipt key contains this. The first deposit
+#                           is spent rather than authorised, so on a chain that
+#                           already lists thirty pools and is opening one, the
+#                           money otherwise goes to whichever unopened pool
+#                           comes first in the receipt. Overrides the config's
+#                           activateMarkets: naming a pool is more specific.
 #   BOOTSTRAP_MARKETS=true  create the markets and lender pools for an already
 #                           deployed chain and stop. A full run does this on
 #                           its own; this is for re-running it alone.

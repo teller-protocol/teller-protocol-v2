@@ -18,9 +18,34 @@ export const MARKET_FEE_PERCENT = 100
 /** Protocol fee taken by TellerV2, in basis points. 10000 == 100%, so 5 == 5bps. */
 export const PROTOCOL_FEE_BPS = 5
 
+/**
+ * What a market is for, which decides the one forwarder its slot holds.
+ *
+ * TellerV2 trusts a forwarder on a market when the market's own slot names
+ * it, or when it is the global `lenderCommitmentForwarder`. The per-market
+ * slot holds exactly one address and `setTrustedMarketForwarder` overwrites
+ * it, so a market cannot serve both pools and offers unless the chain's
+ * global slot happens to hold the other one. Only Robinhood is like that, by
+ * accident — see config/global-commitment-forwarder.ts.
+ *
+ * Everywhere else the two need separate markets, which is why Base runs
+ * offers on market 22 and pools on 18. A chain bootstrapped with pools
+ * markets alone can never publish a lending offer: every attempt reverts
+ * with `Forwarder must be trusted by the market`, and no preview catches it,
+ * because a preview does not simulate the check.
+ */
+export type MarketPurpose = 'pools' | 'offers'
+
 export interface MarketConfig {
   /** Stable key used to name the market in the bootstrap receipt. */
   key: string
+  /**
+   * Which forwarder this market trusts. Defaults to `pools`, the historical
+   * behaviour: the SmartCommitmentForwarder, which LenderCommitmentGroup
+   * pools call through. `offers` trusts LenderCommitmentForwarderAlpha
+   * instead and gets no pools deployed into it.
+   */
+  purpose?: MarketPurpose
   /** Human label, also used to build the market URI. */
   label: string
   /** Loan term in seconds. Doubles as the payment cycle for bullet loans. */

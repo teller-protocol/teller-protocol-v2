@@ -8,6 +8,8 @@ import { HardhatRuntimeEnvironment } from 'hardhat/types'
 import {
   ChainBootstrapConfig,
   MARKET_FEE_PERCENT,
+  MarketConfig,
+  MarketPurpose,
   PROTOCOL_FEE_BPS,
 } from '../../config/chain-bootstrap/types'
 
@@ -195,9 +197,22 @@ task(
     const factory = (await hre.contracts.get(
       'LenderCommitmentGroupFactory_V2'
     )) as unknown as PoolFactoryLike
-    const forwarder = await (
-      await hre.contracts.get('SmartCommitmentForwarder')
-    ).getAddress()
+    // One forwarder per purpose. A market's slot holds a single address and
+    // setTrustedMarketForwarder overwrites it, so which one a market gets is
+    // decided once, at creation, and is the whole of what separates an
+    // offers market from a pools market. See MarketPurpose.
+    const forwarders: Record<MarketPurpose, string> = {
+      pools: await (
+        await hre.contracts.get('SmartCommitmentForwarder')
+      ).getAddress(),
+      offers: await (
+        await hre.contracts.get('LenderCommitmentForwarderAlpha')
+      ).getAddress(),
+    }
+    const purposeOf = (market: MarketConfig): MarketPurpose =>
+      market.purpose ?? 'pools'
+    console.log(`  pools forwarder  ${forwarders.pools}`)
+    console.log(`  offers forwarder ${forwarders.offers}`)
 
     const protocolOwner: string = await tellerV2.owner()
     console.log(`  protocol owner   ${protocolOwner}`)
@@ -273,12 +288,54 @@ task(
       console.log(`    -> market id ${marketId} (${rcpt?.hash ?? tx.hash})`)
     }
 
+    // ---- Forwarder trust ---------------------------------------------------
+    //
+    // Creating a market does not grant it, and only the market owner can, so
+    // until this runs every pool deploy into a pools market reverts with
+    // `Forwarder must be trusted by the market` — and so does every lending
+    // offer published into an offers market.
+    //
+    // Checked rather than assumed, so a market created by an earlier run is
+    // repaired rather than skipped. Never re-granted when already correct:
+    // the slot holds one address, so writing it again on a market that has
+    // the right forwarder is a no-op, and writing the wrong one would take
+    // a working market off line.
+    for (const market of config.markets) {
+      const created = receipt.markets[market.key]
+      if (!created) continue
+      const purpose = purposeOf(market)
+      const forwarder = forwarders[purpose]
+      const trusted = await tellerV2.isTrustedMarketForwarder(
+        created.marketId,
+        forwarder
+      )
+      if (trusted) continue
+      console.log(
+        `\n  trusting the ${purpose} forwarder for market ${created.marketId}`
+      )
+      console.log(`    forwarder        ${forwarder}`)
+      if (args.dryRun) continue
+      const trustTx = await tellerV2.setTrustedMarketForwarder(
+        created.marketId,
+        forwarder
+      )
+      const trustRcpt = await trustTx.wait()
+      console.log(`    -> ${trustRcpt?.hash ?? trustTx.hash}`)
+    }
+
     // ---- Pools -------------------------------------------------------------
     //
     // One pool per collateral per market: a pool pins a single marketId and a
     // single maxLoanDuration, so a 7 day and a 30 day offer against the same
     // collateral are two separate pools.
     for (const market of config.markets) {
+      // An offers market trusts Alpha, not the SmartCommitmentForwarder, so a
+      // pool's initialize() would revert in it. It exists to be published
+      // into, not deployed into.
+      if (purposeOf(market) === 'offers') {
+        console.log(`\n  no pools for ${market.key}: it is an offers market`)
+        continue
+      }
       const created = receipt.markets[market.key]
       if (!created && !args.dryRun) {
         console.log(`\n  skipping pools for ${market.key}: market not created`)
@@ -290,30 +347,6 @@ task(
       // section leaves the riskiest half of the config unprinted.
       const marketId = created?.marketId ?? '<pending>'
 
-      // A pool's initialize() calls approveMarketForwarder on TellerV2, which
-      // reverts with "Forwarder must be trusted by the market" unless the
-      // market already trusts the SmartCommitmentForwarder. Only the market
-      // owner can grant that, and creating a market does not grant it, so
-      // every pool deploy fails until this runs. Checked rather than assumed,
-      // so a market created by an earlier run is repaired rather than skipped.
-      if (created) {
-        const trusted = await tellerV2.isTrustedMarketForwarder(
-          created.marketId,
-          forwarder
-        )
-        if (!trusted) {
-          console.log(
-            `\n  trusting the forwarder for market ${created.marketId}`
-          )
-          console.log(`    forwarder        ${forwarder}`)
-          const trustTx = await tellerV2.setTrustedMarketForwarder(
-            created.marketId,
-            forwarder
-          )
-          const trustRcpt = await trustTx.wait()
-          console.log(`    -> ${trustRcpt?.hash ?? trustTx.hash}`)
-        }
-      }
 
       // Both directions in one list. An ordinary pool lends the chain's
       // principal against an asset; an inverse pool lends the asset against the

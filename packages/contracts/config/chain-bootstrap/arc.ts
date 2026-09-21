@@ -89,6 +89,24 @@ const config: ChainBootstrapConfig = {
       paymentDefaultDuration: 5 * 60,
       bidExpirationTime: 24 * 60 * 60,
     },
+    {
+      // Arc's two markets above both spend their forwarder slot on the
+      // SmartCommitmentForwarder, and Arc's global slot holds the plain
+      // LenderCommitmentForwarder, so LenderCommitmentForwarderAlpha is
+      // trusted nowhere on this chain and no lending offer can be published
+      // into it. The slot holds one address, so granting Alpha on `long`
+      // would not add offers — it would take the pools off line.
+      //
+      // Hence a market of its own, which is what Base does: offers on market
+      // 22, pools on 18. Same 30-day term as `long` so the two sides of the
+      // chain quote the same loan.
+      key: 'offers',
+      label: '30 Day Offers',
+      purpose: 'offers',
+      durationSeconds: 30 * 24 * 60 * 60,
+      paymentDefaultDuration: 5 * 60,
+      bidExpirationTime: 24 * 60 * 60,
+    },
   ],
 
   // ARGUS is only listed on the seven-day market, so that is the one whose

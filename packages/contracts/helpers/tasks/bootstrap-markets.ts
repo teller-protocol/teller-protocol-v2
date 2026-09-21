@@ -213,18 +213,27 @@ task(
     // setTrustedMarketForwarder overwrites it, so which one a market gets is
     // decided once, at creation, and is the whole of what separates an
     // offers market from a pools market. See MarketPurpose.
-    const forwarders: Record<MarketPurpose, string> = {
+    const purposeOf = (market: MarketConfig): MarketPurpose =>
+      market.purpose ?? 'pools'
+    const wantsOffers = config.markets.some((m) => purposeOf(m) === 'offers')
+
+    // Looked up only when a market asks for it. LenderCommitmentForwarderAlpha
+    // is not deployed on every chain this task can run against — five of the
+    // deployment sets have no record of it — and resolving it unconditionally
+    // would fail the whole bootstrap on those chains over a market they do not
+    // declare.
+    const forwarders: Record<MarketPurpose, string | null> = {
       pools: await (
         await hre.contracts.get('SmartCommitmentForwarder')
       ).getAddress(),
-      offers: await (
-        await hre.contracts.get('LenderCommitmentForwarderAlpha')
-      ).getAddress(),
+      offers: wantsOffers
+        ? await (
+            await hre.contracts.get('LenderCommitmentForwarderAlpha')
+          ).getAddress()
+        : null,
     }
-    const purposeOf = (market: MarketConfig): MarketPurpose =>
-      market.purpose ?? 'pools'
     console.log(`  pools forwarder  ${forwarders.pools}`)
-    console.log(`  offers forwarder ${forwarders.offers}`)
+    if (wantsOffers) console.log(`  offers forwarder ${forwarders.offers}`)
 
     const protocolOwner: string = await tellerV2.owner()
     console.log(`  protocol owner   ${protocolOwner}`)
@@ -317,6 +326,12 @@ task(
       if (!created) continue
       const purpose = purposeOf(market)
       const forwarder = forwarders[purpose]
+      if (!forwarder) {
+        throw new Error(
+          `market ${market.key} wants the ${purpose} forwarder, which is not ` +
+            `deployed on this network`
+        )
+      }
       const trusted = await tellerV2.isTrustedMarketForwarder(
         created.marketId,
         forwarder
@@ -358,7 +373,6 @@ task(
       // the parameters every pool will be built from, and skipping the whole
       // section leaves the riskiest half of the config unprinted.
       const marketId = created?.marketId ?? '<pending>'
-
 
       // Both directions in one list. An ordinary pool lends the chain's
       // principal against an asset; an inverse pool lends the asset against the

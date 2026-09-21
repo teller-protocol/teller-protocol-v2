@@ -413,10 +413,28 @@ prepare_artifact_push() {
   # works from the depth-1 clone the image makes.
   if [ -n "${GITHUB_TOKEN:-}" ]; then
     REPO_PATH="$(git remote get-url origin | sed -E 's#^https://[^/]+/##; s#^git@[^:]+:##; s#\.git$##')"
-    git push --dry-run -q \
+    if ! PROBE_OUT="$(git push --dry-run \
       "https://x-access-token:${GITHUB_TOKEN}@github.com/${REPO_PATH}.git" \
-      "$ARTIFACT_REFSPEC" >/dev/null 2>&1 || fail \
-      "GITHUB_TOKEN cannot push $REPO_PATH. Expired, scoped to another repo, or missing contents:write."
+      "$ARTIFACT_REFSPEC" 2>&1)"; then
+      # git can echo the remote it was given, and the remote it was given has
+      # the token in it. Redact before anything reaches a log.
+      PROBE_OUT="$(printf '%s' "$PROBE_OUT" | sed -E 's#(https://)[^@ ]*@#\1***@#g')"
+      # Two failures that look identical here and are not. A rejected
+      # fast-forward means CONTRACTS_REF is *behind* $ARTIFACT_BRANCH, which
+      # happens the moment anything merges to that branch after the pin was
+      # set: the commit this container is standing on cannot push to a ref that
+      # has already moved past it, and no token changes that. Reporting it as a
+      # credential problem cost two deploy cycles and sent someone to rotate a
+      # token that was working.
+      case "$PROBE_OUT" in
+      *non-fast-forward* | *"fetch first"* | *"remote contains work"* | *"behind its remote"*)
+        fail "Cannot push to $ARTIFACT_BRANCH: this checkout ($(git rev-parse --short HEAD)) is behind it, so the artifact commit would not fast-forward. Repin CONTRACTS_REF to the head of $ARTIFACT_BRANCH, or set ARTIFACT_BRANCH to a branch this commit is not behind. The token is not the problem."
+        ;;
+      *)
+        fail "GITHUB_TOKEN cannot push $REPO_PATH. Expired, scoped to another repo, or missing contents:write. git said: $(printf '%s' "$PROBE_OUT" | tr '\n' ' ')"
+        ;;
+      esac
+    fi
   fi
 }
 

@@ -19,7 +19,20 @@ const deployFn: DeployFunction = async (hre) => {
     hre.log('⚠️  protocolTimelock is zero address — skipping proxy admin ownership transfer. Run deploy again after setting protocolTimelock.')
     hre.log('')
     hre.log('=================================================================')
-    return true
+    // `false`, so hardhat-deploy does not record this migration id. `true`
+    // records it, and a recorded id never runs again - which turned the "run
+    // deploy again after setting protocolTimelock" above into something that
+    // could not happen. Pass 1 skips here with the timelock still unset,
+    // writes the id, and pass 2 finds the work already marked done.
+    //
+    // That is how Arc ended up with a deployed-and-wired Safe and timelock
+    // that own nothing, and a ProxyAdmin - admin of sixteen proxies, TellerV2
+    // among them - still held by the deployer EOA. Robinhood has the same
+    // shape. Chains already carrying the stale record need the
+    // `default-proxy-admin:transfer` line removed from their
+    // deployments/<network>/.migrations.json before pass 2 can pick it up;
+    // this fix only stops it happening to the next chain.
+    return false
   }
 
   const isOwner = currentOwner === expectedOwner

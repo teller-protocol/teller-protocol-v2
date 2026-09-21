@@ -90,9 +90,15 @@ task(
   )
   .addOptionalParam(
     'bufferBps',
-    'Headroom above the current reading, in bps. 0 caps exactly at spot.',
-    0,
-    types.int
+    'Headroom above the current reading, in bps. 0 caps exactly at spot, and a ' +
+      'negative value caps below it - which is the case that matters when the ' +
+      'pool being read is not where the asset actually trades.',
+    '0',
+    // A string, not types.int, because hardhat's int refuses a leading minus:
+    // `--buffer-bps -410` dies with HH301 before the task is entered. The value
+    // is parsed with BigInt below, which does accept one. Please do not "tidy"
+    // this back to types.int.
+    types.string
   )
   .addOptionalParam(
     'only',
@@ -123,7 +129,26 @@ task(
     ) as BootstrapReceipt
 
     const [signer] = await ethers.getSigners()
-    const buffer = BigInt(args.bufferBps ?? 0)
+    // BigInt throws on anything that is not an integer literal, which is the
+    // validation this needs: a buffer that silently became NaN would write a
+    // cap of 0 to every pool in the receipt, and a cap of 0 is not "no cap" -
+    // `principalPerCollateral` takes min(oracle, cap), so it would halt every
+    // one of them.
+    let buffer: bigint
+    try {
+      buffer = BigInt(String(args.bufferBps ?? '0').trim())
+    } catch {
+      throw new Error(
+        `--buffer-bps must be an integer number of bps, got "${String(
+          args.bufferBps
+        )}"`
+      )
+    }
+    if (buffer <= -10000n) {
+      throw new Error(
+        `--buffer-bps ${buffer} would cap at or below zero, which halts every pool it touches rather than capping it`
+      )
+    }
 
     console.log(`network   ${network.name} (${config.chainId})`)
     console.log(`signer    ${await signer.getAddress()}`)

@@ -149,6 +149,10 @@
     "short:STRATEGY": {
       "address": "0x82dbcd32989f68130e95b0841c6efdc7c4b7ca64",
       "txHash": "0xffd0bd7839e457a91499f05bd3f819fc605724d85a4fa2202e0fbe7f44a80257"
+    },
+    "short:inverse:STRATEGY": {
+      "address": "0xC827A2522e6b8cB79A525ff78Fc8fEcCEeD13F85",
+      "txHash": "0xec4b4e784425a06b8744a7044c749c0e65b3381bc7a97a3c469a6dfd2ab70dc0"
     }
   }
 }

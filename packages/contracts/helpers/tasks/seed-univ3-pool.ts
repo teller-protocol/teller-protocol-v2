@@ -1,3 +1,4 @@
+import { getAddress } from 'ethers'
 import { task, types } from 'hardhat/config'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
 
@@ -125,11 +126,14 @@ task(
     const deployer = await hre.getNamedSigner('deployer')
     const sender = await deployer.getAddress()
 
-    const pool = await ethers.getContractAt(
-      POOL_ABI,
-      args.pool as string,
-      deployer
-    )
+    // Every address this task touches goes through getAddress first. Not
+    // politeness: ethers rejects a mixed-case address whose EIP-55 checksum
+    // does not match, and it rejects it at call time, three minutes into a
+    // deploy, with a message about an argument rather than about the constant
+    // somebody typed by hand. Normalising at the edge means a lowercase or
+    // miscapitalised address is corrected here or rejected here.
+    const poolAddress = getAddress(args.pool as string)
+    const pool = await ethers.getContractAt(POOL_ABI, poolAddress, deployer)
     const [
       token0Address,
       token1Address,
@@ -148,7 +152,7 @@ task(
 
     if ((slot0[0] as bigint) === BigInt(0)) {
       throw new Error(
-        `${args.pool} has no price: it was created but never initialised, so there is nothing to add liquidity around.`
+        `${poolAddress} has no price: it was created but never initialised, so there is nothing to add liquidity around.`
       )
     }
 
@@ -193,15 +197,16 @@ task(
     const tickLower = Math.ceil(MIN_TICK / spacing) * spacing
     const tickUpper = Math.floor(MAX_TICK / spacing) * spacing
 
-    const npmAddress =
-      (args.positionManager as string) || positionManagerFor(hre.network.name)
+    const npmAddress = args.positionManager
+      ? getAddress(args.positionManager as string)
+      : positionManagerFor(hre.network.name)
     const npm = await ethers.getContractAt(NPM_ABI, npmAddress, deployer)
 
     // Checked rather than trusted: minting through something that is not this
     // chain's position manager would approve two tokens to an arbitrary
     // address and call a function that may mean anything.
     const npmFactory = (await npm.factory()) as string
-    hre.log(`Seeding ${args.pool}`, { star: true })
+    hre.log(`Seeding ${poolAddress}`, { star: true })
     hre.log(`  network          ${hre.network.name}`)
     hre.log(`  pair             ${sym0} / ${sym1} at ${Number(fee) / 10_000}%`)
     hre.log(`  pool liquidity   ${liquidityBefore}`)
@@ -303,7 +308,11 @@ task(
  */
 function positionManagerFor(network: string): string {
   const known = knownPositionManager(network)
-  if (known) return known
+  // getAddress, not the literal: the table below is written in lowercase on
+  // purpose, so that the only capitalisation this task ever uses is the one
+  // keccak produces. A hand-checksummed constant is a constant that can be
+  // wrong, and it fails at the first call rather than at load.
+  if (known) return getAddress(known)
   throw new Error(
     `No NonfungiblePositionManager known for ${network}. Find it (the sender of a Mint ` +
       `on one of this chain's V3 pools), check it reports this chain's factory, then pass ` +
@@ -320,11 +329,11 @@ function knownPositionManager(network: string): string | undefined {
     case 'optimism':
     case 'polygon':
     case 'base':
-      return '0xC36442b4a4522E871399CD717aBDD847Ab11FE88'
+      return '0xc36442b4a4522e871399cd717abdd847ab11fe88'
     // Read off chain 4663: the sender of every Mint on its live V3 pools, and
     // it answers as "Uniswap V3 Positions NFT-V1" with this chain's factory.
     case 'robinhood':
-      return '0x73991a25C818bF1F1128DeAaB1492d45638DE0D3'
+      return '0x73991a25c818bf1f1128deaab1492d45638de0d3'
     default:
       return undefined
   }

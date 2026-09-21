@@ -22,5 +22,6 @@
   "liquidity-rewards:deploy": 1757090162,
   "validate-deployments": 1757090163,
   "default-proxy-admin:transfer": 1757090225,
-  "uniswapv3-quoter:deploy": 1758737943
+  "uniswapv3-quoter:deploy": 1758737943,
+  "lender-commitment-forwarder:extensions:loan-referral-forwarder-v2:deploy": 1789990170
 }

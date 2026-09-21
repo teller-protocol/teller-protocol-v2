@@ -281,3 +281,38 @@ export function get_ecosystem_contract_address(
 
 
 }
+/**
+ * The WETH9 address SwapRolloverLoan is constructed with, which is not always
+ * the chain's swap-path weth9 above.
+ *
+ * SwapRolloverLoan hands the flash loan back to the pool through Uniswap's
+ * PeripheryPayments.pay(), which special-cases
+ * `token == WETH9 && address(this).balance >= value` and wraps native coin
+ * instead of transferring the ERC-20 it is already holding.
+ *
+ * That branch is fatal on a chain where the "wrapped native" IS the native
+ * coin's own ERC-20 view. Arc is such a chain: the gas asset is USDC, and
+ * 0x3600...0000 is that same balance seen as a 6-decimal ERC-20, so the
+ * contract's native balance is never below the amount it owes and the wrap
+ * branch is always taken. It then calls `deposit{value: ...}()` on the
+ * predeploy, and Arc rejects value sent to a precompile - every rollover of a
+ * USDC loan reverted with "Blocked address" after burning the gas limit.
+ *
+ * address(0) is never a token, so `token == WETH9` is never true and pay()
+ * always takes the plain safeTransfer branch - the only one Arc can execute.
+ * Nothing in the rollover path wraps or unwraps native coin, and Arc has no
+ * WETH to wrap into, so the branch is not being given up for anything.
+ *
+ * Every other chain keeps its real WETH9: there the contract holds the wrapped
+ * token and no native balance, so the branch was never taken to begin with.
+ */
+export function get_swap_rollover_weth9_address(
+	networkName: string
+): string | undefined {
+
+	if (networkName === 'arc') {
+		return '0x0000000000000000000000000000000000000000'
+	}
+
+	return get_ecosystem_contract_address(networkName, 'weth9')
+}

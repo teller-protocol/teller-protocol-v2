@@ -758,6 +758,16 @@ async function getOZNetwork(hre: HardhatRuntimeEnvironment): Promise<Network> {
     return 'robinhood'
   }
 
+  // Same gap as 4663: fromChainId() has no name for Arc either, so without
+  // this every Safe proposal path throws `Unknown chain id 5042` - and does it
+  // *after* prepareUpgrade has already broadcast an implementation deploy.
+  // Safe's own transaction service does serve this chain, under this name:
+  // https://api.safe.global/tx-service/arc answers 200 at /api/v1/about/ and
+  // has the protocol owner Safe indexed.
+  if (chainId == '5042' ){
+    return 'arc'
+  }
+
   if (!network) throw new Error(`Unknown chain id ${chainId}`)
   return network
 }

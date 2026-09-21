@@ -143,8 +143,18 @@ const networkUrls: Record<NetworkNames, string> = {
     (ALCHEMY_API_KEY
       ? `https://arb-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
       : ''),
+  // Alchemy's BNB Smart Chain slug is bnb-mainnet, not bsc-mainnet, and it
+  // resolves and answers like the chains above. Wired the same way they are
+  // because the dataseed below cannot do the one thing a monitor needs: it
+  // answers every eth_getLogs, at every width down to a single block, with
+  // "limit exceeded" (-32005). That is a rate limit worded like a range limit,
+  // and it is why the scheduled pool cap audit reported bsc for a week without
+  // ever reading a block of it.
   bsc:
-    process.env.BSC_RPC_URL ?? 'https://bsc-dataseed1.binance.org',
+    process.env.BSC_RPC_URL ??
+    (ALCHEMY_API_KEY
+      ? `https://bnb-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
+      : 'https://bsc-dataseed1.binance.org'),
 
   base:
   process.env.BASE_RPC_URL ??

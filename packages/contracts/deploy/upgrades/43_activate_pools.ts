@@ -88,11 +88,30 @@ const listedPools = async (
   if (!fs.existsSync(receiptPath)) return []
   const receipt = JSON.parse(fs.readFileSync(receiptPath, 'utf8'))
 
+  // ACTIVATE_ONLY names pools rather than markets, and naming a pool is the
+  // more specific instruction, so it overrides the market filter below.
+  //
+  // It exists because the deposit is spent, not just authorised. This script
+  // walks the receipt in order and stops at each pool it cannot afford, which
+  // is fine when there is enough of the principal for all of them and wrong
+  // when there is not: opening one new pool on a chain with thirty-odd
+  // already listed means the first unopened pool in the file takes the money,
+  // whichever pool that happens to be. Mirrors `--only` on
+  // set-pool-price-caps, and matches on the receipt key the same way.
+  const only = (process.env.ACTIVATE_ONLY ?? '').trim()
+  const entries = Object.entries(receipt?.pools ?? {})
+
+  if (only) {
+    return entries
+      .filter(([key]) => key.includes(only))
+      .map(([key, pool]) => [key, (pool as { address: string }).address])
+  }
+
   // Receipt keys are `<market>:<symbol>`. Pools on a market this chain does
   // not surface are still on chain and still borrowable against; they are not
   // shown, so opening them is not this script's business.
   const markets = await activateMarkets(hre.network.name)
-  return Object.entries(receipt?.pools ?? {})
+  return entries
     .filter(([key]) => markets.includes(key.split(':')[0]))
     .map(([key, pool]) => [key, (pool as { address: string }).address])
 }
@@ -104,6 +123,8 @@ const deployFn: DeployFunction = async (hre) => {
   hre.log('----------')
   hre.log('')
   hre.log(`Activating ${hre.network.name} pools as ${deployerAddress}`)
+  const only = (process.env.ACTIVATE_ONLY ?? '').trim()
+  if (only) hre.log(`  only pools matching "${only}"`)
 
   const activated: string[] = []
   const skipped: string[] = []
@@ -149,7 +170,9 @@ const deployFn: DeployFunction = async (hre) => {
       continue
     }
     if (amount < MIN_SHARES) {
-      skipped.push(`${key} (${amount} ${symbol} mints fewer than ${MIN_SHARES} shares)`)
+      skipped.push(
+        `${key} (${amount} ${symbol} mints fewer than ${MIN_SHARES} shares)`
+      )
       continue
     }
 
@@ -165,7 +188,9 @@ const deployFn: DeployFunction = async (hre) => {
       )
     }
     activated.push(`${key} <- ${amount} ${symbol}`)
-    hre.log(`  activated ${key.padEnd(22)} ${amount} ${symbol}`, { star: false })
+    hre.log(`  activated ${key.padEnd(22)} ${amount} ${symbol}`, {
+      star: false,
+    })
   }
 
   for (const line of skipped) hre.log(`  skipped   ${line}`, { star: false })

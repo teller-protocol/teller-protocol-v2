@@ -40,9 +40,23 @@
 #                           already-deployed chain without a full run. Honours
 #                           PUSH_ARTIFACTS, which the oracle wiring needs: it
 #                           writes the Safe batch that switches the firewall on.
+#   ACTIVATE_ONLY=<substr>  with RUN_TAGS=activate-pools, open only the pools
+#                           whose receipt key contains this. The first deposit
+#                           is spent rather than authorised, so on a chain that
+#                           already lists thirty pools and is opening one, the
+#                           money otherwise goes to whichever unopened pool
+#                           comes first in the receipt. Overrides the config's
+#                           activateMarkets: naming a pool is more specific.
 #   BOOTSTRAP_MARKETS=true  create the markets and lender pools for an already
 #                           deployed chain and stop. A full run does this on
 #                           its own; this is for re-running it alone.
+#   ALLOW_UNRECORDED_BOOTSTRAP=true
+#                           run BOOTSTRAP_MARKETS with PUSH_ARTIFACTS off. Only
+#                           when you will commit market-bootstrap.json yourself
+#                           AND repin CONTRACTS_REF to that commit: a later run
+#                           against a checkout without the entry deploys the
+#                           pool a second time, which is how robinhood ended up
+#                           with two short:STRATEGY pools.
 #   BOOTSTRAP_DRY_RUN=true  with BOOTSTRAP_MARKETS, print the plan and send
 #                           nothing.
 #   REPLACE_POOLS=<keys>    with BOOTSTRAP_MARKETS, comma-separated receipt keys
@@ -100,6 +114,15 @@
 #                           throttles a burst serves the same calls spread out,
 #                           and hyperevm's does exactly that - the first sweep
 #                           read one pool of sixteen.
+#   AUDIT_OWNED_BY=<addr,...>
+#                           addresses whose pools this sweep answers for.
+#                           setMaxPrincipalPerCollateralAmount is onlyOwner, so
+#                           an uncapped pool belonging to anyone else is still
+#                           enumerated, printed with its owner and posted to
+#                           Slack - but it does not fail the run, because there
+#                           is no action on this side to fail at. Unset means
+#                           every pool counts, which is how this behaved before
+#                           the option existed.
 #   AUDIT_SLACK_WEBHOOK=<url>
 #                           with AUDIT_NETWORKS, post to Slack when a sweep finds
 #                           anything critical. Silent otherwise: a monitor that
@@ -121,6 +144,24 @@
 #                           and send nothing. Run this before pointing a pool
 #                           config at a window: one the oracle cannot answer is
 #                           a pool that cannot lend.
+#   SEED_UNIV3=true         add full-range liquidity to a Uniswap V3 pool, so
+#                           its TWAP is worth reading, and stop. Needs
+#                           SEED_POOL, SEED_AMOUNT0 and SEED_AMOUNT1. For a
+#                           token whose real market is V4: Teller reads V3 and
+#                           only V3, so the choice is seeding a V3 pool or not
+#                           lending against the token.
+#   SEED_POOL=<addr>        the Uniswap V3 pool to seed.
+#   SEED_AMOUNT0=<n>        whole tokens of the pool's token0 to add.
+#   SEED_AMOUNT1=<n>        whole tokens of its token1.
+#   SEED_POSITION_MANAGER=<addr>
+#                           override the NonfungiblePositionManager. Only
+#                           needed on a chain whose periphery this repo does
+#                           not know - it is not the canonical address
+#                           everywhere, and on Robinhood it is not even a
+#                           position manager at that address.
+#   SEED_SLIPPAGE_BPS=<n>   how far below the asked amounts the mint may
+#                           settle. Default 500.
+#   SEED_DRY_RUN=true       with SEED_UNIV3, print the plan and send nothing.
 #   SET_PRICE_CAPS=true     cap every pool in the bootstrap receipt at the
 #                           price its own oracle quotes right now.
 #   PRICE_CAPS_DRY_RUN=true with SET_PRICE_CAPS, print the caps without
@@ -388,10 +429,28 @@ prepare_artifact_push() {
   # works from the depth-1 clone the image makes.
   if [ -n "${GITHUB_TOKEN:-}" ]; then
     REPO_PATH="$(git remote get-url origin | sed -E 's#^https://[^/]+/##; s#^git@[^:]+:##; s#\.git$##')"
-    git push --dry-run -q \
+    if ! PROBE_OUT="$(git push --dry-run \
       "https://x-access-token:${GITHUB_TOKEN}@github.com/${REPO_PATH}.git" \
-      "$ARTIFACT_REFSPEC" >/dev/null 2>&1 || fail \
-      "GITHUB_TOKEN cannot push $REPO_PATH. Expired, scoped to another repo, or missing contents:write."
+      "$ARTIFACT_REFSPEC" 2>&1)"; then
+      # git can echo the remote it was given, and the remote it was given has
+      # the token in it. Redact before anything reaches a log.
+      PROBE_OUT="$(printf '%s' "$PROBE_OUT" | sed -E 's#(https://)[^@ ]*@#\1***@#g')"
+      # Two failures that look identical here and are not. A rejected
+      # fast-forward means CONTRACTS_REF is *behind* $ARTIFACT_BRANCH, which
+      # happens the moment anything merges to that branch after the pin was
+      # set: the commit this container is standing on cannot push to a ref that
+      # has already moved past it, and no token changes that. Reporting it as a
+      # credential problem cost two deploy cycles and sent someone to rotate a
+      # token that was working.
+      case "$PROBE_OUT" in
+      *non-fast-forward* | *"fetch first"* | *"remote contains work"* | *"behind its remote"*)
+        fail "Cannot push to $ARTIFACT_BRANCH: this checkout ($(git rev-parse --short HEAD)) is behind it, so the artifact commit would not fast-forward. Repin CONTRACTS_REF to the head of $ARTIFACT_BRANCH, or set ARTIFACT_BRANCH to a branch this commit is not behind. The token is not the problem."
+        ;;
+      *)
+        fail "GITHUB_TOKEN cannot push $REPO_PATH. Expired, scoped to another repo, or missing contents:write. git said: $(printf '%s' "$PROBE_OUT" | tr '\n' ' ')"
+        ;;
+      esac
+    fi
   fi
 }
 
@@ -518,6 +577,26 @@ if [ "${BOOTSTRAP_MARKETS:-}" = "true" ]; then
   # Before the first transaction, not after the last one. The receipt is the
   # only thing that stops a re-run creating a second set of markets, so a run
   # that cannot push it is worse than one that never started.
+  #
+  # And that is not a figure of speech: robinhood got a second short:STRATEGY
+  # pool this way. The receipt entry existed - it had been committed by hand,
+  # because prepare_artifact_push was refusing the run - but the container was
+  # pinned to a commit from before that commit, so its checkout had a receipt
+  # with no STRATEGY in it. A redeploy nobody asked for re-ran this branch with
+  # PUSH_ARTIFACTS cleared, found no entry, and dutifully deployed a duplicate.
+  #
+  # Clearing PUSH_ARTIFACTS to get past a push problem is therefore not a
+  # workaround, it is disabling the only thing that makes this branch
+  # idempotent. It still has to be possible - the push can be broken for
+  # reasons that have nothing to do with this chain - but it has to be said out
+  # loud, per run, rather than inherited from whatever the service was last
+  # set to.
+  if [ "${BOOTSTRAP_DRY_RUN:-}" != "true" ] && \
+     [ "${PUSH_ARTIFACTS:-}" != "true" ] && \
+     [ "${ALLOW_UNRECORDED_BOOTSTRAP:-}" != "true" ]; then
+    fail "BOOTSTRAP_MARKETS without PUSH_ARTIFACTS=true would create pools and record them nowhere, and the receipt is the only thing that stops the next run creating them again. Set PUSH_ARTIFACTS=true, or ALLOW_UNRECORDED_BOOTSTRAP=true if you have a way to commit deployments/$NETWORK/market-bootstrap.json yourself - and if you do, repin CONTRACTS_REF to that commit before this branch runs again."
+  fi
+
   prepare_artifact_push
 
   log "Deployer preflight on $NETWORK"
@@ -552,6 +631,40 @@ if [ "${BOOTSTRAP_MARKETS:-}" = "true" ]; then
   fi
 
   log "Done — $NETWORK (markets and pools)"
+  exit 0
+fi
+
+# Liquidity into a Uniswap V3 pool, so its price is worth reading.
+#
+# The counterpart of GROW_ORACLE, and the half that is easy to skip: growing a
+# pool's observation buffer makes its TWAP readable, not honest. A pool with
+# three hundred slots and two dollars in it answers every window and answers
+# them wrong. Depth is what makes arbitrage worth doing, and arbitrage is the
+# only thing that keeps a pool tracking the asset it prices.
+if [ "${SEED_UNIV3:-}" = "true" ]; then
+  [ -n "${SEED_POOL:-}" ] || fail "SEED_UNIV3 is set but SEED_POOL is not."
+  [ -n "${SEED_AMOUNT0:-}" ] || fail \
+    "SEED_UNIV3 is set but SEED_AMOUNT0 is not. Refusing to guess a size."
+  [ -n "${SEED_AMOUNT1:-}" ] || fail \
+    "SEED_UNIV3 is set but SEED_AMOUNT1 is not. Refusing to guess a size."
+  [ -n "${DEPLOYER_MNEMONIC:-}" ] || fail "DEPLOYER_MNEMONIC is not set."
+  printf '%s' "$DEPLOYER_MNEMONIC" > mnemonic.secret
+  chmod 600 mnemonic.secret
+  trap 'rm -f mnemonic.secret' EXIT
+
+  SEED_ARGS="--pool ${SEED_POOL} --amount0 ${SEED_AMOUNT0} --amount1 ${SEED_AMOUNT1}"
+  [ -n "${SEED_POSITION_MANAGER:-}" ] && \
+    SEED_ARGS="$SEED_ARGS --position-manager ${SEED_POSITION_MANAGER}"
+  [ -n "${SEED_SLIPPAGE_BPS:-}" ] && \
+    SEED_ARGS="$SEED_ARGS --slippage-bps ${SEED_SLIPPAGE_BPS}"
+  # Same "true" comparison as every other rehearsal flag here.
+  [ "${SEED_DRY_RUN:-}" = "true" ] && SEED_ARGS="$SEED_ARGS --dry-run true"
+
+  log "Seeding ${SEED_POOL} on $NETWORK"
+  # shellcheck disable=SC2086
+  yarn hh seed-univ3-pool --network "$NETWORK" $SEED_ARGS
+
+  log "Done — $NETWORK (seed)"
   exit 0
 fi
 
@@ -706,10 +819,22 @@ if [ "${AUDIT_POOL_CAPS:-}" = "true" ] && [ -n "${AUDIT_NETWORKS:-}" ]; then
   [ -n "${AUDIT_CHUNK:-}" ] && SWEEP_ARGS="$SWEEP_ARGS --chunk ${AUDIT_CHUNK}"
   [ -n "${AUDIT_MAX_REQUESTS:-}" ] && SWEEP_ARGS="$SWEEP_ARGS --max-requests ${AUDIT_MAX_REQUESTS}"
   [ -n "${AUDIT_PAUSE_MS:-}" ] && SWEEP_ARGS="$SWEEP_ARGS --pause ${AUDIT_PAUSE_MS}"
+  [ -n "${AUDIT_OWNED_BY:-}" ] && SWEEP_ARGS="$SWEEP_ARGS --owned-by ${AUDIT_OWNED_BY}"
 
   SWEEP_DIR="$(mktemp -d)"
   SWEEP_BAD=""
+  # Chains whose only uncapped pools belong to someone else. Reported and
+  # posted exactly like the rest, but they do not fail the run: nobody here can
+  # sign setMaxPrincipalPerCollateralAmount on a pool they do not own, and a
+  # scheduled job that is red for ever over somebody else's pool stops being
+  # read at all.
+  SWEEP_EXTERNAL=""
   SWEEP_SKIPPED=""
+  # Chains the audit could not read, kept apart from the ones it read and found
+  # wanting. Both are non-zero exits and both belong in the alert, but calling
+  # the second the first is a page that names a chain with no finding on it -
+  # and, worse, says nothing about the chains nobody looked at.
+  SWEEP_BLIND=""
 
   for AUDIT_NET in $(echo "$AUDIT_NETWORKS" | tr ',' ' '); do
     # Both checks, and the second is the one that matters: the audit throws when
@@ -735,9 +860,23 @@ if [ "${AUDIT_POOL_CAPS:-}" = "true" ] && [ -n "${AUDIT_NETWORKS:-}" ]; then
     # shellcheck disable=SC2086
     if yarn hh audit-pool-caps --network "$AUDIT_NET" $SWEEP_ARGS \
       > "$SWEEP_DIR/$AUDIT_NET.log" 2>&1; then
-      :
+      # A clean exit is no longer only "clean". With --owned-by set, a chain
+      # whose uncapped pools are all somebody else's exits zero and says so on
+      # its verdict line, and the sweep still has to carry those findings into
+      # the report - silence here would be the sweep hiding what the audit
+      # deliberately printed.
+      case "$(sed -n 's/^audit-verdict: //p' "$SWEEP_DIR/$AUDIT_NET.log" | tail -1)" in
+        external*) SWEEP_EXTERNAL="$SWEEP_EXTERNAL $AUDIT_NET" ;;
+      esac
     else
-      SWEEP_BAD="$SWEEP_BAD $AUDIT_NET"
+      # The audit's last line says which kind of non-zero this is. A run that
+      # died before printing one - a 502 from the RPC, a scan that blew its
+      # budget, an endpoint that serves no logs at all - never got far enough
+      # to have a finding, so the absence of a verdict is itself the verdict.
+      case "$(sed -n 's/^audit-verdict: //p' "$SWEEP_DIR/$AUDIT_NET.log" | tail -1)" in
+        critical*) SWEEP_BAD="$SWEEP_BAD $AUDIT_NET" ;;
+        *)         SWEEP_BLIND="$SWEEP_BLIND $AUDIT_NET" ;;
+      esac
     fi
     cat "$SWEEP_DIR/$AUDIT_NET.log"
   done
@@ -746,25 +885,65 @@ if [ "${AUDIT_POOL_CAPS:-}" = "true" ] && [ -n "${AUDIT_NETWORKS:-}" ]; then
   log "Sweep complete"
   [ -n "$SWEEP_SKIPPED" ] && echo "   not deployed here:$SWEEP_SKIPPED"
 
-  if [ -z "$SWEEP_BAD" ]; then
+  if [ -z "$SWEEP_BAD" ] && [ -z "$SWEEP_BLIND" ] && [ -z "$SWEEP_EXTERNAL" ]; then
     echo "   every audited chain clean"
     rm -rf "$SWEEP_DIR"
     log "Done — pool cap sweep"
     exit 0
   fi
 
-  echo "   chains with critical findings:$SWEEP_BAD"
+  [ -n "$SWEEP_BAD" ] && echo "   chains with critical findings:$SWEEP_BAD"
+  [ -n "$SWEEP_EXTERNAL" ] && \
+    echo "   chains with uncapped pools owned by others:$SWEEP_EXTERNAL"
+  if [ -n "$SWEEP_BLIND" ]; then
+    echo "   chains this run could NOT audit:$SWEEP_BLIND"
+    echo "   (no verdict from those - they are unwatched, not clean; see their output above)"
+  fi
 
   if [ -n "${AUDIT_SLACK_WEBHOOK:-}" ]; then
     # The CRITICAL lines themselves, not a count. An alert that says "3 pools"
     # and nothing else is one somebody has to come here to act on, and the
     # addresses and owners are the whole of the action.
-    SWEEP_TEXT="$(printf 'Pool cap audit: critical findings on%s\n' "$SWEEP_BAD")"
+    if [ -n "$SWEEP_BAD" ]; then
+      SWEEP_TEXT="$(printf 'Pool cap audit: critical findings on%s\n' "$SWEEP_BAD")"
+    elif [ -n "$SWEEP_BLIND" ]; then
+      SWEEP_TEXT="$(printf 'Pool cap audit: no critical findings, but some chains could not be read\n')"
+    else
+      SWEEP_TEXT="$(printf 'Pool cap audit: nothing of ours uncapped\n')"
+    fi
     for AUDIT_NET in $SWEEP_BAD; do
       SWEEP_TEXT="$SWEEP_TEXT
 *$AUDIT_NET*
 $(grep -E 'CRITICAL|Owners who must set it' "$SWEEP_DIR/$AUDIT_NET.log" | head -20)"
     done
+    # Other people's uncapped pools, under their own heading. The money in them
+    # is real and the addresses are the whole of the action for whoever owns
+    # them, so they go in the post - just not as something we failed to do.
+    if [ -n "$SWEEP_EXTERNAL" ]; then
+      SWEEP_TEXT="$SWEEP_TEXT
+
+:information_source: *uncapped, owned by others:*$SWEEP_EXTERNAL
+Not ours to sign; listed so the owners can be told."
+      for AUDIT_NET in $SWEEP_EXTERNAL; do
+        SWEEP_TEXT="$SWEEP_TEXT
+*$AUDIT_NET*
+$(grep -E 'belong to someone else' "$SWEEP_DIR/$AUDIT_NET.log" | head -3)"
+      done
+    fi
+    # Named, with the reason, and never folded in with the findings. A chain
+    # that could not be read is the one thing this report cannot reassure
+    # anybody about, so it says so in its own words rather than borrowing the
+    # word "critical" from a pool it never saw.
+    if [ -n "$SWEEP_BLIND" ]; then
+      SWEEP_TEXT="$SWEEP_TEXT
+
+:warning: *could not audit:*$SWEEP_BLIND
+These chains are unwatched this run, not clean."
+      for AUDIT_NET in $SWEEP_BLIND; do
+        SWEEP_TEXT="$SWEEP_TEXT
+*$AUDIT_NET* $(grep -E '^(Error|HardhatError|ProviderError|.*scan budget spent)' "$SWEEP_DIR/$AUDIT_NET.log" | head -2 | tr '\n' ' ' | cut -c1-220)"
+      done
+    fi
     # Built by jq so a pool address or an owner can never break the JSON.
     if command -v jq >/dev/null 2>&1; then
       jq -n --arg text "$SWEEP_TEXT" '{text: $text}' > "$SWEEP_DIR/slack.json"
@@ -778,9 +957,22 @@ $(grep -E 'CRITICAL|Owners who must set it' "$SWEEP_DIR/$AUDIT_NET.log" | head -
   fi
 
   rm -rf "$SWEEP_DIR"
-  # Non-zero: the scheduler's own failure notification is the second alert, and
-  # the one that still arrives if the webhook is wrong.
-  fail "pool cap audit found critical findings on$SWEEP_BAD"
+  # Non-zero either way: the scheduler's own failure notification is the second
+  # alert, and the one that still arrives if the webhook is wrong. A chain that
+  # could not be read earns it as squarely as a chain with an uncapped pool -
+  # the whole point of the job is to be able to say, and this run could not.
+  if [ -n "$SWEEP_BAD" ] && [ -n "$SWEEP_BLIND" ]; then
+    fail "pool cap audit found critical findings on$SWEEP_BAD; could not audit$SWEEP_BLIND"
+  elif [ -n "$SWEEP_BAD" ]; then
+    fail "pool cap audit found critical findings on$SWEEP_BAD"
+  elif [ -n "$SWEEP_BLIND" ]; then
+    fail "pool cap audit could not audit$SWEEP_BLIND"
+  fi
+
+  # Only other people's uncapped pools left. Reported above and posted to
+  # Slack, but a zero exit: there is no action on this side to fail at.
+  log "Done — pool cap sweep (nothing of ours uncapped)"
+  exit 0
 fi
 
 if [ "${AUDIT_POOL_CAPS:-}" = "true" ]; then
@@ -982,6 +1174,7 @@ if [ "${DEPLOY_PROTOCOL:-}" != "true" ]; then
     AUDIT_POOL_CAPS=true     report pools with no price cap (read-only, no key)
     AUDIT_NETWORKS=<names>   sweep several chains in one run, for a schedule
     GROW_ORACLE=true         grow a Uniswap V3 pool's TWAP observation buffer
+    SEED_UNIV3=true          add full-range liquidity to a Uniswap V3 pool
     SWAP_VIA_LIFI=true       swap one ERC-20 for another from the deployer
     PUBLISH_ONLY=true        publish the package (with PUBLISH_PACKAGE=true)
     DEPLOY_PROTOCOL=true     deploy the entire protocol to $NETWORK from scratch

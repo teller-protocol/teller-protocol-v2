@@ -34,7 +34,11 @@ import path from 'path'
  * `warn` is a cap far enough from the live oracle to be worth a look - too high
  * to bind, or so low it is quietly refusing honest borrowers. Everything else
  * is `ok`. The task exits non-zero when anything is critical, so a scheduler
- * can treat the exit code as the alert.
+ * can treat the exit code as the alert - and prints a final
+ * `audit-verdict: critical <n> | unreadable <n>/<m> | clean` line, so a
+ * scheduler sweeping several chains can tell an alert apart from a chain it
+ * never managed to read. A run that dies before that line printed nothing
+ * because it never got to look.
  *
  * WHEN THE CHAIN WILL NOT BE ENUMERATED. HyperEVM's providers cap eth_getLogs
  * at 1000 blocks with no tier that lifts it, and its head is past 46 million:
@@ -122,6 +126,26 @@ interface Finding {
 }
 
 /**
+ * The endpoint refusing the WIDTH of a query, as opposed to its rate.
+ *
+ * Both arrive as an error on the same call, and the right answer to each is the
+ * opposite of the right answer to the other: a range refusal wants a narrower
+ * window, a rate refusal wants the same window a moment later. Narrowing in
+ * answer to a rate limit makes the scan longer, which makes the throttling
+ * worse. So this insists on the words that actually name a range, and anything
+ * vaguer is left to isTransient.
+ */
+const isRangeShaped = (err: unknown): boolean =>
+  // Both word orders, because endpoints use both: katana answers "getLogs
+  // request exceeded max allowed range" and hyperliquid "query exceeds max
+  // block range 1000". What every one of them has in common, and what bare
+  // "limit exceeded" does not, is that it names the thing being measured -
+  // a range, a count of blocks, a size of response.
+  /block range|allowed range|exceeds? max block|range[^.]*(too|exceed|limit)|(exceed|too large|too wide|too big|smaller)[^.]*range|too many blocks|more than \d+ blocks|query returned more than|log response size|response size exceeded|too many results/i.test(
+    String((err as Error)?.message ?? err ?? '')
+  )
+
+/**
  * A transport failure, as opposed to the chain saying no.
  *
  * The distinction is the whole of this file's honesty. A revert is an answer -
@@ -132,10 +156,42 @@ interface Finding {
  * those warns were "rate limited" and the sixteenth said a capped pool had no
  * oracle routes - which it has, but the call asking for them was throttled.
  */
-const isTransient = (err: unknown): boolean =>
-  /rate.?limit|429|too many requests|timeout|timed out|ECONNRESET|ETIMEDOUT|socket hang up|SERVER_ERROR|bad response|network error|fetch failed/i.test(
-    String((err as Error)?.message ?? err ?? '')
+const isTransient = (err: unknown): boolean => {
+  const message = String((err as Error)?.message ?? err ?? '')
+  // A message that names a range is a range refusal whatever else it says, and
+  // some say both: infura's "query timeout exceeded, retry with a smaller block
+  // range" is a width complaint wearing the word timeout. Retrying that five
+  // times over eight seconds and then halving anyway is the slow way round to
+  // the same window.
+  if (isRangeShaped(message)) return false
+  if (
+    /rate.?limit|429|too many requests|timeout|timed out|ECONNRESET|ETIMEDOUT|socket hang up|SERVER_ERROR|bad response|network error|fetch failed|bad gateway|service unavailable|gateway time-?out/i.test(
+      message
+    )
+  ) {
+    return true
+  }
+  // A bare "limit exceeded", with nothing in it about blocks or ranges, is the
+  // endpoint saying "not so fast" - not "not so wide". bsc-dataseed answers a
+  // burst with exactly those two words, and reading them as a range refusal is
+  // how the scan that should have paused instead halved its window eighteen
+  // times, from 500000 down to 1, and then gave up on a chain it had not
+  // managed to read a single block of.
+  // "block range limit exceeded" never reaches here - isRangeShaped above
+  // short-circuits it - so a remaining "limit exceeded" is an allowance, not a
+  // width. Past tense and an allowance word both required, so a contract that
+  // reverts with "exceeds capacity" stays an answer rather than a fault.
+  return /\blimit exceeded\b|\b(quota|capacity|credits?|compute units?)\b[^.]{0,40}\bexceeded\b|\bexceeded\b[^.]{0,60}\b(quota|capacity|credits?|compute units?)\b/i.test(
+    message
   )
+}
+
+/**
+ * Consecutive clean windows before the scan tries a wider one again. Small
+ * enough that a chain does not crawl for millions of blocks on the strength of
+ * one refusal, large enough that it is not re-probing after every request.
+ */
+const WIDEN_AFTER = 8
 
 /** Retry only what is worth retrying, with a widening gap. */
 const withRetry = async <T>(fn: () => Promise<T>, attempts = 5): Promise<T> => {
@@ -264,13 +320,16 @@ task(
       // Rather than carry a limit per chain, start wide and halve on refusal,
       // keeping whatever window works: a range-capable endpoint finishes in a
       // handful of requests, a strict one still finishes.
-      const isRangeError = (err: unknown): boolean =>
-        /range|too many blocks|block range|limit exceeded|more than/i.test(
-          (err as Error)?.message ?? ''
-        )
-
-      let window = Math.max(1, args.chunk as number)
+      const startWindow = Math.max(1, args.chunk as number)
+      let window = startWindow
+      // The narrowest window any endpoint has already refused. Nothing at or
+      // above it is worth asking for twice, and holding onto it is what stops
+      // the widening below from oscillating between a width that works and a
+      // width that does not.
+      let refusedAt = Number.POSITIVE_INFINITY
+      let okStreak = 0
       let requests = 0
+      let attempts = 0
       let logCount = 0
       const seen = new Set<string>()
       let cursor = from
@@ -278,29 +337,49 @@ task(
       try {
         while (cursor <= latest) {
           const to = Math.min(cursor + window - 1, latest)
+          attempts++
           try {
-            const found = await ethers.provider.getLogs({
-              address: factory.address,
-              topics: [topic],
-              fromBlock: cursor,
-              toBlock: to,
-            })
+            // The same five-attempt backoff every other read in this file gets.
+            // Without it a throttled endpoint's refusal arrives below looking
+            // like a verdict on the window, and the loop answers a rate limit
+            // by making more requests than it was already making.
+            const found = await withRetry(() =>
+              ethers.provider.getLogs({
+                address: factory.address,
+                topics: [topic],
+                fromBlock: cursor,
+                toBlock: to,
+              })
+            )
             requests++
             logCount += found.length
             for (const l of found) {
               seen.add(ethers.getAddress('0x' + l.topics[1].slice(26)))
             }
             cursor = to + 1
+            // Widen again once the narrow window has proved itself. One refusal
+            // used to set the width for the rest of the scan however early it
+            // came: katana halved to 15625 and then spent its entire budget
+            // there, covering 6.25M of 43.2M blocks without a single further
+            // refusal to justify the width it was crawling at.
+            if (++okStreak >= WIDEN_AFTER && window * 2 < refusedAt) {
+              window = Math.min(window * 2, startWindow)
+              okStreak = 0
+            }
           } catch (err) {
-            if (!isRangeError(err) || window === 1) throw err
+            if (!isRangeShaped(err) || window === 1) throw err
+            refusedAt = Math.min(refusedAt, window)
             window = Math.max(1, Math.floor(window / 2))
+            okStreak = 0
           }
-          // Checked after the window has settled, so a chain whose provider
-          // caps the range shows what the cap costs rather than dying of it.
-          if (requests >= budget && cursor <= latest) {
+          // Counted in attempts rather than in answers, so an endpoint that
+          // refuses every width still reaches an end. Refusals used to be free
+          // against the budget, which is a loop that halves forever on a chain
+          // nobody is watching.
+          if (attempts >= budget && cursor <= latest) {
             throw new Error(
-              `scan budget spent: ${requests} request(s) covered ${cursor - from} of ` +
-                `${latest - from} blocks at window ${window}`
+              `scan budget spent: ${attempts} attempt(s), ${requests} answered, covered ` +
+                `${cursor - from} of ${latest - from} blocks at window ${window}`
             )
           }
         }
@@ -328,7 +407,11 @@ task(
           )
         } else {
           hre.log(
-            `  scanned ${from}..${latest} in ${requests} request(s), window ${window}`
+            `  scanned ${from}..${latest} in ${requests} request(s)` +
+              (attempts > requests
+                ? ` (${attempts - requests} refused)`
+                : '') +
+              `, window ${window}`
           )
           hre.log(
             `  pools   ${pools.length} (from ${logCount} deployment logs)`
@@ -521,6 +604,14 @@ task(
             degraded: degraded || null,
             unreadable: unreadable.length,
             blind,
+            // The same fact the table's `audit-verdict:` line carries, so a
+            // caller reading either form can tell an uncapped pool from a
+            // chain nobody could read without re-deriving it from severities.
+            verdict: blind
+              ? 'unreadable'
+              : critical.length > 0
+                ? 'critical'
+                : 'clean',
             findings,
           },
           null,
@@ -547,6 +638,25 @@ task(
         `${critical.length} critical, ${findings.filter((f) => f.severity === 'warn').length} warn, ` +
           `${findings.filter((f) => f.severity === 'ok').length} ok` +
           (unreadable.length > 0 ? ` (${unreadable.length} unreadable)` : '')
+      )
+    }
+
+    // One machine-readable line, last, on every path that got far enough to
+    // have an opinion. A caller sweeping several chains reads the exit code and
+    // gets one bit: non-zero. That bit has to carry both "this chain has
+    // uncapped pools holding money" and "this chain would not answer the
+    // phone", and a sweep that cannot tell them apart reports the second as the
+    // first - which is a page naming chains with no finding on them, and no
+    // mention of the ones that were never read. A run that dies before here
+    // prints nothing, and the absence is itself the answer: it could not look.
+    if (args.json !== true) {
+      hre.log(
+        blind
+          ? `audit-verdict: unreadable ${unreadable.length}/${findings.length}`
+          : critical.length > 0
+            ? `audit-verdict: critical ${critical.length}`
+            : 'audit-verdict: clean',
+        { star: false }
       )
     }
 

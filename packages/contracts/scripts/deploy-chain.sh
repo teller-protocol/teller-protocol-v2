@@ -710,6 +710,11 @@ if [ "${AUDIT_POOL_CAPS:-}" = "true" ] && [ -n "${AUDIT_NETWORKS:-}" ]; then
   SWEEP_DIR="$(mktemp -d)"
   SWEEP_BAD=""
   SWEEP_SKIPPED=""
+  # Chains the audit could not read, kept apart from the ones it read and found
+  # wanting. Both are non-zero exits and both belong in the alert, but calling
+  # the second the first is a page that names a chain with no finding on it -
+  # and, worse, says nothing about the chains nobody looked at.
+  SWEEP_BLIND=""
 
   for AUDIT_NET in $(echo "$AUDIT_NETWORKS" | tr ',' ' '); do
     # Both checks, and the second is the one that matters: the audit throws when
@@ -737,7 +742,14 @@ if [ "${AUDIT_POOL_CAPS:-}" = "true" ] && [ -n "${AUDIT_NETWORKS:-}" ]; then
       > "$SWEEP_DIR/$AUDIT_NET.log" 2>&1; then
       :
     else
-      SWEEP_BAD="$SWEEP_BAD $AUDIT_NET"
+      # The audit's last line says which kind of non-zero this is. A run that
+      # died before printing one - a 502 from the RPC, a scan that blew its
+      # budget, an endpoint that serves no logs at all - never got far enough
+      # to have a finding, so the absence of a verdict is itself the verdict.
+      case "$(sed -n 's/^audit-verdict: //p' "$SWEEP_DIR/$AUDIT_NET.log" | tail -1)" in
+        critical*) SWEEP_BAD="$SWEEP_BAD $AUDIT_NET" ;;
+        *)         SWEEP_BLIND="$SWEEP_BLIND $AUDIT_NET" ;;
+      esac
     fi
     cat "$SWEEP_DIR/$AUDIT_NET.log"
   done
@@ -746,25 +758,47 @@ if [ "${AUDIT_POOL_CAPS:-}" = "true" ] && [ -n "${AUDIT_NETWORKS:-}" ]; then
   log "Sweep complete"
   [ -n "$SWEEP_SKIPPED" ] && echo "   not deployed here:$SWEEP_SKIPPED"
 
-  if [ -z "$SWEEP_BAD" ]; then
+  if [ -z "$SWEEP_BAD" ] && [ -z "$SWEEP_BLIND" ]; then
     echo "   every audited chain clean"
     rm -rf "$SWEEP_DIR"
     log "Done — pool cap sweep"
     exit 0
   fi
 
-  echo "   chains with critical findings:$SWEEP_BAD"
+  [ -n "$SWEEP_BAD" ] && echo "   chains with critical findings:$SWEEP_BAD"
+  if [ -n "$SWEEP_BLIND" ]; then
+    echo "   chains this run could NOT audit:$SWEEP_BLIND"
+    echo "   (no verdict from those - they are unwatched, not clean; see their output above)"
+  fi
 
   if [ -n "${AUDIT_SLACK_WEBHOOK:-}" ]; then
     # The CRITICAL lines themselves, not a count. An alert that says "3 pools"
     # and nothing else is one somebody has to come here to act on, and the
     # addresses and owners are the whole of the action.
-    SWEEP_TEXT="$(printf 'Pool cap audit: critical findings on%s\n' "$SWEEP_BAD")"
+    if [ -n "$SWEEP_BAD" ]; then
+      SWEEP_TEXT="$(printf 'Pool cap audit: critical findings on%s\n' "$SWEEP_BAD")"
+    else
+      SWEEP_TEXT="$(printf 'Pool cap audit: no critical findings, but some chains could not be read\n')"
+    fi
     for AUDIT_NET in $SWEEP_BAD; do
       SWEEP_TEXT="$SWEEP_TEXT
 *$AUDIT_NET*
 $(grep -E 'CRITICAL|Owners who must set it' "$SWEEP_DIR/$AUDIT_NET.log" | head -20)"
     done
+    # Named, with the reason, and never folded in with the findings. A chain
+    # that could not be read is the one thing this report cannot reassure
+    # anybody about, so it says so in its own words rather than borrowing the
+    # word "critical" from a pool it never saw.
+    if [ -n "$SWEEP_BLIND" ]; then
+      SWEEP_TEXT="$SWEEP_TEXT
+
+:warning: *could not audit:*$SWEEP_BLIND
+These chains are unwatched this run, not clean."
+      for AUDIT_NET in $SWEEP_BLIND; do
+        SWEEP_TEXT="$SWEEP_TEXT
+*$AUDIT_NET* $(grep -E '^(Error|HardhatError|ProviderError|.*scan budget spent)' "$SWEEP_DIR/$AUDIT_NET.log" | head -2 | tr '\n' ' ' | cut -c1-220)"
+      done
+    fi
     # Built by jq so a pool address or an owner can never break the JSON.
     if command -v jq >/dev/null 2>&1; then
       jq -n --arg text "$SWEEP_TEXT" '{text: $text}' > "$SWEEP_DIR/slack.json"
@@ -778,9 +812,17 @@ $(grep -E 'CRITICAL|Owners who must set it' "$SWEEP_DIR/$AUDIT_NET.log" | head -
   fi
 
   rm -rf "$SWEEP_DIR"
-  # Non-zero: the scheduler's own failure notification is the second alert, and
-  # the one that still arrives if the webhook is wrong.
-  fail "pool cap audit found critical findings on$SWEEP_BAD"
+  # Non-zero either way: the scheduler's own failure notification is the second
+  # alert, and the one that still arrives if the webhook is wrong. A chain that
+  # could not be read earns it as squarely as a chain with an uncapped pool -
+  # the whole point of the job is to be able to say, and this run could not.
+  if [ -n "$SWEEP_BAD" ] && [ -n "$SWEEP_BLIND" ]; then
+    fail "pool cap audit found critical findings on$SWEEP_BAD; could not audit$SWEEP_BLIND"
+  elif [ -n "$SWEEP_BAD" ]; then
+    fail "pool cap audit found critical findings on$SWEEP_BAD"
+  else
+    fail "pool cap audit could not audit$SWEEP_BLIND"
+  fi
 fi
 
 if [ "${AUDIT_POOL_CAPS:-}" = "true" ]; then

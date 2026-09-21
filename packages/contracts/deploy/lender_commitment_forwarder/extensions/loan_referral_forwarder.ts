@@ -73,10 +73,36 @@ deployFn.dependencies = [
   'lender-commitment-forwarder:deploy',
 ]
  
+// Where the referral rail runs. Teller Pro pays referrals out of the referred
+// borrower's principal on the loan's own transaction, so a lending chain
+// missing from this list still borrows fine but pays the referrer nothing.
+// Add a chain here when Teller starts lending on it, not when the forwarder
+// happens to get deployed there.
+//
+// Not inverted to "any live network": this deployFn depends on teller-v2:deploy
+// and lender-commitment-forwarder:deploy, so on a chain with no TellerV2 it
+// would try to deploy a whole protocol -- the thing deploy-chain.sh's RUN_TAGS
+// guard exists to prevent. Inverting it needs its own PR.
+const REFERRAL_FORWARDER_NETWORKS = [
+  'mainnet',
+  'arbitrum',
+  'base',
+  'polygon',
+  'optimism',
+  'xdc',
+  'bsc',
+  'hyperevm',
+  'robinhood',
+  'arc',
+  'apechain',
+  'katana',
+  'sepolia',
+]
+
 deployFn.skip = async (hre) => {
-  
- 
-  return !hre.network.live || !['sepolia' ,   'mainnet', 'arbitrum' ].includes(hre.network.name)
+  return (
+    !hre.network.live || !REFERRAL_FORWARDER_NETWORKS.includes(hre.network.name)
+  )
 }
 
 export default deployFn

@@ -1,7 +1,7 @@
 import { DeployFunction } from 'hardhat-deploy/dist/types'
 
 
-import { get_ecosystem_contract_address } from "../../../helpers/ecosystem-contracts-lookup" 
+import { get_ecosystem_contract_address, get_swap_rollover_weth9_address } from "../../../helpers/ecosystem-contracts-lookup"
 
 /*
 const uniswapV3Factory: { [networkName: string]: string } = {
@@ -30,7 +30,11 @@ const deployFn: DeployFunction = async (hre) => {
 
  let uniswapV3FactoryAddress =  get_ecosystem_contract_address( hre.network.name, "uniswapV3Factory" ) ;
    
-   let weth9Address =  get_ecosystem_contract_address( hre.network.name, "weth9" ) ;
+   // Not the chain's swap-path weth9. PeripheryPayments.pay() wraps native coin
+   // whenever the token it is paying out equals WETH9, which is wrong on a
+   // chain whose "wrapped native" is the native coin's own ERC-20 - see the
+   // helper for what that cost on Arc.
+   let weth9Address =  get_swap_rollover_weth9_address( hre.network.name ) ;
      
 
 const networksWithUniswap: string[] = Object.keys(uniswapV3FactoryAddress)

@@ -3480,6 +3480,16 @@
         "types": {},
         "namespaces": {}
       }
+    },
+    "883e53183567ba8bfea460da2a6a8682384d0e25710c0ad2b52c66904b19c5a9": {
+      "address": "0xF2CeB106984f2636158B91Fc4e9Dc59a33Ed0f22",
+      "txHash": "0xfc0d25143c80c5cf30907c82b8cd3ba473377fddf1f20d3f120531708b126805",
+      "layout": {
+        "solcVersion": "0.8.11",
+        "storage": [],
+        "types": {},
+        "namespaces": {}
+      }
     }
   }
 }

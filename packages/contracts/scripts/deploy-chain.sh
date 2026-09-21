@@ -50,6 +50,13 @@
 #   BOOTSTRAP_MARKETS=true  create the markets and lender pools for an already
 #                           deployed chain and stop. A full run does this on
 #                           its own; this is for re-running it alone.
+#   ALLOW_UNRECORDED_BOOTSTRAP=true
+#                           run BOOTSTRAP_MARKETS with PUSH_ARTIFACTS off. Only
+#                           when you will commit market-bootstrap.json yourself
+#                           AND repin CONTRACTS_REF to that commit: a later run
+#                           against a checkout without the entry deploys the
+#                           pool a second time, which is how robinhood ended up
+#                           with two short:STRATEGY pools.
 #   BOOTSTRAP_DRY_RUN=true  with BOOTSTRAP_MARKETS, print the plan and send
 #                           nothing.
 #   REPLACE_POOLS=<keys>    with BOOTSTRAP_MARKETS, comma-separated receipt keys
@@ -561,6 +568,26 @@ if [ "${BOOTSTRAP_MARKETS:-}" = "true" ]; then
   # Before the first transaction, not after the last one. The receipt is the
   # only thing that stops a re-run creating a second set of markets, so a run
   # that cannot push it is worse than one that never started.
+  #
+  # And that is not a figure of speech: robinhood got a second short:STRATEGY
+  # pool this way. The receipt entry existed - it had been committed by hand,
+  # because prepare_artifact_push was refusing the run - but the container was
+  # pinned to a commit from before that commit, so its checkout had a receipt
+  # with no STRATEGY in it. A redeploy nobody asked for re-ran this branch with
+  # PUSH_ARTIFACTS cleared, found no entry, and dutifully deployed a duplicate.
+  #
+  # Clearing PUSH_ARTIFACTS to get past a push problem is therefore not a
+  # workaround, it is disabling the only thing that makes this branch
+  # idempotent. It still has to be possible - the push can be broken for
+  # reasons that have nothing to do with this chain - but it has to be said out
+  # loud, per run, rather than inherited from whatever the service was last
+  # set to.
+  if [ "${BOOTSTRAP_DRY_RUN:-}" != "true" ] && \
+     [ "${PUSH_ARTIFACTS:-}" != "true" ] && \
+     [ "${ALLOW_UNRECORDED_BOOTSTRAP:-}" != "true" ]; then
+    fail "BOOTSTRAP_MARKETS without PUSH_ARTIFACTS=true would create pools and record them nowhere, and the receipt is the only thing that stops the next run creating them again. Set PUSH_ARTIFACTS=true, or ALLOW_UNRECORDED_BOOTSTRAP=true if you have a way to commit deployments/$NETWORK/market-bootstrap.json yourself - and if you do, repin CONTRACTS_REF to that commit before this branch runs again."
+  fi
+
   prepare_artifact_push
 
   log "Deployer preflight on $NETWORK"

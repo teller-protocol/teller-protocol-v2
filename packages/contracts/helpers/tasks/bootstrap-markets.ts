@@ -43,7 +43,19 @@ interface BootstrapReceipt {
    */
   retiredPools?: Record<
     string,
-    Array<{ address: string; txHash: string; retiredAt: string }>
+    Array<{
+      address: string
+      txHash: string
+      retiredAt: string
+      /**
+       * Why this pool is not the one the key names, when "it was replaced" is
+       * not the answer. A duplicate created by a re-run against a stale
+       * receipt belongs here too: it is a pool at this key that is not the
+       * live one, which is what this list means, but it was never live and a
+       * reader should not go looking for lenders in it.
+       */
+      note?: string
+    }>
   >
 }
 

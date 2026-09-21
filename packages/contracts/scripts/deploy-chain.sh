@@ -121,6 +121,24 @@
 #                           and send nothing. Run this before pointing a pool
 #                           config at a window: one the oracle cannot answer is
 #                           a pool that cannot lend.
+#   SEED_UNIV3=true         add full-range liquidity to a Uniswap V3 pool, so
+#                           its TWAP is worth reading, and stop. Needs
+#                           SEED_POOL, SEED_AMOUNT0 and SEED_AMOUNT1. For a
+#                           token whose real market is V4: Teller reads V3 and
+#                           only V3, so the choice is seeding a V3 pool or not
+#                           lending against the token.
+#   SEED_POOL=<addr>        the Uniswap V3 pool to seed.
+#   SEED_AMOUNT0=<n>        whole tokens of the pool's token0 to add.
+#   SEED_AMOUNT1=<n>        whole tokens of its token1.
+#   SEED_POSITION_MANAGER=<addr>
+#                           override the NonfungiblePositionManager. Only
+#                           needed on a chain whose periphery this repo does
+#                           not know - it is not the canonical address
+#                           everywhere, and on Robinhood it is not even a
+#                           position manager at that address.
+#   SEED_SLIPPAGE_BPS=<n>   how far below the asked amounts the mint may
+#                           settle. Default 500.
+#   SEED_DRY_RUN=true       with SEED_UNIV3, print the plan and send nothing.
 #   SET_PRICE_CAPS=true     cap every pool in the bootstrap receipt at the
 #                           price its own oracle quotes right now.
 #   PRICE_CAPS_DRY_RUN=true with SET_PRICE_CAPS, print the caps without
@@ -552,6 +570,40 @@ if [ "${BOOTSTRAP_MARKETS:-}" = "true" ]; then
   fi
 
   log "Done — $NETWORK (markets and pools)"
+  exit 0
+fi
+
+# Liquidity into a Uniswap V3 pool, so its price is worth reading.
+#
+# The counterpart of GROW_ORACLE, and the half that is easy to skip: growing a
+# pool's observation buffer makes its TWAP readable, not honest. A pool with
+# three hundred slots and two dollars in it answers every window and answers
+# them wrong. Depth is what makes arbitrage worth doing, and arbitrage is the
+# only thing that keeps a pool tracking the asset it prices.
+if [ "${SEED_UNIV3:-}" = "true" ]; then
+  [ -n "${SEED_POOL:-}" ] || fail "SEED_UNIV3 is set but SEED_POOL is not."
+  [ -n "${SEED_AMOUNT0:-}" ] || fail \
+    "SEED_UNIV3 is set but SEED_AMOUNT0 is not. Refusing to guess a size."
+  [ -n "${SEED_AMOUNT1:-}" ] || fail \
+    "SEED_UNIV3 is set but SEED_AMOUNT1 is not. Refusing to guess a size."
+  [ -n "${DEPLOYER_MNEMONIC:-}" ] || fail "DEPLOYER_MNEMONIC is not set."
+  printf '%s' "$DEPLOYER_MNEMONIC" > mnemonic.secret
+  chmod 600 mnemonic.secret
+  trap 'rm -f mnemonic.secret' EXIT
+
+  SEED_ARGS="--pool ${SEED_POOL} --amount0 ${SEED_AMOUNT0} --amount1 ${SEED_AMOUNT1}"
+  [ -n "${SEED_POSITION_MANAGER:-}" ] && \
+    SEED_ARGS="$SEED_ARGS --position-manager ${SEED_POSITION_MANAGER}"
+  [ -n "${SEED_SLIPPAGE_BPS:-}" ] && \
+    SEED_ARGS="$SEED_ARGS --slippage-bps ${SEED_SLIPPAGE_BPS}"
+  # Same "true" comparison as every other rehearsal flag here.
+  [ "${SEED_DRY_RUN:-}" = "true" ] && SEED_ARGS="$SEED_ARGS --dry-run true"
+
+  log "Seeding ${SEED_POOL} on $NETWORK"
+  # shellcheck disable=SC2086
+  yarn hh seed-univ3-pool --network "$NETWORK" $SEED_ARGS
+
+  log "Done — $NETWORK (seed)"
   exit 0
 fi
 
@@ -1024,6 +1076,7 @@ if [ "${DEPLOY_PROTOCOL:-}" != "true" ]; then
     AUDIT_POOL_CAPS=true     report pools with no price cap (read-only, no key)
     AUDIT_NETWORKS=<names>   sweep several chains in one run, for a schedule
     GROW_ORACLE=true         grow a Uniswap V3 pool's TWAP observation buffer
+    SEED_UNIV3=true          add full-range liquidity to a Uniswap V3 pool
     SWAP_VIA_LIFI=true       swap one ERC-20 for another from the deployer
     PUBLISH_ONLY=true        publish the package (with PUBLISH_PACKAGE=true)
     DEPLOY_PROTOCOL=true     deploy the entire protocol to $NETWORK from scratch

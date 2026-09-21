@@ -190,6 +190,59 @@ const config: ChainBootstrapConfig = {
       markets: ['short'],
       note: 'Single-name equity, leveraged bitcoin proxy. Thinnest pool here and short-market only.',
     },
+    {
+      symbol: 'STRATEGY',
+      token: '0x168661C52E5922288dFb2b3f323b6Cf90eb21e18',
+      // NOT THE DEEPEST MARKET. THE ONLY LEGIBLE ONE.
+      //
+      // Every other entry in this list names the pool where its collateral
+      // actually trades. This one cannot: STRATEGY's real markets are all
+      // Uniswap V4, which UniswapPricingLibraryV2 does not read -
+      //
+      //   STRATEGY / MSTR   $666,312   bankr (V4)
+      //   STRATEGY / USDG   $50,067    uniswap-v4, 0.9%
+      //   STRATEGY / USDG   $16,487    uniswap-v4, 3.69%
+      //   STRATEGY / USDG   ~$2        uniswap-v3, 0.3%  <- this one
+      //
+      // The V3 pool named below is the last line: it exists because someone
+      // created it, and it holds what they left in it. A price read from it
+      // is not the market's price - it was 7.3% above the V4 market when this
+      // entry was written, and nothing had arbitraged it back, because
+      // arbitraging two dollars is not worth anyone's time.
+      //
+      // So this entry is deliberately inert until that pool is seeded. A
+      // lending pool built on an oracle this thin does not merely invite
+      // manipulation; it fails to *track*, which is the worse failure - the
+      // cap below clips a price pushed up, and nothing clips a price that
+      // simply stopped following the asset down.
+      pool: '0x565c8e3a69b5aB39e2C15A1De90164123702a89f',
+      poolFee: 3000,
+      // Read off the pool: token0 is STRATEGY at 18 decimals, token1 is USDG
+      // at 6.
+      token0Decimals: 18,
+      token1Decimals: 6,
+      // USDG is token1 of this pool, so the route is read token1-per-token0
+      // to yield principal per collateral.
+      zeroForOne: true,
+      // 500% collateralisation: a 20% LTV. The tightest ratio on this chain,
+      // and the reason is the oracle rather than the asset - see above.
+      collateralRatio: 50000,
+      // 30% at zero utilization to 60% at the liquidity threshold, against
+      // the chain's 3-18%.
+      //
+      // The chain default is priced for lending USDG against tokenized
+      // equities with million-dollar pools behind them. This is a memecoin-
+      // shaped token whose price Teller reads from a pool it had to be told
+      // about. The floor is what matters: utilization on a new pool sits near
+      // zero, so 30% is close to what every loan here actually pays.
+      interestRateLowerBound: 3000,
+      interestRateUpperBound: 6000,
+      // Seven days only, like MSTR and for a stronger version of the same
+      // reason: a thirty-day loan priced off an oracle this young is a bet
+      // that the oracle is still honest at maturity.
+      markets: ['short'],
+      note: 'Requested listing. 20% LTV, 7-day only, 30-60%. Priced off the only V3 pool STRATEGY has, which must be seeded before this is deployed - its real markets are all V4.',
+    },
   ],
 
   // Inverse pools: USDG is posted, the asset is drawn. See InversePoolConfig.

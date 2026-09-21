@@ -165,7 +165,7 @@ const isTransient = (err: unknown): boolean => {
   // the same window.
   if (isRangeShaped(message)) return false
   if (
-    /rate.?limit|429|too many requests|timeout|timed out|ECONNRESET|ETIMEDOUT|socket hang up|SERVER_ERROR|bad response|network error|fetch failed|502|503|504|bad gateway|service unavailable/i.test(
+    /rate.?limit|429|too many requests|timeout|timed out|ECONNRESET|ETIMEDOUT|socket hang up|SERVER_ERROR|bad response|network error|fetch failed|bad gateway|service unavailable|gateway time-?out/i.test(
       message
     )
   ) {
@@ -177,7 +177,13 @@ const isTransient = (err: unknown): boolean => {
   // how the scan that should have paused instead halved its window eighteen
   // times, from 500000 down to 1, and then gave up on a chain it had not
   // managed to read a single block of.
-  return /limit exceeded|exceeds? [^.]*(quota|credit|capacity)/i.test(message)
+  // "block range limit exceeded" never reaches here - isRangeShaped above
+  // short-circuits it - so a remaining "limit exceeded" is an allowance, not a
+  // width. Past tense and an allowance word both required, so a contract that
+  // reverts with "exceeds capacity" stays an answer rather than a fault.
+  return /\blimit exceeded\b|\b(quota|capacity|credits?|compute units?)\b[^.]{0,40}\bexceeded\b|\bexceeded\b[^.]{0,60}\b(quota|capacity|credits?|compute units?)\b/i.test(
+    message
+  )
 }
 
 /**
@@ -598,6 +604,14 @@ task(
             degraded: degraded || null,
             unreadable: unreadable.length,
             blind,
+            // The same fact the table's `audit-verdict:` line carries, so a
+            // caller reading either form can tell an uncapped pool from a
+            // chain nobody could read without re-deriving it from severities.
+            verdict: blind
+              ? 'unreadable'
+              : critical.length > 0
+                ? 'critical'
+                : 'clean',
             findings,
           },
           null,

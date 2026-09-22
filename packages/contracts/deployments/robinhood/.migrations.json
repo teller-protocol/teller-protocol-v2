@@ -23,5 +23,6 @@
   "validate-deployments": 1789464120,
   "default-proxy-admin:transfer": 1789464120,
   "lender-commitment-forwarder:deploy": 1789993859,
-  "lender-commitment-forwarder:extensions:loan-referral-forwarder-v2:deploy": 1789993860
+  "lender-commitment-forwarder:extensions:loan-referral-forwarder-v2:deploy": 1789993860,
+  "protocol:transfer-timelock-ownership": 1790012191
 }

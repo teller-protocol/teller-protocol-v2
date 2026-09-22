@@ -27,5 +27,6 @@
   "lender-commitment-forwarder:extensions:borrow-swap:rebind-quoter": 1789811385,
   "lender-commitment-forwarder:extensions:loan-referral-forwarder-v2:deploy": 1789989318,
   "lender-commitment-forwarder:extensions:flash-swap-rollover:weth9-upgrade-arc": 1790007076,
-  "default-proxy-admin:transfer": 1790010192
+  "default-proxy-admin:transfer": 1790010192,
+  "protocol:transfer-timelock-ownership": 1790011094
 }

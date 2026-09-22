@@ -11,6 +11,11 @@
       "marketId": "2",
       "owner": "0x8cfd836B4FCD05414f63523BC02f24bda992aa20",
       "txHash": "0xbe9d7077e1f8516b491c34c7819b8fc9a7c656db91630c482de9d4ca506e61a3"
+    },
+    "offers": {
+      "marketId": "3",
+      "owner": "0x8cfd836B4FCD05414f63523BC02f24bda992aa20",
+      "txHash": "0x9ef2d092d91af8dec102204f037b1a49069759610f3f4662809c80da577e4832"
     }
   },
   "pools": {

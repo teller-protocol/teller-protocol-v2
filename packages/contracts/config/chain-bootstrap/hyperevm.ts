@@ -6,14 +6,19 @@ import { ChainBootstrapConfig } from './types'
  * Everything else in this directory brings a chain online: it creates the
  * markets, then a pool per collateral. HyperEVM has been live for months with
  * fourteen pools on market 2, none of them created from this repo. So this
- * config exists to add hyperRAM to that market and nothing else, and the
+ * config started out adding hyperRAM to that market and nothing else, and the
  * receipt at deployments/hyperevm/market-bootstrap.json is pre-seeded with the
- * market that already exists so no fourth one is created.
+ * market that already exists so no duplicate of it is created.
  *
- * The consequence worth stating: every number under `markets` below describes
- * market 2 as it already is, read off chain. They are not applied - a market
- * already in the receipt is skipped - so if they are ever edited, the edit
- * changes nothing on chain and makes this file wrong.
+ * It now also creates one market: a seven-day offers market, because the
+ * chain has none and the thirty-day one it does have cannot carry a
+ * seven-day loan. See the `shortOffers` entry for why.
+ *
+ * The consequence worth stating: the numbers under `markets` below for `long`
+ * describe market 2 as it already is, read off chain. They are not applied - a
+ * market already in the receipt is skipped - so if they are ever edited, the
+ * edit changes nothing on chain and makes this file wrong. `shortOffers` is
+ * the exception: it does not exist yet, so its numbers are real.
  *
  * ## hyperRAM
  *
@@ -93,10 +98,11 @@ const config: ChainBootstrapConfig = {
 
   liquidityThresholdPercent: 8000,
 
-  // Market 2, which exists. Every field here is a description of it, read on
-  // chain, and none of them are applied - see the note at the top of the file.
-  // Its marketplace fee is 200 (2%), not the MARKET_FEE_PERCENT this directory
-  // uses for markets it creates.
+  // Two entries, and they are not the same kind of thing. `long` is market 2,
+  // which exists: every field on it is a description read on chain and none of
+  // them are applied - see the note at the top of the file. Its marketplace fee
+  // is 200 (2%), not the MARKET_FEE_PERCENT this directory uses. `shortOffers`
+  // does not exist and will be created, at that MARKET_FEE_PERCENT.
   markets: [
     {
       key: 'long',
@@ -104,6 +110,48 @@ const config: ChainBootstrapConfig = {
       durationSeconds: 30 * 24 * 60 * 60,
       paymentDefaultDuration: 5 * 60,
       bidExpirationTime: 7 * 24 * 60 * 60,
+    },
+    {
+      // The one market in this file that does not already exist, and the
+      // only entry here whose numbers are applied rather than describing
+      // something read off chain.
+      //
+      // HyperEVM has exactly one market that trusts
+      // LenderCommitmentForwarderAlpha - market 3, created outside this
+      // repo - and its payment cycle is thirty days. That is a problem
+      // specific to EMI markets: TellerV2 sizes payments through
+      // V2Calculations, which for EMI lands in NumbersLib.pmt, and pmt
+      // opens with
+      //
+      //     require(loanDuration >= cycleDuration)
+      //
+      // So a seven-day lending offer published into market 3 cannot be
+      // drawn at all. It publishes, sits in the book looking entirely
+      // normal, and reverts for every borrower who tries. Teller Pro's
+      // on-demand lending wants a seven-day term everywhere, and on this
+      // chain it has been forced back to thirty for exactly this reason.
+      //
+      // A market of its own is the only way to fix it. The forwarder slot
+      // holds one address, so granting Alpha on market 1 (the seven-day
+      // pools market) would not add offers, it would take that market's
+      // pools off line - the same trap Arc hit, and why Base runs offers
+      // on 22 and pools on 18.
+      //
+      // Worth noting that this task creates Bullet markets, so the pmt
+      // floor above does not apply to what it makes: a Bullet loan is one
+      // payment at the end, priced off the cycle rather than divided by
+      // it, and never reaches pmt. The seven-day cycle here is what the
+      // term should be, not a constraint being worked around.
+      key: 'shortOffers',
+      label: '7 Day Offers',
+      purpose: 'offers',
+      durationSeconds: 7 * 24 * 60 * 60,
+      // Matching market 2's grace period, which is this chain's own.
+      paymentDefaultDuration: 5 * 60,
+      // A day, as on Arc's offers market. An offer carries its own expiry;
+      // this governs unaccepted bids, and a short one keeps the book from
+      // filling with stale ones.
+      bidExpirationTime: 24 * 60 * 60,
     },
   ],
 

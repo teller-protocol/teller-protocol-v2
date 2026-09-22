@@ -323,7 +323,12 @@ task(
     // a working market off line.
     for (const market of config.markets) {
       const created = receipt.markets[market.key]
-      if (!created) continue
+      // A market the run has not created. On a real run that means an earlier
+      // step failed and there is nothing to grant yet. On a dry run it is the
+      // normal case for every new market, and skipping quietly would leave the
+      // grant — the step this whole task turns on — absent from the plan the
+      // dry run exists to show.
+      if (!created && !args.dryRun) continue
       const purpose = purposeOf(market)
       const forwarder = forwarders[purpose]
       if (!forwarder) {
@@ -332,16 +337,18 @@ task(
             `deployed on this network`
         )
       }
-      const trusted = await tellerV2.isTrustedMarketForwarder(
-        created.marketId,
-        forwarder
-      )
+      // Only a market that exists can be asked whether it already trusts one.
+      const trusted = created
+        ? await tellerV2.isTrustedMarketForwarder(created.marketId, forwarder)
+        : false
       if (trusted) continue
       console.log(
-        `\n  trusting the ${purpose} forwarder for market ${created.marketId}`
+        `\n  trusting the ${purpose} forwarder for market ${
+          created?.marketId ?? '<pending>'
+        }`
       )
       console.log(`    forwarder        ${forwarder}`)
-      if (args.dryRun) continue
+      if (args.dryRun || !created) continue
       const trustTx = await tellerV2.setTrustedMarketForwarder(
         created.marketId,
         forwarder

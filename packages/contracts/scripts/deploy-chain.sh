@@ -179,6 +179,16 @@
 #   PAYMENT_DEFAULT_DRY_RUN=true
 #                           with SET_PAYMENT_DEFAULT, print before/after and
 #                           send nothing.
+#   SET_MARKET_FEE_RECIPIENT=true
+#                           point markets' marketplace fee at a new address.
+#                           Needs MARKET_FEE_RECIPIENT and MARKET_FEE_MARKETS.
+#   MARKET_FEE_RECIPIENT=<address>
+#                           where the fee goes from now on.
+#   MARKET_FEE_MARKETS=<ids>
+#                           comma-separated market ids. Required: never swept
+#                           across every market by default.
+#   MARKET_FEE_DRY_RUN=true with SET_MARKET_FEE_RECIPIENT, print before/after
+#                           and send nothing.
 #   SWAP_VIA_LIFI=true      swap one ERC-20 for another from the deployer,
 #                           routed by LI.FI, and stop. Needs SWAP_FROM, SWAP_TO
 #                           and SWAP_AMOUNT. For funding a pool whose principal
@@ -748,6 +758,38 @@ if [ "${SET_PAYMENT_DEFAULT:-}" = "true" ]; then
   exit 0
 fi
 
+# Point a market's marketplace fee somewhere other than its owner.
+#
+# A market with no fee recipient pays its owner, and every market the bootstrap
+# creates is owned by the deployer - so without this the fee on every loan lands
+# in a burner key. Market ids are required rather than defaulting to the whole
+# registry: redirecting fees is a decision about specific markets.
+if [ "${SET_MARKET_FEE_RECIPIENT:-}" = "true" ]; then
+  [ -d "deployments/$NETWORK" ] || fail \
+    "SET_MARKET_FEE_RECIPIENT needs deployments/$NETWORK in this checkout."
+  [ -n "${MARKET_FEE_RECIPIENT:-}" ] || fail \
+    "SET_MARKET_FEE_RECIPIENT is set but MARKET_FEE_RECIPIENT is not."
+  [ -n "${MARKET_FEE_MARKETS:-}" ] || fail \
+    "SET_MARKET_FEE_RECIPIENT is set but MARKET_FEE_MARKETS is not. Name the markets."
+  [ -n "${DEPLOYER_MNEMONIC:-}" ] || fail "DEPLOYER_MNEMONIC is not set."
+  printf '%s' "$DEPLOYER_MNEMONIC" > mnemonic.secret
+  chmod 600 mnemonic.secret
+  trap 'rm -f mnemonic.secret' EXIT
+
+  if [ "${MARKET_FEE_DRY_RUN:-}" = "true" ]; then
+    log "Set market fee recipient on $NETWORK markets ${MARKET_FEE_MARKETS} to ${MARKET_FEE_RECIPIENT} (dry run — nothing will be sent)"
+    yarn hh set-market-fee-recipient --network "$NETWORK" \
+      --recipient "$MARKET_FEE_RECIPIENT" --markets "$MARKET_FEE_MARKETS" --dry-run true
+  else
+    log "Set market fee recipient on $NETWORK markets ${MARKET_FEE_MARKETS} to ${MARKET_FEE_RECIPIENT}"
+    yarn hh set-market-fee-recipient --network "$NETWORK" \
+      --recipient "$MARKET_FEE_RECIPIENT" --markets "$MARKET_FEE_MARKETS"
+  fi
+
+  log "Done — $NETWORK (market fee recipient)"
+  exit 0
+fi
+
 # Make a Uniswap V3 pool's TWAP readable.
 #
 # A pool priced off a TWAP needs its oracle pool to hold observations spanning
@@ -1168,6 +1210,7 @@ if [ "${DEPLOY_PROTOCOL:-}" != "true" ]; then
 
     BOOTSTRAP_MARKETS=true   create this chain's markets and lender pools
     SET_PRICE_CAPS=true      cap existing pools at their current oracle price
+    SET_MARKET_FEE_RECIPIENT=true  send a market's fee to a new address
     RUN_TAGS=<tags>          run named deploy tags against a deployed chain
     VERIFY_ONLY=true         verify already-deployed contracts
     REDEEM_POOL=true         take the deployer's own deposit back out of a pool

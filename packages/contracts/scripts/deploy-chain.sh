@@ -125,8 +125,15 @@
 #                           the option existed.
 #   AUDIT_SLACK_WEBHOOK=<url>
 #                           with AUDIT_NETWORKS, post to Slack when a sweep finds
-#                           anything critical. Silent otherwise: a monitor that
-#                           speaks every run is one nobody reads.
+#                           anything new: an uncapped pool not posted before
+#                           (whoever owns it), or a chain it could not read.
+#                           Pools already posted are only counted. Silent
+#                           otherwise: a monitor that speaks every run is one
+#                           nobody reads.
+#   AUDIT_STATE_DIR=<dir>   where the sweep remembers which uncapped pools it
+#                           has already posted. Must outlive the container - a
+#                           Railway volume. Unset, every run treats every
+#                           uncapped pool as new.
 #   GROW_ORACLE=true        grow a Uniswap V3 pool's observation buffer so a
 #                           TWAP can be read from it, and stop. Permissionless -
 #                           increaseObservationCardinalityNext is callable by
@@ -923,6 +930,65 @@ if [ "${AUDIT_POOL_CAPS:-}" = "true" ] && [ -n "${AUDIT_NETWORKS:-}" ]; then
     cat "$SWEEP_DIR/$AUDIT_NET.log"
   done
 
+  # Which uncapped pools this run has not posted before. Every run finds the
+  # same forty-odd pools on the same six chains, most of them other people's,
+  # and a post that repeats them nightly is one nobody reads by the third night.
+  # So the post names a pool once - the first run it is seen uncapped, whoever
+  # owns it - and after that it is only counted.
+  #
+  # "Seen" is a file under AUDIT_STATE_DIR, which on Railway is a volume: the
+  # container is thrown away after every run. One line per pool,
+  # "<network> <pool>", rewritten each run to exactly the pools uncapped now, so
+  # a pool that gets capped and later loses its cap is new again. A chain this
+  # run could not read keeps its previous lines - not reading a chain is not
+  # evidence its pools were capped.
+  SWEEP_NOW="$SWEEP_DIR/uncapped.now"
+  : > "$SWEEP_NOW"
+  for AUDIT_NET in $(echo "$AUDIT_NETWORKS" | tr ',' ' '); do
+    [ -f "$SWEEP_DIR/$AUDIT_NET.log" ] || continue
+    case " $SWEEP_BLIND " in *" $AUDIT_NET "*) continue ;; esac
+    # "CRITICAL <pool> <pair> avail= <amount> <symbol>", then "owner <addr>".
+    # Written as "<network> <pool> <pair> <amount> <symbol> <owner>".
+    awk -v net="$AUDIT_NET" '
+      $1 == "CRITICAL" {
+        pool = $2; pair = $3; line = $0
+        sub(/.*avail= */, "", line)
+        amount = line; next
+      }
+      pool != "" && $1 == "owner" {
+        print net, pool, pair, amount, $2
+        pool = ""
+      }
+    ' "$SWEEP_DIR/$AUDIT_NET.log" >> "$SWEEP_NOW"
+  done
+  SWEEP_SEEN_FILE=""
+  SWEEP_FIRST_RUN=""
+  if [ -n "${AUDIT_STATE_DIR:-}" ]; then
+    mkdir -p "$AUDIT_STATE_DIR"
+    SWEEP_SEEN_FILE="$AUDIT_STATE_DIR/pool-cap-audit-seen.txt"
+    [ -f "$SWEEP_SEEN_FILE" ] || SWEEP_FIRST_RUN=true
+  fi
+  SWEEP_NEW="$SWEEP_DIR/uncapped.new"
+  if [ -n "$SWEEP_SEEN_FILE" ] && [ -f "$SWEEP_SEEN_FILE" ]; then
+    awk 'NR == FNR { seen[$1 " " $2] = 1; next } !(($1 " " $2) in seen)' \
+      "$SWEEP_SEEN_FILE" "$SWEEP_NOW" > "$SWEEP_NEW"
+  else
+    cp "$SWEEP_NOW" "$SWEEP_NEW"
+  fi
+  SWEEP_UNCAPPED_COUNT="$(wc -l < "$SWEEP_NOW" | tr -d ' ')"
+  SWEEP_UNCAPPED_CHAINS="$(awk '{ print $1 }' "$SWEEP_NOW" | sort -u | wc -l | tr -d ' ')"
+  SWEEP_NEW_COUNT="$(wc -l < "$SWEEP_NEW" | tr -d ' ')"
+  if [ -n "$SWEEP_SEEN_FILE" ]; then
+    {
+      awk '{ print $1, $2 }' "$SWEEP_NOW"
+      if [ -f "$SWEEP_SEEN_FILE" ]; then
+        for AUDIT_NET in $SWEEP_BLIND; do
+          awk -v net="$AUDIT_NET" '$1 == net' "$SWEEP_SEEN_FILE"
+        done
+      fi
+    } | sort -u > "$SWEEP_SEEN_FILE.tmp" && mv "$SWEEP_SEEN_FILE.tmp" "$SWEEP_SEEN_FILE"
+  fi
+
   echo
   log "Sweep complete"
   [ -n "$SWEEP_SKIPPED" ] && echo "   not deployed here:$SWEEP_SKIPPED"
@@ -943,51 +1009,38 @@ if [ "${AUDIT_POOL_CAPS:-}" = "true" ] && [ -n "${AUDIT_NETWORKS:-}" ]; then
   fi
 
   if [ -n "${AUDIT_SLACK_WEBHOOK:-}" ]; then
-    # The CRITICAL lines themselves, not a count. An alert that says "3 pools"
-    # and nothing else is one somebody has to come here to act on, and the
-    # addresses and owners are the whole of the action.
-    if [ -n "$SWEEP_BAD" ]; then
-      SWEEP_TEXT="$(printf 'Pool cap audit: critical findings on%s\n' "$SWEEP_BAD")"
-    elif [ -n "$SWEEP_BLIND" ]; then
-      SWEEP_TEXT="$(printf 'Pool cap audit: no critical findings, but some chains could not be read\n')"
-    else
-      SWEEP_TEXT="$(printf 'Pool cap audit: nothing of ours uncapped\n')"
+    # Posts only when there is something the channel has not already been told:
+    # an uncapped pool it has never seen, or a chain this run could not read.
+    # Everything already posted is folded into one line of totals. On the first
+    # run with a state file there is nothing to compare against, and dumping
+    # every pool the channel has been reading nightly for weeks would be the
+    # exact noise this exists to stop - so that run records the baseline and
+    # posts the totals alone.
+    SWEEP_STAT="$SWEEP_UNCAPPED_COUNT uncapped pool(s) across $SWEEP_UNCAPPED_CHAINS chain(s)"
+    [ -n "$SWEEP_BAD" ] && SWEEP_STAT="$SWEEP_STAT, ours on:$SWEEP_BAD"
+    SWEEP_TEXT=""
+    if [ -n "$SWEEP_FIRST_RUN" ]; then
+      SWEEP_TEXT="Pool cap audit: $SWEEP_STAT. Baseline recorded - from now on only newly uncapped pools are posted."
+    elif [ "$SWEEP_NEW_COUNT" -gt 0 ]; then
+      SWEEP_TEXT="Pool cap audit: $SWEEP_NEW_COUNT newly uncapped pool(s)
+$(awk '{ printf "*%s* %s %s avail %s %s - owner %s\n", $1, $2, $3, $4, $5, $6 }' "$SWEEP_NEW" | head -20)
+Total: $SWEEP_STAT."
     fi
-    for AUDIT_NET in $SWEEP_BAD; do
-      SWEEP_TEXT="$SWEEP_TEXT
-*$AUDIT_NET*
-$(grep -E 'CRITICAL|Owners who must set it' "$SWEEP_DIR/$AUDIT_NET.log" | head -20)"
-    done
-    # Other people's uncapped pools, under their own heading. The money in them
-    # is real and the addresses are the whole of the action for whoever owns
-    # them, so they go in the post - just not as something we failed to do.
-    if [ -n "$SWEEP_EXTERNAL" ]; then
-      SWEEP_TEXT="$SWEEP_TEXT
-
-:information_source: *uncapped, owned by others:*$SWEEP_EXTERNAL
-Not ours to sign; listed so the owners can be told."
-      for AUDIT_NET in $SWEEP_EXTERNAL; do
-        SWEEP_TEXT="$SWEEP_TEXT
-*$AUDIT_NET*
-$(grep -E 'belong to someone else' "$SWEEP_DIR/$AUDIT_NET.log" | head -3)"
-      done
-    fi
-    # Named, with the reason, and never folded in with the findings. A chain
-    # that could not be read is the one thing this report cannot reassure
-    # anybody about, so it says so in its own words rather than borrowing the
-    # word "critical" from a pool it never saw.
+    # A chain that could not be read is the one thing this report cannot
+    # reassure anybody about, so it is always said - one line, with the reason.
     if [ -n "$SWEEP_BLIND" ]; then
+      [ -n "$SWEEP_TEXT" ] || SWEEP_TEXT="Pool cap audit: no new uncapped pools. Total: $SWEEP_STAT."
       SWEEP_TEXT="$SWEEP_TEXT
-
-:warning: *could not audit:*$SWEEP_BLIND
-These chains are unwatched this run, not clean."
+:warning: could not audit:$SWEEP_BLIND (unwatched this run, not clean)"
       for AUDIT_NET in $SWEEP_BLIND; do
         SWEEP_TEXT="$SWEEP_TEXT
-*$AUDIT_NET* $(grep -E '^(Error|HardhatError|ProviderError|.*scan budget spent)' "$SWEEP_DIR/$AUDIT_NET.log" | head -2 | tr '\n' ' ' | cut -c1-220)"
+*$AUDIT_NET* $(grep -E '^(Error|HardhatError|ProviderError|.*scan budget spent)' "$SWEEP_DIR/$AUDIT_NET.log" | head -1 | cut -c1-160)"
       done
     fi
+    if [ -z "$SWEEP_TEXT" ]; then
+      echo "   nothing new since the last post; Slack skipped ($SWEEP_STAT)"
     # Built by jq so a pool address or an owner can never break the JSON.
-    if command -v jq >/dev/null 2>&1; then
+    elif command -v jq >/dev/null 2>&1; then
       jq -n --arg text "$SWEEP_TEXT" '{text: $text}' > "$SWEEP_DIR/slack.json"
       curl -sS -X POST -H 'Content-Type: application/json' \
         --data @"$SWEEP_DIR/slack.json" "$AUDIT_SLACK_WEBHOOK" >/dev/null \

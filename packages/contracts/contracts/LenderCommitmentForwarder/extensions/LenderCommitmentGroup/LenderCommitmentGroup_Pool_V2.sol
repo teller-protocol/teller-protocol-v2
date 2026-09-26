@@ -150,7 +150,7 @@ contract LenderCommitmentGroup_Pool_V2 is
     int256 tokenDifferenceFromLiquidations;
 
     bool private firstDepositMade_deprecated;  // no longer used
-    uint256 public withdrawDelayTimeSeconds; // immutable for now - use withdrawDelayBypassForAccount
+    uint256 public withdrawDelayTimeSeconds; // set by protocol owner via setWithdrawDelayTime
 
     IUniswapPricingLibrary.PoolRouteConfig[]  public  poolOracleRoutes;
 
@@ -1147,7 +1147,19 @@ contract LenderCommitmentGroup_Pool_V2 is
     onlyProtocolOwner {
         
         withdrawDelayBypassForAccount[_addr] = _bypass;
-       
+
+    }
+
+    /**
+     * @notice Sets the delay time for withdrawing shares. Only Protocol Owner.
+     * @param _seconds Delay time in seconds. Max 30 days.
+     */
+    function setWithdrawDelayTime(uint256 _seconds)
+    external
+    onlyProtocolOwner {
+        require( _seconds <= 30 days , "WD");
+
+        withdrawDelayTimeSeconds = _seconds;
     }
     
 

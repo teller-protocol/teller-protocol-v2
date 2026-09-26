@@ -23,24 +23,26 @@ Borrowers (and developers building DApps for users) can submit bids by calling:
 /**
 * @notice Function for a borrower to create a bid for a loan.
 * @param _lendingToken The lending token asset requested to be borrowed.
+* @param _marketplaceId The market the bid is submitted to.
 * @param _principal The principal amount of the loan bid.
 * @param _duration The length of time, in seconds, the loan will remain active.
-* @param _APY The proposed interest rate for the loan bid.
-* @param _paymentCycle The recurrent length of time before which a payment is due.
+* @param _APR The proposed annual percentage rate for the loan bid (basis points, 10000 = 100%).
 * @param _metadataURI The URI for additional borrower loan information as part of loan bid.
+* @param _receiver Address that receives borrowed funds if the bid is accepted.
 */
 function submitBid(
   address _lendingToken,
   uint256 _marketplaceId,
   uint256 _principal,
   uint32 _duration,
-  uint16 _APY,
-  uint32 _paymentCycle,
-  bytes32 _metadataURI,
+  uint16 _APR,
+  string calldata _metadataURI,
   address _receiver
-);
-``` 
-The _metadataURI submitted by a borrower along with the proposed loan terms (_APY, _principal, _lendingToken, etc), needs to correspond with the metadata required by the market. Depending on the market, this could be in the form of a verified credit report from the relative credit bureau, identity, or other relevant data.
+) public returns (uint256 bidId_);
+```
+Payment cadence for the loan comes from the market settings (`paymentCycleDuration` / `paymentCycleType` on the market), not from `submitBid`. There is also an overload of `submitBid` that accepts collateral upfront as `Collateral[] calldata _collateralInfo`.
+
+The _metadataURI submitted by a borrower along with the proposed loan terms (_APR, _principal, _lendingToken, etc), needs to correspond with the metadata required by the market. Depending on the market, this could be in the form of a verified credit report from the relative credit bureau, identity, or other relevant data.
 
 Lenders (and developers building DApps for users) can accept bids by calling:
 ```solidity

@@ -1,0 +1,55 @@
+{
+  "description": "LenderCommitmentGroup_Pool_V2 with MAX_WITHDRAW_DELAY_TIME = 2592000 (30 days); otherwise identical to the live implementation",
+  "chainId": 8453,
+  "contractName": "LenderCommitmentGroup_Pool_V2",
+  "sourcePath": "contracts/LenderCommitmentForwarder/extensions/LenderCommitmentGroup/LenderCommitmentGroup_Pool_V2.sol",
+  "compilerVersion": "v0.8.11+commit.d7f03943",
+  "beacon": "0x7848585b707F54CcF7044F8C82CF53F43100dc83",
+  "currentImplementation": "0xd177f4b8e348B4C56c2aC8E03b58E41b79351a7f",
+  "timelock": "0x6BBf498C429C51d05bcA3fC67D2C720B15FC73B8",
+  "protocolOwner": "0x2f74c448CF6d613bEE183fE35dB0c9AC5084F66A",
+  "constructorArgs": {
+    "TELLER_V2": "0x5cfD3aeD08a444Be32839bD911Ebecd688861164",
+    "SMART_COMMITMENT_FORWARDER": "0x0708480670BdE591e275B06Cd19EcaDFC93A1f16",
+    "UNISWAP_V3_FACTORY": "0x33128a8fC17869897dcE68Ed026d694621f6FDfD",
+    "UNISWAP_PRICING_HELPER": "0xAd0fD5947877382E493e17Fb37303D94c4A1deEF"
+  },
+  "expectedImmutables": {
+    "MAX_WITHDRAW_DELAY_TIME": "2592000",
+    "DEFAULT_WITHDRAW_DELAY_TIME_SECONDS": "300"
+  },
+  "lockImplementation": {
+    "initialize": {
+      "principalTokenAddress": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "collateralTokenAddress": "0xA4A2E2ca3fBfE21aed83471D28b6f65A233C6e00",
+      "marketId": "14",
+      "maxLoanDuration": "86400",
+      "interestRateLowerBound": "0",
+      "interestRateUpperBound": "0",
+      "liquidityThresholdPercent": "0",
+      "collateralRatio": "0",
+      "poolOracleRoutes": [
+        {
+          "pool": "0xb08a32FB67F910fCFE5Dc9561a6EA4A159BD9908",
+          "zeroForOne": false,
+          "twapInterval": "5",
+          "token0Decimals": "6",
+          "token1Decimals": "18"
+        }
+      ]
+    },
+    "transferOwnershipTo": "0x2f74c448CF6d613bEE183fE35dB0c9AC5084F66A"
+  },
+  "afterUpgrade": [
+    {
+      "label": "Set the Base USDC pool's withdraw delay to 30 days less one second (the check is a strict <)",
+      "to": "0x13cd7cf42ccbaca8cd97e7f09572b6ea0de1097b",
+      "signature": "function setWithdrawDelayTime(uint256 _seconds)",
+      "args": ["2591999"],
+      "read": {
+        "signature": "function withdrawDelayTimeSeconds() view returns (uint256)",
+        "expect": "2591999"
+      }
+    }
+  ]
+}

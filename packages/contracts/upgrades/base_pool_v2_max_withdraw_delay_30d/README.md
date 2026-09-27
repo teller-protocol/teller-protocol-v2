@@ -55,14 +55,21 @@ the unmodified build in two places only:
    0xf2fde38b0000000000000000000000002f74c448cf6d613bee183fe35db0c9ac5084f66a
    ```
    If `initialize` reverts with "Initializable: contract is already initialized", someone got there first. Deploy again rather than upgrading the beacon to that one.
-2. **Point the beacon at it.** From the beacon owner `0x6BBf…73B8`, call `upgradeTo(NEW_IMPL)` on `0x7848585b…dc83`:
-   ```
-   0x3659cfe6000000000000000000000000<NEW_IMPL without 0x, lowercase>
-   ```
+2. **Point the beacon at it.** The beacon's owner `0x6BBf…73B8` is the protocol TimelockController (min delay 7200s), so the protocol Safe `0x2f74…f66a` schedules `upgradeTo(NEW_IMPL)` on it, then executes it once the delay has passed. The deployer mode (`DEPLOY_POOL_V2_IMPL` in `scripts/deploy-chain.sh`) writes both as Safe Transaction Builder files.
+
    This upgrades **every** V2 pool that uses this beacon. Other pools keep their current `withdrawDelayTimeSeconds`; only the maximum they may be set to changes.
 3. **Set the delay on the pool.** From the TellerV2 owner `0x2f74c448cf6d613bee183fe35db0c9ac5084f66a`, call `setWithdrawDelayTime` on `0x13cd7cf42ccbaca8cd97e7f09572b6ea0de1097b`.
 
-   The check is `require(_seconds < MAX_WITHDRAW_DELAY_TIME, "WD")`, which is a **strict** less-than. So `2592000` itself still reverts with `WD`. The largest accepted value is `2591999`:
-   ```
-   0x08a6355a0000000000000000000000000000000000000000000000000000000000278cff
-   ```
+   The check is `require(_seconds < MAX_WITHDRAW_DELAY_TIME, "WD")`, a **strict** less-than, so the largest accepted value is `2591999`, not `2592000`.
+
+## What happened on Base
+
+| | |
+|---|---|
+| New implementation | `0xf5d3E8aCf964d4b95ec87B2E849A5Cee3e62239a` (verified; owner: protocol Safe) |
+| Deploy / initialize / transferOwnership | `0x7776ac1b…e1d7` / `0x23a197ee…07d7` / `0x5e89b8cb…6258` |
+| Timelock schedule | `0x0861be58f2a5a0d0016042e939b27101c2474b30d2b3cacf9686b311ecac8315` |
+| Timelock execute (beacon upgraded) | `0x0f081f452d096346e0bd37dd398b5ee2a03f264297dc69b6d9cc95470dae7362` |
+| Pool delay set | `0xd0be05719c01b032c1fb09c73578410597a2e6a3cc6f5bae8f2fea17e00efc65`: `setWithdrawDelayTime(1209600)`, **14 days** |
+
+The execute batch in `deployments/base/upgrades/` also carries `setWithdrawDelayTime(2591999)`; the pool was set to 14 days instead, which is what it reads now.

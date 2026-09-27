@@ -83,6 +83,8 @@ interface Manifest {
   protocolOwner: string
   constructorArgs: Record<string, string>
   expectedImmutables: Record<string, string>
+  /** The one immutable value allowed to differ from the live implementation. */
+  immutableChange: { from: string; to: string }
   lockImplementation?: {
     initialize: Record<string, unknown>
     transferOwnershipTo?: string
@@ -94,6 +96,64 @@ interface Manifest {
     args: string[]
     read?: { signature: string; expect: string }
   }[]
+}
+
+interface Artifact {
+  abi: unknown[]
+  deployedBytecode: string
+  /** [start, length] of every immutable slot in the runtime code, in bytes. */
+  immutableRanges: [number, number][]
+  /** CBOR metadata that ends the runtime code of the unmodified source. */
+  originalRuntimeMetadata: string
+}
+
+interface CodeDiff {
+  /** Bytes that differ outside immutable slots and the metadata trailer. */
+  code: number[]
+  /** Immutable slots whose values differ, as [start, a, b]. */
+  immutables: [number, string, string][]
+  metadataA: string
+  metadataB: string
+}
+
+/**
+ * Compares two runtime codes built from the same compiler layout.
+ *
+ * Immutable values are written into the runtime code at deploy time, and the
+ * trailing CBOR metadata hashes the source, so both legitimately differ
+ * between builds. Everything else is instructions, and has to match byte for
+ * byte for the claim "only a constant changed" to hold.
+ */
+const diffRuntime = (a: string, b: string, ranges: [number, number][]): CodeDiff => {
+  const ha = a.replace(/^0x/, '').toLowerCase()
+  const hb = b.replace(/^0x/, '').toLowerCase()
+  if (ha.length !== hb.length) {
+    throw new Error(`Runtime code sizes differ: ${ha.length / 2} vs ${hb.length / 2} bytes.`)
+  }
+  const metaStart = (h: string): number => h.length / 2 - parseInt(h.slice(-4), 16) - 2
+  const ma = metaStart(ha)
+  if (ma !== metaStart(hb)) throw new Error('Metadata trailers differ in length.')
+
+  const masked = new Set<number>()
+  for (const [start, len] of ranges) for (let i = start; i < start + len; i++) masked.add(i)
+
+  const code: number[] = []
+  for (let i = 0; i < ma; i++) {
+    if (masked.has(i)) continue
+    if (ha.substr(i * 2, 2) !== hb.substr(i * 2, 2)) code.push(i)
+  }
+  const immutables: [number, string, string][] = []
+  for (const [start, len] of ranges) {
+    const va = ha.substr(start * 2, len * 2)
+    const vb = hb.substr(start * 2, len * 2)
+    if (va !== vb) immutables.push([start, va, vb])
+  }
+  return {
+    code,
+    immutables,
+    metadataA: `0x${ha.slice(ma * 2)}`,
+    metadataB: `0x${hb.slice(ma * 2)}`,
+  }
 }
 
 interface SafeTx {
@@ -235,7 +295,7 @@ task(
       .trim()
     const artifact = JSON.parse(
       fs.readFileSync(path.join(dir, `${manifest.contractName}.json`), 'utf8')
-    ) as { abi: unknown[]; deployedBytecode: string }
+    ) as Artifact
     const expectedRuntimeBytes = (artifact.deployedBytecode.length - 2) / 2
 
     const chainId = Number((await ethers.provider.getNetwork()).chainId)
@@ -328,6 +388,28 @@ task(
     }
     console.log('  live immutables match the manifest')
 
+    // The live implementation's instructions must be exactly the reviewed
+    // build's: the artifact's runtime code has zeros where immutables go, so
+    // those slots and the metadata trailer are the only bytes skipped. This is
+    // what proves the source directory is the source of what is running.
+    const liveCode = await ethers.provider.getCode(liveImpl)
+    const pre = diffRuntime(liveCode, artifact.deployedBytecode, artifact.immutableRanges)
+    if (pre.code.length > 0) {
+      throw new Error(
+        `The live implementation ${liveImpl} differs from the reviewed build in ${pre.code.length} instruction byte(s), first at byte ${pre.code[0]}. The build is not a one-constant change from what is running.`
+      )
+    }
+    console.log(
+      `  live code == reviewed build outside ${artifact.immutableRanges.length} immutable slots and the metadata hash`
+    )
+    console.log(
+      `  live metadata ${
+        same(pre.metadataA, artifact.originalRuntimeMetadata)
+          ? 'equals the unmodified source build: same source, byte for byte'
+          : 'differs from the unmodified source build (paths or settings in the hash); instructions still match'
+      }`
+    )
+
     const [proposerRole, executorRole] = await Promise.all([
       timelock.PROPOSER_ROLE() as Promise<string>,
       timelock.EXECUTOR_ROLE() as Promise<string>,
@@ -390,6 +472,31 @@ task(
         `${implAddress} has ${runtimeBytes} bytes of code; the reviewed build has ${expectedRuntimeBytes}.`
       )
     }
+
+    // New against live, both as deployed: identical instructions, and the
+    // only immutable values that differ are the one constant, from its old
+    // value to its new one.
+    const post = diffRuntime(liveCode, code, artifact.immutableRanges)
+    if (post.code.length > 0) {
+      throw new Error(
+        `${implAddress} differs from the live implementation in ${post.code.length} instruction byte(s), first at byte ${post.code[0]}. Do not put it behind the beacon.`
+      )
+    }
+    const change = manifest.immutableChange
+    const word = (v: string): string => BigInt(v).toString(16).padStart(64, '0')
+    const unexpected = post.immutables.filter(
+      ([, a, b]) => a !== word(change.from) || b !== word(change.to)
+    )
+    if (unexpected.length > 0 || post.immutables.length === 0) {
+      throw new Error(
+        `Immutable values differ from the live implementation other than ${change.from} -> ${change.to}: ${JSON.stringify(
+          unexpected.length > 0 ? unexpected : 'none changed at all'
+        )}`
+      )
+    }
+    console.log(
+      `  new code == live code except ${post.immutables.length} immutable slot(s) ${change.from} -> ${change.to} and the metadata hash`
+    )
     const impl = new Contract(
       implAddress,
       [

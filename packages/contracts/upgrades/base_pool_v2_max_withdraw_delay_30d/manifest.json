@@ -18,6 +18,10 @@
     "MAX_WITHDRAW_DELAY_TIME": "2592000",
     "DEFAULT_WITHDRAW_DELAY_TIME_SECONDS": "300"
   },
+  "immutableChange": {
+    "from": "86400",
+    "to": "2592000"
+  },
   "lockImplementation": {
     "initialize": {
       "principalTokenAddress": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
@@ -45,7 +49,9 @@
       "label": "Set the Base USDC pool's withdraw delay to 30 days less one second (the check is a strict <)",
       "to": "0x13cd7cf42ccbaca8cd97e7f09572b6ea0de1097b",
       "signature": "function setWithdrawDelayTime(uint256 _seconds)",
-      "args": ["2591999"],
+      "args": [
+        "2591999"
+      ],
       "read": {
         "signature": "function withdrawDelayTimeSeconds() view returns (uint256)",
         "expect": "2591999"

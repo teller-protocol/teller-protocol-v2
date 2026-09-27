@@ -1,0 +1,26 @@
+{
+  "version": "1.0",
+  "chainId": "8453",
+  "createdAt": 1790489934672,
+  "meta": {
+    "name": "Execute: base_pool_v2_max_withdraw_delay_30d",
+    "description": "Executes the scheduled upgrade, then: Set the Base USDC pool's withdraw delay to 30 days less one second (the check is a strict <)",
+    "txBuilderVersion": "1.16.5"
+  },
+  "transactions": [
+    {
+      "to": "0x6BBf498C429C51d05bcA3fC67D2C720B15FC73B8",
+      "value": "0",
+      "data": "0x134008d30000000000000000000000007848585b707f54ccf7044f8c82cf53f43100dc83000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000e5f3177ceec3d7a1573d15283e0baf4a6124cedb0f0f1dd32563a8bfe63951e100000000000000000000000000000000000000000000000000000000000000243659cfe6000000000000000000000000f5d3e8acf964d4b95ec87b2e849a5cee3e62239a00000000000000000000000000000000000000000000000000000000",
+      "contractMethod": null,
+      "contractInputsValues": null
+    },
+    {
+      "to": "0x13cD7cF42cCBAca8CD97e7F09572B6ea0de1097b",
+      "value": "0",
+      "data": "0x08a6355a0000000000000000000000000000000000000000000000000000000000278cff",
+      "contractMethod": null,
+      "contractInputsValues": null
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "upgrade": "base_pool_v2_max_withdraw_delay_30d",
+  "chainId": 8453,
+  "implementation": "0xf5d3E8aCf964d4b95ec87B2E849A5Cee3e62239a",
+  "beacon": "0x7848585b707F54CcF7044F8C82CF53F43100dc83",
+  "previousImplementation": "0xd177f4b8e348B4C56c2aC8E03b58E41b79351a7f",
+  "timelock": "0x6BBf498C429C51d05bcA3fC67D2C720B15FC73B8",
+  "timelockOperationId": "0xa5ca6ec152ad4062ab9091209e47b145e8ae58cf1ba9a3133a8e1b6bf14251f1",
+  "salt": "0xe5f3177ceec3d7a1573d15283e0baf4a6124cedb0f0f1dd32563a8bfe63951e1",
+  "minDelaySeconds": "7200",
+  "transactions": {
+    "deploy": "0x7776ac1bc2919ba078d4e9c7bf9397e32046880dfc7cf3d393dedb40cfc7e1d7",
+    "initialize": "0x23a197ee76b9230640f8fcd92156f7405ce8f0f5fb3aee8504f9e40273a207d7",
+    "transferOwnership": "0x5e89b8cb4d2fdcb6e1fad3148a84db60bf9af3798fbaf2b8b25fb7c341636258"
+  },
+  "basescanVerification": "Pass - Verified"
+}

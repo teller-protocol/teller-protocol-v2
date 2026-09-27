@@ -209,6 +209,18 @@
 #                           deployer.
 #   SWAP_DRY_RUN=true       with SWAP_VIA_LIFI, print the route and send
 #                           nothing.
+#   DEPLOY_POOL_V2_IMPL=<dir>
+#                           deploy the prebuilt pool implementation in
+#                           upgrades/<dir>/, lock it, verify it, and print the
+#                           two Safe batches (timelock schedule, then execute +
+#                           follow-up calls) that put it behind the beacon, and
+#                           stop. Sends only the deployer's own transactions.
+#   DEPLOY_POOL_V2_IMPL_ADDRESS=<address>
+#                           resume from an implementation an earlier run
+#                           deployed instead of deploying another.
+#   DEPLOY_POOL_V2_IMPL_DRY_RUN=true
+#                           with DEPLOY_POOL_V2_IMPL, check the chain and print
+#                           the plan and gas, and send nothing.
 #   PUBLISH_ONLY=true       publish the package from artifacts already in the
 #                           repo and stop. Needs PUBLISH_PACKAGE=true and
 #                           NPM_TOKEN. Sends no transaction. For a chain that
@@ -1082,6 +1094,47 @@ if [ "${REDEEM_POOL:-}" = "true" ]; then
   fi
 
   log "Done — $NETWORK (redeem)"
+  exit 0
+fi
+
+# Deploy a prebuilt pool implementation and hand the upgrade to the Safe.
+#
+# The beacon belongs to the protocol timelock, so the deployer cannot upgrade
+# it; what it can do is the part that needs a funded key - deploy the reviewed
+# bytecode, initialize the implementation so nobody else owns it, pass that
+# ownership to the protocol Safe, verify the source - and write the timelock
+# schedule/execute calls as Safe Transaction Builder files.
+#
+# Nothing is pushed, whatever PUSH_ARTIFACTS says. The checkout is pinned to a
+# reviewed commit, and pushing it to ARTIFACT_BRANCH would fast-forward that
+# branch onto whatever else the commit carries. The batches and the receipt are
+# printed in full instead, so the log is the record.
+if [ -n "${DEPLOY_POOL_V2_IMPL:-}" ]; then
+  [ -f "upgrades/${DEPLOY_POOL_V2_IMPL}/manifest.json" ] || fail \
+    "DEPLOY_POOL_V2_IMPL=${DEPLOY_POOL_V2_IMPL} but upgrades/${DEPLOY_POOL_V2_IMPL}/manifest.json is not in this checkout ($(git rev-parse --short HEAD)). Repin CONTRACTS_REF."
+  [ -n "${DEPLOYER_MNEMONIC:-}" ] || fail "DEPLOYER_MNEMONIC is not set."
+  printf '%s' "$DEPLOYER_MNEMONIC" > mnemonic.secret
+  chmod 600 mnemonic.secret
+  trap 'rm -f mnemonic.secret' EXIT
+
+  IMPL_ARGS=""
+  [ -n "${DEPLOY_POOL_V2_IMPL_ADDRESS:-}" ] && \
+    IMPL_ARGS="--impl ${DEPLOY_POOL_V2_IMPL_ADDRESS}"
+
+  # Same "true" comparison as every other dry run here.
+  if [ "${DEPLOY_POOL_V2_IMPL_DRY_RUN:-}" = "true" ]; then
+    log "Pool implementation ${DEPLOY_POOL_V2_IMPL} on $NETWORK (dry run — nothing will be sent)"
+    # shellcheck disable=SC2086
+    yarn hh deploy-pool-v2-impl --network "$NETWORK" \
+      --dir "$DEPLOY_POOL_V2_IMPL" --dry-run true $IMPL_ARGS
+  else
+    log "Pool implementation ${DEPLOY_POOL_V2_IMPL} on $NETWORK"
+    # shellcheck disable=SC2086
+    yarn hh deploy-pool-v2-impl --network "$NETWORK" \
+      --dir "$DEPLOY_POOL_V2_IMPL" $IMPL_ARGS
+  fi
+
+  log "Done — $NETWORK (pool implementation ${DEPLOY_POOL_V2_IMPL})"
   exit 0
 fi
 

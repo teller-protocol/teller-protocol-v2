@@ -22,19 +22,16 @@ const deployFn: DeployFunction = async (hre) => {
     'ProtocolPausingManager'
   )
   
-  const lenderGroupsFactory = await hre.contracts.get(
-    'LenderCommitmentGroupFactory_V2'
-  )
-
-
-  const lenderGroupsBeacon = await hre.contracts.get(
-    'LenderCommitmentGroupBeaconV2'
-  )
-
-  const smartCommitmentForwarder = await hre.contracts.get(
-    'SmartCommitmentForwarder'
-  )
- 
+  // The pools contracts are checked only where they were deployed. A chain
+  // that runs lending offers alone (no SmartCommitmentForwarder, no lender
+  // groups) has nothing to check here, and gating on the artifact rather
+  // than a feature flag leaves every chain that has them exactly as before.
+  const hasSmartCommitmentForwarder =
+    (await hre.deployments.getOrNull('SmartCommitmentForwarder')) != null
+  const hasLenderGroupsFactory =
+    (await hre.deployments.getOrNull('LenderCommitmentGroupFactory_V2')) != null
+  const hasLenderGroupsBeacon =
+    (await hre.deployments.getOrNull('LenderCommitmentGroupBeaconV2')) != null
 
 
   //make sure the SCF has been initialized  and has an owner 
@@ -50,6 +47,11 @@ const deployFn: DeployFunction = async (hre) => {
 
 
 
+  if (hasSmartCommitmentForwarder) {
+  const smartCommitmentForwarder = await hre.contracts.get(
+    'SmartCommitmentForwarder'
+  )
+
   const scfOwner = await smartCommitmentForwarder.owner()
 
   
@@ -61,10 +63,18 @@ const deployFn: DeployFunction = async (hre) => {
   if (scfOwner == zeroAddress) {
   	throw "Validation Error : SCF owner not defined " 
   }
+  } else {
+    hre.log('No SmartCommitmentForwarder on this chain; skipping its checks.')
+  }
 
 
 
 
+
+  if (hasLenderGroupsFactory) {
+  const lenderGroupsFactory = await hre.contracts.get(
+    'LenderCommitmentGroupFactory_V2'
+  )
 
   const lenderGroupsFactoryOwner = await lenderGroupsFactory.owner()
 
@@ -78,8 +88,16 @@ const deployFn: DeployFunction = async (hre) => {
   if (lenderGroupsFactoryOwner == zeroAddress) {
   	throw "Validation Error : lenderGroupsFactoryOwner not defined " 
   }
+  } else {
+    hre.log('No LenderCommitmentGroupFactory_V2 on this chain; skipping its checks.')
+  }
 
  
+
+  if (hasLenderGroupsBeacon) {
+  const lenderGroupsBeacon = await hre.contracts.get(
+    'LenderCommitmentGroupBeaconV2'
+  )
 
   const lenderGroupsBeaconOwner = await lenderGroupsBeacon.owner()
 
@@ -91,6 +109,9 @@ const deployFn: DeployFunction = async (hre) => {
  
   if (lenderGroupsBeaconOwner == zeroAddress) {
   	throw "Validation Error : lenderGroupsBeaconOwner not defined " 
+  }
+  } else {
+    hre.log('No LenderCommitmentGroupBeaconV2 on this chain; skipping its checks.')
   }
 
 

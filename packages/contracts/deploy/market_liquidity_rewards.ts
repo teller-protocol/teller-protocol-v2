@@ -1,5 +1,7 @@
 import { DeployFunction } from 'hardhat-deploy/dist/types'
 
+import { isOffersOnlyChain } from '../config/chains/features'
+
 const deployFn: DeployFunction = async (hre) => {
   const tellerV2 = await hre.contracts.get('TellerV2')
   const marketRegistry = await hre.contracts.get('MarketRegistry')
@@ -28,4 +30,9 @@ deployFn.dependencies = [
   'market-registry:deploy',
   'collateral:deploy',
 ]
+
+// Nothing on the lending-offers path calls MarketLiquidityRewards, and on the
+// offers-only Rome chains every byte of code costs Solana rent.
+deployFn.skip = async (hre) => isOffersOnlyChain(hre.network)
+
 export default deployFn

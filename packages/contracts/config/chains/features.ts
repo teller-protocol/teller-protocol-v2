@@ -189,6 +189,15 @@ export const CHAIN_FEATURES: Record<string, ChainFeature[]> = {
     'protocolPausingManager',
     'uniswapV3Quoter',
   ],
+  // Rome (hadrian testnet, rubicon mainnet): lending offers only. No pools,
+  // so no SmartCommitmentForwarder, lender groups or pricing libraries, and
+  // no plain LenderCommitmentForwarder either - Alpha takes the global slot
+  // on purpose (see global-commitment-forwarder.ts). protocolPausingManager
+  // is not optional: TellerV2.initialize reads it and every bid, accept,
+  // repay and liquidate calls it. No hypernativeOracle: Alpha never consults
+  // it.
+  hadrian: ['lenderCommitmentForwarderAlpha', 'protocolPausingManager'],
+  rubicon: ['lenderCommitmentForwarderAlpha', 'protocolPausingManager'],
   sepolia: [
     'lenderCommitmentForwarder',
     'lenderCommitmentForwarderAlpha',
@@ -210,6 +219,19 @@ export const chainSupports = (
   network: Network,
   feature: ChainFeature
 ): boolean => (CHAIN_FEATURES[getNetworkName(network)] ?? []).includes(feature)
+
+/**
+ * Chains that run lending offers and nothing else: no pools, no rewards, no
+ * swaps or rollovers. Some deploy scripts predate the table above and deploy
+ * unconditionally (or on a condition these chains happen to meet, such as
+ * having a Uniswap V3 factory); they skip here instead. On Rome every byte of
+ * code costs Solana rent, so nothing the offers path does not call is
+ * deployed.
+ */
+export const OFFERS_ONLY_CHAINS: readonly string[] = ['hadrian', 'rubicon']
+
+export const isOffersOnlyChain = (network: Network): boolean =>
+  OFFERS_ONLY_CHAINS.includes(getNetworkName(network))
 
 /**
  * A `deployFn.skip` that defers to the table. Live-network check included,

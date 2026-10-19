@@ -51,6 +51,15 @@ export const GLOBAL_COMMITMENT_FORWARDER_OVERRIDES: Record<
   // TellerV2.lenderCommitmentForwarder() == the Alpha proxy, and Alpha reads as
   // trusted on every market as a result.
   robinhood: 'LenderCommitmentForwarderAlpha',
+  // Rome (hadrian testnet, rubicon mainnet). Unlike Robinhood, this one is a
+  // deliberate choice, not an accident. Alpha is the forwarder the app creates
+  // and accepts offers through, and plain LenderCommitmentForwarder would be
+  // ~12 KB of code that nothing calls - and on Rome every byte of code costs
+  // real Solana rent. The price is the one the comment above warns about: a
+  // future pools market would have to spend its own slot on the
+  // SmartCommitmentForwarder. Acceptable on chains with no pools planned.
+  hadrian: 'LenderCommitmentForwarderAlpha',
+  rubicon: 'LenderCommitmentForwarderAlpha',
 }
 
 export const getGlobalCommitmentForwarderName = (

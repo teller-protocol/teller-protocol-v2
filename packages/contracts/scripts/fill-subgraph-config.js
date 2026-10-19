@@ -64,21 +64,33 @@ const SUBSTITUTIONS = {
   LENDER_COMMITMENT_GROUP_FACTORY_V2_ADDRESS: 'LenderCommitmentGroupFactory_V2',
 }
 
+const poolV2Target = path.resolve(
+  __dirname,
+  '..',
+  '..',
+  'subgraph-pool-v2',
+  'config',
+  `${network}.json`
+)
+
 const targets = [
   path.resolve(__dirname, '..', '..', 'subgraph', 'config', `${network}.json`),
-  path.resolve(
-    __dirname,
-    '..',
-    '..',
-    'subgraph-pool-v2',
-    'config',
-    `${network}.json`
-  ),
+  poolV2Target,
 ]
 
 let missing = []
 
 for (const target of targets) {
+  // The pools subgraph indexes LenderCommitmentGroupFactory_V2 and nothing
+  // else of its own. A chain deployed without pools (lending offers only) has
+  // no factory, so there is nothing for that subgraph to index: skip it
+  // rather than count the factory missing and fail the run.
+  if (target === poolV2Target && !addressOf('LenderCommitmentGroupFactory_V2')) {
+    console.log(
+      `skip (no LenderCommitmentGroupFactory_V2 deployed, so no pools to index): ${target}`
+    )
+    continue
+  }
   if (!fs.existsSync(target)) {
     const template = path.join(path.dirname(target), '_template.json')
     if (!fs.existsSync(template)) {

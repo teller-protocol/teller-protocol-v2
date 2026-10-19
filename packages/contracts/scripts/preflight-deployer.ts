@@ -11,7 +11,7 @@
  * somewhere in the middle of pass 1 with a gas error and a half-deployed
  * protocol to reason about.
  */
-import { formatEther, parseEther } from 'ethers'
+import { ZeroAddress, formatEther, parseEther } from 'ethers'
 import hre from 'hardhat'
 
 // Enough for a full two-pass deploy with room to spare; a measured run on an
@@ -36,6 +36,29 @@ async function main(): Promise<void> {
   console.log(`deployer: ${address}`)
   console.log(`balance:  ${formatEther(balance)}`)
   console.log(`nonce:    ${nonce}`)
+
+  // The protocol owner is a constant in hardhat.config.ts on most chains, but
+  // on some (Rome, where there is no Safe) it comes from the environment, and
+  // a forgotten variable falls back to the zero address. Deploying with that
+  // would hand the timelock a zero proposer and the protocol to nobody; with
+  // the deployer as owner, a burner key would own it. Neither is recoverable.
+  if (network.live) {
+    const { protocolOwnerSafe } = await hre.getNamedAccounts()
+    console.log(`owner:    ${protocolOwnerSafe}`)
+    if (protocolOwnerSafe == null || protocolOwnerSafe === ZeroAddress) {
+      throw new Error(
+        `protocolOwnerSafe is the zero address on ${network.name}. Set the ` +
+          `protocol owner for this chain (see namedAccounts in ` +
+          `hardhat.config.ts) before deploying.`
+      )
+    }
+    if (protocolOwnerSafe.toLowerCase() === address.toLowerCase()) {
+      throw new Error(
+        `protocolOwnerSafe on ${network.name} is the deployer ${address}. ` +
+          `The protocol owner must be a separate account from the deploy key.`
+      )
+    }
+  }
 
   const minimum = parseEther(MIN_BALANCE)
   if (balance < minimum) {

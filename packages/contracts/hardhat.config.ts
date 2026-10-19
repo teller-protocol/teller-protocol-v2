@@ -115,6 +115,8 @@ type NetworkNames =
   | 'xdc'
   | 'robinhood'
   | 'arc'
+  | 'hadrian'
+  | 'rubicon'
   | 'sepolia'
   | 'mumbai'
   | 'goerli'
@@ -196,6 +198,17 @@ const networkUrls: Record<NetworkNames, string> = {
         (ALCHEMY_API_KEY
           ? `https://arc-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
           : 'https://arc.drpc.org'),
+
+      // Rome. An EVM that executes inside a Solana program; gas is USDC with
+      // 18 decimals on the EVM side. There is no Alchemy slug, so the public,
+      // keyless RPC is the default and the env var only overrides it.
+      // hadrian is the public testnet (200010), rubicon the mainnet (7531).
+      hadrian:
+        process.env.HADRIAN_RPC_URL ??
+        'https://hadrian.testnet.romeprotocol.xyz/',
+      rubicon:
+        process.env.RUBICON_RPC_URL ??
+        'https://rubicon.mainnet.romeprotocol.xyz/',
 
   mantle: 'https://rpc.mantle.xyz',
 
@@ -282,6 +295,11 @@ export default <HardhatUserConfig>{
       arc:
         process.env.ARC_VERIFY_API_KEY ??
         process.env.ETHERSCANV2_VERIFY_API_KEY,
+
+      // Rome verifies through Sourcify, not Etherscan, so the key is never
+      // used; it only has to be non-empty.
+      hadrian: 'sourcify',
+      rubicon: 'sourcify',
 
       mantle: process.env.MANTLE_VERIFY_API_KEY ?? 'xyz',
       clarity: '', //none ? 
@@ -420,6 +438,26 @@ export default <HardhatUserConfig>{
             'https://api.etherscan.io/v2/api?chainid=5042',
           browserURL:
             process.env.ARC_EXPLORER_URL ?? 'https://arc.etherscan.io',
+        },
+      },
+      {
+        // Rome. The explorer is Rome Via, and verification is Sourcify, which
+        // hardhat-verify's Etherscan client does not speak. These entries
+        // exist so logTxLink prints explorer links; verify against Sourcify
+        // separately, from the deployment artifacts.
+        network: 'hadrian',
+        chainId: 200010,
+        urls: {
+          apiURL: 'https://verify.testnet.romeprotocol.xyz',
+          browserURL: 'https://via-hadrian.testnet.romeprotocol.xyz',
+        },
+      },
+      {
+        network: 'rubicon',
+        chainId: 7531,
+        urls: {
+          apiURL: 'https://verify.mainnet.romeprotocol.xyz',
+          browserURL: 'https://via-rubicon.mainnet.romeprotocol.xyz',
         },
       },
       {
@@ -591,6 +629,12 @@ export default <HardhatUserConfig>{
       // proxy, `getThreshold()` returns 2, and `getOwners()` returns the same
       // five owners as Robinhood's.
       5042: '0x654Dc22CC48Ca029A0EAD3Bf66e73BF2db71eA28',
+      // Rome (hadrian testnet, rubicon mainnet). Safe is not deployed on
+      // Rome, so on these chains this is an EOA (a hardware wallet), despite
+      // the name. Taken from the environment; the zero default is refused by
+      // scripts/preflight-deployer.ts on live networks.
+      200010: process.env.HADRIAN_PROTOCOL_OWNER ?? '0x0000000000000000000000000000000000000000',
+      7531: process.env.RUBICON_PROTOCOL_OWNER ?? '0x0000000000000000000000000000000000000000',
     },
     protocolTimelock: {
       31337: 8,
@@ -617,6 +661,11 @@ export default <HardhatUserConfig>{
       // Arc. Same two-pass hand-off: pass 1 deploys the timelock, pass 2
       // consumes it from ARC_TIMELOCK_ADDRESS.
       5042: process.env.ARC_TIMELOCK_ADDRESS ?? '0x0000000000000000000000000000000000000000',
+      // Rome. Same two-pass hand-off as Robinhood and Arc: pass 1 deploys the
+      // timelock, pass 2 consumes it from HADRIAN_TIMELOCK_ADDRESS /
+      // RUBICON_TIMELOCK_ADDRESS.
+      200010: process.env.HADRIAN_TIMELOCK_ADDRESS ?? '0x0000000000000000000000000000000000000000',
+      7531: process.env.RUBICON_TIMELOCK_ADDRESS ?? '0x0000000000000000000000000000000000000000',
     },
   },
 
@@ -863,6 +912,29 @@ export default <HardhatUserConfig>{
             process.env.ETHERSCANV2_VERIFY_API_KEY,
         },
       },
+    }),
+
+    // Rome. Fees are left to ethers by default: the block base fee equals
+    // eth_gasPrice there, so that should land. Rome's proxy enforces a
+    // minimum gas price and serves stub fee history, so if a transaction
+    // comes back "transaction underpriced", set <NET>_GAS_PRICE (in wei) to
+    // pin a legacy gasPrice, e.g. ~1.1x eth_gasPrice.
+    hadrian: networkConfig({
+      url: networkUrls.hadrian,
+      chainId: 200010,
+      live: true,
+      ...(process.env.HADRIAN_GAS_PRICE
+        ? { gasPrice: Number(process.env.HADRIAN_GAS_PRICE) }
+        : {}),
+    }),
+
+    rubicon: networkConfig({
+      url: networkUrls.rubicon,
+      chainId: 7531,
+      live: true,
+      ...(process.env.RUBICON_GAS_PRICE
+        ? { gasPrice: Number(process.env.RUBICON_GAS_PRICE) }
+        : {}),
     }),
 
     clarity: networkConfig({

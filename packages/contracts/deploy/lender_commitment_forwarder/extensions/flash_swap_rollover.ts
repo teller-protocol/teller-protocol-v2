@@ -2,6 +2,7 @@ import { DeployFunction } from 'hardhat-deploy/dist/types'
 
 
 import { get_ecosystem_contract_address, get_swap_rollover_weth9_address } from "../../../helpers/ecosystem-contracts-lookup"
+import { isOffersOnlyChain } from "../../../config/chains/features"
 
 /*
 const uniswapV3Factory: { [networkName: string]: string } = {
@@ -78,6 +79,12 @@ deployFn.skip = async (hre) => {
  
 
 
-  return !hre.network.live || !uniswapV3FactoryAddress
+  // Offers-only chains have a factory but no rollover: no pools to swap
+  // through, and the code would cost rent for nothing.
+  return (
+    !hre.network.live ||
+    !uniswapV3FactoryAddress ||
+    isOffersOnlyChain(hre.network)
+  )
 }
 export default deployFn

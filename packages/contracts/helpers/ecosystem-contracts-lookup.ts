@@ -55,6 +55,20 @@ export function get_ecosystem_contract_address(
 	      // that same pool.
 	      uniswapV3FactoryAddress = '0xf0db7b58379503491d857dB50AC9ece64c653918'
 	      break
+	    case 'rubicon':
+	      // Rome mainnet (7531), from Rome's published contract addresses. There
+	      // are no usable pools for our pairs, so offers here are fixed-price;
+	      // Alpha points at the factory anyway so TWAP-priced offers become
+	      // possible later without a redeploy. No weth9: nothing on the
+	      // offers-only path wraps native.
+	      uniswapV3FactoryAddress = '0x02aed7762fdc8bae826e7ee0ac2d2e1f754ba025'
+	      break
+	    case 'hadrian':
+	      // Rome public testnet (200010), from Rome's published contract
+	      // addresses. Same situation as rubicon: no usable pools, fixed-price
+	      // offers.
+	      uniswapV3FactoryAddress = '0xD9E323088561D40267767b52252595ea9cF1D5bD'
+	      break
 	    default:
 	      return undefined 
 	  }
